@@ -307,7 +307,7 @@ public:
 	void tourvision_i8155_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void tourvision_i8155_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void tourvision_i8155_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(tourvision_timer_out);
+	void tourvision_timer_out(int state);
 	required_device<cpu_device> m_subcpu;
 	required_device<generic_slot_device> m_cart;
 	uint32_t  m_rom_size;
@@ -485,7 +485,7 @@ void tourvision_state::tourvision_i8155_c_w(address_space &space, offs_t offset,
 	//logerror("i8155 Port C: %02X\n", data);
 }
 
-WRITE_LINE_MEMBER(tourvision_state::tourvision_timer_out)
+void tourvision_state::tourvision_timer_out(int state)
 {
 	m_subcpu->set_input_line(I8085_RST55_LINE, state ? CLEAR_LINE : ASSERT_LINE );
 	//logerror("Timer out %d\n", state);

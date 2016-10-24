@@ -90,7 +90,7 @@ public:
 	void sega_road_control_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) { m_segaic16road->segaic16_road_control_0_w(space,offset,data,mem_mask); };
 
 	CUSTOM_INPUT_MEMBER( bankmotor_pos_r );
-	TIMER_DEVICE_CALLBACK_MEMBER(bankmotor_update);
+	void bankmotor_update(timer_device &timer, void *ptr, int32_t param);
 
 protected:
 	// timer IDs
@@ -108,7 +108,7 @@ protected:
 
 	// internal helpers
 	void update_main_irqs();
-	DECLARE_WRITE_LINE_MEMBER(m68k_reset_callback);
+	void m68k_reset_callback(int state);
 
 	// custom I/O
 	uint16_t outrun_custom_io_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);

@@ -304,13 +304,13 @@ INPUT_PORTS_END
 /* Palette Initialization */
 
 
-PALETTE_INIT_MEMBER(zx_state, zx)
+void zx_state::palette_init_zx(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t::white());
 	palette.set_pen_color(1, rgb_t::black());
 }
 
-PALETTE_INIT_MEMBER(zx_state,ts1000)
+void zx_state::palette_init_ts1000(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(64, 244, 244)); /* cyan */
 	palette.set_pen_color(1, rgb_t::black());

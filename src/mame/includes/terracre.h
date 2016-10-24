@@ -45,10 +45,10 @@ public:
 	void init_amazon();
 	void init_amatelas();
 	void init_horekid();
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(terracre);
+	void palette_init_terracre(palette_device &palette);
 	void machine_start_amazon();
 	uint32_t screen_update_amazon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );

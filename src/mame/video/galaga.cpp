@@ -325,7 +325,7 @@ struct galaga_state::star galaga_state::m_star_seed_tab[252]=
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(galaga_state,galaga)
+void galaga_state::palette_init_galaga(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -390,7 +390,7 @@ PALETTE_INIT_MEMBER(galaga_state,galaga)
 ***************************************************************************/
 
 /* convert from 32x32 to 36x28 */
-TILEMAP_MAPPER_MEMBER(galaga_state::tilemap_scan)
+tilemap_memory_index galaga_state::tilemap_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	int offs;
 
@@ -405,7 +405,7 @@ TILEMAP_MAPPER_MEMBER(galaga_state::tilemap_scan)
 }
 
 
-TILE_GET_INFO_MEMBER(galaga_state::get_tile_info)
+void galaga_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	/* the hardware has two character sets, one normal and one x-flipped. When
 	   screen is flipped, character y flip is done by the hardware inverting the

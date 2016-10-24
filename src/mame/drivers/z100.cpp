@@ -196,8 +196,8 @@ public:
 	uint8_t get_slave_ack(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void video_pia_A_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void video_pia_B_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(video_pia_CA2_w);
-	DECLARE_WRITE_LINE_MEMBER(video_pia_CB2_w);
+	void video_pia_CA2_w(int state);
+	void video_pia_CB2_w(int state);
 	std::unique_ptr<uint8_t[]> m_gvram;
 	uint8_t m_keyb_press,m_keyb_status;
 	uint8_t m_vram_enable;
@@ -625,7 +625,7 @@ void z100_state::video_pia_B_w(address_space &space, offs_t offset, uint8_t data
 }
 
 /* clear screen */
-WRITE_LINE_MEMBER( z100_state::video_pia_CA2_w )
+void z100_state::video_pia_CA2_w(int state)
 {
 	int i;
 
@@ -633,7 +633,7 @@ WRITE_LINE_MEMBER( z100_state::video_pia_CA2_w )
 		m_gvram[i] = m_clr_val;
 }
 
-WRITE_LINE_MEMBER( z100_state::video_pia_CB2_w )
+void z100_state::video_pia_CB2_w(int state)
 {
 	m_clr_val = (state & 1) ? 0x00 : 0xff;
 }

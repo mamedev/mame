@@ -30,12 +30,12 @@
  *
  *************************************/
 
-WRITE_LINE_MEMBER(micro3d_state::duart_irq_handler)
+void micro3d_state::duart_irq_handler(int state)
 {
 	m_maincpu->set_input_line_and_vector(3, state, m_duart68681->get_irq_vector());
 }
 
-WRITE_LINE_MEMBER(micro3d_state::duart_txb)
+void micro3d_state::duart_txb(int state)
 {
 	m_m68681_tx0 = state;
 	m_audiocpu->set_input_line(MCS51_RX_LINE, ASSERT_LINE);
@@ -245,7 +245,7 @@ void micro3d_state::device_timer(emu_timer &timer, device_timer_id id, int param
 	}
 }
 
-TIMER_CALLBACK_MEMBER(micro3d_state::mac_done_callback)
+void micro3d_state::mac_done_callback(void *ptr, int32_t param)
 {
 	m_drmath->set_input_line(AM29000_INTR0, ASSERT_LINE);
 	m_mac_stat = 0;
@@ -481,7 +481,7 @@ uint16_t micro3d_state::micro3d_encoder_l_r(address_space &space, offs_t offset,
 	return ((y_encoder & 0xff) << 8) | (x_encoder & 0xff);
 }
 
-TIMER_CALLBACK_MEMBER(micro3d_state::adc_done_callback)
+void micro3d_state::adc_done_callback(void *ptr, int32_t param)
 {
 	switch (param)
 	{

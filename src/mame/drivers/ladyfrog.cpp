@@ -71,7 +71,7 @@ void ladyfrog_state::sound_cpu_reset_w(address_space &space, offs_t offset, uint
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 1 ) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-TIMER_CALLBACK_MEMBER(ladyfrog_state::nmi_callback)
+void ladyfrog_state::nmi_callback(void *ptr, int32_t param)
 {
 	if (m_sound_nmi_enable)
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);

@@ -19,7 +19,7 @@
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(atarisy2_state::get_alpha_tile_info)
+void atarisy2_state::get_alpha_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t data = tilemap.basemem_read(tile_index);
 	int code = data & 0x3ff;
@@ -28,7 +28,7 @@ TILE_GET_INFO_MEMBER(atarisy2_state::get_alpha_tile_info)
 }
 
 
-TILE_GET_INFO_MEMBER(atarisy2_state::get_playfield_tile_info)
+void atarisy2_state::get_playfield_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t data = tilemap.basemem_read(tile_index);
 	int code = m_playfield_tile_bank[(data >> 10) & 1] + (data & 0x3ff);
@@ -129,7 +129,7 @@ void atarisy2_state::xscroll_w(address_space &space, offs_t offset, uint16_t dat
 }
 
 
-TIMER_CALLBACK_MEMBER(atarisy2_state::reset_yscroll_callback)
+void atarisy2_state::reset_yscroll_callback(void *ptr, int32_t param)
 {
 	m_playfield_tilemap->set_scrolly(0, param);
 }
@@ -170,7 +170,7 @@ void atarisy2_state::yscroll_w(address_space &space, offs_t offset, uint16_t dat
  *
  *************************************/
 
-PALETTE_DECODER_MEMBER( atarisy2_state, RRRRGGGGBBBBIIII )
+rgb_t atarisy2_state::RRRRGGGGBBBBIIII_decoder(uint32_t raw)
 {
 	static const int ZB = 115, Z3 = 78, Z2 = 37, Z1 = 17, Z0 = 9;
 

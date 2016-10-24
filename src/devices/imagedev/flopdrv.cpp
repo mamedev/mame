@@ -164,7 +164,7 @@ void legacy_floppy_image_device::floppy_drive_index_func()
 		m_index_pulse_callback(m_controller, this, m_idx);
 }
 
-TIMER_CALLBACK_MEMBER(legacy_floppy_image_device::floppy_drive_index_callback)
+void legacy_floppy_image_device::floppy_drive_index_callback(void *ptr, int32_t param)
 {
 	floppy_drive_index_func();
 }
@@ -465,7 +465,7 @@ error:
 	return image_init_result::FAIL;
 }
 
-TIMER_CALLBACK_MEMBER( legacy_floppy_image_device::set_wpt )
+void legacy_floppy_image_device::set_wpt(void *ptr, int32_t param)
 {
 	m_wpt = param;
 	//m_out_wpt_func(param);
@@ -545,28 +545,28 @@ int floppy_get_count(running_machine &machine)
 
 
 /* drive select 0 */
-WRITE_LINE_MEMBER( legacy_floppy_image_device::floppy_ds0_w )
+void legacy_floppy_image_device::floppy_ds0_w(int state)
 {
 	if (state == CLEAR_LINE)
 		m_active = (m_drive_id == 0);
 }
 
 /* drive select 1 */
-WRITE_LINE_MEMBER( legacy_floppy_image_device::floppy_ds1_w )
+void legacy_floppy_image_device::floppy_ds1_w(int state)
 {
 	if (state == CLEAR_LINE)
 		m_active = (m_drive_id == 1);
 }
 
 /* drive select 2 */
-WRITE_LINE_MEMBER( legacy_floppy_image_device::floppy_ds2_w )
+void legacy_floppy_image_device::floppy_ds2_w(int state)
 {
 	if (state == CLEAR_LINE)
 		m_active = (m_drive_id == 2);
 }
 
 /* drive select 3 */
-WRITE_LINE_MEMBER( legacy_floppy_image_device::floppy_ds3_w )
+void legacy_floppy_image_device::floppy_ds3_w(int state)
 {
 	if (state == CLEAR_LINE)
 		m_active = (m_drive_id == 3);
@@ -582,7 +582,7 @@ void legacy_floppy_image_device::floppy_ds_w(address_space &space, offs_t offset
 }
 
 /* motor on, active low */
-WRITE_LINE_MEMBER( legacy_floppy_image_device::floppy_mon_w )
+void legacy_floppy_image_device::floppy_mon_w(int state)
 {
 	/* force off if there is no attached image */
 	if (!exists())
@@ -603,18 +603,18 @@ WRITE_LINE_MEMBER( legacy_floppy_image_device::floppy_mon_w )
 }
 
 /* direction */
-WRITE_LINE_MEMBER( legacy_floppy_image_device::floppy_drtn_w )
+void legacy_floppy_image_device::floppy_drtn_w(int state)
 {
 	m_drtn = state;
 }
 
 /* write data */
-WRITE_LINE_MEMBER( legacy_floppy_image_device::floppy_wtd_w )
+void legacy_floppy_image_device::floppy_wtd_w(int state)
 {
 }
 
 /* step */
-WRITE_LINE_MEMBER( legacy_floppy_image_device::floppy_stp_w )
+void legacy_floppy_image_device::floppy_stp_w(int state)
 {
 	/* move head one track when going from high to low and write gate is high */
 	if (m_active && m_stp && state == CLEAR_LINE && m_wtg)
@@ -647,31 +647,31 @@ WRITE_LINE_MEMBER( legacy_floppy_image_device::floppy_stp_w )
 }
 
 /* write gate */
-WRITE_LINE_MEMBER( legacy_floppy_image_device::floppy_wtg_w )
+void legacy_floppy_image_device::floppy_wtg_w(int state)
 {
 	m_wtg = state;
 }
 
 /* write protect signal, active low */
-READ_LINE_MEMBER( legacy_floppy_image_device::floppy_wpt_r )
+int legacy_floppy_image_device::floppy_wpt_r()
 {
 	return m_wpt;
 }
 
 /* track 0 detect */
-READ_LINE_MEMBER( legacy_floppy_image_device::floppy_tk00_r )
+int legacy_floppy_image_device::floppy_tk00_r()
 {
 	return m_tk00;
 }
 
 /* disk changed */
-READ_LINE_MEMBER( legacy_floppy_image_device::floppy_dskchg_r )
+int legacy_floppy_image_device::floppy_dskchg_r()
 {
 	return m_dskchg;
 }
 
 /* 2-sided disk */
-READ_LINE_MEMBER( legacy_floppy_image_device::floppy_twosid_r )
+int legacy_floppy_image_device::floppy_twosid_r()
 {
 	if (m_floppy == nullptr)
 		return ASSERT_LINE;
@@ -679,12 +679,12 @@ READ_LINE_MEMBER( legacy_floppy_image_device::floppy_twosid_r )
 		return !floppy_get_heads_per_disk(m_floppy);
 }
 
-READ_LINE_MEMBER( legacy_floppy_image_device::floppy_index_r )
+int legacy_floppy_image_device::floppy_index_r()
 {
 	return m_idx;
 }
 
-READ_LINE_MEMBER( legacy_floppy_image_device::floppy_ready_r )
+int legacy_floppy_image_device::floppy_ready_r()
 {
 	return !(floppy_drive_get_flag_state(FLOPPY_DRIVE_READY) == FLOPPY_DRIVE_READY);
 }

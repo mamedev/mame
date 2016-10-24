@@ -53,7 +53,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_asterix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(asterix_interrupt);
+	void asterix_interrupt(device_t &device);
 	K05324X_CB_MEMBER(sprite_callback);
 	K056832_CB_MEMBER(tile_callback);
 	void reset_spritebank();

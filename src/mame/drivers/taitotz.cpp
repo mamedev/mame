@@ -605,10 +605,10 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_taitotz(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(taitotz_vbi);
+	void taitotz_vbi(device_t &device);
 	uint16_t tlcs_ide0_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	uint16_t tlcs_ide1_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
-	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
+	void ide_interrupt(int state);
 	void draw_tile(uint32_t pos, uint32_t tile);
 	uint32_t video_mem_r(uint32_t address);
 	void video_mem_w(uint32_t address, uint32_t data);
@@ -2546,12 +2546,12 @@ void taitotz_state::machine_start()
 }
 
 
-INTERRUPT_GEN_MEMBER(taitotz_state::taitotz_vbi)
+void taitotz_state::taitotz_vbi(device_t &device)
 {
 	m_iocpu->set_input_line(TLCS900_INT3, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(taitotz_state::ide_interrupt)
+void taitotz_state::ide_interrupt(int state)
 {
 	m_iocpu->set_input_line(TLCS900_INT2, state);
 }

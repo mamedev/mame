@@ -379,7 +379,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-INTERRUPT_GEN_MEMBER(vendetta_state::irq)
+void vendetta_state::irq(device_t &device)
 {
 	if (m_irq_enabled)
 		device.execute().set_input_line(KONAMI_IRQ_LINE, HOLD_LINE);

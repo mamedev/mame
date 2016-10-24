@@ -39,7 +39,7 @@ public:
 	required_device<speaker_sound_device> m_speaker;
 	required_region_ptr<uint8_t> m_bios;
 
-	DECLARE_PALETTE_INIT(svmu);
+	void palette_init_svmu(palette_device &palette);
 	virtual void machine_reset() override;
 
 	void page_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -150,7 +150,7 @@ void svmu_state::machine_reset()
 	m_page = 0;
 }
 
-PALETTE_INIT_MEMBER(svmu_state, svmu)
+void svmu_state::palette_init_svmu(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));

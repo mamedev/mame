@@ -26,7 +26,7 @@ const unsigned char lviv_palette[8*3] =
 };
 
 
-PALETTE_INIT_MEMBER(lviv_state, lviv)
+void lviv_state::palette_init_lviv(palette_device &palette)
 {
 	int i;
 

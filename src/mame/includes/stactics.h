@@ -63,11 +63,11 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(get_not_shot_arrive);
 	DECLARE_CUSTOM_INPUT_MEMBER(get_motor_not_ready);
 	DECLARE_CUSTOM_INPUT_MEMBER(get_rng);
-	INTERRUPT_GEN_MEMBER(interrupt);
+	void interrupt(device_t &device);
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(stactics);
+	void palette_init_stactics(palette_device &palette);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void update_beam();

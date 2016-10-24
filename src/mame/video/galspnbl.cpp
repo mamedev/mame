@@ -4,7 +4,7 @@
 #include "includes/galspnbl.h"
 
 
-PALETTE_INIT_MEMBER(galspnbl_state, galspnbl)
+void galspnbl_state::palette_init_galspnbl(palette_device &palette)
 {
 	int i;
 

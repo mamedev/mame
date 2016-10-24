@@ -86,11 +86,11 @@ public:
 	uint8_t ls259_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void ls259_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t pia_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( pia_cb2_w );
-	DECLARE_WRITE_LINE_MEMBER( pit_out2_w );
-	DECLARE_READ_LINE_MEMBER( ay3600_shift_r );
-	DECLARE_READ_LINE_MEMBER( ay3600_control_r );
-	DECLARE_WRITE_LINE_MEMBER( ay3600_data_ready_w );
+	void pia_cb2_w(int state);
+	void pit_out2_w(int state);
+	int ay3600_shift_r();
+	int ay3600_control_r();
+	void ay3600_data_ready_w(int state);
 	MC6845_UPDATE_ROW( crtc_update_row );
 
 	/* memory state */
@@ -109,14 +109,14 @@ public:
 	int m_motor_on;
 	int m_motor0;
 	int m_motor1;
-	TIMER_DEVICE_CALLBACK_MEMBER(floppy_motor_off_tick);
-	DECLARE_WRITE_LINE_MEMBER(pit_out0_w);
+	void floppy_motor_off_tick(timer_device &timer, void *ptr, int32_t param);
+	void pit_out0_w(int state);
 	DECLARE_FLOPPY_FORMATS( bw12_floppy_formats );
 	DECLARE_FLOPPY_FORMATS( bw14_floppy_formats );
 
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_fault);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
+	void write_centronics_busy(int state);
+	void write_centronics_fault(int state);
+	void write_centronics_perror(int state);
 	int m_centronics_busy;
 	int m_centronics_fault;
 	int m_centronics_perror;

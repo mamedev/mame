@@ -322,7 +322,7 @@ void ec_1841_keyboard_device::device_reset()
 //  clock_write -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( ec_1841_keyboard_device::clock_write )
+void ec_1841_keyboard_device::clock_write(int state)
 {
 	DBG_LOG(1,0,( "%s: clock write %d\n", tag(), state));
 }
@@ -332,7 +332,7 @@ WRITE_LINE_MEMBER( ec_1841_keyboard_device::clock_write )
 //  data_write -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( ec_1841_keyboard_device::data_write )
+void ec_1841_keyboard_device::data_write(int state)
 {
 	DBG_LOG(1,0,( "%s: data write %d\n", tag(), state));
 }

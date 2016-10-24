@@ -112,10 +112,10 @@ public:
 	uint32_t screen_update_namconb1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_namconb2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(scantimer);
-	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq0_cb);
-	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq2_cb);
-	TIMER_DEVICE_CALLBACK_MEMBER(mcu_adc_cb);
+	void scantimer(timer_device &timer, void *ptr, int32_t param);
+	void mcu_irq0_cb(timer_device &timer, void *ptr, int32_t param);
+	void mcu_irq2_cb(timer_device &timer, void *ptr, int32_t param);
+	void mcu_adc_cb(timer_device &timer, void *ptr, int32_t param);
 
 	int NB1objcode2tile(int code);
 	int NB2objcode2tile(int code);

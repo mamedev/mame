@@ -49,10 +49,10 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(pp01);
+	void palette_init_pp01(palette_device &palette);
 	uint32_t screen_update_pp01(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(pp01_pit_out0);
-	DECLARE_WRITE_LINE_MEMBER(pp01_pit_out1);
+	void pp01_pit_out0(int state);
+	void pp01_pit_out1(int state);
 	uint8_t pp01_8255_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void pp01_8255_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t pp01_8255_portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);

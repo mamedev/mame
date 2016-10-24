@@ -134,7 +134,7 @@ public:
 	// device members
 	uint16_t regs_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void regs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	TIMER_CALLBACK_MEMBER( perform_scan );
+	void perform_scan(void *ptr, int32_t param);
 
 	void ab_init();
 

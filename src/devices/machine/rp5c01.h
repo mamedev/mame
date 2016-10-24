@@ -59,8 +59,8 @@ public:
 
 	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_READ_LINE_MEMBER( alarm_r ) { return m_alarm; }
-	DECLARE_WRITE_LINE_MEMBER( adj_w ) { if (state) adjust_seconds(); }
+	int alarm_r() { return m_alarm; }
+	void adj_w(int state) { if (state) adjust_seconds(); }
 
 protected:
 	// device-level overrides

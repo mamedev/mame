@@ -81,7 +81,7 @@ static const gfx_layout objlayout_6bpp =
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(atarisy1_state::get_alpha_tile_info)
+void atarisy1_state::get_alpha_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t data = tilemap.basemem_read(tile_index);
 	int code = data & 0x3ff;
@@ -91,7 +91,7 @@ TILE_GET_INFO_MEMBER(atarisy1_state::get_alpha_tile_info)
 }
 
 
-TILE_GET_INFO_MEMBER(atarisy1_state::get_playfield_tile_info)
+void atarisy1_state::get_playfield_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t data = tilemap.basemem_read(tile_index);
 	uint16_t lookup = m_playfield_lookup[((data >> 8) & 0x7f) | (m_playfield_tile_bank << 7)];
@@ -270,7 +270,7 @@ void atarisy1_state::atarisy1_xscroll_w(address_space &space, offs_t offset, uin
  *
  *************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(atarisy1_state::atarisy1_reset_yscroll_callback)
+void atarisy1_state::atarisy1_reset_yscroll_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	m_playfield_tilemap->set_scrolly(0, param);
 }
@@ -350,7 +350,7 @@ void atarisy1_state::atarisy1_spriteram_w(address_space &space, offs_t offset, u
  *
  *************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(atarisy1_state::atarisy1_int3off_callback)
+void atarisy1_state::atarisy1_int3off_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -359,7 +359,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(atarisy1_state::atarisy1_int3off_callback)
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(atarisy1_state::atarisy1_int3_callback)
+void atarisy1_state::atarisy1_int3_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

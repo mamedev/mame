@@ -293,13 +293,13 @@ void deco16ic_device::device_reset()
 
 /*****************************************************************************************/
 
-TILEMAP_MAPPER_MEMBER(deco16ic_device::deco16_scan_rows)
+tilemap_memory_index deco16ic_device::deco16_scan_rows(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return (col & 0x1f) + ((row & 0x1f) << 5) + ((col & 0x20) << 5) + ((row & 0x20) << 6);
 }
 
-TILE_GET_INFO_MEMBER(deco16ic_device::get_pf2_tile_info)
+void deco16ic_device::get_pf2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t tile = m_pf2_data[tile_index];
 	uint8_t colour = (tile >> 12) & 0xf;
@@ -325,7 +325,7 @@ TILE_GET_INFO_MEMBER(deco16ic_device::get_pf2_tile_info)
 			flags);
 }
 
-TILE_GET_INFO_MEMBER(deco16ic_device::get_pf1_tile_info)
+void deco16ic_device::get_pf1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t tile = m_pf1_data[tile_index];
 	uint8_t colour = (tile >> 12) & 0xf;
@@ -364,7 +364,7 @@ TILE_GET_INFO_MEMBER(deco16ic_device::get_pf1_tile_info)
 	}
 }
 
-TILE_GET_INFO_MEMBER(deco16ic_device::get_pf2_tile_info_b)
+void deco16ic_device::get_pf2_tile_info_b(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t tile = m_pf2_data[tile_index];
 	uint8_t colour = (tile >> 12) & 0xf;
@@ -390,7 +390,7 @@ TILE_GET_INFO_MEMBER(deco16ic_device::get_pf2_tile_info_b)
 			flags);
 }
 
-TILE_GET_INFO_MEMBER(deco16ic_device::get_pf1_tile_info_b)
+void deco16ic_device::get_pf1_tile_info_b(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t tile = m_pf1_data[tile_index];
 	uint8_t colour = (tile >> 12) & 0xf;

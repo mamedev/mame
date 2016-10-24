@@ -112,7 +112,7 @@ public:
 	uint8_t kageki_csport_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void kageki_csport_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void kabukiz_sound_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+	void irqhandler(int state);
 
 	SAMPLES_START_CB_MEMBER(kageki_init_samples);
 
@@ -128,14 +128,14 @@ public:
 	void init_tnzsb();
 	void machine_start_tnzs();
 	void machine_reset_tnzs();
-	DECLARE_PALETTE_INIT(arknoid2);
+	void palette_init_arknoid2(palette_device &palette);
 	void machine_start_tnzs_common();
 	void machine_reset_jpopnics();
 
 	uint32_t screen_update_tnzs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_tnzs(screen_device &screen, bool state);
 
-	INTERRUPT_GEN_MEMBER(arknoid2_interrupt);
+	void arknoid2_interrupt(device_t &device);
 
 	void mcu_reset();
 	void mcu_handle_coins(int coin);

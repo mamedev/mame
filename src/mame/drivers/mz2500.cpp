@@ -199,9 +199,9 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(mz2500);
+	void palette_init_mz2500(palette_device &palette);
 	uint32_t screen_update_mz2500(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(mz2500_vbl);
+	void mz2500_vbl(device_t &device);
 
 	uint8_t fdc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void fdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -218,9 +218,9 @@ public:
 	uint8_t mz2500_pio1_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t opn_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void opn_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(pit8253_clk0_irq);
-	DECLARE_WRITE_LINE_MEMBER(mz2500_rtc_alarm_irq);
-	IRQ_CALLBACK_MEMBER( mz2500_irq_ack );
+	void pit8253_clk0_irq(int state);
+	void mz2500_rtc_alarm_irq(int state);
+	int mz2500_irq_ack(device_t &device, int irqline);
 
 	void draw_80x25(bitmap_ind16 &bitmap,const rectangle &cliprect,uint16_t map_addr);
 	void draw_40x25(bitmap_ind16 &bitmap,const rectangle &cliprect,int plane,uint16_t map_addr);
@@ -1854,7 +1854,7 @@ static GFXDECODE_START( mz2500 )
 //  GFXDECODE_ENTRY("pcg", 0, mz2500_pcg_layout_3bpp, 0, 4)
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(mz2500_state::mz2500_vbl)
+void mz2500_state::mz2500_vbl(device_t &device)
 {
 	if(m_irq_mask[0])
 	{
@@ -1864,7 +1864,7 @@ INTERRUPT_GEN_MEMBER(mz2500_state::mz2500_vbl)
 	m_cg_clear_flag = 0;
 }
 
-IRQ_CALLBACK_MEMBER(mz2500_state::mz2500_irq_ack)
+int mz2500_state::mz2500_irq_ack(device_t &device, int irqline)
 {
 	int i;
 	for(i=0;i<4;i++)
@@ -2010,7 +2010,7 @@ void mz2500_state::opn_porta_w(address_space &space, offs_t offset, uint8_t data
 	m_ym_porta = data;
 }
 
-PALETTE_INIT_MEMBER(mz2500_state, mz2500)
+void mz2500_state::palette_init_mz2500(palette_device &palette)
 {
 	int i;
 
@@ -2051,7 +2051,7 @@ PALETTE_INIT_MEMBER(mz2500_state, mz2500)
 
 /* PIT8253 Interface */
 
-WRITE_LINE_MEMBER(mz2500_state::pit8253_clk0_irq)
+void mz2500_state::pit8253_clk0_irq(int state)
 {
 	if(m_irq_mask[1] && state & 1)
 	{
@@ -2060,7 +2060,7 @@ WRITE_LINE_MEMBER(mz2500_state::pit8253_clk0_irq)
 	}
 }
 
-WRITE_LINE_MEMBER(mz2500_state::mz2500_rtc_alarm_irq)
+void mz2500_state::mz2500_rtc_alarm_irq(int state)
 {
 	/* TODO: doesn't work yet */
 //  if(m_irq_mask[3] && state & 1)

@@ -284,7 +284,7 @@ void pc1512_keyboard_t::device_timer(emu_timer &timer, device_timer_id id, int p
 //  data_w - keyboard data input
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( pc1512_keyboard_t::data_w )
+void pc1512_keyboard_t::data_w(int state)
 {
 	m_data_in = state;
 }
@@ -294,7 +294,7 @@ WRITE_LINE_MEMBER( pc1512_keyboard_t::data_w )
 //  clock_w - keyboard clock input
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( pc1512_keyboard_t::clock_w )
+void pc1512_keyboard_t::clock_w(int state)
 {
 	if (m_clock_in != state)
 	{
@@ -316,7 +316,7 @@ WRITE_LINE_MEMBER( pc1512_keyboard_t::clock_w )
 //  m1_w - mouse button 1
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( pc1512_keyboard_t::m1_w )
+void pc1512_keyboard_t::m1_w(int state)
 {
 	m_m1 = state;
 }
@@ -326,7 +326,7 @@ WRITE_LINE_MEMBER( pc1512_keyboard_t::m1_w )
 //  m2_w - mouse button 2
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( pc1512_keyboard_t::m2_w )
+void pc1512_keyboard_t::m2_w(int state)
 {
 	m_m2 = state;
 }

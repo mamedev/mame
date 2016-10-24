@@ -70,9 +70,9 @@ public:
 	void init_paradise();
 	void init_tgtball();
 
-	TILE_GET_INFO_MEMBER(get_tile_info_0);
-	TILE_GET_INFO_MEMBER(get_tile_info_1);
-	TILE_GET_INFO_MEMBER(get_tile_info_2);
+	void get_tile_info_0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info_1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info_2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -82,7 +82,7 @@ public:
 	uint32_t screen_update_torus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_madball(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	INTERRUPT_GEN_MEMBER(irq);
+	void irq(device_t &device);
 
 	void update_pix_palbank();
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);

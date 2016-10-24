@@ -59,7 +59,7 @@ void isa8_lpt_device::device_reset()
 	}
 }
 
-WRITE_LINE_MEMBER(isa8_lpt_device::pc_cpu_line)
+void isa8_lpt_device::pc_cpu_line(int state)
 {
 	if (is_primary())
 		m_isa->irq7_w(state);

@@ -70,10 +70,10 @@ public:
 	uint8_t bus_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t drw80pkr_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void init_drw80pkr();
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(drw80pkr);
+	void palette_init_drw80pkr(palette_device &palette);
 	uint32_t screen_update_drw80pkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -332,7 +332,7 @@ uint8_t drw80pkr_state::drw80pkr_io_r(address_space &space, offs_t offset, uint8
 * Video/Character functions *
 ****************************/
 
-TILE_GET_INFO_MEMBER(drw80pkr_state::get_bg_tile_info)
+void drw80pkr_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int color = m_color_ram[tile_index];
 	int code = m_video_ram[tile_index];
@@ -352,7 +352,7 @@ uint32_t drw80pkr_state::screen_update_drw80pkr(screen_device &screen, bitmap_in
 	return 0;
 }
 
-PALETTE_INIT_MEMBER(drw80pkr_state, drw80pkr)
+void drw80pkr_state::palette_init_drw80pkr(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int j;

@@ -47,11 +47,11 @@ public:
 	uint16_t dsp_status_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void dsp_status_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void init_prose2k();
-	DECLARE_WRITE_LINE_MEMBER(i8251_rxrdy_int);
-	DECLARE_WRITE_LINE_MEMBER(i8251_txempty_int);
-	DECLARE_WRITE_LINE_MEMBER(i8251_txrdy_int);
-	DECLARE_WRITE_LINE_MEMBER(dsp_to_8086_p0_w);
-	DECLARE_WRITE_LINE_MEMBER(dsp_to_8086_p1_w);
+	void i8251_rxrdy_int(int state);
+	void i8251_txempty_int(int state);
+	void i8251_txrdy_int(int state);
+	void dsp_to_8086_p0_w(int state);
+	void dsp_to_8086_p1_w(int state);
 };
 
 

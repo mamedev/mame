@@ -99,12 +99,12 @@
     TIMER DEVICE CALLBACKS
 ***************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(mz_state::ne556_cursor_callback)
+void mz_state::ne556_cursor_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	m_cursor_timer ^= 1;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(mz_state::ne556_other_callback)
+void mz_state::ne556_other_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	m_other_timer ^= 1;
 }

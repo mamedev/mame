@@ -142,7 +142,7 @@ void p1_sound_device::dac_w(address_space &space, offs_t offset, uint8_t data, u
 	m_isa->irq7_w(CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER( p1_sound_device::sampler_sync )
+void p1_sound_device::sampler_sync(int state)
 {
 	if (state) {
 		m_dac->write(m_dac_data[m_dac_ptr++]);

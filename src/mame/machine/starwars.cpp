@@ -37,7 +37,7 @@
 
 
 
-TIMER_CALLBACK_MEMBER(starwars_state::math_run_clear)
+void starwars_state::math_run_clear(void *ptr, int32_t param)
 {
 	m_math_run = 0;
 }

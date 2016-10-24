@@ -330,7 +330,7 @@ void x68k_state::x68k_keyboard_push_scancode(unsigned char code)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(x68k_state::x68k_keyboard_poll)
+void x68k_state::x68k_keyboard_poll(void *ptr, int32_t param)
 {
 	int x;
 	static const char *const keynames[] = { "key1", "key2", "key3", "key4" };
@@ -388,8 +388,8 @@ TIMER_CALLBACK_MEMBER(x68k_state::x68k_keyboard_poll)
 		int keyon[0x80];  // is 1 if key is pressed, used to determine if the key state has changed from 1 to 0
 		int last_pressed;  // last key pressed, for repeat key handling
 	} m_keyboard;
-	TIMER_CALLBACK_MEMBER(x68k_led_callback);
-	TIMER_CALLBACK_MEMBER(x68k_keyboard_poll);
+	void x68k_led_callback(void *ptr, int32_t param);
+	void x68k_keyboard_poll(void *ptr, int32_t param);
 	void x68k_keyboard_ctrl_w(int data);
 	int x68k_keyboard_pop_scancode();
 	void x68k_keyboard_push_scancode(unsigned char code);

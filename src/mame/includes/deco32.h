@@ -124,7 +124,7 @@ public:
 	void tattass_control_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	// nslasher and lockload
-	DECLARE_WRITE_LINE_MEMBER(sound_irq_nslasher);
+	void sound_irq_nslasher(int state);
 	uint8_t latch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	// captaven, dragongun and lockload
@@ -164,8 +164,8 @@ public:
 	void video_start_fghthist();
 	void video_start_nslasher();
 
-	INTERRUPT_GEN_MEMBER(deco32_vbl_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(interrupt_gen);
+	void deco32_vbl_interrupt(device_t &device);
+	void interrupt_gen(timer_device &timer, void *ptr, int32_t param);
 
 	uint32_t screen_update_captaven(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_fghthist(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -227,7 +227,7 @@ public:
 	void video_start_lockload();
 	void dragngun_init_common();
 
-	TIMER_DEVICE_CALLBACK_MEMBER(lockload_vbl_irq);
+	void lockload_vbl_irq(timer_device &timer, void *ptr, int32_t param);
 
 	uint32_t screen_update_dragngun(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

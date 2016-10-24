@@ -178,13 +178,13 @@ public:
 	void ay_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void ay_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t pia_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(pia_ca2_w);
+	void pia_ca2_w(int state);
 
 	void machine_reset() override;
 
 	int get_color_offset(uint8_t tile, uint8_t attr, int ra, int px);
 	MC6845_UPDATE_ROW(crtc_update_row);
-	DECLARE_PALETTE_INIT(miniboy7);
+	void palette_init_miniboy7(palette_device &palette);
 
 private:
 	uint8_t m_ay_pb;
@@ -244,7 +244,7 @@ MC6845_UPDATE_ROW( miniboy7_state::crtc_update_row )
 	}
 }
 
-PALETTE_INIT_MEMBER(miniboy7_state, miniboy7)
+void miniboy7_state::palette_init_miniboy7(palette_device &palette)
 {
 /*
     prom bits
@@ -330,7 +330,7 @@ uint8_t miniboy7_state::pia_pb_r(address_space &space, offs_t offset, uint8_t me
 	return (m_input2->read() & 0x0f) | ((m_dsw2->read() << (BIT(m_ay_pb, 7) ? 0 : 4)) & 0xf0);
 }
 
-WRITE_LINE_MEMBER(miniboy7_state::pia_ca2_w)
+void miniboy7_state::pia_ca2_w(int state)
 {
 	m_gpri = state;
 }

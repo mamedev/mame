@@ -24,7 +24,7 @@ sprite_data[8] =
 };
 
 
-TILE_GET_INFO_MEMBER(nemesis_state::get_bg_tile_info)
+void nemesis_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code, color, flags, mask, layer;
 
@@ -59,7 +59,7 @@ TILE_GET_INFO_MEMBER(nemesis_state::get_bg_tile_info)
 	tileinfo.category = mask | (layer << 1);
 }
 
-TILE_GET_INFO_MEMBER(nemesis_state::get_fg_tile_info)
+void nemesis_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code, color, flags, mask, layer;
 

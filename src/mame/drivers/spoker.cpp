@@ -91,8 +91,8 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
@@ -108,13 +108,13 @@ void spoker_state::bg_tile_w(address_space &space, offs_t offset, uint8_t data, 
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(spoker_state::get_bg_tile_info)
+void spoker_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_bg_tile_ram[tile_index];
 	SET_TILE_INFO_MEMBER(1 + (tile_index & 3), code & 0xff, 0, 0);
 }
 
-TILE_GET_INFO_MEMBER(spoker_state::get_fg_tile_info)
+void spoker_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_fg_tile_ram[tile_index] | (m_fg_color_ram[tile_index] << 8);
 	SET_TILE_INFO_MEMBER(0, code, (4*(code >> 14)+3), 0);

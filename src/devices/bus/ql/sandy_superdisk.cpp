@@ -69,7 +69,7 @@ FLOPPY_FORMATS_END
 //  centronics
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( sandy_super_disk_t::busy_w )
+void sandy_super_disk_t::busy_w(int state)
 {
 	m_busy = state;
 	check_interrupt();

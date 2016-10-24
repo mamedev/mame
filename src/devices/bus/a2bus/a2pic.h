@@ -34,7 +34,7 @@ public:
 
 	required_ioport m_dsw1;
 
-	DECLARE_WRITE_LINE_MEMBER( ack_w );
+	void ack_w(int state);
 
 protected:
 	virtual void device_start() override;

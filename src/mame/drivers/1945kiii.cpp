@@ -81,7 +81,7 @@ public:
 	void k3_scrolly_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void k3_soundbanks_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void flagrall_soundbanks_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	TILE_GET_INFO_MEMBER(get_k3_bg_tile_info);
+	void get_k3_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -98,7 +98,7 @@ void k3_state::k3_bgram_w(address_space &space, offs_t offset, uint16_t data, ui
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(k3_state::get_k3_bg_tile_info)
+void k3_state::get_k3_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno = m_bgram[tile_index];
 	SET_TILE_INFO_MEMBER(1, tileno, 0, 0);

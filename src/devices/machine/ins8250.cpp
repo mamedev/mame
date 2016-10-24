@@ -518,31 +518,31 @@ void ins8250_uart_device::update_msr()
 		trigger_int(COM_INT_PENDING_MODEM_STATUS_REGISTER);
 }
 
-WRITE_LINE_MEMBER(ins8250_uart_device::dcd_w)
+void ins8250_uart_device::dcd_w(int state)
 {
 	m_dcd = state;
 	update_msr();
 }
 
-WRITE_LINE_MEMBER(ins8250_uart_device::dsr_w)
+void ins8250_uart_device::dsr_w(int state)
 {
 	m_dsr = state;
 	update_msr();
 }
 
-WRITE_LINE_MEMBER(ins8250_uart_device::ri_w)
+void ins8250_uart_device::ri_w(int state)
 {
 	m_ri = state;
 	update_msr();
 }
 
-WRITE_LINE_MEMBER(ins8250_uart_device::cts_w)
+void ins8250_uart_device::cts_w(int state)
 {
 	m_cts = state;
 	update_msr();
 }
 
-WRITE_LINE_MEMBER(ins8250_uart_device::rx_w)
+void ins8250_uart_device::rx_w(int state)
 {
 	m_rxd = state;
 

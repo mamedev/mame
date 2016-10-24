@@ -1238,7 +1238,7 @@ void avgdvg_device::vg_set_halt(int dummy)
 	m_sync_halt = dummy;
 }
 
-TIMER_CALLBACK_MEMBER( avgdvg_device::vg_set_halt_callback )
+void avgdvg_device::vg_set_halt_callback(void *ptr, int32_t param)
 {
 	vg_set_halt(param);
 }
@@ -1257,7 +1257,7 @@ TIMER_CALLBACK_MEMBER( avgdvg_device::vg_set_halt_callback )
  *
  *******************************************************************/
 
-TIMER_CALLBACK_MEMBER( avgdvg_device::run_state_machine )
+void avgdvg_device::run_state_machine(void *ptr, int32_t param)
 {
 	int cycles = 0;
 	uint8_t *state_prom = machine().root_device().memregion("user1")->base();

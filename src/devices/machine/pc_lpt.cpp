@@ -149,13 +149,13 @@ void pc_lpt_device::update_irq()
 	}
 }
 
-WRITE_LINE_MEMBER( pc_lpt_device::write_irq_enabled )
+void pc_lpt_device::write_irq_enabled(int state)
 {
 	m_irq_enabled = state;
 	update_irq();
 }
 
-WRITE_LINE_MEMBER( pc_lpt_device::write_centronics_ack )
+void pc_lpt_device::write_centronics_ack(int state)
 {
 	m_centronics_ack = state;
 	m_cent_status_in->write_bit6(state);

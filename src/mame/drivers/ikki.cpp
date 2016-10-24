@@ -221,7 +221,7 @@ void ikki_state::machine_reset()
 	m_flipscreen = 0;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(ikki_state::ikki_irq)
+void ikki_state::ikki_irq(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

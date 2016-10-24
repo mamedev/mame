@@ -85,19 +85,19 @@ static SLOT_INTERFACE_START(coco_cart_slot4)
 	SLOT_INTERFACE("pak", COCO_PAK)
 SLOT_INTERFACE_END
 
-WRITE_LINE_MEMBER(coco_multipak_device::multi_cart_w)
+void coco_multipak_device::multi_cart_w(int state)
 {
 	cococart_slot_device *cart = dynamic_cast<cococart_slot_device *>(owner());
 	cart->m_cart_callback(state);
 }
 
-WRITE_LINE_MEMBER(coco_multipak_device::multi_nmi_w)
+void coco_multipak_device::multi_nmi_w(int state)
 {
 	cococart_slot_device *cart = dynamic_cast<cococart_slot_device *>(owner());
 	cart->m_nmi_callback(state);
 }
 
-WRITE_LINE_MEMBER(coco_multipak_device::multi_halt_w)
+void coco_multipak_device::multi_halt_w(int state)
 {
 	cococart_slot_device *cart = dynamic_cast<cococart_slot_device *>(owner());
 	cart->m_halt_callback(state);

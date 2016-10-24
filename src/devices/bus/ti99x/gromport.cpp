@@ -177,7 +177,7 @@ void gromport_device::cruwrite(address_space &space, offs_t offset, uint8_t data
 		m_connector->cruwrite(space, offset, data);
 }
 
-WRITE_LINE_MEMBER(gromport_device::ready_line)
+void gromport_device::ready_line(int state)
 {
 	m_console_ready(state);
 }
@@ -185,14 +185,14 @@ WRITE_LINE_MEMBER(gromport_device::ready_line)
 /*
     Asserted when the console addresses cartridge rom.
 */
-WRITE_LINE_MEMBER(gromport_device::romgq_line)
+void gromport_device::romgq_line(int state)
 {
 	m_romgq = state;
 	if (m_connector != nullptr)
 		m_connector->romgq_line(state);
 }
 
-WRITE_LINE_MEMBER(gromport_device::gclock_in)
+void gromport_device::gclock_in(int state)
 {
 	if (m_connector != nullptr)
 		m_connector->gclock_in(state);
@@ -299,7 +299,7 @@ ti99_cartridge_connector_device::ti99_cartridge_connector_device(const machine_c
 {
 }
 
-WRITE_LINE_MEMBER( ti99_cartridge_connector_device::ready_line )
+void ti99_cartridge_connector_device::ready_line(int state)
 {
 	m_gromport->ready_line(state);
 }
@@ -339,7 +339,7 @@ void single_conn_device::cruwrite(address_space &space, offs_t offset, uint8_t d
 	m_cartridge->cruwrite(space, offset, data);
 }
 
-WRITE_LINE_MEMBER(single_conn_device::romgq_line)
+void single_conn_device::romgq_line(int state)
 {
 	// Pass through
 	m_cartridge->romgq_line(state);
@@ -355,7 +355,7 @@ void single_conn_device::set_gromlines(address_space &space, offs_t offset, uint
 }
 
 
-WRITE_LINE_MEMBER(single_conn_device::gclock_in)
+void single_conn_device::gclock_in(int state)
 {
 	// Pass through
 	m_cartridge->gclock_in(state);
@@ -514,7 +514,7 @@ void multi_conn_device::remove(int index)
 	m_cartridge[index] = nullptr;
 }
 
-WRITE_LINE_MEMBER(multi_conn_device::romgq_line)
+void multi_conn_device::romgq_line(int state)
 {
 	m_readrom = state;
 
@@ -546,7 +546,7 @@ void multi_conn_device::set_gromlines(address_space &space, offs_t offset, uint8
 	}
 }
 
-WRITE_LINE_MEMBER(multi_conn_device::gclock_in)
+void multi_conn_device::gclock_in(int state)
 {
 	// Propagate to all slots
 	for (int i=0; i < NUMBER_OF_CARTRIDGE_SLOTS; i++)
@@ -839,7 +839,7 @@ gkracker_device::gkracker_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-WRITE_LINE_MEMBER(gkracker_device::romgq_line)
+void gkracker_device::romgq_line(int state)
 {
 	m_romspace_selected = (state==ASSERT_LINE);
 	// Propagate to the guest
@@ -855,7 +855,7 @@ void gkracker_device::set_gromlines(address_space &space, offs_t offset, uint8_t
 	if (m_cartridge != nullptr) m_cartridge->set_gromlines(space, offset, data);
 }
 
-WRITE_LINE_MEMBER(gkracker_device::gclock_in)
+void gkracker_device::gclock_in(int state)
 {
 	if (m_cartridge != nullptr) m_cartridge->gclock_in(state);
 }
@@ -1494,12 +1494,12 @@ void ti99_cartridge_device::cruwrite(address_space &space, offs_t offset, uint8_
 	if (m_pcb != nullptr) m_pcb->cruwrite(space, offset, data);
 }
 
-WRITE_LINE_MEMBER( ti99_cartridge_device::ready_line )
+void ti99_cartridge_device::ready_line(int state)
 {
 	m_connector->ready_line(state);
 }
 
-WRITE_LINE_MEMBER( ti99_cartridge_device::romgq_line )
+void ti99_cartridge_device::romgq_line(int state)
 {
 	if (m_pcb != nullptr)
 	{
@@ -1516,7 +1516,7 @@ void ti99_cartridge_device::set_gromlines(address_space &space, offs_t offset, u
 	if (m_pcb != nullptr) m_pcb->set_gromlines(space, offset, data);
 }
 
-WRITE_LINE_MEMBER(ti99_cartridge_device::gclock_in)
+void ti99_cartridge_device::gclock_in(int state)
 {
 	if (m_pcb != nullptr) m_pcb->gclock_in(state);
 }
@@ -1677,7 +1677,7 @@ void ti99_cartridge_pcb::set_grom_pointer(int number, device_t *dev)
 }
 
 
-WRITE_LINE_MEMBER( ti99_cartridge_pcb::romgq_line )
+void ti99_cartridge_pcb::romgq_line(int state)
 {
 	m_romspace_selected = (state==ASSERT_LINE);
 }
@@ -1699,7 +1699,7 @@ void ti99_cartridge_pcb::set_gromlines(address_space &space, offs_t offset, uint
 	}
 }
 
-WRITE_LINE_MEMBER(ti99_cartridge_pcb::gclock_in)
+void ti99_cartridge_pcb::gclock_in(int state)
 {
 	for (auto& elem : m_grom)
 	{

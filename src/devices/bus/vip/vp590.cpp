@@ -32,17 +32,17 @@ const device_type VP590 = &device_creator<vp590_device>;
 //  CDP1862_INTERFACE( cgc_intf )
 //-------------------------------------------------
 
-READ_LINE_MEMBER( vp590_device::rd_r )
+int vp590_device::rd_r()
 {
 	return BIT(m_color, 1);
 }
 
-READ_LINE_MEMBER( vp590_device::bd_r )
+int vp590_device::bd_r()
 {
 	return BIT(m_color, 2);
 }
 
-READ_LINE_MEMBER( vp590_device::gd_r )
+int vp590_device::gd_r()
 {
 	return BIT(m_color, 3);
 }

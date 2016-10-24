@@ -15,7 +15,7 @@ class asr733_device : public device_t, public device_gfx_interface
 public:
 	asr733_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_PALETTE_INIT(asr733);
+	void palette_init_asr733(palette_device &palette);
 
 	uint8_t cru_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void cru_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);

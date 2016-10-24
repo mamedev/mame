@@ -75,7 +75,7 @@ g_profiler.start(PROFILER_USER1);
 g_profiler.stop();
 }
 
-TIMER_CALLBACK_MEMBER(hng64_state::hng64_3dfifo_processed)
+void hng64_state::hng64_3dfifo_processed(void *ptr, int32_t param)
 {
 	set_irq(0x0008);
 }

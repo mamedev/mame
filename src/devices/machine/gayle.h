@@ -69,7 +69,7 @@ public:
 		{ return downcast<gayle_device &>(device).m_cs1_write.set_callback(object); }
 
 	// interface
-	DECLARE_WRITE_LINE_MEMBER( ide_interrupt_w );
+	void ide_interrupt_w(int state);
 
 	uint16_t gayle_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void gayle_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);

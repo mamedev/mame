@@ -69,7 +69,7 @@ public:
 	uint8_t read_00(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t read_78xx(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	IRQ_CALLBACK_MEMBER(irq_callback);
+	int irq_callback(device_t &device, int irqline);
 
 	void maple_w(const uint32_t *data, uint32_t in_size) override;
 	virtual void maple_reset() override;

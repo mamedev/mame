@@ -39,7 +39,7 @@ public:
 	void sspeedr_track_vert_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void sspeedr_track_ice_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(sspeedr);
+	void palette_init_sspeedr(palette_device &palette);
 	uint32_t screen_update_sspeedr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_sspeedr(screen_device &screen, bool state);
 	void draw_track(bitmap_ind16 &bitmap);

@@ -325,7 +325,7 @@ void iskr_1030_keyboard_device::device_reset()
 //  clock_write -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( iskr_1030_keyboard_device::clock_write )
+void iskr_1030_keyboard_device::clock_write(int state)
 {
 	DBG_LOG(1,0,( "%s: clock write %d\n", tag(), state));
 	m_maincpu->set_input_line(MCS48_INPUT_IRQ, state ? CLEAR_LINE : ASSERT_LINE);
@@ -336,7 +336,7 @@ WRITE_LINE_MEMBER( iskr_1030_keyboard_device::clock_write )
 //  data_write -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( iskr_1030_keyboard_device::data_write )
+void iskr_1030_keyboard_device::data_write(int state)
 {
 	DBG_LOG(1,0,( "%s: data write %d\n", tag(), state));
 }

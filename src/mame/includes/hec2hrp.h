@@ -163,10 +163,10 @@ public:
 	void machine_start_hec2mdhrx();
 	void machine_reset_hec2mdhrx();
 	uint32_t screen_update_hec2hrp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(Callback_CK);
+	void Callback_CK(void *ptr, int32_t param);
 
-	DECLARE_WRITE_LINE_MEMBER( disc2_fdc_interrupt );
-	DECLARE_WRITE_LINE_MEMBER( disc2_fdc_dma_irq );
+	void disc2_fdc_interrupt(int state);
+	void disc2_fdc_dma_irq(int state);
 	int isHectorWithDisc2();
 	int isHectorWithMiniDisc();
 	int isHectorHR();

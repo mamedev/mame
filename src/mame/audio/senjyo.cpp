@@ -19,7 +19,7 @@ uint8_t senjyo_state::pio_pa_r(address_space &space, offs_t offset, uint8_t mem_
 	return m_sound_cmd;
 }
 
-WRITE_LINE_MEMBER(senjyo_state::sound_line_clock)
+void senjyo_state::sound_line_clock(int state)
 {
 	if (state != 0)
 	{

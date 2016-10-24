@@ -448,13 +448,13 @@ void gyruss_state::machine_start()
 	save_item(NAME(m_slave_irq_mask));
 }
 
-INTERRUPT_GEN_MEMBER(gyruss_state::master_vblank_irq)
+void gyruss_state::master_vblank_irq(device_t &device)
 {
 	if (m_master_nmi_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(gyruss_state::slave_vblank_irq)
+void gyruss_state::slave_vblank_irq(device_t &device)
 {
 	if (m_slave_irq_mask)
 		device.execute().set_input_line(0, ASSERT_LINE);

@@ -29,9 +29,9 @@ public:
 	sv601_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// from slots
-	WRITE_LINE_MEMBER( int_w );
-	WRITE_LINE_MEMBER( romdis_w );
-	WRITE_LINE_MEMBER( ramdis_w );
+	void int_w(int state);
+	void romdis_w(int state);
+	void ramdis_w(int state);
 
 	// from host
 	virtual uint8_t mreq_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;

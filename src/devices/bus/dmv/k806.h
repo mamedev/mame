@@ -33,7 +33,7 @@ public:
 	uint8_t port1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void port2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(mouse_timer);
+	void mouse_timer(timer_device &timer, void *ptr, int32_t param);
 
 protected:
 	// device-level overrides

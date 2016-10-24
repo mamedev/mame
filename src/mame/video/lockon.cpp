@@ -64,7 +64,7 @@ void lockon_state::lockon_crtc_w(address_space &space, offs_t offset, uint16_t d
 #endif
 }
 
-TIMER_CALLBACK_MEMBER(lockon_state::cursor_callback)
+void lockon_state::cursor_callback(void *ptr, int32_t param)
 {
 	if (m_main_inten)
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
@@ -98,7 +98,7 @@ static const res_net_info lockon_pd_net_info =
 	}
 };
 
-PALETTE_INIT_MEMBER(lockon_state, lockon)
+void lockon_state::palette_init_lockon(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -139,7 +139,7 @@ void lockon_state::lockon_char_w(address_space &space, offs_t offset, uint16_t d
 	m_tilemap->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(lockon_state::get_lockon_tile_info)
+void lockon_state::get_lockon_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint32_t tileno = m_char_ram[tile_index] & 0x03ff;
 	uint32_t col = (m_char_ram[tile_index] >> 10) & 0x3f;
@@ -280,7 +280,7 @@ void lockon_state::lockon_ground_ctrl_w(address_space &space, offs_t offset, uin
 	m_ground_ctrl = data & 0xff;
 }
 
-TIMER_CALLBACK_MEMBER(lockon_state::bufend_callback)
+void lockon_state::bufend_callback(void *ptr, int32_t param)
 {
 	m_ground->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 	m_object->set_input_line(NEC_INPUT_LINE_POLL, ASSERT_LINE);

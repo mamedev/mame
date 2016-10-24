@@ -550,7 +550,7 @@ void neogeo_state::acknowledge_interrupt(uint16_t data)
 }
 
 
-TIMER_CALLBACK_MEMBER(neogeo_state::display_position_interrupt_callback)
+void neogeo_state::display_position_interrupt_callback(void *ptr, int32_t param)
 {
 	if (LOG_VIDEO_SYSTEM) logerror("--- Scanline @ %d,%d\n", m_screen->vpos(), m_screen->hpos());
 
@@ -570,7 +570,7 @@ TIMER_CALLBACK_MEMBER(neogeo_state::display_position_interrupt_callback)
 }
 
 
-TIMER_CALLBACK_MEMBER(neogeo_state::display_position_vblank_callback)
+void neogeo_state::display_position_vblank_callback(void *ptr, int32_t param)
 {
 	if (m_display_position_interrupt_control & IRQ2CTRL_AUTOLOAD_VBLANK)
 	{
@@ -583,7 +583,7 @@ TIMER_CALLBACK_MEMBER(neogeo_state::display_position_vblank_callback)
 }
 
 
-TIMER_CALLBACK_MEMBER(neogeo_state::vblank_interrupt_callback)
+void neogeo_state::vblank_interrupt_callback(void *ptr, int32_t param)
 {
 	if (LOG_VIDEO_SYSTEM) logerror("+++ VBLANK @ %d,%d\n", m_screen->vpos(), m_screen->hpos());
 

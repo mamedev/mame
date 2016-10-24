@@ -26,7 +26,7 @@
  * colours are taken from SRAM and are programmable   *
  ******************************************************/
 
-PALETTE_INIT_MEMBER(cvs_state,cvs)
+void cvs_state::palette_init_cvs(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i, attr;

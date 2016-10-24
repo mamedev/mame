@@ -748,13 +748,13 @@ uint8_t dooyong_z80_ym2203_state::unk_r(address_space &space, offs_t offset, uin
 	return 0;
 }
 
-WRITE_LINE_MEMBER(dooyong_z80_ym2203_state::irqhandler_2203_1)
+void dooyong_z80_ym2203_state::irqhandler_2203_1(int state)
 {
 	m_interrupt_line_1=state;
 	m_audiocpu->set_input_line(0, (m_interrupt_line_1 | m_interrupt_line_2) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(dooyong_z80_ym2203_state::irqhandler_2203_2)
+void dooyong_z80_ym2203_state::irqhandler_2203_2(int state)
 {
 	m_interrupt_line_2=state;
 	m_audiocpu->set_input_line(0, (m_interrupt_line_1 | m_interrupt_line_2) ? ASSERT_LINE : CLEAR_LINE);
@@ -1059,7 +1059,7 @@ static MACHINE_CONFIG_START( primella, dooyong_z80_state )
 MACHINE_CONFIG_END
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(dooyong_68k_state::scanline)
+void dooyong_68k_state::scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

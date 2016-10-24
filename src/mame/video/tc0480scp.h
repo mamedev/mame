@@ -98,11 +98,11 @@ private:
 	void common_get_tc0480bg_tile_info( tile_data &tileinfo, int tile_index, uint16_t *ram, int gfxnum );
 	void common_get_tc0480tx_tile_info( tile_data &tileinfo, int tile_index, uint16_t *ram, int gfxnum );
 
-	TILE_GET_INFO_MEMBER(get_bg0_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg3_tile_info);
-	TILE_GET_INFO_MEMBER(get_tx_tile_info);
+	void get_bg0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_bg2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_bg3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	void dirty_tilemaps();
 	void set_layer_ptrs();

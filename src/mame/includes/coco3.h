@@ -47,8 +47,8 @@ public:
 	virtual uint8_t ff40_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
 	virtual void ff40_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
-	DECLARE_WRITE_LINE_MEMBER(gime_firq_w) { recalculate_firq(); }
-	DECLARE_WRITE_LINE_MEMBER(gime_irq_w) { recalculate_irq(); }
+	void gime_firq_w(int state) { recalculate_firq(); }
+	void gime_irq_w(int state) { recalculate_irq(); }
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

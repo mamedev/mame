@@ -48,10 +48,10 @@ public:
 	// construction/destruction
 	e0516_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE_LINE_MEMBER( cs_w );
-	DECLARE_WRITE_LINE_MEMBER( clk_w );
-	DECLARE_WRITE_LINE_MEMBER( dio_w );
-	DECLARE_READ_LINE_MEMBER( dio_r );
+	void cs_w(int state);
+	void clk_w(int state);
+	void dio_w(int state);
+	int dio_r();
 
 protected:
 	// device-level overrides

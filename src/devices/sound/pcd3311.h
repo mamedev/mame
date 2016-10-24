@@ -40,9 +40,9 @@ public:
 	pcd3311_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { m_data = data; }
-	DECLARE_WRITE_LINE_MEMBER( strobe_w ) { m_strobe = state; }
-	DECLARE_WRITE_LINE_MEMBER( mode_w ) { m_mode = state; }
-	DECLARE_WRITE_LINE_MEMBER( a0_w ) { m_a0 = state; }
+	void strobe_w(int state) { m_strobe = state; }
+	void mode_w(int state) { m_mode = state; }
+	void a0_w(int state) { m_a0 = state; }
 
 protected:
 	// device-level overrides

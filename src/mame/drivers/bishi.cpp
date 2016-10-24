@@ -107,7 +107,7 @@ void bishi_state::control2_w(address_space &space, offs_t offset, uint16_t data,
 	COMBINE_DATA(&m_cur_control2);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(bishi_state::bishi_scanline)
+void bishi_state::bishi_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

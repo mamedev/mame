@@ -37,13 +37,13 @@ public:
 	void audio_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint16_t badlandsb_unk_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void init_badlands();
-	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
+	void get_playfield_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void machine_start_badlands();
 	void machine_reset_badlands();
 	void video_start_badlands();
 	void machine_reset_badlandsb();
 	uint32_t screen_update_badlands(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vblank_int);
+	void vblank_int(device_t &device);
 	void badlands_pf_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	static const atari_motion_objects_config s_mob_config;

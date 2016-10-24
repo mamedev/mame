@@ -70,14 +70,14 @@ public:
 	void gbc_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void gbc_io2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t gbc_io2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_PALETTE_INIT(gb);
+	void palette_init_gb(palette_device &palette);
 	void machine_start_sgb();
 	void machine_reset_sgb();
-	DECLARE_PALETTE_INIT(sgb);
-	DECLARE_PALETTE_INIT(gbp);
+	void palette_init_sgb(palette_device &palette);
+	void palette_init_gbp(palette_device &palette);
 	void machine_start_gbc();
 	void machine_reset_gbc();
-	DECLARE_PALETTE_INIT(gbc);
+	void palette_init_gbc(palette_device &palette);
 	void gb_timer_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	uint8_t gb_cart_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
@@ -136,7 +136,7 @@ public:
 	uint8_t megaduck_sound_r2(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void machine_start_megaduck();
 	void machine_reset_megaduck();
-	DECLARE_PALETTE_INIT(megaduck);
+	void palette_init_megaduck(palette_device &palette);
 
 	uint8_t cart_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void bank1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);

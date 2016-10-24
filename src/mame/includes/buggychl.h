@@ -78,9 +78,9 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(buggychl);
+	void palette_init_buggychl(palette_device &palette);
 	uint32_t screen_update_buggychl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(nmi_callback);
+	void nmi_callback(void *ptr, int32_t param);
 	void draw_sky( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_bg( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_fg( bitmap_ind16 &bitmap, const rectangle &cliprect );

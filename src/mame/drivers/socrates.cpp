@@ -152,11 +152,11 @@ public:
 	void init_socrates();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(socrates);
+	void palette_init_socrates(palette_device &palette);
 	uint32_t screen_update_socrates(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(assert_irq);
-	TIMER_CALLBACK_MEMBER(clear_speech_cb);
-	TIMER_CALLBACK_MEMBER(clear_irq_cb);
+	void assert_irq(device_t &device);
+	void clear_speech_cb(void *ptr, int32_t param);
+	void clear_irq_cb(void *ptr, int32_t param);
 	void socrates_set_rom_bank();
 	void socrates_set_ram_bank();
 	void socrates_update_kb();
@@ -436,7 +436,7 @@ uint8_t *speechromext = memregion("speechext")->base();
 	return temp;
 }
 
-TIMER_CALLBACK_MEMBER(socrates_state::clear_speech_cb)
+void socrates_state::clear_speech_cb(void *ptr, int32_t param)
 {
 	m_speech_running = 0;
 	m_speech_load_address_count = 0; // should this be here or in the write functuon subpart which is speak command?
@@ -698,7 +698,7 @@ return composedcolor;
 }
 
 
-PALETTE_INIT_MEMBER(socrates_state, socrates)
+void socrates_state::palette_init_socrates(palette_device &palette)
 {
 	int i; // iterator
 	for (i = 0; i < 256; i++)
@@ -1347,13 +1347,13 @@ INPUT_PORTS_END
 /******************************************************************************
  Machine Drivers
 ******************************************************************************/
-TIMER_CALLBACK_MEMBER(socrates_state::clear_irq_cb)
+void socrates_state::clear_irq_cb(void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 	m_vblankstate = 0;
 }
 
-INTERRUPT_GEN_MEMBER(socrates_state::assert_irq)
+void socrates_state::assert_irq(device_t &device)
 {
 	device.execute().set_input_line(0, ASSERT_LINE);
 	timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(44), TIMER_CLEAR_IRQ);

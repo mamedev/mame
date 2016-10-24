@@ -89,8 +89,8 @@ struct {
 	int breath_of_life;                         //!< if non-zero, interval in seconds at which to broadcast the breath-of-life
 }   m_eth;
 
-TIMER_CALLBACK_MEMBER( rx_breath_of_life );     //!< HACK: pull the next word from the breath-of-life in the fifo
-TIMER_CALLBACK_MEMBER( tx_packet );             //!< transmit data from the FIFO to <nirvana for now>
+void rx_breath_of_life(void *ptr, int32_t param);     //!< HACK: pull the next word from the breath-of-life in the fifo
+void tx_packet(void *ptr, int32_t param);             //!< transmit data from the FIFO to <nirvana for now>
 void eth_wakeup();                              //!< check for the various reasons to wakeup the Ethernet task
 void eth_startf();                              //!< start input or output depending on m_bus
 void bs_early_eidfct();                         //!< bus source: Ethernet input data function

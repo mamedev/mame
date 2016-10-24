@@ -454,11 +454,11 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(amaticmg);
-	DECLARE_PALETTE_INIT(amaticmg2);
+	void palette_init_amaticmg(palette_device &palette);
+	void palette_init_amaticmg2(palette_device &palette);
 	uint32_t screen_update_amaticmg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_amaticmg2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(amaticmg2_irq);
+	void amaticmg2_irq(device_t &device);
 	void encf(uint8_t ciphertext, int address, uint8_t &plaintext, int &newaddress);
 	void decrypt(int key1, int key2);
 	required_device<cpu_device> m_maincpu;
@@ -524,7 +524,7 @@ uint32_t amaticmg_state::screen_update_amaticmg2(screen_device &screen, bitmap_i
 	return 0;
 }
 
-PALETTE_INIT_MEMBER(amaticmg_state, amaticmg)
+void amaticmg_state::palette_init_amaticmg(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int bit0, bit1, bit2 , r, g, b;
@@ -551,7 +551,7 @@ PALETTE_INIT_MEMBER(amaticmg_state, amaticmg)
 }
 
 
-PALETTE_INIT_MEMBER(amaticmg_state,amaticmg2)
+void amaticmg_state::palette_init_amaticmg2(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int r, g, b;
@@ -865,7 +865,7 @@ static MACHINE_CONFIG_START( amaticmg, amaticmg_state )
 MACHINE_CONFIG_END
 
 
-INTERRUPT_GEN_MEMBER(amaticmg_state::amaticmg2_irq)
+void amaticmg_state::amaticmg2_irq(device_t &device)
 {
 	if(m_nmi_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);

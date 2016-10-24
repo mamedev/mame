@@ -22,7 +22,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(timelimt_state, timelimt){
+void timelimt_state::palette_init_timelimt(palette_device &palette){
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
@@ -56,12 +56,12 @@ PALETTE_INIT_MEMBER(timelimt_state, timelimt){
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(timelimt_state::get_bg_tile_info)
+void timelimt_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	SET_TILE_INFO_MEMBER(1, m_bg_videoram[tile_index], 0, 0);
 }
 
-TILE_GET_INFO_MEMBER(timelimt_state::get_fg_tile_info)
+void timelimt_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	SET_TILE_INFO_MEMBER(0, m_videoram[tile_index], 0, 0);
 }

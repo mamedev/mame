@@ -51,7 +51,7 @@ public:
 	void init_trvmstr();
 	void init_popflame();
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(naughtyb);
+	void palette_init_naughtyb(palette_device &palette);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

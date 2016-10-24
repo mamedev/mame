@@ -113,7 +113,7 @@ public:
 	void fw1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void spec_contr_reg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( dbrq_w );
+	void dbrq_w(int state);
 
 	uint8_t cio_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t cio_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
@@ -121,11 +121,11 @@ public:
 	uint8_t cio_pc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void cio_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( nmi_w );
+	void nmi_w(int state);
 
-	IRQ_CALLBACK_MEMBER( abc1600_int_ack );
+	int abc1600_int_ack(device_t &device, int irqline);
 
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
+	void fdc_drq_w(int state);
 
 	void update_drdy0();
 	void update_drdy1();

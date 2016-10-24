@@ -18,7 +18,7 @@
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(divebomb_state::get_fg_tile_info)
+void divebomb_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint32_t code = m_fgram[tile_index + 0x000];
 	uint32_t attr = m_fgram[tile_index + 0x400];
@@ -143,7 +143,7 @@ void divebomb_state::decode_proms(const uint8_t * rgn, int size, int index, bool
 }
 
 
-PALETTE_INIT_MEMBER(divebomb_state, divebomb)
+void divebomb_state::palette_init_divebomb(palette_device &palette)
 {
 	decode_proms(memregion("spr_proms")->base(), 0x100, 0x400 + 0x400 + 0x400, false);
 	decode_proms(memregion("fg_proms")->base(), 0x400, 0x400 + 0x400, false);

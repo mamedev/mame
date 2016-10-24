@@ -255,7 +255,7 @@ uint8_t a2bus_corvfdc02_device::read_cnxx(address_space &space, uint8_t offset)
 	return m_rom[offset & 0x1f];
 }
 
-WRITE_LINE_MEMBER(a2bus_corvfdc02_device::intrq_w)
+void a2bus_corvfdc02_device::intrq_w(int state)
 {
 	if (state)
 	{
@@ -272,7 +272,7 @@ WRITE_LINE_MEMBER(a2bus_corvfdc02_device::intrq_w)
 	}
 }
 
-WRITE_LINE_MEMBER(a2bus_corvfdc02_device::drq_w)
+void a2bus_corvfdc02_device::drq_w(int state)
 {
 	if (state)
 	{

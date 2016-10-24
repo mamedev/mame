@@ -182,7 +182,7 @@ public:
 	void msx_mem_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t msx_switched_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void msx_switched_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(turbo_w);
+	void turbo_w(int state);
 
 	void msx_memory_map_all();
 	void msx_memory_map_page(uint8_t page);
@@ -194,15 +194,15 @@ public:
 	uint8_t msx_psg_port_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void msx_psg_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void msx_psg_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	INTERRUPT_GEN_MEMBER(msx_interrupt);
+	void msx_interrupt(device_t &device);
 	void msx_ay8910_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void msx_memory_init();
 	void post_load();
 
-	DECLARE_WRITE_LINE_MEMBER(msx_irq_source0) { msx_irq_source(0, state); }  // usually tms9918/v9938/v9958
-	DECLARE_WRITE_LINE_MEMBER(msx_irq_source1) { msx_irq_source(1, state); }  // usually first cartridge slot
-	DECLARE_WRITE_LINE_MEMBER(msx_irq_source2) { msx_irq_source(2, state); }  // usually second cartridge slot
-	DECLARE_WRITE_LINE_MEMBER(msx_irq_source3) { msx_irq_source(3, state); }  // sometimes expansion slot
+	void msx_irq_source0(int state) { msx_irq_source(0, state); }  // usually tms9918/v9938/v9958
+	void msx_irq_source1(int state) { msx_irq_source(1, state); }  // usually first cartridge slot
+	void msx_irq_source2(int state) { msx_irq_source(2, state); }  // usually second cartridge slot
+	void msx_irq_source3(int state) { msx_irq_source(3, state); }  // sometimes expansion slot
 
 protected:
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == 0) ? &m_switched_device_as_config : nullptr; }

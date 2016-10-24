@@ -221,7 +221,7 @@ void truco_state::porta_w(address_space &space, offs_t offset, uint8_t data, uin
 	logerror("Port A writes: %2x\n", data);
 }
 
-WRITE_LINE_MEMBER(truco_state::pia_ca2_w)
+void truco_state::pia_ca2_w(int state)
 {
 /*  PIA CA2 line is connected to IC U19, leg 11.
     The IC was successfully identified as MAX691.
@@ -242,12 +242,12 @@ void truco_state::portb_w(address_space &space, offs_t offset, uint8_t data, uin
 		logerror("Port B writes: %2x\n", data);
 }
 
-WRITE_LINE_MEMBER(truco_state::pia_irqa_w)
+void truco_state::pia_irqa_w(int state)
 {
 	logerror("PIA irq A: %2x\n", state);
 }
 
-WRITE_LINE_MEMBER(truco_state::pia_irqb_w)
+void truco_state::pia_irqb_w(int state)
 {
 	logerror("PIA irq B: %2x\n", state);
 }
@@ -392,7 +392,7 @@ void truco_state::machine_reset()
 	m_battery_ram[0x020] = m_battery_ram[0x011];
 }
 
-INTERRUPT_GEN_MEMBER(truco_state::interrupt)
+void truco_state::interrupt(device_t &device)
 {
 	/* coinup */
 

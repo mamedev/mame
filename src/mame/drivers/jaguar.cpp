@@ -360,7 +360,7 @@ Notes:
  *
  *************************************/
 
-IRQ_CALLBACK_MEMBER(jaguar_state::jaguar_irq_callback)
+int jaguar_state::jaguar_irq_callback(device_t &device, int irqline)
 {
 	return (irqline == 6) ? 0x40 : -1;
 }

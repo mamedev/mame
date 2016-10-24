@@ -43,7 +43,7 @@
 
 ********************************************************/
 
-INTERRUPT_GEN_MEMBER(kopunch_state::vblank_interrupt)
+void kopunch_state::vblank_interrupt(device_t &device)
 {
 	device.execute().set_input_line(I8085_RST75_LINE, ASSERT_LINE);
 	device.execute().set_input_line(I8085_RST75_LINE, CLEAR_LINE);

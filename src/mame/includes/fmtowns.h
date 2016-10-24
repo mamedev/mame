@@ -265,9 +265,9 @@ class towns_state : public driver_device
 	uint8_t towns_spriteram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void towns_spriteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER(mb8877a_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(mb8877a_drq_w);
-	DECLARE_WRITE_LINE_MEMBER(pit_out2_changed);
+	void mb8877a_irq_w(int state);
+	void mb8877a_drq_w(int state);
+	void pit_out2_changed(int state);
 
 	RF5C68_SAMPLE_END_CB_MEMBER(towns_pcm_irq);
 
@@ -317,16 +317,16 @@ private:
 	void towns_cd_status_ready();
 	void towns_delay_cdda(cdrom_image_device* dev);
 public:
-	INTERRUPT_GEN_MEMBER(towns_vsync_irq);
-	TIMER_CALLBACK_MEMBER(towns_cdrom_read_byte);
-	TIMER_CALLBACK_MEMBER(towns_sprite_done);
-	TIMER_CALLBACK_MEMBER(towns_vblank_end);
-	DECLARE_WRITE_LINE_MEMBER(towns_scsi_irq);
-	DECLARE_WRITE_LINE_MEMBER(towns_scsi_drq);
-	DECLARE_WRITE_LINE_MEMBER(towns_pit_out0_changed);
-	DECLARE_WRITE_LINE_MEMBER(towns_pit_out1_changed);
+	void towns_vsync_irq(device_t &device);
+	void towns_cdrom_read_byte(void *ptr, int32_t param);
+	void towns_sprite_done(void *ptr, int32_t param);
+	void towns_vblank_end(void *ptr, int32_t param);
+	void towns_scsi_irq(int state);
+	void towns_scsi_drq(int state);
+	void towns_pit_out0_changed(int state);
+	void towns_pit_out1_changed(int state);
 	uint8_t get_slave_ack(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(towns_fm_irq);
+	void towns_fm_irq(int state);
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 	void towns_crtc_refresh_mode();
 	void towns_update_kanji_offset();

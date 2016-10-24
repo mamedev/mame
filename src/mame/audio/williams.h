@@ -42,16 +42,16 @@ public:
 
 	// read/write
 	void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	DECLARE_WRITE_LINE_MEMBER(reset_write);
+	void reset_write(int state);
 
 	// internal communications
 	void bank_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void talkback_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void cvsd_digit_clock_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void cvsd_clock_set_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(pia_irqa);
-	DECLARE_WRITE_LINE_MEMBER(pia_irqb);
+	void ym2151_irq_w(int state);
+	void pia_irqa(int state);
+	void pia_irqb(int state);
 
 protected:
 	// device-level overrides
@@ -83,7 +83,7 @@ public:
 	// read/write
 	uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	DECLARE_WRITE_LINE_MEMBER(reset_write);
+	void reset_write(int state);
 
 	// internal communications
 	void master_bank_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -97,7 +97,7 @@ public:
 	void slave_sync_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void cvsd_digit_clock_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void cvsd_clock_set_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_w);
+	void ym2151_irq_w(int state);
 
 protected:
 	// device-level overrides
@@ -140,15 +140,15 @@ public:
 
 	// read/write
 	void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	DECLARE_WRITE_LINE_MEMBER(reset_write);
-	DECLARE_READ_LINE_MEMBER(irq_read);
+	void reset_write(int state);
+	int irq_read();
 
 	// internal communications
 	void bank_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void oki6295_bank_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t command_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void talkback_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_w);
+	void ym2151_irq_w(int state);
 
 protected:
 	// timer IDs

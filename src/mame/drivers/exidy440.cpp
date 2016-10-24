@@ -354,7 +354,7 @@ uint8_t exidy440_state::sound_command_ack_r(address_space &space, offs_t offset,
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(exidy440_state::delayed_sound_command_w)
+void exidy440_state::delayed_sound_command_w(void *ptr, int32_t param)
 {
 	m_custom->exidy440_sound_command(param);
 }

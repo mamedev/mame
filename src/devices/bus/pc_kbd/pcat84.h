@@ -51,8 +51,8 @@ protected:
 	virtual void device_reset() override;
 
 	// device_pc_kbd_interface overrides
-	virtual DECLARE_WRITE_LINE_MEMBER( clock_write ) override { m_maincpu->set_input_line(MCS48_INPUT_IRQ, state); };
-	virtual DECLARE_WRITE_LINE_MEMBER( data_write ) override { };
+	virtual void clock_write(int state) override { m_maincpu->set_input_line(MCS48_INPUT_IRQ, state); };
+	virtual void data_write(int state) override { };
 
 private:
 	enum

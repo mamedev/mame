@@ -149,7 +149,7 @@ void psychic5_state::bombsa_unknown_w(address_space &space, offs_t offset, uint8
   Callbacks for the tilemap code
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(psychic5_state::get_bg_tile_info)
+void psychic5_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int offs = tile_index << 1;
 	int attr = m_bg_videoram[offs + 1];
@@ -160,7 +160,7 @@ TILE_GET_INFO_MEMBER(psychic5_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(1, code, color, flags);
 }
 
-TILE_GET_INFO_MEMBER(psychic5_state::get_fg_tile_info)
+void psychic5_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int offs = tile_index << 1;
 	int attr = m_fg_videoram[offs + 1];

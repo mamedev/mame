@@ -87,18 +87,18 @@ public:
 	void add_device(cbm_iec_slot_device *slot, device_t *target);
 
 	// reads for both host and peripherals
-	DECLARE_READ_LINE_MEMBER( srq_r ) { return get_signal(SRQ); }
-	DECLARE_READ_LINE_MEMBER( atn_r ) { return get_signal(ATN); }
-	DECLARE_READ_LINE_MEMBER( clk_r ) { return get_signal(CLK); }
-	DECLARE_READ_LINE_MEMBER( data_r ) { return get_signal(DATA); }
-	DECLARE_READ_LINE_MEMBER( reset_r ) { return get_signal(RESET); }
+	int srq_r() { return get_signal(SRQ); }
+	int atn_r() { return get_signal(ATN); }
+	int clk_r() { return get_signal(CLK); }
+	int data_r() { return get_signal(DATA); }
+	int reset_r() { return get_signal(RESET); }
 
 	// writes for host (driver_device)
-	DECLARE_WRITE_LINE_MEMBER( srq_w ) { set_signal(this, SRQ, state); }
-	DECLARE_WRITE_LINE_MEMBER( atn_w ) { set_signal(this, ATN, state); }
-	DECLARE_WRITE_LINE_MEMBER( clk_w ) { set_signal(this, CLK, state); }
-	DECLARE_WRITE_LINE_MEMBER( data_w ) { set_signal(this, DATA, state); }
-	DECLARE_WRITE_LINE_MEMBER( reset_w ) { set_signal(this, RESET, state); }
+	void srq_w(int state) { set_signal(this, SRQ, state); }
+	void atn_w(int state) { set_signal(this, ATN, state); }
+	void clk_w(int state) { set_signal(this, CLK, state); }
+	void data_w(int state) { set_signal(this, DATA, state); }
+	void reset_w(int state) { set_signal(this, RESET, state); }
 
 	// writes for peripherals (device_t)
 	void srq_w(device_t *device, int state) { set_signal(device, SRQ, state); }

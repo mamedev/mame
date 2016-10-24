@@ -309,12 +309,12 @@ public:
 	void init_ecofghtr();
 	void init_sf2dongb();
 	void init_sf2ceblp();
-	TILEMAP_MAPPER_MEMBER(tilemap0_scan);
-	TILEMAP_MAPPER_MEMBER(tilemap1_scan);
-	TILEMAP_MAPPER_MEMBER(tilemap2_scan);
-	TILE_GET_INFO_MEMBER(get_tile0_info);
-	TILE_GET_INFO_MEMBER(get_tile1_info);
-	TILE_GET_INFO_MEMBER(get_tile2_info);
+	tilemap_memory_index tilemap0_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	tilemap_memory_index tilemap1_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	tilemap_memory_index tilemap2_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	void get_tile0_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile1_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile2_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void machine_start_cps1();
 	void video_start_cps1();
 	void machine_start_common();
@@ -327,10 +327,10 @@ public:
 	void machine_start_sf2m1();
 	uint32_t screen_update_cps1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_cps1(screen_device &screen, bool state);
-	INTERRUPT_GEN_MEMBER(cps1_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(ganbare_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(cps2_interrupt);
-	TIMER_CALLBACK_MEMBER(cps2_update_digital_volume);
+	void cps1_interrupt(device_t &device);
+	void ganbare_interrupt(timer_device &timer, void *ptr, int32_t param);
+	void cps2_interrupt(timer_device &timer, void *ptr, int32_t param);
+	void cps2_update_digital_volume(void *ptr, int32_t param);
 
 	void kabuki_setup(void (*decode)(uint8_t *src, uint8_t *dst));
 
@@ -411,8 +411,8 @@ public:
 	uint16_t kludge_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	uint16_t joy_or_paddle_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	uint16_t joy_or_paddle_ecofghtr_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
-	DECLARE_WRITE_LINE_MEMBER(m5205_int1);
-	DECLARE_WRITE_LINE_MEMBER(m5205_int2);
+	void m5205_int1(int state);
+	void m5205_int2(int state);
 };
 
 /*----------- defined in drivers/cps1.c -----------*/

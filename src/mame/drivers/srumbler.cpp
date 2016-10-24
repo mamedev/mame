@@ -57,7 +57,7 @@ void srumbler_state::machine_start()
 	bankswitch_w(m_maincpu->space(AS_PROGRAM), 0, 0);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(srumbler_state::interrupt)
+void srumbler_state::interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

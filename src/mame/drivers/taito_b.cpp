@@ -237,67 +237,67 @@ void taitob_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 }
 
 
-INTERRUPT_GEN_MEMBER(taitob_state::rastansaga2_interrupt)
+void taitob_state::rastansaga2_interrupt(device_t &device)
 {
 	timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(5000), RSAGA2_INTERRUPT2);
 	device.execute().set_input_line(4, HOLD_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(taitob_state::crimec_interrupt)
+void taitob_state::crimec_interrupt(device_t &device)
 {
 	timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(5000), CRIMEC_INTERRUPT3);
 	device.execute().set_input_line(5, HOLD_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(taitob_state::hitice_interrupt)
+void taitob_state::hitice_interrupt(device_t &device)
 {
 	timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(5000), HITICE_INTERRUPT6);
 	device.execute().set_input_line(4, HOLD_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(taitob_state::rambo3_interrupt)
+void taitob_state::rambo3_interrupt(device_t &device)
 {
 	timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(5000), RAMBO3_INTERRUPT1);
 	device.execute().set_input_line(6, HOLD_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(taitob_state::pbobble_interrupt)
+void taitob_state::pbobble_interrupt(device_t &device)
 {
 	timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(5000), PBOBBLE_INTERRUPT5);
 	device.execute().set_input_line(3, HOLD_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(taitob_state::viofight_interrupt)
+void taitob_state::viofight_interrupt(device_t &device)
 {
 	timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(5000), VIOFIGHT_INTERRUPT1);
 	device.execute().set_input_line(4, HOLD_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(taitob_state::masterw_interrupt)
+void taitob_state::masterw_interrupt(device_t &device)
 {
 	timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(5000), MASTERW_INTERRUPT4);
 	device.execute().set_input_line(5, HOLD_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(taitob_state::silentd_interrupt)
+void taitob_state::silentd_interrupt(device_t &device)
 {
 	timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(5000), SILENTD_INTERRUPT4);
 	device.execute().set_input_line(6, HOLD_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(taitob_state::selfeena_interrupt)
+void taitob_state::selfeena_interrupt(device_t &device)
 {
 	timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(5000), SELFEENA_INTERRUPT4);
 	device.execute().set_input_line(6, HOLD_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(taitob_state::sbm_interrupt)//5
+void taitob_state::sbm_interrupt(device_t &device)//5
 {
 	timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(10000), SBM_INTERRUPT5);
 	device.execute().set_input_line(4, HOLD_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(taitob_state::realpunc_interrupt)//2
+void taitob_state::realpunc_interrupt(device_t &device)//2
 {
 	timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(10000), REALPUNC_INTERRUPT3);
 	device.execute().set_input_line(2, HOLD_LINE);

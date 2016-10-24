@@ -81,5 +81,5 @@ public:
 	uint32_t hsync_ram_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	void hsync_ram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	void init_beathead();
-	TIMER_DEVICE_CALLBACK_MEMBER(scanline_callback);
+	void scanline_callback(timer_device &timer, void *ptr, int32_t param);
 };

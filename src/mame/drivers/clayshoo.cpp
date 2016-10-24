@@ -44,7 +44,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_clayshoo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(reset_analog_bit);
+	void reset_analog_bit(void *ptr, int32_t param);
 	uint8_t difficulty_input_port_r( int bit );
 	void create_analog_timers(  );
 	required_device<cpu_device> m_maincpu;
@@ -107,7 +107,7 @@ uint8_t clayshoo_state::input_port_r(address_space &space, offs_t offset, uint8_
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(clayshoo_state::reset_analog_bit)
+void clayshoo_state::reset_analog_bit(void *ptr, int32_t param)
 {
 	m_analog_port_val &= ~param;
 }

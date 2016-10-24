@@ -37,7 +37,7 @@ void tceptor_state::m68k_shared_w(address_space &space, offs_t offset, uint8_t d
 
 /*******************************************************************/
 
-INTERRUPT_GEN_MEMBER(tceptor_state::m6809_vb_interrupt)
+void tceptor_state::m6809_vb_interrupt(device_t &device)
 {
 	if (m_m6809_irq_enable)
 		device.execute().set_input_line(0, HOLD_LINE);
@@ -56,7 +56,7 @@ void tceptor_state::m6809_irq_disable_w(address_space &space, offs_t offset, uin
 }
 
 
-INTERRUPT_GEN_MEMBER(tceptor_state::m68k_vb_interrupt)
+void tceptor_state::m68k_vb_interrupt(device_t &device)
 {
 	if (m_m68k_irq_enable)
 		device.execute().set_input_line(M68K_IRQ_1, HOLD_LINE);
@@ -68,7 +68,7 @@ void tceptor_state::m68k_irq_enable_w(address_space &space, offs_t offset, uint1
 }
 
 
-INTERRUPT_GEN_MEMBER(tceptor_state::mcu_vb_interrupt)
+void tceptor_state::mcu_vb_interrupt(device_t &device)
 {
 	if (m_mcu_irq_enable)
 		device.execute().set_input_line(0, HOLD_LINE);

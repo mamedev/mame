@@ -47,14 +47,14 @@ static const uint8_t kc85_palette[KC85_PALETTE_SIZE * 3] =
 
 
 /* Initialise the palette */
-PALETTE_INIT_MEMBER(kc_state,kc85)
+void kc_state::palette_init_kc85(palette_device &palette)
 {
 	for (int i = 0; i < sizeof(kc85_palette) / 3; i++ )
 		palette.set_pen_color(i, kc85_palette[i*3], kc85_palette[i*3+1], kc85_palette[i*3+2]);
 }
 
 /* set new blink state */
-WRITE_LINE_MEMBER( kc_state::video_toggle_blink_state )
+void kc_state::video_toggle_blink_state(int state)
 {
 	if (state)
 	{

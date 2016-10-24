@@ -491,7 +491,7 @@ GFXDECODE_END
 /******************************************************************************/
 
 /* Main Z80 uses IM2 */
-TIMER_DEVICE_CALLBACK_MEMBER(djboy_state::djboy_scanline)
+void djboy_state::djboy_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

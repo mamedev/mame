@@ -40,8 +40,8 @@ public:
 	void scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	TILE_GET_INFO_MEMBER(holeland_get_tile_info);
-	TILE_GET_INFO_MEMBER(crzrally_get_tile_info);
+	void holeland_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void crzrally_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	void video_start_holeland();
 	void video_start_crzrally();

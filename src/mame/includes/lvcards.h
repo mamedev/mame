@@ -21,12 +21,12 @@ public:
 	uint8_t payout_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void lvcards_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void lvcards_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(lvcards);
+	void palette_init_lvcards(palette_device &palette);
 	void machine_start_lvpoker();
 	void machine_reset_lvpoker();
-	DECLARE_PALETTE_INIT(ponttehk);
+	void palette_init_ponttehk(palette_device &palette);
 	uint32_t screen_update_lvcards(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;

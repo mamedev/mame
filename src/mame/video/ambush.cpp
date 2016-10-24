@@ -20,7 +20,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(ambush_state, ambush)
+void ambush_state::palette_init_ambush(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;

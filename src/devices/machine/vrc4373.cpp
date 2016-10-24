@@ -298,7 +298,7 @@ void vrc4373_device::target2_w(address_space &space, offs_t offset, uint32_t dat
 }
 
 // DMA Transfer
-TIMER_CALLBACK_MEMBER (vrc4373_device::dma_transfer)
+void vrc4373_device::dma_transfer(void *ptr, int32_t param)
 {
 	int which = param;
 

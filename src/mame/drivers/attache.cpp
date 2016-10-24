@@ -153,9 +153,9 @@ public:
 	void memmap_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t dma_mem_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void dma_mem_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(hreq_w);
-	DECLARE_WRITE_LINE_MEMBER(eop_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_dack_w);
+	void hreq_w(int state);
+	void eop_w(int state);
+	void fdc_dack_w(int state);
 	void operation_strobe(address_space& space,uint8_t data);
 	void keyboard_clock_w(bool state);
 	uint8_t keyboard_data_r();
@@ -723,19 +723,19 @@ void attache_state::dma_mem_w(address_space &space, offs_t offset, uint8_t data,
 	m_maincpu->space(AS_PROGRAM).write_byte(offset,data);
 }
 
-WRITE_LINE_MEMBER( attache_state::hreq_w )
+void attache_state::hreq_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
 	m_dma->hack_w(state);
 }
 
-WRITE_LINE_MEMBER(attache_state::eop_w)
+void attache_state::eop_w(int state)
 {
 	m_fdc->tc_w(state);
 }
 
-WRITE_LINE_MEMBER( attache_state::fdc_dack_w )
+void attache_state::fdc_dack_w(int state)
 {
 }
 

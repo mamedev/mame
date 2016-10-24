@@ -522,7 +522,7 @@ void hmcs40_cpu_device::reset_prescaler()
 	m_timer->adjust(base);
 }
 
-TIMER_CALLBACK_MEMBER( hmcs40_cpu_device::simple_timer_cb )
+void hmcs40_cpu_device::simple_timer_cb(void *ptr, int32_t param)
 {
 	// timer prescaler overflow
 	if (!m_cf)

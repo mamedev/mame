@@ -22,7 +22,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(blueprnt_state, blueprnt)
+void blueprnt_state::palette_init_blueprnt(palette_device &palette)
 {
 	int i;
 
@@ -83,7 +83,7 @@ void blueprnt_state::blueprnt_flipscreen_w(address_space &space, offs_t offset, 
 
 
 
-TILE_GET_INFO_MEMBER(blueprnt_state::get_bg_tile_info)
+void blueprnt_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_colorram[tile_index];
 	int bank;

@@ -162,7 +162,7 @@ public:
 	void coin_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_jwildb52();
 	DECLARE_INPUT_CHANGED_MEMBER(coin_drop_start);
-	DECLARE_WRITE_LINE_MEMBER(ptm2_irq);
+	void ptm2_irq(int state);
 	void audiocpu_irq_update();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -190,7 +190,7 @@ void sigmab52_state::audiocpu_irq_update()
 	m_audiocpu->set_input_line(M6809_IRQ_LINE, (m_6840ptm_2->irq_state() || m_audiocpu_cmd_irq) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(sigmab52_state::ptm2_irq)
+void sigmab52_state::ptm2_irq(int state)
 {
 	audiocpu_irq_update();
 }

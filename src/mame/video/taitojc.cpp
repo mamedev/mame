@@ -23,7 +23,7 @@ static const gfx_layout taitojc_char_layout =
 	16*64
 };
 
-TILE_GET_INFO_MEMBER(taitojc_state::taitojc_tile_info)
+void taitojc_state::taitojc_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint32_t val = m_tile_ram[tile_index];
 	int color = (val >> 22) & 0xff;

@@ -17,7 +17,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(skykid_state, skykid)
+void skykid_state::palette_init_skykid(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -56,7 +56,7 @@ PALETTE_INIT_MEMBER(skykid_state, skykid)
 ***************************************************************************/
 
 /* convert from 32x32 to 36x28 */
-TILEMAP_MAPPER_MEMBER(skykid_state::tx_tilemap_scan)
+tilemap_memory_index skykid_state::tx_tilemap_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	int offs;
 
@@ -70,7 +70,7 @@ TILEMAP_MAPPER_MEMBER(skykid_state::tx_tilemap_scan)
 	return offs;
 }
 
-TILE_GET_INFO_MEMBER(skykid_state::tx_get_tile_info)
+void skykid_state::tx_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_textram[tile_index];
 	int attr = m_textram[tile_index + 0x400];
@@ -87,7 +87,7 @@ TILE_GET_INFO_MEMBER(skykid_state::tx_get_tile_info)
 }
 
 
-TILE_GET_INFO_MEMBER(skykid_state::bg_get_tile_info)
+void skykid_state::bg_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index];
 	int attr = m_videoram[tile_index+0x800];

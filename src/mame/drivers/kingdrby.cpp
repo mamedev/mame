@@ -116,11 +116,11 @@ public:
 	uint8_t key_matrix_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t sound_cmd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void outportb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	TILE_GET_INFO_MEMBER(get_sc0_tile_info);
-	TILE_GET_INFO_MEMBER(get_sc1_tile_info);
+	void get_sc0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_sc1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(kingdrby);
-	DECLARE_PALETTE_INIT(kingdrbb);
+	void palette_init_kingdrby(palette_device &palette);
+	void palette_init_kingdrbb(palette_device &palette);
 	uint32_t screen_update_kingdrby(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_soundcpu;
@@ -150,7 +150,7 @@ xxxx ---- basic color?
 ---- ---x tile bank
 */
 
-TILE_GET_INFO_MEMBER(kingdrby_state::get_sc0_tile_info)
+void kingdrby_state::get_sc0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = m_vram[tile_index] | m_attr[tile_index]<<8;
 	int color = (m_attr[tile_index] & 0x06)>>1;
@@ -163,7 +163,7 @@ TILE_GET_INFO_MEMBER(kingdrby_state::get_sc0_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(kingdrby_state::get_sc1_tile_info)
+void kingdrby_state::get_sc1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = m_vram[tile_index] | m_attr[tile_index]<<8;
 	int color = (m_attr[tile_index] & 0x06)>>1;
@@ -864,7 +864,7 @@ GFXDECODE_END
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(kingdrby_state,kingdrby)
+void kingdrby_state::palette_init_kingdrby(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int bit0, bit1, bit2 , r, g, b;
@@ -890,7 +890,7 @@ PALETTE_INIT_MEMBER(kingdrby_state,kingdrby)
 	}
 }
 
-PALETTE_INIT_MEMBER(kingdrby_state,kingdrbb)
+void kingdrby_state::palette_init_kingdrbb(palette_device &palette)
 {
 	uint8_t *raw_prom = memregion("raw_prom")->base();
 	uint8_t *prom = memregion("proms")->base();

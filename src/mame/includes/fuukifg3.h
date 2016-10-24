@@ -71,10 +71,10 @@ public:
 	void vram_2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	void vram_3_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
-	TILE_GET_INFO_MEMBER(get_tile_info_0);
-	TILE_GET_INFO_MEMBER(get_tile_info_1);
-	TILE_GET_INFO_MEMBER(get_tile_info_2);
-	TILE_GET_INFO_MEMBER(get_tile_info_3);
+	void get_tile_info_0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info_1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info_2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info_3(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

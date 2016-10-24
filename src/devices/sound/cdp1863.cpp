@@ -172,7 +172,7 @@ void cdp1863_device::str_w(uint8_t data)
 //  oe_w - output enable write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( cdp1863_device::oe_w )
+void cdp1863_device::oe_w(int state)
 {
 	m_oe = state;
 }

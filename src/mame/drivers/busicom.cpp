@@ -179,7 +179,7 @@ static INPUT_PORTS_START( busicom )
 INPUT_PORTS_END
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(busicom_state::timer_callback)
+void busicom_state::timer_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	m_timer ^=1;
 	if (m_timer==1) m_drum_index++;

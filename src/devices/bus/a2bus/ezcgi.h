@@ -34,7 +34,7 @@ public:
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	DECLARE_WRITE_LINE_MEMBER( tms_irq_w );
+	void tms_irq_w(int state);
 
 protected:
 	virtual void device_start() override;
@@ -59,7 +59,7 @@ public:
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	DECLARE_WRITE_LINE_MEMBER( tms_irq_w );
+	void tms_irq_w(int state);
 
 protected:
 	virtual void device_start() override;
@@ -84,7 +84,7 @@ public:
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	DECLARE_WRITE_LINE_MEMBER( tms_irq_w );
+	void tms_irq_w(int state);
 
 protected:
 	virtual void device_start() override;

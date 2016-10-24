@@ -96,14 +96,14 @@ public:
 	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( dsr_w );
-	DECLARE_WRITE_LINE_MEMBER( dcd_w );
-	DECLARE_WRITE_LINE_MEMBER( cts_w );
+	void dsr_w(int state);
+	void dcd_w(int state);
+	void cts_w(int state);
 
-	DECLARE_READ_LINE_MEMBER( rxrdy_r );
-	DECLARE_READ_LINE_MEMBER( txemt_r );
+	int rxrdy_r();
+	int txemt_r();
 
-	DECLARE_WRITE_LINE_MEMBER( rx_w ) { device_serial_interface::rx_w(state); }
+	void rx_w(int state) { device_serial_interface::rx_w(state); }
 
 protected:
 	// device-level overrides

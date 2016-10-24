@@ -84,11 +84,11 @@ public:
 	void init_irobot();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(irobot);
+	void palette_init_irobot(palette_device &palette);
 	uint32_t screen_update_irobot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(scanline_callback);
-	TIMER_DEVICE_CALLBACK_MEMBER(irobot_irvg_done_callback);
-	TIMER_DEVICE_CALLBACK_MEMBER(irobot_irmb_done_callback);
+	void scanline_callback(void *ptr, int32_t param);
+	void irobot_irvg_done_callback(timer_device &timer, void *ptr, int32_t param);
+	void irobot_irmb_done_callback(timer_device &timer, void *ptr, int32_t param);
 	void _irobot_poly_clear(uint8_t *bitmap_base);
 	void irobot_poly_clear();
 	void draw_line(uint8_t *polybitmap, int x1, int y1, int x2, int y2, int col);

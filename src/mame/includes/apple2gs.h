@@ -187,16 +187,16 @@ public:
 	void machine_start_apple2gs();
 	void machine_reset_apple2gs();
 	void video_start_apple2gs();
-	DECLARE_PALETTE_INIT(apple2gs);
+	void palette_init_apple2gs(palette_device &palette);
 	void machine_start_apple2gsr1();
 	void machine_start_apple2gscommon();
 	uint32_t screen_update_apple2gs(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(apple2gs_clock_tick);
-	TIMER_CALLBACK_MEMBER(apple2gs_qsecond_tick);
-	TIMER_CALLBACK_MEMBER(apple2gs_scanline_tick);
-	DECLARE_WRITE_LINE_MEMBER(a2bus_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(a2bus_nmi_w);
-	DECLARE_WRITE_LINE_MEMBER(a2bus_inh_w);
+	void apple2gs_clock_tick(void *ptr, int32_t param);
+	void apple2gs_qsecond_tick(void *ptr, int32_t param);
+	void apple2gs_scanline_tick(void *ptr, int32_t param);
+	void a2bus_irq_w(int state);
+	void a2bus_nmi_w(int state);
+	void a2bus_inh_w(int state);
 	uint8_t apple2gs_read_vector(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	// ADB MCU and ADB GLU stuff
@@ -259,7 +259,7 @@ public:
 	void apple2gs_E12xxx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void apple2gs_slowmem_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t apple2gs_bank_echo_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( apple2gs_doc_irq);
+	void apple2gs_doc_irq(int state);
 	uint8_t apple2gs_adc_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 };

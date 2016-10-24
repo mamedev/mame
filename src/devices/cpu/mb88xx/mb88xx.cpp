@@ -319,7 +319,7 @@ void mb88_cpu_device::device_reset()
     CORE EXECUTION LOOP
 ***************************************************************************/
 
-TIMER_CALLBACK_MEMBER( mb88_cpu_device::serial_timer )
+void mb88_cpu_device::serial_timer(void *ptr, int32_t param)
 {
 	m_SBcount++;
 
@@ -443,7 +443,7 @@ void mb88_cpu_device::update_pio( int cycles )
 	}
 }
 
-WRITE_LINE_MEMBER( mb88_cpu_device::clock_w )
+void mb88_cpu_device::clock_w(int state)
 {
 	if (state != m_ctr)
 	{

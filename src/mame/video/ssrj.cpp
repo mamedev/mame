@@ -11,7 +11,7 @@ void ssrj_state::vram1_w(address_space &space, offs_t offset, uint8_t data, uint
 	m_tilemap1->mark_tile_dirty(offset>>1);
 }
 
-TILE_GET_INFO_MEMBER(ssrj_state::get_tile_info1)
+void ssrj_state::get_tile_info1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code;
 	code = m_vram1[tile_index<<1] + (m_vram1[(tile_index<<1)+1]<<8);
@@ -29,7 +29,7 @@ void ssrj_state::vram2_w(address_space &space, offs_t offset, uint8_t data, uint
 	m_tilemap2->mark_tile_dirty(offset>>1);
 }
 
-TILE_GET_INFO_MEMBER(ssrj_state::get_tile_info2)
+void ssrj_state::get_tile_info2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code;
 	code = m_vram2[tile_index<<1] + (m_vram2[(tile_index<<1)+1]<<8);
@@ -47,7 +47,7 @@ void ssrj_state::vram4_w(address_space &space, offs_t offset, uint8_t data, uint
 	m_tilemap4->mark_tile_dirty(offset>>1);
 }
 
-TILE_GET_INFO_MEMBER(ssrj_state::get_tile_info4)
+void ssrj_state::get_tile_info4(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code;
 	code = m_vram4[tile_index<<1] + (m_vram4[(tile_index<<1)+1]<<8);
@@ -264,7 +264,7 @@ void ssrj_state::draw_objects(bitmap_ind16 &bitmap, const rectangle &cliprect )
 }
 
 
-PALETTE_INIT_MEMBER(ssrj_state, ssrj)
+void ssrj_state::palette_init_ssrj(palette_device &palette)
 {
 	int i, j;
 	for(i=0; i<4*4; i++)

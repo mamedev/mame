@@ -34,7 +34,7 @@ public:
 	void lviv_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(lviv);
+	void palette_init_lviv(palette_device &palette);
 	uint32_t screen_update_lviv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint8_t lviv_ppi_0_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t lviv_ppi_0_portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);

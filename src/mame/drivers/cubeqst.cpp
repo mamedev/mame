@@ -80,8 +80,8 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_cubeqst(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vblank);
-	TIMER_CALLBACK_MEMBER(delayed_bank_swap);
+	void vblank(device_t &device);
+	void delayed_bank_swap(void *ptr, int32_t param);
 	void swap_linecpu_banks();
 };
 
@@ -200,7 +200,7 @@ uint16_t cubeqst_state::line_r(address_space &space, offs_t offset, uint16_t mem
 	return m_screen->vpos();
 }
 
-INTERRUPT_GEN_MEMBER(cubeqst_state::vblank)
+void cubeqst_state::vblank(device_t &device)
 {
 	int int_level = m_video_field == 0 ? 5 : 6;
 
@@ -263,7 +263,7 @@ void cubeqst_state::control_w(address_space &space, offs_t offset, uint16_t data
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(cubeqst_state::delayed_bank_swap)
+void cubeqst_state::delayed_bank_swap(void *ptr, int32_t param)
 {
 	m_linecpu->cubeqcpu_swap_line_banks();
 

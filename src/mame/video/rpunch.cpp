@@ -23,7 +23,7 @@
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(rpunch_state::get_bg0_tile_info)
+void rpunch_state::get_bg0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t *videoram = m_videoram;
 	int data = videoram[tile_index];
@@ -37,7 +37,7 @@ TILE_GET_INFO_MEMBER(rpunch_state::get_bg0_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(rpunch_state::get_bg1_tile_info)
+void rpunch_state::get_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t *videoram = m_videoram;
 	int data = videoram[0x2000 / 2 + tile_index];
@@ -58,7 +58,7 @@ TILE_GET_INFO_MEMBER(rpunch_state::get_bg1_tile_info)
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(rpunch_state::crtc_interrupt_gen)
+void rpunch_state::crtc_interrupt_gen(void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(1, HOLD_LINE);
 	if (param != 0)

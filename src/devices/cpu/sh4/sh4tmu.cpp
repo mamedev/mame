@@ -58,7 +58,7 @@ void sh34_base_device::sh4_timer_recompute(int which)
 }
 
 
-TIMER_CALLBACK_MEMBER( sh34_base_device::sh4_timer_callback )
+void sh34_base_device::sh4_timer_callback(void *ptr, int32_t param)
 {
 	int which = param;
 

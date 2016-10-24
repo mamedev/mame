@@ -62,7 +62,7 @@ public:
 	void rombank2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t beep_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void beep_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_PALETTE_INIT(pc2000);
+	void palette_init_pc2000(palette_device &palette);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pc2000_cart);
 };
 
@@ -790,7 +790,7 @@ void pc1000_state::machine_reset()
 	m_bank1->set_entry(0);
 }
 
-PALETTE_INIT_MEMBER(pc2000_state, pc2000)
+void pc2000_state::palette_init_pc2000(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));

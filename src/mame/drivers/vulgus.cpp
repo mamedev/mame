@@ -50,7 +50,7 @@ All Clocks and Vsync verified by Corrado Tomaselli (August 2012)
 #include "includes/vulgus.h"
 
 
-INTERRUPT_GEN_MEMBER(vulgus_state::vblank_irq)
+void vulgus_state::vblank_irq(device_t &device)
 {
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xd7); /* RST 10h - vblank */
 }

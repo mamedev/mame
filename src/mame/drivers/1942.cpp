@@ -161,7 +161,7 @@ void _1942_state::c1942_bankswitch_w(address_space &space, offs_t offset, uint8_
 	membank("bank1")->set_entry(data & 0x03);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(_1942_state::c1942_scanline)
+void _1942_state::c1942_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

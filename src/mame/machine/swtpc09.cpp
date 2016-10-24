@@ -29,7 +29,7 @@
 /******* MC6840 PTM on MPID Board *******/
 
 /* 6840 PTM handlers */
-WRITE_LINE_MEMBER( swtpc09_state::ptm_o1_callback )
+void swtpc09_state::ptm_o1_callback(int state)
 {
 	// RH 3 Oct. 2016 FIXME: Does the hardware actually work this way, incrementing a counter any time
 	// the O1 line on the PTM changes? This seems unlikely, as the current implementation will increment
@@ -41,14 +41,14 @@ WRITE_LINE_MEMBER( swtpc09_state::ptm_o1_callback )
 	if (m_pia_counter & 0x80) pia->ca1_w(1);
 }
 
-WRITE_LINE_MEMBER( swtpc09_state::ptm_o3_callback )
+void swtpc09_state::ptm_o3_callback(int state)
 {
 	//ptm6840_device *ptm = machine().device<ptm6840_device>("ptm");
 	/* the output from timer3 is the input clock for timer2 */
 	//m_ptm->set_c2(state);
 }
 
-WRITE_LINE_MEMBER( swtpc09_state::ptm_irq )
+void swtpc09_state::ptm_irq(int state)
 {
 	if (state)
 		swtpc09_irq_handler(PTM_IRQ, ASSERT_LINE);
@@ -69,7 +69,7 @@ uint8_t swtpc09_state::pia0_ca1_r(address_space &space, offs_t offset, uint8_t m
 	return 0;
 }
 
-WRITE_LINE_MEMBER( swtpc09_state::pia0_irq_a )
+void swtpc09_state::pia0_irq_a(int state)
 {
 		pia6821_device *pia = machine().device<pia6821_device>("pia");
 
@@ -83,7 +83,7 @@ WRITE_LINE_MEMBER( swtpc09_state::pia0_irq_a )
 
 /******* MC6850 ACIA on MPS2 *******/
 
-WRITE_LINE_MEMBER( swtpc09_state::acia_interrupt )
+void swtpc09_state::acia_interrupt(int state)
 {
 	if (state)
 	{
@@ -220,7 +220,7 @@ void swtpc09_state::swtpc09_irq_handler(uint8_t peripheral, uint8_t state)
 }
 
 /* handlers for fdc */
-WRITE_LINE_MEMBER( swtpc09_state::fdc_intrq_w )
+void swtpc09_state::fdc_intrq_w(int state)
 {
 	LOG(("swtpc09_fdc_intrq_w %02X\n", state));
 	if ( m_system_type == UNIFLEX_DMF3 )  //IRQ from 1791 is connect into VIA ca2
@@ -276,7 +276,7 @@ WRITE_LINE_MEMBER( swtpc09_state::fdc_intrq_w )
 	}
 }
 
-WRITE_LINE_MEMBER( swtpc09_state::fdc_drq_w )
+void swtpc09_state::fdc_drq_w(int state)
 {
 	if (m_system_type == FLEX_DC4_PIAIDE)  //for dc4 no dma
 	{
@@ -319,14 +319,14 @@ void swtpc09_state::dmf3_via_write_porta(address_space &space, offs_t offset, ui
 	m_dmf3_via_porta &= data;
 }
 
-//WRITE_LINE_MEMBER( swtpc09_state::dmf3_via_write_ca1 )
+//void swtpc09_state::dmf3_via_write_ca1(int state)
 //{
 //  return m_via_ca1_input;
 //    LOG(("swtpc09_dmf3_via_write_ca1 %02X\n", state));
 
 //}
 
-WRITE_LINE_MEMBER( swtpc09_state::dmf3_via_irq )
+void swtpc09_state::dmf3_via_irq(int state)
 {
 	if (state)
 		swtpc09_irq_handler(VIA_IRQ, ASSERT_LINE);

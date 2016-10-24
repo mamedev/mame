@@ -61,13 +61,13 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(galpani2);
+	void palette_init_galpani2(palette_device &palette);
 	uint32_t screen_update_galpani2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void copybg8(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer);
 	void copybg15(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(galpani2_interrupt1);
-	TIMER_DEVICE_CALLBACK_MEMBER(galpani2_interrupt2);
+	void galpani2_interrupt1(timer_device &timer, void *ptr, int32_t param);
+	void galpani2_interrupt2(timer_device &timer, void *ptr, int32_t param);
 	void galpani2_mcu_nmi1();
 	void galpani2_mcu_nmi2();
 };

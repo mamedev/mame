@@ -66,7 +66,7 @@
  *
  **************************************************************************/
 
-PALETTE_INIT_MEMBER(carpolo_state, carpolo)
+void carpolo_state::palette_init_carpolo(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;

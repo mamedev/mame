@@ -8,7 +8,7 @@
 
 /* tilemaps */
 
-TILE_GET_INFO_MEMBER(pirates_state::get_tx_tile_info)
+void pirates_state::get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_tx_tileram[tile_index*2];
 	int colr = m_tx_tileram[tile_index*2+1];
@@ -16,7 +16,7 @@ TILE_GET_INFO_MEMBER(pirates_state::get_tx_tile_info)
 	SET_TILE_INFO_MEMBER(0,code,colr,0);
 }
 
-TILE_GET_INFO_MEMBER(pirates_state::get_fg_tile_info)
+void pirates_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_fg_tileram[tile_index*2];
 	int colr = m_fg_tileram[tile_index*2+1]+0x80;
@@ -24,7 +24,7 @@ TILE_GET_INFO_MEMBER(pirates_state::get_fg_tile_info)
 	SET_TILE_INFO_MEMBER(0,code,colr,0);
 }
 
-TILE_GET_INFO_MEMBER(pirates_state::get_bg_tile_info)
+void pirates_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_bg_tileram[tile_index*2];
 	int colr = m_bg_tileram[tile_index*2+1]+ 0x100;

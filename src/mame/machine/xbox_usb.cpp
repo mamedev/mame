@@ -1525,7 +1525,7 @@ ioport_constructor ohci_game_controller_device::device_input_ports() const
 	return INPUT_PORTS_NAME(xbox_controller);
 }
 
-WRITE_LINE_MEMBER(xbox_base_state::xbox_ohci_usb_interrupt_changed)
+void xbox_base_state::xbox_ohci_usb_interrupt_changed(int state)
 {
 	xbox_base_devs.pic8259_1->ir1_w(state);
 }

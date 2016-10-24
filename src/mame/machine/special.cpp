@@ -233,7 +233,7 @@ uint8_t special_state::specimx_disk_ctrl_r(address_space &space, offs_t offset, 
 	return 0xff;
 }
 
-WRITE_LINE_MEMBER( special_state::fdc_drq )
+void special_state::fdc_drq(int state)
 {
 	/* Clears HALT state of CPU when data is ready to read */
 	if(state) {

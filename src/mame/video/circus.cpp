@@ -29,7 +29,7 @@ void circus_state::circus_clown_y_w(address_space &space, offs_t offset, uint8_t
 	m_clown_y = 240 - data;
 }
 
-TILE_GET_INFO_MEMBER(circus_state::get_bg_tile_info)
+void circus_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index];
 

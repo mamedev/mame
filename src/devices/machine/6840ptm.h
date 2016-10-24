@@ -68,14 +68,14 @@ public:
 	uint8_t read(offs_t offset) { return read(machine().driver_data()->generic_space(), offset); }
 
 	void set_gate(int idx, int state);
-	DECLARE_WRITE_LINE_MEMBER( set_g1 );
-	DECLARE_WRITE_LINE_MEMBER( set_g2 );
-	DECLARE_WRITE_LINE_MEMBER( set_g3 );
+	void set_g1(int state);
+	void set_g2(int state);
+	void set_g3(int state);
 
 	void set_clock(int idx, int state);
-	DECLARE_WRITE_LINE_MEMBER( set_c1 );
-	DECLARE_WRITE_LINE_MEMBER( set_c2 );
-	DECLARE_WRITE_LINE_MEMBER( set_c3 );
+	void set_c1(int state);
+	void set_c2(int state);
+	void set_c3(int state);
 
 	void update_interrupts();
 

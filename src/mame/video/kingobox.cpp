@@ -120,13 +120,13 @@ void kingofb_state::ringking_get_rgb_data( const uint8_t *color_prom, int i, int
 }
 
 
-PALETTE_INIT_MEMBER(kingofb_state,kingofb)
+void kingofb_state::palette_init_kingofb(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	palette_init_common(palette, color_prom, &kingofb_state::kingofb_get_rgb_data);
 }
 
-PALETTE_INIT_MEMBER(kingofb_state,ringking)
+void kingofb_state::palette_init_ringking(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	palette_init_common(palette, color_prom, &kingofb_state::ringking_get_rgb_data);
@@ -173,7 +173,7 @@ void kingofb_state::kingofb_f800_w(address_space &space, offs_t offset, uint8_t 
 	}
 }
 
-TILE_GET_INFO_MEMBER(kingofb_state::get_bg_tile_info)
+void kingofb_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_colorram[tile_index];
 	int bank = ((attr & 0x04) >> 2) + 2;
@@ -183,7 +183,7 @@ TILE_GET_INFO_MEMBER(kingofb_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(bank, code, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(kingofb_state::get_fg_tile_info)
+void kingofb_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_colorram2[tile_index];
 	int bank = (attr & 0x02) >> 1;
@@ -249,7 +249,7 @@ uint32_t kingofb_state::screen_update_kingofb(screen_device &screen, bitmap_ind1
 
 /* Ring King */
 
-TILE_GET_INFO_MEMBER(kingofb_state::ringking_get_bg_tile_info)
+void kingofb_state::ringking_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = (tile_index / 16) ? m_videoram[tile_index] : 0;
 	int color = ((m_colorram[tile_index] & 0x70) >> 4) + 8 * m_palette_bank;

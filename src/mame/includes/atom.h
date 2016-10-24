@@ -93,8 +93,8 @@ public:
 	void ppi_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t vdg_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
-	DECLARE_WRITE_LINE_MEMBER( atom_8271_interrupt_callback );
-	DECLARE_WRITE_LINE_MEMBER( motor_w );
+	void atom_8271_interrupt_callback(int state);
+	void motor_w(int state);
 
 	/* video state */
 	required_shared_ptr<uint8_t> m_video_ram;
@@ -110,7 +110,7 @@ public:
 	/* devices */
 	int m_previous_i8271_int_state;
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
-	TIMER_DEVICE_CALLBACK_MEMBER(cassette_output_tick);
+	void cassette_output_tick(timer_device &timer, void *ptr, int32_t param);
 
 	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load) { return load_cart(image, m_cart); }

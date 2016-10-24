@@ -120,14 +120,14 @@ int thomson_state::to7_get_cassette()
 
 
 /* 1-bit cassette output */
-WRITE_LINE_MEMBER(thomson_state::to7_set_cassette)
+void thomson_state::to7_set_cassette(int state)
 {
 	m_cassette->output(state ? 1. : -1. );
 }
 
 
 
-WRITE_LINE_MEMBER( thomson_state::to7_set_cassette_motor )
+void thomson_state::to7_set_cassette_motor(int state)
 {
 	cassette_state cassstate =  m_cassette->get_state();
 	double pos = m_cassette->get_position();
@@ -198,7 +198,7 @@ void thomson_state::mo5_set_cassette( int data )
 
 
 
-WRITE_LINE_MEMBER( thomson_state::mo5_set_cassette_motor )
+void thomson_state::mo5_set_cassette_motor(int state)
 {
 	cassette_state cassstate = m_cassette->get_state();
 	double pos = m_cassette->get_position();
@@ -287,14 +287,14 @@ void thomson_state::thom_irq_0( int state )
 	thom_set_irq( 0, state );
 }
 
-WRITE_LINE_MEMBER( thomson_state::thom_dev_irq_0 )
+void thomson_state::thom_dev_irq_0(int state)
 {
 	thom_irq_0( state );
 }
 
 
 
-WRITE_LINE_MEMBER( thomson_state::thom_irq_1 )
+void thomson_state::thom_irq_1(int state)
 {
 	thom_set_irq  ( 1, state );
 }
@@ -304,7 +304,7 @@ void thomson_state::thom_irq_3( int state )
 	thom_set_irq  ( 3, state );
 }
 
-WRITE_LINE_MEMBER( thomson_state::thom_firq_1 )
+void thomson_state::thom_firq_1(int state)
 {
 	thom_set_firq ( 1, state );
 }
@@ -530,7 +530,7 @@ void thomson_state::to7_set_init( int init )
 
 
 
-WRITE_LINE_MEMBER( thomson_state::to7_sys_cb2_out )
+void thomson_state::to7_sys_cb2_out(int state)
 {
 	m_to7_lightpen = !state;
 }
@@ -653,25 +653,25 @@ void to7_io_line_device::porta_out(address_space &space, offs_t offset, uint8_t 
 
 
 
-WRITE_LINE_MEMBER(to7_io_line_device::write_rxd )
+void to7_io_line_device::write_rxd(int state)
 {
 	m_rxd = state;
 }
 
-WRITE_LINE_MEMBER(to7_io_line_device::write_dsr )
+void to7_io_line_device::write_dsr(int state)
 {
 	if (!state) m_last_low = 0;
 
 	m_dsr = state;
 }
 
-WRITE_LINE_MEMBER(to7_io_line_device::write_cts )
+void to7_io_line_device::write_cts(int state)
 {
 	m_pia_io->ca1_w(state);
 	m_cts = state;
 }
 
-WRITE_LINE_MEMBER(to7_io_line_device::write_centronics_busy )
+void to7_io_line_device::write_centronics_busy(int state)
 {
 	if (!state) m_last_low = 1;
 
@@ -717,20 +717,20 @@ uint8_t to7_io_line_device::porta_in(address_space &space, offs_t offset, uint8_
  */
 
 
-WRITE_LINE_MEMBER( thomson_state::to7_modem_cb )
+void thomson_state::to7_modem_cb(int state)
 {
 	LOG(( "to7_modem_cb: called %i\n", state ));
 }
 
 
 
-WRITE_LINE_MEMBER( thomson_state::to7_modem_tx_w )
+void thomson_state::to7_modem_tx_w(int state)
 {
 	m_to7_modem_tx = state;
 }
 
 
-WRITE_LINE_MEMBER( thomson_state::write_acia_clock )
+void thomson_state::write_acia_clock(int state)
 {
 	m_acia6850->write_txc(state);
 	m_acia6850->write_rxc(state);
@@ -931,7 +931,7 @@ void thomson_state::to7_game_portb_out(address_space &space, offs_t offset, uint
 
 
 
-WRITE_LINE_MEMBER( thomson_state::to7_game_cb2_out )
+void thomson_state::to7_game_cb2_out(int state)
 {
 	/* undocumented */
 	/* some TO8 games (e.g.: F15) seem to write here a lot */
@@ -940,7 +940,7 @@ WRITE_LINE_MEMBER( thomson_state::to7_game_cb2_out )
 
 
 /* this should be called periodically */
-TIMER_CALLBACK_MEMBER(thomson_state::to7_game_update_cb)
+void thomson_state::to7_game_update_cb(void *ptr, int32_t param)
 {
 	if ( m_io_config->read() & 1 )
 	{
@@ -1142,7 +1142,7 @@ void thomson_state::machine_start_to7()
 
 
 
-WRITE_LINE_MEMBER( thomson_state::to770_sys_cb2_out )
+void thomson_state::to770_sys_cb2_out(int state)
 {
 	/* video overlay: black pixels are transparent and show TV image underneath */
 	LOG(( "$%04x to770_sys_cb2_out: video overlay %i\n", m_maincpu->pc(), state ));
@@ -1372,7 +1372,7 @@ void thomson_state::mo5_lightpen_cb( int step )
 */
 
 
-TIMER_CALLBACK_MEMBER(thomson_state::mo5_periodic_cb)
+void thomson_state::mo5_periodic_cb(void *ptr, int32_t param)
 {
 	/* pulse */
 	m_pia_sys->cb1_w( 1 );
@@ -2442,7 +2442,7 @@ int thomson_state::to9_kbd_get_key()
 
 
 
-TIMER_CALLBACK_MEMBER(thomson_state::to9_kbd_timer_cb)
+void thomson_state::to9_kbd_timer_cb(void *ptr, int32_t param)
 {
 	if ( m_to9_kbd_periph )
 	{
@@ -2880,7 +2880,7 @@ void thomson_state::to8_kbd_timer_func()
 
 
 
-TIMER_CALLBACK_MEMBER(thomson_state::to8_kbd_timer_cb)
+void thomson_state::to8_kbd_timer_cb(void *ptr, int32_t param)
 {
 	to8_kbd_timer_func();
 }
@@ -3536,7 +3536,7 @@ void thomson_state::to8_sys_portb_out(address_space &space, offs_t offset, uint8
 /* ------------ 6846 (timer, I/O) ------------ */
 
 
-WRITE_LINE_MEMBER(thomson_state::write_centronics_busy )
+void thomson_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 }
@@ -3566,7 +3566,7 @@ void thomson_state::to8_timer_port_out(address_space &space, offs_t offset, uint
 
 
 
-WRITE_LINE_MEMBER( thomson_state::to8_timer_cp2_out )
+void thomson_state::to8_timer_cp2_out(int state)
 {
 	/* mute */
 	m_to7_game_mute = state;
@@ -4139,7 +4139,7 @@ void thomson_state::mo6_ext_w(address_space &space, offs_t offset, uint8_t data,
 /* similar to SX 90-018, but with a few differences: mute, printer */
 
 
-WRITE_LINE_MEMBER( thomson_state::mo6_centronics_busy )
+void thomson_state::mo6_centronics_busy(int state)
 {
 	m_pia_game->cb1_w(state);
 }
@@ -4155,7 +4155,7 @@ void thomson_state::mo6_game_porta_out(address_space &space, offs_t offset, uint
 
 
 
-WRITE_LINE_MEMBER( thomson_state::mo6_game_cb2_out )
+void thomson_state::mo6_game_cb2_out(int state)
 {
 	LOG (( "$%04x %f mo6_game_cb2_out: CENTRONICS set strobe=%i\n", m_maincpu->pc(), machine().time().as_double(), state ));
 
@@ -4165,7 +4165,7 @@ WRITE_LINE_MEMBER( thomson_state::mo6_game_cb2_out )
 
 
 
-TIMER_CALLBACK_MEMBER(thomson_state::mo6_game_update_cb)
+void thomson_state::mo6_game_update_cb(void *ptr, int32_t param)
 {
 	/* unlike the TO8, CB1 & CB2 are not connected to buttons */
 	if ( m_io_config->read() & 1 )
@@ -4252,7 +4252,7 @@ void thomson_state::mo6_sys_porta_out(address_space &space, offs_t offset, uint8
 
 
 
-WRITE_LINE_MEMBER( thomson_state::mo6_sys_cb2_out )
+void thomson_state::mo6_sys_cb2_out(int state)
 {
 	/* SCART pin 8 = slow switch (?) */
 	LOG(( "mo6_sys_cb2_out: SCART slow switch set to %i\n", state ));

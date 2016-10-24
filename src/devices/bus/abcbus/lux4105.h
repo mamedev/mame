@@ -44,10 +44,10 @@ public:
 	virtual ioport_constructor device_input_ports() const override;
 
 	// not really public
-	DECLARE_WRITE_LINE_MEMBER( write_sasi_bsy );
-	DECLARE_WRITE_LINE_MEMBER( write_sasi_req );
-	DECLARE_WRITE_LINE_MEMBER( write_sasi_cd );
-	DECLARE_WRITE_LINE_MEMBER( write_sasi_io );
+	void write_sasi_bsy(int state);
+	void write_sasi_req(int state);
+	void write_sasi_cd(int state);
+	void write_sasi_io(int state);
 
 protected:
 	// device-level overrides

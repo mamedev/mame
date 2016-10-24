@@ -81,7 +81,7 @@ public:
 	{
 	}
 
-	DECLARE_READ_LINE_MEMBER(ca1_r);
+	int ca1_r();
 	uint8_t pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -91,7 +91,7 @@ public:
 	void ds_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void machine_reset_cpu09();
 	void machine_reset_ivg09();
-	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
+	void write_acia_clock(int state);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
 	const uint8_t *m_p_chargen;
@@ -265,7 +265,7 @@ void tavernie_state::pb_w(address_space &space, offs_t offset, uint8_t data, uin
 }
 
 // cass in
-READ_LINE_MEMBER( tavernie_state::ca1_r )
+int tavernie_state::ca1_r()
 {
 	return (m_cass->input() > +0.01);
 }
@@ -289,7 +289,7 @@ void tavernie_state::kbd_put(address_space &space, offs_t offset, uint8_t data, 
 	m_pia_ivg->cb1_w(1);
 }
 
-WRITE_LINE_MEMBER( tavernie_state::write_acia_clock )
+void tavernie_state::write_acia_clock(int state)
 {
 	m_acia->write_txc(state);
 	m_acia->write_rxc(state);

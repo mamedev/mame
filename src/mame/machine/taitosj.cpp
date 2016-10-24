@@ -117,7 +117,7 @@ uint8_t taitosj_state::taitosj_mcu_data_r(address_space &space, offs_t offset, u
 }
 
 /* timer callback : */
-TIMER_CALLBACK_MEMBER(taitosj_state::taitosj_mcu_real_data_w)
+void taitosj_state::taitosj_mcu_real_data_w(void *ptr, int32_t param)
 {
 	m_zready = 1;
 	m_mcu->set_input_line(0, ASSERT_LINE);
@@ -182,13 +182,13 @@ uint8_t taitosj_state::taitosj_68705_portB_r(address_space &space, offs_t offset
 }
 
 /* timer callback : 68705 is going to read data from the Z80 */
-TIMER_CALLBACK_MEMBER(taitosj_state::taitosj_mcu_data_real_r)
+void taitosj_state::taitosj_mcu_data_real_r(void *ptr, int32_t param)
 {
 	m_zready = 0;
 }
 
 /* timer callback : 68705 is writing data for the Z80 */
-TIMER_CALLBACK_MEMBER(taitosj_state::taitosj_mcu_status_real_w)
+void taitosj_state::taitosj_mcu_status_real_w(void *ptr, int32_t param)
 {
 	m_toz80 = param;
 	m_zaccept = 0;

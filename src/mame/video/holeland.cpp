@@ -18,7 +18,7 @@
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(holeland_state::holeland_get_tile_info)
+void holeland_state::holeland_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	/*
 	--x- ---- priority?
@@ -37,7 +37,7 @@ TILE_GET_INFO_MEMBER(holeland_state::holeland_get_tile_info)
 	tileinfo.group = (attr >> 5) & 1;
 }
 
-TILE_GET_INFO_MEMBER(holeland_state::crzrally_get_tile_info)
+void holeland_state::crzrally_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_colorram[tile_index];
 	int tile_number = m_videoram[tile_index] | ((attr & 0x03) << 8);

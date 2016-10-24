@@ -27,7 +27,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(polepos_state,polepos)
+void polepos_state::palette_init_polepos(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i, j;
@@ -143,7 +143,7 @@ PALETTE_INIT_MEMBER(polepos_state,polepos)
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(polepos_state::bg_get_tile_info)
+void polepos_state::bg_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t word = m_view16_memory[tile_index];
 	int code = (word & 0xff) | ((word & 0x4000) >> 6);
@@ -154,7 +154,7 @@ TILE_GET_INFO_MEMBER(polepos_state::bg_get_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(polepos_state::tx_get_tile_info)
+void polepos_state::tx_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t word = m_alpha16_memory[tile_index];
 	int code = (word & 0xff) | ((word & 0x4000) >> 6);

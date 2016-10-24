@@ -259,23 +259,23 @@ public:
 	uint32_t screen_update_jantouki_bottom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cdracula(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	INTERRUPT_GEN_MEMBER(sprtmtch_vblank_interrupt);
-	INTERRUPT_GEN_MEMBER(jantouki_vblank_interrupt);
-	INTERRUPT_GEN_MEMBER(jantouki_sound_vblank_interrupt);
-	INTERRUPT_GEN_MEMBER(yarunara_clock_interrupt);
-	INTERRUPT_GEN_MEMBER(mjelctrn_vblank_interrupt);
+	void sprtmtch_vblank_interrupt(device_t &device);
+	void jantouki_vblank_interrupt(device_t &device);
+	void jantouki_sound_vblank_interrupt(device_t &device);
+	void yarunara_clock_interrupt(device_t &device);
+	void mjelctrn_vblank_interrupt(device_t &device);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(neruton_irq_scanline);
-	TIMER_DEVICE_CALLBACK_MEMBER(majxtal7_vblank_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(tenkai_interrupt);
+	void neruton_irq_scanline(timer_device &timer, void *ptr, int32_t param);
+	void majxtal7_vblank_interrupt(timer_device &timer, void *ptr, int32_t param);
+	void tenkai_interrupt(timer_device &timer, void *ptr, int32_t param);
 
 	void tenkai_update_rombank();
 	void gekisha_bank_postload();
 
-	DECLARE_WRITE_LINE_MEMBER(sprtmtch_sound_callback);
-	DECLARE_WRITE_LINE_MEMBER(jantouki_sound_callback);
-	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
-	DECLARE_WRITE_LINE_MEMBER(adpcm_int_cpu1);
+	void sprtmtch_sound_callback(int state);
+	void jantouki_sound_callback(int state);
+	void adpcm_int(int state);
+	void adpcm_int_cpu1(int state);
 
 	void machine_reset_adpcm();
 	void adpcm_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -284,14 +284,14 @@ public:
 	void machine_start_tenkai();
 	void tenkai_dswsel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t tenkai_dsw_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(tenkai_rtc_irq);
+	void tenkai_rtc_irq(int state);
 	void machine_reset_dynax();
 	void machine_start_dynax();
 	void machine_start_hanamai();
 	void video_start_hanamai();
 	void machine_start_hnoridur();
 	void video_start_hnoridur();
-	DECLARE_PALETTE_INIT(sprtmtch);
+	void palette_init_sprtmtch(palette_device &palette);
 	void video_start_sprtmtch();
 	void machine_start_jantouki();
 	void video_start_jantouki();
@@ -299,7 +299,7 @@ public:
 	void video_start_mjembase();
 	void video_start_mjdialq2();
 	void video_start_mcnpshnt();
-	DECLARE_PALETTE_INIT(janyuki);
+	void palette_init_janyuki(palette_device &palette);
 	void video_start_neruton();
 
 	inline void blitter_plot_pixel( int layer, int mask, int x, int y, int pen, int wrap, int flags );

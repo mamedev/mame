@@ -42,7 +42,7 @@ uint8_t aeroboto_state::aeroboto_201_r(address_space &space, offs_t offset, uint
 }
 
 
-INTERRUPT_GEN_MEMBER(aeroboto_state::aeroboto_interrupt)
+void aeroboto_state::aeroboto_interrupt(device_t &device)
 {
 	if (!m_disable_irq)
 		device.execute().set_input_line(0, ASSERT_LINE);

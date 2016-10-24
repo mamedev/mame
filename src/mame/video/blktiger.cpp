@@ -14,19 +14,19 @@
 
 ***************************************************************************/
 
-TILEMAP_MAPPER_MEMBER(blktiger_state::bg8x4_scan)
+tilemap_memory_index blktiger_state::bg8x4_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return (col & 0x0f) + ((row & 0x0f) << 4) + ((col & 0x70) << 4) + ((row & 0x30) << 7);
 }
 
-TILEMAP_MAPPER_MEMBER(blktiger_state::bg4x8_scan)
+tilemap_memory_index blktiger_state::bg4x8_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return (col & 0x0f) + ((row & 0x0f) << 4) + ((col & 0x30) << 4) + ((row & 0x70) << 6);
 }
 
-TILE_GET_INFO_MEMBER(blktiger_state::get_bg_tile_info)
+void blktiger_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	/* the tile priority table is a guess compiled by looking at the game. It
 	   was not derived from a PROM so it could be wrong. */
@@ -46,7 +46,7 @@ TILE_GET_INFO_MEMBER(blktiger_state::get_bg_tile_info)
 	tileinfo.group = split_table[color];
 }
 
-TILE_GET_INFO_MEMBER(blktiger_state::get_tx_tile_info)
+void blktiger_state::get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t attr = m_txvideoram[tile_index + 0x400];
 	SET_TILE_INFO_MEMBER(0,

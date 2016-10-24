@@ -395,15 +395,15 @@ public:
 	uint8_t cashcade_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void mk4_printer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t mk4_printer_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(mkiv_pia_ca2);
-	DECLARE_WRITE_LINE_MEMBER(mkiv_pia_cb2);
+	void mkiv_pia_ca2(int state);
+	void mkiv_pia_cb2(int state);
 	void mkiv_pia_outb(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t via_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t via_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void via_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void via_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(via_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(via_cb2_w);
+	void via_ca2_w(int state);
+	void via_cb2_w(int state);
 	void pblp_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void pbltlp_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void zn434_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -414,13 +414,13 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(aristmk4);
-	DECLARE_PALETTE_INIT(lions);
+	void palette_init_aristmk4(palette_device &palette);
+	void palette_init_lions(palette_device &palette);
 	uint32_t screen_update_aristmk4(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(note_input_reset);
-	TIMER_CALLBACK_MEMBER(coin_input_reset);
-	TIMER_CALLBACK_MEMBER(hopper_reset);
-	TIMER_DEVICE_CALLBACK_MEMBER(aristmk4_pf);
+	void note_input_reset(void *ptr, int32_t param);
+	void coin_input_reset(void *ptr, int32_t param);
+	void hopper_reset(void *ptr, int32_t param);
+	void aristmk4_pf(timer_device &timer, void *ptr, int32_t param);
 	inline void uBackgroundColour();
 };
 
@@ -576,7 +576,7 @@ uint8_t aristmk4_state::u3_p3(address_space &space, offs_t offset, uint8_t mem_m
 
 }
 
-TIMER_CALLBACK_MEMBER(aristmk4_state::note_input_reset)
+void aristmk4_state::note_input_reset(void *ptr, int32_t param)
 {
 	m_insnote=0; //reset note input after 150msec
 }
@@ -660,14 +660,14 @@ void aristmk4_state::mkiv_pia_outa(address_space &space, offs_t offset, uint8_t 
 }
 
 //output ca2
-WRITE_LINE_MEMBER(aristmk4_state::mkiv_pia_ca2)
+void aristmk4_state::mkiv_pia_ca2(int state)
 {
 	m_rtc_address_strobe = state;
 	// logerror("address strobe %02X\n", address_strobe);
 }
 
 //output cb2
-WRITE_LINE_MEMBER(aristmk4_state::mkiv_pia_cb2)
+void aristmk4_state::mkiv_pia_cb2(int state)
 {
 	m_rtc_data_strobe = state;
 	//logerror("data strobe: %02X\n", data);
@@ -740,12 +740,12 @@ VERSATILE INTERFACE ADAPTER CONFIGURATION
 
 ******************************************************************************/
 
-TIMER_CALLBACK_MEMBER(aristmk4_state::coin_input_reset)
+void aristmk4_state::coin_input_reset(void *ptr, int32_t param)
 {
 	m_inscrd=0; //reset credit input after 150msec
 }
 
-TIMER_CALLBACK_MEMBER(aristmk4_state::hopper_reset)
+void aristmk4_state::hopper_reset(void *ptr, int32_t param)
 {
 	m_hopper_motor = 0x01;
 	output().set_value("hopper_motor", m_hopper_motor);
@@ -901,13 +901,13 @@ void aristmk4_state::via_b_w(address_space &space, offs_t offset, uint8_t data, 
 	}
 }
 
-WRITE_LINE_MEMBER(aristmk4_state::via_ca2_w)
+void aristmk4_state::via_ca2_w(int state)
 {
 	// CA2 is connected to CDSOL1 on schematics ?
 	//logerror("Via Port CA2 write %02X\n",data) ;
 }
 
-WRITE_LINE_MEMBER(aristmk4_state::via_cb2_w)
+void aristmk4_state::via_cb2_w(int state)
 {
 	// CB2 = hopper motor (HOPMO1). When it is 0x01, it is not running (active low)
 	// when it goes to 0, we're expecting to coins to be paid out, handled in via_b_r
@@ -1631,7 +1631,7 @@ uint8_t aristmk4_state::pc1_r(address_space &space, offs_t offset, uint8_t mem_m
 }
 
 /* same as Casino Winner HW */
-PALETTE_INIT_MEMBER(aristmk4_state, aristmk4)
+void aristmk4_state::palette_init_aristmk4(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -1683,7 +1683,7 @@ void aristmk4_state::machine_reset()
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(aristmk4_state::aristmk4_pf)
+void aristmk4_state::aristmk4_pf(timer_device &timer, void *ptr, int32_t param)
 {
 	/*
 	IRQ generator pulses the NMI signal to CPU in the event of power down or power failure.
@@ -1787,7 +1787,7 @@ static MACHINE_CONFIG_DERIVED( aristmk4_poker, aristmk4 )
 MACHINE_CONFIG_END
 
 /* same as Aristocrat Mark-IV HW color offset 7 */
-PALETTE_INIT_MEMBER(aristmk4_state,lions)
+void aristmk4_state::palette_init_lions(palette_device &palette)
 {
 	int i;
 

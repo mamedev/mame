@@ -34,7 +34,7 @@ void toki_state::toki_control_w(address_space &space, offs_t offset, uint16_t da
 	COMBINE_DATA(&m_scrollram[offset]);
 }
 
-TILE_GET_INFO_MEMBER(toki_state::get_text_tile_info)
+void toki_state::get_text_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t *videoram = m_videoram;
 	int tile = videoram[tile_index];
@@ -48,7 +48,7 @@ TILE_GET_INFO_MEMBER(toki_state::get_text_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(toki_state::get_back_tile_info)
+void toki_state::get_back_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = m_background1_videoram[tile_index];
 	int color = (tile >> 12) & 0xf;
@@ -61,7 +61,7 @@ TILE_GET_INFO_MEMBER(toki_state::get_back_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(toki_state::get_fore_tile_info)
+void toki_state::get_fore_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = m_background2_videoram[tile_index];
 	int color = (tile >> 12) & 0xf;

@@ -409,7 +409,7 @@ void tms5501_device::tmr_w(address_space &space, offs_t offset, uint8_t data, ui
 //  rcv_w - receive data write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( tms5501_device::rcv_w )
+void tms5501_device::rcv_w(int state)
 {
 	device_serial_interface::rx_w(state);
 
@@ -430,7 +430,7 @@ WRITE_LINE_MEMBER( tms5501_device::rcv_w )
 //  xi7_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( tms5501_device::xi7_w )
+void tms5501_device::xi7_w(int state)
 {
 	if (m_cmd & CMD_XI7)
 	{
@@ -448,7 +448,7 @@ WRITE_LINE_MEMBER( tms5501_device::xi7_w )
 //  sens_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( tms5501_device::sens_w )
+void tms5501_device::sens_w(int state)
 {
 	if (!m_sens && state)
 	{

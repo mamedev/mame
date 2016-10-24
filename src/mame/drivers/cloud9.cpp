@@ -123,7 +123,7 @@ inline void cloud9_state::schedule_next_irq(int curscanline)
 }
 
 
-TIMER_CALLBACK_MEMBER(cloud9_state::clock_irq)
+void cloud9_state::clock_irq(void *ptr, int32_t param)
 {
 	/* assert the IRQ if not already asserted */
 	if (!m_irq_state)

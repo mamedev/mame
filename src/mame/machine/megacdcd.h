@@ -266,7 +266,7 @@ public:
 	uint16_t cdc_data_sub_r(address_space &space, offs_t offset, uint16_t mem_mask);
 	uint16_t cdc_data_main_r(address_space &space, offs_t offset, uint16_t mem_mask);
 
-	TIMER_DEVICE_CALLBACK_MEMBER( segacd_access_timer_callback );
+	void segacd_access_timer_callback(timer_device &timer, void *ptr, int32_t param);
 
 	uint16_t get_segacd_irq_mask(void) { return segacd_irq_mask; }
 	uint16_t segacd_irq_mask;

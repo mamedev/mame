@@ -80,7 +80,7 @@ public:
 
 	/* keyboard state */
 	int m_ksc;              /* keyboard scan column */
-	DECLARE_PALETTE_INIT(px8);
+	void palette_init_px8(palette_device &palette);
 };
 
 #endif

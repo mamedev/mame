@@ -56,7 +56,7 @@ void sprint4_state::device_timer(emu_timer &timer, device_timer_id id, int param
 }
 
 
-TIMER_CALLBACK_MEMBER(sprint4_state::nmi_callback)
+void sprint4_state::nmi_callback(void *ptr, int32_t param)
 {
 	int scanline = param;
 

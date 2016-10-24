@@ -194,7 +194,7 @@ void tc0091lvc_device::device_validity_check(validity_checker &valid) const
 {
 }
 
-TILE_GET_INFO_MEMBER(tc0091lvc_device::get_bg0_tile_info)
+void tc0091lvc_device::get_bg0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_vram0[2 * tile_index + 1];
 	int code = m_vram0[2 * tile_index]
@@ -208,7 +208,7 @@ TILE_GET_INFO_MEMBER(tc0091lvc_device::get_bg0_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(tc0091lvc_device::get_bg1_tile_info)
+void tc0091lvc_device::get_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_vram1[2 * tile_index + 1];
 	int code = m_vram1[2 * tile_index]
@@ -222,7 +222,7 @@ TILE_GET_INFO_MEMBER(tc0091lvc_device::get_bg1_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(tc0091lvc_device::get_tx_tile_info)
+void tc0091lvc_device::get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_tvram[2 * tile_index + 1];
 	uint16_t code = m_tvram[2 * tile_index]

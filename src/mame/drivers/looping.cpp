@@ -144,21 +144,21 @@ public:
 	void adc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void plr2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t cop_unk_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_READ_LINE_MEMBER(cop_serial_r);
+	int cop_serial_r();
 	void cop_l_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t protection_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(looping_spcint);
+	void looping_spcint(int state);
 	void looping_sound_sw(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void ay_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void speech_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_looping();
-	TILE_GET_INFO_MEMBER(get_tile_info);
+	void get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(looping);
+	void palette_init_looping(palette_device &palette);
 	uint32_t screen_update_looping(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(looping_interrupt);
+	void looping_interrupt(device_t &device);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
@@ -176,7 +176,7 @@ public:
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(looping_state, looping)
+void looping_state::palette_init_looping(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances[3] = { 1000, 470, 220 };
@@ -223,7 +223,7 @@ PALETTE_INIT_MEMBER(looping_state, looping)
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(looping_state::get_tile_info)
+void looping_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile_number = m_videoram[tile_index];
 	int color = m_colorram[(tile_index & 0x1f) * 2 + 1] & 0x07;
@@ -358,7 +358,7 @@ void looping_state::machine_reset()
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(looping_state::looping_interrupt)
+void looping_state::looping_interrupt(device_t &device)
 {
 	m_maincpu->set_input_line(INT_9995_INT1, ASSERT_LINE);
 }
@@ -387,7 +387,7 @@ void looping_state::looping_souint_clr(address_space &space, offs_t offset, uint
 }
 
 
-WRITE_LINE_MEMBER(looping_state::looping_spcint)
+void looping_state::looping_spcint(int state)
 {
 	logerror("Speech /int = %d\n", state==ASSERT_LINE? 1:0);
 	m_audiocpu->set_input_line(INT_9980A_LEVEL4, state==ASSERT_LINE? CLEAR_LINE : ASSERT_LINE);
@@ -492,7 +492,7 @@ uint8_t looping_state::cop_unk_r(address_space &space, offs_t offset, uint8_t me
 	return 1;
 }
 
-READ_LINE_MEMBER(looping_state::cop_serial_r)
+int looping_state::cop_serial_r()
 {
 	return 1;
 }

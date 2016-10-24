@@ -160,7 +160,7 @@ void rm380z_state::rm380z_porthi_w(address_space &space, offs_t offset, uint8_t 
 // for about 4.5 milliseconds every 20 milliseconds"
 //
 
-TIMER_CALLBACK_MEMBER(rm380z_state::static_vblank_timer)
+void rm380z_state::static_vblank_timer(void *ptr, int32_t param)
 {
 	//printf("timer callback called at [%f]\n",machine().time().as_double());
 

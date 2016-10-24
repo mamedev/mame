@@ -83,8 +83,8 @@ public:
 	void init_csplayh7();
 	void init_junai2();
 	virtual void machine_reset() override;
-	TIMER_DEVICE_CALLBACK_MEMBER(csplayh5_irq);
-	DECLARE_WRITE_LINE_MEMBER(csplayh5_vdp0_interrupt);
+	void csplayh5_irq(timer_device &timer, void *ptr, int32_t param);
+	void csplayh5_vdp0_interrupt(int state);
 
 	void general_init(int patchaddress, int patchvalue);
 	void soundbank_w(int data);
@@ -94,7 +94,7 @@ public:
 
 #define USE_H8 0
 
-WRITE_LINE_MEMBER(csplayh5_state::csplayh5_vdp0_interrupt)
+void csplayh5_state::csplayh5_vdp0_interrupt(int state)
 {
 	/* this is not used as the v9938 interrupt callbacks are broken
 	   interrupts seem to be fired quite randomly */
@@ -414,7 +414,7 @@ void csplayh5_state::machine_reset()
 {
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(csplayh5_state::csplayh5_irq)
+void csplayh5_state::csplayh5_irq(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

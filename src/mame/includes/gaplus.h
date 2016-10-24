@@ -84,16 +84,16 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(gaplus);
+	void palette_init_gaplus(palette_device &palette);
 
-	TILEMAP_MAPPER_MEMBER(tilemap_scan);
-	TILE_GET_INFO_MEMBER(get_tile_info);
+	tilemap_memory_index tilemap_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	void get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
-	INTERRUPT_GEN_MEMBER(vblank_main_irq);
-	INTERRUPT_GEN_MEMBER(gapluso_vblank_main_irq);
-	INTERRUPT_GEN_MEMBER(vblank_sub_irq);
-	INTERRUPT_GEN_MEMBER(vblank_sub2_irq);
-	TIMER_CALLBACK_MEMBER(namcoio_run);
+	void vblank_main_irq(device_t &device);
+	void gapluso_vblank_main_irq(device_t &device);
+	void vblank_sub_irq(device_t &device);
+	void vblank_sub2_irq(device_t &device);
+	void namcoio_run(void *ptr, int32_t param);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof(screen_device &screen, bool state);

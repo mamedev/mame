@@ -209,7 +209,7 @@ public:
 	void set_irq_num(const int irq_num) {m_irq_num = irq_num;}
 	virtual DECLARE_ADDRESS_MAP(config_map, 32) override;
 
-	DECLARE_WRITE_LINE_MEMBER(pci_stall);
+	void pci_stall(int state);
 
 	// pci bus
 	uint32_t pci_config_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
@@ -281,7 +281,7 @@ private:
 
 	/* timer info */
 	galileo_timer   m_timer[4];
-	TIMER_CALLBACK_MEMBER(timer_callback);
+	void timer_callback(void *ptr, int32_t param);
 
 	/* DMA info */
 	int8_t            m_dma_active;
@@ -307,7 +307,7 @@ private:
 	emu_timer* m_dma_timer;
 	galileo_addr_map dma_addr_map[proc_addr_bank::ADDR_NUM];
 	int dma_fetch_next(address_space &space, int which);
-	TIMER_CALLBACK_MEMBER(perform_dma);
+	void perform_dma(void *ptr, int32_t param);
 	address_space* dma_decode_address(uint32_t &addr);
 
 };

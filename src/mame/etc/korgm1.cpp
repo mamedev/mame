@@ -158,7 +158,7 @@ void korgm1_state::machine_reset()
 }
 
 
-PALETTE_INIT_MEMBER(korgm1_state, korgm1)
+void korgm1_state::palette_init_korgm1(palette_device &palette)
 {
 }
 

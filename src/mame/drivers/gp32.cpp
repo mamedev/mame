@@ -242,7 +242,7 @@ void gp32_state::s3c240x_lcd_render_16( )
 	}
 }
 
-TIMER_CALLBACK_MEMBER(gp32_state::s3c240x_lcd_timer_exp)
+void gp32_state::s3c240x_lcd_timer_exp(void *ptr, int32_t param)
 {
 	screen_device *screen = machine().first_screen();
 	verboselog(*this, 2, "LCD timer callback\n");
@@ -647,7 +647,7 @@ void gp32_state::s3c240x_pwm_w(address_space &space, offs_t offset, uint32_t dat
 	}
 }
 
-TIMER_CALLBACK_MEMBER(gp32_state::s3c240x_pwm_timer_exp)
+void gp32_state::s3c240x_pwm_timer_exp(void *ptr, int32_t param)
 {
 	int ch = param;
 	static const int ch_int[] = { INT_TIMER0, INT_TIMER1, INT_TIMER2, INT_TIMER3, INT_TIMER4 };
@@ -878,7 +878,7 @@ void gp32_state::s3c240x_dma_w(address_space &space, offs_t offset, uint32_t dat
 	}
 }
 
-TIMER_CALLBACK_MEMBER(gp32_state::s3c240x_dma_timer_exp)
+void gp32_state::s3c240x_dma_timer_exp(void *ptr, int32_t param)
 {
 	int ch = param;
 	verboselog(*this, 2, "DMA %d timer callback\n", ch);
@@ -1392,7 +1392,7 @@ void gp32_state::s3c240x_iic_w(address_space &space, offs_t offset, uint32_t dat
 	}
 }
 
-TIMER_CALLBACK_MEMBER(gp32_state::s3c240x_iic_timer_exp)
+void gp32_state::s3c240x_iic_timer_exp(void *ptr, int32_t param)
 {
 	int enable_interrupt, mode_selection;
 	verboselog(*this, 2, "IIC timer callback\n");
@@ -1528,7 +1528,7 @@ void gp32_state::s3c240x_iis_w(address_space &space, offs_t offset, uint32_t dat
 	}
 }
 
-TIMER_CALLBACK_MEMBER(gp32_state::s3c240x_iis_timer_exp)
+void gp32_state::s3c240x_iis_timer_exp(void *ptr, int32_t param)
 {
 	verboselog(*this, 2, "IIS timer callback\n");
 	s3c240x_dma_request_iis();

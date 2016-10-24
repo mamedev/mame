@@ -146,35 +146,35 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( to7_cartridge );
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( mo5_cartridge );
 
-	DECLARE_WRITE_LINE_MEMBER( to7_set_cassette_motor );
-	DECLARE_WRITE_LINE_MEMBER( mo5_set_cassette_motor );
-	DECLARE_WRITE_LINE_MEMBER( thom_dev_irq_0 );
-	DECLARE_WRITE_LINE_MEMBER( thom_irq_1 );
-	DECLARE_WRITE_LINE_MEMBER( thom_firq_1 );
+	void to7_set_cassette_motor(int state);
+	void mo5_set_cassette_motor(int state);
+	void thom_dev_irq_0(int state);
+	void thom_irq_1(int state);
+	void thom_firq_1(int state);
 	void to7_cartridge_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t to7_cartridge_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void to7_timer_port_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t to7_timer_port_in(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( to7_set_cassette );
-	DECLARE_WRITE_LINE_MEMBER( to7_sys_cb2_out );
+	void to7_set_cassette(int state);
+	void to7_sys_cb2_out(int state);
 	void to7_sys_portb_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t to7_sys_porta_in(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t to7_sys_portb_in(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( to7_modem_cb );
-	DECLARE_WRITE_LINE_MEMBER( to7_modem_tx_w );
-	DECLARE_WRITE_LINE_MEMBER( write_acia_clock );
+	void to7_modem_cb(int state);
+	void to7_modem_tx_w(int state);
+	void write_acia_clock(int state);
 	uint8_t to7_modem_mea8000_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void to7_modem_mea8000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t to7_game_porta_in(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t to7_game_portb_in(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void to7_game_portb_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( to7_game_cb2_out );
-	TIMER_CALLBACK_MEMBER( to7_game_update_cb );
+	void to7_game_cb2_out(int state);
+	void to7_game_update_cb(void *ptr, int32_t param);
 	uint8_t to7_midi_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void to7_midi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void machine_reset_to7();
 	void machine_start_to7();
-	DECLARE_WRITE_LINE_MEMBER( to770_sys_cb2_out );
+	void to770_sys_cb2_out(int state);
 	uint8_t to770_sys_porta_in(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void to7_update_cart_bank_postload();
 	void to770_update_ram_bank_postload();
@@ -186,7 +186,7 @@ public:
 	void machine_start_to770();
 	void to7_lightpen_cb( int step );
 	void mo5_lightpen_cb( int step );
-	TIMER_CALLBACK_MEMBER( mo5_periodic_cb );
+	void mo5_periodic_cb(void *ptr, int32_t param);
 	void mo5_sys_porta_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t mo5_sys_porta_in(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t mo5_sys_portb_in(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
@@ -210,14 +210,14 @@ public:
 	void to9_update_ram_bank_postload();
 	uint8_t to9_kbd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void to9_kbd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	TIMER_CALLBACK_MEMBER( to9_kbd_timer_cb );
+	void to9_kbd_timer_cb(void *ptr, int32_t param);
 	uint8_t to9_sys_porta_in(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void to9_sys_porta_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void to9_sys_portb_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void to9_timer_port_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void machine_reset_to9();
 	void machine_start_to9();
-	TIMER_CALLBACK_MEMBER( to8_kbd_timer_cb );
+	void to8_kbd_timer_cb(void *ptr, int32_t param);
 	void to8_update_floppy_bank_postload();
 	void to8_update_ram_bank_postload();
 	void to8_update_cart_bank_postload();
@@ -233,7 +233,7 @@ public:
 	void to8_sys_portb_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t to8_timer_port_in(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void to8_timer_port_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( to8_timer_cp2_out );
+	void to8_timer_cp2_out(int state);
 	void to8_lightpen_cb( int step );
 	void machine_reset_to8();
 	void machine_start_to8();
@@ -246,14 +246,14 @@ public:
 	void mo6_cartridge_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t mo6_cartridge_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void mo6_ext_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( mo6_centronics_busy );
+	void mo6_centronics_busy(int state);
 	void mo6_game_porta_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( mo6_game_cb2_out );
-	TIMER_CALLBACK_MEMBER( mo6_game_update_cb );
+	void mo6_game_cb2_out(int state);
+	void mo6_game_update_cb(void *ptr, int32_t param);
 	uint8_t mo6_sys_porta_in(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t mo6_sys_portb_in(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void mo6_sys_porta_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( mo6_sys_cb2_out );
+	void mo6_sys_cb2_out(int state);
 	uint8_t mo6_gatearray_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void mo6_gatearray_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t mo6_vreg_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
@@ -269,8 +269,8 @@ public:
 	void machine_reset_mo5nr();
 	void machine_start_mo5nr();
 
-	TIMER_CALLBACK_MEMBER( thom_lightpen_step );
-	TIMER_CALLBACK_MEMBER( thom_scanline_start );
+	void thom_lightpen_step(void *ptr, int32_t param);
+	void thom_scanline_start(void *ptr, int32_t param);
 	uint32_t screen_update_thom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void to7_vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void to770_vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -281,7 +281,7 @@ public:
 	void to8_vcart_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void mo6_vcart_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void mo6_vcart_hi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	TIMER_CALLBACK_MEMBER( thom_set_init );
+	void thom_set_init(void *ptr, int32_t param);
 	void to770_scandraw_16( uint8_t* vram, uint16_t* dst, uint16_t* pal, int org, int len );
 	void mo5_scandraw_16( uint8_t* vram, uint16_t* dst, uint16_t* pal, int org, int len );
 	void mo5alt_scandraw_16( uint8_t* vram, uint16_t* dst, uint16_t* pal, int org, int len );
@@ -321,30 +321,30 @@ public:
 	void to7_5p14sd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t to7_qdd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void to7_qdd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	TIMER_CALLBACK_MEMBER( thmfc_floppy_cmd_complete_cb );
+	void thmfc_floppy_cmd_complete_cb(void *ptr, int32_t param);
 	uint8_t thmfc_floppy_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void thmfc_floppy_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	TIMER_CALLBACK_MEMBER( ans4 );
-	TIMER_CALLBACK_MEMBER( ans3 );
-	TIMER_CALLBACK_MEMBER( ans2 );
-	TIMER_CALLBACK_MEMBER( ans );
+	void ans4(void *ptr, int32_t param);
+	void ans3(void *ptr, int32_t param);
+	void ans2(void *ptr, int32_t param);
+	void ans(void *ptr, int32_t param);
 	uint8_t to7_network_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void to7_network_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t to7_floppy_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void to7_floppy_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t to9_floppy_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void to9_floppy_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	WRITE_LINE_MEMBER( fdc_index_0_w );
-	WRITE_LINE_MEMBER( fdc_index_1_w );
-	WRITE_LINE_MEMBER( fdc_index_2_w );
-	WRITE_LINE_MEMBER( fdc_index_3_w );
+	void fdc_index_0_w(int state);
+	void fdc_index_1_w(int state);
+	void fdc_index_2_w(int state);
+	void fdc_index_3_w(int state);
 	void thomson_index_callback(legacy_floppy_image_device *device, int state);
-	DECLARE_PALETTE_INIT(thom);
-	DECLARE_PALETTE_INIT(mo5);
+	void palette_init_thom(palette_device &palette);
+	void palette_init_mo5(palette_device &palette);
 
 	optional_device<mc6854_device> m_mc6854;
 
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
+	void write_centronics_busy(int state);
 
 	int m_centronics_busy;
 	int m_centronics_perror;
@@ -676,10 +676,10 @@ public:
 	/* write data register */
 	void porta_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER(write_rxd);
-	DECLARE_WRITE_LINE_MEMBER(write_cts);
-	DECLARE_WRITE_LINE_MEMBER(write_dsr);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
+	void write_rxd(int state);
+	void write_cts(int state);
+	void write_dsr(int state);
+	void write_centronics_busy(int state);
 
 protected:
 	// device-level overrides

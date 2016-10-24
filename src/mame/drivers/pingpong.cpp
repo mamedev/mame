@@ -58,7 +58,7 @@ void pingpong_state::coin_w(address_space &space, offs_t offset, uint8_t data, u
 	/* other bits unknown */
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(pingpong_state::pingpong_interrupt)
+void pingpong_state::pingpong_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -72,7 +72,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(pingpong_state::pingpong_interrupt)
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(pingpong_state::merlinmm_interrupt)
+void pingpong_state::merlinmm_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

@@ -138,14 +138,14 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_taitopjc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(taitopjc_vbi);
+	void taitopjc_vbi(device_t &device);
 	uint32_t videochip_r(offs_t address);
 	void videochip_w(offs_t address, uint32_t data);
 	void video_exit();
 	void print_display_list();
-	TILE_GET_INFO_MEMBER(tile_get_info);
-	TILEMAP_MAPPER_MEMBER(tile_scan_layer0);
-	TILEMAP_MAPPER_MEMBER(tile_scan_layer1);
+	void tile_get_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	tilemap_memory_index tile_scan_layer0(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	tilemap_memory_index tile_scan_layer1(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
 
 	void init_optiger();
 
@@ -190,7 +190,7 @@ void taitopjc_state::video_exit()
 #endif
 }
 
-TILE_GET_INFO_MEMBER(taitopjc_state::tile_get_info)
+void taitopjc_state::tile_get_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint32_t val = m_screen_ram[0x3f000 + (tile_index/2)];
 
@@ -204,13 +204,13 @@ TILE_GET_INFO_MEMBER(taitopjc_state::tile_get_info)
 	SET_TILE_INFO_MEMBER(0, tile, color, flags);
 }
 
-TILEMAP_MAPPER_MEMBER(taitopjc_state::tile_scan_layer0)
+tilemap_memory_index taitopjc_state::tile_scan_layer0(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return (row * 64) + col;
 }
 
-TILEMAP_MAPPER_MEMBER(taitopjc_state::tile_scan_layer1)
+tilemap_memory_index taitopjc_state::tile_scan_layer1(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return (row * 64) + col + 32;
@@ -746,7 +746,7 @@ void taitopjc_state::machine_reset()
 }
 
 
-INTERRUPT_GEN_MEMBER(taitopjc_state::taitopjc_vbi)
+void taitopjc_state::taitopjc_vbi(device_t &device)
 {
 	m_iocpu->set_input_line(TLCS900_INT1, ASSERT_LINE);
 }

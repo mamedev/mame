@@ -34,7 +34,7 @@ void goldstar_state::goldstar_fg_atrram_w(address_space &space, offs_t offset, u
 }
 
 
-TILE_GET_INFO_MEMBER(goldstar_state::get_goldstar_fg_tile_info)
+void goldstar_state::get_goldstar_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int const code = m_fg_vidram[tile_index];
 	int const attr = m_fg_atrram[tile_index];
@@ -47,7 +47,7 @@ TILE_GET_INFO_MEMBER(goldstar_state::get_goldstar_fg_tile_info)
 
 
 // colour / high tile bits are swapped around
-TILE_GET_INFO_MEMBER(goldstar_state::get_cherrym_fg_tile_info)
+void goldstar_state::get_cherrym_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int const code = m_fg_vidram[tile_index];
 	int const attr = m_fg_atrram[tile_index];
@@ -66,7 +66,7 @@ void goldstar_state::goldstar_reel1_ram_w(address_space &space, offs_t offset, u
 	m_reel1_tilemap->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(goldstar_state::get_goldstar_reel1_tile_info)
+void goldstar_state::get_goldstar_reel1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	SET_TILE_INFO_MEMBER(1,
 			m_reel1_ram[tile_index],
@@ -81,7 +81,7 @@ void goldstar_state::goldstar_reel2_ram_w(address_space &space, offs_t offset, u
 	m_reel2_tilemap->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(goldstar_state::get_goldstar_reel2_tile_info)
+void goldstar_state::get_goldstar_reel2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	SET_TILE_INFO_MEMBER(1,
 			m_reel2_ram[tile_index],
@@ -95,7 +95,7 @@ void goldstar_state::goldstar_reel3_ram_w(address_space &space, offs_t offset, u
 	m_reel3_tilemap->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(goldstar_state::get_goldstar_reel3_tile_info)
+void goldstar_state::get_goldstar_reel3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	SET_TILE_INFO_MEMBER(1,
 			m_reel3_ram[tile_index],
@@ -333,7 +333,7 @@ uint32_t cmaster_state::screen_update_amcoe1a(screen_device &screen, bitmap_ind1
 
 
 
-TILE_GET_INFO_MEMBER(wingco_state::get_magical_fg_tile_info)
+void wingco_state::get_magical_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int const code = m_fg_vidram[tile_index];
 	int const attr = m_fg_atrram[tile_index];
@@ -510,7 +510,7 @@ void sanghopm_state::reel3_attrram_w(address_space &space, offs_t offset, uint8_
 }
 
 
-TILE_GET_INFO_MEMBER(sanghopm_state::get_fg_tile_info)
+void sanghopm_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int const code = m_fg_vidram[tile_index];
 	int const attr = m_fg_atrram[tile_index];
@@ -521,7 +521,7 @@ TILE_GET_INFO_MEMBER(sanghopm_state::get_fg_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(sanghopm_state::get_bg_tile_info)
+void sanghopm_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int const code = m_bg_vidram[tile_index];
 	int const attr = m_bg_atrram[tile_index];
@@ -532,7 +532,7 @@ TILE_GET_INFO_MEMBER(sanghopm_state::get_bg_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(sanghopm_state::get_reel1_tile_info)
+void sanghopm_state::get_reel1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int const code = m_reel1_ram[tile_index];
 	int const attr = m_reel1_attrram[tile_index];
@@ -543,7 +543,7 @@ TILE_GET_INFO_MEMBER(sanghopm_state::get_reel1_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(sanghopm_state::get_reel2_tile_info)
+void sanghopm_state::get_reel2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int const code = m_reel2_ram[tile_index];
 	int const attr = m_reel2_attrram[tile_index];
@@ -554,7 +554,7 @@ TILE_GET_INFO_MEMBER(sanghopm_state::get_reel2_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(sanghopm_state::get_reel3_tile_info)
+void sanghopm_state::get_reel3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int const code = m_reel3_ram[tile_index];
 	int const attr = m_reel3_attrram[tile_index];
@@ -637,7 +637,7 @@ void unkch_state::reel3_attrram_w(address_space &space, offs_t offset, uint8_t d
 }
 
 
-TILE_GET_INFO_MEMBER(unkch_state::get_reel1_tile_info)
+void unkch_state::get_reel1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int const code = m_reel1_ram[tile_index];
 	int const attr = m_reel1_attrram[tile_index];
@@ -648,7 +648,7 @@ TILE_GET_INFO_MEMBER(unkch_state::get_reel1_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(unkch_state::get_reel2_tile_info)
+void unkch_state::get_reel2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int const code = m_reel2_ram[tile_index];
 	int const attr = m_reel2_attrram[tile_index];
@@ -659,7 +659,7 @@ TILE_GET_INFO_MEMBER(unkch_state::get_reel2_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(unkch_state::get_reel3_tile_info)
+void unkch_state::get_reel3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int const code = m_reel3_ram[tile_index];
 	int const attr = m_reel3_attrram[tile_index];

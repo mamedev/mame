@@ -28,19 +28,19 @@ void liberate_state::debug_print(bitmap_ind16 &bitmap)
 }
 #endif
 
-TILEMAP_MAPPER_MEMBER(liberate_state::back_scan)
+tilemap_memory_index liberate_state::back_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return ((row & 0xf)) + ((15 - (col & 0xf)) << 4) + ((row & 0x10) << 5) + ((col & 0x10) << 4);
 }
 
-TILEMAP_MAPPER_MEMBER(liberate_state::fix_scan)
+tilemap_memory_index liberate_state::fix_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return (row & 0x1f) + ((31 - (col & 0x1f)) << 5);
 }
 
-TILE_GET_INFO_MEMBER(liberate_state::get_back_tile_info)
+void liberate_state::get_back_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	const uint8_t *RAM = memregion("user1")->base();
 	int tile, bank;
@@ -69,7 +69,7 @@ TILE_GET_INFO_MEMBER(liberate_state::get_back_tile_info)
 	SET_TILE_INFO_MEMBER(bank, tile & 0x7f, m_background_color, 0);
 }
 
-TILE_GET_INFO_MEMBER(liberate_state::get_fix_tile_info)
+void liberate_state::get_fix_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *videoram = m_videoram;
 	uint8_t *colorram = m_colorram;
@@ -81,7 +81,7 @@ TILE_GET_INFO_MEMBER(liberate_state::get_fix_tile_info)
 	SET_TILE_INFO_MEMBER(0, tile, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(liberate_state::prosport_get_back_tile_info)
+void liberate_state::prosport_get_back_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile;
 
@@ -243,7 +243,7 @@ void liberate_state::video_start_prosport()
 
 /***************************************************************************/
 
-PALETTE_INIT_MEMBER(liberate_state,liberate)
+void liberate_state::palette_init_liberate(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i, bit0, bit1, bit2, g, r, b;

@@ -223,7 +223,7 @@ GFXDECODE_END
 
 /* Interrupt Generator */
 
-INTERRUPT_GEN_MEMBER(commando_state::commando_interrupt)
+void commando_state::commando_interrupt(device_t &device)
 {
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xd7); // RST 10h - VBLANK
 }

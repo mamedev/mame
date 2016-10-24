@@ -6,7 +6,7 @@
 #define Y_PIXELS 200
 
 
-TIMER_CALLBACK_MEMBER(gamecom_state::gamecom_scanline)
+void gamecom_state::gamecom_scanline(void *ptr, int32_t param)
 	{
 	// draw line
 	m_base_address = ( m_p_ram[SM8521_LCDC] & 0x40 ) ? 0x2000 : 0x0000;

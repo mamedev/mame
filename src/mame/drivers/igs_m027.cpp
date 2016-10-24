@@ -60,7 +60,7 @@ public:
 
 	virtual void video_start() override;
 	uint32_t screen_update_igs_majhong(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(igs_majhong_interrupt);
+	void igs_majhong_interrupt(device_t &device);
 
 	void sdwx_gfx_decrypt();
 	void pgm_create_dummy_internal_arm_region();
@@ -326,7 +326,7 @@ INPUT_PORTS_END
 
 
 
-INTERRUPT_GEN_MEMBER(igs_m027_state::igs_majhong_interrupt)
+void igs_m027_state::igs_majhong_interrupt(device_t &device)
 {
 	generic_pulse_irq_line(device.execute(), ARM7_FIRQ_LINE, 1);
 }

@@ -131,7 +131,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_supertnk(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(supertnk_interrupt);
+	void supertnk_interrupt(device_t &device);
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -169,7 +169,7 @@ void supertnk_state::supertnk_bankswitch_1_w(address_space &space, offs_t offset
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(supertnk_state::supertnk_interrupt)
+void supertnk_state::supertnk_interrupt(device_t &device)
 {
 	m_maincpu->set_input_line(INT_9980A_LEVEL4, ASSERT_LINE);
 }

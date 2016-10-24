@@ -82,7 +82,7 @@ public:
 	void init_gpworld();
 	virtual void machine_start() override;
 	uint32_t screen_update_gpworld(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vblank_callback_gpworld);
+	void vblank_callback_gpworld(device_t &device);
 	void gpworld_draw_tiles(bitmap_rgb32 &bitmap,const rectangle &cliprect);
 	inline void draw_pixel(bitmap_rgb32 &bitmap,const rectangle &cliprect,int x,int y,int color,int flip);
 	void gpworld_draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -454,7 +454,7 @@ void gpworld_state::device_timer(emu_timer &timer, device_timer_id id, int param
 	}
 }
 
-INTERRUPT_GEN_MEMBER(gpworld_state::vblank_callback_gpworld)
+void gpworld_state::vblank_callback_gpworld(device_t &device)
 {
 	/* Do an NMI if the enabled bit is set */
 	if (m_nmi_enable)

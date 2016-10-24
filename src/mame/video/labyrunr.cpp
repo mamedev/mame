@@ -4,7 +4,7 @@
 
 #include "includes/labyrunr.h"
 
-PALETTE_INIT_MEMBER(labyrunr_state, labyrunr)
+void labyrunr_state::palette_init_labyrunr(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int pal;
@@ -47,7 +47,7 @@ PALETTE_INIT_MEMBER(labyrunr_state, labyrunr)
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(labyrunr_state::get_tile_info0)
+void labyrunr_state::get_tile_info0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t ctrl_3 = m_k007121->ctrlram_r(generic_space(), 3);
 	uint8_t ctrl_4 = m_k007121->ctrlram_r(generic_space(), 4);
@@ -75,7 +75,7 @@ TILE_GET_INFO_MEMBER(labyrunr_state::get_tile_info0)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(labyrunr_state::get_tile_info1)
+void labyrunr_state::get_tile_info1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t ctrl_3 = m_k007121->ctrlram_r(generic_space(), 3);
 	uint8_t ctrl_4 = m_k007121->ctrlram_r(generic_space(), 4);

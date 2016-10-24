@@ -31,9 +31,9 @@ public:
 	void serctl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t handshake_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void handshake_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(mo_w);
-	DECLARE_WRITE_LINE_MEMBER(timer_irq_w);
-	IRQ_CALLBACK_MEMBER(int_cb);
+	void mo_w(int state);
+	void timer_irq_w(int state);
+	int int_cb(device_t &device, int irqline);
 	bool halted() { return m_z8000_halt; }
 
 	required_device<z8001_device> m_z8000;

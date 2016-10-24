@@ -285,7 +285,7 @@ void nouspikel_ide_interface_device::do_inta(int state)
     ti99_ide_interrupt()
     IDE interrupt callback
 */
-WRITE_LINE_MEMBER(nouspikel_ide_interface_device::ide_interrupt_callback)
+void nouspikel_ide_interface_device::ide_interrupt_callback(int state)
 {
 	m_ata_irq = state;
 	if (m_cru_register & cru_reg_int_en)
@@ -296,7 +296,7 @@ WRITE_LINE_MEMBER(nouspikel_ide_interface_device::ide_interrupt_callback)
     clk_interrupt_callback()
     clock interrupt callback
 */
-WRITE_LINE_MEMBER(nouspikel_ide_interface_device::clock_interrupt_callback)
+void nouspikel_ide_interface_device::clock_interrupt_callback(int state)
 {
 	m_clk_irq = (state!=0);
 	m_slot->set_inta(state);

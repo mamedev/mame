@@ -149,8 +149,8 @@ void a1bus_device::install_bank(offs_t start, offs_t end, const char *tag, uint8
 }
 
 // interrupt request from a1bus card
-WRITE_LINE_MEMBER( a1bus_device::irq_w ) { m_out_irq_cb(state); }
-WRITE_LINE_MEMBER( a1bus_device::nmi_w ) { m_out_nmi_cb(state); }
+void a1bus_device::irq_w(int state) { m_out_irq_cb(state); }
+void a1bus_device::nmi_w(int state) { m_out_nmi_cb(state); }
 
 //**************************************************************************
 //  DEVICE CONFIG A1BUS CARD INTERFACE

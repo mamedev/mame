@@ -47,7 +47,7 @@ public:
 	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	TIMER_CALLBACK_MEMBER(network_irq_clear);
+	void network_irq_clear(void *ptr, int32_t param);
 
 protected:
 	// device-level overrides

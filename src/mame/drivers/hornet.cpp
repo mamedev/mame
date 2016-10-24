@@ -412,8 +412,8 @@ public:
 	void dsp_dataram0_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	uint32_t dsp_dataram1_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	void dsp_dataram1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
-	DECLARE_WRITE_LINE_MEMBER(voodoo_vblank_0);
-	DECLARE_WRITE_LINE_MEMBER(voodoo_vblank_1);
+	void voodoo_vblank_0(int state);
+	void voodoo_vblank_1(int state);
 	void soundtimer_en_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void soundtimer_count_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	ADC12138_IPT_CONVERT_CB(adc12138_input_callback);
@@ -431,7 +431,7 @@ public:
 	void machine_reset_hornet_2board();
 	uint32_t screen_update_hornet(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_hornet_2board(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(sound_irq);
+	void sound_irq(void *ptr, int32_t param);
 	int jvs_encode_data(uint8_t *in, int length);
 	int jvs_decode_data(uint8_t *in, uint8_t *out, int length);
 	void jamma_jvs_cmd_exec();
@@ -477,12 +477,12 @@ void hornet_state::hornet_k037122_reg_w(address_space &space, offs_t offset, uin
 	k037122->reg_w(space, offset, data, mem_mask);
 }
 
-WRITE_LINE_MEMBER(hornet_state::voodoo_vblank_0)
+void hornet_state::voodoo_vblank_0(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, state);
 }
 
-WRITE_LINE_MEMBER(hornet_state::voodoo_vblank_1)
+void hornet_state::voodoo_vblank_1(int state)
 {
 }
 
@@ -703,7 +703,7 @@ void hornet_state::gun_w(address_space &space, offs_t offset, uint32_t data, uin
 
 /******************************************************************/
 
-TIMER_CALLBACK_MEMBER(hornet_state::sound_irq)
+void hornet_state::sound_irq(void *ptr, int32_t param)
 {
 	m_audiocpu->set_input_line(M68K_IRQ_1, ASSERT_LINE);
 }

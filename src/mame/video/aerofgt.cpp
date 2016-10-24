@@ -9,7 +9,7 @@
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(aerofgt_state::get_pspikes_tile_info)
+void aerofgt_state::get_pspikes_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = m_bg1videoram[tile_index];
 	int bank = (code & 0x1000) >> 12;
@@ -19,7 +19,7 @@ TILE_GET_INFO_MEMBER(aerofgt_state::get_pspikes_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(aerofgt_state::karatblz_bg1_tile_info)
+void aerofgt_state::karatblz_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = m_bg1videoram[tile_index];
 	SET_TILE_INFO_MEMBER(0,
@@ -29,7 +29,7 @@ TILE_GET_INFO_MEMBER(aerofgt_state::karatblz_bg1_tile_info)
 }
 
 /* also spinlbrk */
-TILE_GET_INFO_MEMBER(aerofgt_state::karatblz_bg2_tile_info)
+void aerofgt_state::karatblz_bg2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = m_bg2videoram[tile_index];
 	SET_TILE_INFO_MEMBER(1,
@@ -38,7 +38,7 @@ TILE_GET_INFO_MEMBER(aerofgt_state::karatblz_bg2_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(aerofgt_state::spinlbrk_bg1_tile_info)
+void aerofgt_state::spinlbrk_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = m_bg1videoram[tile_index];
 	SET_TILE_INFO_MEMBER(0,
@@ -47,7 +47,7 @@ TILE_GET_INFO_MEMBER(aerofgt_state::spinlbrk_bg1_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(aerofgt_state::get_bg1_tile_info)
+void aerofgt_state::get_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = m_bg1videoram[tile_index];
 	int bank = (code & 0x1800) >> 11;
@@ -57,7 +57,7 @@ TILE_GET_INFO_MEMBER(aerofgt_state::get_bg1_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(aerofgt_state::get_bg2_tile_info)
+void aerofgt_state::get_bg2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = m_bg2videoram[tile_index];
 	int bank = 4 + ((code & 0x1800) >> 11);

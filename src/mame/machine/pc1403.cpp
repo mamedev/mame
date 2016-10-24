@@ -128,12 +128,12 @@ void pc1403_state::pc1403_outc(address_space &space, offs_t offset, uint8_t data
 }
 
 
-READ_LINE_MEMBER(pc1403_state::pc1403_brk)
+int pc1403_state::pc1403_brk()
 {
 	return (ioport("EXTRA")->read() & 0x01);
 }
 
-READ_LINE_MEMBER(pc1403_state::pc1403_reset)
+int pc1403_state::pc1403_reset()
 {
 	return (ioport("EXTRA")->read() & 0x02);
 }

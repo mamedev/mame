@@ -247,7 +247,7 @@ void nitedrvr_state::nitedrvr_out1_w(address_space &space, offs_t offset, uint8_
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(nitedrvr_state::nitedrvr_crash_toggle_callback)
+void nitedrvr_state::nitedrvr_crash_toggle_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	if (m_crash_en && m_crash_data_en)
 	{

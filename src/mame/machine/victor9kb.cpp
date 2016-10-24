@@ -603,7 +603,7 @@ void victor_9000_keyboard_t::device_start()
 //  kback_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( victor_9000_keyboard_t::kback_w )
+void victor_9000_keyboard_t::kback_w(int state)
 {
 	if (LOG) logerror("KBACK %u\n", state);
 

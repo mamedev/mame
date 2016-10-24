@@ -104,7 +104,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(supdrapo);
+	void palette_init_supdrapo(palette_device &palette);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
@@ -146,7 +146,7 @@ uint32_t supdrapo_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 
 /*Maybe bit 2 & 3 of the second color prom are intensity bits? */
-PALETTE_INIT_MEMBER(supdrapo_state, supdrapo)
+void supdrapo_state::palette_init_supdrapo(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int bit0, bit1, bit2 , r, g, b;

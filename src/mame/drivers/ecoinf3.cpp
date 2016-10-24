@@ -49,10 +49,10 @@ public:
 	int strobe_addr;
 	int strobe_amount;
 	int m_optic_pattern;
-	DECLARE_WRITE_LINE_MEMBER(reel0_optic_cb) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
-	DECLARE_WRITE_LINE_MEMBER(reel1_optic_cb) { if (state) m_optic_pattern |= 0x02; else m_optic_pattern &= ~0x02; }
-	DECLARE_WRITE_LINE_MEMBER(reel2_optic_cb) { if (state) m_optic_pattern |= 0x04; else m_optic_pattern &= ~0x04; }
-	DECLARE_WRITE_LINE_MEMBER(reel3_optic_cb) { if (state) m_optic_pattern |= 0x08; else m_optic_pattern &= ~0x08; }
+	void reel0_optic_cb(int state) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
+	void reel1_optic_cb(int state) { if (state) m_optic_pattern |= 0x02; else m_optic_pattern &= ~0x02; }
+	void reel2_optic_cb(int state) { if (state) m_optic_pattern |= 0x04; else m_optic_pattern &= ~0x04; }
+	void reel3_optic_cb(int state) { if (state) m_optic_pattern |= 0x08; else m_optic_pattern &= ~0x08; }
 
 	int m_percent_mux;
 

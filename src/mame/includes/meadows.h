@@ -62,12 +62,12 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	void init_minferno();
 	void init_gypsyjug();
-	TILE_GET_INFO_MEMBER(get_tile_info);
+	void get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void video_start() override;
 	uint32_t screen_update_meadows(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(meadows_interrupt);
-	INTERRUPT_GEN_MEMBER(minferno_interrupt);
-	INTERRUPT_GEN_MEMBER(audio_interrupt);
+	void meadows_interrupt(device_t &device);
+	void minferno_interrupt(device_t &device);
+	void audio_interrupt(device_t &device);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &clip);
 	void meadows_sh_update();
 	SAMPLES_START_CB_MEMBER(meadows_sh_start);

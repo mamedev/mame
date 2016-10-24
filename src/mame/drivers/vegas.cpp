@@ -498,8 +498,8 @@ public:
 	int m_count;
 	int m_dynamic_count;
 	dynamic_address m_dynamic[MAX_DYNAMIC_ADDRESSES];
-	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
-	DECLARE_WRITE_LINE_MEMBER(vblank_assert);
+	void ide_interrupt(int state);
+	void vblank_assert(int state);
 	void init_gauntleg();
 	void init_cartfury();
 	void init_tenthdeg();
@@ -514,7 +514,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_vegas(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(nile_timer_callback);
+	void nile_timer_callback(void *ptr, int32_t param);
 	void remap_dynamic_addresses();
 	void update_nile_irqs();
 	void update_sio_irqs();
@@ -554,8 +554,8 @@ public:
 	uint32_t ethernet_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	void ethernet_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	void dcs3_fifo_full_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
-	DECLARE_WRITE_LINE_MEMBER(ethernet_interrupt);
-	DECLARE_WRITE_LINE_MEMBER(ioasic_irq);
+	void ethernet_interrupt(int state);
+	void ioasic_irq(int state);
 };
 
 
@@ -958,7 +958,7 @@ void vegas_state::update_nile_irqs()
 }
 
 
-TIMER_CALLBACK_MEMBER(vegas_state::nile_timer_callback)
+void vegas_state::nile_timer_callback(void *ptr, int32_t param)
 {
 	int which = param;
 	uint32_t *regs = &m_nile_regs[NREG_T0CTRL + which * 4];
@@ -1298,7 +1298,7 @@ void vegas_state::nile_w(address_space &space, offs_t offset, uint32_t data, uin
  *
  *************************************/
 
-WRITE_LINE_MEMBER(vegas_state::ide_interrupt)
+void vegas_state::ide_interrupt(int state)
 {
 	m_ide_irq_state = state;
 	if (state)
@@ -1326,7 +1326,7 @@ void vegas_state::update_sio_irqs()
 }
 
 
-WRITE_LINE_MEMBER(vegas_state::vblank_assert)
+void vegas_state::vblank_assert(int state)
 {
 	if (!m_vblank_state && state)
 	{
@@ -1343,7 +1343,7 @@ WRITE_LINE_MEMBER(vegas_state::vblank_assert)
 }
 
 
-WRITE_LINE_MEMBER(vegas_state::ioasic_irq)
+void vegas_state::ioasic_irq(int state)
 {
 	if (state)
 		m_sio_irq_state |= 0x04;
@@ -1352,7 +1352,7 @@ WRITE_LINE_MEMBER(vegas_state::ioasic_irq)
 	update_sio_irqs();
 }
 
-WRITE_LINE_MEMBER(vegas_state::ethernet_interrupt)
+void vegas_state::ethernet_interrupt(int state)
 {
 	if (state)
 		m_sio_irq_state |= 0x10;

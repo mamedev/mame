@@ -73,13 +73,13 @@ public:
 	uint8_t sync_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t sync2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void sbrkout_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_sbrkout(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(scanline_callback);
-	TIMER_CALLBACK_MEMBER(pot_trigger_callback);
+	void scanline_callback(void *ptr, int32_t param);
+	void pot_trigger_callback(void *ptr, int32_t param);
 	void update_nmi_state();
 	required_device<cpu_device> m_maincpu;
 	required_device<dac_bit_interface> m_dac;
@@ -145,7 +145,7 @@ void sbrkout_state::machine_reset()
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(sbrkout_state::scanline_callback)
+void sbrkout_state::scanline_callback(void *ptr, int32_t param)
 {
 	uint8_t *videoram = m_videoram;
 	int scanline = param;
@@ -244,7 +244,7 @@ void sbrkout_state::update_nmi_state()
 }
 
 
-TIMER_CALLBACK_MEMBER(sbrkout_state::pot_trigger_callback)
+void sbrkout_state::pot_trigger_callback(void *ptr, int32_t param)
 {
 	m_pot_trigger[param] = 1;
 	update_nmi_state();
@@ -336,7 +336,7 @@ uint8_t sbrkout_state::sync2_r(address_space &space, offs_t offset, uint8_t mem_
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(sbrkout_state::get_bg_tile_info)
+void sbrkout_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *videoram = m_videoram;
 	int code = (videoram[tile_index] & 0x80) ? videoram[tile_index] : 0;

@@ -204,16 +204,16 @@ public:
 	uint8_t mjvegasa_12500_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t royalmah_player_1_port_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t royalmah_player_2_port_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(janptr96_rtc_irq);
-	DECLARE_WRITE_LINE_MEMBER(mjtensin_rtc_irq);
+	void janptr96_rtc_irq(int state);
+	void mjtensin_rtc_irq(int state);
 	void init_janptr96();
 	void init_ippatsu();
-	DECLARE_PALETTE_INIT(royalmah);
-	DECLARE_PALETTE_INIT(mjderngr);
+	void palette_init_royalmah(palette_device &palette);
+	void palette_init_mjderngr(palette_device &palette);
 	uint32_t screen_update_royalmah(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(suzume_irq);
-	INTERRUPT_GEN_MEMBER(mjtensin_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(janptr96_interrupt);
+	void suzume_irq(device_t &device);
+	void mjtensin_interrupt(device_t &device);
+	void janptr96_interrupt(timer_device &timer, void *ptr, int32_t param);
 	void mjtensin_update_rombank();
 	void cafetime_update_rombank();
 };
@@ -221,7 +221,7 @@ public:
 
 
 
-PALETTE_INIT_MEMBER(royalmah_state, royalmah)
+void royalmah_state::palette_init_royalmah(palette_device &palette)
 {
 	offs_t i;
 	const uint8_t *prom = memregion("proms")->base();
@@ -255,7 +255,7 @@ PALETTE_INIT_MEMBER(royalmah_state, royalmah)
 	}
 }
 
-PALETTE_INIT_MEMBER(royalmah_state,mjderngr)
+void royalmah_state::palette_init_mjderngr(palette_device &palette)
 {
 	offs_t i;
 	const uint8_t *prom = memregion("proms")->base();
@@ -3401,7 +3401,7 @@ static MACHINE_CONFIG_DERIVED( ippatsu, dondenmj )
 	MCFG_CPU_IO_MAP(ippatsu_iomap)
 MACHINE_CONFIG_END
 
-INTERRUPT_GEN_MEMBER(royalmah_state::suzume_irq)
+void royalmah_state::suzume_irq(device_t &device)
 {
 	if ( m_suzume_bank & 0x40 )
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -3445,7 +3445,7 @@ static MACHINE_CONFIG_DERIVED( mjderngr, dondenmj )
 MACHINE_CONFIG_END
 
 /* It runs in IM 2, thus needs a vector on the data bus */
-TIMER_DEVICE_CALLBACK_MEMBER(royalmah_state::janptr96_interrupt)
+void royalmah_state::janptr96_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -3456,7 +3456,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(royalmah_state::janptr96_interrupt)
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x84);   // demo
 }
 
-WRITE_LINE_MEMBER(royalmah_state::janptr96_rtc_irq)
+void royalmah_state::janptr96_rtc_irq(int state)
 {
 	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x82);   // rtc
 }
@@ -3500,12 +3500,12 @@ static MACHINE_CONFIG_DERIVED( mjdejavu, mjderngr )
 MACHINE_CONFIG_END
 
 
-INTERRUPT_GEN_MEMBER(royalmah_state::mjtensin_interrupt)
+void royalmah_state::mjtensin_interrupt(device_t &device)
 {
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);  // vblank
 }
 
-WRITE_LINE_MEMBER(royalmah_state::mjtensin_rtc_irq)
+void royalmah_state::mjtensin_rtc_irq(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_IRQ1, HOLD_LINE);  // rtc
 }

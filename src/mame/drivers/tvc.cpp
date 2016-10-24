@@ -80,8 +80,8 @@ public:
 	void sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void cassette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t _5b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(int_ff_set);
-	DECLARE_WRITE_LINE_MEMBER(centronics_ack);
+	void int_ff_set(int state);
+	void centronics_ack(int state);
 
 	// expansions
 	void expansion_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -103,7 +103,7 @@ public:
 	uint8_t       m_vram_bank;
 	uint8_t       m_cassette_ff;
 	uint8_t       m_centronics_ff;
-	DECLARE_PALETTE_INIT(tvc);
+	void palette_init_tvc(palette_device &palette);
 };
 
 
@@ -691,7 +691,7 @@ MC6845_UPDATE_ROW( tvc_state::crtc_update_row )
 	}
 }
 
-PALETTE_INIT_MEMBER(tvc_state, tvc)
+void tvc_state::palette_init_tvc(palette_device &palette)
 {
 	const static unsigned char tvc_palette[16][3] =
 	{
@@ -718,7 +718,7 @@ PALETTE_INIT_MEMBER(tvc_state, tvc)
 		palette.set_pen_color(i, tvc_palette[i][0], tvc_palette[i][1], tvc_palette[i][2]);
 }
 
-WRITE_LINE_MEMBER(tvc_state::int_ff_set)
+void tvc_state::int_ff_set(int state)
 {
 	if (state)
 	{
@@ -727,7 +727,7 @@ WRITE_LINE_MEMBER(tvc_state::int_ff_set)
 	}
 }
 
-WRITE_LINE_MEMBER(tvc_state::centronics_ack)
+void tvc_state::centronics_ack(int state)
 {
 	if (state)
 		m_centronics_ff = 1;

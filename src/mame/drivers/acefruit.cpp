@@ -49,9 +49,9 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(starspnr_payout_r);
 	void init_sidewndr();
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(acefruit);
+	void palette_init_acefruit(palette_device &palette);
 	uint32_t screen_update_acefruit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(acefruit_vblank);
+	void acefruit_vblank(device_t &device);
 	void acefruit_update_irq(int vpos);
 
 	enum
@@ -110,7 +110,7 @@ void acefruit_state::video_start()
 	m_refresh_timer = timer_alloc(TIMER_ACEFRUIT_REFRESH);
 }
 
-INTERRUPT_GEN_MEMBER(acefruit_state::acefruit_vblank)
+void acefruit_state::acefruit_vblank(device_t &device)
 {
 	device.execute().set_input_line(0, HOLD_LINE );
 	m_refresh_timer->adjust( attotime::zero );
@@ -289,7 +289,7 @@ void acefruit_state::acefruit_solenoid_w(address_space &space, offs_t offset, ui
 	}
 }
 
-PALETTE_INIT_MEMBER(acefruit_state, acefruit)
+void acefruit_state::palette_init_acefruit(palette_device &palette)
 {
 	/* sprites */
 	palette.set_pen_color( 0, rgb_t(0x00, 0x00, 0x00) );

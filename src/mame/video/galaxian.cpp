@@ -235,7 +235,7 @@ H=B0: 0C,0C,0D,0D,0E,0E,0F,0F 0C,0C,2D,2D,0E,0E,2F,2F
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(galaxian_state, galaxian)
+void galaxian_state::palette_init_galaxian(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	static const int rgb_resistances[3] = { 1000, 470, 220 };
@@ -359,9 +359,9 @@ PALETTE_INIT_MEMBER(galaxian_state, galaxian)
 	m_bullet_color[7] = rgb_t(0xff,0xff,0x00);
 }
 
-PALETTE_INIT_MEMBER(galaxian_state,moonwar)
+void galaxian_state::palette_init_moonwar(palette_device &palette)
 {
-	PALETTE_INIT_NAME(galaxian)(palette);
+	palette_init_galaxian(palette);
 
 	/* wire mod to connect the bullet blue output to the 220 ohm resistor */
 	m_bullet_color[7] = rgb_t(0xef,0xef,0x97);
@@ -460,7 +460,7 @@ uint32_t galaxian_state::screen_update_galaxian(screen_device &screen, bitmap_rg
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(galaxian_state::bg_get_tile_info)
+void galaxian_state::bg_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *videoram = m_videoram;
 	uint8_t x = tile_index & 0x1f;
@@ -846,7 +846,7 @@ void galaxian_state::stars_update_origin()
  *
  *************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(galaxian_state::galaxian_stars_blink_timer)
+void galaxian_state::galaxian_stars_blink_timer(timer_device &timer, void *ptr, int32_t param)
 {
 	m_stars_blink_state++;
 }

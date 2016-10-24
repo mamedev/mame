@@ -381,7 +381,7 @@ void _20pacgal_state::machine_reset()
 	m_game_selected = 0;
 }
 
-INTERRUPT_GEN_MEMBER(_20pacgal_state::vblank_irq)
+void _20pacgal_state::vblank_irq(device_t &device)
 {
 	if(m_irq_mask)
 		device.execute().set_input_line(0, HOLD_LINE); // TODO: assert breaks the inputs in 25pacman test mode

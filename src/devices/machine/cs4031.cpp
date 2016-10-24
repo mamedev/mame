@@ -376,12 +376,12 @@ void cs4031_device::dma_write_word(address_space &space, offs_t offset, uint8_t 
 	m_space->write_word((page_offset() & 0xfe0000) | (offset << 1), (m_dma_high_byte << 8) | data);
 }
 
-WRITE_LINE_MEMBER( cs4031_device::dma2_dack0_w )
+void cs4031_device::dma2_dack0_w(int state)
 {
 	m_dma1->hack_w(state ? 0 : 1); // inverted?
 }
 
-WRITE_LINE_MEMBER( cs4031_device::dma1_eop_w )
+void cs4031_device::dma1_eop_w(int state)
 {
 	m_dma_eop = state;
 	if (m_dma_channel != -1)
@@ -450,12 +450,12 @@ uint8_t cs4031_device::intc1_slave_ack_r(address_space &space, offs_t offset, ui
 	return 0x00;
 }
 
-WRITE_LINE_MEMBER( cs4031_device::rtc_irq_w )
+void cs4031_device::rtc_irq_w(int state)
 {
 	m_intc2->ir0_w(state ? 0 : 1); // inverted?
 }
 
-WRITE_LINE_MEMBER( cs4031_device::iochck_w )
+void cs4031_device::iochck_w(int state)
 {
 	if (LOG_IO)
 		logerror("cs4031_device::iochck_w: %u\n", state);
@@ -478,13 +478,13 @@ WRITE_LINE_MEMBER( cs4031_device::iochck_w )
 //  TIMER
 //**************************************************************************
 
-WRITE_LINE_MEMBER( cs4031_device::ctc_out1_w )
+void cs4031_device::ctc_out1_w(int state)
 {
 	m_refresh_toggle ^= state;
 	m_portb = (m_portb & 0xef) | (m_refresh_toggle << 4);
 }
 
-WRITE_LINE_MEMBER( cs4031_device::ctc_out2_w )
+void cs4031_device::ctc_out2_w(int state)
 {
 	m_write_spkr(!(state & BIT(m_portb, 1)));
 	m_portb = (m_portb & 0xdf) | (state << 5);
@@ -835,7 +835,7 @@ void cs4031_device::keyb_data_w(address_space &space, offs_t offset, uint8_t dat
 	}
 }
 
-WRITE_LINE_MEMBER( cs4031_device::gatea20_w )
+void cs4031_device::gatea20_w(int state)
 {
 	if (LOG_KEYBOARD)
 		logerror("cs4031_device::gatea20_w: %u\n", state);
@@ -843,7 +843,7 @@ WRITE_LINE_MEMBER( cs4031_device::gatea20_w )
 	keyboard_gatea20(state);
 }
 
-WRITE_LINE_MEMBER( cs4031_device::kbrst_w )
+void cs4031_device::kbrst_w(int state)
 {
 	if (LOG_KEYBOARD)
 		logerror("cs4031_device::kbrst_w: %u\n", state);

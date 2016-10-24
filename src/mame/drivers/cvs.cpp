@@ -112,7 +112,7 @@ Todo & FIXME:
  *
  *************************************/
 
-WRITE_LINE_MEMBER(cvs_state::write_s2650_flag)
+void cvs_state::write_s2650_flag(int state)
 {
 	m_s2650_flag = state;
 }
@@ -221,7 +221,7 @@ void cvs_state::cvs_s2636_2_or_character_ram_w(address_space &space, offs_t offs
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(cvs_state::cvs_main_cpu_interrupt)
+void cvs_state::cvs_main_cpu_interrupt(device_t &device)
 {
 	device.execute().set_input_line_vector(0, 0x03);
 	generic_pulse_irq_line(device.execute(), 0, 1);
@@ -230,7 +230,7 @@ INTERRUPT_GEN_MEMBER(cvs_state::cvs_main_cpu_interrupt)
 }
 
 
-WRITE_LINE_MEMBER(cvs_state::cvs_slave_cpu_interrupt)
+void cvs_state::cvs_slave_cpu_interrupt(int state)
 {
 	m_audiocpu->set_input_line_vector(0, 0x03);
 	//m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
@@ -287,7 +287,7 @@ uint8_t cvs_state::tms_clock_r(address_space &space, offs_t offset, uint8_t mem_
 	return m_tms5110->romclk_hack_r(space, 0) ? 0x80 : 0;
 }
 
-TIMER_CALLBACK_MEMBER(cvs_state::cvs_393hz_timer_cb)
+void cvs_state::cvs_393hz_timer_cb(void *ptr, int32_t param)
 {
 	m_cvs_393hz_clock = !m_cvs_393hz_clock;
 
@@ -409,7 +409,7 @@ void cvs_state::cvs_tms5110_pdc_w(address_space &space, offs_t offset, uint8_t d
 }
 
 
-READ_LINE_MEMBER(cvs_state::speech_rom_read_bit)
+int cvs_state::speech_rom_read_bit()
 {
 	int bit;
 	uint8_t *ROM = memregion("speechdata")->base();

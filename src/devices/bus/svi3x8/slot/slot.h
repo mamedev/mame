@@ -96,9 +96,9 @@ public:
 	void add_card(device_svi_slot_interface *card);
 
 	// from slot
-	DECLARE_WRITE_LINE_MEMBER( int_w ) { m_int_handler(state); };
-	DECLARE_WRITE_LINE_MEMBER( romdis_w ) { m_romdis_handler(state); };
-	DECLARE_WRITE_LINE_MEMBER( ramdis_w ) { m_ramdis_handler(state); };
+	void int_w(int state) { m_int_handler(state); };
+	void romdis_w(int state) { m_romdis_handler(state); };
+	void ramdis_w(int state) { m_ramdis_handler(state); };
 
 	// from host
 	uint8_t mreq_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
@@ -106,10 +106,10 @@ public:
 	uint8_t iorq_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void iorq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( bk21_w );
-	DECLARE_WRITE_LINE_MEMBER( bk22_w );
-	DECLARE_WRITE_LINE_MEMBER( bk31_w );
-	DECLARE_WRITE_LINE_MEMBER( bk32_w );
+	void bk21_w(int state);
+	void bk22_w(int state);
+	void bk31_w(int state);
+	void bk32_w(int state);
 
 private:
 	simple_list<device_svi_slot_interface> m_dev;
@@ -164,10 +164,10 @@ public:
 	virtual uint8_t iorq_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return 0xff; };
 	virtual void iorq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) {};
 
-	virtual DECLARE_WRITE_LINE_MEMBER( bk21_w ) {};
-	virtual DECLARE_WRITE_LINE_MEMBER( bk22_w ) {};
-	virtual DECLARE_WRITE_LINE_MEMBER( bk31_w ) {};
-	virtual DECLARE_WRITE_LINE_MEMBER( bk32_w ) {};
+	virtual void bk21_w(int state) {};
+	virtual void bk22_w(int state) {};
+	virtual void bk31_w(int state) {};
+	virtual void bk32_w(int state) {};
 
 protected:
 	svi_slot_bus_device *m_bus;

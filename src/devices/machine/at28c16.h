@@ -40,8 +40,8 @@ public:
 	// I/O operations
 	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( set_a9_12v );
-	DECLARE_WRITE_LINE_MEMBER( set_oe_12v );
+	void set_a9_12v(int state);
+	void set_oe_12v(int state);
 
 protected:
 	// device-level overrides

@@ -666,7 +666,7 @@ uint32_t seibuspi_state::screen_update_sys386f(screen_device &screen, bitmap_rgb
 
 /*****************************************************************************/
 
-TILE_GET_INFO_MEMBER(seibuspi_state::get_text_tile_info)
+void seibuspi_state::get_text_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int offs = tile_index / 2;
 	int tile = (m_tilemap_ram[offs + m_text_layer_offset] >> ((tile_index & 0x1) ? 16 : 0)) & 0xffff;
@@ -677,7 +677,7 @@ TILE_GET_INFO_MEMBER(seibuspi_state::get_text_tile_info)
 	SET_TILE_INFO_MEMBER(0, tile, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(seibuspi_state::get_back_tile_info)
+void seibuspi_state::get_back_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int offs = tile_index / 2;
 	int tile = (m_tilemap_ram[offs] >> ((tile_index & 0x1) ? 16 : 0)) & 0xffff;
@@ -689,7 +689,7 @@ TILE_GET_INFO_MEMBER(seibuspi_state::get_back_tile_info)
 	SET_TILE_INFO_MEMBER(1, tile, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(seibuspi_state::get_midl_tile_info)
+void seibuspi_state::get_midl_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int offs = tile_index / 2;
 	int tile = (m_tilemap_ram[offs + m_midl_layer_offset] >> ((tile_index & 0x1) ? 16 : 0)) & 0xffff;
@@ -702,7 +702,7 @@ TILE_GET_INFO_MEMBER(seibuspi_state::get_midl_tile_info)
 	SET_TILE_INFO_MEMBER(1, tile, color + 16, 0);
 }
 
-TILE_GET_INFO_MEMBER(seibuspi_state::get_fore_tile_info)
+void seibuspi_state::get_fore_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int offs = tile_index / 2;
 	int tile = (m_tilemap_ram[offs + m_fore_layer_offset] >> ((tile_index & 0x1) ? 16 : 0)) & 0xffff;

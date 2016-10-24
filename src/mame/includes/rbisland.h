@@ -62,7 +62,7 @@ public:
 	void video_start_jumping();
 	uint32_t screen_update_rainbow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_jumping(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(cchip_timer);
+	void cchip_timer(void *ptr, int32_t param);
 	void request_round_data(  );
 	void request_world_data(  );
 	void request_goalin_data(  );

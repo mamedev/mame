@@ -89,7 +89,7 @@ public:
 	uint8_t app_ram_enable;
 	uint8_t file_ram_enable;
 
-	DECLARE_PALETTE_INIT(molecula);
+	void palette_init_molecula(palette_device &palette);
 
 protected:
 	// driver_device overrides
@@ -278,7 +278,7 @@ void molecula_state::machine_reset()
 }
 
 
-PALETTE_INIT_MEMBER(molecula_state, molecula)
+void molecula_state::palette_init_molecula(palette_device &palette)
 {
 }
 

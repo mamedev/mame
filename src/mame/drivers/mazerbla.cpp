@@ -218,14 +218,14 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(mazerbla);
+	void palette_init_mazerbla(palette_device &palette);
 	uint32_t screen_update_mazerbla(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_eof(screen_device &screen, bool state);
-	INTERRUPT_GEN_MEMBER(sound_interrupt);
-	TIMER_CALLBACK_MEMBER(deferred_ls670_0_w);
-	TIMER_CALLBACK_MEMBER(deferred_ls670_1_w);
-	TIMER_CALLBACK_MEMBER(delayed_sound_w);
-	IRQ_CALLBACK_MEMBER(irq_callback);
+	void sound_interrupt(device_t &device);
+	void deferred_ls670_0_w(void *ptr, int32_t param);
+	void deferred_ls670_1_w(void *ptr, int32_t param);
+	void delayed_sound_w(void *ptr, int32_t param);
+	int irq_callback(device_t &device, int irqline);
 };
 
 
@@ -248,7 +248,7 @@ public:
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(mazerbla_state, mazerbla)
+void mazerbla_state::palette_init_mazerbla(palette_device &palette)
 {
 	static const int resistances_r[2]  = { 4700, 2200 };
 	static const int resistances_gb[3] = { 10000, 4700, 2200 };
@@ -765,7 +765,7 @@ uint8_t mazerbla_state::ls670_0_r(address_space &space, offs_t offset, uint8_t m
 	return m_ls670_0[offset];
 }
 
-TIMER_CALLBACK_MEMBER(mazerbla_state::deferred_ls670_0_w)
+void mazerbla_state::deferred_ls670_0_w(void *ptr, int32_t param)
 {
 	int offset = (param >> 8) & 255;
 	int data = param & 255;
@@ -787,7 +787,7 @@ uint8_t mazerbla_state::ls670_1_r(address_space &space, offs_t offset, uint8_t m
 	return m_ls670_1[offset];
 }
 
-TIMER_CALLBACK_MEMBER(mazerbla_state::deferred_ls670_1_w)
+void mazerbla_state::deferred_ls670_1_w(void *ptr, int32_t param)
 {
 	int offset = (param >> 8) & 255;
 	int data = param & 255;
@@ -926,7 +926,7 @@ uint8_t mazerbla_state::soundcommand_r(address_space &space, offs_t offset, uint
 	return m_soundlatch;
 }
 
-TIMER_CALLBACK_MEMBER(mazerbla_state::delayed_sound_w)
+void mazerbla_state::delayed_sound_w(void *ptr, int32_t param)
 {
 	m_soundlatch = param;
 
@@ -1340,7 +1340,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-IRQ_CALLBACK_MEMBER(mazerbla_state::irq_callback)
+int mazerbla_state::irq_callback(device_t &device, int irqline)
 {
 	/* all data lines are tied to +5V via 10K resistors */
 	/* D1 is set to GND when INT comes from CFB */
@@ -1359,7 +1359,7 @@ IRQ_CALLBACK_MEMBER(mazerbla_state::irq_callback)
 }
 
 /* frequency is 14.318 MHz/16/16/16/16 */
-INTERRUPT_GEN_MEMBER(mazerbla_state::sound_interrupt)
+void mazerbla_state::sound_interrupt(device_t &device)
 {
 	device.execute().set_input_line(0, ASSERT_LINE);
 }

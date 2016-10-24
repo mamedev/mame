@@ -66,7 +66,7 @@ void apricot_keyboard_bus_device::device_reset()
 //  host to module interface
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( apricot_keyboard_bus_device::out_w )
+void apricot_keyboard_bus_device::out_w(int state)
 {
 		if (m_kbd)
 			m_kbd->out_w(state);

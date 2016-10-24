@@ -37,7 +37,7 @@ void shisen_state::paletteram_w(address_space &space, offs_t offset, uint8_t dat
 	m_palette->set_pen_color(offset, pal5bit(m_paletteram[offset + 0x000]), pal5bit(m_paletteram[offset + 0x100]), pal5bit(m_paletteram[offset + 0x200]));
 }
 
-TILE_GET_INFO_MEMBER(shisen_state::get_bg_tile_info)
+void shisen_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int offs = tile_index * 2;
 	int code = m_videoram[offs] + ((m_videoram[offs + 1] & 0x0f) << 8) + (m_gfxbank << 12);

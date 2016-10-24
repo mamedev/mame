@@ -42,8 +42,8 @@ public:
 	required_device<cassette_image_device> m_cass;
 	uint8_t bob85_keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void bob85_7seg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(sod_w);
-	DECLARE_READ_LINE_MEMBER(sid_r);
+	void sod_w(int state);
+	int sid_r();
 	uint8_t m_prev_key;
 	uint8_t m_count_key;
 	virtual void machine_reset() override;
@@ -188,12 +188,12 @@ void bob85_state::machine_reset()
 {
 }
 
-WRITE_LINE_MEMBER( bob85_state::sod_w )
+void bob85_state::sod_w(int state)
 {
 	m_cass->output(state ? +1.0 : -1.0);
 }
 
-READ_LINE_MEMBER( bob85_state::sid_r )
+int bob85_state::sid_r()
 {
 	return m_cass->input() > 0.0;
 }

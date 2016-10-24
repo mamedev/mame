@@ -81,8 +81,8 @@ public:
 	void archimedes_ioc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	uint32_t archimedes_vidc_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	void archimedes_vidc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
-	DECLARE_WRITE_LINE_MEMBER( a310_kart_rx_w );
-	DECLARE_WRITE_LINE_MEMBER( a310_kart_tx_w );
+	void a310_kart_rx_w(int state);
+	void a310_kart_tx_w(int state);
 
 	uint8_t m_i2c_clk;
 	int16_t m_memc_pages[0x2000]; // the logical RAM area is 32 megs, and the smallest page size is 4k

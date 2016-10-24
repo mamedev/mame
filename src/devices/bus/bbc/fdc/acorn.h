@@ -36,9 +36,9 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
-	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
-	DECLARE_WRITE_LINE_MEMBER(motor_w);
-	DECLARE_WRITE_LINE_MEMBER(side_w);
+	void fdc_intrq_w(int state);
+	void motor_w(int state);
+	void side_w(int state);
 
 protected:
 	// device-level overrides
@@ -67,8 +67,8 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
-	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
+	void fdc_intrq_w(int state);
+	void fdc_drq_w(int state);
 	uint8_t wd1770l_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void wd1770l_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 

@@ -5,7 +5,7 @@
 #include "emu.h"
 #include "includes/sbugger.h"
 
-TILE_GET_INFO_MEMBER(sbugger_state::get_tile_info)
+void sbugger_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno, color;
 
@@ -39,7 +39,7 @@ uint32_t sbugger_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 }
 
 /* not right but so we can see things ok */
-PALETTE_INIT_MEMBER(sbugger_state, sbugger)
+void sbugger_state::palette_init_sbugger(palette_device &palette)
 {
 	/* just some random colours for now */
 	int i;

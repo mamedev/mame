@@ -304,7 +304,7 @@ public:
 	std::unique_ptr<uint8_t[]> m_texture;
 	std::unique_ptr<rollext_renderer> m_renderer;
 
-	INTERRUPT_GEN_MEMBER(vblank_interrupt);
+	void vblank_interrupt(device_t &device);
 	void init_rollext();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -558,7 +558,7 @@ static MACHINE_CONFIG_START(rollext, rollext_state)
 MACHINE_CONFIG_END
 
 
-INTERRUPT_GEN_MEMBER(rollext_state::vblank_interrupt)
+void rollext_state::vblank_interrupt(device_t &device)
 {
 	m_maincpu->set_input_line(tms32082_mp_device::INPUT_X1, ASSERT_LINE);
 }

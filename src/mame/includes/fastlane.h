@@ -56,13 +56,13 @@ public:
 	void fastlane_k1_k007232_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t fastlane_k2_k007232_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void fastlane_k2_k007232_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	TILE_GET_INFO_MEMBER(get_tile_info0);
-	TILE_GET_INFO_MEMBER(get_tile_info1);
+	void get_tile_info0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(fastlane);
+	void palette_init_fastlane(palette_device &palette);
 	uint32_t screen_update_fastlane(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(fastlane_scanline);
+	void fastlane_scanline(timer_device &timer, void *ptr, int32_t param);
 	void volume_callback0(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void volume_callback1(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };

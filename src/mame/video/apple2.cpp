@@ -1627,7 +1627,7 @@ static const rgb_t apple2_palette[] =
 };
 
 /* Initialize the palette */
-PALETTE_INIT_MEMBER(a2_video_device, apple2)
+void a2_video_device::palette_init_apple2(palette_device &palette)
 {
 	palette.set_pen_colors(0, apple2_palette, ARRAY_LENGTH(apple2_palette));
 }

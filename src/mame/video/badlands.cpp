@@ -18,7 +18,7 @@
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(badlands_state::get_playfield_tile_info)
+void badlands_state::get_playfield_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t data = tilemap.basemem_read(tile_index);
 	int code = (data & 0x1fff) + ((data & 0x1000) ? (m_playfield_tile_bank << 12) : 0);

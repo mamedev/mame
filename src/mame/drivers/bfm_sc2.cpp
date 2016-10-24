@@ -240,12 +240,12 @@ public:
 	int m_mmtr_latch;
 	int m_irq_status;
 	int m_optic_pattern;
-	DECLARE_WRITE_LINE_MEMBER(reel0_optic_cb) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
-	DECLARE_WRITE_LINE_MEMBER(reel1_optic_cb) { if (state) m_optic_pattern |= 0x02; else m_optic_pattern &= ~0x02; }
-	DECLARE_WRITE_LINE_MEMBER(reel2_optic_cb) { if (state) m_optic_pattern |= 0x04; else m_optic_pattern &= ~0x04; }
-	DECLARE_WRITE_LINE_MEMBER(reel3_optic_cb) { if (state) m_optic_pattern |= 0x08; else m_optic_pattern &= ~0x08; }
-	DECLARE_WRITE_LINE_MEMBER(reel4_optic_cb) { if (state) m_optic_pattern |= 0x10; else m_optic_pattern &= ~0x10; }
-	DECLARE_WRITE_LINE_MEMBER(reel5_optic_cb) { if (state) m_optic_pattern |= 0x20; else m_optic_pattern &= ~0x20; }
+	void reel0_optic_cb(int state) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
+	void reel1_optic_cb(int state) { if (state) m_optic_pattern |= 0x02; else m_optic_pattern &= ~0x02; }
+	void reel2_optic_cb(int state) { if (state) m_optic_pattern |= 0x04; else m_optic_pattern &= ~0x04; }
+	void reel3_optic_cb(int state) { if (state) m_optic_pattern |= 0x08; else m_optic_pattern &= ~0x08; }
+	void reel4_optic_cb(int state) { if (state) m_optic_pattern |= 0x10; else m_optic_pattern &= ~0x10; }
+	void reel5_optic_cb(int state) { if (state) m_optic_pattern |= 0x20; else m_optic_pattern &= ~0x20; }
 	int m_uart1_data;
 	int m_uart2_data;
 	int m_data_to_uart1;
@@ -284,7 +284,7 @@ public:
 	uint8_t m_codec_data[256];
 	uint8_t m_lamps_old[0x20];
 	void e2ram_init(nvram_device &nvram, void *data, size_t size);
-	DECLARE_WRITE_LINE_MEMBER(bfmdm01_busy);
+	void bfmdm01_busy(int state);
 	void bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void reel12_vid_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void reel12_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -350,7 +350,7 @@ public:
 	void machine_reset_awp_init();
 	void machine_start_sc2dmd();
 	void machine_reset_dm01_init();
-	INTERRUPT_GEN_MEMBER(timer_irq);
+	void timer_irq(device_t &device);
 	void on_scorpion2_reset();
 	void Scorpion2_SetSwitchState(int strobe, int data, int state);
 	int Scorpion2_GetSwitchState(int strobe, int data);
@@ -525,7 +525,7 @@ void bfm_sc2_state::bankswitch_w(address_space &space, offs_t offset, uint8_t da
 
 ///////////////////////////////////////////////////////////////////////////
 
-INTERRUPT_GEN_MEMBER(bfm_sc2_state::timer_irq)
+void bfm_sc2_state::timer_irq(device_t &device)
 {
 	m_timercnt++;
 
@@ -2712,7 +2712,7 @@ void bfm_sc2_state::sc3_expansion_w(address_space &space, offs_t offset, uint8_t
 }
 #endif
 
-WRITE_LINE_MEMBER(bfm_sc2_state::bfmdm01_busy)
+void bfm_sc2_state::bfmdm01_busy(int state)
 {
 	Scorpion2_SetSwitchState(4,4, state?0:1);
 }

@@ -52,16 +52,16 @@ public:
 	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint32_t acknowledge();
 
-	DECLARE_WRITE_LINE_MEMBER( ir0_w ) { set_irq_line(0, state); }
-	DECLARE_WRITE_LINE_MEMBER( ir1_w ) { set_irq_line(1, state); }
-	DECLARE_WRITE_LINE_MEMBER( ir2_w ) { set_irq_line(2, state); }
-	DECLARE_WRITE_LINE_MEMBER( ir3_w ) { set_irq_line(3, state); }
-	DECLARE_WRITE_LINE_MEMBER( ir4_w ) { set_irq_line(4, state); }
-	DECLARE_WRITE_LINE_MEMBER( ir5_w ) { set_irq_line(5, state); }
-	DECLARE_WRITE_LINE_MEMBER( ir6_w ) { set_irq_line(6, state); }
-	DECLARE_WRITE_LINE_MEMBER( ir7_w ) { set_irq_line(7, state); }
+	void ir0_w(int state) { set_irq_line(0, state); }
+	void ir1_w(int state) { set_irq_line(1, state); }
+	void ir2_w(int state) { set_irq_line(2, state); }
+	void ir3_w(int state) { set_irq_line(3, state); }
+	void ir4_w(int state) { set_irq_line(4, state); }
+	void ir5_w(int state) { set_irq_line(5, state); }
+	void ir6_w(int state) { set_irq_line(6, state); }
+	void ir7_w(int state) { set_irq_line(7, state); }
 
-	IRQ_CALLBACK_MEMBER(inta_cb);
+	int inta_cb(device_t &device, int irqline);
 
 	// used by m92.c until we can figure out how to hook it up in a way that doesn't break nbbatman (probably need correct IRQ timing / clears for the sprites IRQs
 	int HACK_get_base_vector() { return m_base;  }

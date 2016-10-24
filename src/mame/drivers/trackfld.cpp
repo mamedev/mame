@@ -884,13 +884,13 @@ void trackfld_state::machine_reset_trackfld()
 	m_old_gfx_bank = 0;
 }
 
-INTERRUPT_GEN_MEMBER(trackfld_state::vblank_irq)
+void trackfld_state::vblank_irq(device_t &device)
 {
 	if(m_irq_mask)
 		device.execute().set_input_line(0, HOLD_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(trackfld_state::vblank_nmi)
+void trackfld_state::vblank_nmi(device_t &device)
 {
 	if(m_irq_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -947,7 +947,7 @@ static MACHINE_CONFIG_START( trackfld, trackfld_state )
 MACHINE_CONFIG_END
 
 
-INTERRUPT_GEN_MEMBER(trackfld_state::yieartf_timer_irq)
+void trackfld_state::yieartf_timer_irq(device_t &device)
 {
 	if (m_yieartf_nmi_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);

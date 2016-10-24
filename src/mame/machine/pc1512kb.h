@@ -58,10 +58,10 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual ioport_constructor device_input_ports() const override;
 
-	DECLARE_WRITE_LINE_MEMBER( data_w );
-	DECLARE_WRITE_LINE_MEMBER( clock_w );
-	DECLARE_WRITE_LINE_MEMBER( m1_w );
-	DECLARE_WRITE_LINE_MEMBER( m2_w );
+	void data_w(int state);
+	void clock_w(int state);
+	void m1_w(int state);
+	void m2_w(int state);
 
 	uint8_t kb_bus_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void kb_p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);

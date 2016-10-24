@@ -10,7 +10,7 @@
 #include "includes/tecmosys.h"
 
 
-TILE_GET_INFO_MEMBER(tecmosys_state::get_bg0tile_info)
+void tecmosys_state::get_bg0tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	SET_TILE_INFO_MEMBER(1,
 			m_bg0tilemap_ram[2*tile_index+1],
@@ -18,7 +18,7 @@ TILE_GET_INFO_MEMBER(tecmosys_state::get_bg0tile_info)
 			TILE_FLIPYX((m_bg0tilemap_ram[2*tile_index]&0xc0)>>6));
 }
 
-TILE_GET_INFO_MEMBER(tecmosys_state::get_bg1tile_info)
+void tecmosys_state::get_bg1tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	SET_TILE_INFO_MEMBER(2,
 			m_bg1tilemap_ram[2*tile_index+1],
@@ -26,7 +26,7 @@ TILE_GET_INFO_MEMBER(tecmosys_state::get_bg1tile_info)
 			TILE_FLIPYX((m_bg1tilemap_ram[2*tile_index]&0xc0)>>6));
 }
 
-TILE_GET_INFO_MEMBER(tecmosys_state::get_bg2tile_info)
+void tecmosys_state::get_bg2tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	SET_TILE_INFO_MEMBER(3,
 			m_bg2tilemap_ram[2*tile_index+1],
@@ -34,7 +34,7 @@ TILE_GET_INFO_MEMBER(tecmosys_state::get_bg2tile_info)
 			TILE_FLIPYX((m_bg2tilemap_ram[2*tile_index]&0xc0)>>6));
 }
 
-TILE_GET_INFO_MEMBER(tecmosys_state::get_fg_tile_info)
+void tecmosys_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	SET_TILE_INFO_MEMBER(0,
 			m_fgtilemap_ram[2*tile_index+1],

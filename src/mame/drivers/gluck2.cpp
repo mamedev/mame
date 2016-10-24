@@ -222,10 +222,10 @@ public:
 	void videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void counters_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	TILE_GET_INFO_MEMBER(get_tile_info);
+	void get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(gluck2);
+	void palette_init_gluck2(palette_device &palette);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
@@ -249,7 +249,7 @@ void gluck2_state::colorram_w(address_space &space, offs_t offset, uint8_t data,
 }
 
 
-TILE_GET_INFO_MEMBER(gluck2_state::get_tile_info)
+void gluck2_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 /*  - bits -
     7654 3210
@@ -279,7 +279,7 @@ uint32_t gluck2_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 }
 
 
-PALETTE_INIT_MEMBER(gluck2_state, gluck2)
+void gluck2_state::palette_init_gluck2(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;

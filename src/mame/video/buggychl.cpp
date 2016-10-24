@@ -4,7 +4,7 @@
 #include "includes/buggychl.h"
 
 
-PALETTE_INIT_MEMBER(buggychl_state, buggychl)
+void buggychl_state::palette_init_buggychl(palette_device &palette)
 {
 	/* arbitrary blue shading for the sky, estimation */
 	for (int i = 0; i < 128; i++)

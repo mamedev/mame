@@ -73,12 +73,12 @@ public:
 	void init_sprint2();
 	void init_dominos();
 	void init_dominos4();
-	TILE_GET_INFO_MEMBER(get_tile_info);
+	void get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(sprint2);
+	void palette_init_sprint2(palette_device &palette);
 	uint32_t screen_update_sprint2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_sprint2(screen_device &screen, bool state);
-	INTERRUPT_GEN_MEMBER(sprint2);
+	void sprint2(device_t &device);
 	uint8_t collision_check(rectangle& rect);
 	inline int get_sprite_code(uint8_t *video_ram, int n);
 	inline int get_sprite_x(uint8_t *video_ram, int n);

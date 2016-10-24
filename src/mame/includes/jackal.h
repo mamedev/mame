@@ -47,13 +47,13 @@ public:
 	void jackal_zram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void jackal_voram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void jackal_spriteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(jackal);
+	void palette_init_jackal(palette_device &palette);
 	uint32_t screen_update_jackal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(jackal_interrupt);
+	void jackal_interrupt(device_t &device);
 	void jackal_mark_tile_dirty( int offset );
 	void draw_background( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_sprites_region( bitmap_ind16 &bitmap, const rectangle &cliprect, const uint8_t *sram, int length, int bank );

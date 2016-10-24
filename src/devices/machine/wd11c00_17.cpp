@@ -376,7 +376,7 @@ void wd11c00_17_device::write(address_space &space, offs_t offset, uint8_t data,
 //  ireq_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( wd11c00_17_device::ireq_w )
+void wd11c00_17_device::ireq_w(int state)
 {
 	if (LOG) logerror("%s WD11C00-17 '%s' IREQ %u\n", machine().describe_context(), tag(), state);
 
@@ -405,7 +405,7 @@ WRITE_LINE_MEMBER( wd11c00_17_device::ireq_w )
 //  io_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( wd11c00_17_device::io_w )
+void wd11c00_17_device::io_w(int state)
 {
 	if (LOG) logerror("%s WD11C00-17 '%s' I/O %u\n", machine().describe_context(), tag(), state);
 
@@ -417,7 +417,7 @@ WRITE_LINE_MEMBER( wd11c00_17_device::io_w )
 //  cd_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( wd11c00_17_device::cd_w )
+void wd11c00_17_device::cd_w(int state)
 {
 	if (LOG) logerror("%s WD11C00-17 '%s' C/D %u\n", machine().describe_context(), tag(), state);
 
@@ -429,7 +429,7 @@ WRITE_LINE_MEMBER( wd11c00_17_device::cd_w )
 //  clct_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( wd11c00_17_device::clct_w )
+void wd11c00_17_device::clct_w(int state)
 {
 	if (LOG) logerror("%s WD11C00-17 '%s' CLCT %u\n", machine().describe_context(), tag(), state);
 
@@ -445,7 +445,7 @@ WRITE_LINE_MEMBER( wd11c00_17_device::clct_w )
 //  mode_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( wd11c00_17_device::mode_w )
+void wd11c00_17_device::mode_w(int state)
 {
 	if (LOG) logerror("%s WD11C00-17 '%s' MODE %u\n", machine().describe_context(), tag(), state);
 
@@ -458,7 +458,7 @@ WRITE_LINE_MEMBER( wd11c00_17_device::mode_w )
 //  busy_r -
 //-------------------------------------------------
 
-READ_LINE_MEMBER( wd11c00_17_device::busy_r )
+int wd11c00_17_device::busy_r()
 {
 	return (m_status & STATUS_BUSY) ? 0 : 1;
 }
@@ -468,7 +468,7 @@ READ_LINE_MEMBER( wd11c00_17_device::busy_r )
 //  ecc_not_0_r -
 //-------------------------------------------------
 
-READ_LINE_MEMBER( wd11c00_17_device::ecc_not_0_r )
+int wd11c00_17_device::ecc_not_0_r()
 {
 	return m_ecc_not_0;
 }

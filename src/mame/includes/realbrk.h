@@ -63,9 +63,9 @@ public:
 	uint16_t backup_ram_dx_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void backup_ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	TILE_GET_INFO_MEMBER(get_tile_info_0);
-	TILE_GET_INFO_MEMBER(get_tile_info_1);
-	TILE_GET_INFO_MEMBER(get_tile_info_2);
+	void get_tile_info_0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info_1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info_2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	virtual void video_start() override;
 
@@ -74,5 +74,5 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void dai2kaku_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect, int layer);
 
-	INTERRUPT_GEN_MEMBER(interrupt);
+	void interrupt(device_t &device);
 };

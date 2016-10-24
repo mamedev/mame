@@ -85,13 +85,13 @@ public:
 	void hopper_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_INPUT_CHANGED_MEMBER(left_coin_inserted);
 	DECLARE_INPUT_CHANGED_MEMBER(right_coin_inserted);
-	TILE_GET_INFO_MEMBER(m14_get_tile_info);
+	void m14_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(m14);
+	void palette_init_m14(palette_device &palette);
 	uint32_t screen_update_m14(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(m14_irq);
+	void m14_irq(device_t &device);
 };
 
 
@@ -102,7 +102,7 @@ public:
  *************************************/
 
 /* guess, might not be 100% accurate. */
-PALETTE_INIT_MEMBER(m14_state, m14)
+void m14_state::palette_init_m14(palette_device &palette)
 {
 	int i;
 
@@ -119,7 +119,7 @@ PALETTE_INIT_MEMBER(m14_state, m14)
 	}
 }
 
-TILE_GET_INFO_MEMBER(m14_state::m14_get_tile_info)
+void m14_state::m14_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_video_ram[tile_index];
 	int color = m_color_ram[tile_index] & 0x0f;
@@ -311,7 +311,7 @@ static GFXDECODE_START( m14 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 0x10 )
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(m14_state::m14_irq)
+void m14_state::m14_irq(device_t &device)
 {
 	device.execute().set_input_line(I8085_RST75_LINE, ASSERT_LINE);
 	device.execute().set_input_line(I8085_RST75_LINE, CLEAR_LINE);

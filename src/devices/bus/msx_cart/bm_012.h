@@ -22,7 +22,7 @@ public:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_start() override;
 
-	DECLARE_WRITE_LINE_MEMBER(midi_in);
+	void midi_in(int state);
 
 private:
 	required_device<tmpz84c015_device> m_tmpz84c015af;

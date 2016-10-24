@@ -62,10 +62,10 @@ private:
 	static const gfx_layout char_layout;
 
 	void tile_info(int offset, tile_data &tileinfo, tilemap_memory_index tile_index);
-	TILE_GET_INFO_MEMBER(tile_info_0s);
-	TILE_GET_INFO_MEMBER(tile_info_0w);
-	TILE_GET_INFO_MEMBER(tile_info_1s);
-	TILE_GET_INFO_MEMBER(tile_info_1w);
+	void tile_info_0s(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void tile_info_0w(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void tile_info_1s(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void tile_info_1w(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	void draw_rect(screen_device &screen, bitmap_ind16 &bm, bitmap_ind8 &tm, bitmap_ind16 &dm, const uint16_t *mask,
 					uint16_t tpri, uint8_t lpri, int win, int sx, int sy, int xx1, int yy1, int xx2, int yy2);

@@ -50,8 +50,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<dl1416_device> m_ds0;
 	required_device<dl1416_device> m_ds1;
-	DECLARE_WRITE_LINE_MEMBER(sod_led);
-	DECLARE_READ_LINE_MEMBER(sid_line);
+	void sod_led(int state);
+	int sid_line();
 	virtual void machine_reset() override;
 	void sitcom_update_ds0(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void sitcom_update_ds1(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
@@ -96,12 +96,12 @@ void sitcom_state::sitcom_update_ds1(address_space &space, offs_t offset, uint16
 }
 
 // SID line used as serial input from a pc
-READ_LINE_MEMBER( sitcom_state::sid_line )
+int sitcom_state::sid_line()
 {
 	return 1; //idle - changing to 0 gives a FR ERROR
 }
 
-WRITE_LINE_MEMBER( sitcom_state::sod_led )
+void sitcom_state::sod_led(int state)
 {
 	output().set_value("sod_led", state);
 }

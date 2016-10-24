@@ -103,7 +103,7 @@ Dip Locations and factory settings verified with manual
 #include "includes/bombjack.h"
 
 
-TIMER_CALLBACK_MEMBER(bombjack_state::soundlatch_callback)
+void bombjack_state::soundlatch_callback(void *ptr, int32_t param)
 {
 	m_latch = param;
 }
@@ -345,7 +345,7 @@ void bombjack_state::machine_reset()
 }
 
 
-INTERRUPT_GEN_MEMBER(bombjack_state::vblank_irq)
+void bombjack_state::vblank_irq(device_t &device)
 {
 	if(m_nmi_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);

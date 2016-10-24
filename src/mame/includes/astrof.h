@@ -81,7 +81,7 @@ public:
 	void machine_start_tomahawk();
 	uint32_t screen_update_astrof(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_tomahawk(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(irq_callback);
+	void irq_callback(timer_device &timer, void *ptr, int32_t param);
 	rgb_t make_pen( uint8_t data );
 	void astrof_get_pens( pen_t *pens );
 	void tomahawk_get_pens( pen_t *pens );

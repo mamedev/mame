@@ -75,7 +75,7 @@ static const rgb_t specimx_palette[16] = {
 	rgb_t(0xff, 0xff, 0xff)  // F
 };
 
-PALETTE_INIT_MEMBER(special_state,specimx)
+void special_state::palette_init_specimx(palette_device &palette)
 {
 	palette.set_pen_colors(0, specimx_palette, ARRAY_LENGTH(specimx_palette));
 }
@@ -115,7 +115,7 @@ static const rgb_t erik_palette[8] = {
 	rgb_t(0xff, 0xff, 0xff)  // 7
 };
 
-PALETTE_INIT_MEMBER(special_state,erik)
+void special_state::palette_init_erik(palette_device &palette)
 {
 	palette.set_pen_colors(0, erik_palette, ARRAY_LENGTH(erik_palette));
 }

@@ -113,14 +113,14 @@ public:
 	void i8257_LMSR_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_CUSTOM_INPUT_MEMBER(prot_r);
 	void init_ddayjlc();
-	TILE_GET_INFO_MEMBER(get_tile_info_bg);
+	void get_tile_info_bg(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(ddayjlc);
+	void palette_init_ddayjlc(palette_device &palette);
 	uint32_t screen_update_ddayjlc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(ddayjlc_interrupt);
-	INTERRUPT_GEN_MEMBER(ddayjlc_snd_interrupt);
+	void ddayjlc_interrupt(device_t &device);
+	void ddayjlc_snd_interrupt(device_t &device);
 };
 
 
@@ -385,7 +385,7 @@ static GFXDECODE_START( ddayjlc )
 	GFXDECODE_ENTRY( "gfx3", 0, charlayout,     0x100, 16 )
 GFXDECODE_END
 
-TILE_GET_INFO_MEMBER(ddayjlc_state::get_tile_info_bg)
+void ddayjlc_state::get_tile_info_bg(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_bgram[tile_index] + ((m_bgram[tile_index + 0x400] & 0x08) << 5);
 	int color = (m_bgram[tile_index + 0x400] & 0x7);
@@ -435,13 +435,13 @@ uint32_t ddayjlc_state::screen_update_ddayjlc(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-INTERRUPT_GEN_MEMBER(ddayjlc_state::ddayjlc_interrupt)
+void ddayjlc_state::ddayjlc_interrupt(device_t &device)
 {
 	if(m_main_nmi_enable)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(ddayjlc_state::ddayjlc_snd_interrupt)
+void ddayjlc_state::ddayjlc_snd_interrupt(device_t &device)
 {
 	if(m_sound_nmi_enable)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -481,7 +481,7 @@ void ddayjlc_state::machine_reset()
 	}
 }
 
-PALETTE_INIT_MEMBER(ddayjlc_state, ddayjlc)
+void ddayjlc_state::palette_init_ddayjlc(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i,r,g,b,val;

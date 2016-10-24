@@ -194,12 +194,12 @@ public:
 	void init_aristmk5();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	TIMER_CALLBACK_MEMBER(mk5_VSYNC_callback);
-	TIMER_CALLBACK_MEMBER(mk5_2KHz_callback);
+	void mk5_VSYNC_callback(void *ptr, int32_t param);
+	void mk5_2KHz_callback(void *ptr, int32_t param);
 };
 
 
-TIMER_CALLBACK_MEMBER(aristmk5_state::mk5_VSYNC_callback)
+void aristmk5_state::mk5_VSYNC_callback(void *ptr, int32_t param)
 {
 	m_ioc_regs[IRQ_STATUS_A] |= 0x08; //turn vsync bit on
 	m_mk5_VSYNC_timer->adjust(attotime::never);
@@ -263,7 +263,7 @@ void aristmk5_state::Ns5w48(address_space &space, offs_t offset, uint32_t data, 
 	}
 }
 
-TIMER_CALLBACK_MEMBER(aristmk5_state::mk5_2KHz_callback)
+void aristmk5_state::mk5_2KHz_callback(void *ptr, int32_t param)
 {
 	m_ioc_regs[IRQ_STATUS_A] |= 0x01;
 	m_mk5_2KHz_timer->adjust(attotime::never);

@@ -227,9 +227,9 @@ public:
 	void cybertnk_irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void cybertnk_cnt_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_cybertnk();
-	TILE_GET_INFO_MEMBER(get_tilemap0_tile_info);
-	TILE_GET_INFO_MEMBER(get_tilemap1_tile_info);
-	TILE_GET_INFO_MEMBER(get_tilemap2_tile_info);
+	void get_tilemap0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tilemap1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tilemap2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void video_start() override;
 	void draw_road(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int screen_shift, int pri);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int screen_shift);
@@ -249,7 +249,7 @@ public:
 
 */
 
-TILE_GET_INFO_MEMBER(cybertnk_state::get_tilemap0_tile_info)
+void cybertnk_state::get_tilemap0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_tilemap0_vram[tile_index];
 	int pal = (code & 0xe000) >> 13;
@@ -261,7 +261,7 @@ TILE_GET_INFO_MEMBER(cybertnk_state::get_tilemap0_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(cybertnk_state::get_tilemap1_tile_info)
+void cybertnk_state::get_tilemap1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_tilemap1_vram[tile_index];
 	int pal = (code & 0xe000) >> 13;
@@ -273,7 +273,7 @@ TILE_GET_INFO_MEMBER(cybertnk_state::get_tilemap1_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(cybertnk_state::get_tilemap2_tile_info)
+void cybertnk_state::get_tilemap2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_tilemap2_vram[tile_index];
 	int pal = (code & 0xe000) >> 13;

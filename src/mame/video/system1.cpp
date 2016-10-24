@@ -98,7 +98,7 @@
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(system1_state::tile_get_info)
+void system1_state::tile_get_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	const uint8_t *rambase = (const uint8_t *)tilemap.user_data();
 	uint32_t tiledata = rambase[tile_index*2+0] | (rambase[tile_index*2+1] << 8);

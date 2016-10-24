@@ -161,7 +161,7 @@ void maygay1b_state::cpu0_firq(int data)
 
 
 // IRQ from Duart (hopper?)
-WRITE_LINE_MEMBER(maygay1b_state::duart_irq_handler)
+void maygay1b_state::duart_irq_handler(int state)
 {
 	m_maincpu->set_input_line(M6809_IRQ_LINE,  state?ASSERT_LINE:CLEAR_LINE);
 }
@@ -187,7 +187,7 @@ uint8_t maygay1b_state::m1_firq_clr_r(address_space &space, offs_t offset, uint8
 }
 
 // NMI is periodic? or triggered by a write?
-TIMER_DEVICE_CALLBACK_MEMBER( maygay1b_state::maygay1b_nmitimer_callback )
+void maygay1b_state::maygay1b_nmitimer_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	m_Vmm = !m_Vmm;
 	cpu0_nmi();

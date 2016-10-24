@@ -115,13 +115,13 @@ public:
 	void init_addr_lmhe();
 	void init_addr_xhl();
 	void init_laserdisc();
-	TILE_GET_INFO_MEMBER(horizontal_tile_info);
-	TILE_GET_INFO_MEMBER(vertical_tile_info);
+	void horizontal_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void vertical_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(statriv2);
+	void palette_init_statriv2(palette_device &palette);
 	void video_start_vertical();
 	uint32_t screen_update_statriv2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(statriv2_interrupt);
+	void statriv2_interrupt(device_t &device);
 };
 
 
@@ -134,7 +134,7 @@ public:
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(statriv2_state::horizontal_tile_info)
+void statriv2_state::horizontal_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *videoram = m_videoram;
 	int code = videoram[0x400+tile_index];
@@ -143,7 +143,7 @@ TILE_GET_INFO_MEMBER(statriv2_state::horizontal_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, attr, 0);
 }
 
-TILE_GET_INFO_MEMBER(statriv2_state::vertical_tile_info)
+void statriv2_state::vertical_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *videoram = m_videoram;
 	int code = videoram[0x400+tile_index];
@@ -160,7 +160,7 @@ TILE_GET_INFO_MEMBER(statriv2_state::vertical_tile_info)
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(statriv2_state, statriv2)
+void statriv2_state::palette_init_statriv2(palette_device &palette)
 {
 	int i;
 
@@ -221,7 +221,7 @@ uint32_t statriv2_state::screen_update_statriv2(screen_device &screen, bitmap_in
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(statriv2_state::statriv2_interrupt)
+void statriv2_state::statriv2_interrupt(device_t &device)
 {
 	uint8_t new_coin = ioport("COIN")->read();
 

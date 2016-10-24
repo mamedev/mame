@@ -109,9 +109,9 @@ public:
 	void sound_control_3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_undoukai();
 	void init_40love();
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(fortyl);
+	void palette_init_fortyl(palette_device &palette);
 	void machine_start_40love();
 	void machine_reset_40love();
 	void machine_start_undoukai();

@@ -182,7 +182,7 @@ void ssv_state::update_irq_state()
 	m_maincpu->set_input_line(0, (m_requested_int & m_irq_enable)? ASSERT_LINE : CLEAR_LINE);
 }
 
-IRQ_CALLBACK_MEMBER(ssv_state::irq_callback)
+int ssv_state::irq_callback(device_t &device, int irqline)
 {
 	int i;
 	for ( i = 0; i <= 7; i++ )
@@ -228,7 +228,7 @@ void ssv_state::irq_enable_w(address_space &space, offs_t offset, uint16_t data,
 	COMBINE_DATA(&m_irq_enable);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(ssv_state::interrupt)
+void ssv_state::interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -247,7 +247,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(ssv_state::interrupt)
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(ssv_state::gdfs_interrupt)
+void ssv_state::gdfs_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

@@ -255,7 +255,7 @@ const address_space_config *namco_c45_road_device::memory_space_config(address_s
 //  get_road_info -- tilemap callback
 //-------------------------------------------------
 
-TILE_GET_INFO_MEMBER( namco_c45_road_device::get_road_info )
+void namco_c45_road_device::get_road_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	// ------xx xxxxxxxx tile number
 	// xxxxxx-- -------- palette select

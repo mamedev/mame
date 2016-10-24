@@ -55,14 +55,14 @@ public:
 	void colorram2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void colbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	DECLARE_PALETTE_INIT(bogeyman);
+	void palette_init_bogeyman(palette_device &palette);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

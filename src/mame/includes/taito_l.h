@@ -117,9 +117,9 @@ public:
 	void champwr_msm5205_volume_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void portA_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_plottinga();
-	TILE_GET_INFO_MEMBER(get_bg18_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg19_tile_info);
-	TILE_GET_INFO_MEMBER(get_ch1a_tile_info);
+	void get_bg18_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_bg19_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_ch1a_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void machine_start_taito_l();
 	void machine_reset_fhawk();
 	void video_start_taitol();
@@ -134,8 +134,8 @@ public:
 	void machine_reset_cachat();
 	uint32_t screen_update_taitol(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_taitol(screen_device &screen, bool state);
-	TIMER_DEVICE_CALLBACK_MEMBER(vbl_interrupt);
-	IRQ_CALLBACK_MEMBER(irq_callback);
+	void vbl_interrupt(timer_device &timer, void *ptr, int32_t param);
+	int irq_callback(device_t &device, int irqline);
 	void taitol_chardef14_m( int offset );
 	void taitol_chardef15_m( int offset );
 	void taitol_chardef16_m( int offset );
@@ -153,5 +153,5 @@ public:
 	void state_register(  );
 	void taito_machine_reset();
 	void bank_w(address_space &space, offs_t offset, uint8_t data, int banknum );
-	DECLARE_WRITE_LINE_MEMBER(champwr_msm5205_vck);
+	void champwr_msm5205_vck(int state);
 };

@@ -51,7 +51,7 @@ void asterix_state::control2_w(address_space &space, offs_t offset, uint16_t dat
 	}
 }
 
-INTERRUPT_GEN_MEMBER(asterix_state::asterix_interrupt)
+void asterix_state::asterix_interrupt(device_t &device)
 {
 	// global interrupt masking
 	if (!m_k056832->is_irq_enabled(0))

@@ -73,9 +73,9 @@ public:
 
 	uint16_t wd7600_ior(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void wd7600_iow(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	DECLARE_WRITE_LINE_MEMBER( wd7600_hold );
+	void wd7600_hold(int state);
 	void wd7600_tc(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { m_isabus->eop_w(offset, data); }
-	DECLARE_WRITE_LINE_MEMBER( wd7600_spkr ) { m_speaker->level_w(state); }
+	void wd7600_spkr(int state) { m_speaker->level_w(state); }
 };
 
 
@@ -215,7 +215,7 @@ void megapc_state::wd7600_iow(address_space &space, offs_t offset, uint16_t data
 		m_isabus->dack16_w(offset, data);
 }
 
-WRITE_LINE_MEMBER( megapc_state::wd7600_hold )
+void megapc_state::wd7600_hold(int state)
 {
 	// halt cpu
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);

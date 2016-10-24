@@ -36,7 +36,7 @@
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(bionicc_state::get_bg_tile_info)
+void bionicc_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_bgvideoram[2 * tile_index + 1];
 	SET_TILE_INFO_MEMBER(1,
@@ -45,7 +45,7 @@ TILE_GET_INFO_MEMBER(bionicc_state::get_bg_tile_info)
 			TILE_FLIPXY((attr & 0xc0) >> 6));
 }
 
-TILE_GET_INFO_MEMBER(bionicc_state::get_fg_tile_info)
+void bionicc_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_fgvideoram[2 * tile_index + 1];
 	int flags;
@@ -69,7 +69,7 @@ TILE_GET_INFO_MEMBER(bionicc_state::get_fg_tile_info)
 			flags);
 }
 
-TILE_GET_INFO_MEMBER(bionicc_state::get_tx_tile_info)
+void bionicc_state::get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_txvideoram[tile_index + 0x400];
 	SET_TILE_INFO_MEMBER(0,
@@ -98,7 +98,7 @@ void bionicc_state::video_start()
 	m_bg_tilemap->set_transparent_pen(15);
 }
 
-PALETTE_DECODER_MEMBER( bionicc_state, RRRRGGGGBBBBIIII )
+rgb_t bionicc_state::RRRRGGGGBBBBIIII_decoder(uint32_t raw)
 {
 	uint8_t bright = (raw & 0x0f);
 

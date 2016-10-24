@@ -467,7 +467,7 @@ public:
 	void init_lantutor();
 
 	uint8_t m_overlay;
-	TIMER_DEVICE_CALLBACK_MEMBER(tntell_get_overlay);
+	void tntell_get_overlay(timer_device &timer, void *ptr, int32_t param);
 
 protected:
 	virtual void machine_start() override;
@@ -658,7 +658,7 @@ uint8_t tispeak_state::tntell_read_k(address_space &space, offs_t offset, uint8_
 	return k8 | snspellc_read_k(space, offset);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(tispeak_state::tntell_get_overlay)
+void tispeak_state::tntell_get_overlay(timer_device &timer, void *ptr, int32_t param)
 {
 	// Each keyboard overlay insert has 5 holes, used by the game to determine
 	// which one is active(if any). If it matches with the internal ROM or

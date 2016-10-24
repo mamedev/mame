@@ -36,10 +36,10 @@ public:
 	// construction/destruction
 	comx_eb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE_LINE_MEMBER( slot1_irq_w ) { m_irq[0] = state; set_irq(); }
-	DECLARE_WRITE_LINE_MEMBER( slot2_irq_w ) { m_irq[1] = state; set_irq(); }
-	DECLARE_WRITE_LINE_MEMBER( slot3_irq_w ) { m_irq[2] = state; set_irq(); }
-	DECLARE_WRITE_LINE_MEMBER( slot4_irq_w ) { m_irq[3] = state; set_irq(); }
+	void slot1_irq_w(int state) { m_irq[0] = state; set_irq(); }
+	void slot2_irq_w(int state) { m_irq[1] = state; set_irq(); }
+	void slot3_irq_w(int state) { m_irq[2] = state; set_irq(); }
+	void slot4_irq_w(int state) { m_irq[3] = state; set_irq(); }
 
 protected:
 	// device-level overrides

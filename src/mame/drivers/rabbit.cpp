@@ -149,12 +149,12 @@ public:
 
 	void init_rabbit();
 
-	TILE_GET_INFO_MEMBER(get_tilemap0_tile_info);
-	TILE_GET_INFO_MEMBER(get_tilemap1_tile_info);
-	TILE_GET_INFO_MEMBER(get_tilemap2_tile_info);
-	TILE_GET_INFO_MEMBER(get_tilemap3_tile_info);
+	void get_tilemap0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tilemap1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tilemap2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tilemap3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
-	INTERRUPT_GEN_MEMBER(vblank_interrupt);
+	void vblank_interrupt(device_t &device);
 
 	virtual void video_start() override;
 
@@ -232,22 +232,22 @@ void rabbit_state::get_tilemap_info(tile_data &tileinfo, int tile_index, int whi
 	}
 }
 
-TILE_GET_INFO_MEMBER(rabbit_state::get_tilemap0_tile_info)
+void rabbit_state::get_tilemap0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	get_tilemap_info(tileinfo,tile_index,0,1);
 }
 
-TILE_GET_INFO_MEMBER(rabbit_state::get_tilemap1_tile_info)
+void rabbit_state::get_tilemap1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	get_tilemap_info(tileinfo,tile_index,1,1);
 }
 
-TILE_GET_INFO_MEMBER(rabbit_state::get_tilemap2_tile_info)
+void rabbit_state::get_tilemap2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	get_tilemap_info(tileinfo,tile_index,2,1);
 }
 
-TILE_GET_INFO_MEMBER(rabbit_state::get_tilemap3_tile_info)
+void rabbit_state::get_tilemap3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	get_tilemap_info(tileinfo,tile_index,3,0);
 }
@@ -888,7 +888,7 @@ GFXDECODE_END
 
   */
 
-INTERRUPT_GEN_MEMBER(rabbit_state::vblank_interrupt)
+void rabbit_state::vblank_interrupt(device_t &device)
 {
 	m_maincpu->set_input_line(m_vblirqlevel, HOLD_LINE);
 }

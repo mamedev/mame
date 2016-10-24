@@ -40,9 +40,9 @@ public:
 
 	void machine_start_powerinsa();
 
-	TILE_GET_INFO_MEMBER(get_tile_info_0);
-	TILE_GET_INFO_MEMBER(get_tile_info_1);
-	TILEMAP_MAPPER_MEMBER(get_memory_offset_0);
+	void get_tile_info_0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info_1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	tilemap_memory_index get_memory_offset_0(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
 
 	virtual void video_start() override;
 

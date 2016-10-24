@@ -30,9 +30,9 @@ public:
 	uint8_t m_out0;
 	uint8_t m_out1;
 	uint8_t m_out2;
-	DECLARE_WRITE_LINE_MEMBER(pit8253_out0_changed);
-	DECLARE_WRITE_LINE_MEMBER(pit8253_out1_changed);
-	DECLARE_WRITE_LINE_MEMBER(pit8253_out2_changed);
+	void pit8253_out0_changed(int state);
+	void pit8253_out1_changed(int state);
+	void pit8253_out2_changed(int state);
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 
 	required_device<speaker_sound_device> m_speaker;
@@ -146,19 +146,19 @@ INPUT_PORTS_END
 
 static const int16_t speaker_levels[] = {-32767, -10922, 10922, 32767};
 
-WRITE_LINE_MEMBER(apogee_state::pit8253_out0_changed)
+void apogee_state::pit8253_out0_changed(int state)
 {
 	m_out0 = state;
 	m_speaker->level_w(m_out0+m_out1+m_out2);
 }
 
-WRITE_LINE_MEMBER(apogee_state::pit8253_out1_changed)
+void apogee_state::pit8253_out1_changed(int state)
 {
 	m_out1 = state;
 	m_speaker->level_w(m_out0+m_out1+m_out2);
 }
 
-WRITE_LINE_MEMBER(apogee_state::pit8253_out2_changed)
+void apogee_state::pit8253_out2_changed(int state)
 {
 	m_out2 = state;
 	m_speaker->level_w(m_out0+m_out1+m_out2);

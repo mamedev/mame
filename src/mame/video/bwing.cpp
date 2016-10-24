@@ -100,22 +100,22 @@ void bwing_state::paletteram_w(address_space &space, offs_t offset, uint8_t data
 //****************************************************************************
 // Initializations
 
-TILE_GET_INFO_MEMBER(bwing_state::get_fgtileinfo)
+void bwing_state::get_fgtileinfo(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	SET_TILE_INFO_MEMBER(2, m_fgscrollram[tile_index] & 0x7f, m_fgscrollram[tile_index] >> 7, 0);
 }
 
-TILE_GET_INFO_MEMBER(bwing_state::get_bgtileinfo)
+void bwing_state::get_bgtileinfo(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	SET_TILE_INFO_MEMBER(3, m_bgscrollram[tile_index] & 0x7f, m_bgscrollram[tile_index] >> 7, 0);
 }
 
-TILE_GET_INFO_MEMBER(bwing_state::get_charinfo)
+void bwing_state::get_charinfo(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	SET_TILE_INFO_MEMBER(0, m_videoram[tile_index], 0, 0);
 }
 
-TILEMAP_MAPPER_MEMBER(bwing_state::scan_cols)
+tilemap_memory_index bwing_state::scan_cols(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	return (row & 0xf) | ((col & 0xf) << 4) | ((row & 0x30) << 4) | ((col & 0x30) << 6);
 }

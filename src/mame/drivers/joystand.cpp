@@ -166,8 +166,8 @@ public:
 	tilemap_t *m_bg2_tmap;
 	void bg1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void bg2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
+	void get_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_bg2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	// r5g5b5 layers
 	bitmap_rgb32 m_bg15_bitmap[2];
@@ -200,7 +200,7 @@ public:
 	// machine
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	INTERRUPT_GEN_MEMBER(joystand_interrupt);
+	void joystand_interrupt(device_t &device);
 };
 
 const rgb_t joystand_state::BG15_TRANSPARENT = 0x99999999;
@@ -211,13 +211,13 @@ const rgb_t joystand_state::BG15_TRANSPARENT = 0x99999999;
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(joystand_state::get_bg1_tile_info)
+void joystand_state::get_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint32_t code = (m_bg1_ram[tile_index * 2 + 0] << 16) | m_bg1_ram[tile_index * 2 + 1];
 	SET_TILE_INFO_MEMBER(0, code & 0x00ffffff, code >> 24, 0);
 }
 
-TILE_GET_INFO_MEMBER(joystand_state::get_bg2_tile_info)
+void joystand_state::get_bg2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint32_t code = (m_bg2_ram[tile_index * 2 + 0] << 16) | m_bg2_ram[tile_index * 2 + 1];
 	SET_TILE_INFO_MEMBER(0, code & 0x00ffffff, code >> 24, 0);
@@ -571,7 +571,7 @@ void joystand_state::machine_reset()
 {
 }
 
-INTERRUPT_GEN_MEMBER(joystand_state::joystand_interrupt)
+void joystand_state::joystand_interrupt(device_t &device)
 {
 	// VBlank is connected to INT1 (external interrupts pin 1)
 	m_tmp68301->external_interrupt_1();

@@ -153,13 +153,13 @@ void pc_fdc_xt_device::dor_fifo_w(address_space &space, offs_t offset, uint8_t d
 	dor_w(space, 0, data, mem_mask);
 }
 
-WRITE_LINE_MEMBER( pc_fdc_family_device::irq_w )
+void pc_fdc_family_device::irq_w(int state)
 {
 	fdc_irq = state;
 	check_irq();
 }
 
-WRITE_LINE_MEMBER( pc_fdc_family_device::drq_w )
+void pc_fdc_family_device::drq_w(int state)
 {
 	fdc_drq = state;
 	check_drq();

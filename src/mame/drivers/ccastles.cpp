@@ -151,7 +151,7 @@ inline void ccastles_state::schedule_next_irq( int curscanline )
 }
 
 
-TIMER_CALLBACK_MEMBER(ccastles_state::clock_irq)
+void ccastles_state::clock_irq(void *ptr, int32_t param)
 {
 	/* assert the IRQ if not already asserted */
 	if (!m_irq_state)

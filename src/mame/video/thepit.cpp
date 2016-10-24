@@ -31,7 +31,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(thepit_state, thepit)
+void thepit_state::palette_init_thepit(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -72,7 +72,7 @@ PALETTE_INIT_MEMBER(thepit_state, thepit)
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(thepit_state,suprmous)
+void thepit_state::palette_init_suprmous(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -100,7 +100,7 @@ PALETTE_INIT_MEMBER(thepit_state,suprmous)
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(thepit_state::solid_get_tile_info)
+void thepit_state::solid_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t back_color = (m_colorram[tile_index] & 0x70) >> 4;
 	int priority = (back_color != 0) && ((m_colorram[tile_index] & 0x80) == 0);
@@ -110,7 +110,7 @@ TILE_GET_INFO_MEMBER(thepit_state::solid_get_tile_info)
 }
 
 
-TILE_GET_INFO_MEMBER(thepit_state::get_tile_info)
+void thepit_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t fore_color = m_colorram[tile_index] % m_gfxdecode->gfx(0)->colors();
 	uint8_t code = m_videoram[tile_index];

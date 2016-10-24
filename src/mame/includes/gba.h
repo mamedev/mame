@@ -71,16 +71,16 @@ public:
 	uint32_t gba_bios_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	uint32_t gba_10000000_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	void init_gbadv();
-	DECLARE_WRITE_LINE_MEMBER(int_hblank_callback);
-	DECLARE_WRITE_LINE_MEMBER(int_vblank_callback);
-	DECLARE_WRITE_LINE_MEMBER(int_vcount_callback);
-	DECLARE_WRITE_LINE_MEMBER(dma_hblank_callback);
-	DECLARE_WRITE_LINE_MEMBER(dma_vblank_callback);
+	void int_hblank_callback(int state);
+	void int_vblank_callback(int state);
+	void int_vcount_callback(int state);
+	void dma_hblank_callback(int state);
+	void dma_vblank_callback(int state);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	TIMER_CALLBACK_MEMBER(dma_complete);
-	TIMER_CALLBACK_MEMBER(timer_expire);
-	TIMER_CALLBACK_MEMBER(handle_irq);
+	void dma_complete(void *ptr, int32_t param);
+	void timer_expire(void *ptr, int32_t param);
+	void handle_irq(void *ptr, int32_t param);
 
 protected:
 	required_region_ptr<uint32_t> m_region_maincpu;

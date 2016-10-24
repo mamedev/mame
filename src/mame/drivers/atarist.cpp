@@ -710,7 +710,7 @@ void megast_state::fpu_w(address_space &space, offs_t offset, uint16_t data, uin
 {
 }
 
-WRITE_LINE_MEMBER( st_state::write_monochrome )
+void st_state::write_monochrome(int state)
 {
 	m_monochrome = state;
 	m_mfp->i7_w(m_monochrome);
@@ -744,7 +744,7 @@ void ste_state::dmasound_set_state(int level)
 }
 
 
-WRITE_LINE_MEMBER( ste_state::write_monochrome )
+void ste_state::write_monochrome(int state)
 {
 	m_monochrome = state;
 	m_mfp->i7_w(m_monochrome ^ m_dmasnd_active);
@@ -1812,12 +1812,12 @@ void stbook_state::psg_pa_w(address_space &space, offs_t offset, uint8_t data, u
 	m_fdc->dden_w(BIT(data, 7));
 }
 
-WRITE_LINE_MEMBER( st_state::ikbd_tx_w )
+void st_state::ikbd_tx_w(int state)
 {
 	m_ikbd_tx = state;
 }
 
-WRITE_LINE_MEMBER( st_state::acia_ikbd_irq_w )
+void st_state::acia_ikbd_irq_w(int state)
 {
 	m_acia_ikbd_irq = state;
 
@@ -1825,14 +1825,14 @@ WRITE_LINE_MEMBER( st_state::acia_ikbd_irq_w )
 }
 
 
-WRITE_LINE_MEMBER( st_state::acia_midi_irq_w )
+void st_state::acia_midi_irq_w(int state)
 {
 	m_acia_midi_irq = state;
 
 	m_mfp->i4_w(!(m_acia_ikbd_irq || m_acia_midi_irq));
 }
 
-WRITE_LINE_MEMBER(st_state::write_acia_clock)
+void st_state::write_acia_clock(int state)
 {
 	m_acia0->write_txc(state);
 	m_acia0->write_rxc(state);
@@ -1841,12 +1841,12 @@ WRITE_LINE_MEMBER(st_state::write_acia_clock)
 }
 
 
-WRITE_LINE_MEMBER( st_state::mfp_tdo_w )
+void st_state::mfp_tdo_w(int state)
 {
 	m_mfp->clock_w(state);
 }
 
-WRITE_LINE_MEMBER( st_state::fdc_drq_w )
+void st_state::fdc_drq_w(int state)
 {
 	if (state && (!(m_fdc_mode & DMA_MODE_ENABLED)) && (m_fdc_mode & DMA_MODE_FDC_HDC_ACK))
 		fdc_dma_transfer();
@@ -1858,10 +1858,10 @@ WRITE_LINE_MEMBER( st_state::fdc_drq_w )
 //**************************************************************************
 
 //-------------------------------------------------
-//  IRQ_CALLBACK_MEMBER( atarist_int_ack )
+//  int atarist_int_ack(device_t &device, int irqline)
 //-------------------------------------------------
 
-IRQ_CALLBACK_MEMBER(st_state::atarist_int_ack)
+int st_state::atarist_int_ack(device_t &device, int irqline)
 {
 	if (irqline == M68K_IRQ_6)
 	{

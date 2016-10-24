@@ -126,7 +126,7 @@ void mcr_state::machine_reset_mcr()
  *
  *************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(mcr_state::mcr_interrupt)
+void mcr_state::mcr_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	z80ctc_device *ctc = machine().device<z80ctc_device>("ctc");
 	int scanline = param;
@@ -148,7 +148,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mcr_state::mcr_interrupt)
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(mcr_state::mcr_ipu_interrupt)
+void mcr_state::mcr_ipu_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	z80ctc_device *ctc = machine().device<z80ctc_device>("ctc");
 	int scanline = param;
@@ -169,12 +169,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(mcr_state::mcr_ipu_interrupt)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(mcr_state::sio_txda_w)
+void mcr_state::sio_txda_w(int state)
 {
 	m_sio_txda = !state;
 }
 
-WRITE_LINE_MEMBER(mcr_state::sio_txdb_w)
+void mcr_state::sio_txdb_w(int state)
 {
 	// disc player
 	m_sio_txdb = !state;
@@ -193,7 +193,7 @@ void mcr_state::mcr_ipu_laserdisk_w(address_space &space, offs_t offset, uint8_t
 }
 
 
-TIMER_CALLBACK_MEMBER(mcr_state::ipu_watchdog_reset)
+void mcr_state::ipu_watchdog_reset(void *ptr, int32_t param)
 {
 	logerror("ipu_watchdog_reset\n");
 	m_ipu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);

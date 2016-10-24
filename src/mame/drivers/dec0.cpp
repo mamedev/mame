@@ -1358,7 +1358,7 @@ static MACHINE_CONFIG_DERIVED( dec1, dec0_base )
 MACHINE_CONFIG_END
 
 
-WRITE_LINE_MEMBER(dec0_automat_state::automat_vclk_cb)
+void dec0_automat_state::automat_vclk_cb(int state)
 {
 	if (m_automat_msm5205_vclk_toggle == 0)
 	{

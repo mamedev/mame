@@ -72,7 +72,7 @@ void m107_state::machine_start()
 
 /*****************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(m107_state::scanline_interrupt)
+void m107_state::scanline_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

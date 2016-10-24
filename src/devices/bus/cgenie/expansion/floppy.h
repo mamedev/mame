@@ -31,11 +31,11 @@ public:
 
 	DECLARE_ADDRESS_MAP(mmio, 8);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_callback);
+	void timer_callback(timer_device &timer, void *ptr, int32_t param);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(socket_load);
 
-	DECLARE_WRITE_LINE_MEMBER(intrq_w);
+	void intrq_w(int state);
 	uint8_t irq_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);

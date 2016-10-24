@@ -59,7 +59,7 @@ void mugsmash_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	}
 }
 
-TILE_GET_INFO_MEMBER(mugsmash_state::get_mugsmash_tile_info1)
+void mugsmash_state::get_mugsmash_tile_info1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	/* fF-- cccc  nnnn nnnn */
 
@@ -84,7 +84,7 @@ void mugsmash_state::mugsmash_videoram1_w(address_space &space, offs_t offset, u
 	m_tilemap1->mark_tile_dirty(offset / 2);
 }
 
-TILE_GET_INFO_MEMBER(mugsmash_state::get_mugsmash_tile_info2)
+void mugsmash_state::get_mugsmash_tile_info2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	/* fF-- cccc  nnnn nnnn */
 

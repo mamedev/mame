@@ -54,7 +54,7 @@ public:
 	void rst18_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void coin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	WRITE_LINE_MEMBER( fm_irqhandler );
+	void fm_irqhandler(int state);
 	uint8_t soundlatch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t main_data_pending_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void main_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);

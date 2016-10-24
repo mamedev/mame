@@ -231,13 +231,13 @@ public:
 	//void debug_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t unk_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void init_bus();
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(tmspoker);
+	void palette_init_tmspoker(palette_device &palette);
 	uint32_t screen_update_tmspoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(tmspoker_interrupt);
+	void tmspoker_interrupt(device_t &device);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 };
@@ -254,7 +254,7 @@ void tmspoker_state::tmspoker_videoram_w(address_space &space, offs_t offset, ui
 }
 
 
-TILE_GET_INFO_MEMBER(tmspoker_state::get_bg_tile_info)
+void tmspoker_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 /*  - bits -
     7654 3210
@@ -278,7 +278,7 @@ uint32_t tmspoker_state::screen_update_tmspoker(screen_device &screen, bitmap_in
 	return 0;
 }
 
-PALETTE_INIT_MEMBER(tmspoker_state, tmspoker)
+void tmspoker_state::palette_init_tmspoker(palette_device &palette)
 {
 }
 
@@ -292,7 +292,7 @@ PALETTE_INIT_MEMBER(tmspoker_state, tmspoker)
 //  popmessage("written : %02X", data);
 //}
 
-INTERRUPT_GEN_MEMBER(tmspoker_state::tmspoker_interrupt)
+void tmspoker_state::tmspoker_interrupt(device_t &device)
 {
 	m_maincpu->set_input_line(INT_9980A_LEVEL1, ASSERT_LINE); //_and_vector(0, ASSERT_LINE, 3);//2=nmi  3,4,5,6
 	m_maincpu->set_input_line(INT_9980A_LEVEL1, CLEAR_LINE);  // MZ: do we need this?

@@ -54,7 +54,7 @@ public:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
-	DECLARE_PALETTE_INIT(pastelg);
+	void palette_init_pastelg(palette_device &palette);
 	uint32_t screen_update_pastelg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	int pastelg_blitter_src_addr_r();
 	void pastelg_vramflip();

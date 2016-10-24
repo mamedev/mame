@@ -276,9 +276,9 @@ public:
 	virtual void machine_reset() override;
 	uint32_t screen_update_crystal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_crystal(screen_device &screen, bool state);
-	INTERRUPT_GEN_MEMBER(crystal_interrupt);
-	TIMER_CALLBACK_MEMBER(Timercb);
-	IRQ_CALLBACK_MEMBER(icallback);
+	void crystal_interrupt(device_t &device);
+	void Timercb(void *ptr, int32_t param);
+	int icallback(device_t &device, int irqline);
 	void crystal_banksw_postload();
 	void IntReq( int num );
 	inline void Timer_w( address_space &space, int which, uint32_t data, uint32_t mem_mask );
@@ -362,7 +362,7 @@ void crystal_state::IntAck_w(address_space &space, offs_t offset, uint32_t data,
 		m_IntHigh = (data >> 8) & 7;
 }
 
-IRQ_CALLBACK_MEMBER(crystal_state::icallback)
+int crystal_state::icallback(device_t &device, int irqline)
 {
 	address_space &space = device.memory().space(AS_PROGRAM);
 	uint32_t IntPend = space.read_dword(0x01800c0c);
@@ -387,7 +387,7 @@ void crystal_state::Banksw_w(address_space &space, offs_t offset, uint32_t data,
 		membank("bank1")->set_base(memregion("user2")->base());
 }
 
-TIMER_CALLBACK_MEMBER(crystal_state::Timercb)
+void crystal_state::Timercb(void *ptr, int32_t param)
 {
 	int which = (int)(uintptr_t)ptr;
 	static const int num[] = { 0, 1, 9, 10 };
@@ -944,7 +944,7 @@ void crystal_state::screen_eof_crystal(screen_device &screen, bool state)
 	}
 }
 
-INTERRUPT_GEN_MEMBER(crystal_state::crystal_interrupt)
+void crystal_state::crystal_interrupt(device_t &device)
 {
 	IntReq(24);      //VRender0 VBlank
 }

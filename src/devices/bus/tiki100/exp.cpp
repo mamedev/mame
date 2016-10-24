@@ -166,7 +166,7 @@ void tiki100_bus_t::iorq_w(address_space &space, offs_t offset, uint8_t data, ui
 //  busak_w - bus acknowledge write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( tiki100_bus_t::busak_w )
+void tiki100_bus_t::busak_w(int state)
 {
 	device_tiki100bus_card_interface *entry = m_device_list.first();
 

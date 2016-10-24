@@ -129,7 +129,7 @@ public:
 	void init_neocdz();
 	void init_neocdzj();
 
-	IRQ_CALLBACK_MEMBER(neocd_int_callback);
+	int neocd_int_callback(device_t &device, int irqline);
 
 	std::unique_ptr<uint8_t[]> m_meminternal_data;
 protected:
@@ -961,7 +961,7 @@ INPUT_PORTS_END
 
 /* NeoCD uses custom vectors on IRQ4 to handle various events from the CDC */
 
-IRQ_CALLBACK_MEMBER(ngcd_state::neocd_int_callback)
+int ngcd_state::neocd_int_callback(device_t &device, int irqline)
 {
 	if (irqline==4)
 	{

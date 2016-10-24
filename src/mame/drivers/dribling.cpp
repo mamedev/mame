@@ -40,7 +40,7 @@
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(dribling_state::dribling_irq_gen)
+void dribling_state::dribling_irq_gen(device_t &device)
 {
 	if (m_di)
 		device.execute().set_input_line(0, ASSERT_LINE);

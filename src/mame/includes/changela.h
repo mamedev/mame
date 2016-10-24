@@ -95,9 +95,9 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_changela(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(chl_mcu_irq);
-	TIMER_CALLBACK_MEMBER(changela_scanline_callback);
-	TIMER_DEVICE_CALLBACK_MEMBER(changela_scanline);
+	void chl_mcu_irq(device_t &device);
+	void changela_scanline_callback(void *ptr, int32_t param);
+	void changela_scanline(timer_device &timer, void *ptr, int32_t param);
 	void draw_obj0( bitmap_ind16 &bitmap, int sy );
 	void draw_obj1( bitmap_ind16 &bitmap );
 	void draw_river( bitmap_ind16 &bitmap, int sy );

@@ -19,13 +19,13 @@
 #include "includes/ddribble.h"
 
 
-INTERRUPT_GEN_MEMBER(ddribble_state::ddribble_interrupt_0)
+void ddribble_state::ddribble_interrupt_0(device_t &device)
 {
 	if (m_int_enable_0)
 		device.execute().set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(ddribble_state::ddribble_interrupt_1)
+void ddribble_state::ddribble_interrupt_1(device_t &device)
 {
 	if (m_int_enable_1)
 		device.execute().set_input_line(M6809_FIRQ_LINE, HOLD_LINE);

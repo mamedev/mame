@@ -121,7 +121,7 @@ void samcoupe_state::draw_mode1_line(int y, int hpos)
 	draw_mode12_block(m_bitmap, y, hpos, mask);
 }
 
-TIMER_CALLBACK_MEMBER(samcoupe_state::sam_video_update_callback)
+void samcoupe_state::sam_video_update_callback(void *ptr, int32_t param)
 {
 	int vpos = machine().first_screen()->vpos();
 	int hpos = machine().first_screen()->hpos();

@@ -71,7 +71,7 @@ public:
 		: midzeus_state(mconfig, type, tag), m_zeus(*this, "zeus2") { }
 	required_device<zeus2_device> m_zeus;
 
-	DECLARE_WRITE_LINE_MEMBER(zeus_irq);
+	void zeus_irq(int state);
 private:
 };
 
@@ -117,18 +117,18 @@ void midzeus_state::machine_reset_midzeus()
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(midzeus_state::display_irq_off)
+void midzeus_state::display_irq_off(void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(midzeus_state::display_irq)
+void midzeus_state::display_irq(device_t &device)
 {
 	device.execute().set_input_line(0, ASSERT_LINE);
 	machine().scheduler().timer_set(attotime::from_hz(30000000), timer_expired_delegate(FUNC(midzeus_state::display_irq_off),this));
 }
 
-WRITE_LINE_MEMBER(midzeus2_state::zeus_irq)
+void midzeus2_state::zeus_irq(int state)
 {
 	m_maincpu->set_input_line(2, ASSERT_LINE);
 }
@@ -507,7 +507,7 @@ void midzeus_state::update_gun_irq()
 }
 
 
-TIMER_CALLBACK_MEMBER(midzeus_state::invasn_gun_callback)
+void midzeus_state::invasn_gun_callback(void *ptr, int32_t param)
 {
 	int player = param;
 	int beamy = m_screen->vpos();
@@ -1139,7 +1139,7 @@ static MACHINE_CONFIG_DERIVED( mk4, midzeus )
 	MCFG_MIDWAY_IOASIC_SHUFFLE_DEFAULT(1)
 MACHINE_CONFIG_END
 
-READ_LINE_MEMBER(midzeus_state::PIC16C5X_T0_clk_r)
+int midzeus_state::PIC16C5X_T0_clk_r()
 {
 	return 0;
 }

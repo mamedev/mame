@@ -74,10 +74,10 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	DECLARE_INPUT_CHANGED_MEMBER(tilt_pressed);
 
-	TILE_GET_INFO_MEMBER(get_fgtileinfo);
-	TILE_GET_INFO_MEMBER(get_bgtileinfo);
-	TILE_GET_INFO_MEMBER(get_charinfo);
-	TILEMAP_MAPPER_MEMBER(scan_cols);
+	void get_fgtileinfo(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_bgtileinfo(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_charinfo(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	tilemap_memory_index scan_cols(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
 
 	void init_bwing();
 	virtual void machine_start() override;
@@ -88,5 +88,5 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bmp, const rectangle &clip, uint8_t *ram, int pri );
 
-	INTERRUPT_GEN_MEMBER(bwp3_interrupt);
+	void bwp3_interrupt(device_t &device);
 };

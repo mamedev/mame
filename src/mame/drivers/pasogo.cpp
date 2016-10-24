@@ -165,8 +165,8 @@ public:
 	void machine_start() override;
 
 	uint32_t screen_update_pasogo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(pasogo_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(vg230_timer);
+	void pasogo_interrupt(device_t &device);
+	void vg230_timer(timer_device &timer, void *ptr, int32_t param);
 	DECLARE_INPUT_CHANGED_MEMBER(contrast);
 
 	memory_region *m_cart_rom;
@@ -175,7 +175,7 @@ public:
 };
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(pasogo_state::vg230_timer)
+void pasogo_state::vg230_timer(timer_device &timer, void *ptr, int32_t param)
 {
 	m_vg230.rtc.seconds += 1;
 	if (m_vg230.rtc.seconds >= 60)
@@ -512,7 +512,7 @@ uint32_t pasogo_state::screen_update_pasogo(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-INTERRUPT_GEN_MEMBER(pasogo_state::pasogo_interrupt)
+void pasogo_state::pasogo_interrupt(device_t &device)
 {
 //  m_maincpu->set_input_line(UPD7810_INTFE1, PULSE_LINE);
 }

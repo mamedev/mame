@@ -139,7 +139,7 @@ void legionna_state::legionna_text_w(address_space &space, offs_t offset, uint16
 	m_text_layer->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(legionna_state::get_back_tile_info)
+void legionna_state::get_back_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile=m_back_data[tile_index];
 	int color=(tile>>12)&0xf;
@@ -150,7 +150,7 @@ TILE_GET_INFO_MEMBER(legionna_state::get_back_tile_info)
 	SET_TILE_INFO_MEMBER(1,tile,color,0);
 }
 
-TILE_GET_INFO_MEMBER(legionna_state::get_mid_tile_info)
+void legionna_state::get_mid_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile=m_mid_data[tile_index];
 	int color=(tile>>12)&0xf;
@@ -160,7 +160,7 @@ TILE_GET_INFO_MEMBER(legionna_state::get_mid_tile_info)
 	SET_TILE_INFO_MEMBER(5,tile,color,0);
 }
 
-TILE_GET_INFO_MEMBER(legionna_state::get_mid_tile_info_denji)
+void legionna_state::get_mid_tile_info_denji(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile=m_mid_data[tile_index];
 	int color=(tile>>12)&0xf;
@@ -171,7 +171,7 @@ TILE_GET_INFO_MEMBER(legionna_state::get_mid_tile_info_denji)
 	SET_TILE_INFO_MEMBER(5,tile,color,0);
 }
 
-TILE_GET_INFO_MEMBER(legionna_state::get_mid_tile_info_cupsoc)
+void legionna_state::get_mid_tile_info_cupsoc(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile=m_mid_data[tile_index];
 	int color=(tile>>12)&0xf;
@@ -184,7 +184,7 @@ TILE_GET_INFO_MEMBER(legionna_state::get_mid_tile_info_cupsoc)
 	SET_TILE_INFO_MEMBER(1,tile,color,0);
 }
 
-TILE_GET_INFO_MEMBER(legionna_state::get_fore_tile_info)
+void legionna_state::get_fore_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile=m_fore_data[tile_index];
 	int color=(tile>>12)&0xf;
@@ -194,7 +194,7 @@ TILE_GET_INFO_MEMBER(legionna_state::get_fore_tile_info)
 	SET_TILE_INFO_MEMBER(4,tile,color,0);
 }
 
-TILE_GET_INFO_MEMBER(legionna_state::get_fore_tile_info_denji)
+void legionna_state::get_fore_tile_info_denji(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile=m_fore_data[tile_index];
 	int color=(tile>>12)&0xf;
@@ -205,7 +205,7 @@ TILE_GET_INFO_MEMBER(legionna_state::get_fore_tile_info_denji)
 	SET_TILE_INFO_MEMBER(4,tile,color,0);
 }
 
-TILE_GET_INFO_MEMBER(legionna_state::get_text_tile_info)
+void legionna_state::get_text_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = m_textram[tile_index];
 	int color=(tile>>12)&0xf;

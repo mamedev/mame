@@ -278,7 +278,7 @@ void a2bus_ezcgi_9958_device::write_c0nx(address_space &space, uint8_t offset, u
 	}
 }
 
-WRITE_LINE_MEMBER( a2bus_ezcgi_device::tms_irq_w )
+void a2bus_ezcgi_device::tms_irq_w(int state)
 {
 	if (state)
 	{
@@ -290,7 +290,7 @@ WRITE_LINE_MEMBER( a2bus_ezcgi_device::tms_irq_w )
 	}
 }
 
-WRITE_LINE_MEMBER( a2bus_ezcgi_9938_device::tms_irq_w )
+void a2bus_ezcgi_9938_device::tms_irq_w(int state)
 {
 	if (state)
 	{
@@ -302,7 +302,7 @@ WRITE_LINE_MEMBER( a2bus_ezcgi_9938_device::tms_irq_w )
 	}
 }
 
-WRITE_LINE_MEMBER( a2bus_ezcgi_9958_device::tms_irq_w )
+void a2bus_ezcgi_9958_device::tms_irq_w(int state)
 {
 	if (state)
 	{

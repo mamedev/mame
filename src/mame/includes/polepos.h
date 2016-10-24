@@ -116,13 +116,13 @@ public:
 	uint8_t steering_delta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void init_topracern();
 	void init_polepos2();
-	TILE_GET_INFO_MEMBER(bg_get_tile_info);
-	TILE_GET_INFO_MEMBER(tx_get_tile_info);
+	void bg_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void tx_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void machine_reset_polepos();
 	void video_start_polepos();
-	DECLARE_PALETTE_INIT(polepos);
+	void palette_init_polepos(palette_device &palette);
 	uint32_t screen_update_polepos(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(polepos_scanline);
+	void polepos_scanline(timer_device &timer, void *ptr, int32_t param);
 	void draw_road(bitmap_ind16 &bitmap);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void zoom_sprite(bitmap_ind16 &bitmap,int big,uint32_t code,uint32_t color,int flipx,int sx,int sy,int sizex,int sizey);

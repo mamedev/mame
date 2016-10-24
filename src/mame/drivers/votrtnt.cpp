@@ -51,7 +51,7 @@ public:
 	{
 	}
 
-	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
+	void write_acia_clock(int state);
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -100,7 +100,7 @@ static INPUT_PORTS_START(votrtnt)
 INPUT_PORTS_END
 
 
-WRITE_LINE_MEMBER(votrtnt_state::write_acia_clock)
+void votrtnt_state::write_acia_clock(int state)
 {
 	m_acia->write_txc(state);
 	m_acia->write_rxc(state);

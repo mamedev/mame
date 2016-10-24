@@ -100,9 +100,9 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_bigevglf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(from_sound_latch_callback);
-	TIMER_CALLBACK_MEMBER(nmi_callback);
-	TIMER_CALLBACK_MEMBER(deferred_ls74_w);
+	void from_sound_latch_callback(void *ptr, int32_t param);
+	void nmi_callback(void *ptr, int32_t param);
+	void deferred_ls74_w(void *ptr, int32_t param);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;
 	required_device<msm5232_device> m_msm;

@@ -90,7 +90,7 @@ void unico_state::unico_palette32_w(address_space &space, offs_t offset, uint32_
 ***************************************************************************/
 
 
-TILE_GET_INFO_MEMBER(unico_state::get_tile_info)
+void unico_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t *vram = (uint16_t *)tilemap.user_data();
 	uint16_t code = vram[2 * tile_index + 0 ];

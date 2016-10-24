@@ -68,12 +68,12 @@ public:
 	void init_rockduck();
 	void machine_start_scregg();
 	void machine_reset_scregg();
-	TIMER_DEVICE_CALLBACK_MEMBER(scregg_interrupt);
+	void scregg_interrupt(timer_device &timer, void *ptr, int32_t param);
 };
 
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(scregg_state::scregg_interrupt)
+void scregg_state::scregg_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	// assume that the irq generator is similar to burgertime hw
 	m_maincpu->set_input_line(0, (param & 8) ? ASSERT_LINE : CLEAR_LINE);

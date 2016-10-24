@@ -241,11 +241,11 @@ public:
 	void init_vk100();
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	TIMER_CALLBACK_MEMBER(execute_vg);
-	DECLARE_WRITE_LINE_MEMBER(crtc_vsync);
-	DECLARE_WRITE_LINE_MEMBER(i8251_rxrdy_int);
-	DECLARE_WRITE_LINE_MEMBER(i8251_txrdy_int);
-	DECLARE_WRITE_LINE_MEMBER(i8251_rts);
+	void execute_vg(void *ptr, int32_t param);
+	void crtc_vsync(int state);
+	void i8251_rxrdy_int(int state);
+	void i8251_txrdy_int(int state);
+	void i8251_rts(int state);
 	uint8_t vram_read();
 	uint8_t vram_attr_read();
 	MC6845_UPDATE_ROW(crtc_update_row);
@@ -360,7 +360,7 @@ void vk100_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
  *            \--------- UNUSED, always 0
  * The VT125 prom @ E41 is literally identical to this, the same exact part: 23-059B1
  */
-TIMER_CALLBACK_MEMBER(vk100_state::execute_vg)
+void vk100_state::execute_vg(void *ptr, int32_t param)
 {
 	m_cout = 1; // hack for now
 	uint8_t dirbyte = m_dir[(m_dir_a6<<6)|((m_vgY&1)<<5)|(m_cout<<4)|VG_DIR];
@@ -954,23 +954,23 @@ void vk100_state::machine_start()
 	}
 }
 
-WRITE_LINE_MEMBER(vk100_state::crtc_vsync)
+void vk100_state::crtc_vsync(int state)
 {
 	m_maincpu->set_input_line(I8085_RST75_LINE, state? ASSERT_LINE : CLEAR_LINE);
 	m_vsync = state;
 }
 
-WRITE_LINE_MEMBER(vk100_state::i8251_rxrdy_int)
+void vk100_state::i8251_rxrdy_int(int state)
 {
 	m_maincpu->set_input_line(I8085_RST65_LINE, state?ASSERT_LINE:CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(vk100_state::i8251_txrdy_int)
+void vk100_state::i8251_txrdy_int(int state)
 {
 	m_maincpu->set_input_line(I8085_RST55_LINE, state?ASSERT_LINE:CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(vk100_state::i8251_rts)
+void vk100_state::i8251_rts(int state)
 {
 	logerror("callback: RTS state changed to %d\n", state);
 	// TODO: only change this during loopback mode!

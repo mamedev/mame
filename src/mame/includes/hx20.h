@@ -87,7 +87,7 @@ public:
 	required_ioport m_sw6;
 
 	virtual void machine_start() override;
-	DECLARE_PALETTE_INIT(hx20);
+	void palette_init_hx20(palette_device &palette);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void ksc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -110,10 +110,10 @@ public:
 	uint8_t slave_p4_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void slave_p4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( rtc_irq_w );
+	void rtc_irq_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( sio_rx_w ) { m_sio_rx = state; }
-	DECLARE_WRITE_LINE_MEMBER( sio_pin_w ) { m_sio_pin = state; }
+	void sio_rx_w(int state) { m_sio_rx = state; }
+	void sio_pin_w(int state) { m_sio_pin = state; }
 
 	void update_interrupt();
 

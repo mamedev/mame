@@ -78,17 +78,17 @@ public:
 	void fg_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void gfx_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	TILEMAP_MAPPER_MEMBER(tilemap_scan);
-	TILE_GET_INFO_MEMBER(bg_get_tile_info);
-	TILE_GET_INFO_MEMBER(fg_get_tile_info);
+	tilemap_memory_index tilemap_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	void bg_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void fg_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(retofinv);
+	void palette_init_retofinv(palette_device &palette);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap);
 
-	INTERRUPT_GEN_MEMBER(main_vblank_irq);
-	INTERRUPT_GEN_MEMBER(sub_vblank_irq);
+	void main_vblank_irq(device_t &device);
+	void sub_vblank_irq(device_t &device);
 };

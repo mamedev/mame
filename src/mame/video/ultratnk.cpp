@@ -11,7 +11,7 @@ Atari Ultra Tank video emulation
 #include "audio/sprint4.h"
 
 
-PALETTE_INIT_MEMBER(ultratnk_state, ultratnk)
+void ultratnk_state::palette_init_ultratnk(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 
@@ -34,7 +34,7 @@ PALETTE_INIT_MEMBER(ultratnk_state, ultratnk)
 }
 
 
-TILE_GET_INFO_MEMBER(ultratnk_state::ultratnk_tile_info)
+void ultratnk_state::ultratnk_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *videoram = m_videoram;
 	uint8_t code = videoram[tile_index];

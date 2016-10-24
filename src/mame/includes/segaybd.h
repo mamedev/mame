@@ -57,8 +57,8 @@ public:
 	uint8_t sound_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	// linked cabinet specific handlers
-	DECLARE_WRITE_LINE_MEMBER( mb8421_intl );
-	DECLARE_WRITE_LINE_MEMBER( mb8421_intr );
+	void mb8421_intl(int state);
+	void mb8421_intr(int state);
 	uint16_t link_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	uint16_t link2_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void link2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);

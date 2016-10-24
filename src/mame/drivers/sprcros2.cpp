@@ -87,14 +87,14 @@ public:
 
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_PALETTE_INIT(sprcros2);
+	void palette_init_sprcros2(palette_device &palette);
 	void master_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void slave_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void bg_scrollx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void bg_scrolly_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	INTERRUPT_GEN_MEMBER(master_vblank_irq);
-	INTERRUPT_GEN_MEMBER(slave_vblank_irq);
-	TIMER_DEVICE_CALLBACK_MEMBER(master_scanline);
+	void master_vblank_irq(device_t &device);
+	void slave_vblank_irq(device_t &device);
+	void master_scanline(timer_device &timer, void *ptr, int32_t param);
 
 	bool m_master_nmi_enable;
 	bool m_master_irq_enable;
@@ -368,7 +368,7 @@ void sprcros2_state::machine_reset()
 }
 
 
-PALETTE_INIT_MEMBER(sprcros2_state, sprcros2)
+void sprcros2_state::palette_init_sprcros2(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -418,19 +418,19 @@ PALETTE_INIT_MEMBER(sprcros2_state, sprcros2)
 	}
 }
 
-INTERRUPT_GEN_MEMBER(sprcros2_state::master_vblank_irq)
+void sprcros2_state::master_vblank_irq(device_t &device)
 {
 	if(m_master_nmi_enable == true)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(sprcros2_state::slave_vblank_irq)
+void sprcros2_state::slave_vblank_irq(device_t &device)
 {
 	if(m_slave_nmi_enable == true)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(sprcros2_state::master_scanline)
+void sprcros2_state::master_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

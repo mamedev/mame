@@ -59,9 +59,9 @@ public:
 	void init_raidenk();
 	void init_raiden();
 
-	TILE_GET_INFO_MEMBER(get_back_tile_info);
-	TILE_GET_INFO_MEMBER(get_fore_tile_info);
-	TILE_GET_INFO_MEMBER(get_text_tile_info);
+	void get_back_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_fore_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_text_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	virtual void video_start() override;
 	void video_start_raidenb();
@@ -70,7 +70,7 @@ public:
 	uint32_t screen_update_raiden(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_raidenb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	INTERRUPT_GEN_MEMBER(raiden_interrupt);
+	void raiden_interrupt(device_t &device);
 
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri_mask);
 	void common_decrypt();

@@ -24,7 +24,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(digdug_state,digdug)
+void digdug_state::palette_init_digdug(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -74,7 +74,7 @@ PALETTE_INIT_MEMBER(digdug_state,digdug)
 ***************************************************************************/
 
 /* convert from 32x32 to 36x28 */
-TILEMAP_MAPPER_MEMBER(digdug_state::tilemap_scan)
+tilemap_memory_index digdug_state::tilemap_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	int offs;
 
@@ -89,7 +89,7 @@ TILEMAP_MAPPER_MEMBER(digdug_state::tilemap_scan)
 }
 
 
-TILE_GET_INFO_MEMBER(digdug_state::bg_get_tile_info)
+void digdug_state::bg_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *rom = memregion("gfx4")->base();
 
@@ -106,7 +106,7 @@ TILE_GET_INFO_MEMBER(digdug_state::bg_get_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(digdug_state::tx_get_tile_info)
+void digdug_state::tx_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t code = m_videoram[tile_index];
 	int color;

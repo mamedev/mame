@@ -26,9 +26,9 @@ public:
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_rx_handler(device_t &device, _Object object) { return downcast<midi_port_device &>(device).m_rxd_handler.set_callback(object); }
 
-	DECLARE_WRITE_LINE_MEMBER( write_txd );
+	void write_txd(int state);
 
-	DECLARE_READ_LINE_MEMBER( rx_r ) { return m_rxd; }
+	int rx_r() { return m_rxd; }
 
 protected:
 	virtual void device_start() override;
@@ -50,8 +50,8 @@ public:
 	device_midi_port_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_midi_port_interface();
 
-	virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) {}
-	DECLARE_WRITE_LINE_MEMBER( output_rxd ) { m_port->m_rxd = state; m_port->m_rxd_handler(state); }
+	virtual void input_txd(int state) {}
+	void output_rxd(int state) { m_port->m_rxd = state; m_port->m_rxd_handler(state); }
 
 protected:
 	midi_port_device *m_port;

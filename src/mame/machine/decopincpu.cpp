@@ -92,7 +92,7 @@ INPUT_CHANGED_MEMBER( decocpu_type1_device::audio_nmi )
 	// Not on DECO board?
 }
 
-WRITE_LINE_MEMBER(decocpu_type1_device::cpu_pia_irq)
+void decocpu_type1_device::cpu_pia_irq(int state)
 {
 	if(state == CLEAR_LINE)
 	{
@@ -109,7 +109,7 @@ WRITE_LINE_MEMBER(decocpu_type1_device::cpu_pia_irq)
 	}
 }
 
-WRITE_LINE_MEMBER( decocpu_type1_device::pia21_ca2_w )
+void decocpu_type1_device::pia21_ca2_w(int state)
 {
 // sound ns
 	m_ca2 = state;

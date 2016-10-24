@@ -164,7 +164,7 @@ uint32_t psikyo4_state::ps4_eeprom_r(address_space &space, offs_t offset, uint32
 	return 0x00;
 }
 
-INTERRUPT_GEN_MEMBER(psikyo4_state::psikyosh_interrupt)
+void psikyo4_state::psikyosh_interrupt(device_t &device)
 {
 	device.execute().set_input_line(4, HOLD_LINE);
 }

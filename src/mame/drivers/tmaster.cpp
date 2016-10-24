@@ -155,14 +155,14 @@ public:
 	uint8_t m_palette_index;
 	uint8_t m_palette_data[3];
 
-	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
+	void duart_irq_handler(int state);
 	uint16_t rtc_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void rtc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void tmaster_color_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void tmaster_addr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void tmaster_blitter_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	uint16_t tmaster_blitter_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
-	DECLARE_READ_LINE_MEMBER(read_rand);
+	int read_rand();
 	uint16_t galgames_eeprom_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void galgames_eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void galgames_palette_offset_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
@@ -175,8 +175,8 @@ public:
 	uint16_t galgames_cart_data_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void galgames_cart_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	uint16_t dummy_read_01(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
-	DECLARE_WRITE_LINE_MEMBER(write_oki_bank0);
-	DECLARE_WRITE_LINE_MEMBER(write_oki_bank1);
+	void write_oki_bank0(int state);
+	void write_oki_bank1(int state);
 	void init_galgames();
 	void init_galgame2();
 	void machine_reset_tmaster();
@@ -184,7 +184,7 @@ public:
 	void machine_reset_galgames();
 	void video_start_galgames();
 	uint32_t screen_update_tmaster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(tm3k_interrupt);
+	void tm3k_interrupt(timer_device &timer, void *ptr, int32_t param);
 	uint8_t binary_to_BCD(uint8_t data);
 	int tmaster_compute_addr(uint16_t reg_low, uint16_t reg_mid, uint16_t reg_high);
 	int galgames_compute_addr(uint16_t reg_low, uint16_t reg_mid, uint16_t reg_high);
@@ -199,7 +199,7 @@ public:
 
 ***************************************************************************/
 
-WRITE_LINE_MEMBER(tmaster_state::write_oki_bank0)
+void tmaster_state::write_oki_bank0(int state)
 {
 	if (state)
 		m_okibank |= 1;
@@ -209,7 +209,7 @@ WRITE_LINE_MEMBER(tmaster_state::write_oki_bank0)
 	m_oki->set_rom_bank(m_okibank);
 }
 
-WRITE_LINE_MEMBER(tmaster_state::write_oki_bank1)
+void tmaster_state::write_oki_bank1(int state)
 {
 	if (state)
 		m_okibank |= 2;
@@ -225,7 +225,7 @@ WRITE_LINE_MEMBER(tmaster_state::write_oki_bank1)
 
 ***************************************************************************/
 
-WRITE_LINE_MEMBER(tmaster_state::duart_irq_handler)
+void tmaster_state::duart_irq_handler(int state)
 {
 	m_maincpu->set_input_line_and_vector(4, state, m_duart->get_irq_vector());
 }
@@ -520,7 +520,7 @@ uint16_t tmaster_state::tmaster_blitter_r(address_space &space, offs_t offset, u
                                 Touch Master
 ***************************************************************************/
 
-READ_LINE_MEMBER(tmaster_state::read_rand)
+int tmaster_state::read_rand()
 {
 	return machine().rand()&1;
 }
@@ -886,7 +886,7 @@ void tmaster_state::machine_reset_tmaster()
 
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(tmaster_state::tm3k_interrupt)
+void tmaster_state::tm3k_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

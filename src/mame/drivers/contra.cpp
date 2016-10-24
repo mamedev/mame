@@ -27,7 +27,7 @@ Dip locations and factory settings verified with manual
 #include "includes/contra.h"
 
 
-INTERRUPT_GEN_MEMBER(contra_state::contra_interrupt)
+void contra_state::contra_interrupt(device_t &device)
 {
 	address_space &space = generic_space();
 	if (m_k007121_1->ctrlram_r(space, 7) & 0x02)

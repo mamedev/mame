@@ -635,12 +635,12 @@ void twin16_state::volume_callback(address_space &space, offs_t offset, uint8_t 
 
 /* Interrupt Generators */
 
-INTERRUPT_GEN_MEMBER(twin16_state::CPUA_interrupt)
+void twin16_state::CPUA_interrupt(device_t &device)
 {
 	if (CPUA_IRQ_ENABLE) device.execute().set_input_line(5, HOLD_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(twin16_state::CPUB_interrupt)
+void twin16_state::CPUB_interrupt(device_t &device)
 {
 	if (CPUB_IRQ_ENABLE) device.execute().set_input_line(5, HOLD_LINE);
 }

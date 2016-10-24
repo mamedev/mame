@@ -66,15 +66,15 @@ public:
 
 	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( br1_w );
-	DECLARE_WRITE_LINE_MEMBER( br2_w );
+	void br1_w(int state);
+	void br2_w(int state);
 	void ppi0_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t ppi1_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void ppi1_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	offs_t sage2_direct_update_handler(direct_read_data &direct, offs_t address);
 
-	DECLARE_WRITE_LINE_MEMBER( fdc_irq );
+	void fdc_irq(int state);
 
 	const uint8_t *m_rom;
 	int m_reset;
@@ -89,9 +89,9 @@ public:
 	int m_centronics_select;
 	int m_centronics_fault;
 
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_select);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_fault);
+	void write_centronics_ack(int state);
+	void write_centronics_busy(int state);
+	void write_centronics_perror(int state);
+	void write_centronics_select(int state);
+	void write_centronics_fault(int state);
 };

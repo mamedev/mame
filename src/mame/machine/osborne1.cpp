@@ -147,7 +147,7 @@ void osborne1_state::bankswitch_w(address_space &space, offs_t offset, uint8_t d
 	}
 }
 
-WRITE_LINE_MEMBER( osborne1_state::irqack_w )
+void osborne1_state::irqack_w(int state)
 {
 	// Update the flipflops that control bank selection and NMI
 	if (!m_rom_mode) set_rom_mode(m_ub4a_q ? 0 : 1);
@@ -202,7 +202,7 @@ void osborne1_state::ieee_pia_pb_w(address_space &space, offs_t offset, uint8_t 
 	m_ieee->nrfd_w(BIT(data, 7));
 }
 
-WRITE_LINE_MEMBER( osborne1_state::ieee_pia_irq_a_func )
+void osborne1_state::ieee_pia_irq_a_func(int state)
 {
 	update_irq();
 }
@@ -235,17 +235,17 @@ void osborne1_state::video_pia_port_b_w(address_space &space, offs_t offset, uin
 	}
 }
 
-WRITE_LINE_MEMBER( osborne1_state::video_pia_out_cb2_dummy )
+void osborne1_state::video_pia_out_cb2_dummy(int state)
 {
 }
 
-WRITE_LINE_MEMBER( osborne1_state::video_pia_irq_a_func )
+void osborne1_state::video_pia_irq_a_func(int state)
 {
 	update_irq();
 }
 
 
-WRITE_LINE_MEMBER( osborne1_state::serial_acia_irq_func )
+void osborne1_state::serial_acia_irq_func(int state)
 {
 	m_acia_irq_state = state;
 	update_irq();
@@ -368,7 +368,7 @@ void osborne1_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	}
 }
 
-TIMER_CALLBACK_MEMBER(osborne1_state::video_callback)
+void osborne1_state::video_callback(void *ptr, int32_t param)
 {
 	int const y = machine().first_screen()->vpos();
 	uint8_t const ra = y % 10;
@@ -451,7 +451,7 @@ TIMER_CALLBACK_MEMBER(osborne1_state::video_callback)
 }
 
 
-TILE_GET_INFO_MEMBER(osborne1_state::get_tile_info)
+void osborne1_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	// The gfxdecode and tilemap aren't actually used for drawing, they just look nice in the F4 GFX viewer
 	tileinfo.set(0, m_ram->pointer()[0xF000 | tile_index] & 0x7F, 0, 0);

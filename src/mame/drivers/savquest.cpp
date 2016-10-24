@@ -103,7 +103,7 @@ public:
 	uint8_t parallel_port_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void parallel_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER(vblank_assert);
+	void vblank_assert(int state);
 
 	uint8_t smram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void smram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -789,7 +789,7 @@ void savquest_state::machine_reset()
 	m_haspstate = HASPSTATE_NONE;
 }
 
-WRITE_LINE_MEMBER(savquest_state::vblank_assert)
+void savquest_state::vblank_assert(int state)
 {
 }
 

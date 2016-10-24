@@ -389,7 +389,7 @@ void toaplan2_state::machine_start_toaplan2()
 }
 
 
-WRITE_LINE_MEMBER(toaplan2_state::toaplan2_reset)
+void toaplan2_state::toaplan2_reset(int state)
 {
 	if (m_audiocpu != nullptr)
 		m_audiocpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
@@ -501,9 +501,9 @@ void toaplan2_state::toaplan2_vblank_irq(int irq_line)
 	timer_set(m_screen->time_until_pos(0xe6), TIMER_RAISE_IRQ, irq_line);
 }
 
-INTERRUPT_GEN_MEMBER(toaplan2_state::toaplan2_vblank_irq1){ toaplan2_vblank_irq(1); }
-INTERRUPT_GEN_MEMBER(toaplan2_state::toaplan2_vblank_irq2){ toaplan2_vblank_irq(2); }
-INTERRUPT_GEN_MEMBER(toaplan2_state::toaplan2_vblank_irq4){ toaplan2_vblank_irq(4); }
+void toaplan2_state::toaplan2_vblank_irq1(device_t &device){ toaplan2_vblank_irq(1); }
+void toaplan2_state::toaplan2_vblank_irq2(device_t &device){ toaplan2_vblank_irq(2); }
+void toaplan2_state::toaplan2_vblank_irq4(device_t &device){ toaplan2_vblank_irq(4); }
 
 
 uint16_t toaplan2_state::video_count_r(address_space &space, offs_t offset, uint16_t mem_mask)
@@ -978,7 +978,7 @@ void toaplan2_state::bbakraid_eeprom_w(address_space &space, offs_t offset, uint
 }
 
 
-INTERRUPT_GEN_MEMBER(toaplan2_state::bbakraid_snd_interrupt)
+void toaplan2_state::bbakraid_snd_interrupt(device_t &device)
 {
 	device.execute().set_input_line(0, HOLD_LINE);
 }

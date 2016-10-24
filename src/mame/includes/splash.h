@@ -76,7 +76,7 @@ public:
 	void coin_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	// splash specific
-	DECLARE_WRITE_LINE_MEMBER(splash_msm5205_int);
+	void splash_msm5205_int(int state);
 	void splash_sh_irqtrigger_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void splash_adpcm_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
@@ -85,7 +85,7 @@ public:
 	uint16_t roldfrog_bombs_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void roldfrog_vblank_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t roldfrog_unk_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(ym_irq);
+	void ym_irq(int state);
 
 	// funystrp specific
 	uint16_t spr_read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
@@ -95,8 +95,8 @@ public:
 	void msm1_interrupt_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void msm2_interrupt_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void msm2_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(adpcm_int1);
-	DECLARE_WRITE_LINE_MEMBER(adpcm_int2);
+	void adpcm_int1(int state);
+	void adpcm_int2(int state);
 	void funystrp_protection_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	uint16_t funystrp_protection_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void funystrp_sh_irqtrigger_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
@@ -116,8 +116,8 @@ public:
 	void machine_reset_splash();
 	void machine_reset_funystrp();
 
-	TILE_GET_INFO_MEMBER(get_tile_info_tilemap0);
-	TILE_GET_INFO_MEMBER(get_tile_info_tilemap1);
+	void get_tile_info_tilemap0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info_tilemap1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_funystrp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -125,6 +125,6 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void funystrp_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 
-	INTERRUPT_GEN_MEMBER(roldfrog_interrupt);
+	void roldfrog_interrupt(device_t &device);
 	void roldfrog_update_irq(  );
 };

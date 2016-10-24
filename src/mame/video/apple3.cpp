@@ -78,7 +78,7 @@ static const uint32_t text_map[] =
 };
 
 
-PALETTE_INIT_MEMBER(apple3_state, apple3)
+void apple3_state::palette_init_apple3(palette_device &palette)
 {
 	int i;
 

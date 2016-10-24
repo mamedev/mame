@@ -191,11 +191,11 @@ public:
 	uint8_t sms_sscope_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void sms_sscope_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER(sms_pause_callback);
-	DECLARE_WRITE_LINE_MEMBER(sms_csync_callback);
-	DECLARE_WRITE_LINE_MEMBER(sms_ctrl1_th_input);
-	DECLARE_WRITE_LINE_MEMBER(sms_ctrl2_th_input);
-	DECLARE_WRITE_LINE_MEMBER(gg_ext_th_input);
+	void sms_pause_callback(int state);
+	void sms_csync_callback(int state);
+	void sms_ctrl1_th_input(int state);
+	void sms_ctrl2_th_input(int state);
+	void gg_ext_th_input(int state);
 	uint32_t sms_pixel_color(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
 	void init_sg1000m3();
@@ -246,7 +246,7 @@ public:
 
 	uint8_t store_cart_peek(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER(sms_store_int_callback);
+	void sms_store_int_callback(int state);
 };
 
 

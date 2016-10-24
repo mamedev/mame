@@ -233,7 +233,7 @@ void ginganin_state::machine_reset()
 	m_flipscreen = 0;
 }
 
-WRITE_LINE_MEMBER(ginganin_state::ptm_irq)
+void ginganin_state::ptm_irq(int state)
 {
 	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }

@@ -32,7 +32,7 @@ public:
 	void scorpion_port_1ffd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void machine_start_scorpion();
 	void machine_reset_scorpion();
-	TIMER_DEVICE_CALLBACK_MEMBER(nmi_check_callback);
+	void nmi_check_callback(timer_device &timer, void *ptr, int32_t param);
 protected:
 	required_memory_bank m_bank1;
 	required_memory_bank m_bank2;
@@ -141,7 +141,7 @@ offs_t scorpion_state::scorpion_direct(direct_read_data &direct, offs_t address)
 	return address;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(scorpion_state::nmi_check_callback)
+void scorpion_state::nmi_check_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	if ((m_io_nmi->read() & 1)==1)
 	{

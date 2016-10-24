@@ -165,14 +165,14 @@ uint8_t gameplan_state::leprechn_videoram_r(address_space &space, offs_t offset,
 }
 
 
-TIMER_CALLBACK_MEMBER(gameplan_state::clear_screen_done_callback)
+void gameplan_state::clear_screen_done_callback(void *ptr, int32_t param)
 {
 	/* indicate that the we are done clearing the screen */
 	m_via_0->write_ca1(0);
 }
 
 
-WRITE_LINE_MEMBER(gameplan_state::video_command_trigger_w)
+void gameplan_state::video_command_trigger_w(int state)
 {
 	if (state == 0)
 	{
@@ -232,13 +232,13 @@ WRITE_LINE_MEMBER(gameplan_state::video_command_trigger_w)
 }
 
 
-TIMER_CALLBACK_MEMBER(gameplan_state::via_irq_delayed)
+void gameplan_state::via_irq_delayed(void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(0, param);
 }
 
 
-WRITE_LINE_MEMBER(gameplan_state::via_irq)
+void gameplan_state::via_irq(int state)
 {
 	/* Kaos sits in a tight loop polling the VIA irq flags register, but that register is
 	   cleared by the irq handler. Therefore, I wait a bit before triggering the irq to
@@ -247,7 +247,7 @@ WRITE_LINE_MEMBER(gameplan_state::via_irq)
 }
 
 
-TIMER_CALLBACK_MEMBER(gameplan_state::via_0_ca1_timer_callback)
+void gameplan_state::via_0_ca1_timer_callback(void *ptr, int32_t param)
 {
 	/* !VBLANK is connected to CA1 */
 	m_via_0->write_ca1(param);

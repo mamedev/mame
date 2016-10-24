@@ -58,7 +58,7 @@ void _1942_state::create_palette()
 	}
 }
 
-PALETTE_INIT_MEMBER(_1942_state,1942)
+void _1942_state::palette_init_1942(palette_device &palette)
 {
 	create_palette();
 
@@ -92,7 +92,7 @@ PALETTE_INIT_MEMBER(_1942_state,1942)
 		m_palette->set_pen_indirect(colorbase + i, 0x40 | *color_prom++);
 }
 
-PALETTE_INIT_MEMBER(_1942_state,1942p)
+void _1942_state::palette_init_1942p(palette_device &palette)
 {
 	for (int i = 0; i < 0x400; i++)
 	{
@@ -114,7 +114,7 @@ PALETTE_INIT_MEMBER(_1942_state,1942p)
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(_1942_state::get_fg_tile_info)
+void _1942_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code, color;
 
@@ -126,7 +126,7 @@ TILE_GET_INFO_MEMBER(_1942_state::get_fg_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(_1942_state::get_bg_tile_info)
+void _1942_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code, color;
 

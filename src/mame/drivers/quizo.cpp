@@ -48,7 +48,7 @@ public:
 	void port60_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void init_quizo();
-	DECLARE_PALETTE_INIT(quizo);
+	void palette_init_quizo(palette_device &palette);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
@@ -60,7 +60,7 @@ public:
 
 static const uint8_t rombankLookup[]={ 2, 3, 4, 4, 4, 4, 4, 5, 0, 1};
 
-PALETTE_INIT_MEMBER(quizo_state, quizo)
+void quizo_state::palette_init_quizo(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;

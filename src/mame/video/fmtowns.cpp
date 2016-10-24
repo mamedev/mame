@@ -1634,7 +1634,7 @@ void towns_state::draw_text_layer()
 	}
 }
 
-TIMER_CALLBACK_MEMBER(towns_state::towns_sprite_done)
+void towns_state::towns_sprite_done(void *ptr, int32_t param)
 {
 	// sprite drawing is complete, lower flag
 	m_video.towns_sprite_flag = 0;
@@ -1644,7 +1644,7 @@ TIMER_CALLBACK_MEMBER(towns_state::towns_sprite_done)
 		m_video.towns_crtc_reg[21] &= ~0x8000;
 }
 
-TIMER_CALLBACK_MEMBER(towns_state::towns_vblank_end)
+void towns_state::towns_vblank_end(void *ptr, int32_t param)
 {
 	// here we'll clear the vsync signal, I presume it goes low on it's own eventually
 	device_t* dev = (device_t*)ptr;
@@ -1653,7 +1653,7 @@ TIMER_CALLBACK_MEMBER(towns_state::towns_vblank_end)
 	m_video.towns_vblank_flag = 0;
 }
 
-INTERRUPT_GEN_MEMBER(towns_state::towns_vsync_irq)
+void towns_state::towns_vsync_irq(device_t &device)
 {
 	pic8259_device* dev = m_pic_slave;
 	dev->ir3_w(1);  // IRQ11 = VSync

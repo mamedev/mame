@@ -43,14 +43,14 @@ public:
 	void tiamc1_palette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void kot_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void kot_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(pit8253_2_w);
+	void pit8253_2_w(int state);
 
-	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
+	void get_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_bg2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	void video_start_kot();
-	DECLARE_PALETTE_INIT(tiamc1);
+	void palette_init_tiamc1(palette_device &palette);
 	uint32_t screen_update_tiamc1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_kot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);

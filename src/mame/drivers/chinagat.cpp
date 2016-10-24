@@ -91,7 +91,7 @@ public:
 		: ddragon_state(mconfig, type, tag),
 		m_adpcm(*this, "adpcm") { };
 
-	TIMER_DEVICE_CALLBACK_MEMBER(chinagat_scanline);
+	void chinagat_scanline(timer_device &timer, void *ptr, int32_t param);
 	void init_chinagat();
 	void machine_start_chinagat();
 	void machine_reset_chinagat();
@@ -106,7 +106,7 @@ public:
 	void saiyugoub1_adpcm_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void saiyugoub1_m5205_clk_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t saiyugoub1_m5205_irq_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(saiyugoub1_m5205_irq_w);
+	void saiyugoub1_m5205_irq_w(int state);
 	optional_device<msm5205_device> m_adpcm;
 };
 
@@ -135,7 +135,7 @@ void chinagat_state::video_start_chinagat()
     Since MAME's video timing is 0-based, we need to convert this.
 */
 
-TIMER_DEVICE_CALLBACK_MEMBER(chinagat_state::chinagat_scanline)
+void chinagat_state::chinagat_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 	int screen_height = m_screen->height();
@@ -313,7 +313,7 @@ uint8_t chinagat_state::saiyugoub1_m5205_irq_r(address_space &space, offs_t offs
 	return 0;
 }
 
-WRITE_LINE_MEMBER(chinagat_state::saiyugoub1_m5205_irq_w)
+void chinagat_state::saiyugoub1_m5205_irq_w(int state)
 {
 	m_adpcm_sound_irq = 1;
 }

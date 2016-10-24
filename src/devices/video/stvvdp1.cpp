@@ -1747,7 +1747,7 @@ void saturn_state::stv_vdp1_draw_normal_sprite(const rectangle &cliprect, int sp
 	}
 }
 
-TIMER_CALLBACK_MEMBER(saturn_state::vdp1_draw_end )
+void saturn_state::vdp1_draw_end(void *ptr, int32_t param)
 {
 	/* set CEF to 1*/
 	CEF_1;

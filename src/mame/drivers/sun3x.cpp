@@ -197,7 +197,7 @@ public:
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
-	TIMER_DEVICE_CALLBACK_MEMBER(sun380_timer);
+	void sun380_timer(timer_device &timer, void *ptr, int32_t param);
 
 	uint32_t bw2_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -497,7 +497,7 @@ void sun3x_state::cause_buserr_w(address_space &space, offs_t offset, uint32_t d
 	m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(sun3x_state::sun380_timer)
+void sun3x_state::sun380_timer(timer_device &timer, void *ptr, int32_t param)
 {
 	if ((m_irqctrl & 0x81000000) == 0x81000000)
 	{

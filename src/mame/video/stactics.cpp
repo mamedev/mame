@@ -59,7 +59,7 @@ tilt the mirror up and down, and the monitor left and right.
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(stactics_state,stactics)
+void stactics_state::palette_init_stactics(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;

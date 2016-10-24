@@ -43,7 +43,7 @@ public:
 	void init_poker72();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(poker72);
+	void palette_init_poker72(palette_device &palette);
 	uint32_t screen_update_poker72(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -343,7 +343,7 @@ static GFXDECODE_START( poker72 )
 GFXDECODE_END
 
 /* default 444 palette for debug purpose */
-PALETTE_INIT_MEMBER(poker72_state, poker72)
+void poker72_state::palette_init_poker72(palette_device &palette)
 {
 	int x,r,g,b;
 

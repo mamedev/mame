@@ -40,7 +40,7 @@ uint8_t pc9801_86_device::opn_porta_r(address_space &space, offs_t offset, uint8
 
 void pc9801_86_device::opn_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask){ m_joy_sel = data; }
 
-WRITE_LINE_MEMBER(pc9801_86_device::sound_irq)
+void pc9801_86_device::sound_irq(int state)
 {
 	m_fmirq = state ? true : false;
 	/* TODO: seems to die very often */

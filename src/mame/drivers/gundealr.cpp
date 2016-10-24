@@ -392,7 +392,7 @@ void gundealr_state::machine_reset()
 	m_scroll[3] = 0;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(gundealr_state::gundealr_scanline)
+void gundealr_state::gundealr_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -431,7 +431,7 @@ static MACHINE_CONFIG_START( gundealr, gundealr_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-TIMER_DEVICE_CALLBACK_MEMBER(gundealr_state::yamyam_mcu_sim)
+void gundealr_state::yamyam_mcu_sim(timer_device &timer, void *ptr, int32_t param)
 {
 	static const uint8_t snipped_cmd03[8] = { 0x3a, 0x00, 0xc0, 0x47, 0x3a, 0x01, 0xc0, 0xc9 };
 	static const uint8_t snipped_cmd05_1[5] = { 0xcd, 0x20, 0xe0, 0x7e, 0xc9 };

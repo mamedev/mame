@@ -643,7 +643,7 @@ void hyperstone_device::adjust_timer_interrupt()
 		m_timer->adjust(attotime::never);
 }
 
-TIMER_CALLBACK_MEMBER( hyperstone_device::timer_callback )
+void hyperstone_device::timer_callback(void *ptr, int32_t param)
 {
 	int update = param;
 

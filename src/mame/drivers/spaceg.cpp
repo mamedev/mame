@@ -198,7 +198,7 @@ public:
 	required_shared_ptr<uint8_t> m_io9401;
 	void zvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t spaceg_colorram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_PALETTE_INIT(spaceg);
+	void palette_init_spaceg(palette_device &palette);
 	uint32_t screen_update_spaceg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
@@ -229,7 +229,7 @@ void spaceg_state::driver_start()
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(spaceg_state, spaceg)
+void spaceg_state::palette_init_spaceg(palette_device &palette)
 {
 	int i;
 

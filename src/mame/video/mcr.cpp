@@ -28,7 +28,7 @@ static tilemap_t *bg_tilemap;
     Byte 0:
         pppppppp = picture index
  */
-TILE_GET_INFO_MEMBER(mcr_state::mcr_90009_get_tile_info)
+void mcr_state::mcr_90009_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *videoram = m_videoram;
 	SET_TILE_INFO_MEMBER(0, videoram[tile_index], 0, 0);
@@ -51,7 +51,7 @@ TILE_GET_INFO_MEMBER(mcr_state::mcr_90009_get_tile_info)
         ------x- = X flip
         -------p = picture index (high 1 bit)
  */
-TILE_GET_INFO_MEMBER(mcr_state::mcr_90010_get_tile_info)
+void mcr_state::mcr_90010_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *videoram = m_videoram;
 	int data = videoram[tile_index * 2] | (videoram[tile_index * 2 + 1] << 8);
@@ -77,7 +77,7 @@ TILE_GET_INFO_MEMBER(mcr_state::mcr_90010_get_tile_info)
         -----x-- = X flip
         ------pp = picture index (high 2 bits)
  */
-TILE_GET_INFO_MEMBER(mcr_state::mcr_91490_get_tile_info)
+void mcr_state::mcr_91490_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *videoram = m_videoram;
 	int data = videoram[tile_index * 2] | (videoram[tile_index * 2 + 1] << 8);

@@ -31,7 +31,7 @@ Notes:
 #include "includes/konamipt.h"
 #include "includes/mainevt.h"
 
-INTERRUPT_GEN_MEMBER(mainevt_state::mainevt_interrupt)
+void mainevt_state::mainevt_interrupt(device_t &device)
 {
 	if (m_k052109->is_irq_enabled())
 		irq0_line_hold(device);
@@ -42,7 +42,7 @@ void mainevt_state::dv_nmienable_w(address_space &space, offs_t offset, uint8_t 
 	m_nmi_enable = data;
 }
 
-INTERRUPT_GEN_MEMBER(mainevt_state::dv_interrupt)
+void mainevt_state::dv_interrupt(device_t &device)
 {
 	if (m_nmi_enable)
 		nmi_line_pulse(device);
@@ -391,13 +391,13 @@ void mainevt_state::machine_reset()
 	m_nmi_enable = 0;
 }
 
-INTERRUPT_GEN_MEMBER(mainevt_state::mainevt_sound_timer_irq)
+void mainevt_state::mainevt_sound_timer_irq(device_t &device)
 {
 	if(m_sound_irq_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(mainevt_state::devstors_sound_timer_irq)
+void mainevt_state::devstors_sound_timer_irq(device_t &device)
 {
 	if(m_sound_irq_mask)
 		device.execute().set_input_line(0, HOLD_LINE);

@@ -129,7 +129,7 @@ public:
 	void init_cyclemb();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(cyclemb);
+	void palette_init_cyclemb(palette_device &palette);
 
 	uint32_t screen_update_cyclemb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_skydest(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -142,7 +142,7 @@ public:
 
 
 
-PALETTE_INIT_MEMBER(cyclemb_state, cyclemb)
+void cyclemb_state::palette_init_cyclemb(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i,r,g,b,val;

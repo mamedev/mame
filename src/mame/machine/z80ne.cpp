@@ -36,7 +36,7 @@ cassette_image_device* z80ne_state::cassette_device_image()
 		return m_cassette1;
 }
 
-TIMER_CALLBACK_MEMBER(z80ne_state::z80ne_cassette_tc)
+void z80ne_state::z80ne_cassette_tc(void *ptr, int32_t param)
 {
 	uint8_t cass_ws = 0;
 	m_cass_data.input.length++;
@@ -110,7 +110,7 @@ void z80ne_state::init_z80netf()
 
 }
 
-TIMER_CALLBACK_MEMBER(z80ne_state::z80ne_kbd_scan)
+void z80ne_state::z80ne_kbd_scan(void *ptr, int32_t param)
 {
 	/*
 	 * NE555 is connected to a 74LS93 binary counter

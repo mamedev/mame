@@ -34,7 +34,7 @@
       1  | xxxxxxxx x------- | not used?
 */
 
-TILE_GET_INFO_MEMBER(targeth_state::get_tile_info_screen0)
+void targeth_state::get_tile_info_screen0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int data = m_videoram[tile_index << 1];
 	int data2 = m_videoram[(tile_index << 1) + 1];
@@ -43,7 +43,7 @@ TILE_GET_INFO_MEMBER(targeth_state::get_tile_info_screen0)
 	SET_TILE_INFO_MEMBER(0, code, data2 & 0x1f, TILE_FLIPXY((data2 >> 5) & 0x03));
 }
 
-TILE_GET_INFO_MEMBER(targeth_state::get_tile_info_screen1)
+void targeth_state::get_tile_info_screen1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int data = m_videoram[(0x2000/2) + (tile_index << 1)];
 	int data2 = m_videoram[(0x2000/2) + (tile_index << 1) + 1];

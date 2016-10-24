@@ -831,7 +831,7 @@ void i8089_channel::ca()
 	m_prio = PRIO_CHAN_ATTN;
 }
 
-WRITE_LINE_MEMBER( i8089_channel::ext_w )
+void i8089_channel::ext_w(int state)
 {
 	if (VERBOSE)
 		logerror("%s('%s'): ext_w: %d\n", shortname(), tag(), state);
@@ -839,7 +839,7 @@ WRITE_LINE_MEMBER( i8089_channel::ext_w )
 		terminate_dma((CC_TX - 1) * 4);
 }
 
-WRITE_LINE_MEMBER( i8089_channel::drq_w )
+void i8089_channel::drq_w(int state)
 {
 	if (VERBOSE)
 		logerror("%s('%s'): drq_w: %d\n", shortname(), tag(), state);

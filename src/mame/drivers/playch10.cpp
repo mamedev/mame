@@ -634,7 +634,7 @@ static GFXDECODE_START( playch10 )
 	GFXDECODE_ENTRY( "gfx1", 0, bios_charlayout,   0,  32 )
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(playch10_state::playch10_interrupt){
+void playch10_state::playch10_interrupt(device_t &device){
 	/* LS161A, Sheet 1 - bottom left of Z80 */
 	if ( !m_pc10_dog_di && !m_pc10_nmi_enable ) {
 		device.execute().set_input_line(INPUT_LINE_RESET, PULSE_LINE );

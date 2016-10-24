@@ -240,12 +240,12 @@ public:
 	void gamecom_internal_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void gamecom_pio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_gamecom();
-	DECLARE_PALETTE_INIT(gamecom);
-	INTERRUPT_GEN_MEMBER(gamecom_interrupt);
-	TIMER_CALLBACK_MEMBER(gamecom_clock_timer_callback);
-	TIMER_CALLBACK_MEMBER(gamecom_sound0_timer_callback);
-	TIMER_CALLBACK_MEMBER(gamecom_sound1_timer_callback);
-	TIMER_CALLBACK_MEMBER(gamecom_scanline);
+	void palette_init_gamecom(palette_device &palette);
+	void gamecom_interrupt(device_t &device);
+	void gamecom_clock_timer_callback(void *ptr, int32_t param);
+	void gamecom_sound0_timer_callback(void *ptr, int32_t param);
+	void gamecom_sound1_timer_callback(void *ptr, int32_t param);
+	void gamecom_scanline(void *ptr, int32_t param);
 	void gamecom_handle_dma(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void gamecom_update_timers(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( gamecom_cart1 );

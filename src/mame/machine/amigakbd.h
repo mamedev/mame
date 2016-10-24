@@ -51,7 +51,7 @@ public:
 	template<class _Object> static devcb_base &set_krst_wr_callback(device_t &device, _Object object)
 		{ return downcast<amigakbd_device &>(device).m_write_krst.set_callback(object); }
 
-	DECLARE_WRITE_LINE_MEMBER( kdat_w );
+	void kdat_w(int state);
 
 	// 6500/1 internal
 	uint8_t port_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);

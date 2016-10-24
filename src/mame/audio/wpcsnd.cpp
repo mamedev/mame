@@ -113,7 +113,7 @@ void wpcsnd_device::static_set_romregion(device_t &device, const char *tag)
 	cpuboard.m_rom.set_tag(tag);
 }
 
-WRITE_LINE_MEMBER( wpcsnd_device::ym2151_irq_w)
+void wpcsnd_device::ym2151_irq_w(int state)
 {
 	m_cpu->set_input_line(M6809_FIRQ_LINE,state ? ASSERT_LINE : CLEAR_LINE);
 }

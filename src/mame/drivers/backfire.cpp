@@ -94,7 +94,7 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_backfire_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_backfire_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(deco32_vbl_interrupt);
+	void deco32_vbl_interrupt(device_t &device);
 	void descramble_sound();
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 	DECOSPR_PRIORITY_CB_MEMBER(pri_callback);
@@ -437,7 +437,7 @@ static GFXDECODE_START( backfire )
 GFXDECODE_END
 
 
-INTERRUPT_GEN_MEMBER(backfire_state::deco32_vbl_interrupt)
+void backfire_state::deco32_vbl_interrupt(device_t &device)
 {
 	device.execute().set_input_line(ARM_IRQ_LINE, HOLD_LINE);
 }

@@ -61,7 +61,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(jongkyo);
+	void palette_init_jongkyo(palette_device &palette);
 	uint32_t screen_update_jongkyo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 };
@@ -449,7 +449,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(jongkyo_state, jongkyo)
+void jongkyo_state::palette_init_jongkyo(palette_device &palette)
 {
 	int i;
 	uint8_t* proms = memregion("proms")->base();

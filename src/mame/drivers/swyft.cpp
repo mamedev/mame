@@ -345,25 +345,25 @@ public:
 	void swyft_via0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t via0_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void via0_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(via0_ca2_w);
+	void via0_ca2_w(int state);
 	uint8_t via0_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void via0_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(via0_cb1_w);
-	DECLARE_WRITE_LINE_MEMBER(via0_cb2_w);
-	DECLARE_WRITE_LINE_MEMBER(via0_int_w);
+	void via0_cb1_w(int state);
+	void via0_cb2_w(int state);
+	void via0_int_w(int state);
 
 	uint8_t swyft_via1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void swyft_via1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t via1_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void via1_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(via1_ca2_w);
+	void via1_ca2_w(int state);
 	uint8_t via1_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void via1_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(via1_cb1_w);
-	DECLARE_WRITE_LINE_MEMBER(via1_cb2_w);
-	DECLARE_WRITE_LINE_MEMBER(via1_int_w);
+	void via1_cb1_w(int state);
+	void via1_cb2_w(int state);
+	void via1_int_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
+	void write_acia_clock(int state);
 
 	/* gate array 2 has a 16-bit counter inside which counts at 10mhz and
 	   rolls over at FFFF->0000; on roll-over (or likely at FFFF terminal count)
@@ -686,7 +686,7 @@ void swyft_state::via0_pa_w(address_space &space, offs_t offset, uint8_t data, u
 	logerror("VIA0: Port A written with data of 0x%02x!\n", data);
 }
 
-WRITE_LINE_MEMBER ( swyft_state::via0_ca2_w )
+void swyft_state::via0_ca2_w(int state)
 {
 	logerror("VIA0: CA2 written with %d!\n", state);
 }
@@ -702,17 +702,17 @@ void swyft_state::via0_pb_w(address_space &space, offs_t offset, uint8_t data, u
 	logerror("VIA0: Port B written with data of 0x%02x!\n", data);
 }
 
-WRITE_LINE_MEMBER ( swyft_state::via0_cb1_w )
+void swyft_state::via0_cb1_w(int state)
 {
 	logerror("VIA0: CB1 written with %d!\n", state);
 }
 
-WRITE_LINE_MEMBER ( swyft_state::via0_cb2_w )
+void swyft_state::via0_cb2_w(int state)
 {
 	logerror("VIA0: CB2 written with %d!\n", state);
 }
 
-WRITE_LINE_MEMBER ( swyft_state::via0_int_w )
+void swyft_state::via0_int_w(int state)
 {
 	logerror("VIA0: INT output set to %d!\n", state);
 }
@@ -729,7 +729,7 @@ void swyft_state::via1_pa_w(address_space &space, offs_t offset, uint8_t data, u
 	logerror(" VIA1: Port A written with data of 0x%02x!\n", data);
 }
 
-WRITE_LINE_MEMBER ( swyft_state::via1_ca2_w )
+void swyft_state::via1_ca2_w(int state)
 {
 	logerror(" VIA1: CA2 written with %d!\n", state);
 }
@@ -745,22 +745,22 @@ void swyft_state::via1_pb_w(address_space &space, offs_t offset, uint8_t data, u
 	logerror(" VIA1: Port B written with data of 0x%02x!\n", data);
 }
 
-WRITE_LINE_MEMBER ( swyft_state::via1_cb1_w )
+void swyft_state::via1_cb1_w(int state)
 {
 	logerror(" VIA1: CB1 written with %d!\n", state);
 }
 
-WRITE_LINE_MEMBER ( swyft_state::via1_cb2_w )
+void swyft_state::via1_cb2_w(int state)
 {
 	logerror(" VIA1: CB2 written with %d!\n", state);
 }
 
-WRITE_LINE_MEMBER ( swyft_state::via1_int_w )
+void swyft_state::via1_int_w(int state)
 {
 	logerror(" VIA1: INT output set to %d!\n", state);
 }
 
-WRITE_LINE_MEMBER( swyft_state::write_acia_clock )
+void swyft_state::write_acia_clock(int state)
 {
 	m_acia6850->write_txc(state);
 	m_acia6850->write_rxc(state);

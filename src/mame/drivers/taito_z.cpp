@@ -1036,7 +1036,7 @@ void taitoz_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 
 /***** Routines for particular games *****/
 
-INTERRUPT_GEN_MEMBER(taitoz_state::sci_interrupt)
+void taitoz_state::sci_interrupt(device_t &device)
 {
 	/* Need 2 int4's per int6 else (-$6b63,A5) never set to 1 which
 	   causes all sprites to vanish! Spriteram has areas for 2 frames

@@ -36,10 +36,10 @@ public:
 	void foodf_paletteram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void foodf_set_flip(int flip);
 	uint8_t pot_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
+	void get_playfield_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void machine_start_foodf();
 	void machine_reset_foodf();
 	void video_start_foodf();
 	uint32_t screen_update_foodf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(scanline_update_timer);
+	void scanline_update_timer(timer_device &timer, void *ptr, int32_t param);
 };

@@ -110,8 +110,8 @@ public:
 	m_lsw1(*this, "lsw1")
 	{}
 
-	DECLARE_WRITE_LINE_MEMBER(ram_disable_w);
-	DECLARE_WRITE_LINE_MEMBER(ram_disable_cpm_w);
+	void ram_disable_w(int state);
+	void ram_disable_cpm_w(int state);
 	void init_nascom2();
 	void init_nascom2c();
 	uint32_t screen_update_nascom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -361,7 +361,7 @@ void nascom2_state::init_nascom2()
 
 // since we don't know for which regions we should disable ram, we just let other devices
 // overwrite the region they need, and re-install our ram when they are disabled
-WRITE_LINE_MEMBER( nascom2_state::ram_disable_w )
+void nascom2_state::ram_disable_w(int state)
 {
 	if (state)
 	{
@@ -380,7 +380,7 @@ void nascom2_state::init_nascom2c()
 	m_nasbus->set_io_space(&m_maincpu->space(AS_IO));
 }
 
-WRITE_LINE_MEMBER( nascom2_state::ram_disable_cpm_w )
+void nascom2_state::ram_disable_cpm_w(int state)
 {
 	if (state)
 	{

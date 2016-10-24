@@ -1107,28 +1107,28 @@ int mc68901_device::get_vector()
 	return M68K_INT_ACK_SPURIOUS;
 }
 
-WRITE_LINE_MEMBER( mc68901_device::i0_w ) { gpio_input(0, state); }
-WRITE_LINE_MEMBER( mc68901_device::i1_w ) { gpio_input(1, state); }
-WRITE_LINE_MEMBER( mc68901_device::i2_w ) { gpio_input(2, state); }
-WRITE_LINE_MEMBER( mc68901_device::i3_w ) { gpio_input(3, state); }
-WRITE_LINE_MEMBER( mc68901_device::i4_w ) { gpio_input(4, state); }
-WRITE_LINE_MEMBER( mc68901_device::i5_w ) { gpio_input(5, state); }
-WRITE_LINE_MEMBER( mc68901_device::i6_w ) { gpio_input(6, state); }
-WRITE_LINE_MEMBER( mc68901_device::i7_w ) { gpio_input(7, state); }
+void mc68901_device::i0_w(int state) { gpio_input(0, state); }
+void mc68901_device::i1_w(int state) { gpio_input(1, state); }
+void mc68901_device::i2_w(int state) { gpio_input(2, state); }
+void mc68901_device::i3_w(int state) { gpio_input(3, state); }
+void mc68901_device::i4_w(int state) { gpio_input(4, state); }
+void mc68901_device::i5_w(int state) { gpio_input(5, state); }
+void mc68901_device::i6_w(int state) { gpio_input(6, state); }
+void mc68901_device::i7_w(int state) { gpio_input(7, state); }
 
 
-WRITE_LINE_MEMBER( mc68901_device::tai_w )
+void mc68901_device::tai_w(int state)
 {
 	timer_input(TIMER_A, state);
 }
 
 
-WRITE_LINE_MEMBER( mc68901_device::tbi_w )
+void mc68901_device::tbi_w(int state)
 {
 	timer_input(TIMER_B, state);
 }
 
-WRITE_LINE_MEMBER(mc68901_device::write_rx)
+void mc68901_device::write_rx(int state)
 {
 	device_serial_interface::rx_w(state);
 }

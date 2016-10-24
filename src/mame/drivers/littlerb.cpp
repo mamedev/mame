@@ -99,8 +99,8 @@ public:
 	void littlerb_r_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	uint8_t sound_data_shift();
 
-	TIMER_DEVICE_CALLBACK_MEMBER(littlerb_sound_step_cb);
-	TIMER_DEVICE_CALLBACK_MEMBER(littlerb_sound_cb);
+	void littlerb_sound_step_cb(timer_device &timer, void *ptr, int32_t param);
+	void littlerb_sound_cb(timer_device &timer, void *ptr, int32_t param);
 
 };
 
@@ -230,7 +230,7 @@ static INPUT_PORTS_START( littlerb )
 INPUT_PORTS_END
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(littlerb_state::littlerb_sound_cb)
+void littlerb_state::littlerb_sound_cb(timer_device &timer, void *ptr, int32_t param)
 {
 	uint8_t *sample_rom = memregion("samples")->base();
 
@@ -242,7 +242,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(littlerb_state::littlerb_sound_cb)
 	m_sound_pointer_r&=0x3ff;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(littlerb_state::littlerb_sound_step_cb)
+void littlerb_state::littlerb_sound_step_cb(timer_device &timer, void *ptr, int32_t param)
 {
 	m_soundframe++;
 }

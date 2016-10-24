@@ -31,7 +31,7 @@ const unsigned short pocketc_state::pocketc_colortable[8][2] = {
 	{ 3, 5 }
 };
 
-PALETTE_INIT_MEMBER(pocketc_state, pocketc)
+void pocketc_state::palette_init_pocketc(palette_device &palette)
 {
 	uint8_t i=0, r, b, g, color_count = 6;
 

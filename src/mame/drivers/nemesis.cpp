@@ -63,19 +63,19 @@ So this is the correct behavior of real hardware, not an emulation bug.
 #include "konamigt.lh"
 
 
-INTERRUPT_GEN_MEMBER(nemesis_state::nemesis_interrupt)
+void nemesis_state::nemesis_interrupt(device_t &device)
 {
 	if (m_irq_on)
 		device.execute().set_input_line(1, HOLD_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(nemesis_state::blkpnthr_interrupt)
+void nemesis_state::blkpnthr_interrupt(device_t &device)
 {
 	if (m_irq_on)
 		device.execute().set_input_line(2, HOLD_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(nemesis_state::konamigt_interrupt)
+void nemesis_state::konamigt_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -86,7 +86,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(nemesis_state::konamigt_interrupt)
 		m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(nemesis_state::gx400_interrupt)
+void nemesis_state::gx400_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

@@ -228,18 +228,18 @@ public:
 	uint8_t ikbd_port4_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void ikbd_port4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
+	void fdc_drq_w(int state);
 
 	void psg_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( ikbd_tx_w );
-	DECLARE_WRITE_LINE_MEMBER( acia_ikbd_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( acia_midi_irq_w );
+	void ikbd_tx_w(int state);
+	void acia_ikbd_irq_w(int state);
+	void acia_midi_irq_w(int state);
 
 	uint8_t mfp_gpio_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( mfp_tdo_w );
+	void mfp_tdo_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( write_acia_clock );
+	void write_acia_clock(int state);
 
 	void toggle_dma_fifo();
 	void flush_dma_fifo();
@@ -328,11 +328,11 @@ public:
 	floppy_image_device *floppy_devices[2];
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
-	IRQ_CALLBACK_MEMBER(atarist_int_ack);
+	int atarist_int_ack(device_t &device, int irqline);
 
 	int m_monochrome;
 	required_device<palette_device> m_palette;
-	DECLARE_WRITE_LINE_MEMBER( write_monochrome );
+	void write_monochrome(int state);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -393,7 +393,7 @@ public:
 	uint16_t microwire_mask_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void microwire_mask_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE_LINE_MEMBER( write_monochrome );
+	void write_monochrome(int state);
 
 	void dmasound_set_state(int level);
 	void dmasound_tick();

@@ -37,7 +37,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(karnov_state, karnov)
+void karnov_state::palette_init_karnov(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -134,7 +134,7 @@ uint32_t karnov_state::screen_update_karnov(screen_device &screen, bitmap_ind16 
 
 /******************************************************************************/
 
-TILE_GET_INFO_MEMBER(karnov_state::get_fix_tile_info)
+void karnov_state::get_fix_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = m_videoram[tile_index];
 	SET_TILE_INFO_MEMBER(0,

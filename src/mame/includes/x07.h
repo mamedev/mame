@@ -275,11 +275,11 @@ public:
 	uint8_t m_prn_char_code;
 	uint8_t m_prn_buffer[0x100];
 	uint8_t m_prn_size;
-	DECLARE_PALETTE_INIT(x07);
-	TIMER_CALLBACK_MEMBER(cassette_tick);
-	TIMER_CALLBACK_MEMBER(cassette_poll);
-	TIMER_CALLBACK_MEMBER(rsta_clear);
-	TIMER_CALLBACK_MEMBER(rstb_clear);
-	TIMER_CALLBACK_MEMBER(beep_stop);
-	TIMER_DEVICE_CALLBACK_MEMBER(blink_timer);
+	void palette_init_x07(palette_device &palette);
+	void cassette_tick(void *ptr, int32_t param);
+	void cassette_poll(void *ptr, int32_t param);
+	void rsta_clear(void *ptr, int32_t param);
+	void rstb_clear(void *ptr, int32_t param);
+	void beep_stop(void *ptr, int32_t param);
+	void blink_timer(timer_device &timer, void *ptr, int32_t param);
 };

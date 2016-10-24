@@ -71,9 +71,9 @@ public:
 	void scroll_char_x_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void scroll_char_y_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	TILE_GET_INFO_MEMBER(fg_get_tile_info);
-	TILE_GET_INFO_MEMBER(bg_get_tile_info);
-	TILE_GET_INFO_MEMBER(tx_get_tile_info);
+	void fg_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void bg_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void tx_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	virtual void video_start() override;
 	void video_start_ginkun();

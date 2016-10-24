@@ -167,7 +167,7 @@ public:
 	required_memory_bank m_rombank;
 
 	virtual void machine_start() override;
-	DECLARE_PALETTE_INIT(pitagjr);
+	void palette_init_pitagjr(palette_device &palette);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
@@ -188,7 +188,7 @@ void pitagjr_state::machine_start()
 	m_rombank->set_entry(1);
 }
 
-PALETTE_INIT_MEMBER(pitagjr_state, pitagjr)
+void pitagjr_state::palette_init_pitagjr(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));

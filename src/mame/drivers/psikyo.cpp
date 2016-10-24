@@ -149,7 +149,7 @@ uint32_t psikyo_state::gunbird_input_r(address_space &space, offs_t offset, uint
 }
 
 
-TIMER_CALLBACK_MEMBER(psikyo_state::psikyo_soundlatch_callback)
+void psikyo_state::psikyo_soundlatch_callback(void *ptr, int32_t param)
 {
 	m_soundlatch = param;
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);

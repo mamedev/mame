@@ -131,11 +131,11 @@ public:
 	uint8_t samcoupe_attributes_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(samcoupe);
-	INTERRUPT_GEN_MEMBER(samcoupe_frame_interrupt);
-	TIMER_CALLBACK_MEMBER(irq_off);
-	TIMER_CALLBACK_MEMBER(samcoupe_mouse_reset);
-	TIMER_CALLBACK_MEMBER(sam_video_update_callback);
+	void palette_init_samcoupe(palette_device &palette);
+	void samcoupe_frame_interrupt(device_t &device);
+	void irq_off(void *ptr, int32_t param);
+	void samcoupe_mouse_reset(void *ptr, int32_t param);
+	void sam_video_update_callback(void *ptr, int32_t param);
 	uint8_t samcoupe_lpt1_busy_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void samcoupe_lpt1_strobe_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t samcoupe_lpt2_busy_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
@@ -191,8 +191,8 @@ public:
 	uint8_t samcoupe_mouse_r();
 	void samcoupe_irq(uint8_t src);
 
-	DECLARE_WRITE_LINE_MEMBER(write_lpt1_busy);
-	DECLARE_WRITE_LINE_MEMBER(write_lpt2_busy);
+	void write_lpt1_busy(int state);
+	void write_lpt2_busy(int state);
 
 	int m_lpt1_busy;
 	int m_lpt2_busy;

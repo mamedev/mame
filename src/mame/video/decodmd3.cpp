@@ -64,7 +64,7 @@ uint16_t decodmd_type3_device::latch_r(address_space &space, offs_t offset, uint
 	return m_command;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(decodmd_type3_device::dmd_irq)
+void decodmd_type3_device::dmd_irq(timer_device &timer, void *ptr, int32_t param)
 {
 	m_cpu->set_input_line(M68K_IRQ_2, HOLD_LINE);
 }

@@ -42,7 +42,7 @@ public:
 
 	uint8_t keyin_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
+	void write_acia_clock(int state);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
 	const uint8_t *m_p_chargen;
@@ -149,7 +149,7 @@ void mx2178_state::machine_reset()
 	m_p_chargen = memregion("chargen")->base();
 }
 
-WRITE_LINE_MEMBER(mx2178_state::write_acia_clock)
+void mx2178_state::write_acia_clock(int state)
 {
 	m_acia->write_txc(state);
 	m_acia->write_rxc(state);

@@ -39,13 +39,13 @@ public:
 	void compgolf_scrollx_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void compgolf_scrolly_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_compgolf();
-	TILE_GET_INFO_MEMBER(get_text_info);
-	TILEMAP_MAPPER_MEMBER(back_scan);
-	TILE_GET_INFO_MEMBER(get_back_info);
+	void get_text_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	tilemap_memory_index back_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	void get_back_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(compgolf);
+	void palette_init_compgolf(palette_device &palette);
 	uint32_t screen_update_compgolf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void compgolf_expand_bg();

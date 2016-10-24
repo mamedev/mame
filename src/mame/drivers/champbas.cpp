@@ -108,7 +108,7 @@ void champbas_state::irq_enable_w(address_space &space, offs_t offset, uint8_t d
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(champbas_state::exctsccr_sound_irq)
+void champbas_state::exctsccr_sound_irq(timer_device &timer, void *ptr, int32_t param)
 {
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
@@ -511,7 +511,7 @@ void champbas_state::machine_reset()
 		m_maincpu->space(AS_PROGRAM).write_byte(0xa000 + i, 0);
 }
 
-INTERRUPT_GEN_MEMBER(champbas_state::vblank_irq)
+void champbas_state::vblank_irq(device_t &device)
 {
 	if (m_irq_mask)
 		device.execute().set_input_line(0, ASSERT_LINE);

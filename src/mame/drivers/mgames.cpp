@@ -243,7 +243,7 @@ public:
 	void outport6_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void outport7_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(mgames);
+	void palette_init_mgames(palette_device &palette);
 	uint32_t screen_update_mgames(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -276,7 +276,7 @@ uint32_t mgames_state::screen_update_mgames(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-PALETTE_INIT_MEMBER(mgames_state, mgames)
+void mgames_state::palette_init_mgames(palette_device &palette)
 {
 	int i;
 

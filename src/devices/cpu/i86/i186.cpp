@@ -706,7 +706,7 @@ void i80186_cpu_device::write_port_word(uint16_t port, uint16_t data)
  *  80186 interrupt controller
  *
  *************************************/
-IRQ_CALLBACK_MEMBER(i80186_cpu_device::int_callback)
+int i80186_cpu_device::int_callback(device_t &device, int irqline)
 {
 	uint8_t   vector;
 	uint16_t  old;

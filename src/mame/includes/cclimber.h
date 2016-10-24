@@ -78,19 +78,19 @@ public:
 	void init_rpatrol();
 	void machine_reset_cclimber();
 	void video_start_cclimber();
-	DECLARE_PALETTE_INIT(cclimber);
+	void palette_init_cclimber(palette_device &palette);
 	void video_start_swimmer();
-	DECLARE_PALETTE_INIT(swimmer);
-	DECLARE_PALETTE_INIT(yamato);
+	void palette_init_swimmer(palette_device &palette);
+	void palette_init_yamato(palette_device &palette);
 	void video_start_toprollr();
-	DECLARE_PALETTE_INIT(toprollr);
+	void palette_init_toprollr(palette_device &palette);
 
-	TILE_GET_INFO_MEMBER(cclimber_get_pf_tile_info);
-	TILE_GET_INFO_MEMBER(swimmer_get_pf_tile_info);
-	TILE_GET_INFO_MEMBER(toprollr_get_pf_tile_info);
-	TILE_GET_INFO_MEMBER(cclimber_get_bs_tile_info);
-	TILE_GET_INFO_MEMBER(toprollr_get_bs_tile_info);
-	TILE_GET_INFO_MEMBER(toproller_get_bg_tile_info);
+	void cclimber_get_pf_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void swimmer_get_pf_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void toprollr_get_pf_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void cclimber_get_bs_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void toprollr_get_bs_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void toproller_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	uint32_t screen_update_cclimber(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_swimmer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -105,6 +105,6 @@ public:
 	void swimmer_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx);
 	void cclimber_decode(const uint8_t convtable[8][16]);
 
-	INTERRUPT_GEN_MEMBER(vblank_irq);
-	INTERRUPT_GEN_MEMBER(bagmanf_vblank_irq);
+	void vblank_irq(device_t &device);
+	void bagmanf_vblank_irq(device_t &device);
 };

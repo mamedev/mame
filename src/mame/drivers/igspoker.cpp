@@ -123,14 +123,14 @@ public:
 	void init_igs_ncs2();
 	void init_cpokerpk();
 	void init_kungfu();
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	void video_start_cpokerpk();
 	uint32_t screen_update_igs_video(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cpokerpk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(igs_interrupt);
+	void igs_interrupt(timer_device &timer, void *ptr, int32_t param);
 };
 
 
@@ -142,7 +142,7 @@ void igspoker_state::machine_reset()
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(igspoker_state::igs_interrupt)
+void igspoker_state::igs_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -169,13 +169,13 @@ void igspoker_state::igs_irqack_w(address_space &space, offs_t offset, uint8_t d
 }
 
 
-TILE_GET_INFO_MEMBER(igspoker_state::get_bg_tile_info)
+void igspoker_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_bg_tile_ram[tile_index];
 	SET_TILE_INFO_MEMBER(1 + (tile_index & 3), code, 0, 0);
 }
 
-TILE_GET_INFO_MEMBER(igspoker_state::get_fg_tile_info)
+void igspoker_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_fg_tile_ram[tile_index] | (m_fg_color_ram[tile_index] << 8);
 	int tile = code & 0x1fff;

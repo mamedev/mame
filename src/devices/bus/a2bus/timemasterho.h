@@ -36,8 +36,8 @@ public:
 
 	void pia_out_a(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void pia_out_b(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(pia_irqa_w);
-	DECLARE_WRITE_LINE_MEMBER(pia_irqb_w);
+	void pia_irqa_w(int state);
+	void pia_irqb_w(int state);
 
 protected:
 	virtual void device_start() override;

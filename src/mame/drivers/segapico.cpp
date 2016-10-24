@@ -150,7 +150,7 @@ public:
 	uint16_t pico_read_penpos(int pen);
 	uint16_t pico_68k_io_read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void pico_68k_io_write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	DECLARE_WRITE_LINE_MEMBER(sound_cause_irq);
+	void sound_cause_irq(int state);
 
 	void init_pico();
 	void init_picou();
@@ -281,7 +281,7 @@ uint16_t pico_base_state::pico_68k_io_read(address_space &space, offs_t offset, 
 }
 
 
-WRITE_LINE_MEMBER(pico_base_state::sound_cause_irq)
+void pico_base_state::sound_cause_irq(int state)
 {
 //  printf("sound irq\n");
 	/* sega_315_5641_pcm callback */

@@ -583,7 +583,7 @@ uint8_t segas16a_state::mcu_io_r(address_space &space, offs_t offset, uint8_t me
 //  good synchronization with the main CPU
 //-------------------------------------------------
 
-INTERRUPT_GEN_MEMBER( segas16a_state::mcu_irq_assert )
+void segas16a_state::mcu_irq_assert(device_t &device)
 {
 	// toggle the INT0 line on the MCU
 	m_mcu->set_input_line(MCS51_INT0_LINE, ASSERT_LINE);
@@ -599,7 +599,7 @@ INTERRUPT_GEN_MEMBER( segas16a_state::mcu_irq_assert )
 //  handler, we hook this to execute it
 //-------------------------------------------------
 
-INTERRUPT_GEN_MEMBER( segas16a_state::i8751_main_cpu_vblank )
+void segas16a_state::i8751_main_cpu_vblank(device_t &device)
 {
 	// if we have a fake 8751 handler, call it on VBLANK
 	if (!m_i8751_vblank_hook.isnull())

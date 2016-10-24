@@ -38,7 +38,7 @@ public:
 	void ppi0a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void ppi0b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void sndcmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_a);
+	void timer_a(timer_device &timer, void *ptr, int32_t param);
 private:
 	bool m_timer_a;
 	uint8_t m_sndcmd;
@@ -167,7 +167,7 @@ void jeutel_state::machine_reset()
 	m_digit = 0;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( jeutel_state::timer_a )
+void jeutel_state::timer_a(timer_device &timer, void *ptr, int32_t param)
 {
 	m_timer_a ^= 1;
 	m_cpu2->set_input_line(0, (m_timer_a) ? ASSERT_LINE : CLEAR_LINE);

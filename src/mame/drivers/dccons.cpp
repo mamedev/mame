@@ -581,12 +581,12 @@ void dc_cons_state::machine_reset_dc_console()
 	m_aica->set_ram_base(dc_sound_ram, 2*1024*1024);
 }
 
-WRITE_LINE_MEMBER(dc_cons_state::aica_irq)
+void dc_cons_state::aica_irq(int state)
 {
 	m_soundcpu->set_input_line(ARM7_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(dc_cons_state::sh4_aica_irq)
+void dc_cons_state::sh4_aica_irq(int state)
 {
 	if(state)
 		dc_sysctrl_regs[SB_ISTEXT] |= IST_EXT_AICA;

@@ -215,10 +215,10 @@ public:
 	uint8_t m_nubus_irq_state;
 
 	emu_timer *m_overlay_timeout;
-	TIMER_CALLBACK_MEMBER(overlay_timeout_func);
+	void overlay_timeout_func(void *ptr, int32_t param);
 	uint32_t rom_switch_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(mac_scanline);
+	void mac_scanline(timer_device &timer, void *ptr, int32_t param);
 	bool m_snd_enable;
 	bool m_main_buffer;
 	int m_snd_vol;
@@ -297,7 +297,7 @@ public:
 	void set_memory_overlay(int overlay);
 	void scc_mouse_irq( int x, int y );
 	void nubus_slot_interrupt(uint8_t slot, uint32_t state);
-	DECLARE_WRITE_LINE_MEMBER(set_scc_interrupt);
+	void set_scc_interrupt(int state);
 	void set_via_interrupt(int value);
 	void set_via2_interrupt(int value);
 	void field_interrupts();
@@ -369,21 +369,21 @@ public:
 	uint32_t macwd_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	void macwd_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_WRITE_LINE_MEMBER(nubus_irq_9_w);
-	DECLARE_WRITE_LINE_MEMBER(nubus_irq_a_w);
-	DECLARE_WRITE_LINE_MEMBER(nubus_irq_b_w);
-	DECLARE_WRITE_LINE_MEMBER(nubus_irq_c_w);
-	DECLARE_WRITE_LINE_MEMBER(nubus_irq_d_w);
-	DECLARE_WRITE_LINE_MEMBER(nubus_irq_e_w);
+	void nubus_irq_9_w(int state);
+	void nubus_irq_a_w(int state);
+	void nubus_irq_b_w(int state);
+	void nubus_irq_c_w(int state);
+	void nubus_irq_d_w(int state);
+	void nubus_irq_e_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(irq_539x_1_w);
-	DECLARE_WRITE_LINE_MEMBER(drq_539x_1_w);
+	void irq_539x_1_w(int state);
+	void drq_539x_1_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(cuda_reset_w);
-	DECLARE_WRITE_LINE_MEMBER(adb_linechange_w);
+	void cuda_reset_w(int state);
+	void adb_linechange_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(mac_scsi_irq);
-	DECLARE_WRITE_LINE_MEMBER(mac_asc_irq);
+	void mac_scsi_irq(int state);
+	void mac_asc_irq(int state);
 
 private:
 	int has_adb();
@@ -456,9 +456,9 @@ public:
 	void init_macpm8100();
 	void init_macpb100();
 	void video_start_mac();
-	DECLARE_PALETTE_INIT(mac);
+	void palette_init_mac(palette_device &palette);
 	void video_start_macprtb();
-	DECLARE_PALETTE_INIT(macgsc);
+	void palette_init_macgsc(palette_device &palette);
 	void video_start_macsonora();
 	void video_reset_macrbv();
 	void video_start_macdafb();
@@ -478,19 +478,19 @@ public:
 	uint32_t screen_update_macv8(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_macsonora(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_macpbwd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(mac_rbv_vbl);
+	void mac_rbv_vbl(device_t &device);
 #ifndef MAC_USE_EMULATED_KBD
-	TIMER_CALLBACK_MEMBER(kbd_clock);
-	TIMER_CALLBACK_MEMBER(inquiry_timeout_func);
+	void kbd_clock(void *ptr, int32_t param);
+	void inquiry_timeout_func(void *ptr, int32_t param);
 #endif
-	TIMER_CALLBACK_MEMBER(mac_6015_tick);
-	TIMER_CALLBACK_MEMBER(mac_scanline_tick);
-	TIMER_CALLBACK_MEMBER(dafb_vbl_tick);
-	TIMER_CALLBACK_MEMBER(dafb_cursor_tick);
-	TIMER_CALLBACK_MEMBER(mac_adb_tick);    // macadb.c
-	TIMER_CALLBACK_MEMBER(mac_pmu_tick);    // macadb.c
-	DECLARE_WRITE_LINE_MEMBER(mac_via_out_cb2);
-	DECLARE_WRITE_LINE_MEMBER(mac_adb_via_out_cb2);
+	void mac_6015_tick(void *ptr, int32_t param);
+	void mac_scanline_tick(void *ptr, int32_t param);
+	void dafb_vbl_tick(void *ptr, int32_t param);
+	void dafb_cursor_tick(void *ptr, int32_t param);
+	void mac_adb_tick(void *ptr, int32_t param);    // macadb.c
+	void mac_pmu_tick(void *ptr, int32_t param);    // macadb.c
+	void mac_via_out_cb2(int state);
+	void mac_adb_via_out_cb2(int state);
 	uint8_t mac_via_in_a(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t mac_via_in_b(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void mac_via_out_a(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -513,8 +513,8 @@ public:
 	void mac_via2_out_a_pmu(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void mac_via2_out_b_pmu(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void mac_state_load();
-	DECLARE_WRITE_LINE_MEMBER(mac_via_irq);
-	DECLARE_WRITE_LINE_MEMBER(mac_via2_irq);
+	void mac_via_irq(int state);
+	void mac_via2_irq(int state);
 	void dafb_recalc_ints();
 	void set_scc_waitrequest(int waitrequest);
 	int scan_keyboard();

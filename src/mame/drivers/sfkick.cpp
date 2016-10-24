@@ -203,7 +203,7 @@ public:
 	virtual void machine_reset() override;
 	void sfkick_remap_banks();
 	void sfkick_bank_set(int num, int data);
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+	void irqhandler(int state);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	required_memory_region m_region_bios;
@@ -572,7 +572,7 @@ void sfkick_state::machine_reset()
 	sfkick_remap_banks();
 }
 
-WRITE_LINE_MEMBER(sfkick_state::irqhandler)
+void sfkick_state::irqhandler(int state)
 {
 	m_soundcpu->set_input_line_and_vector(0, state ? ASSERT_LINE : CLEAR_LINE, 0xff);
 }

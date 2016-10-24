@@ -38,8 +38,8 @@ private:
 
 	int            m_gfx_index;
 
-	TILE_GET_INFO_MEMBER(tile_info_layer0);
-	TILE_GET_INFO_MEMBER(tile_info_layer1);
+	void tile_info_layer0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void tile_info_layer1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void update_palette_color( uint32_t palette_base, int color );
 };
 

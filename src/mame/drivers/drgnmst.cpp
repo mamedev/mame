@@ -176,7 +176,7 @@ void drgnmst_state::drgnmst_snd_control_w(address_space &space, offs_t offset, u
 }
 
 
-READ_LINE_MEMBER(drgnmst_state::PIC16C5X_T0_clk_r)
+int drgnmst_state::PIC16C5X_T0_clk_r()
 {
 	return 0;
 }

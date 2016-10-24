@@ -21,7 +21,7 @@
 **
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(contra_state, contra)
+void contra_state::palette_init_contra(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int chip;
@@ -58,7 +58,7 @@ PALETTE_INIT_MEMBER(contra_state, contra)
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(contra_state::get_fg_tile_info)
+void contra_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t ctrl_3 = m_k007121_1->ctrlram_r(generic_space(), 3);
 	uint8_t ctrl_4 = m_k007121_1->ctrlram_r(generic_space(), 4);
@@ -85,7 +85,7 @@ TILE_GET_INFO_MEMBER(contra_state::get_fg_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(contra_state::get_bg_tile_info)
+void contra_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t ctrl_3 = m_k007121_2->ctrlram_r(generic_space(), 3);
 	uint8_t ctrl_4 = m_k007121_2->ctrlram_r(generic_space(), 4);
@@ -113,7 +113,7 @@ TILE_GET_INFO_MEMBER(contra_state::get_bg_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(contra_state::get_tx_tile_info)
+void contra_state::get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t ctrl_5 = m_k007121_1->ctrlram_r(generic_space(), 5);
 	uint8_t ctrl_6 = m_k007121_1->ctrlram_r(generic_space(), 6);

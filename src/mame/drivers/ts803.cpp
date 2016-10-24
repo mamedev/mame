@@ -87,7 +87,7 @@ public:
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr);
 	void crtc_controlreg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_ts803();
-	TIMER_DEVICE_CALLBACK_MEMBER(dart_tick);
+	void dart_tick(timer_device &timer, void *ptr, int32_t param);
 
 	uint32_t screen_update_ts803(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<palette_device> m_palette;
@@ -428,7 +428,7 @@ Bit 2 = 0 alpha memory access (round off)
 }
 
 // baud rate generator for keyboard, 9600 baud.
-TIMER_DEVICE_CALLBACK_MEMBER( ts803_state::dart_tick )
+void ts803_state::dart_tick(timer_device &timer, void *ptr, int32_t param)
 {
 	m_tick ^= 1;
 	m_dart->rxca_w(m_tick);

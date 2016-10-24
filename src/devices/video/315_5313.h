@@ -214,10 +214,10 @@ public:
 
 	int get_scanline_counter();
 
-	TIMER_CALLBACK_MEMBER(render_scanline);
+	void render_scanline(void *ptr, int32_t param);
 	void vdp_handle_scanline_callback(int scanline);
-	TIMER_CALLBACK_MEMBER(irq6_on_timer_callback);
-	TIMER_CALLBACK_MEMBER(irq4_on_timer_callback);
+	void irq6_on_timer_callback(void *ptr, int32_t param);
+	void irq4_on_timer_callback(void *ptr, int32_t param);
 	void vdp_handle_eof();
 	void device_reset_old();
 	void vdp_clear_irq6_pending(void) { m_irq6_pending = 0; };
@@ -244,8 +244,8 @@ public:
 	std::unique_ptr<uint16_t[]> m_render_line;
 	std::unique_ptr<uint16_t[]> m_render_line_raw;
 
-	TIMER_DEVICE_CALLBACK_MEMBER( megadriv_scanline_timer_callback_alt_timing );
-	TIMER_DEVICE_CALLBACK_MEMBER( megadriv_scanline_timer_callback );
+	void megadriv_scanline_timer_callback_alt_timing(timer_device &timer, void *ptr, int32_t param);
+	void megadriv_scanline_timer_callback(timer_device &timer, void *ptr, int32_t param);
 	timer_device* m_megadriv_scanline_timer;
 
 	inline uint16_t vdp_get_word_from_68k_mem(uint32_t source);

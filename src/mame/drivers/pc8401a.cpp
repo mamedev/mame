@@ -63,7 +63,7 @@ void pc8401a_state::scan_keyboard()
 	if (strobe) m_key_strobe = strobe;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(pc8401a_state::pc8401a_keyboard_tick)
+void pc8401a_state::pc8401a_keyboard_tick(timer_device &timer, void *ptr, int32_t param)
 {
 	scan_keyboard();
 }

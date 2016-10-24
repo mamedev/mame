@@ -373,7 +373,7 @@ void midyunit_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	}
 }
 
-TIMER_CALLBACK_MEMBER(midyunit_state::dma_callback)
+void midyunit_state::dma_callback(void *ptr, int32_t param)
 {
 	m_dma_register[DMA_COMMAND] &= ~0x8000; /* tell the cpu we're done */
 	m_maincpu->set_input_line(0, ASSERT_LINE);
@@ -543,7 +543,7 @@ if (LOG_DMA)
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(midyunit_state::autoerase_line)
+void midyunit_state::autoerase_line(void *ptr, int32_t param)
 {
 	int scanline = param;
 

@@ -68,7 +68,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_PALETTE_INIT(cgc7900);
+	void palette_init_cgc7900(palette_device &palette);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	uint16_t keyboard_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
@@ -94,7 +94,7 @@ public:
 	rgb_t m_clut[256];
 	int m_blink;
 
-	TIMER_DEVICE_CALLBACK_MEMBER(blink_tick);
+	void blink_tick(timer_device &timer, void *ptr, int32_t param);
 };
 
 /*----------- defined in video/cgc7900.c -----------*/

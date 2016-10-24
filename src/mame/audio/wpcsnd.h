@@ -39,7 +39,7 @@ public:
 	void bg_speech_clock_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void bg_speech_digit_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_w);
+	void ym2151_irq_w(int state);
 	uint8_t latch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void volume_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);

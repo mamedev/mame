@@ -4,7 +4,7 @@
 #include "includes/usgames.h"
 
 
-PALETTE_INIT_MEMBER(usgames_state, usgames)
+void usgames_state::palette_init_usgames(palette_device &palette)
 {
 	int j;
 
@@ -33,7 +33,7 @@ PALETTE_INIT_MEMBER(usgames_state, usgames)
 
 
 
-TILE_GET_INFO_MEMBER(usgames_state::get_tile_info)
+void usgames_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno = m_videoram[tile_index*2];
 	int colour = m_videoram[tile_index*2+1];

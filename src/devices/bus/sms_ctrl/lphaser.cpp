@@ -33,7 +33,7 @@ const device_type SMS_LIGHT_PHASER = &device_creator<sms_light_phaser_device>;
 #define LGUN_X_INTERVAL       4
 
 
-READ_LINE_MEMBER( sms_light_phaser_device::th_pin_r )
+int sms_light_phaser_device::th_pin_r()
 {
 	// The returned value is inverted due to IP_ACTIVE_LOW mapping.
 	return ~m_sensor_last_state;

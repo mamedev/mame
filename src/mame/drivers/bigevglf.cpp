@@ -74,7 +74,7 @@ void bigevglf_state::beg_banking_w(address_space &space, offs_t offset, uint8_t 
 	membank("bank1")->set_entry(m_beg_bank & 0xff); /* empty sockets for IC37-IC44 ROMS */
 }
 
-TIMER_CALLBACK_MEMBER(bigevglf_state::from_sound_latch_callback)
+void bigevglf_state::from_sound_latch_callback(void *ptr, int32_t param)
 {
 	m_from_sound = param & 0xff;
 	m_sound_state |= 2;
@@ -107,7 +107,7 @@ uint8_t bigevglf_state::soundstate_r(address_space &space, offs_t offset, uint8_
 	return m_sound_state;
 }
 
-TIMER_CALLBACK_MEMBER(bigevglf_state::nmi_callback)
+void bigevglf_state::nmi_callback(void *ptr, int32_t param)
 {
 	if (m_sound_nmi_enable)
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -143,7 +143,7 @@ void bigevglf_state::nmi_enable_w(address_space &space, offs_t offset, uint8_t d
 	}
 }
 
-TIMER_CALLBACK_MEMBER(bigevglf_state::deferred_ls74_w)
+void bigevglf_state::deferred_ls74_w(void *ptr, int32_t param)
 {
 	int offs = (param >> 8) & 255;
 	int data = param & 255;

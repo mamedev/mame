@@ -69,7 +69,7 @@ void amiga_sound_device::device_start()
 //  signal_irq - irq signaling
 //-------------------------------------------------
 
-TIMER_CALLBACK_MEMBER( amiga_sound_device::signal_irq )
+void amiga_sound_device::signal_irq(void *ptr, int32_t param)
 {
 	amiga_state *state = machine().driver_data<amiga_state>();
 

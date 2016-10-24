@@ -76,7 +76,7 @@ public:
 	void machine_start_poisk1();
 	void machine_reset_poisk1();
 
-	DECLARE_PALETTE_INIT(p1);
+	void palette_init_p1(palette_device &palette);
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void set_palette_luts();
@@ -84,8 +84,8 @@ public:
 	POISK1_UPDATE_ROW(cga_gfx_1bpp_update_row);
 	POISK1_UPDATE_ROW(poisk1_gfx_1bpp_update_row);
 
-	DECLARE_WRITE_LINE_MEMBER(p1_pit8253_out2_changed);
-	DECLARE_WRITE_LINE_MEMBER(p1_speaker_set_spkrdata);
+	void p1_pit8253_out2_changed(int state);
+	void p1_speaker_set_spkrdata(int state);
 	uint8_t m_p1_spkrdata;
 	uint8_t m_p1_input;
 
@@ -371,7 +371,7 @@ POISK1_UPDATE_ROW( p1_state::poisk1_gfx_1bpp_update_row )
 }
 
 /* Initialise the cga palette */
-PALETTE_INIT_MEMBER(p1_state, p1)
+void p1_state::palette_init_p1(palette_device &palette)
 {
 	int i;
 
@@ -426,13 +426,13 @@ uint32_t p1_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 
 // Timer.  Poisk-1 uses single XTAL for everything? -- check
 
-WRITE_LINE_MEMBER( p1_state::p1_speaker_set_spkrdata )
+void p1_state::p1_speaker_set_spkrdata(int state)
 {
 	m_p1_spkrdata = state ? 1 : 0;
 	m_speaker->level_w(m_p1_spkrdata & m_p1_input);
 }
 
-WRITE_LINE_MEMBER( p1_state::p1_pit8253_out2_changed )
+void p1_state::p1_pit8253_out2_changed(int state)
 {
 	m_p1_input = state ? 1 : 0;
 	m_speaker->level_w(m_p1_spkrdata & m_p1_input);

@@ -179,11 +179,11 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_gp32(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(s3c240x_lcd_timer_exp);
-	TIMER_CALLBACK_MEMBER(s3c240x_pwm_timer_exp);
-	TIMER_CALLBACK_MEMBER(s3c240x_dma_timer_exp);
-	TIMER_CALLBACK_MEMBER(s3c240x_iic_timer_exp);
-	TIMER_CALLBACK_MEMBER(s3c240x_iis_timer_exp);
+	void s3c240x_lcd_timer_exp(void *ptr, int32_t param);
+	void s3c240x_pwm_timer_exp(void *ptr, int32_t param);
+	void s3c240x_dma_timer_exp(void *ptr, int32_t param);
+	void s3c240x_iic_timer_exp(void *ptr, int32_t param);
+	void s3c240x_iis_timer_exp(void *ptr, int32_t param);
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_device<smartmedia_image_device> m_smartmedia;

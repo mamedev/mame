@@ -48,9 +48,9 @@ public:
 
 	DECLARE_CUSTOM_INPUT_MEMBER(clock_r);
 
-	INTERRUPT_GEN_MEMBER(asteroid_interrupt);
-	INTERRUPT_GEN_MEMBER(asterock_interrupt);
-	INTERRUPT_GEN_MEMBER(llander_interrupt);
+	void asteroid_interrupt(device_t &device);
+	void asterock_interrupt(device_t &device);
+	void llander_interrupt(device_t &device);
 
 	void init_asterock();
 	void init_asteroidb();

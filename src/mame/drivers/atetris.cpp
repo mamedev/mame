@@ -69,7 +69,7 @@
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(atetris_state::interrupt_gen)
+void atetris_state::interrupt_gen(void *ptr, int32_t param)
 {
 	int scanline = param;
 

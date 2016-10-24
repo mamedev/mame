@@ -86,9 +86,9 @@ public:
 	uint8_t pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t pb_r();
 
-	DECLARE_WRITE_LINE_MEMBER( pc2_w );
-	DECLARE_WRITE_LINE_MEMBER( pc4_w );
-	DECLARE_WRITE_LINE_MEMBER( pc6_w );
+	void pc2_w(int state);
+	void pc4_w(int state);
+	void pc6_w(int state);
 
 protected:
 	// device-level overrides

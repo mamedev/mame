@@ -246,7 +246,7 @@ void asuka_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 }
 
 
-INTERRUPT_GEN_MEMBER(asuka_state::cadash_interrupt)
+void asuka_state::cadash_interrupt(device_t &device)
 {
 	timer_set(m_maincpu->cycles_to_attotime(500), TIMER_CADASH_INTERRUPT5);
 	device.execute().set_input_line(4, HOLD_LINE);  /* interrupt vector 4 */
@@ -269,7 +269,7 @@ void asuka_state::sound_bankswitch_2151_w(address_space &space, offs_t offset, u
 
 
 
-WRITE_LINE_MEMBER(asuka_state::asuka_msm5205_vck)
+void asuka_state::asuka_msm5205_vck(int state)
 {
 	if (m_adpcm_data != -1)
 	{

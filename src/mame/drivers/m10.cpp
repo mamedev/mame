@@ -149,7 +149,7 @@ void m10_state::ic8j2_output_changed(address_space &space, offs_t offset, uint8_
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(m10_state,m10)
+void m10_state::palette_init_m10(palette_device &palette)
 {
 	int i;
 
@@ -468,7 +468,7 @@ INPUT_CHANGED_MEMBER(m10_state::coin_inserted)
 }
 
 
-TIMER_CALLBACK_MEMBER(m10_state::interrupt_callback)
+void m10_state::interrupt_callback(void *ptr, int32_t param)
 {
 	if (param == 0)
 	{
@@ -497,19 +497,19 @@ void m10_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 }
 
 #if 0
-INTERRUPT_GEN_MEMBER(m10_state::m11_interrupt)
+void m10_state::m11_interrupt(device_t &device)
 {
 	device.execute().set_input_line(0, ASSERT_LINE);
 	//timer_set(m_screen->time_until_pos(IREMM10_VBEND), TIMER_INTERRUPT, -1);
 }
 
-INTERRUPT_GEN_MEMBER(m10_state::m10_interrupt)
+void m10_state::m10_interrupt(device_t &device)
 {
 	device.execute().set_input_line(0, ASSERT_LINE);
 }
 #endif
 
-INTERRUPT_GEN_MEMBER(m10_state::m15_interrupt)
+void m10_state::m15_interrupt(device_t &device)
 {
 	device.execute().set_input_line(0, ASSERT_LINE);
 	timer_set(m_screen->time_until_pos(IREMM10_VBSTART + 1, 80), TIMER_INTERRUPT, -1);

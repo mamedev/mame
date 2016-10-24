@@ -40,7 +40,7 @@ public:
 	uint16_t midxunit_sound_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	uint16_t midxunit_sound_state_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void midxunit_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	DECLARE_WRITE_LINE_MEMBER(midxunit_dcs_output_full);
+	void midxunit_dcs_output_full(int state);
 	void init_revx();
 	void machine_reset_midxunit();
 	void video_start_midxunit();

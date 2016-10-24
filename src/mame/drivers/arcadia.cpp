@@ -440,7 +440,7 @@ static const unsigned short arcadia_palette[128+8] =  /* bgnd, fgnd */
 	7,0, 7,1, 7,2, 7,3, 7,4, 7,5, 7,6, 7,7
 };
 
-PALETTE_INIT_MEMBER(arcadia_state, arcadia)
+void arcadia_state::palette_init_arcadia(palette_device &palette)
 {
 	for (int i = 0; i < 8; i++)
 		palette.set_indirect_color(i, arcadia_colors[i]);

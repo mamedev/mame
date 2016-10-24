@@ -128,7 +128,7 @@ void f3853_device::timer_start(uint8_t value)
 	m_timer->adjust(period);
 }
 
-TIMER_CALLBACK_MEMBER(f3853_device::timer_callback)
+void f3853_device::timer_callback(void *ptr, int32_t param)
 {
 	if(m_timer_enable)
 	{

@@ -18,7 +18,7 @@
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(ninjakd2_state::get_fg_tile_info)
+void ninjakd2_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int const lo = m_fg_videoram[(tile_index << 1)];
 	int const hi = m_fg_videoram[(tile_index << 1) | 1];
@@ -32,7 +32,7 @@ TILE_GET_INFO_MEMBER(ninjakd2_state::get_fg_tile_info)
 			TILE_FLIPYX(flipyx));
 }
 
-TILE_GET_INFO_MEMBER(ninjakd2_state::ninjakd2_get_bg_tile_info)
+void ninjakd2_state::ninjakd2_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int const lo = m_bg_videoram[(tile_index << 1)];
 	int const hi = m_bg_videoram[(tile_index << 1) | 1];
@@ -46,7 +46,7 @@ TILE_GET_INFO_MEMBER(ninjakd2_state::ninjakd2_get_bg_tile_info)
 			TILE_FLIPYX(flipyx));
 }
 
-TILE_GET_INFO_MEMBER(ninjakd2_state::mnight_get_bg_tile_info)
+void ninjakd2_state::mnight_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int const lo = m_bg_videoram[(tile_index << 1)];
 	int const hi = m_bg_videoram[(tile_index << 1) | 1];
@@ -60,13 +60,13 @@ TILE_GET_INFO_MEMBER(ninjakd2_state::mnight_get_bg_tile_info)
 			flipy ? TILE_FLIPY : 0);
 }
 
-TILEMAP_MAPPER_MEMBER(ninjakd2_state::robokid_bg_scan)
+tilemap_memory_index ninjakd2_state::robokid_bg_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return (col & 0x0f) | ((row & 0x1f) << 4) | ((col & 0x10) << 5);
 }
 
-TILEMAP_MAPPER_MEMBER(ninjakd2_state::omegaf_bg_scan)
+tilemap_memory_index ninjakd2_state::omegaf_bg_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return (col & 0x0f) | ((row & 0x1f) << 4) | ((col & 0x70) << 5);
@@ -85,17 +85,17 @@ void ninjakd2_state::robokid_get_bg_tile_info( tile_data& tileinfo, tilemap_memo
 			0);
 }
 
-TILE_GET_INFO_MEMBER(ninjakd2_state::robokid_get_bg0_tile_info)
+void ninjakd2_state::robokid_get_bg0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	robokid_get_bg_tile_info(tileinfo, tile_index, 2, m_robokid_bg0_videoram.get());
 }
 
-TILE_GET_INFO_MEMBER(ninjakd2_state::robokid_get_bg1_tile_info)
+void ninjakd2_state::robokid_get_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	robokid_get_bg_tile_info(tileinfo, tile_index, 3, m_robokid_bg1_videoram.get());
 }
 
-TILE_GET_INFO_MEMBER(ninjakd2_state::robokid_get_bg2_tile_info)
+void ninjakd2_state::robokid_get_bg2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	robokid_get_bg_tile_info(tileinfo, tile_index, 4, m_robokid_bg2_videoram.get());
 }

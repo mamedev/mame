@@ -98,7 +98,7 @@ public:
 	virtual void machine_reset() override;
 
 	int m_centronics_busy;
-	DECLARE_WRITE_LINE_MEMBER( write_centronics_busy );
+	void write_centronics_busy(int state);
 	uint8_t ppi_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void ppi_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 

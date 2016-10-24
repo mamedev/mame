@@ -58,7 +58,7 @@ Notes:
 #include "includes/konamipt.h"
 
 
-INTERRUPT_GEN_MEMBER(rockrage_state::rockrage_interrupt)
+void rockrage_state::rockrage_interrupt(device_t &device)
 {
 	if (m_k007342->is_int_enabled())
 		device.execute().set_input_line(HD6309_IRQ_LINE, HOLD_LINE);

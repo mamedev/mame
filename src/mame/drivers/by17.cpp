@@ -59,24 +59,24 @@ public:
 	void u11_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t nibble_nvram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void nibble_nvram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_READ_LINE_MEMBER(u10_ca1_r);
-	DECLARE_READ_LINE_MEMBER(u10_cb1_r);
-	DECLARE_WRITE_LINE_MEMBER(u10_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(u10_cb2_w);
-	DECLARE_READ_LINE_MEMBER(u11_ca1_r);
-	DECLARE_READ_LINE_MEMBER(u11_cb1_r);
-	DECLARE_WRITE_LINE_MEMBER(u11_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(u11_cb2_w);
+	int u10_ca1_r();
+	int u10_cb1_r();
+	void u10_ca2_w(int state);
+	void u10_cb2_w(int state);
+	int u11_ca1_r();
+	int u11_cb1_r();
+	void u11_ca2_w(int state);
+	void u11_cb2_w(int state);
 	DECLARE_INPUT_CHANGED_MEMBER(activity_button);
 	DECLARE_INPUT_CHANGED_MEMBER(self_test);
 	DECLARE_CUSTOM_INPUT_MEMBER(outhole_x0);
 	DECLARE_CUSTOM_INPUT_MEMBER(saucer_x3);
 	DECLARE_CUSTOM_INPUT_MEMBER(drop_target_x2);
 	void machine_reset_by17();
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_z_freq);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_z_pulse);
-	TIMER_DEVICE_CALLBACK_MEMBER(u11_timer);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_d_pulse);
+	void timer_z_freq(timer_device &timer, void *ptr, int32_t param);
+	void timer_z_pulse(timer_device &timer, void *ptr, int32_t param);
+	void u11_timer(timer_device &timer, void *ptr, int32_t param);
+	void timer_d_pulse(timer_device &timer, void *ptr, int32_t param);
 private:
 	uint8_t m_u10a;
 	uint8_t m_u10b;
@@ -515,16 +515,16 @@ INPUT_CHANGED_MEMBER( by17_state::self_test )
 	m_pia_u10->ca1_w(newval);
 }
 
-READ_LINE_MEMBER( by17_state::u10_ca1_r )
+int by17_state::u10_ca1_r()
 {
 	return m_io_test->read() & 0x01;
 }
-READ_LINE_MEMBER( by17_state::u10_cb1_r )
+int by17_state::u10_cb1_r()
 {
 	return m_u10_cb1;
 }
 
-WRITE_LINE_MEMBER( by17_state::u10_ca2_w )
+void by17_state::u10_ca2_w(int state)
 {
 #if 0                   // Display Blanking - Out of sync with video redraw rate and causes flicker so it's disabled
 	if (state == 0)
@@ -545,7 +545,7 @@ WRITE_LINE_MEMBER( by17_state::u10_ca2_w )
 	m_u10_ca2 = state;
 }
 
-WRITE_LINE_MEMBER( by17_state::u10_cb2_w )
+void by17_state::u10_cb2_w(int state)
 {
 //  logerror("New U10 CB2 state %01x, was %01x.   PIA=%02x\n", state, m_u10_cb2, m_u10a);
 
@@ -555,23 +555,23 @@ WRITE_LINE_MEMBER( by17_state::u10_cb2_w )
 	m_u10_cb2 = state;
 }
 
-WRITE_LINE_MEMBER( by17_state::u11_ca2_w )
+void by17_state::u11_ca2_w(int state)
 {
 	output().set_value("led0", state);
 }
 
-READ_LINE_MEMBER( by17_state::u11_ca1_r )
+int by17_state::u11_ca1_r()
 {
 	return m_u11_ca1;
 }
 
-READ_LINE_MEMBER( by17_state::u11_cb1_r )
+int by17_state::u11_cb1_r()
 {
 	/* Pin 32 on MPU J5 AID connector tied low */
 	return 0;
 }
 
-WRITE_LINE_MEMBER( by17_state::u11_cb2_w )
+void by17_state::u11_cb2_w(int state)
 {
 	m_u11_cb2 = state;
 }
@@ -781,7 +781,7 @@ void by17_state::u11_b_w(address_space &space, offs_t offset, uint8_t data, uint
 
 
 // zero-cross detection
-TIMER_DEVICE_CALLBACK_MEMBER( by17_state::timer_z_freq )
+void by17_state::timer_z_freq(timer_device &timer, void *ptr, int32_t param)
 {
 /*  Zero Crossing Detector - this timing is based on 50Hz AC line power input converted to unregulated DC
 
@@ -807,7 +807,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( by17_state::timer_z_freq )
 	}
 
 }
-TIMER_DEVICE_CALLBACK_MEMBER( by17_state::timer_z_pulse )
+void by17_state::timer_z_pulse(timer_device &timer, void *ptr, int32_t param)
 {
 	/*** Line Power to DC Zero Crossing has ended ***/
 
@@ -816,7 +816,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( by17_state::timer_z_pulse )
 }
 
 // 555 timer for display refresh
-TIMER_DEVICE_CALLBACK_MEMBER( by17_state::u11_timer )
+void by17_state::u11_timer(timer_device &timer, void *ptr, int32_t param)
 {
 /*   +--------------------------+   +-----
      |                          |   |
@@ -833,7 +833,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( by17_state::u11_timer )
 	m_pia_u11->ca1_w(m_u11_ca1);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( by17_state::timer_d_pulse )
+void by17_state::timer_d_pulse(timer_device &timer, void *ptr, int32_t param)
 {
 	m_u11_ca1 = false;
 	m_pia_u11->ca1_w(m_u11_ca1);

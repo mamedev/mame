@@ -78,7 +78,7 @@ public:
 
 	void write_h(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void write_s(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(write_std);
+	void write_std(int state);
 
 protected:
 	// device-level overrides

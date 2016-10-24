@@ -398,7 +398,7 @@ void vic3_device::clear_interrupt( int mask )
 	}
 }
 
-TIMER_CALLBACK_MEMBER( vic3_device::timer_timeout )
+void vic3_device::timer_timeout(void *ptr, int32_t param)
 {
 	int which = param;
 	//DBG_LOG(3, "vic3 ", ("timer %d timeout\n", which));

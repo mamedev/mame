@@ -202,20 +202,20 @@ public:
 	void machine_reset_apollo();
 	void machine_start_apollo();
 
-	IRQ_CALLBACK_MEMBER(apollo_irq_acknowledge);
-	IRQ_CALLBACK_MEMBER(apollo_pic_acknowledge);
+	int apollo_irq_acknowledge(device_t &device, int irqline);
+	int apollo_pic_acknowledge(device_t &device, int irqline);
 	void apollo_bus_error();
-	DECLARE_READ_LINE_MEMBER( apollo_kbd_is_german );
-	DECLARE_WRITE_LINE_MEMBER( apollo_dma8237_out_eop );
-	DECLARE_WRITE_LINE_MEMBER( apollo_dma_1_hrq_changed );
-	DECLARE_WRITE_LINE_MEMBER( apollo_dma_2_hrq_changed );
-	DECLARE_WRITE_LINE_MEMBER( apollo_pic8259_master_set_int_line );
-	DECLARE_WRITE_LINE_MEMBER( apollo_pic8259_slave_set_int_line );
-	DECLARE_WRITE_LINE_MEMBER( sio_irq_handler );
+	int apollo_kbd_is_german();
+	void apollo_dma8237_out_eop(int state);
+	void apollo_dma_1_hrq_changed(int state);
+	void apollo_dma_2_hrq_changed(int state);
+	void apollo_pic8259_master_set_int_line(int state);
+	void apollo_pic8259_slave_set_int_line(int state);
+	void sio_irq_handler(int state);
 	void sio_output(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( sio2_irq_handler );
-	DECLARE_WRITE_LINE_MEMBER( apollo_ptm_irq_function );
-	DECLARE_WRITE_LINE_MEMBER( apollo_ptm_timer_tick );
+	void sio2_irq_handler(int state);
+	void apollo_ptm_irq_function(int state);
+	void apollo_ptm_timer_tick(int state);
 	uint8_t apollo_pic8259_get_slave_ack(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	uint8_t pc_dma8237_0_dack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
@@ -232,20 +232,20 @@ public:
 	void pc_dma8237_5_dack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void pc_dma8237_6_dack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void pc_dma8237_7_dack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack0_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack1_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack2_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack3_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack4_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack5_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack6_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack7_w);
-	TIMER_CALLBACK_MEMBER( apollo_rtc_timer );
+	void pc_dack0_w(int state);
+	void pc_dack1_w(int state);
+	void pc_dack2_w(int state);
+	void pc_dack3_w(int state);
+	void pc_dack4_w(int state);
+	void pc_dack5_w(int state);
+	void pc_dack6_w(int state);
+	void pc_dack7_w(int state);
+	void apollo_rtc_timer(void *ptr, int32_t param);
 
 	void apollo_pic_set_irq_line(int irq, int state);
 	void select_dma_channel(int channel, bool state);
 
-	DECLARE_WRITE_LINE_MEMBER(apollo_reset_instr_callback);
+	void apollo_reset_instr_callback(int state);
 	uint32_t apollo_instruction_hook(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
 private:
@@ -695,7 +695,7 @@ private:
 	virtual void tra_complete(); // Tx completed sending byte
 	virtual void tra_callback(); // Tx send bit
 
-	TIMER_CALLBACK_MEMBER( poll_timer );
+	void poll_timer(void *ptr, int32_t param);
 	void xmit_char(uint8_t data);
 
 	static const int XMIT_RING_SIZE = 64;

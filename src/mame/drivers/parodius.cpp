@@ -17,7 +17,7 @@
 #include "includes/konamipt.h"
 #include "includes/parodius.h"
 
-INTERRUPT_GEN_MEMBER(parodius_state::parodius_interrupt)
+void parodius_state::parodius_interrupt(device_t &device)
 {
 	if (m_k052109->is_irq_enabled())
 		device.execute().set_input_line(0, HOLD_LINE);

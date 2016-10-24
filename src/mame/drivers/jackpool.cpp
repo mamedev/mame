@@ -44,7 +44,7 @@ public:
 	void init_jackpool();
 	virtual void video_start() override;
 	uint32_t screen_update_jackpool(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(jackpool_interrupt);
+	void jackpool_interrupt(device_t &device);
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -259,7 +259,7 @@ GFXDECODE_END
 
 
 /*irq 2 used for communication stuff.3 is just a rte*/
-INTERRUPT_GEN_MEMBER(jackpool_state::jackpool_interrupt)
+void jackpool_state::jackpool_interrupt(device_t &device)
 {
 	device.execute().set_input_line(1, HOLD_LINE);
 }

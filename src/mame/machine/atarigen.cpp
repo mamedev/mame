@@ -152,7 +152,7 @@ void atari_sound_comm_device::device_timer(emu_timer &timer, device_timer_id id,
 //  6502 sound processor.
 //-------------------------------------------------
 
-INTERRUPT_GEN_MEMBER(atari_sound_comm_device::sound_irq_gen)
+void atari_sound_comm_device::sound_irq_gen(device_t &device)
 {
 	m_timed_int = 1;
 	update_sound_irq();
@@ -184,7 +184,7 @@ void atari_sound_comm_device::sound_irq_ack_w(address_space &space, offs_t offse
 //  YM2151's IRQ line.
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(atari_sound_comm_device::ym2151_irq_gen)
+void atari_sound_comm_device::ym2151_irq_gen(int state)
 {
 	m_ym2151_int = state;
 	update_sound_irq();
@@ -1060,7 +1060,7 @@ void atarigen_state::scanline_int_set(screen_device &screen, int scanline)
 //  callback for the scanline interrupt
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(atarigen_state::scanline_int_write_line)
+void atarigen_state::scanline_int_write_line(int state)
 {
 	m_scanline_int_state = state;
 	update_interrupts();
@@ -1072,7 +1072,7 @@ WRITE_LINE_MEMBER(atarigen_state::scanline_int_write_line)
 //  which sets the scanline interrupt state.
 //-------------------------------------------------
 
-INTERRUPT_GEN_MEMBER(atarigen_state::scanline_int_gen)
+void atarigen_state::scanline_int_gen(device_t &device)
 {
 	m_scanline_int_state = 1;
 	update_interrupts();
@@ -1096,7 +1096,7 @@ void atarigen_state::scanline_int_ack_w(address_space &space, offs_t offset, uin
 //  callback for the sound interrupt
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(atarigen_state::sound_int_write_line)
+void atarigen_state::sound_int_write_line(int state)
 {
 	m_sound_int_state = state;
 	update_interrupts();
@@ -1108,7 +1108,7 @@ WRITE_LINE_MEMBER(atarigen_state::sound_int_write_line)
 //  sets the sound interrupt state.
 //-------------------------------------------------
 
-INTERRUPT_GEN_MEMBER(atarigen_state::sound_int_gen)
+void atarigen_state::sound_int_gen(device_t &device)
 {
 	m_sound_int_state = 1;
 	update_interrupts();
@@ -1132,7 +1132,7 @@ void atarigen_state::sound_int_ack_w(address_space &space, offs_t offset, uint16
 //  sets the video interrupt state.
 //-------------------------------------------------
 
-INTERRUPT_GEN_MEMBER(atarigen_state::video_int_gen)
+void atarigen_state::video_int_gen(device_t &device)
 {
 	m_video_int_state = 1;
 	update_interrupts();

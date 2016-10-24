@@ -12,7 +12,7 @@
 
 /* timer for sorcerer serial chip transmit and receive */
 
-TIMER_CALLBACK_MEMBER(sorcerer_state::sorcerer_serial_tc)
+void sorcerer_state::sorcerer_serial_tc(void *ptr, int32_t param)
 {
 	/* if rs232 is enabled, uart is connected to clock defined by bit6 of port fe.
 	Transmit and receive clocks are connected to the same clock. */
@@ -48,7 +48,7 @@ void sorcerer_state::device_timer(emu_timer &timer, device_timer_id id, int para
 
 /* timer to read cassette waveforms */
 
-TIMER_CALLBACK_MEMBER(sorcerer_state::sorcerer_cassette_tc)
+void sorcerer_state::sorcerer_cassette_tc(void *ptr, int32_t param)
 {
 	uint8_t cass_ws = 0;
 	switch (m_fe & 0xc0)        /*/ bit 7 low indicates cassette */
@@ -138,7 +138,7 @@ TIMER_CALLBACK_MEMBER(sorcerer_state::sorcerer_cassette_tc)
 
 
 /* after the first 4 bytes have been read from ROM, switch the ram back in */
-TIMER_CALLBACK_MEMBER(sorcerer_state::sorcerer_reset)
+void sorcerer_state::sorcerer_reset(void *ptr, int32_t param)
 {
 	membank("boot")->set_entry(0);
 }

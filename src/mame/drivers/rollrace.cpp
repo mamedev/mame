@@ -225,13 +225,13 @@ static GFXDECODE_START( rollrace )
 	GFXDECODE_ENTRY( "gfx5", 0x0000, spritelayout,  0,  32 )
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(rollrace_state::vblank_irq)
+void rollrace_state::vblank_irq(device_t &device)
 {
 	if(m_nmi_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(rollrace_state::sound_timer_irq)
+void rollrace_state::sound_timer_irq(device_t &device)
 {
 	if(m_sound_nmi_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);

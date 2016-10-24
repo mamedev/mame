@@ -198,7 +198,7 @@ public:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(mt32);
+	void palette_init_mt32(palette_device &palette);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -211,8 +211,8 @@ public:
 	void lcd_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint16_t port0_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(midi_timer_cb);
-	TIMER_DEVICE_CALLBACK_MEMBER(samples_timer_cb);
+	void midi_timer_cb(timer_device &timer, void *ptr, int32_t param);
+	void samples_timer_cb(timer_device &timer, void *ptr, int32_t param);
 
 private:
 	uint8_t lcd_data_buffer[256];
@@ -292,7 +292,7 @@ void mt32_state::midi_w(address_space &space, offs_t offset, uint16_t data, uint
 	midi = data;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(mt32_state::midi_timer_cb)
+void mt32_state::midi_timer_cb(timer_device &timer, void *ptr, int32_t param)
 {
 	const static uint8_t midi_data[3] = { 0x91, 0x40, 0x7f };
 	midi = midi_data[midi_pos++];
@@ -307,7 +307,7 @@ uint16_t mt32_state::port0_r(address_space &space, offs_t offset, uint16_t mem_m
 	return port0;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(mt32_state::samples_timer_cb)
+void mt32_state::samples_timer_cb(timer_device &timer, void *ptr, int32_t param)
 {
 	port0 ^= 0x10;
 }
@@ -323,7 +323,7 @@ void mt32_state::so_w(address_space &space, offs_t offset, uint8_t data, uint8_t
 	//  logerror("so: x1=%d bank=%d led=%d\n", (data >> 5) & 1, (data >> 1) & 3, data & 1);
 }
 
-PALETTE_INIT_MEMBER(mt32_state, mt32)
+void mt32_state::palette_init_mt32(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(0, 0, 0));
 	palette.set_pen_color(1, rgb_t(0, 255, 0));

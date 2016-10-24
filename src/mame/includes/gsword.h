@@ -69,17 +69,17 @@ public:
 	uint8_t gsword_8741_2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t gsword_8741_3_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	void init_gsword();
 	void init_gsword2();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(gsword);
-	DECLARE_PALETTE_INIT(josvolly);
+	void palette_init_gsword(palette_device &palette);
+	void palette_init_josvolly(palette_device &palette);
 
 	uint32_t screen_update_gsword(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(gsword_snd_interrupt);
+	void gsword_snd_interrupt(device_t &device);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

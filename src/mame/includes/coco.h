@@ -120,25 +120,25 @@ public:
 	// PIA0
 	void pia0_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void pia0_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( pia0_ca2_w );
-	DECLARE_WRITE_LINE_MEMBER( pia0_cb2_w );
-	DECLARE_WRITE_LINE_MEMBER( pia0_irq_a );
-	DECLARE_WRITE_LINE_MEMBER( pia0_irq_b );
+	void pia0_ca2_w(int state);
+	void pia0_cb2_w(int state);
+	void pia0_irq_a(int state);
+	void pia0_irq_b(int state);
 
 	// PIA1
 	uint8_t pia1_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t pia1_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void pia1_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void pia1_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( pia1_ca2_w );
-	DECLARE_WRITE_LINE_MEMBER( pia1_cb2_w );
-	DECLARE_WRITE_LINE_MEMBER( pia1_firq_a );
-	DECLARE_WRITE_LINE_MEMBER( pia1_firq_b );
+	void pia1_ca2_w(int state);
+	void pia1_cb2_w(int state);
+	void pia1_firq_a(int state);
+	void pia1_firq_b(int state);
 
 	// floating bus
 	uint8_t floating_bus_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff)   { return floating_bus_read(); }
 
-	DECLARE_WRITE_LINE_MEMBER( cart_w ) { cart_w((bool) state); }
+	void cart_w(int state) { cart_w((bool) state); }
 
 	// disassembly override
 	offs_t dasm_override(device_t &device, char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options);

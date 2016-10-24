@@ -42,7 +42,7 @@ static INPUT_PORTS_START( lynx )
 	// power on and power off buttons
 INPUT_PORTS_END
 
-PALETTE_INIT_MEMBER(lynx_state, lynx)
+void lynx_state::palette_init_lynx(palette_device &palette)
 {
 	int i;
 

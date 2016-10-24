@@ -58,8 +58,8 @@ public:
 	void plantronics_w(uint8_t data);
 	virtual uint8_t io_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	virtual void io_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( hsync_changed );
-	DECLARE_WRITE_LINE_MEMBER( vsync_changed );
+	void hsync_changed(int state);
+	void vsync_changed(int state);
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	MC6845_RECONFIGURE(reconfigure);
 public:

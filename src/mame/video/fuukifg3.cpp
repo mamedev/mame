@@ -57,8 +57,8 @@ inline void fuuki32_state::get_tile_info8bpp(tile_data &tileinfo, tilemap_memory
 	SET_TILE_INFO_MEMBER(1 + _N_, code, (attr & 0x3f) >> 4, TILE_FLIPYX(attr >> 6));
 }
 
-TILE_GET_INFO_MEMBER(fuuki32_state::get_tile_info_0){ get_tile_info8bpp(tileinfo, tile_index, 0); }
-TILE_GET_INFO_MEMBER(fuuki32_state::get_tile_info_1){ get_tile_info8bpp(tileinfo, tile_index, 1); }
+void fuuki32_state::get_tile_info_0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ get_tile_info8bpp(tileinfo, tile_index, 0); }
+void fuuki32_state::get_tile_info_1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ get_tile_info8bpp(tileinfo, tile_index, 1); }
 
 inline void fuuki32_state::get_tile_info4bpp(tile_data &tileinfo, tilemap_memory_index tile_index, int _N_)
 {
@@ -67,8 +67,8 @@ inline void fuuki32_state::get_tile_info4bpp(tile_data &tileinfo, tilemap_memory
 	SET_TILE_INFO_MEMBER(1 + _N_, code, attr & 0x3f, TILE_FLIPYX(attr >> 6));
 }
 
-TILE_GET_INFO_MEMBER(fuuki32_state::get_tile_info_2){ get_tile_info4bpp(tileinfo, tile_index, 2); }
-TILE_GET_INFO_MEMBER(fuuki32_state::get_tile_info_3){ get_tile_info4bpp(tileinfo, tile_index, 3); }
+void fuuki32_state::get_tile_info_2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ get_tile_info4bpp(tileinfo, tile_index, 2); }
+void fuuki32_state::get_tile_info_3(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ get_tile_info4bpp(tileinfo, tile_index, 3); }
 
 inline void fuuki32_state::vram_w(offs_t offset, uint32_t data, uint32_t mem_mask, int _N_)
 {

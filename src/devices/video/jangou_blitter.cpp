@@ -188,7 +188,7 @@ void jangou_blitter_device::bltflip_w(address_space &space, offs_t offset, uint8
 	m_bltflip = true;
 }
 
-READ_LINE_MEMBER( jangou_blitter_device::status_r )
+int jangou_blitter_device::status_r()
 {
 	return false;
 }

@@ -137,7 +137,7 @@ void a2bus_midi_device::write_c0nx(address_space &space, uint8_t offset, uint8_t
 	}
 }
 
-WRITE_LINE_MEMBER( a2bus_midi_device::acia_irq_w )
+void a2bus_midi_device::acia_irq_w(int state)
 {
 	m_acia_irq = state ? true : false;
 
@@ -151,7 +151,7 @@ WRITE_LINE_MEMBER( a2bus_midi_device::acia_irq_w )
 	}
 }
 
-WRITE_LINE_MEMBER( a2bus_midi_device::ptm_irq_w )
+void a2bus_midi_device::ptm_irq_w(int state)
 {
 	m_acia_irq = state ? true : false;
 
@@ -165,7 +165,7 @@ WRITE_LINE_MEMBER( a2bus_midi_device::ptm_irq_w )
 	}
 }
 
-WRITE_LINE_MEMBER( a2bus_midi_device::write_acia_clock )
+void a2bus_midi_device::write_acia_clock(int state)
 {
 	m_acia->write_txc(state);
 	m_acia->write_rxc(state);

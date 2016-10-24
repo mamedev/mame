@@ -43,9 +43,9 @@ private:
 	void write(int xramsel, offs_t offset, uint8_t data);
 	void field_interrupts();
 
-	TIMER_CALLBACK_MEMBER(rtc_SQW_cb);
-	TIMER_CALLBACK_MEMBER(rtc_begin_update_cb);
-	TIMER_CALLBACK_MEMBER(rtc_end_update_cb);
+	void rtc_SQW_cb(void *ptr, int32_t param);
+	void rtc_begin_update_cb(void *ptr, int32_t param);
+	void rtc_end_update_cb(void *ptr, int32_t param);
 	/* 64 8-bit registers (10 clock registers, 4 control/status registers, and
 	50 bytes of user RAM) */
 	uint8_t m_regs[64];

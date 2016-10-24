@@ -157,7 +157,7 @@ uint16_t rungun_state::sound_status_msb_r(address_space &space, offs_t offset, u
 	return 0;
 }
 
-INTERRUPT_GEN_MEMBER(rungun_state::rng_interrupt)
+void rungun_state::rng_interrupt(device_t &device)
 {
 	// send to sprite device current state (i.e. bread & butter sprite DMA)
 	// TODO: firing this in screen update causes sprites to desync badly ...
@@ -244,7 +244,7 @@ void rungun_state::sound_ctrl_w(address_space &space, offs_t offset, uint8_t dat
 	m_sound_ctrl = data;
 }
 
-WRITE_LINE_MEMBER(rungun_state::k054539_nmi_gen)
+void rungun_state::k054539_nmi_gen(int state)
 {
 	if (m_sound_ctrl & 0x10)
 	{

@@ -35,17 +35,17 @@ public:
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	DECLARE_WRITE_LINE_MEMBER( tpi_irq_w );
+	void tpi_irq_w(int state);
 	uint8_t tpi_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void tpi_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t tpi_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void tpi_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( tpi_ca_w );
-	DECLARE_WRITE_LINE_MEMBER( tpi_cb_w );
+	void tpi_ca_w(int state);
+	void tpi_cb_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( phi2_w );
-	DECLARE_WRITE_LINE_MEMBER( dtrd_w );
-	DECLARE_WRITE_LINE_MEMBER( apd_w );
+	void phi2_w(int state);
+	void dtrd_w(int state);
+	void apd_w(int state);
 
 protected:
 	// device-level overrides

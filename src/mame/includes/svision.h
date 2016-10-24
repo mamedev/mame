@@ -61,16 +61,16 @@ public:
 	void init_svision();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(svision);
-	DECLARE_PALETTE_INIT(svisionp);
-	DECLARE_PALETTE_INIT(svisionn);
+	void palette_init_svision(palette_device &palette);
+	void palette_init_svisionp(palette_device &palette);
+	void palette_init_svisionn(palette_device &palette);
 	void machine_reset_tvlink();
 	uint32_t screen_update_svision(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_tvlink(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(svision_frame_int);
-	TIMER_CALLBACK_MEMBER(svision_pet_timer);
-	TIMER_CALLBACK_MEMBER(svision_timer);
-	TIMER_DEVICE_CALLBACK_MEMBER(svision_pet_timer_dev);
+	void svision_frame_int(device_t &device);
+	void svision_pet_timer(void *ptr, int32_t param);
+	void svision_timer(void *ptr, int32_t param);
+	void svision_pet_timer_dev(timer_device &timer, void *ptr, int32_t param);
 	void svision_irq();
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(svision_cart);
 

@@ -102,26 +102,26 @@ public:
 	void nmimask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	void init_zerotrgt();
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void machine_start_cntsteer();
 	void machine_reset_cntsteer();
 	void video_start_cntsteer();
 	void machine_start_zerotrgt();
 	void machine_reset_zerotrgt();
 	void video_start_zerotrgt();
-	DECLARE_PALETTE_INIT(zerotrgt);
+	void palette_init_zerotrgt(palette_device &palette);
 	uint32_t screen_update_cntsteer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_zerotrgt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(subcpu_vblank_irq);
-	INTERRUPT_GEN_MEMBER(sound_interrupt);
+	void subcpu_vblank_irq(device_t &device);
+	void sound_interrupt(device_t &device);
 	void zerotrgt_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void cntsteer_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void zerotrgt_rearrange_gfx( int romsize, int romarea );
 };
 
 
-PALETTE_INIT_MEMBER(cntsteer_state,zerotrgt)
+void cntsteer_state::palette_init_zerotrgt(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -149,14 +149,14 @@ PALETTE_INIT_MEMBER(cntsteer_state,zerotrgt)
 	}
 }
 
-TILE_GET_INFO_MEMBER(cntsteer_state::get_bg_tile_info)
+void cntsteer_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram2[tile_index];
 
 	SET_TILE_INFO_MEMBER(2, code + m_bg_bank, m_bg_color_bank, 0);
 }
 
-TILE_GET_INFO_MEMBER(cntsteer_state::get_fg_tile_info)
+void cntsteer_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index];
 	int attr = m_colorram[tile_index];
@@ -626,7 +626,7 @@ void cntsteer_state::nmimask_w(address_space &space, offs_t offset, uint8_t data
 	m_nmimask = data & 0x80;
 }
 
-INTERRUPT_GEN_MEMBER(cntsteer_state::subcpu_vblank_irq)
+void cntsteer_state::subcpu_vblank_irq(device_t &device)
 {
 	// TODO: hack for bus request: DP is enabled with 0xff only during POST, and disabled once that critical operations are performed.
 	//       That's my best guess so far about how Slave is supposed to stop execution on Master CPU, the lack of any realistic write
@@ -637,7 +637,7 @@ INTERRUPT_GEN_MEMBER(cntsteer_state::subcpu_vblank_irq)
 	m_subcpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(cntsteer_state::sound_interrupt)
+void cntsteer_state::sound_interrupt(device_t &device)
 {
 	if (!m_nmimask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);

@@ -1437,7 +1437,7 @@ public:
 	void pxa255_ostimer_irq_check();
 	void pxa255_update_interrupts();
 	void pxa255_set_irq_line(uint32_t line, int irq_state);
-	TIMER_DEVICE_CALLBACK_MEMBER(rtc_irq_callback);
+	void rtc_irq_callback(timer_device &timer, void *ptr, int32_t param);
 
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -1731,7 +1731,7 @@ void zaurus_state::machine_reset()
 
 
 /* TODO: Hack */
-TIMER_DEVICE_CALLBACK_MEMBER(zaurus_state::rtc_irq_callback)
+void zaurus_state::rtc_irq_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	#if 0
 	m_rtc_tick++;

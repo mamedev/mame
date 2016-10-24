@@ -397,13 +397,13 @@ void intv_state::machine_start()
 }
 
 
-TIMER_CALLBACK_MEMBER(intv_state::intv_interrupt_complete)
+void intv_state::intv_interrupt_complete(void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(CP1610_INT_INTRM, CLEAR_LINE);
 	m_bus_copy_mode = 0;
 }
 
-TIMER_CALLBACK_MEMBER(intv_state::intv_btb_fill)
+void intv_state::intv_btb_fill(void *ptr, int32_t param)
 {
 	uint8_t row = m_backtab_row;
 	//m_maincpu->adjust_icount(-STIC_ROW_FETCH);
@@ -414,7 +414,7 @@ TIMER_CALLBACK_MEMBER(intv_state::intv_btb_fill)
 	m_backtab_row += 1;
 }
 
-INTERRUPT_GEN_MEMBER(intv_state::intv_interrupt)
+void intv_state::intv_interrupt(device_t &device)
 {
 	int delay = m_stic->read_row_delay();
 	m_maincpu->set_input_line(CP1610_INT_INTRM, ASSERT_LINE);

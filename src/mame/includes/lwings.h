@@ -61,11 +61,11 @@ public:
 	void msm5205_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void fball_oki_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	TILEMAP_MAPPER_MEMBER(get_bg2_memory_offset);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	TILE_GET_INFO_MEMBER(lwings_get_bg1_tile_info);
-	TILE_GET_INFO_MEMBER(trojan_get_bg1_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
+	tilemap_memory_index get_bg2_memory_offset(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void lwings_get_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void trojan_get_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_bg2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -75,8 +75,8 @@ public:
 	void video_start_avengersb();
 	uint32_t screen_update_lwings(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_trojan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(lwings_interrupt);
-	INTERRUPT_GEN_MEMBER(avengers_interrupt);
+	void lwings_interrupt(device_t &device);
+	void avengers_interrupt(device_t &device);
 	inline int is_sprite_on( uint8_t *buffered_spriteram, int offs );
 	void lwings_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void trojan_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );

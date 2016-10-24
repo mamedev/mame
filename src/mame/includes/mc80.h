@@ -26,8 +26,8 @@ public:
 	void mc8030_zve_write_protect_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void mc8030_vis_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void mc8030_eprom_prog_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
-	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
+	void ctc_z0_w(int state);
+	void ctc_z1_w(int state);
 	uint8_t mc80_port_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t mc80_port_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void mc80_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -47,10 +47,10 @@ public:
 	void video_start_mc8030();
 	uint32_t screen_update_mc8020(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_mc8030(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(mc8020_kbd);
-	DECLARE_WRITE_LINE_MEMBER(ctc_z2_w);
-	IRQ_CALLBACK_MEMBER(mc8020_irq_callback);
-	IRQ_CALLBACK_MEMBER(mc8030_irq_callback);
+	void mc8020_kbd(timer_device &timer, void *ptr, int32_t param);
+	void ctc_z2_w(int state);
+	int mc8020_irq_callback(device_t &device, int irqline);
+	int mc8030_irq_callback(device_t &device, int irqline);
 	required_device<cpu_device> m_maincpu;
 };
 

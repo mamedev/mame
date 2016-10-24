@@ -65,8 +65,8 @@ public:
 	virtual DECLARE_ADDRESS_MAP(z80_program_map, 8);
 	virtual DECLARE_ADDRESS_MAP(z80_io_map, 8);
 
-	DECLARE_WRITE_LINE_MEMBER( int1_w );
-	DECLARE_WRITE_LINE_MEMBER( int2_w );
+	void int1_w(int state);
+	void int2_w(int state);
 
 protected:
 	// device-level overrides

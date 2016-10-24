@@ -5,7 +5,7 @@
 
 
 /* Similar as Iron Horse */
-PALETTE_INIT_MEMBER(scotrsht_state, scotrsht)
+void scotrsht_state::palette_init_scotrsht(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -74,7 +74,7 @@ void scotrsht_state::palettebank_w(address_space &space, offs_t offset, uint8_t 
 }
 
 
-TILE_GET_INFO_MEMBER(scotrsht_state::get_bg_tile_info)
+void scotrsht_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_colorram[tile_index];
 	int code = m_videoram[tile_index] + (m_charbank << 9) + ((attr & 0x40) << 2);

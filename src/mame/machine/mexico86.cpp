@@ -179,7 +179,7 @@ void mexico86_state::mcu_simulate(  )
 }
 
 
-INTERRUPT_GEN_MEMBER(mexico86_state::kikikai_interrupt)
+void mexico86_state::kikikai_interrupt(device_t &device)
 {
 	if (m_mcu_running)
 		mcu_simulate();
@@ -244,7 +244,7 @@ void mexico86_state::kiki_clogic(int address, int latch)
 
 ***************************************************************************/
 
-INTERRUPT_GEN_MEMBER(mexico86_state::mexico86_m68705_interrupt)
+void mexico86_state::mexico86_m68705_interrupt(device_t &device)
 {
 	device.execute().set_input_line(0, ASSERT_LINE);
 }

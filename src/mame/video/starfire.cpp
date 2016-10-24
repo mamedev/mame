@@ -227,7 +227,7 @@ void starfire_state::get_pens(pen_t *pens)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(starfire_state::starfire_scanline_callback)
+void starfire_state::starfire_scanline_callback(void *ptr, int32_t param)
 {
 	pen_t pens[STARFIRE_NUM_PENS];
 	int y = param;

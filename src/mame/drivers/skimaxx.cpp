@@ -80,7 +80,7 @@ public:
 	void skimaxx_unk1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	void skimaxx_sub_ctrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	uint32_t skimaxx_analog_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
-	DECLARE_WRITE_LINE_MEMBER(tms_irq);
+	void tms_irq(int state);
 
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
@@ -470,7 +470,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-WRITE_LINE_MEMBER(skimaxx_state::tms_irq)
+void skimaxx_state::tms_irq(int state)
 {
 	// TODO
 }

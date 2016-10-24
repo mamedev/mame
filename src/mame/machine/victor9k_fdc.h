@@ -72,20 +72,20 @@ public:
 	void via4_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t via4_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void via4_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( wrsync_w );
-	DECLARE_WRITE_LINE_MEMBER( via4_irq_w );
+	void wrsync_w(int state);
+	void via4_irq_w(int state);
 
 	uint8_t via5_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void via5_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( via5_irq_w );
+	void via5_irq_w(int state);
 
 	uint8_t via6_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t via6_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void via6_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void via6_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( drw_w );
-	DECLARE_WRITE_LINE_MEMBER( erase_w );
-	DECLARE_WRITE_LINE_MEMBER( via6_irq_w );
+	void drw_w(int state);
+	void erase_w(int state);
+	void via6_irq_w(int state);
 
 protected:
 	// device-level overrides

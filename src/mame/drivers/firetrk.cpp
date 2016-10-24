@@ -51,7 +51,7 @@ INPUT_CHANGED_MEMBER(firetrk_state::gear_changed)
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(firetrk_state::firetrk_scanline)
+void firetrk_state::firetrk_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

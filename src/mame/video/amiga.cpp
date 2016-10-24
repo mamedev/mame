@@ -96,7 +96,7 @@ const uint16_t delay[256] =
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(amiga_state,amiga)
+void amiga_state::palette_init_amiga(palette_device &palette)
 {
 	int i;
 

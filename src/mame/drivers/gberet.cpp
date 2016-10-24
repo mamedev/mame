@@ -85,7 +85,7 @@
  *
  *************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(gberet_state::gberet_interrupt_tick)
+void gberet_state::gberet_interrupt_tick(timer_device &timer, void *ptr, int32_t param)
 {
 	uint8_t ticks_mask = ~m_interrupt_ticks & (m_interrupt_ticks + 1); // 0->1
 	m_interrupt_ticks++;

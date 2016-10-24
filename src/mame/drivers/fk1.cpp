@@ -44,9 +44,9 @@ public:
 	uint8_t fk1_ppi_3_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t fk1_ppi_3_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t fk1_ppi_3_c_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(fk1_pit_out0);
-	DECLARE_WRITE_LINE_MEMBER(fk1_pit_out1);
-	DECLARE_WRITE_LINE_MEMBER(fk1_pit_out2);
+	void fk1_pit_out0(int state);
+	void fk1_pit_out1(int state);
+	void fk1_pit_out2(int state);
 	void fk1_intr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t fk1_bank_ram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t fk1_bank_rom_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
@@ -57,9 +57,9 @@ public:
 	uint8_t m_int_vector;
 	virtual void machine_reset() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
-	TIMER_DEVICE_CALLBACK_MEMBER(vsync_callback);
-	IRQ_CALLBACK_MEMBER(fk1_irq_callback);
+	void keyboard_callback(timer_device &timer, void *ptr, int32_t param);
+	void vsync_callback(timer_device &timer, void *ptr, int32_t param);
+	int fk1_irq_callback(device_t &device, int irqline);
 };
 
 
@@ -217,22 +217,22 @@ uint8_t fk1_state::fk1_ppi_3_c_r(address_space &space, offs_t offset, uint8_t me
 	return 0;
 }
 
-WRITE_LINE_MEMBER( fk1_state::fk1_pit_out0 )
+void fk1_state::fk1_pit_out0(int state)
 {
 	// System time
-	logerror("WRITE_LINE_MEMBER(fk1_pit_out0)\n");
+	logerror("void fk1_pit_out0(int state)\n");
 }
 
-WRITE_LINE_MEMBER( fk1_state::fk1_pit_out1 )
+void fk1_state::fk1_pit_out1(int state)
 {
 	// Timeout for disk operation
-	logerror("WRITE_LINE_MEMBER(fk1_pit_out1)\n");
+	logerror("void fk1_pit_out1(int state)\n");
 }
 
-WRITE_LINE_MEMBER( fk1_state::fk1_pit_out2 )
+void fk1_state::fk1_pit_out2(int state)
 {
 	// Overflow for disk operations
-	logerror("WRITE_LINE_MEMBER(fk1_pit_out2)\n");
+	logerror("void fk1_pit_out2(int state)\n");
 }
 
 /*
@@ -338,7 +338,7 @@ static INPUT_PORTS_START( fk1 )
 		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('\'')
 INPUT_PORTS_END
 
-TIMER_DEVICE_CALLBACK_MEMBER(fk1_state::keyboard_callback)
+void fk1_state::keyboard_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	if (ioport("LINE0")->read())
 	{
@@ -358,13 +358,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(fk1_state::keyboard_callback)
 0 ? PRINTER
 */
 
-IRQ_CALLBACK_MEMBER(fk1_state::fk1_irq_callback)
+int fk1_state::fk1_irq_callback(device_t &device, int irqline)
 {
 	logerror("IRQ %02x\n", m_int_vector*2);
 	return m_int_vector * 2;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(fk1_state::vsync_callback)
+void fk1_state::vsync_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	m_int_vector = 3;
 	m_maincpu->set_input_line(0, HOLD_LINE);

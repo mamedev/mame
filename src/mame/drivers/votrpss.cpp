@@ -104,9 +104,9 @@ public:
 	void ppi_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void ppi_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void ppi_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer);
-	DECLARE_WRITE_LINE_MEMBER(write_uart_clock);
-	IRQ_CALLBACK_MEMBER(irq_ack);
+	void irq_timer(timer_device &timer, void *ptr, int32_t param);
+	void write_uart_clock(int state);
+	int irq_ack(device_t &device, int irqline);
 private:
 	uint8_t m_term_data;
 	uint8_t m_porta;
@@ -181,12 +181,12 @@ void votrpss_state::machine_start()
 {
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( votrpss_state::irq_timer )
+void votrpss_state::irq_timer(timer_device &timer, void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
-IRQ_CALLBACK_MEMBER( votrpss_state::irq_ack )
+int votrpss_state::irq_ack(device_t &device, int irqline)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 	return 0x38;
@@ -240,7 +240,7 @@ void votrpss_state::kbd_put(address_space &space, offs_t offset, uint8_t data, u
 	m_term_data = data;
 }
 
-DECLARE_WRITE_LINE_MEMBER( votrpss_state::write_uart_clock )
+void votrpss_state::write_uart_clock(int state)
 {
 	m_uart->write_txc(state);
 	m_uart->write_rxc(state);

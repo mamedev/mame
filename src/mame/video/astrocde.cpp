@@ -62,7 +62,7 @@ inline int astrocde_state::mame_vpos_to_astrocade_vpos(int scanline)
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(astrocde_state, astrocde)
+void astrocde_state::palette_init_astrocde(palette_device &palette)
 {
 	/*
 	    The Astrocade has a 256 color palette: 32 colors with 8 luminance
@@ -111,7 +111,7 @@ PALETTE_INIT_MEMBER(astrocde_state, astrocde)
 }
 
 
-PALETTE_INIT_MEMBER(astrocde_state,profpac)
+void astrocde_state::palette_init_profpac(palette_device &palette)
 {
 	/* Professor Pac-Man uses a more standard 12-bit RGB palette layout */
 	static const int resistances[4] = { 6200, 3000, 1500, 750 };
@@ -423,7 +423,7 @@ void astrocde_state::astrocade_trigger_lightpen(uint8_t vfeedback, uint8_t hfeed
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(astrocde_state::scanline_callback)
+void astrocde_state::scanline_callback(void *ptr, int32_t param)
 {
 	int scanline = param;
 	int astrocade_scanline = mame_vpos_to_astrocade_vpos(scanline);

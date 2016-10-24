@@ -58,7 +58,7 @@ public:
 	uint8_t sound_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	// I8751-related VBLANK interrupt hanlders
-	INTERRUPT_GEN_MEMBER( i8751_main_cpu_vblank );
+	void i8751_main_cpu_vblank(device_t &device);
 
 	// game-specific driver init
 	void init_generic();

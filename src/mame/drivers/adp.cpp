@@ -191,10 +191,10 @@ public:
 	void input_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void machine_start_skattv();
 	void machine_reset_skattv();
-	DECLARE_PALETTE_INIT(adp);
-	DECLARE_PALETTE_INIT(fstation);
-	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
-	//INTERRUPT_GEN_MEMBER(adp_int);
+	void palette_init_adp(palette_device &palette);
+	void palette_init_fstation(palette_device &palette);
+	void duart_irq_handler(int state);
+	//void adp_int(device_t &device);
 	void skattva_nvram_init(nvram_device &nvram, void *base, size_t size);
 };
 
@@ -222,7 +222,7 @@ void adp_state::skattva_nvram_init(nvram_device &nvram, void *base, size_t size)
 
 ***************************************************************************/
 
-WRITE_LINE_MEMBER(adp_state::duart_irq_handler)
+void adp_state::duart_irq_handler(int state)
 {
 	m_maincpu->set_input_line_and_vector(4, state, m_duart->get_irq_vector());
 }
@@ -237,7 +237,7 @@ void adp_state::machine_reset_skattv()
 	m_mux_data = 0;
 }
 
-PALETTE_INIT_MEMBER(adp_state,adp)
+void adp_state::palette_init_adp(palette_device &palette)
 {
 	int i;
 
@@ -265,7 +265,7 @@ PALETTE_INIT_MEMBER(adp_state,adp)
 	}
 }
 
-PALETTE_INIT_MEMBER(adp_state,fstation)
+void adp_state::palette_init_fstation(palette_device &palette)
 {
 	for (int i = 0; i < palette.entries(); i++)
 		palette.set_pen_color(i, rgb_t(pal3bit(i>>5), pal3bit(i>>2), pal2bit(i>>0)));
@@ -510,7 +510,7 @@ static INPUT_PORTS_START( fstation )
 INPUT_PORTS_END
 
 /*
-INTERRUPT_GEN_MEMBER(adp_state::adp_int)
+void adp_state::adp_int(device_t &device)
 {
     device.execute().set_input_line(1, HOLD_LINE); // ??? All irqs have the same vector, and the mask used is 0 or 7
 }

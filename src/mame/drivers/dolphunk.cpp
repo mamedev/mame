@@ -99,11 +99,11 @@ public:
 	{ }
 
 	uint8_t cass_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(cass_w);
+	void cass_w(int state);
 	uint8_t port07_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void port00_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void port06_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	TIMER_DEVICE_CALLBACK_MEMBER(dauphin_c);
+	void dauphin_c(timer_device &timer, void *ptr, int32_t param);
 private:
 	uint8_t m_cass_data;
 	uint8_t m_last_key;
@@ -120,7 +120,7 @@ uint8_t dauphin_state::cass_r(address_space &space, offs_t offset, uint8_t mem_m
 	return (m_cass->input() > 0.03) ? 1 : 0;
 }
 
-WRITE_LINE_MEMBER( dauphin_state::cass_w )
+void dauphin_state::cass_w(int state)
 {
 	m_cass_state = state; // get flag bit
 }
@@ -162,7 +162,7 @@ uint8_t dauphin_state::port07_r(address_space &space, offs_t offset, uint8_t mem
 	return data;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(dauphin_state::dauphin_c)
+void dauphin_state::dauphin_c(timer_device &timer, void *ptr, int32_t param)
 {
 	m_cass_data++;
 

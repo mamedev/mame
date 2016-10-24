@@ -25,7 +25,7 @@ void dynduke_state::text_w(address_space &space, offs_t offset, uint16_t data, u
 	m_tx_layer->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(dynduke_state::get_bg_tile_info)
+void dynduke_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile=m_back_data[tile_index];
 	int color=tile >> 12;
@@ -38,7 +38,7 @@ TILE_GET_INFO_MEMBER(dynduke_state::get_bg_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(dynduke_state::get_fg_tile_info)
+void dynduke_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile=m_fore_data[tile_index];
 	int color=tile >> 12;
@@ -51,7 +51,7 @@ TILE_GET_INFO_MEMBER(dynduke_state::get_fg_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(dynduke_state::get_tx_tile_info)
+void dynduke_state::get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile=m_videoram[tile_index];
 	int color=(tile >> 8) & 0x0f;

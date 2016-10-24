@@ -159,9 +159,9 @@ public:
 	void show_leds123();
 	void show_leds12();
 	void crtc_lpen_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	DECLARE_WRITE_LINE_MEMBER(crtc_vsync_irq1);
-	DECLARE_WRITE_LINE_MEMBER(crtc_vsync_irq3);
-	DECLARE_WRITE_LINE_MEMBER(crtc_vsync_irq5);
+	void crtc_vsync_irq1(int state);
+	void crtc_vsync_irq3(int state);
+	void crtc_vsync_irq5(int state);
 	void init_bankrob();
 	void init_cjffruit();
 	void init_deucesw2();
@@ -176,7 +176,7 @@ public:
 	void video_start_blitz68k_addr_factor1();
 	uint32_t screen_update_blitz68k(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_blitz68k_noblit(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(steaser_mcu_sim);
+	void steaser_mcu_sim(timer_device &timer, void *ptr, int32_t param);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
@@ -1647,17 +1647,17 @@ INPUT_PORTS_END
 
 // R6845AP used for video sync signals only
 
-WRITE_LINE_MEMBER(blitz68k_state::crtc_vsync_irq1)
+void blitz68k_state::crtc_vsync_irq1(int state)
 {
 	m_maincpu->set_input_line(1, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(blitz68k_state::crtc_vsync_irq3)
+void blitz68k_state::crtc_vsync_irq3(int state)
 {
 	m_maincpu->set_input_line(3, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(blitz68k_state::crtc_vsync_irq5)
+void blitz68k_state::crtc_vsync_irq5(int state)
 {
 	m_maincpu->set_input_line(5, state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -1709,7 +1709,7 @@ MACHINE_CONFIG_END
 2008ad = 1 -> hold 5
 */
 
-TIMER_DEVICE_CALLBACK_MEMBER(blitz68k_state::steaser_mcu_sim)
+void blitz68k_state::steaser_mcu_sim(timer_device &timer, void *ptr, int32_t param)
 {
 //  static int i;
 	/*first off, signal the "MCU is running" flag*/

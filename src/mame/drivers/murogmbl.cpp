@@ -58,13 +58,13 @@ public:
 	required_shared_ptr<uint8_t> m_video;
 
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(murogmbl);
+	void palette_init_murogmbl(palette_device &palette);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
-PALETTE_INIT_MEMBER(murogmbl_state, murogmbl)
+void murogmbl_state::palette_init_murogmbl(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int bit0, bit1, bit2 , r, g, b;

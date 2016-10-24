@@ -46,7 +46,7 @@ public:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(alphasmart);
+	void palette_init_alphasmart(palette_device &palette);
 	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_INPUT_CHANGED_MEMBER(kb_irq);
@@ -384,7 +384,7 @@ static INPUT_PORTS_START( alphasmart )
 	PORT_CONFSETTING (0x01, DEF_STR(Normal))
 INPUT_PORTS_END
 
-PALETTE_INIT_MEMBER(alphasmart_state, alphasmart)
+void alphasmart_state::palette_init_alphasmart(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));

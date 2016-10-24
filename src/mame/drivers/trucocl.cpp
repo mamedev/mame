@@ -131,7 +131,7 @@ static GFXDECODE_START( trucocl )
 	GFXDECODE_ENTRY( "gfx1", 0x10000, tilelayout,      0, 2 )
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(trucocl_state::trucocl_interrupt)
+void trucocl_state::trucocl_interrupt(device_t &device)
 {
 	if(m_irq_mask)
 		device.execute().set_input_line(0, HOLD_LINE);

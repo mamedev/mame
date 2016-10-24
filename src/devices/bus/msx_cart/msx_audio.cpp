@@ -180,7 +180,7 @@ const tiny_rom_entry *msx_cart_msx_audio_nms1205::device_rom_region() const
 }
 
 
-WRITE_LINE_MEMBER(msx_cart_msx_audio_nms1205::irq_write)
+void msx_cart_msx_audio_nms1205::irq_write(int state)
 {
 	// Trigger IRQ on the maincpu
 	// The 8950 seems to trigger an irq on reset, this causes an infinite loop of continuously triggering
@@ -190,7 +190,7 @@ WRITE_LINE_MEMBER(msx_cart_msx_audio_nms1205::irq_write)
 }
 
 
-WRITE_LINE_MEMBER(msx_cart_msx_audio_nms1205::midi_in)
+void msx_cart_msx_audio_nms1205::midi_in(int state)
 {
 	// MIDI in signals is sent to both the 6850 and the MIDI thru output port
 	m_acia6850->write_rxd(state);

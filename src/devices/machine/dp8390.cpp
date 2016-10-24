@@ -166,11 +166,11 @@ void dp8390_device::recv_cb(uint8_t *buf, int len) {
 	if(!LOOPBACK) recv(buf, len);
 }
 
-WRITE_LINE_MEMBER(dp8390_device::dp8390_cs) {
+void dp8390_device::dp8390_cs(int state) {
 	m_cs = state;
 }
 
-WRITE_LINE_MEMBER(dp8390_device::dp8390_reset) {
+void dp8390_device::dp8390_reset(int state) {
 	if(!state) device_reset();
 }
 

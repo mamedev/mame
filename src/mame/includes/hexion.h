@@ -30,13 +30,13 @@ public:
 	void bankedram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void bankctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void gfxrom_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(irq_ack_w);
-	DECLARE_WRITE_LINE_MEMBER(nmi_ack_w);
+	void irq_ack_w(int state);
+	void nmi_ack_w(int state);
 
-	TILE_GET_INFO_MEMBER(get_tile_info0);
-	TILE_GET_INFO_MEMBER(get_tile_info1);
+	void get_tile_info0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+	void scanline(timer_device &timer, void *ptr, int32_t param);
 
 	virtual void video_start() override;
 

@@ -39,8 +39,8 @@ public:
 	uint8_t m_reg[0x100];
 	void init_pc1401();
 	uint32_t screen_update_pc1401(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_READ_LINE_MEMBER(pc1401_reset);
-	DECLARE_READ_LINE_MEMBER(pc1401_brk);
+	int pc1401_reset();
+	int pc1401_brk();
 	void pc1401_outa(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void pc1401_outb(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void pc1401_outc(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);

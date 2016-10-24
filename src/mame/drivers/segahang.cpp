@@ -272,7 +272,7 @@ void segahang_state::sharrier_io_w(address_space &space, offs_t offset, uint16_t
 
 
 #if 0
-TIMER_DEVICE_CALLBACK_MEMBER(segahang_state::hangon_irq)
+void segahang_state::hangon_irq(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -312,7 +312,7 @@ uint8_t segahang_state::sound_data_r(address_space &space, offs_t offset, uint8_
 //  handler, we hook this to execute it
 //-------------------------------------------------
 
-INTERRUPT_GEN_MEMBER( segahang_state::i8751_main_cpu_vblank )
+void segahang_state::i8751_main_cpu_vblank(device_t &device)
 {
 	// if we have a fake 8751 handler, call it on VBLANK
 	if (!m_i8751_vblank_hook.isnull())

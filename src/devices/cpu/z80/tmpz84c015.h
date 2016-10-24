@@ -138,33 +138,33 @@ public:
 	template<class _Object> static devcb_base &set_out_brdy_callback(device_t &device, _Object object) { return downcast<tmpz84c015_device &>(device).m_out_brdy_cb.set_callback(object); }
 
 	// SIO public interface
-	DECLARE_WRITE_LINE_MEMBER( rxa_w ) { m_sio->rxa_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( rxb_w ) { m_sio->rxb_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( ctsa_w ) { m_sio->ctsa_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( ctsb_w ) { m_sio->ctsb_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( dcda_w ) { m_sio->dcda_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( dcdb_w ) { m_sio->dcdb_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( ria_w ) { m_sio->ria_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( rib_w ) { m_sio->rib_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( rxca_w ) { m_sio->rxca_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( rxcb_w ) { m_sio->rxcb_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( txca_w ) { m_sio->txca_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( txcb_w ) { m_sio->txcb_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( rxtxcb_w ) { m_sio->rxtxcb_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( synca_w ) { m_sio->synca_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( syncb_w ) { m_sio->syncb_w(state); }
+	void rxa_w(int state) { m_sio->rxa_w(state); }
+	void rxb_w(int state) { m_sio->rxb_w(state); }
+	void ctsa_w(int state) { m_sio->ctsa_w(state); }
+	void ctsb_w(int state) { m_sio->ctsb_w(state); }
+	void dcda_w(int state) { m_sio->dcda_w(state); }
+	void dcdb_w(int state) { m_sio->dcdb_w(state); }
+	void ria_w(int state) { m_sio->ria_w(state); }
+	void rib_w(int state) { m_sio->rib_w(state); }
+	void rxca_w(int state) { m_sio->rxca_w(state); }
+	void rxcb_w(int state) { m_sio->rxcb_w(state); }
+	void txca_w(int state) { m_sio->txca_w(state); }
+	void txcb_w(int state) { m_sio->txcb_w(state); }
+	void rxtxcb_w(int state) { m_sio->rxtxcb_w(state); }
+	void synca_w(int state) { m_sio->synca_w(state); }
+	void syncb_w(int state) { m_sio->syncb_w(state); }
 
 	// CTC public interface
-	DECLARE_WRITE_LINE_MEMBER( trg0 ) { m_ctc->trg0(state); }
-	DECLARE_WRITE_LINE_MEMBER( trg1 ) { m_ctc->trg1(state); }
-	DECLARE_WRITE_LINE_MEMBER( trg2 ) { m_ctc->trg2(state); }
-	DECLARE_WRITE_LINE_MEMBER( trg3 ) { m_ctc->trg3(state); }
+	void trg0(int state) { m_ctc->trg0(state); }
+	void trg1(int state) { m_ctc->trg1(state); }
+	void trg2(int state) { m_ctc->trg2(state); }
+	void trg3(int state) { m_ctc->trg3(state); }
 
 	// PIO public interface
-	DECLARE_READ_LINE_MEMBER( rdy_a ) { return m_pio->rdy_a(); }
-	DECLARE_READ_LINE_MEMBER( rdy_b ) { return m_pio->rdy_b(); }
-	DECLARE_WRITE_LINE_MEMBER( strobe_a ) { m_pio->strobe_a(state); }
-	DECLARE_WRITE_LINE_MEMBER( strobe_b ) { m_pio->strobe_b(state); }
+	int rdy_a() { return m_pio->rdy_a(); }
+	int rdy_b() { return m_pio->rdy_b(); }
+	void strobe_a(int state) { m_pio->strobe_a(state); }
+	void strobe_b(int state) { m_pio->strobe_b(state); }
 
 	void pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { m_pio->pa_w(space, offset, data, mem_mask); }
 	uint8_t pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return m_pio->pa_r(space, offset, mem_mask); }
@@ -175,34 +175,34 @@ public:
 
 	void irq_priority_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( out_txda_cb_trampoline_w ) { m_out_txda_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER( out_dtra_cb_trampoline_w ) { m_out_dtra_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER( out_rtsa_cb_trampoline_w ) { m_out_rtsa_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER( out_wrdya_cb_trampoline_w ) { m_out_wrdya_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER( out_synca_cb_trampoline_w ) { m_out_synca_cb(state); }
+	void out_txda_cb_trampoline_w(int state) { m_out_txda_cb(state); }
+	void out_dtra_cb_trampoline_w(int state) { m_out_dtra_cb(state); }
+	void out_rtsa_cb_trampoline_w(int state) { m_out_rtsa_cb(state); }
+	void out_wrdya_cb_trampoline_w(int state) { m_out_wrdya_cb(state); }
+	void out_synca_cb_trampoline_w(int state) { m_out_synca_cb(state); }
 
-	DECLARE_WRITE_LINE_MEMBER( out_txdb_cb_trampoline_w ) { m_out_txdb_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER( out_dtrb_cb_trampoline_w ) { m_out_dtrb_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER( out_rtsb_cb_trampoline_w ) { m_out_rtsb_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER( out_wrdyb_cb_trampoline_w ) { m_out_wrdyb_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER( out_syncb_cb_trampoline_w ) { m_out_syncb_cb(state); }
+	void out_txdb_cb_trampoline_w(int state) { m_out_txdb_cb(state); }
+	void out_dtrb_cb_trampoline_w(int state) { m_out_dtrb_cb(state); }
+	void out_rtsb_cb_trampoline_w(int state) { m_out_rtsb_cb(state); }
+	void out_wrdyb_cb_trampoline_w(int state) { m_out_wrdyb_cb(state); }
+	void out_syncb_cb_trampoline_w(int state) { m_out_syncb_cb(state); }
 
-	DECLARE_WRITE_LINE_MEMBER( out_rxdrqa_cb_trampoline_w ) { m_out_rxdrqa_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER( out_txdrqa_cb_trampoline_w ) { m_out_txdrqa_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER( out_rxdrqb_cb_trampoline_w ) { m_out_rxdrqb_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER( out_txdrqb_cb_trampoline_w ) { m_out_txdrqb_cb(state); }
+	void out_rxdrqa_cb_trampoline_w(int state) { m_out_rxdrqa_cb(state); }
+	void out_txdrqa_cb_trampoline_w(int state) { m_out_txdrqa_cb(state); }
+	void out_rxdrqb_cb_trampoline_w(int state) { m_out_rxdrqb_cb(state); }
+	void out_txdrqb_cb_trampoline_w(int state) { m_out_txdrqb_cb(state); }
 
-	DECLARE_WRITE_LINE_MEMBER( zc0_cb_trampoline_w ) { m_zc0_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER( zc1_cb_trampoline_w ) { m_zc1_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER( zc2_cb_trampoline_w ) { m_zc2_cb(state); }
+	void zc0_cb_trampoline_w(int state) { m_zc0_cb(state); }
+	void zc1_cb_trampoline_w(int state) { m_zc1_cb(state); }
+	void zc2_cb_trampoline_w(int state) { m_zc2_cb(state); }
 
 	uint8_t in_pa_cb_trampoline_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return m_in_pa_cb(); }
 	void out_pa_cb_trampoline_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { m_out_pa_cb(data); }
-	DECLARE_WRITE_LINE_MEMBER( out_ardy_cb_trampoline_w ) { m_out_ardy_cb(state); }
+	void out_ardy_cb_trampoline_w(int state) { m_out_ardy_cb(state); }
 
 	uint8_t in_pb_cb_trampoline_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return m_in_pb_cb(); }
 	void out_pb_cb_trampoline_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { m_out_pb_cb(data); }
-	DECLARE_WRITE_LINE_MEMBER( out_brdy_cb_trampoline_w ) { m_out_brdy_cb(state); }
+	void out_brdy_cb_trampoline_w(int state) { m_out_brdy_cb(state); }
 
 protected:
 	// device-level overrides

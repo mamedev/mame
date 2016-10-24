@@ -64,10 +64,10 @@ public:
 	void boxer_led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(boxer);
+	void palette_init_boxer(palette_device &palette);
 	uint32_t screen_update_boxer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(pot_interrupt);
-	TIMER_CALLBACK_MEMBER(periodic_callback);
+	void pot_interrupt(void *ptr, int32_t param);
+	void periodic_callback(void *ptr, int32_t param);
 	void draw_boxer( bitmap_ind16 &bitmap, const rectangle &cliprect );
 
 protected:
@@ -95,7 +95,7 @@ void boxer_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 	}
 }
 
-TIMER_CALLBACK_MEMBER(boxer_state::pot_interrupt)
+void boxer_state::pot_interrupt(void *ptr, int32_t param)
 {
 	int mask = param;
 
@@ -106,7 +106,7 @@ TIMER_CALLBACK_MEMBER(boxer_state::pot_interrupt)
 }
 
 
-TIMER_CALLBACK_MEMBER(boxer_state::periodic_callback)
+void boxer_state::periodic_callback(void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -149,7 +149,7 @@ TIMER_CALLBACK_MEMBER(boxer_state::periodic_callback)
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(boxer_state, boxer)
+void boxer_state::palette_init_boxer(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(0x00,0x00,0x00));
 	palette.set_pen_color(1, rgb_t(0xff,0xff,0xff));

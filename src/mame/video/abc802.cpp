@@ -154,7 +154,7 @@ MC6845_UPDATE_ROW( abc802_state::abc802_update_row )
 //  vs_w - vertical sync write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( abc802_state::vs_w )
+void abc802_state::vs_w(int state)
 {
 	if (!state)
 	{

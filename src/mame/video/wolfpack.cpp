@@ -10,7 +10,7 @@ Atari Wolf Pack (prototype) video emulation
 #include "includes/wolfpack.h"
 
 
-PALETTE_INIT_MEMBER(wolfpack_state, wolfpack)
+void wolfpack_state::palette_init_wolfpack(palette_device &palette)
 {
 	int i;
 

@@ -157,7 +157,7 @@ REF. 970429
 
 
 
-WRITE_LINE_MEMBER(gaelco3d_state::ser_irq)
+void gaelco3d_state::ser_irq(int state)
 {
 	if (state)
 		m_maincpu->set_input_line(6, ASSERT_LINE);
@@ -240,7 +240,7 @@ void gaelco3d_state::machine_reset_gaelco3d2()
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(gaelco3d_state::vblank_gen)
+void gaelco3d_state::vblank_gen(device_t &device)
 {
 	gaelco3d_render(*m_screen);
 	device.execute().set_input_line(2, ASSERT_LINE);
@@ -343,7 +343,7 @@ void gaelco3d_state::eeprom_cs_w(address_space &space, offs_t offset, uint16_t d
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(gaelco3d_state::delayed_sound_w)
+void gaelco3d_state::delayed_sound_w(void *ptr, int32_t param)
 {
 	if (LOG)
 		logerror("delayed_sound_w(%02X)\n", param);
@@ -605,7 +605,7 @@ void gaelco3d_state::adsp_rombank_w(address_space &space, offs_t offset, uint16_
  *
  *************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(gaelco3d_state::adsp_autobuffer_irq)
+void gaelco3d_state::adsp_autobuffer_irq(timer_device &timer, void *ptr, int32_t param)
 {
 	/* get the index register */
 	int reg = m_adsp->state_int(ADSP2100_I0 + m_adsp_ireg);

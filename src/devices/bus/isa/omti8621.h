@@ -45,8 +45,8 @@ public:
 	required_ioport m_iobase;
 	required_ioport m_biosopts;
 
-	DECLARE_WRITE_LINE_MEMBER( fdc_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
+	void fdc_irq_w(int state);
+	void fdc_drq_w(int state);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 protected:

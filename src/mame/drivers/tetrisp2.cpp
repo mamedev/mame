@@ -1243,23 +1243,23 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-TIMER_CALLBACK_MEMBER(tetrisp2_state::rockn_timer_level4_callback)
+void tetrisp2_state::rockn_timer_level4_callback(void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(4, HOLD_LINE);
 }
 
-TIMER_CALLBACK_MEMBER(tetrisp2_state::rockn_timer_sub_level4_callback)
+void tetrisp2_state::rockn_timer_sub_level4_callback(void *ptr, int32_t param)
 {
 	m_subcpu->set_input_line(4, HOLD_LINE);
 }
 
 
-TIMER_CALLBACK_MEMBER(tetrisp2_state::rockn_timer_level1_callback)
+void tetrisp2_state::rockn_timer_level1_callback(void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(1, HOLD_LINE);
 }
 
-TIMER_CALLBACK_MEMBER(tetrisp2_state::rockn_timer_sub_level1_callback)
+void tetrisp2_state::rockn_timer_sub_level1_callback(void *ptr, int32_t param)
 {
 	m_subcpu->set_input_line(1, HOLD_LINE);
 }

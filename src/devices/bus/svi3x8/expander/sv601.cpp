@@ -68,9 +68,9 @@ void sv601_device::device_start()
 //  IMPLEMENTATION
 //**************************************************************************
 
-WRITE_LINE_MEMBER( sv601_device::int_w ) { m_expander->int_w(state); }
-WRITE_LINE_MEMBER( sv601_device::romdis_w ) { m_expander->romdis_w(state); }
-WRITE_LINE_MEMBER( sv601_device::ramdis_w ) { m_expander->ramdis_w(state); }
+void sv601_device::int_w(int state) { m_expander->int_w(state); }
+void sv601_device::romdis_w(int state) { m_expander->romdis_w(state); }
+void sv601_device::ramdis_w(int state) { m_expander->ramdis_w(state); }
 
 uint8_t sv601_device::mreq_r(address_space &space, offs_t offset, uint8_t mem_mask) { return m_slotbus->mreq_r(space, offset); }
 void sv601_device::mreq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) { m_slotbus->mreq_w(space, offset, data); }

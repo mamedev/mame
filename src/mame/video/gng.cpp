@@ -18,7 +18,7 @@
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(gng_state::get_fg_tile_info)
+void gng_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t attr = m_fgvideoram[tile_index + 0x400];
 	SET_TILE_INFO_MEMBER(0,
@@ -27,7 +27,7 @@ TILE_GET_INFO_MEMBER(gng_state::get_fg_tile_info)
 			TILE_FLIPYX((attr & 0x30) >> 4));
 }
 
-TILE_GET_INFO_MEMBER(gng_state::get_bg_tile_info)
+void gng_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t attr = m_bgvideoram[tile_index + 0x400];
 	SET_TILE_INFO_MEMBER(1,

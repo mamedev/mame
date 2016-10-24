@@ -515,7 +515,7 @@ GFXDECODE_END
 
 /*** MACHINE DRIVER **********************************************************/
 
-WRITE_LINE_MEMBER(macrossp_state::irqhandler)
+void macrossp_state::irqhandler(int state)
 {
 	logerror("ES5506 irq %d\n", state);
 

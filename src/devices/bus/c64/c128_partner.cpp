@@ -43,7 +43,7 @@ const device_type C128_PARTNER = &device_creator<partner128_t>;
 //  INPUT_PORTS( c128_partner )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( partner128_t::nmi_w )
+void partner128_t::nmi_w(int state)
 {
 	if (state)
 	{

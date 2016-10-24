@@ -24,7 +24,7 @@
   Zarzon has a different PROM layout from the others.
 
 ***************************************************************************/
-PALETTE_INIT_MEMBER(snk6502_state,snk6502)
+void snk6502_state::palette_init_snk6502(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -147,7 +147,7 @@ void snk6502_state::scrolly_w(address_space &space, offs_t offset, uint8_t data,
 }
 
 
-TILE_GET_INFO_MEMBER(snk6502_state::get_bg_tile_info)
+void snk6502_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index] + 256 * m_charbank;
 	int color = (m_colorram[tile_index] & 0x38) >> 3;
@@ -155,7 +155,7 @@ TILE_GET_INFO_MEMBER(snk6502_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(1, code, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(snk6502_state::get_fg_tile_info)
+void snk6502_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram2[tile_index];
 	int color = m_colorram[tile_index] & 0x07;
@@ -197,7 +197,7 @@ uint32_t snk6502_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 
 /* Satan of Saturn */
 
-PALETTE_INIT_MEMBER(snk6502_state,satansat)
+void snk6502_state::palette_init_satansat(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -278,7 +278,7 @@ void snk6502_state::satansat_backcolor_w(address_space &space, offs_t offset, ui
 	}
 }
 
-TILE_GET_INFO_MEMBER(snk6502_state::satansat_get_bg_tile_info)
+void snk6502_state::satansat_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index];
 	int color = (m_colorram[tile_index] & 0x0c) >> 2;
@@ -286,7 +286,7 @@ TILE_GET_INFO_MEMBER(snk6502_state::satansat_get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(1, code, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(snk6502_state::satansat_get_fg_tile_info)
+void snk6502_state::satansat_get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram2[tile_index];
 	int color = m_colorram[tile_index] & 0x03;

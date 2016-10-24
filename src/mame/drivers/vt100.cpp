@@ -56,7 +56,7 @@ public:
 	void vt100_baud_rate_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void vt100_nvr_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t vt100_read_video_ram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(vt100_clear_video_interrupt);
+	void vt100_clear_video_interrupt(int state);
 	required_shared_ptr<uint8_t> m_p_ram;
 	bool m_keyboard_int;
 	bool m_receiver_int;
@@ -66,9 +66,9 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_vt100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vt100_vertical_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
-	IRQ_CALLBACK_MEMBER(vt100_irq_callback);
+	void vt100_vertical_interrupt(device_t &device);
+	void keyboard_callback(timer_device &timer, void *ptr, int32_t param);
+	int vt100_irq_callback(device_t &device, int irqline);
 	uint8_t bit_sel(uint8_t data);
 };
 
@@ -127,7 +127,7 @@ uint8_t vt100_state::bit_sel(uint8_t data)
 	return 0;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(vt100_state::keyboard_callback)
+void vt100_state::keyboard_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	uint8_t i, code;
 	char kbdrow[8];
@@ -335,7 +335,7 @@ uint32_t vt100_state::screen_update_vt100(screen_device &screen, bitmap_ind16 &b
 //          A4 - receiver
 //          A5 - vertical frequency
 //          all other set to 1
-IRQ_CALLBACK_MEMBER(vt100_state::vt100_irq_callback)
+int vt100_state::vt100_irq_callback(device_t &device, int irqline)
 {
 	uint8_t ret = 0xc7 | (m_keyboard_int << 3) | (m_receiver_int << 4) | (m_vertical_int << 5);
 	m_receiver_int = 0;
@@ -367,12 +367,12 @@ uint8_t vt100_state::vt100_read_video_ram_r(address_space &space, offs_t offset,
 	return m_p_ram[offset];
 }
 
-WRITE_LINE_MEMBER( vt100_state::vt100_clear_video_interrupt )
+void vt100_state::vt100_clear_video_interrupt(int state)
 {
 	m_vertical_int = 0;
 }
 
-INTERRUPT_GEN_MEMBER(vt100_state::vt100_vertical_interrupt)
+void vt100_state::vt100_vertical_interrupt(device_t &device)
 {
 	m_vertical_int = 1;
 	device.execute().set_input_line(0, HOLD_LINE);

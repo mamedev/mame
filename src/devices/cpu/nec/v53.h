@@ -151,13 +151,13 @@ public:
 	template<class _Object> static devcb_base &set_txrdy_handler(device_t &device, _Object object) { return downcast<v53_base_device &>(device).m_txrdy_handler.set_callback(object); }
 	template<class _Object> static devcb_base &set_txempty_handler(device_t &device, _Object object) { return downcast<v53_base_device &>(device).m_txempty_handler.set_callback(object); }
 	template<class _Object> static devcb_base &set_syndet_handler(device_t &device, _Object object) { return downcast<v53_base_device &>(device).m_syndet_handler.set_callback(object); }
-	DECLARE_WRITE_LINE_MEMBER(scu_txd_trampoline_cb) { m_txd_handler(state); }
-	DECLARE_WRITE_LINE_MEMBER(scu_dtr_trampoline_cb) { m_dtr_handler(state); }
-	DECLARE_WRITE_LINE_MEMBER(scu_rts_trampoline_cb) {  m_rts_handler(state); }
-	DECLARE_WRITE_LINE_MEMBER(scu_rxrdy_trampoline_cb) { m_rxrdy_handler(state); } /* should we mask this here based on m_simk? it can mask the interrupt */
-	DECLARE_WRITE_LINE_MEMBER(scu_txrdy_trampoline_cb) { m_txrdy_handler(state); } /* should we mask this here based on m_simk? it can mask the interrupt */
-	DECLARE_WRITE_LINE_MEMBER(scu_txempty_trampoline_cb) {  m_txempty_handler(state); }
-	DECLARE_WRITE_LINE_MEMBER(scu_syndet_trampoline_cb) { m_syndet_handler(state); }
+	void scu_txd_trampoline_cb(int state) { m_txd_handler(state); }
+	void scu_dtr_trampoline_cb(int state) { m_dtr_handler(state); }
+	void scu_rts_trampoline_cb(int state) {  m_rts_handler(state); }
+	void scu_rxrdy_trampoline_cb(int state) { m_rxrdy_handler(state); } /* should we mask this here based on m_simk? it can mask the interrupt */
+	void scu_txrdy_trampoline_cb(int state) { m_txrdy_handler(state); } /* should we mask this here based on m_simk? it can mask the interrupt */
+	void scu_txempty_trampoline_cb(int state) {  m_txempty_handler(state); }
+	void scu_syndet_trampoline_cb(int state) { m_syndet_handler(state); }
 
 	// TCU
 	uint8_t tmu_tst0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
@@ -173,9 +173,9 @@ public:
 	template<class _Object> static devcb_base &set_out0_handler(device_t &device, _Object object) { return downcast<v53_base_device &>(device).m_out0_handler.set_callback(object); }
 	template<class _Object> static devcb_base &set_out1_handler(device_t &device, _Object object) { return downcast<v53_base_device &>(device).m_out1_handler.set_callback(object); }
 	template<class _Object> static devcb_base &set_out2_handler(device_t &device, _Object object) { return downcast<v53_base_device &>(device).m_out2_handler.set_callback(object); }
-	DECLARE_WRITE_LINE_MEMBER(tcu_out0_trampoline_cb){ m_out0_handler(state); }
-	DECLARE_WRITE_LINE_MEMBER(tcu_out1_trampoline_cb){ m_out1_handler(state); }
-	DECLARE_WRITE_LINE_MEMBER(tcu_out2_trampoline_cb){ m_out2_handler(state); }
+	void tcu_out0_trampoline_cb(int state){ m_out0_handler(state); }
+	void tcu_out1_trampoline_cb(int state){ m_out1_handler(state); }
+	void tcu_out2_trampoline_cb(int state){ m_out2_handler(state); }
 
 	// DMAU
 	template<class _Object> static devcb_base &set_out_hreq_callback(device_t &device, _Object object) { return downcast<v53_base_device &>(device).m_out_hreq_cb.set_callback(object); }
@@ -194,8 +194,8 @@ public:
 	template<class _Object> static devcb_base &set_out_dack_1_callback(device_t &device, _Object object) { return downcast<v53_base_device &>(device).m_out_dack_1_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_dack_2_callback(device_t &device, _Object object) { return downcast<v53_base_device &>(device).m_out_dack_2_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_dack_3_callback(device_t &device, _Object object) { return downcast<v53_base_device &>(device).m_out_dack_3_cb.set_callback(object); }
-	DECLARE_WRITE_LINE_MEMBER(hreq_trampoline_cb) { m_out_hreq_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER(eop_trampoline_cb) { m_out_eop_cb(state); }
+	void hreq_trampoline_cb(int state) { m_out_hreq_cb(state); }
+	void eop_trampoline_cb(int state) { m_out_eop_cb(state); }
 	uint8_t dma_memr_trampoline_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return m_in_memr_cb(space, offset); }
 	void dma_memw_trampoline_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) {  m_out_memw_cb(space, offset, data); }
 	uint8_t dma_io_0_trampoline_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return m_in_ior_0_cb(space, offset); }
@@ -206,17 +206,17 @@ public:
 	void dma_io_1_trampoline_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { m_out_iow_1_cb(space, offset, data); }
 	void dma_io_2_trampoline_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { m_out_iow_2_cb(space, offset, data); }
 	void dma_io_3_trampoline_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { m_out_iow_3_cb(space, offset, data); }
-	DECLARE_WRITE_LINE_MEMBER(dma_dack0_trampoline_w) { m_out_dack_0_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER(dma_dack1_trampoline_w) { m_out_dack_1_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER(dma_dack2_trampoline_w) { m_out_dack_2_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER(dma_dack3_trampoline_w) { m_out_dack_3_cb(state); }
+	void dma_dack0_trampoline_w(int state) { m_out_dack_0_cb(state); }
+	void dma_dack1_trampoline_w(int state) { m_out_dack_1_cb(state); }
+	void dma_dack2_trampoline_w(int state) { m_out_dack_2_cb(state); }
+	void dma_dack3_trampoline_w(int state) { m_out_dack_3_cb(state); }
 
 
-	DECLARE_WRITE_LINE_MEMBER(dreq0_w);
-	DECLARE_WRITE_LINE_MEMBER(dreq1_w);
-	DECLARE_WRITE_LINE_MEMBER(dreq2_w);
-	DECLARE_WRITE_LINE_MEMBER(dreq3_w);
-	DECLARE_WRITE_LINE_MEMBER(hack_w);
+	void dreq0_w(int state);
+	void dreq1_w(int state);
+	void dreq2_w(int state);
+	void dreq3_w(int state);
+	void hack_w(int state);
 
 
 
@@ -237,7 +237,7 @@ public:
 
 
 	uint8_t get_pic_ack(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(internal_irq_w);
+	void internal_irq_w(int state);
 
 
 protected:

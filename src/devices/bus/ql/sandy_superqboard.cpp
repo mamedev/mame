@@ -82,7 +82,7 @@ FLOPPY_FORMATS_END
 //  centronics
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( sandy_superqboard_t::busy_w )
+void sandy_superqboard_t::busy_w(int state)
 {
 	if (state)
 	{

@@ -44,7 +44,7 @@ public:
 	void d16_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void d17_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER(sampler_sync);
+	void sampler_sync(int state);
 	uint8_t adc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void dac_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 

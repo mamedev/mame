@@ -125,7 +125,7 @@ public:
 	void port0a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void port0d_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	INTERRUPT_GEN_MEMBER(irq_vs);
+	void irq_vs(device_t &device);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	uint8_t *m_p_videoram;
 	const uint8_t *m_p_chargen;
@@ -224,7 +224,7 @@ uint8_t amust_state::port01_r(address_space &space, offs_t offset, uint8_t mem_m
 }
 
 // bodgy
-INTERRUPT_GEN_MEMBER( amust_state::irq_vs )
+void amust_state::irq_vs(device_t &device)
 {
 	m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, ASSERT_LINE, 0xff);
 }

@@ -10,7 +10,7 @@
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(cbasebal_state::get_bg_tile_info)
+void cbasebal_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t attr = m_scrollram[2 * tile_index + 1];
 	SET_TILE_INFO_MEMBER(1,
@@ -19,7 +19,7 @@ TILE_GET_INFO_MEMBER(cbasebal_state::get_bg_tile_info)
 			(attr & 0x08) ? TILE_FLIPX : 0);
 }
 
-TILE_GET_INFO_MEMBER(cbasebal_state::get_fg_tile_info)
+void cbasebal_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t attr = m_textram[tile_index + 0x800];
 	SET_TILE_INFO_MEMBER(0,

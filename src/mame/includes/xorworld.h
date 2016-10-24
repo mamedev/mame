@@ -31,11 +31,11 @@ public:
 	void eeprom_serial_clock_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void eeprom_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	void init_xorworld();
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(xorworld);
+	void palette_init_xorworld(palette_device &palette);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );

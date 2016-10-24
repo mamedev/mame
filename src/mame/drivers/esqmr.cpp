@@ -221,7 +221,7 @@ public:
 
 public:
 	void init_mr();
-	DECLARE_WRITE_LINE_MEMBER(esq5506_otto_irq);
+	void esq5506_otto_irq(int state);
 	uint16_t esq5506_read_adc(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 };
 
@@ -236,7 +236,7 @@ static ADDRESS_MAP_START( mr_map, AS_PROGRAM, 32, esqmr_state )
 //    AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("osram")
 ADDRESS_MAP_END
 
-WRITE_LINE_MEMBER(esqmr_state::esq5506_otto_irq)
+void esqmr_state::esq5506_otto_irq(int state)
 {
 }
 

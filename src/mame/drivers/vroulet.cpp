@@ -74,7 +74,7 @@ public:
 	void ppi8255_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void ppi8255_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	virtual void video_start() override;
 
@@ -117,7 +117,7 @@ void vroulet_state::colorram_w(address_space &space, offs_t offset, uint8_t data
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(vroulet_state::get_bg_tile_info)
+void vroulet_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_colorram[tile_index];
 	int code = m_videoram[tile_index] + ((attr & 0xc0) << 2);

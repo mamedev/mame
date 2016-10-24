@@ -43,8 +43,8 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(ikki);
+	void palette_init_ikki(palette_device &palette);
 	uint32_t screen_update_ikki(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(ikki_irq);
+	void ikki_irq(timer_device &timer, void *ptr, int32_t param);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 };

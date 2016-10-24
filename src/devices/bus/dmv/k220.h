@@ -31,9 +31,9 @@ public:
 
 	void porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(write_out0);
-	DECLARE_WRITE_LINE_MEMBER(write_out1);
-	DECLARE_WRITE_LINE_MEMBER(write_out2);
+	void write_out0(int state);
+	void write_out1(int state);
+	void write_out2(int state);
 
 protected:
 	// device-level overrides

@@ -67,8 +67,8 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(scanline_callback);
-	DECLARE_PALETTE_INIT(kcgd);
+	void scanline_callback(timer_device &timer, void *ptr, int32_t param);
+	void palette_init_kcgd(palette_device &palette);
 
 	enum
 	{
@@ -172,7 +172,7 @@ void kcgd_state::video_start()
 	m_500hz_timer->adjust(attotime::from_hz(500), 0, attotime::from_hz(500));
 }
 
-PALETTE_INIT_MEMBER(kcgd_state, kcgd)
+void kcgd_state::palette_init_kcgd(palette_device &palette)
 {
 	for (int i = 0; i < 16; i++)
 	{
@@ -299,7 +299,7 @@ void kcgd_state::draw_scanline(uint16_t *p, uint16_t offset)
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(kcgd_state::scanline_callback)
+void kcgd_state::scanline_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	uint16_t y = m_screen->vpos(), offset;
 

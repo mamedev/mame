@@ -7,14 +7,14 @@
 
 static const int gamecom_timer_limit[8] = { 2, 1024, 2048, 4096, 8192, 16384, 32768, 65536 };
 
-TIMER_CALLBACK_MEMBER(gamecom_state::gamecom_clock_timer_callback)
+void gamecom_state::gamecom_clock_timer_callback(void *ptr, int32_t param)
 {
 	uint8_t val = m_p_ram[SM8521_CLKT] + 1;
 	m_p_ram[SM8521_CLKT] = ( m_p_ram[SM8521_CLKT] & 0xC0 ) | (val & 0x3f);
 	m_maincpu->set_input_line(sm8500_cpu_device::CK_INT, ASSERT_LINE );
 }
 
-TIMER_CALLBACK_MEMBER(gamecom_state::gamecom_sound0_timer_callback)
+void gamecom_state::gamecom_sound0_timer_callback(void *ptr, int32_t param)
 {
 	if (m_sound0_cnt > 0x3f)
 	{
@@ -32,7 +32,7 @@ TIMER_CALLBACK_MEMBER(gamecom_state::gamecom_sound0_timer_callback)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(gamecom_state::gamecom_sound1_timer_callback)
+void gamecom_state::gamecom_sound1_timer_callback(void *ptr, int32_t param)
 {
 	if (m_sound1_cnt > 0x3f)
 	{

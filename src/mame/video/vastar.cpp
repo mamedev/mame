@@ -18,7 +18,7 @@
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(vastar_state::get_fg_tile_info)
+void vastar_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_fgvideoram[tile_index + 0x800] | (m_fgvideoram[tile_index + 0x400] << 8);
 	int color = m_fgvideoram[tile_index];
@@ -29,7 +29,7 @@ TILE_GET_INFO_MEMBER(vastar_state::get_fg_tile_info)
 			TILE_FLIPXY(fxy));
 }
 
-TILE_GET_INFO_MEMBER(vastar_state::get_bg1_tile_info)
+void vastar_state::get_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_bg1videoram[tile_index + 0x800] | (m_bg1videoram[tile_index] << 8);
 	int color = m_bg1videoram[tile_index + 0xc00];
@@ -40,7 +40,7 @@ TILE_GET_INFO_MEMBER(vastar_state::get_bg1_tile_info)
 			TILE_FLIPXY(fxy));
 }
 
-TILE_GET_INFO_MEMBER(vastar_state::get_bg2_tile_info)
+void vastar_state::get_bg2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_bg2videoram[tile_index + 0x800] | (m_bg2videoram[tile_index] << 8);
 	int color = m_bg2videoram[tile_index + 0xc00];

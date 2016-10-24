@@ -1407,7 +1407,7 @@ static void uPD71054_update_timer( running_machine &machine, device_t *cpu, int 
 /*------------------------------
     callback
 ------------------------------*/
-TIMER_CALLBACK_MEMBER(seta_state::uPD71054_timer_callback)
+void seta_state::uPD71054_timer_callback(void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(4, HOLD_LINE );
 	uPD71054_update_timer( machine(), nullptr, param );
@@ -1484,7 +1484,7 @@ void seta_state::timer_regs_w(address_space &space, offs_t offset, uint16_t data
 
 ***************************************************************************/
 
-WRITE_LINE_MEMBER(seta_state::utoukond_ym3438_interrupt)
+void seta_state::utoukond_ym3438_interrupt(int state)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, state);
 }
@@ -1503,7 +1503,7 @@ WRITE_LINE_MEMBER(seta_state::utoukond_ym3438_interrupt)
 
 */
 
-WRITE_LINE_MEMBER(seta_state::pit_out0)
+void seta_state::pit_out0(int state)
 {
 	if (state)
 		m_maincpu->set_input_line(4, HOLD_LINE);
@@ -2148,7 +2148,7 @@ uint16_t seta_state::keroppi_coin_r(address_space &space, offs_t offset, uint16_
 	return result;
 }
 
-TIMER_CALLBACK_MEMBER(seta_state::keroppi_prize_hop_callback)
+void seta_state::keroppi_prize_hop_callback(void *ptr, int32_t param)
 {
 	m_keroppi_prize_hop = 2;
 }
@@ -7646,7 +7646,7 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(seta_state::seta_interrupt_1_and_2)
+void seta_state::seta_interrupt_1_and_2(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -7657,7 +7657,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(seta_state::seta_interrupt_1_and_2)
 		m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(seta_state::seta_interrupt_2_and_4)
+void seta_state::seta_interrupt_2_and_4(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -7669,7 +7669,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(seta_state::seta_interrupt_2_and_4)
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(seta_state::seta_sub_interrupt)
+void seta_state::seta_sub_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -7685,7 +7685,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(seta_state::seta_sub_interrupt)
                                 Thundercade
 ***************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(seta_state::tndrcade_sub_interrupt)
+void seta_state::tndrcade_sub_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -7846,7 +7846,7 @@ MACHINE_CONFIG_END
     5 ints per frame
 */
 
-TIMER_DEVICE_CALLBACK_MEMBER(seta_state::calibr50_interrupt)
+void seta_state::calibr50_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -8354,7 +8354,7 @@ MACHINE_CONFIG_END
                                 Seta Roulette
 ***************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(seta_state::setaroul_interrupt)
+void seta_state::setaroul_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -8494,7 +8494,7 @@ MACHINE_CONFIG_END
                                 Gundhara
 ***************************************************************************/
 #if __uPD71054_TIMER
-INTERRUPT_GEN_MEMBER(seta_state::wrofaero_interrupt)
+void seta_state::wrofaero_interrupt(device_t &device)
 {
 	device.execute().set_input_line(2, HOLD_LINE );
 }
@@ -9480,7 +9480,7 @@ MACHINE_CONFIG_END
                                 Crazy Fight
 ***************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(seta_state::crazyfgt_interrupt)
+void seta_state::crazyfgt_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -9534,7 +9534,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 // Test mode shows a 16ms and 2ms counters, then there's vblank and presumably ACIA irqs ...
-TIMER_DEVICE_CALLBACK_MEMBER(seta_state::inttoote_interrupt)
+void seta_state::inttoote_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

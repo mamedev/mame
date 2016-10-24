@@ -4,13 +4,13 @@
 
 const device_type SEGA_837_13551 = &device_creator<sega_837_13551>;
 
-WRITE_LINE_MEMBER(sega_837_13551::jvs13551_coin_1_w)
+void sega_837_13551::jvs13551_coin_1_w(int state)
 {
 	if(state)
 		inc_coin(0);
 }
 
-WRITE_LINE_MEMBER(sega_837_13551::jvs13551_coin_2_w)
+void sega_837_13551::jvs13551_coin_2_w(int state)
 {
 	if(state)
 		inc_coin(1);

@@ -67,8 +67,8 @@ public:
 	void machine_reset_cabalbl();
 	virtual void video_start() override;
 
-	TILE_GET_INFO_MEMBER(get_back_tile_info);
-	TILE_GET_INFO_MEMBER(get_text_tile_info);
+	void get_back_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_text_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);

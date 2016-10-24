@@ -251,7 +251,7 @@ void a2bus_pic_device::write_c0nx(address_space &space, uint8_t offset, uint8_t 
 	}
 }
 
-WRITE_LINE_MEMBER( a2bus_pic_device::ack_w )
+void a2bus_pic_device::ack_w(int state)
 {
 	if (m_started)
 	{

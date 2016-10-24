@@ -112,7 +112,7 @@ void arkanoid_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	}
 }
 
-TIMER_CALLBACK_MEMBER(arkanoid_state::timer_68705_increment)
+void arkanoid_state::timer_68705_increment(void *ptr, int32_t param)
 {
 	m_tdr++;
 	if (m_tdr == 0x00) m_tcr |= 0x80; // if we overflowed, set the int bit

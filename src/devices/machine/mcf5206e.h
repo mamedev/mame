@@ -190,7 +190,7 @@ private:
 	uint16_t m_TRR1;
 	uint8_t m_TER1;
 	uint16_t m_TCN1;
-	TIMER_CALLBACK_MEMBER(timer1_callback);
+	void timer1_callback(void *ptr, int32_t param);
 
 
 	uint8_t m_PPDDR;

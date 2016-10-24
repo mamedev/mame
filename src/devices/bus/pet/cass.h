@@ -64,13 +64,13 @@ public:
 	template<class _Object> static devcb_base &set_read_handler(device_t &device, _Object object) { return downcast<pet_datassette_port_device &>(device).m_read_handler.set_callback(object); }
 
 	// computer interface
-	DECLARE_READ_LINE_MEMBER( read );
-	DECLARE_WRITE_LINE_MEMBER( write );
-	DECLARE_READ_LINE_MEMBER( sense_r );
-	DECLARE_WRITE_LINE_MEMBER( motor_w );
+	int read();
+	void write(int state);
+	int sense_r();
+	void motor_w(int state);
 
 	// device interface
-	DECLARE_WRITE_LINE_MEMBER( read_w );
+	void read_w(int state);
 
 protected:
 	// device-level overrides

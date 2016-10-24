@@ -200,13 +200,13 @@ static const rgb_t amstrad_green_palette[32] =
 *******************************************************************/
 
 /* Initialise the palette */
-PALETTE_INIT_MEMBER(amstrad_state,amstrad_cpc)
+void amstrad_state::palette_init_amstrad_cpc(palette_device &palette)
 {
 	palette.set_pen_colors(0, amstrad_palette, ARRAY_LENGTH(amstrad_palette));
 }
 
 
-PALETTE_INIT_MEMBER(amstrad_state,amstrad_cpc_green)
+void amstrad_state::palette_init_amstrad_cpc_green(palette_device &palette)
 {
 	palette.set_pen_colors(0, amstrad_green_palette, ARRAY_LENGTH(amstrad_green_palette));
 }
@@ -214,7 +214,7 @@ PALETTE_INIT_MEMBER(amstrad_state,amstrad_cpc_green)
 
 /* Some games set the 8255 to mode 1 and expect a strobe signal */
 /* on PC2. Apparently PC2 is always low on the CPC. ?!? */
-TIMER_CALLBACK_MEMBER(amstrad_state::amstrad_pc2_low)
+void amstrad_state::amstrad_pc2_low(void *ptr, int32_t param)
 {
 	m_ppi->pc2_w(0);
 }
@@ -288,7 +288,7 @@ unsigned char amstrad_state::kccomp_get_colour_element(int colour_value)
 /* the colour rom has the same 32 bytes repeated, but it might be possible to put a new rom in
 with different data and be able to select the other entries - not tested on a real kc compact yet
 and not supported by this driver */
-PALETTE_INIT_MEMBER(amstrad_state,kccomp)
+void amstrad_state::palette_init_kccomp(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -311,7 +311,7 @@ Amstrad Plus
 The Amstrad Plus has a 4096 colour palette
 *********************************************/
 
-PALETTE_INIT_MEMBER(amstrad_state,amstrad_plus)
+void amstrad_state::palette_init_amstrad_plus(palette_device &palette)
 {
 	int i;
 
@@ -333,7 +333,7 @@ PALETTE_INIT_MEMBER(amstrad_state,amstrad_plus)
 }
 
 
-PALETTE_INIT_MEMBER(amstrad_state,aleste)
+void amstrad_state::palette_init_aleste(palette_device &palette)
 {
 	int i;
 
@@ -586,7 +586,7 @@ void amstrad_state::amstrad_plus_handle_dma()
 	}
 }
 
-TIMER_CALLBACK_MEMBER(amstrad_state::amstrad_video_update_timer)
+void amstrad_state::amstrad_video_update_timer(void *ptr, int32_t param)
 {
 	if(param == 1)
 	{
@@ -855,7 +855,7 @@ void amstrad_state::amstrad_plus_update_video_sprites()
 }
 
 
-WRITE_LINE_MEMBER(amstrad_state::amstrad_hsync_changed)
+void amstrad_state::amstrad_hsync_changed(int state)
 {
 	amstrad_update_video();
 
@@ -899,7 +899,7 @@ WRITE_LINE_MEMBER(amstrad_state::amstrad_hsync_changed)
 }
 
 
-WRITE_LINE_MEMBER(amstrad_state::amstrad_plus_hsync_changed)
+void amstrad_state::amstrad_plus_hsync_changed(int state)
 {
 	amstrad_plus_update_video();
 
@@ -974,7 +974,7 @@ WRITE_LINE_MEMBER(amstrad_state::amstrad_plus_hsync_changed)
 }
 
 
-WRITE_LINE_MEMBER(amstrad_state::amstrad_vsync_changed)
+void amstrad_state::amstrad_vsync_changed(int state)
 {
 	amstrad_update_video();
 
@@ -995,7 +995,7 @@ WRITE_LINE_MEMBER(amstrad_state::amstrad_vsync_changed)
 }
 
 
-WRITE_LINE_MEMBER(amstrad_state::amstrad_plus_vsync_changed)
+void amstrad_state::amstrad_plus_vsync_changed(int state)
 {
 	amstrad_plus_update_video();
 
@@ -1016,7 +1016,7 @@ WRITE_LINE_MEMBER(amstrad_state::amstrad_plus_vsync_changed)
 }
 
 
-WRITE_LINE_MEMBER(amstrad_state::amstrad_de_changed)
+void amstrad_state::amstrad_de_changed(int state)
 {
 	amstrad_update_video();
 
@@ -1039,7 +1039,7 @@ WRITE_LINE_MEMBER(amstrad_state::amstrad_de_changed)
 }
 
 
-WRITE_LINE_MEMBER(amstrad_state::amstrad_plus_de_changed)
+void amstrad_state::amstrad_plus_de_changed(int state)
 {
 	amstrad_plus_update_video();
 
@@ -1131,7 +1131,7 @@ static device_t* get_expansion_device(running_machine &machine, const char* tag)
 	return nullptr;
 }
 
-WRITE_LINE_MEMBER(amstrad_state::cpc_romdis)
+void amstrad_state::cpc_romdis(int state)
 {
 	m_gate_array.romdis = state;
 	amstrad_rethinkMemory();
@@ -2600,7 +2600,7 @@ Note:
   On the CPC this can be used by a expansion device to report it's presence. "1" = device connected, "0" = device not connected. This is not always used by all expansion devices.
 */
 
-WRITE_LINE_MEMBER(amstrad_state::write_centronics_busy)
+void amstrad_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 }
@@ -2745,7 +2745,7 @@ uint8_t amstrad_state::amstrad_psg_porta_read(address_space &space, offs_t offse
 /* called when cpu acknowledges int */
 /* reset top bit of interrupt line counter */
 /* this ensures that the next interrupt is no closer than 32 lines */
-IRQ_CALLBACK_MEMBER(amstrad_state::amstrad_cpu_acknowledge_int)
+int amstrad_state::amstrad_cpu_acknowledge_int(device_t &device, int irqline)
 {
 	// DMA interrupts can be automatically cleared if bit 0 of &6805 is set to 0
 	if( m_asic.enabled && m_plus_irq_cause != 0x06 && m_asic.dma_clear & 0x01)
@@ -3081,7 +3081,7 @@ void amstrad_state::amstrad_common_init()
 	/* Juergen is a cool dude! */
 }
 
-TIMER_CALLBACK_MEMBER(amstrad_state::cb_set_resolution)
+void amstrad_state::cb_set_resolution(void *ptr, int32_t param)
 {
 	rectangle visarea;
 	attoseconds_t refresh;

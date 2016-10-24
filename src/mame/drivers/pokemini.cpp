@@ -69,7 +69,7 @@ public:
 	virtual void machine_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_PALETTE_INIT(pokemini);
+	void palette_init_pokemini(palette_device &palette);
 	void hwreg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t hwreg_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t rom_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
@@ -140,7 +140,7 @@ static INPUT_PORTS_START( pokemini )
 INPUT_PORTS_END
 
 
-PALETTE_INIT_MEMBER(pokemini_state, pokemini)
+void pokemini_state::palette_init_pokemini(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(0xff, 0xfb, 0x87));
 	palette.set_pen_color(1, rgb_t(0xb1, 0xae, 0x4e));

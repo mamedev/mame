@@ -1676,7 +1676,7 @@ void gba_lcd_device::gba_oam_w(address_space &space, offs_t offset, uint32_t dat
 	m_oam[offset] = combine_data_32_16(m_oam[offset], data, mem_mask);
 }
 
-TIMER_CALLBACK_MEMBER(gba_lcd_device::perform_hbl)
+void gba_lcd_device::perform_hbl(void *ptr, int32_t param)
 {
 	int scanline = machine().first_screen()->vpos();
 
@@ -1709,7 +1709,7 @@ TIMER_CALLBACK_MEMBER(gba_lcd_device::perform_hbl)
 	m_hbl_timer->adjust(attotime::never);
 }
 
-TIMER_CALLBACK_MEMBER(gba_lcd_device::perform_scan)
+void gba_lcd_device::perform_scan(void *ptr, int32_t param)
 {
 	clear(dispstat::hblank);
 	clear(dispstat::vcount);
@@ -1755,7 +1755,7 @@ TIMER_CALLBACK_MEMBER(gba_lcd_device::perform_scan)
 	m_scan_timer->adjust(machine().first_screen()->time_until_pos((scanline + 1) % 228, 0));
 }
 
-PALETTE_INIT_MEMBER(gba_lcd_device, gba)
+void gba_lcd_device::palette_init_gba(palette_device &palette)
 {
 	for (uint8_t b = 0; b < 32; b++)
 	{

@@ -19,7 +19,7 @@
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(gauntlet_state::get_alpha_tile_info)
+void gauntlet_state::get_alpha_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t data = tilemap.basemem_read(tile_index);
 	int code = data & 0x3ff;
@@ -29,7 +29,7 @@ TILE_GET_INFO_MEMBER(gauntlet_state::get_alpha_tile_info)
 }
 
 
-TILE_GET_INFO_MEMBER(gauntlet_state::get_playfield_tile_info)
+void gauntlet_state::get_playfield_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t data = tilemap.basemem_read(tile_index);
 	int code = ((m_playfield_tile_bank * 0x1000) + (data & 0xfff)) ^ 0x800;

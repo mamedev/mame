@@ -34,7 +34,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(brkthru_state, brkthru)
+void brkthru_state::palette_init_brkthru(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -73,7 +73,7 @@ PALETTE_INIT_MEMBER(brkthru_state, brkthru)
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(brkthru_state::get_bg_tile_info)
+void brkthru_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	/* BG RAM format
 	    0         1
@@ -95,7 +95,7 @@ void brkthru_state::brkthru_bgram_w(address_space &space, offs_t offset, uint8_t
 }
 
 
-TILE_GET_INFO_MEMBER(brkthru_state::get_fg_tile_info)
+void brkthru_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t code = m_fg_videoram[tile_index];
 	SET_TILE_INFO_MEMBER(0, code, 0, 0);

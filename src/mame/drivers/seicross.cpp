@@ -378,7 +378,7 @@ static GFXDECODE_START( seicross )
 GFXDECODE_END
 
 
-INTERRUPT_GEN_MEMBER(seicross_state::vblank_irq)
+void seicross_state::vblank_irq(device_t &device)
 {
 	if(m_irq_mask)
 		device.execute().set_input_line(0, HOLD_LINE);

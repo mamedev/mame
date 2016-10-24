@@ -48,12 +48,12 @@ public:
 	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	WRITE_LINE_MEMBER( home_w ); /* home position signal */
-	WRITE_LINE_MEMBER( fire_w ); /* printhead solenoids trigger */
-	WRITE_LINE_MEMBER( strobe_w );
-	READ_LINE_MEMBER( busy_r );
-	WRITE_LINE_MEMBER( resi_w ); /* reset input */
-	WRITE_LINE_MEMBER( init_w ); /* centronics init */
+	void home_w(int state); /* home position signal */
+	void fire_w(int state); /* printhead solenoids trigger */
+	void strobe_w(int state);
+	int busy_r();
+	void resi_w(int state); /* reset input */
+	void init_w(int state); /* centronics init */
 
 protected:
 	// device-level overrides

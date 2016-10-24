@@ -132,17 +132,17 @@
 /*****************************************************************************
  USART 8251 and Terminal stuff
 *****************************************************************************/
-WRITE_LINE_MEMBER(tsispch_state::i8251_rxrdy_int)
+void tsispch_state::i8251_rxrdy_int(int state)
 {
 	m_pic->ir1_w(state);
 }
 
-WRITE_LINE_MEMBER(tsispch_state::i8251_txempty_int)
+void tsispch_state::i8251_txempty_int(int state)
 {
 	m_pic->ir2_w(state);
 }
 
-WRITE_LINE_MEMBER(tsispch_state::i8251_txrdy_int)
+void tsispch_state::i8251_txrdy_int(int state)
 {
 	m_pic->ir3_w(state);
 }
@@ -228,13 +228,13 @@ void tsispch_state::dsp_status_w(address_space &space, offs_t offset, uint16_t d
 	upd7725->snesdsp_write(false, data);
 }
 
-WRITE_LINE_MEMBER( tsispch_state::dsp_to_8086_p0_w )
+void tsispch_state::dsp_to_8086_p0_w(int state)
 {
 	fprintf(stderr, "upd772x changed p0 state to %d!\n",state);
 	//TODO: do stuff here!
 }
 
-WRITE_LINE_MEMBER( tsispch_state::dsp_to_8086_p1_w )
+void tsispch_state::dsp_to_8086_p1_w(int state)
 {
 	fprintf(stderr, "upd772x changed p1 state to %d!\n",state);
 	//TODO: do stuff here!

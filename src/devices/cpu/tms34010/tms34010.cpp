@@ -691,7 +691,7 @@ void tms340x0_device::execute_set_input(int inputnum, int state)
     Generate internal interrupt
 ***************************************************************************/
 
-TIMER_CALLBACK_MEMBER( tms340x0_device::internal_interrupt_callback )
+void tms340x0_device::internal_interrupt_callback(void *ptr, int32_t param)
 {
 	int type = param;
 
@@ -833,7 +833,7 @@ void tms340x0_device::set_raster_op()
     VIDEO TIMING HELPERS
 ***************************************************************************/
 
-TIMER_CALLBACK_MEMBER( tms340x0_device::scanline_callback )
+void tms340x0_device::scanline_callback(void *ptr, int32_t param)
 {
 	int vsblnk, veblnk, vtotal;
 	int vcount = param;

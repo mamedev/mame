@@ -116,7 +116,7 @@ void micro3d_state::micro3d_xfer3dk_w(address_space &space, offs_t offset, uint1
 	m_xfer3dk = data;
 }
 
-WRITE_LINE_MEMBER(micro3d_state::tms_interrupt)
+void micro3d_state::tms_interrupt(int state)
 {
 //  mc68901_int_gen(device->machine(), GPIP4);
 }
@@ -730,7 +730,7 @@ uint32_t micro3d_state::micro3d_pipe_r(address_space &space, offs_t offset, uint
 	return m_pipe_data;
 }
 
-INTERRUPT_GEN_MEMBER(micro3d_state::micro3d_vblank)
+void micro3d_state::micro3d_vblank(device_t &device)
 {
 //  mc68901_int_gen(machine(), GPIP7);
 

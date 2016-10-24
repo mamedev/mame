@@ -125,7 +125,7 @@ void lucky74_state::lucky74_bg_colorram_w(address_space &space, offs_t offset, u
 }
 
 
-PALETTE_INIT_MEMBER(lucky74_state, lucky74)
+void lucky74_state::palette_init_lucky74(palette_device &palette)
 /*
    There are 2 states (see the technical notes).
    We're constructing a double-sized palette with one half for each state.
@@ -198,7 +198,7 @@ PALETTE_INIT_MEMBER(lucky74_state, lucky74)
 }
 
 
-TILE_GET_INFO_MEMBER(lucky74_state::get_fg_tile_info)
+void lucky74_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 /*  - bits -
     7654 3210
@@ -213,7 +213,7 @@ TILE_GET_INFO_MEMBER(lucky74_state::get_fg_tile_info)
 	SET_TILE_INFO_MEMBER(bank, code, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(lucky74_state::get_bg_tile_info)
+void lucky74_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 /*  - bits -
     7654 3210

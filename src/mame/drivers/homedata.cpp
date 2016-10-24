@@ -241,13 +241,13 @@ Custom: GX61A01
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
 
-INTERRUPT_GEN_MEMBER(homedata_state::homedata_irq)
+void homedata_state::homedata_irq(device_t &device)
 {
 	m_vblank = 1;
 	device.execute().set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(homedata_state::upd7807_irq)
+void homedata_state::upd7807_irq(device_t &device)
 {
 	generic_pulse_irq_line(device.execute(), UPD7810_INTF1, 1);
 }

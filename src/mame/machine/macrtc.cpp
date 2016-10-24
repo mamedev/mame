@@ -122,7 +122,7 @@ void rtc3430042_device::rtc_clock_updated(int year, int month, int day, int day_
 }
 
 /* write the rTCEnb state */
-WRITE_LINE_MEMBER( rtc3430042_device::ce_w )
+void rtc3430042_device::ce_w(int state)
 {
 	if (state && (! m_rtc_rTCEnb))
 	{
@@ -144,7 +144,7 @@ WRITE_LINE_MEMBER( rtc3430042_device::ce_w )
 	m_rtc_rTCEnb = state;
 }
 
-WRITE_LINE_MEMBER( rtc3430042_device::clk_w )
+void rtc3430042_device::clk_w(int state)
 {
 	if ((!state) && (m_rtc_rTCClk))
 	{
@@ -154,12 +154,12 @@ WRITE_LINE_MEMBER( rtc3430042_device::clk_w )
 	m_rtc_rTCClk = state;
 }
 
-READ_LINE_MEMBER( rtc3430042_device::data_r )
+int rtc3430042_device::data_r()
 {
 	return m_rtc_data_out;
 }
 
-WRITE_LINE_MEMBER( rtc3430042_device::data_w )
+void rtc3430042_device::data_w(int state)
 {
 	m_data_latch = state;
 }

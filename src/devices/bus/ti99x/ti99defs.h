@@ -169,7 +169,7 @@ public:
 		return downcast<evpc_clock_connector &>(device).m_vdpint.set_callback(object);
 	}
 
-	WRITE_LINE_MEMBER( vclock_line ) { m_vdpint(state); }
+	void vclock_line(int state) { m_vdpint(state); }
 	void device_start() override { m_vdpint.resolve();  }
 
 private:

@@ -350,7 +350,7 @@ void crbaloon_state::machine_reset()
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(crbaloon_state::vblank_irq)
+void crbaloon_state::vblank_irq(device_t &device)
 {
 	if(m_irq_mask)
 		device.execute().set_input_line(0, HOLD_LINE);

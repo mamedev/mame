@@ -49,8 +49,8 @@ public:
 
 	uint8_t sam_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( horizontal_sync );
-	DECLARE_WRITE_LINE_MEMBER( field_sync );
+	void horizontal_sync(int state);
+	void field_sync(int state);
 protected:
 	virtual void device_start() override;
 	virtual void update_cart_base(uint8_t *cart_base) override;

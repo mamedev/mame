@@ -81,8 +81,8 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	TIMER_CALLBACK_MEMBER(irq_callback);
-	TIMER_CALLBACK_MEMBER(nmi_callback);
+	void irq_callback(void *ptr, int32_t param);
+	void nmi_callback(void *ptr, int32_t param);
 	void vpos_to_vsync_chain_counter(int vpos, uint8_t *counter, uint8_t *v256);
 	int vsync_chain_counter_to_vpos(uint8_t counter, uint8_t v256);
 	void create_irq_timer();
@@ -210,7 +210,7 @@ void berzerk_state::irq_enable_w(address_space &space, offs_t offset, uint8_t da
 }
 
 
-TIMER_CALLBACK_MEMBER(berzerk_state::irq_callback)
+void berzerk_state::irq_callback(void *ptr, int32_t param)
 {
 	int irq_number = param;
 	uint8_t next_counter;
@@ -287,7 +287,7 @@ uint8_t berzerk_state::nmi_disable_r(address_space &space, offs_t offset, uint8_
 }
 
 
-TIMER_CALLBACK_MEMBER(berzerk_state::nmi_callback)
+void berzerk_state::nmi_callback(void *ptr, int32_t param)
 {
 	int nmi_number = param;
 	uint8_t next_counter;

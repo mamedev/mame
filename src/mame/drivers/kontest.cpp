@@ -57,8 +57,8 @@ protected:
 
 	virtual void video_start() override;
 public:
-	DECLARE_PALETTE_INIT(kontest);
-	INTERRUPT_GEN_MEMBER(kontest_interrupt);
+	void palette_init_kontest(palette_device &palette);
+	void kontest_interrupt(device_t &device);
 };
 
 
@@ -68,7 +68,7 @@ public:
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(kontest_state, kontest)
+void kontest_state::palette_init_kontest(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int bit0, bit1, bit2 , r, g, b;
@@ -228,7 +228,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-INTERRUPT_GEN_MEMBER(kontest_state::kontest_interrupt)
+void kontest_state::kontest_interrupt(device_t &device)
 {
 	if (m_control & 8)
 		device.execute().set_input_line(0, ASSERT_LINE);

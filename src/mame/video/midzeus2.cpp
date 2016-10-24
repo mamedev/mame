@@ -266,7 +266,7 @@ static inline uint8_t get_texel_4bit(const void *base, int y, int x, int width)
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(midzeus2_state::int_timer_callback)
+void midzeus2_state::int_timer_callback(void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(2, ASSERT_LINE);
 }

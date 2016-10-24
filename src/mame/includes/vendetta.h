@@ -69,7 +69,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	INTERRUPT_GEN_MEMBER(irq);
+	void irq(device_t &device);
 
 	K052109_CB_MEMBER(vendetta_tile_callback);
 	K052109_CB_MEMBER(esckids_tile_callback);

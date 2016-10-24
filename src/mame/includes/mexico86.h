@@ -71,8 +71,8 @@ public:
 	virtual void machine_reset() override;
 	uint32_t screen_update_mexico86(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_kikikai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(kikikai_interrupt);
-	INTERRUPT_GEN_MEMBER(mexico86_m68705_interrupt);
+	void kikikai_interrupt(device_t &device);
+	void mexico86_m68705_interrupt(device_t &device);
 	void mcu_simulate(  );
 	bool mcu_coin_counter_w(bool condition);
 };

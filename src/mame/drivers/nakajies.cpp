@@ -335,9 +335,9 @@ public:
 	/* Banking */
 	uint8_t   m_bank[8];
 	uint8_t   *m_bank_base[8];
-	DECLARE_PALETTE_INIT(nakajies);
+	void palette_init_nakajies(palette_device &palette);
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_irq);
-	TIMER_DEVICE_CALLBACK_MEMBER(kb_timer);
+	void kb_timer(timer_device &timer, void *ptr, int32_t param);
 };
 
 
@@ -678,7 +678,7 @@ uint32_t nakajies_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(nakajies_state::kb_timer)
+void nakajies_state::kb_timer(timer_device &timer, void *ptr, int32_t param)
 {
 	if (m_matrix > 0x09)
 	{
@@ -697,7 +697,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(nakajies_state::kb_timer)
 }
 
 
-PALETTE_INIT_MEMBER(nakajies_state, nakajies)
+void nakajies_state::palette_init_nakajies(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));

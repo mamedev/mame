@@ -123,7 +123,7 @@ public:
 	void v1_fb_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask = U64(0xffffffffffffffff));
 	void crtc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void vcombat_dac_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	DECLARE_WRITE_LINE_MEMBER(sound_update);
+	void sound_update(int state);
 	void init_shadfgtr();
 	void init_vcombat();
 	void machine_reset_vcombat();
@@ -535,7 +535,7 @@ static INPUT_PORTS_START( shadfgtr )
 INPUT_PORTS_END
 
 
-WRITE_LINE_MEMBER(vcombat_state::sound_update)
+void vcombat_state::sound_update(int state)
 {
 	/* Seems reasonable */
 	m_soundcpu->set_input_line(M68K_IRQ_1, state ? ASSERT_LINE : CLEAR_LINE);

@@ -22,7 +22,7 @@ TO DO:
 */
 
 
-TIMER_CALLBACK_MEMBER(msisaac_state::nmi_callback)
+void msisaac_state::nmi_callback(void *ptr, int32_t param)
 {
 	if (m_sound_nmi_enable)
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);

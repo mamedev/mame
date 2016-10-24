@@ -46,11 +46,11 @@ public:
 	void port2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// serial output from main cpu
-	DECLARE_WRITE_LINE_MEMBER( hd6303_tx_w );
+	void hd6303_tx_w(int state);
 
 	// from sio output
-	DECLARE_WRITE_LINE_MEMBER( rxc_w );
-	DECLARE_WRITE_LINE_MEMBER( pinc_w );
+	void rxc_w(int state);
+	void pinc_w(int state);
 
 protected:
 	// device-level overrides

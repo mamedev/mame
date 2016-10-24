@@ -155,25 +155,25 @@ uint8_t e05a03_device::read(address_space &space, offs_t offset, uint8_t mem_mas
 }
 
 /* home position signal */
-WRITE_LINE_MEMBER( e05a03_device::home_w )
+void e05a03_device::home_w(int state)
 {
 }
 
 /* printhead solenoids trigger */
-WRITE_LINE_MEMBER( e05a03_device::fire_w )
+void e05a03_device::fire_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER( e05a03_device::strobe_w )
+void e05a03_device::strobe_w(int state)
 {
 }
 
-READ_LINE_MEMBER( e05a03_device::busy_r )
+int e05a03_device::busy_r()
 {
 	return 1;
 }
 
-WRITE_LINE_MEMBER( e05a03_device::resi_w )
+void e05a03_device::resi_w(int state)
 {
 	if (!state)
 	{
@@ -182,7 +182,7 @@ WRITE_LINE_MEMBER( e05a03_device::resi_w )
 	}
 }
 
-WRITE_LINE_MEMBER( e05a03_device::init_w )
+void e05a03_device::init_w(int state)
 {
 	resi_w(state);
 }

@@ -40,12 +40,12 @@
 
 ***************************************************************************/
 
-TILEMAP_MAPPER_MEMBER(thedeep_state::tilemap_scan_rows_back)
+tilemap_memory_index thedeep_state::tilemap_scan_rows_back(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	return (col & 0x0f) + ((col & 0x10) << 5) + (row << 4);
 }
 
-TILE_GET_INFO_MEMBER(thedeep_state::get_tile_info_0)
+void thedeep_state::get_tile_info_0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t code  =   m_vram_0[ tile_index * 2 + 0 ];
 	uint8_t color =   m_vram_0[ tile_index * 2 + 1 ];
@@ -55,7 +55,7 @@ TILE_GET_INFO_MEMBER(thedeep_state::get_tile_info_0)
 			TILE_FLIPX  );  // why?
 }
 
-TILE_GET_INFO_MEMBER(thedeep_state::get_tile_info_1)
+void thedeep_state::get_tile_info_1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t code  =   m_vram_1[ tile_index * 2 + 0 ];
 	uint8_t color =   m_vram_1[ tile_index * 2 + 1 ];
@@ -84,7 +84,7 @@ void thedeep_state::vram_1_w(address_space &space, offs_t offset, uint8_t data, 
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(thedeep_state, thedeep)
+void thedeep_state::palette_init_thedeep(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;

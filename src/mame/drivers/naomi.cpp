@@ -1956,12 +1956,12 @@ ADDRESS_MAP_END
 /*
  * Aica
  */
-WRITE_LINE_MEMBER(naomi_state::aica_irq)
+void naomi_state::aica_irq(int state)
 {
 	m_soundcpu->set_input_line(ARM7_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(naomi_state::sh4_aica_irq)
+void naomi_state::sh4_aica_irq(int state)
 {
 	if(state)
 		dc_sysctrl_regs[SB_ISTEXT] |= IST_EXT_AICA;

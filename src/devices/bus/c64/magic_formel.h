@@ -39,7 +39,7 @@ public:
 	// not really public
 	void pia_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void pia_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( pia_cb2_w );
+	void pia_cb2_w(int state);
 
 protected:
 	// device-level overrides

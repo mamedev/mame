@@ -303,7 +303,7 @@ GFXDECODE_END
                  MACHINE DRIVERS
 ***********************************************************/
 
-INTERRUPT_GEN_MEMBER(groundfx_state::groundfx_interrupt)
+void groundfx_state::groundfx_interrupt(device_t &device)
 {
 	m_frame_counter^=1;
 	device.execute().set_input_line(4, HOLD_LINE);

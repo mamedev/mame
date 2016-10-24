@@ -176,8 +176,8 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_pv1000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(d65010_irq_on_cb);
-	TIMER_CALLBACK_MEMBER(d65010_irq_off_cb);
+	void d65010_irq_on_cb(void *ptr, int32_t param);
+	void d65010_irq_off_cb(void *ptr, int32_t param);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( pv1000_cart );
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
@@ -352,7 +352,7 @@ uint32_t pv1000_state::screen_update_pv1000(screen_device &screen, bitmap_ind16 
 
 /* Interrupt is triggering 16 times during vblank. */
 /* we have chosen to trigger on scanlines 195, 199, 203, 207, 211, 215, 219, 223, 227, 231, 235, 239, 243, 247, 251, 255 */
-TIMER_CALLBACK_MEMBER(pv1000_state::d65010_irq_on_cb)
+void pv1000_state::d65010_irq_on_cb(void *ptr, int32_t param)
 {
 	int vpos = m_screen->vpos();
 	int next_vpos = vpos + 4;
@@ -373,7 +373,7 @@ TIMER_CALLBACK_MEMBER(pv1000_state::d65010_irq_on_cb)
 }
 
 
-TIMER_CALLBACK_MEMBER(pv1000_state::d65010_irq_off_cb)
+void pv1000_state::d65010_irq_off_cb(void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE );
 }

@@ -120,7 +120,7 @@ public:
 	uint8_t tec1_convert_col_to_bin( uint8_t col, uint8_t row );
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
-	TIMER_CALLBACK_MEMBER(tec1_kbd_callback);
+	void tec1_kbd_callback(void *ptr, int32_t param);
 };
 
 
@@ -222,7 +222,7 @@ uint8_t tec1_state::tec1_convert_col_to_bin( uint8_t col, uint8_t row )
 	return data;
 }
 
-TIMER_CALLBACK_MEMBER(tec1_state::tec1_kbd_callback)
+void tec1_state::tec1_kbd_callback(void *ptr, int32_t param)
 {
 	uint8_t i;
 

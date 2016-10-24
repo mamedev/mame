@@ -76,7 +76,7 @@ void k037122_device::device_reset()
     DEVICE HANDLERS
 *****************************************************************************/
 
-TILE_GET_INFO_MEMBER(k037122_device::tile_info_layer0)
+void k037122_device::tile_info_layer0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint32_t val = m_tile_ram[tile_index + (0x8000/4)];
 	int color = (val >> 17) & 0x1f;
@@ -91,7 +91,7 @@ TILE_GET_INFO_MEMBER(k037122_device::tile_info_layer0)
 	SET_TILE_INFO_MEMBER(m_gfx_index, tile, color, flags);
 }
 
-TILE_GET_INFO_MEMBER(k037122_device::tile_info_layer1)
+void k037122_device::tile_info_layer1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint32_t val = m_tile_ram[tile_index];
 	int color = (val >> 17) & 0x1f;

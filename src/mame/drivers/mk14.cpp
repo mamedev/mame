@@ -56,8 +56,8 @@ public:
 	uint8_t keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void display_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(cass_w);
-	DECLARE_READ_LINE_MEMBER(cass_r);
+	void cass_w(int state);
+	int cass_r();
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -170,13 +170,13 @@ void mk14_state::port_a_w(address_space &space, offs_t offset, uint8_t data, uin
 {
 }
 
-WRITE_LINE_MEMBER( mk14_state::cass_w )
+void mk14_state::cass_w(int state)
 {
 	m_cass->output(state ? -1.0 : +1.0);
 	m_dac->write(state);
 }
 
-READ_LINE_MEMBER( mk14_state::cass_r )
+int mk14_state::cass_r()
 {
 	return (m_cass->input() > 0.03) ? 1 : 0;
 }

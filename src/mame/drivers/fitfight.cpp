@@ -259,7 +259,7 @@ static ADDRESS_MAP_START( snd_io, AS_IO, 8, fitfight_state )
 		AM_RANGE(UPD7810_PORTC, UPD7810_PORTC) AM_READ(snd_portc_r) AM_WRITE(snd_portc_w)
 ADDRESS_MAP_END
 
-INTERRUPT_GEN_MEMBER(fitfight_state::snd_irq)
+void fitfight_state::snd_irq(device_t &device)
 {
 	generic_pulse_irq_line(device.execute(), UPD7810_INTF2, 1);
 }

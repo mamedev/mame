@@ -78,18 +78,18 @@ public:
 	void pitcher_horz_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void misc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	TILEMAP_MAPPER_MEMBER(get_memory_offset);
-	TILE_GET_INFO_MEMBER(get_tile_info);
+	tilemap_memory_index get_memory_offset(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	void get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(flyball);
+	void palette_init_flyball(palette_device &palette);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	TIMER_CALLBACK_MEMBER(joystick_callback);
-	TIMER_CALLBACK_MEMBER(quarter_callback);
+	void joystick_callback(void *ptr, int32_t param);
+	void quarter_callback(void *ptr, int32_t param);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -102,7 +102,7 @@ protected:
  *
  *************************************/
 
-TILEMAP_MAPPER_MEMBER(flyball_state::get_memory_offset)
+tilemap_memory_index flyball_state::get_memory_offset(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	if (col == 0)
 		col = num_cols;
@@ -111,7 +111,7 @@ TILEMAP_MAPPER_MEMBER(flyball_state::get_memory_offset)
 }
 
 
-TILE_GET_INFO_MEMBER(flyball_state::get_tile_info)
+void flyball_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t data = m_playfield_ram[tile_index];
 	int flags = ((data & 0x40) ? TILE_FLIPX : 0) | ((data & 0x80) ? TILE_FLIPY : 0);
@@ -176,7 +176,7 @@ void flyball_state::device_timer(emu_timer &timer, device_timer_id id, int param
 }
 
 
-TIMER_CALLBACK_MEMBER(flyball_state::joystick_callback)
+void flyball_state::joystick_callback(void *ptr, int32_t param)
 {
 	int potsense = param;
 
@@ -191,7 +191,7 @@ TIMER_CALLBACK_MEMBER(flyball_state::joystick_callback)
 }
 
 
-TIMER_CALLBACK_MEMBER(flyball_state::quarter_callback)
+void flyball_state::quarter_callback(void *ptr, int32_t param)
 {
 	int scanline = param;
 	int potsense[64], i;
@@ -406,7 +406,7 @@ static GFXDECODE_START( flyball )
 GFXDECODE_END
 
 
-PALETTE_INIT_MEMBER(flyball_state, flyball)
+void flyball_state::palette_init_flyball(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(0x3F, 0x3F, 0x3F));  /* tiles, ball */
 	palette.set_pen_color(1, rgb_t(0xFF, 0xFF, 0xFF));

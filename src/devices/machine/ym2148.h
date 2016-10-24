@@ -45,7 +45,7 @@ public:
 	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER(write_rxd);
+	void write_rxd(int state);
 	uint8_t get_irq_vector();
 
 protected:

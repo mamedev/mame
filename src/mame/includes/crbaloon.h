@@ -45,12 +45,12 @@ public:
 	void crbaloon_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void crbaloon_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_CUSTOM_INPUT_MEMBER(pc3092_r);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(crbaloon);
+	void palette_init_crbaloon(palette_device &palette);
 	uint32_t screen_update_crbaloon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vblank_irq);
+	void vblank_irq(device_t &device);
 	void crbaloon_audio_set_music_freq(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void crbaloon_audio_set_music_enable(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void crbaloon_audio_set_laugh_enable(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);

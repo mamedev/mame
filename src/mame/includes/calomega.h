@@ -35,7 +35,7 @@ public:
 	uint8_t pia0_bin_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void pia0_aout_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void pia0_bout_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(pia0_ca2_w);
+	void pia0_ca2_w(int state);
 	uint8_t pia1_ain_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t pia1_bin_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void pia1_aout_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -43,16 +43,16 @@ public:
 	void lamps_903a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void lamps_903b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void lamps_905_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(write_acia_tx);
-	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
-	DECLARE_WRITE_LINE_MEMBER(update_aciabaud_scale);
+	void write_acia_tx(int state);
+	void write_acia_clock(int state);
+	void update_aciabaud_scale(int state);
 	void init_sys903();
 	void init_comg080();
 	void init_s903mod();
 	void init_sys905();
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	uint32_t screen_update_calomega(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_PALETTE_INIT(calomega);
+	void palette_init_calomega(palette_device &palette);
 
 protected:
 	virtual void video_start() override;

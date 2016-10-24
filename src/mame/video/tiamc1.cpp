@@ -109,7 +109,7 @@ void tiamc1_state::update_bg_palette()
 		m_palette->set_pen_color(i + 16, m_palette_ptr[m_paletteram[i | bplmask]]);
 }
 
-PALETTE_INIT_MEMBER(tiamc1_state, tiamc1)
+void tiamc1_state::palette_init_tiamc1(palette_device &palette)
 {
 	// Voltage computed by Proteus
 	//static const float g_v[8]={1.05f,0.87f,0.81f,0.62f,0.44f,0.25f,0.19f,0.00f};
@@ -142,12 +142,12 @@ PALETTE_INIT_MEMBER(tiamc1_state, tiamc1)
 	}
 }
 
-TILE_GET_INFO_MEMBER(tiamc1_state::get_bg1_tile_info)
+void tiamc1_state::get_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	SET_TILE_INFO_MEMBER(0, m_tileram[tile_index], 0, 0);
 }
 
-TILE_GET_INFO_MEMBER(tiamc1_state::get_bg2_tile_info)
+void tiamc1_state::get_bg2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	SET_TILE_INFO_MEMBER(0, m_tileram[tile_index + 1024], 0, 0);
 }

@@ -129,7 +129,7 @@ void microdrive_image_device::device_timer(emu_timer &timer, device_timer_id id,
 	}
 }
 
-WRITE_LINE_MEMBER( microdrive_image_device::clk_w )
+void microdrive_image_device::clk_w(int state)
 {
 	if (LOG) logerror("Microdrive '%s' CLK: %u\n", tag(), state);
 	if (!m_clk && state)
@@ -142,25 +142,25 @@ WRITE_LINE_MEMBER( microdrive_image_device::clk_w )
 	m_clk = state;
 }
 
-WRITE_LINE_MEMBER( microdrive_image_device::comms_in_w )
+void microdrive_image_device::comms_in_w(int state)
 {
 	if (LOG) logerror("Microdrive '%s' COMMS IN: %u\n", tag(), state);
 	m_comms_in = state;
 }
 
-WRITE_LINE_MEMBER( microdrive_image_device::erase_w )
+void microdrive_image_device::erase_w(int state)
 {
 	if (LOG) logerror("Microdrive '%s' ERASE: %u\n", tag(), state);
 	m_erase = state;
 }
 
-WRITE_LINE_MEMBER( microdrive_image_device::read_write_w )
+void microdrive_image_device::read_write_w(int state)
 {
 	if (LOG) logerror("Microdrive '%s' READ/WRITE: %u\n", tag(), state);
 	m_read_write = state;
 }
 
-WRITE_LINE_MEMBER( microdrive_image_device::data1_w )
+void microdrive_image_device::data1_w(int state)
 {
 	if (m_comms_out && !m_read_write)
 	{
@@ -168,7 +168,7 @@ WRITE_LINE_MEMBER( microdrive_image_device::data1_w )
 	}
 }
 
-WRITE_LINE_MEMBER( microdrive_image_device::data2_w )
+void microdrive_image_device::data2_w(int state)
 {
 	if (m_comms_out && !m_read_write)
 	{
@@ -176,7 +176,7 @@ WRITE_LINE_MEMBER( microdrive_image_device::data2_w )
 	}
 }
 
-READ_LINE_MEMBER( microdrive_image_device::data1_r )
+int microdrive_image_device::data1_r()
 {
 	int data = 0;
 	if (m_comms_out && m_read_write)
@@ -186,7 +186,7 @@ READ_LINE_MEMBER( microdrive_image_device::data1_r )
 	return data;
 }
 
-READ_LINE_MEMBER( microdrive_image_device::data2_r )
+int microdrive_image_device::data2_r()
 {
 	int data = 0;
 	if (m_comms_out && m_read_write)

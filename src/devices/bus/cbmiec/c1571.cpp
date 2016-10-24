@@ -169,7 +169,7 @@ static ADDRESS_MAP_START( mini_chief_mem, AS_PROGRAM, 8, mini_chief_t )
 ADDRESS_MAP_END
 
 
-WRITE_LINE_MEMBER( c1571_t::via0_irq_w )
+void c1571_t::via0_irq_w(int state)
 {
 	m_via0_irq = state;
 
@@ -397,7 +397,7 @@ void c1571_t::via1_w(address_space &space, offs_t offset, uint8_t data, uint8_t 
 	m_ga->ted_w(1);
 }
 
-WRITE_LINE_MEMBER( c1571_t::via1_irq_w )
+void c1571_t::via1_irq_w(int state)
 {
 	m_via1_irq = state;
 
@@ -467,14 +467,14 @@ void c1571_t::via1_pb_w(address_space &space, offs_t offset, uint8_t data, uint8
 //  MOS6526_INTERFACE( cia_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( c1571_t::cia_irq_w )
+void c1571_t::cia_irq_w(int state)
 {
 	m_cia_irq = state;
 
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, (m_via0_irq || m_via1_irq || m_cia_irq) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER( c1571_t::cia_pc_w )
+void c1571_t::cia_pc_w(int state)
 {
 	if (m_other != nullptr)
 	{
@@ -482,14 +482,14 @@ WRITE_LINE_MEMBER( c1571_t::cia_pc_w )
 	}
 }
 
-WRITE_LINE_MEMBER( c1571_t::cia_cnt_w )
+void c1571_t::cia_cnt_w(int state)
 {
 	m_cnt_out = state;
 
 	update_iec();
 }
 
-WRITE_LINE_MEMBER( c1571_t::cia_sp_w )
+void c1571_t::cia_sp_w(int state)
 {
 	m_sp_out = state;
 
@@ -549,7 +549,7 @@ void mini_chief_t::cia_pb_w(address_space &space, offs_t offset, uint8_t data, u
 //  C64H156_INTERFACE( ga_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( c1571_t::byte_w )
+void c1571_t::byte_w(int state)
 {
 	m_via1->write_ca1(state);
 

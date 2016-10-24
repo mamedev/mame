@@ -77,7 +77,7 @@ static const res_net_info survival_net_info =
 	}
 };
 
-PALETTE_INIT_MEMBER(phoenix_state,phoenix)
+void phoenix_state::palette_init_phoenix(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -94,7 +94,7 @@ PALETTE_INIT_MEMBER(phoenix_state,phoenix)
 	palette.palette()->normalize_range(0, 255);
 }
 
-PALETTE_INIT_MEMBER(phoenix_state,survival)
+void phoenix_state::palette_init_survival(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -111,7 +111,7 @@ PALETTE_INIT_MEMBER(phoenix_state,survival)
 	palette.palette()->normalize_range(0, 255);
 }
 
-PALETTE_INIT_MEMBER(phoenix_state,pleiads)
+void phoenix_state::palette_init_pleiads(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -134,7 +134,7 @@ PALETTE_INIT_MEMBER(phoenix_state,pleiads)
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(phoenix_state::get_fg_tile_info)
+void phoenix_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code, col;
 
@@ -147,7 +147,7 @@ TILE_GET_INFO_MEMBER(phoenix_state::get_fg_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(phoenix_state::get_bg_tile_info)
+void phoenix_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code, col;
 
@@ -427,7 +427,7 @@ uint8_t phoenix_state::survival_protection_r(address_space &space, offs_t offset
 	return m_survival_protection_value;
 }
 
-READ_LINE_MEMBER(phoenix_state::survival_sid_callback)
+int phoenix_state::survival_sid_callback()
 {
 	return m_survival_sid_value ? ASSERT_LINE : CLEAR_LINE;
 }

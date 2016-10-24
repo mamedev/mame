@@ -58,11 +58,11 @@ public:
 	void madgear_scroll1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void madgear_scroll2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void lastduel_palette_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	TILE_GET_INFO_MEMBER(ld_get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(ld_get_fg_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	TILE_GET_INFO_MEMBER(get_fix_info);
+	void ld_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void ld_get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_fix_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_reset() override;
 	void machine_start_lastduel();
 	void video_start_lastduel();
@@ -70,7 +70,7 @@ public:
 	void video_start_madgear();
 	uint32_t screen_update_lastduel(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_madgear(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(lastduel_timer_cb);
-	TIMER_DEVICE_CALLBACK_MEMBER(madgear_timer_cb);
+	void lastduel_timer_cb(timer_device &timer, void *ptr, int32_t param);
+	void madgear_timer_cb(timer_device &timer, void *ptr, int32_t param);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );
 };

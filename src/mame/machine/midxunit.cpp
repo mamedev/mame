@@ -161,7 +161,7 @@ uint16_t midxunit_state::midxunit_status_r(address_space &space, offs_t offset, 
  *
  *************************************/
 
-WRITE_LINE_MEMBER(midxunit_state::midxunit_dcs_output_full)
+void midxunit_state::midxunit_dcs_output_full(int state)
 {
 	/* only signal if not in loopback state */
 	if (m_uart[1] != 0x66)

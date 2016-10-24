@@ -70,7 +70,7 @@ ADDRESS_MAP_END
 INPUT_PORTS_START( bfm_ad5 )
 INPUT_PORTS_END
 
-INTERRUPT_GEN_MEMBER(adder5_state::ad5_fake_timer_int)
+void adder5_state::ad5_fake_timer_int(device_t &device)
 {
 	// this should be coming from the Timer / SIM modules of the Coldfire
 //  m_maincpu->set_input_line_and_vector(5, HOLD_LINE, 0x8c);

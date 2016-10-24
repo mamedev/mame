@@ -74,7 +74,7 @@ TODO:
 #include "includes/galaxia.h"
 
 
-INTERRUPT_GEN_MEMBER(galaxia_state::galaxia_interrupt)
+void galaxia_state::galaxia_interrupt(device_t &device)
 {
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x03);
 	cvs_scroll_stars();

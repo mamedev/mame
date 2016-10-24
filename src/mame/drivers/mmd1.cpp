@@ -168,7 +168,7 @@ public:
 	void mmd2_scanlines_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void mmd2_digit_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void mmd2_status_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(mmd2_inte_callback);
+	void mmd2_inte_callback(int state);
 	uint8_t m_return_code;
 	uint8_t m_digit;
 	void init_mmd2();
@@ -419,7 +419,7 @@ void mmd1_state::mmd2_status_callback(address_space &space, offs_t offset, uint8
 	output().set_value("led_hold", data & I8085_STATUS_WO);
 }
 
-WRITE_LINE_MEMBER( mmd1_state::mmd2_inte_callback )
+void mmd1_state::mmd2_inte_callback(int state)
 {
 	// operate the INTE LED
 	output().set_value("led_inte", state);

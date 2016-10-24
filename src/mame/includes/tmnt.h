@@ -142,8 +142,8 @@ public:
 	void init_mia();
 	void init_tmnt();
 	void init_cuebrick();
-	TILE_GET_INFO_MEMBER(glfgreat_get_roz_tile_info);
-	TILE_GET_INFO_MEMBER(prmrsocr_get_roz_tile_info);
+	void glfgreat_get_roz_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void prmrsocr_get_roz_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void machine_start_common();
 	void machine_reset_common();
 	void video_start_cuebrick();
@@ -163,9 +163,9 @@ public:
 	uint32_t screen_update_tmnt2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_thndrx2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_blswhstl(screen_device &screen, bool state);
-	INTERRUPT_GEN_MEMBER(tmnt_interrupt);
-	INTERRUPT_GEN_MEMBER(punkshot_interrupt);
-	INTERRUPT_GEN_MEMBER(lgtnfght_interrupt);
+	void tmnt_interrupt(device_t &device);
+	void punkshot_interrupt(device_t &device);
+	void lgtnfght_interrupt(device_t &device);
 	inline uint32_t tmnt2_get_word( uint32_t addr );
 	void tmnt2_put_word( address_space &space, uint32_t addr, uint16_t data );
 	void volume_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);

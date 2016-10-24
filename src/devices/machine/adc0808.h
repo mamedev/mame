@@ -97,7 +97,7 @@ public:
 	uint8_t data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void ale_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( start_w );
+	void start_w(int state);
 
 protected:
 	// device-level overrides

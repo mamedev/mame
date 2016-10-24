@@ -121,7 +121,7 @@ void nascom_fdc_device::device_reset_after_children()
 //  IMPLEMENTATION
 //**************************************************************************
 
-TIMER_CALLBACK_MEMBER( nascom_fdc_device::motor_off )
+void nascom_fdc_device::motor_off(void *ptr, int32_t param)
 {
 	if (m_floppy0->get_device())
 		m_floppy0->get_device()->mon_w(1);

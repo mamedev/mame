@@ -74,20 +74,20 @@ SLOT_INTERFACE_START(psx_controllers_nomulti)
 	PSX_CONTROLLERS
 SLOT_INTERFACE_END
 
-WRITE_LINE_MEMBER(psxcontrollerports_device::write_dtr)
+void psxcontrollerports_device::write_dtr(int state)
 {
 	m_port0->sel_w(!state);
 	m_port1->sel_w(state);
 }
 
-WRITE_LINE_MEMBER(psxcontrollerports_device::write_sck)
+void psxcontrollerports_device::write_sck(int state)
 {
 	m_port0->clock_w(state);
 	m_port1->clock_w(state);
 	m_rxd_handler(m_port0->rx_r() && m_port1->rx_r());
 }
 
-WRITE_LINE_MEMBER(psxcontrollerports_device::write_txd)
+void psxcontrollerports_device::write_txd(int state)
 {
 	m_port0->tx_w(state);
 	m_port1->tx_w(state);

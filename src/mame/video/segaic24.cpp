@@ -54,22 +54,22 @@ void segas24_tile::tile_info(int offset, tile_data &tileinfo, tilemap_memory_ind
 	tileinfo.category = (val & 0x8000) != 0;
 }
 
-TILE_GET_INFO_MEMBER(segas24_tile::tile_info_0s)
+void segas24_tile::tile_info_0s(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	tile_info(0x0000, tileinfo, tile_index);
 }
 
-TILE_GET_INFO_MEMBER( segas24_tile::tile_info_0w)
+void segas24_tile::tile_info_0w(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	tile_info(0x1000, tileinfo, tile_index);
 }
 
-TILE_GET_INFO_MEMBER(segas24_tile::tile_info_1s)
+void segas24_tile::tile_info_1s(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	tile_info(0x2000, tileinfo, tile_index);
 }
 
-TILE_GET_INFO_MEMBER(segas24_tile::tile_info_1w)
+void segas24_tile::tile_info_1w(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	tile_info(0x3000, tileinfo, tile_index);
 }

@@ -26,7 +26,7 @@ void sms_state::lphaser_hcount_latch()
 }
 
 
-WRITE_LINE_MEMBER(sms_state::sms_ctrl1_th_input)
+void sms_state::sms_ctrl1_th_input(int state)
 {
 	// Check if TH of controller port 1 is set to input (1)
 	if (m_io_ctrl_reg & 0x02)
@@ -46,7 +46,7 @@ WRITE_LINE_MEMBER(sms_state::sms_ctrl1_th_input)
 }
 
 
-WRITE_LINE_MEMBER(sms_state::sms_ctrl2_th_input)
+void sms_state::sms_ctrl2_th_input(int state)
 {
 	// Check if TH of controller port 2 is set to input (1)
 	if (m_io_ctrl_reg & 0x08)
@@ -66,7 +66,7 @@ WRITE_LINE_MEMBER(sms_state::sms_ctrl2_th_input)
 }
 
 
-WRITE_LINE_MEMBER(sms_state::gg_ext_th_input)
+void sms_state::gg_ext_th_input(int state)
 {
 	if (!(m_cartslot->exists() && m_cartslot->m_cart->get_sms_mode()))
 		return;
@@ -213,7 +213,7 @@ uint8_t sms_state::sms_count_r(address_space &space, offs_t offset, uint8_t mem_
  Check if the pause button is pressed.
  If the gamegear is in sms mode, check if the start button is pressed.
  */
-WRITE_LINE_MEMBER(sms_state::sms_pause_callback)
+void sms_state::sms_pause_callback(int state)
 {
 	bool pause_pressed = false;
 
@@ -250,7 +250,7 @@ WRITE_LINE_MEMBER(sms_state::sms_pause_callback)
 }
 
 
-WRITE_LINE_MEMBER(sms_state::sms_csync_callback)
+void sms_state::sms_csync_callback(int state)
 {
 	if (m_port_rapid.found())
 	{
@@ -1228,7 +1228,7 @@ void smssdisp_state::sms_store_control_w(address_space &space, offs_t offset, ui
 	m_store_control = data;
 }
 
-WRITE_LINE_MEMBER(smssdisp_state::sms_store_int_callback)
+void smssdisp_state::sms_store_int_callback(int state)
 {
 	if ( m_store_control & 0x01 )
 	{

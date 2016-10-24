@@ -182,12 +182,12 @@ protected:
 
 public:
 	// read handlers
-	DECLARE_READ_LINE_MEMBER(do_read);  // combined DO+READY/BUSY
+	int do_read();  // combined DO+READY/BUSY
 
 	// write handlers
-	DECLARE_WRITE_LINE_MEMBER(cs_write);        // CS signal (active high)
-	DECLARE_WRITE_LINE_MEMBER(clk_write);       // CLK signal (active high)
-	DECLARE_WRITE_LINE_MEMBER(di_write);        // DI
+	void cs_write(int state);        // CS signal (active high)
+	void clk_write(int state);       // CLK signal (active high)
+	void di_write(int state);        // DI
 
 protected:
 	// subclass overrides
@@ -205,13 +205,13 @@ protected:
 
 public:
 	// read handlers
-	DECLARE_READ_LINE_MEMBER(do_read);          // DO
-	DECLARE_READ_LINE_MEMBER(ready_read);       // READY/BUSY only
+	int do_read();          // DO
+	int ready_read();       // READY/BUSY only
 
 	// write handlers
-	DECLARE_WRITE_LINE_MEMBER(cs_write);        // CS signal (active high)
-	DECLARE_WRITE_LINE_MEMBER(clk_write);       // CLK signal (active high)
-	DECLARE_WRITE_LINE_MEMBER(di_write);        // DI
+	void cs_write(int state);        // CS signal (active high)
+	void clk_write(int state);       // CLK signal (active high)
+	void di_write(int state);        // DI
 
 protected:
 	// subclass overrides
@@ -231,12 +231,12 @@ protected:
 
 public:
 	// read handlers
-	DECLARE_READ_LINE_MEMBER(do_read);          // DO
+	int do_read();          // DO
 
 	// write handlers
-	DECLARE_WRITE_LINE_MEMBER(cs_write);        // CS signal (active high)
-	DECLARE_WRITE_LINE_MEMBER(clk_write);       // CLK signal (active high)
-	DECLARE_WRITE_LINE_MEMBER(di_write);        // DI
+	void cs_write(int state);        // CS signal (active high)
+	void clk_write(int state);       // CLK signal (active high)
+	void di_write(int state);        // DI
 
 protected:
 	// subclass overrides

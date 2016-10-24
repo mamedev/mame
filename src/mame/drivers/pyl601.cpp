@@ -86,7 +86,7 @@ public:
 	void init_pyl601();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	INTERRUPT_GEN_MEMBER(pyl601_interrupt);
+	void pyl601_interrupt(device_t &device);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
@@ -474,7 +474,7 @@ void pyl601_state::init_pyl601()
 	memset(m_ram->pointer(), 0, 64 * 1024);
 }
 
-INTERRUPT_GEN_MEMBER(pyl601_state::pyl601_interrupt)
+void pyl601_state::pyl601_interrupt(device_t &device)
 {
 	m_tick50_mark = 0x80;
 	device.execute().set_input_line(0, HOLD_LINE);

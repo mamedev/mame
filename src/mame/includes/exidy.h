@@ -99,7 +99,7 @@ public:
 
 	uint32_t screen_update_exidy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	INTERRUPT_GEN_MEMBER(exidy_vblank_interrupt);
+	void exidy_vblank_interrupt(device_t &device);
 
 	void exidy_video_config(uint8_t _collision_mask, uint8_t _collision_invert, int _is_2bpp);
 	inline void latch_condition(int collision);

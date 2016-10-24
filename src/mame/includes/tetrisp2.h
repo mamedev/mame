@@ -116,13 +116,13 @@ public:
 	void init_rockn();
 	void init_rockn3();
 	void init_rocknms();
-	TILE_GET_INFO_MEMBER(get_tile_info_bg);
-	TILE_GET_INFO_MEMBER(get_tile_info_fg);
-	TILE_GET_INFO_MEMBER(get_tile_info_rot);
-	TILE_GET_INFO_MEMBER(get_tile_info_rocknms_sub_bg);
-	TILE_GET_INFO_MEMBER(get_tile_info_rocknms_sub_fg);
-	TILE_GET_INFO_MEMBER(get_tile_info_rocknms_sub_rot);
-	TILE_GET_INFO_MEMBER(stepstag_get_tile_info_fg);
+	void get_tile_info_bg(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info_fg(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info_rot(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info_rocknms_sub_bg(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info_rocknms_sub_fg(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info_rocknms_sub_rot(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void stepstag_get_tile_info_fg(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void video_start_tetrisp2();
 	void video_start_nndmseal();
 	void video_start_rockntread();
@@ -131,10 +131,10 @@ public:
 	uint32_t screen_update_rockntread(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_rocknms_left(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_rocknms_right(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(rockn_timer_level4_callback);
-	TIMER_CALLBACK_MEMBER(rockn_timer_sub_level4_callback);
-	TIMER_CALLBACK_MEMBER(rockn_timer_level1_callback);
-	TIMER_CALLBACK_MEMBER(rockn_timer_sub_level1_callback);
+	void rockn_timer_level4_callback(void *ptr, int32_t param);
+	void rockn_timer_sub_level4_callback(void *ptr, int32_t param);
+	void rockn_timer_level1_callback(void *ptr, int32_t param);
+	void rockn_timer_sub_level1_callback(void *ptr, int32_t param);
 	void init_rockn_timer();
 };
 

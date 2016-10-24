@@ -72,16 +72,16 @@ public:
 	screen_device* get_screen() { return m_screen; }
 
 	void init_video();
-	INTERRUPT_GEN_MEMBER(hd68k_irq_gen);
-	TIMER_CALLBACK_MEMBER(deferred_adsp_bank_switch);
-	TIMER_CALLBACK_MEMBER(rddsp32_sync_cb);
+	void hd68k_irq_gen(device_t &device);
+	void deferred_adsp_bank_switch(void *ptr, int32_t param);
+	void rddsp32_sync_cb(void *ptr, int32_t param);
 
 	/*----------- defined in machine/harddriv.c -----------*/
 
 	/* Driver/Multisync board */
 	void hd68k_irq_ack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE_LINE_MEMBER(harddriv_duart_irq_handler);
+	void harddriv_duart_irq_handler(int state);
 
 	uint16_t hd68k_gsp_io_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void hd68k_gsp_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
@@ -112,8 +112,8 @@ public:
 
 	void hdgsp_protection_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE_LINE_MEMBER( hdgsp_irq_gen );
-	DECLARE_WRITE_LINE_MEMBER( hdmsp_irq_gen );
+	void hdgsp_irq_gen(int state);
+	void hdmsp_irq_gen(int state);
 
 	/* ADSP board */
 	uint16_t hd68k_adsp_program_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
@@ -163,7 +163,7 @@ public:
 	uint16_t hdds3_xdsp_control_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void hdds3_xdsp_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	TIMER_CALLBACK_MEMBER( xsdp_sport1_irq_off_callback );
+	void xsdp_sport1_irq_off_callback(void *ptr, int32_t param);
 
 	uint16_t hdgsp_control_lo_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void hdgsp_control_lo_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
@@ -183,8 +183,8 @@ public:
 	void hddsk_update_pif(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	/* DS III/IV board */
-	TIMER_DEVICE_CALLBACK_MEMBER( ds3sdsp_internal_timer_callback );
-	TIMER_DEVICE_CALLBACK_MEMBER( ds3xdsp_internal_timer_callback );
+	void ds3sdsp_internal_timer_callback(timer_device &timer, void *ptr, int32_t param);
+	void ds3xdsp_internal_timer_callback(timer_device &timer, void *ptr, int32_t param);
 
 	TMS340X0_SCANLINE_IND16_CB_MEMBER(scanline_driver);
 	TMS340X0_SCANLINE_IND16_CB_MEMBER(scanline_multisync);
@@ -194,8 +194,8 @@ public:
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(hdgsp_write_to_shiftreg);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(hdgsp_read_from_shiftreg);
 
-	INTERRUPT_GEN_MEMBER(video_int_gen);
-	DECLARE_WRITE_LINE_MEMBER(sound_int_write_line);
+	void video_int_gen(device_t &device);
+	void sound_int_write_line(int state);
 
 
 	/* DSK board */
@@ -238,11 +238,11 @@ public:
 	uint16_t hdds3_speedup_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
 
-	DECLARE_WRITE_LINE_MEMBER(hdds3sdsp_timer_enable_callback);
+	void hdds3sdsp_timer_enable_callback(int state);
 	void hdds3sdsp_serial_tx_callback(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	uint32_t hdds3sdsp_serial_rx_callback(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_WRITE_LINE_MEMBER(hdds3xdsp_timer_enable_callback);
+	void hdds3xdsp_timer_enable_callback(int state);
 	void hdds3xdsp_serial_tx_callback(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	uint32_t hdds3xdsp_serial_rx_callback(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
@@ -479,7 +479,7 @@ public:
 	void hdsnd68k_320ports_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	uint16_t hdsnd68k_320com_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void hdsnd68k_320com_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	DECLARE_READ_LINE_MEMBER(hdsnddsp_get_bio);
+	int hdsnddsp_get_bio();
 
 	void hdsnddsp_dac_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void hdsnddsp_comport_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
@@ -516,7 +516,7 @@ private:
 	uint64_t                  m_last_bio_cycles;
 
 	void update_68k_interrupts();
-	TIMER_CALLBACK_MEMBER( delayed_68k_w );
+	void delayed_68k_w(void *ptr, int32_t param);
 };
 
 /* Hard Drivin' */

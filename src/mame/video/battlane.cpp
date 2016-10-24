@@ -94,7 +94,7 @@ void battlane_state::battlane_video_ctrl_w(address_space &space, offs_t offset, 
 	m_video_ctrl = data;
 }
 
-TILE_GET_INFO_MEMBER(battlane_state::get_tile_info_bg)
+void battlane_state::get_tile_info_bg(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_tileram[tile_index];
 	int attr = m_tileram[tile_index + 0x400];
@@ -104,7 +104,7 @@ TILE_GET_INFO_MEMBER(battlane_state::get_tile_info_bg)
 	SET_TILE_INFO_MEMBER(gfxn, code, color, 0);
 }
 
-TILEMAP_MAPPER_MEMBER(battlane_state::battlane_tilemap_scan_rows_2x2)
+tilemap_memory_index battlane_state::battlane_tilemap_scan_rows_2x2(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/*
 	        Tilemap Memory Organization

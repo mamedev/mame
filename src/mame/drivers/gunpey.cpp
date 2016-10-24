@@ -225,8 +225,8 @@ public:
 	void init_gunpey();
 	virtual void video_start() override;
 	uint32_t screen_update_gunpey(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(gunpey_scanline);
-	TIMER_CALLBACK_MEMBER(blitter_end);
+	void gunpey_scanline(timer_device &timer, void *ptr, int32_t param);
+	void blitter_end(void *ptr, int32_t param);
 	void gunpey_irq_check(uint8_t irq_type);
 	uint8_t draw_gfx(bitmap_ind16 &bitmap,const rectangle &cliprect,int count,uint8_t scene_gradient);
 	uint16_t m_vram_bank;
@@ -641,7 +641,7 @@ uint8_t gunpey_state::gunpey_inputs_r(address_space &space, offs_t offset, uint8
 	return 0xff;
 }
 
-TIMER_CALLBACK_MEMBER(gunpey_state::blitter_end)
+void gunpey_state::blitter_end(void *ptr, int32_t param)
 {
 	gunpey_irq_check(4);
 }
@@ -1404,7 +1404,7 @@ INPUT_PORTS_END
 0x40 almost certainly vblank (reads inputs)
 0x80
 */
-TIMER_DEVICE_CALLBACK_MEMBER(gunpey_state::gunpey_scanline)
+void gunpey_state::gunpey_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

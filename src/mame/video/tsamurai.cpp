@@ -14,7 +14,7 @@
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(tsamurai_state::get_bg_tile_info)
+void tsamurai_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t attributes = m_bg_videoram[2*tile_index+1];
 	int tile_number = m_bg_videoram[2*tile_index];
@@ -26,7 +26,7 @@ TILE_GET_INFO_MEMBER(tsamurai_state::get_bg_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(tsamurai_state::get_fg_tile_info)
+void tsamurai_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile_number = m_videoram[tile_index];
 	if (m_textbank1 & 0x01) tile_number += 256; /* legacy */
@@ -244,7 +244,7 @@ void tsamurai_state::vsgongf_color_w(address_space &space, offs_t offset, uint8_
 }
 
 
-TILE_GET_INFO_MEMBER(tsamurai_state::get_vsgongf_tile_info)
+void tsamurai_state::get_vsgongf_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile_number = m_videoram[tile_index];
 	int color = m_vsgongf_color&0x1f;

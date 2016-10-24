@@ -66,8 +66,8 @@ public:
 	void switch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void pia2c_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void pia2c_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(pia28_ca2_w) { }; // comma3&4
-	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { }; // comma1&2
+	void pia28_ca2_w(int state) { }; // comma3&4
+	void pia28_cb2_w(int state) { }; // comma1&2
 	uint8_t pia28_w7_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void dig0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void dig1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -75,12 +75,12 @@ public:
 	void alpha3_dig1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void lamp0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void lamp1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { };
-	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(msm5205_irq_w);
+	void ym2151_irq_w(int state);
+	void msm5205_irq_w(int state);
 	void sol2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { }; // solenoids 8-15
 	void sol3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(pia21_ca2_w);
+	void pia21_ca2_w(int state);
 
 	uint8_t sound_latch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void sample_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -223,12 +223,12 @@ void de_2_state::init_de_2()
 	m_sample_bank->set_entry(0);
 }
 
-WRITE_LINE_MEMBER(de_2_state::ym2151_irq_w)
+void de_2_state::ym2151_irq_w(int state)
 {
 	m_audiocpu->set_input_line(M6809_IRQ_LINE,state);
 }
 
-WRITE_LINE_MEMBER(de_2_state::msm5205_irq_w)
+void de_2_state::msm5205_irq_w(int state)
 {
 	m_msm5205->data_w(m_sample_data >> 4);
 	if(m_more_data)
@@ -255,7 +255,7 @@ void de_2_state::sound_w(address_space &space, offs_t offset, uint8_t data, uint
 	m_audiocpu->set_input_line(M6809_FIRQ_LINE, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER( de_2_state::pia21_ca2_w )
+void de_2_state::pia21_ca2_w(int state)
 {
 // sound ns
 	m_ca1 = state;

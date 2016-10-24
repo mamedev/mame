@@ -42,7 +42,7 @@ enum
  *
  *************************************/
 
-WRITE_LINE_MEMBER( exidy_sound_device::update_irq_state )
+void exidy_sound_device::update_irq_state(int state)
 {
 	machine().device("audiocpu")->execute().set_input_line(M6502_IRQ_LINE, (m_pia1->irq_b_state() | m_riot_irq_state) ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -881,7 +881,7 @@ uint8_t victory_sound_device::status_r(address_space &space, offs_t offset, uint
 }
 
 
-TIMER_CALLBACK_MEMBER( victory_sound_device::delayed_command_w )
+void victory_sound_device::delayed_command_w(void *ptr, int32_t param)
 {
 	m_pia1->porta_w(param);
 	m_pia1_ca1 = 0;
@@ -896,7 +896,7 @@ void victory_sound_device::command_w(address_space &space, offs_t offset, uint8_
 }
 
 
-WRITE_LINE_MEMBER( victory_sound_device::irq_clear_w )
+void victory_sound_device::irq_clear_w(int state)
 {
 	if (VICTORY_LOG_SOUND) logerror("%s:!!!! Sound IRQ clear = %02X\n", machine().describe_context(), state);
 
@@ -908,7 +908,7 @@ WRITE_LINE_MEMBER( victory_sound_device::irq_clear_w )
 }
 
 
-WRITE_LINE_MEMBER( victory_sound_device::main_ack_w )
+void victory_sound_device::main_ack_w(int state)
 {
 	if (VICTORY_LOG_SOUND) logerror("%s:!!!! Sound Main ACK W = %02X\n", machine().describe_context(), state);
 

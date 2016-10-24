@@ -85,7 +85,7 @@ void upd4701_device::device_reset()
     ul_w
 -------------------------------------------------*/
 
-WRITE_LINE_MEMBER( upd4701_device::ul_w )
+void upd4701_device::ul_w(int state)
 {
 	m_ul = state;
 }
@@ -94,7 +94,7 @@ WRITE_LINE_MEMBER( upd4701_device::ul_w )
     xy_w
 -------------------------------------------------*/
 
-WRITE_LINE_MEMBER( upd4701_device::xy_w )
+void upd4701_device::xy_w(int state)
 {
 	m_xy = state;
 }
@@ -103,7 +103,7 @@ WRITE_LINE_MEMBER( upd4701_device::xy_w )
     cs_w
 -------------------------------------------------*/
 
-WRITE_LINE_MEMBER( upd4701_device::cs_w )
+void upd4701_device::cs_w(int state)
 {
 	if (m_cs != state)
 	{
@@ -129,7 +129,7 @@ WRITE_LINE_MEMBER( upd4701_device::cs_w )
     resetx_w
 -------------------------------------------------*/
 
-WRITE_LINE_MEMBER( upd4701_device::resetx_w )
+void upd4701_device::resetx_w(int state)
 {
 	if (m_resetx != state)
 	{
@@ -146,7 +146,7 @@ WRITE_LINE_MEMBER( upd4701_device::resetx_w )
     resety_w
 -------------------------------------------------*/
 
-WRITE_LINE_MEMBER( upd4701_device::resety_w )
+void upd4701_device::resety_w(int state)
 {
 	if (m_resety != state)
 	{
@@ -240,7 +240,7 @@ uint16_t upd4701_device::d_r(address_space &space, offs_t offset, uint16_t mem_m
     sf_r
 -------------------------------------------------*/
 
-READ_LINE_MEMBER( upd4701_device::sf_r )
+int upd4701_device::sf_r()
 {
 	if ((m_switches & MASK_SWITCHES) != MASK_SWITCHES)
 	{
@@ -254,7 +254,7 @@ READ_LINE_MEMBER( upd4701_device::sf_r )
     cf_r
 -------------------------------------------------*/
 
-READ_LINE_MEMBER( upd4701_device::cf_r )
+int upd4701_device::cf_r()
 {
 	return m_cf;
 }

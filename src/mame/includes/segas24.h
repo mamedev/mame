@@ -92,7 +92,7 @@ public:
 	segas24_sprite *vsprite;
 	segas24_mixer *vmixer;
 
-	DECLARE_WRITE_LINE_MEMBER(irq_ym);
+	void irq_ym(int state);
 	uint16_t sys16_paletteram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void sys16_paletteram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	uint16_t irq_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
@@ -149,13 +149,13 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_system24(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer_cb);
-	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer_clear_cb);
-	TIMER_DEVICE_CALLBACK_MEMBER(irq_frc_cb);
-	TIMER_DEVICE_CALLBACK_MEMBER(irq_vbl);
+	void irq_timer_cb(timer_device &timer, void *ptr, int32_t param);
+	void irq_timer_clear_cb(timer_device &timer, void *ptr, int32_t param);
+	void irq_frc_cb(timer_device &timer, void *ptr, int32_t param);
+	void irq_vbl(timer_device &timer, void *ptr, int32_t param);
 
 	// game specific
-	TIMER_CALLBACK_MEMBER(gground_hack_timer_callback);
+	void gground_hack_timer_callback(void *ptr, int32_t param);
 	emu_timer *m_gground_hack_timer;
 	required_ioport m_p1;
 	required_ioport m_p2;

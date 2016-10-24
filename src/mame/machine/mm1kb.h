@@ -46,7 +46,7 @@ public:
 
 	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return m_data; }
 
-	DECLARE_WRITE_LINE_MEMBER( bell_w )
+	void bell_w(int state)
 	{
 		if (state == 1)
 		{

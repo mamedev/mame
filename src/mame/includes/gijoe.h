@@ -66,8 +66,8 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_gijoe(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(gijoe_interrupt);
-	TIMER_CALLBACK_MEMBER(dmaend_callback);
+	void gijoe_interrupt(device_t &device);
+	void dmaend_callback(void *ptr, int32_t param);
 	void gijoe_objdma();
 	K056832_CB_MEMBER(tile_callback);
 	K053246_CB_MEMBER(sprite_callback);

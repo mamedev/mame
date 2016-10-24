@@ -54,8 +54,8 @@ public:
 
 	DECLARE_CUSTOM_INPUT_MEMBER(watchdog_bit2);
 
-	INTERRUPT_GEN_MEMBER(vblank_irq);
-	TIMER_DEVICE_CALLBACK_MEMBER(exctsccr_sound_irq);
+	void vblank_irq(device_t &device);
+	void exctsccr_sound_irq(timer_device &timer, void *ptr, int32_t param);
 
 	void tilemap_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void gfxbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -65,12 +65,12 @@ public:
 	void init_exctsccr();
 	void init_champbas();
 
-	DECLARE_PALETTE_INIT(champbas);
-	DECLARE_PALETTE_INIT(exctsccr);
+	void palette_init_champbas(palette_device &palette);
+	void palette_init_exctsccr(palette_device &palette);
 	void video_start_champbas();
 	void video_start_exctsccr();
-	TILE_GET_INFO_MEMBER(champbas_get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(exctsccr_get_bg_tile_info);
+	void champbas_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void exctsccr_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	uint32_t screen_update_champbas(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_exctsccr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

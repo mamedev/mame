@@ -285,7 +285,7 @@ void turrett_state::video_w(address_space &space, offs_t offset, uint32_t data, 
 }
 
 
-TIMER_CALLBACK_MEMBER( turrett_state::dma_complete )
+void turrett_state::dma_complete(void *ptr, int32_t param)
 {
 	m_dma_idle = true;
 }

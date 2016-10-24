@@ -101,19 +101,19 @@ public:
 	uint8_t keyin_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void system_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(irq_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
+	void irq_w(int state);
+	void fdc_irq_w(int state);
+	void fdc_drq_w(int state);
 	uint8_t dma_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void dma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t fdc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void fdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
+	void write_acia_clock(int state);
 	uint8_t pia_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void pia_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t pia_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void pia_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	TIMER_DEVICE_CALLBACK_MEMBER(test_timer_w);
+	void test_timer_w(timer_device &timer, void *ptr, int32_t param);
 	DECLARE_INPUT_CHANGED_MEMBER(drive_size_cb);
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
@@ -427,12 +427,12 @@ void gimix_state::pia_pb_w(address_space &space, offs_t offset, uint8_t data, ui
 }
 
 
-WRITE_LINE_MEMBER(gimix_state::irq_w)
+void gimix_state::irq_w(int state)
 {
 	m_maincpu->set_input_line(M6809_IRQ_LINE,state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(gimix_state::fdc_irq_w)
+void gimix_state::fdc_irq_w(int state)
 {
 	if(state)
 		m_dma_status |= 0x40;
@@ -440,7 +440,7 @@ WRITE_LINE_MEMBER(gimix_state::fdc_irq_w)
 		m_dma_status &= ~0x40;
 }
 
-WRITE_LINE_MEMBER(gimix_state::fdc_drq_w)
+void gimix_state::fdc_drq_w(int state)
 {
 	if(state && DMA_ENABLED)
 	{
@@ -533,7 +533,7 @@ void gimix_state::driver_start()
 {
 }
 
-WRITE_LINE_MEMBER(gimix_state::write_acia_clock)
+void gimix_state::write_acia_clock(int state)
 {
 	m_acia1->write_txc(state);
 	m_acia1->write_rxc(state);
@@ -541,7 +541,7 @@ WRITE_LINE_MEMBER(gimix_state::write_acia_clock)
 	m_acia2->write_rxc(state);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(gimix_state::test_timer_w)
+void gimix_state::test_timer_w(timer_device &timer, void *ptr, int32_t param)
 {
 	static bool prev;
 	if(!prev)

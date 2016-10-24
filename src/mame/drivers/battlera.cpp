@@ -161,7 +161,7 @@ ADDRESS_MAP_END
 /******************************************************************************/
 
 
-WRITE_LINE_MEMBER(battlera_state::adpcm_int)
+void battlera_state::adpcm_int(int state)
 {
 	m_msm->data_w(m_msm5205next >> 4);
 	m_msm5205next <<= 4;

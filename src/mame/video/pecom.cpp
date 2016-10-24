@@ -67,7 +67,7 @@ CDP1869_PCB_READ_MEMBER(pecom_state::pecom_pcb_r )
 	return BIT(pmd, 7);
 }
 
-WRITE_LINE_MEMBER(pecom_state::pecom_prd_w)
+void pecom_state::pecom_prd_w(int state)
 {
 	// every other PRD triggers a DMAOUT request
 	if (m_dma)

@@ -87,11 +87,11 @@ public:
 	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// internal communications
-	DECLARE_WRITE_LINE_MEMBER( snd_interrupt );
+	void snd_interrupt(int state);
 	void r6532_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void votrax_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void speech_clock_dac_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( votrax_request );
+	void votrax_request(int state);
 
 protected:
 	// device-level overrides

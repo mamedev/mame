@@ -56,7 +56,7 @@ void irobot_state::irobot_sharedmem_w(address_space &space, offs_t offset, uint8
 		m_combase[BYTE_XOR_BE(offset & 0xFFF)] = data;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(irobot_state::irobot_irvg_done_callback)
+void irobot_state::irobot_irvg_done_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	logerror("vg done. ");
 	m_irvg_running = 0;
@@ -144,7 +144,7 @@ void irobot_state::irobot_rom_banksel_w(address_space &space, offs_t offset, uin
 	output().set_led_value(1,data & 0x20);
 }
 
-TIMER_CALLBACK_MEMBER(irobot_state::scanline_callback)
+void irobot_state::scanline_callback(void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -403,7 +403,7 @@ void irobot_state::init_irobot()
 	load_oproms();
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(irobot_state::irobot_irmb_done_callback)
+void irobot_state::irobot_irmb_done_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	logerror("mb done. ");
 	m_irmb_running = 0;

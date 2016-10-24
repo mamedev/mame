@@ -126,7 +126,7 @@ void mbc55x_state::mbcpit8253_w(address_space &space, offs_t offset, uint8_t dat
 	m_pit->write(space, offset >> 1, data);
 }
 
-WRITE_LINE_MEMBER( mbc55x_state::pit8253_t2 )
+void mbc55x_state::pit8253_t2(int state)
 {
 	m_kb_uart->write_txc(state);
 	m_kb_uart->write_rxc(state);
@@ -237,7 +237,7 @@ void mbc55x_state::scan_keyboard()
 	}
 }
 
-TIMER_CALLBACK_MEMBER(mbc55x_state::keyscan_callback)
+void mbc55x_state::keyscan_callback(void *ptr, int32_t param)
 {
 	scan_keyboard();
 }

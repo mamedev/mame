@@ -139,7 +139,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	INTERRUPT_GEN_MEMBER(irq);
+	void irq(device_t &device);
 };
 
 ALLOW_SAVE_TYPE(ttchamp_state::picmode);
@@ -631,7 +631,7 @@ static INPUT_PORTS_START(ttchamp)
 INPUT_PORTS_END
 
 
-INTERRUPT_GEN_MEMBER(ttchamp_state::irq)/* right? */
+void ttchamp_state::irq(device_t &device)/* right? */
 {
 	device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }

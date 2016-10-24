@@ -250,7 +250,7 @@ void wwfsstar_state::irqack_w(address_space &space, offs_t offset, uint16_t data
     A hack is required: raise the vblank bit a scanline early.
 */
 
-TIMER_DEVICE_CALLBACK_MEMBER(wwfsstar_state::scanline)
+void wwfsstar_state::scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

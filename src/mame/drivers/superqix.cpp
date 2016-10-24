@@ -279,7 +279,7 @@ uint8_t superqix_state::sqix_from_mcu_r(address_space &space, offs_t offset, uin
 	return m_fromMCU;
 }
 
-TIMER_CALLBACK_MEMBER(superqix_state::mcu_acknowledge_callback)
+void superqix_state::mcu_acknowledge_callback(void *ptr, int32_t param)
 {
 	/* if we're on a set with no mcu, namely sqixb2, perestro or perestrof,
 	   do not set the mcu flags since at least a few checks in sqixb2 were
@@ -924,7 +924,7 @@ Seems to act like an older version of hotsmash mcu code
 
 **************************************************************************/
 
-TIMER_CALLBACK_MEMBER(superqix_state::hle_68705_w_cb)
+void superqix_state::hle_68705_w_cb(void *ptr, int32_t param)
 {
 	m_Z80HasWritten = 0; // unset the z80->mcu semaphore
 	switch (m_fromZ80)
@@ -1375,13 +1375,13 @@ static GFXDECODE_START( sqix )
 GFXDECODE_END
 
 
-INTERRUPT_GEN_MEMBER(superqix_state::vblank_irq)
+void superqix_state::vblank_irq(device_t &device)
 {
 	if(m_nmi_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(superqix_state::sqix_timer_irq)
+void superqix_state::sqix_timer_irq(device_t &device)
 {
 	if (m_nmi_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);

@@ -104,7 +104,7 @@ void beep_device::sound_stream_update(sound_stream &stream, stream_sample_t **in
 //  changing state to on from off will restart tone
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(beep_device::set_state)
+void beep_device::set_state(int state)
 {
 	/* only update if new state is not the same as old state */
 	int on = (state) ? 1 : 0;

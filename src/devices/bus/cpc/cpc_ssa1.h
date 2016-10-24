@@ -66,8 +66,8 @@ public:
 
 	uint8_t ssa1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void ssa1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(lrq_cb);
-	DECLARE_WRITE_LINE_MEMBER(sby_cb);
+	void lrq_cb(int state);
+	void sby_cb(int state);
 
 protected:
 	// device-level overrides
@@ -102,8 +102,8 @@ public:
 
 	uint8_t dkspeech_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void dkspeech_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(lrq_cb);
-	DECLARE_WRITE_LINE_MEMBER(sby_cb);
+	void lrq_cb(int state);
+	void sby_cb(int state);
 
 protected:
 	// device-level overrides

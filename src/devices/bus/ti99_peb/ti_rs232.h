@@ -37,10 +37,10 @@ public:
 	DECLARE_READ8Z_MEMBER(crureadz) override;
 	void cruwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
-	DECLARE_WRITE_LINE_MEMBER( int0_callback );
-	DECLARE_WRITE_LINE_MEMBER( int1_callback );
-	DECLARE_WRITE_LINE_MEMBER( rcv0_callback );
-	DECLARE_WRITE_LINE_MEMBER( rcv1_callback );
+	void int0_callback(int state);
+	void int1_callback(int state);
+	void rcv0_callback(int state);
+	void rcv1_callback(int state);
 	void xmit0_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void xmit1_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void ctrl0_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);

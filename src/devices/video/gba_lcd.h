@@ -100,9 +100,9 @@ public:
 	void gba_vram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	uint32_t gba_oam_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	void gba_oam_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
-	DECLARE_PALETTE_INIT(gba);
-	TIMER_CALLBACK_MEMBER(perform_hbl);
-	TIMER_CALLBACK_MEMBER(perform_scan);
+	void palette_init_gba(palette_device &palette);
+	void perform_hbl(void *ptr, int32_t param);
+	void perform_scan(void *ptr, int32_t param);
 
 	template<class _Object> static devcb_base &set_int_hblank_callback(device_t &device, _Object object)
 	{

@@ -1210,7 +1210,7 @@ uint8_t upi41_cpu_device::upi41_master_r(address_space &space, offs_t offset, ui
     write
 -------------------------------------------------*/
 
-TIMER_CALLBACK_MEMBER( upi41_cpu_device::master_callback )
+void upi41_cpu_device::master_callback(void *ptr, int32_t param)
 {
 	uint8_t a0 = (param >> 8) & 1;
 	uint8_t data = param;

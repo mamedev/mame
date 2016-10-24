@@ -97,7 +97,7 @@
 // CA2: SCSI interrupt     = 0x01
 // CB1: ASC interrupt      = 0x10
 
-INTERRUPT_GEN_MEMBER(mac_state::mac_rbv_vbl)
+void mac_state::mac_rbv_vbl(device_t &device)
 {
 	m_rbv_regs[2] &= ~0x40; // set vblank signal
 	m_rbv_vbltime = 10;
@@ -566,7 +566,7 @@ void mac_state::mac_5396_w(address_space &space, offs_t offset, uint8_t data, ui
 #define MAC_MAIN_SND_BUF_OFFSET 0x0300
 #define MAC_ALT_SND_BUF_OFFSET  0x5F00
 
-TIMER_DEVICE_CALLBACK_MEMBER(mac_state::mac_scanline)
+void mac_state::mac_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 	uint16_t *mac_snd_buf_ptr;

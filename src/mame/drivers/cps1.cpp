@@ -351,7 +351,7 @@ void cps_state::cpsq_coinctrl2_w(address_space &space, offs_t offset, uint16_t d
 	}
 }
 
-INTERRUPT_GEN_MEMBER(cps_state::cps1_interrupt)
+void cps_state::cps1_interrupt(device_t &device)
 {
 	/* Strider also has a IRQ4 handler. It is input port related, but the game */
 	/* works without it. It is the *only* CPS1 game to have that. */
@@ -359,7 +359,7 @@ INTERRUPT_GEN_MEMBER(cps_state::cps1_interrupt)
 	device.execute().set_input_line(2, HOLD_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(cps_state::ganbare_interrupt)
+void cps_state::ganbare_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	/* not sure on the timing or source of this - the game needs it once per frame, */
 	/* otherwise you get a "HARD ERROR" after boot */

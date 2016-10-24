@@ -96,10 +96,10 @@ public:
 	uint8_t irq_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void irq_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_PALETTE_INIT(pce220);
+	void palette_init_pce220(palette_device &palette);
 	DECLARE_INPUT_CHANGED_MEMBER(kb_irq);
 	DECLARE_INPUT_CHANGED_MEMBER(on_irq);
-	TIMER_DEVICE_CALLBACK_MEMBER(pce220_timer_callback);
+	void pce220_timer_callback(timer_device &timer, void *ptr, int32_t param);
 };
 
 class pcg850v_state : public pce220_state
@@ -904,7 +904,7 @@ void pcg850v_state::machine_reset()
 	m_lcd_read_mode = 0;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(pce220_state::pce220_timer_callback)
+void pce220_state::pce220_timer_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	m_timer_status = !m_timer_status;
 
@@ -916,7 +916,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(pce220_state::pce220_timer_callback)
 	}
 }
 
-PALETTE_INIT_MEMBER(pce220_state,pce220)
+void pce220_state::palette_init_pce220(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));

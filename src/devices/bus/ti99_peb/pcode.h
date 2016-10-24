@@ -31,9 +31,9 @@ public:
 	void cruwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 	DECLARE_SETADDRESS_DBIN_MEMBER(setaddress_dbin) override;
 
-	DECLARE_WRITE_LINE_MEMBER(clock_in) override;
+	void clock_in(int state) override;
 
-	DECLARE_WRITE_LINE_MEMBER( ready_line );
+	void ready_line(int state);
 	DECLARE_INPUT_CHANGED_MEMBER( switch_changed );
 
 protected:

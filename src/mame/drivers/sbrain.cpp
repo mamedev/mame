@@ -80,8 +80,8 @@ public:
 	uint8_t port08_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void port08_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void baud_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(fr_w);
-	DECLARE_WRITE_LINE_MEMBER(ft_w);
+	void fr_w(int state);
+	void ft_w(int state);
 private:
 	uint8_t m_porta;
 	uint8_t m_portb;
@@ -169,11 +169,11 @@ void sbrain_state::port08_w(address_space &space, offs_t offset, uint8_t data, u
 	m_floppy1->get_device()->mon_w(0);
 }
 
-WRITE_LINE_MEMBER( sbrain_state::fr_w )
+void sbrain_state::fr_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER( sbrain_state::ft_w )
+void sbrain_state::ft_w(int state)
 {
 }
 

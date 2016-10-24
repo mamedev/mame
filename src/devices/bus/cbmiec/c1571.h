@@ -52,7 +52,7 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual ioport_constructor device_input_ports() const override;
 
-	DECLARE_WRITE_LINE_MEMBER( via0_irq_w );
+	void via0_irq_w(int state);
 	uint8_t via0_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void via0_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t via0_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
@@ -60,18 +60,18 @@ public:
 
 	uint8_t via1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void via1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( via1_irq_w );
+	void via1_irq_w(int state);
 	uint8_t via1_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void via1_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( cia_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( cia_pc_w );
-	DECLARE_WRITE_LINE_MEMBER( cia_cnt_w );
-	DECLARE_WRITE_LINE_MEMBER( cia_sp_w );
+	void cia_irq_w(int state);
+	void cia_pc_w(int state);
+	void cia_cnt_w(int state);
+	void cia_sp_w(int state);
 	uint8_t cia_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void cia_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( byte_w );
+	void byte_w(int state);
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 

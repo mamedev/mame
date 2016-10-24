@@ -64,8 +64,8 @@ public:
 	void soundlatch4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	uint16_t io_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
-	DECLARE_WRITE_LINE_MEMBER(ctc_timer_1_w);
-	DECLARE_WRITE_LINE_MEMBER(ctc_timer_2_w);
+	void ctc_timer_1_w(int state);
+	void ctc_timer_2_w(int state);
 
 	INPUT_CHANGED_MEMBER(set_coin_flag);
 

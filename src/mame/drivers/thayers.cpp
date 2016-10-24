@@ -78,8 +78,8 @@ public:
 	uint8_t cop_g_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void cop_g_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_READ_LINE_MEMBER(cop_si_r);
-	DECLARE_WRITE_LINE_MEMBER(cop_so_w);
+	int cop_si_r();
+	void cop_so_w(int state);
 	void control2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t dsw_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t laserdsc_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
@@ -292,7 +292,7 @@ void thayers_state::cop_g_w(address_space &space, offs_t offset, uint8_t data, u
 
 /* Keyboard */
 
-READ_LINE_MEMBER(thayers_state::cop_si_r)
+int thayers_state::cop_si_r()
 {
 	/* keyboard data */
 
@@ -325,7 +325,7 @@ READ_LINE_MEMBER(thayers_state::cop_si_r)
 	}
 }
 
-WRITE_LINE_MEMBER(thayers_state::cop_so_w)
+void thayers_state::cop_so_w(int state)
 {
 	/* keyboard clock */
 

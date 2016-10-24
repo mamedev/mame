@@ -19,7 +19,7 @@
 #include "includes/runaway.h"
 
 
-TIMER_CALLBACK_MEMBER(runaway_state::interrupt_callback)
+void runaway_state::interrupt_callback(void *ptr, int32_t param)
 {
 	/* assume Centipede-style interrupt timing */
 	int scanline = param;

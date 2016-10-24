@@ -34,7 +34,7 @@ Credits:
 
 
 
-INTERRUPT_GEN_MEMBER(thief_state::thief_interrupt)
+void thief_state::thief_interrupt(device_t &device)
 {
 	/* SLAM switch causes an NMI if it's pressed */
 	if( (ioport("P2")->read() & 0x10) == 0 )

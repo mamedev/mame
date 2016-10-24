@@ -58,8 +58,8 @@ public:
 	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( store );
-	DECLARE_WRITE_LINE_MEMBER( recall );
+	void store(int state);
+	void recall(int state);
 
 protected:
 	// internal helpers

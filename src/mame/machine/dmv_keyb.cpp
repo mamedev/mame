@@ -295,7 +295,7 @@ void dmv_keyboard_device::port2_w(address_space &space, offs_t offset, uint8_t d
 //  sd_poll_w
 //-------------------------------------------------
 
-DECLARE_WRITE_LINE_MEMBER(dmv_keyboard_device::sd_poll_w)
+void dmv_keyboard_device::sd_poll_w(int state)
 {
 	if (m_sd_poll_state && !state)
 		m_maincpu->upi41_master_w(m_maincpu->space(), 0, 0);
@@ -307,7 +307,7 @@ DECLARE_WRITE_LINE_MEMBER(dmv_keyboard_device::sd_poll_w)
 //  sd_poll_r
 //-------------------------------------------------
 
-DECLARE_READ_LINE_MEMBER(dmv_keyboard_device::sd_poll_r)
+int dmv_keyboard_device::sd_poll_r()
 {
 	return m_sd_data_state;
 }

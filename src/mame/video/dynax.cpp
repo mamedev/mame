@@ -28,7 +28,7 @@
 
 
 /* x B01234 G01234 R01234 */
-PALETTE_INIT_MEMBER(dynax_state,sprtmtch)
+void dynax_state::palette_init_sprtmtch(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	if (!color_prom)
@@ -46,7 +46,7 @@ PALETTE_INIT_MEMBER(dynax_state,sprtmtch)
 }
 
 /* x xB0123 xG0123 xR0123 */
-PALETTE_INIT_MEMBER(dynax_state,janyuki)
+void dynax_state::palette_init_janyuki(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	if (!color_prom)

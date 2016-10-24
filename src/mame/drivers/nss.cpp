@@ -345,7 +345,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(game_over_flag_r);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	INTERRUPT_GEN_MEMBER(nss_vblank_irq);
+	void nss_vblank_irq(device_t &device);
 	uint8_t spc_ram_100_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void spc_ram_100_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };
@@ -791,7 +791,7 @@ static INPUT_PORTS_START( snes )
 INPUT_PORTS_END
 
 
-INTERRUPT_GEN_MEMBER(nss_state::nss_vblank_irq)
+void nss_state::nss_vblank_irq(device_t &device)
 {
 	if(m_nmi_enable)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);

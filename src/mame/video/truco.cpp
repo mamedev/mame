@@ -11,7 +11,7 @@
 #include "emu.h"
 #include "includes/truco.h"
 
-PALETTE_INIT_MEMBER(truco_state, truco)
+void truco_state::palette_init_truco(palette_device &palette)
 {
 	int i;
 

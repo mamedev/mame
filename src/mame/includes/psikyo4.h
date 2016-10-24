@@ -73,6 +73,6 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_psikyo4_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_psikyo4_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(psikyosh_interrupt);
+	void psikyosh_interrupt(device_t &device);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t scr);
 };

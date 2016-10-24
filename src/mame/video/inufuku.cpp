@@ -64,7 +64,7 @@ void inufuku_state::inufuku_scrollreg_w(address_space &space, offs_t offset, uin
 
 ******************************************************************************/
 
-TILE_GET_INFO_MEMBER(inufuku_state::get_inufuku_bg_tile_info)
+void inufuku_state::get_inufuku_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	SET_TILE_INFO_MEMBER(0,
 			m_bg_videoram[tile_index],
@@ -72,7 +72,7 @@ TILE_GET_INFO_MEMBER(inufuku_state::get_inufuku_bg_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(inufuku_state::get_inufuku_tx_tile_info)
+void inufuku_state::get_inufuku_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	SET_TILE_INFO_MEMBER(1,
 			m_tx_videoram[tile_index],

@@ -208,7 +208,7 @@ void c80_state::pio1_pb_w(address_space &space, offs_t offset, uint8_t data, uin
 	m_keylatch = data;
 }
 
-WRITE_LINE_MEMBER( c80_state::pio1_brdy_w )
+void c80_state::pio1_brdy_w(int state)
 {
 	m_pio1_brdy = state;
 

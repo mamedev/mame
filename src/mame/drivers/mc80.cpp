@@ -136,7 +136,7 @@ static INPUT_PORTS_START( mc8030 )
 INPUT_PORTS_END
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(mc80_state::mc8020_kbd)
+void mc80_state::mc8020_kbd(timer_device &timer, void *ptr, int32_t param)
 {
 	address_space &mem = m_maincpu->space(AS_PROGRAM);
 	char kbdrow[6];

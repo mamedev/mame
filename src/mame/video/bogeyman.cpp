@@ -4,7 +4,7 @@
 #include "includes/bogeyman.h"
 
 
-PALETTE_INIT_MEMBER(bogeyman_state, bogeyman)
+void bogeyman_state::palette_init_bogeyman(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -62,7 +62,7 @@ void bogeyman_state::colorram2_w(address_space &space, offs_t offset, uint8_t da
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(bogeyman_state::get_bg_tile_info)
+void bogeyman_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_colorram[tile_index];
 	int gfxbank = ((((attr & 0x01) << 8) + m_videoram[tile_index]) / 0x80) + 3;
@@ -72,7 +72,7 @@ TILE_GET_INFO_MEMBER(bogeyman_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(gfxbank, code, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(bogeyman_state::get_fg_tile_info)
+void bogeyman_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_colorram2[tile_index];
 	int tile = m_videoram2[tile_index] | ((attr & 0x03) << 8);

@@ -65,8 +65,8 @@ public:
 	void init_fireone();
 	virtual void video_start() override;
 	uint32_t screen_update_starfire(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(starfire_scanline_callback);
-	INTERRUPT_GEN_MEMBER(vblank_int);
+	void starfire_scanline_callback(void *ptr, int32_t param);
+	void vblank_int(device_t &device);
 	void get_pens(pen_t *pens);
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;

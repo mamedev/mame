@@ -508,7 +508,7 @@ void kyugo_state::machine_reset()
 	m_fgcolor = 0;
 }
 
-INTERRUPT_GEN_MEMBER(kyugo_state::vblank_irq)
+void kyugo_state::vblank_irq(device_t &device)
 {
 	if(m_nmi_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);

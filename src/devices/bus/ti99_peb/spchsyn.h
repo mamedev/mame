@@ -30,7 +30,7 @@ public:
 	DECLARE_READ8Z_MEMBER(crureadz) override { };
 	void cruwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override { };
 
-	DECLARE_WRITE_LINE_MEMBER( speech_ready );
+	void speech_ready(int state);
 
 protected:
 	virtual void            device_start() override;

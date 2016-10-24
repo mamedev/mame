@@ -21,7 +21,7 @@ void nes_state::video_start()
 	m_last_frame_flip =  0;
 }
 
-PALETTE_INIT_MEMBER(nes_state, nes)
+void nes_state::palette_init_nes(palette_device &palette)
 {
 	m_ppu->init_palette(palette, 0);
 }

@@ -516,7 +516,7 @@ uint16_t asic65_device::stat_r(address_space &space, offs_t offset, uint16_t mem
 }
 
 
-READ_LINE_MEMBER( asic65_device::get_bio )
+int asic65_device::get_bio()
 {
 	if (!m_tfull)
 		m_ourcpu->spin_until_interrupt();

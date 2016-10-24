@@ -417,8 +417,8 @@ public:
 	void write_vram(address_space &space, offs_t address, uint8_t data);
 	uint8_t read_vram(address_space &space, offs_t address);
 
-	TIMER_CALLBACK_MEMBER(clock_irq);
-	TIMER_CALLBACK_MEMBER(adjust_cpu_speed);
+	void clock_irq(void *ptr, int32_t param);
+	void adjust_cpu_speed(void *ptr, int32_t param);
 };
 
 
@@ -472,7 +472,7 @@ void missile_state::schedule_next_irq(int curv)
 }
 
 
-TIMER_CALLBACK_MEMBER(missile_state::clock_irq)
+void missile_state::clock_irq(void *ptr, int32_t param)
 {
 	int curv = param;
 
@@ -502,7 +502,7 @@ CUSTOM_INPUT_MEMBER(missile_state::get_vblank)
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(missile_state::adjust_cpu_speed)
+void missile_state::adjust_cpu_speed(void *ptr, int32_t param)
 {
 	int curv = param;
 

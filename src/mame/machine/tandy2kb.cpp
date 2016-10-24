@@ -266,7 +266,7 @@ void tandy2k_keyboard_device::device_reset()
 //  power_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( tandy2k_keyboard_device::power_w )
+void tandy2k_keyboard_device::power_w(int state)
 {
 	// TODO
 }
@@ -276,7 +276,7 @@ WRITE_LINE_MEMBER( tandy2k_keyboard_device::power_w )
 //  reset_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( tandy2k_keyboard_device::reset_w )
+void tandy2k_keyboard_device::reset_w(int state)
 {
 	if (!state)
 	{
@@ -289,7 +289,7 @@ WRITE_LINE_MEMBER( tandy2k_keyboard_device::reset_w )
 //  busy_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( tandy2k_keyboard_device::busy_w )
+void tandy2k_keyboard_device::busy_w(int state)
 {
 	m_maincpu->set_input_line(MCS48_INPUT_IRQ, state ? CLEAR_LINE : ASSERT_LINE);
 }
@@ -299,7 +299,7 @@ WRITE_LINE_MEMBER( tandy2k_keyboard_device::busy_w )
 //  data_r -
 //-------------------------------------------------
 
-READ_LINE_MEMBER( tandy2k_keyboard_device::data_r )
+int tandy2k_keyboard_device::data_r()
 {
 	return m_data;
 }

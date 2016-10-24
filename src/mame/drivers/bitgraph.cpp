@@ -115,21 +115,21 @@ public:
 	uint8_t pia_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void pia_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void pia_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_READ_LINE_MEMBER( pia_ca1_r );
-	DECLARE_WRITE_LINE_MEMBER( pia_cb2_w );
+	int pia_ca1_r();
+	void pia_cb2_w(int state);
 
 	void baud_write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	DECLARE_WRITE_LINE_MEMBER( com8116_a_fr_w );
-	DECLARE_WRITE_LINE_MEMBER( com8116_a_ft_w );
-	DECLARE_WRITE_LINE_MEMBER( com8116_b_fr_w );
-	DECLARE_WRITE_LINE_MEMBER( com8116_b_ft_w );
+	void com8116_a_fr_w(int state);
+	void com8116_a_ft_w(int state);
+	void com8116_b_fr_w(int state);
+	void com8116_b_ft_w(int state);
 
 	uint8_t adlc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void adlc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void earom_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void misccr_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( system_clock_write );
+	void system_clock_write(int state);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -212,12 +212,12 @@ void bitgraph_state::pia_w(address_space &space, offs_t offset, uint8_t data, ui
 	return m_pia->write(space, 3-offset, data);
 }
 
-READ_LINE_MEMBER(bitgraph_state::pia_ca1_r)
+int bitgraph_state::pia_ca1_r()
 {
 	return m_screen->frame_number() & 1;
 }
 
-WRITE_LINE_MEMBER(bitgraph_state::pia_cb2_w)
+void bitgraph_state::pia_cb2_w(int state)
 {
 	// XXX shut up verbose log
 }
@@ -286,7 +286,7 @@ void bitgraph_state::misccr_write(address_space &space, offs_t offset, uint8_t d
 	m_misccr = data;
 }
 
-WRITE_LINE_MEMBER(bitgraph_state::system_clock_write)
+void bitgraph_state::system_clock_write(int state)
 {
 	if (!BIT(m_pia_b, 6)) {
 		m_maincpu->set_input_line(M68K_IRQ_6, CLEAR_LINE);
@@ -308,25 +308,25 @@ void bitgraph_state::baud_write(address_space &space, offs_t offset, uint16_t da
 	m_dbrga->str_w((data >> 12) & 15);  // 0 HOST
 }
 
-WRITE_LINE_MEMBER(bitgraph_state::com8116_a_fr_w)
+void bitgraph_state::com8116_a_fr_w(int state)
 {
 	m_acia0->write_txc(state);
 	m_acia0->write_rxc(state);
 }
 
-WRITE_LINE_MEMBER(bitgraph_state::com8116_a_ft_w)
+void bitgraph_state::com8116_a_ft_w(int state)
 {
 	m_acia1->write_txc(state);
 	m_acia1->write_rxc(state);
 }
 
-WRITE_LINE_MEMBER(bitgraph_state::com8116_b_fr_w)
+void bitgraph_state::com8116_b_fr_w(int state)
 {
 	m_acia2->write_txc(state);
 	m_acia2->write_rxc(state);
 }
 
-WRITE_LINE_MEMBER(bitgraph_state::com8116_b_ft_w)
+void bitgraph_state::com8116_b_ft_w(int state)
 {
 	if (m_acia3) {
 		m_acia3->write_txc(state);

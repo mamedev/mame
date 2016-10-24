@@ -110,14 +110,14 @@ public:
 	void irq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t touchscreen_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void touchscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( alarm_irq );
-	DECLARE_WRITE_LINE_MEMBER( serial_irq );
+	void alarm_irq(int state);
+	void serial_irq(int state);
 
-	DECLARE_PALETTE_INIT(rex6000);
+	void palette_init_rex6000(palette_device &palette);
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_irq);
-	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer1);
-	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer2);
-	TIMER_DEVICE_CALLBACK_MEMBER(sec_timer);
+	void irq_timer1(timer_device &timer, void *ptr, int32_t param);
+	void irq_timer2(timer_device &timer, void *ptr, int32_t param);
+	void sec_timer(timer_device &timer, void *ptr, int32_t param);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(rex6000);
 };
 
@@ -645,7 +645,7 @@ uint32_t oz750_state::screen_update_oz(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(rex6000_state::irq_timer1)
+void rex6000_state::irq_timer1(timer_device &timer, void *ptr, int32_t param)
 {
 	if (!(m_irq_mask & IRQ_FLAG_IRQ2))
 	{
@@ -656,7 +656,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(rex6000_state::irq_timer1)
 
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(rex6000_state::irq_timer2)
+void rex6000_state::irq_timer2(timer_device &timer, void *ptr, int32_t param)
 {
 	if (!(m_irq_mask & IRQ_FLAG_IRQ1))
 	{
@@ -666,7 +666,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(rex6000_state::irq_timer2)
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(rex6000_state::sec_timer)
+void rex6000_state::sec_timer(timer_device &timer, void *ptr, int32_t param)
 {
 	if (!(m_irq_mask & IRQ_FLAG_1HZ))
 	{
@@ -676,7 +676,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(rex6000_state::sec_timer)
 	}
 }
 
-WRITE_LINE_MEMBER( rex6000_state::alarm_irq )
+void rex6000_state::alarm_irq(int state)
 {
 	if (!(m_irq_mask & IRQ_FLAG_ALARM) && state)
 	{
@@ -685,7 +685,7 @@ WRITE_LINE_MEMBER( rex6000_state::alarm_irq )
 	}
 }
 
-WRITE_LINE_MEMBER( rex6000_state::serial_irq )
+void rex6000_state::serial_irq(int state)
 {
 	if (!(m_irq_mask & IRQ_FLAG_SERIAL))
 	{
@@ -694,7 +694,7 @@ WRITE_LINE_MEMBER( rex6000_state::serial_irq )
 	}
 }
 
-PALETTE_INIT_MEMBER(rex6000_state, rex6000)
+void rex6000_state::palette_init_rex6000(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));

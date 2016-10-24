@@ -317,7 +317,7 @@ void a2bus_scsi_device::write_c800(address_space &space, uint16_t offset, uint8_
 	}
 }
 
-WRITE_LINE_MEMBER( a2bus_scsi_device::drq_w )
+void a2bus_scsi_device::drq_w(int state)
 {
 	m_drq = (state ? 0x80 : 0x00);
 }

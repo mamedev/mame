@@ -243,7 +243,7 @@ void m72_state::machine_start_kengo()
 	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m72_state::kengo_scanline_interrupt),this));
 }
 
-TIMER_CALLBACK_MEMBER(m72_state::synch_callback)
+void m72_state::synch_callback(void *ptr, int32_t param)
 {
 	//machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(8000000));
 	machine().scheduler().boost_interleave(attotime::from_hz(MASTER_CLOCK/4/12), attotime::from_seconds(25));
@@ -263,7 +263,7 @@ void m72_state::machine_reset_kengo()
 	m_scanline_timer->adjust(m_screen->time_until_pos(0));
 }
 
-TIMER_CALLBACK_MEMBER(m72_state::scanline_interrupt)
+void m72_state::scanline_interrupt(void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -293,7 +293,7 @@ TIMER_CALLBACK_MEMBER(m72_state::scanline_interrupt)
 	m_scanline_timer->adjust(m_screen->time_until_pos(scanline), scanline);
 }
 
-TIMER_CALLBACK_MEMBER(m72_state::kengo_scanline_interrupt)
+void m72_state::kengo_scanline_interrupt(void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -333,7 +333,7 @@ The protection device does
 
 ***************************************************************************/
 
-TIMER_CALLBACK_MEMBER(m72_state::delayed_ram16_w)
+void m72_state::delayed_ram16_w(void *ptr, int32_t param)
 {
 	uint16_t val = ((uint32_t) param) & 0xffff;
 	uint16_t offset = (((uint32_t) param) >> 16) & 0xffff;
@@ -401,7 +401,7 @@ uint8_t m72_state::mcu_data_r(address_space &space, offs_t offset, uint8_t mem_m
 	return ret;
 }
 
-INTERRUPT_GEN_MEMBER(m72_state::mcu_int)
+void m72_state::mcu_int(device_t &device)
 {
 	//m_mcu_snd_cmd_latch |= 0x11; /* 0x10 is special as well - FIXME */
 	m_mcu_snd_cmd_latch = 0x11;// | (machine.rand() & 1); /* 0x10 is special as well - FIXME */
@@ -549,7 +549,7 @@ int m72_state::find_sample(int num)
 }
 #endif
 
-INTERRUPT_GEN_MEMBER(m72_state::fake_nmi)
+void m72_state::fake_nmi(device_t &device)
 {
 	address_space &space = generic_space();
 	int sample = m_audio->sample_r(space,0);

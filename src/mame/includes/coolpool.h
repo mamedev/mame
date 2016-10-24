@@ -47,7 +47,7 @@ public:
 	void nvram_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void nvram_thrash_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void amerdart_misc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	DECLARE_READ_LINE_MEMBER(amerdart_dsp_bio_line_r);
+	int amerdart_dsp_bio_line_r();
 	uint16_t amerdart_iop_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void amerdart_iop_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	uint16_t amerdart_dsp_cmd_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
@@ -72,9 +72,9 @@ public:
 	void init_9ballsht();
 	void machine_reset_amerdart();
 	void machine_reset_coolpool();
-	TIMER_CALLBACK_MEMBER(deferred_iop_w);
-	TIMER_DEVICE_CALLBACK_MEMBER(nvram_write_timeout);
-	TIMER_DEVICE_CALLBACK_MEMBER(amerdart_audio_int_gen);
+	void deferred_iop_w(void *ptr, int32_t param);
+	void nvram_write_timeout(timer_device &timer, void *ptr, int32_t param);
+	void amerdart_audio_int_gen(timer_device &timer, void *ptr, int32_t param);
 	void register_state_save();
 	int amerdart_trackball_direction(int num, int data);
 };

@@ -22,9 +22,9 @@ public:
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_dataout_handler(device_t &device, _Object object) { return downcast<cat702_device &>(device).m_dataout_handler.set_callback(object); }
 
-	DECLARE_WRITE_LINE_MEMBER(write_select);
-	DECLARE_WRITE_LINE_MEMBER(write_datain);
-	DECLARE_WRITE_LINE_MEMBER(write_clock);
+	void write_select(int state);
+	void write_datain(int state);
+	void write_clock(int state);
 
 protected:
 	virtual void device_start() override;

@@ -30,7 +30,7 @@ void xevious_state::battles_customio_init()
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(xevious_state::battles_nmi_generate)
+void xevious_state::battles_nmi_generate(timer_device &timer, void *ptr, int32_t param)
 {
 	m_battles_customio_prev_command = m_battles_customio_command;
 
@@ -175,7 +175,7 @@ uint8_t xevious_state::battles_input_port_r(address_space &space, offs_t offset,
 }
 
 
-INTERRUPT_GEN_MEMBER(xevious_state::battles_interrupt_4)
+void xevious_state::battles_interrupt_4(device_t &device)
 {
 	device.execute().set_input_line(0, HOLD_LINE);
 }

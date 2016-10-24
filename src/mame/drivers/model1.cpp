@@ -711,7 +711,7 @@ void model1_state::irq_raise(int level)
 	m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
-IRQ_CALLBACK_MEMBER(model1_state::irq_callback)
+int model1_state::irq_callback(device_t &device, int irqline)
 {
 	return m_last_irq;
 }
@@ -734,7 +734,7 @@ void model1_state::irq_init()
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(model1_state::model1_interrupt)
+void model1_state::model1_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

@@ -116,7 +116,7 @@ public:
 	void darius_write_portB0(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void darius_write_portB1(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void adpcm_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -132,5 +132,5 @@ public:
 	void update_psg0( int port );
 	void update_psg1( int port );
 	void update_da(  );
-	DECLARE_WRITE_LINE_MEMBER(darius_adpcm_int);
+	void darius_adpcm_int(int state);
 };

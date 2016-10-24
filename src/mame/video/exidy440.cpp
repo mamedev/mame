@@ -228,7 +228,7 @@ void exidy440_state::exidy440_update_firq()
 }
 
 
-INTERRUPT_GEN_MEMBER(exidy440_state::exidy440_vblank_interrupt)
+void exidy440_state::exidy440_vblank_interrupt(device_t &device)
 {
 	/* set the FIRQ line on a VBLANK */
 	m_firq_vblank = 1;
@@ -243,7 +243,7 @@ INTERRUPT_GEN_MEMBER(exidy440_state::exidy440_vblank_interrupt)
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(exidy440_state::beam_firq_callback)
+void exidy440_state::beam_firq_callback(void *ptr, int32_t param)
 {
 	/* generate the interrupt, if we're selected */
 	if (m_firq_select && m_firq_enable)
@@ -260,7 +260,7 @@ TIMER_CALLBACK_MEMBER(exidy440_state::beam_firq_callback)
 }
 
 
-TIMER_CALLBACK_MEMBER(exidy440_state::collide_firq_callback)
+void exidy440_state::collide_firq_callback(void *ptr, int32_t param)
 {
 	/* generate the interrupt, if we're selected */
 	if (!m_firq_select && m_firq_enable)

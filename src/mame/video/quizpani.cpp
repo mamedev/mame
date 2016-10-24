@@ -10,13 +10,13 @@
 #include "includes/quizpani.h"
 
 
-TILEMAP_MAPPER_MEMBER(quizpani_state::bg_scan)
+tilemap_memory_index quizpani_state::bg_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return (row & 0x0f) + ((col & 0xff) << 4) + ((row & 0x70) << 8);
 }
 
-TILE_GET_INFO_MEMBER(quizpani_state::bg_tile_info)
+void quizpani_state::bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_bg_videoram[tile_index];
 
@@ -26,7 +26,7 @@ TILE_GET_INFO_MEMBER(quizpani_state::bg_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(quizpani_state::txt_tile_info)
+void quizpani_state::txt_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_txt_videoram[tile_index];
 

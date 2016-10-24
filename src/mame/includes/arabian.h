@@ -46,7 +46,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(arabian);
+	void palette_init_arabian(palette_device &palette);
 	uint32_t screen_update_arabian(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void blit_area( uint8_t plane, uint16_t src, uint8_t x, uint8_t y, uint8_t sx, uint8_t sy );
 	required_device<cpu_device> m_maincpu;

@@ -429,7 +429,7 @@ each direction to assign the boundries.
  *
  *************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(centiped_state::generate_interrupt)
+void centiped_state::generate_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

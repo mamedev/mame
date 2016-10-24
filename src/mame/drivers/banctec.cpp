@@ -34,7 +34,7 @@ void banctec_state::machine_reset()
 * Video/Character functions *
 ****************************/
 
-TILE_GET_INFO_MEMBER(banctec_state::get_bg_tile_info)
+void banctec_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *videoram = m_videoram;
 	int code = videoram[tile_index];

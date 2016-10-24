@@ -122,7 +122,7 @@ void _3do_state::m_3do_request_fiq(uint32_t irq_req, uint8_t type)
 }
 
 /* TODO: timer frequency is unknown, everything else is guesswork. */
-TIMER_DEVICE_CALLBACK_MEMBER( _3do_state::timer_x16_cb )
+void _3do_state::timer_x16_cb(timer_device &timer, void *ptr, int32_t param)
 {
 	/*
 	    x--- fablode flag (wtf?)

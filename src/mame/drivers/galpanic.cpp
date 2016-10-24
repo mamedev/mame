@@ -89,7 +89,7 @@ void galpanic_state::screen_eof(screen_device &screen, bool state)
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(galpanic_state::scanline)
+void galpanic_state::scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

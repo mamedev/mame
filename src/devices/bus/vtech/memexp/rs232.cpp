@@ -88,7 +88,7 @@ void rs232_interface_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-WRITE_LINE_MEMBER( rs232_interface_device::rs232_rx_w )
+void rs232_interface_device::rs232_rx_w(int state)
 {
 	m_rx = state;
 }

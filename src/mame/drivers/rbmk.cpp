@@ -86,7 +86,7 @@ public:
 	void eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	virtual void video_start() override;
 	uint32_t screen_update_rbmk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(mcu_irq);
+	void mcu_irq(device_t &device);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_mcu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
@@ -538,7 +538,7 @@ uint32_t rbmk_state::screen_update_rbmk(screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-INTERRUPT_GEN_MEMBER(rbmk_state::mcu_irq)
+void rbmk_state::mcu_irq(device_t &device)
 {
 	m_mcu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }

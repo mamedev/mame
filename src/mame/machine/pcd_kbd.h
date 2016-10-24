@@ -27,7 +27,7 @@ public:
 	uint8_t p1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t t0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( t0_w );
+	void t0_w(int state);
 private:
 	required_ioport_array<17> m_rows;
 	uint8_t m_p1;

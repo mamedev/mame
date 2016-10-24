@@ -349,7 +349,7 @@ static MACHINE_CONFIG_START( robotbwl, circus_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-TIMER_DEVICE_CALLBACK_MEMBER(circus_state::crash_scanline)
+void circus_state::crash_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

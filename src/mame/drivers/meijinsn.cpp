@@ -100,9 +100,9 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(meijinsn);
+	void palette_init_meijinsn(palette_device &palette);
 	uint32_t screen_update_meijinsn(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(meijinsn_interrupt);
+	void meijinsn_interrupt(timer_device &timer, void *ptr, int32_t param);
 };
 
 
@@ -257,7 +257,7 @@ void meijinsn_state::video_start()
 {
 }
 
-PALETTE_INIT_MEMBER(meijinsn_state, meijinsn)
+void meijinsn_state::palette_init_meijinsn(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -322,7 +322,7 @@ uint32_t meijinsn_state::screen_update_meijinsn(screen_device &screen, bitmap_in
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(meijinsn_state::meijinsn_interrupt)
+void meijinsn_state::meijinsn_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

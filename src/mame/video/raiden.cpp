@@ -195,7 +195,7 @@ uint32_t raiden_state::screen_update_raidenb(screen_device &screen, bitmap_ind16
 
 /******************************************************************************/
 
-TILE_GET_INFO_MEMBER(raiden_state::get_back_tile_info)
+void raiden_state::get_back_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tiledata = m_back_data[tile_index];
 	int tile = tiledata & 0x0fff;
@@ -204,7 +204,7 @@ TILE_GET_INFO_MEMBER(raiden_state::get_back_tile_info)
 	SET_TILE_INFO_MEMBER(1, tile, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(raiden_state::get_fore_tile_info)
+void raiden_state::get_fore_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tiledata = m_fore_data[tile_index];
 	int tile = tiledata & 0x0fff;
@@ -213,7 +213,7 @@ TILE_GET_INFO_MEMBER(raiden_state::get_fore_tile_info)
 	SET_TILE_INFO_MEMBER(2, tile, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(raiden_state::get_text_tile_info)
+void raiden_state::get_text_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tiledata = m_videoram[tile_index];
 	int tile = (tiledata & 0xff) | ((tiledata >> 6) & 0x300);

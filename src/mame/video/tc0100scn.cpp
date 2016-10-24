@@ -349,17 +349,17 @@ void tc0100scn_device::common_get_tile_info( tile_data &tileinfo, int tile_index
 			TILE_FLIPYX((attr & 0xc000) >> 14));
 }
 
-TILE_GET_INFO_MEMBER(tc0100scn_device::get_bg_tile_info)
+void tc0100scn_device::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	common_get_tile_info(tileinfo, tile_index, m_bg_ram, m_bg0_colbank);
 }
 
-TILE_GET_INFO_MEMBER(tc0100scn_device::get_fg_tile_info)
+void tc0100scn_device::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	common_get_tile_info(tileinfo, tile_index, m_fg_ram, m_bg1_colbank);
 }
 
-TILE_GET_INFO_MEMBER(tc0100scn_device::get_tx_tile_info)
+void tc0100scn_device::get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_tx_ram[tile_index];
 

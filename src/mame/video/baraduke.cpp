@@ -17,7 +17,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(baraduke_state, baraduke)
+void baraduke_state::palette_init_baraduke(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -60,7 +60,7 @@ PALETTE_INIT_MEMBER(baraduke_state, baraduke)
 ***************************************************************************/
 
 /* convert from 32x32 to 36x28 */
-TILEMAP_MAPPER_MEMBER(baraduke_state::tx_tilemap_scan)
+tilemap_memory_index baraduke_state::tx_tilemap_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	int offs;
 
@@ -74,7 +74,7 @@ TILEMAP_MAPPER_MEMBER(baraduke_state::tx_tilemap_scan)
 	return offs;
 }
 
-TILE_GET_INFO_MEMBER(baraduke_state::tx_get_tile_info)
+void baraduke_state::tx_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	SET_TILE_INFO_MEMBER(0,
 			m_textram[tile_index],
@@ -82,7 +82,7 @@ TILE_GET_INFO_MEMBER(baraduke_state::tx_get_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(baraduke_state::get_tile_info0)
+void baraduke_state::get_tile_info0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[2*tile_index];
 	int attr = m_videoram[2*tile_index + 1];
@@ -93,7 +93,7 @@ TILE_GET_INFO_MEMBER(baraduke_state::get_tile_info0)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(baraduke_state::get_tile_info1)
+void baraduke_state::get_tile_info1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[0x1000 + 2*tile_index];
 	int attr = m_videoram[0x1000 + 2*tile_index + 1];

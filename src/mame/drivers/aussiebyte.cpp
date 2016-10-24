@@ -251,7 +251,7 @@ void aussiebyte_state::io_write_byte(address_space &space, offs_t offset, uint8_
 	prog_space.write_byte(offset, data);
 }
 
-WRITE_LINE_MEMBER( aussiebyte_state::busreq_w )
+void aussiebyte_state::busreq_w(int state)
 {
 // since our Z80 has no support for BUSACK, we assume it is granted immediately
 	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, state);
@@ -263,28 +263,28 @@ WRITE_LINE_MEMBER( aussiebyte_state::busreq_w )
     DMA selector
 
 ************************************************************/
-WRITE_LINE_MEMBER( aussiebyte_state::sio1_rdya_w )
+void aussiebyte_state::sio1_rdya_w(int state)
 {
 	m_port17_rdy = (m_port17_rdy & 0xfd) | (uint8_t)(state << 1);
 	if (m_port17 == 1)
 		m_dma->rdy_w(state);
 }
 
-WRITE_LINE_MEMBER( aussiebyte_state::sio1_rdyb_w )
+void aussiebyte_state::sio1_rdyb_w(int state)
 {
 	m_port17_rdy = (m_port17_rdy & 0xfb) | (uint8_t)(state << 2);
 	if (m_port17 == 2)
 		m_dma->rdy_w(state);
 }
 
-WRITE_LINE_MEMBER( aussiebyte_state::sio2_rdya_w )
+void aussiebyte_state::sio2_rdya_w(int state)
 {
 	m_port17_rdy = (m_port17_rdy & 0xef) | (uint8_t)(state << 4);
 	if (m_port17 == 4)
 		m_dma->rdy_w(state);
 }
 
-WRITE_LINE_MEMBER( aussiebyte_state::sio2_rdyb_w )
+void aussiebyte_state::sio2_rdyb_w(int state)
 {
 	m_port17_rdy = (m_port17_rdy & 0xdf) | (uint8_t)(state << 5);
 	if (m_port17 == 5)
@@ -341,27 +341,27 @@ static const z80_daisy_config daisy_chain_intf[] =
 ************************************************************/
 
 // baud rate generator. All inputs are 1.2288MHz.
-WRITE_LINE_MEMBER( aussiebyte_state::clock_w )
+void aussiebyte_state::clock_w(int state)
 {
 	m_ctc->trg0(state);
 	m_ctc->trg1(state);
 	m_ctc->trg2(state);
 }
 
-WRITE_LINE_MEMBER( aussiebyte_state::ctc_z0_w )
+void aussiebyte_state::ctc_z0_w(int state)
 {
 	m_sio1->rxca_w(state);
 	m_sio1->txca_w(state);
 }
 
-WRITE_LINE_MEMBER( aussiebyte_state::ctc_z1_w )
+void aussiebyte_state::ctc_z1_w(int state)
 {
 	m_sio1->rxtxcb_w(state);
 	m_sio2->rxca_w(state);
 	m_sio2->txca_w(state);
 }
 
-WRITE_LINE_MEMBER( aussiebyte_state::ctc_z2_w )
+void aussiebyte_state::ctc_z2_w(int state)
 {
 	m_sio2->rxtxcb_w(state);
 	m_ctc->trg3(1);
@@ -373,7 +373,7 @@ WRITE_LINE_MEMBER( aussiebyte_state::ctc_z2_w )
     Centronics ack
 
 ************************************************************/
-WRITE_LINE_MEMBER( aussiebyte_state::write_centronics_busy )
+void aussiebyte_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 }
@@ -383,7 +383,7 @@ WRITE_LINE_MEMBER( aussiebyte_state::write_centronics_busy )
     Speech ack
 
 ************************************************************/
-WRITE_LINE_MEMBER( aussiebyte_state::votrax_w )
+void aussiebyte_state::votrax_w(int state)
 {
 	m_port28 = state;
 }
@@ -395,13 +395,13 @@ WRITE_LINE_MEMBER( aussiebyte_state::votrax_w )
 
 ************************************************************/
 
-WRITE_LINE_MEMBER( aussiebyte_state::fdc_intrq_w )
+void aussiebyte_state::fdc_intrq_w(int state)
 {
 	uint8_t data = (m_port19 & 0xbf) | (state ? 0x40 : 0);
 	m_port19 = data;
 }
 
-WRITE_LINE_MEMBER( aussiebyte_state::fdc_drq_w )
+void aussiebyte_state::fdc_drq_w(int state)
 {
 	uint8_t data = (m_port19 & 0x7f) | (state ? 0x80 : 0);
 	m_port19 = data;

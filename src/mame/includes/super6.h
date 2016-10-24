@@ -68,9 +68,9 @@ public:
 	void bank0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void bank1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void baud_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( fr_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
+	void fr_w(int state);
+	void fdc_intrq_w(int state);
+	void fdc_drq_w(int state);
 
 	void bankswitch();
 
@@ -78,7 +78,7 @@ public:
 	uint8_t m_s100;
 	uint8_t m_bank0;
 	uint8_t m_bank1;
-	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
+	void ctc_tick(timer_device &timer, void *ptr, int32_t param);
 	uint8_t memory_read_byte(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void memory_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t io_read_byte(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);

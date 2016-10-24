@@ -26,12 +26,12 @@ public:
 	void coin_counter_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	TILE_GET_INFO_MEMBER(get_tile_info_screen0);
-	TILE_GET_INFO_MEMBER(get_tile_info_screen1);
+	void get_tile_info_screen0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info_screen1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	virtual void video_start() override;
 
-	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
+	void interrupt(timer_device &timer, void *ptr, int32_t param);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);

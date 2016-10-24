@@ -221,11 +221,11 @@ public:
 	void ppcdrc_add_fastram(offs_t start, offs_t end, uint8_t readonly, void *base);
 	void ppcdrc_add_hotspot(offs_t pc, uint32_t opcode, uint32_t cycles);
 
-	TIMER_CALLBACK_MEMBER(decrementer_int_callback);
-	TIMER_CALLBACK_MEMBER(ppc4xx_buffered_dma_callback);
-	TIMER_CALLBACK_MEMBER(ppc4xx_fit_callback);
-	TIMER_CALLBACK_MEMBER(ppc4xx_pit_callback);
-	TIMER_CALLBACK_MEMBER(ppc4xx_spu_callback);
+	void decrementer_int_callback(void *ptr, int32_t param);
+	void ppc4xx_buffered_dma_callback(void *ptr, int32_t param);
+	void ppc4xx_fit_callback(void *ptr, int32_t param);
+	void ppc4xx_pit_callback(void *ptr, int32_t param);
+	void ppc4xx_spu_callback(void *ptr, int32_t param);
 
 	void ppc_cfunc_printf_exception();
 	void ppc_cfunc_printf_debug();

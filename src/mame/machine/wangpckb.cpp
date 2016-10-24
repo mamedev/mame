@@ -479,7 +479,7 @@ void wangpc_keyboard_t::rcv_complete()
 //  write_rxd -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(wangpc_keyboard_t::write_rxd)
+void wangpc_keyboard_t::write_rxd(int state)
 {
 	m_rxd = state;
 

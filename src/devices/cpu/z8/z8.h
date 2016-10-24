@@ -96,8 +96,8 @@ private:
 	emu_timer *m_t0_timer;
 	emu_timer *m_t1_timer;
 
-	TIMER_CALLBACK_MEMBER( t0_tick );
-	TIMER_CALLBACK_MEMBER( t1_tick );
+	void t0_tick(void *ptr, int32_t param);
+	void t1_tick(void *ptr, int32_t param);
 
 	inline uint8_t fetch();
 	inline uint8_t register_read(uint8_t offset);

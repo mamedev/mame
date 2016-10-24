@@ -311,7 +311,7 @@ GFXDECODE_END
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(jackal_state::jackal_interrupt)
+void jackal_state::jackal_interrupt(device_t &device)
 {
 	if (m_irq_enable)
 	{

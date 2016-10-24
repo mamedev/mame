@@ -70,7 +70,7 @@ void realbrk_state::dai2kaku_flipscreen_w(address_space &space, offs_t offset, u
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(realbrk_state::get_tile_info_0)
+void realbrk_state::get_tile_info_0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t attr = m_vram_0[tile_index * 2 + 0];
 	uint16_t code = m_vram_0[tile_index * 2 + 1];
@@ -80,7 +80,7 @@ TILE_GET_INFO_MEMBER(realbrk_state::get_tile_info_0)
 			TILE_FLIPYX( attr >> 14 ));
 }
 
-TILE_GET_INFO_MEMBER(realbrk_state::get_tile_info_1)
+void realbrk_state::get_tile_info_1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t attr = m_vram_1[tile_index * 2 + 0];
 	uint16_t code = m_vram_1[tile_index * 2 + 1];
@@ -116,7 +116,7 @@ void realbrk_state::vram_1_w(address_space &space, offs_t offset, uint16_t data,
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(realbrk_state::get_tile_info_2)
+void realbrk_state::get_tile_info_2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = m_vram_2[tile_index];
 	SET_TILE_INFO_MEMBER(1,

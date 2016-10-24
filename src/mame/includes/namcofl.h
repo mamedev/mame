@@ -77,11 +77,11 @@ public:
 	void machine_reset_namcofl();
 	void video_start_namcofl();
 	uint32_t screen_update_namcofl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(network_interrupt_callback);
-	TIMER_CALLBACK_MEMBER(vblank_interrupt_callback);
-	TIMER_CALLBACK_MEMBER(raster_interrupt_callback);
-	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq0_cb);
-	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq2_cb);
-	TIMER_DEVICE_CALLBACK_MEMBER(mcu_adc_cb);
+	void network_interrupt_callback(void *ptr, int32_t param);
+	void vblank_interrupt_callback(void *ptr, int32_t param);
+	void raster_interrupt_callback(void *ptr, int32_t param);
+	void mcu_irq0_cb(timer_device &timer, void *ptr, int32_t param);
+	void mcu_irq2_cb(timer_device &timer, void *ptr, int32_t param);
+	void mcu_adc_cb(timer_device &timer, void *ptr, int32_t param);
 	void common_init();
 };

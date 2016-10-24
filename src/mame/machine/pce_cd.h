@@ -57,7 +57,7 @@ public:
 	void bram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void intf_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void acard_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(msm5205_int);
+	void msm5205_int(int state);
 	uint8_t bram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t intf_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t acard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
@@ -85,13 +85,13 @@ private:
 	uint8_t get_cd_data_byte();
 	uint8_t get_adpcm_ram_byte();
 
-	TIMER_CALLBACK_MEMBER(data_timer_callback);
-	TIMER_CALLBACK_MEMBER(cdda_fadeout_callback);
-	TIMER_CALLBACK_MEMBER(cdda_fadein_callback);
-	TIMER_CALLBACK_MEMBER(adpcm_fadeout_callback);
-	TIMER_CALLBACK_MEMBER(adpcm_fadein_callback);
-	TIMER_CALLBACK_MEMBER(clear_ack);
-	TIMER_CALLBACK_MEMBER(adpcm_dma_timer_callback);
+	void data_timer_callback(void *ptr, int32_t param);
+	void cdda_fadeout_callback(void *ptr, int32_t param);
+	void cdda_fadein_callback(void *ptr, int32_t param);
+	void adpcm_fadeout_callback(void *ptr, int32_t param);
+	void adpcm_fadein_callback(void *ptr, int32_t param);
+	void clear_ack(void *ptr, int32_t param);
+	void adpcm_dma_timer_callback(void *ptr, int32_t param);
 
 	required_device<cpu_device> m_maincpu;
 

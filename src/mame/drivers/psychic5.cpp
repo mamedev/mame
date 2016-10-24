@@ -362,7 +362,7 @@ void psychic5_state::machine_reset()
 
 ***************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(psychic5_state::scanline)
+void psychic5_state::scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

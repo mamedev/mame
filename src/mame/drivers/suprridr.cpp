@@ -108,7 +108,7 @@ void suprridr_state::nmi_enable_w(address_space &space, offs_t offset, uint8_t d
 }
 
 
-INTERRUPT_GEN_MEMBER(suprridr_state::main_nmi_gen)
+void suprridr_state::main_nmi_gen(device_t &device)
 {
 	if (m_nmi_enable)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -122,7 +122,7 @@ INTERRUPT_GEN_MEMBER(suprridr_state::main_nmi_gen)
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(suprridr_state::delayed_sound_w)
+void suprridr_state::delayed_sound_w(void *ptr, int32_t param)
 {
 	m_sound_data = param;
 	m_audiocpu->set_input_line(0, ASSERT_LINE);

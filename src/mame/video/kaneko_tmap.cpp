@@ -142,8 +142,8 @@ void kaneko_view2_tilemap_device::get_tile_info(tile_data &tileinfo, tilemap_mem
 	tileinfo.category   =   (code_hi >> 8) & 7;
 }
 
-TILE_GET_INFO_MEMBER(kaneko_view2_tilemap_device::get_tile_info_0) { get_tile_info(tileinfo, tile_index, 0); }
-TILE_GET_INFO_MEMBER(kaneko_view2_tilemap_device::get_tile_info_1) { get_tile_info(tileinfo, tile_index, 1); }
+void kaneko_view2_tilemap_device::get_tile_info_0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index) { get_tile_info(tileinfo, tile_index, 0); }
+void kaneko_view2_tilemap_device::get_tile_info_1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index) { get_tile_info(tileinfo, tile_index, 1); }
 
 
 void kaneko_view2_tilemap_device::device_start()

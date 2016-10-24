@@ -69,8 +69,8 @@ public:
 	uint8_t ins8154_b1_port_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void ins8154_b1_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void acrnsys1_led_segment_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	TIMER_DEVICE_CALLBACK_MEMBER(acrnsys1_c);
-	TIMER_DEVICE_CALLBACK_MEMBER(acrnsys1_p);
+	void acrnsys1_c(timer_device &timer, void *ptr, int32_t param);
+	void acrnsys1_p(timer_device &timer, void *ptr, int32_t param);
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ttl74145_device> m_ttl74145;
@@ -113,7 +113,7 @@ void acrnsys1_state::ins8154_b1_port_a_w(address_space &space, offs_t offset, ui
 	m_cass_state = BIT(data, 6);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(acrnsys1_state::acrnsys1_c)
+void acrnsys1_state::acrnsys1_c(timer_device &timer, void *ptr, int32_t param)
 {
 	m_cass_data[3]++;
 
@@ -129,7 +129,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(acrnsys1_state::acrnsys1_c)
 		m_cass->output(BIT(m_cass_data[3], 1) ? -1.0 : +1.0); // 1200Hz
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(acrnsys1_state::acrnsys1_p)
+void acrnsys1_state::acrnsys1_p(timer_device &timer, void *ptr, int32_t param)
 {
 	/* cassette - turn 1200/2400Hz to a bit */
 	m_cass_data[1]++;

@@ -1061,17 +1061,17 @@ void pit8253_device::gate_w(int gate, int state)
 	}
 }
 
-WRITE_LINE_MEMBER( pit8253_device::write_gate0 )
+void pit8253_device::write_gate0(int state)
 {
 	gate_w(0, state);
 }
 
-WRITE_LINE_MEMBER( pit8253_device::write_gate1 )
+void pit8253_device::write_gate1(int state)
 {
 	gate_w(1, state);
 }
 
-WRITE_LINE_MEMBER( pit8253_device::write_gate2 )
+void pit8253_device::write_gate2(int state)
 {
 	gate_w(2, state);
 }
@@ -1108,17 +1108,17 @@ void pit8253_device::set_clock_signal(int timerno, int state)
 	timer->clock = state;
 }
 
-WRITE_LINE_MEMBER( pit8253_device::write_clk0 )
+void pit8253_device::write_clk0(int state)
 {
 	set_clock_signal(0, state);
 }
 
-WRITE_LINE_MEMBER( pit8253_device::write_clk1 )
+void pit8253_device::write_clk1(int state)
 {
 	set_clock_signal(1, state);
 }
 
-WRITE_LINE_MEMBER( pit8253_device::write_clk2 )
+void pit8253_device::write_clk2(int state)
 {
 	set_clock_signal(2, state);
 }

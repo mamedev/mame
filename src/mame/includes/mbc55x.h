@@ -144,9 +144,9 @@ public:
 	void mbc55x_ppi_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void mbc55x_ppi_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void mbc55x_ppi_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(vid_hsync_changed);
-	DECLARE_WRITE_LINE_MEMBER(vid_vsync_changed);
-	DECLARE_WRITE_LINE_MEMBER(pit8253_t2);
+	void vid_hsync_changed(int state);
+	void vid_vsync_changed(int state);
+	void pit8253_t2(int state);
 
 	uint32_t      m_debug_machine;
 	uint32_t      m_debug_video;
@@ -168,9 +168,9 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	virtual void video_reset() override;
-	DECLARE_PALETTE_INIT(mbc55x);
+	void palette_init_mbc55x(palette_device &palette);
 	void screen_eof_mbc55x(screen_device &screen, bool state);
-	TIMER_CALLBACK_MEMBER(keyscan_callback);
+	void keyscan_callback(void *ptr, int32_t param);
 	void keyboard_reset();
 	void scan_keyboard();
 	void set_ram_size();

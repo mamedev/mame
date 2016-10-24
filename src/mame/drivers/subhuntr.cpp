@@ -34,12 +34,12 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 
-	INTERRUPT_GEN_MEMBER(subhuntr_interrupt);
+	void subhuntr_interrupt(device_t &device);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(subhuntr);
+	void palette_init_subhuntr(palette_device &palette);
 	uint32_t screen_update_subhuntr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
@@ -50,7 +50,7 @@ public:
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(subhuntr_state, subhuntr)
+void subhuntr_state::palette_init_subhuntr(palette_device &palette)
 {
 }
 
@@ -107,7 +107,7 @@ void subhuntr_state::machine_reset()
 {
 }
 
-INTERRUPT_GEN_MEMBER(subhuntr_state::subhuntr_interrupt)
+void subhuntr_state::subhuntr_interrupt(device_t &device)
 {
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x03);
 }

@@ -76,7 +76,7 @@ static const gfx_layout p2000m_charlayout =
 	8 * 10
 };
 
-PALETTE_INIT_MEMBER(p2000t_state,p2000m)
+void p2000t_state::palette_init_p2000m(palette_device &palette)
 {
 	palette.set_pen_color(0,rgb_t::white()); /* white */
 	palette.set_pen_color(1,rgb_t::black()); /* black */
@@ -204,7 +204,7 @@ static INPUT_PORTS_START (p2000t)
 INPUT_PORTS_END
 
 
-INTERRUPT_GEN_MEMBER(p2000t_state::p2000_interrupt)
+void p2000t_state::p2000_interrupt(device_t &device)
 {
 	m_maincpu->set_input_line(0, HOLD_LINE);
 }

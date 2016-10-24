@@ -53,13 +53,13 @@ public:
 	uint8_t data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void memory_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_READ_LINE_MEMBER( wait_r );
-	DECLARE_READ_LINE_MEMBER( clear_r );
-	DECLARE_READ_LINE_MEMBER( ef4_r );
-	DECLARE_WRITE_LINE_MEMBER( q_w );
+	int wait_r();
+	int clear_r();
+	int ef4_r();
+	void q_w(int state);
 	uint8_t dma_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void sc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( da_w );
+	void da_w(int state);
 	DECLARE_INPUT_CHANGED_MEMBER( input_w );
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER( elf );

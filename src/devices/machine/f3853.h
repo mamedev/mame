@@ -72,7 +72,7 @@ public:
 	void set_external_interrupt_in_line(int level);
 	void set_priority_in_line(int level);
 
-	TIMER_CALLBACK_MEMBER(timer_callback);
+	void timer_callback(void *ptr, int32_t param);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

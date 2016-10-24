@@ -23,7 +23,7 @@
 class dac_bit_interface
 {
 public:
-	virtual DECLARE_WRITE_LINE_MEMBER(write) = 0;
+	virtual void write(int state) = 0;
 	virtual void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) = 0;
 };
 
@@ -225,7 +225,7 @@ public:
 	{
 	}
 
-	virtual WRITE_LINE_MEMBER(write) override { this->setCode(state); }
+	virtual void write(int state) override { this->setCode(state); }
 	virtual void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) override { this->setCode(data); }
 };
 

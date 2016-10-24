@@ -216,7 +216,7 @@ void tpi6525_device::clear_interrupt()
 }
 
 
-WRITE_LINE_MEMBER( tpi6525_device::i0_w )
+void tpi6525_device::i0_w(int state)
 {
 	if (INTERRUPT_MODE && (state != m_irq_level[0]))
 	{
@@ -231,7 +231,7 @@ WRITE_LINE_MEMBER( tpi6525_device::i0_w )
 }
 
 
-WRITE_LINE_MEMBER( tpi6525_device::i1_w )
+void tpi6525_device::i1_w(int state)
 {
 	if (INTERRUPT_MODE && (state != m_irq_level[1]))
 	{
@@ -246,7 +246,7 @@ WRITE_LINE_MEMBER( tpi6525_device::i1_w )
 }
 
 
-WRITE_LINE_MEMBER( tpi6525_device::i2_w )
+void tpi6525_device::i2_w(int state)
 {
 	if (INTERRUPT_MODE && (state != m_irq_level[2]))
 	{
@@ -261,7 +261,7 @@ WRITE_LINE_MEMBER( tpi6525_device::i2_w )
 }
 
 
-WRITE_LINE_MEMBER( tpi6525_device::i3_w )
+void tpi6525_device::i3_w(int state)
 {
 	if (INTERRUPT_MODE && (state != m_irq_level[3]))
 	{
@@ -278,7 +278,7 @@ WRITE_LINE_MEMBER( tpi6525_device::i3_w )
 }
 
 
-WRITE_LINE_MEMBER( tpi6525_device::i4_w )
+void tpi6525_device::i4_w(int state)
 {
 	if (INTERRUPT_MODE && (state != m_irq_level[4]) )
 	{

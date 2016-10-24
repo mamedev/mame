@@ -680,7 +680,7 @@ void paradise_state::machine_reset()
 	m_irq_count = 0;
 }
 
-INTERRUPT_GEN_MEMBER(paradise_state::irq)
+void paradise_state::irq(device_t &device)
 {
 	if (m_irq_count<300)
 		m_irq_count++;

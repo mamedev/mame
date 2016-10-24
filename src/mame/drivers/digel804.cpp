@@ -111,9 +111,9 @@ public:
 	void acia_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t acia_control_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void acia_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( acia_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( ep804_acia_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( da_w );
+	void acia_irq_w(int state);
+	void ep804_acia_irq_w(int state);
+	void da_w(int state);
 	DECLARE_INPUT_CHANGED_MEMBER(mode_change);
 	// current speaker state for port 45
 	uint8_t m_speaker_state;
@@ -566,19 +566,19 @@ DEVICE_INPUT_DEFAULTS_END
  Machine Drivers
 ******************************************************************************/
 
-WRITE_LINE_MEMBER( digel804_state::da_w )
+void digel804_state::da_w(int state)
 {
 	m_key_intq = state ? 0 : 1;
 	m_maincpu->set_input_line(0, (m_key_intq & m_acia_intq) ? CLEAR_LINE : ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER( digel804_state::acia_irq_w )
+void digel804_state::acia_irq_w(int state)
 {
 	m_acia_intq = state ? 0 : 1;
 	m_maincpu->set_input_line(0, (m_key_intq & m_acia_intq) ? CLEAR_LINE : ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER( digel804_state::ep804_acia_irq_w )
+void digel804_state::ep804_acia_irq_w(int state)
 {
 }
 

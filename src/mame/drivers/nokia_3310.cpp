@@ -51,10 +51,10 @@ public:
 	uint8_t mad2_mcuif_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void mad2_mcuif_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	TIMER_CALLBACK_MEMBER(timer0);
-	TIMER_CALLBACK_MEMBER(timer1);
-	TIMER_CALLBACK_MEMBER(timer_watchdog);
-	TIMER_CALLBACK_MEMBER(timer_fiq8);
+	void timer0(void *ptr, int32_t param);
+	void timer1(void *ptr, int32_t param);
+	void timer_watchdog(void *ptr, int32_t param);
+	void timer_fiq8(void *ptr, int32_t param);
 
 	uint16_t ram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff)        { return m_ram[offset] & mem_mask; }
 	void ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff)       { COMBINE_DATA(&m_ram[offset]); }
@@ -413,7 +413,7 @@ PCD8544_SCREEN_UPDATE(noki3310_state::pcd8544_screen_update)
 		}
 }
 
-TIMER_CALLBACK_MEMBER(noki3310_state::timer0)
+void noki3310_state::timer0(void *ptr, int32_t param)
 {
 	m_timer0_counter++;
 
@@ -421,7 +421,7 @@ TIMER_CALLBACK_MEMBER(noki3310_state::timer0)
 		assert_fiq(4);
 }
 
-TIMER_CALLBACK_MEMBER(noki3310_state::timer1)
+void noki3310_state::timer1(void *ptr, int32_t param)
 {
 	m_timer1_counter++;
 
@@ -432,13 +432,13 @@ TIMER_CALLBACK_MEMBER(noki3310_state::timer1)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(noki3310_state::timer_fiq8)
+void noki3310_state::timer_fiq8(void *ptr, int32_t param)
 {
 	if (m_mad2_regs[0x16] & 0x01)
 		assert_fiq(8);
 }
 
-TIMER_CALLBACK_MEMBER(noki3310_state::timer_watchdog)
+void noki3310_state::timer_watchdog(void *ptr, int32_t param)
 {
 	// CCONT watchdog
 	if (m_ccont.watchdog != 0)

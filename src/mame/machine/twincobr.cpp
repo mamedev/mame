@@ -16,7 +16,7 @@
 static const int toaplan_port_type[2] = { 0x7800c, 0x5c };
 
 
-INTERRUPT_GEN_MEMBER(twincobr_state::twincobr_interrupt)
+void twincobr_state::twincobr_interrupt(device_t &device)
 {
 	if (m_intenable) {
 		m_intenable = 0;
@@ -24,7 +24,7 @@ INTERRUPT_GEN_MEMBER(twincobr_state::twincobr_interrupt)
 	}
 }
 
-INTERRUPT_GEN_MEMBER(twincobr_state::wardner_interrupt)
+void twincobr_state::wardner_interrupt(device_t &device)
 {
 	if (m_intenable) {
 		m_intenable = 0;
@@ -170,7 +170,7 @@ void twincobr_state::fsharkbt_dsp_w(address_space &space, offs_t offset, uint16_
 #endif
 }
 
-READ_LINE_MEMBER(twincobr_state::twincobr_BIO_r)
+int twincobr_state::twincobr_BIO_r()
 {
 	return m_dsp_BIO;
 }

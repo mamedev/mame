@@ -769,13 +769,13 @@ void wiz_state::machine_start()
 
 /**************************************************************************/
 
-INTERRUPT_GEN_MEMBER(wiz_state::wiz_vblank_interrupt)
+void wiz_state::wiz_vblank_interrupt(device_t &device)
 {
 	if (m_main_nmi_mask & 1)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(wiz_state::wiz_sound_interrupt)
+void wiz_state::wiz_sound_interrupt(device_t &device)
 {
 	if (m_sound_nmi_mask & 1)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);

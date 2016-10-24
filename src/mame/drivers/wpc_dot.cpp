@@ -234,7 +234,7 @@ void wpc_dot_state::wpc_dmdbank_w(address_space &space, offs_t offset, uint8_t d
 	}
 }
 
-WRITE_LINE_MEMBER(wpc_dot_state::wpcsnd_reply_w)
+void wpc_dot_state::wpcsnd_reply_w(int state)
 {
 	if(state)
 	{
@@ -243,12 +243,12 @@ WRITE_LINE_MEMBER(wpc_dot_state::wpcsnd_reply_w)
 	}
 }
 
-WRITE_LINE_MEMBER(wpc_dot_state::wpc_irq_w)
+void wpc_dot_state::wpc_irq_w(int state)
 {
 	m_maincpu->set_input_line(M6809_IRQ_LINE,CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(wpc_dot_state::wpc_firq_w)
+void wpc_dot_state::wpc_firq_w(int state)
 {
 	m_maincpu->set_input_line(M6809_FIRQ_LINE,CLEAR_LINE);
 }

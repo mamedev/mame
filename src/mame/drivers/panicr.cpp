@@ -108,18 +108,18 @@ public:
 	uint8_t t5182shared_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void t5182shared_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	TILE_GET_INFO_MEMBER(get_bgtile_info);
-	TILE_GET_INFO_MEMBER(get_infotile_info_2);
-	TILE_GET_INFO_MEMBER(get_txttile_info);
+	void get_bgtile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_infotile_info_2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_txttile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	void init_panicr();
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(panicr);
+	void palette_init_panicr(palette_device &palette);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect );
 
-	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+	void scanline(timer_device &timer, void *ptr, int32_t param);
 };
 
 
@@ -134,7 +134,7 @@ public:
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(panicr_state, panicr)
+void panicr_state::palette_init_panicr(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -189,7 +189,7 @@ PALETTE_INIT_MEMBER(panicr_state, panicr)
 }
 
 
-TILE_GET_INFO_MEMBER(panicr_state::get_bgtile_info)
+void panicr_state::get_bgtile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code,attr;
 
@@ -204,7 +204,7 @@ TILE_GET_INFO_MEMBER(panicr_state::get_bgtile_info)
 
 
 
-TILE_GET_INFO_MEMBER(panicr_state::get_infotile_info_2)
+void panicr_state::get_infotile_info_2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code,attr;
 
@@ -220,7 +220,7 @@ TILE_GET_INFO_MEMBER(panicr_state::get_infotile_info_2)
 
 
 
-TILE_GET_INFO_MEMBER(panicr_state::get_txttile_info)
+void panicr_state::get_txttile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code=m_textram[tile_index*4];
 	int attr=m_textram[tile_index*4+2];
@@ -591,7 +591,7 @@ static GFXDECODE_START( panicr )
 GFXDECODE_END
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(panicr_state::scanline)
+void panicr_state::scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

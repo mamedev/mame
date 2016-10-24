@@ -88,9 +88,9 @@ public:
 	uint16_t rng_psac2_videoram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void rng_psac2_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	uint8_t rng_53936_rom_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	TILE_GET_INFO_MEMBER(ttl_get_tile_info);
-	TILE_GET_INFO_MEMBER(get_rng_936_tile_info);
-	DECLARE_WRITE_LINE_MEMBER(k054539_nmi_gen);
+	void ttl_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_rng_936_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void k054539_nmi_gen(int state);
 	uint16_t palette_read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void palette_write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
@@ -108,5 +108,5 @@ public:
 	bitmap_ind16 m_rng_dual_demultiplex_right_temp;
 	void   sprite_dma_trigger(void);
 
-	INTERRUPT_GEN_MEMBER(rng_interrupt);
+	void rng_interrupt(device_t &device);
 };

@@ -64,7 +64,7 @@ public:
 	void sound_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void sound_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_dynadice();
-	TILE_GET_INFO_MEMBER(get_tile_info);
+	void get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -203,7 +203,7 @@ static GFXDECODE_START( dynadice )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout2,  0, 1 ) /* 3bpp */
 GFXDECODE_END
 
-TILE_GET_INFO_MEMBER(dynadice_state::get_tile_info)
+void dynadice_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index];
 	SET_TILE_INFO_MEMBER(1, code, 0, 0);

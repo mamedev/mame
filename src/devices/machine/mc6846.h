@@ -116,8 +116,8 @@ private:
 	inline void update_cto();
 	inline void timer_launch();
 
-	TIMER_CALLBACK_MEMBER(timer_expire);
-	TIMER_CALLBACK_MEMBER(timer_one_shot);
+	void timer_expire(void *ptr, int32_t param);
+	void timer_one_shot(void *ptr, int32_t param);
 };
 
 extern const device_type MC6846;

@@ -175,7 +175,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_kinst(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(irq0_start);
+	void irq0_start(device_t &device);
 	required_device<mips3_device> m_maincpu;
 	required_device<ata_interface_device> m_ata;
 	required_device<dcs_audio_2k_device> m_dcs;
@@ -297,7 +297,7 @@ void kinst_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 }
 
 
-INTERRUPT_GEN_MEMBER(kinst_state::irq0_start)
+void kinst_state::irq0_start(device_t &device)
 {
 	device.execute().set_input_line(0, ASSERT_LINE);
 	timer_set(attotime::from_usec(50), TIMER_IRQ0_STOP);

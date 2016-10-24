@@ -104,7 +104,7 @@ void m72_audio_device::device_reset()
 
 */
 
-TIMER_CALLBACK_MEMBER( m72_audio_device::setvector_callback )
+void m72_audio_device::setvector_callback(void *ptr, int32_t param)
 {
 	switch(param)
 	{
@@ -129,7 +129,7 @@ TIMER_CALLBACK_MEMBER( m72_audio_device::setvector_callback )
 }
 
 
-WRITE_LINE_MEMBER(m72_audio_device::ym2151_irq_handler)
+void m72_audio_device::ym2151_irq_handler(int state)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(m72_audio_device::setvector_callback), this), state ? YM2151_ASSERT : YM2151_CLEAR);
 }

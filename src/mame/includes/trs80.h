@@ -157,17 +157,17 @@ public:
 	virtual void video_start() override;
 	void machine_reset_trs80m4();
 	void machine_reset_lnw80();
-	DECLARE_PALETTE_INIT(lnw80);
+	void palette_init_lnw80(palette_device &palette);
 	uint32_t screen_update_trs80(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_trs80m4(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_ht1080z(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_lnw80(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_radionic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_meritum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(trs80_rtc_interrupt);
-	INTERRUPT_GEN_MEMBER(trs80_fdc_interrupt);
-	TIMER_CALLBACK_MEMBER(cassette_data_callback);
-	DECLARE_WRITE_LINE_MEMBER(trs80_fdc_intrq_w);
+	void trs80_rtc_interrupt(device_t &device);
+	void trs80_fdc_interrupt(device_t &device);
+	void cassette_data_callback(void *ptr, int32_t param);
+	void trs80_fdc_intrq_w(int state);
 	DECLARE_QUICKLOAD_LOAD_MEMBER( trs80_cmd );
 
 protected:

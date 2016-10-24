@@ -12,7 +12,7 @@
 #include "includes/speedbal.h"
 
 
-TILE_GET_INFO_MEMBER(speedbal_state::get_tile_info_bg)
+void speedbal_state::get_tile_info_bg(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_background_videoram[tile_index*2] + ((m_background_videoram[tile_index*2+1] & 0x30) << 4);
 	int color = m_background_videoram[tile_index*2+1] & 0x0f;
@@ -21,7 +21,7 @@ TILE_GET_INFO_MEMBER(speedbal_state::get_tile_info_bg)
 	tileinfo.group = (color == 8);
 }
 
-TILE_GET_INFO_MEMBER(speedbal_state::get_tile_info_fg)
+void speedbal_state::get_tile_info_fg(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_foreground_videoram[tile_index*2] + ((m_foreground_videoram[tile_index*2+1] & 0x30) << 4);
 	int color = m_foreground_videoram[tile_index*2+1] & 0x0f;

@@ -118,9 +118,9 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void draw_rgbram(bitmap_ind16 &bitmap);
 
-	INTERRUPT_GEN_MEMBER(seta2_interrupt);
-	INTERRUPT_GEN_MEMBER(samshoot_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(funcube_interrupt);
+	void seta2_interrupt(device_t &device);
+	void samshoot_interrupt(device_t &device);
+	void funcube_interrupt(timer_device &timer, void *ptr, int32_t param);
 
 	void funcube_debug_outputs();
 	void staraudi_debug_outputs();

@@ -160,7 +160,7 @@ INPUT_PORTS_END
 
 /* Interrupts */
 
-WRITE_LINE_MEMBER(coleco_state::coleco_vdp_interrupt)
+void coleco_state::coleco_vdp_interrupt(int state)
 {
 	// NMI on rising edge
 	if (state && !m_last_nmi_state)
@@ -169,13 +169,13 @@ WRITE_LINE_MEMBER(coleco_state::coleco_vdp_interrupt)
 	m_last_nmi_state = state;
 }
 
-TIMER_CALLBACK_MEMBER(coleco_state::paddle_d7reset_callback)
+void coleco_state::paddle_d7reset_callback(void *ptr, int32_t param)
 {
 	m_joy_d7_state[param] = 0;
 	m_joy_analog_state[param] = 0;
 }
 
-TIMER_CALLBACK_MEMBER(coleco_state::paddle_irqreset_callback)
+void coleco_state::paddle_irqreset_callback(void *ptr, int32_t param)
 {
 	m_joy_irq_state[param] = 0;
 
@@ -183,7 +183,7 @@ TIMER_CALLBACK_MEMBER(coleco_state::paddle_irqreset_callback)
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
-TIMER_CALLBACK_MEMBER(coleco_state::paddle_pulse_callback)
+void coleco_state::paddle_pulse_callback(void *ptr, int32_t param)
 {
 	if (m_joy_analog_reload[param])
 	{
@@ -203,7 +203,7 @@ TIMER_CALLBACK_MEMBER(coleco_state::paddle_pulse_callback)
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(coleco_state::paddle_update_callback)
+void coleco_state::paddle_update_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	// arbitrary timer for reading analog controls
 	coleco_scan_paddles(&m_joy_analog_reload[0], &m_joy_analog_reload[1]);

@@ -62,11 +62,11 @@ public:
 	uint32_t screen_update_redalert(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_demoneye(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_panther(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(redalert_vblank_interrupt);
+	void redalert_vblank_interrupt(device_t &device);
 	void redalert_analog_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void redalert_AY8910_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(sod_callback);
-	DECLARE_READ_LINE_MEMBER(sid_callback);
+	void sod_callback(int state);
+	int sid_callback();
 	void demoneye_ay8910_latch_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t demoneye_ay8910_latch_2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void demoneye_ay8910_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);

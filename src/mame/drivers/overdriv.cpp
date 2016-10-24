@@ -68,7 +68,7 @@ void overdriv_state::eeprom_w(address_space &space, offs_t offset, uint16_t data
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(overdriv_state::overdriv_cpuA_scanline)
+void overdriv_state::overdriv_cpuA_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	const int timer_threshold = 168; // fwiw matches 0 on mask ROM check, so IF it's a timer irq then should be close ...
 	int scanline = param;
@@ -91,7 +91,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(overdriv_state::overdriv_cpuA_scanline)
 }
 
 #ifdef UNUSED_FUNCTION
-INTERRUPT_GEN_MEMBER(overdriv_state::cpuB_interrupt)
+void overdriv_state::cpuB_interrupt(device_t &device)
 {
 	// this doesn't get turned on until the irq has happened? wrong irq?
 }
@@ -206,7 +206,7 @@ void overdriv_state::overdriv_k053246_word_w(address_space &space, offs_t offset
 }
 #endif
 
-TIMER_CALLBACK_MEMBER(overdriv_state::objdma_end_cb )
+void overdriv_state::objdma_end_cb(void *ptr, int32_t param)
 {
 	m_subcpu->set_input_line(6, HOLD_LINE);
 }

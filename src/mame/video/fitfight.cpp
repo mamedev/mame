@@ -42,7 +42,7 @@ void fitfight_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 	}
 }
 
-TILE_GET_INFO_MEMBER(fitfight_state::get_fof_bak_tile_info)
+void fitfight_state::get_fof_bak_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_fof_bak_tileram[tile_index * 2 + 1];
 	int colr = m_fof_bak_tileram[tile_index * 2] & 0x1f;
@@ -59,7 +59,7 @@ void fitfight_state::fof_bak_tileram_w(address_space &space, offs_t offset, uint
 }
 
 
-TILE_GET_INFO_MEMBER(fitfight_state::get_fof_mid_tile_info)
+void fitfight_state::get_fof_mid_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_fof_mid_tileram[tile_index * 2 + 1];
 	int colr = m_fof_mid_tileram[tile_index * 2] & 0x1f;
@@ -75,7 +75,7 @@ void fitfight_state::fof_mid_tileram_w(address_space &space, offs_t offset, uint
 	m_fof_mid_tilemap->mark_tile_dirty(offset / 2);
 }
 
-TILE_GET_INFO_MEMBER(fitfight_state::get_fof_txt_tile_info)
+void fitfight_state::get_fof_txt_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_fof_txt_tileram[tile_index * 2 + 1];
 	int colr = m_fof_txt_tileram[tile_index * 2] & 0x1f;

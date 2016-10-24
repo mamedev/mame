@@ -267,16 +267,16 @@ public:
 	void machine_start_x1();
 	void machine_reset_x1();
 	void video_start_x1();
-	DECLARE_PALETTE_INIT(x1);
+	void palette_init_x1(palette_device &palette);
 	void machine_reset_x1turbo();
 	uint32_t screen_update_x1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_INPUT_CHANGED_MEMBER(ipl_reset);
 	DECLARE_INPUT_CHANGED_MEMBER(nmi_reset);
-	TIMER_CALLBACK_MEMBER(x1_rtc_increment);
-	TIMER_DEVICE_CALLBACK_MEMBER(x1_cmt_wind_timer);
-	TIMER_DEVICE_CALLBACK_MEMBER(x1_keyboard_callback);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
-	DECLARE_WRITE_LINE_MEMBER(hdl_w);
+	void x1_rtc_increment(void *ptr, int32_t param);
+	void x1_cmt_wind_timer(timer_device &timer, void *ptr, int32_t param);
+	void x1_keyboard_callback(timer_device &timer, void *ptr, int32_t param);
+	void fdc_drq_w(int state);
+	void hdl_w(int state);
 	uint8_t m_fdc_ctrl;
 
 	void x1_draw_pixel(bitmap_rgb32 &bitmap,int y,int x,uint16_t pen,uint8_t width,uint8_t height);

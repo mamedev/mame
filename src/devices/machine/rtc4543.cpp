@@ -129,7 +129,7 @@ void rtc4543_device::rtc_clock_updated(int year, int month, int day, int day_of_
 //  ce_w - chip enable write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( rtc4543_device::ce_w )
+void rtc4543_device::ce_w(int state)
 {
 	if (!state && m_ce) // complete transfer
 	{
@@ -172,7 +172,7 @@ void rtc4543_device::ce_falling()
 //  wr_w - data direction line write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( rtc4543_device::wr_w )
+void rtc4543_device::wr_w(int state)
 {
 	if (VERBOSE && (state != m_wr))
 		logerror("WR: %u\n", state);
@@ -185,7 +185,7 @@ WRITE_LINE_MEMBER( rtc4543_device::wr_w )
 //  clk_w - serial clock write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( rtc4543_device::clk_w )
+void rtc4543_device::clk_w(int state)
 {
 	if (m_ce)
 	{
@@ -243,7 +243,7 @@ void rtc4543_device::clk_falling()
 //  data_w - I/O write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( rtc4543_device::data_w )
+void rtc4543_device::data_w(int state)
 {
 	m_data = state & 1;
 }
@@ -253,7 +253,7 @@ WRITE_LINE_MEMBER( rtc4543_device::data_w )
 //  data_r - I/O read
 //-------------------------------------------------
 
-READ_LINE_MEMBER( rtc4543_device::data_r )
+int rtc4543_device::data_r()
 {
 	return m_data;
 }

@@ -52,8 +52,8 @@ public:
 
 	void bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(model1_interrupt);
-	IRQ_CALLBACK_MEMBER(irq_callback);
+	void model1_interrupt(timer_device &timer, void *ptr, int32_t param);
+	int irq_callback(device_t &device, int irqline);
 
 	// Sound
 	uint16_t snd_68k_ready_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
@@ -82,7 +82,7 @@ public:
 
 	uint32_t copro_ram_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	void copro_ram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
-	DECLARE_READ_LINE_MEMBER(copro_fifoin_pop_ok);
+	int copro_fifoin_pop_ok();
 	uint32_t copro_fifoin_pop(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	void copro_fifoout_push(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 

@@ -128,8 +128,8 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_cps3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(cps3_vbl_interrupt);
-	INTERRUPT_GEN_MEMBER(cps3_other_interrupt);
+	void cps3_vbl_interrupt(device_t &device);
+	void cps3_other_interrupt(device_t &device);
 	uint16_t rotate_left(uint16_t value, int n);
 	uint16_t rotxor(uint16_t val, uint16_t xorval);
 	uint32_t cps3_mask(uint32_t address, uint32_t key1, uint32_t key2);

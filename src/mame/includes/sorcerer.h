@@ -78,9 +78,9 @@ public:
 	void sorcerer_ff_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void machine_start_sorcererd();
 	void init_sorcerer();
-	TIMER_CALLBACK_MEMBER(sorcerer_cassette_tc);
-	TIMER_CALLBACK_MEMBER(sorcerer_serial_tc);
-	TIMER_CALLBACK_MEMBER(sorcerer_reset);
+	void sorcerer_cassette_tc(void *ptr, int32_t param);
+	void sorcerer_serial_tc(void *ptr, int32_t param);
+	void sorcerer_reset(void *ptr, int32_t param);
 	DECLARE_SNAPSHOT_LOAD_MEMBER( sorcerer );
 	DECLARE_QUICKLOAD_LOAD_MEMBER( sorcerer);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

@@ -335,7 +335,7 @@ uint32_t psikyosh_state::psh_eeprom_r(address_space &space, offs_t offset, uint3
 	return 0;
 }
 
-INTERRUPT_GEN_MEMBER(psikyosh_state::psikyosh_interrupt)
+void psikyosh_state::psikyosh_interrupt(device_t &device)
 {
 	device.execute().set_input_line(4, ASSERT_LINE);
 }

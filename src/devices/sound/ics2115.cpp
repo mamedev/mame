@@ -858,13 +858,13 @@ void ics2115_device::recalc_irq()
 		m_irq_cb(irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-TIMER_CALLBACK_MEMBER( ics2115_device::timer_cb_0 )
+void ics2115_device::timer_cb_0(void *ptr, int32_t param)
 {
 	m_irq_pending |= 1 << 0;
 	recalc_irq();
 }
 
-TIMER_CALLBACK_MEMBER( ics2115_device::timer_cb_1 )
+void ics2115_device::timer_cb_1(void *ptr, int32_t param)
 {
 	m_irq_pending |= 1 << 1;
 	recalc_irq();

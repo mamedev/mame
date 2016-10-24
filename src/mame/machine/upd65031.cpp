@@ -592,7 +592,7 @@ void upd65031_device::write(address_space &space, offs_t offset, uint8_t data, u
 //  flp line
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( upd65031_device::flp_w )
+void upd65031_device::flp_w(int state)
 {
 	if (!(m_sta & STA_FLAPOPEN) && state)
 	{
@@ -612,7 +612,7 @@ WRITE_LINE_MEMBER( upd65031_device::flp_w )
 //  battery low line
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( upd65031_device::btl_w )
+void upd65031_device::btl_w(int state)
 {
 	if (state)
 		m_sta |= STA_BTL;

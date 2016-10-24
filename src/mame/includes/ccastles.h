@@ -77,7 +77,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_ccastles(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(clock_irq);
+	void clock_irq(void *ptr, int32_t param);
 	inline void ccastles_write_vram( uint16_t addr, uint8_t data, uint8_t bitmd, uint8_t pixba );
 	inline void bitmode_autoinc(  );
 	inline void schedule_next_irq( int curscanline );

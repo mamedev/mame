@@ -56,12 +56,12 @@ public:
 	uint8_t pia1_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void pia1_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void pia1_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(pia0_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia0_cb2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia1_cb2_w);
+	void pia0_ca2_w(int state);
+	void pia0_cb2_w(int state);
+	void pia1_cb2_w(int state);
 	DECLARE_INPUT_CHANGED_MEMBER(activity_test);
 	DECLARE_INPUT_CHANGED_MEMBER(self_test);
-	TIMER_DEVICE_CALLBACK_MEMBER(pia0_timer);
+	void pia0_timer(timer_device &timer, void *ptr, int32_t param);
 private:
 	uint8_t m_pia0_a;
 	uint8_t m_pia0_b;
@@ -190,17 +190,17 @@ void by6803_state::port2_w(address_space &space, offs_t offset, uint8_t data, ui
 }
 
 // display latch strobes; display blanking
-WRITE_LINE_MEMBER( by6803_state::pia0_ca2_w )
+void by6803_state::pia0_ca2_w(int state)
 {
 }
 
 // lamp strobe 1 when high
-WRITE_LINE_MEMBER( by6803_state::pia0_cb2_w )
+void by6803_state::pia0_cb2_w(int state)
 {
 }
 
 // sol bank select (0 to enable sol selection)
-WRITE_LINE_MEMBER( by6803_state::pia1_cb2_w )
+void by6803_state::pia1_cb2_w(int state)
 {
 }
 
@@ -350,7 +350,7 @@ void by6803_state::init_by6803()
 }
 
 // zero-cross detection
-TIMER_DEVICE_CALLBACK_MEMBER( by6803_state::pia0_timer )
+void by6803_state::pia0_timer(timer_device &timer, void *ptr, int32_t param)
 {
 	// Phase A
 	if ((m_pia0_timer) && (!BIT(m_port2, 1)))

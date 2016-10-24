@@ -22,7 +22,7 @@
     Callbacks for the TileMap code
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(twincobr_state::get_bg_tile_info)
+void twincobr_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code, tile_number, color;
 
@@ -35,7 +35,7 @@ TILE_GET_INFO_MEMBER(twincobr_state::get_bg_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(twincobr_state::get_fg_tile_info)
+void twincobr_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code, tile_number, color;
 
@@ -48,7 +48,7 @@ TILE_GET_INFO_MEMBER(twincobr_state::get_fg_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(twincobr_state::get_tx_tile_info)
+void twincobr_state::get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code, tile_number, color;
 

@@ -137,7 +137,7 @@ Abnormalities:
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(toaplan1_state::get_pf1_tile_info)
+void toaplan1_state::get_pf1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int color, tile_number, attrib;
 
@@ -153,7 +153,7 @@ TILE_GET_INFO_MEMBER(toaplan1_state::get_pf1_tile_info)
 		else tileinfo.category = (attrib & 0xf000) >> 12;
 }
 
-TILE_GET_INFO_MEMBER(toaplan1_state::get_pf2_tile_info)
+void toaplan1_state::get_pf2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int color, tile_number, attrib;
 
@@ -169,7 +169,7 @@ TILE_GET_INFO_MEMBER(toaplan1_state::get_pf2_tile_info)
 		else tileinfo.category = (attrib & 0xf000) >> 12;
 }
 
-TILE_GET_INFO_MEMBER(toaplan1_state::get_pf3_tile_info)
+void toaplan1_state::get_pf3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int color, tile_number, attrib;
 
@@ -185,7 +185,7 @@ TILE_GET_INFO_MEMBER(toaplan1_state::get_pf3_tile_info)
 		else tileinfo.category = (attrib & 0xf000) >> 12;
 }
 
-TILE_GET_INFO_MEMBER(toaplan1_state::get_pf4_tile_info)
+void toaplan1_state::get_pf4_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int color, tile_number, attrib;
 

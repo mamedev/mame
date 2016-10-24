@@ -80,15 +80,15 @@ public:
 	{
 	}
 
-	DECLARE_WRITE_LINE_MEMBER(speaker_en_w);
-	DECLARE_WRITE_LINE_MEMBER(speaker_w);
+	void speaker_en_w(int state);
+	void speaker_w(int state);
 	uint8_t pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void v6809_address_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void v6809_register_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
+	void write_acia_clock(int state);
 	void machine_reset_v6809();
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr);
@@ -239,7 +239,7 @@ void v6809_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uin
 	m_pia0->cb1_w(1);
 }
 
-WRITE_LINE_MEMBER( v6809_state::write_acia_clock )
+void v6809_state::write_acia_clock(int state)
 {
 	m_acia0->write_txc(state);
 	m_acia0->write_rxc(state);
@@ -276,12 +276,12 @@ void v6809_state::pa_w(address_space &space, offs_t offset, uint8_t data, uint8_
 
 // this should output 1 to enable sound, then output 0 after a short time
 // however it continuously outputs 1
-WRITE_LINE_MEMBER( v6809_state::speaker_en_w )
+void v6809_state::speaker_en_w(int state)
 {
 	m_speaker_en = state;
 }
 
-WRITE_LINE_MEMBER( v6809_state::speaker_w )
+void v6809_state::speaker_w(int state)
 {
 //  if (m_speaker_en)
 //      m_speaker->level_w(data);

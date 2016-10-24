@@ -58,10 +58,10 @@ public:
 	void vismac_register_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void vismac_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void page_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_READ_LINE_MEMBER( clear_r );
-	DECLARE_READ_LINE_MEMBER( ef2_r );
-	DECLARE_READ_LINE_MEMBER( ef3_r );
-	DECLARE_WRITE_LINE_MEMBER( q_w );
+	int clear_r();
+	int ef2_r();
+	int ef3_r();
+	void q_w(int state);
 
 	uint8_t get_color(uint16_t pma);
 
@@ -74,7 +74,7 @@ public:
 	// keyboard state
 	int m_keylatch;             // key latch
 
-	TIMER_DEVICE_CALLBACK_MEMBER(blink_tick);
+	void blink_tick(timer_device &timer, void *ptr, int32_t param);
 	CDP1869_CHAR_RAM_READ_MEMBER(tmc600_char_ram_r);
 	CDP1869_PCB_READ_MEMBER(tmc600_pcb_r);
 };

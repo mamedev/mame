@@ -429,31 +429,31 @@ inline void mos8563_device::write_videoram(offs_t offset, uint8_t data)
 }
 
 
-READ_LINE_MEMBER( mc6845_device::de_r )
+int mc6845_device::de_r()
 {
 	return m_de;
 }
 
 
-READ_LINE_MEMBER( mc6845_device::cursor_r )
+int mc6845_device::cursor_r()
 {
 	return m_cur;
 }
 
 
-READ_LINE_MEMBER( mc6845_device::cursor_state_r )
+int mc6845_device::cursor_state_r()
 {
 	return m_cursor_state;
 }
 
 
-READ_LINE_MEMBER( mc6845_device::hsync_r )
+int mc6845_device::hsync_r()
 {
 	return m_hsync;
 }
 
 
-READ_LINE_MEMBER( mc6845_device::vsync_r )
+int mc6845_device::vsync_r()
 {
 	return m_vsync;
 }
@@ -1499,7 +1499,7 @@ machine_config_constructor mos8563_device::device_mconfig_additions() const
 
 
 // VICE palette
-PALETTE_INIT_MEMBER(mos8563_device, mos8563)
+void mos8563_device::palette_init_mos8563(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t::black());
 	palette.set_pen_color(1, rgb_t(0x55, 0x55, 0x55));

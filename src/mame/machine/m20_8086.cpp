@@ -76,7 +76,7 @@ void m20_8086_device::z8000_io_w(address_space &space, offs_t offset, uint16_t d
 	m_maincpu->space(AS_IO).write_word(offset << 1, data, mem_mask);
 }
 
-IRQ_CALLBACK_MEMBER(m20_8086_device::int_cb)
+int m20_8086_device::int_cb(device_t &device, int irqline)
 {
 	if(m_nvi)
 	{
@@ -88,13 +88,13 @@ IRQ_CALLBACK_MEMBER(m20_8086_device::int_cb)
 		return m_pic->acknowledge() << 1;
 }
 
-WRITE_LINE_MEMBER(m20_8086_device::nvi_w)
+void m20_8086_device::nvi_w(int state)
 {
 	m_nvi = state;
 	m_8086->set_input_line(INPUT_LINE_IRQ0, (state || m_vi) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(m20_8086_device::vi_w)
+void m20_8086_device::vi_w(int state)
 {
 	m_vi = state;
 	m_8086->set_input_line(INPUT_LINE_IRQ0, (state || m_nvi) ? ASSERT_LINE : CLEAR_LINE);

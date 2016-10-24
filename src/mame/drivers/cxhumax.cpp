@@ -303,7 +303,7 @@ void cxhumax_state::cx_extdesc_w(address_space &space, offs_t offset, uint32_t d
 	COMBINE_DATA(&m_extdesc_regs[offset]);
 }
 
-TIMER_CALLBACK_MEMBER(cxhumax_state::timer_tick)
+void cxhumax_state::timer_tick(void *ptr, int32_t param)
 {
 	m_timer_regs.timer[param].value++;
 	if(m_timer_regs.timer[param].value==m_timer_regs.timer[param].limit) {

@@ -425,7 +425,7 @@ public:
 
 	void video_start_amiga();
 	void video_start_amiga_aga();
-	DECLARE_PALETTE_INIT( amiga );
+	void palette_init_amiga(palette_device &palette);
 
 	void render_scanline(bitmap_ind16 &bitmap, int scanline);
 	void aga_render_scanline(bitmap_rgb32 &bitmap, int scanline);
@@ -433,36 +433,36 @@ public:
 	uint32_t screen_update_amiga_aga(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void update_screenmode();
 
-	TIMER_CALLBACK_MEMBER( scanline_callback );
-	TIMER_CALLBACK_MEMBER (amiga_irq_proc );
-	TIMER_CALLBACK_MEMBER( amiga_blitter_proc );
+	void scanline_callback(void *ptr, int32_t param);
+	void amiga_irq_proc(void *ptr, int32_t param);
+	void amiga_blitter_proc(void *ptr, int32_t param);
 	void update_irqs();
 
 	DECLARE_CUSTOM_INPUT_MEMBER( amiga_joystick_convert );
 	DECLARE_CUSTOM_INPUT_MEMBER( floppy_drive_status );
 
-	DECLARE_WRITE_LINE_MEMBER( m68k_reset );
-	DECLARE_WRITE_LINE_MEMBER( kbreset_w );
+	void m68k_reset(int state);
+	void kbreset_w(int state);
 
 	uint16_t cia_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void cia_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void gayle_cia_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void cia_0_port_a_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( cia_0_irq );
+	void cia_0_irq(int state);
 	uint8_t cia_1_port_a_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void cia_1_port_a_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( cia_1_irq );
+	void cia_1_irq(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( rs232_rx_w );
-	DECLARE_WRITE_LINE_MEMBER( rs232_dcd_w );
-	DECLARE_WRITE_LINE_MEMBER( rs232_dsr_w );
-	DECLARE_WRITE_LINE_MEMBER( rs232_ri_w );
-	DECLARE_WRITE_LINE_MEMBER( rs232_cts_w );
+	void rs232_rx_w(int state);
+	void rs232_dcd_w(int state);
+	void rs232_dsr_w(int state);
+	void rs232_ri_w(int state);
+	void rs232_cts_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( centronics_ack_w );
-	DECLARE_WRITE_LINE_MEMBER( centronics_busy_w );
-	DECLARE_WRITE_LINE_MEMBER( centronics_perror_w );
-	DECLARE_WRITE_LINE_MEMBER( centronics_select_w );
+	void centronics_ack_w(int state);
+	void centronics_busy_w(int state);
+	void centronics_perror_w(int state);
+	void centronics_select_w(int state);
 
 	uint16_t custom_chip_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void custom_chip_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);

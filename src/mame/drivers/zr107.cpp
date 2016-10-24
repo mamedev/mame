@@ -255,8 +255,8 @@ public:
 	void video_start_jetwave();
 	uint32_t screen_update_zr107(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_jetwave(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(zr107_vblank);
-	WRITE_LINE_MEMBER(k054539_irq_gen);
+	void zr107_vblank(device_t &device);
+	void k054539_irq_gen(int state);
 	ADC083X_INPUT_CB(adc0838_callback);
 	K056832_CB_MEMBER(tile_callback);
 
@@ -725,7 +725,7 @@ ADC083X_INPUT_CB(zr107_state::adc0838_callback)
 
 
 
-WRITE_LINE_MEMBER(zr107_state::k054539_irq_gen)
+void zr107_state::k054539_irq_gen(int state)
 {
 	if (m_sound_ctrl & 1)
 	{
@@ -745,7 +745,7 @@ WRITE_LINE_MEMBER(zr107_state::k054539_irq_gen)
     DMA0
 
 */
-INTERRUPT_GEN_MEMBER(zr107_state::zr107_vblank)
+void zr107_state::zr107_vblank(device_t &device)
 {
 	device.execute().set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 }

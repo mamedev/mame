@@ -124,10 +124,10 @@ public:
 	template<class _Object> static devcb_base &set_out_reset_callback(device_t &device, _Object object) { return downcast<x68k_expansion_slot_device &>(device).m_out_reset_cb.set_callback(object); }
 
 
-	DECLARE_WRITE_LINE_MEMBER( irq2_w );
-	DECLARE_WRITE_LINE_MEMBER( irq4_w );
-	DECLARE_WRITE_LINE_MEMBER( nmi_w );
-	DECLARE_WRITE_LINE_MEMBER( reset_w );
+	void irq2_w(int state);
+	void irq4_w(int state);
+	void nmi_w(int state);
+	void reset_w(int state);
 
 protected:
 	// device-level overrides

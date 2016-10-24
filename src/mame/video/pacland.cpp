@@ -89,7 +89,7 @@ void pacland_state::switch_palette()
 	}
 }
 
-PALETTE_INIT_MEMBER(pacland_state, pacland)
+void pacland_state::palette_init_pacland(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -154,7 +154,7 @@ PALETTE_INIT_MEMBER(pacland_state, pacland)
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(pacland_state::get_bg_tile_info)
+void pacland_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int offs = tile_index * 2;
 	int attr = m_videoram2[offs + 1];
@@ -165,7 +165,7 @@ TILE_GET_INFO_MEMBER(pacland_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(1, code, color, flags);
 }
 
-TILE_GET_INFO_MEMBER(pacland_state::get_fg_tile_info)
+void pacland_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int offs = tile_index * 2;
 	int attr = m_videoram[offs + 1];

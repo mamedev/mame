@@ -16,7 +16,7 @@ Knuckle Joe - (c) 1985 Taito Corporation
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(kncljoe_state, kncljoe)
+void kncljoe_state::palette_init_kncljoe(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -80,7 +80,7 @@ PALETTE_INIT_MEMBER(kncljoe_state, kncljoe)
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(kncljoe_state::get_bg_tile_info)
+void kncljoe_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_videoram[2 * tile_index + 1];
 	int code = m_videoram[2 * tile_index] + ((attr & 0xc0) << 2) + (m_tile_bank << 10);

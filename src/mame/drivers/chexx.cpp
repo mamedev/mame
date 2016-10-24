@@ -50,7 +50,7 @@ public:
 	uint8_t  m_ay_cmd, m_ay_data;
 
 	// callbacks
-	TIMER_DEVICE_CALLBACK_MEMBER(update);
+	void update(timer_device &timer, void *ptr, int32_t param);
 
 	// handlers
 	uint8_t via_a_in(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
@@ -59,10 +59,10 @@ public:
 	void via_a_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void via_b_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER(via_ca2_out);
-	DECLARE_WRITE_LINE_MEMBER(via_cb1_out);
-	DECLARE_WRITE_LINE_MEMBER(via_cb2_out);
-	DECLARE_WRITE_LINE_MEMBER(via_irq_out);
+	void via_ca2_out(int state);
+	void via_cb1_out(int state);
+	void via_cb2_out(int state);
+	void via_irq_out(int state);
 
 	uint8_t input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
@@ -114,7 +114,7 @@ void chexx_state::via_b_out(address_space &space, offs_t offset, uint8_t data, u
 //  logerror("%s: VIA write B = %02X\n", machine().describe_context(), data);
 }
 
-WRITE_LINE_MEMBER(chexx_state::via_ca2_out)
+void chexx_state::via_ca2_out(int state)
 {
 	m_digitalker->digitalker_0_cms_w(CLEAR_LINE);
 	m_digitalker->digitalker_0_cs_w(CLEAR_LINE);
@@ -122,11 +122,11 @@ WRITE_LINE_MEMBER(chexx_state::via_ca2_out)
 
 //  logerror("%s: VIA write CA2 = %02X\n", machine().describe_context(), state);
 }
-WRITE_LINE_MEMBER(chexx_state::via_cb1_out)
+void chexx_state::via_cb1_out(int state)
 {
 //  logerror("%s: VIA write CB1 = %02X\n", machine().describe_context(), state);
 }
-WRITE_LINE_MEMBER(chexx_state::via_cb2_out)
+void chexx_state::via_cb2_out(int state)
 {
 	m_shift = ((m_shift << 1) & 0xffffff) | state;
 
@@ -146,7 +146,7 @@ WRITE_LINE_MEMBER(chexx_state::via_cb2_out)
 
 //  logerror("%s: VIA write CB2 = %02X\n", machine().describe_context(), state);
 }
-WRITE_LINE_MEMBER(chexx_state::via_irq_out)
+void chexx_state::via_irq_out(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
 //  logerror("%s: VIA write IRQ = %02X\n", machine().describe_context(), state);
@@ -269,7 +269,7 @@ void chexx_state::machine_reset()
 	digitalker_set_bank(0);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(chexx_state::update)
+void chexx_state::update(timer_device &timer, void *ptr, int32_t param)
 {
 	// NMI on coin-in
 	uint8_t coin = (~ioport("COIN")->read()) & 0x03;

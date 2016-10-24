@@ -46,11 +46,11 @@ public:
 	void p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t p3_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void p3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_PALETTE_INIT(jtc_es40);
+	void palette_init_jtc_es40(palette_device &palette);
 	optional_shared_ptr<uint8_t> m_video_ram;
 
 	int m_centronics_busy;
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
+	void write_centronics_busy(int state);
 };
 
 
@@ -118,7 +118,7 @@ void jtc_state::p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t 
 	m_centronics->write_strobe(BIT(data, 5));
 }
 
-DECLARE_WRITE_LINE_MEMBER( jtc_state::write_centronics_busy )
+void jtc_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 }
@@ -628,7 +628,7 @@ uint32_t jtces23_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-PALETTE_INIT_MEMBER(jtc_state,jtc_es40)
+void jtc_state::palette_init_jtc_es40(palette_device &palette)
 {
 }
 

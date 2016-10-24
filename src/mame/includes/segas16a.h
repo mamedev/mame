@@ -82,8 +82,8 @@ public:
 	uint8_t mcu_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	// I8751-related VBLANK interrupt handlers
-	INTERRUPT_GEN_MEMBER( mcu_irq_assert );
-	INTERRUPT_GEN_MEMBER( i8751_main_cpu_vblank );
+	void mcu_irq_assert(device_t &device);
+	void i8751_main_cpu_vblank(device_t &device);
 
 	// game-specific driver init
 	void init_generic();

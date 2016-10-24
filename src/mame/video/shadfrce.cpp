@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "includes/shadfrce.h"
 
-TILE_GET_INFO_MEMBER(shadfrce_state::get_fgtile_info)
+void shadfrce_state::get_fgtile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	/* ---- ----  tttt tttt  ---- ----  pppp TTTT */
 	int tileno, colour;
@@ -20,7 +20,7 @@ void shadfrce_state::fgvideoram_w(address_space &space, offs_t offset, uint16_t 
 	m_fgtilemap->mark_tile_dirty(offset/2);
 }
 
-TILE_GET_INFO_MEMBER(shadfrce_state::get_bg0tile_info)
+void shadfrce_state::get_bg0tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	/* ---- ----  ---- cccc  --TT TTTT TTTT TTTT */
 	int tileno, colour,fyx;
@@ -39,7 +39,7 @@ void shadfrce_state::bg0videoram_w(address_space &space, offs_t offset, uint16_t
 	m_bg0tilemap->mark_tile_dirty(offset/2);
 }
 
-TILE_GET_INFO_MEMBER(shadfrce_state::get_bg1tile_info)
+void shadfrce_state::get_bg1tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno, colour;
 

@@ -75,7 +75,7 @@ void tsamurai_state::nmi_enable_w(address_space &space, offs_t offset, uint8_t d
 	m_nmi_enabled = data;
 }
 
-INTERRUPT_GEN_MEMBER(tsamurai_state::interrupt)
+void tsamurai_state::interrupt(device_t &device)
 {
 	if (m_nmi_enabled) device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
@@ -295,7 +295,7 @@ void tsamurai_state::vsgongf_sound_nmi_enable_w(address_space &space, offs_t off
 	m_vsgongf_sound_nmi_enabled = data;
 }
 
-INTERRUPT_GEN_MEMBER(tsamurai_state::vsgongf_sound_interrupt)
+void tsamurai_state::vsgongf_sound_interrupt(device_t &device)
 {
 	if (m_vsgongf_sound_nmi_enabled) device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }

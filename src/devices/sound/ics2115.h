@@ -98,8 +98,8 @@ public:
 	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	//uint8_t read(offs_t offset);
 	//void write(offs_t offset, uint8_t data);
-	TIMER_CALLBACK_MEMBER(timer_cb_0);
-	TIMER_CALLBACK_MEMBER(timer_cb_1);
+	void timer_cb_0(void *ptr, int32_t param);
+	void timer_cb_1(void *ptr, int32_t param);
 
 	sound_stream *m_stream;
 

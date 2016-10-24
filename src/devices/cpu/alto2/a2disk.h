@@ -70,10 +70,10 @@ jkff_t m_sysclkb0[4];               //!< simulate previous sysclkb
 jkff_t m_sysclkb1[4];               //!< simulate current sysclkb
 
 void kwd_timing(int bitclk, int datin, int block);  //!< disk word timing
-TIMER_CALLBACK_MEMBER( disk_seclate );          //!< timer callback to take away the SECLATE pulse (monoflop)
-TIMER_CALLBACK_MEMBER( disk_ok_to_run );        //!< timer callback to take away the OK TO RUN pulse (reset)
-TIMER_CALLBACK_MEMBER( disk_strobon );          //!< timer callback to pulse the STROBE' signal to the drive
-TIMER_CALLBACK_MEMBER( disk_ready_mf31a );      //!< timer callback to change the READY monoflop 31a
+void disk_seclate(void *ptr, int32_t param);          //!< timer callback to take away the SECLATE pulse (monoflop)
+void disk_ok_to_run(void *ptr, int32_t param);        //!< timer callback to take away the OK TO RUN pulse (reset)
+void disk_strobon(void *ptr, int32_t param);          //!< timer callback to pulse the STROBE' signal to the drive
+void disk_ready_mf31a(void *ptr, int32_t param);      //!< timer callback to change the READY monoflop 31a
 void disk_bitclk(void *ptr, int arg);           //!< function to update the disk controller with a new bitclk
 void disk_block(int task);                      //!< called if one of the disk tasks (task_kwd or task_ksec) blocks
 void bs_early_read_kstat();                     //!< bus source: bus driven by disk status register KSTAT

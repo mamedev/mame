@@ -17,7 +17,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(hanaawas_state, hanaawas)
+void hanaawas_state::palette_init_hanaawas(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -87,7 +87,7 @@ void hanaawas_state::hanaawas_portB_w(address_space &space, offs_t offset, uint8
 	}
 }
 
-TILE_GET_INFO_MEMBER(hanaawas_state::get_bg_tile_info)
+void hanaawas_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	/* the color is determined by the current color byte, but the bank is via the previous one!!! */
 	int offset = (tile_index + (flip_screen() ? 1 : -1)) & 0x3ff;

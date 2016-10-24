@@ -205,13 +205,13 @@ void igs017_igs031_device::palram_w(address_space &space, offs_t offset, uint8_t
 
 #define COLOR(_X)   (((_X)>>2)&7)
 
-TILE_GET_INFO_MEMBER(igs017_igs031_device::get_fg_tile_info)
+void igs017_igs031_device::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_fg_videoram[tile_index*4+0] + (m_fg_videoram[tile_index*4+1] << 8);
 	int attr = m_fg_videoram[tile_index*4+2] + (m_fg_videoram[tile_index*4+3] << 8);
 	SET_TILE_INFO_MEMBER(0, code, COLOR(attr), TILE_FLIPXY( attr >> 5 ));
 }
-TILE_GET_INFO_MEMBER(igs017_igs031_device::get_bg_tile_info)
+void igs017_igs031_device::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_bg_videoram[tile_index*4+0] + (m_bg_videoram[tile_index*4+1] << 8);
 	int attr = m_bg_videoram[tile_index*4+2] + (m_bg_videoram[tile_index*4+3] << 8);

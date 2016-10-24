@@ -4,7 +4,7 @@
 #include "includes/munchmo.h"
 
 
-PALETTE_INIT_MEMBER(munchmo_state, munchmo)
+void munchmo_state::palette_init_munchmo(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;

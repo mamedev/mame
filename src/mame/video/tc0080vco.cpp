@@ -211,7 +211,7 @@ static const int tc0080vco_zoomy_conv_table[] =
 #endif
 
 
-TILE_GET_INFO_MEMBER(tc0080vco_device::get_bg0_tile_info)
+void tc0080vco_device::get_bg0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int color, tile;
 
@@ -226,7 +226,7 @@ TILE_GET_INFO_MEMBER(tc0080vco_device::get_bg0_tile_info)
 			TILE_FLIPYX((m_bg0_ram_1[tile_index] & 0x00c0) >> 6));
 }
 
-TILE_GET_INFO_MEMBER(tc0080vco_device::get_bg1_tile_info)
+void tc0080vco_device::get_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int color, tile;
 
@@ -241,7 +241,7 @@ TILE_GET_INFO_MEMBER(tc0080vco_device::get_bg1_tile_info)
 			TILE_FLIPYX((m_bg1_ram_1[tile_index] & 0x00c0) >> 6));
 }
 
-TILE_GET_INFO_MEMBER(tc0080vco_device::get_tx_tile_info)
+void tc0080vco_device::get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile;
 
@@ -682,7 +682,7 @@ uint16_t tc0080vco_device::scrram_r(address_space &space, offs_t offset, uint16_
 	return m_scroll_ram[offset];
 }
 
-READ_LINE_MEMBER( tc0080vco_device::flipscreen_r )
+int tc0080vco_device::flipscreen_r()
 {
 	return m_flipscreen;
 }

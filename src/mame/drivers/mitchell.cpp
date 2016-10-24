@@ -1114,7 +1114,7 @@ void mitchell_state::machine_reset_mitchell()
 	m_keymatrix = 0;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(mitchell_state::mitchell_irq)
+void mitchell_state::mitchell_irq(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -1230,7 +1230,7 @@ GFXDECODE_END
 
 
 
-WRITE_LINE_MEMBER(mitchell_state::spangbl_adpcm_int)
+void mitchell_state::spangbl_adpcm_int(int state)
 {
 	m_msm->data_w(m_sample_buffer & 0x0f);
 	m_sample_buffer >>= 4;

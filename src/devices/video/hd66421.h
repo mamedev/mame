@@ -50,7 +50,7 @@ public:
 	void reg_idx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t reg_dat_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void reg_dat_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_PALETTE_INIT(hd66421);
+	void palette_init_hd66421(palette_device &palette);
 
 	uint32_t update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

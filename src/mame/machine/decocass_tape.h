@@ -67,7 +67,7 @@ private:
 	optional_region_ptr<uint8_t> m_tape_data;
 
 	const char *describe_state();
-	TIMER_CALLBACK_MEMBER( tape_clock_callback );
+	void tape_clock_callback(void *ptr, int32_t param);
 };
 
 extern const device_type DECOCASS_TAPE;

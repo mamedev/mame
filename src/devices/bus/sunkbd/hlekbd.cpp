@@ -799,7 +799,7 @@ machine_config_constructor hle_device_base::device_mconfig_additions() const
     handle serial input line changes
 --------------------------------------------------*/
 
-WRITE_LINE_MEMBER( hle_device_base::input_txd )
+void hle_device_base::input_txd(int state)
 {
 	device_buffered_serial_interface::rx_w(state);
 }

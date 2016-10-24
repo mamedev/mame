@@ -16,7 +16,7 @@
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(exterm_state, exterm)
+void exterm_state::palette_init_exterm(palette_device &palette)
 {
 	int i;
 

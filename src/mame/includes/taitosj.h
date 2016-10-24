@@ -117,9 +117,9 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_taitosj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_kikstart(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(taitosj_mcu_real_data_w);
-	TIMER_CALLBACK_MEMBER(taitosj_mcu_data_real_r);
-	TIMER_CALLBACK_MEMBER(taitosj_mcu_status_real_w);
+	void taitosj_mcu_real_data_w(void *ptr, int32_t param);
+	void taitosj_mcu_data_real_r(void *ptr, int32_t param);
+	void taitosj_mcu_status_real_w(void *ptr, int32_t param);
 	void init_common();
 	void reset_common();
 	void set_pens();

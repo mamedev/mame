@@ -38,7 +38,7 @@ public:
 	void irqmask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void sounden_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	INTERRUPT_GEN_MEMBER(vblank_irq);
+	void vblank_irq(device_t &device);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 private:
@@ -192,7 +192,7 @@ uint32_t alinvade_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	return 0;
 }
 
-INTERRUPT_GEN_MEMBER(alinvade_state::vblank_irq)
+void alinvade_state::vblank_irq(device_t &device)
 {
 	if(m_irqmask & 1)
 		m_maincpu->set_input_line(0,HOLD_LINE);

@@ -93,7 +93,7 @@ uint8_t radio86_state::rk7007_8255_portc_r(address_space &space, offs_t offset, 
 	return key;
 }
 
-WRITE_LINE_MEMBER(radio86_state::hrq_w)
+void radio86_state::hrq_w(int state)
 {
 	/* HACK - this should be connected to the BUSREQ line of Z80 */
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state);
@@ -223,7 +223,7 @@ static const rgb_t radio86_palette[3] = {
 	rgb_t(0xff, 0xff, 0xff)  // highlight
 };
 
-PALETTE_INIT_MEMBER(radio86_state,radio86)
+void radio86_state::palette_init_radio86(palette_device &palette)
 {
 	palette.set_pen_colors(0, radio86_palette, ARRAY_LENGTH(radio86_palette));
 }

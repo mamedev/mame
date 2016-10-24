@@ -323,7 +323,7 @@ GFXDECODE_END
 
 
 
-WRITE_LINE_MEMBER(wc90b_state::adpcm_int)
+void wc90b_state::adpcm_int(int state)
 {
 	m_toggle ^= 1;
 	if(m_toggle)

@@ -110,7 +110,7 @@ INPUT_PORTS_END
 
 /* Z80-PIO Interface */
 
-TIMER_DEVICE_CALLBACK_MEMBER(vcs80_state::vcs80_keyboard_tick)
+void vcs80_state::vcs80_keyboard_tick(timer_device &timer, void *ptr, int32_t param)
 {
 	if (m_keyclk)
 	{

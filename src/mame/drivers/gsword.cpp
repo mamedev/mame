@@ -237,7 +237,7 @@ void gsword_state::machine_reset()
 	m_protect_hack = 0;
 }
 
-INTERRUPT_GEN_MEMBER(gsword_state::gsword_snd_interrupt)
+void gsword_state::gsword_snd_interrupt(device_t &device)
 {
 	if(m_nmi_enable)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);

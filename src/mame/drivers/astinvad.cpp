@@ -100,8 +100,8 @@ public:
 	void video_start_spaceint();
 	uint32_t screen_update_astinvad(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_spaceint(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(kamikaze_int_off);
-	TIMER_CALLBACK_MEMBER(kamizake_int_gen);
+	void kamikaze_int_off(void *ptr, int32_t param);
+	void kamizake_int_gen(void *ptr, int32_t param);
 	void plot_byte( bitmap_rgb32 &bitmap, uint8_t y, uint8_t x, uint8_t data, uint8_t color );
 
 protected:
@@ -234,13 +234,13 @@ void astinvad_state::device_timer(emu_timer &timer, device_timer_id id, int para
 }
 
 
-TIMER_CALLBACK_MEMBER(astinvad_state::kamikaze_int_off)
+void astinvad_state::kamikaze_int_off(void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 
-TIMER_CALLBACK_MEMBER(astinvad_state::kamizake_int_gen)
+void astinvad_state::kamizake_int_gen(void *ptr, int32_t param)
 {
 	/* interrupts are asserted on every state change of the 128V line */
 	m_maincpu->set_input_line(0, ASSERT_LINE);

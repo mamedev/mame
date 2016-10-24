@@ -37,7 +37,7 @@
 #include "includes/bladestl.h"
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(bladestl_state::bladestl_scanline)
+void bladestl_state::bladestl_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

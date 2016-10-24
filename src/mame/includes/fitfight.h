@@ -59,14 +59,14 @@ public:
 	void init_fitfight();
 	void init_histryma();
 	void init_bbprot();
-	TILE_GET_INFO_MEMBER(get_fof_bak_tile_info);
-	TILE_GET_INFO_MEMBER(get_fof_mid_tile_info);
-	TILE_GET_INFO_MEMBER(get_fof_txt_tile_info);
+	void get_fof_bak_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_fof_mid_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_fof_txt_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_fitfight(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(snd_irq);
+	void snd_irq(device_t &device);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int layer );
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;

@@ -372,7 +372,7 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(thedeep_state::interrupt)
+void thedeep_state::interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -402,7 +402,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(thedeep_state::interrupt)
 	}
 }
 
-INTERRUPT_GEN_MEMBER(thedeep_state::mcu_irq)
+void thedeep_state::mcu_irq(device_t &device)
 {
 	m_mcu->set_input_line(MCS51_INT1_LINE, ASSERT_LINE);
 }

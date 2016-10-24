@@ -367,7 +367,7 @@ void grip_device::ppi_pc_w(address_space &space, offs_t offset, uint8_t data, ui
 //  Z80STI_INTERFACE( sti_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(grip_device::write_centronics_busy)
+void grip_device::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 }
@@ -409,7 +409,7 @@ uint8_t grip_device::sti_gpio_r(address_space &space, offs_t offset, uint8_t mem
 	return data;
 }
 
-WRITE_LINE_MEMBER( grip_device::speaker_w )
+void grip_device::speaker_w(int state)
 {
 	int level = state && ((m_vol1 << 1) | m_vol0);
 
@@ -728,7 +728,7 @@ void grip_device::page_w(address_space &space, offs_t offset, uint8_t data, uint
 //  stat_r -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(grip_device::write_centronics_fault)
+void grip_device::write_centronics_fault(int state)
 {
 	m_centronics_fault = state;
 }

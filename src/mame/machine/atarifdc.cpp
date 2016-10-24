@@ -714,7 +714,7 @@ void atari_fdc_device::serout_w(address_space &space, offs_t offset, uint8_t dat
 	}
 }
 
-WRITE_LINE_MEMBER(atari_fdc_device::pia_cb2_w)
+void atari_fdc_device::pia_cb2_w(int state)
 {
 	if (!state)
 	{

@@ -12,7 +12,7 @@ void galpanic_state::video_start()
 	save_item(NAME(m_bitmap));
 }
 
-PALETTE_INIT_MEMBER(galpanic_state,galpanic)
+void galpanic_state::palette_init_galpanic(palette_device &palette)
 {
 	/* first 1024 colors are dynamic */
 

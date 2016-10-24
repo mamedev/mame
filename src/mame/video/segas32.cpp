@@ -267,7 +267,7 @@ void segas32_state::common_start(int multi32)
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(segas32_state::update_sprites)
+void segas32_state::update_sprites(void *ptr, int32_t param)
 {
 	/* if automatic mode is selected, do it every frame (0) or every other frame (1) */
 	if (!(m_sprite_control[3] & 2))
@@ -713,7 +713,7 @@ tilemap_t *segas32_state::find_cache_entry(int page, int bank)
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(segas32_state::get_tile_info)
+void segas32_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	struct segas32_state::cache_entry *entry = (struct segas32_state::cache_entry *)tilemap.user_data();
 	uint16_t data = m_system32_videoram[(entry->page & 0x7f) * 0x200 + tile_index];

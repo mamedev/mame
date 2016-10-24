@@ -416,48 +416,48 @@ inline void taito_f3_state::get_tile_info(tile_data &tileinfo, int tile_index, u
 	tileinfo.pen_mask = (extra_planes << 4) | 0x0f;
 }
 
-TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info1)
+void taito_f3_state::get_tile_info1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	get_tile_info(tileinfo,tile_index,m_f3_pf_data_1);
 }
 
-TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info2)
+void taito_f3_state::get_tile_info2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	get_tile_info(tileinfo,tile_index,m_f3_pf_data_2);
 }
 
-TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info3)
+void taito_f3_state::get_tile_info3(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	get_tile_info(tileinfo,tile_index,m_f3_pf_data_3);
 }
 
-TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info4)
+void taito_f3_state::get_tile_info4(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	get_tile_info(tileinfo,tile_index,m_f3_pf_data_4);
 }
 
-TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info5)
+void taito_f3_state::get_tile_info5(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	get_tile_info(tileinfo,tile_index,m_f3_pf_data_5);
 }
 
-TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info6)
+void taito_f3_state::get_tile_info6(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	get_tile_info(tileinfo,tile_index,m_f3_pf_data_6);
 }
 
-TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info7)
+void taito_f3_state::get_tile_info7(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	get_tile_info(tileinfo,tile_index,m_f3_pf_data_7);
 }
 
-TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info8)
+void taito_f3_state::get_tile_info8(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	get_tile_info(tileinfo,tile_index,m_f3_pf_data_8);
 }
 
 
-TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info_vram)
+void taito_f3_state::get_tile_info_vram(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int vram_tile;
 	int flags=0;
@@ -473,7 +473,7 @@ TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info_vram)
 			flags);
 }
 
-TILE_GET_INFO_MEMBER(taito_f3_state::get_tile_info_pixel)
+void taito_f3_state::get_tile_info_pixel(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int vram_tile,col_off;
 	int flags=0;

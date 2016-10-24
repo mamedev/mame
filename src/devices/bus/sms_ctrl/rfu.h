@@ -33,7 +33,7 @@ public:
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;
 
-	DECLARE_WRITE_LINE_MEMBER(th_pin_w);
+	void th_pin_w(int state);
 	uint32_t pixel_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
 protected:

@@ -79,7 +79,7 @@ void oricext_device::device_start()
 	memset(junk_write, 0x00, sizeof(junk_write));
 }
 
-WRITE_LINE_MEMBER(oricext_device::irq_w)
+void oricext_device::irq_w(int state)
 {
 	connector->irq_w(state);
 }

@@ -52,12 +52,12 @@ public:
 	template<class _Object> static devcb_base &set_out_keydown_handler(device_t &device, _Object object) { return downcast<abc_keyboard_port_device &>(device).m_out_keydown_handler.set_callback(object); }
 
 	// computer interface
-	DECLARE_WRITE_LINE_MEMBER( txd_w );
+	void txd_w(int state);
 
 	// peripheral interface
-	DECLARE_WRITE_LINE_MEMBER( write_rx );
-	DECLARE_WRITE_LINE_MEMBER( trxc_w );
-	DECLARE_WRITE_LINE_MEMBER( keydown_w );
+	void write_rx(int state);
+	void trxc_w(int state);
+	void keydown_w(int state);
 
 protected:
 	// device-level overrides

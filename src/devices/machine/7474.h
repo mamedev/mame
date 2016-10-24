@@ -76,12 +76,12 @@ public:
 	template<class _Object> static devcb_base &set_comp_output_cb(device_t &device, _Object object) { return downcast<ttl7474_device &>(device).m_comp_output_func.set_callback(object); }
 
 	// public interfaces
-	DECLARE_WRITE_LINE_MEMBER( clear_w );
-	DECLARE_WRITE_LINE_MEMBER( preset_w );
-	DECLARE_WRITE_LINE_MEMBER( clock_w );
-	DECLARE_WRITE_LINE_MEMBER( d_w );
-	DECLARE_READ_LINE_MEMBER( output_r );
-	DECLARE_READ_LINE_MEMBER( output_comp_r );    // NOT strictly the same as !output_r()
+	void clear_w(int state);
+	void preset_w(int state);
+	void clock_w(int state);
+	void d_w(int state);
+	int output_r();
+	int output_comp_r();    // NOT strictly the same as !output_r()
 
 protected:
 	// device-level overrides

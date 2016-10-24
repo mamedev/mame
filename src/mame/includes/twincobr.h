@@ -68,7 +68,7 @@ public:
 	void twincobr_dsp_bio_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	uint16_t fsharkbt_dsp_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void fsharkbt_dsp_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	DECLARE_READ_LINE_MEMBER(twincobr_BIO_r);
+	int twincobr_BIO_r();
 	void twincobr_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void wardner_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint16_t twincobr_sharedram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
@@ -101,14 +101,14 @@ public:
 	uint8_t wardner_sprite_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void wardner_sprite_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_twincobr();
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	TILE_GET_INFO_MEMBER(get_tx_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void machine_reset_twincobr();
 	void video_start_toaplan0();
 	uint32_t screen_update_toaplan0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(twincobr_interrupt);
-	INTERRUPT_GEN_MEMBER(wardner_interrupt);
+	void twincobr_interrupt(device_t &device);
+	void wardner_interrupt(device_t &device);
 	void twincobr_restore_dsp();
 	void twincobr_create_tilemaps();
 	void twincobr_display(int enable);

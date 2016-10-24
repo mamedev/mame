@@ -188,7 +188,7 @@ uint32_t laserbat_state_base::screen_update_laserbat(screen_device &screen, bitm
 }
 
 
-TIMER_CALLBACK_MEMBER(laserbat_state_base::video_line)
+void laserbat_state_base::video_line(void *ptr, int32_t param)
 {
 	/*
 	    +-----+---------+----------------------------------+-------------------------------------+
@@ -325,7 +325,7 @@ TIMER_CALLBACK_MEMBER(laserbat_state_base::video_line)
 }
 
 
-PALETTE_INIT_MEMBER(laserbat_state, laserbat)
+void laserbat_state::palette_init_laserbat(palette_device &palette)
 {
 	/*
 	    Uses GRBGRBGR pixel format.  The two topmost bist are the LSBs
@@ -377,7 +377,7 @@ PALETTE_INIT_MEMBER(laserbat_state, laserbat)
 }
 
 
-PALETTE_INIT_MEMBER(catnmous_state, catnmous)
+void catnmous_state::palette_init_catnmous(palette_device &palette)
 {
 	/*
 	    Uses GRBGRBGR pixel format.  The two topmost bist are the LSBs

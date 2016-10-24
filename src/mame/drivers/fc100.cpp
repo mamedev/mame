@@ -68,12 +68,12 @@ public:
 	void port43_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void port60_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void port70_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(txdata_callback);
-	DECLARE_WRITE_LINE_MEMBER(uart_clock_w);
+	void txdata_callback(int state);
+	void uart_clock_w(int state);
 	void init_fc100();
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_c);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_p);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_k);
+	void timer_c(timer_device &timer, void *ptr, int32_t param);
+	void timer_p(timer_device &timer, void *ptr, int32_t param);
+	void timer_k(timer_device &timer, void *ptr, int32_t param);
 
 	uint8_t *m_p_chargen;
 
@@ -287,7 +287,7 @@ uint8_t fc100_state::port00_r(address_space &space, offs_t offset, uint8_t mem_m
 // 0 = no key pressed, nothing to do
 // 1 = key pressed, generate IRQ.
 // 2 = key released, generate IRQ.
-TIMER_DEVICE_CALLBACK_MEMBER( fc100_state::timer_k)
+void fc100_state::timer_k(timer_device &timer, void *ptr, int32_t param)
 {
 	/* scan the keyboard */
 	uint8_t i;
@@ -410,18 +410,18 @@ void fc100_state::port33_w(address_space &space, offs_t offset, uint8_t data, ui
 		m_cass->change_state(CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 }
 
-WRITE_LINE_MEMBER( fc100_state::txdata_callback )
+void fc100_state::txdata_callback(int state)
 {
 	m_cass_state = state;
 }
 
-WRITE_LINE_MEMBER( fc100_state::uart_clock_w )
+void fc100_state::uart_clock_w(int state)
 {
 	m_uart->write_txc(state);
 	m_uart->write_rxc(state);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( fc100_state::timer_c )
+void fc100_state::timer_c(timer_device &timer, void *ptr, int32_t param)
 {
 	m_cass_data[3]++;
 
@@ -437,7 +437,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( fc100_state::timer_c )
 		m_cass->output(BIT(m_cass_data[3], 1) ? -1.0 : +1.0); // 1200Hz
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( fc100_state::timer_p)
+void fc100_state::timer_p(timer_device &timer, void *ptr, int32_t param)
 {
 	/* cassette - turn 1200/2400Hz to a bit */
 	m_cass_data[1]++;

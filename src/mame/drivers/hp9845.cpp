@@ -443,7 +443,7 @@ void hp9845b_state::video_render_buff(unsigned video_scanline , unsigned line_in
 		}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(hp9845b_state::scanline_timer)
+void hp9845b_state::scanline_timer(timer_device &timer, void *ptr, int32_t param)
 {
 		unsigned video_scanline = param;
 
@@ -465,7 +465,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(hp9845b_state::scanline_timer)
 		}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(hp9845b_state::gv_timer)
+void hp9845b_state::gv_timer(timer_device &timer, void *ptr, int32_t param)
 {
 		advance_gv_fsm(false , false);
 }
@@ -799,7 +799,7 @@ void hp9845b_state::graphic_video_render(unsigned video_scanline)
 		}
 }
 
-IRQ_CALLBACK_MEMBER(hp9845b_state::irq_callback)
+int hp9845b_state::irq_callback(device_t &device, int irqline)
 {
 		if (irqline == HPHYBRID_IRL) {
 			//logerror("irq ack L %02x\n" , m_irl_pending);
@@ -874,7 +874,7 @@ void hp9845b_state::install_readwrite_handler(uint8_t sc , read16_delegate rhand
 	m_ppu->space(AS_IO).install_readwrite_handler(sc * 4 , sc * 4 + 3 , rhandler , whandler);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(hp9845b_state::kb_scan)
+void hp9845b_state::kb_scan(timer_device &timer, void *ptr, int32_t param)
 {
 		ioport_value input[ 4 ];
 		input[ 0 ] = m_io_key0->read();
@@ -966,7 +966,7 @@ void hp9845b_state::kb_irq_clear_w(address_space &space, offs_t offset, uint16_t
 		}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(hp9845b_state::beeper_off)
+void hp9845b_state::beeper_off(timer_device &timer, void *ptr, int32_t param)
 {
 	m_beeper->set_state(0);
 }
@@ -979,17 +979,17 @@ void hp9845b_state::pa_w(address_space &space, offs_t offset, uint8_t data, uint
 	}
 }
 
-WRITE_LINE_MEMBER(hp9845b_state::t15_irq_w)
+void hp9845b_state::t15_irq_w(int state)
 {
 	irq_w(T15_PA , state);
 }
 
-WRITE_LINE_MEMBER(hp9845b_state::t15_flg_w)
+void hp9845b_state::t15_flg_w(int state)
 {
 	flg_w(T15_PA , state);
 }
 
-WRITE_LINE_MEMBER(hp9845b_state::t15_sts_w)
+void hp9845b_state::t15_sts_w(int state)
 {
 	sts_w(T15_PA , state);
 }

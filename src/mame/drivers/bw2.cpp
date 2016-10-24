@@ -387,7 +387,7 @@ INPUT_PORTS_END
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
-WRITE_LINE_MEMBER( bw2_state::write_centronics_busy )
+void bw2_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 }
@@ -494,13 +494,13 @@ uint8_t bw2_state::ppi_pc_r(address_space &space, offs_t offset, uint8_t mem_mas
 //  pit8253_config pit_intf
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( bw2_state::pit_out0_w )
+void bw2_state::pit_out0_w(int state)
 {
 	m_uart->write_txc(state);
 	m_uart->write_rxc(state);
 }
 
-WRITE_LINE_MEMBER( bw2_state::mtron_w )
+void bw2_state::mtron_w(int state)
 {
 	m_mtron = state;
 	m_mfdbk = !state;
@@ -512,7 +512,7 @@ WRITE_LINE_MEMBER( bw2_state::mtron_w )
 //  floppy_format_type floppy_formats
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( bw2_state::fdc_drq_w )
+void bw2_state::fdc_drq_w(int state)
 {
 	if (state)
 	{
@@ -542,7 +542,7 @@ SLOT_INTERFACE_END
 //**************************************************************************
 
 
-PALETTE_INIT_MEMBER(bw2_state, bw2)
+void bw2_state::palette_init_bw2(palette_device &palette)
 {
 	palette.set_pen_color(0, 0xa5, 0xad, 0xa5);
 	palette.set_pen_color(1, 0x31, 0x39, 0x10);

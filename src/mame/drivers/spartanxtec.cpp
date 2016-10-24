@@ -56,11 +56,11 @@ public:
 	virtual void video_start() override;
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_spartanxtec(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_PALETTE_INIT(spartanxtec);
+	void palette_init_spartanxtec(palette_device &palette);
 
 	tilemap_t*             m_bg_tilemap;
 	void kungfum_tileram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	TILE_GET_INFO_MEMBER(get_kungfum_bg_tile_info);
+	void get_kungfum_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void spartanxtec_soundlatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void a801_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void sound_irq_ack(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -77,7 +77,7 @@ void spartanxtec_state::kungfum_tileram_w(address_space &space, offs_t offset, u
 }
 
 
-TILE_GET_INFO_MEMBER(spartanxtec_state::get_kungfum_bg_tile_info)
+void spartanxtec_state::get_kungfum_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code;
 	int color;
@@ -334,7 +334,7 @@ void spartanxtec_state::machine_reset()
 {
 }
 
-PALETTE_INIT_MEMBER(spartanxtec_state, spartanxtec)
+void spartanxtec_state::palette_init_spartanxtec(palette_device &palette)
 {
 	// todo, proper weights for this bootleg PCB
 	const uint8_t *color_prom = memregion("cprom")->base();

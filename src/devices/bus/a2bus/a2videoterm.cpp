@@ -368,7 +368,7 @@ MC6845_UPDATE_ROW( a2bus_videx80_device::crtc_update_row )
 	}
 }
 
-WRITE_LINE_MEMBER( a2bus_videx80_device::vsync_changed )
+void a2bus_videx80_device::vsync_changed(int state)
 {
 	if ( state )
 	{

@@ -148,7 +148,7 @@ void tms34061_device::update_interrupts()
 }
 
 
-TIMER_CALLBACK_MEMBER( tms34061_device::interrupt )
+void tms34061_device::interrupt(void *ptr, int32_t param)
 {
 	/* set timer for next frame */
 	m_timer->adjust(m_screen->frame_period());

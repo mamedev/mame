@@ -35,7 +35,7 @@ public:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	DECLARE_WRITE_LINE_MEMBER( fdc_int_w );
+	void fdc_int_w(int state);
 	void fdc_auxiliary_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t fdc_control_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void io_dec_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);

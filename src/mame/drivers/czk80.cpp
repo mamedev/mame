@@ -64,15 +64,15 @@ public:
 
 	void init_czk80();
 	void machine_reset_czk80();
-	TIMER_CALLBACK_MEMBER(czk80_reset);
+	void czk80_reset(void *ptr, int32_t param);
 	uint8_t port80_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t port81_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t portc0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void port40_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
-	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
-	DECLARE_WRITE_LINE_MEMBER(ctc_z2_w);
+	void ctc_z0_w(int state);
+	void ctc_z1_w(int state);
+	void ctc_z2_w(int state);
 private:
 	uint8_t m_term_data;
 	required_device<cpu_device> m_maincpu;
@@ -138,21 +138,21 @@ static const z80_daisy_config daisy_chain[] =
 
 /* Z80-CTC Interface */
 
-WRITE_LINE_MEMBER( czk80_state::ctc_z0_w )
+void czk80_state::ctc_z0_w(int state)
 {
 // guess this generates clock for z80dart
 }
 
-WRITE_LINE_MEMBER( czk80_state::ctc_z1_w )
+void czk80_state::ctc_z1_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER( czk80_state::ctc_z2_w )
+void czk80_state::ctc_z2_w(int state)
 {
 }
 
 /* after the first 4 bytes have been read from ROM, switch the ram back in */
-TIMER_CALLBACK_MEMBER( czk80_state::czk80_reset)
+void czk80_state::czk80_reset(void *ptr, int32_t param)
 {
 	membank("bankr0")->set_entry(1);
 }

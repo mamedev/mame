@@ -70,6 +70,6 @@ public:
 	void init_mhavocrv();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	TIMER_CALLBACK_MEMBER(delayed_gamma_w);
-	TIMER_DEVICE_CALLBACK_MEMBER(mhavoc_cpu_irq_clock);
+	void delayed_gamma_w(void *ptr, int32_t param);
+	void mhavoc_cpu_irq_clock(timer_device &timer, void *ptr, int32_t param);
 };

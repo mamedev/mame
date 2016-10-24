@@ -484,7 +484,7 @@ void dec8_state::dec8_sound_w(address_space &space, offs_t offset, uint8_t data,
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-WRITE_LINE_MEMBER(dec8_state::csilver_adpcm_int)
+void dec8_state::csilver_adpcm_int(int state)
 {
 	m_toggle ^= 1;
 	if (m_toggle)
@@ -1908,14 +1908,14 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-INTERRUPT_GEN_MEMBER(dec8_state::gondo_interrupt)
+void dec8_state::gondo_interrupt(device_t &device)
 {
 	if (m_nmi_enable)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE); /* VBL */
 }
 
 /* Coins generate NMI's */
-INTERRUPT_GEN_MEMBER(dec8_state::oscar_interrupt)
+void dec8_state::oscar_interrupt(device_t &device)
 {
 	if ((ioport("IN2")->read() & 0x7) == 0x7) m_latch = 1;
 	if (m_latch && (ioport("IN2")->read() & 0x7) != 0x7)

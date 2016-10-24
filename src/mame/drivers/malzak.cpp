@@ -261,7 +261,7 @@ static GFXDECODE_START( malzak )
 GFXDECODE_END
 
 
-PALETTE_INIT_MEMBER(malzak_state, malzak)
+void malzak_state::palette_init_malzak(palette_device &palette)
 {
 	int i;
 

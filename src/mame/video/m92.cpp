@@ -145,7 +145,7 @@ void m92_state::m92_paletteram_w(address_space &space, offs_t offset, uint16_t d
 
 /*****************************************************************************/
 
-TILE_GET_INFO_MEMBER(m92_state::get_pf_tile_info)
+void m92_state::get_pf_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	M92_pf_layer_info *layer = (M92_pf_layer_info *)tilemap.user_data();
 	int tile, attrib;

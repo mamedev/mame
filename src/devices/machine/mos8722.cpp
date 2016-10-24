@@ -251,7 +251,7 @@ void mos8722_device::write(address_space &space, offs_t offset, uint8_t data, ui
 //  fsdir_r - fast serial direction read
 //-------------------------------------------------
 
-READ_LINE_MEMBER( mos8722_device::fsdir_r )
+int mos8722_device::fsdir_r()
 {
 	return MCR_FSDIR;
 }

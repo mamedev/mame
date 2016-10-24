@@ -41,20 +41,20 @@ public:
 	void init_raiders5();
 	void init_pkunwar();
 	void video_start_nova2001();
-	DECLARE_PALETTE_INIT(nova2001);
-	DECLARE_PALETTE_DECODER(BBGGRRII);
+	void palette_init_nova2001(palette_device &palette);
+	static rgb_t BBGGRRII_decoder(uint32_t raw);
 	void machine_start_ninjakun();
 	void video_start_ninjakun();
 	void video_start_pkunwar();
 	void video_start_raiders5();
 
-	TILE_GET_INFO_MEMBER(nova2001_get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(nova2001_get_fg_tile_info);
-	TILE_GET_INFO_MEMBER(ninjakun_get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(ninjakun_get_fg_tile_info);
-	TILE_GET_INFO_MEMBER(pkunwar_get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(raiders5_get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(raiders5_get_fg_tile_info);
+	void nova2001_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void nova2001_get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void ninjakun_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void ninjakun_get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void pkunwar_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void raiders5_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void raiders5_get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	uint32_t screen_update_nova2001(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_ninjakun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

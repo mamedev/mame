@@ -25,7 +25,7 @@ Quite similar to Appoooh
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(drmicro_state::drmicro_interrupt)
+void drmicro_state::drmicro_interrupt(device_t &device)
 {
 	if (m_nmi_enable)
 			device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -41,7 +41,7 @@ void drmicro_state::nmi_enable_w(address_space &space, offs_t offset, uint8_t da
 }
 
 
-WRITE_LINE_MEMBER(drmicro_state::pcm_w)
+void drmicro_state::pcm_w(int state)
 {
 	uint8_t *PCM = memregion("adpcm")->base();
 

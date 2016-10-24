@@ -63,16 +63,16 @@ public:
 
 	/* pia2 */
 	void pia2_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( pia2_firq_a );
-	DECLARE_WRITE_LINE_MEMBER( pia2_firq_b );
+	void pia2_firq_a(int state);
+	void pia2_firq_b(int state);
 
 	/* psg */
 	uint8_t psg_porta_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void psg_porta_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	/* fdc */
-	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
+	void fdc_intrq_w(int state);
+	void fdc_drq_w(int state);
 
 protected:
 	/* driver overrides */

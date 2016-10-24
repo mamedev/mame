@@ -41,7 +41,7 @@ protected:
 	virtual void device_reset_after_children() override;
 
 private:
-	TIMER_CALLBACK_MEMBER(motor_off);
+	void motor_off(void *ptr, int32_t param);
 
 	required_device<fd1793_t> m_fdc;
 	required_device<floppy_connector> m_floppy0;

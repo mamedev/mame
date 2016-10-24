@@ -137,8 +137,8 @@ public:
 	void machine_reset_schaser_sh();
 	void machine_start_claybust();
 
-	DECLARE_PALETTE_INIT(rollingc);
-	DECLARE_PALETTE_INIT(sflush);
+	void palette_init_rollingc(palette_device &palette);
+	void palette_init_sflush(palette_device &palette);
 
 	uint32_t screen_update_invadpt2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cosmo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -153,9 +153,9 @@ public:
 	uint32_t screen_update_shuttlei(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_spacecom(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	INTERRUPT_GEN_MEMBER(polaris_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(claybust_gun_callback);
-	TIMER_DEVICE_CALLBACK_MEMBER(schaser_effect_555_cb);
+	void polaris_interrupt(device_t &device);
+	void claybust_gun_callback(timer_device &timer, void *ptr, int32_t param);
+	void schaser_effect_555_cb(timer_device &timer, void *ptr, int32_t param);
 	void indianbt_sh_port_3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void polaris_sh_port_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void polaris_sh_port_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);

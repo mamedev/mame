@@ -95,14 +95,14 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(jangou);
+	void palette_init_jangou(palette_device &palette);
 	void machine_start_jngolady();
 	void machine_reset_jngolady();
 	void machine_start_common();
 	void machine_reset_common();
 	uint32_t screen_update_jangou(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(cvsd_bit_timer_callback);
-	DECLARE_WRITE_LINE_MEMBER(jngolady_vclk_cb);
+	void cvsd_bit_timer_callback(void *ptr, int32_t param);
+	void jngolady_vclk_cb(int state);
 
 	std::unique_ptr<bitmap_ind16> m_tmp_bitmap;
 };
@@ -115,7 +115,7 @@ public:
  *************************************/
 
 /* guess: use the same resistor values as Crazy Climber (needs checking on the real HW) */
-PALETTE_INIT_MEMBER(jangou_state, jangou)
+void jangou_state::palette_init_jangou(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };
@@ -252,7 +252,7 @@ void jangou_state::cvsd_w(address_space &space, offs_t offset, uint8_t data, uin
 	m_cvsd_shiftreg = data;
 }
 
-TIMER_CALLBACK_MEMBER(jangou_state::cvsd_bit_timer_callback)
+void jangou_state::cvsd_bit_timer_callback(void *ptr, int32_t param)
 {
 	/* Data is shifted out at the MSB */
 	m_cvsd->digit_w((m_cvsd_shiftreg >> 7) & 1);
@@ -270,7 +270,7 @@ void jangou_state::adpcm_w(address_space &space, offs_t offset, uint8_t data, ui
 	m_adpcm_byte = data;
 }
 
-WRITE_LINE_MEMBER(jangou_state::jngolady_vclk_cb)
+void jangou_state::jngolady_vclk_cb(int state)
 {
 	if (m_msm5205_vclk_toggle == 0)
 		m_msm->data_w(m_adpcm_byte >> 4);

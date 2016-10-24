@@ -153,11 +153,11 @@ void pp01_state::machine_start()
 }
 
 
-WRITE_LINE_MEMBER(pp01_state::pp01_pit_out0)
+void pp01_state::pp01_pit_out0(int state)
 {
 }
 
-WRITE_LINE_MEMBER(pp01_state::pp01_pit_out1)
+void pp01_state::pp01_pit_out1(int state)
 {
 }
 

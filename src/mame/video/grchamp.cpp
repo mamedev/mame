@@ -13,7 +13,7 @@
 
 #define RGB_MAX     191
 
-PALETTE_INIT_MEMBER(grchamp_state, grchamp)
+void grchamp_state::palette_init_grchamp(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances[3] = { 100, 270, 470 };
@@ -71,27 +71,27 @@ void grchamp_state::right_w(address_space &space, offs_t offset, uint8_t data, u
 	m_right_tilemap->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(grchamp_state::get_text_tile_info)
+void grchamp_state::get_text_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	SET_TILE_INFO_MEMBER(0, m_videoram[tile_index], 0, 0);
 }
 
-TILE_GET_INFO_MEMBER(grchamp_state::get_left_tile_info)
+void grchamp_state::get_left_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	SET_TILE_INFO_MEMBER(1, m_leftram[tile_index], 0, 0);
 }
 
-TILE_GET_INFO_MEMBER(grchamp_state::get_right_tile_info)
+void grchamp_state::get_right_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	SET_TILE_INFO_MEMBER(2, m_rightram[tile_index], 0, 0);
 }
 
-TILE_GET_INFO_MEMBER(grchamp_state::get_center_tile_info)
+void grchamp_state::get_center_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	SET_TILE_INFO_MEMBER(3, m_centerram[tile_index], 0, 0);
 }
 
-TILEMAP_MAPPER_MEMBER(grchamp_state::get_memory_offset)
+tilemap_memory_index grchamp_state::get_memory_offset(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	return (col % 32) + row * 32 + (col / 32) * 32*32;
 }

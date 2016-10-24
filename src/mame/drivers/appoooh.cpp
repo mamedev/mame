@@ -170,7 +170,7 @@ Language
 #include "sound/sn76496.h"
 
 
-WRITE_LINE_MEMBER(appoooh_state::adpcm_int)
+void appoooh_state::adpcm_int(int state)
 {
 	if (m_adpcm_address != 0xffffffff)
 	{
@@ -407,7 +407,7 @@ void appoooh_state::machine_reset()
 	m_priority = 0;
 }
 
-INTERRUPT_GEN_MEMBER(appoooh_state::vblank_irq)
+void appoooh_state::vblank_irq(device_t &device)
 {
 	if(m_nmi_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);

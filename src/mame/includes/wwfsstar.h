@@ -44,11 +44,11 @@ public:
 
 	DECLARE_CUSTOM_INPUT_MEMBER(vblank_r);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+	void scanline(timer_device &timer, void *ptr, int32_t param);
 
-	TILE_GET_INFO_MEMBER(get_fg0_tile_info);
-	TILEMAP_MAPPER_MEMBER(bg0_scan);
-	TILE_GET_INFO_MEMBER(get_bg0_tile_info);
+	void get_fg0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	tilemap_memory_index bg0_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	void get_bg0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	virtual void video_start() override;
 

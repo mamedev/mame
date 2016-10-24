@@ -65,8 +65,8 @@ public:
 	void disp_col_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void task_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( s100_pint_w );
-	DECLARE_WRITE_LINE_MEMBER( s100_nmi_w );
+	void s100_pint_w(int state);
+	void s100_nmi_w(int state);
 	offs_t mpz80_direct_update_handler(direct_read_data &direct, offs_t address);
 
 	// memory state

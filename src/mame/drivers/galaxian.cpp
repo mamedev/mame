@@ -676,7 +676,7 @@ TODO:
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(galaxian_state::interrupt_gen)
+void galaxian_state::interrupt_gen(device_t &device)
 {
 	/* interrupt line is clocked at VBLANK */
 	/* a flip-flop at 6F is held in the preset state based on the NMI ON signal */
@@ -684,7 +684,7 @@ INTERRUPT_GEN_MEMBER(galaxian_state::interrupt_gen)
 		device.execute().set_input_line(m_irq_line, ASSERT_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(galaxian_state::fakechange_interrupt_gen)
+void galaxian_state::fakechange_interrupt_gen(device_t &device)
 {
 	interrupt_gen(device);
 
@@ -1102,7 +1102,7 @@ void galaxian_state::froggermc_sound_control_w(address_space &space, offs_t offs
 	m_audiocpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
-IRQ_CALLBACK_MEMBER(galaxian_state::froggermc_audiocpu_irq_ack)
+int galaxian_state::froggermc_audiocpu_irq_ack(device_t &device, int irqline)
 {
 	// cleared when taking the interrupt using the m1 line
 	// schematic: http://www.jrok.com/schem/FROGSND.pdf
@@ -1423,7 +1423,7 @@ void galaxian_state::checkman_sound_command_w(address_space &space, offs_t offse
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(galaxian_state::checkmaj_irq0_gen)
+void galaxian_state::checkmaj_irq0_gen(timer_device &timer, void *ptr, int32_t param)
 {
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
@@ -5704,7 +5704,7 @@ static MACHINE_CONFIG_DERIVED( fantastc, galaxian_base )
 MACHINE_CONFIG_END
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(galaxian_state::timefgtr_scanline)
+void galaxian_state::timefgtr_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	uint8_t split = param + 16;
 
@@ -6636,7 +6636,7 @@ void galaxian_state::tenspot_set_game_bank(int bank, int from_game)
 	dstregion = memregion("proms")->base();
 	memcpy(dstregion, srcregion, 0x20);
 
-	PALETTE_INIT_NAME(galaxian)(*m_palette);
+	palette_init_galaxian(*m_palette);
 }
 
 void galaxian_state::init_tenspot()

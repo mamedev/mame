@@ -65,7 +65,7 @@ public:
 	void switch_A_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t switch_A_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void switch_B_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(irq_callback);
+	void irq_callback(int state);
 	uint8_t riot_input_port_8_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint16_t a2600_read_input_port(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	uint8_t a2600_get_databus_contents(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
@@ -221,7 +221,7 @@ void a2600_state::switch_B_w(address_space &space, offs_t offset, uint8_t data, 
 {
 }
 
-WRITE_LINE_MEMBER(a2600_state::irq_callback)
+void a2600_state::irq_callback(int state)
 {
 }
 

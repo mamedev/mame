@@ -165,9 +165,9 @@ public:
 	int m_segac2_sp_pal_lookup[4];
 	void recompute_palette_tables();
 
-	DECLARE_WRITE_LINE_MEMBER(vdp_sndirqline_callback_c2);
-	DECLARE_WRITE_LINE_MEMBER(vdp_lv6irqline_callback_c2);
-	DECLARE_WRITE_LINE_MEMBER(vdp_lv4irqline_callback_c2);
+	void vdp_sndirqline_callback_c2(int state);
+	void vdp_lv6irqline_callback_c2(int state);
+	void vdp_lv4irqline_callback_c2(int state);
 
 	uint8_t io_portc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void io_portd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -183,7 +183,7 @@ public:
 	uint16_t printer_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void print_club_camera_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	uint16_t ichirjbl_prot_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
-	DECLARE_WRITE_LINE_MEMBER(segac2_irq2_interrupt);
+	void segac2_irq2_interrupt(int state);
 	optional_device<upd7759_device> m_upd7759;
 	optional_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -1395,7 +1395,7 @@ INPUT_PORTS_END
     Sound interfaces
 ******************************************************************************/
 
-WRITE_LINE_MEMBER(segac2_state::segac2_irq2_interrupt)
+void segac2_state::segac2_irq2_interrupt(int state)
 {
 	//printf("sound irq %d\n", state);
 	m_maincpu->set_input_line(2, state ? ASSERT_LINE : CLEAR_LINE);
@@ -1483,20 +1483,20 @@ uint32_t segac2_state::screen_update_segac2_new(screen_device &screen, bitmap_rg
 
 
 // the main interrupt on C2 comes from the vdp line used to drive the z80 interrupt on a regular genesis(!)
-WRITE_LINE_MEMBER(segac2_state::vdp_sndirqline_callback_c2)
+void segac2_state::vdp_sndirqline_callback_c2(int state)
 {
 	if (state == ASSERT_LINE)
 		m_maincpu->set_input_line(6, HOLD_LINE);
 }
 
 // the line usually used to drive irq6 is not connected
-WRITE_LINE_MEMBER(segac2_state::vdp_lv6irqline_callback_c2)
+void segac2_state::vdp_lv6irqline_callback_c2(int state)
 {
 	//
 }
 
 // the scanline interrupt seems connected as usual
-WRITE_LINE_MEMBER(segac2_state::vdp_lv4irqline_callback_c2)
+void segac2_state::vdp_lv4irqline_callback_c2(int state)
 {
 	if (state == ASSERT_LINE)
 		m_maincpu->set_input_line(4, HOLD_LINE);

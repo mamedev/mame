@@ -54,12 +54,12 @@ void hyprduel_state::update_irq_state(  )
 	m_maincpu->set_input_line(3, (irq & m_int_num) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-TIMER_CALLBACK_MEMBER(hyprduel_state::vblank_end_callback)
+void hyprduel_state::vblank_end_callback(void *ptr, int32_t param)
 {
 	m_requested_int &= ~param;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(hyprduel_state::hyprduel_interrupt)
+void hyprduel_state::hyprduel_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int line = param;
 
@@ -179,7 +179,7 @@ void hyprduel_state::hyprduel_cpusync_trigger2_w(address_space &space, offs_t of
 }
 
 
-TIMER_CALLBACK_MEMBER(hyprduel_state::magerror_irq_callback)
+void hyprduel_state::magerror_irq_callback(void *ptr, int32_t param)
 {
 	m_subcpu->set_input_line(1, HOLD_LINE);
 }
@@ -253,7 +253,7 @@ uint16_t hyprduel_state::hyprduel_bankedrom_r(address_space &space, offs_t offse
 
 ***************************************************************************/
 
-TIMER_CALLBACK_MEMBER(hyprduel_state::hyprduel_blit_done)
+void hyprduel_state::hyprduel_blit_done(void *ptr, int32_t param)
 {
 	m_requested_int |= 1 << m_blitter_bit;
 	update_irq_state();

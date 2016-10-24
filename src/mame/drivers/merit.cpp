@@ -113,7 +113,7 @@ public:
 	void palette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void casino5_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_CUSTOM_INPUT_MEMBER(rndbit_r);
-	DECLARE_WRITE_LINE_MEMBER(hsync_changed);
+	void hsync_changed(int state);
 	void led1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void led2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void misc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -302,7 +302,7 @@ MC6845_UPDATE_ROW( merit_state::crtc_update_row )
 }
 
 
-WRITE_LINE_MEMBER(merit_state::hsync_changed)
+void merit_state::hsync_changed(int state)
 {
 	/* update any video up to the current scanline */
 //  m_screen->update_now();

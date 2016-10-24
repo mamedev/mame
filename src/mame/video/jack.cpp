@@ -39,7 +39,7 @@ void jack_state::jack_flipscreen_w(address_space &space, offs_t offset, uint8_t 
 
 /**************************************************************************/
 
-TILE_GET_INFO_MEMBER(jack_state::get_bg_tile_info)
+void jack_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index] + ((m_colorram[tile_index] & 0x18) << 5);
 	int color = m_colorram[tile_index] & 0x07;
@@ -49,7 +49,7 @@ TILE_GET_INFO_MEMBER(jack_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-TILEMAP_MAPPER_MEMBER(jack_state::tilemap_scan_cols_flipy)
+tilemap_memory_index jack_state::tilemap_scan_cols_flipy(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return (col * num_rows) + (num_rows - 1 - row);
@@ -140,7 +140,7 @@ void jack_state::joinem_scroll_w(address_space &space, offs_t offset, uint8_t da
 
 /**************************************************************************/
 
-PALETTE_INIT_MEMBER(jack_state,joinem)
+void jack_state::palette_init_joinem(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -166,7 +166,7 @@ PALETTE_INIT_MEMBER(jack_state,joinem)
 }
 
 
-TILE_GET_INFO_MEMBER(jack_state::joinem_get_bg_tile_info)
+void jack_state::joinem_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index] + ((m_colorram[tile_index] & 0x03) << 8);
 	int color = (m_colorram[tile_index] & 0x38) >> 3 | m_joinem_palette_bank;

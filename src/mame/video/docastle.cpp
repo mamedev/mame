@@ -29,7 +29,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(docastle_state, docastle)
+void docastle_state::palette_init_docastle(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -86,7 +86,7 @@ void docastle_state::flipscreen_w(address_space &space, offs_t offset, uint8_t d
 	flip_screen_set(offset);
 }
 
-TILE_GET_INFO_MEMBER(docastle_state::get_tile_info)
+void docastle_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index] + 8 * (m_colorram[tile_index] & 0x20);
 	int color = m_colorram[tile_index] & 0x1f;

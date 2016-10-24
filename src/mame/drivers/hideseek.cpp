@@ -43,7 +43,7 @@ public:
 
 	void init_hideseek();
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(hideseek);
+	void palette_init_hideseek(palette_device &palette);
 	uint32_t screen_update_hideseek(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 };
@@ -84,7 +84,7 @@ static GFXDECODE_START( hideseek )
 GFXDECODE_END
 
 
-PALETTE_INIT_MEMBER(hideseek_state, hideseek)
+void hideseek_state::palette_init_hideseek(palette_device &palette)
 {
 	int i;
 

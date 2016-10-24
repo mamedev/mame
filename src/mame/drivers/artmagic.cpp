@@ -51,7 +51,7 @@ void artmagic_state::update_irq_state()
 }
 
 
-WRITE_LINE_MEMBER(artmagic_state::m68k_gen_int)
+void artmagic_state::m68k_gen_int(int state)
 {
 	m_tms_irq = state;
 	update_irq_state();

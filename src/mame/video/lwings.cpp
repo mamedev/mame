@@ -17,12 +17,12 @@
 
 ***************************************************************************/
 
-TILEMAP_MAPPER_MEMBER(lwings_state::get_bg2_memory_offset)
+tilemap_memory_index lwings_state::get_bg2_memory_offset(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	return (row * 0x800) | (col * 2);
 }
 
-TILE_GET_INFO_MEMBER(lwings_state::get_fg_tile_info)
+void lwings_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_fgvideoram[tile_index];
 	int color = m_fgvideoram[tile_index + 0x400];
@@ -32,7 +32,7 @@ TILE_GET_INFO_MEMBER(lwings_state::get_fg_tile_info)
 			TILE_FLIPYX((color & 0x30) >> 4));
 }
 
-TILE_GET_INFO_MEMBER(lwings_state::lwings_get_bg1_tile_info)
+void lwings_state::lwings_get_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_bg1videoram[tile_index];
 	int color = m_bg1videoram[tile_index + 0x400];
@@ -42,7 +42,7 @@ TILE_GET_INFO_MEMBER(lwings_state::lwings_get_bg1_tile_info)
 			TILE_FLIPYX((color & 0x18) >> 3));
 }
 
-TILE_GET_INFO_MEMBER(lwings_state::trojan_get_bg1_tile_info)
+void lwings_state::trojan_get_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_bg1videoram[tile_index];
 	int color = m_bg1videoram[tile_index + 0x400];
@@ -55,7 +55,7 @@ TILE_GET_INFO_MEMBER(lwings_state::trojan_get_bg1_tile_info)
 	tileinfo.group = (color & 0x08) >> 3;
 }
 
-TILE_GET_INFO_MEMBER(lwings_state::get_bg2_tile_info)
+void lwings_state::get_bg2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code, color;
 	uint8_t *rom = memregion("gfx5")->base();

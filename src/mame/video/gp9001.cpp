@@ -231,7 +231,7 @@ const address_space_config *gp9001vdp_device::memory_space_config(address_spacen
 	return (spacenum == 0) ? &m_space_config : nullptr;
 }
 
-TILE_GET_INFO_MEMBER(gp9001vdp_device::get_top0_tile_info)
+void gp9001vdp_device::get_top0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int color, tile_number, attrib;
 
@@ -252,7 +252,7 @@ TILE_GET_INFO_MEMBER(gp9001vdp_device::get_top0_tile_info)
 	//tileinfo.category = (attrib & 0x0f00) >> 8;
 }
 
-TILE_GET_INFO_MEMBER(gp9001vdp_device::get_fg0_tile_info)
+void gp9001vdp_device::get_fg0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int color, tile_number, attrib;
 
@@ -274,7 +274,7 @@ TILE_GET_INFO_MEMBER(gp9001vdp_device::get_fg0_tile_info)
 	//tileinfo.category = (attrib & 0x0f00) >> 8;
 }
 
-TILE_GET_INFO_MEMBER(gp9001vdp_device::get_bg0_tile_info)
+void gp9001vdp_device::get_bg0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int color, tile_number, attrib;
 	attrib = m_vram_bg[2*tile_index];

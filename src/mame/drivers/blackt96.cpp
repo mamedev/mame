@@ -82,7 +82,7 @@ public:
 	required_shared_ptr<uint16_t> m_tilemapram;
 	void blackt96_c0000_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void blackt96_80000_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	DECLARE_READ_LINE_MEMBER(PIC16C5X_T0_clk_r);
+	int PIC16C5X_T0_clk_r();
 	void blackt96_soundio_port00_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t blackt96_soundio_port01_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void blackt96_soundio_port01_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -300,7 +300,7 @@ static GFXDECODE_START( blackt96 )
 GFXDECODE_END
 
 
-READ_LINE_MEMBER(blackt96_state::PIC16C5X_T0_clk_r)
+int blackt96_state::PIC16C5X_T0_clk_r()
 {
 	return 0;
 }

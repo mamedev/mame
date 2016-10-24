@@ -108,18 +108,18 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(pcw);
+	void palette_init_pcw(palette_device &palette);
 	uint32_t screen_update_pcw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_pcw_printer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(pcw_timer_pulse);
-	TIMER_CALLBACK_MEMBER(pcw_stepper_callback);
-	TIMER_CALLBACK_MEMBER(pcw_pins_callback);
-	TIMER_CALLBACK_MEMBER(setup_beep);
-	TIMER_DEVICE_CALLBACK_MEMBER(pcw_timer_interrupt);
+	void pcw_timer_pulse(void *ptr, int32_t param);
+	void pcw_stepper_callback(void *ptr, int32_t param);
+	void pcw_pins_callback(void *ptr, int32_t param);
+	void setup_beep(void *ptr, int32_t param);
+	void pcw_timer_interrupt(timer_device &timer, void *ptr, int32_t param);
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
-	DECLARE_WRITE_LINE_MEMBER( pcw_fdc_interrupt );
+	void pcw_fdc_interrupt(int state);
 	required_device<cpu_device> m_maincpu;
 	required_device<upd765a_device> m_fdc;
 	required_device<ram_device> m_ram;

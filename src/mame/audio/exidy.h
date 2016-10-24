@@ -45,7 +45,7 @@ public:
 	void sh6840_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void sfxctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( update_irq_state );
+	void update_irq_state(int state);
 
 	void r6532_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t r6532_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
@@ -144,8 +144,8 @@ public:
 	uint8_t response_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( irq_clear_w );
-	DECLARE_WRITE_LINE_MEMBER( main_ack_w );
+	void irq_clear_w(int state);
+	void main_ack_w(int state);
 
 protected:
 	// device-level overrides
@@ -160,7 +160,7 @@ private:
 	// internal state
 	uint8_t m_victory_sound_response_ack_clk; /* 7474 @ F4 */
 
-	TIMER_CALLBACK_MEMBER( delayed_command_w );
+	void delayed_command_w(void *ptr, int32_t param);
 
 	int m_pia1_ca1;
 	int m_pia1_cb1;

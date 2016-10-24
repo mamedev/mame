@@ -139,7 +139,7 @@ public:
 	uint8_t mermaid_p3_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void mermaid_p3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -148,7 +148,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof(screen_device &screen, bool state);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+	void scanline(timer_device &timer, void *ptr, int32_t param);
 };
 
 
@@ -186,7 +186,7 @@ void hvyunit_state::machine_reset()
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(hvyunit_state::get_bg_tile_info)
+void hvyunit_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_colorram[tile_index];
 	int code = m_videoram[tile_index] + ((attr & 0x0f) << 8);
@@ -624,7 +624,7 @@ GFXDECODE_END
  *************************************/
 
 /* Main Z80 uses IM2 */
-TIMER_DEVICE_CALLBACK_MEMBER(hvyunit_state::scanline)
+void hvyunit_state::scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

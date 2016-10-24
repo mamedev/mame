@@ -254,7 +254,7 @@ static GFXDECODE_START( pbaction )
 GFXDECODE_END
 
 
-INTERRUPT_GEN_MEMBER(pbaction_state::pbaction_interrupt)
+void pbaction_state::pbaction_interrupt(device_t &device)
 {
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x02); /* the CPU is in Interrupt Mode 2 */
 }
@@ -272,7 +272,7 @@ void pbaction_state::machine_reset()
 	m_scroll = 0;
 }
 
-INTERRUPT_GEN_MEMBER(pbaction_state::vblank_irq)
+void pbaction_state::vblank_irq(device_t &device)
 {
 	if(m_nmi_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);

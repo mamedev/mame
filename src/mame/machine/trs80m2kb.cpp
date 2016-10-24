@@ -268,7 +268,7 @@ void trs80m2_keyboard_device::device_reset()
 //  busy_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( trs80m2_keyboard_device::busy_w )
+void trs80m2_keyboard_device::busy_w(int state)
 {
 	m_busy = state;
 }
@@ -278,7 +278,7 @@ WRITE_LINE_MEMBER( trs80m2_keyboard_device::busy_w )
 //  data_r -
 //-------------------------------------------------
 
-READ_LINE_MEMBER( trs80m2_keyboard_device::data_r )
+int trs80m2_keyboard_device::data_r()
 {
 	return m_data;
 }

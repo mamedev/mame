@@ -638,7 +638,7 @@ public:
 
 	void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
-	DECLARE_WRITE_LINE_MEMBER(set_penirq_line);
+	void set_penirq_line(int state);
 	void set_port_d_lines(uint8_t state, int bit);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -658,10 +658,10 @@ private:
 
 	void register_state_save();
 
-	TIMER_CALLBACK_MEMBER(timer1_hit);
-	TIMER_CALLBACK_MEMBER(timer2_hit);
-	TIMER_CALLBACK_MEMBER(pwm_transition);
-	TIMER_CALLBACK_MEMBER(rtc_tick);
+	void timer1_hit(void *ptr, int32_t param);
+	void timer2_hit(void *ptr, int32_t param);
+	void pwm_transition(void *ptr, int32_t param);
+	void rtc_tick(void *ptr, int32_t param);
 
 	mc68328_regs_t m_regs;
 

@@ -323,7 +323,7 @@ uint8_t mackbd_device::t1_r(address_space &space, offs_t offset, uint8_t mem_mas
 	return (ioport("MODS")->read() & 0x2) ? 0xff : 0x00;
 }
 
-WRITE_LINE_MEMBER(mackbd_device::data_w)
+void mackbd_device::data_w(int state)
 {
 	data_from_mac = (state == ASSERT_LINE) ? 1 : 0;
 }

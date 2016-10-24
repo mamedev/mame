@@ -228,7 +228,7 @@ protected:
 	int m_fout_state;
 
 	void d2f_timer_clock();
-	TIMER_CALLBACK_MEMBER(d2f_timer_cb);
+	void d2f_timer_cb(void *ptr, int32_t param);
 
 	// opcode handlers
 	virtual void op_szk() override;

@@ -58,8 +58,8 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_gradius3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(cpuA_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(gradius3_sub_scanline);
+	void cpuA_interrupt(device_t &device);
+	void gradius3_sub_scanline(timer_device &timer, void *ptr, int32_t param);
 	void gradius3_postload();
 	void volume_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	K052109_CB_MEMBER(tile_callback);

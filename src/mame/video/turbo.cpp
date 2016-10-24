@@ -27,7 +27,7 @@ static const uint32_t sprite_expand[16] =
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(turbo_state,turbo)
+void turbo_state::palette_init_turbo(palette_device &palette)
 {
 	static const int resistances[3] = { 1000, 470, 220 };
 	double rweights[3], gweights[3], bweights[2];
@@ -66,7 +66,7 @@ PALETTE_INIT_MEMBER(turbo_state,turbo)
 }
 
 
-PALETTE_INIT_MEMBER(turbo_state,subroc3d)
+void turbo_state::palette_init_subroc3d(palette_device &palette)
 {
 	static const int resistances[3] = { 1000, 470, 220 };
 	double rweights[3], gweights[3], bweights[2];
@@ -105,7 +105,7 @@ PALETTE_INIT_MEMBER(turbo_state,subroc3d)
 }
 
 
-PALETTE_INIT_MEMBER(turbo_state,buckrog)
+void turbo_state::palette_init_buckrog(palette_device &palette)
 {
 	static const int resistances[4] = { 2200, 1000, 500, 250 };
 	double rweights[3], gweights[3], bweights[4];
@@ -153,7 +153,7 @@ PALETTE_INIT_MEMBER(turbo_state,buckrog)
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(turbo_state::get_fg_tile_info)
+void turbo_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index];
 	SET_TILE_INFO_MEMBER(0, code, code >> 2, 0);

@@ -6,7 +6,7 @@
 
 /* PC-8401A */
 
-PALETTE_INIT_MEMBER(pc8401a_state,pc8401a)
+void pc8401a_state::palette_init_pc8401a(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(39, 108, 51));
 	palette.set_pen_color(1, rgb_t(16, 37, 84));

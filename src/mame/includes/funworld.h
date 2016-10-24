@@ -20,7 +20,7 @@ public:
 	void funworld_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void funworld_lamp_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void funworld_lamp_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(pia1_ca2_w);
+	void pia1_ca2_w(int state);
 	uint8_t funquiz_ay8910_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t funquiz_ay8910_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t chinatow_r_32f0(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
@@ -36,9 +36,9 @@ public:
 	void init_ctunk();
 	void init_rcdino4();
 	void init_rcdinch();
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void video_start_funworld();
-	DECLARE_PALETTE_INIT(funworld);
+	void palette_init_funworld(palette_device &palette);
 	void video_start_magicrd2();
 	void video_start_chinatow();
 	void machine_start_lunapark();

@@ -102,7 +102,7 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_discoboy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	DECLARE_WRITE_LINE_MEMBER(yunsung8_adpcm_int);
+	void yunsung8_adpcm_int(int state);
 };
 
 
@@ -480,7 +480,7 @@ void discoboy_state::machine_reset()
 	m_toggle = 0;
 }
 
-WRITE_LINE_MEMBER(discoboy_state::yunsung8_adpcm_int)
+void discoboy_state::yunsung8_adpcm_int(int state)
 {
 	m_msm->data_w(m_adpcm >> 4);
 	m_adpcm <<= 4;

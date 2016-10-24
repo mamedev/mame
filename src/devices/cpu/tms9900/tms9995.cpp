@@ -1384,7 +1384,7 @@ void tms9995_device::execute_set_input(int irqline, int state)
 /*
     Triggers a RESET.
 */
-WRITE_LINE_MEMBER( tms9995_device::reset_line )
+void tms9995_device::reset_line(int state)
 {
 	if (state==ASSERT_LINE) m_reset = true;
 }
@@ -1419,7 +1419,7 @@ void tms9995_device::pulse_clock(int count)
 /*
     Enter the hold state.
 */
-WRITE_LINE_MEMBER( tms9995_device::hold_line )
+void tms9995_device::hold_line(int state)
 {
 	m_hold_requested = (state==ASSERT_LINE);
 	if (TRACE_WAITHOLD) logerror("set HOLD = %d\n", state);
@@ -1433,7 +1433,7 @@ WRITE_LINE_MEMBER( tms9995_device::hold_line )
     Signal READY to the CPU. When cleared, the CPU enters wait states. This
     becomes effective on a clock pulse.
 */
-WRITE_LINE_MEMBER( tms9995_device::ready_line )
+void tms9995_device::ready_line(int state)
 {
 	if (m_reset && (m_ready_bufd != state)) logerror("Ignoring READY=%d change due to pending RESET\n", state);
 	else

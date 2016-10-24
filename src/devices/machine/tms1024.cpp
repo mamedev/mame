@@ -96,7 +96,7 @@ void tms1024_device::write_s(address_space &space, offs_t offset, uint8_t data, 
 	m_s = data & 7;
 }
 
-WRITE_LINE_MEMBER(tms1024_device::write_std)
+void tms1024_device::write_std(int state)
 {
 	state = (state) ? 1 : 0;
 

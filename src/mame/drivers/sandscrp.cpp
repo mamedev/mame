@@ -128,7 +128,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof(screen_device &screen, bool state);
 
-	INTERRUPT_GEN_MEMBER(interrupt);
+	void interrupt(device_t &device);
 	void update_irq_state();
 };
 
@@ -179,7 +179,7 @@ void sandscrp_state::update_irq_state()
 
 
 /* Called once/frame to generate the VBLANK interrupt */
-INTERRUPT_GEN_MEMBER(sandscrp_state::interrupt)
+void sandscrp_state::interrupt(device_t &device)
 {
 	m_vblank_irq = 1;
 	update_irq_state();

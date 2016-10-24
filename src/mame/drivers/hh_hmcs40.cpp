@@ -145,7 +145,7 @@ public:
 	uint64_t m_display_cache[0x20];       // (internal use)
 	uint8_t m_display_decay[0x20][0x40];  // (internal use)
 
-	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
+	void display_decay_tick(timer_device &timer, void *ptr, int32_t param);
 	void display_update();
 	void set_display_size(int maxx, int maxy);
 	void set_display_segmask(uint32_t digits, uint32_t mask);
@@ -261,7 +261,7 @@ void hh_hmcs40_state::display_update()
 	memcpy(m_display_cache, active_state, sizeof(m_display_cache));
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(hh_hmcs40_state::display_decay_tick)
+void hh_hmcs40_state::display_decay_tick(timer_device &timer, void *ptr, int32_t param)
 {
 	// slowly turn off unpowered segments
 	for (int y = 0; y < m_display_maxy; y++)
@@ -2041,7 +2041,7 @@ public:
 	void grid_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	int m_speaker_volume;
-	TIMER_DEVICE_CALLBACK_MEMBER(speaker_decay_sim);
+	void speaker_decay_sim(timer_device &timer, void *ptr, int32_t param);
 
 protected:
 	virtual void machine_start() override;
@@ -2056,7 +2056,7 @@ protected:
 #define CDKONG_SPEAKER_MAX 0x10000
 #define CDKONG_SPEAKER_DECAY 50
 
-TIMER_DEVICE_CALLBACK_MEMBER(cdkong_state::speaker_decay_sim)
+void cdkong_state::speaker_decay_sim(timer_device &timer, void *ptr, int32_t param)
 {
 	m_speaker->set_output_gain(0, m_speaker_volume / (double)CDKONG_SPEAKER_MAX);
 	m_speaker_volume /= 2;
@@ -2866,7 +2866,7 @@ public:
 	void grid_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	uint8_t m_cop_irq;
-	DECLARE_WRITE_LINE_MEMBER(speaker_w);
+	void speaker_w(int state);
 	void cop_irq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t cop_latch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t cop_ack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
@@ -2925,7 +2925,7 @@ void eturtles_state::update_int()
 
 // handlers: COP side
 
-WRITE_LINE_MEMBER(eturtles_state::speaker_w)
+void eturtles_state::speaker_w(int state)
 {
 	// SK: speaker out
 	m_speaker->level_w(!state);

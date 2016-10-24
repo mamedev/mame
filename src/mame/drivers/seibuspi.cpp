@@ -1164,7 +1164,7 @@ void seibuspi_state::flashrom_write(address_space &space, offs_t offset, uint8_t
 		m_soundflash2->write(offset & 0x0fffff, data);
 }
 
-WRITE_LINE_MEMBER(seibuspi_state::ymf_irqhandler)
+void seibuspi_state::ymf_irqhandler(int state)
 {
 	if (state)
 		m_audiocpu->set_input_line_and_vector(0, ASSERT_LINE, 0xd7); // IRQ is RST10
@@ -1780,12 +1780,12 @@ GFXDECODE_END
 
 /*****************************************************************************/
 
-INTERRUPT_GEN_MEMBER(seibuspi_state::spi_interrupt)
+void seibuspi_state::spi_interrupt(device_t &device)
 {
 	device.execute().set_input_line(0, HOLD_LINE); // where is ack?
 }
 
-IRQ_CALLBACK_MEMBER(seibuspi_state::spi_irq_callback)
+int seibuspi_state::spi_irq_callback(device_t &device, int irqline)
 {
 	return 0x20;
 }

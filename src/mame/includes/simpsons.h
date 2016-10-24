@@ -57,7 +57,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_simpsons(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(simpsons_irq);
+	void simpsons_irq(device_t &device);
 	void simpsons_video_banking(int bank);
 	void simpsons_objdma();
 	K052109_CB_MEMBER(tile_callback);

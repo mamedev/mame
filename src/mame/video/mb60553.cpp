@@ -114,7 +114,7 @@ index is in the MSB. gstriker uses 5 bits for banking, but the chips could be ab
 
 
 
-TILE_GET_INFO_MEMBER(mb60553_zooming_tilemap_device::get_tile_info)
+void mb60553_zooming_tilemap_device::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int data, bankno;
 	int tileno, pal;
@@ -175,7 +175,7 @@ void mb60553_zooming_tilemap_device::reg_written( int num_reg)
 }
 
 /* twc94 has the tilemap made of 2 pages .. it needs this */
-TILEMAP_MAPPER_MEMBER(mb60553_zooming_tilemap_device::twc94_scan)
+tilemap_memory_index mb60553_zooming_tilemap_device::twc94_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return (row*64) + (col&63) + ((col&64)<<6);

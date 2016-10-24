@@ -159,12 +159,12 @@ void tbowl_state::adpcm_int( msm5205_device *device, int num )
 	}
 }
 
-WRITE_LINE_MEMBER(tbowl_state::adpcm_int_1)
+void tbowl_state::adpcm_int_1(int state)
 {
 	adpcm_int(m_msm1, 0);
 }
 
-WRITE_LINE_MEMBER(tbowl_state::adpcm_int_2)
+void tbowl_state::adpcm_int_2(int state)
 {
 	adpcm_int(m_msm2, 1);
 }

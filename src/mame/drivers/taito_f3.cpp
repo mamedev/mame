@@ -406,7 +406,7 @@ void taito_f3_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	}
 }
 
-INTERRUPT_GEN_MEMBER(taito_f3_state::f3_interrupt2)
+void taito_f3_state::f3_interrupt2(device_t &device)
 {
 	device.execute().set_input_line(2, HOLD_LINE);  // vblank
 	timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(10000), TIMER_F3_INTERRUPT3);

@@ -221,8 +221,8 @@ public:
 	void serial_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void serial_status_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t hack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	INTERRUPT_GEN_MEMBER(_4enlinea_irq);
-	INTERRUPT_GEN_MEMBER(_4enlinea_audio_irq);
+	void _4enlinea_irq(device_t &device);
+	void _4enlinea_audio_irq(device_t &device);
 
 	uint8_t m_irq_count;
 	uint8_t m_serial_flags;
@@ -470,7 +470,7 @@ SLOT_INTERFACE_START( 4enlinea_isa8_cards )
 SLOT_INTERFACE_END
 
 /* TODO: irq sources are unknown */
-INTERRUPT_GEN_MEMBER(_4enlinea_state::_4enlinea_irq)
+void _4enlinea_state::_4enlinea_irq(device_t &device)
 {
 	if(m_irq_count == 0)
 	{
@@ -483,7 +483,7 @@ INTERRUPT_GEN_MEMBER(_4enlinea_state::_4enlinea_irq)
 	m_irq_count&=3;
 }
 
-INTERRUPT_GEN_MEMBER(_4enlinea_state::_4enlinea_audio_irq)
+void _4enlinea_state::_4enlinea_audio_irq(device_t &device)
 {
 	device.execute().set_input_line(0, HOLD_LINE);
 }

@@ -93,12 +93,12 @@ void namco_53xx_device::P_w(address_space &space, offs_t offset, uint8_t data, u
 }
 
 
-TIMER_CALLBACK_MEMBER( namco_53xx_device::irq_clear )
+void namco_53xx_device::irq_clear(void *ptr, int32_t param)
 {
 	m_cpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(namco_53xx_device::read_request)
+void namco_53xx_device::read_request(int state)
 {
 	m_cpu->set_input_line(0, ASSERT_LINE);
 

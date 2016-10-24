@@ -380,7 +380,7 @@ static const rgb_t vt_colors[] =
 
 
 /* Initialise the palette */
-PALETTE_INIT_MEMBER(vtech2_state, vtech2)
+void vtech2_state::palette_init_vtech2(palette_device &palette)
 {
 	int i;
 
@@ -397,7 +397,7 @@ PALETTE_INIT_MEMBER(vtech2_state, vtech2)
 		palette.set_pen_indirect(512+i, i);
 }
 
-INTERRUPT_GEN_MEMBER(vtech2_state::vtech2_interrupt)
+void vtech2_state::vtech2_interrupt(device_t &device)
 {
 	m_maincpu->set_input_line(0, HOLD_LINE);
 }

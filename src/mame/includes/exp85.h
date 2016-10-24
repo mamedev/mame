@@ -35,8 +35,8 @@ public:
 
 	uint8_t i8355_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void i8355_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_READ_LINE_MEMBER( sid_r );
-	DECLARE_WRITE_LINE_MEMBER( sod_w );
+	int sid_r();
+	void sod_w(int state);
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_rst75 );
 

@@ -133,7 +133,7 @@ void nasbus_device::set_io_space(address_space *io)
 }
 
 // callbacks from slot device to the host
-WRITE_LINE_MEMBER( nasbus_device::ram_disable_w ) { m_ram_disable_handler(state); }
+void nasbus_device::ram_disable_w(int state) { m_ram_disable_handler(state); }
 
 
 //**************************************************************************

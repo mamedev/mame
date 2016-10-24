@@ -34,9 +34,9 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(busicom);
+	void palette_init_busicom(palette_device &palette);
 	uint32_t screen_update_busicom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_callback);
+	void timer_callback(timer_device &timer, void *ptr, int32_t param);
 	required_device<i4004_cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	uint8_t get_bit_selected(uint32_t val,int num);

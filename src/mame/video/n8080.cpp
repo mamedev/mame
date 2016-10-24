@@ -18,7 +18,7 @@ void n8080_state::n8080_video_control_w(address_space &space, offs_t offset, uin
 }
 
 
-PALETTE_INIT_MEMBER(n8080_state,n8080)
+void n8080_state::palette_init_n8080(palette_device &palette)
 {
 	int i;
 
@@ -27,11 +27,11 @@ PALETTE_INIT_MEMBER(n8080_state,n8080)
 }
 
 
-PALETTE_INIT_MEMBER(n8080_state,helifire)
+void n8080_state::palette_init_helifire(palette_device &palette)
 {
 	int i;
 
-	PALETTE_INIT_NAME(n8080)(palette);
+	palette_init_n8080(palette);
 
 	for (i = 0; i < 0x100; i++)
 	{
@@ -53,7 +53,7 @@ void n8080_state::spacefev_start_red_cannon(  )
 }
 
 
-TIMER_CALLBACK_MEMBER(n8080_state::spacefev_stop_red_cannon)
+void n8080_state::spacefev_stop_red_cannon(void *ptr, int32_t param)
 {
 	m_spacefev_red_cannon = 0;
 	m_cannon_timer->adjust(attotime::never);

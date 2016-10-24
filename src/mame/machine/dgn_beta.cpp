@@ -512,7 +512,7 @@ void dgn_beta_state::d_pia0_pb_w(address_space &space, offs_t offset, uint8_t da
 	m_d_pia0_pb_last=data;
 }
 
-WRITE_LINE_MEMBER(dgn_beta_state::d_pia0_cb2_w)
+void dgn_beta_state::d_pia0_cb2_w(int state)
 {
 	int RowNo;
 	LOG_KEYBOARD(("\nCB2 Write\n"));
@@ -535,12 +535,12 @@ WRITE_LINE_MEMBER(dgn_beta_state::d_pia0_cb2_w)
 }
 
 
-WRITE_LINE_MEMBER(dgn_beta_state::d_pia0_irq_a)
+void dgn_beta_state::d_pia0_irq_a(int state)
 {
 	cpu0_recalc_irq(state);
 }
 
-WRITE_LINE_MEMBER(dgn_beta_state::d_pia0_irq_b)
+void dgn_beta_state::d_pia0_irq_b(int state)
 {
 	cpu0_recalc_firq(state);
 }
@@ -630,12 +630,12 @@ void dgn_beta_state::d_pia1_pb_w(address_space &space, offs_t offset, uint8_t da
 	}
 }
 
-WRITE_LINE_MEMBER(dgn_beta_state::d_pia1_irq_a)
+void dgn_beta_state::d_pia1_irq_a(int state)
 {
 	cpu0_recalc_irq(state);
 }
 
-WRITE_LINE_MEMBER(dgn_beta_state::d_pia1_irq_b)
+void dgn_beta_state::d_pia1_irq_b(int state)
 {
 	cpu0_recalc_irq(state);
 }
@@ -730,12 +730,12 @@ void dgn_beta_state::d_pia2_pb_w(address_space &space, offs_t offset, uint8_t da
 	dgnbeta_vid_set_gctrl(data);
 }
 
-WRITE_LINE_MEMBER(dgn_beta_state::d_pia2_irq_a)
+void dgn_beta_state::d_pia2_irq_a(int state)
 {
 	cpu0_recalc_irq(state);
 }
 
-WRITE_LINE_MEMBER(dgn_beta_state::d_pia2_irq_b)
+void dgn_beta_state::d_pia2_irq_b(int state)
 {
 	cpu0_recalc_irq(state);
 }
@@ -792,7 +792,7 @@ void dgn_beta_state::cpu1_recalc_firq(int state)
 /********************************************************************************************/
 
 /* The INTRQ line goes through pia2 ca1, in exactly the same way as DRQ from DragonDos does */
-WRITE_LINE_MEMBER( dgn_beta_state::dgnbeta_fdc_intrq_w )
+void dgn_beta_state::dgnbeta_fdc_intrq_w(int state)
 {
 	device_t *device = machine().device(PIA_2_TAG);
 	LOG_DISK(("dgnbeta_fdc_intrq_w(%d)\n", state));
@@ -801,7 +801,7 @@ WRITE_LINE_MEMBER( dgn_beta_state::dgnbeta_fdc_intrq_w )
 }
 
 /* DRQ is routed through various logic to the FIRQ inturrupt line on *BOTH* CPUs */
-WRITE_LINE_MEMBER( dgn_beta_state::dgnbeta_fdc_drq_w )
+void dgn_beta_state::dgnbeta_fdc_drq_w(int state)
 {
 	LOG_DISK(("dgnbeta_fdc_drq_w(%d)\n", state));
 	cpu1_recalc_firq(state);

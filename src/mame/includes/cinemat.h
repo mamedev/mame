@@ -110,7 +110,7 @@ public:
 	uint8_t sound_portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void sound_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void sound_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	TIMER_CALLBACK_MEMBER(synced_sound_w);
+	void synced_sound_w(void *ptr, int32_t param);
 	void generic_init(sound_func sound_handler);
 	void cinemat_vector_callback(int16_t sx, int16_t sy, int16_t ex, int16_t ey, uint8_t shift);
 	void spacewar_sound_w(uint8_t sound_val, uint8_t bits_changed);

@@ -184,7 +184,7 @@ private:
 	int m_gfxrombank;
 	int m_outcoin_enable;
 	emu_timer *m_timer_cb;
-	TIMER_CALLBACK_MEMBER( timer_callback );
+	void timer_callback(void *ptr, int32_t param);
 };
 
 /* used in: hyhoo.c, niyanpai.c, pastelg.c, nbmj8688.c, nbmj8891.c, nbmj8991.c, nbmj9195.c*/

@@ -125,7 +125,7 @@ public:
 		return m_read_res((m_counter & m_counter_mask) | m_counter_or);
 	}
 
-	DECLARE_WRITE_LINE_MEMBER( hs_w );
+	void hs_w(int state);
 
 	// typically called by machine
 	address_space *mpu_address_space(void) const { return m_cpu_space; }

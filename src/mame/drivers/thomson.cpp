@@ -571,22 +571,22 @@ static INPUT_PORTS_START ( t9000 )
 	PORT_INCLUDE ( to7 )
 INPUT_PORTS_END
 
-WRITE_LINE_MEMBER( thomson_state::fdc_index_0_w )
+void thomson_state::fdc_index_0_w(int state)
 {
 	thomson_index_callback(machine().device<legacy_floppy_image_device>(FLOPPY_0), state);
 }
 
-WRITE_LINE_MEMBER( thomson_state::fdc_index_1_w )
+void thomson_state::fdc_index_1_w(int state)
 {
 	thomson_index_callback(machine().device<legacy_floppy_image_device>(FLOPPY_1), state);
 }
 
-WRITE_LINE_MEMBER( thomson_state::fdc_index_2_w )
+void thomson_state::fdc_index_2_w(int state)
 {
 	thomson_index_callback(machine().device<legacy_floppy_image_device>(FLOPPY_2), state);
 }
 
-WRITE_LINE_MEMBER( thomson_state::fdc_index_3_w )
+void thomson_state::fdc_index_3_w(int state)
 {
 	thomson_index_callback(machine().device<legacy_floppy_image_device>(FLOPPY_3), state);
 }

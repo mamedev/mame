@@ -10,7 +10,7 @@
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(iqblock_state::get_bg_tile_info)
+void iqblock_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_bgvideoram[tile_index] + (m_bgvideoram[tile_index + 0x800] << 8);
 	SET_TILE_INFO_MEMBER(0,
@@ -19,7 +19,7 @@ TILE_GET_INFO_MEMBER(iqblock_state::get_bg_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(iqblock_state::get_fg_tile_info)
+void iqblock_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_fgvideoram[tile_index];
 	SET_TILE_INFO_MEMBER(1,

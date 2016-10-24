@@ -22,7 +22,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(appoooh_state,appoooh)
+void appoooh_state::palette_init_appoooh(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -61,7 +61,7 @@ PALETTE_INIT_MEMBER(appoooh_state,appoooh)
 	}
 }
 
-PALETTE_INIT_MEMBER(appoooh_state,robowres)
+void appoooh_state::palette_init_robowres(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -102,7 +102,7 @@ PALETTE_INIT_MEMBER(appoooh_state,robowres)
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(appoooh_state::get_fg_tile_info)
+void appoooh_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_fg_videoram[tile_index] + 256 * ((m_fg_colorram[tile_index] >> 5) & 7);
 
@@ -113,7 +113,7 @@ TILE_GET_INFO_MEMBER(appoooh_state::get_fg_tile_info)
 	);
 }
 
-TILE_GET_INFO_MEMBER(appoooh_state::get_bg_tile_info)
+void appoooh_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_bg_videoram[tile_index] + 256 * ((m_bg_colorram[tile_index] >> 5) & 7);
 

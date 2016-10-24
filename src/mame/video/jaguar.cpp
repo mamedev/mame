@@ -276,13 +276,13 @@ void jaguar_state::update_cpu_irq()
 }
 
 
-WRITE_LINE_MEMBER( jaguar_state::gpu_cpu_int )
+void jaguar_state::gpu_cpu_int(int state)
 {
 	m_cpu_irq_state |= 2;
 	update_cpu_irq();
 }
 
-WRITE_LINE_MEMBER( jaguar_state::dsp_cpu_int )
+void jaguar_state::dsp_cpu_int(int state)
 {
 	m_cpu_irq_state |= 16;
 	update_cpu_irq();

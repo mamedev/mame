@@ -439,7 +439,7 @@ void gottlieb_sound_r1_device::write(address_space &space, offs_t offset, uint8_
 //  snd_interrupt - signal a sound interrupt
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( gottlieb_sound_r1_device::snd_interrupt )
+void gottlieb_sound_r1_device::snd_interrupt(int state)
 {
 	m_audiocpu->set_input_line(M6502_IRQ_LINE, state);
 }
@@ -507,7 +507,7 @@ void gottlieb_sound_r1_device::speech_clock_dac_w(address_space &space, offs_t o
 //  line to the NMI pin on the sound chip
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( gottlieb_sound_r1_device::votrax_request )
+void gottlieb_sound_r1_device::votrax_request(int state)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, state);
 }

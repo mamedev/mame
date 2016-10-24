@@ -38,8 +38,8 @@ public:
 	void mugsmash_videoram1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void mugsmash_videoram2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void mugsmash_reg_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	TILE_GET_INFO_MEMBER(get_mugsmash_tile_info1);
-	TILE_GET_INFO_MEMBER(get_mugsmash_tile_info2);
+	void get_mugsmash_tile_info1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_mugsmash_tile_info2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	uint32_t screen_update_mugsmash(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

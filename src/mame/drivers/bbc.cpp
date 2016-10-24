@@ -748,7 +748,7 @@ static INPUT_PORTS_START(ltmpm)
 INPUT_PORTS_END
 
 
-INTERRUPT_GEN_MEMBER(bbc_state::bbcb_vsync)
+void bbc_state::bbcb_vsync(device_t &device)
 {
 	via6522_device *via_0 = machine().device<via6522_device>("via6522_0");
 	via_0->write_ca1(1);
@@ -792,7 +792,7 @@ static SLOT_INTERFACE_START( bbc_floppies_35 )
 SLOT_INTERFACE_END
 
 
-WRITE_LINE_MEMBER(bbc_state::adlc_irq_w)
+void bbc_state::adlc_irq_w(int state)
 {
 	m_adlc_irq = state;
 
@@ -800,7 +800,7 @@ WRITE_LINE_MEMBER(bbc_state::adlc_irq_w)
 }
 
 
-WRITE_LINE_MEMBER(bbc_state::econet_clk_w)
+void bbc_state::econet_clk_w(int state)
 {
 	m_adlc->rxc_w(state);
 	m_adlc->txc_w(state);

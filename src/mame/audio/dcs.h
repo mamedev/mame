@@ -52,7 +52,7 @@ public:
 
 	// non public
 	void dcs_boot();
-	TIMER_CALLBACK_MEMBER( dcs_reset );
+	void dcs_reset(void *ptr, int32_t param);
 	void dcs_register_state();
 	uint16_t dcs_dataram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void dcs_dataram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
@@ -72,35 +72,35 @@ public:
 	uint16_t latch_status_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	uint16_t fifo_input_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void dcs_delayed_data_w(uint16_t data);
-	TIMER_CALLBACK_MEMBER( dcs_delayed_data_w_callback );
+	void dcs_delayed_data_w_callback(void *ptr, int32_t param);
 	void input_latch_ack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	uint16_t input_latch_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	uint32_t input_latch32_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
-	TIMER_CALLBACK_MEMBER( latch_delayed_w );
+	void latch_delayed_w(void *ptr, int32_t param);
 	void output_latch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void output_latch32_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	void delayed_ack_w();
-	TIMER_CALLBACK_MEMBER( delayed_ack_w_callback );
-	TIMER_CALLBACK_MEMBER( output_control_delayed_w );
+	void delayed_ack_w_callback(void *ptr, int32_t param);
+	void output_control_delayed_w(void *ptr, int32_t param);
 	void output_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	uint16_t output_control_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void update_timer_count();
-	TIMER_DEVICE_CALLBACK_MEMBER( internal_timer_callback );
+	void internal_timer_callback(timer_device &timer, void *ptr, int32_t param);
 	void reset_timer();
-	DECLARE_WRITE_LINE_MEMBER(timer_enable_callback);
+	void timer_enable_callback(int state);
 	uint16_t adsp_control_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void adsp_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	TIMER_DEVICE_CALLBACK_MEMBER( dcs_irq );
-	TIMER_DEVICE_CALLBACK_MEMBER( sport0_irq );
+	void dcs_irq(timer_device &timer, void *ptr, int32_t param);
+	void sport0_irq(timer_device &timer, void *ptr, int32_t param);
 	void recompute_sample_rate();
 	void sound_tx_callback(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask);
 	uint16_t dcs_polling_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void dcs_polling_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	TIMER_DEVICE_CALLBACK_MEMBER( transfer_watchdog_callback );
-	TIMER_CALLBACK_MEMBER( s1_ack_callback2 );
-	TIMER_CALLBACK_MEMBER( s1_ack_callback1 );
+	void transfer_watchdog_callback(timer_device &timer, void *ptr, int32_t param);
+	void s1_ack_callback2(void *ptr, int32_t param);
+	void s1_ack_callback1(void *ptr, int32_t param);
 	int preprocess_stage_1(uint16_t data);
-	TIMER_CALLBACK_MEMBER( s2_ack_callback );
+	void s2_ack_callback(void *ptr, int32_t param);
 	int preprocess_stage_2(uint16_t data);
 	int preprocess_write(uint16_t data);
 

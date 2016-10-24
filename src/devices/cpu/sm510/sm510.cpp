@@ -161,7 +161,7 @@ inline uint16_t sm510_base_device::get_lcd_row(int column, uint8_t* ram)
 	return rowdata;
 }
 
-TIMER_CALLBACK_MEMBER(sm510_base_device::lcd_timer_cb)
+void sm510_base_device::lcd_timer_cb(void *ptr, int32_t param)
 {
 	// 4 columns
 	for (int h = 0; h < 4; h++)
@@ -295,7 +295,7 @@ void sm510_base_device::execute_set_input(int line, int state)
 	m_k_active = (state != 0);
 }
 
-TIMER_CALLBACK_MEMBER(sm510_base_device::div_timer_cb)
+void sm510_base_device::div_timer_cb(void *ptr, int32_t param)
 {
 	m_div = (m_div + 1) & 0x7fff;
 

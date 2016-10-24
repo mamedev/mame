@@ -259,7 +259,7 @@ INPUT_PORTS_END
  *************************************/
 
 /* handler called by the 2151 emulator when the internal timers cause an IRQ */
-WRITE_LINE_MEMBER(blockout_state::irq_handler)
+void blockout_state::irq_handler(int state)
 {
 	m_audiocpu->set_input_line_and_vector(0, state ? ASSERT_LINE : CLEAR_LINE, 0xff);
 }
@@ -281,7 +281,7 @@ void blockout_state::machine_reset()
 	m_color = 0;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(blockout_state::blockout_scanline)
+void blockout_state::blockout_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

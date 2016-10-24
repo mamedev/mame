@@ -209,7 +209,7 @@ void dmv_k806_device::port2_w(address_space &space, offs_t offset, uint8_t data,
 
 -------------------------------------------------------------------*/
 
-TIMER_DEVICE_CALLBACK_MEMBER(dmv_k806_device::mouse_timer)
+void dmv_k806_device::mouse_timer(timer_device &timer, void *ptr, int32_t param)
 {
 	switch(m_mouse.phase)
 	{

@@ -746,7 +746,7 @@ GFXDECODE_END
                         Billiard Academy Real Break
 ***************************************************************************/
 
-INTERRUPT_GEN_MEMBER(realbrk_state::interrupt)
+void realbrk_state::interrupt(device_t &device)
 {
 	/* VBlank is connected to INT1 (external interrupts pin 1) */
 	m_tmp68301->external_interrupt_1();

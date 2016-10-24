@@ -210,7 +210,7 @@ static INPUT_PORTS_START( xerox820 )
 	// inputs defined in machine/keyboard.c
 INPUT_PORTS_END
 
-TIMER_CALLBACK_MEMBER( bigboard_state::bigboard_beepoff )
+void bigboard_state::bigboard_beepoff(void *ptr, int32_t param)
 {
 	m_beeper->set_state(0);
 }
@@ -350,14 +350,14 @@ void xerox820ii_state::rdpio_pb_w(address_space &space, offs_t offset, uint8_t d
 	// TODO: LS74 Q
 }
 
-WRITE_LINE_MEMBER( xerox820ii_state::rdpio_pardy_w )
+void xerox820ii_state::rdpio_pardy_w(int state)
 {
 	// TODO
 }
 
 /* Z80 CTC */
 
-TIMER_DEVICE_CALLBACK_MEMBER( xerox820_state::ctc_tick )
+void xerox820_state::ctc_tick(timer_device &timer, void *ptr, int32_t param)
 {
 	m_ctc->trg0(1);
 	m_ctc->trg0(0);
@@ -391,14 +391,14 @@ void xerox820_state::update_nmi()
 	m_maincpu->set_input_line(INPUT_LINE_NMI, state);
 }
 
-WRITE_LINE_MEMBER( xerox820_state::fdc_intrq_w )
+void xerox820_state::fdc_intrq_w(int state)
 {
 	m_fdc_irq = state;
 
 	update_nmi();
 }
 
-WRITE_LINE_MEMBER( xerox820_state::fdc_drq_w )
+void xerox820_state::fdc_drq_w(int state)
 {
 	m_fdc_drq = state;
 
@@ -407,7 +407,7 @@ WRITE_LINE_MEMBER( xerox820_state::fdc_drq_w )
 
 /* COM8116 Interface */
 
-WRITE_LINE_MEMBER( xerox820_state::fr_w )
+void xerox820_state::fr_w(int state)
 {
 	m_sio->rxca_w(state);
 	m_sio->txca_w(state);

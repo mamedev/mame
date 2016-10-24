@@ -45,7 +45,7 @@ public:
 
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_PALETTE_INIT(cesclassic);
+	void palette_init_cesclassic(palette_device &palette);
 protected:
 
 	// devices
@@ -236,7 +236,7 @@ static INPUT_PORTS_START( cesclassic )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("l_lcd")
 INPUT_PORTS_END
 
-PALETTE_INIT_MEMBER(cesclassic_state, cesclassic)
+void cesclassic_state::palette_init_cesclassic(palette_device &palette)
 {
 	int i;
 

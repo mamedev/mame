@@ -12,7 +12,7 @@
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(tail2nos_state::get_tile_info)
+void tail2nos_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = m_txvideoram[tile_index];
 	SET_TILE_INFO_MEMBER(0,

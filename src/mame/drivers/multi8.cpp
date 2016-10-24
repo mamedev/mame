@@ -70,7 +70,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_multi8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
+	void keyboard_callback(timer_device &timer, void *ptr, int32_t param);
 	void multi8_draw_pixel(bitmap_ind16 &bitmap,int y,int x,uint8_t pen,uint8_t width);
 };
 
@@ -484,7 +484,7 @@ static INPUT_PORTS_START( multi8 )
 	PORT_BIT(0x00000010,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("GRPH") PORT_CODE(KEYCODE_LALT)
 INPUT_PORTS_END
 
-TIMER_DEVICE_CALLBACK_MEMBER(multi8_state::keyboard_callback)
+void multi8_state::keyboard_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	static const char *const portnames[3] = { "key1","key2","key3" };
 	int i,port_i,scancode;

@@ -26,8 +26,8 @@ public:
 		: hh_ucom4_state(mconfig, type, tag)
 	{ }
 
-	TIMER_DEVICE_CALLBACK_MEMBER(tp3_clock) { m_maincpu->set_input_line(0, ASSERT_LINE); }
-	TIMER_DEVICE_CALLBACK_MEMBER(tp3_clear) { m_maincpu->set_input_line(0, CLEAR_LINE); }
+	void tp3_clock(timer_device &timer, void *ptr, int32_t param) { m_maincpu->set_input_line(0, ASSERT_LINE); }
+	void tp3_clear(timer_device &timer, void *ptr, int32_t param) { m_maincpu->set_input_line(0, CLEAR_LINE); }
 
 	virtual void machine_start() override;
 };

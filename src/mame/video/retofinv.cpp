@@ -12,7 +12,7 @@
 #include "includes/retofinv.h"
 
 
-PALETTE_INIT_MEMBER(retofinv_state, retofinv)
+void retofinv_state::palette_init_retofinv(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -61,7 +61,7 @@ PALETTE_INIT_MEMBER(retofinv_state, retofinv)
 ***************************************************************************/
 
 /* convert from 32x32 to 36x28 */
-TILEMAP_MAPPER_MEMBER(retofinv_state::tilemap_scan)
+tilemap_memory_index retofinv_state::tilemap_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	row += 2;
 	col -= 2;
@@ -71,7 +71,7 @@ TILEMAP_MAPPER_MEMBER(retofinv_state::tilemap_scan)
 		return (row << 5) + col;
 }
 
-TILE_GET_INFO_MEMBER(retofinv_state::bg_get_tile_info)
+void retofinv_state::bg_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	SET_TILE_INFO_MEMBER(2,
 			m_bg_videoram[tile_index] + 256 * m_bg_bank,
@@ -79,7 +79,7 @@ TILE_GET_INFO_MEMBER(retofinv_state::bg_get_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(retofinv_state::fg_get_tile_info)
+void retofinv_state::fg_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int color = m_fg_videoram[0x400 + tile_index];
 

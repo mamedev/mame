@@ -28,7 +28,7 @@ public:
 	{ }
 
 	const uint8_t *m_p_chargen;
-	DECLARE_PALETTE_INIT(ibm6580);
+	void palette_init_ibm6580(palette_device &palette);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 private:
 	virtual void machine_reset() override;
@@ -57,7 +57,7 @@ uint32_t ibm6580_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-PALETTE_INIT_MEMBER( ibm6580_state, ibm6580 )
+void ibm6580_state::palette_init_ibm6580(palette_device &palette)
 {
 	palette.set_pen_color(0, 0, 0, 0 ); /* Black */
 	palette.set_pen_color(1, 0, 255, 0 );   /* Full */

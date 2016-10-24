@@ -42,7 +42,7 @@ const device_type C64_PARTNER = &device_creator<c64_partner_cartridge_device>;
 //  INPUT_PORTS( c64_partner )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( c64_partner_cartridge_device::nmi_w )
+void c64_partner_cartridge_device::nmi_w(int state)
 {
 	if (!state && !m_a6 && !m_nmi)
 	{

@@ -46,7 +46,7 @@ public:
 	int m_keylatch;
 	int m_keyclk;
 	void init_vcs80();
-	TIMER_DEVICE_CALLBACK_MEMBER(vcs80_keyboard_tick);
+	void vcs80_keyboard_tick(timer_device &timer, void *ptr, int32_t param);
 };
 
 #endif

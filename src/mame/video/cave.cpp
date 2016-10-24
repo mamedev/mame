@@ -70,7 +70,7 @@ Note:   if MAME_DEBUG is defined, pressing:
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(cave_state,cave)
+void cave_state::palette_init_cave(palette_device &palette)
 {
 	for (int chip = 0; chip < 4; chip++)
 	{
@@ -86,7 +86,7 @@ PALETTE_INIT_MEMBER(cave_state,cave)
 	}
 }
 
-PALETTE_INIT_MEMBER(cave_state,dfeveron)
+void cave_state::palette_init_dfeveron(palette_device &palette)
 {
 	int color, pen;
 
@@ -95,14 +95,14 @@ PALETTE_INIT_MEMBER(cave_state,dfeveron)
 	   multiplies the color code by $100 (for consistency).
 	   That's why we need this function.    */
 
-	PALETTE_INIT_NAME(cave)(palette);
+	palette_init_cave(palette);
 
 	for (color = 0; color < 0x40; color++)
 		for (pen = 0; pen < 0x10; pen++)
 			m_palette_map[0][(color << 8) | pen] = (color << 4) | pen;
 }
 
-PALETTE_INIT_MEMBER(cave_state,ddonpach)
+void cave_state::palette_init_ddonpach(palette_device &palette)
 {
 	int color, pen;
 
@@ -111,18 +111,18 @@ PALETTE_INIT_MEMBER(cave_state,ddonpach)
 	   like layer 2, but use the first 16 color of every 256 for
 	   any given color code. */
 
-	PALETTE_INIT_NAME(cave)(palette);
+	palette_init_cave(palette);
 
 	for (color = 0; color < 0x40; color++)
 		for (pen = 0; pen < 0x10; pen++)
 			m_palette_map[0][0x8000 | (color << 4) | pen] = 0x4000 | (color << 8) | pen;
 }
 
-PALETTE_INIT_MEMBER(cave_state,mazinger)
+void cave_state::palette_init_mazinger(palette_device &palette)
 {
 	int color, pen;
 
-	PALETTE_INIT_NAME(cave)(palette);
+	palette_init_cave(palette);
 
 	/* sprites (encrypted) are 4 bit deep */
 	for (color = 0; color < 0x40; color++)
@@ -136,11 +136,11 @@ PALETTE_INIT_MEMBER(cave_state,mazinger)
 			m_palette_map[0][0x4400 + ((color << 6) | pen)] = 0x400 | ((color & 0x0f) << 6) | pen;
 }
 
-PALETTE_INIT_MEMBER(cave_state,sailormn)
+void cave_state::palette_init_sailormn(palette_device &palette)
 {
 	int color, pen;
 
-	PALETTE_INIT_NAME(cave)(palette);
+	palette_init_cave(palette);
 
 	/* sprites (encrypted) are 4 bit deep */
 	for (color = 0; color < 0x40; color++)
@@ -154,11 +154,11 @@ PALETTE_INIT_MEMBER(cave_state,sailormn)
 			m_palette_map[0][0x4c00 + ((color << 6) | pen)] = 0xc00 | ((color & 0x0f) << 6) | pen;
 }
 
-PALETTE_INIT_MEMBER(cave_state,pwrinst2)
+void cave_state::palette_init_pwrinst2(palette_device &palette)
 {
 	int color, pen;
 
-	PALETTE_INIT_NAME(cave)(palette);
+	palette_init_cave(palette);
 
 	for (color = 0; color < 0x80; color++)
 		for (pen = 0; pen < 0x10; pen++)
@@ -168,11 +168,11 @@ PALETTE_INIT_MEMBER(cave_state,pwrinst2)
 			m_palette_map[0][pen] = pen - 0x8000;
 }
 
-PALETTE_INIT_MEMBER(cave_state,korokoro)
+void cave_state::palette_init_korokoro(palette_device &palette)
 {
 	int color, pen;
 
-	PALETTE_INIT_NAME(cave)(palette);
+	palette_init_cave(palette);
 
 	for (color = 0; color < 0x40; color++)
 		for (pen = 0; pen < 0x10; pen++)
@@ -261,7 +261,7 @@ void cave_state::sailormn_tilebank_w(int bank)
 	}
 }
 
-TILE_GET_INFO_MEMBER(cave_state::sailormn_get_tile_info_2)
+void cave_state::sailormn_get_tile_info_2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint32_t code, color, pri;
 
@@ -336,10 +336,10 @@ inline void cave_state::vram_8x8_w( address_space &space, ATTR_UNUSED offs_t off
 }
 
 
-TILE_GET_INFO_MEMBER(cave_state::get_tile_info_0){ get_tile_info(tileinfo, tile_index, 0); }
-TILE_GET_INFO_MEMBER(cave_state::get_tile_info_1){ get_tile_info(tileinfo, tile_index, 1); }
-TILE_GET_INFO_MEMBER(cave_state::get_tile_info_2){ get_tile_info(tileinfo, tile_index, 2); }
-TILE_GET_INFO_MEMBER(cave_state::get_tile_info_3){ get_tile_info(tileinfo, tile_index, 3); }
+void cave_state::get_tile_info_0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ get_tile_info(tileinfo, tile_index, 0); }
+void cave_state::get_tile_info_1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ get_tile_info(tileinfo, tile_index, 1); }
+void cave_state::get_tile_info_2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ get_tile_info(tileinfo, tile_index, 2); }
+void cave_state::get_tile_info_3(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ get_tile_info(tileinfo, tile_index, 3); }
 
 void cave_state::cave_vram_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ vram_w(space, offset, data, mem_mask, 0); }
 void cave_state::cave_vram_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask){ vram_w(space, offset, data, mem_mask, 1); }
@@ -1660,11 +1660,11 @@ void cave_state::cave_get_sprite_info_all()
 
 // Poka Poka Satan: 3 screens * (1 Sprite chip + 1 Tilemap chip)
 
-PALETTE_INIT_MEMBER(cave_state,ppsatan)
+void cave_state::palette_init_ppsatan(palette_device &palette)
 {
 	int color, pen;
 
-	PALETTE_INIT_NAME(cave)(palette);
+	palette_init_cave(palette);
 
 	for (int chip = 0; chip < 3; chip++)
 	{

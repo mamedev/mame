@@ -287,11 +287,11 @@ public:
 
 	uint32_t screen_update_cat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE_LINE_MEMBER(cat_duart_irq_handler);
-	DECLARE_WRITE_LINE_MEMBER(cat_duart_txa);
-	DECLARE_WRITE_LINE_MEMBER(cat_duart_txb);
+	void cat_duart_irq_handler(int state);
+	void cat_duart_txa(int state);
+	void cat_duart_txb(int state);
 	void cat_duart_output(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(prn_ack_ff);
+	void prn_ack_ff(int state);
 
 	uint16_t cat_floppy_control_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void cat_floppy_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
@@ -346,9 +346,9 @@ public:
 	uint8_t m_keyboard_line;
 	uint8_t m_floppy_control;
 
-	//TIMER_CALLBACK_MEMBER(keyboard_callback);
-	TIMER_CALLBACK_MEMBER(counter_6ms_callback);
-	IRQ_CALLBACK_MEMBER(cat_int_ack);
+	//void keyboard_callback(void *ptr, int32_t param);
+	void counter_6ms_callback(void *ptr, int32_t param);
+	int cat_int_ack(device_t &device, int irqline);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -891,7 +891,7 @@ void cat_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 	}
 }
 
-TIMER_CALLBACK_MEMBER(cat_state::counter_6ms_callback)
+void cat_state::counter_6ms_callback(void *ptr, int32_t param)
 {
 	// This is effectively also the KTOBF (guessed: acronym for "Keyboard Timer Out Bit Flip")
 	// line connected in such a way to invert the d-flipflop connected to the duart IP2
@@ -901,7 +901,7 @@ TIMER_CALLBACK_MEMBER(cat_state::counter_6ms_callback)
 	m_6ms_counter++;
 }
 
-IRQ_CALLBACK_MEMBER(cat_state::cat_int_ack)
+int cat_state::cat_int_ack(device_t &device, int irqline)
 {
 	m_maincpu->set_input_line(M68K_IRQ_1,CLEAR_LINE);
 	return M68K_INT_ACK_AUTOVECTOR;
@@ -967,7 +967,7 @@ uint32_t cat_state::screen_update_cat(screen_device &screen, bitmap_ind16 &bitma
  * The duart also will, if configured to do so, fire an int when the state
  * changes of the centronics /ACK pin; this is used while printing.
  */
-WRITE_LINE_MEMBER(cat_state::cat_duart_irq_handler)
+void cat_state::cat_duart_irq_handler(int state)
 {
 	int irqvector = m_duart->get_irq_vector();
 
@@ -977,14 +977,14 @@ WRITE_LINE_MEMBER(cat_state::cat_duart_irq_handler)
 	m_maincpu->set_input_line_and_vector(M68K_IRQ_1, state, irqvector);
 }
 
-WRITE_LINE_MEMBER(cat_state::cat_duart_txa) // semit sends stuff here; connects to the serial port on the back
+void cat_state::cat_duart_txa(int state) // semit sends stuff here; connects to the serial port on the back
 {
 #ifdef DEBUG_DUART_TXA
 	fprintf(stderr, "Duart TXA: data %02X\n", state);
 #endif
 }
 
-WRITE_LINE_MEMBER(cat_state::cat_duart_txb) // memit sends stuff here; connects to the modem chip
+void cat_state::cat_duart_txb(int state) // memit sends stuff here; connects to the modem chip
 {
 #ifdef DEBUG_DUART_TXB
 	fprintf(stderr, "Duart TXB: data %02X\n", state);
@@ -1018,7 +1018,7 @@ void cat_state::cat_duart_output(address_space &space, offs_t offset, uint8_t da
 	m_speaker->level_w((data >> 3) & 1);
 }
 
-WRITE_LINE_MEMBER(cat_state::prn_ack_ff) // switch the flipflop state on the rising edge of /ACK
+void cat_state::prn_ack_ff(int state) // switch the flipflop state on the rising edge of /ACK
 {
 	if ((m_duart_prn_ack_prev_state == 0) && (state == 1))
 	{

@@ -71,7 +71,7 @@ static GFXDECODE_START( asr733 )
 	GFXDECODE_ENTRY( asr733_chr_region, 0, fontlayout, 0, 1 )
 GFXDECODE_END
 
-PALETTE_INIT_MEMBER(asr733_device, asr733)
+void asr733_device::palette_init_asr733(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t::white()); /* white */
 	palette.set_pen_color(1, rgb_t::black()); /* black */

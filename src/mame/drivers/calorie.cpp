@@ -113,8 +113,8 @@ public:
 	uint8_t calorie_soundlatch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void bogus_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_calorieb();
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -133,7 +133,7 @@ public:
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(calorie_state::get_bg_tile_info)
+void calorie_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *src = memregion("user1")->base();
 	int bg_base = (m_bg_bank & 0x0f) * 0x200;
@@ -144,7 +144,7 @@ TILE_GET_INFO_MEMBER(calorie_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(1, code, color, flag);
 }
 
-TILE_GET_INFO_MEMBER(calorie_state::get_fg_tile_info)
+void calorie_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code  = ((m_fg_ram[tile_index + 0x400] & 0x30) << 4) | m_fg_ram[tile_index];
 	int color = m_fg_ram[tile_index + 0x400] & 0x0f;

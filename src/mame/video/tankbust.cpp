@@ -28,7 +28,7 @@ note:
 
 */
 
-TILE_GET_INFO_MEMBER(tankbust_state::get_bg_tile_info)
+void tankbust_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index];
 	int attr = m_colorram[tile_index];
@@ -58,7 +58,7 @@ TILE_GET_INFO_MEMBER(tankbust_state::get_bg_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(tankbust_state::get_txt_tile_info)
+void tankbust_state::get_txt_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_txtram[tile_index];
 	int color = ((code>>6) & 0x03);

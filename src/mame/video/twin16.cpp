@@ -195,7 +195,7 @@ uint16_t twin16_state::sprite_status_r(address_space &space, offs_t offset, uint
 	return m_sprite_busy;
 }
 
-TIMER_CALLBACK_MEMBER(twin16_state::sprite_tick)
+void twin16_state::sprite_tick(void *ptr, int32_t param)
 {
 	m_sprite_busy = 0;
 }
@@ -374,7 +374,7 @@ void twin16_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap )
 }
 
 
-TILE_GET_INFO_MEMBER(twin16_state::fix_tile_info)
+void twin16_state::fix_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_fixram[tile_index];
 	/* fedcba9876543210
@@ -423,12 +423,12 @@ void fround_state::tile_get_info(tile_data &tileinfo, uint16_t data, int color_b
 	tileinfo.category = BIT(data, 15);
 }
 
-TILE_GET_INFO_MEMBER(twin16_state::layer0_tile_info)
+void twin16_state::layer0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	tile_get_info(tileinfo, m_videoram[0][tile_index], 0);
 }
 
-TILE_GET_INFO_MEMBER(twin16_state::layer1_tile_info)
+void twin16_state::layer1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	tile_get_info(tileinfo, m_videoram[1][tile_index], 8);
 }

@@ -27,13 +27,13 @@ public:
 	uint8_t m_gfx_rom_ctrl_latch;
 	uint8_t m_gfx_rom_ctrl_data;
 
-	DECLARE_WRITE_LINE_MEMBER(main_cpu_irq);
-	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
-	DECLARE_WRITE_LINE_MEMBER(display_enable_changed);
+	void main_cpu_irq(int state);
+	void flipscreen_w(int state);
+	void display_enable_changed(int state);
 	void gfx_rom_intf_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t gfx_rom_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
-	INTERRUPT_GEN_MEMBER(update_pia_1);
+	void update_pia_1(device_t &device);
 	void ic60_74123_output_changed(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void spiders_audio_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void spiders_audio_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);

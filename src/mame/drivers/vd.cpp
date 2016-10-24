@@ -30,7 +30,7 @@ public:
 	void disp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void lamp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { };
 	void sol_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { };
-	TIMER_DEVICE_CALLBACK_MEMBER(irq);
+	void irq(timer_device &timer, void *ptr, int32_t param);
 protected:
 
 	// devices
@@ -109,7 +109,7 @@ static INPUT_PORTS_START( vd )
 	PORT_START("X5")
 INPUT_PORTS_END
 
-TIMER_DEVICE_CALLBACK_MEMBER( vd_state::irq )
+void vd_state::irq(timer_device &timer, void *ptr, int32_t param)
 {
 	if (m_t_c > 40)
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);

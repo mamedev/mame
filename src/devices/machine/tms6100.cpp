@@ -98,23 +98,23 @@ void m58819_device::device_start()
 
 // external i/o
 
-WRITE_LINE_MEMBER(tms6100_device::m0_w)
+void tms6100_device::m0_w(int state)
 {
 	m_m0 = (state) ? 1 : 0;
 }
 
-WRITE_LINE_MEMBER(tms6100_device::m1_w)
+void tms6100_device::m1_w(int state)
 {
 	m_m1 = (state) ? 1 : 0;
 }
 
-WRITE_LINE_MEMBER(tms6100_device::cs_w)
+void tms6100_device::cs_w(int state)
 {
 	// chip select pin
 	m_cs = (state) ? 1 : 0;
 }
 
-WRITE_LINE_MEMBER(tms6100_device::rck_w)
+void tms6100_device::rck_w(int state)
 {
 	// gate/mask for clk
 	m_rck = (state) ? 1 : 0;
@@ -130,13 +130,13 @@ uint8_t tms6100_device::data_r(address_space &space, offs_t offset, uint8_t mem_
 	return m_data & 0xf;
 }
 
-READ_LINE_MEMBER(tms6100_device::data_line_r)
+int tms6100_device::data_line_r()
 {
 	// DATA/ADD8
 	return (m_data & 8) ? 1 : 0;
 }
 
-WRITE_LINE_MEMBER(tms6100_device::clk_w)
+void tms6100_device::clk_w(int state)
 {
 	// process on falling edge
 	if (m_clk && !m_rck && !state)

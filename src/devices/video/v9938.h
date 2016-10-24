@@ -279,7 +279,7 @@ class v9938_device : public v99x8_device
 public:
 	v9938_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_PALETTE_INIT(v9938);
+	void palette_init_v9938(palette_device &palette);
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 };
@@ -289,7 +289,7 @@ class v9958_device : public v99x8_device
 public:
 	v9958_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_PALETTE_INIT(v9958);
+	void palette_init_v9958(palette_device &palette);
 
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;

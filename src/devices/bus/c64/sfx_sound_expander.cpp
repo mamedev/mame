@@ -29,7 +29,7 @@ const device_type C64_SFX_SOUND_EXPANDER = &device_creator<c64_sfx_sound_expande
 //  ym3526_interface ym3526_config
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( c64_sfx_sound_expander_cartridge_device::opl_irq_w )
+void c64_sfx_sound_expander_cartridge_device::opl_irq_w(int state)
 {
 	m_slot->irq_w(state);
 }

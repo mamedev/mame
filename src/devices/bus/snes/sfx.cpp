@@ -79,7 +79,7 @@ static ADDRESS_MAP_START( sfx_map, AS_PROGRAM, 8, sns_rom_superfx_device )
 ADDRESS_MAP_END
 
 
-WRITE_LINE_MEMBER(sns_rom_superfx_device::snes_extern_irq_w)
+void sns_rom_superfx_device::snes_extern_irq_w(int state)
 {
 	machine().device("maincpu")->execute().set_input_line(G65816_LINE_IRQ, state);
 }

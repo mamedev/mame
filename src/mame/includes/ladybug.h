@@ -62,11 +62,11 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin1_inserted);
 	DECLARE_INPUT_CHANGED_MEMBER(coin2_inserted);
 	void init_dorodon();
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_grid_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_grid_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void machine_start_ladybug();
 	void video_start_ladybug();
-	DECLARE_PALETTE_INIT(ladybug);
+	void palette_init_ladybug(palette_device &palette);
 	uint32_t screen_update_ladybug(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void palette_init_common( palette_device &palette, const uint8_t *color_prom,

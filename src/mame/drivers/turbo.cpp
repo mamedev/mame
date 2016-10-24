@@ -465,7 +465,7 @@ uint8_t turbo_state::buckrog_port_3_r(address_space &space, offs_t offset, uint8
 }
 
 
-TIMER_CALLBACK_MEMBER(turbo_state::delayed_i8255_w)
+void turbo_state::delayed_i8255_w(void *ptr, int32_t param)
 {
 	m_i8255_0->write(m_maincpu->space(AS_PROGRAM), param >> 8, param & 0xff);
 }

@@ -156,9 +156,9 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_vii(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vii_vblank);
-	TIMER_CALLBACK_MEMBER(tmb1_tick);
-	TIMER_CALLBACK_MEMBER(tmb2_tick);
+	void vii_vblank(device_t &device);
+	void tmb1_tick(void *ptr, int32_t param);
+	void tmb2_tick(void *ptr, int32_t param);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(vii_cart);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(vsmile_cart);
 
@@ -994,12 +994,12 @@ DEVICE_IMAGE_LOAD_MEMBER( vii_state, vsmile_cart )
 }
 
 
-TIMER_CALLBACK_MEMBER(vii_state::tmb1_tick)
+void vii_state::tmb1_tick(void *ptr, int32_t param)
 {
 	m_io_regs[0x22] |= 1;
 }
 
-TIMER_CALLBACK_MEMBER(vii_state::tmb2_tick)
+void vii_state::tmb2_tick(void *ptr, int32_t param)
 {
 	m_io_regs[0x22] |= 2;
 }
@@ -1046,7 +1046,7 @@ void vii_state::machine_reset()
 {
 }
 
-INTERRUPT_GEN_MEMBER(vii_state::vii_vblank)
+void vii_state::vii_vblank(device_t &device)
 {
 	uint32_t x = machine().rand() & 0x3ff;
 	uint32_t y = machine().rand() & 0x3ff;

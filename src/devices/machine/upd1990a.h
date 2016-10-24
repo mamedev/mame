@@ -59,16 +59,16 @@ public:
 	template<class _data> void set_data_callback(_data data) { m_write_data.set_callback(data); }
 	template<class _tp> void set_tp_callback(_tp tp) { m_write_tp.set_callback(tp); }
 
-	DECLARE_WRITE_LINE_MEMBER( oe_w );
-	DECLARE_WRITE_LINE_MEMBER( cs_w );
-	DECLARE_WRITE_LINE_MEMBER( stb_w );
-	DECLARE_WRITE_LINE_MEMBER( clk_w );
-	DECLARE_WRITE_LINE_MEMBER( c0_w );
-	DECLARE_WRITE_LINE_MEMBER( c1_w );
-	DECLARE_WRITE_LINE_MEMBER( c2_w );
-	DECLARE_WRITE_LINE_MEMBER( data_in_w );
-	DECLARE_READ_LINE_MEMBER( data_out_r );
-	DECLARE_READ_LINE_MEMBER( tp_r );
+	void oe_w(int state);
+	void cs_w(int state);
+	void stb_w(int state);
+	void clk_w(int state);
+	void c0_w(int state);
+	void c1_w(int state);
+	void c2_w(int state);
+	void data_in_w(int state);
+	int data_out_r();
+	int tp_r();
 
 protected:
 	// device-level overrides

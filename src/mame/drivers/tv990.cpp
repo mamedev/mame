@@ -82,11 +82,11 @@ public:
 	uint8_t kbdc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void kbdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER(uart0_irq);
-	DECLARE_WRITE_LINE_MEMBER(uart1_irq);
-	DECLARE_WRITE_LINE_MEMBER(lpt_irq);
+	void uart0_irq(int state);
+	void uart1_irq(int state);
+	void lpt_irq(int state);
 
-	INTERRUPT_GEN_MEMBER(vblank);
+	void vblank(device_t &device);
 	DECLARE_INPUT_CHANGED_MEMBER(color);
 private:
 	uint16_t tvi1111_regs[(0x100/2)+2];
@@ -94,7 +94,7 @@ private:
 	int m_rowh, m_width, m_height;
 };
 
-INTERRUPT_GEN_MEMBER(tv990_state::vblank)
+void tv990_state::vblank(device_t &device)
 {
 	m_rowtimer->adjust(m_screen->time_until_pos(m_rowh));
 	m_maincpu->set_input_line(M68K_IRQ_6, ASSERT_LINE);
@@ -118,17 +118,17 @@ void tv990_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 	m_screen->update_now();
 }
 
-WRITE_LINE_MEMBER(tv990_state::uart0_irq)
+void tv990_state::uart0_irq(int state)
 {
 	m_maincpu->set_input_line(M68K_IRQ_5, state);
 }
 
-WRITE_LINE_MEMBER(tv990_state::uart1_irq)
+void tv990_state::uart1_irq(int state)
 {
 	m_maincpu->set_input_line(M68K_IRQ_4, state);
 }
 
-WRITE_LINE_MEMBER(tv990_state::lpt_irq)
+void tv990_state::lpt_irq(int state)
 {
 	m_maincpu->set_input_line(M68K_IRQ_3, state);
 }

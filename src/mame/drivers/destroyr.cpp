@@ -73,12 +73,12 @@ public:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(destroyr);
+	void palette_init_destroyr(palette_device &palette);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	TIMER_CALLBACK_MEMBER(dial_callback);
-	TIMER_CALLBACK_MEMBER(frame_callback);
+	void dial_callback(void *ptr, int32_t param);
+	void frame_callback(void *ptr, int32_t param);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -168,7 +168,7 @@ void destroyr_state::device_timer(emu_timer &timer, device_timer_id id, int para
 }
 
 
-TIMER_CALLBACK_MEMBER(destroyr_state::dial_callback)
+void destroyr_state::dial_callback(void *ptr, int32_t param)
 {
 	int dial = param;
 
@@ -188,7 +188,7 @@ TIMER_CALLBACK_MEMBER(destroyr_state::dial_callback)
 }
 
 
-TIMER_CALLBACK_MEMBER(destroyr_state::frame_callback)
+void destroyr_state::frame_callback(void *ptr, int32_t param)
 {
 	m_potsense[0] = 0;
 	m_potsense[1] = 0;
@@ -462,7 +462,7 @@ static GFXDECODE_START( destroyr )
 GFXDECODE_END
 
 
-PALETTE_INIT_MEMBER(destroyr_state, destroyr)
+void destroyr_state::palette_init_destroyr(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(0x00, 0x00, 0x00));   /* major objects */
 	palette.set_pen_color(1, rgb_t(0x50, 0x50, 0x50));

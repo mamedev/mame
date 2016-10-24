@@ -150,7 +150,7 @@ void gba_state::request_irq(uint32_t int_type)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(gba_state::dma_complete)
+void gba_state::dma_complete(void *ptr, int32_t param)
 {
 	static const uint32_t ch_int[4] = { INT_DMA0, INT_DMA1, INT_DMA2, INT_DMA3 };
 
@@ -391,7 +391,7 @@ void gba_state::audio_tick(int ref)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(gba_state::timer_expire)
+void gba_state::timer_expire(void *ptr, int32_t param)
 {
 	static const uint32_t tmr_ints[4] = { INT_TM0_OVERFLOW, INT_TM1_OVERFLOW, INT_TM2_OVERFLOW, INT_TM3_OVERFLOW };
 	uintptr_t tmr = (uintptr_t) param;
@@ -521,7 +521,7 @@ TIMER_CALLBACK_MEMBER(gba_state::timer_expire)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(gba_state::handle_irq)
+void gba_state::handle_irq(void *ptr, int32_t param)
 {
 	request_irq(IF);
 
@@ -1165,22 +1165,22 @@ uint32_t gba_state::gba_10000000_r(address_space &space, offs_t offset, uint32_t
 	return data;
 }
 
-WRITE_LINE_MEMBER(gba_state::int_hblank_callback)
+void gba_state::int_hblank_callback(int state)
 {
 	request_irq(INT_HBL);
 }
 
-WRITE_LINE_MEMBER(gba_state::int_vblank_callback)
+void gba_state::int_vblank_callback(int state)
 {
 	request_irq(INT_VBL);
 }
 
-WRITE_LINE_MEMBER(gba_state::int_vcount_callback)
+void gba_state::int_vcount_callback(int state)
 {
 	request_irq(INT_VCNT);
 }
 
-WRITE_LINE_MEMBER(gba_state::dma_hblank_callback)
+void gba_state::dma_hblank_callback(int state)
 {
 	for (int ch = 0; ch < 4; ch++)
 	{
@@ -1191,7 +1191,7 @@ WRITE_LINE_MEMBER(gba_state::dma_hblank_callback)
 	}
 }
 
-WRITE_LINE_MEMBER(gba_state::dma_vblank_callback)
+void gba_state::dma_vblank_callback(int state)
 {
 	for (int ch = 0; ch < 4; ch++)
 	{

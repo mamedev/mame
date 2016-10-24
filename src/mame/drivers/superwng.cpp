@@ -85,15 +85,15 @@ public:
 	void superwng_unk_a187_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void superwng_unk_a185_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(superwng);
+	void palette_init_superwng(palette_device &palette);
 	uint32_t screen_update_superwng(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(superwng_nmi_interrupt);
-	INTERRUPT_GEN_MEMBER(superwng_sound_nmi_assert);
+	void superwng_nmi_interrupt(device_t &device);
+	void superwng_sound_nmi_assert(device_t &device);
 };
 
 void superwng_state::superwng_unk_a187_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
@@ -106,7 +106,7 @@ void superwng_state::superwng_unk_a185_w(address_space &space, offs_t offset, ui
 //  printf("superwng_unk_a185_w %02x\n", data);
 }
 
-TILE_GET_INFO_MEMBER(superwng_state::get_bg_tile_info)
+void superwng_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram_bg[tile_index];
 	int attr = m_colorram_bg[tile_index];
@@ -120,7 +120,7 @@ TILE_GET_INFO_MEMBER(superwng_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, attr & 0xf, flipx|flipy);
 }
 
-TILE_GET_INFO_MEMBER(superwng_state::get_fg_tile_info)
+void superwng_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram_fg[tile_index];
 	int attr = m_colorram_fg[tile_index];
@@ -200,7 +200,7 @@ static const uint8_t superwng_colors[]= /* temporary */
 	0x00, 0xc0, 0x07, 0x3f, 0x00, 0x1f, 0x3f, 0xff, 0x00, 0x86, 0x05, 0xff, 0x00, 0xc0, 0xe8, 0xff
 };
 
-PALETTE_INIT_MEMBER(superwng_state, superwng)
+void superwng_state::palette_init_superwng(palette_device &palette)
 {
 	int i;
 	const uint8_t * ptr=superwng_colors;
@@ -233,7 +233,7 @@ void superwng_state::superwng_nmi_enable_w(address_space &space, offs_t offset, 
 	m_nmi_enable = data;
 }
 
-INTERRUPT_GEN_MEMBER(superwng_state::superwng_nmi_interrupt)
+void superwng_state::superwng_nmi_interrupt(device_t &device)
 {
 	if (BIT(m_nmi_enable, 0))
 		nmi_line_pulse(device);
@@ -256,7 +256,7 @@ void superwng_state::superwng_sound_nmi_clear_w(address_space &space, offs_t off
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(superwng_state::superwng_sound_nmi_assert)
+void superwng_state::superwng_sound_nmi_assert(device_t &device)
 {
 	if (BIT(m_nmi_enable, 0))
 		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);

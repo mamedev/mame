@@ -211,7 +211,7 @@ public:
 
 	uint8_t m_key;
 
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
+	void write_centronics_busy(int state);
 	int m_centronics_busy;
 };
 
@@ -274,7 +274,7 @@ void ep64_state::wr0_w(address_space &space, offs_t offset, uint8_t data, uint8_
 	m_cassette2->change_state(BIT(data, 7) ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED, CASSETTE_MASK_MOTOR);
 }
 
-WRITE_LINE_MEMBER( ep64_state::write_centronics_busy )
+void ep64_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 }

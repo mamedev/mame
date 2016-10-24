@@ -19,7 +19,7 @@
 
 ******************************************************************************/
 
-PALETTE_INIT_MEMBER(ojankohs_state,ojankoy)
+void ojankohs_state::palette_init_ojankoy(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -152,7 +152,7 @@ void ojankohs_state::ojankohs_flipscreen_w(address_space &space, offs_t offset, 
 	}
 }
 
-TILE_GET_INFO_MEMBER(ojankohs_state::ojankohs_get_tile_info)
+void ojankohs_state::ojankohs_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = m_videoram[tile_index] | ((m_colorram[tile_index] & 0x0f) << 8);
 	int color = (m_colorram[tile_index] & 0xe0) >> 5;
@@ -166,7 +166,7 @@ TILE_GET_INFO_MEMBER(ojankohs_state::ojankohs_get_tile_info)
 	SET_TILE_INFO_MEMBER(0, tile, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(ojankohs_state::ojankoy_get_tile_info)
+void ojankohs_state::ojankoy_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = m_videoram[tile_index] | (m_videoram[tile_index + 0x1000] << 8);
 	int color = m_colorram[tile_index] & 0x3f;

@@ -85,16 +85,16 @@ public:
 	uint8_t video_ctrl_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void video_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t video_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(dma_hrq_w);
-	DECLARE_WRITE_LINE_MEMBER(dma_nmi_cb);
-	DECLARE_WRITE_LINE_MEMBER(crtc_cb);
+	void dma_hrq_w(int state);
+	void dma_nmi_cb(int state);
+	void crtc_cb(int state);
 	uint8_t hdc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void hdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t fdc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void fdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint16_t via_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void via_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	DECLARE_WRITE_LINE_MEMBER(kb_data_ready);
+	void kb_data_ready(int state);
 	I8275_DRAW_CHARACTER_MEMBER(wicat_display_pixels);
 
 	required_shared_ptr<uint8_t> m_vram;
@@ -712,13 +712,13 @@ uint8_t wicat_state::video_status_r(address_space &space, offs_t offset, uint8_t
 		return 0x00;
 }
 
-WRITE_LINE_MEMBER(wicat_state::dma_hrq_w)
+void wicat_state::dma_hrq_w(int state)
 {
 	m_videocpu->set_input_line(INPUT_LINE_HALT,state ? ASSERT_LINE : CLEAR_LINE);
 	m_videodma->hack_w(state);
 }
 
-WRITE_LINE_MEMBER(wicat_state::dma_nmi_cb)
+void wicat_state::dma_nmi_cb(int state)
 {
 	if(state)
 	{
@@ -727,13 +727,13 @@ WRITE_LINE_MEMBER(wicat_state::dma_nmi_cb)
 	}
 }
 
-WRITE_LINE_MEMBER(wicat_state::kb_data_ready)
+void wicat_state::kb_data_ready(int state)
 {
 	m_video_kb_irq = state ? ASSERT_LINE : CLEAR_LINE;
 	m_videocpu->set_input_line(INPUT_LINE_IRQ0,m_video_kb_irq);
 }
 
-WRITE_LINE_MEMBER(wicat_state::crtc_cb)
+void wicat_state::crtc_cb(int state)
 {
 	m_crtc_irq = state ? ASSERT_LINE : CLEAR_LINE;
 	m_videocpu->set_input_line(INPUT_LINE_IRQ0,m_crtc_irq);

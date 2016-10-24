@@ -66,7 +66,7 @@ public:
 
 	uint8_t ram_bank_r(uint16_t offset, uint8_t bank_num);
 	void ram_bank_w(uint16_t offset, uint8_t data, uint8_t bank_num);
-	TIMER_DEVICE_CALLBACK_MEMBER(dfruit_irq_scanline);
+	void dfruit_irq_scanline(timer_device &timer, void *ptr, int32_t param);
 };
 
 void dfruit_state::video_start()
@@ -340,7 +340,7 @@ static GFXDECODE_START( dfruit )
 	//GFXDECODE_ENTRY( nullptr,           0, char_layout,  0, 16 )  // Ram-based
 GFXDECODE_END
 
-TIMER_DEVICE_CALLBACK_MEMBER(dfruit_state::dfruit_irq_scanline)
+void dfruit_state::dfruit_irq_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

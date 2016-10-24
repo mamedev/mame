@@ -45,7 +45,7 @@ void tmc600_state::vismac_data_w(address_space &space, offs_t offset, uint8_t da
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(tmc600_state::blink_tick)
+void tmc600_state::blink_tick(timer_device &timer, void *ptr, int32_t param)
 {
 	m_blink = !m_blink;
 }

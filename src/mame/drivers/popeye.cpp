@@ -112,7 +112,7 @@ NETLIST_END()
 
 
 
-INTERRUPT_GEN_MEMBER(popeye_state::popeye_interrupt)
+void popeye_state::popeye_interrupt(device_t &device)
 {
 	m_field ^= 1;
 	/* NMIs are enabled by the I register?? How can that be? */

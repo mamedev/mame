@@ -62,10 +62,10 @@ public:
 	void fp200_keyb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_INPUT_CHANGED_MEMBER(keyb_irq);
 
-	DECLARE_WRITE_LINE_MEMBER(sod_w);
-	DECLARE_READ_LINE_MEMBER(sid_r);
+	void sod_w(int state);
+	int sid_r();
 
-	DECLARE_PALETTE_INIT(fp200);
+	void palette_init_fp200(palette_device &palette);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -561,18 +561,18 @@ void fp200_state::machine_reset()
 }
 
 
-PALETTE_INIT_MEMBER(fp200_state, fp200)
+void fp200_state::palette_init_fp200(palette_device &palette)
 {
 	palette.set_pen_color(0, 0xa0, 0xa8, 0xa0);
 	palette.set_pen_color(1, 0x30, 0x38, 0x10);
 }
 
-WRITE_LINE_MEMBER( fp200_state::sod_w )
+void fp200_state::sod_w(int state)
 {
 	m_io_type = state;
 }
 
-READ_LINE_MEMBER( fp200_state::sid_r )
+int fp200_state::sid_r()
 {
 	return (ioport("KEYMOD")->read() >> m_keyb_mux) & 1;
 }

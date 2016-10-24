@@ -386,7 +386,7 @@ void vlm5030_device::restore_state()
 }
 
 /* get BSY pin level */
-READ_LINE_MEMBER( vlm5030_device::bsy )
+int vlm5030_device::bsy()
 {
 	update();
 	return m_pin_BSY;
@@ -399,7 +399,7 @@ void vlm5030_device::data_w(address_space &space, offs_t offset, uint8_t data, u
 }
 
 /* set RST pin level : reset / set table address A8-A15 */
-WRITE_LINE_MEMBER( vlm5030_device::rst )
+void vlm5030_device::rst(int state)
 {
 	if( m_pin_RST )
 	{
@@ -423,14 +423,14 @@ WRITE_LINE_MEMBER( vlm5030_device::rst )
 }
 
 /* set VCU pin level : ?? unknown */
-WRITE_LINE_MEMBER( vlm5030_device::vcu )
+void vlm5030_device::vcu(int state)
 {
 	/* direct mode / indirect mode */
 	m_pin_VCU = state;
 }
 
 /* set ST pin level  : set table address A0-A7 / start speech */
-WRITE_LINE_MEMBER( vlm5030_device::st )
+void vlm5030_device::st(int state)
 {
 	int table;
 

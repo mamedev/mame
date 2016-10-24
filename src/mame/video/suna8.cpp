@@ -35,7 +35,7 @@
     For Debug: there's no tilemap, just sprites.
 ***************************************************************************/
 #if TILEMAPS
-TILE_GET_INFO_MEMBER(suna8_state::get_tile_info)
+void suna8_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t code, attr;
 

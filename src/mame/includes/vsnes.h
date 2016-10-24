@@ -111,11 +111,11 @@ public:
 	void machine_start_vsnes();
 	void machine_reset_vsnes();
 	void video_start_vsnes();
-	DECLARE_PALETTE_INIT(vsnes);
+	void palette_init_vsnes(palette_device &palette);
 	void machine_start_vsdual();
 	void machine_reset_vsdual();
 	void video_start_vsdual();
-	DECLARE_PALETTE_INIT(vsdual);
+	void palette_init_vsdual(palette_device &palette);
 	uint32_t screen_update_vsnes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_vsnes_bottom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void v_set_videorom_bank(  int start, int count, int vrom_start_bank );

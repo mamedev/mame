@@ -183,7 +183,7 @@ void i2cmem_device::nvram_write( emu_file &file )
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-WRITE_LINE_MEMBER( i2cmem_device::write_e0 )
+void i2cmem_device::write_e0(int state)
 {
 	state &= 1;
 	if( m_e0 != state )
@@ -194,7 +194,7 @@ WRITE_LINE_MEMBER( i2cmem_device::write_e0 )
 }
 
 
-WRITE_LINE_MEMBER( i2cmem_device::write_e1 )
+void i2cmem_device::write_e1(int state)
 {
 	state &= 1;
 	if( m_e1 != state )
@@ -205,7 +205,7 @@ WRITE_LINE_MEMBER( i2cmem_device::write_e1 )
 }
 
 
-WRITE_LINE_MEMBER( i2cmem_device::write_e2 )
+void i2cmem_device::write_e2(int state)
 {
 	state &= 1;
 	if( m_e2 != state )
@@ -216,7 +216,7 @@ WRITE_LINE_MEMBER( i2cmem_device::write_e2 )
 }
 
 
-WRITE_LINE_MEMBER( i2cmem_device::write_sda )
+void i2cmem_device::write_sda(int state)
 {
 	state &= 1;
 	if( m_sdaw != state )
@@ -243,7 +243,7 @@ WRITE_LINE_MEMBER( i2cmem_device::write_sda )
 	}
 }
 
-WRITE_LINE_MEMBER( i2cmem_device::write_scl )
+void i2cmem_device::write_scl(int state)
 {
 	if( m_scl != state )
 	{
@@ -404,7 +404,7 @@ WRITE_LINE_MEMBER( i2cmem_device::write_scl )
 }
 
 
-WRITE_LINE_MEMBER( i2cmem_device::write_wc )
+void i2cmem_device::write_wc(int state)
 {
 	state &= 1;
 	if( m_wc != state )
@@ -415,7 +415,7 @@ WRITE_LINE_MEMBER( i2cmem_device::write_wc )
 }
 
 
-READ_LINE_MEMBER( i2cmem_device::read_sda )
+int i2cmem_device::read_sda()
 {
 	int res = m_sdar & 1;
 

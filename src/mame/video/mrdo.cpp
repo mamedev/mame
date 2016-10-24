@@ -44,7 +44,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(mrdo_state, mrdo)
+void mrdo_state::palette_init_mrdo(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -133,7 +133,7 @@ PALETTE_INIT_MEMBER(mrdo_state, mrdo)
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(mrdo_state::get_bg_tile_info)
+void mrdo_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t attr = m_bgvideoram[tile_index];
 	SET_TILE_INFO_MEMBER(1,
@@ -142,7 +142,7 @@ TILE_GET_INFO_MEMBER(mrdo_state::get_bg_tile_info)
 			(attr & 0x40) ? TILE_FORCE_LAYER0 : 0);
 }
 
-TILE_GET_INFO_MEMBER(mrdo_state::get_fg_tile_info)
+void mrdo_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t attr = m_fgvideoram[tile_index];
 	SET_TILE_INFO_MEMBER(0,

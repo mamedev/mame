@@ -55,50 +55,50 @@ public:
 	// acia
 	uint8_t acia_0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void acia_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( acia_0_irq_w );
+	void acia_0_irq_w(int state);
 	uint8_t acia_1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void acia_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( acia_1_irq_w );
+	void acia_1_irq_w(int state);
 	uint8_t acia_2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void acia_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( acia_2_irq_w );
+	void acia_2_irq_w(int state);
 	uint8_t acia_3_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void acia_3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( acia_3_irq_w );
+	void acia_3_irq_w(int state);
 	uint8_t acia_4_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void acia_4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( acia_4_irq_w );
+	void acia_4_irq_w(int state);
 	uint8_t acia_5_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void acia_5_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( acia_5_irq_w );
+	void acia_5_irq_w(int state);
 	uint8_t acia_6_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void acia_6_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( acia_6_irq_w );
+	void acia_6_irq_w(int state);
 
 	// cia
 	uint8_t cia_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void cia_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( cia_irq_w );
+	void cia_irq_w(int state);
 	uint8_t cia_port_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t cia_port_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void cia_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// rs232
-	DECLARE_WRITE_LINE_MEMBER( rs232_1_rxd_w );
-	DECLARE_WRITE_LINE_MEMBER( rs232_1_dcd_w );
-	DECLARE_WRITE_LINE_MEMBER( rs232_1_cts_w );
-	DECLARE_WRITE_LINE_MEMBER( rs232_2_dcd_w );
-	DECLARE_WRITE_LINE_MEMBER( rs232_2_cts_w );
-	DECLARE_WRITE_LINE_MEMBER( rs232_3_dcd_w );
-	DECLARE_WRITE_LINE_MEMBER( rs232_3_cts_w );
-	DECLARE_WRITE_LINE_MEMBER( rs232_4_dcd_w );
-	DECLARE_WRITE_LINE_MEMBER( rs232_4_cts_w );
-	DECLARE_WRITE_LINE_MEMBER( rs232_5_dcd_w );
-	DECLARE_WRITE_LINE_MEMBER( rs232_5_cts_w );
-	DECLARE_WRITE_LINE_MEMBER( rs232_6_dcd_w );
-	DECLARE_WRITE_LINE_MEMBER( rs232_6_cts_w );
-	DECLARE_WRITE_LINE_MEMBER( rs232_7_dcd_w );
-	DECLARE_WRITE_LINE_MEMBER( rs232_7_cts_w );
+	void rs232_1_rxd_w(int state);
+	void rs232_1_dcd_w(int state);
+	void rs232_1_cts_w(int state);
+	void rs232_2_dcd_w(int state);
+	void rs232_2_cts_w(int state);
+	void rs232_3_dcd_w(int state);
+	void rs232_3_cts_w(int state);
+	void rs232_4_dcd_w(int state);
+	void rs232_4_cts_w(int state);
+	void rs232_5_dcd_w(int state);
+	void rs232_5_cts_w(int state);
+	void rs232_6_dcd_w(int state);
+	void rs232_6_cts_w(int state);
+	void rs232_7_dcd_w(int state);
+	void rs232_7_cts_w(int state);
 
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -106,7 +106,7 @@ protected:
 	virtual void device_reset_after_children() override;
 
 	// device_zorro2_card_interface overrides
-	virtual DECLARE_WRITE_LINE_MEMBER( cfgin_w ) override;
+	virtual void cfgin_w(int state) override;
 
 	// amiga_autoconfig overrides
 	virtual void autoconfig_base_address(offs_t address) override;

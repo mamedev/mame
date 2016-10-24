@@ -180,7 +180,7 @@ INPUT_CHANGED_MEMBER( s11_state::audio_nmi )
 			m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-WRITE_LINE_MEMBER( s11_state::pia_irq )
+void s11_state::pia_irq(int state)
 {
 	if(state == CLEAR_LINE)
 	{
@@ -206,7 +206,7 @@ void s11_state::sound_w(address_space &space, offs_t offset, uint8_t data, uint8
 	m_sound_data = data;
 }
 
-WRITE_LINE_MEMBER( s11_state::pia21_ca2_w )
+void s11_state::pia21_ca2_w(int state)
 {
 // sound ns
 	if(m_pias)
@@ -308,7 +308,7 @@ void s11_state::pia34_pb_w(address_space &space, offs_t offset, uint8_t data, ui
 		m_bg->data_w(data);
 }
 
-WRITE_LINE_MEMBER( s11_state::pia34_cb2_w )
+void s11_state::pia34_cb2_w(int state)
 {
 	if(m_pia40)
 		m_pia40->cb1_w(state);  // MCB2 through CPU interface
@@ -322,14 +322,14 @@ void s11_state::bank_w(address_space &space, offs_t offset, uint8_t data, uint8_
 	membank("bank1")->set_entry(BIT(data, 0));
 }
 
-WRITE_LINE_MEMBER( s11_state::pias_ca2_w )
+void s11_state::pias_ca2_w(int state)
 {
 // speech clock
 	if(m_hc55516)
 		m_hc55516->clock_w(state);
 }
 
-WRITE_LINE_MEMBER( s11_state::pias_cb2_w )
+void s11_state::pias_cb2_w(int state)
 {
 // speech data
 	if(m_hc55516)
@@ -341,7 +341,7 @@ uint8_t s11_state::sound_r(address_space &space, offs_t offset, uint8_t mem_mask
 	return m_sound_data;
 }
 
-WRITE_LINE_MEMBER( s11_state::ym2151_irq_w )
+void s11_state::ym2151_irq_w(int state)
 {
 	if(m_pia40)
 	{
@@ -352,7 +352,7 @@ WRITE_LINE_MEMBER( s11_state::ym2151_irq_w )
 	}
 }
 
-WRITE_LINE_MEMBER( s11_state::pia40_cb2_w )
+void s11_state::pia40_cb2_w(int state)
 {
 	m_pia34->cb1_w(state);  // To Widget MCB1 through CPU Data interface
 }

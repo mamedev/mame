@@ -56,14 +56,14 @@ machine_config_constructor sega315_5313_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME( sega_genesis_vdp );
 }
 
-TIMER_CALLBACK_MEMBER(sega315_5313_device::irq6_on_timer_callback)
+void sega315_5313_device::irq6_on_timer_callback(void *ptr, int32_t param)
 {
 // m_irq6_pending = 1;
 	if (MEGADRIVE_REG01_IRQ6_ENABLE)
 		m_lv6irqline_callback(true);
 }
 
-TIMER_CALLBACK_MEMBER(sega315_5313_device::irq4_on_timer_callback)
+void sega315_5313_device::irq4_on_timer_callback(void *ptr, int32_t param)
 {
 	m_lv4irqline_callback(true);
 }
@@ -2578,7 +2578,7 @@ void sega315_5313_device::render_videobuffer_to_screenbuffer(int scanline)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(sega315_5313_device::render_scanline)
+void sega315_5313_device::render_scanline(void *ptr, int32_t param)
 {
 	int scanline = get_scanline_counter();
 
@@ -2722,7 +2722,7 @@ void sega315_5313_device::vdp_handle_eof()
 
 
 // called at the start of each scanline
-TIMER_DEVICE_CALLBACK_MEMBER( sega315_5313_device::megadriv_scanline_timer_callback )
+void sega315_5313_device::megadriv_scanline_timer_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	if (!m_use_alt_timing)
 	{
@@ -2737,7 +2737,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( sega315_5313_device::megadriv_scanline_timer_callb
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( sega315_5313_device::megadriv_scanline_timer_callback_alt_timing )
+void sega315_5313_device::megadriv_scanline_timer_callback_alt_timing(timer_device &timer, void *ptr, int32_t param)
 {
 	if (m_use_alt_timing)
 	{

@@ -44,7 +44,7 @@ void pcktgal_state::sound_w(address_space &space, offs_t offset, uint8_t data, u
 }
 
 
-WRITE_LINE_MEMBER(pcktgal_state::adpcm_int)
+void pcktgal_state::adpcm_int(int state)
 {
 	m_msm->data_w(m_msm5205next >> 4);
 	m_msm5205next <<= 4;

@@ -53,10 +53,10 @@ inline void fuuki16_state::get_tile_info(tile_data &tileinfo, tilemap_memory_ind
 	SET_TILE_INFO_MEMBER(1 + _N_, code, attr & 0x3f, TILE_FLIPYX((attr >> 6) & 3));
 }
 
-TILE_GET_INFO_MEMBER(fuuki16_state::get_tile_info_0){ get_tile_info(tileinfo, tile_index, 0); }
-TILE_GET_INFO_MEMBER(fuuki16_state::get_tile_info_1){ get_tile_info(tileinfo, tile_index, 1); }
-TILE_GET_INFO_MEMBER(fuuki16_state::get_tile_info_2){ get_tile_info(tileinfo, tile_index, 2); }
-TILE_GET_INFO_MEMBER(fuuki16_state::get_tile_info_3){ get_tile_info(tileinfo, tile_index, 3); }
+void fuuki16_state::get_tile_info_0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ get_tile_info(tileinfo, tile_index, 0); }
+void fuuki16_state::get_tile_info_1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ get_tile_info(tileinfo, tile_index, 1); }
+void fuuki16_state::get_tile_info_2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ get_tile_info(tileinfo, tile_index, 2); }
+void fuuki16_state::get_tile_info_3(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ get_tile_info(tileinfo, tile_index, 3); }
 
 inline void fuuki16_state::vram_w(offs_t offset, uint16_t data, uint16_t mem_mask, int _N_)
 {
@@ -80,7 +80,7 @@ void fuuki16_state::vram_3_w(address_space &space, offs_t offset, uint16_t data,
 
 /* Not used atm, seems to be fine without clearing pens? */
 #if 0
-PALETTE_INIT_MEMBER(fuuki16_state,fuuki16)
+void fuuki16_state::palette_init_fuuki16(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int pen;

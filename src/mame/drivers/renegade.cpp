@@ -150,7 +150,7 @@ void renegade_state::adpcm_stop_w(address_space &space, offs_t offset, uint8_t d
 	m_adpcm_playing = false;
 }
 
-WRITE_LINE_MEMBER(renegade_state::adpcm_int)
+void renegade_state::adpcm_int(int state)
 {
 	if (!m_adpcm_playing) return;
 
@@ -582,7 +582,7 @@ void renegade_state::bankswitch_w(address_space &space, offs_t offset, uint8_t d
 	m_rombank->set_entry(data & 1);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(renegade_state::interrupt)
+void renegade_state::interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

@@ -95,9 +95,9 @@ public:
 	void set_irq_line(int state);
 	void set_firq_line(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( nmi_w );
-	DECLARE_WRITE_LINE_MEMBER( irq_w );
-	DECLARE_WRITE_LINE_MEMBER( firq_w );
+	void nmi_w(int state);
+	void irq_w(int state);
+	void firq_w(int state);
 
 protected:
 	// device-level overrides

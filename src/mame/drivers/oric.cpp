@@ -68,12 +68,12 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(nmi_pressed);
 	void via_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void via_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(via_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(via_cb2_w);
-	DECLARE_WRITE_LINE_MEMBER(via_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(ext_irq_w);
+	void via_ca2_w(int state);
+	void via_cb2_w(int state);
+	void via_irq_w(int state);
+	void ext_irq_w(int state);
 	void psg_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	TIMER_DEVICE_CALLBACK_MEMBER(update_tape);
+	void update_tape(timer_device &timer, void *ptr, int32_t param);
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
@@ -128,18 +128,18 @@ public:
 
 	void via2_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void via2_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(via2_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(via2_cb2_w);
-	DECLARE_WRITE_LINE_MEMBER(via2_irq_w);
+	void via2_ca2_w(int state);
+	void via2_cb2_w(int state);
+	void via2_irq_w(int state);
 	void port_314_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t port_314_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t port_318_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER(acia_irq_w);
+	void acia_irq_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(fdc_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_hld_w);
+	void fdc_irq_w(int state);
+	void fdc_drq_w(int state);
+	void fdc_hld_w(int state);
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
@@ -320,25 +320,25 @@ void oric_state::via_b_w(address_space &space, offs_t offset, uint8_t data, uint
 	m_cassette->output(data & 0x80 ? -1.0 : +1.0);
 }
 
-WRITE_LINE_MEMBER(oric_state::via_ca2_w)
+void oric_state::via_ca2_w(int state)
 {
 	m_via_ca2 = state;
 	update_psg(m_maincpu->space(AS_PROGRAM));
 }
 
-WRITE_LINE_MEMBER(oric_state::via_cb2_w)
+void oric_state::via_cb2_w(int state)
 {
 	m_via_cb2 = state;
 	update_psg(m_maincpu->space(AS_PROGRAM));
 }
 
-WRITE_LINE_MEMBER(oric_state::via_irq_w)
+void oric_state::via_irq_w(int state)
 {
 	m_via_irq = state;
 	update_irq();
 }
 
-WRITE_LINE_MEMBER(oric_state::ext_irq_w)
+void oric_state::ext_irq_w(int state)
 {
 	m_ext_irq = state;
 	update_irq();
@@ -350,7 +350,7 @@ void oric_state::psg_a_w(address_space &space, offs_t offset, uint8_t data, uint
 	update_keyboard();
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(oric_state::update_tape)
+void oric_state::update_tape(timer_device &timer, void *ptr, int32_t param)
 {
 	if(!m_config->read())
 		m_via->write_cb1(m_cassette->input() > 0.0038);
@@ -444,17 +444,17 @@ void telestrat_state::via2_b_w(address_space &space, offs_t offset, uint8_t data
 	m_via2->write_pb(space, 0, port);
 }
 
-WRITE_LINE_MEMBER(telestrat_state::via2_ca2_w)
+void telestrat_state::via2_ca2_w(int state)
 {
 	m_via2_ca2 = state;
 }
 
-WRITE_LINE_MEMBER(telestrat_state::via2_cb2_w)
+void telestrat_state::via2_cb2_w(int state)
 {
 	m_via2_cb2 = state;
 }
 
-WRITE_LINE_MEMBER(telestrat_state::via2_irq_w)
+void telestrat_state::via2_irq_w(int state)
 {
 	m_via2_irq = state;
 	update_irq();
@@ -484,24 +484,24 @@ uint8_t telestrat_state::port_318_r(address_space &space, offs_t offset, uint8_t
 }
 
 
-WRITE_LINE_MEMBER(telestrat_state::acia_irq_w)
+void telestrat_state::acia_irq_w(int state)
 {
 	m_acia_irq = state;
 	update_irq();
 }
 
-WRITE_LINE_MEMBER(telestrat_state::fdc_irq_w)
+void telestrat_state::fdc_irq_w(int state)
 {
 	m_fdc_irq = state;
 	update_irq();
 }
 
-WRITE_LINE_MEMBER(telestrat_state::fdc_drq_w)
+void telestrat_state::fdc_drq_w(int state)
 {
 	m_fdc_drq = state;
 }
 
-WRITE_LINE_MEMBER(telestrat_state::fdc_hld_w)
+void telestrat_state::fdc_hld_w(int state)
 {
 	m_fdc_hld = state;
 }

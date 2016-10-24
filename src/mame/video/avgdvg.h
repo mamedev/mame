@@ -41,8 +41,8 @@ public:
 	void set_flip_x(int flip);
 	void set_flip_y(int flip);
 
-	TIMER_CALLBACK_MEMBER(vg_set_halt_callback);
-	TIMER_CALLBACK_MEMBER(run_state_machine);
+	void vg_set_halt_callback(void *ptr, int32_t param);
+	void run_state_machine(void *ptr, int32_t param);
 protected:
 	void apply_flipping(int *x, int *y);
 	void vg_set_halt(int dummy);

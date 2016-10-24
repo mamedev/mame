@@ -233,14 +233,14 @@ do { \
 	SET_TILE_INFO_MEMBER(1, tile >> 1, color, 0); \
 } while (0)
 
-TILE_GET_INFO_MEMBER(model3_state::tile_info_layer0_4bit) { MODEL3_TILE_INFO4(0x000); }
-TILE_GET_INFO_MEMBER(model3_state::tile_info_layer0_8bit) { MODEL3_TILE_INFO8(0x000); }
-TILE_GET_INFO_MEMBER(model3_state::tile_info_layer1_4bit) { MODEL3_TILE_INFO4(0x400); }
-TILE_GET_INFO_MEMBER(model3_state::tile_info_layer1_8bit) { MODEL3_TILE_INFO8(0x400); }
-TILE_GET_INFO_MEMBER(model3_state::tile_info_layer2_4bit) { MODEL3_TILE_INFO4(0x800); }
-TILE_GET_INFO_MEMBER(model3_state::tile_info_layer2_8bit) { MODEL3_TILE_INFO8(0x800); }
-TILE_GET_INFO_MEMBER(model3_state::tile_info_layer3_4bit) { MODEL3_TILE_INFO4(0xc00); }
-TILE_GET_INFO_MEMBER(model3_state::tile_info_layer3_8bit) { MODEL3_TILE_INFO8(0xc00); }
+void model3_state::tile_info_layer0_4bit(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index) { MODEL3_TILE_INFO4(0x000); }
+void model3_state::tile_info_layer0_8bit(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index) { MODEL3_TILE_INFO8(0x000); }
+void model3_state::tile_info_layer1_4bit(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index) { MODEL3_TILE_INFO4(0x400); }
+void model3_state::tile_info_layer1_8bit(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index) { MODEL3_TILE_INFO8(0x400); }
+void model3_state::tile_info_layer2_4bit(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index) { MODEL3_TILE_INFO4(0x800); }
+void model3_state::tile_info_layer2_8bit(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index) { MODEL3_TILE_INFO8(0x800); }
+void model3_state::tile_info_layer3_4bit(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index) { MODEL3_TILE_INFO4(0xc00); }
+void model3_state::tile_info_layer3_8bit(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index) { MODEL3_TILE_INFO8(0xc00); }
 
 #ifdef UNUSED_FUNCTION
 void model3_state::draw_texture_sheet(bitmap_ind16 &bitmap, const rectangle &cliprect)

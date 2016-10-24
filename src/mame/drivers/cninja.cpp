@@ -64,7 +64,7 @@ void cninja_state::stoneage_sound_w(address_space &space, offs_t offset, uint16_
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(cninja_state::interrupt_gen)
+void cninja_state::interrupt_gen(timer_device &timer, void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line((m_irq_mask & 0x10) ? 3 : 4, ASSERT_LINE);
 	m_raster_irq_timer->reset();

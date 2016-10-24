@@ -42,7 +42,7 @@ const unsigned char dai_palette[16*3] =
 };
 
 
-PALETTE_INIT_MEMBER(dai_state, dai)
+void dai_state::palette_init_dai(palette_device &palette)
 {
 	int i;
 

@@ -213,7 +213,7 @@ static GFXDECODE_START( parentj )
 GFXDECODE_END
 
 /* unknown sources ... */
-TIMER_DEVICE_CALLBACK_MEMBER(taitoo_state::parentj_interrupt)
+void taitoo_state::parentj_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

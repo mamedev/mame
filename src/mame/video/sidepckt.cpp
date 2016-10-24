@@ -12,7 +12,7 @@
 #include "includes/sidepckt.h"
 
 
-PALETTE_INIT_MEMBER(sidepckt_state, sidepckt)
+void sidepckt_state::palette_init_sidepckt(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -52,7 +52,7 @@ PALETTE_INIT_MEMBER(sidepckt_state, sidepckt)
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(sidepckt_state::get_tile_info)
+void sidepckt_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t attr = m_colorram[tile_index];
 	SET_TILE_INFO_MEMBER(0,

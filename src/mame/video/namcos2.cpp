@@ -49,7 +49,7 @@ void namcos2_state::gfx_ctrl_w(address_space &space, offs_t offset, uint16_t dat
 	COMBINE_DATA(&m_gfx_ctrl);
 }
 
-TILE_GET_INFO_MEMBER( namcos2_state::roz_tile_info )
+void namcos2_state::roz_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = m_rozram[tile_index];
 	SET_TILE_INFO_MEMBER(3,tile,0/*color*/,0);

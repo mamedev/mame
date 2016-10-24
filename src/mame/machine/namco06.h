@@ -94,7 +94,7 @@ protected:
 	virtual void device_reset() override;
 private:
 
-	TIMER_CALLBACK_MEMBER( nmi_generate );
+	void nmi_generate(void *ptr, int32_t param);
 
 	// internal state
 	uint8_t m_control;

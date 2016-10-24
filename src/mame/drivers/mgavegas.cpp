@@ -136,7 +136,7 @@ public:
 	void init_mgavegas21();
 	void init_mgavegas133();
 
-	TIMER_DEVICE_CALLBACK_MEMBER(int_0);
+	void int_0(timer_device &timer, void *ptr, int32_t param);
 
 
 protected:
@@ -566,7 +566,7 @@ void mgavegas_state::init_mgavegas()
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER( mgavegas_state::int_0 )
+void mgavegas_state::int_0(timer_device &timer, void *ptr, int32_t param)
 {
 	if(m_int==0){
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);

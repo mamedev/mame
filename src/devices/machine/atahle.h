@@ -29,10 +29,10 @@ public:
 	virtual void write_dma(uint16_t data) override;
 	virtual void write_cs0(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) override;
 	virtual void write_cs1(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) override;
-	virtual DECLARE_WRITE_LINE_MEMBER(write_csel) override;
-	virtual DECLARE_WRITE_LINE_MEMBER(write_dasp) override;
-	virtual DECLARE_WRITE_LINE_MEMBER(write_dmack) override;
-	virtual DECLARE_WRITE_LINE_MEMBER(write_pdiag) override;
+	virtual void write_csel(int state) override;
+	virtual void write_dasp(int state) override;
+	virtual void write_dmack(int state) override;
+	virtual void write_pdiag(int state) override;
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;

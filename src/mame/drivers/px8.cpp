@@ -685,7 +685,7 @@ INPUT_PORTS_END
     VIDEO
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(px8_state, px8)
+void px8_state::palette_init_px8(palette_device &palette)
 {
 	palette.set_pen_color(0, 0xa5, 0xad, 0xa5);
 	palette.set_pen_color(1, 0x31, 0x39, 0x10);

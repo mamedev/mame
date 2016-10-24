@@ -21,15 +21,15 @@ public:
 	template<class _Object> static devcb_base &static_set_tmrout0_handler(device_t &device, _Object object) { return downcast<i80186_cpu_device &>(device).m_out_tmrout0_func.set_callback(object); }
 	template<class _Object> static devcb_base &static_set_tmrout1_handler(device_t &device, _Object object) { return downcast<i80186_cpu_device &>(device).m_out_tmrout1_func.set_callback(object); }
 
-	IRQ_CALLBACK_MEMBER(int_callback);
-	DECLARE_WRITE_LINE_MEMBER(drq0_w) { if(state) drq_callback(0); m_dma[0].drq_state = state; }
-	DECLARE_WRITE_LINE_MEMBER(drq1_w) { if(state) drq_callback(1); m_dma[1].drq_state = state; }
-	DECLARE_WRITE_LINE_MEMBER(tmrin0_w) { if(state && (m_timer[0].control & 0x8004) == 0x8004) { inc_timer(0); } }
-	DECLARE_WRITE_LINE_MEMBER(tmrin1_w) { if(state && (m_timer[1].control & 0x8004) == 0x8004) { inc_timer(1); } }
-	DECLARE_WRITE_LINE_MEMBER(int0_w) { external_int(0, state); }
-	DECLARE_WRITE_LINE_MEMBER(int1_w) { external_int(1, state); }
-	DECLARE_WRITE_LINE_MEMBER(int2_w) { external_int(2, state); }
-	DECLARE_WRITE_LINE_MEMBER(int3_w) { external_int(3, state); }
+	int int_callback(device_t &device, int irqline);
+	void drq0_w(int state) { if(state) drq_callback(0); m_dma[0].drq_state = state; }
+	void drq1_w(int state) { if(state) drq_callback(1); m_dma[1].drq_state = state; }
+	void tmrin0_w(int state) { if(state && (m_timer[0].control & 0x8004) == 0x8004) { inc_timer(0); } }
+	void tmrin1_w(int state) { if(state && (m_timer[1].control & 0x8004) == 0x8004) { inc_timer(1); } }
+	void int0_w(int state) { external_int(0, state); }
+	void int1_w(int state) { external_int(1, state); }
+	void int2_w(int state) { external_int(2, state); }
+	void int3_w(int state) { external_int(3, state); }
 
 	// device_memory_interface overrides
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_IO) ? &m_io_config : nullptr ); }

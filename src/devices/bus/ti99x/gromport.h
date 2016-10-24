@@ -27,14 +27,14 @@ public:
 	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 	DECLARE_READ8Z_MEMBER(crureadz);
 	void cruwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(ready_line);
+	void ready_line(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(romgq_line);
+	void romgq_line(int state);
 
 	// Combined GROM select lines
 	void set_gromlines(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER(gclock_in);
+	void gclock_in(int state);
 
 	static void set_mask(device_t &device, int mask) { downcast<gromport_device &>(device).m_mask = mask;   }
 
@@ -93,11 +93,11 @@ public:
 	DECLARE_READ8Z_MEMBER(crureadz);
 	void cruwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER(ready_line);
-	DECLARE_WRITE_LINE_MEMBER(romgq_line);
+	void ready_line(int state);
+	void romgq_line(int state);
 	void set_gromlines(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER(gclock_in);
+	void gclock_in(int state);
 
 	bool    is_available() { return m_pcb != nullptr; }
 	void    set_slot(int i);
@@ -152,12 +152,12 @@ public:
 	virtual DECLARE_READ8Z_MEMBER(crureadz) = 0;
 	virtual void cruwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) = 0;
 
-	virtual DECLARE_WRITE_LINE_MEMBER(romgq_line) =0;
+	virtual void romgq_line(int state) =0;
 	virtual void set_gromlines(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) =0;
 
-	virtual DECLARE_WRITE_LINE_MEMBER(gclock_in) =0;
+	virtual void gclock_in(int state) =0;
 
-	DECLARE_WRITE_LINE_MEMBER(ready_line);
+	void ready_line(int state);
 
 	virtual void insert(int index, ti99_cartridge_device* cart) { m_gromport->cartridge_inserted(); };
 	virtual void remove(int index) { };
@@ -183,9 +183,9 @@ public:
 	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 	DECLARE_READ8Z_MEMBER(crureadz) override;
 	void cruwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
-	DECLARE_WRITE_LINE_MEMBER(romgq_line) override;
+	void romgq_line(int state) override;
 	void set_gromlines(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
-	DECLARE_WRITE_LINE_MEMBER(gclock_in) override;
+	void gclock_in(int state) override;
 
 	bool is_grom_idle() override;
 
@@ -216,9 +216,9 @@ public:
 	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 	DECLARE_READ8Z_MEMBER(crureadz) override;
 	void cruwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
-	DECLARE_WRITE_LINE_MEMBER(romgq_line) override;
+	void romgq_line(int state) override;
 	void set_gromlines(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
-	DECLARE_WRITE_LINE_MEMBER(gclock_in) override;
+	void gclock_in(int state) override;
 
 	void insert(int index, ti99_cartridge_device* cart) override;
 	void remove(int index) override;
@@ -255,9 +255,9 @@ public:
 	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 	DECLARE_READ8Z_MEMBER(crureadz) override;
 	void cruwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
-	DECLARE_WRITE_LINE_MEMBER(romgq_line) override;
+	void romgq_line(int state) override;
 	void set_gromlines(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
-	DECLARE_WRITE_LINE_MEMBER(gclock_in) override;
+	void gclock_in(int state) override;
 
 	void insert(int index, ti99_cartridge_device* cart) override;
 	void remove(int index) override;
@@ -315,9 +315,9 @@ protected:
 	virtual DECLARE_READ8Z_MEMBER(crureadz);
 	virtual void cruwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER(romgq_line);
+	void romgq_line(int state);
 	virtual void set_gromlines(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(gclock_in);
+	void gclock_in(int state);
 
 	DECLARE_READ8Z_MEMBER(gromreadz);
 	void gromwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);

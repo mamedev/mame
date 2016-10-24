@@ -121,7 +121,7 @@ public:
 	void sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void oki_setbank(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(obj_irq_cb);
+	void obj_irq_cb(timer_device &timer, void *ptr, int32_t param);
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
@@ -493,7 +493,7 @@ static ADDRESS_MAP_START( ramdac_map, AS_0, 8, sliver_state )
 	AM_RANGE(0x000, 0x3ff) AM_RAM AM_SHARE("colorram")
 ADDRESS_MAP_END
 
-TIMER_DEVICE_CALLBACK_MEMBER ( sliver_state::obj_irq_cb )
+void sliver_state::obj_irq_cb(timer_device &timer, void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(3, HOLD_LINE);
 }

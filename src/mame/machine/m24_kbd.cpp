@@ -274,7 +274,7 @@ void m24_keyboard_device::bus_w(address_space &space, offs_t offset, uint8_t dat
 	m_keypress = (col & (1 << (data & 7))) ? 1 : 0;
 }
 
-WRITE_LINE_MEMBER( m24_keyboard_device::clock_w )
+void m24_keyboard_device::clock_w(int state)
 {
 	m_mcu->set_input_line(MCS48_INPUT_IRQ, !state);
 	if(!state)
@@ -286,7 +286,7 @@ WRITE_LINE_MEMBER( m24_keyboard_device::clock_w )
 	}
 }
 
-WRITE_LINE_MEMBER( m24_keyboard_device::data_w )
+void m24_keyboard_device::data_w(int state)
 {
 	m_kbcdata = state;
 }

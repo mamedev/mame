@@ -57,13 +57,13 @@ public:
 	void gyruss_filter0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void gyruss_filter1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_gyruss();
-	TILE_GET_INFO_MEMBER(gyruss_get_tile_info);
+	void gyruss_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(gyruss);
+	void palette_init_gyruss(palette_device &palette);
 	uint32_t screen_update_gyruss(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(master_vblank_irq);
-	INTERRUPT_GEN_MEMBER(slave_vblank_irq);
+	void master_vblank_irq(device_t &device);
+	void slave_vblank_irq(device_t &device);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void filter_w(address_space &space, int chip, int data );
 };

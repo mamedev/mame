@@ -1093,7 +1093,7 @@ uint8_t isa8_hdc_device::pc_hdc_dipswitch_r()
 	return dip;
 }
 
-WRITE_LINE_MEMBER( isa8_hdc_device::irq_w )
+void isa8_hdc_device::irq_w(int state)
 {
 	if (BIT(dip, 6))
 		m_isa->irq5_w(state);
@@ -1101,7 +1101,7 @@ WRITE_LINE_MEMBER( isa8_hdc_device::irq_w )
 		m_isa->irq2_w(state);
 }
 
-WRITE_LINE_MEMBER( isa8_hdc_device::drq_w )
+void isa8_hdc_device::drq_w(int state)
 {
 	m_isa->drq3_w(state);
 }

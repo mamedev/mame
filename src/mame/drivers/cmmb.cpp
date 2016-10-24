@@ -83,7 +83,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_cmmb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vblank_irq);
+	void vblank_irq(device_t &device);
 };
 
 
@@ -369,7 +369,7 @@ static GFXDECODE_START( cmmb )
 	GFXDECODE_ENTRY( "gfx", 0, spritelayout,   0x10, 4 )
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(cmmb_state::vblank_irq)
+void cmmb_state::vblank_irq(device_t &device)
 {
 //  if(machine().input().code_pressed_once(KEYCODE_Z))
 //      device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);

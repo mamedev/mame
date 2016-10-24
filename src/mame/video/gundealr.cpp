@@ -18,7 +18,7 @@
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(gundealr_state::get_bg_tile_info)
+void gundealr_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t attr = m_bg_videoram[2 * tile_index + 1];
 	SET_TILE_INFO_MEMBER(0,
@@ -27,13 +27,13 @@ TILE_GET_INFO_MEMBER(gundealr_state::get_bg_tile_info)
 			0);
 }
 
-TILEMAP_MAPPER_MEMBER(gundealr_state::gundealr_scan)
+tilemap_memory_index gundealr_state::gundealr_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return (row & 0x0f) + ((col & 0x3f) << 4) + ((row & 0x10) << 6);
 }
 
-TILE_GET_INFO_MEMBER(gundealr_state::get_fg_tile_info)
+void gundealr_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t attr = m_fg_videoram[2 * tile_index + 1];
 	SET_TILE_INFO_MEMBER(1,

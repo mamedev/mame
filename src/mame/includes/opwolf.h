@@ -110,13 +110,13 @@ public:
 	virtual void machine_start() override;
 	void machine_reset_opwolf();
 	uint32_t screen_update_opwolf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(opwolf_timer_callback);
-	TIMER_CALLBACK_MEMBER(cchip_timer);
+	void opwolf_timer_callback(void *ptr, int32_t param);
+	void cchip_timer(void *ptr, int32_t param);
 	void updateDifficulty( int mode );
 	void opwolf_cchip_init(  );
 	void opwolf_msm5205_vck(msm5205_device *device, int chip);
-	DECLARE_WRITE_LINE_MEMBER(opwolf_msm5205_vck_1);
-	DECLARE_WRITE_LINE_MEMBER(opwolf_msm5205_vck_2);
+	void opwolf_msm5205_vck_1(int state);
+	void opwolf_msm5205_vck_2(int state);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;

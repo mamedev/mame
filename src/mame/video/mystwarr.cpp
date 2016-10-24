@@ -128,7 +128,7 @@ K055673_CB_MEMBER(mystwarr_state::martchmp_sprite_callback)
 
 
 
-TILE_GET_INFO_MEMBER(mystwarr_state::get_gai_936_tile_info)
+void mystwarr_state::get_gai_936_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno, colour;
 	uint8_t *ROM = memregion("gfx4")->base();
@@ -168,7 +168,7 @@ void mystwarr_state::video_start_gaiapols()
 	m_ult_936_tilemap->set_transparent_pen(0);
 }
 
-TILE_GET_INFO_MEMBER(mystwarr_state::get_ult_936_tile_info)
+void mystwarr_state::get_ult_936_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno, colour;
 	uint8_t *ROM = memregion("gfx4")->base();

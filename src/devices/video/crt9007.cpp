@@ -892,7 +892,7 @@ void crt9007_t::write(address_space &space, offs_t offset, uint8_t data, uint8_t
 //  ack_w - DMA acknowledge
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( crt9007_t::ack_w )
+void crt9007_t::ack_w(int state)
 {
 	if (LOG) logerror("CRT9007 '%s' ACK: %u\n", tag(), state);
 
@@ -910,7 +910,7 @@ WRITE_LINE_MEMBER( crt9007_t::ack_w )
 //  lpstb_w - light pen strobe
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( crt9007_t::lpstb_w )
+void crt9007_t::lpstb_w(int state)
 {
 	if (LOG) logerror("CRT9007 '%s' LPSTB: %u\n", tag(), state);
 

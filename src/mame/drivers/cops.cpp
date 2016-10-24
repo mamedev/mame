@@ -82,10 +82,10 @@ public:
 	void io2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t io2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t ldstatus_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(dacia_irq);
-	DECLARE_WRITE_LINE_MEMBER(ld_w);
-	DECLARE_WRITE_LINE_MEMBER(via1_irq);
-	DECLARE_WRITE_LINE_MEMBER(via2_irq);
+	void dacia_irq(int state);
+	void ld_w(int state);
+	void via1_irq(int state);
+	void via2_irq(int state);
 	void dacia_receive(uint8_t data);
 	void update_dacia_irq();
 	void dacia_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -150,7 +150,7 @@ public:
 
 	// LDP-1450
 	emu_timer *m_ld_timer;
-	TIMER_CALLBACK_MEMBER(ld_timer_callback);
+	void ld_timer_callback(void *ptr, int32_t param);
 
 	uint8_t m_ld_command_to_send[8];
 	uint8_t m_ld_command_current_byte;
@@ -229,7 +229,7 @@ uint8_t cops_state::ldstatus_r(address_space &space, offs_t offset, uint8_t mem_
 	return m_ld->status_r();
 }
 
-TIMER_CALLBACK_MEMBER(cops_state::ld_timer_callback)
+void cops_state::ld_timer_callback(void *ptr, int32_t param)
 {
 	m_dacia_receiver_full = 1;
  int m_ld_command_total_bytes =8;
@@ -245,7 +245,7 @@ TIMER_CALLBACK_MEMBER(cops_state::ld_timer_callback)
 	}
 }
 
-WRITE_LINE_MEMBER(cops_state::ld_w)
+void cops_state::ld_w(int state)
 {
 	lddata <<= 1;
 
@@ -742,7 +742,7 @@ void cops_state::io2_w(address_space &space, offs_t offset, uint8_t data, uint8_
  *
  *************************************/
 
-WRITE_LINE_MEMBER(cops_state::via1_irq)
+void cops_state::via1_irq(int state)
 {
 	if ( state == ASSERT_LINE )
 	{
@@ -778,7 +778,7 @@ void cops_state::via1_cb1_w(address_space &space, offs_t offset, uint8_t data, u
  *
  *************************************/
 
-WRITE_LINE_MEMBER(cops_state::via2_irq)
+void cops_state::via2_irq(int state)
 {
 	if ( state == ASSERT_LINE )
 	{

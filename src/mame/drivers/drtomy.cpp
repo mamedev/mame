@@ -40,8 +40,8 @@ public:
 	void drtomy_vram_fg_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void drtomy_vram_bg_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void drtomy_okibank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	TILE_GET_INFO_MEMBER(get_tile_info_fg);
-	TILE_GET_INFO_MEMBER(get_tile_info_bg);
+	void get_tile_info_fg(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info_bg(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -55,7 +55,7 @@ public:
 
 
 
-TILE_GET_INFO_MEMBER(drtomy_state::get_tile_info_fg)
+void drtomy_state::get_tile_info_fg(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code  = m_videoram_fg[tile_index] & 0xfff;
 	int color = (m_videoram_fg[tile_index] & 0xf000) >> 12;
@@ -63,7 +63,7 @@ TILE_GET_INFO_MEMBER(drtomy_state::get_tile_info_fg)
 }
 
 
-TILE_GET_INFO_MEMBER(drtomy_state::get_tile_info_bg)
+void drtomy_state::get_tile_info_bg(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code  = m_videoram_bg[tile_index] & 0xfff;
 	int color = (m_videoram_bg[tile_index] & 0xf000) >> 12;

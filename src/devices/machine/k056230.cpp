@@ -54,7 +54,7 @@ uint8_t k056230_device::read(address_space &space, offs_t offset, uint8_t mem_ma
 	return 0;
 }
 
-TIMER_CALLBACK_MEMBER(k056230_device::network_irq_clear)
+void k056230_device::network_irq_clear(void *ptr, int32_t param)
 {
 	if (m_cpu)
 		m_cpu->set_input_line(INPUT_LINE_IRQ2, CLEAR_LINE);

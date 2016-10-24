@@ -194,7 +194,7 @@ static GFXDECODE_START( solomon )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,   0, 8 )  /* colors   0-127 */
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(solomon_state::vblank_irq)
+void solomon_state::vblank_irq(device_t &device)
 {
 	if(m_nmi_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);

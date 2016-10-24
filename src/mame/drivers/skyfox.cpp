@@ -200,7 +200,7 @@ GFXDECODE_END
 
 /* Scroll the background on every vblank (guess). */
 
-INTERRUPT_GEN_MEMBER(skyfox_state::skyfox_interrupt)
+void skyfox_state::skyfox_interrupt(device_t &device)
 {
 	/* Scroll the bg */
 	m_bg_pos += (m_bg_ctrl >> 1) & 0x7; // maybe..

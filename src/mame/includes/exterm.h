@@ -47,9 +47,9 @@ public:
 	uint8_t sound_nmi_to_slave_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void sound_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void ym2151_data_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_PALETTE_INIT(exterm);
-	TIMER_CALLBACK_MEMBER(sound_delayed_w);
-	TIMER_DEVICE_CALLBACK_MEMBER(master_sound_nmi_callback);
+	void palette_init_exterm(palette_device &palette);
+	void sound_delayed_w(void *ptr, int32_t param);
+	void master_sound_nmi_callback(timer_device &timer, void *ptr, int32_t param);
 	TMS340X0_SCANLINE_IND16_CB_MEMBER(scanline_update);
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg_master);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg_master);

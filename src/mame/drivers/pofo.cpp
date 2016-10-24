@@ -139,8 +139,8 @@ public:
 	void counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void contrast_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( iint_w );
-	DECLARE_WRITE_LINE_MEMBER( eint_w );
+	void iint_w(int state);
+	void eint_w(int state);
 
 	uint8_t m_ip;
 	uint8_t m_ie;
@@ -148,12 +148,12 @@ public:
 	uint8_t m_keylatch;
 	int m_rom_b;
 
-	DECLARE_PALETTE_INIT(portfolio);
-	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_tick);
-	TIMER_DEVICE_CALLBACK_MEMBER(system_tick);
-	TIMER_DEVICE_CALLBACK_MEMBER(counter_tick);
+	void palette_init_portfolio(palette_device &palette);
+	void keyboard_tick(timer_device &timer, void *ptr, int32_t param);
+	void system_tick(timer_device &timer, void *ptr, int32_t param);
+	void counter_tick(timer_device &timer, void *ptr, int32_t param);
 	uint8_t hd61830_rd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	IRQ_CALLBACK_MEMBER(portfolio_int_ack);
+	int portfolio_int_ack(device_t &device, int irqline);
 };
 
 
@@ -191,7 +191,7 @@ void portfolio_state::trigger_interrupt(int level)
 //  iint_w - internal interrupt
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( portfolio_state::iint_w )
+void portfolio_state::iint_w(int state)
 {
 	// TODO
 }
@@ -201,7 +201,7 @@ WRITE_LINE_MEMBER( portfolio_state::iint_w )
 //  eint_w - external interrupt
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( portfolio_state::eint_w )
+void portfolio_state::eint_w(int state)
 {
 	if (state)
 	{
@@ -235,10 +235,10 @@ void portfolio_state::irq_mask_w(address_space &space, offs_t offset, uint8_t da
 
 
 //-------------------------------------------------
-//  IRQ_CALLBACK_MEMBER( portfolio_int_ack )
+//  int portfolio_int_ack(device_t &device, int irqline)
 //-------------------------------------------------
 
-IRQ_CALLBACK_MEMBER(portfolio_state::portfolio_int_ack)
+int portfolio_state::portfolio_int_ack(device_t &device, int irqline)
 {
 	uint8_t vector = 0;
 
@@ -319,10 +319,10 @@ void portfolio_state::scan_keyboard()
 
 
 //-------------------------------------------------
-//  TIMER_DEVICE_CALLBACK_MEMBER( keyboard_tick )
+//  void keyboard_tick(timer_device &timer, void *ptr, int32_t param)
 //-------------------------------------------------
 
-TIMER_DEVICE_CALLBACK_MEMBER(portfolio_state::keyboard_tick)
+void portfolio_state::keyboard_tick(timer_device &timer, void *ptr, int32_t param)
 {
 	scan_keyboard();
 }
@@ -480,20 +480,20 @@ void portfolio_state::select_w(address_space &space, offs_t offset, uint8_t data
 //**************************************************************************
 
 //-------------------------------------------------
-//  TIMER_DEVICE_CALLBACK_MEMBER( system_tick )
+//  void system_tick(timer_device &timer, void *ptr, int32_t param)
 //-------------------------------------------------
 
-TIMER_DEVICE_CALLBACK_MEMBER(portfolio_state::system_tick)
+void portfolio_state::system_tick(timer_device &timer, void *ptr, int32_t param)
 {
 	//trigger_interrupt(INT_TICK);
 }
 
 
 //-------------------------------------------------
-//  TIMER_DEVICE_CALLBACK_MEMBER( counter_tick )
+//  void counter_tick(timer_device &timer, void *ptr, int32_t param)
 //-------------------------------------------------
 
-TIMER_DEVICE_CALLBACK_MEMBER(portfolio_state::counter_tick)
+void portfolio_state::counter_tick(timer_device &timer, void *ptr, int32_t param)
 {
 	m_counter++;
 }
@@ -910,7 +910,7 @@ void portfolio_state::contrast_w(address_space &space, offs_t offset, uint8_t da
 //  PALETTE_INIT( portfolio )
 //-------------------------------------------------
 
-PALETTE_INIT_MEMBER(portfolio_state, portfolio)
+void portfolio_state::palette_init_portfolio(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(142, 193, 172));
 	palette.set_pen_color(1, rgb_t(67, 71, 151));

@@ -244,12 +244,12 @@ public:
 
 	void init_expro02();
 	virtual void machine_start() override;
-	DECLARE_PALETTE_INIT(expro02);
+	void palette_init_expro02(palette_device &palette);
 
 	uint32_t screen_update_backgrounds(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_zipzap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+	void scanline(timer_device &timer, void *ptr, int32_t param);
 
 	// comad
 	uint16_t comad_timer_r(address_space &space, offs_t offset, uint16_t mem_mask);
@@ -263,7 +263,7 @@ void expro02_state::machine_start()
 	membank("okibank")->configure_entries(0, 16, memregion("oki")->base(), 0x10000);
 }
 
-PALETTE_INIT_MEMBER(expro02_state, expro02)
+void expro02_state::palette_init_expro02(palette_device &palette)
 {
 	int i;
 
@@ -808,7 +808,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(expro02_state::scanline)
+void expro02_state::scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

@@ -62,12 +62,12 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(gridlee);
+	void palette_init_gridlee(palette_device &palette);
 	uint32_t screen_update_gridlee(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(irq_off_tick);
-	TIMER_CALLBACK_MEMBER(irq_timer_tick);
-	TIMER_CALLBACK_MEMBER(firq_off_tick);
-	TIMER_CALLBACK_MEMBER(firq_timer_tick);
+	void irq_off_tick(void *ptr, int32_t param);
+	void irq_timer_tick(void *ptr, int32_t param);
+	void firq_off_tick(void *ptr, int32_t param);
+	void firq_timer_tick(void *ptr, int32_t param);
 	void expand_pixels();
 	void poly17_init();
 };

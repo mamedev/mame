@@ -718,13 +718,13 @@ void i8251_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 }
 
 
-WRITE_LINE_MEMBER(i8251_device::write_rxd)
+void i8251_device::write_rxd(int state)
 {
 	m_rxd = state;
 //  device_serial_interface::rx_w(state);
 }
 
-WRITE_LINE_MEMBER(i8251_device::write_cts)
+void i8251_device::write_cts(int state)
 {
 	m_cts = state;
 
@@ -733,12 +733,12 @@ WRITE_LINE_MEMBER(i8251_device::write_cts)
 		update_tx_empty();
 }
 
-WRITE_LINE_MEMBER(i8251_device::write_dsr)
+void i8251_device::write_dsr(int state)
 {
 	m_dsr = !state;
 }
 
-WRITE_LINE_MEMBER(i8251_device::write_rxc)
+void i8251_device::write_rxc(int state)
 {
 	if (m_rxc != state)
 	{
@@ -749,7 +749,7 @@ WRITE_LINE_MEMBER(i8251_device::write_rxc)
 	}
 }
 
-WRITE_LINE_MEMBER(i8251_device::write_txc)
+void i8251_device::write_txc(int state)
 {
 	if (m_txc != state)
 	{

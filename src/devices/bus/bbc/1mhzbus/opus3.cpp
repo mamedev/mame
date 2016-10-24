@@ -174,7 +174,7 @@ void bbc_opus3_device::wd1770l_write(address_space &space, offs_t offset, uint8_
 	m_fdc->dden_w(BIT(data, 5));
 }
 
-WRITE_LINE_MEMBER(bbc_opus3_device::fdc_drq_w)
+void bbc_opus3_device::fdc_drq_w(int state)
 {
 	m_fdc_drq = state;
 

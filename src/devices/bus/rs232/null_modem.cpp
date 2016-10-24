@@ -53,7 +53,7 @@ void null_modem_device::device_start()
 	m_timer_poll = timer_alloc(TIMER_POLL);
 }
 
-WRITE_LINE_MEMBER(null_modem_device::update_serial)
+void null_modem_device::update_serial(int state)
 {
 	int startbits = convert_startbits(m_rs232_startbits->read());
 	int databits = convert_databits(m_rs232_databits->read());

@@ -144,8 +144,8 @@ public:
 	void machine_reset_z80ne_base();
 	DECLARE_INPUT_CHANGED_MEMBER(z80ne_reset);
 	DECLARE_INPUT_CHANGED_MEMBER(z80ne_nmi);
-	TIMER_CALLBACK_MEMBER(z80ne_cassette_tc);
-	TIMER_CALLBACK_MEMBER(z80ne_kbd_scan);
+	void z80ne_cassette_tc(void *ptr, int32_t param);
+	void z80ne_kbd_scan(void *ptr, int32_t param);
 	uint8_t lx388_mc6847_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void lx390_motor_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t lx390_reset_bank(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);

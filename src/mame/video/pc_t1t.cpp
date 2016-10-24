@@ -175,7 +175,7 @@ machine_config_constructor pcvideo_pcjr_device::device_mconfig_additions() const
 ***************************************************************************/
 
 /* Initialise the cga palette */
-PALETTE_INIT_MEMBER( pc_t1t_device, pcjr )
+void pc_t1t_device::palette_init_pcjr(palette_device &palette)
 {
 	const static unsigned char tga_palette[16][3] =
 	{
@@ -1008,13 +1008,13 @@ uint8_t pc_t1t_device::read(address_space &space, offs_t offset, uint8_t mem_mas
 	return data;
 }
 
-WRITE_LINE_MEMBER( pc_t1t_device::t1000_de_changed )
+void pc_t1t_device::t1000_de_changed(int state)
 {
 	m_display_enable = state ? 1 : 0;
 }
 
 
-WRITE_LINE_MEMBER( pcvideo_t1000_device::t1000_vsync_changed )
+void pcvideo_t1000_device::t1000_vsync_changed(int state)
 {
 	m_vsync = state ? 8 : 0;
 	if ( state )
@@ -1023,7 +1023,7 @@ WRITE_LINE_MEMBER( pcvideo_t1000_device::t1000_vsync_changed )
 	}
 }
 
-WRITE_LINE_MEMBER( pcvideo_t1000_device::disable_w )
+void pcvideo_t1000_device::disable_w(int state)
 {
 	if(state)
 		m_vram->set_bank(8);
@@ -1032,7 +1032,7 @@ WRITE_LINE_MEMBER( pcvideo_t1000_device::disable_w )
 	m_disable = state ? true : false;
 }
 
-WRITE_LINE_MEMBER( pcvideo_pcjr_device::pcjr_vsync_changed )
+void pcvideo_pcjr_device::pcjr_vsync_changed(int state)
 {
 	m_vsync = state ? 8 : 0;
 	if ( state )

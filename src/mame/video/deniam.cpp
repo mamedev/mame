@@ -53,13 +53,13 @@ void deniam_state::init_karianx()
 
 ***************************************************************************/
 
-TILEMAP_MAPPER_MEMBER(deniam_state::scan_pages)
+tilemap_memory_index deniam_state::scan_pages(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return (col & 0x3f) + ((row & 0x1f) << 6) + ((col & 0x40) << 5) + ((row & 0x20) << 7);
 }
 
-TILE_GET_INFO_MEMBER(deniam_state::get_bg_tile_info)
+void deniam_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int page = tile_index >> 11;
 	uint16_t attr = m_videoram[m_bg_page[page] * 0x0800 + (tile_index & 0x7ff)];
@@ -69,7 +69,7 @@ TILE_GET_INFO_MEMBER(deniam_state::get_bg_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(deniam_state::get_fg_tile_info)
+void deniam_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int page = tile_index >> 11;
 	uint16_t attr = m_videoram[m_fg_page[page] * 0x0800 + (tile_index & 0x7ff)];
@@ -79,7 +79,7 @@ TILE_GET_INFO_MEMBER(deniam_state::get_fg_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(deniam_state::get_tx_tile_info)
+void deniam_state::get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t attr = m_textram[tile_index];
 	SET_TILE_INFO_MEMBER(0,

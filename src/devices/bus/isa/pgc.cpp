@@ -271,13 +271,13 @@ void isa8_pgc_device::device_reset()
 
 //
 
-INTERRUPT_GEN_MEMBER(isa8_pgc_device::vblank_irq)
+void isa8_pgc_device::vblank_irq(device_t &device)
 {
 	DBG_LOG(2,"irq",("vblank_irq\n"));
 	m_cpu->set_input_line(0, ASSERT_LINE);
 }
 
-IRQ_CALLBACK_MEMBER(isa8_pgc_device::irq_callback)
+int isa8_pgc_device::irq_callback(device_t &device, int irqline)
 {
 	DBG_LOG(2,"irq",("irq_callback\n"));
 	m_cpu->set_input_line(0, CLEAR_LINE);
@@ -334,7 +334,7 @@ uint8_t isa8_pgc_device::init_r(address_space &space, offs_t offset, uint8_t mem
 	return 0; // XXX ignored
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(isa8_pgc_device::scanline_callback)
+void isa8_pgc_device::scanline_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	uint16_t x, y = m_screen->vpos();
 	uint16_t *p;

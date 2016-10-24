@@ -88,7 +88,7 @@
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
 
 
-TIMER_CALLBACK_MEMBER( namco_06xx_device::nmi_generate )
+void namco_06xx_device::nmi_generate(void *ptr, int32_t param)
 {
 	if (!m_nmicpu->suspended(SUSPEND_REASON_HALT | SUSPEND_REASON_RESET | SUSPEND_REASON_DISABLE))
 	{

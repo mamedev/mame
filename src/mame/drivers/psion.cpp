@@ -25,7 +25,7 @@
 #include "rendlay.h"
 #include "softlist.h"
 
-TIMER_DEVICE_CALLBACK_MEMBER(psion_state::nmi_timer)
+void psion_state::nmi_timer(timer_device &timer, void *ptr, int32_t param)
 {
 	if (m_enable_nmi)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -538,7 +538,7 @@ HD44780_PIXEL_UPDATE(psion1_state::psion1_pixel_update)
 		bitmap.pix16(y, (line * 8 + pos) * 6 + x) = state;
 }
 
-PALETTE_INIT_MEMBER(psion_state, psion)
+void psion_state::palette_init_psion(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));

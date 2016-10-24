@@ -287,7 +287,7 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_wheelfir(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_wheelfir(screen_device &screen, bool state);
-	TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer_callback);
+	void scanline_timer_callback(timer_device &timer, void *ptr, int32_t param);
 };
 
 
@@ -699,7 +699,7 @@ static INPUT_PORTS_START( wheelfir )
 	PORT_BIT(0xff, 0x00, IPT_PEDAL2) PORT_INVERT PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_NAME("Brake Pedal") PORT_MINMAX(0x00, 0xff) PORT_REVERSE
 INPUT_PORTS_END
 
-TIMER_DEVICE_CALLBACK_MEMBER(wheelfir_state::scanline_timer_callback)
+void wheelfir_state::scanline_timer_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	if(param<NUM_SCANLINES)
 	{

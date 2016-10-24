@@ -62,8 +62,8 @@ public:
 	void port2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t port2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	virtual void video_start() override;
-	TIMER_DEVICE_CALLBACK_MEMBER(time_tick_timer);
-	DECLARE_PALETTE_INIT(monzagp);
+	void time_tick_timer(timer_device &timer, void *ptr, int32_t param);
+	void palette_init_monzagp(palette_device &palette);
 	uint32_t screen_update_monzagp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -94,12 +94,12 @@ private:
 
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(monzagp_state::time_tick_timer)
+void monzagp_state::time_tick_timer(timer_device &timer, void *ptr, int32_t param)
 {
 	m_time_tick = !m_time_tick;
 }
 
-PALETTE_INIT_MEMBER(monzagp_state, monzagp)
+void monzagp_state::palette_init_monzagp(palette_device &palette)
 {
 	static const int r_resistances[3] = { 220, 1000, 3300 };
 	static const int g_resistances[3] = { 100, 470 , 1500 };

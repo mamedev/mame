@@ -147,13 +147,13 @@ void redalert_state::redalert_voice_command_w(address_space &space, offs_t offse
 }
 
 
-WRITE_LINE_MEMBER(redalert_state::sod_callback)
+void redalert_state::sod_callback(int state)
 {
 	m_cvsd->digit_w(state);
 }
 
 
-READ_LINE_MEMBER(redalert_state::sid_callback)
+int redalert_state::sid_callback()
 {
 	return m_cvsd->clock_state_r();
 }

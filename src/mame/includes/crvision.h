@@ -96,16 +96,16 @@ public:
 	int m_centronics_busy;
 	int m_psg_ready;
 
-	DECLARE_WRITE_LINE_MEMBER( write_centronics_busy );
-	DECLARE_WRITE_LINE_MEMBER( write_psg_ready );
+	void write_centronics_busy(int state);
+	void write_psg_ready(int state);
 	uint8_t pia_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void pia_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t pia_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void pia_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_READ_LINE_MEMBER( pia_ca1_r );
-	DECLARE_WRITE_LINE_MEMBER( pia_ca2_w );
-	DECLARE_READ_LINE_MEMBER( pia_cb1_r );
-	DECLARE_WRITE_LINE_MEMBER( pia_cb2_w );
+	int pia_ca1_r();
+	void pia_ca2_w(int state);
+	int pia_cb1_r();
+	void pia_cb2_w(int state);
 
 protected:
 	virtual void machine_start() override;

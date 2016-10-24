@@ -90,7 +90,7 @@ protected:
 
 public:
 	// internal read/write handlers
-	DECLARE_WRITE_LINE_MEMBER( ctc_interrupt );
+	void ctc_interrupt(int state);
 	void z80_decoder_display_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t z80_decoder_display_port_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t z80_controller_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);

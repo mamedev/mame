@@ -488,7 +488,7 @@ void namcos1_state::sound_bankswitch_w(address_space &space, offs_t offset, uint
 *                                                                              *
 *******************************************************************************/
 
-WRITE_LINE_MEMBER(namcos1_state::subres_w)
+void namcos1_state::subres_w(int state)
 {
 //  logerror("reset control pc=%04x %02x\n",space.device().safe_pc(),data);
 	if (state != m_reset)

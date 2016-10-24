@@ -55,11 +55,11 @@ public:
 
 
 	// I/O operations
-	DECLARE_WRITE_LINE_MEMBER( write_bit );
-	DECLARE_READ_LINE_MEMBER( read_bit );
-	DECLARE_WRITE_LINE_MEMBER( set_cs_line );
-	DECLARE_WRITE_LINE_MEMBER( set_clock_line );
-	TIMER_CALLBACK_MEMBER(timer_callback);
+	void write_bit(int state);
+	int read_bit();
+	void set_cs_line(int state);
+	void set_clock_line(int state);
+	void timer_callback(void *ptr, int32_t param);
 
 protected:
 	// device-level overrides

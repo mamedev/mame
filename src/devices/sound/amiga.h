@@ -57,7 +57,7 @@ private:
 	audio_channel m_channel[4];
 	sound_stream *m_stream;
 
-	TIMER_CALLBACK_MEMBER( signal_irq );
+	void signal_irq(void *ptr, int32_t param);
 };
 
 extern const device_type AMIGA;

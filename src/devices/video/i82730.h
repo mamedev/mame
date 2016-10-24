@@ -59,8 +59,8 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE_LINE_MEMBER(ca_w);
-	DECLARE_WRITE_LINE_MEMBER(irst_w);
+	void ca_w(int state);
+	void irst_w(int state);
 
 protected:
 	virtual void device_start() override;
@@ -95,7 +95,7 @@ private:
 	void execute_command();
 	void load_row();
 
-	TIMER_CALLBACK_MEMBER(row_update);
+	void row_update(void *ptr, int32_t param);
 
 	devcb_write_line m_sint_handler;
 	i82730_update_row_delegate m_update_row_cb;

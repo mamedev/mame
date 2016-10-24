@@ -358,15 +358,15 @@ public:
 	void baby_sound_p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t baby_sound_p3_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void baby_sound_p3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(videopkr);
+	void palette_init_videopkr(palette_device &palette);
 	void video_start_vidadcba();
-	DECLARE_PALETTE_INIT(babypkr);
-	DECLARE_PALETTE_INIT(fortune1);
+	void palette_init_babypkr(palette_device &palette);
+	void palette_init_fortune1(palette_device &palette);
 	uint32_t screen_update_videopkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(sound_t1_callback);
+	void sound_t1_callback(timer_device &timer, void *ptr, int32_t param);
 	void count_7dig(unsigned long data, uint8_t index);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
@@ -416,7 +416,7 @@ void videopkr_state::count_7dig(unsigned long data, uint8_t index)
 	}
 }
 
-PALETTE_INIT_MEMBER(videopkr_state, videopkr)
+void videopkr_state::palette_init_videopkr(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int j;
@@ -443,7 +443,7 @@ PALETTE_INIT_MEMBER(videopkr_state, videopkr)
 	}
 }
 
-PALETTE_INIT_MEMBER(videopkr_state,babypkr)
+void videopkr_state::palette_init_babypkr(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int j;
@@ -474,7 +474,7 @@ PALETTE_INIT_MEMBER(videopkr_state,babypkr)
 	}
 }
 
-PALETTE_INIT_MEMBER(videopkr_state,fortune1)
+void videopkr_state::palette_init_fortune1(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int j;
@@ -507,7 +507,7 @@ PALETTE_INIT_MEMBER(videopkr_state,fortune1)
 	}
 }
 
-TILE_GET_INFO_MEMBER(videopkr_state::get_bg_tile_info)
+void videopkr_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int offs = tile_index;
 	int attr = m_color_ram[offs] + ioport("IN2")->read(); /* Color Switch Action */
@@ -936,7 +936,7 @@ void videopkr_state::baby_sound_p3_w(address_space &space, offs_t offset, uint8_
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(videopkr_state::sound_t1_callback)
+void videopkr_state::sound_t1_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	if (m_te_40103 == 1)
 	{

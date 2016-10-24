@@ -107,7 +107,7 @@ public:
 	void palette_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void handle_sub_board_cpu_lines(cedar_magnet_board_device* dev, int old_data, int data);
-	INTERRUPT_GEN_MEMBER(irq);
+	void irq(device_t &device);
 	void (*m_prothack)(cedar_magnet_state*);
 
 	virtual void machine_start() override;

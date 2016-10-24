@@ -31,8 +31,8 @@ public:
 	virtual ioport_constructor device_input_ports() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
-	virtual DECLARE_WRITE_LINE_MEMBER(clock_write) override;
-	virtual DECLARE_WRITE_LINE_MEMBER(data_write) override;
+	virtual void clock_write(int state) override;
+	virtual void data_write(int state) override;
 
 	uint8_t internal_data_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void internal_data_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);

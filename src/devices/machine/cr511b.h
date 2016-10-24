@@ -99,8 +99,8 @@ public:
 	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( enable_w );
-	DECLARE_WRITE_LINE_MEMBER( cmd_w );
+	void enable_w(int state);
+	void cmd_w(int state);
 
 protected:
 	// device-level overrides

@@ -15,7 +15,7 @@ void rs232_loopback_device::device_start()
 {
 }
 
-WRITE_LINE_MEMBER( rs232_loopback_device::input_txd )
+void rs232_loopback_device::input_txd(int state)
 {
 	if (started())
 	{
@@ -23,7 +23,7 @@ WRITE_LINE_MEMBER( rs232_loopback_device::input_txd )
 	}
 }
 
-WRITE_LINE_MEMBER( rs232_loopback_device::input_rts )
+void rs232_loopback_device::input_rts(int state)
 {
 	if (started())
 	{
@@ -32,7 +32,7 @@ WRITE_LINE_MEMBER( rs232_loopback_device::input_rts )
 	}
 }
 
-WRITE_LINE_MEMBER( rs232_loopback_device::input_dtr )
+void rs232_loopback_device::input_dtr(int state)
 {
 	if (started())
 	{

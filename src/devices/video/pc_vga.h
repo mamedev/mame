@@ -55,7 +55,7 @@ public:
 	virtual void mem_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask);
 	virtual uint8_t mem_linear_r(address_space &space, offs_t offset, uint8_t mem_mask);
 	virtual void mem_linear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask);
-	virtual TIMER_CALLBACK_MEMBER(vblank_timer_cb);
+	virtual void vblank_timer_cb(void *ptr, int32_t param);
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -568,7 +568,7 @@ public:
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 
 	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual TIMER_CALLBACK_MEMBER(vblank_timer_cb) override;
+	virtual void vblank_timer_cb(void *ptr, int32_t param) override;
 
 	ibm8514a_device* get_8514() { return m_8514; }
 protected:

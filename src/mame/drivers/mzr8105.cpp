@@ -196,7 +196,7 @@ void vme_a24_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_
 uint16_t vme_a16_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 void vme_a16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 virtual void machine_start () override;
-DECLARE_WRITE_LINE_MEMBER (write_updterm_clock);
+void write_updterm_clock(int state);
 
 #if CARDSLOT
 // User EPROM/SRAM slot(s)
@@ -313,7 +313,7 @@ int mzr8105_state::mzr8105_load_cart(device_image_interface &image, generic_slot
 }
 #endif
 
-WRITE_LINE_MEMBER (mzr8105_state::write_updterm_clock){
+void mzr8105_state::write_updterm_clock(int state){
 		m_updterm->txca_w (state);
 		m_updterm->rxca_w (state);
 }

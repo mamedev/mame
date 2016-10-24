@@ -86,12 +86,12 @@ public:
 	uint8_t io_r(address_space &space, offs_t offset);
 	void io_w(address_space &space, offs_t offset, uint8_t data);
 
-	DECLARE_READ_LINE_MEMBER( ef4_r );
+	int ef4_r();
 
-	DECLARE_WRITE_LINE_MEMBER( ds_w );
-	DECLARE_WRITE_LINE_MEMBER( q_w );
+	void ds_w(int state);
+	void q_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_write_irq(state); }
+	void irq_w(int state) { m_write_irq(state); }
 
 protected:
 	// device-level overrides

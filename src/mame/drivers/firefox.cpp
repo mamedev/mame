@@ -106,12 +106,12 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(soundflag_r);
 	uint8_t riot_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void riot_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(riot_irq);
-	TILE_GET_INFO_MEMBER(bgtile_get_info);
+	void riot_irq(int state);
+	void bgtile_get_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	uint32_t screen_update_firefox(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(video_timer_callback);
+	void video_timer_callback(timer_device &timer, void *ptr, int32_t param);
 	void set_rgba( int start, int index, unsigned char *palette_ram );
 	void firq_gen(phillips_22vp931_device &laserdisc, int state);
 	required_device<cpu_device> m_maincpu;
@@ -216,7 +216,7 @@ void firefox_state::firefox_disc_data_w(address_space &space, offs_t offset, uin
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(firefox_state::bgtile_get_info)
+void firefox_state::bgtile_get_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	SET_TILE_INFO_MEMBER(0, m_tileram[tile_index], 0, 0);
 }
@@ -272,7 +272,7 @@ uint32_t firefox_state::screen_update_firefox(screen_device &screen, bitmap_rgb3
 	return 0;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(firefox_state::video_timer_callback)
+void firefox_state::video_timer_callback(timer_device &timer, void *ptr, int32_t param)
 {
 //  m_screen->update_now();
 	m_screen->update_partial(m_screen->vpos());
@@ -392,7 +392,7 @@ void firefox_state::riot_porta_w(address_space &space, offs_t offset, uint8_t da
 	tms5220->wsq_w(data & 1);
 }
 
-WRITE_LINE_MEMBER(firefox_state::riot_irq)
+void firefox_state::riot_irq(int state)
 {
 	m_audiocpu->set_input_line(M6502_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }

@@ -558,13 +558,13 @@ void itech8_state::update_interrupts(int periodic, int tms34061, int blitter)
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(itech8_state::irq_off)
+void itech8_state::irq_off(void *ptr, int32_t param)
 {
 	update_interrupts(0, -1, -1);
 }
 
 
-INTERRUPT_GEN_MEMBER(itech8_state::generate_nmi)
+void itech8_state::generate_nmi(device_t &device)
 {
 	/* signal the NMI */
 	update_interrupts(1, -1, -1);
@@ -669,7 +669,7 @@ void itech8_state::device_timer(emu_timer &timer, device_timer_id id, int param,
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(itech8_state::behind_the_beam_update)
+void itech8_state::behind_the_beam_update(void *ptr, int32_t param)
 {
 	int scanline = param >> 8;
 	int interval = param & 0xff;
@@ -772,7 +772,7 @@ void itech8_state::ym2203_portb_out(address_space &space, offs_t offset, uint8_t
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(itech8_state::delayed_sound_data_w)
+void itech8_state::delayed_sound_data_w(void *ptr, int32_t param)
 {
 	m_sound_data = param;
 	m_soundcpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
@@ -1638,7 +1638,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-WRITE_LINE_MEMBER(itech8_state::generate_tms34061_interrupt)
+void itech8_state::generate_tms34061_interrupt(int state)
 {
 	update_interrupts(-1, state, -1);
 

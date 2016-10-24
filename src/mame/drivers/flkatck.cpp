@@ -20,7 +20,7 @@
 #include "includes/flkatck.h"
 
 
-INTERRUPT_GEN_MEMBER(flkatck_state::flkatck_interrupt)
+void flkatck_state::flkatck_interrupt(device_t &device)
 {
 	if (m_irq_enabled)
 		device.execute().set_input_line(HD6309_IRQ_LINE, HOLD_LINE);

@@ -36,13 +36,13 @@ public:
 
 	void shanghai_coin_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_PALETTE_INIT(shanghai);
+	void palette_init_shanghai(palette_device &palette);
 
-	INTERRUPT_GEN_MEMBER(interrupt);
+	void interrupt(device_t &device);
 };
 
 
-PALETTE_INIT_MEMBER(shanghai_state,shanghai)
+void shanghai_state::palette_init_shanghai(palette_device &palette)
 {
 	int i;
 
@@ -72,7 +72,7 @@ PALETTE_INIT_MEMBER(shanghai_state,shanghai)
 	}
 }
 
-INTERRUPT_GEN_MEMBER(shanghai_state::interrupt)
+void shanghai_state::interrupt(device_t &device)
 {
 	device.execute().set_input_line_and_vector(0,HOLD_LINE,0x80);
 }

@@ -184,14 +184,14 @@ public:
 	void init_cshootere();
 	void init_cshooter();
 	void machine_reset_cshooter();
-	TIMER_DEVICE_CALLBACK_MEMBER(cshooter_scanline);
+	void cshooter_scanline(timer_device &timer, void *ptr, int32_t param);
 };
 
 
 
 /* main cpu */
 
-TIMER_DEVICE_CALLBACK_MEMBER(airraid_state::cshooter_scanline)
+void airraid_state::cshooter_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

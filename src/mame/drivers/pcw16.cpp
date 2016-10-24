@@ -123,7 +123,7 @@ void pcw16_state::pcw16_refresh_ints()
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(pcw16_state::pcw16_timer_callback)
+void pcw16_state::pcw16_timer_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	/* do not increment past 15 */
 	if (m_interrupt_counter!=15)
@@ -519,7 +519,7 @@ void pcw16_state::pcw16_keyboard_control_w(address_space &space, offs_t offset, 
 }
 
 
-WRITE_LINE_MEMBER(pcw16_state::pcw16_keyboard_callback)
+void pcw16_state::pcw16_keyboard_callback(int state)
 {
 	if(!state)
 		return;
@@ -578,7 +578,7 @@ void pcw16_state::rtc_setup_max_days()
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(pcw16_state::rtc_timer_callback)
+void pcw16_state::rtc_timer_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	int fraction_of_second;
 
@@ -886,7 +886,7 @@ void pcw16_state::pcw16_system_control_w(address_space &space, offs_t offset, ui
 	}
 }
 
-WRITE_LINE_MEMBER( pcw16_state::fdc_interrupt )
+void pcw16_state::fdc_interrupt(int state)
 {
 	/* IRQ6 */
 	/* bit 6 of PCW16 system status indicates floppy ints */
@@ -899,7 +899,7 @@ WRITE_LINE_MEMBER( pcw16_state::fdc_interrupt )
 }
 
 
-WRITE_LINE_MEMBER(pcw16_state::pcw16_com_interrupt_1)
+void pcw16_state::pcw16_com_interrupt_1(int state)
 {
 	m_system_status &= ~(1 << 4);
 
@@ -911,7 +911,7 @@ WRITE_LINE_MEMBER(pcw16_state::pcw16_com_interrupt_1)
 }
 
 
-WRITE_LINE_MEMBER(pcw16_state::pcw16_com_interrupt_2)
+void pcw16_state::pcw16_com_interrupt_2(int state)
 {
 	m_system_status &= ~(1 << 3);
 

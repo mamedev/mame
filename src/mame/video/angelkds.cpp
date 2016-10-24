@@ -16,7 +16,7 @@ enable / disable tilemap bits might be wrong
 
 */
 
-TILE_GET_INFO_MEMBER(angelkds_state::get_tx_tile_info)
+void angelkds_state::get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno;
 
@@ -43,7 +43,7 @@ void angelkds_state::angelkds_txbank_write(address_space &space, offs_t offset, 
 
 */
 
-TILE_GET_INFO_MEMBER(angelkds_state::get_bgtop_tile_info)
+void angelkds_state::get_bgtop_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno;
 
@@ -77,7 +77,7 @@ void angelkds_state::angelkds_bgtopscroll_write(address_space &space, offs_t off
 
 */
 
-TILE_GET_INFO_MEMBER(angelkds_state::get_bgbot_tile_info)
+void angelkds_state::get_bgbot_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno;
 

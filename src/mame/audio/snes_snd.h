@@ -90,7 +90,7 @@ private:
 
 	uint8_t dsp_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void dsp_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	TIMER_CALLBACK_MEMBER(spc_timer);
+	void spc_timer(void *ptr, int32_t param);
 	void dsp_reset();
 	void dsp_update(short *sound_ptr);
 	int advance_envelope(int v);

@@ -91,8 +91,8 @@ public:
 
 	uint32_t a310_psy_wram_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	void a310_psy_wram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
-	DECLARE_WRITE_LINE_MEMBER(a310_wd177x_intrq_w);
-	DECLARE_WRITE_LINE_MEMBER(a310_wd177x_drq_w);
+	void a310_wd177x_intrq_w(int state);
+	void a310_wd177x_drq_w(int state);
 	void init_a310();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -105,7 +105,7 @@ protected:
 };
 
 
-WRITE_LINE_MEMBER(a310_state::a310_wd177x_intrq_w)
+void a310_state::a310_wd177x_intrq_w(int state)
 {
 	printf("%d IRQ\n",state);
 	if (state)
@@ -116,7 +116,7 @@ WRITE_LINE_MEMBER(a310_state::a310_wd177x_intrq_w)
 		archimedes_clear_fiq(ARCHIMEDES_FIQ_FLOPPY);
 }
 
-WRITE_LINE_MEMBER(a310_state::a310_wd177x_drq_w)
+void a310_state::a310_wd177x_drq_w(int state)
 {
 	printf("%d DRQ\n",state);
 	if (state)
@@ -338,7 +338,7 @@ static SLOT_INTERFACE_START( a310_floppies )
 	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
 SLOT_INTERFACE_END
 
-WRITE_LINE_MEMBER( archimedes_state::a310_kart_tx_w )
+void archimedes_state::a310_kart_tx_w(int state)
 {
 	if(state)
 		archimedes_request_irq_b(ARCHIMEDES_IRQB_KBD_RECV_FULL);
@@ -346,7 +346,7 @@ WRITE_LINE_MEMBER( archimedes_state::a310_kart_tx_w )
 		archimedes_clear_irq_b(ARCHIMEDES_IRQB_KBD_RECV_FULL);
 }
 
-WRITE_LINE_MEMBER( archimedes_state::a310_kart_rx_w )
+void archimedes_state::a310_kart_rx_w(int state)
 {
 	if(state)
 		archimedes_request_irq_b(ARCHIMEDES_IRQB_KBD_XMIT_EMPTY);

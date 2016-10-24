@@ -48,7 +48,7 @@ public:
 	uint8_t read_inputs(int columns);
 	uint8_t read_rotated_inputs(int columns, uint8_t rowmask = 0xf);
 	virtual DECLARE_INPUT_CHANGED_MEMBER(power_button);
-	virtual DECLARE_WRITE_LINE_MEMBER(auto_power_off);
+	virtual void auto_power_off(int state);
 
 	// display common
 	int m_display_wait;                 // led/lamp off-delay in microseconds (default 33ms)
@@ -63,7 +63,7 @@ public:
 	uint32_t m_display_cache[0x20];       // (internal use)
 	uint8_t m_display_decay[0x20][0x20];  // (internal use)
 
-	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
+	void display_decay_tick(timer_device &timer, void *ptr, int32_t param);
 	void display_update();
 	void set_display_size(int maxx, int maxy);
 	void set_display_segmask(uint32_t digits, uint32_t mask);

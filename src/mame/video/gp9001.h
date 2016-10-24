@@ -92,9 +92,9 @@ protected:
 
 	address_space_config        m_space_config;
 
-	TILE_GET_INFO_MEMBER(get_top0_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg0_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg0_tile_info);
+	void get_top0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_fg0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_bg0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 private:
 	required_shared_ptr<uint16_t> m_vram_bg;

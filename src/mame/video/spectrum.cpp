@@ -193,7 +193,7 @@ static const rgb_t spectrum_palette[16] = {
 	rgb_t(0xff, 0xff, 0xff)
 };
 /* Initialise the palette */
-PALETTE_INIT_MEMBER(spectrum_state,spectrum)
+void spectrum_state::palette_init_spectrum(palette_device &palette)
 {
 	palette.set_pen_colors(0, spectrum_palette, ARRAY_LENGTH(spectrum_palette));
 }

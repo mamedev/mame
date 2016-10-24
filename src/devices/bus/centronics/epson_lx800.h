@@ -43,15 +43,15 @@ public:
 	uint8_t portc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t centronics_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(centronics_pe_w);
-	DECLARE_WRITE_LINE_MEMBER(paperempty_led_w);
-	DECLARE_WRITE_LINE_MEMBER(reset_w);
-	DECLARE_READ_LINE_MEMBER(an0_r);
-	DECLARE_READ_LINE_MEMBER(an1_r);
-	DECLARE_READ_LINE_MEMBER(an2_r);
-	DECLARE_READ_LINE_MEMBER(an3_r);
-	DECLARE_READ_LINE_MEMBER(an4_r);
-	DECLARE_READ_LINE_MEMBER(an5_r);
+	void centronics_pe_w(int state);
+	void paperempty_led_w(int state);
+	void reset_w(int state);
+	int an0_r();
+	int an1_r();
+	int an2_r();
+	int an3_r();
+	int an4_r();
+	int an5_r();
 
 protected:
 	// device-level overrides

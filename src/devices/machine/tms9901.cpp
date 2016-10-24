@@ -596,7 +596,7 @@ void tms9901_device::device_reset(void)
 /*
     RST1 input line (active low; using ASSERT/CLEAR).
 */
-WRITE_LINE_MEMBER( tms9901_device::rst1_line )
+void tms9901_device::rst1_line(int state)
 {
 	if (state==ASSERT_LINE) do_reset();
 }

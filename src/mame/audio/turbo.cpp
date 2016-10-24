@@ -39,7 +39,7 @@ void turbo_state::turbo_update_samples()
 
 #if (DISCRETE_TEST)
 
-TIMER_CALLBACK_MEMBER(turbo_state::update_sound_a)
+void turbo_state::update_sound_a(void *ptr, int32_t param)
 {
 	discrete_device *discrete = machine.device<discrete_device>("discrete");
 	int data = param;

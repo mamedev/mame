@@ -60,7 +60,7 @@ public:
 
 	void set_single_int(int pin_number, int state);
 
-	DECLARE_WRITE_LINE_MEMBER( rst1_line );
+	void rst1_line(int state);
 
 	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);

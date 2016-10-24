@@ -89,7 +89,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(nightgal);
+	void palette_init_nightgal(palette_device &palette);
 	uint32_t screen_update_nightgal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
@@ -115,7 +115,7 @@ protected:
 	required_device<palette_device> m_palette;
 	required_device<jangou_blitter_device> m_blitter;
 	void z80_wait_assert_cb();
-	TIMER_CALLBACK_MEMBER( z80_wait_ack_cb );
+	void z80_wait_ack_cb(void *ptr, int32_t param);
 
 	std::unique_ptr<bitmap_ind16> m_tmp_bitmap;
 };
@@ -148,7 +148,7 @@ uint32_t nightgal_state::screen_update_nightgal(screen_device &screen, bitmap_in
 }
 
 /* guess: use the same resistor values as Crazy Climber (needs checking on the real HW) */
-PALETTE_INIT_MEMBER(nightgal_state, nightgal)
+void nightgal_state::palette_init_nightgal(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };
@@ -222,7 +222,7 @@ uint8_t nightgal_state::royalqn_nsc_blit_r(address_space &space, offs_t offset, 
 	return m_blit_raw_data[offset];
 }
 
-TIMER_CALLBACK_MEMBER(nightgal_state::z80_wait_ack_cb)
+void nightgal_state::z80_wait_ack_cb(void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
 }

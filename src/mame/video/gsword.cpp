@@ -11,7 +11,7 @@
 #include "includes/gsword.h"
 
 
-PALETTE_INIT_MEMBER(gsword_state,josvolly)
+void gsword_state::palette_init_josvolly(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -42,7 +42,7 @@ PALETTE_INIT_MEMBER(gsword_state,josvolly)
 }
 
 
-PALETTE_INIT_MEMBER(gsword_state,gsword)
+void gsword_state::palette_init_gsword(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -137,7 +137,7 @@ void gsword_state::scroll_w(address_space &space, offs_t offset, uint8_t data, u
 	m_bg_tilemap->set_scrolly(0, data);
 }
 
-TILE_GET_INFO_MEMBER(gsword_state::get_bg_tile_info)
+void gsword_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index] + ((m_charbank & 0x03) << 8);
 	int color = ((code & 0x3c0) >> 6) + 16 * m_charpalbank;

@@ -34,7 +34,7 @@ void pccard_slot_device::device_start()
 	m_pccard = dynamic_cast<pccard_interface *>(get_card_device());
 }
 
-READ_LINE_MEMBER(pccard_slot_device::read_line_inserted)
+int pccard_slot_device::read_line_inserted()
 {
 	return m_pccard != nullptr;
 }

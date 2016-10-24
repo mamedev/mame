@@ -14,21 +14,21 @@
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(f1gp_state::f1gp_get_roz_tile_info)
+void f1gp_state::f1gp_get_roz_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_rozvideoram[tile_index];
 
 	SET_TILE_INFO_MEMBER(3, code & 0x7ff, code >> 12, 0);
 }
 
-TILE_GET_INFO_MEMBER(f1gp_state::f1gp2_get_roz_tile_info)
+void f1gp_state::f1gp2_get_roz_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_rozvideoram[tile_index];
 
 	SET_TILE_INFO_MEMBER(2, (code & 0x7ff) + (m_roz_bank << 11), code >> 12, 0);
 }
 
-TILE_GET_INFO_MEMBER(f1gp_state::get_fg_tile_info)
+void f1gp_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_fgvideoram[tile_index];
 

@@ -368,11 +368,11 @@ public:
 	{
 	}
 
-	DECLARE_WRITE_LINE_MEMBER(sio0_sck){ m_cat702_1->write_clock(state);  m_cat702_2->write_clock(state); m_zndip->write_clock(state); }
-	DECLARE_WRITE_LINE_MEMBER(sio0_txd){ m_cat702_1->write_datain(state);  m_cat702_2->write_datain(state); }
-	DECLARE_WRITE_LINE_MEMBER(cat702_1_dataout){ m_cat702_1_dataout = state; update_sio0_rxd(); }
-	DECLARE_WRITE_LINE_MEMBER(cat702_2_dataout){ m_cat702_2_dataout = state; update_sio0_rxd(); }
-	DECLARE_WRITE_LINE_MEMBER(zndip_dataout){ m_zndip_dataout = state; update_sio0_rxd(); }
+	void sio0_sck(int state){ m_cat702_1->write_clock(state);  m_cat702_2->write_clock(state); m_zndip->write_clock(state); }
+	void sio0_txd(int state){ m_cat702_1->write_datain(state);  m_cat702_2->write_datain(state); }
+	void cat702_1_dataout(int state){ m_cat702_1_dataout = state; update_sio0_rxd(); }
+	void cat702_2_dataout(int state){ m_cat702_2_dataout = state; update_sio0_rxd(); }
+	void zndip_dataout(int state){ m_zndip_dataout = state; update_sio0_rxd(); }
 	void update_sio0_rxd() { m_sio0->write_rxd(m_cat702_1_dataout && m_cat702_2_dataout && m_zndip_dataout); }
 	uint8_t control_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);

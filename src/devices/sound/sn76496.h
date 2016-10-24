@@ -33,7 +33,7 @@ public:
 	void stereo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void write(uint8_t data);
 	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_READ_LINE_MEMBER( ready_r ) { return m_ready_state ? 1 : 0; }
+	int ready_r() { return m_ready_state ? 1 : 0; }
 
 protected:
 	virtual void    device_start() override;

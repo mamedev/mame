@@ -28,7 +28,7 @@
 
 /**************************************************************************************/
 
-PALETTE_INIT_MEMBER(snk_state,tnk3)
+void snk_state::palette_init_tnk3(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -62,7 +62,7 @@ PALETTE_INIT_MEMBER(snk_state,tnk3)
 
 /**************************************************************************************/
 
-TILEMAP_MAPPER_MEMBER(snk_state::marvins_tx_scan_cols)
+tilemap_memory_index snk_state::marvins_tx_scan_cols(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	// tilemap is 36x28, the central part is from the first RAM page and the
 	// extra 4 columns are from the second page
@@ -73,7 +73,7 @@ TILEMAP_MAPPER_MEMBER(snk_state::marvins_tx_scan_cols)
 		return row + (col << 5);
 }
 
-TILE_GET_INFO_MEMBER(snk_state::marvins_get_tx_tile_info)
+void snk_state::marvins_get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_tx_videoram[tile_index];
 	int color = code >> 5;
@@ -84,7 +84,7 @@ TILE_GET_INFO_MEMBER(snk_state::marvins_get_tx_tile_info)
 			tile_index & 0x400 ? TILE_FORCE_LAYER0 : 0);
 }
 
-TILE_GET_INFO_MEMBER(snk_state::ikari_get_tx_tile_info)
+void snk_state::ikari_get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_tx_videoram[tile_index];
 
@@ -94,7 +94,7 @@ TILE_GET_INFO_MEMBER(snk_state::ikari_get_tx_tile_info)
 			tile_index & 0x400 ? TILE_FORCE_LAYER0 : 0);
 }
 
-TILE_GET_INFO_MEMBER(snk_state::gwar_get_tx_tile_info)
+void snk_state::gwar_get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_tx_videoram[tile_index];
 
@@ -105,7 +105,7 @@ TILE_GET_INFO_MEMBER(snk_state::gwar_get_tx_tile_info)
 }
 
 
-TILE_GET_INFO_MEMBER(snk_state::marvins_get_fg_tile_info)
+void snk_state::marvins_get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_fg_videoram[tile_index];
 
@@ -115,7 +115,7 @@ TILE_GET_INFO_MEMBER(snk_state::marvins_get_fg_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(snk_state::marvins_get_bg_tile_info)
+void snk_state::marvins_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_bg_videoram[tile_index];
 
@@ -126,7 +126,7 @@ TILE_GET_INFO_MEMBER(snk_state::marvins_get_bg_tile_info)
 }
 
 
-TILE_GET_INFO_MEMBER(snk_state::aso_get_bg_tile_info)
+void snk_state::aso_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_bg_videoram[tile_index];
 
@@ -136,7 +136,7 @@ TILE_GET_INFO_MEMBER(snk_state::aso_get_bg_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(snk_state::tnk3_get_bg_tile_info)
+void snk_state::tnk3_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_bg_videoram[2*tile_index+1];
 	int code = m_bg_videoram[2*tile_index] | ((attr & 0x30) << 4);
@@ -148,7 +148,7 @@ TILE_GET_INFO_MEMBER(snk_state::tnk3_get_bg_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(snk_state::ikari_get_bg_tile_info)
+void snk_state::ikari_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_bg_videoram[2*tile_index+1];
 	int code = m_bg_videoram[2*tile_index] | ((attr & 0x03) << 8);
@@ -160,7 +160,7 @@ TILE_GET_INFO_MEMBER(snk_state::ikari_get_bg_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(snk_state::gwar_get_bg_tile_info)
+void snk_state::gwar_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_bg_videoram[2*tile_index+1];
 	int code = m_bg_videoram[2*tile_index] | ((attr & 0x0f) << 8);

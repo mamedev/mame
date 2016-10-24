@@ -467,7 +467,7 @@ void rtc65271_device::field_interrupts()
     Update SQW output state each half-period and assert periodic interrupt each
     period.
 */
-TIMER_CALLBACK_MEMBER(rtc65271_device::rtc_SQW_cb)
+void rtc65271_device::rtc_SQW_cb(void *ptr, int32_t param)
 {
 	attotime half_period;
 
@@ -486,7 +486,7 @@ TIMER_CALLBACK_MEMBER(rtc65271_device::rtc_SQW_cb)
 /*
     Begin update cycle (called every second)
 */
-TIMER_CALLBACK_MEMBER(rtc65271_device::rtc_begin_update_cb)
+void rtc65271_device::rtc_begin_update_cb(void *ptr, int32_t param)
 {
 	if (((m_regs[reg_A] & reg_A_DV) == 0x20) && ! (m_regs[reg_B] & reg_B_SET))
 	{
@@ -501,7 +501,7 @@ TIMER_CALLBACK_MEMBER(rtc65271_device::rtc_begin_update_cb)
     End update cycle (called UPDATE_CYCLE_TIME = 1948us after start of update
     cycle)
 */
-TIMER_CALLBACK_MEMBER(rtc65271_device::rtc_end_update_cb)
+void rtc65271_device::rtc_end_update_cb(void *ptr, int32_t param)
 {
 	static const int days_in_month_table[12] =
 	{

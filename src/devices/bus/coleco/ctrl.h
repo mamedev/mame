@@ -77,8 +77,8 @@ public:
 	uint8_t read() { uint8_t data = 0xff; if (exists()) data = m_device->joy_r(); return data; }
 	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return read(); }
 
-	DECLARE_WRITE_LINE_MEMBER( common0_w ) { if (exists()) m_device->common0_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( common1_w ) { if (exists()) m_device->common1_w(state); }
+	void common0_w(int state) { if (exists()) m_device->common0_w(state); }
+	void common1_w(int state) { if (exists()) m_device->common1_w(state); }
 
 	bool exists() { return m_device != nullptr; }
 

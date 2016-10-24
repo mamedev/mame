@@ -136,7 +136,7 @@ void svi_slot_bus_device::iorq_w(address_space &space, offs_t offset, uint8_t da
 //  bk21_w - signal from host to slots
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( svi_slot_bus_device::bk21_w )
+void svi_slot_bus_device::bk21_w(int state)
 {
 	device_svi_slot_interface *entry = m_dev.first();
 
@@ -151,7 +151,7 @@ WRITE_LINE_MEMBER( svi_slot_bus_device::bk21_w )
 //  bk22_w - signal from host to slots
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( svi_slot_bus_device::bk22_w )
+void svi_slot_bus_device::bk22_w(int state)
 {
 	device_svi_slot_interface *entry = m_dev.first();
 
@@ -166,7 +166,7 @@ WRITE_LINE_MEMBER( svi_slot_bus_device::bk22_w )
 //  bk31_w - signal from host to slots
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( svi_slot_bus_device::bk31_w )
+void svi_slot_bus_device::bk31_w(int state)
 {
 	device_svi_slot_interface *entry = m_dev.first();
 
@@ -181,7 +181,7 @@ WRITE_LINE_MEMBER( svi_slot_bus_device::bk31_w )
 //  bk32_w - signal from host to slots
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( svi_slot_bus_device::bk32_w )
+void svi_slot_bus_device::bk32_w(int state)
 {
 	device_svi_slot_interface *entry = m_dev.first();
 

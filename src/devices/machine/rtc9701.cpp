@@ -43,7 +43,7 @@ rtc9701_device::rtc9701_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-TIMER_CALLBACK_MEMBER(rtc9701_device::timer_callback)
+void rtc9701_device::timer_callback(void *ptr, int32_t param)
 {
 	static const uint8_t dpm[12] = { 0x31, 0x28, 0x31, 0x30, 0x31, 0x30, 0x31, 0x31, 0x30, 0x31, 0x30, 0x31 };
 	int dpm_count;
@@ -217,13 +217,13 @@ inline void rtc9701_device::rtc_write(uint8_t offset,uint8_t data)
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-WRITE_LINE_MEMBER( rtc9701_device::write_bit )
+void rtc9701_device::write_bit(int state)
 {
 	m_latch = state;
 }
 
 
-READ_LINE_MEMBER( rtc9701_device::read_bit )
+int rtc9701_device::read_bit()
 {
 	if (rtc_state == RTC9701_RTC_READ)
 	{
@@ -248,7 +248,7 @@ READ_LINE_MEMBER( rtc9701_device::read_bit )
 }
 
 
-WRITE_LINE_MEMBER( rtc9701_device::set_cs_line )
+void rtc9701_device::set_cs_line(int state)
 {
 	//logerror("set reset line %d\n",state);
 	m_reset_line = state;
@@ -268,7 +268,7 @@ WRITE_LINE_MEMBER( rtc9701_device::set_cs_line )
 
 
 
-WRITE_LINE_MEMBER( rtc9701_device::set_clock_line )
+void rtc9701_device::set_clock_line(int state)
 {
 	//logerror("set clock line %d\n",state);
 

@@ -436,7 +436,7 @@ static INPUT_PORTS_START( gostop )
 INPUT_PORTS_END
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(st0016_state::st0016_int)
+void st0016_state::st0016_int(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

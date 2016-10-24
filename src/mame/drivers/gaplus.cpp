@@ -220,7 +220,7 @@ void gaplus_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 	}
 }
 
-TIMER_CALLBACK_MEMBER(gaplus_state::namcoio_run)
+void gaplus_state::namcoio_run(void *ptr, int32_t param)
 {
 	switch (param)
 	{
@@ -233,7 +233,7 @@ TIMER_CALLBACK_MEMBER(gaplus_state::namcoio_run)
 	}
 }
 
-INTERRUPT_GEN_MEMBER(gaplus_state::vblank_main_irq)
+void gaplus_state::vblank_main_irq(device_t &device)
 {
 	if(m_main_irq_mask)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
@@ -245,7 +245,7 @@ INTERRUPT_GEN_MEMBER(gaplus_state::vblank_main_irq)
 		timer_set(attotime::from_usec(50), TIMER_NAMCOIO_RUN, 1);
 }
 
-INTERRUPT_GEN_MEMBER(gaplus_state::gapluso_vblank_main_irq)
+void gaplus_state::gapluso_vblank_main_irq(device_t &device)
 {
 	if(m_main_irq_mask)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
@@ -257,13 +257,13 @@ INTERRUPT_GEN_MEMBER(gaplus_state::gapluso_vblank_main_irq)
 		timer_set(attotime::from_usec(50), TIMER_NAMCOIO_RUN, 0);
 }
 
-INTERRUPT_GEN_MEMBER(gaplus_state::vblank_sub_irq)
+void gaplus_state::vblank_sub_irq(device_t &device)
 {
 	if(m_sub_irq_mask)
 		m_subcpu->set_input_line(0, ASSERT_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(gaplus_state::vblank_sub2_irq)
+void gaplus_state::vblank_sub2_irq(device_t &device)
 {
 	if(m_sub2_irq_mask)
 		m_subcpu2->set_input_line(0, ASSERT_LINE);

@@ -70,7 +70,7 @@ public:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(tugboat);
+	void palette_init_tugboat(palette_device &palette);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_tilemap(bitmap_ind16 &bitmap,const rectangle &cliprect,
@@ -100,7 +100,7 @@ void tugboat_state::video_start()
 
 /*  there isn't the usual resistor array anywhere near the color prom,
     just four 1k resistors. */
-PALETTE_INIT_MEMBER(tugboat_state, tugboat)
+void tugboat_state::palette_init_tugboat(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;

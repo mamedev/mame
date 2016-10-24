@@ -241,7 +241,7 @@ void samcoupe_state::samcoupe_rtc_w(address_space &space, offs_t offset, uint8_t
     MOUSE
 ***************************************************************************/
 
-TIMER_CALLBACK_MEMBER(samcoupe_state::samcoupe_mouse_reset)
+void samcoupe_state::samcoupe_mouse_reset(void *ptr, int32_t param)
 {
 	m_mouse_index = 0;
 }

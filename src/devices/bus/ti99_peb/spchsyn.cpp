@@ -102,7 +102,7 @@ SETADDRESS_DBIN_MEMBER( ti_speech_synthesizer_device::setaddress_dbin )
 
 /****************************************************************************/
 
-WRITE_LINE_MEMBER( ti_speech_synthesizer_device::speech_ready )
+void ti_speech_synthesizer_device::speech_ready(int state)
 {
 	// The TMS5200 implementation uses true/false, not ASSERT/CLEAR semantics
 	// and we have to adapt a /READY to a READY line.

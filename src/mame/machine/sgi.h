@@ -70,7 +70,7 @@ private:
 	uint32_t m_nDMARunning;
 
 	void update();
-	TIMER_CALLBACK_MEMBER(update_callback);
+	void update_callback(void *ptr, int32_t param);
 	void timer_init();
 };
 

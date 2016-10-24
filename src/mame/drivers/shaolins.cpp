@@ -16,7 +16,7 @@ driver by Allard van der Bas
 
 #define MASTER_CLOCK XTAL_18_432MHz
 
-TIMER_DEVICE_CALLBACK_MEMBER(shaolins_state::interrupt)
+void shaolins_state::interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

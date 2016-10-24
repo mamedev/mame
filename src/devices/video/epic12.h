@@ -832,7 +832,7 @@ protected:
 	emu_timer *m_blitter_delay_timer;
 	int m_blitter_busy;
 
-	TIMER_CALLBACK_MEMBER( blitter_delay_callback );
+	void blitter_delay_callback(void *ptr, int32_t param);
 };
 
 

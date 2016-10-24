@@ -196,9 +196,9 @@ public:
 	uint16_t analog_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void analog_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
-	DECLARE_WRITE_LINE_MEMBER(duart_tx_a);
-	DECLARE_WRITE_LINE_MEMBER(duart_tx_b);
+	void duart_irq_handler(int state);
+	void duart_tx_a(int state);
+	void duart_tx_b(int state);
 	void duart_output(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	int m_system_type;
@@ -223,8 +223,8 @@ public:
 	void init_sq1();
 	void init_denib();
 	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
-	IRQ_CALLBACK_MEMBER(maincpu_irq_acknowledge_callback);
-	DECLARE_WRITE_LINE_MEMBER(esq5505_otis_irq);
+	int maincpu_irq_acknowledge_callback(device_t &device, int irqline);
+	void esq5505_otis_irq(int state);
 
 	//dmac
 	void dma_end(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -241,7 +241,7 @@ static SLOT_INTERFACE_START( ensoniq_floppies )
 	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
 SLOT_INTERFACE_END
 
-IRQ_CALLBACK_MEMBER(esq5505_state::maincpu_irq_acknowledge_callback)
+int esq5505_state::maincpu_irq_acknowledge_callback(device_t &device, int irqline)
 {
 	switch(irqline) {
 	case 1:
@@ -408,7 +408,7 @@ static ADDRESS_MAP_START( sq1_map, AS_PROGRAM, 16, esq5505_state )
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("osram")
 ADDRESS_MAP_END
 
-WRITE_LINE_MEMBER(esq5505_state::esq5505_otis_irq)
+void esq5505_state::esq5505_otis_irq(int state)
 {
 	otis_irq_state = (state != 0);
 	update_irq_to_maincpu();
@@ -425,7 +425,7 @@ uint16_t esq5505_state::analog_r(address_space &space, offs_t offset, uint16_t m
 	return m_analog_values[m_duart_io & 7];
 }
 
-WRITE_LINE_MEMBER(esq5505_state::duart_irq_handler)
+void esq5505_state::duart_irq_handler(int state)
 {
 //    printf("\nDUART IRQ: state %d vector %d\n", state, vector);
 	if (state == ASSERT_LINE)
@@ -492,12 +492,12 @@ void esq5505_state::duart_output(address_space &space, offs_t offset, uint8_t da
 }
 
 // MIDI send
-WRITE_LINE_MEMBER(esq5505_state::duart_tx_a)
+void esq5505_state::duart_tx_a(int state)
 {
 	m_mdout->write_txd(state);
 }
 
-WRITE_LINE_MEMBER(esq5505_state::duart_tx_b)
+void esq5505_state::duart_tx_b(int state)
 {
 	m_panel->rx_w(state);
 }

@@ -37,19 +37,19 @@ public:
 
 	void hw_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	TILE_GET_INFO_MEMBER(get_bgtile_info);
-	TILE_GET_INFO_MEMBER(get_fgtile_info);
-	TILE_GET_INFO_MEMBER(get_txttile_info);
+	void get_bgtile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_fgtile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_txttile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	virtual void machine_start() override;
 	void init_darkmist();
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(darkmist);
+	void palette_init_darkmist(palette_device &palette);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void decrypt_fgbgtiles(uint8_t* rgn, int size);
 	void decrypt_gfx();
 	void decrypt_snd();
 
-	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+	void scanline(timer_device &timer, void *ptr, int32_t param);
 };

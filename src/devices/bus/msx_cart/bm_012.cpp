@@ -105,7 +105,7 @@ void msx_cart_bm_012::device_start()
 }
 
 
-WRITE_LINE_MEMBER(msx_cart_bm_012::midi_in)
+void msx_cart_bm_012::midi_in(int state)
 {
 	m_mdthru->write_txd(state);
 	m_tmpz84c015af->rxb_w(state);

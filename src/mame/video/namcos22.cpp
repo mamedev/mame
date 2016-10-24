@@ -1729,7 +1729,7 @@ void namcos22_state::namcos22s_vics_control_w(address_space &space, offs_t offse
 
 /*********************************************************************************************/
 
-TILE_GET_INFO_MEMBER(namcos22_state::get_text_tile_info)
+void namcos22_state::get_text_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t data = nthword(m_textram, tile_index);
 	/**

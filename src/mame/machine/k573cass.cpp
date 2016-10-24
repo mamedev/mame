@@ -21,41 +21,41 @@ konami573_cassette_interface::~konami573_cassette_interface()
 
 
 
-WRITE_LINE_MEMBER(konami573_cassette_interface::write_line_d0)
+void konami573_cassette_interface::write_line_d0(int state)
 {
 }
 
-WRITE_LINE_MEMBER(konami573_cassette_interface::write_line_d4)
+void konami573_cassette_interface::write_line_d4(int state)
 {
 }
 
-WRITE_LINE_MEMBER(konami573_cassette_interface::write_line_d5)
+void konami573_cassette_interface::write_line_d5(int state)
 {
 }
 
-WRITE_LINE_MEMBER(konami573_cassette_interface::write_line_d6)
+void konami573_cassette_interface::write_line_d6(int state)
 {
 }
 
-WRITE_LINE_MEMBER(konami573_cassette_interface::write_line_d7)
+void konami573_cassette_interface::write_line_d7(int state)
 {
 }
 
-WRITE_LINE_MEMBER(konami573_cassette_interface::write_line_zs01_sda)
+void konami573_cassette_interface::write_line_zs01_sda(int state)
 {
 }
 
-READ_LINE_MEMBER(konami573_cassette_interface::read_line_ds2401)
-{
-	return 0;
-}
-
-READ_LINE_MEMBER(konami573_cassette_interface::read_line_adc083x_do)
+int konami573_cassette_interface::read_line_ds2401()
 {
 	return 0;
 }
 
-READ_LINE_MEMBER(konami573_cassette_interface::read_line_adc083x_sars)
+int konami573_cassette_interface::read_line_adc083x_do()
+{
+	return 0;
+}
+
+int konami573_cassette_interface::read_line_adc083x_sars()
 {
 	return 0;
 }
@@ -91,27 +91,27 @@ void konami573_cassette_x_device::device_start()
 	output_dsr(0);
 }
 
-WRITE_LINE_MEMBER(konami573_cassette_x_device::write_line_d0)
+void konami573_cassette_x_device::write_line_d0(int state)
 {
 	m_x76f041->write_sda( state );
 }
 
-WRITE_LINE_MEMBER(konami573_cassette_x_device::write_line_d1)
+void konami573_cassette_x_device::write_line_d1(int state)
 {
 	m_x76f041->write_scl( state );
 }
 
-WRITE_LINE_MEMBER(konami573_cassette_x_device::write_line_d2)
+void konami573_cassette_x_device::write_line_d2(int state)
 {
 	m_x76f041->write_cs( state );
 }
 
-WRITE_LINE_MEMBER(konami573_cassette_x_device::write_line_d3)
+void konami573_cassette_x_device::write_line_d3(int state)
 {
 	m_x76f041->write_rst( state );
 }
 
-READ_LINE_MEMBER(konami573_cassette_x_device::read_line_secflash_sda)
+int konami573_cassette_x_device::read_line_secflash_sda()
 {
 	return m_x76f041->read_sda();
 }
@@ -137,41 +137,41 @@ machine_config_constructor konami573_cassette_xi_device::device_mconfig_addition
 	return MACHINE_CONFIG_NAME( cassxi );
 }
 
-WRITE_LINE_MEMBER(konami573_cassette_xi_device::write_line_d0)
+void konami573_cassette_xi_device::write_line_d0(int state)
 {
 	konami573_cassette_x_device::write_line_d0( state ); // shares line with x76f041 sda
 
 	m_adc0838->cs_write( state );
 }
 
-WRITE_LINE_MEMBER(konami573_cassette_xi_device::write_line_d1)
+void konami573_cassette_xi_device::write_line_d1(int state)
 {
 	konami573_cassette_x_device::write_line_d1( state ); // shares line with x76f041 scl
 
 	m_adc0838->clk_write( state );
 }
 
-WRITE_LINE_MEMBER(konami573_cassette_xi_device::write_line_d4)
+void konami573_cassette_xi_device::write_line_d4(int state)
 {
 	m_ds2401->write( !state );
 }
 
-WRITE_LINE_MEMBER(konami573_cassette_xi_device::write_line_d5)
+void konami573_cassette_xi_device::write_line_d5(int state)
 {
 	m_adc0838->di_write( state );
 }
 
-READ_LINE_MEMBER(konami573_cassette_xi_device::read_line_ds2401)
+int konami573_cassette_xi_device::read_line_ds2401()
 {
 	return m_ds2401->read();
 }
 
-READ_LINE_MEMBER(konami573_cassette_xi_device::read_line_adc083x_do)
+int konami573_cassette_xi_device::read_line_adc083x_do()
 {
 	return m_adc0838->do_read();
 }
 
-READ_LINE_MEMBER(konami573_cassette_xi_device::read_line_adc083x_sars)
+int konami573_cassette_xi_device::read_line_adc083x_sars()
 {
 	return m_adc0838->sars_read();
 }
@@ -232,51 +232,51 @@ void konami573_cassette_y_device::device_start()
 	output_dsr(0);
 }
 
-READ_LINE_MEMBER(konami573_cassette_y_device::read_line_secflash_sda)
+int konami573_cassette_y_device::read_line_secflash_sda()
 {
 	return m_x76f100->read_sda();
 }
 
-WRITE_LINE_MEMBER(konami573_cassette_y_device::write_line_d0)
+void konami573_cassette_y_device::write_line_d0(int state)
 {
 	m_d0_handler( state );
 	m_x76f100->write_sda( state );
 }
 
-WRITE_LINE_MEMBER(konami573_cassette_y_device::write_line_d1)
+void konami573_cassette_y_device::write_line_d1(int state)
 {
 	m_d1_handler( state );
 	m_x76f100->write_scl( state );
 }
 
-WRITE_LINE_MEMBER(konami573_cassette_y_device::write_line_d2)
+void konami573_cassette_y_device::write_line_d2(int state)
 {
 	m_d2_handler( state );
 	m_x76f100->write_cs( state );
 }
 
-WRITE_LINE_MEMBER(konami573_cassette_y_device::write_line_d3)
+void konami573_cassette_y_device::write_line_d3(int state)
 {
 	m_d3_handler( state );
 	m_x76f100->write_rst( state );
 }
 
-WRITE_LINE_MEMBER(konami573_cassette_y_device::write_line_d4)
+void konami573_cassette_y_device::write_line_d4(int state)
 {
 	m_d4_handler( state );
 }
 
-WRITE_LINE_MEMBER(konami573_cassette_y_device::write_line_d5)
+void konami573_cassette_y_device::write_line_d5(int state)
 {
 	m_d5_handler( state );
 }
 
-WRITE_LINE_MEMBER(konami573_cassette_y_device::write_line_d6)
+void konami573_cassette_y_device::write_line_d6(int state)
 {
 	m_d6_handler( state );
 }
 
-WRITE_LINE_MEMBER(konami573_cassette_y_device::write_line_d7)
+void konami573_cassette_y_device::write_line_d7(int state)
 {
 	m_d7_handler( state );
 }
@@ -300,14 +300,14 @@ machine_config_constructor konami573_cassette_yi_device::device_mconfig_addition
 	return MACHINE_CONFIG_NAME( cassyi );
 }
 
-WRITE_LINE_MEMBER(konami573_cassette_yi_device::write_line_d4)
+void konami573_cassette_yi_device::write_line_d4(int state)
 {
 	konami573_cassette_y_device::write_line_d4( state );
 
 	m_ds2401->write( !state );
 }
 
-READ_LINE_MEMBER(konami573_cassette_yi_device::read_line_ds2401)
+int konami573_cassette_yi_device::read_line_ds2401()
 {
 	return m_ds2401->read();
 }
@@ -339,37 +339,37 @@ void konami573_cassette_zi_device::device_start()
 	output_dsr(0);
 }
 
-WRITE_LINE_MEMBER(konami573_cassette_zi_device::write_line_d1)
+void konami573_cassette_zi_device::write_line_d1(int state)
 {
 	m_zs01->write_scl( state );
 }
 
-WRITE_LINE_MEMBER(konami573_cassette_zi_device::write_line_d2)
+void konami573_cassette_zi_device::write_line_d2(int state)
 {
 	m_zs01->write_cs( state );
 }
 
-WRITE_LINE_MEMBER(konami573_cassette_zi_device::write_line_d3)
+void konami573_cassette_zi_device::write_line_d3(int state)
 {
 	m_zs01->write_rst( state );
 }
 
-WRITE_LINE_MEMBER(konami573_cassette_zi_device::write_line_d4)
+void konami573_cassette_zi_device::write_line_d4(int state)
 {
 	m_ds2401->write( !state );
 }
 
-WRITE_LINE_MEMBER(konami573_cassette_zi_device::write_line_zs01_sda)
+void konami573_cassette_zi_device::write_line_zs01_sda(int state)
 {
 	m_zs01->write_sda( state );
 }
 
-READ_LINE_MEMBER(konami573_cassette_zi_device::read_line_ds2401)
+int konami573_cassette_zi_device::read_line_ds2401()
 {
 	return m_ds2401->read();
 }
 
-READ_LINE_MEMBER(konami573_cassette_zi_device::read_line_secflash_sda)
+int konami573_cassette_zi_device::read_line_secflash_sda()
 {
 	return m_zs01->read_sda();
 }
@@ -391,7 +391,7 @@ void konami573_cassette_slot_device::device_start()
 	m_dev = dynamic_cast<konami573_cassette_interface *>(get_card_device());
 }
 
-WRITE_LINE_MEMBER(konami573_cassette_slot_device::write_line_d0)
+void konami573_cassette_slot_device::write_line_d0(int state)
 {
 	if( m_dev )
 	{
@@ -399,7 +399,7 @@ WRITE_LINE_MEMBER(konami573_cassette_slot_device::write_line_d0)
 	}
 }
 
-WRITE_LINE_MEMBER(konami573_cassette_slot_device::write_line_d1)
+void konami573_cassette_slot_device::write_line_d1(int state)
 {
 	if( m_dev )
 	{
@@ -407,7 +407,7 @@ WRITE_LINE_MEMBER(konami573_cassette_slot_device::write_line_d1)
 	}
 }
 
-WRITE_LINE_MEMBER(konami573_cassette_slot_device::write_line_d2)
+void konami573_cassette_slot_device::write_line_d2(int state)
 {
 	if( m_dev )
 	{
@@ -415,7 +415,7 @@ WRITE_LINE_MEMBER(konami573_cassette_slot_device::write_line_d2)
 	}
 }
 
-WRITE_LINE_MEMBER(konami573_cassette_slot_device::write_line_d3)
+void konami573_cassette_slot_device::write_line_d3(int state)
 {
 	if( m_dev )
 	{
@@ -423,7 +423,7 @@ WRITE_LINE_MEMBER(konami573_cassette_slot_device::write_line_d3)
 	}
 }
 
-WRITE_LINE_MEMBER(konami573_cassette_slot_device::write_line_d4)
+void konami573_cassette_slot_device::write_line_d4(int state)
 {
 	if( m_dev )
 	{
@@ -431,7 +431,7 @@ WRITE_LINE_MEMBER(konami573_cassette_slot_device::write_line_d4)
 	}
 }
 
-WRITE_LINE_MEMBER(konami573_cassette_slot_device::write_line_d5)
+void konami573_cassette_slot_device::write_line_d5(int state)
 {
 	if( m_dev )
 	{
@@ -439,7 +439,7 @@ WRITE_LINE_MEMBER(konami573_cassette_slot_device::write_line_d5)
 	}
 }
 
-WRITE_LINE_MEMBER(konami573_cassette_slot_device::write_line_d6)
+void konami573_cassette_slot_device::write_line_d6(int state)
 {
 	if( m_dev )
 	{
@@ -447,7 +447,7 @@ WRITE_LINE_MEMBER(konami573_cassette_slot_device::write_line_d6)
 	}
 }
 
-WRITE_LINE_MEMBER(konami573_cassette_slot_device::write_line_d7)
+void konami573_cassette_slot_device::write_line_d7(int state)
 {
 	if( m_dev )
 	{
@@ -455,7 +455,7 @@ WRITE_LINE_MEMBER(konami573_cassette_slot_device::write_line_d7)
 	}
 }
 
-WRITE_LINE_MEMBER(konami573_cassette_slot_device::write_line_zs01_sda)
+void konami573_cassette_slot_device::write_line_zs01_sda(int state)
 {
 	if( m_dev )
 	{
@@ -463,7 +463,7 @@ WRITE_LINE_MEMBER(konami573_cassette_slot_device::write_line_zs01_sda)
 	}
 }
 
-READ_LINE_MEMBER(konami573_cassette_slot_device::read_line_ds2401)
+int konami573_cassette_slot_device::read_line_ds2401()
 {
 	if( m_dev )
 	{
@@ -473,7 +473,7 @@ READ_LINE_MEMBER(konami573_cassette_slot_device::read_line_ds2401)
 	return 0;
 }
 
-READ_LINE_MEMBER(konami573_cassette_slot_device::read_line_secflash_sda)
+int konami573_cassette_slot_device::read_line_secflash_sda()
 {
 	if( m_dev )
 	{
@@ -483,7 +483,7 @@ READ_LINE_MEMBER(konami573_cassette_slot_device::read_line_secflash_sda)
 	return 0;
 }
 
-READ_LINE_MEMBER(konami573_cassette_slot_device::read_line_adc083x_do)
+int konami573_cassette_slot_device::read_line_adc083x_do()
 {
 	if( m_dev )
 	{
@@ -493,7 +493,7 @@ READ_LINE_MEMBER(konami573_cassette_slot_device::read_line_adc083x_do)
 	return 0;
 }
 
-READ_LINE_MEMBER(konami573_cassette_slot_device::read_line_adc083x_sars)
+int konami573_cassette_slot_device::read_line_adc083x_sars()
 {
 	if( m_dev )
 	{

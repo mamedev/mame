@@ -50,7 +50,7 @@ public:
 
 	optional_shared_ptr<uint8_t> m_spriteram;
 	optional_shared_ptr<uint8_t> m_spriteram2;
-	DECLARE_WRITE_LINE_MEMBER(galaxygn_sound_irq);
+	void galaxygn_sound_irq(int state);
 	void fantland_nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void fantland_nmi_enable_16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void fantland_soundlatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -68,13 +68,13 @@ public:
 	void machine_start_borntofi();
 	void machine_reset_borntofi();
 	uint32_t screen_update_fantland(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(fantland_irq);
-	INTERRUPT_GEN_MEMBER(fantland_sound_irq);
+	void fantland_irq(device_t &device);
+	void fantland_sound_irq(device_t &device);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(borntofi_adpcm_int_0);
-	DECLARE_WRITE_LINE_MEMBER(borntofi_adpcm_int_1);
-	DECLARE_WRITE_LINE_MEMBER(borntofi_adpcm_int_2);
-	DECLARE_WRITE_LINE_MEMBER(borntofi_adpcm_int_3);
+	void borntofi_adpcm_int_0(int state);
+	void borntofi_adpcm_int_1(int state);
+	void borntofi_adpcm_int_2(int state);
+	void borntofi_adpcm_int_3(int state);
 	void borntofi_adpcm_start( msm5205_device *device, int voice );
 	void borntofi_adpcm_stop( msm5205_device *device, int voice );
 	void borntofi_adpcm_int( msm5205_device *device, int voice );

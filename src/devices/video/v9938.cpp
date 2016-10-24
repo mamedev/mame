@@ -301,7 +301,7 @@ b0 is set if b2 and b1 are set (remember, color bus is 3 bits)
 
 */
 
-PALETTE_INIT_MEMBER(v9938_device, v9938)
+void v9938_device::palette_init_v9938(palette_device &palette)
 {
 	int i;
 
@@ -323,7 +323,7 @@ to emulate this. Also it keeps the palette a reasonable size. :)
 
 uint16_t v99x8_device::s_pal_indYJK[0x20000];
 
-PALETTE_INIT_MEMBER(v9958_device, v9958)
+void v9958_device::palette_init_v9958(palette_device &palette)
 {
 	int r,g,b,y,j,k,i,k0,j0,n;
 	uint8_t pal[19268*3];

@@ -64,7 +64,7 @@ static const res_net_info mario_net_info_std =
   bit 0 -- 470 ohm resistor -- inverter  -- BLUE
 
 ***************************************************************************/
-PALETTE_INIT_MEMBER(mario_state, mario)
+void mario_state::palette_init_mario(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	std::vector<rgb_t> rgb;
@@ -125,7 +125,7 @@ void mario_state::mario_flip_w(address_space &space, offs_t offset, uint8_t data
 	}
 }
 
-TILE_GET_INFO_MEMBER(mario_state::get_bg_tile_info)
+void mario_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index] + 256 * m_gfx_bank;
 	int color = 8 + (m_videoram[tile_index] >> 5) + 16 * m_palette_bank;
@@ -260,7 +260,7 @@ uint32_t mario_state::screen_update_common(screen_device &screen, bitmap_ind16 &
 	if (t != m_monitor)
 	{
 		m_monitor = t;
-		PALETTE_INIT_NAME(mario)(*m_palette);
+		palette_init_mario(*m_palette);
 	}
 
 	m_bg_tilemap->set_scrolly(0, m_gfx_scroll);

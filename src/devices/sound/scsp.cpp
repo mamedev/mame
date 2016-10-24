@@ -311,7 +311,7 @@ void scsp_device::ResetInterrupts()
 	CheckPendingIRQ();
 }
 
-TIMER_CALLBACK_MEMBER( scsp_device::timerA_cb )
+void scsp_device::timerA_cb(void *ptr, int32_t param)
 {
 	m_TimCnt[0] = 0xFFFF;
 	m_udata.data[0x20/2]|=0x40;
@@ -322,7 +322,7 @@ TIMER_CALLBACK_MEMBER( scsp_device::timerA_cb )
 	MainCheckPendingIRQ(0x40);
 }
 
-TIMER_CALLBACK_MEMBER( scsp_device::timerB_cb )
+void scsp_device::timerB_cb(void *ptr, int32_t param)
 {
 	m_TimCnt[1] = 0xFFFF;
 	m_udata.data[0x20/2]|=0x80;
@@ -332,7 +332,7 @@ TIMER_CALLBACK_MEMBER( scsp_device::timerB_cb )
 	CheckPendingIRQ();
 }
 
-TIMER_CALLBACK_MEMBER( scsp_device::timerC_cb )
+void scsp_device::timerC_cb(void *ptr, int32_t param)
 {
 	m_TimCnt[2] = 0xFFFF;
 	m_udata.data[0x20/2]|=0x100;

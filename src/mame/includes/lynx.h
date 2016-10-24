@@ -160,12 +160,12 @@ public:
 	void lynx_timer_write(int which, int offset, uint8_t data);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(lynx);
+	void palette_init_lynx(palette_device &palette);
 	void sound_cb();
-	TIMER_CALLBACK_MEMBER(lynx_blitter_timer);
-	TIMER_CALLBACK_MEMBER(lynx_timer_shot);
-	TIMER_CALLBACK_MEMBER(lynx_uart_loopback_timer);
-	TIMER_CALLBACK_MEMBER(lynx_uart_timer);
+	void lynx_blitter_timer(void *ptr, int32_t param);
+	void lynx_timer_shot(void *ptr, int32_t param);
+	void lynx_uart_loopback_timer(void *ptr, int32_t param);
+	void lynx_uart_timer(void *ptr, int32_t param);
 	void lynx_postload();
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( lynx_cart );
 	uint8_t lynx_read_ram(uint16_t address);

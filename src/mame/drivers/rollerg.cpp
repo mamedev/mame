@@ -209,7 +209,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-WRITE_LINE_MEMBER(rollerg_state::rollerg_irq_ack_w)
+void rollerg_state::rollerg_irq_ack_w(int state)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }

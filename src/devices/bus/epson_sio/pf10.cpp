@@ -191,7 +191,7 @@ void epson_pf10_device::fdc_tc_w(address_space &space, offs_t offset, uint8_t da
 //  rxc_w - rx input
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( epson_pf10_device::rxc_w )
+void epson_pf10_device::rxc_w(int state)
 {
 	m_rxc = state;
 	m_sio_input->rx_w(m_hd6303_tx & m_rxc);
@@ -201,7 +201,7 @@ WRITE_LINE_MEMBER( epson_pf10_device::rxc_w )
 //  pinc_w - pin input
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( epson_pf10_device::pinc_w )
+void epson_pf10_device::pinc_w(int state)
 {
 	m_pinc = state;
 	m_sio_input->pin_w(m_pinc);
@@ -211,7 +211,7 @@ WRITE_LINE_MEMBER( epson_pf10_device::pinc_w )
 //  hd6303_tx_w - rx output
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( epson_pf10_device::hd6303_tx_w )
+void epson_pf10_device::hd6303_tx_w(int state)
 {
 	m_hd6303_tx = state;
 	m_sio_input->rx_w(m_hd6303_tx & m_rxc);

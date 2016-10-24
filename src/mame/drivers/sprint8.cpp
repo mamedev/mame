@@ -24,7 +24,7 @@ void sprint8_state::sprint8_set_collision(int n)
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(sprint8_state::input_callback)
+void sprint8_state::input_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	static const char *const dialnames[] = { "DIAL1", "DIAL2", "DIAL3", "DIAL4", "DIAL5", "DIAL6", "DIAL7", "DIAL8" };
 

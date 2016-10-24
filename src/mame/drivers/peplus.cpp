@@ -316,7 +316,7 @@ public:
 	uint8_t peplus_watchdog_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_CUSTOM_INPUT_MEMBER(peplus_input_r);
 	void peplus_crtc_mode_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(crtc_vsync);
+	void crtc_vsync(int state);
 	void i2c_nvram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t peplus_input_bank_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t peplus_input0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
@@ -325,13 +325,13 @@ public:
 	void init_peplussb();
 	void init_pepluss64();
 	void init_peplussbw();
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_peplus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void peplus_load_superdata(const char *bank_name);
-	DECLARE_PALETTE_INIT(peplus);
+	void palette_init_peplus(palette_device &palette);
 	void handle_lightpen();
 
 protected:
@@ -434,7 +434,7 @@ void peplus_state::handle_lightpen()
 	timer_set(m_screen->time_until_pos(yt, xt), TIMER_ASSERT_LP, 0);
 }
 
-WRITE_LINE_MEMBER(peplus_state::crtc_vsync)
+void peplus_state::crtc_vsync(int state)
 {
 	m_maincpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 	handle_lightpen();
@@ -905,7 +905,7 @@ uint8_t peplus_state::peplus_input_bank_a_r(address_space &space, offs_t offset,
 * Video/Character functions *
 ****************************/
 
-TILE_GET_INFO_MEMBER(peplus_state::get_bg_tile_info)
+void peplus_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *videoram = m_videoram;
 	int pr = m_palette_ram[tile_index];
@@ -941,7 +941,7 @@ uint32_t peplus_state::screen_update_peplus(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-PALETTE_INIT_MEMBER(peplus_state, peplus)
+void peplus_state::palette_init_peplus(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	uint32_t proms_size = memregion("proms")->bytes();

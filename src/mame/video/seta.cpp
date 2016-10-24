@@ -377,8 +377,8 @@ inline void seta_state::twineagl_tile_info( tile_data &tileinfo, int tile_index,
 	SET_TILE_INFO_MEMBER(1, (code & 0x3fff), attr & 0x1f, TILE_FLIPXY((code & 0xc000) >> 14) );
 }
 
-TILE_GET_INFO_MEMBER(seta_state::twineagl_get_tile_info_0){ twineagl_tile_info(tileinfo, tile_index, 0x0000 ); }
-TILE_GET_INFO_MEMBER(seta_state::twineagl_get_tile_info_1){ twineagl_tile_info(tileinfo, tile_index, 0x1000 ); }
+void seta_state::twineagl_get_tile_info_0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ twineagl_tile_info(tileinfo, tile_index, 0x0000 ); }
+void seta_state::twineagl_get_tile_info_1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ twineagl_tile_info(tileinfo, tile_index, 0x1000 ); }
 
 
 inline void seta_state::get_tile_info( tile_data &tileinfo, int tile_index, int layer, int offset )
@@ -401,10 +401,10 @@ inline void seta_state::get_tile_info( tile_data &tileinfo, int tile_index, int 
 	SET_TILE_INFO_MEMBER(gfx, m_tiles_offset + (code & 0x3fff), attr & 0x1f, TILE_FLIPXY((code & 0xc000) >> 14) );
 }
 
-TILE_GET_INFO_MEMBER(seta_state::get_tile_info_0){ get_tile_info(tileinfo, tile_index, 0, 0x0000 ); }
-TILE_GET_INFO_MEMBER(seta_state::get_tile_info_1){ get_tile_info(tileinfo, tile_index, 0, 0x1000 ); }
-TILE_GET_INFO_MEMBER(seta_state::get_tile_info_2){ get_tile_info(tileinfo, tile_index, 1, 0x0000 ); }
-TILE_GET_INFO_MEMBER(seta_state::get_tile_info_3){ get_tile_info(tileinfo, tile_index, 1, 0x1000 ); }
+void seta_state::get_tile_info_0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ get_tile_info(tileinfo, tile_index, 0, 0x0000 ); }
+void seta_state::get_tile_info_1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ get_tile_info(tileinfo, tile_index, 0, 0x1000 ); }
+void seta_state::get_tile_info_2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ get_tile_info(tileinfo, tile_index, 1, 0x0000 ); }
+void seta_state::get_tile_info_3(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ get_tile_info(tileinfo, tile_index, 1, 0x1000 ); }
 
 
 void seta_state::seta_vram_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask)
@@ -592,7 +592,7 @@ void seta_state::video_start_kyustrkr_no_layers()
    The game can select to repeat every 16 colors to fill the 64 colors for the 6bpp gfx
    or to use the first 64 colors of the palette regardless of the color code!
 */
-PALETTE_INIT_MEMBER(seta_state,blandia)
+void seta_state::palette_init_blandia(palette_device &palette)
 {
 	int color, pen;
 
@@ -622,7 +622,7 @@ PALETTE_INIT_MEMBER(seta_state,blandia)
 
 /* layers have 6 bits per pixel, but the color code has a 16 colors granularity,
    even if the low 2 bits are ignored (so there are only 4 different palettes) */
-PALETTE_INIT_MEMBER(seta_state,gundhara)
+void seta_state::palette_init_gundhara(palette_device &palette)
 {
 	int color, pen;
 
@@ -640,7 +640,7 @@ PALETTE_INIT_MEMBER(seta_state,gundhara)
 
 
 /* layers have 6 bits per pixel, but the color code has a 16 colors granularity */
-PALETTE_INIT_MEMBER(seta_state,jjsquawk)
+void seta_state::palette_init_jjsquawk(palette_device &palette)
 {
 	int color, pen;
 
@@ -657,7 +657,7 @@ PALETTE_INIT_MEMBER(seta_state,jjsquawk)
 
 
 /* layer 0 is 6 bit per pixel, but the color code has a 16 colors granularity */
-PALETTE_INIT_MEMBER(seta_state,zingzip)
+void seta_state::palette_init_zingzip(palette_device &palette)
 {
 	int color, pen;
 
@@ -670,7 +670,7 @@ PALETTE_INIT_MEMBER(seta_state,zingzip)
 }
 
 // color prom
-PALETTE_INIT_MEMBER(seta_state,inttoote)
+void seta_state::palette_init_inttoote(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int x;
@@ -681,15 +681,15 @@ PALETTE_INIT_MEMBER(seta_state,inttoote)
 	}
 }
 
-PALETTE_INIT_MEMBER(seta_state,setaroul)
+void seta_state::palette_init_setaroul(palette_device &palette)
 {
 	m_gfxdecode->gfx(0)->set_granularity(16);
 	m_gfxdecode->gfx(1)->set_granularity(16);
 
-	PALETTE_INIT_NAME(inttoote)(palette);
+	palette_init_inttoote(palette);
 }
 
-PALETTE_INIT_MEMBER(seta_state,usclssic)
+void seta_state::palette_init_usclssic(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int color, pen;

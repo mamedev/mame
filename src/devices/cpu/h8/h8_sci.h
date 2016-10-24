@@ -49,8 +49,8 @@ public:
 	void scmr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t scmr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER(rx_w);
-	DECLARE_WRITE_LINE_MEMBER(clk_w);
+	void rx_w(int state);
+	void clk_w(int state);
 
 	template<class _Object> static devcb_base &set_tx_cb(device_t &device, _Object object) { return downcast<h8_sci_device &>(device).tx_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_clk_cb(device_t &device, _Object object) { return downcast<h8_sci_device &>(device).clk_cb.set_callback(object); }

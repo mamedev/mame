@@ -9,7 +9,7 @@
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(ohmygod_state::get_tile_info)
+void ohmygod_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = m_videoram[2 * tile_index + 1];
 	uint16_t attr = m_videoram[2 * tile_index];

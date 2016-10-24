@@ -36,7 +36,7 @@ public:
 	void init_beezer();
 	virtual void machine_start() override;
 	uint32_t screen_update_beezer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(beezer_interrupt);
+	void beezer_interrupt(timer_device &timer, void *ptr, int32_t param);
 	uint8_t b_via_0_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t b_via_0_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void b_via_0_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -82,7 +82,7 @@ public:
 	void timer1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t noise_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	//DECLARE_WRITE_LINE_MEMBER( update_irq_state );
+	//void update_irq_state(int state);
 
 protected:
 	// device-level overrides

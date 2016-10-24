@@ -41,9 +41,9 @@ public:
 	void silkroad_fgram3_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	void silk_6295_bank_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg2_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg3_tile_info);
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_fg2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_fg3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	virtual void video_start() override;
 

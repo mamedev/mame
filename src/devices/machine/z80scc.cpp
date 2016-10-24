@@ -2364,7 +2364,7 @@ void z80scc_channel::receive_data(uint8_t data)
 //  cts_w - clear to send handler
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( z80scc_channel::cts_w )
+void z80scc_channel::cts_w(int state)
 {
 	LOG(("\"%s\" %s: %c : CTS %u\n", m_owner->tag(), FUNCNAME, 'A' + m_index, state));
 
@@ -2408,7 +2408,7 @@ WRITE_LINE_MEMBER( z80scc_channel::cts_w )
 //  dcd_w - data carrier detected handler
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( z80scc_channel::dcd_w )
+void z80scc_channel::dcd_w(int state)
 {
 	LOG(("\"%s\": %c : DCD %u\n", m_owner->tag(), 'A' + m_index, state));
 
@@ -2458,7 +2458,7 @@ WRITE_LINE_MEMBER( z80scc_channel::dcd_w )
 //  ri_w - ring indicator handler
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( z80scc_channel::ri_w )
+void z80scc_channel::ri_w(int state)
 {
 	LOG(("\"%s\": %c : RI %u\n", m_owner->tag(), 'A' + m_index, state));
 
@@ -2489,7 +2489,7 @@ WRITE_LINE_MEMBER( z80scc_channel::ri_w )
 //-------------------------------------------------
 //  sync_w - sync handler
 //-------------------------------------------------
-WRITE_LINE_MEMBER( z80scc_channel::sync_w )
+void z80scc_channel::sync_w(int state)
 {
 	LOG(("\"%s\": %c : SYNC %u\n", m_owner->tag(), 'A' + m_index, state));
 }
@@ -2497,7 +2497,7 @@ WRITE_LINE_MEMBER( z80scc_channel::sync_w )
 //-------------------------------------------------
 //  rxc_w - receive clock
 //-------------------------------------------------
-WRITE_LINE_MEMBER( z80scc_channel::rxc_w )
+void z80scc_channel::rxc_w(int state)
 {
 /* Support for external clock as source for BRG yet to be finished */
 #if 0
@@ -2549,7 +2549,7 @@ WRITE_LINE_MEMBER( z80scc_channel::rxc_w )
 //-------------------------------------------------
 //  txc_w - transmit clock
 //-------------------------------------------------
-WRITE_LINE_MEMBER( z80scc_channel::txc_w )
+void z80scc_channel::txc_w(int state)
 {
 	//LOG(("\"%s\": %c : Transmitter Clock Pulse\n", m_owner->tag(), m_index + 'A'));
 	if (m_wr5 & WR5_TX_ENABLE)
@@ -2674,7 +2674,7 @@ void z80scc_channel::set_dtr(int state)
 //  write_rx - called by terminal through rs232/diserial
 //         when character is sent to board
 //-------------------------------------------------
-WRITE_LINE_MEMBER(z80scc_channel::write_rx)
+void z80scc_channel::write_rx(int state)
 {
 #if START_BIT_HUNT
 	// Check for start bit if not receiving

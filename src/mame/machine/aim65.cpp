@@ -309,7 +309,7 @@ DRIVER_MEMBER(aim65_state, aim65_printer_on), // out CB2
 */
 
 
-TIMER_CALLBACK_MEMBER(aim65_state::aim65_printer_timer)
+void aim65_state::aim65_printer_timer(void *ptr, int32_t param)
 {
 	via6522_device *via_0 = machine().device<via6522_device>("via6522_0");
 

@@ -42,7 +42,7 @@ protected:
 	// internal state
 	void recompute_parameters();
 	virtual void display_char(bitmap_ind16 &bitmap, uint8_t code, int x, int y, uint8_t scroll_region, uint8_t display_type);
-	TIMER_CALLBACK_MEMBER(lba7_change);
+	void lba7_change(void *ptr, int32_t param);
 
 	devcb_read8        m_read_ram;
 	devcb_write8       m_write_clear_video_interrupt;

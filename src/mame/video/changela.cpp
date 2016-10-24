@@ -641,7 +641,7 @@ e:|7 6 5 4 3 2 1 0 Hex|/RAMw /RAMr /ROM  /AdderOutput  AdderInput TrainInputs|
                  written back to RAM
 */
 
-TIMER_CALLBACK_MEMBER(changela_state::changela_scanline_callback)
+void changela_state::changela_scanline_callback(void *ptr, int32_t param)
 {
 	int sy = param;
 	int sx;

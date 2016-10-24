@@ -35,7 +35,7 @@ machine_config_constructor sun_keyboard_adaptor_device::device_mconfig_additions
 }
 
 
-WRITE_LINE_MEMBER( sun_keyboard_adaptor_device::input_txd )
+void sun_keyboard_adaptor_device::input_txd(int state)
 {
 	m_keyboard_port->write_txd(state);
 }

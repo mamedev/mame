@@ -94,7 +94,7 @@ void decodmd_type2_device::status_w(address_space &space, offs_t offset, uint8_t
 	m_status = data & 0x0f;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(decodmd_type2_device::dmd_firq)
+void decodmd_type2_device::dmd_firq(timer_device &timer, void *ptr, int32_t param)
 {
 	m_cpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 }

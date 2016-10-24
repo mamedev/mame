@@ -63,7 +63,7 @@ public:
 	uint8_t rrowx_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	void init_laserbat();
-	INTERRUPT_GEN_MEMBER(laserbat_interrupt);
+	void laserbat_interrupt(device_t &device);
 
 	// video memory and control ports
 	void videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -88,7 +88,7 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// video functions
-	TIMER_CALLBACK_MEMBER(video_line);
+	void video_line(void *ptr, int32_t param);
 
 	// input lines
 	required_ioport_array<4> m_mux_ports;
@@ -158,7 +158,7 @@ public:
 	}
 
 	// video initialisation
-	DECLARE_PALETTE_INIT(laserbat);
+	void palette_init_laserbat(palette_device &palette);
 
 	// sound control ports
 	virtual void csound2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
@@ -188,7 +188,7 @@ public:
 	}
 
 	// video initialisation
-	DECLARE_PALETTE_INIT(catnmous);
+	void palette_init_catnmous(palette_device &palette);
 
 	// sound control ports
 	virtual void csound1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;

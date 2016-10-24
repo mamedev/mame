@@ -99,7 +99,7 @@ static const unsigned short ti85_palette[32][7] =
 	{ 0xd9, 0xda, 0xdb, 0xdc, 0xdd, 0xde, 0xdf }
 };
 
-PALETTE_INIT_MEMBER(ti85_state, ti85)
+void ti85_state::palette_init_ti85(palette_device &palette)
 {
 	uint8_t i, j, r, g, b;
 
@@ -187,7 +187,7 @@ uint32_t ti85_state::screen_update_ti85(screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-PALETTE_INIT_MEMBER(ti85_state,ti82)
+void ti85_state::palette_init_ti82(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(160, 190, 170));
 	palette.set_pen_color(1, rgb_t(83, 111, 138));

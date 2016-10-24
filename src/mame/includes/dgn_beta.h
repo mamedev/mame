@@ -151,7 +151,7 @@ public:
 	int m_DrawInterlace;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(dgn);
+	void palette_init_dgn(palette_device &palette);
 	void dgnbeta_ram_b0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void dgnbeta_ram_b1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void dgnbeta_ram_b2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -173,24 +173,24 @@ public:
 	void d_pia0_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t d_pia0_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void d_pia0_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(d_pia0_cb2_w);
-	DECLARE_WRITE_LINE_MEMBER(d_pia0_irq_a);
-	DECLARE_WRITE_LINE_MEMBER(d_pia0_irq_b);
+	void d_pia0_cb2_w(int state);
+	void d_pia0_irq_a(int state);
+	void d_pia0_irq_b(int state);
 	uint8_t d_pia1_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void d_pia1_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t d_pia1_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void d_pia1_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(d_pia1_irq_a);
-	DECLARE_WRITE_LINE_MEMBER(d_pia1_irq_b);
+	void d_pia1_irq_a(int state);
+	void d_pia1_irq_b(int state);
 	uint8_t d_pia2_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void d_pia2_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t d_pia2_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void d_pia2_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(d_pia2_irq_a);
-	DECLARE_WRITE_LINE_MEMBER(d_pia2_irq_b);
-	DECLARE_WRITE_LINE_MEMBER(dgnbeta_fdc_intrq_w);
-	DECLARE_WRITE_LINE_MEMBER(dgnbeta_fdc_drq_w);
-	DECLARE_WRITE_LINE_MEMBER(dgnbeta_vsync_changed);
+	void d_pia2_irq_a(int state);
+	void d_pia2_irq_b(int state);
+	void dgnbeta_fdc_intrq_w(int state);
+	void dgnbeta_fdc_drq_w(int state);
+	void dgnbeta_vsync_changed(int state);
 	/* 74HC670 4x4bit colour ram */
 	void dgnbeta_colour_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	// Page IO at FE00

@@ -38,7 +38,7 @@ public:
 	uint8_t switch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void switch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
-	INTERRUPT_GEN_MEMBER(whitestar_firq_interrupt);
+	void whitestar_firq_interrupt(device_t &device);
 };
 
 static INPUT_PORTS_START( whitestar )
@@ -108,7 +108,7 @@ void whitestar_state::machine_start()
 }
 
 // the appropriate device is passed in, so we can share this routine
-INTERRUPT_GEN_MEMBER(whitestar_state::whitestar_firq_interrupt)
+void whitestar_state::whitestar_firq_interrupt(device_t &device)
 {
 	device.execute().set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 }

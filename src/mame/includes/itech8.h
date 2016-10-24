@@ -94,7 +94,7 @@ public:
 	emu_timer *m_delayed_z80_control_timer;
 
 	// common
-	DECLARE_WRITE_LINE_MEMBER(generate_tms34061_interrupt);
+	void generate_tms34061_interrupt(int state);
 	void nmi_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void blitter_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void rimrockn_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -140,12 +140,12 @@ public:
 	uint32_t screen_update_2page(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_2page_large(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	INTERRUPT_GEN_MEMBER(generate_nmi);
-	TIMER_CALLBACK_MEMBER(irq_off);
-	TIMER_CALLBACK_MEMBER(behind_the_beam_update);
-	TIMER_CALLBACK_MEMBER(delayed_sound_data_w);
-	TIMER_CALLBACK_MEMBER(blitter_done);
-	TIMER_DEVICE_CALLBACK_MEMBER(grmatch_palette_update);
+	void generate_nmi(device_t &device);
+	void irq_off(void *ptr, int32_t param);
+	void behind_the_beam_update(void *ptr, int32_t param);
+	void delayed_sound_data_w(void *ptr, int32_t param);
+	void blitter_done(void *ptr, int32_t param);
+	void grmatch_palette_update(timer_device &timer, void *ptr, int32_t param);
 
 	inline uint8_t fetch_next_raw();
 	inline void consume_raw(int count);
@@ -173,7 +173,7 @@ public:
 	void words_to_sensors(uint16_t word1, uint16_t word2, uint16_t word3, uint8_t beams,
 							uint16_t *sens0, uint16_t *sens1, uint16_t *sens2, uint16_t *sens3);
 	void compute_sensors();
-	TIMER_CALLBACK_MEMBER( delayed_z80_control_w );
+	void delayed_z80_control_w(void *ptr, int32_t param);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;

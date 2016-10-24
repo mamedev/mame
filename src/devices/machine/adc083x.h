@@ -51,12 +51,12 @@ public:
 	// static configuration helpers
 	static void set_input_callback(device_t &device, adc083x_input_delegate input_callback) { downcast<adc083x_device &>(device).m_input_callback = input_callback; }
 
-	DECLARE_WRITE_LINE_MEMBER( cs_write );
-	DECLARE_WRITE_LINE_MEMBER( clk_write );
-	DECLARE_WRITE_LINE_MEMBER( di_write );
-	DECLARE_WRITE_LINE_MEMBER( se_write );
-	DECLARE_READ_LINE_MEMBER( sars_read );
-	DECLARE_READ_LINE_MEMBER( do_read );
+	void cs_write(int state);
+	void clk_write(int state);
+	void di_write(int state);
+	void se_write(int state);
+	int sars_read();
+	int do_read();
 
 protected:
 	// device-level overrides

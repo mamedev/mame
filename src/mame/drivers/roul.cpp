@@ -93,7 +93,7 @@ public:
 	void ball_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(roul);
+	void palette_init_roul(palette_device &palette);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
@@ -102,7 +102,7 @@ public:
 #define VIDEOBUF_SIZE 256*256
 
 
-PALETTE_INIT_MEMBER(roul_state, roul)
+void roul_state::palette_init_roul(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int bit6, bit7, bit0, bit1, r, g, b;

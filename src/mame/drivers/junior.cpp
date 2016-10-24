@@ -51,7 +51,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_INPUT_CHANGED_MEMBER(junior_reset);
-	TIMER_DEVICE_CALLBACK_MEMBER(junior_update_leds);
+	void junior_update_leds(timer_device &timer, void *ptr, int32_t param);
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -181,7 +181,7 @@ void junior_state::junior_riot_b_w(address_space &space, offs_t offset, uint8_t 
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(junior_state::junior_update_leds)
+void junior_state::junior_update_leds(timer_device &timer, void *ptr, int32_t param)
 {
 	int i;
 

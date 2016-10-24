@@ -198,7 +198,7 @@ static const res_net_info radarscp_grid_net_info =
 	}
 };
 
-PALETTE_INIT_MEMBER(dkong_state,dkong2b)
+void dkong_state::palette_init_dkong2b(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	std::vector<rgb_t> rgb;
@@ -227,7 +227,7 @@ PALETTE_INIT_MEMBER(dkong_state,dkong2b)
 }
 
 #ifdef UNUSED_FUNCTION
-PALETTE_INIT_MEMBER(dkong_state,dkong4b)
+void dkong_state::palette_init_dkong4b(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -265,7 +265,7 @@ PALETTE_INIT_MEMBER(dkong_state,dkong4b)
 }
 #endif
 
-PALETTE_INIT_MEMBER(dkong_state,radarscp)
+void dkong_state::palette_init_radarscp(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -328,7 +328,7 @@ PALETTE_INIT_MEMBER(dkong_state,radarscp)
 	m_color_codes = color_prom; /* we'll need it later */
 }
 
-PALETTE_INIT_MEMBER(dkong_state,radarscp1)
+void dkong_state::palette_init_radarscp1(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -427,7 +427,7 @@ PALETTE_INIT_MEMBER(dkong_state,radarscp1)
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(dkong_state,dkong3)
+void dkong_state::palette_init_dkong3(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	std::vector<rgb_t> rgb;
@@ -441,7 +441,7 @@ PALETTE_INIT_MEMBER(dkong_state,dkong3)
 	m_color_codes = color_prom; /* we'll need it later */
 }
 
-TILE_GET_INFO_MEMBER(dkong_state::dkong_bg_tile_info)
+void dkong_state::dkong_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_video_ram[tile_index] + 256 * m_gfx_bank;
 	int color = (m_color_codes[tile_index % 32 + 32 * (tile_index / 32 / 4)] & 0x0f) + 0x10 * m_palette_bank;
@@ -449,7 +449,7 @@ TILE_GET_INFO_MEMBER(dkong_state::dkong_bg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(dkong_state::radarscp1_bg_tile_info)
+void dkong_state::radarscp1_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_video_ram[tile_index] + 256 * m_gfx_bank;
 	int color = (m_color_codes[tile_index % 32] & 0x0f);
@@ -868,7 +868,7 @@ void dkong_state::radarscp_scanline(int scanline)
 		m_counter++;
 }
 
-TIMER_CALLBACK_MEMBER(dkong_state::scanline_callback)
+void dkong_state::scanline_callback(void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -899,10 +899,10 @@ void dkong_state::check_palette()
 			switch (newset)
 			{
 				case DKONG_RADARSCP_CONVERSION:
-					PALETTE_INIT_NAME(radarscp)(*m_palette);
+					palette_init_radarscp(*m_palette);
 					break;
 				case DKONG_BOARD:
-					PALETTE_INIT_NAME(dkong2b)(*m_palette);
+					palette_init_dkong2b(*m_palette);
 					break;
 			}
 		}

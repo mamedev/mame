@@ -23,7 +23,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(gberet_state,gberet)
+void gberet_state::palette_init_gberet(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -104,7 +104,7 @@ void gberet_state::gberet_sprite_bank_w(address_space &space, offs_t offset, uin
 	m_spritebank = data;
 }
 
-TILE_GET_INFO_MEMBER(gberet_state::get_bg_tile_info)
+void gberet_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_colorram[tile_index];
 	int code = m_videoram[tile_index] + ((attr & 0x40) << 2);

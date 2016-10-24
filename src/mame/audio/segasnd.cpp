@@ -139,7 +139,7 @@ void speech_sound_device::p2_w(address_space &space, offs_t offset, uint8_t data
  *
  *************************************/
 
-WRITE_LINE_MEMBER(speech_sound_device::drq_w)
+void speech_sound_device::drq_w(int state)
 {
 	m_drq = (state == ASSERT_LINE);
 }
@@ -152,7 +152,7 @@ WRITE_LINE_MEMBER(speech_sound_device::drq_w)
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER( speech_sound_device::delayed_speech_w )
+void speech_sound_device::delayed_speech_w(void *ptr, int32_t param)
 {
 	int data = param;
 	uint8_t old = m_latch;
@@ -376,7 +376,7 @@ void usb_sound_device::device_reset()
  *
  *************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER( usb_sound_device::increment_t1_clock_timer_cb )
+void usb_sound_device::increment_t1_clock_timer_cb(timer_device &timer, void *ptr, int32_t param)
 {
 	/* only increment if it is not being forced clear */
 	if (!(m_last_p2_value & 0x80))
@@ -401,7 +401,7 @@ uint8_t usb_sound_device::status_r(address_space &space, offs_t offset, uint8_t 
 }
 
 
-TIMER_CALLBACK_MEMBER( usb_sound_device::delayed_usb_data_w )
+void usb_sound_device::delayed_usb_data_w(void *ptr, int32_t param)
 {
 	int data = param;
 

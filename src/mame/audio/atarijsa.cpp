@@ -386,7 +386,7 @@ void atari_jsa_base_device::ym2151_port_w(address_space &space, offs_t offset, u
 //  main's test line, provided by a callback
 //-------------------------------------------------
 
-READ_LINE_MEMBER(atari_jsa_base_device::main_test_read_line)
+int atari_jsa_base_device::main_test_read_line()
 {
 	return !m_test_read_cb();
 }
@@ -397,7 +397,7 @@ READ_LINE_MEMBER(atari_jsa_base_device::main_test_read_line)
 //  from the comm device to the owning callback
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( atari_jsa_base_device::main_int_write_line )
+void atari_jsa_base_device::main_int_write_line(int state)
 {
 	m_main_int_cb(state);
 }

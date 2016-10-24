@@ -166,7 +166,7 @@ uint8_t a2bus_thunderclock_device::read_c800(address_space &space, uint16_t offs
 	return m_rom[offset];
 }
 
-WRITE_LINE_MEMBER( a2bus_thunderclock_device::upd_dataout_w )
+void a2bus_thunderclock_device::upd_dataout_w(int state)
 {
 	if (state)
 	{

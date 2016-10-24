@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "includes/tmnt.h"
 
-TILE_GET_INFO_MEMBER(tmnt_state::glfgreat_get_roz_tile_info)
+void tmnt_state::glfgreat_get_roz_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *rom = memregion("user1")->base();
 	int code;
@@ -15,7 +15,7 @@ TILE_GET_INFO_MEMBER(tmnt_state::glfgreat_get_roz_tile_info)
 	SET_TILE_INFO_MEMBER(0, code & 0x3fff, code >> 14, 0);
 }
 
-TILE_GET_INFO_MEMBER(tmnt_state::prmrsocr_get_roz_tile_info)
+void tmnt_state::prmrsocr_get_roz_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *rom = memregion("user1")->base();
 	int code = rom[tile_index + 0x20000] + 256 * rom[tile_index];

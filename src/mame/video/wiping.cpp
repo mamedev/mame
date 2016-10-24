@@ -19,7 +19,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(wiping_state, wiping)
+void wiping_state::palette_init_wiping(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };

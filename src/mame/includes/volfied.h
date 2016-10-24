@@ -58,7 +58,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_volfied(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(volfied_timer_callback);
+	void volfied_timer_callback(void *ptr, int32_t param);
 	void refresh_pixel_layer( bitmap_ind16 &bitmap );
 	void volfied_cchip_init();
 	void volfied_cchip_reset();

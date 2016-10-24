@@ -287,7 +287,7 @@ static GFXDECODE_START( triplhnt )
 GFXDECODE_END
 
 
-PALETTE_INIT_MEMBER(triplhnt_state, triplhnt)
+void triplhnt_state::palette_init_triplhnt(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(0xAF, 0xAF, 0xAF));  /* sprites */
 	palette.set_pen_color(1, rgb_t(0x00, 0x00, 0x00));

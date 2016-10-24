@@ -62,8 +62,8 @@ public:
 	tilemap_t  *m_fg_tilemap;
 	std::unique_ptr<uint8_t[]>      m_objram;
 
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void bgram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void fgram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void video_start_wyvernf0();
@@ -83,7 +83,7 @@ public:
 	void nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void machine_start_wyvernf0();
 	void machine_reset_wyvernf0();
-	TIMER_CALLBACK_MEMBER(nmi_callback);
+	void nmi_callback(void *ptr, int32_t param);
 
 	// MCU
 	uint8_t       m_mcu_val, m_mcu_ready;
@@ -129,7 +129,7 @@ void wyvernf0_state::fgram_w(address_space &space, offs_t offset, uint8_t data, 
 	m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-TILE_GET_INFO_MEMBER(wyvernf0_state::get_bg_tile_info)
+void wyvernf0_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int offs = tile_index * 2;
 	int code = m_bgram[offs] + (m_bgram[offs+1] << 8);
@@ -137,7 +137,7 @@ TILE_GET_INFO_MEMBER(wyvernf0_state::get_bg_tile_info)
 
 	SET_TILE_INFO_MEMBER(1, code, color, TILE_FLIPXY(code >> 14));
 }
-TILE_GET_INFO_MEMBER(wyvernf0_state::get_fg_tile_info)
+void wyvernf0_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int offs = tile_index * 2;
 	int code = m_fgram[offs] + (m_fgram[offs+1] << 8);
@@ -345,7 +345,7 @@ void wyvernf0_state::rombank_w(address_space &space, offs_t offset, uint8_t data
 		logerror("%s: unknown rombank bits %02x\n", machine().describe_context(), data);
 }
 
-TIMER_CALLBACK_MEMBER(wyvernf0_state::nmi_callback)
+void wyvernf0_state::nmi_callback(void *ptr, int32_t param)
 {
 	if (m_sound_nmi_enable)
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);

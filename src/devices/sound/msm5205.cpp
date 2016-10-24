@@ -171,7 +171,7 @@ void msm5205_device::compute_tables()
 }
 
 /* timer callback at VCLK low edge on MSM5205 (at rising edge on MSM6585) */
-TIMER_CALLBACK_MEMBER( msm5205_device::vclk_callback )
+void msm5205_device::vclk_callback(void *ptr, int32_t param)
 {
 	int val;
 	int new_signal;

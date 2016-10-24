@@ -40,7 +40,7 @@ public:
 	virtual DECLARE_ADDRESS_MAP(z80_program_map, 8);
 
 	void par_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( mme_w );
+	void mme_w(int state);
 
 protected:
 	// device-level overrides

@@ -254,7 +254,7 @@ void hd44102_device::data_w(address_space &space, offs_t offset, uint8_t data, u
 //  cs2_w - chip select 2 write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( hd44102_device::cs2_w )
+void hd44102_device::cs2_w(int state)
 {
 	m_cs2 = state;
 }

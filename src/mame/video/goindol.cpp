@@ -17,7 +17,7 @@
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(goindol_state::get_fg_tile_info)
+void goindol_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_fg_videoram[2 * tile_index + 1];
 	int attr = m_fg_videoram[2 * tile_index];
@@ -27,7 +27,7 @@ TILE_GET_INFO_MEMBER(goindol_state::get_fg_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(goindol_state::get_bg_tile_info)
+void goindol_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_bg_videoram[2 * tile_index + 1];
 	int attr = m_bg_videoram[2 * tile_index];

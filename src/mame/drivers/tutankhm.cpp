@@ -65,7 +65,7 @@
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(tutankhm_state::tutankhm_interrupt)
+void tutankhm_state::tutankhm_interrupt(device_t &device)
 {
 	/* flip flops cause the interrupt to be signalled every other frame */
 	m_irq_toggle ^= 1;

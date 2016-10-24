@@ -36,7 +36,7 @@
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(toaplan2_state::get_text_tile_info)
+void toaplan2_state::get_text_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int color, tile_number, attrib;
 

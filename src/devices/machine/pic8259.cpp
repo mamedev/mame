@@ -140,7 +140,7 @@ uint32_t pic8259_device::acknowledge()
 }
 
 
-IRQ_CALLBACK_MEMBER(pic8259_device::inta_cb)
+int pic8259_device::inta_cb(device_t &device, int irqline)
 {
 	return acknowledge();
 }

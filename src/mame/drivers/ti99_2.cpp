@@ -105,7 +105,7 @@ public:
 	void init_ti99_2_32();
 	virtual void machine_reset() override;
 	uint32_t screen_update_ti99_2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(ti99_2_vblank_interrupt);
+	void ti99_2_vblank_interrupt(device_t &device);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -142,7 +142,7 @@ void ti99_2_state::machine_reset()
 	static_cast<tms9995_device*>(machine().device("maincpu"))->ready_line(CLEAR_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(ti99_2_state::ti99_2_vblank_interrupt)
+void ti99_2_state::ti99_2_vblank_interrupt(device_t &device)
 {
 	m_maincpu->set_input_line(INT_9995_INT1, m_irq_state);
 	m_irq_state = (m_irq_state == ASSERT_LINE) ? CLEAR_LINE : ASSERT_LINE;

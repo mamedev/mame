@@ -54,13 +54,13 @@ public:
 	void c1943_d806_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_1943b();
 	void init_1943();
-	TILE_GET_INFO_MEMBER(c1943_get_bg2_tile_info);
-	TILE_GET_INFO_MEMBER(c1943_get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(c1943_get_fg_tile_info);
+	void c1943_get_bg2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void c1943_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void c1943_get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(1943);
+	void palette_init_1943(palette_device &palette);
 	uint32_t screen_update_1943(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );
 };

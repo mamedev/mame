@@ -20,7 +20,7 @@
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(superqix_state::pb_get_bg_tile_info)
+void superqix_state::pb_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_videoram[tile_index + 0x400];
 	int code = m_videoram[tile_index] + 256 * (attr & 0x7);
@@ -28,7 +28,7 @@ TILE_GET_INFO_MEMBER(superqix_state::pb_get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(superqix_state::sqix_get_bg_tile_info)
+void superqix_state::sqix_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_videoram[tile_index + 0x400];
 	int bank = (attr & 0x04) ? 0 : 1;
@@ -67,7 +67,7 @@ void superqix_state::video_start_superqix()
 	save_item(NAME(*m_fg_bitmap[1]));
 }
 
-PALETTE_DECODER_MEMBER( superqix_state, BBGGRRII )
+rgb_t superqix_state::BBGGRRII_decoder(uint32_t raw)
 {
 	uint8_t i = raw & 3;
 	uint8_t r = (raw >> 0) & 0x0c;

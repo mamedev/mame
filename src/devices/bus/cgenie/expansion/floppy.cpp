@@ -159,7 +159,7 @@ uint8_t cgenie_fdc_device::irq_r(address_space &space, offs_t offset, uint8_t me
 	return data;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( cgenie_fdc_device::timer_callback )
+void cgenie_fdc_device::timer_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	m_irq_status |= IRQ_TIMER;
 	m_slot->int_w(ASSERT_LINE);
@@ -181,7 +181,7 @@ DEVICE_IMAGE_LOAD_MEMBER( cgenie_fdc_device, socket_load )
 	return image_init_result::PASS;
 }
 
-WRITE_LINE_MEMBER( cgenie_fdc_device::intrq_w )
+void cgenie_fdc_device::intrq_w(int state)
 {
 	if (VERBOSE)
 		logerror("cgenie_fdc_device::intrq_w: %d\n", state);

@@ -65,7 +65,7 @@ void inder_sb_device::update_sound_irqs(void)
 	else m_audiocpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(inder_sb_device::z80ctc_ch0)
+void inder_sb_device::z80ctc_ch0(int state)
 {
 //  int bank = m_soundbank[0] & 7;  membank("snddata")->set_entry(bank);
 //  m_audiocpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
@@ -76,7 +76,7 @@ WRITE_LINE_MEMBER(inder_sb_device::z80ctc_ch0)
 }
 
 
-WRITE_LINE_MEMBER(inder_sb_device::z80ctc_ch1)
+void inder_sb_device::z80ctc_ch1(int state)
 {
 //  int bank = m_soundbank[1] & 7;  membank("snddata")->set_entry(bank);
 //  m_audiocpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
@@ -87,7 +87,7 @@ WRITE_LINE_MEMBER(inder_sb_device::z80ctc_ch1)
 }
 
 
-WRITE_LINE_MEMBER(inder_sb_device::z80ctc_ch2)
+void inder_sb_device::z80ctc_ch2(int state)
 {
 //  int bank = m_soundbank[2] & 7;  membank("snddata")->set_entry(bank);
 //  m_audiocpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
@@ -100,7 +100,7 @@ WRITE_LINE_MEMBER(inder_sb_device::z80ctc_ch2)
 
 
 
-WRITE_LINE_MEMBER(inder_sb_device::z80ctc_ch3)
+void inder_sb_device::z80ctc_ch3(int state)
 {
 //  int bank = m_soundbank[3] & 7;  membank("snddata")->set_entry(bank);
 //  m_audiocpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);

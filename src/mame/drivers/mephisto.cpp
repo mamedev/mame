@@ -108,9 +108,9 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void machine_start_mm2();
-	TIMER_DEVICE_CALLBACK_MEMBER(update_nmi);
-	TIMER_DEVICE_CALLBACK_MEMBER(update_nmi_r5);
-	TIMER_DEVICE_CALLBACK_MEMBER(update_irq);
+	void update_nmi(timer_device &timer, void *ptr, int32_t param);
+	void update_nmi_r5(timer_device &timer, void *ptr, int32_t param);
+	void update_irq(timer_device &timer, void *ptr, int32_t param);
 
 protected:
 	required_ioport m_key1_0;
@@ -288,7 +288,7 @@ static INPUT_PORTS_START( mephisto )
 INPUT_PORTS_END
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(mephisto_state::update_nmi)
+void mephisto_state::update_nmi(timer_device &timer, void *ptr, int32_t param)
 {
 	if (m_allowNMI)
 	{
@@ -298,13 +298,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(mephisto_state::update_nmi)
 	m_beep->set_state(m_led_status&64?1:0);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(mephisto_state::update_nmi_r5)
+void mephisto_state::update_nmi_r5(timer_device &timer, void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI,PULSE_LINE);
 	m_beep->set_state(m_led_status&64?1:0);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(mephisto_state::update_irq)//only mm2
+void mephisto_state::update_irq(timer_device &timer, void *ptr, int32_t param)//only mm2
 {
 	m_maincpu->set_input_line(M65C02_IRQ_LINE, HOLD_LINE);
 

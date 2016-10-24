@@ -9,7 +9,7 @@
 #define RA_BGCHAR_BASE  4
 #define RA_SP_BASE  5
 
-TILE_GET_INFO_MEMBER(rollrace_state::get_fg_tile_info)
+void rollrace_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index];
 	int color = m_colorram[(tile_index & 0x1f)*2+1] & 0x1f;
@@ -61,7 +61,7 @@ void rollrace_state::cram_w(address_space &space, offs_t offset, uint8_t data, u
   bit 0 -- 1  kohm resistor  -- RED/GREEN/BLUE
 
 ***************************************************************************/
-PALETTE_INIT_MEMBER(rollrace_state, rollrace)
+void rollrace_state::palette_init_rollrace(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;

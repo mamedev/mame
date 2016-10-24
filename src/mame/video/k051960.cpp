@@ -235,7 +235,7 @@ void k051960_device::device_reset()
     DEVICE HANDLERS
 *****************************************************************************/
 
-TIMER_CALLBACK_MEMBER( k051960_device::scanline_callback )
+void k051960_device::scanline_callback(void *ptr, int32_t param)
 {
 	// range 0..255
 	uint8_t y = m_screen->vpos();

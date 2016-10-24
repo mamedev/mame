@@ -74,14 +74,14 @@ public:
 	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( vic_irq_w );
+	void vic_irq_w(int state);
 	uint8_t vic_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t vic_colorram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	uint8_t sid_potx_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t sid_poty_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( cia_irq_w );
+	void cia_irq_w(int state);
 	uint8_t cia_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t cia_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void cia_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -89,8 +89,8 @@ public:
 	uint8_t cpu_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void cpu_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( exp_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( exp_reset_w );
+	void exp_irq_w(int state);
+	void exp_reset_w(int state);
 
 	// interrupt state
 	int m_cia_irq;
@@ -370,7 +370,7 @@ INPUT_PORTS_END
 //  vic2_interface vic_intf
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( vic10_state::vic_irq_w )
+void vic10_state::vic_irq_w(int state)
 {
 	m_vic_irq = state;
 
@@ -441,7 +441,7 @@ uint8_t vic10_state::sid_poty_r(address_space &space, offs_t offset, uint8_t mem
 //  MOS6526_INTERFACE( cia_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( vic10_state::cia_irq_w )
+void vic10_state::cia_irq_w(int state)
 {
 	m_cia_irq = state;
 
@@ -619,14 +619,14 @@ void vic10_state::cpu_w(address_space &space, offs_t offset, uint8_t data, uint8
 //  VIC10_EXPANSION_INTERFACE( expansion_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( vic10_state::exp_irq_w )
+void vic10_state::exp_irq_w(int state)
 {
 	m_exp_irq = state;
 
 	check_interrupts();
 }
 
-WRITE_LINE_MEMBER( vic10_state::exp_reset_w )
+void vic10_state::exp_reset_w(int state)
 {
 	if (state == ASSERT_LINE)
 	{

@@ -148,7 +148,7 @@ public:
 	uint32_t itech020_video_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	DECLARE_CUSTOM_INPUT_MEMBER(special_port_r);
 	void drivedge_portb_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(drivedge_turbo_light);
+	void drivedge_turbo_light(int state);
 	void pia_portb_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void init_gtclasscp();
@@ -180,9 +180,9 @@ public:
 	void init_gt_common();
 
 	uint32_t screen_update_itech32(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(generate_int1);
-	TIMER_CALLBACK_MEMBER(delayed_sound_data_w);
-	TIMER_CALLBACK_MEMBER(scanline_interrupt);
+	void generate_int1(device_t &device);
+	void delayed_sound_data_w(void *ptr, int32_t param);
+	void scanline_interrupt(void *ptr, int32_t param);
 	inline offs_t compute_safe_address(int x, int y);
 	inline void disable_clipping();
 	inline void enable_clipping();

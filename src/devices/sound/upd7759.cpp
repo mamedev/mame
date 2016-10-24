@@ -743,7 +743,7 @@ void upd775x_device::postload()
 
 *************************************************************/
 
-WRITE_LINE_MEMBER( upd775x_device::reset_w )
+void upd775x_device::reset_w(int state)
 {
 	/* update the reset value */
 	uint8_t oldreset = m_reset;
@@ -757,7 +757,7 @@ WRITE_LINE_MEMBER( upd775x_device::reset_w )
 		device_reset();
 }
 
-WRITE_LINE_MEMBER( upd7759_device::start_w )
+void upd7759_device::start_w(int state)
 {
 	/* update the start value */
 	uint8_t oldstart = m_start;
@@ -779,7 +779,7 @@ WRITE_LINE_MEMBER( upd7759_device::start_w )
 	}
 }
 
-WRITE_LINE_MEMBER( upd7756_device::start_w )
+void upd7756_device::start_w(int state)
 {
 	/* update the start value */
 	uint8_t oldstart = m_start;
@@ -805,7 +805,7 @@ void upd775x_device::port_w(address_space &space, offs_t offset, uint8_t data, u
 }
 
 
-READ_LINE_MEMBER( upd775x_device::busy_r )
+int upd775x_device::busy_r()
 {
 	/* return /BUSY */
 	return (m_state == STATE_IDLE);

@@ -129,11 +129,11 @@ public:
 	uint8_t mac_5396_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void mac_5396_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER(irq_539x_1_w);
-	DECLARE_WRITE_LINE_MEMBER(drq_539x_1_w);
+	void irq_539x_1_w(int state);
+	void drq_539x_1_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(cuda_reset_w);
-	DECLARE_WRITE_LINE_MEMBER(cuda_adb_linechange_w);
+	void cuda_reset_w(int state);
+	void cuda_adb_linechange_w(int state);
 
 	// hack functions
 	uint64_t unk1_r(address_space &space, offs_t offset, uint64_t mem_mask = U64(0xffffffffffffffff));
@@ -150,14 +150,14 @@ private:
 public:
 	emu_timer *m_scanline_timer;
 	uint32_t screen_update_pippin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(mac_6015_tick);
+	void mac_6015_tick(void *ptr, int32_t param);
 	uint8_t mac_via_in_a(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t mac_via_in_b(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void mac_via_out_a(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void mac_via_out_b(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_READ_LINE_MEMBER(mac_adb_via_in_cb2);
-	DECLARE_WRITE_LINE_MEMBER(mac_adb_via_out_cb2);
-	DECLARE_WRITE_LINE_MEMBER(mac_via_irq);
+	int mac_adb_via_in_cb2();
+	void mac_adb_via_out_cb2(int state);
+	void mac_via_irq(int state);
 	void mac_driver_init(model_t model);
 };
 

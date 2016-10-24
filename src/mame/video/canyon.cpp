@@ -17,7 +17,7 @@ void canyon_state::canyon_videoram_w(address_space &space, offs_t offset, uint8_
 }
 
 
-TILE_GET_INFO_MEMBER(canyon_state::get_bg_tile_info)
+void canyon_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t code = m_videoram[tile_index];
 

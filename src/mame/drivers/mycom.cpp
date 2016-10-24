@@ -91,7 +91,7 @@ public:
 	uint8_t mycom_06_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t mycom_08_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void init_mycom();
-	TIMER_DEVICE_CALLBACK_MEMBER(mycom_kbd);
+	void mycom_kbd(timer_device &timer, void *ptr, int32_t param);
 	void mycom_rtc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	uint8_t *m_p_videoram;
@@ -436,7 +436,7 @@ static const uint8_t mycom_keyval[] = { 0,
 0x0d,0x0d,0x38,0x28,0x49,0x69,0x4b,0x6b,0x2c,0x3c,0x39,0x39,0x36,0x36,0x33,0x33,0x12,0x12,
 0x07,0x07,0x39,0x29,0x4f,0x6f,0x4c,0x6c,0x2e,0x3e,0x63,0x63,0x66,0x66,0x61,0x61,0x2f,0x3f };
 
-TIMER_DEVICE_CALLBACK_MEMBER(mycom_state::mycom_kbd)
+void mycom_state::mycom_kbd(timer_device &timer, void *ptr, int32_t param)
 {
 	uint8_t x, y, scancode = 0;
 	uint16_t pressed[9];

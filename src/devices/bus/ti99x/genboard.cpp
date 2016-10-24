@@ -1292,7 +1292,7 @@ void geneve_mapper_device::setoffset(address_space &space, offs_t offset)
     affect the video access itself but become effective after the access; if
     the code runs on the chip, these wait states are ignored.)
 */
-WRITE_LINE_MEMBER( geneve_mapper_device::clock_in )
+void geneve_mapper_device::clock_in(int state)
 {
 	if (state==ASSERT_LINE)
 	{
@@ -1348,7 +1348,7 @@ WRITE_LINE_MEMBER( geneve_mapper_device::clock_in )
 /*
     We need the DBIN line for the setoffset operation.
 */
-WRITE_LINE_MEMBER( geneve_mapper_device::dbin_in )
+void geneve_mapper_device::dbin_in(int state)
 {
 	m_read_mode = (state==ASSERT_LINE);
 	if (TRACE_DETAIL) logerror("dbin = %02x\n", m_read_mode? 1:0);
@@ -1357,21 +1357,21 @@ WRITE_LINE_MEMBER( geneve_mapper_device::dbin_in )
 /*
     PFM expansion: Setting the bank.
 */
-WRITE_LINE_MEMBER( geneve_mapper_device::pfm_select_lsb )
+void geneve_mapper_device::pfm_select_lsb(int state)
 {
 	if (state==ASSERT_LINE) m_pfm_bank |= 1;
 	else m_pfm_bank &= 0xfe;
 	if (TRACE_PFM) logerror("Setting bank (l) = %d\n", m_pfm_bank);
 }
 
-WRITE_LINE_MEMBER( geneve_mapper_device::pfm_select_msb )
+void geneve_mapper_device::pfm_select_msb(int state)
 {
 	if (state==ASSERT_LINE) m_pfm_bank |= 2;
 	else m_pfm_bank &= 0xfd;
 	if (TRACE_PFM) logerror("Setting bank (u) = %d\n", m_pfm_bank);
 }
 
-WRITE_LINE_MEMBER( geneve_mapper_device::pfm_output_enable )
+void geneve_mapper_device::pfm_output_enable(int state)
 {
 	// Negative logic
 	m_pfm_output_enable = (state==CLEAR_LINE);
@@ -1765,7 +1765,7 @@ void geneve_keyboard_device::signal_when_key_available()
 	}
 }
 
-WRITE_LINE_MEMBER( geneve_keyboard_device::clock_control )
+void geneve_keyboard_device::clock_control(int state)
 {
 	bool rising_edge = (!m_keyboard_clock && (state==ASSERT_LINE));
 	m_keyboard_clock = (state==ASSERT_LINE);
@@ -1774,7 +1774,7 @@ WRITE_LINE_MEMBER( geneve_keyboard_device::clock_control )
 		signal_when_key_available();
 }
 
-WRITE_LINE_MEMBER( geneve_keyboard_device::send_scancodes )
+void geneve_keyboard_device::send_scancodes(int state)
 {
 	bool rising_edge = (!m_keep_keybuf && (state==ASSERT_LINE));
 	bool falling_edge = (m_keep_keybuf && (state==CLEAR_LINE));
@@ -1797,7 +1797,7 @@ WRITE_LINE_MEMBER( geneve_keyboard_device::send_scancodes )
 	}
 }
 
-WRITE_LINE_MEMBER( geneve_keyboard_device::reset_line )
+void geneve_keyboard_device::reset_line(int state)
 {
 	m_key_reset = !(state==ASSERT_LINE);
 

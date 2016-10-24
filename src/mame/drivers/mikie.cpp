@@ -244,7 +244,7 @@ void mikie_state::machine_reset()
 	m_last_irq = 0;
 }
 
-INTERRUPT_GEN_MEMBER(mikie_state::vblank_irq)
+void mikie_state::vblank_irq(device_t &device)
 {
 	if(m_irq_mask)
 		device.execute().set_input_line(0, HOLD_LINE);

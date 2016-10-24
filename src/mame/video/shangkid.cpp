@@ -6,7 +6,7 @@
 #include "includes/shangkid.h"
 
 
-TILE_GET_INFO_MEMBER(shangkid_state::get_bg_tile_info){
+void shangkid_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){
 	int attributes = m_videoram[tile_index+0x800];
 	int tile_number = m_videoram[tile_index]+0x100*(attributes&0x3);
 	int color;
@@ -190,7 +190,7 @@ uint32_t shangkid_state::screen_update_shangkid(screen_device &screen, bitmap_in
 }
 
 
-PALETTE_INIT_MEMBER(shangkid_state,dynamski)
+void shangkid_state::palette_init_dynamski(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;

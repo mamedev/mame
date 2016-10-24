@@ -60,19 +60,19 @@ public:
 	void v_heed_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void color_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	TILE_GET_INFO_MEMBER(get_tile_info1);
-	TILE_GET_INFO_MEMBER(get_tile_info2);
+	void get_tile_info1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
-	INTERRUPT_GEN_MEMBER(nmi_source);
-	TIMER_CALLBACK_MEMBER(mcu_real_data_r);
-	TIMER_CALLBACK_MEMBER(mcu_real_data_w);
-	TIMER_CALLBACK_MEMBER(mcu_data_real_r);
-	TIMER_CALLBACK_MEMBER(mcu_status_real_w);
+	void nmi_source(device_t &device);
+	void mcu_real_data_r(void *ptr, int32_t param);
+	void mcu_real_data_w(void *ptr, int32_t param);
+	void mcu_data_real_r(void *ptr, int32_t param);
+	void mcu_status_real_w(void *ptr, int32_t param);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(pitnrun);
+	void palette_init_pitnrun(palette_device &palette);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void spotlights();

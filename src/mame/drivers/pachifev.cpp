@@ -110,7 +110,7 @@ public:
 	uint8_t controls_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	INTERRUPT_GEN_MEMBER(pachifev_vblank_irq);
+	void pachifev_vblank_irq(device_t &device);
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -254,7 +254,7 @@ INPUT_PORTS_END
 #if USE_MSM
 
 
-WRITE_LINE_MEMBER(pachifev_state::pf_adpcm_int)
+void pachifev_state::pf_adpcm_int(int state)
 {
 	if (m_adpcm_pos >= 0x4000 || m_adpcm_idle)
 	{
@@ -298,7 +298,7 @@ void pachifev_state::machine_reset()
 }
 
 
-INTERRUPT_GEN_MEMBER(pachifev_state::pachifev_vblank_irq)
+void pachifev_state::pachifev_vblank_irq(device_t &device)
 {
 	{
 		static const char *const inname[2] = { "PLUNGER_P1", "PLUNGER_P2" };

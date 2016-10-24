@@ -78,9 +78,9 @@ public:
 	void machine_reset_tickee();
 	void video_start_tickee();
 	void machine_reset_rapidfir();
-	TIMER_CALLBACK_MEMBER(trigger_gun_interrupt);
-	TIMER_CALLBACK_MEMBER(clear_gun_interrupt);
-	TIMER_CALLBACK_MEMBER(setup_gun_interrupts);
+	void trigger_gun_interrupt(void *ptr, int32_t param);
+	void clear_gun_interrupt(void *ptr, int32_t param);
+	void setup_gun_interrupts(void *ptr, int32_t param);
 
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(rapidfir_to_shiftreg);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(rapidfir_from_shiftreg);
@@ -138,7 +138,7 @@ void tickee_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 }
 
 
-TIMER_CALLBACK_MEMBER(tickee_state::trigger_gun_interrupt)
+void tickee_state::trigger_gun_interrupt(void *ptr, int32_t param)
 {
 	int which = param & 1;
 	int beamx = (m_screen->hpos()/2)-58;
@@ -151,14 +151,14 @@ TIMER_CALLBACK_MEMBER(tickee_state::trigger_gun_interrupt)
 }
 
 
-TIMER_CALLBACK_MEMBER(tickee_state::clear_gun_interrupt)
+void tickee_state::clear_gun_interrupt(void *ptr, int32_t param)
 {
 	/* clear the IRQ on the next scanline? */
 	m_maincpu->set_input_line(param, CLEAR_LINE);
 }
 
 
-TIMER_CALLBACK_MEMBER(tickee_state::setup_gun_interrupts)
+void tickee_state::setup_gun_interrupts(void *ptr, int32_t param)
 {
 	int beamx, beamy;
 

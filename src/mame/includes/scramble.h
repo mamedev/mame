@@ -91,7 +91,7 @@ public:
 	void init_billiard();
 	void machine_reset_scramble();
 	void machine_reset_explorer();
-	DECLARE_WRITE_LINE_MEMBER(scramble_sh_7474_q_callback);
+	void scramble_sh_7474_q_callback(int state);
 	void cavelon_banksw();
 	inline int bit(int i,int n);
 	uint8_t mariner_protection_1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
@@ -105,7 +105,7 @@ public:
 	void sh_init();
 	void scramble_sh_irqtrigger_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void mrkougar_sh_irqtrigger_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	IRQ_CALLBACK_MEMBER( scramble_sh_irq_callback );
+	int scramble_sh_irq_callback(device_t &device, int irqline);
 };
 
 /*----------- defined in audio/scramble.c -----------*/

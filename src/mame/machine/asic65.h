@@ -32,7 +32,7 @@ public:
 	uint16_t m68k_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void stat_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	uint16_t stat_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
-	DECLARE_READ_LINE_MEMBER( get_bio );
+	int get_bio();
 
 	enum
 	{

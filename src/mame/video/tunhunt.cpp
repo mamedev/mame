@@ -56,7 +56,7 @@ void tunhunt_state::videoram_w(address_space &space, offs_t offset, uint8_t data
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(tunhunt_state::get_fg_tile_info)
+void tunhunt_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_videoram[tile_index];
 	int code = attr & 0x3f;
@@ -84,7 +84,7 @@ void tunhunt_state::video_start()
 	save_item(NAME(m_control));
 }
 
-PALETTE_INIT_MEMBER(tunhunt_state, tunhunt)
+void tunhunt_state::palette_init_tunhunt(palette_device &palette)
 {
 	/* Tunnel Hunt uses a combination of color proms and palette RAM to specify a 16 color
 	 * palette.  Here, we manage only the mappings for alphanumeric characters and SHELL

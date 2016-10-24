@@ -71,13 +71,13 @@ public:
 	void init_radioram();
 	void init_radio86();
 	void machine_reset_radio86();
-	DECLARE_PALETTE_INIT(radio86);
+	void palette_init_radio86(palette_device &palette);
 	uint8_t radio86_8255_portb_r2(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t radio86_8255_portc_r2(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void radio86_8255_porta_w2(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void radio86_8255_portc_w2(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t rk7007_8255_portc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(hrq_w);
+	void hrq_w(int state);
 	uint8_t radio86rom_romdisk_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t radio86ram_romdisk_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void radio86_romdisk_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);

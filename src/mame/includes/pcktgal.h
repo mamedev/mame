@@ -37,10 +37,10 @@ public:
 	void sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void adpcm_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t adpcm_reset_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
+	void adpcm_int(int state);
 
 	void init_pcktgal();
-	DECLARE_PALETTE_INIT(pcktgal);
+	void palette_init_pcktgal(palette_device &palette);
 	virtual void machine_start() override;
 
 	uint32_t screen_update_pcktgal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

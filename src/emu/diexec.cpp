@@ -604,7 +604,7 @@ void device_execute_interface::interface_clock_changed()
 //  to the debugger
 //-------------------------------------------------
 
-IRQ_CALLBACK_MEMBER( device_execute_interface::standard_irq_callback_member )
+int device_execute_interface::standard_irq_callback_member(device_t &device, int irqline)
 {
 	return device.execute().standard_irq_callback(irqline);
 }
@@ -652,7 +652,7 @@ attoseconds_t device_execute_interface::minimum_quantum() const
 //  trigger
 //-------------------------------------------------
 
-TIMER_CALLBACK_MEMBER( device_execute_interface::timed_trigger_callback )
+void device_execute_interface::timed_trigger_callback(void *ptr, int32_t param)
 {
 	trigger(param);
 }
@@ -683,7 +683,7 @@ void device_execute_interface::on_vblank(screen_device &screen, bool vblank_stat
 //  callback for timed interrupts
 //-------------------------------------------------
 
-TIMER_CALLBACK_MEMBER(device_execute_interface::trigger_periodic_interrupt)
+void device_execute_interface::trigger_periodic_interrupt(void *ptr, int32_t param)
 {
 	// bail if there is no routine
 	if (!suspended(SUSPEND_REASON_HALT | SUSPEND_REASON_RESET | SUSPEND_REASON_DISABLE | SUSPEND_REASON_CLOCK))
@@ -797,7 +797,7 @@ if (TEMPLOG) printf("setline(%s,%d,%d,%d)\n", m_execute->device().tag(), m_linen
 //  empty_event_queue - empty our event queue
 //-------------------------------------------------
 
-TIMER_CALLBACK_MEMBER(device_execute_interface::device_input::empty_event_queue)
+void device_execute_interface::device_input::empty_event_queue(void *ptr, int32_t param)
 {
 if (TEMPLOG) printf("empty_queue(%s,%d,%d)\n", m_execute->device().tag(), m_linenum, m_qindex);
 	// loop over all events

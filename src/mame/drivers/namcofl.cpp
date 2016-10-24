@@ -522,38 +522,38 @@ static GFXDECODE_START( 2 )
 GFXDECODE_END
 
 
-TIMER_CALLBACK_MEMBER(namcofl_state::network_interrupt_callback)
+void namcofl_state::network_interrupt_callback(void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(I960_IRQ0, ASSERT_LINE);
 	machine().scheduler().timer_set(m_screen->frame_period(), timer_expired_delegate(FUNC(namcofl_state::network_interrupt_callback),this));
 }
 
 
-TIMER_CALLBACK_MEMBER(namcofl_state::vblank_interrupt_callback)
+void namcofl_state::vblank_interrupt_callback(void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(I960_IRQ2, ASSERT_LINE);
 	machine().scheduler().timer_set(m_screen->frame_period(), timer_expired_delegate(FUNC(namcofl_state::vblank_interrupt_callback),this));
 }
 
 
-TIMER_CALLBACK_MEMBER(namcofl_state::raster_interrupt_callback)
+void namcofl_state::raster_interrupt_callback(void *ptr, int32_t param)
 {
 	m_screen->update_partial(m_screen->vpos());
 	m_maincpu->set_input_line(I960_IRQ1, ASSERT_LINE);
 	m_raster_interrupt_timer->adjust(m_screen->frame_period());
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(namcofl_state::mcu_irq0_cb)
+void namcofl_state::mcu_irq0_cb(timer_device &timer, void *ptr, int32_t param)
 {
 	m_mcu->set_input_line(M37710_LINE_IRQ0, HOLD_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(namcofl_state::mcu_irq2_cb)
+void namcofl_state::mcu_irq2_cb(timer_device &timer, void *ptr, int32_t param)
 {
 	m_mcu->set_input_line(M37710_LINE_IRQ2, HOLD_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(namcofl_state::mcu_adc_cb)
+void namcofl_state::mcu_adc_cb(timer_device &timer, void *ptr, int32_t param)
 {
 	m_mcu->set_input_line(M37710_LINE_ADC, HOLD_LINE);
 }

@@ -36,9 +36,9 @@ public:
 	virtual ioport_constructor device_input_ports() const override;
 
 	// not really public
-	DECLARE_READ_LINE_MEMBER( rd_r );
-	DECLARE_READ_LINE_MEMBER( bd_r );
-	DECLARE_READ_LINE_MEMBER( gd_r );
+	int rd_r();
+	int bd_r();
+	int gd_r();
 
 protected:
 	// device-level overrides

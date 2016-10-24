@@ -72,7 +72,7 @@ public:
 
 	// host interface
 	void sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(reset_w);
+	void reset_w(int state);
 
 	// PSG output handlers
 	void melodypsg1_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -93,8 +93,8 @@ public:
 
 	// host interface
 	void hs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_READ_LINE_MEMBER(acs_r);
-	DECLARE_WRITE_LINE_MEMBER(ressound_w);
+	int acs_r();
+	void ressound_w(int state);
 
 	// melody section handlers
 	void ay_4g_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -107,7 +107,7 @@ public:
 	void pia_1i_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// input ports don't push
-	INTERRUPT_GEN_MEMBER(input_poll);
+	void input_poll(device_t &device);
 
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;

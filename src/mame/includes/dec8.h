@@ -131,16 +131,16 @@ public:
 	void init_lastmisn();
 	void init_gondo();
 	void init_oscar();
-	TILE_GET_INFO_MEMBER(get_cobracom_fix_tile_info);
-	TILE_GET_INFO_MEMBER(get_ghostb_fix_tile_info);
-	TILE_GET_INFO_MEMBER(get_oscar_fix_tile_info);
-	TILEMAP_MAPPER_MEMBER(lastmisn_scan_rows);
-	TILE_GET_INFO_MEMBER(get_lastmisn_tile_info);
-	TILE_GET_INFO_MEMBER(get_lastmisn_fix_tile_info);
-	TILE_GET_INFO_MEMBER(get_srdarwin_fix_tile_info);
-	TILE_GET_INFO_MEMBER(get_srdarwin_tile_info);
-	TILE_GET_INFO_MEMBER(get_gondo_fix_tile_info);
-	TILE_GET_INFO_MEMBER(get_gondo_tile_info);
+	void get_cobracom_fix_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_ghostb_fix_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_oscar_fix_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	tilemap_memory_index lastmisn_scan_rows(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	void get_lastmisn_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_lastmisn_fix_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_srdarwin_fix_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_srdarwin_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_gondo_fix_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_gondo_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void video_start_lastmisn();
@@ -148,7 +148,7 @@ public:
 	void video_start_gondo();
 	void video_start_garyoret();
 	void video_start_ghostb();
-	DECLARE_PALETTE_INIT(ghostb);
+	void palette_init_ghostb(palette_device &palette);
 	void video_start_oscar();
 	void video_start_srdarwin();
 	void video_start_cobracom();
@@ -161,10 +161,10 @@ public:
 	uint32_t screen_update_srdarwin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cobracom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_dec8(screen_device &screen, bool state);
-	INTERRUPT_GEN_MEMBER(gondo_interrupt);
-	INTERRUPT_GEN_MEMBER(oscar_interrupt);
+	void gondo_interrupt(device_t &device);
+	void oscar_interrupt(device_t &device);
 	void srdarwin_draw_sprites(  bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );
-	DECLARE_WRITE_LINE_MEMBER(csilver_adpcm_int);
+	void csilver_adpcm_int(int state);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;

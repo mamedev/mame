@@ -177,7 +177,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(controls_r);
 	void init_ssingles();
 	virtual void video_start() override;
-	INTERRUPT_GEN_MEMBER(atamanot_irq);
+	void atamanot_irq(device_t &device);
 	MC6845_UPDATE_ROW(ssingles_update_row);
 	MC6845_UPDATE_ROW(atamanot_update_row);
 	required_device<cpu_device> m_maincpu;
@@ -565,7 +565,7 @@ static MACHINE_CONFIG_START( ssingles, ssingles_state )
 
 MACHINE_CONFIG_END
 
-INTERRUPT_GEN_MEMBER(ssingles_state::atamanot_irq)
+void ssingles_state::atamanot_irq(device_t &device)
 {
 	// ...
 }

@@ -107,13 +107,13 @@ void jailbrek_state::coin_w(address_space &space, offs_t offset, uint8_t data, u
 	machine().bookkeeping().coin_counter_w(1, data & 0x02);
 }
 
-INTERRUPT_GEN_MEMBER(jailbrek_state::interrupt)
+void jailbrek_state::interrupt(device_t &device)
 {
 	if (m_irq_enable)
 		device.execute().set_input_line(0, HOLD_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(jailbrek_state::interrupt_nmi)
+void jailbrek_state::interrupt_nmi(device_t &device)
 {
 	if (m_nmi_enable)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);

@@ -142,8 +142,8 @@ public:
 	void video_start_midyunit_6bit();
 	void video_start_mkyawdim();
 	void video_start_common();
-	TIMER_CALLBACK_MEMBER(dma_callback);
-	TIMER_CALLBACK_MEMBER(autoerase_line);
+	void dma_callback(void *ptr, int32_t param);
+	void autoerase_line(void *ptr, int32_t param);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;

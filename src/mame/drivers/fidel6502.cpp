@@ -417,8 +417,8 @@ public:
 	optional_device<i8255_device> m_ppi8255;
 	optional_device<generic_slot_device> m_cart;
 
-	TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE); }
-	TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE); }
+	void irq_on(timer_device &timer, void *ptr, int32_t param) { m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE); }
+	void irq_off(timer_device &timer, void *ptr, int32_t param) { m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE); }
 
 	// CSC, SU9, RSC
 	void csc_prepare_display();
@@ -426,14 +426,14 @@ public:
 	void csc_pia0_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void csc_pia0_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t csc_pia0_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(csc_pia0_ca2_w);
+	void csc_pia0_ca2_w(int state);
 	void csc_pia1_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void csc_pia1_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t csc_pia1_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(csc_pia1_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(csc_pia1_cb2_w);
-	DECLARE_READ_LINE_MEMBER(csc_pia1_ca1_r);
-	DECLARE_READ_LINE_MEMBER(csc_pia1_cb1_r);
+	void csc_pia1_ca2_w(int state);
+	void csc_pia1_cb2_w(int state);
+	int csc_pia1_ca1_r();
+	int csc_pia1_cb1_r();
 
 	// EAS, EAG
 	void eas_prepare_display();
@@ -538,7 +538,7 @@ uint8_t fidel6502_state::csc_pia0_pb_r(address_space &space, offs_t offset, uint
 	return data;
 }
 
-WRITE_LINE_MEMBER(fidel6502_state::csc_pia0_ca2_w)
+void fidel6502_state::csc_pia0_ca2_w(int state)
 {
 	// printer?
 }
@@ -566,26 +566,26 @@ void fidel6502_state::csc_pia1_pb_w(address_space &space, offs_t offset, uint8_t
 	csc_prepare_display();
 }
 
-READ_LINE_MEMBER(fidel6502_state::csc_pia1_ca1_r)
+int fidel6502_state::csc_pia1_ca1_r()
 {
 	// button row 6 (active low)
 	return ~read_inputs(9) >> 6 & 1;
 }
 
-READ_LINE_MEMBER(fidel6502_state::csc_pia1_cb1_r)
+int fidel6502_state::csc_pia1_cb1_r()
 {
 	// button row 7 (active low)
 	return ~read_inputs(9) >> 7 & 1;
 }
 
-WRITE_LINE_MEMBER(fidel6502_state::csc_pia1_cb2_w)
+void fidel6502_state::csc_pia1_cb2_w(int state)
 {
 	// 7442 A2
 	m_led_select = (m_led_select & ~4) | (state ? 4 : 0);
 	csc_prepare_display();
 }
 
-WRITE_LINE_MEMBER(fidel6502_state::csc_pia1_ca2_w)
+void fidel6502_state::csc_pia1_ca2_w(int state)
 {
 	// 7442 A3
 	m_led_select = (m_led_select & ~8) | (state ? 8 : 0);

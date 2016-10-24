@@ -24,7 +24,7 @@ public:
 	void pia2c_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void pia2c_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void pia34_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(pia40_ca2_w);
+	void pia40_ca2_w(int state);
 
 	void bg_speech_clock_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void bg_speech_digit_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);

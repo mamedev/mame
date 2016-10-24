@@ -12,7 +12,7 @@
 *   color prom decoding
 */
 
-PALETTE_INIT_MEMBER(fortyl_state, fortyl)
+void fortyl_state::palette_init_fortyl(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -64,7 +64,7 @@ colorram format (2 bytes per one tilemap character line, 8 pixels height):
     offset 1    xxxx xxxx   x scroll (8 LSB bits)
 */
 
-TILE_GET_INFO_MEMBER(fortyl_state::get_bg_tile_info)
+void fortyl_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile_number = m_videoram[tile_index];
 	int tile_attrib = m_colorram[(tile_index / 64) * 2];

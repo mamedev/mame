@@ -223,7 +223,7 @@ void bbc_acorn1770_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-WRITE_LINE_MEMBER(bbc_acorn8271_device::motor_w)
+void bbc_acorn8271_device::motor_w(int state)
 {
 	for (int i = 0; i != 2; i++) {
 		char devname[8];
@@ -235,7 +235,7 @@ WRITE_LINE_MEMBER(bbc_acorn8271_device::motor_w)
 	}
 }
 
-WRITE_LINE_MEMBER(bbc_acorn8271_device::side_w)
+void bbc_acorn8271_device::side_w(int state)
 {
 	for (int i = 0; i != 2; i++) {
 		char devname[8];
@@ -247,7 +247,7 @@ WRITE_LINE_MEMBER(bbc_acorn8271_device::side_w)
 	}
 }
 
-WRITE_LINE_MEMBER(bbc_acorn8271_device::fdc_intrq_w)
+void bbc_acorn8271_device::fdc_intrq_w(int state)
 {
 	m_slot->intrq_w(state);
 }
@@ -280,12 +280,12 @@ void bbc_acorn1770_device::wd1770l_write(address_space &space, offs_t offset, ui
 	if (!BIT(data, 5)) m_fdc->soft_reset();
 }
 
-WRITE_LINE_MEMBER(bbc_acorn1770_device::fdc_intrq_w)
+void bbc_acorn1770_device::fdc_intrq_w(int state)
 {
 	m_slot->intrq_w(state);
 }
 
-WRITE_LINE_MEMBER(bbc_acorn1770_device::fdc_drq_w)
+void bbc_acorn1770_device::fdc_drq_w(int state)
 {
 	m_slot->drq_w(state);
 }

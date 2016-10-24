@@ -363,13 +363,13 @@ void pdc_device::device_reset()
 //  I8237 DMA
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(pdc_device::i8237_hreq_w)
+void pdc_device::i8237_hreq_w(int state)
 {
 	m_pdccpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 	m_dma8237->hack_w(state);
 }
 
-WRITE_LINE_MEMBER(pdc_device::i8237_eop_w)
+void pdc_device::i8237_eop_w(int state)
 {
 	m_fdc->tc_w(state);
 	reg_p38 |= 4; /* ready for 68k ram DMA */
@@ -417,12 +417,12 @@ void pdc_device::m68k_dma_w(address_space &space, offs_t offset, uint8_t data, u
 	fdd_68k_dma_address++;
 }
 
-WRITE_LINE_MEMBER(pdc_device::hdd_irq)
+void pdc_device::hdd_irq(int state)
 {
 	m_pdccpu->set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);
 }
 
-WRITE_LINE_MEMBER(pdc_device::fdc_irq)
+void pdc_device::fdc_irq(int state)
 {
 	b_fdc_irq = state != 0;
 }

@@ -26,7 +26,7 @@ public:
 	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( reset_w );
+	void reset_w(int state);
 
 protected:
 	// device-level overrides
@@ -84,7 +84,7 @@ protected:
 private:
 
 	void pic_register_state();
-	TIMER_CALLBACK_MEMBER( reset_timer );
+	void reset_timer(void *ptr, int32_t param);
 
 	uint16_t  m_latch;
 	attotime m_latch_expire_time;
@@ -131,12 +131,12 @@ public:
 	void fifo_full_w(uint16_t data);
 	void output_w(uint32_t data);
 
-	DECLARE_WRITE_LINE_MEMBER(fifo_reset_w);
+	void fifo_reset_w(int state);
 	uint16_t fifo_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	uint16_t fifo_status_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE_LINE_MEMBER(ioasic_input_empty);
-	DECLARE_WRITE_LINE_MEMBER(ioasic_output_full);
+	void ioasic_input_empty(int state);
+	void ioasic_output_full(int state);
 
 	uint32_t read(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	void write(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);

@@ -189,7 +189,7 @@ void atari_cage_device::reset_w(int state)
  *
  *************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER( atari_cage_device::dma_timer_callback )
+void atari_cage_device::dma_timer_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	uint32_t *tms32031_io_regs = m_tms32031_io_regs;
 
@@ -275,7 +275,7 @@ void atari_cage_device::update_dma_state(address_space &space)
  *
  *************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER( atari_cage_device::cage_timer_callback )
+void atari_cage_device::cage_timer_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	int which = param;
 	/* set the interrupt */
@@ -510,7 +510,7 @@ uint16_t atari_cage_device::main_r()
 }
 
 
-TIMER_CALLBACK_MEMBER( atari_cage_device::cage_deferred_w )
+void atari_cage_device::cage_deferred_w(void *ptr, int32_t param)
 {
 	m_from_main = param;
 	m_cpu_to_cage_ready = 1;

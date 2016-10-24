@@ -221,7 +221,7 @@ ADDRESS_MAP_END
 
 */
 
-WRITE_LINE_MEMBER( luxor_55_21046_device::dma_int_w )
+void luxor_55_21046_device::dma_int_w(int state)
 {
 	m_dma_irq = state;
 
@@ -262,7 +262,7 @@ static SLOT_INTERFACE_START( abc_floppies )
 	SLOT_INTERFACE( "8dsdd", FLOPPY_8_DSDD )
 SLOT_INTERFACE_END
 
-WRITE_LINE_MEMBER( luxor_55_21046_device::fdc_intrq_w )
+void luxor_55_21046_device::fdc_intrq_w(int state)
 {
 	m_fdc_irq = state;
 

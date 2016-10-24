@@ -49,9 +49,9 @@ private:
 	k007342_delegate m_callback;
 	int m_gfxnum;
 
-	TILEMAP_MAPPER_MEMBER(scan);
-	TILE_GET_INFO_MEMBER(get_tile_info0);
-	TILE_GET_INFO_MEMBER(get_tile_info1);
+	tilemap_memory_index scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	void get_tile_info0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void get_tile_info( tile_data &tileinfo, int tile_index, int layer, uint8_t *cram, uint8_t *vram );
 };
 

@@ -249,7 +249,7 @@
  * The rate should be at about 1 Hz
  *************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(lazercmd_state::lazercmd_timer)
+void lazercmd_state::lazercmd_timer(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -264,7 +264,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(lazercmd_state::lazercmd_timer)
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(lazercmd_state::bbonk_timer)
+void lazercmd_state::bbonk_timer(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -589,7 +589,7 @@ static GFXDECODE_START( lazercmd )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 2 )
 GFXDECODE_END
 
-PALETTE_INIT_MEMBER(lazercmd_state, lazercmd)
+void lazercmd_state::palette_init_lazercmd(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(0xb0, 0xb0, 0xb0)); /* white */
 	palette.set_pen_color(1, rgb_t(0x00, 0x00, 0x00)); /* black */

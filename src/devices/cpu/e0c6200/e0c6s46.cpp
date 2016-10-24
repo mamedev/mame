@@ -375,7 +375,7 @@ uint8_t e0c6s46_device::read_p(uint8_t port)
 //  timers
 //-------------------------------------------------
 
-TIMER_CALLBACK_MEMBER(e0c6s46_device::core_256_cb)
+void e0c6s46_device::core_256_cb(void *ptr, int32_t param)
 {
 	// clock-timer, stopwatch timer, and some features of the buzzer all run
 	// from the same internal 256hz timer (64 ticks high+low at default clock of 32768hz)
@@ -495,7 +495,7 @@ bool e0c6s46_device::prgtimer_reset_prescaler()
 	return (sel >= 2);
 }
 
-TIMER_CALLBACK_MEMBER(e0c6s46_device::prgtimer_cb)
+void e0c6s46_device::prgtimer_cb(void *ptr, int32_t param)
 {
 	// check if it's clocked by osc1, schedule next timeout
 	if (!prgtimer_reset_prescaler())
@@ -531,7 +531,7 @@ void e0c6s46_device::schedule_buzzer()
 	m_buzzer_handle->adjust(attotime::from_ticks(m_bz_pulse ? high : low, mul * unscaled_clock()));
 }
 
-TIMER_CALLBACK_MEMBER(e0c6s46_device::buzzer_cb)
+void e0c6s46_device::buzzer_cb(void *ptr, int32_t param)
 {
 	// invert pulse wave and write to output
 	m_bz_pulse ^= 1;

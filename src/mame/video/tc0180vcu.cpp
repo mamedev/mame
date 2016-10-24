@@ -213,7 +213,7 @@ void tc0180vcu_device::ctrl_w(address_space &space, offs_t offset, uint16_t data
 	}
 }
 
-TILE_GET_INFO_MEMBER(tc0180vcu_device::get_bg_tile_info)
+void tc0180vcu_device::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile  = m_ram[tile_index + m_bg_rambank[0]];
 	int color = m_ram[tile_index + m_bg_rambank[1]];
@@ -223,7 +223,7 @@ TILE_GET_INFO_MEMBER(tc0180vcu_device::get_bg_tile_info)
 		TILE_FLIPYX((color & 0x00c0) >> 6));
 }
 
-TILE_GET_INFO_MEMBER(tc0180vcu_device::get_fg_tile_info)
+void tc0180vcu_device::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile  = m_ram[tile_index + m_fg_rambank[0]];
 	int color = m_ram[tile_index + m_fg_rambank[1]];
@@ -233,7 +233,7 @@ TILE_GET_INFO_MEMBER(tc0180vcu_device::get_fg_tile_info)
 		TILE_FLIPYX((color & 0x00c0) >> 6));
 }
 
-TILE_GET_INFO_MEMBER(tc0180vcu_device::get_tx_tile_info)
+void tc0180vcu_device::get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = m_ram[tile_index + m_tx_rambank];
 

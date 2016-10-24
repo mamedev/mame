@@ -66,10 +66,10 @@ public:
 	void vram_sc1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void vram_sc2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void vram_sc3_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	TILE_GET_INFO_MEMBER(get_sc0_tileinfo);
-	TILE_GET_INFO_MEMBER(get_sc1_tileinfo);
-	TILE_GET_INFO_MEMBER(get_sc2_tileinfo);
-	TILE_GET_INFO_MEMBER(get_sc3_tileinfo);
+	void get_sc0_tileinfo(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_sc1_tileinfo(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_sc2_tileinfo(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_sc3_tileinfo(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 protected:
 	// driver_device overrides
@@ -82,7 +82,7 @@ private:
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect);
 };
 
-TILE_GET_INFO_MEMBER(seicupbl_state::get_sc0_tileinfo)
+void seicupbl_state::get_sc0_tileinfo(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile=m_back_data[tile_index];
 	int color=(tile>>12)&0xf;
@@ -93,7 +93,7 @@ TILE_GET_INFO_MEMBER(seicupbl_state::get_sc0_tileinfo)
 	SET_TILE_INFO_MEMBER(1,tile,color,0);
 }
 
-TILE_GET_INFO_MEMBER(seicupbl_state::get_sc1_tileinfo)
+void seicupbl_state::get_sc1_tileinfo(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile=m_mid_data[tile_index];
 	int color=(tile>>12)&0xf;
@@ -106,7 +106,7 @@ TILE_GET_INFO_MEMBER(seicupbl_state::get_sc1_tileinfo)
 	SET_TILE_INFO_MEMBER(1,tile,color,0);
 }
 
-TILE_GET_INFO_MEMBER(seicupbl_state::get_sc2_tileinfo)
+void seicupbl_state::get_sc2_tileinfo(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile=m_fore_data[tile_index];
 	int color=(tile>>12)&0xf;
@@ -116,7 +116,7 @@ TILE_GET_INFO_MEMBER(seicupbl_state::get_sc2_tileinfo)
 	SET_TILE_INFO_MEMBER(4,tile,color,0);
 }
 
-TILE_GET_INFO_MEMBER(seicupbl_state::get_sc3_tileinfo)
+void seicupbl_state::get_sc3_tileinfo(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = m_textram[tile_index];
 	int color=(tile>>12)&0xf;

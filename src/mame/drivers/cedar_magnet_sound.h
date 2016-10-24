@@ -33,14 +33,14 @@ public:
 	void write_command(uint8_t data);
 	uint8_t m_command;
 
-	DECLARE_WRITE_LINE_MEMBER(ctc1_z0_w);
-	DECLARE_WRITE_LINE_MEMBER(ctc1_z1_w);
-	DECLARE_WRITE_LINE_MEMBER(ctc1_z2_w);
-	DECLARE_WRITE_LINE_MEMBER(ctc0_z0_w);
-	DECLARE_WRITE_LINE_MEMBER(ctc0_z1_w);
-	DECLARE_WRITE_LINE_MEMBER(ctc0_z2_w);
-	DECLARE_WRITE_LINE_MEMBER(ctc0_int_w);
-	DECLARE_WRITE_LINE_MEMBER(ctc1_int_w);
+	void ctc1_z0_w(int state);
+	void ctc1_z1_w(int state);
+	void ctc1_z2_w(int state);
+	void ctc0_z0_w(int state);
+	void ctc0_z1_w(int state);
+	void ctc0_z2_w(int state);
+	void ctc0_int_w(int state);
+	void ctc1_int_w(int state);
 
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;

@@ -19,7 +19,7 @@
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(m52_state, m52)
+void m52_state::palette_init_m52(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	const uint8_t *char_pal = color_prom + 0x000;
@@ -115,7 +115,7 @@ PALETTE_INIT_MEMBER(m52_state, m52)
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(m52_state::get_tile_info)
+void m52_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t video = m_videoram[tile_index];
 	uint8_t color = m_colorram[tile_index];

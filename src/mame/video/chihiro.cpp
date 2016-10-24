@@ -4409,7 +4409,7 @@ void nv2a_renderer::geforce_assign_object(address_space & space, uint32_t chanel
 	channel[chanel][subchannel].object.objclass = objclass;
 }
 
-TIMER_CALLBACK_MEMBER(nv2a_renderer::puller_timer_work)
+void nv2a_renderer::puller_timer_work(void *ptr, int32_t param)
 {
 	int chanel;
 	int method, count;

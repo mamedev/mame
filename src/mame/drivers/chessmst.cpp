@@ -59,7 +59,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(chessmst_sensor);
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 	DECLARE_INPUT_CHANGED_MEMBER(view_monitor_button);
-	DECLARE_WRITE_LINE_MEMBER( timer_555_w );
+	void timer_555_w(int state);
 
 private:
 	void update_display();
@@ -93,7 +93,7 @@ static ADDRESS_MAP_START( chessmstdm_io , AS_IO, 8, chessmst_state)
 	AM_RANGE(0x4c, 0x4c) AM_WRITE(digits_w)
 ADDRESS_MAP_END
 
-WRITE_LINE_MEMBER( chessmst_state::timer_555_w )
+void chessmst_state::timer_555_w(int state)
 {
 	m_pia2->strobe_b(state);
 	m_pia2->data_b_write(m_matrix);

@@ -76,7 +76,7 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 #define BG_NX  (16*32)
 #define BG_NY  (16*2)
 
-TILE_GET_INFO_MEMBER(ginganin_state::get_bg_tile_info)
+void ginganin_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *gfx = memregion("gfx5")->base();
 	int code = gfx[2 * tile_index + 0] * 256 + gfx[2 * tile_index + 1];
@@ -93,7 +93,7 @@ TILE_GET_INFO_MEMBER(ginganin_state::get_bg_tile_info)
 #define FG_NX  (16*16)
 #define FG_NY  (16*2)
 
-TILE_GET_INFO_MEMBER(ginganin_state::get_fg_tile_info)
+void ginganin_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = m_fgram[tile_index];
 	SET_TILE_INFO_MEMBER(FG_GFX,
@@ -115,7 +115,7 @@ void ginganin_state::ginganin_fgram16_w(address_space &space, offs_t offset, uin
 #define TXT_NX  (32)
 #define TXT_NY  (32)
 
-TILE_GET_INFO_MEMBER(ginganin_state::get_txt_tile_info)
+void ginganin_state::get_txt_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = m_txtram[tile_index];
 	SET_TILE_INFO_MEMBER(TXT_GFX,

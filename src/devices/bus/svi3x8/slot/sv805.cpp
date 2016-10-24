@@ -103,7 +103,7 @@ void sv805_device::iorq_w(address_space &space, offs_t offset, uint8_t data, uin
 	}
 }
 
-WRITE_LINE_MEMBER( sv805_device::uart_intr_w )
+void sv805_device::uart_intr_w(int state)
 {
 	m_bus->int_w(state);
 }

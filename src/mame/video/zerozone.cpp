@@ -23,7 +23,7 @@ void zerozone_state::tilebank_w(address_space &space, offs_t offset, uint16_t da
 	m_zz_tilemap->mark_all_dirty();
 }
 
-TILE_GET_INFO_MEMBER(zerozone_state::get_zerozone_tile_info)
+void zerozone_state::get_zerozone_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno = m_vram[tile_index] & 0x07ff;
 	int colour = m_vram[tile_index] & 0xf000;

@@ -450,7 +450,7 @@ void c1pmf_state::osi470_pia_pb_w(address_space &space, offs_t offset, uint8_t d
 	*/
 }
 
-WRITE_LINE_MEMBER( c1pmf_state::osi470_pia_cb2_w )
+void c1pmf_state::osi470_pia_cb2_w(int state)
 {
 }
 
@@ -618,7 +618,7 @@ INPUT_PORTS_END
 
 /* Machine Start */
 
-WRITE_LINE_MEMBER( sb2m600_state::write_cassette_clock )
+void sb2m600_state::write_cassette_clock(int state)
 {
 	m_acia_0->write_rxd((m_cassette->input() > 0.0) ? 1 : 0);
 
@@ -626,7 +626,7 @@ WRITE_LINE_MEMBER( sb2m600_state::write_cassette_clock )
 	m_acia_0->write_rxc(state);
 }
 
-WRITE_LINE_MEMBER( sb2m600_state::cassette_tx )
+void sb2m600_state::cassette_tx(int state)
 {
 	m_cassette->output(state ? +1.0 : -1.0);
 }

@@ -34,8 +34,8 @@ public:
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	DECLARE_WRITE_LINE_MEMBER( fdc_irq );
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq );
+	void fdc_irq(int state);
+	void fdc_drq(int state);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 protected:

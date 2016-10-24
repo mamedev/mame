@@ -168,7 +168,7 @@ void upd71071_device::device_start()
 
 
 
-TIMER_CALLBACK_MEMBER(upd71071_device::dma_transfer_timer)
+void upd71071_device::dma_transfer_timer(void *ptr, int32_t param)
 {
 	// single byte or word transfer
 	int channel = param;
@@ -498,7 +498,7 @@ void upd71071_device::write(address_space &space, offs_t offset, uint8_t data, u
 	}
 }
 
-WRITE_LINE_MEMBER(upd71071_device::set_hreq)
+void upd71071_device::set_hreq(int state)
 {
 	if (m_hreq != state)
 	{
@@ -507,7 +507,7 @@ WRITE_LINE_MEMBER(upd71071_device::set_hreq)
 	}
 }
 
-WRITE_LINE_MEMBER(upd71071_device::set_eop)
+void upd71071_device::set_eop(int state)
 {
 	if (m_eop != state)
 	{

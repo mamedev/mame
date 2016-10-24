@@ -43,7 +43,7 @@
             220 ohm
             100 ohm
 */
-PALETTE_INIT_MEMBER(tp84_state, tp84)
+void tp84_state::palette_init_tp84(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances[4] = { 1000, 470, 220, 100 };
@@ -119,7 +119,7 @@ uint8_t tp84_state::tp84_scanline_r(address_space &space, offs_t offset, uint8_t
 }
 
 
-TILE_GET_INFO_MEMBER(tp84_state::get_bg_tile_info)
+void tp84_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = ((m_bg_colorram[tile_index] & 0x30) << 4) | m_bg_videoram[tile_index];
 	int color = ((*m_palette_bank & 0x07) << 6) |
@@ -130,7 +130,7 @@ TILE_GET_INFO_MEMBER(tp84_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, flags);
 }
 
-TILE_GET_INFO_MEMBER(tp84_state::get_fg_tile_info)
+void tp84_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = ((m_fg_colorram[tile_index] & 0x30) << 4) | m_fg_videoram[tile_index];
 	int color = ((*m_palette_bank & 0x07) << 6) |

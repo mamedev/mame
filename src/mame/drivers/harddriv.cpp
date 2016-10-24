@@ -512,8 +512,8 @@ public:
 		, m_rightpcb(*this, "rightpcb")
 	{ }
 
-	TIMER_DEVICE_CALLBACK_MEMBER(hack_timer);
-	DECLARE_WRITE_LINE_MEMBER(tx_a);
+	void hack_timer(timer_device &timer, void *ptr, int32_t param);
+	void tx_a(int state);
 
 	required_device<harddriv_state> m_mainpcb;
 	optional_device<harddriv_state> m_leftpcb;
@@ -1406,7 +1406,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(harddriv_state::video_int_gen)
+void harddriv_state::video_int_gen(device_t &device)
 {
 	m_video_int_state = 1;
 	update_interrupts();
@@ -1670,7 +1670,7 @@ static MACHINE_CONFIG_FRAGMENT( racedrivc_panorama_side )
 //  MCFG_DEVICE_ADD("sound_board", HARDDRIV_SOUND_BOARD_DEVICE, 0)      /* driver sound board */
 MACHINE_CONFIG_END
 
-WRITE_LINE_MEMBER(harddriv_state::sound_int_write_line)
+void harddriv_state::sound_int_write_line(int state)
 {
 	m_sound_int_state = state;
 	update_interrupts();
@@ -2007,7 +2007,7 @@ static MACHINE_CONFIG_START( steeltalp_machine, harddriv_new_state )
 	MCFG_DEVICE_ADD("mainpcb", STEELTALP_BOARD_DEVICE, 0)
 MACHINE_CONFIG_END
 
-WRITE_LINE_MEMBER(harddriv_new_state::tx_a)
+void harddriv_new_state::tx_a(int state)
 {
 	// passive connection, one way, to both screens
 	m_leftpcb->get_duart()->rx_a_w(state);
@@ -2033,7 +2033,7 @@ MACHINE_CONFIG_END
 
 // this is an ugly hack, otherwise MAME's core can't seem to handle partial updates if you have multiple screens with different update frequencies.
 // by forcing them to stay in sync using this ugly method everything works much better.
-TIMER_DEVICE_CALLBACK_MEMBER(harddriv_new_state::hack_timer)
+void harddriv_new_state::hack_timer(timer_device &timer, void *ptr, int32_t param)
 {
 	m_leftpcb->get_screen()->reset_origin(0, 0);
 	m_mainpcb->get_screen()->reset_origin(0, 0);

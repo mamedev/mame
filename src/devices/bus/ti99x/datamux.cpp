@@ -460,7 +460,7 @@ void ti99_datamux_device::setoffset(address_space &space, offs_t offset)
     The datamux is connected to the clock line in order to operate
     the wait state counter and to read/write the bytes.
 */
-WRITE_LINE_MEMBER( ti99_datamux_device::clock_in )
+void ti99_datamux_device::clock_in(int state)
 {
 	// return immediately if the datamux is currently inactive
 	if (m_waitcount>0)
@@ -525,13 +525,13 @@ void ti99_datamux_device::ready_join()
 	m_ready((m_sysready==CLEAR_LINE || m_muxready==CLEAR_LINE)? CLEAR_LINE : ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER( ti99_datamux_device::dbin_in )
+void ti99_datamux_device::dbin_in(int state)
 {
 	m_dbin = (line_state)state;
 	if (TRACE_ADDRESS) logerror("data bus in = %d\n", (m_dbin==ASSERT_LINE)? 1:0 );
 }
 
-WRITE_LINE_MEMBER( ti99_datamux_device::ready_line )
+void ti99_datamux_device::ready_line(int state)
 {
 	if (TRACE_READY)
 	{
@@ -543,7 +543,7 @@ WRITE_LINE_MEMBER( ti99_datamux_device::ready_line )
 }
 
 /* Called from VDP via console. */
-WRITE_LINE_MEMBER( ti99_datamux_device::gromclk_in )
+void ti99_datamux_device::gromclk_in(int state)
 {
 	// Don't propagate the clock in idle phase
 	if (m_grom_idle) return;

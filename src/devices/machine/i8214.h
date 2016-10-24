@@ -57,9 +57,9 @@ public:
 	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<i8214_device &>(device).m_write_irq.set_callback(object); }
 	template<class _Object> static devcb_base &set_enlg_wr_callback(device_t &device, _Object object) { return downcast<i8214_device &>(device).m_write_enlg.set_callback(object); }
 
-	DECLARE_WRITE_LINE_MEMBER( sgs_w );
-	DECLARE_WRITE_LINE_MEMBER( etlg_w );
-	DECLARE_WRITE_LINE_MEMBER( inte_w );
+	void sgs_w(int state);
+	void etlg_w(int state);
+	void inte_w(int state);
 
 	uint8_t a_r();
 	void b_w(uint8_t data);

@@ -32,7 +32,7 @@ public:
 	// construction/destruction
 	electron_m2105_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE_LINE_MEMBER(intrq_w);
+	void intrq_w(int state);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;

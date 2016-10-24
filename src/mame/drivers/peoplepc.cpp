@@ -49,11 +49,11 @@ public:
 	MC6845_UPDATE_ROW(update_row);
 	uint8_t get_slave_ack(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void charram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	DECLARE_WRITE_LINE_MEMBER(tty_clock_tick_w);
-	DECLARE_WRITE_LINE_MEMBER(kbd_clock_tick_w);
+	void tty_clock_tick_w(int state);
+	void kbd_clock_tick_w(int state);
 	void dmapg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(tc_w);
-	DECLARE_WRITE_LINE_MEMBER(hrq_w);
+	void tc_w(int state);
+	void hrq_w(int state);
 	uint8_t memory_read_byte(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void memory_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
@@ -117,13 +117,13 @@ void peoplepc_state::charram_w(address_space &space, offs_t offset, uint16_t dat
 	m_gfxdecode->gfx(0)->mark_dirty(offset/16);
 }
 
-WRITE_LINE_MEMBER(peoplepc_state::tty_clock_tick_w)
+void peoplepc_state::tty_clock_tick_w(int state)
 {
 	m_8251ser->write_txc(state);
 	m_8251ser->write_rxc(state);
 }
 
-WRITE_LINE_MEMBER(peoplepc_state::kbd_clock_tick_w)
+void peoplepc_state::kbd_clock_tick_w(int state)
 {
 	m_8251key->write_txc(state);
 	m_8251key->write_rxc(state);
@@ -134,12 +134,12 @@ void peoplepc_state::dmapg_w(address_space &space, offs_t offset, uint8_t data, 
 	m_dma0pg = data;
 }
 
-WRITE_LINE_MEMBER(peoplepc_state::tc_w)
+void peoplepc_state::tc_w(int state)
 {
 	m_fdc->tc_w(state);
 }
 
-WRITE_LINE_MEMBER(peoplepc_state::hrq_w)
+void peoplepc_state::hrq_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state);
 	m_dmac->hlda_w(state);

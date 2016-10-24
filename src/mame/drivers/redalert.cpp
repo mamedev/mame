@@ -109,7 +109,7 @@
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(redalert_state::redalert_vblank_interrupt)
+void redalert_state::redalert_vblank_interrupt(device_t &device)
 {
 	if( ioport("COIN")->read() )
 		/* the service coin as conntected to the CPU's RDY pin as well */

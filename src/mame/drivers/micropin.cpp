@@ -43,14 +43,14 @@ public:
 	void pia51_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t p51b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void sol_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(p50ca2_w);
+	void p50ca2_w(int state);
 	void sw_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void lamp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void p50a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void p50b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void p51a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_micropin();
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_a);
+	void timer_a(timer_device &timer, void *ptr, int32_t param);
 private:
 	uint8_t m_row;
 	uint8_t m_counter;
@@ -206,7 +206,7 @@ void micropin_state::p50b_w(address_space &space, offs_t offset, uint8_t data, u
 }
 
 // round LEDs on score panel
-WRITE_LINE_MEMBER( micropin_state::p50ca2_w )
+void micropin_state::p50ca2_w(int state)
 {
 	if ((!state) && (m_row < 8))
 	{
@@ -235,7 +235,7 @@ uint8_t micropin_state::p51b_r(address_space &space, offs_t offset, uint8_t mem_
 	return ioport("X0")->read();
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( micropin_state::timer_a )
+void micropin_state::timer_a(timer_device &timer, void *ptr, int32_t param)
 {
 	// turn off beeper if it has timed out
 

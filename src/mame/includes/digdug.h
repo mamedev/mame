@@ -19,11 +19,11 @@ public:
 	uint8_t m_bg_disable;
 	uint8_t m_bg_color_bank;
 	DECLARE_CUSTOM_INPUT_MEMBER(shifted_port_r);
-	TILEMAP_MAPPER_MEMBER(tilemap_scan);
-	TILE_GET_INFO_MEMBER(bg_get_tile_info);
-	TILE_GET_INFO_MEMBER(tx_get_tile_info);
+	tilemap_memory_index tilemap_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	void bg_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void tx_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void video_start_digdug();
-	DECLARE_PALETTE_INIT(digdug);
+	void palette_init_digdug(palette_device &palette);
 	uint32_t screen_update_digdug(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void digdug_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);

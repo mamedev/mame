@@ -35,7 +35,7 @@ public:
 
 	// not really public
 	MC6845_UPDATE_ROW( crtc_update_row );
-	DECLARE_WRITE_LINE_MEMBER( vsync_w );
+	void vsync_w(int state);
 
 protected:
 	// device-level overrides

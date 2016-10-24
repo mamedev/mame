@@ -482,7 +482,7 @@ uint8_t itech8_state::slikshot_z80_control_r(address_space &space, offs_t offset
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER( itech8_state::delayed_z80_control_w )
+void itech8_state::delayed_z80_control_w(void *ptr, int32_t param)
 {
 	int data = param;
 

@@ -333,12 +333,12 @@ void d9060_base_t::via_pb_w(address_space &space, offs_t offset, uint8_t data, u
 	m_sasibus->write_rst(BIT(data, 1));
 }
 
-WRITE_LINE_MEMBER( d9060_base_t::ack_w )
+void d9060_base_t::ack_w(int state)
 {
 	m_sasibus->write_ack(!state);
 }
 
-WRITE_LINE_MEMBER( d9060_base_t::enable_w )
+void d9060_base_t::enable_w(int state)
 {
 	m_enable = state;
 

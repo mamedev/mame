@@ -343,13 +343,13 @@ GFXDECODE_END
 
 
 
-INTERRUPT_GEN_MEMBER(kchamp_state::kc_interrupt)
+void kchamp_state::kc_interrupt(device_t &device)
 {
 	if (m_nmi_enable)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-WRITE_LINE_MEMBER(kchamp_state::msmint)
+void kchamp_state::msmint(int state)
 {
 	if (m_msm_play_lo_nibble)
 		m_msm->data_w(m_msm_data & 0x0f);
@@ -369,7 +369,7 @@ WRITE_LINE_MEMBER(kchamp_state::msmint)
 * 1 Player Version  *
 ********************/
 
-INTERRUPT_GEN_MEMBER(kchamp_state::sound_int)
+void kchamp_state::sound_int(device_t &device)
 {
 	if (m_sound_nmi_enable)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);

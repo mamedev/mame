@@ -894,7 +894,7 @@ void konamigx_state::konamigx_mixer_draw(screen_device &screen, bitmap_rgb32 &bi
 
 
 /* Run and Gun 2 / Rushing Heroes */
-TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac_tile_info)
+void konamigx_state::get_gx_psac_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno, colour, col, flip = 0;
 	if (tile_index&1)
@@ -939,7 +939,7 @@ void konamigx_state::konamigx_type3_psac2_bank_w(address_space &space, offs_t of
 
 
 /* Soccer Superstars (tile and flip bits now TRUSTED) */
-TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac3_tile_info)
+void konamigx_state::get_gx_psac3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 	{
 	int tileno, colour, flip;
 	uint8_t *tmap = memregion("gfx4")->base();
@@ -960,7 +960,7 @@ TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac3_tile_info)
 	SET_TILE_INFO_MEMBER(0, tileno, colour, flip);
 	}
 
-TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac3_alt_tile_info)
+void konamigx_state::get_gx_psac3_alt_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 	{
 	int tileno, colour, flip;
 	uint8_t *tmap = memregion("gfx4")->base()+0x20000;
@@ -985,7 +985,7 @@ TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac3_alt_tile_info)
 /* PSAC4 */
 /* these tilemaps are weird in both format and content, one of them
    doesn't really look like it should be displayed? - it's height data */
-TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac1a_tile_info)
+void konamigx_state::get_gx_psac1a_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno, colour, flipx,flipy;
 	int flip;
@@ -1007,7 +1007,7 @@ TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac1a_tile_info)
 	SET_TILE_INFO_MEMBER(1, tileno, colour, flip);
 }
 
-TILE_GET_INFO_MEMBER(konamigx_state::get_gx_psac1b_tile_info)
+void konamigx_state::get_gx_psac1b_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno, colour, flipx,flipy;
 	int flip;

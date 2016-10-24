@@ -145,8 +145,8 @@ public:
 	virtual void machine_reset() override;
 	uint32_t screen_update_pockstat(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_INPUT_CHANGED_MEMBER(input_update);
-	TIMER_CALLBACK_MEMBER(timer_tick);
-	TIMER_CALLBACK_MEMBER(rtc_tick);
+	void timer_tick(void *ptr, int32_t param);
+	void rtc_tick(void *ptr, int32_t param);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( pockstat_flash );
 	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
 	uint32_t ps_intc_get_interrupt_line(uint32_t line);
@@ -420,7 +420,7 @@ void pockstat_state::ps_intc_w(address_space &space, offs_t offset, uint32_t dat
 	}
 }
 
-TIMER_CALLBACK_MEMBER(pockstat_state::timer_tick)
+void pockstat_state::timer_tick(void *ptr, int32_t param)
 {
 	ps_intc_set_interrupt_line(param == 2 ? PS_INT_TIMER2 : (param == 1 ? PS_INT_TIMER1 : PS_INT_TIMER0), 1);
 	//printf( "Timer %d is calling back\n", param );
@@ -557,7 +557,7 @@ void pockstat_state::ps_clock_w(address_space &space, offs_t offset, uint32_t da
 	}
 }
 
-TIMER_CALLBACK_MEMBER(pockstat_state::rtc_tick)
+void pockstat_state::rtc_tick(void *ptr, int32_t param)
 {
 	//printf( "RTC is calling back\n" );
 	ps_intc_set_interrupt_line(PS_INT_RTC, ps_intc_get_interrupt_line(PS_INT_RTC) ? 0 : 1);

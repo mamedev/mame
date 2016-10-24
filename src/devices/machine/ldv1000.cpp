@@ -344,7 +344,7 @@ int32_t pioneer_ldv1000_device::player_update(const vbi_metadata &vbi, int field
 //  an interrupt in the daisy chain
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( pioneer_ldv1000_device::ctc_interrupt )
+void pioneer_ldv1000_device::ctc_interrupt(int state)
 {
 	m_z80_cpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }

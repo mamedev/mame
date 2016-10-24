@@ -96,8 +96,8 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_xexex(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(dmaend_callback);
-	TIMER_DEVICE_CALLBACK_MEMBER(xexex_interrupt);
+	void dmaend_callback(void *ptr, int32_t param);
+	void xexex_interrupt(timer_device &timer, void *ptr, int32_t param);
 	void xexex_postload();
 	void xexex_objdma( int limiter );
 	void parse_control2(  );

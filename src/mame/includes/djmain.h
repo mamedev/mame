@@ -65,8 +65,8 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_djmain(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vb_interrupt);
-	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
+	void vb_interrupt(device_t &device);
+	void ide_interrupt(int state);
 	void sndram_set_bank();
 	void draw_sprites( bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;

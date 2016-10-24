@@ -22,7 +22,7 @@
 #include "includes/konamipt.h"
 #include "includes/bottom9.h"
 
-INTERRUPT_GEN_MEMBER(bottom9_state::bottom9_interrupt)
+void bottom9_state::bottom9_interrupt(device_t &device)
 {
 	if (m_k052109->is_irq_enabled())
 		device.execute().set_input_line(0, HOLD_LINE);
@@ -131,7 +131,7 @@ void bottom9_state::bottom9_sh_irqtrigger_w(address_space &space, offs_t offset,
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 }
 
-INTERRUPT_GEN_MEMBER(bottom9_state::bottom9_sound_interrupt)
+void bottom9_state::bottom9_sound_interrupt(device_t &device)
 {
 	if (m_nmienable)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);

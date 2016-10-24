@@ -31,7 +31,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(espial_state, espial)
+void espial_state::palette_init_espial(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -68,7 +68,7 @@ PALETTE_INIT_MEMBER(espial_state, espial)
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(espial_state::get_tile_info)
+void espial_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t code = m_videoram[tile_index];
 	uint8_t col = m_colorram[tile_index];

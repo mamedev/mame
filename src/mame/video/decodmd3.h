@@ -35,7 +35,7 @@ public:
 	void crtc_address_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void crtc_register_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	uint16_t crtc_status_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
-	TIMER_DEVICE_CALLBACK_MEMBER(dmd_irq);
+	void dmd_irq(timer_device &timer, void *ptr, int32_t param);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
 	static void static_set_gfxregion(device_t &device, const char *tag);

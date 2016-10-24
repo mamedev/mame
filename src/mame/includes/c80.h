@@ -41,7 +41,7 @@ public:
 	uint8_t pio1_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void pio1_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void pio1_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( pio1_brdy_w );
+	void pio1_brdy_w(int state);
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
 	DECLARE_INPUT_CHANGED_MEMBER( trigger_nmi );
 

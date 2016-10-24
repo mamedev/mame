@@ -36,8 +36,8 @@ public:
 	virtual ioport_constructor device_input_ports() const override;
 
 	// not really public
-	DECLARE_WRITE_LINE_MEMBER( pic_int_w );
-	DECLARE_WRITE_LINE_MEMBER( rtc_tp_w );
+	void pic_int_w(int state);
+	void rtc_tp_w(int state);
 
 protected:
 	// device-level overrides

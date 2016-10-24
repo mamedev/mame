@@ -76,7 +76,7 @@ void taito8741_4pack_device::serial_rx(I8741 *st,uint8_t *data)
 }
 
 /* timer callback of serial tx finish */
-TIMER_CALLBACK_MEMBER( taito8741_4pack_device::serial_tx )
+void taito8741_4pack_device::serial_tx(void *ptr, int32_t param)
 {
 	int num = param;
 	I8741 *st = &m_taito8741[num];
@@ -394,7 +394,7 @@ void josvolly8741_4pack_device::device_reset()
 }
 
 /* transmit data finish callback */
-TIMER_CALLBACK_MEMBER( josvolly8741_4pack_device::tx )
+void josvolly8741_4pack_device::tx(void *ptr, int32_t param)
 {
 	int num = param;
 	JV8741 *src = &m_i8741[num];

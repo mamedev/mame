@@ -115,7 +115,7 @@ void foodf_state::update_interrupts()
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(foodf_state::scanline_update_timer)
+void foodf_state::scanline_update_timer(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

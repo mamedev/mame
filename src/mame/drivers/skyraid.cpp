@@ -13,7 +13,7 @@ Atari Sky Raider driver
 
 
 
-PALETTE_INIT_MEMBER(skyraid_state, skyraid)
+void skyraid_state::palette_init_skyraid(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(0x00, 0x00, 0x00));   /* terrain */
 	palette.set_pen_color(1, rgb_t(0x18, 0x18, 0x18));

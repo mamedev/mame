@@ -65,19 +65,19 @@ public:
 	virtual void machine_start() override;
 	uint32_t screen_update_mz700(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_mz800(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(ne556_cursor_callback);
-	TIMER_DEVICE_CALLBACK_MEMBER(ne556_other_callback);
-	DECLARE_WRITE_LINE_MEMBER(pit_out0_changed);
-	DECLARE_WRITE_LINE_MEMBER(pit_irq_2);
+	void ne556_cursor_callback(timer_device &timer, void *ptr, int32_t param);
+	void ne556_other_callback(timer_device &timer, void *ptr, int32_t param);
+	void pit_out0_changed(int state);
+	void pit_irq_2(int state);
 	uint8_t pio_port_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t pio_port_c_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void pio_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void pio_port_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(mz800_z80pio_irq);
+	void mz800_z80pio_irq(int state);
 	uint8_t mz800_z80pio_port_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void mz800_z80pio_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
+	void write_centronics_busy(int state);
+	void write_centronics_perror(int state);
 
 private:
 	int m_mz700;                /* 1 if running on an mz700 */

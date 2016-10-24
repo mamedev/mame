@@ -58,9 +58,9 @@ public:
 	void z80_2_ldp_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_istellar();
 	virtual void machine_start() override;
-	DECLARE_PALETTE_INIT(istellar);
+	void palette_init_istellar(palette_device &palette);
 	uint32_t screen_update_istellar(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vblank_callback_istellar);
+	void vblank_callback_istellar(device_t &device);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_subcpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -275,7 +275,7 @@ static INPUT_PORTS_START( istellar )
 	/* SERVICE might be hanging out back here */
 INPUT_PORTS_END
 
-PALETTE_INIT_MEMBER(istellar_state, istellar)
+void istellar_state::palette_init_istellar(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -327,7 +327,7 @@ static GFXDECODE_START( istellar )
 	GFXDECODE_ENTRY( "gfx1", 0, istellar_gfx_layout, 0x0, 0x20 )
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(istellar_state::vblank_callback_istellar)
+void istellar_state::vblank_callback_istellar(device_t &device)
 {
 	/* Interrupt presumably comes from VBlank */
 	device.execute().set_input_line(0, HOLD_LINE);

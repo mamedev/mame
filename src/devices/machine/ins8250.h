@@ -30,11 +30,11 @@ public:
 
 	void ins8250_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t ins8250_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( dcd_w );
-	DECLARE_WRITE_LINE_MEMBER( dsr_w );
-	DECLARE_WRITE_LINE_MEMBER( ri_w );
-	DECLARE_WRITE_LINE_MEMBER( cts_w );
-	DECLARE_WRITE_LINE_MEMBER( rx_w );
+	void dcd_w(int state);
+	void dsr_w(int state);
+	void ri_w(int state);
+	void cts_w(int state);
+	void rx_w(int state);
 
 protected:
 	virtual void device_start() override;

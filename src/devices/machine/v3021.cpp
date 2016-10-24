@@ -38,7 +38,7 @@ v3021_device::v3021_device(const machine_config &mconfig, const char *tag, devic
 {
 }
 
-TIMER_CALLBACK_MEMBER(v3021_device::timer_callback)
+void v3021_device::timer_callback(void *ptr, int32_t param)
 {
 	static const uint8_t dpm[12] = { 0x31, 0x28, 0x31, 0x30, 0x31, 0x30, 0x31, 0x31, 0x30, 0x31, 0x30, 0x31 };
 	int dpm_count;

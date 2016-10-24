@@ -50,7 +50,7 @@ void pbaction_state::pbaction_flipscreen_w(address_space &space, offs_t offset, 
 	flip_screen_set(data & 0x01);
 }
 
-TILE_GET_INFO_MEMBER(pbaction_state::get_bg_tile_info)
+void pbaction_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_colorram[tile_index];
 	int code = m_videoram[tile_index] + 0x10 * (attr & 0x70);
@@ -60,7 +60,7 @@ TILE_GET_INFO_MEMBER(pbaction_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(1, code, color, flags);
 }
 
-TILE_GET_INFO_MEMBER(pbaction_state::get_fg_tile_info)
+void pbaction_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_colorram2[tile_index];
 	int code = m_videoram2[tile_index] + 0x10 * (attr & 0x30);

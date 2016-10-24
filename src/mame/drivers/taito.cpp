@@ -69,9 +69,9 @@ public:
 	void io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t pia_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void pia_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(pia_cb2_w);
-	DECLARE_WRITE_LINE_MEMBER(votrax_request);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_a);
+	void pia_cb2_w(int state);
+	void votrax_request(int state);
+	void timer_a(timer_device &timer, void *ptr, int32_t param);
 private:
 	uint8_t m_out_offs;
 	uint8_t m_sndcmd;
@@ -281,7 +281,7 @@ void taito_state::io_w(address_space &space, offs_t offset, uint8_t data, uint8_
 	}
 }
 
-WRITE_LINE_MEMBER( taito_state::pia_cb2_w )
+void taito_state::pia_cb2_w(int state)
 {
 	address_space& space = m_maincpu->space(AS_PROGRAM);
 	m_votrax->write(space, 0, m_votrax_cmd);
@@ -297,7 +297,7 @@ void taito_state::pia_pb_w(address_space &space, offs_t offset, uint8_t data, ui
 	m_votrax_cmd = data;
 }
 
-WRITE_LINE_MEMBER( taito_state::votrax_request )
+void taito_state::votrax_request(int state)
 {
 	m_pia->ca1_w(state ? 0 : 1);
 }
@@ -310,7 +310,7 @@ void taito_state::init_taito()
 {
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( taito_state::timer_a )
+void taito_state::timer_a(timer_device &timer, void *ptr, int32_t param)
 {
 	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // don't know, 7446 assumed
 	m_out_offs &= 15;

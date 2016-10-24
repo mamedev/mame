@@ -70,10 +70,10 @@ public:
 	void sndcmd_lapbylap_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void lamp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { };
 	void disp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(vck_w);
-	DECLARE_WRITE_LINE_MEMBER(qc7a_w);
-	DECLARE_WRITE_LINE_MEMBER(q9a_w);
-	DECLARE_WRITE_LINE_MEMBER(qc9b_w);
+	void vck_w(int state);
+	void qc7a_w(int state);
+	void q9a_w(int state);
+	void qc9b_w(int state);
 	void init_inder();
 	void init_inder1();
 private:
@@ -1234,7 +1234,7 @@ void inder_state::sndbank_w(address_space &space, offs_t offset, uint8_t data, u
 			m_sound_addr = (m_sound_addr & 0x0ffff) | (i << 16);
 }
 
-WRITE_LINE_MEMBER( inder_state::vck_w )
+void inder_state::vck_w(int state)
 {
 	m_9a->clock_w(0);
 	m_9b->clock_w(0);
@@ -1252,19 +1252,19 @@ WRITE_LINE_MEMBER( inder_state::vck_w )
 		m_msm->data_w(0);
 }
 
-WRITE_LINE_MEMBER( inder_state::qc7a_w )
+void inder_state::qc7a_w(int state)
 {
 	m_msm->reset_w(state);
 	m_9a->clear_w(!state);
 	m_9b->clear_w(!state);
 }
 
-WRITE_LINE_MEMBER( inder_state::q9a_w )
+void inder_state::q9a_w(int state)
 {
 	m_pc0 = state;
 }
 
-WRITE_LINE_MEMBER( inder_state::qc9b_w )
+void inder_state::qc9b_w(int state)
 {
 	m_9a->d_w(state);
 	m_9b->d_w(state);

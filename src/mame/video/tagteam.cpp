@@ -34,7 +34,7 @@ static const res_net_decode_info tagteam_decode_info =
 	{  0x07, 0x07, 0x03 }  /* masks */
 };
 
-PALETTE_INIT_MEMBER(tagteam_state, tagteam)
+void tagteam_state::palette_init_tagteam(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	std::vector<rgb_t> rgb;
@@ -127,7 +127,7 @@ void tagteam_state::flipscreen_w(address_space &space, offs_t offset, uint8_t da
 	machine().bookkeeping().coin_counter_w(1, data & 0x40);
 }
 
-TILE_GET_INFO_MEMBER(tagteam_state::get_bg_tile_info)
+void tagteam_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index] + 256 * m_colorram[tile_index];
 	int color = m_palettebank << 1;

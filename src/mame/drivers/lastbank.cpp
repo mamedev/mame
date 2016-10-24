@@ -67,7 +67,7 @@ public:
 
 	uint8_t ram_bank_r(uint16_t offset, uint8_t bank_num);
 	void ram_bank_w(uint16_t offset, uint8_t data, uint8_t bank_num);
-	TIMER_DEVICE_CALLBACK_MEMBER(lastbank_irq_scanline);
+	void lastbank_irq_scanline(timer_device &timer, void *ptr, int32_t param);
 };
 
 void lastbank_state::video_start()
@@ -436,7 +436,7 @@ static GFXDECODE_START( lastbank )
 	GFXDECODE_ENTRY( "gfx1",        0, sp2_layout, 0, 16 )
 GFXDECODE_END
 
-TIMER_DEVICE_CALLBACK_MEMBER(lastbank_state::lastbank_irq_scanline)
+void lastbank_state::lastbank_irq_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

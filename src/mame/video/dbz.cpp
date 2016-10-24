@@ -43,7 +43,7 @@ void dbz_state::dbz_bg2_videoram_w(address_space &space, offs_t offset, uint16_t
 	m_bg2_tilemap->mark_tile_dirty(offset / 2);
 }
 
-TILE_GET_INFO_MEMBER(dbz_state::get_dbz_bg2_tile_info)
+void dbz_state::get_dbz_bg2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno, colour, flag;
 
@@ -60,7 +60,7 @@ void dbz_state::dbz_bg1_videoram_w(address_space &space, offs_t offset, uint16_t
 	m_bg1_tilemap->mark_tile_dirty(offset / 2);
 }
 
-TILE_GET_INFO_MEMBER(dbz_state::get_dbz_bg1_tile_info)
+void dbz_state::get_dbz_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno, colour, flag;
 

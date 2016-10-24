@@ -28,10 +28,10 @@ public:
 	// construction/destruction
 	cgenie_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE_LINE_MEMBER(busy_w);
-	DECLARE_WRITE_LINE_MEMBER(perror_w);
-	DECLARE_WRITE_LINE_MEMBER(select_w);
-	DECLARE_WRITE_LINE_MEMBER(fault_w);
+	void busy_w(int state);
+	void perror_w(int state);
+	void select_w(int state);
+	void fault_w(int state);
 
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;

@@ -2807,7 +2807,7 @@ void mos6566_device::write(address_space &space, offs_t offset, uint8_t data, ui
 //  lp_w - light pen strobe
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( mos6566_device::lp_w )
+void mos6566_device::lp_w(int state)
 {
 	if (m_lp && !state && !(m_reg[REGISTER_IRQ] & IRQ_LP))
 	{

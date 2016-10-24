@@ -238,7 +238,7 @@ void k051316_device::wraparound_enable( int status )
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(k051316_device::get_tile_info)
+void k051316_device::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_ram[tile_index];
 	int color = m_ram[tile_index + 0x400];

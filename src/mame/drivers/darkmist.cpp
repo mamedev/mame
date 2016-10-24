@@ -220,7 +220,7 @@ static GFXDECODE_START( darkmist )
 	GFXDECODE_ENTRY( "spr_gfx", 0, tilelayout,  0, 16*4 )
 GFXDECODE_END
 
-TIMER_DEVICE_CALLBACK_MEMBER(darkmist_state::scanline)
+void darkmist_state::scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

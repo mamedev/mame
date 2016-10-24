@@ -187,7 +187,7 @@ void t5182_device::sharedram_w(address_space &space, offs_t offset, uint8_t data
 	m_sharedram[offset] = data;
 }
 
-TIMER_CALLBACK_MEMBER( t5182_device::setirq_callback )
+void t5182_device::setirq_callback(void *ptr, int32_t param)
 {
 	switch(param)
 	{
@@ -248,7 +248,7 @@ void t5182_device::cpu_irq_ack_w(address_space &space, offs_t offset, uint8_t da
 	synchronize(SETIRQ_CB, CPU_CLEAR);
 }
 
-WRITE_LINE_MEMBER(t5182_device::ym2151_irq_handler)
+void t5182_device::ym2151_irq_handler(int state)
 {
 	if (state)
 		synchronize(SETIRQ_CB, YM2151_ASSERT);

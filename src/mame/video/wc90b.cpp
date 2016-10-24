@@ -10,7 +10,7 @@
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(wc90b_state::get_bg_tile_info)
+void wc90b_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_bgvideoram[tile_index];
 	int tile = m_bgvideoram[tile_index + 0x800];
@@ -20,7 +20,7 @@ TILE_GET_INFO_MEMBER(wc90b_state::get_bg_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(wc90b_state::get_fg_tile_info)
+void wc90b_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_fgvideoram[tile_index];
 	int tile = m_fgvideoram[tile_index + 0x800];
@@ -30,7 +30,7 @@ TILE_GET_INFO_MEMBER(wc90b_state::get_fg_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(wc90b_state::get_tx_tile_info)
+void wc90b_state::get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	SET_TILE_INFO_MEMBER(0,
 			m_txvideoram[tile_index + 0x800] + ((m_txvideoram[tile_index] & 0x07) << 8),

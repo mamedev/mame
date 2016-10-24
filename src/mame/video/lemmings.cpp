@@ -20,7 +20,7 @@
 
 /******************************************************************************/
 
-TILE_GET_INFO_MEMBER(lemmings_state::get_tile_info)
+void lemmings_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t tile = m_vram_data[tile_index];
 

@@ -303,7 +303,7 @@ void shadfrce_state::scanline_w(address_space &space, offs_t offset, uint16_t da
 	m_raster_scanline = data;   /* guess, 0 is always written */
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(shadfrce_state::scanline)
+void shadfrce_state::scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

@@ -127,7 +127,7 @@ void comx_expansion_slot_device::io_w(address_space &space, offs_t offset, uint8
 //  ds_w - device select write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( comx_expansion_slot_device::ds_w )
+void comx_expansion_slot_device::ds_w(int state)
 {
 	if (m_card != nullptr)
 	{
@@ -140,7 +140,7 @@ WRITE_LINE_MEMBER( comx_expansion_slot_device::ds_w )
 //  q_w - Q write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( comx_expansion_slot_device::q_w )
+void comx_expansion_slot_device::q_w(int state)
 {
 	if (m_card != nullptr)
 	{
@@ -148,7 +148,7 @@ WRITE_LINE_MEMBER( comx_expansion_slot_device::q_w )
 	}
 }
 
-READ_LINE_MEMBER( comx_expansion_slot_device::ef4_r )
+int comx_expansion_slot_device::ef4_r()
 {
 	int state = CLEAR_LINE;
 

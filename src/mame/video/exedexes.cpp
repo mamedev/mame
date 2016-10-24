@@ -33,7 +33,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(exedexes_state, exedexes)
+void exedexes_state::palette_init_exedexes(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -122,7 +122,7 @@ void exedexes_state::exedexes_gfxctrl_w(address_space &space, offs_t offset, uin
 }
 
 
-TILE_GET_INFO_MEMBER(exedexes_state::get_bg_tile_info)
+void exedexes_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *tilerom = memregion("gfx5")->base();
 
@@ -134,14 +134,14 @@ TILE_GET_INFO_MEMBER(exedexes_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(1, code, color, flags);
 }
 
-TILE_GET_INFO_MEMBER(exedexes_state::get_fg_tile_info)
+void exedexes_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = memregion("gfx5")->base()[tile_index];
 
 	SET_TILE_INFO_MEMBER(2, code, 0, 0);
 }
 
-TILE_GET_INFO_MEMBER(exedexes_state::get_tx_tile_info)
+void exedexes_state::get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index] + 2 * (m_colorram[tile_index] & 0x80);
 	int color = m_colorram[tile_index] & 0x3f;
@@ -151,13 +151,13 @@ TILE_GET_INFO_MEMBER(exedexes_state::get_tx_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-TILEMAP_MAPPER_MEMBER(exedexes_state::exedexes_bg_tilemap_scan)
+tilemap_memory_index exedexes_state::exedexes_bg_tilemap_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return ((col * 32 & 0xe0) >> 5) + ((row * 32 & 0xe0) >> 2) + ((col * 32 & 0x3f00) >> 1) + 0x4000;
 }
 
-TILEMAP_MAPPER_MEMBER(exedexes_state::exedexes_fg_tilemap_scan)
+tilemap_memory_index exedexes_state::exedexes_fg_tilemap_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return ((col * 16 & 0xf0) >> 4) + (row * 16 & 0xf0) + (col * 16 & 0x700) + ((row * 16 & 0x700) << 3);

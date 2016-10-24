@@ -628,7 +628,7 @@ static INPUT_PORTS_START( cedar_magnet )
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
 INPUT_PORTS_END
 
-INTERRUPT_GEN_MEMBER(cedar_magnet_state::irq)
+void cedar_magnet_state::irq(device_t &device)
 {
 	if (m_prothack)
 		m_prothack(this);

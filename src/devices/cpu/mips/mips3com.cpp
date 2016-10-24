@@ -195,7 +195,7 @@ void mips3_device::mips3com_tlbp()
     whenever a compare interrupt is generated
 -------------------------------------------------*/
 
-TIMER_CALLBACK_MEMBER( mips3_device::compare_int_callback )
+void mips3_device::compare_int_callback(void *ptr, int32_t param)
 {
 	m_compare_int_timer->adjust(attotime::never);
 	set_input_line(MIPS3_IRQ5, ASSERT_LINE);

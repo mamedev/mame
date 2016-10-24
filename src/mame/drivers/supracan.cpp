@@ -206,21 +206,21 @@ public:
 	tilemap_t *m_tilemap_sizes[4][4];
 	bitmap_ind16 m_sprite_final_bitmap;
 	void write_swapped_byte(int offset, uint8_t byte);
-	TILE_GET_INFO_MEMBER(get_supracan_tilemap0_tile_info);
-	TILE_GET_INFO_MEMBER(get_supracan_tilemap1_tile_info);
-	TILE_GET_INFO_MEMBER(get_supracan_tilemap2_tile_info);
-	TILE_GET_INFO_MEMBER(get_supracan_roz_tile_info);
+	void get_supracan_tilemap0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_supracan_tilemap1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_supracan_tilemap2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_supracan_roz_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(supracan);
+	void palette_init_supracan(palette_device &palette);
 	uint32_t screen_update_supracan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(supracan_irq);
-	INTERRUPT_GEN_MEMBER(supracan_sound_irq);
-	TIMER_CALLBACK_MEMBER(supracan_hbl_callback);
-	TIMER_CALLBACK_MEMBER(supracan_line_on_callback);
-	TIMER_CALLBACK_MEMBER(supracan_line_off_callback);
-	TIMER_CALLBACK_MEMBER(supracan_video_callback);
+	void supracan_irq(device_t &device);
+	void supracan_sound_irq(device_t &device);
+	void supracan_hbl_callback(void *ptr, int32_t param);
+	void supracan_line_on_callback(void *ptr, int32_t param);
+	void supracan_line_off_callback(void *ptr, int32_t param);
+	void supracan_video_callback(void *ptr, int32_t param);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(supracan_cart);
 	inline void verboselog(const char *tag, int n_level, const char *s_fmt, ...) ATTR_PRINTF(4,5);
 	int supracan_tilemap_get_region(int layer);
@@ -405,22 +405,22 @@ void supracan_state::supracan_tilemap_get_info_roz(int layer, tile_data &tileinf
 
 
 
-TILE_GET_INFO_MEMBER(supracan_state::get_supracan_tilemap0_tile_info)
+void supracan_state::get_supracan_tilemap0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	supracan_tilemap_get_info_common(0, tileinfo, tile_index);
 }
 
-TILE_GET_INFO_MEMBER(supracan_state::get_supracan_tilemap1_tile_info)
+void supracan_state::get_supracan_tilemap1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	supracan_tilemap_get_info_common(1, tileinfo, tile_index);
 }
 
-TILE_GET_INFO_MEMBER(supracan_state::get_supracan_tilemap2_tile_info)
+void supracan_state::get_supracan_tilemap2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	supracan_tilemap_get_info_common(2, tileinfo, tile_index);
 }
 
-TILE_GET_INFO_MEMBER(supracan_state::get_supracan_roz_tile_info)
+void supracan_state::get_supracan_roz_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	supracan_tilemap_get_info_roz(3, tileinfo, tile_index);
 }
@@ -1344,7 +1344,7 @@ static INPUT_PORTS_START( supracan )
 	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(4) PORT_NAME("P4 Button A")
 INPUT_PORTS_END
 
-PALETTE_INIT_MEMBER(supracan_state, supracan)
+void supracan_state::palette_init_supracan(palette_device &palette)
 {
 	// Used for debugging purposes for now
 	//#if 0
@@ -1493,28 +1493,28 @@ uint16_t supracan_state::video_r(address_space &space, offs_t offset, uint16_t m
 	return data;
 }
 
-TIMER_CALLBACK_MEMBER(supracan_state::supracan_hbl_callback)
+void supracan_state::supracan_hbl_callback(void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(3, HOLD_LINE);
 
 	m_hbl_timer->adjust(attotime::never);
 }
 
-TIMER_CALLBACK_MEMBER(supracan_state::supracan_line_on_callback)
+void supracan_state::supracan_line_on_callback(void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(5, HOLD_LINE);
 
 	m_line_on_timer->adjust(attotime::never);
 }
 
-TIMER_CALLBACK_MEMBER(supracan_state::supracan_line_off_callback)
+void supracan_state::supracan_line_off_callback(void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(5, CLEAR_LINE);
 
 	m_line_on_timer->adjust(attotime::never);
 }
 
-TIMER_CALLBACK_MEMBER(supracan_state::supracan_video_callback)
+void supracan_state::supracan_video_callback(void *ptr, int32_t param)
 {
 	int vpos = machine().first_screen()->vpos();
 
@@ -1860,7 +1860,7 @@ static GFXDECODE_START( supracan )
 	GFXDECODE_RAM( "vram",  0, supracan_gfx1bpp_alt,   0, 0x80 )
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(supracan_state::supracan_irq)
+void supracan_state::supracan_irq(device_t &device)
 {
 #if 0
 
@@ -1871,7 +1871,7 @@ INTERRUPT_GEN_MEMBER(supracan_state::supracan_irq)
 #endif
 }
 
-INTERRUPT_GEN_MEMBER(supracan_state::supracan_sound_irq)
+void supracan_state::supracan_sound_irq(device_t &device)
 {
 	m_sound_irq_source_reg |= 0x80;
 

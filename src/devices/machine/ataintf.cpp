@@ -35,7 +35,7 @@ void ata_interface_device::set_dasp(int state)
 	m_dasp_handler(state);
 }
 
-WRITE_LINE_MEMBER( ata_interface_device::irq0_write_line )
+void ata_interface_device::irq0_write_line(int state)
 {
 	if (m_irq[0] != state)
 	{
@@ -45,7 +45,7 @@ WRITE_LINE_MEMBER( ata_interface_device::irq0_write_line )
 	}
 }
 
-WRITE_LINE_MEMBER( ata_interface_device::irq1_write_line )
+void ata_interface_device::irq1_write_line(int state)
 {
 	if (m_irq[1] != state)
 	{
@@ -55,7 +55,7 @@ WRITE_LINE_MEMBER( ata_interface_device::irq1_write_line )
 	}
 }
 
-WRITE_LINE_MEMBER( ata_interface_device::dasp0_write_line )
+void ata_interface_device::dasp0_write_line(int state)
 {
 	if (m_dasp[0] != state)
 	{
@@ -65,7 +65,7 @@ WRITE_LINE_MEMBER( ata_interface_device::dasp0_write_line )
 	}
 }
 
-WRITE_LINE_MEMBER( ata_interface_device::dasp1_write_line )
+void ata_interface_device::dasp1_write_line(int state)
 {
 	if (m_dasp[1] != state)
 	{
@@ -79,7 +79,7 @@ WRITE_LINE_MEMBER( ata_interface_device::dasp1_write_line )
 	}
 }
 
-WRITE_LINE_MEMBER( ata_interface_device::dmarq0_write_line )
+void ata_interface_device::dmarq0_write_line(int state)
 {
 	if (m_dmarq[0] != state)
 	{
@@ -89,7 +89,7 @@ WRITE_LINE_MEMBER( ata_interface_device::dmarq0_write_line )
 	}
 }
 
-WRITE_LINE_MEMBER( ata_interface_device::dmarq1_write_line )
+void ata_interface_device::dmarq1_write_line(int state)
 {
 	if (m_dmarq[1] != state)
 	{
@@ -99,12 +99,12 @@ WRITE_LINE_MEMBER( ata_interface_device::dmarq1_write_line )
 	}
 }
 
-WRITE_LINE_MEMBER( ata_interface_device::pdiag0_write_line )
+void ata_interface_device::pdiag0_write_line(int state)
 {
 	m_pdiag[0] = state;
 }
 
-WRITE_LINE_MEMBER( ata_interface_device::pdiag1_write_line )
+void ata_interface_device::pdiag1_write_line(int state)
 {
 	if (m_pdiag[1] != state)
 	{
@@ -193,7 +193,7 @@ void ata_interface_device::write_cs1(address_space &space, offs_t offset, uint16
 			elem->dev()->write_cs1(space, offset, data, mem_mask);
 }
 
-WRITE_LINE_MEMBER( ata_interface_device::write_dmack )
+void ata_interface_device::write_dmack(int state)
 {
 //  printf( "%s: write_dmack %04x\n", machine().describe_context(), state );
 

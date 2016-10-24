@@ -142,7 +142,7 @@ void rpunch_state::machine_start()
  *
  *************************************/
 
-WRITE_LINE_MEMBER(rpunch_state::ym2151_irq_gen)
+void rpunch_state::ym2151_irq_gen(int state)
 {
 	m_ym2151_irq = state;
 	m_audiocpu->set_input_line(0, (m_ym2151_irq | m_sound_busy) ? ASSERT_LINE : CLEAR_LINE);
@@ -175,7 +175,7 @@ CUSTOM_INPUT_MEMBER(rpunch_state::hi_bits_r)
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(rpunch_state::sound_command_w_callback)
+void rpunch_state::sound_command_w_callback(void *ptr, int32_t param)
 {
 	m_sound_busy = 1;
 	m_sound_data = param;

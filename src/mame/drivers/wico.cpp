@@ -63,8 +63,8 @@ public:
 	void zcres_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void wdogcl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t gentmrcl_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	TIMER_DEVICE_CALLBACK_MEMBER(irq_housekeeping);
-	TIMER_DEVICE_CALLBACK_MEMBER(firq_housekeeping);
+	void irq_housekeeping(timer_device &timer, void *ptr, int32_t param);
+	void firq_housekeeping(timer_device &timer, void *ptr, int32_t param);
 private:
 	bool m_zcen;
 	bool m_gten;
@@ -392,13 +392,13 @@ void wico_state::wdogcl_w(address_space &space, offs_t offset, uint8_t data, uin
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER( wico_state::irq_housekeeping )
+void wico_state::irq_housekeeping(timer_device &timer, void *ptr, int32_t param)
 {
 	if (m_zcen)
 		m_hcpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( wico_state::firq_housekeeping )
+void wico_state::firq_housekeeping(timer_device &timer, void *ptr, int32_t param)
 {
 	if (m_gten)
 		m_hcpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);

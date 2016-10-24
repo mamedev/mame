@@ -59,9 +59,9 @@ public:
 	void init_spclords();
 	void init_rrreveng();
 	void init_motofren();
-	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
-	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
-	TILEMAP_MAPPER_MEMBER(atarigx2_playfield_scan);
+	void get_alpha_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_playfield_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	tilemap_memory_index atarigx2_playfield_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
 	void machine_start_atarigx2();
 	void machine_reset_atarigx2();
 	void video_start_atarigx2();

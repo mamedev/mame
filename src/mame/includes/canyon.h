@@ -43,9 +43,9 @@ public:
 	uint8_t canyon_options_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void canyon_led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void canyon_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(canyon);
+	void palette_init_canyon(palette_device &palette);
 	uint32_t screen_update_canyon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void canyon_motor_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void canyon_explode_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);

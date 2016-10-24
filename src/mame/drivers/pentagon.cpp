@@ -35,9 +35,9 @@ public:
 	void pentagon_scr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void pentagon_scr2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void machine_reset_pentagon();
-	INTERRUPT_GEN_MEMBER(pentagon_interrupt);
-	TIMER_CALLBACK_MEMBER(irq_on);
-	TIMER_CALLBACK_MEMBER(irq_off);
+	void pentagon_interrupt(device_t &device);
+	void irq_on(void *ptr, int32_t param);
+	void irq_off(void *ptr, int32_t param);
 protected:
 	required_memory_bank m_bank1;
 	required_memory_bank m_bank2;
@@ -167,18 +167,18 @@ void pentagon_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	}
 }
 
-TIMER_CALLBACK_MEMBER(pentagon_state::irq_on)
+void pentagon_state::irq_on(void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(0, HOLD_LINE);
 	timer_set(attotime::from_ticks(32, XTAL_14MHz / 4), TIMER_IRQ_OFF, 0);
 }
 
-TIMER_CALLBACK_MEMBER(pentagon_state::irq_off)
+void pentagon_state::irq_off(void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(pentagon_state::pentagon_interrupt)
+void pentagon_state::pentagon_interrupt(device_t &device)
 {
 	timer_set(attotime::from_ticks(179, XTAL_14MHz / 4), TIMER_IRQ_ON, 0);
 }

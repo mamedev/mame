@@ -60,7 +60,7 @@ void magmax_state::ay8910_portB_0_w(address_space &space, offs_t offset, uint8_t
 		m_LS74_q = 0;
 }
 
-TIMER_CALLBACK_MEMBER(magmax_state::scanline_callback)
+void magmax_state::scanline_callback(void *ptr, int32_t param)
 {
 	int scanline = param;
 

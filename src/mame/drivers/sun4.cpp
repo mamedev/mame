@@ -574,11 +574,11 @@ public:
 	uint32_t dma_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	void dma_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_WRITE_LINE_MEMBER( scsi_irq );
-	DECLARE_WRITE_LINE_MEMBER( scsi_drq );
+	void scsi_irq(int state);
+	void scsi_drq(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( scc1_int );
-	DECLARE_WRITE_LINE_MEMBER( scc2_int );
+	void scc1_int(int state);
+	void scc2_int(int state);
 
 	void init_sun4();
 	void init_sun4c();
@@ -1529,7 +1529,7 @@ void sun4_state::irq_w(address_space &space, offs_t offset, uint8_t data, uint8_
 	m_maincpu->set_input_line(SPARC_IRQ12, ((m_scc1_int || m_scc2_int) && (m_irq_reg & 0x01)) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER( sun4_state::scc1_int )
+void sun4_state::scc1_int(int state)
 {
 	printf("scc1 int: %d\n", state);
 	m_scc1_int = state;
@@ -1537,7 +1537,7 @@ WRITE_LINE_MEMBER( sun4_state::scc1_int )
 	m_maincpu->set_input_line(SPARC_IRQ12, ((m_scc1_int || m_scc2_int) && (m_irq_reg & 0x01)) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER( sun4_state::scc2_int )
+void sun4_state::scc2_int(int state)
 {
 	printf("scc2 int: %d\n", state);
 	m_scc2_int = state;
@@ -1884,7 +1884,7 @@ void sun4_state::dma_w(address_space &space, offs_t offset, uint32_t data, uint3
 	}
 }
 
-WRITE_LINE_MEMBER( sun4_state::scsi_irq )
+void sun4_state::scsi_irq(int state)
 {
 	if (!(m_dma[DMA_CTRL] & DMA_TC))
 	{
@@ -1893,7 +1893,7 @@ WRITE_LINE_MEMBER( sun4_state::scsi_irq )
 	m_scsi_irq = state;
 }
 
-WRITE_LINE_MEMBER( sun4_state::scsi_drq )
+void sun4_state::scsi_drq(int state)
 {
 	if (state)
 	{

@@ -262,7 +262,7 @@ public:
 	void machine_start_a800();
 	void machine_start_a800xl();
 	void machine_start_a5200();
-	DECLARE_PALETTE_INIT(a400);
+	void palette_init_a400(palette_device &palette);
 
 	void machine_reset_a400();
 
@@ -293,9 +293,9 @@ public:
 	uint8_t xegs_low_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void xegs_low_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(a400_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(a800xl_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(a5200_interrupt);
+	void a400_interrupt(timer_device &timer, void *ptr, int32_t param);
+	void a800xl_interrupt(timer_device &timer, void *ptr, int32_t param);
+	void a5200_interrupt(timer_device &timer, void *ptr, int32_t param);
 
 protected:
 	//required_device<cpu_device> m_maincpu;    // maincpu is already contained in atari_common_state
@@ -1088,7 +1088,7 @@ static const uint8_t atari_palette[256*3] =
 
 
 /* Initialise the palette */
-PALETTE_INIT_MEMBER(a400_state, a400)
+void a400_state::palette_init_a400(palette_device &palette)
 {
 	for (int i = 0; i < sizeof(atari_palette) / 3; i++ )
 	{
@@ -1965,17 +1965,17 @@ void a400_state::setup_cart(a800_cart_slot_device *slot)
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER( a400_state::a400_interrupt )
+void a400_state::a400_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	m_antic->generic_interrupt(4);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( a400_state::a800xl_interrupt )
+void a400_state::a800xl_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	m_antic->generic_interrupt(2);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( a400_state::a5200_interrupt )
+void a400_state::a5200_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	m_antic->generic_interrupt(4);
 }

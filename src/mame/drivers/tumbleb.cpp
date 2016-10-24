@@ -442,7 +442,7 @@ static void tumbleb2_playmusic( device_t *device )
 }
 
 
-INTERRUPT_GEN_MEMBER(tumbleb_state::tumbleb2_interrupt)
+void tumbleb_state::tumbleb2_interrupt(device_t &device)
 {
 	device.execute().set_input_line(6, HOLD_LINE);
 	tumbleb2_playmusic(m_oki);

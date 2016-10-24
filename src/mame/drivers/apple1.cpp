@@ -112,18 +112,18 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_PALETTE_INIT(apple2);
+	void palette_init_apple2(palette_device &palette);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	uint8_t ram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t pia_keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void pia_display_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(pia_display_gate_w);
+	void pia_display_gate_w(int state);
 	DECLARE_SNAPSHOT_LOAD_MEMBER( apple1 );
-	TIMER_CALLBACK_MEMBER(ready_start_cb);
-	TIMER_CALLBACK_MEMBER(ready_end_cb);
-	TIMER_CALLBACK_MEMBER(keyboard_strobe_cb);
+	void ready_start_cb(void *ptr, int32_t param);
+	void ready_end_cb(void *ptr, int32_t param);
+	void keyboard_strobe_cb(void *ptr, int32_t param);
 
 private:
 	uint8_t *m_ram_ptr, *m_char_ptr;
@@ -483,7 +483,7 @@ void apple1_state::pia_display_w(address_space &space, offs_t offset, uint8_t da
 
 // CB2 here is connected two places: Port B bit 7 for CPU readback,
 // and to the display hardware
-WRITE_LINE_MEMBER(apple1_state::pia_display_gate_w)
+void apple1_state::pia_display_gate_w(int state)
 {
 	m_pia->portb_w((state << 7) ^ 0x80);
 
@@ -494,19 +494,19 @@ WRITE_LINE_MEMBER(apple1_state::pia_display_gate_w)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(apple1_state::ready_start_cb)
+void apple1_state::ready_start_cb(void *ptr, int32_t param)
 {
 	// we're ready, pulse CB1 for 3500 nanoseconds
 	m_pia->cb1_w(0);
 	m_ready_end_timer->adjust(attotime::from_nsec(3500));
 }
 
-TIMER_CALLBACK_MEMBER(apple1_state::ready_end_cb)
+void apple1_state::ready_end_cb(void *ptr, int32_t param)
 {
 	m_pia->cb1_w(1);
 }
 
-TIMER_CALLBACK_MEMBER(apple1_state::keyboard_strobe_cb)
+void apple1_state::keyboard_strobe_cb(void *ptr, int32_t param)
 {
 	m_pia->ca1_w(0);
 }

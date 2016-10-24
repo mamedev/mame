@@ -308,11 +308,11 @@ void a2bus_mouse_device::pia_out_b(address_space &space, offs_t offset, uint8_t 
 	m_rom_bank = (data & 0xe) << 7;
 }
 
-WRITE_LINE_MEMBER(a2bus_mouse_device::pia_irqa_w)
+void a2bus_mouse_device::pia_irqa_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER(a2bus_mouse_device::pia_irqb_w)
+void a2bus_mouse_device::pia_irqb_w(int state)
 {
 }
 

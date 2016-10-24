@@ -2060,7 +2060,7 @@ MACHINE_CONFIG_END
 
 /* 1 x 24 MHz crystal */
 
-TIMER_DEVICE_CALLBACK_MEMBER(suna8_state::hardhea2_interrupt)
+void suna8_state::hardhea2_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

@@ -1277,7 +1277,7 @@ GFXDECODE_END
 */
 
 
-IRQ_CALLBACK_MEMBER(ms32_state::irq_callback)
+int ms32_state::irq_callback(device_t &device, int irqline)
 {
 	int i;
 	for(i=15; i>=0 && !(m_irqreq & (1<<i)); i--);
@@ -1300,7 +1300,7 @@ void ms32_state::irq_raise(int level)
 }
 
 /* TODO: fix this arrangement (derived from old deprecat lib) */
-TIMER_DEVICE_CALLBACK_MEMBER(ms32_state::ms32_interrupt)
+void ms32_state::ms32_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 	if( scanline == 0) irq_raise(10);

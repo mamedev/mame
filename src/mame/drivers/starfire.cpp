@@ -317,7 +317,7 @@ static const char *const starfire_sample_names[] =
 	nullptr
 };
 
-INTERRUPT_GEN_MEMBER(starfire_state::vblank_int)
+void starfire_state::vblank_int(device_t &device)
 {
 	// starfire has a jumper for disabling NMI, used to do a complete RAM test
 	if (m_nmi.read_safe(0x01))

@@ -131,17 +131,17 @@ public:
 	void init_xsedae();
 	void init_zeroteam();
 	void init_raiden2();
-	TILE_GET_INFO_MEMBER(get_back_tile_info);
-	TILE_GET_INFO_MEMBER(get_mid_tile_info);
-	TILE_GET_INFO_MEMBER(get_fore_tile_info);
-	TILE_GET_INFO_MEMBER(get_text_tile_info);
+	void get_back_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_mid_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_fore_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_text_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void machine_reset_raiden2();
 	void video_start_raiden2();
 	void machine_reset_zeroteam();
 	void machine_reset_xsedae();
 	void machine_reset_raidendx();
 	uint32_t screen_update_raiden2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(raiden2_interrupt);
+	void raiden2_interrupt(device_t &device);
 	void combine32(uint32_t *val, int offset, uint16_t data, uint16_t mem_mask);
 	void sprcpt_init(void);
 

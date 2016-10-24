@@ -351,7 +351,7 @@ uint8_t snk_state::marvins_sound_nmi_ack_r(address_space &space, offs_t offset, 
 
 /*********************************************************************/
 
-TIMER_CALLBACK_MEMBER(snk_state::sgladiat_sndirq_update_callback)
+void snk_state::sgladiat_sndirq_update_callback(void *ptr, int32_t param)
 {
 	switch(param)
 	{
@@ -420,7 +420,7 @@ uint8_t snk_state::sgladiat_sound_irq_ack_r(address_space &space, offs_t offset,
 
 *********************************************************************/
 
-TIMER_CALLBACK_MEMBER(snk_state::sndirq_update_callback)
+void snk_state::sndirq_update_callback(void *ptr, int32_t param)
 {
 	switch(param)
 	{
@@ -458,13 +458,13 @@ TIMER_CALLBACK_MEMBER(snk_state::sndirq_update_callback)
 
 
 
-WRITE_LINE_MEMBER(snk_state::ymirq_callback_1 )
+void snk_state::ymirq_callback_1(int state)
 {
 	if (state)
 		machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sndirq_update_callback),this), YM1IRQ_ASSERT);
 }
 
-WRITE_LINE_MEMBER(snk_state::ymirq_callback_2)
+void snk_state::ymirq_callback_2(int state)
 {
 	if (state)
 		machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sndirq_update_callback),this), YM2IRQ_ASSERT);

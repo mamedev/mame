@@ -52,7 +52,7 @@ public:
 	void bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t prot_latch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	TILE_GET_INFO_MEMBER(get_sc0_tile_info);
+	void get_sc0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
@@ -62,7 +62,7 @@ public:
 
 
 
-TILE_GET_INFO_MEMBER(d9final_state::get_sc0_tile_info)
+void d9final_state::get_sc0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = ((m_hi_vram[tile_index] & 0x3f)<<8) | m_lo_vram[tile_index];
 	int color = m_cram[tile_index] & 0x3f;

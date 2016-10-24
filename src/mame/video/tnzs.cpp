@@ -31,7 +31,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(tnzs_state,arknoid2)
+void tnzs_state::palette_init_arknoid2(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i, col;

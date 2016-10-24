@@ -70,7 +70,7 @@ int sprint2_state::service_mode()
 }
 
 
-INTERRUPT_GEN_MEMBER(sprint2_state::sprint2)
+void sprint2_state::sprint2(device_t &device)
 {
 	/* handle steering wheels */
 

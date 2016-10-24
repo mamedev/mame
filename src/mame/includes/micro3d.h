@@ -176,17 +176,17 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	virtual void video_reset() override;
-	INTERRUPT_GEN_MEMBER(micro3d_vblank);
-	TIMER_CALLBACK_MEMBER(mac_done_callback);
-	TIMER_CALLBACK_MEMBER(adc_done_callback);
+	void micro3d_vblank(device_t &device);
+	void mac_done_callback(void *ptr, int32_t param);
+	void adc_done_callback(void *ptr, int32_t param);
 	void micro3d_upd7759_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void data_from_i8031(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t data_to_i8031(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
+	void duart_irq_handler(int state);
 	uint8_t duart_input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void duart_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(duart_txb);
-	DECLARE_WRITE_LINE_MEMBER(tms_interrupt);
+	void duart_txb(int state);
+	void tms_interrupt(int state);
 	TMS340X0_SCANLINE_IND16_CB_MEMBER(scanline_update);
 
 	/* 3D graphics */

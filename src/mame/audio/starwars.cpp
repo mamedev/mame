@@ -51,7 +51,7 @@ void starwars_state::r6532_porta_w(address_space &space, offs_t offset, uint8_t 
 }
 
 
-WRITE_LINE_MEMBER(starwars_state::snd_interrupt)
+void starwars_state::snd_interrupt(int state)
 {
 	m_audiocpu->set_input_line(M6809_IRQ_LINE, state);
 }
@@ -63,7 +63,7 @@ WRITE_LINE_MEMBER(starwars_state::snd_interrupt)
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(starwars_state::sound_callback)
+void starwars_state::sound_callback(void *ptr, int32_t param)
 {
 	m_riot->porta_in_set(0x40, 0x40);
 	m_main_data = param;
@@ -103,7 +103,7 @@ uint8_t starwars_state::starwars_main_ready_flag_r(address_space &space, offs_t 
 	return m_riot->porta_in_get() & 0xc0;    /* only upper two flag bits mapped */
 }
 
-TIMER_CALLBACK_MEMBER(starwars_state::main_callback )
+void starwars_state::main_callback(void *ptr, int32_t param)
 {
 	if (m_riot->porta_in_get() & 0x80)
 		logerror("Sound data not read %x\n", m_sound_data);

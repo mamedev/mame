@@ -26,9 +26,9 @@ public:
 	template<class _Object> static devcb_base &set_bsy_handler(device_t &device, _Object object) { return downcast<s14001a_device &>(device).m_bsy_handler.set_callback(object); }
 	template<class _Object> static devcb_base &set_ext_read_handler(device_t &device, _Object object) { return downcast<s14001a_device &>(device).m_ext_read_handler.set_callback(object); }
 
-	DECLARE_READ_LINE_MEMBER(busy_r);   // /BUSY (pin 40)
-	DECLARE_READ_LINE_MEMBER(romen_r);  // ROM /EN (pin 9)
-	DECLARE_WRITE_LINE_MEMBER(start_w); // START (pin 10)
+	int busy_r();   // /BUSY (pin 40)
+	int romen_r();  // ROM /EN (pin 9)
+	void start_w(int state); // START (pin 10)
 	void data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);      // 6-bit word
 
 	void set_clock(uint32_t clock);       // set new CLK frequency

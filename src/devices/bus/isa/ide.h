@@ -27,7 +27,7 @@ public:
 	virtual ioport_constructor device_input_ports() const override;
 
 	bool is_primary() { return m_is_primary; }
-	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
+	void ide_interrupt(int state);
 	DECLARE_ADDRESS_MAP(map, 16);
 	DECLARE_ADDRESS_MAP(alt_map, 8);
 	uint8_t ide16_alt_r(address_space &space, offs_t offset, uint8_t mem_mask);

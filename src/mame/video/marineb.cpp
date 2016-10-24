@@ -12,7 +12,7 @@
 #include "includes/marineb.h"
 
 
-PALETTE_INIT_MEMBER(marineb_state, marineb)
+void marineb_state::palette_init_marineb(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -47,7 +47,7 @@ PALETTE_INIT_MEMBER(marineb_state, marineb)
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(marineb_state::get_tile_info)
+void marineb_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t code = m_videoram[tile_index];
 	uint8_t col = m_colorram[tile_index];

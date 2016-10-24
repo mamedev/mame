@@ -184,7 +184,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tankbatt_state )
 	AM_RANGE(0x2000, 0xffff) AM_READNOP //anything else might be left-over for a diagnostic ROM or something related to the discrete sound HW
 ADDRESS_MAP_END
 
-INTERRUPT_GEN_MEMBER(tankbatt_state::interrupt)
+void tankbatt_state::interrupt(device_t &device)
 {
 	if (m_nmi_enable) device.execute().set_input_line(INPUT_LINE_NMI,PULSE_LINE);
 }

@@ -52,8 +52,8 @@ public:
 	void init_wcs();
 	void init_tfs();
 
-	DECLARE_WRITE_LINE_MEMBER(scanline_irq);
-	TIMER_DEVICE_CALLBACK_MEMBER(zc_timer);
+	void scanline_irq(int state);
+	void zc_timer(timer_device &timer, void *ptr, int32_t param);
 
 protected:
 	// devices
@@ -192,7 +192,7 @@ uint8_t wpc_s_state::zc_r(address_space &space, offs_t offset, uint8_t mem_mask)
 	return res;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(wpc_s_state::zc_timer)
+void wpc_s_state::zc_timer(timer_device &timer, void *ptr, int32_t param)
 {
 	zc |= 0x80;
 }
@@ -208,7 +208,7 @@ void wpc_s_state::watchdog_w(address_space &space, offs_t offset, uint8_t data, 
 	maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(wpc_s_state::scanline_irq)
+void wpc_s_state::scanline_irq(int state)
 {
 	firq_src = 0x00;
 	maincpu->set_input_line(1, state);

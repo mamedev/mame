@@ -367,7 +367,7 @@ public:
 		else
 			write(newval);
 	}
-	inline DECLARE_WRITE_LINE_MEMBER(write_line)       { write(state);  }
+	inline void write_line(int state)       { write(state);  }
 	inline void write8(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff)               { write(data);   }
 	inline void write16(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff)             { write(data);   }
 	inline void write32(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff)             { write(data);   }
@@ -434,7 +434,7 @@ public:
 	}
 
 	inline DECLARE_INPUT_CHANGED_MEMBER(input_changed) { write(newval); }
-	DECLARE_WRITE_LINE_MEMBER(write_line)       { write(state);  }
+	void write_line(int state)       { write(state);  }
 	void write8(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff)               { write(data);   }
 	void write16(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff)             { write(data);   }
 	void write32(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff)             { write(data);   }
@@ -480,7 +480,7 @@ public:
 	}
 
 	inline DECLARE_INPUT_CHANGED_MEMBER(input_changed) { write(newval); }
-	DECLARE_WRITE_LINE_MEMBER(write_line)       { write(state);  }
+	void write_line(int state)       { write(state);  }
 	void write8(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff)               { write(data);   }
 	void write16(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff)             { write(data);   }
 	void write32(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff)             { write(data);   }

@@ -159,14 +159,14 @@ uint16_t huc6202_device::time_until_next_event(address_space &space, offs_t offs
 }
 
 
-WRITE_LINE_MEMBER( huc6202_device::vsync_changed )
+void huc6202_device::vsync_changed(int state)
 {
 	m_vsync_changed_0_cb( state );
 	m_vsync_changed_1_cb( state );
 }
 
 
-WRITE_LINE_MEMBER( huc6202_device::hsync_changed )
+void huc6202_device::hsync_changed(int state)
 {
 	m_hsync_changed_0_cb( state );
 	m_hsync_changed_1_cb( state );

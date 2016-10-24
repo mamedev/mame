@@ -50,13 +50,13 @@ public:
 	void ultratnk_fire_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void ultratnk_attract_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void ultratnk_explosion_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	TILE_GET_INFO_MEMBER(ultratnk_tile_info);
+	void ultratnk_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(ultratnk);
+	void palette_init_ultratnk(palette_device &palette);
 	uint32_t screen_update_ultratnk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_ultratnk(screen_device &screen, bool state);
-	TIMER_CALLBACK_MEMBER(nmi_callback);
+	void nmi_callback(void *ptr, int32_t param);
 	required_device<cpu_device> m_maincpu;
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<discrete_device> m_discrete;

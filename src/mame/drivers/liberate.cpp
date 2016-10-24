@@ -673,7 +673,7 @@ GFXDECODE_END
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(liberate_state::deco16_interrupt)
+void liberate_state::deco16_interrupt(device_t &device)
 {
 	int p = ~ioport("IN3")->read();
 	if ((p & 0x43) && !m_latch)
@@ -689,7 +689,7 @@ INTERRUPT_GEN_MEMBER(liberate_state::deco16_interrupt)
 }
 
 #if 0
-INTERRUPT_GEN_MEMBER(liberate_state::prosport_interrupt)
+void liberate_state::prosport_interrupt(device_t &device)
 {
 	/* ??? */
 	device.execute().set_input_line(DECO16_IRQ_LINE, ASSERT_LINE);

@@ -60,7 +60,7 @@ Notes:
 #include "includes/dbz.h"
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(dbz_state::dbz_scanline)
+void dbz_state::dbz_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -291,7 +291,7 @@ GFXDECODE_END
 
 /**********************************************************************************/
 
-WRITE_LINE_MEMBER(dbz_state::dbz_irq2_ack_w)
+void dbz_state::dbz_irq2_ack_w(int state)
 {
 	m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE);
 }

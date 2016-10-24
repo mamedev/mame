@@ -33,10 +33,10 @@ public:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	DECLARE_WRITE_LINE_MEMBER( exp1_extintl_w ) { m_exp1_extinl = state; update_extintl(); }
-	DECLARE_WRITE_LINE_MEMBER( exp2_extintl_w ) { m_exp2_extinl = state; update_extintl(); }
-	DECLARE_WRITE_LINE_MEMBER( exp3_extintl_w ) { m_exp3_extinl = state; update_extintl(); }
-	DECLARE_WRITE_LINE_MEMBER( exp4_extintl_w ) { m_exp4_extinl = state; update_extintl(); }
+	void exp1_extintl_w(int state) { m_exp1_extinl = state; update_extintl(); }
+	void exp2_extintl_w(int state) { m_exp2_extinl = state; update_extintl(); }
+	void exp3_extintl_w(int state) { m_exp3_extinl = state; update_extintl(); }
+	void exp4_extintl_w(int state) { m_exp4_extinl = state; update_extintl(); }
 
 protected:
 	// device-level overrides

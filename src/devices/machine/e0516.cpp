@@ -81,7 +81,7 @@ void e0516_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 //  cs_w - chip select input
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( e0516_device::cs_w )
+void e0516_device::cs_w(int state)
 {
 	if (LOG) logerror("E05-16 '%s' CS %u\n", tag(), state);
 
@@ -101,7 +101,7 @@ WRITE_LINE_MEMBER( e0516_device::cs_w )
 //  clk_w - serial clock input
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( e0516_device::clk_w )
+void e0516_device::clk_w(int state)
 {
 	if (LOG) logerror("E05-16 '%s' CLK %u\n", tag(), state);
 
@@ -170,7 +170,7 @@ WRITE_LINE_MEMBER( e0516_device::clk_w )
 //  dio_w - serial data input
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( e0516_device::dio_w )
+void e0516_device::dio_w(int state)
 {
 	if (LOG) logerror("E05-16 '%s' DIO %u\n", tag(), state);
 
@@ -182,7 +182,7 @@ WRITE_LINE_MEMBER( e0516_device::dio_w )
 //  do_r - serial data output
 //-------------------------------------------------
 
-READ_LINE_MEMBER( e0516_device::dio_r )
+int e0516_device::dio_r()
 {
 	return m_dio;
 }

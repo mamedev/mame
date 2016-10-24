@@ -90,7 +90,7 @@ void ne2000_device::ne2000_port_w(address_space &space, offs_t offset, uint16_t 
 	return;
 }
 
-WRITE_LINE_MEMBER(ne2000_device::ne2000_irq_w) {
+void ne2000_device::ne2000_irq_w(int state) {
 	switch(m_irq) {
 	case 0:
 		m_isa->irq2_w(state);

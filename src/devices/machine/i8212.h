@@ -76,8 +76,8 @@ public:
 	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( md_w );
-	DECLARE_WRITE_LINE_MEMBER( stb_w );
+	void md_w(int state);
+	void stb_w(int state);
 
 protected:
 	// device-level overrides

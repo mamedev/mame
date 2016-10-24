@@ -73,7 +73,7 @@ public:
 		m_floppy(*this, "fdc:0"),
 		m_palette(*this, "palette") { }
 
-	DECLARE_WRITE_LINE_MEMBER(generate_tms34061_interrupt);
+	void generate_tms34061_interrupt(int state);
 	void guab_tms34061_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	uint16_t guab_tms34061_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void ef9369_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
@@ -81,7 +81,7 @@ public:
 	uint16_t io_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-	DECLARE_WRITE_LINE_MEMBER(ptm_irq);
+	void ptm_irq(int state);
 	uint32_t screen_update_guab(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
@@ -107,7 +107,7 @@ private:
  *
  *************************************/
 
-WRITE_LINE_MEMBER(guab_state::ptm_irq)
+void guab_state::ptm_irq(int state)
 {
 	m_maincpu->set_input_line(INT_6840PTM, state);
 }
@@ -122,7 +122,7 @@ WRITE_LINE_MEMBER(guab_state::ptm_irq)
  * TMS34061 CRTC
  *****************/
 
-WRITE_LINE_MEMBER(guab_state::generate_tms34061_interrupt)
+void guab_state::generate_tms34061_interrupt(int state)
 {
 	m_maincpu->set_input_line(INT_TMS34061, state);
 }

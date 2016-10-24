@@ -182,7 +182,7 @@ public:
 	void init_hatris();
 	void pipedrm_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void sound_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	TIMER_CALLBACK_MEMBER( delayed_command_w );
+	void delayed_command_w(void *ptr, int32_t param);
 	void sound_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void sound_command_nonmi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void pending_command_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -232,7 +232,7 @@ void pipedrm_state::sound_bankswitch_w(address_space &space, offs_t offset, uint
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(pipedrm_state::delayed_command_w)
+void pipedrm_state::delayed_command_w(void *ptr, int32_t param)
 {
 	m_sound_command = param & 0xff;
 	m_pending_command = 1;

@@ -41,7 +41,7 @@
  *
  *************************************/
 
-WRITE_LINE_MEMBER(esripsys_state::ptm_irq)
+void esripsys_state::ptm_irq(int state)
 {
 	m_soundcpu->set_input_line(M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -154,7 +154,7 @@ void esripsys_state::f_status_w(address_space &space, offs_t offset, uint8_t dat
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(esripsys_state::delayed_bank_swap)
+void esripsys_state::delayed_bank_swap(void *ptr, int32_t param)
 {
 	m_fasel ^= 1;
 	m_fbsel ^= 1;

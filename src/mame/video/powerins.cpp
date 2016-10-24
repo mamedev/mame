@@ -93,7 +93,7 @@ Offset:
 #define DIM_NY_0            (0x20)
 
 
-TILE_GET_INFO_MEMBER(powerins_state::get_tile_info_0)
+void powerins_state::get_tile_info_0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = m_vram_0[tile_index];
 	SET_TILE_INFO_MEMBER(0,
@@ -108,7 +108,7 @@ void powerins_state::vram_0_w(address_space &space, offs_t offset, uint16_t data
 	m_tilemap_0->mark_tile_dirty(offset);
 }
 
-TILEMAP_MAPPER_MEMBER(powerins_state::get_memory_offset_0)
+tilemap_memory_index powerins_state::get_memory_offset_0(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	return  (col * TILES_PER_PAGE_Y) +
 
@@ -132,7 +132,7 @@ Offset:
 #define DIM_NX_1    (0x40)
 #define DIM_NY_1    (0x20)
 
-TILE_GET_INFO_MEMBER(powerins_state::get_tile_info_1)
+void powerins_state::get_tile_info_1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = m_vram_1[tile_index];
 	SET_TILE_INFO_MEMBER(1,

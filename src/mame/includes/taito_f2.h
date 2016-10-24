@@ -174,7 +174,7 @@ public:
 	void screen_eof_taitof2_partial_buffer_delayed_thundfox(screen_device &screen, bool state);
 	void screen_eof_taitof2_full_buffer_delayed(screen_device &screen, bool state);
 	void screen_eof_taitof2_partial_buffer_delayed_qzchikyu(screen_device &screen, bool state);
-	INTERRUPT_GEN_MEMBER(taitof2_interrupt);
+	void taitof2_interrupt(device_t &device);
 	void reset_driveout_sound_region();
 	void taitof2_core_vh_start (int sprite_type, int hide, int flip_hide );
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int *primasks, int uses_tc360_mixer );

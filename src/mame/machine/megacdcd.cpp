@@ -1035,7 +1035,7 @@ void lc89510_temp_device::reset_cd(void)
 
 
 
-TIMER_DEVICE_CALLBACK_MEMBER( lc89510_temp_device::segacd_access_timer_callback )
+void lc89510_temp_device::segacd_access_timer_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	if (!is_neoCD)
 	{

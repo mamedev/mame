@@ -112,18 +112,18 @@ void vector06_state::vector06_8255_2_w(address_space &space, offs_t offset, uint
 	m_ppi2->write(space, offset^3, data);
 }
 
-INTERRUPT_GEN_MEMBER(vector06_state::vector06_interrupt)
+void vector06_state::vector06_interrupt(device_t &device)
 {
 	device.execute().set_input_line(0, HOLD_LINE);
 }
 
-IRQ_CALLBACK_MEMBER(vector06_state::vector06_irq_callback)
+int vector06_state::vector06_irq_callback(device_t &device, int irqline)
 {
 	// Interupt is RST 7
 	return 0xff;
 }
 
-TIMER_CALLBACK_MEMBER(vector06_state::reset_check_callback)
+void vector06_state::reset_check_callback(void *ptr, int32_t param)
 {
 	uint8_t val = m_reset->read();
 
@@ -199,7 +199,7 @@ void vector06_state::vector06_status_callback(address_space &space, offs_t offse
 		update_mem();
 }
 
-WRITE_LINE_MEMBER(vector06_state::speaker_w)
+void vector06_state::speaker_w(int state)
 {
 	m_speaker->level_w(state);
 }

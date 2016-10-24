@@ -91,9 +91,9 @@ public:
 	uint8_t kbpio_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void kbpio_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t kbpio_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( fr_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
+	void fr_w(int state);
+	void fdc_intrq_w(int state);
+	void fdc_drq_w(int state);
 
 	virtual void bankswitch(int bank);
 	void update_nmi();
@@ -112,7 +112,7 @@ public:
 	int m_8n5;                          /* 5.25" / 8" drive select */
 	int m_400_460;                      /* double sided disk detect */
 
-	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
+	void ctc_tick(timer_device &timer, void *ptr, int32_t param);
 };
 
 class bigboard_state : public xerox820_state
@@ -131,7 +131,7 @@ public:
 
 	bool m_bit5;
 
-	TIMER_CALLBACK_MEMBER(bigboard_beepoff);
+	void bigboard_beepoff(void *ptr, int32_t param);
 };
 
 class xerox820ii_state : public xerox820_state
@@ -156,7 +156,7 @@ public:
 	void sync_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void rdpio_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( rdpio_pardy_w );
+	void rdpio_pardy_w(int state);
 
 	void bankswitch(int bank) override;
 };

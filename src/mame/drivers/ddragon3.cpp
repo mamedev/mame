@@ -773,7 +773,7 @@ GFXDECODE_END
  *
  *************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(ddragon3_state::ddragon3_scanline)
+void ddragon3_state::ddragon3_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

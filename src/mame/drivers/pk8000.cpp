@@ -49,12 +49,12 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_pk8000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(pk8000_interrupt);
+	void pk8000_interrupt(device_t &device);
 	void pk8000_80_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t pk8000_80_portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void pk8000_80_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	IRQ_CALLBACK_MEMBER(pk8000_irq_callback);
+	int pk8000_irq_callback(device_t &device, int irqline);
 
 protected:
 	required_device<cpu_device> m_maincpu;
@@ -308,12 +308,12 @@ static INPUT_PORTS_START( pk8000 )
 		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
-INTERRUPT_GEN_MEMBER(pk8000_state::pk8000_interrupt)
+void pk8000_state::pk8000_interrupt(device_t &device)
 {
 	device.execute().set_input_line(0, HOLD_LINE);
 }
 
-IRQ_CALLBACK_MEMBER(pk8000_state::pk8000_irq_callback)
+int pk8000_state::pk8000_irq_callback(device_t &device, int irqline)
 {
 	return 0xff;
 }

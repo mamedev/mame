@@ -32,7 +32,7 @@ public:
 	void init_enc();
 	void init_deb();
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(norautp);
+	void palette_init_norautp(palette_device &palette);
 	uint32_t screen_update_norautp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<discrete_device> m_discrete;

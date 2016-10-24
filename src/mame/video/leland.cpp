@@ -29,7 +29,7 @@
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(leland_state::scanline_callback)
+void leland_state::scanline_callback(void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -284,7 +284,7 @@ void leland_state::leland_master_video_addr_w(address_space &space, offs_t offse
 }
 
 
-TIMER_CALLBACK_MEMBER(leland_state::leland_delayed_mvram_w)
+void leland_state::leland_delayed_mvram_w(void *ptr, int32_t param)
 {
 	address_space &space = m_master->space(AS_PROGRAM);
 

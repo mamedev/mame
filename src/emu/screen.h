@@ -232,8 +232,8 @@ public:
 	int vpos() const;
 	int hpos() const;
 	bool vblank() const { return (machine().time() < m_vblank_end_time); }
-	DECLARE_READ_LINE_MEMBER(vblank) { return (machine().time() < m_vblank_end_time) ? ASSERT_LINE : CLEAR_LINE; }
-	DECLARE_READ_LINE_MEMBER(hblank) { int curpos = hpos(); return (curpos < m_visarea.min_x || curpos > m_visarea.max_x) ? ASSERT_LINE : CLEAR_LINE; }
+	int vblank() { return (machine().time() < m_vblank_end_time) ? ASSERT_LINE : CLEAR_LINE; }
+	int hblank() { int curpos = hpos(); return (curpos < m_visarea.min_x || curpos > m_visarea.max_x) ? ASSERT_LINE : CLEAR_LINE; }
 
 	// timing
 	attotime time_until_pos(int vpos, int hpos = 0) const;

@@ -50,8 +50,8 @@ public:
 	template<class _Object> static devcb_base &set_drq_handler(device_t &device, _Object object)
 		{ return downcast<bbc_fdc_slot_device &>(device).m_drq_handler.set_callback(object); }
 
-	DECLARE_WRITE_LINE_MEMBER( intrq_w ) { m_intrq_handler(state); }
-	DECLARE_WRITE_LINE_MEMBER( drq_w) { m_drq_handler(state); }
+	void intrq_w(int state) { m_intrq_handler(state); }
+	void drq_w(int state) { m_drq_handler(state); }
 
 protected:
 	// device-level overrides

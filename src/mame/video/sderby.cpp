@@ -5,7 +5,7 @@
 
 /* BG Layer */
 
-TILE_GET_INFO_MEMBER(sderby_state::get_sderby_tile_info)
+void sderby_state::get_sderby_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno,colour;
 
@@ -23,7 +23,7 @@ void sderby_state::sderby_videoram_w(address_space &space, offs_t offset, uint16
 
 /* MD Layer */
 
-TILE_GET_INFO_MEMBER(sderby_state::get_sderby_md_tile_info)
+void sderby_state::get_sderby_md_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno,colour;
 
@@ -41,7 +41,7 @@ void sderby_state::sderby_md_videoram_w(address_space &space, offs_t offset, uin
 
 /* FG Layer */
 
-TILE_GET_INFO_MEMBER(sderby_state::get_sderby_fg_tile_info)
+void sderby_state::get_sderby_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno,colour;
 

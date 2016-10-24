@@ -68,7 +68,7 @@ static ADDRESS_MAP_START( c2031_mem, AS_PROGRAM, 8, c2031_device )
 ADDRESS_MAP_END
 
 
-WRITE_LINE_MEMBER( c2031_device::via0_irq_w )
+void c2031_device::via0_irq_w(int state)
 {
 	m_via0_irq = state;
 
@@ -200,7 +200,7 @@ void c2031_device::via0_pb_w(address_space &space, offs_t offset, uint8_t data, 
 }
 
 
-WRITE_LINE_MEMBER( c2031_device::via1_irq_w )
+void c2031_device::via1_irq_w(int state)
 {
 	m_via1_irq = state;
 
@@ -270,7 +270,7 @@ void c2031_device::via1_pb_w(address_space &space, offs_t offset, uint8_t data, 
 //  C64H156_INTERFACE( ga_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( c2031_device::byte_w )
+void c2031_device::byte_w(int state)
 {
 	m_maincpu->set_input_line(M6502_SET_OVERFLOW, state);
 

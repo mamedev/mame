@@ -178,7 +178,7 @@ public:
 	uint32_t speedup9_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	uint32_t speedup10_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	uint32_t speedup11_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
-	TIMER_DEVICE_CALLBACK_MEMBER(sound_timer_callback);
+	void sound_timer_callback(timer_device &timer, void *ptr, int32_t param);
 	void draw_char(bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx, int ch, int att, int x, int y);
 	void draw_framebuffer(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_cga(bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -653,7 +653,7 @@ static void cx5510_pci_w(device_t *busdevice, device_t *device, int function, in
 
 /* Analog Devices AD1847 Stereo DAC */
 
-TIMER_DEVICE_CALLBACK_MEMBER(mediagx_state::sound_timer_callback)
+void mediagx_state::sound_timer_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	m_ad1847_sample_counter = 0;
 	timer.adjust(attotime::from_msec(10));

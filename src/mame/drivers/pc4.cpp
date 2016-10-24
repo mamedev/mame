@@ -161,7 +161,7 @@ static INPUT_PORTS_START( pc4 )
 		PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
-PALETTE_INIT_MEMBER(pc4_state, pc4)
+void pc4_state::palette_init_pc4(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));

@@ -42,7 +42,7 @@ public:
 	// writers
 	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void inflection_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_READ_LINE_MEMBER( request ) { m_stream->update(); return m_request_state; }
+	int request() { m_stream->update(); return m_request_state; }
 
 protected:
 	// device-level overrides

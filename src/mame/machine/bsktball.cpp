@@ -21,7 +21,7 @@ void bsktball_state::bsktball_nmion_w(address_space &space, offs_t offset, uint8
     bsktball_interrupt
 ***************************************************************************/
 /* NMI every 32V, IRQ every VBLANK */
-TIMER_DEVICE_CALLBACK_MEMBER(bsktball_state::bsktball_scanline)
+void bsktball_state::bsktball_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

@@ -10,7 +10,7 @@
 
 /* Foreground Layer (tx) Tilemap */
 
-TILE_GET_INFO_MEMBER(tbowl_state::get_tx_tile_info)
+void tbowl_state::get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno;
 	int col;
@@ -29,7 +29,7 @@ void tbowl_state::txvideoram_w(address_space &space, offs_t offset, uint8_t data
 
 /* Bottom BG Layer (bg) Tilemap */
 
-TILE_GET_INFO_MEMBER(tbowl_state::get_bg_tile_info)
+void tbowl_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno;
 	int col;
@@ -68,7 +68,7 @@ void tbowl_state::bgyscroll_hi(address_space &space, offs_t offset, uint8_t data
 
 /* Middle BG Layer (bg2) Tilemaps */
 
-TILE_GET_INFO_MEMBER(tbowl_state::get_bg2_tile_info)
+void tbowl_state::get_bg2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno;
 	int col;

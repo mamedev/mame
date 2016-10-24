@@ -98,12 +98,12 @@ public:
 	uint8_t spyhuntertec_in2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t spyhuntertec_in3_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	TILEMAP_MAPPER_MEMBER(spyhunt_bg_scan);
-	TILE_GET_INFO_MEMBER(spyhunt_get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(spyhunt_get_alpha_tile_info);
+	tilemap_memory_index spyhunt_bg_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	void spyhunt_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void spyhunt_get_alpha_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void mcr3_update_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int color_mask, int code_xor, int dx, int dy, int interlaced);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(analog_count_callback);
+	void analog_count_callback(timer_device &timer, void *ptr, int32_t param);
 	void reset_analog_timer();
 
 	uint8_t m_analog_select;
@@ -127,7 +127,7 @@ void spyhuntertec_state::reset_analog_timer()
 	m_analog_timer->adjust(attotime::from_nsec(9400));
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(spyhuntertec_state::analog_count_callback)
+void spyhuntertec_state::analog_count_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	if (m_analog_count != 0)
 		m_analog_count--;
@@ -205,14 +205,14 @@ void spyhuntertec_state::spyhuntertec_paletteram_w(address_space &space, offs_t 
 }
 
 
-TILEMAP_MAPPER_MEMBER(spyhuntertec_state::spyhunt_bg_scan)
+tilemap_memory_index spyhuntertec_state::spyhunt_bg_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return (row & 0x0f) | ((col & 0x3f) << 4) | ((row & 0x10) << 6);
 }
 
 
-TILE_GET_INFO_MEMBER(spyhuntertec_state::spyhunt_get_bg_tile_info)
+void spyhuntertec_state::spyhunt_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *videoram = m_videoram;
 	int data = videoram[tile_index];
@@ -221,7 +221,7 @@ TILE_GET_INFO_MEMBER(spyhuntertec_state::spyhunt_get_bg_tile_info)
 }
 
 
-TILE_GET_INFO_MEMBER(spyhuntertec_state::spyhunt_get_alpha_tile_info)
+void spyhuntertec_state::spyhunt_get_alpha_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	SET_TILE_INFO_MEMBER(2, m_spyhunt_alpharam[tile_index], 0, 0);
 }

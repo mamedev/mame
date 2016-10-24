@@ -112,13 +112,13 @@ public:
 	void init_arkbloc2();
 	void init_arkangc();
 	void init_brixian();
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_arkanoid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_hexa(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(timer_68705_increment);
+	void timer_68705_increment(void *ptr, int32_t param);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void arkanoid_bootleg_init(  );
 

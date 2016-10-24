@@ -356,7 +356,7 @@ void segas1x_bootleg_state::tturfbl_msm5205_data_w(address_space &space, offs_t 
 	m_sample_buffer = data;
 }
 
-WRITE_LINE_MEMBER(segas1x_bootleg_state::tturfbl_msm5205_callback)
+void segas1x_bootleg_state::tturfbl_msm5205_callback(int state)
 {
 	m_msm->data_w((m_sample_buffer >> 4) & 0x0f);
 
@@ -1141,7 +1141,7 @@ void segas1x_bootleg_state::shdancbl_msm5205_data_w(address_space &space, offs_t
 	m_sample_buffer = data;
 }
 
-WRITE_LINE_MEMBER(segas1x_bootleg_state::shdancbl_msm5205_callback)
+void segas1x_bootleg_state::shdancbl_msm5205_callback(int state)
 {
 	m_msm->data_w(m_sample_buffer & 0x0f);
 
@@ -2014,7 +2014,7 @@ static MACHINE_CONFIG_FRAGMENT( z80_ym2151 )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.32)
 MACHINE_CONFIG_END
 
-WRITE_LINE_MEMBER(segas1x_bootleg_state::sound_cause_nmi)
+void segas1x_bootleg_state::sound_cause_nmi(int state)
 {
 	/* upd7759 callback */
 	m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);

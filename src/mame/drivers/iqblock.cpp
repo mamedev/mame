@@ -75,7 +75,7 @@ void iqblock_state::grndtour_prot_w(address_space &space, offs_t offset, uint8_t
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(iqblock_state::irq)
+void iqblock_state::irq(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

@@ -13,7 +13,7 @@ Video hardware driver by Uki
 #include "emu.h"
 #include "includes/ikki.h"
 
-PALETTE_INIT_MEMBER(ikki_state, ikki)
+void ikki_state::palette_init_ikki(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;

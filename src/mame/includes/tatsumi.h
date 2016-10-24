@@ -130,9 +130,9 @@ public:
 	void init_roundup5();
 	void init_apache3();
 	void init_cyclwarr();
-	TILE_GET_INFO_MEMBER(get_text_tile_info);
-	TILE_GET_INFO_MEMBER(get_tile_info_bigfight_0);
-	TILE_GET_INFO_MEMBER(get_tile_info_bigfight_1);
+	void get_text_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info_bigfight_0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info_bigfight_1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void machine_reset_apache3();
 	void video_start_apache3();
 	void video_start_roundup5();
@@ -142,9 +142,9 @@ public:
 	uint32_t screen_update_roundup5(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cyclwarr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_bigfight(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(roundup5_interrupt);
+	void roundup5_interrupt(device_t &device);
 	uint8_t tatsumi_hack_ym2151_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t tatsumi_hack_oki_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(apache3_68000_reset);
+	void apache3_68000_reset(int state);
 	void tatsumi_reset();
 };

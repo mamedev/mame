@@ -2050,7 +2050,7 @@ void ppc_device::ppccom_update_fprf()
     whenever a decrementer interrupt is generated
 -------------------------------------------------*/
 
-TIMER_CALLBACK_MEMBER( ppc_device::decrementer_int_callback )
+void ppc_device::decrementer_int_callback(void *ptr, int32_t param)
 {
 	uint64_t cycles_until_next;
 
@@ -2272,7 +2272,7 @@ bool ppc_device::ppc4xx_dma_decrement_count(int dmachan)
     when buffered DMA transfer is ready
 -------------------------------------------------*/
 
-TIMER_CALLBACK_MEMBER( ppc_device::ppc4xx_buffered_dma_callback )
+void ppc_device::ppc4xx_buffered_dma_callback(void *ptr, int32_t param)
 {
 	int dmachan = param;
 
@@ -2536,7 +2536,7 @@ void ppc_device::ppc4xx_dma_exec(int dmachan)
     ppc4xx_fit_callback - FIT timer callback
 -------------------------------------------------*/
 
-TIMER_CALLBACK_MEMBER( ppc_device::ppc4xx_fit_callback )
+void ppc_device::ppc4xx_fit_callback(void *ptr, int32_t param)
 {
 	/* if this is a real callback and we are enabled, signal an interrupt */
 	if (param)
@@ -2564,7 +2564,7 @@ TIMER_CALLBACK_MEMBER( ppc_device::ppc4xx_fit_callback )
     ppc4xx_pit_callback - PIT timer callback
 -------------------------------------------------*/
 
-TIMER_CALLBACK_MEMBER( ppc_device::ppc4xx_pit_callback )
+void ppc_device::ppc4xx_pit_callback(void *ptr, int32_t param)
 {
 	/* if this is a real callback and we are enabled, signal an interrupt */
 	if (param)
@@ -2673,7 +2673,7 @@ void ppc_device::ppc4xx_spu_timer_reset()
     timer
 -------------------------------------------------*/
 
-TIMER_CALLBACK_MEMBER( ppc_device::ppc4xx_spu_callback )
+void ppc_device::ppc4xx_spu_callback(void *ptr, int32_t param)
 {
 	/* transmit enabled? */
 	if (m_spu.regs[SPU4XX_TX_COMMAND] & 0x80)

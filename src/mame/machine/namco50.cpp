@@ -135,13 +135,13 @@ Flags: 80=high score, 40=first bonus, 20=interval bonus, 10=?
 #include "emu.h"
 #include "namco50.h"
 
-TIMER_CALLBACK_MEMBER( namco_50xx_device::latch_callback )
+void namco_50xx_device::latch_callback(void *ptr, int32_t param)
 {
 	m_latched_cmd = param;
 	m_latched_rw = 0;
 }
 
-TIMER_CALLBACK_MEMBER( namco_50xx_device::readrequest_callback )
+void namco_50xx_device::readrequest_callback(void *ptr, int32_t param)
 {
 	m_latched_rw = 1;
 }
@@ -170,7 +170,7 @@ void namco_50xx_device::O_w(address_space &space, offs_t offset, uint8_t data, u
 		m_portO = (m_portO & 0xf0) | (out);
 }
 
-TIMER_CALLBACK_MEMBER( namco_50xx_device::irq_clear )
+void namco_50xx_device::irq_clear(void *ptr, int32_t param)
 {
 	m_cpu->set_input_line(0, CLEAR_LINE);
 }
@@ -195,7 +195,7 @@ void namco_50xx_device::write(address_space &space, offs_t offset, uint8_t data,
 }
 
 
-WRITE_LINE_MEMBER(namco_50xx_device::read_request)
+void namco_50xx_device::read_request(int state)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(namco_50xx_device::readrequest_callback),this), 0);
 

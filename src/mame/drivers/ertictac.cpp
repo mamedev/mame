@@ -41,7 +41,7 @@ public:
 	void init_ertictac();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	INTERRUPT_GEN_MEMBER(ertictac_podule_irq);
+	void ertictac_podule_irq(device_t &device);
 };
 
 
@@ -209,7 +209,7 @@ void ertictac_state::machine_reset()
 	archimedes_reset();
 }
 
-INTERRUPT_GEN_MEMBER(ertictac_state::ertictac_podule_irq)
+void ertictac_state::ertictac_podule_irq(device_t &device)
 {
 	archimedes_request_irq_b(ARCHIMEDES_IRQB_PODULE_IRQ);
 }

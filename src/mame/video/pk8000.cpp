@@ -82,7 +82,7 @@ static const rgb_t pk8000_palette[16] = {
 	rgb_t(0xff, 0xff, 0xff), // F
 };
 
-PALETTE_INIT_MEMBER(pk8000_base_state, pk8000)
+void pk8000_base_state::palette_init_pk8000(palette_device &palette)
 {
 	palette.set_pen_colors(0, pk8000_palette, ARRAY_LENGTH(pk8000_palette));
 }

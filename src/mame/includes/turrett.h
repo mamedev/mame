@@ -41,12 +41,12 @@ public:
 	uint32_t int_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	void int_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	INPUT_CHANGED_MEMBER(ipt_change);
-	DECLARE_READ_LINE_MEMBER(sbrc2_r);
-	DECLARE_READ_LINE_MEMBER(sbrc3_r);
+	int sbrc2_r();
+	int sbrc3_r();
 
-	TIMER_CALLBACK_MEMBER(dma_complete);
-	INTERRUPT_GEN_MEMBER(vblank);
-	INTERRUPT_GEN_MEMBER(adc);
+	void dma_complete(void *ptr, int32_t param);
+	void vblank(device_t &device);
+	void adc(device_t &device);
 
 	// functions
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

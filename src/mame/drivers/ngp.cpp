@@ -191,12 +191,12 @@ public:
 
 	void ngp_z80_clear_irq(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( ngp_vblank_pin_w );
-	DECLARE_WRITE_LINE_MEMBER( ngp_hblank_pin_w );
+	void ngp_vblank_pin_w(int state);
+	void ngp_hblank_pin_w(int state);
 	void ngp_tlcs900_porta(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint32_t screen_update_ngp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_INPUT_CHANGED_MEMBER(power_callback);
-	TIMER_CALLBACK_MEMBER(ngp_seconds_callback);
+	void ngp_seconds_callback(void *ptr, int32_t param);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( ngp_cart);
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( ngp_cart );
@@ -213,7 +213,7 @@ protected:
 };
 
 
-TIMER_CALLBACK_MEMBER(ngp_state::ngp_seconds_callback)
+void ngp_state::ngp_seconds_callback(void *ptr, int32_t param)
 {
 	m_io_reg[0x16] += 1;
 	if ( ( m_io_reg[0x16] & 0x0f ) == 0x0a )
@@ -621,13 +621,13 @@ static INPUT_PORTS_START( ngp )
 INPUT_PORTS_END
 
 
-WRITE_LINE_MEMBER( ngp_state::ngp_vblank_pin_w )
+void ngp_state::ngp_vblank_pin_w(int state)
 {
 	m_tlcs900->set_input_line(TLCS900_INT4, state ? ASSERT_LINE : CLEAR_LINE );
 }
 
 
-WRITE_LINE_MEMBER( ngp_state::ngp_hblank_pin_w )
+void ngp_state::ngp_hblank_pin_w(int state)
 {
 	m_tlcs900->set_input_line(TLCS900_TIO, state ? ASSERT_LINE : CLEAR_LINE );
 }

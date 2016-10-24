@@ -57,7 +57,7 @@ public:
 	uint32_t m_display_cache[0x20];       // (internal use)
 	uint8_t m_display_decay[0x20][0x20];  // (internal use)
 
-	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
+	void display_decay_tick(timer_device &timer, void *ptr, int32_t param);
 	void display_update();
 	void set_display_size(int maxx, int maxy);
 	void display_matrix(int maxx, int maxy, uint32_t setx, uint32_t sety, bool update = true);

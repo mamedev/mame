@@ -84,8 +84,8 @@ public:
 	void printer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void mc6845_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void mc6847_attr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( fs_w );
-	DECLARE_WRITE_LINE_MEMBER( hs_w );
+	void fs_w(int state);
+	void hs_w(int state);
 	uint8_t videoram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void keylatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t keydata_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
@@ -109,11 +109,11 @@ public:
 	int m_vsync;
 	uint8_t m_mc6847_attr;
 
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
+	void write_centronics_busy(int state);
 	int m_centronics_busy;
 
 	void init_mc1000();
-	TIMER_DEVICE_CALLBACK_MEMBER(ne555_tick);
+	void ne555_tick(timer_device &timer, void *ptr, int32_t param);
 };
 
 /* Memory Banking */
@@ -167,7 +167,7 @@ void mc1000_state::bankswitch()
 
 /* Read/Write Handlers */
 
-WRITE_LINE_MEMBER( mc1000_state::write_centronics_busy )
+void mc1000_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 }
@@ -352,12 +352,12 @@ INPUT_PORTS_END
 
 /* Video */
 
-WRITE_LINE_MEMBER( mc1000_state::fs_w )
+void mc1000_state::fs_w(int state)
 {
 	m_vsync = state;
 }
 
-WRITE_LINE_MEMBER( mc1000_state::hs_w )
+void mc1000_state::hs_w(int state)
 {
 	m_hsync = state;
 }
@@ -501,7 +501,7 @@ void mc1000_state::machine_reset()
 #define MC1000_NE555_FREQ       (367) /* Hz */
 #define MC1000_NE555_DUTY_CYCLE (99.745) /* % */
 
-TIMER_DEVICE_CALLBACK_MEMBER(mc1000_state::ne555_tick)
+void mc1000_state::ne555_tick(timer_device &timer, void *ptr, int32_t param)
 {
 	// (m_ne555_int not needed anymore and can be done with?)
 	m_ne555_int = param;

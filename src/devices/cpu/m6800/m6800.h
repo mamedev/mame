@@ -195,7 +195,7 @@ protected:
 	int m6800_rx();
 	void serial_transmit();
 	void serial_receive();
-	TIMER_CALLBACK_MEMBER( sci_tick );
+	void sci_tick(void *ptr, int32_t param);
 	void set_os3(int state);
 
 	void aba();

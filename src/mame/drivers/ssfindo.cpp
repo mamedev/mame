@@ -279,9 +279,9 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	INTERRUPT_GEN_MEMBER(interrupt);
-	TIMER_CALLBACK_MEMBER(PS7500_Timer0_callback);
-	TIMER_CALLBACK_MEMBER(PS7500_Timer1_callback);
+	void interrupt(device_t &device);
+	void PS7500_Timer0_callback(void *ptr, int32_t param);
+	void PS7500_Timer1_callback(void *ptr, int32_t param);
 
 	typedef void (ssfindo_state::*speedup_func)(address_space &space);
 	speedup_func m_speedup;
@@ -329,7 +329,7 @@ void ssfindo_state::FIFO_w(address_space &space, offs_t offset, uint32_t data, u
 		m_PS7500_FIFO[1]++; //autoinc
 	}
 }
-TIMER_CALLBACK_MEMBER(ssfindo_state::PS7500_Timer0_callback)
+void ssfindo_state::PS7500_Timer0_callback(void *ptr, int32_t param)
 {
 	m_PS7500_IO[IRQSTA]|=0x20;
 	if(m_PS7500_IO[IRQMSKA]&0x20)
@@ -348,7 +348,7 @@ void ssfindo_state::PS7500_startTimer0()
 		m_PS7500timer0->adjust(attotime::from_usec(val ), 0, attotime::from_usec(val ));
 }
 
-TIMER_CALLBACK_MEMBER(ssfindo_state::PS7500_Timer1_callback)
+void ssfindo_state::PS7500_Timer1_callback(void *ptr, int32_t param)
 {
 	m_PS7500_IO[IRQSTA]|=0x40;
 	if(m_PS7500_IO[IRQMSKA]&0x40)
@@ -366,7 +366,7 @@ void ssfindo_state::PS7500_startTimer1()
 		m_PS7500timer1->adjust(attotime::from_usec(val ), 0, attotime::from_usec(val ));
 }
 
-INTERRUPT_GEN_MEMBER(ssfindo_state::interrupt)
+void ssfindo_state::interrupt(device_t &device)
 {
 	m_PS7500_IO[IRQSTA]|=0x08;
 		if(m_PS7500_IO[IRQMSKA]&0x08)

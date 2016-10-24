@@ -74,7 +74,7 @@ void snes_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 }
 
 
-TIMER_CALLBACK_MEMBER(snes_state::snes_nmi_tick)
+void snes_state::snes_nmi_tick(void *ptr, int32_t param)
 {
 	// pull NMI
 	m_maincpu->set_input_line(G65816_LINE_NMI, ASSERT_LINE);
@@ -95,12 +95,12 @@ void snes_state::hirq_tick()
 	m_hirq_timer->adjust(attotime::never);
 }
 
-TIMER_CALLBACK_MEMBER(snes_state::snes_hirq_tick_callback)
+void snes_state::snes_hirq_tick_callback(void *ptr, int32_t param)
 {
 	hirq_tick();
 }
 
-TIMER_CALLBACK_MEMBER(snes_state::snes_reset_oam_address)
+void snes_state::snes_reset_oam_address(void *ptr, int32_t param)
 {
 	// make sure we're in the 65816's context since we're messing with the OAM and stuff
 	address_space &space = m_maincpu->space(AS_PROGRAM);
@@ -113,13 +113,13 @@ TIMER_CALLBACK_MEMBER(snes_state::snes_reset_oam_address)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(snes_state::snes_reset_hdma)
+void snes_state::snes_reset_hdma(void *ptr, int32_t param)
 {
 	address_space &cpu0space = m_maincpu->space(AS_PROGRAM);
 	hdma_init(cpu0space);
 }
 
-TIMER_CALLBACK_MEMBER(snes_state::snes_update_io)
+void snes_state::snes_update_io(void *ptr, int32_t param)
 {
 	io_read(m_maincpu->space(AS_PROGRAM),0,0,0);
 	SNES_CPU_REG(HVBJOY) &= 0xfe;       /* Clear busy bit */
@@ -127,7 +127,7 @@ TIMER_CALLBACK_MEMBER(snes_state::snes_update_io)
 	m_io_timer->adjust(attotime::never);
 }
 
-TIMER_CALLBACK_MEMBER(snes_state::snes_scanline_tick)
+void snes_state::snes_scanline_tick(void *ptr, int32_t param)
 {
 	/* Increase current line - we want to latch on this line during it, not after it */
 	m_ppu->m_beam.current_vert = m_screen->vpos();
@@ -217,7 +217,7 @@ TIMER_CALLBACK_MEMBER(snes_state::snes_scanline_tick)
 }
 
 /* This is called at the start of hblank *before* the scanline indicated in current_vert! */
-TIMER_CALLBACK_MEMBER(snes_state::snes_hblank_tick)
+void snes_state::snes_hblank_tick(void *ptr, int32_t param)
 {
 	address_space &cpu0space = m_maincpu->space(AS_PROGRAM);
 	int nextscan;
@@ -616,7 +616,7 @@ void snes_state::wrio_write(uint8_t data)
 	}
 }
 
-WRITE_LINE_MEMBER(snes_state::snes_extern_irq_w)
+void snes_state::snes_extern_irq_w(int state)
 {
 	m_maincpu->set_input_line(G65816_LINE_IRQ, state);
 }

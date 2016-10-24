@@ -56,7 +56,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(ganjaja_d7756_busy_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(ganjaja_hopper_status_r);
 
-	TILE_GET_INFO_MEMBER(get_homerun_tile_info);
+	void get_homerun_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

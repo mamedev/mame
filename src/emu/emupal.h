@@ -107,14 +107,6 @@
 #define PALETTE_DEFAULT_SHADOW_FACTOR (0.6)
 #define PALETTE_DEFAULT_HIGHLIGHT_FACTOR (1/PALETTE_DEFAULT_SHADOW_FACTOR)
 
-#define PALETTE_INIT_NAME(_Name) palette_init_##_Name
-#define DECLARE_PALETTE_INIT(_Name) void PALETTE_INIT_NAME(_Name)(palette_device &palette)
-#define PALETTE_INIT_MEMBER(_Class, _Name) void _Class::PALETTE_INIT_NAME(_Name)(palette_device &palette)
-
-#define PALETTE_DECODER_NAME(_Name) _Name##_decoder
-#define DECLARE_PALETTE_DECODER(_Name) static rgb_t PALETTE_DECODER_NAME(_Name)(uint32_t raw)
-#define PALETTE_DECODER_MEMBER(_Class, _Name) rgb_t _Class::PALETTE_DECODER_NAME(_Name)(uint32_t raw)
-
 // standard 3-3-2 formats
 #define PALETTE_FORMAT_BBGGGRRR raw_to_rgb_converter(1, &raw_to_rgb_converter::standard_rgb_decoder<3,3,2, 0,3,6>)
 #define PALETTE_FORMAT_RRRGGGBB raw_to_rgb_converter(1, &raw_to_rgb_converter::standard_rgb_decoder<3,3,2, 5,2,0>)
@@ -188,12 +180,14 @@
 
 
 #define MCFG_PALETTE_INIT_OWNER(_class, _method) \
-	palette_device::static_set_init(*device, palette_init_delegate(&_class::PALETTE_INIT_NAME(_method), #_class "::palette_init_" #_method, downcast<_class *>(owner)));
+	palette_device::static_set_init(*device, palette_init_delegate(&_class::palette_init_##_method, #_class "::palette_init_" #_method, downcast<_class *>(owner)));
 #define MCFG_PALETTE_INIT_DEVICE(_tag, _class, _method) \
-	palette_device::static_set_init(*device, palette_init_delegate(&_class::PALETTE_INIT_NAME(_method), #_class "::palette_init_" #_method, _tag));
+	palette_device::static_set_init(*device, palette_init_delegate(&_class::palette_init_##_method, #_class "::palette_init_" #_method, _tag));
 
 #define MCFG_PALETTE_FORMAT(_format) \
 	palette_device::static_set_format(*device, PALETTE_FORMAT_##_format);
+
+#define PALETTE_DECODER_NAME(_Name) _Name##_decoder
 
 #define MCFG_PALETTE_FORMAT_CLASS(_bytes_per_entry, _class, _method) \
 	palette_device::static_set_format(*device, raw_to_rgb_converter(_bytes_per_entry, &_class::PALETTE_DECODER_NAME(_method)));

@@ -66,7 +66,7 @@ public:
 	void port2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void count_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_INPUT_CHANGED_MEMBER(ficha);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_r);
+	void timer_r(timer_device &timer, void *ptr, int32_t param);
 private:
 	bool m_timer_r;
 	bool m_clear;
@@ -384,7 +384,7 @@ void ltd_state::init_zephy()
 	m_game = 3;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( ltd_state::timer_r )
+void ltd_state::timer_r(timer_device &timer, void *ptr, int32_t param)
 {
 	m_timer_r ^= 1;
 	m_maincpu->set_input_line(M6802_IRQ_LINE, (m_timer_r) ? CLEAR_LINE : ASSERT_LINE);

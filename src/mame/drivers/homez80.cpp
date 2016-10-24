@@ -41,7 +41,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(homez80_interrupt);
+	void homez80_interrupt(device_t &device);
 };
 
 
@@ -274,7 +274,7 @@ static GFXDECODE_START( homez80 )
 GFXDECODE_END
 
 
-INTERRUPT_GEN_MEMBER(homez80_state::homez80_interrupt)
+void homez80_state::homez80_interrupt(device_t &device)
 {
 	device.execute().set_input_line(0, (m_irq) ? HOLD_LINE : CLEAR_LINE);
 	m_irq ^= 1;

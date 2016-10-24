@@ -70,7 +70,7 @@ public:
 	uint32_t screen_update_bonzeadv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_asuka(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_asuka(screen_device &screen, bool state);
-	INTERRUPT_GEN_MEMBER(cadash_interrupt);
+	void cadash_interrupt(device_t &device);
 
 	/*----------- defined in machine/bonzeadv.c -----------*/
 	void WriteLevelData();
@@ -81,7 +81,7 @@ public:
 	void bonzeadv_cchip_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void bonzeadv_cchip_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void bonzeadv_cchip_ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	DECLARE_WRITE_LINE_MEMBER(asuka_msm5205_vck);
+	void asuka_msm5205_vck(int state);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;

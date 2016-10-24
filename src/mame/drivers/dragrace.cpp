@@ -14,7 +14,7 @@
 #include "dragrace.lh"
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(dragrace_state::dragrace_frame_callback)
+void dragrace_state::dragrace_frame_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	static const char *const portnames[] = { "P1", "P2" };
 
@@ -290,7 +290,7 @@ static GFXDECODE_START( dragrace )
 GFXDECODE_END
 
 
-PALETTE_INIT_MEMBER(dragrace_state, dragrace)
+void dragrace_state::palette_init_dragrace(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(0xFF, 0xFF, 0xFF));   /* 2 color tiles */
 	palette.set_pen_color(1, rgb_t(0x00, 0x00, 0x00));

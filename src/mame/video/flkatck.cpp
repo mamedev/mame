@@ -15,7 +15,7 @@
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(flkatck_state::get_tile_info_A)
+void flkatck_state::get_tile_info_A(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t ctrl_0 = m_k007121->ctrlram_r(generic_space(), 0);
 	uint8_t ctrl_2 = m_k007121->ctrlram_r(generic_space(), 2);
@@ -48,7 +48,7 @@ TILE_GET_INFO_MEMBER(flkatck_state::get_tile_info_A)
 			(attr & 0x20) ? TILE_FLIPY : 0);
 }
 
-TILE_GET_INFO_MEMBER(flkatck_state::get_tile_info_B)
+void flkatck_state::get_tile_info_B(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_k007121_ram[tile_index + 0x800];
 	int code = m_k007121_ram[tile_index + 0xc00];

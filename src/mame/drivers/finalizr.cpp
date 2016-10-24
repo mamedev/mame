@@ -25,7 +25,7 @@
 #include "sound/volt_reg.h"
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(finalizr_state::finalizr_scanline)
+void finalizr_state::finalizr_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

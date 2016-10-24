@@ -48,8 +48,8 @@ public:
 	virtual ioport_constructor device_input_ports() const override;
 
 	// not really public
-	DECLARE_WRITE_LINE_MEMBER( cnt_w );
-	DECLARE_WRITE_LINE_MEMBER( sp_w );
+	void cnt_w(int state);
+	void sp_w(int state);
 	uint8_t cia_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void cia_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t cia_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);

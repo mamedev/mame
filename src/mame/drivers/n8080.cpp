@@ -430,7 +430,7 @@ INPUT_PORTS_END
 
 /* Interrupts */
 
-TIMER_DEVICE_CALLBACK_MEMBER(n8080_state::rst1_tick)
+void n8080_state::rst1_tick(timer_device &timer, void *ptr, int32_t param)
 {
 	int state = m_inte ? ASSERT_LINE : CLEAR_LINE;
 
@@ -438,7 +438,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(n8080_state::rst1_tick)
 	m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, state, 0xcf);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(n8080_state::rst2_tick)
+void n8080_state::rst2_tick(timer_device &timer, void *ptr, int32_t param)
 {
 	int state = m_inte ? ASSERT_LINE : CLEAR_LINE;
 
@@ -446,7 +446,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(n8080_state::rst2_tick)
 	m_maincpu->set_input_line_and_vector(INPUT_LINE_IRQ0, state, 0xd7);
 }
 
-WRITE_LINE_MEMBER(n8080_state::n8080_inte_callback)
+void n8080_state::n8080_inte_callback(int state)
 {
 	m_inte = state;
 }

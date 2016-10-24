@@ -504,9 +504,9 @@ public:
 	uint32_t widget_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	void widget_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	uint32_t seattle_ide_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
-	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
-	DECLARE_WRITE_LINE_MEMBER(vblank_assert);
-	DECLARE_WRITE_LINE_MEMBER(voodoo_stall);
+	void ide_interrupt(int state);
+	void vblank_assert(int state);
+	void voodoo_stall(int state);
 	void init_sfrush();
 	void init_blitz2k();
 	void init_carnevil();
@@ -522,9 +522,9 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_seattle(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(galileo_timer_callback);
-	DECLARE_WRITE_LINE_MEMBER(ethernet_interrupt);
-	DECLARE_WRITE_LINE_MEMBER(ioasic_irq);
+	void galileo_timer_callback(void *ptr, int32_t param);
+	void ethernet_interrupt(int state);
+	void ioasic_irq(int state);
 	void update_vblank_irq();
 	uint32_t pci_bridge_r(address_space &space, uint8_t reg, uint8_t type);
 	void pci_bridge_w(address_space &space, uint8_t reg, uint8_t type, uint32_t data);
@@ -647,7 +647,7 @@ void seattle_state::machine_reset()
  *
  *************************************/
 
-WRITE_LINE_MEMBER(seattle_state::ide_interrupt)
+void seattle_state::ide_interrupt(int state)
 {
 	m_maincpu->set_input_line(IDE_IRQ_NUM, state);
 }
@@ -660,7 +660,7 @@ WRITE_LINE_MEMBER(seattle_state::ide_interrupt)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(seattle_state::ethernet_interrupt)
+void seattle_state::ethernet_interrupt(int state)
 {
 	m_ethernet_irq_state = state;
 	if (m_board_config == FLAGSTAFF_CONFIG)
@@ -680,7 +680,7 @@ WRITE_LINE_MEMBER(seattle_state::ethernet_interrupt)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(seattle_state::ioasic_irq)
+void seattle_state::ioasic_irq(int state)
 {
 	m_maincpu->set_input_line(IOASIC_IRQ_NUM, state);
 }
@@ -796,7 +796,7 @@ void seattle_state::vblank_clear_w(address_space &space, offs_t offset, uint32_t
 }
 
 
-WRITE_LINE_MEMBER(seattle_state::vblank_assert)
+void seattle_state::vblank_assert(int state)
 {
 	/* cache the raw state */
 	m_vblank_state = state;
@@ -952,7 +952,7 @@ void seattle_state::update_galileo_irqs()
 }
 
 
-TIMER_CALLBACK_MEMBER(seattle_state::galileo_timer_callback)
+void seattle_state::galileo_timer_callback(void *ptr, int32_t param)
 {
 	int which = param;
 	galileo_timer *timer = &m_galileo.timer[which];
@@ -1381,7 +1381,7 @@ void seattle_state::seattle_voodoo_w(address_space &space, offs_t offset, uint32
 }
 
 
-WRITE_LINE_MEMBER(seattle_state::voodoo_stall)
+void seattle_state::voodoo_stall(int state)
 {
 	/* set the new state */
 	m_voodoo_stalled = state;

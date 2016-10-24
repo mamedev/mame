@@ -15,7 +15,7 @@
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(gaiden_state::get_bg_tile_info)
+void gaiden_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t *videoram1 = &m_videoram3[0x0800];
 	uint16_t *videoram2 = m_videoram3;
@@ -25,7 +25,7 @@ TILE_GET_INFO_MEMBER(gaiden_state::get_bg_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(gaiden_state::get_fg_tile_info)
+void gaiden_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t *videoram1 = &m_videoram2[0x0800];
 	uint16_t *videoram2 = m_videoram2;
@@ -35,7 +35,7 @@ TILE_GET_INFO_MEMBER(gaiden_state::get_fg_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(gaiden_state::get_fg_tile_info_raiga)
+void gaiden_state::get_fg_tile_info_raiga(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t *videoram1 = &m_videoram2[0x0800];
 	uint16_t *videoram2 = m_videoram2;
@@ -52,7 +52,7 @@ TILE_GET_INFO_MEMBER(gaiden_state::get_fg_tile_info_raiga)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(gaiden_state::get_tx_tile_info)
+void gaiden_state::get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t *videoram1 = &m_videoram[0x0400];
 	uint16_t *videoram2 = m_videoram;

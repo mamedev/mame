@@ -59,12 +59,12 @@ public:
 	void asic_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void a3003_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_PALETTE_INIT(cardline);
+	void palette_init_cardline(palette_device &palette);
 
 	virtual void machine_start() override;
 
-	DECLARE_WRITE_LINE_MEMBER(hsync_changed);
-	DECLARE_WRITE_LINE_MEMBER(vsync_changed);
+	void hsync_changed(int state);
+	void vsync_changed(int state);
 	MC6845_BEGIN_UPDATE(crtc_begin_update);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
@@ -135,7 +135,7 @@ MC6845_UPDATE_ROW( cardline_state::crtc_update_row )
 }
 
 
-WRITE_LINE_MEMBER(cardline_state::hsync_changed)
+void cardline_state::hsync_changed(int state)
 {
 	/* update any video up to the current scanline */
 	m_hsync_q = (state ? 0x00 : 0x10);
@@ -143,7 +143,7 @@ WRITE_LINE_MEMBER(cardline_state::hsync_changed)
 	m_screen->update_partial(m_screen->vpos());
 }
 
-WRITE_LINE_MEMBER(cardline_state::vsync_changed)
+void cardline_state::vsync_changed(int state)
 {
 	//m_maincpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -283,7 +283,7 @@ static GFXDECODE_START( cardline )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 2 )
 GFXDECODE_END
 
-PALETTE_INIT_MEMBER(cardline_state, cardline)
+void cardline_state::palette_init_cardline(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i,r,g,b,data;

@@ -35,7 +35,7 @@ public:
 	required_device<ncr5380n_device> m_ncr5380;
 	required_device<nscsi_bus_device> m_scsibus;
 
-	DECLARE_WRITE_LINE_MEMBER( drq_w );
+	void drq_w(int state);
 
 protected:
 	virtual void device_start() override;

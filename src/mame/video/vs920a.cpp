@@ -75,7 +75,7 @@ void vs920a_text_tilemap_device::static_set_gfxdecode_tag(device_t &device, cons
 
 
 
-TILE_GET_INFO_MEMBER(vs920a_text_tilemap_device::get_tile_info)
+void vs920a_text_tilemap_device::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int data;
 	int tileno, pal;

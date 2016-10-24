@@ -123,7 +123,7 @@ protected:
 	void check_interrupts();
 	void do_interrupt(int irqline);
 
-	TIMER_CALLBACK_MEMBER(simple_timer_cb);
+	void simple_timer_cb(void *ptr, int32_t param);
 	void timer_run(int tmr);
 	void timer_reload(int tmr);
 	void timer_tick_pre(int tmr);

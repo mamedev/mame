@@ -319,7 +319,7 @@ void h8_sci_device::device_timer(emu_timer &timer, device_timer_id id, int param
 	// Used only to force system-wide syncs
 }
 
-WRITE_LINE_MEMBER(h8_sci_device::rx_w)
+void h8_sci_device::rx_w(int state)
 {
 	rx_value = state;
 	if(V>=2) logerror("rx=%d\n", state);
@@ -327,7 +327,7 @@ WRITE_LINE_MEMBER(h8_sci_device::rx_w)
 		clock_start(CLK_RX);
 }
 
-WRITE_LINE_MEMBER(h8_sci_device::clk_w)
+void h8_sci_device::clk_w(int state)
 {
 	if(ext_clock_value != state) {
 		ext_clock_value = state;

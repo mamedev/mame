@@ -77,9 +77,9 @@ public:
 	uint8_t p2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void writeA(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void writeB(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
+	void adpcm_int(int state);
 
-	TILE_GET_INFO_MEMBER(get_tile_info);
+	void get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	void init_suprgolf();
 	virtual void machine_start() override;
@@ -89,7 +89,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
-TILE_GET_INFO_MEMBER(suprgolf_state::get_tile_info)
+void suprgolf_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index*2]+256*(m_videoram[tile_index*2+1]);
 	int color = m_videoram[tile_index*2+0x800] & 0x7f;
@@ -446,7 +446,7 @@ void suprgolf_state::writeB(address_space &space, offs_t offset, uint8_t data, u
 	osd_printf_debug("ymwA\n");
 }
 
-WRITE_LINE_MEMBER(suprgolf_state::adpcm_int)
+void suprgolf_state::adpcm_int(int state)
 {
 	m_msm->reset_w(0);
 	m_toggle ^= 1;

@@ -110,10 +110,10 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(famibox);
+	void palette_init_famibox(palette_device &palette);
 	uint32_t screen_update_famibox(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(famicombox_attract_timer_callback);
-	TIMER_CALLBACK_MEMBER(famicombox_gameplay_timer_callback);
+	void famicombox_attract_timer_callback(void *ptr, int32_t param);
+	void famicombox_gameplay_timer_callback(void *ptr, int32_t param);
 	void famicombox_bankswitch(uint8_t bank);
 	void famicombox_reset();
 	void ppu_irq(int *ppu_regs);
@@ -271,7 +271,7 @@ void famibox_state::famicombox_reset()
 	m_maincpu->reset();
 }
 
-TIMER_CALLBACK_MEMBER(famibox_state::famicombox_attract_timer_callback)
+void famibox_state::famicombox_attract_timer_callback(void *ptr, int32_t param)
 {
 	m_attract_timer->adjust(attotime::never, 0, attotime::never);
 	if ( BIT(m_exception_mask,1) )
@@ -281,7 +281,7 @@ TIMER_CALLBACK_MEMBER(famibox_state::famicombox_attract_timer_callback)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(famibox_state::famicombox_gameplay_timer_callback)
+void famibox_state::famicombox_gameplay_timer_callback(void *ptr, int32_t param)
 {
 	if (m_coins > 0)
 		m_coins--;
@@ -489,7 +489,7 @@ INPUT_PORTS_END
 
 *******************************************************/
 
-PALETTE_INIT_MEMBER(famibox_state, famibox)
+void famibox_state::palette_init_famibox(palette_device &palette)
 {
 	m_ppu->init_palette(palette, 0);
 }

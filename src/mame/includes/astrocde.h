@@ -180,12 +180,12 @@ public:
 	void init_gorf();
 	void init_astrocde();
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(astrocde);
+	void palette_init_astrocde(palette_device &palette);
 	void video_start_profpac();
-	DECLARE_PALETTE_INIT(profpac);
+	void palette_init_profpac(palette_device &palette);
 	uint32_t screen_update_astrocde(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_profpac(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(scanline_callback);
+	void scanline_callback(void *ptr, int32_t param);
 	inline int mame_vpos_to_astrocade_vpos(int scanline);
 	void init_savestate();
 	void astrocade_trigger_lightpen(uint8_t vfeedback, uint8_t hfeedback);

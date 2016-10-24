@@ -129,7 +129,7 @@ public:
 	void machine_start_common();
 	void machine_reset_common();
 	uint32_t screen_update_bublbobl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(bublbobl_m68705_interrupt);
+	void bublbobl_m68705_interrupt(device_t &device);
 	void configure_banks(  );
 
 protected:

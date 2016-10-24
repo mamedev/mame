@@ -103,10 +103,10 @@ public:
 	virtual uint8_t nrdi_r(address_space &space, offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1) { return data; };
 	virtual void nwri_w(address_space &space, offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1) { };
 
-	DECLARE_WRITE_LINE_MEMBER( iint_w );
-	DECLARE_WRITE_LINE_MEMBER( eint_w );
-	DECLARE_WRITE_LINE_MEMBER( nmio_w );
-	DECLARE_WRITE_LINE_MEMBER( wake_w );
+	void iint_w(int state);
+	void eint_w(int state);
+	void nmio_w(int state);
+	void wake_w(int state);
 
 protected:
 	portfolio_expansion_slot_t *m_slot;
@@ -140,10 +140,10 @@ public:
 	void nwri_w(address_space &space, offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1) { if (m_card != nullptr) m_card->nwri_w(space, offset, data, iom, bcom, ncc1); }
 
 	// peripheral interface
-	WRITE_LINE_MEMBER( iint_w ) { m_write_iint(state); }
-	WRITE_LINE_MEMBER( eint_w ) { m_write_eint(state); }
-	WRITE_LINE_MEMBER( nmio_w ) { m_write_nmio(state); }
-	WRITE_LINE_MEMBER( wake_w ) { m_write_wake(state); }
+	void iint_w(int state) { m_write_iint(state); }
+	void eint_w(int state) { m_write_eint(state); }
+	void nmio_w(int state) { m_write_nmio(state); }
+	void wake_w(int state) { m_write_wake(state); }
 
 protected:
 	// device-level overrides

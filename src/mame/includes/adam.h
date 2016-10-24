@@ -87,12 +87,12 @@ public:
 	void m6801_p3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void m6801_p4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( vdc_int_w );
+	void vdc_int_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( os3_w );
+	void os3_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( joy1_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( joy2_irq_w );
+	void joy1_irq_w(int state);
+	void joy2_irq_w(int state);
 
 	// memory state
 	uint8_t m_mioc;

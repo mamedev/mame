@@ -205,11 +205,11 @@ public:
 	void machine_reset_model2_common();
 	void machine_reset_model2_scsp();
 	uint32_t screen_update_model2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(model2_timer_cb);
-	TIMER_DEVICE_CALLBACK_MEMBER(model2_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(model2c_interrupt);
+	void model2_timer_cb(timer_device &timer, void *ptr, int32_t param);
+	void model2_interrupt(timer_device &timer, void *ptr, int32_t param);
+	void model2c_interrupt(timer_device &timer, void *ptr, int32_t param);
 	void scsp_irq(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_READ_LINE_MEMBER(copro_tgp_fifoin_pop_ok);
+	int copro_tgp_fifoin_pop_ok();
 	uint32_t copro_tgp_fifoin_pop(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	void copro_tgp_fifoout_push(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	uint8_t virtuacop_lightgun_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);

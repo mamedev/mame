@@ -50,7 +50,7 @@
 #include "includes/funworld.h"
 
 
-PALETTE_INIT_MEMBER(funworld_state,funworld)
+void funworld_state::palette_init_funworld(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -109,7 +109,7 @@ void funworld_state::funworld_colorram_w(address_space &space, offs_t offset, ui
     xxxx -xxx   tiles color (background).
 */
 
-TILE_GET_INFO_MEMBER(funworld_state::get_bg_tile_info)
+void funworld_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 /*  - bits -
     7654 3210

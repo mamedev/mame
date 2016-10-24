@@ -140,8 +140,8 @@ public:
 	template<class _Object> static devcb_base &set_nmi_handler(device_t &device, _Object object)
 		{ return downcast<electron_expansion_slot_device &>(device).m_nmi_handler.set_callback(object); }
 
-	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_irq_handler(state); }
-	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_nmi_handler(state); }
+	void irq_w(int state) { m_irq_handler(state); }
+	void nmi_w(int state) { m_nmi_handler(state); }
 
 protected:
 	// device-level overrides

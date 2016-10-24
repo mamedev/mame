@@ -150,7 +150,7 @@ void stactics_state::coinlockout_w(address_space &space, offs_t offset, uint8_t 
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(stactics_state::interrupt)
+void stactics_state::interrupt(device_t &device)
 {
 	move_motor();
 

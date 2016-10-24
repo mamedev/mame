@@ -282,7 +282,7 @@ void el2_3c503_device::el2_3c503_hiport_w(address_space &space, offs_t offset, u
 	}
 }
 
-WRITE_LINE_MEMBER(el2_3c503_device::el2_3c503_irq_w) {
+void el2_3c503_device::el2_3c503_irq_w(int state) {
 	m_irq_state = state;
 	if(!(m_regs.gacfr & 0x80)) set_irq(state);
 }

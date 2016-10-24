@@ -127,7 +127,7 @@ public:
 	void unmap_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { bo_w(space, offset + 0x3000, data, 1, 0); }
 
 	// cartridge interface
-	DECLARE_WRITE_LINE_MEMBER( extres_w ) { m_write_extres(state); }
+	void extres_w(int state) { m_write_extres(state); }
 
 protected:
 	// device-level overrides

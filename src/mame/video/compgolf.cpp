@@ -11,7 +11,7 @@
 #include "includes/compgolf.h"
 
 
-PALETTE_INIT_MEMBER(compgolf_state, compgolf)
+void compgolf_state::palette_init_compgolf(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -48,19 +48,19 @@ void compgolf_state::compgolf_back_w(address_space &space, offs_t offset, uint8_
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-TILE_GET_INFO_MEMBER(compgolf_state::get_text_info)
+void compgolf_state::get_text_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	tile_index <<= 1;
 	SET_TILE_INFO_MEMBER(2, m_videoram[tile_index + 1] | (m_videoram[tile_index] << 8), m_videoram[tile_index] >> 2, 0);
 }
 
-TILEMAP_MAPPER_MEMBER(compgolf_state::back_scan)
+tilemap_memory_index compgolf_state::back_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return (col & 0x0f) + ((row & 0x0f) << 4) + ((col & 0x10) << 4) + ((row & 0x10) << 5);
 }
 
-TILE_GET_INFO_MEMBER(compgolf_state::get_back_info)
+void compgolf_state::get_back_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_bg_ram[tile_index * 2];
 	int code = m_bg_ram[tile_index * 2 + 1] + ((attr & 1) << 8);

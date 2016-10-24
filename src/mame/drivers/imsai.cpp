@@ -40,7 +40,7 @@ public:
 	uint8_t keyin_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(write_uart_clock);
+	void write_uart_clock(int state);
 
 private:
 	uint8_t m_term_data;
@@ -95,7 +95,7 @@ void imsai_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uin
 	m_term_data = data;
 }
 
-WRITE_LINE_MEMBER(imsai_state::write_uart_clock)
+void imsai_state::write_uart_clock(int state)
 {
 	m_uart->write_txc(state);
 	m_uart->write_rxc(state);

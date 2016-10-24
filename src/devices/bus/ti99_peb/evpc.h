@@ -40,11 +40,11 @@ public:
 	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 	DECLARE_SETADDRESS_DBIN_MEMBER(setaddress_dbin) override;
 
-	DECLARE_WRITE_LINE_MEMBER( ready_line );
+	void ready_line(int state);
 
 	DECLARE_READ8Z_MEMBER(crureadz) override;
 	void cruwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
-	DECLARE_WRITE_LINE_MEMBER( video_interrupt_in );
+	void video_interrupt_in(int state);
 
 protected:
 	void device_start(void) override;

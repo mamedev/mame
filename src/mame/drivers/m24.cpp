@@ -37,10 +37,10 @@ public:
 	void pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t kbcdata_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void kbcdata_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(kbcin_w);
-	DECLARE_WRITE_LINE_MEMBER(dma_hrq_w);
-	DECLARE_WRITE_LINE_MEMBER(int_w);
-	DECLARE_WRITE_LINE_MEMBER(halt_i86_w);
+	void kbcin_w(int state);
+	void dma_hrq_w(int state);
+	void int_w(int state);
+	void halt_i86_w(int state);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 	void machine_reset() override;
@@ -130,12 +130,12 @@ void m24_state::kbcdata_w(address_space &space, offs_t offset, uint8_t data, uin
 	m_kbcout = data;
 }
 
-WRITE_LINE_MEMBER(m24_state::kbcin_w)
+void m24_state::kbcin_w(int state)
 {
 	m_kbdata = state;
 }
 
-WRITE_LINE_MEMBER(m24_state::dma_hrq_w)
+void m24_state::dma_hrq_w(int state)
 {
 	if(!m_i86_halt)
 		m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
@@ -146,7 +146,7 @@ WRITE_LINE_MEMBER(m24_state::dma_hrq_w)
 	m_mb->m_dma8237->hack_w(state);
 }
 
-WRITE_LINE_MEMBER(m24_state::int_w)
+void m24_state::int_w(int state)
 {
 	if(!m_i86_halt)
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);
@@ -154,7 +154,7 @@ WRITE_LINE_MEMBER(m24_state::int_w)
 		m_z8000_apb->m_z8000->set_input_line(INPUT_LINE_IRQ1, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(m24_state::halt_i86_w)
+void m24_state::halt_i86_w(int state)
 {
 	if(m_i86_halt_perm)
 		return;

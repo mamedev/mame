@@ -141,12 +141,12 @@ public:
 	uint16_t c123_tilemap_videoram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void c123_tilemap_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	uint16_t c123_tilemap_control_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
-	TILE_GET_INFO_MEMBER( get_tile_info0 );
-	TILE_GET_INFO_MEMBER( get_tile_info1 );
-	TILE_GET_INFO_MEMBER( get_tile_info2 );
-	TILE_GET_INFO_MEMBER( get_tile_info3 );
-	TILE_GET_INFO_MEMBER( get_tile_info4 );
-	TILE_GET_INFO_MEMBER( get_tile_info5 );
+	void get_tile_info0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info3(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info4(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info5(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void namco_tilemap_init(int gfxbank, void *pMaskROM, void (*cb)( running_machine &machine, uint16_t code, int *gfx, int *mask) );
 
 	// C169 ROZ Layer Emulation
@@ -172,9 +172,9 @@ protected:
 	void c169_roz_draw_helper(screen_device &screen, bitmap_ind16 &bitmap, tilemap_t &tmap, const rectangle &clip, const roz_parameters &params);
 	void c169_roz_draw_scanline(screen_device &screen, bitmap_ind16 &bitmap, int line, int which, int pri, const rectangle &cliprect);
 	void c169_roz_get_info(tile_data &tileinfo, int tile_index, int which);
-	TILE_GET_INFO_MEMBER( c169_roz_get_info0 );
-	TILE_GET_INFO_MEMBER( c169_roz_get_info1 );
-	TILEMAP_MAPPER_MEMBER( c169_roz_mapper );
+	void c169_roz_get_info0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void c169_roz_get_info1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	tilemap_memory_index c169_roz_mapper(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
 
 	static const int ROZ_TILEMAP_COUNT = 2;
 	tilemap_t *m_c169_roz_tilemap[ROZ_TILEMAP_COUNT];
@@ -218,10 +218,10 @@ public:
 	// general
 	void zdrawgfxzoom(screen_device &screen, bitmap_ind16 &dest_bmp, const rectangle &clip, gfx_element *gfx, uint32_t code, uint32_t color, int flipx, int flipy, int sx, int sy, int scalex, int scaley, int zpos);
 	void zdrawgfxzoom(screen_device &screen, bitmap_rgb32 &dest_bmp, const rectangle &clip, gfx_element *gfx, uint32_t code, uint32_t color, int flipx, int flipy, int sx, int sy, int scalex, int scaley, int zpos);
-	INTERRUPT_GEN_MEMBER(namcos2_68k_master_vblank);
-	INTERRUPT_GEN_MEMBER(namcos2_68k_slave_vblank);
-	INTERRUPT_GEN_MEMBER(namcos2_68k_gpu_vblank);
-	TIMER_CALLBACK_MEMBER(namcos2_posirq_tick);
+	void namcos2_68k_master_vblank(device_t &device);
+	void namcos2_68k_slave_vblank(device_t &device);
+	void namcos2_68k_gpu_vblank(device_t &device);
+	void namcos2_posirq_tick(void *ptr, int32_t param);
 	void adjust_posirq_timer( int scanline );
 	void init_c148();
 	void reset_all_subcpus(int state);
@@ -324,7 +324,7 @@ public:
 	uint32_t screen_update_metlhawk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_sgunner(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	TILE_GET_INFO_MEMBER( roz_tile_info );
+	void roz_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	uint16_t paletteram_word_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void paletteram_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);

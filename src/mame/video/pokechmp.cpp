@@ -22,7 +22,7 @@ void pokechmp_state::pokechmp_flipscreen_w(address_space &space, offs_t offset, 
 	}
 }
 
-TILE_GET_INFO_MEMBER(pokechmp_state::get_bg_tile_info)
+void pokechmp_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *videoram = m_videoram;
 	int code = videoram[tile_index*2+1] + ((videoram[tile_index*2] & 0x3f) << 8);

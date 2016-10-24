@@ -100,8 +100,8 @@ public:
 	void lamps_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void watchdog_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(dblcrown_irq_scanline);
-	DECLARE_PALETTE_INIT(dblcrown);
+	void dblcrown_irq_scanline(timer_device &timer, void *ptr, int32_t param);
+	void palette_init_dblcrown(palette_device &palette);
 
 protected:
 	// driver_device overrides
@@ -564,11 +564,11 @@ void dblcrown_state::machine_reset()
 }
 
 
-PALETTE_INIT_MEMBER(dblcrown_state, dblcrown)
+void dblcrown_state::palette_init_dblcrown(palette_device &palette)
 {
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(dblcrown_state::dblcrown_irq_scanline)
+void dblcrown_state::dblcrown_irq_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

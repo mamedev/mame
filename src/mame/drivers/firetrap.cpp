@@ -319,7 +319,7 @@ void firetrap_state::firetrap_sound_bankselect_w(address_space &space, offs_t of
 	membank("bank2")->set_entry(data & 0x01);
 }
 
-WRITE_LINE_MEMBER(firetrap_state::firetrap_adpcm_int)
+void firetrap_state::firetrap_adpcm_int(int state)
 {
 	m_msm->data_w(m_msm5205next >> 4);
 	m_msm5205next <<= 4;
@@ -572,7 +572,7 @@ static GFXDECODE_START( firetrap )
 GFXDECODE_END
 
 
-INTERRUPT_GEN_MEMBER(firetrap_state::firetrap_irq)
+void firetrap_state::firetrap_irq(device_t &device)
 {
 	if (m_nmi_enable)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);

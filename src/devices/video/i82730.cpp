@@ -389,7 +389,7 @@ void i82730_device::load_row()
 	m_sptr -= 2;
 }
 
-TIMER_CALLBACK_MEMBER( i82730_device::row_update )
+void i82730_device::row_update(void *ptr, int32_t param)
 {
 	int y = m_screen->vpos();
 
@@ -465,7 +465,7 @@ TIMER_CALLBACK_MEMBER( i82730_device::row_update )
 	m_row_timer->adjust(m_screen->time_until_pos((y + 1) % m_screen->height()));
 }
 
-WRITE_LINE_MEMBER( i82730_device::ca_w )
+void i82730_device::ca_w(int state)
 {
 	if (VERBOSE)
 		logerror("%s('%s'): ca_w %d\n", shortname(), basetag(), state);
@@ -512,7 +512,7 @@ WRITE_LINE_MEMBER( i82730_device::ca_w )
 	m_ca = state;
 }
 
-WRITE_LINE_MEMBER( i82730_device::irst_w )
+void i82730_device::irst_w(int state)
 {
 	if (VERBOSE)
 		logerror("%s('%s'): irst_w %d\n", shortname(), basetag(), state);

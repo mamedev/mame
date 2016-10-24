@@ -14,7 +14,7 @@ Video hardware driver by Uki
 #include "includes/strnskil.h"
 
 
-PALETTE_INIT_MEMBER(strnskil_state, strnskil)
+void strnskil_state::palette_init_strnskil(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -58,7 +58,7 @@ void strnskil_state::strnskil_scrl_ctrl_w(address_space &space, offs_t offset, u
 	}
 }
 
-TILE_GET_INFO_MEMBER(strnskil_state::get_bg_tile_info)
+void strnskil_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_videoram[tile_index * 2];
 	int code = m_videoram[(tile_index * 2) + 1] + ((attr & 0x60) << 3);

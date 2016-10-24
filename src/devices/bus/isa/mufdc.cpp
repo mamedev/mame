@@ -177,12 +177,12 @@ uint8_t mufdc_device::fdc_input_r(address_space &space, offs_t offset, uint8_t m
 	return ~m_config->read();
 }
 
-WRITE_LINE_MEMBER( mufdc_device::fdc_irq_w )
+void mufdc_device::fdc_irq_w(int state)
 {
 	m_isa->irq6_w(state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER( mufdc_device::fdc_drq_w )
+void mufdc_device::fdc_drq_w(int state)
 {
 	m_isa->drq2_w(state ? ASSERT_LINE : CLEAR_LINE);
 }

@@ -452,7 +452,7 @@ uint8_t bagman_state::dial_input_p2_r(address_space &space, offs_t offset, uint8
 	return (ioport("P2")->read() & 0x9f) | (m_p2_res);
 }
 
-INTERRUPT_GEN_MEMBER(bagman_state::vblank_irq)
+void bagman_state::vblank_irq(device_t &device)
 {
 	if(m_irq_mask)
 		device.execute().set_input_line(0, HOLD_LINE);

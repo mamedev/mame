@@ -144,11 +144,11 @@ INPUT_PORTS_END
 
 
 /* Initialize the palette */
-PALETTE_INIT_MEMBER(apple2gs_state,apple2gs)
+void apple2gs_state::palette_init_apple2gs(palette_device &palette)
 {
 	int i;
 
-//  PALETTE_INIT_NAME(apple2)(palette);
+//  palette_init_apple2(palette);
 
 	for (i = 0; i < 16; i++)
 	{
@@ -257,7 +257,7 @@ void apple2gs_state::adbmicro_p3_out(address_space &space, offs_t offset, uint8_
 }
 #endif
 
-WRITE_LINE_MEMBER(apple2gs_state::a2bus_irq_w)
+void apple2gs_state::a2bus_irq_w(int state)
 {
 	if (state)
 	{
@@ -269,12 +269,12 @@ WRITE_LINE_MEMBER(apple2gs_state::a2bus_irq_w)
 	}
 }
 
-WRITE_LINE_MEMBER(apple2gs_state::a2bus_nmi_w)
+void apple2gs_state::a2bus_nmi_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, state);
 }
 
-WRITE_LINE_MEMBER(apple2gs_state::a2bus_inh_w)
+void apple2gs_state::a2bus_inh_w(int state)
 {
 	m_inh_slot = -1;
 	apple2_update_memory();

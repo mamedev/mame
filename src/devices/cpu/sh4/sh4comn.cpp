@@ -488,7 +488,7 @@ void sh34_base_device::sh4_refresh_timer_recompute()
 }
 
 
-TIMER_CALLBACK_MEMBER( sh34_base_device::sh4_refresh_timer_callback )
+void sh34_base_device::sh4_refresh_timer_callback(void *ptr, int32_t param)
 {
 	if (m_cpu_type != CPU_TYPE_SH4)
 		fatalerror("sh4_refresh_timer_callback uses m_m[] with SH3\n");
@@ -603,7 +603,7 @@ void sh34_base_device::increment_rtc_time(int mode)
 		m_m[RYRCNT] = 0;
 }
 
-TIMER_CALLBACK_MEMBER( sh34_base_device::sh4_rtc_timer_callback )
+void sh34_base_device::sh4_rtc_timer_callback(void *ptr, int32_t param)
 {
 	if (m_cpu_type != CPU_TYPE_SH4)
 	{

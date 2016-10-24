@@ -148,11 +148,11 @@ public:
 	void machine_reset_sknse();
 	void machine_reset_sknsk();
 
-	TILE_GET_INFO_MEMBER(get_tilemap_A_tile_info);
-	TILE_GET_INFO_MEMBER(get_tilemap_B_tile_info);
+	void get_tilemap_A_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tilemap_B_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(interrupt_callback);
-	TIMER_DEVICE_CALLBACK_MEMBER(irq);
+	void interrupt_callback(timer_device &timer, void *ptr, int32_t param);
+	void irq(timer_device &timer, void *ptr, int32_t param);
 	void draw_roz(bitmap_ind16 &bitmap, bitmap_ind8& bitmapflags, const rectangle &cliprect, tilemap_t *tmap, uint32_t startx, uint32_t starty, int incxx, int incxy, int incyx, int incyy, int wraparound, int columnscroll, uint32_t* scrollram);
 	void palette_set_rgb_brightness (int offset, uint8_t brightness_r, uint8_t brightness_g, uint8_t brightness_b);
 	void palette_update();

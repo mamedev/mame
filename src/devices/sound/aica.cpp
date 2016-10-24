@@ -190,7 +190,7 @@ void aica_device::CheckPendingIRQ_SH4()
 		m_main_irq_cb(0);
 }
 
-TIMER_CALLBACK_MEMBER( aica_device::timerA_cb )
+void aica_device::timerA_cb(void *ptr, int32_t param)
 {
 	m_TimCnt[0] = 0xFFFF;
 	m_udata.data[0xa0/2]|=0x40;
@@ -203,7 +203,7 @@ TIMER_CALLBACK_MEMBER( aica_device::timerA_cb )
 
 }
 
-TIMER_CALLBACK_MEMBER( aica_device::timerB_cb )
+void aica_device::timerB_cb(void *ptr, int32_t param)
 {
 	m_TimCnt[1] = 0xFFFF;
 	m_udata.data[0xa0/2]|=0x80;
@@ -215,7 +215,7 @@ TIMER_CALLBACK_MEMBER( aica_device::timerB_cb )
 	CheckPendingIRQ_SH4();
 }
 
-TIMER_CALLBACK_MEMBER( aica_device::timerC_cb )
+void aica_device::timerC_cb(void *ptr, int32_t param)
 {
 	m_TimCnt[2] = 0xFFFF;
 	m_udata.data[0xa0/2]|=0x100;

@@ -114,7 +114,7 @@ static GFXDECODE_START( mm1 )
 	GFXDECODE_ENTRY( "chargen", 0, charlayout, 0, 1 )
 GFXDECODE_END
 
-PALETTE_INIT_MEMBER( mm1_state, mm1 )
+void mm1_state::palette_init_mm1(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(0x00,0x00,0x00));
 	palette.set_pen_color(1, rgb_t(0x00,0x7F,0x0A)); // dark green ("highlight" mode color)

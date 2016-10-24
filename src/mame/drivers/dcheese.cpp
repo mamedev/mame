@@ -57,7 +57,7 @@ void dcheese_state::update_irq_state()
 }
 
 
-IRQ_CALLBACK_MEMBER(dcheese_state::irq_callback)
+int dcheese_state::irq_callback(device_t &device, int irqline)
 {
 	/* auto-ack the IRQ */
 	m_irq_state[irqline] = 0;
@@ -75,7 +75,7 @@ void dcheese_state::dcheese_signal_irq(int which )
 }
 
 
-INTERRUPT_GEN_MEMBER(dcheese_state::dcheese_vblank)
+void dcheese_state::dcheese_vblank(device_t &device)
 {
 	logerror("---- VBLANK ----\n");
 	dcheese_signal_irq(4);

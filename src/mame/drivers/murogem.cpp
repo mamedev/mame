@@ -132,7 +132,7 @@ public:
 	required_shared_ptr<uint8_t> m_videoram;
 
 	void outport_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_PALETTE_INIT(murogem);
+	void palette_init_murogem(palette_device &palette);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
@@ -214,7 +214,7 @@ static GFXDECODE_START( murogem )
 GFXDECODE_END
 
 
-PALETTE_INIT_MEMBER(murogem_state, murogem)
+void murogem_state::palette_init_murogem(palette_device &palette)
 {}
 
 uint32_t murogem_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

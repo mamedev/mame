@@ -352,7 +352,7 @@ INPUT_PORTS_END
 //  Z80CTC
 //-------------------------------------------------
 
-TIMER_DEVICE_CALLBACK_MEMBER( super6_state::ctc_tick )
+void super6_state::ctc_tick(timer_device &timer, void *ptr, int32_t param)
 {
 	m_ctc->trg0(1);
 	m_ctc->trg0(0);
@@ -390,7 +390,7 @@ void super6_state::io_write_byte(address_space &space, offs_t offset, uint8_t da
 //  COM8116_INTERFACE( brg_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( super6_state::fr_w )
+void super6_state::fr_w(int state)
 {
 	m_dart->rxca_w(state);
 	m_dart->txca_w(state);
@@ -407,14 +407,14 @@ static SLOT_INTERFACE_START( super6_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_QD )
 SLOT_INTERFACE_END
 
-WRITE_LINE_MEMBER( super6_state::fdc_intrq_w )
+void super6_state::fdc_intrq_w(int state)
 {
 	if (state) m_maincpu->set_input_line(Z80_INPUT_LINE_BOGUSWAIT, CLEAR_LINE);
 
 	m_ctc->trg3(!state);
 }
 
-WRITE_LINE_MEMBER( super6_state::fdc_drq_w )
+void super6_state::fdc_drq_w(int state)
 {
 	if (state) m_maincpu->set_input_line(Z80_INPUT_LINE_BOGUSWAIT, CLEAR_LINE);
 

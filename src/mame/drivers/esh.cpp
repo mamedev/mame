@@ -59,10 +59,10 @@ public:
 	void init_esh();
 	bool m_nmi_enable;
 	virtual void machine_start() override;
-	DECLARE_PALETTE_INIT(esh);
+	void palette_init_esh(palette_device &palette);
 	uint32_t screen_update_esh(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vblank_callback_esh);
-	DECLARE_WRITE_LINE_MEMBER(ld_command_strobe_cb);
+	void vblank_callback_esh(device_t &device);
+	void ld_command_strobe_cb(int state);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<beep_device> m_beep;
@@ -272,7 +272,7 @@ static INPUT_PORTS_START( esh )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-PALETTE_INIT_MEMBER(esh_state, esh)
+void esh_state::palette_init_esh(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -330,14 +330,14 @@ static GFXDECODE_START( esh )
 	GFXDECODE_ENTRY("gfx2", 0, esh_gfx_layout, 0x0, 0x20)
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(esh_state::vblank_callback_esh)
+void esh_state::vblank_callback_esh(device_t &device)
 {
 	// IRQ
 	device.execute().set_input_line(0, HOLD_LINE);
 }
 
 // TODO: 0xfe NMI enabled after writing to LD command port, NMI reads LD port.
-WRITE_LINE_MEMBER(esh_state::ld_command_strobe_cb)
+void esh_state::ld_command_strobe_cb(int state)
 {
 	if(m_nmi_enable)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);

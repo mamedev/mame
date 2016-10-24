@@ -13,7 +13,7 @@
 #include "emu.h"
 #include "includes/markham.h"
 
-PALETTE_INIT_MEMBER(markham_state, markham)
+void markham_state::palette_init_markham(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -54,7 +54,7 @@ void markham_state::markham_flipscreen_w(address_space &space, offs_t offset, ui
 	}
 }
 
-TILE_GET_INFO_MEMBER(markham_state::get_bg_tile_info)
+void markham_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_videoram[tile_index * 2];
 	int code = m_videoram[(tile_index * 2) + 1] + ((attr & 0x60) << 3);

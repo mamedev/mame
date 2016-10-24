@@ -134,9 +134,9 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(jantotsu);
+	void palette_init_jantotsu(palette_device &palette);
 	uint32_t screen_update_jantotsu(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(jan_adpcm_int);
+	void jan_adpcm_int(int state);
 	required_device<cpu_device> m_maincpu;
 	required_device<msm5205_device> m_adpcm;
 	required_device<palette_device> m_palette;
@@ -209,7 +209,7 @@ void jantotsu_state::bankaddr_w(address_space &space, offs_t offset, uint8_t dat
 		logerror("I/O port $07 write trips %02x\n",data);
 }
 
-PALETTE_INIT_MEMBER(jantotsu_state, jantotsu)
+void jantotsu_state::palette_init_jantotsu(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int bit0, bit1, bit2, r, g, b;
@@ -297,7 +297,7 @@ void jantotsu_state::jan_adpcm_w(address_space &space, offs_t offset, uint8_t da
 	}
 }
 
-WRITE_LINE_MEMBER(jantotsu_state::jan_adpcm_int)
+void jantotsu_state::jan_adpcm_int(int state)
 {
 	if (m_adpcm_pos >= 0x10000 || m_adpcm_idle)
 	{

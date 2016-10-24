@@ -88,7 +88,7 @@ public:
 	void taito_handle_sprite_buffering(  );
 	void taito_update_sprites_active_area(  );
 
-	INTERRUPT_GEN_MEMBER(interrupt);
+	void interrupt(device_t &device);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;

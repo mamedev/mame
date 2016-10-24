@@ -46,8 +46,8 @@ public:
 	void tileregs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void bgvideoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	TILE_GET_INFO_MEMBER(bg_tile_info);
-	TILEMAP_MAPPER_MEMBER(tilemap_scan_rows);
+	void bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	tilemap_memory_index tilemap_scan_rows(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
 
 	virtual void machine_start() override;
 	virtual void video_start() override;

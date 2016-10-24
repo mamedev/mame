@@ -228,23 +228,23 @@ public:
 	template<class _Object> static devcb_base &set_pb6_wr_callback(device_t &device, _Object object) { return downcast<mos6530_base_t &>(device).m_out_pb6_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_pb7_wr_callback(device_t &device, _Object object) { return downcast<mos6530_base_t &>(device).m_out_pb7_cb.set_callback(object); }
 
-	DECLARE_WRITE_LINE_MEMBER( pa0_w ) { pa_w(0, state); }
-	DECLARE_WRITE_LINE_MEMBER( pa1_w ) { pa_w(1, state); }
-	DECLARE_WRITE_LINE_MEMBER( pa2_w ) { pa_w(2, state); }
-	DECLARE_WRITE_LINE_MEMBER( pa3_w ) { pa_w(3, state); }
-	DECLARE_WRITE_LINE_MEMBER( pa4_w ) { pa_w(4, state); }
-	DECLARE_WRITE_LINE_MEMBER( pa5_w ) { pa_w(5, state); }
-	DECLARE_WRITE_LINE_MEMBER( pa6_w ) { pa_w(6, state); }
-	DECLARE_WRITE_LINE_MEMBER( pa7_w ) { pa_w(7, state); }
+	void pa0_w(int state) { pa_w(0, state); }
+	void pa1_w(int state) { pa_w(1, state); }
+	void pa2_w(int state) { pa_w(2, state); }
+	void pa3_w(int state) { pa_w(3, state); }
+	void pa4_w(int state) { pa_w(4, state); }
+	void pa5_w(int state) { pa_w(5, state); }
+	void pa6_w(int state) { pa_w(6, state); }
+	void pa7_w(int state) { pa_w(7, state); }
 
-	DECLARE_WRITE_LINE_MEMBER( pb0_w ) { pb_w(0, state); }
-	DECLARE_WRITE_LINE_MEMBER( pb1_w ) { pb_w(1, state); }
-	DECLARE_WRITE_LINE_MEMBER( pb2_w ) { pb_w(2, state); }
-	DECLARE_WRITE_LINE_MEMBER( pb3_w ) { pb_w(3, state); }
-	DECLARE_WRITE_LINE_MEMBER( pb4_w ) { pb_w(4, state); }
-	DECLARE_WRITE_LINE_MEMBER( pb5_w ) { pb_w(5, state); }
-	DECLARE_WRITE_LINE_MEMBER( pb6_w ) { pb_w(6, state); }
-	DECLARE_WRITE_LINE_MEMBER( pb7_w ) { pb_w(7, state); }
+	void pb0_w(int state) { pb_w(0, state); }
+	void pb1_w(int state) { pb_w(1, state); }
+	void pb2_w(int state) { pb_w(2, state); }
+	void pb3_w(int state) { pb_w(3, state); }
+	void pb4_w(int state) { pb_w(4, state); }
+	void pb5_w(int state) { pb_w(5, state); }
+	void pb6_w(int state) { pb_w(6, state); }
+	void pb7_w(int state) { pb_w(7, state); }
 
 protected:
 	// device-level overrides

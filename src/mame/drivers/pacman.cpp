@@ -402,13 +402,13 @@ void pacman_state::machine_reset_superabc()
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(pacman_state::vblank_irq)
+void pacman_state::vblank_irq(device_t &device)
 {
 	if(m_irq_mask)
 		device.execute().set_input_line(0, HOLD_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(pacman_state::vblank_nmi)
+void pacman_state::vblank_nmi(device_t &device)
 {
 	if(m_irq_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -692,7 +692,7 @@ uint8_t pacman_state::bigbucks_question_r(address_space &space, offs_t offset, u
  *
  ************************************/
 
-INTERRUPT_GEN_MEMBER(pacman_state::s2650_interrupt)
+void pacman_state::s2650_interrupt(device_t &device)
 {
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x03);
 }

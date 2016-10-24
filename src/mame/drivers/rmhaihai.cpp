@@ -74,7 +74,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 };
 
 
@@ -91,7 +91,7 @@ void rmhaihai_state::rmhaihai_colorram_w(address_space &space, offs_t offset, ui
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(rmhaihai_state::get_bg_tile_info)
+void rmhaihai_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_colorram[tile_index];
 	int code = m_videoram[tile_index] + (m_gfxbank << 12) + ((attr & 0x07) << 8) + ((attr & 0x80) << 4);

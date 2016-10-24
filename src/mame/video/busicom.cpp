@@ -1847,7 +1847,7 @@ static const uint8_t color[] = { 0xFF,0xDB,0xB7,0x92,0x6E,0x49,0x25,0x00 };
 
 static const uint8_t color_red[] = { 0xb0,0xb5,0xc0,0xc5,0xd0,0xd5,0xdf };
 
-PALETTE_INIT_MEMBER(busicom_state, busicom)
+void busicom_state::palette_init_busicom(palette_device &palette)
 {
 	int i;
 	for(i=0;i<8;i++) {

@@ -414,7 +414,7 @@ void mccs1850_device::nvram_write(emu_file &file)
 //  ce_w - chip enable write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( mccs1850_device::ce_w )
+void mccs1850_device::ce_w(int state)
 {
 	m_ce = state;
 
@@ -430,7 +430,7 @@ WRITE_LINE_MEMBER( mccs1850_device::ce_w )
 //  sck_w - serial clock write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( mccs1850_device::sck_w )
+void mccs1850_device::sck_w(int state)
 {
 	if (!m_ce) return;
 
@@ -510,7 +510,7 @@ WRITE_LINE_MEMBER( mccs1850_device::sck_w )
 //  sdo_r - serial data out read
 //-------------------------------------------------
 
-READ_LINE_MEMBER( mccs1850_device::sdo_r )
+int mccs1850_device::sdo_r()
 {
 	if (!m_ce || BIT(m_address, 7))
 	{
@@ -528,7 +528,7 @@ READ_LINE_MEMBER( mccs1850_device::sdo_r )
 //  sdi_w - serial data in write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( mccs1850_device::sdi_w )
+void mccs1850_device::sdi_w(int state)
 {
 	m_sdi = state;
 }
@@ -538,7 +538,7 @@ WRITE_LINE_MEMBER( mccs1850_device::sdi_w )
 //  pwrsw_w - power switch write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( mccs1850_device::pwrsw_w )
+void mccs1850_device::pwrsw_w(int state)
 {
 	if (!state)
 	{
@@ -558,7 +558,7 @@ WRITE_LINE_MEMBER( mccs1850_device::pwrsw_w )
 //  por_w - power on reset write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( mccs1850_device::por_w )
+void mccs1850_device::por_w(int state)
 {
 	if (!state)
 	{
@@ -571,7 +571,7 @@ WRITE_LINE_MEMBER( mccs1850_device::por_w )
 //  test_w - test mode write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( mccs1850_device::test_w )
+void mccs1850_device::test_w(int state)
 {
 	if (state)
 	{

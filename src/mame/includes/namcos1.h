@@ -73,7 +73,7 @@ public:
 	int m_copy_sprites;
 	uint8_t m_drawmode_table[16];
 
-	DECLARE_WRITE_LINE_MEMBER(subres_w);
+	void subres_w(int state);
 	void irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t dsw_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void coin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -124,12 +124,12 @@ public:
 	virtual void video_start() override;
 	void driver_init();
 
-	TILE_GET_INFO_MEMBER(bg_get_info0);
-	TILE_GET_INFO_MEMBER(bg_get_info1);
-	TILE_GET_INFO_MEMBER(bg_get_info2);
-	TILE_GET_INFO_MEMBER(bg_get_info3);
-	TILE_GET_INFO_MEMBER(fg_get_info4);
-	TILE_GET_INFO_MEMBER(fg_get_info5);
+	void bg_get_info0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void bg_get_info1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void bg_get_info2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void bg_get_info3(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void fg_get_info4(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void fg_get_info5(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

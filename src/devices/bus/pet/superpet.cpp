@@ -428,7 +428,7 @@ void superpet_device::write(address_space &space, offs_t offset, uint8_t data, u
 //  acia_irq_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( superpet_device::acia_irq_w )
+void superpet_device::acia_irq_w(int state)
 {
 	m_acia_irq = state;
 

@@ -49,7 +49,7 @@ public:
 	void hpc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	uint32_t int_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	void int_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
-	DECLARE_WRITE_LINE_MEMBER(scsi_irq);
+	void scsi_irq(int state);
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
@@ -481,7 +481,7 @@ static ADDRESS_MAP_START( indigo4k_map, AS_PROGRAM, 32, indigo_state )
 	AM_RANGE( 0x1fc00000, 0x1fc7ffff ) AM_ROM AM_SHARE("share2") AM_REGION( "user1", 0 )
 ADDRESS_MAP_END
 
-WRITE_LINE_MEMBER(indigo_state::scsi_irq)
+void indigo_state::scsi_irq(int state)
 {
 }
 

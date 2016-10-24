@@ -259,7 +259,7 @@ public:
 	uint32_t bw2_16x11_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t bw2_350_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(sun3_timer);
+	void sun3_timer(timer_device &timer, void *ptr, int32_t param);
 
 private:
 	uint32_t *m_rom_ptr, *m_ram_ptr;
@@ -826,7 +826,7 @@ void sun3_state::ecc_w(address_space &space, offs_t offset, uint32_t data, uint3
 	m_ecc[offset] = data;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(sun3_state::sun3_timer)
+void sun3_state::sun3_timer(timer_device &timer, void *ptr, int32_t param)
 {
 	if ((m_irqctrl & 0x81000000) == 0x81000000)
 	{

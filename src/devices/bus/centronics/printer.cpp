@@ -48,7 +48,7 @@ machine_config_constructor centronics_printer_device::device_mconfig_additions()
     sets us busy when the printer goes offline
 -------------------------------------------------*/
 
-WRITE_LINE_MEMBER(centronics_printer_device::printer_online)
+void centronics_printer_device::printer_online(int state)
 {
 	output_perror(!state);
 }
@@ -109,7 +109,7 @@ void centronics_printer_device::device_reset()
     ready
 -------------------------------------------------*/
 
-WRITE_LINE_MEMBER( centronics_printer_device::input_strobe )
+void centronics_printer_device::input_strobe(int state)
 {
 	/* look for a high -> low transition */
 	if (m_strobe == true && state == false && m_busy == false)
@@ -127,7 +127,7 @@ WRITE_LINE_MEMBER( centronics_printer_device::input_strobe )
     printer (centronics mode)
 -------------------------------------------------*/
 
-WRITE_LINE_MEMBER(centronics_printer_device::input_init)
+void centronics_printer_device::input_init(int state)
 {
 	/* reset printer if line is low */
 	if (state == false)

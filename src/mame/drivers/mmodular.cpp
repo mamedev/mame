@@ -194,12 +194,12 @@ public:
 	void machine_start_van16();
 	void machine_start_risc();
 	void machine_reset_academy();
-	DECLARE_PALETTE_INIT(chess_lcd);
-	TIMER_DEVICE_CALLBACK_MEMBER(cause_nmi);
-	TIMER_DEVICE_CALLBACK_MEMBER(cause_M6502_irq);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_update_irq6);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_update_irq2);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_update_irq_academy);
+	void palette_init_chess_lcd(palette_device &palette);
+	void cause_nmi(timer_device &timer, void *ptr, int32_t param);
+	void cause_M6502_irq(timer_device &timer, void *ptr, int32_t param);
+	void timer_update_irq6(timer_device &timer, void *ptr, int32_t param);
+	void timer_update_irq2(timer_device &timer, void *ptr, int32_t param);
+	void timer_update_irq_academy(timer_device &timer, void *ptr, int32_t param);
 	void common_chess_start();
 	uint8_t convert_imputmask(uint8_t input);
 	uint8_t convertMCIV2LED(uint8_t codedchar);
@@ -801,12 +801,12 @@ uint8_t polgar_state::read_keys_board_academy(address_space &space, offs_t offse
 	return data;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(polgar_state::cause_nmi)
+void polgar_state::cause_nmi(timer_device &timer, void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI,PULSE_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(polgar_state::cause_M6502_irq)
+void polgar_state::cause_M6502_irq(timer_device &timer, void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(M65C02_IRQ_LINE, HOLD_LINE);
 }
@@ -968,18 +968,18 @@ void polgar_state::write_1000000(address_space &space, offs_t offset, uint32_t d
 	logerror("Write to  RISC2500 1000000\n");
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(polgar_state::timer_update_irq6)
+void polgar_state::timer_update_irq6(timer_device &timer, void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(6, HOLD_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(polgar_state::timer_update_irq2)
+void polgar_state::timer_update_irq2(timer_device &timer, void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(polgar_state::timer_update_irq_academy)
+void polgar_state::timer_update_irq_academy(timer_device &timer, void *ptr, int32_t param)
 {
 	if (academyallowNMI) {
 		m_maincpu->set_input_line(6, HOLD_LINE);
@@ -1060,7 +1060,7 @@ void polgar_state::machine_reset_academy()
 	common_chess_start();
 }
 
-PALETTE_INIT_MEMBER(polgar_state,chess_lcd)
+void polgar_state::palette_init_chess_lcd(palette_device &palette)
 {
 	// palette.set_pen_color(0, rgb_t(138, 146, 148)); // some think this is closer, but slightly less readable
 	palette.set_pen_color(0, rgb_t(255, 255, 255));

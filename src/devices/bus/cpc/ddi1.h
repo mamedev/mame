@@ -26,7 +26,7 @@ public:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual void set_mapping(uint8_t type) override;
-	virtual WRITE_LINE_MEMBER( romen_w ) override { m_romen = state; }
+	virtual void romen_w(int state) override { m_romen = state; }
 
 	void motor_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void fdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);

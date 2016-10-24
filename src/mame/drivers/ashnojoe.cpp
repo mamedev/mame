@@ -284,7 +284,7 @@ void ashnojoe_state::ym2203_write_b(address_space &space, offs_t offset, uint8_t
 	membank("bank4")->set_entry(data & 0x0f);
 }
 
-WRITE_LINE_MEMBER(ashnojoe_state::ashnojoe_vclk_cb)
+void ashnojoe_state::ashnojoe_vclk_cb(int state)
 {
 	if (m_msm5205_vclk_toggle == 0)
 	{

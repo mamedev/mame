@@ -23,7 +23,7 @@ public:
 
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(unistar);
+	void palette_init_unistar(palette_device &palette);
 	uint32_t screen_update_unistar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	const uint8_t *m_p_chargen;
 private:
@@ -54,7 +54,7 @@ void unistar_state::machine_reset()
 	m_p_chargen = memregion("chargen")->base();
 }
 
-PALETTE_INIT_MEMBER( unistar_state, unistar )
+void unistar_state::palette_init_unistar(palette_device &palette)
 {
 	palette.set_pen_color(0, 0, 0, 0 ); /* Black */
 	palette.set_pen_color(1, 0, 255, 0 );   /* Full */

@@ -212,7 +212,7 @@ void epson_tf20_device::device_timer(emu_timer &timer, device_timer_id id, int p
 //  irq vector callback
 //-------------------------------------------------
 
-IRQ_CALLBACK_MEMBER( epson_tf20_device::irq_callback )
+int epson_tf20_device::irq_callback(device_t &device, int irqline)
 {
 	return 0x00;
 }
@@ -263,7 +263,7 @@ void epson_tf20_device::fdc_control_w(address_space &space, offs_t offset, uint8
 //  rxc_w - rx input
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( epson_tf20_device::rxc_w )
+void epson_tf20_device::rxc_w(int state)
 {
 	m_rxc = state;
 	m_sio_input->rx_w(m_txda && m_rxc);
@@ -273,7 +273,7 @@ WRITE_LINE_MEMBER( epson_tf20_device::rxc_w )
 //  pinc_w - pin input
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( epson_tf20_device::pinc_w )
+void epson_tf20_device::pinc_w(int state)
 {
 	m_pinc = state;
 	m_sio_input->pin_w(!m_dtra || m_pinc);
@@ -283,7 +283,7 @@ WRITE_LINE_MEMBER( epson_tf20_device::pinc_w )
 //  txda_w - rx output
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( epson_tf20_device::txda_w )
+void epson_tf20_device::txda_w(int state)
 {
 	m_txda = state;
 	m_sio_input->rx_w(m_txda && m_rxc);
@@ -293,7 +293,7 @@ WRITE_LINE_MEMBER( epson_tf20_device::txda_w )
 //  dtra_w - pin output
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( epson_tf20_device::dtra_w )
+void epson_tf20_device::dtra_w(int state)
 {
 	m_dtra = state;
 	m_sio_input->pin_w(!m_dtra || m_pinc);

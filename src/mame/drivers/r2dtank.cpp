@@ -74,12 +74,12 @@ public:
 	uint8_t audio_answer_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void audio_answer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_CUSTOM_INPUT_MEMBER(get_ttl74123_output);
-	DECLARE_WRITE_LINE_MEMBER(main_cpu_irq);
+	void main_cpu_irq(int state);
 	void AY8910_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t AY8910_port_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void AY8910_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
-	DECLARE_WRITE_LINE_MEMBER(display_enable_changed);
+	void flipscreen_w(int state);
+	void display_enable_changed(int state);
 	void pia_comp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
 	void ttl74123_output_changed(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -111,7 +111,7 @@ public:
  *
  *************************************/
 
-WRITE_LINE_MEMBER(r2dtank_state::main_cpu_irq)
+void r2dtank_state::main_cpu_irq(int state)
 {
 	pia6821_device *pia0 = machine().device<pia6821_device>("pia_main");
 	pia6821_device *pia1 = machine().device<pia6821_device>("pia_audio");
@@ -257,7 +257,7 @@ void r2dtank_state::machine_start()
  *************************************/
 
 
-WRITE_LINE_MEMBER(r2dtank_state::flipscreen_w)
+void r2dtank_state::flipscreen_w(int state)
 {
 	m_flipscreen = !state;
 }
@@ -308,7 +308,7 @@ MC6845_UPDATE_ROW( r2dtank_state::crtc_update_row )
 }
 
 
-WRITE_LINE_MEMBER(r2dtank_state::display_enable_changed)
+void r2dtank_state::display_enable_changed(int state)
 {
 	machine().device<ttl74123_device>("74123")->a_w(generic_space(), 0, state);
 }

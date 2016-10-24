@@ -128,16 +128,16 @@ public:
 	template<class _Object> static devcb_base &set_ri_handler(device_t &device, _Object object) { return downcast<rs232_port_device &>(device).m_ri_handler.set_callback(object); }
 	template<class _Object> static devcb_base &set_cts_handler(device_t &device, _Object object) { return downcast<rs232_port_device &>(device).m_cts_handler.set_callback(object); }
 
-	DECLARE_WRITE_LINE_MEMBER( write_txd );
-	DECLARE_WRITE_LINE_MEMBER( write_dtr );
-	DECLARE_WRITE_LINE_MEMBER( write_rts );
-	DECLARE_WRITE_LINE_MEMBER( write_etc );
+	void write_txd(int state);
+	void write_dtr(int state);
+	void write_rts(int state);
+	void write_etc(int state);
 
-	DECLARE_READ_LINE_MEMBER( rxd_r ) { return m_rxd; }
-	DECLARE_READ_LINE_MEMBER( dcd_r ) { return m_dcd; }
-	DECLARE_READ_LINE_MEMBER( dsr_r ) { return m_dsr; }
-	DECLARE_READ_LINE_MEMBER( ri_r )  { return m_ri; }
-	DECLARE_READ_LINE_MEMBER( cts_r ) { return m_cts; }
+	int rxd_r() { return m_rxd; }
+	int dcd_r() { return m_dcd; }
+	int dsr_r() { return m_dsr; }
+	int ri_r()  { return m_ri; }
+	int cts_r() { return m_cts; }
 
 protected:
 	virtual void device_start() override;
@@ -167,16 +167,16 @@ public:
 	device_rs232_port_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_rs232_port_interface();
 
-	virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) {}
-	virtual DECLARE_WRITE_LINE_MEMBER( input_dtr ) {}
-	virtual DECLARE_WRITE_LINE_MEMBER( input_rts ) {}
-	virtual DECLARE_WRITE_LINE_MEMBER( input_etc ) {}
+	virtual void input_txd(int state) {}
+	virtual void input_dtr(int state) {}
+	virtual void input_rts(int state) {}
+	virtual void input_etc(int state) {}
 
-	DECLARE_WRITE_LINE_MEMBER( output_rxd ) { m_port->m_rxd = state; m_port->m_rxd_handler(state); }
-	DECLARE_WRITE_LINE_MEMBER( output_dcd ) { m_port->m_dcd = state; m_port->m_dcd_handler(state); }
-	DECLARE_WRITE_LINE_MEMBER( output_dsr ) { m_port->m_dsr = state; m_port->m_dsr_handler(state); }
-	DECLARE_WRITE_LINE_MEMBER( output_ri )  { m_port->m_ri = state; m_port->m_ri_handler(state); }
-	DECLARE_WRITE_LINE_MEMBER( output_cts ) { m_port->m_cts = state; m_port->m_cts_handler(state); }
+	void output_rxd(int state) { m_port->m_rxd = state; m_port->m_rxd_handler(state); }
+	void output_dcd(int state) { m_port->m_dcd = state; m_port->m_dcd_handler(state); }
+	void output_dsr(int state) { m_port->m_dsr = state; m_port->m_dsr_handler(state); }
+	void output_ri(int state)  { m_port->m_ri = state; m_port->m_ri_handler(state); }
+	void output_cts(int state) { m_port->m_cts = state; m_port->m_cts_handler(state); }
 
 protected:
 	rs232_port_device *m_port;
@@ -260,7 +260,7 @@ template <uint32_t FIFO_LENGTH>
 class buffered_rs232_device : public device_t, public device_buffered_serial_interface<FIFO_LENGTH>, public device_rs232_port_interface
 {
 public:
-	virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) override
+	virtual void input_txd(int state) override
 	{
 		device_buffered_serial_interface<FIFO_LENGTH>::rx_w(state);
 	}

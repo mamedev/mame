@@ -101,15 +101,15 @@ public:
 		m_cass(*this, "cassette")
 	{ }
 
-	DECLARE_READ_LINE_MEMBER(mekd2_key40_r);
+	int mekd2_key40_r();
 	uint8_t mekd2_key_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(mekd2_nmi_w);
+	void mekd2_nmi_w(int state);
 	void mekd2_digit_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void mekd2_segment_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(mekd2_quik);
-	DECLARE_WRITE_LINE_MEMBER(cass_w);
-	TIMER_DEVICE_CALLBACK_MEMBER(mekd2_c);
-	TIMER_DEVICE_CALLBACK_MEMBER(mekd2_p);
+	void cass_w(int state);
+	void mekd2_c(timer_device &timer, void *ptr, int32_t param);
+	void mekd2_p(timer_device &timer, void *ptr, int32_t param);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -210,7 +210,7 @@ void mekd2_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 }
 
 
-WRITE_LINE_MEMBER( mekd2_state::mekd2_nmi_w )
+void mekd2_state::mekd2_nmi_w(int state)
 {
 	if (state)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
@@ -226,7 +226,7 @@ WRITE_LINE_MEMBER( mekd2_state::mekd2_nmi_w )
 
 ************************************************************/
 
-READ_LINE_MEMBER( mekd2_state::mekd2_key40_r )
+int mekd2_state::mekd2_key40_r()
 {
 	return BIT(m_keydata, 6);
 }
@@ -296,7 +296,7 @@ void mekd2_state::mekd2_digit_w(address_space &space, offs_t offset, uint8_t dat
 
 ************************************************************/
 
-WRITE_LINE_MEMBER( mekd2_state::cass_w )
+void mekd2_state::cass_w(int state)
 {
 	m_cass_state = state;
 }
@@ -326,7 +326,7 @@ QUICKLOAD_LOAD_MEMBER( mekd2_state, mekd2_quik )
 	return image_init_result::PASS;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(mekd2_state::mekd2_c)
+void mekd2_state::mekd2_c(timer_device &timer, void *ptr, int32_t param)
 {
 	m_cass_data[3]++;
 
@@ -342,7 +342,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mekd2_state::mekd2_c)
 		m_cass->output(BIT(m_cass_data[3], 1) ? -1.0 : +1.0); // 1200Hz
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(mekd2_state::mekd2_p)
+void mekd2_state::mekd2_p(timer_device &timer, void *ptr, int32_t param)
 {
 	/* cassette - turn 1200/2400Hz to a bit */
 	m_cass_data[1]++;

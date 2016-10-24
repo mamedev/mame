@@ -27,7 +27,7 @@
   bit 0 -- 2.2kohm resistor  -- RED/GREEN/BLUE
 
 ***************************************************************************/
-PALETTE_INIT_MEMBER(xevious_state,xevious)
+void xevious_state::palette_init_xevious(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -103,7 +103,7 @@ PALETTE_INIT_MEMBER(xevious_state,xevious)
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(xevious_state::get_fg_tile_info)
+void xevious_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t attr = m_xevious_fg_colorram[tile_index];
 
@@ -119,7 +119,7 @@ TILE_GET_INFO_MEMBER(xevious_state::get_fg_tile_info)
 			TILE_FLIPYX((attr & 0xc0) >> 6) ^ (flip_screen() ? TILE_FLIPX : 0));
 }
 
-TILE_GET_INFO_MEMBER(xevious_state::get_bg_tile_info)
+void xevious_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t code = m_xevious_bg_videoram[tile_index];
 	uint8_t attr = m_xevious_bg_colorram[tile_index];

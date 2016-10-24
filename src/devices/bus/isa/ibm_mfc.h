@@ -45,12 +45,12 @@ public:
 	uint8_t ibm_mfc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void ibm_mfc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( d8253_out0 );
-	DECLARE_WRITE_LINE_MEMBER( d8253_out1 );
+	void d8253_out0(int state);
+	void d8253_out1(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( write_usart_clock );
+	void write_usart_clock(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( ibm_mfc_ym_irq );
+	void ibm_mfc_ym_irq(int state);
 
 protected:
 	// Device-level overrides

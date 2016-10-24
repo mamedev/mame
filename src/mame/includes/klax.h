@@ -30,7 +30,7 @@ public:
 	void klax_latch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	void video_start_klax();
-	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
+	void get_playfield_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	uint32_t screen_update_klax(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	static const atari_motion_objects_config s_mob_config;

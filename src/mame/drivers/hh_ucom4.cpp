@@ -180,7 +180,7 @@ void hh_ucom4_state::display_update()
 	memcpy(m_display_cache, active_state, sizeof(m_display_cache));
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(hh_ucom4_state::display_decay_tick)
+void hh_ucom4_state::display_decay_tick(timer_device &timer, void *ptr, int32_t param)
 {
 	// slowly turn off unpowered segments
 	for (int y = 0; y < m_display_maxy; y++)

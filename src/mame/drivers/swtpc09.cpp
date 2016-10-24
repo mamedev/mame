@@ -85,7 +85,7 @@ static SLOT_INTERFACE_START( swtpc09_floppies )
 	SLOT_INTERFACE("35hd",   FLOPPY_35_HD)        // flex 1.44mb disk from swtpc emu (emulator only?)
 SLOT_INTERFACE_END
 
-WRITE_LINE_MEMBER(swtpc09_state::write_acia_clock)
+void swtpc09_state::write_acia_clock(int state)
 {
 	m_acia->write_txc(state);
 	m_acia->write_rxc(state);

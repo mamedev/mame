@@ -71,7 +71,7 @@ void ojankohs_state::ojankohs_msm5205_w(address_space &space, offs_t offset, uin
 	m_vclk_left = 2;
 }
 
-WRITE_LINE_MEMBER(ojankohs_state::ojankohs_adpcm_int)
+void ojankohs_state::ojankohs_adpcm_int(int state)
 {
 	/* skip if we're reset */
 	if (!m_adpcm_reset)

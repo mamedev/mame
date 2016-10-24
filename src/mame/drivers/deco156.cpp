@@ -64,7 +64,7 @@ public:
 	void init_wcvol95();
 	virtual void video_start() override;
 	uint32_t screen_update_wcvol95(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(deco32_vbl_interrupt);
+	void deco32_vbl_interrupt(device_t &device);
 	void descramble_sound( const char *tag );
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 	DECOSPR_PRIORITY_CB_MEMBER(pri_callback);
@@ -314,7 +314,7 @@ GFXDECODE_END
 
 /**********************************************************************************/
 
-INTERRUPT_GEN_MEMBER(deco156_state::deco32_vbl_interrupt)
+void deco156_state::deco32_vbl_interrupt(device_t &device)
 {
 	device.execute().set_input_line(ARM_IRQ_LINE, HOLD_LINE);
 }

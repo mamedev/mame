@@ -132,13 +132,13 @@ private:
 	uint8_t cdda_getstatus(uint32_t *lba);
 	void set_cd_status(uint32_t status);
 
-	TIMER_CALLBACK_MEMBER( frame_proc );
-	TIMER_CALLBACK_MEMBER( dma_proc );
+	void frame_proc(void *ptr, int32_t param);
+	void dma_proc(void *ptr, int32_t param);
 
 	void start_dma();
 	void setup_response( int len, uint8_t *r1 );
 
-	TIMER_CALLBACK_MEMBER( cd_delayed_cmd );
+	void cd_delayed_cmd(void *ptr, int32_t param);
 	void update_cdrom();
 
 	// i2c interface

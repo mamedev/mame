@@ -261,12 +261,12 @@ void m50458_device::device_reset()
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-WRITE_LINE_MEMBER( m50458_device::write_bit )
+void m50458_device::write_bit(int state)
 {
 	m_latch = state;
 }
 
-WRITE_LINE_MEMBER( m50458_device::set_cs_line )
+void m50458_device::set_cs_line(int state)
 {
 	m_reset_line = state;
 
@@ -280,7 +280,7 @@ WRITE_LINE_MEMBER( m50458_device::set_cs_line )
 }
 
 
-WRITE_LINE_MEMBER( m50458_device::set_clock_line )
+void m50458_device::set_clock_line(int state)
 {
 	if (m_reset_line == CLEAR_LINE)
 	{

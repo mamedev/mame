@@ -51,7 +51,7 @@ public:
 	// read/write
 	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(reset_write);
+	void reset_write(int state);
 	uint8_t ioport_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void ioport_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
@@ -60,7 +60,7 @@ public:
 	void set_custom_output(int which, uint8_t mask, write8_delegate handler);
 
 	// internal communications
-	INTERRUPT_GEN_MEMBER(clock_14024);
+	void clock_14024(device_t &device);
 	uint8_t irq_clear(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void status_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
@@ -120,12 +120,12 @@ public:
 	// read/write
 	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(reset_write);
+	void reset_write(int state);
 
 	// internal communications
 	void porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(irq_w);
+	void irq_w(int state);
 	uint16_t pia_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void pia_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
@@ -160,12 +160,12 @@ public:
 	// read/write
 	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(reset_write);
+	void reset_write(int state);
 
 	// internal communications
 	void porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(irq_w);
+	void irq_w(int state);
 
 protected:
 	// device-level overrides
@@ -198,12 +198,12 @@ public:
 	// read/write
 	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(reset_write);
+	void reset_write(int state);
 
 	// internal communications
 	void porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(irq_w);
+	void irq_w(int state);
 
 protected:
 	// device-level overrides
@@ -235,14 +235,14 @@ public:
 
 	// read/write
 	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(reset_write);
+	void reset_write(int state);
 
 	// internal communications
 	void porta1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void dac_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void porta2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void portb2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(irq_w);
+	void irq_w(int state);
 
 protected:
 	// device-level overrides

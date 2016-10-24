@@ -84,7 +84,7 @@ public:
 	uint32_t screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+	void scanline(timer_device &timer, void *ptr, int32_t param);
 
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int screen);
 	void draw_tile(bitmap_ind16 &bitmap, const rectangle &cliprect, int x,int y,int sizex,int sizey, uint32_t tiledata, uint8_t* rom);
@@ -406,7 +406,7 @@ uint32_t tmmjprd_state::randomtmmjprds(address_space &space, offs_t offset, uint
 #define BLITLOG 0
 
 #if 0
-TIMER_CALLBACK_MEMBER(tmmjprd_state::blit_done)
+void tmmjprd_state::blit_done(void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(3, HOLD_LINE);
 }
@@ -749,7 +749,7 @@ static GFXDECODE_START( tmmjprd )
 GFXDECODE_END
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(tmmjprd_state::scanline)
+void tmmjprd_state::scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

@@ -222,7 +222,7 @@ private:
 
 	// Implementation
 	void m37710i_set_execution_mode(uint32_t mode);
-	TIMER_CALLBACK_MEMBER( m37710_timer_cb );
+	void m37710_timer_cb(void *ptr, int32_t param);
 	void m37710_external_tick(int timer, int state);
 	void m37710_recalc_timer(int timer);
 	uint8_t m37710_internal_r(int offset);

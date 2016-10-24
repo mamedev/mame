@@ -34,7 +34,7 @@ public:
 	virtual void io_read(offs_t offset, uint8_t &data) { }
 	virtual void io_write(offs_t offset, uint8_t data) { }
 	virtual uint8_t* get_cart_base() { return nullptr; }
-	virtual DECLARE_WRITE_LINE_MEMBER( mei_w ) { };
+	virtual void mei_w(int state) { };
 };
 
 // ======================> kcexp_slot_device
@@ -65,8 +65,8 @@ public:
 	virtual void write(offs_t offset, uint8_t data);
 	virtual void io_read(offs_t offset, uint8_t &data);
 	virtual void io_write(offs_t offset, uint8_t data);
-	virtual DECLARE_WRITE_LINE_MEMBER( mei_w );
-	virtual DECLARE_WRITE_LINE_MEMBER( meo_w );
+	virtual void mei_w(int state);
+	virtual void meo_w(int state);
 
 	devcb_write_line                m_out_irq_cb;
 	devcb_write_line                m_out_nmi_cb;

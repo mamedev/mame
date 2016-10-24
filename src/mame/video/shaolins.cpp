@@ -28,7 +28,7 @@
   bit 0 -- 2.2kohm resistor  -- RED/GREEN/BLUE
 
 ***************************************************************************/
-PALETTE_INIT_MEMBER(shaolins_state, shaolins)
+void shaolins_state::palette_init_shaolins(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances[4] = { 2200, 1000, 470, 220 };
@@ -126,7 +126,7 @@ void shaolins_state::nmi_w(address_space &space, offs_t offset, uint8_t data, ui
 	}
 }
 
-TILE_GET_INFO_MEMBER(shaolins_state::get_bg_tile_info)
+void shaolins_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_colorram[tile_index];
 	int code = m_videoram[tile_index] + ((attr & 0x40) << 2);

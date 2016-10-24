@@ -41,7 +41,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<generic_slot_device> m_cart;
-	DECLARE_WRITE_LINE_MEMBER(gamepock_to_w);
+	void gamepock_to_w(int state);
 };
 
 #endif

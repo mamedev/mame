@@ -38,9 +38,9 @@ public:
 	required_shared_ptr<uint8_t> m_colorram;
 	tilemap_t *m_tmap;
 	void init_tattack();
-	TILE_GET_INFO_MEMBER(get_tile_info);
+	void get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(tattack);
+	void palette_init_tattack(palette_device &palette);
 	uint32_t screen_update_tattack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -48,7 +48,7 @@ public:
 
 
 
-TILE_GET_INFO_MEMBER(tattack_state::get_tile_info)
+void tattack_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index];
 	int color = m_colorram[tile_index];
@@ -181,7 +181,7 @@ static GFXDECODE_START( tattack )
 	GFXDECODE_ENTRY( "gfx1", 0     , charlayout,  0, 8 )
 GFXDECODE_END
 
-PALETTE_INIT_MEMBER(tattack_state, tattack)
+void tattack_state::palette_init_tattack(palette_device &palette)
 {
 	int i,r,g,b;
 	for(i=0;i<8;i++)

@@ -46,7 +46,7 @@ int fgoal_state::intensity(int bits)
 }
 
 
-PALETTE_INIT_MEMBER(fgoal_state, fgoal)
+void fgoal_state::palette_init_fgoal(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -83,7 +83,7 @@ void fgoal_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 }
 
 
-TIMER_CALLBACK_MEMBER(fgoal_state::interrupt_callback)
+void fgoal_state::interrupt_callback(void *ptr, int32_t param)
 {
 	int scanline;
 	int coin = (ioport("IN1")->read() & 2);

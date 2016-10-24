@@ -331,7 +331,7 @@ private:
 	void update_timer_prescale();
 	void adjust_timer_interrupt();
 
-	TIMER_CALLBACK_MEMBER(timer_callback);
+	void timer_callback(void *ptr, int32_t param);
 
 	void execute_br(struct regs_decode *decode);
 	void execute_dbr(struct regs_decode *decode);

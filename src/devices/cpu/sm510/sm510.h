@@ -180,7 +180,7 @@ protected:
 	bool m_bc;
 
 	uint16_t get_lcd_row(int column, uint8_t* ram);
-	TIMER_CALLBACK_MEMBER(lcd_timer_cb);
+	void lcd_timer_cb(void *ptr, int32_t param);
 	virtual void init_lcd_driver();
 
 	// melody controller
@@ -201,7 +201,7 @@ protected:
 
 	bool wake_me_up();
 	void init_divider();
-	TIMER_CALLBACK_MEMBER(div_timer_cb);
+	void div_timer_cb(void *ptr, int32_t param);
 
 	// other i/o handlers
 	devcb_read8 m_read_k;

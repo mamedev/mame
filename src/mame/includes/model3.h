@@ -263,9 +263,9 @@ public:
 	void machine_reset_model3_20();
 	void machine_start_model3_21();
 	void machine_reset_model3_21();
-	TIMER_CALLBACK_MEMBER(model3_sound_timer_tick);
-	TIMER_CALLBACK_MEMBER(real3d_dma_timer_callback);
-	TIMER_DEVICE_CALLBACK_MEMBER(model3_interrupt);
+	void model3_sound_timer_tick(void *ptr, int32_t param);
+	void real3d_dma_timer_callback(void *ptr, int32_t param);
+	void model3_interrupt(timer_device &timer, void *ptr, int32_t param);
 	void model3_exit();
 	void scsp_irq(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	LSI53C810_DMA_CB(real3d_dma_callback);
@@ -277,14 +277,14 @@ public:
 	// video
 	virtual void video_start() override;
 	uint32_t screen_update_model3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	TILE_GET_INFO_MEMBER(tile_info_layer0_4bit);
-	TILE_GET_INFO_MEMBER(tile_info_layer1_4bit);
-	TILE_GET_INFO_MEMBER(tile_info_layer2_4bit);
-	TILE_GET_INFO_MEMBER(tile_info_layer3_4bit);
-	TILE_GET_INFO_MEMBER(tile_info_layer0_8bit);
-	TILE_GET_INFO_MEMBER(tile_info_layer1_8bit);
-	TILE_GET_INFO_MEMBER(tile_info_layer2_8bit);
-	TILE_GET_INFO_MEMBER(tile_info_layer3_8bit);
+	void tile_info_layer0_4bit(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void tile_info_layer1_4bit(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void tile_info_layer2_4bit(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void tile_info_layer3_4bit(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void tile_info_layer0_8bit(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void tile_info_layer1_8bit(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void tile_info_layer2_8bit(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void tile_info_layer3_8bit(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void reset_triangle_buffers();
 	m3_triangle* push_triangle(bool alpha);
 	void draw_layer(bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, int sx, int sy, int prio);

@@ -63,8 +63,8 @@ public:
 	void via_out_a(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t via_in_b(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void via_out_b(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(via_out_cb2);
-	DECLARE_WRITE_LINE_MEMBER(via_irq_func);
+	void via_out_cb2(int state);
+	void via_irq_func(int state);
 	void concept_set_interrupt(int level, int state);
 };
 

@@ -400,7 +400,7 @@ void itech32_state::update_interrupts(int fast)
 }
 
 
-TIMER_CALLBACK_MEMBER(itech32_state::scanline_interrupt)
+void itech32_state::scanline_interrupt(void *ptr, int32_t param)
 {
 	/* set timer for next frame */
 	m_scanline_timer->adjust(m_screen->time_until_pos(VIDEO_INTSCANLINE));

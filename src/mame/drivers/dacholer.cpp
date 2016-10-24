@@ -94,24 +94,24 @@ public:
 	void snd_irq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void music_irq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_CUSTOM_INPUT_MEMBER(snd_ack_r);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(dacholer);
+	void palette_init_dacholer(palette_device &palette);
 	uint32_t screen_update_dacholer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(sound_irq);
+	void sound_irq(device_t &device);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
-	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
+	void adpcm_int(int state);
 };
 
-TILE_GET_INFO_MEMBER(dacholer_state::get_bg_tile_info)
+void dacholer_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	SET_TILE_INFO_MEMBER(1, m_bgvideoram[tile_index] + m_bg_bank * 0x100, 0, 0);
 }
 
-TILE_GET_INFO_MEMBER(dacholer_state::get_fg_tile_info)
+void dacholer_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	SET_TILE_INFO_MEMBER(0, m_fgvideoram[tile_index], 0, 0);
 }
@@ -561,7 +561,7 @@ static GFXDECODE_START( itaten )
 GFXDECODE_END
 
 
-INTERRUPT_GEN_MEMBER(dacholer_state::sound_irq)
+void dacholer_state::sound_irq(device_t &device)
 {
 	if (m_music_interrupt_enable == 1)
 	{
@@ -569,7 +569,7 @@ INTERRUPT_GEN_MEMBER(dacholer_state::sound_irq)
 	}
 }
 
-WRITE_LINE_MEMBER(dacholer_state::adpcm_int)
+void dacholer_state::adpcm_int(int state)
 {
 	if (m_snd_interrupt_enable == 1 || (m_snd_interrupt_enable == 0 && m_msm_toggle == 1))
 	{
@@ -605,7 +605,7 @@ void dacholer_state::machine_reset()
 }
 
 /* guess: use the same resistor values as Crazy Climber (needs checking on the real HW) */
-PALETTE_INIT_MEMBER(dacholer_state, dacholer)
+void dacholer_state::palette_init_dacholer(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };

@@ -70,8 +70,8 @@ public:
 	void command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// interface to the keyboard
-	DECLARE_WRITE_LINE_MEMBER( keyboard_clock_w );
-	DECLARE_WRITE_LINE_MEMBER( keyboard_data_w );
+	void keyboard_clock_w(int state);
+	void keyboard_data_w(int state);
 
 protected:
 	// device-level overrides

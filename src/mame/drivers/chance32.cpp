@@ -59,8 +59,8 @@ public:
 	required_shared_ptr<uint8_t> m_bgram;
 
 	uint8_t mux_data;
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -70,7 +70,7 @@ public:
 };
 
 
-TILE_GET_INFO_MEMBER(chance32_state::get_fg_tile_info)
+void chance32_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = (m_fgram[tile_index * 2 + 1] << 8) | m_fgram[tile_index * 2];
 	int flip = (~code >> 12)&1;
@@ -80,7 +80,7 @@ TILE_GET_INFO_MEMBER(chance32_state::get_fg_tile_info)
 			TILE_FLIPYX(flip<<1)|flip);
 }
 
-TILE_GET_INFO_MEMBER(chance32_state::get_bg_tile_info)
+void chance32_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = (m_bgram[tile_index * 2 +1] << 8) | m_bgram[tile_index * 2];
 	int flip = (~code >> 12)&1;

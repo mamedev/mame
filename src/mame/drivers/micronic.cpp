@@ -306,7 +306,7 @@ void micronic_state::nvram_init(nvram_device &nvram, void *data, size_t size)
 }
 
 
-PALETTE_INIT_MEMBER(micronic_state, micronic)
+void micronic_state::palette_init_micronic(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
@@ -340,7 +340,7 @@ void micronic_state::machine_reset()
 }
 
 
-WRITE_LINE_MEMBER( micronic_state::mc146818_irq )
+void micronic_state::mc146818_irq(int state)
 {
 	m_maincpu->set_input_line(0, !state ? HOLD_LINE : CLEAR_LINE);
 }

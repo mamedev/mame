@@ -100,7 +100,7 @@ public:
 		m_nvram->set_base(ram()->pointer(), ram()->size());
 	}
 
-	DECLARE_PALETTE_INIT(clcd)
+	void palette_init_clcd(palette_device &palette)
 	{
 		palette.set_pen_color(0, rgb_t(36,72,36));
 		palette.set_pen_color(1, rgb_t(2,4,2));
@@ -209,19 +209,19 @@ public:
 		m_maincpu->set_input_line(M65C02_IRQ_LINE, m_irq_via0 | m_irq_via1 | m_irq_acia);
 	}
 
-	WRITE_LINE_MEMBER(write_irq_via0)
+	void write_irq_via0(int state)
 	{
 		m_irq_via0 = state;
 		update_irq();
 	}
 
-	WRITE_LINE_MEMBER(write_irq_via1)
+	void write_irq_via1(int state)
 	{
 		m_irq_via1 = state;
 		update_irq();
 	}
 
-	WRITE_LINE_MEMBER(write_irq_acia)
+	void write_irq_acia(int state)
 	{
 		m_irq_acia = state;
 		update_irq();
@@ -469,7 +469,7 @@ public:
 		m_rtc->cs2_w((data >> 1) & 1);
 	}
 
-	WRITE_LINE_MEMBER(write_key_poll)
+	void write_key_poll(int state)
 	{
 		if (m_key_poll != state)
 		{
@@ -497,7 +497,7 @@ public:
 		}
 	}
 
-	WRITE_LINE_MEMBER(via0_cb1_w)
+	void via0_cb1_w(int state)
 	{
 		int newm_key_clk = state & 1;
 		if (m_key_clk != newm_key_clk)

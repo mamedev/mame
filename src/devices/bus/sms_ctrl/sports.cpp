@@ -76,13 +76,13 @@ void sms_sports_pad_device::device_timer(emu_timer &timer, device_timer_id id, i
 }
 
 
-READ_LINE_MEMBER( sms_sports_pad_device::th_pin_r )
+int sms_sports_pad_device::th_pin_r()
 {
 	return m_th_pin_state;
 }
 
 
-WRITE_LINE_MEMBER( sms_sports_pad_device::th_pin_w )
+void sms_sports_pad_device::th_pin_w(int state)
 {
 	m_read_state = (m_read_state + 1) & 3;
 	m_sportspad_timer->adjust(m_interval);

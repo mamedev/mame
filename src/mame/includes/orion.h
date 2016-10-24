@@ -89,12 +89,12 @@ public:
 	void machine_start_orion128();
 	void machine_reset_orion128();
 	void video_start_orion128();
-	DECLARE_PALETTE_INIT(orion128);
+	void palette_init_orion128(palette_device &palette);
 	void machine_start_orionz80();
 	void machine_reset_orionz80();
 	void machine_reset_orionpro();
 	uint32_t screen_update_orion128(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(orionz80_interrupt);
+	void orionz80_interrupt(device_t &device);
 	uint8_t orion_romdisk_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void orion_romdisk_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void orion_romdisk_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);

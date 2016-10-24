@@ -14,7 +14,7 @@ Functions to emulate the video hardware of the machine.
 /* bit 3 and 7 of the char color PROMs are used for something -- not currently emulated -
    thus GAME_IMPERFECT_GRAPHICS */
 
-PALETTE_INIT_MEMBER(cheekyms_state, cheekyms)
+void cheekyms_state::palette_init_cheekyms(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i, j, bit, r, g, b;
@@ -65,7 +65,7 @@ void cheekyms_state::port_80_w(address_space &space, offs_t offset, uint8_t data
 
 
 
-TILE_GET_INFO_MEMBER(cheekyms_state::get_tile_info)
+void cheekyms_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int color;
 

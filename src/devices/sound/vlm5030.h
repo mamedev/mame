@@ -13,19 +13,19 @@
 	~vlm5030_device() {}
 
 	/* get BSY pin level */
-	DECLARE_READ_LINE_MEMBER( bsy );
+	int bsy();
 
 	/* latch contoll data */
 	void data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	/* set RST pin level : reset / set table address A8-A15 */
-	DECLARE_WRITE_LINE_MEMBER( rst );
+	void rst(int state);
 
 	/* set VCU pin level : ?? unknown */
-	DECLARE_WRITE_LINE_MEMBER( vcu );
+	void vcu(int state);
 
 	/* set ST pin level  : set table address A0-A7 / start speech */
-	DECLARE_WRITE_LINE_MEMBER( st );
+	void st(int state);
 
 protected:
 	// device-level overrides

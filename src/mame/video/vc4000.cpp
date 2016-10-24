@@ -572,7 +572,7 @@ inline void vc4000_state::vc4000_draw_grid(uint8_t *collision)
 	}
 }
 
-INTERRUPT_GEN_MEMBER(vc4000_state::vc4000_video_line)
+void vc4000_state::vc4000_video_line(device_t &device)
 {
 	int x,y,i;
 	uint8_t collision[400]={0}; // better alloca or gcc feature of non constant long automatic arrays

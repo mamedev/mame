@@ -32,7 +32,7 @@ public:
 	virtual uint8_t iorq_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
 	virtual void iorq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
-	DECLARE_WRITE_LINE_MEMBER( uart_intr_w );
+	void uart_intr_w(int state);
 
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;

@@ -456,7 +456,7 @@ void wgp_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 /* FWIW offset of 10000,10500 on ints can get CPUB obeying the
    first CPUA command the same frame; probably not necessary */
 
-INTERRUPT_GEN_MEMBER(wgp_state::wgp_cpub_interrupt)
+void wgp_state::wgp_cpub_interrupt(device_t &device)
 {
 	timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(200000-500), TIMER_WGP_CPUB_INTERRUPT6);
 	device.execute().set_input_line(4, HOLD_LINE);

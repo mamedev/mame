@@ -108,7 +108,7 @@ private:
 	emu_timer *         m_timer;
 
 	void update_interrupts(void);
-	TIMER_CALLBACK_MEMBER( interrupt );
+	void interrupt(void *ptr, int32_t param);
 	void register_w(address_space &space, offs_t offset, uint8_t data);
 	uint8_t register_r(address_space &space, offs_t offset);
 	void adjust_xyaddress(int offset);

@@ -84,8 +84,8 @@ public:
 	template<class _lamp_w> void set_lamp_write_callback(_lamp_w lamp_w) { m_write_lamp.set_callback(lamp_w); }
 	template<class _sol_w> void set_solenoid_write_callback(_sol_w sol_w) { m_write_solenoid.set_callback(sol_w); }
 
-	DECLARE_WRITE_LINE_MEMBER(cpu_pia_irq);
-	DECLARE_WRITE_LINE_MEMBER(pia21_ca2_w);
+	void cpu_pia_irq(int state);
+	void pia21_ca2_w(int state);
 	void lamp0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void lamp1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t display_strobe_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);

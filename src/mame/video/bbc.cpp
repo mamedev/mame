@@ -122,7 +122,7 @@ inline rgb_t bbc_state::out_rgb(rgb_t entry)
 	}
 }
 
-PALETTE_INIT_MEMBER(bbc_state, bbc)
+void bbc_state::palette_init_bbc(palette_device &palette)
 {
 	palette.set_pen_colors(0, bbc_palette, ARRAY_LENGTH(bbc_palette));
 }
@@ -279,18 +279,18 @@ MC6845_UPDATE_ROW( bbc_state::crtc_update_row )
 	}
 }
 
-WRITE_LINE_MEMBER(bbc_state::bbc_hsync_changed)
+void bbc_state::bbc_hsync_changed(int state)
 {
 	m_hsync = state ? 1 : 0;
 }
 
-WRITE_LINE_MEMBER(bbc_state::bbc_vsync_changed)
+void bbc_state::bbc_vsync_changed(int state)
 {
 	m_vsync = state ? 1 : 0;
 	m_trom->dew_w(state);
 }
 
-WRITE_LINE_MEMBER(bbc_state::bbc_de_changed)
+void bbc_state::bbc_de_changed(int state)
 {
 	m_display_enable = state ? 1 : 0;
 }

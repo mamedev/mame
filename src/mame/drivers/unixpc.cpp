@@ -67,8 +67,8 @@ public:
 	void diskdma_size_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void diskdma_ptr_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE_LINE_MEMBER( wd2797_intrq_w );
-	DECLARE_WRITE_LINE_MEMBER( wd2797_drq_w );
+	void wd2797_intrq_w(int state);
+	void wd2797_drq_w(int state);
 
 	required_shared_ptr<uint16_t> m_mapram;
 	required_shared_ptr<uint16_t> m_videoram;
@@ -239,13 +239,13 @@ void unixpc_state::disk_control_w(address_space &space, offs_t offset, uint16_t 
 		m_wd2797->set_floppy(nullptr);
 }
 
-WRITE_LINE_MEMBER( unixpc_state::wd2797_intrq_w )
+void unixpc_state::wd2797_intrq_w(int state)
 {
 	logerror("wd2797_intrq_w: %d\n", state);
 	m_fdc_intrq = state;
 }
 
-WRITE_LINE_MEMBER( unixpc_state::wd2797_drq_w )
+void unixpc_state::wd2797_drq_w(int state)
 {
 	logerror("wd2797_drq_w: %d\n", state);
 }

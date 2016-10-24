@@ -16,7 +16,7 @@ public:
 	namco_50xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask);
-	WRITE_LINE_MEMBER(read_request);
+	void read_request(int state);
 	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask);
 
 	uint8_t K_r(address_space &space, offs_t offset, uint8_t mem_mask);
@@ -30,9 +30,9 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	TIMER_CALLBACK_MEMBER( latch_callback );
-	TIMER_CALLBACK_MEMBER( readrequest_callback );
-	TIMER_CALLBACK_MEMBER( irq_clear );
+	void latch_callback(void *ptr, int32_t param);
+	void readrequest_callback(void *ptr, int32_t param);
+	void irq_clear(void *ptr, int32_t param);
 	void irq_set();
 private:
 	// internal state

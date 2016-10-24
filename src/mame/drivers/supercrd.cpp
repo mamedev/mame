@@ -186,8 +186,8 @@ public:
 	tilemap_t *m_bg_tilemap;
 	void supercrd_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void supercrd_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	DECLARE_PALETTE_INIT(supercrd);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void palette_init_supercrd(palette_device &palette);
 	void video_start_supercrd();
 	uint32_t screen_update_supercrd(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
@@ -199,7 +199,7 @@ public:
 *     Video Hardware     *
 *************************/
 
-PALETTE_INIT_MEMBER(supercrd_state, supercrd)
+void supercrd_state::palette_init_supercrd(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -250,7 +250,7 @@ void supercrd_state::supercrd_colorram_w(address_space &space, offs_t offset, ui
 }
 
 
-TILE_GET_INFO_MEMBER(supercrd_state::get_bg_tile_info)
+void supercrd_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 /*  - bits -
     7654 3210

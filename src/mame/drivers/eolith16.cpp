@@ -35,7 +35,7 @@ public:
 
 	void init_eolith16();
 	void video_start_eolith16();
-	DECLARE_PALETTE_INIT(eolith16);
+	void palette_init_eolith16(palette_device &palette);
 
 	uint32_t screen_update_eolith16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
@@ -145,7 +145,7 @@ uint32_t eolith16_state::screen_update_eolith16(screen_device &screen, bitmap_in
 
 
 // setup a custom palette because pixels use 8 bits per color
-PALETTE_INIT_MEMBER(eolith16_state,eolith16)
+void eolith16_state::palette_init_eolith16(palette_device &palette)
 {
 	int c;
 

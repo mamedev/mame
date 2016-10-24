@@ -196,20 +196,20 @@ public:
 	void nmi_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_wilytowr();
 	void init_fghtbskt();
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void machine_start_m63();
 	void machine_reset_m63();
 	void video_start_m63();
-	DECLARE_PALETTE_INIT(m63);
+	void palette_init_m63(palette_device &palette);
 	uint32_t screen_update_m63(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(snd_irq);
-	INTERRUPT_GEN_MEMBER(vblank_irq);
+	void snd_irq(device_t &device);
+	void vblank_irq(device_t &device);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 };
 
 
-PALETTE_INIT_MEMBER(m63_state,m63)
+void m63_state::palette_init_m63(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -308,7 +308,7 @@ void m63_state::fghtbskt_flipscreen_w(address_space &space, offs_t offset, uint8
 }
 
 
-TILE_GET_INFO_MEMBER(m63_state::get_bg_tile_info)
+void m63_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_colorram[tile_index];
 	int code = m_videoram[tile_index] | ((attr & 0x30) << 4);
@@ -317,7 +317,7 @@ TILE_GET_INFO_MEMBER(m63_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(1, code, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(m63_state::get_fg_tile_info)
+void m63_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram2[tile_index];
 
@@ -715,7 +715,7 @@ SAMPLES_START_CB_MEMBER(m63_state::fghtbskt_sh_start)
 		m_samplebuf[i] = ((int8_t)(ROM[i] ^ 0x80)) * 256;
 }
 
-INTERRUPT_GEN_MEMBER(m63_state::snd_irq)
+void m63_state::snd_irq(device_t &device)
 {
 	m_sound_irq = 1;
 }
@@ -744,7 +744,7 @@ void m63_state::machine_reset_m63()
 }
 
 
-INTERRUPT_GEN_MEMBER(m63_state::vblank_irq)
+void m63_state::vblank_irq(device_t &device)
 {
 	if(m_nmi_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);

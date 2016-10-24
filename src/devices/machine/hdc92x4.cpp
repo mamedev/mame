@@ -4691,7 +4691,7 @@ void hdc92x4_device::set_interrupt(line_state intr)
 /*
     DMA acknowledge line.
 */
-WRITE_LINE_MEMBER( hdc92x4_device::dmaack )
+void hdc92x4_device::dmaack(int state)
 {
 	if (state==ASSERT_LINE)
 	{
@@ -4752,7 +4752,7 @@ void hdc92x4_device::device_timer(emu_timer &timer, device_timer_id id, int para
 /*
     Reset the controller. Negative logic, but we use ASSERT_LINE.
 */
-WRITE_LINE_MEMBER( hdc92x4_device::reset )
+void hdc92x4_device::reset(int state)
 {
 	if (state == ASSERT_LINE)
 	{

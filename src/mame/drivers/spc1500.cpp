@@ -256,7 +256,7 @@ public:
 	{}
 	uint8_t psga_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( centronics_busy_w ) { m_centronics_busy = state; }
+	void centronics_busy_w(int state) { m_centronics_busy = state; }
 	uint8_t mc6845_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void palet_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -279,11 +279,11 @@ public:
 	uint8_t portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void double_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_PALETTE_INIT(spc);
+	void palette_init_spc(palette_device &palette);
 	void video_start_spc();
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_RECONFIGURE(crtc_reconfig);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer);
+	void timer(timer_device &timer, void *ptr, int32_t param);
 private:
 	uint8_t *m_p_ram;
 	uint8_t m_ipl;
@@ -413,7 +413,7 @@ uint8_t spc1500_state::crtc_r(address_space &space, offs_t offset, uint8_t mem_m
 	return 0;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(spc1500_state::timer)
+void spc1500_state::timer(timer_device &timer, void *ptr, int32_t param)
 {
 	if(m_motor_toggle == true)
 	{
@@ -492,7 +492,7 @@ void spc1500_state::palet_w(address_space &space, offs_t offset, uint8_t data, u
 	}
 }
 
-PALETTE_INIT_MEMBER(spc1500_state,spc)
+void spc1500_state::palette_init_spc(palette_device &palette)
 {
 	palette.set_pen_color(0,rgb_t(0x00,0x00,0x00));
 	palette.set_pen_color(1,rgb_t(0x00,0x00,0xff));

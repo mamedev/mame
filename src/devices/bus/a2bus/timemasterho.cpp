@@ -267,13 +267,13 @@ void a2bus_timemasterho_device::update_irqs()
 	}
 }
 
-WRITE_LINE_MEMBER(a2bus_timemasterho_device::pia_irqa_w)
+void a2bus_timemasterho_device::pia_irqa_w(int state)
 {
 	m_irqa = state;
 	update_irqs();
 }
 
-WRITE_LINE_MEMBER(a2bus_timemasterho_device::pia_irqb_w)
+void a2bus_timemasterho_device::pia_irqb_w(int state)
 {
 	m_irqb = state;
 	update_irqs();

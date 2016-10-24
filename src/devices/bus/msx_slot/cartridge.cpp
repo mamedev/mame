@@ -198,7 +198,7 @@ void msx_slot_cartridge_device::call_unload()
 }
 
 
-WRITE_LINE_MEMBER(msx_slot_cartridge_device::irq_out)
+void msx_slot_cartridge_device::irq_out(int state)
 {
 	m_irq_handler(state);
 }

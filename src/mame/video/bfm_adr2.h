@@ -9,10 +9,10 @@ public:
 	// construction/destruction
 	bfm_adder2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	TILE_GET_INFO_MEMBER( get_tile0_info );
-	TILE_GET_INFO_MEMBER( get_tile1_info );
+	void get_tile0_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile1_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	uint32_t update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER( adder2_vbl );
+	void adder2_vbl(device_t &device);
 	uint8_t screen_ram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void screen_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t normal_ram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);

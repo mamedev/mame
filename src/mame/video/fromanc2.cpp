@@ -25,14 +25,14 @@ inline void fromanc2_state::fromanc2_get_tile_info( tile_data &tileinfo, int til
 	SET_TILE_INFO_MEMBER(layer, tile, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(fromanc2_state::fromanc2_get_v0_l0_tile_info){ fromanc2_get_tile_info(tileinfo, tile_index, 0, 0); }
-TILE_GET_INFO_MEMBER(fromanc2_state::fromanc2_get_v0_l1_tile_info){ fromanc2_get_tile_info(tileinfo, tile_index, 0, 1); }
-TILE_GET_INFO_MEMBER(fromanc2_state::fromanc2_get_v0_l2_tile_info){ fromanc2_get_tile_info(tileinfo, tile_index, 0, 2); }
-TILE_GET_INFO_MEMBER(fromanc2_state::fromanc2_get_v0_l3_tile_info){ fromanc2_get_tile_info(tileinfo, tile_index, 0, 3); }
-TILE_GET_INFO_MEMBER(fromanc2_state::fromanc2_get_v1_l0_tile_info){ fromanc2_get_tile_info(tileinfo, tile_index, 1, 0); }
-TILE_GET_INFO_MEMBER(fromanc2_state::fromanc2_get_v1_l1_tile_info){ fromanc2_get_tile_info(tileinfo, tile_index, 1, 1); }
-TILE_GET_INFO_MEMBER(fromanc2_state::fromanc2_get_v1_l2_tile_info){ fromanc2_get_tile_info(tileinfo, tile_index, 1, 2); }
-TILE_GET_INFO_MEMBER(fromanc2_state::fromanc2_get_v1_l3_tile_info){ fromanc2_get_tile_info(tileinfo, tile_index, 1, 3); }
+void fromanc2_state::fromanc2_get_v0_l0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ fromanc2_get_tile_info(tileinfo, tile_index, 0, 0); }
+void fromanc2_state::fromanc2_get_v0_l1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ fromanc2_get_tile_info(tileinfo, tile_index, 0, 1); }
+void fromanc2_state::fromanc2_get_v0_l2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ fromanc2_get_tile_info(tileinfo, tile_index, 0, 2); }
+void fromanc2_state::fromanc2_get_v0_l3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ fromanc2_get_tile_info(tileinfo, tile_index, 0, 3); }
+void fromanc2_state::fromanc2_get_v1_l0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ fromanc2_get_tile_info(tileinfo, tile_index, 1, 0); }
+void fromanc2_state::fromanc2_get_v1_l1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ fromanc2_get_tile_info(tileinfo, tile_index, 1, 1); }
+void fromanc2_state::fromanc2_get_v1_l2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ fromanc2_get_tile_info(tileinfo, tile_index, 1, 2); }
+void fromanc2_state::fromanc2_get_v1_l3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ fromanc2_get_tile_info(tileinfo, tile_index, 1, 3); }
 
 
 inline void fromanc2_state::fromancr_get_tile_info( tile_data &tileinfo, int tile_index, int vram, int layer )
@@ -42,12 +42,12 @@ inline void fromanc2_state::fromancr_get_tile_info( tile_data &tileinfo, int til
 	SET_TILE_INFO_MEMBER(layer, tile, 0, 0);
 }
 
-TILE_GET_INFO_MEMBER(fromanc2_state::fromancr_get_v0_l0_tile_info){ fromancr_get_tile_info(tileinfo, tile_index, 0, 0); }
-TILE_GET_INFO_MEMBER(fromanc2_state::fromancr_get_v0_l1_tile_info){ fromancr_get_tile_info(tileinfo, tile_index, 0, 1); }
-TILE_GET_INFO_MEMBER(fromanc2_state::fromancr_get_v0_l2_tile_info){ fromancr_get_tile_info(tileinfo, tile_index, 0, 2); }
-TILE_GET_INFO_MEMBER(fromanc2_state::fromancr_get_v1_l0_tile_info){ fromancr_get_tile_info(tileinfo, tile_index, 1, 0); }
-TILE_GET_INFO_MEMBER(fromanc2_state::fromancr_get_v1_l1_tile_info){ fromancr_get_tile_info(tileinfo, tile_index, 1, 1); }
-TILE_GET_INFO_MEMBER(fromanc2_state::fromancr_get_v1_l2_tile_info){ fromancr_get_tile_info(tileinfo, tile_index, 1, 2); }
+void fromanc2_state::fromancr_get_v0_l0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ fromancr_get_tile_info(tileinfo, tile_index, 0, 0); }
+void fromanc2_state::fromancr_get_v0_l1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ fromancr_get_tile_info(tileinfo, tile_index, 0, 1); }
+void fromanc2_state::fromancr_get_v0_l2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ fromancr_get_tile_info(tileinfo, tile_index, 0, 2); }
+void fromanc2_state::fromancr_get_v1_l0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ fromancr_get_tile_info(tileinfo, tile_index, 1, 0); }
+void fromanc2_state::fromancr_get_v1_l1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ fromancr_get_tile_info(tileinfo, tile_index, 1, 1); }
+void fromanc2_state::fromancr_get_v1_l2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ fromancr_get_tile_info(tileinfo, tile_index, 1, 2); }
 
 
 /******************************************************************************

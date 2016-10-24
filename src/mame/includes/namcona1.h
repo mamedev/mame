@@ -133,15 +133,15 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	TILE_GET_INFO_MEMBER(tilemap_get_info0);
-	TILE_GET_INFO_MEMBER(tilemap_get_info1);
-	TILE_GET_INFO_MEMBER(tilemap_get_info2);
-	TILE_GET_INFO_MEMBER(tilemap_get_info3);
-	TILE_GET_INFO_MEMBER(roz_get_info);
+	void tilemap_get_info0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void tilemap_get_info1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void tilemap_get_info2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void tilemap_get_info3(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void roz_get_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
+	void interrupt(timer_device &timer, void *ptr, int32_t param);
 	void postload();
 
 private:

@@ -52,10 +52,10 @@ public:
 
 	void fresh_bg_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void fresh_attr_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	TILE_GET_INFO_MEMBER(get_fresh_bg_tile_info);
+	void get_fresh_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void fresh_bg_2_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void fresh_attr_2_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	TILE_GET_INFO_MEMBER(get_fresh_bg_2_tile_info);
+	void get_fresh_bg_2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 
 	uint16_t m_d30000_value;
@@ -91,7 +91,7 @@ public:
 		return 0x10;
 	}
 
-	TIMER_DEVICE_CALLBACK_MEMBER(fake_scanline);
+	void fake_scanline(timer_device &timer, void *ptr, int32_t param);
 
 
 	virtual void video_start() override;
@@ -102,7 +102,7 @@ public:
 };
 
 
-TILE_GET_INFO_MEMBER(fresh_state::get_fresh_bg_tile_info)
+void fresh_state::get_fresh_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno, pal;
 	tileno = m_bg_videoram[tile_index];
@@ -124,7 +124,7 @@ void fresh_state::fresh_attr_videoram_w(address_space &space, offs_t offset, uin
 }
 
 
-TILE_GET_INFO_MEMBER(fresh_state::get_fresh_bg_2_tile_info)
+void fresh_state::get_fresh_bg_2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno, pal;
 	tileno = m_bg_2_videoram[tile_index];
@@ -560,7 +560,7 @@ static GFXDECODE_START( fresh )
 GFXDECODE_END
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(fresh_state::fake_scanline)
+void fresh_state::fake_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

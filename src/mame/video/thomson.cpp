@@ -165,7 +165,7 @@ void thomson_state::thom_set_lightpen_callback( int nb )
 	m_thom_lightpen_nb = nb;
 }
 
-TIMER_CALLBACK_MEMBER( thomson_state::thom_lightpen_step )
+void thomson_state::thom_lightpen_step(void *ptr, int32_t param)
 {
 	int step = param;
 
@@ -792,7 +792,7 @@ static const thom_scandraw thom_scandraw_funcs[THOM_VMODE_NB][2] =
 /* called at the start of each scanline in the active area, just after
    left border (-1<=y<199), and also after the last scanline (y=199)
 */
-TIMER_CALLBACK_MEMBER( thomson_state::thom_scanline_start )
+void thomson_state::thom_scanline_start(void *ptr, int32_t param)
 {
 	int y = param;
 
@@ -1009,7 +1009,7 @@ uint32_t thomson_state::screen_update_thom(screen_device &screen, bitmap_ind16 &
 /* -------------- frame start ------------------ */
 
 
-TIMER_CALLBACK_MEMBER( thomson_state::thom_set_init )
+void thomson_state::thom_set_init(void *ptr, int32_t param)
 {
 	int init = param;
 	LOG (( "%f thom_set_init: %i, at line %i col %i\n", machine().time().as_double(), init, thom_video_elapsed() / 64, thom_video_elapsed() % 64 ));
@@ -1197,7 +1197,7 @@ void thomson_state::thom_configure_palette(double gamma, const uint16_t* pal, pa
 }
 
 
-PALETTE_INIT_MEMBER(thomson_state, thom)
+void thomson_state::palette_init_thom(palette_device &palette)
 {
 	LOG (( "thom: palette init called\n" ));
 
@@ -1213,7 +1213,7 @@ PALETTE_INIT_MEMBER(thomson_state, thom)
 		thom_configure_palette(1.0 / 2.8, thom_pal_init, palette);
 }
 
-PALETTE_INIT_MEMBER(thomson_state, mo5)
+void thomson_state::palette_init_mo5(palette_device &palette)
 {
 	LOG (( "thom: MO5 palette init called\n" ));
 

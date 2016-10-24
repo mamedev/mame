@@ -55,7 +55,7 @@ public:
 	void str_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void str_w(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( oe_w );
+	void oe_w(int state);
 
 	void set_clk1(int clock);
 	void set_clk2(int clock);

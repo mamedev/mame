@@ -75,7 +75,7 @@ public:
 	uint8_t mux_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void mux_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void yumefuda_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	TILE_GET_INFO_MEMBER(y_get_bg_tile_info);
+	void y_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -84,7 +84,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 };
 
-TILE_GET_INFO_MEMBER(albazg_state::y_get_bg_tile_info)
+void albazg_state::y_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index];
 	int color = m_colorram[tile_index];

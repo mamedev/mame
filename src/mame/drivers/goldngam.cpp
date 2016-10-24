@@ -250,7 +250,7 @@ public:
 	required_shared_ptr<uint16_t> m_videoram;
 	uint16_t unk_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(goldngam);
+	void palette_init_goldngam(palette_device &palette);
 	uint32_t screen_update_goldngam(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 };
@@ -283,7 +283,7 @@ uint32_t goldngam_state::screen_update_goldngam(screen_device &screen, bitmap_in
 }
 
 
-PALETTE_INIT_MEMBER(goldngam_state, goldngam)
+void goldngam_state::palette_init_goldngam(palette_device &palette)
 {
 }
 

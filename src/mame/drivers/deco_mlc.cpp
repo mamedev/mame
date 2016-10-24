@@ -196,7 +196,7 @@ void deco_mlc_state::avengrs_palette_w(address_space &space, offs_t offset, uint
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(deco_mlc_state::interrupt_gen)
+void deco_mlc_state::interrupt_gen(timer_device &timer, void *ptr, int32_t param)
 {
 //  logerror("hit scanline IRQ %d (%08x)\n", m_screen->vpos(), info.i);
 	m_maincpu->set_input_line(m_mainCpuIsArm ? ARM_IRQ_LINE : 1, HOLD_LINE);

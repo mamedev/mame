@@ -36,7 +36,7 @@ public:
 
 	void init_powerbal();
 	void init_magicstk();
-	TILE_GET_INFO_MEMBER(powerbal_get_bg_tile_info);
+	void powerbal_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void machine_start_powerbal();
 	void machine_reset_powerbal();
 	void video_start_powerbal();
@@ -388,7 +388,7 @@ static INPUT_PORTS_START( hotminda )
 	PORT_DIPSETTING(    0xe0, "Easy 9" )
 INPUT_PORTS_END
 
-TILE_GET_INFO_MEMBER(powerbal_state::powerbal_get_bg_tile_info)
+void powerbal_state::powerbal_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = (m_videoram1[tile_index] & 0x07ff) + m_tilebank * 0x800;
 	int colr = m_videoram1[tile_index] & 0xf000;

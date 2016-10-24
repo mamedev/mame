@@ -59,7 +59,7 @@ static const res_net_info naughtyb_net_info =
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(naughtyb_state, naughtyb)
+void naughtyb_state::palette_init_naughtyb(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances[2] = { 270, 130 };

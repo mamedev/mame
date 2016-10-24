@@ -83,7 +83,7 @@ protected:
 
 	// internal helpers
 	void update_main_irqs();
-	DECLARE_WRITE_LINE_MEMBER(m68k_reset_callback);
+	void m68k_reset_callback(int state);
 
 	// custom I/O
 	void generic_iochip0_lamps_w(uint8_t data);

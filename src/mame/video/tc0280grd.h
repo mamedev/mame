@@ -41,7 +41,7 @@ private:
 	int            m_gfxnum;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	TILE_GET_INFO_MEMBER(tc0280grd_get_tile_info);
+	void tc0280grd_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void zoom_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffset, int yoffset, uint32_t priority, int xmultiply );
 };
 

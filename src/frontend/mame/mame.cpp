@@ -245,7 +245,7 @@ int mame_machine_manager::execute()
 	return error;
 }
 
-TIMER_CALLBACK_MEMBER(mame_machine_manager::autoboot_callback)
+void mame_machine_manager::autoboot_callback(void *ptr, int32_t param)
 {
 	if (strlen(options().autoboot_script())!=0) {
 		mame_machine_manager::instance()->lua()->load_script(options().autoboot_script());

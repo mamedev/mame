@@ -14,7 +14,7 @@ Taito Super Speed Race driver
 
 
 
-PALETTE_INIT_MEMBER(sspeedr_state, sspeedr)
+void sspeedr_state::palette_init_sspeedr(palette_device &palette)
 {
 	int i;
 

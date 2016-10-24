@@ -33,7 +33,7 @@ void pitnrun_state::machine_reset()
 	m_mcu->set_input_line(0, CLEAR_LINE);
 }
 
-TIMER_CALLBACK_MEMBER(pitnrun_state::mcu_real_data_r)
+void pitnrun_state::mcu_real_data_r(void *ptr, int32_t param)
 {
 	m_zaccept = 1;
 }
@@ -44,7 +44,7 @@ uint8_t pitnrun_state::mcu_data_r(address_space &space, offs_t offset, uint8_t m
 	return m_toz80;
 }
 
-TIMER_CALLBACK_MEMBER(pitnrun_state::mcu_real_data_w)
+void pitnrun_state::mcu_real_data_w(void *ptr, int32_t param)
 {
 	m_zready = 1;
 	m_mcu->set_input_line(0, ASSERT_LINE);
@@ -102,12 +102,12 @@ uint8_t pitnrun_state::m68705_portB_r(address_space &space, offs_t offset, uint8
 }
 
 
-TIMER_CALLBACK_MEMBER(pitnrun_state::mcu_data_real_r)
+void pitnrun_state::mcu_data_real_r(void *ptr, int32_t param)
 {
 	m_zready = 0;
 }
 
-TIMER_CALLBACK_MEMBER(pitnrun_state::mcu_status_real_w)
+void pitnrun_state::mcu_status_real_w(void *ptr, int32_t param)
 {
 	m_toz80 = param;
 	m_zaccept = 0;

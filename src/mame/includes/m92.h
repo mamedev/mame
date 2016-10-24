@@ -91,14 +91,14 @@ public:
 	void init_lethalth();
 	void init_m92();
 	void init_m92_bank();
-	TILE_GET_INFO_MEMBER(get_pf_tile_info);
+	void get_pf_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void machine_start_m92();
 	void machine_reset_m92();
 	void video_start_m92();
 	void video_start_ppan();
 	uint32_t screen_update_m92(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_ppan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(m92_scanline_interrupt);
+	void m92_scanline_interrupt(timer_device &timer, void *ptr, int32_t param);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void ppan_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void m92_update_scroll_positions();

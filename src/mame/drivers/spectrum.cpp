@@ -652,7 +652,7 @@ void spectrum_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(spectrum_state::spec_interrupt)
+void spectrum_state::spec_interrupt(device_t &device)
 {
 	m_maincpu->set_input_line(0, HOLD_LINE);
 	timer_set(attotime::from_ticks(32, m_maincpu->clock()), 0, 0);

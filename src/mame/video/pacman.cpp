@@ -63,7 +63,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(pacman_state,pacman)
+void pacman_state::palette_init_pacman(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances[3] = { 1000, 470, 220 };
@@ -118,7 +118,7 @@ PALETTE_INIT_MEMBER(pacman_state,pacman)
 	}
 }
 
-TILEMAP_MAPPER_MEMBER(pacman_state::pacman_scan_rows)
+tilemap_memory_index pacman_state::pacman_scan_rows(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	int offs;
 
@@ -132,7 +132,7 @@ TILEMAP_MAPPER_MEMBER(pacman_state::pacman_scan_rows)
 	return offs;
 }
 
-TILE_GET_INFO_MEMBER(pacman_state::pacman_get_tile_info)
+void pacman_state::pacman_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index] | (m_charbank << 8);
 	int attr = (m_colorram[tile_index] & 0x1f) | (m_colortablebank << 5) | (m_palettebank << 6 );
@@ -360,7 +360,7 @@ S2650 Games
 
 **************************************************************************/
 
-TILE_GET_INFO_MEMBER(pacman_state::s2650_get_tile_info)
+void pacman_state::s2650_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int colbank, code, attr;
 
@@ -484,7 +484,7 @@ Jr. Pac-Man
 2018 - 2045 = column 1 attr (28 rows)
 */
 
-TILEMAP_MAPPER_MEMBER(pacman_state::jrpacman_scan_rows)
+tilemap_memory_index pacman_state::jrpacman_scan_rows(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	int offs;
 
@@ -499,7 +499,7 @@ TILEMAP_MAPPER_MEMBER(pacman_state::jrpacman_scan_rows)
 	return offs;
 }
 
-TILE_GET_INFO_MEMBER(pacman_state::jrpacman_get_tile_info)
+void pacman_state::jrpacman_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int color_index, code, attr;
 	if( tile_index < 1792 )

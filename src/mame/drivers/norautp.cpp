@@ -612,7 +612,7 @@ uint32_t norautp_state::screen_update_norautp(screen_device &screen, bitmap_ind1
 }
 
 
-PALETTE_INIT_MEMBER(norautp_state, norautp)
+void norautp_state::palette_init_norautp(palette_device &palette)
 {
 	/* 1st gfx bank */
 	palette.set_pen_color(0, rgb_t(0x00, 0x00, 0xff));    /* blue */

@@ -82,8 +82,8 @@ public:
 	void video_high_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void pio_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t pio_port_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(pio_ardy);
-	DECLARE_WRITE_LINE_MEMBER(crtc_vs);
+	void pio_ardy(int state);
+	void crtc_vs(int state);
 	uint8_t fdc_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void fdc_motor_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_mbeepc85();
@@ -99,19 +99,19 @@ public:
 	void video_start_mono();
 	void video_start_standard();
 	void video_start_premium();
-	DECLARE_PALETTE_INIT(standard);
-	DECLARE_PALETTE_INIT(premium);
+	void palette_init_standard(palette_device &palette);
+	void palette_init_premium(palette_device &palette);
 	void machine_reset_mbee56();
 	void machine_reset_mbee128();
 	void machine_reset_mbee256();
 	void machine_reset_mbeett();
 	uint32_t screen_update_mbee(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(timer_newkb);
+	void timer_newkb(void *ptr, int32_t param);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(mbee);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(mbee_z80bin);
-	WRITE_LINE_MEMBER(rtc_irq_w);
-	WRITE_LINE_MEMBER(fdc_intrq_w);
-	WRITE_LINE_MEMBER(fdc_drq_w);
+	void rtc_irq_w(int state);
+	void fdc_intrq_w(int state);
+	void fdc_drq_w(int state);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr);
 

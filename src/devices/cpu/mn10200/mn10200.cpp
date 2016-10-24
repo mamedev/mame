@@ -429,7 +429,7 @@ void mn10200_device::refresh_all_timers()
 		refresh_timer(tmr);
 }
 
-TIMER_CALLBACK_MEMBER( mn10200_device::simple_timer_cb )
+void mn10200_device::simple_timer_cb(void *ptr, int32_t param)
 {
 	int tmr = param;
 

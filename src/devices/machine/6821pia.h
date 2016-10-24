@@ -110,9 +110,9 @@ public:
 	void set_a_input(uint8_t data, uint8_t z_mask);
 	uint8_t a_output();
 
-	DECLARE_WRITE_LINE_MEMBER( ca1_w );
+	void ca1_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( ca2_w );
+	void ca2_w(int state);
 	int ca2_output();
 	int ca2_output_z();
 
@@ -120,9 +120,9 @@ public:
 	void portb_w(uint8_t data);
 	uint8_t b_output();
 
-	DECLARE_WRITE_LINE_MEMBER( cb1_w );
+	void cb1_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( cb2_w );
+	void cb2_w(int state);
 	int cb2_output();
 	int cb2_output_z();
 

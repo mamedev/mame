@@ -54,7 +54,7 @@ void silkroad_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 }
 
 
-TILE_GET_INFO_MEMBER(silkroad_state::get_fg_tile_info)
+void silkroad_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = ((m_vidram[tile_index] & 0xffff0000) >> 16 );
 	int color = ((m_vidram[tile_index] & 0x000001f));
@@ -76,7 +76,7 @@ void silkroad_state::silkroad_fgram_w(address_space &space, offs_t offset, uint3
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(silkroad_state::get_fg2_tile_info)
+void silkroad_state::get_fg2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = ((m_vidram2[tile_index] & 0xffff0000) >> 16 );
 	int color = ((m_vidram2[tile_index] & 0x000001f));
@@ -96,7 +96,7 @@ void silkroad_state::silkroad_fgram2_w(address_space &space, offs_t offset, uint
 	m_fg2_tilemap->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(silkroad_state::get_fg3_tile_info)
+void silkroad_state::get_fg3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = ((m_vidram3[tile_index] & 0xffff0000) >> 16 );
 	int color = ((m_vidram3[tile_index] & 0x000001f));

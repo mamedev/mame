@@ -62,9 +62,9 @@ public:
 
 	// read/write handlers
 	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_READ_LINE_MEMBER( line_r );
+	int line_r();
 	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( motor_w );
+	void motor_w(int state);
 
 protected:
 	// device-level overrides

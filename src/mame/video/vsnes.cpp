@@ -5,12 +5,12 @@
 #include "includes/vsnes.h"
 
 
-PALETTE_INIT_MEMBER(vsnes_state,vsnes)
+void vsnes_state::palette_init_vsnes(palette_device &palette)
 {
 	m_ppu1->init_palette_rgb(palette, 0);
 }
 
-PALETTE_INIT_MEMBER(vsnes_state,vsdual)
+void vsnes_state::palette_init_vsdual(palette_device &palette)
 {
 	m_ppu1->init_palette_rgb(palette, 0);
 	m_ppu2->init_palette_rgb(palette, 8 * 4 * 16);

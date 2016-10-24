@@ -248,8 +248,8 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_sigmab98(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_sammymdl(screen_device &screen, bool state);
-	INTERRUPT_GEN_MEMBER(sigmab98_vblank_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(sammymdl_irq);
+	void sigmab98_vblank_interrupt(device_t &device);
+	void sammymdl_irq(timer_device &timer, void *ptr, int32_t param);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int pri_mask);
 };
 
@@ -2140,7 +2140,7 @@ void sigmab98_state::machine_reset_sigmab98()
 	membank("rambank")->set_entry(0);
 }
 
-INTERRUPT_GEN_MEMBER(sigmab98_state::sigmab98_vblank_interrupt)
+void sigmab98_state::sigmab98_vblank_interrupt(device_t &device)
 {
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x5a);
 }
@@ -2212,7 +2212,7 @@ void sigmab98_state::machine_reset_sammymdl()
 	m_maincpu->set_state_int(Z80_PC, 0x400);  // code starts at 400 ??? (000 = cart header)
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(sigmab98_state::sammymdl_irq)
+void sigmab98_state::sammymdl_irq(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

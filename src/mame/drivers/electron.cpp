@@ -86,7 +86,7 @@ static const rgb_t electron_palette[8]=
 	rgb_t(0x000,0x000,0x000)
 };
 
-PALETTE_INIT_MEMBER(electron_state, electron)
+void electron_state::palette_init_electron(palette_device &palette)
 {
 	palette.set_pen_colors(0, electron_palette, ARRAY_LENGTH(electron_palette));
 }

@@ -32,7 +32,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(circusc_state, circusc)
+void circusc_state::palette_init_circusc(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };
@@ -98,7 +98,7 @@ PALETTE_INIT_MEMBER(circusc_state, circusc)
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(circusc_state::get_tile_info)
+void circusc_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t attr = m_colorram[tile_index];
 	tileinfo.category = (attr & 0x10) >> 4;

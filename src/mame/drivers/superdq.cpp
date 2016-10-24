@@ -50,19 +50,19 @@ public:
 	void superdq_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t superdq_ld_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void superdq_ld_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	TILE_GET_INFO_MEMBER(get_tile_info);
+	void get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(superdq);
+	void palette_init_superdq(palette_device &palette);
 	uint32_t screen_update_superdq(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(superdq_vblank);
+	void superdq_vblank(device_t &device);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 };
 
-TILE_GET_INFO_MEMBER(superdq_state::get_tile_info)
+void superdq_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = m_videoram[tile_index];
 
@@ -89,7 +89,7 @@ uint32_t superdq_state::screen_update_superdq(screen_device &screen, bitmap_rgb3
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(superdq_state, superdq)
+void superdq_state::palette_init_superdq(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -136,7 +136,7 @@ void superdq_state::machine_reset()
 	m_color_bank = 0;
 }
 
-INTERRUPT_GEN_MEMBER(superdq_state::superdq_vblank)
+void superdq_state::superdq_vblank(device_t &device)
 {
 	/* status is read when the STATUS line from the laserdisc
 	   toggles (600usec after the vblank). We could set up a

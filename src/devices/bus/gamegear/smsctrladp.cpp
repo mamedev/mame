@@ -69,7 +69,7 @@ void sms_ctrl_adaptor_device::peripheral_w(uint8_t data)
 //  machine configurations
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( sms_ctrl_adaptor_device::th_pin_w )
+void sms_ctrl_adaptor_device::th_pin_w(int state)
 {
 	m_port->th_pin_w(state);
 }

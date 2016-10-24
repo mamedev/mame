@@ -60,15 +60,15 @@ public:
 	void port14_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void port18_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void port1c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(crtc_drq_w);
-	DECLARE_WRITE_LINE_MEMBER(crtc_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(busreq_w);
-	DECLARE_WRITE_LINE_MEMBER(clock_w);
-	DECLARE_WRITE_LINE_MEMBER(zc0_w);
-	DECLARE_WRITE_LINE_MEMBER(tc_w);
-	DECLARE_WRITE_LINE_MEMBER(q_w);
-	DECLARE_WRITE_LINE_MEMBER(qbar_w);
-	DECLARE_WRITE_LINE_MEMBER(dack1_w);
+	void crtc_drq_w(int state);
+	void crtc_irq_w(int state);
+	void busreq_w(int state);
+	void clock_w(int state);
+	void zc0_w(int state);
+	void tc_w(int state);
+	void q_w(int state);
+	void qbar_w(int state);
+	void dack1_w(int state);
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
@@ -154,7 +154,7 @@ void rc702_state::machine_reset_rc702()
 	m_maincpu->reset();
 }
 
-WRITE_LINE_MEMBER( rc702_state::q_w )
+void rc702_state::q_w(int state)
 {
 	m_q_state = state;
 
@@ -164,7 +164,7 @@ WRITE_LINE_MEMBER( rc702_state::q_w )
 		m_dma->dreq3_w(0);
 }
 
-WRITE_LINE_MEMBER( rc702_state::qbar_w )
+void rc702_state::qbar_w(int state)
 {
 	m_qbar_state = state;
 
@@ -174,7 +174,7 @@ WRITE_LINE_MEMBER( rc702_state::qbar_w )
 		m_dma->dreq2_w(0);
 }
 
-WRITE_LINE_MEMBER( rc702_state::crtc_drq_w )
+void rc702_state::crtc_drq_w(int state)
 {
 	m_drq_state = state;
 
@@ -189,7 +189,7 @@ WRITE_LINE_MEMBER( rc702_state::crtc_drq_w )
 		m_dma->dreq2_w(0);
 }
 
-WRITE_LINE_MEMBER( rc702_state::tc_w )
+void rc702_state::tc_w(int state)
 {
 	m_tc = state;
 	if ((m_dack == 1) && m_tc)
@@ -201,7 +201,7 @@ WRITE_LINE_MEMBER( rc702_state::tc_w )
 		m_fdc->tc_w(0);
 }
 
-WRITE_LINE_MEMBER( rc702_state::dack1_w )
+void rc702_state::dack1_w(int state)
 {
 	m_dack = 1;
 	if ((m_dack == 1) && m_tc)
@@ -273,7 +273,7 @@ I8275_DRAW_CHARACTER_MEMBER( rc702_state::display_pixels )
 }
 
 // Baud rate generator. All inputs are 0.614MHz.
-WRITE_LINE_MEMBER( rc702_state::clock_w )
+void rc702_state::clock_w(int state)
 {
 	m_ctc1->trg0(state);
 	m_ctc1->trg1(state);
@@ -283,19 +283,19 @@ WRITE_LINE_MEMBER( rc702_state::clock_w )
 		m_beepcnt--;
 }
 
-WRITE_LINE_MEMBER( rc702_state::zc0_w )
+void rc702_state::zc0_w(int state)
 {
 	m_sio1->txca_w(state);
 	m_sio1->rxca_w(state);
 }
 
-WRITE_LINE_MEMBER( rc702_state::crtc_irq_w )
+void rc702_state::crtc_irq_w(int state)
 {
 	m_7474->clear_w(!state);
 	m_ctc1->trg2(state);
 }
 
-WRITE_LINE_MEMBER( rc702_state::busreq_w )
+void rc702_state::busreq_w(int state)
 {
 // since our Z80 has no support for BUSACK, we assume it is granted immediately
 	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, state);

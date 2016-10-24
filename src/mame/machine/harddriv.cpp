@@ -103,7 +103,7 @@ void harddriv_state::update_interrupts()
 }
 
 
-INTERRUPT_GEN_MEMBER(harddriv_state::hd68k_irq_gen)
+void harddriv_state::hd68k_irq_gen(device_t &device)
 {
 	m_irq_state = 1;
 	update_interrupts();
@@ -117,14 +117,14 @@ void harddriv_state::hd68k_irq_ack_w(address_space &space, offs_t offset, uint16
 }
 
 
-WRITE_LINE_MEMBER(harddriv_state::hdgsp_irq_gen)
+void harddriv_state::hdgsp_irq_gen(int state)
 {
 	m_gsp_irq_state = state;
 	update_interrupts();
 }
 
 
-WRITE_LINE_MEMBER(harddriv_state::hdmsp_irq_gen)
+void harddriv_state::hdmsp_irq_gen(int state)
 {
 	m_msp_irq_state = state;
 	update_interrupts();
@@ -461,7 +461,7 @@ void harddriv_state::hd68k_zram_w(address_space &space, offs_t offset, uint16_t 
  *
  *************************************/
 
-WRITE_LINE_MEMBER(harddriv_state::harddriv_duart_irq_handler)
+void harddriv_state::harddriv_duart_irq_handler(int state)
 {
 	m_duart_irq_state = state;
 	update_interrupts();
@@ -610,7 +610,7 @@ void harddriv_state::hd68k_adsp_buffer_w(address_space &space, offs_t offset, ui
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(harddriv_state::deferred_adsp_bank_switch)
+void harddriv_state::deferred_adsp_bank_switch(void *ptr, int32_t param)
 {
 	if (LOG_COMMANDS && m_m68k_adsp_buffer_bank != param && machine().input().code_pressed(KEYCODE_L))
 	{
@@ -1225,7 +1225,7 @@ void harddriv_state::hdds3_xdsp_control_w(address_space &space, offs_t offset, u
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( harddriv_state::ds3sdsp_internal_timer_callback )
+void harddriv_state::ds3sdsp_internal_timer_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	uint16_t period = m_ds3sdsp_regs[0x1d];
 	uint16_t scale = m_ds3sdsp_regs[0x1b] + 1;
@@ -1249,7 +1249,7 @@ void harddriv_state::hdds3sdsp_reset_timer()
 	m_ds3sdsp_internal_timer->adjust(m_ds3sdsp->cycles_to_attotime(count * scale));
 }
 
-WRITE_LINE_MEMBER(harddriv_state::hdds3sdsp_timer_enable_callback)
+void harddriv_state::hdds3sdsp_timer_enable_callback(int state)
 {
 	m_ds3sdsp_timer_en = state;
 
@@ -1260,7 +1260,7 @@ WRITE_LINE_MEMBER(harddriv_state::hdds3sdsp_timer_enable_callback)
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER( harddriv_state::ds3xdsp_internal_timer_callback )
+void harddriv_state::ds3xdsp_internal_timer_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	uint16_t period = m_ds3xdsp_regs[0x1d];
 	uint16_t scale = m_ds3xdsp_regs[0x1b] + 1;
@@ -1285,7 +1285,7 @@ void harddriv_state::hdds3xdsp_reset_timer()
 }
 
 
-WRITE_LINE_MEMBER(harddriv_state::hdds3xdsp_timer_enable_callback)
+void harddriv_state::hdds3xdsp_timer_enable_callback(int state)
 {
 	m_ds3xdsp_timer_en = state;
 
@@ -1299,7 +1299,7 @@ WRITE_LINE_MEMBER(harddriv_state::hdds3xdsp_timer_enable_callback)
 /*
     TODO: The following does not work correctly
 */
-TIMER_CALLBACK_MEMBER(harddriv_state::xsdp_sport1_irq_off_callback)
+void harddriv_state::xsdp_sport1_irq_off_callback(void *ptr, int32_t param)
 {
 	m_ds3xdsp->set_input_line(ADSP2105_SPORT1_RX, CLEAR_LINE);
 }
@@ -1598,7 +1598,7 @@ uint16_t harddriv_state::hd68k_dsk_dsp32_r(address_space &space, offs_t offset, 
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(harddriv_state::rddsp32_sync_cb)
+void harddriv_state::rddsp32_sync_cb(void *ptr, int32_t param)
 {
 	*m_dataptr[param] = m_dataval[param];
 }

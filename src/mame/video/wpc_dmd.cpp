@@ -144,7 +144,7 @@ uint32_t wpc_dmd_device::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(wpc_dmd_device::scanline_timer)
+void wpc_dmd_device::scanline_timer(timer_device &timer, void *ptr, int32_t param)
 {
 	const uint8_t *src = &ram[0x200*(visible_page & 0xf) + 16*cur_scanline];
 	uint8_t *base = &screen_buffer[128*cur_scanline];

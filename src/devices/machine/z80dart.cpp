@@ -1119,7 +1119,7 @@ void z80dart_channel::receive_data(uint8_t data)
 //  cts_w - clear to send handler
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( z80dart_channel::cts_w )
+void z80dart_channel::cts_w(int state)
 {
 	LOG(("Z80DART \"%s\" Channel %c : CTS %u\n", m_owner->tag(), 'A' + m_index, state));
 
@@ -1158,7 +1158,7 @@ WRITE_LINE_MEMBER( z80dart_channel::cts_w )
 //  dcd_w - data carrier detected handler
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( z80dart_channel::dcd_w )
+void z80dart_channel::dcd_w(int state)
 {
 	LOG(("Z80DART \"%s\" Channel %c : DCD %u\n", m_owner->tag(), 'A' + m_index, state));
 
@@ -1196,7 +1196,7 @@ WRITE_LINE_MEMBER( z80dart_channel::dcd_w )
 //  ri_w - ring indicator handler
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( z80dart_channel::ri_w )
+void z80dart_channel::ri_w(int state)
 {
 	LOG(("Z80DART \"%s\" Channel %c : RI %u\n", m_owner->tag(), 'A' + m_index, state));
 
@@ -1229,7 +1229,7 @@ WRITE_LINE_MEMBER( z80dart_channel::ri_w )
 //  sync_w - sync handler
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( z80dart_channel::sync_w )
+void z80dart_channel::sync_w(int state)
 {
 	LOG(("Z80DART \"%s\" Channel %c : SYNC %u\n", m_owner->tag(), 'A' + m_index, state));
 }
@@ -1239,7 +1239,7 @@ WRITE_LINE_MEMBER( z80dart_channel::sync_w )
 //  rxc_w - receive clock
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( z80dart_channel::rxc_w )
+void z80dart_channel::rxc_w(int state)
 {
 	//LOG(("Z80DART \"%s\" Channel %c : Receiver Clock Pulse\n", m_owner->tag(), m_index + 'A'));
 	int clocks = get_clock_mode();
@@ -1261,7 +1261,7 @@ WRITE_LINE_MEMBER( z80dart_channel::rxc_w )
 //  txc_w - transmit clock
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( z80dart_channel::txc_w )
+void z80dart_channel::txc_w(int state)
 {
 	//LOG(("Z80DART \"%s\" Channel %c : Transmitter Clock Pulse\n", m_owner->tag(), m_index + 'A'));
 	int clocks = get_clock_mode();
@@ -1348,7 +1348,7 @@ void z80dart_channel::set_rts(int state)
 //  write_rx -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(z80dart_channel::write_rx)
+void z80dart_channel::write_rx(int state)
 {
 	m_rxd = state;
 	//only use rx_w when self-clocked

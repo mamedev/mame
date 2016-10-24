@@ -16,7 +16,7 @@ void playch10_state::playch10_videoram_w(address_space &space, offs_t offset, ui
 	}
 }
 
-PALETTE_INIT_MEMBER(playch10_state, playch10)
+void playch10_state::palette_init_playch10(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 
@@ -64,7 +64,7 @@ void playch10_state::ppu_irq(int *ppu_regs)
 	m_pc10_int_detect = 1;
 }
 
-TILE_GET_INFO_MEMBER(playch10_state::get_bg_tile_info)
+void playch10_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *videoram = m_videoram;
 	int offs = tile_index * 2;

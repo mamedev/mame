@@ -36,10 +36,10 @@ public:
 		, m_cassette(*this, "cassette")
 	{ }
 
-	DECLARE_WRITE_LINE_MEMBER( write_centronics_busy );
+	void write_centronics_busy(int state);
 	uint8_t port40_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void port40_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(irq_w);
+	void irq_w(int state);
 	uint8_t video_ram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	MC6847_GET_CHARROM_MEMBER(ntsc_char_rom_r);
 	MC6847_GET_CHARROM_MEMBER(pal_char_rom_r);

@@ -39,7 +39,7 @@ class m68307_timer
 	void init(m68307cpu_device *device);
 	void reset(void);
 
-	TIMER_CALLBACK_MEMBER(timer0_callback);
-	TIMER_CALLBACK_MEMBER(timer1_callback);
-	TIMER_CALLBACK_MEMBER(wd_timer_callback);
+	void timer0_callback(void *ptr, int32_t param);
+	void timer1_callback(void *ptr, int32_t param);
+	void wd_timer_callback(void *ptr, int32_t param);
 };

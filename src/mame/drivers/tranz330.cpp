@@ -72,17 +72,17 @@ void tranz330_state::machine_reset()
 {
 }
 
-WRITE_LINE_MEMBER( tranz330_state::syncb_w )
+void tranz330_state::syncb_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER( tranz330_state::sound_w )
+void tranz330_state::sound_w(int state)
 {
 	m_speaker->level_w(state);
 	m_ctc->trg3(state);
 }
 
-WRITE_LINE_MEMBER( tranz330_state::clock_w )
+void tranz330_state::clock_w(int state)
 {
 	// Ch 0 and 1 might be DART Ch A & B baud clocks
 	//m_ctc->trg0(state);

@@ -203,7 +203,7 @@ public:
 	void lightgun_set( int, int );
 	int vramSize;
 	void vblank(screen_device &screen, bool vblank_state);
-	DECLARE_PALETTE_INIT( psx );
+	void palette_init_psx(palette_device &palette);
 
 protected:
 	virtual void device_start() override;

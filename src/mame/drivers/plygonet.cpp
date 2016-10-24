@@ -126,7 +126,7 @@ void polygonet_state::polygonet_sys_w(address_space &space, offs_t offset, uint8
 /* irq 3 is network.  don't generate if you don't emulate the network h/w! */
 /* irq 5 is vblank */
 /* irq 7 does nothing (it jsrs to a rts and then rte) */
-INTERRUPT_GEN_MEMBER(polygonet_state::polygonet_interrupt)
+void polygonet_state::polygonet_interrupt(device_t &device)
 {
 	if (m_sys1 & 0x20)
 		device.execute().set_input_line(M68K_IRQ_5, ASSERT_LINE);
@@ -591,7 +591,7 @@ void polygonet_state::machine_start()
 	save_item(NAME(m_sound_intck));
 }
 
-WRITE_LINE_MEMBER(polygonet_state::k054539_nmi_gen)
+void polygonet_state::k054539_nmi_gen(int state)
 {
 	// Trigger interrupt on rising clock edge
 	if (!m_sound_intck && state)

@@ -175,7 +175,7 @@ public:
 	void video_start__3do();
 	uint32_t screen_update__3do(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	TIMER_DEVICE_CALLBACK_MEMBER( timer_x16_cb );
+	void timer_x16_cb(timer_device &timer, void *ptr, int32_t param);
 
 protected:
 	required_memory_bank m_bank1;

@@ -100,14 +100,14 @@ ADDRESS_MAP_END
 //  MOS8520_INTERFACE( cia_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( c1581_t::cnt_w )
+void c1581_t::cnt_w(int state)
 {
 	m_cnt_out = state;
 
 	update_iec();
 }
 
-WRITE_LINE_MEMBER( c1581_t::sp_w )
+void c1581_t::sp_w(int state)
 {
 	m_sp_out = state;
 

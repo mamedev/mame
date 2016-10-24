@@ -40,7 +40,7 @@ J Clegg
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(travrusa_state, travrusa)
+void travrusa_state::palette_init_travrusa(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -113,7 +113,7 @@ PALETTE_INIT_MEMBER(travrusa_state, travrusa)
 	}
 }
 
-PALETTE_INIT_MEMBER(travrusa_state,shtrider)
+void travrusa_state::palette_init_shtrider(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -194,7 +194,7 @@ PALETTE_INIT_MEMBER(travrusa_state,shtrider)
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(travrusa_state::get_tile_info)
+void travrusa_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t attr = m_videoram[2 * tile_index + 1];
 	int flags = TILE_FLIPXY((attr & 0x30) >> 4);

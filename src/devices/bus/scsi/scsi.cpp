@@ -511,7 +511,7 @@ void SCSI_PORT_DEVICE::update_data7()
 	}
 }
 
-WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_bsy )
+void SCSI_PORT_DEVICE::write_bsy(int state)
 {
 	if (m_bsy_in != state)
 	{
@@ -520,7 +520,7 @@ WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_bsy )
 	}
 }
 
-WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_sel )
+void SCSI_PORT_DEVICE::write_sel(int state)
 {
 	if (m_sel_in != state)
 	{
@@ -529,7 +529,7 @@ WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_sel )
 	}
 }
 
-WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_cd )
+void SCSI_PORT_DEVICE::write_cd(int state)
 {
 	if (m_cd_in != state)
 	{
@@ -538,7 +538,7 @@ WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_cd )
 	}
 }
 
-WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_io )
+void SCSI_PORT_DEVICE::write_io(int state)
 {
 	if (m_io_in != state)
 	{
@@ -547,7 +547,7 @@ WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_io )
 	}
 }
 
-WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_msg )
+void SCSI_PORT_DEVICE::write_msg(int state)
 {
 	if (m_msg_in != state)
 	{
@@ -556,7 +556,7 @@ WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_msg )
 	}
 }
 
-WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_req )
+void SCSI_PORT_DEVICE::write_req(int state)
 {
 	if (m_req_in != state)
 	{
@@ -565,7 +565,7 @@ WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_req )
 	}
 }
 
-WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_ack )
+void SCSI_PORT_DEVICE::write_ack(int state)
 {
 	if (m_ack_in != state)
 	{
@@ -574,7 +574,7 @@ WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_ack )
 	}
 }
 
-WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_atn )
+void SCSI_PORT_DEVICE::write_atn(int state)
 {
 	if (m_atn_in != state)
 	{
@@ -583,7 +583,7 @@ WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_atn )
 	}
 }
 
-WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_rst )
+void SCSI_PORT_DEVICE::write_rst(int state)
 {
 	if (m_rst_in != state)
 	{
@@ -592,7 +592,7 @@ WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_rst )
 	}
 }
 
-WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_data0 )
+void SCSI_PORT_DEVICE::write_data0(int state)
 {
 	if (m_data0_in != state)
 	{
@@ -601,7 +601,7 @@ WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_data0 )
 	}
 }
 
-WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_data1 )
+void SCSI_PORT_DEVICE::write_data1(int state)
 {
 	if (m_data1_in != state)
 	{
@@ -610,7 +610,7 @@ WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_data1 )
 	}
 }
 
-WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_data2 )
+void SCSI_PORT_DEVICE::write_data2(int state)
 {
 	if (m_data2_in != state)
 	{
@@ -619,7 +619,7 @@ WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_data2 )
 	}
 }
 
-WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_data3 )
+void SCSI_PORT_DEVICE::write_data3(int state)
 {
 	if (m_data3_in != state)
 	{
@@ -628,7 +628,7 @@ WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_data3 )
 	}
 }
 
-WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_data4 )
+void SCSI_PORT_DEVICE::write_data4(int state)
 {
 	if (m_data4_in != state)
 	{
@@ -637,7 +637,7 @@ WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_data4 )
 	}
 }
 
-WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_data5 )
+void SCSI_PORT_DEVICE::write_data5(int state)
 {
 	if (m_data5_in != state)
 	{
@@ -646,7 +646,7 @@ WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_data5 )
 	}
 }
 
-WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_data6 )
+void SCSI_PORT_DEVICE::write_data6(int state)
 {
 	if (m_data6_in != state)
 	{
@@ -655,7 +655,7 @@ WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_data6 )
 	}
 }
 
-WRITE_LINE_MEMBER( SCSI_PORT_DEVICE::write_data7 )
+void SCSI_PORT_DEVICE::write_data7(int state)
 {
 	if (m_data7_in != state)
 	{

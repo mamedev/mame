@@ -72,11 +72,11 @@ public:
 	void io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void unknown_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	TILE_GET_INFO_MEMBER(get_tile_info);
+	void get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(koikoi);
+	void palette_init_koikoi(palette_device &palette);
 	uint32_t screen_update_koikoi(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -89,7 +89,7 @@ public:
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(koikoi_state::get_tile_info)
+void koikoi_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code  = m_videoram[tile_index] | ((m_videoram[tile_index + 0x400] & 0x40) << 2);
 	int color = (m_videoram[tile_index + 0x400] & 0x1f);
@@ -98,7 +98,7 @@ TILE_GET_INFO_MEMBER(koikoi_state::get_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, flip);
 }
 
-PALETTE_INIT_MEMBER(koikoi_state, koikoi)
+void koikoi_state::palette_init_koikoi(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;

@@ -8,7 +8,7 @@
 #include "includes/drgnmst.h"
 
 
-TILE_GET_INFO_MEMBER(drgnmst_state::get_drgnmst_fg_tile_info)
+void drgnmst_state::get_drgnmst_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno, colour, flipyx;
 	tileno = m_fg_videoram[tile_index * 2] & 0xfff;
@@ -24,7 +24,7 @@ void drgnmst_state::drgnmst_fg_videoram_w(address_space &space, offs_t offset, u
 	m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-TILE_GET_INFO_MEMBER(drgnmst_state::get_drgnmst_bg_tile_info)
+void drgnmst_state::get_drgnmst_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno, colour, flipyx;
 	tileno = (m_bg_videoram[tile_index * 2]& 0x1fff) + 0x800;
@@ -40,7 +40,7 @@ void drgnmst_state::drgnmst_bg_videoram_w(address_space &space, offs_t offset, u
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-TILE_GET_INFO_MEMBER(drgnmst_state::get_drgnmst_md_tile_info)
+void drgnmst_state::get_drgnmst_md_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno, colour, flipyx;
 	tileno = (m_md_videoram[tile_index * 2] & 0x7fff) - 0x2000;
@@ -103,17 +103,17 @@ void drgnmst_state::draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect
 }
 
 
-TILEMAP_MAPPER_MEMBER(drgnmst_state::drgnmst_fg_tilemap_scan_cols)
+tilemap_memory_index drgnmst_state::drgnmst_fg_tilemap_scan_cols(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	return (col * 32) + (row & 0x1f) + ((row & 0xe0) >> 5) * 2048;
 }
 
-TILEMAP_MAPPER_MEMBER(drgnmst_state::drgnmst_md_tilemap_scan_cols)
+tilemap_memory_index drgnmst_state::drgnmst_md_tilemap_scan_cols(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	return (col * 16) + (row & 0x0f) + ((row & 0xf0) >> 4) * 1024;
 }
 
-TILEMAP_MAPPER_MEMBER(drgnmst_state::drgnmst_bg_tilemap_scan_cols)
+tilemap_memory_index drgnmst_state::drgnmst_bg_tilemap_scan_cols(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	return (col * 8) + (row & 0x07) + ((row & 0xf8) >> 3) * 512;
 }

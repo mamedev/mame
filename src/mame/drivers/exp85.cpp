@@ -120,7 +120,7 @@ void exp85_state::i8355_a_w(address_space &space, offs_t offset, uint8_t data, u
 
 /* I8085A Interface */
 
-READ_LINE_MEMBER( exp85_state::sid_r )
+int exp85_state::sid_r()
 {
 	int data = 1;
 
@@ -136,7 +136,7 @@ READ_LINE_MEMBER( exp85_state::sid_r )
 	return data;
 }
 
-WRITE_LINE_MEMBER( exp85_state::sod_w )
+void exp85_state::sod_w(int state)
 {
 	if (m_tape_control)
 	{

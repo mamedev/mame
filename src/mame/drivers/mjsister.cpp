@@ -69,7 +69,7 @@ public:
 	void input_sel1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void input_sel2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t keys_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	TIMER_CALLBACK_MEMBER(dac_callback);
+	void dac_callback(void *ptr, int32_t param);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -194,7 +194,7 @@ void mjsister_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	}
 }
 
-TIMER_CALLBACK_MEMBER(mjsister_state::dac_callback)
+void mjsister_state::dac_callback(void *ptr, int32_t param)
 {
 	uint8_t *DACROM = memregion("samples")->base();
 

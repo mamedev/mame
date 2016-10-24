@@ -105,14 +105,14 @@ public:
 	void qx10_18_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void prom_sel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void cmos_sel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( qx10_upd765_interrupt );
+	void qx10_upd765_interrupt(int state);
 	uint8_t fdc_dma_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void fdc_dma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void fdd_motor_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t qx10_30_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t gdc_dack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void gdc_dack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( tc_w );
+	void tc_w(int state);
 	uint8_t mc146818_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void mc146818_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t get_slave_ack(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
@@ -122,8 +122,8 @@ public:
 	void vram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	uint8_t memory_read_byte(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void memory_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(keyboard_clk);
-	DECLARE_WRITE_LINE_MEMBER(keyboard_irq);
+	void keyboard_clk(int state);
+	void keyboard_irq(int state);
 
 	uint8_t *m_char_rom;
 
@@ -144,8 +144,8 @@ public:
 		uint8_t rx;
 	}m_rs232c;
 
-	DECLARE_PALETTE_INIT(qx10);
-	DECLARE_WRITE_LINE_MEMBER(dma_hrq_changed);
+	void palette_init_qx10(palette_device &palette);
+	void dma_hrq_changed(int state);
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<palette_device> m_palette;
@@ -323,7 +323,7 @@ static SLOT_INTERFACE_START( qx10_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
 
-WRITE_LINE_MEMBER( qx10_state::qx10_upd765_interrupt )
+void qx10_state::qx10_upd765_interrupt(int state)
 {
 	m_fdcint = state;
 
@@ -356,7 +356,7 @@ uint8_t qx10_state::qx10_30_r(address_space &space, offs_t offset, uint8_t mem_m
 /*
     DMA8237
 */
-WRITE_LINE_MEMBER(qx10_state::dma_hrq_changed)
+void qx10_state::dma_hrq_changed(int state)
 {
 	/* Assert HLDA */
 	m_dma_1->hack_w(state);
@@ -373,7 +373,7 @@ void qx10_state::gdc_dack_w(address_space &space, offs_t offset, uint8_t data, u
 	logerror("GDC DACK write %02x\n", data);
 }
 
-WRITE_LINE_MEMBER( qx10_state::tc_w )
+void qx10_state::tc_w(int state)
 {
 	/* floppy terminal count */
 	m_fdc->tc_w(!state);
@@ -419,13 +419,13 @@ uint8_t qx10_state::mc146818_r(address_space &space, offs_t offset, uint8_t mem_
 	return m_rtc->read(space, !offset);
 }
 
-WRITE_LINE_MEMBER(qx10_state::keyboard_irq)
+void qx10_state::keyboard_irq(int state)
 {
 	m_scc->m1_r(); // always set
 	m_pic_m->ir4_w(state);
 }
 
-WRITE_LINE_MEMBER(qx10_state::keyboard_clk)
+void qx10_state::keyboard_clk(int state)
 {
 	// clock keyboard too
 	m_scc->rxca_w(state);
@@ -625,7 +625,7 @@ void qx10_state::video_start()
 	m_char_rom = memregion("chargen")->base();
 }
 
-PALETTE_INIT_MEMBER(qx10_state, qx10)
+void qx10_state::palette_init_qx10(palette_device &palette)
 {
 	// ...
 }

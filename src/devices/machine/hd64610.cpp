@@ -274,7 +274,7 @@ void hd64610_device::nvram_write(emu_file &file)
 //  hardware start/stop
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( hd64610_device::h_w )
+void hd64610_device::h_w(int state)
 {
 	m_hline_state = state;
 }

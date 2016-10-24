@@ -124,8 +124,8 @@ public:
 	void flip_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t custom_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	TILE_GET_INFO_MEMBER(get_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	void init_pturn();
 	virtual void machine_start() override;
@@ -134,8 +134,8 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	INTERRUPT_GEN_MEMBER(sub_intgen);
-	INTERRUPT_GEN_MEMBER(main_intgen);
+	void sub_intgen(device_t &device);
+	void main_intgen(device_t &device);
 };
 
 
@@ -149,7 +149,7 @@ static const uint8_t tile_lookup[0x10]=
 	0xa0, 0xb0, 0xe0, 0xf0
 };
 
-TILE_GET_INFO_MEMBER(pturn_state::get_tile_info)
+void pturn_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno = m_videoram[tile_index];
 
@@ -160,7 +160,7 @@ TILE_GET_INFO_MEMBER(pturn_state::get_tile_info)
 
 
 
-TILE_GET_INFO_MEMBER(pturn_state::get_bg_tile_info)
+void pturn_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno = memregion("user1")->base()[tile_index];
 	int palno=m_bgpalette;
@@ -468,7 +468,7 @@ static INPUT_PORTS_START( pturn )
 	PORT_DIPSETTING(    0x80, DEF_STR( Japanese ) )
 INPUT_PORTS_END
 
-INTERRUPT_GEN_MEMBER(pturn_state::sub_intgen)
+void pturn_state::sub_intgen(device_t &device)
 {
 	if(m_nmi_sub)
 	{
@@ -476,7 +476,7 @@ INTERRUPT_GEN_MEMBER(pturn_state::sub_intgen)
 	}
 }
 
-INTERRUPT_GEN_MEMBER(pturn_state::main_intgen)
+void pturn_state::main_intgen(device_t &device)
 {
 	if (m_nmi_main)
 	{

@@ -13,7 +13,7 @@
 
 /**************************** PALETTES for super80m and super80v ******************************************/
 
-PALETTE_INIT_MEMBER( super80_state, super80m )
+void super80_state::palette_init_super80m(palette_device &palette)
 {
 	// RGB
 	m_palette->set_pen_color(0, rgb_t(0x00, 0x00, 0x00));   /*  0 Black     */

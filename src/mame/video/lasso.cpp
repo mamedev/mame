@@ -66,7 +66,7 @@ rgb_t lasso_state::get_color( int data )
 }
 
 
-PALETTE_INIT_MEMBER(lasso_state, lasso)
+void lasso_state::palette_init_lasso(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -76,7 +76,7 @@ PALETTE_INIT_MEMBER(lasso_state, lasso)
 }
 
 
-PALETTE_INIT_MEMBER(lasso_state,wwjgtin)
+void lasso_state::palette_init_wwjgtin(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -120,7 +120,7 @@ void lasso_state::wwjgtin_set_last_four_colors()
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(lasso_state::lasso_get_bg_tile_info)
+void lasso_state::lasso_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index];
 	int color = m_colorram[tile_index];
@@ -131,7 +131,7 @@ TILE_GET_INFO_MEMBER(lasso_state::lasso_get_bg_tile_info)
 					0);
 }
 
-TILE_GET_INFO_MEMBER(lasso_state::wwjgtin_get_track_tile_info)
+void lasso_state::wwjgtin_get_track_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *ROM = memregion("user1")->base();
 	int code = ROM[tile_index];
@@ -143,7 +143,7 @@ TILE_GET_INFO_MEMBER(lasso_state::wwjgtin_get_track_tile_info)
 					0);
 }
 
-TILE_GET_INFO_MEMBER(lasso_state::pinbo_get_bg_tile_info)
+void lasso_state::pinbo_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code  = m_videoram[tile_index];
 	int color = m_colorram[tile_index];

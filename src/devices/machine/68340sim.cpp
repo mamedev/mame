@@ -333,7 +333,7 @@ void m68340cpu_device::do_timer_irq(void)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(m68340cpu_device::periodic_interrupt_timer_callback)
+void m68340cpu_device::periodic_interrupt_timer_callback(void *ptr, int32_t param)
 {
 	do_timer_irq();
 	m_irq_timer->adjust(cycles_to_attotime(20000)); // hack

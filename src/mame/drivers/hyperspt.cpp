@@ -286,7 +286,7 @@ static GFXDECODE_START( roadf )
 	GFXDECODE_ENTRY( "gfx2", 0, roadf_charlayout,    16*16, 16 )
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(hyperspt_state::vblank_irq)
+void hyperspt_state::vblank_irq(device_t &device)
 {
 	if(m_irq_mask)
 		device.execute().set_input_line(0, HOLD_LINE);

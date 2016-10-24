@@ -103,9 +103,9 @@ public:
 	void init_legendoh();
 	void init_spotty();
 
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_md_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_md_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	virtual void video_start() override;
 	uint32_t screen_update_limenko(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -300,21 +300,21 @@ ADDRESS_MAP_END
   VIDEO HARDWARE EMULATION
 *****************************************************************************************************/
 
-TILE_GET_INFO_MEMBER(limenko_state::get_bg_tile_info)
+void limenko_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile  = m_bg_videoram[tile_index] & 0x7ffff;
 	int color = (m_bg_videoram[tile_index]>>28) & 0xf;
 	SET_TILE_INFO_MEMBER(0,tile,color,0);
 }
 
-TILE_GET_INFO_MEMBER(limenko_state::get_md_tile_info)
+void limenko_state::get_md_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile  = m_md_videoram[tile_index] & 0x7ffff;
 	int color = (m_md_videoram[tile_index]>>28) & 0xf;
 	SET_TILE_INFO_MEMBER(0,tile,color,0);
 }
 
-TILE_GET_INFO_MEMBER(limenko_state::get_fg_tile_info)
+void limenko_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile  = m_fg_videoram[tile_index] & 0x7ffff;
 	int color = (m_fg_videoram[tile_index]>>28) & 0xf;

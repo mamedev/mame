@@ -550,7 +550,7 @@ void sgi_mc_device::update()
 	m_nRPSSCounter += 1000;
 }
 
-TIMER_CALLBACK_MEMBER(sgi_mc_device::update_callback)
+void sgi_mc_device::update_callback(void *ptr, int32_t param)
 {
 	update();
 }

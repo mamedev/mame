@@ -675,7 +675,7 @@ private:
 	void lcd_start();
 	void lcd_stop();
 	void lcd_recalc();
-	TIMER_CALLBACK_MEMBER(lcd_timer_exp);
+	void lcd_timer_exp(void *ptr, int32_t param);
 
 	// Clock & Power Management
 	uint32_t get_mclk();
@@ -690,7 +690,7 @@ private:
 	void pwm_start(int timer);
 	void pwm_stop(int timer);
 	void pwm_recalc(int timer);
-	TIMER_CALLBACK_MEMBER(pwm_timer_exp);
+	void pwm_timer_exp(void *ptr, int32_t param);
 	//void dma_request_pwm();
 
 	// IIC
@@ -704,7 +704,7 @@ private:
 	void iic_start();
 	void iic_stop();
 	void iic_resume();
-	TIMER_CALLBACK_MEMBER(iic_timer_exp);
+	void iic_timer_exp(void *ptr, int32_t param);
 
 	// I/O Port
 	inline uint32_t iface_gpio_port_r(int port);
@@ -714,39 +714,39 @@ private:
 	uint32_t uart_r(int ch, uint32_t offset);
 	void uart_w(int ch, uint32_t offset, uint32_t data, uint32_t mem_mask);
 	void uart_fifo_w(int uart, uint8_t data);
-	TIMER_CALLBACK_MEMBER(uart_timer_exp);
+	void uart_timer_exp(void *ptr, int32_t param);
 
 	// Watchdog Timer
 	uint16_t wdt_calc_current_count();
 	void wdt_start();
 	void wdt_stop();
 	void wdt_recalc();
-	TIMER_CALLBACK_MEMBER(wdt_timer_exp);
+	void wdt_timer_exp(void *ptr, int32_t param);
 
 	// A/D Converter
 	void adc_start();
 	void adc_stop();
 	void adc_recalc();
-	TIMER_CALLBACK_MEMBER(adc_timer_exp);
+	void adc_timer_exp(void *ptr, int32_t param);
 
 	// SIO
 	void sio_start();
 	void sio_stop();
 	void sio_recalc();
-	TIMER_CALLBACK_MEMBER(sio_timer_exp);
+	void sio_timer_exp(void *ptr, int32_t param);
 
 	// IIS
 	inline void iface_i2s_data_w(address_space &space, int ch, uint16_t data);
 	void iis_start();
 	void iis_stop();
-	TIMER_CALLBACK_MEMBER(iis_timer_exp);
+	void iis_timer_exp(void *ptr, int32_t param);
 
 	// ZDMA
 	void zdma_trigger(int ch);
 	void zdma_start(int ch);
 	uint32_t zdma_r(int ch, uint32_t offset);
 	void zdma_w(int ch, uint32_t offset, uint32_t data, uint32_t mem_mask);
-	TIMER_CALLBACK_MEMBER(zdma_timer_exp);
+	void zdma_timer_exp(void *ptr, int32_t param);
 
 	// BDMA
 	void bdma_trigger(int ch);
@@ -755,7 +755,7 @@ private:
 	void bdma_start(int ch);
 	void bdma_stop(int ch);
 	void bdma_w(int ch, uint32_t offset, uint32_t data, uint32_t mem_mask);
-	TIMER_CALLBACK_MEMBER(bdma_timer_exp);
+	void bdma_timer_exp(void *ptr, int32_t param);
 
 	cpu_device *m_cpu;
 	//s3c44b0_memcon_t m_memcon;

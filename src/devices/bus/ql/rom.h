@@ -87,7 +87,7 @@ public:
 	// computer interface
 	uint8_t read(address_space &space, offs_t offset, uint8_t data) { if (m_card) data = m_card->read(space, offset, data); return data; }
 	void write(address_space &space, offs_t offset, uint8_t data) { if (m_card) m_card->write(space, offset, data); }
-	DECLARE_WRITE_LINE_MEMBER( romoeh_w ) { if (m_card) m_card->romoeh_w(state); }
+	void romoeh_w(int state) { if (m_card) m_card->romoeh_w(state); }
 
 protected:
 	// device-level overrides

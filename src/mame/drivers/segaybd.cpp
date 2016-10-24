@@ -763,13 +763,13 @@ ADDRESS_MAP_END
 //  LINK BOARD
 //**************************************************************************
 
-WRITE_LINE_MEMBER(segaybd_state::mb8421_intl)
+void segaybd_state::mb8421_intl(int state)
 {
 	// shared ram interrupt request from linkcpu side
 	// unused?
 }
 
-WRITE_LINE_MEMBER(segaybd_state::mb8421_intr)
+void segaybd_state::mb8421_intr(int state)
 {
 	// shared ram interrupt request from maincpu side
 	m_linkcpu->set_input_line_and_vector(0, state ? ASSERT_LINE : CLEAR_LINE, 0xef); // RST $28

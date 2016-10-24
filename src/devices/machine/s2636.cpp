@@ -432,7 +432,7 @@ void s2636_device::write_data(address_space &space, offs_t offset, uint8_t data,
 	m_registers[offset] = data;
 }
 
-WRITE_LINE_MEMBER( s2636_device::write_intack )
+void s2636_device::write_intack(int state)
 {
 	assert((ASSERT_LINE == state) || (HOLD_LINE == state) || (CLEAR_LINE == state) || (PULSE_LINE == state));
 

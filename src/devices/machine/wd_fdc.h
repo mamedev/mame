@@ -609,13 +609,13 @@ protected:
 class wd2791_t : public wd_fdc_analog_t {
 public:
 	wd2791_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	DECLARE_WRITE_LINE_MEMBER(enmf_w) { enmf = state ? false : true; }
+	void enmf_w(int state) { enmf = state ? false : true; }
 };
 
 class wd2793_t : public wd_fdc_analog_t {
 public:
 	wd2793_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	DECLARE_WRITE_LINE_MEMBER(enmf_w) { enmf = state ? false : true; }
+	void enmf_w(int state) { enmf = state ? false : true; }
 };
 
 class wd2795_t : public wd_fdc_analog_t {

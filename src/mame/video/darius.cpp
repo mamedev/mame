@@ -5,7 +5,7 @@
 
 /***************************************************************************/
 
-TILE_GET_INFO_MEMBER(darius_state::get_fg_tile_info)
+void darius_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = (m_fg_ram[tile_index + 0x2000] & 0x7ff);
 	uint16_t attr = m_fg_ram[tile_index];

@@ -191,10 +191,10 @@ public:
 	static void set_md8(device_t &device, int md0) { downcast<sh34_base_device &>(device).c_md8 = md0; }
 	static void set_sh4_clock(device_t &device, int clock) { downcast<sh34_base_device &>(device).c_clock = clock; }
 
-	TIMER_CALLBACK_MEMBER( sh4_refresh_timer_callback );
-	TIMER_CALLBACK_MEMBER( sh4_rtc_timer_callback );
-	TIMER_CALLBACK_MEMBER( sh4_timer_callback );
-	TIMER_CALLBACK_MEMBER( sh4_dmac_callback );
+	void sh4_refresh_timer_callback(void *ptr, int32_t param);
+	void sh4_rtc_timer_callback(void *ptr, int32_t param);
+	void sh4_timer_callback(void *ptr, int32_t param);
+	void sh4_dmac_callback(void *ptr, int32_t param);
 
 	void sh4_set_frt_input(int state);
 	void sh4_set_irln_input(int value);

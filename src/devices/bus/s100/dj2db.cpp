@@ -63,7 +63,7 @@ const tiny_rom_entry *s100_dj2db_device::device_rom_region() const
 //  COM8116_INTERFACE( brg_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( s100_dj2db_device::fr_w )
+void s100_dj2db_device::fr_w(int state)
 {
 	// S1602 RRC/TRC
 }
@@ -72,7 +72,7 @@ static SLOT_INTERFACE_START( s100_dj2db_floppies )
 	SLOT_INTERFACE( "8dsdd", FLOPPY_8_DSDD )
 SLOT_INTERFACE_END
 
-WRITE_LINE_MEMBER( s100_dj2db_device::fdc_intrq_w )
+void s100_dj2db_device::fdc_intrq_w(int state)
 {
 	if (state) m_bus->rdy_w(CLEAR_LINE);
 
@@ -90,7 +90,7 @@ WRITE_LINE_MEMBER( s100_dj2db_device::fdc_intrq_w )
 	}
 }
 
-WRITE_LINE_MEMBER( s100_dj2db_device::fdc_drq_w )
+void s100_dj2db_device::fdc_drq_w(int state)
 {
 	if (state) m_bus->rdy_w(CLEAR_LINE);
 }

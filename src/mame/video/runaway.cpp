@@ -51,7 +51,7 @@ void runaway_state::runaway_tile_bank_w(address_space &space, offs_t offset, uin
 }
 
 
-TILE_GET_INFO_MEMBER(runaway_state::runaway_get_tile_info)
+void runaway_state::runaway_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t code = m_video_ram[tile_index];
 
@@ -59,7 +59,7 @@ TILE_GET_INFO_MEMBER(runaway_state::runaway_get_tile_info)
 }
 
 
-TILE_GET_INFO_MEMBER(runaway_state::qwak_get_tile_info)
+void runaway_state::qwak_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t code = m_video_ram[tile_index];
 

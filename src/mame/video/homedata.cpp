@@ -312,7 +312,7 @@ finish:
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(homedata_state,mrokumei)
+void homedata_state::palette_init_mrokumei(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -335,7 +335,7 @@ PALETTE_INIT_MEMBER(homedata_state,mrokumei)
 	}
 }
 
-PALETTE_INIT_MEMBER(homedata_state,reikaids)
+void homedata_state::palette_init_reikaids(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -358,7 +358,7 @@ PALETTE_INIT_MEMBER(homedata_state,reikaids)
 	}
 }
 
-PALETTE_INIT_MEMBER(homedata_state,pteacher)
+void homedata_state::palette_init_pteacher(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -381,7 +381,7 @@ PALETTE_INIT_MEMBER(homedata_state,pteacher)
 	}
 }
 
-PALETTE_INIT_MEMBER(homedata_state,mirderby)
+void homedata_state::palette_init_mirderby(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -422,22 +422,22 @@ inline void homedata_state::mrokumei_info1( tile_data &tileinfo, int tile_index,
 	SET_TILE_INFO_MEMBER(1, code, color, m_flipscreen );
 }
 
-TILE_GET_INFO_MEMBER(homedata_state::mrokumei_get_info0_0)
+void homedata_state::mrokumei_get_info0_0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	mrokumei_info0(tileinfo, tile_index, 0,  m_blitter_bank & 0x03 );
 }
 
-TILE_GET_INFO_MEMBER(homedata_state::mrokumei_get_info1_0)
+void homedata_state::mrokumei_get_info1_0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	mrokumei_info0(tileinfo, tile_index, 1,  m_blitter_bank & 0x03 );
 }
 
-TILE_GET_INFO_MEMBER(homedata_state::mrokumei_get_info0_1)
+void homedata_state::mrokumei_get_info0_1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	mrokumei_info1(tileinfo, tile_index, 0, (m_blitter_bank & 0x38) >> 3 );
 }
 
-TILE_GET_INFO_MEMBER(homedata_state::mrokumei_get_info1_1)
+void homedata_state::mrokumei_get_info1_1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	mrokumei_info1(tileinfo, tile_index, 1, (m_blitter_bank & 0x38) >> 3 );
 }
@@ -464,42 +464,42 @@ inline void homedata_state::reikaids_info( tile_data &tileinfo, int tile_index, 
 	 *      xxxx.x---   layer#0
 	 *      ----.-xxx   layer#2
 	 */
-TILE_GET_INFO_MEMBER(homedata_state::reikaids_get_info0_0)
+void homedata_state::reikaids_get_info0_0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	reikaids_info(tileinfo, tile_index, 0, 0,  (m_gfx_bank[1] >> 3));
 }
 
-TILE_GET_INFO_MEMBER(homedata_state::reikaids_get_info1_0)
+void homedata_state::reikaids_get_info1_0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	reikaids_info(tileinfo, tile_index, 1, 0,  (m_gfx_bank[1] >> 3));
 }
 
-TILE_GET_INFO_MEMBER(homedata_state::reikaids_get_info0_1)
+void homedata_state::reikaids_get_info0_1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	reikaids_info(tileinfo, tile_index, 0, 1, ((m_gfx_bank[0] & 0x78) >> 3));
 }
 
-TILE_GET_INFO_MEMBER(homedata_state::reikaids_get_info1_1)
+void homedata_state::reikaids_get_info1_1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	reikaids_info(tileinfo, tile_index, 1, 1, ((m_gfx_bank[0] & 0x78) >> 3));
 }
 
-TILE_GET_INFO_MEMBER(homedata_state::reikaids_get_info0_2)
+void homedata_state::reikaids_get_info0_2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	reikaids_info(tileinfo, tile_index, 0, 2,  (m_gfx_bank[1] & 0x7));
 }
 
-TILE_GET_INFO_MEMBER(homedata_state::reikaids_get_info1_2)
+void homedata_state::reikaids_get_info1_2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	reikaids_info(tileinfo, tile_index, 1, 2,  (m_gfx_bank[1] & 0x7));
 }
 
-TILE_GET_INFO_MEMBER(homedata_state::reikaids_get_info0_3)
+void homedata_state::reikaids_get_info0_3(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	reikaids_info(tileinfo, tile_index, 0, 3,  (m_gfx_bank[0] & 0x7));
 }
 
-TILE_GET_INFO_MEMBER(homedata_state::reikaids_get_info1_3)
+void homedata_state::reikaids_get_info1_3(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	reikaids_info(tileinfo, tile_index, 1, 3,  (m_gfx_bank[0] & 0x7));
 }
@@ -515,22 +515,22 @@ inline void homedata_state::pteacher_info( tile_data &tileinfo, int tile_index, 
 	SET_TILE_INFO_MEMBER(layer, code, color, m_flipscreen);
 }
 
-TILE_GET_INFO_MEMBER(homedata_state::pteacher_get_info0_0)
+void homedata_state::pteacher_get_info0_0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	pteacher_info(tileinfo, tile_index, 0, 0, m_gfx_bank[0] & 0x0f);
 }
 
-TILE_GET_INFO_MEMBER(homedata_state::pteacher_get_info1_0)
+void homedata_state::pteacher_get_info1_0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	pteacher_info(tileinfo, tile_index, 1, 0, m_gfx_bank[0] & 0x0f);
 }
 
-TILE_GET_INFO_MEMBER(homedata_state::pteacher_get_info0_1)
+void homedata_state::pteacher_get_info0_1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	pteacher_info(tileinfo, tile_index, 0, 1, m_gfx_bank[0] >> 4);
 }
 
-TILE_GET_INFO_MEMBER(homedata_state::pteacher_get_info1_1)
+void homedata_state::pteacher_get_info1_1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	pteacher_info(tileinfo, tile_index, 1, 1, m_gfx_bank[0] >> 4);
 }
@@ -546,23 +546,23 @@ inline void homedata_state::lemnangl_info( tile_data &tileinfo, int tile_index, 
 	SET_TILE_INFO_MEMBER(2 * layer + gfxset, code, color, m_flipscreen);
 }
 
-TILE_GET_INFO_MEMBER(homedata_state::lemnangl_get_info0_0)
+void homedata_state::lemnangl_get_info0_0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	lemnangl_info(tileinfo, tile_index, 0, 0,  m_blitter_bank & 1, m_gfx_bank[0] & 0x0f );
 }
 
-TILE_GET_INFO_MEMBER(homedata_state::lemnangl_get_info1_0)
+void homedata_state::lemnangl_get_info1_0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	lemnangl_info(tileinfo, tile_index, 1, 0,  m_blitter_bank & 1, m_gfx_bank[0] & 0x0f );
 }
 
 
-TILE_GET_INFO_MEMBER(homedata_state::lemnangl_get_info0_1)
+void homedata_state::lemnangl_get_info0_1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	lemnangl_info(tileinfo, tile_index, 0, 1, (m_blitter_bank & 2) >> 1, m_gfx_bank[0] >> 4 );
 }
 
-TILE_GET_INFO_MEMBER(homedata_state::lemnangl_get_info1_1)
+void homedata_state::lemnangl_get_info1_1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	lemnangl_info(tileinfo, tile_index, 1, 1, (m_blitter_bank & 2) >> 1, m_gfx_bank[0] >> 4 );
 }
@@ -587,22 +587,22 @@ inline void homedata_state::mirderby_info1( tile_data &tileinfo, int tile_index,
 	SET_TILE_INFO_MEMBER(1, code, color, m_flipscreen );
 }
 
-TILE_GET_INFO_MEMBER(homedata_state::mirderby_get_info0_0)
+void homedata_state::mirderby_get_info0_0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	mirderby_info0(tileinfo, tile_index, 0, 0);// m_blitter_bank & 0x03 );
 }
 
-TILE_GET_INFO_MEMBER(homedata_state::mirderby_get_info1_0)
+void homedata_state::mirderby_get_info1_0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	mirderby_info0(tileinfo, tile_index, 1, 0);// m_blitter_bank & 0x03 );
 }
 
-TILE_GET_INFO_MEMBER(homedata_state::mirderby_get_info0_1)
+void homedata_state::mirderby_get_info0_1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	mirderby_info1(tileinfo, tile_index, 0, 0);//(m_blitter_bank & 0x38) >> 3 );
 }
 
-TILE_GET_INFO_MEMBER(homedata_state::mirderby_get_info1_1)
+void homedata_state::mirderby_get_info1_1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	mirderby_info1(tileinfo, tile_index, 1, 0);//(m_blitter_bank & 0x38) >> 3 );
 }

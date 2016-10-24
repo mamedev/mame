@@ -191,10 +191,10 @@ public:
 	uint8_t tx1_ppi_portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void machine_reset_tx1();
 	void video_start_tx1();
-	DECLARE_PALETTE_INIT(tx1);
+	void palette_init_tx1(palette_device &palette);
 	void machine_reset_buggyboy();
 	void video_start_buggyboy();
-	DECLARE_PALETTE_INIT(buggyboy);
+	void palette_init_buggyboy(palette_device &palette);
 	void video_start_buggybjr();
 
 	void tx1_draw_char(uint8_t *bitmap);
@@ -225,8 +225,8 @@ public:
 	uint32_t screen_update_buggybjr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_tx1(screen_device &screen, bool state);
 	void screen_eof_buggyboy(screen_device &screen, bool state);
-	INTERRUPT_GEN_MEMBER(z80_irq);
-	TIMER_CALLBACK_MEMBER(interrupt_callback);
+	void z80_irq(device_t &device);
+	void interrupt_callback(void *ptr, int32_t param);
 };
 
 /*----------- defined in audio/tx1.c -----------*/

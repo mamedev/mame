@@ -410,7 +410,7 @@ static GFXDECODE_START( laserbat )
 GFXDECODE_END
 
 
-INTERRUPT_GEN_MEMBER(laserbat_state_base::laserbat_interrupt)
+void laserbat_state_base::laserbat_interrupt(device_t &device)
 {
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x0a);
 }

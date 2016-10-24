@@ -307,7 +307,7 @@ void mm1_state::update_tc()
 	}
 }
 
-WRITE_LINE_MEMBER( mm1_state::dma_hrq_w )
+void mm1_state::dma_hrq_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
@@ -331,7 +331,7 @@ void mm1_state::mpsc_dack_w(address_space &space, offs_t offset, uint8_t data, u
 	m_dmac->dreq1_w(CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER( mm1_state::dma_eop_w )
+void mm1_state::dma_eop_w(int state)
 {
 	m_maincpu->set_input_line(I8085_RST75_LINE, state);
 
@@ -339,13 +339,13 @@ WRITE_LINE_MEMBER( mm1_state::dma_eop_w )
 	update_tc();
 }
 
-WRITE_LINE_MEMBER( mm1_state::dack3_w )
+void mm1_state::dack3_w(int state)
 {
 	m_dack3 = state;
 	update_tc();
 }
 
-WRITE_LINE_MEMBER( mm1_state::itxc_w )
+void mm1_state::itxc_w(int state)
 {
 	if (!m_intc)
 	{
@@ -353,7 +353,7 @@ WRITE_LINE_MEMBER( mm1_state::itxc_w )
 	}
 }
 
-WRITE_LINE_MEMBER( mm1_state::irxc_w )
+void mm1_state::irxc_w(int state)
 {
 	if (!m_intc)
 	{
@@ -361,7 +361,7 @@ WRITE_LINE_MEMBER( mm1_state::irxc_w )
 	}
 }
 
-WRITE_LINE_MEMBER( mm1_state::auxc_w )
+void mm1_state::auxc_w(int state)
 {
 	m_mpsc->txcb_w(state);
 	m_mpsc->rxcb_w(state);
@@ -371,7 +371,7 @@ WRITE_LINE_MEMBER( mm1_state::auxc_w )
 //  UPD7201
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( mm1_state::drq2_w )
+void mm1_state::drq2_w(int state)
 {
 	if (state)
 	{
@@ -379,7 +379,7 @@ WRITE_LINE_MEMBER( mm1_state::drq2_w )
 	}
 }
 
-WRITE_LINE_MEMBER( mm1_state::drq1_w )
+void mm1_state::drq1_w(int state)
 {
 	if (state)
 	{
@@ -387,7 +387,7 @@ WRITE_LINE_MEMBER( mm1_state::drq1_w )
 	}
 }
 
-READ_LINE_MEMBER( mm1_state::dsra_r )
+int mm1_state::dsra_r()
 {
 	return 1;
 }

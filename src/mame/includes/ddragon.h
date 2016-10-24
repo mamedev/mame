@@ -88,10 +88,10 @@ public:
 	void dd_adpcm_int(msm5205_device *device, int chip);
 
 	/* video/ddragon.c */
-	TILEMAP_MAPPER_MEMBER(background_scan);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_16color_tile_info);
+	tilemap_memory_index background_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_fg_16color_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	uint32_t screen_update_ddragon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -99,9 +99,9 @@ public:
 	void machine_reset_ddragon();
 	void video_start_ddragon();
 
-	TIMER_DEVICE_CALLBACK_MEMBER(ddragon_scanline);
+	void ddragon_scanline(timer_device &timer, void *ptr, int32_t param);
 
-	DECLARE_WRITE_LINE_MEMBER(irq_handler);
+	void irq_handler(int state);
 	void ddragon_bgvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void ddragon_fgvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_CUSTOM_INPUT_MEMBER(subcpu_bus_free);
@@ -123,8 +123,8 @@ public:
 	void dd_adpcm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t dd_adpcm_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void ddragonba_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(dd_adpcm_int_1);
-	DECLARE_WRITE_LINE_MEMBER(dd_adpcm_int_2);
+	void dd_adpcm_int_1(int state);
+	void dd_adpcm_int_2(int state);
 
 	void init_toffy();
 	void init_darktowr();

@@ -115,7 +115,7 @@
  *
  *************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(beathead_state::scanline_callback)
+void beathead_state::scanline_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

@@ -221,7 +221,7 @@ void m68307cpu_device::serial_interrupt(int vector)
 	set_interrupt(prioritylevel, vector);
 }
 
-WRITE_LINE_MEMBER(m68307cpu_device::m68307_duart_irq_handler)
+void m68307cpu_device::m68307_duart_irq_handler(int state)
 {
 	if (state == ASSERT_LINE)
 	{

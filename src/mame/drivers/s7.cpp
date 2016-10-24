@@ -96,17 +96,17 @@ public:
 	void switch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t nvram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void nvram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(pia21_ca2_w) { };
-	DECLARE_WRITE_LINE_MEMBER(pia21_cb2_w) { }; // enable solenoids
-	DECLARE_WRITE_LINE_MEMBER(pia22_ca2_w) { }; //ST5
-	DECLARE_WRITE_LINE_MEMBER(pia22_cb2_w) { }; //ST-solenoids enable
-	DECLARE_WRITE_LINE_MEMBER(pia24_ca2_w) { }; //ST2
-	DECLARE_WRITE_LINE_MEMBER(pia24_cb2_w) { }; //ST1
-	DECLARE_WRITE_LINE_MEMBER(pia28_ca2_w) { }; //diag leds enable
-	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { }; //ST6
-	DECLARE_WRITE_LINE_MEMBER(pia30_ca2_w) { }; //ST4
-	DECLARE_WRITE_LINE_MEMBER(pia30_cb2_w) { }; //ST3
-	DECLARE_WRITE_LINE_MEMBER(pia_irq);
+	void pia21_ca2_w(int state) { };
+	void pia21_cb2_w(int state) { }; // enable solenoids
+	void pia22_ca2_w(int state) { }; //ST5
+	void pia22_cb2_w(int state) { }; //ST-solenoids enable
+	void pia24_ca2_w(int state) { }; //ST2
+	void pia24_cb2_w(int state) { }; //ST1
+	void pia28_ca2_w(int state) { }; //diag leds enable
+	void pia28_cb2_w(int state) { }; //ST6
+	void pia30_ca2_w(int state) { }; //ST4
+	void pia30_cb2_w(int state) { }; //ST3
+	void pia_irq(int state);
 	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 	DECLARE_INPUT_CHANGED_MEMBER(diag_coin);
@@ -363,7 +363,7 @@ uint8_t s7_state::sound_r(address_space &space, offs_t offset, uint8_t mem_mask)
 	return m_sound_data;
 }
 
-WRITE_LINE_MEMBER( s7_state::pia_irq )
+void s7_state::pia_irq(int state)
 {
 	if(state == CLEAR_LINE)
 	{

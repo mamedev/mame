@@ -146,15 +146,15 @@ public:
 	void darkhors_eeprom_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	void jclub2o_eeprom_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	void init_darkhors();
-	TILE_GET_INFO_MEMBER(get_tile_info_0);
-	TILE_GET_INFO_MEMBER(get_tile_info_1);
+	void get_tile_info_0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info_1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void video_start_darkhors();
 	void video_start_jclub2();
 	void video_start_jclub2o();
 	uint32_t screen_update_darkhors(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_jclub2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_jclub2o(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(darkhors_irq);
+	void darkhors_irq(timer_device &timer, void *ptr, int32_t param);
 	void draw_sprites_darkhors(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	optional_device<gfxdecode_device> m_gfxdecode;
 
@@ -176,14 +176,14 @@ public:
 
 
 
-TILE_GET_INFO_MEMBER(darkhors_state::get_tile_info_0)
+void darkhors_state::get_tile_info_0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t tile     =   m_tmapram[tile_index] >> 16;
 	uint16_t color    =   m_tmapram[tile_index] & 0xffff;
 	SET_TILE_INFO_MEMBER(0, tile/2, (color & 0x200) ? (color & 0x1ff) : ((color & 0x0ff) * 4) , 0);
 }
 
-TILE_GET_INFO_MEMBER(darkhors_state::get_tile_info_1)
+void darkhors_state::get_tile_info_1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t tile     =   m_tmapram2[tile_index] >> 16;
 	uint16_t color    =   m_tmapram2[tile_index] & 0xffff;
@@ -947,7 +947,7 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(darkhors_state::darkhors_irq)
+void darkhors_state::darkhors_irq(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

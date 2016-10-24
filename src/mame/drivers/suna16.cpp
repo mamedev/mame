@@ -782,7 +782,7 @@ GFXDECODE_END
                             Back Street Soccer
 ***************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(suna16_state::bssoccer_interrupt)
+void suna16_state::bssoccer_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

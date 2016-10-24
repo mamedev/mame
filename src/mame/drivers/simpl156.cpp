@@ -351,7 +351,7 @@ static GFXDECODE_START( simpl156 )
 
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(simpl156_state::simpl156_vbl_interrupt)
+void simpl156_state::simpl156_vbl_interrupt(device_t &device)
 {
 	device.execute().set_input_line(ARM_IRQ_LINE, HOLD_LINE);
 }

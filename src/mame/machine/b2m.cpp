@@ -142,7 +142,7 @@ void b2m_state::b2m_set_bank(int bank)
 }
 
 
-WRITE_LINE_MEMBER(b2m_state::bm2_pit_out1)
+void b2m_state::bm2_pit_out1(int state)
 {
 	m_speaker->level_w(state);
 }
@@ -169,7 +169,7 @@ uint8_t b2m_state::b2m_8255_portb_r(address_space &space, offs_t offset, uint8_t
 	return m_b2m_video_scroll;
 }
 
-WRITE_LINE_MEMBER( b2m_state::b2m_fdc_drq )
+void b2m_state::b2m_fdc_drq(int state)
 {
 	/* Clears HALT state of CPU when data is ready to read */
 	if (state)
@@ -288,7 +288,7 @@ void b2m_state::machine_start()
 	machine().save().register_postload(save_prepost_delegate(FUNC(b2m_state::b2m_postload), this));
 }
 
-INTERRUPT_GEN_MEMBER(b2m_state::b2m_vblank_interrupt)
+void b2m_state::b2m_vblank_interrupt(device_t &device)
 {
 	m_vblank_state++;
 	if (m_vblank_state>1) m_vblank_state=0;

@@ -103,14 +103,14 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(intv);
+	void palette_init_intv(palette_device &palette);
 	uint32_t screen_update_intv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_intvkbd(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(intv_interrupt2);
-	INTERRUPT_GEN_MEMBER(intv_interrupt);
-	TIMER_CALLBACK_MEMBER(intv_interrupt2_complete);
-	TIMER_CALLBACK_MEMBER(intv_interrupt_complete);
-	TIMER_CALLBACK_MEMBER(intv_btb_fill);
+	void intv_interrupt2(device_t &device);
+	void intv_interrupt(device_t &device);
+	void intv_interrupt2_complete(void *ptr, int32_t param);
+	void intv_interrupt_complete(void *ptr, int32_t param);
+	void intv_btb_fill(void *ptr, int32_t param);
 
 protected:
 	int m_is_keybd;

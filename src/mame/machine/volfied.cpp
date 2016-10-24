@@ -291,7 +291,7 @@ void volfied_state::device_timer(emu_timer &timer, device_timer_id id, int param
 	}
 }
 
-TIMER_CALLBACK_MEMBER(volfied_state::volfied_timer_callback)
+void volfied_state::volfied_timer_callback(void *ptr, int32_t param)
 {
 	// Palette commands - palette data written to bank 0: $10 - $af
 	if (m_current_cmd >= 0x1 && m_current_cmd < 0x12)

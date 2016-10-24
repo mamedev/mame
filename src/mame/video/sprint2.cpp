@@ -10,7 +10,7 @@
 #include "includes/sprint2.h"
 
 
-PALETTE_INIT_MEMBER(sprint2_state, sprint2)
+void sprint2_state::palette_init_sprint2(palette_device &palette)
 {
 	palette.set_indirect_color(0, rgb_t(0x00, 0x00, 0x00));
 	palette.set_indirect_color(1, rgb_t(0x5b, 0x5b, 0x5b));
@@ -33,7 +33,7 @@ PALETTE_INIT_MEMBER(sprint2_state, sprint2)
 }
 
 
-TILE_GET_INFO_MEMBER(sprint2_state::get_tile_info)
+void sprint2_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t code = m_video_ram[tile_index];
 

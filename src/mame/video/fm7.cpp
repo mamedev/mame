@@ -96,7 +96,7 @@ void fm7_state::fm7_vram_access_w(address_space &space, offs_t offset, uint8_t d
 	m_video.vram_access = 0;
 }
 
-TIMER_CALLBACK_MEMBER(fm7_state::fm77av_alu_task_end)
+void fm7_state::fm77av_alu_task_end(void *ptr, int32_t param)
 {
 	m_alu.busy = 0;
 }
@@ -1257,7 +1257,7 @@ void fm7_state::fm77av_alu_w(address_space &space, offs_t offset, uint8_t data, 
 	}
 }
 
-TIMER_CALLBACK_MEMBER(fm7_state::fm77av_vsync)
+void fm7_state::fm77av_vsync(void *ptr, int32_t param)
 {
 	if(param == 0)  // start of vsync
 	{

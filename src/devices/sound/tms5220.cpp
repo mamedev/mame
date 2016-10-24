@@ -1822,7 +1822,7 @@ void tms5220_device::device_timer(emu_timer &timer, device_timer_id id, int para
 /*
  * /RS line write handler
  */
-WRITE_LINE_MEMBER( tms5220_device::rsq_w )
+void tms5220_device::rsq_w(int state)
 {
 	uint8_t new_val;
 
@@ -1874,7 +1874,7 @@ WRITE_LINE_MEMBER( tms5220_device::rsq_w )
 /*
  * /WS line write handler
  */
-WRITE_LINE_MEMBER( tms5220_device::wsq_w )
+void tms5220_device::wsq_w(int state)
 {
 	uint8_t new_val;
 
@@ -2078,7 +2078,7 @@ uint8_t tms5220_device::status_r(address_space &space, offs_t offset, uint8_t me
 
 ***********************************************************************************************/
 
-READ_LINE_MEMBER( tms5220_device::readyq_r )
+int tms5220_device::readyq_r()
 {
 	/* bring up to date first */
 	m_stream->update();
@@ -2111,7 +2111,7 @@ double tms5220_device::time_to_ready()
 
 ***********************************************************************************************/
 
-READ_LINE_MEMBER( tms5220_device::intq_r )
+int tms5220_device::intq_r()
 {
 	/* bring up to date first */
 	m_stream->update();

@@ -495,7 +495,7 @@ public:
 	void clear_render_target(int what, uint32_t value);
 	void clear_depth_buffer(int what, uint32_t value);
 	inline uint8_t *direct_access_ptr(offs_t address);
-	TIMER_CALLBACK_MEMBER(puller_timer_work);
+	void puller_timer_work(void *ptr, int32_t param);
 
 	struct {
 		uint32_t regs[0x80 / 4];

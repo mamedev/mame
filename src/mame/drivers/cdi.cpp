@@ -286,7 +286,7 @@ static INPUT_PORTS_START( quizard )
 INPUT_PORTS_END
 
 
-INTERRUPT_GEN_MEMBER( cdi_state::mcu_frame )
+void cdi_state::mcu_frame(device_t &device)
 {
 	m_scc->mcu_frame();
 }

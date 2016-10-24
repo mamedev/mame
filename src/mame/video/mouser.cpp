@@ -18,7 +18,7 @@
 #include "emu.h"
 #include "includes/mouser.h"
 
-PALETTE_INIT_MEMBER(mouser_state, mouser)
+void mouser_state::palette_init_mouser(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;

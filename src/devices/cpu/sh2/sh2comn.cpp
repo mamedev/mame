@@ -73,7 +73,7 @@ void sh2_device::sh2_timer_activate()
 	}
 }
 
-TIMER_CALLBACK_MEMBER( sh2_device::sh2_timer_callback )
+void sh2_device::sh2_timer_callback(void *ptr, int32_t param)
 {
 	uint16_t frc;
 
@@ -375,7 +375,7 @@ void sh2_device::sh2_do_dma(int dma)
 	}
 }
 
-TIMER_CALLBACK_MEMBER( sh2_device::sh2_dma_current_active_callback )
+void sh2_device::sh2_dma_current_active_callback(void *ptr, int32_t param)
 {
 	int dma = param & 1;
 

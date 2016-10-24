@@ -13,7 +13,7 @@
 #include "includes/jackal.h"
 
 
-PALETTE_INIT_MEMBER(jackal_state, jackal)
+void jackal_state::palette_init_jackal(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -43,7 +43,7 @@ void jackal_state::jackal_mark_tile_dirty( int offset )
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(jackal_state::get_bg_tile_info)
+void jackal_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *RAM = memregion("master")->base();
 

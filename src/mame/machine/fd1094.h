@@ -99,11 +99,11 @@ protected:
 	uint16_t decrypt_one(offs_t address, uint16_t val, const uint8_t *main_key, uint8_t state, bool vector_fetch);
 	void decrypt(offs_t baseaddr, uint32_t size, const uint16_t *srcptr, uint16_t *opcodesptr, uint8_t state);
 	void default_state_change(uint8_t state);
-	IRQ_CALLBACK_MEMBER( irq_callback );
+	int irq_callback(device_t &device, int irqline);
 
 	// static helpers
 	void cmp_callback(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
-	DECLARE_WRITE_LINE_MEMBER(rte_callback);
+	void rte_callback(int state);
 
 	// internal state
 	uint8_t                   m_state;

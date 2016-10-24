@@ -66,14 +66,14 @@ public:
 	void init_chelnovu();
 	void init_chelnovj();
 	void init_chelnov();
-	TILE_GET_INFO_MEMBER(get_fix_tile_info);
+	void get_fix_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(karnov);
+	void palette_init_karnov(palette_device &palette);
 	void video_start_karnov();
 	void video_start_wndrplnt();
 	uint32_t screen_update_karnov(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(karnov_interrupt);
+	void karnov_interrupt(device_t &device);
 	void karnov_flipscreen_w( int data );
 	void draw_background( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void karnov_i8751_w( int data );

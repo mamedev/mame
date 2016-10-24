@@ -85,8 +85,8 @@ public:
 
 	void sound_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void msm5205_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(msm5205_1_vck);
-	DECLARE_WRITE_LINE_MEMBER(z80ctc_to0);
+	void msm5205_1_vck(int state);
+	void z80ctc_to0(int state);
 	void volume_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// video/topspeed.c

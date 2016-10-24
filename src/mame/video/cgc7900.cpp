@@ -24,7 +24,7 @@
 #define OVERLAY_CURSOR_BLINK        BIT(m_roll_overlay[0], 12)
 #define OVERLAY_CHARACTER_BLINK     BIT(m_roll_overlay[0], 11)
 
-PALETTE_INIT_MEMBER(cgc7900_state, cgc7900)
+void cgc7900_state::palette_init_cgc7900(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t::black());
 	palette.set_pen_color(1, rgb_t(0x00, 0x00, 0xff));
@@ -173,10 +173,10 @@ void cgc7900_state::draw_overlay(screen_device *screen, bitmap_rgb32 &bitmap)
 }
 
 /*-------------------------------------------------
-    TIMER_DEVICE_CALLBACK_MEMBER( blink_tick )
+    void blink_tick(timer_device &timer, void *ptr, int32_t param)
 -------------------------------------------------*/
 
-TIMER_DEVICE_CALLBACK_MEMBER(cgc7900_state::blink_tick)
+void cgc7900_state::blink_tick(timer_device &timer, void *ptr, int32_t param)
 {
 	m_blink = !m_blink;
 }

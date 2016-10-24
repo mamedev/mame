@@ -52,13 +52,13 @@ Sprite layout.
 
 ***************************************************************************/
 
-TILEMAP_MAPPER_MEMBER(ddragon_state::background_scan)
+tilemap_memory_index ddragon_state::background_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return (col & 0x0f) + ((row & 0x0f) << 4) + ((col & 0x10) << 4) + ((row & 0x10) << 5);
 }
 
-TILE_GET_INFO_MEMBER(ddragon_state::get_bg_tile_info)
+void ddragon_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t attr = m_bgvideoram[2 * tile_index];
 	SET_TILE_INFO_MEMBER(2,
@@ -67,7 +67,7 @@ TILE_GET_INFO_MEMBER(ddragon_state::get_bg_tile_info)
 			TILE_FLIPYX((attr & 0xc0) >> 6));
 }
 
-TILE_GET_INFO_MEMBER(ddragon_state::get_fg_tile_info)
+void ddragon_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t attr = m_fgvideoram[2 * tile_index];
 	SET_TILE_INFO_MEMBER(0,
@@ -76,7 +76,7 @@ TILE_GET_INFO_MEMBER(ddragon_state::get_fg_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(ddragon_state::get_fg_16color_tile_info)
+void ddragon_state::get_fg_16color_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t attr = m_fgvideoram[2 * tile_index];
 	SET_TILE_INFO_MEMBER(0,

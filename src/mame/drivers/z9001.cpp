@@ -63,14 +63,14 @@ public:
 	required_shared_ptr<uint8_t> m_p_videoram;
 	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void port88_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(cass_w);
+	void cass_w(int state);
 	const uint8_t *m_p_chargen;
 	bool m_cassbit;
 	virtual void machine_reset() override;
 	//virtual void machine_start();
 	virtual void video_start() override;
 	uint32_t screen_update_z9001(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_callback);
+	void timer_callback(timer_device &timer, void *ptr, int32_t param);
 };
 
 static ADDRESS_MAP_START(z9001_mem, AS_PROGRAM, 8, z9001_state)
@@ -107,7 +107,7 @@ void z9001_state::port88_w(address_space &space, offs_t offset, uint8_t data, ui
 	m_beeper->set_state(BIT(data, 7));
 }
 
-WRITE_LINE_MEMBER( z9001_state::cass_w )
+void z9001_state::cass_w(int state)
 {
 	if (state)
 	{
@@ -118,7 +118,7 @@ WRITE_LINE_MEMBER( z9001_state::cass_w )
 
 
 // temporary (prevent freezing when you type an invalid filename)
-TIMER_DEVICE_CALLBACK_MEMBER(z9001_state::timer_callback)
+void z9001_state::timer_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	m_maincpu->space(AS_PROGRAM).write_byte(0x006a, 0);
 }

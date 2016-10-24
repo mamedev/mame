@@ -59,10 +59,10 @@ public:
 	uint8_t elwro800jr_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void elwro800jr_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void machine_reset_elwro800();
-	INTERRUPT_GEN_MEMBER(elwro800jr_interrupt);
+	void elwro800jr_interrupt(device_t &device);
 	uint8_t i8255_port_c_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void i8255_port_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
+	void write_centronics_ack(int state);
 
 protected:
 	required_device<i8251_device> m_i8251;
@@ -185,7 +185,7 @@ void elwro800_state::elwro800jr_mmu_w(uint8_t data)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(elwro800_state::write_centronics_ack)
+void elwro800_state::write_centronics_ack(int state)
 {
 	m_centronics_ack = state;
 	m_i8255->pc2_w(state);
@@ -510,7 +510,7 @@ void elwro800_state::machine_reset_elwro800()
 	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(elwro800_state::elwro800_direct_handler), this));
 }
 
-INTERRUPT_GEN_MEMBER(elwro800_state::elwro800jr_interrupt)
+void elwro800_state::elwro800jr_interrupt(device_t &device)
 {
 	device.execute().set_input_line(0, HOLD_LINE);
 }

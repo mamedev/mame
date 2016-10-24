@@ -10,7 +10,7 @@ namco_settings_device::namco_settings_device(const machine_config &mconfig, cons
 {
 }
 
-WRITE_LINE_MEMBER( namco_settings_device::ce_w )
+void namco_settings_device::ce_w(int state)
 {
 	if(ce != state) {
 		ce = state;
@@ -19,7 +19,7 @@ WRITE_LINE_MEMBER( namco_settings_device::ce_w )
 	}
 }
 
-WRITE_LINE_MEMBER( namco_settings_device::clk_w )
+void namco_settings_device::clk_w(int state)
 {
 	if(clk != state) {
 		clk = state;
@@ -37,7 +37,7 @@ WRITE_LINE_MEMBER( namco_settings_device::clk_w )
 	}
 }
 
-WRITE_LINE_MEMBER( namco_settings_device::data_w )
+void namco_settings_device::data_w(int state)
 {
 	data = state;
 }

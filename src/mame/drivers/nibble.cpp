@@ -68,14 +68,14 @@ public:
 	required_shared_ptr<uint16_t> m_videoram;
 	tilemap_t *m_bg_tilemap;
 	void nibble_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(nibble);
+	void palette_init_nibble(palette_device &palette);
 	uint32_t screen_update_nibble(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(nibble_interrupt);
+	void nibble_interrupt(device_t &device);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 };
@@ -93,7 +93,7 @@ void nibble_state::nibble_videoram_w(address_space &space, offs_t offset, uint16
 }
 
 
-TILE_GET_INFO_MEMBER(nibble_state::get_bg_tile_info)
+void nibble_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 /*  - bits -
     7654 3210
@@ -117,7 +117,7 @@ uint32_t nibble_state::screen_update_nibble(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-PALETTE_INIT_MEMBER(nibble_state, nibble)
+void nibble_state::palette_init_nibble(palette_device &palette)
 {
 }
 
@@ -126,7 +126,7 @@ PALETTE_INIT_MEMBER(nibble_state, nibble)
 *  Read / Write Handlers  *
 **************************/
 
-INTERRUPT_GEN_MEMBER(nibble_state::nibble_interrupt)
+void nibble_state::nibble_interrupt(device_t &device)
 {
 }
 

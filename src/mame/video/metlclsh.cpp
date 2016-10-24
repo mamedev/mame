@@ -64,12 +64,12 @@ void metlclsh_state::metlclsh_gfxbank_w(address_space &space, offs_t offset, uin
 
 ***************************************************************************/
 
-TILEMAP_MAPPER_MEMBER(metlclsh_state::metlclsh_bgtilemap_scan)
+tilemap_memory_index metlclsh_state::metlclsh_bgtilemap_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	return  (row & 7) + ((row & ~7) << 4) + ((col & 0xf) << 3) + ((col & ~0xf) << 4);
 }
 
-TILE_GET_INFO_MEMBER(metlclsh_state::get_bg_tile_info)
+void metlclsh_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	SET_TILE_INFO_MEMBER(1, m_bgram[tile_index] + (m_gfxbank << 7), 0, 0);
 }
@@ -110,7 +110,7 @@ void metlclsh_state::metlclsh_bgram_w(address_space &space, offs_t offset, uint8
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(metlclsh_state::get_fg_tile_info)
+void metlclsh_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t code = m_fgram[tile_index + 0x000];
 	uint8_t attr = m_fgram[tile_index + 0x400];

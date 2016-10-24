@@ -1316,7 +1316,7 @@ int apple2_state::a2_no_ctrl_reset()
  * Apple II interrupt; used to force partial updates
  * ----------------------------------------------------------------------- */
 
-TIMER_DEVICE_CALLBACK_MEMBER(apple2_state::apple2_interrupt)
+void apple2_state::apple2_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -2512,7 +2512,7 @@ void apple2_state::apple2_refresh_delegates()
 	write_delegates_e000[1] = write8_delegate(FUNC(apple2_state::apple2_mainrame000_w), this);
 }
 
-READ_LINE_MEMBER(apple2_state::ay3600_shift_r)
+int apple2_state::ay3600_shift_r()
 {
 	// either shift key
 	if (m_kbspecial->read() & 0x06)
@@ -2523,7 +2523,7 @@ READ_LINE_MEMBER(apple2_state::ay3600_shift_r)
 	return CLEAR_LINE;
 }
 
-READ_LINE_MEMBER(apple2_state::ay3600_control_r)
+int apple2_state::ay3600_control_r()
 {
 	if (m_kbspecial->read() & 0x08)
 	{
@@ -2588,7 +2588,7 @@ static const uint8_t a2_key_remap[0x32][4] =
 	{ 0x0d,0x0d,0x0d,0x0d },    /* Enter   31     */
 };
 
-WRITE_LINE_MEMBER(apple2_state::ay3600_data_ready_w)
+void apple2_state::ay3600_data_ready_w(int state)
 {
 	if (state == ASSERT_LINE)
 	{
@@ -2608,7 +2608,7 @@ WRITE_LINE_MEMBER(apple2_state::ay3600_data_ready_w)
 	}
 }
 
-WRITE_LINE_MEMBER(apple2_state::ay3600_iie_data_ready_w)
+void apple2_state::ay3600_iie_data_ready_w(int state)
 {
 	if (state == ASSERT_LINE)
 	{

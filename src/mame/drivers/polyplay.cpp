@@ -109,13 +109,13 @@ void polyplay_state::machine_reset()
 }
 
 
-INTERRUPT_GEN_MEMBER(polyplay_state::periodic_interrupt)
+void polyplay_state::periodic_interrupt(device_t &device)
 {
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x4e);
 }
 
 
-INTERRUPT_GEN_MEMBER(polyplay_state::coin_interrupt)
+void polyplay_state::coin_interrupt(device_t &device)
 {
 	if (ioport("INPUT")->read() & 0x80)
 		m_last = 0;
@@ -335,7 +335,7 @@ ROM_START( polyplay )
 ROM_END
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(polyplay_state::polyplay_timer_callback)
+void polyplay_state::polyplay_timer_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x4c);
 }

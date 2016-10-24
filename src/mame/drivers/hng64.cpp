@@ -1484,7 +1484,7 @@ void hng64_state::set_irq(uint32_t irq_vector)
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(hng64_state::hng64_irq)
+void hng64_state::hng64_irq(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

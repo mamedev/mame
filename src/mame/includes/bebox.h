@@ -71,18 +71,18 @@ public:
 	void init_bebox();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_WRITE_LINE_MEMBER(bebox_pic8259_master_set_int_line);
-	DECLARE_WRITE_LINE_MEMBER(bebox_pic8259_slave_set_int_line);
+	void bebox_pic8259_master_set_int_line(int state);
+	void bebox_pic8259_slave_set_int_line(int state);
 	uint8_t get_slave_ack(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(bebox_dma_hrq_changed);
+	void bebox_dma_hrq_changed(int state);
 	uint8_t bebox_dma8237_fdc_dack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void bebox_dma8237_fdc_dack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(bebox_dma8237_out_eop);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack0_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack1_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack2_w);
-	DECLARE_WRITE_LINE_MEMBER(pc_dack3_w);
-	DECLARE_WRITE_LINE_MEMBER(bebox_timer0_w);
+	void bebox_dma8237_out_eop(int state);
+	void pc_dack0_w(int state);
+	void pc_dack1_w(int state);
+	void pc_dack2_w(int state);
+	void pc_dack3_w(int state);
+	void bebox_timer0_w(int state);
 	uint64_t bebox_cpu0_imask_r(address_space &space, offs_t offset, uint64_t mem_mask = U64(0xffffffffffffffff));
 	uint64_t bebox_cpu1_imask_r(address_space &space, offs_t offset, uint64_t mem_mask = U64(0xffffffffffffffff));
 	uint64_t bebox_interrupt_sources_r(address_space &space, offs_t offset, uint64_t mem_mask = U64(0xffffffffffffffff));
@@ -107,11 +107,11 @@ public:
 	void scsi53c810_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask = U64(0xffffffffffffffff));
 	uint64_t bb_slave_64be_r(address_space &space, offs_t offset, uint64_t mem_mask = U64(0xffffffffffffffff));
 
-	DECLARE_WRITE_LINE_MEMBER(bebox_ide_interrupt);
+	void bebox_ide_interrupt(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(bebox_keyboard_interrupt);
+	void bebox_keyboard_interrupt(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( fdc_interrupt );
+	void fdc_interrupt(int state);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 	LSI53C810_FETCH_CB(scsi_fetch);

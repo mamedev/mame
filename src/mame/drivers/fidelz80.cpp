@@ -539,7 +539,7 @@ public:
 	uint8_t vcc_ppi_portc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void vcc_ppi_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void cc10_ppi_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	TIMER_DEVICE_CALLBACK_MEMBER(beeper_off_callback);
+	void beeper_off_callback(timer_device &timer, void *ptr, int32_t param);
 	void machine_start_vcc();
 
 	// BCC
@@ -671,7 +671,7 @@ void fidelz80base_state::display_update()
 	memcpy(m_display_cache, active_state, sizeof(m_display_cache));
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(fidelz80base_state::display_decay_tick)
+void fidelz80base_state::display_decay_tick(timer_device &timer, void *ptr, int32_t param)
 {
 	// slowly turn off unpowered segments
 	for (int y = 0; y < m_display_maxy; y++)
@@ -849,7 +849,7 @@ void fidelz80_state::vcc_ppi_portc_w(address_space &space, offs_t offset, uint8_
 
 // CC10-specific (no speech chip, 1-bit beeper instead)
 
-TIMER_DEVICE_CALLBACK_MEMBER(fidelz80_state::beeper_off_callback)
+void fidelz80_state::beeper_off_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	m_beeper->set_state(0);
 }

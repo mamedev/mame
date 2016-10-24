@@ -69,7 +69,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	TIMER_CALLBACK_MEMBER(vclk_callback);
+	void vclk_callback(void *ptr, int32_t param);
 
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;

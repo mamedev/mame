@@ -46,7 +46,7 @@ public:
 	oricext_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	void set_cputag(const char *tag);
-	DECLARE_WRITE_LINE_MEMBER(irq_w);
+	void irq_w(int state);
 
 protected:
 	const char *cputag;

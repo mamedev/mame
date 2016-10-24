@@ -19,7 +19,7 @@ public:
 		m_palette(*this, "palette") { }
 
 
-	DECLARE_WRITE_LINE_MEMBER(sound_irq);
+	void sound_irq(int state);
 	void init_igs_fear();
 	//virtual void video_start();
 	virtual void video_start_igs_fear();
@@ -68,7 +68,7 @@ GFXDECODE_END
 static INPUT_PORTS_START( fear )
 INPUT_PORTS_END
 
-WRITE_LINE_MEMBER(igs_fear_state::sound_irq)
+void igs_fear_state::sound_irq(int state)
 {
 }
 

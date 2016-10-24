@@ -559,7 +559,7 @@ void pgm_state::pgm_tx_videoram_w(address_space &space, offs_t offset, uint16_t 
 	m_tx_tilemap->mark_tile_dirty(offset / 2);
 }
 
-TILE_GET_INFO_MEMBER(pgm_state::get_pgm_tx_tilemap_tile_info)
+void pgm_state::get_pgm_tx_tilemap_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 /* 0x904000 - 0x90ffff is the Text Overlay Ram (pgm_tx_videoram)
     each tile uses 4 bytes, the tilemap is 64x128?
@@ -592,7 +592,7 @@ void pgm_state::pgm_bg_videoram_w(address_space &space, offs_t offset, uint16_t 
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-TILE_GET_INFO_MEMBER(pgm_state::get_pgm_bg_tilemap_tile_info)
+void pgm_state::get_pgm_bg_tilemap_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	/* pretty much the same as tx layer */
 

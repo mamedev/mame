@@ -95,7 +95,7 @@ void homerun_state::homerun_color_w(address_space &space, offs_t offset, uint8_t
 
 /**************************************************************************/
 
-TILE_GET_INFO_MEMBER(homerun_state::get_homerun_tile_info)
+void homerun_state::get_homerun_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno = (m_videoram[tile_index]) | ((m_videoram[tile_index | 0x1000] & 0x38) << 5) | ((m_gfx_ctrl & 1) << 11);
 	int palno = (m_videoram[tile_index | 0x1000] & 0x07);

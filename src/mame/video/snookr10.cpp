@@ -46,7 +46,7 @@ void snookr10_state::snookr10_colorram_w(address_space &space, offs_t offset, ui
 }
 
 
-PALETTE_INIT_MEMBER(snookr10_state, snookr10)
+void snookr10_state::palette_init_snookr10(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	/* GGBBBRRR */
@@ -87,7 +87,7 @@ PALETTE_INIT_MEMBER(snookr10_state, snookr10)
 	}
 }
 
-TILE_GET_INFO_MEMBER(snookr10_state::get_bg_tile_info)
+void snookr10_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 /*  - bits -
     7654 3210
@@ -112,7 +112,7 @@ TILE_GET_INFO_MEMBER(snookr10_state::get_bg_tile_info)
 
 **********************************************************/
 
-PALETTE_INIT_MEMBER(snookr10_state, apple10)
+void snookr10_state::palette_init_apple10(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	/* GGBBBRRR */
@@ -156,7 +156,7 @@ PALETTE_INIT_MEMBER(snookr10_state, apple10)
 	}
 }
 
-TILE_GET_INFO_MEMBER(snookr10_state::apple10_get_bg_tile_info)
+void snookr10_state::apple10_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 /*  - bits -
     7654 3210
@@ -181,7 +181,7 @@ TILE_GET_INFO_MEMBER(snookr10_state::apple10_get_bg_tile_info)
 
 **********************************************************/
 
-PALETTE_INIT_MEMBER(snookr10_state, crystalc)
+void snookr10_state::palette_init_crystalc(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	/* GGBBBRRR */
@@ -225,7 +225,7 @@ PALETTE_INIT_MEMBER(snookr10_state, crystalc)
 	}
 }
 
-TILE_GET_INFO_MEMBER(snookr10_state::crystalc_get_bg_tile_info)
+void snookr10_state::crystalc_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 /*  - bits -
     7654 3210

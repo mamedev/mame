@@ -21,7 +21,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(redclash_state,redclash)
+void redclash_state::palette_init_redclash(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -100,7 +100,7 @@ PALETTE_INIT_MEMBER(redclash_state,redclash)
 		palette.set_pen_indirect(i, (i - 0x60) + 0x20);
 }
 
-PALETTE_INIT_MEMBER(redclash_state,sraider)
+void redclash_state::palette_init_sraider(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -193,7 +193,7 @@ void redclash_state::redclash_star_reset_w(address_space &space, offs_t offset, 
 	redclash_set_stars_enable(1);
 }
 
-TILE_GET_INFO_MEMBER(redclash_state::get_fg_tile_info)
+void redclash_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index];
 	int color = (m_videoram[tile_index] & 0x70) >> 4; // ??

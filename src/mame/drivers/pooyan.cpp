@@ -28,7 +28,7 @@
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(pooyan_state::interrupt)
+void pooyan_state::interrupt(device_t &device)
 {
 	if (m_irq_enable)
 		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);

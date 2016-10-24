@@ -95,12 +95,12 @@ public:
 	uint16_t ac_devices_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void ac_devices_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void ac_unk2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	TILEMAP_MAPPER_MEMBER(bg_scan);
-	TILE_GET_INFO_MEMBER(ac_get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(ac_get_tx_tile_info);
+	tilemap_memory_index bg_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	void ac_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void ac_get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void video_start() override;
 	uint32_t screen_update_acommand(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(acommand_scanline);
+	void acommand_scanline(timer_device &timer, void *ptr, int32_t param);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int priority, int pri_mask);
 	void draw_led(bitmap_ind16 &bitmap, int x, int y,uint8_t value);
 	required_device<cpu_device> m_maincpu;
@@ -112,13 +112,13 @@ public:
 
 
 
-TILEMAP_MAPPER_MEMBER(acommand_state::bg_scan)
+tilemap_memory_index acommand_state::bg_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return (row & 0x0f) + ((col & 0xff) << 4) + ((row & 0x70) << 8);
 }
 
-TILE_GET_INFO_MEMBER(acommand_state::ac_get_bg_tile_info)
+void acommand_state::ac_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_ac_bgvram[tile_index];
 	SET_TILE_INFO_MEMBER(1,
@@ -127,7 +127,7 @@ TILE_GET_INFO_MEMBER(acommand_state::ac_get_bg_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(acommand_state::ac_get_tx_tile_info)
+void acommand_state::ac_get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_ac_txvram[tile_index];
 	SET_TILE_INFO_MEMBER(0,
@@ -593,7 +593,7 @@ static GFXDECODE_START( acommand )
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout, 0x1800, 256 )
 GFXDECODE_END
 
-TIMER_DEVICE_CALLBACK_MEMBER(acommand_state::acommand_scanline)
+void acommand_state::acommand_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

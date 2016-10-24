@@ -52,12 +52,12 @@ public:
 	void multiply_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void flkatck_k007121_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void flkatck_k007121_regs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	TILE_GET_INFO_MEMBER(get_tile_info_A);
-	TILE_GET_INFO_MEMBER(get_tile_info_B);
+	void get_tile_info_A(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info_B(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_flkatck(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(flkatck_interrupt);
+	void flkatck_interrupt(device_t &device);
 	void volume_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };

@@ -235,7 +235,7 @@ INPUT_PORTS_END
 
 /* Intel 8255A Interface */
 
-TIMER_CALLBACK_MEMBER(mpf1_state::led_refresh)
+void mpf1_state::led_refresh(void *ptr, int32_t param)
 {
 	if (BIT(m_lednum, 5)) output().set_digit_value(0, param);
 	if (BIT(m_lednum, 4)) output().set_digit_value(1, param);
@@ -307,7 +307,7 @@ static const z80_daisy_config mpf1_daisy_chain[] =
 
 /* Machine Initialization */
 
-TIMER_DEVICE_CALLBACK_MEMBER(mpf1_state::check_halt_callback)
+void mpf1_state::check_halt_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	// halt-LED; the red one, is turned on when the processor is halted
 	// TODO: processor seems to halt, but restarts(?) at 0x0000 after a while -> fix

@@ -64,7 +64,7 @@ public:
 	void port30_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t port40_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void port40_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( hrq_w );
+	void hrq_w(int state);
 	uint8_t dma_mem_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	/* video state */
@@ -74,8 +74,8 @@ public:
 	int m_centronics_busy;
 	int m_centronics_ack;
 
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
+	void write_centronics_busy(int state);
+	void write_centronics_ack(int state);
 	UPD3301_DRAW_CHARACTER_MEMBER( pc8001_display_pixels );
 };
 

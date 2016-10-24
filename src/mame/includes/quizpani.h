@@ -29,9 +29,9 @@ public:
 	void txt_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void tilesbank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	TILEMAP_MAPPER_MEMBER(bg_scan);
-	TILE_GET_INFO_MEMBER(bg_tile_info);
-	TILE_GET_INFO_MEMBER(txt_tile_info);
+	tilemap_memory_index bg_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	void bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void txt_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	virtual void video_start() override;
 

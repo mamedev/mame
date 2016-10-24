@@ -382,7 +382,7 @@ static INPUT_PORTS_START( changela )
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_MINMAX(0x00, 0xff) PORT_SENSITIVITY(50) PORT_KEYDELTA(8) PORT_CONDITION("DSWA", 0x20, EQUALS, 0x00)
 INPUT_PORTS_END
 
-TIMER_DEVICE_CALLBACK_MEMBER(changela_state::changela_scanline)
+void changela_state::changela_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -392,7 +392,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(changela_state::changela_scanline)
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xcf);
 }
 
-INTERRUPT_GEN_MEMBER(changela_state::chl_mcu_irq)
+void changela_state::chl_mcu_irq(device_t &device)
 {
 	generic_pulse_irq_line(*m_mcu, 0, 1);
 }

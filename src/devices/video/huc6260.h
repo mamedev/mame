@@ -48,7 +48,7 @@ public:
 	void video_update(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_PALETTE_INIT(huc6260);
+	void palette_init_huc6260(palette_device &palette);
 
 	uint8_t palette_direct_read(address_space &space, offs_t offset, uint8_t mem_mask);
 	void palette_direct_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask);

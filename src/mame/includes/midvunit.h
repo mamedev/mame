@@ -154,7 +154,7 @@ public:
 	virtual void video_start() override;
 	void machine_reset_midvplus();
 	uint32_t screen_update_midvunit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(scanline_timer_cb);
+	void scanline_timer_cb(void *ptr, int32_t param);
 	required_device<cpu_device> m_maincpu;
 	required_device<watchdog_timer_device> m_watchdog;
 	required_device<screen_device> m_screen;

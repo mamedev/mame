@@ -52,7 +52,7 @@ public:
 	uint32_t m_display_cache[0x20];       // (internal use)
 	uint8_t m_display_decay[0x20][0x20];  // (internal use)
 
-	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
+	void display_decay_tick(timer_device &timer, void *ptr, int32_t param);
 	void display_update();
 	void set_display_size(int maxx, int maxy);
 	void display_matrix(int maxx, int maxy, uint32_t setx, uint32_t sety, bool update = true);
@@ -160,7 +160,7 @@ void hh_melps4_state::display_update()
 	memcpy(m_display_cache, active_state, sizeof(m_display_cache));
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(hh_melps4_state::display_decay_tick)
+void hh_melps4_state::display_decay_tick(timer_device &timer, void *ptr, int32_t param)
 {
 	// slowly turn off unpowered segments
 	for (int y = 0; y < m_display_maxy; y++)
@@ -238,7 +238,7 @@ public:
 	void prepare_display();
 	void plate_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void grid_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	DECLARE_WRITE_LINE_MEMBER(speaker_w);
+	void speaker_w(int state);
 	uint16_t input_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 };
 
@@ -271,7 +271,7 @@ void cfrogger_state::grid_w(address_space &space, offs_t offset, uint16_t data, 
 	prepare_display();
 }
 
-WRITE_LINE_MEMBER(cfrogger_state::speaker_w)
+void cfrogger_state::speaker_w(int state)
 {
 	// T: speaker out
 	m_speaker->level_w(state);
@@ -354,7 +354,7 @@ public:
 	void prepare_display();
 	void plate_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void grid_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	DECLARE_WRITE_LINE_MEMBER(speaker_w);
+	void speaker_w(int state);
 	uint16_t input_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 };
 
@@ -387,7 +387,7 @@ void gjungler_state::grid_w(address_space &space, offs_t offset, uint16_t data, 
 	prepare_display();
 }
 
-WRITE_LINE_MEMBER(gjungler_state::speaker_w)
+void gjungler_state::speaker_w(int state)
 {
 	// T: speaker out
 	m_speaker->level_w(state);

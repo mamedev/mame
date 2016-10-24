@@ -47,7 +47,7 @@ void amu880_state::scan_keyboard()
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(amu880_state::keyboard_tick)
+void amu880_state::keyboard_tick(timer_device &timer, void *ptr, int32_t param)
 {
 	scan_keyboard();
 }
@@ -242,23 +242,23 @@ uint32_t amu880_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 
 /* Z80-CTC Interface */
 
-WRITE_LINE_MEMBER(amu880_state::ctc_z0_w)
+void amu880_state::ctc_z0_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER(amu880_state::ctc_z2_w)
+void amu880_state::ctc_z2_w(int state)
 {
 	/* cassette transmit/receive clock */
 }
 
 /* Z80-SIO Interface */
 
-TIMER_DEVICE_CALLBACK_MEMBER( amu880_state::tape_tick )
+void amu880_state::tape_tick(timer_device &timer, void *ptr, int32_t param)
 {
 	m_z80sio->rxa_w(m_cassette->input() < 0.0);
 }
 
-WRITE_LINE_MEMBER(amu880_state::cassette_w)
+void amu880_state::cassette_w(int state)
 {
 	m_cassette->output(state ? -1.0 : +1.0);
 }

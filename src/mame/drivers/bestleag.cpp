@@ -60,10 +60,10 @@ public:
 	void fgram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void oki_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	TILE_GET_INFO_MEMBER(get_tx_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	TILEMAP_MAPPER_MEMBER(bsb_bg_scan);
+	void get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	tilemap_memory_index bsb_bg_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
 
 	virtual void video_start() override;
 
@@ -76,7 +76,7 @@ public:
 /* Video Handling */
 
 
-TILE_GET_INFO_MEMBER(bestleag_state::get_tx_tile_info)
+void bestleag_state::get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_txram[tile_index];
 
@@ -86,7 +86,7 @@ TILE_GET_INFO_MEMBER(bestleag_state::get_tx_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(bestleag_state::get_bg_tile_info)
+void bestleag_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_bgram[tile_index];
 
@@ -96,7 +96,7 @@ TILE_GET_INFO_MEMBER(bestleag_state::get_bg_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(bestleag_state::get_fg_tile_info)
+void bestleag_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_fgram[tile_index];
 
@@ -106,7 +106,7 @@ TILE_GET_INFO_MEMBER(bestleag_state::get_fg_tile_info)
 			0);
 }
 
-TILEMAP_MAPPER_MEMBER(bestleag_state::bsb_bg_scan)
+tilemap_memory_index bestleag_state::bsb_bg_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	int offset;
 

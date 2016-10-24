@@ -89,7 +89,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(cham24);
+	void palette_init_cham24(palette_device &palette);
 	uint32_t screen_update_cham24(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void cham24_set_mirroring( int mirroring );
 	void ppu_irq(int *ppu_regs);
@@ -253,7 +253,7 @@ void cham24_state::machine_reset()
 {
 }
 
-PALETTE_INIT_MEMBER(cham24_state, cham24)
+void cham24_state::palette_init_cham24(palette_device &palette)
 {
 	m_ppu->init_palette(palette, 0);
 }

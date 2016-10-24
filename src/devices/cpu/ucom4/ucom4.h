@@ -222,7 +222,7 @@ protected:
 	void push_stack();
 
 	bool check_op_43();
-	TIMER_CALLBACK_MEMBER( simple_timer_cb );
+	void simple_timer_cb(void *ptr, int32_t param);
 	uint8_t ucom43_reg_r(int index);
 	void ucom43_reg_w(int index, uint8_t data);
 

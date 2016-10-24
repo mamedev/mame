@@ -138,9 +138,9 @@ public:
 	void init_magic10();
 	void init_hotslot();
 	void init_altaten();
-	TILE_GET_INFO_MEMBER(get_layer0_tile_info);
-	TILE_GET_INFO_MEMBER(get_layer1_tile_info);
-	TILE_GET_INFO_MEMBER(get_layer2_tile_info);
+	void get_layer0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_layer1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_layer2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void video_start() override;
 	uint32_t screen_update_magic10(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
@@ -171,7 +171,7 @@ void magic10_state::layer2_videoram_w(address_space &space, offs_t offset, uint1
 	m_layer2_tilemap->mark_tile_dirty(offset >> 1);
 }
 
-TILE_GET_INFO_MEMBER(magic10_state::get_layer0_tile_info)
+void magic10_state::get_layer0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	SET_TILE_INFO_MEMBER(1,
 		m_layer0_videoram[tile_index * 2],
@@ -179,7 +179,7 @@ TILE_GET_INFO_MEMBER(magic10_state::get_layer0_tile_info)
 		TILE_FLIPYX((m_layer0_videoram[tile_index * 2 + 1] & 0xc0) >> 6));
 }
 
-TILE_GET_INFO_MEMBER(magic10_state::get_layer1_tile_info)
+void magic10_state::get_layer1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	SET_TILE_INFO_MEMBER(1,
 		m_layer1_videoram[tile_index * 2],
@@ -187,7 +187,7 @@ TILE_GET_INFO_MEMBER(magic10_state::get_layer1_tile_info)
 		TILE_FLIPYX((m_layer1_videoram[tile_index * 2 + 1] & 0xc0) >> 6));
 }
 
-TILE_GET_INFO_MEMBER(magic10_state::get_layer2_tile_info)
+void magic10_state::get_layer2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	SET_TILE_INFO_MEMBER(0,
 		m_layer2_videoram[tile_index * 2],

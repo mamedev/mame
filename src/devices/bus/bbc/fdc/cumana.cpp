@@ -194,19 +194,19 @@ void bbc_cumanafdc_device::ctrl_w(address_space &space, offs_t offset, uint8_t d
 	m_fdc_ie = BIT(data, 4);
 }
 
-WRITE_LINE_MEMBER(bbc_cumanafdc_device::fdc_intrq_w)
+void bbc_cumanafdc_device::fdc_intrq_w(int state)
 {
 	if (m_fdc_ie)
 		m_slot->intrq_w(state);
 }
 
-WRITE_LINE_MEMBER(bbc_cumanafdc_device::fdc_drq_w)
+void bbc_cumanafdc_device::fdc_drq_w(int state)
 {
 	if (m_fdc_ie)
 		m_slot->drq_w(state);
 }
 
-WRITE_LINE_MEMBER(bbc_cumanafdc_device::motor_w)
+void bbc_cumanafdc_device::motor_w(int state)
 {
 	for (int i = 0; i != 2; i++) {
 		char devname[8];

@@ -29,14 +29,14 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
-	DECLARE_WRITE_LINE_MEMBER(hsync_changed);
-	DECLARE_WRITE_LINE_MEMBER(vsync_changed);
+	void hsync_changed(int state);
+	void vsync_changed(int state);
 	virtual uint8_t io_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	virtual void io_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual uint8_t status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	virtual void mode_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	WRITE_LINE_MEMBER(pc_cpu_line);
+	void pc_cpu_line(int state);
 
 	virtual MC6845_UPDATE_ROW( crtc_update_row );
 	MC6845_UPDATE_ROW( mda_text_inten_update_row );

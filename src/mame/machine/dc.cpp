@@ -93,7 +93,7 @@ void dc_state::generic_dma(uint32_t main_adr, void *dma_ptr, uint32_t length, ui
 	m_maincpu->sh4_dma_ddt(&ddt);
 }
 
-TIMER_CALLBACK_MEMBER(dc_state::g2_dma_irq)
+void dc_state::g2_dma_irq(void *ptr, int32_t param)
 {
 	m_g2_dma[param].start = g2bus_regs[SB_ADST + (param * 8)] = 0;
 	dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_AICA << param;
@@ -184,7 +184,7 @@ void dc_maple_irq(running_machine &machine)
 	state->dc_update_interrupt_status();
 }
 
-TIMER_CALLBACK_MEMBER(dc_state::ch2_dma_irq)
+void dc_state::ch2_dma_irq(void *ptr, int32_t param)
 {
 	dc_sysctrl_regs[SB_C2DLEN]=0;
 	dc_sysctrl_regs[SB_C2DST]=0;
@@ -718,7 +718,7 @@ void dc_state::dc_arm_aica_w(address_space &space, offs_t offset, uint32_t data,
 	m_aica->write(space, offset*2, data, mem_mask&0xffff);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(dc_state::dc_scanline)
+void dc_state::dc_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	m_powervr2->pvr_scanline_timer(param);
 }

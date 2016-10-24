@@ -65,7 +65,7 @@ public:
 	int m_high_write;
 	uint8_t m_uppersprite;
 
-	INTERRUPT_GEN_MEMBER(irq);
+	void irq(device_t &device);
 
 	required_device<z80pio_device> m_pio0;
 	required_device<z80pio_device> m_pio1;

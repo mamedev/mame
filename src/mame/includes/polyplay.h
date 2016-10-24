@@ -49,9 +49,9 @@ public:
 	void play_channel2(int data);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(polyplay);
+	void palette_init_polyplay(palette_device &palette);
 	uint32_t screen_update_polyplay(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(periodic_interrupt);
-	INTERRUPT_GEN_MEMBER(coin_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(polyplay_timer_callback);
+	void periodic_interrupt(device_t &device);
+	void coin_interrupt(device_t &device);
+	void polyplay_timer_callback(timer_device &timer, void *ptr, int32_t param);
 };

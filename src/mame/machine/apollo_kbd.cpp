@@ -212,7 +212,7 @@ int apollo_kbd_device::beeper::keyboard_has_beeper()
 	return true;    // driver has no facility to return false here, so go with it
 }
 
-TIMER_CALLBACK_MEMBER(apollo_kbd_device::beeper::beeper_callback)
+void apollo_kbd_device::beeper::beeper_callback(void *ptr, int32_t param)
 {
 	off();
 }
@@ -661,7 +661,7 @@ void apollo_kbd_device::scan_keyboard()
 	}
 }
 
-TIMER_CALLBACK_MEMBER(apollo_kbd_device::kbd_scan_timer)
+void apollo_kbd_device::kbd_scan_timer(void *ptr, int32_t param)
 {
 	scan_keyboard();
 

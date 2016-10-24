@@ -19,7 +19,7 @@
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(mcr68_state::get_bg_tile_info)
+void mcr68_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t *videoram = m_videoram;
 	int data = LOW_BYTE(videoram[tile_index * 2]) | (LOW_BYTE(videoram[tile_index * 2 + 1]) << 8);
@@ -31,7 +31,7 @@ TILE_GET_INFO_MEMBER(mcr68_state::get_bg_tile_info)
 }
 
 
-TILE_GET_INFO_MEMBER(mcr68_state::zwackery_get_bg_tile_info)
+void mcr68_state::zwackery_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t *videoram = m_videoram;
 	int data = videoram[tile_index];
@@ -40,7 +40,7 @@ TILE_GET_INFO_MEMBER(mcr68_state::zwackery_get_bg_tile_info)
 }
 
 
-TILE_GET_INFO_MEMBER(mcr68_state::zwackery_get_fg_tile_info)
+void mcr68_state::zwackery_get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t *videoram = m_videoram;
 	int data = videoram[tile_index];

@@ -48,7 +48,7 @@ public:
 
 	void soundcommand_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	virtual void machine_start() override;
-	DECLARE_PALETTE_INIT(galspnbl);
+	void palette_init_galspnbl(palette_device &palette);
 	uint32_t screen_update_galspnbl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_background( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	bitmap_ind16 m_sprite_bitmap;

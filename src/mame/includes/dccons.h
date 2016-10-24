@@ -29,11 +29,11 @@ public:
 	void dc_pdtra_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask = U64(0xffffffffffffffff));
 	uint64_t dc_arm_r(address_space &space, offs_t offset, uint64_t mem_mask = U64(0xffffffffffffffff));
 	void dc_arm_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask = U64(0xffffffffffffffff));
-	DECLARE_WRITE_LINE_MEMBER(aica_irq);
-	DECLARE_WRITE_LINE_MEMBER(sh4_aica_irq);
-	DECLARE_WRITE_LINE_MEMBER(ata_interrupt);
+	void aica_irq(int state);
+	void sh4_aica_irq(int state);
+	void ata_interrupt(int state);
 
-	TIMER_CALLBACK_MEMBER( atapi_xfer_end );
+	void atapi_xfer_end(void *ptr, int32_t param);
 
 	void dreamcast_atapi_init();
 	uint32_t dc_mess_g1_ctrl_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);

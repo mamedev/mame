@@ -23,7 +23,7 @@ public:
 	void pk8000_84_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void pk8000_84_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_PALETTE_INIT(pk8000);
+	void palette_init_pk8000(palette_device &palette);
 
 	uint32_t pk8000_video_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *videomem);
 protected:

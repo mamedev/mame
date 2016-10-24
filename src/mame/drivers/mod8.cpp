@@ -71,7 +71,7 @@ public:
 	void tty_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t tty_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	IRQ_CALLBACK_MEMBER(mod8_irq_callback);
+	int mod8_irq_callback(device_t &device, int irqline);
 private:
 	uint16_t m_tty_data;
 	uint8_t m_tty_key_data;
@@ -125,7 +125,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( mod8 )
 INPUT_PORTS_END
 
-IRQ_CALLBACK_MEMBER(mod8_state::mod8_irq_callback)
+int mod8_state::mod8_irq_callback(device_t &device, int irqline)
 {
 	return 0xC0; // LAA - NOP equivalent
 }

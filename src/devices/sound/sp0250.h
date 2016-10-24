@@ -45,7 +45,7 @@ private:
 	} m_filter[6];
 
 	void load_values();
-	TIMER_CALLBACK_MEMBER( timer_tick );
+	void timer_tick(void *ptr, int32_t param);
 };
 
 extern const device_type SP0250;

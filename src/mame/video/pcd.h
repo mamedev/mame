@@ -19,7 +19,7 @@ public:
 	virtual DECLARE_ADDRESS_MAP(map, 16) = 0;
 	uint8_t detect_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void detect_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_PALETTE_INIT(pcdx);
+	void palette_init_pcdx(palette_device &palette);
 
 protected:
 	required_device<cpu_device> m_maincpu;
@@ -40,7 +40,7 @@ public:
 	uint8_t t1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t p1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	TIMER_DEVICE_CALLBACK_MEMBER(mouse_timer);
+	void mouse_timer(timer_device &timer, void *ptr, int32_t param);
 
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;

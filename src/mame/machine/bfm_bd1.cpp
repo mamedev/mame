@@ -561,10 +561,10 @@ void bfm_bd1_t::shift_clock(int state)
 	m_sclk = state;
 }
 
-WRITE_LINE_MEMBER( bfm_bd1_t::sclk ) { shift_clock(state); }
-WRITE_LINE_MEMBER( bfm_bd1_t::data ) { m_data = state; }
+void bfm_bd1_t::sclk(int state) { shift_clock(state); }
+void bfm_bd1_t::data(int state) { m_data = state; }
 
-WRITE_LINE_MEMBER( bfm_bd1_t::por )
+void bfm_bd1_t::por(int state)
 {
 	if (!state)
 	{

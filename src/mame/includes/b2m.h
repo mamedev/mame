@@ -60,10 +60,10 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(b2m);
+	void palette_init_b2m(palette_device &palette);
 	uint32_t screen_update_b2m(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(b2m_vblank_interrupt);
-	DECLARE_WRITE_LINE_MEMBER(bm2_pit_out1);
+	void b2m_vblank_interrupt(device_t &device);
+	void bm2_pit_out1(int state);
 	void b2m_8255_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void b2m_8255_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void b2m_8255_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -72,7 +72,7 @@ public:
 	uint8_t b2m_romdisk_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void b2m_romdisk_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void b2m_romdisk_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(b2m_fdc_drq);
+	void b2m_fdc_drq(int state);
 	DECLARE_FLOPPY_FORMATS( b2m_floppy_formats );
 	void b2m_postload();
 	void b2m_set_bank(int bank);

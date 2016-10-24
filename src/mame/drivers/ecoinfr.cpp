@@ -64,10 +64,10 @@ public:
 
 	int irq_toggle;
 	int m_optic_pattern;
-	DECLARE_WRITE_LINE_MEMBER(reel0_optic_cb) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
-	DECLARE_WRITE_LINE_MEMBER(reel1_optic_cb) { if (state) m_optic_pattern |= 0x02; else m_optic_pattern &= ~0x02; }
-	DECLARE_WRITE_LINE_MEMBER(reel2_optic_cb) { if (state) m_optic_pattern |= 0x04; else m_optic_pattern &= ~0x04; }
-	DECLARE_WRITE_LINE_MEMBER(reel3_optic_cb) { if (state) m_optic_pattern |= 0x08; else m_optic_pattern &= ~0x08; }
+	void reel0_optic_cb(int state) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
+	void reel1_optic_cb(int state) { if (state) m_optic_pattern |= 0x02; else m_optic_pattern &= ~0x02; }
+	void reel2_optic_cb(int state) { if (state) m_optic_pattern |= 0x04; else m_optic_pattern &= ~0x04; }
+	void reel3_optic_cb(int state) { if (state) m_optic_pattern |= 0x08; else m_optic_pattern &= ~0x08; }
 
 	uint8_t port09_value;
 	uint8_t port10_value;
@@ -112,7 +112,7 @@ public:
 	void init_ecoinfr();
 	void init_ecoinfrmab();
 	virtual void machine_reset() override;
-	TIMER_DEVICE_CALLBACK_MEMBER(ecoinfr_irq_timer);
+	void ecoinfr_irq_timer(timer_device &timer, void *ptr, int32_t param);
 
 	uint8_t m_banksel;
 	uint8_t m_credsel;
@@ -126,7 +126,7 @@ public:
 
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(ecoinfr_state::ecoinfr_irq_timer)
+void ecoinfr_state::ecoinfr_irq_timer(timer_device &timer, void *ptr, int32_t param)
 {
 	irq_toggle^=1;
 

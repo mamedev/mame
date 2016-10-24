@@ -73,11 +73,11 @@ public:
 
 	void io_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t io_port_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(coin_w);
-	DECLARE_WRITE_LINE_MEMBER(audio_reset_w);
+	void coin_w(int state);
+	void audio_reset_w(int state);
 	void audio_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(audio_trigger_w);
-	DECLARE_WRITE_LINE_MEMBER(r6532_irq);
+	void audio_trigger_w(int state);
+	void r6532_irq(int state);
 	void r6532_soundlatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void machine_start_gameplan();
 	void machine_reset_gameplan();
@@ -90,21 +90,21 @@ public:
 	void video_start_common();
 	uint32_t screen_update_gameplan(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_leprechn(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(trvquest_interrupt);
-	TIMER_CALLBACK_MEMBER(clear_screen_done_callback);
-	TIMER_CALLBACK_MEMBER(via_irq_delayed);
-	TIMER_CALLBACK_MEMBER(via_0_ca1_timer_callback);
+	void trvquest_interrupt(device_t &device);
+	void clear_screen_done_callback(void *ptr, int32_t param);
+	void via_irq_delayed(void *ptr, int32_t param);
+	void via_0_ca1_timer_callback(void *ptr, int32_t param);
 	void video_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void gameplan_video_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void leprechn_video_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t leprechn_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(video_command_trigger_w);
+	void video_command_trigger_w(int state);
 	void gameplan_get_pens( pen_t *pens );
 	void leprechn_get_pens( pen_t *pens );
-	DECLARE_WRITE_LINE_MEMBER(via_irq);
+	void via_irq(int state);
 	uint8_t trvquest_question_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(trvquest_coin_w);
-	DECLARE_WRITE_LINE_MEMBER(trvquest_misc_w);
+	void trvquest_coin_w(int state);
+	void trvquest_misc_w(int state);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;

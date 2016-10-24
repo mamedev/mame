@@ -16,7 +16,7 @@
 #include "includes/rungun.h"
 
 /* TTL text plane stuff */
-TILE_GET_INFO_MEMBER(rungun_state::ttl_get_tile_info)
+void rungun_state::ttl_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint32_t base_addr = (uintptr_t)tilemap.user_data();
 	uint8_t *lvram = (uint8_t *)m_ttl_vram.get() + base_addr;
@@ -56,7 +56,7 @@ void rungun_state::rng_psac2_videoram_w(address_space &space, offs_t offset, uin
 	m_936_tilemap[m_video_mux_bank]->mark_tile_dirty(offset / 2);
 }
 
-TILE_GET_INFO_MEMBER(rungun_state::get_rng_936_tile_info)
+void rungun_state::get_rng_936_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint32_t base_addr = (uintptr_t)tilemap.user_data();
 	int tileno, colour, flipx;

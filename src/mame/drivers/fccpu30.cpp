@@ -232,8 +232,8 @@ fccpu30_state(const machine_config &mconfig, device_type type, const char *tag)
 	void bootvect_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
 	/* Interrupt  support */
-	//  IRQ_CALLBACK_MEMBER(maincpu_iack_callback);
-	DECLARE_WRITE_LINE_MEMBER(fga_irq_callback);
+	//  int maincpu_iack_callback(device_t &device, int irqline);
+	void fga_irq_callback(int state);
 	uint8_t fga_irq_state;
 	//  int fga_irq_vector;
 	int fga_irq_level;
@@ -476,7 +476,7 @@ void fccpu30_state::vme_a16_w(address_space &space, offs_t offset, uint16_t data
 }
 #endif
 
-WRITE_LINE_MEMBER(fccpu30_state::fga_irq_callback)
+void fccpu30_state::fga_irq_callback(int state)
 {
 	LOGINT(("%s(%02x)\n", FUNCNAME, state));
 

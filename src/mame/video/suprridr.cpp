@@ -16,14 +16,14 @@
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(suprridr_state::get_tile_info)
+void suprridr_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t code = m_bgram[tile_index];
 	SET_TILE_INFO_MEMBER(0, code, 0, 0);
 }
 
 
-TILE_GET_INFO_MEMBER(suprridr_state::get_tile_info2)
+void suprridr_state::get_tile_info2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t code = m_fgram[tile_index];
 	SET_TILE_INFO_MEMBER(1, code, 0, 0);
@@ -57,7 +57,7 @@ void suprridr_state::video_start()
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(suprridr_state, suprridr)
+void suprridr_state::palette_init_suprridr(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;

@@ -431,7 +431,7 @@ void mea8000_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 }
 
 /* next sample in frame, sampling at 64 kHz */
-TIMER_CALLBACK_MEMBER( mea8000_device::timer_expire )
+void mea8000_device::timer_expire(void *ptr, int32_t param)
 {
 	int pos = m_framepos % SUPERSAMPLING;
 

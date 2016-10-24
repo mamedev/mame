@@ -105,14 +105,14 @@ void grchamp_state::machine_start()
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(grchamp_state::cpu0_interrupt)
+void grchamp_state::cpu0_interrupt(device_t &device)
 {
 	if (m_cpu0_out[0] & 0x01)
 		device.execute().set_input_line(0, ASSERT_LINE);
 }
 
 
-INTERRUPT_GEN_MEMBER(grchamp_state::cpu1_interrupt)
+void grchamp_state::cpu1_interrupt(device_t &device)
 {
 	if (m_cpu1_out[4] & 0x01)
 		device.execute().set_input_line(0, ASSERT_LINE);
@@ -396,7 +396,7 @@ uint8_t grchamp_state::sub_to_main_comm_r(address_space &space, offs_t offset, u
 }
 
 
-TIMER_CALLBACK_MEMBER(grchamp_state::main_to_sub_comm_sync_w)
+void grchamp_state::main_to_sub_comm_sync_w(void *ptr, int32_t param)
 {
 	int offset = param >> 8;
 	m_comm_latch2[offset & 3] = param;

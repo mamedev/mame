@@ -127,7 +127,7 @@ public:
 	void config_memory_map();
 	void update_screen(bitmap_ind16 &bitmap);
 	uint32_t screen_update_rm380z(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(static_vblank_timer);
+	void static_vblank_timer(void *ptr, int32_t param);
 };
 
 

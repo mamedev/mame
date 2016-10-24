@@ -1270,7 +1270,7 @@ static void configure_fast_ram(running_machine &machine)
 	machine.device<ppc_device>("maincpu")->ppcdrc_add_fastram(0x00000000, 0x007fffff, false, state->m_work_ram);
 }
 
-TIMER_CALLBACK_MEMBER(model3_state::model3_sound_timer_tick)
+void model3_state::model3_sound_timer_tick(void *ptr, int32_t param)
 {
 	if (m_sound_irq_enable)
 	{
@@ -1278,7 +1278,7 @@ TIMER_CALLBACK_MEMBER(model3_state::model3_sound_timer_tick)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(model3_state::real3d_dma_timer_callback)
+void model3_state::real3d_dma_timer_callback(void *ptr, int32_t param)
 {
 	m_dma_busy = 0;
 }
@@ -5521,7 +5521,7 @@ void model3_state::scsp_irq(address_space &space, offs_t offset, uint8_t data, u
     IRQ 0x08 and 0x04 directly affect the game speed in magtruck, once per scanline seems fast enough
     Un-syncing the interrupts breaks the progress bar in magtruck
 */
-TIMER_DEVICE_CALLBACK_MEMBER(model3_state::model3_interrupt)
+void model3_state::model3_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

@@ -38,7 +38,7 @@ Changes by Martin M. (pfloyd@gmx.net) 14.10.2001:
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(megazone_state, megazone)
+void megazone_state::palette_init_megazone(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };

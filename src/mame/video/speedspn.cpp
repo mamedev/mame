@@ -6,7 +6,7 @@
 #include "includes/speedspn.h"
 
 
-TILE_GET_INFO_MEMBER(speedspn_state::get_tile_info)
+void speedspn_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_vidram[tile_index*2+1] | (m_vidram[tile_index*2] << 8);
 	int attr = m_attram[tile_index^0x400];

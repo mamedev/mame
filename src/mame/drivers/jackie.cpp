@@ -116,10 +116,10 @@ public:
 
 	DECLARE_CUSTOM_INPUT_MEMBER(hopper_r);
 
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	TILE_GET_INFO_MEMBER(get_reel1_tile_info);
-	TILE_GET_INFO_MEMBER(get_reel2_tile_info);
-	TILE_GET_INFO_MEMBER(get_reel3_tile_info);
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_reel1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_reel2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_reel3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	void init_jackie();
 	virtual void machine_start() override;
@@ -127,13 +127,13 @@ public:
 	virtual void video_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(irq);
+	void irq(timer_device &timer, void *ptr, int32_t param);
 };
 
 
 
 
-TILE_GET_INFO_MEMBER(jackie_state::get_fg_tile_info)
+void jackie_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_fg_tile_ram[tile_index] | (m_fg_color_ram[tile_index] << 8);
 	int tile = code & 0x1fff;
@@ -167,7 +167,7 @@ void jackie_state::reel1_ram_w(address_space &space, offs_t offset, uint8_t data
 	m_reel1_tilemap->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(jackie_state::get_reel1_tile_info)
+void jackie_state::get_reel1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_reel1_ram[tile_index];
 	SET_TILE_INFO_MEMBER(1, code, 0, 0);
@@ -181,7 +181,7 @@ void jackie_state::reel2_ram_w(address_space &space, offs_t offset, uint8_t data
 	m_reel2_tilemap->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(jackie_state::get_reel2_tile_info)
+void jackie_state::get_reel2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_reel2_ram[tile_index];
 	SET_TILE_INFO_MEMBER(1, code, 0, 0);
@@ -194,7 +194,7 @@ void jackie_state::reel3_ram_w(address_space &space, offs_t offset, uint8_t data
 	m_reel3_tilemap->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(jackie_state::get_reel3_tile_info)
+void jackie_state::get_reel3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_reel3_ram[tile_index];
 	SET_TILE_INFO_MEMBER(1, code, 0, 0);
@@ -582,7 +582,7 @@ void jackie_state::init_jackie()
 	rom[0x7e86] = 0xc3;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(jackie_state::irq)
+void jackie_state::irq(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

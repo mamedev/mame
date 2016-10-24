@@ -148,7 +148,7 @@ public:
 
 	uint8_t bus_r();
 
-	DECLARE_WRITE_LINE_MEMBER( lp_w );
+	void lp_w(int state);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

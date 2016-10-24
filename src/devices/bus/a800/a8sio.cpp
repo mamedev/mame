@@ -147,17 +147,17 @@ void a8sio_device::add_a8sio_card(device_a8sio_card_interface *card)
 	m_device = card;
 }
 
-WRITE_LINE_MEMBER( a8sio_device::clock_in_w )
+void a8sio_device::clock_in_w(int state)
 {
 	m_out_clock_in_cb(state);
 }
 
-WRITE_LINE_MEMBER( a8sio_device::data_in_w )
+void a8sio_device::data_in_w(int state)
 {
 	m_out_data_in_cb(state);
 }
 
-WRITE_LINE_MEMBER( a8sio_device::motor_w )
+void a8sio_device::motor_w(int state)
 {
 	if (m_device)
 	{
@@ -208,7 +208,7 @@ void device_a8sio_card_interface::set_a8sio_device()
 	m_a8sio->add_a8sio_card(this);
 }
 
-WRITE_LINE_MEMBER( device_a8sio_card_interface::motor_w )
+void device_a8sio_card_interface::motor_w(int state)
 {
 	//printf("device_a8sio_card_interface::motor_w %d\n", state);
 }

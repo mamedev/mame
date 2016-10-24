@@ -61,10 +61,10 @@ public:
 
 	void init_pulsar();
 	void machine_reset_pulsar();
-	TIMER_CALLBACK_MEMBER(pulsar_reset);
+	void pulsar_reset(void *ptr, int32_t param);
 	void baud_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(fr_w);
-	DECLARE_WRITE_LINE_MEMBER(ft_w);
+	void fr_w(int state);
+	void ft_w(int state);
 	void ppi_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void ppi_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void ppi_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -98,13 +98,13 @@ ADDRESS_MAP_END
 
 // Schematic has the labels for FT and FR the wrong way around,
 //  the pin numbers are correct.
-WRITE_LINE_MEMBER( pulsar_state::fr_w )
+void pulsar_state::fr_w(int state)
 {
 	m_dart->rxca_w(state);
 	m_dart->txca_w(state);
 }
 
-WRITE_LINE_MEMBER( pulsar_state::ft_w )
+void pulsar_state::ft_w(int state)
 {
 	m_dart->rxcb_w(state);
 	m_dart->txcb_w(state);
@@ -117,7 +117,7 @@ void pulsar_state::baud_w(address_space &space, offs_t offset, uint8_t data, uin
 }
 
 /* after the first 4 bytes have been read from ROM, switch the ram back in */
-TIMER_CALLBACK_MEMBER( pulsar_state::pulsar_reset)
+void pulsar_state::pulsar_reset(void *ptr, int32_t param)
 {
 	membank("bankr0")->set_entry(1);
 }

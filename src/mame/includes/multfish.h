@@ -81,8 +81,8 @@ public:
 	void init_crzmon2();
 	void init_crzmon2lot();
 	void init_crzmon2ent();
-	TILE_GET_INFO_MEMBER(get_igrosoft_gamble_tile_info);
-	TILE_GET_INFO_MEMBER(get_igrosoft_gamble_reel_tile_info);
+	void get_igrosoft_gamble_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_igrosoft_gamble_reel_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

@@ -16,24 +16,24 @@
 
 ***************************************************************************/
 
-TILEMAP_MAPPER_MEMBER(armedf_state::armedf_scan_type1)
+tilemap_memory_index armedf_state::armedf_scan_type1(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {   /* col: 0..63; row: 0..31 */
 	/* armed formation */
 	return col * 32 + row;
 }
 
-TILEMAP_MAPPER_MEMBER(armedf_state::armedf_scan_type2)
+tilemap_memory_index armedf_state::armedf_scan_type2(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {   /* col: 0..63; row: 0..31 */
 	return 32 * (31 - row) + (col & 0x1f) + 0x800 * (col / 32);
 }
 
-TILEMAP_MAPPER_MEMBER(armedf_state::armedf_scan_type3)
+tilemap_memory_index armedf_state::armedf_scan_type3(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {   /* col: 0..63; row: 0..31 */
 	/* legion & legiono */
 	return (col & 0x1f) * 32 + row + 0x800 * (col / 32);
 }
 
-TILE_GET_INFO_MEMBER(armedf_state::get_nb1414m4_tx_tile_info)
+void armedf_state::get_nb1414m4_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile_number = m_text_videoram[tile_index] & 0xff;
 	int attributes;
@@ -58,7 +58,7 @@ TILE_GET_INFO_MEMBER(armedf_state::get_nb1414m4_tx_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(armedf_state::get_armedf_tx_tile_info)
+void armedf_state::get_armedf_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile_number = m_text_videoram[tile_index] & 0xff;
 	int attributes;
@@ -84,7 +84,7 @@ TILE_GET_INFO_MEMBER(armedf_state::get_armedf_tx_tile_info)
 }
 
 
-TILE_GET_INFO_MEMBER(armedf_state::get_fg_tile_info)
+void armedf_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int data = m_fg_videoram[tile_index];
 	SET_TILE_INFO_MEMBER(1,
@@ -94,7 +94,7 @@ TILE_GET_INFO_MEMBER(armedf_state::get_fg_tile_info)
 }
 
 
-TILE_GET_INFO_MEMBER(armedf_state::get_bg_tile_info)
+void armedf_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int data = m_bg_videoram[tile_index];
 	SET_TILE_INFO_MEMBER(2,

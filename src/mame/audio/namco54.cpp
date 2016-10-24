@@ -52,7 +52,7 @@
 #include "emu.h"
 #include "namco54.h"
 
-TIMER_CALLBACK_MEMBER( namco_54xx_device::latch_callback )
+void namco_54xx_device::latch_callback(void *ptr, int32_t param)
 {
 	m_latched_cmd = param;
 }
@@ -84,7 +84,7 @@ void namco_54xx_device::R1_w(address_space &space, offs_t offset, uint8_t data, 
 }
 
 
-TIMER_CALLBACK_MEMBER( namco_54xx_device::irq_clear )
+void namco_54xx_device::irq_clear(void *ptr, int32_t param)
 {
 	m_cpu->set_input_line(0, CLEAR_LINE);
 }

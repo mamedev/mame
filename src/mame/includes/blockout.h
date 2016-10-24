@@ -39,7 +39,7 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE_LINE_MEMBER(irq_handler);
+	void irq_handler(int state);
 	void blockout_sound_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void blockout_irq6_ack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void blockout_irq5_ack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
@@ -50,7 +50,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_blockout(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(blockout_scanline);
+	void blockout_scanline(timer_device &timer, void *ptr, int32_t param);
 	void setcolor( int color, int rgb );
 	void update_pixels( int x, int y );
 };

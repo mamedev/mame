@@ -76,7 +76,7 @@ uint8_t *sc61860_device::internal_ram()
 	return m_ram;
 }
 
-TIMER_CALLBACK_MEMBER(sc61860_device::sc61860_2ms_tick)
+void sc61860_device::sc61860_2ms_tick(void *ptr, int32_t param)
 {
 	if (--m_timer.count == 0)
 	{

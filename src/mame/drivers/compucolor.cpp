@@ -69,9 +69,9 @@ public:
 
 	uint8_t xi_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void xo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( xmt_w );
+	void xmt_w(int state);
 
-	IRQ_CALLBACK_MEMBER( int_ack );
+	int int_ack(device_t &device, int irqline);
 
 	uint8_t m_xo;
 };
@@ -350,7 +350,7 @@ void compucolor2_state::xo_w(address_space &space, offs_t offset, uint8_t data, 
 	}
 }
 
-WRITE_LINE_MEMBER( compucolor2_state::xmt_w )
+void compucolor2_state::xmt_w(int state)
 {
 	switch ((m_xo >> 4) & 0x03)
 	{
@@ -368,7 +368,7 @@ WRITE_LINE_MEMBER( compucolor2_state::xmt_w )
 	}
 }
 
-IRQ_CALLBACK_MEMBER( compucolor2_state::int_ack )
+int compucolor2_state::int_ack(device_t &device, int irqline)
 {
 	return m_mioc->get_vector();
 }

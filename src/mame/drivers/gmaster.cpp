@@ -23,7 +23,7 @@ public:
 		, m_io_joy(*this, "JOY")
 	{ }
 
-	DECLARE_PALETTE_INIT(gmaster);
+	void palette_init_gmaster(palette_device &palette);
 	uint8_t gmaster_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void gmaster_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t gmaster_port_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
@@ -219,7 +219,7 @@ static const unsigned char gmaster_palette[2][3] =
 };
 
 
-PALETTE_INIT_MEMBER(gmaster_state, gmaster)
+void gmaster_state::palette_init_gmaster(palette_device &palette)
 {
 	int i;
 

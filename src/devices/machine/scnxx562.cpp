@@ -2415,7 +2415,7 @@ void duscc_channel::receive_data(uint8_t data)
 //  cts_w - clear to send handler
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( duscc_channel::cts_w )
+void duscc_channel::cts_w(int state)
 {
 	LOG(("\"%s\" %s: %c : CTS %u\n", m_owner->tag(), FUNCNAME, 'A' + m_index, state));
 
@@ -2445,7 +2445,7 @@ WRITE_LINE_MEMBER( duscc_channel::cts_w )
 //-------------------------------------------------
 //  dcd_w - data carrier detected handler
 //-------------------------------------------------
-WRITE_LINE_MEMBER( duscc_channel::dcd_w )
+void duscc_channel::dcd_w(int state)
 {
 	LOG(("\"%s\" %s: %c : DCD %u - not implemented\n", m_owner->tag(), FUNCNAME, 'A' + m_index, state));
 #if 0
@@ -2469,7 +2469,7 @@ WRITE_LINE_MEMBER( duscc_channel::dcd_w )
 //  ri_w - ring indicator handler
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( duscc_channel::ri_w )
+void duscc_channel::ri_w(int state)
 {
 	LOG(("\"%s\" %s: %c : RI %u - not implemented\n", m_owner->tag(), FUNCNAME, 'A' + m_index, state));
 #if 0
@@ -2484,7 +2484,7 @@ WRITE_LINE_MEMBER( duscc_channel::ri_w )
 //-------------------------------------------------
 //  sync_w - sync handler
 //-------------------------------------------------
-WRITE_LINE_MEMBER( duscc_channel::sync_w )
+void duscc_channel::sync_w(int state)
 {
 	LOG(("\"%s\" %s: %c : SYNC %u - not implemented\n", m_owner->tag(), FUNCNAME, 'A' + m_index, state));
 }
@@ -2492,7 +2492,7 @@ WRITE_LINE_MEMBER( duscc_channel::sync_w )
 //-------------------------------------------------
 //  rxc_w - receive clock
 //-------------------------------------------------
-WRITE_LINE_MEMBER( duscc_channel::rxc_w )
+void duscc_channel::rxc_w(int state)
 {
 	LOG(("\"%s\" %s: %c : RXC %u - not implemented\n", m_owner->tag(), FUNCNAME, 'A' + m_index, state));
 }
@@ -2500,7 +2500,7 @@ WRITE_LINE_MEMBER( duscc_channel::rxc_w )
 //-------------------------------------------------
 //  txc_w - transmit clock
 //-------------------------------------------------
-WRITE_LINE_MEMBER( duscc_channel::txc_w )
+void duscc_channel::txc_w(int state)
 {
 	LOG(("\"%s\" %s: %c : TXC %u - not implemented\n", m_owner->tag(), FUNCNAME, 'A' + m_index, state));
 }
@@ -2578,7 +2578,7 @@ void duscc_channel::set_dtr(int state)
 //  write_rx - called by terminal through rs232/diserial
 //         when character is sent to board
 //-------------------------------------------------
-WRITE_LINE_MEMBER(duscc_channel::write_rx)
+void duscc_channel::write_rx(int state)
 {
 	m_rxd = state;
 	//only use rx_w when self-clocked

@@ -629,11 +629,11 @@ public:
 	uint32_t hal2_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	void hal2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_WRITE_LINE_MEMBER(scsi_irq);
+	void scsi_irq(int state);
 
 	void init_ip225015();
 
-	TIMER_CALLBACK_MEMBER(ip22_dma);
+	void ip22_dma(void *ptr, int32_t param);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -1015,7 +1015,7 @@ void ip22_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 	}
 }
 
-TIMER_CALLBACK_MEMBER(ip22_state::ip22_dma)
+void ip22_state::ip22_dma(void *ptr, int32_t param)
 {
 	timer_set(attotime::never, TIMER_IP22_DMA);
 #if 0
@@ -1187,7 +1187,7 @@ void ip22_state::dump_chain(address_space &space, uint32_t ch_base)
 #define HPC3_DMACTRL_ENABLE (0x10)
 
 
-WRITE_LINE_MEMBER(ip22_state::scsi_irq)
+void ip22_state::scsi_irq(int state)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 

@@ -66,9 +66,9 @@ public:
 	void common_start();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(wswan);
+	void palette_init_wswan(palette_device &palette);
 	void machine_start_wscolor();
-	DECLARE_PALETTE_INIT(wscolor);
+	void palette_init_wscolor(palette_device &palette);
 
 protected:
 	/* Interrupt flags */

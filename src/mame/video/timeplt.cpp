@@ -39,7 +39,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(timeplt_state, timeplt)
+void timeplt_state::palette_init_timeplt(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	rgb_t palette_val[32];
@@ -92,7 +92,7 @@ PALETTE_INIT_MEMBER(timeplt_state, timeplt)
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(timeplt_state::get_tile_info)
+void timeplt_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_colorram[tile_index];
 	int code = m_videoram[tile_index] + 8 * (attr & 0x20);
@@ -103,7 +103,7 @@ TILE_GET_INFO_MEMBER(timeplt_state::get_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, flags);
 }
 
-TILE_GET_INFO_MEMBER(timeplt_state::get_chkun_tile_info)
+void timeplt_state::get_chkun_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_colorram[tile_index];
 	int code = m_videoram[tile_index] + ((attr & 0x60) << 3);

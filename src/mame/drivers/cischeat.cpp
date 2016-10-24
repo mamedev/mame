@@ -1885,7 +1885,7 @@ GFXDECODE_END
  irq 1 is comms related, presumably the bridge chip is capable of sending the irq signal at given times. Wild Pilot of course doesn't need it.
  irq 2/4 controls gameplay speed, currently unknown about the timing
  */
-TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::bigrun_scanline)
+void cischeat_state::bigrun_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -2074,7 +2074,7 @@ MACHINE_CONFIG_END
     4]          == 3
 */
 
-TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::scudhamm_scanline)
+void cischeat_state::scudhamm_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -2129,7 +2129,7 @@ MACHINE_CONFIG_END
                             Arm Champs II
 **************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::armchamp2_scanline)
+void cischeat_state::armchamp2_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -2161,7 +2161,7 @@ MACHINE_CONFIG_END
     4-7]        rte
 */
 
-TIMER_DEVICE_CALLBACK_MEMBER(cischeat_state::captflag_scanline)
+void cischeat_state::captflag_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "includes/pcktgal.h"
 
-PALETTE_INIT_MEMBER(pcktgal_state, pcktgal)
+void pcktgal_state::palette_init_pcktgal(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 

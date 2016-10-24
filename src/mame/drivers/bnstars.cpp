@@ -146,12 +146,12 @@ public:
 	void bnstars1_mahjong_select_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	DECLARE_CUSTOM_INPUT_MEMBER(mahjong_ctrl_r);
 	void init_bnstars();
-	TILE_GET_INFO_MEMBER(get_ms32_tx0_tile_info);
-	TILE_GET_INFO_MEMBER(get_ms32_tx1_tile_info);
-	TILE_GET_INFO_MEMBER(get_ms32_bg0_tile_info);
-	TILE_GET_INFO_MEMBER(get_ms32_bg1_tile_info);
-	TILE_GET_INFO_MEMBER(get_ms32_roz0_tile_info);
-	TILE_GET_INFO_MEMBER(get_ms32_roz1_tile_info);
+	void get_ms32_tx0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_ms32_tx1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_ms32_bg0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_ms32_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_ms32_roz0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_ms32_roz1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_bnstars_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -162,7 +162,7 @@ public:
 
 
 
-TILE_GET_INFO_MEMBER(bnstars_state::get_ms32_tx0_tile_info)
+void bnstars_state::get_ms32_tx0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno, colour;
 
@@ -172,7 +172,7 @@ TILE_GET_INFO_MEMBER(bnstars_state::get_ms32_tx0_tile_info)
 	SET_TILE_INFO_MEMBER(3,tileno,colour,0);
 }
 
-TILE_GET_INFO_MEMBER(bnstars_state::get_ms32_tx1_tile_info)
+void bnstars_state::get_ms32_tx1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno, colour;
 
@@ -196,7 +196,7 @@ void bnstars_state::ms32_tx1_ram_w(address_space &space, offs_t offset, uint32_t
 
 /* BG Layers */
 
-TILE_GET_INFO_MEMBER(bnstars_state::get_ms32_bg0_tile_info)
+void bnstars_state::get_ms32_bg0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno,colour;
 
@@ -206,7 +206,7 @@ TILE_GET_INFO_MEMBER(bnstars_state::get_ms32_bg0_tile_info)
 	SET_TILE_INFO_MEMBER(2,tileno,colour,0);
 }
 
-TILE_GET_INFO_MEMBER(bnstars_state::get_ms32_bg1_tile_info)
+void bnstars_state::get_ms32_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno,colour;
 
@@ -315,7 +315,7 @@ void bnstars_state::draw_roz(screen_device &screen, bitmap_ind16 &bitmap, const 
 }
 
 
-TILE_GET_INFO_MEMBER(bnstars_state::get_ms32_roz0_tile_info)
+void bnstars_state::get_ms32_roz0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno,colour;
 
@@ -325,7 +325,7 @@ TILE_GET_INFO_MEMBER(bnstars_state::get_ms32_roz0_tile_info)
 	SET_TILE_INFO_MEMBER(1,tileno,colour,0);
 }
 
-TILE_GET_INFO_MEMBER(bnstars_state::get_ms32_roz1_tile_info)
+void bnstars_state::get_ms32_roz1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno,colour;
 

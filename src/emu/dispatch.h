@@ -46,7 +46,7 @@ public:
 
 	template<class _Object> static devcb_base &set_fwd_cb(device_t &device, int entry, _Object object) { return downcast<devcb_line_dispatch_device<N> &>(device).fwd_cb[entry]->set_callback(object); }
 
-	WRITE_LINE_MEMBER( in_w ) {
+	void in_w(int state) {
 		for(auto & elem : fwd_cb)
 			(*(elem))(state);
 	}

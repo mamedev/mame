@@ -27,7 +27,7 @@ public:
 	uint16_t es5510_dsp_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void es5510_dsp_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
+	void duart_irq_handler(int state);
 
 	void mb87078_gain_changed(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 

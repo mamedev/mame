@@ -175,7 +175,7 @@ inline int xain_state::scanline_to_vcount(int scanline)
 		return (vcount - 0x18) | 0x100;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(xain_state::scanline)
+void xain_state::scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 	int screen_height = m_screen->height();

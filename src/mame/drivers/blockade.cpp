@@ -60,7 +60,7 @@
 /* Need to check for a coin on the interrupt, */
 /* This will reset the cpu                    */
 
-INTERRUPT_GEN_MEMBER(blockade_state::blockade_interrupt)
+void blockade_state::blockade_interrupt(device_t &device)
 {
 	device.execute().resume(SUSPEND_ANY_REASON);
 

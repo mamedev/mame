@@ -42,7 +42,7 @@ public:
 	void sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t k052109_051960_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void k052109_051960_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	IRQ_CALLBACK_MEMBER(audiocpu_irq_ack);
+	int audiocpu_irq_ack(device_t &device, int irqline);
 	void ym2151_ct_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
 	uint32_t screen_update_crimfght(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

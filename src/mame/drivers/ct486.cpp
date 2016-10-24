@@ -42,9 +42,9 @@ public:
 
 	uint16_t cs4031_ior(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void cs4031_iow(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	DECLARE_WRITE_LINE_MEMBER( cs4031_hold );
+	void cs4031_hold(int state);
 	void cs4031_tc(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { m_isabus->eop_w(offset, data); }
-	DECLARE_WRITE_LINE_MEMBER( cs4031_spkr ) { m_speaker->level_w(state); }
+	void cs4031_spkr(int state) { m_speaker->level_w(state); }
 };
 
 
@@ -72,7 +72,7 @@ void ct486_state::cs4031_iow(address_space &space, offs_t offset, uint16_t data,
 		m_isabus->dack16_w(offset, data);
 }
 
-WRITE_LINE_MEMBER( ct486_state::cs4031_hold )
+void ct486_state::cs4031_hold(int state)
 {
 	// halt cpu
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);

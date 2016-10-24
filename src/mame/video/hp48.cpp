@@ -41,7 +41,7 @@ static const int hp48_fg_color[3] = {   0,   0,  64 };  /* dark blue */
     FUNCTIONS
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(hp48_state, hp48)
+void hp48_state::palette_init_hp48(palette_device &palette)
 {
 	int i;
 	for ( i = 0; i < 255; i++ )

@@ -93,13 +93,13 @@ public:
 	uint8_t portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t portc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(centronics_busy_w);
-	DECLARE_WRITE_LINE_MEMBER(cass_w);
-	INTERRUPT_GEN_MEMBER(fp1100_vblank_irq);
+	void centronics_busy_w(int state);
+	void cass_w(int state);
+	void fp1100_vblank_irq(device_t &device);
 	void init_fp1100();
 	void machine_reset_fp1100();
 	MC6845_UPDATE_ROW(fp1100_update_row);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_c);
+	void timer_c(timer_device &timer, void *ptr, int32_t param);
 	required_device<palette_device> m_palette;
 private:
 	uint8_t m_irq_mask;
@@ -568,17 +568,17 @@ static GFXDECODE_START( fp1100 )
 	GFXDECODE_ENTRY( "sub_ipl", 0x2400, fp1100_chars_8x8, 0, 1 )
 GFXDECODE_END
 
-WRITE_LINE_MEMBER( fp1100_state::centronics_busy_w )
+void fp1100_state::centronics_busy_w(int state)
 {
 	m_centronics_busy = state;
 }
 
-WRITE_LINE_MEMBER( fp1100_state::cass_w )
+void fp1100_state::cass_w(int state)
 {
 	m_cass_state = state;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( fp1100_state::timer_c )
+void fp1100_state::timer_c(timer_device &timer, void *ptr, int32_t param)
 {
 	m_cass_data[3]++;
 
@@ -594,7 +594,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( fp1100_state::timer_c )
 		m_cass->output(BIT(m_cass_data[3], 1) ? -1.0 : +1.0); // 1200Hz
 }
 
-INTERRUPT_GEN_MEMBER(fp1100_state::fp1100_vblank_irq)
+void fp1100_state::fp1100_vblank_irq(device_t &device)
 {
 //  if (BIT(m_irq_mask, 4))
 //      m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xf8);

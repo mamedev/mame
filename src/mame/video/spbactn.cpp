@@ -12,7 +12,7 @@ void spbactn_state::bg_videoram_w(address_space &space, offs_t offset, uint16_t 
 	m_bg_tilemap->mark_tile_dirty(offset&0x1fff);
 }
 
-TILE_GET_INFO_MEMBER(spbactn_state::get_bg_tile_info)
+void spbactn_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_bgvideoram[tile_index];
 	int tileno = m_bgvideoram[tile_index+0x2000];
@@ -26,7 +26,7 @@ void spbactn_state::fg_videoram_w(address_space &space, offs_t offset, uint16_t 
 	m_fg_tilemap->mark_tile_dirty(offset&0x1fff);
 }
 
-TILE_GET_INFO_MEMBER(spbactn_state::get_fg_tile_info)
+void spbactn_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_fgvideoram[tile_index];
 	int tileno = m_fgvideoram[tile_index+0x2000];
@@ -108,7 +108,7 @@ void spbactn_state::extraram_w(address_space &space, offs_t offset, uint8_t data
 	m_extra_tilemap->mark_tile_dirty(offset/2);
 }
 
-TILE_GET_INFO_MEMBER(spbactn_state::get_extra_tile_info)
+void spbactn_state::get_extra_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno = m_extraram[(tile_index*2)+1];
 	tileno |= m_extraram[(tile_index*2)] << 8;

@@ -141,7 +141,7 @@ void spacefb_state::device_timer(emu_timer &timer, device_timer_id id, int param
 	}
 }
 
-TIMER_CALLBACK_MEMBER(spacefb_state::interrupt_callback)
+void spacefb_state::interrupt_callback(void *ptr, int32_t param)
 {
 	int next_vpos;
 

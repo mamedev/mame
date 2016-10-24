@@ -77,12 +77,12 @@ uint8_t pc1251_state::pc1251_inb(address_space &space, offs_t offset, uint8_t me
 	return data;
 }
 
-READ_LINE_MEMBER(pc1251_state::pc1251_brk)
+int pc1251_state::pc1251_brk()
 {
 	return (ioport("EXTRA")->read() & 0x01);
 }
 
-READ_LINE_MEMBER(pc1251_state::pc1251_reset)
+int pc1251_state::pc1251_reset()
 {
 	return (ioport("EXTRA")->read() & 0x02);
 }

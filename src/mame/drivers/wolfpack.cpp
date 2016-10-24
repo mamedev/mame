@@ -25,7 +25,7 @@ void wolfpack_state::device_timer(emu_timer &timer, device_timer_id id, int para
 }
 
 
-TIMER_CALLBACK_MEMBER(wolfpack_state::periodic_callback)
+void wolfpack_state::periodic_callback(void *ptr, int32_t param)
 {
 	int scanline = param;
 

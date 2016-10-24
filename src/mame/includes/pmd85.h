@@ -77,8 +77,8 @@ public:
 	void init_c2717();
 	virtual void machine_reset() override;
 	uint32_t screen_update_pmd85(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(pmd85_cassette_timer_callback);
-	DECLARE_WRITE_LINE_MEMBER(write_cas_tx);
+	void pmd85_cassette_timer_callback(void *ptr, int32_t param);
+	void write_cas_tx(int state);
 	uint8_t pmd85_ppi_0_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t pmd85_ppi_0_portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t pmd85_ppi_0_portc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);

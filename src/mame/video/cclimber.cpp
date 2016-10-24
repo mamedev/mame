@@ -38,7 +38,7 @@
   bit 0 -- 1  kohm resistor  -- RED
 
 ***************************************************************************/
-PALETTE_INIT_MEMBER(cclimber_state,cclimber)
+void cclimber_state::palette_init_cclimber(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };
@@ -115,7 +115,7 @@ PALETTE_INIT_MEMBER(cclimber_state,cclimber)
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(cclimber_state,swimmer)
+void cclimber_state::palette_init_swimmer(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -184,7 +184,7 @@ PALETTE_INIT_MEMBER(cclimber_state,swimmer)
 }
 
 
-PALETTE_INIT_MEMBER(cclimber_state,yamato)
+void cclimber_state::palette_init_yamato(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -252,7 +252,7 @@ PALETTE_INIT_MEMBER(cclimber_state,yamato)
 }
 
 
-PALETTE_INIT_MEMBER(cclimber_state,toprollr)
+void cclimber_state::palette_init_toprollr(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -345,7 +345,7 @@ void cclimber_state::cannonb_flip_screen_w(address_space &space, offs_t offset, 
 }
 
 
-TILE_GET_INFO_MEMBER(cclimber_state::cclimber_get_pf_tile_info)
+void cclimber_state::cclimber_get_pf_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code, color;
 
@@ -365,7 +365,7 @@ TILE_GET_INFO_MEMBER(cclimber_state::cclimber_get_pf_tile_info)
 }
 
 
-TILE_GET_INFO_MEMBER(cclimber_state::swimmer_get_pf_tile_info)
+void cclimber_state::swimmer_get_pf_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code, color;
 
@@ -382,7 +382,7 @@ TILE_GET_INFO_MEMBER(cclimber_state::swimmer_get_pf_tile_info)
 }
 
 
-TILE_GET_INFO_MEMBER(cclimber_state::toprollr_get_pf_tile_info)
+void cclimber_state::toprollr_get_pf_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code, attr, color;
 
@@ -394,7 +394,7 @@ TILE_GET_INFO_MEMBER(cclimber_state::toprollr_get_pf_tile_info)
 }
 
 
-TILE_GET_INFO_MEMBER(cclimber_state::cclimber_get_bs_tile_info)
+void cclimber_state::cclimber_get_bs_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code, color;
 
@@ -411,7 +411,7 @@ TILE_GET_INFO_MEMBER(cclimber_state::cclimber_get_bs_tile_info)
 }
 
 
-TILE_GET_INFO_MEMBER(cclimber_state::toprollr_get_bs_tile_info)
+void cclimber_state::toprollr_get_bs_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code, color;
 
@@ -428,7 +428,7 @@ TILE_GET_INFO_MEMBER(cclimber_state::toprollr_get_bs_tile_info)
 }
 
 
-TILE_GET_INFO_MEMBER(cclimber_state::toproller_get_bg_tile_info)
+void cclimber_state::toproller_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = ((m_toprollr_bg_coloram[tile_index] & 0x40) << 2) | m_toprollr_bg_videoram[tile_index];
 	int color = m_toprollr_bg_coloram[tile_index] & 0x0f;

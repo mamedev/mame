@@ -226,14 +226,14 @@ public:
 	void video_start_firebeat();
 	uint32_t screen_update_firebeat_0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_firebeat_1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(firebeat_interrupt);
+	void firebeat_interrupt(device_t &device);
 	uint32_t input_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	uint32_t sensor_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	uint32_t flashram_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	void flashram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	uint32_t soundflash_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	void soundflash_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
-	DECLARE_WRITE_LINE_MEMBER(ata_interrupt);
+	void ata_interrupt(int state);
 	uint32_t ata_command_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	void ata_command_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	uint32_t ata_control_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
@@ -261,20 +261,20 @@ public:
 	void spu_sdram_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	uint16_t m68k_spu_share_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void m68k_spu_share_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	DECLARE_WRITE_LINE_MEMBER(spu_ata_interrupt);
-//  TIMER_CALLBACK_MEMBER(keyboard_timer_callback);
-	TIMER_DEVICE_CALLBACK_MEMBER(spu_timer_callback);
+	void spu_ata_interrupt(int state);
+//  void keyboard_timer_callback(void *ptr, int32_t param);
+	void spu_timer_callback(timer_device &timer, void *ptr, int32_t param);
 	void set_ibutton(uint8_t *data);
 	int ibutton_w(uint8_t data);
 	void security_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_lights(write32_delegate out1, write32_delegate out2, write32_delegate out3);
 	void init_firebeat();
 	void init_keyboard();
-	DECLARE_WRITE_LINE_MEMBER(sound_irq_callback);
-	DECLARE_WRITE_LINE_MEMBER(midi_uart_ch0_irq_callback);
-	DECLARE_WRITE_LINE_MEMBER(midi_uart_ch1_irq_callback);
-	DECLARE_WRITE_LINE_MEMBER(gcu0_interrupt);
-	DECLARE_WRITE_LINE_MEMBER(gcu1_interrupt);
+	void sound_irq_callback(int state);
+	void midi_uart_ch0_irq_callback(int state);
+	void midi_uart_ch1_irq_callback(int state);
+	void gcu0_interrupt(int state);
+	void gcu1_interrupt(int state);
 };
 
 
@@ -603,7 +603,7 @@ void firebeat_state::midi_uart_w(address_space &space, offs_t offset, uint8_t da
 	m_duart_midi->write(space, offset >> 6, data);
 }
 
-WRITE_LINE_MEMBER(firebeat_state::midi_uart_ch0_irq_callback)
+void firebeat_state::midi_uart_ch0_irq_callback(int state)
 {
 	if ((m_extend_board_irq_enable & 0x02) == 0 && state != CLEAR_LINE)
 	{
@@ -614,7 +614,7 @@ WRITE_LINE_MEMBER(firebeat_state::midi_uart_ch0_irq_callback)
 		m_maincpu->set_input_line(INPUT_LINE_IRQ1, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(firebeat_state::midi_uart_ch1_irq_callback)
+void firebeat_state::midi_uart_ch1_irq_callback(int state)
 {
 	if ((m_extend_board_irq_enable & 0x01) == 0 && state != CLEAR_LINE)
 	{
@@ -654,7 +654,7 @@ static const int keyboard_notes[24] =
     0x53,   // B2
 };
 
-TIMER_CALLBACK_MEMBER(firebeat_state::keyboard_timer_callback)
+void firebeat_state::keyboard_timer_callback(void *ptr, int32_t param)
 {
     static const int kb_uart_channel[2] = { 1, 0 };
     static const char *const keynames[] = { "KEYBOARD_P1", "KEYBOARD_P2" };
@@ -1021,12 +1021,12 @@ void firebeat_state::spu_sdram_bank_w(address_space &space, offs_t offset, uint1
 {
 }
 
-WRITE_LINE_MEMBER(firebeat_state::spu_ata_interrupt)
+void firebeat_state::spu_ata_interrupt(int state)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_IRQ6, state);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(firebeat_state::spu_timer_callback)
+void firebeat_state::spu_timer_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_IRQ2, ASSERT_LINE);
 }
@@ -1091,7 +1091,7 @@ uint8_t firebeat_state::soundram_r(address_space &space, offs_t offset, uint8_t 
 		return m_flash_snd2->read(offset & 0x1fffff);
 }
 
-WRITE_LINE_MEMBER(firebeat_state::sound_irq_callback)
+void firebeat_state::sound_irq_callback(int state)
 {
 }
 
@@ -1231,7 +1231,7 @@ static INPUT_PORTS_START(popn)
 
 INPUT_PORTS_END
 
-INTERRUPT_GEN_MEMBER(firebeat_state::firebeat_interrupt)
+void firebeat_state::firebeat_interrupt(device_t &device)
 {
 	// IRQs
 	// IRQ 0: VBlank
@@ -1243,12 +1243,12 @@ INTERRUPT_GEN_MEMBER(firebeat_state::firebeat_interrupt)
 	device.execute().set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(firebeat_state::gcu0_interrupt)
+void firebeat_state::gcu0_interrupt(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, state);
 }
 
-WRITE_LINE_MEMBER(firebeat_state::gcu1_interrupt)
+void firebeat_state::gcu1_interrupt(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, state);
 }
@@ -1258,7 +1258,7 @@ void firebeat_state::machine_reset_firebeat()
 	m_layer = 0;
 }
 
-WRITE_LINE_MEMBER( firebeat_state::ata_interrupt )
+void firebeat_state::ata_interrupt(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_IRQ4, state);
 }

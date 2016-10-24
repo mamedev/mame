@@ -59,7 +59,7 @@ public:
 	void portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	/* Extended Timer Output */
-	DECLARE_WRITE_LINE_MEMBER(co0_w);
+	void co0_w(int state);
 
 	/* ADC */
 	uint8_t an0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
@@ -79,23 +79,23 @@ public:
 	void printhead(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void pf_stepper(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void cr_stepper(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(e05a30_ready);
+	void e05a30_ready(int state);
 
 	/* Centronics stuff */
-	virtual DECLARE_WRITE_LINE_MEMBER( input_strobe ) override { if (m_e05a30) m_e05a30->centronics_input_strobe(state); }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data0 ) override { if (m_e05a30) m_e05a30->centronics_input_data0(state); }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data1 ) override { if (m_e05a30) m_e05a30->centronics_input_data1(state); }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data2 ) override { if (m_e05a30) m_e05a30->centronics_input_data2(state); }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data3 ) override { if (m_e05a30) m_e05a30->centronics_input_data3(state); }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data4 ) override { if (m_e05a30) m_e05a30->centronics_input_data4(state); }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data5 ) override { if (m_e05a30) m_e05a30->centronics_input_data5(state); }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data6 ) override { if (m_e05a30) m_e05a30->centronics_input_data6(state); }
-	virtual DECLARE_WRITE_LINE_MEMBER( input_data7 ) override { if (m_e05a30) m_e05a30->centronics_input_data7(state); }
-	DECLARE_WRITE_LINE_MEMBER(e05a30_centronics_ack) { output_ack(state); }
-	DECLARE_WRITE_LINE_MEMBER(e05a30_centronics_busy) { output_busy(state); }
-	DECLARE_WRITE_LINE_MEMBER(e05a30_centronics_perror) { output_perror(state); }
-	DECLARE_WRITE_LINE_MEMBER(e05a30_centronics_fault) { output_fault(state); }
-	DECLARE_WRITE_LINE_MEMBER(e05a30_centronics_select) { output_select(state); }
+	virtual void input_strobe(int state) override { if (m_e05a30) m_e05a30->centronics_input_strobe(state); }
+	virtual void input_data0(int state) override { if (m_e05a30) m_e05a30->centronics_input_data0(state); }
+	virtual void input_data1(int state) override { if (m_e05a30) m_e05a30->centronics_input_data1(state); }
+	virtual void input_data2(int state) override { if (m_e05a30) m_e05a30->centronics_input_data2(state); }
+	virtual void input_data3(int state) override { if (m_e05a30) m_e05a30->centronics_input_data3(state); }
+	virtual void input_data4(int state) override { if (m_e05a30) m_e05a30->centronics_input_data4(state); }
+	virtual void input_data5(int state) override { if (m_e05a30) m_e05a30->centronics_input_data5(state); }
+	virtual void input_data6(int state) override { if (m_e05a30) m_e05a30->centronics_input_data6(state); }
+	virtual void input_data7(int state) override { if (m_e05a30) m_e05a30->centronics_input_data7(state); }
+	void e05a30_centronics_ack(int state) { output_ack(state); }
+	void e05a30_centronics_busy(int state) { output_busy(state); }
+	void e05a30_centronics_perror(int state) { output_perror(state); }
+	void e05a30_centronics_fault(int state) { output_fault(state); }
+	void e05a30_centronics_select(int state) { output_select(state); }
 
 	/* Panel buttons */
 	DECLARE_INPUT_CHANGED_MEMBER(online_sw);

@@ -28,7 +28,7 @@ void drmicro_state::drmicro_videoram_w(address_space &space, offs_t offset, uint
 
 /****************************************************************************/
 
-TILE_GET_INFO_MEMBER(drmicro_state::get_bg1_tile_info)
+void drmicro_state::get_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code, col, flags;
 
@@ -42,7 +42,7 @@ TILE_GET_INFO_MEMBER(drmicro_state::get_bg1_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, col, flags);
 }
 
-TILE_GET_INFO_MEMBER(drmicro_state::get_bg2_tile_info)
+void drmicro_state::get_bg2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code, col, flags;
 
@@ -58,7 +58,7 @@ TILE_GET_INFO_MEMBER(drmicro_state::get_bg2_tile_info)
 
 /****************************************************************************/
 
-PALETTE_INIT_MEMBER(drmicro_state, drmicro)
+void drmicro_state::palette_init_drmicro(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;

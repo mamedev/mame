@@ -205,14 +205,14 @@ public:
 	virtual void video_start() override;
 	void nvram_init(nvram_device &nvram, void *data, size_t size);
 	uint32_t screen_update_lisa(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(lisa_interrupt);
-	TIMER_CALLBACK_MEMBER(handle_mouse);
-	TIMER_CALLBACK_MEMBER(read_COPS_command);
-	TIMER_CALLBACK_MEMBER(set_COPS_ready);
+	void lisa_interrupt(device_t &device);
+	void handle_mouse(void *ptr, int32_t param);
+	void read_COPS_command(void *ptr, int32_t param);
+	void set_COPS_ready(void *ptr, int32_t param);
 	void COPS_via_out_a(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(COPS_via_out_ca2);
+	void COPS_via_out_ca2(int state);
 	void COPS_via_out_b(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(COPS_via_out_cb2);
+	void COPS_via_out_cb2(int state);
 
 	void field_interrupts();
 	void set_parity_error_pending(int value);

@@ -58,7 +58,7 @@ public:
 	void init_plctr13b();
 	virtual void video_start() override;
 	uint32_t screen_update_policetr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(irq4_gen);
+	void irq4_gen(device_t &device);
 	void render_display_list(offs_t offset);
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;

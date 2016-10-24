@@ -2420,7 +2420,7 @@ void tlcs90_device::t90_stop_timer4()
 	t90_stop_timer(4);
 }
 
-TIMER_CALLBACK_MEMBER( tlcs90_device::t90_timer_callback )
+void tlcs90_device::t90_timer_callback(void *ptr, int32_t param)
 {
 	int mode, timer_fired;
 	int i = param;
@@ -2479,7 +2479,7 @@ TIMER_CALLBACK_MEMBER( tlcs90_device::t90_timer_callback )
 	}
 }
 
-TIMER_CALLBACK_MEMBER( tlcs90_device::t90_timer4_callback )
+void tlcs90_device::t90_timer4_callback(void *ptr, int32_t param)
 {
 //  logerror("CPU Timer 4 fired! value = %d\n", (unsigned)m_timer4_value);
 

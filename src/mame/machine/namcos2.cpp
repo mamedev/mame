@@ -637,7 +637,7 @@ int namcos2_shared_state::get_posirq_scanline()
 	return downcast<namcos2_state *>(this)->get_pos_irq_scanline();
 }
 
-TIMER_CALLBACK_MEMBER(namcos2_shared_state::namcos2_posirq_tick)
+void namcos2_shared_state::namcos2_posirq_tick(void *ptr, int32_t param)
 {
 	if (is_system21()) {
 		if (m_68k_gpu_C148[NAMCOS2_C148_POSIRQ]) {
@@ -659,19 +659,19 @@ void namcos2_shared_state::adjust_posirq_timer( int scanline )
 	m_posirq_timer->adjust(m_screen->time_until_pos(scanline, 80), scanline);
 }
 
-INTERRUPT_GEN_MEMBER(namcos2_shared_state::namcos2_68k_master_vblank)
+void namcos2_shared_state::namcos2_68k_master_vblank(device_t &device)
 {
 	if (!is_system21()) adjust_posirq_timer(get_posirq_scanline());
 	device.execute().set_input_line(m_68k_master_C148[NAMCOS2_C148_VBLANKIRQ], HOLD_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(namcos2_shared_state::namcos2_68k_slave_vblank)
+void namcos2_shared_state::namcos2_68k_slave_vblank(device_t &device)
 {
 	if (!is_system21()) adjust_posirq_timer(get_posirq_scanline());
 	device.execute().set_input_line(m_68k_slave_C148[NAMCOS2_C148_VBLANKIRQ], HOLD_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(namcos2_shared_state::namcos2_68k_gpu_vblank)
+void namcos2_shared_state::namcos2_68k_gpu_vblank(device_t &device)
 {
 	/* only used by namcos21 */
 	//int scanline = get_posirq_scanline();

@@ -100,8 +100,8 @@ public:
 	template<class _Object> static devcb_base &set_efx_wr_callback(device_t &device, _Object object) { return downcast<cdp1861_device &>(device).m_write_efx.set_callback(object); }
 
 	void dma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( disp_on_w );
-	DECLARE_WRITE_LINE_MEMBER( disp_off_w );
+	void disp_on_w(int state);
+	void disp_off_w(int state);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

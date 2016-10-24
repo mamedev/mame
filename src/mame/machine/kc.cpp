@@ -201,7 +201,7 @@ void kc_state::update_cassette(int state)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(kc_state::kc_cassette_oneshot_timer)
+void kc_state::kc_cassette_oneshot_timer(void *ptr, int32_t param)
 {
 	update_cassette(0);
 
@@ -210,7 +210,7 @@ TIMER_CALLBACK_MEMBER(kc_state::kc_cassette_oneshot_timer)
 
 // timer used for polling data from cassette input
 // enabled only when cassette motor is on
-TIMER_CALLBACK_MEMBER(kc_state::kc_cassette_timer_callback)
+void kc_state::kc_cassette_timer_callback(void *ptr, int32_t param)
 {
 	// read cassette data
 	int bit = (m_cassette->input() > 0.0038) ? 1 : 0;
@@ -671,20 +671,20 @@ uint8_t kc85_4_state::kc85_4_86_r(address_space &space, offs_t offset, uint8_t m
 
 /* callback for ardy output from PIO */
 /* used in KC85/4 & KC85/3 cassette interface */
-WRITE_LINE_MEMBER( kc_state::pio_ardy_cb)
+void kc_state::pio_ardy_cb(int state)
 {
 	m_ardy = state & 0x01;
 }
 
 /* callback for brdy output from PIO */
 /* used in KC85/4 & KC85/3 keyboard interface */
-WRITE_LINE_MEMBER( kc_state::pio_brdy_cb)
+void kc_state::pio_brdy_cb(int state)
 {
 	m_brdy = state & 0x01;
 }
 
 /* used in cassette write -> K0 */
-WRITE_LINE_MEMBER( kc_state::ctc_zc0_callback )
+void kc_state::ctc_zc0_callback(int state)
 {
 	if (state)
 	{
@@ -694,7 +694,7 @@ WRITE_LINE_MEMBER( kc_state::ctc_zc0_callback )
 }
 
 /* used in cassette write -> K1 */
-WRITE_LINE_MEMBER( kc_state::ctc_zc1_callback)
+void kc_state::ctc_zc1_callback(int state)
 {
 	if (state)
 	{
@@ -707,7 +707,7 @@ WRITE_LINE_MEMBER( kc_state::ctc_zc1_callback)
 
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(kc_state::kc_scanline)
+void kc_state::kc_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = (int)param;
 
@@ -734,7 +734,7 @@ void kc_state::speaker_update()
 }
 
 /* keyboard callback */
-WRITE_LINE_MEMBER( kc_state::keyboard_cb )
+void kc_state::keyboard_cb(int state)
 {
 	m_z80pio->strobe_b(state & m_brdy);
 

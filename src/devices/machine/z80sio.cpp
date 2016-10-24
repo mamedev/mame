@@ -1213,7 +1213,7 @@ void z80sio_channel::receive_data(uint8_t data)
 //  cts_w - clear to send handler
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( z80sio_channel::cts_w )
+void z80sio_channel::cts_w(int state)
 {
 	LOG(("%s(%02x) %s:%c\n",FUNCNAME, state, tag(), 'A' + m_index));
 
@@ -1252,7 +1252,7 @@ WRITE_LINE_MEMBER( z80sio_channel::cts_w )
 //  dcd_w - data carrier detected handler
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( z80sio_channel::dcd_w )
+void z80sio_channel::dcd_w(int state)
 {
 	LOG(("Z80SIO \"%s\" Channel %c : DCD %u\n", m_owner->tag(), 'A' + m_index, state));
 
@@ -1290,7 +1290,7 @@ WRITE_LINE_MEMBER( z80sio_channel::dcd_w )
 //  sh_w - Sync Hunt handler
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( z80sio_channel::sync_w )
+void z80sio_channel::sync_w(int state)
 {
 	LOG(("Z80SIO \"%s\" Channel %c : Sync %u\n", m_owner->tag(), 'A' + m_index, state));
 
@@ -1323,7 +1323,7 @@ WRITE_LINE_MEMBER( z80sio_channel::sync_w )
 //  rxc_w - receive clock
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( z80sio_channel::rxc_w )
+void z80sio_channel::rxc_w(int state)
 {
 	//LOG(("Z80SIO \"%s\" Channel %c : Receiver Clock Pulse\n", m_owner->tag(), m_index + 'A'));
 	int clocks = get_clock_mode();
@@ -1345,7 +1345,7 @@ WRITE_LINE_MEMBER( z80sio_channel::rxc_w )
 //  txc_w - transmit clock
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( z80sio_channel::txc_w )
+void z80sio_channel::txc_w(int state)
 {
 	//LOG(("Z80SIO \"%s\" Channel %c : Transmitter Clock Pulse\n", m_owner->tag(), m_index + 'A'));
 	int clocks = get_clock_mode();
@@ -1420,7 +1420,7 @@ void z80sio_channel::set_dtr(int state)
 //  write_rx -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(z80sio_channel::write_rx)
+void z80sio_channel::write_rx(int state)
 {
 	m_rxd = state;
 	//only use rx_w when self-clocked

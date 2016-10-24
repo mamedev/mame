@@ -82,12 +82,12 @@ public:
 
 	uint8_t vic_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( write_light_pen );
-	DECLARE_WRITE_LINE_MEMBER( write_user_joy0 );
-	DECLARE_WRITE_LINE_MEMBER( write_user_joy1 );
-	DECLARE_WRITE_LINE_MEMBER( write_user_joy2 );
-	DECLARE_WRITE_LINE_MEMBER( write_user_light_pen );
-	DECLARE_WRITE_LINE_MEMBER( write_user_cassette_switch );
+	void write_light_pen(int state);
+	void write_user_joy0(int state);
+	void write_user_joy1(int state);
+	void write_user_joy2(int state);
+	void write_user_light_pen(int state);
+	void write_user_cassette_switch(int state);
 
 	uint8_t via1_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void via1_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -96,10 +96,10 @@ public:
 	uint8_t via2_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t via2_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void via2_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( via2_ca2_w );
-	DECLARE_WRITE_LINE_MEMBER( via2_cb2_w );
+	void via2_ca2_w(int state);
+	void via2_cb2_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( exp_reset_w );
+	void exp_reset_w(int state);
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER( cbm_vc20 );
 	// keyboard state
@@ -674,13 +674,13 @@ void vic20_state::via2_pb_w(address_space &space, offs_t offset, uint8_t data, u
 	m_key_col = data;
 }
 
-WRITE_LINE_MEMBER( vic20_state::via2_ca2_w )
+void vic20_state::via2_ca2_w(int state)
 {
 	// serial clock out
 	m_iec->clk_w(!state);
 }
 
-WRITE_LINE_MEMBER( vic20_state::via2_cb2_w )
+void vic20_state::via2_cb2_w(int state)
 {
 	// serial data out
 	m_iec->data_w(!state);
@@ -691,7 +691,7 @@ WRITE_LINE_MEMBER( vic20_state::via2_cb2_w )
 //  VIC20_EXPANSION_INTERFACE( expansion_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( vic20_state::exp_reset_w )
+void vic20_state::exp_reset_w(int state)
 {
 	if (!state)
 	{
@@ -745,34 +745,34 @@ void vic20_state::machine_reset()
 	m_user->write_3(1);
 }
 
-WRITE_LINE_MEMBER(vic20_state::write_user_joy0)
+void vic20_state::write_user_joy0(int state)
 {
 	m_user_joy0 = state;
 }
 
-WRITE_LINE_MEMBER(vic20_state::write_user_joy1)
+void vic20_state::write_user_joy1(int state)
 {
 	m_user_joy1 = state;
 }
 
-WRITE_LINE_MEMBER(vic20_state::write_user_joy2)
+void vic20_state::write_user_joy2(int state)
 {
 	m_user_joy2 = state;
 }
 
-WRITE_LINE_MEMBER(vic20_state::write_light_pen)
+void vic20_state::write_light_pen(int state)
 {
 	m_light_pen = state;
 	m_vic->lp_w(m_light_pen && m_user_light_pen);
 }
 
-WRITE_LINE_MEMBER(vic20_state::write_user_light_pen)
+void vic20_state::write_user_light_pen(int state)
 {
 	m_user_light_pen = state;
 	m_vic->lp_w(m_light_pen && m_user_light_pen);
 }
 
-WRITE_LINE_MEMBER(vic20_state::write_user_cassette_switch)
+void vic20_state::write_user_cassette_switch(int state)
 {
 	m_user_cassette_switch = state;
 }

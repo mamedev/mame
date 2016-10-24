@@ -18,7 +18,7 @@ public:
 	// construction/destruction
 	a2_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_PALETTE_INIT(apple2);
+	void palette_init_apple2(palette_device &palette);
 
 	bool m_page2;
 	bool m_flash;

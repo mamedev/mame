@@ -37,7 +37,7 @@ void serial_terminal_device::device_start()
 	device_buffered_serial_interface::register_save_state(machine().save(), this);
 }
 
-WRITE_LINE_MEMBER(serial_terminal_device::update_serial)
+void serial_terminal_device::update_serial(int state)
 {
 	clear_fifo();
 

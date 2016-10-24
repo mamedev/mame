@@ -16,7 +16,7 @@
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(centiped_state::centiped_get_tile_info)
+void centiped_state::centiped_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *videoram = m_videoram;
 
@@ -25,7 +25,7 @@ TILE_GET_INFO_MEMBER(centiped_state::centiped_get_tile_info)
 }
 
 
-TILE_GET_INFO_MEMBER(centiped_state::warlords_get_tile_info)
+void centiped_state::warlords_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *videoram = m_videoram;
 	int data = videoram[tile_index];
@@ -35,7 +35,7 @@ TILE_GET_INFO_MEMBER(centiped_state::warlords_get_tile_info)
 }
 
 
-TILE_GET_INFO_MEMBER(centiped_state::milliped_get_tile_info)
+void centiped_state::milliped_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *videoram = m_videoram;
 	int data = videoram[tile_index];
@@ -48,7 +48,7 @@ TILE_GET_INFO_MEMBER(centiped_state::milliped_get_tile_info)
 }
 
 
-TILE_GET_INFO_MEMBER(centiped_state::bullsdrt_get_tile_info)
+void centiped_state::bullsdrt_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *videoram = m_videoram;
 	int data = videoram[tile_index];
@@ -282,7 +282,7 @@ void centiped_state::centiped_paletteram_w(address_space &space, offs_t offset, 
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(centiped_state,warlords)
+void centiped_state::palette_init_warlords(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;

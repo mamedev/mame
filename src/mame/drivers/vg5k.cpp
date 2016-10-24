@@ -93,9 +93,9 @@ public:
 	uint8_t cassette_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void cassette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_vg5k();
-	TIMER_CALLBACK_MEMBER(z80_irq_clear);
-	TIMER_DEVICE_CALLBACK_MEMBER(z80_irq);
-	TIMER_DEVICE_CALLBACK_MEMBER(vg5k_scanline);
+	void z80_irq_clear(void *ptr, int32_t param);
+	void z80_irq(timer_device &timer, void *ptr, int32_t param);
+	void vg5k_scanline(timer_device &timer, void *ptr, int32_t param);
 };
 
 
@@ -282,20 +282,20 @@ static INPUT_PORTS_START( vg5k )
 INPUT_PORTS_END
 
 
-TIMER_CALLBACK_MEMBER(vg5k_state::z80_irq_clear)
+void vg5k_state::z80_irq_clear(void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(vg5k_state::z80_irq)
+void vg5k_state::z80_irq(timer_device &timer, void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(0, ASSERT_LINE);
 
 	machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(vg5k_state::z80_irq_clear),this));
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(vg5k_state::vg5k_scanline)
+void vg5k_state::vg5k_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	m_ef9345->update_scanline((uint16_t)param);
 }

@@ -73,8 +73,8 @@ public:
 	emu_timer  *m_auto_animation_timer;
 	emu_timer  *m_sprite_line_timer;
 
-	TIMER_CALLBACK_MEMBER(auto_animation_timer_callback);
-	TIMER_CALLBACK_MEMBER(sprite_line_timer_callback);
+	void auto_animation_timer_callback(void *ptr, int32_t param);
+	void sprite_line_timer_callback(void *ptr, int32_t param);
 
 
 	int m_bppshift; // 4 for 4bpp gfx (NeoGeo) 8 for 8bpp gfx (Midas)

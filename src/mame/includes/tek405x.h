@@ -78,45 +78,45 @@ public:
 	uint8_t x_pia_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void x_pia_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void x_pia_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( adot_w );
-	DECLARE_WRITE_LINE_MEMBER( bufclk_w );
-	DECLARE_WRITE_LINE_MEMBER( x_pia_irqa_w );
-	DECLARE_WRITE_LINE_MEMBER( x_pia_irqb_w );
+	void adot_w(int state);
+	void bufclk_w(int state);
+	void x_pia_irqa_w(int state);
+	void x_pia_irqb_w(int state);
 
 	uint8_t sa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void y_pia_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void sb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( sot_w );
-	DECLARE_WRITE_LINE_MEMBER( y_pia_irqa_w );
-	DECLARE_WRITE_LINE_MEMBER( y_pia_irqb_w );
+	void sot_w(int state);
+	void y_pia_irqa_w(int state);
+	void y_pia_irqb_w(int state);
 
 	uint8_t kb_pia_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t kb_pia_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void kb_pia_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( kb_halt_w );
-	DECLARE_WRITE_LINE_MEMBER( kb_pia_irqa_w );
-	DECLARE_WRITE_LINE_MEMBER( kb_pia_irqb_w );
+	void kb_halt_w(int state);
+	void kb_pia_irqa_w(int state);
+	void kb_pia_irqb_w(int state);
 
 	uint8_t tape_pia_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void tape_pia_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void tape_pia_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( tape_pia_irqa_w );
-	DECLARE_WRITE_LINE_MEMBER( tape_pia_irqb_w );
+	void tape_pia_irqa_w(int state);
+	void tape_pia_irqb_w(int state);
 
 	void dio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t gpib_pia_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void gpib_pia_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( talk_w );
-	DECLARE_WRITE_LINE_MEMBER( gpib_pia_irqa_w );
-	DECLARE_WRITE_LINE_MEMBER( gpib_pia_irqb_w );
+	void talk_w(int state);
+	void gpib_pia_irqa_w(int state);
+	void gpib_pia_irqb_w(int state);
 
 	void com_pia_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t com_pia_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void com_pia_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( com_pia_irqa_w );
-	DECLARE_WRITE_LINE_MEMBER( com_pia_irqb_w );
-	DECLARE_WRITE_LINE_MEMBER( acia_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( write_acia_clock );
+	void com_pia_irqa_w(int state);
+	void com_pia_irqb_w(int state);
+	void acia_irq_w(int state);
+	void write_acia_clock(int state);
 
 	// interrupts
 	int m_x_pia_irqa;
@@ -139,7 +139,7 @@ public:
 
 	// GPIB
 	int m_talk;
-	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_tick);
+	void keyboard_tick(timer_device &timer, void *ptr, int32_t param);
 };
 
 class tek4052_state : public driver_device

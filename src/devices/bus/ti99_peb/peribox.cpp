@@ -290,7 +290,7 @@ void peribox_device::cruwrite(address_space &space, offs_t offset, uint8_t data,
     And here are finally the two mythical lines SENILA* and SENILB*; mythical
     since there is no report of any software that ever used them.
 */
-WRITE_LINE_MEMBER(peribox_device::senila)
+void peribox_device::senila(int state)
 {
 	for (int i=2; i <= 8; i++)
 	{
@@ -298,7 +298,7 @@ WRITE_LINE_MEMBER(peribox_device::senila)
 	}
 }
 
-WRITE_LINE_MEMBER(peribox_device::senilb)
+void peribox_device::senilb(int state)
 {
 	for (int i=2; i <= 8; i++)
 	{
@@ -309,7 +309,7 @@ WRITE_LINE_MEMBER(peribox_device::senilb)
 /*
     MEMEN input. Used to start the external memory access cycle.
 */
-WRITE_LINE_MEMBER(peribox_device::memen_in)
+void peribox_device::memen_in(int state)
 {
 	m_memen = (state==ASSERT_LINE);
 }
@@ -317,7 +317,7 @@ WRITE_LINE_MEMBER(peribox_device::memen_in)
 /*
     MSAST input. Defined by TI-99/8; we ignore this part in the PEB.
 */
-WRITE_LINE_MEMBER(peribox_device::msast_in)
+void peribox_device::msast_in(int state)
 {
 	m_msast = (state==ASSERT_LINE);
 }
@@ -326,7 +326,7 @@ WRITE_LINE_MEMBER(peribox_device::msast_in)
     CLKOUT line
 */
 
-WRITE_LINE_MEMBER(peribox_device::clock_in)
+void peribox_device::clock_in(int state)
 {
 	for (int i=2; i <= 8; i++)
 	{
@@ -676,17 +676,17 @@ void peribox_slot_device::cruwrite(address_space &space, offs_t offset, uint8_t 
 	m_card->cruwrite(space, offset, data);
 }
 
-WRITE_LINE_MEMBER( peribox_slot_device::senila )
+void peribox_slot_device::senila(int state)
 {
 	m_card->set_senila(state);
 }
 
-WRITE_LINE_MEMBER( peribox_slot_device::senilb )
+void peribox_slot_device::senilb(int state)
 {
 	m_card->set_senilb(state);
 }
 
-WRITE_LINE_MEMBER( peribox_slot_device::clock_in )
+void peribox_slot_device::clock_in(int state)
 {
 	m_card->clock_in(state);
 }
@@ -732,25 +732,25 @@ device_t* peribox_slot_device::get_drive(const char* name)
     These methods are called from the expansion cards. They add the
     slot number to identify the slot to the box.
 */
-WRITE_LINE_MEMBER( peribox_slot_device::set_inta )
+void peribox_slot_device::set_inta(int state)
 {
 	peribox_device *peb = static_cast<peribox_device*>(owner());
 	peb->inta_join(m_slotnumber, state);
 }
 
-WRITE_LINE_MEMBER( peribox_slot_device::set_intb )
+void peribox_slot_device::set_intb(int state)
 {
 	peribox_device *peb = static_cast<peribox_device*>(owner());
 	peb->intb_join(m_slotnumber, state);
 }
 
-WRITE_LINE_MEMBER( peribox_slot_device::lcp_line )
+void peribox_slot_device::lcp_line(int state)
 {
 	peribox_device *peb = static_cast<peribox_device*>(owner());
 	peb->lcp_join(m_slotnumber, state);
 }
 
-WRITE_LINE_MEMBER( peribox_slot_device::set_ready )
+void peribox_slot_device::set_ready(int state)
 {
 	peribox_device *peb = static_cast<peribox_device*>(owner());
 	peb->ready_join(m_slotnumber, state);

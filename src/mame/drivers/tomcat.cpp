@@ -80,7 +80,7 @@ public:
 	uint16_t tomcat_320bio_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	uint8_t tomcat_nvram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void tomcat_nvram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_READ_LINE_MEMBER(dsp_BIO_r);
+	int dsp_BIO_r();
 	void soundlatches_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
@@ -230,7 +230,7 @@ uint16_t tomcat_state::tomcat_320bio_r(address_space &space, offs_t offset, uint
 	return 0;
 }
 
-READ_LINE_MEMBER(tomcat_state::dsp_BIO_r)
+int tomcat_state::dsp_BIO_r()
 {
 	if ( m_dsp->pc() == 0x0001 )
 	{

@@ -40,7 +40,7 @@
 #include "machine/ram.h"
 
 
-PALETTE_DECODER_MEMBER(x68k_state, GGGGGRRRRRBBBBBI)
+rgb_t x68k_state::GGGGGRRRRRBBBBBI_decoder(uint32_t raw)
 {
 	uint8_t i = raw & 1;
 	uint8_t r = pal6bit(((raw >> 5) & 0x3e) | i);
@@ -109,7 +109,7 @@ void x68k_state::x68k_crtc_text_copy(int src, int dest, uint8_t planes)
 		memcpy(&m_tvram[dest_ram+0x30000],&m_tvram[src_ram+0x30000],512);
 }
 
-TIMER_CALLBACK_MEMBER(x68k_state::x68k_crtc_operation_end)
+void x68k_state::x68k_crtc_operation_end(void *ptr, int32_t param)
 {
 	int bit = param;
 	m_crtc.operation &= ~bit;
@@ -175,7 +175,7 @@ void x68k_state::x68k_crtc_refresh_mode()
 	m_screen->configure(scr.max_x,scr.max_y,visiblescr,HZ_TO_ATTOSECONDS(55.45));
 }
 
-TIMER_CALLBACK_MEMBER(x68k_state::x68k_hsync)
+void x68k_state::x68k_hsync(void *ptr, int32_t param)
 {
 	int hstate = param;
 	attotime hsync_time;
@@ -267,12 +267,12 @@ TIMER_CALLBACK_MEMBER(x68k_state::x68k_hsync)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(x68k_state::x68k_crtc_raster_end)
+void x68k_state::x68k_crtc_raster_end(void *ptr, int32_t param)
 {
 	m_mfpdev->i6_w(1);
 }
 
-TIMER_CALLBACK_MEMBER(x68k_state::x68k_crtc_raster_irq)
+void x68k_state::x68k_crtc_raster_irq(void *ptr, int32_t param)
 {
 	int scan = param;
 	attotime irq_time;
@@ -291,7 +291,7 @@ TIMER_CALLBACK_MEMBER(x68k_state::x68k_crtc_raster_irq)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(x68k_state::x68k_crtc_vblank_irq)
+void x68k_state::x68k_crtc_vblank_irq(void *ptr, int32_t param)
 {
 	int val = param;
 	attotime irq_time;
@@ -1053,7 +1053,7 @@ static const gfx_layout x68k_pcg_16 =
 	128*8
 };
 
-TILE_GET_INFO_MEMBER(x68k_state::x68k_get_bg0_tile)
+void x68k_state::x68k_get_bg0_tile(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_spriteram[0x3000+tile_index] & 0x00ff;
 	int colour = (m_spriteram[0x3000+tile_index] & 0x0f00) >> 8;
@@ -1061,7 +1061,7 @@ TILE_GET_INFO_MEMBER(x68k_state::x68k_get_bg0_tile)
 	SET_TILE_INFO_MEMBER(0,code,colour,flags);
 }
 
-TILE_GET_INFO_MEMBER(x68k_state::x68k_get_bg1_tile)
+void x68k_state::x68k_get_bg1_tile(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_spriteram[0x2000+tile_index] & 0x00ff;
 	int colour = (m_spriteram[0x2000+tile_index] & 0x0f00) >> 8;
@@ -1069,7 +1069,7 @@ TILE_GET_INFO_MEMBER(x68k_state::x68k_get_bg1_tile)
 	SET_TILE_INFO_MEMBER(0,code,colour,flags);
 }
 
-TILE_GET_INFO_MEMBER(x68k_state::x68k_get_bg0_tile_16)
+void x68k_state::x68k_get_bg0_tile_16(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_spriteram[0x3000+tile_index] & 0x00ff;
 	int colour = (m_spriteram[0x3000+tile_index] & 0x0f00) >> 8;
@@ -1077,7 +1077,7 @@ TILE_GET_INFO_MEMBER(x68k_state::x68k_get_bg0_tile_16)
 	SET_TILE_INFO_MEMBER(1,code,colour,flags);
 }
 
-TILE_GET_INFO_MEMBER(x68k_state::x68k_get_bg1_tile_16)
+void x68k_state::x68k_get_bg1_tile_16(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_spriteram[0x2000+tile_index] & 0x00ff;
 	int colour = (m_spriteram[0x2000+tile_index] & 0x0f00) >> 8;

@@ -107,8 +107,8 @@ public:
 	void port80_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void portc0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t porte2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_ack);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
+	void write_centronics_ack(int state);
+	void write_centronics_busy(int state);
 	DECLARE_CUSTOM_INPUT_MEMBER(printer_ready_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(printer_ack_r);
 private:
@@ -177,7 +177,7 @@ void pencil2_state::portc0_w(address_space &space, offs_t offset, uint8_t data, 
 {
 }
 
-WRITE_LINE_MEMBER( pencil2_state::write_centronics_busy )
+void pencil2_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 }
@@ -187,7 +187,7 @@ CUSTOM_INPUT_MEMBER( pencil2_state::printer_ready_r )
 	return m_centronics_busy;
 }
 
-WRITE_LINE_MEMBER( pencil2_state::write_centronics_ack )
+void pencil2_state::write_centronics_ack(int state)
 {
 	m_centronics_ack = state;
 }

@@ -1863,7 +1863,7 @@ MACHINE_CONFIG_END
 /*                                                     */
 /*******************************************************/
 
-INTERRUPT_GEN_MEMBER(_8080bw_state::polaris_interrupt)
+void _8080bw_state::polaris_interrupt(device_t &device)
 {
 	m_polaris_cloud_speed++;
 
@@ -3003,7 +3003,7 @@ Claybuster is on the same hardware, PCB labels CS 235A and CS 238A as well
 
 */
 
-TIMER_DEVICE_CALLBACK_MEMBER(_8080bw_state::claybust_gun_callback)
+void _8080bw_state::claybust_gun_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	// reset gun latch
 	m_claybust_gun_pos = 0;

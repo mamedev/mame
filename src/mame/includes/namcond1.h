@@ -38,5 +38,5 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	INTERRUPT_GEN_MEMBER(mcu_interrupt);
+	void mcu_interrupt(device_t &device);
 };

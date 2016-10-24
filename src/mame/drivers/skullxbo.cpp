@@ -40,7 +40,7 @@ void skullxbo_state::update_interrupts()
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(skullxbo_state::scanline_timer)
+void skullxbo_state::scanline_timer(timer_device &timer, void *ptr, int32_t param)
 {
 	scanline_int_gen(*m_maincpu);
 }

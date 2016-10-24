@@ -104,7 +104,7 @@ enum {
 const device_type HP_5061_3001 = &device_creator<hp_5061_3001_cpu_device>;
 const device_type HP_5061_3011 = &device_creator<hp_5061_3011_cpu_device>;
 
-WRITE_LINE_MEMBER(hp_hybrid_cpu_device::dmar_w)
+void hp_hybrid_cpu_device::dmar_w(int state)
 {
 				if (state) {
 								BIT_SET(m_flags , HPHYBRID_DMAR_BIT);
@@ -113,7 +113,7 @@ WRITE_LINE_MEMBER(hp_hybrid_cpu_device::dmar_w)
 				}
 }
 
-WRITE_LINE_MEMBER(hp_hybrid_cpu_device::halt_w)
+void hp_hybrid_cpu_device::halt_w(int state)
 {
 		if (state) {
 				BIT_SET(m_flags , HPHYBRID_HALT_BIT);
@@ -122,7 +122,7 @@ WRITE_LINE_MEMBER(hp_hybrid_cpu_device::halt_w)
 		}
 }
 
-WRITE_LINE_MEMBER(hp_hybrid_cpu_device::status_w)
+void hp_hybrid_cpu_device::status_w(int state)
 {
 		if (state) {
 				BIT_SET(m_flags , HPHYBRID_STS_BIT);
@@ -131,7 +131,7 @@ WRITE_LINE_MEMBER(hp_hybrid_cpu_device::status_w)
 		}
 }
 
-WRITE_LINE_MEMBER(hp_hybrid_cpu_device::flag_w)
+void hp_hybrid_cpu_device::flag_w(int state)
 {
 		if (state) {
 				BIT_SET(m_flags , HPHYBRID_FLG_BIT);

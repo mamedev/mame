@@ -48,12 +48,12 @@ public:
 	required_device<palette_device> m_palette;
 
 	// screen updates
-	DECLARE_PALETTE_INIT(sealy);
+	void palette_init_sealy(palette_device &palette);
 	uint32_t screen_update_sealy(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
-PALETTE_INIT_MEMBER(sealy_state,sealy)
+void sealy_state::palette_init_sealy(palette_device &palette)
 {
 //  for (int i = 0; i < 32768; i++)
 //      palette.set_pen_color(i,pal5bit(i >> 5),pal5bit(i >> 10),pal5bit(i >> 0));

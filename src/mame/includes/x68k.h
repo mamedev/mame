@@ -251,37 +251,37 @@ public:
 	void init_x68kxvi();
 	void init_x68030();
 	void init_x68000();
-	TILE_GET_INFO_MEMBER(x68k_get_bg0_tile);
-	TILE_GET_INFO_MEMBER(x68k_get_bg1_tile);
-	TILE_GET_INFO_MEMBER(x68k_get_bg0_tile_16);
-	TILE_GET_INFO_MEMBER(x68k_get_bg1_tile_16);
+	void x68k_get_bg0_tile(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void x68k_get_bg1_tile(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void x68k_get_bg0_tile_16(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void x68k_get_bg1_tile_16(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void machine_start_x68030();
 	void machine_reset_x68000();
 	void machine_start_x68000();
 	void video_start_x68000();
-	DECLARE_PALETTE_INIT(x68000);
+	void palette_init_x68000(palette_device &palette);
 	uint32_t screen_update_x68000(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(x68k_led_callback);
-	TIMER_CALLBACK_MEMBER(x68k_scc_ack);
-	TIMER_CALLBACK_MEMBER(md_6button_port1_timeout);
-	TIMER_CALLBACK_MEMBER(md_6button_port2_timeout);
-	TIMER_CALLBACK_MEMBER(x68k_bus_error);
-	TIMER_CALLBACK_MEMBER(x68k_net_irq);
-	TIMER_CALLBACK_MEMBER(x68k_crtc_operation_end);
-	TIMER_CALLBACK_MEMBER(x68k_hsync);
-	TIMER_CALLBACK_MEMBER(x68k_crtc_raster_end);
-	TIMER_CALLBACK_MEMBER(x68k_crtc_raster_irq);
-	TIMER_CALLBACK_MEMBER(x68k_crtc_vblank_irq);
+	void x68k_led_callback(void *ptr, int32_t param);
+	void x68k_scc_ack(void *ptr, int32_t param);
+	void md_6button_port1_timeout(void *ptr, int32_t param);
+	void md_6button_port2_timeout(void *ptr, int32_t param);
+	void x68k_bus_error(void *ptr, int32_t param);
+	void x68k_net_irq(void *ptr, int32_t param);
+	void x68k_crtc_operation_end(void *ptr, int32_t param);
+	void x68k_hsync(void *ptr, int32_t param);
+	void x68k_crtc_raster_end(void *ptr, int32_t param);
+	void x68k_crtc_raster_irq(void *ptr, int32_t param);
+	void x68k_crtc_vblank_irq(void *ptr, int32_t param);
 	uint8_t ppi_port_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t ppi_port_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t ppi_port_c_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void ppi_port_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
+	void fdc_irq(int state);
 	void x68k_ct_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void x68030_adpcm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(mfp_irq_callback);
-	DECLARE_WRITE_LINE_MEMBER(x68k_scsi_irq);
-	DECLARE_WRITE_LINE_MEMBER(x68k_scsi_drq);
+	void mfp_irq_callback(int state);
+	void x68k_scsi_irq(int state);
+	void x68k_scsi_drq(int state);
 
 	//dmac
 	void dma_irq(int channel);
@@ -295,8 +295,8 @@ public:
 	uint8_t md_6button_r(int port);
 	uint8_t xpd1lr_r(int port);
 
-	DECLARE_WRITE_LINE_MEMBER(x68k_fm_irq);
-	DECLARE_WRITE_LINE_MEMBER(x68k_irq2_line);
+	void x68k_fm_irq(int state);
+	void x68k_irq2_line(int state);
 
 	void x68k_scc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void x68k_fdc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
@@ -332,7 +332,7 @@ public:
 	uint16_t x68k_gvram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void x68k_tvram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	uint16_t x68k_tvram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
-	IRQ_CALLBACK_MEMBER(x68k_int_ack);
+	int x68k_int_ack(device_t &device, int irqline);
 
 private:
 	inline void x68k_plot_pixel(bitmap_rgb32 &bitmap, int x, int y, uint32_t color);
@@ -344,7 +344,7 @@ private:
 	void x68k_draw_sprites(bitmap_ind16 &bitmap, int priority, rectangle cliprect);
 
 public:
-	DECLARE_PALETTE_DECODER(GGGGGRRRRRBBBBBI);
+	static rgb_t GGGGGRRRRRBBBBBI_decoder(uint32_t raw);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;

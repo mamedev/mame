@@ -108,7 +108,7 @@ static const rgb_t orion128_palette[18] = {
 	rgb_t(0x32, 0xfa, 0xfa)  // 11
 };
 
-PALETTE_INIT_MEMBER(orion_state,orion128 )
+void orion_state::palette_init_orion128(palette_device &palette)
 {
 	palette.set_pen_colors(0, orion128_palette, ARRAY_LENGTH(orion128_palette));
 }

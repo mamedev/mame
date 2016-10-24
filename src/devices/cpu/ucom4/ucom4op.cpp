@@ -451,7 +451,7 @@ inline bool ucom4_cpu_device::check_op_43()
 	return (m_family == NEC_UCOM43);
 }
 
-TIMER_CALLBACK_MEMBER( ucom4_cpu_device::simple_timer_cb )
+void ucom4_cpu_device::simple_timer_cb(void *ptr, int32_t param)
 {
 	m_timer_f = 1;
 }

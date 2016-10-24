@@ -45,7 +45,7 @@ void aztarac_state::snd_status_w(address_space &space, offs_t offset, uint8_t da
 	m_sound_status &= ~0x10;
 }
 
-INTERRUPT_GEN_MEMBER(aztarac_state::snd_timed_irq)
+void aztarac_state::snd_timed_irq(device_t &device)
 {
 	m_sound_status ^= 0x10;
 

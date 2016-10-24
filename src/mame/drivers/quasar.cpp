@@ -267,7 +267,7 @@ static GFXDECODE_START( quasar )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, charlayout, 0, 64+1 )  /* ROM chars */
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(quasar_state::quasar_interrupt)
+void quasar_state::quasar_interrupt(device_t &device)
 {
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x03);
 }

@@ -228,16 +228,16 @@ public:
 	void unmap_rom(offs_t start, offs_t end);
 	bool is_option_rom_space_available(offs_t start, int size);
 
-	DECLARE_WRITE_LINE_MEMBER( irq2_w );
-	DECLARE_WRITE_LINE_MEMBER( irq3_w );
-	DECLARE_WRITE_LINE_MEMBER( irq4_w );
-	DECLARE_WRITE_LINE_MEMBER( irq5_w );
-	DECLARE_WRITE_LINE_MEMBER( irq6_w );
-	DECLARE_WRITE_LINE_MEMBER( irq7_w );
+	void irq2_w(int state);
+	void irq3_w(int state);
+	void irq4_w(int state);
+	void irq5_w(int state);
+	void irq6_w(int state);
+	void irq7_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( drq1_w );
-	DECLARE_WRITE_LINE_MEMBER( drq2_w );
-	DECLARE_WRITE_LINE_MEMBER( drq3_w );
+	void drq1_w(int state);
+	void drq2_w(int state);
+	void drq3_w(int state);
 
 	// 8 bit accessors for ISA-defined address spaces
 	uint8_t prog_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
@@ -372,16 +372,16 @@ public:
 		}
 	}
 
-	DECLARE_WRITE_LINE_MEMBER( irq10_w );
-	DECLARE_WRITE_LINE_MEMBER( irq11_w );
-	DECLARE_WRITE_LINE_MEMBER( irq12_w );
-	DECLARE_WRITE_LINE_MEMBER( irq14_w );
-	DECLARE_WRITE_LINE_MEMBER( irq15_w );
+	void irq10_w(int state);
+	void irq11_w(int state);
+	void irq12_w(int state);
+	void irq14_w(int state);
+	void irq15_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( drq0_w );
-	DECLARE_WRITE_LINE_MEMBER( drq5_w );
-	DECLARE_WRITE_LINE_MEMBER( drq6_w );
-	DECLARE_WRITE_LINE_MEMBER( drq7_w );
+	void drq0_w(int state);
+	void drq5_w(int state);
+	void drq6_w(int state);
+	void drq7_w(int state);
 
 	uint16_t dack16_r(int line);
 	void dack16_w(int line,uint16_t data);

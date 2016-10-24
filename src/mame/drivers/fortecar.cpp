@@ -350,7 +350,7 @@ public:
 	void init_fortecar();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(fortecar);
+	void palette_init_fortecar(palette_device &palette);
 	uint32_t screen_update_fortecar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -393,7 +393,7 @@ uint32_t fortecar_state::screen_update_fortecar(screen_device &screen, bitmap_in
 	return 0;
 }
 
-PALETTE_INIT_MEMBER(fortecar_state, fortecar)
+void fortecar_state::palette_init_fortecar(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 /* Video resistors...

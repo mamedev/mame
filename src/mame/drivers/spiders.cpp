@@ -223,7 +223,7 @@
  *
  *************************************/
 
-WRITE_LINE_MEMBER(spiders_state::main_cpu_irq)
+void spiders_state::main_cpu_irq(int state)
 {
 	pia6821_device *pia1 = machine().device<pia6821_device>("pia1");
 	pia6821_device *pia2 = machine().device<pia6821_device>("pia2");
@@ -243,7 +243,7 @@ WRITE_LINE_MEMBER(spiders_state::main_cpu_irq)
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(spiders_state::update_pia_1)
+void spiders_state::update_pia_1(device_t &device)
 {
 	pia6821_device *pia1 = machine().device<pia6821_device>("pia1");
 	/* update the different PIA pins from the input ports */
@@ -305,7 +305,7 @@ void spiders_state::machine_start()
  *************************************/
 
 
-WRITE_LINE_MEMBER(spiders_state::flipscreen_w)
+void spiders_state::flipscreen_w(int state)
 {
 	m_flipscreen = state;
 }
@@ -366,7 +366,7 @@ MC6845_UPDATE_ROW( spiders_state::crtc_update_row )
 }
 
 
-WRITE_LINE_MEMBER(spiders_state::display_enable_changed)
+void spiders_state::display_enable_changed(int state)
 {
 	machine().device<ttl74123_device>("ic60")->a_w(generic_space(), 0, state);
 }

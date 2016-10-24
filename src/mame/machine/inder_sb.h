@@ -39,10 +39,10 @@ public:
 	void dac2_rombank_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void dac3_rombank_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER(z80ctc_ch0);
-	DECLARE_WRITE_LINE_MEMBER(z80ctc_ch1);
-	DECLARE_WRITE_LINE_MEMBER(z80ctc_ch2);
-	DECLARE_WRITE_LINE_MEMBER(z80ctc_ch3);
+	void z80ctc_ch0(int state);
+	void z80ctc_ch1(int state);
+	void z80ctc_ch2(int state);
+	void z80ctc_ch3(int state);
 
 	uint8_t megaphx_02cc_hack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t megaphx_02e6_hack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);

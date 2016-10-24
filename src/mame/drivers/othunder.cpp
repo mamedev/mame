@@ -321,7 +321,7 @@ void othunder_state::irq_ack_w(address_space &space, offs_t offset, uint16_t dat
 	update_irq();
 }
 
-INTERRUPT_GEN_MEMBER(othunder_state::vblank_interrupt)
+void othunder_state::vblank_interrupt(device_t &device)
 {
 	m_vblank_irq = 1;
 	update_irq();

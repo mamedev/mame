@@ -308,7 +308,7 @@ void gt64xxx_device::reset_all_mappings()
 }
 
 // PCI Stalling
-WRITE_LINE_MEMBER(gt64xxx_device::pci_stall)
+void gt64xxx_device::pci_stall(int state)
 {
 	// Reset the retry count once unstalled
 	if (state==0 && m_pci_stall_state==1) {
@@ -727,7 +727,7 @@ void gt64xxx_device::update_irqs()
 }
 
 
-TIMER_CALLBACK_MEMBER(gt64xxx_device::timer_callback)
+void gt64xxx_device::timer_callback(void *ptr, int32_t param)
 {
 	int which = param;
 	galileo_timer *timer = &m_timer[which];
@@ -806,7 +806,7 @@ int gt64xxx_device::dma_fetch_next(address_space &space, int which)
 }
 
 
-TIMER_CALLBACK_MEMBER (gt64xxx_device::perform_dma)
+void gt64xxx_device::perform_dma(void *ptr, int32_t param)
 {
 	// Cycle through the channels
 	int which = -1;

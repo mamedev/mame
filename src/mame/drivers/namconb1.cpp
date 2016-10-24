@@ -293,7 +293,7 @@ void namconb1_state::machine_start()
 
 /****************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(namconb1_state::scantimer)
+void namconb1_state::scantimer(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -325,17 +325,17 @@ TIMER_DEVICE_CALLBACK_MEMBER(namconb1_state::scantimer)
 */
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(namconb1_state::mcu_irq0_cb)
+void namconb1_state::mcu_irq0_cb(timer_device &timer, void *ptr, int32_t param)
 {
 	m_mcu->set_input_line(M37710_LINE_IRQ0, HOLD_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(namconb1_state::mcu_irq2_cb)
+void namconb1_state::mcu_irq2_cb(timer_device &timer, void *ptr, int32_t param)
 {
 	m_mcu->set_input_line(M37710_LINE_IRQ2, HOLD_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(namconb1_state::mcu_adc_cb)
+void namconb1_state::mcu_adc_cb(timer_device &timer, void *ptr, int32_t param)
 {
 	m_mcu->set_input_line(M37710_LINE_ADC, HOLD_LINE);
 }

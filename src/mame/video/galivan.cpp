@@ -54,7 +54,7 @@ background: 0x4000 bytes of ROM:    76543210    tile code low bits
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(galivan_state, galivan)
+void galivan_state::palette_init_galivan(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -119,7 +119,7 @@ PALETTE_INIT_MEMBER(galivan_state, galivan)
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(galivan_state::get_bg_tile_info)
+void galivan_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *BGROM = memregion("gfx4")->base();
 	int attr = BGROM[tile_index + 0x4000];
@@ -130,7 +130,7 @@ TILE_GET_INFO_MEMBER(galivan_state::get_bg_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(galivan_state::get_tx_tile_info)
+void galivan_state::get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_videoram[tile_index + 0x400];
 	int code = m_videoram[tile_index] | ((attr & 0x01) << 8);
@@ -141,7 +141,7 @@ TILE_GET_INFO_MEMBER(galivan_state::get_tx_tile_info)
 	tileinfo.category = attr & 8 ? 0 : 1;   /* seems correct */
 }
 
-TILE_GET_INFO_MEMBER(galivan_state::ninjemak_get_bg_tile_info)
+void galivan_state::ninjemak_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *BGROM = memregion("gfx4")->base();
 	int attr = BGROM[tile_index + 0x4000];
@@ -152,7 +152,7 @@ TILE_GET_INFO_MEMBER(galivan_state::ninjemak_get_bg_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(galivan_state::ninjemak_get_tx_tile_info)
+void galivan_state::ninjemak_get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_videoram[tile_index + 0x400];
 	int code = m_videoram[tile_index] | ((attr & 0x03) << 8);

@@ -31,7 +31,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(yiear_state, yiear)
+void yiear_state::palette_init_yiear(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -89,7 +89,7 @@ void yiear_state::yiear_control_w(address_space &space, offs_t offset, uint8_t d
 	machine().bookkeeping().coin_counter_w(1, data & 0x10);
 }
 
-TILE_GET_INFO_MEMBER(yiear_state::get_bg_tile_info)
+void yiear_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int offs = tile_index * 2;
 	int attr = m_videoram[offs];

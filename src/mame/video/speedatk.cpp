@@ -9,7 +9,7 @@
 #include "includes/speedatk.h"
 
 
-PALETTE_INIT_MEMBER(speedatk_state, speedatk)
+void speedatk_state::palette_init_speedatk(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;

@@ -152,7 +152,7 @@ void sp0250_device::load_values()
 	m_playing = 1;
 }
 
-TIMER_CALLBACK_MEMBER( sp0250_device::timer_tick )
+void sp0250_device::timer_tick(void *ptr, int32_t param)
 {
 	m_stream->update();
 }

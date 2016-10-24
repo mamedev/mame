@@ -326,7 +326,7 @@ static GFXDECODE_START( strnskil )
 GFXDECODE_END
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(strnskil_state::strnskil_irq)
+void strnskil_state::strnskil_irq(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

@@ -50,8 +50,8 @@ public:
 	uint16_t ide_1_interrupt_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void ide_interrupt_enable_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE_LINE_MEMBER( ide_0_interrupt_w );
-	DECLARE_WRITE_LINE_MEMBER( ide_1_interrupt_w );
+	void ide_0_interrupt_w(int state);
+	void ide_1_interrupt_w(int state);
 
 protected:
 	// device-level overrides
@@ -62,7 +62,7 @@ protected:
 	virtual void device_reset() override;
 
 	// device_zorro2_card_interface overrides
-	virtual DECLARE_WRITE_LINE_MEMBER( cfgin_w ) override;
+	virtual void cfgin_w(int state) override;
 
 	// amiga_autoconfig overrides
 	virtual void autoconfig_base_address(offs_t address) override;

@@ -889,7 +889,7 @@ GFXDECODE_END
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(ninjakd2_state::ninjakd2_interrupt)
+void ninjakd2_state::ninjakd2_interrupt(device_t &device)
 {
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xd7); /* RST 10h */
 }

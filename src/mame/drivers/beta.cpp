@@ -93,7 +93,7 @@ public:
 	uint8_t m_segment;
 
 	emu_timer *m_led_refresh_timer;
-	TIMER_CALLBACK_MEMBER(led_refresh);
+	void led_refresh(void *ptr, int32_t param);
 };
 
 
@@ -151,7 +151,7 @@ INPUT_PORTS_END
 
 /* M6532 Interface */
 
-TIMER_CALLBACK_MEMBER(beta_state::led_refresh)
+void beta_state::led_refresh(void *ptr, int32_t param)
 {
 	if (m_ls145_p < 6)
 	{

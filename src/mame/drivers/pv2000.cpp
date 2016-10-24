@@ -58,7 +58,7 @@ public:
 	uint8_t keys_hi_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t keys_lo_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t keys_mod_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(pv2000_vdp_interrupt);
+	void pv2000_vdp_interrupt(int state);
 	uint8_t cass_in(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void cass_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	bool m_last_state;
@@ -309,7 +309,7 @@ static INPUT_PORTS_START( pv2000 )
 INPUT_PORTS_END
 
 
-WRITE_LINE_MEMBER( pv2000_state::pv2000_vdp_interrupt )
+void pv2000_state::pv2000_vdp_interrupt(int state)
 {
 	// only if it goes up
 	if (state && !m_last_state)

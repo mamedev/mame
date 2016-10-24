@@ -17,11 +17,11 @@ public:
 
 	void decwriter_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void decwriter_kbd_input(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	TIMER_CALLBACK_MEMBER(decwriter_callback);
+	void decwriter_callback(void *ptr, int32_t param);
 
 	void teletype_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void teletype_kbd_input(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	TIMER_CALLBACK_MEMBER(teletype_callback);
+	void teletype_callback(void *ptr, int32_t param);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( patinho_tape );
 	void load_tape(const char* name);

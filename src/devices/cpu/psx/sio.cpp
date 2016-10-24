@@ -337,12 +337,12 @@ uint32_t psxsio_device::read(address_space &space, offs_t offset, uint32_t mem_m
 	return data;
 }
 
-WRITE_LINE_MEMBER(psxsio_device::write_rxd)
+void psxsio_device::write_rxd(int state)
 {
 	m_rxd = state;
 }
 
-WRITE_LINE_MEMBER(psxsio_device::write_dsr)
+void psxsio_device::write_dsr(int state)
 {
 	if (state)
 	{

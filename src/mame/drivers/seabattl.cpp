@@ -77,7 +77,7 @@ public:
 	tilemap_t *m_bg_tilemap;
 	bitmap_ind16 m_collision_bg;
 
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void seabattl_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void seabattl_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void seabattl_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -90,12 +90,12 @@ public:
 	void score_display_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void score2_display_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	INTERRUPT_GEN_MEMBER(seabattl_interrupt);
+	void seabattl_interrupt(device_t &device);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(seabattl);
+	void palette_init_seabattl(palette_device &palette);
 	uint32_t screen_update_seabattl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	bool m_waveenable;
 	uint8_t m_collision;
@@ -111,7 +111,7 @@ public:
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(seabattl_state, seabattl)
+void seabattl_state::palette_init_seabattl(palette_device &palette)
 {
 	// sprites (m.obj) + s2636
 	for (int i = 0; i < 8; i++)
@@ -131,7 +131,7 @@ PALETTE_INIT_MEMBER(seabattl_state, seabattl)
 	palette.set_pen_color(25, rgb_t(0x00, 0xff, 0xff)); // cyan
 }
 
-TILE_GET_INFO_MEMBER(seabattl_state::get_bg_tile_info)
+void seabattl_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index];
 	int color = m_colorram[tile_index];
@@ -440,7 +440,7 @@ void seabattl_state::machine_reset()
 {
 }
 
-INTERRUPT_GEN_MEMBER(seabattl_state::seabattl_interrupt)
+void seabattl_state::seabattl_interrupt(device_t &device)
 {
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x03);
 }

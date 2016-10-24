@@ -59,15 +59,15 @@ public:
 	uint8_t m_last_code;
 	uint8_t m_key_pressed;
 	void nanos_tc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( ctc_z0_w );
-	DECLARE_WRITE_LINE_MEMBER( ctc_z1_w );
-	DECLARE_WRITE_LINE_MEMBER( ctc_z2_w );
+	void ctc_z0_w(int state);
+	void ctc_z1_w(int state);
+	void ctc_z2_w(int state);
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
-	DECLARE_WRITE_LINE_MEMBER(z80daisy_interrupt);
+	void keyboard_callback(timer_device &timer, void *ptr, int32_t param);
+	void z80daisy_interrupt(int state);
 	uint8_t nanos_port_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t nanos_port_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void nanos_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -98,21 +98,21 @@ void nanos_state::nanos_tc_w(address_space &space, offs_t offset, uint8_t data, 
 
 /* Z80-CTC Interface */
 
-WRITE_LINE_MEMBER( nanos_state::ctc_z0_w )
+void nanos_state::ctc_z0_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER( nanos_state::ctc_z1_w )
+void nanos_state::ctc_z1_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER( nanos_state::ctc_z2_w )
+void nanos_state::ctc_z2_w(int state)
 {
 }
 
 /* Z80-SIO Interface */
 
-WRITE_LINE_MEMBER(nanos_state::z80daisy_interrupt)
+void nanos_state::z80daisy_interrupt(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, state);
 }
@@ -329,7 +329,7 @@ uint8_t nanos_state::row_number(uint8_t code)
 	return 0;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(nanos_state::keyboard_callback)
+void nanos_state::keyboard_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	int i;
 	uint8_t code;

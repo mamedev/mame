@@ -16,7 +16,7 @@ void suprslam_state::suprslam_screen_videoram_w(address_space &space, offs_t off
 }
 
 
-TILE_GET_INFO_MEMBER(suprslam_state::get_suprslam_tile_info)
+void suprslam_state::get_suprslam_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno = m_screen_videoram[tile_index] & 0x0fff;
 	int colour = m_screen_videoram[tile_index] & 0xf000;
@@ -36,7 +36,7 @@ void suprslam_state::suprslam_bg_videoram_w(address_space &space, offs_t offset,
 }
 
 
-TILE_GET_INFO_MEMBER(suprslam_state::get_suprslam_bg_tile_info)
+void suprslam_state::get_suprslam_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno = m_bg_videoram[tile_index] & 0x0fff;
 	int colour = m_bg_videoram[tile_index] & 0xf000;

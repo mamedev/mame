@@ -84,12 +84,12 @@ void spdodgeb_state::spd_adpcm_int( msm5205_device *device, int chip )
 	}
 }
 
-WRITE_LINE_MEMBER(spdodgeb_state::spd_adpcm_int_1)
+void spdodgeb_state::spd_adpcm_int_1(int state)
 {
 	spd_adpcm_int(m_msm1, 0);
 }
 
-WRITE_LINE_MEMBER(spdodgeb_state::spd_adpcm_int_2)
+void spdodgeb_state::spd_adpcm_int_2(int state)
 {
 	spd_adpcm_int(m_msm2, 1);
 }

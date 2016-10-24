@@ -582,7 +582,7 @@ static const rgb_t lnw80_palette[] =
 	rgb_t(0, 0, 0), // black
 };
 
-PALETTE_INIT_MEMBER(trs80_state,lnw80)
+void trs80_state::palette_init_lnw80(palette_device &palette)
 {
 	palette.set_pen_colors(0, lnw80_palette, ARRAY_LENGTH(lnw80_palette));
 }

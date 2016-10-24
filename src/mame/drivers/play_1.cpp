@@ -43,12 +43,12 @@ public:
 	void port04_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void port05_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void port06_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_READ_LINE_MEMBER(clear_r);
-	DECLARE_READ_LINE_MEMBER(wait_r);
-	DECLARE_READ_LINE_MEMBER(ef2_r);
-	DECLARE_READ_LINE_MEMBER(ef3_r);
-	DECLARE_READ_LINE_MEMBER(ef4_r);
-	DECLARE_WRITE_LINE_MEMBER(clock_w);
+	int clear_r();
+	int wait_r();
+	int ef2_r();
+	int ef3_r();
+	int ef4_r();
+	void clock_w(int state);
 
 private:
 	uint16_t m_resetcnt;
@@ -397,7 +397,7 @@ void play_1_state::port06_w(address_space &space, offs_t offset, uint8_t data, u
 	m_waitcnt = 0;
 }
 
-READ_LINE_MEMBER( play_1_state::clear_r )
+int play_1_state::clear_r()
 {
 	// A hack to make the machine reset itself on boot
 	if (m_resetcnt < 0xffff)
@@ -405,7 +405,7 @@ READ_LINE_MEMBER( play_1_state::clear_r )
 	return (m_resetcnt == 0x8000) ? 0 : 1;
 }
 
-READ_LINE_MEMBER( play_1_state::wait_r )
+int play_1_state::wait_r()
 {
 	// Any OUT instruction forces a 60-100msec wait
 	if (m_waitcnt < 0x180)
@@ -417,22 +417,22 @@ READ_LINE_MEMBER( play_1_state::wait_r )
 		return 1;
 }
 
-READ_LINE_MEMBER( play_1_state::ef2_r )
+int play_1_state::ef2_r()
 {
 	return !BIT(m_dips[0]->read(), 0); // 1 or 3 games dip (1=1 game) inverted
 }
 
-READ_LINE_MEMBER( play_1_state::ef3_r )
+int play_1_state::ef3_r()
 {
 	return !BIT(m_dips[0]->read(), 1); // 3 or 5 balls dip (1=5 balls) inverted
 }
 
-READ_LINE_MEMBER( play_1_state::ef4_r )
+int play_1_state::ef4_r()
 {
 	return !BIT(m_dips[0]->read(), 2); // extra ball or game dip (1=extra ball) inverted
 }
 
-WRITE_LINE_MEMBER( play_1_state::clock_w )
+void play_1_state::clock_w(int state)
 {
 	if (state)
 	{

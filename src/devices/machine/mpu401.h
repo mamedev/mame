@@ -45,7 +45,7 @@ public:
 	void port1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t port2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void port2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(midi_rx_w);
+	void midi_rx_w(int state);
 
 	// public API - call for reads/writes at I/O 330/331 on PC, C0n0/C0n1 on Apple II, etc.
 	uint8_t mpu_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);

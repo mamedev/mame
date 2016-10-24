@@ -418,36 +418,36 @@ public:
 	void init_hyperbbc();
 	void init_drmn();
 	void machine_reset_konami573();
-	WRITE_LINE_MEMBER( h8_clk_w );
-	DECLARE_READ_LINE_MEMBER( h8_d0_r );
-	DECLARE_READ_LINE_MEMBER( h8_d1_r );
-	DECLARE_READ_LINE_MEMBER( h8_d2_r );
-	DECLARE_READ_LINE_MEMBER( h8_d3_r );
-	DECLARE_WRITE_LINE_MEMBER( gtrfrks_lamps_b7 );
-	DECLARE_WRITE_LINE_MEMBER( gtrfrks_lamps_b6 );
-	DECLARE_WRITE_LINE_MEMBER( gtrfrks_lamps_b5 );
-	DECLARE_WRITE_LINE_MEMBER( gtrfrks_lamps_b4 );
-	DECLARE_WRITE_LINE_MEMBER( dmx_lamps_b0 );
-	DECLARE_WRITE_LINE_MEMBER( dmx_lamps_b1 );
-	DECLARE_WRITE_LINE_MEMBER( dmx_lamps_b2 );
-	DECLARE_WRITE_LINE_MEMBER( dmx_lamps_b3 );
-	DECLARE_WRITE_LINE_MEMBER( dmx_lamps_b4 );
-	DECLARE_WRITE_LINE_MEMBER( dmx_lamps_b5 );
-	DECLARE_WRITE_LINE_MEMBER( mamboagg_lamps_b3 );
-	DECLARE_WRITE_LINE_MEMBER( mamboagg_lamps_b4 );
-	DECLARE_WRITE_LINE_MEMBER( mamboagg_lamps_b5 );
-	DECLARE_WRITE_LINE_MEMBER( salarymc_lamp_rst );
-	DECLARE_WRITE_LINE_MEMBER( salarymc_lamp_d );
-	DECLARE_WRITE_LINE_MEMBER( salarymc_lamp_clk );
-	DECLARE_WRITE_LINE_MEMBER( hyperbbc_lamp_red );
-	DECLARE_WRITE_LINE_MEMBER( hyperbbc_lamp_green );
-	DECLARE_WRITE_LINE_MEMBER( hyperbbc_lamp_blue );
-	DECLARE_WRITE_LINE_MEMBER( hyperbbc_lamp_start );
-	DECLARE_WRITE_LINE_MEMBER( hyperbbc_lamp_strobe1 );
-	DECLARE_WRITE_LINE_MEMBER( hyperbbc_lamp_strobe2 );
-	DECLARE_WRITE_LINE_MEMBER( hyperbbc_lamp_strobe3 );
-	DECLARE_WRITE_LINE_MEMBER( ata_interrupt );
-	TIMER_CALLBACK_MEMBER( atapi_xfer_end );
+	void h8_clk_w(int state);
+	int h8_d0_r();
+	int h8_d1_r();
+	int h8_d2_r();
+	int h8_d3_r();
+	void gtrfrks_lamps_b7(int state);
+	void gtrfrks_lamps_b6(int state);
+	void gtrfrks_lamps_b5(int state);
+	void gtrfrks_lamps_b4(int state);
+	void dmx_lamps_b0(int state);
+	void dmx_lamps_b1(int state);
+	void dmx_lamps_b2(int state);
+	void dmx_lamps_b3(int state);
+	void dmx_lamps_b4(int state);
+	void dmx_lamps_b5(int state);
+	void mamboagg_lamps_b3(int state);
+	void mamboagg_lamps_b4(int state);
+	void mamboagg_lamps_b5(int state);
+	void salarymc_lamp_rst(int state);
+	void salarymc_lamp_d(int state);
+	void salarymc_lamp_clk(int state);
+	void hyperbbc_lamp_red(int state);
+	void hyperbbc_lamp_green(int state);
+	void hyperbbc_lamp_blue(int state);
+	void hyperbbc_lamp_start(int state);
+	void hyperbbc_lamp_strobe1(int state);
+	void hyperbbc_lamp_strobe2(int state);
+	void hyperbbc_lamp_strobe3(int state);
+	void ata_interrupt(int state);
+	void atapi_xfer_end(void *ptr, int32_t param);
 	void ddr_output_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void ddrsolo_output_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void drmn_output_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -619,7 +619,7 @@ void ksys573_state::control_w(address_space &space, offs_t offset, uint16_t data
 	m_flashbank->set_bank( m_control & 0x3f );
 }
 
-TIMER_CALLBACK_MEMBER( ksys573_state::atapi_xfer_end )
+void ksys573_state::atapi_xfer_end(void *ptr, int32_t param)
 {
 	/// TODO: respect timing of data from ATAPI device.
 
@@ -643,7 +643,7 @@ TIMER_CALLBACK_MEMBER( ksys573_state::atapi_xfer_end )
 	}
 }
 
-WRITE_LINE_MEMBER( ksys573_state::ata_interrupt )
+void ksys573_state::ata_interrupt(int state)
 {
 	m_psxirq->intin10( state );
 }
@@ -789,7 +789,7 @@ void ksys573_state::sys573_vblank( screen_device &screen, bool vblank_state )
 
 // H8 check at startup (JVS related)
 
-WRITE_LINE_MEMBER( ksys573_state::h8_clk_w )
+void ksys573_state::h8_clk_w(int state)
 {
 	if( m_h8_clk != state )
 	{
@@ -805,22 +805,22 @@ WRITE_LINE_MEMBER( ksys573_state::h8_clk_w )
 	}
 }
 
-READ_LINE_MEMBER( ksys573_state::h8_d0_r )
+int ksys573_state::h8_d0_r()
 {
 	return ( m_h8_response[ m_h8_index ] >> 0 ) & 1;
 }
 
-READ_LINE_MEMBER( ksys573_state::h8_d1_r )
+int ksys573_state::h8_d1_r()
 {
 	return ( m_h8_response[ m_h8_index ] >> 1 ) & 1;
 }
 
-READ_LINE_MEMBER( ksys573_state::h8_d2_r )
+int ksys573_state::h8_d2_r()
 {
 	return ( m_h8_response[ m_h8_index ] >> 2 ) & 1;
 }
 
-READ_LINE_MEMBER( ksys573_state::h8_d3_r )
+int ksys573_state::h8_d3_r()
 {
 	return ( m_h8_response[ m_h8_index ] >> 3 ) & 1;
 }
@@ -1171,22 +1171,22 @@ void ksys573_state::init_ddr()
 
 /* Guitar freaks */
 
-WRITE_LINE_MEMBER( ksys573_state::gtrfrks_lamps_b7 )
+void ksys573_state::gtrfrks_lamps_b7(int state)
 {
 	output().set_value( "spot left", state );
 }
 
-WRITE_LINE_MEMBER( ksys573_state::gtrfrks_lamps_b6 )
+void ksys573_state::gtrfrks_lamps_b6(int state)
 {
 	output().set_value( "spot right", state );
 }
 
-WRITE_LINE_MEMBER( ksys573_state::gtrfrks_lamps_b5 )
+void ksys573_state::gtrfrks_lamps_b5(int state)
 {
 	output().set_led_value( 0, state ); // start left
 }
 
-WRITE_LINE_MEMBER( ksys573_state::gtrfrks_lamps_b4 )
+void ksys573_state::gtrfrks_lamps_b4(int state)
 {
 	output().set_led_value( 1, state ); // start right
 }
@@ -1437,39 +1437,39 @@ void ksys573_state::dmx_output_callback(address_space &space, offs_t offset, uin
 	}
 }
 
-WRITE_LINE_MEMBER( ksys573_state::dmx_lamps_b0 )
+void ksys573_state::dmx_lamps_b0(int state)
 {
 	output().set_value( "left 2p", state );
 }
 
-WRITE_LINE_MEMBER( ksys573_state::dmx_lamps_b1 )
+void ksys573_state::dmx_lamps_b1(int state)
 {
 	output().set_led_value( 1, state ); // start 1p
 }
 
-WRITE_LINE_MEMBER( ksys573_state::dmx_lamps_b2 )
+void ksys573_state::dmx_lamps_b2(int state)
 {
 	output().set_value( "right 2p", state );
 }
 
-WRITE_LINE_MEMBER( ksys573_state::dmx_lamps_b3 )
+void ksys573_state::dmx_lamps_b3(int state)
 {
 	output().set_value( "left 1p", state );
 }
 
-WRITE_LINE_MEMBER( ksys573_state::dmx_lamps_b4 )
+void ksys573_state::dmx_lamps_b4(int state)
 {
 	output().set_led_value( 0, state ); // start 2p
 }
 
-WRITE_LINE_MEMBER( ksys573_state::dmx_lamps_b5 )
+void ksys573_state::dmx_lamps_b5(int state)
 {
 	output().set_value( "right 1p", state );
 }
 
 /* salary man champ */
 
-WRITE_LINE_MEMBER( ksys573_state::salarymc_lamp_rst )
+void ksys573_state::salarymc_lamp_rst(int state)
 {
 	if( state )
 	{
@@ -1478,12 +1478,12 @@ WRITE_LINE_MEMBER( ksys573_state::salarymc_lamp_rst )
 	}
 }
 
-WRITE_LINE_MEMBER( ksys573_state::salarymc_lamp_d )
+void ksys573_state::salarymc_lamp_d(int state)
 {
 	m_salarymc_lamp_d = state;
 }
 
-WRITE_LINE_MEMBER( ksys573_state::salarymc_lamp_clk )
+void ksys573_state::salarymc_lamp_clk(int state)
 {
 	if( state && !m_salarymc_lamp_clk )
 	{
@@ -1537,27 +1537,27 @@ void ksys573_state::init_salarymc()
 
 /* Hyper Bishi Bashi Champ */
 
-WRITE_LINE_MEMBER( ksys573_state::hyperbbc_lamp_red )
+void ksys573_state::hyperbbc_lamp_red(int state)
 {
 	m_hyperbbc_lamp_red = state;
 }
 
-WRITE_LINE_MEMBER( ksys573_state::hyperbbc_lamp_green )
+void ksys573_state::hyperbbc_lamp_green(int state)
 {
 	m_hyperbbc_lamp_green = state;
 }
 
-WRITE_LINE_MEMBER( ksys573_state::hyperbbc_lamp_blue )
+void ksys573_state::hyperbbc_lamp_blue(int state)
 {
 	m_hyperbbc_lamp_blue = state;
 }
 
-WRITE_LINE_MEMBER( ksys573_state::hyperbbc_lamp_start )
+void ksys573_state::hyperbbc_lamp_start(int state)
 {
 	m_hyperbbc_lamp_start = state;
 }
 
-WRITE_LINE_MEMBER( ksys573_state::hyperbbc_lamp_strobe1 )
+void ksys573_state::hyperbbc_lamp_strobe1(int state)
 {
 	if( state && !m_hyperbbc_lamp_strobe1 )
 	{
@@ -1570,7 +1570,7 @@ WRITE_LINE_MEMBER( ksys573_state::hyperbbc_lamp_strobe1 )
 	m_hyperbbc_lamp_strobe1 = state;
 }
 
-WRITE_LINE_MEMBER( ksys573_state::hyperbbc_lamp_strobe2 )
+void ksys573_state::hyperbbc_lamp_strobe2(int state)
 {
 	if( state && !m_hyperbbc_lamp_strobe2 )
 	{
@@ -1583,7 +1583,7 @@ WRITE_LINE_MEMBER( ksys573_state::hyperbbc_lamp_strobe2 )
 	m_hyperbbc_lamp_strobe2 = state;
 }
 
-WRITE_LINE_MEMBER( ksys573_state::hyperbbc_lamp_strobe3 )
+void ksys573_state::hyperbbc_lamp_strobe3(int state)
 {
 	if( state && !m_hyperbbc_lamp_strobe3 )
 	{
@@ -1665,17 +1665,17 @@ void ksys573_state::mamboagg_output_callback(address_space &space, offs_t offset
 	}
 }
 
-WRITE_LINE_MEMBER( ksys573_state::mamboagg_lamps_b3 )
+void ksys573_state::mamboagg_lamps_b3(int state)
 {
 	output().set_led_value( 0, state ); // start 1p
 }
 
-WRITE_LINE_MEMBER( ksys573_state::mamboagg_lamps_b4 )
+void ksys573_state::mamboagg_lamps_b4(int state)
 {
 	output().set_value( "select right", state );
 }
 
-WRITE_LINE_MEMBER( ksys573_state::mamboagg_lamps_b5 )
+void ksys573_state::mamboagg_lamps_b5(int state)
 {
 	output().set_value( "select left", state );
 }

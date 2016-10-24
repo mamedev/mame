@@ -22,7 +22,7 @@
  *
  *************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(ironhors_state::irq)
+void ironhors_state::irq(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -401,7 +401,7 @@ static MACHINE_CONFIG_START( ironhors, ironhors_state )
 
 MACHINE_CONFIG_END
 
-TIMER_DEVICE_CALLBACK_MEMBER(ironhors_state::farwest_irq)
+void ironhors_state::farwest_irq(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

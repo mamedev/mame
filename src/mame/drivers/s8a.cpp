@@ -52,13 +52,13 @@ public:
 	void sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t switch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void switch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_READ_LINE_MEMBER(pia21_ca1_r);
-	DECLARE_WRITE_LINE_MEMBER(pia21_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia21_cb2_w) { }; // enable solenoids
-	DECLARE_WRITE_LINE_MEMBER(pia24_cb2_w) { }; // dummy to stop error log filling up
-	DECLARE_WRITE_LINE_MEMBER(pia28_ca2_w) { }; // comma3&4
-	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { }; // comma1&2
-	DECLARE_WRITE_LINE_MEMBER(pia_irq);
+	int pia21_ca1_r();
+	void pia21_ca2_w(int state);
+	void pia21_cb2_w(int state) { }; // enable solenoids
+	void pia24_cb2_w(int state) { }; // dummy to stop error log filling up
+	void pia28_ca2_w(int state) { }; // comma3&4
+	void pia28_cb2_w(int state) { }; // comma1&2
+	void pia_irq(int state);
 	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 	void machine_reset_s8a();
@@ -171,13 +171,13 @@ void s8a_state::sound_w(address_space &space, offs_t offset, uint8_t data, uint8
 	m_sound_data = data;
 }
 
-READ_LINE_MEMBER( s8a_state::pia21_ca1_r )
+int s8a_state::pia21_ca1_r()
 {
 // sound busy
 	return 1;
 }
 
-WRITE_LINE_MEMBER( s8a_state::pia21_ca2_w )
+void s8a_state::pia21_ca2_w(int state)
 {
 // sound ns
 	m_pias->ca1_w(state);
@@ -224,7 +224,7 @@ uint8_t s8a_state::sound_r(address_space &space, offs_t offset, uint8_t mem_mask
 	return m_sound_data;
 }
 
-WRITE_LINE_MEMBER( s8a_state::pia_irq )
+void s8a_state::pia_irq(int state)
 {
 	if(state == CLEAR_LINE)
 	{

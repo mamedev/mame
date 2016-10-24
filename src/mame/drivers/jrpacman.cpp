@@ -113,7 +113,7 @@ public:
 	void jrpacman_interrupt_vector_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void irq_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_jrpacman();
-	INTERRUPT_GEN_MEMBER(vblank_irq);
+	void vblank_irq(device_t &device);
 };
 
 
@@ -266,7 +266,7 @@ GFXDECODE_END
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(jrpacman_state::vblank_irq)
+void jrpacman_state::vblank_irq(device_t &device)
 {
 	if(m_irq_mask)
 		device.execute().set_input_line(0, HOLD_LINE);

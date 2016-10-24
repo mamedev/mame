@@ -659,7 +659,7 @@
 *               Read/Write Handlers               *
 **************************************************/
 
-WRITE_LINE_MEMBER(calomega_state::update_aciabaud_scale)
+void calomega_state::update_aciabaud_scale(int state)
 {
 	uint8_t dsw2 = m_sw2->read();
 
@@ -730,7 +730,7 @@ void calomega_state::pia0_bout_w(address_space &space, offs_t offset, uint8_t da
 	logerror("PIA0: Port B out: %02X\n", data);
 }
 
-WRITE_LINE_MEMBER(calomega_state::pia0_ca2_w)
+void calomega_state::pia0_ca2_w(int state)
 {
 	/* Seems a kind of "heartbit" watchdog, switching 1's and 0's */
 	logerror("PIA0: CA2: %02X\n", state);
@@ -2547,12 +2547,12 @@ GFXDECODE_END
 *                 ACIA Interface                 *
 *************************************************/
 
-WRITE_LINE_MEMBER(calomega_state::write_acia_tx)
+void calomega_state::write_acia_tx(int state)
 {
 	m_tx_line = state;
 }
 
-WRITE_LINE_MEMBER(calomega_state::write_acia_clock)
+void calomega_state::write_acia_clock(int state)
 {
 	m_acia6850_0->write_txc(state);
 	m_acia6850_0->write_rxc(state);

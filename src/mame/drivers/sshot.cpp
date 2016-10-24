@@ -182,7 +182,7 @@ public:
 	void supershot_vidram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void supershot_output0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void supershot_output1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	TILE_GET_INFO_MEMBER(get_supershot_text_tile_info);
+	void get_supershot_text_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void video_start() override;
 	uint32_t screen_update_supershot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
@@ -196,7 +196,7 @@ public:
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(supershot_state::get_supershot_text_tile_info)
+void supershot_state::get_supershot_text_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t code = m_videoram[tile_index];
 	SET_TILE_INFO_MEMBER(0, code, 0, 0);

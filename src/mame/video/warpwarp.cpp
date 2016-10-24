@@ -20,7 +20,7 @@ static const rgb_t geebee_palette[] =
 	rgb_t(0x7f,0x7f,0x7f)  /* grey  */
 };
 
-PALETTE_INIT_MEMBER(warpwarp_state,geebee)
+void warpwarp_state::palette_init_geebee(palette_device &palette)
 {
 	palette.set_pen_color(0, geebee_palette[0]);
 	palette.set_pen_color(1, geebee_palette[1]);
@@ -32,7 +32,7 @@ PALETTE_INIT_MEMBER(warpwarp_state,geebee)
 	palette.set_pen_color(7, geebee_palette[0]);
 }
 
-PALETTE_INIT_MEMBER(warpwarp_state,navarone)
+void warpwarp_state::palette_init_navarone(palette_device &palette)
 {
 	palette.set_pen_color(0, geebee_palette[0]);
 	palette.set_pen_color(1, geebee_palette[1]);
@@ -61,7 +61,7 @@ PALETTE_INIT_MEMBER(warpwarp_state,navarone)
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(warpwarp_state,warpwarp)
+void warpwarp_state::palette_init_warpwarp(palette_device &palette)
 {
 	static const int resistances_tiles_rg[] = { 1600, 820, 390 };
 	static const int resistances_tiles_b[]  = { 820, 390 };
@@ -112,7 +112,7 @@ PALETTE_INIT_MEMBER(warpwarp_state,warpwarp)
 ***************************************************************************/
 
 /* convert from 32x32 to 34x28 */
-TILEMAP_MAPPER_MEMBER(warpwarp_state::tilemap_scan)
+tilemap_memory_index warpwarp_state::tilemap_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	int offs;
 
@@ -126,7 +126,7 @@ TILEMAP_MAPPER_MEMBER(warpwarp_state::tilemap_scan)
 	return offs;
 }
 
-TILE_GET_INFO_MEMBER(warpwarp_state::geebee_get_tile_info)
+void warpwarp_state::geebee_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_geebee_videoram[tile_index];
 	int color = (m_geebee_bgw & 1) | ((code & 0x80) >> 6);
@@ -136,7 +136,7 @@ TILE_GET_INFO_MEMBER(warpwarp_state::geebee_get_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(warpwarp_state::navarone_get_tile_info)
+void warpwarp_state::navarone_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_geebee_videoram[tile_index];
 	int color = m_geebee_bgw & 1;
@@ -146,7 +146,7 @@ TILE_GET_INFO_MEMBER(warpwarp_state::navarone_get_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(warpwarp_state::warpwarp_get_tile_info)
+void warpwarp_state::warpwarp_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	SET_TILE_INFO_MEMBER(0,
 			m_videoram[tile_index],

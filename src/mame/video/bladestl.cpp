@@ -4,7 +4,7 @@
 #include "includes/bladestl.h"
 
 
-PALETTE_INIT_MEMBER(bladestl_state, bladestl)
+void bladestl_state::palette_init_bladestl(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;

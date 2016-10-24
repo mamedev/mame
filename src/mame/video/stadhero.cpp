@@ -42,7 +42,7 @@ void stadhero_state::stadhero_pf1_data_w(address_space &space, offs_t offset, ui
 
 /******************************************************************************/
 
-TILE_GET_INFO_MEMBER(stadhero_state::get_pf1_tile_info)
+void stadhero_state::get_pf1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile=m_pf1_data[tile_index];
 	int color=tile >> 12;

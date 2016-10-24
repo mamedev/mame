@@ -76,11 +76,11 @@ public:
 	void nmi_reg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t nmi_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t nmi_portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	TIMER_CALLBACK_MEMBER(pio_timer);
+	void pio_timer(void *ptr, int32_t param);
 	void init_p7_lcd();
 	void init_p7_raster();
 	void video_start_pasopia7();
-	DECLARE_PALETTE_INIT(p7_lcd);
+	void palette_init_p7_lcd(palette_device &palette);
 	uint32_t screen_update_pasopia7(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 private:
@@ -134,7 +134,7 @@ private:
 #define LCD_CLOCK VDP_CLOCK/10
 
 // needed to scan the keyboard, as the pio emulation doesn't do it.
-TIMER_CALLBACK_MEMBER( pasopia7_state::pio_timer )
+void pasopia7_state::pio_timer(void *ptr, int32_t param)
 {
 	m_pio->port_b_write(keyb_r(generic_space(),0,0xff));
 }
@@ -883,7 +883,7 @@ void pasopia7_state::machine_reset()
 }
 
 /* TODO: palette values are mostly likely to be wrong in there */
-PALETTE_INIT_MEMBER(pasopia7_state,p7_lcd)
+void pasopia7_state::palette_init_p7_lcd(palette_device &palette)
 {
 	int i;
 

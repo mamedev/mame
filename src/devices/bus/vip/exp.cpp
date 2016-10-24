@@ -181,12 +181,12 @@ uint32_t vip_expansion_slot_device::screen_update(screen_device &screen, bitmap_
 	return value;
 }
 
-READ_LINE_MEMBER( vip_expansion_slot_device::ef1_r ) { int state = CLEAR_LINE; if (m_card != nullptr) state = m_card->vip_ef1_r(); return state; }
-READ_LINE_MEMBER( vip_expansion_slot_device::ef3_r ) { int state = CLEAR_LINE; if (m_card != nullptr) state = m_card->vip_ef3_r(); return state; }
-READ_LINE_MEMBER( vip_expansion_slot_device::ef4_r ) { int state = CLEAR_LINE; if (m_card != nullptr) state = m_card->vip_ef4_r(); return state; }
+int vip_expansion_slot_device::ef1_r() { int state = CLEAR_LINE; if (m_card != nullptr) state = m_card->vip_ef1_r(); return state; }
+int vip_expansion_slot_device::ef3_r() { int state = CLEAR_LINE; if (m_card != nullptr) state = m_card->vip_ef3_r(); return state; }
+int vip_expansion_slot_device::ef4_r() { int state = CLEAR_LINE; if (m_card != nullptr) state = m_card->vip_ef4_r(); return state; }
 void vip_expansion_slot_device::sc_w(int data) { if (m_card != nullptr) m_card->vip_sc_w(data); }
-WRITE_LINE_MEMBER( vip_expansion_slot_device::q_w ) { if (m_card != nullptr) m_card->vip_q_w(state); }
-WRITE_LINE_MEMBER( vip_expansion_slot_device::run_w ) { if (m_card != nullptr) m_card->vip_run_w(state); }
+void vip_expansion_slot_device::q_w(int state) { if (m_card != nullptr) m_card->vip_q_w(state); }
+void vip_expansion_slot_device::run_w(int state) { if (m_card != nullptr) m_card->vip_run_w(state); }
 
 
 

@@ -136,7 +136,7 @@ void a2bus_arcboard_device::write_c0nx(address_space &space, uint8_t offset, uin
 	}
 }
 
-WRITE_LINE_MEMBER( a2bus_arcboard_device::tms_irq_w )
+void a2bus_arcboard_device::tms_irq_w(int state)
 {
 	if (state)
 	{

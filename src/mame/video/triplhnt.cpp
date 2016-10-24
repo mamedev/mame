@@ -10,7 +10,7 @@ Atari Triple Hunt video emulation
 #include "includes/triplhnt.h"
 
 
-TILE_GET_INFO_MEMBER(triplhnt_state::get_tile_info)
+void triplhnt_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_playfield_ram[tile_index] & 0x3f;
 

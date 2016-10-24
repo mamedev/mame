@@ -26,9 +26,9 @@ public:
 			// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	DECLARE_WRITE_LINE_MEMBER(pit_out0_w);
-	DECLARE_WRITE_LINE_MEMBER(pit_out1_w);
-	DECLARE_WRITE_LINE_MEMBER(pit_out2_w);
+	void pit_out0_w(int state);
+	void pit_out1_w(int state);
+	void pit_out2_w(int state);
 
 	uint8_t dart_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void dart_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);

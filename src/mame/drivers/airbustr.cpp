@@ -519,7 +519,7 @@ GFXDECODE_END
 /* Interrupt Generators */
 
 /* Main Z80 uses IM2 */
-TIMER_DEVICE_CALLBACK_MEMBER(airbustr_state::airbustr_scanline)
+void airbustr_state::airbustr_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -532,7 +532,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(airbustr_state::airbustr_scanline)
 }
 
 /* Sub Z80 uses IM2 too, but 0xff irq routine just contains an irq ack in it */
-INTERRUPT_GEN_MEMBER(airbustr_state::slave_interrupt)
+void airbustr_state::slave_interrupt(device_t &device)
 {
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xfd);
 }

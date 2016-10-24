@@ -134,12 +134,12 @@ void decobsmt_device::bsmt_comms_w(address_space &space, offs_t offset, uint8_t 
 	m_bsmt_comms = data;
 }
 
-WRITE_LINE_MEMBER(decobsmt_device::bsmt_reset_line)
+void decobsmt_device::bsmt_reset_line(int state)
 {
 	m_ourcpu->set_input_line(INPUT_LINE_RESET, state);
 }
 
-INTERRUPT_GEN_MEMBER(decobsmt_device::decobsmt_firq_interrupt)
+void decobsmt_device::decobsmt_firq_interrupt(device_t &device)
 {
 	device.execute().set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 }

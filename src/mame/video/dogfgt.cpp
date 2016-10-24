@@ -13,7 +13,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(dogfgt_state, dogfgt)
+void dogfgt_state::palette_init_dogfgt(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -51,7 +51,7 @@ PALETTE_INIT_MEMBER(dogfgt_state, dogfgt)
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(dogfgt_state::get_tile_info)
+void dogfgt_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	SET_TILE_INFO_MEMBER(0,
 			m_bgvideoram[tile_index],

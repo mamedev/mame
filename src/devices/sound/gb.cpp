@@ -234,7 +234,7 @@ void cgb04_apu_device::device_reset()
     IMPLEMENTATION
 ***************************************************************************/
 
-TIMER_CALLBACK_MEMBER(gameboy_sound_device::timer_callback)
+void gameboy_sound_device::timer_callback(void *ptr, int32_t param)
 {
 	m_channel->update();
 	update_state();

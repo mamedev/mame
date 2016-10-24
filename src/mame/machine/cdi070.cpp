@@ -244,7 +244,7 @@ void cdi68070_device::set_quizard_mcu_value(uint16_t value)
 	m_mcu_value = value;
 }
 
-TIMER_CALLBACK_MEMBER( cdi68070_device::timer0_callback )
+void cdi68070_device::timer0_callback(void *ptr, int32_t param)
 {
 	cdi_state *state = machine().driver_data<cdi_state>();
 
@@ -317,7 +317,7 @@ void cdi68070_device::uart_tx(uint8_t data)
 	uart_tx_check();
 }
 
-TIMER_CALLBACK_MEMBER( cdi68070_device::rx_callback )
+void cdi68070_device::rx_callback(void *ptr, int32_t param)
 {
 	cdi_state *state = machine().driver_data<cdi_state>();
 
@@ -529,7 +529,7 @@ void cdi68070_device::quizard_handle_byte_tx()
 	}
 }
 
-TIMER_CALLBACK_MEMBER( cdi68070_device::tx_callback )
+void cdi68070_device::tx_callback(void *ptr, int32_t param)
 {
 	cdi_state *state = machine().driver_data<cdi_state>();
 

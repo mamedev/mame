@@ -227,7 +227,7 @@ void megazone_state::machine_reset()
 	m_i8039_status = 0;
 }
 
-INTERRUPT_GEN_MEMBER(megazone_state::vblank_irq)
+void megazone_state::vblank_irq(device_t &device)
 {
 	if(m_irq_mask)
 		device.execute().set_input_line(0, HOLD_LINE);

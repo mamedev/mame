@@ -62,7 +62,7 @@ public:
 	virtual void machine_reset() override;
 
 	void init_asr();
-	DECLARE_WRITE_LINE_MEMBER(esq5506_otto_irq);
+	void esq5506_otto_irq(int state);
 	uint16_t esq5506_read_adc(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 };
 
@@ -81,7 +81,7 @@ static ADDRESS_MAP_START( asrx_map, AS_PROGRAM, 32, esqasr_state )
 	AM_RANGE(0x0be00000, 0x0befffff) AM_RAM
 ADDRESS_MAP_END
 
-WRITE_LINE_MEMBER(esqasr_state::esq5506_otto_irq)
+void esqasr_state::esq5506_otto_irq(int state)
 {
 }
 

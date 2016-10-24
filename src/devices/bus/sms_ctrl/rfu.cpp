@@ -128,7 +128,7 @@ void sms_rapid_fire_device::peripheral_w(uint8_t data)
 //  machine configurations
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( sms_rapid_fire_device::th_pin_w )
+void sms_rapid_fire_device::th_pin_w(int state)
 {
 	m_port->th_pin_w(state);
 }

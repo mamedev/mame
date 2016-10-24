@@ -29,21 +29,21 @@
 
 /******************************************************************************/
 
-TILE_GET_INFO_MEMBER(bbusters_state::get_tile_info)
+void bbusters_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t tile = m_videoram[tile_index];
 
 	SET_TILE_INFO_MEMBER(0,tile&0xfff,tile>>12,0);
 }
 
-TILE_GET_INFO_MEMBER(bbusters_state::get_pf1_tile_info)
+void bbusters_state::get_pf1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t tile = m_pf1_data[tile_index];
 
 	SET_TILE_INFO_MEMBER(3,tile&0xfff,tile>>12,0);
 }
 
-TILE_GET_INFO_MEMBER(bbusters_state::get_pf2_tile_info)
+void bbusters_state::get_pf2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t tile = m_pf2_data[tile_index];
 

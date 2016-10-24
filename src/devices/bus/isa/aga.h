@@ -46,8 +46,8 @@ public:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual ioport_constructor device_input_ports() const override;
 
-	DECLARE_WRITE_LINE_MEMBER( hsync_changed );
-	DECLARE_WRITE_LINE_MEMBER( vsync_changed );
+	void hsync_changed(int state);
+	void vsync_changed(int state);
 
 	uint8_t pc_aga_mda_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void pc_aga_mda_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);

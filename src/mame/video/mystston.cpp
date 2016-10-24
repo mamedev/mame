@@ -47,7 +47,7 @@
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(mystston_state::interrupt_callback)
+void mystston_state::interrupt_callback(void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -148,7 +148,7 @@ void mystston_state::mystston_video_control_w(address_space &space, offs_t offse
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(mystston_state::get_bg_tile_info)
+void mystston_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int page = (*m_video_control & 0x04) << 8;
 	int code = ((m_bg_videoram[page | 0x200 | tile_index] & 0x01) << 8) | m_bg_videoram[page | tile_index];
@@ -158,7 +158,7 @@ TILE_GET_INFO_MEMBER(mystston_state::get_bg_tile_info)
 }
 
 
-TILE_GET_INFO_MEMBER(mystston_state::get_fg_tile_info)
+void mystston_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = ((m_fg_videoram[0x400 | tile_index] & 0x07) << 8) | m_fg_videoram[tile_index];
 	int color = ((*m_video_control & 0x01) << 1) | ((*m_video_control & 0x02) >> 1);

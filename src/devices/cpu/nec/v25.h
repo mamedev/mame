@@ -63,7 +63,7 @@ public:
 	template<class _Object> static devcb_base & set_p1_out_cb(device_t &device, _Object object) { return downcast<v25_common_device &>(device).m_p1_out.set_callback(object); }
 	template<class _Object> static devcb_base & set_p2_out_cb(device_t &device, _Object object) { return downcast<v25_common_device &>(device).m_p2_out.set_callback(object); }
 
-	TIMER_CALLBACK_MEMBER(v25_timer_callback);
+	void v25_timer_callback(void *ptr, int32_t param);
 
 protected:
 	// device-level overrides

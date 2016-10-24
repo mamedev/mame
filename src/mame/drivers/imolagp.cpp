@@ -121,13 +121,13 @@ public:
 	void vreg_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void vreg_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_CUSTOM_INPUT_MEMBER(imolagp_steerlatch_r);
-	INTERRUPT_GEN_MEMBER(slave_vblank_irq);
-	TIMER_DEVICE_CALLBACK_MEMBER(imolagp_pot_callback);
+	void slave_vblank_irq(device_t &device);
+	void imolagp_pot_callback(timer_device &timer, void *ptr, int32_t param);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(imolagp);
+	void palette_init_imolagp(palette_device &palette);
 	uint32_t screen_update_imolagp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
@@ -138,7 +138,7 @@ public:
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(imolagp_state, imolagp)
+void imolagp_state::palette_init_imolagp(palette_device &palette)
 {
 	// palette seems like 3bpp + intensity
 	// this still needs to be verified
@@ -197,7 +197,7 @@ uint32_t imolagp_state::screen_update_imolagp(screen_device &screen, bitmap_ind1
 
 ***************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(imolagp_state::imolagp_pot_callback)
+void imolagp_state::imolagp_pot_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	int steer = m_steer_inp->read();
 	if (steer & 0x7f)
@@ -220,7 +220,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(imolagp_state::imolagp_pot_callback)
 		m_steer_pot_timer->adjust(attotime::from_msec(20));
 }
 
-INTERRUPT_GEN_MEMBER(imolagp_state::slave_vblank_irq)
+void imolagp_state::slave_vblank_irq(device_t &device)
 {
 	m_scroll = m_vreg[0xe]; // latch scroll
 	device.execute().set_input_line(0, HOLD_LINE);

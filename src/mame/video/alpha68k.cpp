@@ -22,7 +22,7 @@ void alpha68k_state::alpha68k_V_video_bank_w( int bank )
 
 /******************************************************************************/
 
-TILE_GET_INFO_MEMBER(alpha68k_state::get_tile_info)
+void alpha68k_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = m_videoram[2 * tile_index] & 0xff;
 	int color = m_videoram[2 * tile_index + 1] & 0x0f;
@@ -348,7 +348,7 @@ uint32_t alpha68k_state::screen_update_alpha68k_I(screen_device &screen, bitmap_
 //ZT
 /******************************************************************************/
 
-PALETTE_INIT_MEMBER(alpha68k_state,kyros)
+void alpha68k_state::palette_init_kyros(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -373,7 +373,7 @@ PALETTE_INIT_MEMBER(alpha68k_state,kyros)
 	}
 }
 
-PALETTE_INIT_MEMBER(alpha68k_state,paddlem)
+void alpha68k_state::palette_init_paddlem(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;

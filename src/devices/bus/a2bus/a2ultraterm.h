@@ -30,7 +30,7 @@ public:
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	DECLARE_WRITE_LINE_MEMBER(vsync_changed);
+	void vsync_changed(int state);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
 	uint8_t *m_rom, *m_chrrom;

@@ -90,12 +90,12 @@ void isa8_fdc_device::device_reset()
 {
 }
 
-WRITE_LINE_MEMBER( isa8_fdc_device::irq_w )
+void isa8_fdc_device::irq_w(int state)
 {
 	m_isa->irq6_w(state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER( isa8_fdc_device::drq_w )
+void isa8_fdc_device::drq_w(int state)
 {
 	m_isa->drq2_w(state ? ASSERT_LINE : CLEAR_LINE);
 }

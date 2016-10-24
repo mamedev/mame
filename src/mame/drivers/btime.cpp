@@ -183,7 +183,7 @@ void btime_state::ay_audio_nmi_enable_w(address_space &space, offs_t offset, uin
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(btime_state::audio_nmi_gen)
+void btime_state::audio_nmi_gen(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 	m_audio_nmi_state = scanline & 8;

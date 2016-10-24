@@ -40,13 +40,13 @@ Boards:
 #define SOUND_CLOCK         XTAL_14_31818MHz
 
 
-INTERRUPT_GEN_MEMBER(pandoras_state::pandoras_master_interrupt)
+void pandoras_state::pandoras_master_interrupt(device_t &device)
 {
 	if (m_irq_enable_a)
 		device.execute().set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(pandoras_state::pandoras_slave_interrupt)
+void pandoras_state::pandoras_slave_interrupt(device_t &device)
 {
 	if (m_irq_enable_b)
 		device.execute().set_input_line(M6809_IRQ_LINE, HOLD_LINE);

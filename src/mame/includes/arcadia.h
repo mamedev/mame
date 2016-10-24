@@ -98,9 +98,9 @@ public:
 	void init_arcadia();
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(arcadia);
+	void palette_init_arcadia(palette_device &palette);
 	uint32_t screen_update_arcadia(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(video_line);
+	void video_line(device_t &device);
 
 protected:
 	required_device<arcadia_sound_device> m_custom;

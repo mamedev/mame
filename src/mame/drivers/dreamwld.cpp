@@ -143,8 +143,8 @@ public:
 	uint32_t dreamwld_protdata_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	void dreamwld_6295_0_bank_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	void dreamwld_6295_1_bank_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
-	TILE_GET_INFO_MEMBER(get_dreamwld_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_dreamwld_bg2_tile_info);
+	void get_dreamwld_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_dreamwld_bg2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -233,7 +233,7 @@ void dreamwld_state::dreamwld_bg_videoram_w(address_space &space, offs_t offset,
 	m_bg_tilemap->mark_tile_dirty(offset * 2 + 1);
 }
 
-TILE_GET_INFO_MEMBER(dreamwld_state::get_dreamwld_bg_tile_info)
+void dreamwld_state::get_dreamwld_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno, colour;
 	tileno = (tile_index & 1) ? (m_bg_videoram[tile_index >> 1] & 0xffff) : ((m_bg_videoram[tile_index >> 1] >> 16) & 0xffff);
@@ -250,7 +250,7 @@ void dreamwld_state::dreamwld_bg2_videoram_w(address_space &space, offs_t offset
 	m_bg2_tilemap->mark_tile_dirty(offset * 2 + 1);
 }
 
-TILE_GET_INFO_MEMBER(dreamwld_state::get_dreamwld_bg2_tile_info)
+void dreamwld_state::get_dreamwld_bg2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t tileno, colour;
 	tileno = (tile_index & 1) ? (m_bg2_videoram[tile_index >> 1] & 0xffff) : ((m_bg2_videoram[tile_index >> 1] >> 16) & 0xffff);

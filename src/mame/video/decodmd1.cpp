@@ -186,7 +186,7 @@ void decodmd_type1_device::set_busy(uint8_t input, uint8_t val)
 	m_cpu->set_input_line(INPUT_LINE_IRQ0,m_busy ? ASSERT_LINE : CLEAR_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(decodmd_type1_device::dmd_nmi)
+void decodmd_type1_device::dmd_nmi(timer_device &timer, void *ptr, int32_t param)
 {
 	m_cpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }

@@ -34,11 +34,11 @@ public:
 	void machine_start_sraider();
 	void machine_reset_sraider();
 	void video_start_sraider();
-	DECLARE_PALETTE_INIT(sraider);
+	void palette_init_sraider(palette_device &palette);
 	void machine_start_redclash();
 	void machine_reset_redclash();
 	void video_start_redclash();
-	DECLARE_PALETTE_INIT(redclash);
+	void palette_init_redclash(palette_device &palette);
 	uint32_t screen_update_sraider(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_redclash(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_sraider(screen_device &screen, bool state);
@@ -46,7 +46,7 @@ public:
 	void redclash_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void redclash_gfxbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void redclash_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	void redclash_star0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void redclash_star1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);

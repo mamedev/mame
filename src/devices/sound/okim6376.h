@@ -30,11 +30,11 @@ public:
 
 	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( st_w );
-	DECLARE_WRITE_LINE_MEMBER( ch2_w );
+	void st_w(int state);
+	void ch2_w(int state);
 
-	DECLARE_READ_LINE_MEMBER( busy_r );
-	DECLARE_READ_LINE_MEMBER( nar_r );
+	int busy_r();
+	int nar_r();
 
 	void set_frequency(int frequency);
 

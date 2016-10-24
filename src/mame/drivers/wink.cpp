@@ -50,7 +50,7 @@ public:
 	void prot_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t sound_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	void init_wink();
 	virtual void machine_start() override;
@@ -59,11 +59,11 @@ public:
 
 	uint32_t screen_update_wink(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	INTERRUPT_GEN_MEMBER(wink_sound);
+	void wink_sound(device_t &device);
 };
 
 
-TILE_GET_INFO_MEMBER(wink_state::get_bg_tile_info)
+void wink_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *videoram = m_videoram;
 	int code = videoram[tile_index];
@@ -336,7 +336,7 @@ uint8_t wink_state::sound_r(address_space &space, offs_t offset, uint8_t mem_mas
 }
 
 //AY portA is fed by an input clock at 15625 Hz
-INTERRUPT_GEN_MEMBER(wink_state::wink_sound)
+void wink_state::wink_sound(device_t &device)
 {
 	m_sound_flag ^= 0x80;
 }

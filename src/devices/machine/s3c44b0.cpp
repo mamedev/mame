@@ -473,7 +473,7 @@ int s3c44b0_device::lcd_get_hpos()
 	return delta / m_lcd.pixeltime;
 }
 
-TIMER_CALLBACK_MEMBER( s3c44b0_device::lcd_timer_exp )
+void s3c44b0_device::lcd_timer_exp(void *ptr, int32_t param)
 {
 	int vpos = m_lcd.vpos;
 	verboselog( *this, 2, "LCD timer callback (%f)\n", machine().time().as_double());
@@ -1029,7 +1029,7 @@ void s3c44b0_device::pwm_w(address_space &space, offs_t offset, uint32_t data, u
 	}
 }
 
-TIMER_CALLBACK_MEMBER( s3c44b0_device::pwm_timer_exp )
+void s3c44b0_device::pwm_timer_exp(void *ptr, int32_t param)
 {
 	int ch = param;
 	const int ch_int[] = { S3C44B0_INT_TIMER0, S3C44B0_INT_TIMER1, S3C44B0_INT_TIMER2, S3C44B0_INT_TIMER3, S3C44B0_INT_TIMER4, S3C44B0_INT_TIMER5 };
@@ -1250,7 +1250,7 @@ void s3c44b0_device::iic_w(address_space &space, offs_t offset, uint32_t data, u
 	}
 }
 
-TIMER_CALLBACK_MEMBER( s3c44b0_device::iic_timer_exp )
+void s3c44b0_device::iic_timer_exp(void *ptr, int32_t param)
 {
 	int enable_interrupt;
 	verboselog( *this, 2, "IIC timer callback\n");
@@ -1460,7 +1460,7 @@ void s3c44b0_device::uart_fifo_w(int uart, uint8_t data)
 	m_uart[uart].regs.utrstat |= 1; // [bit 0] Receive buffer data ready
 }
 
-TIMER_CALLBACK_MEMBER( s3c44b0_device::uart_timer_exp )
+void s3c44b0_device::uart_timer_exp(void *ptr, int32_t param)
 {
 	int ch = param;
 	verboselog( *this, 2, "UART %d timer callback\n", ch);
@@ -1544,7 +1544,7 @@ void s3c44b0_device::wdt_w(address_space &space, offs_t offset, uint32_t data, u
 	}
 }
 
-TIMER_CALLBACK_MEMBER( s3c44b0_device::wdt_timer_exp )
+void s3c44b0_device::wdt_timer_exp(void *ptr, int32_t param)
 {
 	verboselog( *this, 2, "WDT timer callback\n");
 	if ((m_wdt.regs.wtcon & (1 << 2)) != 0)
@@ -1628,7 +1628,7 @@ void s3c44b0_device::adc_w(address_space &space, offs_t offset, uint32_t data, u
 	}
 }
 
-TIMER_CALLBACK_MEMBER( s3c44b0_device::adc_timer_exp )
+void s3c44b0_device::adc_timer_exp(void *ptr, int32_t param)
 {
 	verboselog( *this, 2, "ADC timer callback\n");
 	m_adc.regs.adccon |= (1 << 6);
@@ -1692,7 +1692,7 @@ void s3c44b0_device::sio_w(address_space &space, offs_t offset, uint32_t data, u
 	}
 }
 
-TIMER_CALLBACK_MEMBER( s3c44b0_device::sio_timer_exp )
+void s3c44b0_device::sio_timer_exp(void *ptr, int32_t param)
 {
 	verboselog( *this, 2, "SIO timer callback\n");
 
@@ -1783,7 +1783,7 @@ void s3c44b0_device::iis_w(address_space &space, offs_t offset, uint32_t data, u
 	}
 }
 
-TIMER_CALLBACK_MEMBER( s3c44b0_device::iis_timer_exp )
+void s3c44b0_device::iis_timer_exp(void *ptr, int32_t param)
 {
 	verboselog( *this, 2, "IIS timer callback\n");
 	if ((m_iis.regs.iiscon & (1 << 5)) != 0)
@@ -1906,7 +1906,7 @@ void s3c44b0_device::zdma_1_w(address_space &space, offs_t offset, uint32_t data
 	zdma_w(1, offset, data, mem_mask);
 }
 
-TIMER_CALLBACK_MEMBER( s3c44b0_device::zdma_timer_exp )
+void s3c44b0_device::zdma_timer_exp(void *ptr, int32_t param)
 {
 	int ch = param;
 	verboselog( *this, 2, "ZDMA %d timer callback\n", ch);
@@ -2046,7 +2046,7 @@ void s3c44b0_device::bdma_1_w(address_space &space, offs_t offset, uint32_t data
 	bdma_w(1, offset, data, mem_mask);
 }
 
-TIMER_CALLBACK_MEMBER( s3c44b0_device::bdma_timer_exp )
+void s3c44b0_device::bdma_timer_exp(void *ptr, int32_t param)
 {
 	int ch = param;
 	verboselog( *this, 2, "BDMA %d timer callback\n", ch);

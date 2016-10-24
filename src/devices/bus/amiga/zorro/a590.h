@@ -38,9 +38,9 @@ public:
 
 	uint8_t dmac_scsi_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void dmac_scsi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( dmac_int_w );
-	DECLARE_WRITE_LINE_MEMBER( dmac_cfgout_w ) { cfgout_w(state); }
-	DECLARE_WRITE_LINE_MEMBER( scsi_irq_w );
+	void dmac_int_w(int state);
+	void dmac_cfgout_w(int state) { cfgout_w(state); }
+	void scsi_irq_w(int state);
 
 protected:
 	// device-level overrides
@@ -87,7 +87,7 @@ protected:
 	virtual void int6_w(int state) override { m_slot->int6_w(state); }
 
 	// input from slot
-	virtual DECLARE_WRITE_LINE_MEMBER( cfgin_w ) override;
+	virtual void cfgin_w(int state) override;
 
 private:
 	required_ioport m_dips;
@@ -117,7 +117,7 @@ public:
 	virtual void int6_w(int state) override { m_slot->int6_w(state); }
 
 	// input from slot
-	virtual DECLARE_WRITE_LINE_MEMBER( cfgin_w ) override;
+	virtual void cfgin_w(int state) override;
 
 private:
 	required_ioport m_jp1;

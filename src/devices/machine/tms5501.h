@@ -76,10 +76,10 @@ public:
 
 	virtual DECLARE_ADDRESS_MAP(io_map, 8);
 
-	DECLARE_WRITE_LINE_MEMBER( rcv_w );
+	void rcv_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( sens_w );
-	DECLARE_WRITE_LINE_MEMBER( xi7_w );
+	void sens_w(int state);
+	void xi7_w(int state);
 
 	uint8_t get_vector();
 

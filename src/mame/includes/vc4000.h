@@ -121,9 +121,9 @@ public:
 	std::unique_ptr<bitmap_ind16> m_bitmap;
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(vc4000);
+	void palette_init_vc4000(palette_device &palette);
 	uint32_t screen_update_vc4000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vc4000_video_line);
+	void vc4000_video_line(device_t &device);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(vc4000);
 
 protected:

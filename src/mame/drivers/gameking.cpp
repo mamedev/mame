@@ -46,14 +46,14 @@ public:
 	void init_gameking();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(gameking);
+	void palette_init_gameking(palette_device &palette);
 	uint8_t io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t lcd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void lcd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	INTERRUPT_GEN_MEMBER(gameking_frame_int);
-	TIMER_CALLBACK_MEMBER(gameking_timer);
-	TIMER_CALLBACK_MEMBER(gameking_timer2);
+	void gameking_frame_int(device_t &device);
+	void gameking_timer(void *ptr, int32_t param);
+	void gameking_timer2(void *ptr, int32_t param);
 
 	uint32_t screen_update_gameking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(gameking_cart);
@@ -178,7 +178,7 @@ static const unsigned char gameking_palette[] =
 	0, 0, 0
 };
 
-PALETTE_INIT_MEMBER(gameking_state, gameking)
+void gameking_state::palette_init_gameking(palette_device &palette)
 {
 	for (int i = 0; i < sizeof(gameking_palette) / 3; i++)
 		palette.set_pen_color(i, gameking_palette[i*3], gameking_palette[i*3+1], gameking_palette[i*3+2]);
@@ -209,7 +209,7 @@ void gameking_state::init_gameking()
 	timer2 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gameking_state::gameking_timer2), this));
 }
 
-TIMER_CALLBACK_MEMBER(gameking_state::gameking_timer)
+void gameking_state::gameking_timer(void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE); // in reality int for vector at fff4
 	timer1->enable(false);
@@ -217,7 +217,7 @@ TIMER_CALLBACK_MEMBER(gameking_state::gameking_timer)
 	timer2->reset(m_maincpu->cycles_to_attotime(10/*?*/));
 }
 
-TIMER_CALLBACK_MEMBER(gameking_state::gameking_timer2)
+void gameking_state::gameking_timer2(void *ptr, int32_t param)
 {
 	memory_region *maincpu_rom = memregion("maincpu");
 	m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE); // in reality int for vector at fff4
@@ -266,7 +266,7 @@ void gameking_state::machine_reset()
 	//m_bank8000->set_base(maincpu_rom->base()+0x10000); //? no reason to enforce this yet
 }
 
-INTERRUPT_GEN_MEMBER(gameking_state::gameking_frame_int) // guess to get over bios wai
+void gameking_state::gameking_frame_int(device_t &device) // guess to get over bios wai
 {
 	//  static int line=0;
 	//  line++;

@@ -67,10 +67,10 @@ public:
 		{ return downcast<apricot_keyboard_bus_device &>(device).m_in_handler.set_callback(object); }
 
 	// called from keyboard
-	DECLARE_WRITE_LINE_MEMBER( in_w ) { m_in_handler(state); }
+	void in_w(int state) { m_in_handler(state); }
 
 	// called from host
-	DECLARE_WRITE_LINE_MEMBER( out_w );
+	void out_w(int state);
 
 protected:
 	// device-level overrides

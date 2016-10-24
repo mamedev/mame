@@ -92,7 +92,7 @@ void buggychl_state::bankswitch_w(address_space &space, offs_t offset, uint8_t d
 	membank("bank1")->set_entry(data & 0x07);   // shall we check if data&7 < # banks?
 }
 
-TIMER_CALLBACK_MEMBER(buggychl_state::nmi_callback)
+void buggychl_state::nmi_callback(void *ptr, int32_t param)
 {
 	if (m_sound_nmi_enable)
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);

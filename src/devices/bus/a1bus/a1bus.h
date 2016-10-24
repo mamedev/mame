@@ -89,8 +89,8 @@ public:
 	void install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler);
 	void install_bank(offs_t start, offs_t end, const char *tag, uint8_t *data);
 
-	DECLARE_WRITE_LINE_MEMBER( irq_w );
-	DECLARE_WRITE_LINE_MEMBER( nmi_w );
+	void irq_w(int state);
+	void nmi_w(int state);
 
 protected:
 	// device-level overrides

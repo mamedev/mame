@@ -127,13 +127,13 @@ public:
 	void init_dendego2();
 	void init_dangcurv();
 	void init_taitojc();
-	TILE_GET_INFO_MEMBER(taitojc_tile_info);
+	void taitojc_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	uint32_t screen_update_taitojc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_dendego(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(taitojc_vblank);
+	void taitojc_vblank(device_t &device);
 	void draw_object(bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t w1, uint32_t w2, uint8_t bank_type);
 	void draw_object_bank(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t bank_type, uint8_t pri);
 };

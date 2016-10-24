@@ -91,9 +91,9 @@ public:
 	void blt_write( address_space &space, const int tmap, const offs_t offs, const uint16_t data, const uint16_t mask );
 	void init_magerror();
 	void init_hyprduel();
-	TILE_GET_INFO_MEMBER(get_tile_info_0_8bit);
-	TILE_GET_INFO_MEMBER(get_tile_info_1_8bit);
-	TILE_GET_INFO_MEMBER(get_tile_info_2_8bit);
+	void get_tile_info_0_8bit(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info_1_8bit(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info_2_8bit(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_reset() override;
 	void machine_start_hyprduel();
 	void video_start_hyprduel_14220();
@@ -101,10 +101,10 @@ public:
 	void video_start_magerror_14220();
 	void video_start_common_14220();
 	uint32_t screen_update_hyprduel(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(vblank_end_callback);
-	TIMER_CALLBACK_MEMBER(magerror_irq_callback);
-	TIMER_CALLBACK_MEMBER(hyprduel_blit_done);
-	TIMER_DEVICE_CALLBACK_MEMBER(hyprduel_interrupt);
+	void vblank_end_callback(void *ptr, int32_t param);
+	void magerror_irq_callback(void *ptr, int32_t param);
+	void hyprduel_blit_done(void *ptr, int32_t param);
+	void hyprduel_interrupt(timer_device &timer, void *ptr, int32_t param);
 	void hyprduel_postload();
 	inline void get_tile_info( tile_data &tileinfo, int tile_index, int layer, uint16_t *vram);
 	inline void get_tile_info_8bit( tile_data &tileinfo, int tile_index, int layer, uint16_t *vram );

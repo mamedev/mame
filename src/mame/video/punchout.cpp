@@ -18,7 +18,7 @@
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(punchout_state::top_get_info)
+void punchout_state::top_get_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_bg_top_videoram[tile_index*2 + 1];
 	int code = m_bg_top_videoram[tile_index*2] + ((attr & 0x03) << 8);
@@ -27,7 +27,7 @@ TILE_GET_INFO_MEMBER(punchout_state::top_get_info)
 	SET_TILE_INFO_MEMBER(0, code, color, flipx ? TILE_FLIPX : 0);
 }
 
-TILE_GET_INFO_MEMBER(punchout_state::armwrest_top_get_info)
+void punchout_state::armwrest_top_get_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_bg_top_videoram[tile_index*2 + 1];
 	int code = m_bg_top_videoram[tile_index*2] + ((attr & 0x03) << 8) + ((attr & 0x80) << 3);
@@ -35,7 +35,7 @@ TILE_GET_INFO_MEMBER(punchout_state::armwrest_top_get_info)
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(punchout_state::bot_get_info)
+void punchout_state::bot_get_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_bg_bot_videoram[tile_index*2 + 1];
 	int code = m_bg_bot_videoram[tile_index*2] + ((attr & 0x03) << 8);
@@ -44,7 +44,7 @@ TILE_GET_INFO_MEMBER(punchout_state::bot_get_info)
 	SET_TILE_INFO_MEMBER(1, code, color, flipx ? TILE_FLIPX : 0);
 }
 
-TILE_GET_INFO_MEMBER(punchout_state::armwrest_bot_get_info)
+void punchout_state::armwrest_bot_get_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_bg_bot_videoram[tile_index*2 + 1];
 	int code = m_bg_bot_videoram[tile_index*2] + ((attr & 0x03) << 8);
@@ -53,7 +53,7 @@ TILE_GET_INFO_MEMBER(punchout_state::armwrest_bot_get_info)
 	SET_TILE_INFO_MEMBER(0, code, color, flipx ? TILE_FLIPX : 0);
 }
 
-TILE_GET_INFO_MEMBER(punchout_state::bs1_get_info)
+void punchout_state::bs1_get_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_spr1_videoram[tile_index*4 + 3];
 	int code = m_spr1_videoram[tile_index*4] + ((m_spr1_videoram[tile_index*4 + 1] & 0x1f) << 8);
@@ -62,7 +62,7 @@ TILE_GET_INFO_MEMBER(punchout_state::bs1_get_info)
 	SET_TILE_INFO_MEMBER(2, code, color, flipx ? TILE_FLIPX : 0);
 }
 
-TILE_GET_INFO_MEMBER(punchout_state::bs2_get_info)
+void punchout_state::bs2_get_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_spr2_videoram[tile_index*4 + 3];
 	int code = m_spr2_videoram[tile_index*4] + ((m_spr2_videoram[tile_index*4 + 1] & 0x0f) << 8);
@@ -71,7 +71,7 @@ TILE_GET_INFO_MEMBER(punchout_state::bs2_get_info)
 	SET_TILE_INFO_MEMBER(3, code, color, flipx ? TILE_FLIPX : 0);
 }
 
-TILE_GET_INFO_MEMBER(punchout_state::armwrest_fg_get_info)
+void punchout_state::armwrest_fg_get_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_armwrest_fg_videoram[tile_index*2 + 1];
 	int code = m_armwrest_fg_videoram[tile_index*2] + 256 * (attr & 0x07);
@@ -80,13 +80,13 @@ TILE_GET_INFO_MEMBER(punchout_state::armwrest_fg_get_info)
 	SET_TILE_INFO_MEMBER(1, code, color, flipx ? TILE_FLIPX : 0);
 }
 
-TILEMAP_MAPPER_MEMBER(punchout_state::armwrest_bs1_scan)
+tilemap_memory_index punchout_state::armwrest_bs1_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	int halfcols = num_cols/2;
 	return (col/halfcols)*(halfcols*num_rows) + row*halfcols + col%halfcols;
 }
 
-TILEMAP_MAPPER_MEMBER(punchout_state::armwrest_bs1_scan_flipx)
+tilemap_memory_index punchout_state::armwrest_bs1_scan_flipx(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	int halfcols = num_cols/2;
 	col ^=0x10;

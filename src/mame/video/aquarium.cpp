@@ -7,7 +7,7 @@
 
 
 /* TXT Layer */
-TILE_GET_INFO_MEMBER(aquarium_state::get_aquarium_txt_tile_info)
+void aquarium_state::get_aquarium_txt_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno, colour;
 
@@ -26,7 +26,7 @@ void aquarium_state::aquarium_txt_videoram_w(address_space &space, offs_t offset
 }
 
 /* MID Layer */
-TILE_GET_INFO_MEMBER(aquarium_state::get_aquarium_mid_tile_info)
+void aquarium_state::get_aquarium_mid_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno, colour, flag;
 
@@ -46,7 +46,7 @@ void aquarium_state::aquarium_mid_videoram_w(address_space &space, offs_t offset
 }
 
 /* BAK Layer */
-TILE_GET_INFO_MEMBER(aquarium_state::get_aquarium_bak_tile_info)
+void aquarium_state::get_aquarium_bak_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno, colour, flag;
 

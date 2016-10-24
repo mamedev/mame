@@ -150,13 +150,13 @@ public:
 	void counters_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t test_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void init_luckgrln();
-	TILE_GET_INFO_MEMBER(get_luckgrln_reel1_tile_info);
-	TILE_GET_INFO_MEMBER(get_luckgrln_reel2_tile_info);
-	TILE_GET_INFO_MEMBER(get_luckgrln_reel3_tile_info);
-	TILE_GET_INFO_MEMBER(get_luckgrln_reel4_tile_info);
+	void get_luckgrln_reel1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_luckgrln_reel2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_luckgrln_reel3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_luckgrln_reel4_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void video_start() override;
 	uint32_t screen_update_luckgrln(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(luckgrln_irq);
+	void luckgrln_irq(device_t &device);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -177,7 +177,7 @@ void luckgrln_state::luckgrln_reel1_attr_w(address_space &space, offs_t offset, 
 
 
 
-TILE_GET_INFO_MEMBER(luckgrln_state::get_luckgrln_reel1_tile_info)
+void luckgrln_state::get_luckgrln_reel1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_reel1_ram[tile_index];
 	int attr = m_reel1_attr[tile_index];
@@ -206,7 +206,7 @@ void luckgrln_state::luckgrln_reel2_attr_w(address_space &space, offs_t offset, 
 }
 
 
-TILE_GET_INFO_MEMBER(luckgrln_state::get_luckgrln_reel2_tile_info)
+void luckgrln_state::get_luckgrln_reel2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_reel2_ram[tile_index];
 	int attr = m_reel2_attr[tile_index];
@@ -234,7 +234,7 @@ void luckgrln_state::luckgrln_reel3_attr_w(address_space &space, offs_t offset, 
 }
 
 
-TILE_GET_INFO_MEMBER(luckgrln_state::get_luckgrln_reel3_tile_info)
+void luckgrln_state::get_luckgrln_reel3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_reel3_ram[tile_index];
 	int attr = m_reel3_attr[tile_index];
@@ -261,7 +261,7 @@ void luckgrln_state::luckgrln_reel4_attr_w(address_space &space, offs_t offset, 
 }
 
 
-TILE_GET_INFO_MEMBER(luckgrln_state::get_luckgrln_reel4_tile_info)
+void luckgrln_state::get_luckgrln_reel4_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_reel4_ram[tile_index];
 	int attr = m_reel4_attr[tile_index];
@@ -977,7 +977,7 @@ static GFXDECODE_START( luckgrln )
 	GFXDECODE_ENTRY( "reels", 0, tiles8x32_layout, 0, 64 )
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(luckgrln_state::luckgrln_irq)
+void luckgrln_state::luckgrln_irq(device_t &device)
 {
 	if(m_nmi_enable)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);

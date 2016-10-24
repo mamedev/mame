@@ -494,8 +494,8 @@ class cobra_jvs : public jvs_device
 public:
 	cobra_jvs(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE_LINE_MEMBER(coin_1_w);
-	DECLARE_WRITE_LINE_MEMBER(coin_2_w);
+	void coin_1_w(int state);
+	void coin_2_w(int state);
 
 protected:
 	virtual bool switches(uint8_t *&buf, uint8_t count_players, uint8_t bytes_per_switch) override;
@@ -519,13 +519,13 @@ cobra_jvs::cobra_jvs(const machine_config &mconfig, const char *tag, device_t *o
 	m_coin_counter[1] = 0;
 }
 
-WRITE_LINE_MEMBER(cobra_jvs::coin_1_w)
+void cobra_jvs::coin_1_w(int state)
 {
 	if(state)
 		m_coin_counter[0]++;
 }
 
-WRITE_LINE_MEMBER(cobra_jvs::coin_2_w)
+void cobra_jvs::coin_2_w(int state)
 {
 	if(state)
 		m_coin_counter[1]++;
@@ -719,7 +719,7 @@ public:
 
 	void sub_jvs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
+	void ide_interrupt(int state);
 
 	std::unique_ptr<cobra_renderer> m_renderer;
 
@@ -791,7 +791,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_cobra(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(cobra_vblank);
+	void cobra_vblank(device_t &device);
 	void cobra_video_exit();
 	int decode_debug_state_value(int v);
 };
@@ -3203,7 +3203,7 @@ INPUT_PORTS_START( cobra )
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_COIN2) PORT_WRITE_LINE_DEVICE_MEMBER("cobra_jvs1", cobra_jvs, coin_2_w)
 INPUT_PORTS_END
 
-WRITE_LINE_MEMBER(cobra_state::ide_interrupt)
+void cobra_state::ide_interrupt(int state)
 {
 	if (state == CLEAR_LINE)
 	{
@@ -3216,7 +3216,7 @@ WRITE_LINE_MEMBER(cobra_state::ide_interrupt)
 }
 
 
-INTERRUPT_GEN_MEMBER(cobra_state::cobra_vblank)
+void cobra_state::cobra_vblank(device_t &device)
 {
 	if (m_vblank_enable & 0x80)
 	{

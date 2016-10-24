@@ -55,7 +55,7 @@ public:
 
 	void via_video_pba_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void via_video_pbb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(via_video_ca2_w);
+	void via_video_ca2_w(int state);
 
 	uint8_t kbd1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t kbd2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
@@ -67,7 +67,7 @@ public:
 	void scanlines_kbd1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void scanlines_kbd2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ_LINE_MEMBER(via_keyb_ca2_r);
+	int via_keyb_ca2_r();
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -78,7 +78,7 @@ public:
 	uint8_t via_video_pbb_data;
 	uint8_t cnttim;
 	uint8_t valkeyb;
-	TIMER_DEVICE_CALLBACK_MEMBER(goupil_scanline);
+	void goupil_scanline(timer_device &timer, void *ptr, int32_t param);
 
 private:
 	required_device<acia6850_device> m_acia;
@@ -102,7 +102,7 @@ private:
 *      Keyboard I/O Handlers      *
 ***********************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER( goupil_g1_state::goupil_scanline )
+void goupil_g1_state::goupil_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	m_ef9364->update_scanline((uint16_t)param);
 }
@@ -210,7 +210,7 @@ void goupil_g1_state::scanlines_kbd2_w(address_space &space, offs_t offset, uint
 	m_row_kbd2 = data & 7;
 }
 
-READ_LINE_MEMBER( goupil_g1_state::via_keyb_ca2_r )
+int goupil_g1_state::via_keyb_ca2_r()
 {
 	return 0;
 }
@@ -415,7 +415,7 @@ void goupil_g1_state::via_video_pbb_w(address_space &space, offs_t offset, uint8
 	via_video_pbb_data = data;
 }
 
-WRITE_LINE_MEMBER( goupil_g1_state::via_video_ca2_w )
+void goupil_g1_state::via_video_ca2_w(int state)
 {
 	if(old_state_ca2==0 && state==1)
 	{

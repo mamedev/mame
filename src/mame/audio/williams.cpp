@@ -96,7 +96,7 @@ void williams_cvsd_sound_device::write(address_space &space, offs_t offset, uint
 //  reset_write - write to the reset line
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(williams_cvsd_sound_device::reset_write)
+void williams_cvsd_sound_device::reset_write(int state)
 {
 	// going high halts the CPU
 	if (state)
@@ -160,7 +160,7 @@ void williams_cvsd_sound_device::cvsd_clock_set_w(address_space &space, offs_t o
 //  the YM2151
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(williams_cvsd_sound_device::ym2151_irq_w)
+void williams_cvsd_sound_device::ym2151_irq_w(int state)
 {
 	m_pia->ca1_w(!state);
 }
@@ -171,7 +171,7 @@ WRITE_LINE_MEMBER(williams_cvsd_sound_device::ym2151_irq_w)
 //  the 6821
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(williams_cvsd_sound_device::pia_irqa)
+void williams_cvsd_sound_device::pia_irqa(int state)
 {
 	m_cpu->set_input_line(M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -182,7 +182,7 @@ WRITE_LINE_MEMBER(williams_cvsd_sound_device::pia_irqa)
 //  the 6821
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(williams_cvsd_sound_device::pia_irqb)
+void williams_cvsd_sound_device::pia_irqb(int state)
 {
 	m_cpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -345,7 +345,7 @@ void williams_narc_sound_device::write(address_space &space, offs_t offset, uint
 //  reset_write - write to the reset line
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(williams_narc_sound_device::reset_write)
+void williams_narc_sound_device::reset_write(int state)
 {
 	// going high halts the CPU
 	if (state)
@@ -500,7 +500,7 @@ void williams_narc_sound_device::cvsd_clock_set_w(address_space &space, offs_t o
 //  YM2151 IRQ line
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(williams_narc_sound_device::ym2151_irq_w)
+void williams_narc_sound_device::ym2151_irq_w(int state)
 {
 	m_cpu0->set_input_line(M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -703,7 +703,7 @@ void williams_adpcm_sound_device::write(address_space &space, offs_t offset, uin
 //  reset_write - write to the reset line
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(williams_adpcm_sound_device::reset_write)
+void williams_adpcm_sound_device::reset_write(int state)
 {
 	// going high halts the CPU
 	if (state)
@@ -723,7 +723,7 @@ WRITE_LINE_MEMBER(williams_adpcm_sound_device::reset_write)
 //  irq_read - read the sound IRQ state
 //-------------------------------------------------
 
-READ_LINE_MEMBER(williams_adpcm_sound_device::irq_read)
+int williams_adpcm_sound_device::irq_read()
 {
 	return m_sound_int_state;
 }
@@ -782,7 +782,7 @@ void williams_adpcm_sound_device::talkback_w(address_space &space, offs_t offset
 //  talkback_w - write to the talkback latch
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(williams_adpcm_sound_device::ym2151_irq_w)
+void williams_adpcm_sound_device::ym2151_irq_w(int state)
 {
 	m_cpu->set_input_line(M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }

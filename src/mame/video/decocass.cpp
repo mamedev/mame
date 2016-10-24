@@ -187,19 +187,19 @@ void decocass_state::decocass_video_state_save_init()
     tilemap callbacks
  ********************************************/
 
-TILEMAP_MAPPER_MEMBER(decocass_state::fgvideoram_scan_cols )
+tilemap_memory_index decocass_state::fgvideoram_scan_cols(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return (num_cols - 1 - col) * num_rows + row;
 }
 
-TILEMAP_MAPPER_MEMBER(decocass_state::bgvideoram_scan_cols )
+tilemap_memory_index decocass_state::bgvideoram_scan_cols(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return tile_offset[col * num_rows + row];
 }
 
-TILE_GET_INFO_MEMBER(decocass_state::get_bg_l_tile_info)
+void decocass_state::get_bg_l_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int color = (m_color_center_bot >> 7) & 1;
 	SET_TILE_INFO_MEMBER(2,
@@ -210,7 +210,7 @@ TILE_GET_INFO_MEMBER(decocass_state::get_bg_l_tile_info)
 		tileinfo.pen_data = m_empty_tile;
 }
 
-TILE_GET_INFO_MEMBER(decocass_state::get_bg_r_tile_info )
+void decocass_state::get_bg_r_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int color = (m_color_center_bot >> 7) & 1;
 	SET_TILE_INFO_MEMBER(2,
@@ -221,7 +221,7 @@ TILE_GET_INFO_MEMBER(decocass_state::get_bg_r_tile_info )
 		tileinfo.pen_data = m_empty_tile;
 }
 
-TILE_GET_INFO_MEMBER(decocass_state::get_fg_tile_info )
+void decocass_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t code = m_fgvideoram[tile_index];
 	uint8_t attr = m_colorram[tile_index];

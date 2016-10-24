@@ -32,7 +32,7 @@
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(fromanc2_state::fromanc2_interrupt)
+void fromanc2_state::fromanc2_interrupt(device_t &device)
 {
 	device.execute().set_input_line(1, HOLD_LINE);
 }

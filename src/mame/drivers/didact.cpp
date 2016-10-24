@@ -104,7 +104,7 @@ class didact_state : public driver_device
 	uint8_t m_shift;
 	uint8_t m_led;
 	optional_device<rs232_port_device> m_rs232;
-	TIMER_DEVICE_CALLBACK_MEMBER(scan_artwork);
+	void scan_artwork(timer_device &timer, void *ptr, int32_t param);
 };
 
 
@@ -163,7 +163,7 @@ class md6802_state : public didact_state
 	void pia2_kbA_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t pia2_kbB_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void pia2_kbB_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( pia2_ca2_w);
+	void pia2_ca2_w(int state);
 
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
@@ -237,7 +237,7 @@ void md6802_state::pia2_kbB_w(address_space &space, offs_t offset, uint8_t data,
 	m_segments = BITSWAP8(data, 0, 4, 5, 3, 2, 1, 7, 6);
 }
 
-WRITE_LINE_MEMBER( md6802_state::pia2_ca2_w )
+void md6802_state::pia2_ca2_w(int state)
 {
 	LOG(("--->%s(%02x) LED is connected through resisitor to +5v so logical 0 will lit it\n", FUNCNAME, state));
 	output().set_led_value(m_led, !state);
@@ -336,7 +336,7 @@ class mp68a_state : public didact_state
 	void pia2_kbA_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t pia2_kbB_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void pia2_kbB_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_READ_LINE_MEMBER( pia2_cb1_r );
+	int pia2_cb1_r();
 
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
@@ -414,7 +414,7 @@ void mp68a_state::pia2_kbB_w(address_space &space, offs_t offset, uint8_t data, 
 	LOG(("--->%s(%02x)\n", FUNCNAME, data));
 }
 
-READ_LINE_MEMBER( mp68a_state::pia2_cb1_r )
+int mp68a_state::pia2_cb1_r()
 {
 	m_line0 = m_io_line0->read();
 	m_line1 = m_io_line1->read();
@@ -535,11 +535,11 @@ public:
 	void pia1_kbA_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t pia1_kbB_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void pia1_kbB_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_READ_LINE_MEMBER( pia1_ca1_r );
-	DECLARE_READ_LINE_MEMBER( pia1_cb1_r );
-	DECLARE_WRITE_LINE_MEMBER( pia1_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER( pia1_cb2_w);
-	TIMER_DEVICE_CALLBACK_MEMBER(rtc_w);
+	int pia1_ca1_r();
+	int pia1_cb1_r();
+	void pia1_ca2_w(int state);
+	void pia1_cb2_w(int state);
+	void rtc_w(timer_device &timer, void *ptr, int32_t param);
 protected:
 	required_device<pia6821_device> m_pia1;
 	required_device<pia6821_device> m_pia2;
@@ -552,7 +552,7 @@ protected:
 	uint8_t m_50hz;
 };
 
-TIMER_DEVICE_CALLBACK_MEMBER(e100_state::rtc_w)
+void e100_state::rtc_w(timer_device &timer, void *ptr, int32_t param)
 {
 	m_pia2->ca1_w((m_50hz++ & 1));
 }
@@ -751,23 +751,23 @@ uint8_t e100_state::pia1_kbB_r(address_space &space, offs_t offset, uint8_t mem_
 	return m_pia1_B;
 }
 
-READ_LINE_MEMBER(e100_state::pia1_ca1_r)
+int e100_state::pia1_ca1_r()
 {
 	// TODO: Make this a slot device for time meassurements
 	return ASSERT_LINE;  // Default is handshake for serial port TODO: Fix RS 232 handshake as default
 }
 
-READ_LINE_MEMBER(e100_state::pia1_cb1_r)
+int e100_state::pia1_cb1_r()
 {
 	return m_rs232->rxd_r();
 }
 
-WRITE_LINE_MEMBER(e100_state::pia1_ca2_w)
+void e100_state::pia1_ca2_w(int state)
 {
 	// TODO: Make this a slot device to trigger time meassurements
 }
 
-WRITE_LINE_MEMBER(e100_state::pia1_cb2_w)
+void e100_state::pia1_cb2_w(int state)
 {
 	m_rs232->write_txd(!state);
 }
@@ -990,7 +990,7 @@ DEVICE_INPUT_DEFAULTS_END
 #endif
 
 // TODO: Fix shift led for mp68a correctly, workaround doesn't work anymore! Shift works though...
-TIMER_DEVICE_CALLBACK_MEMBER(didact_state::scan_artwork)
+void didact_state::scan_artwork(timer_device &timer, void *ptr, int32_t param)
 {
 	//  LOG(("--->%s()\n", FUNCNAME));
 

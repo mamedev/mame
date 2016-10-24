@@ -224,7 +224,7 @@ void adsp21062_device::sharc_dma_exec(int channel)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(adsp21062_device::sharc_dma_callback)
+void adsp21062_device::sharc_dma_callback(void *ptr, int32_t param)
 {
 	int channel = param;
 

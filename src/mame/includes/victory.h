@@ -76,8 +76,8 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	INTERRUPT_GEN_MEMBER(vblank_interrupt);
-	TIMER_CALLBACK_MEMBER(bgcoll_irq_callback);
+	void vblank_interrupt(device_t &device);
+	void bgcoll_irq_callback(void *ptr, int32_t param);
 
 	void update_irq();
 	void set_palette();

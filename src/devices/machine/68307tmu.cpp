@@ -99,7 +99,7 @@ void m68307cpu_device::m68307_internal_timer_w(address_space &space, offs_t offs
 	}
 }
 
-TIMER_CALLBACK_MEMBER(m68307_timer::timer0_callback )
+void m68307_timer::timer0_callback(void *ptr, int32_t param)
 {
 	m68307cpu_device* m68k = (m68307cpu_device *)ptr;
 	m68307_single_timer* tptr = &m68k->m68307TIMER->singletimer[0];
@@ -110,7 +110,7 @@ TIMER_CALLBACK_MEMBER(m68307_timer::timer0_callback )
 	tptr->mametimer->adjust(m68k->cycles_to_attotime(20000));
 }
 
-TIMER_CALLBACK_MEMBER(m68307_timer::timer1_callback )
+void m68307_timer::timer1_callback(void *ptr, int32_t param)
 {
 	m68307cpu_device* m68k = (m68307cpu_device *)ptr;
 	m68307_single_timer* tptr = &m68k->m68307TIMER->singletimer[1];
@@ -122,7 +122,7 @@ TIMER_CALLBACK_MEMBER(m68307_timer::timer1_callback )
 
 }
 
-TIMER_CALLBACK_MEMBER(m68307_timer::wd_timer_callback )
+void m68307_timer::wd_timer_callback(void *ptr, int32_t param)
 {
 	printf("wd timer\n");
 }

@@ -7,7 +7,7 @@
 
 /* background, appears to be the bottom layer */
 
-TILE_GET_INFO_MEMBER(stlforce_state::get_stlforce_bg_tile_info)
+void stlforce_state::get_stlforce_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno,colour;
 
@@ -25,7 +25,7 @@ void stlforce_state::stlforce_bg_videoram_w(address_space &space, offs_t offset,
 
 /* middle layer, low */
 
-TILE_GET_INFO_MEMBER(stlforce_state::get_stlforce_mlow_tile_info)
+void stlforce_state::get_stlforce_mlow_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno,colour;
 
@@ -46,7 +46,7 @@ void stlforce_state::stlforce_mlow_videoram_w(address_space &space, offs_t offse
 
 /* middle layer, high */
 
-TILE_GET_INFO_MEMBER(stlforce_state::get_stlforce_mhigh_tile_info)
+void stlforce_state::get_stlforce_mhigh_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno,colour;
 
@@ -67,7 +67,7 @@ void stlforce_state::stlforce_mhigh_videoram_w(address_space &space, offs_t offs
 
 /* text layer, appears to be the top layer */
 
-TILE_GET_INFO_MEMBER(stlforce_state::get_stlforce_tx_tile_info)
+void stlforce_state::get_stlforce_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno,colour;
 

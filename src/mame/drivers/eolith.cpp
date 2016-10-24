@@ -1650,7 +1650,7 @@ void eolith_state::init_speedup()
 }
 
 /* todo, use timers instead! */
-TIMER_DEVICE_CALLBACK_MEMBER(eolith_state::eolith_speedup)
+void eolith_state::eolith_speedup(timer_device &timer, void *ptr, int32_t param)
 {
 	if (param==0)
 	{

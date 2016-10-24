@@ -179,9 +179,9 @@ public:
 	void init_dharmak();
 	void init_puzzlet();
 	void init_metro();
-	TILE_GET_INFO_MEMBER(metro_k053936_get_tile_info);
-	TILE_GET_INFO_MEMBER(metro_k053936_gstrik2_get_tile_info);
-	TILEMAP_MAPPER_MEMBER(tilemap_scan_gstrik2);
+	void metro_k053936_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void metro_k053936_gstrik2_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	tilemap_memory_index tilemap_scan_gstrik2(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
 	void expand_gfx1();
 	void video_start_metro_i4100();
 	void video_start_metro_i4220();
@@ -191,13 +191,13 @@ public:
 	void video_start_blzntrnd();
 	void video_start_gstrik2();
 	uint32_t screen_update_metro(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(metro_vblank_interrupt);
-	INTERRUPT_GEN_MEMBER(metro_periodic_interrupt);
-	INTERRUPT_GEN_MEMBER(karatour_interrupt);
-	INTERRUPT_GEN_MEMBER(puzzlet_interrupt);
-	TIMER_CALLBACK_MEMBER(metro_blit_done);
+	void metro_vblank_interrupt(device_t &device);
+	void metro_periodic_interrupt(device_t &device);
+	void karatour_interrupt(device_t &device);
+	void puzzlet_interrupt(device_t &device);
+	void metro_blit_done(void *ptr, int32_t param);
 	void update_irq_state();
-	IRQ_CALLBACK_MEMBER(metro_irq_callback);
+	int metro_irq_callback(device_t &device, int irqline);
 	inline uint8_t get_tile_pix( uint16_t code, uint8_t x, uint8_t y, int big, uint16_t *pix );
 	inline void metro_vram_w( offs_t offset, uint16_t data, uint16_t mem_mask, int layer, uint16_t *vram );
 	void metro_draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
@@ -206,7 +206,7 @@ public:
 	void metro_common(  );
 	void draw_tilemap( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t flags, uint32_t pcode,
 					int sx, int sy, int wx, int wy, int big, uint16_t *tilemapram, int layer );
-	DECLARE_READ_LINE_MEMBER(metro_rxd_r);
+	int metro_rxd_r();
 
 protected:
 	virtual void machine_start() override;

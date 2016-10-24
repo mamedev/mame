@@ -127,7 +127,7 @@ public:
 	uint16_t r2dx_i_dx, r2dx_i_dy, r2dx_i_angle;
 	uint32_t r2dx_i_sdist;
 
-	INTERRUPT_GEN_MEMBER(rdx_v33_interrupt);
+	void rdx_v33_interrupt(device_t &device);
 
 protected:
 	virtual void machine_start() override;
@@ -516,7 +516,7 @@ ADDRESS_MAP_END
 
 
 
-INTERRUPT_GEN_MEMBER(r2dx_v33_state::rdx_v33_interrupt)
+void r2dx_v33_state::rdx_v33_interrupt(device_t &device)
 {
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xc0/4);   /* VBL */
 }

@@ -259,19 +259,19 @@ public:
 	void ta_texture_directpath0_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask = U64(0xffffffffffffffff));
 	void ta_texture_directpath1_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask = U64(0xffffffffffffffff));
 
-	TIMER_CALLBACK_MEMBER(vbin);
-	TIMER_CALLBACK_MEMBER(vbout);
-	TIMER_CALLBACK_MEMBER(hbin);
-	TIMER_CALLBACK_MEMBER(yuv_convert_end);
-	TIMER_CALLBACK_MEMBER(endofrender_video);
-	TIMER_CALLBACK_MEMBER(endofrender_tsp);
-	TIMER_CALLBACK_MEMBER(endofrender_isp);
-	TIMER_CALLBACK_MEMBER(transfer_opaque_list_irq);
-	TIMER_CALLBACK_MEMBER(transfer_opaque_modifier_volume_list_irq);
-	TIMER_CALLBACK_MEMBER(transfer_translucent_list_irq);
-	TIMER_CALLBACK_MEMBER(transfer_translucent_modifier_volume_list_irq);
-	TIMER_CALLBACK_MEMBER(transfer_punch_through_list_irq);
-	TIMER_CALLBACK_MEMBER(pvr_dma_irq);
+	void vbin(void *ptr, int32_t param);
+	void vbout(void *ptr, int32_t param);
+	void hbin(void *ptr, int32_t param);
+	void yuv_convert_end(void *ptr, int32_t param);
+	void endofrender_video(void *ptr, int32_t param);
+	void endofrender_tsp(void *ptr, int32_t param);
+	void endofrender_isp(void *ptr, int32_t param);
+	void transfer_opaque_list_irq(void *ptr, int32_t param);
+	void transfer_opaque_modifier_volume_list_irq(void *ptr, int32_t param);
+	void transfer_translucent_list_irq(void *ptr, int32_t param);
+	void transfer_translucent_modifier_volume_list_irq(void *ptr, int32_t param);
+	void transfer_punch_through_list_irq(void *ptr, int32_t param);
+	void pvr_dma_irq(void *ptr, int32_t param);
 
 	void pvr_dma_execute(address_space &space);
 	void pvr_scanline_timer(int vpos);

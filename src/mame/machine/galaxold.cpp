@@ -13,21 +13,21 @@
 #include "includes/galaxold.h"
 
 
-IRQ_CALLBACK_MEMBER(galaxold_state::hunchbkg_irq_callback)
+int galaxold_state::hunchbkg_irq_callback(device_t &device, int irqline)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 	return 0x03;
 }
 
 /* FIXME: remove trampoline */
-WRITE_LINE_MEMBER(galaxold_state::galaxold_7474_9m_2_q_callback)
+void galaxold_state::galaxold_7474_9m_2_q_callback(int state)
 {
 	/* Q bar clocks the other flip-flop,
 	   Q is VBLANK (not visible to the CPU) */
 	m_7474_9m_1->clock_w(state);
 }
 
-WRITE_LINE_MEMBER(galaxold_state::galaxold_7474_9m_1_callback)
+void galaxold_state::galaxold_7474_9m_1_callback(int state)
 {
 	/* Q goes to the NMI line */
 	m_maincpu->set_input_line(m_irq_line, state ? CLEAR_LINE : ASSERT_LINE);
@@ -39,7 +39,7 @@ void galaxold_state::galaxold_nmi_enable_w(address_space &space, offs_t offset, 
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(galaxold_state::galaxold_interrupt_timer)
+void galaxold_state::galaxold_interrupt_timer(timer_device &timer, void *ptr, int32_t param)
 {
 	/* 128V, 64V and 32V go to D */
 	m_7474_9m_2->d_w(((param & 0xe0) != 0xe0) ? 1 : 0);
@@ -169,7 +169,7 @@ void galaxold_state::init_4in1()
 	save_item(NAME(m__4in1_bank));
 }
 
-INTERRUPT_GEN_MEMBER(galaxold_state::hunchbks_vh_interrupt)
+void galaxold_state::hunchbks_vh_interrupt(device_t &device)
 {
 	generic_pulse_irq_line_and_vector(device.execute(),0,0x03,1);
 }

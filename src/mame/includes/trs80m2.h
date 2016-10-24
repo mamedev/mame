@@ -96,12 +96,12 @@ public:
 	void nmi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t fdc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void fdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( de_w );
-	DECLARE_WRITE_LINE_MEMBER( vsync_w );
+	void de_w(int state);
+	void vsync_w(int state);
 	uint8_t pio_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void pio_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( strobe_w );
-	DECLARE_WRITE_LINE_MEMBER( kb_clock_w );
+	void strobe_w(int state);
+	void kb_clock_w(int state);
 	void kbd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	MC6845_UPDATE_ROW( crtc_update_row );
@@ -126,7 +126,7 @@ public:
 	int m_rtc_int;
 	int m_enable_rtc_int;
 
-	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
+	void ctc_tick(timer_device &timer, void *ptr, int32_t param);
 	uint8_t io_read_byte(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void io_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
@@ -134,9 +134,9 @@ public:
 	int m_centronics_fault;
 	int m_centronics_perror;
 
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_fault);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
+	void write_centronics_busy(int state);
+	void write_centronics_fault(int state);
+	void write_centronics_perror(int state);
 };
 
 class trs80m16_state : public trs80m2_state

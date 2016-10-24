@@ -95,8 +95,8 @@ public:
 	template<class _BitmapClass>
 	uint32_t screen_update_common(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(kaneko16_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(shogwarr_interrupt);
+	void kaneko16_interrupt(timer_device &timer, void *ptr, int32_t param);
+	void shogwarr_interrupt(timer_device &timer, void *ptr, int32_t param);
 
 	template<class _BitmapClass>
 	void kaneko16_fill_bitmap(_BitmapClass &bitmap, const rectangle &cliprect);
@@ -164,7 +164,7 @@ public:
 	void berlwall_spriteregs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	void init_berlwall();
-	DECLARE_PALETTE_INIT(berlwall);
+	void palette_init_berlwall(palette_device &palette);
 	void video_start_berlwall();
 	uint32_t screen_update_berlwall(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void kaneko16_render_15bpp_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect);

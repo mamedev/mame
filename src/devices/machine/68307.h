@@ -48,9 +48,9 @@ public:
 	template<class _Object> static devcb_base &set_inport_cb(device_t &device, _Object object) { return downcast<m68307cpu_device &>(device).read_inport.set_callback(object); }
 	template<class _Object> static devcb_base &set_outport_cb(device_t &device, _Object object) { return downcast<m68307cpu_device &>(device).write_outport.set_callback(object); }
 
-	DECLARE_WRITE_LINE_MEMBER(m68307_duart_irq_handler);
-	DECLARE_WRITE_LINE_MEMBER(m68307_duart_txa){ write_a_tx(state); }
-	DECLARE_WRITE_LINE_MEMBER(m68307_duart_txb){ write_b_tx(state);  }
+	void m68307_duart_irq_handler(int state);
+	void m68307_duart_txa(int state){ write_a_tx(state); }
+	void m68307_duart_txb(int state){ write_b_tx(state);  }
 	uint8_t m68307_duart_input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff){ return read_inport();  }
 	void m68307_duart_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff){ write_outport(data);  }
 	devcb_write_line write_irq, write_a_tx, write_b_tx;

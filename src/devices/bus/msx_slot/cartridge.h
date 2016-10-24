@@ -61,7 +61,7 @@ public:
 	virtual uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
 	virtual void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
-	DECLARE_WRITE_LINE_MEMBER(irq_out);
+	void irq_out(int state);
 
 protected:
 	devcb_write_line m_irq_handler;

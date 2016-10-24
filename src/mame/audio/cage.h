@@ -42,9 +42,9 @@ public:
 	uint16_t control_r();
 	void control_w(uint16_t data);
 
-	TIMER_DEVICE_CALLBACK_MEMBER( dma_timer_callback );
+	void dma_timer_callback(timer_device &timer, void *ptr, int32_t param);
 	void update_dma_state(address_space &space);
-	TIMER_DEVICE_CALLBACK_MEMBER( cage_timer_callback );
+	void cage_timer_callback(timer_device &timer, void *ptr, int32_t param);
 	void update_timer(int which);
 	void update_serial();
 	uint32_t tms32031_io_r(address_space &space, offs_t offset, uint32_t mem_mask);
@@ -54,7 +54,7 @@ public:
 	void cage_from_main_ack_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask);
 	void cage_to_main_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask);
 	uint32_t cage_io_status_r(address_space &space, offs_t offset, uint32_t mem_mask);
-	TIMER_CALLBACK_MEMBER( cage_deferred_w );
+	void cage_deferred_w(void *ptr, int32_t param);
 	void speedup_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask);
 
 protected:

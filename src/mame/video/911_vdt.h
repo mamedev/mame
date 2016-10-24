@@ -42,7 +42,7 @@ public:
 	uint8_t cru_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void cru_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_PALETTE_INIT(vdt911);
+	void palette_init_vdt911(palette_device &palette);
 
 	template<class _Object> static devcb_base &static_set_keyint_callback(device_t &device, _Object object)
 	{

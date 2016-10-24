@@ -23,7 +23,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(pandoras_state, pandoras)
+void pandoras_state::palette_init_pandoras(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };
@@ -87,7 +87,7 @@ PALETTE_INIT_MEMBER(pandoras_state, pandoras)
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(pandoras_state::get_tile_info0)
+void pandoras_state::get_tile_info0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t attr = m_colorram[tile_index];
 	SET_TILE_INFO_MEMBER(1,

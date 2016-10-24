@@ -406,12 +406,12 @@ public:
 	void mapper_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void analog_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
-	DECLARE_WRITE_LINE_MEMBER(duart_tx_a);
-	DECLARE_WRITE_LINE_MEMBER(duart_tx_b);
+	void duart_irq_handler(int state);
+	void duart_tx_a(int state);
+	void duart_tx_b(int state);
 	void duart_output(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER(esq1_doc_irq);
+	void esq1_doc_irq(int state);
 	uint8_t esq1_adc_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	int m_mapper_state;
@@ -425,7 +425,7 @@ public:
 };
 
 
-WRITE_LINE_MEMBER(esq1_state::esq1_doc_irq)
+void esq1_state::esq1_doc_irq(int state)
 {
 }
 
@@ -534,7 +534,7 @@ ADDRESS_MAP_END
 // OP5 = metronome hi
 // OP6/7 = tape out
 
-WRITE_LINE_MEMBER(esq1_state::duart_irq_handler)
+void esq1_state::duart_irq_handler(int state)
 {
 	m_maincpu->set_input_line(M6809_IRQ_LINE, state);
 }
@@ -552,12 +552,12 @@ void esq1_state::duart_output(address_space &space, offs_t offset, uint8_t data,
 }
 
 // MIDI send
-WRITE_LINE_MEMBER(esq1_state::duart_tx_a)
+void esq1_state::duart_tx_a(int state)
 {
 	m_mdout->write_txd(state);
 }
 
-WRITE_LINE_MEMBER(esq1_state::duart_tx_b)
+void esq1_state::duart_tx_b(int state)
 {
 	m_panel->rx_w(state);
 }

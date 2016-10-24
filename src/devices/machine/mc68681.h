@@ -112,8 +112,8 @@ public:
 	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t get_irq_vector() { m_read_vector = true; return IVR; }
 
-	DECLARE_WRITE_LINE_MEMBER( rx_a_w ) { m_chanA->device_serial_interface::rx_w((uint8_t)state); }
-	DECLARE_WRITE_LINE_MEMBER( rx_b_w ) { m_chanB->device_serial_interface::rx_w((uint8_t)state); }
+	void rx_a_w(int state) { m_chanA->device_serial_interface::rx_w((uint8_t)state); }
+	void rx_b_w(int state) { m_chanB->device_serial_interface::rx_w((uint8_t)state); }
 
 	template<class _Object> static devcb_base &set_irq_cb(device_t &device, _Object object) { return downcast<mc68681_device &>(device).write_irq.set_callback(object); }
 	template<class _Object> static devcb_base &set_a_tx_cb(device_t &device, _Object object) { return downcast<mc68681_device &>(device).write_a_tx.set_callback(object); }
@@ -127,12 +127,12 @@ public:
 	int32_t ip3clk, ip4clk, ip5clk, ip6clk;
 
 	// new-style push handlers for input port bits
-	DECLARE_WRITE_LINE_MEMBER( ip0_w );
-	DECLARE_WRITE_LINE_MEMBER( ip1_w );
-	DECLARE_WRITE_LINE_MEMBER( ip2_w );
-	DECLARE_WRITE_LINE_MEMBER( ip3_w );
-	DECLARE_WRITE_LINE_MEMBER( ip4_w );
-	DECLARE_WRITE_LINE_MEMBER( ip5_w );
+	void ip0_w(int state);
+	void ip1_w(int state);
+	void ip2_w(int state);
+	void ip3_w(int state);
+	void ip4_w(int state);
+	void ip5_w(int state);
 
 protected:
 	// device-level overrides
@@ -141,7 +141,7 @@ protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 private:
-	TIMER_CALLBACK_MEMBER( duart_timer_callback );
+	void duart_timer_callback(void *ptr, int32_t param);
 
 	/* registers */
 	uint8_t ACR;  /* Auxiliary Control Register */

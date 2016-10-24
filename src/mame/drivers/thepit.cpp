@@ -700,7 +700,7 @@ static GFXDECODE_START( suprmous )
 GFXDECODE_END
 
 
-INTERRUPT_GEN_MEMBER(thepit_state::vblank_irq)
+void thepit_state::vblank_irq(device_t &device)
 {
 	if(m_nmi_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);

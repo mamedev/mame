@@ -207,7 +207,7 @@ static INPUT_PORTS_START( mbc55x )
 INPUT_PORTS_END
 
 
-PALETTE_INIT_MEMBER(mbc55x_state, mbc55x)
+void mbc55x_state::palette_init_mbc55x(palette_device &palette)
 {
 	int colourno;
 

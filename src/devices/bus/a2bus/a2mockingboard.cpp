@@ -274,7 +274,7 @@ void a2bus_ayboard_device::write_cnxx(address_space &space, uint8_t offset, uint
 }
 
 
-WRITE_LINE_MEMBER( a2bus_ayboard_device::via1_irq_w )
+void a2bus_ayboard_device::via1_irq_w(int state)
 {
 	if (state)
 	{
@@ -286,7 +286,7 @@ WRITE_LINE_MEMBER( a2bus_ayboard_device::via1_irq_w )
 	}
 }
 
-WRITE_LINE_MEMBER( a2bus_ayboard_device::via2_irq_w )
+void a2bus_ayboard_device::via2_irq_w(int state)
 {
 	if (state)
 	{

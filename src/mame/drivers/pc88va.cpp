@@ -134,7 +134,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_pc88va(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(pc88va_vrtc_irq);
+	void pc88va_vrtc_irq(device_t &device);
 	uint8_t cpu_8255_c_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void cpu_8255_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t fdc_8255_c_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
@@ -146,25 +146,25 @@ public:
 	void r232_ctrl_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void r232_ctrl_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t get_slave_ack(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(pc88va_pit_out0_changed);
-//  DECLARE_WRITE_LINE_MEMBER(pc88va_upd765_interrupt);
+	void pc88va_pit_out0_changed(int state);
+//  void pc88va_upd765_interrupt(int state);
 	uint8_t m_fdc_ctrl_2;
-	TIMER_CALLBACK_MEMBER(pc8801fd_upd765_tc_to_zero);
-	TIMER_CALLBACK_MEMBER(t3_mouse_callback);
-	TIMER_CALLBACK_MEMBER(pc88va_fdc_timer);
-	TIMER_CALLBACK_MEMBER(pc88va_fdc_motor_start_0);
-	TIMER_CALLBACK_MEMBER(pc88va_fdc_motor_start_1);
+	void pc8801fd_upd765_tc_to_zero(void *ptr, int32_t param);
+	void t3_mouse_callback(void *ptr, int32_t param);
+	void pc88va_fdc_timer(void *ptr, int32_t param);
+	void pc88va_fdc_motor_start_0(void *ptr, int32_t param);
+	void pc88va_fdc_motor_start_1(void *ptr, int32_t param);
 //  uint16_t m_fdc_dma_r();
 //  void m_fdc_dma_w(uint16_t data);
-	DECLARE_WRITE_LINE_MEMBER(pc88va_hlda_w);
-	DECLARE_WRITE_LINE_MEMBER(pc88va_tc_w);
+	void pc88va_hlda_w(int state);
+	void pc88va_tc_w(int state);
 	uint8_t fdc_dma_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void fdc_dma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 uint8_t dma_memr_cb(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 void dma_memw_cb(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER(fdc_irq);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq);
+	void fdc_irq(int state);
+	void fdc_drq(int state);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	void pc88va_fdc_update_ready(floppy_image_device *, int);
 	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -1049,7 +1049,7 @@ uint8_t pc88va_state::pc88va_fdc_r(address_space &space, offs_t offset, uint8_t 
 	return 0xff;
 }
 
-TIMER_CALLBACK_MEMBER(pc88va_state::pc88va_fdc_timer)
+void pc88va_state::pc88va_fdc_timer(void *ptr, int32_t param)
 {
 	if(m_fdc_ctrl_2 & 4) // XTMASK
 	{
@@ -1058,13 +1058,13 @@ TIMER_CALLBACK_MEMBER(pc88va_state::pc88va_fdc_timer)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(pc88va_state::pc88va_fdc_motor_start_0)
+void pc88va_state::pc88va_fdc_motor_start_0(void *ptr, int32_t param)
 {
 	machine().device<floppy_connector>("upd765:0")->get_device()->mon_w(0);
 	m_fdc_motor_status[0] = 1;
 }
 
-TIMER_CALLBACK_MEMBER(pc88va_state::pc88va_fdc_motor_start_1)
+void pc88va_state::pc88va_fdc_motor_start_1(void *ptr, int32_t param)
 {
 	machine().device<floppy_connector>("upd765:1")->get_device()->mon_w(0);
 	m_fdc_motor_status[1] = 1;
@@ -1181,7 +1181,7 @@ void pc88va_state::screen_ctrl_w(address_space &space, offs_t offset, uint16_t d
 	m_screen_ctrl_reg = data;
 }
 
-TIMER_CALLBACK_MEMBER(pc88va_state::t3_mouse_callback)
+void pc88va_state::t3_mouse_callback(void *ptr, int32_t param)
 {
 	if(m_timer3_io_reg & 0x80)
 	{
@@ -1312,7 +1312,7 @@ static ADDRESS_MAP_START( pc88va_io_map, AS_IO, 16, pc88va_state )
 ADDRESS_MAP_END
 // (*) are specific N88 V1 / V2 ports
 
-TIMER_CALLBACK_MEMBER(pc88va_state::pc8801fd_upd765_tc_to_zero)
+void pc88va_state::pc8801fd_upd765_tc_to_zero(void *ptr, int32_t param)
 {
 	machine().device<upd765a_device>("upd765")->tc_w(false);
 }
@@ -1688,13 +1688,13 @@ void pc88va_state::machine_reset()
 	m_fdc_motor_status[1] = 0;
 }
 
-INTERRUPT_GEN_MEMBER(pc88va_state::pc88va_vrtc_irq)
+void pc88va_state::pc88va_vrtc_irq(device_t &device)
 {
 	machine().device<pic8259_device>("pic8259_master")->ir2_w(0);
 	machine().device<pic8259_device>("pic8259_master")->ir2_w(1);
 }
 
-WRITE_LINE_MEMBER(pc88va_state::pc88va_pit_out0_changed)
+void pc88va_state::pc88va_pit_out0_changed(int state)
 {
 	if(state)
 	{
@@ -1703,13 +1703,13 @@ WRITE_LINE_MEMBER(pc88va_state::pc88va_pit_out0_changed)
 	}
 }
 
-WRITE_LINE_MEMBER( pc88va_state::fdc_drq )
+void pc88va_state::fdc_drq(int state)
 {
 	printf("%02x DRQ\n",state);
 	m_dmac->dreq2_w(state);
 }
 
-WRITE_LINE_MEMBER( pc88va_state::fdc_irq )
+void pc88va_state::fdc_irq(int state)
 {
 	if(m_fdc_mode && state)
 	{
@@ -1723,7 +1723,7 @@ WRITE_LINE_MEMBER( pc88va_state::fdc_irq )
 	#endif
 }
 
-WRITE_LINE_MEMBER(pc88va_state::pc88va_hlda_w)
+void pc88va_state::pc88va_hlda_w(int state)
 {
 //  m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
@@ -1732,7 +1732,7 @@ WRITE_LINE_MEMBER(pc88va_state::pc88va_hlda_w)
 //  printf("%02x HLDA\n",state);
 }
 
-WRITE_LINE_MEMBER( pc88va_state::pc88va_tc_w )
+void pc88va_state::pc88va_tc_w(int state)
 {
 	/* floppy terminal count */
 	m_fdc->tc_w(state);

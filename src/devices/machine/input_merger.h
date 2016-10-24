@@ -45,14 +45,14 @@ public:
 		{ return downcast<input_merger_device &>(device).m_output_handler.set_callback(object); }
 
 	// input lines
-	DECLARE_WRITE_LINE_MEMBER( in0_w ) { m_state[0] = state; update_state(); };
-	DECLARE_WRITE_LINE_MEMBER( in1_w ) { m_state[1] = state; update_state(); };
-	DECLARE_WRITE_LINE_MEMBER( in2_w ) { m_state[2] = state; update_state(); };
-	DECLARE_WRITE_LINE_MEMBER( in3_w ) { m_state[3] = state; update_state(); };
-	DECLARE_WRITE_LINE_MEMBER( in4_w ) { m_state[4] = state; update_state(); };
-	DECLARE_WRITE_LINE_MEMBER( in5_w ) { m_state[5] = state; update_state(); };
-	DECLARE_WRITE_LINE_MEMBER( in6_w ) { m_state[6] = state; update_state(); };
-	DECLARE_WRITE_LINE_MEMBER( in7_w ) { m_state[7] = state; update_state(); };
+	void in0_w(int state) { m_state[0] = state; update_state(); };
+	void in1_w(int state) { m_state[1] = state; update_state(); };
+	void in2_w(int state) { m_state[2] = state; update_state(); };
+	void in3_w(int state) { m_state[3] = state; update_state(); };
+	void in4_w(int state) { m_state[4] = state; update_state(); };
+	void in5_w(int state) { m_state[5] = state; update_state(); };
+	void in6_w(int state) { m_state[6] = state; update_state(); };
+	void in7_w(int state) { m_state[7] = state; update_state(); };
 
 protected:
 	// constructor/destructor

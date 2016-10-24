@@ -64,12 +64,12 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(sound_latch_state_r);
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(dcheese);
+	void palette_init_dcheese(palette_device &palette);
 	uint32_t screen_update_dcheese(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(dcheese_vblank);
+	void dcheese_vblank(device_t &device);
 	void dcheese_signal_irq(int which);
 	void update_irq_state();
-	IRQ_CALLBACK_MEMBER(irq_callback);
+	int irq_callback(device_t &device, int irqline);
 	void update_scanline_irq();
 	void do_clear(  );
 	void do_blit(  );

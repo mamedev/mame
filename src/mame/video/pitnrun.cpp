@@ -23,7 +23,7 @@ In debug build press 'w' for spotlight and 'e' for lightning
 
 
 
-TILE_GET_INFO_MEMBER(pitnrun_state::get_tile_info1)
+void pitnrun_state::get_tile_info1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index];
 	SET_TILE_INFO_MEMBER(0,
@@ -32,7 +32,7 @@ TILE_GET_INFO_MEMBER(pitnrun_state::get_tile_info1)
 		0);
 }
 
-TILE_GET_INFO_MEMBER(pitnrun_state::get_tile_info2)
+void pitnrun_state::get_tile_info2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram2[tile_index];
 	SET_TILE_INFO_MEMBER(1,
@@ -108,7 +108,7 @@ void pitnrun_state::spotlights()
 }
 
 
-PALETTE_INIT_MEMBER(pitnrun_state, pitnrun)
+void pitnrun_state::palette_init_pitnrun(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;

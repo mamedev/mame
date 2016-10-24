@@ -277,7 +277,7 @@ uint32_t electron_state::screen_update_electron(screen_device &screen, bitmap_in
 	return 0;
 }
 
-TIMER_CALLBACK_MEMBER(electron_state::electron_scanline_interrupt)
+void electron_state::electron_scanline_interrupt(void *ptr, int32_t param)
 {
 	switch (machine().first_screen()->vpos())
 	{

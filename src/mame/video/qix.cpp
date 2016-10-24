@@ -43,7 +43,7 @@ void qix_state::video_start_qix()
  *
  *************************************/
 
-WRITE_LINE_MEMBER(qix_state::display_enable_changed)
+void qix_state::display_enable_changed(int state)
 {
 	/* on the rising edge, latch the scanline */
 	if (state)
@@ -64,7 +64,7 @@ WRITE_LINE_MEMBER(qix_state::display_enable_changed)
  *
  *************************************/
 
-WRITE_LINE_MEMBER(qix_state::qix_flip_screen_w)
+void qix_state::qix_flip_screen_w(int state)
 {
 	m_flip = state;
 }

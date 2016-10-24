@@ -165,8 +165,8 @@ public:
 	void sol20_fe_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_sol20();
-	TIMER_CALLBACK_MEMBER(sol20_cassette_tc);
-	TIMER_CALLBACK_MEMBER(sol20_boot);
+	void sol20_cassette_tc(void *ptr, int32_t param);
+	void sol20_boot(void *ptr, int32_t param);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 private:
@@ -228,7 +228,7 @@ void sol20_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 
 
 // identical to sorcerer
-TIMER_CALLBACK_MEMBER(sol20_state::sol20_cassette_tc)
+void sol20_state::sol20_cassette_tc(void *ptr, int32_t param)
 {
 	uint8_t cass_ws = 0;
 	switch (m_sol20_fa & 0x20)
@@ -549,7 +549,7 @@ INPUT_PORTS_END
 
 
 /* after the first 4 bytes have been read from ROM, switch the ram back in */
-TIMER_CALLBACK_MEMBER(sol20_state::sol20_boot)
+void sol20_state::sol20_boot(void *ptr, int32_t param)
 {
 	membank("boot")->set_entry(0);
 }

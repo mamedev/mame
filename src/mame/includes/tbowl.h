@@ -69,9 +69,9 @@ public:
 	void bg2yscroll_lo(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void bg2yscroll_hi(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	TILE_GET_INFO_MEMBER(get_tx_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
+	void get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_bg2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -81,6 +81,6 @@ public:
 	uint32_t screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void adpcm_int(msm5205_device *device, int chip);
-	DECLARE_WRITE_LINE_MEMBER(adpcm_int_1);
-	DECLARE_WRITE_LINE_MEMBER(adpcm_int_2);
+	void adpcm_int_1(int state);
+	void adpcm_int_2(int state);
 };

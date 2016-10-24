@@ -444,7 +444,7 @@ GFXDECODE_END
 ***************************************************************************/
 
 
-WRITE_LINE_MEMBER(yunsung8_state::adpcm_int)
+void yunsung8_state::adpcm_int(int state)
 {
 	m_msm->data_w(m_adpcm >> 4);
 	m_adpcm <<= 4;

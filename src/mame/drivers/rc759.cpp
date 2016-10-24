@@ -72,11 +72,11 @@ public:
 	uint8_t ppi_portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void ppi_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER(centronics_busy_w);
-	DECLARE_WRITE_LINE_MEMBER(centronics_ack_w);
-	DECLARE_WRITE_LINE_MEMBER(centronics_fault_w);
-	DECLARE_WRITE_LINE_MEMBER(centronics_perror_w);
-	DECLARE_WRITE_LINE_MEMBER(centronics_select_w);
+	void centronics_busy_w(int state);
+	void centronics_ack_w(int state);
+	void centronics_fault_w(int state);
+	void centronics_perror_w(int state);
+	void centronics_select_w(int state);
 
 	uint8_t centronics_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void centronics_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -89,8 +89,8 @@ public:
 	uint8_t palette_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void palette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER(i186_timer0_w);
-	DECLARE_WRITE_LINE_MEMBER(i186_timer1_w);
+	void i186_timer0_w(int state);
+	void i186_timer1_w(int state);
 
 	void nvram_init(nvram_device &nvram, void *data, size_t size);
 	uint8_t nvram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
@@ -210,28 +210,28 @@ void rc759_state::ppi_portc_w(address_space &space, offs_t offset, uint8_t data,
 		m_cas_enabled, BIT(data, 1), m_drq_source, m_nvram_bank, m_gfx_mode, m_keyboard_enable);
 }
 
-WRITE_LINE_MEMBER( rc759_state::centronics_busy_w )
+void rc759_state::centronics_busy_w(int state)
 {
 	m_centronics_busy = state;
 	m_pic->ir6_w(state);
 }
 
-WRITE_LINE_MEMBER( rc759_state::centronics_ack_w )
+void rc759_state::centronics_ack_w(int state)
 {
 	m_centronics_ack = state;
 }
 
-WRITE_LINE_MEMBER( rc759_state::centronics_fault_w )
+void rc759_state::centronics_fault_w(int state)
 {
 	m_centronics_fault = state;
 }
 
-WRITE_LINE_MEMBER( rc759_state::centronics_perror_w )
+void rc759_state::centronics_perror_w(int state)
 {
 	m_centronics_perror = state;
 }
 
-WRITE_LINE_MEMBER( rc759_state::centronics_select_w )
+void rc759_state::centronics_select_w(int state)
 {
 	m_centronics_select = state;
 }
@@ -394,7 +394,7 @@ void rc759_state::rtc_w(address_space &space, offs_t offset, uint8_t data, uint8
 //  MACHINE EMULATION
 //**************************************************************************
 
-WRITE_LINE_MEMBER( rc759_state::i186_timer0_w )
+void rc759_state::i186_timer0_w(int state)
 {
 	if (m_cas_enabled)
 	{
@@ -403,7 +403,7 @@ WRITE_LINE_MEMBER( rc759_state::i186_timer0_w )
 	}
 }
 
-WRITE_LINE_MEMBER( rc759_state::i186_timer1_w )
+void rc759_state::i186_timer1_w(int state)
 {
 	m_speaker->level_w(state);
 }

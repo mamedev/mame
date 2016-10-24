@@ -199,21 +199,21 @@ void popeye_state::convert_color_prom(const uint8_t *color_prom)
 #endif
 }
 
-PALETTE_INIT_MEMBER(popeye_state, popeye)
+void popeye_state::palette_init_popeye(palette_device &palette)
 {
 	m_invertmask = (USE_NEW_COLOR) ? 0x00 : 0xff;
 
 	convert_color_prom(m_color_prom);
 }
 
-PALETTE_INIT_MEMBER(popeye_state,popeyebl)
+void popeye_state::palette_init_popeyebl(palette_device &palette)
 {
 	m_invertmask = (USE_NEW_COLOR) ? 0xff : 0x00;
 
 	convert_color_prom(m_color_prom);
 }
 
-PALETTE_INIT_MEMBER(popeye_state, skyskipr)
+void popeye_state::palette_init_skyskipr(palette_device &palette)
 {
 	/* Two of the PROM address pins are tied together and one is not connected... */
 	for (int i = 0;i < 0x100;i++)
@@ -343,7 +343,7 @@ void popeye_state::skyskipr_bitmap_w(address_space &space, offs_t offset, uint8_
 	popeye_bitmap_w(space,offset,data);
 }
 
-TILE_GET_INFO_MEMBER(popeye_state::get_fg_tile_info)
+void popeye_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index];
 	int color = m_colorram[tile_index] & 0x0f;

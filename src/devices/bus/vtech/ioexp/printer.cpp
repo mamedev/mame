@@ -76,7 +76,7 @@ void printer_interface_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-WRITE_LINE_MEMBER( printer_interface_device::busy_w )
+void printer_interface_device::busy_w(int state)
 {
 	m_centronics_busy = state;
 }

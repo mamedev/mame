@@ -39,7 +39,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(irobot_state, irobot)
+void irobot_state::palette_init_irobot(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;

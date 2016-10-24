@@ -18,7 +18,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(xorworld_state, xorworld)
+void xorworld_state::palette_init_xorworld(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -67,7 +67,7 @@ void xorworld_state::videoram_w(address_space &space, offs_t offset, uint16_t da
       0  | xxxx---- -------- | color
 */
 
-TILE_GET_INFO_MEMBER(xorworld_state::get_bg_tile_info)
+void xorworld_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int data = m_videoram[tile_index];
 	int code = data & 0x0fff;

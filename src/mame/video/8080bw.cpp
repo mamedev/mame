@@ -26,7 +26,7 @@ void _8080bw_state::machine_start_extra_8080bw_vh()
 }
 
 
-PALETTE_INIT_MEMBER(_8080bw_state,rollingc)
+void _8080bw_state::palette_init_rollingc(palette_device &palette)
 {
 	// palette is 3bpp + intensity
 	for (int i = 0; i < 8; i++)
@@ -42,7 +42,7 @@ PALETTE_INIT_MEMBER(_8080bw_state,rollingc)
 }
 
 
-PALETTE_INIT_MEMBER( _8080bw_state, sflush )
+void _8080bw_state::palette_init_sflush(palette_device &palette)
 {
 	// standard 3-bit rbg palette
 	palette.palette_init_3bit_rbg(palette);

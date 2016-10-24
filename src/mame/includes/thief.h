@@ -43,7 +43,7 @@ public:
 	void init_thief();
 	virtual void video_start() override;
 	uint32_t screen_update_thief(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(thief_interrupt);
+	void thief_interrupt(device_t &device);
 	uint16_t fetch_image_addr( coprocessor_t &thief_coprocessor );
 	void tape_set_audio( int track, int bOn );
 	void tape_set_motor( int bOn );

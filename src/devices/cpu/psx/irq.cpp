@@ -118,7 +118,7 @@ uint32_t psxirq_device::read(address_space &space, offs_t offset, uint32_t mem_m
 	return 0;
 }
 
-WRITE_LINE_MEMBER( psxirq_device::intin0 )
+void psxirq_device::intin0(int state)
 {
 	if( state )
 	{
@@ -126,7 +126,7 @@ WRITE_LINE_MEMBER( psxirq_device::intin0 )
 	}
 }
 
-WRITE_LINE_MEMBER( psxirq_device::intin1 )
+void psxirq_device::intin1(int state)
 {
 	if( state )
 	{
@@ -134,7 +134,7 @@ WRITE_LINE_MEMBER( psxirq_device::intin1 )
 	}
 }
 
-WRITE_LINE_MEMBER( psxirq_device::intin2 )
+void psxirq_device::intin2(int state)
 {
 	if( state )
 	{
@@ -142,7 +142,7 @@ WRITE_LINE_MEMBER( psxirq_device::intin2 )
 	}
 }
 
-WRITE_LINE_MEMBER( psxirq_device::intin3 )
+void psxirq_device::intin3(int state)
 {
 	if( state )
 	{
@@ -150,7 +150,7 @@ WRITE_LINE_MEMBER( psxirq_device::intin3 )
 	}
 }
 
-WRITE_LINE_MEMBER( psxirq_device::intin4 )
+void psxirq_device::intin4(int state)
 {
 	if( state )
 	{
@@ -158,7 +158,7 @@ WRITE_LINE_MEMBER( psxirq_device::intin4 )
 	}
 }
 
-WRITE_LINE_MEMBER( psxirq_device::intin5 )
+void psxirq_device::intin5(int state)
 {
 	if( state )
 	{
@@ -166,7 +166,7 @@ WRITE_LINE_MEMBER( psxirq_device::intin5 )
 	}
 }
 
-WRITE_LINE_MEMBER( psxirq_device::intin6 )
+void psxirq_device::intin6(int state)
 {
 	if( state )
 	{
@@ -174,7 +174,7 @@ WRITE_LINE_MEMBER( psxirq_device::intin6 )
 	}
 }
 
-WRITE_LINE_MEMBER( psxirq_device::intin7 )
+void psxirq_device::intin7(int state)
 {
 	if( state )
 	{
@@ -182,7 +182,7 @@ WRITE_LINE_MEMBER( psxirq_device::intin7 )
 	}
 }
 
-WRITE_LINE_MEMBER( psxirq_device::intin8 )
+void psxirq_device::intin8(int state)
 {
 	if( state )
 	{
@@ -190,7 +190,7 @@ WRITE_LINE_MEMBER( psxirq_device::intin8 )
 	}
 }
 
-WRITE_LINE_MEMBER( psxirq_device::intin9 )
+void psxirq_device::intin9(int state)
 {
 	if( state )
 	{
@@ -198,7 +198,7 @@ WRITE_LINE_MEMBER( psxirq_device::intin9 )
 	}
 }
 
-WRITE_LINE_MEMBER( psxirq_device::intin10 )
+void psxirq_device::intin10(int state)
 {
 	if( state )
 	{

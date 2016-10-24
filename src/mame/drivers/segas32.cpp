@@ -661,7 +661,7 @@ void segas32_state::signal_v60_irq(int which)
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(segas32_state::signal_v60_irq_callback)
+void segas32_state::signal_v60_irq_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	signal_v60_irq(param);
 }
@@ -782,14 +782,14 @@ void segas32_state::interrupt_control_32_w(address_space &space, offs_t offset, 
 }
 
 
-TIMER_CALLBACK_MEMBER(segas32_state::end_of_vblank_int)
+void segas32_state::end_of_vblank_int(void *ptr, int32_t param)
 {
 	signal_v60_irq(MAIN_IRQ_VBSTOP);
 	system32_set_vblank(0);
 }
 
 
-INTERRUPT_GEN_MEMBER(segas32_state::start_of_vblank_int)
+void segas32_state::start_of_vblank_int(device_t &device)
 {
 	signal_v60_irq(MAIN_IRQ_VBSTART);
 	system32_set_vblank(1);
@@ -1310,7 +1310,7 @@ void segas32_state::sound_int_control_hi_w(address_space &space, offs_t offset, 
 }
 
 
-WRITE_LINE_MEMBER(segas32_state::ym3438_irq_handler)
+void segas32_state::ym3438_irq_handler(int state)
 {
 	if (state)
 		signal_sound_irq(SOUND_IRQ_YM3438);

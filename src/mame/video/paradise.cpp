@@ -94,7 +94,7 @@ void paradise_state::palbank_w(address_space &space, offs_t offset, uint8_t data
 	}
 }
 
-TILE_GET_INFO_MEMBER(paradise_state::get_tile_info_0)
+void paradise_state::get_tile_info_0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_vram_0[tile_index] + (m_vram_0[tile_index + 0x400] << 8);
 	SET_TILE_INFO_MEMBER(1, code, m_palbank, 0);
@@ -108,7 +108,7 @@ void paradise_state::vram_1_w(address_space &space, offs_t offset, uint8_t data,
 	m_tilemap_1->mark_tile_dirty(offset % 0x400);
 }
 
-TILE_GET_INFO_MEMBER(paradise_state::get_tile_info_1)
+void paradise_state::get_tile_info_1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_vram_1[tile_index] + (m_vram_1[tile_index + 0x400] << 8);
 	SET_TILE_INFO_MEMBER(2, code, 0, 0);
@@ -122,7 +122,7 @@ void paradise_state::vram_2_w(address_space &space, offs_t offset, uint8_t data,
 	m_tilemap_2->mark_tile_dirty(offset % 0x400);
 }
 
-TILE_GET_INFO_MEMBER(paradise_state::get_tile_info_2)
+void paradise_state::get_tile_info_2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_vram_2[tile_index] + (m_vram_2[tile_index + 0x400] << 8);
 	SET_TILE_INFO_MEMBER(3, code, 0, 0);

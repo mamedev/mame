@@ -31,7 +31,7 @@ static GFXDECODE_START( 0x080000 )
 GFXDECODE_END
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(targeth_state::interrupt)
+void targeth_state::interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

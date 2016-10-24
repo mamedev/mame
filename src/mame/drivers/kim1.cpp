@@ -190,7 +190,7 @@ void kim1_state::kim1_u2_write_b(address_space &space, offs_t offset, uint8_t da
 	/* Set IRQ when bit 7 is cleared */
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(kim1_state::kim1_cassette_input)
+void kim1_state::kim1_cassette_input(timer_device &timer, void *ptr, int32_t param)
 {
 	double tap_val = m_cass->input();
 
@@ -208,7 +208,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(kim1_state::kim1_cassette_input)
 }
 
 // Blank LEDs during cassette operations
-TIMER_DEVICE_CALLBACK_MEMBER(kim1_state::kim1_update_leds)
+void kim1_state::kim1_update_leds(timer_device &timer, void *ptr, int32_t param)
 {
 	uint8_t i;
 

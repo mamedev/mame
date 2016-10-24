@@ -1388,13 +1388,13 @@ void saturn_state::cd_exec_command( void )
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( saturn_state::stv_sh1_sim )
+void saturn_state::stv_sh1_sim(timer_device &timer, void *ptr, int32_t param)
 {
 	if((cmd_pending == 0xf) && (!(hirqreg & CMOK)))
 		cd_exec_command();
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( saturn_state::stv_sector_cb )
+void saturn_state::stv_sector_cb(timer_device &timer, void *ptr, int32_t param)
 {
 	//sector_timer->reset();
 

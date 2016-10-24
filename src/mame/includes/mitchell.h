@@ -118,14 +118,14 @@ public:
 	void init_pkladies();
 	void init_blockbl();
 	void init_dokaben();
-	TILE_GET_INFO_MEMBER(get_tile_info);
+	void get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void machine_start_mitchell();
 	void machine_reset_mitchell();
 	void video_start_pang();
 	uint32_t screen_update_pang(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(mitchell_irq);
+	void mitchell_irq(timer_device &timer, void *ptr, int32_t param);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void bootleg_decode();
 	void configure_banks(void (*decode)(uint8_t *src, uint8_t *dst, int size));
-	DECLARE_WRITE_LINE_MEMBER(spangbl_adpcm_int);
+	void spangbl_adpcm_int(int state);
 };

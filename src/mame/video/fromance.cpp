@@ -31,8 +31,8 @@ inline void fromance_state::get_fromance_tile_info( tile_data &tileinfo, int til
 	SET_TILE_INFO_MEMBER(layer, tile, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(fromance_state::get_fromance_bg_tile_info){ get_fromance_tile_info(tileinfo, tile_index, 0); }
-TILE_GET_INFO_MEMBER(fromance_state::get_fromance_fg_tile_info){ get_fromance_tile_info(tileinfo, tile_index, 1); }
+void fromance_state::get_fromance_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ get_fromance_tile_info(tileinfo, tile_index, 0); }
+void fromance_state::get_fromance_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ get_fromance_tile_info(tileinfo, tile_index, 1); }
 
 
 inline void fromance_state::get_nekkyoku_tile_info( tile_data &tileinfo, int tile_index, int layer )
@@ -44,8 +44,8 @@ inline void fromance_state::get_nekkyoku_tile_info( tile_data &tileinfo, int til
 	SET_TILE_INFO_MEMBER(layer, tile, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(fromance_state::get_nekkyoku_bg_tile_info){ get_nekkyoku_tile_info(tileinfo, tile_index, 0); }
-TILE_GET_INFO_MEMBER(fromance_state::get_nekkyoku_fg_tile_info){ get_nekkyoku_tile_info(tileinfo, tile_index, 1); }
+void fromance_state::get_nekkyoku_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ get_nekkyoku_tile_info(tileinfo, tile_index, 0); }
+void fromance_state::get_nekkyoku_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ get_nekkyoku_tile_info(tileinfo, tile_index, 1); }
 
 
 
@@ -243,7 +243,7 @@ void fromance_state::fromance_scroll_w(address_space &space, offs_t offset, uint
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(fromance_state::crtc_interrupt_gen)
+void fromance_state::crtc_interrupt_gen(void *ptr, int32_t param)
 {
 	m_subcpu->set_input_line(0, HOLD_LINE);
 	if (param != 0)

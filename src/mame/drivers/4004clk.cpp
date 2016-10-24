@@ -31,7 +31,7 @@ public:
 	uint16_t m_nixie[16];
 	uint8_t m_timer;
 	virtual void machine_start() override;
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_callback);
+	void timer_callback(timer_device &timer, void *ptr, int32_t param);
 	uint8_t nixie_to_num(uint16_t val);
 	inline void output_set_nixie_value(int index, int value);
 	inline void output_set_neon_value(int index, int value);
@@ -125,7 +125,7 @@ INPUT_PORTS_END
 
 */
 
-TIMER_DEVICE_CALLBACK_MEMBER(nixieclock_state::timer_callback)
+void nixieclock_state::timer_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	m_maincpu->set_test(m_timer);
 	m_timer^=1;

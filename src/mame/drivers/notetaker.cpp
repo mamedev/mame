@@ -185,7 +185,7 @@ public:
 	uint8_t m_outfifo_head_ptr;
 	// fifo timer
 	emu_timer *m_FIFO_timer;
-	TIMER_CALLBACK_MEMBER(timer_fifoclk);
+	void timer_fifoclk(void *ptr, int32_t param);
 	// framebuffer display starting address
 	uint16_t m_DispAddr;
 
@@ -213,7 +213,7 @@ void notetaker_state::device_timer(emu_timer &timer, device_timer_id id, int par
 	}
 }
 
-TIMER_CALLBACK_MEMBER(notetaker_state::timer_fifoclk)
+void notetaker_state::timer_fifoclk(void *ptr, int32_t param)
 {
 	uint16_t data;
 	//pop a value off the fifo and send it to the dac.

@@ -140,15 +140,15 @@ public:
 	void init_decocass();
 	void init_decocrom();
 	void init_cdsteljn();
-	TILEMAP_MAPPER_MEMBER(fgvideoram_scan_cols);
-	TILEMAP_MAPPER_MEMBER(bgvideoram_scan_cols);
-	TILE_GET_INFO_MEMBER(get_bg_l_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg_r_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	tilemap_memory_index fgvideoram_scan_cols(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	tilemap_memory_index bgvideoram_scan_cols(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	void get_bg_l_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_bg_r_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(decocass);
+	void palette_init_decocass(palette_device &palette);
 	void machine_reset_ctsttape();
 	void machine_reset_cprogolfj();
 	void machine_reset_cdsteljn();
@@ -245,7 +245,7 @@ public:
 	uint8_t mirrorcolorram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t cdsteljn_input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void cdsteljn_mux_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	TIMER_DEVICE_CALLBACK_MEMBER(decocass_audio_nmi_gen);
+	void decocass_audio_nmi_gen(timer_device &timer, void *ptr, int32_t param);
 private:
 	uint8_t decocass_type1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t decocass_type2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);

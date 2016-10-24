@@ -66,7 +66,7 @@ public:
 	uint16_t shtstar_unk_2_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	uint16_t artmagic_blitter_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void artmagic_blitter_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	DECLARE_WRITE_LINE_MEMBER(m68k_gen_int);
+	void m68k_gen_int(int state);
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline);

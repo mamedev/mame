@@ -270,12 +270,12 @@ public:
 	void init_halleys();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(halleys);
+	void palette_init_halleys(palette_device &palette);
 	uint32_t screen_update_halleys(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_benberob(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(blitter_reset);
-	TIMER_DEVICE_CALLBACK_MEMBER(halleys_scanline);
-	TIMER_DEVICE_CALLBACK_MEMBER(benberob_scanline);
+	void blitter_reset(void *ptr, int32_t param);
+	void halleys_scanline(timer_device &timer, void *ptr, int32_t param);
+	void benberob_scanline(timer_device &timer, void *ptr, int32_t param);
 	void halleys_decode_rgb(uint32_t *r, uint32_t *g, uint32_t *b, int addr, int data);
 	void copy_scroll_op(bitmap_ind16 &bitmap, uint16_t *source, int sx, int sy);
 	void copy_scroll_xp(bitmap_ind16 &bitmap, uint16_t *source, int sx, int sy);
@@ -1050,7 +1050,7 @@ uint8_t halleys_state::blitter_r(address_space &space, offs_t offset, uint8_t me
 }
 
 
-TIMER_CALLBACK_MEMBER(halleys_state::blitter_reset)
+void halleys_state::blitter_reset(void *ptr, int32_t param)
 {
 	m_blitter_busy = 0;
 }
@@ -1118,7 +1118,7 @@ uint8_t halleys_state::collision_id_r(address_space &space, offs_t offset, uint8
 //**************************************************************************
 // Video Initializations and Updates
 
-PALETTE_INIT_MEMBER(halleys_state, halleys)
+void halleys_state::palette_init_halleys(palette_device &palette)
 {
 	uint32_t d, r, g, b, i, j, count;
 	// allocate memory for internal palette
@@ -1515,7 +1515,7 @@ uint8_t halleys_state::debug_r(address_space &space, offs_t offset, uint8_t mem_
 // Interrupt and Hardware Handlers
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(halleys_state::halleys_scanline)
+void halleys_state::halleys_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -1544,7 +1544,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(halleys_state::halleys_scanline)
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(halleys_state::benberob_scanline)
+void halleys_state::benberob_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

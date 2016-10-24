@@ -144,7 +144,7 @@ void warpwarp_state::machine_start()
 }
 
 /* Interrupt Gen */
-INTERRUPT_GEN_MEMBER(warpwarp_state::vblank_irq)
+void warpwarp_state::vblank_irq(device_t &device)
 {
 	if (m_ball_on)
 		device.execute().set_input_line(0, ASSERT_LINE);

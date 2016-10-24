@@ -89,8 +89,8 @@ public:
 
 	// getters
 	m6502_device &soundcpu() const { return *m_jsacpu; }
-	DECLARE_READ_LINE_MEMBER(main_to_sound_ready) { return m_soundcomm->main_to_sound_ready(); }
-	DECLARE_READ_LINE_MEMBER(sound_to_main_ready) { return m_soundcomm->sound_to_main_ready(); }
+	int main_to_sound_ready() { return m_soundcomm->main_to_sound_ready(); }
+	int sound_to_main_ready() { return m_soundcomm->sound_to_main_ready(); }
 
 	// main cpu accessors
 	void main_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -99,10 +99,10 @@ public:
 
 	// read/write handlers
 	void ym2151_port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_READ_LINE_MEMBER(main_test_read_line);
+	int main_test_read_line();
 
 	// I/O lines
-	DECLARE_WRITE_LINE_MEMBER(main_int_write_line);
+	void main_int_write_line(int state);
 
 protected:
 	// device-level overrides

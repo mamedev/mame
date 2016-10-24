@@ -1365,7 +1365,7 @@ void namcos22_state::namcos22s_system_controller_w(address_space &space, offs_t 
 00008bf0: sys[0x00] := 0x04 // vblank
 00008bf8: sys[0x08] := 0xff // ?
 */
-INTERRUPT_GEN_MEMBER(namcos22_state::namcos22s_interrupt)
+void namcos22_state::namcos22s_interrupt(device_t &device)
 {
 	if (m_syscontrol[0x00] & 7)
 	{
@@ -1541,7 +1541,7 @@ Cyber Commando:
 
     move.b  #$34, $40000004.l
 */
-INTERRUPT_GEN_MEMBER(namcos22_state::namcos22_interrupt)
+void namcos22_state::namcos22_interrupt(device_t &device)
 {
 	switch (m_gametype)
 	{
@@ -2440,7 +2440,7 @@ uint16_t namcos22_state::master_serial_io_r(address_space &space, offs_t offset,
 	return m_SerialDataSlaveToMasterCurrent;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::dsp_master_serial_irq)
+void namcos22_state::dsp_master_serial_irq(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -2460,7 +2460,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::dsp_master_serial_irq)
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::dsp_slave_serial_irq)
+void namcos22_state::dsp_slave_serial_irq(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -2728,7 +2728,7 @@ ADDRESS_MAP_END
 
 // Super System 22 M37710
 
-TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::mcu_irq)
+void namcos22_state::mcu_irq(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -2923,7 +2923,7 @@ void namcos22_state::handle_cybrcomm_io()
 
 // Alpine skiing games
 
-TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::alpine_steplock_callback)
+void namcos22_state::alpine_steplock_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	m_motor_status = param;
 }
@@ -2973,12 +2973,12 @@ static ADDRESS_MAP_START( propcycl_io_map, AS_IO, 8, namcos22_state )
 	AM_IMPORT_FROM( mcu_io )
 ADDRESS_MAP_END
 
-TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::propcycl_pedal_interrupt)
+void namcos22_state::propcycl_pedal_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	generic_pulse_irq_line(*m_mcu, M37710_LINE_TIMERA3TICK, 1);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::propcycl_pedal_update)
+void namcos22_state::propcycl_pedal_update(timer_device &timer, void *ptr, int32_t param)
 {
 	// arbitrary timer for reading optical pedal
 	uint8_t i = ioport("PEDAL")->read();
@@ -3008,12 +3008,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::propcycl_pedal_update)
 
 // Armadillo Racing
 
-TIMER_CALLBACK_MEMBER(namcos22_state::adillor_trackball_interrupt)
+void namcos22_state::adillor_trackball_interrupt(void *ptr, int32_t param)
 {
 	generic_pulse_irq_line(*m_mcu, param ? M37710_LINE_TIMERA2TICK : M37710_LINE_TIMERA3TICK, 1);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(namcos22_state::adillor_trackball_update)
+void namcos22_state::adillor_trackball_update(timer_device &timer, void *ptr, int32_t param)
 {
 	// arbitrary timer for reading optical trackball
 	uint8_t ix = ioport("TRACKX")->read();

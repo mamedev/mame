@@ -51,7 +51,7 @@ void segas1x_bootleg_state::setup_system16_bootleg_spritebanking(  )
 
 /***************************************************************************/
 
-TILEMAP_MAPPER_MEMBER(segas1x_bootleg_state::sys16_bg_map)
+tilemap_memory_index segas1x_bootleg_state::sys16_bg_map(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	int page = 0;
 	if (row < 32)
@@ -76,7 +76,7 @@ TILEMAP_MAPPER_MEMBER(segas1x_bootleg_state::sys16_bg_map)
 	return page * 64 * 32 + row * 64 + col;
 }
 
-TILEMAP_MAPPER_MEMBER(segas1x_bootleg_state::sys16_text_map)
+tilemap_memory_index segas1x_bootleg_state::sys16_text_map(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	return row * 64 + col + (64 - 40);
 }
@@ -227,7 +227,7 @@ void segas1x_bootleg_state::update_page(  )
 	}
 }
 
-TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_bg_tile_info)
+void segas1x_bootleg_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	const uint16_t *source = 64 * 32 * m_bg_page[tile_index / (64 * 32)] + m_tileram;
 	int data = source[tile_index%(64*32)];
@@ -239,7 +239,7 @@ TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_bg_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_fg_tile_info)
+void segas1x_bootleg_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	const uint16_t *source = 64 * 32 * m_fg_page[tile_index / (64 * 32)] + m_tileram;
 	int data = source[tile_index % (64 * 32)];
@@ -251,7 +251,7 @@ TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_fg_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_bg2_tile_info)
+void segas1x_bootleg_state::get_bg2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	const uint16_t *source = 64 * 32 * m_bg2_page[tile_index / (64 * 32)] + m_tileram;
 	int data = source[tile_index % (64 * 32)];
@@ -263,7 +263,7 @@ TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_bg2_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_fg2_tile_info)
+void segas1x_bootleg_state::get_fg2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	const uint16_t *source = 64 * 32 * m_fg2_page[tile_index / (64 * 32)] + m_tileram;
 	int data = source[tile_index % (64 * 32)];
@@ -313,7 +313,7 @@ void segas1x_bootleg_state::sys16_tileram_w(address_space &space, offs_t offset,
 
 /***************************************************************************/
 
-TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_text_tile_info)
+void segas1x_bootleg_state::get_text_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	const uint16_t *source = m_textram;
 	int tile_number = source[tile_index];
@@ -471,7 +471,7 @@ void segas1x_bootleg_state::video_start_system18old()
 *****************************************************************************************/
 
 
-TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_s16a_bootleg_tile_infotxt)
+void segas1x_bootleg_state::get_s16a_bootleg_tile_infotxt(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int data, tile_number;
 
@@ -484,7 +484,7 @@ TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_s16a_bootleg_tile_infotxt)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_s16a_bootleg_tile_info0)
+void segas1x_bootleg_state::get_s16a_bootleg_tile_info0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int data, tile_number;
 
@@ -498,7 +498,7 @@ TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_s16a_bootleg_tile_info0)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(segas1x_bootleg_state::get_s16a_bootleg_tile_info1)
+void segas1x_bootleg_state::get_s16a_bootleg_tile_info1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int data, tile_number;
 

@@ -77,7 +77,7 @@ public:
 
 	void init_px4();
 
-	DECLARE_PALETTE_INIT( px4 );
+	void palette_init_px4(palette_device &palette);
 	uint32_t screen_update_px4(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	uint8_t icrlc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
@@ -110,21 +110,21 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER( key_callback );
 
-	TIMER_DEVICE_CALLBACK_MEMBER( ext_cassette_read );
-	TIMER_DEVICE_CALLBACK_MEMBER( frc_tick );
-	TIMER_DEVICE_CALLBACK_MEMBER( upd7508_1sec_callback );
+	void ext_cassette_read(timer_device &timer, void *ptr, int32_t param);
+	void frc_tick(timer_device &timer, void *ptr, int32_t param);
+	void upd7508_1sec_callback(timer_device &timer, void *ptr, int32_t param);
 
 	// serial
-	DECLARE_WRITE_LINE_MEMBER( sio_rx_w );
-	DECLARE_WRITE_LINE_MEMBER( sio_pin_w );
-	DECLARE_WRITE_LINE_MEMBER( rs232_rx_w );
-	DECLARE_WRITE_LINE_MEMBER( rs232_dcd_w );
-	DECLARE_WRITE_LINE_MEMBER( rs232_dsr_w );
-	DECLARE_WRITE_LINE_MEMBER( rs232_cts_w );
+	void sio_rx_w(int state);
+	void sio_pin_w(int state);
+	void rs232_rx_w(int state);
+	void rs232_dcd_w(int state);
+	void rs232_dsr_w(int state);
+	void rs232_cts_w(int state);
 
 	// centronics
-	DECLARE_WRITE_LINE_MEMBER( centronics_busy_w ) { m_centronics_busy = state; }
-	DECLARE_WRITE_LINE_MEMBER( centronics_perror_w ) { m_centronics_perror = state; }
+	void centronics_busy_w(int state) { m_centronics_busy = state; }
+	void centronics_perror_w(int state) { m_centronics_perror = state; }
 
 protected:
 	// driver_device overrides
@@ -173,7 +173,7 @@ private:
 
 	void gapnit_interrupt();
 
-	DECLARE_WRITE_LINE_MEMBER( serial_rx_w );
+	void serial_rx_w(int state);
 	void txd_w(int data);
 
 	void install_rom_capsule(address_space &space, int size, memory_region *mem);
@@ -254,7 +254,7 @@ public:
 
 	void init_px4p();
 
-	DECLARE_PALETTE_INIT( px4p );
+	void palette_init_px4p(palette_device &palette);
 
 	void ramdisk_address_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t ramdisk_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
@@ -300,7 +300,7 @@ void px4_state::gapnit_interrupt()
 }
 
 // external cassette or barcode reader input
-TIMER_DEVICE_CALLBACK_MEMBER( px4_state::ext_cassette_read )
+void px4_state::ext_cassette_read(timer_device &timer, void *ptr, int32_t param)
 {
 	uint8_t result;
 	int trigger = 0;
@@ -338,7 +338,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( px4_state::ext_cassette_read )
 }
 
 // free running counter
-TIMER_DEVICE_CALLBACK_MEMBER( px4_state::frc_tick )
+void px4_state::frc_tick(timer_device &timer, void *ptr, int32_t param)
 {
 	m_frc_value++;
 
@@ -782,40 +782,40 @@ void px4_state::spur_w(address_space &space, offs_t offset, uint8_t data, uint8_
 //  GAPNIO
 //**************************************************************************
 
-WRITE_LINE_MEMBER( px4_state::serial_rx_w )
+void px4_state::serial_rx_w(int state)
 {
 	m_serial_rx = state;
 	device_serial_interface::rx_w(state);
 }
 
-WRITE_LINE_MEMBER( px4_state::sio_rx_w )
+void px4_state::sio_rx_w(int state)
 {
 	if (!BIT(m_swr, 3) && BIT(m_swr, 2))
 		serial_rx_w(state);
 }
 
-WRITE_LINE_MEMBER( px4_state::sio_pin_w )
+void px4_state::sio_pin_w(int state)
 {
 	m_sio_pin = state;
 }
 
-WRITE_LINE_MEMBER( px4_state::rs232_rx_w )
+void px4_state::rs232_rx_w(int state)
 {
 	if (BIT(m_swr, 3))
 		serial_rx_w(state);
 }
 
-WRITE_LINE_MEMBER( px4_state::rs232_dcd_w )
+void px4_state::rs232_dcd_w(int state)
 {
 	m_rs232_dcd = state;
 }
 
-WRITE_LINE_MEMBER( px4_state::rs232_dsr_w )
+void px4_state::rs232_dsr_w(int state)
 {
 	m_artsr |= !state << 7;
 }
 
-WRITE_LINE_MEMBER( px4_state::rs232_cts_w )
+void px4_state::rs232_cts_w(int state)
 {
 	m_rs232_cts = state;
 }
@@ -1048,7 +1048,7 @@ void px4_state::ioctlr_w(address_space &space, offs_t offset, uint8_t data, uint
 //  7508 RELATED
 //**************************************************************************
 
-TIMER_DEVICE_CALLBACK_MEMBER( px4_state::upd7508_1sec_callback )
+void px4_state::upd7508_1sec_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	// adjust interrupt status
 	m_interrupt_status |= UPD7508_INT_ONE_SECOND;
@@ -1449,13 +1449,13 @@ INPUT_PORTS_END
 //  PALETTE
 //**************************************************************************
 
-PALETTE_INIT_MEMBER( px4_state, px4 )
+void px4_state::palette_init_px4(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
 }
 
-PALETTE_INIT_MEMBER( px4p_state, px4p )
+void px4p_state::palette_init_px4p(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(149, 157, 130));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));

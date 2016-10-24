@@ -179,7 +179,7 @@ void beezer_sound_device::device_reset()
  *  TODO: make this actually do something useful
  *************************************/
 
-/*WRITE_LINE_MEMBER( beezer_sound_device::update_irq_state )
+/*void beezer_sound_device::update_irq_state(int state)
 {
     m_audiocpu->set_input_line(M6809_IRQ_LINE, (sndptm_irq_state) ? ASSERT_LINE : CLEAR_LINE);
 }*/

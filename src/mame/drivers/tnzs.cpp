@@ -1533,7 +1533,7 @@ GFXDECODE_END
 
 
 /* handler called by the 2203 emulator when the internal timers cause an IRQ */
-WRITE_LINE_MEMBER(tnzs_state::irqhandler)
+void tnzs_state::irqhandler(int state)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
 }

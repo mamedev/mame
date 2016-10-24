@@ -134,22 +134,22 @@ INPUT_PORTS_END
 
 /* CDP1802 Configuration */
 
-READ_LINE_MEMBER( elf2_state::wait_r )
+int elf2_state::wait_r()
 {
 	return LOAD;
 }
 
-READ_LINE_MEMBER( elf2_state::clear_r )
+int elf2_state::clear_r()
 {
 	return RUN;
 }
 
-READ_LINE_MEMBER( elf2_state::ef4_r )
+int elf2_state::ef4_r()
 {
 	return INPUT;
 }
 
-WRITE_LINE_MEMBER( elf2_state::q_w )
+void elf2_state::q_w(int state)
 {
 	output().set_led_value(0, state);
 }
@@ -176,7 +176,7 @@ void elf2_state::sc_w(address_space &space, offs_t offset, uint8_t data, uint8_t
 
 /* MM74C923 Interface */
 
-WRITE_LINE_MEMBER( elf2_state::da_w )
+void elf2_state::da_w(int state)
 {
 	if (state)
 	{

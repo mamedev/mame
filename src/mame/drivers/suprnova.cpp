@@ -417,7 +417,7 @@ uint32_t skns_state::hit_r(address_space &space, offs_t offset, uint32_t mem_mas
 /* start old driver code */
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(skns_state::interrupt_callback)
+void skns_state::interrupt_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(param, HOLD_LINE);
 }
@@ -475,7 +475,7 @@ void skns_state::machine_reset()
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(skns_state::irq)
+void skns_state::irq(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

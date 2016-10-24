@@ -35,8 +35,8 @@ public:
 	int m_palette_bank;
 	uint8_t m_scroll[2];
 	void create_palette();
-	DECLARE_PALETTE_INIT(1942);
-	DECLARE_PALETTE_INIT(1942p);
+	void palette_init_1942(palette_device &palette);
+	void palette_init_1942p(palette_device &palette);
 	void c1942p_palette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	/* devices */
@@ -50,15 +50,15 @@ public:
 	void c1942p_f600_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void c1942p_soundlatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_1942();
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	void video_start_c1942p();
 	uint32_t screen_update_1942(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_1942p(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(c1942_scanline);
+	void c1942_scanline(timer_device &timer, void *ptr, int32_t param);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_sprites_p( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	required_device<cpu_device> m_maincpu;

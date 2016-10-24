@@ -66,9 +66,9 @@ public:
 
 	void init_zodiack();
 	void init_percuss();
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	DECLARE_PALETTE_INIT(zodiack);
-	INTERRUPT_GEN_MEMBER(zodiack_sound_nmi_gen);
-	INTERRUPT_GEN_MEMBER(zodiack_main_nmi_gen);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void palette_init_zodiack(palette_device &palette);
+	void zodiack_sound_nmi_gen(device_t &device);
+	void zodiack_main_nmi_gen(device_t &device);
 };

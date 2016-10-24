@@ -825,7 +825,7 @@ void sc4_state::machine_start_sc4()
 }
 
 
-WRITE_LINE_MEMBER(sc4_state::bfm_sc4_duart_irq_handler)
+void sc4_state::bfm_sc4_duart_irq_handler(int state)
 {
 	// triggers after reel tests on luckb, at the start on dnd...
 	// not sure this is right, causes some games to crash
@@ -836,7 +836,7 @@ WRITE_LINE_MEMBER(sc4_state::bfm_sc4_duart_irq_handler)
 	}
 }
 
-WRITE_LINE_MEMBER(sc4_state::bfm_sc4_duart_txa)
+void sc4_state::bfm_sc4_duart_txa(int state)
 {
 	logerror("bfm_sc4_duart_tx\n");
 }
@@ -868,7 +868,7 @@ void sc4_state::bfm_sc4_duart_output_w(address_space &space, offs_t offset, uint
 }
 
 
-WRITE_LINE_MEMBER(sc4_state::m68307_duart_txa)
+void sc4_state::m68307_duart_txa(int state)
 {
 	logerror("m68307_duart_tx %02x\n", state);
 }
@@ -885,7 +885,7 @@ void sc4_state::m68307_duart_output_w(address_space &space, offs_t offset, uint8
 }
 
 /* default dmd */
-WRITE_LINE_MEMBER(sc4_state::bfmdm01_busy)
+void sc4_state::bfmdm01_busy(int state)
 {
 	// Must tie back to inputs somehow!
 }

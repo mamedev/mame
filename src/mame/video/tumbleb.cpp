@@ -118,7 +118,7 @@ void tumbleb_state::pangpang_pf2_data_w(address_space &space, offs_t offset, uin
 
 /******************************************************************************/
 
-TILEMAP_MAPPER_MEMBER(tumbleb_state::tumblep_scan)
+tilemap_memory_index tumbleb_state::tumblep_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return (col & 0x1f) + ((row & 0x1f) << 5) + ((col & 0x60) << 5);
@@ -134,10 +134,10 @@ inline void tumbleb_state::get_bg_tile_info( tile_data &tileinfo, int tile_index
 			0);
 }
 
-TILE_GET_INFO_MEMBER(tumbleb_state::get_bg1_tile_info){ get_bg_tile_info(tileinfo, tile_index, 2, m_pf1_data); }
-TILE_GET_INFO_MEMBER(tumbleb_state::get_bg2_tile_info){ get_bg_tile_info(tileinfo, tile_index, 1, m_pf2_data); }
+void tumbleb_state::get_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ get_bg_tile_info(tileinfo, tile_index, 2, m_pf1_data); }
+void tumbleb_state::get_bg2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ get_bg_tile_info(tileinfo, tile_index, 1, m_pf2_data); }
 
-TILE_GET_INFO_MEMBER(tumbleb_state::get_fg_tile_info)
+void tumbleb_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int data = m_pf1_data[tile_index];
 
@@ -158,10 +158,10 @@ inline void tumbleb_state::get_fncywld_bg_tile_info( tile_data &tileinfo, int ti
 			0);
 }
 
-TILE_GET_INFO_MEMBER(tumbleb_state::get_fncywld_bg1_tile_info){ get_fncywld_bg_tile_info(tileinfo, tile_index, 2, m_pf1_data); }
-TILE_GET_INFO_MEMBER(tumbleb_state::get_fncywld_bg2_tile_info){ get_fncywld_bg_tile_info(tileinfo, tile_index, 1, m_pf2_data); }
+void tumbleb_state::get_fncywld_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ get_fncywld_bg_tile_info(tileinfo, tile_index, 2, m_pf1_data); }
+void tumbleb_state::get_fncywld_bg2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ get_fncywld_bg_tile_info(tileinfo, tile_index, 1, m_pf2_data); }
 
-TILE_GET_INFO_MEMBER(tumbleb_state::get_fncywld_fg_tile_info)
+void tumbleb_state::get_fncywld_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int data = m_pf1_data[tile_index * 2];
 	int attr = m_pf1_data[tile_index * 2 + 1];
@@ -196,10 +196,10 @@ inline void tumbleb_state::pangpang_get_bg2x_tile_info( tile_data &tileinfo, int
 }
 
 
-TILE_GET_INFO_MEMBER(tumbleb_state::pangpang_get_bg1_tile_info){ pangpang_get_bg_tile_info(tileinfo, tile_index, 2, m_pf1_data); }
-TILE_GET_INFO_MEMBER(tumbleb_state::pangpang_get_bg2_tile_info){ pangpang_get_bg2x_tile_info(tileinfo, tile_index, 1, m_pf2_data); }
+void tumbleb_state::pangpang_get_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ pangpang_get_bg_tile_info(tileinfo, tile_index, 2, m_pf1_data); }
+void tumbleb_state::pangpang_get_bg2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ pangpang_get_bg2x_tile_info(tileinfo, tile_index, 1, m_pf2_data); }
 
-TILE_GET_INFO_MEMBER(tumbleb_state::pangpang_get_fg_tile_info)
+void tumbleb_state::pangpang_get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int data = m_pf1_data[tile_index * 2 + 1];
 	int attr = m_pf1_data[tile_index * 2];

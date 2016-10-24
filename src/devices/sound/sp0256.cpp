@@ -1179,7 +1179,7 @@ void sp0256_device::ald_w(address_space &space, offs_t offset, uint8_t data, uin
 	return;
 }
 
-READ_LINE_MEMBER( sp0256_device::lrq_r )
+int sp0256_device::lrq_r()
 {
 	// force stream update
 	m_stream->update();
@@ -1187,7 +1187,7 @@ READ_LINE_MEMBER( sp0256_device::lrq_r )
 	return m_lrq == 0x8000;
 }
 
-READ_LINE_MEMBER( sp0256_device::sby_r )
+int sp0256_device::sby_r()
 {
 	// TODO: force stream update??
 
@@ -1268,7 +1268,7 @@ void sp0256_device::set_clock(int clock)
 }
 
 
-TIMER_CALLBACK_MEMBER(sp0256_device::set_lrq_timer_proc)
+void sp0256_device::set_lrq_timer_proc(void *ptr, int32_t param)
 {
 	m_lrq = 0x8000;
 }

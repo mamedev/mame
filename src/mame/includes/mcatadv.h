@@ -51,8 +51,8 @@ public:
 	void mcatadv_sound_bw_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void mcatadv_videoram1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void mcatadv_videoram2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	TILE_GET_INFO_MEMBER(get_mcatadv_tile_info1);
-	TILE_GET_INFO_MEMBER(get_mcatadv_tile_info2);
+	void get_mcatadv_tile_info1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_mcatadv_tile_info2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	uint32_t screen_update_mcatadv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

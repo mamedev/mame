@@ -100,13 +100,13 @@ public:
 	static void set_wc(device_t &device, int wc) { downcast<i2cmem_device &>(device).m_wc = wc; }
 
 	// I/O operations
-	DECLARE_WRITE_LINE_MEMBER( write_e0 );
-	DECLARE_WRITE_LINE_MEMBER( write_e1 );
-	DECLARE_WRITE_LINE_MEMBER( write_e2 );
-	DECLARE_WRITE_LINE_MEMBER( write_sda );
-	DECLARE_WRITE_LINE_MEMBER( write_scl );
-	DECLARE_WRITE_LINE_MEMBER( write_wc );
-	DECLARE_READ_LINE_MEMBER( read_sda );
+	void write_e0(int state);
+	void write_e1(int state);
+	void write_e2(int state);
+	void write_sda(int state);
+	void write_scl(int state);
+	void write_wc(int state);
+	int read_sda();
 
 protected:
 	// device-level overrides

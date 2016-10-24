@@ -662,12 +662,12 @@ void pmd85_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 	}
 }
 
-WRITE_LINE_MEMBER(pmd85_state::write_cas_tx)
+void pmd85_state::write_cas_tx(int state)
 {
 	m_cas_tx = state;
 }
 
-TIMER_CALLBACK_MEMBER(pmd85_state::pmd85_cassette_timer_callback)
+void pmd85_state::pmd85_cassette_timer_callback(void *ptr, int32_t param)
 {
 	int data;
 	int current_level;

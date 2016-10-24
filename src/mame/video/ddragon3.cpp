@@ -44,7 +44,7 @@ uint16_t ddragon3_state::ddragon3_scroll_r(address_space &space, offs_t offset, 
 
 /*****************************************************************************************************************************************************/
 
-TILE_GET_INFO_MEMBER(ddragon3_state::get_bg_tile_info)
+void ddragon3_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t attr = m_bg_videoram[tile_index];
 	int code = (attr & 0x0fff) | ((m_bg_tilebase & 0x01) << 12);
@@ -68,7 +68,7 @@ void ddragon3_state::ddragon3_bg_videoram_w(address_space &space, offs_t offset,
 
 
 
-TILE_GET_INFO_MEMBER(ddragon3_state::get_fg_tile_info)
+void ddragon3_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t *tilebase;
 	int tileno,colbank;
@@ -96,7 +96,7 @@ void ddragon3_state::ddragon3_fg_videoram_w(address_space &space, offs_t offset,
 /*****************************************************************************************************************************************************/
 /* 8x8 text layer - wwfwfest only */
 
-TILE_GET_INFO_MEMBER(wwfwfest_state::get_fg0_tile_info)
+void wwfwfest_state::get_fg0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t *tilebase;
 	int tileno;

@@ -76,7 +76,7 @@ public:
 	void tms_rom_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void tms_left_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void tms_right_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	DECLARE_READ_LINE_MEMBER( tms_write_pending_r );
+	int tms_write_pending_r();
 
 private:
 	// timers

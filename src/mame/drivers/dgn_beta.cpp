@@ -280,7 +280,7 @@ static INPUT_PORTS_START( dgnbeta )
 INPUT_PORTS_END
 
 
-PALETTE_INIT_MEMBER(dgn_beta_state, dgn)
+void dgn_beta_state::palette_init_dgn(palette_device &palette)
 {
 	int i;
 

@@ -44,7 +44,7 @@ void macrossp_state::macrossp_scra_videoram_w(address_space &space, offs_t offse
 }
 
 
-TILE_GET_INFO_MEMBER(macrossp_state::get_macrossp_scra_tile_info)
+void macrossp_state::get_macrossp_scra_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint32_t attr, tileno, color;
 
@@ -79,7 +79,7 @@ void macrossp_state::macrossp_scrb_videoram_w(address_space &space, offs_t offse
 }
 
 
-TILE_GET_INFO_MEMBER(macrossp_state::get_macrossp_scrb_tile_info)
+void macrossp_state::get_macrossp_scrb_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint32_t attr, tileno, color;
 
@@ -114,7 +114,7 @@ void macrossp_state::macrossp_scrc_videoram_w(address_space &space, offs_t offse
 }
 
 
-TILE_GET_INFO_MEMBER(macrossp_state::get_macrossp_scrc_tile_info)
+void macrossp_state::get_macrossp_scrc_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint32_t attr, tileno, color;
 
@@ -149,7 +149,7 @@ void macrossp_state::macrossp_text_videoram_w(address_space &space, offs_t offse
 }
 
 
-TILE_GET_INFO_MEMBER(macrossp_state::get_macrossp_text_tile_info)
+void macrossp_state::get_macrossp_text_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint32_t tileno, colour;
 

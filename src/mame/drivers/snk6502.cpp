@@ -308,7 +308,7 @@ void snk6502_state::machine_start()
 }
 
 /* binary counter (1.4MHz update) */
-TIMER_DEVICE_CALLBACK_MEMBER(snk6502_state::sasuke_update_counter)
+void snk6502_state::sasuke_update_counter(timer_device &timer, void *ptr, int32_t param)
 {
 	m_sasuke_counter += 0x10;
 }
@@ -745,13 +745,13 @@ GFXDECODE_END
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(snk6502_state::satansat_interrupt)
+void snk6502_state::satansat_interrupt(device_t &device)
 {
 	if(m_irq_mask)
 		device.execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE); /* one IRQ per frame */
 }
 
-INTERRUPT_GEN_MEMBER(snk6502_state::snk6502_interrupt)
+void snk6502_state::snk6502_interrupt(device_t &device)
 {
 	device.execute().set_input_line(M6502_IRQ_LINE, HOLD_LINE); /* one IRQ per frame */
 }

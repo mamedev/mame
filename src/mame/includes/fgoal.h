@@ -61,12 +61,12 @@ public:
 
 	DECLARE_CUSTOM_INPUT_MEMBER(_80_r);
 
-	TIMER_CALLBACK_MEMBER(interrupt_callback);
+	void interrupt_callback(void *ptr, int32_t param);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(fgoal);
+	void palette_init_fgoal(palette_device &palette);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	int intensity(int bits);

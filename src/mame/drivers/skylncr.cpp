@@ -196,17 +196,17 @@ public:
 	uint8_t ret_ff(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void skylncr_nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void mbutrfly_prot_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	READ_LINE_MEMBER(mbutrfly_prot_r);
+	int mbutrfly_prot_r();
 	uint8_t bdream97_opcode_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void init_sonikfig();
-	TILE_GET_INFO_MEMBER(get_tile_info);
-	TILE_GET_INFO_MEMBER(get_reel_1_tile_info);
-	TILE_GET_INFO_MEMBER(get_reel_2_tile_info);
-	TILE_GET_INFO_MEMBER(get_reel_3_tile_info);
-	TILE_GET_INFO_MEMBER(get_reel_4_tile_info);
+	void get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_reel_1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_reel_2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_reel_3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_reel_4_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void video_start() override;
 	uint32_t screen_update_skylncr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(skylncr_vblank_interrupt);
+	void skylncr_vblank_interrupt(device_t &device);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -232,35 +232,35 @@ void skylncr_state::skylncr_colorram_w(address_space &space, offs_t offset, uint
 }
 
 
-TILE_GET_INFO_MEMBER(skylncr_state::get_tile_info)
+void skylncr_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = m_videoram[ tile_index ] + (m_colorram[ tile_index ] << 8);
 	int pal = (code & 0x8000) >> 15;
 	SET_TILE_INFO_MEMBER(0, code, pal^1, TILE_FLIPYX( 0 ));
 }
 
-TILE_GET_INFO_MEMBER(skylncr_state::get_reel_1_tile_info)
+void skylncr_state::get_reel_1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = m_reeltiles_1_ram[ tile_index ] + (m_reeltileshigh_1_ram[ tile_index ] << 8);
 	int pal = (code & 0x8000) >> 15;
 	SET_TILE_INFO_MEMBER(1, code&0x7fff, pal^1, TILE_FLIPYX( 0 ));
 }
 
-TILE_GET_INFO_MEMBER(skylncr_state::get_reel_2_tile_info)
+void skylncr_state::get_reel_2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = m_reeltiles_2_ram[ tile_index ] + (m_reeltileshigh_2_ram[ tile_index ] << 8);
 	int pal = (code & 0x8000) >> 15;
 	SET_TILE_INFO_MEMBER(1, code, pal^1, TILE_FLIPYX( 0 ));
 }
 
-TILE_GET_INFO_MEMBER(skylncr_state::get_reel_3_tile_info)
+void skylncr_state::get_reel_3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = m_reeltiles_3_ram[ tile_index ] + (m_reeltileshigh_3_ram[ tile_index ] << 8);
 	int pal = (code & 0x8000) >> 15;
 	SET_TILE_INFO_MEMBER(1, code, pal^1, TILE_FLIPYX( 0 ));
 }
 
-TILE_GET_INFO_MEMBER(skylncr_state::get_reel_4_tile_info)
+void skylncr_state::get_reel_4_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = m_reeltiles_4_ram[ tile_index ] + (m_reeltileshigh_4_ram[ tile_index ] << 8);
 	int pal = (code & 0x8000) >> 15;
@@ -426,7 +426,7 @@ void skylncr_state::mbutrfly_prot_w(address_space &space, offs_t offset, uint8_t
 	m_mbutrfly_prot = BIT(data, 7);
 }
 
-READ_LINE_MEMBER(skylncr_state::mbutrfly_prot_r)
+int skylncr_state::mbutrfly_prot_r()
 {
 	return m_mbutrfly_prot;
 }
@@ -1605,7 +1605,7 @@ INPUT_PORTS_END
 
 
 // It runs in IM 0, thus needs an opcode on the data bus
-INTERRUPT_GEN_MEMBER(skylncr_state::skylncr_vblank_interrupt)
+void skylncr_state::skylncr_vblank_interrupt(device_t &device)
 {
 	if (m_nmi_enable) device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }

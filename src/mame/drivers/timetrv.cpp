@@ -46,8 +46,8 @@ public:
 	uint8_t ld_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	virtual void video_start() override;
 	uint32_t screen_update_timetrv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vblank_irq);
-	INTERRUPT_GEN_MEMBER(ld_irq);
+	void vblank_irq(device_t &device);
+	void ld_irq(device_t &device);
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -139,12 +139,12 @@ static INPUT_PORTS_START( timetrv )
 	// 0x80 eeprom read bit
 INPUT_PORTS_END
 
-INTERRUPT_GEN_MEMBER(timetrv_state::vblank_irq)
+void timetrv_state::vblank_irq(device_t &device)
 {
 	device.execute().set_input_line_and_vector(0,HOLD_LINE,0x20/4); //vblank bit flag clear
 }
 
-INTERRUPT_GEN_MEMBER(timetrv_state::ld_irq)
+void timetrv_state::ld_irq(device_t &device)
 {
 	device.execute().set_input_line_and_vector(0,HOLD_LINE,0x48/4); //ld irq
 }

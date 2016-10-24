@@ -38,7 +38,7 @@ static const uint8_t toaplan1_credits_for_coin[TOAPLAN1_REGION_OTHER+1][2][4] =
 };
 
 
-INTERRUPT_GEN_MEMBER(toaplan1_state::toaplan1_interrupt)
+void toaplan1_state::toaplan1_interrupt(device_t &device)
 {
 	if (m_intenable)
 		device.execute().set_input_line(4, HOLD_LINE);
@@ -121,7 +121,7 @@ void toaplan1_state::demonwld_dsp_bio_w(address_space &space, offs_t offset, uin
 	}
 }
 
-READ_LINE_MEMBER(toaplan1_state::demonwld_BIO_r)
+int toaplan1_state::demonwld_BIO_r()
 {
 	return m_dsp_BIO;
 }
@@ -368,7 +368,7 @@ void toaplan1_state::samesame_coin_w(address_space &space, offs_t offset, uint16
 	}
 }
 
-WRITE_LINE_MEMBER(toaplan1_state::toaplan1_reset_callback)
+void toaplan1_state::toaplan1_reset_callback(int state)
 {
 	toaplan1_reset_sound();
 }

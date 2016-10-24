@@ -45,7 +45,7 @@ int mw8080bw_state::vysnc_chain_counter_to_vpos( uint8_t counter, int vblank )
 }
 
 
-TIMER_CALLBACK_MEMBER(mw8080bw_state::mw8080bw_interrupt_callback)
+void mw8080bw_state::mw8080bw_interrupt_callback(void *ptr, int32_t param)
 {
 	uint8_t next_counter;
 	int next_vpos;

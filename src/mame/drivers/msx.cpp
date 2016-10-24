@@ -1229,7 +1229,7 @@ INPUT_PORTS_END
 
 
 // Some MSX2+ can switch the z80 clock between 3.5 and 5.3 MHz
-WRITE_LINE_MEMBER(msx_state::turbo_w)
+void msx_state::turbo_w(int state)
 {
 	// 0 - 5.369317 MHz
 	// 1 - 3.579545 MHz

@@ -72,7 +72,7 @@ public:
 	void rtc_address_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t rtc_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void rtc_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( mc146818_irq );
+	void mc146818_irq(int state);
 
 	required_shared_ptr<uint8_t> m_ram_base;
 	uint8_t m_banks_num;
@@ -80,7 +80,7 @@ public:
 	uint8_t m_lcd_contrast;
 	int m_lcd_backlight;
 	uint8_t m_status_flag;
-	DECLARE_PALETTE_INIT(micronic);
+	void palette_init_micronic(palette_device &palette);
 
 protected:
 	required_memory_bank m_bank1;

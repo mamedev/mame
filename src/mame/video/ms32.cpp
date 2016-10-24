@@ -22,7 +22,7 @@ priority should be given to
 
 /********** Tilemaps **********/
 
-TILE_GET_INFO_MEMBER(ms32_state::get_ms32_tx_tile_info)
+void ms32_state::get_ms32_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno, colour;
 
@@ -32,7 +32,7 @@ TILE_GET_INFO_MEMBER(ms32_state::get_ms32_tx_tile_info)
 	SET_TILE_INFO_MEMBER(3,tileno,colour,0);
 }
 
-TILE_GET_INFO_MEMBER(ms32_state::get_ms32_roz_tile_info)
+void ms32_state::get_ms32_roz_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno,colour;
 
@@ -42,7 +42,7 @@ TILE_GET_INFO_MEMBER(ms32_state::get_ms32_roz_tile_info)
 	SET_TILE_INFO_MEMBER(1,tileno,colour,0);
 }
 
-TILE_GET_INFO_MEMBER(ms32_state::get_ms32_bg_tile_info)
+void ms32_state::get_ms32_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno,colour;
 
@@ -52,7 +52,7 @@ TILE_GET_INFO_MEMBER(ms32_state::get_ms32_bg_tile_info)
 	SET_TILE_INFO_MEMBER(2,tileno,colour,0);
 }
 
-TILE_GET_INFO_MEMBER(ms32_state::get_ms32_extra_tile_info)
+void ms32_state::get_ms32_extra_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno,colour;
 

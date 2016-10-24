@@ -418,14 +418,14 @@ static GFXDECODE_START( skykid )
 GFXDECODE_END
 
 
-INTERRUPT_GEN_MEMBER(skykid_state::main_vblank_irq)
+void skykid_state::main_vblank_irq(device_t &device)
 {
 	if(m_main_irq_mask)
 		device.execute().set_input_line(0, ASSERT_LINE);
 }
 
 
-INTERRUPT_GEN_MEMBER(skykid_state::mcu_vblank_irq)
+void skykid_state::mcu_vblank_irq(device_t &device)
 {
 	if(m_mcu_irq_mask)
 		device.execute().set_input_line(0, ASSERT_LINE);

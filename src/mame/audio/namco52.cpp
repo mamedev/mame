@@ -50,7 +50,7 @@
 #include "emu.h"
 #include "namco52.h"
 
-TIMER_CALLBACK_MEMBER( namco_52xx_device::latch_callback )
+void namco_52xx_device::latch_callback(void *ptr, int32_t param)
 {
 	m_latched_cmd = param;
 }
@@ -99,7 +99,7 @@ void namco_52xx_device::O_w(address_space &space, offs_t offset, uint8_t data, u
 		m_address = (m_address & 0xf0ff) | ((data & 0xf) << 8);
 }
 
-TIMER_CALLBACK_MEMBER( namco_52xx_device::irq_clear )
+void namco_52xx_device::irq_clear(void *ptr, int32_t param)
 {
 	m_cpu->set_input_line(0, CLEAR_LINE);
 }
@@ -122,7 +122,7 @@ void namco_52xx_device::write(address_space &space, offs_t offset, uint8_t data,
 }
 
 
-TIMER_CALLBACK_MEMBER( namco_52xx_device::external_clock_pulse )
+void namco_52xx_device::external_clock_pulse(void *ptr, int32_t param)
 {
 	m_cpu->clock_w(ASSERT_LINE);
 	m_cpu->clock_w(CLEAR_LINE);

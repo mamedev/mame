@@ -14,10 +14,10 @@ public:
 	null_modem_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	virtual WRITE_LINE_MEMBER( input_txd ) override { device_serial_interface::rx_w(state); }
-	virtual WRITE_LINE_MEMBER( input_rts ) override { m_rts = state; }
+	virtual void input_txd(int state) override { device_serial_interface::rx_w(state); }
+	virtual void input_rts(int state) override { m_rts = state; }
 
-	DECLARE_WRITE_LINE_MEMBER(update_serial);
+	void update_serial(int state);
 
 protected:
 	virtual ioport_constructor device_input_ports() const override;

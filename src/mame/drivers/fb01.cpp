@@ -32,16 +32,16 @@ public:
 	{
 	}
 
-	DECLARE_WRITE_LINE_MEMBER(write_usart_clock);
-	DECLARE_WRITE_LINE_MEMBER(midi_in);
-	DECLARE_WRITE_LINE_MEMBER(ym2164_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(upd71051_txrdy_w);
-	DECLARE_WRITE_LINE_MEMBER(upd71051_rxrdy_w);
+	void write_usart_clock(int state);
+	void midi_in(int state);
+	void ym2164_irq_w(int state);
+	void upd71051_txrdy_w(int state);
+	void upd71051_rxrdy_w(int state);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_PALETTE_INIT(fb01);
+	void palette_init_fb01(palette_device &palette);
 	HD44780_PIXEL_UPDATE(fb01_pixel_update);
 
 private:
@@ -110,35 +110,35 @@ void fb01_state::machine_reset()
 }
 
 
-WRITE_LINE_MEMBER(fb01_state::write_usart_clock)
+void fb01_state::write_usart_clock(int state)
 {
 	m_upd71051->write_txc(state);
 	m_upd71051->write_rxc(state);
 }
 
 
-WRITE_LINE_MEMBER(fb01_state::midi_in)
+void fb01_state::midi_in(int state)
 {
 	m_midi_thru->write_txd(state);
 	m_upd71051->write_rxd(state);
 }
 
 
-WRITE_LINE_MEMBER(fb01_state::ym2164_irq_w)
+void fb01_state::ym2164_irq_w(int state)
 {
 	m_ym2164_irq = state;
 	update_int();
 }
 
 
-WRITE_LINE_MEMBER(fb01_state::upd71051_txrdy_w)
+void fb01_state::upd71051_txrdy_w(int state)
 {
 	m_upd71051_txrdy = state;
 	update_int();
 }
 
 
-WRITE_LINE_MEMBER(fb01_state::upd71051_rxrdy_w)
+void fb01_state::upd71051_rxrdy_w(int state)
 {
 	m_upd71051_rxrdy = state;
 	update_int();
@@ -160,7 +160,7 @@ HD44780_PIXEL_UPDATE(fb01_state::fb01_pixel_update)
 }
 
 
-PALETTE_INIT_MEMBER(fb01_state, fb01)
+void fb01_state::palette_init_fb01(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(30, 0, 0));
 	palette.set_pen_color(1, rgb_t(150, 0, 0));

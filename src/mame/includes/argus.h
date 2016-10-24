@@ -96,14 +96,14 @@ public:
 	void valtric_paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void valtric_unknown_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	TILE_GET_INFO_MEMBER(argus_get_tx_tile_info);
-	TILE_GET_INFO_MEMBER(argus_get_bg0_tile_info);
-	TILE_GET_INFO_MEMBER(argus_get_bg1_tile_info);
-	TILE_GET_INFO_MEMBER(valtric_get_tx_tile_info);
-	TILE_GET_INFO_MEMBER(valtric_get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(butasan_get_tx_tile_info);
-	TILE_GET_INFO_MEMBER(butasan_get_bg0_tile_info);
-	TILE_GET_INFO_MEMBER(butasan_get_bg1_tile_info);
+	void argus_get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void argus_get_bg0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void argus_get_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void valtric_get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void valtric_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void butasan_get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void butasan_get_bg0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void butasan_get_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	virtual void machine_start() override;
 	void video_start_argus();
@@ -117,8 +117,8 @@ public:
 	uint32_t screen_update_valtric(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_butasan(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
-	TIMER_DEVICE_CALLBACK_MEMBER(butasan_scanline);
+	void scanline(timer_device &timer, void *ptr, int32_t param);
+	void butasan_scanline(timer_device &timer, void *ptr, int32_t param);
 
 	void reset_common();
 	void change_palette(int color, int lo_offs, int hi_offs);

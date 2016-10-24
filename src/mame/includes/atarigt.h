@@ -79,9 +79,9 @@ public:
 	uint16_t atarigt_colorram_r(offs_t address);
 	void init_primrage();
 	void init_tmek();
-	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
-	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
-	TILEMAP_MAPPER_MEMBER(atarigt_playfield_scan);
+	void get_alpha_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_playfield_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	tilemap_memory_index atarigt_playfield_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
 	void machine_start_atarigt();
 	void machine_reset_atarigt();
 	void video_start_atarigt();

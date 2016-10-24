@@ -213,12 +213,12 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(vboy);
+	void palette_init_vboy(palette_device &palette);
 	uint32_t screen_update_vboy_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_vboy_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_main_tick);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_pad_tick);
-	TIMER_DEVICE_CALLBACK_MEMBER(vboy_scanlineL);
+	void timer_main_tick(timer_device &timer, void *ptr, int32_t param);
+	void timer_pad_tick(timer_device &timer, void *ptr, int32_t param);
+	void vboy_scanlineL(timer_device &timer, void *ptr, int32_t param);
 };
 
 
@@ -1236,18 +1236,18 @@ void vboy_state::m_timer_tick()
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(vboy_state::timer_main_tick)
+void vboy_state::timer_main_tick(timer_device &timer, void *ptr, int32_t param)
 {
 	m_timer_tick();
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(vboy_state::timer_pad_tick)
+void vboy_state::timer_pad_tick(timer_device &timer, void *ptr, int32_t param)
 {
 	if((m_vboy_regs.kcr & 0x80) == 0)
 		m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
-PALETTE_INIT_MEMBER(vboy_state, vboy)
+void vboy_state::palette_init_vboy(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t::black());
 	palette.set_pen_color(1, rgb_t::black());
@@ -1318,7 +1318,7 @@ void vboy_state::m_scanline_tick(int scanline, uint8_t screen_type)
 
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(vboy_state::vboy_scanlineL)
+void vboy_state::vboy_scanlineL(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -1326,7 +1326,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(vboy_state::vboy_scanlineL)
 }
 
 #if 0
-TIMER_DEVICE_CALLBACK_MEMBER(vboy_state::vboy_scanlineR)
+void vboy_state::vboy_scanlineR(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

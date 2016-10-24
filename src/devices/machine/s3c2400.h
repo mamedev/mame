@@ -403,7 +403,7 @@ public:
 	void s3c24xx_lcd_render_tft_04();
 	void s3c24xx_lcd_render_tft_08();
 	void s3c24xx_lcd_render_tft_16();
-	TIMER_CALLBACK_MEMBER( s3c24xx_lcd_timer_exp );
+	void s3c24xx_lcd_timer_exp(void *ptr, int32_t param);
 	void s3c24xx_video_start();
 	void bitmap_blend( bitmap_rgb32 &bitmap_dst, bitmap_rgb32 &bitmap_src_1, bitmap_rgb32 &bitmap_src_2);
 	uint32_t s3c24xx_video_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -435,7 +435,7 @@ public:
 	void s3c24xx_pwm_stop(int timer);
 	void s3c24xx_pwm_recalc(int timer);
 	void s3c24xx_pwm_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask);
-	TIMER_CALLBACK_MEMBER( s3c24xx_pwm_timer_exp );
+	void s3c24xx_pwm_timer_exp(void *ptr, int32_t param);
 	void s3c24xx_dma_reset();
 	void s3c24xx_dma_reload(int ch);
 	void s3c24xx_dma_trigger(int ch);
@@ -454,7 +454,7 @@ public:
 	void s3c24xx_dma_1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask);
 	void s3c24xx_dma_2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask);
 	void s3c24xx_dma_3_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask);
-	TIMER_CALLBACK_MEMBER( s3c24xx_dma_timer_exp );
+	void s3c24xx_dma_timer_exp(void *ptr, int32_t param);
 	void s3c24xx_gpio_reset();
 	inline uint32_t iface_gpio_port_r(int port, uint32_t mask);
 	inline void iface_gpio_port_w(int port, uint32_t mask, uint32_t data);
@@ -485,7 +485,7 @@ public:
 	void s3c24xx_wdt_stop();
 	void s3c24xx_wdt_recalc();
 	void s3c24xx_wdt_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask);
-	TIMER_CALLBACK_MEMBER( s3c24xx_wdt_timer_exp );
+	void s3c24xx_wdt_timer_exp(void *ptr, int32_t param);
 	void s3c24xx_iic_reset();
 	inline void iface_i2c_scl_w( int state);
 	inline void iface_i2c_sda_w(int state);
@@ -499,7 +499,7 @@ public:
 	void iic_resume();
 	uint32_t s3c24xx_iic_r(address_space &space, offs_t offset, uint32_t mem_mask);
 	void s3c24xx_iic_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask);
-	TIMER_CALLBACK_MEMBER( s3c24xx_iic_timer_exp );
+	void s3c24xx_iic_timer_exp(void *ptr, int32_t param);
 	void s3c24xx_iis_reset();
 	inline void iface_i2s_data_w(int ch, uint16_t data);
 	void s3c24xx_iis_start();
@@ -507,15 +507,15 @@ public:
 	void s3c24xx_iis_recalc();
 	uint32_t s3c24xx_iis_r(address_space &space, offs_t offset, uint32_t mem_mask);
 	void s3c24xx_iis_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask);
-	TIMER_CALLBACK_MEMBER( s3c24xx_iis_timer_exp );
+	void s3c24xx_iis_timer_exp(void *ptr, int32_t param);
 	void s3c24xx_rtc_reset();
 	uint32_t s3c24xx_rtc_r(address_space &space, offs_t offset, uint32_t mem_mask);
 	void s3c24xx_rtc_recalc();
 	void s3c24xx_rtc_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask);
-	TIMER_CALLBACK_MEMBER( s3c24xx_rtc_timer_tick_count_exp );
+	void s3c24xx_rtc_timer_tick_count_exp(void *ptr, int32_t param);
 	void s3c24xx_rtc_update();
 	void s3c24xx_rtc_check_alarm();
-	TIMER_CALLBACK_MEMBER( s3c24xx_rtc_timer_update_exp );
+	void s3c24xx_rtc_timer_update_exp(void *ptr, int32_t param);
 	void s3c24xx_adc_reset();
 	uint32_t iface_adc_data_r(int ch);
 	uint32_t s3c24xx_adc_r(address_space &space, offs_t offset, uint32_t mem_mask);

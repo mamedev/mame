@@ -92,7 +92,7 @@ void cyberbal_state::update_sound_68k_interrupts()
 }
 
 
-INTERRUPT_GEN_MEMBER(cyberbal_state::sound_68k_irq_gen)
+void cyberbal_state::sound_68k_irq_gen(device_t &device)
 {
 	if (!m_fast_68k_int)
 	{

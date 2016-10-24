@@ -49,7 +49,7 @@ public:
 	uint8_t adcr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void adcsr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void adcr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(adtrg_w);
+	void adtrg_w(int state);
 
 	void set_suspend(bool suspend);
 	uint64_t internal_update(uint64_t current_time);

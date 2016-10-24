@@ -62,7 +62,7 @@ public:
 	void porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	TIMER_DEVICE_CALLBACK_MEMBER(zero_timer);
+	void zero_timer(timer_device &timer, void *ptr, int32_t param);
 private:
 	uint8_t m_u14;
 	uint8_t m_digit;
@@ -557,7 +557,7 @@ void gp_2_state::machine_reset()
 }
 
 // zero-cross detection
-TIMER_DEVICE_CALLBACK_MEMBER( gp_2_state::zero_timer )
+void gp_2_state::zero_timer(timer_device &timer, void *ptr, int32_t param)
 {
 	m_ctc->trg2(0);
 	m_ctc->trg2(1);

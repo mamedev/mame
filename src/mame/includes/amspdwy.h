@@ -55,8 +55,8 @@ public:
 	void amspdwy_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void amspdwy_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t amspdwy_sound_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	TILE_GET_INFO_MEMBER(get_tile_info);
-	TILEMAP_MAPPER_MEMBER(tilemap_scan_cols_back);
+	void get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	tilemap_memory_index tilemap_scan_cols_back(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
 
 	uint32_t screen_update_amspdwy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );

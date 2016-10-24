@@ -74,20 +74,20 @@ public:
 	void init_kaitei();
 	void init_bombbee();
 	void video_start_geebee();
-	DECLARE_PALETTE_INIT(geebee);
+	void palette_init_geebee(palette_device &palette);
 	void video_start_warpwarp();
-	DECLARE_PALETTE_INIT(warpwarp);
+	void palette_init_warpwarp(palette_device &palette);
 	void video_start_navarone();
-	DECLARE_PALETTE_INIT(navarone);
+	void palette_init_navarone(palette_device &palette);
 
-	TILEMAP_MAPPER_MEMBER(tilemap_scan);
-	TILE_GET_INFO_MEMBER(geebee_get_tile_info);
-	TILE_GET_INFO_MEMBER(navarone_get_tile_info);
-	TILE_GET_INFO_MEMBER(warpwarp_get_tile_info);
+	tilemap_memory_index tilemap_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	void geebee_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void navarone_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void warpwarp_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	inline void plot(bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y, pen_t pen);
 	void draw_ball(bitmap_ind16 &bitmap, const rectangle &cliprect,pen_t pen);
 
-	INTERRUPT_GEN_MEMBER(vblank_irq);
+	void vblank_irq(device_t &device);
 };

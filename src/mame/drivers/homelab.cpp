@@ -76,11 +76,11 @@ public:
 	void video_start_brailab4();
 	uint32_t screen_update_homelab2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_homelab3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(homelab_frame);
+	void homelab_frame(device_t &device);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(homelab);
 };
 
-INTERRUPT_GEN_MEMBER(homelab_state::homelab_frame)
+void homelab_state::homelab_frame(device_t &device)
 {
 	if (m_nmi)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);

@@ -40,7 +40,7 @@ public:
 	uint8_t m_gins;
 	tilemap_t *m_background[2];
 	emu_timer *m_crtc_timer;
-	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_gen);
+	void ym2151_irq_gen(int state);
 	void sound_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	uint8_t sound_command_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint16_t sound_busy_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
@@ -55,8 +55,8 @@ public:
 	void upd_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_rabiolep();
 	void init_svolley();
-	TILE_GET_INFO_MEMBER(get_bg0_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
+	void get_bg0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -65,8 +65,8 @@ public:
 
 
 	uint32_t screen_update_rpunch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(sound_command_w_callback);
-	TIMER_CALLBACK_MEMBER(crtc_interrupt_gen);
+	void sound_command_w_callback(void *ptr, int32_t param);
+	void crtc_interrupt_gen(void *ptr, int32_t param);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int start, int stop);
 	void draw_bitmap(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

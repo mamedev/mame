@@ -634,7 +634,7 @@ const z8_device::z8_opcode_map z8_device::Z8601_OPCODE_MAP[256] =
     TIMER CALLBACKS
 ***************************************************************************/
 
-TIMER_CALLBACK_MEMBER( z8_device::t0_tick )
+void z8_device::t0_tick(void *ptr, int32_t param)
 {
 	m_t0--;
 
@@ -647,7 +647,7 @@ TIMER_CALLBACK_MEMBER( z8_device::t0_tick )
 	}
 }
 
-TIMER_CALLBACK_MEMBER( z8_device::t1_tick )
+void z8_device::t1_tick(void *ptr, int32_t param)
 {
 	m_t1--;
 

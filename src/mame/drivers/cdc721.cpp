@@ -24,7 +24,7 @@ public:
 
 public:
 	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(cdc721);
+	void palette_init_cdc721(palette_device &palette);
 	const uint8_t *m_p_chargen;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_shared_ptr<uint8_t> m_p_videoram;
@@ -71,7 +71,7 @@ static GFXDECODE_START( cdc721 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, cdc721_charlayout, 0, 1 )
 GFXDECODE_END
 
-PALETTE_INIT_MEMBER( cdc721_state, cdc721 )
+void cdc721_state::palette_init_cdc721(palette_device &palette)
 {
 	palette.set_pen_color(0, 0, 0, 0 ); /* Black */
 	palette.set_pen_color(1, 0, 255, 0 );   /* Full */

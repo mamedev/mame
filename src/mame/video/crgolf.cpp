@@ -23,7 +23,7 @@
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(crgolf_state, crgolf)
+void crgolf_state::palette_init_crgolf(palette_device &palette)
 {
 	offs_t offs;
 	const uint8_t *prom = memregion("proms")->base();
@@ -55,7 +55,7 @@ PALETTE_INIT_MEMBER(crgolf_state, crgolf)
 	}
 }
 
-PALETTE_INIT_MEMBER(crgolf_state, mastrglf)
+void crgolf_state::palette_init_mastrglf(palette_device &palette)
 {
 }
 

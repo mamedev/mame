@@ -60,7 +60,7 @@ public:
 	int m_start_offs;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(itgambl3);
+	void palette_init_itgambl3(palette_device &palette);
 	uint32_t screen_update_itgambl3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
@@ -238,7 +238,7 @@ void itgambl3_state::machine_reset()
 }
 
 /* default 444 palette for debug purpose*/
-PALETTE_INIT_MEMBER(itgambl3_state, itgambl3)
+void itgambl3_state::palette_init_itgambl3(palette_device &palette)
 {
 	int x,r,g,b;
 

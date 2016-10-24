@@ -40,7 +40,7 @@ public:
 	void init_bradley();
 	virtual void machine_start() override;
 	void machine_start_redbaron();
-	INTERRUPT_GEN_MEMBER(bzone_interrupt);
+	void bzone_interrupt(device_t &device);
 	void bzone_sounds_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };
 

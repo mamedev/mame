@@ -78,14 +78,14 @@ public:
 	void lamp1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { };
 	void volume_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { };
 	void disp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(ic5a_w);
-	DECLARE_WRITE_LINE_MEMBER(ic5m_w);
-	DECLARE_WRITE_LINE_MEMBER(vck_a_w);
-	DECLARE_WRITE_LINE_MEMBER(vck_m_w);
+	void ic5a_w(int state);
+	void ic5m_w(int state);
+	void vck_a_w(int state);
+	void vck_m_w(int state);
 	void init_game0();
 	void init_game1();
 	void init_game2();
-	DECLARE_PALETTE_INIT(spinb);
+	void palette_init_spinb(palette_device &palette);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 private:
 	bool m_pc0a;
@@ -422,7 +422,7 @@ void spinb_state::sndbank_m_w(address_space &space, offs_t offset, uint8_t data,
 		m_sndbank_m = 0xff;
 }
 
-WRITE_LINE_MEMBER( spinb_state::vck_a_w )
+void spinb_state::vck_a_w(int state)
 {
 	m_ic5a->clock_w(0);
 	m_ic5a->clock_w(1);
@@ -438,7 +438,7 @@ WRITE_LINE_MEMBER( spinb_state::vck_a_w )
 		m_msm_a->data_w(0);
 }
 
-WRITE_LINE_MEMBER( spinb_state::vck_m_w )
+void spinb_state::vck_m_w(int state)
 {
 	m_ic5m->clock_w(0);
 	m_ic5m->clock_w(1);
@@ -454,13 +454,13 @@ WRITE_LINE_MEMBER( spinb_state::vck_m_w )
 		m_msm_m->data_w(0);
 }
 
-WRITE_LINE_MEMBER( spinb_state::ic5a_w )
+void spinb_state::ic5a_w(int state)
 {
 	m_pc0a = state;
 	m_ic5a->d_w(state);
 }
 
-WRITE_LINE_MEMBER( spinb_state::ic5m_w )
+void spinb_state::ic5m_w(int state)
 {
 	m_pc0m = state;
 	m_ic5m->d_w(state);
@@ -553,7 +553,7 @@ void spinb_state::init_game2()
 	m_game = 2;
 }
 
-PALETTE_INIT_MEMBER( spinb_state, spinb )
+void spinb_state::palette_init_spinb(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(0x00, 0x00, 0x00));
 	palette.set_pen_color(1, rgb_t(0xf7, 0xaa, 0x00));

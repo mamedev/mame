@@ -2286,12 +2286,12 @@ static INPUT_PORTS_START( cps3_jojo)
 	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_PLAYER(2)
 INPUT_PORTS_END
 
-INTERRUPT_GEN_MEMBER(cps3_state::cps3_vbl_interrupt)
+void cps3_state::cps3_vbl_interrupt(device_t &device)
 {
 	device.execute().set_input_line(12, ASSERT_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(cps3_state::cps3_other_interrupt)
+void cps3_state::cps3_other_interrupt(device_t &device)
 {
 	// this seems to need to be periodic (see the life bar portraits in sfiii2
 	// but also triggered on certain dma events (or warzard locks up in attract)

@@ -264,7 +264,7 @@ uint8_t a2bus_corvfdc01_device::read_cnxx(address_space &space, uint8_t offset)
 	return m_rom[offset & 0x1f];
 }
 
-WRITE_LINE_MEMBER(a2bus_corvfdc01_device::intrq_w)
+void a2bus_corvfdc01_device::intrq_w(int state)
 {
 	if (state)
 		m_fdc_local_status |= LS_INT_mask;
@@ -272,7 +272,7 @@ WRITE_LINE_MEMBER(a2bus_corvfdc01_device::intrq_w)
 		m_fdc_local_status &= ~LS_INT_mask;
 }
 
-WRITE_LINE_MEMBER(a2bus_corvfdc01_device::drq_w)
+void a2bus_corvfdc01_device::drq_w(int state)
 {
 	if (state)
 		m_fdc_local_status |= LS_DRQ_mask;

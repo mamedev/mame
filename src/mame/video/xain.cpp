@@ -42,13 +42,13 @@
 
 ***************************************************************************/
 
-TILEMAP_MAPPER_MEMBER(xain_state::back_scan)
+tilemap_memory_index xain_state::back_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return (col & 0x0f) + ((row & 0x0f) << 4) + ((col & 0x10) << 4) + ((row & 0x10) << 5);
 }
 
-TILE_GET_INFO_MEMBER(xain_state::get_bgram0_tile_info)
+void xain_state::get_bgram0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_bgram0[tile_index | 0x400];
 	SET_TILE_INFO_MEMBER(2,
@@ -57,7 +57,7 @@ TILE_GET_INFO_MEMBER(xain_state::get_bgram0_tile_info)
 			(attr & 0x80) ? TILE_FLIPX : 0);
 }
 
-TILE_GET_INFO_MEMBER(xain_state::get_bgram1_tile_info)
+void xain_state::get_bgram1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_bgram1[tile_index | 0x400];
 	SET_TILE_INFO_MEMBER(1,
@@ -66,7 +66,7 @@ TILE_GET_INFO_MEMBER(xain_state::get_bgram1_tile_info)
 			(attr & 0x80) ? TILE_FLIPX : 0);
 }
 
-TILE_GET_INFO_MEMBER(xain_state::get_char_tile_info)
+void xain_state::get_char_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_charram[tile_index | 0x400];
 	SET_TILE_INFO_MEMBER(0,

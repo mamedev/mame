@@ -724,7 +724,7 @@ GFXDECODE_END
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(karnov_state::karnov_interrupt)
+void karnov_state::karnov_interrupt(device_t &device)
 {
 	uint8_t port = ioport("FAKE")->read();
 

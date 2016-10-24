@@ -82,12 +82,12 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(collision_latch_r);
 	void starshp1_audio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void starshp1_analog_out_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	TILE_GET_INFO_MEMBER(get_tile_info);
+	void get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(starshp1);
+	void palette_init_starshp1(palette_device &palette);
 	uint32_t screen_update_starshp1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_starshp1(screen_device &screen, bool state);
-	INTERRUPT_GEN_MEMBER(starshp1_interrupt);
+	void starshp1_interrupt(device_t &device);
 	void set_pens();
 	void draw_starfield(bitmap_ind16 &bitmap);
 	int get_sprite_hpos(int i);

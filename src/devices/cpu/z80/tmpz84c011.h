@@ -95,10 +95,10 @@ public:
 	template<class _Object> static devcb_base & set_inportse_cb(device_t &device, _Object object) { return downcast<tmpz84c011_device &>(device).m_inportse.set_callback(object); }
 
 	// CTC public interface
-	DECLARE_WRITE_LINE_MEMBER( trg0 ) { m_ctc->trg0(state); }
-	DECLARE_WRITE_LINE_MEMBER( trg1 ) { m_ctc->trg1(state); }
-	DECLARE_WRITE_LINE_MEMBER( trg2 ) { m_ctc->trg2(state); }
-	DECLARE_WRITE_LINE_MEMBER( trg3 ) { m_ctc->trg3(state); }
+	void trg0(int state) { m_ctc->trg0(state); }
+	void trg1(int state) { m_ctc->trg1(state); }
+	void trg2(int state) { m_ctc->trg2(state); }
+	void trg3(int state) { m_ctc->trg3(state); }
 
 	/////////////////////////////////////////////////////////
 
@@ -124,9 +124,9 @@ public:
 	void tmpz84c011_dir_pd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { m_pio_dir[3] = data; }
 	void tmpz84c011_dir_pe_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { m_pio_dir[4] = data; }
 
-	DECLARE_WRITE_LINE_MEMBER( zc0_cb_trampoline_w ) { m_zc0_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER( zc1_cb_trampoline_w ) { m_zc1_cb(state); }
-	DECLARE_WRITE_LINE_MEMBER( zc2_cb_trampoline_w ) { m_zc2_cb(state); }
+	void zc0_cb_trampoline_w(int state) { m_zc0_cb(state); }
+	void zc1_cb_trampoline_w(int state) { m_zc1_cb(state); }
+	void zc2_cb_trampoline_w(int state) { m_zc2_cb(state); }
 
 protected:
 	// device-level overrides

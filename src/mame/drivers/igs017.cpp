@@ -168,9 +168,9 @@ public:
 	void machine_reset_mgcs();
 	void machine_reset_lhzb2a();
 	uint32_t screen_update_igs017(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(iqblocka_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(mgcs_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(mgdh_interrupt);
+	void iqblocka_interrupt(timer_device &timer, void *ptr, int32_t param);
+	void mgcs_interrupt(timer_device &timer, void *ptr, int32_t param);
+	void mgdh_interrupt(timer_device &timer, void *ptr, int32_t param);
 
 
 	void decrypt_program_rom(int mask, int a7, int a6, int a5, int a4, int a3, int a2, int a1, int a0);
@@ -3227,7 +3227,7 @@ INPUT_PORTS_END
                                 Machine Drivers
 ***************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(igs017_state::iqblocka_interrupt)
+void igs017_state::iqblocka_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -3290,7 +3290,7 @@ MACHINE_CONFIG_END
 
 // mgcs
 
-TIMER_DEVICE_CALLBACK_MEMBER(igs017_state::mgcs_interrupt)
+void igs017_state::mgcs_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -3518,7 +3518,7 @@ MACHINE_CONFIG_END
 
 // mgdh
 
-TIMER_DEVICE_CALLBACK_MEMBER(igs017_state::mgdh_interrupt)
+void igs017_state::mgdh_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

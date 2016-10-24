@@ -11,7 +11,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(gotya_state, gotya)
+void gotya_state::palette_init_gotya(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };
@@ -88,7 +88,7 @@ void gotya_state::gotya_video_control_w(address_space &space, offs_t offset, uin
 	}
 }
 
-TILE_GET_INFO_MEMBER(gotya_state::get_bg_tile_info)
+void gotya_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index];
 	int color = m_colorram[tile_index] & 0x0f;
@@ -96,7 +96,7 @@ TILE_GET_INFO_MEMBER(gotya_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-TILEMAP_MAPPER_MEMBER(gotya_state::tilemap_scan_rows_thehand)
+tilemap_memory_index gotya_state::tilemap_scan_rows_thehand(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	row = 31 - row;

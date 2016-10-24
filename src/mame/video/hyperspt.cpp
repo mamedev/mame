@@ -31,7 +31,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(hyperspt_state, hyperspt)
+void hyperspt_state::palette_init_hyperspt(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };
@@ -110,7 +110,7 @@ void hyperspt_state::hyperspt_flipscreen_w(address_space &space, offs_t offset, 
 	}
 }
 
-TILE_GET_INFO_MEMBER(hyperspt_state::get_bg_tile_info)
+void hyperspt_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index] + ((m_colorram[tile_index] & 0x80) << 1) + ((m_colorram[tile_index] & 0x40) << 3);
 	int color = m_colorram[tile_index] & 0x0f;
@@ -185,7 +185,7 @@ uint32_t hyperspt_state::screen_update_hyperspt(screen_device &screen, bitmap_in
 }
 
 /* Road Fighter */
-TILE_GET_INFO_MEMBER(hyperspt_state::roadf_get_bg_tile_info)
+void hyperspt_state::roadf_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index] + ((m_colorram[tile_index] & 0x80) << 1) + ((m_colorram[tile_index] & 0x60) << 4);
 	int color = m_colorram[tile_index] & 0x0f;

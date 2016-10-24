@@ -268,7 +268,7 @@ INPUT_PORTS_END
     }
 }
 
-TIMER_CALLBACK_MEMBER(symbolics_state::outfifo_read_cb)
+void symbolics_state::outfifo_read_cb(void *ptr, int32_t param)
 {
     uint16_t data;
 }

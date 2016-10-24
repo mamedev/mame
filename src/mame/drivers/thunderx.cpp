@@ -42,7 +42,7 @@
 #include "includes/thunderx.h"
 
 
-INTERRUPT_GEN_MEMBER(thunderx_state::vblank_interrupt)
+void thunderx_state::vblank_interrupt(device_t &device)
 {
 	if (m_k052109->is_irq_enabled())
 		device.execute().set_input_line(KONAMI_IRQ_LINE, HOLD_LINE);

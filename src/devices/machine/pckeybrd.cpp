@@ -373,7 +373,7 @@ void at_keyboard_device::device_reset()
 	pc_keyboard_device::device_reset();
 }
 
-WRITE_LINE_MEMBER(pc_keyboard_device::enable)
+void pc_keyboard_device::enable(int state)
 {
 	if(state && !m_on)
 	{

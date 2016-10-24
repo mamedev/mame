@@ -46,6 +46,6 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	INTERRUPT_GEN_MEMBER(interrupt);
-	TIMER_CALLBACK_MEMBER(sample_player);
+	void interrupt(device_t &device);
+	void sample_player(void *ptr, int32_t param);
 };

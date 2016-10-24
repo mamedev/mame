@@ -225,7 +225,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_magicard(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(magicard_irq);
+	void magicard_irq(device_t &device);
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -736,7 +736,7 @@ void magicard_state::machine_reset()
 *************************/
 
 /*Probably there's a mask somewhere if it REALLY uses irqs at all...irq vectors dynamically changes after some time.*/
-INTERRUPT_GEN_MEMBER(magicard_state::magicard_irq)
+void magicard_state::magicard_irq(device_t &device)
 {
 	if(machine().input().code_pressed(KEYCODE_Z)) //vblank?
 		device.execute().set_input_line_and_vector(1, HOLD_LINE, 0xe4 / 4);

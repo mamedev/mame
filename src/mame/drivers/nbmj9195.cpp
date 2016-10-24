@@ -211,7 +211,7 @@ void nbmj9195_state::soundcpu_porte_w(address_space &space, offs_t offset, uint8
 
 
 /* CTC of main cpu, ch0 trigger is vblank */
-INTERRUPT_GEN_MEMBER(nbmj9195_state::ctc0_trg1)
+void nbmj9195_state::ctc0_trg1(device_t &device)
 {
 	m_maincpu->trg1(1);
 	m_maincpu->trg1(0);

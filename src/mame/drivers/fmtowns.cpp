@@ -492,7 +492,7 @@ void towns_state::towns_dma2_w(address_space &space, offs_t offset, uint8_t data
  *  Floppy Disc Controller (MB8877A)
  */
 
-WRITE_LINE_MEMBER( towns_state::mb8877a_irq_w )
+void towns_state::mb8877a_irq_w(int state)
 {
 	if(m_towns_fdc_irq6mask == 0)
 		state = 0;
@@ -500,7 +500,7 @@ WRITE_LINE_MEMBER( towns_state::mb8877a_irq_w )
 	if(IRQ_LOG) logerror("PIC: IRQ6 (FDC) set to %i\n",state);
 }
 
-WRITE_LINE_MEMBER( towns_state::mb8877a_drq_w )
+void towns_state::mb8877a_drq_w(int state)
 {
 	m_dma_1->dmarq(state, 0);
 }
@@ -1402,7 +1402,7 @@ uint8_t towns_state::towns_cd_get_track()
 	return track;
 }
 
-TIMER_CALLBACK_MEMBER(towns_state::towns_cdrom_read_byte)
+void towns_state::towns_cdrom_read_byte(void *ptr, int32_t param)
 {
 	upd71071_device* device = (upd71071_device* )ptr;
 	int masked;
@@ -1994,14 +1994,14 @@ void towns_state::towns_scsi_dma_w(address_space &space, offs_t offset, uint16_t
 	m_scsi->fmscsi_data_w(data & 0xff);
 }
 
-WRITE_LINE_MEMBER(towns_state::towns_scsi_irq)
+void towns_state::towns_scsi_irq(int state)
 {
 	m_pic_slave->ir0_w(state);
 	if(IRQ_LOG)
 		logerror("PIC: IRQ8 (SCSI) set to %i\n",state);
 }
 
-WRITE_LINE_MEMBER(towns_state::towns_scsi_drq)
+void towns_state::towns_scsi_drq(int state)
 {
 	m_dma_1->dmarq(state, 1);  // SCSI HDs use channel 1
 }
@@ -2059,7 +2059,7 @@ uint8_t towns_state::towns_41ff_r(address_space &space, offs_t offset, uint8_t m
 }
 
 // YM3438 interrupt (IRQ 13)
-WRITE_LINE_MEMBER(towns_state::towns_fm_irq)
+void towns_state::towns_fm_irq(int state)
 {
 	if(state)
 	{
@@ -2090,7 +2090,7 @@ RF5C68_SAMPLE_END_CB_MEMBER(towns_state::towns_pcm_irq)
 	}
 }
 
-WRITE_LINE_MEMBER(towns_state::towns_pit_out0_changed)
+void towns_state::towns_pit_out0_changed(int state)
 {
 	m_pit_out0 = state;
 
@@ -2105,7 +2105,7 @@ WRITE_LINE_MEMBER(towns_state::towns_pit_out0_changed)
 	m_pic_master->ir0_w(m_timer0 || m_timer1);
 }
 
-WRITE_LINE_MEMBER(towns_state::towns_pit_out1_changed)
+void towns_state::towns_pit_out1_changed(int state)
 {
 	m_pit_out1 = state;
 
@@ -2120,7 +2120,7 @@ WRITE_LINE_MEMBER(towns_state::towns_pit_out1_changed)
 	m_pic_master->ir0_w(m_timer0 || m_timer1);
 }
 
-WRITE_LINE_MEMBER( towns_state::pit_out2_changed )
+void towns_state::pit_out2_changed(int state)
 {
 	m_pit_out2 = state ? 1 : 0;
 	m_speaker->level_w(speaker_get_spk());

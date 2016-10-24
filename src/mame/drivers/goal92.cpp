@@ -209,13 +209,13 @@ static INPUT_PORTS_START( goal92 )
 INPUT_PORTS_END
 
 /* handler called by the 2203 emulator when the internal timers cause an IRQ */
-WRITE_LINE_MEMBER(goal92_state::irqhandler)
+void goal92_state::irqhandler(int state)
 {
 	/* NMI writes to MSM ports *only*! -AS */
 	//m_audiocpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(goal92_state::goal92_adpcm_int)
+void goal92_state::goal92_adpcm_int(int state)
 {
 	m_msm->data_w(m_msm5205next);
 	m_msm5205next >>= 4;

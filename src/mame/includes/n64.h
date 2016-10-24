@@ -103,11 +103,11 @@ public:
 	void dd_reg_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	uint32_t pif_ram_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	void pif_ram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
-	TIMER_CALLBACK_MEMBER(reset_timer_callback);
-	TIMER_CALLBACK_MEMBER(vi_scanline_callback);
-	TIMER_CALLBACK_MEMBER(ai_timer_callback);
-	TIMER_CALLBACK_MEMBER(pi_dma_callback);
-	TIMER_CALLBACK_MEMBER(si_dma_callback);
+	void reset_timer_callback(void *ptr, int32_t param);
+	void vi_scanline_callback(void *ptr, int32_t param);
+	void ai_timer_callback(void *ptr, int32_t param);
+	void pi_dma_callback(void *ptr, int32_t param);
+	void si_dma_callback(void *ptr, int32_t param);
 	uint32_t dp_reg_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	void dp_reg_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	uint32_t sp_reg_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);

@@ -40,7 +40,7 @@ public:
 
 	uint8_t m_port_f2;
 	virtual void machine_reset() override;
-	TIMER_DEVICE_CALLBACK_MEMBER(h89_irq_timer);
+	void h89_irq_timer(timer_device &timer, void *ptr, int32_t param);
 };
 
 
@@ -97,7 +97,7 @@ void h89_state::machine_reset()
 {
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(h89_state::h89_irq_timer)
+void h89_state::h89_irq_timer(timer_device &timer, void *ptr, int32_t param)
 {
 	if (m_port_f2 & 0x02)
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xcf);

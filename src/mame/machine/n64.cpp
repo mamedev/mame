@@ -33,7 +33,7 @@ n64_periphs::n64_periphs(const machine_config &mconfig, const char *tag, device_
 	}
 }
 
-TIMER_CALLBACK_MEMBER(n64_periphs::reset_timer_callback)
+void n64_periphs::reset_timer_callback(void *ptr, int32_t param)
 {
 	reset_tick();
 }
@@ -977,7 +977,7 @@ void n64_periphs::dp_reg_w(address_space &space, offs_t offset, uint32_t data, u
 	}
 }
 
-TIMER_CALLBACK_MEMBER(n64_periphs::vi_scanline_callback)
+void n64_periphs::vi_scanline_callback(void *ptr, int32_t param)
 {
 	signal_rcp_interrupt(VI_INTERRUPT);
 	vi_scanline_timer->adjust(m_screen->time_until_pos(vi_intr >> 1));
@@ -1272,7 +1272,7 @@ void n64_periphs::ai_dma()
 	ai_timer->adjust(period);
 }
 
-TIMER_CALLBACK_MEMBER(n64_periphs::ai_timer_callback)
+void n64_periphs::ai_timer_callback(void *ptr, int32_t param)
 {
 	machine().device<n64_periphs>("rcp")->ai_timer_tick();
 }
@@ -1371,7 +1371,7 @@ void n64_periphs::ai_reg_w(address_space &space, offs_t offset, uint32_t data, u
 
 // Peripheral Interface
 
-TIMER_CALLBACK_MEMBER(n64_periphs::pi_dma_callback)
+void n64_periphs::pi_dma_callback(void *ptr, int32_t param)
 {
 	pi_dma_tick();
 	//m_rsp->yield();
@@ -2075,7 +2075,7 @@ void n64_periphs::handle_pif()
 	}*/
 }
 
-TIMER_CALLBACK_MEMBER(n64_periphs::si_dma_callback)
+void n64_periphs::si_dma_callback(void *ptr, int32_t param)
 {
 	machine().device<n64_periphs>("rcp")->si_dma_tick();
 }

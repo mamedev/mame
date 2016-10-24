@@ -40,7 +40,7 @@ public:
 	void mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t pcm_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void pcm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(sound_irq);
+	void sound_irq(int state);
 	virtual const tiny_rom_entry *device_rom_region() const override;
 protected:
 	// device-level overrides

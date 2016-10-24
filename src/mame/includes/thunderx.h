@@ -67,7 +67,7 @@ public:
 	virtual void video_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vblank_interrupt);
+	void vblank_interrupt(device_t &device);
 	void run_collisions( int s0, int e0, int s1, int e1, int cm, int hm );
 	void calculate_collisions(  );
 	void volume_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);

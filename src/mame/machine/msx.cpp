@@ -212,7 +212,7 @@ void msx_state::post_load()
 	}
 }
 
-INTERRUPT_GEN_MEMBER(msx_state::msx_interrupt)
+void msx_state::msx_interrupt(device_t &device)
 {
 	m_mouse[0] = m_io_mouse0->read();
 	m_mouse_stat[0] = -1;

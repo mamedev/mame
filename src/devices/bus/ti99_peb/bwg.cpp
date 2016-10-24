@@ -116,7 +116,7 @@ void snug_bwg_device::operate_ready_line()
 /*
     Callbacks from the WD1773 chip
 */
-WRITE_LINE_MEMBER( snug_bwg_device::fdc_irq_w )
+void snug_bwg_device::fdc_irq_w(int state)
 {
 	if (TRACE_SIGNALS) logerror("bwg: set intrq = %d\n", state);
 	m_IRQ = (line_state)state;
@@ -125,7 +125,7 @@ WRITE_LINE_MEMBER( snug_bwg_device::fdc_irq_w )
 	operate_ready_line();
 }
 
-WRITE_LINE_MEMBER( snug_bwg_device::fdc_drq_w )
+void snug_bwg_device::fdc_drq_w(int state)
 {
 	if (TRACE_SIGNALS) logerror("bwg: set drq = %d\n", state);
 	m_DRQ = (line_state)state;

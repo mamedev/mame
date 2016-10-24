@@ -450,7 +450,7 @@ uint8_t mos6560_device::read(address_space &space, offs_t offset, uint8_t mem_ma
 	return val;
 }
 
-WRITE_LINE_MEMBER( mos6560_device::lp_w )
+void mos6560_device::lp_w(int state)
 {
 	// TODO
 }

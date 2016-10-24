@@ -162,7 +162,7 @@ uint16_t ti68k_state::flash_r(address_space &space, offs_t offset, uint16_t mem_
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(ti68k_state::ti68k_timer_callback)
+void ti68k_state::ti68k_timer_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	m_timer++;
 
@@ -507,7 +507,7 @@ uint32_t ti68k_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	return 0;
 }
 
-PALETTE_INIT_MEMBER(ti68k_state, ti68k)
+void ti68k_state::palette_init_ti68k(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));

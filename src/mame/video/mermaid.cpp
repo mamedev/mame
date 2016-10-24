@@ -4,7 +4,7 @@
 #include "includes/mermaid.h"
 
 
-PALETTE_INIT_MEMBER(mermaid_state, mermaid)
+void mermaid_state::palette_init_mermaid(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -32,7 +32,7 @@ PALETTE_INIT_MEMBER(mermaid_state, mermaid)
 	palette.set_pen_indirect(0x43, 0x21);
 }
 
-PALETTE_INIT_MEMBER(mermaid_state,rougien)
+void mermaid_state::palette_init_rougien(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -139,7 +139,7 @@ uint8_t mermaid_state::mermaid_collision_r(address_space &space, offs_t offset, 
 	return collision;
 }
 
-TILE_GET_INFO_MEMBER(mermaid_state::get_bg_tile_info)
+void mermaid_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram2[tile_index];
 	int sx = tile_index % 32;
@@ -148,7 +148,7 @@ TILE_GET_INFO_MEMBER(mermaid_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(2, code, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(mermaid_state::get_fg_tile_info)
+void mermaid_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_colorram[tile_index];
 	int code = m_videoram[tile_index] + ((attr & 0x30) << 4);

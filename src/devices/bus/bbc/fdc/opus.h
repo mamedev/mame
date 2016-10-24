@@ -31,9 +31,9 @@ public:
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
-	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
-	DECLARE_WRITE_LINE_MEMBER(motor_w);
+	void fdc_intrq_w(int state);
+	void fdc_drq_w(int state);
+	void motor_w(int state);
 	uint8_t ctrl_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 

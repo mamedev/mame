@@ -122,11 +122,11 @@ public:
 	void dsp_speedup_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	uint32_t ncr53c700_read(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	void ncr53c700_write(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
-	DECLARE_WRITE_LINE_MEMBER(scsi_irq);
+	void scsi_irq(int state);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(tms_timer1);
-	TIMER_DEVICE_CALLBACK_MEMBER(tms_tx_timer);
-	INTERRUPT_GEN_MEMBER(vblank_irq);
+	void tms_timer1(timer_device &timer, void *ptr, int32_t param);
+	void tms_tx_timer(timer_device &timer, void *ptr, int32_t param);
+	void vblank_irq(device_t &device);
 
 	std::unique_ptr<uint8_t[]>   m_nvram8;
 	uint8_t   m_io_reg;
@@ -140,7 +140,7 @@ public:
 	uint32_t  screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void    update_irq(uint32_t which, uint32_t state);
 	void    upload_palette(uint32_t word1, uint32_t word2);
-	IRQ_CALLBACK_MEMBER(irq_callback);
+	int irq_callback(device_t &device, int irqline);
 protected:
 	// driver_device overrides
 	virtual void machine_reset() override;
@@ -363,7 +363,7 @@ uint32_t rastersp_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
  *
  *************************************/
 
-IRQ_CALLBACK_MEMBER(rastersp_state::irq_callback)
+int rastersp_state::irq_callback(device_t &device, int irqline)
 {
 	uint8_t vector = 0;
 
@@ -403,13 +403,13 @@ void rastersp_state::update_irq(uint32_t which, uint32_t state)
 }
 
 
-WRITE_LINE_MEMBER( rastersp_state::scsi_irq )
+void rastersp_state::scsi_irq(int state)
 {
 	update_irq(IRQ_SCSI, state);
 }
 
 
-INTERRUPT_GEN_MEMBER( rastersp_state::vblank_irq )
+void rastersp_state::vblank_irq(device_t &device)
 {
 	update_irq(IRQ_VBLANK, ASSERT_LINE);
 }
@@ -503,7 +503,7 @@ void rastersp_state::cyrix_cache_w(address_space &space, offs_t offset, uint32_t
  *
  *************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER( rastersp_state::tms_tx_timer )
+void rastersp_state::tms_tx_timer(timer_device &timer, void *ptr, int32_t param)
 {
 	// Is the transmit shifter full?
 	if (m_tms_io_regs[SPORT_GLOBAL_CTL] & (1 << 3))
@@ -529,7 +529,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( rastersp_state::tms_tx_timer )
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER( rastersp_state::tms_timer1 )
+void rastersp_state::tms_timer1(timer_device &timer, void *ptr, int32_t param)
 {
 }
 

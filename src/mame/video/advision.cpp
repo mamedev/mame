@@ -35,7 +35,7 @@ void advision_state::video_start()
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(advision_state, advision)
+void advision_state::palette_init_advision(palette_device &palette)
 {
 	for (int i = 0; i < 8; i++)
 	{

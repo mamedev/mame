@@ -79,8 +79,8 @@ public:
 	uint16_t ddd_053936_tilerom_1_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	uint16_t gai_053936_tilerom_2_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	uint16_t ddd_053936_tilerom_2_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
-	TILE_GET_INFO_MEMBER(get_gai_936_tile_info);
-	TILE_GET_INFO_MEMBER(get_ult_936_tile_info);
+	void get_gai_936_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_ult_936_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void machine_start_mystwarr();
 	void machine_reset_mystwarr();
 	void video_start_mystwarr();
@@ -98,11 +98,11 @@ public:
 	uint32_t screen_update_metamrph(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_dadandrn(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_martchmp(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(ddd_interrupt);
-	DECLARE_WRITE_LINE_MEMBER(k054539_nmi_gen);
-	TIMER_DEVICE_CALLBACK_MEMBER(mystwarr_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(metamrph_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(mchamp_interrupt);
+	void ddd_interrupt(device_t &device);
+	void k054539_nmi_gen(int state);
+	void mystwarr_interrupt(timer_device &timer, void *ptr, int32_t param);
+	void metamrph_interrupt(timer_device &timer, void *ptr, int32_t param);
+	void mchamp_interrupt(timer_device &timer, void *ptr, int32_t param);
 	K056832_CB_MEMBER(mystwarr_tile_callback);
 	K056832_CB_MEMBER(game5bpp_tile_callback);
 	K056832_CB_MEMBER(game4bpp_tile_callback);

@@ -56,15 +56,15 @@ public:
 	void rtc_address_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t rtc_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void rtc_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( rtc_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( adlc_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( econet_data_w );
-	DECLARE_WRITE_LINE_MEMBER( via_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( clk_en_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
-	DECLARE_WRITE_LINE_MEMBER( scsi_bsy_w );
-	DECLARE_WRITE_LINE_MEMBER( scsi_req_w );
+	void rtc_irq_w(int state);
+	void adlc_irq_w(int state);
+	void econet_data_w(int state);
+	void via_irq_w(int state);
+	void clk_en_w(int state);
+	void fdc_irq_w(int state);
+	void fdc_drq_w(int state);
+	void scsi_bsy_w(int state);
+	void scsi_req_w(int state);
 
 protected:
 	// device-level overrides

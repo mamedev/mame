@@ -49,15 +49,15 @@ public:
 	void init_ghunter();
 	virtual void video_start() override;
 
-	TILEMAP_MAPPER_MEMBER(bg_scan);
-	TILE_GET_INFO_MEMBER(get_pf3_tile_info);
-	TILE_GET_INFO_MEMBER(get_pf2_tile_info);
-	TILE_GET_INFO_MEMBER(get_pf1_tile_info);
-	TILE_GET_INFO_MEMBER(get_text_tile_info);
+	tilemap_memory_index bg_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	void get_pf3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_pf2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_pf1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_text_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(main_scanline);
-	TIMER_DEVICE_CALLBACK_MEMBER(sub_scanline);
+	void main_scanline(timer_device &timer, void *ptr, int32_t param);
+	void sub_scanline(timer_device &timer, void *ptr, int32_t param);
 };

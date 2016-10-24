@@ -46,7 +46,7 @@ void segag80r_state::vblank_latch_set()
 }
 
 
-INTERRUPT_GEN_MEMBER(segag80r_state::segag80r_vblank_start)
+void segag80r_state::segag80r_vblank_start(device_t &device)
 {
 	vblank_latch_set();
 
@@ -56,7 +56,7 @@ INTERRUPT_GEN_MEMBER(segag80r_state::segag80r_vblank_start)
 }
 
 
-INTERRUPT_GEN_MEMBER(segag80r_state::sindbadm_vblank_start)
+void segag80r_state::sindbadm_vblank_start(device_t &device)
 {
 	vblank_latch_set();
 
@@ -155,14 +155,14 @@ void segag80r_state::spaceod_bg_init_palette()
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(segag80r_state::spaceod_get_tile_info)
+void segag80r_state::spaceod_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = memregion("gfx2")->base()[tile_index + 0x1000 * (m_spaceod_bg_control >> 6)];
 	SET_TILE_INFO_MEMBER(1, code + 0x100 * ((m_spaceod_bg_control >> 2) & 1), 0, 0);
 }
 
 
-TILEMAP_MAPPER_MEMBER(segag80r_state::spaceod_scan_rows)
+tilemap_memory_index segag80r_state::spaceod_scan_rows(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* this works for both horizontal and vertical tilemaps */
 	/* which are 4 32x32 sections */
@@ -170,7 +170,7 @@ TILEMAP_MAPPER_MEMBER(segag80r_state::spaceod_scan_rows)
 }
 
 
-TILE_GET_INFO_MEMBER(segag80r_state::bg_get_tile_info)
+void segag80r_state::bg_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = memregion("gfx2")->base()[tile_index];
 	SET_TILE_INFO_MEMBER(1, code + 0x100 * m_bg_char_bank, code >> 4, 0);

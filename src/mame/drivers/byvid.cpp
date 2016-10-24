@@ -94,14 +94,14 @@ public:
 	void u11_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t u11_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void u11_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(u7_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(u10_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(u11_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(u7_cb2_w);
-	DECLARE_WRITE_LINE_MEMBER(u10_cb2_w);
-	DECLARE_WRITE_LINE_MEMBER(u11_cb2_w);
-	TIMER_DEVICE_CALLBACK_MEMBER(u10_timer);
-	TIMER_DEVICE_CALLBACK_MEMBER(u11_timer);
+	void u7_ca2_w(int state);
+	void u10_ca2_w(int state);
+	void u11_ca2_w(int state);
+	void u7_cb2_w(int state);
+	void u10_cb2_w(int state);
+	void u11_cb2_w(int state);
+	void u10_timer(timer_device &timer, void *ptr, int32_t param);
+	void u11_timer(timer_device &timer, void *ptr, int32_t param);
 	void granny_crtc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint32_t screen_update_granny(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 private:
@@ -564,35 +564,35 @@ void by133_state::m6803_port2_w(address_space &space, offs_t offset, uint8_t dat
 	m_beep->set_state(BIT(data, 0));
 }
 
-WRITE_LINE_MEMBER( by133_state::u7_ca2_w )
+void by133_state::u7_ca2_w(int state)
 {
 	// comms out
 }
 
-WRITE_LINE_MEMBER( by133_state::u10_ca2_w )
+void by133_state::u10_ca2_w(int state)
 {
 	// enable digital display
 }
 
-WRITE_LINE_MEMBER( by133_state::u11_ca2_w )
+void by133_state::u11_ca2_w(int state)
 {
 	// green led
 }
 
-WRITE_LINE_MEMBER( by133_state::u7_cb2_w )
+void by133_state::u7_cb2_w(int state)
 {
 	// red led
 	m_beep->set_clock(950);
 	m_beep->set_state(state);
 }
 
-WRITE_LINE_MEMBER( by133_state::u10_cb2_w )
+void by133_state::u10_cb2_w(int state)
 {
 	// lamp strobe #1
 	m_u10_cb2 = state;
 }
 
-WRITE_LINE_MEMBER( by133_state::u11_cb2_w )
+void by133_state::u11_cb2_w(int state)
 {
 	// solenoid-sound selector
 }
@@ -704,14 +704,14 @@ void by133_state::u11_b_w(address_space &space, offs_t offset, uint8_t data, uin
 }
 
 // zero-cross detection
-TIMER_DEVICE_CALLBACK_MEMBER( by133_state::u10_timer )
+void by133_state::u10_timer(timer_device &timer, void *ptr, int32_t param)
 {
 	m_u10_timer ^= 1;
 	m_pia_u10->cb1_w(m_u10_timer);
 }
 
 // 555 timer for display refresh
-TIMER_DEVICE_CALLBACK_MEMBER( by133_state::u11_timer )
+void by133_state::u11_timer(timer_device &timer, void *ptr, int32_t param)
 {
 	m_u11_timer ^= 1;
 	m_pia_u11->ca1_w(m_u11_timer);

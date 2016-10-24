@@ -60,7 +60,7 @@ public:
 	void init_gunbustr();
 	virtual void video_start() override;
 	uint32_t screen_update_gunbustr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(gunbustr_interrupt);
+	void gunbustr_interrupt(device_t &device);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,const int *primasks,int x_offs,int y_offs);
 
 protected:

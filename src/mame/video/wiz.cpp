@@ -27,7 +27,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(wiz_state, wiz)
+void wiz_state::palette_init_wiz(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances[4] = { 1000, 470, 220, 100 };

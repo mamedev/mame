@@ -54,8 +54,8 @@ public:
 	void init_zx();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(zx);
-	DECLARE_PALETTE_INIT(ts1000);
+	void palette_init_zx(palette_device &palette);
+	void palette_init_ts1000(palette_device &palette);
 	void zx_tape_input();
 	void zx_ula_hsync();
 

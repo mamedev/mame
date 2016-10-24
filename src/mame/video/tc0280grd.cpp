@@ -81,7 +81,7 @@ void tc0280grd_device::device_reset()
     DEVICE HANDLERS
 *****************************************************************************/
 
-TILE_GET_INFO_MEMBER(tc0280grd_device::tc0280grd_get_tile_info)
+void tc0280grd_device::tc0280grd_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_ram[tile_index];
 	SET_TILE_INFO_MEMBER(m_gfxnum,

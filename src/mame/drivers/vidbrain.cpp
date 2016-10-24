@@ -374,7 +374,7 @@ F3853_INTERRUPT_REQ_CB(vidbrain_state::f3853_int_req_w)
 //  UV201_INTERFACE( uv_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( vidbrain_state::ext_int_w )
+void vidbrain_state::ext_int_w(int state)
 {
 	if (state)
 	{
@@ -383,7 +383,7 @@ WRITE_LINE_MEMBER( vidbrain_state::ext_int_w )
 	}
 }
 
-WRITE_LINE_MEMBER( vidbrain_state::hblank_w )
+void vidbrain_state::hblank_w(int state)
 {
 	if (state && m_joy_enable && !m_timer_ne555->enabled())
 	{
@@ -421,10 +421,10 @@ uint8_t vidbrain_state::memory_read_byte(address_space &space, offs_t offset, ui
 //**************************************************************************
 
 //-------------------------------------------------
-//      IRQ_CALLBACK_MEMBER(vidbrain_int_ack)
+//      int vidbrain_int_ack(device_t &device, int irqline)
 //-------------------------------------------------
 
-IRQ_CALLBACK_MEMBER(vidbrain_state::vidbrain_int_ack)
+int vidbrain_state::vidbrain_int_ack(device_t &device, int irqline)
 {
 	uint16_t vector = m_vector;
 

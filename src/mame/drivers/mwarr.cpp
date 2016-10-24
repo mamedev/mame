@@ -97,10 +97,10 @@ public:
 	void sprites_commands_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void mwarr_brightness_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void oki1_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_mlow_tile_info);
-	TILE_GET_INFO_MEMBER(get_mhigh_tile_info);
-	TILE_GET_INFO_MEMBER(get_tx_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_mlow_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_mhigh_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -363,7 +363,7 @@ GFXDECODE_END
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(mwarr_state::get_bg_tile_info)
+void mwarr_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno = m_bg_videoram[tile_index] & 0x1fff;
 	int colour = (m_bg_videoram[tile_index] & 0xe000) >> 13;
@@ -371,7 +371,7 @@ TILE_GET_INFO_MEMBER(mwarr_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(4, tileno, colour, 0);
 }
 
-TILE_GET_INFO_MEMBER(mwarr_state::get_mlow_tile_info)
+void mwarr_state::get_mlow_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno = m_mlow_videoram[tile_index] & 0x1fff;
 	int colour = (m_mlow_videoram[tile_index] & 0xe000) >> 13;
@@ -379,7 +379,7 @@ TILE_GET_INFO_MEMBER(mwarr_state::get_mlow_tile_info)
 	SET_TILE_INFO_MEMBER(3, tileno, colour, 0);
 }
 
-TILE_GET_INFO_MEMBER(mwarr_state::get_mhigh_tile_info)
+void mwarr_state::get_mhigh_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno = m_mhigh_videoram[tile_index] & 0x1fff;
 	int colour = (m_mhigh_videoram[tile_index] & 0xe000) >> 13;
@@ -387,7 +387,7 @@ TILE_GET_INFO_MEMBER(mwarr_state::get_mhigh_tile_info)
 	SET_TILE_INFO_MEMBER(2, tileno, colour, 0);
 }
 
-TILE_GET_INFO_MEMBER(mwarr_state::get_tx_tile_info)
+void mwarr_state::get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno = m_tx_videoram[tile_index] & 0x1fff;
 	int colour = (m_tx_videoram[tile_index] & 0xe000) >> 13;

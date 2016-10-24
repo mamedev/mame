@@ -276,7 +276,7 @@ void apple2gs_state::apple2gs_remove_irq(uint16_t irq_mask)
 	}
 }
 
-WRITE_LINE_MEMBER(apple2gs_state::apple2gs_doc_irq)
+void apple2gs_state::apple2gs_doc_irq(int state)
 {
 	if (state)
 	{
@@ -290,7 +290,7 @@ WRITE_LINE_MEMBER(apple2gs_state::apple2gs_doc_irq)
 
 
 /* Clock interrupt */
-TIMER_CALLBACK_MEMBER(apple2gs_state::apple2gs_clock_tick)
+void apple2gs_state::apple2gs_clock_tick(void *ptr, int32_t param)
 {
 	if ((m_vgcint & 0x04) && !(m_vgcint & 0x40))
 	{
@@ -301,7 +301,7 @@ TIMER_CALLBACK_MEMBER(apple2gs_state::apple2gs_clock_tick)
 
 
 /* Quarter-second interrupt */
-TIMER_CALLBACK_MEMBER(apple2gs_state::apple2gs_qsecond_tick)
+void apple2gs_state::apple2gs_qsecond_tick(void *ptr, int32_t param)
 {
 	if ((m_inten & 0x10) && !(m_intflag & 0x10))
 	{
@@ -719,7 +719,7 @@ void apple2gs_state::apple2gs_set_scanint(uint8_t data)
 }
 
 
-TIMER_CALLBACK_MEMBER(apple2gs_state::apple2gs_scanline_tick)
+void apple2gs_state::apple2gs_scanline_tick(void *ptr, int32_t param)
 {
 	int scanline;
 

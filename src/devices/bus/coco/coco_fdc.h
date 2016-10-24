@@ -35,8 +35,8 @@ public:
 		m_owner = dynamic_cast<cococart_slot_device *>(owner);
 	};
 
-	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w) { m_intrq = state; update_lines(); }
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w) { m_drq = state; update_lines(); }
+	void fdc_intrq_w(int state) { m_intrq = state; update_lines(); }
+	void fdc_drq_w(int state) { m_drq = state; update_lines(); }
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 

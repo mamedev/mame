@@ -34,7 +34,7 @@ public:
 		, m_bankmulti(*this, "bankmulti")
 	{ }
 
-	DECLARE_PALETTE_INIT(gamate);
+	void palette_init_gamate(palette_device &palette);
 	uint8_t protection_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t newer_protection_set(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void protection_reset(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -47,9 +47,9 @@ public:
 	void gamate_video_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_gamate();
 	uint32_t screen_update_gamate(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(gamate_interrupt);
-	TIMER_CALLBACK_MEMBER(gamate_timer);
-	TIMER_CALLBACK_MEMBER(gamate_timer2);
+	void gamate_interrupt(device_t &device);
+	void gamate_timer(void *ptr, int32_t param);
+	void gamate_timer2(void *ptr, int32_t param);
 
 private:
 	virtual void machine_start() override;
@@ -263,7 +263,7 @@ static const unsigned char gamate_colors[4][3] =
 	{ 0, 0, 0 }
 };
 
-PALETTE_INIT_MEMBER(gamate_state, gamate)
+void gamate_state::palette_init_gamate(palette_device &palette)
 {
 	int i;
 
@@ -352,13 +352,13 @@ void gamate_state::machine_start()
 #endif
 }
 
-TIMER_CALLBACK_MEMBER(gamate_state::gamate_timer)
+void gamate_state::gamate_timer(void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
 	timer1->enable(false);
 }
 
-TIMER_CALLBACK_MEMBER(gamate_state::gamate_timer2)
+void gamate_state::gamate_timer2(void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE);
 	timer1->enable(true);
@@ -368,7 +368,7 @@ TIMER_CALLBACK_MEMBER(gamate_state::gamate_timer2)
 }
 
 
-INTERRUPT_GEN_MEMBER(gamate_state::gamate_interrupt)
+void gamate_state::gamate_interrupt(device_t &device)
 {
 }
 

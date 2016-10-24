@@ -45,9 +45,9 @@ public:
 	void init_f1dream();
 	void init_pushman();
 	void init_bballs();
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	TILEMAP_MAPPER_MEMBER(tigeroad_tilemap_scan);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	tilemap_memory_index tigeroad_tilemap_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
 	virtual void video_start() override;
 	uint32_t screen_update_tigeroad(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void f1dream_protection_w(address_space &space);

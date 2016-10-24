@@ -270,13 +270,13 @@ static GFXDECODE_START( wiping )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 64*4, 64 )
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(wiping_state::vblank_irq)
+void wiping_state::vblank_irq(device_t &device)
 {
 	if(m_main_irq_mask)
 		device.execute().set_input_line(0, HOLD_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(wiping_state::sound_timer_irq)
+void wiping_state::sound_timer_irq(device_t &device)
 {
 	if(m_sound_irq_mask)
 		device.execute().set_input_line(0, HOLD_LINE);

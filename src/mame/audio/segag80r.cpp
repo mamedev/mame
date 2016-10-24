@@ -551,7 +551,7 @@ void segag80r_state::sega005_sound_b_w(address_space &space, offs_t offset, uint
 
 
 
-TIMER_CALLBACK_MEMBER( sega005_sound_device::sega005_auto_timer )
+void sega005_sound_device::sega005_auto_timer(void *ptr, int32_t param)
 {
 	segag80r_state *state = machine().driver_data<segag80r_state>();
 	/* force an update then clock the sound address if not held in reset */

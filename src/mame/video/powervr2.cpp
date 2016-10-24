@@ -1681,35 +1681,35 @@ void powervr2_device::sb_pdapro_w(address_space &space, offs_t offset, uint32_t 
 }
 
 
-TIMER_CALLBACK_MEMBER(powervr2_device::transfer_opaque_list_irq)
+void powervr2_device::transfer_opaque_list_irq(void *ptr, int32_t param)
 {
 //  printf("OPLST %d\n",m_screen->vpos());
 
 	irq_cb(EOXFER_OPLST_IRQ);
 }
 
-TIMER_CALLBACK_MEMBER(powervr2_device::transfer_opaque_modifier_volume_list_irq)
+void powervr2_device::transfer_opaque_modifier_volume_list_irq(void *ptr, int32_t param)
 {
 //  printf("OPMV %d\n",m_screen->vpos());
 
 	irq_cb(EOXFER_OPMV_IRQ);
 }
 
-TIMER_CALLBACK_MEMBER(powervr2_device::transfer_translucent_list_irq)
+void powervr2_device::transfer_translucent_list_irq(void *ptr, int32_t param)
 {
 //  printf("TRLST %d\n",m_screen->vpos());
 
 	irq_cb(EOXFER_TRLST_IRQ);
 }
 
-TIMER_CALLBACK_MEMBER(powervr2_device::transfer_translucent_modifier_volume_list_irq)
+void powervr2_device::transfer_translucent_modifier_volume_list_irq(void *ptr, int32_t param)
 {
 //  printf("TRMV %d\n",m_screen->vpos());
 
 	irq_cb(EOXFER_TRMV_IRQ);
 }
 
-TIMER_CALLBACK_MEMBER(powervr2_device::transfer_punch_through_list_irq)
+void powervr2_device::transfer_punch_through_list_irq(void *ptr, int32_t param)
 {
 //  printf("PTLST %d\n",m_screen->vpos());
 
@@ -2044,7 +2044,7 @@ void powervr2_device::ta_fifo_poly_w(address_space &space, offs_t offset, uint64
 
 }
 
-TIMER_CALLBACK_MEMBER(powervr2_device::yuv_convert_end)
+void powervr2_device::yuv_convert_end(void *ptr, int32_t param)
 {
 	irq_cb(EOXFER_YUV_IRQ);
 	yuv_timer_end->adjust(attotime::never);
@@ -3356,7 +3356,7 @@ void powervr2_device::pvr_build_parameterconfig()
 			pvr_parameterconfig[a] = pvr_parameterconfig[a-1];
 }
 
-TIMER_CALLBACK_MEMBER(powervr2_device::vbin)
+void powervr2_device::vbin(void *ptr, int32_t param)
 {
 	irq_cb(VBL_IN_IRQ);
 
@@ -3364,14 +3364,14 @@ TIMER_CALLBACK_MEMBER(powervr2_device::vbin)
 //  vbin_timer->adjust(m_screen->time_until_pos(spg_vblank_int & 0x3ff));
 }
 
-TIMER_CALLBACK_MEMBER(powervr2_device::vbout)
+void powervr2_device::vbout(void *ptr, int32_t param)
 {
 	irq_cb(VBL_OUT_IRQ);
 
 //  vbout_timer->adjust(m_screen->time_until_pos((spg_vblank_int >> 16) & 0x3ff));
 }
 
-TIMER_CALLBACK_MEMBER(powervr2_device::hbin)
+void powervr2_device::hbin(void *ptr, int32_t param)
 {
 	if(spg_hblank_int & 0x1000)
 	{
@@ -3401,13 +3401,13 @@ TIMER_CALLBACK_MEMBER(powervr2_device::hbin)
 
 
 
-TIMER_CALLBACK_MEMBER(powervr2_device::endofrender_video)
+void powervr2_device::endofrender_video(void *ptr, int32_t param)
 {
 	printf("VIDEO END %d\n",m_screen->vpos());
 //  endofrender_timer_video->adjust(attotime::never);
 }
 
-TIMER_CALLBACK_MEMBER(powervr2_device::endofrender_tsp)
+void powervr2_device::endofrender_tsp(void *ptr, int32_t param)
 {
 	printf("TSP END %d\n",m_screen->vpos());
 
@@ -3415,7 +3415,7 @@ TIMER_CALLBACK_MEMBER(powervr2_device::endofrender_tsp)
 //  endofrender_timer_video->adjust(attotime::from_usec(500) );
 }
 
-TIMER_CALLBACK_MEMBER(powervr2_device::endofrender_isp)
+void powervr2_device::endofrender_isp(void *ptr, int32_t param)
 {
 	irq_cb(EOR_ISP_IRQ); // ISP end of render
 	irq_cb(EOR_TSP_IRQ); // TSP end of render
@@ -3548,7 +3548,7 @@ void powervr2_device::pvrs_ta_w(address_space &space, offs_t offset, uint32_t da
 	//printf("PVR2 %08x %08x\n",reg,dat);
 }
 
-TIMER_CALLBACK_MEMBER(powervr2_device::pvr_dma_irq)
+void powervr2_device::pvr_dma_irq(void *ptr, int32_t param)
 {
 	m_pvr_dma.start = sb_pdst = 0;
 	irq_cb(DMA_PVR_IRQ);

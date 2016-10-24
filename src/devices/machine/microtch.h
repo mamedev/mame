@@ -15,7 +15,7 @@ public:
 	template<class _Object> static devcb_base &static_set_stx_callback(device_t &device, _Object object) { return downcast<microtouch_device &>(device).m_out_stx_func.set_callback(object); }
 
 	virtual ioport_constructor device_input_ports() const override;
-	DECLARE_WRITE_LINE_MEMBER(rx) { device_serial_interface::rx_w(state); }
+	void rx(int state) { device_serial_interface::rx_w(state); }
 	DECLARE_INPUT_CHANGED_MEMBER(touch);
 
 	typedef delegate<int (int *, int *)> touch_cb;

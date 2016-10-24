@@ -734,7 +734,7 @@ CPUs to worry about.
 
 */
 
-TIMER_CALLBACK_MEMBER(segas24_state::gground_hack_timer_callback)
+void segas24_state::gground_hack_timer_callback(void *ptr, int32_t param)
 {
 	m_subcpu->set_clock_scale(1.0f);
 }
@@ -926,7 +926,7 @@ void segas24_state::irq_timer_start(int old_tmode)
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(segas24_state::irq_timer_cb)
+void segas24_state::irq_timer_cb(timer_device &timer, void *ptr, int32_t param)
 {
 	irq_timer_sync();
 
@@ -949,7 +949,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(segas24_state::irq_timer_cb)
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(segas24_state::irq_timer_clear_cb)
+void segas24_state::irq_timer_clear_cb(timer_device &timer, void *ptr, int32_t param)
 {
 	irq_sprite = irq_vblank = 0;
 	m_maincpu->set_input_line(IRQ_VBLANK+1, CLEAR_LINE);
@@ -958,7 +958,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(segas24_state::irq_timer_clear_cb)
 	m_subcpu->set_input_line(IRQ_SPRITE+1, CLEAR_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(segas24_state::irq_frc_cb)
+void segas24_state::irq_frc_cb(timer_device &timer, void *ptr, int32_t param)
 {
 	if(irq_allow0 & (1 << IRQ_FRC) && frc_mode == 1)
 		m_maincpu->set_input_line(IRQ_FRC+1, ASSERT_LINE);
@@ -1049,7 +1049,7 @@ uint16_t segas24_state::irq_r(address_space &space, offs_t offset, uint16_t mem_
 	return irq_tval & 0xfff;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(segas24_state::irq_vbl)
+void segas24_state::irq_vbl(timer_device &timer, void *ptr, int32_t param)
 {
 	int irq, mask;
 	int scanline = param;
@@ -1083,7 +1083,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(segas24_state::irq_vbl)
 	irq_vsynctime = machine().time();
 }
 
-WRITE_LINE_MEMBER(segas24_state::irq_ym)
+void segas24_state::irq_ym(int state)
 {
 	irq_yms = state;
 	m_maincpu->set_input_line(IRQ_YM2151+1, irq_yms && (irq_allow0 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);

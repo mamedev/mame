@@ -32,7 +32,7 @@
   bit 0 -- 1  kohm resistor  -- RED
 
 ***************************************************************************/
-PALETTE_INIT_MEMBER(pingpong_state, pingpong)
+void pingpong_state::palette_init_pingpong(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -94,7 +94,7 @@ void pingpong_state::pingpong_colorram_w(address_space &space, offs_t offset, ui
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(pingpong_state::get_bg_tile_info)
+void pingpong_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_colorram[tile_index];
 	int code = m_videoram[tile_index] + ((attr & 0x20) << 3);

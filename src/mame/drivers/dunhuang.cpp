@@ -123,8 +123,8 @@ public:
 	uint8_t dunhuang_input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void dunhuang_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t dunhuang_dsw_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	TILE_GET_INFO_MEMBER(get_tile_info);
-	TILE_GET_INFO_MEMBER(get_tile_info2);
+	void get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -141,13 +141,13 @@ public:
 ***************************************************************************/
 
 
-TILE_GET_INFO_MEMBER(dunhuang_state::get_tile_info)
+void dunhuang_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = m_videoram[tile_index];
 	uint8_t color = m_colorram[tile_index] & 0x0f;
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
-TILE_GET_INFO_MEMBER(dunhuang_state::get_tile_info2)
+void dunhuang_state::get_tile_info2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = m_videoram2[tile_index];
 	uint8_t color = m_colorram2[tile_index] & 0x0f;

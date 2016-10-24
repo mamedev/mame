@@ -81,9 +81,9 @@ public:
 	void flash_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	uint16_t flash_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	uint64_t m_timer;
-	DECLARE_PALETTE_INIT(ti68k);
+	void palette_init_ti68k(palette_device &palette);
 	DECLARE_INPUT_CHANGED_MEMBER(ti68k_on_key);
-	TIMER_DEVICE_CALLBACK_MEMBER(ti68k_timer_callback);
+	void ti68k_timer_callback(timer_device &timer, void *ptr, int32_t param);
 };
 
 #endif // TI89_H_

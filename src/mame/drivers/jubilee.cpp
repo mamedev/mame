@@ -223,10 +223,10 @@ public:
 	void jubileep_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void unk_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t mux_port_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void video_start() override;
 	uint32_t screen_update_jubileep(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(jubileep_interrupt);
+	void jubileep_interrupt(device_t &device);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 };
@@ -249,7 +249,7 @@ void jubilee_state::jubileep_colorram_w(address_space &space, offs_t offset, uin
 }
 
 
-TILE_GET_INFO_MEMBER(jubilee_state::get_bg_tile_info)
+void jubilee_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 /*  - bits -   (attr for gfx banks 00-03)
     7654 3210
@@ -282,7 +282,7 @@ uint32_t jubilee_state::screen_update_jubileep(screen_device &screen, bitmap_ind
 *  Read / Write Handlers  *
 **************************/
 
-INTERRUPT_GEN_MEMBER(jubilee_state::jubileep_interrupt)
+void jubilee_state::jubileep_interrupt(device_t &device)
 {
 	m_maincpu->set_input_line(INT_9980A_LEVEL1, ASSERT_LINE);
 }

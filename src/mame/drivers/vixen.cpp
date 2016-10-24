@@ -394,10 +394,10 @@ INPUT_PORTS_END
 //**************************************************************************
 
 //-------------------------------------------------
-//  TIMER_DEVICE_CALLBACK_MEMBER( vsync_tick )
+//  void vsync_tick(timer_device &timer, void *ptr, int32_t param)
 //-------------------------------------------------
 
-TIMER_DEVICE_CALLBACK_MEMBER(vixen_state::vsync_tick)
+void vixen_state::vsync_tick(timer_device &timer, void *ptr, int32_t param)
 {
 	if (m_cmd_d0)
 	{
@@ -623,7 +623,7 @@ void vixen_state::io_i8155_pc_w(address_space &space, offs_t offset, uint8_t dat
 	m_enb_srq_int = BIT(data, 5);
 }
 
-WRITE_LINE_MEMBER( vixen_state::io_i8155_to_w )
+void vixen_state::io_i8155_to_w(int state)
 {
 	if (m_int_clk)
 	{
@@ -636,13 +636,13 @@ WRITE_LINE_MEMBER( vixen_state::io_i8155_to_w )
 //  i8251_interface usart_intf
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( vixen_state::rxrdy_w )
+void vixen_state::rxrdy_w(int state)
 {
 	m_rxrdy = state;
 	update_interrupt();
 }
 
-WRITE_LINE_MEMBER( vixen_state::txrdy_w )
+void vixen_state::txrdy_w(int state)
 {
 	m_txrdy = state;
 	update_interrupt();
@@ -652,13 +652,13 @@ WRITE_LINE_MEMBER( vixen_state::txrdy_w )
 //  IEEE488_INTERFACE( ieee488_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( vixen_state::srq_w )
+void vixen_state::srq_w(int state)
 {
 	m_srq = state;
 	update_interrupt();
 }
 
-WRITE_LINE_MEMBER( vixen_state::atn_w )
+void vixen_state::atn_w(int state)
 {
 	m_atn = state;
 	update_interrupt();
@@ -668,7 +668,7 @@ static SLOT_INTERFACE_START( vixen_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
 
-WRITE_LINE_MEMBER( vixen_state::fdc_intrq_w )
+void vixen_state::fdc_intrq_w(int state)
 {
 	m_fdint = state;
 	update_interrupt();
@@ -681,10 +681,10 @@ WRITE_LINE_MEMBER( vixen_state::fdc_intrq_w )
 //**************************************************************************
 
 //-------------------------------------------------
-//  IRQ_CALLBACK_MEMBER( vixen_int_ack )
+//  int vixen_int_ack(device_t &device, int irqline)
 //-------------------------------------------------
 
-IRQ_CALLBACK_MEMBER(vixen_state::vixen_int_ack)
+int vixen_state::vixen_int_ack(device_t &device, int irqline)
 {
 	// D0 is pulled low
 	return 0xfe;

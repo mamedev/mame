@@ -110,16 +110,16 @@ public:
 	uint8_t protection_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void protection_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	TILE_GET_INFO_MEMBER(get_tile_info);
-	TILE_GET_INFO_MEMBER(get_tile_info2);
+	void get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(pipeline);
+	void palette_init_pipeline(palette_device &palette);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	TIMER_CALLBACK_MEMBER(protection_deferred_w);
+	void protection_deferred_w(void *ptr, int32_t param);
 };
 
 
@@ -130,7 +130,7 @@ void pipeline_state::machine_start()
 	save_item(NAME(m_ddrA));
 }
 
-TILE_GET_INFO_MEMBER(pipeline_state::get_tile_info)
+void pipeline_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_vram2[tile_index]+m_vram2[tile_index+0x800]*256;
 	SET_TILE_INFO_MEMBER(0,
@@ -139,7 +139,7 @@ TILE_GET_INFO_MEMBER(pipeline_state::get_tile_info)
 		0);
 }
 
-TILE_GET_INFO_MEMBER(pipeline_state::get_tile_info2)
+void pipeline_state::get_tile_info2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code =m_vram1[tile_index]+((m_vram1[tile_index+0x800]>>4))*256;
 	int color=((m_vram1[tile_index+0x800])&0xf);
@@ -202,7 +202,7 @@ uint8_t pipeline_state::protection_r(address_space &space, offs_t offset, uint8_
 	return m_fromMCU;
 }
 
-TIMER_CALLBACK_MEMBER(pipeline_state::protection_deferred_w)
+void pipeline_state::protection_deferred_w(void *ptr, int32_t param)
 {
 	m_toMCU = param;
 }
@@ -342,7 +342,7 @@ static const z80_daisy_config daisy_chain_sound[] =
 	{ nullptr }
 };
 
-PALETTE_INIT_MEMBER(pipeline_state, pipeline)
+void pipeline_state::palette_init_pipeline(palette_device &palette)
 {
 	int r,g,b,i,c;
 	uint8_t *prom1 = &memregion("proms")->base()[0x000];

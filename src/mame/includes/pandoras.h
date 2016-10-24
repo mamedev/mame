@@ -56,13 +56,13 @@ public:
 	void pandoras_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t pandoras_portA_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t pandoras_portB_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	TILE_GET_INFO_MEMBER(get_tile_info0);
+	void get_tile_info0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(pandoras);
+	void palette_init_pandoras(palette_device &palette);
 	uint32_t screen_update_pandoras(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(pandoras_master_interrupt);
-	INTERRUPT_GEN_MEMBER(pandoras_slave_interrupt);
+	void pandoras_master_interrupt(device_t &device);
+	void pandoras_slave_interrupt(device_t &device);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t* sr );
 };

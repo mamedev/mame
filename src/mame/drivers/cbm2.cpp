@@ -164,13 +164,13 @@ public:
 	uint8_t sid_potx_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t sid_poty_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( tpi1_irq_w );
+	void tpi1_irq_w(int state);
 	uint8_t tpi1_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void tpi1_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t tpi1_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void tpi1_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( tpi1_ca_w );
-	DECLARE_WRITE_LINE_MEMBER( tpi1_cb_w );
+	void tpi1_ca_w(int state);
+	void tpi1_cb_w(int state);
 
 	void tpi2_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void tpi2_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -184,11 +184,11 @@ public:
 	void ext_tpi_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void ext_tpi_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( ext_cia_irq_w );
+	void ext_cia_irq_w(int state);
 	uint8_t ext_cia_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void ext_cia_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( user_irq_w );
+	void user_irq_w(int state);
 
 	MC6845_UPDATE_ROW( crtc_update_row );
 
@@ -279,16 +279,16 @@ public:
 
 	uint8_t vic_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t vic_colorram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( vic_irq_w );
+	void vic_irq_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( tpi1_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( tpi1_ca_w );
-	DECLARE_WRITE_LINE_MEMBER( tpi1_cb_w );
+	void tpi1_irq_w(int state);
+	void tpi1_ca_w(int state);
+	void tpi1_cb_w(int state);
 
 	uint8_t tpi2_pc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void tpi2_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( user_irq_w );
+	void user_irq_w(int state);
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER( p500 );
 	// video state
@@ -1421,7 +1421,7 @@ MC6845_UPDATE_ROW( cbm2_state::crtc_update_row )
 //  vic2_interface vic_intf
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( p500_state::vic_irq_w )
+void p500_state::vic_irq_w(int state)
 {
 	m_vic_irq = state;
 
@@ -1492,14 +1492,14 @@ uint8_t cbm2_state::sid_poty_r(address_space &space, offs_t offset, uint8_t mem_
 //  tpi6525_interface tpi1_intf
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( cbm2_state::tpi1_irq_w )
+void cbm2_state::tpi1_irq_w(int state)
 {
 	m_tpi1_irq = state;
 
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, m_tpi1_irq || m_user_irq);
 }
 
-WRITE_LINE_MEMBER( p500_state::tpi1_irq_w )
+void p500_state::tpi1_irq_w(int state)
 {
 	m_tpi1_irq = state;
 
@@ -1634,17 +1634,17 @@ void cbm2_state::tpi1_pb_w(address_space &space, offs_t offset, uint8_t data, ui
 	m_cassette->motor_w(BIT(data, 6));
 }
 
-WRITE_LINE_MEMBER( cbm2_state::tpi1_ca_w )
+void cbm2_state::tpi1_ca_w(int state)
 {
 	m_graphics = state;
 }
 
-WRITE_LINE_MEMBER( p500_state::tpi1_ca_w )
+void p500_state::tpi1_ca_w(int state)
 {
 	m_statvid = state;
 }
 
-WRITE_LINE_MEMBER( p500_state::tpi1_cb_w )
+void p500_state::tpi1_cb_w(int state)
 {
 	m_vicdotsel = state;
 }
@@ -1970,7 +1970,7 @@ void cbm2_state::ext_tpi_pc_w(address_space &space, offs_t offset, uint8_t data,
 //  MOS6526_INTERFACE( ext_cia_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( cbm2_state::ext_cia_irq_w )
+void cbm2_state::ext_cia_irq_w(int state)
 {
 	m_tpi1->i3_w(!state);
 }
@@ -2045,7 +2045,7 @@ void cbm2_state::ext_cia_pb_w(address_space &space, offs_t offset, uint8_t data,
 //  CBM2_USER_PORT_INTERFACE( user_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( cbm2_state::user_irq_w )
+void cbm2_state::user_irq_w(int state)
 {
 	m_user_irq = state;
 
@@ -2057,7 +2057,7 @@ WRITE_LINE_MEMBER( cbm2_state::user_irq_w )
 //  CBM2_USER_PORT_INTERFACE( p500_user_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( p500_state::user_irq_w )
+void p500_state::user_irq_w(int state)
 {
 	m_user_irq = state;
 

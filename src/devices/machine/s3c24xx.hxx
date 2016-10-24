@@ -671,7 +671,7 @@ void S3C24_CLASS_NAME::s3c24xx_lcd_render_tft_16()
 	}
 }
 
-TIMER_CALLBACK_MEMBER( S3C24_CLASS_NAME::s3c24xx_lcd_timer_exp )
+void S3C24_CLASS_NAME::s3c24xx_lcd_timer_exp(void *ptr, int32_t param)
 {
 	screen_device *screen = machine().first_screen();
 	uint32_t tpalen;
@@ -1463,7 +1463,7 @@ void S3C24_CLASS_NAME::s3c24xx_pwm_w(address_space &space, offs_t offset, uint32
 	}
 }
 
-TIMER_CALLBACK_MEMBER( S3C24_CLASS_NAME::s3c24xx_pwm_timer_exp )
+void S3C24_CLASS_NAME::s3c24xx_pwm_timer_exp(void *ptr, int32_t param)
 {
 	int ch = param;
 	const int ch_int[] = { S3C24XX_INT_TIMER0, S3C24XX_INT_TIMER1, S3C24XX_INT_TIMER2, S3C24XX_INT_TIMER3, S3C24XX_INT_TIMER4 };
@@ -1717,7 +1717,7 @@ void S3C24_CLASS_NAME::s3c24xx_dma_3_w(address_space &space, offs_t offset, uint
 	s3c24xx_dma_w( 3, offset, data, mem_mask);
 }
 
-TIMER_CALLBACK_MEMBER( S3C24_CLASS_NAME::s3c24xx_dma_timer_exp )
+void S3C24_CLASS_NAME::s3c24xx_dma_timer_exp(void *ptr, int32_t param)
 {
 	int ch = param;
 	verboselog( *this, 2, "DMA %d timer callback\n", ch);
@@ -2265,7 +2265,7 @@ void S3C24_CLASS_NAME::s3c24xx_wdt_w(address_space &space, offs_t offset, uint32
 	}
 }
 
-TIMER_CALLBACK_MEMBER( S3C24_CLASS_NAME::s3c24xx_wdt_timer_exp )
+void S3C24_CLASS_NAME::s3c24xx_wdt_timer_exp(void *ptr, int32_t param)
 {
 	verboselog( *this, 2, "WDT timer callback\n");
 	if ((m_wdt.regs.wtcon & (1 << 2)) != 0)
@@ -2507,7 +2507,7 @@ void S3C24_CLASS_NAME::s3c24xx_iic_w(address_space &space, offs_t offset, uint32
 	}
 }
 
-TIMER_CALLBACK_MEMBER( S3C24_CLASS_NAME::s3c24xx_iic_timer_exp )
+void S3C24_CLASS_NAME::s3c24xx_iic_timer_exp(void *ptr, int32_t param)
 {
 	int enable_interrupt;
 	verboselog( *this, 2, "IIC timer callback\n");
@@ -2626,7 +2626,7 @@ void S3C24_CLASS_NAME::s3c24xx_iis_w(address_space &space, offs_t offset, uint32
 	}
 }
 
-TIMER_CALLBACK_MEMBER( S3C24_CLASS_NAME::s3c24xx_iis_timer_exp )
+void S3C24_CLASS_NAME::s3c24xx_iis_timer_exp(void *ptr, int32_t param)
 {
 	verboselog( *this, 2, "IIS timer callback\n");
 	s3c24xx_dma_request_iis();
@@ -2682,7 +2682,7 @@ void S3C24_CLASS_NAME::s3c24xx_rtc_w(address_space &space, offs_t offset, uint32
 	}
 }
 
-TIMER_CALLBACK_MEMBER( S3C24_CLASS_NAME::s3c24xx_rtc_timer_tick_count_exp )
+void S3C24_CLASS_NAME::s3c24xx_rtc_timer_tick_count_exp(void *ptr, int32_t param)
 {
 	verboselog( *this, 2, "RTC timer callback (tick count)\n");
 	s3c24xx_request_irq( S3C24XX_INT_TICK);
@@ -2751,7 +2751,7 @@ void S3C24_CLASS_NAME::s3c24xx_rtc_check_alarm()
 	}
 }
 
-TIMER_CALLBACK_MEMBER( S3C24_CLASS_NAME::s3c24xx_rtc_timer_update_exp )
+void S3C24_CLASS_NAME::s3c24xx_rtc_timer_update_exp(void *ptr, int32_t param)
 {
 	verboselog( *this, 2, "RTC timer callback (update)\n");
 	s3c24xx_rtc_update();
@@ -3287,7 +3287,7 @@ void S3C24_CLASS_NAME::s3c24xx_nand_w(address_space &space, offs_t offset, uint3
 	}
 }
 
-ATTR_UNUSED WRITE_LINE_MEMBER( S3C24_CLASS_NAME::s3c24xx_pin_frnb_w )
+ATTR_UNUSED void S3C24_CLASS_NAME::s3c24xx_pin_frnb_w(int state)
 {
 	verboselog( *this, 9, "s3c24xx_pin_frnb_w (%d)\n", state);
 #if defined(DEVICE_S3C2440)

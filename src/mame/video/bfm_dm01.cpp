@@ -282,7 +282,7 @@ uint32_t bfmdm01_device::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 
 
-INTERRUPT_GEN_MEMBER( bfmdm01_device::nmi_line_assert )
+void bfmdm01_device::nmi_line_assert(device_t &device)
 {
 	m_matrixcpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }

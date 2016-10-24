@@ -33,9 +33,9 @@ public:
 	uint16_t dsp_dma_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void dsp_dma_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void output_ctl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	DECLARE_READ_LINE_MEMBER(bio_line_r);
+	int bio_line_r();
 	void irq_line_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	DECLARE_WRITE_LINE_MEMBER(clock_w);
+	void clock_w(int state);
 
 protected:
 	// device-level overrides

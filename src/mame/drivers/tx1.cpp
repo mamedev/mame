@@ -84,7 +84,7 @@ void tx1_state::z80_intreq_w(address_space &space, offs_t offset, uint8_t data, 
 }
 
 /* Periodic Z80 interrupt */
-INTERRUPT_GEN_MEMBER(tx1_state::z80_irq)
+void tx1_state::z80_irq(device_t &device)
 {
 	device.execute().set_input_line(0, HOLD_LINE);
 }

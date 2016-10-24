@@ -12,7 +12,7 @@
 #include "includes/kopunch.h"
 
 
-PALETTE_INIT_MEMBER(kopunch_state, kopunch)
+void kopunch_state::palette_init_kopunch(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 
@@ -79,14 +79,14 @@ void kopunch_state::gfxbank_w(address_space &space, offs_t offset, uint8_t data,
 	m_bg_tilemap->set_flip((data & 0x08) ? TILEMAP_FLIPY : 0);
 }
 
-TILE_GET_INFO_MEMBER(kopunch_state::get_fg_tile_info)
+void kopunch_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_vram_fg[tile_index];
 
 	SET_TILE_INFO_MEMBER(0, code, 0, 0);
 }
 
-TILE_GET_INFO_MEMBER(kopunch_state::get_bg_tile_info)
+void kopunch_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	// note: highest bit is unused
 	int code = (m_vram_bg[tile_index] & 0x7f) | m_gfxbank << 7;

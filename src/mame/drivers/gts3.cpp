@@ -51,7 +51,7 @@ public:
 	uint8_t u4a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t u4b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void u4b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(nmi_w);
+	void nmi_w(int state);
 	DECLARE_INPUT_CHANGED_MEMBER(test_inp);
 private:
 	bool m_dispclk;
@@ -209,7 +209,7 @@ INPUT_CHANGED_MEMBER( gts3_state::test_inp )
 }
 
 // This trampoline needed; DEVWRITELINE("maincpu", m65c02_device, nmi_line) does not work
-WRITE_LINE_MEMBER( gts3_state::nmi_w )
+void gts3_state::nmi_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, (state) ? CLEAR_LINE : HOLD_LINE);
 }

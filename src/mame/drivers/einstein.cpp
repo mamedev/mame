@@ -115,7 +115,7 @@ MC6845_UPDATE_ROW( einstein_state::crtc_update_row )
 	}
 }
 
-WRITE_LINE_MEMBER(einstein_state::einstein_6845_de_changed)
+void einstein_state::einstein_6845_de_changed(int state)
 {
 	m_de=state;
 }
@@ -169,7 +169,7 @@ void einstein_state::einstein_scan_keyboard()
 	m_keyboard_data = data;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(einstein_state::einstein_keyboard_timer_callback)
+void einstein_state::einstein_keyboard_timer_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	/* re-scan keyboard */
 	einstein_scan_keyboard();
@@ -247,7 +247,7 @@ void einstein_state::einstein_drsel_w(address_space &space, offs_t offset, uint8
 ***************************************************************************/
 
 /* channel 0 and 1 have a 2 MHz input clock for triggering */
-TIMER_DEVICE_CALLBACK_MEMBER(einstein_state::einstein_ctc_trigger_callback)
+void einstein_state::einstein_ctc_trigger_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	/* toggle line status */
 	m_ctc_trigger ^= 1;
@@ -261,12 +261,12 @@ TIMER_DEVICE_CALLBACK_MEMBER(einstein_state::einstein_ctc_trigger_callback)
     UART
 ***************************************************************************/
 
-WRITE_LINE_MEMBER(einstein_state::einstein_serial_transmit_clock)
+void einstein_state::einstein_serial_transmit_clock(int state)
 {
 	m_uart->write_txc(state);
 }
 
-WRITE_LINE_MEMBER(einstein_state::einstein_serial_receive_clock)
+void einstein_state::einstein_serial_receive_clock(int state)
 {
 	m_uart->write_rxc(state);
 }
@@ -293,17 +293,17 @@ void einstein_state::einstein_rom_w(address_space &space, offs_t offset, uint8_t
     INTERRUPTS
 ***************************************************************************/
 
-WRITE_LINE_MEMBER(einstein_state::write_centronics_busy)
+void einstein_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 }
 
-WRITE_LINE_MEMBER(einstein_state::write_centronics_perror)
+void einstein_state::write_centronics_perror(int state)
 {
 	m_centronics_perror = state;
 }
 
-WRITE_LINE_MEMBER(einstein_state::write_centronics_fault)
+void einstein_state::write_centronics_fault(int state)
 {
 	m_centronics_fault = state;
 }

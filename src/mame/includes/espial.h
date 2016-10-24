@@ -59,14 +59,14 @@ public:
 	void espial_attributeram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void espial_scrollram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void espial_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	TILE_GET_INFO_MEMBER(get_tile_info);
+	void get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(espial);
+	void palette_init_espial(palette_device &palette);
 	void video_start_netwars();
 	uint32_t screen_update_espial(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(espial_sound_nmi_gen);
-	TIMER_DEVICE_CALLBACK_MEMBER(espial_scanline);
+	void espial_sound_nmi_gen(device_t &device);
+	void espial_scanline(timer_device &timer, void *ptr, int32_t param);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 };

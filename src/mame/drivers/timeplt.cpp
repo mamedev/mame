@@ -64,7 +64,7 @@
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(timeplt_state::interrupt)
+void timeplt_state::interrupt(device_t &device)
 {
 	if (m_nmi_enable)
 		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);

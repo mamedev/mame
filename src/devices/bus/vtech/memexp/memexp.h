@@ -84,9 +84,9 @@ public:
 		{ return downcast<memexp_slot_device &>(device).m_reset_handler.set_callback(object); }
 
 	// called from cart device
-	DECLARE_WRITE_LINE_MEMBER( int_w ) { m_int_handler(state); }
-	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_nmi_handler(state); }
-	DECLARE_WRITE_LINE_MEMBER( reset_w ) { m_reset_handler(state); }
+	void int_w(int state) { m_int_handler(state); }
+	void nmi_w(int state) { m_nmi_handler(state); }
+	void reset_w(int state) { m_reset_handler(state); }
 
 	address_space *m_program;
 	address_space *m_io;

@@ -52,12 +52,12 @@ public:
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(photon2);
+	void palette_init_photon2(palette_device &palette);
 
 	uint32_t screen_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_spectrum(screen_device &screen, bool state);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(spec_interrupt_hack);
+	void spec_interrupt_hack(timer_device &timer, void *ptr, int32_t param);
 };
 
 
@@ -107,7 +107,7 @@ static const rgb_t spectrum_palette[16] = {
 };
 
 /* Initialise the palette */
-PALETTE_INIT_MEMBER(photon2_state, photon2)
+void photon2_state::palette_init_photon2(palette_device &palette)
 {
 	palette.set_pen_colors(0, spectrum_palette, ARRAY_LENGTH(spectrum_palette));
 }
@@ -319,7 +319,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(photon2_state::spec_interrupt_hack)
+void photon2_state::spec_interrupt_hack(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

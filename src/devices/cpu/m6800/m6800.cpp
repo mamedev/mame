@@ -1041,7 +1041,7 @@ void m6800_cpu_device::serial_receive()
 	}
 }
 
-TIMER_CALLBACK_MEMBER( m6800_cpu_device::sci_tick )
+void m6800_cpu_device::sci_tick(void *ptr, int32_t param)
 {
 	serial_transmit();
 	serial_receive();

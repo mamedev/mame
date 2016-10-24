@@ -809,7 +809,7 @@ void x1_state::cmt_command( uint8_t cmd )
 	logerror("CMT: Command 0xe9-0x%02x received.\n",cmd);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(x1_state::x1_cmt_wind_timer)
+void x1_state::x1_cmt_wind_timer(timer_device &timer, void *ptr, int32_t param)
 {
 	if(m_cassette->get_image() == nullptr) //avoid a crash if a disk game tries to access this
 		return;
@@ -1068,12 +1068,12 @@ void x1_state::x1_fdc_w(address_space &space, offs_t offset, uint8_t data, uint8
 	}
 }
 
-WRITE_LINE_MEMBER(x1_state::fdc_drq_w)
+void x1_state::fdc_drq_w(int state)
 {
 	m_dma->rdy_w(state ^ 1);
 }
 
-WRITE_LINE_MEMBER(x1_state::hdl_w)
+void x1_state::hdl_w(int state)
 {
 	floppy_image_device *floppy = nullptr;
 
@@ -2257,7 +2257,7 @@ static const z80_daisy_config x1turbo_daisy[] =
  *************************************/
 
 #ifdef UNUSED_FUNCTION
-IRQ_CALLBACK_MEMBER(x1_state::x1_irq_callback)
+int x1_state::x1_irq_callback(device_t &device, int irqline)
 {
 	if(m_ctc_irq_flag != 0)
 	{
@@ -2277,7 +2277,7 @@ IRQ_CALLBACK_MEMBER(x1_state::x1_irq_callback)
 }
 #endif
 
-TIMER_DEVICE_CALLBACK_MEMBER(x1_state::x1_keyboard_callback)
+void x1_state::x1_keyboard_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	uint32_t key1 = ioport("key1")->read();
@@ -2307,7 +2307,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(x1_state::x1_keyboard_callback)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(x1_state::x1_rtc_increment)
+void x1_state::x1_rtc_increment(void *ptr, int32_t param)
 {
 	static const uint8_t dpm[12] = { 0x31, 0x28, 0x31, 0x30, 0x31, 0x30, 0x31, 0x31, 0x30, 0x31, 0x30, 0x31 };
 
@@ -2430,7 +2430,7 @@ void x1_state::machine_start_x1()
 	m_gfxdecode->set_gfx(3, std::make_unique<gfx_element>(*m_palette, x1_pcg_8x8, m_pcg_ram.get(), 0, 1, 0));
 }
 
-PALETTE_INIT_MEMBER(x1_state,x1)
+void x1_state::palette_init_x1(palette_device &palette)
 {
 	int i;
 

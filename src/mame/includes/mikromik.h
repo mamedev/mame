@@ -91,17 +91,17 @@ public:
 	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void ls259_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( dma_hrq_w );
+	void dma_hrq_w(int state);
 	uint8_t mpsc_dack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void mpsc_dack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( dma_eop_w );
-	DECLARE_WRITE_LINE_MEMBER( dack3_w );
-	DECLARE_WRITE_LINE_MEMBER( itxc_w );
-	DECLARE_WRITE_LINE_MEMBER( irxc_w );
-	DECLARE_WRITE_LINE_MEMBER( auxc_w );
-	DECLARE_WRITE_LINE_MEMBER( drq2_w );
-	DECLARE_WRITE_LINE_MEMBER( drq1_w );
-	DECLARE_READ_LINE_MEMBER( dsra_r );
+	void dma_eop_w(int state);
+	void dack3_w(int state);
+	void itxc_w(int state);
+	void irxc_w(int state);
+	void auxc_w(int state);
+	void drq2_w(int state);
+	void drq1_w(int state);
+	int dsra_r();
 
 	void update_tc();
 
@@ -125,7 +125,7 @@ public:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
 	UPD7220_DISPLAY_PIXELS_MEMBER( hgdc_display_pixels );
-	DECLARE_PALETTE_INIT( mm1 );
+	void palette_init_mm1(palette_device &palette);
 };
 
 

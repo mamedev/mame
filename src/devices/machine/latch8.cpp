@@ -35,7 +35,7 @@ void latch8_device::update(uint8_t new_val, uint8_t mask)
 	}
 }
 
-TIMER_CALLBACK_MEMBER( latch8_device::timerproc )
+void latch8_device::timerproc(void *ptr, int32_t param)
 {
 	uint8_t new_val = param & 0xFF;
 	uint8_t mask = param >> 8;

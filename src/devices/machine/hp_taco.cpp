@@ -370,12 +370,12 @@ uint16_t hp_taco_device::reg_r(address_space &space, offs_t offset, uint16_t mem
 		return res;
 }
 
-READ_LINE_MEMBER(hp_taco_device::flg_r)
+int hp_taco_device::flg_r()
 {
 		return m_flg;
 }
 
-READ_LINE_MEMBER(hp_taco_device::sts_r)
+int hp_taco_device::sts_r()
 {
 		return m_sts;
 }

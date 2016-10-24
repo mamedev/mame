@@ -36,9 +36,9 @@ public:
 	static void static_set_screen_update_cb(device_t &device, pcd8544_screen_update_delegate _cb) { downcast<pcd8544_device &>(device).m_screen_update_cb = _cb; }
 
 	// device interface
-	DECLARE_WRITE_LINE_MEMBER(sdin_w);
-	DECLARE_WRITE_LINE_MEMBER(sclk_w);
-	DECLARE_WRITE_LINE_MEMBER(dc_w);
+	void sdin_w(int state);
+	void sclk_w(int state);
+	void dc_w(int state);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:

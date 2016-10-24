@@ -83,7 +83,7 @@ public:
 	uint8_t m_memsel[4];
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(a5105);
+	void palette_init_a5105(palette_device &palette);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	required_device<ram_device> m_ram;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -511,7 +511,7 @@ static GFXDECODE_START( a5105 )
 GFXDECODE_END
 
 
-PALETTE_INIT_MEMBER(a5105_state, a5105)
+void a5105_state::palette_init_a5105(palette_device &palette)
 {
 	int i;
 	int r,g,b;

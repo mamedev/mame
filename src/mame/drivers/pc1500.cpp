@@ -50,7 +50,7 @@ public:
 	void port_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	uint8_t pc1500_kb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_PALETTE_INIT(pc1500);
+	void palette_init_pc1500(palette_device &palette);
 };
 
 static ADDRESS_MAP_START( pc1500_mem , AS_PROGRAM, 8, pc1500_state)
@@ -254,7 +254,7 @@ uint8_t pc1500_state::port_a_r(address_space &space, offs_t offset, uint8_t mem_
 	return 0xff;
 }
 
-PALETTE_INIT_MEMBER(pc1500_state, pc1500)
+void pc1500_state::palette_init_pc1500(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));

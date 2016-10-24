@@ -17,7 +17,7 @@
 #define TI85_SNAPSHOT_SIZE   32976
 #define TI86_SNAPSHOT_SIZE  131284
 
-TIMER_CALLBACK_MEMBER(ti85_state::ti85_timer_callback)
+void ti85_state::ti85_timer_callback(void *ptr, int32_t param)
 {
 	if (ioport("ON")->read() & 0x01)
 	{
@@ -39,7 +39,7 @@ TIMER_CALLBACK_MEMBER(ti85_state::ti85_timer_callback)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(ti85_state::ti83_timer1_callback)
+void ti85_state::ti83_timer1_callback(void *ptr, int32_t param)
 {
 	if (ioport("ON")->read() & 0x01)
 	{
@@ -62,7 +62,7 @@ TIMER_CALLBACK_MEMBER(ti85_state::ti83_timer1_callback)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(ti85_state::ti83_timer2_callback)
+void ti85_state::ti83_timer2_callback(void *ptr, int32_t param)
 {
 	if (m_timer_interrupt_mask & 4)
 	{

@@ -579,7 +579,7 @@ void atom_state::ppi_pc_w(address_space &space, offs_t offset, uint8_t data, uin
     i8271 interface
 -------------------------------------------------*/
 
-WRITE_LINE_MEMBER( atom_state::atom_8271_interrupt_callback )
+void atom_state::atom_8271_interrupt_callback(int state)
 {
 	/* I'm assuming that the nmi is edge triggered */
 	/* a interrupt from the fdc will cause a change in line state, and
@@ -600,7 +600,7 @@ WRITE_LINE_MEMBER( atom_state::atom_8271_interrupt_callback )
 	m_previous_i8271_int_state = state;
 }
 
-WRITE_LINE_MEMBER( atom_state::motor_w )
+void atom_state::motor_w(int state)
 {
 	for (int i=0; i != 2; i++) {
 		char devname[1];
@@ -612,7 +612,7 @@ WRITE_LINE_MEMBER( atom_state::motor_w )
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(atom_state::cassette_output_tick)
+void atom_state::cassette_output_tick(timer_device &timer, void *ptr, int32_t param)
 {
 	int level = !(!(!m_hz2400 && m_pc1) && m_pc0);
 

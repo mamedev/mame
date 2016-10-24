@@ -256,7 +256,7 @@ void dragon_alpha_state::pia2_pa_w(address_space &space, offs_t offset, uint8_t 
 //  pia1_firq_a
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( dragon_alpha_state::pia2_firq_a )
+void dragon_alpha_state::pia2_firq_a(int state)
 {
 	recalculate_firq();
 }
@@ -267,7 +267,7 @@ WRITE_LINE_MEMBER( dragon_alpha_state::pia2_firq_a )
 //  pia1_firq_b
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( dragon_alpha_state::pia2_firq_b )
+void dragon_alpha_state::pia2_firq_b(int state)
 {
 	recalculate_firq();
 }
@@ -343,7 +343,7 @@ void dragon_alpha_state::psg_porta_write(address_space &space, offs_t offset, ui
 //  through IC16 (early PLD), and is gated by pia2 CA2
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( dragon_alpha_state::fdc_intrq_w )
+void dragon_alpha_state::fdc_intrq_w(int state)
 {
 	if (state)
 	{
@@ -371,7 +371,7 @@ WRITE_LINE_MEMBER( dragon_alpha_state::fdc_intrq_w )
 //  does for pia1 CB1
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( dragon_alpha_state::fdc_drq_w )
+void dragon_alpha_state::fdc_drq_w(int state)
 {
 	m_pia_2->cb1_w(state ? ASSERT_LINE : CLEAR_LINE);
 }

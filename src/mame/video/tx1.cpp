@@ -35,7 +35,7 @@
 /*
     TODO: Check interrupt timing from CRT config. Probably different between games.
 */
-TIMER_CALLBACK_MEMBER(tx1_state::interrupt_callback)
+void tx1_state::interrupt_callback(void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);
 	m_interrupt_timer->adjust(m_screen->time_until_pos(CURSOR_YPOS, CURSOR_XPOS));
@@ -113,7 +113,7 @@ enum
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(tx1_state,tx1)
+void tx1_state::palette_init_tx1(palette_device &palette)
 {
 	const uint8_t *const color_prom = &m_proms[0];
 	int i;
@@ -1252,7 +1252,7 @@ uint32_t tx1_state::screen_update_tx1_right(screen_device &screen, bitmap_ind16 
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(tx1_state,buggyboy)
+void tx1_state::palette_init_buggyboy(palette_device &palette)
 {
 	const uint8_t *const color_prom = &m_proms[0];
 	int i;

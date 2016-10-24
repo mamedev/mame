@@ -32,7 +32,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(m57_state, m57)
+void m57_state::palette_init_m57(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -110,7 +110,7 @@ PALETTE_INIT_MEMBER(m57_state, m57)
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(m57_state::get_tile_info)
+void m57_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t attr = m_videoram[tile_index * 2 + 0];
 	uint16_t code = m_videoram[tile_index * 2 + 1] | ((attr & 0xc0) << 2);

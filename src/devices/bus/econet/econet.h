@@ -64,8 +64,8 @@ public:
 	void add_device(device_t *target, int address);
 
 	// writes for host (driver_device)
-	DECLARE_WRITE_LINE_MEMBER( clk_w );
-	DECLARE_WRITE_LINE_MEMBER( data_w );
+	void clk_w(int state);
+	void data_w(int state);
 
 	// writes for peripherals (device_t)
 	void clk_w(device_t *device, int state);

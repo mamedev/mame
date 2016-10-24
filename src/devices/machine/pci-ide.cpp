@@ -121,7 +121,7 @@ void ide_pci_device::ide2_write_cs1(address_space &space, offs_t offset, uint32_
 	m_ide2->write_cs1(space, ++offset, data, mem_mask);
 }
 
-WRITE_LINE_MEMBER(ide_pci_device::ide_interrupt)
+void ide_pci_device::ide_interrupt(int state)
 {
 	// Assert/Clear the interrupt if the irq num is set.
 	if (m_irq_num != -1) {

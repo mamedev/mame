@@ -66,13 +66,13 @@ public:
 	uint8_t portfd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t portfe_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t sense_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(flag_w);
+	void flag_w(int state);
 	void port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void portf8_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void portf9_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void portfa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(instruct);
-	INTERRUPT_GEN_MEMBER(t2l_int);
+	void t2l_int(device_t &device);
 private:
 	virtual void machine_reset() override;
 	uint16_t m_lar;
@@ -88,7 +88,7 @@ private:
 };
 
 // flag led
-WRITE_LINE_MEMBER( instruct_state::flag_w )
+void instruct_state::flag_w(int state)
 {
 	output().set_value("led8", !state);
 }
@@ -174,7 +174,7 @@ uint8_t instruct_state::sense_r(address_space &space, offs_t offset, uint8_t mem
 		return BIT(ioport("HW")->read(), 0);
 }
 
-INTERRUPT_GEN_MEMBER( instruct_state::t2l_int )
+void instruct_state::t2l_int(device_t &device)
 {
 	uint8_t hwkeys = ioport("HW")->read();
 

@@ -72,8 +72,8 @@ public:
 	uint32_t sound_data_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	void sound_data_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_WRITE_LINE_MEMBER(gcu_interrupt);
-	INTERRUPT_GEN_MEMBER(vbl_interrupt);
+	void gcu_interrupt(int state);
+	void vbl_interrupt(device_t &device);
 
 	uint8_t rtc_dev_r(uint32_t reg);
 
@@ -284,14 +284,14 @@ static INPUT_PORTS_START( konendev )
 INPUT_PORTS_END
 
 
-WRITE_LINE_MEMBER(konendev_state::gcu_interrupt)
+void konendev_state::gcu_interrupt(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_IRQ1, state);
 	m_maincpu->set_input_line(INPUT_LINE_IRQ3, state);
 }
 
 
-INTERRUPT_GEN_MEMBER(konendev_state::vbl_interrupt)
+void konendev_state::vbl_interrupt(device_t &device)
 {
 	device.execute().set_input_line(INPUT_LINE_IRQ1, ASSERT_LINE);
 	device.execute().set_input_line(INPUT_LINE_IRQ3, ASSERT_LINE);

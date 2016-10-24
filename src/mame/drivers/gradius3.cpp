@@ -100,14 +100,14 @@ void gradius3_state::cpuB_irqenable_w(address_space &space, offs_t offset, uint1
 		m_irqBmask = (data >> 8) & 0x07;
 }
 
-INTERRUPT_GEN_MEMBER(gradius3_state::cpuA_interrupt)
+void gradius3_state::cpuA_interrupt(device_t &device)
 {
 	if (m_irqAen)
 		device.execute().set_input_line(2, HOLD_LINE);
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(gradius3_state::gradius3_sub_scanline)
+void gradius3_state::gradius3_sub_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

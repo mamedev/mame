@@ -144,7 +144,7 @@ void coolpool_state::machine_reset_coolpool()
  *
  *************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(coolpool_state::nvram_write_timeout)
+void coolpool_state::nvram_write_timeout(timer_device &timer, void *ptr, int32_t param)
 {
 	m_nvram_write_enable = 0;
 }
@@ -193,7 +193,7 @@ void coolpool_state::nvram_thrash_data_w(address_space &space, offs_t offset, ui
  *
  *************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(coolpool_state::amerdart_audio_int_gen)
+void coolpool_state::amerdart_audio_int_gen(timer_device &timer, void *ptr, int32_t param)
 {
 	m_dsp->set_input_line(0, ASSERT_LINE);
 	m_dsp->set_input_line(0, CLEAR_LINE);
@@ -212,7 +212,7 @@ void coolpool_state::amerdart_misc_w(address_space &space, offs_t offset, uint16
 	m_dsp->set_input_line(INPUT_LINE_RESET, (data & 0x0400) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-READ_LINE_MEMBER(coolpool_state::amerdart_dsp_bio_line_r)
+int coolpool_state::amerdart_dsp_bio_line_r()
 {
 	/* Skip idle checking */
 	if (m_old_cmd == m_cmd_pending)
@@ -433,7 +433,7 @@ void coolpool_state::coolpool_misc_w(address_space &space, offs_t offset, uint16
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(coolpool_state::deferred_iop_w)
+void coolpool_state::deferred_iop_w(void *ptr, int32_t param)
 {
 	m_iop_cmd = param;
 	m_cmd_pending = 1;

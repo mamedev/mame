@@ -108,22 +108,22 @@ public:
 	void init_csprint();
 	void init_paperboy();
 	void init_720();
-	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
-	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
+	void get_alpha_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_playfield_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void machine_start_atarisy2();
 	void machine_reset_atarisy2();
 	void video_start_atarisy2();
 	uint32_t screen_update_atarisy2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vblank_int);
-	TIMER_CALLBACK_MEMBER(delayed_int_enable_w);
-	TIMER_CALLBACK_MEMBER(reset_yscroll_callback);
+	void vblank_int(device_t &device);
+	void delayed_int_enable_w(void *ptr, int32_t param);
+	void reset_yscroll_callback(void *ptr, int32_t param);
 	uint16_t slapstic_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	uint16_t videoram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void slapstic_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void yscroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void xscroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	DECLARE_PALETTE_DECODER(RRRRGGGGBBBBIIII);
+	static rgb_t RRRRGGGGBBBBIIII_decoder(uint32_t raw);
 
 	static const atari_motion_objects_config s_mob_config;
 };

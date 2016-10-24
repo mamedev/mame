@@ -51,14 +51,14 @@ public:
 
 	void orbit_misc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void orbit_playfield_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	TILE_GET_INFO_MEMBER(get_tile_info);
+	void get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_orbit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(orbit_interrupt);
-	TIMER_CALLBACK_MEMBER(irq_off);
-	TIMER_DEVICE_CALLBACK_MEMBER(nmi_32v);
+	void orbit_interrupt(device_t &device);
+	void irq_off(void *ptr, int32_t param);
+	void nmi_32v(timer_device &timer, void *ptr, int32_t param);
 	void orbit_note_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void orbit_note_amp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void orbit_noise_amp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);

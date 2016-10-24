@@ -1064,7 +1064,7 @@ void pokey_device::write_internal(offs_t offset, uint8_t data)
 
 }
 
-WRITE_LINE_MEMBER( pokey_device::sid_w )
+void pokey_device::sid_w(int state)
 {
 	if (state)
 	{

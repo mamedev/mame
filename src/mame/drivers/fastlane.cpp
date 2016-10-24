@@ -17,7 +17,7 @@
 #include "includes/konamipt.h"
 #include "includes/fastlane.h"
 
-TIMER_DEVICE_CALLBACK_MEMBER(fastlane_state::fastlane_scanline)
+void fastlane_state::fastlane_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

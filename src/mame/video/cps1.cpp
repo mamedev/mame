@@ -2119,25 +2119,25 @@ int cps_state::gfxrom_bank_mapper( int type, int code )
 
 ***************************************************************************/
 
-TILEMAP_MAPPER_MEMBER(cps_state::tilemap0_scan)
+tilemap_memory_index cps_state::tilemap0_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return (row & 0x1f) + ((col & 0x3f) << 5) + ((row & 0x20) << 6);
 }
 
-TILEMAP_MAPPER_MEMBER(cps_state::tilemap1_scan)
+tilemap_memory_index cps_state::tilemap1_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return (row & 0x0f) + ((col & 0x3f) << 4) + ((row & 0x30) << 6);
 }
 
-TILEMAP_MAPPER_MEMBER(cps_state::tilemap2_scan)
+tilemap_memory_index cps_state::tilemap2_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return (row & 0x07) + ((col & 0x3f) << 3) + ((row & 0x38) << 6);
 }
 
-TILE_GET_INFO_MEMBER(cps_state::get_tile0_info)
+void cps_state::get_tile0_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_scroll1[2 * tile_index];
 	int attr = m_scroll1[2 * tile_index + 1];
@@ -2162,7 +2162,7 @@ TILE_GET_INFO_MEMBER(cps_state::get_tile0_info)
 		tileinfo.pen_data = m_empty_tile;
 }
 
-TILE_GET_INFO_MEMBER(cps_state::get_tile1_info)
+void cps_state::get_tile1_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_scroll2[2 * tile_index];
 	int attr = m_scroll2[2 * tile_index + 1];
@@ -2180,7 +2180,7 @@ TILE_GET_INFO_MEMBER(cps_state::get_tile1_info)
 		tileinfo.pen_data = m_empty_tile;
 }
 
-TILE_GET_INFO_MEMBER(cps_state::get_tile2_info)
+void cps_state::get_tile2_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_scroll3[2 * tile_index] & 0x3fff;
 	int attr = m_scroll3[2 * tile_index + 1];

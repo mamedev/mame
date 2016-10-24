@@ -56,7 +56,7 @@ void ultratnk_state::device_timer(emu_timer &timer, device_timer_id id, int para
 }
 
 
-TIMER_CALLBACK_MEMBER(ultratnk_state::nmi_callback)
+void ultratnk_state::nmi_callback(void *ptr, int32_t param)
 {
 	int scanline = param + 64;
 

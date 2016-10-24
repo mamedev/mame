@@ -539,7 +539,7 @@ void abc1600_state::update_drdy0()
 	}
 }
 
-WRITE_LINE_MEMBER( abc1600_state::dbrq_w )
+void abc1600_state::dbrq_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state && m_dmadis);
 }
@@ -752,7 +752,7 @@ static SLOT_INTERFACE_START( abc1600_floppies )
 	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
 SLOT_INTERFACE_END
 
-WRITE_LINE_MEMBER( abc1600_state::fdc_drq_w )
+void abc1600_state::fdc_drq_w(int state)
 {
 	update_drdy0();
 }
@@ -762,7 +762,7 @@ WRITE_LINE_MEMBER( abc1600_state::fdc_drq_w )
 //  ABC1600BUS_INTERFACE( abcbus_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( abc1600_state::nmi_w )
+void abc1600_state::nmi_w(int state)
 {
 	if (state == ASSERT_LINE)
 	{
@@ -777,10 +777,10 @@ WRITE_LINE_MEMBER( abc1600_state::nmi_w )
 //**************************************************************************
 
 //-------------------------------------------------
-//  IRQ_CALLBACK_MEMBER( abc1600_int_ack )
+//  int abc1600_int_ack(device_t &device, int irqline)
 //-------------------------------------------------
 
-IRQ_CALLBACK_MEMBER( abc1600_state::abc1600_int_ack )
+int abc1600_state::abc1600_int_ack(device_t &device, int irqline)
 {
 	int data = 0;
 

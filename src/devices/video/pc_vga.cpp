@@ -217,14 +217,14 @@ void svga_device::zero()
 }
 
 /* VBLANK callback, start address definitely updates AT vblank, not before. */
-TIMER_CALLBACK_MEMBER(vga_device::vblank_timer_cb)
+void vga_device::vblank_timer_cb(void *ptr, int32_t param)
 {
 	vga.crtc.start_addr = vga.crtc.start_addr_latch;
 	vga.attribute.pel_shift = vga.attribute.pel_shift_latch;
 	m_vblank_timer->adjust( machine().first_screen()->time_until_pos(vga.crtc.vert_blank_start + vga.crtc.vert_blank_end) );
 }
 
-TIMER_CALLBACK_MEMBER(s3_vga_device::vblank_timer_cb)
+void s3_vga_device::vblank_timer_cb(void *ptr, int32_t param)
 {
 	// not sure if this is correct, but XF86_S3 seems to expect the viewport scrolling to be faster
 	if(s3.memory_config & 0x08)

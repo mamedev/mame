@@ -31,7 +31,7 @@
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(subs_state, subs)
+void subs_state::palette_init_subs(palette_device &palette)
 {
 	palette.set_pen_color(0,rgb_t(0x00,0x00,0x00)); /* BLACK - modified on video invert */
 	palette.set_pen_color(1,rgb_t(0xff,0xff,0xff)); /* WHITE - modified on video invert */

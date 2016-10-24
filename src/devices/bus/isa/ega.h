@@ -37,10 +37,10 @@ public:
 		void pc_ega8_3c0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 		uint8_t pc_ega8_3d0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 		void pc_ega8_3d0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-		DECLARE_WRITE_LINE_MEMBER(de_changed);
-		DECLARE_WRITE_LINE_MEMBER(hsync_changed);
-		DECLARE_WRITE_LINE_MEMBER(vsync_changed);
-		DECLARE_WRITE_LINE_MEMBER(vblank_changed);
+		void de_changed(int state);
+		void hsync_changed(int state);
+		void vsync_changed(int state);
+		void vblank_changed(int state);
 
 		CRTC_EGA_ROW_UPDATE(ega_update_row);
 		CRTC_EGA_ROW_UPDATE(pc_ega_graphics);

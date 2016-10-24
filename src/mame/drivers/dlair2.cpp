@@ -48,8 +48,8 @@ public:
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	INTERRUPT_GEN_MEMBER(dlair2_timer_irq);
-	DECLARE_PALETTE_INIT(dlair2);
+	void dlair2_timer_irq(device_t &device);
+	void palette_init_dlair2(palette_device &palette);
 
 protected:
 	// driver_device overrides
@@ -162,11 +162,11 @@ void dlair2_state::machine_reset()
 {
 }
 
-PALETTE_INIT_MEMBER(dlair2_state, dlair2)
+void dlair2_state::palette_init_dlair2(palette_device &palette)
 {
 }
 
-INTERRUPT_GEN_MEMBER(dlair2_state::dlair2_timer_irq)
+void dlair2_state::dlair2_timer_irq(device_t &device)
 {
 	device.execute().set_input_line_and_vector(0,HOLD_LINE,0x20/4);
 }

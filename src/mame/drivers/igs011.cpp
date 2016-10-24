@@ -204,7 +204,7 @@ public:
 	void lhb_okibank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	uint16_t ics2115_word_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void ics2115_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	DECLARE_WRITE_LINE_MEMBER(sound_irq);
+	void sound_irq(int state);
 	void init_lhbv33c();
 	void init_drgnwrldv21j();
 	void init_wlcc();
@@ -223,14 +223,14 @@ public:
 	void init_vbowl();
 	void init_vbowlj();
 	void init_ryukobou();
-	TIMER_DEVICE_CALLBACK_MEMBER(lev5_timer_irq_cb);
-	TIMER_DEVICE_CALLBACK_MEMBER(lhb_timer_irq_cb);
-	TIMER_DEVICE_CALLBACK_MEMBER(lev3_timer_irq_cb);
+	void lev5_timer_irq_cb(timer_device &timer, void *ptr, int32_t param);
+	void lhb_timer_irq_cb(timer_device &timer, void *ptr, int32_t param);
+	void lev3_timer_irq_cb(timer_device &timer, void *ptr, int32_t param);
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	uint32_t screen_update_igs011(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_vbowl(screen_device &screen, bool state);
-	INTERRUPT_GEN_MEMBER(lhb_vblank_irq);
+	void lhb_vblank_irq(device_t &device);
 	void wlcc_decrypt();
 	void lhb_decrypt();
 	void drgnwrld_type3_decrypt();
@@ -4012,7 +4012,7 @@ static MACHINE_CONFIG_START( igs011_base, igs011_state )
 MACHINE_CONFIG_END
 
 
-TIMER_DEVICE_CALLBACK_MEMBER( igs011_state::lev5_timer_irq_cb )
+void igs011_state::lev5_timer_irq_cb(timer_device &timer, void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(5, HOLD_LINE);
 }
@@ -4034,7 +4034,7 @@ MACHINE_CONFIG_END
 
 
 
-INTERRUPT_GEN_MEMBER(igs011_state::lhb_vblank_irq)
+void igs011_state::lhb_vblank_irq(device_t &device)
 {
 	if (!m_lhb_irq_enable)
 		return;
@@ -4042,7 +4042,7 @@ INTERRUPT_GEN_MEMBER(igs011_state::lhb_vblank_irq)
 	m_maincpu->set_input_line(6, HOLD_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( igs011_state::lhb_timer_irq_cb )
+void igs011_state::lhb_timer_irq_cb(timer_device &timer, void *ptr, int32_t param)
 {
 	if (!m_lhb_irq_enable)
 		return;
@@ -4060,7 +4060,7 @@ MACHINE_CONFIG_END
 
 
 
-TIMER_DEVICE_CALLBACK_MEMBER( igs011_state::lev3_timer_irq_cb )
+void igs011_state::lev3_timer_irq_cb(timer_device &timer, void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(3, HOLD_LINE);
 }
@@ -4114,7 +4114,7 @@ MACHINE_CONFIG_END
 
 
 
-WRITE_LINE_MEMBER(igs011_state::sound_irq)
+void igs011_state::sound_irq(int state)
 {
 //   m_maincpu->set_input_line(3, state);
 }

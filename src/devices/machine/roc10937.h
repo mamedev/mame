@@ -68,9 +68,9 @@ public:
 	void shift_clock(int data);
 	void write_char(int data);
 	uint32_t set_display(uint32_t segin);
-	DECLARE_WRITE_LINE_MEMBER( sclk );
-	DECLARE_WRITE_LINE_MEMBER( data );
-	DECLARE_WRITE_LINE_MEMBER( por );
+	void sclk(int state);
+	void data(int state);
+	void por(int state);
 
 
 protected:

@@ -371,7 +371,7 @@ uint8_t mcr_state::kick_ip1_r(address_space &space, offs_t offset, uint8_t mem_m
  *
  *************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(mcr_state::dpoker_hopper_callback)
+void mcr_state::dpoker_hopper_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	if (dpoker_output & 0x40)
 	{
@@ -387,7 +387,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mcr_state::dpoker_hopper_callback)
 	machine().bookkeeping().coin_counter_w(3, dpoker_coin_status & 8);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(mcr_state::dpoker_coin_in_callback)
+void mcr_state::dpoker_coin_in_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	dpoker_coin_status &= ~2;
 }

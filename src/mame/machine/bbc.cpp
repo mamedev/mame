@@ -702,7 +702,7 @@ B7 - Operates the SHIFT lock LED (Pin 16 keyboard connector)
 ******************************************************************************/
 
 
-INTERRUPT_GEN_MEMBER(bbc_state::bbcb_keyscan)
+void bbc_state::bbcb_keyscan(device_t &device)
 {
 	/* only do auto scan if keyboard is not enabled */
 	if (m_b3_keyboard == 1)
@@ -1137,7 +1137,7 @@ void bbc_state::MC6850_Receive_Clock(int new_clock)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(bbc_state::bbc_tape_timer_cb)
+void bbc_state::bbc_tape_timer_cb(void *ptr, int32_t param)
 {
 	if ( m_cass_out_enabled )
 	{
@@ -1247,7 +1247,7 @@ TIMER_CALLBACK_MEMBER(bbc_state::bbc_tape_timer_cb)
 	}
 }
 
-WRITE_LINE_MEMBER( bbc_state::write_rxd_serial )
+void bbc_state::write_rxd_serial(int state)
 {
 	m_rxd_serial = state;
 	update_acia_rxd();
@@ -1259,7 +1259,7 @@ void bbc_state::update_acia_rxd()
 }
 
 
-WRITE_LINE_MEMBER( bbc_state::write_dcd_serial )
+void bbc_state::write_dcd_serial(int state)
 {
 	m_dcd_serial = state;
 	update_acia_dcd();
@@ -1271,7 +1271,7 @@ void bbc_state::update_acia_dcd()
 }
 
 
-WRITE_LINE_MEMBER( bbc_state::write_cts_serial )
+void bbc_state::write_cts_serial(int state)
 {
 	m_cts_serial = state;
 	update_acia_cts();
@@ -1283,7 +1283,7 @@ void bbc_state::update_acia_cts()
 }
 
 
-WRITE_LINE_MEMBER( bbc_state::bbc_rts_w )
+void bbc_state::bbc_rts_w(int state)
 {
 	if ( m_serproc_data & 0x40 )
 	{
@@ -1297,7 +1297,7 @@ WRITE_LINE_MEMBER( bbc_state::bbc_rts_w )
 }
 
 
-WRITE_LINE_MEMBER( bbc_state::bbc_txd_w )
+void bbc_state::bbc_txd_w(int state)
 {
 	if ( m_serproc_data & 0x40 )
 	{
@@ -1374,7 +1374,7 @@ void bbc_state::bbc_SerialULA_w(address_space &space, offs_t offset, uint8_t dat
 	m_acia_clock->set_clock_scale( (double) 1 / serial_clocks[ data & 0x07 ] );
 }
 
-WRITE_LINE_MEMBER(bbc_state::write_acia_clock)
+void bbc_state::write_acia_clock(int state)
 {
 	m_acia->write_txc(state);
 
@@ -1388,7 +1388,7 @@ WRITE_LINE_MEMBER(bbc_state::write_acia_clock)
 ***************************************/
 
 
-WRITE_LINE_MEMBER(bbc_state::bus_nmi_w)
+void bbc_state::bus_nmi_w(int state)
 {
 	m_bus_nmi = state;
 	bbc_update_nmi();
@@ -1400,7 +1400,7 @@ WRITE_LINE_MEMBER(bbc_state::bus_nmi_w)
 ***************************************/
 
 
-WRITE_LINE_MEMBER(bbc_state::motor_w)
+void bbc_state::motor_w(int state)
 {
 	for (int i=0; i != 2; i++) {
 		char devname[8];
@@ -1412,7 +1412,7 @@ WRITE_LINE_MEMBER(bbc_state::motor_w)
 	}
 }
 
-WRITE_LINE_MEMBER(bbc_state::side_w)
+void bbc_state::side_w(int state)
 {
 	for (int i=0; i != 2; i++) {
 		char devname[8];
@@ -1455,13 +1455,13 @@ void bbc_state::bbc_update_nmi()
 	}
 }
 
-WRITE_LINE_MEMBER(bbc_state::fdc_intrq_w)
+void bbc_state::fdc_intrq_w(int state)
 {
 	m_fdc_irq = state;
 	bbc_update_nmi();
 }
 
-WRITE_LINE_MEMBER(bbc_state::fdc_drq_w)
+void bbc_state::fdc_drq_w(int state)
 {
 	m_fdc_drq = state;
 	bbc_update_nmi();

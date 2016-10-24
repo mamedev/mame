@@ -173,11 +173,11 @@ public:
 	void video_start_ataxx();
 	uint32_t screen_update_leland(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_ataxx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(leland_master_interrupt);
-	TIMER_CALLBACK_MEMBER(leland_interrupt_callback);
-	TIMER_CALLBACK_MEMBER(ataxx_interrupt_callback);
-	TIMER_CALLBACK_MEMBER(scanline_callback);
-	TIMER_CALLBACK_MEMBER(leland_delayed_mvram_w);
+	void leland_master_interrupt(device_t &device);
+	void leland_interrupt_callback(void *ptr, int32_t param);
+	void ataxx_interrupt_callback(void *ptr, int32_t param);
+	void scanline_callback(void *ptr, int32_t param);
+	void leland_delayed_mvram_w(void *ptr, int32_t param);
 	uint8_t ataxx_eeprom_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void ataxx_eeprom_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t leland_sound_port_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
@@ -231,12 +231,12 @@ public:
 	uint8_t leland_80186_response_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void dac_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void ataxx_dac_control(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	DECLARE_WRITE_LINE_MEMBER(pit0_2_w);
-	DECLARE_WRITE_LINE_MEMBER(pit1_0_w);
-	DECLARE_WRITE_LINE_MEMBER(pit1_1_w);
-	DECLARE_WRITE_LINE_MEMBER(pit1_2_w);
-	DECLARE_WRITE_LINE_MEMBER(i80186_tmr0_w);
-	DECLARE_WRITE_LINE_MEMBER(i80186_tmr1_w);
+	void pit0_2_w(int state);
+	void pit1_0_w(int state);
+	void pit1_1_w(int state);
+	void pit1_2_w(int state);
+	void i80186_tmr0_w(int state);
+	void i80186_tmr1_w(int state);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

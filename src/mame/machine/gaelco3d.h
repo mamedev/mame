@@ -106,8 +106,8 @@ private:
 	shmem_t *m_shmem;
 	std::mutex m_mutex;
 
-	TIMER_CALLBACK_MEMBER( set_status_cb );
-	TIMER_CALLBACK_MEMBER( link_cb );
+	void set_status_cb(void *ptr, int32_t param);
+	void link_cb(void *ptr, int32_t param);
 	void set_status(uint8_t mask, uint8_t set, int wait);
 	void process_in();
 	void sync_link();

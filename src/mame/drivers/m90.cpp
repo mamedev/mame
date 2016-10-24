@@ -682,7 +682,7 @@ GFXDECODE_END
 
 /*****************************************************************************/
 
-INTERRUPT_GEN_MEMBER(m90_state::fake_nmi)
+void m90_state::fake_nmi(device_t &device)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int sample = m_audio->sample_r(space,0);
@@ -690,7 +690,7 @@ INTERRUPT_GEN_MEMBER(m90_state::fake_nmi)
 		m_audio->sample_w(space,0,sample);
 }
 
-INTERRUPT_GEN_MEMBER(m90_state::bomblord_fake_nmi)
+void m90_state::bomblord_fake_nmi(device_t &device)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int sample = m_audio->sample_r(space,0);
@@ -698,17 +698,17 @@ INTERRUPT_GEN_MEMBER(m90_state::bomblord_fake_nmi)
 		m_audio->sample_w(space,0,sample);
 }
 
-INTERRUPT_GEN_MEMBER(m90_state::m90_interrupt)
+void m90_state::m90_interrupt(device_t &device)
 {
 	generic_pulse_irq_line(device.execute(), NEC_INPUT_LINE_INTP0, 1);
 }
 
-INTERRUPT_GEN_MEMBER(m90_state::dynablsb_interrupt)
+void m90_state::dynablsb_interrupt(device_t &device)
 {
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x60/4);
 }
 
-INTERRUPT_GEN_MEMBER(m90_state::bomblord_interrupt)
+void m90_state::bomblord_interrupt(device_t &device)
 {
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x50/4);
 }

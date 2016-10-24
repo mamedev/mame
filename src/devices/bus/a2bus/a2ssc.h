@@ -34,7 +34,7 @@ public:
 
 	required_ioport m_dsw1, m_dsw2;
 
-	DECLARE_WRITE_LINE_MEMBER( acia_irq_w );
+	void acia_irq_w(int state);
 
 protected:
 	virtual void device_start() override;

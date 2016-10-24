@@ -330,45 +330,45 @@ void driver_device::generic_pulse_irq_line_and_vector(device_execute_interface &
 //  NMI callbacks
 //-------------------------------------------------
 
-INTERRUPT_GEN_MEMBER( driver_device::nmi_line_pulse )   { device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE); }
-INTERRUPT_GEN_MEMBER( driver_device::nmi_line_assert )  { device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE); }
+void driver_device::nmi_line_pulse(device_t &device)   { device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE); }
+void driver_device::nmi_line_assert(device_t &device)  { device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE); }
 
 
 //-------------------------------------------------
 //  IRQn callbacks
 //-------------------------------------------------
 
-INTERRUPT_GEN_MEMBER( driver_device::irq0_line_hold )   { device.execute().set_input_line(0, HOLD_LINE); }
-INTERRUPT_GEN_MEMBER( driver_device::irq0_line_pulse )  { generic_pulse_irq_line(device.execute(), 0, 1); }
-INTERRUPT_GEN_MEMBER( driver_device::irq0_line_assert ) { device.execute().set_input_line(0, ASSERT_LINE); }
+void driver_device::irq0_line_hold(device_t &device)   { device.execute().set_input_line(0, HOLD_LINE); }
+void driver_device::irq0_line_pulse(device_t &device)  { generic_pulse_irq_line(device.execute(), 0, 1); }
+void driver_device::irq0_line_assert(device_t &device) { device.execute().set_input_line(0, ASSERT_LINE); }
 
-INTERRUPT_GEN_MEMBER( driver_device::irq1_line_hold )   { device.execute().set_input_line(1, HOLD_LINE); }
-INTERRUPT_GEN_MEMBER( driver_device::irq1_line_pulse )  { generic_pulse_irq_line(device.execute(), 1, 1); }
-INTERRUPT_GEN_MEMBER( driver_device::irq1_line_assert ) { device.execute().set_input_line(1, ASSERT_LINE); }
+void driver_device::irq1_line_hold(device_t &device)   { device.execute().set_input_line(1, HOLD_LINE); }
+void driver_device::irq1_line_pulse(device_t &device)  { generic_pulse_irq_line(device.execute(), 1, 1); }
+void driver_device::irq1_line_assert(device_t &device) { device.execute().set_input_line(1, ASSERT_LINE); }
 
-INTERRUPT_GEN_MEMBER( driver_device::irq2_line_hold )   { device.execute().set_input_line(2, HOLD_LINE); }
-INTERRUPT_GEN_MEMBER( driver_device::irq2_line_pulse )  { generic_pulse_irq_line(device.execute(), 2, 1); }
-INTERRUPT_GEN_MEMBER( driver_device::irq2_line_assert ) { device.execute().set_input_line(2, ASSERT_LINE); }
+void driver_device::irq2_line_hold(device_t &device)   { device.execute().set_input_line(2, HOLD_LINE); }
+void driver_device::irq2_line_pulse(device_t &device)  { generic_pulse_irq_line(device.execute(), 2, 1); }
+void driver_device::irq2_line_assert(device_t &device) { device.execute().set_input_line(2, ASSERT_LINE); }
 
-INTERRUPT_GEN_MEMBER( driver_device::irq3_line_hold )   { device.execute().set_input_line(3, HOLD_LINE); }
-INTERRUPT_GEN_MEMBER( driver_device::irq3_line_pulse )  { generic_pulse_irq_line(device.execute(), 3, 1); }
-INTERRUPT_GEN_MEMBER( driver_device::irq3_line_assert ) { device.execute().set_input_line(3, ASSERT_LINE); }
+void driver_device::irq3_line_hold(device_t &device)   { device.execute().set_input_line(3, HOLD_LINE); }
+void driver_device::irq3_line_pulse(device_t &device)  { generic_pulse_irq_line(device.execute(), 3, 1); }
+void driver_device::irq3_line_assert(device_t &device) { device.execute().set_input_line(3, ASSERT_LINE); }
 
-INTERRUPT_GEN_MEMBER( driver_device::irq4_line_hold )   { device.execute().set_input_line(4, HOLD_LINE); }
-INTERRUPT_GEN_MEMBER( driver_device::irq4_line_pulse )  { generic_pulse_irq_line(device.execute(), 4, 1); }
-INTERRUPT_GEN_MEMBER( driver_device::irq4_line_assert ) { device.execute().set_input_line(4, ASSERT_LINE); }
+void driver_device::irq4_line_hold(device_t &device)   { device.execute().set_input_line(4, HOLD_LINE); }
+void driver_device::irq4_line_pulse(device_t &device)  { generic_pulse_irq_line(device.execute(), 4, 1); }
+void driver_device::irq4_line_assert(device_t &device) { device.execute().set_input_line(4, ASSERT_LINE); }
 
-INTERRUPT_GEN_MEMBER( driver_device::irq5_line_hold )   { device.execute().set_input_line(5, HOLD_LINE); }
-INTERRUPT_GEN_MEMBER( driver_device::irq5_line_pulse )  { generic_pulse_irq_line(device.execute(), 5, 1); }
-INTERRUPT_GEN_MEMBER( driver_device::irq5_line_assert ) { device.execute().set_input_line(5, ASSERT_LINE); }
+void driver_device::irq5_line_hold(device_t &device)   { device.execute().set_input_line(5, HOLD_LINE); }
+void driver_device::irq5_line_pulse(device_t &device)  { generic_pulse_irq_line(device.execute(), 5, 1); }
+void driver_device::irq5_line_assert(device_t &device) { device.execute().set_input_line(5, ASSERT_LINE); }
 
-INTERRUPT_GEN_MEMBER( driver_device::irq6_line_hold )   { device.execute().set_input_line(6, HOLD_LINE); }
-INTERRUPT_GEN_MEMBER( driver_device::irq6_line_pulse )  { generic_pulse_irq_line(device.execute(), 6, 1); }
-INTERRUPT_GEN_MEMBER( driver_device::irq6_line_assert ) { device.execute().set_input_line(6, ASSERT_LINE); }
+void driver_device::irq6_line_hold(device_t &device)   { device.execute().set_input_line(6, HOLD_LINE); }
+void driver_device::irq6_line_pulse(device_t &device)  { generic_pulse_irq_line(device.execute(), 6, 1); }
+void driver_device::irq6_line_assert(device_t &device) { device.execute().set_input_line(6, ASSERT_LINE); }
 
-INTERRUPT_GEN_MEMBER( driver_device::irq7_line_hold )   { device.execute().set_input_line(7, HOLD_LINE); }
-INTERRUPT_GEN_MEMBER( driver_device::irq7_line_pulse )  { generic_pulse_irq_line(device.execute(), 7, 1); }
-INTERRUPT_GEN_MEMBER( driver_device::irq7_line_assert ) { device.execute().set_input_line(7, ASSERT_LINE); }
+void driver_device::irq7_line_hold(device_t &device)   { device.execute().set_input_line(7, HOLD_LINE); }
+void driver_device::irq7_line_pulse(device_t &device)  { generic_pulse_irq_line(device.execute(), 7, 1); }
+void driver_device::irq7_line_assert(device_t &device) { device.execute().set_input_line(7, ASSERT_LINE); }
 
 
 //**************************************************************************

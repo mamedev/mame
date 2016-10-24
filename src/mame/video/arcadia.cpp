@@ -613,7 +613,7 @@ void arcadia_state::draw_sprites()
 	if (sprite_collision(2,3)) m_reg.d.collision_sprite&=~0x20; //guess
 }
 
-INTERRUPT_GEN_MEMBER(arcadia_state::video_line)
+void arcadia_state::video_line(device_t &device)
 {
 	int width = m_screen->width();
 

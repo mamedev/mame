@@ -318,10 +318,10 @@ public:
 	void dsp_dataram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	void soundtimer_en_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void soundtimer_count_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	DECLARE_WRITE_LINE_MEMBER(voodoo_vblank_0);
+	void voodoo_vblank_0(int state);
 	ADC12138_IPT_CONVERT_CB(adc12138_input_callback);
 
-	TIMER_CALLBACK_MEMBER(sound_irq);
+	void sound_irq(void *ptr, int32_t param);
 	void init_nwktr();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -339,7 +339,7 @@ void nwktr_state::paletteram32_w(address_space &space, offs_t offset, uint32_t d
 	m_palette->set_pen_color(offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
 
-WRITE_LINE_MEMBER(nwktr_state::voodoo_vblank_0)
+void nwktr_state::voodoo_vblank_0(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, state);
 }
@@ -583,7 +583,7 @@ void nwktr_state::lanc2_w(address_space &space, offs_t offset, uint32_t data, ui
 
 /*****************************************************************************/
 
-TIMER_CALLBACK_MEMBER(nwktr_state::sound_irq)
+void nwktr_state::sound_irq(void *ptr, int32_t param)
 {
 	m_audiocpu->set_input_line(M68K_IRQ_1, ASSERT_LINE);
 }

@@ -106,26 +106,26 @@ public:
 	// reads for both host and peripherals
 	uint8_t dio_r() { return get_data(); }
 	uint8_t dio_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return get_data(); }
-	DECLARE_READ_LINE_MEMBER( eoi_r ) { return get_signal(EOI); }
-	DECLARE_READ_LINE_MEMBER( dav_r ) { return get_signal(DAV); }
-	DECLARE_READ_LINE_MEMBER( nrfd_r ) { return get_signal(NRFD); }
-	DECLARE_READ_LINE_MEMBER( ndac_r ) { return get_signal(NDAC); }
-	DECLARE_READ_LINE_MEMBER( ifc_r ) { return get_signal(IFC); }
-	DECLARE_READ_LINE_MEMBER( srq_r ) { return get_signal(SRQ); }
-	DECLARE_READ_LINE_MEMBER( atn_r ) { return get_signal(ATN); }
-	DECLARE_READ_LINE_MEMBER( ren_r ) { return get_signal(REN); }
+	int eoi_r() { return get_signal(EOI); }
+	int dav_r() { return get_signal(DAV); }
+	int nrfd_r() { return get_signal(NRFD); }
+	int ndac_r() { return get_signal(NDAC); }
+	int ifc_r() { return get_signal(IFC); }
+	int srq_r() { return get_signal(SRQ); }
+	int atn_r() { return get_signal(ATN); }
+	int ren_r() { return get_signal(REN); }
 
 	// writes for host (driver_device)
 	void dio_w(uint8_t data) { return set_data(this, data); }
 	void dio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { set_data(this, data); }
-	DECLARE_WRITE_LINE_MEMBER( eoi_w ) { set_signal(this, EOI, state); }
-	DECLARE_WRITE_LINE_MEMBER( dav_w ) { set_signal(this, DAV, state); }
-	DECLARE_WRITE_LINE_MEMBER( nrfd_w ) { set_signal(this, NRFD, state); }
-	DECLARE_WRITE_LINE_MEMBER( ndac_w ) { set_signal(this, NDAC, state); }
-	DECLARE_WRITE_LINE_MEMBER( ifc_w ) { set_signal(this, IFC, state); }
-	DECLARE_WRITE_LINE_MEMBER( srq_w ) { set_signal(this, SRQ, state); }
-	DECLARE_WRITE_LINE_MEMBER( atn_w ) { set_signal(this, ATN, state); }
-	DECLARE_WRITE_LINE_MEMBER( ren_w ) { set_signal(this, REN, state); }
+	void eoi_w(int state) { set_signal(this, EOI, state); }
+	void dav_w(int state) { set_signal(this, DAV, state); }
+	void nrfd_w(int state) { set_signal(this, NRFD, state); }
+	void ndac_w(int state) { set_signal(this, NDAC, state); }
+	void ifc_w(int state) { set_signal(this, IFC, state); }
+	void srq_w(int state) { set_signal(this, SRQ, state); }
+	void atn_w(int state) { set_signal(this, ATN, state); }
+	void ren_w(int state) { set_signal(this, REN, state); }
 
 	// writes for peripherals (device_t)
 	void dio_w(device_t *device, uint8_t data) { set_data(device, data); }

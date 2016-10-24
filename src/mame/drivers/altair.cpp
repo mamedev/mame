@@ -42,7 +42,7 @@ public:
 	}
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER(altair);
-	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
+	void write_acia_clock(int state);
 
 protected:
 	virtual void machine_reset() override;
@@ -89,7 +89,7 @@ QUICKLOAD_LOAD_MEMBER( altair_state,altair)
 	return image_init_result::PASS;
 }
 
-WRITE_LINE_MEMBER(altair_state::write_acia_clock)
+void altair_state::write_acia_clock(int state)
 {
 	m_mc6850->write_txc(state);
 	m_mc6850->write_rxc(state);

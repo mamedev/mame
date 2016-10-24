@@ -21,9 +21,9 @@ public:
 	uint8_t port_314_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t port_318_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER(fdc_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_hld_w);
+	void fdc_irq_w(int state);
+	void fdc_drq_w(int state);
+	void fdc_hld_w(int state);
 
 protected:
 	enum {

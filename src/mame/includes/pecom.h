@@ -49,12 +49,12 @@ public:
 	virtual void machine_reset() override;
 	void video_start_pecom();
 	DECLARE_INPUT_CHANGED_MEMBER(ef_w);
-	TIMER_CALLBACK_MEMBER(reset_tick);
-	DECLARE_READ_LINE_MEMBER(clear_r);
-	DECLARE_READ_LINE_MEMBER(ef2_r);
-	DECLARE_WRITE_LINE_MEMBER(q_w);
+	void reset_tick(void *ptr, int32_t param);
+	int clear_r();
+	int ef2_r();
+	void q_w(int state);
 	void sc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(pecom_prd_w);
+	void pecom_prd_w(int state);
 	CDP1869_CHAR_RAM_READ_MEMBER(pecom_char_ram_r);
 	CDP1869_CHAR_RAM_WRITE_MEMBER(pecom_char_ram_w);
 	CDP1869_PCB_READ_MEMBER(pecom_pcb_r);

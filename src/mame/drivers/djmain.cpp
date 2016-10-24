@@ -337,7 +337,7 @@ void djmain_state::unknownc02000_w(address_space &space, offs_t offset, uint32_t
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(djmain_state::vb_interrupt)
+void djmain_state::vb_interrupt(device_t &device)
 {
 	m_pending_vb_int = 0;
 
@@ -352,7 +352,7 @@ INTERRUPT_GEN_MEMBER(djmain_state::vb_interrupt)
 }
 
 
-WRITE_LINE_MEMBER( djmain_state::ide_interrupt )
+void djmain_state::ide_interrupt(int state)
 {
 	if (state != CLEAR_LINE)
 	{

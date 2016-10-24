@@ -7,7 +7,7 @@
 /*******************************************************************/
 
 
-TILE_GET_INFO_MEMBER(gcpinbal_state::get_bg0_tile_info)
+void gcpinbal_state::get_bg0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t tilenum = m_tilemapram[0 + tile_index * 2];
 	uint16_t attr    = m_tilemapram[1 + tile_index * 2];
@@ -18,7 +18,7 @@ TILE_GET_INFO_MEMBER(gcpinbal_state::get_bg0_tile_info)
 			TILE_FLIPYX( (attr & 0x300) >> 8));
 }
 
-TILE_GET_INFO_MEMBER(gcpinbal_state::get_bg1_tile_info)
+void gcpinbal_state::get_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t tilenum = m_tilemapram[0x800 + tile_index * 2];
 	uint16_t attr    = m_tilemapram[0x801 + tile_index * 2];
@@ -29,7 +29,7 @@ TILE_GET_INFO_MEMBER(gcpinbal_state::get_bg1_tile_info)
 			TILE_FLIPYX( (attr & 0x300) >> 8));
 }
 
-TILE_GET_INFO_MEMBER(gcpinbal_state::get_fg_tile_info)
+void gcpinbal_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t tilenum = m_tilemapram[0x1000 + tile_index];
 

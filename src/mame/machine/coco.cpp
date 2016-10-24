@@ -347,7 +347,7 @@ void coco_state::pia0_pb_w(address_space &space, offs_t offset, uint8_t data, ui
 //  pia0_ca2_w
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( coco_state::pia0_ca2_w )
+void coco_state::pia0_ca2_w(int state)
 {
 	update_sound();     // analog mux SEL1 is tied to PIA0 CA2
 	poll_keyboard();
@@ -359,7 +359,7 @@ WRITE_LINE_MEMBER( coco_state::pia0_ca2_w )
 //  pia0_cb2_w
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( coco_state::pia0_cb2_w )
+void coco_state::pia0_cb2_w(int state)
 {
 	update_sound();     // analog mux SEL2 is tied to PIA0 CB2
 	poll_keyboard();
@@ -371,7 +371,7 @@ WRITE_LINE_MEMBER( coco_state::pia0_cb2_w )
 //  pia0_irq_a
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( coco_state::pia0_irq_a )
+void coco_state::pia0_irq_a(int state)
 {
 	recalculate_irq();
 }
@@ -382,7 +382,7 @@ WRITE_LINE_MEMBER( coco_state::pia0_irq_a )
 //  pia0_irq_b
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( coco_state::pia0_irq_b )
+void coco_state::pia0_irq_b(int state)
 {
 	recalculate_irq();
 }
@@ -506,7 +506,7 @@ void coco_state::pia1_pb_w(address_space &space, offs_t offset, uint8_t data, ui
 //  pia1_ca2_w
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( coco_state::pia1_ca2_w )
+void coco_state::pia1_ca2_w(int state)
 {
 	m_cassette->change_state(
 		state ? CASSETTE_MOTOR_ENABLED : CASSETTE_MOTOR_DISABLED,
@@ -519,7 +519,7 @@ WRITE_LINE_MEMBER( coco_state::pia1_ca2_w )
 //  pia1_cb2_w
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( coco_state::pia1_cb2_w )
+void coco_state::pia1_cb2_w(int state)
 {
 	update_sound();     // SOUND_ENABLE is connected to PIA1 CB2
 }
@@ -530,7 +530,7 @@ WRITE_LINE_MEMBER( coco_state::pia1_cb2_w )
 //  pia1_firq_a
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( coco_state::pia1_firq_a )
+void coco_state::pia1_firq_a(int state)
 {
 	recalculate_firq();
 }
@@ -541,7 +541,7 @@ WRITE_LINE_MEMBER( coco_state::pia1_firq_a )
 //  pia1_firq_b
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( coco_state::pia1_firq_b )
+void coco_state::pia1_firq_b(int state)
 {
 	recalculate_firq();
 }

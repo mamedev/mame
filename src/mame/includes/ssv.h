@@ -101,7 +101,7 @@ public:
 	uint16_t gdfs_eeprom_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void gdfs_eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	TILE_GET_INFO_MEMBER(get_tile_info_0);
+	void get_tile_info_0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	void init_gdfs();
 	void init_sxyreac2();
@@ -134,10 +134,10 @@ public:
 	uint32_t screen_update_gdfs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_eaglshot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(gdfs_interrupt);
+	void interrupt(timer_device &timer, void *ptr, int32_t param);
+	void gdfs_interrupt(timer_device &timer, void *ptr, int32_t param);
 	void update_irq_state();
-	IRQ_CALLBACK_MEMBER(irq_callback);
+	int irq_callback(device_t &device, int irqline);
 
 	void drawgfx(bitmap_ind16 &bitmap, const rectangle &cliprect, gfx_element *gfx,uint32_t code,uint32_t color,int flipx,int flipy,int x0,int y0,int shadow);
 	void draw_row(bitmap_ind16 &bitmap, const rectangle &cliprect, int sx, int sy, int scroll);

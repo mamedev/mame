@@ -105,18 +105,18 @@ void airraid_video_device::device_reset()
 {
 }
 
-TILEMAP_MAPPER_MEMBER(airraid_video_device::bg_scan)
+tilemap_memory_index airraid_video_device::bg_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	return ((row&0xf) * 0x10) + (col&0xf) + (((col&0x7f0) >> 4)*0x100) + ((row & 0x30)>>4) * 0x8000;
 }
 
-TILEMAP_MAPPER_MEMBER(airraid_video_device::fg_scan)
+tilemap_memory_index airraid_video_device::fg_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	return ((row&0xf) * 0x10) + (col&0xf) + (((col&0x0f0) >> 4)*0x100) + ((row & 0x1f0)>>4) * 0x1000;
 }
 
 
-TILE_GET_INFO_MEMBER(airraid_video_device::get_bg_tile_info)
+void airraid_video_device::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = m_bgmap[(tile_index*2)+1] & 0xff;
 	int attr = m_bgmap[(tile_index*2)+0] & 0xff;
@@ -129,7 +129,7 @@ TILE_GET_INFO_MEMBER(airraid_video_device::get_bg_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(airraid_video_device::get_fg_tile_info)
+void airraid_video_device::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = m_fgmap[(tile_index*2)+1] & 0xff;
 	int attr = m_fgmap[(tile_index*2)+0] & 0xff;
@@ -142,7 +142,7 @@ TILE_GET_INFO_MEMBER(airraid_video_device::get_fg_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(airraid_video_device::get_cstx_tile_info)
+void airraid_video_device::get_cstx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = (m_txram[tile_index*2]);
 	int attr = (m_txram[tile_index*2+1]);

@@ -12,7 +12,7 @@ Video hardware
 #include "emu.h"
 #include "includes/himesiki.h"
 
-TILE_GET_INFO_MEMBER(himesiki_state::get_bg_tile_info)
+void himesiki_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_bg_ram[tile_index * 2] + m_bg_ram[tile_index * 2 + 1] * 0x100 ;
 	int col = code >> 12;

@@ -303,7 +303,7 @@ void simpsons_state::simpsons_objdma(  )
 	if (num_inactive) do { *dst = 0; dst += 8; } while (--num_inactive);
 }
 
-INTERRUPT_GEN_MEMBER(simpsons_state::simpsons_irq)
+void simpsons_state::simpsons_irq(device_t &device)
 {
 	if (m_k053246->k053246_is_irq_enabled())
 	{

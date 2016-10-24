@@ -105,13 +105,13 @@ public:
 	uint8_t   m_wx318;    /* data of 74ls374 labeled wx318 */
 	uint8_t   m_wx319;    /* data of 74sl374 labeled wx319 */
 
-	TIMER_DEVICE_CALLBACK_MEMBER(exelv_hblank_interrupt);
+	void exelv_hblank_interrupt(timer_device &timer, void *ptr, int32_t param);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( exelvision_cartridge );
 };
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(exelv_state::exelv_hblank_interrupt)
+void exelv_state::exelv_hblank_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	m_tms3556->interrupt(machine());
 }

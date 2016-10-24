@@ -36,7 +36,7 @@ public:
 
 	uint8_t bml3_mp1802_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void bml3_mp1802_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(bml3_wd17xx_intrq_w);
+	void bml3_wd17xx_intrq_w(int state);
 
 protected:
 	virtual void device_start() override;

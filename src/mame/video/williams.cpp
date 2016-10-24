@@ -342,7 +342,7 @@ uint8_t williams_state::williams_video_counter_r(address_space &space, offs_t of
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(williams2_state::get_tile_info)
+void williams2_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int mask = m_gfxdecode->gfx(0)->elements() - 1;
 	int data = m_williams2_tileram[tile_index];

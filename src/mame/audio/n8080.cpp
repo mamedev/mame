@@ -97,7 +97,7 @@ void n8080_state::stop_mono_flop( int n )
 }
 
 
-TIMER_CALLBACK_MEMBER( n8080_state::stop_mono_flop_callback )
+void n8080_state::stop_mono_flop_callback(void *ptr, int32_t param)
 {
 	stop_mono_flop(param);
 }
@@ -218,7 +218,7 @@ void n8080_state::delayed_sound_1( int data )
 }
 
 
-TIMER_CALLBACK_MEMBER( n8080_state::delayed_sound_1_callback )
+void n8080_state::delayed_sound_1_callback(void *ptr, int32_t param)
 {
 	delayed_sound_1(param);
 }
@@ -250,7 +250,7 @@ void n8080_state::delayed_sound_2( int data )
 }
 
 
-TIMER_CALLBACK_MEMBER( n8080_state::delayed_sound_2_callback )
+void n8080_state::delayed_sound_2_callback(void *ptr, int32_t param)
 {
 	delayed_sound_2(param);
 }
@@ -349,7 +349,7 @@ void n8080_state::helifire_sound_ctrl_w(address_space &space, offs_t offset, uin
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(n8080_state::spacefev_vco_voltage_timer)
+void n8080_state::spacefev_vco_voltage_timer(timer_device &timer, void *ptr, int32_t param)
 {
 	double voltage = 0;
 
@@ -362,7 +362,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(n8080_state::spacefev_vco_voltage_timer)
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(n8080_state::helifire_dac_volume_timer)
+void n8080_state::helifire_dac_volume_timer(timer_device &timer, void *ptr, int32_t param)
 {
 	double t = m_helifire_dac_timing - machine().time().as_double();
 

@@ -67,8 +67,8 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	INTERRUPT_GEN_MEMBER(interrupt);
-	TIMER_CALLBACK_MEMBER(update);
+	void interrupt(device_t &device);
+	void update(void *ptr, int32_t param);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	inline rgb_t pen_for_pixel( uint8_t *src, uint8_t pix );

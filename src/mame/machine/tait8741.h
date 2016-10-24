@@ -77,7 +77,7 @@ public:
 	uint8_t read_3(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { if(offset&1) return status_r(3); else return data_r(3); }
 	void write_3(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { if(offset&1) command_w(3,data); else data_w(3,data); }
 
-	TIMER_CALLBACK_MEMBER( serial_tx );
+	void serial_tx(void *ptr, int32_t param);
 	void update(int num);
 	int status_r(int num);
 	int data_r(int num);
@@ -160,7 +160,7 @@ public:
 
 	void nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { m_nmi_enable = 1; }
 
-	TIMER_CALLBACK_MEMBER( tx );
+	void tx(void *ptr, int32_t param);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

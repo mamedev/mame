@@ -602,7 +602,7 @@ void lynx_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 	}
 }
 
-TIMER_CALLBACK_MEMBER(lynx_state::lynx_blitter_timer)
+void lynx_state::lynx_blitter_timer(void *ptr, int32_t param)
 {
 	m_blitter.busy=0; // blitter finished
 	m_maincpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
@@ -1491,7 +1491,7 @@ uint32_t lynx_state::lynx_time_factor(int val)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(lynx_state::lynx_timer_shot)
+void lynx_state::lynx_timer_shot(void *ptr, int32_t param)
 {
 	lynx_timer_signal_irq(param);
 	if (!(m_timer[param].cntrl1 & 0x10)) // if reload not enabled
@@ -1600,12 +1600,12 @@ void lynx_state::lynx_uart_reset()
 	memset(&m_uart, 0, sizeof(m_uart));
 }
 
-TIMER_CALLBACK_MEMBER(lynx_state::lynx_uart_loopback_timer)
+void lynx_state::lynx_uart_loopback_timer(void *ptr, int32_t param)
 {
 	m_uart.received = false;
 }
 
-TIMER_CALLBACK_MEMBER(lynx_state::lynx_uart_timer)
+void lynx_state::lynx_uart_timer(void *ptr, int32_t param)
 {
 	if (m_uart.buffer_loaded)
 	{

@@ -109,10 +109,10 @@ public:
 	void ay_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void ay_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER(pia_u72_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia_u72_cb2_w);
+	void pia_u72_ca2_w(int state);
+	void pia_u72_cb2_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(pia_u75_cb2_w);
+	void pia_u75_cb2_w(int state);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( squale_cart );
 	virtual void machine_start() override;
@@ -126,7 +126,7 @@ public:
 	uint8_t  cart_addr_counter_reset;
 	uint16_t cart_addr_counter;
 
-	TIMER_DEVICE_CALLBACK_MEMBER(squale_scanline);
+	void squale_scanline(timer_device &timer, void *ptr, int32_t param);
 
 private:
 	required_device<acia6850_device> m_acia;
@@ -507,7 +507,7 @@ void squale_state::pia_u72_porta_w(address_space &space, offs_t offset, uint8_t 
 	return;
 }
 
-WRITE_LINE_MEMBER( squale_state::pia_u72_ca2_w )
+void squale_state::pia_u72_ca2_w(int state)
 {
 	// U72 PIA CA2 : Cartridge address control
 
@@ -531,7 +531,7 @@ WRITE_LINE_MEMBER( squale_state::pia_u72_ca2_w )
 	}
 }
 
-WRITE_LINE_MEMBER( squale_state::pia_u75_cb2_w )
+void squale_state::pia_u75_cb2_w(int state)
 {
 	// U75 PIA CB2 : Cartridge address reset
 
@@ -579,7 +579,7 @@ void squale_state::pia_u72_portb_w(address_space &space, offs_t offset, uint8_t 
 	return;
 }
 
-WRITE_LINE_MEMBER( squale_state::pia_u72_cb2_w )
+void squale_state::pia_u72_cb2_w(int state)
 {
 	// U72 PIA CB2 : Printer Data Strobe line
 
@@ -604,7 +604,7 @@ DEVICE_IMAGE_LOAD_MEMBER( squale_state, squale_cart )
 	return image_init_result::PASS;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( squale_state::squale_scanline )
+void squale_state::squale_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	m_ef9365->update_scanline((uint16_t)param);
 }

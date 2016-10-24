@@ -15,7 +15,7 @@ void blockade_state::blockade_videoram_w(address_space &space, offs_t offset, ui
 	}
 }
 
-TILE_GET_INFO_MEMBER(blockade_state::get_bg_tile_info)
+void blockade_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index];
 

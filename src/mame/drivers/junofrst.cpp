@@ -130,7 +130,7 @@ public:
 	void machine_start_junofrst();
 	void machine_reset_junofrst();
 
-	INTERRUPT_GEN_MEMBER(_30hz_irq);
+	void _30hz_irq(device_t &device);
 };
 
 
@@ -401,7 +401,7 @@ void junofrst_state::machine_reset_junofrst()
 	m_blitterdata[3] = 0;
 }
 
-INTERRUPT_GEN_MEMBER(junofrst_state::_30hz_irq)
+void junofrst_state::_30hz_irq(device_t &device)
 {
 	/* flip flops cause the interrupt to be signalled every other frame */
 	m_irq_toggle ^= 1;

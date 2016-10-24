@@ -44,10 +44,10 @@ public:
 	at45db041_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	at45db041_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
-	DECLARE_WRITE_LINE_MEMBER(cs_w);
-	DECLARE_WRITE_LINE_MEMBER(sck_w);
-	DECLARE_WRITE_LINE_MEMBER(si_w);
-	DECLARE_READ_LINE_MEMBER(so_r);
+	void cs_w(int state);
+	void sck_w(int state);
+	void si_w(int state);
+	int so_r();
 
 	uint8_t *get_ptr() {  return &m_data[0];  }
 

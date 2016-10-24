@@ -73,11 +73,11 @@ public:
 	uint8_t port10_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void port10_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_INPUT_CHANGED_MEMBER(alphatro_break);
-	DECLARE_WRITE_LINE_MEMBER(txdata_callback);
-	DECLARE_WRITE_LINE_MEMBER(write_usart_clock);
-	DECLARE_PALETTE_INIT(alphatro);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_c);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_p);
+	void txdata_callback(int state);
+	void write_usart_clock(int state);
+	void palette_init_alphatro(palette_device &palette);
+	void timer_c(timer_device &timer, void *ptr, int32_t param);
+	void timer_p(timer_device &timer, void *ptr, int32_t param);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	required_shared_ptr<uint8_t> m_p_videoram;
 	uint8_t *m_p_chargen;
@@ -140,12 +140,12 @@ void alphatro_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	}
 }
 
-WRITE_LINE_MEMBER( alphatro_state::txdata_callback )
+void alphatro_state::txdata_callback(int state)
 {
 	m_cass_state = state;
 }
 
-WRITE_LINE_MEMBER( alphatro_state::write_usart_clock )
+void alphatro_state::write_usart_clock(int state)
 {
 	m_usart->write_txc(state);
 	m_usart->write_rxc(state);
@@ -398,7 +398,7 @@ void alphatro_state::machine_reset()
 	m_beep->set_state(0);
 }
 
-PALETTE_INIT_MEMBER(alphatro_state, alphatro)
+void alphatro_state::palette_init_alphatro(palette_device &palette)
 {
 	// RGB colours
 	palette.set_pen_color(0, 0x00, 0x00, 0x00);
@@ -414,7 +414,7 @@ PALETTE_INIT_MEMBER(alphatro_state, alphatro)
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(alphatro_state::timer_c)
+void alphatro_state::timer_c(timer_device &timer, void *ptr, int32_t param)
 {
 	m_cass_data[3]++;
 
@@ -430,7 +430,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(alphatro_state::timer_c)
 		m_cass->output(BIT(m_cass_data[3], 1) ? -1.0 : +1.0); // 1200Hz
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(alphatro_state::timer_p)
+void alphatro_state::timer_p(timer_device &timer, void *ptr, int32_t param)
 {
 	/* cassette - turn 1200/2400Hz to a bit */
 	m_cass_data[1]++;

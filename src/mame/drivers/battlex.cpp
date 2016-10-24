@@ -50,7 +50,7 @@
 #include "includes/battlex.h"
 
 
-INTERRUPT_GEN_MEMBER(battlex_state::battlex_interrupt)
+void battlex_state::battlex_interrupt(device_t &device)
 {
 	m_in0_b4 = 1;
 	device.execute().set_input_line(0, ASSERT_LINE);

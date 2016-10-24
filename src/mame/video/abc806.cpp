@@ -323,7 +323,7 @@ MC6845_UPDATE_ROW( abc806_state::abc806_update_row )
 //  hs_w - horizontal sync write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( abc806_state::hs_w )
+void abc806_state::hs_w(int state)
 {
 	int vsync;
 
@@ -371,7 +371,7 @@ WRITE_LINE_MEMBER( abc806_state::hs_w )
 //  vs_w - vertical sync write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( abc806_state::vs_w )
+void abc806_state::vs_w(int state)
 {
 	m_vsync = state;
 }
@@ -470,7 +470,7 @@ uint32_t abc806_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 //  PALETTE_INIT( abc806 )
 //-------------------------------------------------
 
-PALETTE_INIT_MEMBER( abc806_state, abc806 )
+void abc806_state::palette_init_abc806(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(0x00, 0x00, 0x00)); // black
 	palette.set_pen_color(1, rgb_t(0xff, 0x00, 0x00)); // red

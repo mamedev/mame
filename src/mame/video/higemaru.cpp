@@ -21,7 +21,7 @@ void higemaru_state::higemaru_colorram_w(address_space &space, offs_t offset, ui
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(higemaru_state, higemaru)
+void higemaru_state::palette_init_higemaru(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -88,7 +88,7 @@ void higemaru_state::higemaru_c800_w(address_space &space, offs_t offset, uint8_
 	}
 }
 
-TILE_GET_INFO_MEMBER(higemaru_state::get_bg_tile_info)
+void higemaru_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index] + ((m_colorram[tile_index] & 0x80) << 1);
 	int color = m_colorram[tile_index] & 0x1f;

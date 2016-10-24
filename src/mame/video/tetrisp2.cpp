@@ -111,7 +111,7 @@ void tetrisp2_state::rocknms_sub_priority_w(address_space &space, offs_t offset,
 #define NX_0  (0x40)
 #define NY_0  (0x40)
 
-TILE_GET_INFO_MEMBER(tetrisp2_state::get_tile_info_bg)
+void tetrisp2_state::get_tile_info_bg(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code_hi = m_vram_bg[ 2 * tile_index + 0];
 	uint16_t code_lo = m_vram_bg[ 2 * tile_index + 1];
@@ -131,7 +131,7 @@ void tetrisp2_state::tetrisp2_vram_bg_w(address_space &space, offs_t offset, uin
 #define NX_1  (0x40)
 #define NY_1  (0x40)
 
-TILE_GET_INFO_MEMBER(tetrisp2_state::get_tile_info_fg)
+void tetrisp2_state::get_tile_info_fg(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code_hi = m_vram_fg[ 2 * tile_index + 0];
 	uint16_t code_lo = m_vram_fg[ 2 * tile_index + 1];
@@ -148,7 +148,7 @@ void tetrisp2_state::tetrisp2_vram_fg_w(address_space &space, offs_t offset, uin
 }
 
 
-TILE_GET_INFO_MEMBER(tetrisp2_state::get_tile_info_rot)
+void tetrisp2_state::get_tile_info_rot(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code_hi = m_vram_rot[ 2 * tile_index + 0];
 	uint16_t code_lo = m_vram_rot[ 2 * tile_index + 1];
@@ -164,7 +164,7 @@ void tetrisp2_state::tetrisp2_vram_rot_w(address_space &space, offs_t offset, ui
 	m_tilemap_rot->mark_tile_dirty(offset/2);
 }
 
-TILE_GET_INFO_MEMBER(tetrisp2_state::get_tile_info_rocknms_sub_bg)
+void tetrisp2_state::get_tile_info_rocknms_sub_bg(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code_hi = m_rocknms_sub_vram_bg[ 2 * tile_index + 0];
 	uint16_t code_lo = m_rocknms_sub_vram_bg[ 2 * tile_index + 1];
@@ -181,7 +181,7 @@ void tetrisp2_state::rocknms_sub_vram_bg_w(address_space &space, offs_t offset, 
 }
 
 
-TILE_GET_INFO_MEMBER(tetrisp2_state::get_tile_info_rocknms_sub_fg)
+void tetrisp2_state::get_tile_info_rocknms_sub_fg(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code_hi = m_rocknms_sub_vram_fg[ 2 * tile_index + 0];
 	uint16_t code_lo = m_rocknms_sub_vram_fg[ 2 * tile_index + 1];
@@ -198,7 +198,7 @@ void tetrisp2_state::rocknms_sub_vram_fg_w(address_space &space, offs_t offset, 
 }
 
 
-TILE_GET_INFO_MEMBER(tetrisp2_state::get_tile_info_rocknms_sub_rot)
+void tetrisp2_state::get_tile_info_rocknms_sub_rot(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code_hi = m_rocknms_sub_vram_rot[ 2 * tile_index + 0];
 	uint16_t code_lo = m_rocknms_sub_vram_rot[ 2 * tile_index + 1];
@@ -708,7 +708,7 @@ uint32_t tetrisp2_state::screen_update_rocknms_right(screen_device &screen, bitm
 
 // Temporary hack for stpestag: unaltered ASCII bytes are written in the most significant byte
 // of code_hi, one of the CPUs probably reads them and writes the actual tile codes somewhere.
-TILE_GET_INFO_MEMBER(tetrisp2_state::stepstag_get_tile_info_fg)
+void tetrisp2_state::stepstag_get_tile_info_fg(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code_hi = m_vram_fg[ 2 * tile_index + 0];
 	uint16_t code_lo = m_vram_fg[ 2 * tile_index + 1];

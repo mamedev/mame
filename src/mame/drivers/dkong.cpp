@@ -449,7 +449,7 @@ void dkong_state::memory_write_byte(address_space &space, offs_t offset, uint8_t
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(dkong_state::s2650_interrupt)
+void dkong_state::s2650_interrupt(device_t &device)
 {
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x03);
 }
@@ -687,7 +687,7 @@ void dkong_state::s2650_data_w(address_space &space, offs_t offset, uint8_t data
 	m_hunchloopback = data;
 }
 
-WRITE_LINE_MEMBER(dkong_state::s2650_fo_w)
+void dkong_state::s2650_fo_w(int state)
 {
 #if DEBUG_PROTECTION
 	logerror("write : pc = %04x, FO = %02x\n",space.device().safe_pc(), data);
@@ -1685,13 +1685,13 @@ void dkong_state::braze_decrypt_rom(uint8_t *dest)
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(dkong_state::vblank_irq)
+void dkong_state::vblank_irq(device_t &device)
 {
 	if(m_nmi_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-WRITE_LINE_MEMBER(dkong_state::busreq_w )
+void dkong_state::busreq_w(int state)
 {
 	// since our Z80 has no support for BUSACK, we assume it is granted immediately
 	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, state);

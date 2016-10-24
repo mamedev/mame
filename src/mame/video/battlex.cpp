@@ -47,7 +47,7 @@ void battlex_state::battlex_flipscreen_w(address_space &space, offs_t offset, ui
 }
 
 
-TILE_GET_INFO_MEMBER(battlex_state::get_bg_tile_info)
+void battlex_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = m_videoram[tile_index * 2] | (((m_videoram[tile_index * 2 + 1] & 0x01)) << 8);
 	int color = (m_videoram[tile_index * 2 + 1] & 0x0e) >> 1; // high bits unused

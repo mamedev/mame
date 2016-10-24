@@ -26,8 +26,8 @@ public:
 	void sc5_mux1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void sc5_mux2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER(bfm_sc5_duart_irq_handler);
-	DECLARE_WRITE_LINE_MEMBER(bfm_sc5_duart_txa);
+	void bfm_sc5_duart_irq_handler(int state);
+	void bfm_sc5_duart_txa(int state);
 	uint8_t bfm_sc5_duart_input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void bfm_sc5_duart_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };

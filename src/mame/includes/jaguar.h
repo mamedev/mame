@@ -239,13 +239,13 @@ public:
 	uint32_t cojag_gun_input_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	DECLARE_WRITE_LINE_MEMBER( gpu_cpu_int );
-	DECLARE_WRITE_LINE_MEMBER( dsp_cpu_int );
-	DECLARE_WRITE_LINE_MEMBER( external_int );
+	void gpu_cpu_int(int state);
+	void dsp_cpu_int(int state);
+	void external_int(int state);
 
 	image_init_result quickload(device_image_interface &image, const char *file_type, int quickload_size);
 	void cart_start();
-	IRQ_CALLBACK_MEMBER(jaguar_irq_callback);
+	int jaguar_irq_callback(device_t &device, int irqline);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( jaguar_cart );
 	DECLARE_QUICKLOAD_LOAD_MEMBER( jaguar );
 protected:

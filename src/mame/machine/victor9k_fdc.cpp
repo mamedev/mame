@@ -777,7 +777,7 @@ void victor_9000_fdc_t::via4_pb_w(address_space &space, offs_t offset, uint8_t d
 	}
 }
 
-WRITE_LINE_MEMBER( victor_9000_fdc_t::wrsync_w )
+void victor_9000_fdc_t::wrsync_w(int state)
 {
 	if (m_wrsync != state)
 	{
@@ -790,7 +790,7 @@ WRITE_LINE_MEMBER( victor_9000_fdc_t::wrsync_w )
 	}
 }
 
-WRITE_LINE_MEMBER( victor_9000_fdc_t::via4_irq_w )
+void victor_9000_fdc_t::via4_irq_w(int state)
 {
 	m_via4_irq = state;
 
@@ -847,7 +847,7 @@ void victor_9000_fdc_t::via5_pb_w(address_space &space, offs_t offset, uint8_t d
 	}
 }
 
-WRITE_LINE_MEMBER( victor_9000_fdc_t::via5_irq_w )
+void victor_9000_fdc_t::via5_irq_w(int state)
 {
 	m_via5_irq = state;
 
@@ -1033,7 +1033,7 @@ void victor_9000_fdc_t::via6_pb_w(address_space &space, offs_t offset, uint8_t d
 	}
 }
 
-WRITE_LINE_MEMBER( victor_9000_fdc_t::drw_w )
+void victor_9000_fdc_t::drw_w(int state)
 {
 	if (m_drw != state)
 	{
@@ -1050,7 +1050,7 @@ WRITE_LINE_MEMBER( victor_9000_fdc_t::drw_w )
 	}
 }
 
-WRITE_LINE_MEMBER( victor_9000_fdc_t::erase_w )
+void victor_9000_fdc_t::erase_w(int state)
 {
 	if (m_erase != state)
 	{
@@ -1062,7 +1062,7 @@ WRITE_LINE_MEMBER( victor_9000_fdc_t::erase_w )
 	}
 }
 
-WRITE_LINE_MEMBER( victor_9000_fdc_t::via6_irq_w )
+void victor_9000_fdc_t::via6_irq_w(int state)
 {
 	m_via6_irq = state;
 

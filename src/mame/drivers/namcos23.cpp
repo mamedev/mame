@@ -1554,14 +1554,14 @@ public:
 	void c435_state_pio_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void c435_state_reset_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void init_s23();
-	TILE_GET_INFO_MEMBER(TextTilemapGetInfo);
+	void TextTilemapGetInfo(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void video_start_s23();
 	void machine_reset_gmen();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(interrupt);
-	TIMER_CALLBACK_MEMBER(c361_timer_cb);
+	void interrupt(device_t &device);
+	void c361_timer_cb(void *ptr, int32_t param);
 	void sub_irq(screen_device &screen, bool vblank_state);
 	uint8_t nthbyte(const uint32_t *pSource, int offs);
 	uint16_t nthword(const uint32_t *pSource, int offs);
@@ -2351,7 +2351,7 @@ void namcos23_state::paletteram_w(address_space &space, offs_t offset, uint32_t 
 
 // C361 (text)
 
-TILE_GET_INFO_MEMBER(namcos23_state::TextTilemapGetInfo)
+void namcos23_state::TextTilemapGetInfo(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t data = nthword( m_textram,tile_index );
 	/**
@@ -2446,7 +2446,7 @@ void namcos23_state::update_main_interrupts(uint32_t cause)
 	// level 6: C450
 }
 
-INTERRUPT_GEN_MEMBER(namcos23_state::interrupt)
+void namcos23_state::interrupt(device_t &device)
 {
 	if(!m_ctl_vbl_active) {
 		m_ctl_vbl_active = true;
@@ -2709,7 +2709,7 @@ void namcos23_state::c422_w(address_space &space, offs_t offset, uint16_t data, 
 
 // C361 (text)
 
-TIMER_CALLBACK_MEMBER(namcos23_state::c361_timer_cb)
+void namcos23_state::c361_timer_cb(void *ptr, int32_t param)
 {
 	if(m_c361.scanline != 0x1ff) {
 		// need to do a partial update here, but doesn't work properly yet

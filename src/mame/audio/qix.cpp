@@ -101,7 +101,7 @@ void qix_state::sndpia_2_warning_w(address_space &space, offs_t offset, uint8_t 
 }
 
 
-TIMER_CALLBACK_MEMBER(qix_state::deferred_sndpia1_porta_w)
+void qix_state::deferred_sndpia1_porta_w(void *ptr, int32_t param)
 {
 	m_sndpia1->porta_w(param);
 }
@@ -128,7 +128,7 @@ void qix_state::slither_coinctl_w(address_space &space, offs_t offset, uint8_t d
  *
  *************************************/
 
-WRITE_LINE_MEMBER(qix_state::qix_pia_dint)
+void qix_state::qix_pia_dint(int state)
 {
 	int combined_state = m_sndpia0->irq_a_state() | m_sndpia0->irq_b_state();
 
@@ -137,7 +137,7 @@ WRITE_LINE_MEMBER(qix_state::qix_pia_dint)
 }
 
 
-WRITE_LINE_MEMBER(qix_state::qix_pia_sint)
+void qix_state::qix_pia_sint(int state)
 {
 	int combined_state = m_sndpia1->irq_a_state() | m_sndpia1->irq_b_state();
 

@@ -342,7 +342,7 @@ uint8_t v53_base_device::tmu_tst2_r(address_space &space, offs_t offset, uint8_t
 /*** DMA ***/
 
 // could be wrong / nonexistent
-WRITE_LINE_MEMBER(v53_base_device::dreq0_w)
+void v53_base_device::dreq0_w(int state)
 {
 	if (!(m_SCTL & 0x02))
 	{
@@ -354,7 +354,7 @@ WRITE_LINE_MEMBER(v53_base_device::dreq0_w)
 	}
 }
 
-WRITE_LINE_MEMBER(v53_base_device::dreq1_w)
+void v53_base_device::dreq1_w(int state)
 {
 	if (!(m_SCTL & 0x02))
 	{
@@ -366,7 +366,7 @@ WRITE_LINE_MEMBER(v53_base_device::dreq1_w)
 	}
 }
 
-WRITE_LINE_MEMBER(v53_base_device::dreq2_w)
+void v53_base_device::dreq2_w(int state)
 {
 	if (!(m_SCTL & 0x02))
 	{
@@ -378,7 +378,7 @@ WRITE_LINE_MEMBER(v53_base_device::dreq2_w)
 	}
 }
 
-WRITE_LINE_MEMBER(v53_base_device::dreq3_w)
+void v53_base_device::dreq3_w(int state)
 {
 	if (!(m_SCTL & 0x02))
 	{
@@ -390,7 +390,7 @@ WRITE_LINE_MEMBER(v53_base_device::dreq3_w)
 	}
 }
 
-WRITE_LINE_MEMBER(v53_base_device::hack_w)
+void v53_base_device::hack_w(int state)
 {
 	if (!(m_SCTL & 0x02))
 	{
@@ -469,7 +469,7 @@ void v53_base_device::execute_set_input(int irqline, int state)
 }
 
 // for hooking the interrupt controller output up to the core
-WRITE_LINE_MEMBER(v53_base_device::internal_irq_w)
+void v53_base_device::internal_irq_w(int state)
 {
 	nec_common_device::execute_set_input(0, state);
 }

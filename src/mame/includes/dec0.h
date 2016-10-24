@@ -130,7 +130,7 @@ public:
 	{
 		COMBINE_DATA(&m_automat_scroll_regs[offset]);
 	}
-	DECLARE_WRITE_LINE_MEMBER(automat_vclk_cb);
+	void automat_vclk_cb(int state);
 
 	virtual void machine_start() override;
 

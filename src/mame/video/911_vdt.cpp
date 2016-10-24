@@ -101,7 +101,7 @@ static const unsigned short vdt911_palette[] =
 /*
     Initialize vdt911 palette
 */
-PALETTE_INIT_MEMBER(vdt911_device, vdt911)
+void vdt911_device::palette_init_vdt911(palette_device &palette)
 {
 	uint8_t i, r, g, b;
 

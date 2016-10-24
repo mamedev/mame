@@ -235,12 +235,12 @@ void bbc_weddb3_device::wd177xl_write(address_space &space, offs_t offset, uint8
 	if (!BIT(data, 5)) m_fdc->soft_reset();
 }
 
-WRITE_LINE_MEMBER(bbc_watfordfdc_device::fdc_intrq_w)
+void bbc_watfordfdc_device::fdc_intrq_w(int state)
 {
 	m_slot->intrq_w(state);
 }
 
-WRITE_LINE_MEMBER(bbc_watfordfdc_device::fdc_drq_w)
+void bbc_watfordfdc_device::fdc_drq_w(int state)
 {
 	m_slot->drq_w(state);
 }

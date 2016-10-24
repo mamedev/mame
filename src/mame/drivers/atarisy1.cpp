@@ -246,7 +246,7 @@ void atarisy1_state::machine_reset_atarisy1()
  *
  *************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(atarisy1_state::delayed_joystick_int)
+void atarisy1_state::delayed_joystick_int(timer_device &timer, void *ptr, int32_t param)
 {
 	m_joystick_value = param;
 	m_joystick_int = 1;

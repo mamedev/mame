@@ -166,7 +166,7 @@
         uint16_t *my_tmap_memory;
         required_device<gfxdecode_device> gfxdecode;
 
-        TILE_GET_INFO_MEMBER( my_state::my_get_info )
+        void my_state::my_get_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
         {
             uint16_t tiledata = my_tmap_memory[tile_index];
             uint8_t code = tiledata & 0xff;
@@ -788,12 +788,6 @@ private:
 // macros to help form flags for tilemap_t::draw
 #define TILEMAP_DRAW_CATEGORY(x)        (x)     // specify category to draw
 #define TILEMAP_DRAW_ALPHA(x)           (TILEMAP_DRAW_ALPHA_FLAG | (rgb_t::clamp(x) << 24))
-
-// function definition for a get info callback
-#define TILE_GET_INFO_MEMBER(_name)     void _name(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
-
-// function definition for a logical-to-memory mapper
-#define TILEMAP_MAPPER_MEMBER(_name)    tilemap_memory_index _name(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 
 // useful macro inside of a TILE_GET_INFO callback to set tile information
 #define SET_TILE_INFO_MEMBER(GFX,CODE,COLOR,FLAGS)  tileinfo.set(GFX, CODE, COLOR, FLAGS)

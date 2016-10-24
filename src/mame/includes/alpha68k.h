@@ -95,11 +95,11 @@ public:
 	void init_timesold();
 	void init_kyros();
 	void init_sstingry();
-	TILE_GET_INFO_MEMBER(get_tile_info);
+	void get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void machine_start_common();
 	void machine_reset_common();
-	DECLARE_PALETTE_INIT(kyros);
-	DECLARE_PALETTE_INIT(paddlem);
+	void palette_init_kyros(palette_device &palette);
+	void palette_init_paddlem(palette_device &palette);
 	void machine_start_alpha68k_II();
 	void machine_reset_alpha68k_II();
 	void video_start_alpha68k();
@@ -111,7 +111,7 @@ public:
 	uint32_t screen_update_alpha68k_II(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_alpha68k_V(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_alpha68k_V_sb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(alpha68k_sound_nmi);
+	void alpha68k_sound_nmi(device_t &device);
 	void alpha68k_flipscreen_w( int flip );
 	void alpha68k_V_video_bank_w( int bank );
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int j, int s, int e );

@@ -902,7 +902,7 @@ static void adjust_vblank_timer(voodoo_device *vd)
 }
 
 
-TIMER_CALLBACK_MEMBER( voodoo_device::vblank_off_callback )
+void voodoo_device::vblank_off_callback(void *ptr, int32_t param)
 {
 	if (LOG_VBLANK_SWAP) device->logerror("--- vblank end\n");
 
@@ -932,7 +932,7 @@ TIMER_CALLBACK_MEMBER( voodoo_device::vblank_off_callback )
 }
 
 
-TIMER_CALLBACK_MEMBER( voodoo_device::vblank_callback )
+void voodoo_device::vblank_callback(void *ptr, int32_t param)
 {
 	if (LOG_VBLANK_SWAP) device->logerror("--- vblank start\n");
 
@@ -2046,7 +2046,7 @@ void voodoo_device::cmdfifo_w(voodoo_device *vd, cmdfifo_info *f, offs_t offset,
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER( voodoo_device::stall_cpu_callback )
+void voodoo_device::stall_cpu_callback(void *ptr, int32_t param)
 {
 	check_stalled_cpu(this, machine().time());
 }

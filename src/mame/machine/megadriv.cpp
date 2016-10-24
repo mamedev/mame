@@ -91,7 +91,7 @@ void md_base_state::megadriv_68k_YM2612_write(address_space &space, offs_t offse
 }
 
 // this is used by 6 button pads and gets installed in machine_start for drivers requiring it
-TIMER_CALLBACK_MEMBER(md_base_state::io_timeout_timer_callback)
+void md_base_state::io_timeout_timer_callback(void *ptr, int32_t param)
 {
 	m_io_stage[(int)(uintptr_t)ptr] = -1;
 }
@@ -574,7 +574,7 @@ uint16_t md_base_state::megadriv_68k_check_z80_bus(address_space &space, offs_t 
 }
 
 
-TIMER_CALLBACK_MEMBER(md_base_state::megadriv_z80_run_state)
+void md_base_state::megadriv_z80_run_state(void *ptr, int32_t param)
 {
 	/* Is the z80 RESET line pulled? */
 	if (m_genz80.z80_is_reset)
@@ -836,7 +836,7 @@ void md_base_state::megadriv_stop_scanline_timer()
 
 
 // this comes from the VDP on lines 240 (on) 241 (off) and is connected to the z80 irq 0
-WRITE_LINE_MEMBER(md_base_state::vdp_sndirqline_callback_genesis_z80)
+void md_base_state::vdp_sndirqline_callback_genesis_z80(int state)
 {
 	if (m_z80snd)
 	{
@@ -852,7 +852,7 @@ WRITE_LINE_MEMBER(md_base_state::vdp_sndirqline_callback_genesis_z80)
 }
 
 // this comes from the vdp, and is connected to 68k irq level 6 (main vbl interrupt)
-WRITE_LINE_MEMBER(md_base_state::vdp_lv6irqline_callback_genesis_68k)
+void md_base_state::vdp_lv6irqline_callback_genesis_68k(int state)
 {
 	if (state == ASSERT_LINE)
 		m_maincpu->set_input_line(6, HOLD_LINE);
@@ -861,7 +861,7 @@ WRITE_LINE_MEMBER(md_base_state::vdp_lv6irqline_callback_genesis_68k)
 }
 
 // this comes from the vdp, and is connected to 68k irq level 4 (raster interrupt)
-WRITE_LINE_MEMBER(md_base_state::vdp_lv4irqline_callback_genesis_68k)
+void md_base_state::vdp_lv4irqline_callback_genesis_68k(int state)
 {
 	if (state == ASSERT_LINE)
 		m_maincpu->set_input_line(4, HOLD_LINE);
@@ -870,7 +870,7 @@ WRITE_LINE_MEMBER(md_base_state::vdp_lv4irqline_callback_genesis_68k)
 }
 
 /* Callback when the 68k takes an IRQ */
-IRQ_CALLBACK_MEMBER(md_base_state::genesis_int_callback)
+int md_base_state::genesis_int_callback(device_t &device, int irqline)
 {
 	if (irqline==4)
 	{

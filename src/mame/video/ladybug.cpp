@@ -92,7 +92,7 @@ void ladybug_state::palette_init_common( palette_device &palette, const uint8_t 
 }
 
 
-PALETTE_INIT_MEMBER(ladybug_state,ladybug)
+void ladybug_state::palette_init_ladybug(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	palette_init_common(palette, color_prom, 0, 5, 2, 6, 4, 7);
@@ -119,7 +119,7 @@ void ladybug_state::ladybug_flipscreen_w(address_space &space, offs_t offset, ui
 	}
 }
 
-TILE_GET_INFO_MEMBER(ladybug_state::get_bg_tile_info)
+void ladybug_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index] + 32 * (m_colorram[tile_index] & 0x08);
 	int color = m_colorram[tile_index] & 0x07;
@@ -127,7 +127,7 @@ TILE_GET_INFO_MEMBER(ladybug_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(ladybug_state::get_grid_tile_info)
+void ladybug_state::get_grid_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	if (tile_index < 512)
 		SET_TILE_INFO_MEMBER(3, tile_index, 0, 0);

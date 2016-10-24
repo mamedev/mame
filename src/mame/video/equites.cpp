@@ -18,7 +18,7 @@
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(equites_state,equites)
+void equites_state::palette_init_equites(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -36,7 +36,7 @@ PALETTE_INIT_MEMBER(equites_state,equites)
 		palette.set_pen_indirect(i + 0x100, color_prom[i]);
 }
 
-PALETTE_INIT_MEMBER(equites_state,splndrbt)
+void equites_state::palette_init_splndrbt(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -68,7 +68,7 @@ PALETTE_INIT_MEMBER(equites_state,splndrbt)
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(equites_state::equites_fg_info)
+void equites_state::equites_fg_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = m_fg_videoram[2 * tile_index];
 	int color = m_fg_videoram[2 * tile_index + 1] & 0x1f;
@@ -78,7 +78,7 @@ TILE_GET_INFO_MEMBER(equites_state::equites_fg_info)
 		tileinfo.flags |= TILE_FORCE_LAYER0;
 }
 
-TILE_GET_INFO_MEMBER(equites_state::splndrbt_fg_info)
+void equites_state::splndrbt_fg_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = m_fg_videoram[2 * tile_index] + (m_fg_char_bank << 8);
 	int color = m_fg_videoram[2 * tile_index + 1] & 0x3f;
@@ -88,7 +88,7 @@ TILE_GET_INFO_MEMBER(equites_state::splndrbt_fg_info)
 		tileinfo.flags |= TILE_FORCE_LAYER0;
 }
 
-TILE_GET_INFO_MEMBER(equites_state::equites_bg_info)
+void equites_state::equites_bg_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int data = m_bg_videoram[tile_index];
 	int tile = data & 0x1ff;
@@ -98,7 +98,7 @@ TILE_GET_INFO_MEMBER(equites_state::equites_bg_info)
 	SET_TILE_INFO_MEMBER(1, tile, color, TILE_FLIPXY(fxy));
 }
 
-TILE_GET_INFO_MEMBER(equites_state::splndrbt_bg_info)
+void equites_state::splndrbt_bg_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int data = m_bg_videoram[tile_index];
 	int tile = data & 0x1ff;

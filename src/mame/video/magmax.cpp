@@ -26,7 +26,7 @@ Additional tweaking by Jarek Burczynski
   bit 0 -- 2.2kohm resistor  -- RED/GREEN/BLUE
 
 ***************************************************************************/
-PALETTE_INIT_MEMBER(magmax_state, magmax)
+void magmax_state::palette_init_magmax(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;

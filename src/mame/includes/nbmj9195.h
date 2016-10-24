@@ -102,7 +102,7 @@ public:
 	void video_start__1layer();
 	void video_start_nb22090();
 
-	INTERRUPT_GEN_MEMBER(ctc0_trg1);
+	void ctc0_trg1(device_t &device);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	int blitter_r(int offset, int vram);

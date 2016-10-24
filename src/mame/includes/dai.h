@@ -63,10 +63,10 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(dai);
+	void palette_init_dai(palette_device &palette);
 	uint32_t screen_update_dai(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void dai_update_memory(int dai_rom_bank);
-	IRQ_CALLBACK_MEMBER(int_ack);
+	int int_ack(device_t &device, int irqline);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;

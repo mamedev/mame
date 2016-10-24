@@ -415,7 +415,7 @@ void leland_state::machine_reset_ataxx()
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(leland_state::leland_interrupt_callback)
+void leland_state::leland_interrupt_callback(void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -431,7 +431,7 @@ TIMER_CALLBACK_MEMBER(leland_state::leland_interrupt_callback)
 }
 
 
-TIMER_CALLBACK_MEMBER(leland_state::ataxx_interrupt_callback)
+void leland_state::ataxx_interrupt_callback(void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -443,7 +443,7 @@ TIMER_CALLBACK_MEMBER(leland_state::ataxx_interrupt_callback)
 }
 
 
-INTERRUPT_GEN_MEMBER(leland_state::leland_master_interrupt)
+void leland_state::leland_master_interrupt(device_t &device)
 {
 	/* check for coins here */
 	if ((ioport("IN1")->read() & 0x0e) != 0x0e)

@@ -71,13 +71,13 @@ public:
 	void pegasus_controls_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void pegasus_keyboard_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void pegasus_pcg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_READ_LINE_MEMBER(pegasus_keyboard_irq);
-	DECLARE_READ_LINE_MEMBER(pegasus_cassette_r);
-	DECLARE_WRITE_LINE_MEMBER(pegasus_cassette_w);
-	DECLARE_WRITE_LINE_MEMBER(pegasus_firq_clr);
+	int pegasus_keyboard_irq();
+	int pegasus_cassette_r();
+	void pegasus_cassette_w(int state);
+	void pegasus_firq_clr(int state);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void init_pegasus();
-	TIMER_DEVICE_CALLBACK_MEMBER(pegasus_firq);
+	void pegasus_firq(timer_device &timer, void *ptr, int32_t param);
 	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot, const char *reg_tag);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp00_load) { return load_cart(image, m_exp_00, "0000"); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp01_load) { return load_cart(image, m_exp_01, "1000"); }
@@ -107,12 +107,12 @@ private:
 	required_ioport_array<8> m_io_keyboard;
 };
 
-TIMER_DEVICE_CALLBACK_MEMBER(pegasus_state::pegasus_firq)
+void pegasus_state::pegasus_firq(timer_device &timer, void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 }
 
-WRITE_LINE_MEMBER( pegasus_state::pegasus_firq_clr )
+void pegasus_state::pegasus_firq_clr(int state)
 {
 	m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
 }
@@ -146,17 +146,17 @@ void pegasus_state::pegasus_controls_w(address_space &space, offs_t offset, uint
 	m_control_bits = data;
 }
 
-READ_LINE_MEMBER( pegasus_state::pegasus_keyboard_irq )
+int pegasus_state::pegasus_keyboard_irq()
 {
 	return m_kbd_irq;
 }
 
-READ_LINE_MEMBER( pegasus_state::pegasus_cassette_r )
+int pegasus_state::pegasus_cassette_r()
 {
 	return m_cass->input();
 }
 
-WRITE_LINE_MEMBER( pegasus_state::pegasus_cassette_w )
+void pegasus_state::pegasus_cassette_w(int state)
 {
 	m_cass->output(state ? 1 : -1);
 }

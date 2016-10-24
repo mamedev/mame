@@ -71,7 +71,7 @@ void electron_state::electron_tape_stop()
 #define TAPE_LOW    0x00;
 #define TAPE_HIGH   0xFF;
 
-TIMER_CALLBACK_MEMBER(electron_state::electron_tape_timer_handler)
+void electron_state::electron_tape_timer_handler(void *ptr, int32_t param)
 {
 	if ( m_ula.cassette_motor_mode )
 	{
@@ -356,7 +356,7 @@ void electron_state::electron_interrupt_handler(int mode, int interrupt)
    Machine Initialisation functions
 ***************************************/
 
-TIMER_CALLBACK_MEMBER(electron_state::setup_beep)
+void electron_state::setup_beep(void *ptr, int32_t param)
 {
 	m_beeper->set_state( 0 );
 	m_beeper->set_clock( 300 );

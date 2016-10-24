@@ -61,8 +61,8 @@ public:
 	void refresh_ints();
 	void nvram_init(nvram_device &nvram, void *base, size_t size);
 
-	DECLARE_WRITE_LINE_MEMBER( tc8521_alarm_int );
-	DECLARE_WRITE_LINE_MEMBER( com_interrupt );
+	void tc8521_alarm_int(int state);
+	void com_interrupt(int state);
 
 	uint8_t key_data_read_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void set_key_line_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -103,9 +103,9 @@ public:
 	uint8_t *             m_video_memory;
 	uint8_t               m_screen_column;
 	uint8_t               m_warm_start;
-	DECLARE_PALETTE_INIT(avigo);
-	TIMER_DEVICE_CALLBACK_MEMBER(avigo_scan_timer);
-	TIMER_DEVICE_CALLBACK_MEMBER(avigo_1hz_timer);
+	void palette_init_avigo(palette_device &palette);
+	void avigo_scan_timer(timer_device &timer, void *ptr, int32_t param);
+	void avigo_1hz_timer(timer_device &timer, void *ptr, int32_t param);
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER( avigo);
 };

@@ -452,7 +452,7 @@ void upd1771c_device::write(address_space &space, offs_t offset, uint8_t data, u
 }
 
 
-WRITE_LINE_MEMBER( upd1771c_device::pcm_write )
+void upd1771c_device::pcm_write(int state)
 {
 	//RESET upon HIGH
 	if (state != m_pc3)
@@ -466,7 +466,7 @@ WRITE_LINE_MEMBER( upd1771c_device::pcm_write )
 }
 
 
-TIMER_CALLBACK_MEMBER( upd1771c_device::ack_callback )
+void upd1771c_device::ack_callback(void *ptr, int32_t param)
 {
 	m_ack_handler(1);
 }

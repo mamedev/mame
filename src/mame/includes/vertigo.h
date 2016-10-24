@@ -122,10 +122,10 @@ public:
 	void vertigo_pit8254_lsb_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	INTERRUPT_GEN_MEMBER(vertigo_interrupt);
-	TIMER_CALLBACK_MEMBER(sound_command_w);
-	DECLARE_WRITE_LINE_MEMBER(v_irq4_w);
-	DECLARE_WRITE_LINE_MEMBER(v_irq3_w);
+	void vertigo_interrupt(device_t &device);
+	void sound_command_w(void *ptr, int32_t param);
+	void v_irq4_w(int state);
+	void v_irq3_w(int state);
 	TTL74148_OUTPUT_CB(update_irq);
 
 	void vertigo_vproc_init();

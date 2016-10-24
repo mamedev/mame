@@ -618,9 +618,9 @@ public:
 
 	uint16_t magic_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE_LINE_MEMBER(vsync_w);
-	DECLARE_WRITE_LINE_MEMBER(tc_w);
-	DECLARE_WRITE_LINE_MEMBER(hrq_w);
+	void vsync_w(int state);
+	void tc_w(int state);
+	void hrq_w(int state);
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_UPDATE_ROW(crtc_update_row_mono);
@@ -668,12 +668,12 @@ uint8_t fanucspmg_state::get_slave_ack(address_space &space, offs_t offset, uint
 	return 0x00;
 }
 
-WRITE_LINE_MEMBER(fanucspmg_state::tc_w)
+void fanucspmg_state::tc_w(int state)
 {
 	m_fdc->tc_w(state);
 }
 
-WRITE_LINE_MEMBER(fanucspmg_state::hrq_w)
+void fanucspmg_state::hrq_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state);
 	m_dmac->hlda_w(state);
@@ -735,7 +735,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(maincpu_io, AS_IO, 16, fanucspmg_state)
 ADDRESS_MAP_END
 
-WRITE_LINE_MEMBER(fanucspmg_state::vsync_w)
+void fanucspmg_state::vsync_w(int state)
 {
 	if ((m_vbl_ctrl & 0x08) == 0x08)
 	{

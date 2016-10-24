@@ -1212,7 +1212,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER( cinemat_state::synced_sound_w )
+void cinemat_state::synced_sound_w(void *ptr, int32_t param)
 {
 	m_sound_fifo[m_sound_fifo_in] = param;
 	m_sound_fifo_in = (m_sound_fifo_in + 1) % 16;

@@ -63,7 +63,7 @@ public:
 	void bd_w(address_space &space, offs_t offset, uint8_t data, int bmreq, int biorq, int aux_rom_cs, int cas1, int cas2);
 
 	// cartridge interface
-	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_write_irq(state); }
+	void irq_w(int state) { m_write_irq(state); }
 
 protected:
 	// device-level overrides

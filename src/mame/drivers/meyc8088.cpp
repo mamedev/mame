@@ -66,10 +66,10 @@ public:
 	void meyc8088_lights2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void meyc8088_common_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_PALETTE_INIT(meyc8088);
+	void palette_init_meyc8088(palette_device &palette);
 	uint32_t screen_update_meyc8088(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_meyc8088(screen_device &screen, bool state);
-	TIMER_DEVICE_CALLBACK_MEMBER(heartbeat_callback);
+	void heartbeat_callback(timer_device &timer, void *ptr, int32_t param);
 };
 
 
@@ -119,7 +119,7 @@ static const res_net_info meyc8088_net_info =
 	}
 };
 
-PALETTE_INIT_MEMBER(meyc8088_state, meyc8088)
+void meyc8088_state::palette_init_meyc8088(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	std::vector<rgb_t> rgb;
@@ -170,7 +170,7 @@ void meyc8088_state::screen_eof_meyc8088(screen_device &screen, bool state)
 
 ***************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(meyc8088_state::heartbeat_callback)
+void meyc8088_state::heartbeat_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	m_status |= 0x20;
 }

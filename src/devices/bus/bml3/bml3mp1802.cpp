@@ -27,7 +27,7 @@ static SLOT_INTERFACE_START( mp1802_floppies )
 	SLOT_INTERFACE("dd", FLOPPY_525_DD)
 SLOT_INTERFACE_END
 
-WRITE_LINE_MEMBER( bml3bus_mp1802_device::bml3_wd17xx_intrq_w )
+void bml3bus_mp1802_device::bml3_wd17xx_intrq_w(int state)
 {
 	if (state) {
 		m_bml3bus->set_nmi_line(PULSE_LINE);

@@ -247,25 +247,25 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(pc6001);
+	void palette_init_pc6001(palette_device &palette);
 	void machine_reset_pc6001m2();
-	DECLARE_PALETTE_INIT(pc6001m2);
+	void palette_init_pc6001m2(palette_device &palette);
 	void machine_reset_pc6001sr();
 	uint32_t screen_update_pc6001(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_pc6001m2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_pc6001sr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(pc6001_interrupt);
-	INTERRUPT_GEN_MEMBER(pc6001sr_interrupt);
-	TIMER_CALLBACK_MEMBER(audio_callback);
-	TIMER_DEVICE_CALLBACK_MEMBER(cassette_callback);
-	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
+	void pc6001_interrupt(device_t &device);
+	void pc6001sr_interrupt(device_t &device);
+	void audio_callback(void *ptr, int32_t param);
+	void cassette_callback(timer_device &timer, void *ptr, int32_t param);
+	void keyboard_callback(timer_device &timer, void *ptr, int32_t param);
 	uint8_t pc6001_8255_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void pc6001_8255_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t pc6001_8255_portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void pc6001_8255_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void pc6001_8255_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t pc6001_8255_portc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	IRQ_CALLBACK_MEMBER(pc6001_irq_callback);
+	int pc6001_irq_callback(device_t &device, int irqline);
 protected:
 	required_device<cpu_device> m_maincpu;
 	optional_device<cassette_image_device> m_cassette;
@@ -1366,7 +1366,7 @@ void pc6001_state::pc6001m2_0xf3_w(address_space &space, offs_t offset, uint8_t 
 	m_timer_irq_mask2 = data & 4;
 }
 
-TIMER_CALLBACK_MEMBER(pc6001_state::audio_callback)
+void pc6001_state::audio_callback(void *ptr, int32_t param)
 {
 	if(m_cas_switch == 0 && ((m_timer_irq_mask == 0) || (m_timer_irq_mask2 == 0)))
 	{
@@ -1842,7 +1842,7 @@ static INPUT_PORTS_START( pc6001 )
 	PORT_BIT(0x00000020,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("STOP") PORT_CODE(KEYCODE_ESC)
 INPUT_PORTS_END
 
-INTERRUPT_GEN_MEMBER(pc6001_state::pc6001_interrupt)
+void pc6001_state::pc6001_interrupt(device_t &device)
 {
 	m_cur_keycode = check_joy_press();
 	if(IRQ_LOG) printf("Stick IRQ called 0x16\n");
@@ -1850,7 +1850,7 @@ INTERRUPT_GEN_MEMBER(pc6001_state::pc6001_interrupt)
 	device.execute().set_input_line(0, ASSERT_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(pc6001_state::pc6001sr_interrupt)
+void pc6001_state::pc6001sr_interrupt(device_t &device)
 {
 	m_kludge^= 1;
 
@@ -1860,7 +1860,7 @@ INTERRUPT_GEN_MEMBER(pc6001_state::pc6001sr_interrupt)
 	device.execute().set_input_line(0, ASSERT_LINE);
 }
 
-IRQ_CALLBACK_MEMBER(pc6001_state::pc6001_irq_callback)
+int pc6001_state::pc6001_irq_callback(device_t &device, int irqline)
 {
 	device.execute().set_input_line(0, CLEAR_LINE);
 	return m_irq_vector;
@@ -1977,7 +1977,7 @@ uint8_t pc6001_state::check_joy_press()
 	return joy_press;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(pc6001_state::cassette_callback)
+void pc6001_state::cassette_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	if(m_cas_switch == 1)
 	{
@@ -2020,7 +2020,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(pc6001_state::cassette_callback)
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(pc6001_state::keyboard_callback)
+void pc6001_state::keyboard_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	uint32_t key1 = m_io_keys[0]->read();
 	uint32_t key2 = m_io_keys[1]->read();
@@ -2206,7 +2206,7 @@ static const rgb_t mk2_defcolors[] =
 	rgb_t(0xff, 0xff, 0xff)  /* WHITE */
 };
 
-PALETTE_INIT_MEMBER(pc6001_state, pc6001)
+void pc6001_state::palette_init_pc6001(palette_device &palette)
 {
 	int i;
 
@@ -2214,7 +2214,7 @@ PALETTE_INIT_MEMBER(pc6001_state, pc6001)
 		palette.set_pen_color(i+8,defcolors[i]);
 }
 
-PALETTE_INIT_MEMBER(pc6001_state,pc6001m2)
+void pc6001_state::palette_init_pc6001m2(palette_device &palette)
 {
 	int i;
 

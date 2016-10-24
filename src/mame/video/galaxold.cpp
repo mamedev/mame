@@ -45,7 +45,7 @@
   The RGB outputs have a 470 ohm pull-down each.
 
 ***************************************************************************/
-PALETTE_INIT_MEMBER(galaxold_state,galaxold)
+void galaxold_state::palette_init_galaxold(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i, len;
@@ -85,9 +85,9 @@ PALETTE_INIT_MEMBER(galaxold_state,galaxold)
 	palette.set_pen_color(BULLETS_COLOR_BASE+1,rgb_t(0xef,0xef,0xef));
 }
 
-PALETTE_INIT_MEMBER(galaxold_state,scrambold)
+void galaxold_state::palette_init_scrambold(palette_device &palette)
 {
-	PALETTE_INIT_NAME(galaxold)(palette);
+	palette_init_galaxold(palette);
 
 
 	/* blue background - 390 ohm resistor */
@@ -96,13 +96,13 @@ PALETTE_INIT_MEMBER(galaxold_state,scrambold)
 
 
 
-PALETTE_INIT_MEMBER(galaxold_state,stratgyx)
+void galaxold_state::palette_init_stratgyx(palette_device &palette)
 {
 	int base = BACKGROUND_COLOR_BASE;
 	int i;
 
 
-	PALETTE_INIT_NAME(galaxold)(palette);
+	palette_init_galaxold(palette);
 
 
 	/*  The background color generator is connected this way:
@@ -121,7 +121,7 @@ PALETTE_INIT_MEMBER(galaxold_state,stratgyx)
 	}
 }
 
-PALETTE_INIT_MEMBER(galaxold_state,rockclim)
+void galaxold_state::palette_init_rockclim(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i, len;
@@ -170,7 +170,7 @@ PALETTE_INIT_MEMBER(galaxold_state,rockclim)
   The RGB outputs have a 470 ohm pull-down each.
 
 ***************************************************************************/
-PALETTE_INIT_MEMBER(galaxold_state,darkplnt)
+void galaxold_state::palette_init_darkplnt(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -205,13 +205,13 @@ PALETTE_INIT_MEMBER(galaxold_state,darkplnt)
 	palette.set_pen_color(BULLETS_COLOR_BASE+1,rgb_t(0x00,0x00,0xef));
 }
 
-PALETTE_INIT_MEMBER(galaxold_state,minefld)
+void galaxold_state::palette_init_minefld(palette_device &palette)
 {
 	int base = BACKGROUND_COLOR_BASE;
 	int i;
 
 
-	PALETTE_INIT_NAME(galaxold)(palette);
+	palette_init_galaxold(palette);
 
 
 	/* set up background colors */
@@ -237,13 +237,13 @@ PALETTE_INIT_MEMBER(galaxold_state,minefld)
 	}
 }
 
-PALETTE_INIT_MEMBER(galaxold_state,rescue)
+void galaxold_state::palette_init_rescue(palette_device &palette)
 {
 	int base = BACKGROUND_COLOR_BASE;
 	int i;
 
 
-	PALETTE_INIT_NAME(galaxold)(palette);
+	palette_init_galaxold(palette);
 
 
 	/* set up background colors */
@@ -259,13 +259,13 @@ PALETTE_INIT_MEMBER(galaxold_state,rescue)
 	}
 }
 
-PALETTE_INIT_MEMBER(galaxold_state,mariner)
+void galaxold_state::palette_init_mariner(palette_device &palette)
 {
 	int base = BACKGROUND_COLOR_BASE;
 	int i;
 
 
-	PALETTE_INIT_NAME(galaxold)(palette);
+	palette_init_galaxold(palette);
 
 
 	/* set up background colors */
@@ -290,7 +290,7 @@ PALETTE_INIT_MEMBER(galaxold_state,mariner)
 }
 
 /* swapped r/g/b hook-up */
-PALETTE_INIT_MEMBER(galaxold_state,dambustr)
+void galaxold_state::palette_init_dambustr(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int base = BACKGROUND_COLOR_BASE;
@@ -349,13 +349,13 @@ PALETTE_INIT_MEMBER(galaxold_state,dambustr)
 }
 
 
-PALETTE_INIT_MEMBER(galaxold_state,turtles)
+void galaxold_state::palette_init_turtles(palette_device &palette)
 {
 	int base = BACKGROUND_COLOR_BASE;
 	int i;
 
 
-	PALETTE_INIT_NAME(galaxold)(palette);
+	palette_init_galaxold(palette);
 
 
 	/*  The background color generator is connected this way:
@@ -642,7 +642,7 @@ void galaxold_state::video_start_rockclim()
 	save_item(NAME(m_rockclim_h));
 }
 
-TILE_GET_INFO_MEMBER(galaxold_state::drivfrcg_get_tile_info)
+void galaxold_state::drivfrcg_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index];
 	uint8_t x = tile_index & 0x1f;
@@ -693,7 +693,7 @@ void galaxold_state::racknrol_tiles_bank_w(address_space &space, offs_t offset, 
 	m_bg_tilemap->mark_all_dirty();
 }
 
-TILE_GET_INFO_MEMBER(galaxold_state::racknrol_get_tile_info)
+void galaxold_state::racknrol_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index];
 	uint8_t x = tile_index & 0x1f;
@@ -719,7 +719,7 @@ void galaxold_state::video_start_racknrol()
 
 // Harem
 
-TILE_GET_INFO_MEMBER(galaxold_state::harem_get_tile_info)
+void galaxold_state::harem_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index];
 	uint8_t x = tile_index & 0x1f;
@@ -765,7 +765,7 @@ void galaxold_state::video_start_bongo()
 	m_modify_spritecode = &galaxold_state::batman2_modify_spritecode;
 }
 
-TILE_GET_INFO_MEMBER(galaxold_state::dambustr_get_tile_info2)
+void galaxold_state::dambustr_get_tile_info2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t x = tile_index & 0x1f;
 
@@ -1575,7 +1575,7 @@ void galaxold_state::mariner_draw_stars(bitmap_ind16 &bitmap, const rectangle &c
 	}
 }
 
-TIMER_CALLBACK_MEMBER(galaxold_state::stars_blink_callback)
+void galaxold_state::stars_blink_callback(void *ptr, int32_t param)
 {
 	m_stars_blink_state++;
 }
@@ -1590,7 +1590,7 @@ void galaxold_state::start_stars_blink_timer(double ra, double rb, double c)
 }
 
 
-TIMER_CALLBACK_MEMBER(galaxold_state::stars_scroll_callback)
+void galaxold_state::stars_scroll_callback(void *ptr, int32_t param)
 {
 	if (m_stars_on)
 	{
@@ -1605,7 +1605,7 @@ void galaxold_state::start_stars_scroll_timer()
 
 
 
-TILE_GET_INFO_MEMBER(galaxold_state::get_tile_info)
+void galaxold_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t x = tile_index & 0x1f;
 
@@ -1625,7 +1625,7 @@ TILE_GET_INFO_MEMBER(galaxold_state::get_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(galaxold_state::rockclim_get_tile_info)
+void galaxold_state::rockclim_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = m_rockclim_videoram[tile_index];
 	SET_TILE_INFO_MEMBER(2, code, 0, 0);

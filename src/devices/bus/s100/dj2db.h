@@ -37,9 +37,9 @@ public:
 	virtual ioport_constructor device_input_ports() const override;
 
 	// not really public
-	DECLARE_WRITE_LINE_MEMBER( fr_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
+	void fr_w(int state);
+	void fdc_intrq_w(int state);
+	void fdc_drq_w(int state);
 
 protected:
 	// device-level overrides

@@ -176,7 +176,7 @@ void metro_state::update_irq_state()
 
 
 /* For games that supply an *IRQ Vector* on the data bus */
-IRQ_CALLBACK_MEMBER(metro_state::metro_irq_callback)
+int metro_state::metro_irq_callback(device_t &device, int irqline)
 {
 	// logerror("%s: irq callback returns %04X\n", device.machine().describe_context(), m_irq_vectors[int_level]);
 	return m_irq_vectors[irqline] & 0xff;
@@ -217,20 +217,20 @@ void metro_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 	}
 }
 
-INTERRUPT_GEN_MEMBER(metro_state::metro_vblank_interrupt)
+void metro_state::metro_vblank_interrupt(device_t &device)
 {
 	m_requested_int[m_vblank_bit] = 1;
 	update_irq_state();
 }
 
-INTERRUPT_GEN_MEMBER(metro_state::metro_periodic_interrupt)
+void metro_state::metro_periodic_interrupt(device_t &device)
 {
 	m_requested_int[4] = 1;
 	update_irq_state();
 }
 
 /* lev 2-7 (lev 1 seems sound related) */
-INTERRUPT_GEN_MEMBER(metro_state::karatour_interrupt)
+void metro_state::karatour_interrupt(device_t &device)
 {
 	m_requested_int[m_vblank_bit] = 1;
 
@@ -248,7 +248,7 @@ void metro_state::mouja_irq_timer_ctrl_w(address_space &space, offs_t offset, ui
 	m_mouja_irq_timer->adjust(attotime::zero, 0, attotime::from_hz(freq));
 }
 
-INTERRUPT_GEN_MEMBER(metro_state::puzzlet_interrupt)
+void metro_state::puzzlet_interrupt(device_t &device)
 {
 	m_requested_int[m_vblank_bit] = 1;
 	m_requested_int[5] = 1;
@@ -264,7 +264,7 @@ INTERRUPT_GEN_MEMBER(metro_state::puzzlet_interrupt)
 
 ***************************************************************************/
 
-READ_LINE_MEMBER(metro_state::metro_rxd_r)
+int metro_state::metro_rxd_r()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	uint8_t data = m_soundlatch->read(space, 0);
@@ -543,7 +543,7 @@ uint16_t metro_state::metro_bankedrom_r(address_space &space, offs_t offset, uin
 
 ***************************************************************************/
 
-TIMER_CALLBACK_MEMBER(metro_state::metro_blit_done)
+void metro_state::metro_blit_done(void *ptr, int32_t param)
 {
 	m_requested_int[m_blitter_bit] = 1;
 	update_irq_state();
@@ -1715,8 +1715,8 @@ class puzzlet_io_device : public device_t {
 public:
 	puzzlet_io_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE_LINE_MEMBER( ce_w );
-	DECLARE_WRITE_LINE_MEMBER( clk_w );
+	void ce_w(int state);
+	void clk_w(int state);
 
 	template<class _Object> static devcb_base &set_data_cb(device_t &device, _Object object) { return downcast<puzzlet_io_device &>(device).data_cb.set_callback(object); }
 
@@ -1759,7 +1759,7 @@ void puzzlet_io_device::device_reset()
 	value = 0xff;
 }
 
-WRITE_LINE_MEMBER(puzzlet_io_device::ce_w)
+void puzzlet_io_device::ce_w(int state)
 {
 	if(ce && !state) {
 		value = port->read();
@@ -1770,7 +1770,7 @@ WRITE_LINE_MEMBER(puzzlet_io_device::ce_w)
 	ce = state;
 }
 
-WRITE_LINE_MEMBER(puzzlet_io_device::clk_w)
+void puzzlet_io_device::clk_w(int state)
 {
 	if(clk && !state) {
 		if(cur_bit == 8)

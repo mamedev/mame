@@ -21,7 +21,7 @@ uint8_t ladyfrog_state::ladyfrog_spriteram_r(address_space &space, offs_t offset
 	return m_spriteram[offset];
 }
 
-TILE_GET_INFO_MEMBER(ladyfrog_state::get_tile_info)
+void ladyfrog_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int pal = m_videoram[tile_index * 2 + 1] & 0x0f;
 	int tile = m_videoram[tile_index * 2] + ((m_videoram[tile_index * 2 + 1] & 0xc0) << 2)+ ((m_videoram[tile_index * 2 + 1] & 0x30) << 6);

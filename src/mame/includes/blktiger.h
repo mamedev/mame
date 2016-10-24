@@ -60,10 +60,10 @@ public:
 	void blktiger_video_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void blktiger_video_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void blktiger_screen_layout_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	TILEMAP_MAPPER_MEMBER(bg8x4_scan);
-	TILEMAP_MAPPER_MEMBER(bg4x8_scan);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_tx_tile_info);
+	tilemap_memory_index bg8x4_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	tilemap_memory_index bg4x8_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

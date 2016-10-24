@@ -13,7 +13,7 @@ ToDo: Fix Sprites & Rowscroll/Select for Cocktail
 #include "emu.h"
 #include "includes/mcatadv.h"
 
-TILE_GET_INFO_MEMBER(mcatadv_state::get_mcatadv_tile_info1)
+void mcatadv_state::get_mcatadv_tile_info1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno = m_videoram1[tile_index * 2 + 1];
 	int colour = (m_videoram1[tile_index * 2] & 0x3f00) >> 8;
@@ -31,7 +31,7 @@ void mcatadv_state::mcatadv_videoram1_w(address_space &space, offs_t offset, uin
 	m_tilemap1->mark_tile_dirty(offset / 2);
 }
 
-TILE_GET_INFO_MEMBER(mcatadv_state::get_mcatadv_tile_info2)
+void mcatadv_state::get_mcatadv_tile_info2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno = m_videoram2[tile_index * 2 + 1];
 	int colour = (m_videoram2[tile_index * 2] & 0x3f00) >> 8;

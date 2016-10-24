@@ -74,7 +74,7 @@ public:
 	void mc10_port2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t mc6847_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void init_mc10();
-	TIMER_DEVICE_CALLBACK_MEMBER(alice32_scanline);
+	void alice32_scanline(timer_device &timer, void *ptr, int32_t param);
 };
 
 
@@ -223,7 +223,7 @@ uint8_t mc10_state::mc6847_videoram_r(address_space &space, offs_t offset, uint8
 	return m_ram_base[offset];
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(mc10_state::alice32_scanline)
+void mc10_state::alice32_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	m_ef9345->update_scanline((uint16_t)param);
 }

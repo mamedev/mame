@@ -78,7 +78,7 @@ const tiny_rom_entry *mc1502_fdc_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-TIMER_CALLBACK_MEMBER(mc1502_fdc_device::motor_callback)
+void mc1502_fdc_device::motor_callback(void *ptr, int32_t param)
 {
 	m_fdc->subdevice<floppy_connector>("0")->get_device()->mon_w(ASSERT_LINE);
 	m_fdc->subdevice<floppy_connector>("1")->get_device()->mon_w(ASSERT_LINE);
@@ -141,7 +141,7 @@ uint8_t mc1502_fdc_device::mc1502_wd17xx_motor_r()
 	return motor_on;
 }
 
-WRITE_LINE_MEMBER( mc1502_fdc_device::mc1502_fdc_irq_drq )
+void mc1502_fdc_device::mc1502_fdc_irq_drq(int state)
 {
 	cpu_device *maincpu = machine().device<cpu_device>("maincpu");
 

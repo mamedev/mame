@@ -73,7 +73,7 @@ public:
 	//void henry_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t henry_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void init_hprot1();
-	DECLARE_PALETTE_INIT(hprot1);
+	void palette_init_hprot1(palette_device &palette);
 	HD44780_PIXEL_UPDATE(hprot1_pixel_update);
 private:
 	virtual void machine_start() override;
@@ -264,7 +264,7 @@ void hprot1_state::henry_io_w(address_space &space, offs_t offset, uint8_t data,
 }
 */
 
-PALETTE_INIT_MEMBER(hprot1_state, hprot1)
+void hprot1_state::palette_init_hprot1(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));

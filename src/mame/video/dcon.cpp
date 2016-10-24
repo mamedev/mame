@@ -44,7 +44,7 @@ void dcon_state::text_w(address_space &space, offs_t offset, uint16_t data, uint
 	m_text_layer->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(dcon_state::get_back_tile_info)
+void dcon_state::get_back_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile=m_back_data[tile_index];
 	int color=(tile>>12)&0xf;
@@ -57,7 +57,7 @@ TILE_GET_INFO_MEMBER(dcon_state::get_back_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(dcon_state::get_fore_tile_info)
+void dcon_state::get_fore_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile=m_fore_data[tile_index];
 	int color=(tile>>12)&0xf;
@@ -70,7 +70,7 @@ TILE_GET_INFO_MEMBER(dcon_state::get_fore_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(dcon_state::get_mid_tile_info)
+void dcon_state::get_mid_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile=m_mid_data[tile_index];
 	int color=(tile>>12)&0xf;
@@ -83,7 +83,7 @@ TILE_GET_INFO_MEMBER(dcon_state::get_mid_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(dcon_state::get_text_tile_info)
+void dcon_state::get_text_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = m_textram[tile_index];
 	int color=(tile>>12)&0xf;

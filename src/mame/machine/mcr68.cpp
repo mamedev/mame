@@ -134,7 +134,7 @@ void mcr68_state::machine_reset_zwackery()
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(mcr68_state::mcr68_interrupt)
+void mcr68_state::mcr68_interrupt(device_t &device)
 {
 	/* update the 6840 VBLANK clock */
 	if (!m_m6840_state[0].timer_active)
@@ -163,14 +163,14 @@ void mcr68_state::update_mcr68_interrupts()
 }
 
 
-TIMER_CALLBACK_MEMBER(mcr68_state::mcr68_493_off_callback)
+void mcr68_state::mcr68_493_off_callback(void *ptr, int32_t param)
 {
 	m_v493_irq_state = 0;
 	update_mcr68_interrupts();
 }
 
 
-TIMER_CALLBACK_MEMBER(mcr68_state::mcr68_493_callback)
+void mcr68_state::mcr68_493_callback(void *ptr, int32_t param)
 {
 	m_v493_irq_state = 1;
 	update_mcr68_interrupts();
@@ -203,14 +203,14 @@ void mcr68_state::zwackery_pia1_w(address_space &space, offs_t offset, uint8_t d
 }
 
 
-WRITE_LINE_MEMBER(mcr68_state::zwackery_ca2_w)
+void mcr68_state::zwackery_ca2_w(int state)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	m_chip_squeak_deluxe->write(space, 0, (state << 4) | m_zwackery_sound_data);
 }
 
 
-WRITE_LINE_MEMBER(mcr68_state::zwackery_pia_irq)
+void mcr68_state::zwackery_pia_irq(int state)
 {
 	pia6821_device *pia = machine().device<pia6821_device>("pia0");
 	m_v493_irq_state = pia->irq_a_state() | pia->irq_b_state();
@@ -218,14 +218,14 @@ WRITE_LINE_MEMBER(mcr68_state::zwackery_pia_irq)
 }
 
 
-TIMER_CALLBACK_MEMBER(mcr68_state::zwackery_493_off_callback)
+void mcr68_state::zwackery_493_off_callback(void *ptr, int32_t param)
 {
 	pia6821_device *pia = machine().device<pia6821_device>("pia0");
 	pia->ca1_w(0);
 }
 
 
-TIMER_CALLBACK_MEMBER(mcr68_state::zwackery_493_callback)
+void mcr68_state::zwackery_493_callback(void *ptr, int32_t param)
 {
 	pia6821_device *pia = machine().device<pia6821_device>("pia0");
 
@@ -316,7 +316,7 @@ void mcr68_state::subtract_from_counter(int counter, int count)
 }
 
 
-TIMER_CALLBACK_MEMBER(mcr68_state::counter_fired_callback)
+void mcr68_state::counter_fired_callback(void *ptr, int32_t param)
 {
 	int count = param >> 2;
 	int counter = param & 3;

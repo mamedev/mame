@@ -262,7 +262,7 @@ void nycaptor_state::machine_reset_ta7630()
 	}
 }
 
-TIMER_CALLBACK_MEMBER(nycaptor_state::nmi_callback)
+void nycaptor_state::nmi_callback(void *ptr, int32_t param)
 {
 	if (m_sound_nmi_enable)
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);

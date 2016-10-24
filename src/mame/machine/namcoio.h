@@ -24,8 +24,8 @@ public:
 	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	WRITE_LINE_MEMBER( set_reset_line );
-	READ_LINE_MEMBER( read_reset_line );
+	void set_reset_line(int state);
+	int read_reset_line();
 
 protected:
 	// device-level overrides

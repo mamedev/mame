@@ -44,9 +44,9 @@ public:
 	void gotcha_gfxbank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void gotcha_scroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void gotcha_oki_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	TILEMAP_MAPPER_MEMBER(gotcha_tilemap_scan);
-	TILE_GET_INFO_MEMBER(fg_get_tile_info);
-	TILE_GET_INFO_MEMBER(bg_get_tile_info);
+	tilemap_memory_index gotcha_tilemap_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	void fg_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void bg_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

@@ -54,7 +54,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	TILE_GET_INFO_MEMBER(get_tile_info);
+	void get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 };
 
 
@@ -64,7 +64,7 @@ public:
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(headonb_state::get_tile_info)
+void headonb_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t code = m_video_ram[tile_index];
 	SET_TILE_INFO_MEMBER(0, code, 0, 0);

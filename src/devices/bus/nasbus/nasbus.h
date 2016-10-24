@@ -167,7 +167,7 @@ public:
 	void set_io_space(address_space *io);
 
 	// from cards
-	DECLARE_WRITE_LINE_MEMBER( ram_disable_w );
+	void ram_disable_w(int state);
 
 	address_space *m_program;
 	address_space *m_io;

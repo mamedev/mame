@@ -2300,13 +2300,13 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-INTERRUPT_GEN_MEMBER(seta2_state::seta2_interrupt)
+void seta2_state::seta2_interrupt(device_t &device)
 {
 	/* VBlank is connected to INT0 (external interrupts pin 0) */
 	m_tmp68301->external_interrupt_0();
 }
 
-INTERRUPT_GEN_MEMBER(seta2_state::samshoot_interrupt)
+void seta2_state::samshoot_interrupt(device_t &device)
 {
 	m_tmp68301->external_interrupt_2();   // to do: hook up x1-10 interrupts
 }
@@ -2473,7 +2473,7 @@ MACHINE_CONFIG_END
                                Funcube series
 ***************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(seta2_state::funcube_interrupt)
+void seta2_state::funcube_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

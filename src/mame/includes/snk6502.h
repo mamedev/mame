@@ -60,27 +60,27 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(sasuke_count_r);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	TILE_GET_INFO_MEMBER(satansat_get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(satansat_get_fg_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void satansat_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void satansat_get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	virtual void machine_start() override;
 	void machine_reset_sasuke();
 	void video_start_satansat();
-	DECLARE_PALETTE_INIT(satansat);
+	void palette_init_satansat(palette_device &palette);
 	void machine_reset_vanguard();
 	void video_start_snk6502();
-	DECLARE_PALETTE_INIT(snk6502);
+	void palette_init_snk6502(palette_device &palette);
 	void machine_reset_satansat();
 	void machine_reset_pballoon();
 	void video_start_pballoon();
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	INTERRUPT_GEN_MEMBER(satansat_interrupt);
-	INTERRUPT_GEN_MEMBER(snk6502_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(sasuke_update_counter);
+	void satansat_interrupt(device_t &device);
+	void snk6502_interrupt(device_t &device);
+	void sasuke_update_counter(timer_device &timer, void *ptr, int32_t param);
 
 	void sasuke_start_counter();
 	void postload();

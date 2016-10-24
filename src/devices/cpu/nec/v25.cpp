@@ -82,7 +82,7 @@ v35_device::v35_device(const machine_config &mconfig, const char *tag, device_t 
 }
 
 
-TIMER_CALLBACK_MEMBER(v25_common_device::v25_timer_callback)
+void v25_common_device::v25_timer_callback(void *ptr, int32_t param)
 {
 	m_pending_irq |= param;
 }

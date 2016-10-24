@@ -170,11 +170,11 @@ public:
 	void init_saklove();
 	void init_xplan();
 	void init_ptrain();
-	TILE_GET_INFO_MEMBER(ss9601_get_tile_info_0);
-	TILE_GET_INFO_MEMBER(ss9601_get_tile_info_1);
+	void ss9601_get_tile_info_0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void ss9601_get_tile_info_1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void video_start_subsino2();
 	uint32_t screen_update_subsino2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(am188em_int0_irq);
+	void am188em_int0_irq(device_t &device);
 	required_device<cpu_device> m_maincpu;
 	optional_device<okim6295_device> m_oki;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -206,13 +206,13 @@ inline void subsino2_state::ss9601_get_tile_info(layer_t *l, tile_data &tileinfo
 }
 
 // Layer 0
-TILE_GET_INFO_MEMBER(subsino2_state::ss9601_get_tile_info_0)
+void subsino2_state::ss9601_get_tile_info_0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	ss9601_get_tile_info(&m_layers[0], tileinfo, tile_index);
 }
 
 // Layer 1
-TILE_GET_INFO_MEMBER(subsino2_state::ss9601_get_tile_info_1)
+void subsino2_state::ss9601_get_tile_info_1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	ss9601_get_tile_info(&m_layers[1], tileinfo, tile_index);
 }
@@ -855,7 +855,7 @@ void subsino2_state::oki_bank_bit4_w(address_space &space, offs_t offset, uint8_
 	m_oki->set_rom_bank((data >> 4) & 1);
 }
 
-INTERRUPT_GEN_MEMBER(subsino2_state::am188em_int0_irq)
+void subsino2_state::am188em_int0_irq(device_t &device)
 {
 	downcast<i80186_cpu_device *>(m_maincpu.target())->int0_w(1);
 }

@@ -101,7 +101,7 @@ public:
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(progolf);
+	void palette_init_progolf(palette_device &palette);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
@@ -392,7 +392,7 @@ static GFXDECODE_START( progolf )
 GFXDECODE_END
 
 
-PALETTE_INIT_MEMBER(progolf_state, progolf)
+void progolf_state::palette_init_progolf(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;

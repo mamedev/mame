@@ -67,7 +67,7 @@ private:
 	virtual void tra_callback() override;    // Tx send bit
 	void input_callback(uint8_t state);
 
-	TIMER_CALLBACK_MEMBER( kbd_scan_timer );
+	void kbd_scan_timer(void *ptr, int32_t param);
 
 	const char *cpu_context() ;
 	template <typename Format, typename... Params>
@@ -95,7 +95,7 @@ private:
 		void on();
 	private:
 		int keyboard_has_beeper();
-		TIMER_CALLBACK_MEMBER(beeper_callback);
+		void beeper_callback(void *ptr, int32_t param);
 
 		apollo_kbd_device *m_device; // pointer back to our device
 		beep_device *m_beeper; // the keyboard beeper device

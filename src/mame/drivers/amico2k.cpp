@@ -55,7 +55,7 @@ public:
 
 	// timers
 	emu_timer *m_led_refresh_timer;
-	TIMER_CALLBACK_MEMBER(led_refresh);
+	void led_refresh(void *ptr, int32_t param);
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -102,7 +102,7 @@ static INPUT_PORTS_START( amico2k )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-TIMER_CALLBACK_MEMBER(amico2k_state::led_refresh)
+void amico2k_state::led_refresh(void *ptr, int32_t param)
 {
 	if (m_ls145_p > 3)
 	{

@@ -18,7 +18,7 @@
  *
  *************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(mhavoc_state::mhavoc_cpu_irq_clock)
+void mhavoc_state::mhavoc_cpu_irq_clock(timer_device &timer, void *ptr, int32_t param)
 {
 	/* clock the LS161 driving the alpha CPU IRQ */
 	if (m_alpha_irq_clock_enable)
@@ -121,7 +121,7 @@ void mhavoc_state::machine_reset()
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(mhavoc_state::delayed_gamma_w)
+void mhavoc_state::delayed_gamma_w(void *ptr, int32_t param)
 {
 	/* mark the data received */
 	m_gamma_rcvd = 0;

@@ -88,10 +88,10 @@ public:
 	void macrossp_text_videoram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	void init_quizmoon();
 	void init_macrossp();
-	TILE_GET_INFO_MEMBER(get_macrossp_scra_tile_info);
-	TILE_GET_INFO_MEMBER(get_macrossp_scrb_tile_info);
-	TILE_GET_INFO_MEMBER(get_macrossp_scrc_tile_info);
-	TILE_GET_INFO_MEMBER(get_macrossp_text_tile_info);
+	void get_macrossp_scra_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_macrossp_scrb_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_macrossp_scrc_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_macrossp_text_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -99,5 +99,5 @@ public:
 	void screen_eof_macrossp(screen_device &screen, bool state);
 	void draw_sprites(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_layer(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int layer, int linem, int pri);
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+	void irqhandler(int state);
 };

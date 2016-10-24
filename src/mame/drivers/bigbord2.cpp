@@ -111,12 +111,12 @@ public:
 	uint8_t portc4_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t portd0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(clock_w);
-	DECLARE_WRITE_LINE_MEMBER(busreq_w);
-	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
-	DECLARE_WRITE_LINE_MEMBER(sio_wrdya_w);
-	DECLARE_WRITE_LINE_MEMBER(sio_wrdyb_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
+	void clock_w(int state);
+	void busreq_w(int state);
+	void ctc_z1_w(int state);
+	void sio_wrdya_w(int state);
+	void sio_wrdyb_w(int state);
+	void fdc_drq_w(int state);
 	void init_bigbord2();
 	uint8_t memory_read_byte(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void memory_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -198,17 +198,17 @@ void bigbord2_state::kbd_put(address_space &space, offs_t offset, uint8_t data, 
 	}
 }
 
-WRITE_LINE_MEMBER( bigbord2_state::sio_wrdya_w )
+void bigbord2_state::sio_wrdya_w(int state)
 {
 	m_cc[0] = state;
 }
 
-WRITE_LINE_MEMBER( bigbord2_state::sio_wrdyb_w )
+void bigbord2_state::sio_wrdyb_w(int state)
 {
 	m_cc[1] = state;
 }
 
-WRITE_LINE_MEMBER( bigbord2_state::fdc_drq_w )
+void bigbord2_state::fdc_drq_w(int state)
 {
 	m_cc[2] = state;
 }
@@ -217,7 +217,7 @@ WRITE_LINE_MEMBER( bigbord2_state::fdc_drq_w )
 /* Z80 DMA */
 
 
-WRITE_LINE_MEMBER( bigbord2_state::busreq_w )
+void bigbord2_state::busreq_w(int state)
 {
 // since our Z80 has no support for BUSACK, we assume it is granted immediately
 	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, state);
@@ -402,7 +402,7 @@ INPUT_PORTS_END
 
 /* Z80 CTC */
 
-WRITE_LINE_MEMBER( bigbord2_state::clock_w )
+void bigbord2_state::clock_w(int state)
 {
 	m_ctc2->trg0(state);
 	m_ctc2->trg1(state);
@@ -411,7 +411,7 @@ WRITE_LINE_MEMBER( bigbord2_state::clock_w )
 }
 
 // there's a multitude of optional jumpers in this area, but this will do
-WRITE_LINE_MEMBER( bigbord2_state::ctc_z1_w )
+void bigbord2_state::ctc_z1_w(int state)
 {
 	m_sio->rxca_w(state);
 	m_sio->txca_w(state);

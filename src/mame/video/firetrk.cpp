@@ -12,7 +12,7 @@ Atari Fire Truck + Super Bug + Monte Carlo video emulation
 static const rectangle playfield_window(0x02a, 0x115, 0x000, 0x0ff);
 
 
-PALETTE_INIT_MEMBER(firetrk_state, firetrk)
+void firetrk_state::palette_init_firetrk(palette_device &palette)
 {
 	int i;
 
@@ -56,7 +56,7 @@ void firetrk_state::prom_to_palette(int number, uint8_t val)
 }
 
 
-PALETTE_INIT_MEMBER(firetrk_state,montecar)
+void firetrk_state::palette_init_montecar(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -113,7 +113,7 @@ PALETTE_INIT_MEMBER(firetrk_state,montecar)
 }
 
 
-TILE_GET_INFO_MEMBER(firetrk_state::firetrk_get_tile_info1)
+void firetrk_state::firetrk_get_tile_info1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_playfield_ram[tile_index] & 0x3f;
 	int color = (m_playfield_ram[tile_index] >> 6) & 0x03;
@@ -128,7 +128,7 @@ TILE_GET_INFO_MEMBER(firetrk_state::firetrk_get_tile_info1)
 }
 
 
-TILE_GET_INFO_MEMBER(firetrk_state::superbug_get_tile_info1)
+void firetrk_state::superbug_get_tile_info1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_playfield_ram[tile_index] & 0x3f;
 	int color = (m_playfield_ram[tile_index] >> 6) & 0x03;
@@ -143,7 +143,7 @@ TILE_GET_INFO_MEMBER(firetrk_state::superbug_get_tile_info1)
 }
 
 
-TILE_GET_INFO_MEMBER(firetrk_state::montecar_get_tile_info1)
+void firetrk_state::montecar_get_tile_info1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_playfield_ram[tile_index] & 0x3f;
 	int color = (m_playfield_ram[tile_index] >> 6) & 0x03;
@@ -155,7 +155,7 @@ TILE_GET_INFO_MEMBER(firetrk_state::montecar_get_tile_info1)
 }
 
 
-TILE_GET_INFO_MEMBER(firetrk_state::firetrk_get_tile_info2)
+void firetrk_state::firetrk_get_tile_info2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t code = m_playfield_ram[tile_index] & 0x3f;
 	int color = 0;
@@ -171,7 +171,7 @@ TILE_GET_INFO_MEMBER(firetrk_state::firetrk_get_tile_info2)
 }
 
 
-TILE_GET_INFO_MEMBER(firetrk_state::superbug_get_tile_info2)
+void firetrk_state::superbug_get_tile_info2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t code = m_playfield_ram[tile_index] & 0x3f;
 	int color = 0;
@@ -187,7 +187,7 @@ TILE_GET_INFO_MEMBER(firetrk_state::superbug_get_tile_info2)
 }
 
 
-TILE_GET_INFO_MEMBER(firetrk_state::montecar_get_tile_info2)
+void firetrk_state::montecar_get_tile_info2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t code = m_playfield_ram[tile_index];
 	int color = 0;

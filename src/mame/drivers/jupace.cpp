@@ -108,8 +108,8 @@ public:
 	uint8_t pio_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void pio_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(set_irq);
-	TIMER_DEVICE_CALLBACK_MEMBER(clear_irq);
+	void set_irq(timer_device &timer, void *ptr, int32_t param);
+	void clear_irq(timer_device &timer, void *ptr, int32_t param);
 	uint8_t pio_ad_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t pio_bd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t pio_ac_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
@@ -550,20 +550,20 @@ GFXDECODE_END
 
 
 //-------------------------------------------------
-//  TIMER_DEVICE_CALLBACK_MEMBER( set_irq )
+//  void set_irq(timer_device &timer, void *ptr, int32_t param)
 //-------------------------------------------------
 
-TIMER_DEVICE_CALLBACK_MEMBER(ace_state::set_irq)
+void ace_state::set_irq(timer_device &timer, void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
 
 //-------------------------------------------------
-//  TIMER_DEVICE_CALLBACK_MEMBER( clear_irq )
+//  void clear_irq(timer_device &timer, void *ptr, int32_t param)
 //-------------------------------------------------
 
-TIMER_DEVICE_CALLBACK_MEMBER(ace_state::clear_irq)
+void ace_state::clear_irq(timer_device &timer, void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 }

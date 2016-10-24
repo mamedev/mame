@@ -61,11 +61,11 @@ public:
 	{
 	}
 
-	DECLARE_WRITE_LINE_MEMBER(sio0_sck){ m_cat702_1->write_clock(state);  m_cat702_2->write_clock(state); m_zndip->write_clock(state); }
-	DECLARE_WRITE_LINE_MEMBER(sio0_txd){ m_cat702_1->write_datain(state);  m_cat702_2->write_datain(state); }
-	DECLARE_WRITE_LINE_MEMBER(cat702_1_dataout){ m_cat702_1_dataout = state; update_sio0_rxd(); }
-	DECLARE_WRITE_LINE_MEMBER(cat702_2_dataout){ m_cat702_2_dataout = state; update_sio0_rxd(); }
-	DECLARE_WRITE_LINE_MEMBER(zndip_dataout){ m_zndip_dataout = state; update_sio0_rxd(); }
+	void sio0_sck(int state){ m_cat702_1->write_clock(state);  m_cat702_2->write_clock(state); m_zndip->write_clock(state); }
+	void sio0_txd(int state){ m_cat702_1->write_datain(state);  m_cat702_2->write_datain(state); }
+	void cat702_1_dataout(int state){ m_cat702_1_dataout = state; update_sio0_rxd(); }
+	void cat702_2_dataout(int state){ m_cat702_2_dataout = state; update_sio0_rxd(); }
+	void zndip_dataout(int state){ m_zndip_dataout = state; update_sio0_rxd(); }
 	void update_sio0_rxd() { m_sio0->write_rxd( m_cat702_1_dataout && m_cat702_2_dataout && m_zndip_dataout ); }
 	DECLARE_CUSTOM_INPUT_MEMBER(jdredd_gun_mux_read);
 	uint8_t znsecsel_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
@@ -115,7 +115,7 @@ public:
 	void machine_reset_coh1001l();
 	void machine_reset_coh1002v();
 	void machine_reset_coh1002m();
-	INTERRUPT_GEN_MEMBER(qsound_interrupt);
+	void qsound_interrupt(device_t &device);
 	void atpsx_dma_read(uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
 	void atpsx_dma_write(uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
 	void jdredd_vblank(screen_device &screen, bool vblank_state);
@@ -493,7 +493,7 @@ void zn_state::qsound_bankswitch_w(address_space &space, offs_t offset, uint8_t 
 	membank( "bank10" )->set_base( memregion( "audiocpu" )->base() + 0x10000 + ( ( data & 0x0f ) * 0x4000 ) );
 }
 
-INTERRUPT_GEN_MEMBER(zn_state::qsound_interrupt)
+void zn_state::qsound_interrupt(device_t &device)
 {
 	device.execute().set_input_line(0, HOLD_LINE);
 }

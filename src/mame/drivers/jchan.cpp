@@ -218,7 +218,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(vblank);
+	void vblank(timer_device &timer, void *ptr, int32_t param);
 };
 
 
@@ -237,7 +237,7 @@ public:
 //  if it is incorrect jchan2 will crash when
 //  certain characters win/lose but no finish
 //  move was performed
-TIMER_DEVICE_CALLBACK_MEMBER(jchan_state::vblank)
+void jchan_state::vblank(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

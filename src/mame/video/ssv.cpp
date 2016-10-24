@@ -212,7 +212,7 @@ void ssv_state::video_start_eaglshot()
 	save_pointer(NAME(m_eaglshot_gfxram.get()), 16 * 0x40000 / 2);
 }
 
-TILE_GET_INFO_MEMBER(ssv_state::get_tile_info_0)
+void ssv_state::get_tile_info_0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t tile = m_gdfs_tmapram[tile_index];
 

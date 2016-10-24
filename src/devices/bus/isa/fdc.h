@@ -30,8 +30,8 @@ public:
 
 	required_device<pc_fdc_interface> fdc;
 
-	DECLARE_WRITE_LINE_MEMBER( irq_w );
-	DECLARE_WRITE_LINE_MEMBER( drq_w );
+	void irq_w(int state);
+	void drq_w(int state);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 protected:

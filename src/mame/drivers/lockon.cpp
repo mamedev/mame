@@ -416,7 +416,7 @@ void lockon_state::sound_vol(address_space &space, offs_t offset, uint8_t data, 
 	m_f2203_3r->flt_volume_set_volume(rgain);
 }
 
-WRITE_LINE_MEMBER(lockon_state::ym2203_irq)
+void lockon_state::ym2203_irq(int state)
 {
 	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE );
 }

@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "includes/rockrage.h"
 
-PALETTE_INIT_MEMBER(rockrage_state, rockrage)
+void rockrage_state::palette_init_rockrage(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 

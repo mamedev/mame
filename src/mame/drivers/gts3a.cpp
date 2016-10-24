@@ -43,10 +43,10 @@ public:
 	void u4b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t dmd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void dmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(nmi_w);
+	void nmi_w(int state);
 	DECLARE_INPUT_CHANGED_MEMBER(test_inp);
 	MC6845_UPDATE_ROW(crtc_update_row);
-	DECLARE_PALETTE_INIT(gts3a);
+	void palette_init_gts3a(palette_device &palette);
 	required_device<palette_device> m_palette;
 private:
 	bool m_dispclk;
@@ -218,7 +218,7 @@ INPUT_CHANGED_MEMBER( gts3a_state::test_inp )
 }
 
 // This trampoline needed; DEVWRITELINE("maincpu", m65c02_device, nmi_line) does not work
-WRITE_LINE_MEMBER( gts3a_state::nmi_w )
+void gts3a_state::nmi_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, (state) ? CLEAR_LINE : HOLD_LINE);
 }
@@ -296,7 +296,7 @@ void gts3a_state::dmd_w(address_space &space, offs_t offset, uint8_t data, uint8
 	membank("bank1")->set_entry(data & 0x1f);
 }
 
-PALETTE_INIT_MEMBER( gts3a_state, gts3a )
+void gts3a_state::palette_init_gts3a(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(0x00, 0x00, 0x00));
 	palette.set_pen_color(1, rgb_t(0xf7, 0x00, 0x00));

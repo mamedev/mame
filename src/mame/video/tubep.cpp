@@ -133,7 +133,7 @@
 ***************************************************************************/
 
 
-PALETTE_INIT_MEMBER(tubep_state,tubep)
+void tubep_state::palette_init_tubep(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i,r,g,b;
@@ -674,7 +674,7 @@ uint32_t tubep_state::screen_update_tubep(screen_device &screen, bitmap_ind16 &b
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(tubep_state,rjammer)
+void tubep_state::palette_init_rjammer(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;

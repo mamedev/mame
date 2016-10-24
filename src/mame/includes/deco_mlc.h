@@ -68,7 +68,7 @@ public:
 	void video_start_mlc();
 	uint32_t screen_update_mlc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_eof_mlc(screen_device &screen, bool state);
-	TIMER_DEVICE_CALLBACK_MEMBER(interrupt_gen);
+	void interrupt_gen(timer_device &timer, void *ptr, int32_t param);
 	void draw_sprites( const rectangle &cliprect, int scanline, uint32_t* dest);
 	void descramble_sound(  );
 	required_device<cpu_device> m_maincpu;

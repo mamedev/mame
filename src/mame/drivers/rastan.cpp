@@ -169,7 +169,7 @@ void rastan_state::rastan_bankswitch_w(address_space &space, offs_t offset, uint
 }
 
 
-WRITE_LINE_MEMBER(rastan_state::rastan_msm5205_vck)
+void rastan_state::rastan_msm5205_vck(int state)
 {
 	if (m_adpcm_data != -1)
 	{

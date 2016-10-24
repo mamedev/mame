@@ -77,9 +77,9 @@ public:
 	void io_rw(address_space &space, uint16_t offset);
 	void io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_PALETTE_INIT(psion);
+	void palette_init_psion(palette_device &palette);
 	DECLARE_INPUT_CHANGED_MEMBER(psion_on);
-	TIMER_DEVICE_CALLBACK_MEMBER(nmi_timer);
+	void nmi_timer(timer_device &timer, void *ptr, int32_t param);
 
 	HD44780_PIXEL_UPDATE(lz_pixel_update);
 };

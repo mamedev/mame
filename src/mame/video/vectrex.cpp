@@ -39,7 +39,7 @@ enum {
 
 *********************************************************************/
 
-TIMER_CALLBACK_MEMBER(vectrex_state::lightpen_trigger)
+void vectrex_state::lightpen_trigger(void *ptr, int32_t param)
 {
 	if (m_lightpen_port & 1)
 	{
@@ -112,7 +112,7 @@ void vectrex_state::vectrex_via_w(address_space &space, offs_t offset, uint8_t d
 
 *********************************************************************/
 
-TIMER_CALLBACK_MEMBER(vectrex_state::vectrex_refresh)
+void vectrex_state::vectrex_refresh(void *ptr, int32_t param)
 {
 	/* Refresh only marks the range of vectors which will be drawn
 	 * during the next screen_update. */
@@ -182,7 +182,7 @@ void vectrex_state::vectrex_add_point_stereo(int x, int y, rgb_t color, int inte
 }
 
 
-TIMER_CALLBACK_MEMBER(vectrex_state::vectrex_zero_integrators)
+void vectrex_state::vectrex_zero_integrators(void *ptr, int32_t param)
 {
 	m_x_int = m_x_center + (m_analog[A_ZR] * INT_PER_CLOCK);
 	m_y_int = m_y_center + (m_analog[A_ZR] * INT_PER_CLOCK);
@@ -200,7 +200,7 @@ TIMER_CALLBACK_MEMBER(vectrex_state::vectrex_zero_integrators)
 
 *********************************************************************/
 
-TIMER_CALLBACK_MEMBER(vectrex_state::update_signal)
+void vectrex_state::update_signal(void *ptr, int32_t param)
 {
 	int length;
 
@@ -363,14 +363,14 @@ void vectrex_state::v_via_pa_w(address_space &space, offs_t offset, uint8_t data
 }
 
 
-WRITE_LINE_MEMBER(vectrex_state::v_via_ca2_w)
+void vectrex_state::v_via_ca2_w(int state)
 {
 	if (state == 0)
 		timer_set(attotime::from_nsec(ANALOG_DELAY), TIMER_VECTREX_ZERO_INTEGRATORS);
 }
 
 
-WRITE_LINE_MEMBER(vectrex_state::v_via_cb2_w)
+void vectrex_state::v_via_cb2_w(int state)
 {
 	int dx, dy;
 

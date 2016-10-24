@@ -15,7 +15,7 @@
 #include "includes/bk.h"
 
 
-TIMER_CALLBACK_MEMBER(bk_state::keyboard_callback)
+void bk_state::keyboard_callback(void *ptr, int32_t param)
 {
 	uint8_t code, i, j;
 	static const char *const keynames[] = {
@@ -72,7 +72,7 @@ void bk_state::machine_start()
 	machine().scheduler().timer_pulse(attotime::from_hz(2400), timer_expired_delegate(FUNC(bk_state::keyboard_callback),this));
 }
 
-IRQ_CALLBACK_MEMBER(bk_state::bk0010_irq_callback)
+int bk_state::bk0010_irq_callback(device_t &device, int irqline)
 {
 	device.execute().set_input_line(0, CLEAR_LINE);
 	return m_key_irq_vector;

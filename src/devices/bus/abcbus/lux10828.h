@@ -66,8 +66,8 @@ public:
 	uint8_t pio_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void pio_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( fdc_intrq_w );
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
+	void fdc_intrq_w(int state);
+	void fdc_drq_w(int state);
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 

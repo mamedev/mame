@@ -164,13 +164,13 @@ void gijoe_state::gijoe_objdma(  )
 	}
 }
 
-TIMER_CALLBACK_MEMBER(gijoe_state::dmaend_callback)
+void gijoe_state::dmaend_callback(void *ptr, int32_t param)
 {
 	if (m_cur_control2 & 0x0020)
 		m_maincpu->set_input_line(6, HOLD_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(gijoe_state::gijoe_interrupt)
+void gijoe_state::gijoe_interrupt(device_t &device)
 {
 	// global interrupt masking (*this game only)
 	if (!m_k056832->is_irq_enabled(0))

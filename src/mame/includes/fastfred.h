@@ -74,16 +74,16 @@ public:
 	void init_jumpcoas();
 	void init_boggy84b();
 
-	TILE_GET_INFO_MEMBER(get_tile_info);
-	TILE_GET_INFO_MEMBER(imago_get_tile_info_bg);
-	TILE_GET_INFO_MEMBER(imago_get_tile_info_fg);
-	TILE_GET_INFO_MEMBER(imago_get_tile_info_web);
+	void get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void imago_get_tile_info_bg(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void imago_get_tile_info_fg(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void imago_get_tile_info_web(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
-	INTERRUPT_GEN_MEMBER(vblank_irq);
-	INTERRUPT_GEN_MEMBER(sound_timer_irq);
+	void vblank_irq(device_t &device);
+	void sound_timer_irq(device_t &device);
 
 	virtual void machine_start() override;
-	DECLARE_PALETTE_INIT(fastfred);
+	void palette_init_fastfred(palette_device &palette);
 	void machine_start_imago();
 	void video_start_fastfred();
 	void video_start_imago();

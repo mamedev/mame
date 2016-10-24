@@ -109,12 +109,12 @@ public:
 	void install_bank(offs_t start, offs_t end, const char *tag, uint8_t *data);
 	void set_irq_line(int slot, int state);
 
-	DECLARE_WRITE_LINE_MEMBER( irq9_w );
-	DECLARE_WRITE_LINE_MEMBER( irqa_w );
-	DECLARE_WRITE_LINE_MEMBER( irqb_w );
-	DECLARE_WRITE_LINE_MEMBER( irqc_w );
-	DECLARE_WRITE_LINE_MEMBER( irqd_w );
-	DECLARE_WRITE_LINE_MEMBER( irqe_w );
+	void irq9_w(int state);
+	void irqa_w(int state);
+	void irqb_w(int state);
+	void irqc_w(int state);
+	void irqd_w(int state);
+	void irqe_w(int state);
 
 protected:
 	// device-level overrides

@@ -102,17 +102,17 @@ public:
 	// PIO callback
 	uint8_t pio_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t pio_portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( pio_ardy_cb);
-	DECLARE_WRITE_LINE_MEMBER( pio_brdy_cb);
+	void pio_ardy_cb(int state);
+	void pio_brdy_cb(int state);
 	void pio_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void pio_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	// CTC callback
-	DECLARE_WRITE_LINE_MEMBER( ctc_zc0_callback );
-	DECLARE_WRITE_LINE_MEMBER( ctc_zc1_callback );
+	void ctc_zc0_callback(int state);
+	void ctc_zc1_callback(int state);
 
 	// keyboard
-	DECLARE_WRITE_LINE_MEMBER( keyboard_cb );
+	void keyboard_cb(int state);
 
 	// cassette
 	void update_cassette(int state);
@@ -124,7 +124,7 @@ public:
 	// defined in video/kc.c
 	virtual void video_start() override;
 	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER( video_toggle_blink_state );
+	void video_toggle_blink_state(int state);
 	void video_draw_8_pixels(bitmap_ind16 &bitmap, int x, int y, uint8_t colour_byte, uint8_t gfx_byte);
 
 	// driver state
@@ -146,10 +146,10 @@ public:
 	int                 m_cassette_in;
 
 	kcexp_slot_device * m_expansions[3];
-	DECLARE_PALETTE_INIT(kc85);
-	TIMER_CALLBACK_MEMBER(kc_cassette_oneshot_timer);
-	TIMER_CALLBACK_MEMBER(kc_cassette_timer_callback);
-	TIMER_DEVICE_CALLBACK_MEMBER(kc_scanline);
+	void palette_init_kc85(palette_device &palette);
+	void kc_cassette_oneshot_timer(void *ptr, int32_t param);
+	void kc_cassette_timer_callback(void *ptr, int32_t param);
+	void kc_scanline(timer_device &timer, void *ptr, int32_t param);
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER( kc );
 };

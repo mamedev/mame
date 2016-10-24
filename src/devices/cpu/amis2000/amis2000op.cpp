@@ -509,7 +509,7 @@ void amis2152_cpu_device::d2f_timer_clock()
 	m_d2f_timer->adjust(base * (0x10 - m_d2f_latch));
 }
 
-TIMER_CALLBACK_MEMBER(amis2152_cpu_device::d2f_timer_cb)
+void amis2152_cpu_device::d2f_timer_cb(void *ptr, int32_t param)
 {
 	m_write_f(m_fout_state);
 	m_fout_state ^= 1;

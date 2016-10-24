@@ -60,12 +60,12 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(ticket_status_r);
 	void eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void oki_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	TILE_GET_INFO_MEMBER(get_mid_tile_info);
-	TILE_GET_INFO_MEMBER(get_txt_tile_info);
+	void get_mid_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_txt_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(pzletime);
+	void palette_init_pzletime(palette_device &palette);
 	uint32_t screen_update_pzletime(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
@@ -76,7 +76,7 @@ public:
 };
 
 
-TILE_GET_INFO_MEMBER(pzletime_state::get_mid_tile_info)
+void pzletime_state::get_mid_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno = m_mid_videoram[tile_index] & 0x0fff;
 	int colour = m_mid_videoram[tile_index] & 0xf000;
@@ -84,7 +84,7 @@ TILE_GET_INFO_MEMBER(pzletime_state::get_mid_tile_info)
 	SET_TILE_INFO_MEMBER(2, tileno, colour, 0);
 }
 
-TILE_GET_INFO_MEMBER(pzletime_state::get_txt_tile_info)
+void pzletime_state::get_txt_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno = m_txt_videoram[tile_index] & 0x0fff;
 	int colour = m_txt_videoram[tile_index] & 0xf000;
@@ -304,7 +304,7 @@ static GFXDECODE_START( pzletime )
 	GFXDECODE_ENTRY( "gfx3", 0, layout16x16, 0x000, 0x10 )
 GFXDECODE_END
 
-PALETTE_INIT_MEMBER(pzletime_state, pzletime)
+void pzletime_state::palette_init_pzletime(palette_device &palette)
 {
 	int i;
 

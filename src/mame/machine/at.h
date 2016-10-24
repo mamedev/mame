@@ -25,8 +25,8 @@ public:
 	uint8_t portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t get_slave_ack(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(pit8254_out2_changed);
-	DECLARE_WRITE_LINE_MEMBER(dma_hrq_changed);
+	void pit8254_out2_changed(int state);
+	void dma_hrq_changed(int state);
 	uint8_t dma8237_0_dack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t dma8237_1_dack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t dma8237_2_dack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
@@ -41,18 +41,18 @@ public:
 	void dma8237_5_dack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void dma8237_6_dack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void dma8237_7_dack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(dma8237_out_eop);
-	DECLARE_WRITE_LINE_MEMBER(dack0_w);
-	DECLARE_WRITE_LINE_MEMBER(dack1_w);
-	DECLARE_WRITE_LINE_MEMBER(dack2_w);
-	DECLARE_WRITE_LINE_MEMBER(dack3_w);
-	DECLARE_WRITE_LINE_MEMBER(dack4_w);
-	DECLARE_WRITE_LINE_MEMBER(dack5_w);
-	DECLARE_WRITE_LINE_MEMBER(dack6_w);
-	DECLARE_WRITE_LINE_MEMBER(dack7_w);
+	void dma8237_out_eop(int state);
+	void dack0_w(int state);
+	void dack1_w(int state);
+	void dack2_w(int state);
+	void dack3_w(int state);
+	void dack4_w(int state);
+	void dack5_w(int state);
+	void dack6_w(int state);
+	void dack7_w(int state);
 	void write_rtc(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER(shutdown);
+	void shutdown(int state);
 
 	uint8_t dma_read_byte(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void dma_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);

@@ -567,7 +567,7 @@ public:
 	uint8_t m_ext2_ff;
 	uint8_t m_sys_type;
 
-	DECLARE_WRITE_LINE_MEMBER( write_uart_clock );
+	void write_uart_clock(int state);
 	void rtc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void dmapg4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void dmapg8_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -607,16 +607,16 @@ public:
 	void ide_cs0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	uint16_t ide_cs1_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void ide_cs1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	DECLARE_WRITE_LINE_MEMBER(ide1_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(ide2_irq_w);
+	void ide1_irq_w(int state);
+	void ide2_irq_w(int state);
 
 	uint8_t m_ide_sel;
 	bool m_ide1_irq, m_ide2_irq;
 
 	void sasi_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t sasi_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(write_sasi_io);
-	DECLARE_WRITE_LINE_MEMBER(write_sasi_req);
+	void write_sasi_io(int state);
+	void write_sasi_req(int state);
 	uint8_t sasi_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void sasi_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
@@ -699,22 +699,22 @@ public:
 	void machine_reset_pc9801rs();
 	void machine_reset_pc9821();
 
-	DECLARE_PALETTE_INIT(pc9801);
-	INTERRUPT_GEN_MEMBER(vrtc_irq);
+	void palette_init_pc9801(palette_device &palette);
+	void vrtc_irq(device_t &device);
 	uint8_t get_slave_ack(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(dma_hrq_changed);
-	DECLARE_WRITE_LINE_MEMBER(tc_w);
+	void dma_hrq_changed(int state);
+	void tc_w(int state);
 	uint8_t dma_read_byte(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void dma_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(dack0_w);
-	DECLARE_WRITE_LINE_MEMBER(dack1_w);
-	DECLARE_WRITE_LINE_MEMBER(dack2_w);
-	DECLARE_WRITE_LINE_MEMBER(dack3_w);
+	void dack0_w(int state);
+	void dack1_w(int state);
+	void dack2_w(int state);
+	void dack3_w(int state);
 	void ppi_sys_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER(fdc_2dd_irq);
-	DECLARE_WRITE_LINE_MEMBER(pc9801rs_fdc_irq);
-	DECLARE_WRITE_LINE_MEMBER(pc9801rs_fdc_drq);
+	void fdc_2dd_irq(int state);
+	void pc9801rs_fdc_irq(int state);
+	void pc9801rs_fdc_drq(int state);
 
 	uint8_t ppi_mouse_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void ppi_mouse_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -727,7 +727,7 @@ public:
 		uint8_t freq_reg;
 		uint8_t freq_index;
 	}m_mouse;
-	TIMER_DEVICE_CALLBACK_MEMBER( mouse_irq_cb );
+	void mouse_irq_cb(timer_device &timer, void *ptr, int32_t param);
 	uint8_t unk_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	void init_pc9801_kanji();
@@ -1189,7 +1189,7 @@ void pc9801_state::pc9801_a0_w(address_space &space, offs_t offset, uint8_t data
 	}
 }
 
-DECLARE_WRITE_LINE_MEMBER(pc9801_state::write_uart_clock)
+void pc9801_state::write_uart_clock(int state)
 {
 	m_sio->write_txc(state);
 	m_sio->write_rxc(state);
@@ -1564,13 +1564,13 @@ void pc9801_state::ide_cs1_w(address_space &space, offs_t offset, uint16_t data,
 	(m_ide_sel ? m_ide2 : m_ide1)->write_cs1(space, offset, data, mem_mask);
 }
 
-WRITE_LINE_MEMBER(pc9801_state::ide1_irq_w)
+void pc9801_state::ide1_irq_w(int state)
 {
 	m_ide1_irq = state ? true : false;
 	m_pic2->ir1_w((state || m_ide2_irq) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(pc9801_state::ide2_irq_w)
+void pc9801_state::ide2_irq_w(int state)
 {
 	m_ide2_irq = state ? true : false;
 	m_pic2->ir1_w((state || m_ide1_irq) ? ASSERT_LINE : CLEAR_LINE);
@@ -1597,7 +1597,7 @@ void pc9801_state::sasi_data_w(address_space &space, offs_t offset, uint8_t data
 	}
 }
 
-WRITE_LINE_MEMBER( pc9801_state::write_sasi_io )
+void pc9801_state::write_sasi_io(int state)
 {
 	m_sasi_ctrl_in->write_bit2(state);
 
@@ -1617,7 +1617,7 @@ WRITE_LINE_MEMBER( pc9801_state::write_sasi_io )
 		m_pic2->ir1_w(0);
 }
 
-WRITE_LINE_MEMBER( pc9801_state::write_sasi_req )
+void pc9801_state::write_sasi_req(int state)
 {
 	m_sasi_ctrl_in->write_bit7(state);
 
@@ -2733,7 +2733,7 @@ uint8_t pc9801_state::get_slave_ack(address_space &space, offs_t offset, uint8_t
 *
 ****************************************/
 
-WRITE_LINE_MEMBER(pc9801_state::dma_hrq_changed)
+void pc9801_state::dma_hrq_changed(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state ? ASSERT_LINE : CLEAR_LINE);
 
@@ -2742,7 +2742,7 @@ WRITE_LINE_MEMBER(pc9801_state::dma_hrq_changed)
 //  logerror("%02x HLDA\n",state);
 }
 
-WRITE_LINE_MEMBER(pc9801_state::tc_w )
+void pc9801_state::tc_w(int state)
 {
 	/* floppy terminal count */
 	m_fdc_2hd->tc_w(state);
@@ -2807,10 +2807,10 @@ void pc9801_state::set_dma_channel(int channel, int state)
 	if (!state) m_dack = channel;
 }
 
-WRITE_LINE_MEMBER(pc9801_state::dack0_w){ /*logerror("%02x 0\n",state);*/ set_dma_channel(0, state); }
-WRITE_LINE_MEMBER(pc9801_state::dack1_w){ /*logerror("%02x 1\n",state);*/ set_dma_channel(1, state); }
-WRITE_LINE_MEMBER(pc9801_state::dack2_w){ /*logerror("%02x 2\n",state);*/ set_dma_channel(2, state); }
-WRITE_LINE_MEMBER(pc9801_state::dack3_w){ /*logerror("%02x 3\n",state);*/ set_dma_channel(3, state); }
+void pc9801_state::dack0_w(int state){ /*logerror("%02x 0\n",state);*/ set_dma_channel(0, state); }
+void pc9801_state::dack1_w(int state){ /*logerror("%02x 1\n",state);*/ set_dma_channel(1, state); }
+void pc9801_state::dack2_w(int state){ /*logerror("%02x 2\n",state);*/ set_dma_channel(2, state); }
+void pc9801_state::dack3_w(int state){ /*logerror("%02x 3\n",state);*/ set_dma_channel(3, state); }
 
 /*
 ch1 cs-4231a
@@ -2905,7 +2905,7 @@ SLOT_INTERFACE_END
 
 //  Jast Sound, could be put independently
 
-WRITE_LINE_MEMBER( pc9801_state::fdc_2dd_irq )
+void pc9801_state::fdc_2dd_irq(int state)
 {
 	logerror("IRQ 2DD %d\n",state);
 
@@ -2915,7 +2915,7 @@ WRITE_LINE_MEMBER( pc9801_state::fdc_2dd_irq )
 	}
 }
 
-WRITE_LINE_MEMBER( pc9801_state::pc9801rs_fdc_irq )
+void pc9801_state::pc9801rs_fdc_irq(int state)
 {
 	/* 0xffaf8 */
 
@@ -2927,7 +2927,7 @@ WRITE_LINE_MEMBER( pc9801_state::pc9801rs_fdc_irq )
 		m_pic2->ir2_w(state);
 }
 
-WRITE_LINE_MEMBER( pc9801_state::pc9801rs_fdc_drq )
+void pc9801_state::pc9801rs_fdc_drq(int state)
 {
 	if(m_fdc_ctrl & 1)
 		m_dmac->dreq2_w(state ^ 1);
@@ -2947,7 +2947,7 @@ uint32_t pc9801_state::a20_286(bool state)
 ****************************************/
 
 //
-PALETTE_INIT_MEMBER(pc9801_state,pc9801)
+void pc9801_state::palette_init_pc9801(palette_device &palette)
 {
 	int i;
 
@@ -3098,7 +3098,7 @@ void pc9801_state::device_reset_after_children()
 		ide0->identify_device_buffer()[47] = 0;
 }
 
-INTERRUPT_GEN_MEMBER(pc9801_state::vrtc_irq)
+void pc9801_state::vrtc_irq(device_t &device)
 {
 	m_pic1->ir2_w(1);
 	m_vbirq->adjust(m_screen->time_until_vblank_end());
@@ -3114,7 +3114,7 @@ FLOPPY_FORMATS_MEMBER( pc9801_state::floppy_formats )
 	FLOPPY_NFD_FORMAT
 FLOPPY_FORMATS_END
 
-TIMER_DEVICE_CALLBACK_MEMBER( pc9801_state::mouse_irq_cb )
+void pc9801_state::mouse_irq_cb(timer_device &timer, void *ptr, int32_t param)
 {
 	if((m_mouse.control & 0x10) == 0)
 	{

@@ -324,9 +324,9 @@ public:
 	void c76_shared_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	uint16_t c76_speedup_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void c76_speedup_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq0_cb);
-	TIMER_DEVICE_CALLBACK_MEMBER(mcu_irq2_cb);
-	TIMER_DEVICE_CALLBACK_MEMBER(mcu_adc_cb);
+	void mcu_irq0_cb(timer_device &timer, void *ptr, int32_t param);
+	void mcu_irq2_cb(timer_device &timer, void *ptr, int32_t param);
+	void mcu_adc_cb(timer_device &timer, void *ptr, int32_t param);
 
 protected:
 	virtual void driver_start() override;
@@ -558,17 +558,17 @@ void namcos11_state::driver_start()
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(namcos11_state::mcu_irq0_cb)
+void namcos11_state::mcu_irq0_cb(timer_device &timer, void *ptr, int32_t param)
 {
 	m_mcu->set_input_line(M37710_LINE_IRQ0, HOLD_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(namcos11_state::mcu_irq2_cb)
+void namcos11_state::mcu_irq2_cb(timer_device &timer, void *ptr, int32_t param)
 {
 	m_mcu->set_input_line(M37710_LINE_IRQ2, HOLD_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(namcos11_state::mcu_adc_cb)
+void namcos11_state::mcu_adc_cb(timer_device &timer, void *ptr, int32_t param)
 {
 	m_mcu->set_input_line(M37710_LINE_ADC, HOLD_LINE);
 }

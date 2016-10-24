@@ -423,8 +423,8 @@ private:
 	inline void op1101(uint16_t opcode);
 	inline void op1110(uint16_t opcode);
 	inline void op1111(uint16_t opcode);
-	TIMER_CALLBACK_MEMBER( sh2_timer_callback );
-	TIMER_CALLBACK_MEMBER( sh2_dma_current_active_callback );
+	void sh2_timer_callback(void *ptr, int32_t param);
+	void sh2_dma_current_active_callback(void *ptr, int32_t param);
 	void sh2_timer_resync();
 	void sh2_timer_activate();
 	void sh2_do_dma(int dma);

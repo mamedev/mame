@@ -110,7 +110,7 @@ void patinho_feio_state::decwriter_data_w(address_space &space, offs_t offset, u
 /*
     timer callback to generate decwriter char print completion signal
 */
-TIMER_CALLBACK_MEMBER(patinho_feio_state::decwriter_callback)
+void patinho_feio_state::decwriter_callback(void *ptr, int32_t param)
 {
 	m_maincpu->set_iodev_status(0xA, IODEV_READY);
 	m_decwriter_timer->enable(0); //stop the timer
@@ -133,7 +133,7 @@ void patinho_feio_state::teletype_data_w(address_space &space, offs_t offset, ui
 /*
     timer callback to generate teletype char print completion signal
 */
-TIMER_CALLBACK_MEMBER(patinho_feio_state::teletype_callback)
+void patinho_feio_state::teletype_callback(void *ptr, int32_t param)
 {
 	m_maincpu->set_iodev_status(0xB, IODEV_READY);
 	m_teletype_timer->enable(0); //stop the timer

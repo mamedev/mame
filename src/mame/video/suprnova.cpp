@@ -271,7 +271,7 @@ void skns_state::palette_update()
 
 
 
-TILE_GET_INFO_MEMBER(skns_state::get_tilemap_A_tile_info)
+void skns_state::get_tilemap_A_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = ((m_tilemapA_ram[tile_index] & 0x001fffff) >> 0 );
 	int colr = ((m_tilemapA_ram[tile_index] & 0x3f000000) >> 24 );
@@ -297,7 +297,7 @@ void skns_state::tilemapA_w(address_space &space, offs_t offset, uint32_t data, 
 	m_tilemap_A->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(skns_state::get_tilemap_B_tile_info)
+void skns_state::get_tilemap_B_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = ((m_tilemapB_ram[tile_index] & 0x001fffff) >> 0 );
 	int colr = ((m_tilemapB_ram[tile_index] & 0x3f000000) >> 24 );

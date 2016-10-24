@@ -386,7 +386,7 @@ void ms7004_device::device_reset()
 }
 
 
-WRITE_LINE_MEMBER( ms7004_device::write_rxd )
+void ms7004_device::write_rxd(int state)
 {
 	DBG_LOG(1,0,("write_rxd %d\n", state));
 }

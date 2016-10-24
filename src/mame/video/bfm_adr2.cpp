@@ -146,7 +146,7 @@ bfm_adder2_device::bfm_adder2_device( const machine_config &mconfig, const char 
 
 ///////////////////////////////////////////////////////////////////////////
 
-TILE_GET_INFO_MEMBER( bfm_adder2_device::get_tile0_info )
+void bfm_adder2_device::get_tile0_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	short data;
 	int  code,  color, flags,x,y;
@@ -169,7 +169,7 @@ TILE_GET_INFO_MEMBER( bfm_adder2_device::get_tile0_info )
 
 ///////////////////////////////////////////////////////////////////////////
 
-TILE_GET_INFO_MEMBER( bfm_adder2_device::get_tile1_info )
+void bfm_adder2_device::get_tile1_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	short data;
 	int  code,  color, flags,x,y;
@@ -265,7 +265,7 @@ uint32_t bfm_adder2_device::update_screen(screen_device &screen, bitmap_ind16 &b
 
 ///////////////////////////////////////////////////////////////////////////
 
-INTERRUPT_GEN_MEMBER( bfm_adder2_device::adder2_vbl )
+void bfm_adder2_device::adder2_vbl(device_t &device)
 {
 	if ( m_adder2_c101 & 0x01 )
 	{

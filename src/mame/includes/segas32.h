@@ -175,14 +175,14 @@ public:
 	void multipcm_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void scross_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	TILE_GET_INFO_MEMBER(get_tile_info);
+	void get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	uint32_t screen_update_system32(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_multi32_left(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_multi32_right(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(start_of_vblank_int);
-	TIMER_CALLBACK_MEMBER(end_of_vblank_int);
-	TIMER_CALLBACK_MEMBER(update_sprites);
-	TIMER_DEVICE_CALLBACK_MEMBER(signal_v60_irq_callback);
+	void start_of_vblank_int(device_t &device);
+	void end_of_vblank_int(void *ptr, int32_t param);
+	void update_sprites(void *ptr, int32_t param);
+	void signal_v60_irq_callback(timer_device &timer, void *ptr, int32_t param);
 	void common_start(int multi32);
 	void system32_set_vblank(int state);
 	inline uint16_t xBBBBBGGGGGRRRRR_to_xBGRBBBBGGGGRRRR(uint16_t value);
@@ -234,7 +234,7 @@ public:
 	void update_tilemap_text(screen_device &screen, struct layer_info *layer, const rectangle &cliprect);
 	void update_bitmap(screen_device &screen, struct layer_info *layer, const rectangle &cliprect);
 	void update_background(struct layer_info *layer, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(ym3438_irq_handler);
+	void ym3438_irq_handler(int state);
 	void signal_sound_irq(int which);
 	void clear_sound_irq(int which);
 	void darkedge_fd1149_vblank();

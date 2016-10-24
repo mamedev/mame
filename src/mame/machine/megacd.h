@@ -94,8 +94,8 @@ public:
 	uint8_t m_irq3_timer_reg;
 
 
-	TIMER_DEVICE_CALLBACK_MEMBER( irq3_timer_callback );
-	TIMER_DEVICE_CALLBACK_MEMBER( stamp_timer_callback );
+	void irq3_timer_callback(timer_device &timer, void *ptr, int32_t param);
+	void stamp_timer_callback(timer_device &timer, void *ptr, int32_t param);
 
 	inline void write_pixel(uint8_t pix, int pixeloffset);
 	uint16_t segacd_1meg_mode_word_read(int offset, uint16_t mem_mask);
@@ -124,10 +124,10 @@ public:
 	void SCD_GET_TILE_INFO_16x16_16x16( int& tile_region, int& tileno, int tile_index );
 	void SCD_GET_TILE_INFO_32x32_16x16( int& tile_region, int& tileno, int tile_index );
 
-	TILE_GET_INFO_MEMBER( get_stampmap_16x16_1x1_tile_info );
-	TILE_GET_INFO_MEMBER( get_stampmap_32x32_1x1_tile_info );
-	TILE_GET_INFO_MEMBER( get_stampmap_16x16_16x16_tile_info );
-	TILE_GET_INFO_MEMBER( get_stampmap_32x32_16x16_tile_info );
+	void get_stampmap_16x16_1x1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_stampmap_32x32_1x1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_stampmap_16x16_16x16_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_stampmap_32x32_16x16_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	uint8_t get_stampmap_16x16_1x1_tile_info_pixel(int xpos, int ypos);
 	uint8_t get_stampmap_32x32_1x1_tile_info_pixel(int xpos, int ypos);
@@ -204,8 +204,8 @@ public:
 	uint8_t font_color_r(address_space &space, offs_t offset, uint8_t mem_mask);
 	void font_color_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask);
 	uint16_t font_converted_r(address_space &space, offs_t offset, uint16_t mem_mask);
-	TIMER_DEVICE_CALLBACK_MEMBER( dma_timer_callback );
-	IRQ_CALLBACK_MEMBER(segacd_sub_int_callback);
+	void dma_timer_callback(timer_device &timer, void *ptr, int32_t param);
+	int segacd_sub_int_callback(device_t &device, int irqline);
 
 	void SegaCD_CDC_Do_DMA( int &dmacount, uint8_t *CDC_BUFFER, uint16_t &dma_addrc, uint16_t &destination );
 

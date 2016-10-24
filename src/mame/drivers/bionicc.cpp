@@ -118,7 +118,7 @@ uint16_t bionicc_state::hacked_soundcommand_r(address_space &space, offs_t offse
 
 ********************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(bionicc_state::bionicc_scanline)
+void bionicc_state::bionicc_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

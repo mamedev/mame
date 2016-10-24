@@ -15,10 +15,10 @@ class serial_printer_device : public device_t,
 public:
 	serial_printer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) override { device_serial_interface::rx_w(state); }
+	virtual void input_txd(int state) override { device_serial_interface::rx_w(state); }
 
-	DECLARE_WRITE_LINE_MEMBER(update_serial);
-	DECLARE_WRITE_LINE_MEMBER(printer_online);
+	void update_serial(int state);
+	void printer_online(int state);
 
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;

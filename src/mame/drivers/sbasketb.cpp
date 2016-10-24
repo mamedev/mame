@@ -177,7 +177,7 @@ static GFXDECODE_START( sbasketb )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 16*16, 16*16 )
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(sbasketb_state::vblank_irq)
+void sbasketb_state::vblank_irq(device_t &device)
 {
 	if(m_irq_mask)
 		device.execute().set_input_line(0, HOLD_LINE);

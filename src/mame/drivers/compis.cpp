@@ -141,18 +141,18 @@ public:
 	uint8_t ppi_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void ppi_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( tmr0_w );
-	DECLARE_WRITE_LINE_MEMBER( tmr1_w );
-	DECLARE_WRITE_LINE_MEMBER( tmr2_w );
-	DECLARE_WRITE_LINE_MEMBER( tmr5_w );
+	void tmr0_w(int state);
+	void tmr1_w(int state);
+	void tmr2_w(int state);
+	void tmr5_w(int state);
 
-	TIMER_DEVICE_CALLBACK_MEMBER( tape_tick );
+	void tape_tick(timer_device &timer, void *ptr, int32_t param);
 
 	int m_centronics_busy;
 	int m_centronics_select;
 
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_select);
+	void write_centronics_busy(int state);
+	void write_centronics_select(int state);
 
 	int m_tmr0;
 };
@@ -565,7 +565,7 @@ uint8_t compis_state::compis_irq_callback(address_space &space, offs_t offset, u
 	return m_osp->inta_r();
 }
 
-WRITE_LINE_MEMBER( compis_state::tmr0_w )
+void compis_state::tmr0_w(int state)
 {
 	m_tmr0 = state;
 
@@ -574,7 +574,7 @@ WRITE_LINE_MEMBER( compis_state::tmr0_w )
 	m_maincpu->tmrin0_w(state);
 }
 
-WRITE_LINE_MEMBER( compis_state::tmr1_w )
+void compis_state::tmr1_w(int state)
 {
 	m_isbx0->mclk_w(state);
 	m_isbx1->mclk_w(state);
@@ -587,14 +587,14 @@ WRITE_LINE_MEMBER( compis_state::tmr1_w )
 //  I80130_INTERFACE( osp_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( compis_state::tmr2_w )
+void compis_state::tmr2_w(int state)
 {
 	m_uart->write_rxc(state);
 	m_uart->write_txc(state);
 }
 
 
-WRITE_LINE_MEMBER( compis_state::tmr5_w )
+void compis_state::tmr5_w(int state)
 {
 	m_mpsc->rxca_w(state);
 	m_mpsc->txca_w(state);
@@ -604,12 +604,12 @@ WRITE_LINE_MEMBER( compis_state::tmr5_w )
 //  I8255A interface
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(compis_state::write_centronics_busy)
+void compis_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 }
 
-WRITE_LINE_MEMBER(compis_state::write_centronics_select)
+void compis_state::write_centronics_select(int state)
 {
 	m_centronics_select = state;
 }
@@ -678,7 +678,7 @@ void compis_state::ppi_pc_w(address_space &space, offs_t offset, uint8_t data, u
 	m_isbx0->opt0_w(BIT(data, 7));
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( compis_state::tape_tick )
+void compis_state::tape_tick(timer_device &timer, void *ptr, int32_t param)
 {
 	m_maincpu->tmrin0_w(m_cassette->input() > 0.0);
 }

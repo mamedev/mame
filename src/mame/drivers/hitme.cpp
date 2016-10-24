@@ -32,7 +32,7 @@
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(hitme_state::get_hitme_tile_info)
+void hitme_state::get_hitme_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	/* the code is the low 6 bits */
 	uint8_t code = m_videoram[tile_index] & 0x3f;

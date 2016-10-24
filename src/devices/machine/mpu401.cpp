@@ -276,7 +276,7 @@ void mpu401_device::asic_w(address_space &space, offs_t offset, uint8_t data, ui
 }
 
 // MIDI receive
-WRITE_LINE_MEMBER( mpu401_device::midi_rx_w )
+void mpu401_device::midi_rx_w(int state)
 {
 	if (state == ASSERT_LINE)
 	{

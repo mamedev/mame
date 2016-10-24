@@ -71,13 +71,13 @@ public:
 	void cb2001_vidctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void cb2001_vidctrl2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void cb2001_bg_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	TILE_GET_INFO_MEMBER(get_cb2001_reel1_tile_info);
-	TILE_GET_INFO_MEMBER(get_cb2001_reel2_tile_info);
-	TILE_GET_INFO_MEMBER(get_cb2001_reel3_tile_info);
+	void get_cb2001_reel1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_cb2001_reel2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_cb2001_reel3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(cb2001);
+	void palette_init_cb2001(palette_device &palette);
 	uint32_t screen_update_cb2001(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vblank_irq);
+	void vblank_irq(device_t &device);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -470,7 +470,7 @@ void cb2001_state::cb2001_vidctrl2_w(address_space &space, offs_t offset, uint16
 }
 
 
-TILE_GET_INFO_MEMBER(cb2001_state::get_cb2001_reel1_tile_info)
+void cb2001_state::get_cb2001_reel1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_vram_bg[(0x0000/2) + tile_index/2];
 
@@ -487,7 +487,7 @@ TILE_GET_INFO_MEMBER(cb2001_state::get_cb2001_reel1_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(cb2001_state::get_cb2001_reel2_tile_info)
+void cb2001_state::get_cb2001_reel2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_vram_bg[(0x0200/2) + tile_index/2];
 
@@ -505,7 +505,7 @@ TILE_GET_INFO_MEMBER(cb2001_state::get_cb2001_reel2_tile_info)
 }
 
 
-TILE_GET_INFO_MEMBER(cb2001_state::get_cb2001_reel3_tile_info)
+void cb2001_state::get_cb2001_reel3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_vram_bg[(0x0400/2) + tile_index/2];
 	int colour = 0;//(cb2001_out_c&0x7) + 8;
@@ -743,7 +743,7 @@ static INPUT_PORTS_START( cb2001 )
 
 INPUT_PORTS_END
 
-INTERRUPT_GEN_MEMBER(cb2001_state::vblank_irq)
+void cb2001_state::vblank_irq(device_t &device)
 {
 	generic_pulse_irq_line(device.execute(), NEC_INPUT_LINE_INTP0, 1);
 }
@@ -776,7 +776,7 @@ static GFXDECODE_START( cb2001 )
 	GFXDECODE_ENTRY( "gfx", 0, cb2001_layout32, 0x0, 32 )
 GFXDECODE_END
 
-PALETTE_INIT_MEMBER(cb2001_state, cb2001)
+void cb2001_state::palette_init_cb2001(palette_device &palette)
 {
 	int i;
 	for (i = 0; i < 0x200; i++)

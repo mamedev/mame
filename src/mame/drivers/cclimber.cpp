@@ -1098,13 +1098,13 @@ static GFXDECODE_START( toprollr )
 	GFXDECODE_ENTRY( "gfx3", 0x0000, cclimber_charlayout,   24*4, 16 )
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(cclimber_state::vblank_irq)
+void cclimber_state::vblank_irq(device_t &device)
 {
 	if(m_nmi_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(cclimber_state::bagmanf_vblank_irq)
+void cclimber_state::bagmanf_vblank_irq(device_t &device)
 {
 	if(m_nmi_mask)
 		device.execute().set_input_line(0, HOLD_LINE);

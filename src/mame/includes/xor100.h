@@ -90,17 +90,17 @@ public:
 	bool m_fdc_irq;
 	bool m_fdc_drq;
 	int m_fdc_dden;
-	DECLARE_WRITE_LINE_MEMBER(com5016_fr_w);
-	DECLARE_WRITE_LINE_MEMBER(com5016_ft_w);
+	void com5016_fr_w(int state);
+	void com5016_ft_w(int state);
 	uint8_t i8255_pc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
-	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
-	DECLARE_WRITE_LINE_MEMBER(ctc_z2_w);
+	void ctc_z0_w(int state);
+	void ctc_z1_w(int state);
+	void ctc_z2_w(int state);
 
 	int m_centronics_busy;
 	int m_centronics_select;
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_select);
+	void write_centronics_busy(int state);
+	void write_centronics_select(int state);
 };
 
 #endif

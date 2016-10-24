@@ -61,11 +61,11 @@ public:
 	void command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void mode_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( write_rxd );
-	DECLARE_WRITE_LINE_MEMBER( write_cts );
-	DECLARE_WRITE_LINE_MEMBER( write_dsr );
-	DECLARE_WRITE_LINE_MEMBER( write_txc );
-	DECLARE_WRITE_LINE_MEMBER( write_rxc );
+	void write_rxd(int state);
+	void write_cts(int state);
+	void write_dsr(int state);
+	void write_txc(int state);
+	void write_rxc(int state);
 
 	/// TODO: REMOVE THIS
 	void receive_character(uint8_t ch);

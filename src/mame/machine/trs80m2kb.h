@@ -53,8 +53,8 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual ioport_constructor device_input_ports() const override;
 
-	DECLARE_WRITE_LINE_MEMBER( busy_w );
-	DECLARE_READ_LINE_MEMBER( data_r );
+	void busy_w(int state);
+	int data_r();
 
 	// not really public
 	uint8_t kb_t1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);

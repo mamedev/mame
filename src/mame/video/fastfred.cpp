@@ -25,7 +25,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(fastfred_state,fastfred)
+void fastfred_state::palette_init_fastfred(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances[4] = { 1000, 470, 220, 100 };
@@ -79,7 +79,7 @@ PALETTE_INIT_MEMBER(fastfred_state,fastfred)
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(fastfred_state::get_tile_info)
+void fastfred_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t x = tile_index & 0x1f;
 
@@ -295,7 +295,7 @@ uint32_t fastfred_state::screen_update_fastfred(screen_device &screen, bitmap_in
 }
 
 
-TILE_GET_INFO_MEMBER(fastfred_state::imago_get_tile_info_bg)
+void fastfred_state::imago_get_tile_info_bg(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t x = tile_index & 0x1f;
 
@@ -305,13 +305,13 @@ TILE_GET_INFO_MEMBER(fastfred_state::imago_get_tile_info_bg)
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(fastfred_state::imago_get_tile_info_fg)
+void fastfred_state::imago_get_tile_info_fg(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_imago_fg_videoram[tile_index];
 	SET_TILE_INFO_MEMBER(2, code, 2, 0);
 }
 
-TILE_GET_INFO_MEMBER(fastfred_state::imago_get_tile_info_web)
+void fastfred_state::imago_get_tile_info_web(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	SET_TILE_INFO_MEMBER(3, tile_index & 0x1ff, 0, 0);
 }

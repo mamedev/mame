@@ -33,9 +33,9 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	TIMER_DEVICE_CALLBACK_MEMBER( scanline_callback );
-	INTERRUPT_GEN_MEMBER(vblank_irq);
-	IRQ_CALLBACK_MEMBER(irq_callback);
+	void scanline_callback(timer_device &timer, void *ptr, int32_t param);
+	void vblank_irq(device_t &device);
+	int irq_callback(device_t &device, int irqline);
 
 	void stateparam_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t stateparam_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);

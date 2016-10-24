@@ -950,7 +950,7 @@ void ti_rs232_pio_device::output_line_state(int uartind, int mask, uint8_t value
 /*
     Propagates the /INT signal of the UARTs to the /INT line of the pbox.
 */
-WRITE_LINE_MEMBER( ti_rs232_pio_device::int0_callback )
+void ti_rs232_pio_device::int0_callback(int state)
 {
 	int senila_bit = SENILA_0_BIT;
 
@@ -960,7 +960,7 @@ WRITE_LINE_MEMBER( ti_rs232_pio_device::int0_callback )
 	m_slot->set_inta(state);
 }
 
-WRITE_LINE_MEMBER( ti_rs232_pio_device::int1_callback )
+void ti_rs232_pio_device::int1_callback(int state)
 {
 	int senila_bit = SENILA_1_BIT;
 
@@ -976,12 +976,12 @@ WRITE_LINE_MEMBER( ti_rs232_pio_device::int1_callback )
     Instead, we check for signal line change or data transmission
     and call the respective function
 */
-WRITE_LINE_MEMBER( ti_rs232_pio_device::rcv0_callback )
+void ti_rs232_pio_device::rcv0_callback(int state)
 {
 	receive_data_or_line_state(0);
 }
 
-WRITE_LINE_MEMBER( ti_rs232_pio_device::rcv1_callback )
+void ti_rs232_pio_device::rcv1_callback(int state)
 {
 	receive_data_or_line_state(1);
 }

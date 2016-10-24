@@ -65,22 +65,6 @@ enum
 	INPUT_LINE_HALT = MAX_INPUT_LINES - 1
 };
 
-
-
-//**************************************************************************
-//  MACROS
-//**************************************************************************
-
-#define TIMER_CALLBACK_MEMBER(name)     void name(void *ptr, int32_t param)
-
-// IRQ callback to be called by device implementations when an IRQ is actually taken
-#define IRQ_CALLBACK_MEMBER(func)       int func(device_t &device, int irqline)
-
-// interrupt generator callback called as a VBLANK or periodic interrupt
-#define INTERRUPT_GEN_MEMBER(func)      void func(device_t &device)
-
-
-
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
@@ -218,7 +202,7 @@ protected:
 	virtual void interface_clock_changed() override;
 
 	// for use by devcpu for now...
-	IRQ_CALLBACK_MEMBER(standard_irq_callback_member);
+	int standard_irq_callback_member(device_t &device, int irqline);
 	int standard_irq_callback(int irqline);
 
 	// internal information about the state of inputs
@@ -246,7 +230,7 @@ protected:
 		int             m_qindex;           // index within the queue
 
 	private:
-		TIMER_CALLBACK_MEMBER(empty_event_queue);
+		void empty_event_queue(void *ptr, int32_t param);
 	};
 
 	// scheduler
@@ -291,11 +275,11 @@ protected:
 
 private:
 	// callbacks
-	TIMER_CALLBACK_MEMBER(timed_trigger_callback);
+	void timed_trigger_callback(void *ptr, int32_t param);
 
 	void on_vblank(screen_device &screen, bool vblank_state);
 
-	TIMER_CALLBACK_MEMBER(trigger_periodic_interrupt);
+	void trigger_periodic_interrupt(void *ptr, int32_t param);
 	void suspend_resume_changed();
 
 	attoseconds_t minimum_quantum() const;

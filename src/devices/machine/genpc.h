@@ -76,18 +76,18 @@ public:
 	uint8_t                   m_ppi_shift_enable;
 
 	// interface to the keyboard
-	DECLARE_WRITE_LINE_MEMBER( keyboard_clock_w );
-	DECLARE_WRITE_LINE_MEMBER( keyboard_data_w );
+	void keyboard_clock_w(int state);
+	void keyboard_data_w(int state);
 
 	uint8_t pc_ppi_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t pc_ppi_portc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void pc_ppi_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( pc_pit8253_out1_changed );
-	DECLARE_WRITE_LINE_MEMBER( pc_pit8253_out2_changed );
+	void pc_pit8253_out1_changed(int state);
+	void pc_pit8253_out2_changed(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( pc_dma_hrq_changed );
-	DECLARE_WRITE_LINE_MEMBER( pc_dma8237_out_eop );
+	void pc_dma_hrq_changed(int state);
+	void pc_dma8237_out_eop(int state);
 	uint8_t pc_dma_read_byte(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void pc_dma_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t pc_dma8237_1_dack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
@@ -97,12 +97,12 @@ public:
 	void pc_dma8237_2_dack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void pc_dma8237_3_dack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void pc_dma8237_0_dack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( pc_dack0_w );
-	DECLARE_WRITE_LINE_MEMBER( pc_dack1_w );
-	DECLARE_WRITE_LINE_MEMBER( pc_dack2_w );
-	DECLARE_WRITE_LINE_MEMBER( pc_dack3_w );
+	void pc_dack0_w(int state);
+	void pc_dack1_w(int state);
+	void pc_dack2_w(int state);
+	void pc_dack3_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( pc_speaker_set_spkrdata );
+	void pc_speaker_set_spkrdata(int state);
 
 	void pc_page_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -132,7 +132,7 @@ public:
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	DECLARE_WRITE_LINE_MEMBER( keyboard_clock_w );
+	void keyboard_clock_w(int state);
 
 protected:
 	// device-level overrides
@@ -168,7 +168,7 @@ public:
 	uint8_t pc_ppi_portc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void pc_ppi_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( keyboard_clock_w );
+	void keyboard_clock_w(int state);
 };
 
 extern const device_type EC1841_MOTHERBOARD;

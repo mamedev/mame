@@ -89,7 +89,7 @@ public:
 
 	dmadac_sound_device *m_dmadac[2];
 
-	INTERRUPT_GEN_MEMBER( mcu_frame );
+	void mcu_frame(device_t &device);
 
 	uint8_t m_servo_io_regs[0x20];
 	uint8_t m_slave_io_regs[0x20];

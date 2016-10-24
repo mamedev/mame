@@ -162,7 +162,7 @@ void ygv608_device::set_gfxbank(uint8_t gfxbank)
 }
 
 /* interrupt generated every 1ms second */
-INTERRUPT_GEN_MEMBER(ygv608_device::timed_interrupt )
+void ygv608_device::timed_interrupt(device_t &device)
 {
 /*
     this is not quite generic, because we trigger a 68k interrupt
@@ -193,7 +193,7 @@ INTERRUPT_GEN_MEMBER(ygv608_device::timed_interrupt )
 }
 
 
-TILEMAP_MAPPER_MEMBER( ygv608_device::get_tile_offset )
+tilemap_memory_index ygv608_device::get_tile_offset(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	// this optimisation is not much good to us,
 	// since we really need row,col in the get_tile_info() routines
@@ -205,7 +205,7 @@ TILEMAP_MAPPER_MEMBER( ygv608_device::get_tile_offset )
 #define layout_total(x) \
 (gfx(x)->elements())
 
-TILE_GET_INFO_MEMBER( ygv608_device::get_tile_info_A_8 )
+void ygv608_device::get_tile_info_A_8(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	// extract row,col packed into tile_index
 	int             col = tile_index >> 6;
@@ -298,7 +298,7 @@ TILE_GET_INFO_MEMBER( ygv608_device::get_tile_info_A_8 )
 	}
 }
 
-TILE_GET_INFO_MEMBER( ygv608_device::get_tile_info_B_8 )
+void ygv608_device::get_tile_info_B_8(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	// extract row,col packed into tile_index
 	int             col = tile_index >> 6;
@@ -395,7 +395,7 @@ TILE_GET_INFO_MEMBER( ygv608_device::get_tile_info_B_8 )
 	}
 }
 
-TILE_GET_INFO_MEMBER( ygv608_device::get_tile_info_A_16 )
+void ygv608_device::get_tile_info_A_16(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	// extract row,col packed into tile_index
 	int             col = tile_index >> 6;
@@ -484,7 +484,7 @@ TILE_GET_INFO_MEMBER( ygv608_device::get_tile_info_A_16 )
 	}
 }
 
-TILE_GET_INFO_MEMBER( ygv608_device::get_tile_info_B_16 )
+void ygv608_device::get_tile_info_B_16(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	// extract row,col packed into tile_index
 	int             col = tile_index >> 6;

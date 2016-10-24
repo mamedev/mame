@@ -29,7 +29,7 @@ public:
 	void visible_page_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void firq_scanline_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer);
+	void scanline_timer(timer_device &timer, void *ptr, int32_t param);
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	template<class _Object> static devcb_base &set_scanline_cb(device_t &device, _Object object) { return downcast<wpc_dmd_device &>(device).scanline_cb.set_callback(object); }

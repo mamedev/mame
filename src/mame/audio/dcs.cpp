@@ -662,7 +662,7 @@ void dcs_audio_device::dcs_boot()
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER( dcs_audio_device::dcs_reset )
+void dcs_audio_device::dcs_reset(void *ptr, int32_t param)
 {
 	if (LOG_DCS_IO)
 		logerror("dcs_reset\n");
@@ -1597,7 +1597,7 @@ void dcs_audio_device::dcs_delayed_data_w(uint16_t data)
 }
 
 
-TIMER_CALLBACK_MEMBER( dcs_audio_device::dcs_delayed_data_w_callback )
+void dcs_audio_device::dcs_delayed_data_w_callback(void *ptr, int32_t param)
 {
 	dcs_delayed_data_w(param);
 }
@@ -1648,7 +1648,7 @@ uint32_t dcs_audio_device::input_latch32_r(address_space &space, offs_t offset, 
     OUTPUT LATCH (data from DCS to host)
 ****************************************************************************/
 
-TIMER_CALLBACK_MEMBER( dcs_audio_device::latch_delayed_w )
+void dcs_audio_device::latch_delayed_w(void *ptr, int32_t param)
 {
 	if (!m_last_output_full && !m_output_full_cb.isnull())
 		m_output_full_cb(m_last_output_full = 1);
@@ -1682,7 +1682,7 @@ void dcs_audio_device::delayed_ack_w()
 }
 
 
-TIMER_CALLBACK_MEMBER( dcs_audio_device::delayed_ack_w_callback )
+void dcs_audio_device::delayed_ack_w_callback(void *ptr, int32_t param)
 {
 	delayed_ack_w();
 }
@@ -1713,7 +1713,7 @@ uint16_t dcs_audio_device::data_r()
     OUTPUT CONTROL BITS (has 3 additional lines to the host)
 ****************************************************************************/
 
-TIMER_CALLBACK_MEMBER( dcs_audio_device::output_control_delayed_w )
+void dcs_audio_device::output_control_delayed_w(void *ptr, int32_t param)
 {
 	if (LOG_DCS_IO)
 		logerror("output_control = %04X\n", param);
@@ -1779,7 +1779,7 @@ void dcs_audio_device::update_timer_count()
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER( dcs_audio_device::internal_timer_callback )
+void dcs_audio_device::internal_timer_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	int64_t target_cycles;
 
@@ -1831,7 +1831,7 @@ void dcs_audio_device::reset_timer()
 }
 
 
-WRITE_LINE_MEMBER(dcs_audio_device::timer_enable_callback)
+void dcs_audio_device::timer_enable_callback(int state)
 {
 	m_timer_enable = state;
 	m_timer_ignore = 0;
@@ -1978,7 +1978,7 @@ void dcs_audio_device:: adsp_control_w(address_space &space, offs_t offset, uint
     DCS IRQ GENERATION CALLBACKS
 ****************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER( dcs_audio_device::dcs_irq )
+void dcs_audio_device::dcs_irq(timer_device &timer, void *ptr, int32_t param)
 {
 	/* get the index register */
 	int reg = m_cpu->state_int(ADSP2100_I0 + m_ireg);
@@ -2015,7 +2015,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( dcs_audio_device::dcs_irq )
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER( dcs_audio_device::sport0_irq )
+void dcs_audio_device::sport0_irq(timer_device &timer, void *ptr, int32_t param)
 {
 	/* this latches internally, so we just pulse */
 	/* note that there is non-interrupt code that reads/modifies/writes the output_control */
@@ -2147,7 +2147,7 @@ void dcs_audio_device::fifo_notify(int count, int max)
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER( dcs_audio_device::transfer_watchdog_callback )
+void dcs_audio_device::transfer_watchdog_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	hle_transfer_state &transfer = m_transfer;
 	int starting_writes_left = param;
@@ -2162,7 +2162,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( dcs_audio_device::transfer_watchdog_callback )
 }
 
 
-TIMER_CALLBACK_MEMBER( dcs_audio_device::s1_ack_callback2 )
+void dcs_audio_device::s1_ack_callback2(void *ptr, int32_t param)
 {
 	/* if the output is full, stall for a usec */
 	if (IS_OUTPUT_FULL())
@@ -2174,7 +2174,7 @@ TIMER_CALLBACK_MEMBER( dcs_audio_device::s1_ack_callback2 )
 }
 
 
-TIMER_CALLBACK_MEMBER( dcs_audio_device::s1_ack_callback1 )
+void dcs_audio_device::s1_ack_callback1(void *ptr, int32_t param)
 {
 	/* if the output is full, stall for a usec */
 	if (IS_OUTPUT_FULL())
@@ -2312,7 +2312,7 @@ int dcs_audio_device::preprocess_stage_1(uint16_t data)
 }
 
 
-TIMER_CALLBACK_MEMBER( dcs_audio_device::s2_ack_callback )
+void dcs_audio_device::s2_ack_callback(void *ptr, int32_t param)
 {
 	address_space &space = m_cpu->space(AS_PROGRAM);
 

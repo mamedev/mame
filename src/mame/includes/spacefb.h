@@ -64,7 +64,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	TIMER_CALLBACK_MEMBER(interrupt_callback);
+	void interrupt_callback(void *ptr, int32_t param);
 	void start_interrupt_timer();
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

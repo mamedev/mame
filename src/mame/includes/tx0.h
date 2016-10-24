@@ -160,14 +160,14 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(tx0);
+	void palette_init_tx0(palette_device &palette);
 	uint32_t screen_update_tx0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_tx0(screen_device &screen, bool state);
-	INTERRUPT_GEN_MEMBER(tx0_interrupt);
-	TIMER_CALLBACK_MEMBER(reader_callback);
-	TIMER_CALLBACK_MEMBER(puncher_callback);
-	TIMER_CALLBACK_MEMBER(prt_callback);
-	TIMER_CALLBACK_MEMBER(dis_callback);
+	void tx0_interrupt(device_t &device);
+	void reader_callback(void *ptr, int32_t param);
+	void puncher_callback(void *ptr, int32_t param);
+	void prt_callback(void *ptr, int32_t param);
+	void dis_callback(void *ptr, int32_t param);
 	void tx0_machine_stop();
 	required_device<tx0_device> m_maincpu;
 	inline void tx0_plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint32_t color);
@@ -190,15 +190,15 @@ public:
 	void schedule_select();
 	void schedule_unselect();
 	void tx0_keyboard();
-	DECLARE_WRITE_LINE_MEMBER(tx0_io_cpy);
-	DECLARE_WRITE_LINE_MEMBER(tx0_io_r1l);
-	DECLARE_WRITE_LINE_MEMBER(tx0_io_r3l);
-	DECLARE_WRITE_LINE_MEMBER(tx0_io_p6h);
-	DECLARE_WRITE_LINE_MEMBER(tx0_io_p7h);
-	DECLARE_WRITE_LINE_MEMBER(tx0_io_prt);
-	DECLARE_WRITE_LINE_MEMBER(tx0_io_dis);
-	DECLARE_WRITE_LINE_MEMBER(tx0_sel);
-	DECLARE_WRITE_LINE_MEMBER(tx0_io_reset_callback);
+	void tx0_io_cpy(int state);
+	void tx0_io_r1l(int state);
+	void tx0_io_r3l(int state);
+	void tx0_io_p6h(int state);
+	void tx0_io_p7h(int state);
+	void tx0_io_prt(int state);
+	void tx0_io_dis(int state);
+	void tx0_sel(int state);
+	void tx0_io_reset_callback(int state);
 	void magtape_callback();
 
 private:

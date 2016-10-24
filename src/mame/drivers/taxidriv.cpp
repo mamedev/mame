@@ -302,7 +302,7 @@ static GFXDECODE_START( taxidriv )
 	GFXDECODE_ENTRY( "gfx5", 0, charlayout2, 0, 1 )
 GFXDECODE_END
 
-PALETTE_INIT_MEMBER(taxidriv_state, taxidriv)
+void taxidriv_state::palette_init_taxidriv(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int bit0, bit1, r, g, b;

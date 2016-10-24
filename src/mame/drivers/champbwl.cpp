@@ -182,14 +182,14 @@ public:
 	void machine_start_champbwl();
 	void machine_reset_champbwl();
 	void machine_start_doraemon();
-	DECLARE_PALETTE_INIT(champbwl);
+	void palette_init_champbwl(palette_device &palette);
 	uint32_t screen_update_champbwl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_doraemon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_champbwl(screen_device &screen, bool state);
 	void screen_eof_doraemon(screen_device &screen, bool state);
 };
 
-PALETTE_INIT_MEMBER(champbwl_state,champbwl)
+void champbwl_state::palette_init_champbwl(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i, col;

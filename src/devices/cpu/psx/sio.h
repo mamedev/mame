@@ -64,8 +64,8 @@ public:
 	void write(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	uint32_t read(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_WRITE_LINE_MEMBER(write_rxd);
-	DECLARE_WRITE_LINE_MEMBER(write_dsr);
+	void write_rxd(int state);
+	void write_dsr(int state);
 
 protected:
 	// device-level overrides

@@ -26,8 +26,8 @@ public:
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
-	DECLARE_WRITE_LINE_MEMBER(pc_com_interrupt_1) { m_isa->irq4_w(state); }
-	DECLARE_WRITE_LINE_MEMBER(pc_com_interrupt_2) { m_isa->irq3_w(state); }
+	void pc_com_interrupt_1(int state) { m_isa->irq4_w(state); }
+	void pc_com_interrupt_2(int state) { m_isa->irq3_w(state); }
 protected:
 		// device-level overrides
 		virtual void device_start() override;

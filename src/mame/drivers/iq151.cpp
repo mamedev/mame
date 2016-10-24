@@ -96,9 +96,9 @@ public:
 	uint8_t m_cassette_data;
 	iq151cart_slot_device * m_carts[5];
 	void init_iq151();
-	INTERRUPT_GEN_MEMBER(iq151_vblank_interrupt);
+	void iq151_vblank_interrupt(device_t &device);
 	DECLARE_INPUT_CHANGED_MEMBER(iq151_break);
-	TIMER_DEVICE_CALLBACK_MEMBER(cassette_timer);
+	void cassette_timer(timer_device &timer, void *ptr, int32_t param);
 };
 
 uint8_t iq151_state::keyboard_row_r(address_space &space, offs_t offset, uint8_t mem_mask)
@@ -316,13 +316,13 @@ static INPUT_PORTS_START( iq151 )
 INPUT_PORTS_END
 
 
-INTERRUPT_GEN_MEMBER(iq151_state::iq151_vblank_interrupt)
+void iq151_state::iq151_vblank_interrupt(device_t &device)
 {
 	m_pic->ir6_w(m_vblank_irq_state & 1);
 	m_vblank_irq_state ^= 1;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(iq151_state::cassette_timer)
+void iq151_state::cassette_timer(timer_device &timer, void *ptr, int32_t param)
 {
 	m_cassette_clk ^= 1;
 

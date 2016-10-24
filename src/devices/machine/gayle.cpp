@@ -166,7 +166,7 @@ void gayle_device::gayle_w(address_space &space, offs_t offset, uint16_t data, u
 	}
 }
 
-WRITE_LINE_MEMBER( gayle_device::ide_interrupt_w )
+void gayle_device::ide_interrupt_w(int state)
 {
 	if (VERBOSE)
 		logerror("ide_interrupt_w: %d\n", state);

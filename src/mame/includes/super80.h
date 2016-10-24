@@ -60,7 +60,7 @@ public:
 	void super80_f0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void super80r_f0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t super80_read_ff(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(busreq_w);
+	void busreq_w(int state);
 	uint8_t memory_read_byte(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void memory_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t io_read_byte(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
@@ -72,7 +72,7 @@ public:
 	void machine_reset_super80r();
 	void video_start_super80();
 	void video_start_super80v();
-	DECLARE_PALETTE_INIT(super80m);
+	void palette_init_super80m(palette_device &palette);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(super80);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	uint32_t screen_update_super80(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -81,10 +81,10 @@ public:
 	uint32_t screen_update_super80e(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_super80m(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_super80m(screen_device &screen, bool state);
-	TIMER_CALLBACK_MEMBER(super80_reset);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_h);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_k);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_p);
+	void super80_reset(void *ptr, int32_t param);
+	void timer_h(timer_device &timer, void *ptr, int32_t param);
+	void timer_k(timer_device &timer, void *ptr, int32_t param);
+	void timer_p(timer_device &timer, void *ptr, int32_t param);
 	uint8_t m_s_options;
 	uint8_t m_portf0;
 	uint8_t *m_p_videoram;

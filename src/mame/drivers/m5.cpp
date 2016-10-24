@@ -300,7 +300,7 @@ Few other notes:
 //  MEMORY BANKING
 //**************************************************************************
 
-WRITE_LINE_MEMBER( m5_state::write_centronics_busy )
+void m5_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 }
@@ -874,7 +874,7 @@ INPUT_PORTS_END
 //  TMS9928a_interface vdp_intf
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(m5_state::sordm5_video_interrupt_callback)
+void m5_state::sordm5_video_interrupt_callback(int state)
 {
 	if (state)
 	{

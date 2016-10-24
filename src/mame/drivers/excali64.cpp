@@ -65,7 +65,7 @@ public:
 		, m_floppy1(*this, "fdc:1")
 	{ }
 
-	DECLARE_PALETTE_INIT(excali64);
+	void palette_init_excali64(palette_device &palette);
 	void ppib_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t ppic_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void ppic_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -76,15 +76,15 @@ public:
 	uint8_t porte8_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void portec_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
-	DECLARE_WRITE_LINE_MEMBER(cent_busy_w);
-	DECLARE_WRITE_LINE_MEMBER(busreq_w);
+	void cent_busy_w(int state);
+	void busreq_w(int state);
 	uint8_t memory_read_byte(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void memory_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t io_read_byte(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void io_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	MC6845_UPDATE_ROW(update_row);
-	DECLARE_WRITE_LINE_MEMBER(crtc_hs);
-	DECLARE_WRITE_LINE_MEMBER(crtc_vs);
+	void crtc_hs(int state);
+	void crtc_vs(int state);
 	void motor_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void machine_reset_excali64();
 	required_device<palette_device> m_palette;
@@ -220,7 +220,7 @@ static INPUT_PORTS_START( excali64 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("7 &") PORT_CODE(KEYCODE_7) PORT_CHAR('7') PORT_CHAR('&')
 INPUT_PORTS_END
 
-WRITE_LINE_MEMBER( excali64_state::cent_busy_w )
+void excali64_state::cent_busy_w(int state)
 {
 	m_centronics_busy = state;
 }
@@ -273,7 +273,7 @@ void excali64_state::portec_w(address_space &space, offs_t offset, uint8_t data,
 	m_fdc->dden_w(BIT(data, 2));
 }
 
-WRITE_LINE_MEMBER( excali64_state::busreq_w )
+void excali64_state::busreq_w(int state)
 {
 // since our Z80 has no support for BUSACK, we assume it is granted immediately
 	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, state);
@@ -412,12 +412,12 @@ void excali64_state::machine_reset_excali64()
 	m_maincpu->reset();
 }
 
-WRITE_LINE_MEMBER( excali64_state::crtc_hs )
+void excali64_state::crtc_hs(int state)
 {
 	m_crtc_hs = state;
 }
 
-WRITE_LINE_MEMBER( excali64_state::crtc_vs )
+void excali64_state::crtc_vs(int state)
 {
 	m_crtc_vs = state;
 }
@@ -443,7 +443,7 @@ GFXDECODE_END
 // The prom, the schematic, and the manual all contradict each other,
 // so the colours can only be described as wild guesses. Further, the 38
 // colour-load resistors are missing labels and values.
-PALETTE_INIT_MEMBER( excali64_state, excali64 )
+void excali64_state::palette_init_excali64(palette_device &palette)
 {
 	// do this here because driver_init hasn't run yet
 	m_p_videoram = memregion("videoram")->base();

@@ -93,7 +93,7 @@ void scramble_state::mrkougar_sh_irqtrigger_w(address_space &space, offs_t offse
 	m_konami_7474->clock_w((~data & 0x08) >> 3);
 }
 
-IRQ_CALLBACK_MEMBER(scramble_state::scramble_sh_irq_callback)
+int scramble_state::scramble_sh_irq_callback(device_t &device, int irqline)
 {
 	/* interrupt acknowledge clears the flip-flop --
 	   we need to pulse the CLR line because MAME's core never clears this
@@ -105,7 +105,7 @@ IRQ_CALLBACK_MEMBER(scramble_state::scramble_sh_irq_callback)
 	return 0xff;
 }
 
-WRITE_LINE_MEMBER(scramble_state::scramble_sh_7474_q_callback)
+void scramble_state::scramble_sh_7474_q_callback(int state)
 {
 	/* the Q bar is connected to the Z80's INT line.  But since INT is complemented, */
 	/* we need to complement Q bar */

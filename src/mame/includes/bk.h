@@ -41,8 +41,8 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_bk0010(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(keyboard_callback);
-	IRQ_CALLBACK_MEMBER(bk0010_irq_callback);
+	void keyboard_callback(void *ptr, int32_t param);
+	int bk0010_irq_callback(device_t &device, int irqline);
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
 };

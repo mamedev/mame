@@ -128,7 +128,7 @@ public:
 	uint8_t flipjack_soundlatch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void flipjack_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
-	DECLARE_PALETTE_INIT(flipjack);
+	void palette_init_flipjack(palette_device &palette);
 	uint32_t screen_update_flipjack(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
@@ -139,7 +139,7 @@ public:
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(flipjack_state, flipjack)
+void flipjack_state::palette_init_flipjack(palette_device &palette)
 {
 	// from prom
 	const uint8_t *color_prom = memregion("proms")->base();

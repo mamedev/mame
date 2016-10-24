@@ -42,7 +42,7 @@ public:
 	void pc1350_outb(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void pc1350_outc(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ_LINE_MEMBER(pc1350_brk);
+	int pc1350_brk();
 	uint8_t pc1350_ina(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t pc1350_inb(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t pc1350_lcd_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);

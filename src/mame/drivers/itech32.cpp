@@ -419,7 +419,7 @@ void itech32_state::itech32_update_interrupts(int vint, int xint, int qint)
 }
 
 
-INTERRUPT_GEN_MEMBER(itech32_state::generate_int1)
+void itech32_state::generate_int1(device_t &device)
 {
 	/* signal the NMI */
 	itech32_update_interrupts(1, -1, -1);
@@ -671,7 +671,7 @@ void itech32_state::sound_bank_w(address_space &space, offs_t offset, uint8_t da
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(itech32_state::delayed_sound_data_w)
+void itech32_state::delayed_sound_data_w(void *ptr, int32_t param)
 {
 	m_sound_data = param;
 	m_sound_int_state = 1;
@@ -744,7 +744,7 @@ void itech32_state::drivedge_portb_out(address_space &space, offs_t offset, uint
 }
 
 
-WRITE_LINE_MEMBER(itech32_state::drivedge_turbo_light)
+void itech32_state::drivedge_turbo_light(int state)
 {
 	output().set_led_value(0, state);
 }

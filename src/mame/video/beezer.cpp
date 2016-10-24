@@ -6,7 +6,7 @@
 #include "includes/beezer.h"
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(beezer_state::beezer_interrupt)
+void beezer_state::beezer_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 	via6522_device *via_0 = machine().device<via6522_device>("via6522_0");

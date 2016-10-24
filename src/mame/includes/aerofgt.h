@@ -104,12 +104,12 @@ public:
 	void aerfboo2_okim6295_banking_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void karatblzbl_d7759_write_port_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void karatblzbl_d7759_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	TILE_GET_INFO_MEMBER(get_pspikes_tile_info);
-	TILE_GET_INFO_MEMBER(karatblz_bg1_tile_info);
-	TILE_GET_INFO_MEMBER(karatblz_bg2_tile_info);
-	TILE_GET_INFO_MEMBER(spinlbrk_bg1_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
+	void get_pspikes_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void karatblz_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void karatblz_bg2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void spinlbrk_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_bg2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void machine_start_aerofgt();
 	void machine_reset_aerofgt();
 	void video_start_pspikes();

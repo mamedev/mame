@@ -36,7 +36,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(exerion_state, exerion)
+void exerion_state::palette_init_exerion(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };

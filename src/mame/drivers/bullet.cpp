@@ -714,7 +714,7 @@ INPUT_PORTS_END
 //  Z80CTC
 //-------------------------------------------------
 
-TIMER_DEVICE_CALLBACK_MEMBER(bullet_state::ctc_tick)
+void bullet_state::ctc_tick(timer_device &timer, void *ptr, int32_t param)
 {
 	m_ctc->trg0(1);
 	m_ctc->trg0(0);
@@ -726,7 +726,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(bullet_state::ctc_tick)
 	m_ctc->trg2(0);
 }
 
-WRITE_LINE_MEMBER( bullet_state::dart_rxtxca_w )
+void bullet_state::dart_rxtxca_w(int state)
 {
 	m_dart->txca_w(state);
 	m_dart->rxca_w(state);
@@ -736,13 +736,13 @@ WRITE_LINE_MEMBER( bullet_state::dart_rxtxca_w )
 //  Z80DART
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( bullet_state::dartardy_w )
+void bullet_state::dartardy_w(int state)
 {
 	m_dartardy = state;
 	update_dma_rdy();
 }
 
-WRITE_LINE_MEMBER( bullet_state::dartbrdy_w )
+void bullet_state::dartbrdy_w(int state)
 {
 	m_dartbrdy = state;
 	update_dma_rdy();
@@ -852,22 +852,22 @@ void bulletf_state::dma_mreq_w(address_space &space, offs_t offset, uint8_t data
 //  Z80PIO
 //-------------------------------------------------
 
-DECLARE_WRITE_LINE_MEMBER( bullet_state::write_centronics_busy )
+void bullet_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 }
 
-DECLARE_WRITE_LINE_MEMBER( bullet_state::write_centronics_perror )
+void bullet_state::write_centronics_perror(int state)
 {
 	m_centronics_perror = state;
 }
 
-DECLARE_WRITE_LINE_MEMBER( bullet_state::write_centronics_select )
+void bullet_state::write_centronics_select(int state)
 {
 	m_centronics_select = state;
 }
 
-DECLARE_WRITE_LINE_MEMBER( bullet_state::write_centronics_fault )
+void bullet_state::write_centronics_fault(int state)
 {
 	m_centronics_fault = state;
 }
@@ -923,7 +923,7 @@ void bulletf_state::pio_pa_w(address_space &space, offs_t offset, uint8_t data, 
 	m_scsibus->write_sel(BIT(data, 2));
 }
 
-WRITE_LINE_MEMBER( bulletf_state::cstrb_w )
+void bulletf_state::cstrb_w(int state)
 {
 	m_centronics->write_strobe(!state);
 }
@@ -943,13 +943,13 @@ static SLOT_INTERFACE_START( bullet_35_floppies )
 	SLOT_INTERFACE( "35dd", FLOPPY_35_DD )
 SLOT_INTERFACE_END
 
-WRITE_LINE_MEMBER( bullet_state::fdc_drq_w )
+void bullet_state::fdc_drq_w(int state)
 {
 	m_fdrdy = !state;
 	update_dma_rdy();
 }
 
-WRITE_LINE_MEMBER( bulletf_state::req_w )
+void bulletf_state::req_w(int state)
 {
 	if (!state)
 	{

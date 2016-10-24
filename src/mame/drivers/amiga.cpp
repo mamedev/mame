@@ -67,8 +67,8 @@ public:
 	void init_pal();
 	void init_ntsc();
 
-	DECLARE_WRITE_LINE_MEMBER( zorro2_int2_w );
-	DECLARE_WRITE_LINE_MEMBER( zorro2_int6_w );
+	void zorro2_int2_w(int state);
+	void zorro2_int6_w(int state);
 
 	uint16_t clock_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void clock_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
@@ -103,8 +103,8 @@ public:
 	void init_pal();
 	void init_ntsc();
 
-	DECLARE_WRITE_LINE_MEMBER( side_int2_w );
-	DECLARE_WRITE_LINE_MEMBER( side_int6_w );
+	void side_int2_w(int state);
+	void side_int6_w(int state);
 
 protected:
 	virtual void machine_reset() override;
@@ -145,10 +145,10 @@ public:
 	void dmac_scsi_data_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t dmac_io_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void dmac_io_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( dmac_int_w );
+	void dmac_int_w(int state);
 
 	void tpi_port_b_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( tpi_int_w );
+	void tpi_int_w(int state);
 
 protected:
 	// driver_device overrides
@@ -232,7 +232,7 @@ public:
 	m_gayle_int2(0)
 	{ }
 
-	DECLARE_WRITE_LINE_MEMBER( gayle_int2_w );
+	void gayle_int2_w(int state);
 
 	void init_pal();
 	void init_ntsc();
@@ -254,7 +254,7 @@ public:
 	m_gayle_int2(0)
 	{ }
 
-	DECLARE_WRITE_LINE_MEMBER( gayle_int2_w );
+	void gayle_int2_w(int state);
 
 	void init_pal();
 	void init_ntsc();
@@ -285,7 +285,7 @@ public:
 	void scsi_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	uint16_t ide_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void ide_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	DECLARE_WRITE_LINE_MEMBER( ide_interrupt_w );
+	void ide_interrupt_w(int state);
 	uint32_t motherboard_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	void motherboard_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
@@ -402,7 +402,7 @@ void cdtv_state::dmac_io_write(address_space &space, offs_t offset, uint8_t data
 	m_cdrom->write(space, 0, data);
 }
 
-WRITE_LINE_MEMBER( cdtv_state::dmac_int_w )
+void cdtv_state::dmac_int_w(int state)
 {
 	m_dmac_irq = state;
 	update_int2();
@@ -414,7 +414,7 @@ void cdtv_state::tpi_port_b_write(address_space &space, offs_t offset, uint8_t d
 	m_cdrom->enable_w(BIT(data, 1));
 }
 
-WRITE_LINE_MEMBER( cdtv_state::tpi_int_w )
+void cdtv_state::tpi_int_w(int state)
 {
 	m_tpi_irq = state;
 	update_int2();
@@ -589,13 +589,13 @@ void a2000_state::machine_reset()
 	m_zorro->reset();
 }
 
-WRITE_LINE_MEMBER( a2000_state::zorro2_int2_w )
+void a2000_state::zorro2_int2_w(int state)
 {
 	m_zorro2_int2 = state;
 	update_int2();
 }
 
-WRITE_LINE_MEMBER( a2000_state::zorro2_int6_w )
+void a2000_state::zorro2_int6_w(int state)
 {
 	m_zorro2_int6 = state;
 	update_int6();
@@ -620,13 +620,13 @@ void a500_state::machine_reset()
 	m_side->reset();
 }
 
-WRITE_LINE_MEMBER( a500_state::side_int2_w )
+void a500_state::side_int2_w(int state)
 {
 	m_side_int2 = state;
 	update_int2();
 }
 
-WRITE_LINE_MEMBER( a500_state::side_int6_w )
+void a500_state::side_int6_w(int state)
 {
 	m_side_int6 = state;
 	update_int6();
@@ -710,7 +710,7 @@ bool a600_state::int2_pending()
 	return m_cia_0_irq || m_gayle_int2;
 }
 
-WRITE_LINE_MEMBER( a600_state::gayle_int2_w )
+void a600_state::gayle_int2_w(int state)
 {
 	m_gayle_int2 = state;
 	update_int2();
@@ -721,7 +721,7 @@ bool a1200_state::int2_pending()
 	return m_cia_0_irq || m_gayle_int2;
 }
 
-WRITE_LINE_MEMBER( a1200_state::gayle_int2_w )
+void a1200_state::gayle_int2_w(int state)
 {
 	m_gayle_int2 = state;
 	update_int2();
@@ -779,7 +779,7 @@ void a4000_state::ide_w(address_space &space, offs_t offset, uint16_t data, uint
 		m_ata->write_cs0(space, (offset >> 1) & 0x07, data, mem_mask);
 }
 
-WRITE_LINE_MEMBER( a4000_state::ide_interrupt_w )
+void a4000_state::ide_interrupt_w(int state)
 {
 	m_ide_interrupt = state;
 }

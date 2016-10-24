@@ -62,9 +62,9 @@ public:
 	virtual void machine_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(IOMD_timer0_callback);
-	TIMER_CALLBACK_MEMBER(IOMD_timer1_callback);
-	TIMER_CALLBACK_MEMBER(flyback_timer_callback);
+	void IOMD_timer0_callback(void *ptr, int32_t param);
+	void IOMD_timer1_callback(void *ptr, int32_t param);
+	void flyback_timer_callback(void *ptr, int32_t param);
 };
 
 
@@ -582,7 +582,7 @@ void riscpc_state::fire_iomd_timer(int timer)
 		m_IOMD_timer[timer]->adjust(attotime::from_usec(val), 0, attotime::from_usec(val));
 }
 
-TIMER_CALLBACK_MEMBER(riscpc_state::IOMD_timer0_callback)
+void riscpc_state::IOMD_timer0_callback(void *ptr, int32_t param)
 {
 	m_IRQ_status_A|=0x20;
 	if(m_IRQ_mask_A&0x20)
@@ -591,7 +591,7 @@ TIMER_CALLBACK_MEMBER(riscpc_state::IOMD_timer0_callback)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(riscpc_state::IOMD_timer1_callback)
+void riscpc_state::IOMD_timer1_callback(void *ptr, int32_t param)
 {
 	m_IRQ_status_A|=0x40;
 	if(m_IRQ_mask_A&0x40)
@@ -600,7 +600,7 @@ TIMER_CALLBACK_MEMBER(riscpc_state::IOMD_timer1_callback)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(riscpc_state::flyback_timer_callback)
+void riscpc_state::flyback_timer_callback(void *ptr, int32_t param)
 {
 	m_IRQ_status_A|=0x08;
 	if(m_IRQ_mask_A&0x08)

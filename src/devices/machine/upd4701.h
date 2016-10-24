@@ -24,15 +24,15 @@ public:
 	void y_add( int16_t data );
 	void switches_set( uint8_t data );
 
-	DECLARE_WRITE_LINE_MEMBER( cs_w );
-	DECLARE_WRITE_LINE_MEMBER( xy_w );
-	DECLARE_WRITE_LINE_MEMBER( ul_w );
-	DECLARE_WRITE_LINE_MEMBER( resetx_w );
-	DECLARE_WRITE_LINE_MEMBER( resety_w );
+	void cs_w(int state);
+	void xy_w(int state);
+	void ul_w(int state);
+	void resetx_w(int state);
+	void resety_w(int state);
 
 	uint16_t d_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
-	DECLARE_READ_LINE_MEMBER( cf_r );
-	DECLARE_READ_LINE_MEMBER( sf_r );
+	int cf_r();
+	int sf_r();
 
 protected:
 	// device-level overrides

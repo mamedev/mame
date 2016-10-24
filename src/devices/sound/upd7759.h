@@ -44,8 +44,8 @@ public:
 
 	void set_bank_base(offs_t base);
 
-	DECLARE_WRITE_LINE_MEMBER( reset_w );
-	DECLARE_READ_LINE_MEMBER( busy_r );
+	void reset_w(int state);
+	int busy_r();
 	virtual void port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void postload();
 
@@ -124,7 +124,7 @@ public:
 
 	emu_timer *m_timer;                       /* timer */
 
-	DECLARE_WRITE_LINE_MEMBER( start_w );
+	void start_w(int state);
 };
 
 class upd7756_device : public upd775x_device
@@ -136,7 +136,7 @@ public:
 	virtual void device_reset() override;
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
-	DECLARE_WRITE_LINE_MEMBER( start_w );
+	void start_w(int state);
 };
 
 extern const device_type UPD7759;

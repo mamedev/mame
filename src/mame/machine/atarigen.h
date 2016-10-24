@@ -115,8 +115,8 @@ public:
 	template<class _Object> static devcb_base &static_set_main_int_cb(device_t &device, _Object object) { return downcast<atari_sound_comm_device &>(device).m_main_int_cb.set_callback(object); }
 
 	// getters
-	DECLARE_READ_LINE_MEMBER(main_to_sound_ready) { return m_main_to_sound_ready ? ASSERT_LINE : CLEAR_LINE; }
-	DECLARE_READ_LINE_MEMBER(sound_to_main_ready) { return m_sound_to_main_ready ? ASSERT_LINE : CLEAR_LINE; }
+	int main_to_sound_ready() { return m_main_to_sound_ready ? ASSERT_LINE : CLEAR_LINE; }
+	int sound_to_main_ready() { return m_sound_to_main_ready ? ASSERT_LINE : CLEAR_LINE; }
 
 	// main cpu accessors (forward internally to the atari_sound_comm_device)
 	void main_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -129,10 +129,10 @@ public:
 	uint8_t sound_command_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void sound_irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t sound_irq_ack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	INTERRUPT_GEN_MEMBER(sound_irq_gen);
+	void sound_irq_gen(device_t &device);
 
 	// additional helpers
-	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_gen);
+	void ym2151_irq_gen(int state);
 
 protected:
 	// sound I/O helpers
@@ -343,15 +343,15 @@ public:
 
 	// interrupt handling
 	void scanline_int_set(screen_device &screen, int scanline);
-	DECLARE_WRITE_LINE_MEMBER(scanline_int_write_line);
-	INTERRUPT_GEN_MEMBER(scanline_int_gen);
+	void scanline_int_write_line(int state);
+	void scanline_int_gen(device_t &device);
 	void scanline_int_ack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE_LINE_MEMBER(sound_int_write_line);
-	INTERRUPT_GEN_MEMBER(sound_int_gen);
+	void sound_int_write_line(int state);
+	void sound_int_gen(device_t &device);
 	void sound_int_ack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	INTERRUPT_GEN_MEMBER(video_int_gen);
+	void video_int_gen(device_t &device);
 	void video_int_ack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	// slapstic helpers

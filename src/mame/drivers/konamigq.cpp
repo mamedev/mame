@@ -115,8 +115,8 @@ public:
 	void init_konamigq();
 	void machine_start_konamigq();
 	void machine_reset_konamigq();
-	INTERRUPT_GEN_MEMBER(tms_sync);
-	DECLARE_WRITE_LINE_MEMBER(k054539_irq_gen);
+	void tms_sync(device_t &device);
+	void k054539_irq_gen(int state);
 
 	void scsi_dma_read( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
 	void scsi_dma_write( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
@@ -179,7 +179,7 @@ ADDRESS_MAP_END
 
 /* SOUND CPU */
 
-INTERRUPT_GEN_MEMBER(konamigq_state::tms_sync)
+void konamigq_state::tms_sync(device_t &device)
 {
 	// DASP is synced to the LRCLK of the 058141
 	if (m_sound_ctrl & 0x20)
@@ -239,7 +239,7 @@ ADDRESS_MAP_END
 
 
 /* 058141 */
-WRITE_LINE_MEMBER(konamigq_state::k054539_irq_gen)
+void konamigq_state::k054539_irq_gen(int state)
 {
 	if (m_sound_ctrl & 1)
 	{

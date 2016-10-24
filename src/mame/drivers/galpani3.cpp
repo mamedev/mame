@@ -118,7 +118,7 @@ public:
 	virtual void video_start() override;
 
 	uint32_t screen_update_galpani3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(galpani3_vblank);
+	void galpani3_vblank(timer_device &timer, void *ptr, int32_t param);
 	int gp3_is_alpha_pen(int pen);
 };
 
@@ -131,7 +131,7 @@ public:
 
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(galpani3_state::galpani3_vblank)// 2, 3, 5 ?
+void galpani3_state::galpani3_vblank(timer_device &timer, void *ptr, int32_t param)// 2, 3, 5 ?
 {
 	int scanline = param;
 

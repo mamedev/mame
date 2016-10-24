@@ -501,8 +501,8 @@ public:
 	void lamps_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void pulses_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_majorpkr();
-	TILE_GET_INFO_MEMBER(bg_get_tile_info);
-	TILE_GET_INFO_MEMBER(fg_get_tile_info);
+	void bg_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void fg_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void video_start() override;
 	uint32_t screen_update_majorpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
@@ -512,7 +512,7 @@ public:
 *     Video Hardware     *
 *************************/
 
-TILE_GET_INFO_MEMBER(majorpkr_state::bg_get_tile_info)
+void majorpkr_state::bg_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_bg_vram[2 * tile_index] + (m_bg_vram[2 * tile_index + 1] << 8);
 
@@ -522,7 +522,7 @@ TILE_GET_INFO_MEMBER(majorpkr_state::bg_get_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(majorpkr_state::fg_get_tile_info)
+void majorpkr_state::fg_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_fg_vram[2 * tile_index] + (m_fg_vram[2 * tile_index + 1] << 8);
 

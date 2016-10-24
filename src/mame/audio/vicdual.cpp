@@ -123,7 +123,7 @@ MACHINE_CONFIG_FRAGMENT( frogs_audio )
 MACHINE_CONFIG_END
 
 
-TIMER_CALLBACK_MEMBER( vicdual_state::frogs_croak_callback )
+void vicdual_state::frogs_croak_callback(void *ptr, int32_t param)
 {
 	m_samples->stop(2);
 }

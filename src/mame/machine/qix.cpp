@@ -42,7 +42,7 @@ void qix_state::machine_start_qixmcu()
  *
  *************************************/
 
-WRITE_LINE_MEMBER(qix_state::qix_vsync_changed)
+void qix_state::qix_vsync_changed(int state)
 {
 	m_sndpia0->cb1_w(state);
 }
@@ -242,7 +242,7 @@ void qix_state::qix_68705_portC_w(address_space &space, offs_t offset, uint8_t d
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(qix_state::pia_w_callback)
+void qix_state::pia_w_callback(void *ptr, int32_t param)
 {
 	m_pia0->write(generic_space(), param >> 8, param & 0xff);
 }

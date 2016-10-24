@@ -17,17 +17,17 @@ inline void wgp_state::common_get_piv_tile_info( tile_data &tileinfo, int tile_i
 			TILE_FLIPYX( (attr & 0xc0) >> 6));
 }
 
-TILE_GET_INFO_MEMBER(wgp_state::get_piv0_tile_info)
+void wgp_state::get_piv0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	common_get_piv_tile_info(tileinfo, tile_index, 0);
 }
 
-TILE_GET_INFO_MEMBER(wgp_state::get_piv1_tile_info)
+void wgp_state::get_piv1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	common_get_piv_tile_info(tileinfo, tile_index, 1);
 }
 
-TILE_GET_INFO_MEMBER(wgp_state::get_piv2_tile_info)
+void wgp_state::get_piv2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	common_get_piv_tile_info(tileinfo, tile_index, 2);
 }

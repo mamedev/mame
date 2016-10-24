@@ -1422,7 +1422,7 @@ void mcd212_device::regs_w(address_space &space, offs_t offset, uint16_t data, u
 	}
 }
 
-TIMER_CALLBACK_MEMBER( mcd212_device::perform_scan )
+void mcd212_device::perform_scan(void *ptr, int32_t param)
 {
 	int scanline = m_screen->vpos();
 

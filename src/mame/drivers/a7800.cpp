@@ -141,10 +141,10 @@ public:
 	void init_a7800_ntsc();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(a7800);
-	DECLARE_PALETTE_INIT(a7800p);
-	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
-	TIMER_CALLBACK_MEMBER(maria_startdma);
+	void palette_init_a7800(palette_device &palette);
+	void palette_init_a7800p(palette_device &palette);
+	void interrupt(timer_device &timer, void *ptr, int32_t param);
+	void maria_startdma(void *ptr, int32_t param);
 	uint8_t riot_joystick_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t riot_console_button_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void riot_button_pullup_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -249,14 +249,14 @@ void a7800_state::tia_w(address_space &space, offs_t offset, uint8_t data, uint8
 
 // TIMERS
 
-TIMER_DEVICE_CALLBACK_MEMBER(a7800_state::interrupt)
+void a7800_state::interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	// DMA Begins 7 cycles after hblank
 	machine().scheduler().timer_set(m_maincpu->cycles_to_attotime(7), timer_expired_delegate(FUNC(a7800_state::maria_startdma),this));
 	m_maria->interrupt(m_lines);
 }
 
-TIMER_CALLBACK_MEMBER(a7800_state::maria_startdma)
+void a7800_state::maria_startdma(void *ptr, int32_t param)
 {
 	m_maria->startdma(m_lines);
 }
@@ -1281,13 +1281,13 @@ define NTSC_LIGHT_ORANGE
 ***************************************************************************/
 
 /* Initialise the palette */
-PALETTE_INIT_MEMBER(a7800_state, a7800)
+void a7800_state::palette_init_a7800(palette_device &palette)
 {
 	palette.set_pen_colors(0, a7800_palette, ARRAY_LENGTH(a7800_palette));
 }
 
 
-PALETTE_INIT_MEMBER(a7800_state,a7800p)
+void a7800_state::palette_init_a7800p(palette_device &palette)
 {
 	palette.set_pen_colors(0, a7800p_palette, ARRAY_LENGTH(a7800p_palette));
 }

@@ -60,10 +60,10 @@ void snapshot_image_device::device_config_complete()
 }
 
 /*-------------------------------------------------
-    TIMER_CALLBACK_MEMBER(process_snapshot_or_quickload)
+    void process_snapshot_or_quickload(void *ptr, int32_t param)
 -------------------------------------------------*/
 
-TIMER_CALLBACK_MEMBER(snapshot_image_device::process_snapshot_or_quickload)
+void snapshot_image_device::process_snapshot_or_quickload(void *ptr, int32_t param)
 {
 	/* invoke the load */
 	m_load(*this, filetype().c_str(), length());

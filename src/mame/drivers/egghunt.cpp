@@ -84,7 +84,7 @@ public:
 	void egghunt_soundlatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t egghunt_okibanking_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void egghunt_okibanking_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -136,7 +136,7 @@ void egghunt_state::draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect
 	}
 }
 
-TILE_GET_INFO_MEMBER(egghunt_state::get_bg_tile_info)
+void egghunt_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = ((m_bgram[tile_index * 2 + 1] << 8) | m_bgram[tile_index * 2]) & 0x3fff;
 	int colour = m_atram[tile_index] & 0x3f;

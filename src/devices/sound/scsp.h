@@ -180,9 +180,9 @@ private:
 	void CheckPendingIRQ();
 	void MainCheckPendingIRQ(uint16_t irq_type);
 	void ResetInterrupts();
-	TIMER_CALLBACK_MEMBER( timerA_cb );
-	TIMER_CALLBACK_MEMBER( timerB_cb );
-	TIMER_CALLBACK_MEMBER( timerC_cb );
+	void timerA_cb(void *ptr, int32_t param);
+	void timerB_cb(void *ptr, int32_t param);
+	void timerC_cb(void *ptr, int32_t param);
 	int Get_AR(int base, int R);
 	int Get_DR(int base, int R);
 	int Get_RR(int base, int R);

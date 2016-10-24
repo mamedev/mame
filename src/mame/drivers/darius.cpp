@@ -474,7 +474,7 @@ static ADDRESS_MAP_START( darius_sound2_map, AS_PROGRAM, 8, darius_state )
 ADDRESS_MAP_END
 
 
-WRITE_LINE_MEMBER(darius_state::darius_adpcm_int)
+void darius_state::darius_adpcm_int(int state)
 {
 	if (m_nmi_enable)
 		m_adpcm->set_input_line(INPUT_LINE_NMI, PULSE_LINE);

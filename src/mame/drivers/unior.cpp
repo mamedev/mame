@@ -61,7 +61,7 @@ public:
 
 	void vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(write_uart_clock);
+	void write_uart_clock(int state);
 	uint8_t ppi0_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void ppi0_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t ppi1_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
@@ -69,8 +69,8 @@ public:
 	uint8_t ppi1_c_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void ppi1_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void ppi1_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(hrq_w);
-	DECLARE_PALETTE_INIT(unior);
+	void hrq_w(int state);
+	void palette_init_unior(palette_device &palette);
 	uint8_t dma_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 
@@ -286,7 +286,7 @@ static const rgb_t unior_palette[3] =
 	rgb_t(0xff, 0xff, 0xff)  // highlight
 };
 
-PALETTE_INIT_MEMBER(unior_state,unior)
+void unior_state::palette_init_unior(palette_device &palette)
 {
 	palette.set_pen_colors(0, unior_palette, ARRAY_LENGTH(unior_palette));
 }
@@ -299,7 +299,7 @@ PALETTE_INIT_MEMBER(unior_state,unior)
 *************************************************/
 
 
-WRITE_LINE_MEMBER(unior_state::write_uart_clock)
+void unior_state::write_uart_clock(int state)
 {
 	m_uart->write_txc(state);
 	m_uart->write_rxc(state);
@@ -363,7 +363,7 @@ uint8_t unior_state::dma_r(address_space &space, offs_t offset, uint8_t mem_mask
 		return m_p_vram[offset & 0x7ff];
 }
 
-WRITE_LINE_MEMBER( unior_state::hrq_w )
+void unior_state::hrq_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state);
 	m_dma->hlda_w(state);

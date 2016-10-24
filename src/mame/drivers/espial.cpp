@@ -73,7 +73,7 @@ void espial_state::espial_sound_nmi_mask_w(address_space &space, offs_t offset, 
 	m_sound_nmi_enabled = data & 1;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(espial_state::espial_scanline)
+void espial_state::espial_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -85,7 +85,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(espial_state::espial_scanline)
 }
 
 
-INTERRUPT_GEN_MEMBER(espial_state::espial_sound_nmi_gen)
+void espial_state::espial_sound_nmi_gen(device_t &device)
 {
 	if (m_sound_nmi_enabled)
 		nmi_line_pulse(device);

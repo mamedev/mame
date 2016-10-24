@@ -57,7 +57,7 @@ public:
 	void machine_reset_divebomb();
 	void machine_start_divebomb();
 	void video_start_divebomb();
-	DECLARE_PALETTE_INIT(divebomb);
+	void palette_init_divebomb(palette_device &palette);
 
 	void update_irqs();
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -67,7 +67,7 @@ public:
 	K051316_CB_MEMBER(zoom_callback_1);
 	K051316_CB_MEMBER(zoom_callback_2);
 
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	uint8_t fgcpu_roz_comm_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void fgcpu_roz_comm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);

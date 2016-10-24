@@ -46,8 +46,8 @@ public:
 	void sol1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { };
 	void intack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void display_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	TIMER_DEVICE_CALLBACK_MEMBER(irq);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_s);
+	void irq(timer_device &timer, void *ptr, int32_t param);
+	void timer_s(timer_device &timer, void *ptr, int32_t param);
 private:
 	bool m_timer_sb;
 	uint8_t m_timer_s[5];
@@ -377,7 +377,7 @@ void atari_s2_state::intack_w(address_space &space, offs_t offset, uint8_t data,
 // m_timer_s[3] shift register of 74LS164 P4
 // m_timer_s[4] shift register of 74LS164 N4
 // m_timer_sb   wanted output of m_timer_s[0]
-TIMER_DEVICE_CALLBACK_MEMBER( atari_s2_state::timer_s )
+void atari_s2_state::timer_s(timer_device &timer, void *ptr, int32_t param)
 {
 	m_timer_s[0]++;
 	bool cs = BIT(m_timer_s[0], (m_sound0 & 0x30) >> 4); // select which frequency to work with by using SEL A,B
@@ -441,7 +441,7 @@ void atari_s2_state::sound1_w(address_space &space, offs_t offset, uint8_t data,
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( atari_s2_state::irq )
+void atari_s2_state::irq(timer_device &timer, void *ptr, int32_t param)
 {
 	if (m_t_c > 0x40)
 		m_maincpu->set_input_line(M6800_IRQ_LINE, HOLD_LINE);

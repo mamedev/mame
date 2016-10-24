@@ -226,7 +226,7 @@ void atarisy2_state::machine_reset_atarisy2()
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(atarisy2_state::vblank_int)
+void atarisy2_state::vblank_int(device_t &device)
 {
 	/* clock the VBLANK through */
 	if (m_interrupt_enable & 8)
@@ -250,7 +250,7 @@ void atarisy2_state::int1_ack_w(address_space &space, offs_t offset, uint16_t da
 }
 
 
-TIMER_CALLBACK_MEMBER(atarisy2_state::delayed_int_enable_w)
+void atarisy2_state::delayed_int_enable_w(void *ptr, int32_t param)
 {
 	m_interrupt_enable = param;
 }

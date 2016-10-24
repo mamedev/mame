@@ -467,7 +467,7 @@ interleave.
 *********************************/
 
 /*
-TIMER_CALLBACK_MEMBER(tnzs_state::kludge_callback)
+void tnzs_state::kludge_callback(void *ptr, int32_t param)
 {
     tnzs_sharedram[0x0f10] = param;
 }
@@ -586,7 +586,7 @@ void tnzs_state::tnzs_mcu_w(address_space &space, offs_t offset, uint8_t data, u
 	}
 }
 
-INTERRUPT_GEN_MEMBER(tnzs_state::arknoid2_interrupt)
+void tnzs_state::arknoid2_interrupt(device_t &device)
 {
 	int coin;
 

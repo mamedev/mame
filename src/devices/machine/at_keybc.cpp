@@ -215,12 +215,12 @@ void at_keyboard_controller_device::command_w(address_space &space, offs_t offse
 	m_cpu->upi41_master_w(space, 1, data);
 }
 
-WRITE_LINE_MEMBER( at_keyboard_controller_device::keyboard_clock_w )
+void at_keyboard_controller_device::keyboard_clock_w(int state)
 {
 	m_clock_signal = state;
 }
 
-WRITE_LINE_MEMBER( at_keyboard_controller_device::keyboard_data_w )
+void at_keyboard_controller_device::keyboard_data_w(int state)
 {
 	m_data_signal = state;
 }

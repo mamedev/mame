@@ -35,8 +35,8 @@ public:
 	uint8_t control_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( write_irq_enabled );
-	DECLARE_WRITE_LINE_MEMBER( write_centronics_ack );
+	void write_irq_enabled(int state);
+	void write_centronics_ack(int state);
 
 protected:
 	// device-level overrides

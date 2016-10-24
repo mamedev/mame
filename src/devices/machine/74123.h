@@ -118,8 +118,8 @@ protected:
 	virtual void device_post_load() override { }
 	virtual void device_clock_changed() override { }
 
-	TIMER_CALLBACK_MEMBER( output_callback );
-	TIMER_CALLBACK_MEMBER( clear_callback );
+	void output_callback(void *ptr, int32_t param);
+	void clear_callback(void *ptr, int32_t param);
 
 private:
 

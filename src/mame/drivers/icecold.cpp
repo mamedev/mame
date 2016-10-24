@@ -57,8 +57,8 @@ public:
 	// motors positions
 	int     m_rmotor;           // right motor position (0-100)
 	int     m_lmotor;           // left motor position (0-100)
-	TIMER_DEVICE_CALLBACK_MEMBER(icecold_sint_timer);
-	TIMER_DEVICE_CALLBACK_MEMBER(icecold_motors_timer);
+	void icecold_sint_timer(timer_device &timer, void *ptr, int32_t param);
+	void icecold_motors_timer(timer_device &timer, void *ptr, int32_t param);
 };
 
 static ADDRESS_MAP_START( icecold_map, AS_PROGRAM, 8, icecold_state )
@@ -284,13 +284,13 @@ void icecold_state::ay8910_1_b_w(address_space &space, offs_t offset, uint8_t da
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(icecold_state::icecold_sint_timer)
+void icecold_state::icecold_sint_timer(timer_device &timer, void *ptr, int32_t param)
 {
 	m_sint = !m_sint;
 	m_pia1->ca1_w(m_sint);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(icecold_state::icecold_motors_timer)
+void icecold_state::icecold_motors_timer(timer_device &timer, void *ptr, int32_t param)
 {
 	// /MOTENBL is set high during reset for disable the motors control
 	if (m_motenbl == 0)

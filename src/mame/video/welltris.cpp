@@ -51,7 +51,7 @@ void welltris_state::scrollreg_w(address_space &space, offs_t offset, uint16_t d
 	}
 }
 
-TILE_GET_INFO_MEMBER(welltris_state::get_tile_info)
+void welltris_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = m_charvideoram[tile_index];
 	int bank = (code & 0x1000) >> 12;

@@ -36,9 +36,9 @@ public:
 	void init_apexc();
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(apexc);
+	void palette_init_apexc(palette_device &palette);
 	uint32_t screen_update_apexc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(apexc_interrupt);
+	void apexc_interrupt(device_t &device);
 	uint8_t tape_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void tape_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void apexc_draw_led(bitmap_ind16 &bitmap, int x, int y, int state);
@@ -399,7 +399,7 @@ INPUT_PORTS_END
 /*
     Not a real interrupt - just handle keyboard input
 */
-INTERRUPT_GEN_MEMBER(apexc_state::apexc_interrupt)
+void apexc_state::apexc_interrupt(device_t &device)
 {
 	address_space& space = m_maincpu->space(AS_PROGRAM);
 	uint32_t edit_keys;
@@ -552,7 +552,7 @@ static const rectangle teletyper_scroll_clear_window(
 );
 //static const int var_teletyper_scroll_step = - teletyper_scroll_step;
 
-PALETTE_INIT_MEMBER(apexc_state, apexc)
+void apexc_state::palette_init_apexc(palette_device &palette)
 {
 	palette.set_pen_colors(0, apexc_palette, APEXC_PALETTE_SIZE);
 }

@@ -42,8 +42,8 @@ public:
 
 	void init_pc1403();
 	uint32_t screen_update_pc1403(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_READ_LINE_MEMBER(pc1403_reset);
-	DECLARE_READ_LINE_MEMBER(pc1403_brk);
+	int pc1403_reset();
+	int pc1403_brk();
 	void pc1403_outa(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void pc1403_outc(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t pc1403_ina(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);

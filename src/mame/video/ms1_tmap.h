@@ -89,10 +89,10 @@ private:
 	tilemap_t *m_tilemap[2][4];
 
 	// helpers
-	TILEMAP_MAPPER_MEMBER(scan_8x8);
-	TILEMAP_MAPPER_MEMBER(scan_16x16);
-	TILE_GET_INFO_MEMBER(get_scroll_tile_info_8x8);
-	TILE_GET_INFO_MEMBER(get_scroll_tile_info_16x16);
+	tilemap_memory_index scan_8x8(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	tilemap_memory_index scan_16x16(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	void get_scroll_tile_info_8x8(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_scroll_tile_info_16x16(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 };
 
 // device type definition

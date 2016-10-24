@@ -47,7 +47,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(rotaryf_interrupt);
+	void rotaryf_interrupt(timer_device &timer, void *ptr, int32_t param);
 };
 
 
@@ -120,7 +120,7 @@ void rotaryf_state::port30_w(address_space &space, offs_t offset, uint8_t data, 
  *
  *************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(rotaryf_state::rotaryf_interrupt)
+void rotaryf_state::rotaryf_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

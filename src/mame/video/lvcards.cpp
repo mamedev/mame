@@ -12,7 +12,7 @@
 #include "includes/lvcards.h"
 
 
-PALETTE_INIT_MEMBER(lvcards_state,ponttehk)
+void lvcards_state::palette_init_ponttehk(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -48,7 +48,7 @@ PALETTE_INIT_MEMBER(lvcards_state,ponttehk)
 	}
 }
 
-PALETTE_INIT_MEMBER(lvcards_state, lvcards)//Ever so slightly different, but different enough.
+void lvcards_state::palette_init_lvcards(palette_device &palette)//Ever so slightly different, but different enough.
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -96,7 +96,7 @@ void lvcards_state::lvcards_colorram_w(address_space &space, offs_t offset, uint
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(lvcards_state::get_bg_tile_info)
+void lvcards_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_colorram[tile_index];
 	int code = m_videoram[tile_index] + ((attr & 0x30) << 4) + ((attr & 0x80) << 3);

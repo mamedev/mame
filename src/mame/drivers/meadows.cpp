@@ -208,7 +208,7 @@ INPUT_CHANGED_MEMBER(meadows_state::coin_inserted)
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(meadows_state::meadows_interrupt)
+void meadows_state::meadows_interrupt(device_t &device)
 {
 	/* fake something toggling the sense input line of the S2650 */
 	m_main_sense_state ^= 1;
@@ -223,7 +223,7 @@ INTERRUPT_GEN_MEMBER(meadows_state::meadows_interrupt)
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(meadows_state::minferno_interrupt)
+void meadows_state::minferno_interrupt(device_t &device)
 {
 	m_main_sense_state++;
 	device.execute().set_input_line(1, (m_main_sense_state & 0x40) ? ASSERT_LINE : CLEAR_LINE );
@@ -304,7 +304,7 @@ uint8_t meadows_state::audio_hardware_r(address_space &space, offs_t offset, uin
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(meadows_state::audio_interrupt)
+void meadows_state::audio_interrupt(device_t &device)
 {
 	/* fake something toggling the sense input line of the S2650 */
 	m_audio_sense_state ^= 1;

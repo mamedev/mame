@@ -82,15 +82,15 @@ public:
 	void segment_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void display_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( dmaout_w );
-	DECLARE_WRITE_LINE_MEMBER( efx_w );
-	DECLARE_READ_LINE_MEMBER( wait_r );
-	DECLARE_READ_LINE_MEMBER( clear_r );
-	DECLARE_READ_LINE_MEMBER( ef1_r );
-	DECLARE_READ_LINE_MEMBER( ef2_r );
-	DECLARE_READ_LINE_MEMBER( ef3_r );
-	DECLARE_READ_LINE_MEMBER( ef4_r );
-	DECLARE_WRITE_LINE_MEMBER( q_w );
+	void dmaout_w(int state);
+	void efx_w(int state);
+	int wait_r();
+	int clear_r();
+	int ef1_r();
+	int ef2_r();
+	int ef3_r();
+	int ef4_r();
+	void q_w(int state);
 	uint8_t dma_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void sc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_INPUT_CHANGED_MEMBER( data );
@@ -133,8 +133,8 @@ public:
 	int m_video_on;
 
 	void init_cosmicos();
-	TIMER_DEVICE_CALLBACK_MEMBER(digit_tick);
-	TIMER_DEVICE_CALLBACK_MEMBER(int_tick);
+	void digit_tick(timer_device &timer, void *ptr, int32_t param);
+	void int_tick(timer_device &timer, void *ptr, int32_t param);
 };
 
 #endif

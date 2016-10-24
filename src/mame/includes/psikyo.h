@@ -91,8 +91,8 @@ public:
 	void init_tengai();
 	void init_s1945jn();
 	void init_gunbird();
-	TILE_GET_INFO_MEMBER(get_tile_info_0);
-	TILE_GET_INFO_MEMBER(get_tile_info_1);
+	void get_tile_info_0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info_1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void video_start_sngkace();
@@ -100,7 +100,7 @@ public:
 	uint32_t screen_update_psikyo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_psikyo_bootleg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_psikyo(screen_device &screen, bool state);
-	TIMER_CALLBACK_MEMBER(psikyo_soundlatch_callback);
+	void psikyo_soundlatch_callback(void *ptr, int32_t param);
 	void psikyo_switch_banks( int tmap, int bank );
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int trans_pen );
 	void draw_sprites_bootleg( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int trans_pen );

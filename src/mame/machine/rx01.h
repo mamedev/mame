@@ -48,7 +48,7 @@ protected:
 	void data_write(uint16_t data);
 	uint16_t data_read();
 
-	TIMER_CALLBACK_MEMBER(service_command);
+	void service_command(void *ptr, int32_t param);
 
 	void position_head();
 	void read_sector();

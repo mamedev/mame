@@ -77,7 +77,7 @@ static GFXDECODE_START( wswan )
 GFXDECODE_END
 
 /* WonderSwan can display 16 shades of grey */
-PALETTE_INIT_MEMBER(wswan_state, wswan)
+void wswan_state::palette_init_wswan(palette_device &palette)
 {
 	for (int i = 0; i < 16; i++)
 	{
@@ -86,7 +86,7 @@ PALETTE_INIT_MEMBER(wswan_state, wswan)
 	}
 }
 
-PALETTE_INIT_MEMBER(wswan_state, wscolor)
+void wswan_state::palette_init_wscolor(palette_device &palette)
 {
 	for (int i = 0; i < 4096; i++)
 	{

@@ -74,7 +74,7 @@ void sslam_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 
 /* Text Layer */
 
-TILE_GET_INFO_MEMBER(sslam_state::get_sslam_tx_tile_info)
+void sslam_state::get_sslam_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_tx_tileram[tile_index] & 0x0fff;
 	int colr = m_tx_tileram[tile_index] & 0xf000;
@@ -90,7 +90,7 @@ void sslam_state::sslam_tx_tileram_w(address_space &space, offs_t offset, uint16
 
 /* Middle Layer */
 
-TILE_GET_INFO_MEMBER(sslam_state::get_sslam_md_tile_info)
+void sslam_state::get_sslam_md_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_md_tileram[tile_index] & 0x0fff;
 	int colr = m_md_tileram[tile_index] & 0xf000;
@@ -106,7 +106,7 @@ void sslam_state::sslam_md_tileram_w(address_space &space, offs_t offset, uint16
 
 /* Background Layer */
 
-TILE_GET_INFO_MEMBER(sslam_state::get_sslam_bg_tile_info)
+void sslam_state::get_sslam_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_bg_tileram[tile_index] & 0x1fff;
 	int colr = m_bg_tileram[tile_index] & 0xe000;
@@ -120,7 +120,7 @@ void sslam_state::sslam_bg_tileram_w(address_space &space, offs_t offset, uint16
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(sslam_state::get_powerbls_bg_tile_info)
+void sslam_state::get_powerbls_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_bg_tileram[tile_index*2+1] & 0x0fff;
 	int colr = (m_bg_tileram[tile_index*2+1] & 0xf000) >> 12;

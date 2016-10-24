@@ -86,14 +86,14 @@ public:
 	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( ireq_w );
-	DECLARE_WRITE_LINE_MEMBER( io_w );
-	DECLARE_WRITE_LINE_MEMBER( cd_w );
-	DECLARE_WRITE_LINE_MEMBER( clct_w );
-	DECLARE_WRITE_LINE_MEMBER( mode_w );
+	void ireq_w(int state);
+	void io_w(int state);
+	void cd_w(int state);
+	void clct_w(int state);
+	void mode_w(int state);
 
-	DECLARE_READ_LINE_MEMBER( busy_r );
-	DECLARE_READ_LINE_MEMBER( ecc_not_0_r );
+	int busy_r();
+	int ecc_not_0_r();
 
 protected:
 	// device-level overrides

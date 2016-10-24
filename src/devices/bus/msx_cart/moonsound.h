@@ -27,7 +27,7 @@ public:
 	void write_ymf278b_pcm(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t read_ymf278b_pcm(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t read_c0(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(irq_w);
+	void irq_w(int state);
 
 private:
 	required_device<ymf278b_device> m_ymf278b;

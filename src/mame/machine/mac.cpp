@@ -237,7 +237,7 @@ void mac_state::field_interrupts()
 	}
 }
 
-WRITE_LINE_MEMBER(mac_state::set_scc_interrupt)
+void mac_state::set_scc_interrupt(int state)
 {
 	m_scc_interrupt = state;
 	this->field_interrupts();
@@ -256,7 +256,7 @@ void mac_state::set_via2_interrupt(int value)
 	this->field_interrupts();
 }
 
-WRITE_LINE_MEMBER(mac_state::mac_asc_irq)
+void mac_state::mac_asc_irq(int state)
 {
 	if (INTS_RBV)
 	{
@@ -663,13 +663,13 @@ void mac_state::keyboard_init()
 
 #ifdef MAC_USE_EMULATED_KBD
 
-WRITE_LINE_MEMBER(mac_state::mac_kbd_clk_in)
+void mac_state::mac_kbd_clk_in(int state)
 {
 	printf("CLK: %d\n", state^1);
 	m_via1->write_cb1(state ? 0 : 1);
 }
 
-WRITE_LINE_MEMBER(mac_state::mac_via_out_cb2)
+void mac_state::mac_via_out_cb2(int state)
 {
 	printf("Sending %d to kbd (PC=%x)\n", data, m_maincpu->pc());
 	m_mackbd->data_w((data & 1) ? ASSERT_LINE : CLEAR_LINE);
@@ -677,7 +677,7 @@ WRITE_LINE_MEMBER(mac_state::mac_via_out_cb2)
 
 #else   // keyboard HLE
 
-TIMER_CALLBACK_MEMBER(mac_state::kbd_clock)
+void mac_state::kbd_clock(void *ptr, int32_t param)
 {
 	int i;
 
@@ -715,7 +715,7 @@ void mac_state::kbd_shift_out(int data)
 	}
 }
 
-WRITE_LINE_MEMBER(mac_state::mac_via_out_cb2)
+void mac_state::mac_via_out_cb2(int state)
 {
 	if (m_kbd_comm == false && state == 0)
 	{
@@ -734,7 +734,7 @@ WRITE_LINE_MEMBER(mac_state::mac_via_out_cb2)
 /*
     called when inquiry times out (1/4s)
 */
-TIMER_CALLBACK_MEMBER(mac_state::inquiry_timeout_func)
+void mac_state::inquiry_timeout_func(void *ptr, int32_t param)
 {
 	if (LOG_KEYBOARD)
 		logerror("keyboard enquiry timeout\n");
@@ -1031,7 +1031,7 @@ void mac_state::macii_scsi_w(address_space &space, offs_t offset, uint16_t data,
 	m_ncr5380->ncr5380_write_reg(reg, data>>8);
 }
 
-WRITE_LINE_MEMBER(mac_state::mac_scsi_irq)
+void mac_state::mac_scsi_irq(int state)
 {
 /*  mac_state *mac = machine.driver_data<mac_state>();
 
@@ -1042,7 +1042,7 @@ WRITE_LINE_MEMBER(mac_state::mac_scsi_irq)
     }*/
 }
 
-WRITE_LINE_MEMBER(mac_state::irq_539x_1_w)
+void mac_state::irq_539x_1_w(int state)
 {
 	if (state)  // make sure a CB1 transition occurs
 	{
@@ -1051,7 +1051,7 @@ WRITE_LINE_MEMBER(mac_state::irq_539x_1_w)
 	}
 }
 
-WRITE_LINE_MEMBER(mac_state::drq_539x_1_w)
+void mac_state::drq_539x_1_w(int state)
 {
 	m_dafb_scsi1_drq = state;
 }
@@ -1225,7 +1225,7 @@ void mac_state::mac_iwm_w(address_space &space, offs_t offset, uint16_t data, ui
 		fdc->write((offset >> 8), data>>8);
 }
 
-WRITE_LINE_MEMBER(mac_state::mac_adb_via_out_cb2)
+void mac_state::mac_adb_via_out_cb2(int state)
 {
 //        printf("VIA OUT CB2 = %x\n", state);
 	if (ADB_IS_EGRET)
@@ -1620,7 +1620,7 @@ void mac_state::mac_via_out_b_pmu(address_space &space, offs_t offset, uint8_t d
 	m_pm_req = data & 1;
 }
 
-WRITE_LINE_MEMBER(mac_state::mac_via_irq)
+void mac_state::mac_via_irq(int state)
 {
 	/* interrupt the 68k (level 1) */
 	set_via_interrupt(state);
@@ -1662,7 +1662,7 @@ void mac_state::mac_via_w(address_space &space, offs_t offset, uint16_t data, ui
  * VIA 2 (on Mac IIs, PowerBooks > 100, and PowerMacs)
  * *************************************************************************/
 
-WRITE_LINE_MEMBER(mac_state::mac_via2_irq)
+void mac_state::mac_via2_irq(int state)
 {
 	set_via2_interrupt(state);
 }
@@ -1835,7 +1835,7 @@ void mac_state::mac_via2_out_b_pmu(address_space &space, offs_t offset, uint8_t 
 }
 
 // This signal is generated internally on RBV, V8, Sonora, VASP, Eagle, etc.
-TIMER_CALLBACK_MEMBER(mac_state::mac_6015_tick)
+void mac_state::mac_6015_tick(void *ptr, int32_t param)
 {
 	m_via1->write_ca1(0);
 	m_via1->write_ca1(1);
@@ -2013,7 +2013,7 @@ void mac_state::machine_reset()
 	m_last_taken_interrupt = 0;
 }
 
-WRITE_LINE_MEMBER(mac_state::cuda_reset_w)
+void mac_state::cuda_reset_w(int state)
 {
 	if ((state == ASSERT_LINE) && (m_model < MODEL_MAC_POWERMAC_6100))
 	{
@@ -2036,7 +2036,7 @@ void mac_state::mac_state_load()
 }
 
 
-TIMER_CALLBACK_MEMBER(mac_state::overlay_timeout_func)
+void mac_state::overlay_timeout_func(void *ptr, int32_t param)
 {
 	if (m_overlay != -1)
 	{
@@ -2293,7 +2293,7 @@ void mac_state::vblank_irq()
 	}
 }
 
-TIMER_CALLBACK_MEMBER(mac_state::mac_scanline_tick)
+void mac_state::mac_scanline_tick(void *ptr, int32_t param)
 {
 	int scanline;
 
@@ -2322,32 +2322,32 @@ TIMER_CALLBACK_MEMBER(mac_state::mac_scanline_tick)
 	m_scanline_timer->adjust(machine().first_screen()->time_until_pos((scanline+1) % MAC_V_TOTAL, 0));
 }
 
-WRITE_LINE_MEMBER(mac_state::nubus_irq_9_w)
+void mac_state::nubus_irq_9_w(int state)
 {
 	nubus_slot_interrupt(9, state);
 }
 
-WRITE_LINE_MEMBER(mac_state::nubus_irq_a_w)
+void mac_state::nubus_irq_a_w(int state)
 {
 	nubus_slot_interrupt(0xa, state);
 }
 
-WRITE_LINE_MEMBER(mac_state::nubus_irq_b_w)
+void mac_state::nubus_irq_b_w(int state)
 {
 	nubus_slot_interrupt(0xb, state);
 }
 
-WRITE_LINE_MEMBER(mac_state::nubus_irq_c_w)
+void mac_state::nubus_irq_c_w(int state)
 {
 	nubus_slot_interrupt(0xc, state);
 }
 
-WRITE_LINE_MEMBER(mac_state::nubus_irq_d_w)
+void mac_state::nubus_irq_d_w(int state)
 {
 	nubus_slot_interrupt(0xd, state);
 }
 
-WRITE_LINE_MEMBER(mac_state::nubus_irq_e_w)
+void mac_state::nubus_irq_e_w(int state)
 {
 	nubus_slot_interrupt(0xe, state);
 }

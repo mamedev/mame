@@ -82,7 +82,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_WRITE_LINE_MEMBER(crtc_vsync);
+	void crtc_vsync(int state);
 
 	void palette_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	uint16_t read_from_z80(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
@@ -197,7 +197,7 @@ void tapatune_state::palette_w(address_space &space, offs_t offset, uint16_t dat
 }
 
 
-WRITE_LINE_MEMBER(tapatune_state::crtc_vsync)
+void tapatune_state::crtc_vsync(int state)
 {
 	m_videocpu->set_input_line(2, state ? HOLD_LINE : CLEAR_LINE);
 }

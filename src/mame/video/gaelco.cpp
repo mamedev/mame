@@ -33,7 +33,7 @@
       1  | xxxxxxxx -------- | not used
 */
 
-TILE_GET_INFO_MEMBER(gaelco_state::get_tile_info_gaelco_screen0)
+void gaelco_state::get_tile_info_gaelco_screen0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int data = m_videoram[tile_index << 1];
 	int data2 = m_videoram[(tile_index << 1) + 1];
@@ -45,7 +45,7 @@ TILE_GET_INFO_MEMBER(gaelco_state::get_tile_info_gaelco_screen0)
 }
 
 
-TILE_GET_INFO_MEMBER(gaelco_state::get_tile_info_gaelco_screen1)
+void gaelco_state::get_tile_info_gaelco_screen1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int data = m_videoram[(0x1000 / 2) + (tile_index << 1)];
 	int data2 = m_videoram[(0x1000 / 2) + (tile_index << 1) + 1];

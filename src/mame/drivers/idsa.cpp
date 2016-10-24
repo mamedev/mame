@@ -40,7 +40,7 @@ public:
 		, m_speech(*this, "speech")
 		{ }
 
-	DECLARE_WRITE_LINE_MEMBER(clock_w);
+	void clock_w(int state);
 	uint8_t portb0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void port80_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void port90_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -238,7 +238,7 @@ void idsa_state::ay2_b_w(address_space &space, offs_t offset, uint8_t data, uint
 {
 }
 
-WRITE_LINE_MEMBER( idsa_state::clock_w )
+void idsa_state::clock_w(int state)
 {
 	if (state)
 	{

@@ -117,8 +117,8 @@ public:
 
 	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( ack_w );
-	DECLARE_WRITE_LINE_MEMBER( lpstb_w );
+	void ack_w(int state);
+	void lpstb_w(int state);
 
 	void set_character_width(int value);
 

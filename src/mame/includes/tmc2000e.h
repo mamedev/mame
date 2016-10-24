@@ -51,13 +51,13 @@ public:
 	void io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void io_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void keyboard_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_READ_LINE_MEMBER( rdata_r );
-	DECLARE_READ_LINE_MEMBER( bdata_r );
-	DECLARE_READ_LINE_MEMBER( gdata_r );
-	DECLARE_READ_LINE_MEMBER( clear_r );
-	DECLARE_READ_LINE_MEMBER( ef2_r );
-	DECLARE_READ_LINE_MEMBER( ef3_r );
-	DECLARE_WRITE_LINE_MEMBER( q_w );
+	int rdata_r();
+	int bdata_r();
+	int gdata_r();
+	int clear_r();
+	int ef2_r();
+	int ef3_r();
+	void q_w(int state);
 	void dma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	/* video state */

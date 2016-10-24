@@ -116,10 +116,10 @@ void z80ctc_device::write(address_space &space, offs_t offset, uint8_t data, uin
 //  trigger
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( z80ctc_device::trg0 ) { m_channel[0].trigger(state); }
-WRITE_LINE_MEMBER( z80ctc_device::trg1 ) { m_channel[1].trigger(state); }
-WRITE_LINE_MEMBER( z80ctc_device::trg2 ) { m_channel[2].trigger(state); }
-WRITE_LINE_MEMBER( z80ctc_device::trg3 ) { m_channel[3].trigger(state); }
+void z80ctc_device::trg0(int state) { m_channel[0].trigger(state); }
+void z80ctc_device::trg1(int state) { m_channel[1].trigger(state); }
+void z80ctc_device::trg2(int state) { m_channel[2].trigger(state); }
+void z80ctc_device::trg3(int state) { m_channel[3].trigger(state); }
 
 
 //-------------------------------------------------
@@ -490,7 +490,7 @@ void z80ctc_device::ctc_channel::trigger(uint8_t data)
 //  side-effects
 //-------------------------------------------------
 
-TIMER_CALLBACK_MEMBER(z80ctc_device::ctc_channel::timer_callback)
+void z80ctc_device::ctc_channel::timer_callback(void *ptr, int32_t param)
 {
 	// down counter has reached zero - see if we should interrupt
 	if ((m_mode & INTERRUPT) == INTERRUPT_ON)

@@ -44,7 +44,7 @@ void exprraid_state::exprraid_scrolly_w(address_space &space, offs_t offset, uin
 	m_bg_tilemap->set_scrolly(0, data);
 }
 
-TILE_GET_INFO_MEMBER(exprraid_state::get_bg_tile_info)
+void exprraid_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *tilerom = memregion("gfx4")->base();
 
@@ -71,7 +71,7 @@ TILE_GET_INFO_MEMBER(exprraid_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(bank, code, color, flags);
 }
 
-TILE_GET_INFO_MEMBER(exprraid_state::get_fg_tile_info)
+void exprraid_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_colorram[tile_index];
 	int code = m_videoram[tile_index] + ((attr & 0x07) << 8);

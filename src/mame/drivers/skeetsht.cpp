@@ -51,7 +51,7 @@ public:
 	uint8_t hc11_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void hc11_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void ay8910_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(tms_irq);
+	void tms_irq(int state);
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline_update);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -125,7 +125,7 @@ void skeetsht_state::ramdac_w(address_space &space, offs_t offset, uint16_t data
  *
  *************************************/
 
-WRITE_LINE_MEMBER(skeetsht_state::tms_irq)
+void skeetsht_state::tms_irq(int state)
 {
 	m_68hc11->set_input_line(MC68HC11_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }

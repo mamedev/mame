@@ -55,13 +55,13 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_poly88(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(poly88_interrupt);
-	TIMER_CALLBACK_MEMBER(poly88_usart_timer_callback);
-	TIMER_CALLBACK_MEMBER(keyboard_callback);
-	TIMER_CALLBACK_MEMBER(poly88_cassette_timer_callback);
-	DECLARE_WRITE_LINE_MEMBER(write_cas_tx);
-	DECLARE_WRITE_LINE_MEMBER(poly88_usart_rxready);
-	IRQ_CALLBACK_MEMBER(poly88_irq_callback);
+	void poly88_interrupt(device_t &device);
+	void poly88_usart_timer_callback(void *ptr, int32_t param);
+	void keyboard_callback(void *ptr, int32_t param);
+	void poly88_cassette_timer_callback(void *ptr, int32_t param);
+	void write_cas_tx(int state);
+	void poly88_usart_rxready(int state);
+	int poly88_irq_callback(device_t &device, int irqline);
 	DECLARE_SNAPSHOT_LOAD_MEMBER( poly88 );
 
 protected:

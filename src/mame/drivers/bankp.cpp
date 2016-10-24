@@ -282,7 +282,7 @@ void bankp_state::machine_reset()
 	m_nmi_mask = 0;
 }
 
-INTERRUPT_GEN_MEMBER(bankp_state::vblank_irq)
+void bankp_state::vblank_irq(device_t &device)
 {
 	if(m_nmi_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);

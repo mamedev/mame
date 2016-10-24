@@ -116,7 +116,7 @@ public:
 	uint8_t m_blit_ram[8];
 	uint8_t blitter_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void blitter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(ptm_irq);
+	void ptm_irq(int state);
 	virtual void video_start() override;
 	uint32_t screen_update_vpoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
@@ -620,7 +620,7 @@ static GFXDECODE_START( vpoker )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 1 )
 GFXDECODE_END
 
-WRITE_LINE_MEMBER(vpoker_state::ptm_irq)
+void vpoker_state::ptm_irq(int state)
 {
 	m_maincpu->set_input_line(M6809_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }

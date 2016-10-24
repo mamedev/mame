@@ -221,7 +221,7 @@ static INPUT_PORTS_START( gamecom )
 	PORT_BIT( 0x200, IP_ACTIVE_HIGH, IPT_OTHER)
 	INPUT_PORTS_END
 
-PALETTE_INIT_MEMBER(gamecom_state, gamecom)
+void gamecom_state::palette_init_gamecom(palette_device &palette)
 {
 	palette.set_pen_color(0, 0x00, 0x00, 0x00 ); // Black
 	palette.set_pen_color(1, 0x0F, 0x4F, 0x2F ); // Gray 1
@@ -236,7 +236,7 @@ uint32_t gamecom_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	return 0;
 }
 
-INTERRUPT_GEN_MEMBER(gamecom_state::gamecom_interrupt)
+void gamecom_state::gamecom_interrupt(device_t &device)
 {
 	m_maincpu->set_input_line(sm8500_cpu_device::LCDC_INT, ASSERT_LINE );
 }

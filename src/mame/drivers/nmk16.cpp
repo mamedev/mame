@@ -874,12 +874,12 @@ void nmk16_state::mcu_run(uint8_t dsw_setting)
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(nmk16_state::tdragon_mcu_sim)
+void nmk16_state::tdragon_mcu_sim(timer_device &timer, void *ptr, int32_t param)
 {
 	mcu_run(1);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(nmk16_state::hachamf_mcu_sim)
+void nmk16_state::hachamf_mcu_sim(timer_device &timer, void *ptr, int32_t param)
 {
 	mcu_run(0);
 }
@@ -3806,7 +3806,7 @@ LV4         LV2 LV1        LV1
 
 // todo:total scanlines is 263, adjust according to that!
 // todo: replace with raw screen timings
-TIMER_DEVICE_CALLBACK_MEMBER(nmk16_state::nmk16_scanline)
+void nmk16_state::nmk16_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	const int NUM_SCANLINES = 256;
 	const int IRQ1_SCANLINE = 25; // guess
@@ -4611,7 +4611,7 @@ MACHINE_CONFIG_END
 
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(nmk16_state::manybloc_scanline)
+void nmk16_state::manybloc_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

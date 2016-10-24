@@ -470,7 +470,7 @@ void apple3_state::apple3_c0xx_w(address_space &space, offs_t offset, uint8_t da
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(apple3_state::apple3_interrupt)
+void apple3_state::apple3_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	m_via_1->write_cb1(machine().first_screen()->vblank());
 	m_via_1->write_cb2(machine().first_screen()->vblank());
@@ -637,14 +637,14 @@ void apple3_state::apple3_irq_update()
 	}
 }
 
-WRITE_LINE_MEMBER(apple3_state::apple3_acia_irq_func)
+void apple3_state::apple3_acia_irq_func(int state)
 {
 //  printf("acia IRQ: %d\n", state);
 	m_acia_irq = state;
 	apple3_irq_update();
 }
 
-WRITE_LINE_MEMBER(apple3_state::apple3_via_1_irq_func)
+void apple3_state::apple3_via_1_irq_func(int state)
 {
 //  printf("via 1 IRQ: %d\n", state);
 	m_via_1_irq = state;
@@ -652,7 +652,7 @@ WRITE_LINE_MEMBER(apple3_state::apple3_via_1_irq_func)
 }
 
 
-WRITE_LINE_MEMBER(apple3_state::apple3_via_0_irq_func)
+void apple3_state::apple3_via_0_irq_func(int state)
 {
 //  printf("via 0 IRQ: %d\n", state);
 	m_via_0_irq = state;
@@ -1070,7 +1070,7 @@ void apple3_state::apple3_memory_w(address_space &space, offs_t offset, uint8_t 
 	}
 }
 
-WRITE_LINE_MEMBER(apple3_state::apple3_sync_w)
+void apple3_state::apple3_sync_w(int state)
 {
 //  printf("sync: %d\n", state);
 	m_sync = (state == ASSERT_LINE) ? true : false;
@@ -1081,7 +1081,7 @@ WRITE_LINE_MEMBER(apple3_state::apple3_sync_w)
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(apple3_state::apple3_c040_tick)
+void apple3_state::apple3_c040_tick(timer_device &timer, void *ptr, int32_t param)
 {
 	if (m_c040_time > 0)
 	{
@@ -1091,7 +1091,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple3_state::apple3_c040_tick)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(apple3_state::scanstart_cb)
+void apple3_state::scanstart_cb(void *ptr, int32_t param)
 {
 	int scanline;
 
@@ -1103,7 +1103,7 @@ TIMER_CALLBACK_MEMBER(apple3_state::scanstart_cb)
 	m_scanend->adjust(machine().first_screen()->time_until_pos(scanline, 559));
 }
 
-TIMER_CALLBACK_MEMBER(apple3_state::scanend_cb)
+void apple3_state::scanend_cb(void *ptr, int32_t param)
 {
 	int scanline = machine().first_screen()->vpos();
 
@@ -1112,7 +1112,7 @@ TIMER_CALLBACK_MEMBER(apple3_state::scanend_cb)
 	m_scanstart->adjust(machine().first_screen()->time_until_pos((scanline+1) % 224, 0));
 }
 
-READ_LINE_MEMBER(apple3_state::ay3600_shift_r)
+int apple3_state::ay3600_shift_r()
 {
 	// either shift key
 	if (m_kbspecial->read() & 0x06)
@@ -1123,7 +1123,7 @@ READ_LINE_MEMBER(apple3_state::ay3600_shift_r)
 	return CLEAR_LINE;
 }
 
-READ_LINE_MEMBER(apple3_state::ay3600_control_r)
+int apple3_state::ay3600_control_r()
 {
 	if (m_kbspecial->read() & 0x08)
 	{
@@ -1218,7 +1218,7 @@ static const uint8_t key_remap[0x50][4] =
 	{ 0x00,0x00,0x00,0x00 }     /* 0x4f unused    */
 };
 
-WRITE_LINE_MEMBER(apple3_state::ay3600_data_ready_w)
+void apple3_state::ay3600_data_ready_w(int state)
 {
 	m_via_1->write_ca2(state);
 
@@ -1316,7 +1316,7 @@ void apple3_state::pdl_handler(int offset)
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(apple3_state::paddle_timer)
+void apple3_state::paddle_timer(timer_device &timer, void *ptr, int32_t param)
 {
 	if (m_ramp_active)
 	{
@@ -1339,7 +1339,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple3_state::paddle_timer)
 	}
 }
 
-WRITE_LINE_MEMBER(apple3_state::a2bus_irq_w)
+void apple3_state::a2bus_irq_w(int state)
 {
 	uint8_t irq_mask = m_a2bus->get_a2bus_irq_mask();
 
@@ -1365,7 +1365,7 @@ WRITE_LINE_MEMBER(apple3_state::a2bus_irq_w)
 	}
 }
 
-WRITE_LINE_MEMBER(apple3_state::a2bus_nmi_w)
+void apple3_state::a2bus_nmi_w(int state)
 {
 	m_via_1->write_pb7(state);
 

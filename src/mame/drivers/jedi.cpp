@@ -126,7 +126,7 @@
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(jedi_state::generate_interrupt)
+void jedi_state::generate_interrupt(void *ptr, int32_t param)
 {
 	int scanline = param;
 

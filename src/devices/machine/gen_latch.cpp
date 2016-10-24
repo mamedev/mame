@@ -51,12 +51,12 @@ void generic_latch_8_device::clear_w(address_space &space, offs_t offset, uint8_
 	m_latched_value = 0x00;
 }
 
-WRITE_LINE_MEMBER( generic_latch_8_device::preset_w )
+void generic_latch_8_device::preset_w(int state)
 {
 	m_latched_value = 0xff;
 }
 
-WRITE_LINE_MEMBER( generic_latch_8_device::clear_w )
+void generic_latch_8_device::clear_w(int state)
 {
 	m_latched_value = 0x00;
 }
@@ -133,12 +133,12 @@ void generic_latch_16_device::clear_w(address_space &space, offs_t offset, uint1
 	m_latched_value = 0x0000;
 }
 
-WRITE_LINE_MEMBER( generic_latch_16_device::preset_w )
+void generic_latch_16_device::preset_w(int state)
 {
 	m_latched_value = 0xffff;
 }
 
-WRITE_LINE_MEMBER( generic_latch_16_device::clear_w )
+void generic_latch_16_device::clear_w(int state)
 {
 	m_latched_value = 0x0000;
 }

@@ -18,7 +18,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(gunsmoke_state, gunsmoke)
+void gunsmoke_state::palette_init_gunsmoke(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -100,7 +100,7 @@ void gunsmoke_state::gunsmoke_d806_w(address_space &space, offs_t offset, uint8_
 	m_objon = data & 0x20;
 }
 
-TILE_GET_INFO_MEMBER(gunsmoke_state::get_bg_tile_info)
+void gunsmoke_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *tilerom = memregion("gfx4")->base();
 
@@ -113,7 +113,7 @@ TILE_GET_INFO_MEMBER(gunsmoke_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(1, code, color, flags);
 }
 
-TILE_GET_INFO_MEMBER(gunsmoke_state::get_fg_tile_info)
+void gunsmoke_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_colorram[tile_index];
 	int code = m_videoram[tile_index] + ((attr & 0xe0) << 2);

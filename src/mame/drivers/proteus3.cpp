@@ -67,14 +67,14 @@ public:
 		, m_cass(*this, "cassette")
 	{ }
 
-	DECLARE_WRITE_LINE_MEMBER(ca2_w);
+	void ca2_w(int state);
 	void video_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(acia1_txdata_w);
-	DECLARE_WRITE_LINE_MEMBER(acia1_clock_w);
-	DECLARE_WRITE_LINE_MEMBER(acia2_clock_w);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_c);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_p);
+	void acia1_txdata_w(int state);
+	void acia1_clock_w(int state);
+	void acia2_clock_w(int state);
+	void timer_c(timer_device &timer, void *ptr, int32_t param);
+	void timer_p(timer_device &timer, void *ptr, int32_t param);
 	uint32_t screen_update_proteus3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 private:
@@ -130,7 +130,7 @@ void proteus3_state::kbd_put(address_space &space, offs_t offset, uint8_t data, 
 	m_pia->cb1_w(0);
 }
 
-WRITE_LINE_MEMBER( proteus3_state::acia2_clock_w )
+void proteus3_state::acia2_clock_w(int state)
 {
 	m_acia2->write_txc(state);
 	m_acia2->write_rxc(state);
@@ -139,7 +139,7 @@ WRITE_LINE_MEMBER( proteus3_state::acia2_clock_w )
 /******************************************************************************
  Cassette
 ******************************************************************************/
-TIMER_DEVICE_CALLBACK_MEMBER( proteus3_state::timer_c )
+void proteus3_state::timer_c(timer_device &timer, void *ptr, int32_t param)
 {
 	m_cass_data[3]++;
 
@@ -155,7 +155,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( proteus3_state::timer_c )
 		m_cass->output(BIT(m_cass_data[3], 1) ? -1.0 : +1.0); // 1200Hz
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( proteus3_state::timer_p )
+void proteus3_state::timer_p(timer_device &timer, void *ptr, int32_t param)
 {
 	/* cassette - turn 1200/2400Hz to a bit */
 	m_cass_data[1]++;
@@ -169,12 +169,12 @@ TIMER_DEVICE_CALLBACK_MEMBER( proteus3_state::timer_p )
 	}
 }
 
-WRITE_LINE_MEMBER( proteus3_state::acia1_txdata_w )
+void proteus3_state::acia1_txdata_w(int state)
 {
 	m_cass_state = state;
 }
 
-WRITE_LINE_MEMBER( proteus3_state::acia1_clock_w )
+void proteus3_state::acia1_clock_w(int state)
 {
 	m_clockcnt++;
 	m_acia1->write_txc(BIT(m_clockcnt, 0));  // divide by 16 selected in the acia
@@ -191,7 +191,7 @@ void proteus3_state::video_w(address_space &space, offs_t offset, uint8_t data, 
 	m_video_data = data;
 }
 
-WRITE_LINE_MEMBER( proteus3_state::ca2_w )
+void proteus3_state::ca2_w(int state)
 {
 	if (state)
 	{

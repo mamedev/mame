@@ -254,7 +254,7 @@ public:
 	void init_m2();
 	virtual void video_start() override;
 	uint32_t screen_update_m2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(m2);
+	void m2(device_t &device);
 	void cde_init();
 	void cde_handle_command();
 	void cde_handle_reports();
@@ -1149,7 +1149,7 @@ static INPUT_PORTS_START( m2 )
 INPUT_PORTS_END
 
 
-INTERRUPT_GEN_MEMBER(konamim2_state::m2)
+void konamim2_state::m2(device_t &device)
 {
 	if (m_irq_enable & 0x800000)
 	{

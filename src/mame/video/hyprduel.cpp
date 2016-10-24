@@ -249,17 +249,17 @@ inline void hyprduel_state::hyprduel_vram_w( offs_t offset, uint16_t data, uint1
 
 
 
-TILE_GET_INFO_MEMBER(hyprduel_state::get_tile_info_0_8bit)
+void hyprduel_state::get_tile_info_0_8bit(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	get_tile_info_8bit(tileinfo, tile_index, 0, m_vram_0);
 }
 
-TILE_GET_INFO_MEMBER(hyprduel_state::get_tile_info_1_8bit)
+void hyprduel_state::get_tile_info_1_8bit(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	get_tile_info_8bit(tileinfo, tile_index, 1, m_vram_1);
 }
 
-TILE_GET_INFO_MEMBER(hyprduel_state::get_tile_info_2_8bit)
+void hyprduel_state::get_tile_info_2_8bit(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	get_tile_info_8bit(tileinfo, tile_index, 2, m_vram_2);
 }

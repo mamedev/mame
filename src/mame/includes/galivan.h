@@ -54,11 +54,11 @@ public:
 	void galivan_scrollx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void galivan_scrolly_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_youmab();
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_tx_tile_info);
-	TILE_GET_INFO_MEMBER(ninjemak_get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(ninjemak_get_tx_tile_info);
-	DECLARE_PALETTE_INIT(galivan);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void ninjemak_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void ninjemak_get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void palette_init_galivan(palette_device &palette);
 	void machine_start_galivan();
 	void machine_reset_galivan();
 	void video_start_galivan();

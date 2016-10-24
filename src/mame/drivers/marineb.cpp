@@ -518,13 +518,13 @@ static GFXDECODE_START( hopprobo )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, marineb_big_spritelayout,    0, 64 )
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(marineb_state::marineb_vblank_irq)
+void marineb_state::marineb_vblank_irq(device_t &device)
 {
 	if(m_irq_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(marineb_state::wanted_vblank_irq)
+void marineb_state::wanted_vblank_irq(device_t &device)
 {
 	if(m_irq_mask)
 		device.execute().set_input_line(0, HOLD_LINE);

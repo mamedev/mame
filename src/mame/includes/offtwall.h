@@ -38,7 +38,7 @@ public:
 	uint16_t unknown_verify_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void init_offtwall();
 	void init_offtwalc();
-	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
+	void get_playfield_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void machine_start_offtwall();
 	void machine_reset_offtwall();
 	void video_start_offtwall();

@@ -40,7 +40,7 @@
 #define PAGES_PER_TMAP_X    (0x4)
 #define PAGES_PER_TMAP_Y    (0x4)
 
-TILEMAP_MAPPER_MEMBER(yunsun16_state::tilemap_scan_pages)
+tilemap_memory_index yunsun16_state::tilemap_scan_pages(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	return  (row / TILES_PER_PAGE_Y) * TILES_PER_PAGE_X * TILES_PER_PAGE_Y * PAGES_PER_TMAP_X +
 			(row % TILES_PER_PAGE_Y) +
@@ -49,7 +49,7 @@ TILEMAP_MAPPER_MEMBER(yunsun16_state::tilemap_scan_pages)
 			(col % TILES_PER_PAGE_X) * TILES_PER_PAGE_Y;
 }
 
-TILE_GET_INFO_MEMBER(yunsun16_state::get_tile_info_0)
+void yunsun16_state::get_tile_info_0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = m_vram_0[2 * tile_index + 0];
 	uint16_t attr = m_vram_0[2 * tile_index + 1];
@@ -59,7 +59,7 @@ TILE_GET_INFO_MEMBER(yunsun16_state::get_tile_info_0)
 			(attr & 0x20) ? TILE_FLIPX : 0);
 }
 
-TILE_GET_INFO_MEMBER(yunsun16_state::get_tile_info_1)
+void yunsun16_state::get_tile_info_1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = m_vram_1[2 * tile_index + 0];
 	uint16_t attr = m_vram_1[2 * tile_index + 1];

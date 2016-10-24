@@ -57,9 +57,9 @@ public:
 	void phunsy_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t cass_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(cass_w);
+	void cass_w(int state);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(phunsy);
-	DECLARE_PALETTE_INIT(phunsy);
+	void palette_init_phunsy(palette_device &palette);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 private:
 	const uint8_t *m_p_chargen;
@@ -74,7 +74,7 @@ private:
 };
 
 
-WRITE_LINE_MEMBER( phunsy_state::cass_w )
+void phunsy_state::cass_w(int state)
 {
 	m_cass->output(state ? -1.0 : +1.0);
 }
@@ -195,7 +195,7 @@ void phunsy_state::machine_reset()
 }
 
 
-PALETTE_INIT_MEMBER(phunsy_state, phunsy)
+void phunsy_state::palette_init_phunsy(palette_device &palette)
 {
 	for ( int i = 0; i < 8; i++ )
 	{

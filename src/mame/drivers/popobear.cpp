@@ -112,10 +112,10 @@ public:
 	int m_tilemap_base[4];
 	tilemap_t    *m_bg_tilemap[4];
 
-	TILE_GET_INFO_MEMBER(get_bg0_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg3_tile_info);
+	void get_bg0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_bg2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_bg3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	uint8_t _620000_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -125,7 +125,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(irq);
+	void irq(timer_device &timer, void *ptr, int32_t param);
 
 	void postload();
 };
@@ -173,7 +173,7 @@ GFXDECODE_START(popobear)
 	GFXDECODE_RAM( "vram", 0, char_layout, 0, 1 )
 GFXDECODE_END
 
-TILE_GET_INFO_MEMBER(popobear_state::get_bg0_tile_info)
+void popobear_state::get_bg0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int base = m_tilemap_base[0];
 	int tileno = m_vram[base/2 + tile_index];
@@ -181,7 +181,7 @@ TILE_GET_INFO_MEMBER(popobear_state::get_bg0_tile_info)
 	SET_TILE_INFO_MEMBER(0, tileno&0x3fff, 0, TILE_FLIPYX(flipyx));
 }
 
-TILE_GET_INFO_MEMBER(popobear_state::get_bg1_tile_info)
+void popobear_state::get_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int base = m_tilemap_base[1];
 	int tileno = m_vram[base/2 + tile_index];
@@ -189,7 +189,7 @@ TILE_GET_INFO_MEMBER(popobear_state::get_bg1_tile_info)
 	SET_TILE_INFO_MEMBER(0, tileno&0x3fff, 0, TILE_FLIPYX(flipyx));
 }
 
-TILE_GET_INFO_MEMBER(popobear_state::get_bg2_tile_info)
+void popobear_state::get_bg2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int base = m_tilemap_base[2];
 	int tileno = m_vram[base/2 + tile_index];
@@ -197,7 +197,7 @@ TILE_GET_INFO_MEMBER(popobear_state::get_bg2_tile_info)
 	SET_TILE_INFO_MEMBER(0, tileno&0x3fff, 0, TILE_FLIPYX(flipyx));
 }
 
-TILE_GET_INFO_MEMBER(popobear_state::get_bg3_tile_info)
+void popobear_state::get_bg3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int base = m_tilemap_base[3];
 	int tileno = m_vram[base/2 + tile_index];
@@ -615,7 +615,7 @@ static INPUT_PORTS_START( popobear )
 INPUT_PORTS_END
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(popobear_state::irq)
+void popobear_state::irq(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

@@ -20,7 +20,7 @@
 
 ******************************************************************************/
 
-PALETTE_INIT_MEMBER(gomoku_state, gomoku)
+void gomoku_state::palette_init_gomoku(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -56,7 +56,7 @@ PALETTE_INIT_MEMBER(gomoku_state, gomoku)
 
 ******************************************************************************/
 
-TILE_GET_INFO_MEMBER(gomoku_state::get_fg_tile_info)
+void gomoku_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = (m_videoram[tile_index]);
 	int attr = (m_colorram[tile_index]);

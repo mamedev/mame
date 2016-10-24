@@ -256,7 +256,7 @@ public:
 
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_PALETTE_INIT(bingoman);
+	void palette_init_bingoman(palette_device &palette);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -365,7 +365,7 @@ void bingoman_state::machine_reset()
 }
 
 
-PALETTE_INIT_MEMBER(bingoman_state, bingoman)
+void bingoman_state::palette_init_bingoman(palette_device &palette)
 {
 }
 

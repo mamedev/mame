@@ -185,7 +185,7 @@ uint32_t nubus_mac8390_device::en_r(address_space &space, offs_t offset, uint32_
 	return 0;
 }
 
-WRITE_LINE_MEMBER( nubus_mac8390_device::dp_irq_w )
+void nubus_mac8390_device::dp_irq_w(int state)
 {
 	if (state)
 	{

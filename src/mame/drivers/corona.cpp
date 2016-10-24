@@ -350,7 +350,7 @@ public:
 	void wc_meters_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void blitter_execute(int x, int y, int color, int width, int flag);
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(corona);
+	void palette_init_corona(palette_device &palette);
 	uint32_t screen_update_winner(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_luckyrlt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
@@ -364,7 +364,7 @@ public:
 *               Video Hardware               *
 *********************************************/
 
-PALETTE_INIT_MEMBER(corona_state, corona)
+void corona_state::palette_init_corona(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int bit6, bit7, bit0, bit1, r, g, b;

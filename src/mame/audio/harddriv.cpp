@@ -99,7 +99,7 @@ uint16_t harddriv_sound_board_device::hd68k_snd_status_r(address_space &space, o
 }
 
 
-TIMER_CALLBACK_MEMBER( harddriv_sound_board_device::delayed_68k_w )
+void harddriv_sound_board_device::delayed_68k_w(void *ptr, int32_t param)
 {
 	m_maindata = param;
 	m_mainflag = 1;
@@ -298,7 +298,7 @@ void harddriv_sound_board_device::hdsnd68k_320com_w(address_space &space, offs_t
  *
  *************************************/
 
-READ_LINE_MEMBER(harddriv_sound_board_device::hdsnddsp_get_bio)
+int harddriv_sound_board_device::hdsnddsp_get_bio()
 {
 	uint64_t cycles_since_last_bio = m_sounddsp->total_cycles() - m_last_bio_cycles;
 	int32_t cycles_until_bio = CYCLES_PER_BIO - cycles_since_last_bio;

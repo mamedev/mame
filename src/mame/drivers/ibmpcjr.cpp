@@ -52,12 +52,12 @@ public:
 	required_device<upd765a_device> m_fdc;
 	required_device<pc_keyboard_device> m_keyboard;
 
-	DECLARE_WRITE_LINE_MEMBER(out2_changed);
-	DECLARE_WRITE_LINE_MEMBER(keyb_interrupt);
+	void out2_changed(int state);
+	void keyb_interrupt(int state);
 
 	void pc_nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t pcjr_nmi_enable_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(pic8259_set_int_line);
+	void pic8259_set_int_line(int state);
 
 	void pcjr_ppi_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t pcjr_ppi_portc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
@@ -184,7 +184,7 @@ void pcjr_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
  *
  *************************************************************/
 
-WRITE_LINE_MEMBER(pcjr_state::pic8259_set_int_line)
+void pcjr_state::pic8259_set_int_line(int state)
 {
 	uint32_t pc = m_maincpu->pc();
 	if ( (pc == 0xF0453) || (pc == 0xFF196) )
@@ -208,7 +208,7 @@ void pcjr_state::pc_speaker_set_spkrdata(uint8_t data)
 	m_speaker->level_w(m_pc_spkrdata & m_pit_out2);
 }
 
-WRITE_LINE_MEMBER(pcjr_state::out2_changed)
+void pcjr_state::out2_changed(int state)
 {
 	m_pit_out2 = state ? 1 : 0;
 	m_speaker->level_w(m_pc_spkrdata & m_pit_out2);
@@ -252,7 +252,7 @@ WRITE_LINE_MEMBER(pcjr_state::out2_changed)
  *
  *************************************************************/
 
-WRITE_LINE_MEMBER(pcjr_state::keyb_interrupt)
+void pcjr_state::keyb_interrupt(int state)
 {
 	int data;
 

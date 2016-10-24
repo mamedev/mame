@@ -391,10 +391,10 @@ void fantland_state::borntofi_adpcm_int( msm5205_device *device, int voice )
 	}
 }
 
-WRITE_LINE_MEMBER(fantland_state::borntofi_adpcm_int_0) { borntofi_adpcm_int(m_msm1, 0); }
-WRITE_LINE_MEMBER(fantland_state::borntofi_adpcm_int_1) { borntofi_adpcm_int(m_msm2, 1); }
-WRITE_LINE_MEMBER(fantland_state::borntofi_adpcm_int_2) { borntofi_adpcm_int(m_msm3, 2); }
-WRITE_LINE_MEMBER(fantland_state::borntofi_adpcm_int_3) { borntofi_adpcm_int(m_msm4, 3); }
+void fantland_state::borntofi_adpcm_int_0(int state) { borntofi_adpcm_int(m_msm1, 0); }
+void fantland_state::borntofi_adpcm_int_1(int state) { borntofi_adpcm_int(m_msm2, 1); }
+void fantland_state::borntofi_adpcm_int_2(int state) { borntofi_adpcm_int(m_msm3, 2); }
+void fantland_state::borntofi_adpcm_int_3(int state) { borntofi_adpcm_int(m_msm4, 3); }
 
 
 static ADDRESS_MAP_START( borntofi_sound_map, AS_PROGRAM, 8, fantland_state )
@@ -825,13 +825,13 @@ void fantland_state::machine_reset_fantland()
 	m_nmi_enable = 0;
 }
 
-INTERRUPT_GEN_MEMBER(fantland_state::fantland_irq)
+void fantland_state::fantland_irq(device_t &device)
 {
 	if (m_nmi_enable & 8)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(fantland_state::fantland_sound_irq)
+void fantland_state::fantland_sound_irq(device_t &device)
 {
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x80 / 4);
 }
@@ -882,7 +882,7 @@ static MACHINE_CONFIG_START( fantland, fantland_state )
 MACHINE_CONFIG_END
 
 
-WRITE_LINE_MEMBER(fantland_state::galaxygn_sound_irq)
+void fantland_state::galaxygn_sound_irq(int state)
 {
 	m_audiocpu->set_input_line_and_vector(0, state ? ASSERT_LINE : CLEAR_LINE, 0x80/4);
 }

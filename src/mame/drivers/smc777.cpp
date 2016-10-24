@@ -84,17 +84,17 @@ public:
 	void smc777_mem_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t irq_mask_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void irq_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_PALETTE_INIT(smc777);
+	void palette_init_smc777(palette_device &palette);
 	uint32_t screen_update_smc777(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vblank_irq);
-	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
+	void vblank_irq(device_t &device);
+	void keyboard_callback(timer_device &timer, void *ptr, int32_t param);
 
 	uint8_t fdc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void fdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t fdc_request_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void floppy_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
+	void fdc_intrq_w(int state);
+	void fdc_drq_w(int state);
 
 protected:
 	virtual void machine_start() override;
@@ -425,12 +425,12 @@ void smc777_state::floppy_select_w(address_space &space, offs_t offset, uint8_t 
 		printf("floppy access %02x\n", data);
 }
 
-WRITE_LINE_MEMBER( smc777_state::fdc_intrq_w )
+void smc777_state::fdc_intrq_w(int state)
 {
 	m_fdc_irq_flag = state;
 }
 
-WRITE_LINE_MEMBER( smc777_state::fdc_drq_w )
+void smc777_state::fdc_drq_w(int state)
 {
 	m_fdc_drq_flag = state;
 }
@@ -864,7 +864,7 @@ static const uint8_t smc777_keytable[2][0xa0] =
 	}
 };
 
-TIMER_DEVICE_CALLBACK_MEMBER(smc777_state::keyboard_callback)
+void smc777_state::keyboard_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	static const char *const portnames[11] = { "key0","key1","key2","key3","key4","key5","key6","key7", "key8", "key9", "keya" };
 	int i,port_i,scancode;
@@ -930,7 +930,7 @@ void smc777_state::machine_reset()
 
 
 /* set-up SMC-70 mode colors */
-PALETTE_INIT_MEMBER(smc777_state, smc777)
+void smc777_state::palette_init_smc777(palette_device &palette)
 {
 	int i;
 
@@ -948,7 +948,7 @@ PALETTE_INIT_MEMBER(smc777_state, smc777)
 }
 
 
-INTERRUPT_GEN_MEMBER(smc777_state::vblank_irq)
+void smc777_state::vblank_irq(device_t &device)
 {
 	if(m_irq_mask)
 		device.execute().set_input_line(0,HOLD_LINE);

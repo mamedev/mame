@@ -137,7 +137,7 @@ void argus_state::machine_start()
 
 ***************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(argus_state::scanline)
+void argus_state::scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -148,7 +148,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(argus_state::scanline)
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xcf); /* RST 08h */
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(argus_state::butasan_scanline)
+void argus_state::butasan_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

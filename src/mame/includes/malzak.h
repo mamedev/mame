@@ -52,6 +52,6 @@ public:
 	uint8_t videoram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(malzak);
+	void palette_init_malzak(palette_device &palette);
 	uint32_t screen_update_malzak(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };

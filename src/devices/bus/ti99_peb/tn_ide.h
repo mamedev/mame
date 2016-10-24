@@ -35,8 +35,8 @@ public:
 	bool    m_ata_irq;
 	int     m_cru_register;
 
-	DECLARE_WRITE_LINE_MEMBER(clock_interrupt_callback);
-	DECLARE_WRITE_LINE_MEMBER(ide_interrupt_callback);
+	void clock_interrupt_callback(int state);
+	void ide_interrupt_callback(int state);
 
 protected:
 	virtual void device_start(void) override;

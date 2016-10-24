@@ -102,7 +102,7 @@ public:
 	uint8_t applix_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void applix_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void applix_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(vsync_w);
+	void vsync_w(int state);
 	uint8_t port00_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t port08_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t port10_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
@@ -127,14 +127,14 @@ public:
 	void p2_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t p3_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void p3_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	TIMER_DEVICE_CALLBACK_MEMBER(cass_timer);
+	void cass_timer(timer_device &timer, void *ptr, int32_t param);
 	void init_applix();
 	MC6845_UPDATE_ROW(crtc_update_row);
 	uint8_t m_video_latch;
 	uint8_t m_pa;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(applix);
+	void palette_init_applix(palette_device &palette);
 	uint8_t m_palette_latch[4];
 	required_shared_ptr<uint16_t> m_base;
 private:
@@ -734,7 +734,7 @@ static SLOT_INTERFACE_START( applix_floppies )
 SLOT_INTERFACE_END
 
 
-PALETTE_INIT_MEMBER(applix_state, applix)
+void applix_state::palette_init_applix(palette_device &palette)
 { // shades need to be verified - the names on the right are from the manual
 	const uint8_t colors[16*3] = {
 	0x00, 0x00, 0x00,   //  0 Black
@@ -805,12 +805,12 @@ MC6845_UPDATE_ROW( applix_state::crtc_update_row )
 	}
 }
 
-WRITE_LINE_MEMBER( applix_state::vsync_w )
+void applix_state::vsync_w(int state)
 {
 	m_via->write_ca2(state);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(applix_state::cass_timer)
+void applix_state::cass_timer(timer_device &timer, void *ptr, int32_t param)
 {
 	/* cassette - turn 2500/5000Hz to a bit */
 	m_cass_data[1]++;

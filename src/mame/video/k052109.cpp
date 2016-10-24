@@ -729,17 +729,17 @@ void k052109_device::get_tile_info( tile_data &tileinfo, int tile_index, int lay
 	tileinfo.category = priority;
 }
 
-TILE_GET_INFO_MEMBER(k052109_device::get_tile_info0)
+void k052109_device::get_tile_info0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	get_tile_info(tileinfo, tile_index, 0, m_colorram_F, m_videoram_F, m_videoram2_F);
 }
 
-TILE_GET_INFO_MEMBER(k052109_device::get_tile_info1)
+void k052109_device::get_tile_info1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	get_tile_info(tileinfo, tile_index, 1, m_colorram_A, m_videoram_A, m_videoram2_A);
 }
 
-TILE_GET_INFO_MEMBER(k052109_device::get_tile_info2)
+void k052109_device::get_tile_info2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	get_tile_info(tileinfo, tile_index, 2, m_colorram_B, m_videoram_B, m_videoram2_B);
 }

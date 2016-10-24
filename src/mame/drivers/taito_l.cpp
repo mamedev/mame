@@ -285,12 +285,12 @@ void taitol_state::machine_reset_horshoes()
 }
 
 
-IRQ_CALLBACK_MEMBER(taitol_state::irq_callback)
+int taitol_state::irq_callback(device_t &device, int irqline)
 {
 	return m_irq_adr_table[m_last_irq_level];
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(taitol_state::vbl_interrupt)
+void taitol_state::vbl_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -555,7 +555,7 @@ void taitol_state::mux_ctrl_w(address_space &space, offs_t offset, uint8_t data,
 }
 
 
-WRITE_LINE_MEMBER(taitol_state::champwr_msm5205_vck)
+void taitol_state::champwr_msm5205_vck(int state)
 {
 	if (m_adpcm_data != -1)
 	{

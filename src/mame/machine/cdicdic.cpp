@@ -531,7 +531,7 @@ void cdicdic_device::decode_audio_sector(const uint8_t *xa, int32_t triggered)
 }
 
 // After an appropriate delay for decoding to take place...
-TIMER_CALLBACK_MEMBER( cdicdic_device::audio_sample_trigger )
+void cdicdic_device::audio_sample_trigger(void *ptr, int32_t param)
 {
 	sample_trigger();
 }
@@ -592,7 +592,7 @@ void cdicdic_device::sample_trigger()
 	}
 }
 
-TIMER_CALLBACK_MEMBER( cdicdic_device::trigger_readback_int )
+void cdicdic_device::trigger_readback_int(void *ptr, int32_t param)
 {
 	process_delayed_command();
 }

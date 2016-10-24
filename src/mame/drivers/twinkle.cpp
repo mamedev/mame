@@ -286,8 +286,8 @@ public:
 	uint16_t shared_68k_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void shared_68k_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	uint16_t unk_68k_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
-	DECLARE_WRITE_LINE_MEMBER(spu_ata_irq);
-	DECLARE_WRITE_LINE_MEMBER(spu_ata_dmarq);
+	void spu_ata_irq(int state);
+	void spu_ata_dmarq(int state);
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 
@@ -714,7 +714,7 @@ ADDRESS_MAP_END
 
 /* SPU board */
 
-WRITE_LINE_MEMBER(twinkle_state::spu_ata_irq)
+void twinkle_state::spu_ata_irq(int state)
 {
 	if ((state) && (m_spu_ctrl & 0x0400))
 	{
@@ -765,7 +765,7 @@ void twinkle_state::spu_ata_dma_high_w(address_space &space, offs_t offset, uint
 	m_spu_ata_dma = (m_spu_ata_dma & 0xffff) | (data << 16);
 }
 
-WRITE_LINE_MEMBER(twinkle_state::spu_ata_dmarq)
+void twinkle_state::spu_ata_dmarq(int state)
 {
 	if (m_spu_ata_dmarq != state)
 	{

@@ -27,17 +27,17 @@ class imds2_state : public driver_device
 	uint8_t ipc_mem_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void ipc_mem_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void imds2_ipc_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(imds2_ipc_intr);
+	void imds2_ipc_intr(int state);
 	uint8_t imds2_ipcsyspic_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t imds2_ipclocpic_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void imds2_ipcsyspic_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void imds2_ipclocpic_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(imds2_baud_clk_0_w);
-	DECLARE_WRITE_LINE_MEMBER(imds2_baud_clk_1_w);
+	void imds2_baud_clk_0_w(int state);
+	void imds2_baud_clk_1_w(int state);
 
 	void imds2_miscout_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t imds2_miscin_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(imds2_beep_timer_w);
+	void imds2_beep_timer_w(int state);
 	void imds2_start_timer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t imds2_kb_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t imds2_kb_port_p2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
@@ -54,7 +54,7 @@ class imds2_state : public driver_device
 	uint8_t imds2_ipc_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void imds2_ipc_dbbin_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void imds2_ipc_dbbin_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(imds2_hrq_w);
+	void imds2_hrq_w(int state);
 
 	uint8_t imds2_ioc_mem_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void imds2_ioc_mem_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -62,9 +62,9 @@ class imds2_state : public driver_device
 	void imds2_pio_port_p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t imds2_pio_port_p2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void imds2_pio_port_p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(imds2_pio_lpt_ack_w);
-	DECLARE_WRITE_LINE_MEMBER(imds2_pio_lpt_busy_w);
-	DECLARE_WRITE_LINE_MEMBER(imds2_pio_lpt_select_w);
+	void imds2_pio_lpt_ack_w(int state);
+	void imds2_pio_lpt_busy_w(int state);
+	void imds2_pio_lpt_select_w(int state);
 
 	I8275_DRAW_CHARACTER_MEMBER(crtc_display_pixels);
 

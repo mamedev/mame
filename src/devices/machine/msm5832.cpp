@@ -229,7 +229,7 @@ void msm5832_device::address_w(uint8_t data)
 //  adj_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( msm5832_device::adj_w )
+void msm5832_device::adj_w(int state)
 {
 	if (LOG) logerror("MSM5832 30 ADJ: %u\n", state);
 
@@ -244,7 +244,7 @@ WRITE_LINE_MEMBER( msm5832_device::adj_w )
 //  test_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( msm5832_device::test_w )
+void msm5832_device::test_w(int state)
 {
 	if (LOG) logerror("MSM5832 TEST: %u\n", state);
 }
@@ -254,7 +254,7 @@ WRITE_LINE_MEMBER( msm5832_device::test_w )
 //  hold_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( msm5832_device::hold_w )
+void msm5832_device::hold_w(int state)
 {
 	if (LOG) logerror("MSM5832 HOLD: %u\n", state);
 
@@ -266,7 +266,7 @@ WRITE_LINE_MEMBER( msm5832_device::hold_w )
 //  read_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( msm5832_device::read_w )
+void msm5832_device::read_w(int state)
 {
 	if (LOG) logerror("MSM5832 READ: %u\n", state);
 
@@ -278,7 +278,7 @@ WRITE_LINE_MEMBER( msm5832_device::read_w )
 //  write_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( msm5832_device::write_w )
+void msm5832_device::write_w(int state)
 {
 	if (LOG) logerror("MSM5832 WR: %u\n", state);
 
@@ -290,7 +290,7 @@ WRITE_LINE_MEMBER( msm5832_device::write_w )
 //  cs_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( msm5832_device::cs_w )
+void msm5832_device::cs_w(int state)
 {
 	if (LOG) logerror("MSM5832 CS: %u\n", state);
 

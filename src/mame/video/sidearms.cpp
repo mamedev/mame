@@ -92,7 +92,7 @@ void sidearms_state::star_scrolly_w(address_space &space, offs_t offset, uint8_t
 }
 
 
-TILE_GET_INFO_MEMBER(sidearms_state::get_sidearms_bg_tile_info)
+void sidearms_state::get_sidearms_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code, attr, color, flags;
 
@@ -105,7 +105,7 @@ TILE_GET_INFO_MEMBER(sidearms_state::get_sidearms_bg_tile_info)
 	SET_TILE_INFO_MEMBER(1, code, color, flags);
 }
 
-TILE_GET_INFO_MEMBER(sidearms_state::get_philko_bg_tile_info)
+void sidearms_state::get_philko_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code, attr, color, flags;
 
@@ -118,7 +118,7 @@ TILE_GET_INFO_MEMBER(sidearms_state::get_philko_bg_tile_info)
 	SET_TILE_INFO_MEMBER(1, code, color, flags);
 }
 
-TILE_GET_INFO_MEMBER(sidearms_state::get_fg_tile_info)
+void sidearms_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_colorram[tile_index];
 	int code = m_videoram[tile_index] + (attr<<2 & 0x300);
@@ -127,7 +127,7 @@ TILE_GET_INFO_MEMBER(sidearms_state::get_fg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-TILEMAP_MAPPER_MEMBER(sidearms_state::tilemap_scan)
+tilemap_memory_index sidearms_state::tilemap_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	int offset = ((row << 7) + col) << 1;

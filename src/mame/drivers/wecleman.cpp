@@ -1042,7 +1042,7 @@ GFXDECODE_END
 ***************************************************************************/
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(wecleman_state::wecleman_scanline)
+void wecleman_state::wecleman_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -1052,7 +1052,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(wecleman_state::wecleman_scanline)
 		m_maincpu->set_input_line(5, HOLD_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(wecleman_state::hotchase_scanline)
+void wecleman_state::hotchase_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -1118,7 +1118,7 @@ MACHINE_CONFIG_END
                         Hot Chase Hardware Definitions
 ***************************************************************************/
 
-INTERRUPT_GEN_MEMBER(wecleman_state::hotchase_sound_timer)
+void wecleman_state::hotchase_sound_timer(device_t &device)
 {
 	device.execute().set_input_line(M6809_FIRQ_LINE, HOLD_LINE);
 }

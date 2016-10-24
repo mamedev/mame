@@ -45,7 +45,7 @@
 
 #include "includes/mbee.h"
 
-WRITE_LINE_MEMBER( mbee_state::crtc_vs )
+void mbee_state::crtc_vs(int state)
 {
 	m_b7_vs = state;
 	if ((m_io_config->read() & 0xc0) == 0) // VS selected in config menu
@@ -416,7 +416,7 @@ MC6845_UPDATE_ROW( mbee_state::crtc_update_row )
 
 *****************************************************************************************************/
 
-PALETTE_INIT_MEMBER( mbee_state, standard )
+void mbee_state::palette_init_standard(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	uint8_t i=0, r, b, g, k, r1, g1, b1;
@@ -458,7 +458,7 @@ PALETTE_INIT_MEMBER( mbee_state, standard )
 }
 
 
-PALETTE_INIT_MEMBER( mbee_state, premium )
+void mbee_state::palette_init_premium(palette_device &palette)
 {
 	uint8_t i, r, b, g;
 

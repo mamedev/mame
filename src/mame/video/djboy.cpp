@@ -19,7 +19,7 @@ void djboy_state::djboy_scrolly_w(address_space &space, offs_t offset, uint8_t d
 	m_scrolly = data;
 }
 
-TILE_GET_INFO_MEMBER(djboy_state::get_bg_tile_info)
+void djboy_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t attr = m_videoram[tile_index + 0x800];
 	int code = m_videoram[tile_index] + (attr & 0xf) * 256;

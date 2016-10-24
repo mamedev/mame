@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "includes/xyonix.h"
 
-PALETTE_INIT_MEMBER(xyonix_state, xyonix)
+void xyonix_state::palette_init_xyonix(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -33,7 +33,7 @@ PALETTE_INIT_MEMBER(xyonix_state, xyonix)
 }
 
 
-TILE_GET_INFO_MEMBER(xyonix_state::get_tile_info)
+void xyonix_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno;
 	int attr = m_vidram[tile_index+0x1000+1];

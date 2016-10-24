@@ -106,12 +106,12 @@ public:
 	void layer_en_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void layer_scroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	TILE_GET_INFO_MEMBER(seibucrtc_sc0_tile_info);
-	TILE_GET_INFO_MEMBER(seibucrtc_sc1_tile_info);
-	TILE_GET_INFO_MEMBER(seibucrtc_sc2_tile_info);
-	TILE_GET_INFO_MEMBER(seibucrtc_sc3_tile_info);
+	void seibucrtc_sc0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void seibucrtc_sc1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void seibucrtc_sc2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void seibucrtc_sc3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
-	INTERRUPT_GEN_MEMBER(interrupt);
+	void interrupt(device_t &device);
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
@@ -223,7 +223,7 @@ void sengokmj_state::seibucrtc_sc3vram_w(address_space &space, offs_t offset, ui
 *
 *******************************/
 
-TILE_GET_INFO_MEMBER( sengokmj_state::seibucrtc_sc0_tile_info )
+void sengokmj_state::seibucrtc_sc0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = m_sc0_vram[tile_index] & 0xfff;
 	int color = (m_sc0_vram[tile_index] >> 12) & 0x0f;
@@ -231,21 +231,21 @@ TILE_GET_INFO_MEMBER( sengokmj_state::seibucrtc_sc0_tile_info )
 	SET_TILE_INFO_MEMBER(1, tile, color, 0);
 }
 
-TILE_GET_INFO_MEMBER( sengokmj_state::seibucrtc_sc2_tile_info )
+void sengokmj_state::seibucrtc_sc2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = m_sc2_vram[tile_index] & 0xfff;
 	int color = (m_sc2_vram[tile_index] >> 12) & 0x0f;
 	SET_TILE_INFO_MEMBER(2, tile, color, 0);
 }
 
-TILE_GET_INFO_MEMBER( sengokmj_state::seibucrtc_sc1_tile_info )
+void sengokmj_state::seibucrtc_sc1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = m_sc1_vram[tile_index] & 0xfff;
 	int color = (m_sc1_vram[tile_index] >> 12) & 0x0f;
 	SET_TILE_INFO_MEMBER(3, tile, color, 0);
 }
 
-TILE_GET_INFO_MEMBER( sengokmj_state::seibucrtc_sc3_tile_info )
+void sengokmj_state::seibucrtc_sc3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = m_sc3_vram[tile_index] & 0xfff;
 	int color = (m_sc3_vram[tile_index] >> 12) & 0x0f;
@@ -546,7 +546,7 @@ static GFXDECODE_START( sengokmj )
 	GFXDECODE_ENTRY( "tx_gfx", 0, charlayout, 0x700, 0x10 ) /* Text */
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(sengokmj_state::interrupt)
+void sengokmj_state::interrupt(device_t &device)
 {
 	device.execute().set_input_line_and_vector(0,HOLD_LINE,0xc8/4);
 }

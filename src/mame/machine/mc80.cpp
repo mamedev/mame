@@ -15,7 +15,7 @@
 /*                            Implementation for MC80.2x                     */
 /*****************************************************************************/
 
-IRQ_CALLBACK_MEMBER(mc80_state::mc8020_irq_callback)
+int mc80_state::mc8020_irq_callback(device_t &device, int irqline)
 {
 	return 0x00;
 }
@@ -24,15 +24,15 @@ void mc80_state::machine_reset_mc8020()
 {
 }
 
-WRITE_LINE_MEMBER( mc80_state::ctc_z0_w )
+void mc80_state::ctc_z0_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER( mc80_state::ctc_z1_w )
+void mc80_state::ctc_z1_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER(mc80_state::ctc_z2_w)
+void mc80_state::ctc_z2_w(int state)
 {
 	downcast<z80ctc_device *>(machine().device("z80ctc"))->trg0(state);
 	downcast<z80ctc_device *>(machine().device("z80ctc"))->trg1(state);
@@ -88,7 +88,7 @@ void mc80_state::mc8030_eprom_prog_w(address_space &space, offs_t offset, uint8_
 {
 }
 
-IRQ_CALLBACK_MEMBER(mc80_state::mc8030_irq_callback )
+int mc80_state::mc8030_irq_callback(device_t &device, int irqline)
 {
 	return 0x20;
 }

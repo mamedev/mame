@@ -467,7 +467,7 @@ void tms7000_device::timer_tick_low(int tmr)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(tms7000_device::simple_timer_cb)
+void tms7000_device::simple_timer_cb(void *ptr, int32_t param)
 {
 	int tmr = param;
 

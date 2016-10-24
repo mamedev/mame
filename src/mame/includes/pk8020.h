@@ -69,16 +69,16 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(pk8020);
+	void palette_init_pk8020(palette_device &palette);
 	uint32_t screen_update_pk8020(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(pk8020_interrupt);
+	void pk8020_interrupt(device_t &device);
 	uint8_t pk8020_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void pk8020_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void pk8020_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t pk8020_portc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void pk8020_2_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(pk8020_pit_out0);
-	DECLARE_WRITE_LINE_MEMBER(pk8020_pit_out1);
+	void pk8020_pit_out0(int state);
+	void pk8020_pit_out1(int state);
 
 protected:
 	required_device<cpu_device> m_maincpu;

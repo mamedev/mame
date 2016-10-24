@@ -9,7 +9,7 @@
 #include "includes/shootout.h"
 
 
-PALETTE_INIT_MEMBER(shootout_state, shootout)
+void shootout_state::palette_init_shootout(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -41,7 +41,7 @@ PALETTE_INIT_MEMBER(shootout_state, shootout)
 
 
 
-TILE_GET_INFO_MEMBER(shootout_state::get_bg_tile_info)
+void shootout_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attributes = m_videoram[tile_index+0x400]; /* CCCC -TTT */
 	int tile_number = m_videoram[tile_index] + 256*(attributes&7);
@@ -53,7 +53,7 @@ TILE_GET_INFO_MEMBER(shootout_state::get_bg_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(shootout_state::get_fg_tile_info)
+void shootout_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attributes = m_textram[tile_index+0x400]; /* CCCC --TT */
 	int tile_number = m_textram[tile_index] + 256*(attributes&0x3);

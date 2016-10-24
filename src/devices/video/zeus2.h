@@ -110,8 +110,8 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t zeus2_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	void zeus2_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
-	TIMER_CALLBACK_MEMBER(display_irq_off);
-	TIMER_CALLBACK_MEMBER(display_irq);
+	void display_irq_off(void *ptr, int32_t param);
+	void display_irq(void *ptr, int32_t param);
 
 	template<class _Object> static devcb_base &set_vblank_callback(device_t &device, _Object object) { return downcast<zeus2_device &>(device).m_vblank.set_callback(object); }
 	template<class _Object> static devcb_base &set_irq_callback(device_t &device, _Object object) { return downcast<zeus2_device &>(device).m_irq.set_callback(object); }
@@ -155,7 +155,7 @@ protected:
 	virtual void device_stop() override;
 
 private:
-	TIMER_CALLBACK_MEMBER(int_timer_callback);
+	void int_timer_callback(void *ptr, int32_t param);
 	void zeus2_register32_w(offs_t offset, uint32_t data, int logit);
 	void zeus2_register_update(offs_t offset, uint32_t oldval, int logit);
 	bool zeus2_fifo_process(const uint32_t *data, int numwords);

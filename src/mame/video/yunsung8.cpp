@@ -132,7 +132,7 @@ void yunsung8_state::flipscreen_w(address_space &space, offs_t offset, uint8_t d
 #define DIM_NX_0            (0x40)
 #define DIM_NY_0            (0x20)
 
-TILE_GET_INFO_MEMBER(yunsung8_state::get_tile_info_0)
+void yunsung8_state::get_tile_info_0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code  =  m_videoram_0[0x1000 + tile_index * 2 + 0] + m_videoram_0[0x1000 + tile_index * 2 + 1] * 256;
 	int color =  m_videoram_0[0x0800 + tile_index] & 0x07;
@@ -147,7 +147,7 @@ TILE_GET_INFO_MEMBER(yunsung8_state::get_tile_info_0)
 #define DIM_NX_1            (0x40)
 #define DIM_NY_1            (0x20)
 
-TILE_GET_INFO_MEMBER(yunsung8_state::get_tile_info_1)
+void yunsung8_state::get_tile_info_1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code  =  m_videoram_1[0x1000 + tile_index * 2 + 0] + m_videoram_1[0x1000 + tile_index * 2 + 1] * 256;
 	int color =  m_videoram_1[0x0800 + tile_index] & 0x3f;

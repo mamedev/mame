@@ -145,18 +145,18 @@ public:
 	void ay2_sel(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void init_mirax();
-	DECLARE_PALETTE_INIT(mirax);
+	void palette_init_mirax(palette_device &palette);
 	virtual void machine_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t draw_flag);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	INTERRUPT_GEN_MEMBER(vblank_irq);
+	void vblank_irq(device_t &device);
 };
 
 
-PALETTE_INIT_MEMBER(mirax_state, mirax)
+void mirax_state::palette_init_mirax(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -466,7 +466,7 @@ static GFXDECODE_START( mirax )
 GFXDECODE_END
 
 
-INTERRUPT_GEN_MEMBER(mirax_state::vblank_irq)
+void mirax_state::vblank_irq(device_t &device)
 {
 	if(m_nmi_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);

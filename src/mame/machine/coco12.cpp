@@ -57,7 +57,7 @@ void coco12_state::configure_sam()
 //  horizontal_sync
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( coco12_state::horizontal_sync )
+void coco12_state::horizontal_sync(int state)
 {
 	m_pia_0->ca1_w(state);
 	m_sam->hs_w(state);
@@ -69,7 +69,7 @@ WRITE_LINE_MEMBER( coco12_state::horizontal_sync )
 //  field_sync
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( coco12_state::field_sync )
+void coco12_state::field_sync(int state)
 {
 	m_pia_0->cb1_w(state);
 }

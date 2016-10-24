@@ -705,7 +705,7 @@ static INPUT_PORTS_START( zokumahj )    // I don't have manual for this game.
 INPUT_PORTS_END
 
 
-INTERRUPT_GEN_MEMBER(niyanpai_state::interrupt)
+void niyanpai_state::interrupt(device_t &device)
 {
 	m_tmp68301->external_interrupt_0();
 }

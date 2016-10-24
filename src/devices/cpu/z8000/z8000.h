@@ -42,7 +42,7 @@ public:
 	~z8002_device();
 
 	template<class _Object> static devcb_base &set_mo_callback(device_t &device, _Object object) { return downcast<z8002_device &>(device).m_mo_out.set_callback(object); }
-	DECLARE_WRITE_LINE_MEMBER(mi_w) { m_mi = state; } // XXX: this has to apply in the middle of an insn for now
+	void mi_w(int state) { m_mi = state; } // XXX: this has to apply in the middle of an insn for now
 
 protected:
 	// device-level overrides

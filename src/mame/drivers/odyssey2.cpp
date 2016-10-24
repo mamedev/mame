@@ -51,7 +51,7 @@ public:
 	void init_odyssey2();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(odyssey2);
+	void palette_init_odyssey2(palette_device &palette);
 	uint32_t screen_update_odyssey2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void scanline_postprocess(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
@@ -83,7 +83,7 @@ public:
 	required_device<i8243_device> m_i8243;
 	required_device<ef9340_1_device> m_ef9340_1;
 
-	DECLARE_PALETTE_INIT(g7400);
+	void palette_init_g7400(palette_device &palette);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void p2_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -236,7 +236,7 @@ const uint8_t odyssey2_colors[] =
 };
 
 
-PALETTE_INIT_MEMBER(odyssey2_state, odyssey2)
+void odyssey2_state::palette_init_odyssey2(palette_device &palette)
 {
 	for ( int i = 0; i < 16; i++ )
 	{
@@ -245,7 +245,7 @@ PALETTE_INIT_MEMBER(odyssey2_state, odyssey2)
 }
 
 
-PALETTE_INIT_MEMBER(g7400_state, g7400)
+void g7400_state::palette_init_g7400(palette_device &palette)
 {
 	const uint8_t g7400_colors[] =
 	{

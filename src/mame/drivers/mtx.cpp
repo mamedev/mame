@@ -210,7 +210,7 @@ INPUT_PORTS_END
     Z80CTC
 -------------------------------------------------*/
 
-TIMER_DEVICE_CALLBACK_MEMBER(mtx_state::ctc_tick)
+void mtx_state::ctc_tick(timer_device &timer, void *ptr, int32_t param)
 {
 	m_z80ctc->trg1(1);
 	m_z80ctc->trg1(0);
@@ -218,7 +218,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mtx_state::ctc_tick)
 	m_z80ctc->trg2(0);
 }
 
-WRITE_LINE_MEMBER(mtx_state::ctc_trg1_w)
+void mtx_state::ctc_trg1_w(int state)
 {
 	if (m_z80dart)
 	{
@@ -227,7 +227,7 @@ WRITE_LINE_MEMBER(mtx_state::ctc_trg1_w)
 	}
 }
 
-WRITE_LINE_MEMBER(mtx_state::ctc_trg2_w)
+void mtx_state::ctc_trg2_w(int state)
 {
 	if (m_z80dart)
 	{
@@ -257,7 +257,7 @@ static const z80_daisy_config rs128_daisy_chain[] =
 };
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(mtx_state::cassette_tick)
+void mtx_state::cassette_tick(timer_device &timer, void *ptr, int32_t param)
 {
 	int data = ((m_cassette)->input() > +0.0) ? 0 : 1;
 
@@ -268,7 +268,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mtx_state::cassette_tick)
     mtx_tms9928a_interface
 -------------------------------------------------*/
 
-WRITE_LINE_MEMBER(mtx_state::mtx_tms9929a_interrupt)
+void mtx_state::mtx_tms9929a_interrupt(int state)
 {
 	m_z80ctc->trg0(state ? 0 : 1);
 }

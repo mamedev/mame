@@ -92,9 +92,9 @@ public:
 	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void dack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( lpen_w );
-	DECLARE_READ_LINE_MEMBER( hrtc_r );
-	DECLARE_READ_LINE_MEMBER( vrtc_r );
+	void lpen_w(int state);
+	int hrtc_r();
+	int vrtc_r();
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

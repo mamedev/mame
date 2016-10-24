@@ -652,7 +652,7 @@ void segaorun_state::device_timer(emu_timer &timer, device_timer_id id, int para
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(segaorun_state::bankmotor_update)
+void segaorun_state::bankmotor_update(timer_device &timer, void *ptr, int32_t param)
 {
 	// arbitrary timer for updating bank motor position
 	// these values may need to be tweaked when hooking up real motors to MAME
@@ -870,7 +870,7 @@ void segaorun_state::update_main_irqs()
 //  main 68000 is reset
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(segaorun_state::m68k_reset_callback)
+void segaorun_state::m68k_reset_callback(int state)
 {
 	m_subcpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 }

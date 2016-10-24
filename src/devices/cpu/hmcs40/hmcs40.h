@@ -243,7 +243,7 @@ protected:
 	virtual void write_d(int index, int state);
 
 	void reset_prescaler();
-	TIMER_CALLBACK_MEMBER( simple_timer_cb );
+	void simple_timer_cb(void *ptr, int32_t param);
 	void increment_tc();
 	void do_interrupt();
 

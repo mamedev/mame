@@ -43,13 +43,13 @@ public:
 	uint8_t m_SN76496_latch;
 	void konami_SN76496_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { m_SN76496_latch = data; };
 	void konami_SN76496_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { m_sn->write(space, offset, m_SN76496_latch); };
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(yiear);
+	void palette_init_yiear(palette_device &palette);
 	uint32_t screen_update_yiear(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(yiear_vblank_interrupt);
-	INTERRUPT_GEN_MEMBER(yiear_nmi_interrupt);
+	void yiear_vblank_interrupt(device_t &device);
+	void yiear_nmi_interrupt(device_t &device);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 };

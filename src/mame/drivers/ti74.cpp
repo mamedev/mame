@@ -109,7 +109,7 @@ public:
 
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
-	DECLARE_PALETTE_INIT(ti74);
+	void palette_init_ti74(palette_device &palette);
 	DECLARE_INPUT_CHANGED_MEMBER(battery_status_changed);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(ti74_cartridge);
 	HD44780_PIXEL_UPDATE(ti74_pixel_update);
@@ -149,7 +149,7 @@ DEVICE_IMAGE_LOAD_MEMBER(ti74_state, ti74_cartridge)
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(ti74_state, ti74)
+void ti74_state::palette_init_ti74(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148)); // background
 	palette.set_pen_color(1, rgb_t(92, 83, 88)); // lcd pixel on

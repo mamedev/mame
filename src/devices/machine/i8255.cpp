@@ -919,7 +919,7 @@ uint8_t i8255_device::pb_r()
 //  pc2_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( i8255_device::pc2_w )
+void i8255_device::pc2_w(int state)
 {
 	if (group_mode(GROUP_B) == 1)
 	{
@@ -956,7 +956,7 @@ WRITE_LINE_MEMBER( i8255_device::pc2_w )
 //  pc4_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( i8255_device::pc4_w )
+void i8255_device::pc4_w(int state)
 {
 	if ((group_mode(GROUP_A) == 2) || ((group_mode(GROUP_A) == 1) && (port_mode(PORT_A) == MODE_INPUT)))
 	{
@@ -979,7 +979,7 @@ WRITE_LINE_MEMBER( i8255_device::pc4_w )
 //  pc6_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( i8255_device::pc6_w )
+void i8255_device::pc6_w(int state)
 {
 	if ((group_mode(GROUP_A) == 2) || ((group_mode(GROUP_A) == 1) && (port_mode(PORT_A) == MODE_OUTPUT)))
 	{

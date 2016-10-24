@@ -62,10 +62,10 @@ public:
 	int m_reel_phase[4];
 	int m_reel_count[4];
 	int m_optic_pattern;
-	DECLARE_WRITE_LINE_MEMBER(reel0_optic_cb) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
-	DECLARE_WRITE_LINE_MEMBER(reel1_optic_cb) { if (state) m_optic_pattern |= 0x02; else m_optic_pattern &= ~0x02; }
-	DECLARE_WRITE_LINE_MEMBER(reel2_optic_cb) { if (state) m_optic_pattern |= 0x04; else m_optic_pattern &= ~0x04; }
-	DECLARE_WRITE_LINE_MEMBER(reel3_optic_cb) { if (state) m_optic_pattern |= 0x08; else m_optic_pattern &= ~0x08; }
+	void reel0_optic_cb(int state) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
+	void reel1_optic_cb(int state) { if (state) m_optic_pattern |= 0x02; else m_optic_pattern &= ~0x02; }
+	void reel2_optic_cb(int state) { if (state) m_optic_pattern |= 0x04; else m_optic_pattern &= ~0x04; }
+	void reel3_optic_cb(int state) { if (state) m_optic_pattern |= 0x08; else m_optic_pattern &= ~0x08; }
 
 	uint8_t aces1_unk_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff)
 	{
@@ -224,22 +224,22 @@ public:
 	void init_aces1();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	TIMER_CALLBACK_MEMBER(m_aces1_irq_timer_callback);
-	TIMER_CALLBACK_MEMBER(m_aces1_nmi_timer_callback);
+	void m_aces1_irq_timer_callback(void *ptr, int32_t param);
+	void m_aces1_nmi_timer_callback(void *ptr, int32_t param);
 };
 
 
 
 
 
-TIMER_CALLBACK_MEMBER(aces1_state::m_aces1_irq_timer_callback)
+void aces1_state::m_aces1_irq_timer_callback(void *ptr, int32_t param)
 {
 //  printf("irq\n");
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);
 	aces1_reset_irq_timer();
 }
 
-TIMER_CALLBACK_MEMBER(aces1_state::m_aces1_nmi_timer_callback)
+void aces1_state::m_aces1_nmi_timer_callback(void *ptr, int32_t param)
 {
 //  printf("nmi\n");
 	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);

@@ -78,7 +78,7 @@ public:
 	void mole_irqack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void mole_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t mole_protection_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -92,7 +92,7 @@ public:
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(mole_state::get_bg_tile_info)
+void mole_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = m_tileram[tile_index];
 

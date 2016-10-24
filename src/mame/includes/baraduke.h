@@ -44,12 +44,12 @@ public:
 	uint8_t baraduke_spriteram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void baraduke_spriteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_baraduke();
-	TILEMAP_MAPPER_MEMBER(tx_tilemap_scan);
-	TILE_GET_INFO_MEMBER(tx_get_tile_info);
-	TILE_GET_INFO_MEMBER(get_tile_info0);
-	TILE_GET_INFO_MEMBER(get_tile_info1);
+	tilemap_memory_index tx_tilemap_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	void tx_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(baraduke);
+	void palette_init_baraduke(palette_device &palette);
 	uint32_t screen_update_baraduke(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_baraduke(screen_device &screen, bool state);
 	void scroll_w(address_space &space, int layer, int offset, int data);

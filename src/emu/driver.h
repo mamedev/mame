@@ -109,40 +109,40 @@ public:
 	void generic_pulse_irq_line(device_execute_interface &exec, int irqline, int cycles);
 	void generic_pulse_irq_line_and_vector(device_execute_interface &exec, int irqline, int vector, int cycles);
 
-	INTERRUPT_GEN_MEMBER( nmi_line_pulse );
-	INTERRUPT_GEN_MEMBER( nmi_line_assert );
+	void nmi_line_pulse(device_t &device);
+	void nmi_line_assert(device_t &device);
 
-	INTERRUPT_GEN_MEMBER( irq0_line_hold );
-	INTERRUPT_GEN_MEMBER( irq0_line_pulse );
-	INTERRUPT_GEN_MEMBER( irq0_line_assert );
+	void irq0_line_hold(device_t &device);
+	void irq0_line_pulse(device_t &device);
+	void irq0_line_assert(device_t &device);
 
-	INTERRUPT_GEN_MEMBER( irq1_line_hold );
-	INTERRUPT_GEN_MEMBER( irq1_line_pulse );
-	INTERRUPT_GEN_MEMBER( irq1_line_assert );
+	void irq1_line_hold(device_t &device);
+	void irq1_line_pulse(device_t &device);
+	void irq1_line_assert(device_t &device);
 
-	INTERRUPT_GEN_MEMBER( irq2_line_hold );
-	INTERRUPT_GEN_MEMBER( irq2_line_pulse );
-	INTERRUPT_GEN_MEMBER( irq2_line_assert );
+	void irq2_line_hold(device_t &device);
+	void irq2_line_pulse(device_t &device);
+	void irq2_line_assert(device_t &device);
 
-	INTERRUPT_GEN_MEMBER( irq3_line_hold );
-	INTERRUPT_GEN_MEMBER( irq3_line_pulse );
-	INTERRUPT_GEN_MEMBER( irq3_line_assert );
+	void irq3_line_hold(device_t &device);
+	void irq3_line_pulse(device_t &device);
+	void irq3_line_assert(device_t &device);
 
-	INTERRUPT_GEN_MEMBER( irq4_line_hold );
-	INTERRUPT_GEN_MEMBER( irq4_line_pulse );
-	INTERRUPT_GEN_MEMBER( irq4_line_assert );
+	void irq4_line_hold(device_t &device);
+	void irq4_line_pulse(device_t &device);
+	void irq4_line_assert(device_t &device);
 
-	INTERRUPT_GEN_MEMBER( irq5_line_hold );
-	INTERRUPT_GEN_MEMBER( irq5_line_pulse );
-	INTERRUPT_GEN_MEMBER( irq5_line_assert );
+	void irq5_line_hold(device_t &device);
+	void irq5_line_pulse(device_t &device);
+	void irq5_line_assert(device_t &device);
 
-	INTERRUPT_GEN_MEMBER( irq6_line_hold );
-	INTERRUPT_GEN_MEMBER( irq6_line_pulse );
-	INTERRUPT_GEN_MEMBER( irq6_line_assert );
+	void irq6_line_hold(device_t &device);
+	void irq6_line_pulse(device_t &device);
+	void irq6_line_assert(device_t &device);
 
-	INTERRUPT_GEN_MEMBER( irq7_line_hold );
-	INTERRUPT_GEN_MEMBER( irq7_line_pulse );
-	INTERRUPT_GEN_MEMBER( irq7_line_assert );
+	void irq7_line_hold(device_t &device);
+	void irq7_line_pulse(device_t &device);
+	void irq7_line_assert(device_t &device);
 
 
 	// generic video

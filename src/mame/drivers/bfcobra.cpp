@@ -270,16 +270,16 @@ public:
 	void latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t upd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void upd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(z80_acia_irq);
-	DECLARE_WRITE_LINE_MEMBER(m6809_data_irq);
-	DECLARE_WRITE_LINE_MEMBER(data_acia_tx_w);
-	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
+	void z80_acia_irq(int state);
+	void m6809_data_irq(int state);
+	void data_acia_tx_w(int state);
+	void write_acia_clock(int state);
 	void init_bfcobra();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_bfcobra(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(timer_irq);
-	INTERRUPT_GEN_MEMBER(vblank_gen);
+	void timer_irq(device_t &device);
+	void vblank_gen(device_t &device);
 	void RunBlit(address_space &space);
 	void update_irqs();
 	void reset_fdc();
@@ -1526,26 +1526,26 @@ void bfcobra_state::init_ram()
 }
 
 
-WRITE_LINE_MEMBER(bfcobra_state::z80_acia_irq)
+void bfcobra_state::z80_acia_irq(int state)
 {
 	m_acia_irq = state;
 	update_irqs();
 }
 
 
-WRITE_LINE_MEMBER(bfcobra_state::m6809_data_irq)
+void bfcobra_state::m6809_data_irq(int state)
 {
 	m_audiocpu->set_input_line(M6809_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
-WRITE_LINE_MEMBER(bfcobra_state::data_acia_tx_w)
+void bfcobra_state::data_acia_tx_w(int state)
 {
 	m_data_t = state;
 }
 
 
-WRITE_LINE_MEMBER(bfcobra_state::write_acia_clock)
+void bfcobra_state::write_acia_clock(int state)
 {
 	m_acia6850_0->write_txc(state);
 	m_acia6850_0->write_rxc(state);
@@ -1617,13 +1617,13 @@ void bfcobra_state::init_bfcobra()
 }
 
 /* TODO */
-INTERRUPT_GEN_MEMBER(bfcobra_state::timer_irq)
+void bfcobra_state::timer_irq(device_t &device)
 {
 	device.execute().set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 }
 
 /* TODO */
-INTERRUPT_GEN_MEMBER(bfcobra_state::vblank_gen)
+void bfcobra_state::vblank_gen(device_t &device)
 {
 	m_vblank_irq = 1;
 	update_irqs();

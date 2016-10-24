@@ -296,7 +296,7 @@ public:
 
 	uint32_t update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	INTERRUPT_GEN_MEMBER( timed_interrupt );
+	void timed_interrupt(device_t &device);
 
 	// to be removed
 	uint16_t debug_trigger_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
@@ -304,11 +304,11 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 private:
-	TILEMAP_MAPPER_MEMBER(get_tile_offset);
-	TILE_GET_INFO_MEMBER(get_tile_info_A_8);
-	TILE_GET_INFO_MEMBER(get_tile_info_B_8);
-	TILE_GET_INFO_MEMBER(get_tile_info_A_16);
-	TILE_GET_INFO_MEMBER(get_tile_info_B_16);
+	tilemap_memory_index get_tile_offset(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	void get_tile_info_A_8(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info_B_8(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info_A_16(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info_B_16(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void postload();
 	void register_state_save();
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);

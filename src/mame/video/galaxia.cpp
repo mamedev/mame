@@ -19,7 +19,7 @@
 // Colors are 3bpp, but how they are generated is a mystery
 // there's no color prom on the pcb, nor palette ram
 
-PALETTE_INIT_MEMBER(galaxia_state,galaxia)
+void galaxia_state::palette_init_galaxia(palette_device &palette)
 {
 	// estimated with video/photo references
 	const int lut_clr[0x18] = {
@@ -41,7 +41,7 @@ PALETTE_INIT_MEMBER(galaxia_state,galaxia)
 	palette.set_pen_color(BULLET_PEN, pal1bit(1), pal1bit(1), pal1bit(0));
 }
 
-PALETTE_INIT_MEMBER(galaxia_state,astrowar)
+void galaxia_state::palette_init_astrowar(palette_device &palette)
 {
 	// no reference material available(?), except for Data East astrof
 	const int lut_clr[8] = { 7, 3, 5, 1, 4, 2, 6, 7 };
@@ -61,7 +61,7 @@ PALETTE_INIT_MEMBER(galaxia_state,astrowar)
 	palette.set_pen_color(BULLET_PEN, pal1bit(1), pal1bit(1), pal1bit(0));
 }
 
-TILE_GET_INFO_MEMBER(galaxia_state::get_galaxia_bg_tile_info)
+void galaxia_state::get_galaxia_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t code = m_video_ram[tile_index] & 0x7f; // d7 unused
 	uint8_t color = m_color_ram[tile_index] & 3; // highest bits unused
@@ -69,7 +69,7 @@ TILE_GET_INFO_MEMBER(galaxia_state::get_galaxia_bg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(galaxia_state::get_astrowar_bg_tile_info)
+void galaxia_state::get_astrowar_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t code = m_video_ram[tile_index];
 	uint8_t color = m_color_ram[tile_index] & 7; // highest bits unused

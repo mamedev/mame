@@ -44,12 +44,12 @@ public:
 		, m_io_x4(*this, "X4")
 	{ }
 
-	DECLARE_WRITE_LINE_MEMBER(ic10_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(ic10_cb2_w);
-	DECLARE_WRITE_LINE_MEMBER(ic11_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(ic11_cb2_w);
-	DECLARE_WRITE_LINE_MEMBER(ic2_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(ic2_cb2_w);
+	void ic10_ca2_w(int state);
+	void ic10_cb2_w(int state);
+	void ic11_ca2_w(int state);
+	void ic11_cb2_w(int state);
+	void ic2_ca2_w(int state);
+	void ic2_cb2_w(int state);
 	void ic10_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void ic10_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void ic11_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -58,8 +58,8 @@ public:
 	uint8_t ic11_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t ic2_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	DECLARE_INPUT_CHANGED_MEMBER(self_test);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_s);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_x);
+	void timer_s(timer_device &timer, void *ptr, int32_t param);
+	void timer_x(timer_device &timer, void *ptr, int32_t param);
 private:
 	bool m_timer_x;
 	bool m_timer_sb;
@@ -313,14 +313,14 @@ void hankin_state::ic10_b_w(address_space &space, offs_t offset, uint8_t data, u
 	// also sound data
 }
 
-WRITE_LINE_MEMBER( hankin_state::ic10_ca2_w )
+void hankin_state::ic10_ca2_w(int state)
 {
 	output().set_value("led0", !state);
 	// also sound strobe
 	m_ic2->ca1_w(state);
 }
 
-WRITE_LINE_MEMBER( hankin_state::ic10_cb2_w )
+void hankin_state::ic10_cb2_w(int state)
 {
 	// solenoid strobe
 	m_ic10_cb2 = state;
@@ -382,7 +382,7 @@ uint8_t hankin_state::ic11_b_r(address_space &space, offs_t offset, uint8_t mem_
 	return data;
 }
 
-WRITE_LINE_MEMBER( hankin_state::ic11_ca2_w )
+void hankin_state::ic11_ca2_w(int state)
 {
 	m_ic11_ca2 = state;
 	if (!state)
@@ -390,12 +390,12 @@ WRITE_LINE_MEMBER( hankin_state::ic11_ca2_w )
 }
 
 // lamp strobe
-WRITE_LINE_MEMBER( hankin_state::ic11_cb2_w )
+void hankin_state::ic11_cb2_w(int state)
 {
 }
 
 // zero-cross detection
-TIMER_DEVICE_CALLBACK_MEMBER( hankin_state::timer_x )
+void hankin_state::timer_x(timer_device &timer, void *ptr, int32_t param)
 {
 	m_timer_x ^= 1;
 	m_ic11->cb1_w(m_timer_x);
@@ -414,7 +414,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( hankin_state::timer_x )
 // m_timer_s[1] count in 74LS161
 // m_timer_s[2] count in 7493s
 // m_timer_sb   wanted output of m_timer_s[0]
-TIMER_DEVICE_CALLBACK_MEMBER( hankin_state::timer_s )
+void hankin_state::timer_s(timer_device &timer, void *ptr, int32_t param)
 {
 	m_timer_s[0]++;
 	bool cs = (m_ic2_ca2) ? BIT(m_timer_s[0], 0) : BIT(m_timer_s[0], 1); // divide by 2 stage
@@ -475,13 +475,13 @@ void hankin_state::ic2_b_w(address_space &space, offs_t offset, uint8_t data, ui
 }
 
 // low to divide 555 by 2
-WRITE_LINE_MEMBER( hankin_state::ic2_ca2_w )
+void hankin_state::ic2_ca2_w(int state)
 {
 	m_ic2_ca2 = state;
 }
 
 // low to enable 7493 dividers
-WRITE_LINE_MEMBER( hankin_state::ic2_cb2_w )
+void hankin_state::ic2_cb2_w(int state)
 {
 	m_ic2_cb2 = state;
 }

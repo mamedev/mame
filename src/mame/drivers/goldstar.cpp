@@ -8011,7 +8011,7 @@ static MACHINE_CONFIG_START( super9, goldstar_state )
 MACHINE_CONFIG_END
 
 
-PALETTE_INIT_MEMBER(goldstar_state, cm)
+void goldstar_state::palette_init_cm(palette_device &palette)
 {
 	/* BBGGGRRR */
 
@@ -8028,7 +8028,7 @@ PALETTE_INIT_MEMBER(goldstar_state, cm)
 	}
 }
 
-PALETTE_INIT_MEMBER(goldstar_state, cmast91)
+void goldstar_state::palette_init_cmast91(palette_device &palette)
 {
 	int i;
 	for (i = 0; i < 0x100; i++)
@@ -8045,7 +8045,7 @@ PALETTE_INIT_MEMBER(goldstar_state, cmast91)
 	}
 }
 
-PALETTE_INIT_MEMBER(goldstar_state, lucky8)
+void goldstar_state::palette_init_lucky8(palette_device &palette)
 {
 	/* BBGGGRRR */
 
@@ -8281,7 +8281,7 @@ MACHINE_CONFIG_END
 
 
 
-INTERRUPT_GEN_MEMBER(wingco_state::masked_irq)
+void wingco_state::masked_irq(device_t &device)
 {
 	if (m_nmi_enable)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -8442,7 +8442,7 @@ MACHINE_CONFIG_END
 
 
 
-PALETTE_INIT_MEMBER(wingco_state, magodds)
+void wingco_state::palette_init_magodds(palette_device &palette)
 {
 	for (int i = 0; i < 0x100; i++)
 	{
@@ -8762,7 +8762,7 @@ static MACHINE_CONFIG_DERIVED( nfm, amcoe2 )
 MACHINE_CONFIG_END
 
 
-INTERRUPT_GEN_MEMBER(unkch_state::vblank_irq)
+void unkch_state::vblank_irq(device_t &device)
 {
 	if (m_vblank_irq_enable)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);

@@ -475,7 +475,7 @@ const address_space_config *cdp1869_device::memory_space_config(address_spacenum
 //  initialize_palette - initialize palette
 //-------------------------------------------------
 
-PALETTE_INIT_MEMBER(cdp1869_device, cdp1869)
+void cdp1869_device::palette_init_cdp1869(palette_device &palette)
 {
 	// color-on-color display (CFC=0)
 	int i;
@@ -914,7 +914,7 @@ void cdp1869_device::page_ram_w(address_space &space, offs_t offset, uint8_t dat
 //  page_ram_w - predisplay
 //-------------------------------------------------
 
-READ_LINE_MEMBER( cdp1869_device::predisplay_r )
+int cdp1869_device::predisplay_r()
 {
 	return m_prd;
 }
@@ -924,7 +924,7 @@ READ_LINE_MEMBER( cdp1869_device::predisplay_r )
 //  pal_ntsc_r - PAL/NTSC
 //-------------------------------------------------
 
-READ_LINE_MEMBER( cdp1869_device::pal_ntsc_r )
+int cdp1869_device::pal_ntsc_r()
 {
 	return m_read_pal_ntsc();
 }

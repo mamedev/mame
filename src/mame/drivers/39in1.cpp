@@ -80,10 +80,10 @@ public:
 	void machine_start_60in1();
 	virtual void machine_start() override;
 	uint32_t screen_update_39in1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(pxa255_vblank_start);
-	TIMER_CALLBACK_MEMBER(pxa255_dma_dma_end);
-	TIMER_CALLBACK_MEMBER(pxa255_ostimer_match);
-	TIMER_CALLBACK_MEMBER(pxa255_lcd_dma_eof);
+	void pxa255_vblank_start(device_t &device);
+	void pxa255_dma_dma_end(void *ptr, int32_t param);
+	void pxa255_ostimer_match(void *ptr, int32_t param);
+	void pxa255_lcd_dma_eof(void *ptr, int32_t param);
 	void pxa255_dma_irq_check();
 	void pxa255_dma_load_descriptor_and_start(int channel);
 	void pxa255_ostimer_irq_check();
@@ -299,7 +299,7 @@ void _39in1_state::pxa255_dma_load_descriptor_and_start(int channel)
 	dma_regs->dcsr[channel] &= ~PXA255_DCSR_STOPSTATE;
 }
 
-TIMER_CALLBACK_MEMBER(_39in1_state::pxa255_dma_dma_end)
+void _39in1_state::pxa255_dma_dma_end(void *ptr, int32_t param)
 {
 	PXA255_DMA_Regs *dma_regs = &m_dma_regs;
 	uint32_t sadr = dma_regs->dsadr[param];
@@ -568,7 +568,7 @@ void _39in1_state::pxa255_ostimer_irq_check()
 	//pxa255_set_irq_line(PXA255_INT_OSTIMER3, (ostimer_regs->oier & PXA255_OIER_E3) ? ((ostimer_regs->ossr & PXA255_OSSR_M3) ? 1 : 0) : 0);
 }
 
-TIMER_CALLBACK_MEMBER(_39in1_state::pxa255_ostimer_match)
+void _39in1_state::pxa255_ostimer_match(void *ptr, int32_t param)
 {
 	PXA255_OSTMR_Regs *ostimer_regs = &m_ostimer_regs;
 
@@ -1148,7 +1148,7 @@ void _39in1_state::pxa255_lcd_check_load_next_branch(int channel)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(_39in1_state::pxa255_lcd_dma_eof)
+void _39in1_state::pxa255_lcd_dma_eof(void *ptr, int32_t param)
 {
 	PXA255_LCD_Regs *lcd_regs = &m_lcd_regs;
 
@@ -1335,7 +1335,7 @@ void _39in1_state::pxa255_lcd_w(address_space &space, offs_t offset, uint32_t da
 	}
 }
 
-INTERRUPT_GEN_MEMBER(_39in1_state::pxa255_vblank_start)
+void _39in1_state::pxa255_vblank_start(device_t &device)
 {
 }
 

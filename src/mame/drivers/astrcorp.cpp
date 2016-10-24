@@ -83,7 +83,7 @@ public:
 	void init_showhand();
 	void video_start_astrocorp();
 	uint32_t screen_update_astrocorp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(skilldrp_scanline);
+	void skilldrp_scanline(timer_device &timer, void *ptr, int32_t param);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
@@ -526,7 +526,7 @@ static MACHINE_CONFIG_DERIVED( showhanc, showhand )
 MACHINE_CONFIG_END
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(astrocorp_state::skilldrp_scanline)
+void astrocorp_state::skilldrp_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

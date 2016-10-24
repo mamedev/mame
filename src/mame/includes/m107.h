@@ -68,9 +68,9 @@ public:
 	void control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void spritebuffer_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	TILE_GET_INFO_MEMBER(get_pf_tile_info);
+	void get_pf_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(scanline_interrupt);
+	void scanline_interrupt(timer_device &timer, void *ptr, int32_t param);
 
 	void init_firebarr();
 	void init_dsoccr94();

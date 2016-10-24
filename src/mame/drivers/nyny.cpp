@@ -137,16 +137,16 @@ public:
 	void audio_2_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t nyny_pia_1_2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void nyny_pia_1_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(main_cpu_irq);
-	DECLARE_WRITE_LINE_MEMBER(main_cpu_firq);
+	void main_cpu_irq(int state);
+	void main_cpu_firq(int state);
 	void pia_2_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void pia_2_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(flipscreen_w);
-	DECLARE_WRITE_LINE_MEMBER(display_enable_changed);
+	void flipscreen_w(int state);
+	void display_enable_changed(int state);
 	void nyny_ay8910_37_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	INTERRUPT_GEN_MEMBER(update_pia_1);
+	void update_pia_1(device_t &device);
 	void ic48_1_74123_output_changed(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	inline void shift_star_generator(  );
 
@@ -161,7 +161,7 @@ public:
  *
  *************************************/
 
-WRITE_LINE_MEMBER(nyny_state::main_cpu_irq)
+void nyny_state::main_cpu_irq(int state)
 {
 	int combined_state = m_pia1->irq_a_state() | m_pia1->irq_b_state() | m_pia2->irq_b_state();
 
@@ -169,7 +169,7 @@ WRITE_LINE_MEMBER(nyny_state::main_cpu_irq)
 }
 
 
-WRITE_LINE_MEMBER(nyny_state::main_cpu_firq)
+void nyny_state::main_cpu_firq(int state)
 {
 	m_maincpu->set_input_line(M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -182,7 +182,7 @@ WRITE_LINE_MEMBER(nyny_state::main_cpu_firq)
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(nyny_state::update_pia_1)
+void nyny_state::update_pia_1(device_t &device)
 {
 	/* update the different PIA pins from the input ports */
 
@@ -248,7 +248,7 @@ void nyny_state::ic48_1_74123_output_changed(address_space &space, offs_t offset
  *************************************/
 
 
-WRITE_LINE_MEMBER(nyny_state::flipscreen_w)
+void nyny_state::flipscreen_w(int state)
 {
 	m_flipscreen = state ? 0 : 1;
 }
@@ -349,7 +349,7 @@ MC6845_END_UPDATE( nyny_state::crtc_end_update )
 }
 
 
-WRITE_LINE_MEMBER(nyny_state::display_enable_changed)
+void nyny_state::display_enable_changed(int state)
 {
 	m_ic48_1->a_w(generic_space(), 0, state);
 }

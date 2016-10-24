@@ -438,7 +438,7 @@ static GFXDECODE_START( rk )
 	GFXDECODE_ENTRY( "gfx4", 0x00000, rk_bglayout,       0, 32 )    /* bg tiles */
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(kingofb_state::kingofb_interrupt)
+void kingofb_state::kingofb_interrupt(device_t &device)
 {
 	if (m_nmi_enable)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);

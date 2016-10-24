@@ -493,7 +493,7 @@ void opwolf_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 }
 
 
-TIMER_CALLBACK_MEMBER(opwolf_state::opwolf_timer_callback)
+void opwolf_state::opwolf_timer_callback(void *ptr, int32_t param)
 {
 	// Level data command
 	if (m_current_cmd == 0xf5)
@@ -773,7 +773,7 @@ uint16_t opwolf_state::opwolf_cchip_data_r(address_space &space, offs_t offset, 
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(opwolf_state::cchip_timer)
+void opwolf_state::cchip_timer(void *ptr, int32_t param)
 {
 	// Update input ports, these are used by both the 68k directly and by the c-chip
 	m_cchip_ram[0x4] = ioport("IN0")->read();

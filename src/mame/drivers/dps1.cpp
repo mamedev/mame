@@ -40,7 +40,7 @@ public:
 	void portbe_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t portff_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void portff_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
+	void fdc_drq_w(int state);
 	void init_dps1();
 	void machine_reset_dps1();
 	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -157,7 +157,7 @@ void dps1_state::portff_w(address_space &space, offs_t offset, uint8_t data, uin
 }
 
 // do dma
-WRITE_LINE_MEMBER( dps1_state::fdc_drq_w )
+void dps1_state::fdc_drq_w(int state)
 {
 	if (state)
 	{

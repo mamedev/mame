@@ -51,8 +51,8 @@ public:
 
 	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(set_hreq);
-	DECLARE_WRITE_LINE_MEMBER(set_eop);
+	void set_hreq(int state);
+	void set_eop(int state);
 
 	int dmarq(int state, int channel);
 
@@ -63,7 +63,7 @@ protected:
 private:
 	// internal state
 	void soft_reset();
-	TIMER_CALLBACK_MEMBER(dma_transfer_timer);
+	void dma_transfer_timer(void *ptr, int32_t param);
 
 	struct upd71071_reg m_reg;
 	int m_selected_channel;

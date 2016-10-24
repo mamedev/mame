@@ -218,7 +218,7 @@ uint32_t gamepock_state::screen_update_gamepock(screen_device &screen, bitmap_in
 }
 
 /* This is called whenever the T0 pin switches state */
-WRITE_LINE_MEMBER(gamepock_state::gamepock_to_w)
+void gamepock_state::gamepock_to_w(int state)
 {
 	m_speaker->level_w(state & 1);
 }

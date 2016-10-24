@@ -91,23 +91,23 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(carpolo);
+	void palette_init_carpolo(palette_device &palette);
 	uint32_t screen_update_carpolo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_carpolo(screen_device &screen, bool state);
-	INTERRUPT_GEN_MEMBER(carpolo_timer_interrupt);
-	DECLARE_WRITE_LINE_MEMBER(coin1_interrupt_clear_w);
-	DECLARE_WRITE_LINE_MEMBER(coin2_interrupt_clear_w);
-	DECLARE_WRITE_LINE_MEMBER(coin3_interrupt_clear_w);
-	DECLARE_WRITE_LINE_MEMBER(coin4_interrupt_clear_w);
+	void carpolo_timer_interrupt(device_t &device);
+	void coin1_interrupt_clear_w(int state);
+	void coin2_interrupt_clear_w(int state);
+	void coin3_interrupt_clear_w(int state);
+	void coin4_interrupt_clear_w(int state);
 	void pia_0_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void pia_0_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t pia_0_port_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t pia_1_port_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t pia_1_port_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(carpolo_7474_2s_1_q_cb);
-	DECLARE_WRITE_LINE_MEMBER(carpolo_7474_2s_2_q_cb);
-	DECLARE_WRITE_LINE_MEMBER(carpolo_7474_2u_1_q_cb);
-	DECLARE_WRITE_LINE_MEMBER(carpolo_7474_2u_2_q_cb);
+	void carpolo_7474_2s_1_q_cb(int state);
+	void carpolo_7474_2s_2_q_cb(int state);
+	void carpolo_7474_2u_1_q_cb(int state);
+	void carpolo_7474_2u_2_q_cb(int state);
 
 	TTL74148_OUTPUT_CB(ttl74148_3s_cb);
 

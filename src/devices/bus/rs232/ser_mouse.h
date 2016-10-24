@@ -33,8 +33,8 @@ protected:
 	virtual void tra_callback() override;
 	void reset_mouse();
 
-	virtual WRITE_LINE_MEMBER(input_dtr) override;
-	virtual WRITE_LINE_MEMBER(input_rts) override;
+	virtual void input_dtr(int state) override;
+	virtual void input_rts(int state) override;
 	int m_dtr;
 	int m_rts;
 
@@ -58,7 +58,7 @@ public:
 	microsoft_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual WRITE_LINE_MEMBER(input_rts) override;
+	virtual void input_rts(int state) override;
 
 	virtual void set_frame() override { set_data_frame(1, 7, PARITY_NONE, STOP_BITS_2); }
 	virtual void mouse_trans(int dx, int dy, int nb, int mbc) override;

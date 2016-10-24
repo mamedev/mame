@@ -36,7 +36,7 @@ public:
 	void opn_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t pc9801_26_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void pc9801_26_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(pc9801_sound_irq);
+	void pc9801_sound_irq(int state);
 
 //  required_device<cpu_device>  m_maincpu;
 	required_device<ym2203_device>  m_opn;

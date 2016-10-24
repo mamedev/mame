@@ -85,7 +85,7 @@ public:
 	void init_hitpoker();
 	virtual void video_start() override;
 	uint32_t screen_update_hitpoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(hitpoker_irq);
+	void hitpoker_irq(device_t &device);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -462,7 +462,7 @@ static GFXDECODE_START( hitpoker )
 	GFXDECODE_ENTRY( "gfx1", 0, hitpoker_layout_8bpp,   0, 8  )
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(hitpoker_state::hitpoker_irq)
+void hitpoker_state::hitpoker_irq(device_t &device)
 {
 	device.execute().set_input_line(MC68HC11_IRQ_LINE, HOLD_LINE);
 }

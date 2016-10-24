@@ -303,7 +303,7 @@ void lisa_state::scan_keyboard()
 
 /* handle mouse moves */
 /* shamelessly stolen from machine/mac.c :-) */
-TIMER_CALLBACK_MEMBER(lisa_state::handle_mouse)
+void lisa_state::handle_mouse(void *ptr, int32_t param)
 {
 	int diff_x = 0, diff_y = 0;
 	int new_mx, new_my;
@@ -384,7 +384,7 @@ TIMER_CALLBACK_MEMBER(lisa_state::handle_mouse)
 }
 
 /* read command from the VIA port A */
-TIMER_CALLBACK_MEMBER(lisa_state::read_COPS_command)
+void lisa_state::read_COPS_command(void *ptr, int32_t param)
 {
 	int command;
 	address_space &space = m_maincpu->space(AS_PROGRAM);
@@ -558,7 +558,7 @@ TIMER_CALLBACK_MEMBER(lisa_state::read_COPS_command)
 }
 
 /* this timer callback raises the COPS Ready line, which tells the COPS is about to read a command */
-TIMER_CALLBACK_MEMBER(lisa_state::set_COPS_ready)
+void lisa_state::set_COPS_ready(void *ptr, int32_t param)
 {
 	m_COPS_Ready = 1;
 	m_via0->write_pb6(m_COPS_Ready);
@@ -645,7 +645,7 @@ void lisa_state::COPS_via_out_a(address_space &space, offs_t offset, uint8_t dat
 	m_COPS_command = data;
 }
 
-WRITE_LINE_MEMBER(lisa_state::COPS_via_out_ca2)
+void lisa_state::COPS_via_out_ca2(int state)
 {
 	m_hold_COPS_data = state;
 
@@ -694,7 +694,7 @@ void lisa_state::COPS_via_out_b(address_space &space, offs_t offset, uint8_t dat
 	}
 }
 
-WRITE_LINE_MEMBER(lisa_state::COPS_via_out_cb2)
+void lisa_state::COPS_via_out_cb2(int state)
 {
 	m_speaker->level_w(state);
 }
@@ -1008,7 +1008,7 @@ void lisa_state::machine_reset()
 	m_maincpu->reset();
 }
 
-INTERRUPT_GEN_MEMBER(lisa_state::lisa_interrupt)
+void lisa_state::lisa_interrupt(device_t &device)
 {
 	if ((++m_frame_count) == 6)
 	{   /* increment clock every 1/10s */

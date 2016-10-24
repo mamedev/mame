@@ -63,8 +63,8 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(country_sndpending_r);
 	void init_crshrace2();
 	void init_crshrace();
-	TILE_GET_INFO_MEMBER(get_tile_info1);
-	TILE_GET_INFO_MEMBER(get_tile_info2);
+	void get_tile_info1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

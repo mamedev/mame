@@ -49,7 +49,7 @@ public:
 	void init_gigas();
 	void init_gigasb();
 	void init_pbillrds();
-	TILE_GET_INFO_MEMBER(get_freek_tile_info);
+	void get_freek_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void video_start() override;
 	void machine_start_pbillrd();
 	void machine_reset_freekick();
@@ -59,7 +59,7 @@ public:
 	uint32_t screen_update_pbillrd(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_freekick(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_gigas(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(freekick_irqgen);
+	void freekick_irqgen(device_t &device);
 	void gigas_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void pbillrd_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void freekick_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );

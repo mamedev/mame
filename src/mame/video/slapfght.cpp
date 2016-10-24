@@ -18,7 +18,7 @@
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(slapfght_state::get_pf_tile_info)
+void slapfght_state::get_pf_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	/* For Performan only */
 	int tile = m_videoram[tile_index] | ((m_colorram[tile_index] & 0x03) << 8);
@@ -27,7 +27,7 @@ TILE_GET_INFO_MEMBER(slapfght_state::get_pf_tile_info)
 	SET_TILE_INFO_MEMBER(0, tile, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(slapfght_state::get_pf1_tile_info)
+void slapfght_state::get_pf1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = m_videoram[tile_index] | ((m_colorram[tile_index] & 0x0f) << 8);
 	int color = (m_colorram[tile_index] & 0xf0) >> 4;
@@ -35,7 +35,7 @@ TILE_GET_INFO_MEMBER(slapfght_state::get_pf1_tile_info)
 	SET_TILE_INFO_MEMBER(1, tile, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(slapfght_state::get_fix_tile_info)
+void slapfght_state::get_fix_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = m_fixvideoram[tile_index] | ((m_fixcolorram[tile_index] & 0x03) << 8);
 	int color = (m_fixcolorram[tile_index] & 0xfc) >> 2;

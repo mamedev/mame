@@ -218,10 +218,10 @@ public:
 	emu_timer *m_tape_interrupt_timer;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	TIMER_CALLBACK_MEMBER(tape_interrupt_handler);
+	void tape_interrupt_handler(void *ptr, int32_t param);
 
 	int m_centronics_busy;
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
+	void write_centronics_busy(int state);
 };
 
 
@@ -391,7 +391,7 @@ uint8_t tutor_state::tutor_highmem_r(address_space &space, offs_t offset, uint8_
     know their exact meaning.
 */
 
-TIMER_CALLBACK_MEMBER(tutor_state::tape_interrupt_handler)
+void tutor_state::tape_interrupt_handler(void *ptr, int32_t param)
 {
 	//assert(m_tape_interrupt_enable);
 	m_maincpu->set_input_line(INT_9995_INT4, (m_cass->input() > 0.0) ? ASSERT_LINE : CLEAR_LINE);
@@ -446,7 +446,7 @@ void tutor_state::tutor_cassette_w(address_space &space, offs_t offset, uint8_t 
 	}
 }
 
-WRITE_LINE_MEMBER( tutor_state::write_centronics_busy )
+void tutor_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 }

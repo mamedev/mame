@@ -200,22 +200,22 @@ public:
 	void init_kakumei2();
 	void init_daireika();
 	void init_mjzoomin();
-	TILEMAP_MAPPER_MEMBER(range0_16x16);
-	TILEMAP_MAPPER_MEMBER(range1_16x16);
-	TILEMAP_MAPPER_MEMBER(range2_16x16);
-	TILEMAP_MAPPER_MEMBER(range3_16x16);
-	TILEMAP_MAPPER_MEMBER(range2_8x8);
-	TILEMAP_MAPPER_MEMBER(range3_8x8);
-	TILE_GET_INFO_MEMBER(get_sc0_tile_info);
-	TILE_GET_INFO_MEMBER(get_sc1_tile_info);
-	TILE_GET_INFO_MEMBER(get_sc2_tile_info);
-	TILE_GET_INFO_MEMBER(get_sc3_tile_info);
+	tilemap_memory_index range0_16x16(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	tilemap_memory_index range1_16x16(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	tilemap_memory_index range2_16x16(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	tilemap_memory_index range3_16x16(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	tilemap_memory_index range2_8x8(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	tilemap_memory_index range3_8x8(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	void get_sc0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_sc1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_sc2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_sc3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	void video_start_urashima();
 	uint32_t screen_update_jalmah(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_urashima(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(jalmah_mcu_sim);
+	void jalmah_mcu_sim(timer_device &timer, void *ptr, int32_t param);
 	void jalmah_priority_system();
 	void draw_sc0_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sc1_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -239,28 +239,28 @@ Video Hardware start
 ******************************************************************************************/
 
 /*4096x512 tilemap*/
-TILEMAP_MAPPER_MEMBER(jalmah_state::range0_16x16)
+tilemap_memory_index jalmah_state::range0_16x16(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return (row & 0x0f) + ((col & 0xff) << 4) + ((row & 0x70) << 8);
 }
 
 /*2048x1024 tilemap*/
-TILEMAP_MAPPER_MEMBER(jalmah_state::range1_16x16)
+tilemap_memory_index jalmah_state::range1_16x16(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return (row & 0x0f) + ((col & 0x7f) << 4) + ((row & 0xf0) << 7);
 }
 
 /*1024x2048 tilemap*/
-TILEMAP_MAPPER_MEMBER(jalmah_state::range2_16x16)
+tilemap_memory_index jalmah_state::range2_16x16(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return (row & 0x0f) + ((col & 0x3f) << 4) + ((row & 0x1f0) << 6);
 }
 
 /*512x4096 tilemap*/
-TILEMAP_MAPPER_MEMBER(jalmah_state::range3_16x16)
+tilemap_memory_index jalmah_state::range3_16x16(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return (row & 0x0f) + ((col & 0x1f) << 4) + ((row & 0x3f0) << 5);
@@ -268,19 +268,19 @@ TILEMAP_MAPPER_MEMBER(jalmah_state::range3_16x16)
 
 
 /*1024x512 tilemap*/
-TILEMAP_MAPPER_MEMBER(jalmah_state::range2_8x8)
+tilemap_memory_index jalmah_state::range2_8x8(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return (row & 0x1f) + ((col & 0x7f) * 0x20) + ((row & 0x20) * 0x80);
 }
 
 /*512x1024 tilemap*/
-TILEMAP_MAPPER_MEMBER(jalmah_state::range3_8x8)
+tilemap_memory_index jalmah_state::range3_8x8(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	return (row & 0x1f) + ((col & 0x3f) * 0x20) + ((row & 0x60) * 0x40);
 }
 
-TILE_GET_INFO_MEMBER(jalmah_state::get_sc0_tile_info)
+void jalmah_state::get_sc0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_sc0_vram[tile_index];
 	SET_TILE_INFO_MEMBER(3,
@@ -289,7 +289,7 @@ TILE_GET_INFO_MEMBER(jalmah_state::get_sc0_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(jalmah_state::get_sc1_tile_info)
+void jalmah_state::get_sc1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_sc1_vram[tile_index];
 	SET_TILE_INFO_MEMBER(2,
@@ -298,7 +298,7 @@ TILE_GET_INFO_MEMBER(jalmah_state::get_sc1_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(jalmah_state::get_sc2_tile_info)
+void jalmah_state::get_sc2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_sc2_vram[tile_index];
 	SET_TILE_INFO_MEMBER(1,
@@ -307,7 +307,7 @@ TILE_GET_INFO_MEMBER(jalmah_state::get_sc2_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(jalmah_state::get_sc3_tile_info)
+void jalmah_state::get_sc3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_sc3_vram[tile_index];
 	SET_TILE_INFO_MEMBER(0,
@@ -939,7 +939,7 @@ void jalmah_state::second_mcu_run()
 
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(jalmah_state::jalmah_mcu_sim)
+void jalmah_state::jalmah_mcu_sim(timer_device &timer, void *ptr, int32_t param)
 {
 	switch(m_mcu_prg)
 	{

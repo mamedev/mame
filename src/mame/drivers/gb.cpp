@@ -578,19 +578,19 @@ static const unsigned char palette_megaduck[] = {
 };
 
 /* Initialise the palettes */
-PALETTE_INIT_MEMBER(gb_state, gb)
+void gb_state::palette_init_gb(palette_device &palette)
 {
 	for (int i = 0; i < 4; i++)
 		palette.set_pen_color(i, palette_gb[i * 3 + 0], palette_gb[i * 3 + 1], palette_gb[i * 3 + 2]);
 }
 
-PALETTE_INIT_MEMBER(gb_state, gbp)
+void gb_state::palette_init_gbp(palette_device &palette)
 {
 	for (int i = 0; i < 4; i++)
 		palette.set_pen_color(i, palette_gb[(i + 4) * 3 + 0], palette_gb[(i + 4) * 3 + 1], palette_gb[(i + 4) * 3 + 2]);
 }
 
-PALETTE_INIT_MEMBER(gb_state, sgb)
+void gb_state::palette_init_sgb(palette_device &palette)
 {
 	int r, g, b;
 
@@ -603,7 +603,7 @@ PALETTE_INIT_MEMBER(gb_state, sgb)
 	}
 }
 
-PALETTE_INIT_MEMBER(gb_state, gbc)
+void gb_state::palette_init_gbc(palette_device &palette)
 {
 	int r, g, b;
 
@@ -616,7 +616,7 @@ PALETTE_INIT_MEMBER(gb_state, gbc)
 	}
 }
 
-PALETTE_INIT_MEMBER(megaduck_state, megaduck)
+void megaduck_state::palette_init_megaduck(palette_device &palette)
 {
 	for (int i = 0; i < 4; i++)
 		palette.set_pen_color(i, palette_megaduck[i * 3 + 0], palette_megaduck[i * 3 + 1], palette_megaduck[i * 3 + 2]);

@@ -64,7 +64,7 @@ protected:
 	virtual void device_clock_changed() override { }
 
 	// internal callbacks
-	TIMER_CALLBACK_MEMBER( trigger_readback_int );
+	void trigger_readback_int(void *ptr, int32_t param);
 
 private:
 	// internal state

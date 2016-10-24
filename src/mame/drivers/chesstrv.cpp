@@ -37,7 +37,7 @@ public:
 	uint8_t m_ram_addr;
 	uint8_t *m_ram;
 	uint8_t m_matrix;
-	//TIMER_DEVICE_CALLBACK_MEMBER(borisdpl_timer_interrupt);
+	//void borisdpl_timer_interrupt(timer_device &timer, void *ptr, int32_t param);
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -199,7 +199,7 @@ static INPUT_PORTS_START( borisdpl )
 INPUT_PORTS_END
 
 /*
-TIMER_DEVICE_CALLBACK_MEMBER(chesstrv_state::borisdpl_timer_interrupt)
+void chesstrv_state::borisdpl_timer_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
     m_maincpu->set_input_line_and_vector(F8_INPUT_LINE_INT_REQ, HOLD_LINE, 0x20);
 }

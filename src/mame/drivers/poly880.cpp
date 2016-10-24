@@ -131,12 +131,12 @@ INPUT_PORTS_END
 
 /* Z80-CTC Interface */
 
-WRITE_LINE_MEMBER( poly880_state::ctc_z0_w )
+void poly880_state::ctc_z0_w(int state)
 {
 	// SEND
 }
 
-WRITE_LINE_MEMBER( poly880_state::ctc_z1_w )
+void poly880_state::ctc_z1_w(int state)
 {
 }
 

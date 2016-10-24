@@ -71,17 +71,17 @@ public:
 	static void set_year0(device_t &device, int year0) { downcast<msm58321_device &>(device).m_year0 = year0; }
 	static void set_default_24h(device_t &device, bool default_24h) { downcast<msm58321_device &>(device).m_default_24h = default_24h; }
 
-	DECLARE_WRITE_LINE_MEMBER( cs2_w );
-	DECLARE_WRITE_LINE_MEMBER( write_w );
-	DECLARE_WRITE_LINE_MEMBER( read_w );
-	DECLARE_WRITE_LINE_MEMBER( d0_w );
-	DECLARE_WRITE_LINE_MEMBER( d1_w );
-	DECLARE_WRITE_LINE_MEMBER( d2_w );
-	DECLARE_WRITE_LINE_MEMBER( d3_w );
-	DECLARE_WRITE_LINE_MEMBER( address_write_w );
-	DECLARE_WRITE_LINE_MEMBER( stop_w );
-	DECLARE_WRITE_LINE_MEMBER( test_w );
-	DECLARE_WRITE_LINE_MEMBER( cs1_w );
+	void cs2_w(int state);
+	void write_w(int state);
+	void read_w(int state);
+	void d0_w(int state);
+	void d1_w(int state);
+	void d2_w(int state);
+	void d3_w(int state);
+	void address_write_w(int state);
+	void stop_w(int state);
+	void test_w(int state);
+	void cs1_w(int state);
 
 protected:
 	// device-level overrides

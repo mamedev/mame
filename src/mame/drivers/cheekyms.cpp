@@ -112,7 +112,7 @@ void cheekyms_state::machine_start()
 	save_item(NAME(m_irq_mask));
 }
 
-INTERRUPT_GEN_MEMBER(cheekyms_state::vblank_irq)
+void cheekyms_state::vblank_irq(device_t &device)
 {
 	if(m_irq_mask)
 		device.execute().set_input_line(0, HOLD_LINE);

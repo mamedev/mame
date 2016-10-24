@@ -521,22 +521,22 @@ void k056832_device::get_tile_info(  tile_data &tileinfo, int tile_index, int pa
 
 
 
-TILE_GET_INFO_MEMBER( k056832_device::get_tile_info0 ) { get_tile_info(tileinfo,tile_index,0x0); }
-TILE_GET_INFO_MEMBER( k056832_device::get_tile_info1 ) { get_tile_info(tileinfo,tile_index,0x1); }
-TILE_GET_INFO_MEMBER( k056832_device::get_tile_info2 ) { get_tile_info(tileinfo,tile_index,0x2); }
-TILE_GET_INFO_MEMBER( k056832_device::get_tile_info3 ) { get_tile_info(tileinfo,tile_index,0x3); }
-TILE_GET_INFO_MEMBER( k056832_device::get_tile_info4 ) { get_tile_info(tileinfo,tile_index,0x4); }
-TILE_GET_INFO_MEMBER( k056832_device::get_tile_info5 ) { get_tile_info(tileinfo,tile_index,0x5); }
-TILE_GET_INFO_MEMBER( k056832_device::get_tile_info6 ) { get_tile_info(tileinfo,tile_index,0x6); }
-TILE_GET_INFO_MEMBER( k056832_device::get_tile_info7 ) { get_tile_info(tileinfo,tile_index,0x7); }
-TILE_GET_INFO_MEMBER( k056832_device::get_tile_info8 ) { get_tile_info(tileinfo,tile_index,0x8); }
-TILE_GET_INFO_MEMBER( k056832_device::get_tile_info9 ) { get_tile_info(tileinfo,tile_index,0x9); }
-TILE_GET_INFO_MEMBER( k056832_device::get_tile_infoa ) { get_tile_info(tileinfo,tile_index,0xa); }
-TILE_GET_INFO_MEMBER( k056832_device::get_tile_infob ) { get_tile_info(tileinfo,tile_index,0xb); }
-TILE_GET_INFO_MEMBER( k056832_device::get_tile_infoc ) { get_tile_info(tileinfo,tile_index,0xc); }
-TILE_GET_INFO_MEMBER( k056832_device::get_tile_infod ) { get_tile_info(tileinfo,tile_index,0xd); }
-TILE_GET_INFO_MEMBER( k056832_device::get_tile_infoe ) { get_tile_info(tileinfo,tile_index,0xe); }
-TILE_GET_INFO_MEMBER( k056832_device::get_tile_infof ) { get_tile_info(tileinfo,tile_index,0xf); }
+void k056832_device::get_tile_info0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index) { get_tile_info(tileinfo,tile_index,0x0); }
+void k056832_device::get_tile_info1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index) { get_tile_info(tileinfo,tile_index,0x1); }
+void k056832_device::get_tile_info2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index) { get_tile_info(tileinfo,tile_index,0x2); }
+void k056832_device::get_tile_info3(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index) { get_tile_info(tileinfo,tile_index,0x3); }
+void k056832_device::get_tile_info4(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index) { get_tile_info(tileinfo,tile_index,0x4); }
+void k056832_device::get_tile_info5(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index) { get_tile_info(tileinfo,tile_index,0x5); }
+void k056832_device::get_tile_info6(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index) { get_tile_info(tileinfo,tile_index,0x6); }
+void k056832_device::get_tile_info7(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index) { get_tile_info(tileinfo,tile_index,0x7); }
+void k056832_device::get_tile_info8(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index) { get_tile_info(tileinfo,tile_index,0x8); }
+void k056832_device::get_tile_info9(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index) { get_tile_info(tileinfo,tile_index,0x9); }
+void k056832_device::get_tile_infoa(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index) { get_tile_info(tileinfo,tile_index,0xa); }
+void k056832_device::get_tile_infob(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index) { get_tile_info(tileinfo,tile_index,0xb); }
+void k056832_device::get_tile_infoc(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index) { get_tile_info(tileinfo,tile_index,0xc); }
+void k056832_device::get_tile_infod(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index) { get_tile_info(tileinfo,tile_index,0xd); }
+void k056832_device::get_tile_infoe(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index) { get_tile_info(tileinfo,tile_index,0xe); }
+void k056832_device::get_tile_infof(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index) { get_tile_info(tileinfo,tile_index,0xf); }
 
 
 void k056832_device::change_rambank( )

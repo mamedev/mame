@@ -431,7 +431,7 @@ static ADDRESS_MAP_START( magspot_map, AS_PROGRAM, 8, cosmic_state )
 ADDRESS_MAP_END
 
 
-WRITE_LINE_MEMBER(cosmic_state::panic_coin_inserted)
+void cosmic_state::panic_coin_inserted(int state)
 {
 	if (m_sound_enabled && !state) m_samples->start(0, 10);   /* Coin - Not triggered by software */
 
@@ -1014,7 +1014,7 @@ static MACHINE_CONFIG_START( cosmic, cosmic_state )
 	MCFG_SCREEN_PALETTE("palette")
 MACHINE_CONFIG_END
 
-TIMER_DEVICE_CALLBACK_MEMBER(cosmic_state::panic_scanline)
+void cosmic_state::panic_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

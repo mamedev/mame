@@ -68,8 +68,8 @@ public:
 	uint8_t data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( write_out2 );
-	DECLARE_WRITE_LINE_MEMBER( keyboard_w );
+	void write_out2(int state);
+	void keyboard_w(int state);
 
 	void at_8042_set_outport(uint8_t data, int initial);
 	void at_8042_receive(uint8_t data);

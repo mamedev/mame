@@ -148,8 +148,8 @@ public:
 	void msm5205_1_addr_hi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void msm5205_2_start_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void msm5205_2_stop_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(msm5205_1_vck);
-	DECLARE_WRITE_LINE_MEMBER(z80ctc_to0);
+	void msm5205_1_vck(int state);
+	void z80ctc_to0(int state);
 
 	uint8_t motor_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
@@ -589,13 +589,13 @@ void mlanding_state::msm5205_update(int chip)
 }
 
 
-WRITE_LINE_MEMBER(mlanding_state::msm5205_1_vck)
+void mlanding_state::msm5205_1_vck(int state)
 {
 	msm5205_update(0);
 }
 
 
-WRITE_LINE_MEMBER(mlanding_state::z80ctc_to0)
+void mlanding_state::z80ctc_to0(int state)
 {
 	if (m_msm2_vck2 && !state)
 	{

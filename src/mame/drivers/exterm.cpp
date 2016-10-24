@@ -172,7 +172,7 @@ void exterm_state::exterm_output_port_0_w(address_space &space, offs_t offset, u
 }
 
 
-TIMER_CALLBACK_MEMBER(exterm_state::sound_delayed_w)
+void exterm_state::sound_delayed_w(void *ptr, int32_t param)
 {
 	/* data is latched independently for both sound CPUs */
 	m_master_sound_latch = m_slave_sound_latch = param;
@@ -195,7 +195,7 @@ void exterm_state::sound_latch_w(address_space &space, offs_t offset, uint16_t d
  *
  *************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(exterm_state::master_sound_nmi_callback)
+void exterm_state::master_sound_nmi_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	/* bit 0 of the sound control determines if the NMI is actually delivered */
 	if (m_sound_control & 0x01)

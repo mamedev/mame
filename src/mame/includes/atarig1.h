@@ -57,8 +57,8 @@ public:
 	void init_hydra();
 	void init_pitfight();
 	void init_pitfightb();
-	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
-	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
+	void get_alpha_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_playfield_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void machine_start_atarig1();
 	void machine_reset_atarig1();
 	void video_start_atarig1();

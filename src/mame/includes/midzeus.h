@@ -53,7 +53,7 @@ public:
 	void analog_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	void invasn_gun_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	uint32_t invasn_gun_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
-	DECLARE_READ_LINE_MEMBER(PIC16C5X_T0_clk_r);
+	int PIC16C5X_T0_clk_r();
 	uint32_t zeus_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	void zeus_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	DECLARE_CUSTOM_INPUT_MEMBER(custom_49way_r);
@@ -68,9 +68,9 @@ public:
 	void machine_reset_midzeus();
 	void video_start_midzeus();
 	uint32_t screen_update_midzeus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(display_irq);
-	TIMER_CALLBACK_MEMBER(display_irq_off);
-	TIMER_CALLBACK_MEMBER(invasn_gun_callback);
+	void display_irq(device_t &device);
+	void display_irq_off(void *ptr, int32_t param);
+	void invasn_gun_callback(void *ptr, int32_t param);
 private:
 	void exit_handler();
 	void zeus_pointer_w(uint32_t which, uint32_t data, bool logit);

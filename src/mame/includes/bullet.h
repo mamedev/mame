@@ -92,13 +92,13 @@ public:
 	uint8_t dma_mreq_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void dma_mreq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t pio_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( dartardy_w );
-	DECLARE_WRITE_LINE_MEMBER( dartbrdy_w );
-	DECLARE_WRITE_LINE_MEMBER( write_centronics_busy );
-	DECLARE_WRITE_LINE_MEMBER( write_centronics_perror );
-	DECLARE_WRITE_LINE_MEMBER( write_centronics_select );
-	DECLARE_WRITE_LINE_MEMBER( write_centronics_fault );
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
+	void dartardy_w(int state);
+	void dartbrdy_w(int state);
+	void write_centronics_busy(int state);
+	void write_centronics_perror(int state);
+	void write_centronics_select(int state);
+	void write_centronics_fault(int state);
+	void fdc_drq_w(int state);
 
 	void update_dma_rdy();
 	// memory state
@@ -122,8 +122,8 @@ public:
 	int m_centronics_select;
 	int m_centronics_fault;
 
-	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
-	DECLARE_WRITE_LINE_MEMBER(dart_rxtxca_w);
+	void ctc_tick(timer_device &timer, void *ptr, int32_t param);
+	void dart_rxtxca_w(int state);
 	uint8_t io_read_byte(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void io_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };
@@ -164,8 +164,8 @@ public:
 	uint8_t dma_mreq_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void dma_mreq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void pio_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( cstrb_w );
-	DECLARE_WRITE_LINE_MEMBER( req_w );
+	void cstrb_w(int state);
+	void req_w(int state);
 
 	void update_dma_rdy();
 

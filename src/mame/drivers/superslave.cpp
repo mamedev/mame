@@ -253,7 +253,7 @@ INPUT_PORTS_END
 //  COM8116_INTERFACE( dbrg_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( superslave_state::fr_w )
+void superslave_state::fr_w(int state)
 {
 	m_dart0->rxca_w(state);
 	m_dart0->txca_w(state);
@@ -261,7 +261,7 @@ WRITE_LINE_MEMBER( superslave_state::fr_w )
 	m_dart1->txca_w(state);
 }
 
-WRITE_LINE_MEMBER( superslave_state::ft_w )
+void superslave_state::ft_w(int state)
 {
 	m_dart0->rxtxcb_w(state);
 	m_dart1->rxtxcb_w(state);

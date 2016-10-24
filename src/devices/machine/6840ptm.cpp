@@ -646,9 +646,9 @@ void ptm6840_device::set_gate(int idx, int state)
 	m_gate[idx] = state;
 }
 
-WRITE_LINE_MEMBER( ptm6840_device::set_g1 ) { set_gate(0, state); }
-WRITE_LINE_MEMBER( ptm6840_device::set_g2 ) { set_gate(1, state); }
-WRITE_LINE_MEMBER( ptm6840_device::set_g3 ) { set_gate(2, state); }
+void ptm6840_device::set_g1(int state) { set_gate(0, state); }
+void ptm6840_device::set_g2(int state) { set_gate(1, state); }
+void ptm6840_device::set_g3(int state) { set_gate(2, state); }
 
 
 //-------------------------------------------------
@@ -668,9 +668,9 @@ void ptm6840_device::set_clock(int idx, int state)
 	}
 }
 
-WRITE_LINE_MEMBER( ptm6840_device::set_c1 ) { set_clock(0, state); }
-WRITE_LINE_MEMBER( ptm6840_device::set_c2 ) { set_clock(1, state); }
-WRITE_LINE_MEMBER( ptm6840_device::set_c3 ) { set_clock(2, state); }
+void ptm6840_device::set_c1(int state) { set_clock(0, state); }
+void ptm6840_device::set_c2(int state) { set_clock(1, state); }
+void ptm6840_device::set_c3(int state) { set_clock(2, state); }
 
 
 //-------------------------------------------------

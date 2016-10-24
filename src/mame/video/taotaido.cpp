@@ -60,7 +60,7 @@ void taotaido_state::bgvideoram_w(address_space &space, offs_t offset, uint16_t 
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(taotaido_state::bg_tile_info)
+void taotaido_state::bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_bgram[tile_index]&0x01ff;
 	int bank = (m_bgram[tile_index]&0x0e00)>>9;
@@ -74,7 +74,7 @@ TILE_GET_INFO_MEMBER(taotaido_state::bg_tile_info)
 			0);
 }
 
-TILEMAP_MAPPER_MEMBER(taotaido_state::tilemap_scan_rows)
+tilemap_memory_index taotaido_state::tilemap_scan_rows(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return row*0x40 + (col&0x3f) + ((col&0x40)<<6);

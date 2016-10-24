@@ -44,17 +44,17 @@ INPUT_PORTS_END
 SLOT_INTERFACE_EXTERN(kc85_cart);
 SLOT_INTERFACE_EXTERN(kc85_exp);
 
-WRITE_LINE_MEMBER(kc_d002_device::out_irq_w)
+void kc_d002_device::out_irq_w(int state)
 {
 	m_slot->m_out_irq_cb(state);
 }
 
-WRITE_LINE_MEMBER(kc_d002_device::out_nmi_w)
+void kc_d002_device::out_nmi_w(int state)
 {
 	m_slot->m_out_nmi_cb(state);
 }
 
-WRITE_LINE_MEMBER(kc_d002_device::out_halt_w)
+void kc_d002_device::out_halt_w(int state)
 {
 	m_slot->m_out_halt_cb(state);
 }
@@ -224,7 +224,7 @@ void kc_d002_device::io_write(offs_t offset, uint8_t data)
    MEI line write
 -------------------------------------------------*/
 
-WRITE_LINE_MEMBER( kc_d002_device::mei_w )
+void kc_d002_device::mei_w(int state)
 {
 	m_expansions[0]->mei_w(state);
 }

@@ -112,7 +112,7 @@ public:
 	required_device<decospr_device> m_sprgen;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	DECLARE_WRITE_LINE_MEMBER(sound_irq);
+	void sound_irq(int state);
 	uint8_t irq_latch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void init_dblewing();
 	virtual void machine_start() override;
@@ -327,7 +327,7 @@ static INPUT_PORTS_START( dblewing )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
-WRITE_LINE_MEMBER(dblewing_state::sound_irq)
+void dblewing_state::sound_irq(int state)
 {
 	/* bit 0 of dblewing_sound_irq specifies IRQ from sound chip */
 	if (state)

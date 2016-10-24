@@ -825,7 +825,7 @@ uint8_t galaga_state::custom_mod_r(address_space &space, offs_t offset, uint8_t 
 	return m_custom_mod << 1;
 }
 
-TIMER_CALLBACK_MEMBER(galaga_state::cpu3_interrupt_callback)
+void galaga_state::cpu3_interrupt_callback(void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -1589,13 +1589,13 @@ static const char *const battles_sample_names[] =
 	nullptr   /* end of array */
 };
 
-INTERRUPT_GEN_MEMBER(galaga_state::main_vblank_irq)
+void galaga_state::main_vblank_irq(device_t &device)
 {
 	if(m_main_irq_mask)
 		device.execute().set_input_line(0, ASSERT_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(galaga_state::sub_vblank_irq)
+void galaga_state::sub_vblank_irq(device_t &device)
 {
 	if(m_sub_irq_mask)
 		device.execute().set_input_line(0, ASSERT_LINE);

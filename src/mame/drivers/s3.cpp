@@ -69,17 +69,17 @@ public:
 	uint8_t dips_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t switch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void switch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_READ_LINE_MEMBER(pia28_ca1_r);
-	DECLARE_READ_LINE_MEMBER(pia28_cb1_r);
-	DECLARE_WRITE_LINE_MEMBER(pia22_ca2_w) { }; //ST5
-	DECLARE_WRITE_LINE_MEMBER(pia22_cb2_w) { }; //ST-solenoids enable
-	DECLARE_WRITE_LINE_MEMBER(pia24_ca2_w) { }; //ST2
-	DECLARE_WRITE_LINE_MEMBER(pia24_cb2_w) { }; //ST1
-	DECLARE_WRITE_LINE_MEMBER(pia28_ca2_w) { }; //diag leds enable
-	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { }; //ST6
-	DECLARE_WRITE_LINE_MEMBER(pia30_ca2_w) { }; //ST4
-	DECLARE_WRITE_LINE_MEMBER(pia30_cb2_w) { }; //ST3
-	TIMER_DEVICE_CALLBACK_MEMBER(irq);
+	int pia28_ca1_r();
+	int pia28_cb1_r();
+	void pia22_ca2_w(int state) { }; //ST5
+	void pia22_cb2_w(int state) { }; //ST-solenoids enable
+	void pia24_ca2_w(int state) { }; //ST2
+	void pia24_cb2_w(int state) { }; //ST1
+	void pia28_ca2_w(int state) { }; //diag leds enable
+	void pia28_cb2_w(int state) { }; //ST6
+	void pia30_ca2_w(int state) { }; //ST4
+	void pia30_cb2_w(int state) { }; //ST3
+	void irq(timer_device &timer, void *ptr, int32_t param);
 	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 	void machine_reset_s3();
@@ -346,12 +346,12 @@ void s3_state::lamp1_w(address_space &space, offs_t offset, uint8_t data, uint8_
 {
 }
 
-READ_LINE_MEMBER( s3_state::pia28_ca1_r )
+int s3_state::pia28_ca1_r()
 {
 	return BIT(ioport("DIAGS")->read(), 2); // advance button
 }
 
-READ_LINE_MEMBER( s3_state::pia28_cb1_r )
+int s3_state::pia28_cb1_r()
 {
 	return BIT(ioport("DIAGS")->read(), 3); // auto/manual switch
 }
@@ -411,7 +411,7 @@ uint8_t s3_state::sound_r(address_space &space, offs_t offset, uint8_t mem_mask)
 	return m_sound_data;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( s3_state::irq )
+void s3_state::irq(timer_device &timer, void *ptr, int32_t param)
 {
 	if (m_t_c > 0x70)
 		m_maincpu->set_input_line(M6800_IRQ_LINE, ASSERT_LINE);

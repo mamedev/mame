@@ -169,9 +169,9 @@ public:
 	uint32_t screen_update_phantom2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_invaders(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_eof_phantom2(screen_device &screen, bool state);
-	TIMER_CALLBACK_MEMBER(maze_tone_timing_timer_callback);
-	TIMER_CALLBACK_MEMBER(mw8080bw_interrupt_callback);
-	TIMER_DEVICE_CALLBACK_MEMBER(spcenctr_strobe_timer_callback);
+	void maze_tone_timing_timer_callback(void *ptr, int32_t param);
+	void mw8080bw_interrupt_callback(void *ptr, int32_t param);
+	void spcenctr_strobe_timer_callback(timer_device &timer, void *ptr, int32_t param);
 	void midway_tone_generator_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void midway_tone_generator_hi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void tornbase_audio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);

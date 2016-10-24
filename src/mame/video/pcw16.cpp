@@ -58,7 +58,7 @@ inline void pcw16_state::pcw16_plot_pixel(bitmap_ind16 &bitmap, int x, int y, ui
 }
 
 /* Initialise the palette */
-PALETTE_INIT_MEMBER(pcw16_state, pcw16)
+void pcw16_state::palette_init_pcw16(palette_device &palette)
 {
 	palette.set_pen_colors(0, pcw16_palette, ARRAY_LENGTH(pcw16_palette));
 }

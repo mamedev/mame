@@ -46,11 +46,11 @@ public:
 	uint8_t ctrl_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t serial_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(serial_w);
+	void serial_w(int state);
 	uint8_t reset_int_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void reset_int_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	TIMER_DEVICE_CALLBACK_MEMBER(zac_1_inttimer);
-	TIMER_DEVICE_CALLBACK_MEMBER(zac_1_outtimer);
+	void zac_1_inttimer(timer_device &timer, void *ptr, int32_t param);
+	void zac_1_outtimer(timer_device &timer, void *ptr, int32_t param);
 protected:
 
 	// devices
@@ -182,7 +182,7 @@ uint8_t zac_1_state::serial_r(address_space &space, offs_t offset, uint8_t mem_m
 	return 0;
 }
 
-WRITE_LINE_MEMBER( zac_1_state::serial_w )
+void zac_1_state::serial_w(int state)
 {
 // to printer
 }
@@ -203,7 +203,7 @@ void zac_1_state::machine_reset()
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(zac_1_state::zac_1_inttimer)
+void zac_1_state::zac_1_inttimer(timer_device &timer, void *ptr, int32_t param)
 {
 	if (m_t_c > 0x40)
 	{
@@ -217,7 +217,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(zac_1_state::zac_1_inttimer)
 /* scores = 1800-182D; solenoids = 1840-1853;
    lamps = 1880-18BF; bookkeeping=18C0-18FF. 4-tone osc=1854-1857.
    182E-183F is a storage area for inputs. */
-TIMER_DEVICE_CALLBACK_MEMBER(zac_1_state::zac_1_outtimer)
+void zac_1_state::zac_1_outtimer(timer_device &timer, void *ptr, int32_t param)
 {
 	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // 4511
 	m_out_offs++;

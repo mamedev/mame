@@ -48,8 +48,8 @@ public:
 	uint8_t palm_port_f_in(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void palm_spim_out(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	uint16_t palm_spim_in(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
-	DECLARE_WRITE_LINE_MEMBER(palm_spim_exchange);
-	DECLARE_PALETTE_INIT(palm);
+	void palm_spim_exchange(int state);
+	void palette_init_palm(palette_device &palette);
 
 	required_ioport m_io_penx;
 	required_ioport m_io_peny;
@@ -105,7 +105,7 @@ uint16_t palm_state::palm_spim_in(address_space &space, offs_t offset, uint16_t 
 	return m_spim_data;
 }
 
-WRITE_LINE_MEMBER(palm_state::palm_spim_exchange)
+void palm_state::palm_spim_exchange(int state)
 {
 	uint8_t x = m_io_penx->read();
 	uint8_t y = m_io_peny->read();
@@ -144,7 +144,7 @@ void palm_state::machine_reset()
 }
 
 /* THIS IS PRETTY MUCH TOTALLY WRONG AND DOESN'T REFLECT THE MC68328'S INTERNAL FUNCTIONALITY AT ALL! */
-PALETTE_INIT_MEMBER(palm_state, palm)
+void palm_state::palette_init_palm(palette_device &palette)
 {
 	palette.set_pen_color(0, 0x7b, 0x8c, 0x5a);
 	palette.set_pen_color(1, 0x00, 0x00, 0x00);

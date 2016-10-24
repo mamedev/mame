@@ -114,7 +114,7 @@ public:
 	void w2(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void w3(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void trvmadns_tileram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_trvmadns(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -297,7 +297,7 @@ static GFXDECODE_START( trvmadns )
 	GFXDECODE_ENTRY( nullptr, 0x6000, charlayout, 0, 4 ) // doesn't matter where we point this, all the tiles are decoded while the game runs
 GFXDECODE_END
 
-TILE_GET_INFO_MEMBER(trvmadns_state::get_bg_tile_info)
+void trvmadns_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile,attr,color,flag;
 

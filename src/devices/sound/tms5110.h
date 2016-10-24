@@ -57,7 +57,7 @@ public:
 
 	void ctl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t ctl_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( pdc_w );
+	void pdc_w(int state);
 
 	/* this is only used by cvs.c
 	 * it is not related at all to the speech generation
@@ -310,13 +310,13 @@ public:
 	template<class _Object> static devcb_base &set_pdc_callback(device_t &device, _Object object) { return downcast<tmsprom_device &>(device).m_pdc_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_ctl_callback(device_t &device, _Object object) { return downcast<tmsprom_device &>(device).m_ctl_cb.set_callback(object); }
 
-	DECLARE_WRITE_LINE_MEMBER( m0_w );
-	DECLARE_READ_LINE_MEMBER( data_r );
+	void m0_w(int state);
+	int data_r();
 
 	/* offset is rom # */
 	void rom_csq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void bit_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( enable_w );
+	void enable_w(int state);
 
 protected:
 	// device-level overrides

@@ -15,7 +15,7 @@
 #include "cpu/z80/z80.h"
 
 
-TIMER_CALLBACK_MEMBER(galaxy_state::gal_video)
+void galaxy_state::gal_video(void *ptr, int32_t param)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int y, x;

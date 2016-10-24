@@ -54,16 +54,16 @@ public:
 	static void set_databus_width(device_t &device, uint8_t databus_width) { downcast<i8089_device &>(device).m_databus_width = databus_width; }
 
 	// input lines
-	DECLARE_WRITE_LINE_MEMBER( ca_w );
-	DECLARE_WRITE_LINE_MEMBER( sel_w ) { m_sel = state; }
-	DECLARE_WRITE_LINE_MEMBER( drq1_w );
-	DECLARE_WRITE_LINE_MEMBER( drq2_w );
-	DECLARE_WRITE_LINE_MEMBER( ext1_w );
-	DECLARE_WRITE_LINE_MEMBER( ext2_w );
+	void ca_w(int state);
+	void sel_w(int state) { m_sel = state; }
+	void drq1_w(int state);
+	void drq2_w(int state);
+	void ext1_w(int state);
+	void ext2_w(int state);
 
 	// internal communication
-	DECLARE_WRITE_LINE_MEMBER( ch1_sintr_w ) { m_write_sintr1(state); }
-	DECLARE_WRITE_LINE_MEMBER( ch2_sintr_w ) { m_write_sintr2(state); }
+	void ch1_sintr_w(int state) { m_write_sintr1(state); }
+	void ch2_sintr_w(int state) { m_write_sintr2(state); }
 
 protected:
 	// device-level overrides

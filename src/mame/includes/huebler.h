@@ -51,7 +51,7 @@ public:
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	uint8_t keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	TIMER_DEVICE_CALLBACK_MEMBER( tape_tick );
+	void tape_tick(timer_device &timer, void *ptr, int32_t param);
 
 	void scan_keyboard();
 
@@ -63,10 +63,10 @@ public:
 	int m_key_a8;
 
 	// video state
-	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_tick);
-	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
-	DECLARE_WRITE_LINE_MEMBER(ctc_z2_w);
-	DECLARE_WRITE_LINE_MEMBER(cassette_w);
+	void keyboard_tick(timer_device &timer, void *ptr, int32_t param);
+	void ctc_z0_w(int state);
+	void ctc_z2_w(int state);
+	void cassette_w(int state);
 };
 
 #endif

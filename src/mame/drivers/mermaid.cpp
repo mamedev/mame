@@ -394,7 +394,7 @@ void mermaid_state::machine_reset()
 }
 
 /* Similar to Jantotsu, apparently the HW has three ports that controls what kind of sample should be played. Every sample size is 0x1000. */
-WRITE_LINE_MEMBER(mermaid_state::rougien_adpcm_int)
+void mermaid_state::rougien_adpcm_int(int state)
 {
 //  popmessage("%08x",m_adpcm_pos);
 
@@ -420,7 +420,7 @@ WRITE_LINE_MEMBER(mermaid_state::rougien_adpcm_int)
 	}
 }
 
-INTERRUPT_GEN_MEMBER(mermaid_state::vblank_irq)
+void mermaid_state::vblank_irq(device_t &device)
 {
 	if(m_nmi_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);

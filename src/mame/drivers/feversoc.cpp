@@ -99,7 +99,7 @@ public:
 	void init_feversoc();
 	virtual void video_start() override;
 	uint32_t screen_update_feversoc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(feversoc_irq);
+	void feversoc_irq(device_t &device);
 	required_device<sh2_device> m_maincpu;
 	required_device<okim6295_device> m_oki;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
@@ -259,7 +259,7 @@ static INPUT_PORTS_START( feversoc )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-INTERRUPT_GEN_MEMBER(feversoc_state::feversoc_irq)
+void feversoc_state::feversoc_irq(device_t &device)
 {
 	m_maincpu->set_input_line(8, HOLD_LINE );
 }

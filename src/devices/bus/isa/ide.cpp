@@ -29,7 +29,7 @@ DEVICE_ADDRESS_MAP_START(alt_map, 8, isa16_ide_device)
 	AM_RANGE(0x6, 0x6) AM_READWRITE(ide16_alt_r, ide16_alt_w)
 ADDRESS_MAP_END
 
-WRITE_LINE_MEMBER(isa16_ide_device::ide_interrupt)
+void isa16_ide_device::ide_interrupt(int state)
 {
 	if (is_primary())
 	{

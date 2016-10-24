@@ -36,7 +36,7 @@ void flstory_state::to_main_w(address_space &space, offs_t offset, uint8_t data,
 	m_snd_flag = 2;
 }
 
-TIMER_CALLBACK_MEMBER(flstory_state::nmi_callback)
+void flstory_state::nmi_callback(void *ptr, int32_t param)
 {
 	if (m_sound_nmi_enable)
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);

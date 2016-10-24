@@ -14,7 +14,7 @@ cedar_magnet_board_device::cedar_magnet_board_device(const machine_config &mconf
 {
 }
 
-INTERRUPT_GEN_MEMBER(cedar_magnet_board_device::irq)
+void cedar_magnet_board_device::irq(device_t &device)
 {
 	m_cpu->set_input_line(0, HOLD_LINE);
 }
@@ -42,23 +42,23 @@ bool cedar_magnet_board_device::is_running(void)
 	return m_is_running;
 }
 
-TIMER_CALLBACK_MEMBER(cedar_magnet_board_device::reset_assert_callback)
+void cedar_magnet_board_device::reset_assert_callback(void *ptr, int32_t param)
 {
 	m_cpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-TIMER_CALLBACK_MEMBER(cedar_magnet_board_device::reset_clear_callback)
+void cedar_magnet_board_device::reset_clear_callback(void *ptr, int32_t param)
 {
 	m_cpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
 }
 
-TIMER_CALLBACK_MEMBER(cedar_magnet_board_device::halt_assert_callback)
+void cedar_magnet_board_device::halt_assert_callback(void *ptr, int32_t param)
 {
 	m_cpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
 	m_is_running = false;
 }
 
-TIMER_CALLBACK_MEMBER(cedar_magnet_board_device::halt_clear_callback)
+void cedar_magnet_board_device::halt_clear_callback(void *ptr, int32_t param)
 {
 	m_cpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 	m_is_running = true;

@@ -69,8 +69,8 @@ protected:
 	virtual void device_reset() override;
 
 	// internal callbacks
-	TIMER_CALLBACK_MEMBER( audio_sample_trigger );
-	TIMER_CALLBACK_MEMBER( trigger_readback_int );
+	void audio_sample_trigger(void *ptr, int32_t param);
+	void trigger_readback_int(void *ptr, int32_t param);
 
 private:
 	// internal state

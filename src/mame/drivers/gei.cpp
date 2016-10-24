@@ -144,7 +144,7 @@ public:
 	uint8_t portC_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void init_geimulti();
 	void init_setbank();
-	INTERRUPT_GEN_MEMBER(vblank_irq);
+	void vblank_irq(device_t &device);
 };
 
 
@@ -1016,7 +1016,7 @@ static INPUT_PORTS_START(sprtauth)
 INPUT_PORTS_END
 
 
-INTERRUPT_GEN_MEMBER(gei_state::vblank_irq)
+void gei_state::vblank_irq(device_t &device)
 {
 	if(m_nmi_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);

@@ -40,7 +40,7 @@ public:
 	virtual const char *image_interface() const override { return m_interface; }
 	virtual const char *file_extensions() const override { return m_file_extensions; }
 
-	TIMER_CALLBACK_MEMBER(process_snapshot_or_quickload);
+	void process_snapshot_or_quickload(void *ptr, int32_t param);
 	void set_handler(snapquick_load_delegate load, const char *ext, seconds_t sec) { m_load = load; m_file_extensions = ext; m_delay_seconds = sec; };
 protected:
 	// device-level overrides

@@ -93,11 +93,11 @@ public:
 	void galaxi_500004_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	DECLARE_CUSTOM_INPUT_MEMBER(ticket_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(hopper_r);
-	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg2_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg3_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg4_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	void get_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_bg2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_bg3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_bg4_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -114,31 +114,31 @@ public:
                                 Video Hardware
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(galaxi_state::get_bg1_tile_info)
+void galaxi_state::get_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = m_bg1_ram[tile_index];
 	SET_TILE_INFO_MEMBER(0, code, 0x10 + (code >> 12), 0);
 }
 
-TILE_GET_INFO_MEMBER(galaxi_state::get_bg2_tile_info)
+void galaxi_state::get_bg2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = m_bg2_ram[tile_index];
 	SET_TILE_INFO_MEMBER(0, code, 0x10 + (code >> 12), 0);
 }
 
-TILE_GET_INFO_MEMBER(galaxi_state::get_bg3_tile_info)
+void galaxi_state::get_bg3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = m_bg3_ram[tile_index];
 	SET_TILE_INFO_MEMBER(0, code, (code >> 12), 0);
 }
 
-TILE_GET_INFO_MEMBER(galaxi_state::get_bg4_tile_info)
+void galaxi_state::get_bg4_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = m_bg4_ram[tile_index];
 	SET_TILE_INFO_MEMBER(0, code, (code >> 12), 0);
 }
 
-TILE_GET_INFO_MEMBER(galaxi_state::get_fg_tile_info)
+void galaxi_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = m_fg_ram[tile_index];
 	SET_TILE_INFO_MEMBER(1, code, 0x20 + (code >> 12), 0);

@@ -70,7 +70,7 @@ void x76f100_device::device_start()
 	save_item( NAME( m_data ) );
 }
 
-WRITE_LINE_MEMBER( x76f100_device::write_cs )
+void x76f100_device::write_cs(int state)
 {
 	if( m_cs != state )
 	{
@@ -94,7 +94,7 @@ WRITE_LINE_MEMBER( x76f100_device::write_cs )
 	m_cs = state;
 }
 
-WRITE_LINE_MEMBER( x76f100_device::write_rst )
+void x76f100_device::write_rst(int state)
 {
 	if( m_rst != state )
 	{
@@ -145,7 +145,7 @@ int x76f100_device::data_offset()
 	return ( block_offset * sizeof( m_write_buffer ) ) + m_byte;
 }
 
-WRITE_LINE_MEMBER( x76f100_device::write_scl )
+void x76f100_device::write_scl(int state)
 {
 	if( m_scl != state )
 	{
@@ -316,7 +316,7 @@ WRITE_LINE_MEMBER( x76f100_device::write_scl )
 	m_scl = state;
 }
 
-WRITE_LINE_MEMBER( x76f100_device::write_sda )
+void x76f100_device::write_sda(int state)
 {
 	if( m_sdaw != state )
 	{
@@ -367,7 +367,7 @@ WRITE_LINE_MEMBER( x76f100_device::write_sda )
 	m_sdaw = state;
 }
 
-READ_LINE_MEMBER( x76f100_device::read_sda )
+int x76f100_device::read_sda()
 {
 	if( m_cs != 0 )
 	{

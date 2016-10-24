@@ -51,7 +51,7 @@ public:
 	required_shared_ptr<uint8_t> m_video_ram;
 	required_shared_ptr<uint8_t> m_display_ram;
 	uint16_t m_ko;                /* KO lines KO1 - KO14 */
-	DECLARE_PALETTE_INIT(cfx9850);
+	void palette_init_cfx9850(palette_device &palette);
 	uint32_t screen_update_cfx9850(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
@@ -220,7 +220,7 @@ static INPUT_PORTS_START( cfx9850 )
 INPUT_PORTS_END
 
 
-PALETTE_INIT_MEMBER(cfx9850_state, cfx9850)
+void cfx9850_state::palette_init_cfx9850(palette_device &palette)
 {
 	palette.set_pen_color( 0, 0xff, 0xff, 0xff );
 	palette.set_pen_color( 1, 0x00, 0x00, 0xff );

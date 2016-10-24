@@ -72,8 +72,8 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	TILE_GET_INFO_MEMBER(get_tile_info_0);
-	TILE_GET_INFO_MEMBER(get_tile_info_1);
+	void get_tile_info_0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info_1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	required_device<gfxdecode_device> m_gfxdecode;
 };
 

@@ -309,17 +309,17 @@ public:
 	void init_sharkpye();
 	void init_tisub();
 	void init_mtrainnv();
-	TILE_GET_INFO_MEMBER(get_tile_info);
-	TILE_GET_INFO_MEMBER(get_stbsub_tile_info);
-	TILE_GET_INFO_MEMBER(get_subsino_reel1_tile_info);
-	TILE_GET_INFO_MEMBER(get_stbsub_reel1_tile_info);
-	TILE_GET_INFO_MEMBER(get_subsino_reel2_tile_info);
-	TILE_GET_INFO_MEMBER(get_stbsub_reel2_tile_info);
-	TILE_GET_INFO_MEMBER(get_subsino_reel3_tile_info);
-	TILE_GET_INFO_MEMBER(get_stbsub_reel3_tile_info);
+	void get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_stbsub_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_subsino_reel1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_stbsub_reel1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_subsino_reel2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_stbsub_reel2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_subsino_reel3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_stbsub_reel3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void video_start_subsino();
-	DECLARE_PALETTE_INIT(subsino_2proms);
-	DECLARE_PALETTE_INIT(subsino_3proms);
+	void palette_init_subsino_2proms(palette_device &palette);
+	void palette_init_subsino_3proms(palette_device &palette);
 	void video_start_subsino_reels();
 	void video_start_stbsub();
 	uint32_t screen_update_subsino(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -360,7 +360,7 @@ void subsino_state::subsino_colorram_w(address_space &space, offs_t offset, uint
 	m_tmap->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(subsino_state::get_tile_info)
+void subsino_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = m_videoram[ tile_index ] + (m_colorram[ tile_index ] << 8);
 	uint16_t color = (code >> 8) & 0x0f;
@@ -369,7 +369,7 @@ TILE_GET_INFO_MEMBER(subsino_state::get_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(subsino_state::get_stbsub_tile_info)
+void subsino_state::get_stbsub_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = m_videoram[ tile_index ] + (m_colorram[ tile_index ] << 8);
 	code&= 0x3fff;
@@ -392,7 +392,7 @@ void subsino_state::subsino_reel1_ram_w(address_space &space, offs_t offset, uin
 	m_reel1_tilemap->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(subsino_state::get_subsino_reel1_tile_info)
+void subsino_state::get_subsino_reel1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_reel1_ram[tile_index];
 	int colour = (m_out_c&0x7) + 8;
@@ -403,7 +403,7 @@ TILE_GET_INFO_MEMBER(subsino_state::get_subsino_reel1_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(subsino_state::get_stbsub_reel1_tile_info)
+void subsino_state::get_stbsub_reel1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_reel1_ram[tile_index];
 	int attr = m_reel1_attr[tile_index];
@@ -421,7 +421,7 @@ void subsino_state::subsino_reel2_ram_w(address_space &space, offs_t offset, uin
 	m_reel2_tilemap->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(subsino_state::get_subsino_reel2_tile_info)
+void subsino_state::get_subsino_reel2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_reel2_ram[tile_index];
 	int colour = (m_out_c&0x7) + 8;
@@ -432,7 +432,7 @@ TILE_GET_INFO_MEMBER(subsino_state::get_subsino_reel2_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(subsino_state::get_stbsub_reel2_tile_info)
+void subsino_state::get_stbsub_reel2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_reel2_ram[tile_index];
 	int attr = m_reel2_attr[tile_index];
@@ -449,7 +449,7 @@ void subsino_state::subsino_reel3_ram_w(address_space &space, offs_t offset, uin
 	m_reel3_tilemap->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(subsino_state::get_subsino_reel3_tile_info)
+void subsino_state::get_subsino_reel3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_reel3_ram[tile_index];
 	int colour = (m_out_c&0x7) + 8;
@@ -460,7 +460,7 @@ TILE_GET_INFO_MEMBER(subsino_state::get_subsino_reel3_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(subsino_state::get_stbsub_reel3_tile_info)
+void subsino_state::get_stbsub_reel3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_reel3_ram[tile_index];
 	int attr = m_reel3_attr[tile_index];
@@ -576,7 +576,7 @@ uint32_t subsino_state::screen_update_stbsub_reels(screen_device &screen, bitmap
 
 
 
-PALETTE_INIT_MEMBER(subsino_state,subsino_2proms)
+void subsino_state::palette_init_subsino_2proms(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i,r,g,b,val;
@@ -603,7 +603,7 @@ PALETTE_INIT_MEMBER(subsino_state,subsino_2proms)
 	}
 }
 
-PALETTE_INIT_MEMBER(subsino_state,subsino_3proms)
+void subsino_state::palette_init_subsino_3proms(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i,r,g,b,val;

@@ -106,7 +106,7 @@ public:
 	void init_bootsys2d();
 	void init_choplift();
 
-	TILE_GET_INFO_MEMBER(tile_get_info);
+	void tile_get_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -116,9 +116,9 @@ public:
 	uint32_t screen_update_system1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_system2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_system2_rowscroll(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(mcu_irq_assert);
-	TIMER_DEVICE_CALLBACK_MEMBER(soundirq_gen);
-	TIMER_DEVICE_CALLBACK_MEMBER(mcu_t0_callback);
+	void mcu_irq_assert(device_t &device);
+	void soundirq_gen(timer_device &timer, void *ptr, int32_t param);
+	void mcu_t0_callback(timer_device &timer, void *ptr, int32_t param);
 	void system1_videoram_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void video_start_common(int pagecount);
 	inline void videoram_wait_states(cpu_device *cpu);

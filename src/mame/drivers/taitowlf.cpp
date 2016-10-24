@@ -59,7 +59,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	#if !ENABLE_VGA
-	DECLARE_PALETTE_INIT(taitowlf);
+	void palette_init_taitowlf(palette_device &palette);
 	#endif
 	uint32_t screen_update_taitowlf(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void intel82439tx_init();
@@ -353,7 +353,7 @@ void taitowlf_state::machine_reset()
 
 #if !ENABLE_VGA
 /* debug purpose*/
-PALETTE_INIT_MEMBER(taitowlf_state, taitowlf)
+void taitowlf_state::palette_init_taitowlf(palette_device &palette)
 {
 	palette.set_pen_color(0x70,rgb_t(0xff,0xff,0xff));
 	palette.set_pen_color(0x71,rgb_t(0xff,0xff,0xff));

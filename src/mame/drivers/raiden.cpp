@@ -260,7 +260,7 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-INTERRUPT_GEN_MEMBER(raiden_state::raiden_interrupt)
+void raiden_state::raiden_interrupt(device_t &device)
 {
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xc8/4); /* VBL */
 }

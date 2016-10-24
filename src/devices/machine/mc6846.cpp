@@ -227,7 +227,7 @@ inline void mc6846_device::timer_launch()
 
 /******************* timer callbacks *********************************/
 
-TIMER_CALLBACK_MEMBER( mc6846_device::timer_expire )
+void mc6846_device::timer_expire(void *ptr, int32_t param)
 {
 	int delay = FACTOR * (m_latch+1);
 
@@ -270,7 +270,7 @@ TIMER_CALLBACK_MEMBER( mc6846_device::timer_expire )
 
 
 
-TIMER_CALLBACK_MEMBER( mc6846_device::timer_one_shot )
+void mc6846_device::timer_one_shot(void *ptr, int32_t param)
 {
 	LOG (( "%f: mc6846 timer one shot called\n", machine().time().as_double() ));
 

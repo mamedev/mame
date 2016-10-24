@@ -104,22 +104,22 @@ public:
 	virtual void machine_start() override;
 	void video_start_raaspec();
 	uint32_t screen_update_vectrex(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(vectrex_imager_change_color);
-	TIMER_CALLBACK_MEMBER(update_level);
-	TIMER_CALLBACK_MEMBER(vectrex_imager_eye);
-	TIMER_CALLBACK_MEMBER(lightpen_trigger);
-	TIMER_CALLBACK_MEMBER(vectrex_refresh);
-	TIMER_CALLBACK_MEMBER(vectrex_zero_integrators);
-	TIMER_CALLBACK_MEMBER(update_signal);
+	void vectrex_imager_change_color(void *ptr, int32_t param);
+	void update_level(void *ptr, int32_t param);
+	void vectrex_imager_eye(void *ptr, int32_t param);
+	void lightpen_trigger(void *ptr, int32_t param);
+	void vectrex_refresh(void *ptr, int32_t param);
+	void vectrex_zero_integrators(void *ptr, int32_t param);
+	void update_signal(void *ptr, int32_t param);
 	uint8_t vectrex_via_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t vectrex_via_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t vectrex_s1_via_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void v_via_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void v_via_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(v_via_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(v_via_cb2_w);
+	void v_via_ca2_w(int state);
+	void v_via_cb2_w(int state);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( vectrex_cart );
-	DECLARE_WRITE_LINE_MEMBER(vectrex_via_irq);
+	void vectrex_via_irq(int state);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;

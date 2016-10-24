@@ -172,7 +172,7 @@ private:
 	void draw_block(int x, int y, int offset);
 	void draw_bitplanes();
 
-	TIMER_CALLBACK_MEMBER(timer_timeout);
+	void timer_timeout(void *ptr, int32_t param);
 
 	vic3_type  m_type;
 

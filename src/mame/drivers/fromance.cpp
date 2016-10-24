@@ -90,7 +90,7 @@ uint8_t fromance_state::fromance_commanddata_r(address_space &space, offs_t offs
 }
 
 
-TIMER_CALLBACK_MEMBER(fromance_state::deferred_commanddata_w)
+void fromance_state::deferred_commanddata_w(void *ptr, int32_t param)
 {
 	m_commanddata = param;
 	m_directionflag = 1;
@@ -167,7 +167,7 @@ void fromance_state::fromance_adpcm_w(address_space &space, offs_t offset, uint8
 }
 
 
-WRITE_LINE_MEMBER(fromance_state::fromance_adpcm_int)
+void fromance_state::fromance_adpcm_int(int state)
 {
 	/* skip if we're reset */
 	if (!m_adpcm_reset)

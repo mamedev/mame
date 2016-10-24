@@ -73,8 +73,8 @@ public:
 	uint32_t screen_update_wintbob(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_snowbros(screen_device &screen, bool state);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(snowbros_irq);
-	TIMER_DEVICE_CALLBACK_MEMBER(snowbros3_irq);
+	void snowbros_irq(timer_device &timer, void *ptr, int32_t param);
+	void snowbros3_irq(timer_device &timer, void *ptr, int32_t param);
 
 	void sb3_play_music(int data);
 	void sb3_play_sound(int data);

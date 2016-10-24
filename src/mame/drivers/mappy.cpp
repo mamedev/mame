@@ -766,7 +766,7 @@ void mappy_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 	}
 }
 
-TIMER_CALLBACK_MEMBER(mappy_state::superpac_io_run)
+void mappy_state::superpac_io_run(void *ptr, int32_t param)
 {
 	switch (param)
 	{
@@ -779,7 +779,7 @@ TIMER_CALLBACK_MEMBER(mappy_state::superpac_io_run)
 	}
 }
 
-INTERRUPT_GEN_MEMBER(mappy_state::superpac_main_vblank_irq)
+void mappy_state::superpac_main_vblank_irq(device_t &device)
 {
 	if (m_main_irq_mask)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
@@ -791,7 +791,7 @@ INTERRUPT_GEN_MEMBER(mappy_state::superpac_main_vblank_irq)
 		timer_set(attotime::from_usec(50), TIMER_SUPERPAC_IO_RUN, 1);
 }
 
-TIMER_CALLBACK_MEMBER(mappy_state::pacnpal_io_run)
+void mappy_state::pacnpal_io_run(void *ptr, int32_t param)
 {
 	switch (param)
 	{
@@ -804,7 +804,7 @@ TIMER_CALLBACK_MEMBER(mappy_state::pacnpal_io_run)
 	}
 }
 
-INTERRUPT_GEN_MEMBER(mappy_state::pacnpal_main_vblank_irq)
+void mappy_state::pacnpal_main_vblank_irq(device_t &device)
 {
 	if (m_main_irq_mask)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
@@ -816,7 +816,7 @@ INTERRUPT_GEN_MEMBER(mappy_state::pacnpal_main_vblank_irq)
 		timer_set(attotime::from_usec(50), TIMER_PACNPAL_IO_RUN, 1);
 }
 
-TIMER_CALLBACK_MEMBER(mappy_state::grobda_io_run)
+void mappy_state::grobda_io_run(void *ptr, int32_t param)
 {
 	switch (param)
 	{
@@ -829,7 +829,7 @@ TIMER_CALLBACK_MEMBER(mappy_state::grobda_io_run)
 	}
 }
 
-INTERRUPT_GEN_MEMBER(mappy_state::grobda_main_vblank_irq)
+void mappy_state::grobda_main_vblank_irq(device_t &device)
 {
 	if (m_main_irq_mask)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
@@ -841,7 +841,7 @@ INTERRUPT_GEN_MEMBER(mappy_state::grobda_main_vblank_irq)
 		timer_set(attotime::from_usec(50), TIMER_GROBDA_IO_RUN, 1);
 }
 
-TIMER_CALLBACK_MEMBER(mappy_state::phozon_io_run)
+void mappy_state::phozon_io_run(void *ptr, int32_t param)
 {
 	switch (param)
 	{
@@ -854,7 +854,7 @@ TIMER_CALLBACK_MEMBER(mappy_state::phozon_io_run)
 	}
 }
 
-INTERRUPT_GEN_MEMBER(mappy_state::phozon_main_vblank_irq)
+void mappy_state::phozon_main_vblank_irq(device_t &device)
 {
 	if (m_main_irq_mask)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
@@ -866,7 +866,7 @@ INTERRUPT_GEN_MEMBER(mappy_state::phozon_main_vblank_irq)
 		timer_set(attotime::from_usec(50), TIMER_PHOZON_IO_RUN, 1);
 }
 
-TIMER_CALLBACK_MEMBER(mappy_state::mappy_io_run)
+void mappy_state::mappy_io_run(void *ptr, int32_t param)
 {
 	switch (param)
 	{
@@ -879,7 +879,7 @@ TIMER_CALLBACK_MEMBER(mappy_state::mappy_io_run)
 	}
 }
 
-INTERRUPT_GEN_MEMBER(mappy_state::mappy_main_vblank_irq)
+void mappy_state::mappy_main_vblank_irq(device_t &device)
 {
 	if(m_main_irq_mask)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
@@ -891,7 +891,7 @@ INTERRUPT_GEN_MEMBER(mappy_state::mappy_main_vblank_irq)
 		timer_set(attotime::from_usec(50), TIMER_MAPPY_IO_RUN, 1);
 }
 
-TIMER_CALLBACK_MEMBER(mappy_state::digdug2_io_run)
+void mappy_state::digdug2_io_run(void *ptr, int32_t param)
 {
 	switch (param)
 	{
@@ -904,7 +904,7 @@ TIMER_CALLBACK_MEMBER(mappy_state::digdug2_io_run)
 	}
 }
 
-INTERRUPT_GEN_MEMBER(mappy_state::digdug2_main_vblank_irq)
+void mappy_state::digdug2_main_vblank_irq(device_t &device)
 {
 	if(m_main_irq_mask)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
@@ -916,7 +916,7 @@ INTERRUPT_GEN_MEMBER(mappy_state::digdug2_main_vblank_irq)
 		timer_set(attotime::from_usec(50), TIMER_DIGDUG2_IO_RUN, 1);
 }
 
-TIMER_CALLBACK_MEMBER(mappy_state::motos_io_run)
+void mappy_state::motos_io_run(void *ptr, int32_t param)
 {
 	switch (param)
 	{
@@ -929,7 +929,7 @@ TIMER_CALLBACK_MEMBER(mappy_state::motos_io_run)
 	}
 }
 
-INTERRUPT_GEN_MEMBER(mappy_state::motos_main_vblank_irq)
+void mappy_state::motos_main_vblank_irq(device_t &device)
 {
 	if(m_main_irq_mask)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
@@ -941,13 +941,13 @@ INTERRUPT_GEN_MEMBER(mappy_state::motos_main_vblank_irq)
 		timer_set(attotime::from_usec(50), TIMER_MOTOS_IO_RUN, 1);
 }
 
-INTERRUPT_GEN_MEMBER(mappy_state::sub_vblank_irq)
+void mappy_state::sub_vblank_irq(device_t &device)
 {
 	if(m_sub_irq_mask)
 		m_subcpu->set_input_line(0, ASSERT_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(mappy_state::sub2_vblank_irq)
+void mappy_state::sub2_vblank_irq(device_t &device)
 {
 	if(m_sub2_irq_mask)
 		m_subcpu2->set_input_line(0, ASSERT_LINE);

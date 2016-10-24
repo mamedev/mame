@@ -65,8 +65,8 @@ public:
 	uint8_t status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( fr_w );
-	DECLARE_WRITE_LINE_MEMBER( ft_w );
+	void fr_w(int state);
+	void ft_w(int state);
 
 	uint8_t m_memctrl;
 	uint8_t m_cmd;

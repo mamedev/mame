@@ -256,7 +256,7 @@ void m92_state::machine_reset_m92()
 /*****************************************************************************/
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(m92_state::m92_scanline_interrupt)
+void m92_state::m92_scanline_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

@@ -51,7 +51,7 @@ void midvunit_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	}
 }
 
-TIMER_CALLBACK_MEMBER(midvunit_state::scanline_timer_cb)
+void midvunit_state::scanline_timer_cb(void *ptr, int32_t param)
 {
 	int scanline = param;
 

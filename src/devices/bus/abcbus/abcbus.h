@@ -230,15 +230,15 @@ public:
 	void c4_w(uint8_t data) { if (m_card) m_card->abcbus_c4(data); }
 	uint8_t xmemfl_r(offs_t offset) { return m_card ? m_card->abcbus_xmemfl(offset) : 0xff; }
 	void xmemw_w(offs_t offset, uint8_t data) { if (m_card) m_card->abcbus_xmemw(offset, data); }
-	DECLARE_READ_LINE_MEMBER( csb_r ) { return m_card ? m_card->abcbus_csb() : 1; }
+	int csb_r() { return m_card ? m_card->abcbus_csb() : 1; }
 	uint8_t ops_r() { return m_card ? m_card->abcbus_ops() : 0xff; }
 	uint8_t exp_r() { return m_card ? m_card->abcbus_exp() : 0xff; }
-	DECLARE_READ_LINE_MEMBER( xcsb2_r ) { return m_card ? m_card->abcbus_xcsb2() : 1; }
-	DECLARE_READ_LINE_MEMBER( xcsb3_r ) { return m_card ? m_card->abcbus_xcsb3() : 1; }
-	DECLARE_READ_LINE_MEMBER( xcsb4_r ) { return m_card ? m_card->abcbus_xcsb4() : 1; }
-	DECLARE_READ_LINE_MEMBER( xcsb5_r ) { return m_card ? m_card->abcbus_xcsb5() : 1; }
-	DECLARE_WRITE_LINE_MEMBER( tren_w ) { if (m_card) m_card->abcbus_tren(state); }
-	DECLARE_WRITE_LINE_MEMBER( prac_w ) { if (m_card) m_card->abcbus_prac(state); }
+	int xcsb2_r() { return m_card ? m_card->abcbus_xcsb2() : 1; }
+	int xcsb3_r() { return m_card ? m_card->abcbus_xcsb3() : 1; }
+	int xcsb4_r() { return m_card ? m_card->abcbus_xcsb4() : 1; }
+	int xcsb5_r() { return m_card ? m_card->abcbus_xcsb5() : 1; }
+	void tren_w(int state) { if (m_card) m_card->abcbus_tren(state); }
+	void prac_w(int state) { if (m_card) m_card->abcbus_prac(state); }
 
 	void cs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { cs_w(data); }
 	uint8_t rst_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return rst_r(); }
@@ -252,26 +252,26 @@ public:
 	uint8_t xmemfl_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return xmemfl_r(offset); }
 	void xmemw_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { xmemw_w(offset, data); }
 
-	DECLARE_READ_LINE_MEMBER( irq_r ) { return m_irq; }
-	DECLARE_READ_LINE_MEMBER( nmi_r ) { return m_nmi; }
-	DECLARE_READ_LINE_MEMBER( pren_r ) { return m_pren; }
-	DECLARE_READ_LINE_MEMBER( trrq_r ) { return m_trrq; }
-	DECLARE_READ_LINE_MEMBER( xint2_r ) { return m_xint2; }
-	DECLARE_READ_LINE_MEMBER( xint3_r ) { return m_xint3; }
-	DECLARE_READ_LINE_MEMBER( xint4_r ) { return m_xint4; }
-	DECLARE_READ_LINE_MEMBER( xint5_r ) { return m_xint5; }
+	int irq_r() { return m_irq; }
+	int nmi_r() { return m_nmi; }
+	int pren_r() { return m_pren; }
+	int trrq_r() { return m_trrq; }
+	int xint2_r() { return m_xint2; }
+	int xint3_r() { return m_xint3; }
+	int xint4_r() { return m_xint4; }
+	int xint5_r() { return m_xint5; }
 
 	// card interface
-	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_irq = state; m_write_irq(state); }
-	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_nmi = state; m_write_nmi(state); }
-	DECLARE_WRITE_LINE_MEMBER( rdy_w ) { m_write_rdy(state); }
-	DECLARE_WRITE_LINE_MEMBER( resin_w ) { m_write_resin(state); }
-	DECLARE_WRITE_LINE_MEMBER( pren_w ) { m_pren = state; m_write_pren(state); }
-	DECLARE_WRITE_LINE_MEMBER( trrq_w ) { m_trrq = state; m_write_trrq(state); }
-	DECLARE_WRITE_LINE_MEMBER( xint2_w ) { m_xint2 = state; m_write_xint2(state); }
-	DECLARE_WRITE_LINE_MEMBER( xint3_w ) { m_xint3 = state; m_write_xint3(state); }
-	DECLARE_WRITE_LINE_MEMBER( xint4_w ) { m_xint4 = state; m_write_xint4(state); }
-	DECLARE_WRITE_LINE_MEMBER( xint5_w ) { m_xint5 = state; m_write_xint5(state); }
+	void irq_w(int state) { m_irq = state; m_write_irq(state); }
+	void nmi_w(int state) { m_nmi = state; m_write_nmi(state); }
+	void rdy_w(int state) { m_write_rdy(state); }
+	void resin_w(int state) { m_write_resin(state); }
+	void pren_w(int state) { m_pren = state; m_write_pren(state); }
+	void trrq_w(int state) { m_trrq = state; m_write_trrq(state); }
+	void xint2_w(int state) { m_xint2 = state; m_write_xint2(state); }
+	void xint3_w(int state) { m_xint3 = state; m_write_xint3(state); }
+	void xint4_w(int state) { m_xint4 = state; m_write_xint4(state); }
+	void xint5_w(int state) { m_xint5 = state; m_write_xint5(state); }
 
 protected:
 	// device-level overrides

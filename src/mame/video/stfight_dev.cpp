@@ -147,13 +147,13 @@ machine_config_constructor stfight_video_device::device_mconfig_additions() cons
 
  */
 
-TILEMAP_MAPPER_MEMBER(stfight_video_device::fg_scan)
+tilemap_memory_index stfight_video_device::fg_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return (col & 0x0f) + ((row & 0x0f) << 4) + ((col & 0x70) << 4) + ((row & 0xf0) << 7);
 }
 
-TILE_GET_INFO_MEMBER(stfight_video_device::get_fg_tile_info)
+void stfight_video_device::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr,tile_base;
 
@@ -166,7 +166,7 @@ TILE_GET_INFO_MEMBER(stfight_video_device::get_fg_tile_info)
 			0);
 }
 
-TILEMAP_MAPPER_MEMBER(stfight_video_device::bg_scan)
+tilemap_memory_index stfight_video_device::bg_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return ((col & 0x0e) >> 1) + ((row & 0x0f) << 3) + ((col & 0x70) << 3) +
@@ -174,7 +174,7 @@ TILEMAP_MAPPER_MEMBER(stfight_video_device::bg_scan)
 			((row & 0x60) << 8);
 }
 
-TILE_GET_INFO_MEMBER(stfight_video_device::get_bg_tile_info)
+void stfight_video_device::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr,tile_bank,tile_base;
 
@@ -188,7 +188,7 @@ TILE_GET_INFO_MEMBER(stfight_video_device::get_bg_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(stfight_video_device::get_tx_tile_info)
+void stfight_video_device::get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t attr = m_txram[tile_index+0x400];
 	int color = attr & 0x0f;

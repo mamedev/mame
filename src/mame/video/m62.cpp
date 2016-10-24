@@ -199,7 +199,7 @@ void m62_state::m62_amplify_contrast(palette_t *palette, uint32_t numcolors)
 	palette->set_contrast(255000.0/ymax);
 }
 
-PALETTE_INIT_MEMBER(m62_state, m62)
+void m62_state::palette_init_m62(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	std::vector<rgb_t> rgb;
@@ -217,7 +217,7 @@ PALETTE_INIT_MEMBER(m62_state, m62)
 }
 
 
-PALETTE_INIT_MEMBER(m62_state,lotlot)
+void m62_state::palette_init_lotlot(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	std::vector<rgb_t> rgb;
@@ -235,7 +235,7 @@ PALETTE_INIT_MEMBER(m62_state,lotlot)
 }
 
 
-PALETTE_INIT_MEMBER(m62_state,battroad)
+void m62_state::palette_init_battroad(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	std::vector<rgb_t> rgb;
@@ -258,7 +258,7 @@ PALETTE_INIT_MEMBER(m62_state,battroad)
 }
 
 
-PALETTE_INIT_MEMBER(m62_state,spelunk2)
+void m62_state::palette_init_spelunk2(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	std::vector<rgb_t> rgb;
@@ -429,7 +429,7 @@ void m62_state::kungfum_tileram_w(address_space &space, offs_t offset, uint8_t d
 	m_bg_tilemap->mark_tile_dirty(offset & 0x7ff);
 }
 
-TILE_GET_INFO_MEMBER(m62_state::get_kungfum_bg_tile_info)
+void m62_state::get_kungfum_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code;
 	int color;
@@ -473,7 +473,7 @@ uint32_t m62_state::screen_update_kungfum(screen_device &screen, bitmap_ind16 &b
 }
 
 
-TILE_GET_INFO_MEMBER(m62_state::get_ldrun_bg_tile_info)
+void m62_state::get_ldrun_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code;
 	int color;
@@ -511,7 +511,7 @@ uint32_t m62_state::screen_update_ldrun(screen_device &screen, bitmap_ind16 &bit
 	return 0;
 }
 
-TILE_GET_INFO_MEMBER(m62_state::get_ldrun2_bg_tile_info)
+void m62_state::get_ldrun2_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code;
 	int color;
@@ -564,7 +564,7 @@ uint32_t m62_state::screen_update_ldrun3(screen_device &screen, bitmap_ind16 &bi
 }
 
 
-TILE_GET_INFO_MEMBER(m62_state::get_battroad_bg_tile_info)
+void m62_state::get_battroad_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code;
 	int color;
@@ -583,7 +583,7 @@ TILE_GET_INFO_MEMBER(m62_state::get_battroad_bg_tile_info)
 		tileinfo.group = 0;
 }
 
-TILE_GET_INFO_MEMBER(m62_state::get_battroad_fg_tile_info)
+void m62_state::get_battroad_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code;
 	int color;
@@ -619,7 +619,7 @@ uint32_t m62_state::screen_update_battroad(screen_device &screen, bitmap_ind16 &
 
 /* almost identical but scrolling background, more characters, */
 /* no char x flip, and more sprites */
-TILE_GET_INFO_MEMBER(m62_state::get_ldrun4_bg_tile_info)
+void m62_state::get_ldrun4_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code;
 	int color;
@@ -643,7 +643,7 @@ uint32_t m62_state::screen_update_ldrun4(screen_device &screen, bitmap_ind16 &bi
 }
 
 
-TILE_GET_INFO_MEMBER(m62_state::get_lotlot_bg_tile_info)
+void m62_state::get_lotlot_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code;
 	int color;
@@ -658,7 +658,7 @@ TILE_GET_INFO_MEMBER(m62_state::get_lotlot_bg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code | ((color & 0xc0) << 2), color & 0x1f, flags);
 }
 
-TILE_GET_INFO_MEMBER(m62_state::get_lotlot_fg_tile_info)
+void m62_state::get_lotlot_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code;
 	int color;
@@ -707,7 +707,7 @@ void m62_state::kidniki_background_bank_w(address_space &space, offs_t offset, u
 	}
 }
 
-TILE_GET_INFO_MEMBER(m62_state::get_kidniki_bg_tile_info)
+void m62_state::get_kidniki_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code;
 	int color;
@@ -717,7 +717,7 @@ TILE_GET_INFO_MEMBER(m62_state::get_kidniki_bg_tile_info)
 	tileinfo.group = ((color & 0xe0) == 0xe0) ? 1 : 0;
 }
 
-TILE_GET_INFO_MEMBER(m62_state::get_kidniki_fg_tile_info)
+void m62_state::get_kidniki_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code;
 	int color;
@@ -762,7 +762,7 @@ void m62_state::spelunkr_palbank_w(address_space &space, offs_t offset, uint8_t 
 	}
 }
 
-TILE_GET_INFO_MEMBER(m62_state::get_spelunkr_bg_tile_info)
+void m62_state::get_spelunkr_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code;
 	int color;
@@ -771,7 +771,7 @@ TILE_GET_INFO_MEMBER(m62_state::get_spelunkr_bg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code | ((color & 0x10) << 4) | ((color & 0x20) << 6) | ((color & 0xc0) << 3), (color & 0x0f) | (m_spelunkr_palbank << 4), 0);
 }
 
-TILE_GET_INFO_MEMBER(m62_state::get_spelunkr_fg_tile_info)
+void m62_state::get_spelunkr_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code;
 	int color;
@@ -814,7 +814,7 @@ void m62_state::spelunk2_gfxport_w(address_space &space, offs_t offset, uint8_t 
 	}
 }
 
-TILE_GET_INFO_MEMBER(m62_state::get_spelunk2_bg_tile_info)
+void m62_state::get_spelunk2_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code;
 	int color;
@@ -844,7 +844,7 @@ uint32_t m62_state::screen_update_spelunk2(screen_device &screen, bitmap_ind16 &
 }
 
 
-TILE_GET_INFO_MEMBER(m62_state::get_youjyudn_bg_tile_info)
+void m62_state::get_youjyudn_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code;
 	int color;
@@ -857,7 +857,7 @@ TILE_GET_INFO_MEMBER(m62_state::get_youjyudn_bg_tile_info)
 		tileinfo.group = 0;
 }
 
-TILE_GET_INFO_MEMBER(m62_state::get_youjyudn_fg_tile_info)
+void m62_state::get_youjyudn_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code;
 	int color;
@@ -894,7 +894,7 @@ void m62_state::horizon_scrollram_w(address_space &space, offs_t offset, uint8_t
 	m_scrollram[offset] = data;
 }
 
-TILE_GET_INFO_MEMBER(m62_state::get_horizon_bg_tile_info)
+void m62_state::get_horizon_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code;
 	int color;

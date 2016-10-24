@@ -34,7 +34,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(finalizr_state, finalizr)
+void finalizr_state::palette_init_finalizr(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances[4] = { 2200, 1000, 470, 220 };
@@ -93,7 +93,7 @@ PALETTE_INIT_MEMBER(finalizr_state, finalizr)
 	}
 }
 
-TILE_GET_INFO_MEMBER(finalizr_state::get_bg_tile_info)
+void finalizr_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_colorram[tile_index];
 	int code = m_videoram[tile_index] + ((attr & 0xc0) << 2) + (m_charbank << 10);
@@ -103,7 +103,7 @@ TILE_GET_INFO_MEMBER(finalizr_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, flags);
 }
 
-TILE_GET_INFO_MEMBER(finalizr_state::get_fg_tile_info)
+void finalizr_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_colorram2[tile_index];
 	int code = m_videoram2[tile_index] + ((attr & 0xc0) << 2);

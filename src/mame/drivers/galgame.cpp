@@ -51,8 +51,8 @@ public:
 	void init_galaxygame();
 	virtual void machine_reset() override;
 	uint32_t screen_update_galaxygame(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(galaxygame_irq);
-	IRQ_CALLBACK_MEMBER(galaxygame_irq_callback);
+	void galaxygame_irq(device_t &device);
+	int galaxygame_irq_callback(device_t &device, int irqline);
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 };
@@ -294,13 +294,13 @@ static ADDRESS_MAP_START( galaxygame_map, AS_PROGRAM, 16, galaxygame_state )
 ADDRESS_MAP_END
 
 
-IRQ_CALLBACK_MEMBER(galaxygame_state::galaxygame_irq_callback)
+int galaxygame_state::galaxygame_irq_callback(device_t &device, int irqline)
 {
 	device.execute().set_input_line(0, CLEAR_LINE);
 	return 0x40;
 }
 
-INTERRUPT_GEN_MEMBER(galaxygame_state::galaxygame_irq)
+void galaxygame_state::galaxygame_irq(device_t &device)
 {
 	if ( m_clk & 0x40 )
 	{

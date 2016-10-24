@@ -31,7 +31,7 @@ static const uint16_t colormap[] = {
 };
 
 /* Initialise the palette */
-PALETTE_INIT_MEMBER(channelf_state, channelf)
+void channelf_state::palette_init_channelf(palette_device &palette)
 {
 	palette.set_pen_colors(0, channelf_palette, ARRAY_LENGTH(channelf_palette));
 }

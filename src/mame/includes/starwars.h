@@ -68,12 +68,12 @@ public:
 	void init_esb();
 	void init_starwars();
 	virtual void machine_reset() override;
-	TIMER_CALLBACK_MEMBER(math_run_clear);
-	TIMER_CALLBACK_MEMBER(main_callback);
-	TIMER_CALLBACK_MEMBER(sound_callback);
+	void math_run_clear(void *ptr, int32_t param);
+	void main_callback(void *ptr, int32_t param);
+	void sound_callback(void *ptr, int32_t param);
 	uint8_t r6532_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void r6532_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(snd_interrupt);
+	void snd_interrupt(int state);
 	void starwars_mproc_init();
 	void starwars_mproc_reset();
 	void run_mproc();

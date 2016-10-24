@@ -35,7 +35,7 @@ Here's the hookup from the proms (82s131) to the r-g-b-outputs
 
 
 ***************************************************************************/
-PALETTE_INIT_MEMBER(zaccaria_state, zaccaria)
+void zaccaria_state::palette_init_zaccaria(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i, j, k;
@@ -112,7 +112,7 @@ PALETTE_INIT_MEMBER(zaccaria_state, zaccaria)
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(zaccaria_state::get_tile_info)
+void zaccaria_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t attr = m_videoram[tile_index + 0x400];
 	SET_TILE_INFO_MEMBER(0,

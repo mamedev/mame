@@ -38,7 +38,7 @@ public:
 	uint8_t iox_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void iox_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void iox_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
+	void adpcm_int(int state);
 
 	// mjuugi
 	void mjyuugi_flags_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
@@ -63,9 +63,9 @@ public:
 
 	virtual void machine_start() override;
 	void machine_start_srmp2();
-	DECLARE_PALETTE_INIT(srmp2);
+	void palette_init_srmp2(palette_device &palette);
 	void machine_start_srmp3();
-	DECLARE_PALETTE_INIT(srmp3);
+	void palette_init_srmp3(palette_device &palette);
 	void machine_start_rmgoldyh();
 	void machine_start_mjyuugi();
 

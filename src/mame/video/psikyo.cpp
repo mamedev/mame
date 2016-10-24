@@ -73,7 +73,7 @@ Offset:
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(psikyo_state::get_tile_info_0)
+void psikyo_state::get_tile_info_0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = ((uint16_t *)m_vram_0.target())[BYTE_XOR_BE(tile_index)];
 	SET_TILE_INFO_MEMBER(1,
@@ -82,7 +82,7 @@ TILE_GET_INFO_MEMBER(psikyo_state::get_tile_info_0)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(psikyo_state::get_tile_info_1)
+void psikyo_state::get_tile_info_1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = ((uint16_t *)m_vram_1.target())[BYTE_XOR_BE(tile_index)];
 	SET_TILE_INFO_MEMBER(1,

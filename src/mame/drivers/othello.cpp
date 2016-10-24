@@ -107,7 +107,7 @@ public:
 	void n7751_rom_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(othello);
+	void palette_init_othello(palette_device &palette);
 	MC6845_UPDATE_ROW(crtc_update_row);
 };
 
@@ -134,7 +134,7 @@ MC6845_UPDATE_ROW( othello_state::crtc_update_row )
 	}
 }
 
-PALETTE_INIT_MEMBER(othello_state, othello)
+void othello_state::palette_init_othello(palette_device &palette)
 {
 	int i;
 	for (i = 0; i < palette.entries(); i++)

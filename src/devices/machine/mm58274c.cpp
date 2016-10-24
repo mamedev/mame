@@ -340,14 +340,14 @@ void mm58274c_device::write(address_space &space, offs_t offset, uint8_t data, u
 
 
 // Set RTC interrupt flag
-TIMER_CALLBACK_MEMBER(mm58274c_device::rtc_interrupt_cb)
+void mm58274c_device::rtc_interrupt_cb(void *ptr, int32_t param)
 {
 	m_status |= st_if;
 }
 
 
 // Increment RTC clock (timed interrupt every 1/10s)
-TIMER_CALLBACK_MEMBER(mm58274c_device::rtc_increment_cb)
+void mm58274c_device::rtc_increment_cb(void *ptr, int32_t param)
 {
 	if (!(m_control & ctl_clkstop))
 	{

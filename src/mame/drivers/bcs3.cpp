@@ -71,8 +71,8 @@ public:
 	uint8_t keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t video_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t zx_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
-	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
+	void ctc_z0_w(int state);
+	void ctc_z1_w(int state);
 	void init_bcs3a();
 	void init_bcs3b();
 	void init_bcs3c();
@@ -319,7 +319,7 @@ static GFXDECODE_START( bcs3 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, bcs3_charlayout, 0, 1 )
 GFXDECODE_END
 
-WRITE_LINE_MEMBER( bcs3_state::ctc_z0_w )
+void bcs3_state::ctc_z0_w(int state)
 {
 	m_ctc->trg1(state);
 	if (state)
@@ -329,7 +329,7 @@ WRITE_LINE_MEMBER( bcs3_state::ctc_z0_w )
 	}
 }
 
-WRITE_LINE_MEMBER( bcs3_state::ctc_z1_w )
+void bcs3_state::ctc_z1_w(int state)
 {
 	m_ctc->trg2(state);
 }

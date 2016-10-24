@@ -70,7 +70,7 @@ public:
 	void p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t p3_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void p3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	TIMER_DEVICE_CALLBACK_MEMBER(int_0);
+	void int_0(timer_device &timer, void *ptr, int32_t param);
 
 protected:
 
@@ -464,7 +464,7 @@ void fireball_state::machine_reset()
 *   INT callback         *
 *************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER( fireball_state::int_0 )
+void fireball_state::int_0(timer_device &timer, void *ptr, int32_t param)
 {
 	/* toggle the INT0 line on the CPU */
 	if (int_timing==1){

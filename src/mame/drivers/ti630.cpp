@@ -51,7 +51,7 @@ public:
 	void ti630_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t ti630_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void init_ti630();
-	DECLARE_PALETTE_INIT(ti630);
+	void palette_init_ti630(palette_device &palette);
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -158,7 +158,7 @@ void ti630_state::ti630_io_w(address_space &space, offs_t offset, uint8_t data, 
 	}
 }
 
-PALETTE_INIT_MEMBER(ti630_state, ti630)
+void ti630_state::palette_init_ti630(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));

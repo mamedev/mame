@@ -936,7 +936,7 @@ void _8080bw_state::schaser_sh_port_2_w(address_space &space, offs_t offset, uin
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(_8080bw_state::schaser_effect_555_cb)
+void _8080bw_state::schaser_effect_555_cb(timer_device &timer, void *ptr, int32_t param)
 {
 	int effect = param;
 	attotime new_time;

@@ -156,12 +156,12 @@ public:
 	int m_reel4_latch;
 	int m_reel56_latch;
 	int m_optic_pattern;
-	DECLARE_WRITE_LINE_MEMBER(reel1_optic_cb) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
-	DECLARE_WRITE_LINE_MEMBER(reel2_optic_cb) { if (state) m_optic_pattern |= 0x02; else m_optic_pattern &= ~0x02; }
-	DECLARE_WRITE_LINE_MEMBER(reel3_optic_cb) { if (state) m_optic_pattern |= 0x04; else m_optic_pattern &= ~0x04; }
-	DECLARE_WRITE_LINE_MEMBER(reel4_optic_cb) { if (state) m_optic_pattern |= 0x08; else m_optic_pattern &= ~0x08; }
-	DECLARE_WRITE_LINE_MEMBER(reel5_optic_cb) { if (state) m_optic_pattern |= 0x10; else m_optic_pattern &= ~0x10; }
-	DECLARE_WRITE_LINE_MEMBER(reel6_optic_cb) { if (state) m_optic_pattern |= 0x20; else m_optic_pattern &= ~0x20; }
+	void reel1_optic_cb(int state) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
+	void reel2_optic_cb(int state) { if (state) m_optic_pattern |= 0x02; else m_optic_pattern &= ~0x02; }
+	void reel3_optic_cb(int state) { if (state) m_optic_pattern |= 0x04; else m_optic_pattern &= ~0x04; }
+	void reel4_optic_cb(int state) { if (state) m_optic_pattern |= 0x08; else m_optic_pattern &= ~0x08; }
+	void reel5_optic_cb(int state) { if (state) m_optic_pattern |= 0x10; else m_optic_pattern &= ~0x10; }
+	void reel6_optic_cb(int state) { if (state) m_optic_pattern |= 0x20; else m_optic_pattern &= ~0x20; }
 	SEC sec;
 
 	int m_meterstatus;
@@ -174,19 +174,19 @@ public:
 	uint8_t read_input_matrix(int row);
 
 
-	DECLARE_WRITE_LINE_MEMBER(bfmdm01_busy);
+	void bfmdm01_busy(int state);
 
 	uint16_t sc4_mem_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void sc4_mem_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	uint16_t sc4_cs1_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE_LINE_MEMBER(bfm_sc4_duart_irq_handler);
-	DECLARE_WRITE_LINE_MEMBER(bfm_sc4_duart_txa);
+	void bfm_sc4_duart_irq_handler(int state);
+	void bfm_sc4_duart_txa(int state);
 	uint8_t bfm_sc4_duart_input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void bfm_sc4_duart_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER(m68307_duart_txa);
+	void m68307_duart_txa(int state);
 	uint8_t m68307_duart_input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void m68307_duart_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 

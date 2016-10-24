@@ -179,7 +179,7 @@ void i8214_device::r_w(int line, int state)
 //  sgs_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( i8214_device::sgs_w )
+void i8214_device::sgs_w(int state)
 {
 	if (LOG) logerror("I8214 '%s' SGS: %u\n", tag(), state);
 
@@ -193,7 +193,7 @@ WRITE_LINE_MEMBER( i8214_device::sgs_w )
 //  etlg_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( i8214_device::etlg_w )
+void i8214_device::etlg_w(int state)
 {
 	if (LOG) logerror("I8214 '%s' ETLG: %u\n", tag(), state);
 
@@ -205,7 +205,7 @@ WRITE_LINE_MEMBER( i8214_device::etlg_w )
 //  inte_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( i8214_device::inte_w )
+void i8214_device::inte_w(int state)
 {
 	if (LOG) logerror("I8214 '%s' INTE: %u\n", tag(), state);
 

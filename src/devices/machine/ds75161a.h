@@ -109,26 +109,26 @@ public:
 	template<class _Object> static devcb_base &set_out_atn_callback(device_t &device, _Object object) { return downcast<ds75161a_device &>(device).m_out_atn_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_srq_callback(device_t &device, _Object object) { return downcast<ds75161a_device &>(device).m_out_srq_cb.set_callback(object); }
 
-	DECLARE_WRITE_LINE_MEMBER( te_w );
-	DECLARE_WRITE_LINE_MEMBER( dc_w );
+	void te_w(int state);
+	void dc_w(int state);
 
-	DECLARE_READ_LINE_MEMBER( ren_r );
-	DECLARE_READ_LINE_MEMBER( ifc_r );
-	DECLARE_READ_LINE_MEMBER( ndac_r );
-	DECLARE_READ_LINE_MEMBER( nrfd_r );
-	DECLARE_READ_LINE_MEMBER( dav_r );
-	DECLARE_READ_LINE_MEMBER( eoi_r );
-	DECLARE_READ_LINE_MEMBER( atn_r );
-	DECLARE_READ_LINE_MEMBER( srq_r );
+	int ren_r();
+	int ifc_r();
+	int ndac_r();
+	int nrfd_r();
+	int dav_r();
+	int eoi_r();
+	int atn_r();
+	int srq_r();
 
-	DECLARE_WRITE_LINE_MEMBER( ren_w );
-	DECLARE_WRITE_LINE_MEMBER( ifc_w );
-	DECLARE_WRITE_LINE_MEMBER( ndac_w );
-	DECLARE_WRITE_LINE_MEMBER( nrfd_w );
-	DECLARE_WRITE_LINE_MEMBER( dav_w );
-	DECLARE_WRITE_LINE_MEMBER( eoi_w );
-	DECLARE_WRITE_LINE_MEMBER( atn_w );
-	DECLARE_WRITE_LINE_MEMBER( srq_w );
+	void ren_w(int state);
+	void ifc_w(int state);
+	void ndac_w(int state);
+	void nrfd_w(int state);
+	void dav_w(int state);
+	void eoi_w(int state);
+	void atn_w(int state);
+	void srq_w(int state);
 
 protected:
 	// device-level overrides

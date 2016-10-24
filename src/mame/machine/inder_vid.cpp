@@ -75,7 +75,7 @@ TMS340X0_FROM_SHIFTREG_CB_MEMBER(inder_vid_device::from_shiftreg)
 	m_shiftfull = 0;
 }
 
-WRITE_LINE_MEMBER(inder_vid_device::m68k_gen_int)
+void inder_vid_device::m68k_gen_int(int state)
 {
 	cpu_device *maincpu = (cpu_device*)machine().device("maincpu");
 	if (state) maincpu->set_input_line(4, ASSERT_LINE);

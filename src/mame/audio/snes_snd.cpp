@@ -995,7 +995,7 @@ int snes_sound_device::advance_envelope( int v )
 }
 
 
-TIMER_CALLBACK_MEMBER( snes_sound_device::spc_timer )
+void snes_sound_device::spc_timer(void *ptr, int32_t param)
 {
 	int which = param;
 

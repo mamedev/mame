@@ -158,7 +158,7 @@ static GFXDECODE_START( mustache )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0x80, 8 )
 GFXDECODE_END
 
-TIMER_DEVICE_CALLBACK_MEMBER(mustache_state::scanline)
+void mustache_state::scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

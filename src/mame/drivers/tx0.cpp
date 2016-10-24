@@ -228,7 +228,7 @@ static GFXDECODE_START( tx0 )
 GFXDECODE_END
 
 /* Initialise the palette */
-PALETTE_INIT_MEMBER(tx0_state, tx0)
+void tx0_state::palette_init_tx0(palette_device &palette)
 {
 	/* rgb components for the two color emissions */
 	const double r1 = .1, g1 = .1, b1 = .924, r2 = .7, g2 = .7, b2 = .076;
@@ -579,7 +579,7 @@ void tx0_state::begin_tape_read(int binary)
 /*
     timer callback to simulate reader IO
 */
-TIMER_CALLBACK_MEMBER(tx0_state::reader_callback)
+void tx0_state::reader_callback(void *ptr, int32_t param)
 {
 	int not_ready;
 	uint8_t data;
@@ -644,7 +644,7 @@ void tx0_punchtape_image_device::call_unload()
 	state->m_tape_puncher.fd = nullptr;
 }
 
-TIMER_CALLBACK_MEMBER(tx0_state::puncher_callback)
+void tx0_state::puncher_callback(void *ptr, int32_t param)
 {
 	m_maincpu->set_state_int(TX0_IOS,1);
 }
@@ -652,7 +652,7 @@ TIMER_CALLBACK_MEMBER(tx0_state::puncher_callback)
 /*
     Initiate read of a 6-bit word from tape
 */
-WRITE_LINE_MEMBER( tx0_state::tx0_io_r1l )
+void tx0_state::tx0_io_r1l(int state)
 {
 	begin_tape_read( 0);
 }
@@ -660,7 +660,7 @@ WRITE_LINE_MEMBER( tx0_state::tx0_io_r1l )
 /*
     Initiate read of a 18-bit word from tape (used in read-in mode)
 */
-WRITE_LINE_MEMBER( tx0_state::tx0_io_r3l )
+void tx0_state::tx0_io_r3l(int state)
 {
 	begin_tape_read(1);
 }
@@ -668,7 +668,7 @@ WRITE_LINE_MEMBER( tx0_state::tx0_io_r3l )
 /*
     Write a 7-bit word to tape (7th bit clear)
 */
-WRITE_LINE_MEMBER( tx0_state::tx0_io_p6h )
+void tx0_state::tx0_io_p6h(int state)
 {
 	int ac;
 
@@ -683,7 +683,7 @@ WRITE_LINE_MEMBER( tx0_state::tx0_io_p6h )
 /*
     Write a 7-bit word to tape (7th bit set)
 */
-WRITE_LINE_MEMBER( tx0_state::tx0_io_p7h )
+void tx0_state::tx0_io_p7h(int state)
 {
 	int ac;
 
@@ -734,7 +734,7 @@ void tx0_state::typewriter_out(uint8_t data)
 /*
     timer callback to generate typewriter completion pulse
 */
-TIMER_CALLBACK_MEMBER(tx0_state::prt_callback)
+void tx0_state::prt_callback(void *ptr, int32_t param)
 {
 	m_maincpu->io_complete();
 }
@@ -742,7 +742,7 @@ TIMER_CALLBACK_MEMBER(tx0_state::prt_callback)
 /*
     prt io callback
 */
-WRITE_LINE_MEMBER( tx0_state::tx0_io_prt )
+void tx0_state::tx0_io_prt(int state)
 {
 	int ac;
 	int ch;
@@ -760,7 +760,7 @@ WRITE_LINE_MEMBER( tx0_state::tx0_io_prt )
 /*
     timer callback to generate crt completion pulse
 */
-TIMER_CALLBACK_MEMBER(tx0_state::dis_callback)
+void tx0_state::dis_callback(void *ptr, int32_t param)
 {
 	m_maincpu->io_complete();
 }
@@ -768,7 +768,7 @@ TIMER_CALLBACK_MEMBER(tx0_state::dis_callback)
 /*
     Plot one point on crt
 */
-WRITE_LINE_MEMBER( tx0_state::tx0_io_dis )
+void tx0_state::tx0_io_dis(int state)
 {
 	int ac;
 	int x;
@@ -1325,7 +1325,7 @@ void tx0_state::magtape_callback()
 	}
 }
 
-WRITE_LINE_MEMBER( tx0_state::tx0_sel )
+void tx0_state::tx0_sel(int state)
 {
 	m_magtape.sel_pending = true;
 
@@ -1337,7 +1337,7 @@ WRITE_LINE_MEMBER( tx0_state::tx0_sel )
 	}
 }
 
-WRITE_LINE_MEMBER( tx0_state::tx0_io_cpy )
+void tx0_state::tx0_io_cpy(int state)
 {
 	switch (m_magtape.state)
 	{
@@ -1371,7 +1371,7 @@ WRITE_LINE_MEMBER( tx0_state::tx0_io_cpy )
 
     IO devices should reset
 */
-WRITE_LINE_MEMBER( tx0_state::tx0_io_reset_callback )
+void tx0_state::tx0_io_reset_callback(int state)
 {
 	m_tape_reader.rcl = m_tape_reader.rc = 0;
 	if (m_tape_reader.timer)
@@ -1432,7 +1432,7 @@ void tx0_state::tx0_keyboard()
 /*
     Not a real interrupt - just handle keyboard input
 */
-INTERRUPT_GEN_MEMBER(tx0_state::tx0_interrupt)
+void tx0_state::tx0_interrupt(device_t &device)
 {
 	int control_keys;
 	int tsr_keys;

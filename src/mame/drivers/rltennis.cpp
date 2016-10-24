@@ -132,7 +132,7 @@ static INPUT_PORTS_START( rltennis )
 	PORT_BIT( 0xff80, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-TIMER_CALLBACK_MEMBER(rltennis_state::sample_player)
+void rltennis_state::sample_player(void *ptr, int32_t param)
 {
 	if((m_dac_counter&0x7ff) == 0x7ff) /* reload top address bits */
 	{
@@ -147,7 +147,7 @@ TIMER_CALLBACK_MEMBER(rltennis_state::sample_player)
 	m_timer->adjust(attotime::from_hz( RLT_TIMER_FREQ ));
 }
 
-INTERRUPT_GEN_MEMBER(rltennis_state::interrupt)
+void rltennis_state::interrupt(device_t &device)
 {
 	++m_unk_counter; /* frame counter? verify */
 	device.execute().set_input_line(4, HOLD_LINE);

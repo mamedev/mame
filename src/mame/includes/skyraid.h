@@ -30,7 +30,7 @@ public:
 	void skyraid_offset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void skyraid_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(skyraid);
+	void palette_init_skyraid(palette_device &palette);
 	uint32_t screen_update_skyraid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void skyraid_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void draw_text(bitmap_ind16 &bitmap, const rectangle &cliprect);

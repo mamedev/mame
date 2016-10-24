@@ -96,7 +96,7 @@ void crt9212_t::device_start()
 //  clrcnt_w - clear counter
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( crt9212_t::clrcnt_w )
+void crt9212_t::clrcnt_w(int state)
 {
 	if (m_clrcnt && !state)
 	{
@@ -111,7 +111,7 @@ WRITE_LINE_MEMBER( crt9212_t::clrcnt_w )
 //  rclk_w - read clock
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( crt9212_t::rclk_w )
+void crt9212_t::rclk_w(int state)
 {
 	if (!m_rclk && state)
 	{
@@ -164,7 +164,7 @@ WRITE_LINE_MEMBER( crt9212_t::rclk_w )
 //  wclk_w - write clock
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( crt9212_t::wclk_w )
+void crt9212_t::wclk_w(int state)
 {
 	if (!m_wclk && state)
 	{

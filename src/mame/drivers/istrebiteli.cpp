@@ -133,7 +133,7 @@ public:
 	{
 	}
 
-	DECLARE_PALETTE_INIT(istrebiteli);
+	void palette_init_istrebiteli(palette_device &palette);
 	uint8_t ppi0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void ppi0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t ppi1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
@@ -157,7 +157,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	TILE_GET_INFO_MEMBER(get_tile_info);
+	void get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	tilemap_t *m_tilemap;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -193,12 +193,12 @@ static const rgb_t istreb_palette[4] = {
 	rgb_t(0x00, 0x00, 0xff)
 };
 
-PALETTE_INIT_MEMBER(istrebiteli_state,istrebiteli)
+void istrebiteli_state::palette_init_istrebiteli(palette_device &palette)
 {
 	palette.set_pen_colors(0, istreb_palette, ARRAY_LENGTH(istreb_palette));
 }
 
-TILE_GET_INFO_MEMBER(istrebiteli_state::get_tile_info)
+void istrebiteli_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	SET_TILE_INFO_MEMBER(0, m_tileram[tile_index] & 0x1f, 0, 0);
 }

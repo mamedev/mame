@@ -56,7 +56,7 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 #include "emu.h"
 #include "includes/metro.h"
 
-TILE_GET_INFO_MEMBER(metro_state::metro_k053936_get_tile_info)
+void metro_state::metro_k053936_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_k053936_ram[tile_index];
 
@@ -66,7 +66,7 @@ TILE_GET_INFO_MEMBER(metro_state::metro_k053936_get_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(metro_state::metro_k053936_gstrik2_get_tile_info)
+void metro_state::metro_k053936_gstrik2_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_k053936_ram[tile_index];
 
@@ -82,7 +82,7 @@ void metro_state::metro_k053936_w(address_space &space, offs_t offset, uint16_t 
 	m_k053936_tilemap->mark_tile_dirty(offset);
 }
 
-TILEMAP_MAPPER_MEMBER(metro_state::tilemap_scan_gstrik2)
+tilemap_memory_index metro_state::tilemap_scan_gstrik2(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	int val;

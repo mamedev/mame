@@ -1686,7 +1686,7 @@ int antic_device::cycle()
 	return m_screen->hpos() * CYCLES_PER_LINE / m_screen->width();
 }
 
-TIMER_CALLBACK_MEMBER( antic_device::issue_dli )
+void antic_device::issue_dli(void *ptr, int32_t param)
 {
 	if( m_w.nmien & DLI_NMI )
 	{
@@ -1706,7 +1706,7 @@ TIMER_CALLBACK_MEMBER( antic_device::issue_dli )
  *  Antic Line Done
  *
  *****************************************************************************/
-TIMER_CALLBACK_MEMBER( antic_device::line_done )
+void antic_device::line_done(void *ptr, int32_t param)
 {
 	LOG(("           @cycle #%3d line_done\n", cycle()));
 	if( m_w.wsync )
@@ -1734,7 +1734,7 @@ TIMER_CALLBACK_MEMBER( antic_device::line_done )
  *  TRIGGER_HSYNC if WSYNC (D01A) was accessed
  *
  *****************************************************************************/
-TIMER_CALLBACK_MEMBER( antic_device::steal_cycles )
+void antic_device::steal_cycles(void *ptr, int32_t param)
 {
 	LOG(("           @cycle #%3d steal %d cycles\n", cycle(), m_steal_cycles));
 	timer_set(ANTIC_TIME_FROM_CYCLES(m_steal_cycles), TIMER_LINE_DONE);
@@ -1751,7 +1751,7 @@ TIMER_CALLBACK_MEMBER( antic_device::steal_cycles )
  *  of the GTIA if enabled (DMA_PLAYER or DMA_MISSILE)
  *
  *****************************************************************************/
-TIMER_CALLBACK_MEMBER( antic_device::scanline_render )
+void antic_device::scanline_render(void *ptr, int32_t param)
 {
 	address_space &space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 

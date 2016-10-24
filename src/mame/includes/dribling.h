@@ -49,7 +49,7 @@ public:
 	void shr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(dribling);
+	void palette_init_dribling(palette_device &palette);
 	uint32_t screen_update_dribling(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(dribling_irq_gen);
+	void dribling_irq_gen(device_t &device);
 };

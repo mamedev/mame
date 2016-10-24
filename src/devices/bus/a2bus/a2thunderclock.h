@@ -32,7 +32,7 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
-	DECLARE_WRITE_LINE_MEMBER( upd_dataout_w );
+	void upd_dataout_w(int state);
 
 protected:
 	virtual void device_start() override;

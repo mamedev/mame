@@ -313,8 +313,8 @@ public:
 	required_device<mc68681_device> m_duart;
 	required_device<x2212_device> m_nvram;
 	required_device<dac_word_interface> m_dac;
-	DECLARE_WRITE_LINE_MEMBER(dectalk_duart_irq_handler);
-	DECLARE_WRITE_LINE_MEMBER(dectalk_duart_txa);
+	void dectalk_duart_irq_handler(int state);
+	void dectalk_duart_txa(int state);
 	uint8_t dectalk_duart_input(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void dectalk_duart_output(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t nvram_recall(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
@@ -329,15 +329,15 @@ public:
 	void spc_latch_outfifo_error_stats(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	uint16_t spc_infifo_data_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void spc_outfifo_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	DECLARE_READ_LINE_MEMBER(spc_semaphore_r);
+	int spc_semaphore_r();
 	void init_dectalk();
 	virtual void machine_reset() override;
-	TIMER_CALLBACK_MEMBER(outfifo_read_cb);
+	void outfifo_read_cb(void *ptr, int32_t param);
 	void dectalk_outfifo_check ();
 	void dectalk_clear_all_fifos(  );
 	void dectalk_semaphore_w ( uint16_t data );
 	uint16_t dectalk_outfifo_r (  );
-	DECLARE_WRITE_LINE_MEMBER(dectalk_reset);
+	void dectalk_reset(int state);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -345,7 +345,7 @@ protected:
 
 
 /* 2681 DUART */
-WRITE_LINE_MEMBER(dectalk_state::dectalk_duart_irq_handler)
+void dectalk_state::dectalk_duart_irq_handler(int state)
 {
 	m_maincpu->set_input_line_and_vector(M68K_IRQ_6, state, M68K_INT_ACK_AUTOVECTOR);
 	//drvstate->m_maincpu->set_input_line_and_vector(M68K_IRQ_6, CLEAR_LINE, M68K_INT_ACK_AUTOVECTOR);
@@ -370,7 +370,7 @@ void dectalk_state::dectalk_duart_output(address_space &space, offs_t offset, ui
 #endif
 }
 
-WRITE_LINE_MEMBER(dectalk_state::dectalk_duart_txa)
+void dectalk_state::dectalk_duart_txa(int state)
 {
 	//TODO: this needs to be plumbed so it shows up optionally on a second terminal somehow, or connects to diserial
 	// it is the second 'alternate' serial connection on the DTC-01, used for a serial passthru and other stuff.
@@ -446,7 +446,7 @@ uint16_t dectalk_state::dectalk_outfifo_r (  )
 }
 
 /* Machine reset and friends: stuff that needs setting up which IS directly affected by reset */
-WRITE_LINE_MEMBER(dectalk_state::dectalk_reset)
+void dectalk_state::dectalk_reset(int state)
 {
 	m_hack_self_test = 0; // hack
 	// stuff that is DIRECTLY affected by the RESET line
@@ -736,7 +736,7 @@ void dectalk_state::spc_outfifo_data_w(address_space &space, offs_t offset, uint
 	//dectalk_outfifo_check(); // outfifo check should only be done in the audio 10khz polling function
 }
 
-READ_LINE_MEMBER(dectalk_state::spc_semaphore_r)// Return state of d-latch 74ls74 @ E64 'lower half' in d0 which indicates whether infifo is readable
+int dectalk_state::spc_semaphore_r()// Return state of d-latch 74ls74 @ E64 'lower half' in d0 which indicates whether infifo is readable
 {
 #ifdef SPC_LOG_DSP
 	//logerror("dsp: read infifo semaphore, returned %d\n", m_infifo_semaphore); // commented due to extreme annoyance factor
@@ -836,7 +836,7 @@ void dectalk_state::device_timer(emu_timer &timer, device_timer_id id, int param
 	}
 }
 
-TIMER_CALLBACK_MEMBER(dectalk_state::outfifo_read_cb)
+void dectalk_state::outfifo_read_cb(void *ptr, int32_t param)
 {
 	uint16_t data;
 	data = dectalk_outfifo_r();

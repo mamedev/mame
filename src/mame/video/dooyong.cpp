@@ -169,7 +169,7 @@ void dooyong_rom_tilemap_device::device_start()
 	save_item(NAME(m_palette_bank));
 }
 
-TILE_GET_INFO_MEMBER(dooyong_rom_tilemap_device::tile_info)
+void dooyong_rom_tilemap_device::tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	unsigned const attr = m_tilerom[m_tilerom_offset + adjust_tile_index(tile_index)];
 	unsigned code, color, flags;
@@ -233,7 +233,7 @@ void rshark_rom_tilemap_device::device_start()
 		m_colorrom_offset = m_colorrom.length() + m_colorrom_offset;
 }
 
-TILE_GET_INFO_MEMBER(rshark_rom_tilemap_device::tile_info)
+void rshark_rom_tilemap_device::tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	dooyong_rom_tilemap_device::tile_info(tilemap, tileinfo, tile_index);
 
@@ -283,7 +283,7 @@ void dooyong_ram_tilemap_device::device_start()
 	save_item(NAME(m_palette_bank));
 }
 
-TILE_GET_INFO_MEMBER(dooyong_ram_tilemap_device::tile_info)
+void dooyong_ram_tilemap_device::tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	// Each tile takes one word of memory:
 	// MSB             LSB

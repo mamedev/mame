@@ -183,7 +183,7 @@ void crgolf_state::unknown_w(address_space &space, offs_t offset, uint8_t data, 
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(crgolf_state::main_to_sound_callback)
+void crgolf_state::main_to_sound_callback(void *ptr, int32_t param)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	m_main_to_sound_data = param;
@@ -210,7 +210,7 @@ uint8_t crgolf_state::main_to_sound_r(address_space &space, offs_t offset, uint8
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(crgolf_state::sound_to_main_callback)
+void crgolf_state::sound_to_main_callback(void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 	m_sound_to_main_data = param;
@@ -237,7 +237,7 @@ uint8_t crgolf_state::sound_to_main_r(address_space &space, offs_t offset, uint8
  *
  *************************************/
 
-WRITE_LINE_MEMBER(crgolf_state::vck_callback)
+void crgolf_state::vck_callback(int state)
 {
 	/* only play back if we have data remaining */
 	if (m_sample_count != 0xff)

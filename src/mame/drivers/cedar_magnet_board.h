@@ -26,10 +26,10 @@ public:
 	virtual uint8_t read_cpu_bus(int offset);
 	virtual void write_cpu_bus(int offset, uint8_t data);
 
-	TIMER_CALLBACK_MEMBER(halt_assert_callback);
-	TIMER_CALLBACK_MEMBER(halt_clear_callback);
-	TIMER_CALLBACK_MEMBER(reset_assert_callback);
-	TIMER_CALLBACK_MEMBER(reset_clear_callback);
+	void halt_assert_callback(void *ptr, int32_t param);
+	void halt_clear_callback(void *ptr, int32_t param);
+	void reset_assert_callback(void *ptr, int32_t param);
+	void reset_clear_callback(void *ptr, int32_t param);
 
 	void halt_assert(void);
 	void halt_clear(void);
@@ -38,7 +38,7 @@ public:
 	bool is_running(void);
 	bool m_is_running;
 
-	INTERRUPT_GEN_MEMBER(irq);
+	void irq(device_t &device);
 
 protected:
 	virtual void device_start() override;

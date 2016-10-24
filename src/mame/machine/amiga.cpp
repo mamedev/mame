@@ -161,7 +161,7 @@ void amiga_state::machine_start()
 	timer_set(m_screen->time_until_pos(0), TIMER_SCANLINE);
 }
 
-WRITE_LINE_MEMBER( amiga_state::m68k_reset )
+void amiga_state::m68k_reset(int state)
 {
 	logerror("%s: Executed RESET\n", machine().describe_context());
 	machine_reset();
@@ -183,7 +183,7 @@ void amiga_state::machine_reset()
 	m_overlay->set_bank(1);
 }
 
-WRITE_LINE_MEMBER( amiga_state::kbreset_w )
+void amiga_state::kbreset_w(int state)
 {
 	// this is connected to the gary chip, gary then resets the 68k, agnus, paula and the cias
 	if (!state)
@@ -238,7 +238,7 @@ void amiga_state::vblank()
 }
 
 // todo: cia a clock can be connected to either a fixed 50/60hz signal from the power supply, or the vblank
-TIMER_CALLBACK_MEMBER( amiga_state::scanline_callback )
+void amiga_state::scanline_callback(void *ptr, int32_t param)
 {
 	amiga_state *state = this;
 	int scanline = param;
@@ -367,7 +367,7 @@ void amiga_state::update_irqs()
 	}
 }
 
-TIMER_CALLBACK_MEMBER( amiga_state::amiga_irq_proc )
+void amiga_state::amiga_irq_proc(void *ptr, int32_t param)
 {
 	update_irqs();
 	m_irq_timer->reset();
@@ -871,7 +871,7 @@ static uint32_t blit_line(amiga_state *state)
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER( amiga_state::amiga_blitter_proc )
+void amiga_state::amiga_blitter_proc(void *ptr, int32_t param)
 {
 	amiga_state *state = machine().driver_data<amiga_state>();
 	uint32_t blitsum = 0;
@@ -995,24 +995,24 @@ static void blitter_setup(address_space &space)
 //  CENTRONICS
 //**************************************************************************
 
-WRITE_LINE_MEMBER( amiga_state::centronics_ack_w )
+void amiga_state::centronics_ack_w(int state)
 {
 	m_cia_0->flag_w(state);
 }
 
-WRITE_LINE_MEMBER( amiga_state::centronics_busy_w )
+void amiga_state::centronics_busy_w(int state)
 {
 	m_centronics_busy = state;
 	m_cia_1->sp_w(state);
 }
 
-WRITE_LINE_MEMBER( amiga_state::centronics_perror_w )
+void amiga_state::centronics_perror_w(int state)
 {
 	m_centronics_perror = state;
 	m_cia_1->cnt_w(state);
 }
 
-WRITE_LINE_MEMBER( amiga_state::centronics_select_w )
+void amiga_state::centronics_select_w(int state)
 {
 	m_centronics_select = state;
 }
@@ -1081,7 +1081,7 @@ void amiga_state::cia_0_port_a_write(address_space &space, offs_t offset, uint8_
 	output().set_value("power_led", !BIT(data, 1));
 }
 
-WRITE_LINE_MEMBER( amiga_state::cia_0_irq )
+void amiga_state::cia_0_irq(int state)
 {
 	if (LOG_CIA)
 		logerror("%s: cia_0_irq: %d\n", machine().describe_context(), state);
@@ -1117,7 +1117,7 @@ void amiga_state::cia_1_port_a_write(address_space &space, offs_t offset, uint8_
 	}
 }
 
-WRITE_LINE_MEMBER( amiga_state::cia_1_irq )
+void amiga_state::cia_1_irq(int state)
 {
 	if (LOG_CIA)
 		logerror("%s: cia_1_irq: %d\n", machine().describe_context(), state);
@@ -1700,7 +1700,7 @@ void amiga_state::rx_write(amiga_state *state, int level)
 	CUSTOM_REG(REG_SERDATR) |= level << 11;
 }
 
-WRITE_LINE_MEMBER( amiga_state::rs232_rx_w )
+void amiga_state::rs232_rx_w(int state)
 {
 	rx_write(this, state);
 
@@ -1709,22 +1709,22 @@ WRITE_LINE_MEMBER( amiga_state::rs232_rx_w )
 		serial_adjust();
 }
 
-WRITE_LINE_MEMBER( amiga_state::rs232_dcd_w )
+void amiga_state::rs232_dcd_w(int state)
 {
 	m_rs232_dcd = state;
 }
 
-WRITE_LINE_MEMBER( amiga_state::rs232_dsr_w )
+void amiga_state::rs232_dsr_w(int state)
 {
 	m_rs232_dsr = state;
 }
 
-WRITE_LINE_MEMBER( amiga_state::rs232_ri_w )
+void amiga_state::rs232_ri_w(int state)
 {
 	m_rs232_ri = state;
 }
 
-WRITE_LINE_MEMBER( amiga_state::rs232_cts_w )
+void amiga_state::rs232_cts_w(int state)
 {
 	m_rs232_cts = state;
 }

@@ -56,17 +56,17 @@ void spcforce_state::SN76496_latch_w(address_space &space, offs_t offset, uint8_
 	m_sn76496_latch = data;
 }
 
-WRITE_LINE_MEMBER(spcforce_state::write_sn1_ready)
+void spcforce_state::write_sn1_ready(int state)
 {
 	m_sn1_ready = state;
 }
 
-WRITE_LINE_MEMBER(spcforce_state::write_sn2_ready)
+void spcforce_state::write_sn2_ready(int state)
 {
 	m_sn2_ready = state;
 }
 
-WRITE_LINE_MEMBER(spcforce_state::write_sn3_ready)
+void spcforce_state::write_sn3_ready(int state)
 {
 	m_sn3_ready = state;
 }
@@ -257,7 +257,7 @@ static const int colortable_source[] =
 	0, 2, 3, 4, 5, 6, 7, 0
 };
 
-PALETTE_INIT_MEMBER(spcforce_state, spcforce)
+void spcforce_state::palette_init_spcforce(palette_device &palette)
 {
 	int i;
 
@@ -271,7 +271,7 @@ PALETTE_INIT_MEMBER(spcforce_state, spcforce)
 }
 
 
-INTERRUPT_GEN_MEMBER(spcforce_state::vblank_irq)
+void spcforce_state::vblank_irq(device_t &device)
 {
 	if(m_irq_mask)
 		device.execute().set_input_line(3, HOLD_LINE);

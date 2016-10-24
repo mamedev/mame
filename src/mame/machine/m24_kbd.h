@@ -30,8 +30,8 @@ public:
 	uint8_t p2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t t0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t t1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(clock_w);
-	DECLARE_WRITE_LINE_MEMBER(data_w);
+	void clock_w(int state);
+	void data_w(int state);
 private:
 	required_ioport_array<16> m_rows;
 	required_ioport m_mousebtn;

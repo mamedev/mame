@@ -155,7 +155,7 @@ protected:
 	bool dac_enabled(struct SOUND &snd);
 	virtual void corrupt_wave_ram() { };
 	uint64_t noise_period_cycles();
-	TIMER_CALLBACK_MEMBER(timer_callback);
+	void timer_callback(void *ptr, int32_t param);
 };
 
 

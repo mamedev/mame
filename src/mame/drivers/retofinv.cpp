@@ -354,13 +354,13 @@ static GFXDECODE_START( retofinv )
 	GFXDECODE_ENTRY( "gfx3", 0, bglayout,     64*16+256*2,  64 )
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(retofinv_state::main_vblank_irq)
+void retofinv_state::main_vblank_irq(device_t &device)
 {
 	if(m_main_irq_mask)
 		device.execute().set_input_line(0, ASSERT_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(retofinv_state::sub_vblank_irq)
+void retofinv_state::sub_vblank_irq(device_t &device)
 {
 	if(m_sub_irq_mask)
 		device.execute().set_input_line(0, ASSERT_LINE);

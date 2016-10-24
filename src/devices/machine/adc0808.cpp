@@ -167,7 +167,7 @@ void adc0808_device::ale_w(address_space &space, offs_t offset, uint8_t data, ui
 //  start_w - start conversion
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( adc0808_device::start_w )
+void adc0808_device::start_w(int state)
 {
 	if (!m_start && state) // rising edge
 	{

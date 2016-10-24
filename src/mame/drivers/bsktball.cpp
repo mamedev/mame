@@ -37,7 +37,7 @@
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(bsktball_state, bsktball)
+void bsktball_state::palette_init_bsktball(palette_device &palette)
 {
 	int i;
 

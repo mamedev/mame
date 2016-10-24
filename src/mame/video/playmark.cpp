@@ -10,14 +10,14 @@
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(playmark_state::bigtwin_get_tx_tile_info)
+void playmark_state::bigtwin_get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = m_videoram1[2 * tile_index];
 	uint16_t color = m_videoram1[2 * tile_index + 1];
 	SET_TILE_INFO_MEMBER(2, code, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(playmark_state::bigtwin_get_fg_tile_info)
+void playmark_state::bigtwin_get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = m_videoram2[2 * tile_index];
 	uint16_t color = m_videoram2[2 * tile_index + 1];
@@ -25,7 +25,7 @@ TILE_GET_INFO_MEMBER(playmark_state::bigtwin_get_fg_tile_info)
 }
 
 
-TILE_GET_INFO_MEMBER(playmark_state::wbeachvl_get_tx_tile_info)
+void playmark_state::wbeachvl_get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = m_videoram1[2 * tile_index];
 	uint16_t color = m_videoram1[2 * tile_index + 1];
@@ -33,7 +33,7 @@ TILE_GET_INFO_MEMBER(playmark_state::wbeachvl_get_tx_tile_info)
 	SET_TILE_INFO_MEMBER(2, code, (color >> 2), 0);
 }
 
-TILE_GET_INFO_MEMBER(playmark_state::wbeachvl_get_fg_tile_info)
+void playmark_state::wbeachvl_get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = m_videoram2[2 * tile_index];
 	uint16_t color = m_videoram2[2 * tile_index + 1];
@@ -41,7 +41,7 @@ TILE_GET_INFO_MEMBER(playmark_state::wbeachvl_get_fg_tile_info)
 	SET_TILE_INFO_MEMBER(1, (code & 0x7fff), (color >> 2) + 8, (code & 0x8000) ? TILE_FLIPX : 0);
 }
 
-TILE_GET_INFO_MEMBER(playmark_state::wbeachvl_get_bg_tile_info)
+void playmark_state::wbeachvl_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = m_videoram3[2 * tile_index];
 	uint16_t color = m_videoram3[2 * tile_index + 1];
@@ -50,7 +50,7 @@ TILE_GET_INFO_MEMBER(playmark_state::wbeachvl_get_bg_tile_info)
 }
 
 
-TILE_GET_INFO_MEMBER(playmark_state::hrdtimes_get_tx_tile_info)
+void playmark_state::hrdtimes_get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram1[tile_index] & 0x0fff;
 	int colr = m_videoram1[tile_index] & 0xe000;
@@ -58,7 +58,7 @@ TILE_GET_INFO_MEMBER(playmark_state::hrdtimes_get_tx_tile_info)
 	SET_TILE_INFO_MEMBER(3, code, (colr >> 13), 0);
 }
 
-TILE_GET_INFO_MEMBER(playmark_state::hrdtimes_get_fg_tile_info)
+void playmark_state::hrdtimes_get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram2[tile_index] & 0x1fff;
 	int colr = m_videoram2[tile_index] & 0xe000;
@@ -66,7 +66,7 @@ TILE_GET_INFO_MEMBER(playmark_state::hrdtimes_get_fg_tile_info)
 	SET_TILE_INFO_MEMBER(2, code, (colr >> 13) + 8, 0);
 }
 
-TILE_GET_INFO_MEMBER(playmark_state::hrdtimes_get_bg_tile_info)
+void playmark_state::hrdtimes_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram3[tile_index] & 0x1fff;
 	int colr = m_videoram3[tile_index] & 0xe000;
@@ -75,7 +75,7 @@ TILE_GET_INFO_MEMBER(playmark_state::hrdtimes_get_bg_tile_info)
 }
 
 
-TILE_GET_INFO_MEMBER(playmark_state::bigtwinb_get_tx_tile_info)
+void playmark_state::bigtwinb_get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram1[tile_index] & 0x0fff;
 	int colr = m_videoram1[tile_index] & 0xf000;
@@ -207,7 +207,7 @@ void playmark_state::video_start_luckboomh()
 #define PAGES_PER_TMAP_Y    (0x1)
 #define PAGES_PER_TMAP_X    (0x4)
 
-TILEMAP_MAPPER_MEMBER(playmark_state::playmark_tilemap_scan_pages)
+tilemap_memory_index playmark_state::playmark_tilemap_scan_pages(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	return  (col / TILES_PER_PAGE_X) * TILES_PER_PAGE_Y * TILES_PER_PAGE_X * PAGES_PER_TMAP_Y +
 			(col % TILES_PER_PAGE_X) +

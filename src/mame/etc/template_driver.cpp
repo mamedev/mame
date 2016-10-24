@@ -26,7 +26,7 @@ public:
 
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_PALETTE_INIT(xxx);
+	void palette_init_xxx(palette_device &palette);
 protected:
 	// driver_device overrides
 	virtual void machine_start();
@@ -133,7 +133,7 @@ void xxx_state::machine_reset()
 }
 
 
-PALETTE_INIT_MEMBER(xxx_state, xxx)
+void xxx_state::palette_init_xxx(palette_device &palette)
 {
 }
 

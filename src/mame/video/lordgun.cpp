@@ -71,10 +71,10 @@ inline void lordgun_state::get_tile_info(tile_data &tileinfo, tilemap_memory_ind
 	SET_TILE_INFO_MEMBER(_N_, code, ((attr & 0x0030) >> 4) + 0x10 + 0x4 * ((_N_ + 1) & 3) + pri*0x800/0x40, TILE_FLIPXY(attr >> 14));
 }
 
-TILE_GET_INFO_MEMBER(lordgun_state::get_tile_info_0){ get_tile_info(tileinfo, tile_index, 0); }
-TILE_GET_INFO_MEMBER(lordgun_state::get_tile_info_1){ get_tile_info(tileinfo, tile_index, 1); }
-TILE_GET_INFO_MEMBER(lordgun_state::get_tile_info_2){ get_tile_info(tileinfo, tile_index, 2); }
-TILE_GET_INFO_MEMBER(lordgun_state::get_tile_info_3){ get_tile_info(tileinfo, tile_index, 3); }
+void lordgun_state::get_tile_info_0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ get_tile_info(tileinfo, tile_index, 0); }
+void lordgun_state::get_tile_info_1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ get_tile_info(tileinfo, tile_index, 1); }
+void lordgun_state::get_tile_info_2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ get_tile_info(tileinfo, tile_index, 2); }
+void lordgun_state::get_tile_info_3(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ get_tile_info(tileinfo, tile_index, 3); }
 
 inline void lordgun_state::lordgun_vram_w(offs_t offset, uint16_t data, uint16_t mem_mask, int _N_)
 {

@@ -111,17 +111,17 @@ public:
 	void video_start_special();
 	void machine_reset_erik();
 	void video_start_erik();
-	DECLARE_PALETTE_INIT(erik);
+	void palette_init_erik(palette_device &palette);
 	void video_start_specialp();
 	void machine_start_specimx();
 	void machine_reset_specimx();
 	void video_start_specimx();
-	DECLARE_PALETTE_INIT(specimx);
+	void palette_init_specimx(palette_device &palette);
 	uint32_t screen_update_special(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_erik(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_specialp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_specimx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq);
+	void fdc_drq(int state);
 	DECLARE_FLOPPY_FORMATS( specimx_floppy_formats );
 
 protected:

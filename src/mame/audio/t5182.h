@@ -34,7 +34,7 @@ public:
 	uint8_t sharedram_semaphore_main_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t sharedram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void sharedram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_handler);
+	void ym2151_irq_handler(int state);
 	void ym2151_irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void cpu_irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
@@ -54,7 +54,7 @@ private:
 	int m_semaphore_main;
 	int m_semaphore_snd;
 	emu_timer *m_setirq_cb;
-	TIMER_CALLBACK_MEMBER( setirq_callback );
+	void setirq_callback(void *ptr, int32_t param);
 };
 
 extern const device_type T5182;

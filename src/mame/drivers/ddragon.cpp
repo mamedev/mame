@@ -99,7 +99,7 @@ int ddragon_state::scanline_to_vcount( int scanline )
 		return (vcount - 0x18) | 0x100;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(ddragon_state::ddragon_scanline)
+void ddragon_state::ddragon_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 	int screen_height = m_screen->height();
@@ -317,7 +317,7 @@ void ddragon_state::ddragon2_sub_irq_w(address_space &space, offs_t offset, uint
 }
 
 
-WRITE_LINE_MEMBER(ddragon_state::irq_handler)
+void ddragon_state::irq_handler(int state)
 {
 	m_soundcpu->set_input_line(m_ym_irq, state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -470,12 +470,12 @@ void ddragon_state::dd_adpcm_int( msm5205_device *device, int chip )
 	}
 }
 
-WRITE_LINE_MEMBER(ddragon_state::dd_adpcm_int_1)
+void ddragon_state::dd_adpcm_int_1(int state)
 {
 	dd_adpcm_int(m_adpcm1, 0);
 }
 
-WRITE_LINE_MEMBER(ddragon_state::dd_adpcm_int_2)
+void ddragon_state::dd_adpcm_int_2(int state)
 {
 	dd_adpcm_int(m_adpcm2, 1);
 }

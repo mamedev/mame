@@ -300,7 +300,7 @@ public:
 	void update_sound_irq(uint8_t cause);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_WRITE_LINE_MEMBER(kurukuru_msm5205_vck);
+	void kurukuru_msm5205_vck(int state);
 };
 
 #define MAIN_CLOCK      XTAL_21_4772MHz
@@ -336,7 +336,7 @@ void kurukuru_state::update_sound_irq(uint8_t cause)
 }
 
 
-WRITE_LINE_MEMBER(kurukuru_state::kurukuru_msm5205_vck)
+void kurukuru_state::kurukuru_msm5205_vck(int state)
 {
 	update_sound_irq(m_sound_irq_cause | 2);
 	m_adpcm->data_w(m_adpcm_data);

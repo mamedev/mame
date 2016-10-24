@@ -152,7 +152,7 @@ void abc80_state::write(address_space &space, offs_t offset, uint8_t data, uint8
 //  vco_voltage_w - CSG VCO voltage select
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( abc80_state::vco_voltage_w )
+void abc80_state::vco_voltage_w(int state)
 {
 	m_psg->vco_voltage_w(state ? 2.5 : 0);
 }
@@ -374,7 +374,7 @@ static const z80_daisy_config abc80_daisy_chain[] =
 //  ABC80_KEYBOARD_INTERFACE( kb_intf )
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( abc80_state::keydown_w )
+void abc80_state::keydown_w(int state)
 {
 	m_key_strobe = state;
 

@@ -99,12 +99,12 @@ void pc8001mk2_state::port31_w(address_space &space, offs_t offset, uint8_t data
 	*/
 }
 
-WRITE_LINE_MEMBER( pc8001_state::write_centronics_busy )
+void pc8001_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 }
 
-WRITE_LINE_MEMBER( pc8001_state::write_centronics_ack )
+void pc8001_state::write_centronics_ack(int state)
 {
 	m_centronics_ack = state;
 }
@@ -401,7 +401,7 @@ UPD3301_DRAW_CHARACTER_MEMBER( pc8001_state::pc8001_display_pixels )
 
 /* 8257 Interface */
 
-WRITE_LINE_MEMBER( pc8001_state::hrq_w )
+void pc8001_state::hrq_w(int state)
 {
 	/* HACK - this should be connected to the BUSREQ line of Z80 */
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state);

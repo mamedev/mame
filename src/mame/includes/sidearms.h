@@ -69,10 +69,10 @@ public:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
-	TILE_GET_INFO_MEMBER(get_sidearms_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_philko_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	TILEMAP_MAPPER_MEMBER(tilemap_scan);
+	void get_sidearms_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_philko_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	tilemap_memory_index tilemap_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites_region(bitmap_ind16 &bitmap, const rectangle &cliprect, int start_offset, int end_offset );

@@ -34,27 +34,27 @@ void namcona1_state::tilemap_get_info(
 	}
 } /* tilemap_get_info */
 
-TILE_GET_INFO_MEMBER(namcona1_state::tilemap_get_info0)
+void namcona1_state::tilemap_get_info0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	tilemap_get_info(tileinfo,tile_index,0*0x1000+m_videoram,m_vreg[0xbc/2]&1);
 }
 
-TILE_GET_INFO_MEMBER(namcona1_state::tilemap_get_info1)
+void namcona1_state::tilemap_get_info1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	tilemap_get_info(tileinfo,tile_index,1*0x1000+m_videoram,m_vreg[0xbc/2]&2);
 }
 
-TILE_GET_INFO_MEMBER(namcona1_state::tilemap_get_info2)
+void namcona1_state::tilemap_get_info2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	tilemap_get_info(tileinfo,tile_index,2*0x1000+m_videoram,m_vreg[0xbc/2]&4);
 }
 
-TILE_GET_INFO_MEMBER(namcona1_state::tilemap_get_info3)
+void namcona1_state::tilemap_get_info3(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	tilemap_get_info(tileinfo,tile_index,3*0x1000+m_videoram,m_vreg[0xbc/2]&8);
 }
 
-TILE_GET_INFO_MEMBER(namcona1_state::roz_get_info)
+void namcona1_state::roz_get_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	/* each logical tile is constructed from 4*4 normal tiles */
 	int use_4bpp_gfx = m_vreg[0xbc/2]&16; /* ? */

@@ -21,12 +21,12 @@ inline void hexion_state::get_tile_info(tile_data &tileinfo,int tile_index,uint8
 			0);
 }
 
-TILE_GET_INFO_MEMBER(hexion_state::get_tile_info0)
+void hexion_state::get_tile_info0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	get_tile_info(tileinfo,tile_index,m_vram[0]);
 }
 
-TILE_GET_INFO_MEMBER(hexion_state::get_tile_info1)
+void hexion_state::get_tile_info1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	get_tile_info(tileinfo,tile_index,m_vram[1]);
 }

@@ -60,13 +60,13 @@ public:
 	template<class _Object> static devcb_base &set_pse_wr_callback(device_t &device, _Object object) { return downcast<mccs1850_device &>(device).pse_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_nuc_wr_callback(device_t &device, _Object object) { return downcast<mccs1850_device &>(device).nuc_cb.set_callback(object); }
 
-	DECLARE_WRITE_LINE_MEMBER( ce_w );
-	DECLARE_WRITE_LINE_MEMBER( sck_w );
-	DECLARE_READ_LINE_MEMBER( sdo_r );
-	DECLARE_WRITE_LINE_MEMBER( sdi_w );
-	DECLARE_WRITE_LINE_MEMBER( pwrsw_w );
-	DECLARE_WRITE_LINE_MEMBER( por_w );
-	DECLARE_WRITE_LINE_MEMBER( test_w );
+	void ce_w(int state);
+	void sck_w(int state);
+	int sdo_r();
+	void sdi_w(int state);
+	void pwrsw_w(int state);
+	void por_w(int state);
+	void test_w(int state);
 
 protected:
 	// device-level overrides

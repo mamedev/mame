@@ -78,8 +78,8 @@ public:
 	void write_lcd32(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	void write_lcd_flag32(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	uint32_t read_newkeys32(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
-	TIMER_DEVICE_CALLBACK_MEMBER(update_nmi);
-	TIMER_DEVICE_CALLBACK_MEMBER(update_nmi32);
+	void update_nmi(timer_device &timer, void *ptr, int32_t param);
+	void update_nmi32(timer_device &timer, void *ptr, int32_t param);
 	void machine_start_dallas32();
 	void machine_start_glasgow();
 	void machine_reset_glasgow();
@@ -506,12 +506,12 @@ void glasgow_state::write_beeper32(address_space &space, offs_t offset, uint32_t
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER( glasgow_state::update_nmi)
+void glasgow_state::update_nmi(timer_device &timer, void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(7, HOLD_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( glasgow_state::update_nmi32 )
+void glasgow_state::update_nmi32(timer_device &timer, void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(6, HOLD_LINE); // this was 7 in the old code, which is correct?
 }

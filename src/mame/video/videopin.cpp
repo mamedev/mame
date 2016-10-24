@@ -13,13 +13,13 @@
 
 
 
-TILEMAP_MAPPER_MEMBER(videopin_state::get_memory_offset)
+tilemap_memory_index videopin_state::get_memory_offset(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	return num_rows * ((col + 16) % 48) + row;
 }
 
 
-TILE_GET_INFO_MEMBER(videopin_state::get_tile_info)
+void videopin_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t code = m_video_ram[tile_index];
 

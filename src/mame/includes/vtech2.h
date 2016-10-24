@@ -62,11 +62,11 @@ public:
 	void init_laser();
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(vtech2);
+	void palette_init_vtech2(palette_device &palette);
 	void machine_reset_laser500();
 	void machine_reset_laser700();
 	uint32_t screen_update_laser(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vtech2_interrupt);
+	void vtech2_interrupt(device_t &device);
 
 	int mra_bank(int bank, int offs);
 	void mwa_bank(int bank, int offs, int data);

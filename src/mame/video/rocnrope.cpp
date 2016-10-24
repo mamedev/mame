@@ -31,7 +31,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(rocnrope_state, rocnrope)
+void rocnrope_state::palette_init_rocnrope(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances_rg[3] = { 1000, 470, 220 };
@@ -103,7 +103,7 @@ void rocnrope_state::rocnrope_flipscreen_w(address_space &space, offs_t offset, 
 	}
 }
 
-TILE_GET_INFO_MEMBER(rocnrope_state::get_bg_tile_info)
+void rocnrope_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_colorram[tile_index];
 	int code = m_videoram[tile_index] + 2 * (attr & 0x80);

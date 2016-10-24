@@ -16,7 +16,7 @@
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(gladiatr_state::bg_get_tile_info)
+void gladiatr_state::bg_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t attr = m_colorram[tile_index];
 
@@ -26,7 +26,7 @@ TILE_GET_INFO_MEMBER(gladiatr_state::bg_get_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(gladiatr_state::fg_get_tile_info)
+void gladiatr_state::fg_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	SET_TILE_INFO_MEMBER(0,
 			m_textram[tile_index] + (m_fg_tile_bank << 8),

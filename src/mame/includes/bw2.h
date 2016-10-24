@@ -73,10 +73,10 @@ public:
 	void ppi_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t ppi_pc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( pit_out0_w );
-	DECLARE_WRITE_LINE_MEMBER( mtron_w );
+	void pit_out0_w(int state);
+	void mtron_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( fdc_drq_w );
+	void fdc_drq_w(int state);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 	// keyboard state
@@ -91,9 +91,9 @@ public:
 
 	// video state
 	optional_shared_ptr<uint8_t> m_video_ram;
-	DECLARE_PALETTE_INIT(bw2);
+	void palette_init_bw2(palette_device &palette);
 
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
+	void write_centronics_busy(int state);
 	int m_centronics_busy;
 };
 

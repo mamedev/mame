@@ -22,11 +22,11 @@ public:
 	uint8_t *m_spriteram2;
 	uint32_t m_spriteram_size;
 	void bosco_flip_screen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	TILEMAP_MAPPER_MEMBER(fg_tilemap_scan);
-	TILE_GET_INFO_MEMBER(bg_get_tile_info);
-	TILE_GET_INFO_MEMBER(fg_get_tile_info);
+	tilemap_memory_index fg_tilemap_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	void bg_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void fg_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void video_start_bosco();
-	DECLARE_PALETTE_INIT(bosco);
+	void palette_init_bosco(palette_device &palette);
 	uint32_t screen_update_bosco(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_bosco(screen_device &screen, bool state);
 

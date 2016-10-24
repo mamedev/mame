@@ -40,9 +40,9 @@ public:
 	void machine_reset_galaxy();
 	void machine_reset_galaxyp();
 	uint32_t screen_update_galaxy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(galaxy_interrupt);
-	TIMER_CALLBACK_MEMBER(gal_video);
-	IRQ_CALLBACK_MEMBER(galaxy_irq_callback);
+	void galaxy_interrupt(device_t &device);
+	void gal_video(void *ptr, int32_t param);
+	int galaxy_irq_callback(device_t &device, int irqline);
 	void galaxy_set_timer();
 	void galaxy_setup_snapshot (const uint8_t * data, uint32_t size);
 	required_device<cpu_device> m_maincpu;

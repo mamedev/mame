@@ -157,7 +157,7 @@ void cdp1862_device::dma_w(address_space &space, offs_t offset, uint8_t data, ui
 //  disp_on_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( cdp1862_device::bkg_w )
+void cdp1862_device::bkg_w(int state)
 {
 	if (state)
 	{
@@ -175,7 +175,7 @@ WRITE_LINE_MEMBER( cdp1862_device::bkg_w )
 //  disp_off_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( cdp1862_device::con_w )
+void cdp1862_device::con_w(int state)
 {
 	if (!state)
 	{

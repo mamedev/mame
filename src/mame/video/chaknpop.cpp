@@ -24,7 +24,7 @@
   palette decode
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(chaknpop_state, chaknpop)
+void chaknpop_state::palette_init_chaknpop(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 
@@ -124,7 +124,7 @@ void chaknpop_state::attrram_w(address_space &space, offs_t offset, uint8_t data
  *  I'm not sure how to handle attributes about color
  */
 
-TILE_GET_INFO_MEMBER(chaknpop_state::get_tx_tile_info)
+void chaknpop_state::get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = m_tx_ram[tile_index];
 	int tile_h_bank = (m_gfxmode & GFX_TX_BANK2) << 2;  /* 0x00-0xff -> 0x200-0x2ff */

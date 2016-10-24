@@ -68,10 +68,10 @@ public:
 	// read/write handlers
 	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( trg0 );
-	DECLARE_WRITE_LINE_MEMBER( trg1 );
-	DECLARE_WRITE_LINE_MEMBER( trg2 );
-	DECLARE_WRITE_LINE_MEMBER( trg3 );
+	void trg0(int state);
+	void trg1(int state);
+	void trg2(int state);
+	void trg3(int state);
 
 	uint16_t get_channel_constant(uint8_t channel) { return m_channel[channel].m_tconst; }
 
@@ -103,7 +103,7 @@ private:
 
 		attotime period() const;
 		void trigger(uint8_t data);
-		TIMER_CALLBACK_MEMBER(timer_callback);
+		void timer_callback(void *ptr, int32_t param);
 
 		z80ctc_device * m_device;               // pointer back to our device
 		int             m_index;                // our channel index

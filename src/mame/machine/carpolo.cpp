@@ -64,25 +64,25 @@ TTL74148_OUTPUT_CB(carpolo_state::ttl74148_3s_cb)
 
 
 /* the outputs of the flip-flops are connected to the priority encoder */
-WRITE_LINE_MEMBER(carpolo_state::carpolo_7474_2s_1_q_cb)
+void carpolo_state::carpolo_7474_2s_1_q_cb(int state)
 {
 	m_ttl74148_3s->input_line_w(COIN1_PRIORITY_LINE, state);
 	m_ttl74148_3s->update();
 }
 
-WRITE_LINE_MEMBER(carpolo_state::carpolo_7474_2s_2_q_cb)
+void carpolo_state::carpolo_7474_2s_2_q_cb(int state)
 {
 	m_ttl74148_3s->input_line_w(COIN2_PRIORITY_LINE, state);
 	m_ttl74148_3s->update();
 }
 
-WRITE_LINE_MEMBER(carpolo_state::carpolo_7474_2u_1_q_cb)
+void carpolo_state::carpolo_7474_2u_1_q_cb(int state)
 {
 	m_ttl74148_3s->input_line_w(COIN3_PRIORITY_LINE, state);
 	m_ttl74148_3s->update();
 }
 
-WRITE_LINE_MEMBER(carpolo_state::carpolo_7474_2u_2_q_cb)
+void carpolo_state::carpolo_7474_2u_2_q_cb(int state)
 {
 	m_ttl74148_3s->input_line_w(COIN4_PRIORITY_LINE, state);
 	m_ttl74148_3s->update();
@@ -196,7 +196,7 @@ uint8_t carpolo_state::carpolo_interrupt_cause_r(address_space &space, offs_t of
 }
 
 
-INTERRUPT_GEN_MEMBER(carpolo_state::carpolo_timer_interrupt)
+void carpolo_state::carpolo_timer_interrupt(device_t &device)
 {
 	uint8_t port_value;
 	int player;
@@ -281,22 +281,22 @@ INTERRUPT_GEN_MEMBER(carpolo_state::carpolo_timer_interrupt)
 
 // FIXME: Remove trampolines
 
-WRITE_LINE_MEMBER(carpolo_state::coin1_interrupt_clear_w)
+void carpolo_state::coin1_interrupt_clear_w(int state)
 {
 	m_ttl7474_2s_1->clear_w(state);
 }
 
-WRITE_LINE_MEMBER(carpolo_state::coin2_interrupt_clear_w)
+void carpolo_state::coin2_interrupt_clear_w(int state)
 {
 	m_ttl7474_2s_2->clear_w(state);
 }
 
-WRITE_LINE_MEMBER(carpolo_state::coin3_interrupt_clear_w)
+void carpolo_state::coin3_interrupt_clear_w(int state)
 {
 	m_ttl7474_2u_1->clear_w(state);
 }
 
-WRITE_LINE_MEMBER(carpolo_state::coin4_interrupt_clear_w)
+void carpolo_state::coin4_interrupt_clear_w(int state)
 {
 	m_ttl7474_2u_2->clear_w(state);
 }

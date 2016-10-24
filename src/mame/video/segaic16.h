@@ -124,7 +124,7 @@ public:
 
 	segaic16_video_pagelatch_delegate m_pagelatch_cb;
 	void tilemap_16b_fill_latch(int i, uint16_t* latched_pageselect, uint16_t* latched_yscroll, uint16_t* latched_xscroll, uint16_t* textram);
-	TIMER_CALLBACK_MEMBER( tilemap_16b_latch_values );
+	void tilemap_16b_latch_values(void *ptr, int32_t param);
 
 	struct rotate_info m_rotate[SEGAIC16_MAX_ROTATE];
 	struct tilemap_info m_bg_tilemap[SEGAIC16_MAX_TILEMAPS];
@@ -142,13 +142,13 @@ public:
 
 	uint16_t rotate_control_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
-	TILE_GET_INFO_MEMBER( tilemap_16b_tile_info );
-	TILE_GET_INFO_MEMBER( tilemap_16b_text_info );
-	TILE_GET_INFO_MEMBER( tilemap_16b_alt_tile_info );
-	TILE_GET_INFO_MEMBER( tilemap_16b_alt_text_info );
+	void tilemap_16b_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void tilemap_16b_text_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void tilemap_16b_alt_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void tilemap_16b_alt_text_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
-	TILE_GET_INFO_MEMBER( tilemap_16a_tile_info );
-	TILE_GET_INFO_MEMBER( tilemap_16a_text_info );
+	void tilemap_16a_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void tilemap_16a_text_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 protected:
 	// device-level overrides

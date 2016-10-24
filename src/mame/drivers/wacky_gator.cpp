@@ -50,7 +50,7 @@ public:
 	void init_wackygtr();
 	void machine_reset() override;
 
-	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
+	void adpcm_int(int state);
 	void sample_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void alligators_ctrl1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void alligators_ctrl2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -70,16 +70,16 @@ public:
 	void disp3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff)              { set_digits(6, data); }
 
 	void pmm8713_ck(int i, int state);
-	DECLARE_WRITE_LINE_MEMBER(alligator0_ck)    { pmm8713_ck(0, state); }
-	DECLARE_WRITE_LINE_MEMBER(alligator1_ck)    { pmm8713_ck(1, state); }
-	DECLARE_WRITE_LINE_MEMBER(alligator2_ck)    { pmm8713_ck(2, state); }
-	DECLARE_WRITE_LINE_MEMBER(alligator3_ck)    { pmm8713_ck(3, state); }
-	DECLARE_WRITE_LINE_MEMBER(alligator4_ck)    { pmm8713_ck(4, state); }
+	void alligator0_ck(int state)    { pmm8713_ck(0, state); }
+	void alligator1_ck(int state)    { pmm8713_ck(1, state); }
+	void alligator2_ck(int state)    { pmm8713_ck(2, state); }
+	void alligator3_ck(int state)    { pmm8713_ck(3, state); }
+	void alligator4_ck(int state)    { pmm8713_ck(4, state); }
 
 	void irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff)            { m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE); }
 	void firq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff)           { m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE); }
 
-	TIMER_DEVICE_CALLBACK_MEMBER(nmi_timer)     { m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE); }
+	void nmi_timer(timer_device &timer, void *ptr, int32_t param)     { m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE); }
 
 private:
 	int     m_adpcm_sel;
@@ -236,7 +236,7 @@ static INPUT_PORTS_START( wackygtr )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 INPUT_PORTS_END
 
-WRITE_LINE_MEMBER(wackygtr_state::adpcm_int)
+void wackygtr_state::adpcm_int(int state)
 {
 	if (!(m_adpcm_ctrl & 0x80))
 	{

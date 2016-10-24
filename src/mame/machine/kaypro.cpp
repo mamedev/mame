@@ -15,7 +15,7 @@
 
 ************************************************************/
 
-WRITE_LINE_MEMBER( kaypro_state::write_centronics_busy )
+void kaypro_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 }
@@ -224,12 +224,12 @@ void kaypro_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 	}
 }
 
-WRITE_LINE_MEMBER( kaypro_state::fdc_intrq_w )
+void kaypro_state::fdc_intrq_w(int state)
 {
 	m_fdc_rq = (m_fdc_rq & 0x82) | state;
 }
 
-WRITE_LINE_MEMBER( kaypro_state::fdc_drq_w )
+void kaypro_state::fdc_drq_w(int state)
 {
 	m_fdc_rq = (m_fdc_rq & 0x81) | (state << 1);
 }

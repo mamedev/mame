@@ -82,8 +82,8 @@ public:
 	void audioen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void audiores_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void midearth_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	TIMER_DEVICE_CALLBACK_MEMBER(nmi);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_s);
+	void nmi(timer_device &timer, void *ptr, int32_t param);
+	void timer_s(timer_device &timer, void *ptr, int32_t param);
 private:
 	bool m_audiores;
 	uint8_t m_timer_s[3];
@@ -358,7 +358,7 @@ uint8_t atari_s1_state::switch_r(address_space &space, offs_t offset, uint8_t me
 	return (BIT(m_switch[offset>>3]->read(), offset&7 ) << 7) | (BIT(m_bit6, 1) << 6); // switch bit | BIT6_CLK
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( atari_s1_state::nmi )
+void atari_s1_state::nmi(timer_device &timer, void *ptr, int32_t param)
 {
 	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // 4511
 	m_bit6++;
@@ -393,7 +393,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( atari_s1_state::nmi )
 // Variables:
 // m_timer_s[1] count in 74LS161
 // m_timer_s[2] count in 7493s
-TIMER_DEVICE_CALLBACK_MEMBER( atari_s1_state::timer_s )
+void atari_s1_state::timer_s(timer_device &timer, void *ptr, int32_t param)
 {
 	m_timer_s[1]++;
 

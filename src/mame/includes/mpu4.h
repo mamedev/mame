@@ -143,43 +143,43 @@ public:
 	uint8_t crystal_sound_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void crystal_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void ic3ss_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(cpu0_irq);
-	DECLARE_WRITE_LINE_MEMBER(ic2_o1_callback);
-	DECLARE_WRITE_LINE_MEMBER(ic2_o2_callback);
-	DECLARE_WRITE_LINE_MEMBER(ic2_o3_callback);
+	void cpu0_irq(int state);
+	void ic2_o1_callback(int state);
+	void ic2_o2_callback(int state);
+	void ic2_o3_callback(int state);
 	void pia_ic3_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void pia_ic3_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(pia_ic3_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia_ic3_cb2_w);
+	void pia_ic3_ca2_w(int state);
+	void pia_ic3_cb2_w(int state);
 	void pia_ic4_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void pia_ic4_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t pia_ic4_portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(pia_ic4_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia_ic4_cb2_w);
+	void pia_ic4_ca2_w(int state);
+	void pia_ic4_cb2_w(int state);
 	uint8_t pia_ic5_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void pia_ic5_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void pia_ic5_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t pia_ic5_portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(pia_ic5_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia_ic5_cb2_w);
+	void pia_ic5_ca2_w(int state);
+	void pia_ic5_cb2_w(int state);
 	void pia_ic6_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void pia_ic6_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(pia_ic6_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia_ic6_cb2_w);
+	void pia_ic6_ca2_w(int state);
+	void pia_ic6_cb2_w(int state);
 	void pia_ic7_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void pia_ic7_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t pia_ic7_portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(pia_ic7_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia_ic7_cb2_w);
+	void pia_ic7_ca2_w(int state);
+	void pia_ic7_cb2_w(int state);
 	uint8_t pia_ic8_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void pia_ic8_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(pia_ic8_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia_ic8_cb2_w);
+	void pia_ic8_ca2_w(int state);
+	void pia_ic8_cb2_w(int state);
 	void pia_gb_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void pia_gb_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t pia_gb_portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(pia_gb_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia_gb_cb2_w);
+	void pia_gb_ca2_w(int state);
+	void pia_gb_cb2_w(int state);
 	void init_m4default_alt();
 	void init_crystali();
 	void init_m4tst2();
@@ -249,15 +249,15 @@ public:
 	void machine_start_mod2_alt();
 	void machine_start_mpu4bwb();
 	void machine_start_mpu4cry();
-	TIMER_DEVICE_CALLBACK_MEMBER(gen_50hz);
-	DECLARE_WRITE_LINE_MEMBER(reel0_optic_cb) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
-	DECLARE_WRITE_LINE_MEMBER(reel1_optic_cb) { if (state) m_optic_pattern |= 0x02; else m_optic_pattern &= ~0x02; }
-	DECLARE_WRITE_LINE_MEMBER(reel2_optic_cb) { if (state) m_optic_pattern |= 0x04; else m_optic_pattern &= ~0x04; }
-	DECLARE_WRITE_LINE_MEMBER(reel3_optic_cb) { if (state) m_optic_pattern |= 0x08; else m_optic_pattern &= ~0x08; }
-	DECLARE_WRITE_LINE_MEMBER(reel4_optic_cb) { if (state) m_optic_pattern |= 0x10; else m_optic_pattern &= ~0x10; }
-	DECLARE_WRITE_LINE_MEMBER(reel5_optic_cb) { if (state) m_optic_pattern |= 0x20; else m_optic_pattern &= ~0x20; }
-	DECLARE_WRITE_LINE_MEMBER(reel6_optic_cb) { if (state) m_optic_pattern |= 0x40; else m_optic_pattern &= ~0x40; }
-	DECLARE_WRITE_LINE_MEMBER(reel7_optic_cb) { if (state) m_optic_pattern |= 0x80; else m_optic_pattern &= ~0x80; }
+	void gen_50hz(timer_device &timer, void *ptr, int32_t param);
+	void reel0_optic_cb(int state) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
+	void reel1_optic_cb(int state) { if (state) m_optic_pattern |= 0x02; else m_optic_pattern &= ~0x02; }
+	void reel2_optic_cb(int state) { if (state) m_optic_pattern |= 0x04; else m_optic_pattern &= ~0x04; }
+	void reel3_optic_cb(int state) { if (state) m_optic_pattern |= 0x08; else m_optic_pattern &= ~0x08; }
+	void reel4_optic_cb(int state) { if (state) m_optic_pattern |= 0x10; else m_optic_pattern &= ~0x10; }
+	void reel5_optic_cb(int state) { if (state) m_optic_pattern |= 0x20; else m_optic_pattern &= ~0x20; }
+	void reel6_optic_cb(int state) { if (state) m_optic_pattern |= 0x40; else m_optic_pattern &= ~0x40; }
+	void reel7_optic_cb(int state) { if (state) m_optic_pattern |= 0x80; else m_optic_pattern &= ~0x80; }
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 

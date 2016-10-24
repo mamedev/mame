@@ -258,7 +258,7 @@ uint8_t pcd_keyboard_device::t0_r(address_space &space, offs_t offset, uint8_t m
 	return m_t0;
 }
 
-WRITE_LINE_MEMBER( pcd_keyboard_device::t0_w )
+void pcd_keyboard_device::t0_w(int state)
 {
 	m_t0 = state;
 }

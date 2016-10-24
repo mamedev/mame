@@ -12,7 +12,7 @@
 #include "includes/cop01.h"
 
 
-PALETTE_INIT_MEMBER(cop01_state, cop01)
+void cop01_state::palette_init_cop01(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -60,7 +60,7 @@ PALETTE_INIT_MEMBER(cop01_state, cop01)
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(cop01_state::get_bg_tile_info)
+void cop01_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = m_bgvideoram[tile_index];
 	int attr = m_bgvideoram[tile_index + 0x800];
@@ -83,7 +83,7 @@ TILE_GET_INFO_MEMBER(cop01_state::get_bg_tile_info)
 	tileinfo.group = pri;
 }
 
-TILE_GET_INFO_MEMBER(cop01_state::get_fg_tile_info)
+void cop01_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = m_fgvideoram[tile_index];
 	SET_TILE_INFO_MEMBER(0, tile, 0, 0);

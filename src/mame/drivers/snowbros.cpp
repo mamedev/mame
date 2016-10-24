@@ -126,7 +126,7 @@ void snowbros_state::snowbros_irq2_ack_w(address_space &space, offs_t offset, ui
 	m_maincpu->set_input_line(2, CLEAR_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(snowbros_state::snowbros_irq)
+void snowbros_state::snowbros_irq(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -140,7 +140,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(snowbros_state::snowbros_irq)
 		m_maincpu->set_input_line(4, ASSERT_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(snowbros_state::snowbros3_irq)
+void snowbros_state::snowbros3_irq(timer_device &timer, void *ptr, int32_t param)
 {
 	int status = m_oki->read_status();
 	int scanline = param;

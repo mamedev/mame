@@ -4,7 +4,7 @@
 #include "includes/mainsnk.h"
 
 
-PALETTE_INIT_MEMBER(mainsnk_state, mainsnk)
+void mainsnk_state::palette_init_mainsnk(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -36,7 +36,7 @@ PALETTE_INIT_MEMBER(mainsnk_state, mainsnk)
 	}
 }
 
-TILEMAP_MAPPER_MEMBER(mainsnk_state::marvins_tx_scan_cols)
+tilemap_memory_index mainsnk_state::marvins_tx_scan_cols(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	// tilemap is 36x28, the central part is from the first RAM page and the
 	// extra 4 columns are from the second page
@@ -47,7 +47,7 @@ TILEMAP_MAPPER_MEMBER(mainsnk_state::marvins_tx_scan_cols)
 		return row + (col << 5);
 }
 
-TILE_GET_INFO_MEMBER(mainsnk_state::get_tx_tile_info)
+void mainsnk_state::get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_fgram[tile_index];
 
@@ -57,7 +57,7 @@ TILE_GET_INFO_MEMBER(mainsnk_state::get_tx_tile_info)
 			tile_index & 0x400 ? TILE_FORCE_LAYER0 : 0);
 }
 
-TILE_GET_INFO_MEMBER(mainsnk_state::get_bg_tile_info)
+void mainsnk_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = (m_bgram[tile_index]);
 

@@ -11,13 +11,13 @@
 #include "includes/esripsys.h"
 
 
-INTERRUPT_GEN_MEMBER(esripsys_state::esripsys_vblank_irq)
+void esripsys_state::esripsys_vblank_irq(device_t &device)
 {
 	m_gamecpu->set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
 	m_frame_vbl = 0;
 }
 
-TIMER_CALLBACK_MEMBER(esripsys_state::hblank_start_callback)
+void esripsys_state::hblank_start_callback(void *ptr, int32_t param)
 {
 	int v = m_screen->vpos();
 
@@ -43,7 +43,7 @@ TIMER_CALLBACK_MEMBER(esripsys_state::hblank_start_callback)
 	m_hblank = 0;
 }
 
-TIMER_CALLBACK_MEMBER(esripsys_state::hblank_end_callback)
+void esripsys_state::hblank_end_callback(void *ptr, int32_t param)
 {
 	int v = m_screen->vpos();
 

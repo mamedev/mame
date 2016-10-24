@@ -45,8 +45,8 @@ public:
 	void init_mouser();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(mouser);
+	void palette_init_mouser(palette_device &palette);
 	uint32_t screen_update_mouser(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(mouser_nmi_interrupt);
-	INTERRUPT_GEN_MEMBER(mouser_sound_nmi_assert);
+	void mouser_nmi_interrupt(device_t &device);
+	void mouser_sound_nmi_assert(device_t &device);
 };

@@ -9,7 +9,7 @@
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(taitol_state::get_bg18_tile_info)
+void taitol_state::get_bg18_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_rambanks[2 * tile_index + 0x8000 + 1];
 	int code = m_rambanks[2 * tile_index + 0x8000]
@@ -23,7 +23,7 @@ TILE_GET_INFO_MEMBER(taitol_state::get_bg18_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(taitol_state::get_bg19_tile_info)
+void taitol_state::get_bg19_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_rambanks[2 * tile_index + 0x9000 + 1];
 	int code = m_rambanks[2 * tile_index + 0x9000]
@@ -37,7 +37,7 @@ TILE_GET_INFO_MEMBER(taitol_state::get_bg19_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(taitol_state::get_ch1a_tile_info)
+void taitol_state::get_ch1a_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_rambanks[2 * tile_index + 0xa000 + 1];
 	int code = m_rambanks[2 * tile_index + 0xa000] | ((attr & 0x01) << 8) | ((attr & 0x04) << 7);

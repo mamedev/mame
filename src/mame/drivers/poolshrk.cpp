@@ -203,7 +203,7 @@ static GFXDECODE_START( poolshrk )
 GFXDECODE_END
 
 
-PALETTE_INIT_MEMBER(poolshrk_state, poolshrk)
+void poolshrk_state::palette_init_poolshrk(palette_device &palette)
 {
 	palette.set_pen_color(0,rgb_t(0x7F, 0x7F, 0x7F));
 	palette.set_pen_color(1,rgb_t(0xFF, 0xFF, 0xFF));

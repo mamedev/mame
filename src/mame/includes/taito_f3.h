@@ -296,22 +296,22 @@ public:
 	void init_cleopatr();
 	void init_scfinals();
 	void init_pbobbl2x();
-	TILE_GET_INFO_MEMBER(get_tile_info1);
-	TILE_GET_INFO_MEMBER(get_tile_info2);
-	TILE_GET_INFO_MEMBER(get_tile_info3);
-	TILE_GET_INFO_MEMBER(get_tile_info4);
-	TILE_GET_INFO_MEMBER(get_tile_info5);
-	TILE_GET_INFO_MEMBER(get_tile_info6);
-	TILE_GET_INFO_MEMBER(get_tile_info7);
-	TILE_GET_INFO_MEMBER(get_tile_info8);
-	TILE_GET_INFO_MEMBER(get_tile_info_vram);
-	TILE_GET_INFO_MEMBER(get_tile_info_pixel);
+	void get_tile_info1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info3(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info4(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info5(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info6(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info7(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info8(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info_vram(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info_pixel(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void machine_start_f3();
 	void machine_reset_f3();
 	void video_start_f3();
 	uint32_t screen_update_f3(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_eof_f3(screen_device &screen, bool state);
-	INTERRUPT_GEN_MEMBER(f3_interrupt2);
+	void f3_interrupt2(device_t &device);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;

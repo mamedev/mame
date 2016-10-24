@@ -206,7 +206,7 @@ void ti_pcode_card_device::write(address_space &space, offs_t offset, uint8_t da
 /*
     Common READY* line from the GROMs.
 */
-WRITE_LINE_MEMBER( ti_pcode_card_device::ready_line )
+void ti_pcode_card_device::ready_line(int state)
 {
 	m_slot->set_ready(state);
 }
@@ -216,7 +216,7 @@ WRITE_LINE_MEMBER( ti_pcode_card_device::ready_line )
     clock input for the GROMs, which are thus running at a lower rate than
     those in the console driven by the VDP (477 kHz).
 */
-WRITE_LINE_MEMBER( ti_pcode_card_device::clock_in)
+void ti_pcode_card_device::clock_in(int state)
 {
 	m_clock_count = (m_clock_count+1) & 0x03;  // four pulses high, four pulses low
 	if (m_clock_count==0)

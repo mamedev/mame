@@ -41,7 +41,7 @@ public:
 	uint8_t ctrl_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void status_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	TIMER_DEVICE_CALLBACK_MEMBER(dmd_firq);
+	void dmd_firq(timer_device &timer, void *ptr, int32_t param);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
 	static void static_set_gfxregion(device_t &device, const char *tag);

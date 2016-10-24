@@ -80,7 +80,7 @@ public:
 	void port71_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t ppi_pc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void ppi_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_PALETTE_INIT(pc8401a);
+	void palette_init_pc8401a(palette_device &palette);
 
 	void scan_keyboard();
 	void bankswitch(uint8_t data);
@@ -93,7 +93,7 @@ public:
 	uint32_t m_io_addr;           // I/O ROM address counter
 
 	uint8_t m_key_latch;
-	TIMER_DEVICE_CALLBACK_MEMBER(pc8401a_keyboard_tick);
+	void pc8401a_keyboard_tick(timer_device &timer, void *ptr, int32_t param);
 };
 
 class pc8500_state : public pc8401a_state

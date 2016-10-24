@@ -43,7 +43,7 @@ public:
 	uint8_t lcd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void lcd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer);
+	void irq_timer(timer_device &timer, void *ptr, int32_t param);
 
 	void show_leds();
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -107,7 +107,7 @@ void stratos_state::show_leds()
 	logerror("leds R:%s -- G:%s (%s)\n", str_red, str_green, machine().describe_context());
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(stratos_state::irq_timer)
+void stratos_state::irq_timer(timer_device &timer, void *ptr, int32_t param)
 {
 	maincpu->set_input_line(M65C02_IRQ_LINE, HOLD_LINE);
 }

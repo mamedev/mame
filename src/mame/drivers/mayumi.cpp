@@ -44,12 +44,12 @@ public:
 	void input_sel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t key_matrix_1p_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t key_matrix_2p_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	TILE_GET_INFO_MEMBER(get_tile_info);
+	void get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_mayumi(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(mayumi_interrupt);
+	void mayumi_interrupt(device_t &device);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 };
@@ -61,7 +61,7 @@ public:
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(mayumi_state::get_tile_info)
+void mayumi_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index] + (m_videoram[tile_index + 0x800] & 0x1f) * 0x100;
 	int col = (m_videoram[tile_index + 0x1000] >> 3) & 0x1f;
@@ -92,7 +92,7 @@ uint32_t mayumi_state::screen_update_mayumi(screen_device &screen, bitmap_ind16 
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(mayumi_state::mayumi_interrupt)
+void mayumi_state::mayumi_interrupt(device_t &device)
 {
 	if (m_int_enable)
 			device.execute().set_input_line(0, HOLD_LINE);

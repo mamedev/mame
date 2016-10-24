@@ -108,7 +108,7 @@ void adsp21062_device::CHANGE_PC_DELAYED(uint32_t newpc)
 	m_core->delay_slot2 = m_core->daddr;
 }
 
-TIMER_CALLBACK_MEMBER(adsp21062_device::sharc_iop_delayed_write_callback)
+void adsp21062_device::sharc_iop_delayed_write_callback(void *ptr, int32_t param)
 {
 	switch (m_core->iop_delayed_reg)
 	{

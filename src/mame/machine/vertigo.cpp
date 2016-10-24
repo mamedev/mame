@@ -51,7 +51,7 @@ void vertigo_state::update_irq_encoder(int line, int state)
 }
 
 
-WRITE_LINE_MEMBER(vertigo_state::v_irq4_w)
+void vertigo_state::v_irq4_w(int state)
 {
 	update_irq_encoder(INPUT_LINE_IRQ4, state);
 	vertigo_vproc(m_maincpu->attotime_to_cycles(machine().time() - m_irq4_time), state);
@@ -59,7 +59,7 @@ WRITE_LINE_MEMBER(vertigo_state::v_irq4_w)
 }
 
 
-WRITE_LINE_MEMBER(vertigo_state::v_irq3_w)
+void vertigo_state::v_irq3_w(int state)
 {
 	if (state)
 		m_audiocpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
@@ -103,7 +103,7 @@ uint16_t vertigo_state::vertigo_coin_r(address_space &space, offs_t offset, uint
 }
 
 
-INTERRUPT_GEN_MEMBER(vertigo_state::vertigo_interrupt)
+void vertigo_state::vertigo_interrupt(device_t &device)
 {
 	/* Coin inputs cause IRQ6 */
 	if ((ioport("COIN")->read() & 0x7) < 0x7)
@@ -128,7 +128,7 @@ void vertigo_state::vertigo_wsot_w(address_space &space, offs_t offset, uint16_t
 }
 
 
-TIMER_CALLBACK_MEMBER(vertigo_state::sound_command_w)
+void vertigo_state::sound_command_w(void *ptr, int32_t param)
 {
 	m_custom->exidy440_sound_command(param);
 

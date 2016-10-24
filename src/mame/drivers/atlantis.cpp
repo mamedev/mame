@@ -137,13 +137,13 @@ public:
 	uint8_t board_ctrl[CTRL_SIZE];
 	void update_asic_irq();
 
-	DECLARE_WRITE_LINE_MEMBER(vblank_irq);
-	DECLARE_WRITE_LINE_MEMBER(zeus_irq);
-	DECLARE_WRITE_LINE_MEMBER(ide_irq);
-	DECLARE_WRITE_LINE_MEMBER(ioasic_irq);
+	void vblank_irq(int state);
+	void zeus_irq(int state);
+	void ide_irq(int state);
+	void ioasic_irq(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(uart0_irq_callback);
-	DECLARE_WRITE_LINE_MEMBER(uart1_irq_callback);
+	void uart0_irq_callback(int state);
+	void uart1_irq_callback(int state);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(port_mod_r);
 	uint32_t port_ctrl_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
@@ -416,7 +416,7 @@ uint32_t atlantis_state::user_io_input(address_space &space, offs_t offset, uint
 /*************************************
 *  UART0 interrupt handler
 *************************************/
-WRITE_LINE_MEMBER(atlantis_state::uart0_irq_callback)
+void atlantis_state::uart0_irq_callback(int state)
 {
 	uint32_t status_bit = (1 << UART0_SHIFT);
 	if (state && !(board_ctrl[CTRL_STATUS] & status_bit)) {
@@ -434,7 +434,7 @@ WRITE_LINE_MEMBER(atlantis_state::uart0_irq_callback)
 /*************************************
 *  UART1 interrupt handler
 *************************************/
-WRITE_LINE_MEMBER(atlantis_state::uart1_irq_callback)
+void atlantis_state::uart1_irq_callback(int state)
 {
 	uint32_t status_bit = (1 << UART1_SHIFT);
 	if (state && !(board_ctrl[CTRL_STATUS] & status_bit)) {
@@ -452,7 +452,7 @@ WRITE_LINE_MEMBER(atlantis_state::uart1_irq_callback)
 /*************************************
 *  Video interrupts
 *************************************/
-WRITE_LINE_MEMBER(atlantis_state::vblank_irq)
+void atlantis_state::vblank_irq(int state)
 {
 	//logerror("%s: atlantis_state::vblank state = %i\n", machine().describe_context(), state);
 	if (1) {
@@ -470,7 +470,7 @@ WRITE_LINE_MEMBER(atlantis_state::vblank_irq)
 	}
 }
 
-WRITE_LINE_MEMBER(atlantis_state::zeus_irq)
+void atlantis_state::zeus_irq(int state)
 {
 	//logerror("%s: atlantis_state::zeus_irq state = %i\n", machine().describe_context(), state);
 	if (state) {
@@ -487,7 +487,7 @@ WRITE_LINE_MEMBER(atlantis_state::zeus_irq)
 /*************************************
 *  IDE interrupts
 *************************************/
-WRITE_LINE_MEMBER(atlantis_state::ide_irq)
+void atlantis_state::ide_irq(int state)
 {
 	m_maincpu->set_input_line(IDE_IRQ_NUM, state);
 	if (LOG_IRQ)
@@ -497,7 +497,7 @@ WRITE_LINE_MEMBER(atlantis_state::ide_irq)
 /*************************************
 *  I/O ASIC interrupts
 *************************************/
-WRITE_LINE_MEMBER(atlantis_state::ioasic_irq)
+void atlantis_state::ioasic_irq(int state)
 {
 	if (LOG_IRQ)
 		logerror("%s: atlantis_state::ioasic_irq state = %i\n", machine().describe_context(), state);

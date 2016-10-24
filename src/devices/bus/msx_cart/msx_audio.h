@@ -48,8 +48,8 @@ public:
 
 	virtual uint8_t read_cart(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
 
-	DECLARE_WRITE_LINE_MEMBER(midi_in);
-	DECLARE_WRITE_LINE_MEMBER(irq_write);
+	void midi_in(int state);
+	void irq_write(int state);
 
 private:
 	required_device<y8950_device> m_y8950;

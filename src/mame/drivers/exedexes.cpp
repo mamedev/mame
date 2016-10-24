@@ -19,7 +19,7 @@
 #include "includes/exedexes.h"
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(exedexes_state::exedexes_scanline)
+void exedexes_state::exedexes_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

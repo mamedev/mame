@@ -77,7 +77,7 @@ void hp48_state::hp48_pulse_irq( int irq_line)
 #define RS232_DELAY attotime::from_usec( 300 )
 
 /* end of receive event */
-TIMER_CALLBACK_MEMBER(hp48_state::hp48_rs232_byte_recv_cb)
+void hp48_state::hp48_rs232_byte_recv_cb(void *ptr, int32_t param)
 {
 	LOG_SERIAL(( "%f hp48_rs232_byte_recv_cb: end of receive, data=%02x\n",
 				machine().time().as_double(), param ));
@@ -114,7 +114,7 @@ void hp48_state::hp48_rs232_start_recv_byte( uint8_t data )
 
 
 /* end of send event */
-TIMER_CALLBACK_MEMBER(hp48_state::hp48_rs232_byte_sent_cb)
+void hp48_state::hp48_rs232_byte_sent_cb(void *ptr, int32_t param)
 {
 	//device_image_interface *xmodem = dynamic_cast<device_image_interface *>(machine().device("rs232_x"));
 	//device_image_interface *kermit = dynamic_cast<device_image_interface *>(machine().device("rs232_k"));
@@ -219,7 +219,7 @@ void hp48_state::hp48_update_kdn( )
 }
 
 /* periodic keyboard polling, generates an interrupt */
-TIMER_CALLBACK_MEMBER(hp48_state::hp48_kbd_cb)
+void hp48_state::hp48_kbd_cb(void *ptr, int32_t param)
 {
 	/* NMI for ON key */
 	if ( ioport( "ON" )->read() )
@@ -237,7 +237,7 @@ TIMER_CALLBACK_MEMBER(hp48_state::hp48_kbd_cb)
 }
 
 /* RSI opcode */
-WRITE_LINE_MEMBER( hp48_state::hp48_rsi )
+void hp48_state::hp48_rsi(int state)
 {
 	LOG(( "%s %f hp48_rsi\n", machine().describe_context(), machine().time().as_double() ));
 
@@ -544,7 +544,7 @@ void hp48_state::hp49_bank_w(address_space &space, offs_t offset, uint8_t data, 
 
 /* ---------------- timers --------------- */
 
-TIMER_CALLBACK_MEMBER(hp48_state::hp48_timer1_cb)
+void hp48_state::hp48_timer1_cb(void *ptr, int32_t param)
 {
 	if ( !(m_io[0x2f] & 1) ) return; /* timer enable */
 
@@ -568,7 +568,7 @@ TIMER_CALLBACK_MEMBER(hp48_state::hp48_timer1_cb)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(hp48_state::hp48_timer2_cb)
+void hp48_state::hp48_timer2_cb(void *ptr, int32_t param)
 {
 	if ( !(m_io[0x2f] & 1) ) return; /* timer enable */
 
@@ -780,7 +780,7 @@ void hp48_state::hp48_reset_modules(  )
 
 
 /* RESET opcode */
-WRITE_LINE_MEMBER( hp48_state::hp48_mem_reset )
+void hp48_state::hp48_mem_reset(int state)
 {
 	LOG(( "%s %f hp48_mem_reset\n", machine().describe_context(), machine().time().as_double() ));
 	hp48_reset_modules();

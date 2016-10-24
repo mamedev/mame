@@ -60,22 +60,22 @@ public:
 	void pia2c_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void pia34_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void pia34_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(pia34_cb2_w);
+	void pia34_cb2_w(int state);
 	void pia40_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(pia40_cb2_w);
+	void pia40_cb2_w(int state);
 	uint8_t switch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void switch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t pia28_w7_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(pias_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(pias_cb2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia21_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia21_cb2_w) { }; // enable solenoids
-	DECLARE_WRITE_LINE_MEMBER(pia24_cb2_w) { }; // dummy to stop error log filling up
-	DECLARE_WRITE_LINE_MEMBER(pia28_ca2_w) { }; // comma3&4
-	DECLARE_WRITE_LINE_MEMBER(pia28_cb2_w) { }; // comma1&2
-	DECLARE_WRITE_LINE_MEMBER(pia30_cb2_w) { }; // dummy to stop error log filling up
-	DECLARE_WRITE_LINE_MEMBER(ym2151_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(pia_irq);
+	void pias_ca2_w(int state);
+	void pias_cb2_w(int state);
+	void pia21_ca2_w(int state);
+	void pia21_cb2_w(int state) { }; // enable solenoids
+	void pia24_cb2_w(int state) { }; // dummy to stop error log filling up
+	void pia28_ca2_w(int state) { }; // comma3&4
+	void pia28_cb2_w(int state) { }; // comma1&2
+	void pia30_cb2_w(int state) { }; // dummy to stop error log filling up
+	void ym2151_irq_w(int state);
+	void pia_irq(int state);
 	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
 	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
 	void machine_reset_s11();

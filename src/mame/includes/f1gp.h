@@ -90,9 +90,9 @@ public:
 	void f1gp_fgscroll_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void f1gp_gfxctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void f1gp2_gfxctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	TILE_GET_INFO_MEMBER(f1gp_get_roz_tile_info);
-	TILE_GET_INFO_MEMBER(f1gp2_get_roz_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	void f1gp_get_roz_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void f1gp2_get_roz_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void machine_start_f1gp();
 	void machine_reset_f1gp();
 	void video_start_f1gp();

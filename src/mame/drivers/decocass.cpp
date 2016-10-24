@@ -722,7 +722,7 @@ static GFXDECODE_START( decocass )
 	GFXDECODE_ENTRY( nullptr, 0xd800, objlayout,       48, 4 )  /* object */
 GFXDECODE_END
 
-PALETTE_INIT_MEMBER(decocass_state, decocass)
+void decocass_state::palette_init_decocass(palette_device &palette)
 {
 	int i;
 

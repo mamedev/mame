@@ -175,7 +175,7 @@ void vectrex_state::vectrex_configuration()
 
 *********************************************************************/
 
-WRITE_LINE_MEMBER(vectrex_state::vectrex_via_irq)
+void vectrex_state::vectrex_via_irq(int state)
 {
 	m_maincpu->set_input_line(M6809_IRQ_LINE, state);
 }
@@ -218,20 +218,20 @@ uint8_t vectrex_state::vectrex_s1_via_pb_r(address_space &space, offs_t offset, 
 
 *********************************************************************/
 
-TIMER_CALLBACK_MEMBER(vectrex_state::vectrex_imager_change_color)
+void vectrex_state::vectrex_imager_change_color(void *ptr, int32_t param)
 {
 	m_beam_color = param;
 }
 
 
-TIMER_CALLBACK_MEMBER(vectrex_state::update_level)
+void vectrex_state::update_level(void *ptr, int32_t param)
 {
 	if (ptr)
 		* (uint8_t *) ptr = param;
 }
 
 
-TIMER_CALLBACK_MEMBER(vectrex_state::vectrex_imager_eye)
+void vectrex_state::vectrex_imager_eye(void *ptr, int32_t param)
 {
 	int coffset;
 	double rtime = (1.0 / m_imager_freq);

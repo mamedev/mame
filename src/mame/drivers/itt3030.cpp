@@ -260,10 +260,10 @@ public:
 	void fdc_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_FLOPPY_FORMATS(itt3030_floppy_formats);
 
-	DECLARE_WRITE_LINE_MEMBER(fdcirq_w);
-	DECLARE_WRITE_LINE_MEMBER(fdcdrq_w);
-	DECLARE_WRITE_LINE_MEMBER(fdchld_w);
-	DECLARE_PALETTE_INIT(itt3030);
+	void fdcirq_w(int state);
+	void fdcdrq_w(int state);
+	void fdchld_w(int state);
+	void palette_init_itt3030(palette_device &palette);
 
 private:
 	uint8_t m_kbdclk, m_kbdread, m_kbdport2;
@@ -328,19 +328,19 @@ uint32_t itt3030_state::screen_update( screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-WRITE_LINE_MEMBER(itt3030_state::fdcirq_w)
+void itt3030_state::fdcirq_w(int state)
 {
 	m_fdc_irq = state;
 }
 
 #include "debugger.h"
 
-WRITE_LINE_MEMBER(itt3030_state::fdcdrq_w)
+void itt3030_state::fdcdrq_w(int state)
 {
 	m_fdc_drq = state;
 }
 
-WRITE_LINE_MEMBER(itt3030_state::fdchld_w)
+void itt3030_state::fdchld_w(int state)
 {
 	m_fdc_hld = state;
 }
@@ -654,7 +654,7 @@ static SLOT_INTERFACE_START( itt3030_floppies )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_QD )
 SLOT_INTERFACE_END
 
-PALETTE_INIT_MEMBER(itt3030_state, itt3030)
+void itt3030_state::palette_init_itt3030(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t::black());
 	palette.set_pen_color(1, rgb_t(215, 229, 82));

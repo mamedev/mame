@@ -71,16 +71,16 @@ public:
 	void vector06_ramdisk_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void pit8253_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t pit8253_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(speaker_w);
+	void speaker_w(int state);
 	void vector06_set_video_mode(int width);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(vector06);
+	void palette_init_vector06(palette_device &palette);
 	uint32_t screen_update_vector06(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vector06_interrupt);
-	TIMER_CALLBACK_MEMBER(reset_check_callback);
-	IRQ_CALLBACK_MEMBER(vector06_irq_callback);
+	void vector06_interrupt(device_t &device);
+	void reset_check_callback(void *ptr, int32_t param);
+	int vector06_irq_callback(device_t &device, int irqline);
 
 private:
 	required_device<cpu_device> m_maincpu;

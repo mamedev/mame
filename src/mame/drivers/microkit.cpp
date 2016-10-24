@@ -49,7 +49,7 @@ public:
 		, m_terminal(*this, "terminal")
 	{ }
 
-	DECLARE_READ_LINE_MEMBER(clear_r);
+	int clear_r();
 	void ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t ram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
@@ -75,7 +75,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( microkit )
 INPUT_PORTS_END
 
-READ_LINE_MEMBER( microkit_state::clear_r )
+int microkit_state::clear_r()
 {
 	if (m_resetcnt < 0x10)
 		m_maincpu->set_state_int(COSMAC_R0, 0x8001); // skip IDL

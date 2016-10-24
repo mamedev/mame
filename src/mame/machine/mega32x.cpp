@@ -815,7 +815,7 @@ void sega_32x_device::calculate_pwm_timer()
 }
 
 
-TIMER_CALLBACK_MEMBER(sega_32x_device::handle_pwm_callback)
+void sega_32x_device::handle_pwm_callback(void *ptr, int32_t param)
 {
 	if(m_lch_index_r < PWM_FIFO_SIZE)
 	{

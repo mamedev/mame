@@ -56,7 +56,7 @@ public:
 	required_shared_ptr<uint8_t> m_reel1_alt_scroll;
 
 
-	INTERRUPT_GEN_MEMBER(funtech_vblank_interrupt);
+	void funtech_vblank_interrupt(device_t &device);
 
 	void funtech_lamps_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void funtech_coins_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -69,7 +69,7 @@ public:
 
 	void fgram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	tilemap_t *m_reel1_tilemap;
 	tilemap_t *m_reel2_tilemap;
@@ -79,9 +79,9 @@ public:
 	void reel2_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void reel3_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	TILE_GET_INFO_MEMBER(get_reel1_tile_info);
-	TILE_GET_INFO_MEMBER(get_reel2_tile_info);
-	TILE_GET_INFO_MEMBER(get_reel3_tile_info);
+	void get_reel1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_reel2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_reel3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -93,7 +93,7 @@ public:
 };
 
 
-TILE_GET_INFO_MEMBER(fun_tech_corp_state::get_fg_tile_info)
+void fun_tech_corp_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_fgram[tile_index];
 	int attr = m_fgram[tile_index+0x800];
@@ -109,7 +109,7 @@ TILE_GET_INFO_MEMBER(fun_tech_corp_state::get_fg_tile_info)
 }
 
 
-TILE_GET_INFO_MEMBER(fun_tech_corp_state::get_reel1_tile_info)
+void fun_tech_corp_state::get_reel1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_reel1_ram[tile_index];
 	if (m_vreg & 0x4) code |= 0x100;
@@ -121,7 +121,7 @@ TILE_GET_INFO_MEMBER(fun_tech_corp_state::get_reel1_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(fun_tech_corp_state::get_reel2_tile_info)
+void fun_tech_corp_state::get_reel2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_reel2_ram[tile_index];
 	if (m_vreg & 0x4) code |= 0x100;
@@ -134,7 +134,7 @@ TILE_GET_INFO_MEMBER(fun_tech_corp_state::get_reel2_tile_info)
 }
 
 
-TILE_GET_INFO_MEMBER(fun_tech_corp_state::get_reel3_tile_info)
+void fun_tech_corp_state::get_reel3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_reel3_ram[tile_index];
 	if (m_vreg & 0x4) code |= 0x100;
@@ -227,7 +227,7 @@ uint32_t fun_tech_corp_state::screen_update_funtech(screen_device &screen, bitma
 
 
 
-INTERRUPT_GEN_MEMBER(fun_tech_corp_state::funtech_vblank_interrupt)
+void fun_tech_corp_state::funtech_vblank_interrupt(device_t &device)
 {
 //  if (m_nmi_enable)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);

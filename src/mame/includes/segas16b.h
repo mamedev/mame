@@ -87,8 +87,8 @@ public:
 	void sound_w16(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	// other callbacks
-	DECLARE_WRITE_LINE_MEMBER(upd7759_generate_nmi);
-	INTERRUPT_GEN_MEMBER( i8751_main_cpu_vblank );
+	void upd7759_generate_nmi(int state);
+	void i8751_main_cpu_vblank(device_t &device);
 
 	// ROM board-specific driver init
 	void init_generic_5521();

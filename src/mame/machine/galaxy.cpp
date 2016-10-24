@@ -43,12 +43,12 @@ void galaxy_state::galaxy_latch_w(address_space &space, offs_t offset, uint8_t d
   Interrupts
 ***************************************************************************/
 
-INTERRUPT_GEN_MEMBER(galaxy_state::galaxy_interrupt)
+void galaxy_state::galaxy_interrupt(device_t &device)
 {
 	device.execute().set_input_line(0, HOLD_LINE);
 }
 
-IRQ_CALLBACK_MEMBER(galaxy_state::galaxy_irq_callback)
+int galaxy_state::galaxy_irq_callback(device_t &device, int irqline)
 {
 	galaxy_set_timer();
 	m_interrupts_enabled = true;

@@ -49,9 +49,9 @@ public:
 	void rockrage_speech_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(rockrage);
+	void palette_init_rockrage(palette_device &palette);
 	uint32_t screen_update_rockrage(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(rockrage_interrupt);
+	void rockrage_interrupt(device_t &device);
 	K007342_CALLBACK_MEMBER(rockrage_tile_callback);
 	K007420_CALLBACK_MEMBER(rockrage_sprite_callback);
 

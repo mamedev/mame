@@ -90,8 +90,8 @@ public:
 	uint16_t sgi_ip2_stklmt_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void sgi_ip2_stklmt_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void init_sgi_ip2();
-	DECLARE_WRITE_LINE_MEMBER(duarta_irq_handler);
-	DECLARE_WRITE_LINE_MEMBER(duartb_irq_handler);
+	void duarta_irq_handler(int state);
+	void duartb_irq_handler(int state);
 	required_device<cpu_device> m_maincpu;
 protected:
 	required_shared_ptr<uint32_t> m_mainram;
@@ -399,12 +399,12 @@ ADDRESS_MAP_END
     MACHINE DRIVERS
 ***************************************************************************/
 
-WRITE_LINE_MEMBER(sgi_ip2_state::duarta_irq_handler)
+void sgi_ip2_state::duarta_irq_handler(int state)
 {
 	m_maincpu->set_input_line_and_vector(M68K_IRQ_6, state, M68K_INT_ACK_AUTOVECTOR);
 }
 
-WRITE_LINE_MEMBER(sgi_ip2_state::duartb_irq_handler)
+void sgi_ip2_state::duartb_irq_handler(int state)
 {
 	m_maincpu->set_input_line_and_vector(M68K_IRQ_6, state, M68K_INT_ACK_AUTOVECTOR);
 }

@@ -551,7 +551,7 @@ void system1_state::soundport_w(address_space &space, offs_t offset, uint8_t dat
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(system1_state::soundirq_gen)
+void system1_state::soundirq_gen(timer_device &timer, void *ptr, int32_t param)
 {
 	/* sound IRQ is generated on 32V, 96V, ... and auto-acknowledged */
 	m_soundcpu->set_input_line(0, HOLD_LINE);
@@ -624,7 +624,7 @@ uint8_t system1_state::mcu_io_r(address_space &space, offs_t offset, uint8_t mem
 }
 
 
-INTERRUPT_GEN_MEMBER(system1_state::mcu_irq_assert)
+void system1_state::mcu_irq_assert(device_t &device)
 {
 	/* toggle the INT0 line on the MCU */
 	device.execute().set_input_line(MCS51_INT0_LINE, ASSERT_LINE);
@@ -635,7 +635,7 @@ INTERRUPT_GEN_MEMBER(system1_state::mcu_irq_assert)
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(system1_state::mcu_t0_callback)
+void system1_state::mcu_t0_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	/* The T0 line is clocked by something; if it is not clocked fast
 	   enough, the MCU will fail; on shtngmst this happens after 3

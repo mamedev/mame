@@ -475,7 +475,7 @@ GFXDECODE_END
 
 /* most games require IRQ4 for inputs to work, Puzzli 2 is explicit about not wanting it tho
    what is the source? */
-TIMER_DEVICE_CALLBACK_MEMBER(pgm_state::pgm_interrupt)
+void pgm_state::pgm_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

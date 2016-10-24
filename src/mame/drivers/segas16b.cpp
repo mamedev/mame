@@ -1252,7 +1252,7 @@ uint8_t segas16b_state::upd7759_status_r(address_space &space, offs_t offset, ui
 //  NMI to the sound CPU
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(segas16b_state::upd7759_generate_nmi)
+void segas16b_state::upd7759_generate_nmi(int state)
 {
 	if (state)
 		m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -1264,7 +1264,7 @@ WRITE_LINE_MEMBER(segas16b_state::upd7759_generate_nmi)
 //  state if we have a handler
 //-------------------------------------------------
 
-INTERRUPT_GEN_MEMBER( segas16b_state::i8751_main_cpu_vblank )
+void segas16b_state::i8751_main_cpu_vblank(device_t &device)
 {
 	// if we have a fake 8751 handler, call it on VBLANK
 	if (!m_i8751_vblank_hook.isnull())

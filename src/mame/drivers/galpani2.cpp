@@ -582,7 +582,7 @@ GFXDECODE_END
 
 
 /* CPU#1 Interrups , lev 3,4 & 5 are tested on power up. The rest is rte, but lev 6 */
-TIMER_DEVICE_CALLBACK_MEMBER(galpani2_state::galpani2_interrupt1)
+void galpani2_state::galpani2_interrupt1(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -601,7 +601,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(galpani2_state::galpani2_interrupt1)
 }
 
 /* CPU#2 interrupts, lev 3,4 & 5 are tested on power up. The rest is rte, but lev 7 */
-TIMER_DEVICE_CALLBACK_MEMBER(galpani2_state::galpani2_interrupt2)
+void galpani2_state::galpani2_interrupt2(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

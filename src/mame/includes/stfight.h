@@ -45,7 +45,7 @@ public:
 
 	uint8_t m_coin_state;
 
-	DECLARE_WRITE_LINE_MEMBER(stfight_adpcm_int);
+	void stfight_adpcm_int(int state);
 
 	void init_stfight();
 	void init_empcity();
@@ -66,7 +66,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	INTERRUPT_GEN_MEMBER(stfight_vb_interrupt);
+	void stfight_vb_interrupt(device_t &device);
 
 	/*
 	    MCU specifics

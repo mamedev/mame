@@ -40,7 +40,7 @@
       0  | xxxx---- -------- | color
 */
 
-TILE_GET_INFO_MEMBER(splash_state::get_tile_info_tilemap0)
+void splash_state::get_tile_info_tilemap0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int data = m_videoram[tile_index];
 	int attr = data >> 8;
@@ -52,7 +52,7 @@ TILE_GET_INFO_MEMBER(splash_state::get_tile_info_tilemap0)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(splash_state::get_tile_info_tilemap1)
+void splash_state::get_tile_info_tilemap1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int data = m_videoram[(0x1000/2) + tile_index];
 	int attr = data >> 8;

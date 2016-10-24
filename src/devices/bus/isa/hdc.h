@@ -150,8 +150,8 @@ public:
 
 		uint8_t pc_hdc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 		void pc_hdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-		DECLARE_WRITE_LINE_MEMBER(irq_w);
-		DECLARE_WRITE_LINE_MEMBER(drq_w);
+		void irq_w(int state);
+		void drq_w(int state);
 		required_device<xt_hdc_device> m_hdc;
 
 		// optional information overrides

@@ -36,7 +36,7 @@ public:
 	uint8_t *m_video_ram;
 	uint8_t m_sysreg;
 	int m_blink;
-	DECLARE_PALETTE_INIT(ms0515);
+	void palette_init_ms0515(palette_device &palette);
 	uint32_t screen_update_ms0515(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void ms0515_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };
@@ -188,7 +188,7 @@ uint32_t ms0515_state::screen_update_ms0515(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-PALETTE_INIT_MEMBER(ms0515_state, ms0515)
+void ms0515_state::palette_init_ms0515(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(0, 0, 0));
 	palette.set_pen_color(1, rgb_t(0, 0, 127));

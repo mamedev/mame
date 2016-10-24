@@ -46,9 +46,9 @@ public:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	// not really public
-	DECLARE_WRITE_LINE_MEMBER( irq5_w );
-	DECLARE_WRITE_LINE_MEMBER( drq3_w );
-	DECLARE_WRITE_LINE_MEMBER( mr_w );
+	void irq5_w(int state);
+	void drq3_w(int state);
+	void mr_w(int state);
 	uint8_t rd322_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t ram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);

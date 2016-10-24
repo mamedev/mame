@@ -51,7 +51,7 @@ public:
 	uint16_t pdir_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void pdir_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	IRQ_CALLBACK_MEMBER(irq_callback);
+	int irq_callback(device_t &device, int irqline);
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -70,7 +70,7 @@ private:
 
 	uint16_t m_irq_vector[8];
 
-	TIMER_CALLBACK_MEMBER( timer_callback );
+	void timer_callback(void *ptr, int32_t param);
 	void update_timer( int i );
 	void update_irq_state();
 

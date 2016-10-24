@@ -99,15 +99,15 @@ public:
 
 	static void enable_4bit_mode(device_t &device) { downcast<tms6100_device &>(device).m_4bit_mode = true; }
 
-	DECLARE_WRITE_LINE_MEMBER(m0_w);
-	DECLARE_WRITE_LINE_MEMBER(m1_w);
-	DECLARE_WRITE_LINE_MEMBER(rck_w);
-	DECLARE_WRITE_LINE_MEMBER(cs_w);
-	DECLARE_WRITE_LINE_MEMBER(clk_w);
+	void m0_w(int state);
+	void m1_w(int state);
+	void rck_w(int state);
+	void cs_w(int state);
+	void clk_w(int state);
 
 	void add_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff); // 4bit
-	DECLARE_READ_LINE_MEMBER(data_line_r);
+	int data_line_r();
 
 protected:
 	// device-level overrides

@@ -459,11 +459,11 @@ public:
 						uint8_t xor5, uint8_t b50, uint8_t b51, uint8_t b52, uint8_t b53, uint8_t b54, uint8_t b55, uint8_t b56,uint8_t b57,
 						uint8_t xor6, uint8_t b60, uint8_t b61, uint8_t b62, uint8_t b63, uint8_t b64, uint8_t b65, uint8_t b66,uint8_t b67,
 						uint8_t xor7, uint8_t b70, uint8_t b71, uint8_t b72, uint8_t b73, uint8_t b74, uint8_t b75, uint8_t b76,uint8_t b77 );
-	TILE_GET_INFO_MEMBER(get_sfbonus_tile_info);
-	TILE_GET_INFO_MEMBER(get_sfbonus_reel_tile_info);
-	TILE_GET_INFO_MEMBER(get_sfbonus_reel2_tile_info);
-	TILE_GET_INFO_MEMBER(get_sfbonus_reel3_tile_info);
-	TILE_GET_INFO_MEMBER(get_sfbonus_reel4_tile_info);
+	void get_sfbonus_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_sfbonus_reel_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_sfbonus_reel2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_sfbonus_reel3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_sfbonus_reel4_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	void draw_reel_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int category);
@@ -787,7 +787,7 @@ INPUT_PORTS_END
 
 
 
-TILE_GET_INFO_MEMBER(sfbonus_state::get_sfbonus_tile_info)
+void sfbonus_state::get_sfbonus_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_tilemap_ram[(tile_index*2)+0] | (m_tilemap_ram[(tile_index*2)+1]<<8);
 	int flipx = (m_tilemap_ram[(tile_index*2)+1] & 0x80)>>7;
@@ -799,7 +799,7 @@ TILE_GET_INFO_MEMBER(sfbonus_state::get_sfbonus_tile_info)
 			TILE_FLIPYX(flipx | flipy));
 }
 
-TILE_GET_INFO_MEMBER(sfbonus_state::get_sfbonus_reel_tile_info)
+void sfbonus_state::get_sfbonus_reel_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_reel_ram[(tile_index*2)+0] | (m_reel_ram[(tile_index*2)+1]<<8);
 	int flipx = (m_reel_ram[(tile_index*2)+1] & 0x80)>>7;
@@ -813,7 +813,7 @@ TILE_GET_INFO_MEMBER(sfbonus_state::get_sfbonus_reel_tile_info)
 			TILE_FLIPYX(flipx | flipy));
 }
 
-TILE_GET_INFO_MEMBER(sfbonus_state::get_sfbonus_reel2_tile_info)
+void sfbonus_state::get_sfbonus_reel2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_reel2_ram[(tile_index*2)+0] | (m_reel2_ram[(tile_index*2)+1]<<8);
 	int flipx = (m_reel2_ram[(tile_index*2)+1] & 0x80)>>7;
@@ -827,7 +827,7 @@ TILE_GET_INFO_MEMBER(sfbonus_state::get_sfbonus_reel2_tile_info)
 			TILE_FLIPYX(flipx | flipy));
 }
 
-TILE_GET_INFO_MEMBER(sfbonus_state::get_sfbonus_reel3_tile_info)
+void sfbonus_state::get_sfbonus_reel3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_reel3_ram[(tile_index*2)+0] | (m_reel3_ram[(tile_index*2)+1]<<8);
 	int flipx = (m_reel3_ram[(tile_index*2)+1] & 0x80)>>7;
@@ -841,7 +841,7 @@ TILE_GET_INFO_MEMBER(sfbonus_state::get_sfbonus_reel3_tile_info)
 			TILE_FLIPYX(flipx | flipy));
 }
 
-TILE_GET_INFO_MEMBER(sfbonus_state::get_sfbonus_reel4_tile_info)
+void sfbonus_state::get_sfbonus_reel4_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_reel4_ram[(tile_index*2)+0] | (m_reel4_ram[(tile_index*2)+1]<<8);
 	int flipx = (m_reel4_ram[(tile_index*2)+1] & 0x80)>>7;

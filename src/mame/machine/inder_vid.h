@@ -32,7 +32,7 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<tms34010_device> m_tms;
 
-	DECLARE_WRITE_LINE_MEMBER(m68k_gen_int);
+	void m68k_gen_int(int state);
 
 	int m_shiftfull; // this might be a driver specific hack for a TMS bug.
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);

@@ -65,10 +65,10 @@ public:
 
 	void ic1_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void ic2_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(ic2_cb2_w);
+	void ic2_cb2_w(int state);
 	void ic3_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void ic4_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(ic4_cb2_w);
+	void ic4_cb2_w(int state);
 	void ic5_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void ic6_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void ic7_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -81,8 +81,8 @@ public:
 	uint8_t ic6_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t ic6_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t ic7_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(ic8_cb2_w);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_a);
+	void ic8_cb2_w(int state);
+	void timer_a(timer_device &timer, void *ptr, int32_t param);
 private:
 	uint32_t m_player_score[6];
 	uint8_t m_display;
@@ -377,7 +377,7 @@ void allied_state::ic2_b_w(address_space &space, offs_t offset, uint8_t data, ui
 	m_disp_data = !BIT(data, 7);
 }
 
-WRITE_LINE_MEMBER( allied_state::ic2_cb2_w )
+void allied_state::ic2_cb2_w(int state)
 {
 	if ((m_display) && (!state))
 	{
@@ -440,7 +440,7 @@ void allied_state::ic4_b_w(address_space &space, offs_t offset, uint8_t data, ui
 // PB0-3 - player 1-4 LED - to do
 }
 
-WRITE_LINE_MEMBER( allied_state::ic4_cb2_w )
+void allied_state::ic4_cb2_w(int state)
 {
 }
 
@@ -578,13 +578,13 @@ void allied_state::ic8_b_w(address_space &space, offs_t offset, uint8_t data, ui
 }
 
 // this line not emulated in PinMAME, maybe it isn't needed
-WRITE_LINE_MEMBER( allied_state::ic8_cb2_w )
+void allied_state::ic8_cb2_w(int state)
 {
 	m_ic6b7 = state ? 128 : 0; // i think it's pb7, hard to tell
 	m_ic7->cb1_w(state);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( allied_state::timer_a )
+void allied_state::timer_a(timer_device &timer, void *ptr, int32_t param)
 {
 	uint8_t data = ioport("X6A")->read();
 

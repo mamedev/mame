@@ -27,14 +27,14 @@ public:
 	uint8_t data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t serial_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(serial_w);
+	void serial_w(int state);
 	uint8_t m_t_c;
 	uint8_t m_out_offs;
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_p_ram;
 	required_ioport_array<6> m_row;
-	TIMER_DEVICE_CALLBACK_MEMBER(zac_2_inttimer);
-	TIMER_DEVICE_CALLBACK_MEMBER(zac_2_outtimer);
+	void zac_2_inttimer(timer_device &timer, void *ptr, int32_t param);
+	void zac_2_outtimer(timer_device &timer, void *ptr, int32_t param);
 protected:
 
 	// devices
@@ -167,7 +167,7 @@ uint8_t zac_2_state::serial_r(address_space &space, offs_t offset, uint8_t mem_m
 	return 0;
 }
 
-WRITE_LINE_MEMBER( zac_2_state::serial_w )
+void zac_2_state::serial_w(int state)
 {
 // to printer
 }
@@ -177,7 +177,7 @@ void zac_2_state::machine_reset()
 	m_t_c = 0;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(zac_2_state::zac_2_inttimer)
+void zac_2_state::zac_2_inttimer(timer_device &timer, void *ptr, int32_t param)
 {
 	// a pulse is sent via a capacitor (similar to what one finds at a reset pin)
 	if (m_t_c > 0x80)
@@ -186,7 +186,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(zac_2_state::zac_2_inttimer)
 		m_t_c++;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(zac_2_state::zac_2_outtimer)
+void zac_2_state::zac_2_outtimer(timer_device &timer, void *ptr, int32_t param)
 {
 	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x6f, 0, 0, 0, 0, 0, 0 };
 	m_out_offs++;

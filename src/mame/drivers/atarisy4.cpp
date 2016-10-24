@@ -86,11 +86,11 @@ public:
 	void m68k_shared_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	uint16_t dsp0_status_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void dsp0_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	DECLARE_READ_LINE_MEMBER(dsp0_bio_r);
+	int dsp0_bio_r();
 	void dsp0_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	uint16_t dsp1_status_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void dsp1_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	DECLARE_READ_LINE_MEMBER(dsp1_bio_r);
+	int dsp1_bio_r();
 	void dsp1_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	uint16_t analog_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void init_airrace();
@@ -100,7 +100,7 @@ public:
 	virtual void video_reset() override;
 	void machine_reset_airrace();
 	uint32_t screen_update_atarisy4(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vblank_int);
+	void vblank_int(device_t &device);
 	void image_mem_to_screen( bool clip);
 	void execute_gpu_command();
 	inline uint8_t hex_to_ascii(uint8_t in);
@@ -547,7 +547,7 @@ uint16_t atarisy4_state::gpu_r(address_space &space, offs_t offset, uint16_t mem
 	return res;
 }
 
-INTERRUPT_GEN_MEMBER(atarisy4_state::vblank_int)
+void atarisy4_state::vblank_int(device_t &device)
 {
 	if (gpu.mcr & 0x08)
 		m_maincpu->set_input_line(6, ASSERT_LINE);
@@ -601,7 +601,7 @@ void atarisy4_state::dsp0_control_w(address_space &space, offs_t offset, uint16_
 	m_csr[0] = data;
 }
 
-READ_LINE_MEMBER(atarisy4_state::dsp0_bio_r)
+int atarisy4_state::dsp0_bio_r()
 {
 	return BIT(m_csr[0], 2);
 }
@@ -635,7 +635,7 @@ void atarisy4_state::dsp1_control_w(address_space &space, offs_t offset, uint16_
 	m_csr[1] = data;
 }
 
-READ_LINE_MEMBER(atarisy4_state::dsp1_bio_r)
+int atarisy4_state::dsp1_bio_r()
 {
 	return BIT(m_csr[1], 2);
 }

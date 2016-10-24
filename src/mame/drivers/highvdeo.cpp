@@ -149,8 +149,8 @@ public:
 	void video_start_tourvisn();
 	uint32_t screen_update_tourvisn(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_brasil(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vblank_irq);
-	INTERRUPT_GEN_MEMBER(vblank_irq_80186);
+	void vblank_irq(device_t &device);
+	void vblank_irq_80186(device_t &device);
 	required_device<cpu_device> m_maincpu;
 	required_device<okim6376_device> m_okim6376;
 	required_device<palette_device> m_palette;
@@ -1104,12 +1104,12 @@ static INPUT_PORTS_START( fashion )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INTERRUPT_GEN_MEMBER(highvdeo_state::vblank_irq)
+void highvdeo_state::vblank_irq(device_t &device)
 {
 	device.execute().set_input_line_and_vector(0,HOLD_LINE,0x08/4);
 }
 
-INTERRUPT_GEN_MEMBER(highvdeo_state::vblank_irq_80186)
+void highvdeo_state::vblank_irq_80186(device_t &device)
 {
 	device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }

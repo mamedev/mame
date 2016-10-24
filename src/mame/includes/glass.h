@@ -55,10 +55,10 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	TILE_GET_INFO_MEMBER(get_tile_info_screen0);
-	TILE_GET_INFO_MEMBER(get_tile_info_screen1);
+	void get_tile_info_screen0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info_screen1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(interrupt);
+	void interrupt(device_t &device);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void ROM16_split_gfx( const char *src_reg, const char *dst_reg, int start, int length, int dest1, int dest2 );
 };

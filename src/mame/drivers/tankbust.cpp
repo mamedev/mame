@@ -38,7 +38,7 @@ void tankbust_state::machine_start()
 
 //port A of ay8910#0
 
-TIMER_CALLBACK_MEMBER(tankbust_state::soundlatch_callback)
+void tankbust_state::soundlatch_callback(void *ptr, int32_t param)
 {
 	m_latch = param;
 }
@@ -63,7 +63,7 @@ uint8_t tankbust_state::soundtimer_r(address_space &space, offs_t offset, uint8_
 	return ret;
 }
 
-TIMER_CALLBACK_MEMBER(tankbust_state::soundirqline_callback)
+void tankbust_state::soundirqline_callback(void *ptr, int32_t param)
 {
 //logerror("sound_irq_line write = %2x (after CPUs synced) \n",param);
 
@@ -125,7 +125,7 @@ uint8_t tankbust_state::debug_output_area_r(address_space &space, offs_t offset,
 
 
 
-PALETTE_INIT_MEMBER(tankbust_state, tankbust)
+void tankbust_state::palette_init_tankbust(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -321,7 +321,7 @@ void tankbust_state::machine_reset()
 	m_variable_data = 0x11;
 }
 
-INTERRUPT_GEN_MEMBER(tankbust_state::vblank_irq)
+void tankbust_state::vblank_irq(device_t &device)
 {
 	if(m_irq_mask)
 		device.execute().set_input_line(0, HOLD_LINE);

@@ -129,7 +129,7 @@ void crt9021_t::device_start()
 //  ld_sh_w - load/shift
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( crt9021_t::ld_sh_w )
+void crt9021_t::ld_sh_w(int state)
 {
 	if (LOG) logerror("CRT9021 '%s' LD/SH: %u\n", tag(), state);
 
@@ -169,7 +169,7 @@ WRITE_LINE_MEMBER( crt9021_t::ld_sh_w )
 //  vsync_w - vertical sync
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( crt9021_t::vsync_w )
+void crt9021_t::vsync_w(int state)
 {
 	if (LOG) logerror("CRT9021 '%s' VSYNC: %u\n", tag(), state);
 }

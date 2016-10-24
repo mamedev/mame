@@ -69,10 +69,10 @@ public:
 	void init_lazercmd();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(lazercmd);
+	void palette_init_lazercmd(palette_device &palette);
 	uint32_t screen_update_lazercmd(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(lazercmd_timer);
-	TIMER_DEVICE_CALLBACK_MEMBER(bbonk_timer);
+	void lazercmd_timer(timer_device &timer, void *ptr, int32_t param);
+	void bbonk_timer(timer_device &timer, void *ptr, int32_t param);
 	int vert_scale(int data);
 	void plot_pattern( bitmap_ind16 &bitmap, int x, int y );
 };

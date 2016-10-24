@@ -38,13 +38,6 @@
 #define MCFG_DEVICE_INPUT_DEFAULTS(_config) \
 	device_t::static_set_input_default(*device, DEVICE_INPUT_DEFAULTS_NAME(_config));
 
-#define DECLARE_READ_LINE_MEMBER(name)      int  name()
-#define READ_LINE_MEMBER(name)              int  name()
-#define DECLARE_WRITE_LINE_MEMBER(name)     void name(ATTR_UNUSED int state)
-#define WRITE_LINE_MEMBER(name)             void name(ATTR_UNUSED int state)
-
-
-
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************

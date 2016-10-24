@@ -1019,7 +1019,7 @@ void thomson_state::thmfc_floppy_cmd_complete()
 
 
 
-TIMER_CALLBACK_MEMBER( thomson_state::thmfc_floppy_cmd_complete_cb )
+void thomson_state::thmfc_floppy_cmd_complete_cb(void *ptr, int32_t param)
 {
 	thmfc_floppy_cmd_complete();
 }
@@ -1573,27 +1573,27 @@ void thomson_state::thmfc_floppy_init()
    no way to answer the request.
 */
 
-TIMER_CALLBACK_MEMBER( thomson_state::ans4 )
+void thomson_state::ans4(void *ptr, int32_t param)
 {
 	LOG(( "%f ans4\n", machine().time().as_double() ));
 	m_mc6854->set_cts( 0 );
 }
 
-TIMER_CALLBACK_MEMBER( thomson_state::ans3 )
+void thomson_state::ans3(void *ptr, int32_t param)
 {
 	LOG(( "%f ans3\n", machine().time().as_double() ));
 	m_mc6854->set_cts( 1 );
 	machine().scheduler().timer_set( attotime::from_usec( 100 ), timer_expired_delegate(FUNC(thomson_state::ans4),this));
 }
 
-TIMER_CALLBACK_MEMBER( thomson_state::ans2 )
+void thomson_state::ans2(void *ptr, int32_t param)
 {
 	LOG(( "%f ans2\n", machine().time().as_double() ));
 	m_mc6854->set_cts( 0 );
 	machine().scheduler().timer_set( attotime::from_usec( 100 ), timer_expired_delegate(FUNC(thomson_state::ans3),this));
 }
 
-TIMER_CALLBACK_MEMBER( thomson_state::ans )
+void thomson_state::ans(void *ptr, int32_t param)
 {
 	LOG(( "%f ans\n", machine().time().as_double() ));
 	m_mc6854->set_cts( 1 );

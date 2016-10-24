@@ -36,7 +36,7 @@ static const unsigned char ssystem3_palette[] =
 };
 
 
-PALETTE_INIT_MEMBER(ssystem3_state, ssystem3)
+void ssystem3_state::palette_init_ssystem3(palette_device &palette)
 {
 	int i;
 

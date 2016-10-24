@@ -301,7 +301,7 @@ static GFXDECODE_START( pdp1 )
 GFXDECODE_END
 
 /* Initialise the palette */
-PALETTE_INIT_MEMBER(pdp1_state, pdp1)
+void pdp1_state::palette_init_pdp1(palette_device &palette)
 {
 	/* rgb components for the two color emissions */
 	const double r1 = .1, g1 = .1, b1 = .924, r2 = .7, g2 = .7, b2 = .076;
@@ -885,7 +885,7 @@ void pdp1_state::begin_tape_read( int binary, int nac)
 /*
     timer callback to simulate reader IO
 */
-TIMER_CALLBACK_MEMBER(pdp1_state::reader_callback)
+void pdp1_state::reader_callback(void *ptr, int32_t param)
 {
 	int not_ready;
 	uint8_t data;
@@ -1062,7 +1062,7 @@ void pdp1_state::tape_write(uint8_t data)
 /*
     timer callback to generate punch completion pulse
 */
-TIMER_CALLBACK_MEMBER(pdp1_state::puncher_callback)
+void pdp1_state::puncher_callback(void *ptr, int32_t param)
 {
 	int nac = param;
 	m_io_status |= io_st_ptp;
@@ -1270,7 +1270,7 @@ void pdp1_state::typewriter_out(uint8_t data)
 /*
     timer callback to generate typewriter completion pulse
 */
-TIMER_CALLBACK_MEMBER(pdp1_state::tyo_callback)
+void pdp1_state::tyo_callback(void *ptr, int32_t param)
 {
 	int nac = param;
 	m_io_status |= io_st_tyo;
@@ -1392,7 +1392,7 @@ static void iot_tyi(device_t *device, int op2, int nac, int mb, int *io, int ac)
 /*
     timer callback to generate crt completion pulse
 */
-TIMER_CALLBACK_MEMBER(pdp1_state::dpy_callback)
+void pdp1_state::dpy_callback(void *ptr, int32_t param)
 {
 	m_maincpu->set_state_int(PDP1_IOS,1);
 }
@@ -1457,7 +1457,7 @@ void pdp1_state::parallel_drum_set_il(int il)
 }
 
 #ifdef UNUSED_FUNCTION
-TIMER_CALLBACK_MEMBER(pdp1_state::il_timer_callback)
+void pdp1_state::il_timer_callback(void *ptr, int32_t param)
 {
 	if (m_parallel_drum.dba)
 	{
@@ -1774,7 +1774,7 @@ void pdp1_state::pdp1_lightpen()
 /*
     Not a real interrupt - just handle keyboard input
 */
-INTERRUPT_GEN_MEMBER(pdp1_state::pdp1_interrupt)
+void pdp1_state::pdp1_interrupt(device_t &device)
 {
 	int control_keys;
 	int tw_keys;

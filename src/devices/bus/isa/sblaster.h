@@ -119,7 +119,7 @@ public:
 		void dsp_rbuf_status_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 		void dsp_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-		DECLARE_WRITE_LINE_MEMBER( midi_rx_w ) { device_serial_interface::rx_w((uint8_t)state); }
+		void midi_rx_w(int state) { device_serial_interface::rx_w((uint8_t)state); }
 
 protected:
 		// device-level overrides

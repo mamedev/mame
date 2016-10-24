@@ -16,7 +16,7 @@
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(mitchell_state::get_tile_info)
+void mitchell_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t attr = m_colorram[tile_index];
 	int code = m_videoram[2 * tile_index] + (m_videoram[2 * tile_index + 1] << 8);

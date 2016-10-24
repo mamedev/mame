@@ -42,7 +42,7 @@ void sauro_state::scroll_bg_w(address_space &space, offs_t offset, uint8_t data,
 	m_bg_tilemap->set_scrollx(0, data);
 }
 
-TILE_GET_INFO_MEMBER(sauro_state::get_tile_info_bg)
+void sauro_state::get_tile_info_bg(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index] + ((m_colorram[tile_index] & 0x07) << 8);
 	int color = ((m_colorram[tile_index] >> 4) & 0x0f) | m_palette_bank;
@@ -51,7 +51,7 @@ TILE_GET_INFO_MEMBER(sauro_state::get_tile_info_bg)
 	SET_TILE_INFO_MEMBER(0, code, color, flags);
 }
 
-TILE_GET_INFO_MEMBER(sauro_state::get_tile_info_fg)
+void sauro_state::get_tile_info_fg(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram2[tile_index] + ((m_colorram2[tile_index] & 0x07) << 8);
 	int color = ((m_colorram2[tile_index] >> 4) & 0x0f) | m_palette_bank;

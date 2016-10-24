@@ -105,7 +105,7 @@ inline int vball_state::scanline_to_vcount(int scanline)
 		return (vcount - 0x18) | 0x100;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(vball_state::vball_scanline)
+void vball_state::vball_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 	int screen_height = m_screen->height();

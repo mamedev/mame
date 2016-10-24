@@ -258,7 +258,7 @@ uint32_t hd66421_device::update_screen(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-PALETTE_INIT_MEMBER(hd66421_device, hd66421)
+void hd66421_device::palette_init_hd66421(palette_device &palette)
 {
 	// init palette
 	for (int i = 0; i < 4; i++)

@@ -958,7 +958,7 @@ MACHINE_CONFIG_END
 
 /***************************************************************/
 
-INTERRUPT_GEN_MEMBER(jack_state::joinem_vblank_irq)
+void jack_state::joinem_vblank_irq(device_t &device)
 {
 	if (m_joinem_nmi_enable)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);

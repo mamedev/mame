@@ -89,7 +89,7 @@ public:
 	uint16_t demonwld_dsp_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void demonwld_dsp_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void demonwld_dsp_bio_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	DECLARE_READ_LINE_MEMBER(demonwld_BIO_r);
+	int demonwld_BIO_r();
 	void demonwld_dsp_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	uint16_t samesame_port_6_word_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	uint16_t vimana_system_port_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
@@ -124,10 +124,10 @@ public:
 	void init_toaplan1();
 	void init_demonwld();
 	void init_vimana();
-	TILE_GET_INFO_MEMBER(get_pf1_tile_info);
-	TILE_GET_INFO_MEMBER(get_pf2_tile_info);
-	TILE_GET_INFO_MEMBER(get_pf3_tile_info);
-	TILE_GET_INFO_MEMBER(get_pf4_tile_info);
+	void get_pf1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_pf2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_pf3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_pf4_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void machine_reset_toaplan1();
 	void video_start_toaplan1();
 	void machine_reset_zerowing();
@@ -137,7 +137,7 @@ public:
 
 	void screen_eof_toaplan1(screen_device &screen, bool state);
 	void screen_eof_samesame(screen_device &screen, bool state);
-	INTERRUPT_GEN_MEMBER(toaplan1_interrupt);
+	void toaplan1_interrupt(device_t &device);
 
 	void demonwld_restore_dsp();
 	void toaplan1_create_tilemaps();
@@ -152,7 +152,7 @@ public:
 	void toaplan1_driver_savestate();
 	void demonwld_driver_savestate();
 	void vimana_driver_savestate();
-	DECLARE_WRITE_LINE_MEMBER(toaplan1_reset_callback);
+	void toaplan1_reset_callback(int state);
 	required_device<m68000_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	optional_device<cpu_device> m_dsp;

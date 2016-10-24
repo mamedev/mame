@@ -376,7 +376,7 @@ NOTE: There are several unpopulated locations (denoted by *) for additional rom 
 /**********************************************************************************/
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(deco32_state::interrupt_gen)
+void deco32_state::interrupt_gen(timer_device &timer, void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(ARM_IRQ_LINE, HOLD_LINE);
 }
@@ -1747,7 +1747,7 @@ GFXDECODE_END
 
 /**********************************************************************************/
 
-WRITE_LINE_MEMBER(deco32_state::sound_irq_nslasher)
+void deco32_state::sound_irq_nslasher(int state)
 {
 	/* bit 0 of nslasher_sound_irq specifies IRQ from sound chip */
 	if (state)
@@ -1770,7 +1770,7 @@ void deco32_state::machine_reset_deco32()
 	m_raster_irq_timer = machine().device<timer_device>("int_timer");
 }
 
-INTERRUPT_GEN_MEMBER(deco32_state::deco32_vbl_interrupt)
+void deco32_state::deco32_vbl_interrupt(device_t &device)
 {
 	device.execute().set_input_line(ARM_IRQ_LINE, HOLD_LINE);
 }
@@ -2209,7 +2209,7 @@ static MACHINE_CONFIG_START( dragngun, dragngun_state )
 MACHINE_CONFIG_END
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(dragngun_state::lockload_vbl_irq)
+void dragngun_state::lockload_vbl_irq(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

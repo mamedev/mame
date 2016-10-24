@@ -47,8 +47,8 @@ public:
 
 	void dp8390_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	uint16_t dp8390_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
-	DECLARE_WRITE_LINE_MEMBER( dp8390_cs );
-	DECLARE_WRITE_LINE_MEMBER( dp8390_reset );
+	void dp8390_cs(int state);
+	void dp8390_reset(int state);
 	void recv_cb(uint8_t *buf, int len) override;
 
 protected:

@@ -55,18 +55,18 @@ public:
 	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	/* low-level, bit-based interface */
-	DECLARE_WRITE_LINE_MEMBER( set_rx );
+	void set_rx(int state);
 
 	/* high-level, frame-based interface */
 	int send_frame( uint8_t* data, int length ); /* ret -1 if busy */
 
 	/* control lines */
-	DECLARE_WRITE_LINE_MEMBER( set_cts ); /* 1 = clear-to-send, 0 = busy */
-	DECLARE_WRITE_LINE_MEMBER( set_dcd ); /* 1 = carrier, 0 = no carrier */
+	void set_cts(int state); /* 1 = clear-to-send, 0 = busy */
+	void set_dcd(int state); /* 1 = carrier, 0 = no carrier */
 
 	/* clock */
-	DECLARE_WRITE_LINE_MEMBER( rxc_w );
-	DECLARE_WRITE_LINE_MEMBER( txc_w );
+	void rxc_w(int state);
+	void txc_w(int state);
 
 protected:
 	// device-level overrides
@@ -123,7 +123,7 @@ private:
 	void send_bits( uint32_t data, int len, int zi );
 	void tfifo_push( uint8_t data );
 	void tfifo_terminate( );
-	TIMER_CALLBACK_MEMBER(tfifo_cb);
+	void tfifo_cb(void *ptr, int32_t param);
 	void tfifo_clear( );
 
 	void rfifo_push( uint8_t d );

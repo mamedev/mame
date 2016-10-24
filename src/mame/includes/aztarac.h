@@ -47,8 +47,8 @@ public:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
-	INTERRUPT_GEN_MEMBER(snd_timed_irq);
-	IRQ_CALLBACK_MEMBER(irq_callback);
+	void snd_timed_irq(device_t &device);
+	int irq_callback(device_t &device, int irqline);
 
 	inline void read_vectorram(uint16_t *vectorram, int addr, int *x, int *y, int *c);
 };

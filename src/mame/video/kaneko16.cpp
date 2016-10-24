@@ -99,7 +99,7 @@ uint32_t kaneko16_state::screen_update_kaneko16(screen_device &screen, bitmap_in
 
 /* Berlwall and Gals Panic have an additional hi-color layers */
 
-PALETTE_INIT_MEMBER(kaneko16_berlwall_state,berlwall)
+void kaneko16_berlwall_state::palette_init_berlwall(palette_device &palette)
 {
 	int i;
 

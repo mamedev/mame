@@ -46,7 +46,7 @@ public:
 	void mux_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	void init_pasopia();
-	TIMER_CALLBACK_MEMBER(pio_timer);
+	void pio_timer(void *ptr, int32_t param);
 
 private:
 	uint8_t m_hblank;
@@ -74,7 +74,7 @@ private:
 };
 
 // needed to scan the keyboard, as the pio emulation doesn't do it.
-TIMER_CALLBACK_MEMBER( pasopia_state::pio_timer )
+void pasopia_state::pio_timer(void *ptr, int32_t param)
 {
 	m_pio->port_b_write(keyb_r(generic_space(),0,0xff));
 }

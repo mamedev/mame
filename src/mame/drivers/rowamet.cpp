@@ -43,7 +43,7 @@ public:
 	void mute_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_a);
+	void timer_a(timer_device &timer, void *ptr, int32_t param);
 private:
 	uint8_t m_out_offs;
 	uint8_t m_sndcmd;
@@ -195,7 +195,7 @@ void rowamet_state::machine_reset()
 		m_io[i] = 0;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( rowamet_state::timer_a )
+void rowamet_state::timer_a(timer_device &timer, void *ptr, int32_t param)
 {
 	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // 7446
 	m_out_offs &= 15;

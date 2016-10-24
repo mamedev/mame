@@ -97,7 +97,7 @@ TODO:
 #define MCU_CLOCK           (XTAL_12MHz/4)
 
 
-TIMER_CALLBACK_MEMBER(lkage_state::nmi_callback)
+void lkage_state::nmi_callback(void *ptr, int32_t param)
 {
 	if (m_sound_nmi_enable)
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);

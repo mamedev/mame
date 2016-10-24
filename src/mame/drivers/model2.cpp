@@ -171,7 +171,7 @@ bool model2_state::copro_fifoin_pop(device_t *device, uint32_t *result,uint32_t 
 	return true;
 }
 
-READ_LINE_MEMBER(model2_state::copro_tgp_fifoin_pop_ok)
+int model2_state::copro_tgp_fifoin_pop_ok()
 {
 	if (m_copro_fifoin_num == 0)
 	{
@@ -350,7 +350,7 @@ void model2_state::timers_w(address_space &space, offs_t offset, uint32_t data, 
 	m_timerrun[offset] = 1;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(model2_state::model2_timer_cb)
+void model2_state::model2_timer_cb(timer_device &timer, void *ptr, int32_t param)
 {
 	int tnum = (int)(uintptr_t)ptr;
 	int bit = tnum + 2;
@@ -2172,7 +2172,7 @@ static INPUT_PORTS_START( skytargt )
 INPUT_PORTS_END
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(model2_state::model2_interrupt)
+void model2_state::model2_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -2195,7 +2195,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(model2_state::model2_interrupt)
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(model2_state::model2c_interrupt)
+void model2_state::model2c_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

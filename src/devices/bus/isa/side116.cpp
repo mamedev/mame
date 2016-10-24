@@ -179,7 +179,7 @@ void side116_device::write(address_space &space, offs_t offset, uint8_t data, ui
 	}
 }
 
-WRITE_LINE_MEMBER( side116_device::ide_interrupt )
+void side116_device::ide_interrupt(int state)
 {
 	uint8_t level = m_config->read() & 0x18;
 

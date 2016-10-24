@@ -211,7 +211,7 @@ GFXDECODE_END
 
 /* Interrupt Generators */
 
-TIMER_DEVICE_CALLBACK_MEMBER(deadang_state::main_scanline)
+void deadang_state::main_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -222,7 +222,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(deadang_state::main_scanline)
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE,0xc8/4);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(deadang_state::sub_scanline)
+void deadang_state::sub_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

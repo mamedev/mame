@@ -264,7 +264,7 @@ static GFXDECODE_START( mz80kj )
 	GFXDECODE_ENTRY( "chargen", 0x0000, mz80kj_charlayout, 0, 1 )
 GFXDECODE_END
 
-TIMER_DEVICE_CALLBACK_MEMBER(mz80_state::ne555_tempo_callback)
+void mz80_state::ne555_tempo_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	m_mz80k_tempo_strobe ^= 1;
 }

@@ -25,7 +25,7 @@ int nycaptor_state::nycaptor_spot(  )
 		return 0;
 }
 
-TILE_GET_INFO_MEMBER(nycaptor_state::get_tile_info)
+void nycaptor_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int pal = m_videoram[tile_index * 2 + 1] & 0x0f;
 	tileinfo.category = (m_videoram[tile_index * 2 + 1] & 0x30) >> 4;

@@ -69,7 +69,7 @@ public:
 
 	void kbd_put(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE_LINE_MEMBER( serial_rx_callback );
+	void serial_rx_callback(int state);
 	virtual void rcv_complete() override;
 	virtual void tra_callback() override;
 	virtual void tra_complete() override;
@@ -98,13 +98,13 @@ public:
 	uint8_t serial_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void serial_speed_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_PALETTE_INIT( ie15 );
+	void palette_init_ie15(palette_device &palette);
 
 	static const device_timer_id TIMER_HBLANK = 0;
 
 	void scanline_callback();
 private:
-	TIMER_CALLBACK_MEMBER(ie15_beepoff);
+	void ie15_beepoff(void *ptr, int32_t param);
 	void update_leds();
 	uint32_t draw_scanline(uint32_t *p, uint16_t offset, uint8_t scanline);
 	rectangle m_tmpclip;
@@ -219,7 +219,7 @@ void ie15_state::mem_addr_hi_w(address_space &space, offs_t offset, uint8_t data
 		m_video.ptr2 = tmp;
 }
 
-TIMER_CALLBACK_MEMBER(ie15_state::ie15_beepoff)
+void ie15_state::ie15_beepoff(void *ptr, int32_t param)
 {
 	m_beeper->set_state(0);
 }
@@ -309,7 +309,7 @@ void ie15_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 	}
 }
 
-WRITE_LINE_MEMBER( ie15_state::serial_rx_callback )
+void ie15_state::serial_rx_callback(int state)
 {
 	device_serial_interface::rx_w(state);
 }
@@ -651,7 +651,7 @@ static GFXDECODE_START( ie15 )
 	GFXDECODE_ENTRY("chargen", 0x0000, ie15_charlayout, 0, 1)
 GFXDECODE_END
 
-PALETTE_INIT_MEMBER( ie15_state, ie15 )
+void ie15_state::palette_init_ie15(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t::black()); // black
 	palette.set_pen_color(1, 0x00, 0xc0, 0x00); // green

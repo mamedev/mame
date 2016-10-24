@@ -37,8 +37,8 @@ protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	TIMER_CALLBACK_MEMBER( latch_callback );
-	TIMER_CALLBACK_MEMBER( irq_clear );
+	void latch_callback(void *ptr, int32_t param);
+	void irq_clear(void *ptr, int32_t param);
 private:
 	// internal state
 	required_device<mb88_cpu_device> m_cpu;

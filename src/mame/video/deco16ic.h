@@ -148,11 +148,11 @@ private:
 	int m_pf1_colourmask, m_pf2_colourmask;
 	int m_pf12_8x8_gfx_bank, m_pf12_16x16_gfx_bank;
 
-	TILEMAP_MAPPER_MEMBER(deco16_scan_rows);
-	TILE_GET_INFO_MEMBER(get_pf2_tile_info);
-	TILE_GET_INFO_MEMBER(get_pf1_tile_info);
-	TILE_GET_INFO_MEMBER(get_pf2_tile_info_b);
-	TILE_GET_INFO_MEMBER(get_pf1_tile_info_b);
+	tilemap_memory_index deco16_scan_rows(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	void get_pf2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_pf1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_pf2_tile_info_b(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_pf1_tile_info_b(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	required_device<gfxdecode_device> m_gfxdecode;
 };
 

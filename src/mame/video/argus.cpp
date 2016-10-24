@@ -123,7 +123,7 @@ BG0 palette intensity ( $C47F, $C4FF )
   Callbacks for the tilemap code
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(argus_state::argus_get_tx_tile_info)
+void argus_state::argus_get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t hi, lo;
 
@@ -138,7 +138,7 @@ TILE_GET_INFO_MEMBER(argus_state::argus_get_tx_tile_info)
 			TILE_FLIPYX((hi & 0x30) >> 4));
 }
 
-TILE_GET_INFO_MEMBER(argus_state::argus_get_bg0_tile_info)
+void argus_state::argus_get_bg0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t hi, lo;
 
@@ -153,7 +153,7 @@ TILE_GET_INFO_MEMBER(argus_state::argus_get_bg0_tile_info)
 			TILE_FLIPYX((hi & 0x30) >> 4));
 }
 
-TILE_GET_INFO_MEMBER(argus_state::argus_get_bg1_tile_info)
+void argus_state::argus_get_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t hi, lo;
 
@@ -168,7 +168,7 @@ TILE_GET_INFO_MEMBER(argus_state::argus_get_bg1_tile_info)
 			TILE_FLIPYX((hi & 0x30) >> 4));
 }
 
-TILE_GET_INFO_MEMBER(argus_state::valtric_get_tx_tile_info)
+void argus_state::valtric_get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t hi, lo;
 
@@ -183,7 +183,7 @@ TILE_GET_INFO_MEMBER(argus_state::valtric_get_tx_tile_info)
 			TILE_FLIPYX((hi & 0x30) >> 4));
 }
 
-TILE_GET_INFO_MEMBER(argus_state::valtric_get_bg_tile_info)
+void argus_state::valtric_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t hi, lo;
 
@@ -198,7 +198,7 @@ TILE_GET_INFO_MEMBER(argus_state::valtric_get_bg_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(argus_state::butasan_get_tx_tile_info)
+void argus_state::butasan_get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t hi, lo;
 
@@ -214,7 +214,7 @@ TILE_GET_INFO_MEMBER(argus_state::butasan_get_tx_tile_info)
 			TILE_FLIPYX((hi & 0x30) >> 4));
 }
 
-TILE_GET_INFO_MEMBER(argus_state::butasan_get_bg0_tile_info)
+void argus_state::butasan_get_bg0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t hi, lo;
 	int attrib;
@@ -232,7 +232,7 @@ TILE_GET_INFO_MEMBER(argus_state::butasan_get_bg0_tile_info)
 			TILE_FLIPYX((hi & 0x30) >> 4));
 }
 
-TILE_GET_INFO_MEMBER(argus_state::butasan_get_bg1_tile_info)
+void argus_state::butasan_get_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attrib, tile;
 

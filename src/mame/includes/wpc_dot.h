@@ -59,9 +59,9 @@ public:
 	void init_wpc_dot();
 	uint8_t ram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(wpcsnd_reply_w);
-	DECLARE_WRITE_LINE_MEMBER(wpc_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(wpc_firq_w);
+	void wpcsnd_reply_w(int state);
+	void wpc_irq_w(int state);
+	void wpc_firq_w(int state);
 	uint8_t wpc_sound_ctrl_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void wpc_sound_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t wpc_sound_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);

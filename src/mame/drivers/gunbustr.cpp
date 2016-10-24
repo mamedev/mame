@@ -65,7 +65,7 @@ void gunbustr_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	}
 }
 
-INTERRUPT_GEN_MEMBER(gunbustr_state::gunbustr_interrupt)
+void gunbustr_state::gunbustr_interrupt(device_t &device)
 {
 	timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(200000-500), TIMER_GUNBUSTR_INTERRUPT5);
 	device.execute().set_input_line(4, HOLD_LINE);

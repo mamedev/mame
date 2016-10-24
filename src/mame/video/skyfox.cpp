@@ -76,7 +76,7 @@ static const res_net_info skyfox_net_info =
 	}
 };
 
-PALETTE_INIT_MEMBER(skyfox_state, skyfox)
+void skyfox_state::palette_init_skyfox(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	std::vector<rgb_t> rgb;

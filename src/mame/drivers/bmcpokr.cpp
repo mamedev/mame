@@ -74,13 +74,13 @@ public:
 	uint16_t m_irq_enable;
 	void irq_enable_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void irq_ack_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
+	void interrupt(timer_device &timer, void *ptr, int32_t param);
 
 	// Video
 	tilemap_t *m_tilemap_1;
 	tilemap_t *m_tilemap_2;
-	TILE_GET_INFO_MEMBER(get_t1_tile_info);
-	TILE_GET_INFO_MEMBER(get_t2_tile_info);
+	void get_t1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_t2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void videoram_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void videoram_2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
@@ -122,13 +122,13 @@ void bmcpokr_state::videoram_2_w(address_space &space, offs_t offset, uint16_t d
 	m_tilemap_2->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(bmcpokr_state::get_t1_tile_info)
+void bmcpokr_state::get_t1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t data = m_videoram_1[tile_index];
 	SET_TILE_INFO_MEMBER(0, data, 0, (data & 0x8000) ? TILE_FLIPX : 0);
 }
 
-TILE_GET_INFO_MEMBER(bmcpokr_state::get_t2_tile_info)
+void bmcpokr_state::get_t2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t data = m_videoram_2[tile_index];
 	SET_TILE_INFO_MEMBER(0, data, 0, (data & 0x8000) ? TILE_FLIPX : 0);
@@ -779,7 +779,7 @@ GFXDECODE_END
                                 Machine Drivers
 ***************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(bmcpokr_state::interrupt)
+void bmcpokr_state::interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

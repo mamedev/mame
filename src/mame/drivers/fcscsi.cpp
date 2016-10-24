@@ -89,7 +89,7 @@ fcscsi1_state(const machine_config &mconfig, device_type type, const char *tag) 
 	uint8_t tcr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void tcr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	IRQ_CALLBACK_MEMBER(maincpu_irq_acknowledge_callback);
+	int maincpu_irq_acknowledge_callback(device_t &device, int irqline);
 
 	//dmac
 	void dma_end(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -298,7 +298,7 @@ void fcscsi1_state::update_irq_to_maincpu() {
 	}
 }
 
-IRQ_CALLBACK_MEMBER(fcscsi1_state::maincpu_irq_acknowledge_callback)
+int fcscsi1_state::maincpu_irq_acknowledge_callback(device_t &device, int irqline)
 {
 	// We immediately update the interrupt presented to the CPU, so that it doesn't
 	// end up retrying the same interrupt over and over. We then return the appropriate vector.

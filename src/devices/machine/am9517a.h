@@ -77,14 +77,14 @@ public:
 	virtual uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	virtual void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( hack_w );
-	DECLARE_WRITE_LINE_MEMBER( ready_w );
-	DECLARE_WRITE_LINE_MEMBER( eop_w );
+	void hack_w(int state);
+	void ready_w(int state);
+	void eop_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( dreq0_w );
-	DECLARE_WRITE_LINE_MEMBER( dreq1_w );
-	DECLARE_WRITE_LINE_MEMBER( dreq2_w );
-	DECLARE_WRITE_LINE_MEMBER( dreq3_w );
+	void dreq0_w(int state);
+	void dreq1_w(int state);
+	void dreq2_w(int state);
+	void dreq3_w(int state);
 
 protected:
 	// device-level overrides

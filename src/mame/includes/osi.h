@@ -57,12 +57,12 @@ public:
 	uint8_t keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void keyboard_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( cassette_tx );
-	DECLARE_WRITE_LINE_MEMBER( write_cassette_clock );
+	void cassette_tx(int state);
+	void write_cassette_clock(int state);
 
 	void floppy_index_callback(floppy_image_device *floppy, int state);
 
-	DECLARE_PALETTE_INIT(osi630);
+	void palette_init_osi630(palette_device &palette);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -135,7 +135,7 @@ public:
 	uint8_t osi470_pia_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void osi470_pia_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void osi470_pia_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( osi470_pia_cb2_w );
+	void osi470_pia_cb2_w(int state);
 
 protected:
 	virtual void machine_start() override;

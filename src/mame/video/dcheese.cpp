@@ -27,7 +27,7 @@
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(dcheese_state, dcheese)
+void dcheese_state::palette_init_dcheese(palette_device &palette)
 {
 	const uint16_t *src = (uint16_t *)memregion("user1")->base();
 	int i;

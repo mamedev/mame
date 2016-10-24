@@ -30,7 +30,7 @@
  *
  *************************************/
 
-IRQ_CALLBACK_MEMBER(aztarac_state::irq_callback)
+int aztarac_state::irq_callback(device_t &device, int irqline)
 {
 	return 0xc;
 }

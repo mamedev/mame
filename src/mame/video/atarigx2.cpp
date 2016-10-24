@@ -33,7 +33,7 @@
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(atarigx2_state::get_alpha_tile_info)
+void atarigx2_state::get_alpha_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t data = tilemap.basemem_read(tile_index);
 	int code = data & 0xfff;
@@ -43,7 +43,7 @@ TILE_GET_INFO_MEMBER(atarigx2_state::get_alpha_tile_info)
 }
 
 
-TILE_GET_INFO_MEMBER(atarigx2_state::get_playfield_tile_info)
+void atarigx2_state::get_playfield_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t data = tilemap.basemem_read(tile_index);
 	int code = (m_playfield_tile_bank << 12) | (data & 0xfff);
@@ -53,7 +53,7 @@ TILE_GET_INFO_MEMBER(atarigx2_state::get_playfield_tile_info)
 }
 
 
-TILEMAP_MAPPER_MEMBER(atarigx2_state::atarigx2_playfield_scan)
+tilemap_memory_index atarigx2_state::atarigx2_playfield_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	int bank = 1 - (col / (num_cols / 2));
 	return bank * (num_rows * num_cols / 2) + row * (num_cols / 2) + (col % (num_cols / 2));

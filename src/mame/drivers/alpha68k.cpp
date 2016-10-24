@@ -2104,7 +2104,7 @@ static MACHINE_CONFIG_START( alpha68k_I, alpha68k_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
-INTERRUPT_GEN_MEMBER(alpha68k_state::alpha68k_sound_nmi)
+void alpha68k_state::alpha68k_sound_nmi(device_t &device)
 {
 	if(m_sound_nmi_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);

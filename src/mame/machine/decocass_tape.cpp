@@ -233,7 +233,7 @@ const char *decocass_tape_device::describe_state()
     to increment/decrement the tape location
 -------------------------------------------------*/
 
-TIMER_CALLBACK_MEMBER( decocass_tape_device::tape_clock_callback )
+void decocass_tape_device::tape_clock_callback(void *ptr, int32_t param)
 {
 	/* advance by one clock in the desired direction */
 	if (m_speed < 0 && m_clockpos > 0)

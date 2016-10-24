@@ -33,9 +33,9 @@ public:
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	DECLARE_WRITE_LINE_MEMBER( ptm_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( acia_irq_w );
-	DECLARE_WRITE_LINE_MEMBER( write_acia_clock );
+	void ptm_irq_w(int state);
+	void acia_irq_w(int state);
+	void write_acia_clock(int state);
 
 protected:
 	// device-level overrides

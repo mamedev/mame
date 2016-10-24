@@ -10,7 +10,7 @@
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(nova2001_state,nova2001)
+void nova2001_state::palette_init_nova2001(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -50,7 +50,7 @@ PALETTE_INIT_MEMBER(nova2001_state,nova2001)
 	}
 }
 
-PALETTE_DECODER_MEMBER( nova2001_state, BBGGRRII )
+rgb_t nova2001_state::BBGGRRII_decoder(uint32_t raw)
 {
 	uint8_t i = raw & 3;
 	uint8_t r = (raw >> 0) & 0x0c;
@@ -89,7 +89,7 @@ void nova2001_state::ninjakun_paletteram_w(address_space &space, offs_t offset, 
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(nova2001_state::nova2001_get_bg_tile_info)
+void nova2001_state::nova2001_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_bg_videoram[tile_index];
 	int color = m_bg_videoram[tile_index + 0x400] & 0x0f;
@@ -97,7 +97,7 @@ TILE_GET_INFO_MEMBER(nova2001_state::nova2001_get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(2, code, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(nova2001_state::nova2001_get_fg_tile_info)
+void nova2001_state::nova2001_get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_fg_videoram[tile_index + 0x400];
 	int code = m_fg_videoram[tile_index];
@@ -108,7 +108,7 @@ TILE_GET_INFO_MEMBER(nova2001_state::nova2001_get_fg_tile_info)
 	tileinfo.category = (attr & 0x10) >> 4;
 }
 
-TILE_GET_INFO_MEMBER(nova2001_state::ninjakun_get_bg_tile_info)
+void nova2001_state::ninjakun_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr  = m_bg_videoram[tile_index+0x400];
 	int code = m_bg_videoram[tile_index] + ((attr & 0xc0) << 2);
@@ -117,7 +117,7 @@ TILE_GET_INFO_MEMBER(nova2001_state::ninjakun_get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(2, code, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(nova2001_state::ninjakun_get_fg_tile_info)
+void nova2001_state::ninjakun_get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_fg_videoram[tile_index+0x400];
 	int code = m_fg_videoram[tile_index] + ((attr & 0x20) << 3);
@@ -128,7 +128,7 @@ TILE_GET_INFO_MEMBER(nova2001_state::ninjakun_get_fg_tile_info)
 	tileinfo.category = (attr & 0x10) >> 4;
 }
 
-TILE_GET_INFO_MEMBER(nova2001_state::pkunwar_get_bg_tile_info)
+void nova2001_state::pkunwar_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_bg_videoram[tile_index + 0x400];
 	int code = m_bg_videoram[tile_index] + ((attr & 0x07) << 8);
@@ -139,7 +139,7 @@ TILE_GET_INFO_MEMBER(nova2001_state::pkunwar_get_bg_tile_info)
 	tileinfo.category = (attr & 0x08) >> 3;
 }
 
-TILE_GET_INFO_MEMBER(nova2001_state::raiders5_get_bg_tile_info)
+void nova2001_state::raiders5_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_bg_videoram[tile_index+0x400];
 	int code = m_bg_videoram[tile_index] + ((attr & 0x01) << 8);
@@ -148,7 +148,7 @@ TILE_GET_INFO_MEMBER(nova2001_state::raiders5_get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(2, code, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(nova2001_state::raiders5_get_fg_tile_info)
+void nova2001_state::raiders5_get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_fg_videoram[tile_index];
 	int color = (m_fg_videoram[tile_index + 0x400] & 0xf0) >> 4;

@@ -257,26 +257,26 @@ public:
 	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( via_irq_w );
+	void via_irq_w(int state);
 	void via_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t via_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void via_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( via_ca2_w );
-	DECLARE_WRITE_LINE_MEMBER( via_cb2_w );
+	void via_ca2_w(int state);
+	void via_cb2_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( pia1_irqa_w );
-	DECLARE_WRITE_LINE_MEMBER( pia1_irqb_w );
+	void pia1_irqa_w(int state);
+	void pia1_irqb_w(int state);
 	uint8_t pia1_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t pia1_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void pia1_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( pia1_ca2_w );
+	void pia1_ca2_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( pia2_irqa_w );
-	DECLARE_WRITE_LINE_MEMBER( pia2_irqb_w );
+	void pia2_irqa_w(int state);
+	void pia2_irqb_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( user_diag_w );
+	void user_diag_w(int state);
 
-	TIMER_DEVICE_CALLBACK_MEMBER( sync_tick );
+	void sync_tick(timer_device &timer, void *ptr, int32_t param);
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER( cbm_pet );
 
@@ -1108,7 +1108,7 @@ INPUT_PORTS_END
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
-WRITE_LINE_MEMBER( pet_state::via_irq_w )
+void pet_state::via_irq_w(int state)
 {
 	m_via_irq = state;
 
@@ -1186,12 +1186,12 @@ void pet_state::via_pb_w(address_space &space, offs_t offset, uint8_t data, uint
 	m_cassette2->motor_w(BIT(data, 4));
 }
 
-WRITE_LINE_MEMBER( pet_state::via_ca2_w )
+void pet_state::via_ca2_w(int state)
 {
 	m_graphic = state;
 }
 
-WRITE_LINE_MEMBER( pet_state::via_cb2_w )
+void pet_state::via_cb2_w(int state)
 {
 	m_via_cb2 = state;
 	update_speaker();
@@ -1200,14 +1200,14 @@ WRITE_LINE_MEMBER( pet_state::via_cb2_w )
 }
 
 
-WRITE_LINE_MEMBER( pet_state::pia1_irqa_w )
+void pet_state::pia1_irqa_w(int state)
 {
 	m_pia1a_irq = state;
 
 	check_interrupts();
 }
 
-WRITE_LINE_MEMBER( pet_state::pia1_irqb_w )
+void pet_state::pia1_irqb_w(int state)
 {
 	m_pia1b_irq = state;
 
@@ -1316,7 +1316,7 @@ uint8_t pet2001b_state::pia1_pb_r(address_space &space, offs_t offset, uint8_t m
 	return data;
 }
 
-WRITE_LINE_MEMBER( pet_state::pia1_ca2_w )
+void pet_state::pia1_ca2_w(int state)
 {
 	m_ieee->eoi_w(state);
 
@@ -1324,21 +1324,21 @@ WRITE_LINE_MEMBER( pet_state::pia1_ca2_w )
 }
 
 
-WRITE_LINE_MEMBER( pet_state::pia2_irqa_w )
+void pet_state::pia2_irqa_w(int state)
 {
 	m_pia2a_irq = state;
 
 	check_interrupts();
 }
 
-WRITE_LINE_MEMBER( pet_state::pia2_irqb_w )
+void pet_state::pia2_irqb_w(int state)
 {
 	m_pia2b_irq = state;
 
 	check_interrupts();
 }
 
-WRITE_LINE_MEMBER( pet_state::user_diag_w )
+void pet_state::user_diag_w(int state)
 {
 	m_user_diag = state;
 }
@@ -1353,7 +1353,7 @@ WRITE_LINE_MEMBER( pet_state::user_diag_w )
 //  TIMER_DEVICE_CALLBACK( sync_tick )
 //-------------------------------------------------
 
-TIMER_DEVICE_CALLBACK_MEMBER( pet_state::sync_tick )
+void pet_state::sync_tick(timer_device &timer, void *ptr, int32_t param)
 {
 	m_sync = !m_sync;
 

@@ -18,7 +18,7 @@ Use Player 1 joystick and button, then press START1 to go to next screen.
 #include "includes/higemaru.h"
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(higemaru_state::higemaru_scanline)
+void higemaru_state::higemaru_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

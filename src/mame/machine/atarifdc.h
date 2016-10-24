@@ -17,7 +17,7 @@ public:
 
 	uint8_t serin_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void serout_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( pia_cb2_w );
+	void pia_cb2_w(int state);
 	void atari_load_proc(device_image_interface &image, bool is_created);
 
 protected:

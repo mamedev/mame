@@ -31,7 +31,7 @@ public:
 
 	bool is_primary() { return m_is_primary; }
 
-	WRITE_LINE_MEMBER(pc_cpu_line);
+	void pc_cpu_line(int state);
 
 protected:
 	// device-level overrides

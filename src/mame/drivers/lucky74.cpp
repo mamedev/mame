@@ -909,7 +909,7 @@ void lucky74_state::lamps_b_w(address_space &space, offs_t offset, uint8_t data,
 *    Interrupts Gen     *
 ************************/
 
-INTERRUPT_GEN_MEMBER(lucky74_state::nmi_interrupt)
+void lucky74_state::nmi_interrupt(device_t &device)
 {
 	if ((m_ym2149_portb & 0x10) == 0)   /* ym2149 portB bit 4 trigger the NMI */
 	{
@@ -1408,7 +1408,7 @@ void lucky74_state::sound_start()
 	m_adpcm_busy_line = 0x01;    /* free and ready */
 }
 
-WRITE_LINE_MEMBER(lucky74_state::lucky74_adpcm_int)
+void lucky74_state::lucky74_adpcm_int(int state)
 {
 	if (m_adpcm_reg[05] == 0x01) /* register 0x05 (bit 0 activated), trigger the sample */
 	{

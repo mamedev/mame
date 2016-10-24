@@ -260,7 +260,7 @@ void gladiatr_state::gladiator_int_control_w(address_space &space, offs_t offset
 	/* bit 0   : ??                    */
 }
 /* YM2203 IRQ */
-WRITE_LINE_MEMBER(gladiatr_state::gladiator_ym_irq)
+void gladiatr_state::gladiator_ym_irq(int state)
 {
 	/* NMI IRQ is not used by gladiator sound program */
 	m_subcpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);

@@ -74,17 +74,17 @@ public:
 	uint8_t helifire_8035_p2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void n8080_dac_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void helifire_sound_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(n8080_inte_callback);
+	void n8080_inte_callback(int state);
 	void n8080_status_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
 	void machine_reset_spacefev();
 	void video_start_spacefev();
-	DECLARE_PALETTE_INIT(n8080);
+	void palette_init_n8080(palette_device &palette);
 	void machine_reset_sheriff();
 	void video_start_sheriff();
 	void machine_reset_helifire();
 	void video_start_helifire();
-	DECLARE_PALETTE_INIT(helifire);
+	void palette_init_helifire(palette_device &palette);
 	void sound_start_spacefev();
 	void sound_reset_spacefev();
 	void sound_start_sheriff();
@@ -97,11 +97,11 @@ public:
 	uint32_t screen_update_sheriff(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_helifire(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_helifire(screen_device &screen, bool state);
-	TIMER_CALLBACK_MEMBER(spacefev_stop_red_cannon);
-	TIMER_DEVICE_CALLBACK_MEMBER(rst1_tick);
-	TIMER_DEVICE_CALLBACK_MEMBER(rst2_tick);
-	TIMER_DEVICE_CALLBACK_MEMBER(spacefev_vco_voltage_timer);
-	TIMER_DEVICE_CALLBACK_MEMBER(helifire_dac_volume_timer);
+	void spacefev_stop_red_cannon(void *ptr, int32_t param);
+	void rst1_tick(timer_device &timer, void *ptr, int32_t param);
+	void rst2_tick(timer_device &timer, void *ptr, int32_t param);
+	void spacefev_vco_voltage_timer(timer_device &timer, void *ptr, int32_t param);
+	void helifire_dac_volume_timer(timer_device &timer, void *ptr, int32_t param);
 	void spacefev_start_red_cannon(  );
 	void helifire_next_line(  );
 	void spacefev_update_SN76477_status();
@@ -109,15 +109,15 @@ public:
 	void update_SN76477_status();
 	void start_mono_flop( int n, const attotime &expire );
 	void stop_mono_flop( int n );
-	TIMER_CALLBACK_MEMBER( stop_mono_flop_callback );
+	void stop_mono_flop_callback(void *ptr, int32_t param);
 	void spacefev_sound_pins_changed();
 	void sheriff_sound_pins_changed();
 	void helifire_sound_pins_changed();
 	void sound_pins_changed();
 	void delayed_sound_1( int data );
-	TIMER_CALLBACK_MEMBER( delayed_sound_1_callback );
+	void delayed_sound_1_callback(void *ptr, int32_t param);
 	void delayed_sound_2( int data );
-	TIMER_CALLBACK_MEMBER( delayed_sound_2_callback );
+	void delayed_sound_2_callback(void *ptr, int32_t param);
 };
 
 /*----------- defined in audio/n8080.c -----------*/

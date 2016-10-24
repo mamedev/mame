@@ -86,23 +86,23 @@ public:
 
 	uint8_t apple3_memory_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void apple3_memory_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(apple3_sync_w);
+	void apple3_sync_w(int state);
 	uint8_t apple3_c0xx_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void apple3_c0xx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_apple3();
 	void machine_reset_apple3();
 	void video_start_apple3();
 	uint32_t screen_update_apple3(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(apple3_interrupt);
-	TIMER_CALLBACK_MEMBER(scanstart_cb);
-	TIMER_CALLBACK_MEMBER(scanend_cb);
-	DECLARE_WRITE_LINE_MEMBER(apple3_acia_irq_func);
+	void apple3_interrupt(timer_device &timer, void *ptr, int32_t param);
+	void scanstart_cb(void *ptr, int32_t param);
+	void scanend_cb(void *ptr, int32_t param);
+	void apple3_acia_irq_func(int state);
 	void apple3_via_0_out_a(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void apple3_via_0_out_b(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void apple3_via_1_out_a(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void apple3_via_1_out_b(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(apple3_via_0_irq_func);
-	DECLARE_WRITE_LINE_MEMBER(apple3_via_1_irq_func);
+	void apple3_via_0_irq_func(int state);
+	void apple3_via_1_irq_func(int state);
 	void apple3_write_charmem();
 	void text40(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void text80(bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -115,18 +115,18 @@ public:
 	void apple3_update_memory();
 	void apple3_via_out(uint8_t *var, uint8_t data);
 	uint8_t *apple3_get_indexed_addr(offs_t offset);
-	TIMER_DEVICE_CALLBACK_MEMBER(apple3_c040_tick);
-	DECLARE_PALETTE_INIT(apple3);
+	void apple3_c040_tick(timer_device &timer, void *ptr, int32_t param);
+	void palette_init_apple3(palette_device &palette);
 	void apple3_irq_update();
-	DECLARE_READ_LINE_MEMBER(ay3600_shift_r);
-	DECLARE_READ_LINE_MEMBER(ay3600_control_r);
-	DECLARE_WRITE_LINE_MEMBER(ay3600_data_ready_w);
+	int ay3600_shift_r();
+	int ay3600_control_r();
+	void ay3600_data_ready_w(int state);
 	void apple3_postload();
-	TIMER_DEVICE_CALLBACK_MEMBER(paddle_timer);
+	void paddle_timer(timer_device &timer, void *ptr, int32_t param);
 	void pdl_handler(int offset);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
-	DECLARE_WRITE_LINE_MEMBER(a2bus_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(a2bus_nmi_w);
+	void a2bus_irq_w(int state);
+	void a2bus_nmi_w(int state);
 
 	// these need to be public for now
 	uint32_t m_flags;

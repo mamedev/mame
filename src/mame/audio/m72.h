@@ -25,7 +25,7 @@ public:
 		Z80_CLEAR
 	};
 
-	WRITE_LINE_MEMBER( ym2151_irq_handler );
+	void ym2151_irq_handler(int state);
 	void sound_command_byte_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void sound_command_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void sound_irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -58,7 +58,7 @@ private:
 	optional_device<dac_byte_interface> m_dac;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	TIMER_CALLBACK_MEMBER( setvector_callback );
+	void setvector_callback(void *ptr, int32_t param);
 };
 
 extern const device_type M72;

@@ -182,7 +182,7 @@ void i8244_device::device_reset()
 }
 
 
-PALETTE_INIT_MEMBER(i8244_device, i8244)
+void i8244_device::palette_init_i8244(palette_device &palette)
 {
 	static const uint8_t i8244_colors[3*16] =
 	{
@@ -358,7 +358,7 @@ void i8244_device::write(address_space &space, offs_t offset, uint8_t data, uint
 }
 
 
-READ_LINE_MEMBER(i8244_device::vblank)
+int i8244_device::vblank()
 {
 	if ( m_screen->vpos() > m_start_vpos && m_screen->vpos() < m_start_vblank )
 	{
@@ -368,7 +368,7 @@ READ_LINE_MEMBER(i8244_device::vblank)
 }
 
 
-READ_LINE_MEMBER(i8244_device::hblank)
+int i8244_device::hblank()
 {
 	int hpos = m_screen->hpos();
 	int vpos = m_screen->vpos();

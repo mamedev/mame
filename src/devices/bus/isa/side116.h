@@ -38,7 +38,7 @@ public:
 
 	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( ide_interrupt );
+	void ide_interrupt(int state);
 
 protected:
 	// device-level overrides

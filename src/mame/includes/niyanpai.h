@@ -98,7 +98,7 @@ public:
 	void update_pixel(int vram, int x, int y);
 	void gfxdraw(int vram);
 
-	INTERRUPT_GEN_MEMBER(interrupt);
+	void interrupt(device_t &device);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;

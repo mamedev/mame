@@ -152,8 +152,8 @@ public:
 	void external_iop_write(uint32_t address, uint32_t data);
 	void external_dma_write(uint32_t address, uint64_t data);
 
-	TIMER_CALLBACK_MEMBER(sharc_iop_delayed_write_callback);
-	TIMER_CALLBACK_MEMBER(sharc_dma_callback);
+	void sharc_iop_delayed_write_callback(void *ptr, int32_t param);
+	void sharc_dma_callback(void *ptr, int32_t param);
 
 	void sharc_cfunc_unimplemented();
 	void sharc_cfunc_read_iop();

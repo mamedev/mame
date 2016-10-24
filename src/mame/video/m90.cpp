@@ -74,20 +74,20 @@ inline void m90_state::dynablsb_get_tile_info(tile_data &tileinfo,int tile_index
 			tileinfo.category = (color & 0x30) ? 1 : 0;
 }
 
-TILE_GET_INFO_MEMBER(m90_state::get_pf1_tile_info){ get_tile_info(tileinfo,tile_index,0,0x3); }
-TILE_GET_INFO_MEMBER(m90_state::get_pf1w_tile_info){ get_tile_info(tileinfo,tile_index,0,0x2); }
-TILE_GET_INFO_MEMBER(m90_state::get_pf2_tile_info){ get_tile_info(tileinfo,tile_index,1,0x3); }
-TILE_GET_INFO_MEMBER(m90_state::get_pf2w_tile_info){ get_tile_info(tileinfo,tile_index,1,0x2); }
+void m90_state::get_pf1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ get_tile_info(tileinfo,tile_index,0,0x3); }
+void m90_state::get_pf1w_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ get_tile_info(tileinfo,tile_index,0,0x2); }
+void m90_state::get_pf2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ get_tile_info(tileinfo,tile_index,1,0x3); }
+void m90_state::get_pf2w_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ get_tile_info(tileinfo,tile_index,1,0x2); }
 
-TILE_GET_INFO_MEMBER(m90_state::bomblord_get_pf1_tile_info){ bomblord_get_tile_info(tileinfo,tile_index,0); }
-TILE_GET_INFO_MEMBER(m90_state::bomblord_get_pf1w_tile_info){ bomblord_get_tile_info(tileinfo,tile_index,0); }
-TILE_GET_INFO_MEMBER(m90_state::bomblord_get_pf2_tile_info){ bomblord_get_tile_info(tileinfo,tile_index,2); }
-TILE_GET_INFO_MEMBER(m90_state::bomblord_get_pf2w_tile_info){ bomblord_get_tile_info(tileinfo,tile_index,2); }
+void m90_state::bomblord_get_pf1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ bomblord_get_tile_info(tileinfo,tile_index,0); }
+void m90_state::bomblord_get_pf1w_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ bomblord_get_tile_info(tileinfo,tile_index,0); }
+void m90_state::bomblord_get_pf2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ bomblord_get_tile_info(tileinfo,tile_index,2); }
+void m90_state::bomblord_get_pf2w_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ bomblord_get_tile_info(tileinfo,tile_index,2); }
 
-TILE_GET_INFO_MEMBER(m90_state::dynablsb_get_pf1_tile_info){ dynablsb_get_tile_info(tileinfo,tile_index,0); }
-TILE_GET_INFO_MEMBER(m90_state::dynablsb_get_pf1w_tile_info){ dynablsb_get_tile_info(tileinfo,tile_index,0); }
-TILE_GET_INFO_MEMBER(m90_state::dynablsb_get_pf2_tile_info){ dynablsb_get_tile_info(tileinfo,tile_index,2); }
-TILE_GET_INFO_MEMBER(m90_state::dynablsb_get_pf2w_tile_info){ dynablsb_get_tile_info(tileinfo,tile_index,2); }
+void m90_state::dynablsb_get_pf1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ dynablsb_get_tile_info(tileinfo,tile_index,0); }
+void m90_state::dynablsb_get_pf1w_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ dynablsb_get_tile_info(tileinfo,tile_index,0); }
+void m90_state::dynablsb_get_pf2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ dynablsb_get_tile_info(tileinfo,tile_index,2); }
+void m90_state::dynablsb_get_pf2w_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ dynablsb_get_tile_info(tileinfo,tile_index,2); }
 
 void m90_state::video_start()
 {

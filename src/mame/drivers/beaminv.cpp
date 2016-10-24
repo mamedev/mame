@@ -85,7 +85,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_beaminv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(interrupt_callback);
+	void interrupt_callback(void *ptr, int32_t param);
 	void create_interrupt_timer();
 	void start_interrupt_timer();
 };
@@ -105,7 +105,7 @@ public:
 static const int interrupt_lines[INTERRUPTS_PER_FRAME] = { 0x00, 0x80 };
 
 
-TIMER_CALLBACK_MEMBER(beaminv_state::interrupt_callback)
+void beaminv_state::interrupt_callback(void *ptr, int32_t param)
 {
 	int interrupt_number = param;
 	int next_interrupt_number;

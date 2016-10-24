@@ -74,7 +74,7 @@ public:
 	// comms from card 2 (oscillator parameter writes)
 	mcms_device *get_engine(void);
 
-	DECLARE_WRITE_LINE_MEMBER(irq_w);
+	void irq_w(int state);
 
 	required_device<mcms_device> m_mcms;
 

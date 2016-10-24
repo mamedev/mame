@@ -334,7 +334,7 @@ void mc68328_device::poll_port_d_interrupts()
 	}
 }
 
-WRITE_LINE_MEMBER( mc68328_device::set_penirq_line )
+void mc68328_device::set_penirq_line(int state)
 {
 	if (state)
 	{
@@ -465,17 +465,17 @@ void mc68328_device::timer_compare_event(uint32_t index)
 	}
 }
 
-TIMER_CALLBACK_MEMBER( mc68328_device::timer1_hit )
+void mc68328_device::timer1_hit(void *ptr, int32_t param)
 {
 	timer_compare_event(0);
 }
 
-TIMER_CALLBACK_MEMBER( mc68328_device::timer2_hit )
+void mc68328_device::timer2_hit(void *ptr, int32_t param)
 {
 	timer_compare_event(1);
 }
 
-TIMER_CALLBACK_MEMBER( mc68328_device::pwm_transition )
+void mc68328_device::pwm_transition(void *ptr, int32_t param)
 {
 	if (m_regs.pwmw >= m_regs.pwmp || m_regs.pwmw == 0 || m_regs.pwmp == 0)
 	{
@@ -520,7 +520,7 @@ TIMER_CALLBACK_MEMBER( mc68328_device::pwm_transition )
 	}
 }
 
-TIMER_CALLBACK_MEMBER( mc68328_device::rtc_tick )
+void mc68328_device::rtc_tick(void *ptr, int32_t param)
 {
 	if (m_regs.rtcctl & RTCCTL_ENABLE)
 	{

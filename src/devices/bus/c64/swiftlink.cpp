@@ -165,7 +165,7 @@ void c64_swiftlink_cartridge_device::c64_cd_w(address_space &space, offs_t offse
 //  acia_irq_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( c64_swiftlink_cartridge_device::acia_irq_w )
+void c64_swiftlink_cartridge_device::acia_irq_w(int state)
 {
 	switch (m_irq)
 	{

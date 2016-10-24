@@ -94,7 +94,7 @@ void victory_state::update_irq()
 }
 
 
-INTERRUPT_GEN_MEMBER(victory_state::vblank_interrupt)
+void victory_state::vblank_interrupt(device_t &device)
 {
 	m_vblank_irq = 1;
 
@@ -1073,7 +1073,7 @@ void victory_state::update_foreground()
 }
 
 
-TIMER_CALLBACK_MEMBER(victory_state::bgcoll_irq_callback)
+void victory_state::bgcoll_irq_callback(void *ptr, int32_t param)
 {
 	m_bgcollx = param & 0xff;
 	m_bgcolly = param >> 8;

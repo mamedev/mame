@@ -66,7 +66,7 @@ void hng64_state::hng64_mark_tile_dirty( int tilemap, int tile_index )
 	}                                                                           \
 }
 
-TILE_GET_INFO_MEMBER(hng64_state::get_hng64_tile0_8x8_info)
+void hng64_state::get_hng64_tile0_8x8_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int offset = 0x00000;
 	int size = 0;
@@ -76,7 +76,7 @@ TILE_GET_INFO_MEMBER(hng64_state::get_hng64_tile0_8x8_info)
 	HNG64_GET_TILE_INFO
 }
 
-TILE_GET_INFO_MEMBER(hng64_state::get_hng64_tile0_16x16_info)
+void hng64_state::get_hng64_tile0_16x16_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int offset = 0x00000;
 	int size = 1;
@@ -86,7 +86,7 @@ TILE_GET_INFO_MEMBER(hng64_state::get_hng64_tile0_16x16_info)
 	HNG64_GET_TILE_INFO
 }
 
-TILE_GET_INFO_MEMBER(hng64_state::get_hng64_tile1_8x8_info)
+void hng64_state::get_hng64_tile1_8x8_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int offset = 0x10000;
 	int size = 0;
@@ -96,7 +96,7 @@ TILE_GET_INFO_MEMBER(hng64_state::get_hng64_tile1_8x8_info)
 	HNG64_GET_TILE_INFO
 }
 
-TILE_GET_INFO_MEMBER(hng64_state::get_hng64_tile1_16x16_info)
+void hng64_state::get_hng64_tile1_16x16_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int offset = 0x10000;
 	int size = 1;
@@ -106,7 +106,7 @@ TILE_GET_INFO_MEMBER(hng64_state::get_hng64_tile1_16x16_info)
 	HNG64_GET_TILE_INFO
 }
 
-TILE_GET_INFO_MEMBER(hng64_state::get_hng64_tile2_8x8_info)
+void hng64_state::get_hng64_tile2_8x8_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int offset = 0x20000;
 	int size = 0;
@@ -116,7 +116,7 @@ TILE_GET_INFO_MEMBER(hng64_state::get_hng64_tile2_8x8_info)
 	HNG64_GET_TILE_INFO
 }
 
-TILE_GET_INFO_MEMBER(hng64_state::get_hng64_tile2_16x16_info)
+void hng64_state::get_hng64_tile2_16x16_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int offset = 0x20000;
 	int size = 1;
@@ -126,7 +126,7 @@ TILE_GET_INFO_MEMBER(hng64_state::get_hng64_tile2_16x16_info)
 	HNG64_GET_TILE_INFO
 }
 
-TILE_GET_INFO_MEMBER(hng64_state::get_hng64_tile3_8x8_info)
+void hng64_state::get_hng64_tile3_8x8_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int offset = 0x30000;
 	int size = 0;
@@ -136,7 +136,7 @@ TILE_GET_INFO_MEMBER(hng64_state::get_hng64_tile3_8x8_info)
 	HNG64_GET_TILE_INFO
 }
 
-TILE_GET_INFO_MEMBER(hng64_state::get_hng64_tile3_16x16_info)
+void hng64_state::get_hng64_tile3_16x16_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int offset = 0x30000;
 	int size = 1;

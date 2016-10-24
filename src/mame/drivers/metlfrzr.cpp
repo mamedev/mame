@@ -56,7 +56,7 @@ public:
 
 	void init_metlfrzr();
 	void output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+	void scanline(timer_device &timer, void *ptr, int32_t param);
 	uint8_t m_fg_tilebank;
 	bool m_rowscroll_enable;
 };
@@ -341,7 +341,7 @@ static GFXDECODE_START(metlfrzr)
 	GFXDECODE_ENTRY("gfx4", 0, sprite_layout, 0, 16)
 GFXDECODE_END
 
-TIMER_DEVICE_CALLBACK_MEMBER(metlfrzr_state::scanline)
+void metlfrzr_state::scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

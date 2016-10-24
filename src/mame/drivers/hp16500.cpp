@@ -92,11 +92,11 @@ public:
 
 	void maskval_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE_LINE_MEMBER(vsync_changed);
+	void vsync_changed(int state);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_UPDATE_ROW(crtc_update_row_1650);
 
-	INTERRUPT_GEN_MEMBER(vblank);
+	void vblank(device_t &device);
 
 private:
 	uint32_t m_palette[256], m_colors[3], m_count, m_clutoffs;
@@ -123,7 +123,7 @@ void hp16500_state::vbl_ack16_w(address_space &space, offs_t offset, uint16_t da
 	m_maincpu->set_input_line(M68K_IRQ_1, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER( hp16500_state::vsync_changed )
+void hp16500_state::vsync_changed(int state)
 {
 	if (state)
 	{
@@ -301,7 +301,7 @@ static ADDRESS_MAP_START(hp16500_map, AS_PROGRAM, 32, hp16500_state)
 	AM_RANGE(0x00800000, 0x009fffff) AM_RAM
 ADDRESS_MAP_END
 
-INTERRUPT_GEN_MEMBER(hp16500_state::vblank)
+void hp16500_state::vblank(device_t &device)
 {
 	m_maincpu->set_input_line(M68K_IRQ_1, ASSERT_LINE);
 }

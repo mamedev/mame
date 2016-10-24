@@ -55,12 +55,12 @@ public:
 	uint8_t port05_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void port06_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void port07_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_READ_LINE_MEMBER(clear_r);
-	DECLARE_READ_LINE_MEMBER(ef1_r);
-	DECLARE_READ_LINE_MEMBER(ef4_r);
-	DECLARE_WRITE_LINE_MEMBER(q4013a_w);
-	DECLARE_WRITE_LINE_MEMBER(clock_w);
-	DECLARE_WRITE_LINE_MEMBER(clock2_w);
+	int clear_r();
+	int ef1_r();
+	int ef4_r();
+	void q4013a_w(int state);
+	void clock_w(int state);
+	void clock2_w(int state);
 	// Zira
 	void sound_d_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void sound_g_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -258,7 +258,7 @@ void play_2_state::port07_w(address_space &space, offs_t offset, uint8_t data, u
 	}
 }
 
-READ_LINE_MEMBER( play_2_state::clear_r )
+int play_2_state::clear_r()
 {
 	// A hack to make the machine reset itself on boot
 	if (m_resetcnt < 0xffff)
@@ -266,17 +266,17 @@ READ_LINE_MEMBER( play_2_state::clear_r )
 	return (m_resetcnt == 0xff00) ? 0 : 1;
 }
 
-READ_LINE_MEMBER( play_2_state::ef1_r )
+int play_2_state::ef1_r()
 {
 	return (!BIT(m_clockcnt, 10)); // inverted
 }
 
-READ_LINE_MEMBER( play_2_state::ef4_r )
+int play_2_state::ef4_r()
 {
 	return BIT(m_keyboard[7]->read(), 0); // inverted test button - doesn't seem to do anything
 }
 
-WRITE_LINE_MEMBER( play_2_state::clock_w )
+void play_2_state::clock_w(int state)
 {
 	m_4013a->clock_w(state);
 
@@ -289,13 +289,13 @@ WRITE_LINE_MEMBER( play_2_state::clock_w )
 	}
 }
 
-WRITE_LINE_MEMBER( play_2_state::clock2_w )
+void play_2_state::clock2_w(int state)
 {
 	m_4013b->clock_w(state);
 	m_maincpu->ef3_w(state); // inverted
 }
 
-WRITE_LINE_MEMBER( play_2_state::q4013a_w )
+void play_2_state::q4013a_w(int state)
 {
 	m_clockcnt = 0;
 }

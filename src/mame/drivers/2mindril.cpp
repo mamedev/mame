@@ -64,10 +64,10 @@ public:
 	void init_drill();
 	void machine_start_drill();
 	void machine_reset_drill();
-	INTERRUPT_GEN_MEMBER(drill_vblank_irq);
-	//INTERRUPT_GEN_MEMBER(drill_device_irq);
+	void drill_vblank_irq(device_t &device);
+	//void drill_device_irq(device_t &device);
 	void tile_decode();
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
+	void irqhandler(int state);
 	#ifdef UNUSED_FUNCTION
 	enum
 	{
@@ -410,20 +410,20 @@ static GFXDECODE_START( 2mindril )
 GFXDECODE_END
 
 
-INTERRUPT_GEN_MEMBER(_2mindril_state::drill_vblank_irq)
+void _2mindril_state::drill_vblank_irq(device_t &device)
 {
 	device.execute().set_input_line(4, ASSERT_LINE);
 }
 
 #if 0
-INTERRUPT_GEN_MEMBER(_2mindril_state::drill_device_irq)
+void _2mindril_state::drill_device_irq(device_t &device)
 {
 	device.execute().set_input_line(5, ASSERT_LINE);
 }
 #endif
 
 /* WRONG,it does something with 60000c & 700002,likely to be called when the player throws the ball.*/
-WRITE_LINE_MEMBER(_2mindril_state::irqhandler)
+void _2mindril_state::irqhandler(int state)
 {
 //  m_maincpu->set_input_line(5, state ? ASSERT_LINE : CLEAR_LINE);
 }

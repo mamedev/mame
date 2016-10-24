@@ -61,9 +61,9 @@ public:
 		, m_usart_clock_state(0)
 	{ }
 
-	DECLARE_WRITE_LINE_MEMBER( usart_clock_tick );
+	void usart_clock_tick(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( isbc8030_tmr2_w );
+	void isbc8030_tmr2_w(int state);
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -106,7 +106,7 @@ static INPUT_PORTS_START( isbc8030 )
 	PORT_DIPSETTING(    0x40, "75")
 INPUT_PORTS_END
 
-WRITE_LINE_MEMBER( isbc8030_state::usart_clock_tick )
+void isbc8030_state::usart_clock_tick(int state)
 {
 	uint8_t old_counter = m_usart_divide_counter;
 	m_usart_divide_counter++;
@@ -120,7 +120,7 @@ WRITE_LINE_MEMBER( isbc8030_state::usart_clock_tick )
 	}
 }
 
-WRITE_LINE_MEMBER( isbc8030_state::isbc8030_tmr2_w )
+void isbc8030_state::isbc8030_tmr2_w(int state)
 {
 	m_usart->write_rxc(state);
 	m_usart->write_txc(state);

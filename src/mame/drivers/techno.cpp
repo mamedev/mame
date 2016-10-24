@@ -39,7 +39,7 @@ public:
 	void sol1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void sol2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	INTERRUPT_GEN_MEMBER(techno_intgen);
+	void techno_intgen(device_t &device);
 private:
 	bool m_digwait;
 	uint8_t m_keyrow;
@@ -227,7 +227,7 @@ static INPUT_PORTS_START( techno )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME("Fix top left target middle") PORT_CODE(KEYCODE_EQUALS)
 INPUT_PORTS_END
 
-INTERRUPT_GEN_MEMBER(techno_state::techno_intgen)
+void techno_state::techno_intgen(device_t &device)
 {
 	// vectors change per int: 88-8F, 98-9F)
 	if ((m_vector & 7) == 7)

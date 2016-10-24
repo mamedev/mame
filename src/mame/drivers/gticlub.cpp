@@ -307,8 +307,8 @@ public:
 	void dsp_dataram0_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	uint32_t dsp_dataram1_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	void dsp_dataram1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
-	DECLARE_WRITE_LINE_MEMBER(voodoo_vblank_0);
-	DECLARE_WRITE_LINE_MEMBER(voodoo_vblank_1);
+	void voodoo_vblank_0(int state);
+	void voodoo_vblank_1(int state);
 	void soundtimer_en_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void soundtimer_count_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
@@ -320,8 +320,8 @@ public:
 	void machine_reset_gticlub();
 	void machine_reset_hangplt();
 	void video_start_gticlub();
-	INTERRUPT_GEN_MEMBER(gticlub_vblank);
-	TIMER_CALLBACK_MEMBER(sound_irq);
+	void gticlub_vblank(device_t &device);
+	void sound_irq(void *ptr, int32_t param);
 
 	ADC1038_INPUT_CB(adc1038_input_callback);
 
@@ -345,12 +345,12 @@ void gticlub_state::paletteram32_w(address_space &space, offs_t offset, uint32_t
 	m_palette->set_pen_color(offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
 
-WRITE_LINE_MEMBER(gticlub_state::voodoo_vblank_0)
+void gticlub_state::voodoo_vblank_0(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, state? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(gticlub_state::voodoo_vblank_1)
+void gticlub_state::voodoo_vblank_1(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_IRQ1, state ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -459,7 +459,7 @@ void gticlub_state::sysreg_w(address_space &space, offs_t offset, uint8_t data, 
 
 /******************************************************************/
 
-TIMER_CALLBACK_MEMBER(gticlub_state::sound_irq)
+void gticlub_state::sound_irq(void *ptr, int32_t param)
 {
 	m_audiocpu->set_input_line(M68K_IRQ_1, ASSERT_LINE);
 }
@@ -792,7 +792,7 @@ INPUT_PORTS_END
     DMA0
 
 */
-INTERRUPT_GEN_MEMBER(gticlub_state::gticlub_vblank)
+void gticlub_state::gticlub_vblank(device_t &device)
 {
 	device.execute().set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 }

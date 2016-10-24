@@ -138,12 +138,12 @@ public:
 	int m_vfd_latch;  //initialized but not used
 	int m_irq_status;
 	int m_optic_pattern;
-	DECLARE_WRITE_LINE_MEMBER(reel0_optic_cb) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
-	DECLARE_WRITE_LINE_MEMBER(reel1_optic_cb) { if (state) m_optic_pattern |= 0x02; else m_optic_pattern &= ~0x02; }
-	DECLARE_WRITE_LINE_MEMBER(reel2_optic_cb) { if (state) m_optic_pattern |= 0x04; else m_optic_pattern &= ~0x04; }
-	DECLARE_WRITE_LINE_MEMBER(reel3_optic_cb) { if (state) m_optic_pattern |= 0x08; else m_optic_pattern &= ~0x08; }
-	DECLARE_WRITE_LINE_MEMBER(reel4_optic_cb) { if (state) m_optic_pattern |= 0x10; else m_optic_pattern &= ~0x10; }
-	DECLARE_WRITE_LINE_MEMBER(reel5_optic_cb) { if (state) m_optic_pattern |= 0x20; else m_optic_pattern &= ~0x20; }
+	void reel0_optic_cb(int state) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
+	void reel1_optic_cb(int state) { if (state) m_optic_pattern |= 0x02; else m_optic_pattern &= ~0x02; }
+	void reel2_optic_cb(int state) { if (state) m_optic_pattern |= 0x04; else m_optic_pattern &= ~0x04; }
+	void reel3_optic_cb(int state) { if (state) m_optic_pattern |= 0x08; else m_optic_pattern &= ~0x08; }
+	void reel4_optic_cb(int state) { if (state) m_optic_pattern |= 0x10; else m_optic_pattern &= ~0x10; }
+	void reel5_optic_cb(int state) { if (state) m_optic_pattern |= 0x20; else m_optic_pattern &= ~0x20; }
 	int m_acia_status;
 	int m_locked;
 	int m_is_timer_enabled;
@@ -200,7 +200,7 @@ public:
 	void init_rou029();
 	void init_nocrypt();
 	virtual void machine_reset() override;
-	INTERRUPT_GEN_MEMBER(timer_irq);
+	void timer_irq(device_t &device);
 	void sc1_common_init(int reels, int decrypt, int defaultbank);
 	void Scorpion1_SetSwitchState(int strobe, int data, int state);
 	int sc1_find_project_string( );
@@ -275,7 +275,7 @@ void bfm_sc1_state::bankswitch_w(address_space &space, offs_t offset, uint8_t da
 
 ///////////////////////////////////////////////////////////////////////////
 
-INTERRUPT_GEN_MEMBER(bfm_sc1_state::timer_irq)
+void bfm_sc1_state::timer_irq(device_t &device)
 {
 	if ( m_is_timer_enabled )
 	{

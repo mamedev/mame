@@ -187,12 +187,12 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(multigam);
+	void palette_init_multigam(palette_device &palette);
 	void machine_start_multigm3();
 	void machine_reset_multigm3();
 	void machine_start_supergm3();
 	uint32_t screen_update_multigam(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(mmc1_resync_callback);
+	void mmc1_resync_callback(void *ptr, int32_t param);
 	void set_videorom_bank( int start, int count, int bank, int bank_size_in_kb);
 	void set_videoram_bank( int start, int count, int bank, int bank_size_in_kb);
 	void multigam_init_mmc3(uint8_t *prg_base, int prg_size, int chr_bank_base);
@@ -720,7 +720,7 @@ void multigam_state::multigam_init_mapper02(uint8_t* prg_base, int prg_size)
 *******************************************************/
 
 
-TIMER_CALLBACK_MEMBER(multigam_state::mmc1_resync_callback)
+void multigam_state::mmc1_resync_callback(void *ptr, int32_t param)
 {
 	m_mmc1_reg_write_enable = 1;
 }
@@ -1119,7 +1119,7 @@ INPUT_PORTS_END
 
 *******************************************************/
 
-PALETTE_INIT_MEMBER(multigam_state, multigam)
+void multigam_state::palette_init_multigam(palette_device &palette)
 {
 	m_ppu->init_palette(palette, 0);
 }

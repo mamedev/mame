@@ -105,10 +105,10 @@ public:
 
 	uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	DECLARE_WRITE_LINE_MEMBER(drq0_w);
-	DECLARE_WRITE_LINE_MEMBER(drq1_w);
-	DECLARE_WRITE_LINE_MEMBER(drq2_w);
-	DECLARE_WRITE_LINE_MEMBER(drq3_w);
+	void drq0_w(int state);
+	void drq1_w(int state);
+	void drq2_w(int state);
+	void drq3_w(int state);
 
 	void single_transfer(int x);
 	void set_timer(int channel, const attotime &tm);
@@ -145,7 +145,7 @@ private:
 	cpu_device *m_cpu;
 	bool m_drq_state[4];
 
-	TIMER_CALLBACK_MEMBER(dma_transfer_timer);
+	void dma_transfer_timer(void *ptr, int32_t param);
 	void dma_transfer_abort(int channel);
 	void dma_transfer_halt(int channel);
 	void dma_transfer_continue(int channel);

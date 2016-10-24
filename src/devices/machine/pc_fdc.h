@@ -44,8 +44,8 @@ public:
 	void dor_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask);
 	uint8_t dir_r(address_space &space, offs_t offset, uint8_t mem_mask);
 	void ccr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask);
-	DECLARE_WRITE_LINE_MEMBER( irq_w );
-	DECLARE_WRITE_LINE_MEMBER( drq_w );
+	void irq_w(int state);
+	void drq_w(int state);
 
 protected:
 	virtual void device_start() override;

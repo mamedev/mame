@@ -74,12 +74,12 @@ public:
 
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
-	DECLARE_PALETTE_INIT(wiz);
+	void palette_init_wiz(palette_device &palette);
 	uint32_t screen_update_wiz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_stinger(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_kungfut(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(wiz_vblank_interrupt);
-	INTERRUPT_GEN_MEMBER(wiz_sound_interrupt);
+	void wiz_vblank_interrupt(device_t &device);
+	void wiz_sound_interrupt(device_t &device);
 	void draw_tiles(bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int charbank, int colortype);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int set, int charbank);
 };

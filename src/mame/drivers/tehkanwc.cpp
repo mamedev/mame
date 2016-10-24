@@ -203,7 +203,7 @@ void tehkanwc_state::msm_reset_w(address_space &space, offs_t offset, uint8_t da
 	m_msm->reset_w(data ? 0 : 1);
 }
 
-WRITE_LINE_MEMBER(tehkanwc_state::adpcm_int)
+void tehkanwc_state::adpcm_int(int state)
 {
 	uint8_t *SAMPLES = memregion("adpcm")->base();
 	int msm_data = SAMPLES[m_msm_data_offs & 0x7fff];

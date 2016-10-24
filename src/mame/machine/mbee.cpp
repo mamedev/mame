@@ -34,7 +34,7 @@ void mbee_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 
 ************************************************************/
 
-WRITE_LINE_MEMBER( mbee_state::pio_ardy )
+void mbee_state::pio_ardy(int state)
 {
 	m_centronics->write_strobe((state) ? 0 : 1);
 }
@@ -90,12 +90,12 @@ uint8_t mbee_state::pio_port_b_r(address_space &space, offs_t offset, uint8_t me
 
 *************************************************************************************/
 
-WRITE_LINE_MEMBER( mbee_state::fdc_intrq_w )
+void mbee_state::fdc_intrq_w(int state)
 {
 	m_fdc_rq = (m_fdc_rq & 2) | state;
 }
 
-WRITE_LINE_MEMBER( mbee_state::fdc_drq_w )
+void mbee_state::fdc_drq_w(int state)
 {
 	m_fdc_rq = (m_fdc_rq & 1) | (state << 1);
 }
@@ -143,7 +143,7 @@ void mbee_state::fdc_motor_w(address_space &space, offs_t offset, uint8_t data, 
 ************************************************************/
 
 
-TIMER_CALLBACK_MEMBER( mbee_state::timer_newkb )
+void mbee_state::timer_newkb(void *ptr, int32_t param)
 {
 	/* Keyboard scanner is a Mostek M3870 chip. Its speed of operation is determined by a 15k resistor on
 	pin 2 (XTL2) and is therefore 2MHz. If a key change is detected (up or down), the /strobe
@@ -246,7 +246,7 @@ uint8_t mbee_state::port07_r(address_space &space, offs_t offset, uint8_t mem_ma
 }
 
 // See it work: Run mbeett, choose RTC in the config switches, run the F3 test, press Esc.
-WRITE_LINE_MEMBER( mbee_state::rtc_irq_w )
+void mbee_state::rtc_irq_w(int state)
 {
 	m_b7_rtc = (state) ? 0 : 1; // inverted by IC15 (pins 8,9,10)
 

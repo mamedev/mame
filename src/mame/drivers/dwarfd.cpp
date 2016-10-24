@@ -332,13 +332,13 @@ public:
 	void output1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void output2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t qc_b8_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(dwarfd_sod_callback);
-	DECLARE_WRITE_LINE_MEMBER(drq_w);
+	void dwarfd_sod_callback(int state);
+	void drq_w(int state);
 	void init_qc();
 	void init_dwarfd();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(dwarfd);
+	void palette_init_dwarfd(palette_device &palette);
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 	I8275_DRAW_CHARACTER_MEMBER(pesp_display_pixels);
 	I8275_DRAW_CHARACTER_MEMBER(qc_display_pixels);
@@ -647,12 +647,12 @@ I8275_DRAW_CHARACTER_MEMBER(dwarfd_state::qc_display_pixels)
 	}
 }
 
-WRITE_LINE_MEMBER(dwarfd_state::dwarfd_sod_callback)
+void dwarfd_state::dwarfd_sod_callback(int state)
 {
 	m_crt_access = state;
 }
 
-WRITE_LINE_MEMBER(dwarfd_state::drq_w)
+void dwarfd_state::drq_w(int state)
 {
 	if(state && !m_crt_access)
 		m_maincpu->set_input_line(I8085_RST65_LINE, ASSERT_LINE);
@@ -758,7 +758,7 @@ static GFXDECODE_START( dwarfd )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout3, 0, 16 )
 GFXDECODE_END
 
-PALETTE_INIT_MEMBER(dwarfd_state, dwarfd)
+void dwarfd_state::palette_init_dwarfd(palette_device &palette)
 {
 	uint8_t rgb[3];
 	int i,j;

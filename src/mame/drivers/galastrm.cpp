@@ -49,7 +49,7 @@ $305.b invincibility
 
 /*********************************************************************/
 
-INTERRUPT_GEN_MEMBER(galastrm_state::galastrm_interrupt)
+void galastrm_state::galastrm_interrupt(device_t &device)
 {
 	m_frame_counter ^= 1;
 	device.execute().set_input_line(5, HOLD_LINE);

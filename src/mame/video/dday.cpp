@@ -25,7 +25,7 @@ uint8_t dday_state::dday_countdown_timer_r(address_space &space, offs_t offset, 
 	return ((m_timer_value / 10) << 4) | (m_timer_value % 10);
 }
 
-TIMER_CALLBACK_MEMBER(dday_state::countdown_timer_callback)
+void dday_state::countdown_timer_callback(void *ptr, int32_t param)
 {
 	m_timer_value--;
 
@@ -47,7 +47,7 @@ void dday_state::start_countdown_timer()
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(dday_state, dday)
+void dday_state::palette_init_dday(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -149,7 +149,7 @@ PALETTE_INIT_MEMBER(dday_state, dday)
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(dday_state::get_bg_tile_info)
+void dday_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code;
 
@@ -157,7 +157,7 @@ TILE_GET_INFO_MEMBER(dday_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, code >> 5, 0);
 }
 
-TILE_GET_INFO_MEMBER(dday_state::get_fg_tile_info)
+void dday_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code, flipx;
 
@@ -166,7 +166,7 @@ TILE_GET_INFO_MEMBER(dday_state::get_fg_tile_info)
 	SET_TILE_INFO_MEMBER(2, code, code >> 5, flipx ? TILE_FLIPX : 0);
 }
 
-TILE_GET_INFO_MEMBER(dday_state::get_text_tile_info)
+void dday_state::get_text_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code;
 
@@ -174,7 +174,7 @@ TILE_GET_INFO_MEMBER(dday_state::get_text_tile_info)
 	SET_TILE_INFO_MEMBER(1, code, code >> 5, 0);
 }
 
-TILE_GET_INFO_MEMBER(dday_state::get_sl_tile_info)
+void dday_state::get_sl_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code, sl_flipx, flipx;
 	uint8_t* sl_map;

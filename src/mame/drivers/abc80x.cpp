@@ -643,7 +643,7 @@ INPUT_PORTS_END
 //  Z80CTC
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( abc800_state::ctc_z0_w )
+void abc800_state::ctc_z0_w(int state)
 {
 	if (BIT(m_sb, 2))
 	{
@@ -654,7 +654,7 @@ WRITE_LINE_MEMBER( abc800_state::ctc_z0_w )
 	clock_cassette(state);
 }
 
-WRITE_LINE_MEMBER( abc800_state::ctc_z1_w )
+void abc800_state::ctc_z1_w(int state)
 {
 	if (BIT(m_sb, 3))
 	{
@@ -668,7 +668,7 @@ WRITE_LINE_MEMBER( abc800_state::ctc_z1_w )
 	}
 }
 
-WRITE_LINE_MEMBER( abc800_state::ctc_z2_w )
+void abc800_state::ctc_z2_w(int state)
 {
 	m_dart->rxca_w(state);
 	m_dart->txca_w(state);
@@ -704,12 +704,12 @@ void abc800_state::clock_cassette(int state)
 	m_ctc_z0 = state;
 }
 
-WRITE_LINE_MEMBER( abc800_state::sio_txdb_w )
+void abc800_state::sio_txdb_w(int state)
 {
 	m_sio_txdb = state;
 }
 
-WRITE_LINE_MEMBER( abc800_state::sio_dtrb_w )
+void abc800_state::sio_dtrb_w(int state)
 {
 	if (m_cassette == nullptr) return;
 
@@ -725,7 +725,7 @@ WRITE_LINE_MEMBER( abc800_state::sio_dtrb_w )
 	}
 }
 
-WRITE_LINE_MEMBER( abc800_state::sio_rtsb_w )
+void abc800_state::sio_rtsb_w(int state)
 {
 	if (m_cassette == nullptr) return;
 
@@ -741,14 +741,14 @@ WRITE_LINE_MEMBER( abc800_state::sio_rtsb_w )
 //  Z80DART abc802
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( abc802_state::lrs_w )
+void abc802_state::lrs_w(int state)
 {
 	m_lrs = state;
 
 	bankswitch();
 }
 
-WRITE_LINE_MEMBER( abc802_state::mux80_40_w )
+void abc802_state::mux80_40_w(int state)
 {
 	m_80_40_mux = state;
 }
@@ -757,7 +757,7 @@ WRITE_LINE_MEMBER( abc802_state::mux80_40_w )
 //  Z80DART abc806
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( abc806_state::keydtr_w )
+void abc806_state::keydtr_w(int state)
 {
 	m_keydtr = state;
 

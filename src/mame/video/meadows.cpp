@@ -20,7 +20,7 @@
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(meadows_state::get_tile_info)
+void meadows_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *videoram = m_videoram;
 	SET_TILE_INFO_MEMBER(0, videoram[tile_index] & 0x7f, 0, 0);

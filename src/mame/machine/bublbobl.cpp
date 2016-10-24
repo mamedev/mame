@@ -373,7 +373,7 @@ uint8_t bublbobl_state::boblbobl_ic43_b_r(address_space &space, offs_t offset, u
  The following is ENTIRELY GUESSWORK!!!
 
 ***************************************************************************/
-INTERRUPT_GEN_MEMBER(bublbobl_state::bublbobl_m68705_interrupt)
+void bublbobl_state::bublbobl_m68705_interrupt(device_t &device)
 {
 	device.execute().set_input_line(0, ASSERT_LINE);
 	timer_set(attotime::from_msec(1000/60), TIMER_M68705_IRQ_ACK); /* TODO: understand how this is ack'ed */

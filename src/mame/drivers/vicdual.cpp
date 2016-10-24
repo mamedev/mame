@@ -87,7 +87,7 @@
  *
  *************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(vicdual_state::clear_coin_status)
+void vicdual_state::clear_coin_status(timer_device &timer, void *ptr, int32_t param)
 {
 	m_coin_status = 0;
 }
@@ -2269,7 +2269,7 @@ ADDRESS_MAP_END
 
 // coinage is handled by extra hardware on a daughterboard, put before the coin-in pin on the main logic board
 // IC board "COIN CALCULATOR" (97201-P): two 74191 counters, a 555 timer, coin meters, and lots of other TTL
-TIMER_DEVICE_CALLBACK_MEMBER(vicdual_state::nsub_coin_pulse)
+void vicdual_state::nsub_coin_pulse(timer_device &timer, void *ptr, int32_t param)
 {
 	if (m_nsub_play_counter > 0)
 	{

@@ -397,7 +397,7 @@ void itech8_state::perform_blit(address_space &space)
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(itech8_state::blitter_done)
+void itech8_state::blitter_done(void *ptr, int32_t param)
 {
 	/* turn off blitting and generate an interrupt */
 	m_blit_in_progress = 0;
@@ -543,7 +543,7 @@ void itech8_state::grmatch_xscroll_w(address_space &space, offs_t offset, uint8_
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(itech8_state::grmatch_palette_update)
+void itech8_state::grmatch_palette_update(timer_device &timer, void *ptr, int32_t param)
 {
 	/* if the high bit is set, we are supposed to latch the palette values */
 	if (m_grmatch_palcontrol & 0x80)

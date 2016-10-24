@@ -138,7 +138,7 @@ adamnet_device::daisy_entry::daisy_entry(device_t *device)
 //  rxd_r - receive data
 //-------------------------------------------------
 
-READ_LINE_MEMBER( adamnet_device::rxd_r )
+int adamnet_device::rxd_r()
 {
 	int state = m_txd;//1;
 
@@ -183,7 +183,7 @@ int adamnet_device::rxd_r(device_t *device)
 //  txd_w - transmit data
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( adamnet_device::txd_w )
+void adamnet_device::txd_w(int state)
 {
 	if (m_txd != state)
 	{
@@ -220,7 +220,7 @@ void adamnet_device::txd_w(device_t *device, int state)
 //  reset_r - bus reset
 //-------------------------------------------------
 
-READ_LINE_MEMBER( adamnet_device::reset_r )
+int adamnet_device::reset_r()
 {
 	return m_reset;
 }
@@ -230,7 +230,7 @@ READ_LINE_MEMBER( adamnet_device::reset_r )
 //  reset_w - bus reset
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( adamnet_device::reset_w )
+void adamnet_device::reset_w(int state)
 {
 	m_reset = state;
 

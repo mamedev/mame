@@ -47,7 +47,7 @@ static void extend_palette(palette_device &palette) {
 	}
 }
 
-PALETTE_INIT_MEMBER(tia_ntsc_video_device, tia_ntsc)
+void tia_ntsc_video_device::palette_init_tia_ntsc(palette_device &palette)
 {
 	int i, j;
 /********************************************************************
@@ -293,7 +293,7 @@ Phase Shift 26.2
 }
 
 
-PALETTE_INIT_MEMBER(tia_pal_video_device, tia_pal)
+void tia_pal_video_device::palette_init_tia_pal(palette_device &palette)
 {
 	int i, j;
 

@@ -49,16 +49,16 @@ public:
 	uint8_t pio2_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void pio1_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void pio2_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
-	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
-	DECLARE_WRITE_LINE_MEMBER(ctc_z2_w);
+	void ctc_z0_w(int state);
+	void ctc_z1_w(int state);
+	void ctc_z2_w(int state);
 	uint8_t m_segment;
 	uint8_t m_key;
 	uint8_t m_prev_key;
 	bool m_step;
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
-	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
+	void keyboard_callback(timer_device &timer, void *ptr, int32_t param);
 };
 
 
@@ -139,15 +139,15 @@ INPUT_PORTS_END
 
 /* Z80-CTC Interface */
 
-WRITE_LINE_MEMBER( babbage_state::ctc_z0_w )
+void babbage_state::ctc_z0_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER( babbage_state::ctc_z1_w )
+void babbage_state::ctc_z1_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER( babbage_state::ctc_z2_w )
+void babbage_state::ctc_z2_w(int state)
 {
 }
 
@@ -193,7 +193,7 @@ static const z80_daisy_config babbage_daisy_chain[] =
 	{ nullptr }
 };
 
-TIMER_DEVICE_CALLBACK_MEMBER(babbage_state::keyboard_callback)
+void babbage_state::keyboard_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	uint8_t i, j, inp;
 	char kbdrow[6];

@@ -291,7 +291,7 @@ void kickgoal_state::actionhw_snd_w(address_space &space, offs_t offset, uint16_
 }
 
 
-INTERRUPT_GEN_MEMBER(kickgoal_state::kickgoal_interrupt)
+void kickgoal_state::kickgoal_interrupt(device_t &device)
 {
 	if ((m_adpcm->read_status() & 0x08) == 0)
 	{

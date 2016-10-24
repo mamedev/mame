@@ -119,13 +119,13 @@ void dynax_state::dynax_blitter_ack_w(address_space &space, offs_t offset, uint8
 	sprtmtch_update_irq();
 }
 
-INTERRUPT_GEN_MEMBER(dynax_state::sprtmtch_vblank_interrupt)
+void dynax_state::sprtmtch_vblank_interrupt(device_t &device)
 {
 	m_vblank_irq = 1;
 	sprtmtch_update_irq();
 }
 
-WRITE_LINE_MEMBER(dynax_state::sprtmtch_sound_callback)
+void dynax_state::sprtmtch_sound_callback(int state)
 {
 	m_sound_irq = state;
 	sprtmtch_update_irq();
@@ -161,7 +161,7 @@ void dynax_state::jantouki_blitter2_ack_w(address_space &space, offs_t offset, u
 	jantouki_update_irq();
 }
 
-INTERRUPT_GEN_MEMBER(dynax_state::jantouki_vblank_interrupt)
+void dynax_state::jantouki_vblank_interrupt(device_t &device)
 {
 	m_vblank_irq = 1;
 	jantouki_update_irq();
@@ -178,7 +178,7 @@ void dynax_state::jantouki_sound_update_irq()
 	m_soundcpu->set_input_line_and_vector(0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq); /* rst $xx */
 }
 
-INTERRUPT_GEN_MEMBER(dynax_state::jantouki_sound_vblank_interrupt)
+void dynax_state::jantouki_sound_vblank_interrupt(device_t &device)
 {
 	m_sound_vblank_irq = 1;
 	jantouki_sound_update_irq();
@@ -190,7 +190,7 @@ void dynax_state::jantouki_sound_vblank_ack_w(address_space &space, offs_t offse
 	jantouki_sound_update_irq();
 }
 
-WRITE_LINE_MEMBER(dynax_state::jantouki_sound_callback)
+void dynax_state::jantouki_sound_callback(int state)
 {
 	m_sound_irq = state;
 	jantouki_sound_update_irq();
@@ -386,7 +386,7 @@ void dynax_state::nanajign_palette_w(address_space &space, offs_t offset, uint8_
 }
 
 
-WRITE_LINE_MEMBER(dynax_state::adpcm_int)
+void dynax_state::adpcm_int(int state)
 {
 	m_msm->data_w(m_msm5205next >> 4);
 	m_msm5205next <<= 4;
@@ -400,7 +400,7 @@ WRITE_LINE_MEMBER(dynax_state::adpcm_int)
 	}
 }
 
-WRITE_LINE_MEMBER(dynax_state::adpcm_int_cpu1)
+void dynax_state::adpcm_int_cpu1(int state)
 {
 	m_msm->data_w(m_msm5205next >> 4);
 	m_msm5205next <<= 4;
@@ -4665,7 +4665,7 @@ MACHINE_CONFIG_END
   what was it trying to do?
   set an irq and clear it before its even taken? */
 
-INTERRUPT_GEN_MEMBER(dynax_state::yarunara_clock_interrupt)
+void dynax_state::yarunara_clock_interrupt(device_t &device)
 {
 	m_yarunara_clk_toggle ^= 1;
 
@@ -4826,7 +4826,7 @@ void dynax_state::mjelctrn_update_irq()
 	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xfa);
 }
 
-INTERRUPT_GEN_MEMBER(dynax_state::mjelctrn_vblank_interrupt)
+void dynax_state::mjelctrn_vblank_interrupt(device_t &device)
 {
 	// This is a kludge to avoid losing blitter interrupts
 	// there should be a vblank ack mechanism
@@ -4866,7 +4866,7 @@ void dynax_state::neruton_update_irq()
 	m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0x42);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(dynax_state::neruton_irq_scanline)
+void dynax_state::neruton_irq_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -4895,7 +4895,7 @@ MACHINE_CONFIG_END
     0x42 and 0x44 are very similar, they should be triggered by the blitter
     0x40 is vblank  */
 
-TIMER_DEVICE_CALLBACK_MEMBER(dynax_state::majxtal7_vblank_interrupt)
+void dynax_state::majxtal7_vblank_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -4920,7 +4920,7 @@ MACHINE_CONFIG_END
                                Mahjong Tenkaigen
 ***************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(dynax_state::tenkai_interrupt)
+void dynax_state::tenkai_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -4938,7 +4938,7 @@ void dynax_state::machine_start_tenkai()
 	machine().save().register_postload(save_prepost_delegate(FUNC(dynax_state::tenkai_update_rombank), this));
 }
 
-WRITE_LINE_MEMBER(dynax_state::tenkai_rtc_irq)
+void dynax_state::tenkai_rtc_irq(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_IRQ2, HOLD_LINE);
 }

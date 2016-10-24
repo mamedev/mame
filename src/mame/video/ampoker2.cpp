@@ -73,7 +73,7 @@
 #include "includes/ampoker2.h"
 
 
-PALETTE_INIT_MEMBER(ampoker2_state, ampoker2)
+void ampoker2_state::palette_init_ampoker2(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 /*    - bits -
@@ -121,7 +121,7 @@ void ampoker2_state::ampoker2_videoram_w(address_space &space, offs_t offset, ui
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-TILE_GET_INFO_MEMBER(ampoker2_state::get_bg_tile_info)
+void ampoker2_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *videoram = m_videoram;
 	int offs = tile_index * 2;
@@ -134,7 +134,7 @@ TILE_GET_INFO_MEMBER(ampoker2_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(ampoker2_state::s2k_get_bg_tile_info)
+void ampoker2_state::s2k_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *videoram = m_videoram;
 	int offs = tile_index * 2;

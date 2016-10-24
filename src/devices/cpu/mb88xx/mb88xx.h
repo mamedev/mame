@@ -70,7 +70,7 @@ public:
 	// static configuration helpers
 	static void set_pla(device_t &device, uint8_t *pla) { downcast<mb88_cpu_device &>(device).m_PLA = pla; }
 
-	DECLARE_WRITE_LINE_MEMBER( clock_w );
+	void clock_w(int state);
 
 protected:
 	// device-level overrides
@@ -148,7 +148,7 @@ private:
 	uint16_t m_debugger_pc;
 	uint8_t m_debugger_flags;
 
-	TIMER_CALLBACK_MEMBER( serial_timer );
+	void serial_timer(void *ptr, int32_t param);
 	int pla( int inA, int inB );
 	void update_pio_enable( uint8_t newpio );
 	void increment_timer();

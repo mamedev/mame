@@ -65,7 +65,7 @@ public:
 	uint32_t m_display_cache[0x20];       // (internal use)
 	uint8_t m_display_decay[0x20][0x20];  // (internal use)
 
-	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
+	void display_decay_tick(timer_device &timer, void *ptr, int32_t param);
 	void display_update();
 	void set_display_size(int maxx, int maxy);
 	void set_display_segmask(uint32_t digits, uint32_t mask);
@@ -180,7 +180,7 @@ void hh_cop400_state::display_update()
 	memcpy(m_display_cache, active_state, sizeof(m_display_cache));
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(hh_cop400_state::display_decay_tick)
+void hh_cop400_state::display_decay_tick(timer_device &timer, void *ptr, int32_t param)
 {
 	// slowly turn off unpowered segments
 	for (int y = 0; y < m_display_maxy; y++)
@@ -360,7 +360,7 @@ public:
 	void write_g(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void write_l(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t read_in(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(write_so);
+	void write_so(int state);
 };
 
 // handlers
@@ -487,8 +487,8 @@ public:
 	void prepare_display();
 	void write_d(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void write_g(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(write_sk);
-	DECLARE_WRITE_LINE_MEMBER(write_so);
+	void write_sk(int state);
+	void write_so(int state);
 	void write_l(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 };
 
@@ -520,7 +520,7 @@ void einvaderc_state::write_g(address_space &space, offs_t offset, uint8_t data,
 	prepare_display();
 }
 
-WRITE_LINE_MEMBER(einvaderc_state::write_sk)
+void einvaderc_state::write_sk(int state)
 {
 	// SK: speaker out + led grid 8
 	m_dac->write(state);
@@ -528,7 +528,7 @@ WRITE_LINE_MEMBER(einvaderc_state::write_sk)
 	prepare_display();
 }
 
-WRITE_LINE_MEMBER(einvaderc_state::write_so)
+void einvaderc_state::write_so(int state)
 {
 	// SO: led grid 9
 	m_so = state;
@@ -889,7 +889,7 @@ public:
 	{ }
 
 	void prepare_display();
-	DECLARE_WRITE_LINE_MEMBER(write_so);
+	void write_so(int state);
 	void write_d(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void write_l(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t read_g(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
@@ -903,7 +903,7 @@ void lightfgt_state::prepare_display()
 	display_matrix(5, 5, m_l, grid);
 }
 
-WRITE_LINE_MEMBER(lightfgt_state::write_so)
+void lightfgt_state::write_so(int state)
 {
 	// SO: led grid 0 (and input mux)
 	m_so = state;
@@ -1011,7 +1011,7 @@ public:
 	void write_d(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t read_l(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t read_in(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(write_so);
+	void write_so(int state);
 };
 
 // handlers
@@ -1034,7 +1034,7 @@ uint8_t bship82_state::read_in(address_space &space, offs_t offset, uint8_t mem_
 	return read_inputs(4) >> 8 & 0xf;
 }
 
-WRITE_LINE_MEMBER(bship82_state::write_so)
+void bship82_state::write_so(int state)
 {
 	// SO: led
 	display_matrix(1, 1, state, 1);

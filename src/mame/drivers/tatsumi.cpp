@@ -840,12 +840,12 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-INTERRUPT_GEN_MEMBER(tatsumi_state::roundup5_interrupt)
+void tatsumi_state::roundup5_interrupt(device_t &device)
 {
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xc8/4);   /* VBL */
 }
 
-WRITE_LINE_MEMBER(tatsumi_state::apache3_68000_reset)
+void tatsumi_state::apache3_68000_reset(int state)
 {
 	m_subcpu2->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 }

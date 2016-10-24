@@ -256,14 +256,14 @@ public:
 	void machine_start_meritm_crt260();
 	void machine_start_merit_common();
 	uint32_t screen_update_meritm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(vblank_start_tick);
-	TIMER_DEVICE_CALLBACK_MEMBER(vblank_end_tick);
+	void vblank_start_tick(timer_device &timer, void *ptr, int32_t param);
+	void vblank_end_tick(timer_device &timer, void *ptr, int32_t param);
 	void meritm_crt250_switch_banks(  );
 	void meritm_switch_banks(  );
 	int meritm_touch_coord_transform(int *touch_x, int *touch_y);
 	uint8_t binary_to_BCD(uint8_t data);
-	DECLARE_WRITE_LINE_MEMBER(meritm_vdp0_interrupt);
-	DECLARE_WRITE_LINE_MEMBER(meritm_vdp1_interrupt);
+	void meritm_vdp0_interrupt(int state);
+	void meritm_vdp1_interrupt(int state);
 };
 
 
@@ -308,13 +308,13 @@ int meritm_state::meritm_touch_coord_transform(int *touch_x, int *touch_y)
  *************************************/
 
 
-WRITE_LINE_MEMBER(meritm_state::meritm_vdp0_interrupt)
+void meritm_state::meritm_vdp0_interrupt(int state)
 {
 	/* this is not used as the v9938 interrupt callbacks are broken
 	   interrupts seem to be fired quite randomly */
 }
 
-WRITE_LINE_MEMBER(meritm_state::meritm_vdp1_interrupt)
+void meritm_state::meritm_vdp1_interrupt(int state)
 {
 	/* this is not used as the v9938 interrupt callbacks are broken
 	   interrupts seem to be fired quite randomly */
@@ -1070,14 +1070,14 @@ void meritm_state::machine_start_meritm_crt260()
 	save_pointer(NAME(m_ram.get()), 0x8000);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(meritm_state::vblank_start_tick)
+void meritm_state::vblank_start_tick(timer_device &timer, void *ptr, int32_t param)
 {
 	/* this is a workaround to signal the v9938 vblank interrupt correctly */
 	m_vint = 0x08;
 	m_z80pio_0->port_a_write(m_vint);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(meritm_state::vblank_end_tick)
+void meritm_state::vblank_end_tick(timer_device &timer, void *ptr, int32_t param)
 {
 	/* this is a workaround to signal the v9938 vblank interrupt correctly */
 	m_vint = 0x18;

@@ -67,7 +67,7 @@ void galpani2_bg8_regs_1_w(address_space &space, offs_t offset, uint16_t data, u
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(galpani2_state, galpani2)
+void galpani2_state::palette_init_galpani2(palette_device &palette)
 {
 	int i;
 	/* first $4200 colors are dynamic */

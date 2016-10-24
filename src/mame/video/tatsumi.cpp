@@ -98,7 +98,7 @@ void tatsumi_state::roundup5_crt_w(address_space &space, offs_t offset, uint16_t
 
 /********************************************************************/
 
-TILE_GET_INFO_MEMBER(tatsumi_state::get_text_tile_info)
+void tatsumi_state::get_text_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t *videoram = m_videoram;
 	int tile = videoram[tile_index];
@@ -108,14 +108,14 @@ TILE_GET_INFO_MEMBER(tatsumi_state::get_text_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(tatsumi_state::get_tile_info_bigfight_0)
+void tatsumi_state::get_tile_info_bigfight_0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile=m_cyclwarr_videoram0[(tile_index+0x400)%0x8000];
 	int bank = (m_bigfight_a40000[0] >> (((tile&0xc00)>>10)*4))&0xf;
 	SET_TILE_INFO_MEMBER(1,(tile&0x3ff)+(bank<<10),(tile>>12)&0xf,0);
 }
 
-TILE_GET_INFO_MEMBER(tatsumi_state::get_tile_info_bigfight_1)
+void tatsumi_state::get_tile_info_bigfight_1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile=m_cyclwarr_videoram1[(tile_index+0x400)%0x8000];
 	int bank = (m_bigfight_a40000[0] >> (((tile&0xc00)>>10)*4))&0xf;

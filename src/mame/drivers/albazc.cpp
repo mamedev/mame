@@ -38,7 +38,7 @@ public:
 	void hanaroku_out_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void albazc_vregs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(albazc);
+	void palette_init_albazc(palette_device &palette);
 	uint32_t screen_update_hanaroku(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
@@ -50,7 +50,7 @@ public:
 
 /* video */
 
-PALETTE_INIT_MEMBER(albazc_state, albazc)
+void albazc_state::palette_init_albazc(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;

@@ -335,27 +335,27 @@ void tc0480scp_device::common_get_tc0480tx_tile_info( tile_data &tileinfo, int t
 			TILE_FLIPYX((attr & 0xc000) >> 14));
 }
 
-TILE_GET_INFO_MEMBER(tc0480scp_device::get_bg0_tile_info)
+void tc0480scp_device::get_bg0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	common_get_tc0480bg_tile_info(tileinfo, tile_index, m_bg_ram[0], m_gfxnum );
 }
 
-TILE_GET_INFO_MEMBER(tc0480scp_device::get_bg1_tile_info)
+void tc0480scp_device::get_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	common_get_tc0480bg_tile_info(tileinfo, tile_index, m_bg_ram[1], m_gfxnum);
 }
 
-TILE_GET_INFO_MEMBER(tc0480scp_device::get_bg2_tile_info)
+void tc0480scp_device::get_bg2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	common_get_tc0480bg_tile_info(tileinfo, tile_index, m_bg_ram[2], m_gfxnum);
 }
 
-TILE_GET_INFO_MEMBER(tc0480scp_device::get_bg3_tile_info)
+void tc0480scp_device::get_bg3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	common_get_tc0480bg_tile_info(tileinfo, tile_index, m_bg_ram[3], m_gfxnum);
 }
 
-TILE_GET_INFO_MEMBER(tc0480scp_device::get_tx_tile_info)
+void tc0480scp_device::get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	common_get_tc0480tx_tile_info(tileinfo, tile_index, m_tx_ram, m_txnum);
 }

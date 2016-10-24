@@ -53,7 +53,7 @@ void super80_state::super80_cassette_motor( bool motor_state )
 
 
 // If normal keyboard scan has stopped, then do a scan to allow the interrupt key sequence
-TIMER_DEVICE_CALLBACK_MEMBER( super80_state::timer_k )
+void super80_state::timer_k(timer_device &timer, void *ptr, int32_t param)
 {
 	if (m_key_pressed)
 		m_key_pressed--;
@@ -72,7 +72,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( super80_state::timer_k )
     bit 0 = original system (U79 and U1)
     bit 1 = MDS fast system
     bit 2 = CA3140 */
-TIMER_DEVICE_CALLBACK_MEMBER( super80_state::timer_p )
+void super80_state::timer_p(timer_device &timer, void *ptr, int32_t param)
 {
 	uint8_t cass_ws=0;
 
@@ -89,12 +89,12 @@ TIMER_DEVICE_CALLBACK_MEMBER( super80_state::timer_p )
 }
 
 /* after the first 4 bytes have been read from ROM, switch the ram back in */
-TIMER_CALLBACK_MEMBER(super80_state::super80_reset)
+void super80_state::super80_reset(void *ptr, int32_t param)
 {
 	membank("boot")->set_entry(0);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( super80_state::timer_h )
+void super80_state::timer_h(timer_device &timer, void *ptr, int32_t param)
 {
 	uint8_t go_fast = 0;
 	if ( (!BIT(m_portf0, 2)) | (!BIT(m_io_config->read(), 1)) )    /* bit 2 of port F0 is low, OR user turned on config switch */

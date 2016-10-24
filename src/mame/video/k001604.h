@@ -44,14 +44,14 @@ private:
 	std::unique_ptr<uint32_t[]>       m_char_ram;
 	std::unique_ptr<uint32_t[]>       m_reg;
 
-	TILEMAP_MAPPER_MEMBER(scan_layer_8x8_0_size0);
-	TILEMAP_MAPPER_MEMBER(scan_layer_8x8_0_size1);
-	TILEMAP_MAPPER_MEMBER(scan_layer_8x8_1_size0);
-	TILEMAP_MAPPER_MEMBER(scan_layer_8x8_1_size1);
-	TILEMAP_MAPPER_MEMBER(scan_layer_roz_256);
-	TILEMAP_MAPPER_MEMBER(scan_layer_roz_128);
-	TILE_GET_INFO_MEMBER(tile_info_layer_8x8);
-	TILE_GET_INFO_MEMBER(tile_info_layer_roz);
+	tilemap_memory_index scan_layer_8x8_0_size0(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	tilemap_memory_index scan_layer_8x8_0_size1(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	tilemap_memory_index scan_layer_8x8_1_size0(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	tilemap_memory_index scan_layer_8x8_1_size1(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	tilemap_memory_index scan_layer_roz_256(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	tilemap_memory_index scan_layer_roz_128(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	void tile_info_layer_8x8(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void tile_info_layer_roz(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 };
 
 extern const device_type K001604;

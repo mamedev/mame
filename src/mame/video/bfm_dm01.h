@@ -33,7 +33,7 @@ public:
 	void writedata(uint8_t data);
 	int busy(void);
 
-	INTERRUPT_GEN_MEMBER(nmi_line_assert);
+	void nmi_line_assert(device_t &device);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

@@ -302,7 +302,7 @@ K054539_CB_MEMBER(xexex_state::ym_set_mixing)
 	m_filter2r->flt_volume_set_volume((71.0 * right) / 55.0);
 }
 
-TIMER_CALLBACK_MEMBER(xexex_state::dmaend_callback)
+void xexex_state::dmaend_callback(void *ptr, int32_t param)
 {
 	if (m_cur_control2 & 0x0040)
 	{
@@ -319,7 +319,7 @@ TIMER_CALLBACK_MEMBER(xexex_state::dmaend_callback)
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(xexex_state::xexex_interrupt)
+void xexex_state::xexex_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

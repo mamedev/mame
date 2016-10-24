@@ -10,7 +10,7 @@ Functions to emulate the video hardware of the machine.
 #include "emu.h"
 #include "includes/srmp2.h"
 
-PALETTE_INIT_MEMBER(srmp2_state,srmp2)
+void srmp2_state::palette_init_srmp2(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -25,7 +25,7 @@ PALETTE_INIT_MEMBER(srmp2_state,srmp2)
 }
 
 
-PALETTE_INIT_MEMBER(srmp2_state,srmp3)
+void srmp2_state::palette_init_srmp3(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;

@@ -101,7 +101,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(coin_word_r);
 	virtual void video_start() override;
 	uint32_t screen_update_galastrm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(galastrm_interrupt);
+	void galastrm_interrupt(device_t &device);
 	void draw_sprites_pre(int x_offs, int y_offs);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, const int *primasks, int priority);
 

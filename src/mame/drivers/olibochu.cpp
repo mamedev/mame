@@ -93,19 +93,19 @@ public:
 	void olibochu_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void olibochu_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void sound_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(olibochu);
+	void palette_init_olibochu(palette_device &palette);
 	uint32_t screen_update_olibochu(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(olibochu_scanline);
+	void olibochu_scanline(timer_device &timer, void *ptr, int32_t param);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 };
 
 
 
-PALETTE_INIT_MEMBER(olibochu_state, olibochu)
+void olibochu_state::palette_init_olibochu(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -166,7 +166,7 @@ void olibochu_state::olibochu_flipscreen_w(address_space &space, offs_t offset, 
 	/* other bits are used, but unknown */
 }
 
-TILE_GET_INFO_MEMBER(olibochu_state::get_bg_tile_info)
+void olibochu_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_colorram[tile_index];
 	int code = m_videoram[tile_index] + ((attr & 0x20) << 3);
@@ -443,7 +443,7 @@ void olibochu_state::machine_reset()
 	m_cmd = 0;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(olibochu_state::olibochu_scanline)
+void olibochu_state::olibochu_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

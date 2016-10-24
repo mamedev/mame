@@ -151,14 +151,14 @@ void pcw_state::pcw_update_irqs()
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-TIMER_CALLBACK_MEMBER(pcw_state::pcw_timer_pulse)
+void pcw_state::pcw_timer_pulse(void *ptr, int32_t param)
 {
 	m_timer_irq_flag = 0;
 	pcw_update_irqs();
 }
 
 /* callback for 1/300ths of a second interrupt */
-TIMER_DEVICE_CALLBACK_MEMBER(pcw_state::pcw_timer_interrupt)
+void pcw_state::pcw_timer_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	pcw_update_interrupt_counter();
 
@@ -170,7 +170,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(pcw_state::pcw_timer_interrupt)
 /* PCW uses UPD765 in NON-DMA mode. FDC Ints are connected to /INT or
  * /NMI depending on choice (see system control below)
  * fdc interrupt callback. set/clear fdc int */
-WRITE_LINE_MEMBER( pcw_state::pcw_fdc_interrupt )
+void pcw_state::pcw_fdc_interrupt(int state)
 {
 	if (!state)
 		m_system_status &= ~(1<<5);
@@ -696,7 +696,7 @@ uint8_t pcw_state::pcw_printer_status_r(address_space &space, offs_t offset, uin
  * T0: Paper sensor (?)
  * T1: Print head location (1 if not at left margin)
  */
-TIMER_CALLBACK_MEMBER(pcw_state::pcw_stepper_callback)
+void pcw_state::pcw_stepper_callback(void *ptr, int32_t param)
 {
 	//popmessage("PRN: P2 bits %s %s %s\nSerial: %02x\nHeadpos: %i",m_printer_p2 & 0x40 ? " " : "6",m_printer_p2 & 0x20 ? " " : "5",m_printer_p2 & 0x10 ? " " : "4",m_printer_shift_output,m_printer_headpos);
 	if((m_printer_p2 & 0x10) == 0)  // print head motor active
@@ -755,7 +755,7 @@ TIMER_CALLBACK_MEMBER(pcw_state::pcw_stepper_callback)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(pcw_state::pcw_pins_callback)
+void pcw_state::pcw_pins_callback(void *ptr, int32_t param)
 {
 	pcw_printer_fire_pins(m_printer_pins);
 	m_printer_p2 |= 0x40;
@@ -993,7 +993,7 @@ static ADDRESS_MAP_START(pcw_keyboard_io, AS_IO, 8, pcw_state )
 ADDRESS_MAP_END
 
 
-TIMER_CALLBACK_MEMBER(pcw_state::setup_beep)
+void pcw_state::setup_beep(void *ptr, int32_t param)
 {
 	m_beeper->set_state(0);
 }

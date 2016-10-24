@@ -31,7 +31,7 @@ public:
 
 	uint8_t hdc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void hdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(irq_w);
+	void irq_w(int state);
 
 protected:
 	// device-level overrides

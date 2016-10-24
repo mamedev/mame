@@ -55,8 +55,8 @@ public:
 	void com8116_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t pia_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void pia_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( rx_tx_0_w );
-	DECLARE_WRITE_LINE_MEMBER( rx_tx_1_w );
+	void rx_tx_0_w(int state);
+	void rx_tx_1_w(int state);
 };
 
 #endif

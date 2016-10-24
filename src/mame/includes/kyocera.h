@@ -119,9 +119,9 @@ public:
 	void i8155_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void i8155_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t i8155_pc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( i8155_to_w );
-	DECLARE_WRITE_LINE_MEMBER( write_centronics_busy );
-	DECLARE_WRITE_LINE_MEMBER( write_centronics_select );
+	void i8155_to_w(int state);
+	void write_centronics_busy(int state);
+	void write_centronics_select(int state);
 
 	/* memory state */
 	uint8_t m_bank;           /* memory bank selection */
@@ -136,9 +136,9 @@ public:
 	int m_centronics_busy;
 	int m_centronics_select;
 
-	DECLARE_PALETTE_INIT(kc85);
-	DECLARE_WRITE_LINE_MEMBER(kc85_sod_w);
-	DECLARE_READ_LINE_MEMBER(kc85_sid_r);
+	void palette_init_kc85(palette_device &palette);
+	void kc85_sod_w(int state);
+	int kc85_sid_r();
 };
 
 class trsm100_state : public kc85_state
@@ -224,15 +224,15 @@ public:
 	void i8155_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void i8155_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t i8155_pc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( i8155_to_w );
-	DECLARE_WRITE_LINE_MEMBER(kc85_sod_w);
-	DECLARE_READ_LINE_MEMBER(kc85_sid_r);
-	DECLARE_WRITE_LINE_MEMBER( write_centronics_busy );
-	DECLARE_WRITE_LINE_MEMBER( write_centronics_select );
+	void i8155_to_w(int state);
+	void kc85_sod_w(int state);
+	int kc85_sid_r();
+	void write_centronics_busy(int state);
+	void write_centronics_select(int state);
 
-	DECLARE_PALETTE_INIT(tandy200);
+	void palette_init_tandy200(palette_device &palette);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(tandy200_tp_tick);
+	void tandy200_tp_tick(timer_device &timer, void *ptr, int32_t param);
 
 	void bankswitch(uint8_t data);
 

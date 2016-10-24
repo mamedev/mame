@@ -323,7 +323,7 @@ const char *const m37710_cpu_device::m37710_tnames[8] =
 	"A0", "A1", "A2", "A3", "A4", "B0", "B1", "B2"
 };
 
-TIMER_CALLBACK_MEMBER( m37710_cpu_device::m37710_timer_cb )
+void m37710_cpu_device::m37710_timer_cb(void *ptr, int32_t param)
 {
 	int which = param;
 	int curirq = M37710_LINE_TIMERA0 - which;

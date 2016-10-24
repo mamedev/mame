@@ -34,7 +34,7 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual ioport_constructor device_input_ports() const override;
 
-	DECLARE_WRITE_LINE_MEMBER( opl_irq_w );
+	void opl_irq_w(int state);
 
 protected:
 	// device-level overrides

@@ -20,7 +20,7 @@ class midiin_port_device : public device_t,
 public:
 	midiin_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE_LINE_MEMBER( read ) { output_rxd(state); }
+	void read(int state) { output_rxd(state); }
 
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;

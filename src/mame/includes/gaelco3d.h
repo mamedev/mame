@@ -129,7 +129,7 @@ public:
 	void gaelco3d_paletteram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void gaelco3d_paletteram_020_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	DECLARE_CUSTOM_INPUT_MEMBER(analog_bit_r);
-	DECLARE_WRITE_LINE_MEMBER(ser_irq);
+	void ser_irq(int state);
 	uint16_t eeprom_data_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	uint32_t eeprom_data32_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	void eeprom_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
@@ -142,9 +142,9 @@ public:
 	void machine_reset_gaelco3d2();
 	void machine_reset_common();
 	uint32_t screen_update_gaelco3d(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vblank_gen);
-	TIMER_CALLBACK_MEMBER(delayed_sound_w);
-	TIMER_DEVICE_CALLBACK_MEMBER(adsp_autobuffer_irq);
+	void vblank_gen(device_t &device);
+	void delayed_sound_w(void *ptr, int32_t param);
+	void adsp_autobuffer_irq(timer_device &timer, void *ptr, int32_t param);
 	void gaelco3d_render(screen_device &screen);
 	void adsp_tx_callback(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 };

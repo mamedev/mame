@@ -129,24 +129,24 @@ INPUT_PORTS_END
 
 /* Video */
 
-READ_LINE_MEMBER( eti660_state::rdata_r )
+int eti660_state::rdata_r()
 {
 	return BIT(m_color, 0);
 }
 
-READ_LINE_MEMBER( eti660_state::bdata_r )
+int eti660_state::bdata_r()
 {
 	return BIT(m_color, 1);
 }
 
-READ_LINE_MEMBER( eti660_state::gdata_r )
+int eti660_state::gdata_r()
 {
 	return BIT(m_color, 2);
 }
 
 /* CDP1802 Interface */
 
-READ_LINE_MEMBER( eti660_state::clear_r )
+int eti660_state::clear_r()
 {
 	// A hack to make the machine reset itself on
 	// boot, like the real one does.
@@ -157,17 +157,17 @@ READ_LINE_MEMBER( eti660_state::clear_r )
 	return BIT(m_special->read(), 0); // R key
 }
 
-READ_LINE_MEMBER( eti660_state::ef2_r )
+int eti660_state::ef2_r()
 {
 	return m_cassette->input() < 0;
 }
 
-READ_LINE_MEMBER( eti660_state::ef4_r )
+int eti660_state::ef4_r()
 {
 	return BIT(m_special->read(), 1); // S key
 }
 
-WRITE_LINE_MEMBER( eti660_state::q_w )
+void eti660_state::q_w(int state)
 {
 	/* CDP1864 audio output enable */
 	m_cti->aoe_w(state);

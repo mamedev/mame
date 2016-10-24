@@ -93,7 +93,7 @@ void tecmo_state::adpcm_vol_w(address_space &space, offs_t offset, uint8_t data,
 	m_msm->set_volume((data & 0x0f) * 100 / 15);
 }
 
-WRITE_LINE_MEMBER(tecmo_state::adpcm_int)
+void tecmo_state::adpcm_int(int state)
 {
 	if (m_adpcm_pos >= m_adpcm_end ||
 				m_adpcm_pos >= memregion("adpcm")->bytes())

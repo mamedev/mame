@@ -85,7 +85,7 @@ static const unsigned char intv_colors[] =
 	0xB5, 0x1A, 0x58  /* PURPLE */
 };
 
-PALETTE_INIT_MEMBER(intv_state, intv)
+void intv_state::palette_init_intv(palette_device &palette)
 {
 	int k = 0;
 	uint8_t r, g, b;
@@ -438,12 +438,12 @@ void intv_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 /* This is needed because MAME core does not allow PULSE_LINE.
     The time interval is not critical, although it should be below 1000. */
 
-TIMER_CALLBACK_MEMBER(intv_state::intv_interrupt2_complete)
+void intv_state::intv_interrupt2_complete(void *ptr, int32_t param)
 {
 	m_keyboard->set_input_line(0, CLEAR_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(intv_state::intv_interrupt2)
+void intv_state::intv_interrupt2(device_t &device)
 {
 	m_keyboard->set_input_line(0, ASSERT_LINE);
 	timer_set(m_keyboard->cycles_to_attotime(100), TIMER_INTV_INTERRUPT2_COMPLETE);

@@ -121,14 +121,14 @@ void yiear_state::yiear_VLM5030_control_w(address_space &space, offs_t offset, u
 	m_vlm->rst((data >> 2) & 1);
 }
 
-INTERRUPT_GEN_MEMBER(yiear_state::yiear_vblank_interrupt)
+void yiear_state::yiear_vblank_interrupt(device_t &device)
 {
 	if (m_yiear_irq_enable)
 		device.execute().set_input_line(0, HOLD_LINE);
 }
 
 
-INTERRUPT_GEN_MEMBER(yiear_state::yiear_nmi_interrupt)
+void yiear_state::yiear_nmi_interrupt(device_t &device)
 {
 	if (m_yiear_nmi_enable)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);

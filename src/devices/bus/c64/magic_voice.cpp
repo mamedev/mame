@@ -71,7 +71,7 @@ const device_type C64_MAGIC_VOICE = &device_creator<c64_magic_voice_cartridge_de
 //  tpi6525_interface tpi_intf
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( c64_magic_voice_cartridge_device::tpi_irq_w )
+void c64_magic_voice_cartridge_device::tpi_irq_w(int state)
 {
 	m_slot->nmi_w(state);
 }
@@ -172,12 +172,12 @@ void c64_magic_voice_cartridge_device::tpi_pb_w(address_space &space, offs_t off
 	m_tpi_pb = data;
 }
 
-WRITE_LINE_MEMBER( c64_magic_voice_cartridge_device::tpi_ca_w )
+void c64_magic_voice_cartridge_device::tpi_ca_w(int state)
 {
 	m_tpi_pc6 = state;
 }
 
-WRITE_LINE_MEMBER( c64_magic_voice_cartridge_device::tpi_cb_w )
+void c64_magic_voice_cartridge_device::tpi_cb_w(int state)
 {
 	m_exrom = state;
 }
@@ -186,7 +186,7 @@ WRITE_LINE_MEMBER( c64_magic_voice_cartridge_device::tpi_cb_w )
 //  t6721_interface
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( c64_magic_voice_cartridge_device::phi2_w )
+void c64_magic_voice_cartridge_device::phi2_w(int state)
 {
 	if (state)
 	{
@@ -196,14 +196,14 @@ WRITE_LINE_MEMBER( c64_magic_voice_cartridge_device::phi2_w )
 	}
 }
 
-WRITE_LINE_MEMBER( c64_magic_voice_cartridge_device::dtrd_w )
+void c64_magic_voice_cartridge_device::dtrd_w(int state)
 {
 	m_fifo->so_w(!state);
 
 	m_pd = m_fifo->read();
 }
 
-WRITE_LINE_MEMBER( c64_magic_voice_cartridge_device::apd_w )
+void c64_magic_voice_cartridge_device::apd_w(int state)
 {
 	if (state)
 	{

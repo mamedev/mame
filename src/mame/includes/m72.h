@@ -148,13 +148,13 @@ public:
 	void m82_gfx_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void m82_tm_ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
-	TILE_GET_INFO_MEMBER(rtype2_get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(rtype2_get_fg_tile_info);
+	void rtype2_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void rtype2_get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
-	TILEMAP_MAPPER_MEMBER(m82_scan_rows);
+	tilemap_memory_index m82_scan_rows(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
 
 	void machine_start() override;
 	void machine_reset() override;
@@ -177,12 +177,12 @@ public:
 	void init_loht();
 	void init_imgfight();
 
-	INTERRUPT_GEN_MEMBER(mcu_int);
-	INTERRUPT_GEN_MEMBER(fake_nmi);
-	TIMER_CALLBACK_MEMBER(synch_callback);
-	TIMER_CALLBACK_MEMBER(scanline_interrupt);
-	TIMER_CALLBACK_MEMBER(kengo_scanline_interrupt);
-	TIMER_CALLBACK_MEMBER(delayed_ram16_w);
+	void mcu_int(device_t &device);
+	void fake_nmi(device_t &device);
+	void synch_callback(void *ptr, int32_t param);
+	void scanline_interrupt(void *ptr, int32_t param);
+	void kengo_scanline_interrupt(void *ptr, int32_t param);
+	void delayed_ram16_w(void *ptr, int32_t param);
 
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

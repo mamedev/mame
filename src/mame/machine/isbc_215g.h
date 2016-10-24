@@ -23,10 +23,10 @@ public:
 	uint16_t mem_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void mem_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_WRITE_LINE_MEMBER(isbx_irq_00_w);
-	DECLARE_WRITE_LINE_MEMBER(isbx_irq_01_w);
-	DECLARE_WRITE_LINE_MEMBER(isbx_irq_10_w);
-	DECLARE_WRITE_LINE_MEMBER(isbx_irq_11_w);
+	void isbx_irq_00_w(int state);
+	void isbx_irq_01_w(int state);
+	void isbx_irq_10_w(int state);
+	void isbx_irq_11_w(int state);
 
 	static void static_set_wakeup_addr(device_t &device, uint32_t wakeup) { downcast<isbc_215g_device &>(device).m_wakeup = wakeup; }
 	static void static_set_maincpu_tag(device_t &device, const char *maincpu_tag) { downcast<isbc_215g_device &>(device).m_maincpu_tag = maincpu_tag; }

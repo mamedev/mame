@@ -426,7 +426,7 @@ void upd3301_device::dack_w(address_space &space, offs_t offset, uint8_t data, u
 //  lpen_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( upd3301_device::lpen_w )
+void upd3301_device::lpen_w(int state)
 {
 }
 
@@ -435,7 +435,7 @@ WRITE_LINE_MEMBER( upd3301_device::lpen_w )
 //  hrtc_r -
 //-------------------------------------------------
 
-READ_LINE_MEMBER( upd3301_device::hrtc_r )
+int upd3301_device::hrtc_r()
 {
 	return m_hrtc;
 }
@@ -445,7 +445,7 @@ READ_LINE_MEMBER( upd3301_device::hrtc_r )
 //  vrtc_r -
 //-------------------------------------------------
 
-READ_LINE_MEMBER( upd3301_device::vrtc_r )
+int upd3301_device::vrtc_r()
 {
 	return m_vrtc;
 }

@@ -27,12 +27,12 @@
 const device_type C64_MIDI_NAMESOFT = &device_creator<c64_namesoft_midi_cartridge_device>;
 
 
-WRITE_LINE_MEMBER( c64_namesoft_midi_cartridge_device::acia_irq_w )
+void c64_namesoft_midi_cartridge_device::acia_irq_w(int state)
 {
 	m_slot->nmi_w(state);
 }
 
-WRITE_LINE_MEMBER( c64_namesoft_midi_cartridge_device::write_acia_clock )
+void c64_namesoft_midi_cartridge_device::write_acia_clock(int state)
 {
 	m_acia->write_txc(state);
 	m_acia->write_rxc(state);

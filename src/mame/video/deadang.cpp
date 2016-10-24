@@ -33,26 +33,26 @@ void deadang_state::bank_w(address_space &space, offs_t offset, uint16_t data, u
 
 /******************************************************************************/
 
-TILEMAP_MAPPER_MEMBER(deadang_state::bg_scan)
+tilemap_memory_index deadang_state::bg_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	return (col&0xf) | ((row&0xf)<<4) | ((col&0x70)<<4) | ((row&0xf0)<<7);
 }
 
-TILE_GET_INFO_MEMBER(deadang_state::get_pf3_tile_info)
+void deadang_state::get_pf3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	const uint16_t *bgMap = (const uint16_t *)memregion("gfx6")->base();
 	int code= bgMap[tile_index];
 	SET_TILE_INFO_MEMBER(4,code&0x7ff,code>>12,0);
 }
 
-TILE_GET_INFO_MEMBER(deadang_state::get_pf2_tile_info)
+void deadang_state::get_pf2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	const uint16_t *bgMap = (const uint16_t *)memregion("gfx7")->base();
 	int code= bgMap[tile_index];
 	SET_TILE_INFO_MEMBER(3,code&0x7ff,code>>12,0);
 }
 
-TILE_GET_INFO_MEMBER(deadang_state::get_pf1_tile_info)
+void deadang_state::get_pf1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile=m_video_data[tile_index];
 	int color=tile >> 12;
@@ -61,7 +61,7 @@ TILE_GET_INFO_MEMBER(deadang_state::get_pf1_tile_info)
 	SET_TILE_INFO_MEMBER(2,tile+m_tilebank*0x1000,color,0);
 }
 
-TILE_GET_INFO_MEMBER(deadang_state::get_text_tile_info)
+void deadang_state::get_text_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile=(m_videoram[tile_index] & 0xff) | ((m_videoram[tile_index] >> 6) & 0x300);
 	int color=(m_videoram[tile_index] >> 8)&0xf;

@@ -77,8 +77,8 @@ public:
 	void sound_68k_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void sound_68k_dac_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void init_cyberbalt();
-	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
-	TILE_GET_INFO_MEMBER(get_playfield_tile_info);
+	void get_alpha_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_playfield_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void machine_start_cyberbal();
 	void machine_start_cyberbal2p();
 	void machine_reset_cyberbal();
@@ -88,7 +88,7 @@ public:
 	uint32_t screen_update_cyberbal_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cyberbal_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cyberbal2p(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(sound_68k_irq_gen);
+	void sound_68k_irq_gen(device_t &device);
 
 	static const atari_motion_objects_config s_mob_config;
 

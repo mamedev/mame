@@ -12,7 +12,7 @@
 #include "includes/terracre.h"
 
 
-TILE_GET_INFO_MEMBER(terracre_state::get_bg_tile_info)
+void terracre_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	/* xxxx.----.----.----
 	 * ----.xx--.----.----
@@ -22,7 +22,7 @@ TILE_GET_INFO_MEMBER(terracre_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(1,data&0x3ff,color,0 );
 }
 
-TILE_GET_INFO_MEMBER(terracre_state::get_fg_tile_info)
+void terracre_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	unsigned data = m_fg_videoram[tile_index];
 	SET_TILE_INFO_MEMBER(0,data&0xff,0,0 );
@@ -89,7 +89,7 @@ void terracre_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	}
 }
 
-PALETTE_INIT_MEMBER(terracre_state, terracre)
+void terracre_state::palette_init_terracre(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;

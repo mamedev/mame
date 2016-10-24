@@ -7,7 +7,7 @@
 
 /* background tilemap stuff */
 
-TILE_GET_INFO_MEMBER(pass_state::get_pass_bg_tile_info)
+void pass_state::get_pass_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno, fx;
 
@@ -25,7 +25,7 @@ void pass_state::pass_bg_videoram_w(address_space &space, offs_t offset, uint16_
 
 /* foreground 'sprites' tilemap stuff */
 
-TILE_GET_INFO_MEMBER(pass_state::get_pass_fg_tile_info)
+void pass_state::get_pass_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno, flip;
 

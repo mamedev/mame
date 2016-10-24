@@ -120,17 +120,17 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_pc100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(pc100_vblank_irq);
-	TIMER_DEVICE_CALLBACK_MEMBER(pc100_600hz_irq);
-	TIMER_DEVICE_CALLBACK_MEMBER(pc100_100hz_irq);
-	TIMER_DEVICE_CALLBACK_MEMBER(pc100_50hz_irq);
-	TIMER_DEVICE_CALLBACK_MEMBER(pc100_10hz_irq);
+	void pc100_vblank_irq(device_t &device);
+	void pc100_600hz_irq(timer_device &timer, void *ptr, int32_t param);
+	void pc100_100hz_irq(timer_device &timer, void *ptr, int32_t param);
+	void pc100_50hz_irq(timer_device &timer, void *ptr, int32_t param);
+	void pc100_10hz_irq(timer_device &timer, void *ptr, int32_t param);
 
 
-	WRITE_LINE_MEMBER(rtc_portc_0_w) { m_rtc_portc = (m_rtc_portc & ~(1 << 0)) | ((state & 1) << 0); }
-	WRITE_LINE_MEMBER(rtc_portc_1_w) { m_rtc_portc = (m_rtc_portc & ~(1 << 1)) | ((state & 1) << 1); }
-	WRITE_LINE_MEMBER(rtc_portc_2_w) { m_rtc_portc = (m_rtc_portc & ~(1 << 2)) | ((state & 1) << 2); }
-	WRITE_LINE_MEMBER(rtc_portc_3_w) { m_rtc_portc = (m_rtc_portc & ~(1 << 3)) | ((state & 1) << 3); }
+	void rtc_portc_0_w(int state) { m_rtc_portc = (m_rtc_portc & ~(1 << 0)) | ((state & 1) << 0); }
+	void rtc_portc_1_w(int state) { m_rtc_portc = (m_rtc_portc & ~(1 << 1)) | ((state & 1) << 1); }
+	void rtc_portc_2_w(int state) { m_rtc_portc = (m_rtc_portc & ~(1 << 2)) | ((state & 1) << 2); }
+	void rtc_portc_3_w(int state) { m_rtc_portc = (m_rtc_portc & ~(1 << 3)) | ((state & 1) << 3); }
 	uint8_t m_rtc_portc;
 };
 
@@ -401,13 +401,13 @@ void pc100_state::machine_reset()
 	m_beeper->set_state(0);
 }
 
-INTERRUPT_GEN_MEMBER(pc100_state::pc100_vblank_irq)
+void pc100_state::pc100_vblank_irq(device_t &device)
 {
 	machine().device<pic8259_device>("pic8259")->ir4_w(0);
 	machine().device<pic8259_device>("pic8259")->ir4_w(1);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(pc100_state::pc100_600hz_irq)
+void pc100_state::pc100_600hz_irq(timer_device &timer, void *ptr, int32_t param)
 {
 	if(m_timer_mode == 0)
 	{
@@ -416,7 +416,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(pc100_state::pc100_600hz_irq)
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(pc100_state::pc100_100hz_irq)
+void pc100_state::pc100_100hz_irq(timer_device &timer, void *ptr, int32_t param)
 {
 	if(m_timer_mode == 1)
 	{
@@ -425,7 +425,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(pc100_state::pc100_100hz_irq)
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(pc100_state::pc100_50hz_irq)
+void pc100_state::pc100_50hz_irq(timer_device &timer, void *ptr, int32_t param)
 {
 	if(m_timer_mode == 2)
 	{
@@ -434,7 +434,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(pc100_state::pc100_50hz_irq)
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(pc100_state::pc100_10hz_irq)
+void pc100_state::pc100_10hz_irq(timer_device &timer, void *ptr, int32_t param)
 {
 	if(m_timer_mode == 3)
 	{

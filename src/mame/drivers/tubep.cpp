@@ -275,7 +275,7 @@ void tubep_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 }
 
 
-TIMER_CALLBACK_MEMBER(tubep_state::tubep_scanline_callback)
+void tubep_state::tubep_scanline_callback(void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -456,7 +456,7 @@ static ADDRESS_MAP_START( rjammer_second_portmap, AS_IO, 8, tubep_state )
 ADDRESS_MAP_END
 
 
-TIMER_CALLBACK_MEMBER(tubep_state::rjammer_scanline_callback)
+void tubep_state::rjammer_scanline_callback(void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -568,7 +568,7 @@ void tubep_state::rjammer_voice_frequency_select_w(address_space &space, offs_t 
 }
 
 
-WRITE_LINE_MEMBER(tubep_state::rjammer_adpcm_vck)
+void tubep_state::rjammer_adpcm_vck(int state)
 {
 	m_ls74 = (m_ls74 + 1) & 1;
 

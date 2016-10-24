@@ -33,7 +33,7 @@ public:
 	uint16_t sprram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	uint16_t scrram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void scrollram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	READ_LINE_MEMBER( flipscreen_r );
+	int flipscreen_r();
 	void postload();
 
 protected:
@@ -75,9 +75,9 @@ private:
 
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	TILE_GET_INFO_MEMBER(get_bg0_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
-	TILE_GET_INFO_MEMBER(get_tx_tile_info);
+	void get_bg0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void bg0_tilemap_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, uint32_t priority );
 	void bg1_tilemap_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, uint32_t priority );
 };

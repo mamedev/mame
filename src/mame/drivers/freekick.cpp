@@ -97,7 +97,7 @@ void freekick_state::nmi_enable_w(address_space &space, offs_t offset, uint8_t d
 	m_nmi_en = data & 1;
 }
 
-INTERRUPT_GEN_MEMBER(freekick_state::freekick_irqgen)
+void freekick_state::freekick_irqgen(device_t &device)
 {
 	if (m_nmi_en)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);

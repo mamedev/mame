@@ -60,7 +60,7 @@ public:
 	// static configuration helpers
 	static void set_screen_tag(device_t &device, const char *screen_tag) { downcast<gic_device &>(device).m_screen_tag = screen_tag; }
 
-	DECLARE_PALETTE_INIT(gic);
+	void palette_init_gic(palette_device &palette);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 

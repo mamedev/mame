@@ -183,7 +183,7 @@ public:
 	void port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_replicator();
 	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(replicator);
+	void palette_init_replicator(palette_device &palette);
 };
 
 void replicator_state::machine_start()
@@ -575,7 +575,7 @@ void replicator_state::machine_reset()
 	m_port_l = 0;
 }
 
-PALETTE_INIT_MEMBER(replicator_state, replicator)
+void replicator_state::palette_init_replicator(palette_device &palette)
 {
 //These colors were picked with the color picker in Inkscape, based on a photo of the LCD used in the Replicator 1 3d printer:
 	palette.set_pen_color(0, rgb_t(0xCA, 0xE7, 0xEB));

@@ -74,8 +74,8 @@ public:
 	void io_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint16_t next_pixel(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	uint16_t time_until_next_event(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
-	DECLARE_WRITE_LINE_MEMBER( vsync_changed );
-	DECLARE_WRITE_LINE_MEMBER( hsync_changed );
+	void vsync_changed(int state);
+	void hsync_changed(int state);
 
 protected:
 	// device-level overrides

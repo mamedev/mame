@@ -31,9 +31,9 @@ public:
 
 	optional_shared_ptr<uint8_t> m_dealem_videoram;
 	void machine_reset_dealem_vid();
-	DECLARE_PALETTE_INIT(dealem);
+	void palette_init_dealem(palette_device &palette);
 	uint32_t screen_update_dealem(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(dealem_vsync_changed);
+	void dealem_vsync_changed(int state);
 	required_device<gfxdecode_device> m_gfxdecode;
 };
 
@@ -78,7 +78,7 @@ GFXDECODE_END
 ***************************************************************************/
 
 
-PALETTE_INIT_MEMBER(mpu4dealem_state,dealem)
+void mpu4dealem_state::palette_init_dealem(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i, len;
@@ -136,7 +136,7 @@ uint32_t mpu4dealem_state::screen_update_dealem(screen_device &screen, bitmap_in
 }
 
 
-WRITE_LINE_MEMBER(mpu4dealem_state::dealem_vsync_changed)
+void mpu4dealem_state::dealem_vsync_changed(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, state);
 }

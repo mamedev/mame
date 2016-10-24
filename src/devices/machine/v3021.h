@@ -45,7 +45,7 @@ public:
 	// I/O operations
 	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	TIMER_CALLBACK_MEMBER(timer_callback);
+	void timer_callback(void *ptr, int32_t param);
 
 protected:
 	// device-level overrides

@@ -509,7 +509,7 @@ void taitojc_state::main_to_dsp_7ff_w(address_space &space, offs_t offset, uint1
 	}
 }
 
-INTERRUPT_GEN_MEMBER(taitojc_state::taitojc_vblank)
+void taitojc_state::taitojc_vblank(device_t &device)
 {
 	device.execute().set_input_line_and_vector(2, HOLD_LINE, 0x82); // where does it come from?
 }

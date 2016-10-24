@@ -11,7 +11,7 @@
 #include "includes/ashnojoe.h"
 
 
-TILE_GET_INFO_MEMBER(ashnojoe_state::get_joe_tile_info)
+void ashnojoe_state::get_joe_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_tileram[tile_index];
 
@@ -21,7 +21,7 @@ TILE_GET_INFO_MEMBER(ashnojoe_state::get_joe_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(ashnojoe_state::get_joe_tile_info_2)
+void ashnojoe_state::get_joe_tile_info_2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_tileram_2[tile_index * 2];
 	int attr = m_tileram_2[tile_index * 2 + 1];
@@ -32,7 +32,7 @@ TILE_GET_INFO_MEMBER(ashnojoe_state::get_joe_tile_info_2)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(ashnojoe_state::get_joe_tile_info_3)
+void ashnojoe_state::get_joe_tile_info_3(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_tileram_3[tile_index];
 
@@ -42,7 +42,7 @@ TILE_GET_INFO_MEMBER(ashnojoe_state::get_joe_tile_info_3)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(ashnojoe_state::get_joe_tile_info_4)
+void ashnojoe_state::get_joe_tile_info_4(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_tileram_4[tile_index];
 
@@ -52,7 +52,7 @@ TILE_GET_INFO_MEMBER(ashnojoe_state::get_joe_tile_info_4)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(ashnojoe_state::get_joe_tile_info_5)
+void ashnojoe_state::get_joe_tile_info_5(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_tileram_5[tile_index * 2];
 	int attr = m_tileram_5[tile_index * 2 + 1];
@@ -63,7 +63,7 @@ TILE_GET_INFO_MEMBER(ashnojoe_state::get_joe_tile_info_5)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(ashnojoe_state::get_joe_tile_info_6)
+void ashnojoe_state::get_joe_tile_info_6(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_tileram_6[tile_index * 2];
 	int attr = m_tileram_6[tile_index * 2 + 1];
@@ -75,7 +75,7 @@ TILE_GET_INFO_MEMBER(ashnojoe_state::get_joe_tile_info_6)
 }
 
 
-TILE_GET_INFO_MEMBER(ashnojoe_state::get_joe_tile_info_7)
+void ashnojoe_state::get_joe_tile_info_7(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_tileram_7[tile_index * 2];
 	int attr = m_tileram_7[tile_index * 2 + 1];

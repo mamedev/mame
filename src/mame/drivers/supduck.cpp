@@ -75,7 +75,7 @@ public:
 	void supduck_4000_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void supduck_4002_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	TILEMAP_MAPPER_MEMBER(supduk_tilemap_scan);
+	tilemap_memory_index supduk_tilemap_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
 
 	void okibank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
@@ -87,15 +87,15 @@ protected:
 
 	virtual void video_start() override;
 
-	TILE_GET_INFO_MEMBER(get_text_tile_info);
-	TILE_GET_INFO_MEMBER(get_fore_tile_info);
-	TILE_GET_INFO_MEMBER(get_back_tile_info);
+	void get_text_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_fore_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_back_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 };
 
 
 
-TILEMAP_MAPPER_MEMBER(supduck_state::supduk_tilemap_scan)
+tilemap_memory_index supduck_state::supduk_tilemap_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	// where does each page start?
 	int pagesize = 0x8 * 0x8;
@@ -157,7 +157,7 @@ void supduck_state::back_videoram_w(address_space &space, offs_t offset, uint16_
 }
 
 
-TILE_GET_INFO_MEMBER(supduck_state::get_text_tile_info) // same as tigeroad.c
+void supduck_state::get_text_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index) // same as tigeroad.c
 {
 	uint16_t *videoram = m_text_videoram;
 	int data = videoram[tile_index];
@@ -169,7 +169,7 @@ TILE_GET_INFO_MEMBER(supduck_state::get_text_tile_info) // same as tigeroad.c
 	SET_TILE_INFO_MEMBER(0, code, color, flags);
 }
 
-TILE_GET_INFO_MEMBER(supduck_state::get_fore_tile_info)
+void supduck_state::get_fore_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t *videoram = m_fore_videoram;
 	int data = videoram[tile_index];
@@ -185,7 +185,7 @@ TILE_GET_INFO_MEMBER(supduck_state::get_fore_tile_info)
 	SET_TILE_INFO_MEMBER(1, code, color, flags);
 }
 
-TILE_GET_INFO_MEMBER(supduck_state::get_back_tile_info)
+void supduck_state::get_back_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t *videoram = m_back_videoram;
 	int data = videoram[tile_index];

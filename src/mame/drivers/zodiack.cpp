@@ -115,13 +115,13 @@ void zodiack_state::sound_nmi_enable_w(address_space &space, offs_t offset, uint
 	m_sound_nmi_enabled = data & 1;
 }
 
-INTERRUPT_GEN_MEMBER(zodiack_state::zodiack_main_nmi_gen)
+void zodiack_state::zodiack_main_nmi_gen(device_t &device)
 {
 	if (m_main_nmi_enabled)
 		nmi_line_pulse(device);
 }
 
-INTERRUPT_GEN_MEMBER(zodiack_state::zodiack_sound_nmi_gen)
+void zodiack_state::zodiack_sound_nmi_gen(device_t &device)
 {
 	if (m_sound_nmi_enabled)
 		nmi_line_pulse(device);

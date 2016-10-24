@@ -55,12 +55,12 @@ static ADDRESS_MAP_START( cedar_magnet_sound_io, AS_IO, 8, cedar_magnet_sound_de
 ADDRESS_MAP_END
 
 
-WRITE_LINE_MEMBER(cedar_magnet_sound_device::ctc0_z0_w)
+void cedar_magnet_sound_device::ctc0_z0_w(int state)
 {
 //  printf("USED ctc0_z0_w %d\n", state);
 }
 
-WRITE_LINE_MEMBER(cedar_magnet_sound_device::ctc0_z1_w)
+void cedar_magnet_sound_device::ctc0_z1_w(int state)
 {
 //  printf("USED  ctc0_z1_w %d\n", state);
 }
@@ -68,32 +68,32 @@ WRITE_LINE_MEMBER(cedar_magnet_sound_device::ctc0_z1_w)
 
 // I don't think any of the below are used
 
-WRITE_LINE_MEMBER(cedar_magnet_sound_device::ctc1_z0_w)
+void cedar_magnet_sound_device::ctc1_z0_w(int state)
 {
 	printf("ctc1_z0_w %d\n", state);
 }
 
-WRITE_LINE_MEMBER(cedar_magnet_sound_device::ctc1_z1_w)
+void cedar_magnet_sound_device::ctc1_z1_w(int state)
 {
 	printf("ctc1_z1_w %d\n", state);
 }
 
-WRITE_LINE_MEMBER(cedar_magnet_sound_device::ctc1_z2_w)
+void cedar_magnet_sound_device::ctc1_z2_w(int state)
 {
 	printf("ctc1_z2_w %d\n", state);
 }
 
-WRITE_LINE_MEMBER(cedar_magnet_sound_device::ctc0_z2_w)
+void cedar_magnet_sound_device::ctc0_z2_w(int state)
 {
 	printf("ctc0_z2_w %d\n", state);
 }
 
-WRITE_LINE_MEMBER(cedar_magnet_sound_device::ctc0_int_w)
+void cedar_magnet_sound_device::ctc0_int_w(int state)
 {
 	//printf("ctc0_int_w %d\n", state);
 }
 
-WRITE_LINE_MEMBER(cedar_magnet_sound_device::ctc1_int_w)
+void cedar_magnet_sound_device::ctc1_int_w(int state)
 {
 /*
     switch (rand()&0x1)

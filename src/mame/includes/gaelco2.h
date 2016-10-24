@@ -54,10 +54,10 @@ public:
 	void init_snowboar();
 	void init_alighunt();
 	void init_maniacsqa();
-	TILE_GET_INFO_MEMBER(get_tile_info_gaelco2_screen0);
-	TILE_GET_INFO_MEMBER(get_tile_info_gaelco2_screen1);
-	TILE_GET_INFO_MEMBER(get_tile_info_gaelco2_screen0_dual);
-	TILE_GET_INFO_MEMBER(get_tile_info_gaelco2_screen1_dual);
+	void get_tile_info_gaelco2_screen0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info_gaelco2_screen1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info_gaelco2_screen0_dual(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info_gaelco2_screen1_dual(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void video_start_gaelco2();
 	void video_start_gaelco2_dual();
 	uint32_t screen_update_gaelco2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -95,7 +95,7 @@ public:
 	uint16_t p2_gun_x(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	uint16_t p2_gun_y(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void bang_clr_gun_int_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	TIMER_DEVICE_CALLBACK_MEMBER(bang_irq);
+	void bang_irq(timer_device &timer, void *ptr, int32_t param);
 	void init_bang();
 };
 

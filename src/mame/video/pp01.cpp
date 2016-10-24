@@ -50,7 +50,7 @@ static const rgb_t pp01_palette[8] = {
 	rgb_t(0x80, 0x80, 0x80), // 7
 };
 
-PALETTE_INIT_MEMBER(pp01_state, pp01)
+void pp01_state::palette_init_pp01(palette_device &palette)
 {
 	palette.set_pen_colors(0, pp01_palette, ARRAY_LENGTH(pp01_palette));
 }

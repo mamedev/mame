@@ -48,7 +48,7 @@ void scotrsht_state::ctrl_w(address_space &space, offs_t offset, uint8_t data, u
 	flip_screen_set(data & 0x08);
 }
 
-INTERRUPT_GEN_MEMBER(scotrsht_state::interrupt)
+void scotrsht_state::interrupt(device_t &device)
 {
 	if (m_irq_enable)
 		m_maincpu->set_input_line(0, HOLD_LINE);

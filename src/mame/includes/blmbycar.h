@@ -55,8 +55,8 @@ public:
 	// waterball
 	uint16_t waterball_unk_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
-	TILE_GET_INFO_MEMBER(get_tile_info_0);
-	TILE_GET_INFO_MEMBER(get_tile_info_1);
+	void get_tile_info_0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info_1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	void init_blmbycar();
 	virtual void video_start() override;

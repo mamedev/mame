@@ -90,10 +90,10 @@ public:
 	int m_alpha_clock;
 	int m_irq_status;
 	int m_optic_pattern;
-	DECLARE_WRITE_LINE_MEMBER(reel0_optic_cb) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
-	DECLARE_WRITE_LINE_MEMBER(reel1_optic_cb) { if (state) m_optic_pattern |= 0x02; else m_optic_pattern &= ~0x02; }
-	DECLARE_WRITE_LINE_MEMBER(reel2_optic_cb) { if (state) m_optic_pattern |= 0x04; else m_optic_pattern &= ~0x04; }
-	DECLARE_WRITE_LINE_MEMBER(reel3_optic_cb) { if (state) m_optic_pattern |= 0x08; else m_optic_pattern &= ~0x08; }
+	void reel0_optic_cb(int state) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
+	void reel1_optic_cb(int state) { if (state) m_optic_pattern |= 0x02; else m_optic_pattern &= ~0x02; }
+	void reel2_optic_cb(int state) { if (state) m_optic_pattern |= 0x04; else m_optic_pattern &= ~0x04; }
+	void reel3_optic_cb(int state) { if (state) m_optic_pattern |= 0x08; else m_optic_pattern &= ~0x08; }
 	int m_locked;
 	int m_is_timer_enabled;
 	int m_coin_inhibits;
@@ -117,13 +117,13 @@ public:
 	void mux_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void triac_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t triac_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(sys85_data_w);
-	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
+	void sys85_data_w(int state);
+	void write_acia_clock(int state);
 	void init_decode();
 	void init_nodecode();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	INTERRUPT_GEN_MEMBER(timer_irq);
+	void timer_irq(device_t &device);
 	int b85_find_project_string( );
 	optional_device<roc10937_t> m_vfd;
 	required_device<cpu_device> m_maincpu;
@@ -142,13 +142,13 @@ public:
 ///////////////////////////////////////////////////////////////////////////
 
 
-WRITE_LINE_MEMBER(bfmsys85_state::sys85_data_w)
+void bfmsys85_state::sys85_data_w(int state)
 {
 	m_sys85_data_line_t = state;
 }
 
 
-WRITE_LINE_MEMBER(bfmsys85_state::write_acia_clock)
+void bfmsys85_state::write_acia_clock(int state)
 {
 	m_acia6850_0->write_txc(state);
 	m_acia6850_0->write_rxc(state);
@@ -184,7 +184,7 @@ void bfmsys85_state::watchdog_w(address_space &space, offs_t offset, uint8_t dat
 
 ///////////////////////////////////////////////////////////////////////////
 
-INTERRUPT_GEN_MEMBER(bfmsys85_state::timer_irq)
+void bfmsys85_state::timer_irq(device_t &device)
 {
 	if ( m_is_timer_enabled )
 	{

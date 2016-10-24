@@ -64,7 +64,7 @@ public:
 	void spritectrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	virtual void machine_start() override;
-	DECLARE_PALETTE_INIT(taxidriv);
+	void palette_init_taxidriv(palette_device &palette);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

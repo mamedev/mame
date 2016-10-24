@@ -1778,9 +1778,9 @@ public:
 	devcb_write_line   m_vblank;
 	devcb_write_line   m_stall;
 
-	TIMER_CALLBACK_MEMBER( vblank_off_callback );
-	TIMER_CALLBACK_MEMBER( stall_cpu_callback );
-	TIMER_CALLBACK_MEMBER( vblank_callback );
+	void vblank_off_callback(void *ptr, int32_t param);
+	void stall_cpu_callback(void *ptr, int32_t param);
+	void vblank_callback(void *ptr, int32_t param);
 
 	static void voodoo_postload(voodoo_device *vd);
 

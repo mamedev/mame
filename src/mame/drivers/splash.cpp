@@ -111,7 +111,7 @@ void splash_state::splash_adpcm_data_w(address_space &space, offs_t offset, uint
 	m_adpcm_data = data;
 }
 
-WRITE_LINE_MEMBER(splash_state::splash_msm5205_int)
+void splash_state::splash_msm5205_int(int state)
 {
 	m_msm->data_w(m_adpcm_data >> 4);
 	m_adpcm_data = (m_adpcm_data << 4) & 0xf0;
@@ -154,7 +154,7 @@ void splash_state::roldfrog_vblank_ack_w(address_space &space, offs_t offset, ui
 }
 
 
-WRITE_LINE_MEMBER(splash_state::ym_irq)
+void splash_state::ym_irq(int state)
 {
 	m_sound_irq = state;
 	roldfrog_update_irq();
@@ -533,7 +533,7 @@ void splash_state::machine_start_roldfrog()
 	save_item(NAME(m_sound_irq));
 }
 
-INTERRUPT_GEN_MEMBER(splash_state::roldfrog_interrupt)
+void splash_state::roldfrog_interrupt(device_t &device)
 {
 	m_vblank_irq = 1;
 	roldfrog_update_irq();
@@ -580,7 +580,7 @@ static MACHINE_CONFIG_START( roldfrog, splash_state )
 	MCFG_SOUND_ROUTE(3, "mono", 1.0)
 MACHINE_CONFIG_END
 
-WRITE_LINE_MEMBER(splash_state::adpcm_int1)
+void splash_state::adpcm_int1(int state)
 {
 	if (m_snd_interrupt_enable1  || m_msm_toggle1 == 1)
 	{
@@ -595,7 +595,7 @@ WRITE_LINE_MEMBER(splash_state::adpcm_int1)
 	}
 }
 
-WRITE_LINE_MEMBER(splash_state::adpcm_int2)
+void splash_state::adpcm_int2(int state)
 {
 	if (m_snd_interrupt_enable2 || m_msm_toggle2 == 1)
 	{

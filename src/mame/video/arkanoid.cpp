@@ -162,7 +162,7 @@ void arkanoid_state::hexa_d008_w(address_space &space, offs_t offset, uint8_t da
 	/* bit 6 - 7 unknown */
 }
 
-TILE_GET_INFO_MEMBER(arkanoid_state::get_bg_tile_info)
+void arkanoid_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int offs = tile_index * 2;
 	int code = m_videoram[offs + 1] + ((m_videoram[offs] & 0x07) << 8) + 2048 * m_gfxbank;

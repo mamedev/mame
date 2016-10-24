@@ -120,9 +120,9 @@ public:
 
 	DECLARE_CUSTOM_INPUT_MEMBER(ejanhs_encode);
 
-	DECLARE_WRITE_LINE_MEMBER(ymf_irqhandler);
-	IRQ_CALLBACK_MEMBER(spi_irq_callback);
-	INTERRUPT_GEN_MEMBER(spi_interrupt);
+	void ymf_irqhandler(int state);
+	int spi_irq_callback(device_t &device, int irqline);
+	void spi_interrupt(device_t &device);
 
 	void set_layer_offsets();
 	void drawgfx_blend(bitmap_rgb32 &bitmap, const rectangle &cliprect, gfx_element *gfx, uint32_t code, uint32_t color, int flipx, int flipy, int sx, int sy, bitmap_ind8 &primap, int primask);
@@ -135,10 +135,10 @@ public:
 	void machine_reset_sxx2e();
 	void video_start_ejanhs();
 	void video_start_sys386f();
-	TILE_GET_INFO_MEMBER(get_text_tile_info);
-	TILE_GET_INFO_MEMBER(get_back_tile_info);
-	TILE_GET_INFO_MEMBER(get_midl_tile_info);
-	TILE_GET_INFO_MEMBER(get_fore_tile_info);
+	void get_text_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_back_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_midl_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_fore_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	uint32_t screen_update_spi(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_sys386f(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

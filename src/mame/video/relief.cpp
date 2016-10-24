@@ -18,7 +18,7 @@
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(relief_state::get_playfield_tile_info)
+void relief_state::get_playfield_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t data1 = tilemap.basemem_read(tile_index);
 	uint16_t data2 = tilemap.extmem_read(tile_index) & 0xff;
@@ -28,7 +28,7 @@ TILE_GET_INFO_MEMBER(relief_state::get_playfield_tile_info)
 }
 
 
-TILE_GET_INFO_MEMBER(relief_state::get_playfield2_tile_info)
+void relief_state::get_playfield2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t data1 = tilemap.basemem_read(tile_index);
 	uint16_t data2 = tilemap.extmem_read(tile_index) >> 8;

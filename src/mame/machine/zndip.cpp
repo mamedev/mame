@@ -24,7 +24,7 @@ void zndip_device::device_start()
 	m_dsr_handler(1);
 }
 
-WRITE_LINE_MEMBER(zndip_device::write_select)
+void zndip_device::write_select(int state)
 {
 	if (!state && m_select)
 	{
@@ -40,7 +40,7 @@ WRITE_LINE_MEMBER(zndip_device::write_select)
 	m_select = state;
 }
 
-WRITE_LINE_MEMBER(zndip_device::write_clock)
+void zndip_device::write_clock(int state)
 {
 	if (!state && m_clock && !m_select)
 	{

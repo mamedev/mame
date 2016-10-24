@@ -45,7 +45,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_sgi_ip6(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(sgi_ip6_vbl);
+	void sgi_ip6_vbl(device_t &device);
 	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
 	required_device<cpu_device> m_maincpu;
 };
@@ -196,7 +196,7 @@ void sgi_ip6_state::ip6_unk3_w(address_space &space, offs_t offset, uint32_t dat
 	verboselog(0, "ip6_unk3_w: Unknown address: %08x = %08x & %08x\n", 0x1fb00000 + (offset << 2), data, mem_mask );
 }
 
-INTERRUPT_GEN_MEMBER(sgi_ip6_state::sgi_ip6_vbl)
+void sgi_ip6_state::sgi_ip6_vbl(device_t &device)
 {
 }
 

@@ -26,7 +26,7 @@
 
 /* VIA1 Handlers */
 
-WRITE_LINE_MEMBER(macpci_state::mac_via_irq)
+void macpci_state::mac_via_irq(int state)
 {
 }
 
@@ -95,7 +95,7 @@ void macpci_state::mac_via_w(address_space &space, offs_t offset, uint16_t data,
 	m_maincpu->adjust_icount(m_via_cycles);
 }
 
-READ_LINE_MEMBER(macpci_state::mac_adb_via_in_cb2)
+int macpci_state::mac_adb_via_in_cb2()
 {
 	uint8_t ret;
 	ret = m_cuda->get_via_data();
@@ -106,7 +106,7 @@ READ_LINE_MEMBER(macpci_state::mac_adb_via_in_cb2)
 	return ret;
 }
 
-WRITE_LINE_MEMBER(macpci_state::mac_adb_via_out_cb2)
+void macpci_state::mac_adb_via_out_cb2(int state)
 {
 	m_cuda->set_via_data(state);
 }
@@ -126,12 +126,12 @@ void macpci_state::machine_reset()
 	m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(macpci_state::cuda_reset_w)
+void macpci_state::cuda_reset_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_RESET, state);
 }
 
-WRITE_LINE_MEMBER(macpci_state::cuda_adb_linechange_w)
+void macpci_state::cuda_adb_linechange_w(int state)
 {
 }
 
@@ -208,14 +208,14 @@ void macpci_state::mac_5396_w(address_space &space, offs_t offset, uint8_t data,
 	}
 }
 
-WRITE_LINE_MEMBER(macpci_state::irq_539x_1_w)
+void macpci_state::irq_539x_1_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER(macpci_state::drq_539x_1_w)
+void macpci_state::drq_539x_1_w(int state)
 {
 }
 
-TIMER_CALLBACK_MEMBER(macpci_state::mac_6015_tick)
+void macpci_state::mac_6015_tick(void *ptr, int32_t param)
 {
 }

@@ -115,20 +115,20 @@ public:
 	void einstein_kybintmsk_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void einstein_adcintmsk_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void einstein_fire_int_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_fault);
+	void write_centronics_busy(int state);
+	void write_centronics_perror(int state);
+	void write_centronics_fault(int state);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void machine_start_einstein2();
 	void machine_reset_einstein2();
 	uint32_t screen_update_einstein2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(einstein_keyboard_timer_callback);
-	TIMER_DEVICE_CALLBACK_MEMBER(einstein_ctc_trigger_callback);
-	DECLARE_WRITE_LINE_MEMBER(einstein_6845_de_changed);
+	void einstein_keyboard_timer_callback(timer_device &timer, void *ptr, int32_t param);
+	void einstein_ctc_trigger_callback(timer_device &timer, void *ptr, int32_t param);
+	void einstein_6845_de_changed(int state);
 	void einstein_drsel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(einstein_serial_transmit_clock);
-	DECLARE_WRITE_LINE_MEMBER(einstein_serial_receive_clock);
+	void einstein_serial_transmit_clock(int state);
+	void einstein_serial_receive_clock(int state);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
 protected:

@@ -264,7 +264,7 @@ econet_device::daisy_entry::daisy_entry(device_t *device) :
 //  clk_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( econet_device::clk_w )
+void econet_device::clk_w(int state)
 {
 	set_signal(this, CLK, state);
 }
@@ -274,7 +274,7 @@ WRITE_LINE_MEMBER( econet_device::clk_w )
 //  data_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( econet_device::data_w )
+void econet_device::data_w(int state)
 {
 	set_signal(this, DATA, state);
 }

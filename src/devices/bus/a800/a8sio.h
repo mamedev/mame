@@ -91,13 +91,13 @@ public:
 	void add_a8sio_card(device_a8sio_card_interface *card);
 	device_a8sio_card_interface *get_a8sio_card();
 
-	DECLARE_WRITE_LINE_MEMBER( clock_in_w );  // pin 1
-	//virtual DECLARE_WRITE_LINE_MEMBER( clock_out_w ); // pin 2
-	DECLARE_WRITE_LINE_MEMBER( data_in_w );   // pin 3
-	//DECLARE_WRITE_LINE_MEMBER( data_out_wi ); // pin 5
-	//DECLARE_WRITE_LINE_MEMBER( command_w );   // pin 7
-	DECLARE_WRITE_LINE_MEMBER( motor_w );     // pin 8
-	//DECLARE_WRITE_LINE_MEMBER( proceed_w );   // pin 9
+	void clock_in_w(int state);  // pin 1
+	//virtual void clock_out_w(int state); // pin 2
+	void data_in_w(int state);   // pin 3
+	//void data_out_wi(int state); // pin 5
+	//void command_w(int state);   // pin 7
+	void motor_w(int state);     // pin 8
+	//void proceed_w(int state);   // pin 9
 	void audio_in_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);      // pin 11
 
 protected:
@@ -130,7 +130,7 @@ public:
 	// inline configuration
 	static void static_set_a8sio_tag(device_t &device, const char *tag, const char *slottag);
 
-	virtual DECLARE_WRITE_LINE_MEMBER( motor_w );
+	virtual void motor_w(int state);
 
 public:
 	a8sio_device  *m_a8sio;

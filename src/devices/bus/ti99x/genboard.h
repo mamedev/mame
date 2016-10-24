@@ -61,9 +61,9 @@ class geneve_keyboard_device : public device_t
 {
 public:
 	geneve_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	DECLARE_WRITE_LINE_MEMBER( reset_line );
-	DECLARE_WRITE_LINE_MEMBER( send_scancodes );
-	DECLARE_WRITE_LINE_MEMBER( clock_control );
+	void reset_line(int state);
+	void send_scancodes(int state);
+	void clock_control(int state);
 	uint8_t get_recent_key();
 
 	template<class _Object> static devcb_base &static_set_int_callback(device_t &device, _Object object) { return downcast<geneve_keyboard_device &>(device).m_interrupt.set_callback(object); }
@@ -126,13 +126,13 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER( settings_changed );
 
-	DECLARE_WRITE_LINE_MEMBER( clock_in );
-	DECLARE_WRITE_LINE_MEMBER( dbin_in );
+	void clock_in(int state);
+	void dbin_in(int state);
 
 	// PFM support
-	DECLARE_WRITE_LINE_MEMBER( pfm_select_lsb );
-	DECLARE_WRITE_LINE_MEMBER( pfm_select_msb );
-	DECLARE_WRITE_LINE_MEMBER( pfm_output_enable );
+	void pfm_select_lsb(int state);
+	void pfm_select_msb(int state);
+	void pfm_output_enable(int state);
 
 	template<class _Object> static devcb_base &static_set_ready_callback(device_t &device, _Object object) {  return downcast<geneve_mapper_device &>(device).m_ready.set_callback(object); }
 

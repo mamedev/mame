@@ -6,7 +6,7 @@
 #include "includes/freekick.h"
 
 
-TILE_GET_INFO_MEMBER(freekick_state::get_freek_tile_info)
+void freekick_state::get_freek_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno, palno;
 

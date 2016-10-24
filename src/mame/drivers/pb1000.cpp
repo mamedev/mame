@@ -68,8 +68,8 @@ public:
 	uint8_t pb2000c_port_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void port_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint16_t read_touchscreen(uint8_t line);
-	DECLARE_PALETTE_INIT(pb1000);
-	TIMER_CALLBACK_MEMBER(keyboard_timer);
+	void palette_init_pb1000(palette_device &palette);
+	void keyboard_timer(void *ptr, int32_t param);
 };
 
 static ADDRESS_MAP_START(pb1000_mem, AS_PROGRAM, 16, pb1000_state)
@@ -296,7 +296,7 @@ static INPUT_PORTS_START( pb2000c )
 		PORT_BIT(0xffff, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
-PALETTE_INIT_MEMBER(pb1000_state, pb1000)
+void pb1000_state::palette_init_pb1000(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
@@ -449,7 +449,7 @@ void pb1000_state::port_w(address_space &space, offs_t offset, uint8_t data, uin
 }
 
 
-TIMER_CALLBACK_MEMBER(pb1000_state::keyboard_timer)
+void pb1000_state::keyboard_timer(void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(HD61700_KEY_INT, ASSERT_LINE);
 	m_maincpu->set_input_line(HD61700_KEY_INT, CLEAR_LINE);

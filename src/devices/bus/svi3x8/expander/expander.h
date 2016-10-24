@@ -109,11 +109,11 @@ public:
 		{ return downcast<svi_expander_device &>(device).m_excsw_handler.set_callback(object); }
 
 	// called from cart device
-	DECLARE_WRITE_LINE_MEMBER( int_w ) { m_int_handler(state); }
-	DECLARE_WRITE_LINE_MEMBER( romdis_w ) { m_romdis_handler(state); }
-	DECLARE_WRITE_LINE_MEMBER( ramdis_w ) { m_ramdis_handler(state); }
-	DECLARE_WRITE_LINE_MEMBER( ctrl1_w ) { m_ctrl1_handler(state); }
-	DECLARE_WRITE_LINE_MEMBER( ctrl2_w ) { m_ctrl2_handler(state); }
+	void int_w(int state) { m_int_handler(state); }
+	void romdis_w(int state) { m_romdis_handler(state); }
+	void ramdis_w(int state) { m_ramdis_handler(state); }
+	void ctrl1_w(int state) { m_ctrl1_handler(state); }
+	void ctrl2_w(int state) { m_ctrl2_handler(state); }
 
 	uint8_t excs_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return m_excsr_handler(space, offset); }
 	void excs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { m_excsw_handler(space, offset, data); }
@@ -124,10 +124,10 @@ public:
 	uint8_t iorq_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void iorq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( bk21_w );
-	DECLARE_WRITE_LINE_MEMBER( bk22_w );
-	DECLARE_WRITE_LINE_MEMBER( bk31_w );
-	DECLARE_WRITE_LINE_MEMBER( bk32_w );
+	void bk21_w(int state);
+	void bk22_w(int state);
+	void bk31_w(int state);
+	void bk32_w(int state);
 
 protected:
 	// device-level overrides

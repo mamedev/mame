@@ -75,7 +75,7 @@ void jedi_state::jedi_audio_reset_w(address_space &space, offs_t offset, uint8_t
 }
 
 
-TIMER_CALLBACK_MEMBER(jedi_state::delayed_audio_latch_w)
+void jedi_state::delayed_audio_latch_w(void *ptr, int32_t param)
 {
 	m_audio_latch = param;
 	*m_audio_comm_stat |= 0x80;

@@ -351,7 +351,7 @@ ADDRESS_MAP_END
 
 /**************************************************************************/
 
-INTERRUPT_GEN_MEMBER(slapfght_state::vblank_irq)
+void slapfght_state::vblank_irq(device_t &device)
 {
 	if (m_main_irq_enabled)
 		device.execute().set_input_line(0, ASSERT_LINE);
@@ -443,7 +443,7 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-INTERRUPT_GEN_MEMBER(slapfght_state::sound_nmi)
+void slapfght_state::sound_nmi(device_t &device)
 {
 	if (m_sound_nmi_enabled)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);

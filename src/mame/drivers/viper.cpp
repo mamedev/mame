@@ -420,16 +420,16 @@ public:
 	void ata_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask = U64(0xffffffffffffffff));
 	uint64_t unk_serial_r(address_space &space, offs_t offset, uint64_t mem_mask = U64(0xffffffffffffffff));
 	void unk_serial_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask = U64(0xffffffffffffffff));
-	DECLARE_WRITE_LINE_MEMBER(voodoo_vblank);
+	void voodoo_vblank(int state);
 	void init_viper();
 	void init_vipercf();
 	void init_viperhd();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_viper(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(viper_vblank);
-	TIMER_CALLBACK_MEMBER(epic_global_timer_callback);
-	TIMER_CALLBACK_MEMBER(ds2430_timer_callback);
+	void viper_vblank(device_t &device);
+	void epic_global_timer_callback(void *ptr, int32_t param);
+	void ds2430_timer_callback(void *ptr, int32_t param);
 #if VIPER_DEBUG_EPIC_REGS
 	const char* epic_get_register_name(uint32_t reg);
 #endif
@@ -743,7 +743,7 @@ const char* viper_state::epic_get_register_name(uint32_t reg)
 }
 #endif
 
-TIMER_CALLBACK_MEMBER(viper_state::epic_global_timer_callback)
+void viper_state::epic_global_timer_callback(void *ptr, int32_t param)
 {
 	int timer_num = param;
 
@@ -1736,7 +1736,7 @@ static uint8_t *ds2430_rom;
 static uint8_t ds2430_addr;
 
 
-TIMER_CALLBACK_MEMBER(viper_state::ds2430_timer_callback)
+void viper_state::ds2430_timer_callback(void *ptr, int32_t param)
 {
 	printf("DS2430 timer callback\n");
 
@@ -2133,13 +2133,13 @@ INPUT_PORTS_END
 /*****************************************************************************/
 
 
-INTERRUPT_GEN_MEMBER(viper_state::viper_vblank)
+void viper_state::viper_vblank(device_t &device)
 {
 	mpc8240_interrupt(MPC8240_IRQ0);
 	//mpc8240_interrupt(device.machine, MPC8240_IRQ3);
 }
 
-WRITE_LINE_MEMBER(viper_state::voodoo_vblank)
+void viper_state::voodoo_vblank(int state)
 {
 	mpc8240_interrupt(MPC8240_IRQ4);
 }

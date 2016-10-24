@@ -253,8 +253,8 @@ public:
 	void init_kas89();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	TIMER_DEVICE_CALLBACK_MEMBER(kas89_nmi_cb);
-	TIMER_DEVICE_CALLBACK_MEMBER(kas89_sound_nmi_cb);
+	void kas89_nmi_cb(timer_device &timer, void *ptr, int32_t param);
+	void kas89_sound_nmi_cb(timer_device &timer, void *ptr, int32_t param);
 };
 
 
@@ -312,13 +312,13 @@ uint8_t kas89_state::mux_r(address_space &space, offs_t offset, uint8_t mem_mask
 	return m_mux_data;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(kas89_state::kas89_nmi_cb)
+void kas89_state::kas89_nmi_cb(timer_device &timer, void *ptr, int32_t param)
 {
 	if (m_main_nmi_enable)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(kas89_state::kas89_sound_nmi_cb)
+void kas89_state::kas89_sound_nmi_cb(timer_device &timer, void *ptr, int32_t param)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }

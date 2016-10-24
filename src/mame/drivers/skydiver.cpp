@@ -114,7 +114,7 @@ static const int colortable_source[] =
 	0x01, 0x02
 };
 
-PALETTE_INIT_MEMBER(skydiver_state, skydiver)
+void skydiver_state::palette_init_skydiver(palette_device &palette)
 {
 	int i;
 
@@ -147,7 +147,7 @@ void skydiver_state::nmion_w(address_space &space, offs_t offset, uint8_t data, 
 }
 
 
-INTERRUPT_GEN_MEMBER(skydiver_state::interrupt)
+void skydiver_state::interrupt(device_t &device)
 {
 	/* Convert range data to divide value and write to sound */
 	address_space &space = m_maincpu->space(AS_PROGRAM);

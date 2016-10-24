@@ -48,14 +48,14 @@ public:
 	void videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void attrib_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	TILEMAP_MAPPER_MEMBER(background_scan);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	tilemap_memory_index background_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(vball_scanline);
+	void vball_scanline(timer_device &timer, void *ptr, int32_t param);
 	void bgprombank_w(int bank);
 	void spprombank_w(int bank);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);

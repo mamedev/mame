@@ -41,8 +41,8 @@ public:
 	uint8_t mz80k_8255_portc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void mz80k_8255_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void mz80k_8255_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(pit_out0_changed);
-	DECLARE_WRITE_LINE_MEMBER(pit_out2_changed);
+	void pit_out0_changed(int state);
+	void pit_out2_changed(int state);
 	bool m_mz80k_vertical;
 	bool m_mz80k_tempo_strobe;
 	uint8_t m_speaker_level;
@@ -58,7 +58,7 @@ public:
 	uint32_t screen_update_mz80k(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_mz80kj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_mz80a(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(ne555_tempo_callback);
+	void ne555_tempo_callback(timer_device &timer, void *ptr, int32_t param);
 };
 
 

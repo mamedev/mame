@@ -275,7 +275,7 @@ public:
 	static void set_dcache_size(device_t &device, size_t dcache_size) { downcast<mips3_device &>(device).c_dcache_size = dcache_size; }
 	static void set_system_clock(device_t &device, uint32_t system_clock) { downcast<mips3_device &>(device).c_system_clock = system_clock; }
 
-	TIMER_CALLBACK_MEMBER(compare_int_callback);
+	void compare_int_callback(void *ptr, int32_t param);
 
 	void add_fastram(offs_t start, offs_t end, uint8_t readonly, void *base);
 	void clear_fastram(uint32_t select_start);

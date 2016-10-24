@@ -488,7 +488,7 @@ public:
 	uint8_t port_38_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t nmi_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void msm5205_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
+	void adpcm_int(int state);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -496,7 +496,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	INTERRUPT_GEN_MEMBER(interrupt);
+	void interrupt(device_t &device);
 };
 
 
@@ -681,7 +681,7 @@ void mastboy_state::msm5205_data_w(address_space &space, offs_t offset, uint8_t 
 	m_m5205_next = data;
 }
 
-WRITE_LINE_MEMBER(mastboy_state::adpcm_int)
+void mastboy_state::adpcm_int(int state)
 {
 	m_msm->data_w(m_m5205_next);
 	m_m5205_next >>= 4;
@@ -701,7 +701,7 @@ void mastboy_state::irq0_ack_w(address_space &space, offs_t offset, uint8_t data
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(mastboy_state::interrupt)
+void mastboy_state::interrupt(device_t &device)
 {
 	if ((m_irq0_ack & 1) == 1)
 	{

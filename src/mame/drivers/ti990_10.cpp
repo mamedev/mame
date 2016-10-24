@@ -92,14 +92,14 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	DECLARE_WRITE_LINE_MEMBER( key_interrupt );
-	DECLARE_WRITE_LINE_MEMBER( line_interrupt );
-	DECLARE_WRITE_LINE_MEMBER( tape_interrupt );
+	void key_interrupt(int state);
+	void line_interrupt(int state);
+	void tape_interrupt(int state);
 	void ti990_set_int_line(int line, int state);
-	WRITE_LINE_MEMBER(ti990_set_int13);
-	TIMER_CALLBACK_MEMBER(clear_load);
+	void ti990_set_int13(int state);
+	void clear_load(void *ptr, int32_t param);
 	void ti990_hold_load();
-	WRITE_LINE_MEMBER(ti990_ckon_ckof_callback);
+	void ti990_ckon_ckof_callback(int state);
 	uint8_t ti990_panel_read(address_space &space, offs_t offset, uint8_t mem_mask);
 	void ti990_panel_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask);
 
@@ -134,7 +134,7 @@ void ti990_10_state::ti990_set_int_line(int line, int state)
 }
 
 
-WRITE_LINE_MEMBER(ti990_10_state::ti990_set_int13)
+void ti990_10_state::ti990_set_int13(int state)
 {
 	ti990_set_int_line(13, state);
 }
@@ -143,7 +143,7 @@ WRITE_LINE_MEMBER(ti990_10_state::ti990_set_int13)
     hold and debounce load line (emulation is inaccurate)
 */
 
-TIMER_CALLBACK_MEMBER(ti990_10_state::clear_load)
+void ti990_10_state::clear_load(void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
@@ -160,14 +160,14 @@ void ti990_10_state::ti990_hold_load()
 
 /* m_ckon_state: 1 if line clock active (RTCLR flip-flop on TI990/10 schematics -
 SMI sheet 4) */
-WRITE_LINE_MEMBER(ti990_10_state::line_interrupt)
+void ti990_10_state::line_interrupt(int state)
 {
 	// set_int10(state);
 	if (m_ckon_state)
 		ti990_set_int_line(5, 1);
 }
 
-WRITE_LINE_MEMBER(ti990_10_state::ti990_ckon_ckof_callback)
+void ti990_10_state::ti990_ckon_ckof_callback(int state)
 {
 	m_ckon_state = state;
 	if (! m_ckon_state)
@@ -265,7 +265,7 @@ void ti990_10_state::video_start()
 	m_terminal = machine().device("vdt911");
 }
 
-WRITE_LINE_MEMBER(ti990_10_state::key_interrupt)
+void ti990_10_state::key_interrupt(int state)
 {
 	// set_int10(state);
 }
@@ -306,7 +306,7 @@ ADDRESS_MAP_END
 /*
     Callback from the tape controller.
 */
-WRITE_LINE_MEMBER(ti990_10_state::tape_interrupt)
+void ti990_10_state::tape_interrupt(int state)
 {
 	// set_int9(state);
 }

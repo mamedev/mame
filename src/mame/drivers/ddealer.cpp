@@ -158,13 +158,13 @@ public:
 	void ddealer_mcu_shared_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	uint16_t ddealer_mcu_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void init_ddealer();
-	TILE_GET_INFO_MEMBER(get_back_tile_info);
+	void get_back_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_ddealer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(ddealer_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(ddealer_mcu_sim);
+	void ddealer_interrupt(device_t &device);
+	void ddealer_mcu_sim(timer_device &timer, void *ptr, int32_t param);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -178,7 +178,7 @@ void ddealer_state::ddealer_flipscreen_w(address_space &space, offs_t offset, ui
 	m_flipscreen = data & 0x01;
 }
 
-TILE_GET_INFO_MEMBER(ddealer_state::get_back_tile_info)
+void ddealer_state::get_back_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_back_vram[tile_index];
 	SET_TILE_INFO_MEMBER(0,
@@ -317,7 +317,7 @@ uint32_t ddealer_state::screen_update_ddealer(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(ddealer_state::ddealer_mcu_sim)
+void ddealer_state::ddealer_mcu_sim(timer_device &timer, void *ptr, int32_t param)
 {
 	/*coin/credit simulation*/
 	/*$fe002 is used,might be for multiple coins for one credit settings.*/
@@ -614,7 +614,7 @@ void ddealer_state::machine_reset()
 	m_coin_input = 0;
 }
 
-INTERRUPT_GEN_MEMBER(ddealer_state::ddealer_interrupt)
+void ddealer_state::ddealer_interrupt(device_t &device)
 {
 	device.execute().set_input_line(4, HOLD_LINE);
 }

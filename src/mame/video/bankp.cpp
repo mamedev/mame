@@ -35,7 +35,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(bankp_state, bankp)
+void bankp_state::palette_init_bankp(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -126,7 +126,7 @@ void bankp_state::out_w(address_space &space, offs_t offset, uint8_t data, uint8
 	/* bits 6-7 unknown */
 }
 
-TILE_GET_INFO_MEMBER(bankp_state::get_bg_tile_info)
+void bankp_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram2[tile_index] + 256 * (m_colorram2[tile_index] & 0x07);
 	int color = m_colorram2[tile_index] >> 4;
@@ -136,7 +136,7 @@ TILE_GET_INFO_MEMBER(bankp_state::get_bg_tile_info)
 	tileinfo.group = color;
 }
 
-TILE_GET_INFO_MEMBER(bankp_state::get_fg_tile_info)
+void bankp_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index] + 256 * ((m_colorram[tile_index] & 3) >> 0);
 	int color = m_colorram[tile_index] >> 3;

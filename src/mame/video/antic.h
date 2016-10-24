@@ -468,10 +468,10 @@ private:
 	void linerefresh();
 	int cycle();
 
-	TIMER_CALLBACK_MEMBER( issue_dli );
-	TIMER_CALLBACK_MEMBER( line_done );
-	TIMER_CALLBACK_MEMBER( steal_cycles );
-	TIMER_CALLBACK_MEMBER( scanline_render );
+	void issue_dli(void *ptr, int32_t param);
+	void line_done(void *ptr, int32_t param);
+	void steal_cycles(void *ptr, int32_t param);
+	void scanline_render(void *ptr, int32_t param);
 
 	void render(address_space &space, int param1, int param2, int param3);
 

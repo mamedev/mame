@@ -13,7 +13,7 @@ static const int dmasize[8] = { 8, 1, 2, 4, 32, 0, 0, 0 };
 
 static const int sh3_dmasize[4] = { 1, 2, 4, 16 };
 
-TIMER_CALLBACK_MEMBER( sh34_base_device::sh4_dmac_callback )
+void sh34_base_device::sh4_dmac_callback(void *ptr, int32_t param)
 {
 	int channel = param;
 

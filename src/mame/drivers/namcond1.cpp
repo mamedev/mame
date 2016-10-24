@@ -157,7 +157,7 @@ static ADDRESS_MAP_START( nd1h8iomap, AS_IO, 16, namcond1_state )
 	AM_RANGE(h8_device::ADC_0,  h8_device::ADC_3)  AM_NOP // MCU reads these, but the games have no analog controls
 ADDRESS_MAP_END
 
-INTERRUPT_GEN_MEMBER(namcond1_state::mcu_interrupt)
+void namcond1_state::mcu_interrupt(device_t &device)
 {
 	if( m_h8_irq5_enabled )
 	{

@@ -264,13 +264,13 @@ public:
 	optional_device<applefdc_base_device> m_laserudc;
 	optional_device<iwm_device> m_iicpiwm;
 
-	TIMER_DEVICE_CALLBACK_MEMBER(apple2_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(ay3600_repeat);
+	void apple2_interrupt(timer_device &timer, void *ptr, int32_t param);
+	void ay3600_repeat(timer_device &timer, void *ptr, int32_t param);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_PALETTE_INIT(apple2);
+	void palette_init_apple2(palette_device &palette);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	uint8_t ram0000_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
@@ -323,13 +323,13 @@ public:
 	void inh_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t lc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void lc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(a2bus_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(a2bus_nmi_w);
-	DECLARE_WRITE_LINE_MEMBER(a2bus_inh_w);
-	DECLARE_READ_LINE_MEMBER(ay3600_shift_r);
-	DECLARE_READ_LINE_MEMBER(ay3600_control_r);
-	DECLARE_WRITE_LINE_MEMBER(ay3600_data_ready_w);
-	DECLARE_WRITE_LINE_MEMBER(ay3600_ako_w);
+	void a2bus_irq_w(int state);
+	void a2bus_nmi_w(int state);
+	void a2bus_inh_w(int state);
+	int ay3600_shift_r();
+	int ay3600_control_r();
+	void ay3600_data_ready_w(int state);
+	void ay3600_ako_w(int state);
 	uint8_t memexp_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void memexp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
@@ -414,7 +414,7 @@ private:
 #define JOYSTICK_SENSITIVITY    50
 #define JOYSTICK_AUTOCENTER     80
 
-WRITE_LINE_MEMBER(apple2e_state::a2bus_irq_w)
+void apple2e_state::a2bus_irq_w(int state)
 {
 	if (state == ASSERT_LINE)
 	{
@@ -426,13 +426,13 @@ WRITE_LINE_MEMBER(apple2e_state::a2bus_irq_w)
 	}
 }
 
-WRITE_LINE_MEMBER(apple2e_state::a2bus_nmi_w)
+void apple2e_state::a2bus_nmi_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, state);
 }
 
 // TODO: this assumes /INH only on ROM, needs expansion to support e.g. phantom-slotting cards and etc.
-WRITE_LINE_MEMBER(apple2e_state::a2bus_inh_w)
+void apple2e_state::a2bus_inh_w(int state)
 {
 	if (state == ASSERT_LINE)
 	{
@@ -785,7 +785,7 @@ void apple2e_state::lower_irq(int irq)
     VIDEO
 ***************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(apple2e_state::apple2_interrupt)
+void apple2e_state::apple2_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -814,7 +814,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(apple2e_state::apple2_interrupt)
 	}
 }
 
-PALETTE_INIT_MEMBER(apple2e_state, apple2)
+void apple2e_state::palette_init_apple2(palette_device &palette)
 {
 	m_video->palette_init_apple2(palette);
 }
@@ -2464,7 +2464,7 @@ ADDRESS_MAP_END
     KEYBOARD
 ***************************************************************************/
 
-READ_LINE_MEMBER(apple2e_state::ay3600_shift_r)
+int apple2e_state::ay3600_shift_r()
 {
 	// either shift key
 	if (m_kbspecial->read() & 0x06)
@@ -2475,7 +2475,7 @@ READ_LINE_MEMBER(apple2e_state::ay3600_shift_r)
 	return CLEAR_LINE;
 }
 
-READ_LINE_MEMBER(apple2e_state::ay3600_control_r)
+int apple2e_state::ay3600_control_r()
 {
 	if (m_kbspecial->read() & 0x08)
 	{
@@ -2485,7 +2485,7 @@ READ_LINE_MEMBER(apple2e_state::ay3600_control_r)
 	return CLEAR_LINE;
 }
 
-WRITE_LINE_MEMBER(apple2e_state::ay3600_data_ready_w)
+void apple2e_state::ay3600_data_ready_w(int state)
 {
 	if (state == ASSERT_LINE)
 	{
@@ -2516,7 +2516,7 @@ WRITE_LINE_MEMBER(apple2e_state::ay3600_data_ready_w)
 	}
 }
 
-WRITE_LINE_MEMBER(apple2e_state::ay3600_ako_w)
+void apple2e_state::ay3600_ako_w(int state)
 {
 	m_anykeydown = (state == ASSERT_LINE) ? true : false;
 
@@ -2526,7 +2526,7 @@ WRITE_LINE_MEMBER(apple2e_state::ay3600_ako_w)
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(apple2e_state::ay3600_repeat)
+void apple2e_state::ay3600_repeat(timer_device &timer, void *ptr, int32_t param)
 {
 	// is the key still down?
 	if (m_anykeydown)

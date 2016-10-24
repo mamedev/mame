@@ -82,9 +82,9 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(get_memcard_status);
 	DECLARE_CUSTOM_INPUT_MEMBER(get_audio_result);
 
-	TIMER_CALLBACK_MEMBER(display_position_interrupt_callback);
-	TIMER_CALLBACK_MEMBER(display_position_vblank_callback);
-	TIMER_CALLBACK_MEMBER(vblank_interrupt_callback);
+	void display_position_interrupt_callback(void *ptr, int32_t param);
+	void display_position_vblank_callback(void *ptr, int32_t param);
+	void vblank_interrupt_callback(void *ptr, int32_t param);
 
 	// MVS-specific
 	void save_ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);

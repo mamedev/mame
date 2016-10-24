@@ -871,7 +871,7 @@ void mw8080bw_state::maze_update_discrete()
 }
 
 
-TIMER_CALLBACK_MEMBER(mw8080bw_state::maze_tone_timing_timer_callback)
+void mw8080bw_state::maze_tone_timing_timer_callback(void *ptr, int32_t param)
 {
 	m_maze_tone_timing_state = !m_maze_tone_timing_state;
 	maze_write_discrete(m_maze_tone_timing_state);
@@ -2129,7 +2129,7 @@ MACHINE_CONFIG_END
 #define SPCENCTR_STROBE_DUTY_CYCLE  (95.0)  /* % */
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(mw8080bw_state::spcenctr_strobe_timer_callback)
+void mw8080bw_state::spcenctr_strobe_timer_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	output().set_value("STROBE", param && m_spcenctr_strobe_state);
 }

@@ -101,8 +101,8 @@ public:
 	virtual void machine_reset() override;
 	uint32_t screen_update_enigma2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_enigma2a(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(interrupt_clear_callback);
-	TIMER_CALLBACK_MEMBER(interrupt_assert_callback);
+	void interrupt_clear_callback(void *ptr, int32_t param);
+	void interrupt_assert_callback(void *ptr, int32_t param);
 	inline uint16_t vpos_to_vysnc_chain_counter( int vpos );
 	inline int vysnc_chain_counter_to_vpos( uint16_t counter );
 	void create_interrupt_timers(  );
@@ -129,13 +129,13 @@ int enigma2_state::vysnc_chain_counter_to_vpos( uint16_t counter )
 }
 
 
-TIMER_CALLBACK_MEMBER(enigma2_state::interrupt_clear_callback)
+void enigma2_state::interrupt_clear_callback(void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 
-TIMER_CALLBACK_MEMBER(enigma2_state::interrupt_assert_callback)
+void enigma2_state::interrupt_assert_callback(void *ptr, int32_t param)
 {
 	uint16_t next_counter;
 	int next_vpos;

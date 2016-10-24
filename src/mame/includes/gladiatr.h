@@ -75,7 +75,7 @@ public:
 	void gladiatr_irq_patch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void gladiator_int_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void gladiator_adpcm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(gladiator_ym_irq);
+	void gladiator_ym_irq(int state);
 
 	// ppking specific
 	uint8_t ppking_f1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
@@ -93,8 +93,8 @@ public:
 	void init_gladiatr();
 	void init_ppking();
 
-	TILE_GET_INFO_MEMBER(bg_get_tile_info);
-	TILE_GET_INFO_MEMBER(fg_get_tile_info);
+	void bg_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void fg_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	void machine_reset_ppking();
 	void video_start_ppking();

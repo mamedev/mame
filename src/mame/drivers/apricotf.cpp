@@ -97,8 +97,8 @@ public:
 	uint16_t palette_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void palette_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void system_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( ctc_z1_w );
-	DECLARE_WRITE_LINE_MEMBER( ctc_z2_w );
+	void ctc_z1_w(int state);
+	void ctc_z2_w(int state);
 
 	int m_40_80;
 	int m_200_256;
@@ -294,13 +294,13 @@ INPUT_PORTS_END
 //  Z80CTC
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( f1_state::ctc_z1_w )
+void f1_state::ctc_z1_w(int state)
 {
 	m_sio->rxcb_w(state);
 	m_sio->txcb_w(state);
 }
 
-WRITE_LINE_MEMBER( f1_state::ctc_z2_w )
+void f1_state::ctc_z2_w(int state)
 {
 	m_sio->txca_w(state);
 }

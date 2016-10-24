@@ -59,7 +59,7 @@ void videopin_state::device_timer(emu_timer &timer, device_timer_id id, int para
 }
 
 
-TIMER_CALLBACK_MEMBER(videopin_state::interrupt_callback)
+void videopin_state::interrupt_callback(void *ptr, int32_t param)
 {
 	int scanline = param;
 

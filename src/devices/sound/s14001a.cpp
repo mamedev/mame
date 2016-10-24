@@ -205,13 +205,13 @@ void s14001a_device::force_update()
 	m_stream->update();
 }
 
-READ_LINE_MEMBER(s14001a_device::romen_r)
+int s14001a_device::romen_r()
 {
 	m_stream->update();
 	return (m_bPhase1) ? 1 : 0;
 }
 
-READ_LINE_MEMBER(s14001a_device::busy_r)
+int s14001a_device::busy_r()
 {
 	m_stream->update();
 	return (m_bBusyP1) ? 1 : 0;
@@ -223,7 +223,7 @@ void s14001a_device::data_w(address_space &space, offs_t offset, uint8_t data, u
 	m_uWord = data & 0x3f; // C0-C5
 }
 
-WRITE_LINE_MEMBER(s14001a_device::start_w)
+void s14001a_device::start_w(int state)
 {
 	m_stream->update();
 	m_bStart = (state != 0);

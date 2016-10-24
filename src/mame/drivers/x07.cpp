@@ -679,12 +679,12 @@ void x07_state::cassette_w()
 	m_cass_data = m_regs_w[7];
 }
 
-TIMER_CALLBACK_MEMBER(x07_state::cassette_tick)
+void x07_state::cassette_tick(void *ptr, int32_t param)
 {
 	m_cass_clk++;
 }
 
-TIMER_CALLBACK_MEMBER(x07_state::cassette_poll)
+void x07_state::cassette_poll(void *ptr, int32_t param)
 {
 	if ((m_cassette->get_state() & 0x03) == CASSETTE_PLAY)
 		cassette_load();
@@ -1071,7 +1071,7 @@ DEVICE_IMAGE_LOAD_MEMBER( x07_state, x07_card )
 	return image_init_result::PASS;
 }
 
-PALETTE_INIT_MEMBER(x07_state, x07)
+void x07_state::palette_init_x07(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
@@ -1330,12 +1330,12 @@ void x07_state::nvram_init(nvram_device &nvram, void *data, size_t size)
 	m_warm_start = 0;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(x07_state::blink_timer)
+void x07_state::blink_timer(timer_device &timer, void *ptr, int32_t param)
 {
 	m_blink = !m_blink;
 }
 
-TIMER_CALLBACK_MEMBER(x07_state::rsta_clear)
+void x07_state::rsta_clear(void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(NSC800_RSTA, CLEAR_LINE);
 
@@ -1343,12 +1343,12 @@ TIMER_CALLBACK_MEMBER(x07_state::rsta_clear)
 		kb_irq();
 }
 
-TIMER_CALLBACK_MEMBER(x07_state::rstb_clear)
+void x07_state::rstb_clear(void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(NSC800_RSTB, CLEAR_LINE);
 }
 
-TIMER_CALLBACK_MEMBER(x07_state::beep_stop)
+void x07_state::beep_stop(void *ptr, int32_t param)
 {
 	m_beep->set_state(0);
 }

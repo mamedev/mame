@@ -17,7 +17,7 @@
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(zaxxon_state, zaxxon)
+void zaxxon_state::palette_init_zaxxon(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances[3] = { 1000, 470, 220 };
@@ -68,7 +68,7 @@ PALETTE_INIT_MEMBER(zaxxon_state, zaxxon)
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(zaxxon_state::get_bg_tile_info)
+void zaxxon_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	const uint8_t *source = memregion("tilemap_dat")->base();
 	int size = memregion("tilemap_dat")->bytes() / 2;
@@ -80,7 +80,7 @@ TILE_GET_INFO_MEMBER(zaxxon_state::get_bg_tile_info)
 }
 
 
-TILE_GET_INFO_MEMBER(zaxxon_state::zaxxon_get_fg_tile_info)
+void zaxxon_state::zaxxon_get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int sx = tile_index % 32;
 	int sy = tile_index / 32;
@@ -91,7 +91,7 @@ TILE_GET_INFO_MEMBER(zaxxon_state::zaxxon_get_fg_tile_info)
 }
 
 
-TILE_GET_INFO_MEMBER(zaxxon_state::razmataz_get_fg_tile_info)
+void zaxxon_state::razmataz_get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index];
 	int color = m_color_codes[code] & 0x0f;
@@ -100,7 +100,7 @@ TILE_GET_INFO_MEMBER(zaxxon_state::razmataz_get_fg_tile_info)
 }
 
 
-TILE_GET_INFO_MEMBER(zaxxon_state::congo_get_fg_tile_info)
+void zaxxon_state::congo_get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index] + (m_congo_fg_bank << 8);
 	int color = m_colorram[tile_index] & 0x1f;

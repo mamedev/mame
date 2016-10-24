@@ -42,15 +42,15 @@ public:
 	void anout_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t anin_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void anio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( acia_interrupt );
-	DECLARE_WRITE_LINE_MEMBER( ctc_z2_w );
-	DECLARE_WRITE_LINE_MEMBER( adc_eoc_w );
+	void acia_interrupt(int state);
+	void ctc_z2_w(int state);
+	void adc_eoc_w(int state);
 
 	ADC0808_ANALOG_READ_CB(adc_vref_pos_r);
 	ADC0808_ANALOG_READ_CB(adc_vref_neg_r);
 	ADC0808_ANALOG_READ_CB(adc_input_r);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(ctc_c2_tick);
+	void ctc_c2_tick(timer_device &timer, void *ptr, int32_t param);
 
 protected:
 	// device-level overrides

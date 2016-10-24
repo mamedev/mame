@@ -101,12 +101,12 @@ uint8_t pc1401_state::pc1401_inb(address_space &space, offs_t offset, uint8_t me
 	return data;
 }
 
-READ_LINE_MEMBER(pc1401_state::pc1401_brk)
+int pc1401_state::pc1401_brk()
 {
 	return (ioport("EXTRA")->read() & 0x01);
 }
 
-READ_LINE_MEMBER(pc1401_state::pc1401_reset)
+int pc1401_state::pc1401_reset()
 {
 	return (ioport("EXTRA")->read() & 0x02);
 }

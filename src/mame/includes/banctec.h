@@ -20,7 +20,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_videoram(*this, "videoram") { }
 
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
 	virtual void machine_reset() override;
 	virtual void video_start() override;

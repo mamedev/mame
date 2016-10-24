@@ -27,7 +27,7 @@ public:
 	void m79amb_8002_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_m79amb();
 	uint32_t screen_update_ramtek(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(m79amb_interrupt);
+	void m79amb_interrupt(device_t &device);
 	void m79amb_8000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void m79amb_8003_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	required_device<cpu_device> m_maincpu;

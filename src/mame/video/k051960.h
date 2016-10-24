@@ -78,7 +78,7 @@ public:
 
 	void k051960_sprites_draw(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, int min_priority, int max_priority);
 
-	TIMER_CALLBACK_MEMBER(scanline_callback);
+	void scanline_callback(void *ptr, int32_t param);
 
 protected:
 	// device-level overrides

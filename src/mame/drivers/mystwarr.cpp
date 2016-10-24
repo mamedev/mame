@@ -189,7 +189,7 @@ void mystwarr_state::mmeeprom_w(address_space &space, offs_t offset, uint16_t da
 /**********************************************************************************/
 /* IRQ controllers */
 
-TIMER_DEVICE_CALLBACK_MEMBER(mystwarr_state::mystwarr_interrupt)
+void mystwarr_state::mystwarr_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -205,7 +205,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mystwarr_state::mystwarr_interrupt)
 //  m_maincpu->set_input_line(M68K_IRQ_6, HOLD_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(mystwarr_state::metamrph_interrupt)
+void mystwarr_state::metamrph_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -219,7 +219,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mystwarr_state::metamrph_interrupt)
 		if (m_k055673->k053246_is_irq_enabled()) m_maincpu->set_input_line(M68K_IRQ_5, HOLD_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(mystwarr_state::mchamp_interrupt)
+void mystwarr_state::mchamp_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -234,7 +234,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mystwarr_state::mchamp_interrupt)
 		m_maincpu->set_input_line(M68K_IRQ_2, HOLD_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(mystwarr_state::ddd_interrupt)
+void mystwarr_state::ddd_interrupt(device_t &device)
 {
 	device.execute().set_input_line(M68K_IRQ_5, HOLD_LINE);
 }
@@ -621,7 +621,7 @@ static ADDRESS_MAP_START( mystwarr_sound_map, AS_PROGRAM, 8, mystwarr_state )
 ADDRESS_MAP_END
 
 
-WRITE_LINE_MEMBER(mystwarr_state::k054539_nmi_gen)
+void mystwarr_state::k054539_nmi_gen(int state)
 {
 	if (m_sound_ctrl & 0x10)
 	{

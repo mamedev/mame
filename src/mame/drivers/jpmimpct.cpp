@@ -196,7 +196,7 @@ void jpmimpct_state::machine_reset_jpmimpct()
  *  TxDB/TxDB: Data retrieval unit
  */
 
-TIMER_DEVICE_CALLBACK_MEMBER(jpmimpct_state::duart_1_timer_event)
+void jpmimpct_state::duart_1_timer_event(timer_device &timer, void *ptr, int32_t param)
 {
 	m_duart_1.tc = 0;
 	m_duart_1.ISR |= 0x08;
@@ -819,7 +819,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-WRITE_LINE_MEMBER(jpmimpct_state::tms_irq)
+void jpmimpct_state::tms_irq(int state)
 {
 	m_tms_irq = state;
 	update_irqs();

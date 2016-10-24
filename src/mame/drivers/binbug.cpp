@@ -73,7 +73,7 @@ public:
 
 	void binbug_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t binbug_serial_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(binbug_serial_w);
+	void binbug_serial_w(int state);
 	const uint8_t *m_p_chargen;
 	uint8_t m_framecnt;
 	virtual void video_start() override;
@@ -95,7 +95,7 @@ uint8_t binbug_state::binbug_serial_r(address_space &space, offs_t offset, uint8
 	return m_rs232->rxd_r() & (m_cass->input() < 0.03);
 }
 
-WRITE_LINE_MEMBER( binbug_state::binbug_serial_w )
+void binbug_state::binbug_serial_w(int state)
 {
 	m_cass->output(state ? -1.0 : +1.0);
 }
@@ -421,8 +421,8 @@ public:
 	uint8_t port08_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void port08_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	TIMER_DEVICE_CALLBACK_MEMBER(time_tick);
-	TIMER_DEVICE_CALLBACK_MEMBER(uart_tick);
+	void time_tick(timer_device &timer, void *ptr, int32_t param);
+	void uart_tick(timer_device &timer, void *ptr, int32_t param);
 	uint8_t m_pio_b;
 	uint8_t m_term_data;
 	uint8_t m_protection[0x100];
@@ -509,7 +509,7 @@ void dg680_state::port08_w(address_space &space, offs_t offset, uint8_t data, ui
 	m_protection[breg] = data;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(dg680_state::time_tick)
+void dg680_state::time_tick(timer_device &timer, void *ptr, int32_t param)
 {
 // ch0 is for the clock
 	m_ctc->trg0(1);
@@ -519,7 +519,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(dg680_state::time_tick)
 	m_ctc->trg2(0);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(dg680_state::uart_tick)
+void dg680_state::uart_tick(timer_device &timer, void *ptr, int32_t param)
 {
 // ch3 is for cassette
 	m_ctc->trg3(1);

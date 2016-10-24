@@ -10,7 +10,7 @@ Atari Sprint 8 video emulation
 #include "includes/sprint8.h"
 
 
-PALETTE_INIT_MEMBER(sprint8_state, sprint8)
+void sprint8_state::palette_init_sprint8(palette_device &palette)
 {
 	int i;
 
@@ -62,7 +62,7 @@ void sprint8_state::set_pens()
 }
 
 
-TILE_GET_INFO_MEMBER(sprint8_state::get_tile_info1)
+void sprint8_state::get_tile_info1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t code = m_video_ram[tile_index];
 
@@ -87,7 +87,7 @@ TILE_GET_INFO_MEMBER(sprint8_state::get_tile_info1)
 }
 
 
-TILE_GET_INFO_MEMBER(sprint8_state::get_tile_info2)
+void sprint8_state::get_tile_info2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t code = m_video_ram[tile_index];
 
@@ -146,7 +146,7 @@ void sprint8_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 }
 
 
-TIMER_CALLBACK_MEMBER(sprint8_state::sprint8_collision_callback)
+void sprint8_state::sprint8_collision_callback(void *ptr, int32_t param)
 {
 	sprint8_set_collision(param);
 }

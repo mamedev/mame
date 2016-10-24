@@ -50,7 +50,7 @@ public:
 
 	virtual void machine_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(interrupt);
+	void interrupt(device_t &device);
 };
 
 void horse_state::machine_start()
@@ -182,7 +182,7 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-INTERRUPT_GEN_MEMBER(horse_state::interrupt)
+void horse_state::interrupt(device_t &device)
 {
 	device.execute().set_input_line(I8085_RST75_LINE, ASSERT_LINE);
 	device.execute().set_input_line(I8085_RST75_LINE, CLEAR_LINE);

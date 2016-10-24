@@ -84,8 +84,8 @@ public:
 	virtual void sound_reset() override;
 	void video_start_jedi();
 	uint32_t screen_update_jedi(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(generate_interrupt);
-	TIMER_CALLBACK_MEMBER(delayed_audio_latch_w);
+	void generate_interrupt(void *ptr, int32_t param);
+	void delayed_audio_latch_w(void *ptr, int32_t param);
 	void get_pens(pen_t *pens);
 	void do_pen_lookup(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void draw_background_and_text(bitmap_rgb32 &bitmap, const rectangle &cliprect);

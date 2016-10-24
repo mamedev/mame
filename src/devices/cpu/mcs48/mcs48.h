@@ -596,7 +596,7 @@ public:
 protected:
 	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
-	TIMER_CALLBACK_MEMBER( master_callback );
+	void master_callback(void *ptr, int32_t param);
 };
 
 class i8041_device : public upi41_cpu_device

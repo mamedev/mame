@@ -332,7 +332,7 @@ static INPUT_PORTS_START( sr16 )
 INPUT_PORTS_END
 
 
-PALETTE_INIT_MEMBER(alesis_state, alesis)
+void alesis_state::palette_init_alesis(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));

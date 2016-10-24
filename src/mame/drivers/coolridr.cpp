@@ -415,8 +415,8 @@ public:
 	uint8_t analog_mux_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void analog_mux_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void lamps_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(scsp1_to_sh1_irq);
-	DECLARE_WRITE_LINE_MEMBER(scsp2_to_sh1_irq);
+	void scsp1_to_sh1_irq(int state);
+	void scsp2_to_sh1_irq(int state);
 	void sound_to_sh1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_coolridr();
 	void init_aquastge();
@@ -438,8 +438,8 @@ public:
 	uint32_t screen_update_coolridr1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_coolridr2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void blit_current_sprite(address_space &space);
-	TIMER_DEVICE_CALLBACK_MEMBER(system_h1_main);
-	TIMER_DEVICE_CALLBACK_MEMBER(system_h1_sub);
+	void system_h1_main(timer_device &timer, void *ptr, int32_t param);
+	void system_h1_sub(timer_device &timer, void *ptr, int32_t param);
 	void scsp_irq(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void sysh1_dma_transfer( address_space &space, uint16_t dma_index );
@@ -3532,7 +3532,7 @@ INPUT_PORTS_END
 
 
 // IRQs 4 & 6 are valid on SH-2
-TIMER_DEVICE_CALLBACK_MEMBER(coolridr_state::system_h1_main)
+void coolridr_state::system_h1_main(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -3543,7 +3543,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(coolridr_state::system_h1_main)
 		m_maincpu->set_input_line(6, HOLD_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(coolridr_state::system_h1_sub)
+void coolridr_state::system_h1_sub(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -3690,7 +3690,7 @@ void coolridr_state::scsp_irq(address_space &space, offs_t offset, uint8_t data,
 	m_soundcpu->set_input_line(offset, data);
 }
 
-WRITE_LINE_MEMBER(coolridr_state::scsp1_to_sh1_irq)
+void coolridr_state::scsp1_to_sh1_irq(int state)
 {
 	m_subcpu->set_input_line(0xe, (state) ? ASSERT_LINE : CLEAR_LINE);
 	if(state)
@@ -3699,7 +3699,7 @@ WRITE_LINE_MEMBER(coolridr_state::scsp1_to_sh1_irq)
 		sound_data &= ~0x10;
 }
 
-WRITE_LINE_MEMBER(coolridr_state::scsp2_to_sh1_irq)
+void coolridr_state::scsp2_to_sh1_irq(int state)
 {
 	m_subcpu->set_input_line(0xe, (state) ? ASSERT_LINE : CLEAR_LINE);
 	if(state)

@@ -426,7 +426,7 @@ void akiko_device::set_cd_status(uint32_t status)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(akiko_device::frame_proc)
+void akiko_device::frame_proc(void *ptr, int32_t param)
 {
 	(void)param;
 
@@ -454,7 +454,7 @@ static uint32_t lba_from_triplet( uint8_t *triplet )
 	return r;
 }
 
-TIMER_CALLBACK_MEMBER(akiko_device::dma_proc)
+void akiko_device::dma_proc(void *ptr, int32_t param)
 {
 	uint8_t   buf[2352];
 	int     index;
@@ -569,7 +569,7 @@ void akiko_device::setup_response( int len, uint8_t *r1 )
 	set_cd_status(0x10000000); /* new data available */
 }
 
-TIMER_CALLBACK_MEMBER( akiko_device::cd_delayed_cmd )
+void akiko_device::cd_delayed_cmd(void *ptr, int32_t param)
 {
 	uint8_t   resp[32];
 	uint8_t   cddastatus;

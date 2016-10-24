@@ -15,7 +15,7 @@
 
 
 ******************************************************************************/
-PALETTE_INIT_MEMBER(pastelg_state, pastelg)
+void pastelg_state::palette_init_pastelg(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;

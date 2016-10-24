@@ -18,7 +18,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(ironhors_state, ironhors)
+void ironhors_state::palette_init_ironhors(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances[4] = { 2000, 1000, 470, 220 };
@@ -131,7 +131,7 @@ void ironhors_state::flipscreen_w(address_space &space, offs_t offset, uint8_t d
 	/* other bits are used too, but unknown */
 }
 
-TILE_GET_INFO_MEMBER(ironhors_state::get_bg_tile_info)
+void ironhors_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index] + ((m_colorram[tile_index] & 0x40) << 2) +
 		((m_colorram[tile_index] & 0x20) << 4) + (m_charbank << 10);
@@ -244,7 +244,7 @@ uint32_t ironhors_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	return 0;
 }
 
-TILE_GET_INFO_MEMBER(ironhors_state::farwest_get_bg_tile_info)
+void ironhors_state::farwest_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index] + ((m_colorram[tile_index] & 0x40) << 2) +
 		((m_colorram[tile_index] & 0x20) << 4) + (m_charbank << 10);

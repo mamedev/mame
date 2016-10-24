@@ -625,7 +625,7 @@ void i8275_device::dack_w(address_space &space, offs_t offset, uint8_t data, uin
 //  lpen_w -
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( i8275_device::lpen_w )
+void i8275_device::lpen_w(int state)
 {
 	if (!m_lpen && state)
 	{

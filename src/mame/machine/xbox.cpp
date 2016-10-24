@@ -683,7 +683,7 @@ void xbox_base_state::audio_ac93_w(address_space &space, offs_t offset, uint32_t
 	}
 }
 
-TIMER_CALLBACK_MEMBER(xbox_base_state::audio_apu_timer)
+void xbox_base_state::audio_apu_timer(void *ptr, int32_t param)
 {
 	int cmd;
 	int bb, b, v;
@@ -777,7 +777,7 @@ void xbox_base_state::dummy_w(address_space &space, offs_t offset, uint32_t data
  * PIC & PIT
  */
 
-WRITE_LINE_MEMBER(xbox_base_state::xbox_pic8259_1_set_int_line)
+void xbox_base_state::xbox_pic8259_1_set_int_line(int state)
 {
 	m_maincpu->set_input_line(0, state ? HOLD_LINE : CLEAR_LINE);
 }
@@ -790,7 +790,7 @@ uint8_t xbox_base_state::get_slave_ack(address_space &space, offs_t offset, uint
 	return 0x00;
 }
 
-IRQ_CALLBACK_MEMBER(xbox_base_state::irq_callback)
+int xbox_base_state::irq_callback(device_t &device, int irqline)
 {
 	int r = 0;
 	r = xbox_base_devs.pic8259_1->acknowledge();
@@ -799,7 +799,7 @@ IRQ_CALLBACK_MEMBER(xbox_base_state::irq_callback)
 	return r;
 }
 
-WRITE_LINE_MEMBER(xbox_base_state::xbox_pit8254_out0_changed)
+void xbox_base_state::xbox_pit8254_out0_changed(int state)
 {
 	if (xbox_base_devs.pic8259_1)
 	{
@@ -807,7 +807,7 @@ WRITE_LINE_MEMBER(xbox_base_state::xbox_pit8254_out0_changed)
 	}
 }
 
-WRITE_LINE_MEMBER(xbox_base_state::xbox_pit8254_out2_changed)
+void xbox_base_state::xbox_pit8254_out2_changed(int state)
 {
 	//xbox_speaker_set_input( state ? 1 : 0 );
 }

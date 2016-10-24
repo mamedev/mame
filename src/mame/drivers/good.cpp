@@ -57,8 +57,8 @@ public:
 	tilemap_t  *m_fg_tilemap;
 	void fg_tilemapram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void bg_tilemapram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void video_start() override;
 	uint32_t screen_update_good(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
@@ -72,7 +72,7 @@ void good_state::fg_tilemapram_w(address_space &space, offs_t offset, uint16_t d
 	m_fg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-TILE_GET_INFO_MEMBER(good_state::get_fg_tile_info)
+void good_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno = m_fg_tilemapram[tile_index * 2];
 	int attr = m_fg_tilemapram[tile_index * 2 + 1] & 0xf;
@@ -85,7 +85,7 @@ void good_state::bg_tilemapram_w(address_space &space, offs_t offset, uint16_t d
 	m_bg_tilemap->mark_tile_dirty(offset / 2);
 }
 
-TILE_GET_INFO_MEMBER(good_state::get_bg_tile_info)
+void good_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno = m_bg_tilemapram[tile_index * 2];
 	int attr = m_bg_tilemapram[tile_index * 2 + 1] & 0xf;

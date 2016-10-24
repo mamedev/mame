@@ -137,7 +137,7 @@ public:
 	void init_fixeightbl();
 	void init_vfive();
 	void init_batrider();
-	TILE_GET_INFO_MEMBER(get_text_tile_info);
+	void get_text_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void machine_start_toaplan2();
 	void machine_reset_toaplan2();
 	void video_start_toaplan2();
@@ -153,10 +153,10 @@ public:
 	uint32_t screen_update_truxton2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_bootleg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_toaplan2(screen_device &screen, bool state);
-	INTERRUPT_GEN_MEMBER(toaplan2_vblank_irq1);
-	INTERRUPT_GEN_MEMBER(toaplan2_vblank_irq2);
-	INTERRUPT_GEN_MEMBER(toaplan2_vblank_irq4);
-	INTERRUPT_GEN_MEMBER(bbakraid_snd_interrupt);
+	void toaplan2_vblank_irq1(device_t &device);
+	void toaplan2_vblank_irq2(device_t &device);
+	void toaplan2_vblank_irq4(device_t &device);
+	void bbakraid_snd_interrupt(device_t &device);
 	void truxton2_postload();
 	void create_tx_tilemap(int dx = 0, int dx_flipped = 0);
 	void toaplan2_vblank_irq(int irq_line);
@@ -164,7 +164,7 @@ public:
 	void pwrkick_coin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void pwrkick_coin_lockout_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER(toaplan2_reset);
+	void toaplan2_reset(int state);
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

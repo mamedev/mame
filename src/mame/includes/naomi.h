@@ -53,8 +53,8 @@ class naomi_state : public dc_state
 	optional_device<macronix_29l001mc_device> m_awflash;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
 
-	DECLARE_WRITE_LINE_MEMBER(aica_irq);
-	DECLARE_WRITE_LINE_MEMBER(sh4_aica_irq);
+	void aica_irq(int state);
+	void sh4_aica_irq(int state);
 	void machine_reset_naomi();
 	void init_atomiswave();
 	void init_xtrmhnt2();

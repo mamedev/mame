@@ -44,7 +44,7 @@ void bagman_state::colorram_w(address_space &space, offs_t offset, uint8_t data,
   bit 0 -- 1  kohm resistor  -- /
 
 ***************************************************************************/
-PALETTE_INIT_MEMBER(bagman_state,bagman)
+void bagman_state::palette_init_bagman(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -87,7 +87,7 @@ void bagman_state::flipscreen_w(address_space &space, offs_t offset, uint8_t dat
 	flip_screen_set(data & 0x01);
 }
 
-TILE_GET_INFO_MEMBER(bagman_state::get_bg_tile_info)
+void bagman_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int gfxbank = (m_gfxdecode->gfx(2) && (m_colorram[tile_index] & 0x10)) ? 2 : 0;
 	int code = m_videoram[tile_index] + 8 * (m_colorram[tile_index] & 0x20);

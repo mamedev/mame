@@ -1145,13 +1145,13 @@ public:
 	void init_vkdlswwr();
 	void init_vkdlswwv();
 	void init_bchancep();
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(wcrdxtnd_get_bg_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void wcrdxtnd_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(goldnpkr);
-	DECLARE_PALETTE_INIT(witchcrd);
+	void palette_init_goldnpkr(palette_device &palette);
+	void palette_init_witchcrd(palette_device &palette);
 	void video_start_wcrdxtnd();
-	DECLARE_PALETTE_INIT(wcrdxtnd);
+	void palette_init_wcrdxtnd(palette_device &palette);
 	void machine_start_mondial();
 	void machine_reset_mondial();
 	uint32_t screen_update_goldnpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -1179,7 +1179,7 @@ void goldnpkr_state::goldnpkr_colorram_w(address_space &space, offs_t offset, ui
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(goldnpkr_state::get_bg_tile_info)
+void goldnpkr_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 /*  - bits -
     7654 3210
@@ -1197,7 +1197,7 @@ TILE_GET_INFO_MEMBER(goldnpkr_state::get_bg_tile_info)
 	SET_TILE_INFO_MEMBER(bank, code, color, 0);
 }
 
-TILE_GET_INFO_MEMBER(goldnpkr_state::wcrdxtnd_get_bg_tile_info)
+void goldnpkr_state::wcrdxtnd_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 /* 16 graphics banks system for VK extended (up & down) PCB's
 
@@ -1231,7 +1231,7 @@ uint32_t goldnpkr_state::screen_update_goldnpkr(screen_device &screen, bitmap_in
 	return 0;
 }
 
-PALETTE_INIT_MEMBER(goldnpkr_state, goldnpkr)
+void goldnpkr_state::palette_init_goldnpkr(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 /*  prom bits
@@ -1275,7 +1275,7 @@ PALETTE_INIT_MEMBER(goldnpkr_state, goldnpkr)
 	}
 }
 
-PALETTE_INIT_MEMBER(goldnpkr_state,witchcrd)
+void goldnpkr_state::palette_init_witchcrd(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 /*
@@ -1323,7 +1323,7 @@ PALETTE_INIT_MEMBER(goldnpkr_state,witchcrd)
 	}
 }
 
-PALETTE_INIT_MEMBER(goldnpkr_state,wcrdxtnd)
+void goldnpkr_state::palette_init_wcrdxtnd(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 /*

@@ -42,13 +42,13 @@ public:
 	void chinhero_ay8910_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void shangkid_ay8910_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	void init_shangkid();
 	void init_chinhero();
 	void machine_reset_chinhero();
 	void video_start_shangkid();
-	DECLARE_PALETTE_INIT(dynamski);
+	void palette_init_dynamski(palette_device &palette);
 	void machine_reset_shangkid();
 
 	uint32_t screen_update_shangkid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

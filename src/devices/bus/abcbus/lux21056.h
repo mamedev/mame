@@ -56,11 +56,11 @@ public:
 	uint8_t io_read_byte(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void io_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( write_sasi_req );
-	DECLARE_WRITE_LINE_MEMBER( write_sasi_io );
-	DECLARE_WRITE_LINE_MEMBER( write_sasi_cd );
-	DECLARE_WRITE_LINE_MEMBER( write_sasi_msg );
-	DECLARE_WRITE_LINE_MEMBER( write_sasi_bsy );
+	void write_sasi_req(int state);
+	void write_sasi_io(int state);
+	void write_sasi_cd(int state);
+	void write_sasi_msg(int state);
+	void write_sasi_bsy(int state);
 
 protected:
 	// device-level overrides

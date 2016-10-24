@@ -31,18 +31,18 @@ public:
 	optional_device<mc146818_device> m_mc146818;
 	required_device<kbdc8042_device> m_kbdc;
 
-	DECLARE_WRITE_LINE_MEMBER(pc_dma_hrq_changed);
+	void pc_dma_hrq_changed(int state);
 	uint8_t pc_dma_read_byte(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void pc_dma_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t dma_page_select_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void dma_page_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void set_dma_channel(int channel, int state);
-	DECLARE_WRITE_LINE_MEMBER( pc_dack0_w );
-	DECLARE_WRITE_LINE_MEMBER( pc_dack1_w );
-	DECLARE_WRITE_LINE_MEMBER( pc_dack2_w );
-	DECLARE_WRITE_LINE_MEMBER( pc_dack3_w );
+	void pc_dack0_w(int state);
+	void pc_dack1_w(int state);
+	void pc_dack2_w(int state);
+	void pc_dack3_w(int state);
 	uint8_t get_slave_ack(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( at_pit8254_out2_changed );
+	void at_pit8254_out2_changed(int state);
 	int m_dma_channel;
 	uint8_t m_dma_offset[2][4];
 	uint8_t m_at_pages[0x10];

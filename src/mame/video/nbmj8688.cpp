@@ -36,7 +36,7 @@ enum
 
 ******************************************************************************/
 
-PALETTE_INIT_MEMBER(nbmj8688_state,mbmj8688_8bit)
+void nbmj8688_state::palette_init_mbmj8688_8bit(palette_device &palette)
 {
 	int i;
 	int bit0, bit1, bit2, r, g, b;
@@ -65,7 +65,7 @@ PALETTE_INIT_MEMBER(nbmj8688_state,mbmj8688_8bit)
 	}
 }
 
-PALETTE_INIT_MEMBER(nbmj8688_state,mbmj8688_12bit)
+void nbmj8688_state::palette_init_mbmj8688_12bit(palette_device &palette)
 {
 	int i;
 	int r, g, b;
@@ -82,7 +82,7 @@ PALETTE_INIT_MEMBER(nbmj8688_state,mbmj8688_12bit)
 	}
 }
 
-PALETTE_INIT_MEMBER(nbmj8688_state,mbmj8688_16bit)
+void nbmj8688_state::palette_init_mbmj8688_16bit(palette_device &palette)
 {
 	int i;
 	int r, g, b;
@@ -98,7 +98,7 @@ PALETTE_INIT_MEMBER(nbmj8688_state,mbmj8688_16bit)
 	}
 }
 
-PALETTE_INIT_MEMBER(nbmj8688_state,mbmj8688_lcd)
+void nbmj8688_state::palette_init_mbmj8688_lcd(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(28, 123, 57));
 	palette.set_pen_color(1, rgb_t(0, 0, 0));

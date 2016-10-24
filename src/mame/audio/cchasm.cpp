@@ -97,7 +97,7 @@ uint16_t cchasm_state::io_r(address_space &space, offs_t offset, uint16_t mem_ma
 }
 
 
-WRITE_LINE_MEMBER(cchasm_state::ctc_timer_1_w)
+void cchasm_state::ctc_timer_1_w(int state)
 {
 	if (state) /* rising edge */
 	{
@@ -106,7 +106,7 @@ WRITE_LINE_MEMBER(cchasm_state::ctc_timer_1_w)
 	}
 }
 
-WRITE_LINE_MEMBER(cchasm_state::ctc_timer_2_w)
+void cchasm_state::ctc_timer_2_w(int state)
 {
 	if (state) /* rising edge */
 	{

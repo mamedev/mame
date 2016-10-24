@@ -3,13 +3,13 @@
 #include "includes/kyocera.h"
 #include "rendlay.h"
 
-PALETTE_INIT_MEMBER(kc85_state,kc85)
+void kc85_state::palette_init_kc85(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));
 }
 
-PALETTE_INIT_MEMBER(tandy200_state,tandy200)
+void tandy200_state::palette_init_tandy200(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));

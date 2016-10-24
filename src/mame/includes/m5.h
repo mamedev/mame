@@ -82,11 +82,11 @@ public:
 //  const TMS9928a_interface *m_vdp_intf;
 
 	int m_centronics_busy;
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
+	void write_centronics_busy(int state);
 
 	void init_pal();
 	void init_ntsc();
-	DECLARE_WRITE_LINE_MEMBER(sordm5_video_interrupt_callback);
+	void sordm5_video_interrupt_callback(int state);
 
 	// memory
 	uint8_t mem64KBI_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
@@ -140,9 +140,9 @@ public:
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 
-//  DECLARE_WRITE_LINE_MEMBER( wd2797_intrq_w );
-//  DECLARE_WRITE_LINE_MEMBER( wd2797_drq_w );
-//  DECLARE_WRITE_LINE_MEMBER( wd2797_index_callback);
+//  void wd2797_intrq_w(int state);
+//  void wd2797_drq_w(int state);
+//  void wd2797_index_callback(int state);
 
 	//required_device<ram_device> m_ramdisk;
 	void init_brno();

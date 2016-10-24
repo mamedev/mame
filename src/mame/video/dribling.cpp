@@ -17,7 +17,7 @@
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(dribling_state, dribling)
+void dribling_state::palette_init_dribling(palette_device &palette)
 {
 	const uint8_t *prom = memregion("proms")->base() + 0x400;
 	int i;

@@ -46,7 +46,7 @@ public:
 	virtual void update_machine() override;
 
 	void reset();
-	TIMER_CALLBACK_MEMBER(autoboot_callback);
+	void autoboot_callback(void *ptr, int32_t param);
 
 	virtual ui_manager* create_ui(running_machine& machine) override;
 

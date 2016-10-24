@@ -59,14 +59,14 @@ Apple color FPD      01           11           10   (FPD = Full Page Display)
 #include "machine/ram.h"
 #include "render.h"
 
-PALETTE_INIT_MEMBER(mac_state,mac)
+void mac_state::palette_init_mac(palette_device &palette)
 {
 	palette.set_pen_color(0, 0xff, 0xff, 0xff);
 	palette.set_pen_color(1, 0x00, 0x00, 0x00);
 }
 
 // 4-level grayscale
-PALETTE_INIT_MEMBER(mac_state,macgsc)
+void mac_state::palette_init_macgsc(palette_device &palette)
 {
 	palette.set_pen_color(0, 0xff, 0xff, 0xff);
 	palette.set_pen_color(1, 0x7f, 0x7f, 0x7f);
@@ -869,7 +869,7 @@ void mac_state::dafb_recalc_ints()
 	}
 }
 
-TIMER_CALLBACK_MEMBER(mac_state::dafb_vbl_tick)
+void mac_state::dafb_vbl_tick(void *ptr, int32_t param)
 {
 	m_dafb_int_status |= 1;
 	dafb_recalc_ints();
@@ -877,7 +877,7 @@ TIMER_CALLBACK_MEMBER(mac_state::dafb_vbl_tick)
 	m_vbl_timer->adjust(m_screen->time_until_pos(480, 0), 0);
 }
 
-TIMER_CALLBACK_MEMBER(mac_state::dafb_cursor_tick)
+void mac_state::dafb_cursor_tick(void *ptr, int32_t param)
 {
 	m_dafb_int_status |= 4;
 	dafb_recalc_ints();

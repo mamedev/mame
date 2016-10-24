@@ -88,9 +88,9 @@ public:
 	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return read(); }
 	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { write(data); }
 
-	DECLARE_WRITE_LINE_MEMBER(rdy_w);
-	DECLARE_WRITE_LINE_MEMBER(wait_w);
-	DECLARE_WRITE_LINE_MEMBER(bai_w);
+	void rdy_w(int state);
+	void wait_w(int state);
+	void bai_w(int state);
 
 private:
 	// device-level overrides
@@ -111,11 +111,11 @@ private:
 	void do_transfer_write();
 	void do_search();
 
-	TIMER_CALLBACK_MEMBER(timerproc);
+	void timerproc(void *ptr, int32_t param);
 
 	void update_status();
 
-	TIMER_CALLBACK_MEMBER(rdy_write_callback);
+	void rdy_write_callback(void *ptr, int32_t param);
 
 	// internal state
 	devcb_write_line   m_out_busreq_cb;

@@ -31,9 +31,9 @@ public:
 		uint8_t bsmt_comms_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 		void bsmt_comms_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-		DECLARE_WRITE_LINE_MEMBER(bsmt_reset_line);
+		void bsmt_reset_line(int state);
 
-		INTERRUPT_GEN_MEMBER(decobsmt_firq_interrupt);
+		void decobsmt_firq_interrupt(device_t &device);
 
 		required_device<cpu_device> m_ourcpu;
 		required_device<bsmt2000_device> m_bsmt;

@@ -30,8 +30,8 @@ public:
 	uint8_t t90_internal_registers_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void t90_internal_registers_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	TIMER_CALLBACK_MEMBER( t90_timer_callback );
-	TIMER_CALLBACK_MEMBER( t90_timer4_callback );
+	void t90_timer_callback(void *ptr, int32_t param);
+	void t90_timer4_callback(void *ptr, int32_t param);
 
 protected:
 	enum _e_op {    UNKNOWN,    NOP,    EX,     EXX,    LD,     LDW,    LDA,    LDI,    LDIR,   LDD,    LDDR,   CPI,    CPIR,   CPD,    CPDR,   PUSH,   POP,    JP,     JR,     CALL,   CALLR,      RET,    RETI,   HALT,   DI,     EI,     SWI,    DAA,    CPL,    NEG,    LDAR,   RCF,    SCF,    CCF,    TSET,   BIT,    SET,    RES,    INC,    DEC,    INCX,   DECX,   INCW,   DECW,   ADD,    ADC,    SUB,    SBC,    AND,    XOR,    OR,     CP,     RLC,    RRC,    RL,     RR,     SLA,    SRA,    SLL,    SRL,    RLD,    RRD,    DJNZ,   MUL,    DIV     };

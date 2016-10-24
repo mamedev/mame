@@ -138,8 +138,8 @@ public:
 	uint8_t io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_write_irq(state); }
-	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_write_nmi(state); }
+	void irq_w(int state) { m_write_irq(state); }
+	void nmi_w(int state) { m_write_nmi(state); }
 
 protected:
 	// device-level overrides

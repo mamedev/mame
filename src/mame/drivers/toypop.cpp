@@ -73,13 +73,13 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(master_scanline);
-	INTERRUPT_GEN_MEMBER(slave_vblank_irq);
+	void master_scanline(timer_device &timer, void *ptr, int32_t param);
+	void slave_vblank_irq(device_t &device);
 
 	uint8_t irq_enable_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void irq_disable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void irq_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_PALETTE_INIT(toypop);
+	void palette_init_toypop(palette_device &palette);
 	uint8_t dipA_l(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t dipA_h(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t dipB_l(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
@@ -111,7 +111,7 @@ private:
 	void legacy_obj_draw(bitmap_ind16 &bitmap,const rectangle &cliprect);
 };
 
-PALETTE_INIT_MEMBER(namcos16_state, toypop)
+void namcos16_state::palette_init_toypop(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 
@@ -619,7 +619,7 @@ void namcos16_state::machine_reset()
 	m_sound_cpu->set_input_line(INPUT_LINE_RESET,ASSERT_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(namcos16_state::master_scanline)
+void namcos16_state::master_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -640,7 +640,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos16_state::master_scanline)
 	}
 }
 
-INTERRUPT_GEN_MEMBER(namcos16_state::slave_vblank_irq)
+void namcos16_state::slave_vblank_irq(device_t &device)
 {
 	if(m_slave_irq_enable == true)
 		device.execute().set_input_line(6,HOLD_LINE);

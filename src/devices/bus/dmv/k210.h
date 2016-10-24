@@ -34,13 +34,13 @@ public:
 	void portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER(cent_ack_w);
-	DECLARE_WRITE_LINE_MEMBER(cent_busy_w);
-	DECLARE_WRITE_LINE_MEMBER(cent_slct_w);
-	DECLARE_WRITE_LINE_MEMBER(cent_pe_w);
-	DECLARE_WRITE_LINE_MEMBER(cent_fault_w);
-	DECLARE_WRITE_LINE_MEMBER(cent_autofd_w);
-	DECLARE_WRITE_LINE_MEMBER(cent_init_w);
+	void cent_ack_w(int state);
+	void cent_busy_w(int state);
+	void cent_slct_w(int state);
+	void cent_pe_w(int state);
+	void cent_fault_w(int state);
+	void cent_autofd_w(int state);
+	void cent_init_w(int state);
 
 protected:
 	// device-level overrides

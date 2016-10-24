@@ -65,7 +65,7 @@ public:
 	int8_t m_disp_shift;
 	int8_t m_direction;
 	uint8_t m_blink;
-	DECLARE_PALETTE_INIT(pc4);
+	void palette_init_pc4(palette_device &palette);
 
 protected:
 	required_memory_region m_region_charset;

@@ -94,7 +94,7 @@ private:
 	void start_frame();
 	void stop_frame();
 
-	TIMER_CALLBACK_MEMBER(timer_expire);
+	void timer_expire(void *ptr, int32_t param);
 
 	devcb_write8 m_write_req;
 

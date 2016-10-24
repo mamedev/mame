@@ -624,7 +624,7 @@ static GFXDECODE_START( armwrest )
 GFXDECODE_END
 
 
-INTERRUPT_GEN_MEMBER(punchout_state::vblank_irq)
+void punchout_state::vblank_irq(device_t &device)
 {
 	if (m_nmi_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);

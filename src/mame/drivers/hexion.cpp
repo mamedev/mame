@@ -102,12 +102,12 @@ void hexion_state::coincntr_w(address_space &space, offs_t offset, uint8_t data,
 if ((data & 0xdc) != 0x10) popmessage("coincntr %02x",data);
 }
 
-WRITE_LINE_MEMBER(hexion_state::irq_ack_w)
+void hexion_state::irq_ack_w(int state)
 {
 	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER(hexion_state::nmi_ack_w)
+void hexion_state::nmi_ack_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
@@ -225,7 +225,7 @@ static GFXDECODE_START( hexion )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 16 )
 GFXDECODE_END
 
-TIMER_DEVICE_CALLBACK_MEMBER(hexion_state::scanline)
+void hexion_state::scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

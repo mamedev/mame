@@ -145,7 +145,7 @@ public:
 	void init_plus3();
 	void machine_reset_spectrum();
 	void video_start_spectrum();
-	DECLARE_PALETTE_INIT(spectrum);
+	void palette_init_spectrum(palette_device &palette);
 	void machine_reset_tc2048();
 	void video_start_spectrum_128();
 	void machine_reset_spectrum_128();
@@ -157,7 +157,7 @@ public:
 	uint32_t screen_update_ts2068(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_spectrum(screen_device &screen, bool state);
 	void screen_eof_timex(screen_device &screen, bool state);
-	INTERRUPT_GEN_MEMBER(spec_interrupt);
+	void spec_interrupt(device_t &device);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( spectrum_cart );
 
 	// for timex cart only

@@ -277,7 +277,7 @@ static GFXDECODE_START( tp84 )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 64*4*8, 16*8 )
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(tp84_state::sub_vblank_irq)
+void tp84_state::sub_vblank_irq(device_t &device)
 {
 	if(m_sub_irq_mask)
 		device.execute().set_input_line(0, HOLD_LINE);

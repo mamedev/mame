@@ -51,15 +51,15 @@ public:
 
 	DECLARE_CUSTOM_INPUT_MEMBER(control_r);
 
-	TILE_GET_INFO_MEMBER(get_tile_info);
-	TILE_GET_INFO_MEMBER(get_tile_info2);
+	void get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
-	INTERRUPT_GEN_MEMBER(main_nmi_gen);
-	TIMER_CALLBACK_MEMBER(delayed_sound_w);
+	void main_nmi_gen(device_t &device);
+	void delayed_sound_w(void *ptr, int32_t param);
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(suprridr);
+	void palette_init_suprridr(palette_device &palette);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	int is_screen_flipped();

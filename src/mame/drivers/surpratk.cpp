@@ -17,7 +17,7 @@
 #include "includes/konamipt.h"
 #include "includes/surpratk.h"
 
-INTERRUPT_GEN_MEMBER(surpratk_state::surpratk_interrupt)
+void surpratk_state::surpratk_interrupt(device_t &device)
 {
 	if (m_k052109->is_irq_enabled())
 		device.execute().set_input_line(0, HOLD_LINE);

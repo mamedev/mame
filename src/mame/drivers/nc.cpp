@@ -274,7 +274,7 @@ void nc_state::nc_update_interrupts()
 	}
 }
 
-TIMER_CALLBACK_MEMBER(nc_state::nc_keyboard_timer_callback)
+void nc_state::nc_keyboard_timer_callback(void *ptr, int32_t param)
 {
 		LOG(("keyboard int\n"));
 
@@ -386,7 +386,7 @@ void nc_state::nc_refresh_memory_config()
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(nc_state::dummy_timer_callback)
+void nc_state::dummy_timer_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	int inputport_10_state;
 	int changed_bits;
@@ -657,7 +657,7 @@ static const int baud_rate_table[]=
 	1, //19200
 };
 
-WRITE_LINE_MEMBER(nc_state::write_uart_clock)
+void nc_state::write_uart_clock(int state)
 {
 	m_uart->write_txc(state);
 	m_uart->write_rxc(state);
@@ -721,12 +721,12 @@ void nc_state::nc100_uart_control_w(address_space &space, offs_t offset, uint8_t
 }
 
 
-WRITE_LINE_MEMBER(nc_state::nc100_tc8521_alarm_callback)
+void nc_state::nc100_tc8521_alarm_callback(int state)
 {
 	// TODO
 }
 
-WRITE_LINE_MEMBER(nc_state::nc100_txrdy_callback)
+void nc_state::nc100_txrdy_callback(int state)
 {
 	m_irq_latch &= ~(1 << 1);
 
@@ -743,7 +743,7 @@ WRITE_LINE_MEMBER(nc_state::nc100_txrdy_callback)
 	nc_update_interrupts();
 }
 
-WRITE_LINE_MEMBER(nc_state::nc100_rxrdy_callback)
+void nc_state::nc100_rxrdy_callback(int state)
 {
 	m_irq_latch &= ~(1<<0);
 
@@ -759,7 +759,7 @@ WRITE_LINE_MEMBER(nc_state::nc100_rxrdy_callback)
 	nc_update_interrupts();
 }
 
-WRITE_LINE_MEMBER(nc_state::write_nc100_centronics_ack)
+void nc_state::write_nc100_centronics_ack(int state)
 {
 	m_centronics_ack = state;
 
@@ -772,7 +772,7 @@ WRITE_LINE_MEMBER(nc_state::write_nc100_centronics_ack)
 	nc_update_interrupts();
 }
 
-WRITE_LINE_MEMBER(nc_state::write_centronics_busy)
+void nc_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 }
@@ -1034,7 +1034,7 @@ void nc_state::nc200_display_memory_start_w(address_space &space, offs_t offset,
 #endif
 
 
-WRITE_LINE_MEMBER(nc_state::write_nc200_centronics_ack)
+void nc_state::write_nc200_centronics_ack(int state)
 {
 	if (state)
 		m_irq_status |= 0x01;
@@ -1063,7 +1063,7 @@ void nc_state::nc200_refresh_uart_interrupt()
 	nc_update_interrupts();
 }
 
-WRITE_LINE_MEMBER(nc_state::nc200_txrdy_callback)
+void nc_state::nc200_txrdy_callback(int state)
 {
 //  m_nc200_uart_interrupt_irq &=~(1<<0);
 //
@@ -1075,7 +1075,7 @@ WRITE_LINE_MEMBER(nc_state::nc200_txrdy_callback)
 //  nc200_refresh_uart_interrupt();
 }
 
-WRITE_LINE_MEMBER(nc_state::nc200_rxrdy_callback)
+void nc_state::nc200_rxrdy_callback(int state)
 {
 	m_nc200_uart_interrupt_irq &=~(1<<1);
 
@@ -1087,7 +1087,7 @@ WRITE_LINE_MEMBER(nc_state::nc200_rxrdy_callback)
 	nc200_refresh_uart_interrupt();
 }
 
-WRITE_LINE_MEMBER( nc_state::nc200_fdc_interrupt )
+void nc_state::nc200_fdc_interrupt(int state)
 {
 #if 0
 	m_irq_latch &=~(1<<5);

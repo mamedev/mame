@@ -224,14 +224,14 @@ SCN2674_DRAW_CHARACTER_MEMBER(pcx_video_device::display_pixels)
 		bitmap.pix32(y, x + i) = palette().pen((data & (1 << (7 - i))) ? 1 : 0);
 }
 
-PALETTE_INIT_MEMBER(pcdx_video_device, pcdx)
+void pcdx_video_device::palette_init_pcdx(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t::black());
 	palette.set_pen_color(1, rgb_t::white());
 	palette.set_pen_color(2, rgb_t(128, 128, 128));
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(pcd_video_device::mouse_timer)
+void pcd_video_device::mouse_timer(timer_device &timer, void *ptr, int32_t param)
 {
 	m_t1 = (m_t1 == CLEAR_LINE) ? ASSERT_LINE : CLEAR_LINE;
 	if(m_t1)

@@ -2000,7 +2000,7 @@ void model1_state::vr_tgp_reset()
 }
 
 /* FIFO */
-READ_LINE_MEMBER(model1_state::copro_fifoin_pop_ok)
+int model1_state::copro_fifoin_pop_ok()
 {
 	if (m_copro_fifoin_num == 0)
 	{

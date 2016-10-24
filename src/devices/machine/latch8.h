@@ -103,7 +103,7 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_validity_check(validity_checker &valid) const override;
 
-	TIMER_CALLBACK_MEMBER( timerproc );
+	void timerproc(void *ptr, int32_t param);
 	void update(uint8_t new_val, uint8_t mask);
 	inline uint8_t bitx_r( offs_t offset, int bit);
 	inline void bitx_w(int bit, offs_t offset, uint8_t data);

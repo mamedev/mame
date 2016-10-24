@@ -74,7 +74,7 @@ K1000233A
 #include "includes/pitnrun.h"
 
 
-INTERRUPT_GEN_MEMBER(pitnrun_state::nmi_source)
+void pitnrun_state::nmi_source(device_t &device)
 {
 	if(m_nmi) device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }

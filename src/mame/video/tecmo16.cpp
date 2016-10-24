@@ -28,7 +28,7 @@ void tecmo16_state::save_state()
 	save_item(NAME(m_scroll_char_y_w));
 }
 
-TILE_GET_INFO_MEMBER(tecmo16_state::fg_get_tile_info)
+void tecmo16_state::fg_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = m_videoram[tile_index] & 0x1fff;
 	int color = m_colorram[tile_index] & 0x1f;
@@ -42,7 +42,7 @@ TILE_GET_INFO_MEMBER(tecmo16_state::fg_get_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(tecmo16_state::bg_get_tile_info)
+void tecmo16_state::bg_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = m_videoram2[tile_index] & 0x1fff;
 	int color = (m_colorram2[tile_index] & 0x0f);
@@ -53,7 +53,7 @@ TILE_GET_INFO_MEMBER(tecmo16_state::bg_get_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(tecmo16_state::tx_get_tile_info)
+void tecmo16_state::tx_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = m_charram[tile_index];
 	SET_TILE_INFO_MEMBER(0,

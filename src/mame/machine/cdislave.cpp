@@ -52,7 +52,7 @@ static inline void ATTR_PRINTF(3,4) verboselog(device_t& device, int n_level, co
 //  MEMBER FUNCTIONS
 //**************************************************************************
 
-TIMER_CALLBACK_MEMBER( cdislave_device::trigger_readback_int )
+void cdislave_device::trigger_readback_int(void *ptr, int32_t param)
 {
 	cdi_state *state = machine().driver_data<cdi_state>();
 

@@ -65,11 +65,11 @@ public:
 	void init_loverboy();
 	void init_jack();
 
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILEMAP_MAPPER_MEMBER(tilemap_scan_cols_flipy);
-	TILE_GET_INFO_MEMBER(joinem_get_bg_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	tilemap_memory_index tilemap_scan_cols_flipy(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	void joinem_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void video_start_joinem();
-	DECLARE_PALETTE_INIT(joinem);
+	void palette_init_joinem(palette_device &palette);
 	void machine_start_striv();
 	void machine_reset_striv();
 	void machine_start_joinem();
@@ -83,7 +83,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	INTERRUPT_GEN_MEMBER(joinem_vblank_irq);
+	void joinem_vblank_irq(device_t &device);
 	void jack_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void joinem_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void treahunt_decode(  );

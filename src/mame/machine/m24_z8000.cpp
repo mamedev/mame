@@ -181,7 +181,7 @@ void m24_z8000_device::serctl_w(address_space &space, offs_t offset, uint8_t dat
 	m_z8000_mem = (data & 0x20) ? true : false;
 }
 
-IRQ_CALLBACK_MEMBER(m24_z8000_device::int_cb)
+int m24_z8000_device::int_cb(device_t &device, int irqline)
 {
 	if (!irqline)
 	{
@@ -216,13 +216,13 @@ void m24_z8000_device::handshake_w(address_space &space, offs_t offset, uint8_t 
 	}
 }
 
-WRITE_LINE_MEMBER(m24_z8000_device::mo_w)
+void m24_z8000_device::mo_w(int state)
 {
 	m_z8000->mi_w(state ? ASSERT_LINE : CLEAR_LINE);
 	m_halt_out(state);
 }
 
-WRITE_LINE_MEMBER(m24_z8000_device::timer_irq_w)
+void m24_z8000_device::timer_irq_w(int state)
 {
 	m_timer_irq = state ? true : false;
 	m_z8000->set_input_line(INPUT_LINE_IRQ0, state ? ASSERT_LINE : CLEAR_LINE);

@@ -96,13 +96,13 @@
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(gridlee_state::irq_off_tick)
+void gridlee_state::irq_off_tick(void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 }
 
 
-TIMER_CALLBACK_MEMBER(gridlee_state::irq_timer_tick)
+void gridlee_state::irq_timer_tick(void *ptr, int32_t param)
 {
 	/* next interrupt after scanline 256 is scanline 64 */
 	if (param == 256)
@@ -118,13 +118,13 @@ TIMER_CALLBACK_MEMBER(gridlee_state::irq_timer_tick)
 }
 
 
-TIMER_CALLBACK_MEMBER(gridlee_state::firq_off_tick)
+void gridlee_state::firq_off_tick(void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 
-TIMER_CALLBACK_MEMBER(gridlee_state::firq_timer_tick)
+void gridlee_state::firq_timer_tick(void *ptr, int32_t param)
 {
 	/* same time next frame */
 	m_firq_timer->adjust(m_screen->time_until_pos(FIRQ_SCANLINE));

@@ -104,7 +104,7 @@ protected:
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum) const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	TIMER_CALLBACK_MEMBER(dma_transfer);
+	void dma_transfer(void *ptr, int32_t param);
 
 private:
 	mips3_device *m_cpu;

@@ -54,7 +54,7 @@ public:
 	void digit_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t kbd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( write_usart_clock );
+	void write_usart_clock(int state);
 
 	uint8_t m_digit;
 };
@@ -131,7 +131,7 @@ uint8_t sdk86_state::kbd_r(address_space &space, offs_t offset, uint8_t mem_mask
 	return data;
 }
 
-WRITE_LINE_MEMBER( sdk86_state::write_usart_clock )
+void sdk86_state::write_usart_clock(int state)
 {
 	m_usart->write_txc(state);
 	m_usart->write_rxc(state);

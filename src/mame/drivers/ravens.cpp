@@ -99,7 +99,7 @@ public:
 	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void machine_reset_ravens2();
 	uint8_t cass_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(cass_w);
+	void cass_w(int state);
 	DECLARE_QUICKLOAD_LOAD_MEMBER( ravens );
 	uint8_t m_term_char;
 	uint8_t m_term_data;
@@ -108,7 +108,7 @@ public:
 	required_device<cassette_image_device> m_cass;
 };
 
-WRITE_LINE_MEMBER( ravens_state::cass_w )
+void ravens_state::cass_w(int state)
 {
 	m_cass->output(state ? -1.0 : +1.0);
 }

@@ -37,9 +37,9 @@ public:
 
 	virtual uint8_t* get_cart_base() override;
 
-	DECLARE_WRITE_LINE_MEMBER(multi_cart_w);
-	DECLARE_WRITE_LINE_MEMBER(multi_nmi_w);
-	DECLARE_WRITE_LINE_MEMBER(multi_halt_w);
+	void multi_cart_w(int state);
+	void multi_nmi_w(int state);
+	void multi_halt_w(int state);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

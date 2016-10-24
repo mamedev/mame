@@ -110,7 +110,7 @@ const device_type SEGA315_5246 = &device_creator<sega315_5246_device>;
 const device_type SEGA315_5378 = &device_creator<sega315_5378_device>;
 
 
-PALETTE_INIT_MEMBER(sega315_5124_device, sega315_5124)
+void sega315_5124_device::palette_init_sega315_5124(palette_device &palette)
 {
 	int i;
 	for (i = 0; i < 64; i++)
@@ -141,7 +141,7 @@ PALETTE_INIT_MEMBER(sega315_5124_device, sega315_5124)
 }
 
 
-PALETTE_INIT_MEMBER(sega315_5378_device, sega315_5378)
+void sega315_5378_device::palette_init_sega315_5378(palette_device &palette)
 {
 	int i;
 	for (i = 0; i < 4096; i++)

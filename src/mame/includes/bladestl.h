@@ -62,9 +62,9 @@ public:
 	void bladestl_speech_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(bladestl);
+	void palette_init_bladestl(palette_device &palette);
 	uint32_t screen_update_bladestl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(bladestl_scanline);
+	void bladestl_scanline(timer_device &timer, void *ptr, int32_t param);
 	K007342_CALLBACK_MEMBER(bladestl_tile_callback);
 	K007420_CALLBACK_MEMBER(bladestl_sprite_callback);
 };

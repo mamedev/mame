@@ -247,7 +247,7 @@ void i8279_device::new_fifo(uint8_t data)
 }
 
 
-TIMER_CALLBACK_MEMBER( i8279_device::timerproc_callback )
+void i8279_device::timerproc_callback(void *ptr, int32_t param)
 {
 	timer_mainloop();
 }

@@ -33,11 +33,11 @@ public:
 	void sound_irq_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_PALETTE_INIT(wiping);
+	void palette_init_wiping(palette_device &palette);
 	virtual void machine_start() override;
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	INTERRUPT_GEN_MEMBER(vblank_irq);
-	INTERRUPT_GEN_MEMBER(sound_timer_irq);
+	void vblank_irq(device_t &device);
+	void sound_timer_irq(device_t &device);
 };

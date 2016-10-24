@@ -586,7 +586,7 @@ void taitof2_state::device_timer(emu_timer &timer, device_timer_id id, int param
 	}
 }
 
-INTERRUPT_GEN_MEMBER(taitof2_state::taitof2_interrupt)
+void taitof2_state::taitof2_interrupt(device_t &device)
 {
 	m_int6_timer->adjust(m_maincpu->cycles_to_attotime(500));
 	device.execute().set_input_line(5, HOLD_LINE);

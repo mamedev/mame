@@ -273,7 +273,7 @@ void ay31015_device::update_status_pins()
  ay31015_rx_process - convert serial to parallel
 -------------------------------------------------*/
 
-TIMER_CALLBACK_MEMBER( ay31015_device::rx_process )
+void ay31015_device::rx_process(void *ptr, int32_t param)
 {
 	switch (m_rx_state)
 	{
@@ -426,7 +426,7 @@ TIMER_CALLBACK_MEMBER( ay31015_device::rx_process )
  ay31015_tx_process - convert parallel to serial
 -------------------------------------------------*/
 
-TIMER_CALLBACK_MEMBER( ay31015_device::tx_process )
+void ay31015_device::tx_process(void *ptr, int32_t param)
 {
 	uint8_t t1;
 	switch (m_tx_state)

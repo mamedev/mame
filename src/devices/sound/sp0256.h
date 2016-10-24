@@ -65,12 +65,12 @@ public:
 	template<class _Object> static devcb_base &set_standby_callback(device_t &device, _Object object) { return downcast<sp0256_device &>(device).m_sby_cb.set_callback(object); }
 
 	void ald_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_READ_LINE_MEMBER(lrq_r);
-	DECLARE_READ_LINE_MEMBER(sby_r);
+	int lrq_r();
+	int sby_r();
 	uint16_t spb640_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void spb640_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	TIMER_CALLBACK_MEMBER(set_lrq_timer_proc);
+	void set_lrq_timer_proc(void *ptr, int32_t param);
 	void set_clock(int clock);
 	void bitrevbuff(uint8_t *buffer, unsigned int start, unsigned int length);
 

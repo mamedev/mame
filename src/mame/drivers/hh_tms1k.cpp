@@ -298,7 +298,7 @@ void hh_tms1k_state::display_update()
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(hh_tms1k_state::display_decay_tick)
+void hh_tms1k_state::display_decay_tick(timer_device &timer, void *ptr, int32_t param)
 {
 	// slowly turn off unpowered segments
 	for (int y = 0; y < m_display_maxy; y++)
@@ -370,7 +370,7 @@ uint8_t hh_tms1k_state::read_rotated_inputs(int columns, uint8_t rowmask)
 
 // devices with a TMS0980 can auto power-off
 
-WRITE_LINE_MEMBER(hh_tms1k_state::auto_power_off)
+void hh_tms1k_state::auto_power_off(int state)
 {
 	if (state)
 	{
@@ -4700,7 +4700,7 @@ public:
 
 	int m_gearbox_pos;
 	bool sensor_state() { return m_gearbox_pos < 0 && m_display_decay[0][0] != 0; }
-	TIMER_DEVICE_CALLBACK_MEMBER(gearbox_sim_tick);
+	void gearbox_sim_tick(timer_device &timer, void *ptr, int32_t param);
 
 protected:
 	virtual void machine_start() override;
@@ -4708,7 +4708,7 @@ protected:
 
 // handlers
 
-TIMER_DEVICE_CALLBACK_MEMBER(bigtrak_state::gearbox_sim_tick)
+void bigtrak_state::gearbox_sim_tick(timer_device &timer, void *ptr, int32_t param)
 {
 	// the last gear in the gearbox has 12 evenly spaced holes, it is located
 	// between an IR emitter and receiver
@@ -4888,7 +4888,7 @@ public:
 	bool m_motor_on;
 	bool m_sensor_blind;
 
-	TIMER_DEVICE_CALLBACK_MEMBER(motor_sim_tick);
+	void motor_sim_tick(timer_device &timer, void *ptr, int32_t param);
 
 	void write_r(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void write_o(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
@@ -4900,7 +4900,7 @@ protected:
 
 // handlers
 
-TIMER_DEVICE_CALLBACK_MEMBER(mbdtower_state::motor_sim_tick)
+void mbdtower_state::motor_sim_tick(timer_device &timer, void *ptr, int32_t param)
 {
 	// it rotates counter-clockwise (when viewed from above)
 	if (m_motor_on)

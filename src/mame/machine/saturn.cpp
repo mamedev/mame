@@ -350,7 +350,7 @@ void saturn_state::saturn_scu_w(address_space &space, offs_t offset, uint32_t da
 }
 
 /*Lv 0 DMA end irq*/
-TIMER_CALLBACK_MEMBER(saturn_state::dma_lv0_ended )
+void saturn_state::dma_lv0_ended(void *ptr, int32_t param)
 {
 	if(!(m_scu.ism & IRQ_DMALV0))
 		m_maincpu->set_input_line_and_vector(5, HOLD_LINE, 0x4b);
@@ -361,7 +361,7 @@ TIMER_CALLBACK_MEMBER(saturn_state::dma_lv0_ended )
 }
 
 /*Lv 1 DMA end irq*/
-TIMER_CALLBACK_MEMBER(saturn_state::dma_lv1_ended)
+void saturn_state::dma_lv1_ended(void *ptr, int32_t param)
 {
 	if(!(m_scu.ism & IRQ_DMALV1))
 		m_maincpu->set_input_line_and_vector(6, HOLD_LINE, 0x4a);
@@ -372,7 +372,7 @@ TIMER_CALLBACK_MEMBER(saturn_state::dma_lv1_ended)
 }
 
 /*Lv 2 DMA end irq*/
-TIMER_CALLBACK_MEMBER(saturn_state::dma_lv2_ended)
+void saturn_state::dma_lv2_ended(void *ptr, int32_t param)
 {
 	if(!(m_scu.ism & IRQ_DMALV2))
 		m_maincpu->set_input_line_and_vector(6, HOLD_LINE, 0x49);
@@ -673,7 +673,7 @@ void saturn_state::scu_reset(void)
 	m_scu.status = 0;
 }
 
-TIMER_CALLBACK_MEMBER(saturn_state::stv_rtc_increment)
+void saturn_state::stv_rtc_increment(void *ptr, int32_t param)
 {
 	static const uint8_t dpm[12] = { 0x31, 0x28, 0x31, 0x30, 0x31, 0x30, 0x31, 0x31, 0x30, 0x31, 0x30, 0x31 };
 	static int year_num, year_count;
@@ -745,7 +745,7 @@ TIMER_CALLBACK_MEMBER(saturn_state::stv_rtc_increment)
 /* Official documentation says that the "RESET/TAS opcodes aren't supported", but Out Run definitely contradicts with it.
    Since that m68k can't reset itself via the RESET opcode I suppose that the SMPC actually do it by reading an i/o
    connected to this opcode. */
-WRITE_LINE_MEMBER(saturn_state::m68k_reset_callback)
+void saturn_state::m68k_reset_callback(int state)
 {
 	machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(saturn_state::smpc_audio_reset_line_pulse), this));
 
@@ -771,7 +771,7 @@ void saturn_state::scsp_irq(address_space &space, offs_t offset, uint8_t data, u
 	}
 }
 
-WRITE_LINE_MEMBER(saturn_state::scsp_to_main_irq)
+void saturn_state::scsp_to_main_irq(int state)
 {
 	if(state)
 	{
@@ -810,7 +810,7 @@ TODO:
 */
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(saturn_state::saturn_scanline)
+void saturn_state::saturn_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 	int y_step,vblank_line;
@@ -891,7 +891,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(saturn_state::saturn_scanline)
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(saturn_state::saturn_slave_scanline )
+void saturn_state::saturn_slave_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 	int y_step,vblank_line;
@@ -970,7 +970,7 @@ GFXDECODE_START( stv )
 	GFXDECODE_ENTRY( nullptr, 0, tiles16x16x8_layout, 0x00, (0x08*(2+1))  )
 GFXDECODE_END
 
-WRITE_LINE_MEMBER(saturn_state::scudsp_end_w)
+void saturn_state::scudsp_end_w(int state)
 {
 	if(state)
 	{

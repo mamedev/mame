@@ -87,7 +87,7 @@ public:
 	/* this is though for power on/off of the sharps */
 	uint8_t *internal_ram();
 
-	TIMER_CALLBACK_MEMBER(sc61860_2ms_tick);
+	void sc61860_2ms_tick(void *ptr, int32_t param);
 
 protected:
 	// device-level overrides

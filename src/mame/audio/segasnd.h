@@ -25,7 +25,7 @@ public:
 	void p1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER(drq_w);
+	void drq_w(int state);
 
 protected:
 	// device-level overrides
@@ -42,7 +42,7 @@ private:
 	uint8_t m_p2;
 	uint8_t *m_speech;
 
-	TIMER_CALLBACK_MEMBER( delayed_speech_w );
+	void delayed_speech_w(void *ptr, int32_t param);
 };
 
 extern const device_type SEGASPEECH;
@@ -133,7 +133,7 @@ public:
 	uint8_t workram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void workram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	TIMER_DEVICE_CALLBACK_MEMBER( increment_t1_clock_timer_cb );
+	void increment_t1_clock_timer_cb(timer_device &timer, void *ptr, int32_t param);
 
 protected:
 	// device-level overrides
@@ -166,7 +166,7 @@ private:
 	g80_filter_state        m_final_filter;
 	g80_filter_state        m_noise_filters[5];
 
-	TIMER_CALLBACK_MEMBER( delayed_usb_data_w );
+	void delayed_usb_data_w(void *ptr, int32_t param);
 	void timer_w(int which, uint8_t offset, uint8_t data);
 	void env_w(int which, uint8_t offset, uint8_t data);
 };

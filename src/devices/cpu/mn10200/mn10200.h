@@ -130,7 +130,7 @@ private:
 	void refresh_timer(int tmr);
 	void refresh_all_timers();
 	int timer_tick_simple(int tmr);
-	TIMER_CALLBACK_MEMBER( simple_timer_cb );
+	void simple_timer_cb(void *ptr, int32_t param);
 
 	attotime m_sysclock_base;
 	emu_timer *m_timer_timers[MN10200_NUM_TIMERS_8BIT];

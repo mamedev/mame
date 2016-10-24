@@ -29,7 +29,7 @@ public:
 
 	virtual void write_bank(int bank) override   { if (m_subslot->exists()) m_subslot->write_bank(bank); }
 
-	DECLARE_WRITE_LINE_MEMBER(lrq_callback);
+	void lrq_callback(int state);
 	virtual void io_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 	virtual uint8_t t0_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff)  override { return m_speech->lrq_r() ? 0 : 1; }
 

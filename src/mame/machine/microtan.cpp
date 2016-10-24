@@ -176,17 +176,17 @@ void microtan_state::via_0_out_b(address_space &space, offs_t offset, uint8_t da
 	m_cassette->output(data & 0x80 ? +1.0 : -1.0);
 }
 
-WRITE_LINE_MEMBER(microtan_state::via_0_out_ca2)
+void microtan_state::via_0_out_ca2(int state)
 {
 	LOG(("microtan_via_0_out_ca2 %d\n", state));
 }
 
-WRITE_LINE_MEMBER(microtan_state::via_0_out_cb2)
+void microtan_state::via_0_out_cb2(int state)
 {
 	LOG(("microtan_via_0_out_cb2 %d\n", state));
 }
 
-WRITE_LINE_MEMBER(microtan_state::via_0_irq)
+void microtan_state::via_0_irq(int state)
 {
 	LOG(("microtan_via_0_irq %d\n", state));
 	m_via_0_irq_line = state;
@@ -207,17 +207,17 @@ void microtan_state::via_1_out_b(address_space &space, offs_t offset, uint8_t da
 	LOG(("microtan_via_1_out_b %02X\n", data));
 }
 
-WRITE_LINE_MEMBER(microtan_state::via_1_out_ca2)
+void microtan_state::via_1_out_ca2(int state)
 {
 	LOG(("microtan_via_1_out_ca2 %d\n", state));
 }
 
-WRITE_LINE_MEMBER(microtan_state::via_1_out_cb2)
+void microtan_state::via_1_out_cb2(int state)
 {
 	LOG(("microtan_via_1_out_cb2 %d\n", state));
 }
 
-WRITE_LINE_MEMBER(microtan_state::via_1_irq)
+void microtan_state::via_1_irq(int state)
 {
 	LOG(("microtan_via_1_irq %d\n", state));
 	m_via_1_irq_line = state;
@@ -240,7 +240,7 @@ void microtan_state::device_timer(emu_timer &timer, device_timer_id id, int para
 }
 
 
-TIMER_CALLBACK_MEMBER(microtan_state::microtan_read_cassette)
+void microtan_state::microtan_read_cassette(void *ptr, int32_t param)
 {
 	double level = m_cassette->input();
 
@@ -288,7 +288,7 @@ uint8_t microtan_state::microtan_bffx_r(address_space &space, offs_t offset, uin
 
 
 /* This callback is called one clock cycle after BFF2 is written (delayed nmi) */
-TIMER_CALLBACK_MEMBER(microtan_state::microtan_pulse_nmi)
+void microtan_state::microtan_pulse_nmi(void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
@@ -326,7 +326,7 @@ void microtan_state::store_key(int key)
 	microtan_set_irq_line();
 }
 
-INTERRUPT_GEN_MEMBER(microtan_state::microtan_interrupt)
+void microtan_state::microtan_interrupt(device_t &device)
 {
 	int mod, row, col, chg, newvar;
 	static const char *const keynames[] = { "ROW0", "ROW1", "ROW2", "ROW3", "ROW4", "ROW5", "ROW6", "ROW7", "ROW8" };

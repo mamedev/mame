@@ -327,7 +327,7 @@ static DISCRETE_SOUND_START( circusc )
 
 DISCRETE_SOUND_END
 
-INTERRUPT_GEN_MEMBER(circusc_state::vblank_irq)
+void circusc_state::vblank_irq(device_t &device)
 {
 	if(m_irq_mask)
 		device.execute().set_input_line(0, HOLD_LINE);

@@ -93,15 +93,15 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(in5);
 	DECLARE_INPUT_CHANGED_MEMBER(in6);
 
-	DECLARE_READ_LINE_MEMBER(sid_read);
+	int sid_read();
 
 
 	virtual void video_start() override;
 
-	TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer);
-	TIMER_DEVICE_CALLBACK_MEMBER(count_ar);
-	DECLARE_WRITE_LINE_MEMBER(vsync);
-	DECLARE_WRITE_LINE_MEMBER(hsync);
+	void scanline_timer(timer_device &timer, void *ptr, int32_t param);
+	void count_ar(timer_device &timer, void *ptr, int32_t param);
+	void vsync(int state);
+	void hsync(int state);
 	uint8_t memory_read_byte(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void memory_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void dark_1_clr(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -114,7 +114,7 @@ public:
 };
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(fastinvaders_state::scanline_timer)
+void fastinvaders_state::scanline_timer(timer_device &timer, void *ptr, int32_t param)
 {
 /*  int scanline = param;
 
@@ -129,7 +129,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(fastinvaders_state::scanline_timer)
     */
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(fastinvaders_state::count_ar)
+void fastinvaders_state::count_ar(timer_device &timer, void *ptr, int32_t param)
 {
 	if (m_ar<255){
 		m_riga_sup= ((m_prom[m_ar]&0x08)>>3)&0x01;
@@ -349,7 +349,7 @@ void fastinvaders_state::io_f0_w(address_space &space, offs_t offset, uint8_t da
 	m_pic8259->ir6_w(CLEAR_LINE);
 }
 
-READ_LINE_MEMBER(fastinvaders_state::sid_read)
+int fastinvaders_state::sid_read()
 {
 	uint8_t tmp= m_start2_value ? ASSERT_LINE : CLEAR_LINE;
 	m_start2_value=0;
@@ -439,7 +439,7 @@ INPUT_CHANGED_MEMBER(fastinvaders_state::in6)
 
 
 
-DECLARE_WRITE_LINE_MEMBER( fastinvaders_state::vsync)
+void fastinvaders_state::vsync(int state)
 {
 	//logerror("p8257_drq_w\n");
 	if (!state){
@@ -457,7 +457,7 @@ DECLARE_WRITE_LINE_MEMBER( fastinvaders_state::vsync)
 	}
 }
 
-DECLARE_WRITE_LINE_MEMBER( fastinvaders_state::hsync)
+void fastinvaders_state::hsync(int state)
 {
 	//m_hsync=1;
 	if (!state){

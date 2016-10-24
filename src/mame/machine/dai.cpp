@@ -72,7 +72,7 @@ void dai_state::dai_keyboard_w(address_space &space, offs_t offset, uint8_t data
 	m_keyboard_scan_mask = data;
 }
 
-IRQ_CALLBACK_MEMBER(dai_state::int_ack)
+int dai_state::int_ack(device_t &device, int irqline)
 {
 	return m_tms5501->get_vector();
 }

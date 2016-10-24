@@ -47,10 +47,10 @@ public:
 	void port09_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void port14_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_altos5();
-	DECLARE_WRITE_LINE_MEMBER(ctc_z1_w);
-	DECLARE_WRITE_LINE_MEMBER(busreq_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
-	DECLARE_WRITE_LINE_MEMBER(clock_w);
+	void ctc_z1_w(int state);
+	void busreq_w(int state);
+	void fdc_intrq_w(int state);
+	void clock_w(int state);
 
 private:
 	uint8_t m_port08;
@@ -234,7 +234,7 @@ void altos5_state::io_write_byte(address_space &space, offs_t offset, uint8_t da
 	prog_space.write_byte(offset, data);
 }
 
-WRITE_LINE_MEMBER( altos5_state::busreq_w )
+void altos5_state::busreq_w(int state)
 {
 // since our Z80 has no support for BUSACK, we assume it is granted immediately
 	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, state);
@@ -243,14 +243,14 @@ WRITE_LINE_MEMBER( altos5_state::busreq_w )
 }
 
 // baud rate generator and RTC. All inputs are 2MHz.
-WRITE_LINE_MEMBER( altos5_state::clock_w )
+void altos5_state::clock_w(int state)
 {
 	m_ctc->trg0(state);
 	m_ctc->trg1(state);
 	m_ctc->trg2(state);
 }
 
-WRITE_LINE_MEMBER( altos5_state::ctc_z1_w )
+void altos5_state::ctc_z1_w(int state)
 {
 	m_dart->rxca_w(state);
 	m_dart->txca_w(state);
@@ -322,7 +322,7 @@ static SLOT_INTERFACE_START( altos5_floppies )
 	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
 SLOT_INTERFACE_END
 
-WRITE_LINE_MEMBER( altos5_state::fdc_intrq_w )
+void altos5_state::fdc_intrq_w(int state)
 {
 	uint8_t data = m_port08 | ((uint8_t)(state) << 7);
 	m_pio0->port_a_write(data);

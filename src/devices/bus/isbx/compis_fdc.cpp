@@ -28,12 +28,12 @@ const device_type COMPIS_FDC = &device_creator<compis_fdc_device>;
 //  floppy_format_type floppy_formats
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( compis_fdc_device::fdc_irq )
+void compis_fdc_device::fdc_irq(int state)
 {
 	m_slot->mintr1_w(state);
 }
 
-WRITE_LINE_MEMBER( compis_fdc_device::fdc_drq )
+void compis_fdc_device::fdc_drq(int state)
 {
 	m_slot->mdrqt_w(state);
 }

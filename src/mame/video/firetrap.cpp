@@ -36,7 +36,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(firetrap_state, firetrap)
+void firetrap_state::palette_init_firetrap(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -74,19 +74,19 @@ PALETTE_INIT_MEMBER(firetrap_state, firetrap)
 
 ***************************************************************************/
 
-TILEMAP_MAPPER_MEMBER(firetrap_state::get_fg_memory_offset)
+tilemap_memory_index firetrap_state::get_fg_memory_offset(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	return (row ^ 0x1f) + (col << 5);
 }
 
-TILEMAP_MAPPER_MEMBER(firetrap_state::get_bg_memory_offset)
+tilemap_memory_index firetrap_state::get_bg_memory_offset(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	return ((row & 0x0f) ^ 0x0f) | ((col & 0x0f) << 4) |
 			/* hole at bit 8 */
 			((row & 0x10) << 5) | ((col & 0x10) << 6);
 }
 
-TILE_GET_INFO_MEMBER(firetrap_state::get_fg_tile_info)
+void firetrap_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_fgvideoram[tile_index];
 	int color = m_fgvideoram[tile_index + 0x400];
@@ -106,12 +106,12 @@ inline void firetrap_state::get_bg_tile_info(tile_data &tileinfo, int tile_index
 			TILE_FLIPXY((color & 0x0c) >> 2));
 }
 
-TILE_GET_INFO_MEMBER(firetrap_state::get_bg1_tile_info)
+void firetrap_state::get_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	get_bg_tile_info(tileinfo, tile_index, m_bg1videoram, 1);
 }
 
-TILE_GET_INFO_MEMBER(firetrap_state::get_bg2_tile_info)
+void firetrap_state::get_bg2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	get_bg_tile_info(tileinfo, tile_index, m_bg2videoram, 2);
 }

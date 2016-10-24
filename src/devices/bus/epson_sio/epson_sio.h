@@ -49,12 +49,12 @@ public:
 	template<class _pin> void set_pin_callback(_pin pin) { m_write_pin.set_callback(pin); }
 
 	// called from owner
-	DECLARE_WRITE_LINE_MEMBER( tx_w );
-	DECLARE_WRITE_LINE_MEMBER( pout_w );
+	void tx_w(int state);
+	void pout_w(int state);
 
 	// called from subdevice
-	DECLARE_WRITE_LINE_MEMBER( rx_w ) { m_write_rx(state); }
-	DECLARE_WRITE_LINE_MEMBER( pin_w ) { m_write_pin(state); }
+	void rx_w(int state) { m_write_rx(state); }
+	void pin_w(int state) { m_write_pin(state); }
 
 protected:
 	// device-level overrides

@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "includes/jailbrek.h"
 
-PALETTE_INIT_MEMBER(jailbrek_state, jailbrek)
+void jailbrek_state::palette_init_jailbrek(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -46,7 +46,7 @@ void jailbrek_state::colorram_w(address_space &space, offs_t offset, uint8_t dat
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(jailbrek_state::get_bg_tile_info)
+void jailbrek_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_colorram[tile_index];
 	int code = m_videoram[tile_index] + ((attr & 0xc0) << 2);

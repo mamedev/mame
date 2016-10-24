@@ -89,16 +89,16 @@ public:
 	void kungfur_adpcm2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	INTERRUPT_GEN_MEMBER(kungfur_irq);
-	DECLARE_WRITE_LINE_MEMBER(kfr_adpcm1_int);
-	DECLARE_WRITE_LINE_MEMBER(kfr_adpcm2_int);
+	void kungfur_irq(device_t &device);
+	void kfr_adpcm1_int(int state);
+	void kfr_adpcm2_int(int state);
 	required_device<cpu_device> m_maincpu;
 	required_device<msm5205_device> m_adpcm1;
 	required_device<msm5205_device> m_adpcm2;
 };
 
 
-INTERRUPT_GEN_MEMBER(kungfur_state::kungfur_irq)
+void kungfur_state::kungfur_irq(device_t &device)
 {
 	if (m_control & 0x10)
 		device.execute().set_input_line(M6809_IRQ_LINE, ASSERT_LINE);
@@ -199,7 +199,7 @@ void kungfur_state::kungfur_adpcm2_w(address_space &space, offs_t offset, uint8_
 }
 
 // adpcm callbacks
-WRITE_LINE_MEMBER(kungfur_state::kfr_adpcm1_int)
+void kungfur_state::kfr_adpcm1_int(int state)
 {
 	uint8_t *ROM = memregion("adpcm1")->base();
 	uint8_t data = ROM[m_adpcm_pos[0] & 0x1ffff];
@@ -209,7 +209,7 @@ WRITE_LINE_MEMBER(kungfur_state::kfr_adpcm1_int)
 	m_adpcm_sel[0] ^= 1;
 }
 
-WRITE_LINE_MEMBER(kungfur_state::kfr_adpcm2_int)
+void kungfur_state::kfr_adpcm2_int(int state)
 {
 	uint8_t *ROM = memregion("adpcm2")->base();
 	uint8_t data = ROM[m_adpcm_pos[1] & 0x3ffff];

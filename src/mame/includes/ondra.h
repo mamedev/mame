@@ -47,8 +47,8 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_ondra(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(ondra_interrupt);
-	TIMER_CALLBACK_MEMBER(nmi_check_callback);
+	void ondra_interrupt(device_t &device);
+	void nmi_check_callback(void *ptr, int32_t param);
 
 protected:
 	required_device<cpu_device> m_maincpu;

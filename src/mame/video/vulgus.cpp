@@ -18,7 +18,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(vulgus_state, vulgus)
+void vulgus_state::palette_init_vulgus(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -77,7 +77,7 @@ PALETTE_INIT_MEMBER(vulgus_state, vulgus)
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(vulgus_state::get_fg_tile_info)
+void vulgus_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code, color;
 
@@ -90,7 +90,7 @@ TILE_GET_INFO_MEMBER(vulgus_state::get_fg_tile_info)
 	tileinfo.group = color & 0x3f;
 }
 
-TILE_GET_INFO_MEMBER(vulgus_state::get_bg_tile_info)
+void vulgus_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code, color;
 

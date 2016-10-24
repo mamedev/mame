@@ -44,12 +44,12 @@ public:
 
 	void init_ampro();
 	void machine_reset_ampro();
-	TIMER_DEVICE_CALLBACK_MEMBER(ctc_tick);
-	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
+	void ctc_tick(timer_device &timer, void *ptr, int32_t param);
+	void ctc_z0_w(int state);
 	void port00_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(clock_w);
+	void clock_w(int state);
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -121,13 +121,13 @@ static const z80_daisy_config daisy_chain_intf[] =
 };
 
 // Baud rate generator. All inputs are 2MHz.
-WRITE_LINE_MEMBER( ampro_state::clock_w )
+void ampro_state::clock_w(int state)
 {
 	m_ctc->trg0(state);
 	m_ctc->trg1(state);
 }
 
-WRITE_LINE_MEMBER( ampro_state::ctc_z0_w )
+void ampro_state::ctc_z0_w(int state)
 {
 	m_dart->rxca_w(state);
 	m_dart->txca_w(state);

@@ -282,7 +282,7 @@ void lethal_state::control2_w(address_space &space, offs_t offset, uint8_t data,
 	ioport("EEPROMOUT")->write(m_cur_control2, 0xff);
 }
 
-INTERRUPT_GEN_MEMBER(lethal_state::lethalen_interrupt)
+void lethal_state::lethalen_interrupt(device_t &device)
 {
 	if (m_k056832->is_irq_enabled(0))
 		device.execute().set_input_line(HD6309_IRQ_LINE, HOLD_LINE);

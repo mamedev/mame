@@ -18,7 +18,7 @@
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(lastduel_state::ld_get_bg_tile_info)
+void lastduel_state::ld_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = m_scroll2[2 * tile_index] & 0x1fff;
 	int color = m_scroll2[2 * tile_index + 1];
@@ -27,7 +27,7 @@ TILE_GET_INFO_MEMBER(lastduel_state::ld_get_bg_tile_info)
 			TILE_FLIPYX((color & 0x60) >> 5));
 }
 
-TILE_GET_INFO_MEMBER(lastduel_state::ld_get_fg_tile_info)
+void lastduel_state::ld_get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = m_scroll1[2 * tile_index] & 0x1fff;
 	int color = m_scroll1[2 * tile_index + 1];
@@ -38,7 +38,7 @@ TILE_GET_INFO_MEMBER(lastduel_state::ld_get_fg_tile_info)
 	tileinfo.group = (color & 0x80) >> 7;
 }
 
-TILE_GET_INFO_MEMBER(lastduel_state::get_bg_tile_info)
+void lastduel_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = m_scroll2[tile_index] & 0x1fff;
 	int color = m_scroll2[tile_index + 0x0800];
@@ -48,7 +48,7 @@ TILE_GET_INFO_MEMBER(lastduel_state::get_bg_tile_info)
 			TILE_FLIPYX((color & 0x60) >> 5));
 }
 
-TILE_GET_INFO_MEMBER(lastduel_state::get_fg_tile_info)
+void lastduel_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = m_scroll1[tile_index] & 0x1fff;
 	int color = m_scroll1[tile_index + 0x0800];
@@ -59,7 +59,7 @@ TILE_GET_INFO_MEMBER(lastduel_state::get_fg_tile_info)
 	tileinfo.group = (color & 0x10) >> 4;
 }
 
-TILE_GET_INFO_MEMBER(lastduel_state::get_fix_info)
+void lastduel_state::get_fix_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = m_vram[tile_index];
 	SET_TILE_INFO_MEMBER(1,

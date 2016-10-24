@@ -659,7 +659,7 @@ void mcf5206e_peripheral_device::ICR_info(uint8_t ICR)
 
 
 
-TIMER_CALLBACK_MEMBER(mcf5206e_peripheral_device::timer1_callback)
+void mcf5206e_peripheral_device::timer1_callback(void *ptr, int32_t param)
 {
 	uint8_t ICR = m_ICR[ICR9];
 

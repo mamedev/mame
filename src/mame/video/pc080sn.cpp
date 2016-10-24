@@ -155,7 +155,7 @@ void pc080sn_device::common_get_pc080sn_bg_tile_info( tile_data &tileinfo, int t
 			TILE_FLIPYX((attr & 0xc000) >> 14));
 }
 
-TILE_GET_INFO_MEMBER(pc080sn_device::get_bg_tile_info)
+void pc080sn_device::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	common_get_pc080sn_bg_tile_info( tileinfo, tile_index, m_bg_ram[0], m_gfxnum );
 }
@@ -181,7 +181,7 @@ void pc080sn_device::common_get_pc080sn_fg_tile_info( tile_data &tileinfo, int t
 			TILE_FLIPYX((attr & 0xc000) >> 14));
 }
 
-TILE_GET_INFO_MEMBER(pc080sn_device::get_fg_tile_info)
+void pc080sn_device::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	common_get_pc080sn_fg_tile_info( tileinfo, tile_index, m_bg_ram[1], m_gfxnum );
 }

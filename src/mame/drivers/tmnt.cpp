@@ -145,21 +145,21 @@ void tmnt_state::k053244_word_noA1_w(address_space &space, offs_t offset, uint16
 }
 
 /* cuebrick, mia, tmnt */
-INTERRUPT_GEN_MEMBER(tmnt_state::tmnt_interrupt)
+void tmnt_state::tmnt_interrupt(device_t &device)
 {
 	if (m_irq5_mask)
 		device.execute().set_input_line(M68K_IRQ_5, HOLD_LINE);
 }
 
 /* punkshot, blswhstl, tmnt2, ssriders, thndrx2 */
-INTERRUPT_GEN_MEMBER(tmnt_state::punkshot_interrupt)
+void tmnt_state::punkshot_interrupt(device_t &device)
 {
 	if (m_k052109->is_irq_enabled())
 		device.execute().set_input_line(M68K_IRQ_4, HOLD_LINE);
 }
 
 /* lgtnfght, glfgreat, prmrsocr */
-INTERRUPT_GEN_MEMBER(tmnt_state::lgtnfght_interrupt)
+void tmnt_state::lgtnfght_interrupt(device_t &device)
 {
 	if (m_k052109->is_irq_enabled())
 		device.execute().set_input_line(M68K_IRQ_5, HOLD_LINE);

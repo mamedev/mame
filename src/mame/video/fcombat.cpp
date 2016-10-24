@@ -10,7 +10,7 @@
 #include "includes/fcombat.h"
 
 
-TILE_GET_INFO_MEMBER(fcombat_state::get_bg_tile_info)
+void fcombat_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tileno, palno;  //32*16 x 32
 
@@ -39,7 +39,7 @@ TILE_GET_INFO_MEMBER(fcombat_state::get_bg_tile_info)
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(fcombat_state, fcombat)
+void fcombat_state::palette_init_fcombat(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;

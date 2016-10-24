@@ -54,7 +54,7 @@ public:
 	void ci16_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void init_icatel();
-	DECLARE_PALETTE_INIT(icatel);
+	void palette_init_icatel(palette_device &palette);
 
 	HD44780_PIXEL_UPDATE(icatel_pixel_update);
 
@@ -201,7 +201,7 @@ void icatel_state::ci16_w(address_space &space, offs_t offset, uint8_t data, uin
 
 //----------------------------------------
 
-PALETTE_INIT_MEMBER(icatel_state, icatel)
+void icatel_state::palette_init_icatel(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(138, 146, 148));
 	palette.set_pen_color(1, rgb_t(92, 83, 88));

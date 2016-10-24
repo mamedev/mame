@@ -265,7 +265,7 @@ GFXDECODE_END
 
 /* Interrupt Generator */
 
-INTERRUPT_GEN_MEMBER(dynduke_state::interrupt)
+void dynduke_state::interrupt(device_t &device)
 {
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xc8/4);   // VBL
 }

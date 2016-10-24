@@ -109,9 +109,9 @@ public:
 	void init_lnc();
 	void machine_start_btime();
 	void machine_reset_btime();
-	DECLARE_PALETTE_INIT(btime);
+	void palette_init_btime(palette_device &palette);
 	void machine_reset_lnc();
-	DECLARE_PALETTE_INIT(lnc);
+	void palette_init_lnc(palette_device &palette);
 	void machine_start_mmonkey();
 	void machine_reset_mmonkey();
 	void video_start_bnj();
@@ -123,7 +123,7 @@ public:
 	uint32_t screen_update_bnj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_zoar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_disco(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(audio_nmi_gen);
+	void audio_nmi_gen(timer_device &timer, void *ptr, int32_t param);
 	void draw_chars( bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t transparency, uint8_t color, int priority );
 	void draw_background( bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t* tmap, uint8_t color );
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t color,

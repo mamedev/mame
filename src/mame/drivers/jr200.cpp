@@ -71,7 +71,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_jr200(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(timer_d_callback);
+	void timer_d_callback(void *ptr, int32_t param);
 
 protected:
 	required_device<cpu_device> m_maincpu;
@@ -321,7 +321,7 @@ void jr200_state::jr200_border_col_w(address_space &space, offs_t offset, uint8_
 }
 
 
-TIMER_CALLBACK_MEMBER(jr200_state::timer_d_callback)
+void jr200_state::timer_d_callback(void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(0, HOLD_LINE);
 }

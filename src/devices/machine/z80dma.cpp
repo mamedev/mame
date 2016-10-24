@@ -488,7 +488,7 @@ int z80dma_device::do_write()
 //  timerproc
 //-------------------------------------------------
 
-TIMER_CALLBACK_MEMBER(z80dma_device::timerproc)
+void z80dma_device::timerproc(void *ptr, int32_t param)
 {
 	int done;
 
@@ -837,7 +837,7 @@ void z80dma_device::write(uint8_t data)
 //  rdy_write_callback - deferred RDY signal write
 //-------------------------------------------------
 
-TIMER_CALLBACK_MEMBER(z80dma_device::rdy_write_callback)
+void z80dma_device::rdy_write_callback(void *ptr, int32_t param)
 {
 	// normalize state
 	m_rdy = param;
@@ -856,7 +856,7 @@ TIMER_CALLBACK_MEMBER(z80dma_device::rdy_write_callback)
 //  rdy_w - ready input
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(z80dma_device::rdy_w)
+void z80dma_device::rdy_w(int state)
 {
 	if (LOG) logerror("Z80DMA '%s' RDY: %d Active High: %d\n", tag(), state, READY_ACTIVE_HIGH);
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(z80dma_device::rdy_write_callback),this), state);
@@ -867,7 +867,7 @@ WRITE_LINE_MEMBER(z80dma_device::rdy_w)
 //  wait_w - wait input
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(z80dma_device::wait_w)
+void z80dma_device::wait_w(int state)
 {
 }
 
@@ -876,6 +876,6 @@ WRITE_LINE_MEMBER(z80dma_device::wait_w)
 //  bai_w - bus acknowledge input
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER(z80dma_device::bai_w)
+void z80dma_device::bai_w(int state)
 {
 }

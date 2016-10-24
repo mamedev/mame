@@ -37,7 +37,7 @@ public:
 	virtual void superfx_w_bank1(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void superfx_w_bank2(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void superfx_w_bank3(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	virtual DECLARE_WRITE_LINE_MEMBER(snes_extern_irq_w);
+	virtual void snes_extern_irq_w(int state);
 
 
 	uint8_t sfx_ram[0x200000];

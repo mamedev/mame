@@ -747,7 +747,7 @@ INPUT_PORTS_END
 //  mc146818_interface rtc_intf
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( hx20_state::rtc_irq_w )
+void hx20_state::rtc_irq_w(int state)
 {
 	m_rtc_irq = state;
 
@@ -760,7 +760,7 @@ WRITE_LINE_MEMBER( hx20_state::rtc_irq_w )
 //  VIDEO
 //**************************************************************************
 
-PALETTE_INIT_MEMBER(hx20_state, hx20)
+void hx20_state::palette_init_hx20(palette_device &palette)
 {
 	palette.set_pen_color(0, 0xa5, 0xad, 0xa5);
 	palette.set_pen_color(1, 0x31, 0x39, 0x10);

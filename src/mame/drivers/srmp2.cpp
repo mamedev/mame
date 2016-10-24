@@ -242,7 +242,7 @@ void srmp2_state::srmp3_adpcm_code_w(address_space &space, offs_t offset, uint8_
 }
 
 
-WRITE_LINE_MEMBER(srmp2_state::adpcm_int)
+void srmp2_state::adpcm_int(int state)
 {
 	uint8_t *ROM = memregion("adpcm")->base();
 

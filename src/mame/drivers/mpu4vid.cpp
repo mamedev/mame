@@ -280,15 +280,15 @@ public:
 	void machine_reset_mpu4_vid();
 	void video_start_mpu4_vid();
 	SCN2674_DRAW_CHARACTER_MEMBER(display_pixels);
-	DECLARE_WRITE_LINE_MEMBER(m6809_acia_irq);
-	DECLARE_WRITE_LINE_MEMBER(m68k_acia_irq);
-	DECLARE_WRITE_LINE_MEMBER(cpu1_ptm_irq);
-	DECLARE_WRITE_LINE_MEMBER(vid_o1_callback);
-	DECLARE_WRITE_LINE_MEMBER(vid_o2_callback);
-	DECLARE_WRITE_LINE_MEMBER(vid_o3_callback);
+	void m6809_acia_irq(int state);
+	void m68k_acia_irq(int state);
+	void cpu1_ptm_irq(int state);
+	void vid_o1_callback(int state);
+	void vid_o2_callback(int state);
+	void vid_o3_callback(int state);
 	uint8_t pia_ic5_porta_track_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void mpu4vid_char_cheat( int address);
-	DECLARE_WRITE_LINE_MEMBER(update_mpu68_interrupts);
+	void update_mpu68_interrupts(int state);
 	uint16_t mpu4_vid_vidram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void mpu4_vid_vidram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void ef9369_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -297,7 +297,7 @@ public:
 	uint8_t bt471_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void vidcharacteriser_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t vidcharacteriser_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(mpu_video_reset);
+	void mpu_video_reset(int state);
 	void vram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t vram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 };
@@ -323,7 +323,7 @@ public:
 */
 
 
-WRITE_LINE_MEMBER(mpu4vid_state::update_mpu68_interrupts)
+void mpu4vid_state::update_mpu68_interrupts(int state)
 {
 	m_videocpu->set_input_line(1, m_m6840_irq_state ? ASSERT_LINE : CLEAR_LINE);
 	m_videocpu->set_input_line(2, m_m6850_irq_state ? ASSERT_LINE : CLEAR_LINE);
@@ -331,13 +331,13 @@ WRITE_LINE_MEMBER(mpu4vid_state::update_mpu68_interrupts)
 
 /* Communications with 6809 board */
 
-WRITE_LINE_MEMBER(mpu4vid_state::m6809_acia_irq)
+void mpu4vid_state::m6809_acia_irq(int state)
 {
 	m_acia_1->write_cts(state);
 	m_maincpu->set_input_line(M6809_IRQ_LINE, state);
 }
 
-WRITE_LINE_MEMBER(mpu4vid_state::m68k_acia_irq)
+void mpu4vid_state::m68k_acia_irq(int state)
 {
 	m_acia_0->write_cts(state);
 	m_m6850_irq_state = state;
@@ -345,14 +345,14 @@ WRITE_LINE_MEMBER(mpu4vid_state::m68k_acia_irq)
 }
 
 
-WRITE_LINE_MEMBER(mpu4vid_state::cpu1_ptm_irq)
+void mpu4vid_state::cpu1_ptm_irq(int state)
 {
 	m_m6840_irq_state = state;
 	update_mpu68_interrupts(1);
 }
 
 
-WRITE_LINE_MEMBER(mpu4vid_state::vid_o1_callback)
+void mpu4vid_state::vid_o1_callback(int state)
 {
 	m_ptm->set_c2(state); /* this output is the clock for timer2 */
 
@@ -363,13 +363,13 @@ WRITE_LINE_MEMBER(mpu4vid_state::vid_o1_callback)
 }
 
 
-WRITE_LINE_MEMBER(mpu4vid_state::vid_o2_callback)
+void mpu4vid_state::vid_o2_callback(int state)
 {
 	m_ptm->set_c3(state); /* this output is the clock for timer3 */
 }
 
 
-WRITE_LINE_MEMBER(mpu4vid_state::vid_o3_callback)
+void mpu4vid_state::vid_o3_callback(int state)
 {
 	m_ptm->set_c1(state); /* this output is the clock for timer1 */
 }
@@ -1201,7 +1201,7 @@ static INPUT_PORTS_START( adders )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_COIN4) PORT_NAME("100p")//PORT_IMPULSE(5)
 INPUT_PORTS_END
 
-WRITE_LINE_MEMBER(mpu4vid_state::mpu_video_reset)
+void mpu4vid_state::mpu_video_reset(int state)
 {
 	m_ptm->reset();
 	m_acia_1->reset();

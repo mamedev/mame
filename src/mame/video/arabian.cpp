@@ -22,7 +22,7 @@
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(arabian_state, arabian)
+void arabian_state::palette_init_arabian(palette_device &palette)
 {
 	int i;
 

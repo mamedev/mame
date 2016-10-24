@@ -254,7 +254,7 @@ void taito_en_device::mb87078_gain_changed(address_space &space, offs_t offset, 
  *
  *************************************/
 
-WRITE_LINE_MEMBER(taito_en_device::duart_irq_handler)
+void taito_en_device::duart_irq_handler(int state)
 {
 	if (state == ASSERT_LINE)
 	{

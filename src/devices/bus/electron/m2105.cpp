@@ -164,7 +164,7 @@ void electron_m2105_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-WRITE_LINE_MEMBER(electron_m2105_device::intrq_w)
+void electron_m2105_device::intrq_w(int state)
 {
 	m_slot->irq_w(state);
 }

@@ -117,32 +117,32 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER( load_interrupt );
 
-	DECLARE_WRITE_LINE_MEMBER(usr9901_led0_w);
-	DECLARE_WRITE_LINE_MEMBER(usr9901_led1_w);
-	DECLARE_WRITE_LINE_MEMBER(usr9901_led2_w);
-	DECLARE_WRITE_LINE_MEMBER(usr9901_led3_w);
+	void usr9901_led0_w(int state);
+	void usr9901_led1_w(int state);
+	void usr9901_led2_w(int state);
+	void usr9901_led3_w(int state);
 	void usr9901_interrupt_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void sys9901_interrupt_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t sys9901_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(sys9901_digitsel0_w);
-	DECLARE_WRITE_LINE_MEMBER(sys9901_digitsel1_w);
-	DECLARE_WRITE_LINE_MEMBER(sys9901_digitsel2_w);
-	DECLARE_WRITE_LINE_MEMBER(sys9901_digitsel3_w);
+	void sys9901_digitsel0_w(int state);
+	void sys9901_digitsel1_w(int state);
+	void sys9901_digitsel2_w(int state);
+	void sys9901_digitsel3_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(sys9901_segment0_w);
-	DECLARE_WRITE_LINE_MEMBER(sys9901_segment1_w);
-	DECLARE_WRITE_LINE_MEMBER(sys9901_segment2_w);
-	DECLARE_WRITE_LINE_MEMBER(sys9901_segment3_w);
-	DECLARE_WRITE_LINE_MEMBER(sys9901_segment4_w);
-	DECLARE_WRITE_LINE_MEMBER(sys9901_segment5_w);
-	DECLARE_WRITE_LINE_MEMBER(sys9901_segment6_w);
-	DECLARE_WRITE_LINE_MEMBER(sys9901_segment7_w);
+	void sys9901_segment0_w(int state);
+	void sys9901_segment1_w(int state);
+	void sys9901_segment2_w(int state);
+	void sys9901_segment3_w(int state);
+	void sys9901_segment4_w(int state);
+	void sys9901_segment5_w(int state);
+	void sys9901_segment6_w(int state);
+	void sys9901_segment7_w(int state);
 
-	DECLARE_WRITE_LINE_MEMBER(sys9901_dsplytrgr_w);
-	DECLARE_WRITE_LINE_MEMBER(sys9901_shiftlight_w);
-	DECLARE_WRITE_LINE_MEMBER(sys9901_spkrdrive_w);
-	DECLARE_WRITE_LINE_MEMBER(sys9901_tapewdata_w);
+	void sys9901_dsplytrgr_w(int state);
+	void sys9901_shiftlight_w(int state);
+	void sys9901_spkrdrive_w(int state);
+	void sys9901_tapewdata_w(int state);
 
 	void xmit_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void machine_start_tm990_189();
@@ -150,8 +150,8 @@ public:
 	void machine_start_tm990_189_v();
 	void machine_reset_tm990_189_v();
 
-	TIMER_DEVICE_CALLBACK_MEMBER(display_callback);
-	TIMER_CALLBACK_MEMBER(clear_load);
+	void display_callback(timer_device &timer, void *ptr, int32_t param);
+	void clear_load(void *ptr, int32_t param);
 	void hold_load();
 private:
 	void draw_digit(void);
@@ -200,7 +200,7 @@ void tm990189_state::machine_reset_tm990_189_v()
     hold and debounce load line (emulation is inaccurate)
 */
 
-TIMER_CALLBACK_MEMBER(tm990189_state::clear_load)
+void tm990189_state::clear_load(void *ptr, int32_t param)
 {
 	m_load_state = false;
 	m_tms9980a->set_input_line(INT_9980A_LOAD, CLEAR_LINE);
@@ -236,7 +236,7 @@ void tm990189_state::draw_digit()
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(tm990189_state::display_callback)
+void tm990189_state::display_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	uint8_t i;
 	char ledname[8];
@@ -280,22 +280,22 @@ void tm990189_state::led_set(int offset, bool state)
 		m_LED_state &= ~(1 << offset);
 }
 
-WRITE_LINE_MEMBER( tm990189_state::usr9901_led0_w )
+void tm990189_state::usr9901_led0_w(int state)
 {
 	led_set(0, state);
 }
 
-WRITE_LINE_MEMBER( tm990189_state::usr9901_led1_w )
+void tm990189_state::usr9901_led1_w(int state)
 {
 	led_set(1, state);
 }
 
-WRITE_LINE_MEMBER( tm990189_state::usr9901_led2_w )
+void tm990189_state::usr9901_led2_w(int state)
 {
 	led_set(2, state);
 }
 
-WRITE_LINE_MEMBER( tm990189_state::usr9901_led3_w )
+void tm990189_state::usr9901_led3_w(int state)
 {
 	led_set(3, state);
 }
@@ -334,19 +334,19 @@ void tm990189_state::digitsel(int offset, bool state)
 		m_digitsel &= ~ (1 << offset);
 }
 
-WRITE_LINE_MEMBER( tm990189_state::sys9901_digitsel0_w )
+void tm990189_state::sys9901_digitsel0_w(int state)
 {
 	digitsel(0, state);
 }
-WRITE_LINE_MEMBER( tm990189_state::sys9901_digitsel1_w )
+void tm990189_state::sys9901_digitsel1_w(int state)
 {
 	digitsel(1, state);
 }
-WRITE_LINE_MEMBER( tm990189_state::sys9901_digitsel2_w )
+void tm990189_state::sys9901_digitsel2_w(int state)
 {
 	digitsel(2, state);
 }
-WRITE_LINE_MEMBER( tm990189_state::sys9901_digitsel3_w )
+void tm990189_state::sys9901_digitsel3_w(int state)
 {
 	digitsel(3, state);
 }
@@ -364,40 +364,40 @@ void tm990189_state::segment_set(int offset, bool state)
 	}
 }
 
-WRITE_LINE_MEMBER( tm990189_state::sys9901_segment0_w )
+void tm990189_state::sys9901_segment0_w(int state)
 {
 	segment_set(0, state);
 }
-WRITE_LINE_MEMBER( tm990189_state::sys9901_segment1_w )
+void tm990189_state::sys9901_segment1_w(int state)
 {
 	segment_set(1, state);
 }
-WRITE_LINE_MEMBER( tm990189_state::sys9901_segment2_w )
+void tm990189_state::sys9901_segment2_w(int state)
 {
 	segment_set(2, state);
 }
-WRITE_LINE_MEMBER( tm990189_state::sys9901_segment3_w )
+void tm990189_state::sys9901_segment3_w(int state)
 {
 	segment_set(3, state);
 }
-WRITE_LINE_MEMBER( tm990189_state::sys9901_segment4_w )
+void tm990189_state::sys9901_segment4_w(int state)
 {
 	segment_set(4, state);
 }
-WRITE_LINE_MEMBER( tm990189_state::sys9901_segment5_w )
+void tm990189_state::sys9901_segment5_w(int state)
 {
 	segment_set(5, state);
 }
-WRITE_LINE_MEMBER( tm990189_state::sys9901_segment6_w )
+void tm990189_state::sys9901_segment6_w(int state)
 {
 	segment_set(6, state);
 }
-WRITE_LINE_MEMBER( tm990189_state::sys9901_segment7_w )
+void tm990189_state::sys9901_segment7_w(int state)
 {
 	segment_set(7, state);
 }
 
-WRITE_LINE_MEMBER( tm990189_state::sys9901_dsplytrgr_w )
+void tm990189_state::sys9901_dsplytrgr_w(int state)
 {
 	if ((!state) && (m_digitsel < 10))
 	{
@@ -406,7 +406,7 @@ WRITE_LINE_MEMBER( tm990189_state::sys9901_dsplytrgr_w )
 	}
 }
 
-WRITE_LINE_MEMBER( tm990189_state::sys9901_shiftlight_w )
+void tm990189_state::sys9901_shiftlight_w(int state)
 {
 	if (state)
 		m_LED_state |= 0x10;
@@ -414,12 +414,12 @@ WRITE_LINE_MEMBER( tm990189_state::sys9901_shiftlight_w )
 		m_LED_state &= ~0x10;
 }
 
-WRITE_LINE_MEMBER( tm990189_state::sys9901_spkrdrive_w )
+void tm990189_state::sys9901_spkrdrive_w(int state)
 {
 	m_speaker->level_w(state);
 }
 
-WRITE_LINE_MEMBER( tm990189_state::sys9901_tapewdata_w )
+void tm990189_state::sys9901_tapewdata_w(int state)
 {
 	m_cassette->output(state ? +1.0 : -1.0);
 }

@@ -24,7 +24,7 @@ MAX_SECTORS     5       and granules of sectors
 #define MODEL4_MASTER_CLOCK 20275200
 
 
-TIMER_CALLBACK_MEMBER(trs80_state::cassette_data_callback)
+void trs80_state::cassette_data_callback(void *ptr, int32_t param)
 {
 /* This does all baud rates. 250 baud (trs80), and 500 baud (all others) set bit 7 of "cassette_data".
     1500 baud (trs80m3, trs80m4) is interrupt-driven and uses bit 0 of "cassette_data" */
@@ -620,7 +620,7 @@ void trs80_state::trs80m4_ff_w(address_space &space, offs_t offset, uint8_t data
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(trs80_state::trs80_rtc_interrupt)
+void trs80_state::trs80_rtc_interrupt(device_t &device)
 {
 /* This enables the processing of interrupts for the clock and the flashing cursor.
     The OS counts one tick for each interrupt. The Model I has 40 ticks per
@@ -658,12 +658,12 @@ void trs80_state::trs80_fdc_interrupt_internal()
 	}
 }
 
-INTERRUPT_GEN_MEMBER(trs80_state::trs80_fdc_interrupt)/* not used - should it be? */
+void trs80_state::trs80_fdc_interrupt(device_t &device)/* not used - should it be? */
 {
 	trs80_fdc_interrupt_internal();
 }
 
-WRITE_LINE_MEMBER(trs80_state::trs80_fdc_intrq_w)
+void trs80_state::trs80_fdc_intrq_w(int state)
 {
 	if (state)
 	{

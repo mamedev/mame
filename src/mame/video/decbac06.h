@@ -137,14 +137,14 @@ protected:
 							uint16_t penmask, uint16_t pencondition,uint16_t colprimask, uint16_t colpricondition);
 
 private:
-	TILEMAP_MAPPER_MEMBER(tile_shape0_scan);
-	TILEMAP_MAPPER_MEMBER(tile_shape1_scan);
-	TILEMAP_MAPPER_MEMBER(tile_shape2_scan);
-	TILEMAP_MAPPER_MEMBER(tile_shape0_8x8_scan);
-	TILEMAP_MAPPER_MEMBER(tile_shape1_8x8_scan);
-	TILEMAP_MAPPER_MEMBER(tile_shape2_8x8_scan);
-	TILE_GET_INFO_MEMBER(get_pf8x8_tile_info);
-	TILE_GET_INFO_MEMBER(get_pf16x16_tile_info);
+	tilemap_memory_index tile_shape0_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	tilemap_memory_index tile_shape1_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	tilemap_memory_index tile_shape2_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	tilemap_memory_index tile_shape0_8x8_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	tilemap_memory_index tile_shape1_8x8_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	tilemap_memory_index tile_shape2_8x8_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	void get_pf8x8_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_pf16x16_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	required_device<gfxdecode_device> m_gfxdecode;
 };
 

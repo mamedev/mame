@@ -61,8 +61,8 @@ public:
 	uint16_t inufuku_tx_videoram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void inufuku_tx_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	DECLARE_CUSTOM_INPUT_MEMBER(soundflag_r);
-	TILE_GET_INFO_MEMBER(get_inufuku_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_inufuku_tx_tile_info);
+	void get_inufuku_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_inufuku_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

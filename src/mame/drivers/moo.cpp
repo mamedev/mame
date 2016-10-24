@@ -187,13 +187,13 @@ void moo_state::moo_objdma()
 	}
 }
 
-TIMER_CALLBACK_MEMBER(moo_state::dmaend_callback)
+void moo_state::dmaend_callback(void *ptr, int32_t param)
 {
 	if (m_cur_control2 & 0x800)
 		m_maincpu->set_input_line(4, HOLD_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(moo_state::moo_interrupt)
+void moo_state::moo_interrupt(device_t &device)
 {
 	if (m_k053246->k053246_is_irq_enabled())
 	{
@@ -208,7 +208,7 @@ INTERRUPT_GEN_MEMBER(moo_state::moo_interrupt)
 		device.execute().set_input_line(5, HOLD_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(moo_state::moobl_interrupt)
+void moo_state::moobl_interrupt(device_t &device)
 {
 	moo_objdma();
 

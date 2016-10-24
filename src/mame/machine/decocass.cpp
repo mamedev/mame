@@ -94,7 +94,7 @@ uint8_t decocass_state::decocass_sound_command_r(address_space &space, offs_t of
 	return data;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(decocass_state::decocass_audio_nmi_gen)
+void decocass_state::decocass_audio_nmi_gen(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 	m_audio_nmi_state = scanline & 8;

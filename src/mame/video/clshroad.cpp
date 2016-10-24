@@ -42,7 +42,7 @@ void clshroad_state::flipscreen_w(address_space &space, offs_t offset, uint8_t d
 }
 
 
-PALETTE_INIT_MEMBER(clshroad_state,clshroad)
+void clshroad_state::palette_init_clshroad(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -52,7 +52,7 @@ PALETTE_INIT_MEMBER(clshroad_state,clshroad)
 										pal4bit(color_prom[i + 256 * 2]));
 }
 
-PALETTE_INIT_MEMBER(clshroad_state,firebatl)
+void clshroad_state::palette_init_firebatl(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -103,7 +103,7 @@ Offset:
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(clshroad_state::get_tile_info_0a)
+void clshroad_state::get_tile_info_0a(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t code;
 	tile_index = (tile_index & 0x1f) + (tile_index & ~0x1f)*2;
@@ -115,7 +115,7 @@ TILE_GET_INFO_MEMBER(clshroad_state::get_tile_info_0a)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(clshroad_state::get_tile_info_0b)
+void clshroad_state::get_tile_info_0b(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t code;
 	tile_index = (tile_index & 0x1f) + (tile_index & ~0x1f)*2;
@@ -155,7 +155,7 @@ Offset:
 ***************************************************************************/
 
 /* logical (col,row) -> memory offset */
-TILEMAP_MAPPER_MEMBER(clshroad_state::tilemap_scan_rows_extra)
+tilemap_memory_index clshroad_state::tilemap_scan_rows_extra(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	// The leftmost columns come from the bottom rows
 	if (col <= 0x01)    return row + (col + 0x1e) * 0x20;
@@ -171,7 +171,7 @@ TILEMAP_MAPPER_MEMBER(clshroad_state::tilemap_scan_rows_extra)
 	return (col-2) + row * 0x20;
 }
 
-TILE_GET_INFO_MEMBER(clshroad_state::get_tile_info_fb1)
+void clshroad_state::get_tile_info_fb1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t code  =   m_vram_1[ tile_index + 0x000 ];
 	uint8_t color =   m_vram_1[ tile_index + 0x400 ] & 0x3f;
@@ -182,7 +182,7 @@ TILE_GET_INFO_MEMBER(clshroad_state::get_tile_info_fb1)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(clshroad_state::get_tile_info_1)
+void clshroad_state::get_tile_info_1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t code  =   m_vram_1[ tile_index + 0x000 ];
 	uint8_t color =   m_vram_1[ tile_index + 0x400 ];

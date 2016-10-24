@@ -62,7 +62,7 @@ public:
 	uint8_t uballoon_prot_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void uballoon_prot_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(bssoccer_interrupt);
+	void bssoccer_interrupt(timer_device &timer, void *ptr, int32_t param);
 
 	void init_uballoon();
 	virtual void video_start() override;

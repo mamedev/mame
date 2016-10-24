@@ -76,9 +76,9 @@ public:
 	void init_wallc();
 	void init_wallca();
 	void init_sidam();
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(wallc);
+	void palette_init_wallc(palette_device &palette);
 	uint32_t screen_update_wallc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
@@ -108,7 +108,7 @@ public:
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(wallc_state, wallc)
+void wallc_state::palette_init_wallc(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -152,7 +152,7 @@ void wallc_state::wallc_videoram_w(address_space &space, offs_t offset, uint8_t 
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(wallc_state::get_bg_tile_info)
+void wallc_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	SET_TILE_INFO_MEMBER(0, m_videoram[tile_index] + 0x100, 1, 0);
 }

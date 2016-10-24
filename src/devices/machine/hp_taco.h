@@ -40,8 +40,8 @@ public:
 	uint16_t reg_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
 	// Flag & status read
-	DECLARE_READ_LINE_MEMBER(flg_r);
-	DECLARE_READ_LINE_MEMBER(sts_r);
+	int flg_r();
+	int sts_r();
 
 		// device_image_interface overrides
 	virtual image_init_result call_load() override;

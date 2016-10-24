@@ -189,7 +189,7 @@ void x68k_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 }
 
 // LED timer callback
-TIMER_CALLBACK_MEMBER(x68k_state::x68k_led_callback)
+void x68k_state::x68k_led_callback(void *ptr, int32_t param)
 {
 	int drive;
 	if(m_led_state == 0)
@@ -307,7 +307,7 @@ void x68k_state::x68k_scc_w(address_space &space, offs_t offset, uint16_t data, 
 	m_scc_prev = m_scc->get_reg_b(5) & 0x02;
 }
 
-TIMER_CALLBACK_MEMBER(x68k_state::x68k_scc_ack)
+void x68k_state::x68k_scc_ack(void *ptr, int32_t param)
 {
 	if(m_mouse.bufferempty != 0)  // nothing to do if the mouse data buffer is empty
 		return;
@@ -393,12 +393,12 @@ uint8_t x68k_state::md_3button_r(int port)
 }
 
 // Megadrive 6 button gamepad
-TIMER_CALLBACK_MEMBER(x68k_state::md_6button_port1_timeout)
+void x68k_state::md_6button_port1_timeout(void *ptr, int32_t param)
 {
 	m_mdctrl.seq1 = 0;
 }
 
-TIMER_CALLBACK_MEMBER(x68k_state::md_6button_port2_timeout)
+void x68k_state::md_6button_port2_timeout(void *ptr, int32_t param)
 {
 	m_mdctrl.seq2 = 0;
 }
@@ -697,7 +697,7 @@ uint16_t x68k_state::x68k_fdc_r(address_space &space, offs_t offset, uint16_t me
 	return 0xff;
 }
 
-WRITE_LINE_MEMBER( x68k_state::fdc_irq )
+void x68k_state::fdc_irq(int state)
 {
 	if((m_ioc.irqstatus & 0x04) && state)
 	{
@@ -953,7 +953,7 @@ void x68k_state::x68k_enh_areaset_w(address_space &space, offs_t offset, uint16_
 	logerror("SYS: Enhanced Supervisor area set (from %iMB): 0x%02x\n",(offset + 1) * 2,data & 0xff);
 }
 
-TIMER_CALLBACK_MEMBER(x68k_state::x68k_bus_error)
+void x68k_state::x68k_bus_error(void *ptr, int32_t param)
 {
 	m_bus_error = false;
 }
@@ -1053,7 +1053,7 @@ void x68k_state::dma_error(address_space &space, offs_t offset, uint8_t data, ui
 	}
 }
 
-WRITE_LINE_MEMBER(x68k_state::x68k_fm_irq)
+void x68k_state::x68k_fm_irq(int state)
 {
 	if(state == CLEAR_LINE)
 	{
@@ -1078,7 +1078,7 @@ void x68k_state::x68030_adpcm_w(address_space &space, offs_t offset, uint8_t dat
 	}
 }
 
-WRITE_LINE_MEMBER(x68k_state::mfp_irq_callback)
+void x68k_state::mfp_irq_callback(int state)
 {
 	if(m_mfp_prev == CLEAR_LINE && state == CLEAR_LINE)  // eliminate unnecessary calls to set the IRQ line for speed reasons
 		return;
@@ -1091,7 +1091,7 @@ WRITE_LINE_MEMBER(x68k_state::mfp_irq_callback)
 	m_mfp_prev = state;
 }
 
-IRQ_CALLBACK_MEMBER(x68k_state::x68k_int_ack)
+int x68k_state::x68k_int_ack(device_t &device, int irqline)
 {
 	if(irqline == 6)  // MFP
 	{
@@ -1117,7 +1117,7 @@ IRQ_CALLBACK_MEMBER(x68k_state::x68k_int_ack)
 	return m_current_vector[irqline];
 }
 
-WRITE_LINE_MEMBER(x68k_state::x68k_scsi_irq)
+void x68k_state::x68k_scsi_irq(int state)
 {
 	// TODO : Internal SCSI IRQ vector 0x6c, External SCSI IRQ vector 0xf6, IRQs go through the IOSC (IRQ line 1)
 	if(state != 0)
@@ -1128,7 +1128,7 @@ WRITE_LINE_MEMBER(x68k_state::x68k_scsi_irq)
 	}
 }
 
-WRITE_LINE_MEMBER(x68k_state::x68k_scsi_drq)
+void x68k_state::x68k_scsi_drq(int state)
 {
 	// TODO
 }
@@ -1453,14 +1453,14 @@ void x68k_state::floppy_unload(floppy_image_device *dev)
 	floppy_load_unload(false, dev);
 }
 
-TIMER_CALLBACK_MEMBER(x68k_state::x68k_net_irq)
+void x68k_state::x68k_net_irq(void *ptr, int32_t param)
 {
 	m_current_vector[2] = 0xf9;
 	m_current_irq_line = 2;
 	m_maincpu->set_input_line_and_vector(2,ASSERT_LINE,m_current_vector[2]);
 }
 
-WRITE_LINE_MEMBER(x68k_state::x68k_irq2_line)
+void x68k_state::x68k_irq2_line(int state)
 {
 	if(state==ASSERT_LINE)
 	{

@@ -44,7 +44,7 @@
 
 /*****************************************************************************/
 
-TILE_GET_INFO_MEMBER(m107_state::get_pf_tile_info)
+void m107_state::get_pf_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	pf_layer_info *layer = (pf_layer_info *)tilemap.user_data();
 	int tile, attrib;

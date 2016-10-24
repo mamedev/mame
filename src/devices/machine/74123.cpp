@@ -116,10 +116,10 @@ int ttl74123_device::timer_running()
 
 
 /*-------------------------------------------------
-    TIMER_CALLBACK_MEMBER( output_callback )
+    void output_callback(void *ptr, int32_t param)
 -------------------------------------------------*/
 
-TIMER_CALLBACK_MEMBER( ttl74123_device::output_callback )
+void ttl74123_device::output_callback(void *ptr, int32_t param)
 {
 	m_output_changed_cb((offs_t)0, param);
 }
@@ -140,10 +140,10 @@ void ttl74123_device::set_output()
 
 
 /*-------------------------------------------------
-    TIMER_CALLBACK_MEMBER( clear_callback )
+    void clear_callback(void *ptr, int32_t param)
 -------------------------------------------------*/
 
-TIMER_CALLBACK_MEMBER( ttl74123_device::clear_callback )
+void ttl74123_device::clear_callback(void *ptr, int32_t param)
 {
 	int output = timer_running();
 

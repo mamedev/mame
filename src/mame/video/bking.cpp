@@ -30,7 +30,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(bking_state, bking)
+void bking_state::palette_init_bking(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances_rg[3] = { 220, 390, 820 };
@@ -204,7 +204,7 @@ uint8_t bking_state::bking_pos_r(address_space &space, offs_t offset, uint8_t me
 }
 
 
-TILE_GET_INFO_MEMBER(bking_state::get_tile_info)
+void bking_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t code0 = m_playfield_ram[2 * tile_index + 0];
 	uint8_t code1 = m_playfield_ram[2 * tile_index + 1];

@@ -89,7 +89,7 @@ uint8_t astrof_state::irq_clear_r(address_space &space, offs_t offset, uint8_t m
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(astrof_state::irq_callback)
+void astrof_state::irq_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(0, ASSERT_LINE);
 }

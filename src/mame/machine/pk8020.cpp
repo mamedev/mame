@@ -867,7 +867,7 @@ void pk8020_state::pk8020_2_portc_w(address_space &space, offs_t offset, uint8_t
 	m_speaker->level_w(m_sound_gate ? m_sound_level : 0);
 }
 
-WRITE_LINE_MEMBER(pk8020_state::pk8020_pit_out0)
+void pk8020_state::pk8020_pit_out0(int state)
 {
 	m_sound_level = state;
 
@@ -875,7 +875,7 @@ WRITE_LINE_MEMBER(pk8020_state::pk8020_pit_out0)
 }
 
 
-WRITE_LINE_MEMBER(pk8020_state::pk8020_pit_out1)
+void pk8020_state::pk8020_pit_out1(int state)
 {
 }
 
@@ -901,7 +901,7 @@ void pk8020_state::machine_reset()
 	m_sound_level = 0;
 }
 
-INTERRUPT_GEN_MEMBER(pk8020_state::pk8020_interrupt)
+void pk8020_state::pk8020_interrupt(device_t &device)
 {
 	m_takt ^= 1;
 	m_pic8259->ir4_w(1);

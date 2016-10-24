@@ -108,9 +108,9 @@ public:
 	uint32_t screen_update_scudhamm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cischeat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_f1gpstar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(bigrun_scanline);
-	TIMER_DEVICE_CALLBACK_MEMBER(scudhamm_scanline);
-	TIMER_DEVICE_CALLBACK_MEMBER(armchamp2_scanline);
+	void bigrun_scanline(timer_device &timer, void *ptr, int32_t param);
+	void scudhamm_scanline(timer_device &timer, void *ptr, int32_t param);
+	void armchamp2_scanline(timer_device &timer, void *ptr, int32_t param);
 	void prepare_shadows();
 	void cischeat_draw_road(bitmap_ind16 &bitmap, const rectangle &cliprect, int road_num, int priority1, int priority2, int transparency);
 	void f1gpstar_draw_road(bitmap_ind16 &bitmap, const rectangle &cliprect, int road_num, int priority1, int priority2, int transparency);
@@ -154,5 +154,5 @@ public:
 	void captflag_leds_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	void init_captflag();
-	TIMER_DEVICE_CALLBACK_MEMBER(captflag_scanline);
+	void captflag_scanline(timer_device &timer, void *ptr, int32_t param);
 };

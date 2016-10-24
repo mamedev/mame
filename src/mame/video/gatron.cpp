@@ -30,7 +30,7 @@ void gatron_state::gat_videoram_w(address_space &space, offs_t offset, uint8_t d
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(gatron_state::get_bg_tile_info)
+void gatron_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *videoram = m_videoram;
 /*  - bits -
@@ -56,6 +56,6 @@ uint32_t gatron_state::screen_update_gat(screen_device &screen, bitmap_ind16 &bi
 	return 0;
 }
 
-PALETTE_INIT_MEMBER(gatron_state, gatron)
+void gatron_state::palette_init_gatron(palette_device &palette)
 {
 }

@@ -59,7 +59,7 @@ public:
 	void i8155_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void i8155_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void i8155_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(i8155_timer_out);
+	void i8155_timer_out(int state);
 };
 
 
@@ -153,7 +153,7 @@ void paranoia_state::i8155_c_w(address_space &space, offs_t offset, uint8_t data
 	//logerror("i8155 Port C: %02X\n", data);
 }
 
-WRITE_LINE_MEMBER(paranoia_state::i8155_timer_out)
+void paranoia_state::i8155_timer_out(int state)
 {
 	//m_subcpu->set_input_line(I8085_RST55_LINE, state ? CLEAR_LINE : ASSERT_LINE );
 	//logerror("Timer out %d\n", state);

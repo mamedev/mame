@@ -25,7 +25,7 @@ public:
 	virtual void pcb_reset() override;
 
 protected:
-	TIMER_CALLBACK_MEMBER(resync_callback);
+	void resync_callback(void *ptr, int32_t param);
 	virtual void set_prg();
 	virtual void set_chr();
 

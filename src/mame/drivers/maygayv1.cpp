@@ -247,11 +247,11 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_maygayv1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_maygayv1(screen_device &screen, bool state);
-	INTERRUPT_GEN_MEMBER(vsync_interrupt);
+	void vsync_interrupt(device_t &device);
 	void data_from_i8031(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t data_to_i8031(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
-	DECLARE_WRITE_LINE_MEMBER(duart_txa);
+	void duart_irq_handler(int state);
+	void duart_txa(int state);
 };
 
 
@@ -800,14 +800,14 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-WRITE_LINE_MEMBER(maygayv1_state::duart_irq_handler)
+void maygayv1_state::duart_irq_handler(int state)
 {
 	m_maincpu->set_input_line_and_vector(5, state, m_duart68681->get_irq_vector());
 //  m_maincpu->set_input_line(5, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
-WRITE_LINE_MEMBER(maygayv1_state::duart_txa)
+void maygayv1_state::duart_txa(int state)
 {
 	m_d68681_val = state;
 	m_soundcpu->set_input_line(MCS51_RX_LINE, ASSERT_LINE);  // ?
@@ -853,7 +853,7 @@ void maygayv1_state::machine_reset()
 }
 
 
-INTERRUPT_GEN_MEMBER(maygayv1_state::vsync_interrupt)
+void maygayv1_state::vsync_interrupt(device_t &device)
 {
 	if (m_vsync_latch_preset)
 		m_maincpu->set_input_line(3, ASSERT_LINE);

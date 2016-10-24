@@ -4,7 +4,7 @@
 
 /* Palette Initialization */
 
-PALETTE_INIT_MEMBER(sb2m600_state, osi630)
+void sb2m600_state::palette_init_osi630(palette_device &palette)
 {
 	/* black and white */
 	palette.set_pen_color(0, 0x00, 0x00, 0x00); // black

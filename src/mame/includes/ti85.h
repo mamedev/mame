@@ -168,10 +168,10 @@ public:
 	uint8_t ti84pse_port_0056_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(ti85);
+	void palette_init_ti85(palette_device &palette);
 	void machine_reset_ti85();
 	void machine_reset_ti83p();
-	DECLARE_PALETTE_INIT(ti82);
+	void palette_init_ti82(palette_device &palette);
 	void machine_start_ti86();
 	void machine_start_ti83p();
 	void machine_start_ti83pse();
@@ -180,9 +180,9 @@ public:
 	void ti8xpse_init_common();
 
 	uint32_t screen_update_ti85(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(ti85_timer_callback);
-	TIMER_CALLBACK_MEMBER(ti83_timer1_callback);
-	TIMER_CALLBACK_MEMBER(ti83_timer2_callback);
+	void ti85_timer_callback(void *ptr, int32_t param);
+	void ti83_timer1_callback(void *ptr, int32_t param);
+	void ti83_timer2_callback(void *ptr, int32_t param);
 
 	//crystal timers
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;

@@ -116,7 +116,7 @@ uint8_t mrflea_state::mrflea_io_status_r(address_space &space, offs_t offset, ui
 	return m_status ^ 0x01;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(mrflea_state::mrflea_slave_interrupt)
+void mrflea_state::mrflea_slave_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

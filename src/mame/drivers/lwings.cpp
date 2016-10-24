@@ -95,13 +95,13 @@ void lwings_state::lwings_bankswitch_w(address_space &space, offs_t offset, uint
 	machine().bookkeeping().coin_counter_w(0, data & 0x80);
 }
 
-INTERRUPT_GEN_MEMBER(lwings_state::lwings_interrupt)
+void lwings_state::lwings_interrupt(device_t &device)
 {
 	if(m_nmi_mask)
 		device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xd7); /* RST 10h */
 }
 
-INTERRUPT_GEN_MEMBER(lwings_state::avengers_interrupt)
+void lwings_state::avengers_interrupt(device_t &device)
 {
 	if(m_nmi_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);

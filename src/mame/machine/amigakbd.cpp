@@ -561,7 +561,7 @@ void amigakbd_device::control_w(address_space &space, offs_t offset, uint8_t dat
 	update_irqs();
 }
 
-WRITE_LINE_MEMBER( amigakbd_device::kdat_w )
+void amigakbd_device::kdat_w(int state)
 {
 	// detect positive edge
 	if (state && !m_kdat)

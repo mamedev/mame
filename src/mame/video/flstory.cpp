@@ -11,7 +11,7 @@
 #include "emu.h"
 #include "includes/flstory.h"
 
-TILE_GET_INFO_MEMBER(flstory_state::get_tile_info)
+void flstory_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index * 2];
 	int attr = m_videoram[tile_index * 2 + 1];
@@ -25,7 +25,7 @@ TILE_GET_INFO_MEMBER(flstory_state::get_tile_info)
 			flags);
 }
 
-TILE_GET_INFO_MEMBER(flstory_state::victnine_get_tile_info)
+void flstory_state::victnine_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index * 2];
 	int attr = m_videoram[tile_index * 2 + 1];
@@ -38,7 +38,7 @@ TILE_GET_INFO_MEMBER(flstory_state::victnine_get_tile_info)
 			flags);
 }
 
-TILE_GET_INFO_MEMBER(flstory_state::get_rumba_tile_info)
+void flstory_state::get_rumba_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index * 2];
 	int attr = m_videoram[tile_index * 2 + 1];

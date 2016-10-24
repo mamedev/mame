@@ -22,7 +22,7 @@
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(_88games_state::k88games_interrupt)
+void _88games_state::k88games_interrupt(device_t &device)
 {
 	if (m_k052109->is_irq_enabled())
 		irq0_line_hold(device);

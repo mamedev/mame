@@ -106,7 +106,7 @@
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(capbowl_state::interrupt)
+void capbowl_state::interrupt(device_t &device)
 {
 	if (ioport("SERVICE")->read() & 1)                      /* get status of the F2 key */
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);    /* trigger self test */
@@ -133,7 +133,7 @@ void capbowl_state::device_timer(emu_timer &timer, device_timer_id id, int param
 }
 
 
-TIMER_CALLBACK_MEMBER(capbowl_state::update)
+void capbowl_state::update(void *ptr, int32_t param)
 {
 	int scanline = param;
 

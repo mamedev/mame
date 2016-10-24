@@ -89,7 +89,7 @@ protected:
 
 	virtual void device_start() override;
 
-	virtual TILE_GET_INFO_MEMBER(tile_info);
+	virtual void tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	tilemap_memory_index adjust_tile_index(tilemap_memory_index tile_index) const
 	{ return tile_index + ((unsigned(m_registers[1]) * 256U / gfx().width()) * m_rows); }
@@ -118,7 +118,7 @@ public:
 protected:
 	virtual void device_start() override;
 
-	virtual TILE_GET_INFO_MEMBER(tile_info) override;
+	virtual void tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index) override;
 
 private:
 	required_region_ptr<uint8_t> m_colorrom;
@@ -138,7 +138,7 @@ protected:
 	virtual void device_start() override;
 
 private:
-	TILE_GET_INFO_MEMBER(tile_info);
+	void tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	std::unique_ptr<uint16_t[]> m_tileram;
 };
@@ -198,7 +198,7 @@ public:
 	uint8_t paletteram_flytiger_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void paletteram_flytiger_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void flytiger_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	TILE_GET_INFO_MEMBER(get_tx_tile_info);
+	void get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, unsigned extensions = 0);
 	uint32_t screen_update_bluehawk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_flytiger(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -228,8 +228,8 @@ public:
 
 	void lastday_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void pollux_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(irqhandler_2203_1);
-	DECLARE_WRITE_LINE_MEMBER(irqhandler_2203_2);
+	void irqhandler_2203_1(int state);
+	void irqhandler_2203_2(int state);
 	uint8_t unk_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void machine_reset_sound_ym2203();
 	uint32_t screen_update_lastday(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -253,7 +253,7 @@ public:
 	}
 
 	void ctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+	void scanline(timer_device &timer, void *ptr, int32_t param);
 
 protected:
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

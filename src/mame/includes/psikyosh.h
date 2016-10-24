@@ -70,7 +70,7 @@ public:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	uint32_t screen_update_psikyosh(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(psikyosh_interrupt);
+	void psikyosh_interrupt(device_t &device);
 	void draw_scanline32_alpha(bitmap_rgb32 &bitmap, int32_t destx, int32_t desty, int32_t length, const uint32_t *srcptr, int alpha);
 	void draw_scanline32_argb(bitmap_rgb32 &bitmap, int32_t destx, int32_t desty, int32_t length, const uint32_t *srcptr);
 	void draw_scanline32_transpen(bitmap_rgb32 &bitmap, int32_t destx, int32_t desty, int32_t length, const uint32_t *srcptr);

@@ -180,7 +180,7 @@ static INPUT_PORTS_START( m79amb )
 INPUT_PORTS_END
 
 
-INTERRUPT_GEN_MEMBER(m79amb_state::m79amb_interrupt)
+void m79amb_state::m79amb_interrupt(device_t &device)
 {
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xcf);  /* RST 08h */
 }

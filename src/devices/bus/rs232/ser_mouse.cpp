@@ -220,19 +220,19 @@ void serial_mouse_device::set_mouse_enable(bool state)
 }
 
 
-WRITE_LINE_MEMBER(serial_mouse_device::input_dtr)
+void serial_mouse_device::input_dtr(int state)
 {
 	m_dtr = state;
 	check_state();
 }
 
-WRITE_LINE_MEMBER(serial_mouse_device::input_rts)
+void serial_mouse_device::input_rts(int state)
 {
 	m_rts = state;
 	check_state();
 }
 
-WRITE_LINE_MEMBER(microsoft_mouse_device::input_rts)
+void microsoft_mouse_device::input_rts(int state)
 {
 	if (!m_dtr && m_rts && !state)
 	{

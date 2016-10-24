@@ -101,11 +101,11 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(electron);
+	void palette_init_electron(palette_device &palette);
 	uint32_t screen_update_electron(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(electron_tape_timer_handler);
-	TIMER_CALLBACK_MEMBER(setup_beep);
-	TIMER_CALLBACK_MEMBER(electron_scanline_interrupt);
+	void electron_tape_timer_handler(void *ptr, int32_t param);
+	void setup_beep(void *ptr, int32_t param);
+	void electron_scanline_interrupt(void *ptr, int32_t param);
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette;
 	required_device<beep_device> m_beeper;

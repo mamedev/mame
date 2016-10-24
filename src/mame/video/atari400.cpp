@@ -122,7 +122,7 @@ static const uint8_t atari_palette[256*3] =
 
 
 /* Initialise the palette */
-PALETTE_INIT_MEMBER(atari_common_state, atari)
+void atari_common_state::palette_init_atari(palette_device &palette)
 {
 	int i;
 

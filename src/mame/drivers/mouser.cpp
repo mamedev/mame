@@ -27,7 +27,7 @@ void mouser_state::mouser_nmi_enable_w(address_space &space, offs_t offset, uint
 	m_nmi_enable = data;
 }
 
-INTERRUPT_GEN_MEMBER(mouser_state::mouser_nmi_interrupt)
+void mouser_state::mouser_nmi_interrupt(device_t &device)
 {
 	if (BIT(m_nmi_enable, 0))
 		nmi_line_pulse(device);
@@ -54,7 +54,7 @@ void mouser_state::mouser_sound_nmi_clear_w(address_space &space, offs_t offset,
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(mouser_state::mouser_sound_nmi_assert)
+void mouser_state::mouser_sound_nmi_assert(device_t &device)
 {
 	if (BIT(m_nmi_enable, 0))
 		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);

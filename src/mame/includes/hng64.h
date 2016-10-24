@@ -297,20 +297,20 @@ public:
 	uint8_t read_comm_data(uint32_t offset);
 	void write_comm_data(uint32_t offset,uint8_t data);
 	int m_irq_level;
-	TILE_GET_INFO_MEMBER(get_hng64_tile0_8x8_info);
-	TILE_GET_INFO_MEMBER(get_hng64_tile0_16x16_info);
-	TILE_GET_INFO_MEMBER(get_hng64_tile1_8x8_info);
-	TILE_GET_INFO_MEMBER(get_hng64_tile1_16x16_info);
-	TILE_GET_INFO_MEMBER(get_hng64_tile2_8x8_info);
-	TILE_GET_INFO_MEMBER(get_hng64_tile2_16x16_info);
-	TILE_GET_INFO_MEMBER(get_hng64_tile3_8x8_info);
-	TILE_GET_INFO_MEMBER(get_hng64_tile3_16x16_info);
+	void get_hng64_tile0_8x8_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_hng64_tile0_16x16_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_hng64_tile1_8x8_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_hng64_tile1_16x16_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_hng64_tile2_8x8_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_hng64_tile2_16x16_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_hng64_tile3_8x8_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_hng64_tile3_16x16_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_hng64(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_eof_hng64(screen_device &screen, bool state);
-	TIMER_DEVICE_CALLBACK_MEMBER(hng64_irq);
+	void hng64_irq(timer_device &timer, void *ptr, int32_t param);
 	void do_dma(address_space &space);
 
 	void hng64_mark_all_tiles_dirty(int tilemap);
@@ -337,7 +337,7 @@ public:
 
 	std::unique_ptr<hng64_poly_renderer> m_poly_renderer;
 
-	TIMER_CALLBACK_MEMBER(hng64_3dfifo_processed);
+	void hng64_3dfifo_processed(void *ptr, int32_t param);
 
 	uint8_t *m_texturerom;
 	uint16_t* m_vertsrom;
@@ -364,12 +364,12 @@ public:
 	void reset_sound();
 	void reset_net();
 
-	DECLARE_WRITE_LINE_MEMBER(dma_hreq_cb);
+	void dma_hreq_cb(int state);
 	uint8_t dma_memr_cb(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void dma_iow3_cb(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(tcu_tm0_cb);
-	DECLARE_WRITE_LINE_MEMBER(tcu_tm1_cb);
-	DECLARE_WRITE_LINE_MEMBER(tcu_tm2_cb);
+	void tcu_tm0_cb(int state);
+	void tcu_tm1_cb(int state);
+	void tcu_tm2_cb(int state);
 
 
 

@@ -470,7 +470,7 @@ void raiden2_state::raidendx_cop_bank_2_w(address_space &space, offs_t offset, u
 
 /* TILEMAP RELATED (move to video file) */
 
-TILE_GET_INFO_MEMBER(raiden2_state::get_back_tile_info)
+void raiden2_state::get_back_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = back_data[tile_index];
 	int color = (tile >> 12) | (0 << 4);
@@ -480,7 +480,7 @@ TILE_GET_INFO_MEMBER(raiden2_state::get_back_tile_info)
 	SET_TILE_INFO_MEMBER(1,tile+0x0000,color,0);
 }
 
-TILE_GET_INFO_MEMBER(raiden2_state::get_mid_tile_info)
+void raiden2_state::get_mid_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = mid_data[tile_index];
 	int color = (tile >> 12) | (2 << 4);
@@ -490,7 +490,7 @@ TILE_GET_INFO_MEMBER(raiden2_state::get_mid_tile_info)
 	SET_TILE_INFO_MEMBER(1,tile,color,0);
 }
 
-TILE_GET_INFO_MEMBER(raiden2_state::get_fore_tile_info)
+void raiden2_state::get_fore_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = fore_data[tile_index];
 	int color = (tile >> 12) | (1 << 4);
@@ -500,7 +500,7 @@ TILE_GET_INFO_MEMBER(raiden2_state::get_fore_tile_info)
 	SET_TILE_INFO_MEMBER(1,tile,color,0);
 }
 
-TILE_GET_INFO_MEMBER(raiden2_state::get_text_tile_info)
+void raiden2_state::get_text_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = text_data[tile_index];
 	int color = (tile>>12)&0xf;
@@ -612,7 +612,7 @@ uint32_t raiden2_state::screen_update_raiden2(screen_device &screen, bitmap_rgb3
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(raiden2_state::raiden2_interrupt)
+void raiden2_state::raiden2_interrupt(device_t &device)
 {
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xc0/4);   /* VBL */
 }

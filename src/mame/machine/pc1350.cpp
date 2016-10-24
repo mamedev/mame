@@ -80,7 +80,7 @@ uint8_t pc1350_state::pc1350_inb(address_space &space, offs_t offset, uint8_t me
 	return m_outb;
 }
 
-READ_LINE_MEMBER(pc1350_state::pc1350_brk)
+int pc1350_state::pc1350_brk()
 {
 	return (ioport("EXTRA")->read() & 0x01);
 }

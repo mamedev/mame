@@ -136,7 +136,7 @@ public:
 	uint8_t via_b_in(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void via_a_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void via_b_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(via_ca2_out);
+	void via_ca2_out(int state);
 	uint8_t dips1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void input_mux_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_bmcbowl();
@@ -245,7 +245,7 @@ void bmcbowl_state::via_b_out(address_space &space, offs_t offset, uint8_t data,
 	//used
 }
 
-WRITE_LINE_MEMBER(bmcbowl_state::via_ca2_out)
+void bmcbowl_state::via_ca2_out(int state)
 {
 	//used
 }

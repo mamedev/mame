@@ -78,11 +78,11 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof(screen_device &screen, bool state);
-	TIMER_DEVICE_CALLBACK_MEMBER( scanline_callback );
-	DECLARE_PALETTE_INIT(sm7238);
+	void scanline_callback(timer_device &timer, void *ptr, int32_t param);
+	void palette_init_sm7238(palette_device &palette);
 
-	DECLARE_WRITE_LINE_MEMBER(write_keyboard_clock);
-	DECLARE_WRITE_LINE_MEMBER(write_printer_clock);
+	void write_keyboard_clock(int state);
+	void write_printer_clock(int state);
 
 	void control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void text_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -183,13 +183,13 @@ void sm7238_state::text_control_w(address_space &space, offs_t offset, uint8_t d
 	m_video.control = data;
 }
 
-WRITE_LINE_MEMBER(sm7238_state::write_keyboard_clock)
+void sm7238_state::write_keyboard_clock(int state)
 {
 	m_i8251kbd->write_txc(state);
 	m_i8251kbd->write_rxc(state);
 }
 
-WRITE_LINE_MEMBER(sm7238_state::write_printer_clock)
+void sm7238_state::write_printer_clock(int state)
 {
 	m_i8251prn->write_txc(state);
 	m_i8251prn->write_rxc(state);
@@ -255,7 +255,7 @@ uint32_t sm7238_state::draw_scanline(uint16_t *p, uint16_t offset, uint8_t scanl
 	return 0;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(sm7238_state::scanline_callback)
+void sm7238_state::scanline_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	uint16_t y = m_screen->vpos();
 	uint16_t o = m_video.ptr;
@@ -330,7 +330,7 @@ static GFXDECODE_START( sm7238 )
 	GFXDECODE_ENTRY("chargen", 0x0000, sm7238_charlayout, 0, 1)
 GFXDECODE_END
 
-PALETTE_INIT_MEMBER(sm7238_state, sm7238)
+void sm7238_state::palette_init_sm7238(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t::black());
 	palette.set_pen_color(1, 0x00, 0xc0, 0x00); // green

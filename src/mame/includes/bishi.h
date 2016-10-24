@@ -55,6 +55,6 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_bishi(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(bishi_scanline);
+	void bishi_scanline(timer_device &timer, void *ptr, int32_t param);
 	K056832_CB_MEMBER(tile_callback);
 };

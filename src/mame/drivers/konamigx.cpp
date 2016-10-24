@@ -558,7 +558,7 @@ void konamigx_state::control_w(address_space &space, offs_t offset, uint32_t dat
 /**********************************************************************************/
 /* IRQ controllers */
 
-TIMER_CALLBACK_MEMBER(konamigx_state::boothack_callback)
+void konamigx_state::boothack_callback(void *ptr, int32_t param)
 {
 	// Restore main CPU normal operating frequency
 	m_maincpu->set_clock_scale(1.0f);
@@ -572,7 +572,7 @@ TIMER_CALLBACK_MEMBER(konamigx_state::boothack_callback)
     12Mhz dotclock: 42.7us(clear) / 341.3us(transfer)
 */
 
-TIMER_CALLBACK_MEMBER(konamigx_state::dmaend_callback)
+void konamigx_state::dmaend_callback(void *ptr, int32_t param)
 {
 	// foul-proof (CPU0 could be deactivated while we wait)
 	if (m_resume_trigger && m_suspension_active)
@@ -620,7 +620,7 @@ void konamigx_state::dmastart_callback(int data)
 }
 
 
-INTERRUPT_GEN_MEMBER(konamigx_state::konamigx_type2_vblank_irq)
+void konamigx_state::konamigx_type2_vblank_irq(device_t &device)
 {
 	// lift idle suspension
 	if (m_resume_trigger && m_suspension_active)
@@ -645,7 +645,7 @@ INTERRUPT_GEN_MEMBER(konamigx_state::konamigx_type2_vblank_irq)
 	dmastart_callback(0);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(konamigx_state::konamigx_type2_scanline)
+void konamigx_state::konamigx_type2_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -666,7 +666,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(konamigx_state::konamigx_type2_scanline)
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(konamigx_state::konamigx_type4_scanline)
+void konamigx_state::konamigx_type4_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -1123,7 +1123,7 @@ static ADDRESS_MAP_START( gxtmsmap, AS_DATA, 8, konamigx_state )
 ADDRESS_MAP_END
 
 
-WRITE_LINE_MEMBER(konamigx_state::k054539_irq_gen)
+void konamigx_state::k054539_irq_gen(int state)
 {
 	if (m_sound_ctrl & 1)
 	{
@@ -1594,13 +1594,13 @@ static GFXDECODE_START( type4 )
 	GFXDECODE_ENTRY( "gfx3", 0, bglayout_8bpp, 0x1800, 8 )
 GFXDECODE_END
 
-WRITE_LINE_MEMBER(konamigx_state::vblank_irq_ack_w)
+void konamigx_state::vblank_irq_ack_w(int state)
 {
 	m_maincpu->set_input_line(1, CLEAR_LINE);
 	m_gx_syncen |= 0x20;
 }
 
-WRITE_LINE_MEMBER(konamigx_state::hblank_irq_ack_w)
+void konamigx_state::hblank_irq_ack_w(int state)
 {
 	m_maincpu->set_input_line(2, CLEAR_LINE);
 	m_gx_syncen |= 0x40;

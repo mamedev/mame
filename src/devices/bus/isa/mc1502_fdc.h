@@ -33,12 +33,12 @@ public:
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
-	TIMER_CALLBACK_MEMBER( motor_callback );
+	void motor_callback(void *ptr, int32_t param);
 
 	uint8_t mc1502_fdc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t mc1502_fdcv2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void mc1502_fdc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( mc1502_fdc_irq_drq );
+	void mc1502_fdc_irq_drq(int state);
 
 protected:
 	// device-level overrides

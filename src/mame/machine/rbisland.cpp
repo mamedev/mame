@@ -730,7 +730,7 @@ void rbisland_state::request_goalin_data(  )
 	m_CRAM[1][0x154] = cchip_goalin[n][5];
 }
 
-TIMER_CALLBACK_MEMBER(rbisland_state::cchip_timer)
+void rbisland_state::cchip_timer(void *ptr, int32_t param)
 {
 	if (m_CRAM[1][0x100] == 1)
 	{

@@ -232,7 +232,7 @@ uint16_t qdrmfgp_state::gp2_ide_std_r(address_space &space, offs_t offset, uint1
  *
  *************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(qdrmfgp_state::qdrmfgp_interrupt)
+void qdrmfgp_state::qdrmfgp_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -242,7 +242,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(qdrmfgp_state::qdrmfgp_interrupt)
 			m_maincpu->set_input_line(M68K_IRQ_3, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(qdrmfgp_state::ide_interrupt)
+void qdrmfgp_state::ide_interrupt(int state)
 {
 	if (m_control & 0x0008)
 		if (state != CLEAR_LINE)
@@ -251,20 +251,20 @@ WRITE_LINE_MEMBER(qdrmfgp_state::ide_interrupt)
 
 /*************/
 
-TIMER_CALLBACK_MEMBER(qdrmfgp_state::gp2_timer_callback)
+void qdrmfgp_state::gp2_timer_callback(void *ptr, int32_t param)
 {
 	if (m_control & 0x0004)
 		m_maincpu->set_input_line(M68K_IRQ_3, ASSERT_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(qdrmfgp_state::qdrmfgp2_interrupt)
+void qdrmfgp_state::qdrmfgp2_interrupt(device_t &device)
 {
 	/* trigger V-blank interrupt */
 	if (m_control & 0x0008)
 		device.execute().set_input_line(M68K_IRQ_4, ASSERT_LINE);
 }
 
-WRITE_LINE_MEMBER(qdrmfgp_state::gp2_ide_interrupt)
+void qdrmfgp_state::gp2_ide_interrupt(int state)
 {
 #if IDE_HACK
 	if (m_control & 0x0010)
@@ -524,7 +524,7 @@ INPUT_PORTS_END
 
 int m_sound_intck;
 
-WRITE_LINE_MEMBER(qdrmfgp_state::k054539_irq1_gen)
+void qdrmfgp_state::k054539_irq1_gen(int state)
 {
 	if (m_control & 1)
 	{

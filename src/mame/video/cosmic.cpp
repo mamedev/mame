@@ -73,7 +73,7 @@ pen_t cosmic_state::magspot_map_color( uint8_t x, uint8_t y )
  * (1k to ground) so second version of table has blue set to 2/3
  */
 
-PALETTE_INIT_MEMBER(cosmic_state,panic)
+void cosmic_state::palette_init_panic(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -112,7 +112,7 @@ PALETTE_INIT_MEMBER(cosmic_state,panic)
  *
  */
 
-PALETTE_INIT_MEMBER(cosmic_state,cosmica)
+void cosmic_state::palette_init_cosmica(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -152,7 +152,7 @@ PALETTE_INIT_MEMBER(cosmic_state,cosmica)
  * It's possible that the background is dark gray and not black, as the
  * resistor chain would never drop to zero, Anybody know ?
  */
-PALETTE_INIT_MEMBER(cosmic_state,cosmicg)
+void cosmic_state::palette_init_cosmicg(palette_device &palette)
 {
 	int i;
 
@@ -169,7 +169,7 @@ PALETTE_INIT_MEMBER(cosmic_state,cosmicg)
 }
 
 
-PALETTE_INIT_MEMBER(cosmic_state,magspot)
+void cosmic_state::palette_init_magspot(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -200,7 +200,7 @@ PALETTE_INIT_MEMBER(cosmic_state,magspot)
 }
 
 
-PALETTE_INIT_MEMBER(cosmic_state,nomnlnd)
+void cosmic_state::palette_init_nomnlnd(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;

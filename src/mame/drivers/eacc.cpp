@@ -64,11 +64,11 @@ public:
 	m_p_nvram(*this, "nvram")
 	{ }
 
-	DECLARE_READ_LINE_MEMBER( eacc_cb1_r );
-	DECLARE_READ_LINE_MEMBER( eacc_distance_r );
-	DECLARE_READ_LINE_MEMBER( eacc_fuel_sensor_r );
+	int eacc_cb1_r();
+	int eacc_distance_r();
+	int eacc_fuel_sensor_r();
 	uint8_t eacc_keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( eacc_cb2_w );
+	void eacc_cb2_w(int state);
 	void eacc_digit_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void eacc_segment_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	bool m_cb1;
@@ -78,8 +78,8 @@ public:
 	required_device<pia6821_device> m_pia;
 	required_shared_ptr<uint8_t> m_p_nvram;
 	virtual void machine_reset() override;
-	TIMER_DEVICE_CALLBACK_MEMBER(eacc_cb1);
-	TIMER_DEVICE_CALLBACK_MEMBER(eacc_nmi);
+	void eacc_cb1(timer_device &timer, void *ptr, int32_t param);
+	void eacc_nmi(timer_device &timer, void *ptr, int32_t param);
 private:
 	uint8_t m_digit;
 };
@@ -136,14 +136,14 @@ void eacc_state::machine_reset()
 	m_cb2 = 0;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(eacc_state::eacc_cb1)
+void eacc_state::eacc_cb1(timer_device &timer, void *ptr, int32_t param)
 {
 	m_cb1 ^= 1; // 15hz
 	if (m_cb2)
 		m_maincpu->set_input_line(M6802_IRQ_LINE, ASSERT_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(eacc_state::eacc_nmi)
+void eacc_state::eacc_nmi(timer_device &timer, void *ptr, int32_t param)
 {
 	if (m_cb2)
 	{
@@ -152,22 +152,22 @@ TIMER_DEVICE_CALLBACK_MEMBER(eacc_state::eacc_nmi)
 	}
 }
 
-READ_LINE_MEMBER( eacc_state::eacc_cb1_r )
+int eacc_state::eacc_cb1_r()
 {
 	return (m_cb2) ? m_cb1 : 1;
 }
 
-READ_LINE_MEMBER( eacc_state::eacc_distance_r )
+int eacc_state::eacc_distance_r()
 {
 	return machine().rand() & 1; // needs random pulses to simulate movement
 }
 
-READ_LINE_MEMBER( eacc_state::eacc_fuel_sensor_r )
+int eacc_state::eacc_fuel_sensor_r()
 {
 	return machine().rand() & 1; // needs random pulses to simulate fuel usage
 }
 
-WRITE_LINE_MEMBER( eacc_state::eacc_cb2_w )
+void eacc_state::eacc_cb2_w(int state)
 {
 	m_cb2 = state;
 }

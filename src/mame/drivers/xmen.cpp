@@ -299,7 +299,7 @@ void xmen_state::machine_reset()
 	m_vblank_irq_mask = 0;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(xmen_state::xmen_scanline)
+void xmen_state::xmen_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

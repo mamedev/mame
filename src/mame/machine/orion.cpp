@@ -344,7 +344,7 @@ void orion_state::machine_reset_orionz80()
 	radio86_init_keyboard();
 }
 
-INTERRUPT_GEN_MEMBER(orion_state::orionz80_interrupt)
+void orion_state::orionz80_interrupt(device_t &device)
 {
 	if ((m_orionz80_dispatcher & 0x40)==0x40)
 	{

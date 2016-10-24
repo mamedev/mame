@@ -120,7 +120,7 @@
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(atarifb_state, atarifb)
+void atarifb_state::palette_init_atarifb(palette_device &palette)
 {
 	/* chars */
 	palette.set_pen_color(0, rgb_t(0xff,0xff,0xff)); /* white  */

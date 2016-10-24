@@ -13,7 +13,7 @@
 #include "k1ge.h"
 
 
-PALETTE_INIT_MEMBER(k1ge_device, k1ge)
+void k1ge_device::palette_init_k1ge(palette_device &palette)
 {
 	int i;
 
@@ -26,7 +26,7 @@ PALETTE_INIT_MEMBER(k1ge_device, k1ge)
 }
 
 
-PALETTE_INIT_MEMBER(k2ge_device, k2ge)
+void k2ge_device::palette_init_k2ge(palette_device &palette)
 {
 	int r,g,b;
 
@@ -728,13 +728,13 @@ void k2ge_device::draw( int line )
 }
 
 
-TIMER_CALLBACK_MEMBER( k1ge_device::hblank_on_timer_callback )
+void k1ge_device::hblank_on_timer_callback(void *ptr, int32_t param)
 {
 	m_hblank_pin_w(0);
 }
 
 
-TIMER_CALLBACK_MEMBER( k1ge_device::timer_callback )
+void k1ge_device::timer_callback(void *ptr, int32_t param)
 {
 	int y = m_screen->vpos();
 

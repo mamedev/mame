@@ -110,12 +110,12 @@ void cr511b_device::write(address_space &space, offs_t offset, uint8_t data, uin
 {
 }
 
-WRITE_LINE_MEMBER( cr511b_device::enable_w )
+void cr511b_device::enable_w(int state)
 {
 	m_enabled = state;
 }
 
-WRITE_LINE_MEMBER( cr511b_device::cmd_w )
+void cr511b_device::cmd_w(int state)
 {
 	m_cmd = state;
 }

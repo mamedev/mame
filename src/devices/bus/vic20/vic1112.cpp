@@ -26,7 +26,7 @@
 const device_type VIC1112 = &device_creator<vic1112_device>;
 
 
-WRITE_LINE_MEMBER( vic1112_device::via0_irq_w )
+void vic1112_device::via0_irq_w(int state)
 {
 	m_via0_irq = state;
 
@@ -84,7 +84,7 @@ void vic1112_device::via0_pb_w(address_space &space, offs_t offset, uint8_t data
 }
 
 
-WRITE_LINE_MEMBER( vic1112_device::via1_irq_w )
+void vic1112_device::via1_irq_w(int state)
 {
 	m_via1_irq = state;
 

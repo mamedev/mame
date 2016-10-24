@@ -288,7 +288,7 @@ void mie_device::recalc_irq()
 	cpu->set_input_line(0, irq_enable & irq_pending & 0x7f ? ASSERT_LINE : CLEAR_LINE);
 }
 
-IRQ_CALLBACK_MEMBER(mie_device::irq_callback)
+int mie_device::irq_callback(device_t &device, int irqline)
 {
 	if(!(irq_enable & irq_pending & 0x7f))
 		throw emu_fatalerror("MIE irq callback called with enable=%02x, pending=%02x", irq_enable, irq_pending);

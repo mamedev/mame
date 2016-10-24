@@ -189,7 +189,7 @@ void bang_state::bang_clr_gun_int_w(address_space &space, offs_t offset, uint16_
 	m_clr_gun_int = 1;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(bang_state::bang_irq)
+void bang_state::bang_irq(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

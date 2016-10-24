@@ -245,7 +245,7 @@ public:
 	void init_cmrltv75();
 	virtual void video_start() override;
 	uint32_t screen_update_coinmvga(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vblank_irq);
+	void vblank_irq(device_t &device);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -604,7 +604,7 @@ GFXDECODE_END
 *    Sound Interface     *
 *************************/
 
-INTERRUPT_GEN_MEMBER(coinmvga_state::vblank_irq)
+void coinmvga_state::vblank_irq(device_t &device)
 {
 	//printf("1\n");
 	device.execute().set_input_line(2, HOLD_LINE);

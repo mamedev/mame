@@ -92,9 +92,9 @@ public:
 	uint8_t      m_character_ram[3 * 0x800];  /* only half is used, but
 	                                           by allocating twice the amount,
 	                                           we can use the same gfx_layout */
-	DECLARE_READ_LINE_MEMBER(speech_rom_read_bit);
-	DECLARE_WRITE_LINE_MEMBER(write_s2650_flag);
-	DECLARE_WRITE_LINE_MEMBER(cvs_slave_cpu_interrupt);
+	int speech_rom_read_bit();
+	void write_s2650_flag(int state);
+	void cvs_slave_cpu_interrupt(int state);
 	uint8_t cvs_input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void cvs_speech_rom_address_lo_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void cvs_speech_rom_address_hi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -127,10 +127,10 @@ public:
 	void machine_start_cvs();
 	void machine_reset_cvs();
 	void video_start_cvs();
-	DECLARE_PALETTE_INIT(cvs);
+	void palette_init_cvs(palette_device &palette);
 	uint32_t screen_update_cvs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(cvs_main_cpu_interrupt);
-	TIMER_CALLBACK_MEMBER(cvs_393hz_timer_cb);
+	void cvs_main_cpu_interrupt(device_t &device);
+	void cvs_393hz_timer_cb(void *ptr, int32_t param);
 	void set_pens(  );
 	void cvs_scroll_stars(  );
 	void cvs_init_stars(  );

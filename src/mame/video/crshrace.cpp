@@ -11,14 +11,14 @@
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(crshrace_state::get_tile_info1)
+void crshrace_state::get_tile_info1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram1[tile_index];
 
 	SET_TILE_INFO_MEMBER(1, (code & 0xfff) + (m_roz_bank << 12), code >> 12, 0);
 }
 
-TILE_GET_INFO_MEMBER(crshrace_state::get_tile_info2)
+void crshrace_state::get_tile_info2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram2[tile_index];
 

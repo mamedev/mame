@@ -110,7 +110,7 @@ void gottlieb_state::gottlieb_charram_w(address_space &space, offs_t offset, uin
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(gottlieb_state::get_bg_tile_info)
+void gottlieb_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *videoram = m_videoram;
 	int code = videoram[tile_index];
@@ -120,7 +120,7 @@ TILE_GET_INFO_MEMBER(gottlieb_state::get_bg_tile_info)
 		SET_TILE_INFO_MEMBER(m_gfxcharhi, code, 0, 0);
 }
 
-TILE_GET_INFO_MEMBER(gottlieb_state::get_screwloo_bg_tile_info)
+void gottlieb_state::get_screwloo_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *videoram = m_videoram;
 	int code = videoram[tile_index];

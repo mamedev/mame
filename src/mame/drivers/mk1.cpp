@@ -59,7 +59,7 @@ public:
 	uint8_t m_f8[2];
 	uint8_t m_led[4];
 	virtual void machine_start() override;
-	TIMER_DEVICE_CALLBACK_MEMBER(mk1_update_leds);
+	void mk1_update_leds(timer_device &timer, void *ptr, int32_t param);
 	F3853_INTERRUPT_REQ_CB(mk1_interrupt);
 	required_device<cpu_device> m_maincpu;
 };
@@ -152,7 +152,7 @@ static INPUT_PORTS_START( mk1 )
 INPUT_PORTS_END
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(mk1_state::mk1_update_leds)
+void mk1_state::mk1_update_leds(timer_device &timer, void *ptr, int32_t param)
 {
 	for (int i = 0; i < 4; i++)
 	{

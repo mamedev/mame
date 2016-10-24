@@ -97,7 +97,7 @@ return ((strncmp(machine().system().name , "hec2mdhrx", 9)==0) ||
 }
 
 /* Cassette timer*/
-TIMER_CALLBACK_MEMBER(hec2hrp_state::Callback_CK)
+void hec2hrp_state::Callback_CK(void *ptr, int32_t param)
 {
 /* To generate the CK signal (K7)*/
 	m_CK_signal++;
@@ -855,14 +855,14 @@ MACHINE_CONFIG_END
 /*****************************************************************************/
 
 /* upd765 INT is connected to interrupt of Z80 within a RNMI hardware authorization */
-WRITE_LINE_MEMBER( hec2hrp_state::disc2_fdc_interrupt )
+void hec2hrp_state::disc2_fdc_interrupt(int state)
 {
 	m_IRQ_current_state = state;
 	m_disc2cpu->set_input_line(INPUT_LINE_IRQ0, state && m_hector_disc2_RNMI ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /* upd765 DRQ is connected to NMI of Z80 within a RNMI hardware authorization */
-WRITE_LINE_MEMBER( hec2hrp_state::disc2_fdc_dma_irq )
+void hec2hrp_state::disc2_fdc_dma_irq(int state)
 {
 	m_NMI_current_state = state;
 	m_disc2cpu->set_input_line(INPUT_LINE_NMI,  state && m_hector_disc2_RNMI ? ASSERT_LINE : CLEAR_LINE);

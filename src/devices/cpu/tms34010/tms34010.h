@@ -259,8 +259,8 @@ public:
 	void host_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	uint16_t host_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
-	TIMER_CALLBACK_MEMBER(internal_interrupt_callback);
-	TIMER_CALLBACK_MEMBER(scanline_callback);
+	void internal_interrupt_callback(void *ptr, int32_t param);
+	void scanline_callback(void *ptr, int32_t param);
 
 protected:
 	// device-level overrides

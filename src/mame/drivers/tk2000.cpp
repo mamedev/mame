@@ -64,12 +64,12 @@ public:
 	required_device<cassette_image_device> m_cassette;
 	required_device<address_map_bank_device> m_upperbank;
 
-	TIMER_DEVICE_CALLBACK_MEMBER(apple2_interrupt);
+	void apple2_interrupt(timer_device &timer, void *ptr, int32_t param);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_PALETTE_INIT(tk2000);
+	void palette_init_tk2000(palette_device &palette);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	uint8_t ram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
@@ -133,7 +133,7 @@ void tk2000_state::machine_reset()
     VIDEO
 ***************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(tk2000_state::apple2_interrupt)
+void tk2000_state::apple2_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -147,7 +147,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(tk2000_state::apple2_interrupt)
 	}
 }
 
-PALETTE_INIT_MEMBER(tk2000_state, tk2000)
+void tk2000_state::palette_init_tk2000(palette_device &palette)
 {
 	m_video->palette_init_apple2(palette);
 }

@@ -84,7 +84,7 @@ public:
 	void maniach_sh_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void matmania_paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(matmania);
+	void palette_init_matmania(palette_device &palette);
 	void machine_start_maniach();
 	void machine_reset_maniach();
 	uint32_t screen_update_matmania(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

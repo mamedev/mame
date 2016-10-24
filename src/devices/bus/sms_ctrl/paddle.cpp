@@ -50,7 +50,7 @@ CUSTOM_INPUT_MEMBER( sms_paddle_device::rldu_pins_r )
 }
 
 
-READ_LINE_MEMBER( sms_paddle_device::tr_pin_r )
+int sms_paddle_device::tr_pin_r()
 {
 	// The returned value is inverted due to IP_ACTIVE_LOW mapping.
 	return ~m_read_state;

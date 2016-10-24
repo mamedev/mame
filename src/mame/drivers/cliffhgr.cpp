@@ -117,7 +117,7 @@ public:
 	void init_cliff();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	TIMER_CALLBACK_MEMBER(cliff_irq_callback);
+	void cliff_irq_callback(void *ptr, int32_t param);
 	required_device<cpu_device> m_maincpu;
 	required_device<discrete_device> m_discrete;
 	required_device<screen_device> m_screen;
@@ -193,7 +193,7 @@ void cliffhgr_state::cliff_ldwire_w(address_space &space, offs_t offset, uint8_t
 
 /********************************************************/
 
-TIMER_CALLBACK_MEMBER(cliffhgr_state::cliff_irq_callback)
+void cliffhgr_state::cliff_irq_callback(void *ptr, int32_t param)
 {
 	m_phillips_code = 0;
 

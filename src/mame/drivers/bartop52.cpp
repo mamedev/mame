@@ -32,7 +32,7 @@ public:
 		: atari_common_state(mconfig, type, tag)
 		{ }
 
-	TIMER_DEVICE_CALLBACK_MEMBER( bartop_interrupt );
+	void bartop_interrupt(timer_device &timer, void *ptr, int32_t param);
 
 	virtual void machine_reset() override;
 	//required_device<cpu_device> m_maincpu;    // maincpu is already contained in atari_common_state
@@ -111,7 +111,7 @@ void bartop52_state::machine_reset()
 	pokey->write(15,0);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( bartop52_state::bartop_interrupt )
+void bartop52_state::bartop_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	m_antic->generic_interrupt(4);
 }

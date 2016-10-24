@@ -113,15 +113,15 @@ public:
 	uint8_t osbexec_rtc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void init_osbexec();
 	virtual void machine_reset() override;
-	TIMER_CALLBACK_MEMBER(osbexec_video_callback);
+	void osbexec_video_callback(void *ptr, int32_t param);
 	uint8_t osbexec_pia0_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void osbexec_pia0_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t osbexec_pia0_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void osbexec_pia0_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(osbexec_pia0_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(osbexec_pia0_cb2_w);
-	DECLARE_WRITE_LINE_MEMBER(osbexec_pia0_irq);
-	DECLARE_WRITE_LINE_MEMBER(osbexec_pia1_irq);
+	void osbexec_pia0_ca2_w(int state);
+	void osbexec_pia0_cb2_w(int state);
+	void osbexec_pia0_irq(int state);
+	void osbexec_pia1_irq(int state);
 };
 
 
@@ -396,26 +396,26 @@ void osbexec_state::osbexec_pia0_b_w(address_space &space, offs_t offset, uint8_
 }
 
 
-WRITE_LINE_MEMBER(osbexec_state::osbexec_pia0_ca2_w)
+void osbexec_state::osbexec_pia0_ca2_w(int state)
 {
 	logerror("osbexec_pia0_ca2_w: state = %d\n", state);
 }
 
 
-WRITE_LINE_MEMBER(osbexec_state::osbexec_pia0_cb2_w)
+void osbexec_state::osbexec_pia0_cb2_w(int state)
 {
 	m_pia0_cb2 = state;
 }
 
 
-WRITE_LINE_MEMBER(osbexec_state::osbexec_pia0_irq)
+void osbexec_state::osbexec_pia0_irq(int state)
 {
 	m_pia0_irq_state = state;
 	update_irq_state();
 }
 
 
-WRITE_LINE_MEMBER(osbexec_state::osbexec_pia1_irq)
+void osbexec_state::osbexec_pia1_irq(int state)
 {
 	m_pia1_irq_state = state;
 	update_irq_state();
@@ -437,7 +437,7 @@ static SLOT_INTERFACE_START( osborne2_floppies )
 SLOT_INTERFACE_END
 
 
-TIMER_CALLBACK_MEMBER(osbexec_state::osbexec_video_callback)
+void osbexec_state::osbexec_video_callback(void *ptr, int32_t param)
 {
 	int y = machine().first_screen()->vpos();
 

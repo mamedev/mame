@@ -78,7 +78,7 @@ void avigo_state::video_start()
 }
 
 /* Initialise the palette */
-PALETTE_INIT_MEMBER(avigo_state, avigo)
+void avigo_state::palette_init_avigo(palette_device &palette)
 {
 	m_palette->set_pen_color(0,rgb_t(0xff,0xff,0xff)); /* white  */
 	m_palette->set_pen_color(1,rgb_t(0x00,0x00,0x00)); /* black  */

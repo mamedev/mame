@@ -873,7 +873,7 @@ int rainbow_video_device::MHFU(int ASK)
 	} // switch
 }
 
-TIMER_CALLBACK_MEMBER(vt100_video_device::lba7_change)
+void vt100_video_device::lba7_change(void *ptr, int32_t param)
 {
 	m_lba7 = (m_lba7) ? 0 : 1;
 }

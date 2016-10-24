@@ -23,7 +23,7 @@ void starshp1_state::set_pens()
 }
 
 
-PALETTE_INIT_MEMBER(starshp1_state, starshp1)
+void starshp1_state::palette_init_starshp1(palette_device &palette)
 {
 	int i;
 
@@ -44,7 +44,7 @@ PALETTE_INIT_MEMBER(starshp1_state, starshp1)
 }
 
 
-TILE_GET_INFO_MEMBER(starshp1_state::get_tile_info)
+void starshp1_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t code = m_playfield_ram[tile_index];
 

@@ -899,7 +899,7 @@ GFXDECODE_END
 //                 IRQ 1 =>
 //                 IRQ 2 =>
 
-TIMER_DEVICE_CALLBACK_MEMBER(namcona1_state::interrupt)
+void namcona1_state::interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 	int enabled = m_mEnableInterrupts ? ~m_vreg[0x1a/2] : 0;

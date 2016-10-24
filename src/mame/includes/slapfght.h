@@ -140,9 +140,9 @@ public:
 	void init_slapfigh();
 	void init_getstarb2();
 
-	TILE_GET_INFO_MEMBER(get_pf_tile_info);
-	TILE_GET_INFO_MEMBER(get_pf1_tile_info);
-	TILE_GET_INFO_MEMBER(get_fix_tile_info);
+	void get_pf_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_pf1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_fix_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void video_start_perfrman();
 	void video_start_slapfight();
 
@@ -151,6 +151,6 @@ public:
 	uint32_t screen_update_perfrman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_slapfight(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	INTERRUPT_GEN_MEMBER(vblank_irq);
-	INTERRUPT_GEN_MEMBER(sound_nmi);
+	void vblank_irq(device_t &device);
+	void sound_nmi(device_t &device);
 };

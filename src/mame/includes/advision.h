@@ -81,7 +81,7 @@ public:
 	int m_sound_cmd;
 	int m_sound_d;
 	int m_sound_g;
-	DECLARE_PALETTE_INIT(advision);
+	void palette_init_advision(palette_device &palette);
 };
 
 #endif

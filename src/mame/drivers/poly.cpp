@@ -61,9 +61,9 @@ public:
 	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t pia1_b_in(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t videoram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
-	DECLARE_WRITE_LINE_MEMBER( ptm_o2_callback );
-	DECLARE_WRITE_LINE_MEMBER( ptm_o3_callback );
+	void write_acia_clock(int state);
+	void ptm_o2_callback(int state);
+	void ptm_o3_callback(int state);
 
 protected:
 	virtual void machine_reset() override;
@@ -134,18 +134,18 @@ void poly_state::kbd_put(address_space &space, offs_t offset, uint8_t data, uint
 	m_pia1->cb1_w(0);
 }
 
-WRITE_LINE_MEMBER( poly_state::write_acia_clock )
+void poly_state::write_acia_clock(int state)
 {
 	m_acia->write_txc(state);
 	m_acia->write_rxc(state);
 }
 
-WRITE_LINE_MEMBER( poly_state::ptm_o2_callback )
+void poly_state::ptm_o2_callback(int state)
 {
 	m_ptm->set_c1(state);
 }
 
-WRITE_LINE_MEMBER( poly_state::ptm_o3_callback )
+void poly_state::ptm_o3_callback(int state)
 {
 	m_speaker->level_w(state);
 }

@@ -186,14 +186,14 @@ inline void tmp68301_device::write_word(offs_t address, uint16_t data)
 	space(AS_0).write_word(address << 1, data);
 }
 
-IRQ_CALLBACK_MEMBER(tmp68301_device::irq_callback)
+int tmp68301_device::irq_callback(device_t &device, int irqline)
 {
 	int vector = m_irq_vector[irqline];
 //  logerror("%s: irq callback returns %04X for level %x\n",machine.describe_context(),vector,int_level);
 	return vector;
 }
 
-TIMER_CALLBACK_MEMBER( tmp68301_device::timer_callback )
+void tmp68301_device::timer_callback(void *ptr, int32_t param)
 {
 	int i = param;
 	uint16_t TCR  =   m_regs[(0x200 + i * 0x20)/2];

@@ -12,7 +12,7 @@ const device_type SEGA_SEGACD_EUROPE = &device_creator<sega_segacd_europe_device
 
 
 /* Callback when the genesis enters interrupt code */
-IRQ_CALLBACK_MEMBER(sega_segacd_device::segacd_sub_int_callback)
+int sega_segacd_device::segacd_sub_int_callback(device_t &device, int irqline)
 {
 	if (irqline==2)
 	{
@@ -25,14 +25,14 @@ IRQ_CALLBACK_MEMBER(sega_segacd_device::segacd_sub_int_callback)
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER( sega_segacd_device::irq3_timer_callback )
+void sega_segacd_device::irq3_timer_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	CHECK_SCD_LV3_INTERRUPT
 	m_irq3_timer->adjust(SEGACD_IRQ3_TIMER_SPEED);
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER( sega_segacd_device::stamp_timer_callback )
+void sega_segacd_device::stamp_timer_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	//printf("stamp_timer_callback\n");
 
@@ -1001,14 +1001,14 @@ void sega_segacd_device::SCD_GET_TILE_INFO_32x32_16x16( int& tile_region, int& t
 
 
 
-TILE_GET_INFO_MEMBER( sega_segacd_device::get_stampmap_16x16_1x1_tile_info )
+void sega_segacd_device::get_stampmap_16x16_1x1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile_region, tileno;
 	SCD_GET_TILE_INFO_16x16_1x1(tile_region,tileno,(int)tile_index);
 	SET_TILE_INFO_MEMBER(tile_region, tileno, 0, 0);
 }
 
-TILE_GET_INFO_MEMBER( sega_segacd_device::get_stampmap_32x32_1x1_tile_info )
+void sega_segacd_device::get_stampmap_32x32_1x1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile_region, tileno;
 	SCD_GET_TILE_INFO_32x32_1x1(tile_region,tileno,(int)tile_index);
@@ -1016,14 +1016,14 @@ TILE_GET_INFO_MEMBER( sega_segacd_device::get_stampmap_32x32_1x1_tile_info )
 }
 
 
-TILE_GET_INFO_MEMBER( sega_segacd_device::get_stampmap_16x16_16x16_tile_info )
+void sega_segacd_device::get_stampmap_16x16_16x16_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile_region, tileno;
 	SCD_GET_TILE_INFO_16x16_16x16(tile_region,tileno,(int)tile_index);
 	SET_TILE_INFO_MEMBER(tile_region, tileno, 0, 0);
 }
 
-TILE_GET_INFO_MEMBER( sega_segacd_device::get_stampmap_32x32_16x16_tile_info )
+void sega_segacd_device::get_stampmap_32x32_16x16_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile_region, tileno;
 	SCD_GET_TILE_INFO_32x32_16x16(tile_region,tileno,(int)tile_index);
@@ -1797,7 +1797,7 @@ void sega_segacd_device::device_reset()
 
 
 // todo: tidy up
-TIMER_DEVICE_CALLBACK_MEMBER( sega_segacd_device::dma_timer_callback )
+void sega_segacd_device::dma_timer_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	// todo: accurate timing of this!
 

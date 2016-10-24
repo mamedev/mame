@@ -164,7 +164,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_cxhumax(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(timer_tick);
+	void timer_tick(void *ptr, int32_t param);
 };
 
 #define INTDEST         0   // Interrupt destination (1=IRQ, 0=FIQ)

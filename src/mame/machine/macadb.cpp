@@ -527,7 +527,7 @@ void mac_state::adb_talk()
 	}
 }
 
-TIMER_CALLBACK_MEMBER(mac_state::mac_adb_tick)
+void mac_state::mac_adb_tick(void *ptr, int32_t param)
 {
 	if ((ADB_IS_EGRET) || (ADB_IS_CUDA))
 	{
@@ -733,7 +733,7 @@ void mac_state::mac_adb_newaction(int state)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(mac_state::mac_pmu_tick)
+void mac_state::mac_pmu_tick(void *ptr, int32_t param)
 {
 	// state 10 means this is in response to an ADB command
 	if (m_pm_state == 10)
@@ -1226,7 +1226,7 @@ void mac_state::adb_reset()
 	m_adb_keybuf_end = 0;
 }
 
-WRITE_LINE_MEMBER(mac_state::adb_linechange_w)
+void mac_state::adb_linechange_w(int state)
 {
 	int dtime = 0;
 /*    static const char *states[] =

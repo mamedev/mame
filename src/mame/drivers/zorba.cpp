@@ -75,7 +75,7 @@ public:
 	uint8_t rom_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void rom_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void intmask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(busreq_w);
+	void busreq_w(int state);
 	uint8_t memory_read_byte(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void memory_write_byte(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t io_read_byte(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
@@ -83,9 +83,9 @@ public:
 	void pia0_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void kbd_put(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(irq0_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
-	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
+	void irq0_w(int state);
+	void fdc_drq_w(int state);
+	void fdc_intrq_w(int state);
 	I8275_DRAW_CHARACTER_MEMBER(zorba_update_chr);
 	required_device<palette_device> m_palette;
 
@@ -159,7 +159,7 @@ void zorba_state::rom_w(address_space &space, offs_t offset, uint8_t data, uint8
 	membank("bankr0")->set_entry(1);
 }
 
-WRITE_LINE_MEMBER( zorba_state::irq0_w )
+void zorba_state::irq0_w(int state)
 {
 	if (state)
 	{
@@ -170,7 +170,7 @@ WRITE_LINE_MEMBER( zorba_state::irq0_w )
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER( zorba_state::fdc_intrq_w )
+void zorba_state::fdc_intrq_w(int state)
 {
 	m_fdc_rq = (m_fdc_rq & 2) | state;
 	if (m_fdc_rq == 1)
@@ -183,7 +183,7 @@ WRITE_LINE_MEMBER( zorba_state::fdc_intrq_w )
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
-WRITE_LINE_MEMBER( zorba_state::fdc_drq_w )
+void zorba_state::fdc_drq_w(int state)
 {
 	m_fdc_rq = (m_fdc_rq & 1) | (state << 1);
 	if (m_fdc_rq == 2)
@@ -216,7 +216,7 @@ void zorba_state::init_zorba()
 //  Z80DMA
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( zorba_state::busreq_w )
+void zorba_state::busreq_w(int state)
 {
 // since our Z80 has no support for BUSACK, we assume it is granted immediately
 	m_maincpu->set_input_line(Z80_INPUT_LINE_BUSRQ, state);

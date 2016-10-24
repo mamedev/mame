@@ -300,7 +300,7 @@ INPUT_CHANGED_MEMBER(zaxxon_state::service_switch)
 }
 
 
-INTERRUPT_GEN_MEMBER(zaxxon_state::vblank_int)
+void zaxxon_state::vblank_int(device_t &device)
 {
 	if (m_int_enabled)
 		device.execute().set_input_line(0, ASSERT_LINE);

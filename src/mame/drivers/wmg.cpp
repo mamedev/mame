@@ -97,7 +97,7 @@ public:
 	void wmg_nvram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t wmg_pia_0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void wmg_def_rombank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(wmg_port_select_w);
+	void wmg_port_select_w(int state);
 	void wmg_sound_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void wmg_vram_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	DECLARE_CUSTOM_INPUT_MEMBER(wmg_mux_r);
@@ -241,7 +241,7 @@ void wmg_state::machine_reset_wmg()
  *
  *************************************/
 
-WRITE_LINE_MEMBER( wmg_state::wmg_port_select_w )
+void wmg_state::wmg_port_select_w(int state)
 {
 	m_wmg_port_select = state | (m_wmg_bank << 1);
 }

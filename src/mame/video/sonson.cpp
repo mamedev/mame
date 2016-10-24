@@ -41,7 +41,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(sonson_state, sonson)
+void sonson_state::palette_init_sonson(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -119,7 +119,7 @@ void sonson_state::sonson_flipscreen_w(address_space &space, offs_t offset, uint
 	flip_screen_set(~data & 0x01);
 }
 
-TILE_GET_INFO_MEMBER(sonson_state::get_bg_tile_info)
+void sonson_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int attr = m_colorram[tile_index];
 	int code = m_videoram[tile_index] + 256 * (attr & 0x03);

@@ -269,7 +269,7 @@ uint8_t samcoupe_state::samcoupe_attributes_r(address_space &space, offs_t offse
 	return m_attribute;
 }
 
-WRITE_LINE_MEMBER(samcoupe_state::write_lpt1_busy)
+void samcoupe_state::write_lpt1_busy(int state)
 {
 	m_lpt1_busy = state;
 }
@@ -284,7 +284,7 @@ void samcoupe_state::samcoupe_lpt1_strobe_w(address_space &space, offs_t offset,
 	m_lpt1->write_strobe(data & 1);
 }
 
-DECLARE_WRITE_LINE_MEMBER(samcoupe_state::write_lpt2_busy)
+void samcoupe_state::write_lpt2_busy(int state)
 {
 	m_lpt2_busy = state;
 }
@@ -334,7 +334,7 @@ ADDRESS_MAP_END
     INTERRUPTS
 ***************************************************************************/
 
-TIMER_CALLBACK_MEMBER(samcoupe_state::irq_off)
+void samcoupe_state::irq_off(void *ptr, int32_t param)
 {
 	/* adjust STATUS register */
 	m_status |= param;
@@ -355,7 +355,7 @@ void samcoupe_state::samcoupe_irq(uint8_t src)
 	m_status &= ~src;
 }
 
-INTERRUPT_GEN_MEMBER(samcoupe_state::samcoupe_frame_interrupt)
+void samcoupe_state::samcoupe_frame_interrupt(device_t &device)
 {
 	/* signal frame interrupt */
 	samcoupe_irq(SAM_FRAME_INT);
@@ -484,7 +484,7 @@ INPUT_PORTS_END
          nothing   G+4     R+4     B+4    ALL+1    G+2     R+2     B+2
 
 */
-PALETTE_INIT_MEMBER(samcoupe_state, samcoupe)
+void samcoupe_state::palette_init_samcoupe(palette_device &palette)
 {
 	for (int i = 0; i < 128; i++)
 	{

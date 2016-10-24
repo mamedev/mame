@@ -70,15 +70,15 @@ public:
 
 	void init_twin16();
 
-	TILE_GET_INFO_MEMBER(fix_tile_info);
-	TILE_GET_INFO_MEMBER(layer0_tile_info);
-	TILE_GET_INFO_MEMBER(layer1_tile_info);
+	void fix_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void layer0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void layer1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	uint32_t screen_update_twin16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_twin16(screen_device &screen, bool state);
-	INTERRUPT_GEN_MEMBER(CPUA_interrupt);
-	INTERRUPT_GEN_MEMBER(CPUB_interrupt);
-	TIMER_CALLBACK_MEMBER(sprite_tick);
+	void CPUA_interrupt(device_t &device);
+	void CPUB_interrupt(device_t &device);
+	void sprite_tick(void *ptr, int32_t param);
 	void volume_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 protected:
 	virtual void machine_start() override;

@@ -445,12 +445,12 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(lastduel_state::lastduel_timer_cb)
+void lastduel_state::lastduel_timer_cb(timer_device &timer, void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(4, HOLD_LINE); /* Controls */
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(lastduel_state::madgear_timer_cb)
+void lastduel_state::madgear_timer_cb(timer_device &timer, void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(6, HOLD_LINE); /* Controls */
 }

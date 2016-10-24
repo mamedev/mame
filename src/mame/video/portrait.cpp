@@ -54,12 +54,12 @@ inline void portrait_state::get_tile_info( tile_data &tileinfo, int tile_index, 
 	SET_TILE_INFO_MEMBER(0, tilenum, color, flags );
 }
 
-TILE_GET_INFO_MEMBER(portrait_state::get_bg_tile_info)
+void portrait_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	get_tile_info(tileinfo, tile_index, m_bgvideoram );
 }
 
-TILE_GET_INFO_MEMBER(portrait_state::get_fg_tile_info)
+void portrait_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	get_tile_info(tileinfo, tile_index, m_fgvideoram );
 }
@@ -76,7 +76,7 @@ void portrait_state::video_start()
 
 
 
-PALETTE_INIT_MEMBER(portrait_state, portrait)
+void portrait_state::palette_init_portrait(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;

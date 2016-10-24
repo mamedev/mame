@@ -20,7 +20,7 @@
 #include "cpu/s2650/s2650.h"
 #include "includes/quasar.h"
 
-PALETTE_INIT_MEMBER(quasar_state,quasar)
+void quasar_state::palette_init_quasar(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;

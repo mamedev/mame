@@ -28,7 +28,7 @@ public:
 
 	uint32_t dd_null_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	void machine_start_n64dd();
-	INTERRUPT_GEN_MEMBER(n64_reset_poll);
+	void n64_reset_poll(device_t &device);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(n64_cart);
 	void mempak_format(uint8_t* pak);
 	image_init_result disk_load(device_image_interface &image);
@@ -409,7 +409,7 @@ void n64_mess_state::disk_unload(device_image_interface &image)
 	machine().device<n64_periphs>("rcp")->disk_present = false;
 }
 
-INTERRUPT_GEN_MEMBER(n64_mess_state::n64_reset_poll)
+void n64_mess_state::n64_reset_poll(device_t &device)
 {
 	n64_periphs *periphs = machine().device<n64_periphs>("rcp");
 	periphs->poll_reset_button((ioport("RESET")->read() & 1) ? true : false);

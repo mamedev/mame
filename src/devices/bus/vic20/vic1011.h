@@ -33,12 +33,12 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// device_pet_user_port_interface overrides
-	virtual DECLARE_WRITE_LINE_MEMBER( input_d ) override;
-	virtual DECLARE_WRITE_LINE_MEMBER( input_e ) override;
-	virtual DECLARE_WRITE_LINE_MEMBER( input_j ) override;
-	virtual DECLARE_WRITE_LINE_MEMBER( input_m ) override;
+	virtual void input_d(int state) override;
+	virtual void input_e(int state) override;
+	virtual void input_j(int state) override;
+	virtual void input_m(int state) override;
 
-	DECLARE_WRITE_LINE_MEMBER( output_rxd );
+	void output_rxd(int state);
 
 protected:
 	// device-level overrides

@@ -368,7 +368,7 @@ void cdp1864_device::dma_w(address_space &space, offs_t offset, uint8_t data, ui
 //  con_w - color on write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( cdp1864_device::con_w )
+void cdp1864_device::con_w(int state)
 {
 	if (!state)
 	{
@@ -381,7 +381,7 @@ WRITE_LINE_MEMBER( cdp1864_device::con_w )
 //  aoe_w - audio output enable write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( cdp1864_device::aoe_w )
+void cdp1864_device::aoe_w(int state)
 {
 	if (!state)
 	{
@@ -396,7 +396,7 @@ WRITE_LINE_MEMBER( cdp1864_device::aoe_w )
 //  evs_w - external vertical sync write
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( cdp1864_device::evs_w )
+void cdp1864_device::evs_w(int state)
 {
 }
 

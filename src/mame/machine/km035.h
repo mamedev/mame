@@ -48,7 +48,7 @@ public:
 	uint8_t t0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t t1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( write_rxd );
+	void write_rxd(int state);
 
 protected:
 	// device-level overrides

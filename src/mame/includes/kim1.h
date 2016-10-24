@@ -54,8 +54,8 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_reset);
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_nmi);
-	TIMER_DEVICE_CALLBACK_MEMBER(kim1_cassette_input);
-	TIMER_DEVICE_CALLBACK_MEMBER(kim1_update_leds);
+	void kim1_cassette_input(timer_device &timer, void *ptr, int32_t param);
+	void kim1_update_leds(timer_device &timer, void *ptr, int32_t param);
 
 protected:
 	required_ioport m_row0;

@@ -20,9 +20,9 @@ public:
 	// construction/destruction
 	dai_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_WRITE_LINE_MEMBER(set_input_ch0);
-	DECLARE_WRITE_LINE_MEMBER(set_input_ch1);
-	DECLARE_WRITE_LINE_MEMBER(set_input_ch2);
+	void set_input_ch0(int state);
+	void set_input_ch1(int state);
+	void set_input_ch2(int state);
 	void set_volume(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 protected:

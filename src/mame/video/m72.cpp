@@ -68,22 +68,22 @@ inline void m72_state::m82_m84_get_tile_info(tile_data &tileinfo,int tile_index,
 }
 
 
-TILE_GET_INFO_MEMBER(m72_state::get_bg_tile_info)
+void m72_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	m72_m81_get_tile_info(tileinfo,tile_index,m_videoram2,m_bg_source);
 }
 
-TILE_GET_INFO_MEMBER(m72_state::get_fg_tile_info)
+void m72_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	m72_m81_get_tile_info(tileinfo,tile_index,m_videoram1,m_fg_source);
 }
 
-TILE_GET_INFO_MEMBER(m72_state::rtype2_get_bg_tile_info)
+void m72_state::rtype2_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	m82_m84_get_tile_info(tileinfo,tile_index,m_videoram2,1);
 }
 
-TILE_GET_INFO_MEMBER(m72_state::rtype2_get_fg_tile_info)
+void m72_state::rtype2_get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	m82_m84_get_tile_info(tileinfo,tile_index,m_videoram1,1);
 }
@@ -174,7 +174,7 @@ void m72_state::video_start_hharry()
 
 /* Major Title has a larger background RAM, and rowscroll */
 // the Air Duel conversion on the same PCB does not, is it jumper selectable, or a register, or a different RAM chip?
-TILEMAP_MAPPER_MEMBER(m72_state::m82_scan_rows)
+tilemap_memory_index m72_state::m82_scan_rows(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return row*256 + col;

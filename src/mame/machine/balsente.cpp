@@ -22,13 +22,13 @@
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(balsente_state::irq_off)
+void balsente_state::irq_off(void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(M6809_IRQ_LINE, CLEAR_LINE);
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(balsente_state::balsente_interrupt_timer)
+void balsente_state::balsente_interrupt_timer(timer_device &timer, void *ptr, int32_t param)
 {
 	/* next interrupt after scanline 256 is scanline 64 */
 	if (param == 256)
@@ -442,7 +442,7 @@ uint8_t balsente_state::balsente_m6850_r(address_space &space, offs_t offset, ui
 }
 
 
-TIMER_CALLBACK_MEMBER(balsente_state::m6850_data_ready_callback)
+void balsente_state::m6850_data_ready_callback(void *ptr, int32_t param)
 {
 	/* set the output data byte and indicate that we're ready to go */
 	m_m6850_output = param;
@@ -451,7 +451,7 @@ TIMER_CALLBACK_MEMBER(balsente_state::m6850_data_ready_callback)
 }
 
 
-TIMER_CALLBACK_MEMBER(balsente_state::m6850_w_callback)
+void balsente_state::m6850_w_callback(void *ptr, int32_t param)
 {
 	/* indicate that the transmit buffer is no longer empty and update the I/O state */
 	m_m6850_status &= ~0x02;
@@ -536,7 +536,7 @@ void balsente_state::balsente_m6850_sound_w(address_space &space, offs_t offset,
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(balsente_state::balsente_update_analog_inputs)
+void balsente_state::balsente_update_analog_inputs(device_t &device)
 {
 	int i;
 	static const char *const analog[] = { "AN0", "AN1", "AN2", "AN3" };
@@ -550,7 +550,7 @@ INTERRUPT_GEN_MEMBER(balsente_state::balsente_update_analog_inputs)
 }
 
 
-TIMER_CALLBACK_MEMBER(balsente_state::adc_finished)
+void balsente_state::adc_finished(void *ptr, int32_t param)
 {
 	int which = param;
 
@@ -725,7 +725,7 @@ void balsente_state::counter_set_out(int which, int out)
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(balsente_state::balsente_counter_callback)
+void balsente_state::balsente_counter_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	/* reset the counter and the count */
 	m_counter[param].timer_active = 0;
@@ -875,7 +875,7 @@ void balsente_state::set_counter_0_ff(timer_device &timer, int newstate)
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(balsente_state::balsente_clock_counter_0_ff)
+void balsente_state::balsente_clock_counter_0_ff(timer_device &timer, void *ptr, int32_t param)
 {
 	/* clock the D value through the flip-flop */
 	set_counter_0_ff(timer, (m_counter_control >> 3) & 1);

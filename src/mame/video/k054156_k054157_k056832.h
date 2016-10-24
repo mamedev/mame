@@ -178,22 +178,22 @@ private:
 
 	void get_tile_info(  tile_data &tileinfo, int tile_index, int pageIndex );
 
-	TILE_GET_INFO_MEMBER(get_tile_info0);
-	TILE_GET_INFO_MEMBER(get_tile_info1);
-	TILE_GET_INFO_MEMBER(get_tile_info2);
-	TILE_GET_INFO_MEMBER(get_tile_info3);
-	TILE_GET_INFO_MEMBER(get_tile_info4);
-	TILE_GET_INFO_MEMBER(get_tile_info5);
-	TILE_GET_INFO_MEMBER(get_tile_info6);
-	TILE_GET_INFO_MEMBER(get_tile_info7);
-	TILE_GET_INFO_MEMBER(get_tile_info8);
-	TILE_GET_INFO_MEMBER(get_tile_info9);
-	TILE_GET_INFO_MEMBER(get_tile_infoa);
-	TILE_GET_INFO_MEMBER(get_tile_infob);
-	TILE_GET_INFO_MEMBER(get_tile_infoc);
-	TILE_GET_INFO_MEMBER(get_tile_infod);
-	TILE_GET_INFO_MEMBER(get_tile_infoe);
-	TILE_GET_INFO_MEMBER(get_tile_infof);
+	void get_tile_info0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info3(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info4(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info5(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info6(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info7(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info8(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info9(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_infoa(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_infob(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_infoc(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_infod(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_infoe(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_infof(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	void mark_page_dirty(int page);
 	void update_page_layout();

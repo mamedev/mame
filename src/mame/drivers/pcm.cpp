@@ -88,7 +88,7 @@ public:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<cassette_image_device> m_cass;
 	uint8_t pcm_85_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( pcm_82_w );
+	void pcm_82_w(int state);
 	void pcm_85_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t *m_p_chargen;
 	bool m_cone;
@@ -101,7 +101,7 @@ private:
 };
 
 
-WRITE_LINE_MEMBER( pcm_state::pcm_82_w )
+void pcm_state::pcm_82_w(int state)
 {
 	if (state)
 	{

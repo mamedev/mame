@@ -54,13 +54,13 @@ public:
 	void slave_irq4_assert_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void slave_irq5_assert_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void objdma_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	TIMER_CALLBACK_MEMBER(objdma_end_cb);
+	void objdma_end_cb(void *ptr, int32_t param);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_overdriv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	//INTERRUPT_GEN_MEMBER(cpuB_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(overdriv_cpuA_scanline);
+	//void cpuB_interrupt(device_t &device);
+	void overdriv_cpuA_scanline(timer_device &timer, void *ptr, int32_t param);
 	int m_fake_timer;
 
 	K051316_CB_MEMBER(zoom_callback_1);

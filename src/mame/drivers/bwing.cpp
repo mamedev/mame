@@ -36,7 +36,7 @@ Known issues:
 //****************************************************************************
 // Interrupt Handlers
 
-INTERRUPT_GEN_MEMBER(bwing_state::bwp3_interrupt)
+void bwing_state::bwp3_interrupt(device_t &device)
 {
 	if (!m_bwp3_nmimask)
 		device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);

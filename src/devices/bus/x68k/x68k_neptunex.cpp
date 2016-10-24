@@ -142,7 +142,7 @@ void x68k_neptune_device::x68k_neptune_mem_write(address_space &space, offs_t of
 	m_board_ram[offset - (16*1024)] = data;
 }
 
-WRITE_LINE_MEMBER(x68k_neptune_device::x68k_neptune_irq_w)
+void x68k_neptune_device::x68k_neptune_irq_w(int state)
 {
 	machine().device("maincpu")->execute().set_input_line_vector(2, NEPTUNE_IRQ_VECTOR);
 	m_slot->irq2_w(state);

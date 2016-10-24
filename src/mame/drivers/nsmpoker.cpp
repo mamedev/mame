@@ -82,12 +82,12 @@ public:
 	void nsmpoker_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void nsmpoker_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t debug_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(nsmpoker);
+	void palette_init_nsmpoker(palette_device &palette);
 	virtual void machine_reset() override;
 	uint32_t screen_update_nsmpoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(nsmpoker_interrupt);
+	void nsmpoker_interrupt(device_t &device);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 };
@@ -112,7 +112,7 @@ void nsmpoker_state::nsmpoker_colorram_w(address_space &space, offs_t offset, ui
 }
 
 
-TILE_GET_INFO_MEMBER(nsmpoker_state::get_bg_tile_info)
+void nsmpoker_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 /*  - bits -
     7654 3210
@@ -142,7 +142,7 @@ uint32_t nsmpoker_state::screen_update_nsmpoker(screen_device &screen, bitmap_in
 }
 
 
-PALETTE_INIT_MEMBER(nsmpoker_state, nsmpoker)
+void nsmpoker_state::palette_init_nsmpoker(palette_device &palette)
 {
 }
 
@@ -151,7 +151,7 @@ PALETTE_INIT_MEMBER(nsmpoker_state, nsmpoker)
 *  Read / Write Handlers  *
 **************************/
 
-INTERRUPT_GEN_MEMBER(nsmpoker_state::nsmpoker_interrupt)
+void nsmpoker_state::nsmpoker_interrupt(device_t &device)
 {
 	m_maincpu->set_input_line(INT_9995_INT1, ASSERT_LINE);
 	// need to clear the interrupt; maybe right here?

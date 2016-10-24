@@ -34,7 +34,7 @@ public:
 	const uint8_t *m_p_chargen;
 	uint32_t screen_update_vta2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_shared_ptr<uint8_t> m_p_videoram;
-	DECLARE_PALETTE_INIT(vta2000);
+	void palette_init_vta2000(palette_device &palette);
 private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -150,7 +150,7 @@ static GFXDECODE_START( vta2000 )
 	GFXDECODE_ENTRY( "chargen", 0x0000, vta2000_charlayout, 0, 1 )
 GFXDECODE_END
 
-PALETTE_INIT_MEMBER(vta2000_state, vta2000)
+void vta2000_state::palette_init_vta2000(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t::black());
 	palette.set_pen_color(1, 0x00, 0xc0, 0x00); // green

@@ -259,7 +259,7 @@ uint8_t fm7_state::fm7_irq_cause_r(address_space &space, offs_t offset, uint8_t 
 	return ret;
 }
 
-TIMER_CALLBACK_MEMBER(fm7_state::fm7_beeper_off)
+void fm7_state::fm7_beeper_off(void *ptr, int32_t param)
 {
 	m_beeper->set_state(0);
 	logerror("timed beeper off\n");
@@ -420,12 +420,12 @@ void fm7_state::fm7_init_en_w(address_space &space, offs_t offset, uint8_t data,
  *  Main CPU: I/O ports 0xfd18 - 0xfd1f
  *  Floppy Disk Controller (MB8877A)
  */
-WRITE_LINE_MEMBER(fm7_state::fm7_fdc_intrq_w)
+void fm7_state::fm7_fdc_intrq_w(int state)
 {
 	m_fdc_irq_flag = state;
 }
 
-WRITE_LINE_MEMBER(fm7_state::fm7_fdc_drq_w)
+void fm7_state::fm7_fdc_drq_w(int state)
 {
 	m_fdc_drq_flag = state;
 }
@@ -657,7 +657,7 @@ void fm7_state::fm77av_encoder_setup_command()
 	}
 }
 
-TIMER_CALLBACK_MEMBER(fm7_state::fm77av_encoder_ack)
+void fm7_state::fm77av_encoder_ack(void *ptr, int32_t param)
 {
 	m_encoder.ack = 1;
 }
@@ -750,22 +750,22 @@ void fm7_state::fm77av_key_encoder_w(address_space &space, offs_t offset, uint8_
 	}
 }
 
-WRITE_LINE_MEMBER(fm7_state::write_centronics_busy)
+void fm7_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 }
 
-WRITE_LINE_MEMBER(fm7_state::write_centronics_fault)
+void fm7_state::write_centronics_fault(int state)
 {
 	m_centronics_fault = state;
 }
 
-WRITE_LINE_MEMBER(fm7_state::write_centronics_ack)
+void fm7_state::write_centronics_ack(int state)
 {
 	m_centronics_ack = state;
 }
 
-WRITE_LINE_MEMBER(fm7_state::write_centronics_perror)
+void fm7_state::write_centronics_perror(int state)
 {
 	m_centronics_perror = state;
 }
@@ -1251,7 +1251,7 @@ void fm7_state::fm7_kanji_w(address_space &space, offs_t offset, uint8_t data, u
 	}
 }
 
-TIMER_CALLBACK_MEMBER(fm7_state::fm7_timer_irq)
+void fm7_state::fm7_timer_irq(void *ptr, int32_t param)
 {
 	if(m_irq_mask & IRQ_FLAG_TIMER)
 	{
@@ -1259,7 +1259,7 @@ TIMER_CALLBACK_MEMBER(fm7_state::fm7_timer_irq)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(fm7_state::fm7_subtimer_irq)
+void fm7_state::fm7_subtimer_irq(void *ptr, int32_t param)
 {
 	if(m_video.nmi_mask == 0 && m_video.sub_halt == 0)
 		m_sub->set_input_line(INPUT_LINE_NMI,PULSE_LINE);
@@ -1330,7 +1330,7 @@ void fm7_state::fm7_keyboard_poll_scan()
 	m_mod_data = modifiers;
 }
 
-TIMER_CALLBACK_MEMBER(fm7_state::fm7_keyboard_poll)
+void fm7_state::fm7_keyboard_poll(void *ptr, int32_t param)
 {
 	int x,y;
 	int bit = 0;
@@ -1382,20 +1382,20 @@ TIMER_CALLBACK_MEMBER(fm7_state::fm7_keyboard_poll)
 	}
 }
 
-IRQ_CALLBACK_MEMBER(fm7_state::fm7_irq_ack)
+int fm7_state::fm7_irq_ack(device_t &device, int irqline)
 {
 	if(irqline == M6809_FIRQ_LINE)
 		m_maincpu->set_input_line(irqline,CLEAR_LINE);
 	return -1;
 }
 
-IRQ_CALLBACK_MEMBER(fm7_state::fm7_sub_irq_ack)
+int fm7_state::fm7_sub_irq_ack(device_t &device, int irqline)
 {
 	m_sub->set_input_line(irqline,CLEAR_LINE);
 	return -1;
 }
 
-WRITE_LINE_MEMBER(fm7_state::fm77av_fmirq)
+void fm7_state::fm77av_fmirq(int state)
 {
 	if(state == 1)
 	{

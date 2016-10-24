@@ -227,7 +227,7 @@ static GFXDECODE_START( kncljoe )
 GFXDECODE_END
 
 
-INTERRUPT_GEN_MEMBER(kncljoe_state::sound_nmi)
+void kncljoe_state::sound_nmi(device_t &device)
 {
 	device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }

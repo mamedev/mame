@@ -82,10 +82,10 @@
 class hp_hybrid_cpu_device : public cpu_device
 {
 public:
-				DECLARE_WRITE_LINE_MEMBER(dmar_w);
-				DECLARE_WRITE_LINE_MEMBER(halt_w);
-				DECLARE_WRITE_LINE_MEMBER(status_w);
-				DECLARE_WRITE_LINE_MEMBER(flag_w);
+				void dmar_w(int state);
+				void halt_w(int state);
+				void status_w(int state);
+				void flag_w(int state);
 
 		uint8_t pa_r(void) const;
 

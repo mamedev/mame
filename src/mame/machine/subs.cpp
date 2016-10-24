@@ -35,7 +35,7 @@ void subs_state::machine_reset()
 /***************************************************************************
 interrupt
 ***************************************************************************/
-INTERRUPT_GEN_MEMBER(subs_state::interrupt)
+void subs_state::interrupt(device_t &device)
 {
 	/* only do NMI interrupt if not in TEST mode */
 	if ((ioport("IN1")->read() & 0x40)==0x40)

@@ -139,7 +139,7 @@ void stfight_state::device_timer(emu_timer &timer, device_timer_id id, int param
 	}
 }
 
-INTERRUPT_GEN_MEMBER(stfight_state::stfight_vb_interrupt)
+void stfight_state::stfight_vb_interrupt(device_t &device)
 {
 	// Do a RST10
 	device.execute().set_input_line_and_vector(0, HOLD_LINE, 0xcf);
@@ -176,7 +176,7 @@ void stfight_state::stfight_coin_w(address_space &space, offs_t offset, uint8_t 
  *      Machine hardware for MSM5205 ADPCM sound control
  */
 
-WRITE_LINE_MEMBER(stfight_state::stfight_adpcm_int)
+void stfight_state::stfight_adpcm_int(int state)
 {
 	static int m_vck2 = 0;
 

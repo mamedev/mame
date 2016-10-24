@@ -84,9 +84,9 @@ public:
 	void video_start_moo();
 	void video_start_bucky();
 	uint32_t screen_update_moo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(moo_interrupt);
-	INTERRUPT_GEN_MEMBER(moobl_interrupt);
-	TIMER_CALLBACK_MEMBER(dmaend_callback);
+	void moo_interrupt(device_t &device);
+	void moobl_interrupt(device_t &device);
+	void dmaend_callback(void *ptr, int32_t param);
 	void moo_objdma();
 	K056832_CB_MEMBER(tile_callback);
 	K053246_CB_MEMBER(sprite_callback);

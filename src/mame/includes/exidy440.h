@@ -83,10 +83,10 @@ public:
 	void update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect,  int scroll_offset, int check_collision);
 	uint32_t screen_update_exidy440(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_topsecex(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(exidy440_vblank_interrupt);
-	TIMER_CALLBACK_MEMBER(delayed_sound_command_w);
-	TIMER_CALLBACK_MEMBER(beam_firq_callback);
-	TIMER_CALLBACK_MEMBER(collide_firq_callback);
+	void exidy440_vblank_interrupt(device_t &device);
+	void delayed_sound_command_w(void *ptr, int32_t param);
+	void beam_firq_callback(void *ptr, int32_t param);
+	void collide_firq_callback(void *ptr, int32_t param);
 	void exidy440_update_firq();
 	void exidy440_bank_select(uint8_t bank);
 };

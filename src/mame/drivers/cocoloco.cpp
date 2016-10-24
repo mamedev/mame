@@ -225,7 +225,7 @@ public:
 	void init_cocob();
 
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(cocoloco);
+	void palette_init_cocoloco(palette_device &palette);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
@@ -281,7 +281,7 @@ NETLIST_END()
 *          Video Hardware          *
 ***********************************/
 
-PALETTE_INIT_MEMBER(cocoloco_state, cocoloco)
+void cocoloco_state::palette_init_cocoloco(palette_device &palette)
 {
 	for(int i = 0; i < 0x10; i += 2)
 	{

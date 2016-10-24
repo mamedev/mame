@@ -187,7 +187,7 @@ uint16_t rx01_device::data_read()
 	return m_rxdb;
 }
 
-TIMER_CALLBACK_MEMBER(rx01_device::service_command)
+void rx01_device::service_command(void *ptr, int32_t param)
 {
 	printf("service_command %d\n",m_state);
 	m_rxes |= m_image[m_unit]->floppy_drive_get_flag_state(FLOPPY_DRIVE_READY) << 7;

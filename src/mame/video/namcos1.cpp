@@ -62,32 +62,32 @@ inline void namcos1_state::get_tile_info(tile_data &tileinfo,int tile_index,uint
 	tileinfo.mask_data = &m_tilemap_maskdata[code << 3];
 }
 
-TILE_GET_INFO_MEMBER(namcos1_state::bg_get_info0)
+void namcos1_state::bg_get_info0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	get_tile_info(tileinfo,tile_index,&m_videoram[0x0000]);
 }
 
-TILE_GET_INFO_MEMBER(namcos1_state::bg_get_info1)
+void namcos1_state::bg_get_info1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	get_tile_info(tileinfo,tile_index,&m_videoram[0x2000]);
 }
 
-TILE_GET_INFO_MEMBER(namcos1_state::bg_get_info2)
+void namcos1_state::bg_get_info2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	get_tile_info(tileinfo,tile_index,&m_videoram[0x4000]);
 }
 
-TILE_GET_INFO_MEMBER(namcos1_state::bg_get_info3)
+void namcos1_state::bg_get_info3(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	get_tile_info(tileinfo,tile_index,&m_videoram[0x6000]);
 }
 
-TILE_GET_INFO_MEMBER(namcos1_state::fg_get_info4)
+void namcos1_state::fg_get_info4(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	get_tile_info(tileinfo,tile_index,&m_videoram[0x7010]);
 }
 
-TILE_GET_INFO_MEMBER(namcos1_state::fg_get_info5)
+void namcos1_state::fg_get_info5(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	get_tile_info(tileinfo,tile_index,&m_videoram[0x7810]);
 }

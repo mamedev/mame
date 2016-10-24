@@ -449,8 +449,8 @@ public:
 	uint8_t upd765_tc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void fdc_irq_vector_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void fdc_drive_mode_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(txdata_callback);
-	DECLARE_WRITE_LINE_MEMBER(rxrdy_w);
+	void txdata_callback(int state);
+	void rxrdy_w(int state);
 	uint8_t pc8801_sound_board_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void pc8801_sound_board_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t pc8801_opna_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
@@ -469,7 +469,7 @@ public:
 	void draw_text(bitmap_ind16 &bitmap,int y_size, uint8_t width);
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_PALETTE_INIT(pc8801);
+	void palette_init_pc8801(palette_device &palette);
 protected:
 
 	virtual void video_start() override;
@@ -479,17 +479,17 @@ public:
 	void machine_reset_pc8801_clock_speed();
 	void machine_reset_pc8801_dic();
 	void machine_reset_pc8801_cdrom();
-	INTERRUPT_GEN_MEMBER(pc8801_vrtc_irq);
-	TIMER_CALLBACK_MEMBER(pc8801fd_upd765_tc_to_zero);
-	TIMER_DEVICE_CALLBACK_MEMBER(pc8801_rtc_irq);
+	void pc8801_vrtc_irq(device_t &device);
+	void pc8801fd_upd765_tc_to_zero(void *ptr, int32_t param);
+	void pc8801_rtc_irq(timer_device &timer, void *ptr, int32_t param);
 	uint8_t cpu_8255_c_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void cpu_8255_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t fdc_8255_c_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void fdc_8255_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t opn_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t opn_portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	IRQ_CALLBACK_MEMBER(pc8801_irq_callback);
-	DECLARE_WRITE_LINE_MEMBER(pc8801_sound_irq);
+	int pc8801_irq_callback(device_t &device, int irqline);
+	void pc8801_sound_irq(int state);
 };
 
 
@@ -1863,7 +1863,7 @@ static ADDRESS_MAP_START( pc8801fdc_mem, AS_PROGRAM, 8, pc8801_state )
 	AM_RANGE(0x4000, 0x7fff) AM_RAM
 ADDRESS_MAP_END
 
-TIMER_CALLBACK_MEMBER(pc8801_state::pc8801fd_upd765_tc_to_zero)
+void pc8801_state::pc8801fd_upd765_tc_to_zero(void *ptr, int32_t param)
 {
 	//printf("0\n");
 	machine().device<upd765a_device>("upd765")->tc_w(false);
@@ -2266,7 +2266,7 @@ void pc8801_state::pc8801_raise_irq(uint8_t irq,uint8_t state)
 	}
 }
 
-WRITE_LINE_MEMBER(pc8801_state::pic_int_w)
+void pc8801_state::pic_int_w(int state)
 {
 	device_t *device = m_maincpu;
 //  if (state == ASSERT_LINE)
@@ -2274,7 +2274,7 @@ WRITE_LINE_MEMBER(pc8801_state::pic_int_w)
 //  }
 }
 
-WRITE_LINE_MEMBER(pc8801_state::pic_enlg_w)
+void pc8801_state::pic_enlg_w(int state)
 {
 	device_t *device = m_maincpu;
 	//if (state == CLEAR_LINE)
@@ -2288,7 +2288,7 @@ static I8214_INTERFACE( pic_intf )
 	DEVCB_DRIVER_LINE_MEMBER(pc8801_state,pic_enlg_w)
 };
 
-IRQ_CALLBACK_MEMBER(pc8801_state::pc8801_irq_callback)
+int pc8801_state::pc8801_irq_callback(device_t &device, int irqline)
 {
 	uint8_t vector = (7 - m_pic->a_r());
 
@@ -2298,21 +2298,21 @@ IRQ_CALLBACK_MEMBER(pc8801_state::pc8801_irq_callback)
 	return vector << 1;
 }
 
-WRITE_LINE_MEMBER(pc8801_state::pc8801_sound_irq)
+void pc8801_state::pc8801_sound_irq(int state)
 {
 	if(m_sound_irq_mask && state)
 		pc8801_raise_irq(machine(),1<<(4),1);
 }
 
 /*
-TIMER_DEVICE_CALLBACK_MEMBER(pc8801_state::pc8801_rtc_irq)
+void pc8801_state::pc8801_rtc_irq(timer_device &timer, void *ptr, int32_t param)
 {
     if(m_timer_irq_mask)
         pc8801_raise_irq(machine(),1<<(2),1);
 }
 */
 
-INTERRUPT_GEN_MEMBER(pc8801_state::pc8801_vrtc_irq)
+void pc8801_state::pc8801_vrtc_irq(device_t &device)
 {
 	if(m_vblank_irq_mask)
 		pc8801_raise_irq(machine(),1<<(1),1);
@@ -2322,7 +2322,7 @@ INTERRUPT_GEN_MEMBER(pc8801_state::pc8801_vrtc_irq)
 
 #include "debugger.h"
 
-IRQ_CALLBACK_MEMBER(pc8801_state::pc8801_irq_callback)
+int pc8801_state::pc8801_irq_callback(device_t &device, int irqline)
 {
 	if(m_sound_irq_latch)
 	{
@@ -2346,7 +2346,7 @@ IRQ_CALLBACK_MEMBER(pc8801_state::pc8801_irq_callback)
 	return 4*2; //TODO: mustn't happen
 }
 
-WRITE_LINE_MEMBER(pc8801_state::pc8801_sound_irq)
+void pc8801_state::pc8801_sound_irq(int state)
 {
 //  printf("%02x %02x %02x\n",m_sound_irq_mask,m_i8214_irq_level,state);
 	/* TODO: correct i8214 irq level? */
@@ -2364,7 +2364,7 @@ WRITE_LINE_MEMBER(pc8801_state::pc8801_sound_irq)
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(pc8801_state::pc8801_rtc_irq)
+void pc8801_state::pc8801_rtc_irq(timer_device &timer, void *ptr, int32_t param)
 {
 	if(m_timer_irq_mask && m_i8214_irq_level >= 3)
 	{
@@ -2374,7 +2374,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(pc8801_state::pc8801_rtc_irq)
 	}
 }
 
-INTERRUPT_GEN_MEMBER(pc8801_state::pc8801_vrtc_irq)
+void pc8801_state::pc8801_vrtc_irq(device_t &device)
 {
 	if(m_vrtc_irq_mask && m_i8214_irq_level >= 2)
 	{
@@ -2525,7 +2525,7 @@ void pc8801_state::machine_reset_pc8801_cdrom()
 	}
 }
 
-PALETTE_INIT_MEMBER(pc8801_state, pc8801)
+void pc8801_state::palette_init_pc8801(palette_device &palette)
 {
 	int i;
 
@@ -2554,12 +2554,12 @@ uint8_t pc8801_state::opn_porta_r(address_space &space, offs_t offset, uint8_t m
 uint8_t pc8801_state::opn_portb_r(address_space &space, offs_t offset, uint8_t mem_mask){ return ioport("OPN_PB")->read(); }
 
 /* Cassette Configuration */
-WRITE_LINE_MEMBER( pc8801_state::txdata_callback )
+void pc8801_state::txdata_callback(int state)
 {
 	//m_cass->output( (state) ? 0.8 : -0.8);
 }
 
-WRITE_LINE_MEMBER( pc8801_state::rxrdy_w )
+void pc8801_state::rxrdy_w(int state)
 {
 	// ...
 }

@@ -35,5 +35,5 @@ public:
 	void machine_start_tutankhm();
 	void machine_reset_tutankhm();
 	uint32_t screen_update_tutankhm(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(tutankhm_interrupt);
+	void tutankhm_interrupt(device_t &device);
 };

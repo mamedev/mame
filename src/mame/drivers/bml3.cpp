@@ -98,13 +98,13 @@ public:
 	void bml3_firq_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t bml3_firq_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void relay_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(bml3bus_nmi_w);
-	DECLARE_WRITE_LINE_MEMBER(bml3bus_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(bml3bus_firq_w);
-	DECLARE_WRITE_LINE_MEMBER(bml3_acia_tx_w);
-	DECLARE_WRITE_LINE_MEMBER(bml3_acia_rts_w);
-	DECLARE_WRITE_LINE_MEMBER(bml3_acia_irq_w);
-	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
+	void bml3bus_nmi_w(int state);
+	void bml3bus_irq_w(int state);
+	void bml3bus_firq_w(int state);
+	void bml3_acia_tx_w(int state);
+	void bml3_acia_rts_w(int state);
+	void bml3_acia_irq_w(int state);
+	void write_acia_clock(int state);
 
 	uint8_t bml3_a000_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff); void bml3_a000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t bml3_c000_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff); void bml3_c000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -118,11 +118,11 @@ public:
 	uint8_t *m_p_chargen;
 	uint8_t m_hres_reg;
 	uint8_t m_crtc_vreg[0x100];
-	// INTERRUPT_GEN_MEMBER(bml3_irq);
-	INTERRUPT_GEN_MEMBER(bml3_timer_firq);
-	TIMER_DEVICE_CALLBACK_MEMBER(bml3_c);
-	TIMER_DEVICE_CALLBACK_MEMBER(bml3_p);
-	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
+	// void bml3_irq(device_t &device);
+	void bml3_timer_firq(device_t &device);
+	void bml3_c(timer_device &timer, void *ptr, int32_t param);
+	void bml3_p(timer_device &timer, void *ptr, int32_t param);
+	void keyboard_callback(timer_device &timer, void *ptr, int32_t param);
 	uint8_t bml3_ym2203_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void bml3_ym2203_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
@@ -372,17 +372,17 @@ uint8_t bml3_state::bml3_firq_status_r(address_space &space, offs_t offset, uint
 	return res;
 }
 
-WRITE_LINE_MEMBER(bml3_state::bml3bus_nmi_w)
+void bml3_state::bml3bus_nmi_w(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, state);
 }
 
-WRITE_LINE_MEMBER(bml3_state::bml3bus_irq_w)
+void bml3_state::bml3bus_irq_w(int state)
 {
 	m_maincpu->set_input_line(M6809_IRQ_LINE, state);
 }
 
-WRITE_LINE_MEMBER(bml3_state::bml3bus_firq_w)
+void bml3_state::bml3bus_firq_w(int state)
 {
 	m_maincpu->set_input_line(M6809_FIRQ_LINE, state);
 }
@@ -681,7 +681,7 @@ MC6845_UPDATE_ROW( bml3_state::crtc_update_row )
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(bml3_state::keyboard_callback)
+void bml3_state::keyboard_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	static const char *const portnames[3] = { "key1","key2","key3" };
 	int i,port_i,trigger = 0;
@@ -729,7 +729,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(bml3_state::keyboard_callback)
 	}
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( bml3_state::bml3_p )
+void bml3_state::bml3_p(timer_device &timer, void *ptr, int32_t param)
 {
 	/* cassette - turn 1200/2400Hz to a bit */
 	m_cass_data[1]++;
@@ -744,14 +744,14 @@ TIMER_DEVICE_CALLBACK_MEMBER( bml3_state::bml3_p )
 }
 
 #if 0
-INTERRUPT_GEN_MEMBER(bml3_state::bml3_irq)
+void bml3_state::bml3_irq(device_t &device)
 {
 	m_maincpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 }
 #endif
 
 
-INTERRUPT_GEN_MEMBER(bml3_state::bml3_timer_firq)
+void bml3_state::bml3_timer_firq(device_t &device)
 {
 	if(!m_firq_mask)
 	{
@@ -901,30 +901,30 @@ void bml3_state::bml3_piaA_w(address_space &space, offs_t offset, uint8_t data, 
 	}
 }
 
-WRITE_LINE_MEMBER( bml3_state::bml3_acia_tx_w )
+void bml3_state::bml3_acia_tx_w(int state)
 {
 	//logerror("%02x TAPE\n",state);
 	m_cassbit = state;
 }
 
 
-WRITE_LINE_MEMBER( bml3_state::bml3_acia_rts_w )
+void bml3_state::bml3_acia_rts_w(int state)
 {
 	logerror("%02x TAPE RTS\n",state);
 }
 
-WRITE_LINE_MEMBER( bml3_state::bml3_acia_irq_w )
+void bml3_state::bml3_acia_irq_w(int state)
 {
 	logerror("%02x TAPE IRQ\n",state);
 }
 
-WRITE_LINE_MEMBER( bml3_state::write_acia_clock )
+void bml3_state::write_acia_clock(int state)
 {
 	m_acia6850->write_txc(state);
 	m_acia6850->write_rxc(state);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( bml3_state::bml3_c )
+void bml3_state::bml3_c(timer_device &timer, void *ptr, int32_t param)
 {
 	m_cass_data[3]++;
 

@@ -83,9 +83,9 @@ public:
 	tilemap_t   *m_tilemap2;
 	tilemap_t   *m_tilemap3;
 
-	TILE_GET_INFO_MEMBER(get_tile1_info);
-	TILE_GET_INFO_MEMBER(get_tile2_info);
-	TILE_GET_INFO_MEMBER(get_tile3_info);
+	void get_tile1_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile2_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile3_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	int       m_oki_bank;
 	uint16_t  m_gfx_control;
@@ -102,7 +102,7 @@ protected:
 
 
 
-TILE_GET_INFO_MEMBER(_3x3puzzle_state::get_tile1_info)
+void _3x3puzzle_state::get_tile1_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = m_videoram1_buffer[tile_index];
 	SET_TILE_INFO_MEMBER(0,
@@ -111,7 +111,7 @@ TILE_GET_INFO_MEMBER(_3x3puzzle_state::get_tile1_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(_3x3puzzle_state::get_tile2_info)
+void _3x3puzzle_state::get_tile2_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = m_videoram2_buffer[tile_index];
 	SET_TILE_INFO_MEMBER(1,
@@ -120,7 +120,7 @@ TILE_GET_INFO_MEMBER(_3x3puzzle_state::get_tile2_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(_3x3puzzle_state::get_tile3_info)
+void _3x3puzzle_state::get_tile3_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t code = m_videoram3_buffer[tile_index];
 	SET_TILE_INFO_MEMBER(2,

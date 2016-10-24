@@ -33,7 +33,7 @@ public:
 	required_device<bus_master_ide_controller_device> m_ide;
 	required_device<bus_master_ide_controller_device> m_ide2;
 	virtual DECLARE_ADDRESS_MAP(config_map, 32) override;
-	DECLARE_WRITE_LINE_MEMBER(ide_interrupt);
+	void ide_interrupt(int state);
 	uint32_t ide_read_cs1(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	void ide_write_cs1(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	uint32_t ide2_read_cs1(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);

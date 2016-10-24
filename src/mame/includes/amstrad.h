@@ -214,42 +214,42 @@ public:
 	void machine_start_amstrad();
 	void machine_reset_amstrad();
 	void video_start_amstrad();
-	DECLARE_PALETTE_INIT(amstrad_cpc);
-	DECLARE_PALETTE_INIT(amstrad_cpc_green);
+	void palette_init_amstrad_cpc(palette_device &palette);
+	void palette_init_amstrad_cpc_green(palette_device &palette);
 	void machine_start_plus();
 	void machine_reset_plus();
-	DECLARE_PALETTE_INIT(amstrad_plus);
+	void palette_init_amstrad_plus(palette_device &palette);
 	void machine_start_gx4000();
 	void machine_reset_gx4000();
 	void machine_start_kccomp();
 	void machine_reset_kccomp();
-	DECLARE_PALETTE_INIT(kccomp);
+	void palette_init_kccomp(palette_device &palette);
 	void machine_start_aleste();
 	void machine_reset_aleste();
-	DECLARE_PALETTE_INIT(aleste);
+	void palette_init_aleste(palette_device &palette);
 	uint32_t screen_update_amstrad(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_amstrad(screen_device &screen, bool state);
 	DECLARE_INPUT_CHANGED_MEMBER(cpc_monitor_changed);
-	TIMER_CALLBACK_MEMBER(amstrad_pc2_low);
-	TIMER_CALLBACK_MEMBER(amstrad_video_update_timer);
-	TIMER_CALLBACK_MEMBER(cb_set_resolution);
-	DECLARE_WRITE_LINE_MEMBER(amstrad_hsync_changed);
-	DECLARE_WRITE_LINE_MEMBER(amstrad_plus_hsync_changed);
-	DECLARE_WRITE_LINE_MEMBER(amstrad_vsync_changed);
-	DECLARE_WRITE_LINE_MEMBER(amstrad_plus_vsync_changed);
-	DECLARE_WRITE_LINE_MEMBER(amstrad_de_changed);
-	DECLARE_WRITE_LINE_MEMBER(amstrad_plus_de_changed);
+	void amstrad_pc2_low(void *ptr, int32_t param);
+	void amstrad_video_update_timer(void *ptr, int32_t param);
+	void cb_set_resolution(void *ptr, int32_t param);
+	void amstrad_hsync_changed(int state);
+	void amstrad_plus_hsync_changed(int state);
+	void amstrad_vsync_changed(int state);
+	void amstrad_plus_vsync_changed(int state);
+	void amstrad_de_changed(int state);
+	void amstrad_plus_de_changed(int state);
 	uint8_t amstrad_ppi_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void amstrad_ppi_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t amstrad_ppi_portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void amstrad_ppi_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( cpc_romdis );
+	void cpc_romdis(int state);
 	void rom_select(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	DECLARE_FLOPPY_FORMATS( aleste_floppy_formats );
 
-	IRQ_CALLBACK_MEMBER(amstrad_cpu_acknowledge_int);
+	int amstrad_cpu_acknowledge_int(device_t &device, int irqline);
 
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( amstrad_plus_cartridge );
 
@@ -257,7 +257,7 @@ public:
 	void amstrad_rethinkMemory();
 	DECLARE_SNAPSHOT_LOAD_MEMBER( amstrad );
 
-	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
+	void write_centronics_busy(int state);
 
 protected:
 	required_memory_region m_region_maincpu;

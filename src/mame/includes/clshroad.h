@@ -31,19 +31,19 @@ public:
 	void vram_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void vram_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	TILE_GET_INFO_MEMBER(get_tile_info_0a);
-	TILE_GET_INFO_MEMBER(get_tile_info_0b);
-	TILEMAP_MAPPER_MEMBER(tilemap_scan_rows_extra);
-	TILE_GET_INFO_MEMBER(get_tile_info_fb1);
-	TILE_GET_INFO_MEMBER(get_tile_info_1);
+	void get_tile_info_0a(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info_0b(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	tilemap_memory_index tilemap_scan_rows_extra(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	void get_tile_info_fb1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info_1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 
 	void init_firebatl();
 	virtual void machine_reset() override;
 	void video_start_firebatl();
-	DECLARE_PALETTE_INIT(firebatl);
+	void palette_init_firebatl(palette_device &palette);
 	void video_start_clshroad();
-	DECLARE_PALETTE_INIT(clshroad);
+	void palette_init_clshroad(palette_device &palette);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

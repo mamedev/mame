@@ -62,16 +62,16 @@ public:
 	void ioc_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	uint16_t gcpinbal_tilemaps_word_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void gcpinbal_tilemaps_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	TILE_GET_INFO_MEMBER(get_bg0_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	void get_bg0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_gcpinbal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(gcpinbal_interrupt);
+	void gcpinbal_interrupt(device_t &device);
 	void gcpinbal_core_vh_start(  );
-	DECLARE_WRITE_LINE_MEMBER(gcp_adpcm_int);
+	void gcp_adpcm_int(int state);
 	required_device<excellent_spr_device> m_sprgen;
 
 protected:

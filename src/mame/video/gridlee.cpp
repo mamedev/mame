@@ -20,7 +20,7 @@
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(gridlee_state, gridlee)
+void gridlee_state::palette_init_gridlee(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;

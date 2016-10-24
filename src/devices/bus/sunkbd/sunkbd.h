@@ -31,9 +31,9 @@ public:
 	// static configuration helpers
 	template <class Object> static devcb_base &set_rxd_handler(device_t &device, Object object) { return downcast<sun_keyboard_port_device &>(device).m_rxd_handler.set_callback(object); }
 
-	DECLARE_WRITE_LINE_MEMBER( write_txd );
+	void write_txd(int state);
 
-	DECLARE_READ_LINE_MEMBER( rxd_r ) { return m_rxd; }
+	int rxd_r() { return m_rxd; }
 
 protected:
 	virtual void device_start() override;
@@ -56,9 +56,9 @@ public:
 	device_sun_keyboard_port_interface(machine_config const &mconfig, device_t &device);
 	virtual ~device_sun_keyboard_port_interface() override;
 
-	virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) { }
+	virtual void input_txd(int state) { }
 
-	DECLARE_WRITE_LINE_MEMBER( output_rxd ) { m_port->m_rxd = state; m_port->m_rxd_handler(state); }
+	void output_rxd(int state) { m_port->m_rxd = state; m_port->m_rxd_handler(state); }
 
 protected:
 	sun_keyboard_port_device *m_port;

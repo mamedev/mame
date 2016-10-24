@@ -28,7 +28,7 @@
 
 #define ATAPI_CYCLES_PER_SECTOR (5000)  // TBD for Dreamcast
 
-WRITE_LINE_MEMBER(dc_cons_state::ata_interrupt)
+void dc_cons_state::ata_interrupt(int state)
 {
 	if (state)
 		dc_sysctrl_regs[SB_ISTEXT] |= IST_EXT_GDROM;
@@ -38,7 +38,7 @@ WRITE_LINE_MEMBER(dc_cons_state::ata_interrupt)
 	dc_update_interrupt_status();
 }
 
-TIMER_CALLBACK_MEMBER(dc_cons_state::atapi_xfer_end )
+void dc_cons_state::atapi_xfer_end(void *ptr, int32_t param)
 {
 	uint8_t sector_buffer[ 4096 ];
 

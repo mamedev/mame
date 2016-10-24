@@ -44,7 +44,7 @@ public:
 	template<class _Object> static devcb_base &set_intl_handler(device_t &device, _Object object) { return downcast<mb8421_device &>(device).m_intl_handler.set_callback(object); }
 	template<class _Object> static devcb_base &set_intr_handler(device_t &device, _Object object) { return downcast<mb8421_device &>(device).m_intr_handler.set_callback(object); }
 
-	DECLARE_READ_LINE_MEMBER( busy_r ) { return 0; } // _BUSY pin - not emulated
+	int busy_r() { return 0; } // _BUSY pin - not emulated
 	uint8_t peek(offs_t offset) { return m_ram[offset & 0x7ff]; }
 
 	void left_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);

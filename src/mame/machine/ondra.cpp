@@ -80,7 +80,7 @@ void ondra_state::ondra_port_0a_w(address_space &space, offs_t offset, uint8_t d
 {
 }
 
-TIMER_CALLBACK_MEMBER(ondra_state::nmi_check_callback)
+void ondra_state::nmi_check_callback(void *ptr, int32_t param)
 {
 	if ((m_nmi->read() & 1) == 1)
 	{

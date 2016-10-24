@@ -91,9 +91,9 @@ public:
 	void init_lgp();
 	virtual void machine_start() override;
 	uint32_t screen_update_lgp(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vblank_callback_lgp);
-	DECLARE_WRITE_LINE_MEMBER(ld_command_strobe_cb);
-	DECLARE_PALETTE_INIT(lgp);
+	void vblank_callback_lgp(device_t &device);
+	void ld_command_strobe_cb(int state);
+	void palette_init_lgp(palette_device &palette);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -341,7 +341,7 @@ static GFXDECODE_START( lgp )
 	GFXDECODE_ENTRY("gfx4", 0, lgp_gfx_layout_16x32, 0x0, 0x100)
 GFXDECODE_END
 
-INTERRUPT_GEN_MEMBER(lgp_state::vblank_callback_lgp)
+void lgp_state::vblank_callback_lgp(device_t &device)
 {
 	// NMI
 	//device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -355,12 +355,12 @@ void lgp_state::machine_start()
 {
 }
 
-WRITE_LINE_MEMBER(lgp_state::ld_command_strobe_cb)
+void lgp_state::ld_command_strobe_cb(int state)
 {
 	//m_maincpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-PALETTE_INIT_MEMBER(lgp_state, lgp)
+void lgp_state::palette_init_lgp(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;

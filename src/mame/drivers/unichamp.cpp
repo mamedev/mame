@@ -62,7 +62,7 @@ public:
 	void init_unichamp();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(unichamp);
+	void palette_init_unichamp(palette_device &palette);
 
 	uint8_t bext_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
@@ -79,7 +79,7 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
-PALETTE_INIT_MEMBER(unichamp_state, unichamp)
+void unichamp_state::palette_init_unichamp(palette_device &palette)
 {
 	/*
 	palette.set_pen_color(GIC_BLACK, rgb_t(0x00, 0x00, 0x00));

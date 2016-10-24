@@ -91,11 +91,11 @@ public:
 	uint8_t bking_pos_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void unk_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	TILE_GET_INFO_MEMBER(get_tile_info);
+	void get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(bking);
+	void palette_init_bking(palette_device &palette);
 	void machine_start_bking3();
 	void machine_reset_bking3();
 	void machine_reset_common();

@@ -78,7 +78,7 @@ public:
 	required_device<hd44780_device> m_lcdc;
 	optional_device<cassette_image_device> m_cassette;
 
-	DECLARE_PALETTE_INIT(alesis);
+	void palette_init_alesis(palette_device &palette);
 	virtual void machine_reset() override;
 
 	void update_lcd_symbols(bitmap_ind16 &bitmap, uint8_t pos, uint8_t y, uint8_t x, int state);

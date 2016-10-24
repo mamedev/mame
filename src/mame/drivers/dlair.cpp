@@ -126,9 +126,9 @@ public:
 	void init_variable();
 	void machine_start_dlair();
 	void machine_reset_dlair();
-	DECLARE_PALETTE_INIT(dleuro);
+	void palette_init_dleuro(palette_device &palette);
 	uint32_t screen_update_dleuro(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(write_speaker);
+	void write_speaker(int state);
 };
 
 
@@ -164,7 +164,7 @@ static const uint8_t led_map[16] =
  *
  *************************************/
 
-WRITE_LINE_MEMBER(dlair_state::write_speaker)
+void dlair_state::write_speaker(int state)
 {
 	m_speaker->level_w(state);
 }
@@ -185,7 +185,7 @@ static const z80_daisy_config dleuro_daisy_chain[] =
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(dlair_state,dleuro)
+void dlair_state::palette_init_dleuro(palette_device &palette)
 {
 	int i;
 

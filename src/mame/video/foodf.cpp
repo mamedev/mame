@@ -17,7 +17,7 @@
  *
  *************************************/
 
-TILE_GET_INFO_MEMBER(foodf_state::get_playfield_tile_info)
+void foodf_state::get_playfield_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint16_t data = tilemap.basemem_read(tile_index);
 	int code = (data & 0xff) | ((data >> 7) & 0x100);

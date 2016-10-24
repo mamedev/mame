@@ -217,33 +217,33 @@ public:
 
 	int m_optic_pattern;
 
-	DECLARE_WRITE_LINE_MEMBER(reel0_optic_cb) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
-	DECLARE_WRITE_LINE_MEMBER(reel1_optic_cb) { if (state) m_optic_pattern |= 0x02; else m_optic_pattern &= ~0x02; }
-	DECLARE_WRITE_LINE_MEMBER(reel2_optic_cb) { if (state) m_optic_pattern |= 0x04; else m_optic_pattern &= ~0x04; }
-	DECLARE_WRITE_LINE_MEMBER(reel3_optic_cb) { if (state) m_optic_pattern |= 0x08; else m_optic_pattern &= ~0x08; }
+	void reel0_optic_cb(int state) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
+	void reel1_optic_cb(int state) { if (state) m_optic_pattern |= 0x02; else m_optic_pattern &= ~0x02; }
+	void reel2_optic_cb(int state) { if (state) m_optic_pattern |= 0x04; else m_optic_pattern &= ~0x04; }
+	void reel3_optic_cb(int state) { if (state) m_optic_pattern |= 0x08; else m_optic_pattern &= ~0x08; }
 
 	emu_timer *m_ic21_timer;
 	void characteriser_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t characteriser_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void mpu3ptm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t mpu3ptm_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(cpu0_irq);
-	DECLARE_WRITE_LINE_MEMBER(ic2_o1_callback);
-	DECLARE_WRITE_LINE_MEMBER(ic2_o2_callback);
-	DECLARE_WRITE_LINE_MEMBER(ic2_o3_callback);
+	void cpu0_irq(int state);
+	void ic2_o1_callback(int state);
+	void ic2_o2_callback(int state);
+	void ic2_o3_callback(int state);
 	uint8_t pia_ic3_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void pia_ic3_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(pia_ic3_ca2_w);
+	void pia_ic3_ca2_w(int state);
 	uint8_t pia_ic4_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void pia_ic4_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void pia_ic4_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(pia_ic4_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia_ic4_cb2_w);
+	void pia_ic4_ca2_w(int state);
+	void pia_ic4_cb2_w(int state);
 	void pia_ic5_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t pia_ic5_portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void pia_ic5_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(pia_ic5_ca2_w);
-	DECLARE_WRITE_LINE_MEMBER(pia_ic5_cb2_w);
+	void pia_ic5_ca2_w(int state);
+	void pia_ic5_cb2_w(int state);
 	uint8_t pia_ic6_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t pia_ic6_portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void pia_ic6_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -251,9 +251,9 @@ public:
 	void init_m3hprvpr();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	TIMER_CALLBACK_MEMBER(ic21_timeout);
-	TIMER_DEVICE_CALLBACK_MEMBER(gen_50hz);
-	TIMER_DEVICE_CALLBACK_MEMBER(ic10_callback);
+	void ic21_timeout(void *ptr, int32_t param);
+	void gen_50hz(timer_device &timer, void *ptr, int32_t param);
+	void ic10_callback(timer_device &timer, void *ptr, int32_t param);
 	void update_triacs();
 	void ic11_update();
 	void ic21_output(int data);
@@ -302,7 +302,7 @@ void mpu3_state::machine_reset()
 }
 
 /* 6808 IRQ handler */
-WRITE_LINE_MEMBER(mpu3_state::cpu0_irq)
+void mpu3_state::cpu0_irq(int state)
 {
 	pia6821_device *pia3 = machine().device<pia6821_device>("pia_ic3");
 	pia6821_device *pia4 = machine().device<pia6821_device>("pia_ic4");
@@ -323,17 +323,17 @@ WRITE_LINE_MEMBER(mpu3_state::cpu0_irq)
 
 
 /* IC2 6840 PTM handler probably clocked from elsewhere*/
-WRITE_LINE_MEMBER(mpu3_state::ic2_o1_callback)
+void mpu3_state::ic2_o1_callback(int state)
 {
 }
 
 //FIXME FROM HERE
-WRITE_LINE_MEMBER(mpu3_state::ic2_o2_callback)
+void mpu3_state::ic2_o2_callback(int state)
 {
 }
 
 
-WRITE_LINE_MEMBER(mpu3_state::ic2_o3_callback)
+void mpu3_state::ic2_o3_callback(int state)
 {
 }
 
@@ -408,7 +408,7 @@ void mpu3_state::ic21_setup()
 	}
 }
 
-TIMER_CALLBACK_MEMBER(mpu3_state::ic21_timeout)
+void mpu3_state::ic21_timeout(void *ptr, int32_t param)
 {
 	m_ic11_active=0;
 	ic21_output(0);
@@ -464,7 +464,7 @@ void mpu3_state::pia_ic3_portb_w(address_space &space, offs_t offset, uint8_t da
 }
 
 
-WRITE_LINE_MEMBER(mpu3_state::pia_ic3_ca2_w)
+void mpu3_state::pia_ic3_ca2_w(int state)
 {
 	LOG(("%s: IC3 PIA Port CA2 Set to %2x (input A)\n", machine().describe_context(),state));
 	m_IC11GA = state;
@@ -541,14 +541,14 @@ void mpu3_state::pia_ic4_portb_w(address_space &space, offs_t offset, uint8_t da
 	}
 }
 
-WRITE_LINE_MEMBER(mpu3_state::pia_ic4_ca2_w)
+void mpu3_state::pia_ic4_ca2_w(int state)
 {
 	LOG(("%s: IC4 PIA Port CA2 Set to %2x (Input B)\n", machine().describe_context(),state));
 	m_IC11GB = state;
 	ic11_update();
 }
 
-WRITE_LINE_MEMBER(mpu3_state::pia_ic4_cb2_w)
+void mpu3_state::pia_ic4_cb2_w(int state)
 {
 	LOG(("%s: IC4 PIA Port CA2 Set to %2x (Triac)\n", machine().describe_context(),state));
 	m_triac_ic4=state;
@@ -587,14 +587,14 @@ void mpu3_state::pia_ic5_portb_w(address_space &space, offs_t offset, uint8_t da
 	m_ic3_data = data;
 }
 
-WRITE_LINE_MEMBER(mpu3_state::pia_ic5_ca2_w)
+void mpu3_state::pia_ic5_ca2_w(int state)
 {
 	LOG(("%s: IC5 PIA Port CA2 Set to %2x (C)\n", machine().describe_context(),state));
 	m_IC11GC = state;
 	ic11_update();
 }
 
-WRITE_LINE_MEMBER(mpu3_state::pia_ic5_cb2_w)
+void mpu3_state::pia_ic5_cb2_w(int state)
 {
 	LOG(("%s: IC5 PIA Port CB2 Set to %2x (Triac)\n", machine().describe_context(),state));
 	m_triac_ic5 = state;
@@ -794,7 +794,7 @@ uint8_t mpu3_state::characteriser_r(address_space &space, offs_t offset, uint8_t
 }
 
 /* generate a 50 Hz signal (some components rely on this for external sync) */
-TIMER_DEVICE_CALLBACK_MEMBER(mpu3_state::gen_50hz)
+void mpu3_state::gen_50hz(timer_device &timer, void *ptr, int32_t param)
 {
 	/* Although reported as a '50Hz' signal, the fact that both rising and
 	falling edges of the pulse are used means the timer actually gives a 100Hz
@@ -805,7 +805,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mpu3_state::gen_50hz)
 	update_triacs();
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(mpu3_state::ic10_callback)
+void mpu3_state::ic10_callback(timer_device &timer, void *ptr, int32_t param)
 {
 	// TODO: Use discrete handler for 555, this is far too simplistic
 

@@ -63,15 +63,15 @@ public:
 	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	/* Centronics stuff */
-	DECLARE_WRITE_LINE_MEMBER( centronics_input_strobe );
-	DECLARE_WRITE_LINE_MEMBER( centronics_input_data0 ) { if (state) m_centronics_data |= 0x01; else m_centronics_data &= ~0x01; }
-	DECLARE_WRITE_LINE_MEMBER( centronics_input_data1 ) { if (state) m_centronics_data |= 0x02; else m_centronics_data &= ~0x02; }
-	DECLARE_WRITE_LINE_MEMBER( centronics_input_data2 ) { if (state) m_centronics_data |= 0x04; else m_centronics_data &= ~0x04; }
-	DECLARE_WRITE_LINE_MEMBER( centronics_input_data3 ) { if (state) m_centronics_data |= 0x08; else m_centronics_data &= ~0x08; }
-	DECLARE_WRITE_LINE_MEMBER( centronics_input_data4 ) { if (state) m_centronics_data |= 0x10; else m_centronics_data &= ~0x10; }
-	DECLARE_WRITE_LINE_MEMBER( centronics_input_data5 ) { if (state) m_centronics_data |= 0x20; else m_centronics_data &= ~0x20; }
-	DECLARE_WRITE_LINE_MEMBER( centronics_input_data6 ) { if (state) m_centronics_data |= 0x40; else m_centronics_data &= ~0x40; }
-	DECLARE_WRITE_LINE_MEMBER( centronics_input_data7 ) { if (state) m_centronics_data |= 0x80; else m_centronics_data &= ~0x80; }
+	void centronics_input_strobe(int state);
+	void centronics_input_data0(int state) { if (state) m_centronics_data |= 0x01; else m_centronics_data &= ~0x01; }
+	void centronics_input_data1(int state) { if (state) m_centronics_data |= 0x02; else m_centronics_data &= ~0x02; }
+	void centronics_input_data2(int state) { if (state) m_centronics_data |= 0x04; else m_centronics_data &= ~0x04; }
+	void centronics_input_data3(int state) { if (state) m_centronics_data |= 0x08; else m_centronics_data &= ~0x08; }
+	void centronics_input_data4(int state) { if (state) m_centronics_data |= 0x10; else m_centronics_data &= ~0x10; }
+	void centronics_input_data5(int state) { if (state) m_centronics_data |= 0x20; else m_centronics_data &= ~0x20; }
+	void centronics_input_data6(int state) { if (state) m_centronics_data |= 0x40; else m_centronics_data &= ~0x40; }
+	void centronics_input_data7(int state) { if (state) m_centronics_data |= 0x80; else m_centronics_data &= ~0x80; }
 
 protected:
 	// device-level overrides

@@ -251,7 +251,7 @@ void gaelco_serial_device::device_stop()
 	osd_sharedmem_free(m_os_shmem);
 }
 
-TIMER_CALLBACK_MEMBER( gaelco_serial_device::set_status_cb )
+void gaelco_serial_device::set_status_cb(void *ptr, int32_t param)
 {
 	uint8_t mask = param >> 8;
 	uint8_t set = param & 0xff;
@@ -317,7 +317,7 @@ void gaelco_serial_device::sync_link()
 	}
 }
 
-TIMER_CALLBACK_MEMBER( gaelco_serial_device::link_cb )
+void gaelco_serial_device::link_cb(void *ptr, int32_t param)
 {
 	std::lock_guard<std::mutex> guard(m_mutex);
 	m_out_ptr->cnt++;

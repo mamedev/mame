@@ -37,7 +37,7 @@ public:
 	void digit_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void segment_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t kp_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	TIMER_DEVICE_CALLBACK_MEMBER(timer_p);
+	void timer_p(timer_device &timer, void *ptr, int32_t param);
 
 private:
 	uint8_t m_digit_sel;
@@ -50,7 +50,7 @@ private:
 
 // This can read the first few bytes correctly, but after that bit slippage occurs.
 // Needs to be reworked
-TIMER_DEVICE_CALLBACK_MEMBER( pro80_state::timer_p )
+void pro80_state::timer_p(timer_device &timer, void *ptr, int32_t param)
 {
 	m_cass_data[1]++;
 	uint8_t cass_ws = ((m_cass)->input() > +0.03) ? 1 : 0;

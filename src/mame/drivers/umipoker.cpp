@@ -65,10 +65,10 @@ public:
 	void saiyu_counters_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void init_umipoker();
 	void init_saiyukip();
-	TILE_GET_INFO_MEMBER(get_tile_info_0);
-	TILE_GET_INFO_MEMBER(get_tile_info_1);
-	TILE_GET_INFO_MEMBER(get_tile_info_2);
-	TILE_GET_INFO_MEMBER(get_tile_info_3);
+	void get_tile_info_0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info_1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info_2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info_3(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -78,7 +78,7 @@ public:
 	required_device<palette_device> m_palette;
 };
 
-TILE_GET_INFO_MEMBER(umipoker_state::get_tile_info_0)
+void umipoker_state::get_tile_info_0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = m_vram_0[tile_index*2+0];
 	int color = m_vram_0[tile_index*2+1] & 0x3f;
@@ -89,7 +89,7 @@ TILE_GET_INFO_MEMBER(umipoker_state::get_tile_info_0)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(umipoker_state::get_tile_info_1)
+void umipoker_state::get_tile_info_1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = m_vram_1[tile_index*2+0];
 	int color = m_vram_1[tile_index*2+1] & 0x3f;
@@ -100,7 +100,7 @@ TILE_GET_INFO_MEMBER(umipoker_state::get_tile_info_1)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(umipoker_state::get_tile_info_2)
+void umipoker_state::get_tile_info_2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = m_vram_2[tile_index*2+0];
 	int color = m_vram_2[tile_index*2+1] & 0x3f;
@@ -111,7 +111,7 @@ TILE_GET_INFO_MEMBER(umipoker_state::get_tile_info_2)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(umipoker_state::get_tile_info_3)
+void umipoker_state::get_tile_info_3(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = m_vram_3[tile_index*2+0];
 	int color = m_vram_3[tile_index*2+1] & 0x3f;

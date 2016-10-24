@@ -99,9 +99,9 @@ public:
 	void testa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void testb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_jokrwild();
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(jokrwild);
+	void palette_init_jokrwild(palette_device &palette);
 	uint32_t screen_update_jokrwild(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -124,7 +124,7 @@ void jokrwild_state::jokrwild_colorram_w(address_space &space, offs_t offset, ui
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-TILE_GET_INFO_MEMBER(jokrwild_state::get_bg_tile_info)
+void jokrwild_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 /*  - bits -
     7654 3210
@@ -149,7 +149,7 @@ uint32_t jokrwild_state::screen_update_jokrwild(screen_device &screen, bitmap_in
 	return 0;
 }
 
-PALETTE_INIT_MEMBER(jokrwild_state, jokrwild)
+void jokrwild_state::palette_init_jokrwild(palette_device &palette)
 {
 	//missing proms
 }

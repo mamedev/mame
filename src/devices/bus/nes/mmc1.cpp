@@ -136,7 +136,7 @@ void nes_sorom_a_device::pcb_reset()
 
  -------------------------------------------------*/
 
-TIMER_CALLBACK_MEMBER( nes_sxrom_device::resync_callback )
+void nes_sxrom_device::resync_callback(void *ptr, int32_t param)
 {
 	m_reg_write_enable = 1;
 }

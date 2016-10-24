@@ -9,7 +9,7 @@
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(sf_state::get_bg_tile_info)
+void sf_state::get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *base = memregion("gfx5")->base() + 2 * tile_index;
 	int attr = base[0x10000];
@@ -21,7 +21,7 @@ TILE_GET_INFO_MEMBER(sf_state::get_bg_tile_info)
 			TILE_FLIPYX(attr & 3));
 }
 
-TILE_GET_INFO_MEMBER(sf_state::get_fg_tile_info)
+void sf_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t *base = memregion("gfx5")->base() + 0x20000 + 2 * tile_index;
 	int attr = base[0x10000];
@@ -33,7 +33,7 @@ TILE_GET_INFO_MEMBER(sf_state::get_fg_tile_info)
 			TILE_FLIPYX(attr & 3));
 }
 
-TILE_GET_INFO_MEMBER(sf_state::get_tx_tile_info)
+void sf_state::get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code = m_videoram[tile_index];
 	SET_TILE_INFO_MEMBER(3,

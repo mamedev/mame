@@ -3787,7 +3787,7 @@ void psxgpu_device::lightgun_set( int n_x, int n_y )
 	n_lightgun_y = n_y;
 }
 
-PALETTE_INIT_MEMBER( psxgpu_device, psx )
+void psxgpu_device::palette_init_psx(palette_device &palette)
 {
 	uint32_t n_colour;
 

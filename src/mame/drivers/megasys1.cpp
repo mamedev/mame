@@ -158,7 +158,7 @@ void megasys1_state::machine_reset_megasys1_hachoo()
                         [ Main CPU - System A / Z ]
 ***************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(megasys1_state::megasys1A_scanline)
+void megasys1_state::megasys1A_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -184,7 +184,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(megasys1_state::megasys1A_scanline)
 		m_maincpu->set_input_line(3, HOLD_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(megasys1_state::megasys1A_iganinju_scanline)
+void megasys1_state::megasys1A_iganinju_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -231,7 +231,7 @@ ADDRESS_MAP_END
                             [ Main CPU - System B ]
 ***************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(megasys1_state::megasys1B_scanline)
+void megasys1_state::megasys1B_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -387,7 +387,7 @@ ADDRESS_MAP_END
                             [ Main CPU - System D ]
 ***************************************************************************/
 
-INTERRUPT_GEN_MEMBER(megasys1_state::megasys1D_irq)
+void megasys1_state::megasys1D_irq(device_t &device)
 {
 	device.execute().set_input_line(2, HOLD_LINE);
 }
@@ -474,7 +474,7 @@ ADDRESS_MAP_END
 */
 
 /* YM2151 IRQ */
-WRITE_LINE_MEMBER(megasys1_state::sound_irq)
+void megasys1_state::sound_irq(int state)
 {
 	if (state)
 		m_audiocpu->set_input_line(4, HOLD_LINE);

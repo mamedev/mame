@@ -109,7 +109,7 @@ public:
 	void frogs_audio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void headon_audio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void invho2_audio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	TIMER_CALLBACK_MEMBER( frogs_croak_callback );
+	void frogs_croak_callback(void *ptr, int32_t param);
 
 	/*----------- defined in audio/carnival.c -----------*/
 	void carnival_audio_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -139,8 +139,8 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_changed);
 	DECLARE_INPUT_CHANGED_MEMBER(nsub_coin_in);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(clear_coin_status);
-	TIMER_DEVICE_CALLBACK_MEMBER(nsub_coin_pulse);
+	void clear_coin_status(timer_device &timer, void *ptr, int32_t param);
+	void nsub_coin_pulse(timer_device &timer, void *ptr, int32_t param);
 
 	void machine_start_samurai();
 	void machine_start_nsub();

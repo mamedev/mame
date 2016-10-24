@@ -160,7 +160,7 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 	virtual void machine_start() override;
 	uint32_t screen_update_rblaster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(sound_interrupt);
+	void sound_interrupt(device_t &device);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *spriteram, uint16_t tile_bank );
 };
 
@@ -297,7 +297,7 @@ void deco_ld_state::nmimask_w(address_space &space, offs_t offset, uint8_t data,
 }
 #endif
 
-INTERRUPT_GEN_MEMBER(deco_ld_state::sound_interrupt)
+void deco_ld_state::sound_interrupt(device_t &device)
 {
 	if (!m_nmimask) device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }

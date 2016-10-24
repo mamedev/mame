@@ -88,10 +88,10 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(vblank_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(mcu_status_r);
 
-	TILEMAP_MAPPER_MEMBER(back_scan);
-	TILE_GET_INFO_MEMBER(get_bgram0_tile_info);
-	TILE_GET_INFO_MEMBER(get_bgram1_tile_info);
-	TILE_GET_INFO_MEMBER(get_char_tile_info);
+	tilemap_memory_index back_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	void get_bgram0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_bgram1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_char_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
@@ -100,5 +100,5 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	inline int scanline_to_vcount(int scanline);
 
-	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
+	void scanline(timer_device &timer, void *ptr, int32_t param);
 };

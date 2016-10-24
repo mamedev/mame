@@ -75,7 +75,7 @@ public:
 	void mk2_write_b(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t m_led[5];
 	virtual void machine_start() override;
-	TIMER_DEVICE_CALLBACK_MEMBER(update_leds);
+	void update_leds(timer_device &timer, void *ptr, int32_t param);
 };
 
 
@@ -114,7 +114,7 @@ static INPUT_PORTS_START( mk2 )
 INPUT_PORTS_END
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(mk2_state::update_leds)
+void mk2_state::update_leds(timer_device &timer, void *ptr, int32_t param)
 {
 	int i;
 

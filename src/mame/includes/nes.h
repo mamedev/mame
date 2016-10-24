@@ -94,7 +94,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	virtual void video_reset() override;
-	DECLARE_PALETTE_INIT(nes);
+	void palette_init_nes(palette_device &palette);
 	uint32_t screen_update_nes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	NESCTRL_BRIGHTPIXEL_CB(bright_pixel);
 

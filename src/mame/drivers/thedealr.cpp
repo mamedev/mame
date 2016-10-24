@@ -66,10 +66,10 @@ public:
 	// machine
 	void machine_start_thedealr();
 	void machine_reset_thedealr();
-	TIMER_DEVICE_CALLBACK_MEMBER(thedealr_interrupt);
+	void thedealr_interrupt(timer_device &timer, void *ptr, int32_t param);
 
 	// video
-	DECLARE_PALETTE_INIT(thedealr);
+	void palette_init_thedealr(palette_device &palette);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof(screen_device &screen, bool state);
 };
@@ -80,7 +80,7 @@ public:
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(thedealr_state,thedealr)
+void thedealr_state::palette_init_thedealr(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 
@@ -512,7 +512,7 @@ void thedealr_state::machine_start_thedealr()
     Hence we generate more IRQs than that in a frame. Besides, with a single VBLANK IRQ,
     the two 65C02 fail to sync properly on boot with error $26 and/or $27 (commram[0]) !?
 */
-TIMER_DEVICE_CALLBACK_MEMBER(thedealr_state::thedealr_interrupt)
+void thedealr_state::thedealr_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

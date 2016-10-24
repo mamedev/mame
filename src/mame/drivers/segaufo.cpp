@@ -101,9 +101,9 @@ public:
 
 	void motor_tick(int p, int m);
 
-	DECLARE_WRITE_LINE_MEMBER(pit_out0);
-	DECLARE_WRITE_LINE_MEMBER(pit_out1);
-	DECLARE_WRITE_LINE_MEMBER(pit_out2);
+	void pit_out0(int state);
+	void pit_out1(int state);
+	void pit_out2(int state);
 	uint8_t crane_limits_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void stepper_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void cp_lamps_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -123,8 +123,8 @@ public:
 
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
-	TIMER_DEVICE_CALLBACK_MEMBER(simulate_xyz);
-	TIMER_DEVICE_CALLBACK_MEMBER(update_info);
+	void simulate_xyz(timer_device &timer, void *ptr, int32_t param);
+	void update_info(timer_device &timer, void *ptr, int32_t param);
 };
 
 
@@ -144,7 +144,7 @@ void ufo_state::motor_tick(int p, int m)
 		m_player[p].motor[m].position = 1;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(ufo_state::simulate_xyz)
+void ufo_state::simulate_xyz(timer_device &timer, void *ptr, int32_t param)
 {
 	for (int p = 0; p < 2; p++)
 		for (int m = 0; m < 3; m++)
@@ -152,7 +152,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(ufo_state::simulate_xyz)
 }
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(ufo_state::update_info)
+void ufo_state::update_info(timer_device &timer, void *ptr, int32_t param)
 {
 	// output ufo motor positions
 	// 0 X: 000 = right,  100 = left (player 1)
@@ -183,19 +183,19 @@ TIMER_DEVICE_CALLBACK_MEMBER(ufo_state::update_info)
 
 ***************************************************************************/
 
-WRITE_LINE_MEMBER(ufo_state::pit_out0)
+void ufo_state::pit_out0(int state)
 {
 	// ?
 }
 
-WRITE_LINE_MEMBER(ufo_state::pit_out1)
+void ufo_state::pit_out1(int state)
 {
 	// NMI?
 	if (state)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-WRITE_LINE_MEMBER(ufo_state::pit_out2)
+void ufo_state::pit_out2(int state)
 {
 	// ?
 }

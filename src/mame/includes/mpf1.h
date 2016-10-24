@@ -71,8 +71,8 @@ public:
 
 	emu_timer *m_led_refresh_timer;
 	void init_mpf1();
-	TIMER_CALLBACK_MEMBER(led_refresh);
-	TIMER_DEVICE_CALLBACK_MEMBER(check_halt_callback);
+	void led_refresh(void *ptr, int32_t param);
+	void check_halt_callback(timer_device &timer, void *ptr, int32_t param);
 };
 
 #endif

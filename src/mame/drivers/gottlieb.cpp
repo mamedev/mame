@@ -419,7 +419,7 @@ void gottlieb_state::laserdisc_command_w(address_space &space, offs_t offset, ui
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(gottlieb_state::laserdisc_philips_callback)
+void gottlieb_state::laserdisc_philips_callback(void *ptr, int32_t param)
 {
 	uint32_t newcode = m_laserdisc->get_field_code((param == 17) ? LASERDISC_CODE_LINE17 : LASERDISC_CODE_LINE18, true);
 
@@ -439,14 +439,14 @@ TIMER_CALLBACK_MEMBER(gottlieb_state::laserdisc_philips_callback)
 }
 
 
-TIMER_CALLBACK_MEMBER(gottlieb_state::laserdisc_bit_off_callback)
+void gottlieb_state::laserdisc_bit_off_callback(void *ptr, int32_t param)
 {
 	/* deassert the control line */
 	m_laserdisc->control_w(CLEAR_LINE);
 }
 
 
-TIMER_CALLBACK_MEMBER(gottlieb_state::laserdisc_bit_callback)
+void gottlieb_state::laserdisc_bit_callback(void *ptr, int32_t param)
 {
 	uint8_t bitsleft = param >> 16;
 	uint8_t data = param;
@@ -707,13 +707,13 @@ void gottlieb_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	}
 }
 
-TIMER_CALLBACK_MEMBER(gottlieb_state::nmi_clear)
+void gottlieb_state::nmi_clear(void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
-INTERRUPT_GEN_MEMBER(gottlieb_state::gottlieb_interrupt)
+void gottlieb_state::gottlieb_interrupt(device_t &device)
 {
 	/* assert the NMI and set a timer to clear it at the first visible line */
 	device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);

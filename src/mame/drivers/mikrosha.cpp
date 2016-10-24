@@ -26,7 +26,7 @@ public:
 		: radio86_state(mconfig, type, tag),
 		m_cart(*this, "cartslot")
 		{ }
-	DECLARE_WRITE_LINE_MEMBER(mikrosha_pit_out2);
+	void mikrosha_pit_out2(int state);
 	I8275_DRAW_CHARACTER_MEMBER(display_pixels);
 	void machine_reset_mikrosha();
 
@@ -152,7 +152,7 @@ static INPUT_PORTS_START( mikrosha )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Shift") PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_CHAR(UCHAR_SHIFT_1)
 INPUT_PORTS_END
 
-WRITE_LINE_MEMBER(mikrosha_state::mikrosha_pit_out2)
+void mikrosha_state::mikrosha_pit_out2(int state)
 {
 }
 

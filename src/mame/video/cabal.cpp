@@ -11,7 +11,7 @@
 #include "emu.h"
 #include "includes/cabal.h"
 
-TILE_GET_INFO_MEMBER(cabal_state::get_back_tile_info)
+void cabal_state::get_back_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = m_videoram[tile_index];
 	int color = (tile>>12)&0xf;
@@ -24,7 +24,7 @@ TILE_GET_INFO_MEMBER(cabal_state::get_back_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(cabal_state::get_text_tile_info)
+void cabal_state::get_text_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int tile = m_colorram[tile_index];
 	int color = (tile>>10);

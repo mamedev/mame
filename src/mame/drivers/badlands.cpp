@@ -229,7 +229,7 @@ void badlands_state::machine_reset_badlands()
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(badlands_state::vblank_int)
+void badlands_state::vblank_int(device_t &device)
 {
 	int pedal_state = ioport("PEDALS")->read();
 	int i;

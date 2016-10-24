@@ -45,11 +45,11 @@ public:
 	uint8_t read();
 	void write(uint8_t data);
 
-	DECLARE_WRITE_LINE_MEMBER( si_w );
-	DECLARE_WRITE_LINE_MEMBER( so_w );
+	void si_w(int state);
+	void so_w(int state);
 
-	DECLARE_READ_LINE_MEMBER( dir_r );
-	DECLARE_READ_LINE_MEMBER( dor_r );
+	int dir_r();
+	int dor_r();
 
 protected:
 	// device-level overrides

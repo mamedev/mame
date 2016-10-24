@@ -62,7 +62,7 @@ public:
 	void init_groundfx();
 	virtual void video_start() override;
 	uint32_t screen_update_groundfx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(groundfx_interrupt);
+	void groundfx_interrupt(device_t &device);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,int do_hack,int x_offs,int y_offs);
 
 

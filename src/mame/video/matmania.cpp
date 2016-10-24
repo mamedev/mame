@@ -44,7 +44,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(matmania_state, matmania)
+void matmania_state::palette_init_matmania(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 

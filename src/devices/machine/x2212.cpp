@@ -218,7 +218,7 @@ uint8_t x2212_device::read(address_space &space, offs_t offset, uint8_t mem_mask
 //  (active high)
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( x2212_device::store )
+void x2212_device::store(int state)
 {
 	if (state != 0 && !m_store)
 		store();
@@ -231,7 +231,7 @@ WRITE_LINE_MEMBER( x2212_device::store )
 //  (active high)
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( x2212_device::recall )
+void x2212_device::recall(int state)
 {
 	if (state != 0 && !m_array_recall)
 		recall();

@@ -385,12 +385,12 @@ D                                                                               
 /******************************************************************************/
 // Sound
 
-TIMER_CALLBACK_MEMBER(equites_state::equites_nmi_callback)
+void equites_state::equites_nmi_callback(void *ptr, int32_t param)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
-TIMER_CALLBACK_MEMBER(equites_state::equites_frq_adjuster_callback)
+void equites_state::equites_frq_adjuster_callback(void *ptr, int32_t param)
 {
 	uint8_t frq = ioport(FRQ_ADJUSTER_TAG)->read();
 
@@ -524,7 +524,7 @@ void equites_state::equites_8155_portb_w(address_space &space, offs_t offset, ui
 	equites_update_dac();
 }
 
-WRITE_LINE_MEMBER(equites_state::equites_msm5232_gate)
+void equites_state::equites_msm5232_gate(int state)
 {
 }
 
@@ -533,7 +533,7 @@ WRITE_LINE_MEMBER(equites_state::equites_msm5232_gate)
 /******************************************************************************/
 // Interrupt Handlers
 
-TIMER_DEVICE_CALLBACK_MEMBER(equites_state::equites_scanline)
+void equites_state::equites_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -544,7 +544,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(equites_state::equites_scanline)
 		m_maincpu->set_input_line(2, HOLD_LINE);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(equites_state::splndrbt_scanline)
+void equites_state::splndrbt_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

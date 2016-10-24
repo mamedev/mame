@@ -38,8 +38,8 @@ public:
 
 	void preset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( preset_w );
-	DECLARE_WRITE_LINE_MEMBER( clear_w );
+	void preset_w(int state);
+	void clear_w(int state);
 
 	void preset_w(uint16_t value) { m_latched_value = value; }
 
@@ -69,8 +69,8 @@ public:
 
 	void preset_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void clear_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	DECLARE_WRITE_LINE_MEMBER( preset_w );
-	DECLARE_WRITE_LINE_MEMBER( clear_w );
+	void preset_w(int state);
+	void clear_w(int state);
 
 protected:
 	virtual void device_start() override;

@@ -409,7 +409,7 @@ uint8_t polepos_state::steering_delta_r(address_space &space, offs_t offset, uin
 	return m_steer_delta;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(polepos_state::polepos_scanline)
+void polepos_state::polepos_scanline(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

@@ -155,7 +155,7 @@ uint8_t abc800c_state::char_ram_r(address_space &space, offs_t offset, uint8_t m
 //  PALETTE_INIT( abc800c )
 //-------------------------------------------------
 
-PALETTE_INIT_MEMBER( abc800c_state, abc800c )
+void abc800c_state::palette_init_abc800c(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(0x00, 0x00, 0x00)); // black
 	palette.set_pen_color(1, rgb_t(0xff, 0x00, 0x00)); // red

@@ -227,7 +227,7 @@ void s11b_state::pia34_pa_w(address_space &space, offs_t offset, uint8_t data, u
 	set_segment2(seg);
 }
 
-WRITE_LINE_MEMBER( s11b_state::pia40_ca2_w)
+void s11b_state::pia40_ca2_w(int state)
 {
 	if(state == ASSERT_LINE)
 		m_ym->reset();

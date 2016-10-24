@@ -13,7 +13,7 @@
 #define DISPLAY_TXT     16
 
 
-TILE_GET_INFO_MEMBER(darkmist_state::get_bgtile_info)
+void darkmist_state::get_bgtile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code,attr,pal;
 
@@ -29,7 +29,7 @@ TILE_GET_INFO_MEMBER(darkmist_state::get_bgtile_info)
 		0);
 }
 
-TILE_GET_INFO_MEMBER(darkmist_state::get_fgtile_info)
+void darkmist_state::get_fgtile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code,attr,pal;
 
@@ -47,7 +47,7 @@ TILE_GET_INFO_MEMBER(darkmist_state::get_fgtile_info)
 		0);
 }
 
-TILE_GET_INFO_MEMBER(darkmist_state::get_txttile_info)
+void darkmist_state::get_txttile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	int code,attr,pal;
 
@@ -65,7 +65,7 @@ TILE_GET_INFO_MEMBER(darkmist_state::get_txttile_info)
 		0);
 }
 
-PALETTE_INIT_MEMBER(darkmist_state, darkmist)
+void darkmist_state::palette_init_darkmist(palette_device &palette)
 {
 	const uint8_t *bg_clut = memregion("bg_clut")->base();
 	const uint8_t *fg_clut = memregion("fg_clut")->base();

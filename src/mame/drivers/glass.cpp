@@ -21,7 +21,7 @@ void glass_state::clr_int_w(address_space &space, offs_t offset, uint16_t data, 
 	m_cause_interrupt = 1;
 }
 
-INTERRUPT_GEN_MEMBER(glass_state::interrupt)
+void glass_state::interrupt(device_t &device)
 {
 	if (m_cause_interrupt)
 	{

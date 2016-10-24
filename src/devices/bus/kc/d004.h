@@ -53,7 +53,7 @@ public:
 	void fdd_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void hw_terminal_count_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( fdc_irq );
+	void fdc_irq(int state);
 
 private:
 	static const device_timer_id TIMER_RESET = 0;

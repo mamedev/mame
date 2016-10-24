@@ -64,5 +64,5 @@ public:
 	void init_chainrec();
 	virtual void video_start() override;
 	uint32_t screen_update_simpl156(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(simpl156_vbl_interrupt);
+	void simpl156_vbl_interrupt(device_t &device);
 };

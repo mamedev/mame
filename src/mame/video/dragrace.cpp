@@ -10,7 +10,7 @@
 #include "includes/dragrace.h"
 
 
-TILE_GET_INFO_MEMBER(dragrace_state::get_tile_info)
+void dragrace_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t code = m_playfield_ram[tile_index];
 	int num = 0;

@@ -155,7 +155,7 @@ void pcf8593_device::nvram_write(emu_file &file)
     pcf8593_pin_scl
 -------------------------------------------------*/
 
-WRITE_LINE_MEMBER(pcf8593_device::scl_w)
+void pcf8593_device::scl_w(int state)
 {
 	// send bit
 	if ((m_active) && (!m_pin_scl) && (state))
@@ -233,7 +233,7 @@ WRITE_LINE_MEMBER(pcf8593_device::scl_w)
     pcf8593_pin_sda_w
 -------------------------------------------------*/
 
-WRITE_LINE_MEMBER(pcf8593_device::sda_w)
+void pcf8593_device::sda_w(int state)
 {
 	// clock is high
 	if (m_pin_scl)
@@ -267,7 +267,7 @@ WRITE_LINE_MEMBER(pcf8593_device::sda_w)
     pcf8593_pin_sda_r
 -------------------------------------------------*/
 
-READ_LINE_MEMBER(pcf8593_device::sda_r)
+int pcf8593_device::sda_r()
 {
 	return m_inp;
 }

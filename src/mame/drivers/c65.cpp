@@ -74,17 +74,17 @@ public:
 	void cia0_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t cia0_portb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void cia0_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(cia0_irq);
+	void cia0_irq(int state);
 
 	uint8_t dummy_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	// screen updates
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_PALETTE_INIT(c65);
+	void palette_init_c65(palette_device &palette);
 	void init_c65();
 	void init_c65pal();
 
-	INTERRUPT_GEN_MEMBER(vic3_vblank_irq);
+	void vic3_vblank_irq(device_t &device);
 protected:
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -530,7 +530,7 @@ void c65_state::machine_reset()
 }
 
 
-PALETTE_INIT_MEMBER(c65_state, c65)
+void c65_state::palette_init_c65(palette_device &palette)
 {
 	// TODO: initial state?
 }
@@ -558,14 +558,14 @@ void c65_state::IRQCheck(uint8_t irq_cause)
 	m_maincpu->set_input_line(M4510_IRQ_LINE,m_VIC2_IRQMask & m_VIC2_IRQPend ? ASSERT_LINE : CLEAR_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(c65_state::vic3_vblank_irq)
+void c65_state::vic3_vblank_irq(device_t &device)
 {
 	IRQCheck(1);
 	//if(m_VIC2_IRQMask & 1)
 	//  m_maincpu->set_input_line(M4510_IRQ_LINE,HOLD_LINE);
 }
 
-WRITE_LINE_MEMBER(c65_state::cia0_irq)
+void c65_state::cia0_irq(int state)
 {
 	printf("%d IRQ\n",state);
 

@@ -364,7 +364,7 @@ INPUT_PORTS_END
     I8255 INTERFACE
 -------------------------------------------------*/
 
-WRITE_LINE_MEMBER( sf7000_state::write_centronics_busy )
+void sf7000_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 }

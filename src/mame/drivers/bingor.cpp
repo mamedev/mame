@@ -457,8 +457,8 @@ public:
 	required_shared_ptr<uint16_t> m_blit_ram;
 	virtual void video_start() override;
 	uint32_t screen_update_bingor(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(vblank_irq);
-	INTERRUPT_GEN_MEMBER(unk_irq);
+	void vblank_irq(device_t &device);
+	void unk_irq(device_t &device);
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 };
@@ -576,13 +576,13 @@ static INPUT_PORTS_START( bingor )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INTERRUPT_GEN_MEMBER(bingor_state::vblank_irq)
+void bingor_state::vblank_irq(device_t &device)
 {
 //  device.execute().set_input_line_and_vector(0,HOLD_LINE,0x08/4); // reads i/o 0x200 and puts the result in ram, pic irq?
 	device.execute().set_input_line_and_vector(0,HOLD_LINE,0x4c/4); // ?
 }
 
-INTERRUPT_GEN_MEMBER(bingor_state::unk_irq)
+void bingor_state::unk_irq(device_t &device)
 {
 	device.execute().set_input_line_and_vector(0,HOLD_LINE,0x48/4); // ?
 }

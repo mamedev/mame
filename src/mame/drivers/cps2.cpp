@@ -654,7 +654,7 @@ Stephh's inputs notes (based on some tests on the "parent" set) :
  *
  *************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(cps_state::cps2_interrupt)
+void cps_state::cps2_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	/* 2 is vblank, 4 is some sort of scanline interrupt, 6 is both at the same time. */
 	if (param == 0)
@@ -789,7 +789,7 @@ void cps_state::cps2_eeprom_port_w(address_space &space, offs_t offset, uint16_t
  *
  *************************************/
 
-TIMER_CALLBACK_MEMBER(cps_state::cps2_update_digital_volume)
+void cps_state::cps2_update_digital_volume(void *ptr, int32_t param)
 {
 	int vol_button_state;
 

@@ -291,7 +291,7 @@ void pce_cd_device::adpcm_play()
   the MSM5205. Currently we can only use static clocks for the
   MSM5205.
  */
-WRITE_LINE_MEMBER( pce_cd_device::msm5205_int )
+void pce_cd_device::msm5205_int(int state)
 {
 	uint8_t msm_data;
 
@@ -939,7 +939,7 @@ void pce_cd_device::set_irq_line(int num, int state)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(pce_cd_device::data_timer_callback)
+void pce_cd_device::data_timer_callback(void *ptr, int32_t param)
 {
 	if (m_data_buffer_index == m_data_buffer_size)
 	{
@@ -1002,7 +1002,7 @@ void pce_cd_device::set_adpcm_ram_byte(uint8_t val)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(pce_cd_device::cdda_fadeout_callback)
+void pce_cd_device::cdda_fadeout_callback(void *ptr, int32_t param)
 {
 	m_cdda_volume -= 0.1;
 
@@ -1019,7 +1019,7 @@ TIMER_CALLBACK_MEMBER(pce_cd_device::cdda_fadeout_callback)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(pce_cd_device::cdda_fadein_callback)
+void pce_cd_device::cdda_fadein_callback(void *ptr, int32_t param)
 {
 	m_cdda_volume += 0.1;
 
@@ -1036,7 +1036,7 @@ TIMER_CALLBACK_MEMBER(pce_cd_device::cdda_fadein_callback)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(pce_cd_device::adpcm_fadeout_callback)
+void pce_cd_device::adpcm_fadeout_callback(void *ptr, int32_t param)
 {
 	m_adpcm_volume -= 0.1;
 
@@ -1053,7 +1053,7 @@ TIMER_CALLBACK_MEMBER(pce_cd_device::adpcm_fadeout_callback)
 	}
 }
 
-TIMER_CALLBACK_MEMBER(pce_cd_device::adpcm_fadein_callback)
+void pce_cd_device::adpcm_fadein_callback(void *ptr, int32_t param)
 {
 	m_adpcm_volume += 0.1;
 
@@ -1249,7 +1249,7 @@ void pce_cd_device::intf_w(address_space &space, offs_t offset, uint8_t data, ui
 	m_regs[offset & 0xf] = data;
 }
 
-TIMER_CALLBACK_MEMBER(pce_cd_device::clear_ack)
+void pce_cd_device::clear_ack(void *ptr, int32_t param)
 {
 	update();
 	m_scsi_ACK = 0;
@@ -1275,7 +1275,7 @@ uint8_t pce_cd_device::get_cd_data_byte()
 }
 
 
-TIMER_CALLBACK_MEMBER(pce_cd_device::adpcm_dma_timer_callback)
+void pce_cd_device::adpcm_dma_timer_callback(void *ptr, int32_t param)
 {
 	if (m_scsi_REQ && !m_scsi_ACK && !m_scsi_CD && m_scsi_IO)
 	{

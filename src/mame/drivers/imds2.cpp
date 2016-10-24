@@ -229,7 +229,7 @@ void imds2_state::imds2_ipc_control_w(address_space &space, offs_t offset, uint8
 	}
 }
 
-WRITE_LINE_MEMBER(imds2_state::imds2_ipc_intr)
+void imds2_state::imds2_ipc_intr(int state)
 {
 	m_ipccpu->set_input_line(I8085_INTR_LINE , (state != 0) && BIT(m_ipc_control , 2));
 }
@@ -254,13 +254,13 @@ void imds2_state::imds2_ipclocpic_w(address_space &space, offs_t offset, uint8_t
 	m_ipclocpic->write(space , offset == 0 , data);
 }
 
-WRITE_LINE_MEMBER(imds2_state::imds2_baud_clk_0_w)
+void imds2_state::imds2_baud_clk_0_w(int state)
 {
 		m_ipcusart0->write_txc(state);
 		m_ipcusart0->write_rxc(state);
 }
 
-WRITE_LINE_MEMBER(imds2_state::imds2_baud_clk_1_w)
+void imds2_state::imds2_baud_clk_1_w(int state)
 {
 		m_ipcusart1->write_txc(state);
 		m_ipcusart1->write_rxc(state);
@@ -280,7 +280,7 @@ uint8_t imds2_state::imds2_miscin_r(address_space &space, offs_t offset, uint8_t
 	return res | ((m_beeper_timer == 0) << 2);
 }
 
-WRITE_LINE_MEMBER(imds2_state::imds2_beep_timer_w)
+void imds2_state::imds2_beep_timer_w(int state)
 {
 	m_beeper_timer = state;
 	imds2_update_beeper();
@@ -444,7 +444,7 @@ void imds2_state::imds2_ipc_dbbin_cmd_w(address_space &space, offs_t offset, uin
 	m_ioc_ibf = data;
 }
 
-WRITE_LINE_MEMBER(imds2_state::imds2_hrq_w)
+void imds2_state::imds2_hrq_w(int state)
 {
 	// Should be propagated to HOLD input of IOC CPU
 	m_iocdma->hlda_w(state);
@@ -492,7 +492,7 @@ void imds2_state::imds2_pio_port_p2_w(address_space &space, offs_t offset, uint8
 	m_ipclocpic->ir5_w(BIT(data , 7));
 }
 
-WRITE_LINE_MEMBER(imds2_state::imds2_pio_lpt_ack_w)
+void imds2_state::imds2_pio_lpt_ack_w(int state)
 {
 	if (state) {
 		m_device_status_byte |= 0x20;
@@ -501,7 +501,7 @@ WRITE_LINE_MEMBER(imds2_state::imds2_pio_lpt_ack_w)
 	}
 }
 
-WRITE_LINE_MEMBER(imds2_state::imds2_pio_lpt_busy_w)
+void imds2_state::imds2_pio_lpt_busy_w(int state)
 {
 	// Busy is active high in centronics_device whereas it's active low in MDS
 	if (!state) {
@@ -511,7 +511,7 @@ WRITE_LINE_MEMBER(imds2_state::imds2_pio_lpt_busy_w)
 	}
 }
 
-WRITE_LINE_MEMBER(imds2_state::imds2_pio_lpt_select_w)
+void imds2_state::imds2_pio_lpt_select_w(int state)
 {
 	if (state) {
 		m_device_status_byte |= 0x40;

@@ -429,7 +429,7 @@ void mc2661_device::write(address_space &space, offs_t offset, uint8_t data, uin
 //  dsr_w - data set ready
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( mc2661_device::dsr_w )
+void mc2661_device::dsr_w(int state)
 {
 	if (LOG) logerror("MC2661 '%s' Data Set Ready: %u\n", tag(), state);
 
@@ -448,7 +448,7 @@ WRITE_LINE_MEMBER( mc2661_device::dsr_w )
 //  dcd_w - data carrier detect
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( mc2661_device::dcd_w )
+void mc2661_device::dcd_w(int state)
 {
 	if (LOG) logerror("MC2661 '%s' Data Carrier Detect: %u\n", tag(), state);
 
@@ -467,7 +467,7 @@ WRITE_LINE_MEMBER( mc2661_device::dcd_w )
 //  cts_w - clear to send
 //-------------------------------------------------
 
-WRITE_LINE_MEMBER( mc2661_device::cts_w )
+void mc2661_device::cts_w(int state)
 {
 	if (LOG) logerror("MC2661 '%s' Clear to Send: %u\n", tag(), state);
 }
@@ -477,7 +477,7 @@ WRITE_LINE_MEMBER( mc2661_device::cts_w )
 //  rxrdy_r - receiver ready
 //-------------------------------------------------
 
-READ_LINE_MEMBER( mc2661_device::rxrdy_r )
+int mc2661_device::rxrdy_r()
 {
 	return (m_sr & STATUS_RXRDY) ? ASSERT_LINE : CLEAR_LINE;
 }
@@ -487,7 +487,7 @@ READ_LINE_MEMBER( mc2661_device::rxrdy_r )
 //  txemt_r - transmitter empty
 //-------------------------------------------------
 
-READ_LINE_MEMBER( mc2661_device::txemt_r )
+int mc2661_device::txemt_r()
 {
 	return (m_sr & STATUS_TXEMT) ? ASSERT_LINE : CLEAR_LINE;
 }

@@ -272,7 +272,7 @@ public:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(geniusiq);
+	void palette_init_geniusiq(palette_device &palette);
 	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	uint16_t input_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
@@ -322,7 +322,7 @@ public:
 	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
-PALETTE_INIT_MEMBER(geniusiq_state, geniusiq)
+void geniusiq_state::palette_init_geniusiq(palette_device &palette)
 {
 	// shades need to be verified
 	const uint8_t palette_val[] =

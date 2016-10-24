@@ -32,7 +32,7 @@ epic12_device::epic12_device(const machine_config &mconfig, const char *tag, dev
 	epic12_device_blit_delay = 0;
 }
 
-TIMER_CALLBACK_MEMBER( epic12_device::blitter_delay_callback )
+void epic12_device::blitter_delay_callback(void *ptr, int32_t param)
 {
 	m_blitter_busy = 0;
 }

@@ -362,13 +362,13 @@ INPUT_PORTS_END
 
 /* COM5016 Interface */
 
-WRITE_LINE_MEMBER( xor100_state::com5016_fr_w )
+void xor100_state::com5016_fr_w(int state)
 {
 	m_uart_a->write_txc(state);
 	m_uart_a->write_rxc(state);
 }
 
-WRITE_LINE_MEMBER( xor100_state::com5016_ft_w )
+void xor100_state::com5016_ft_w(int state)
 {
 	m_uart_b->write_txc(state);
 	m_uart_b->write_rxc(state);
@@ -376,12 +376,12 @@ WRITE_LINE_MEMBER( xor100_state::com5016_ft_w )
 
 /* Printer 8255A Interface */
 
-WRITE_LINE_MEMBER( xor100_state::write_centronics_busy )
+void xor100_state::write_centronics_busy(int state)
 {
 	m_centronics_busy = state;
 }
 
-WRITE_LINE_MEMBER( xor100_state::write_centronics_select )
+void xor100_state::write_centronics_select(int state)
 {
 	m_centronics_select = state;
 }
@@ -416,15 +416,15 @@ uint8_t xor100_state::i8255_pc_r(address_space &space, offs_t offset, uint8_t me
 
 /* Z80-CTC Interface */
 
-WRITE_LINE_MEMBER( xor100_state::ctc_z0_w )
+void xor100_state::ctc_z0_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER( xor100_state::ctc_z1_w )
+void xor100_state::ctc_z1_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER( xor100_state::ctc_z2_w )
+void xor100_state::ctc_z2_w(int state)
 {
 }
 

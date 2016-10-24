@@ -112,7 +112,7 @@ void nb1413m3_device::device_timer(emu_timer &timer, device_timer_id id, int par
 }
 
 /* TODO: is all of this actually programmable? */
-TIMER_CALLBACK_MEMBER( nb1413m3_device::timer_callback )
+void nb1413m3_device::timer_callback(void *ptr, int32_t param)
 {
 	m_timer_cb->adjust(attotime::from_hz(NB1413M3_TIMER_BASE) * 256);
 

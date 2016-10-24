@@ -42,7 +42,7 @@ public:
 	void rt1715_rom_disable(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(rt1715);
+	void palette_init_rt1715(palette_device &palette);
 	I8275_DRAW_CHARACTER_MEMBER( crtc_display_pixels );
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
@@ -164,7 +164,7 @@ GFXDECODE_END
     PALETTE
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(rt1715_state, rt1715)
+void rt1715_state::palette_init_rt1715(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(0x00, 0x00, 0x00)); /* black */
 	palette.set_pen_color(1, rgb_t(0x00, 0x7f, 0x00)); /* low intensity */

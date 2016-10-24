@@ -50,7 +50,7 @@
  *
  *************************************/
 
-PALETTE_INIT_MEMBER(canyon_state, canyon)
+void canyon_state::palette_init_canyon(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t(0x80, 0x80, 0x80)); /* GREY  */
 	palette.set_pen_color(1, rgb_t(0x00, 0x00, 0x00)); /* BLACK */

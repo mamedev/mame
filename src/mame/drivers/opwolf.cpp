@@ -478,11 +478,11 @@ void opwolf_state::opwolf_msm5205_vck(msm5205_device *device,int chip)
 		device->data_w(m_adpcm_data[chip] >> 4);
 	}
 }
-WRITE_LINE_MEMBER(opwolf_state::opwolf_msm5205_vck_1)
+void opwolf_state::opwolf_msm5205_vck_1(int state)
 {
 	opwolf_msm5205_vck(m_msm1, 0);
 }
-WRITE_LINE_MEMBER(opwolf_state::opwolf_msm5205_vck_2)
+void opwolf_state::opwolf_msm5205_vck_2(int state)
 {
 	opwolf_msm5205_vck(m_msm2, 1);
 }

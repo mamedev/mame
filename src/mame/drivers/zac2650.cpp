@@ -187,7 +187,7 @@ static INPUT_PORTS_START( dodgem )
 INPUT_PORTS_END
 
 
-PALETTE_INIT_MEMBER(zac2650_state, zac2650)
+void zac2650_state::palette_init_zac2650(palette_device &palette)
 {
 	palette.set_pen_color(0, rgb_t::black());
 	palette.set_pen_color(1, rgb_t::white());

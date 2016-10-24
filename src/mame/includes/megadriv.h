@@ -78,7 +78,7 @@ public:
 
 	uint8_t megadriv_68k_YM2612_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void megadriv_68k_YM2612_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	IRQ_CALLBACK_MEMBER(genesis_int_callback);
+	int genesis_int_callback(device_t &device, int irqline);
 	void megadriv_init_common();
 
 	void megadriv_z80_bank_w(uint16_t data);
@@ -96,7 +96,7 @@ public:
 	void megadriv_z80_vdp_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t megadriv_z80_vdp_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t megadriv_z80_unmapped_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	TIMER_CALLBACK_MEMBER(megadriv_z80_run_state);
+	void megadriv_z80_run_state(void *ptr, int32_t param);
 
 	/* Megadrive / Genesis has 3 I/O ports */
 	emu_timer *m_io_timeout[3];
@@ -107,11 +107,11 @@ public:
 	read8_delegate m_megadrive_io_read_data_port_ptr;
 	write16_delegate m_megadrive_io_write_data_port_ptr;
 
-	WRITE_LINE_MEMBER(vdp_sndirqline_callback_genesis_z80);
-	WRITE_LINE_MEMBER(vdp_lv6irqline_callback_genesis_68k);
-	WRITE_LINE_MEMBER(vdp_lv4irqline_callback_genesis_68k);
+	void vdp_sndirqline_callback_genesis_z80(int state);
+	void vdp_lv6irqline_callback_genesis_68k(int state);
+	void vdp_lv4irqline_callback_genesis_68k(int state);
 
-	TIMER_CALLBACK_MEMBER( io_timeout_timer_callback );
+	void io_timeout_timer_callback(void *ptr, int32_t param);
 	void megadrive_reset_io();
 	uint8_t megadrive_io_read_data_port_6button(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t megadrive_io_read_data_port_3button(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);

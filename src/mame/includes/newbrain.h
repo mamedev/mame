@@ -66,11 +66,11 @@ public:
 	uint8_t cop_g_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void cop_d_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t cop_in_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( k2_w );
-	DECLARE_READ_LINE_MEMBER( tdi_r );
-	DECLARE_WRITE_LINE_MEMBER( k1_w );
+	void k2_w(int state);
+	int tdi_r();
+	void k1_w(int state);
 
-	INTERRUPT_GEN_MEMBER(newbrain_interrupt);
+	void newbrain_interrupt(device_t &device);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;

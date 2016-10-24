@@ -46,19 +46,19 @@ public:
 	void init_wcherry();
 	void init_super9();
 	void video_start_goldstar();
-	DECLARE_PALETTE_INIT(cm);
+	void palette_init_cm(palette_device &palette);
 	void video_start_cherrym();
-	DECLARE_PALETTE_INIT(cmast91);
-	DECLARE_PALETTE_INIT(lucky8);
+	void palette_init_cmast91(palette_device &palette);
+	void palette_init_lucky8(palette_device &palette);
 	uint32_t screen_update_goldstar(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cmast91(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
-	TILE_GET_INFO_MEMBER(get_goldstar_fg_tile_info);
-	TILE_GET_INFO_MEMBER(get_cherrym_fg_tile_info);
-	TILE_GET_INFO_MEMBER(get_goldstar_reel1_tile_info);
-	TILE_GET_INFO_MEMBER(get_goldstar_reel2_tile_info);
-	TILE_GET_INFO_MEMBER(get_goldstar_reel3_tile_info);
+	void get_goldstar_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_cherrym_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_goldstar_reel1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_goldstar_reel2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_goldstar_reel3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	int m_dataoffset;
 
@@ -174,14 +174,14 @@ public:
 
 	void video_start_bingowng();
 	void video_start_magical();
-	DECLARE_PALETTE_INIT(magodds);
+	void palette_init_magodds(palette_device &palette);
 	uint32_t screen_update_bingowng(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_magical(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	INTERRUPT_GEN_MEMBER(masked_irq);
+	void masked_irq(device_t &device);
 
 protected:
-	TILE_GET_INFO_MEMBER(get_magical_fg_tile_info);
+	void get_magical_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 private:
 	optional_device<ds2401_device> m_fl7w4_id;
@@ -242,11 +242,11 @@ public:
 	uint32_t screen_update_sangho(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
-	TILE_GET_INFO_MEMBER(get_bg_tile_info);
-	TILE_GET_INFO_MEMBER(get_reel1_tile_info);
-	TILE_GET_INFO_MEMBER(get_reel2_tile_info);
-	TILE_GET_INFO_MEMBER(get_reel3_tile_info);
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_reel1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_reel2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_reel3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 private:
 	required_shared_ptr<uint8_t> m_reel1_attrram;
@@ -284,12 +284,12 @@ public:
 	void video_start_unkch();
 	uint32_t screen_update_unkch(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	INTERRUPT_GEN_MEMBER(vblank_irq);
+	void vblank_irq(device_t &device);
 
 protected:
-	TILE_GET_INFO_MEMBER(get_reel1_tile_info);
-	TILE_GET_INFO_MEMBER(get_reel2_tile_info);
-	TILE_GET_INFO_MEMBER(get_reel3_tile_info);
+	void get_reel1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_reel2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_reel3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 private:
 	required_shared_ptr<uint8_t> m_reel1_attrram;

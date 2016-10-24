@@ -33,7 +33,7 @@ public:
 	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_PALETTE_INIT(k1ge);
+	void palette_init_k1ge(palette_device &palette);
 
 	void update( bitmap_ind16 &bitmap, const rectangle &cliprect );
 
@@ -61,8 +61,8 @@ protected:
 
 	void draw_scroll_plane( uint16_t *p, uint16_t base, int line, int scroll_x, int scroll_y, int pal_base );
 	void draw_sprite_plane( uint16_t *p, uint16_t priority, int line, int scroll_x, int scroll_y );
-	TIMER_CALLBACK_MEMBER( hblank_on_timer_callback );
-	TIMER_CALLBACK_MEMBER( timer_callback );
+	void hblank_on_timer_callback(void *ptr, int32_t param);
+	void timer_callback(void *ptr, int32_t param);
 
 };
 
@@ -72,7 +72,7 @@ class k2ge_device : public k1ge_device
 public:
 	k2ge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_PALETTE_INIT(k2ge);
+	void palette_init_k2ge(palette_device &palette);
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 

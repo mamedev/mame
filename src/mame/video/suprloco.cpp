@@ -30,7 +30,7 @@
   I'm not sure about the resistor values, I'm using the Galaxian ones.
 
 ***************************************************************************/
-PALETTE_INIT_MEMBER(suprloco_state, suprloco)
+void suprloco_state::palette_init_suprloco(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
@@ -77,7 +77,7 @@ PALETTE_INIT_MEMBER(suprloco_state, suprloco)
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(suprloco_state::get_tile_info)
+void suprloco_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t attr = m_videoram[2*tile_index+1];
 	SET_TILE_INFO_MEMBER(0,

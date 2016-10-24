@@ -104,9 +104,9 @@ public:
 	template<class _Object> static devcb_base &set_nmi_wr_callback(device_t &device, _Object object) { return downcast<ep64_expansion_bus_slot_device &>(device).m_write_nmi.set_callback(object); }
 	template<class _Object> static devcb_base &set_wait_wr_callback(device_t &device, _Object object) { return downcast<ep64_expansion_bus_slot_device &>(device).m_write_wait.set_callback(object); }
 
-	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_write_irq(state); }
-	DECLARE_WRITE_LINE_MEMBER( nmi_w ) { m_write_nmi(state); }
-	DECLARE_WRITE_LINE_MEMBER( wait_w ) { m_write_wait(state); }
+	void irq_w(int state) { m_write_irq(state); }
+	void nmi_w(int state) { m_write_nmi(state); }
+	void wait_w(int state) { m_write_wait(state); }
 
 	address_space& program() { return m_dave->space(AS_PROGRAM); }
 	address_space& io() { return m_dave->space(AS_IO); }

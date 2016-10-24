@@ -284,8 +284,8 @@ public:
 	void init_prot_val_10();
 	void init_prot_val_20();
 	void init_prot_val_40();
-	TILE_GET_INFO_MEMBER(fg_get_tile_info);
-	TILE_GET_INFO_MEMBER(bg_get_tile_info);
+	void fg_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void bg_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -827,8 +827,8 @@ static INPUT_PORTS_START( wondstck )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
 INPUT_PORTS_END
 
-TILE_GET_INFO_MEMBER(nmg5_state::fg_get_tile_info){ SET_TILE_INFO_MEMBER(0, m_fg_videoram[tile_index] | (m_gfx_bank << 16), 0, 0);}
-TILE_GET_INFO_MEMBER(nmg5_state::bg_get_tile_info){ SET_TILE_INFO_MEMBER(0, m_bg_videoram[tile_index] | (m_gfx_bank << 16), 1, 0);}
+void nmg5_state::fg_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ SET_TILE_INFO_MEMBER(0, m_fg_videoram[tile_index] | (m_gfx_bank << 16), 0, 0);}
+void nmg5_state::bg_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index){ SET_TILE_INFO_MEMBER(0, m_bg_videoram[tile_index] | (m_gfx_bank << 16), 1, 0);}
 
 void nmg5_state::video_start()
 {

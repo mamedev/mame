@@ -89,7 +89,7 @@ const tiny_rom_entry *o2_voice_device::device_rom_region() const
 	return ROM_NAME( o2voice );
 }
 
-WRITE_LINE_MEMBER(o2_voice_device::lrq_callback)
+void o2_voice_device::lrq_callback(int state)
 {
 	m_lrq_state = state;
 }

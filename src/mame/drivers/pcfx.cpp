@@ -58,15 +58,15 @@ public:
 
 	inline void check_irqs();
 	inline void set_irq_line(int line, int state);
-	DECLARE_WRITE_LINE_MEMBER( irq8_w );
-	DECLARE_WRITE_LINE_MEMBER( irq9_w );
-	DECLARE_WRITE_LINE_MEMBER( irq10_w );
-	DECLARE_WRITE_LINE_MEMBER( irq11_w );
-	DECLARE_WRITE_LINE_MEMBER( irq12_w );
-	DECLARE_WRITE_LINE_MEMBER( irq13_w );
-	DECLARE_WRITE_LINE_MEMBER( irq14_w );
-	DECLARE_WRITE_LINE_MEMBER( irq15_w );
-	TIMER_CALLBACK_MEMBER(pad_func);
+	void irq8_w(int state);
+	void irq9_w(int state);
+	void irq10_w(int state);
+	void irq11_w(int state);
+	void irq12_w(int state);
+	void irq13_w(int state);
+	void irq14_w(int state);
+	void irq15_w(int state);
+	void pad_func(void *ptr, int32_t param);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -139,7 +139,7 @@ void pcfx_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 	}
 }
 
-TIMER_CALLBACK_MEMBER(pcfx_state::pad_func)
+void pcfx_state::pad_func(void *ptr, int32_t param)
 {
 	const char *const padnames[] = { "P1", "P2" };
 
@@ -418,42 +418,42 @@ inline void pcfx_state::set_irq_line(int line, int state)
 	check_irqs();
 }
 
-WRITE_LINE_MEMBER( pcfx_state::irq8_w )
+void pcfx_state::irq8_w(int state)
 {
 	set_irq_line(8, state);
 }
 
-WRITE_LINE_MEMBER( pcfx_state::irq9_w )
+void pcfx_state::irq9_w(int state)
 {
 	set_irq_line(9, state);
 }
 
-WRITE_LINE_MEMBER( pcfx_state::irq10_w )
+void pcfx_state::irq10_w(int state)
 {
 	set_irq_line(10, state);
 }
 
-WRITE_LINE_MEMBER( pcfx_state::irq11_w )
+void pcfx_state::irq11_w(int state)
 {
 	set_irq_line(11, state);
 }
 
-WRITE_LINE_MEMBER( pcfx_state::irq12_w )
+void pcfx_state::irq12_w(int state)
 {
 	set_irq_line(12, state);
 }
 
-WRITE_LINE_MEMBER( pcfx_state::irq13_w )
+void pcfx_state::irq13_w(int state)
 {
 	set_irq_line(13, state);
 }
 
-WRITE_LINE_MEMBER( pcfx_state::irq14_w )
+void pcfx_state::irq14_w(int state)
 {
 	set_irq_line(14, state);
 }
 
-WRITE_LINE_MEMBER( pcfx_state::irq15_w )
+void pcfx_state::irq15_w(int state)
 {
 	set_irq_line(15, state);
 }

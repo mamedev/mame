@@ -104,10 +104,10 @@ public:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
-	TILE_GET_INFO_MEMBER(get_bg0tile_info);
-	TILE_GET_INFO_MEMBER(get_bg1tile_info);
-	TILE_GET_INFO_MEMBER(get_bg2tile_info);
-	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	void get_bg0tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_bg1tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_bg2tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void prot_init(int which);

@@ -268,7 +268,7 @@ int k007342_device::is_int_enabled( )
   color RAM     ----xxxx    depends on external connections (usually color and banking)
 */
 
-TILEMAP_MAPPER_MEMBER(k007342_device::scan)
+tilemap_memory_index k007342_device::scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	/* logical (col,row) -> memory offset */
 	return (col & 0x1f) + ((row & 0x1f) << 5) + ((col & 0x20) << 5);
@@ -294,12 +294,12 @@ void k007342_device::get_tile_info( tile_data &tileinfo, int tile_index, int lay
 			flags);
 }
 
-TILE_GET_INFO_MEMBER(k007342_device::get_tile_info0)
+void k007342_device::get_tile_info0(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	get_tile_info(tileinfo, tile_index, 0, m_colorram_0, m_videoram_0);
 }
 
-TILE_GET_INFO_MEMBER(k007342_device::get_tile_info1)
+void k007342_device::get_tile_info1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	get_tile_info(tileinfo, tile_index, 1, m_colorram_1, m_videoram_1);
 }

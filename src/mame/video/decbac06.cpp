@@ -140,37 +140,37 @@ void deco_bac06_device::set_gfx_region_wide(device_t &device, int region8x8, int
 	dev.m_wide = wide;
 }
 
-TILEMAP_MAPPER_MEMBER(deco_bac06_device::tile_shape0_scan)
+tilemap_memory_index deco_bac06_device::tile_shape0_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	return (col & 0xf) + ((row & 0xf) << 4) + ((col & 0x1f0) << 4);
 }
 
-TILEMAP_MAPPER_MEMBER(deco_bac06_device::tile_shape1_scan)
+tilemap_memory_index deco_bac06_device::tile_shape1_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	return (col & 0xf) + ((row & 0x1f) << 4) + ((col & 0xf0) << 5);
 }
 
-TILEMAP_MAPPER_MEMBER(deco_bac06_device::tile_shape2_scan)
+tilemap_memory_index deco_bac06_device::tile_shape2_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	return (col & 0xf) + ((row & 0x3f) << 4) + ((col & 0x70) << 6);
 }
 
-TILEMAP_MAPPER_MEMBER(deco_bac06_device::tile_shape0_8x8_scan)
+tilemap_memory_index deco_bac06_device::tile_shape0_8x8_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	return (col & 0x1f) + ((row & 0x1f) << 5) + ((col & 0x60) << 5);
 }
 
-TILEMAP_MAPPER_MEMBER(deco_bac06_device::tile_shape1_8x8_scan)
+tilemap_memory_index deco_bac06_device::tile_shape1_8x8_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	return (col & 0x1f) + ((row & 0x1f) << 5) + ((row & 0x20) << 5) + ((col & 0x20) << 6);
 }
 
-TILEMAP_MAPPER_MEMBER(deco_bac06_device::tile_shape2_8x8_scan)
+tilemap_memory_index deco_bac06_device::tile_shape2_8x8_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
 {
 	return (col & 0x1f) + ((row & 0x7f) << 5);
 }
 
-TILE_GET_INFO_MEMBER(deco_bac06_device::get_pf8x8_tile_info)
+void deco_bac06_device::get_pf8x8_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	if (m_rambank&1) tile_index+=0x1000;
 	int tile=m_pf_data[tile_index];
@@ -179,7 +179,7 @@ TILE_GET_INFO_MEMBER(deco_bac06_device::get_pf8x8_tile_info)
 	tileinfo.category = colourpri;
 }
 
-TILE_GET_INFO_MEMBER(deco_bac06_device::get_pf16x16_tile_info)
+void deco_bac06_device::get_pf16x16_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	if (m_rambank&1) tile_index+=0x1000;
 	int tile=m_pf_data[tile_index];

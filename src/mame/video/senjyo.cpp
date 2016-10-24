@@ -18,7 +18,7 @@
 
 ***************************************************************************/
 
-TILE_GET_INFO_MEMBER(senjyo_state::get_fg_tile_info)
+void senjyo_state::get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t attr = m_fgcolorram[tile_index];
 	int flags = (attr & 0x80) ? TILE_FLIPY : 0;
@@ -32,7 +32,7 @@ TILE_GET_INFO_MEMBER(senjyo_state::get_fg_tile_info)
 			flags);
 }
 
-TILE_GET_INFO_MEMBER(senjyo_state::senjyo_bg1_tile_info)
+void senjyo_state::senjyo_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t code = m_bg1videoram[tile_index];
 
@@ -42,7 +42,7 @@ TILE_GET_INFO_MEMBER(senjyo_state::senjyo_bg1_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(senjyo_state::starforc_bg1_tile_info)
+void senjyo_state::starforc_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	/* Star Force has more tiles in bg1, so to get a uniform color code spread */
 	/* they wired bit 7 of the tile code in place of bit 4 to get the color code */
@@ -55,7 +55,7 @@ TILE_GET_INFO_MEMBER(senjyo_state::starforc_bg1_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(senjyo_state::get_bg2_tile_info)
+void senjyo_state::get_bg2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t code = m_bg2videoram[tile_index];
 
@@ -65,7 +65,7 @@ TILE_GET_INFO_MEMBER(senjyo_state::get_bg2_tile_info)
 			0);
 }
 
-TILE_GET_INFO_MEMBER(senjyo_state::get_bg3_tile_info)
+void senjyo_state::get_bg3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t code = m_bg3videoram[tile_index];
 
@@ -107,7 +107,7 @@ void senjyo_state::video_start()
 	m_fg_tilemap->set_scroll_cols(32);
 }
 
-PALETTE_DECODER_MEMBER( senjyo_state, IIBBGGRR )
+rgb_t senjyo_state::IIBBGGRR_decoder(uint32_t raw)
 {
 	uint8_t i = (raw >> 6) & 3;
 	uint8_t r = (raw << 2) & 0x0c;
@@ -117,7 +117,7 @@ PALETTE_DECODER_MEMBER( senjyo_state, IIBBGGRR )
 	return rgb_t(pal4bit(r ? (r | i) : 0), pal4bit(g ? (g | i) : 0), pal4bit(b ? (b | i) : 0));
 }
 
-PALETTE_INIT_MEMBER( senjyo_state, radar )
+void senjyo_state::palette_init_radar(palette_device &palette)
 {
 	// two colors for the radar dots (verified on the real board)
 	m_radar_palette->set_pen_color(0, rgb_t(0xff, 0x00, 0x00));  // red for enemies

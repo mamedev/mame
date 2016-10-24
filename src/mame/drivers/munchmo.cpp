@@ -43,7 +43,7 @@ void munchmo_state::mnchmobl_nmi_enable_w(address_space &space, offs_t offset, u
 }
 
 /* trusted thru schematics, NMI and IRQ triggers at vblank, at the same time (!) */
-INTERRUPT_GEN_MEMBER(munchmo_state::mnchmobl_vblank_irq)
+void munchmo_state::mnchmobl_vblank_irq(device_t &device)
 {
 	if (m_nmi_enable)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -51,7 +51,7 @@ INTERRUPT_GEN_MEMBER(munchmo_state::mnchmobl_vblank_irq)
 	m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(munchmo_state::mnchmobl_sound_irq)
+void munchmo_state::mnchmobl_sound_irq(device_t &device)
 {
 	device.execute().set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }

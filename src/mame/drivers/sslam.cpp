@@ -214,7 +214,7 @@ static const uint8_t sslam_snd_loop[8][19] =
 
 
 
-TIMER_CALLBACK_MEMBER(sslam_state::music_playback)
+void sslam_state::music_playback(void *ptr, int32_t param)
 {
 	int pattern = 0;
 	if ((m_oki->read_status() & 0x08) == 0)

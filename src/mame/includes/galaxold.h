@@ -147,8 +147,8 @@ public:
 	uint8_t rockclim_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void dambustr_bg_split_line_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void dambustr_bg_color_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(galaxold_7474_9m_2_q_callback);
-	DECLARE_WRITE_LINE_MEMBER(galaxold_7474_9m_1_callback);
+	void galaxold_7474_9m_2_q_callback(int state);
+	void galaxold_7474_9m_1_callback(int state);
 	uint8_t rescueb_a002_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return 0xfc; }
 	DECLARE_CUSTOM_INPUT_MEMBER(_4in1_fake_port_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(vpool_lives_r);
@@ -161,27 +161,27 @@ public:
 	void init_guttangt();
 	void init_ckonggx();
 
-	TILE_GET_INFO_MEMBER(drivfrcg_get_tile_info);
-	TILE_GET_INFO_MEMBER(racknrol_get_tile_info);
-	TILE_GET_INFO_MEMBER(dambustr_get_tile_info2);
-	TILE_GET_INFO_MEMBER(get_tile_info);
-	TILE_GET_INFO_MEMBER(rockclim_get_tile_info);
-	TILE_GET_INFO_MEMBER(harem_get_tile_info);
+	void drivfrcg_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void racknrol_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void dambustr_get_tile_info2(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void rockclim_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void harem_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	void machine_reset_galaxold();
 	void machine_reset_devilfsg();
 	void machine_reset_hunchbkg();
 
-	DECLARE_PALETTE_INIT(galaxold);
-	DECLARE_PALETTE_INIT(rockclim);
-	DECLARE_PALETTE_INIT(scrambold);
-	DECLARE_PALETTE_INIT(stratgyx);
-	DECLARE_PALETTE_INIT(darkplnt);
-	DECLARE_PALETTE_INIT(minefld);
-	DECLARE_PALETTE_INIT(rescue);
-	DECLARE_PALETTE_INIT(mariner);
-	DECLARE_PALETTE_INIT(dambustr);
-	DECLARE_PALETTE_INIT(turtles);
+	void palette_init_galaxold(palette_device &palette);
+	void palette_init_rockclim(palette_device &palette);
+	void palette_init_scrambold(palette_device &palette);
+	void palette_init_stratgyx(palette_device &palette);
+	void palette_init_darkplnt(palette_device &palette);
+	void palette_init_minefld(palette_device &palette);
+	void palette_init_rescue(palette_device &palette);
+	void palette_init_mariner(palette_device &palette);
+	void palette_init_dambustr(palette_device &palette);
+	void palette_init_turtles(palette_device &palette);
 
 	void video_start_galaxold();
 	void video_start_drivfrcg();
@@ -212,11 +212,11 @@ public:
 	uint32_t screen_update_galaxold(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_dambustr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	INTERRUPT_GEN_MEMBER(hunchbks_vh_interrupt);
-	TIMER_CALLBACK_MEMBER(stars_blink_callback);
-	TIMER_CALLBACK_MEMBER(stars_scroll_callback);
-	TIMER_DEVICE_CALLBACK_MEMBER(galaxold_interrupt_timer);
-	IRQ_CALLBACK_MEMBER(hunchbkg_irq_callback);
+	void hunchbks_vh_interrupt(device_t &device);
+	void stars_blink_callback(void *ptr, int32_t param);
+	void stars_scroll_callback(void *ptr, int32_t param);
+	void galaxold_interrupt_timer(timer_device &timer, void *ptr, int32_t param);
+	int hunchbkg_irq_callback(device_t &device, int irqline);
 
 	void state_save_register();
 	void video_start_common();

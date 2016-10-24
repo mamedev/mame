@@ -60,7 +60,7 @@ void crimfght_state::sound_w(address_space &space, offs_t offset, uint8_t data, 
 	m_audiocpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
-IRQ_CALLBACK_MEMBER( crimfght_state::audiocpu_irq_ack )
+int crimfght_state::audiocpu_irq_ack(device_t &device, int irqline)
 {
 	// irq ack cycle clears irq via flip-flop u86
 	m_audiocpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);

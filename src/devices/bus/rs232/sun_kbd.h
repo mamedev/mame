@@ -20,7 +20,7 @@ public:
 
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
-	virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) override;
+	virtual void input_txd(int state) override;
 
 protected:
 	virtual void device_start() override;

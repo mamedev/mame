@@ -54,10 +54,10 @@ public:
 	virtual void machine_reset() override;
 	uint32_t screen_update_mainevt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_dv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(mainevt_interrupt);
-	INTERRUPT_GEN_MEMBER(dv_interrupt);
-	INTERRUPT_GEN_MEMBER(mainevt_sound_timer_irq);
-	INTERRUPT_GEN_MEMBER(devstors_sound_timer_irq);
+	void mainevt_interrupt(device_t &device);
+	void dv_interrupt(device_t &device);
+	void mainevt_sound_timer_irq(device_t &device);
+	void devstors_sound_timer_irq(device_t &device);
 	void volume_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	K052109_CB_MEMBER(mainevt_tile_callback);
 	K052109_CB_MEMBER(dv_tile_callback);

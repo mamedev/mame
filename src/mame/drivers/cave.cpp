@@ -104,7 +104,7 @@ void cave_state::update_irq_state()
 		m_maincpu->set_input_line(m_irq_level, CLEAR_LINE);
 }
 
-TIMER_CALLBACK_MEMBER(cave_state::cave_vblank_end)
+void cave_state::cave_vblank_end(void *ptr, int32_t param)
 {
 	if (m_kludge == 3)  /* mazinger metmqstr */
 	{
@@ -114,7 +114,7 @@ TIMER_CALLBACK_MEMBER(cave_state::cave_vblank_end)
 	m_agallet_vblank_irq = 0;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(cave_state::cave_vblank_start)
+void cave_state::cave_vblank_start(timer_device &timer, void *ptr, int32_t param)
 {
 	m_vblank_irq = 1;
 	update_irq_state();
@@ -122,21 +122,21 @@ TIMER_DEVICE_CALLBACK_MEMBER(cave_state::cave_vblank_start)
 	m_agallet_vblank_irq = 1;
 	machine().scheduler().timer_set(attotime::from_usec(2000), timer_expired_delegate(FUNC(cave_state::cave_vblank_end),this));
 }
-TIMER_DEVICE_CALLBACK_MEMBER(cave_state::cave_vblank_start_left)
+void cave_state::cave_vblank_start_left(timer_device &timer, void *ptr, int32_t param)
 {
 	cave_get_sprite_info(1);
 }
-TIMER_DEVICE_CALLBACK_MEMBER(cave_state::cave_vblank_start_right)
+void cave_state::cave_vblank_start_right(timer_device &timer, void *ptr, int32_t param)
 {
 	cave_get_sprite_info(2);
 }
 
 /* Called once/frame to generate the VBLANK interrupt */
-INTERRUPT_GEN_MEMBER(cave_state::cave_interrupt)
+void cave_state::cave_interrupt(device_t &device)
 {
 	m_int_timer->adjust(attotime::from_usec(17376 - m_time_vblank_irq));
 }
-INTERRUPT_GEN_MEMBER(cave_state::cave_interrupt_ppsatan)
+void cave_state::cave_interrupt_ppsatan(device_t &device)
 {
 	m_int_timer->adjust      (attotime::from_usec(17376 - m_time_vblank_irq));
 	m_int_timer_left->adjust (attotime::from_usec(17376 - m_time_vblank_irq));
@@ -144,7 +144,7 @@ INTERRUPT_GEN_MEMBER(cave_state::cave_interrupt_ppsatan)
 }
 
 /* Called by the YMZ280B to set the IRQ state */
-WRITE_LINE_MEMBER(cave_state::sound_irq_gen)
+void cave_state::sound_irq_gen(int state)
 {
 	m_sound_irq = (state != 0);
 	update_irq_state();
@@ -2473,7 +2473,7 @@ MACHINE_CONFIG_END
                                Poka Poka Satan
 ***************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER( cave_state::timer_lev2_cb )
+void cave_state::timer_lev2_cb(timer_device &timer, void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(M68K_IRQ_2, HOLD_LINE);   // ppsatan: read touch screens
 }
@@ -2602,7 +2602,7 @@ MACHINE_CONFIG_END
                         Sailor Moon / Air Gallet
 ***************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER( cave_state::sailormn_startup )
+void cave_state::sailormn_startup(timer_device &timer, void *ptr, int32_t param)
 {
 	m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 }

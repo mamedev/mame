@@ -30,7 +30,7 @@
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(btime_state,btime)
+void btime_state::palette_init_btime(palette_device &palette)
 {
 	/* Burger Time doesn't have a color PROM, but Hamburge has. */
 	/* This function is also used by Eggs. */
@@ -82,7 +82,7 @@ PALETTE_INIT_MEMBER(btime_state,btime)
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(btime_state,lnc)
+void btime_state::palette_init_lnc(palette_device &palette)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
 

@@ -79,9 +79,9 @@ public:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	TIMER_CALLBACK_MEMBER(subcpu_suspend);
-	TIMER_CALLBACK_MEMBER(subcpu_resume);
-	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
+	void subcpu_suspend(void *ptr, int32_t param);
+	void subcpu_resume(void *ptr, int32_t param);
+	void adpcm_int(int state);
 	void unlock_shared_ram();
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
@@ -121,12 +121,12 @@ void sothello_state::bank_w(address_space &space, offs_t offset, uint8_t data, u
 	m_bank1->set_entry(bank);
 }
 
-TIMER_CALLBACK_MEMBER(sothello_state::subcpu_suspend)
+void sothello_state::subcpu_suspend(void *ptr, int32_t param)
 {
 	m_subcpu->suspend(SUSPEND_REASON_HALT, 1);
 }
 
-TIMER_CALLBACK_MEMBER(sothello_state::subcpu_resume)
+void sothello_state::subcpu_resume(void *ptr, int32_t param)
 {
 	m_subcpu->resume(SUSPEND_REASON_HALT);
 	m_subcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -328,7 +328,7 @@ static INPUT_PORTS_START( sothello )
 INPUT_PORTS_END
 
 
-WRITE_LINE_MEMBER(sothello_state::adpcm_int)
+void sothello_state::adpcm_int(int state)
 {
 	/* only 4 bits are used */
 	m_msm->data_w(m_msm_data & 0x0f );

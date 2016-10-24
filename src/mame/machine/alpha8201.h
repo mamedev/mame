@@ -22,8 +22,8 @@ public:
 	void mcu_d_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	// external I/O
-	DECLARE_WRITE_LINE_MEMBER(bus_dir_w);
-	DECLARE_WRITE_LINE_MEMBER(mcu_start_w);
+	void bus_dir_w(int state);
+	void mcu_start_w(int state);
 	uint8_t ext_ram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void ext_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 

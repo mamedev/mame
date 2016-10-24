@@ -17,10 +17,10 @@ public:
 
 	uint16_t z8000_io_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void z8000_io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	DECLARE_WRITE_LINE_MEMBER(vi_w);
-	DECLARE_WRITE_LINE_MEMBER(nvi_w);
+	void vi_w(int state);
+	void nvi_w(int state);
 	void handshake_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	IRQ_CALLBACK_MEMBER(int_cb);
+	int int_cb(device_t &device, int irqline);
 	bool halted() { return m_8086_halt; }
 	required_device<cpu_device> m_8086;
 

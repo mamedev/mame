@@ -551,7 +551,7 @@ void epson_lx810l_t::cr_stepper(address_space &space, offs_t offset, uint8_t dat
 	LX810LLOG("%s: %s(%02x); abs %d\n", machine().describe_context(), __func__, data, m_cr_pos_abs);
 }
 
-WRITE_LINE_MEMBER( epson_lx810l_t::e05a30_ready )
+void epson_lx810l_t::e05a30_ready(int state)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
@@ -577,7 +577,7 @@ uint32_t epson_lx810l_t::screen_update_lx810l(screen_device &screen, bitmap_rgb3
     Extended Timer Output
 ***************************************************************************/
 
-WRITE_LINE_MEMBER( epson_lx810l_t::co0_w )
+void epson_lx810l_t::co0_w(int state)
 {
 	/* Printhead is being fired on !state. */
 	if (!state) {

@@ -161,11 +161,11 @@ public:
 
 	void iplk_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t iplk_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(irq_w);
+	void irq_w(int state);
 	void gmode_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t gmode_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( centronics_busy_w ) { m_centronics_busy = state; }
+	void centronics_busy_w(int state) { m_centronics_busy = state; }
 	uint8_t mc6847_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void cass_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
@@ -440,7 +440,7 @@ uint8_t spc1000_state::porta_r(address_space &space, offs_t offset, uint8_t mem_
 }
 
 // irq is inverted in emulation, so we need this trampoline
-WRITE_LINE_MEMBER( spc1000_state::irq_w )
+void spc1000_state::irq_w(int state)
 {
 	m_maincpu->set_input_line(0, state ? CLEAR_LINE : HOLD_LINE);
 }

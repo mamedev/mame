@@ -26,7 +26,7 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 public:
-	DECLARE_WRITE_LINE_MEMBER(set_state);   // enable/disable sound output
+	void set_state(int state);   // enable/disable sound output
 	void set_clock(uint32_t frequency);       // output frequency
 
 private:

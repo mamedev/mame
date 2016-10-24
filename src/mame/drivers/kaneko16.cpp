@@ -1829,7 +1829,7 @@ GFXDECODE_END
 
 ***************************************************************************/
 
-TIMER_DEVICE_CALLBACK_MEMBER(kaneko16_state::kaneko16_interrupt)
+void kaneko16_state::kaneko16_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 
@@ -2314,7 +2314,7 @@ MACHINE_CONFIG_END
     other: busy loop
 */
 
-TIMER_DEVICE_CALLBACK_MEMBER(kaneko16_state::shogwarr_interrupt)
+void kaneko16_state::shogwarr_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	int scanline = param;
 

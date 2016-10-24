@@ -826,13 +826,13 @@ void rallyx_state::machine_reset_rallyx()
 	m_stars_enable = 0;
 }
 
-INTERRUPT_GEN_MEMBER(rallyx_state::rallyx_vblank_irq)
+void rallyx_state::rallyx_vblank_irq(device_t &device)
 {
 	if (m_main_irq_mask)
 		device.execute().set_input_line(0, ASSERT_LINE);
 }
 
-INTERRUPT_GEN_MEMBER(rallyx_state::jungler_vblank_irq)
+void rallyx_state::jungler_vblank_irq(device_t &device)
 {
 	if (m_main_irq_mask)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);

@@ -200,7 +200,7 @@ public:
 	static void static_set_pcb_read(device_t &device, cdp1869_pcb_read_delegate callback) { downcast<cdp1869_device &>(device).m_in_pcb_func = callback; }
 	static void static_set_color_clock(device_t &device, int color_clock) { downcast<cdp1869_device &>(device).m_color_clock = color_clock; }
 
-	DECLARE_PALETTE_INIT(cdp1869);
+	void palette_init_cdp1869(palette_device &palette);
 
 	virtual DECLARE_ADDRESS_MAP(io_map, 8);
 	virtual DECLARE_ADDRESS_MAP(char_map, 8);
@@ -218,8 +218,8 @@ public:
 	uint8_t page_ram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void page_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_READ_LINE_MEMBER( predisplay_r );
-	DECLARE_READ_LINE_MEMBER( pal_ntsc_r );
+	int predisplay_r();
+	int pal_ntsc_r();
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

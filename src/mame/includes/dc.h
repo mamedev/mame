@@ -55,8 +55,8 @@ class dc_state : public driver_device
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	TIMER_CALLBACK_MEMBER(g2_dma_irq);
-	TIMER_CALLBACK_MEMBER(ch2_dma_irq);
+	void g2_dma_irq(void *ptr, int32_t param);
+	void ch2_dma_irq(void *ptr, int32_t param);
 	uint32_t dc_aica_reg_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	void dc_aica_reg_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	uint32_t dc_arm_aica_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
@@ -86,7 +86,7 @@ class dc_state : public driver_device
 	required_device<aica_device> m_aica;
 
 	void generic_dma(uint32_t main_adr, void *dma_ptr, uint32_t length, uint32_t size, bool to_mainram);
-	TIMER_DEVICE_CALLBACK_MEMBER(dc_scanline);
+	void dc_scanline(timer_device &timer, void *ptr, int32_t param);
 };
 
 /*--------- Ch2-DMA Control Registers ----------*/

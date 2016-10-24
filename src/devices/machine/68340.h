@@ -56,7 +56,7 @@ public:
 	void m68340_internal_timer_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask);
 
 	emu_timer *m_irq_timer;
-	TIMER_CALLBACK_MEMBER(periodic_interrupt_timer_callback);
+	void periodic_interrupt_timer_callback(void *ptr, int32_t param);
 	void start_68340_sim(void);
 	void do_timer_irq(void);
 protected:

@@ -84,29 +84,29 @@ public:
 	uint8_t read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_WRITE_LINE_MEMBER( write_pa0 ) { write_pa(0, state); }
-	DECLARE_WRITE_LINE_MEMBER( write_pa1 ) { write_pa(1, state); }
-	DECLARE_WRITE_LINE_MEMBER( write_pa2 ) { write_pa(2, state); }
-	DECLARE_WRITE_LINE_MEMBER( write_pa3 ) { write_pa(3, state); }
-	DECLARE_WRITE_LINE_MEMBER( write_pa4 ) { write_pa(4, state); }
-	DECLARE_WRITE_LINE_MEMBER( write_pa5 ) { write_pa(5, state); }
-	DECLARE_WRITE_LINE_MEMBER( write_pa6 ) { write_pa(6, state); }
-	DECLARE_WRITE_LINE_MEMBER( write_pa7 ) { write_pa(7, state); }
+	void write_pa0(int state) { write_pa(0, state); }
+	void write_pa1(int state) { write_pa(1, state); }
+	void write_pa2(int state) { write_pa(2, state); }
+	void write_pa3(int state) { write_pa(3, state); }
+	void write_pa4(int state) { write_pa(4, state); }
+	void write_pa5(int state) { write_pa(5, state); }
+	void write_pa6(int state) { write_pa(6, state); }
+	void write_pa7(int state) { write_pa(7, state); }
 	void write_pa(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( write_ca1 );
-	DECLARE_WRITE_LINE_MEMBER( write_ca2 );
+	void write_ca1(int state);
+	void write_ca2(int state);
 
-	DECLARE_WRITE_LINE_MEMBER( write_pb0 ) { write_pb(0, state); }
-	DECLARE_WRITE_LINE_MEMBER( write_pb1 ) { write_pb(1, state); }
-	DECLARE_WRITE_LINE_MEMBER( write_pb2 ) { write_pb(2, state); }
-	DECLARE_WRITE_LINE_MEMBER( write_pb3 ) { write_pb(3, state); }
-	DECLARE_WRITE_LINE_MEMBER( write_pb4 ) { write_pb(4, state); }
-	DECLARE_WRITE_LINE_MEMBER( write_pb5 ) { write_pb(5, state); }
-	DECLARE_WRITE_LINE_MEMBER( write_pb6 ) { write_pb(6, state); }
-	DECLARE_WRITE_LINE_MEMBER( write_pb7 ) { write_pb(7, state); }
+	void write_pb0(int state) { write_pb(0, state); }
+	void write_pb1(int state) { write_pb(1, state); }
+	void write_pb2(int state) { write_pb(2, state); }
+	void write_pb3(int state) { write_pb(3, state); }
+	void write_pb4(int state) { write_pb(4, state); }
+	void write_pb5(int state) { write_pb(5, state); }
+	void write_pb6(int state) { write_pb(6, state); }
+	void write_pb7(int state) { write_pb(7, state); }
 	void write_pb(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER( write_cb1 );
-	DECLARE_WRITE_LINE_MEMBER( write_cb2 );
+	void write_cb1(int state);
+	void write_cb2(int state);
 
 	enum
 	{

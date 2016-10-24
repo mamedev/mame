@@ -70,9 +70,9 @@ public:
 	uint8_t pia_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t pia_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void pia_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) { mmu(data); }
-	WRITE_LINE_MEMBER(pia_cb2_w) { }  // This is used by Floppy drive on Atari 8bits Home Computers
-	TIMER_DEVICE_CALLBACK_MEMBER(mf_interrupt);
-	TIMER_DEVICE_CALLBACK_MEMBER(mcu_timer_proc);
+	void pia_cb2_w(int state) { }  // This is used by Floppy drive on Atari 8bits Home Computers
+	void mf_interrupt(timer_device &timer, void *ptr, int32_t param);
+	void mcu_timer_proc(timer_device &timer, void *ptr, int32_t param);
 	int atari_input_disabled();
 	virtual void machine_reset() override;
 	//required_device<cpu_device> m_maincpu;    // maincpu is already contained in atari_common_state
@@ -221,7 +221,7 @@ void maxaflex_state::mcu_portC_ddr_w(address_space &space, offs_t offset, uint8_
 	m_ddrC = data;
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER(maxaflex_state::mcu_timer_proc)
+void maxaflex_state::mcu_timer_proc(timer_device &timer, void *ptr, int32_t param)
 {
 	if ( --m_tdr == 0x00 )
 	{
@@ -419,7 +419,7 @@ void maxaflex_state::machine_reset()
 	output().set_digit_value(2, 0x00);
 }
 
-TIMER_DEVICE_CALLBACK_MEMBER( maxaflex_state::mf_interrupt )
+void maxaflex_state::mf_interrupt(timer_device &timer, void *ptr, int32_t param)
 {
 	m_antic->generic_interrupt(2);
 }

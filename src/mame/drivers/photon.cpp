@@ -37,8 +37,8 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_photon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(pk8000_interrupt);
-	IRQ_CALLBACK_MEMBER(pk8000_irq_callback);
+	void pk8000_interrupt(device_t &device);
+	int pk8000_irq_callback(device_t &device, int irqline);
 	void pk8000_set_bank(uint8_t data);
 	required_device<speaker_sound_device> m_speaker;
 };
@@ -155,12 +155,12 @@ static INPUT_PORTS_START( photon )
 	PORT_BIT(0xff, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
-INTERRUPT_GEN_MEMBER(photon_state::pk8000_interrupt)
+void photon_state::pk8000_interrupt(device_t &device)
 {
 	device.execute().set_input_line(0, HOLD_LINE);
 }
 
-IRQ_CALLBACK_MEMBER(photon_state::pk8000_irq_callback)
+int photon_state::pk8000_irq_callback(device_t &device, int irqline)
 {
 	return 0xff;
 }

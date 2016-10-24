@@ -55,15 +55,15 @@ public:
 	void background2_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void tokib_adpcm_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void tokib_adpcm_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_WRITE_LINE_MEMBER(tokib_adpcm_int);
+	void tokib_adpcm_int(int state);
 
 	void init_tokib();
 	void init_jujuba();
 	void init_toki();
 
-	TILE_GET_INFO_MEMBER(get_text_tile_info);
-	TILE_GET_INFO_MEMBER(get_back_tile_info);
-	TILE_GET_INFO_MEMBER(get_fore_tile_info);
+	void get_text_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_back_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	void get_fore_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	virtual void video_start() override;
 

@@ -111,8 +111,8 @@ protected:
 	void transfer_control_pins();
 	inline void update_rx_timer();
 	inline void update_tx_timer();
-	TIMER_CALLBACK_MEMBER(rx_process);
-	TIMER_CALLBACK_MEMBER(tx_process);
+	void rx_process(void *ptr, int32_t param);
+	void tx_process(void *ptr, int32_t param);
 
 	int m_pins[41];
 

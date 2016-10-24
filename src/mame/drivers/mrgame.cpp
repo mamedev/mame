@@ -60,7 +60,7 @@ public:
 		, m_io_x1(*this, "X1")
 	{ }
 
-	DECLARE_PALETTE_INIT(mrgame);
+	void palette_init_mrgame(palette_device &palette);
 	void init_mrgame();
 	void ack1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void ack2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -75,7 +75,7 @@ public:
 	uint8_t porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t portc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t rsw_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer);
+	void irq_timer(timer_device &timer, void *ptr, int32_t param);
 	uint32_t screen_update_mrgame(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	std::unique_ptr<bitmap_ind16> m_tile_bitmap;
 	required_device<palette_device> m_palette;
@@ -323,7 +323,7 @@ void mrgame_state::init_mrgame()
 
 // This pulses the IRQ pins of both audio cpus. The schematic does not
 //show which 4040 output is used, so we have guessed.
-TIMER_DEVICE_CALLBACK_MEMBER( mrgame_state::irq_timer )
+void mrgame_state::irq_timer(timer_device &timer, void *ptr, int32_t param)
 {
 	m_irq_state++;
 	// pulse_line of IRQ not allowed, so trying this instead
@@ -368,7 +368,7 @@ static GFXDECODE_START( mrgame )
 	GFXDECODE_ENTRY( "chargen", 0, spritelayout, 0, 16 )
 GFXDECODE_END
 
-PALETTE_INIT_MEMBER( mrgame_state, mrgame)
+void mrgame_state::palette_init_mrgame(palette_device &palette)
 {
 	static const int resistances[3] = { 1000, 470, 220 };
 	double rweights[3], gweights[3], bweights[2];

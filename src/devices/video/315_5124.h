@@ -78,7 +78,7 @@ public:
 	uint8_t vcount_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t hcount_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_PALETTE_INIT( sega315_5124 );
+	void palette_init_sega315_5124(palette_device &palette);
 
 	void hcount_latch() { hcount_latch_at_hpos( m_screen->hpos() ); };
 	void hcount_latch_at_hpos( int hpos );
@@ -199,7 +199,7 @@ class sega315_5378_device : public sega315_5124_device
 public:
 	sega315_5378_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	DECLARE_PALETTE_INIT( sega315_5378 );
+	void palette_init_sega315_5378(palette_device &palette);
 
 	virtual void set_sega315_5124_compatibility_mode( bool sega315_5124_compatibility_mode ) override;
 

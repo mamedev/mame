@@ -127,14 +127,14 @@ public:
 	void init_005();
 	void init_monster2();
 	void init_astrob();
-	TILE_GET_INFO_MEMBER(spaceod_get_tile_info);
-	TILEMAP_MAPPER_MEMBER(spaceod_scan_rows);
-	TILE_GET_INFO_MEMBER(bg_get_tile_info);
+	void spaceod_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
+	tilemap_memory_index spaceod_scan_rows(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
+	void bg_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	uint32_t screen_update_segag80r(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(segag80r_vblank_start);
-	INTERRUPT_GEN_MEMBER(sindbadm_vblank_start);
+	void segag80r_vblank_start(device_t &device);
+	void sindbadm_vblank_start(device_t &device);
 	void sega005_sound_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void sega005_sound_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	inline void sega005_update_sound_data();
@@ -182,7 +182,7 @@ protected:
 
 private:
 	// internal state
-	TIMER_CALLBACK_MEMBER( sega005_auto_timer );
+	void sega005_auto_timer(void *ptr, int32_t param);
 };
 
 extern const device_type SEGA005;

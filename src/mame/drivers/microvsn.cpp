@@ -41,7 +41,7 @@ public:
 
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_PALETTE_INIT(microvision);
+	void palette_init_microvision(palette_device &palette);
 	void machine_start_microvision();
 	void machine_reset_microvision();
 
@@ -121,7 +121,7 @@ protected:
 };
 
 
-PALETTE_INIT_MEMBER(microvision_state,microvision)
+void microvision_state::palette_init_microvision(palette_device &palette)
 {
 	palette.set_pen_color( 15, 0x00, 0x00, 0x00 );
 	palette.set_pen_color( 14, 0x11, 0x11, 0x11 );

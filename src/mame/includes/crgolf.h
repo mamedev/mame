@@ -72,13 +72,13 @@ public:
 	void init_crgolfhi();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(crgolf);
-	DECLARE_PALETTE_INIT(mastrglf);
+	void palette_init_crgolf(palette_device &palette);
+	void palette_init_mastrglf(palette_device &palette);
 	uint32_t screen_update_crgolf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(main_to_sound_callback);
-	TIMER_CALLBACK_MEMBER(sound_to_main_callback);
+	void main_to_sound_callback(void *ptr, int32_t param);
+	void sound_to_main_callback(void *ptr, int32_t param);
 	void get_pens( pen_t *pens );
-	DECLARE_WRITE_LINE_MEMBER(vck_callback);
+	void vck_callback(int state);
 };
 
 /*----------- defined in video/crgolf.c -----------*/

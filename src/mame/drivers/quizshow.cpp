@@ -69,12 +69,12 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(quizshow_tape_headpos_r);
 	DECLARE_INPUT_CHANGED_MEMBER(quizshow_category_select);
 	void init_quizshow();
-	TILE_GET_INFO_MEMBER(get_tile_info);
+	void get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_PALETTE_INIT(quizshow);
+	void palette_init_quizshow(palette_device &palette);
 	uint32_t screen_update_quizshow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_DEVICE_CALLBACK_MEMBER(quizshow_clock_timer_cb);
+	void quizshow_clock_timer_cb(timer_device &timer, void *ptr, int32_t param);
 };
 
 
@@ -84,7 +84,7 @@ public:
 
 ***************************************************************************/
 
-PALETTE_INIT_MEMBER(quizshow_state, quizshow)
+void quizshow_state::palette_init_quizshow(palette_device &palette)
 {
 	palette.set_indirect_color(0, rgb_t::black());
 	palette.set_indirect_color(1, rgb_t::white());
@@ -101,7 +101,7 @@ PALETTE_INIT_MEMBER(quizshow_state, quizshow)
 		palette.set_pen_indirect(i, lut_pal[i]);
 }
 
-TILE_GET_INFO_MEMBER(quizshow_state::get_tile_info)
+void quizshow_state::get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index)
 {
 	uint8_t code = m_main_ram[tile_index];
 
@@ -359,7 +359,7 @@ static GFXDECODE_START( quizshow )
 GFXDECODE_END
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(quizshow_state::quizshow_clock_timer_cb)
+void quizshow_state::quizshow_clock_timer_cb(timer_device &timer, void *ptr, int32_t param)
 {
 	m_clocks++;
 

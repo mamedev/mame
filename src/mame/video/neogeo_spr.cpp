@@ -138,7 +138,7 @@ uint8_t neosprite_base_device::neogeo_get_auto_animation_counter()
 }
 
 
-TIMER_CALLBACK_MEMBER(neosprite_base_device::auto_animation_timer_callback)
+void neosprite_base_device::auto_animation_timer_callback(void *ptr, int32_t param)
 {
 	if (m_auto_animation_frame_counter == 0)
 	{
@@ -546,7 +546,7 @@ void neosprite_base_device::parse_sprites(int scanline)
 }
 
 
-TIMER_CALLBACK_MEMBER(neosprite_base_device::sprite_line_timer_callback)
+void neosprite_base_device::sprite_line_timer_callback(void *ptr, int32_t param)
 {
 	int scanline = param;
 
