@@ -497,10 +497,9 @@ void adsp21xx_device::device_start()
 	save_item(NAME(m_irq_latch));
 
 	// register state with the debugger
-	state_add(ADSP2100_PC,      "PC",        m_pc);
-	state_add(STATE_GENPC,      "GENPC",     m_pc).noshow();
-	state_add(STATE_GENPCBASE,  "CURPC",     m_ppc).noshow();
-	state_add(STATE_GENFLAGS,   "GENFLAGS",  m_astat).mask(0xff).noshow().formatstr("%8s");
+	state_add(ADSP2100_PC,      "PC",        m_pc).callimport();
+	state_add(STATE_GENPCBASE,  "CURPC",     m_ppc).callimport().noshow();
+	state_add(STATE_GENFLAGS,   "CURFLAGS",  m_astat).mask(0xff).formatstr("%8s").noshow();
 
 	state_add(ADSP2100_AX0,     "AX0",       m_core.ax0.u);
 	state_add(ADSP2100_AX1,     "AX1",       m_core.ax1.u);
@@ -562,7 +561,7 @@ void adsp21xx_device::device_start()
 	state_add(ADSP2100_MSTAT,   "MSTAT",     m_mstat).mask((m_chip_type == CHIP_TYPE_ADSP2100) ? 0x0f : 0x7f).callimport();
 
 	state_add(ADSP2100_PCSP,    "PCSP",      m_pc_sp).mask(0xff);
-	state_add(STATE_GENSP,      "GENSP",     m_pc_sp).mask(0xff).noshow();
+	state_add(STATE_GENSP,      "CURSP",     m_pc_sp).mask(0xff).noshow();
 	state_add(ADSP2100_CNTRSP,  "CNTRSP",    m_cntr_sp).mask(0xf);
 	state_add(ADSP2100_STATSP,  "STATSP",    m_stat_sp).mask(0xf);
 	state_add(ADSP2100_LOOPSP,  "LOOPSP",    m_loop_sp).mask(0xf);
@@ -675,6 +674,14 @@ void adsp21xx_device::state_import(const device_state_entry &entry)
 {
 	switch (entry.index())
 	{
+		case ADSP2100_PC:
+			m_ppc = m_pc;
+			break;
+
+		case STATE_GENPCBASE:
+			m_pc = m_ppc;
+			break;
+
 		case ADSP2100_MSTAT:
 			update_mstat();
 			break;

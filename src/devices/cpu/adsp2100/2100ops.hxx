@@ -250,7 +250,7 @@ inline void adsp21xx_device::loop_stack_pop()
 		}
 		else
 		{
-			m_loop = m_loop_stack[m_loop_sp -1] >> 4;
+			m_loop = m_loop_stack[m_loop_sp - 1] >> 4;
 			m_loop_condition = m_loop_stack[m_loop_sp - 1] & 15;
 		}
 	}
