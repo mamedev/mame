@@ -56,7 +56,7 @@ menu::global_state_ptr menu::get_global_state(running_machine &machine)
 }
 
 //-------------------------------------------------
-//  exclusive_input_pressed - return TRUE if the
+//  exclusive_input_pressed - return true if the
 //  given key is pressed and we haven't already
 //  reported a key
 //-------------------------------------------------
@@ -506,7 +506,7 @@ void menu::draw(uint32_t flags)
 	if (ui().show_fps_counter())
 	{
 		ui().draw_text_full(container(), machine().video().speed_text().c_str(), 0.0f, 0.0f, 1.0f,
-				ui::text_layout::RIGHT, ui::text_layout::WORD, mame_ui_manager::OPAQUE_, rgb_t::white, rgb_t::black, nullptr, nullptr);
+				ui::text_layout::RIGHT, ui::text_layout::WORD, mame_ui_manager::OPAQUE_, rgb_t::white(), rgb_t::black(), nullptr, nullptr);
 	}
 
 	bool const customonly = (flags & PROCESS_CUSTOM_ONLY);
@@ -756,7 +756,7 @@ void menu::draw(uint32_t flags)
 
 		// compute the multi-line target width/height
 		ui().draw_text_full(container(), pitem.subtext.c_str(), 0, 0, visible_width * 0.75f,
-			ui::text_layout::RIGHT, ui::text_layout::WORD, mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &target_width, &target_height);
+			ui::text_layout::RIGHT, ui::text_layout::WORD, mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), &target_width, &target_height);
 
 		// determine the target location
 		float const target_x = visible_left + visible_width - target_width - UI_BOX_LR_BORDER;
@@ -801,7 +801,7 @@ void menu::draw_text_box()
 
 	// compute the multi-line target width/height
 	ui().draw_text_full(container(), text, 0, 0, 1.0f - 2.0f * UI_BOX_LR_BORDER - 2.0f * gutter_width,
-		ui::text_layout::LEFT, ui::text_layout::WORD, mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &target_width, &target_height);
+		ui::text_layout::LEFT, ui::text_layout::WORD, mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), &target_width, &target_height);
 	target_height += 2.0f * line_height;
 	if (target_height > 1.0f - 2.0f * UI_BOX_TB_BORDER)
 		target_height = floorf((1.0f - 2.0f * UI_BOX_TB_BORDER) / line_height) * line_height;
@@ -976,7 +976,7 @@ void menu::handle_keys(uint32_t flags, int &iptkey)
 	if (item.empty())
 		return;
 
-	// if we hit select, return TRUE or pop the stack, depending on the item
+	// if we hit select, return true or pop the stack, depending on the item
 	if (exclusive_input_pressed(iptkey, IPT_UI_SELECT, 0))
 	{
 		if (is_last_selected())
@@ -1181,7 +1181,7 @@ uint32_t menu::ui_handler(render_container &container, mame_ui_manager &mui)
 
 void menu::highlight(float x0, float y0, float x1, float y1, rgb_t bgcolor)
 {
-	container().add_quad(x0, y0, x1, y1, bgcolor, m_global_state->hilight_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE) | PRIMFLAG_PACKABLE);
+	container().add_quad(x0, y0, x1, y1, bgcolor, m_global_state->hilight_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(1) | PRIMFLAG_PACKABLE);
 }
 
 
@@ -1226,7 +1226,7 @@ void menu::draw_background()
 {
 	// draw background image if available
 	if (ui().options().use_background_image() && m_global_state->bgrnd_bitmap() && m_global_state->bgrnd_bitmap()->valid())
-		container().add_quad(0.0f, 0.0f, 1.0f, 1.0f, rgb_t::white, m_global_state->bgrnd_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+		container().add_quad(0.0f, 0.0f, 1.0f, 1.0f, rgb_t::white(), m_global_state->bgrnd_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 }
 
 

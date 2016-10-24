@@ -178,7 +178,7 @@ int mame_machine_manager::execute()
 	// loop across multiple hard resets
 	bool exit_pending = false;
 	int error = EMU_ERR_NONE;
-	
+
 	while (error == EMU_ERR_NONE && !exit_pending)
 	{
 		m_new_driver_pending = nullptr;

@@ -548,7 +548,7 @@ static int cmd_create(const struct command *c, int argc, char *argv[])
 	int unnamedargs;
 	const imgtool_module *module;
 	std::unique_ptr<util::option_resolution> resolution;
-	
+
 	module = imgtool_find_module(argv[0]);
 	if (!module)
 	{
@@ -855,7 +855,7 @@ int CLIB_DECL main(int argc, char *argv[])
 					goto cmderror;
 
 				/* initialize the imgtool core */
-				imgtool_init(TRUE, nullptr);
+				imgtool_init(true, nullptr);
 
 				if (c->lastargrepeats && (argc > c->maxargs))
 				{

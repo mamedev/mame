@@ -572,12 +572,12 @@ void usb_sound_device::timer_w(int which, uint8_t offset, uint8_t data)
 			{
 				case 1: /* low word only */
 					ch->count = data;
-					ch->holding = FALSE;
+					ch->holding = false;
 					break;
 
 				case 2: /* high word only */
 					ch->count = data << 8;
-					ch->holding = FALSE;
+					ch->holding = false;
 					break;
 
 				case 3: /* low word followed by high word */
@@ -589,7 +589,7 @@ void usb_sound_device::timer_w(int which, uint8_t offset, uint8_t data)
 					else
 					{
 						ch->count = (ch->count & 0x00ff) | (data << 8);
-						ch->holding = FALSE;
+						ch->holding = false;
 						ch->latchtoggle = 0;
 					}
 					break;
@@ -607,7 +607,7 @@ void usb_sound_device::timer_w(int which, uint8_t offset, uint8_t data)
 				ch = &g->chan[(data & 0xc0) >> 6];
 
 				/* extract the bits */
-				ch->holding = TRUE;
+				ch->holding = true;
 				ch->latchmode = (data >> 4) & 3;
 				ch->clockmode = (data >> 1) & 7;
 				ch->bcdmode = (data >> 0) & 1;

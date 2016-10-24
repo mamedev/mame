@@ -163,7 +163,7 @@ void pentagon_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		irq_off(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in pentagon_state::device_timer");
+		assert_always(false, "Unknown id in pentagon_state::device_timer");
 	}
 }
 

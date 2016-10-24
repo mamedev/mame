@@ -34,7 +34,7 @@ void triplhnt_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		triplhnt_set_collision(param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in triplhnt_state::device_timer");
+		assert_always(false, "Unknown id in triplhnt_state::device_timer");
 	}
 }
 

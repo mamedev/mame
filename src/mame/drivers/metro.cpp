@@ -213,7 +213,7 @@ void metro_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 		metro_blit_done(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in metro_state::device_timer");
+		assert_always(false, "Unknown id in metro_state::device_timer");
 	}
 }
 

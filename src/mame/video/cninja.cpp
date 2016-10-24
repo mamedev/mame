@@ -149,7 +149,7 @@ uint32_t cninja_state::screen_update_cninjabl2(screen_device &screen, bitmap_ind
 	m_deco_tilegen1->set_enable(1, 1 );
 
 	screen_update_cninja(screen, bitmap, cliprect);
-	
+
 	return 0;
 }
 

@@ -111,7 +111,7 @@ void policetr_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		m_maincpu->set_input_line(R3000_IRQ5, ASSERT_LINE);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in policetr_state::device_timer");
+		assert_always(false, "Unknown id in policetr_state::device_timer");
 	}
 }
 

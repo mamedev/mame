@@ -463,7 +463,7 @@ DRIVER_INIT_MEMBER(md_cons_state, genesis)
 
 	if (m_32x)
 	{
-		m_32x->set_32x_pal(FALSE);
+		m_32x->set_32x_pal(false);
 		m_32x->set_framerate(60);
 		m_32x->set_total_scanlines(262);
 	}
@@ -485,7 +485,7 @@ DRIVER_INIT_MEMBER(md_cons_state, md_eur)
 
 	if (m_32x)
 	{
-		m_32x->set_32x_pal(TRUE);
+		m_32x->set_32x_pal(true);
 		m_32x->set_framerate(50);
 		m_32x->set_total_scanlines(313);
 	}
@@ -507,7 +507,7 @@ DRIVER_INIT_MEMBER(md_cons_state, md_jpn)
 
 	if (m_32x)
 	{
-		m_32x->set_32x_pal(FALSE);
+		m_32x->set_32x_pal(false);
 		m_32x->set_framerate(60);
 		m_32x->set_total_scanlines(262);
 	}

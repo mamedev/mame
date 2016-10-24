@@ -121,22 +121,22 @@ static int page_buffer_verify( uint8_t *buffer, uint32_t size, int block_type)
 	// checksum 1
 	checksum_calc = page_buffer_calc_checksum_1( buffer, size, block_type);
 	checksum_page = buffer_read_32_be( buffer + 0);
-	if (checksum_calc != checksum_page) return FALSE;
+	if (checksum_calc != checksum_page) return false;
 	// checksum 2
 	checksum_calc = page_buffer_calc_checksum_2( buffer);
 	checksum_page = buffer_read_16_be( buffer + 6);
-	if (checksum_calc != checksum_page) return FALSE;
+	if (checksum_calc != checksum_page) return false;
 	// ok
-	return TRUE;
+	return true;
 }
 
 static int cfs_block_to_page( cybiko_file_system *cfs, int block_type, uint32_t block, uint32_t *page)
 {
 	switch (block_type)
 	{
-		case BLOCK_TYPE_BOOT : if (page) *page = block; return TRUE;
-		case BLOCK_TYPE_FILE : if (page) *page = block + cfs->block_count_boot; return TRUE;
-		default              : return FALSE;
+		case BLOCK_TYPE_BOOT : if (page) *page = block; return true;
+		case BLOCK_TYPE_FILE : if (page) *page = block + cfs->block_count_boot; return true;
+		default              : return false;
 	}
 }
 
@@ -148,7 +148,7 @@ static int cfs_page_to_block( cybiko_file_system *cfs, uint32_t page, int *block
 	{
 		if (block_type) *block_type = BLOCK_TYPE_BOOT;
 		if (block) *block = tmp;
-		return TRUE;
+		return true;
 	}
 	tmp -= cfs->block_count_boot;
 	// file block
@@ -156,37 +156,37 @@ static int cfs_page_to_block( cybiko_file_system *cfs, uint32_t page, int *block
 	{
 		if (block_type) *block_type = BLOCK_TYPE_FILE;
 		if (block) *block = tmp;
-		return TRUE;
+		return true;
 	}
 	tmp -= cfs->block_count_file;
 	// error
-	return FALSE;
+	return false;
 }
 
 static int cfs_page_read( cybiko_file_system *cfs, uint8_t *buffer, uint32_t page)
 {
-	if (page >= cfs->page_count) return FALSE;
+	if (page >= cfs->page_count) return false;
 	cfs->stream->seek(page * cfs->page_size, SEEK_SET);
 	cfs->stream->read(buffer, cfs->page_size);
-	return TRUE;
+	return true;
 }
 
 static int cfs_page_write( cybiko_file_system *cfs, uint8_t *buffer, uint32_t page)
 {
-	if (page >= cfs->page_count) return FALSE;
+	if (page >= cfs->page_count) return false;
 	cfs->stream->seek(page * cfs->page_size, SEEK_SET);
 	cfs->stream->write(buffer, cfs->page_size);
-	return TRUE;
+	return true;
 }
 
 static int cfs_block_read( cybiko_file_system *cfs, uint8_t *buffer, int block_type, uint32_t block)
 {
 	uint8_t buffer_page[MAX_PAGE_SIZE];
 	uint32_t page;
-	if (!cfs_block_to_page( cfs, block_type, block, &page)) return FALSE;
-	if (!cfs_page_read( cfs, buffer_page, page)) return FALSE;
+	if (!cfs_block_to_page( cfs, block_type, block, &page)) return false;
+	if (!cfs_page_read( cfs, buffer_page, page)) return false;
 	memcpy( buffer, buffer_page + 8, cfs->page_size - 10);
-	return TRUE;
+	return true;
 }
 
 static int cfs_block_write( cybiko_file_system *cfs, uint8_t *buffer, int block_type, uint32_t block)
@@ -198,9 +198,9 @@ static int cfs_block_write( cybiko_file_system *cfs, uint8_t *buffer, int block_
 	buffer_write_16_be( buffer_page + 4, cfs->write_count++);
 	buffer_write_16_be( buffer_page + 6, page_buffer_calc_checksum_2( buffer_page));
 	buffer_write_16_be( buffer_page + cfs->page_size - 2, 0xFFFF);
-	if (!cfs_block_to_page( cfs, block_type, block, &page)) return FALSE;
-	if (!cfs_page_write( cfs, buffer_page, page)) return FALSE;
-	return TRUE;
+	if (!cfs_block_to_page( cfs, block_type, block, &page)) return false;
+	if (!cfs_page_write( cfs, buffer_page, page)) return false;
+	return true;
 }
 
 static int cfs_file_delete( cybiko_file_system *cfs, uint16_t file_id)
@@ -209,14 +209,14 @@ static int cfs_file_delete( cybiko_file_system *cfs, uint16_t file_id)
 	int i;
 	for (i=0;i<cfs->block_count_file;i++)
 	{
-		if (!cfs_block_read( cfs, buffer, BLOCK_TYPE_FILE, i)) return FALSE;
+		if (!cfs_block_read( cfs, buffer, BLOCK_TYPE_FILE, i)) return false;
 		if (BLOCK_USED(buffer) && (BLOCK_FILE_ID(buffer) == file_id))
 		{
 			buffer[0] &= ~0x80;
-			if (!cfs_block_write( cfs, buffer, BLOCK_TYPE_FILE, i)) return FALSE;
+			if (!cfs_block_write( cfs, buffer, BLOCK_TYPE_FILE, i)) return false;
 		}
 	}
-	return TRUE;
+	return true;
 }
 
 static int cfs_file_info( cybiko_file_system *cfs, uint16_t file_id, cfs_file *file)
@@ -226,7 +226,7 @@ static int cfs_file_info( cybiko_file_system *cfs, uint16_t file_id, cfs_file *f
 	file->blocks = file->size = 0;
 	for (i=0;i<cfs->block_count_file;i++)
 	{
-		if (!cfs_block_read( cfs, buffer, BLOCK_TYPE_FILE, i)) return FALSE;
+		if (!cfs_block_read( cfs, buffer, BLOCK_TYPE_FILE, i)) return false;
 		if (BLOCK_USED(buffer) && (BLOCK_FILE_ID(buffer) == file_id))
 		{
 			if (BLOCK_PART_ID(buffer) == 0)
@@ -238,7 +238,7 @@ static int cfs_file_info( cybiko_file_system *cfs, uint16_t file_id, cfs_file *f
 			file->blocks++;
 		}
 	}
-	return (file->blocks > 0) ? TRUE : FALSE;
+	return (file->blocks > 0) ? true : false;
 }
 
 static int cfs_file_find( cybiko_file_system *cfs, const char *filename, uint16_t *file_id)
@@ -247,14 +247,14 @@ static int cfs_file_find( cybiko_file_system *cfs, const char *filename, uint16_
 	int i;
 	for (i=0;i<cfs->block_count_file;i++)
 	{
-		if (!cfs_block_read( cfs, buffer, BLOCK_TYPE_FILE, i)) return FALSE;
+		if (!cfs_block_read( cfs, buffer, BLOCK_TYPE_FILE, i)) return false;
 		if (BLOCK_USED(buffer) && (strncmp( filename, BLOCK_FILENAME(buffer), 40) == 0))
 		{
 			*file_id = i;
-			return TRUE;
+			return true;
 		}
 	}
-	return FALSE;
+	return false;
 }
 
 static int cfs_verify(cybiko_file_system &cfs)
@@ -263,11 +263,11 @@ static int cfs_verify(cybiko_file_system &cfs)
 	int i, block_type;
 	for (i = 0; i < cfs.page_count; i++)
 	{
-		if (!cfs_page_read(&cfs, buffer, i)) return FALSE;
-		if (!cfs_page_to_block(&cfs, i, &block_type, NULL)) return FALSE;
-		if (!page_buffer_verify(buffer, cfs.page_size, block_type)) return FALSE;
+		if (!cfs_page_read(&cfs, buffer, i)) return false;
+		if (!cfs_page_to_block(&cfs, i, &block_type, NULL)) return false;
+		if (!page_buffer_verify(buffer, cfs.page_size, block_type)) return false;
 	}
-	return TRUE;
+	return true;
 }
 
 static int cfs_init(cybiko_file_system &cfs, imgtool::stream::ptr &&stream, int flash_type)
@@ -278,12 +278,12 @@ static int cfs_init(cybiko_file_system &cfs, imgtool::stream::ptr &&stream, int 
 		case FLASH_TYPE_AT45DB041 : cfs.page_count = 2048; cfs.page_size = 264; break;
 		case FLASH_TYPE_AT45DB081 : cfs.page_count = 4096; cfs.page_size = 264; break;
 		case FLASH_TYPE_AT45DB161 : cfs.page_count = 4096; cfs.page_size = 528; break;
-		default                   : return FALSE;
+		default                   : return false;
 	}
 	cfs.block_count_boot = 5;
 	cfs.block_count_file = cfs.page_count - cfs.block_count_boot;
 	cfs.write_count = 0;
-	return TRUE;
+	return true;
 }
 
 static int cfs_format( cybiko_file_system *cfs)
@@ -294,17 +294,17 @@ static int cfs_format( cybiko_file_system *cfs)
 	memset( buffer, 0xFF, sizeof( buffer));
 	for (i=0;i<cfs->block_count_boot;i++)
 	{
-		if (!cfs_block_write( cfs, buffer, BLOCK_TYPE_BOOT, i)) return FALSE;
+		if (!cfs_block_write( cfs, buffer, BLOCK_TYPE_BOOT, i)) return false;
 	}
 	// file blocks
 	memset( buffer, 0xFF, sizeof( buffer));
 	buffer[0] &= ~0x80;
 	for (i=0;i<cfs->block_count_file;i++)
 	{
-		if (!cfs_block_write( cfs, buffer, BLOCK_TYPE_FILE, i)) return FALSE;
+		if (!cfs_block_write( cfs, buffer, BLOCK_TYPE_FILE, i)) return false;
 	}
 	// ok
-	return TRUE;
+	return true;
 }
 
 static uint16_t cfs_calc_free_blocks( cybiko_file_system *cfs)

@@ -72,7 +72,7 @@ inline int32_t tilemap_t::effective_colscroll(int index, uint32_t screen_height)
 
 
 //-------------------------------------------------
-//  gfx_tiles_changed - return TRUE if any
+//  gfx_tiles_changed - return true if any
 //  gfx_elements used by this tilemap have
 //  changed
 //-------------------------------------------------

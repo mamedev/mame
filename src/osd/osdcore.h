@@ -265,11 +265,11 @@ const char *osd_getenv(const char *name);
 
     Return value:
 
-        TRUE if the filename points to a physical drive and if the values
-        pointed to by cylinders, heads, sectors, and bps are valid; FALSE in
+        true if the filename points to a physical drive and if the values
+        pointed to by cylinders, heads, sectors, and bps are valid; false in
         any other case
 -----------------------------------------------------------------------------*/
-int osd_get_physical_drive_geometry(const char *filename, uint32_t *cylinders, uint32_t *heads, uint32_t *sectors, uint32_t *bps);
+bool osd_get_physical_drive_geometry(const char *filename, uint32_t *cylinders, uint32_t *heads, uint32_t *sectors, uint32_t *bps);
 
 
 /*-----------------------------------------------------------------------------
@@ -560,10 +560,10 @@ int osd_work_queue_items(osd_work_queue *queue);
 
     Return value:
 
-        TRUE if the queue is empty; FALSE if the wait timed out before the
+        true if the queue is empty; false if the wait timed out before the
         queue was emptied.
 -----------------------------------------------------------------------------*/
-int osd_work_queue_wait(osd_work_queue *queue, osd_ticks_t timeout);
+bool osd_work_queue_wait(osd_work_queue *queue, osd_ticks_t timeout);
 
 
 /*-----------------------------------------------------------------------------
@@ -637,10 +637,10 @@ static inline osd_work_item *osd_work_item_queue(osd_work_queue *queue, osd_work
 
     Return value:
 
-        TRUE if the item completed; FALSE if the wait timed out before the
+        true if the item completed; false if the wait timed out before the
         item completed.
 -----------------------------------------------------------------------------*/
-int osd_work_item_wait(osd_work_item *item, osd_ticks_t timeout);
+bool osd_work_item_wait(osd_work_item *item, osd_ticks_t timeout);
 
 
 /*-----------------------------------------------------------------------------

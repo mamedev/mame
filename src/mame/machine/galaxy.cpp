@@ -51,7 +51,7 @@ INTERRUPT_GEN_MEMBER(galaxy_state::galaxy_interrupt)
 IRQ_CALLBACK_MEMBER(galaxy_state::galaxy_irq_callback)
 {
 	galaxy_set_timer();
-	m_interrupts_enabled = TRUE;
+	m_interrupts_enabled = true;
 	return 0xff;
 }
 
@@ -186,7 +186,7 @@ MACHINE_RESET_MEMBER(galaxy_state,galaxy)
 	if (ioport("ROM2")->read())
 		membank("bank10")->set_base(memregion("maincpu")->base() + 0x1000);
 
-	m_interrupts_enabled = TRUE;
+	m_interrupts_enabled = true;
 }
 
 DRIVER_INIT_MEMBER(galaxy_state,galaxyp)
@@ -207,5 +207,5 @@ MACHINE_RESET_MEMBER(galaxy_state,galaxyp)
 	space.install_read_bank(0xe000, 0xefff, "bank11");
 	space.nop_write(0xe000, 0xefff);
 	membank("bank11")->set_base(memregion("maincpu")->base() + 0xe000);
-	m_interrupts_enabled = TRUE;
+	m_interrupts_enabled = true;
 }

@@ -170,7 +170,7 @@ private:
 	// Needed for triggering the motor monoflop
 	uint8_t m_lastval;
 
-	// Signal motor_on. When TRUE, makes all drives turning.
+	// Signal motor_on. When true, makes all drives turning.
 	int m_MOTOR_ON;
 
 	// Calculates the index from the bit

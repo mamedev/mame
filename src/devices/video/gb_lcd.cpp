@@ -19,7 +19,7 @@ no sprites being displayed. If sprites are displayed then the timing of mode
 3 and mode 0 will change.
 
 * LCD turn on for a DMG (on a CGB the timing is a little bit different)
-our state                                     LY   Mode  #Cycles 
+our state                                     LY   Mode  #Cycles
 (GB_LCD_STATE_LY00_M2)                        0    0     80 (?)   The unit is actually in mode 0 here and the OAM area is unlocked
 GB_LCD_STATE_LYXX_M3                          0    3     169-172  Draw line 0 during this period
   - Lock OAM area
@@ -868,7 +868,7 @@ LOG(("scrollx_to_apply: %u\n", m_line.scrollx_to_apply));
 			{
 				// Interleave bits from plane0 and plane1
 				m_line.shift_register = (((((m_line.plane0 * U64(0x0101010101010101)) & U64(0x8040201008040201)) * U64(0x0102040810204081)) >> 49) & 0x5555)
-				                      | (((((m_line.plane1 * U64(0x0101010101010101)) & U64(0x8040201008040201)) * U64(0x0102040810204081)) >> 48) & 0xAAAA);
+									  | (((((m_line.plane1 * U64(0x0101010101010101)) & U64(0x8040201008040201)) * U64(0x0102040810204081)) >> 48) & 0xAAAA);
 			}
 			if (m_line.pixels_drawn < 8)
 			{
@@ -1961,12 +1961,12 @@ void dmg_ppu_device::update_oam_dma_state(uint64_t cycles)
 	}
 
 	if (m_oam_dma_start_cycles > 0)
-	{   
+	{
 		if (cycles >= m_oam_dma_start_cycles)
 		{
 			for (int i = 0; i < 0xA0; i++)
 			{
-				m_oam[i] = m_program_space->read_byte(m_oam_dma_source_address + i); 
+				m_oam[i] = m_program_space->read_byte(m_oam_dma_source_address + i);
 			}
 
 			m_oam_dma_start_cycles = 0;
@@ -2161,7 +2161,7 @@ void dmg_ppu_device::update_state()
 				m_next_state = GB_LCD_STATE_LYXX_M3;
 				clear_line_state();
 				select_sprites();
-//				if (!m_enable_experimental_engine)
+//              if (!m_enable_experimental_engine)
 				{
 					m_window_y = WNDPOSY;
 				}
@@ -2507,17 +2507,17 @@ void cgb_ppu_device::update_state()
 		LOG(("m_cycles_left = %d, cycles = %d, m_next_state = %s\n", m_cycles_left, cycles, state_to_string(m_next_state)));
 
 		if (m_cycles_left > 0)
-		{   
+		{
 			if (cycles >= m_cycles_left) {
 				cycles -= m_cycles_left;
 				m_cycles_left = 0;
-			}   
+			}
 			else
-			{   
+			{
 				m_cycles_left -= cycles;
 				cycles = 0;
-			}   
-		}   
+			}
+		}
 
 		while (m_cycles_left == 0)
 		{
@@ -3262,7 +3262,7 @@ bool cgb_ppu_device::stat_write(uint8_t new_data)
 		}
 		m_stat_mode1_int = (new_data & MODE_1_INT_ENABLED) ? true : false;
 		break;
-    case 2:
+	case 2:
 		// 0x20 -> 0x40  with LYC -> trigger
 		//m_stat_mode2_int = (new_data & MODE_2_INT_ENABLED) ? true : false;
 		if (LCDSTAT & MODE_2_INT_ENABLED)

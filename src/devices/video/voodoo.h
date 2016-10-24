@@ -1614,7 +1614,7 @@ struct raster_info
 {
 	raster_info *       next;                   /* pointer to next entry with the same hash */
 	poly_draw_scanline_func callback;           /* callback pointer */
-	uint8_t               is_generic;             /* TRUE if this is one of the generic rasterizers */
+	bool                  is_generic;             /* true if this is one of the generic rasterizers */
 	uint8_t               display;                /* display index */
 	uint32_t              hits;                   /* how many hits (pixels) we've used this for */
 	uint32_t              polys;                  /* how many polys we've used this for */

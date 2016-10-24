@@ -482,7 +482,7 @@ int micro3d_state::clip_triangle(micro3d_vtx *v, micro3d_vtx *vout, int num_vert
 void micro3d_state::draw_triangles(uint32_t attr)
 {
 	int i;
-	int triangles = 0;
+	bool triangles = false;
 	int vertices = m_fifo_idx / 3;
 	int min_y = 0x3ff;
 	int max_y = 0;
@@ -548,7 +548,7 @@ void micro3d_state::draw_triangles(uint32_t attr)
 			micro3d_vtx a = vclip_list[0];
 			micro3d_vtx b = vclip_list[1];
 
-			triangles = TRUE;
+			triangles = true;
 
 			a.x += m_x_mid;
 			a.y += m_y_mid;
@@ -589,7 +589,7 @@ void micro3d_state::draw_triangles(uint32_t attr)
 		}
 	}
 
-	if (triangles == TRUE)
+	if (triangles == true)
 		rasterise_spans(min_y, max_y, attr);
 }
 

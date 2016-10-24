@@ -265,7 +265,7 @@ void rtc3430042_device::rtc_execute_cmd(int data)
 			/* Write-protect register  */
 			if (LOG_RTC)
 				printf("RTC write to write-protect register, data = %X\n", (int) m_rtc_data_byte&0x80);
-			m_rtc_write_protect = (m_rtc_data_byte & 0x80) ? TRUE : FALSE;
+			m_rtc_write_protect = (m_rtc_data_byte & 0x80) ? true : false;
 			break;
 
 		case 16: case 17: case 18: case 19: /* RAM address $00-$0f */

@@ -12,7 +12,7 @@
 #include "emu.h"
 
 
-static uint32_t common_dasm(device_t *device, char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int upi41)
+static uint32_t common_dasm(device_t *device, char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, bool upi41)
 {
 	const uint8_t *startram = opram;
 	uint32_t flags = 0;
@@ -317,11 +317,11 @@ static uint32_t common_dasm(device_t *device, char *buffer, offs_t pc, const uin
 
 CPU_DISASSEMBLE( mcs48 )
 {
-	return common_dasm(device, buffer, pc, oprom, opram, FALSE);
+	return common_dasm(device, buffer, pc, oprom, opram, false);
 }
 
 
 CPU_DISASSEMBLE( upi41 )
 {
-	return common_dasm(device, buffer, pc, oprom, opram, TRUE);
+	return common_dasm(device, buffer, pc, oprom, opram, true);
 }

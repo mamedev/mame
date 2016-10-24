@@ -3,6 +3,18 @@
 
 <!-- define elements -->
 
+	<element name="static_black"><rect><color red="0" green="0" blue="0" /></rect></element>
+
+<!-- our digit element is bright-on-dark, this means the lcd panel is the wrong colour here -->
+
+	<element name="digit" defstate="0">
+		<led7seg><color red="1.0" green="1.0" blue="1.0" /></led7seg>
+	</element>
+	<element name="ldot" defstate="0">
+		<rect state="1"><color red="1.0" green="1.0" blue="1.0" /></rect>
+		<rect state="0"><color red="0.1" green="0.1" blue="0.1" /></rect>
+	</element>
+
 	<element name="led" defstate="0">
 		<disk state="1"><color red="1.0" green="0.1" blue="0.15" /></disk>
 		<disk state="0"><color red="0.1" green="0.01" blue="0.015" /></disk>
@@ -158,7 +170,7 @@
 	</element>
 	<element name="text_s2">
 		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="REPLAY"><color red="0.81" green="0.3" blue="0.29" /></text>
+		<text string="TIME"><color red="0.81" green="0.3" blue="0.29" /></text>
 	</element>
 	<element name="text_s3">
 		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
@@ -166,15 +178,15 @@
 	</element>
 	<element name="text_s4">
 		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="REPEAT"><color red="0.81" green="0.3" blue="0.29" /></text>
+		<text string="REPLAY"><color red="0.81" green="0.3" blue="0.29" /></text>
 	</element>
 	<element name="text_s5">
 		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="YES"><color red="0.81" green="0.3" blue="0.29" /></text>
+		<text string="INFO"><color red="0.81" green="0.3" blue="0.29" /></text>
 	</element>
 	<element name="text_s6">
 		<rect><color red="0.81" green="0.8" blue="0.79" /></rect>
-		<text string="NO"><color red="0.81" green="0.3" blue="0.29" /></text>
+		<text string="ALTERNATE"><color red="0.81" green="0.3" blue="0.29" /></text>
 	</element>
 
 	<element name="text_king">
@@ -426,6 +438,22 @@
 		<bezel element="white"><bounds x="83.75" y="91.75" width="6.5" height="4.5" /></bezel>
 		<bezel element="text_clear"><bounds x="84" y="93" width="6" height="2" /></bezel>
 		<bezel element="hlr" inputtag="IN.8" inputmask="0x01"><bounds x="83" y="91" width="8" height="6" /><color alpha="0.3" /></bezel>
+
+	<!-- lcd panel -->
+
+		<bezel element="static_black"><bounds x="30.5" y="90" width="25" height="8" /></bezel>
+
+		<bezel name="digit2" element="digit"><bounds x="32" y="91" width="4" height="6" /></bezel>
+		<bezel name="digit3" element="digit"><bounds x="38" y="91" width="4" height="6" /></bezel>
+		<bezel name="digit4" element="digit"><bounds x="44" y="91" width="4" height="6" /></bezel>
+		<bezel name="digit5" element="digit"><bounds x="50" y="91" width="4" height="6" /></bezel>
+
+		<bezel name="2.7" element="ldot"><bounds x="36.5" y="96.5" width="0.6" height="0.6" /></bezel>
+		<bezel name="3.7" element="ldot"><bounds x="42.5" y="96.5" width="0.6" height="0.6" /></bezel>
+		<bezel name="4.7" element="ldot"><bounds x="48.5" y="96.5" width="0.6" height="0.6" /></bezel>
+
+		<bezel name="5.7" element="ldot"><bounds x="42.9" y="92.8" width="0.6" height="0.6" /></bezel>
+		<bezel name="5.7" element="ldot"><bounds x="42.7" y="94.65" width="0.6" height="0.6" /></bezel>
 
 	</view>
 </mamelayout>

@@ -11905,8 +11905,8 @@ equitess                        // (c) 1984 Alpha Denshi Co./Sega
 gekisou                         // (c) 1985 Eastern
 hvoltage                        // (c) 1985 Alpha Denshi Co.
 kouyakyu                        // (c) 1985 Alpha Denshi Co.
-splendorblast2                  // (c) 1985 Alpha Denshi Co.
 splndrbt                        // (c) 1985 Alpha Denshi Co.
+splndrbt2                       // (c) 1985 Alpha Denshi Co.
 splndrbta                       // (c) 1985 Alpha Denshi Co.
 splndrbtb                       // (c) 1985 Alpha Denshi Co.
 
@@ -12218,6 +12218,7 @@ cscfr                           // * French
 cscg                            // * German
 cscsp                           // * Spanish
 fdes2000                        //
+fdes2100d                       //
 feasbu                          // EAS: Elite A/S Challenger (Budapest program, English)
 feasbufr                        // * French
 feasbug                         // * German
@@ -28918,7 +28919,8 @@ sweetgal                        // (c) 1985
 @source:ninjakd2.cpp
 arkarea                         // UPL-87007 (c) 1988 (Arcade TV Game List - P.67, Right, 2 from top)
 jt104                           // hack?
-mnight                          // UPL-????? (c) 1987 distributed by Kawakus
+mnight                          // UPL-87007 (c) 1987
+mnightj                         // UPL-87007 (c) 1987 distributed by Kawakus
 ninjakd2                        // UPL-????? (c) 1987
 ninjakd2a                       // UPL-????? (c) 1987
 ninjakd2b                       // UPL-????? (c) 1987
@@ -33697,7 +33699,7 @@ twinadv                         // (c) 1995 Barko Corp
 twinadvk                        // (c) 1995 Barko Corp
 twinkle                         // (c) 1997 SemiCom
 wintbob                         // bootleg
-yutnori							// (c) 199? yutnori
+yutnori                         // (c) 199? yutnori
 
 @source:socrates.cpp
 iqunlimz                        // 1991 IQ Unlimited (Z80)
@@ -34144,7 +34146,7 @@ stuntair                        // (c) 1983 Nuova Videotron
 astrass                         // 1998.06 Astra Super Stars (Sunsoft)
 bakubaku                        // 1995.04 Bakubaku Animal
 batmanfr                        // 1996.02 Batman Forever (Acclaim)
-choroqhr						// 1998.12 Choro Q Hyper Racing Five (Takara)
+choroqhr                        // 1998.12 Choro Q Hyper Racing Five (Takara)
 colmns97                        // 1997.01 Columns 97
 cotton2                         // 1997.11 Cotton 2 (Success)
 cottonbm                        // 1998.09 Cotton Boomerang (Success)

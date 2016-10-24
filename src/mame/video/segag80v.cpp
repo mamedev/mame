@@ -77,9 +77,9 @@
 */
 
 
-inline int segag80v_state::adjust_xy(int rawx, int rawy, int *outx, int *outy)
+inline bool segag80v_state::adjust_xy(int rawx, int rawy, int *outx, int *outy)
 {
-	int clipped = FALSE;
+	bool clipped = false;
 
 	/* first apply the XOR at 0x200 */
 	*outx = (rawx & 0x7ff) ^ 0x200;
@@ -87,17 +87,17 @@ inline int segag80v_state::adjust_xy(int rawx, int rawy, int *outx, int *outy)
 
 	/* apply clipping logic to X */
 	if ((*outx & 0x600) == 0x200)
-		*outx = 0x000, clipped = TRUE;
+		*outx = 0x000, clipped = true;
 	else if ((*outx & 0x600) == 0x400)
-		*outx = 0x3ff, clipped = TRUE;
+		*outx = 0x3ff, clipped = true;
 	else
 		*outx &= 0x3ff;
 
 	/* apply clipping logic to Y */
 	if ((*outy & 0x600) == 0x200)
-		*outy = 0x000, clipped = TRUE;
+		*outy = 0x000, clipped = true;
 	else if ((*outy & 0x600) == 0x400)
-		*outy = 0x3ff, clipped = TRUE;
+		*outy = 0x3ff, clipped = true;
 	else
 		*outy &= 0x3ff;
 

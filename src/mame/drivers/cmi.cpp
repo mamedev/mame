@@ -274,9 +274,9 @@ private:
 	uint8_t   m_env_dir_ctrl;
 	uint8_t   m_vol_latch;
 	uint8_t   m_flt_latch;
-	uint8_t	m_rp;
-	uint8_t	m_ws;
-	int		m_dir;
+	uint8_t m_rp;
+	uint8_t m_ws;
+	int     m_dir;
 
 	double  m_freq;
 	bool    m_active;
@@ -2771,7 +2771,7 @@ static MACHINE_CONFIG_START( cmi2x, cmi_state )
 	MCFG_DL1416_UPDATE_HANDLER(WRITE16(cmi_state, cmi_iix_update_dp3))
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBLANK_END, HBLANK_START, VTOTAL, VBLANK_END, VBLANK_START)
 	MCFG_SCREEN_UPDATE_DRIVER(cmi_state, screen_update_cmi2x)
 	MCFG_PALETTE_ADD_MONOCHROME("palette")

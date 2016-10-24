@@ -488,7 +488,7 @@ void opwolf_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 		cchip_timer(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in opwolf_state::device_timer");
+		assert_always(false, "Unknown id in opwolf_state::device_timer");
 	}
 }
 

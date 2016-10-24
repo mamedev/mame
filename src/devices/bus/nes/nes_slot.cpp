@@ -119,11 +119,11 @@ device_nes_cart_interface::device_nes_cart_interface(const machine_config &mconf
 						m_vrc_ls_prg_b(0),
 						m_vrc_ls_chr(0),
 						m_mirroring(PPU_MIRROR_NONE),
-						m_pcb_ctrl_mirror(FALSE),
-						m_four_screen_vram(FALSE),
-						m_has_trainer(FALSE),
-						m_x1_005_alt_mirroring(FALSE),
-						m_bus_conflict(TRUE),
+						m_pcb_ctrl_mirror(false),
+						m_four_screen_vram(false),
+						m_has_trainer(false),
+						m_x1_005_alt_mirroring(false),
+						m_bus_conflict(true),
 						m_open_bus(0),
 						m_prg_chunks(0),
 						m_prg_mask(0xffff),
@@ -583,7 +583,7 @@ uint8_t device_nes_cart_interface::hi_access_rom(uint32_t offset)
 uint8_t device_nes_cart_interface::account_bus_conflict(uint32_t offset, uint8_t data)
 {
 	// pirate variants of boards subject to bus conflict are often not subject to it
-	// so we allow to set m_bus_conflict to FALSE at loading time when necessary
+	// so we allow to set m_bus_conflict to false at loading time when necessary
 	if (m_bus_conflict)
 		return data & hi_access_rom(offset);
 	else

@@ -189,10 +189,10 @@ INPUT_PORTS_END
 
 PALETTE_INIT_MEMBER(zac2650_state, zac2650)
 {
-	palette.set_pen_color(0,rgb_t::black);
-	palette.set_pen_color(1,rgb_t::white);
-	palette.set_pen_color(2,rgb_t::black);
-	palette.set_pen_color(3,rgb_t::black);
+	palette.set_pen_color(0, rgb_t::black());
+	palette.set_pen_color(1, rgb_t::white());
+	palette.set_pen_color(2, rgb_t::black());
+	palette.set_pen_color(3, rgb_t::black());
 }
 
 /************************************************************************************************

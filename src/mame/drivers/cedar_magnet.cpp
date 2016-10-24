@@ -7,32 +7,32 @@
   - fix sound emulation
   - fix sprite communication / banking
     * bit "output bit 0x02 %d (IC21)" at 0x42 might be important
-	* mag_exzi currently requires a gross hack to stop the sprite CPU crashing on startup
-	* mag_xain sometimes leaves old sprites on the screen, probably due to a lost clear 
-	  command
+    * mag_exzi currently requires a gross hack to stop the sprite CPU crashing on startup
+    * mag_xain sometimes leaves old sprites on the screen, probably due to a lost clear
+      command
   - fix flipscreen
   - verify behavior of unknown / unused ports / interrupt sources etc.
   - verify the disk images, convert to a better format that can natively store protection
     * RAW data also available if required
-	* as mentioned, the disks are copy protected, see notes below
-	* are the bad tiles shortly into the first level of mag_exzi caused by a bad dump or
-	  bad comms?
+    * as mentioned, the disks are copy protected, see notes below
+    * are the bad tiles shortly into the first level of mag_exzi caused by a bad dump or
+      bad comms?
   - Use proper floppy drive emulation code that originally came from MESS (tied with above)
   - verify all clocks and screen params (50hz seems to match original videos)
   - work out why we need a protection hack and replace it with proper emulation
     * there are no per-game protection devices, so it's something to do with the base hardware
-	* there seem to be 2 checks, one based on a weird sector on the discs, the other based on
-	  a port read
+    * there seem to be 2 checks, one based on a weird sector on the discs, the other based on
+      a port read
   - add additional hardware notes from ArcadeHacker
 
 */
 
 
 /*
- 
+
  Magnet System by
 
- EFO SA (Electrónica Funcional Operativa SA).
+ EFO SA (ElectrÃ³nica Funcional Operativa SA).
  based on Cedar hardware
 
 
@@ -231,19 +231,19 @@ READ8_MEMBER(cedar_magnet_state::port7c_r)
 
 READ8_MEMBER(cedar_magnet_state::port18_r)
 {
-//	printf("%s: port18_r\n", device().machine().describe_context());
+//  printf("%s: port18_r\n", device().machine().describe_context());
 	return 0x00;
 }
 
 WRITE8_MEMBER(cedar_magnet_state::port18_w)
 {
-//	printf("%s: port18_w %02x\n", device().machine().describe_context(), data);
+//  printf("%s: port18_w %02x\n", device().machine().describe_context(), data);
 }
 
 READ8_MEMBER(cedar_magnet_state::port19_r)
 {
 	uint8_t ret = 0x00;
-//	printf("%s: port19_r\n", device().machine().describe_context());
+//  printf("%s: port19_r\n", device().machine().describe_context());
 
 // 9496 in a,($19)
 // 9498 bit 2,a
@@ -255,19 +255,19 @@ READ8_MEMBER(cedar_magnet_state::port19_r)
 
 READ8_MEMBER(cedar_magnet_state::port1a_r)
 {
-//	printf("%s: port1a_r\n", device().machine().describe_context());
+//  printf("%s: port1a_r\n", device().machine().describe_context());
 	return 0x00;
 }
 
 
 WRITE8_MEMBER(cedar_magnet_state::port19_w)
 {
-//	printf("%s: port19_w %02x\n", device().machine().describe_context(), data);
+//  printf("%s: port19_w %02x\n", device().machine().describe_context(), data);
 }
 
 WRITE8_MEMBER(cedar_magnet_state::port1b_w)
 {
-//	printf("%s: port1b_w %02x\n", device().machine().describe_context(), data);
+//  printf("%s: port1b_w %02x\n", device().machine().describe_context(), data);
 }
 
 /***********************
@@ -325,7 +325,7 @@ void cedar_magnet_state::video_start()
 
 WRITE8_MEMBER(cedar_magnet_state::soundlatch_w)
 {
-//	printf("%s: writing soundlatch_w! %02x\n", device().machine().describe_context(), data);
+//  printf("%s: writing soundlatch_w! %02x\n", device().machine().describe_context(), data);
 	portff_data = data;
 	m_cedsound->write_command(data);
 }
@@ -373,8 +373,8 @@ READ8_MEMBER(cedar_magnet_state::other_cpu_r)
 	if (cpus_accessed != 1)
 		logerror("%s: reading multiple CPUS!!! %04x - bank bits %d %d %d %d %d %d %d\n", device().machine().describe_context(), offset,bankbit0, plane0select, plane1select, spriteselect, soundselect, windowbank, unk2);
 
-//	if ((offset==0) || (offset2 == 0xe) || (offset2 == 0xf) || (offset2 == 0x68))
-//		logerror("%s: reading banked bus area %04x - bank bits %d %d %d %d %d %d %d\n", device().machine().describe_context(), offset,bankbit0, plane0select, plane1select, spriteselect, soundselect, windowbank, unk2);
+//  if ((offset==0) || (offset2 == 0xe) || (offset2 == 0xf) || (offset2 == 0x68))
+//      logerror("%s: reading banked bus area %04x - bank bits %d %d %d %d %d %d %d\n", device().machine().describe_context(), offset,bankbit0, plane0select, plane1select, spriteselect, soundselect, windowbank, unk2);
 
 	return ret;
 }
@@ -388,11 +388,11 @@ WRITE8_MEMBER(cedar_magnet_state::other_cpu_w)
 	int soundselect = (m_ic49_pio_pb_val & 0x70) >> 4;
 	int windowbank = (m_ic49_pio_pb_val & 0x0c) >> 2;
 	int unk2 = (m_ic49_pio_pb_val & 0x03) >> 0;
-	
+
 	int cpus_accessed = 0;
 
 	int offset2 = offset + windowbank * 0x4000;
-	
+
 	if (spriteselect == 0x1)
 	{
 		cpus_accessed++;
@@ -415,14 +415,14 @@ WRITE8_MEMBER(cedar_magnet_state::other_cpu_w)
 	{
 		cpus_accessed++;
 		m_cedsound->write_cpu_bus(offset2, data);
-	//	printf("%s: sound cpu write %04x %02x - bank bits %d %d %d %d %d %d %d\n", device().machine().describe_context(), offset,data, bankbit0, plane0select, plane1select, spriteselect, soundselect, windowbank, unk2);
+	//  printf("%s: sound cpu write %04x %02x - bank bits %d %d %d %d %d %d %d\n", device().machine().describe_context(), offset,data, bankbit0, plane0select, plane1select, spriteselect, soundselect, windowbank, unk2);
 	}
 
 	if (cpus_accessed != 1)
 		logerror("%s: writing multiple CPUS!!! %04x %02x - bank bits %d %d %d %d %d %d %d\n", device().machine().describe_context(), offset,data, bankbit0, plane0select, plane1select, spriteselect, soundselect, windowbank, unk2);
 
-//	if ((offset==0) || (offset2 == 0xe) || (offset2 == 0xf) || (offset2 == 0x68))
-//		printf("%s: other cpu write %04x %02x - bank bits %d %d %d %d %d %d %d\n", device().machine().describe_context(), offset,data, bankbit0, plane0select, plane1select, spriteselect, soundselect, windowbank, unk2);
+//  if ((offset==0) || (offset2 == 0xe) || (offset2 == 0xf) || (offset2 == 0x68))
+//      printf("%s: other cpu write %04x %02x - bank bits %d %d %d %d %d %d %d\n", device().machine().describe_context(), offset,data, bankbit0, plane0select, plane1select, spriteselect, soundselect, windowbank, unk2);
 }
 
 
@@ -477,7 +477,7 @@ WRITE8_MEMBER( cedar_magnet_state::ic48_pio_pa_w ) // 0x20
 	if (LOG_IC48_PIO_PA) printf("output bit 0x40 %d (bank)\n", (data >> 6)&1); // A6 -> 2 74HC10 3NAND IC19
 	if (LOG_IC48_PIO_PA) printf("output bit 0x20 %d (bank)\n", (data >> 5)&1); // A5 -> 4 74HC10 3NAND IC19
 	if (LOG_IC48_PIO_PA) printf("input  bit 0x10 %d (interrupt source related?)\n", (data >> 4)&1); // 10 in // A4 <- 9 74HC74 IC20 <- input from 18 74LS244 IC61
-	if (LOG_IC48_PIO_PA) printf("input  bit 0x08 %d (COIN1)\n", (data >> 3)&1); // 08 in // A3 <- 4 74HC14P (inverter) IC4 <- EDGE 21 COIN1 
+	if (LOG_IC48_PIO_PA) printf("input  bit 0x08 %d (COIN1)\n", (data >> 3)&1); // 08 in // A3 <- 4 74HC14P (inverter) IC4 <- EDGE 21 COIN1
 	if (LOG_IC48_PIO_PA) printf("output bit 0x04 %d (plane0 CPU/bus related?)\n", (data >> 2)&1); // A2 -> 45 J6
 	if (LOG_IC48_PIO_PA) printf("output bit 0x02 %d (plane0 CPU/bus related?)\n", (data >> 1)&1); // A1 -> 47 J6
 	if (LOG_IC48_PIO_PA) printf("input  bit 0x01 %d (plane0 CPU/bus related?)\n", (data >> 0)&1); // A0 -> 49 J6
@@ -514,15 +514,15 @@ WRITE8_MEMBER(cedar_magnet_state::ic48_pio_pb_w) // 0x22
 	if (LOG_IC48_PIO_PB)  printf("%s: ic48_pio_pb_w %02x\n", device().machine().describe_context(), data);
 
 	// address 0x22 - pio ic48 port b
-	if (LOG_IC48_PIO_PB) printf("input  bit 0x80 %d (COIN2)\n", (data >> 7)&1); // B7 <- 2 74HC14P (inverter) IC4 <- EDGE 22 COIN2  
+	if (LOG_IC48_PIO_PB) printf("input  bit 0x80 %d (COIN2)\n", (data >> 7)&1); // B7 <- 2 74HC14P (inverter) IC4 <- EDGE 22 COIN2
 	if (LOG_IC48_PIO_PB) printf("output bit 0x40 (J6) (sprite CPU/bus related?) %d\n", (data >> 6)&1); // B6 -> 41 J6
 	if (LOG_IC48_PIO_PB) printf("output bit 0x20 (J6) (sprite CPU/bus related?) %d\n", (data >> 5)&1); // B5 -> 43 J6
-	if (LOG_IC48_PIO_PB) printf("input  bit 0x10 (J6) (sprite CPU/bus related?) %d\n", (data >> 4)&1); // B4 -> 44 J6 
+	if (LOG_IC48_PIO_PB) printf("input  bit 0x10 (J6) (sprite CPU/bus related?) %d\n", (data >> 4)&1); // B4 -> 44 J6
 	if (LOG_IC48_PIO_PB) printf("output bit 0x08 (Q8) %d\n", (data >> 3)&1); // B3 -> Q8 transistor
 	if (LOG_IC48_PIO_PB) printf("output bit 0x04 (J6) (plane1 CPU/bus related?) %d\n", (data >> 2)&1); // B2 -> 46 J6
 	if (LOG_IC48_PIO_PB) printf("output bit 0x02 (J6) (plane1 CPU/bus related?) %d\n", (data >> 1)&1); // B1 -> 48 J6
 	if (LOG_IC48_PIO_PB) printf("input  bit 0x01 (J6) (plane1 CPU/bus related?) %d\n", (data >> 0)&1); // B0 -> 50 J6
-		 
+
 	int plane1select = (m_ic48_pio_pb_val & 0x07) >> 0;
 	int spriteselect = (m_ic48_pio_pb_val & 0x70) >> 4;
 
@@ -569,7 +569,7 @@ WRITE8_MEMBER( cedar_magnet_state::ic49_pio_pb_w ) // 0x42
 
 
 	int soundselect = (m_ic49_pio_pb_val & 0x70) >> 4;
-	
+
 	handle_sub_board_cpu_lines(m_cedsound, oldsoundselect, soundselect);
 }
 
@@ -612,7 +612,7 @@ static INPUT_PORTS_START( cedar_magnet )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
-	
+
 	PORT_START("P2_IN")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
@@ -630,7 +630,7 @@ INPUT_PORTS_END
 
 INTERRUPT_GEN_MEMBER(cedar_magnet_state::irq)
 {
-	if (m_prothack) 
+	if (m_prothack)
 		m_prothack(this);
 
 	m_maincpu->set_input_line(0, HOLD_LINE);
@@ -667,16 +667,16 @@ static MACHINE_CONFIG_START( cedar_magnet, cedar_magnet_state )
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x100)
 
 	MCFG_DEVICE_ADD("z80pio_ic48", Z80PIO, 4000000/2)
-//	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+//  MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80PIO_IN_PA_CB(READ8(cedar_magnet_state, ic48_pio_pa_r))
 	MCFG_Z80PIO_OUT_PA_CB(WRITE8(cedar_magnet_state, ic48_pio_pa_w))
 	MCFG_Z80PIO_IN_PB_CB(READ8(cedar_magnet_state, ic48_pio_pb_r))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(cedar_magnet_state, ic48_pio_pb_w))
 
 	MCFG_DEVICE_ADD("z80pio_ic49", Z80PIO, 4000000/2)
-//	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-//	MCFG_Z80PIO_IN_PA_CB(READ8(cedar_magnet_state, ic49_pio_pa_r)) // NOT USED
-//	MCFG_Z80PIO_OUT_PA_CB(WRITE8(cedar_magnet_state, ic49_pio_pa_w)) // NOT USED
+//  MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+//  MCFG_Z80PIO_IN_PA_CB(READ8(cedar_magnet_state, ic49_pio_pa_r)) // NOT USED
+//  MCFG_Z80PIO_OUT_PA_CB(WRITE8(cedar_magnet_state, ic49_pio_pa_w)) // NOT USED
 	MCFG_Z80PIO_IN_PB_CB(READ8(cedar_magnet_state, ic49_pio_pb_r))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(cedar_magnet_state, ic49_pio_pb_w))
 
@@ -737,17 +737,17 @@ ROM_START( mag_xain )
 ROM_END
 
 /*
-	protection? (Time Scanner note)
-      
-	one part of the code is a weird loop checking values from port 0x7c while doing other nonsensical stuff, a flag gets set to 0xff if it fails
+    protection? (Time Scanner note)
 
-	the other part is after reading the weird extra block on the disk (score / protection data at 0xea400 in the disk image*) and again a flag
-	gets set to 0xff in certain conditions there's then a check after inserting a coin, these values can't be 0xff at that point, and there
-	doesn't appear to be any code to reset them.
+    one part of the code is a weird loop checking values from port 0x7c while doing other nonsensical stuff, a flag gets set to 0xff if it fails
 
-	*0xea400 is/was track 4e, side 00, sector 01 for future reference if the floppy format changes
+    the other part is after reading the weird extra block on the disk (score / protection data at 0xea400 in the disk image*) and again a flag
+    gets set to 0xff in certain conditions there's then a check after inserting a coin, these values can't be 0xff at that point, and there
+    doesn't appear to be any code to reset them.
 
-	all games have the same code in them but at different addresses
+    *0xea400 is/was track 4e, side 00, sector 01 for future reference if the floppy format changes
+
+    all games have the same code in them but at different addresses
 */
 
 

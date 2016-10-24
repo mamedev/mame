@@ -152,7 +152,7 @@ void amust_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 		m_beep->set_state(0);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in amust_state::device_timer");
+		assert_always(false, "Unknown id in amust_state::device_timer");
 	}
 }
 
@@ -397,7 +397,7 @@ static MACHINE_CONFIG_START( amust, amust_state )
 	MCFG_MACHINE_RESET_OVERRIDE(amust_state, amust)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 480)

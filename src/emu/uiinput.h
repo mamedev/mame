@@ -74,10 +74,10 @@ public:
 	render_target *find_mouse(int32_t *x, int32_t *y, bool *button) const;
 	ioport_field *find_mouse_field() const;
 
-	/* return TRUE if a key down for the given user interface sequence is detected */
+	/* return true if a key down for the given user interface sequence is detected */
 	bool pressed(int code);
 
-	/* return TRUE if a key down for the given user interface sequence is detected, or if
+	/* return true if a key down for the given user interface sequence is detected, or if
 	autorepeat at the given speed is triggered */
 	bool pressed_repeat(int code, int speed);
 

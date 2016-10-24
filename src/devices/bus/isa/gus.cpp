@@ -1504,7 +1504,7 @@ WRITE_LINE_MEMBER(isa16_gus_device::sb_irq)
 
 WRITE_LINE_MEMBER(isa16_gus_device::drq1_w)
 {
-	m_isa->set_dma_channel(m_gf1->dma_channel1(), this, TRUE);
+	m_isa->set_dma_channel(m_gf1->dma_channel1(), this, true);
 	switch(m_gf1->dma_channel1())
 	{
 	case 1:
@@ -1529,7 +1529,7 @@ WRITE_LINE_MEMBER(isa16_gus_device::drq1_w)
 
 WRITE_LINE_MEMBER(isa16_gus_device::drq2_w)
 {
-	m_isa->set_dma_channel(m_gf1->dma_channel2(), this, TRUE);
+	m_isa->set_dma_channel(m_gf1->dma_channel2(), this, true);
 	switch(m_gf1->dma_channel2())
 	{
 	case 1:

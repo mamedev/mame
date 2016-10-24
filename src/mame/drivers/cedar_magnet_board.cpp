@@ -10,7 +10,7 @@
 
 cedar_magnet_board_device::cedar_magnet_board_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
-//	m_ram(*this, "ram")
+//  m_ram(*this, "ram")
 {
 }
 

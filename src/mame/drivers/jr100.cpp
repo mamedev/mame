@@ -285,7 +285,7 @@ WRITE8_MEMBER(jr100_state::jr100_via_write_a)
 
 WRITE8_MEMBER(jr100_state::jr100_via_write_b)
 {
-	m_use_pcg = (data & 0x20) ? TRUE : FALSE;
+	m_use_pcg = (data & 0x20) ? true : false;
 	m_speaker_data = data>>7;
 }
 

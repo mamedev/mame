@@ -208,7 +208,7 @@ void rtc65271_device::nvram_read(emu_file &file)
 		return;
 
 	m_regs[reg_D] |= reg_D_VRT; /* the data was backed up successfully */
-	/*m_dirty = FALSE;*/
+	/*m_dirty = false;*/
 
 	{
 		system_time systime;

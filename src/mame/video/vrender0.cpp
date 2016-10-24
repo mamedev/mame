@@ -395,7 +395,7 @@ static const _DrawTemplate DrawTile[]=
 
 #define Packet(i) space.read_word(PacketPtr + 2 * i)
 
-//Returns TRUE if the operation was a flip (sync or async)
+//Returns true if the operation was a flip (sync or async)
 int vr0video_device::vrender0_ProcessPacket(uint32_t PacketPtr, uint16_t *Dest, uint8_t *TEXTURE)
 {
 	address_space &space = m_cpu->space(AS_PROGRAM);

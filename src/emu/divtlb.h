@@ -54,7 +54,7 @@ public:
 	void set_vtlb_fixed_entries(int entries) { m_fixed = entries; }
 
 	// filling
-	int vtlb_fill(offs_t address, int intention);
+	bool vtlb_fill(offs_t address, int intention);
 	void vtlb_load(int entrynum, int numpages, offs_t address, vtlb_entry value);
 	void vtlb_dynload(uint32_t index, offs_t address, vtlb_entry value);
 

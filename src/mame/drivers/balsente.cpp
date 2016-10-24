@@ -2267,74 +2267,74 @@ inline void balsente_state::config_shooter_adc(uint8_t shooter, uint8_t adc_shif
 	m_adc_shift = adc_shift;
 }
 
-DRIVER_INIT_MEMBER(balsente_state,sentetst)  { expand_roms(EXPAND_ALL);  config_shooter_adc(FALSE, 0 /* noanalog */); }
-DRIVER_INIT_MEMBER(balsente_state,cshift)    { expand_roms(EXPAND_ALL);  config_shooter_adc(FALSE, 0 /* noanalog */); }
-DRIVER_INIT_MEMBER(balsente_state,gghost)    { expand_roms(EXPAND_ALL);  config_shooter_adc(FALSE, 1); }
-DRIVER_INIT_MEMBER(balsente_state,hattrick)  { expand_roms(EXPAND_ALL);  config_shooter_adc(FALSE, 0 /* noanalog */); }
+DRIVER_INIT_MEMBER(balsente_state,sentetst)  { expand_roms(EXPAND_ALL);  config_shooter_adc(false, 0 /* noanalog */); }
+DRIVER_INIT_MEMBER(balsente_state,cshift)    { expand_roms(EXPAND_ALL);  config_shooter_adc(false, 0 /* noanalog */); }
+DRIVER_INIT_MEMBER(balsente_state,gghost)    { expand_roms(EXPAND_ALL);  config_shooter_adc(false, 1); }
+DRIVER_INIT_MEMBER(balsente_state,hattrick)  { expand_roms(EXPAND_ALL);  config_shooter_adc(false, 0 /* noanalog */); }
 DRIVER_INIT_MEMBER(balsente_state,teamht)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	expand_roms(EXPAND_ALL);
-	config_shooter_adc(FALSE, 0 /* noanalog */);
+	config_shooter_adc(false, 0 /* noanalog */);
 	space.install_read_handler(0x9404, 0x9404, read8_delegate(FUNC(balsente_state::teamht_extra_r),this));
 	space.install_write_handler(0x9000, 0x9007, write8_delegate(FUNC(balsente_state::teamht_multiplex_select_w),this));
 
 }
 
-DRIVER_INIT_MEMBER(balsente_state,otwalls)   { expand_roms(EXPAND_ALL);  config_shooter_adc(FALSE, 0); }
-DRIVER_INIT_MEMBER(balsente_state,snakepit)  { expand_roms(EXPAND_ALL);  config_shooter_adc(FALSE, 1); }
-DRIVER_INIT_MEMBER(balsente_state,snakjack)  { expand_roms(EXPAND_ALL);  config_shooter_adc(FALSE, 1); }
-DRIVER_INIT_MEMBER(balsente_state,stocker)   { expand_roms(EXPAND_ALL);  config_shooter_adc(FALSE, 0); }
-DRIVER_INIT_MEMBER(balsente_state,triviag1)  { expand_roms(EXPAND_ALL);  config_shooter_adc(FALSE, 0 /* noanalog */); }
+DRIVER_INIT_MEMBER(balsente_state,otwalls)   { expand_roms(EXPAND_ALL);  config_shooter_adc(false, 0); }
+DRIVER_INIT_MEMBER(balsente_state,snakepit)  { expand_roms(EXPAND_ALL);  config_shooter_adc(false, 1); }
+DRIVER_INIT_MEMBER(balsente_state,snakjack)  { expand_roms(EXPAND_ALL);  config_shooter_adc(false, 1); }
+DRIVER_INIT_MEMBER(balsente_state,stocker)   { expand_roms(EXPAND_ALL);  config_shooter_adc(false, 0); }
+DRIVER_INIT_MEMBER(balsente_state,triviag1)  { expand_roms(EXPAND_ALL);  config_shooter_adc(false, 0 /* noanalog */); }
 DRIVER_INIT_MEMBER(balsente_state,triviag2)
 {
 	uint8_t *rom = memregion("maincpu")->base();
 	memcpy(&rom[0x20000], &rom[0x28000], 0x4000);
 	memcpy(&rom[0x24000], &rom[0x28000], 0x4000);
-	expand_roms(EXPAND_NONE); config_shooter_adc(FALSE, 0 /* noanalog */);
+	expand_roms(EXPAND_NONE); config_shooter_adc(false, 0 /* noanalog */);
 }
-DRIVER_INIT_MEMBER(balsente_state,triviaes)  { expand_roms(EXPAND_NONE | SWAP_HALVES); config_shooter_adc(FALSE, 0 /* noanalog */); }
-DRIVER_INIT_MEMBER(balsente_state,gimeabrk)  { expand_roms(EXPAND_ALL);  config_shooter_adc(FALSE, 1); }
-DRIVER_INIT_MEMBER(balsente_state,minigolf)  { expand_roms(EXPAND_NONE); config_shooter_adc(FALSE, 2); }
-DRIVER_INIT_MEMBER(balsente_state,minigolf2) { expand_roms(0x0c);        config_shooter_adc(FALSE, 2); }
-DRIVER_INIT_MEMBER(balsente_state,toggle)    { expand_roms(EXPAND_ALL);  config_shooter_adc(FALSE, 0 /* noanalog */); }
+DRIVER_INIT_MEMBER(balsente_state,triviaes)  { expand_roms(EXPAND_NONE | SWAP_HALVES); config_shooter_adc(false, 0 /* noanalog */); }
+DRIVER_INIT_MEMBER(balsente_state,gimeabrk)  { expand_roms(EXPAND_ALL);  config_shooter_adc(false, 1); }
+DRIVER_INIT_MEMBER(balsente_state,minigolf)  { expand_roms(EXPAND_NONE); config_shooter_adc(false, 2); }
+DRIVER_INIT_MEMBER(balsente_state,minigolf2) { expand_roms(0x0c);        config_shooter_adc(false, 2); }
+DRIVER_INIT_MEMBER(balsente_state,toggle)    { expand_roms(EXPAND_ALL);  config_shooter_adc(false, 0 /* noanalog */); }
 DRIVER_INIT_MEMBER(balsente_state,nametune)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	space.install_write_handler(0x9f00, 0x9f00, write8_delegate(FUNC(balsente_state::balsente_rombank2_select_w),this));
-	expand_roms(EXPAND_NONE | SWAP_HALVES); config_shooter_adc(FALSE, 0 /* noanalog */);
+	expand_roms(EXPAND_NONE | SWAP_HALVES); config_shooter_adc(false, 0 /* noanalog */);
 }
 DRIVER_INIT_MEMBER(balsente_state,nstocker)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	space.install_write_handler(0x9f00, 0x9f00, write8_delegate(FUNC(balsente_state::balsente_rombank2_select_w),this));
-	expand_roms(EXPAND_NONE | SWAP_HALVES); config_shooter_adc(TRUE, 1);
+	expand_roms(EXPAND_NONE | SWAP_HALVES); config_shooter_adc(true, 1);
 }
 DRIVER_INIT_MEMBER(balsente_state,sfootbal)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	space.install_write_handler(0x9f00, 0x9f00, write8_delegate(FUNC(balsente_state::balsente_rombank2_select_w),this));
-	expand_roms(EXPAND_ALL  | SWAP_HALVES); config_shooter_adc(FALSE, 0);
+	expand_roms(EXPAND_ALL  | SWAP_HALVES); config_shooter_adc(false, 0);
 }
 DRIVER_INIT_MEMBER(balsente_state,spiker)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	space.install_readwrite_handler(0x9f80, 0x9f8f, read8_delegate(FUNC(balsente_state::spiker_expand_r),this), write8_delegate(FUNC(balsente_state::spiker_expand_w),this));
 	space.install_write_handler(0x9f00, 0x9f00, write8_delegate(FUNC(balsente_state::balsente_rombank2_select_w),this));
-	expand_roms(EXPAND_ALL  | SWAP_HALVES); config_shooter_adc(FALSE, 1);
+	expand_roms(EXPAND_ALL  | SWAP_HALVES); config_shooter_adc(false, 1);
 }
 DRIVER_INIT_MEMBER(balsente_state,stompin)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	space.install_write_handler(0x9f00, 0x9f00, write8_delegate(FUNC(balsente_state::balsente_rombank2_select_w),this));
-	expand_roms(0x0c | SWAP_HALVES); config_shooter_adc(FALSE, 32);
+	expand_roms(0x0c | SWAP_HALVES); config_shooter_adc(false, 32);
 }
-DRIVER_INIT_MEMBER(balsente_state,rescraid)  { expand_roms(EXPAND_NONE); config_shooter_adc(FALSE, 0 /* noanalog */); }
+DRIVER_INIT_MEMBER(balsente_state,rescraid)  { expand_roms(EXPAND_NONE); config_shooter_adc(false, 0 /* noanalog */); }
 DRIVER_INIT_MEMBER(balsente_state,grudge)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	space.install_read_handler(0x9400, 0x9400, read8_delegate(FUNC(balsente_state::grudge_steering_r),this));
-	expand_roms(EXPAND_NONE); config_shooter_adc(FALSE, 0);
+	expand_roms(EXPAND_NONE); config_shooter_adc(false, 0);
 }
 DRIVER_INIT_MEMBER(balsente_state,shrike)
 {
@@ -2343,7 +2343,7 @@ DRIVER_INIT_MEMBER(balsente_state,shrike)
 	space.install_write_handler(0x9e01, 0x9e01, write8_delegate(FUNC(balsente_state::shrike_sprite_select_w),this));
 	m_68k->space(AS_PROGRAM).install_readwrite_handler(0x10000, 0x1001f, read16_delegate(FUNC(balsente_state::shrike_io_68k_r),this), write16_delegate(FUNC(balsente_state::shrike_io_68k_w),this));
 
-	expand_roms(EXPAND_ALL);  config_shooter_adc(FALSE, 32);
+	expand_roms(EXPAND_ALL);  config_shooter_adc(false, 32);
 }
 
 

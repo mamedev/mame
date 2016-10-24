@@ -78,7 +78,7 @@ void cmulti8_state::prepare_display()
 	// M-digit is on in memory mode, upper row is off in single mode
 	uint32_t m = (m_inp_matrix[10]->read() & 0x10) ? 0x100000 : 0;
 	uint32_t mask = (m_inp_matrix[10]->read() & 0x20) ? 0xfffff : 0xffc00;
-	
+
 	// R10 selects display row
 	uint32_t sel = (m_r & 0x400) ? (m_r & 0x3ff) : (m_r << 10 & 0xffc00);
 	display_matrix(8, 21, m_o, (sel & mask) | m);

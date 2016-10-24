@@ -58,8 +58,8 @@ READ8_MEMBER( crtc_ega_device::register_r )
 		case 0x0d:  ret = (m_disp_start_addr >> 0) & 0xff; break;
 		case 0x0e:  ret = (m_cursor_addr    >> 8) & 0xff; break;
 		case 0x0f:  ret = (m_cursor_addr    >> 0) & 0xff; break;
-		case 0x10:  ret = (m_light_pen_addr >> 8) & 0xff; m_light_pen_latched = FALSE; break;
-		case 0x11:  ret = (m_light_pen_addr >> 0) & 0xff; m_light_pen_latched = FALSE; break;
+		case 0x10:  ret = (m_light_pen_addr >> 8) & 0xff; m_light_pen_latched = false; break;
+		case 0x11:  ret = (m_light_pen_addr >> 0) & 0xff; m_light_pen_latched = false; break;
 
 		/* all other registers are write only and return 0 */
 		default: break;
@@ -305,7 +305,7 @@ void crtc_ega_device::handle_line_timer()
 		{
 			m_vsync_ff = 0;
 
-			new_vsync = FALSE;
+			new_vsync = false;
 		}
 	}
 
@@ -333,7 +333,7 @@ void crtc_ega_device::handle_line_timer()
 		m_vsync_width_counter = 0;
 		m_vsync_ff = 1;
 
-		new_vsync = TRUE;
+		new_vsync = true;
 	}
 
 	/* Check if we have reached the end of the vertical area */
@@ -342,7 +342,7 @@ void crtc_ega_device::handle_line_timer()
 		m_line_counter = 0;
 		m_line_address = m_disp_start_addr;
 		m_line_enable_ff = true;
-		set_vblank( FALSE );
+		set_vblank( false );
 		/* also update the cursor state now */
 		update_cursor_state();
 
@@ -375,7 +375,7 @@ void crtc_ega_device::handle_line_timer()
 	/* Set VBlank signal */
 	if ( m_line_counter == m_vert_disp_end + 1 )
 	{
-		set_vblank( TRUE );
+		set_vblank( true );
 	}
 
 	/* Schedule our next callback */
@@ -383,7 +383,7 @@ void crtc_ega_device::handle_line_timer()
 
 	/* Set VSYNC and DE signals */
 	set_vsync( new_vsync );
-	set_de( m_line_enable_ff ? TRUE : FALSE );
+	set_de( m_line_enable_ff ? true : false );
 }
 
 
@@ -396,18 +396,18 @@ void crtc_ega_device::device_timer(emu_timer &timer, device_timer_id id, int par
 		break;
 
 	case TIMER_DE_OFF:
-		set_de( FALSE );
+		set_de( false );
 		break;
 
 	case TIMER_CUR_ON:
-		set_cur( TRUE );
+		set_cur( true );
 
 		/* Schedule CURSOR off signal */
 		m_cur_off_timer->adjust( attotime::from_ticks( 1, m_clock ) );
 		break;
 
 	case TIMER_CUR_OFF:
-		set_cur( FALSE );
+		set_cur( false );
 		break;
 
 	case TIMER_HSYNC_ON:
@@ -420,7 +420,7 @@ void crtc_ega_device::device_timer(emu_timer &timer, device_timer_id id, int par
 			}
 
 			m_hsync_width_counter = 0;
-			set_hsync( TRUE );
+			set_hsync( true );
 
 			/* Schedule HSYNC off signal */
 			m_hsync_off_timer->adjust( attotime::from_ticks( hsync_width, m_clock ) );
@@ -428,7 +428,7 @@ void crtc_ega_device::device_timer(emu_timer &timer, device_timer_id id, int par
 		break;
 
 	case TIMER_HSYNC_OFF:
-		set_hsync( FALSE );
+		set_hsync( false );
 		break;
 
 	case TIMER_LIGHT_PEN_LATCH:
@@ -646,7 +646,7 @@ void crtc_ega_device::device_start()
 	m_adjust_active = 0;
 
 	m_current_disp_addr = 0;
-	m_light_pen_latched = FALSE;
+	m_light_pen_latched = false;
 	m_has_valid_parameters = false;
 
 	/* register for state saving */

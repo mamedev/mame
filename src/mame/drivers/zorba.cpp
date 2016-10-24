@@ -353,7 +353,7 @@ static MACHINE_CONFIG_START( zorba, zorba_state )
 	MCFG_CPU_PROGRAM_MAP(zorba_kbdmem)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", i8275_device, screen_update)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", zorba)

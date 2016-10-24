@@ -317,7 +317,7 @@ bool i80286_cpu_device::memory_translate(address_spacenum spacenum, int intentio
 	if(spacenum == AS_PROGRAM)
 		address &= m_amask;
 
-	return TRUE;
+	return true;
 }
 
 void i80286_cpu_device::execute_set_input(int inptnum, int state)

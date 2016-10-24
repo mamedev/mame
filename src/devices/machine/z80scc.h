@@ -169,7 +169,7 @@ public:
 	uint8_t do_sccreg_rr5();
 	uint8_t do_sccreg_rr6();
 	uint8_t do_sccreg_rr7();
-	uint8_t do_sccreg_rr7p(){ return 0; } // Needs to be implemented for Synchronous mode 
+	uint8_t do_sccreg_rr7p(){ return 0; } // Needs to be implemented for Synchronous mode
 	// uint8_t do_sccreg_rr8(); Short cutted due to frequent use
 	uint8_t do_sccreg_rr9();
 	uint8_t do_sccreg_rr10();
@@ -189,7 +189,7 @@ public:
 	void do_sccreg_wr5(uint8_t data);
 	void do_sccreg_wr6(uint8_t data);
 	void do_sccreg_wr7(uint8_t data);
-	void do_sccreg_wr7p(uint8_t data){}; // Needs to be implemented for Synchronous mode 
+	void do_sccreg_wr7p(uint8_t data){}; // Needs to be implemented for Synchronous mode
 	void do_sccreg_wr8(uint8_t data);
 	void do_sccreg_wr9(uint8_t data);
 	void do_sccreg_wr10(uint8_t data);
@@ -250,9 +250,9 @@ public:
 	uint8_t m_wr5; // REG_WR5_TX_CONTROL
 	uint8_t m_wr6; // REG_WR6_SYNC_OR_SDLC_A
 	uint8_t m_wr7; // REG_WR7_SYNC_OR_SDLC_F
-	uint8_t m_wr7p; // 
+	uint8_t m_wr7p; //
 	uint8_t m_wr8;  // REG_WR8_TRANSMIT_DATA
-	//	uint8_t m_wr9;  // REG_WR9_MASTER_INT_CTRL
+	//  uint8_t m_wr9;  // REG_WR9_MASTER_INT_CTRL
 	uint8_t m_wr10; // REG_WR10_MSC_RX_TX_CTRL
 	uint8_t m_wr11; // REG_WR11_CLOCK_MODES
 	uint8_t m_wr12; // REG_WR12_LO_BAUD_GEN
@@ -521,14 +521,14 @@ protected:
 
 	enum
 	{
-		WR15_WR7PRIME		= 0x01,
-		WR15_ZEROCOUNT		= 0x02,
-		WR15_STATUS_FIFO	= 0x04,
-		WR15_DCD     		= 0x08,
-		WR15_SYNC    		= 0x10,
-		WR15_CTS      		= 0x20,
-		WR15_TX_EOM      	= 0x40,
-		WR15_BREAK_ABORT	= 0x80
+		WR15_WR7PRIME       = 0x01,
+		WR15_ZEROCOUNT      = 0x02,
+		WR15_STATUS_FIFO    = 0x04,
+		WR15_DCD            = 0x08,
+		WR15_SYNC           = 0x10,
+		WR15_CTS            = 0x20,
+		WR15_TX_EOM         = 0x40,
+		WR15_BREAK_ABORT    = 0x80
 	};
 
 	enum
@@ -587,7 +587,7 @@ protected:
 	int m_tx_fifo_wp;           // FIFO write pointer
 	int m_tx_fifo_sz;           // FIFO size
 	uint8_t m_tx_error;           // current error
-	//	uint8_t m_tx_data;    // transmit data register
+	//  uint8_t m_tx_data;    // transmit data register
 	int m_tx_clock;     // transmit clock pulse count
 
 	int m_dtr;      // data terminal ready

@@ -101,7 +101,7 @@ void acefruit_state::device_timer(emu_timer &timer, device_timer_id id, int para
 			m_refresh_timer->adjust( m_screen->time_until_pos(vpos) );
 			break;
 	default:
-			assert_always(FALSE, "Unknown id in acefruit_state::device_timer");
+			assert_always(false, "Unknown id in acefruit_state::device_timer");
 	}
 }
 

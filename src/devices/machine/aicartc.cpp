@@ -70,10 +70,10 @@ void aicartc_device::rtc_clock_updated(int year, int month, int day, int day_of_
 
 	// put the minutes
 	current_time += minute * 60;
-	
+
 	// put the hours
 	current_time += hour * 60 * 60;
-	
+
 	// put the days (note -1) */
 	current_time += (day - 1) * 60 * 60 * 24;
 

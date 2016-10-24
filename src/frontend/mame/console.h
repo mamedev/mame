@@ -25,7 +25,7 @@ public:
 
 	void start_console();
 	void completion(char const* prefix, linenoiseCompletions* lc);
-	
+
 private:
 	void read_console(std::string &cmdLine);
 	void split_command(std::vector<std::string>& arg, std::string command);
@@ -36,7 +36,7 @@ private:
 	//osd_interface &     m_osd;
 	std::atomic<bool>   m_run;
 	std::atomic<bool>   m_wait;
-	std::string		    m_prompt;
+	std::string         m_prompt;
 
 	std::unordered_map<std::string, std::function<void(std::vector<std::string>& arg)>> m_commands;
 };

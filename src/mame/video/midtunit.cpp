@@ -589,7 +589,7 @@ void midtunit_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		m_maincpu->set_input_line(0, ASSERT_LINE);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in midtunit_state::device_timer");
+		assert_always(false, "Unknown id in midtunit_state::device_timer");
 	}
 }
 

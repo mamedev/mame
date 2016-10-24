@@ -6,9 +6,9 @@
 
     Four quadrant multiplying DAC.
 
-	Binary Weighted Resistor Network, R-2R Ladder & PWM
+    Binary Weighted Resistor Network, R-2R Ladder & PWM
 
-	Binary, Ones Complement, Twos Complement or Sign Magnitude coding
+    Binary, Ones Complement, Twos Complement or Sign Magnitude coding
 
 ***************************************************************************/
 

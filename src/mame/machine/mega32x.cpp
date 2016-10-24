@@ -1136,7 +1136,7 @@ WRITE16_MEMBER( sega_32x_device::_32x_common_vdp_regs_w )
 			{
 				m_32x_fb_swap = data & 1;
 
-				_32x_check_framebuffer_swap(TRUE);
+				_32x_check_framebuffer_swap(true);
 			}
 
 			break;

@@ -186,7 +186,7 @@ void ultrsprt_state::machine_start()
 	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	m_maincpu->ppcdrc_add_fastram(0xff000000, 0xff01ffff, FALSE, m_workram);
+	m_maincpu->ppcdrc_add_fastram(0xff000000, 0xff01ffff, false, m_workram);
 
 	m_vram = std::make_unique<uint8_t[]>(VRAM_PAGE_BYTES * VRAM_PAGES);
 

@@ -34,7 +34,7 @@ const size_t debugger_commands::MAX_GLOBALS = 1000;
 ***************************************************************************/
 
 /*-------------------------------------------------
-    cheat_address_is_valid - return TRUE if the
+    cheat_address_is_valid - return true if the
     given address is valid for cheating
 -------------------------------------------------*/
 
@@ -90,7 +90,7 @@ uint64_t debugger_commands::cheat_byte_swap(const cheat_system *cheatsys, uint64
 
 uint64_t debugger_commands::cheat_read_extended(const cheat_system *cheatsys, address_space &space, offs_t address)
 {
-	return cheat_sign_extend(cheatsys, cheat_byte_swap(cheatsys, m_cpu.read_memory(space, address, cheatsys->width, TRUE)));
+	return cheat_sign_extend(cheatsys, cheat_byte_swap(cheatsys, m_cpu.read_memory(space, address, cheatsys->width, true)));
 }
 
 debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu, debugger_console& console)
@@ -1630,7 +1630,7 @@ void debugger_commands::execute_save(int ref, int params, const char *param[])
 	/* now write the data out */
 	for (i = offset; i <= endoffset; i++)
 	{
-		uint8_t byte = m_cpu.read_byte(*space, i, TRUE);
+		uint8_t byte = m_cpu.read_byte(*space, i, true);
 		fwrite(&byte, 1, 1, f);
 	}
 
@@ -1767,7 +1767,7 @@ void debugger_commands::execute_dump(int ref, int params, const char *param[])
 				offs_t curaddr = i + j;
 				if (space->device().memory().translate(space->spacenum(), TRANSLATE_READ_DEBUG, curaddr))
 				{
-					uint64_t value = m_cpu.read_memory(*space, i + j, width, TRUE);
+					uint64_t value = m_cpu.read_memory(*space, i + j, width, true);
 					util::stream_format(output, " %0*X", width * 2, value);
 				}
 				else
@@ -1788,7 +1788,7 @@ void debugger_commands::execute_dump(int ref, int params, const char *param[])
 				offs_t curaddr = i + j;
 				if (space->device().memory().translate(space->spacenum(), TRANSLATE_READ_DEBUG, curaddr))
 				{
-					uint8_t byte = m_cpu.read_byte(*space, i + j, TRUE);
+					uint8_t byte = m_cpu.read_byte(*space, i + j, true);
 					util::stream_format(output, "%c", (byte >= 32 && byte < 127) ? byte : '.');
 				}
 				else
@@ -1832,16 +1832,16 @@ void debugger_commands::execute_cheatinit(int ref, int params, const char *param
 	if (ref == 0)
 	{
 		m_cheat.width = 1;
-		m_cheat.signed_cheat = FALSE;
-		m_cheat.swapped_cheat = FALSE;
+		m_cheat.signed_cheat = false;
+		m_cheat.swapped_cheat = false;
 		if (params > 0)
 		{
 			char *srtpnt = (char*)param[0];
 
 			if (*srtpnt == 's')
-				m_cheat.signed_cheat = TRUE;
+				m_cheat.signed_cheat = true;
 			else if (*srtpnt == 'u')
-				m_cheat.signed_cheat = FALSE;
+				m_cheat.signed_cheat = false;
 			else
 			{
 				m_console.printf("Invalid sign: expected s or u\n");
@@ -1863,9 +1863,9 @@ void debugger_commands::execute_cheatinit(int ref, int params, const char *param
 			}
 
 			if (*(++srtpnt) == 's')
-				m_cheat.swapped_cheat = TRUE;
+				m_cheat.swapped_cheat = true;
 			else
-				m_cheat.swapped_cheat = FALSE;
+				m_cheat.swapped_cheat = false;
 		}
 	}
 
@@ -1877,14 +1877,14 @@ void debugger_commands::execute_cheatinit(int ref, int params, const char *param
 			cheat_region[region_count].offset = space->address_to_byte(entry.m_addrstart) & space->bytemask();
 			cheat_region[region_count].endoffset = space->address_to_byte(entry.m_addrend) & space->bytemask();
 			cheat_region[region_count].share = entry.m_share;
-			cheat_region[region_count].disabled = (entry.m_write.m_type == AMH_RAM) ? FALSE : TRUE;
+			cheat_region[region_count].disabled = (entry.m_write.m_type == AMH_RAM) ? false : true;
 
 			/* disable double share regions */
 			if (entry.m_share != nullptr)
 				for (i = 0; i < region_count; i++)
 					if (cheat_region[i].share != nullptr)
 						if (strcmp(cheat_region[i].share, entry.m_share) == 0)
-							cheat_region[region_count].disabled = TRUE;
+							cheat_region[region_count].disabled = true;
 
 			region_count++;
 		}
@@ -1901,7 +1901,7 @@ void debugger_commands::execute_cheatinit(int ref, int params, const char *param
 		cheat_region[region_count].offset = space->address_to_byte(offset) & space->bytemask();
 		cheat_region[region_count].endoffset = space->address_to_byte(offset + length - 1) & space->bytemask();
 		cheat_region[region_count].share = nullptr;
-		cheat_region[region_count].disabled = FALSE;
+		cheat_region[region_count].disabled = false;
 		region_count++;
 	}
 
@@ -2040,7 +2040,7 @@ void debugger_commands::execute_cheatnext(int ref, int params, const char *param
 		{
 			uint64_t cheat_value = cheat_read_extended(&m_cheat, *space, m_cheat.cheatmap[cheatindex].offset);
 			uint64_t comp_byte = (ref == 0) ? m_cheat.cheatmap[cheatindex].previous_value : m_cheat.cheatmap[cheatindex].first_value;
-			uint8_t disable_byte = FALSE;
+			uint8_t disable_byte = false;
 
 			switch (condition)
 			{
@@ -2326,10 +2326,10 @@ void debugger_commands::execute_find(int ref, int params, const char *param[])
 		{
 			switch (data_size[j])
 			{
-				case 1: match = ((uint8_t)m_cpu.read_byte(*space, i + suboffset, TRUE) == (uint8_t)data_to_find[j]);    break;
-				case 2: match = ((uint16_t)m_cpu.read_word(*space, i + suboffset, TRUE) == (uint16_t)data_to_find[j]);  break;
-				case 4: match = ((uint32_t)m_cpu.read_dword(*space, i + suboffset, TRUE) == (uint32_t)data_to_find[j]); break;
-				case 8: match = ((uint64_t)m_cpu.read_qword(*space, i + suboffset, TRUE) == (uint64_t)data_to_find[j]); break;
+				case 1: match = ((uint8_t)m_cpu.read_byte(*space, i + suboffset, true) == (uint8_t)data_to_find[j]);    break;
+				case 2: match = ((uint16_t)m_cpu.read_word(*space, i + suboffset, true) == (uint16_t)data_to_find[j]);  break;
+				case 4: match = ((uint32_t)m_cpu.read_dword(*space, i + suboffset, true) == (uint32_t)data_to_find[j]); break;
+				case 8: match = ((uint64_t)m_cpu.read_qword(*space, i + suboffset, true) == (uint64_t)data_to_find[j]); break;
 				default:    /* all other cases are wildcards */     break;
 			}
 			suboffset += data_size[j] & 0x0f;

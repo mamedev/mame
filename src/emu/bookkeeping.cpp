@@ -198,7 +198,7 @@ void bookkeeping_manager::coin_lockout_w(int num,int on)
 int bookkeeping_manager::coin_lockout_get_state(int num)
 {
 	if (num >= ARRAY_LENGTH(m_coinlockedout))
-		return FALSE;
+		return false;
 	return m_coinlockedout[num];
 }
 

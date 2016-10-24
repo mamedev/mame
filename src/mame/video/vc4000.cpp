@@ -88,23 +88,23 @@ READ8_MEMBER( vc4000_state::vc4000_video_r )
 		if (m_video.sprites[3].finished)
 		{
 			data |= 1;
-			m_video.sprites[3].finished = FALSE;
+			m_video.sprites[3].finished = false;
 		}
 
 		if (m_video.sprites[2].finished)
 		{
 			data |= 2;
-			m_video.sprites[2].finished = FALSE;
+			m_video.sprites[2].finished = false;
 		}
 		if (m_video.sprites[1].finished)
 		{
 			data |= 4;
-			m_video.sprites[1].finished = FALSE;
+			m_video.sprites[1].finished = false;
 		}
 		if (m_video.sprites[0].finished)
 		{
 			data |= 8;
-			m_video.sprites[0].finished = FALSE;
+			m_video.sprites[0].finished = false;
 		}
 		break;
 
@@ -416,10 +416,10 @@ void vc4000_state::vc4000_sprite_update(bitmap_ind16 &bitmap, uint8_t *collision
 		This->y=This->data->y1;
 		This->state=0;
 		This->delay=0;
-		This->finished=FALSE;
+		This->finished=false;
 	}
 
-	This->finished_now=FALSE;
+	This->finished_now=false;
 
 	if (m_video.line>VC4000_END_LINE) return;
 
@@ -455,8 +455,8 @@ void vc4000_state::vc4000_sprite_update(bitmap_ind16 &bitmap, uint8_t *collision
 
 		if (This->state>10)
 		{
-			This->finished=TRUE;
-			This->finished_now=TRUE;
+			This->finished=true;
+			This->finished_now=true;
 		}
 
 		break;
@@ -509,8 +509,8 @@ void vc4000_state::vc4000_sprite_update(bitmap_ind16 &bitmap, uint8_t *collision
 		This->delay=0;
 		This->state++;
 		if (This->state<23) break;
-		This->finished=TRUE;
-		This->finished_now=TRUE;
+		This->finished=true;
+		This->finished_now=true;
 		This->state=11;
 		break;
 	}

@@ -17,19 +17,6 @@
 
 
 //**************************************************************************
-//  CONSTANTS
-//**************************************************************************
-
-const rgb_t rgb_t::black(0,0,0);
-const rgb_t rgb_t::white(255,255,255);
-const rgb_t rgb_t::transparent(0, 0, 0, 0);
-
-// the colors below are commonly used screen colors
-const rgb_t rgb_t::green(0, 255, 0);
-const rgb_t rgb_t::amber(247, 170, 0);
-
-
-//**************************************************************************
 //  INLINE FUNCTIONS
 //**************************************************************************
 
@@ -239,7 +226,7 @@ palette_t::palette_t(uint32_t numcolors, uint32_t numgroups)
 	// initialize the per-entry data
 	for (uint32_t index = 0; index < numcolors; index++)
 	{
-		m_entry_color[index] = rgb_t::black;
+		m_entry_color[index] = rgb_t::black();
 		m_entry_contrast[index] = 1.0f;
 	}
 
@@ -253,15 +240,15 @@ palette_t::palette_t(uint32_t numcolors, uint32_t numgroups)
 	// initialize the expanded data
 	for (uint32_t index = 0; index < numcolors * numgroups; index++)
 	{
-		m_adjusted_color[index] = rgb_t::black;
-		m_adjusted_rgb15[index] = rgb_t::black.as_rgb15();
+		m_adjusted_color[index] = rgb_t::black();
+		m_adjusted_rgb15[index] = rgb_t::black().as_rgb15();
 	}
 
 	// add black and white as the last two colors
-	m_adjusted_color[numcolors * numgroups + 0] = rgb_t::black;
-	m_adjusted_rgb15[numcolors * numgroups + 0] = rgb_t::black.as_rgb15();
-	m_adjusted_color[numcolors * numgroups + 1] = rgb_t::white;
-	m_adjusted_rgb15[numcolors * numgroups + 1] = rgb_t::white.as_rgb15();
+	m_adjusted_color[numcolors * numgroups + 0] = rgb_t::black();
+	m_adjusted_rgb15[numcolors * numgroups + 0] = rgb_t::black().as_rgb15();
+	m_adjusted_color[numcolors * numgroups + 1] = rgb_t::white();
+	m_adjusted_rgb15[numcolors * numgroups + 1] = rgb_t::white().as_rgb15();
 }
 
 

@@ -137,13 +137,13 @@
 
 WRITE8_MEMBER(astrocde_state::protected_ram_enable_w)
 {
-	m_ram_write_enable = TRUE;
+	m_ram_write_enable = true;
 }
 
 
 READ8_MEMBER(astrocde_state::protected_ram_r)
 {
-	m_ram_write_enable = FALSE;
+	m_ram_write_enable = false;
 	return m_protected_ram[offset];
 }
 
@@ -152,7 +152,7 @@ WRITE8_MEMBER(astrocde_state::protected_ram_w)
 {
 	if (m_ram_write_enable)
 		m_protected_ram[offset] = data;
-	m_ram_write_enable = FALSE;
+	m_ram_write_enable = false;
 }
 
 

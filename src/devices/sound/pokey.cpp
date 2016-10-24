@@ -439,7 +439,7 @@ void pokey_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 		m_IRQST |=  (param & 0xff);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in pokey_device::device_timer");
+		assert_always(false, "Unknown id in pokey_device::device_timer");
 	}
 }
 

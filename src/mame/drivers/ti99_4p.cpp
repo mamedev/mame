@@ -211,10 +211,10 @@ private:
 	int     m_keyboard_column;
 	int     m_check_alphalock;
 
-	// True if SGCPU DSR is enabled
+	// true if SGCPU DSR is enabled
 	bool m_internal_dsr;
 
-	// True if SGCPU rom6 is enabled
+	// true if SGCPU rom6 is enabled
 	bool m_internal_rom6;
 
 	// Offset to the ROM6 bank.
@@ -223,10 +223,10 @@ private:
 	// Wait states
 	int m_waitcount;
 
-	// TRUE when mapper is active
+	// true when mapper is active
 	bool m_map_mode;
 
-	// TRUE when mapper registers are accessible
+	// true when mapper registers are accessible
 	bool m_access_mapper;
 
 	// Value on address bus (after being set by setaddress)

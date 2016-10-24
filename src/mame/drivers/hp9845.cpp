@@ -1063,7 +1063,7 @@ static MACHINE_CONFIG_START( hp9845b, hp9845b_state )
 		MCFG_HPHYBRID_PA_CHANGED(WRITE8(hp9845b_state , pa_w))
 
 	// video hardware
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_UPDATE_DRIVER(hp9845b_state, screen_update)
 		// These parameters are for alpha video
 	MCFG_SCREEN_RAW_PARAMS(VIDEO_PIXEL_CLOCK , VIDEO_HTOTAL , 0 , VIDEO_HBSTART , VIDEO_VTOTAL , 0 , VIDEO_ACTIVE_SCANLINES)

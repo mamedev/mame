@@ -91,7 +91,7 @@ WRITE8_MEMBER(gameking_state::io_w)
 	maincpu_rom->base()[offset] = data;
 	if (offset == offsetof(Gkio, timer)) {
 		m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE);
-		timer1->enable(TRUE);
+		timer1->enable(true);
 		timer1->reset(m_maincpu->cycles_to_attotime(data * 300/*?*/));
 	}
 
@@ -212,8 +212,8 @@ DRIVER_INIT_MEMBER(gameking_state, gameking)
 TIMER_CALLBACK_MEMBER(gameking_state::gameking_timer)
 {
 	m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE); // in reality int for vector at fff4
-	timer1->enable(FALSE);
-	timer2->enable(TRUE);
+	timer1->enable(false);
+	timer2->enable(true);
 	timer2->reset(m_maincpu->cycles_to_attotime(10/*?*/));
 }
 
@@ -221,8 +221,8 @@ TIMER_CALLBACK_MEMBER(gameking_state::gameking_timer2)
 {
 	memory_region *maincpu_rom = memregion("maincpu");
 	m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE); // in reality int for vector at fff4
-	timer2->enable(FALSE);
-	timer1->enable(TRUE);
+	timer2->enable(false);
+	timer1->enable(true);
 	Gkio *io = reinterpret_cast<Gkio*>(maincpu_rom->base());
 	timer1->reset(m_maincpu->cycles_to_attotime(io->timer * 300/*?*/));
 }

@@ -1202,7 +1202,7 @@ void adsp21062_device::compile_block(offs_t pc)
 
 
 				/* count off cycles and go there */
-				generate_update_cycles(block, &compiler, nextpc, TRUE);                     // <subtract cycles>
+				generate_update_cycles(block, &compiler, nextpc, true);                     // <subtract cycles>
 
 				if (seqlast->next() == nullptr || seqlast->next()->pc != nextpc)
 					UML_HASHJMP(block, 0, nextpc, *m_nocode);                               // hashjmp <mode>,nextpc,nocode
@@ -1536,13 +1536,13 @@ void adsp21062_device::generate_sequence_instruction(drcuml_block *block, compil
 	}
 }
 
-void adsp21062_device::generate_update_cycles(drcuml_block *block, compiler_state *compiler, uml::parameter param, int allow_exception)
+void adsp21062_device::generate_update_cycles(drcuml_block *block, compiler_state *compiler, uml::parameter param, bool allow_exception)
 {
 	/* check full interrupts if pending */
 	if (compiler->checkints)
 	{
 		code_label skip = compiler->labelnum++;
-		compiler->checkints = FALSE;
+		compiler->checkints = false;
 
 		UML_CMP(block, mem(&m_core->irq_pending), 0);                                       // cmp     [irq_pending],0
 		UML_JMPc(block, COND_E, skip);                                                      // je      skip
@@ -1854,7 +1854,7 @@ void adsp21062_device::generate_call(drcuml_block *block, compiler_state *compil
 	// update cycles and hash jump
 	if (desc->targetpc != BRANCH_TARGET_DYNAMIC)
 	{
-		generate_update_cycles(block, &compiler_temp, desc->targetpc, TRUE);
+		generate_update_cycles(block, &compiler_temp, desc->targetpc, true);
 		if (desc->flags & OPFLAG_INTRABLOCK_BRANCH)
 			UML_JMP(block, desc->targetpc | 0x80000000);                                // jmp      targetpc | 0x80000000
 		else
@@ -1862,7 +1862,7 @@ void adsp21062_device::generate_call(drcuml_block *block, compiler_state *compil
 	}
 	else
 	{
-		generate_update_cycles(block, &compiler_temp, mem(&m_core->jmpdest), TRUE);
+		generate_update_cycles(block, &compiler_temp, mem(&m_core->jmpdest), true);
 		UML_HASHJMP(block, 0, mem(&m_core->jmpdest), *m_nocode);                        // hashjmp  0,jmpdest,nocode
 	}
 
@@ -1917,7 +1917,7 @@ void adsp21062_device::generate_jump(drcuml_block *block, compiler_state *compil
 	// update cycles and hash jump
 	if (desc->targetpc != BRANCH_TARGET_DYNAMIC)
 	{
-		generate_update_cycles(block, &compiler_temp, desc->targetpc, TRUE);
+		generate_update_cycles(block, &compiler_temp, desc->targetpc, true);
 		if (desc->flags & OPFLAG_INTRABLOCK_BRANCH)
 			UML_JMP(block, desc->targetpc | 0x80000000);                                // jmp      targetpc | 0x80000000
 		else
@@ -1925,7 +1925,7 @@ void adsp21062_device::generate_jump(drcuml_block *block, compiler_state *compil
 	}
 	else
 	{
-		generate_update_cycles(block, &compiler_temp, mem(&m_core->jmpdest), TRUE);
+		generate_update_cycles(block, &compiler_temp, mem(&m_core->jmpdest), true);
 		UML_HASHJMP(block, 0, mem(&m_core->jmpdest), *m_nocode);                        // hashjmp  0,jmpdest,nocode
 	}
 
@@ -1940,7 +1940,7 @@ void adsp21062_device::generate_jump(drcuml_block *block, compiler_state *compil
 void adsp21062_device::generate_loop_jump(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
 {
 	// update cycles and hash jump
-	generate_update_cycles(block, compiler, desc->userdata0, TRUE);
+	generate_update_cycles(block, compiler, desc->userdata0, true);
 	/*
 	if (desc->flags & OPFLAG_INTRABLOCK_BRANCH)
 	    UML_JMP(block, desc->targetpc | 0x80000000);                                // jmp      targetpc | 0x80000000
@@ -2280,7 +2280,7 @@ void adsp21062_device::generate_write_ureg(drcuml_block *block, compiler_state *
 	}
 }
 
-int adsp21062_device::generate_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
+bool adsp21062_device::generate_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
 {
 	uint64_t opcode = desc->opptr.q[0];
 
@@ -2297,12 +2297,12 @@ int adsp21062_device::generate_opcode(drcuml_block *block, compiler_state *compi
 						// IDLE
 						UML_MOV(block, mem(&m_core->idle), 1);
 						UML_MOV(block, mem(&m_core->icount), 0);
-						return TRUE;
+						return true;
 					}
 					else
 					{
 						// NOP
-						return TRUE;
+						return true;
 					}
 					break;
 
@@ -2323,7 +2323,7 @@ int adsp21062_device::generate_opcode(drcuml_block *block, compiler_state *compi
 
 					if (has_condition)
 						UML_LABEL(block, skip_label);
-					return TRUE;
+					return true;
 				}
 
 				case 0x02:          // immediate shift                      |000|00010|
@@ -2347,7 +2347,7 @@ int adsp21062_device::generate_opcode(drcuml_block *block, compiler_state *compi
 
 					if (has_condition)
 						UML_LABEL(block, skip_label);
-					return TRUE;
+					return true;
 				}
 
 				case 0x04:          // compute / modify                     |000|00100|
@@ -2384,7 +2384,7 @@ int adsp21062_device::generate_opcode(drcuml_block *block, compiler_state *compi
 					if (has_condition)
 						UML_LABEL(block, skip_label);
 
-					return TRUE;
+					return true;
 				}
 
 				case 0x06:          // direct jump|call                     |000|00110|
@@ -2413,7 +2413,7 @@ int adsp21062_device::generate_opcode(drcuml_block *block, compiler_state *compi
 					}
 					if (has_condition)
 						UML_LABEL(block, skip_label);
-					return TRUE;
+					return true;
 				}
 
 				case 0x07:          // direct jump|call                     |000|00111|
@@ -2442,7 +2442,7 @@ int adsp21062_device::generate_opcode(drcuml_block *block, compiler_state *compi
 					}
 					if (has_condition)
 						UML_LABEL(block, skip_label);
-					return TRUE;
+					return true;
 				}
 
 				case 0x08:          // indirect jump|call / compute         |000|01000|
@@ -2505,7 +2505,7 @@ int adsp21062_device::generate_opcode(drcuml_block *block, compiler_state *compi
 							UML_LABEL(block, skip_label);
 					}
 
-					return TRUE;
+					return true;
 				}
 
 				case 0x09:          // indirect jump|call / compute         |000|01001|
@@ -2562,7 +2562,7 @@ int adsp21062_device::generate_opcode(drcuml_block *block, compiler_state *compi
 							UML_LABEL(block, skip_label);
 					}
 
-					return TRUE;
+					return true;
 				}
 
 				case 0x0a:          // return from subroutine / compute     |000|01010|
@@ -2607,7 +2607,7 @@ int adsp21062_device::generate_opcode(drcuml_block *block, compiler_state *compi
 							UML_LABEL(block, skip_label);
 					}
 
-					return TRUE;
+					return true;
 				}
 
 				case 0x0b:          // return from interrupt / compute      |000|01011|
@@ -2664,7 +2664,7 @@ int adsp21062_device::generate_opcode(drcuml_block *block, compiler_state *compi
 							UML_LABEL(block, skip_label);
 					}
 
-					return TRUE;
+					return true;
 				}
 
 				case 0x0c:          // do until counter expired             |000|01100|
@@ -2685,7 +2685,7 @@ int adsp21062_device::generate_opcode(drcuml_block *block, compiler_state *compi
 						UML_MOV(block, I1, address);
 						UML_CALLH(block, *m_push_loop);
 					}
-					return TRUE;
+					return true;
 				}
 
 				case 0x0d:          // do until counter expired             |000|01101|
@@ -2707,7 +2707,7 @@ int adsp21062_device::generate_opcode(drcuml_block *block, compiler_state *compi
 					UML_MOV(block, I0, I3);
 					UML_MOV(block, I1, address);
 					UML_CALLH(block, *m_push_loop);
-					return TRUE;
+					return true;
 				}
 
 				case 0x0e:          // do until                             |000|01110|
@@ -2723,7 +2723,7 @@ int adsp21062_device::generate_opcode(drcuml_block *block, compiler_state *compi
 					UML_MOV(block, I0, 0);
 					UML_MOV(block, I1, address);
 					UML_CALLH(block, *m_push_loop);
-					return TRUE;
+					return true;
 				}
 
 				case 0x0f:          // immediate data -> ureg               |000|01111|
@@ -2732,7 +2732,7 @@ int adsp21062_device::generate_opcode(drcuml_block *block, compiler_state *compi
 					uint32_t data = (uint32_t)opcode;
 
 					generate_write_ureg(block, compiler, desc, ureg, true, data);
-					return TRUE;
+					return true;
 				}
 
 				case 0x10:          // ureg <-> DM|PM (direct)              |000|100|G|D|
@@ -2784,7 +2784,7 @@ int adsp21062_device::generate_opcode(drcuml_block *block, compiler_state *compi
 
 						generate_write_ureg(block, compiler, desc, ureg, false, 0);
 					}
-					return TRUE;
+					return true;
 				}
 
 				case 0x14:          // system register bit manipulation     |000|10100|
@@ -2872,9 +2872,9 @@ int adsp21062_device::generate_opcode(drcuml_block *block, compiler_state *compi
 									break;
 
 								default:
-									return FALSE;
+									return false;
 							}
-							return TRUE;
+							return true;
 						}
 						case 1:     // CLEAR
 						{
@@ -2953,9 +2953,9 @@ int adsp21062_device::generate_opcode(drcuml_block *block, compiler_state *compi
 									break;
 
 								default:
-									return FALSE;
+									return false;
 							}
-							return TRUE;
+							return true;
 						}
 						case 2:     // TOGGLE
 						{
@@ -2979,7 +2979,7 @@ int adsp21062_device::generate_opcode(drcuml_block *block, compiler_state *compi
 									compiler->mode1_delay.mode = MODE1_TOGGLE;
 									break;
 								case 0xc: // ASTAT
-									return FALSE;
+									return false;
 								case 0xd: // IMASK
 									UML_XOR(block, IMASK, IMASK, data);
 									break;
@@ -2991,9 +2991,9 @@ int adsp21062_device::generate_opcode(drcuml_block *block, compiler_state *compi
 									break;
 
 								default:
-									return FALSE;
+									return false;
 							}
-							return TRUE;
+							return true;
 						}
 						case 4:     // TEST
 						{
@@ -3025,7 +3025,7 @@ int adsp21062_device::generate_opcode(drcuml_block *block, compiler_state *compi
 									UML_SETc(block, COND_E, ASTAT_BTF);
 									break;
 								case 0xc: // ASTAT
-									return FALSE;
+									return false;
 								case 0xd: // IMASK
 									UML_AND(block, I0, IMASK, data);
 									UML_CMP(block, I0, data);
@@ -3043,26 +3043,26 @@ int adsp21062_device::generate_opcode(drcuml_block *block, compiler_state *compi
 									break;
 
 								default:
-									return FALSE;
+									return false;
 							}
-							return TRUE;
+							return true;
 						}
 						case 5:     // XOR
 						{
-							return FALSE;
+							return false;
 						}
 
 						default:
-							return FALSE;
+							return false;
 					}
-					return TRUE;
+					return true;
 				}
 
 				case 0x16:          // I register modify / bit-reverse      |000|10110|
 				{
 					if (opcode & U64(0x008000000000))   // bit reverse
 					{
-						return FALSE;
+						return false;
 					}
 					else            // modify
 					{
@@ -3081,7 +3081,7 @@ int adsp21062_device::generate_opcode(drcuml_block *block, compiler_state *compi
 							UML_ADD(block, DM_I(i), DM_I(i), data);
 						}
 						generate_update_circular_buffer(block, compiler, desc, g, i);
-						return TRUE;
+						return true;
 					}
 				}
 
@@ -3112,17 +3112,17 @@ int adsp21062_device::generate_opcode(drcuml_block *block, compiler_state *compi
 					{
 						UML_CALLH(block, *m_pop_pc);
 					}
-					return TRUE;
+					return true;
 				}
 
 				case 0x18:          // cjump                                |000|11000|
-					return FALSE;
+					return false;
 
 				case 0x19:          // rframe                               |000|11001|
-					return FALSE;
+					return false;
 
 				default:
-					return FALSE;
+					return false;
 			}
 			break;
 		}
@@ -3199,7 +3199,7 @@ int adsp21062_device::generate_opcode(drcuml_block *block, compiler_state *compi
 				UML_ADD(block, DM_I(dmi), DM_I(dmi), DM_M(dmm));
 				generate_update_circular_buffer(block, compiler, desc, 0, dmi);
 			}
-			return TRUE;
+			return true;
 		}
 
 		case 2:             // compute / ureg <-> DM|PM, register modify                            |010|
@@ -3290,7 +3290,7 @@ int adsp21062_device::generate_opcode(drcuml_block *block, compiler_state *compi
 			if (has_condition)
 				UML_LABEL(block, skip_label);
 
-			return TRUE;
+			return true;
 		}
 
 		case 3:
@@ -3341,7 +3341,7 @@ int adsp21062_device::generate_opcode(drcuml_block *block, compiler_state *compi
 				if (has_condition)
 					UML_LABEL(block, skip_label);
 
-				return TRUE;
+				return true;
 			}
 			else                                // compute / dreg <-> DM|PM, immediate modify       |011|0|
 			{
@@ -3413,7 +3413,7 @@ int adsp21062_device::generate_opcode(drcuml_block *block, compiler_state *compi
 				if (has_condition)
 					UML_LABEL(block, skip_label);
 
-				return TRUE;
+				return true;
 			}
 			break;
 		}
@@ -3446,7 +3446,7 @@ int adsp21062_device::generate_opcode(drcuml_block *block, compiler_state *compi
 
 				generate_update_circular_buffer(block, compiler, desc, g, i);
 
-				return TRUE;
+				return true;
 			}
 			else                                // immediate shift / dreg <-> DM|PM                 |100|0|
 			{
@@ -3515,7 +3515,7 @@ int adsp21062_device::generate_opcode(drcuml_block *block, compiler_state *compi
 				if (has_condition)
 					UML_LABEL(block, skip_label);
 
-				return TRUE;
+				return true;
 			}
 			break;
 		}
@@ -3552,7 +3552,7 @@ int adsp21062_device::generate_opcode(drcuml_block *block, compiler_state *compi
 
 				generate_write_ureg(block, compiler, desc, ureg, false, 0);
 			}
-			return TRUE;
+			return true;
 		}
 
 		case 6:                             // indirect jump / compute / dreg <-> DM                |110|
@@ -3613,7 +3613,7 @@ int adsp21062_device::generate_opcode(drcuml_block *block, compiler_state *compi
 
 			generate_update_circular_buffer(block, compiler, desc, 0, dmi);
 
-			return TRUE;
+			return true;
 		}
 
 		case 7:                             // indirect jump / compute / dreg <-> DM                |111|
@@ -3671,11 +3671,11 @@ int adsp21062_device::generate_opcode(drcuml_block *block, compiler_state *compi
 
 			generate_update_circular_buffer(block, compiler, desc, 0, dmi);
 
-			return TRUE;
+			return true;
 		}
 	}
 
-	return FALSE;
+	return false;
 }
 
 void adsp21062_device::generate_unimplemented_compute(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
@@ -5303,7 +5303,7 @@ void adsp21062_device::generate_if_condition(drcuml_block *block, compiler_state
 		case 0x1e:                                    /* NOT BM */
 			fatalerror("generate_if_condition 0x1e"); // should not happen
 			break;
-		case 0x1f:                                    /* TRUE */
+		case 0x1f:                                    /* true */
 			fatalerror("generate_if_condition 0x1f"); // should not happen
 			break;
 	}
@@ -5452,7 +5452,7 @@ void adsp21062_device::generate_do_condition(drcuml_block *block, compiler_state
 			// always true
 			UML_JMP(block, skip_label);
 			break;
-		case 0x1f:                                    /* FALSE (FOREVER) */
+		case 0x1f:                                    /* false (FOREVER) */
 			// infinite loop
 			break;
 	}

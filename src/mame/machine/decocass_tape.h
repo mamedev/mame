@@ -10,7 +10,7 @@ public:
 	~decocass_tape_device() {}
 
 	uint8_t get_status_bits();
-	uint8_t is_present();
+	bool is_present();
 	void change_speed(int8_t newspeed);
 
 protected:

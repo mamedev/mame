@@ -621,7 +621,7 @@ input_code::input_code(input_device &device, input_item_id itemid)
 
 input_seq &input_seq::operator+=(input_code code)
 {
-	// if not enough room, return FALSE
+	// if not enough room, return false
 	int curlength = length();
 	if (curlength < ARRAY_LENGTH(m_code) - 1)
 	{
@@ -2439,7 +2439,7 @@ int32_t input_device_absolute_item::read_as_switch(input_item_modifier modifier)
 		}
 	}
 
-	// positive/negative: TRUE if past the deadzone in either direction
+	// positive/negative: true if past the deadzone in either direction
 	if (modifier == ITEM_MODIFIER_POS || modifier == ITEM_MODIFIER_RIGHT || modifier == ITEM_MODIFIER_DOWN)
 		return (result > 0);
 	else if (modifier == ITEM_MODIFIER_NEG || modifier == ITEM_MODIFIER_LEFT || modifier == ITEM_MODIFIER_UP)

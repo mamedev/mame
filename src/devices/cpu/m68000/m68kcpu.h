@@ -1682,7 +1682,7 @@ static inline void m68ki_check_interrupts(m68000_base_device *m68k)
 {
 	if(m68k->nmi_pending)
 	{
-		m68k->nmi_pending = FALSE;
+		m68k->nmi_pending = false;
 		m68k->m68ki_exception_interrupt(m68k, 7);
 	}
 	else if(m68k->int_level > m68k->int_mask)

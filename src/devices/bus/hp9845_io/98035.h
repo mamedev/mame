@@ -2,9 +2,9 @@
 // copyright-holders: F. Ulivi
 /*********************************************************************
 
-	98035.h
+    98035.h
 
-	98035 module (Real time clock)
+    98035 module (Real time clock)
 
 *********************************************************************/
 
@@ -15,9 +15,9 @@
 
 #include "hp9845_io.h"
 
-#define HP98035_IBUFFER_LEN	16	// Totally arbitrary
-#define HP98035_OBUFFER_LEN	16	// Totally arbitrary
-#define HP98035_UNIT_COUNT	4	// Count of counter/timer units
+#define HP98035_IBUFFER_LEN 16  // Totally arbitrary
+#define HP98035_OBUFFER_LEN 16  // Totally arbitrary
+#define HP98035_UNIT_COUNT  4   // Count of counter/timer units
 
 class hp98035_io_card : public hp9845_io_card_device
 {
@@ -42,8 +42,8 @@ private:
 	bool m_intflag;
 	bool m_irq;
 	bool m_idr_full;
-	uint8_t m_idr;	// Input Data Register
-	uint8_t m_odr;	// Output Data Register
+	uint8_t m_idr;  // Input Data Register
+	uint8_t m_odr;  // Output Data Register
 	uint8_t m_error;
 	uint8_t m_triggered;
 	uint8_t m_lost_irq;
@@ -54,30 +54,30 @@ private:
 	unsigned m_obuffer_ptr;
 
 	// Clock/timer state
-	unsigned m_msec;	// Milliseconds
-	uint8_t m_sec;	// Seconds
-	uint8_t m_min;	// Minutes
-	uint8_t m_hrs;	// Hours
-	uint8_t m_dom;	// Day of month
-	uint8_t m_mon;	// Month
+	unsigned m_msec;    // Milliseconds
+	uint8_t m_sec;  // Seconds
+	uint8_t m_min;  // Minutes
+	uint8_t m_hrs;  // Hours
+	uint8_t m_dom;  // Day of month
+	uint8_t m_mon;  // Month
 	// Strangely enough this RTC has no notion of current year
 	emu_timer *m_msec_timer;
 
 	// Timer units
 	typedef enum {
-		UNIT_IDLE,	// Not active
-		UNIT_ACTIVE,	// Active (output units: waiting for date/time match)
-		UNIT_WAIT_FOR_TO	// Active, output units only: waiting for timeout
+		UNIT_IDLE,  // Not active
+		UNIT_ACTIVE,    // Active (output units: waiting for date/time match)
+		UNIT_WAIT_FOR_TO    // Active, output units only: waiting for timeout
 	} unit_state_t;
 
 	typedef struct {
-		unit_state_t m_state;	// State
-		bool m_input;	// Input or output
-		uint8_t m_port;	// Assigned port # (0 if not assigned)
-		uint8_t m_match_datetime[ 4 ];	// Date&time to match (month is not included)
-		unsigned m_delay;	// Timer delay
-		unsigned m_period;	// Timer period (when != 0)
-		unsigned m_value;	// Current counter value
+		unit_state_t m_state;   // State
+		bool m_input;   // Input or output
+		uint8_t m_port; // Assigned port # (0 if not assigned)
+		uint8_t m_match_datetime[ 4 ];  // Date&time to match (month is not included)
+		unsigned m_delay;   // Timer delay
+		unsigned m_period;  // Timer period (when != 0)
+		unsigned m_value;   // Current counter value
 
 		void init(void);
 		void deactivate(void);

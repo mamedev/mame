@@ -297,7 +297,7 @@ static MACHINE_CONFIG_START( binbug, binbug_state )
 	MCFG_S2650_FLAG_HANDLER(WRITELINE(binbug_state, binbug_serial_w))
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::amber)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::amber())
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_UPDATE_DRIVER(binbug_state, screen_update)
@@ -534,7 +534,7 @@ static MACHINE_CONFIG_START( dg680, dg680_state )
 	MCFG_Z80_DAISY_CHAIN(dg680_daisy_chain)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::amber)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::amber())
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_UPDATE_DRIVER(binbug_state, screen_update)

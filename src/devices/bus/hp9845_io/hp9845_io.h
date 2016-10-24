@@ -19,7 +19,7 @@
 	MCFG_DEVICE_ADD(_tag, HP9845_IO_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(hp9845_io_slot_devices, nullptr, false)
 
-#define HP9845_IO_FIRST_SC	1	// Lowest SC used by I/O cards
+#define HP9845_IO_FIRST_SC  1   // Lowest SC used by I/O cards
 
 #define MCFG_HP9845_IO_SC\
 	PORT_START("SC") \

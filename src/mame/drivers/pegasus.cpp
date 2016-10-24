@@ -388,17 +388,17 @@ GFXDECODE_END
 // so we check the first 4 bytes for a signature, and decrypt if found.
 void pegasus_state::pegasus_decrypt_rom(uint8_t *ROM)
 {
-	bool doit = FALSE;
+	bool doit = false;
 	uint8_t b;
 	uint16_t j;
 	std::vector<uint8_t> temp_copy;
 	temp_copy.resize(0x1000);
 
-	if (ROM[0] == 0x02) doit = TRUE;
-	if (ROM[0] == 0x1e && ROM[1] == 0xfa && ROM[2] == 0x60 && ROM[3] == 0x71) doit = TRUE; // xbasic 2nd rom
-	if (ROM[0] == 0x72 && ROM[1] == 0x62 && ROM[2] == 0xc6 && ROM[3] == 0x36) doit = TRUE; // xbasic 3rd rom
-	if (ROM[0] == 0xf0 && ROM[1] == 0x40 && ROM[2] == 0xce && ROM[3] == 0x80) doit = TRUE; // forth 2nd rom (both sets)
-	if (ROM[0] == 0x80 && ROM[1] == 0x06 && ROM[2] == 0x68 && ROM[3] == 0x14) doit = TRUE; // pascal 2nd rom
+	if (ROM[0] == 0x02) doit = true;
+	if (ROM[0] == 0x1e && ROM[1] == 0xfa && ROM[2] == 0x60 && ROM[3] == 0x71) doit = true; // xbasic 2nd rom
+	if (ROM[0] == 0x72 && ROM[1] == 0x62 && ROM[2] == 0xc6 && ROM[3] == 0x36) doit = true; // xbasic 3rd rom
+	if (ROM[0] == 0xf0 && ROM[1] == 0x40 && ROM[2] == 0xce && ROM[3] == 0x80) doit = true; // forth 2nd rom (both sets)
+	if (ROM[0] == 0x80 && ROM[1] == 0x06 && ROM[2] == 0x68 && ROM[3] == 0x14) doit = true; // pascal 2nd rom
 
 	if (doit)
 	{

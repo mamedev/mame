@@ -18,7 +18,7 @@
 
 
 //-------------------------------------------------
-//	ctor
+//  ctor
 //-------------------------------------------------
 
 imgtool::stream::stream(bool wp)
@@ -34,7 +34,7 @@ imgtool::stream::stream(bool wp)
 
 
 //-------------------------------------------------
-//	ctor
+//  ctor
 //-------------------------------------------------
 
 imgtool::stream::stream(bool wp, util::core_file::ptr &&f)
@@ -50,7 +50,7 @@ imgtool::stream::stream(bool wp, util::core_file::ptr &&f)
 
 
 //-------------------------------------------------
-//	ctor
+//  ctor
 //-------------------------------------------------
 
 imgtool::stream::stream(bool wp, std::size_t size)
@@ -66,7 +66,7 @@ imgtool::stream::stream(bool wp, std::size_t size)
 
 
 //-------------------------------------------------
-//	ctor
+//  ctor
 //-------------------------------------------------
 
 imgtool::stream::stream(bool wp, std::size_t size, void *buf)
@@ -82,7 +82,7 @@ imgtool::stream::stream(bool wp, std::size_t size, void *buf)
 
 
 //-------------------------------------------------
-//	dtor
+//  dtor
 //-------------------------------------------------
 
 imgtool::stream::~stream()
@@ -93,7 +93,7 @@ imgtool::stream::~stream()
 
 
 //-------------------------------------------------
-//	open_zip
+//  open_zip
 //-------------------------------------------------
 
 imgtool::stream *imgtool::stream::open_zip(const char *zipname, const char *subname, int read_or_write)
@@ -136,7 +136,7 @@ imgtool::stream *imgtool::stream::open_zip(const char *zipname, const char *subn
 
 
 //-------------------------------------------------
-//	open
+//  open
 //-------------------------------------------------
 
 imgtool::stream *imgtool::stream::open(const char *fname, int read_or_write)
@@ -196,7 +196,7 @@ imgtool::stream *imgtool::stream::open(const char *fname, int read_or_write)
 
 
 //-------------------------------------------------
-//	open_write_stream
+//  open_write_stream
 //-------------------------------------------------
 
 imgtool::stream *imgtool::stream::open_write_stream(int size)
@@ -210,7 +210,7 @@ imgtool::stream *imgtool::stream::open_write_stream(int size)
 
 
 //-------------------------------------------------
-//	open_mem
+//  open_mem
 //-------------------------------------------------
 
 imgtool::stream *imgtool::stream::open_mem(void *buf, size_t sz)
@@ -222,7 +222,7 @@ imgtool::stream *imgtool::stream::open_mem(void *buf, size_t sz)
 
 
 //-------------------------------------------------
-//	core_file
+//  core_file
 //-------------------------------------------------
 
 util::core_file *imgtool::stream::core_file()
@@ -232,7 +232,7 @@ util::core_file *imgtool::stream::core_file()
 
 
 //-------------------------------------------------
-//	read
+//  read
 //-------------------------------------------------
 
 uint32_t imgtool::stream::read(void *buf, uint32_t sz)
@@ -266,7 +266,7 @@ uint32_t imgtool::stream::read(void *buf, uint32_t sz)
 
 
 //-------------------------------------------------
-//	write
+//  write
 //-------------------------------------------------
 
 uint32_t imgtool::stream::write(const void *buf, uint32_t sz)
@@ -321,7 +321,7 @@ uint32_t imgtool::stream::write(const void *buf, uint32_t sz)
 
 
 //-------------------------------------------------
-//	size
+//  size
 //-------------------------------------------------
 
 uint64_t imgtool::stream::size() const
@@ -331,7 +331,7 @@ uint64_t imgtool::stream::size() const
 
 
 //-------------------------------------------------
-//	getptr
+//  getptr
 //-------------------------------------------------
 
 void *imgtool::stream::getptr()
@@ -353,7 +353,7 @@ void *imgtool::stream::getptr()
 
 
 //-------------------------------------------------
-//	seek
+//  seek
 //-------------------------------------------------
 
 int imgtool::stream::seek(int64_t pos, int where)
@@ -381,7 +381,7 @@ int imgtool::stream::seek(int64_t pos, int where)
 
 
 //-------------------------------------------------
-//	tell
+//  tell
 //-------------------------------------------------
 
 uint64_t imgtool::stream::tell()
@@ -391,7 +391,7 @@ uint64_t imgtool::stream::tell()
 
 
 //-------------------------------------------------
-//	transfer
+//  transfer
 //-------------------------------------------------
 
 uint64_t imgtool::stream::transfer(imgtool::stream &dest, imgtool::stream &source, uint64_t sz)
@@ -411,7 +411,7 @@ uint64_t imgtool::stream::transfer(imgtool::stream &dest, imgtool::stream &sourc
 
 
 //-------------------------------------------------
-//	transfer_all
+//  transfer_all
 //-------------------------------------------------
 
 uint64_t imgtool::stream::transfer_all(imgtool::stream &dest, imgtool::stream &source)
@@ -421,7 +421,7 @@ uint64_t imgtool::stream::transfer_all(imgtool::stream &dest, imgtool::stream &s
 
 
 //-------------------------------------------------
-//	crc
+//  crc
 //-------------------------------------------------
 
 int imgtool::stream::crc(unsigned long *result)
@@ -455,7 +455,7 @@ int imgtool::stream::crc(unsigned long *result)
 
 
 //-------------------------------------------------
-//	file_crc
+//  file_crc
 //-------------------------------------------------
 
 int imgtool::stream::file_crc(const char *fname, unsigned long *result)
@@ -474,7 +474,7 @@ int imgtool::stream::file_crc(const char *fname, unsigned long *result)
 
 
 //-------------------------------------------------
-//	fill
+//  fill
 //-------------------------------------------------
 
 uint64_t imgtool::stream::fill(unsigned char b, uint64_t sz)
@@ -495,7 +495,7 @@ uint64_t imgtool::stream::fill(unsigned char b, uint64_t sz)
 
 
 //-------------------------------------------------
-//	is_read_only
+//  is_read_only
 //-------------------------------------------------
 
 int imgtool::stream::is_read_only()
@@ -505,7 +505,7 @@ int imgtool::stream::is_read_only()
 
 
 //-------------------------------------------------
-//	putc
+//  putc
 //-------------------------------------------------
 
 uint32_t imgtool::stream::putc(char c)
@@ -515,7 +515,7 @@ uint32_t imgtool::stream::putc(char c)
 
 
 //-------------------------------------------------
-//	puts
+//  puts
 //-------------------------------------------------
 
 uint32_t imgtool::stream::puts(const char *s)
@@ -525,7 +525,7 @@ uint32_t imgtool::stream::puts(const char *s)
 
 
 //-------------------------------------------------
-//	printf
+//  printf
 //-------------------------------------------------
 
 uint32_t imgtool::stream::printf(const char *fmt, ...)

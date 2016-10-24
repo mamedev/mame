@@ -1311,7 +1311,7 @@ void isa8_sblaster1_0_device::device_start()
 	// 1.0 always has the SAA1099s for CMS back-compatibility
 	m_isa->install_device(0x0220, 0x0221, read8_delegate( FUNC(isa8_sblaster1_0_device::saa1099_16_r), this ), write8_delegate( FUNC(isa8_sblaster1_0_device::saa1099_1_16_w), this ) );
 	m_isa->install_device(0x0222, 0x0223, read8_delegate( FUNC(isa8_sblaster1_0_device::saa1099_16_r), this ), write8_delegate( FUNC(isa8_sblaster1_0_device::saa1099_2_16_w), this ) );
-	m_isa->set_dma_channel(1, this, FALSE);
+	m_isa->set_dma_channel(1, this, false);
 	m_dsp.version = 0x0105;
 	sb8_device::device_start();
 }
@@ -1320,7 +1320,7 @@ void isa8_sblaster1_5_device::device_start()
 {
 	set_isa_device();
 	/* 1.5 makes CM/S support optional (empty sockets, but they work if the user populates them!) */
-	m_isa->set_dma_channel(1, this, FALSE);
+	m_isa->set_dma_channel(1, this, false);
 	m_dsp.version = 0x0200;
 	sb8_device::device_start();
 }
@@ -1363,8 +1363,8 @@ void sb16_device::device_start()
 void isa16_sblaster16_device::device_start()
 {
 	set_isa_device();
-	m_isa->set_dma_channel(1, this, FALSE);
-	m_isa->set_dma_channel(5, this, FALSE);
+	m_isa->set_dma_channel(1, this, false);
+	m_isa->set_dma_channel(5, this, false);
 	m_dsp.version = 0x0405; // diagnose.exe rejects anything lower than 0x0402
 	sb16_device::device_start();
 }

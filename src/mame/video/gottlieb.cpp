@@ -69,8 +69,8 @@ WRITE8_MEMBER(gottlieb_state::gottlieb_laserdisc_video_control_w)
 
 	/* bit 2 video enable (0 = black screen) */
 	/* bit 3 genlock control (1 = show laserdisc image) */
-	m_laserdisc->overlay_enable((data & 0x04) ? TRUE : FALSE);
-	m_laserdisc->video_enable(((data & 0x0c) == 0x0c) ? TRUE : FALSE);
+	m_laserdisc->overlay_enable((data & 0x04) ? true : false);
+	m_laserdisc->video_enable(((data & 0x0c) == 0x0c) ? true : false);
 
 	/* configure the palette if the laserdisc is enabled */
 	m_transparent0 = (data >> 3) & 1;
@@ -142,7 +142,7 @@ void gottlieb_state::video_start()
 			4, resistances, m_weights, 180, 0,
 			4, resistances, m_weights, 180, 0,
 			4, resistances, m_weights, 180, 0);
-	m_transparent0 = FALSE;
+	m_transparent0 = false;
 
 	/* configure the background tilemap */
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gottlieb_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
@@ -167,7 +167,7 @@ VIDEO_START_MEMBER(gottlieb_state,screwloo)
 			4, resistances, m_weights, 180, 0,
 			4, resistances, m_weights, 180, 0,
 			4, resistances, m_weights, 180, 0);
-	m_transparent0 = FALSE;
+	m_transparent0 = false;
 
 	/* configure the background tilemap */
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(gottlieb_state::get_screwloo_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);

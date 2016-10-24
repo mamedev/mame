@@ -414,7 +414,7 @@ uint32_t cdp1864_device::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	}
 	else
 	{
-		bitmap.fill(rgb_t::black, cliprect);
+		bitmap.fill(rgb_t::black(), cliprect);
 	}
 
 	return 0;

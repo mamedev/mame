@@ -76,7 +76,7 @@ OP( 0x22, i_and_r8b  ) { DEF_r8b;   ANDB;   RegByte(ModRM)=dst;         CLKM(2,2
 OP( 0x23, i_and_r16w ) { DEF_r16w;  ANDW;   RegWord(ModRM)=dst;         CLKR(15,15,8,15,11,6,2,m_EA); }
 OP( 0x24, i_and_ald8 ) { DEF_ald8;  ANDB;   Breg(AL)=dst;           CLKS(4,4,2);                }
 OP( 0x25, i_and_axd16) { DEF_axd16; ANDW;   Wreg(AW)=dst;           CLKS(4,4,2);    }
-OP( 0x26, i_es       ) { m_seg_prefix=TRUE;    m_prefix_base=Sreg(DS1)<<4;    CLK(2);     (this->*s_nec_instruction[fetchop()])(); m_seg_prefix=FALSE; }
+OP( 0x26, i_es       ) { m_seg_prefix=true;    m_prefix_base=Sreg(DS1)<<4;    CLK(2);     (this->*s_nec_instruction[fetchop()])(); m_seg_prefix=false; }
 OP( 0x27, i_daa      ) { ADJ4(6,0x60);                                  CLKS(3,3,2);    }
 
 OP( 0x28, i_sub_br8  ) { DEF_br8;   SUBB;   PutbackRMByte(ModRM,dst);   CLKM(2,2,2,16,16,7);        }
@@ -85,7 +85,7 @@ OP( 0x2a, i_sub_r8b  ) { DEF_r8b;   SUBB;   RegByte(ModRM)=dst;         CLKM(2,2
 OP( 0x2b, i_sub_r16w ) { DEF_r16w;  SUBW;   RegWord(ModRM)=dst;         CLKR(15,15,8,15,11,6,2,m_EA); }
 OP( 0x2c, i_sub_ald8 ) { DEF_ald8;  SUBB;   Breg(AL)=dst;           CLKS(4,4,2);                }
 OP( 0x2d, i_sub_axd16) { DEF_axd16; SUBW;   Wreg(AW)=dst;           CLKS(4,4,2);    }
-OP( 0x2e, i_cs       ) { m_seg_prefix=TRUE;    m_prefix_base=Sreg(PS)<<4; CLK(2);     (this->*s_nec_instruction[fetchop()])(); m_seg_prefix=FALSE; }
+OP( 0x2e, i_cs       ) { m_seg_prefix=true;    m_prefix_base=Sreg(PS)<<4; CLK(2);     (this->*s_nec_instruction[fetchop()])(); m_seg_prefix=false; }
 OP( 0x2f, i_das      ) { ADJ4(-6,-0x60);                                CLKS(3,3,2);    }
 
 OP( 0x30, i_xor_br8  ) { DEF_br8;   XORB;   PutbackRMByte(ModRM,dst);   CLKM(2,2,2,16,16,7);        }
@@ -94,7 +94,7 @@ OP( 0x32, i_xor_r8b  ) { DEF_r8b;   XORB;   RegByte(ModRM)=dst;         CLKM(2,2
 OP( 0x33, i_xor_r16w ) { DEF_r16w;  XORW;   RegWord(ModRM)=dst;         CLKR(15,15,8,15,11,6,2,m_EA); }
 OP( 0x34, i_xor_ald8 ) { DEF_ald8;  XORB;   Breg(AL)=dst;           CLKS(4,4,2);                }
 OP( 0x35, i_xor_axd16) { DEF_axd16; XORW;   Wreg(AW)=dst;           CLKS(4,4,2);    }
-OP( 0x36, i_ss       ) { m_seg_prefix=TRUE;    m_prefix_base=Sreg(SS)<<4; CLK(2);     (this->*s_nec_instruction[fetchop()])(); m_seg_prefix=FALSE; }
+OP( 0x36, i_ss       ) { m_seg_prefix=true;    m_prefix_base=Sreg(SS)<<4; CLK(2);     (this->*s_nec_instruction[fetchop()])(); m_seg_prefix=false; }
 OP( 0x37, i_aaa      ) { ADJB(6, (Breg(AL) > 0xf9) ? 2 : 1);        CLKS(7,7,4);    }
 
 OP( 0x38, i_cmp_br8  ) { DEF_br8;   SUBB;                   CLKM(2,2,2,11,11,6); }
@@ -103,7 +103,7 @@ OP( 0x3a, i_cmp_r8b  ) { DEF_r8b;   SUBB;                   CLKM(2,2,2,11,11,6);
 OP( 0x3b, i_cmp_r16w ) { DEF_r16w;  SUBW;                   CLKR(15,15,8,15,11,6,2,m_EA); }
 OP( 0x3c, i_cmp_ald8 ) { DEF_ald8;  SUBB;                   CLKS(4,4,2); }
 OP( 0x3d, i_cmp_axd16) { DEF_axd16; SUBW;                   CLKS(4,4,2);    }
-OP( 0x3e, i_ds       ) { m_seg_prefix=TRUE;    m_prefix_base=Sreg(DS0)<<4;    CLK(2);     (this->*s_nec_instruction[fetchop()])(); m_seg_prefix=FALSE; }
+OP( 0x3e, i_ds       ) { m_seg_prefix=true;    m_prefix_base=Sreg(DS0)<<4;    CLK(2);     (this->*s_nec_instruction[fetchop()])(); m_seg_prefix=false; }
 OP( 0x3f, i_aas      ) { ADJB(-6, (Breg(AL) < 6) ? -2 : -1);        CLKS(7,7,4);    }
 
 OP( 0x40, i_inc_ax  ) { IncWordReg(AW);                     CLK(2); }
@@ -180,10 +180,10 @@ OP( 0x62, i_chkind  ) {
 }
 OP( 0x64, i_repnc  ) {  uint32_t next = fetchop();   uint16_t c = Wreg(CW);
 	switch(next) { /* Segments */
-		case 0x26:  m_seg_prefix=TRUE; m_prefix_base=Sreg(DS1)<<4;    next = fetchop();  CLK(2); break;
-		case 0x2e:  m_seg_prefix=TRUE; m_prefix_base=Sreg(PS)<<4; next = fetchop();  CLK(2); break;
-		case 0x36:  m_seg_prefix=TRUE; m_prefix_base=Sreg(SS)<<4; next = fetchop();  CLK(2); break;
-		case 0x3e:  m_seg_prefix=TRUE; m_prefix_base=Sreg(DS0)<<4;    next = fetchop();  CLK(2); break;
+		case 0x26:  m_seg_prefix=true; m_prefix_base=Sreg(DS1)<<4;    next = fetchop();  CLK(2); break;
+		case 0x2e:  m_seg_prefix=true; m_prefix_base=Sreg(PS)<<4; next = fetchop();  CLK(2); break;
+		case 0x36:  m_seg_prefix=true; m_prefix_base=Sreg(SS)<<4; next = fetchop();  CLK(2); break;
+		case 0x3e:  m_seg_prefix=true; m_prefix_base=Sreg(DS0)<<4;    next = fetchop();  CLK(2); break;
 	}
 
 	switch(next) {
@@ -203,15 +203,15 @@ OP( 0x64, i_repnc  ) {  uint32_t next = fetchop();   uint16_t c = Wreg(CW);
 		case 0xaf:  CLK(2); if (c) do { i_scasw(); c--; } while (c>0 && !CF); Wreg(CW)=c; break;
 		default:    logerror("%06x: REPNC invalid\n",PC());    (this->*s_nec_instruction[next])();
 	}
-	m_seg_prefix=FALSE;
+	m_seg_prefix=false;
 }
 
 OP( 0x65, i_repc  ) {   uint32_t next = fetchop();   uint16_t c = Wreg(CW);
 	switch(next) { /* Segments */
-		case 0x26:  m_seg_prefix=TRUE; m_prefix_base=Sreg(DS1)<<4;    next = fetchop();  CLK(2); break;
-		case 0x2e:  m_seg_prefix=TRUE; m_prefix_base=Sreg(PS)<<4; next = fetchop();  CLK(2); break;
-		case 0x36:  m_seg_prefix=TRUE; m_prefix_base=Sreg(SS)<<4; next = fetchop();  CLK(2); break;
-		case 0x3e:  m_seg_prefix=TRUE; m_prefix_base=Sreg(DS0)<<4;    next = fetchop();  CLK(2); break;
+		case 0x26:  m_seg_prefix=true; m_prefix_base=Sreg(DS1)<<4;    next = fetchop();  CLK(2); break;
+		case 0x2e:  m_seg_prefix=true; m_prefix_base=Sreg(PS)<<4; next = fetchop();  CLK(2); break;
+		case 0x36:  m_seg_prefix=true; m_prefix_base=Sreg(SS)<<4; next = fetchop();  CLK(2); break;
+		case 0x3e:  m_seg_prefix=true; m_prefix_base=Sreg(DS0)<<4;    next = fetchop();  CLK(2); break;
 	}
 
 	switch(next) {
@@ -231,7 +231,7 @@ OP( 0x65, i_repc  ) {   uint32_t next = fetchop();   uint16_t c = Wreg(CW);
 		case 0xaf:  CLK(2); if (c) do { i_scasw(); c--; } while (c>0 && CF);   Wreg(CW)=c; break;
 		default:    logerror("%06x: REPC invalid\n",PC()); (this->*s_nec_instruction[next])();
 	}
-	m_seg_prefix=FALSE;
+	m_seg_prefix=false;
 }
 
 OP( 0x68, i_push_d16 ) { uint32_t tmp;    tmp = FETCHWORD(); PUSH(tmp);   CLKW(12,12,5,12,8,5,Wreg(SP));  }
@@ -558,10 +558,10 @@ OP( 0xef, i_outdxax  ) { write_port_word(Wreg(DW), Wreg(AW)); CLKW(12,12,5,12,8,
 OP( 0xf0, i_lock     ) { logerror("%06x: Warning - BUSLOCK\n",PC()); m_no_interrupt=1; CLK(2); }
 OP( 0xf2, i_repne    ) { uint32_t next = fetchop(); uint16_t c = Wreg(CW);
 	switch(next) { /* Segments */
-		case 0x26:  m_seg_prefix=TRUE; m_prefix_base=Sreg(DS1)<<4;    next = fetchop();  CLK(2); break;
-		case 0x2e:  m_seg_prefix=TRUE; m_prefix_base=Sreg(PS)<<4;     next = fetchop();  CLK(2); break;
-		case 0x36:  m_seg_prefix=TRUE; m_prefix_base=Sreg(SS)<<4;     next = fetchop();  CLK(2); break;
-		case 0x3e:  m_seg_prefix=TRUE; m_prefix_base=Sreg(DS0)<<4;    next = fetchop();  CLK(2); break;
+		case 0x26:  m_seg_prefix=true; m_prefix_base=Sreg(DS1)<<4;    next = fetchop();  CLK(2); break;
+		case 0x2e:  m_seg_prefix=true; m_prefix_base=Sreg(PS)<<4;     next = fetchop();  CLK(2); break;
+		case 0x36:  m_seg_prefix=true; m_prefix_base=Sreg(SS)<<4;     next = fetchop();  CLK(2); break;
+		case 0x3e:  m_seg_prefix=true; m_prefix_base=Sreg(DS0)<<4;    next = fetchop();  CLK(2); break;
 	}
 
 	switch(next) {
@@ -581,14 +581,14 @@ OP( 0xf2, i_repne    ) { uint32_t next = fetchop(); uint16_t c = Wreg(CW);
 		case 0xaf:  CLK(2); if (c) do { i_scasw(); c--; } while (c>0 && !ZF);    Wreg(CW)=c; break;
 		default:    logerror("%06x: REPNE invalid\n",PC());    (this->*s_nec_instruction[next])();
 	}
-	m_seg_prefix=FALSE;
+	m_seg_prefix=false;
 }
 OP( 0xf3, i_repe     ) { uint32_t next = fetchop(); uint16_t c = Wreg(CW);
 	switch(next) { /* Segments */
-		case 0x26:  m_seg_prefix=TRUE; m_prefix_base=Sreg(DS1)<<4;    next = fetchop();  CLK(2); break;
-		case 0x2e:  m_seg_prefix=TRUE; m_prefix_base=Sreg(PS)<<4; next = fetchop();  CLK(2); break;
-		case 0x36:  m_seg_prefix=TRUE; m_prefix_base=Sreg(SS)<<4; next = fetchop();  CLK(2); break;
-		case 0x3e:  m_seg_prefix=TRUE; m_prefix_base=Sreg(DS0)<<4;    next = fetchop();  CLK(2); break;
+		case 0x26:  m_seg_prefix=true; m_prefix_base=Sreg(DS1)<<4;    next = fetchop();  CLK(2); break;
+		case 0x2e:  m_seg_prefix=true; m_prefix_base=Sreg(PS)<<4; next = fetchop();  CLK(2); break;
+		case 0x36:  m_seg_prefix=true; m_prefix_base=Sreg(SS)<<4; next = fetchop();  CLK(2); break;
+		case 0x3e:  m_seg_prefix=true; m_prefix_base=Sreg(DS0)<<4;    next = fetchop();  CLK(2); break;
 	}
 
 	switch(next) {
@@ -608,7 +608,7 @@ OP( 0xf3, i_repe     ) { uint32_t next = fetchop(); uint16_t c = Wreg(CW);
 		case 0xaf:  CLK(2); if (c) do { i_scasw(); c--; } while (c>0 && ZF);    Wreg(CW)=c; break;
 		default:    logerror("%06x: REPE invalid\n",PC()); (this->*s_nec_instruction[next])();
 	}
-	m_seg_prefix=FALSE;
+	m_seg_prefix=false;
 }
 OP( 0xf4, i_hlt ) { logerror("%06x: HALT\n",PC()); m_halted=1; m_icount=0; }
 OP( 0xf5, i_cmc ) { m_CarryVal = !CF; CLK(2); }

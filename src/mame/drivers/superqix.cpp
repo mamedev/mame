@@ -217,7 +217,7 @@ void superqix_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		hle_68705_w_cb(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in superqix_state::device_timer");
+		assert_always(false, "Unknown id in superqix_state::device_timer");
 	}
 }
 

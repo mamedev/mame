@@ -167,11 +167,11 @@ osd_file::error osd_file::remove(std::string const &filename)
 //  osd_get_physical_drive_geometry
 //============================================================
 
-int osd_get_physical_drive_geometry(const char *filename, uint32_t *cylinders, uint32_t *heads, uint32_t *sectors, uint32_t *bps)
+bool osd_get_physical_drive_geometry(const char *filename, uint32_t *cylinders, uint32_t *heads, uint32_t *sectors, uint32_t *bps)
 {
-	// there is no standard way of doing this, so we always return FALSE, indicating
+	// there is no standard way of doing this, so we always return false, indicating
 	// that a given path is not a physical drive
-	return FALSE;
+	return false;
 }
 
 

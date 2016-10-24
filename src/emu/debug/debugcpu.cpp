@@ -357,7 +357,7 @@ bool debugger_cpu::comment_load(bool is_inline)
     memory space
 -------------------------------------------------*/
 
-uint8_t debugger_cpu::read_byte(address_space &space, offs_t address, int apply_translation)
+uint8_t debugger_cpu::read_byte(address_space &space, offs_t address, bool apply_translation)
 {
 	device_memory_interface &memory = space.device().memory();
 
@@ -396,7 +396,7 @@ uint8_t debugger_cpu::read_byte(address_space &space, offs_t address, int apply_
     memory space
 -------------------------------------------------*/
 
-uint16_t debugger_cpu::read_word(address_space &space, offs_t address, int apply_translation)
+uint16_t debugger_cpu::read_word(address_space &space, offs_t address, bool apply_translation)
 {
 	/* mask against the logical byte mask */
 	address &= space.logbytemask();
@@ -450,7 +450,7 @@ uint16_t debugger_cpu::read_word(address_space &space, offs_t address, int apply
     memory space
 -------------------------------------------------*/
 
-uint32_t debugger_cpu::read_dword(address_space &space, offs_t address, int apply_translation)
+uint32_t debugger_cpu::read_dword(address_space &space, offs_t address, bool apply_translation)
 {
 	/* mask against the logical byte mask */
 	address &= space.logbytemask();
@@ -503,7 +503,7 @@ uint32_t debugger_cpu::read_dword(address_space &space, offs_t address, int appl
     memory space
 -------------------------------------------------*/
 
-uint64_t debugger_cpu::read_qword(address_space &space, offs_t address, int apply_translation)
+uint64_t debugger_cpu::read_qword(address_space &space, offs_t address, bool apply_translation)
 {
 	/* mask against the logical byte mask */
 	address &= space.logbytemask();
@@ -557,7 +557,7 @@ uint64_t debugger_cpu::read_qword(address_space &space, offs_t address, int appl
     from the specified memory space
 -------------------------------------------------*/
 
-uint64_t debugger_cpu::read_memory(address_space &space, offs_t address, int size, int apply_translation)
+uint64_t debugger_cpu::read_memory(address_space &space, offs_t address, int size, bool apply_translation)
 {
 	uint64_t result = ~(uint64_t)0 >> (64 - 8*size);
 	switch (size)
@@ -576,7 +576,7 @@ uint64_t debugger_cpu::read_memory(address_space &space, offs_t address, int siz
     memory space
 -------------------------------------------------*/
 
-void debugger_cpu::write_byte(address_space &space, offs_t address, uint8_t data, int apply_translation)
+void debugger_cpu::write_byte(address_space &space, offs_t address, uint8_t data, bool apply_translation)
 {
 	device_memory_interface &memory = space.device().memory();
 
@@ -612,7 +612,7 @@ void debugger_cpu::write_byte(address_space &space, offs_t address, uint8_t data
     memory space
 -------------------------------------------------*/
 
-void debugger_cpu::write_word(address_space &space, offs_t address, uint16_t data, int apply_translation)
+void debugger_cpu::write_word(address_space &space, offs_t address, uint16_t data, bool apply_translation)
 {
 	/* mask against the logical byte mask */
 	address &= space.logbytemask();
@@ -667,7 +667,7 @@ void debugger_cpu::write_word(address_space &space, offs_t address, uint16_t dat
     memory space
 -------------------------------------------------*/
 
-void debugger_cpu::write_dword(address_space &space, offs_t address, uint32_t data, int apply_translation)
+void debugger_cpu::write_dword(address_space &space, offs_t address, uint32_t data, bool apply_translation)
 {
 	/* mask against the logical byte mask */
 	address &= space.logbytemask();
@@ -721,7 +721,7 @@ void debugger_cpu::write_dword(address_space &space, offs_t address, uint32_t da
     memory space
 -------------------------------------------------*/
 
-void debugger_cpu::write_qword(address_space &space, offs_t address, uint64_t data, int apply_translation)
+void debugger_cpu::write_qword(address_space &space, offs_t address, uint64_t data, bool apply_translation)
 {
 	/* mask against the logical byte mask */
 	address &= space.logbytemask();
@@ -776,7 +776,7 @@ void debugger_cpu::write_qword(address_space &space, offs_t address, uint64_t da
     specified memory space
 -------------------------------------------------*/
 
-void debugger_cpu::write_memory(address_space &space, offs_t address, uint64_t data, int size, int apply_translation)
+void debugger_cpu::write_memory(address_space &space, offs_t address, uint64_t data, int size, bool apply_translation)
 {
 	switch (size)
 	{

@@ -147,7 +147,7 @@ void pastelg_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		m_nb1413m3->m_busyflag = 1;
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in pastelg_state::device_timer");
+		assert_always(false, "Unknown id in pastelg_state::device_timer");
 	}
 }
 

@@ -396,7 +396,7 @@ int main(int argc, char *argv[])
 	{
 		if (argc != 3 && argc != 4)
 			goto usage;
-		result = join_file(argv[2], (argc >= 4) ? argv[3] : nullptr, TRUE);
+		result = join_file(argv[2], (argc >= 4) ? argv[3] : nullptr, true);
 	}
 
 	/* verify command */
@@ -404,7 +404,7 @@ int main(int argc, char *argv[])
 	{
 		if (argc != 3)
 			goto usage;
-		result = join_file(argv[2], nullptr, FALSE);
+		result = join_file(argv[2], nullptr, false);
 	}
 	else
 		goto usage;

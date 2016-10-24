@@ -32,7 +32,7 @@ void zx_state::device_timer(emu_timer &timer, device_timer_id id, int param, voi
 		zx_ula_hsync();
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in zx_state::device_timer");
+		assert_always(false, "Unknown id in zx_state::device_timer");
 	}
 }
 

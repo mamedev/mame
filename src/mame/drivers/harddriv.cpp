@@ -1429,7 +1429,7 @@ static MACHINE_CONFIG_FRAGMENT( driver_nomsp )
 
 	MCFG_CPU_ADD("gsp", TMS34010, HARDDRIV_GSP_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(driver_gsp_map)
-	MCFG_TMS340X0_HALT_ON_RESET(TRUE) /* halt on reset */
+	MCFG_TMS340X0_HALT_ON_RESET(true) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(4000000) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(4) /* pixels per clock */
 	MCFG_TMS340X0_SCANLINE_IND16_CB(harddriv_state, scanline_driver) /* scanline callback (indexed16) */
@@ -1465,7 +1465,7 @@ static MACHINE_CONFIG_FRAGMENT( driver_msp )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("msp", TMS34010, XTAL_50MHz)
 	MCFG_CPU_PROGRAM_MAP(driver_msp_map)
-	MCFG_TMS340X0_HALT_ON_RESET(TRUE) /* halt on reset */
+	MCFG_TMS340X0_HALT_ON_RESET(true) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(5000000) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(2) /* pixels per clock */
 	MCFG_TMS340X0_OUTPUT_INT_CB(WRITELINE(harddriv_state, hdmsp_irq_gen))
@@ -1504,7 +1504,7 @@ static MACHINE_CONFIG_FRAGMENT( multisync_msp )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("msp", TMS34010, XTAL_50MHz)
 	MCFG_CPU_PROGRAM_MAP(driver_msp_map)
-	MCFG_TMS340X0_HALT_ON_RESET(TRUE) /* halt on reset */
+	MCFG_TMS340X0_HALT_ON_RESET(true) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(5000000) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(2) /* pixels per clock */
 	MCFG_TMS340X0_OUTPUT_INT_CB(WRITELINE(harddriv_state, hdmsp_irq_gen))
@@ -4634,7 +4634,7 @@ ROM_END
 void harddriv_state::init_driver()
 {
 	/* note that we're not multisync */
-	m_gsp_multisync = FALSE;
+	m_gsp_multisync = false;
 }
 
 
@@ -4642,7 +4642,7 @@ void harddriv_state::init_driver()
 void harddriv_state::init_multisync(int compact_inputs)
 {
 	/* note that we're multisync */
-	m_gsp_multisync = TRUE;
+	m_gsp_multisync = true;
 
 	// if we have a JSA board, install the read/write handlers
 	if (m_jsa.found())

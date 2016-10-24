@@ -26,7 +26,7 @@ namespace imgtool
 		static imgtool::stream *open(const char *fname, int read_or_write);  /* similar params to mame_fopen */
 		static imgtool::stream *open_write_stream(int filesize);
 		static imgtool::stream *open_mem(void *buf, size_t sz);
-		
+
 		util::core_file *core_file();
 		uint32_t read(void *buf, uint32_t sz);
 		uint32_t write(const void *buf, uint32_t sz);

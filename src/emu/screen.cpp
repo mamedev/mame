@@ -246,7 +246,7 @@ void screen_device_svg_renderer::output_change(const char *outname, int32_t valu
 	auto l = m_key_ids.find(outname);
 	if (l == m_key_ids.end())
 		return;
-	m_key_state[l->second] = value!=0;
+	m_key_state[l->second] = value;
 }
 
 void screen_device_svg_renderer::compute_initial_bboxes(std::vector<bbox> &bboxes)

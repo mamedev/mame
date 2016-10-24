@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood
 
-// todo, scrap this and use the core SAB 2797B emulation 
+// todo, scrap this and use the core SAB 2797B emulation
 // (FM - MFM type) @ 1.25mhz (oscillates 1.250~1.251)
 
 
@@ -75,17 +75,17 @@ READ8_MEMBER(cedar_magnet_flop_device::port63_r)
 			if (m_secoffs == 0)
 			{
 				// this is weird data, protection??
-				if(read_offset_base==0xea400) 
-					printf("reading sector %d offset %d (from disk image at %04x) (cur track %02x cur side %02x cur sector %02x)\n", m_flopsec, m_secoffs, read_offset, m_curtrack, side, m_flopsec);		
+				if(read_offset_base==0xea400)
+					printf("reading sector %d offset %d (from disk image at %04x) (cur track %02x cur side %02x cur sector %02x)\n", m_flopsec, m_secoffs, read_offset, m_curtrack, side, m_flopsec);
 			}
-			
+
 			m_secoffs++;
 
 			if (m_secoffs == sector_size)
 			{
 				//printf("finished sector read\n");
-				m_flopstat &= ~0x05; 		
-				
+				m_flopstat &= ~0x05;
+
 				m_secoffs = 0;
 				m_flopsec++;
 			}
@@ -95,13 +95,13 @@ READ8_MEMBER(cedar_magnet_flop_device::port63_r)
 			printf("read past sector!! %d\n", m_secoffs);
 			m_secoffs++;
 		}
-		
+
 	}
 	else
 	{
 		fatalerror("read data in non-read mode?\n");
 	}
-//	
+//
 	return ret;
 }
 
@@ -139,9 +139,9 @@ WRITE8_MEMBER(cedar_magnet_flop_device::port60_w)
 
 	case 0xd0:
 		//printf("force interrupt?\n");
-	//	m_flopstat = 0x06;
-	//	m_flopstat &= ~0x07; 
-	//	m_maincpu->set_input_line(0, HOLD_LINE);
+	//  m_flopstat = 0x06;
+	//  m_flopstat &= ~0x07;
+	//  m_maincpu->set_input_line(0, HOLD_LINE);
 
 		break;
 
@@ -210,7 +210,7 @@ WRITE8_MEMBER(cedar_magnet_flop_device::write)
 	switch (offset & 3)
 	{
 		case 0x00:port60_w(space, offset, data);break;
-	//	case 0x01:port61_w(space, offset, data);break;
+	//  case 0x01:port61_w(space, offset, data);break;
 		case 0x02:port62_w(space, offset, data);break;
 		case 0x03:port63_w(space, offset, data);break;
 		default:break;

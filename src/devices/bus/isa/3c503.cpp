@@ -46,7 +46,7 @@ void el2_3c503_device::device_start() {
 			chan++;
 			idcfr >>= 1;
 		}
-		m_isa->set_dma_channel(chan, this, FALSE);
+		m_isa->set_dma_channel(chan, this, false);
 	}
 }
 

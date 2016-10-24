@@ -972,7 +972,7 @@ void debug_view_memory::set_reverse(bool reverse)
 
 
 //-------------------------------------------------
-//  set_ascii - specify TRUE if the memory view
+//  set_ascii - specify true if the memory view
 //  should display an ASCII representation
 //-------------------------------------------------
 

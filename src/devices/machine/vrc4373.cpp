@@ -73,7 +73,7 @@ void vrc4373_device::device_start()
 	m_cpu_space->install_device(0x0f000100, 0x0f0001ff, *static_cast<vrc4373_device *>(this), &vrc4373_device::config_map);
 
 	// MIPS drc
-	m_cpu->add_fastram(0x1fc00000, 0x1fcfffff, TRUE, m_romRegion->base());
+	m_cpu->add_fastram(0x1fc00000, 0x1fcfffff, true, m_romRegion->base());
 
 	// DMA timer
 	m_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vrc4373_device::dma_transfer), this));
@@ -114,7 +114,7 @@ void vrc4373_device::map_cpu_space()
 
 		m_ram.resize(winSize / 4);
 		m_cpu_space->install_ram(winStart, winEnd, m_ram.data());
-		m_cpu->add_fastram(winStart, winEnd, FALSE, m_ram.data());
+		m_cpu->add_fastram(winStart, winEnd, false, m_ram.data());
 		if (LOG_NILE)
 			logerror("map_cpu_space ram_size=%08X ram_base=%08X\n", winSize, winStart);
 	}
@@ -133,7 +133,7 @@ void vrc4373_device::map_cpu_space()
 
 			m_simm[simIndex].resize(winSize / 4);
 			m_cpu_space->install_ram(winStart, winEnd, m_simm[simIndex].data());
-			m_cpu->add_fastram(winStart, winEnd, FALSE, m_simm[simIndex].data());
+			m_cpu->add_fastram(winStart, winEnd, false, m_simm[simIndex].data());
 			if (LOG_NILE)
 				logerror("map_cpu_space simm_size[%i]=%08X simm_base=%08X\n", simIndex, winSize, winStart);
 		}

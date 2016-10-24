@@ -147,7 +147,7 @@ void mgolf_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 		interrupt_callback(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in mgolf_state::device_timer");
+		assert_always(false, "Unknown id in mgolf_state::device_timer");
 	}
 }
 

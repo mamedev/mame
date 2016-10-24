@@ -145,7 +145,7 @@ void tms9927_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 void tms9927_device::state_postload()
 {
-	recompute_parameters(TRUE);
+	recompute_parameters(true);
 }
 
 
@@ -174,7 +174,7 @@ void tms9927_device::generic_access(address_space &space, offs_t offset)
 			if (!m_reset)
 			{
 				m_screen->update_now();
-				m_reset = TRUE;
+				m_reset = true;
 			}
 			break;
 
@@ -188,8 +188,8 @@ osd_printf_debug("Up scroll\n");
 			if (m_reset)
 			{
 				m_screen->update_now();
-				m_reset = FALSE;
-				recompute_parameters(FALSE);
+				m_reset = false;
+				recompute_parameters(false);
 			}
 			break;
 	}
@@ -208,14 +208,14 @@ WRITE8_MEMBER( tms9927_device::write )
 		case 0x05:  /* VERTICAL DATA START */
 		case 0x06:  /* LAST DISPLAYED DATA ROW */
 			m_reg[offset] = data;
-			recompute_parameters(FALSE);
+			recompute_parameters(false);
 			break;
 
 		case 0x0c:  /* LOAD CURSOR CHARACTER ADDRESS */
 		case 0x0d:  /* LOAD CURSOR ROW ADDRESS */
 osd_printf_debug("Cursor address changed\n");
 			m_reg[offset - 0x0c + 7] = data;
-			recompute_parameters(FALSE);
+			recompute_parameters(false);
 			break;
 
 		default:
@@ -267,7 +267,7 @@ int tms9927_device::cursor_bounds(rectangle &bounds)
 }
 
 
-void tms9927_device::recompute_parameters(int postload)
+void tms9927_device::recompute_parameters(bool postload)
 {
 	uint16_t offset_hpix, offset_vpix;
 	attoseconds_t refresh;
@@ -292,16 +292,16 @@ void tms9927_device::recompute_parameters(int postload)
 	osd_printf_debug("TMS9937: Total = %dx%d, Visible = %dx%d, Offset=%dx%d, Skew=%d, Upscroll=%d\n", m_total_hpix, m_total_vpix, m_visible_hpix, m_visible_vpix, offset_hpix, offset_vpix, SKEW_BITS, m_start_datarow);
 
 	/* see if it all makes sense */
-	m_valid_config = TRUE;
+	m_valid_config = true;
 	if ( (m_visible_hpix > m_total_hpix || m_visible_vpix > m_total_vpix) || (((m_visible_hpix-1)<=0) || ((m_visible_vpix-1)<=0)) || ((m_total_hpix * m_total_vpix) == 0) )
 	{
-		m_valid_config = FALSE;
+		m_valid_config = false;
 		logerror("tms9927: invalid visible size (%dx%d) versus total size (%dx%d)\n", m_visible_hpix, m_visible_vpix, m_total_hpix, m_total_vpix);
 	}
 
 	if (m_clock == 0)
 	{
-		m_valid_config = FALSE;
+		m_valid_config = false;
 		// TODO: make the screen refresh never, and disable the vblank and odd/even interrupts here!
 		logerror("tms9927: invalid clock rate of zero defined!\n");
 	}

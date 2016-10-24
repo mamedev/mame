@@ -638,7 +638,7 @@ void mc6845_device::update_upd_adr_timer()
 
 void mc6845_device::handle_line_timer()
 {
-	int new_vsync = m_vsync;
+	bool new_vsync = m_vsync;
 
 	m_character_counter = 0;
 	m_cursor_x = -1;
@@ -655,7 +655,7 @@ void mc6845_device::handle_line_timer()
 		{
 			m_vsync_ff = 0;
 
-			new_vsync = FALSE;
+			new_vsync = false;
 		}
 	}
 
@@ -688,7 +688,7 @@ void mc6845_device::handle_line_timer()
 			m_vsync_width_counter = 0;
 			m_vsync_ff = 1;
 
-			new_vsync = TRUE;
+			new_vsync = true;
 		}
 	}
 	else
@@ -747,7 +747,7 @@ void mc6845_device::handle_line_timer()
 
 	/* Set VSYNC and DE signals */
 	set_vsync( new_vsync );
-	set_de( m_line_enable_ff ? TRUE : FALSE );
+	set_de( m_line_enable_ff ? true : false );
 }
 
 
@@ -760,18 +760,18 @@ void mc6845_device::device_timer(emu_timer &timer, device_timer_id id, int param
 		break;
 
 	case TIMER_DE_OFF:
-		set_de( FALSE );
+		set_de( false );
 		break;
 
 	case TIMER_CUR_ON:
-		set_cur( TRUE );
+		set_cur( true );
 
 		/* Schedule CURSOR off signal */
 		m_cur_off_timer->adjust( attotime::from_ticks( 1, m_clock ) );
 		break;
 
 	case TIMER_CUR_OFF:
-		set_cur( FALSE );
+		set_cur( false );
 		break;
 
 	case TIMER_HSYNC_ON:
@@ -779,7 +779,7 @@ void mc6845_device::device_timer(emu_timer &timer, device_timer_id id, int param
 			uint8_t hsync_width = ( m_sync_width & 0x0f ) ? ( m_sync_width & 0x0f ) : 0x10;
 
 			m_hsync_width_counter = 0;
-			set_hsync( TRUE );
+			set_hsync( true );
 
 			/* Schedule HSYNC off signal */
 			m_hsync_off_timer->adjust( attotime::from_ticks( hsync_width, m_clock ) );
@@ -787,7 +787,7 @@ void mc6845_device::device_timer(emu_timer &timer, device_timer_id id, int param
 		break;
 
 	case TIMER_HSYNC_OFF:
-		set_hsync( FALSE );
+		set_hsync( false );
 		break;
 
 	case TIMER_LIGHT_PEN_LATCH:
@@ -1501,7 +1501,7 @@ machine_config_constructor mos8563_device::device_mconfig_additions() const
 // VICE palette
 PALETTE_INIT_MEMBER(mos8563_device, mos8563)
 {
-	palette.set_pen_color(0, rgb_t::black);
+	palette.set_pen_color(0, rgb_t::black());
 	palette.set_pen_color(1, rgb_t(0x55, 0x55, 0x55));
 	palette.set_pen_color(2, rgb_t(0x00, 0x00, 0xaa));
 	palette.set_pen_color(3, rgb_t(0x55, 0x55, 0xff));
@@ -1516,7 +1516,7 @@ PALETTE_INIT_MEMBER(mos8563_device, mos8563)
 	palette.set_pen_color(12, rgb_t(0xaa, 0x55, 0x00));
 	palette.set_pen_color(13, rgb_t(0xff, 0xff, 0x55));
 	palette.set_pen_color(14, rgb_t(0xaa, 0xaa, 0xaa));
-	palette.set_pen_color(15, rgb_t::white);
+	palette.set_pen_color(15, rgb_t::white());
 }
 
 

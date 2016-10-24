@@ -325,14 +325,14 @@ void mac_state::v8_resize()
 		/* ROM mirror */
 		memory_size = memregion("bootrom")->bytes();
 		memory_data = memregion("bootrom")->base();
-		is_rom = TRUE;
+		is_rom = true;
 	}
 	else
 	{
 		/* RAM */
 		memory_size = m_ram->size();
 		memory_data = m_ram->pointer();
-		is_rom = FALSE;
+		is_rom = false;
 	}
 
 //    printf("mac_v8_resize: memory_size = %x, ctrl bits %02x (overlay %d = %s)\n", memory_size, m_rbv_regs[1] & 0xe0, m_overlay, is_rom ? "ROM" : "RAM");
@@ -402,7 +402,7 @@ void mac_state::set_memory_overlay(int overlay)
 	int is_rom;
 
 	/* normalize overlay */
-	overlay = overlay ? TRUE : FALSE;
+	overlay = overlay ? true : false;
 
 	if (overlay != m_overlay)
 	{
@@ -412,14 +412,14 @@ void mac_state::set_memory_overlay(int overlay)
 			/* ROM mirror */
 			memory_size = memregion("bootrom")->bytes();
 			memory_data = memregion("bootrom")->base();
-			is_rom = TRUE;
+			is_rom = true;
 		}
 		else
 		{
 			/* RAM */
 			memory_size = m_ram->size();
 			memory_data = m_ram->pointer();
-			is_rom = FALSE;
+			is_rom = false;
 		}
 
 		/* install the memory */
@@ -643,8 +643,8 @@ void mac_state::keyboard_init()
 	int i;
 
 	/* init flag */
-	m_kbd_comm = FALSE;
-	m_kbd_receive = FALSE;
+	m_kbd_comm = false;
+	m_kbd_receive = false;
 	m_kbd_shift_reg=0;
 	m_kbd_shift_count=0;
 
@@ -681,34 +681,34 @@ TIMER_CALLBACK_MEMBER(mac_state::kbd_clock)
 {
 	int i;
 
-	if (m_kbd_comm == TRUE)
+	if (m_kbd_comm == true)
 	{
 		for (i=0; i<8; i++)
 		{
 			/* Put data on CB2 if we are sending*/
-			if (m_kbd_receive == FALSE)
+			if (m_kbd_receive == false)
 				m_via1->write_cb2(m_kbd_shift_reg&0x80?1:0);
 			m_kbd_shift_reg <<= 1;
 			m_via1->write_cb1(0);
 			m_via1->write_cb1(1);
 		}
-		if (m_kbd_receive == TRUE)
+		if (m_kbd_receive == true)
 		{
-			m_kbd_receive = FALSE;
+			m_kbd_receive = false;
 			/* Process the command received from mac */
 			keyboard_receive(m_kbd_shift_reg & 0xff);
 		}
 		else
 		{
 			/* Communication is over */
-			m_kbd_comm = FALSE;
+			m_kbd_comm = false;
 		}
 	}
 }
 
 void mac_state::kbd_shift_out(int data)
 {
-	if (m_kbd_comm == TRUE)
+	if (m_kbd_comm == true)
 	{
 		m_kbd_shift_reg = data;
 		machine().scheduler().timer_set(attotime::from_msec(1), timer_expired_delegate(FUNC(mac_state::kbd_clock),this));
@@ -717,14 +717,14 @@ void mac_state::kbd_shift_out(int data)
 
 WRITE_LINE_MEMBER(mac_state::mac_via_out_cb2)
 {
-	if (m_kbd_comm == FALSE && state == 0)
+	if (m_kbd_comm == false && state == 0)
 	{
 		/* Mac pulls CB2 down to initiate communication */
-		m_kbd_comm = TRUE;
-		m_kbd_receive = TRUE;
+		m_kbd_comm = true;
+		m_kbd_receive = true;
 		machine().scheduler().timer_set(attotime::from_usec(100), timer_expired_delegate(FUNC(mac_state::kbd_clock),this));
 	}
-	if (m_kbd_comm == TRUE && m_kbd_receive == TRUE)
+	if (m_kbd_comm == true && m_kbd_receive == true)
 	{
 		/* Shift in what mac is sending */
 		m_kbd_shift_reg = (m_kbd_shift_reg & ~1) | state;
@@ -2115,11 +2115,11 @@ void mac_state::mac_driver_init(model_t model)
 	if (model < MODEL_MAC_PORTABLE)
 	{
 		/* set up RAM mirror at 0x600000-0x6fffff (0x7fffff ???) */
-		mac_install_memory(0x600000, 0x6fffff, m_ram->size(), m_ram->pointer(), FALSE, "bank2");
+		mac_install_memory(0x600000, 0x6fffff, m_ram->size(), m_ram->pointer(), false, "bank2");
 
 		/* set up ROM at 0x400000-0x4fffff (-0x5fffff for mac 128k/512k/512ke) */
 		mac_install_memory(0x400000, (model >= MODEL_MAC_PLUS) ? 0x4fffff : 0x5fffff,
-			memregion("bootrom")->bytes(), memregion("bootrom")->base(), TRUE, "bank3");
+			memregion("bootrom")->bytes(), memregion("bootrom")->base(), true, "bank3");
 	}
 
 	m_overlay = -1;
@@ -2253,7 +2253,7 @@ void mac_state::vblank_irq()
 
 #ifndef MAC_USE_EMULATED_KBD
 	/* handle keyboard */
-	if (m_kbd_comm == TRUE && m_kbd_receive == FALSE)
+	if (m_kbd_comm == true && m_kbd_receive == false)
 	{
 		int keycode = scan_keyboard();
 

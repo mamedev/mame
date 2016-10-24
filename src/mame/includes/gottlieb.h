@@ -137,8 +137,8 @@ public:
 	TIMER_CALLBACK_MEMBER(nmi_clear);
 	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	inline void audio_end_state();
-	void audio_process_clock(int logit);
-	void audio_handle_zero_crossing(const attotime &zerotime, int logit);
+	void audio_process_clock(bool logit);
+	void audio_handle_zero_crossing(const attotime &zerotime, bool logit);
 	void laserdisc_audio_process(laserdisc_device &device, int samplerate, int samples, const int16_t *ch0, const int16_t *ch1);
 
 protected:

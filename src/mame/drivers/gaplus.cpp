@@ -216,7 +216,7 @@ void gaplus_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 		namcoio_run(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in gaplus_state::device_timer");
+		assert_always(false, "Unknown id in gaplus_state::device_timer");
 	}
 }
 

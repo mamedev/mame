@@ -203,9 +203,9 @@ void kinst_state::machine_start()
 	m_maincpu->mips3drc_set_options(MIPS3DRC_FASTEST_OPTIONS);
 
 	/* configure fast RAM regions */
-	m_maincpu->add_fastram(0x08000000, 0x087fffff, FALSE, m_rambase2);
-	m_maincpu->add_fastram(0x00000000, 0x0007ffff, FALSE, m_rambase);
-	m_maincpu->add_fastram(0x1fc00000, 0x1fc7ffff, TRUE,  m_rombase);
+	m_maincpu->add_fastram(0x08000000, 0x087fffff, false, m_rambase2);
+	m_maincpu->add_fastram(0x00000000, 0x0007ffff, false, m_rambase);
+	m_maincpu->add_fastram(0x1fc00000, 0x1fc7ffff, true,  m_rombase);
 }
 
 
@@ -292,7 +292,7 @@ void kinst_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 		m_maincpu->set_input_line(0, CLEAR_LINE);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in kinst_state::device_timer");
+		assert_always(false, "Unknown id in kinst_state::device_timer");
 	}
 }
 

@@ -640,8 +640,8 @@ OPHANDLER( dec_r5 )         { R5--; return 1; }
 OPHANDLER( dec_r6 )         { R6--; return 1; }
 OPHANDLER( dec_r7 )         { R7--; return 1; }
 
-OPHANDLER( dis_i )          { m_xirq_enabled = FALSE; return 1; }
-OPHANDLER( dis_tcnti )      { m_tirq_enabled = FALSE; m_timer_overflow = FALSE; return 1; }
+OPHANDLER( dis_i )          { m_xirq_enabled = false; return 1; }
+OPHANDLER( dis_tcnti )      { m_tirq_enabled = false; m_timer_overflow = false; return 1; }
 
 OPHANDLER( djnz_r0 )        { execute_jcc(--R0 != 0); return 2; }
 OPHANDLER( djnz_r1 )        { execute_jcc(--R1 != 0); return 2; }
@@ -652,10 +652,10 @@ OPHANDLER( djnz_r5 )        { execute_jcc(--R5 != 0); return 2; }
 OPHANDLER( djnz_r6 )        { execute_jcc(--R6 != 0); return 2; }
 OPHANDLER( djnz_r7 )        { execute_jcc(--R7 != 0); return 2; }
 
-OPHANDLER( en_i )           { m_xirq_enabled = TRUE; return 1 + check_irqs(); }
-OPHANDLER( en_tcnti )       { m_tirq_enabled = TRUE; return 1 + check_irqs(); }
-OPHANDLER( en_dma )         { m_dma_enabled = TRUE; port_w(2, m_p2); return 1; }
-OPHANDLER( en_flags )       { m_flags_enabled = TRUE; port_w(2, m_p2); return 1; }
+OPHANDLER( en_i )           { m_xirq_enabled = true; return 1 + check_irqs(); }
+OPHANDLER( en_tcnti )       { m_tirq_enabled = true; return 1 + check_irqs(); }
+OPHANDLER( en_dma )         { m_dma_enabled = true; port_w(2, m_p2); return 1; }
+OPHANDLER( en_flags )       { m_flags_enabled = true; port_w(2, m_p2); return 1; }
 OPHANDLER( ent0_clk )
 {
 	logerror("MCS-48 PC:%04X - Unimplemented opcode = %02x\n", m_pc - 1, program_r(m_pc - 1));
@@ -709,7 +709,7 @@ OPHANDLER( jnt_0 )          { execute_jcc(test_r(0) == 0); return 2; }
 OPHANDLER( jnt_1 )          { execute_jcc(test_r(1) == 0); return 2; }
 OPHANDLER( jnz )            { execute_jcc(m_a != 0); return 2; }
 OPHANDLER( jobf )           { execute_jcc((m_sts & STS_OBF) != 0); return 2; }
-OPHANDLER( jtf )            { execute_jcc(m_timer_flag); m_timer_flag = FALSE; return 2; }
+OPHANDLER( jtf )            { execute_jcc(m_timer_flag); m_timer_flag = false; return 2; }
 OPHANDLER( jt_0 )           { execute_jcc(test_r(0) != 0); return 2; }
 OPHANDLER( jt_1 )           { execute_jcc(test_r(1) != 0); return 2; }
 OPHANDLER( jz )             { execute_jcc(m_a == 0); return 2; }
@@ -823,7 +823,7 @@ OPHANDLER( retr )
 	pull_pc_psw();
 
 	/* implicitly clear the IRQ in progress flip flop and re-check interrupts */
-	m_irq_in_progress = FALSE;
+	m_irq_in_progress = false;
 	return 2 + check_irqs();
 }
 
@@ -1036,17 +1036,17 @@ void mcs48_cpu_device::device_reset()
 	m_p2 = 0xff;
 	port_w(1, m_p1);
 	port_w(2, m_p2);
-	m_tirq_enabled = FALSE;
-	m_xirq_enabled = FALSE;
+	m_tirq_enabled = false;
+	m_xirq_enabled = false;
 	m_timecount_enabled = 0;
-	m_timer_flag = FALSE;
+	m_timer_flag = false;
 	m_sts = 0;
-	m_flags_enabled = FALSE;
-	m_dma_enabled = FALSE;
+	m_flags_enabled = false;
+	m_dma_enabled = false;
 
 	/* confirmed from interrupt logic description */
-	m_irq_in_progress = FALSE;
-	m_timer_overflow = FALSE;
+	m_irq_in_progress = false;
+	m_timer_overflow = false;
 }
 
 
@@ -1068,7 +1068,7 @@ int mcs48_cpu_device::check_irqs()
 	/* external interrupts take priority */
 	if ((m_irq_state || (m_sts & STS_IBF) != 0) && m_xirq_enabled)
 	{
-		m_irq_in_progress = TRUE;
+		m_irq_in_progress = true;
 
 		/* transfer to location 0x03 */
 		push_pc_psw();
@@ -1082,14 +1082,14 @@ int mcs48_cpu_device::check_irqs()
 	/* timer overflow interrupts follow */
 	if (m_timer_overflow && m_tirq_enabled)
 	{
-		m_irq_in_progress = TRUE;
+		m_irq_in_progress = true;
 
 		/* transfer to location 0x07 */
 		push_pc_psw();
 		m_pc = 0x07;
 
 		/* timer overflow flip-flop is reset once taken */
-		m_timer_overflow = FALSE;
+		m_timer_overflow = false;
 		return 2;
 	}
 	return 0;
@@ -1103,7 +1103,7 @@ int mcs48_cpu_device::check_irqs()
 
 void mcs48_cpu_device::burn_cycles(int count)
 {
-	int timerover = FALSE;
+	int timerover = false;
 
 	/* if the timer is enabled, accumulate prescaler cycles */
 	if (m_timecount_enabled & TIMER_ENABLED)
@@ -1127,12 +1127,12 @@ void mcs48_cpu_device::burn_cycles(int count)
 	/* if either source caused a timer overflow, set the flags and check IRQs */
 	if (timerover)
 	{
-		m_timer_flag = TRUE;
+		m_timer_flag = true;
 
 		/* according to the docs, if an overflow occurs with interrupts disabled, the overflow is not stored */
 		if (m_tirq_enabled)
 		{
-			m_timer_overflow = TRUE;
+			m_timer_overflow = true;
 			check_irqs();
 		}
 	}

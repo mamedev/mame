@@ -567,7 +567,7 @@ READ8_MEMBER( z80scc_device::zbus_r )
 		return data;
 	}
 
-    switch ((m_chanB->m_wr0) & 7)
+	switch ((m_chanB->m_wr0) & 7)
 	{
 	case z80scc_channel::WR0_Z_SEL_SHFT_LEFT:  ba = offset & 0x01; reg = (offset >> 1) & 0x0f; break; /* Shift Left mode */
 	case z80scc_channel::WR0_Z_SEL_SHFT_RIGHT: ba = offset & 0x10; reg = (offset >> 1) & 0x0f; break; /* Shift Right mode */
@@ -600,7 +600,7 @@ WRITE8_MEMBER( z80scc_device::zbus_w )
 		return;
 	}
 
-    switch ((m_chanB->m_wr0) & 7)
+	switch ((m_chanB->m_wr0) & 7)
 	{
 	case z80scc_channel::WR0_Z_SEL_SHFT_LEFT:  ba = offset & 0x01; reg = (offset >> 1) & 0x0f; break; /* Shift Left mode */
 	case z80scc_channel::WR0_Z_SEL_SHFT_RIGHT: ba = offset & 0x10; reg = (offset >> 1) & 0x0f; break; /* Shift Right mode */
@@ -926,7 +926,7 @@ void z80scc_channel::device_reset()
 	m_rr3   = 0x00;
 	m_rr10 &= 0x40;
 
-	// reset external lines 
+	// reset external lines
 	set_rts(m_wr5 & WR5_RTS ? 0 : 1);
 	set_dtr(m_wr14 & WR14_DTR_REQ_FUNC ? 0 : (m_wr5 & WR5_DTR ? 0 : 1));
 
@@ -1036,7 +1036,7 @@ void z80scc_channel::tra_complete()
 		if ( (m_rr0 & RR0_TX_BUFFER_EMPTY) == 0 || // Takes care of the NMOS/CMOS 1 slot TX FIFO
 			 m_tx_fifo_rp != m_tx_fifo_wp) // or there are more characters to send in a longer FIFO.
 		{
-			LOGTX((" %s() %s %c done sending, loading data from fifo:%02x '%c'\n", FUNCNAME, m_owner->tag(), 'A' + m_index, 
+			LOGTX((" %s() %s %c done sending, loading data from fifo:%02x '%c'\n", FUNCNAME, m_owner->tag(), 'A' + m_index,
 				   m_tx_data_fifo[m_tx_fifo_rp], isascii(m_tx_data_fifo[m_tx_fifo_rp]) ? m_tx_data_fifo[m_tx_fifo_rp] : ' '));
 			transmit_register_setup(m_tx_data_fifo[m_tx_fifo_rp]); // Reload the shift register
 			m_tx_fifo_rp_step();
@@ -1054,7 +1054,7 @@ void z80scc_channel::tra_complete()
 
 		if (m_wr1 & WR1_TX_INT_ENABLE)
 		{
-			if ((m_uart->m_variant & SET_ESCC) && 
+			if ((m_uart->m_variant & SET_ESCC) &&
 				(m_wr7p & WR7P_TX_FIFO_EMPTY)  &&
 				m_tx_fifo_wp == m_tx_fifo_rp)  // ESCC and fifo empty bit set and fifo is completelly empty?
 			{
@@ -1458,22 +1458,22 @@ uint8_t z80scc_channel::do_sccreg_rr15()
 //-------------------------------------------------
 uint8_t z80scc_channel::scc_register_read( uint8_t reg)
 {
-	if (reg > 1) 
+	if (reg > 1)
 		LOG(("%s %02x\n", FUNCNAME, reg));
 	uint8_t data = 0;
 	uint8_t wreg = 0;
 
 	/* Sort out 80X30 limitations in register access */
-//	if ((BIT(m_wr15, 2) == 0) || m_uart->m_variant == z80scc_device::TYPE_SCC8030)
+//  if ((BIT(m_wr15, 2) == 0) || m_uart->m_variant == z80scc_device::TYPE_SCC8030)
 	if (BIT(m_wr15, 2) == 0 || m_uart->m_variant & SET_NMOS)
 	{
 		if (reg > 3 && reg < 8) reg &= 0x03;
 		else if (reg == 9) reg = 13;
 		else if (reg == 11) reg = 15;
 	}
-	else if (BIT(m_wr15, 2) != 0) 
+	else if (BIT(m_wr15, 2) != 0)
 	{
-//		if (m_uart->variant == z80scc_device::TYPE_SCC80230 && BIT(m_wr7p, 6) != 0)
+//      if (m_uart->variant == z80scc_device::TYPE_SCC80230 && BIT(m_wr7p, 6) != 0)
 		if (m_uart->m_variant & SET_ESCC && BIT(m_wr7p, 6) != 0)
 		{
 			if (reg > 3 && reg < 6) wreg = 1;
@@ -1754,7 +1754,7 @@ void z80scc_channel::do_sccreg_wr5(uint8_t data)
 	}
 	else
 	{
-		//		uint8_t old_wr5 = m_wr5;
+		//      uint8_t old_wr5 = m_wr5;
 		m_wr5 = data;
 		LOG(("- Transmitter Enable %u\n", (data & WR5_TX_ENABLE) ? 1 : 0));
 		LOG(("- Transmitter Bits/Character %u\n", get_tx_word_length()));
@@ -2265,7 +2265,7 @@ void z80scc_channel::data_write(uint8_t data)
 		// Check FIFO fullness and set TBE bit accordingly
 		if (m_tx_fifo_sz == 1)
 		{
-			m_rr0 &= ~RR0_TX_BUFFER_EMPTY; // If only one FIFO position it is full now! 
+			m_rr0 &= ~RR0_TX_BUFFER_EMPTY; // If only one FIFO position it is full now!
 		}
 		else if (m_tx_fifo_wp + 1 == m_tx_fifo_rp || ( (m_tx_fifo_wp + 1 == m_tx_fifo_sz) && (m_tx_fifo_rp == 0) ))
 		{
@@ -2295,7 +2295,7 @@ void z80scc_channel::data_write(uint8_t data)
 	// check if to fire interrupt
 	if (m_wr1 & WR1_TX_INT_ENABLE)
 	{
-		if ((m_uart->m_variant & SET_ESCC) && 
+		if ((m_uart->m_variant & SET_ESCC) &&
 			(m_wr7p & WR7P_TX_FIFO_EMPTY)  &&
 			m_tx_fifo_wp == m_tx_fifo_rp)  // ESCC and fifo empty bit set and fifo is completelly empty?
 		{

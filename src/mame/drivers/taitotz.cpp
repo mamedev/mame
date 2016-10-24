@@ -2542,7 +2542,7 @@ void taitotz_state::machine_start()
 	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	m_maincpu->ppcdrc_add_fastram(0x40000000, 0x40ffffff, FALSE, m_work_ram);
+	m_maincpu->ppcdrc_add_fastram(0x40000000, 0x40ffffff, false, m_work_ram);
 }
 
 

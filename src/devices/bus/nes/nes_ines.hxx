@@ -343,11 +343,11 @@ void nes_cart_slot_device::call_load_ines()
 	uint32_t prg_size, vrom_size;
 	uint8_t header[0x10];
 	uint8_t mapper, submapper = 0, local_options;
-	bool ines20 = FALSE, prg16k;
+	bool ines20 = false, prg16k;
 	std::string mapinfo;
 	int pcb_id = 0, mapint1 = 0, mapint2 = 0, mapint3 = 0, mapint4 = 0;
 	int crc_hack = 0;
-	bool bus_conflict = FALSE;
+	bool bus_conflict = false;
 
 	// read out the header
 	fseek(0, SEEK_SET);
@@ -371,7 +371,7 @@ void nes_cart_slot_device::call_load_ines()
 			break;
 
 		case 0x8:   // it's iNES 2.0 format
-			ines20 = TRUE;
+			ines20 = true;
 		case 0x0:
 		default:
 			mapper |= header[7] & 0xf0;
@@ -423,11 +423,11 @@ void nes_cart_slot_device::call_load_ines()
 			logerror("Unimplemented iNES2.0 submapper: SEROM/SHROM/SH1ROM.\n");
 		// 002, 003, 007: UxROM, CNROM, AxROM
 		else if (mapper == 2 && submapper == 2)
-			bus_conflict = TRUE;
+			bus_conflict = true;
 		else if (mapper == 3 && submapper == 2)
-			bus_conflict = TRUE;
+			bus_conflict = true;
 		else if (mapper == 7 && submapper == 2)
-			bus_conflict = TRUE;
+			bus_conflict = true;
 		// 021, 023, 025: VRC4 / VRC2
 		else if (mapper == 21 || mapper == 23 || mapper == 25)
 		{
@@ -464,7 +464,7 @@ void nes_cart_slot_device::call_load_ines()
 		// iNES Mapper 071
 		else if (mapper == 71 && submapper == 1)
 		{
-			m_cart->set_pcb_ctrl_mirror(TRUE);    // Mapper 71 is used for 2 diff boards
+			m_cart->set_pcb_ctrl_mirror(true);    // Mapper 71 is used for 2 diff boards
 		}
 		// iNES Mapper 078
 		else if (mapper == 78)
@@ -498,8 +498,8 @@ void nes_cart_slot_device::call_load_ines()
 	m_cart->set_mirroring(BIT(local_options, 0) ? PPU_MIRROR_VERT : PPU_MIRROR_HORZ);
 	if (BIT(local_options, 1))
 		battery_size = NES_BATTERY_SIZE; // with original iNES format we can only support 8K WRAM battery
-	m_cart->set_trainer(BIT(local_options, 2) ? TRUE : FALSE);
-	m_cart->set_four_screen_vram(BIT(local_options, 3) ? TRUE : FALSE);
+	m_cart->set_trainer(BIT(local_options, 2) ? true : false);
+	m_cart->set_four_screen_vram(BIT(local_options, 3) ? true : false);
 
 	if (ines20)
 	{
@@ -537,7 +537,7 @@ void nes_cart_slot_device::call_load_ines()
 
 		case NOCASH_NOCHR:
 			// this mapper uses mirroring flags differently
-			m_cart->set_four_screen_vram(FALSE);
+			m_cart->set_four_screen_vram(false);
 			switch (local_options & 0x09)
 			{
 				case 0x00:
@@ -607,31 +607,31 @@ void nes_cart_slot_device::call_load_ines()
 			if (crc_hack && !submapper)
 				m_cart->set_mirroring(PPU_MIRROR_HIGH); // Major League has hardwired mirroring
 			else if (!submapper)
-				m_cart->set_pcb_ctrl_mirror(TRUE);
+				m_cart->set_pcb_ctrl_mirror(true);
 			break;
 
 		case DIS_74X161X161X32:
 			if (mapper == 70)
 				m_cart->set_mirroring(PPU_MIRROR_VERT); // only hardwired mirroring makes different mappers 70 & 152
 			else
-				m_cart->set_pcb_ctrl_mirror(TRUE);
+				m_cart->set_pcb_ctrl_mirror(true);
 			break;
 
 		case SUNSOFT_2:
 			if (mapper == 93)
 				m_cart->set_mirroring(PPU_MIRROR_VERT); // only hardwired mirroring makes different mappers 89 & 93
 			else
-				m_cart->set_pcb_ctrl_mirror(TRUE);
+				m_cart->set_pcb_ctrl_mirror(true);
 			break;
 
 		case HES_BOARD:
 			if (crc_hack)
-				m_cart->set_pcb_ctrl_mirror(TRUE);    // Mapper 113 is used for 2 diff boards
+				m_cart->set_pcb_ctrl_mirror(true);    // Mapper 113 is used for 2 diff boards
 			break;
 
 		case CAMERICA_BF9093:
 			if (crc_hack && !submapper)
-				m_cart->set_pcb_ctrl_mirror(TRUE);    // Mapper 71 is used for 2 diff boards
+				m_cart->set_pcb_ctrl_mirror(true);    // Mapper 71 is used for 2 diff boards
 			break;
 
 		case STD_BXROM:
@@ -670,7 +670,7 @@ void nes_cart_slot_device::call_load_ines()
 
 		case TAITO_X1_005:
 			if (mapper == 207)
-				m_cart->set_x1_005_alt(TRUE);
+				m_cart->set_x1_005_alt(true);
 			mapper_sram_size = m_cart->get_mapper_sram_size();
 			break;
 
@@ -814,7 +814,7 @@ void nes_cart_slot_device::call_load_ines()
 const char * nes_cart_slot_device::get_default_card_ines(uint8_t *ROM, uint32_t len)
 {
 	uint8_t mapper, submapper = 0;
-	bool ines20 = FALSE;
+	bool ines20 = false;
 	std::string mapinfo;
 	int pcb_id = 0, mapint1 = 0, mapint2 = 0, mapint3 = 0, mapint4 = 0;
 	int crc_hack = 0;
@@ -829,7 +829,7 @@ const char * nes_cart_slot_device::get_default_card_ines(uint8_t *ROM, uint32_t 
 			break;
 
 		case 0x8:   // it's iNES 2.0 format
-			ines20 = TRUE;
+			ines20 = true;
 		case 0x0:
 		default:
 			mapper |= ROM[7] & 0xf0;

@@ -332,7 +332,7 @@ GFXDECODE_END
 
 PALETTE_INIT_MEMBER(sm7238_state, sm7238)
 {
-	palette.set_pen_color(0, rgb_t::black); // black
+	palette.set_pen_color(0, rgb_t::black());
 	palette.set_pen_color(1, 0x00, 0xc0, 0x00); // green
 	palette.set_pen_color(2, 0x00, 0xff, 0x00); // highlight
 }

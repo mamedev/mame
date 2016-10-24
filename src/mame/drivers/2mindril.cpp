@@ -153,7 +153,7 @@ void _2mindril_state::device_timer(emu_timer &timer, device_timer_id id, int par
 			m_defender_sensor = param;
 			break;
 	default:
-			assert_always(FALSE, "Unknown id in _2mindril_state::device_timer");
+			assert_always(false, "Unknown id in _2mindril_state::device_timer");
 	}
 }
 #endif

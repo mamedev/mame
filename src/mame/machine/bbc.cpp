@@ -886,8 +886,8 @@ WRITE8_MEMBER(bbc_state::bbcb_via_system_write_portb)
 				{
 					/* VSP TMS 5220 */
 					m_b1_speech_read = 1;
-					//logerror("Speech read select TRUE\n");
-					if (m_tms) m_tms->rsq_w(TRUE);
+					//logerror("Speech read select true\n");
+					if (m_tms) m_tms->rsq_w(true);
 				}
 			}
 			break;
@@ -904,8 +904,8 @@ WRITE8_MEMBER(bbc_state::bbcb_via_system_write_portb)
 				{
 					/* VSP TMS 5220 */
 					m_b2_speech_write = 1;
-					//logerror("Speech write select TRUE\n");
-					if (m_tms) m_tms->wsq_w(TRUE);
+					//logerror("Speech write select true\n");
+					if (m_tms) m_tms->wsq_w(true);
 				}
 			}
 			break;
@@ -969,8 +969,8 @@ WRITE8_MEMBER(bbc_state::bbcb_via_system_write_portb)
 				{
 					/* VSP TMS 5220 */
 					m_b1_speech_read = 0;
-					//logerror("Speech read select FALSE\n");
-					if (m_tms) m_tms->rsq_w(FALSE);
+					//logerror("Speech read select false\n");
+					if (m_tms) m_tms->rsq_w(false);
 				}
 			}
 			break;
@@ -987,8 +987,8 @@ WRITE8_MEMBER(bbc_state::bbcb_via_system_write_portb)
 				{
 					/* VSP TMS 5220 */
 					m_b2_speech_write = 0;
-					//logerror("Speech write select FALSE\n");
-					if (m_tms) m_tms->wsq_w(FALSE);
+					//logerror("Speech write select false\n");
+					if (m_tms) m_tms->wsq_w(false);
 				}
 			}
 			break;

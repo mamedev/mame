@@ -68,7 +68,7 @@ OPTION_GUIDE_START(floppy_option_guide)
 OPTION_GUIDE_END
 
 
-static void floppy_close_internal(floppy_image_legacy *floppy, int close_file);
+static void floppy_close_internal(floppy_image_legacy *floppy, bool close_file);
 
 /*********************************************************************
     opening, closing and creating of floppy images
@@ -167,7 +167,7 @@ done:
 	/* if we have a floppy disk and we either errored or are not keeping it, close it */
 	if (floppy && (!outfloppy || err))
 	{
-		floppy_close_internal(floppy, FALSE);
+		floppy_close_internal(floppy, false);
 		floppy = nullptr;
 	}
 
@@ -270,20 +270,20 @@ floperr_t floppy_create(void *fp, const struct io_procs *procs, const struct Flo
 done:
 	if (err && floppy)
 	{
-		floppy_close_internal(floppy, FALSE);
+		floppy_close_internal(floppy, false);
 		floppy = nullptr;
 	}
 
 	if (outfloppy)
 		*outfloppy = floppy;
 	else if (floppy)
-		floppy_close_internal(floppy, FALSE);
+		floppy_close_internal(floppy, false);
 	return err;
 }
 
 
 
-static void floppy_close_internal(floppy_image_legacy *floppy, int close_file)
+static void floppy_close_internal(floppy_image_legacy *floppy, bool close_file)
 {
 	if (floppy) {
 		floppy_track_unload(floppy);
@@ -304,7 +304,7 @@ static void floppy_close_internal(floppy_image_legacy *floppy, int close_file)
 
 void floppy_close(floppy_image_legacy *floppy)
 {
-	floppy_close_internal(floppy, TRUE);
+	floppy_close_internal(floppy, true);
 }
 
 
@@ -388,7 +388,7 @@ uint64_t floppy_image_size(floppy_image_legacy *floppy)
 *********************************************************************/
 
 static floperr_t floppy_readwrite_sector(floppy_image_legacy *floppy, int head, int track, int sector, int offset,
-	void *buffer, size_t buffer_len, int writing, int indexed, int ddam)
+	void *buffer, size_t buffer_len, bool writing, bool indexed, int ddam)
 {
 	floperr_t err;
 	const struct FloppyCallbacks *fmt;
@@ -507,28 +507,28 @@ done:
 
 floperr_t floppy_read_sector(floppy_image_legacy *floppy, int head, int track, int sector, int offset,  void *buffer, size_t buffer_len)
 {
-	return floppy_readwrite_sector(floppy, head, track, sector, offset, buffer, buffer_len, FALSE, FALSE, 0);
+	return floppy_readwrite_sector(floppy, head, track, sector, offset, buffer, buffer_len, false, false, 0);
 }
 
 
 
 floperr_t floppy_write_sector(floppy_image_legacy *floppy, int head, int track, int sector, int offset, const void *buffer, size_t buffer_len, int ddam)
 {
-	return floppy_readwrite_sector(floppy, head, track, sector, offset, (void *) buffer, buffer_len, TRUE, FALSE, ddam);
+	return floppy_readwrite_sector(floppy, head, track, sector, offset, (void *) buffer, buffer_len, true, false, ddam);
 }
 
 
 
 floperr_t floppy_read_indexed_sector(floppy_image_legacy *floppy, int head, int track, int sector_index, int offset,    void *buffer, size_t buffer_len)
 {
-	return floppy_readwrite_sector(floppy, head, track, sector_index, offset, buffer, buffer_len, FALSE, TRUE, 0);
+	return floppy_readwrite_sector(floppy, head, track, sector_index, offset, buffer, buffer_len, false, true, 0);
 }
 
 
 
 floperr_t floppy_write_indexed_sector(floppy_image_legacy *floppy, int head, int track, int sector_index, int offset, const void *buffer, size_t buffer_len, int ddam)
 {
-	return floppy_readwrite_sector(floppy, head, track, sector_index, offset, (void *) buffer, buffer_len, TRUE, TRUE, ddam);
+	return floppy_readwrite_sector(floppy, head, track, sector_index, offset, (void *) buffer, buffer_len, true, true, ddam);
 }
 
 

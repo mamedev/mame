@@ -128,7 +128,7 @@ static imgtoolerr_t imgtool_floppy_open_internal(imgtool::image &image, imgtool:
 		err = imgtool_floppy_error(ferr);
 		goto done;
 	}
-	f = nullptr;	// the floppy object has the stream now
+	f = nullptr;    // the floppy object has the stream now
 
 	if (open)
 	{
@@ -147,7 +147,7 @@ done:
 
 static imgtoolerr_t imgtool_floppy_open(imgtool::image &image, imgtool::stream::ptr &&stream)
 {
-	return imgtool_floppy_open_internal(image, std::move(stream), FALSE);
+	return imgtool_floppy_open_internal(image, std::move(stream), false);
 }
 
 
@@ -179,7 +179,7 @@ static imgtoolerr_t imgtool_floppy_create(imgtool::image &image, imgtool::stream
 		err = imgtool_floppy_error(ferr);
 		goto done;
 	}
-	f = nullptr;	// the floppy object has the stream now
+	f = nullptr;    // the floppy object has the stream now
 
 	// do we have to do extra stuff when creating the image?
 	if (create)
@@ -301,12 +301,12 @@ int imgtool_floppy_make_class(int index, imgtool_class *imgclass)
 		imgtool_get_info_ptr(imgclass, IMGTOOLINFO_PTR_FLOPPY_FORMAT);
 	assert(format);
 	if (!format[index].construct)
-		return FALSE;
+		return false;
 
 	imgclass->derived_get_info = imgclass->get_info;
 	imgclass->get_info = imgtool_floppy_get_info;
 	imgclass->derived_param = (void *) &format[index];
-	return TRUE;
+	return true;
 }
 
 

@@ -1143,7 +1143,7 @@ void ioport_field::frame_update(ioport_value &result)
 	}
 
 	// for toggle switches, the current value is folded into the port's default value
-	// so we always return FALSE here
+	// so we always return false here
 	if (m_live->toggle)
 		curstate = false;
 
@@ -2516,7 +2516,7 @@ bool ioport_manager::playback_read<bool>(bool &result)
 {
 	uint8_t temp;
 	playback_read(temp);
-	return result = temp!=0;
+	return result = bool(temp);
 }
 
 
@@ -2974,7 +2974,7 @@ const char *ioport_configurer::string_from_token(const char *string)
 	if (uintptr_t(string) >= INPUT_STRING_COUNT)
 		return string;
 
-#if FALSE // Set TRUE, If you want to take care missing-token or wrong-sorting
+#if false // Set true, If you want to take care missing-token or wrong-sorting
 
 	// otherwise, scan the list for a matching string and return it
 	{

@@ -926,7 +926,7 @@ static char *hexstring(uint32_t value, int digits)
 	return (buffer[1] >= '0' && buffer[1] <= '9') ? &buffer[1] : &buffer[0];
 }
 
-static char *shexstring(uint32_t value, int digits, int always)
+static char *shexstring(uint32_t value, int digits, bool always)
 {
 	static char buffer[20];
 	if (value >= 0x80000000)
@@ -980,10 +980,10 @@ static void handle_modrm(char* s)
 	}
 	if( mod == 1 ) {
 		disp8 = FETCHD();
-		s += sprintf( s, "%s", shexstring((int32_t)disp8, 0, TRUE) );
+		s += sprintf( s, "%s", shexstring((int32_t)disp8, 0, true) );
 	} else if( mod == 2 ) {
 		disp16 = FETCHD16();
-		s += sprintf( s, "%s", shexstring((int32_t)disp16, 0, TRUE) );
+		s += sprintf( s, "%s", shexstring((int32_t)disp16, 0, true) );
 	}
 	s += sprintf( s, "]" );
 }
@@ -1049,17 +1049,17 @@ static char* handle_param(char* s, uint32_t param)
 
 		case PARAM_I8:
 			i8 = FETCHD();
-			s += sprintf( s, "%s", shexstring((int8_t)i8, 0, FALSE) );
+			s += sprintf( s, "%s", shexstring((int8_t)i8, 0, false) );
 			break;
 
 		case PARAM_I16:
 			i16 = FETCHD16();
-			s += sprintf( s, "%s", shexstring((int16_t)i16, 0, FALSE) );
+			s += sprintf( s, "%s", shexstring((int16_t)i16, 0, false) );
 			break;
 
 		case PARAM_UI8:
 			i8 = FETCHD();
-			s += sprintf( s, "%s", shexstring((uint8_t)i8, 0, FALSE) );
+			s += sprintf( s, "%s", shexstring((uint8_t)i8, 0, false) );
 			break;
 
 		case PARAM_IMM:

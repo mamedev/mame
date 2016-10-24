@@ -215,12 +215,12 @@ static int os9_interpret_dirent(void *entry, char **filename, uint32_t *lsn, int
 	*filename = NULL;
 	*lsn = 0;
 	if (corrupt)
-		*corrupt = FALSE;
+		*corrupt = false;
 
 	if (entry_b[28] != '\0')
 	{
 		if (corrupt)
-			*corrupt = TRUE;
+			*corrupt = true;
 	}
 
 	for (i = 0; (i < 28) && !(entry_b[i] & 0x80); i++)

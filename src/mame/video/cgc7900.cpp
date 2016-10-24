@@ -26,14 +26,14 @@
 
 PALETTE_INIT_MEMBER(cgc7900_state, cgc7900)
 {
-	palette.set_pen_color(0, rgb_t::black);
+	palette.set_pen_color(0, rgb_t::black());
 	palette.set_pen_color(1, rgb_t(0x00, 0x00, 0xff));
 	palette.set_pen_color(2, rgb_t(0x00, 0xff, 0x00));
 	palette.set_pen_color(3, rgb_t(0x00, 0xff, 0xff));
 	palette.set_pen_color(4, rgb_t(0xff, 0x00, 0x00));
 	palette.set_pen_color(5, rgb_t(0xff, 0x00, 0xff));
 	palette.set_pen_color(6, rgb_t(0xff, 0xff, 0x00));
-	palette.set_pen_color(7, rgb_t::white);
+	palette.set_pen_color(7, rgb_t::white());
 }
 
 /***************************************************************************

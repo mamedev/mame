@@ -665,7 +665,7 @@ inline void z80_device::ld_a_r()
 {
 	A = (m_r & 0x7f) | m_r2;
 	F = (F & CF) | SZ[A] | (m_iff2 << 2);
-	m_after_ldair = TRUE;
+	m_after_ldair = true;
 }
 
 /***************************************************************
@@ -683,7 +683,7 @@ inline void z80_device::ld_a_i()
 {
 	A = m_i;
 	F = (F & CF) | SZ[A] | (m_iff2 << 2);
-	m_after_ldair = TRUE;
+	m_after_ldair = true;
 }
 
 /***************************************************************
@@ -1359,7 +1359,7 @@ inline void z80_device::otdr()
 inline void z80_device::ei()
 {
 	m_iff1 = m_iff2 = 1;
-	m_after_ei = TRUE;
+	m_after_ei = true;
 }
 
 /**********************************************************
@@ -3139,7 +3139,7 @@ void z80_device::take_nmi()
 	PCD = 0x0066;
 	WZ=PCD;
 	m_icount -= 11;
-	m_nmi_pending = FALSE;
+	m_nmi_pending = false;
 }
 
 void z80_device::take_interrupt()
@@ -3475,9 +3475,9 @@ void z80_device::device_reset()
 	m_i = 0;
 	m_r = 0;
 	m_r2 = 0;
-	m_nmi_pending = FALSE;
-	m_after_ei = FALSE;
-	m_after_ldair = FALSE;
+	m_nmi_pending = false;
+	m_after_ei = false;
+	m_after_ldair = false;
 	m_iff1 = 0;
 	m_iff2 = 0;
 
@@ -3510,8 +3510,8 @@ void z80_device::execute_run()
 		else if (m_irq_state != CLEAR_LINE && m_iff1 && !m_after_ei)
 			take_interrupt();
 
-		m_after_ei = FALSE;
-		m_after_ldair = FALSE;
+		m_after_ei = false;
+		m_after_ldair = false;
 
 		PRVPC = PCD;
 		debugger_instruction_hook(this, PCD);
@@ -3539,8 +3539,8 @@ void nsc800_device::execute_run()
 		else if (m_irq_state != CLEAR_LINE && m_iff1 && !m_after_ei)
 			take_interrupt();
 
-		m_after_ei = FALSE;
-		m_after_ldair = FALSE;
+		m_after_ei = false;
+		m_after_ldair = false;
 
 		PRVPC = PCD;
 		debugger_instruction_hook(this, PCD);
@@ -3560,7 +3560,7 @@ void z80_device::execute_set_input(int inputnum, int state)
 	case INPUT_LINE_NMI:
 		/* mark an NMI pending on the rising edge */
 		if (m_nmi_state == CLEAR_LINE && state != CLEAR_LINE)
-			m_nmi_pending = TRUE;
+			m_nmi_pending = true;
 		m_nmi_state = state;
 		break;
 
@@ -3617,7 +3617,7 @@ void z80_device::state_import( const device_state_entry &entry )
 		case STATE_GENPC:
 			m_prvpc = m_pc;
 			break;
-			
+
 		case STATE_GENPCBASE:
 			m_pc = m_prvpc;
 			break;

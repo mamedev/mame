@@ -22,10 +22,10 @@ public:
 private:
 	TIMER_CALLBACK_MEMBER(int_timer_callback);
 	void exit_handler2();
-	void zeus2_register32_w(offs_t offset, uint32_t data, int logit);
-	void zeus2_register_update(offs_t offset, uint32_t oldval, int logit);
-	int zeus2_fifo_process(const uint32_t *data, int numwords);
+	void zeus2_register32_w(offs_t offset, uint32_t data, bool logit);
+	void zeus2_register_update(offs_t offset, uint32_t oldval, bool logit);
+	bool zeus2_fifo_process(const uint32_t *data, int numwords);
 	void zeus2_pointer_write(uint8_t which, uint32_t value);
-	void zeus2_draw_model(uint32_t baseaddr, uint16_t count, int logit);
+	void zeus2_draw_model(uint32_t baseaddr, uint16_t count, bool logit);
 	void log_fifo_command(const uint32_t *data, int numwords, const char *suffix);
 };

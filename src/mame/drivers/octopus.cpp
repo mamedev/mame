@@ -201,7 +201,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(serial_clock_w);
 	DECLARE_WRITE_LINE_MEMBER(parallel_busy_w) { m_printer_busy = state; }
 	DECLARE_WRITE_LINE_MEMBER(parallel_slctout_w) { m_printer_slctout = state; }
-	
+
 	DECLARE_WRITE_LINE_MEMBER(dack0_w) { m_dma1->hack_w(state ? 0 : 1); }  // for all unused DMA channel?
 	DECLARE_WRITE_LINE_MEMBER(dack1_w) { if(!state) m_current_dma = 1; else if(m_current_dma == 1) m_current_dma = -1; }  // HD
 	DECLARE_WRITE_LINE_MEMBER(dack2_w) { if(!state) m_current_dma = 2; else if(m_current_dma == 2) m_current_dma = -1; }  // RAM refresh
@@ -751,7 +751,7 @@ SCN2674_DRAW_CHARACTER_MEMBER(octopus_state::display_pixels)
 		uint8_t tile = m_vram[address & 0x0fff];
 		uint8_t data = m_fontram[(tile * 16) + linecount];
 		for (int z=0;z<8;z++)
-			bitmap.pix32(y,x + z) = BIT(data,z) ? rgb_t::white : rgb_t::black;
+			bitmap.pix32(y,x + z) = BIT(data,z) ? rgb_t::white() : rgb_t::black();
 	}
 }
 

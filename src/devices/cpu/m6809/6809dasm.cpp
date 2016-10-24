@@ -371,8 +371,10 @@ CPU_DISASSEMBLE( m6809 )
 	uint8_t opcode, mode, pb, pbm, reg;
 	const uint8_t *operandarray;
 	unsigned int ea, flags;
-	int numoperands, offset, indirect;
-	int i, p = 0, page = 0, opcode_found;
+	int numoperands, offset;
+	bool indirect;
+	int i, p = 0, page = 0;
+	bool opcode_found;
 
 	do
 	{
@@ -383,7 +385,7 @@ CPU_DISASSEMBLE( m6809 )
 				break;
 
 		if (i < m6809_numops[page])
-			opcode_found = TRUE;
+			opcode_found = true;
 		else
 		{
 			strcpy(buffer, "Illegal Opcode");
@@ -393,7 +395,7 @@ CPU_DISASSEMBLE( m6809 )
 		if (m6809_pgpointers[page][i].mode >= PG1)
 		{
 			page = m6809_pgpointers[page][i].mode - PG1 + 1;
-			opcode_found = FALSE;
+			opcode_found = false;
 		}
 	} while (!opcode_found);
 
@@ -485,7 +487,7 @@ CPU_DISASSEMBLE( m6809 )
 		pb = operandarray[0];
 		reg = (pb >> 5) & 3;
 		pbm = pb & 0x8f;
-		indirect = ((pb & 0x90) == 0x90 )? TRUE : FALSE;
+		indirect = ((pb & 0x90) == 0x90 )? true : false;
 
 		// open brackets if indirect
 		if (indirect && pbm != 0x80 && pbm != 0x82)

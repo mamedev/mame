@@ -296,7 +296,7 @@ void menu_dats_view::custom_render(void *selectedref, float top, float bottom, f
 	std::string driver = (m_issoft == true) ? m_swinfo->longname : m_driver->description;
 
 	ui().draw_text_full(container(), driver.c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
-		mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
+		mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
 	maxwidth = std::max(maxwidth, width);
 
@@ -321,7 +321,7 @@ void menu_dats_view::custom_render(void *selectedref, float top, float bottom, f
 	for (auto & elem : m_items_list)
 	{
 		ui().draw_text_full(container(), elem.label.c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::NEVER,
-			mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
+			mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), &width, nullptr);
 		maxwidth += width;
 	}
 
@@ -350,7 +350,7 @@ void menu_dats_view::custom_render(void *selectedref, float top, float bottom, f
 
 		if (bcolor != UI_TEXT_BG_COLOR)
 			ui().draw_textured_box(container(), x1 - (space / 2), y1, x1 + width + (space / 2), y2, bcolor, rgb_t(255, 43, 43, 43),
-				hilight_main_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
+				hilight_main_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(1));
 
 		ui().draw_text_full(container(), elem.label.c_str(), x1, y1, 1.0f, ui::text_layout::LEFT, ui::text_layout::NEVER, mame_ui_manager::NORMAL, fcolor, bcolor, &width, nullptr);
 		x1 += width + space;
@@ -360,7 +360,7 @@ void menu_dats_view::custom_render(void *selectedref, float top, float bottom, f
 	// bottom
 	std::string revision;
 	revision.assign(_("Revision: ")).append(m_items_list[m_actual].revision);
-	ui().draw_text_full(container(), revision.c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE, mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
+	ui().draw_text_full(container(), revision.c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE, mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
 	maxwidth = std::max(origx2 - origx1, width);
 

@@ -29,7 +29,7 @@ void segag80r_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		m_vblank_latch = 0;
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in segag80r_state::device_timer");
+		assert_always(false, "Unknown id in segag80r_state::device_timer");
 	}
 }
 

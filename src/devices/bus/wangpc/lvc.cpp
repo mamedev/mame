@@ -69,7 +69,7 @@ MC6845_UPDATE_ROW( wangpc_lvc_device::crtc_update_row )
 
 				if (column == cursor_x) color = 0x03;
 
-				bitmap.pix32(vbp + y, hbp + x) = de ? m_palette[color] : rgb_t::black;
+				bitmap.pix32(vbp + y, hbp + x) = de ? m_palette[color] : rgb_t::black();
 
 				data <<= 1;
 			}
@@ -91,7 +91,7 @@ MC6845_UPDATE_ROW( wangpc_lvc_device::crtc_update_row )
 
 				if (column == cursor_x) color = 0x03;
 
-				bitmap.pix32(vbp + y, hbp + x) = de ? m_palette[color] : rgb_t::black;
+				bitmap.pix32(vbp + y, hbp + x) = de ? m_palette[color] : rgb_t::black();
 
 				data <<= 1;
 			}

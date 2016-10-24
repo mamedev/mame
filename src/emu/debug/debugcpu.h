@@ -510,34 +510,34 @@ public:
 	/* ----- debugger memory accessors ----- */
 
 	/* return a byte from the specified memory space */
-	uint8_t read_byte(address_space &space, offs_t address, int apply_translation);
+	uint8_t read_byte(address_space &space, offs_t address, bool apply_translation);
 
 	/* return a word from the specified memory space */
-	uint16_t read_word(address_space &space, offs_t address, int apply_translation);
+	uint16_t read_word(address_space &space, offs_t address, bool apply_translation);
 
 	/* return a dword from the specified memory space */
-	uint32_t read_dword(address_space &space, offs_t address, int apply_translation);
+	uint32_t read_dword(address_space &space, offs_t address, bool apply_translation);
 
 	/* return a qword from the specified memory space */
-	uint64_t read_qword(address_space &space, offs_t address, int apply_translation);
+	uint64_t read_qword(address_space &space, offs_t address, bool apply_translation);
 
 	/* return 1,2,4 or 8 bytes from the specified memory space */
-	uint64_t read_memory(address_space &space, offs_t address, int size, int apply_translation);
+	uint64_t read_memory(address_space &space, offs_t address, int size, bool apply_translation);
 
 	/* write a byte to the specified memory space */
-	void write_byte(address_space &space, offs_t address, uint8_t data, int apply_translation);
+	void write_byte(address_space &space, offs_t address, uint8_t data, bool apply_translation);
 
 	/* write a word to the specified memory space */
-	void write_word(address_space &space, offs_t address, uint16_t data, int apply_translation);
+	void write_word(address_space &space, offs_t address, uint16_t data, bool apply_translation);
 
 	/* write a dword to the specified memory space */
-	void write_dword(address_space &space, offs_t address, uint32_t data, int apply_translation);
+	void write_dword(address_space &space, offs_t address, uint32_t data, bool apply_translation);
 
 	/* write a qword to the specified memory space */
-	void write_qword(address_space &space, offs_t address, uint64_t data, int apply_translation);
+	void write_qword(address_space &space, offs_t address, uint64_t data, bool apply_translation);
 
 	/* write 1,2,4 or 8 bytes to the specified memory space */
-	void write_memory(address_space &space, offs_t address, uint64_t data, int size, int apply_translation);
+	void write_memory(address_space &space, offs_t address, uint64_t data, int size, bool apply_translation);
 
 	/* read 1,2,4 or 8 bytes at the given offset from opcode space */
 	uint64_t read_opcode(address_space &space, offs_t offset, int size);

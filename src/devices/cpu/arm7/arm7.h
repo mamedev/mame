@@ -279,7 +279,7 @@ protected:
 	{
 		offs_t              start;                      /* start of the RAM block */
 		offs_t              end;                        /* end of the RAM block */
-		uint8_t               readonly;                   /* TRUE if read-only */
+		bool                readonly;                   /* true if read-only */
 		void *              base;                       /* base in memory where the RAM lives */
 	};
 
@@ -486,7 +486,7 @@ protected:
 	bool drcarm7ops_cd(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t op);
 	bool drcarm7ops_e(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t op);
 	bool drcarm7ops_f(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t op);
-	int generate_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	bool generate_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 
 };
 

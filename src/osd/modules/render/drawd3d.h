@@ -78,14 +78,14 @@ public:
 	void                    update_presentation_parameters();
 	void                    update_gamma_ramp();
 
-	int                     device_verify_caps();
+	bool					device_verify_caps();
 	int                     device_test_cooperative();
 
 	int                     config_adapter_mode();
 	void                    pick_best_mode();
 	int                     get_adapter_for_monitor();
 
-	int                     update_window_size();
+	bool                    update_window_size();
 
 	int                     pre_window_draw_check();
 	void                    begin_frame();

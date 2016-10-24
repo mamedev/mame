@@ -385,7 +385,7 @@ WRITE32_MEMBER(gaelco3d_state::gaelco3d_render_w)
 			m_poly->render_poly(*m_screen, &m_polydata_buffer[0]);
 			m_polydata_count = 0;
 		}
-		m_video_changed = TRUE;
+		m_video_changed = true;
 	}
 
 #if DISPLAY_STATS
@@ -471,7 +471,7 @@ uint32_t gaelco3d_state::screen_update_gaelco3d(screen_device &screen, bitmap_in
 		if (m_video_changed)
 			copybitmap(bitmap, m_poly->screenbits(), 0,1, 0,0, cliprect);
 		ret = m_video_changed;
-		m_video_changed = FALSE;
+		m_video_changed = false;
 	}
 
 	logerror("---update---\n");

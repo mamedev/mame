@@ -349,7 +349,7 @@ void ef9365_device::device_reset()
 
 	set_video_mode();
 
-	m_irq_handler(FALSE);
+	m_irq_handler(false);
 }
 
 //-------------------------------------------------

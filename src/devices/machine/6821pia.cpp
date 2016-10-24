@@ -143,8 +143,8 @@ void pia6821_device::device_reset()
 	// ports B,CB1,CB2 are three-state and undefined (set to 0)
 	//
 	m_in_a = 0xff;
-	m_in_ca1 = TRUE;
-	m_in_ca2 = TRUE;
+	m_in_ca1 = true;
+	m_in_ca2 = true;
 	m_out_a = 0;
 	m_out_ca2 = 0;
 	m_port_a_z_mask = 0;
@@ -183,8 +183,8 @@ void pia6821_device::device_reset()
 
 
 	// clear the IRQs
-	m_irqa_handler(FALSE);
-	m_irqb_handler(FALSE);
+	m_irqa_handler(false);
+	m_irqb_handler(false);
 }
 
 
@@ -409,20 +409,20 @@ uint8_t pia6821_device::port_a_r()
 	uint8_t ret = get_in_a_value();
 
 	// IRQ flags implicitly cleared by a read
-	m_irq_a1 = FALSE;
-	m_irq_a2 = FALSE;
+	m_irq_a1 = false;
+	m_irq_a2 = false;
 	update_interrupts();
 
 	// CA2 is configured as output and in read strobe mode
 	if(C2_OUTPUT(m_ctl_a) && C2_STROBE_MODE(m_ctl_a))
 	{
 		// this will cause a transition low
-		set_out_ca2(FALSE);
+		set_out_ca2(false);
 
 		// if the CA2 strobe is cleared by the E, reset it right away
 		if(STROBE_E_RESET(m_ctl_a))
 		{
-			set_out_ca2(TRUE);
+			set_out_ca2(true);
 		}
 	}
 
@@ -460,12 +460,12 @@ uint8_t pia6821_device::port_b_r()
 	// from what happens with port A.
 	if(m_irq_b1 && C2_STROBE_MODE(m_ctl_b) && STROBE_C1_RESET(m_ctl_b))
 	{
-		set_out_cb2(TRUE);
+		set_out_cb2(true);
 	}
 
 	// IRQ flags implicitly cleared by a read
-	m_irq_b1 = FALSE;
-	m_irq_b2 = FALSE;
+	m_irq_b1 = false;
+	m_irq_b2 = false;
 	update_interrupts();
 
 	LOG(("PIA #%s: port B read = %02X\n", tag(), ret));
@@ -740,12 +740,12 @@ void pia6821_device::port_b_w(uint8_t data)
 	if(C2_STROBE_MODE(m_ctl_b))
 	{
 		// this will cause a transition low
-		set_out_cb2(FALSE);
+		set_out_cb2(false);
 
 		// if the CB2 strobe is cleared by the E, reset it right away
 		if(STROBE_E_RESET(m_ctl_b))
 		{
-			set_out_cb2(TRUE);
+			set_out_cb2(true);
 		}
 	}
 }
@@ -807,7 +807,7 @@ void pia6821_device::control_a_w(uint8_t data)
 		else
 		{
 			// strobe mode - output is always high unless strobed
-			temp = TRUE;
+			temp = true;
 		}
 
 		set_out_ca2(temp);
@@ -842,7 +842,7 @@ void pia6821_device::control_b_w(uint8_t data)
 	else
 	{
 		// strobe mode - output is always high unless strobed
-		temp = TRUE;
+		temp = true;
 	}
 
 	set_out_cb2(temp);
@@ -946,7 +946,7 @@ WRITE_LINE_MEMBER( pia6821_device::ca1_w )
 		LOG(("PIA #%s: CA1 triggering\n", tag()));
 
 		// mark the IRQ
-		m_irq_a1 = TRUE;
+		m_irq_a1 = true;
 
 		// update externals
 		update_interrupts();
@@ -954,7 +954,7 @@ WRITE_LINE_MEMBER( pia6821_device::ca1_w )
 		// CA2 is configured as output and in read strobe mode and cleared by a CA1 transition
 		if(C2_OUTPUT(m_ctl_a) && C2_STROBE_MODE(m_ctl_a) && STROBE_C1_RESET(m_ctl_a))
 		{
-			set_out_ca2(TRUE);
+			set_out_ca2(true);
 		}
 	}
 
@@ -978,7 +978,7 @@ WRITE_LINE_MEMBER( pia6821_device::ca2_w )
 		LOG(("PIA #%s: CA2 triggering\n", tag()));
 
 		// mark the IRQ
-		m_irq_a2 = TRUE;
+		m_irq_a2 = true;
 
 		// update externals
 		update_interrupts();

@@ -683,7 +683,7 @@ void ymz280b_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	if (id < 8)
 		update_irq_state_timer_common( id );
 	else
-		assert_always(FALSE, "Unknown id in ymz280b_device::device_timer");
+		assert_always(false, "Unknown id in ymz280b_device::device_timer");
 }
 
 

@@ -207,11 +207,22 @@ uint32_t ie15_device::execute_max_cycles() const
 
 void ie15_device::execute_run()
 {
-	do
+	// Removing the hook entirely is considerably faster than calling it for every instruction if the debugger is disabled entirely
+	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
-		debugger_instruction_hook(this, m_PC.d);
-		execute_one(rop());
-	} while (m_icount > 0);
+		do
+		{
+			debugger_instruction_hook(this, m_PC.d);
+			execute_one(rop());
+		} while (m_icount > 0);
+	}
+	else
+	{
+		do
+		{
+			execute_one(rop());
+		} while (m_icount > 0);
+	}
 }
 
 inline void ie15_device::illegal(uint8_t opcode)

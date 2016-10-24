@@ -85,9 +85,9 @@ protected:
 	virtual void init();
 	virtual void start();
 
-	virtual int generate_cop2(drcuml_block *block, rsp_device::compiler_state *compiler, const opcode_desc *desc) { return TRUE; }
-	virtual int generate_lwc2(drcuml_block *block, rsp_device::compiler_state *compiler, const opcode_desc *desc) { return TRUE; }
-	virtual int generate_swc2(drcuml_block *block, rsp_device::compiler_state *compiler, const opcode_desc *desc) { return TRUE; }
+	virtual bool generate_cop2(drcuml_block *block, rsp_device::compiler_state *compiler, const opcode_desc *desc) { return true; }
+	virtual bool generate_lwc2(drcuml_block *block, rsp_device::compiler_state *compiler, const opcode_desc *desc) { return true; }
+	virtual bool generate_swc2(drcuml_block *block, rsp_device::compiler_state *compiler, const opcode_desc *desc) { return true; }
 
 	virtual void state_string_export(const int index, std::string &str) const;
 
@@ -172,7 +172,7 @@ public:
 	void            dump_dmem();
 
 protected:
-	virtual int     generate_vector_opcode(drcuml_block *block, rsp_device::compiler_state *compiler, const opcode_desc *desc) { return TRUE; }
+	virtual bool     generate_vector_opcode(drcuml_block *block, rsp_device::compiler_state *compiler, const opcode_desc *desc) { return true; }
 
 	uint16_t          SATURATE_ACCUM(int accum, int slice, uint16_t negative, uint16_t positive);
 

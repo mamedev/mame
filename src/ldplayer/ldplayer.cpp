@@ -176,7 +176,7 @@ protected:
 
 chd_file *ldplayer_state::get_disc()
 {
-	bool found = FALSE;
+	bool found = false;
 	// open a path to the ROMs and find the first CHD file
 	file_enumerator path(machine().options().media_path());
 
@@ -206,7 +206,7 @@ chd_file *ldplayer_state::get_disc()
 				if (machine().rom_load().set_disk_handle("laserdisc", fullpath.c_str()) == CHDERR_NONE)
 				{
 					m_filename.assign(dir->name);
-					found = TRUE;
+					found = true;
 					break;
 				}
 			}
@@ -214,7 +214,7 @@ chd_file *ldplayer_state::get_disc()
 	}
 
 	// if we failed, pop a message and exit
-	if (found == FALSE)
+	if (found == false)
 		throw emu_fatalerror("No valid image file found!\n");
 
 	return machine().rom_load().get_disk_handle("laserdisc");

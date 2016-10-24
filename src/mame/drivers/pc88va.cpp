@@ -559,7 +559,7 @@ void pc88va_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 		pc88va_fdc_motor_start_1(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in pc88va_state::device_timer");
+		assert_always(false, "Unknown id in pc88va_state::device_timer");
 	}
 }
 

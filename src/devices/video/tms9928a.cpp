@@ -668,8 +668,8 @@ void tms9928a_device::set_palette()
 	*/
 	static const rgb_t tms9928a_palette[TMS9928A_PALETTE_SIZE] =
 	{
-		rgb_t::black,
-		rgb_t::black,
+		rgb_t::black(),
+		rgb_t::black(),
 		rgb_t(33, 200, 66),
 		rgb_t(94, 220, 120),
 		rgb_t(84, 85, 237),
@@ -683,7 +683,7 @@ void tms9928a_device::set_palette()
 		rgb_t(33, 176, 59),
 		rgb_t(201, 91, 186),
 		rgb_t(204, 204, 204),
-		rgb_t::white
+		rgb_t::white()
 	};
 
 	/* copy default palette into working palette */

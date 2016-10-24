@@ -826,7 +826,7 @@ if (subregdata_count[which] < 256)
  *  Process the FIFO
  *************************************/
 
-int zeus2_device::zeus2_fifo_process(const uint32_t *data, int numwords)
+bool zeus2_device::zeus2_fifo_process(const uint32_t *data, int numwords)
 {
 	int dataoffs = 0;
 
@@ -839,13 +839,13 @@ int zeus2_device::zeus2_fifo_process(const uint32_t *data, int numwords)
 		if (((data[0] >> 16) & 0x7f) == 0x0) {
 			if (log_fifo && (data[0] & 0xfff) != 0x2c0)
 				log_fifo_command(data, numwords, " -- ignored\n");
-			return TRUE;
+			return true;
 		}
 		// Drop through to 0x05 command
 	/* 0x05: write 32-bit value to low registers */
 	case 0x05:
 		if (numwords < 2)
-			return FALSE;
+			return false;
 		if (log_fifo)
 			log_fifo_command(data, numwords, " -- reg32");
 		if (((data[0] >> 16) & 0x7f) != 0x08)
@@ -855,13 +855,13 @@ int zeus2_device::zeus2_fifo_process(const uint32_t *data, int numwords)
 		/* 0x08: set matrix and point (thegrid) */
 		case 0x08:
 			if (numwords < 14)
-				return FALSE;
+				return false;
 			dataoffs = 1;
 
 		/* 0x07: set matrix and point (crusnexo) */
 		case 0x07:
 			if (numwords < 13)
-				return FALSE;
+				return false;
 
 			/* extract the matrix from the raw data */
 			zeus_matrix[0][0] = convert_float(data[dataoffs + 1]);
@@ -899,7 +899,7 @@ int zeus2_device::zeus2_fifo_process(const uint32_t *data, int numwords)
 		case 0x15:
 		case 0x16:
 			if (numwords < 4)
-				return FALSE;
+				return false;
 
 			/* extract the translation point from the raw data */
 			zeus_point[0] = convert_float(data[1]);
@@ -920,7 +920,7 @@ int zeus2_device::zeus2_fifo_process(const uint32_t *data, int numwords)
 		case 0x1c:
 			if (m_thegrid) {
 				if (numwords < 3)
-					return FALSE;
+					return false;
 				if (log_fifo)
 					log_fifo_command(data, numwords, " -- unknown control\n");
 				break;
@@ -931,7 +931,7 @@ int zeus2_device::zeus2_fifo_process(const uint32_t *data, int numwords)
 		case 0x10:
 		case 0x1b:
 			if (numwords < 4)
-				return FALSE;
+				return false;
 			if (log_fifo)
 			{
 				log_fifo_command(data, numwords, " -- unknown control + happens after clear screen\n");
@@ -950,7 +950,7 @@ int zeus2_device::zeus2_fifo_process(const uint32_t *data, int numwords)
 		// thegrid ???
 		case 0x1d:
 			if (numwords < 2)
-				return FALSE;
+				return false;
 			if (log_fifo)
 			{
 				log_fifo_command(data, numwords, " -- unknown\n");
@@ -966,7 +966,7 @@ int zeus2_device::zeus2_fifo_process(const uint32_t *data, int numwords)
 		case 0x23:
 		case 0x24:
 			if (numwords < 2)
-				return FALSE;
+				return false;
 			if (log_fifo)
 				log_fifo_command(data, numwords, "");
 			zeus2_draw_model(data[1], data[0] & 0xffff, log_fifo);
@@ -975,7 +975,7 @@ int zeus2_device::zeus2_fifo_process(const uint32_t *data, int numwords)
 		// 0x2d; set direct render pixels location (atlantis)
 		case 0x2d:
 			if (numwords < 2)
-				return FALSE;
+				return false;
 			if (log_fifo)
 				log_fifo_command(data, numwords, "\n");
 			m_renderAddr = frame_addr_from_phys_addr(data[1]);
@@ -997,14 +997,14 @@ int zeus2_device::zeus2_fifo_process(const uint32_t *data, int numwords)
 		case 0x38:
 			if (data[0] == 0x38000000) {
 				if (numwords < 3)
-					return FALSE;
+					return false;
 				// Direct write to frame buffer
 				m_frameColor[m_renderAddr++] = conv_rgb555_to_rgb32((uint16_t)data[1]);
 				m_frameColor[m_renderAddr++] = conv_rgb555_to_rgb32((uint16_t)(data[1] >> 16));
 				m_frameColor[m_renderAddr++] = conv_rgb555_to_rgb32((uint16_t)data[2]);
 				m_frameColor[m_renderAddr++] = conv_rgb555_to_rgb32((uint16_t)(data[2] >> 16));
 			} else if (numwords < 12)
-				return FALSE;
+				return false;
 			//print_fifo_command(data, numwords, "\n");
 			if (log_fifo)
 				log_fifo_command(data, numwords, "\n");
@@ -1019,7 +1019,7 @@ int zeus2_device::zeus2_fifo_process(const uint32_t *data, int numwords)
 			}
 			break;
 	}
-	return TRUE;
+	return true;
 }
 
 /*************************************
@@ -1030,7 +1030,7 @@ void zeus2_device::zeus2_draw_model(uint32_t baseaddr, uint16_t count, int logit
 {
 	uint32_t databuffer[32];
 	int databufcount = 0;
-	int model_done = FALSE;
+	int model_done = false;
 	uint32_t texdata = 0;
 
 	if (logit)
@@ -1071,7 +1071,7 @@ void zeus2_device::zeus2_draw_model(uint32_t baseaddr, uint16_t count, int logit
 				if (logit)
 				{
 					//if ((cmd == 0x38) || (cmd == 0x2d))
-					//	log_render_info(texdata);
+					//  log_render_info(texdata);
 					if (cmd != 0x00 || (cmd == 0x00 && curoffs == count)) {
 						logerror("\t");
 						for (int offs = 0; offs < databufcount; offs++)
@@ -1120,24 +1120,24 @@ void zeus2_device::zeus2_draw_model(uint32_t baseaddr, uint16_t count, int logit
 							// Direct commands from waveram buffer
 							//uint32_t cmdData[2];
 							//for (int subIndex = 0; subIndex < 2; ++subIndex) {
-							//	uint32_t offset = (databuffer[subIndex] & 0xff) * 6;
-							//	//printf("directRead curoffs: 0x%X\n", curoffs);
-							//	for (int cmdIndex = 0; cmdIndex < 3; ++cmdIndex) {
-							//		cmdData[0] = m_directCmd[offset + cmdIndex * 2 + 0];
-							//		cmdData[1] = m_directCmd[offset + cmdIndex * 2 + 1];
-							//		if (curoffs < 0x40)
-							//			printf("directRead curoffs: 0x%X cmdData %08X %08X\n", curoffs, cmdData[0], cmdData[1]);
-							//		if (cmdData[0] != 0 && cmdData[1] != 0) {
-							//			// Error check
-							//			if (cmdData[0] != 0x58 && cmdData[0] != 0x5A) {
-							//				if (curoffs < 0x20)
-							//					printf("case38 error curoffs: 0x%X cmdData %08X %08X\n", curoffs, cmdData[0], cmdData[1]);
-							//			}
-							//			else {
-							//				zeus2_register32_w(cmdData[0] & 0x7f, cmdData[1], logit);
-							//			}
-							//		}
-							//	}
+							//  uint32_t offset = (databuffer[subIndex] & 0xff) * 6;
+							//  //printf("directRead curoffs: 0x%X\n", curoffs);
+							//  for (int cmdIndex = 0; cmdIndex < 3; ++cmdIndex) {
+							//      cmdData[0] = m_directCmd[offset + cmdIndex * 2 + 0];
+							//      cmdData[1] = m_directCmd[offset + cmdIndex * 2 + 1];
+							//      if (curoffs < 0x40)
+							//          printf("directRead curoffs: 0x%X cmdData %08X %08X\n", curoffs, cmdData[0], cmdData[1]);
+							//      if (cmdData[0] != 0 && cmdData[1] != 0) {
+							//          // Error check
+							//          if (cmdData[0] != 0x58 && cmdData[0] != 0x5A) {
+							//              if (curoffs < 0x20)
+							//                  printf("case38 error curoffs: 0x%X cmdData %08X %08X\n", curoffs, cmdData[0], cmdData[1]);
+							//          }
+							//          else {
+							//              zeus2_register32_w(cmdData[0] & 0x7f, cmdData[1], logit);
+							//          }
+							//      }
+							//  }
 							//}
 							//void *palbase = waveram0_ptr_from_expanded_addr(m_zeusbase[0x41]);
 							//uint8_t texel = databuffer[0];
@@ -1153,8 +1153,8 @@ void zeus2_device::zeus2_draw_model(uint32_t baseaddr, uint16_t count, int logit
 							//m_frameDepth[m_renderAddr] = 0;
 							//m_frameColor[m_renderAddr++] = databuffer[1] & 0x00ffffff;
 							//if (logit)
-							//	if ((curoffs + 1) % 16 == 0)
-							//		logerror("\n");
+							//  if ((curoffs + 1) % 16 == 0)
+							//      logerror("\n");
 						}
 						else {
 							poly->zeus2_draw_quad(databuffer, texdata, logit);

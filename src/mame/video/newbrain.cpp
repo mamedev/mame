@@ -151,7 +151,7 @@ uint32_t newbrain_state::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 	}
 	else
 	{
-		bitmap.fill(rgb_t::black, cliprect);
+		bitmap.fill(rgb_t::black(), cliprect);
 	}
 
 	return 0;
@@ -180,7 +180,7 @@ GFXDECODE_END
 MACHINE_CONFIG_FRAGMENT( newbrain_video )
 	MCFG_DEFAULT_LAYOUT(layout_newbrain)
 
-	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
 	MCFG_SCREEN_UPDATE_DRIVER(newbrain_state, screen_update)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */

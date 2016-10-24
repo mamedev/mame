@@ -90,11 +90,11 @@ public:
 class sns_rom_sgb2_device : public sns_rom_sgb_device
 {
 public:
-    // construction/destruction
-    sns_rom_sgb2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	// construction/destruction
+	sns_rom_sgb2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-    // device-level overrides
-    virtual machine_config_constructor device_mconfig_additions() const override;
+	// device-level overrides
+	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 

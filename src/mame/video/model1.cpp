@@ -1336,7 +1336,7 @@ void model1_state::tgp_render(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 			{
 				list_offset = draw_direct(bitmap, cliprect, list_offset);
 				break;
-			}				
+			}
 			case 3:
 			{
 				LOG_TGP(("VIDEO:   viewport (%d, %d, %d, %d, %d, %d, %d)\n",

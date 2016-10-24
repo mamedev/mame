@@ -576,8 +576,8 @@ void seattle_state::machine_start()
 	m_maincpu->mips3drc_set_options(MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
 
 	/* configure fast RAM regions */
-	m_maincpu->add_fastram(0x00000000, 0x007fffff, FALSE, m_rambase);
-	m_maincpu->add_fastram(0x1fc00000, 0x1fc7ffff, TRUE,  m_rombase);
+	m_maincpu->add_fastram(0x00000000, 0x007fffff, false, m_rambase);
+	m_maincpu->add_fastram(0x1fc00000, 0x1fc7ffff, true,  m_rombase);
 
 	/* register for save states */
 	save_item(NAME(m_galileo.reg));
@@ -618,8 +618,8 @@ void seattle_state::machine_reset()
 	m_galileo.dma_active = -1;
 
 	m_vblank_irq_num = 0;
-	m_voodoo_stalled = FALSE;
-	m_cpu_stalled_on_voodoo = FALSE;
+	m_voodoo_stalled = false;
+	m_cpu_stalled_on_voodoo = false;
 
 	/* reset either the DCS2 board or the CAGE board */
 	if (machine().device("dcs") != nullptr)
@@ -1370,7 +1370,7 @@ WRITE32_MEMBER(seattle_state::seattle_voodoo_w)
 		fatalerror("seattle_voodoo_w while CPU is stalled\n");
 
 	/* remember all the info about this access for later */
-	m_cpu_stalled_on_voodoo = TRUE;
+	m_cpu_stalled_on_voodoo = true;
 	m_cpu_stalled_offset = offset;
 	m_cpu_stalled_data = data;
 	m_cpu_stalled_mem_mask = mem_mask;
@@ -1392,7 +1392,7 @@ WRITE_LINE_MEMBER(seattle_state::voodoo_stall)
 		if (m_galileo.dma_active != -1)
 		{
 			if (LOG_DMA) logerror("Stalling DMA%d on voodoo\n", m_galileo.dma_active);
-			m_galileo.dma_stalled_on_voodoo[m_galileo.dma_active] = TRUE;
+			m_galileo.dma_stalled_on_voodoo[m_galileo.dma_active] = true;
 		}
 		else
 		{
@@ -1414,7 +1414,7 @@ WRITE_LINE_MEMBER(seattle_state::voodoo_stall)
 				if (LOG_DMA) logerror("Resuming DMA%d on voodoo\n", which);
 
 				/* mark this DMA as no longer stalled */
-				m_galileo.dma_stalled_on_voodoo[which] = FALSE;
+				m_galileo.dma_stalled_on_voodoo[which] = false;
 
 				/* resume execution */
 				galileo_perform_dma(space, which);
@@ -1430,7 +1430,7 @@ WRITE_LINE_MEMBER(seattle_state::voodoo_stall)
 				address_space &space = m_maincpu->space(AS_PROGRAM);
 				m_voodoo->voodoo_w(space, m_cpu_stalled_offset, m_cpu_stalled_data, m_cpu_stalled_mem_mask);
 			}
-			m_cpu_stalled_on_voodoo = FALSE;
+			m_cpu_stalled_on_voodoo = false;
 
 			/* resume CPU execution */
 			if (LOG_DMA) logerror("Resuming CPU on voodoo\n");
@@ -1709,7 +1709,7 @@ WRITE32_MEMBER(seattle_state::cmos_w)
 {
 	if (m_cmos_write_enabled)
 		COMBINE_DATA(m_nvram + offset);
-	m_cmos_write_enabled = FALSE;
+	m_cmos_write_enabled = false;
 }
 
 
@@ -1721,7 +1721,7 @@ READ32_MEMBER(seattle_state::cmos_r)
 
 WRITE32_MEMBER(seattle_state::cmos_protect_w)
 {
-	m_cmos_write_enabled = TRUE;
+	m_cmos_write_enabled = true;
 }
 
 

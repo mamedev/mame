@@ -560,7 +560,7 @@ DRIVER_INIT_MEMBER(igs017_state,tarzan)
 DRIVER_INIT_MEMBER(igs017_state,tarzana)
 {
 	tarzana_decrypt_program_rom();
-//	tarzana_decrypt_tiles();	// to do
+//  tarzana_decrypt_tiles();    // to do
 }
 
 // starzan

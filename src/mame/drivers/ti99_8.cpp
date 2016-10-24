@@ -624,8 +624,8 @@ WRITE_LINE_MEMBER( ti99_8_state::console_reset )
 		m_tms9901->rst1_line(state);
 
 		// Pull up the CRUS and PTGEN lines (9901 outputs have been deactivated, pull-up resistors on the board show effect)
-		m_mainboard->crus_in(TRUE); // assert
-		m_mainboard->ptgen_in(TRUE); // clear
+		m_mainboard->crus_in(true); // assert
+		m_mainboard->ptgen_in(true); // clear
 
 		// Setting ready to false so that automatic wait states are enabled
 		m_cpu->ready_line(CLEAR_LINE);

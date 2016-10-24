@@ -113,7 +113,7 @@ void pc1251_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 		m_power = 0;
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in pc1251_state::device_timer");
+		assert_always(false, "Unknown id in pc1251_state::device_timer");
 	}
 }
 

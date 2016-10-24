@@ -782,7 +782,7 @@ READ8_MEMBER(fidelz80_state::vcc_speech_r)
 MACHINE_START_MEMBER(fidelz80_state,vcc)
 {
 	machine_start();
-	
+
 	// game relies on RAM initialized filled with 1
 	for (int i = 0; i < 0x400; i++)
 		m_maincpu->space(AS_PROGRAM).write_byte(i + 0x4000, 0xff);
@@ -1502,7 +1502,7 @@ static MACHINE_CONFIG_START( vcc, fidelz80_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelz80base_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_fidel_vcc)
-	
+
 	MCFG_MACHINE_START_OVERRIDE(fidelz80_state,vcc)
 
 	/* sound hardware */

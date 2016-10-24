@@ -136,7 +136,7 @@ void alphatro_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		m_timer_bit ^= 0x80;
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in alphatro_state::device_timer");
+		assert_always(false, "Unknown id in alphatro_state::device_timer");
 	}
 }
 

@@ -592,7 +592,7 @@ static MACHINE_CONFIG_START( tunit_core, midtunit_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS34010, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_TMS340X0_HALT_ON_RESET(FALSE) /* halt on reset */
+	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(PIXEL_CLOCK) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(2) /* pixels per clock */
 	MCFG_TMS340X0_SCANLINE_IND16_CB(midtunit_state, scanline_update)       /* scanline updater (indexed16) */

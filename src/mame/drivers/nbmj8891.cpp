@@ -1243,7 +1243,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( scandal )
-        // do not have the manual
+		// do not have the manual
 	PORT_START("DSWA")
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("DSWA:1,2,3")
 	PORT_DIPSETTING(    0x07, "1 (Easy)" )

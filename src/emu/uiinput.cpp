@@ -20,7 +20,7 @@ enum
 {
 	SEQ_PRESSED_FALSE = 0,      /* not pressed */
 	SEQ_PRESSED_TRUE,           /* pressed */
-	SEQ_PRESSED_RESET           /* reset -- converted to FALSE once detected as not pressed */
+	SEQ_PRESSED_RESET           /* reset -- converted to false once detected as not pressed */
 };
 
 
@@ -224,7 +224,7 @@ ioport_field *ui_input_manager::find_mouse_field() const
 ***************************************************************************/
 
 /*-------------------------------------------------
-    pressed - return TRUE if a key down
+    pressed - return true if a key down
     for the given user interface sequence is
     detected
 -------------------------------------------------*/
@@ -236,7 +236,7 @@ bool ui_input_manager::pressed(int code)
 
 
 /*-------------------------------------------------
-    pressed_repeat - return TRUE if a key
+    pressed_repeat - return true if a key
     down for the given user interface sequence is
     detected, or if autorepeat at the given speed
     is triggered

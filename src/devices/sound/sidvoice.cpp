@@ -212,7 +212,7 @@ static void sidMode80hp(sidOperator* pVoice)  {
 
 static void sidModeLock(sidOperator* pVoice)
 {
-	pVoice->noiseIsLocked = TRUE;
+	pVoice->noiseIsLocked = true;
 	pVoice->output = (pVoice->filtIO-0x80);
 	waveAdvance(pVoice);
 }
@@ -570,7 +570,7 @@ void sidClearOperator( sidOperator* pVoice )
 	pVoice->SIDAD = 0;
 	pVoice->SIDSR = 0;
 
-	pVoice->sync = FALSE;
+	pVoice->sync = false;
 
 	pVoice->pulseIndex = (pVoice->newPulseIndex = (pVoice->SIDpulseWidth = 0));
 	pVoice->curSIDfreq = (pVoice->curNoiseFreq = 0);
@@ -578,7 +578,7 @@ void sidClearOperator( sidOperator* pVoice )
 	pVoice->output = (pVoice->noiseOutput = 0);
 	pVoice->filtIO = 0;
 
-	pVoice->filtEnabled = FALSE;
+	pVoice->filtEnabled = false;
 	pVoice->filtLow = (pVoice->filtRef = 0);
 
 	pVoice->cycleLenCount = 0;
@@ -611,13 +611,13 @@ void sidClearOperator( sidOperator* pVoice )
 	pVoice->noiseReg = noiseSeed;
 #endif
 	pVoice->noiseStepAdd = (pVoice->noiseStep = 0);
-	pVoice->noiseIsLocked = FALSE;
+	pVoice->noiseIsLocked = false;
 }
 
 void sidEmuSet2(sidOperator* pVoice)
 {
 	pVoice->outProc = &sidWaveCalcNormal;
-	pVoice->sync = FALSE;
+	pVoice->sync = false;
 
 	if ( (pVoice->SIDfreq < 16) || ((pVoice->SIDctrl & 8) != 0) )
 //    if ( /*(pVoice->SIDfreq < 16) || */((pVoice->SIDctrl & 8) != 0) )
@@ -642,7 +642,7 @@ void sidEmuSet2(sidOperator* pVoice)
 	{
 		if (pVoice->noiseIsLocked)
 		{
-		pVoice->noiseIsLocked = FALSE;
+		pVoice->noiseIsLocked = false;
 #if defined(DIRECT_FIXPOINT)
 		pVoice->noiseReg.l = noiseSeed;
 #else
@@ -699,7 +699,7 @@ void sidEmuSet2(sidOperator* pVoice)
 		}
 		else
 		{
-		pVoice->sync = TRUE;
+		pVoice->sync = true;
 		}
 	}
 

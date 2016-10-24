@@ -247,7 +247,7 @@ void exidy_sound_device::device_config_complete()
 void exidy_sound_device::device_start()
 {
 	/* indicate no additional hardware */
-	m_has_sh8253  = FALSE;
+	m_has_sh8253  = false;
 	m_tms = nullptr;
 	m_cvsd = nullptr;
 
@@ -694,7 +694,7 @@ void venture_sound_device::device_start()
 
 	m_riot = machine().device<riot6532_device>("riot");
 
-	m_has_sh8253  = TRUE;
+	m_has_sh8253  = true;
 	m_tms = nullptr;
 	m_pia0 = machine().device<pia6821_device>("pia0");
 	m_pia1 = machine().device<pia6821_device>("pia1");
@@ -954,7 +954,7 @@ void victory_sound_device::device_start()
 
 	m_riot = machine().device<riot6532_device>("riot");
 
-	m_has_sh8253  = TRUE;
+	m_has_sh8253  = true;
 	m_tms = nullptr;
 	m_pia0 = machine().device<pia6821_device>("pia0");
 	m_pia1 = machine().device<pia6821_device>("pia1");
