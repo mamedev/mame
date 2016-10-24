@@ -50,6 +50,9 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	// device_state_interface overrides
+	virtual void state_import(const device_state_entry &entry) override;
+
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const override { return 1; }
 	virtual uint32_t execute_max_cycles() const override { return 1; }
@@ -76,6 +79,7 @@ protected:
 	address_space_config m_io_config;
 
 	int m_icount;
+	bool m_increment_pc;
 
 	address_space *m_program;
 	direct_read_data *m_direct;
