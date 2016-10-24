@@ -588,7 +588,7 @@ static int cmd_readsector(const struct command *c, int argc, char *argv[])
 {
 	imgtoolerr_t err;
 	std::unique_ptr<imgtool::image> img;
-	imgtool::stream *stream = nullptr;
+	imgtool::stream::ptr stream;
 	std::vector<uint8_t> buffer;
 	uint32_t track, head, sector;
 
@@ -615,8 +615,6 @@ static int cmd_readsector(const struct command *c, int argc, char *argv[])
 	stream->write(&buffer[0], buffer.size());
 
 done:
-	if (stream)
-		delete stream;
 	if (err)
 		reporterror(err, c, argv[0], argv[1], nullptr, nullptr, nullptr);
 	return err ? -1 : 0;
@@ -628,7 +626,7 @@ static int cmd_writesector(const struct command *c, int argc, char *argv[])
 {
 	imgtoolerr_t err;
 	std::unique_ptr<imgtool::image> img;
-	imgtool::stream *stream = nullptr;
+	imgtool::stream::ptr stream;
 	std::vector<uint8_t> buffer;
 	uint32_t size, track, head, sector;
 
@@ -659,8 +657,6 @@ static int cmd_writesector(const struct command *c, int argc, char *argv[])
 		goto done;
 
 done:
-	if (stream)
-		delete stream;
 	if (err)
 		reporterror(err, c, argv[0], argv[1], nullptr, nullptr, nullptr);
 	return err ? -1 : 0;
