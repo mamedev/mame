@@ -17,7 +17,6 @@
 #pragma GCC diagnostic ignored "-Wunused-variable"
 #endif
 
-#define ASIO_HEADER_ONLY
 #define ASIO_STANDALONE
 #define ASIO_SEPARATE_COMPILATION
 #define ASIO_NOEXCEPT noexcept(true)
