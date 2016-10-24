@@ -154,7 +154,6 @@ private:
 	vec2f                   m_stop;                     // ending UV coordinates
 	vec2f                   m_rawdims;                  // raw dims of the texture
 	int                     m_type;                     // what type of texture are we?
-	int                     m_xborderpix, m_yborderpix; // number of border pixels on X/Y
 	int                     m_xprescale, m_yprescale;   // X/Y prescale factor
 	int                     m_cur_frame;                // what is our current frame?
 	IDirect3DTexture9 *     m_d3dtex;                   // Direct3D texture pointer
