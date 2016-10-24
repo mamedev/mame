@@ -96,6 +96,7 @@
 #include "xmlfile.h"
 #include "profiler.h"
 #include "ui/uimain.h"
+#include "inputdev.h"
 #include "natkeyboard.h"
 
 #include "osdepend.h"
@@ -1737,7 +1738,8 @@ time_t ioport_manager::initialize()
 			for (ioport_field &field : port.second->fields())
 				if (field.live().joystick != nullptr && field.rotated())
 				{
-					machine().input().set_global_joystick_map(joystick_map_4way_diagonal);
+					input_class_joystick &devclass = downcast<input_class_joystick &>(machine().input().device_class(DEVICE_CLASS_JOYSTICK));
+					devclass.set_global_joystick_map(input_class_joystick::map_4way_diagonal);
 					break;
 				}
 
@@ -1790,45 +1792,33 @@ void ioport_manager::init_autoselect_devices(int type1, int type2, int type3, co
 {
 	// if nothing specified, ignore the option
 	const char *stemp = machine().options().value(option);
-	if (stemp[0] == 0)
+	if (stemp[0] == 0 || strcmp(stemp, "none") == 0)
 		return;
 
 	// extract valid strings
-	const char *autostring = "keyboard";
-	input_device_class autoenable = DEVICE_CLASS_KEYBOARD;
-	if (strcmp(stemp, "mouse") == 0)
+	input_class *autoenable_class = nullptr;
+	for (input_device_class devclass = DEVICE_CLASS_FIRST_VALID; devclass <= DEVICE_CLASS_LAST_VALID; ++devclass)
+		if (strcmp(stemp, machine().input().device_class(devclass).name()) == 0)
+		{
+			autoenable_class = &machine().input().device_class(devclass);
+			break;
+		}
+	if (autoenable_class == nullptr)
 	{
-		autoenable = DEVICE_CLASS_MOUSE;
-		autostring = "mouse";
-	}
-	else if (strcmp(stemp, "joystick") == 0)
-	{
-		autoenable = DEVICE_CLASS_JOYSTICK;
-		autostring = "joystick";
-	}
-	else if (strcmp(stemp, "lightgun") == 0)
-	{
-		autoenable = DEVICE_CLASS_LIGHTGUN;
-		autostring = "lightgun";
-	}
-	else if (strcmp(stemp, "none") == 0)
-	{
-		// nothing specified
-		return;
-	}
-	else if (strcmp(stemp, "keyboard") != 0)
 		osd_printf_error("Invalid %s value %s; reverting to keyboard\n", option, stemp);
+		autoenable_class = &machine().input().device_class(DEVICE_CLASS_KEYBOARD);
+	}
 
 	// only scan the list if we haven't already enabled this class of control
-	if (!m_portlist.empty() && !machine().input().device_class(autoenable).enabled())
+	if (!autoenable_class->enabled())
 		for (auto &port : m_portlist)
 			for (ioport_field &field : port.second->fields())
 
 				// if this port type is in use, apply the autoselect criteria
 				if ((type1 != 0 && field.type() == type1) || (type2 != 0 && field.type() == type2) || (type3 != 0 && field.type() == type3))
 				{
-					osd_printf_verbose("Input: Autoenabling %s due to presence of a %s\n", autostring, ananame);
-					machine().input().device_class(autoenable).enable();
+					osd_printf_verbose("Input: Autoenabling %s due to presence of a %s\n", autoenable_class->name(), ananame);
+					autoenable_class->enable();
 					break;
 				}
 }

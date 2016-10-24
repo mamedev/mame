@@ -350,60 +350,10 @@ DECLARE_ENUM_OPERATORS(input_item_id)
 class input_device_item;
 class input_device;
 class input_class;
-class input_manager;
 
-
-// callback for getting the value of an item on a device
-typedef int32_t (*item_get_state_func)(void *device_internal, void *item_internal);
 
 // controller alias table typedef
 typedef std::map<std::string, std::string> devicemap_table_type;
-
-// ======================> joystick_map
-
-// a 9x9 joystick map
-class joystick_map
-{
-public:
-	// construction/destruction
-	joystick_map();
-	joystick_map(const joystick_map &src) { copy(src); }
-
-	// operators
-	joystick_map &operator=(const joystick_map &src) { if (this != &src) copy(src); return *this; }
-
-	// parse from a string
-	bool parse(const char *mapstring);
-
-	// create a friendly string
-	std::string to_string() const;
-
-	// update the state of a live map
-	uint8_t update(int32_t xaxisval, int32_t yaxisval);
-
-	// joystick mapping codes
-	static const uint8_t JOYSTICK_MAP_NEUTRAL = 0x00;
-	static const uint8_t JOYSTICK_MAP_LEFT    = 0x01;
-	static const uint8_t JOYSTICK_MAP_RIGHT   = 0x02;
-	static const uint8_t JOYSTICK_MAP_UP      = 0x04;
-	static const uint8_t JOYSTICK_MAP_DOWN    = 0x08;
-	static const uint8_t JOYSTICK_MAP_STICKY  = 0x0f;
-
-private:
-	// internal helpers
-	void copy(const joystick_map &src)
-	{
-		memcpy(m_map, src.m_map, sizeof(m_map));
-		m_lastmap = JOYSTICK_MAP_NEUTRAL;
-		m_origstring = src.m_origstring;
-	}
-
-	// internal state
-	uint8_t                   m_map[9][9];            // 9x9 grid
-	uint8_t                   m_lastmap;              // last value returned (for sticky tracking)
-	std::string             m_origstring;           // originally parsed string
-};
-
 
 // ======================> input_code
 
@@ -423,7 +373,6 @@ public:
 	}
 	input_code(const input_code &src)
 		: m_internal(src.m_internal) { }
-	input_code(input_device &device, input_item_id itemid);
 
 	// operators
 	bool operator==(const input_code &rhs) const { return m_internal == rhs.m_internal; }
@@ -495,155 +444,6 @@ private:
 };
 
 
-// ======================> input_device_item
-
-// a single item on an input device
-class input_device_item
-{
-protected:
-	// construction/destruction
-	input_device_item(input_device &device, const char *name, void *internal, input_item_id itemid, item_get_state_func getstate, input_item_class itemclass);
-
-public:
-	virtual ~input_device_item();
-
-	// getters
-	input_device &device() const { return m_device; }
-	input_manager &manager() const;
-	running_machine &machine() const;
-	const char *name() const { return m_name.c_str(); }
-	void *internal() const { return m_internal; }
-	input_item_id itemid() const { return m_itemid; }
-	input_item_class itemclass() const { return m_itemclass; }
-	const char *token() const { return m_token.c_str(); }
-	int32_t current() const { return m_current; }
-	int32_t memory() const { return m_memory; }
-
-	// helpers
-	int32_t update_value();
-	void set_memory(int32_t value) { m_memory = value; }
-
-	// readers
-	virtual int32_t read_as_switch(input_item_modifier modifier) = 0;
-	virtual int32_t read_as_relative(input_item_modifier modifier) = 0;
-	virtual int32_t read_as_absolute(input_item_modifier modifier) = 0;
-
-protected:
-	// internal state
-	input_device &          m_device;               // reference to our owning device
-	std::string             m_name;                 // string name of item
-	void *                  m_internal;             // internal callback pointer
-	input_item_id           m_itemid;               // originally specified item id
-	input_item_class        m_itemclass;            // class of the item
-	item_get_state_func     m_getstate;             // get state callback
-	std::string             m_token;                // tokenized name for non-standard items
-
-	// live state
-	int32_t                   m_current;              // current raw value
-	int32_t                   m_memory;               // "memory" value, to remember where we started during polling
-};
-
-
-// ======================> input_device
-
-// a logical device of a given class that can provide input
-class input_device
-{
-	friend class input_class;
-
-public:
-	// construction/destruction
-	input_device(input_class &_class, int _devindex, const char *_name, const char *_id, void *_internal);
-	// getters
-	input_class &device_class() const { return m_class; }
-	input_manager &manager() const;
-	running_machine &machine() const;
-	input_device_class devclass() const;
-	const char *name() const { return m_name.c_str(); }
-	const char *id() const { return m_id.c_str(); }
-	int devindex() const { return m_devindex; }
-	input_device_item *item(input_item_id index) const { return m_item[index].get(); }
-	input_item_id maxitem() const { return m_maxitem; }
-	void *internal() const { return m_internal; }
-	joystick_map &joymap() { return m_joymap; }
-	bool steadykey_enabled() const { return m_steadykey_enabled; }
-	bool lightgun_reload_button() const { return m_lightgun_reload_button; }
-
-	// setters
-	void set_devindex(int devindex) { m_devindex = devindex; }
-
-	// item management
-	input_item_id add_item(const char *name, input_item_id itemid, item_get_state_func getstate, void *internal = nullptr);
-	void set_joystick_map(const joystick_map &map) { m_joymap = map; }
-
-	// helpers
-	int32_t apply_deadzone_and_saturation(int32_t value) const;
-	void apply_steadykey() const;
-	bool match_device_id(const char * deviceid);
-
-private:
-	// internal state
-	input_class &           m_class;                // reference to our class
-	std::string             m_name;                 // string name of device
-	std::string             m_id;                   // id of device
-	int                     m_devindex;             // device index of this device
-	std::unique_ptr<input_device_item> m_item[ITEM_ID_ABSOLUTE_MAXIMUM+1]; // array of pointers to items
-	input_item_id           m_maxitem;              // maximum item index
-	void *                  m_internal;             // internal callback pointer
-
-	// joystick information
-	joystick_map            m_joymap;               // joystick map for this device
-	int32_t                   m_joystick_deadzone;    // deadzone for joystick
-	int32_t                   m_joystick_saturation;  // saturation position for joystick
-	bool                    m_steadykey_enabled;    // steadykey enabled for keyboards
-	bool                    m_lightgun_reload_button; // lightgun reload hack
-};
-
-
-// ======================> input_class
-
-// a class of device that provides input
-class input_class
-{
-public:
-	// construction/destruction
-	input_class(input_manager &manager, input_device_class devclass, bool enabled = false, bool multi = false);
-
-	// getters
-	input_manager &manager() const { return m_manager; }
-	running_machine &machine() const;
-	input_device *device(int index) const { return (index <= m_maxindex) ? m_device[index].get() : nullptr; }
-	input_device_class devclass() const { return m_devclass; }
-	int maxindex() const { return m_maxindex; }
-	bool enabled() const { return m_enabled; }
-	bool multi() const { return m_multi; }
-
-	// setters
-	void enable(bool state = true) { m_enabled = state; }
-	void set_multi(bool multi = true) { m_multi = multi; }
-
-	// device management
-	input_device *add_device(const char *name, const char *id, void *internal = nullptr);
-	input_device *add_device(int devindex, const char *name, const char *id, void *internal = nullptr);
-
-	// misc helpers
-	input_item_class standard_item_class(input_item_id itemid);
-	void remap_device_index(int oldindex, int newindex);
-
-private:
-	// internal helpers
-	void frame_callback();
-
-	// internal state
-	input_manager &         m_manager;              // reference to our manager
-	std::unique_ptr<input_device> m_device[DEVICE_INDEX_MAXIMUM]; // array of devices in this class
-	input_device_class      m_devclass;             // our device class
-	int                     m_maxindex;             // maximum populated index
-	bool                    m_enabled;              // is this class enabled?
-	bool                    m_multi;                // are multiple instances of this class allowed?
-};
-
-
 // ======================> input_manager
 
 // global machine-level information about devices
@@ -652,10 +452,11 @@ class input_manager
 public:
 	// construction/destruction
 	input_manager(running_machine &machine);
+	~input_manager();
 
 	// getters
 	running_machine &machine() const { return m_machine; }
-	input_class &device_class(input_device_class devclass) { assert(devclass < ARRAY_LENGTH(m_class)); assert(m_class[devclass] != nullptr); return *m_class[devclass]; }
+	input_class &device_class(input_device_class devclass) { assert(devclass >= DEVICE_CLASS_FIRST_VALID && devclass <= DEVICE_CLASS_LAST_VALID); return *m_class[devclass]; }
 
 	// input code readers
 	int32_t code_value(input_code code);
@@ -675,6 +476,7 @@ public:
 	std::string code_name(input_code code) const;
 	std::string code_to_token(input_code code) const;
 	input_code code_from_token(const char *_token);
+	const char *standard_token(input_item_id itemid) const;
 
 	// input sequence readers
 	bool seq_pressed(const input_seq &seq);
@@ -691,7 +493,6 @@ public:
 	void seq_from_tokens(input_seq &seq, const char *_token);
 
 	// misc
-	bool set_global_joystick_map(const char *mapstring);
 	bool map_device_to_controller(const devicemap_table_type *devicemap_table = nullptr);
 
 private:
@@ -704,11 +505,7 @@ private:
 	input_code          m_switch_memory[64];
 
 	// classes
-	input_class         m_keyboard_class;
-	input_class         m_mouse_class;
-	input_class         m_joystick_class;
-	input_class         m_lightgun_class;
-	input_class *       m_class[DEVICE_CLASS_MAXIMUM];
+	std::array<std::unique_ptr<input_class>, DEVICE_CLASS_MAXIMUM> m_class;
 
 	// sequence polling state
 	input_seq           m_poll_seq;
@@ -1162,34 +959,6 @@ private:
 #define JOYCODE_BUTTON32 JOYCODE_BUTTON32_INDEXED(0)
 #define JOYCODE_START JOYCODE_START_INDEXED(0)
 #define JOYCODE_SELECT JOYCODE_SELECT_INDEXED(0)
-
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-// joystick maps
-extern const char joystick_map_8way[];
-extern const char joystick_map_4way_diagonal[];
-
-
-//**************************************************************************
-//  INLINE FUNCTIONS
-//**************************************************************************
-
-// input_device_item helpers
-inline input_manager &input_device_item::manager() const { return m_device.manager(); }
-inline running_machine &input_device_item::machine() const { return m_device.machine(); }
-inline  int32_t input_device_item::update_value() { return m_current = (*m_getstate)(m_device.internal(), m_internal); }
-
-// input_device helpers
-inline input_manager &input_device::manager() const { return m_class.manager(); }
-inline running_machine &input_device::machine() const { return m_class.machine(); }
-inline input_device_class input_device::devclass() const { return m_class.devclass(); }
-
-// input_class helpers
-inline running_machine &input_class::machine() const { return m_manager.machine(); }
 
 
 

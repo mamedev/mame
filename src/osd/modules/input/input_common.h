@@ -13,6 +13,8 @@
 
 #include "input_module.h"
 
+#include "inputdev.h"
+
 #include <chrono>
 #include <memory>
 #include <mutex>
