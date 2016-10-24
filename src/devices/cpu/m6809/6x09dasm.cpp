@@ -119,6 +119,12 @@ namespace
 		m6x09_instruction_level m_level;
 
 		const opcodeinfo *fetch_opcode(const uint8_t *oprom, int &p);
+
+		void assert_hd6309_exclusive()
+		{
+			if (m_level < HD6309_EXCLUSIVE)
+				throw false;
+		}
 	};
 }
 
@@ -264,7 +270,7 @@ offs_t m6x09_disassembler_base::disassemble(std::ostream &stream, offs_t pc, con
 		break;
 
 	case DIR_IM:
-		assert(m_level >= HD6309_EXCLUSIVE);
+		assert_hd6309_exclusive();
 		util::stream_format(stream, "#$%02X;", operandarray[0]);
 		util::stream_format(stream, "$%02X", operandarray[1]);
 		break;
@@ -282,7 +288,7 @@ offs_t m6x09_disassembler_base::disassemble(std::ostream &stream, offs_t pc, con
 	case EXT:
 		if (numoperands == 3)
 		{
-			assert(m_level >= HD6309_EXCLUSIVE);
+			assert_hd6309_exclusive();
 			pb = operandarray[0];
 			ea = (operandarray[1] << 8) + operandarray[2];
 			util::stream_format(stream, "#$%02X,$%04X", pb, ea);
@@ -297,7 +303,7 @@ offs_t m6x09_disassembler_base::disassemble(std::ostream &stream, offs_t pc, con
 	case IND:
 		if (numoperands == 2)
 		{
-			assert(m_level >= HD6309_EXCLUSIVE);
+			assert_hd6309_exclusive();
 			util::stream_format(stream, "#$%02X;", operandarray[0]);
 			pb = operandarray[1];
 		}
