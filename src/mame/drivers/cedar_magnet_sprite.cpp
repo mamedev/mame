@@ -78,8 +78,8 @@ void cedar_magnet_sprite_device::do_blit()
 //  printf("~~~~~~~~~~~~~~~~~ drawing sprite with x:%02x y:%02x code:%04x size:%02x unk:%02x\n", m_loweraddr, m_upperaddr, (m_spritecodehigh << 8) | m_spritecodelow, m_spritesize, pio0_pb_data);
 //  printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
 
-	int ysize;
-	int xsize;
+	int ysize = 0;
+	int xsize = 0;
 	int erase = 0;
 
 	// bit 0x80 is always set
