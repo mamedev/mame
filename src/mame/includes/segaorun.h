@@ -89,7 +89,7 @@ public:
 	uint16_t sega_road_control_0_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) { return m_segaic16road->segaic16_road_control_0_r(space,offset,mem_mask); };
 	void sega_road_control_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff) { m_segaic16road->segaic16_road_control_0_w(space,offset,data,mem_mask); };
 
-	CUSTOM_INPUT_MEMBER( bankmotor_pos_r );
+	ioport_value bankmotor_pos_r(ioport_field &field, void *param);
 	void bankmotor_update(timer_device &timer, void *ptr, int32_t param);
 
 protected:

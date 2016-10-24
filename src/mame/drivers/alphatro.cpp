@@ -72,7 +72,7 @@ public:
 
 	uint8_t port10_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void port10_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_INPUT_CHANGED_MEMBER(alphatro_break);
+	void alphatro_break(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	void txdata_callback(int state);
 	void write_usart_clock(int state);
 	void palette_init_alphatro(palette_device &palette);
@@ -208,7 +208,7 @@ MC6845_UPDATE_ROW( alphatro_state::crtc_update_row )
 	}
 }
 
-INPUT_CHANGED_MEMBER( alphatro_state::alphatro_break )
+void alphatro_state::alphatro_break(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, HOLD_LINE);
 }

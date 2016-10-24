@@ -40,8 +40,8 @@ public:
 	std::unique_ptr<uint8_t[]> m_harem_decrypted_data;
 	std::unique_ptr<uint8_t[]> m_harem_decrypted_opcodes;
 
-	DECLARE_CUSTOM_INPUT_MEMBER(darkplnt_custom_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(ckongs_coinage_r);
+	ioport_value darkplnt_custom_r(ioport_field &field, void *param);
+	ioport_value ckongs_coinage_r(ioport_field &field, void *param);
 	uint8_t hncholms_prot_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t scramble_soundram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t mars_ppi8255_0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);

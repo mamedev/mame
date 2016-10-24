@@ -57,7 +57,7 @@ public:
 	void txt_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void ticket_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void video_regs_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	DECLARE_CUSTOM_INPUT_MEMBER(ticket_status_r);
+	ioport_value ticket_status_r(ioport_field &field, void *param);
 	void eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void oki_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void get_mid_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
@@ -223,7 +223,7 @@ void pzletime_state::oki_bank_w(address_space &space, offs_t offset, uint16_t da
 	m_oki->set_rom_bank(data & 0x3);
 }
 
-CUSTOM_INPUT_MEMBER(pzletime_state::ticket_status_r)
+ioport_value pzletime_state::ticket_status_r(ioport_field &field, void *param)
 {
 	return (m_ticket && !(m_screen->frame_number() % 128));
 }

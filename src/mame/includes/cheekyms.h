@@ -57,7 +57,7 @@ public:
 	void port_40_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void port_80_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+	void coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	void vblank_irq(device_t &device);
 
 	void get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);

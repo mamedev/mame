@@ -779,7 +779,7 @@ static ADDRESS_MAP_START( bullsdrtg_io_map, AS_IO, 8, galaxold_state )
 ADDRESS_MAP_END
 
 /* Lives Dips are spread across two input ports */
-CUSTOM_INPUT_MEMBER(galaxold_state::vpool_lives_r)
+ioport_value galaxold_state::vpool_lives_r(ioport_field &field, void *param)
 {
 	int bit_mask = (uintptr_t)param;
 
@@ -1022,7 +1022,7 @@ INPUT_PORTS_END
 
 
 /* Coinage Dips are spread across two input ports */
-CUSTOM_INPUT_MEMBER(galaxold_state::ckongg_coinage_r)
+ioport_value galaxold_state::ckongg_coinage_r(ioport_field &field, void *param)
 {
 	int bit_mask = (uintptr_t)param;
 
@@ -1534,7 +1534,7 @@ INPUT_PORTS_END
 
 
 /* Coinage Dips are spread across two input ports */
-CUSTOM_INPUT_MEMBER(galaxold_state::dkongjrm_coinage_r)
+ioport_value galaxold_state::dkongjrm_coinage_r(ioport_field &field, void *param)
 {
 	int bit_mask = (uintptr_t)param;
 

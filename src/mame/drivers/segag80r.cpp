@@ -144,7 +144,7 @@
  *
  *************************************/
 
-INPUT_CHANGED_MEMBER(segag80r_state::service_switch)
+void segag80r_state::service_switch(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	/* pressing the service switch sends an NMI */
 	if (newval)

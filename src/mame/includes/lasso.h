@@ -64,7 +64,7 @@ public:
 	void lasso_video_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void wwjgtin_video_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void pinbo_video_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+	void coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	void lasso_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void wwjgtin_get_track_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void pinbo_get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);

@@ -84,7 +84,7 @@ public:
 	void mcu_prog_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t mcu_t1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_INPUT_CHANGED_MEMBER(power_on);
+	void power_on(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	void power_off();
 
 protected:
@@ -145,7 +145,7 @@ void k28_state::machine_reset()
 	m_onbutton_timer->adjust(attotime::from_msec(250));
 }
 
-INPUT_CHANGED_MEMBER(k28_state::power_on)
+void k28_state::power_on(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (newval && !m_power_on)
 		machine_reset();

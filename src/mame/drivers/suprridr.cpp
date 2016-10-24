@@ -230,7 +230,7 @@ ADDRESS_MAP_END
 #define SUPRRIDR_P1_CONTROL_PORT_TAG    ("CONTP1")
 #define SUPRRIDR_P2_CONTROL_PORT_TAG    ("CONTP2")
 
-CUSTOM_INPUT_MEMBER(suprridr_state::control_r)
+ioport_value suprridr_state::control_r(ioport_field &field, void *param)
 {
 	uint32_t ret;
 

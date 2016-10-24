@@ -97,7 +97,7 @@ public:
 	uint8_t videoram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+	void coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 	virtual void machine_start() override;
 	virtual void video_start() override;
@@ -296,7 +296,7 @@ static ADDRESS_MAP_START( sound_cpu, AS_PROGRAM, 8, progolf_state )
 ADDRESS_MAP_END
 
 
-INPUT_CHANGED_MEMBER(progolf_state::coin_inserted)
+void progolf_state::coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }

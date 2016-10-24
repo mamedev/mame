@@ -112,7 +112,7 @@ public:
 	void custom_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t exp_rom_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void show_out();
-	DECLARE_CUSTOM_INPUT_MEMBER(hopper_r);
+	ioport_value hopper_r(ioport_field &field, void *param);
 	void init_igs_ncs();
 	void init_number10();
 	void init_pktet346();
@@ -353,7 +353,7 @@ void igspoker_state::custom_io_w(address_space &space, offs_t offset, uint8_t da
 	}
 }
 
-CUSTOM_INPUT_MEMBER(igspoker_state::hopper_r)
+ioport_value igspoker_state::hopper_r(ioport_field &field, void *param)
 {
 	if (m_hopper) return !(m_screen->frame_number()%10);
 	return machine().input().code_pressed(KEYCODE_H);

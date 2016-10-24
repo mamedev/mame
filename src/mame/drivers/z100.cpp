@@ -216,7 +216,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_z100(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
+	void key_stroke(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 };
 
 #define mc6845_h_char_total     (m_crtc_vreg[0])
@@ -417,7 +417,7 @@ static ADDRESS_MAP_START(z100_io, AS_IO, 8, z100_state)
 	AM_RANGE (0xff, 0xff) AM_READ_PORT("DSW101")
 ADDRESS_MAP_END
 
-INPUT_CHANGED_MEMBER(z100_state::key_stroke)
+void z100_state::key_stroke(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if(newval && !oldval)
 	{

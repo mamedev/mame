@@ -60,8 +60,8 @@ public:
 	void exprraid_bgselect_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void exprraid_scrollx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void exprraid_scrolly_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_deco16);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_nmi);
+	void coin_inserted_deco16(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void coin_inserted_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 	uint8_t sound_cpu_command_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 

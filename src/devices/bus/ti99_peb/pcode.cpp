@@ -314,7 +314,7 @@ void ti_pcode_card_device::device_config_complete()
 {
 }
 
-INPUT_CHANGED_MEMBER( ti_pcode_card_device::switch_changed )
+void ti_pcode_card_device::switch_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (TRACE_SWITCH) logerror("Switch changed to %d\n", newval);
 	m_active = (newval != 0);

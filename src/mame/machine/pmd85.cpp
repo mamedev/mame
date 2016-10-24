@@ -731,7 +731,7 @@ void pmd85_state::pmd85_cassette_timer_callback(void *ptr, int32_t param)
 	}
 }
 
-INPUT_CHANGED_MEMBER(pmd85_state::pmd85_reset)
+void pmd85_state::pmd85_reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	machine().schedule_soft_reset();
 }

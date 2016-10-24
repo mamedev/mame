@@ -222,7 +222,7 @@ public:
 	void init_common();
 	void init_sq1();
 	void init_denib();
-	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
+	void key_stroke(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	int maincpu_irq_acknowledge_callback(device_t &device, int irqline);
 	void esq5505_otis_irq(int state);
 
@@ -546,7 +546,7 @@ void esq5505_state::fdc_write_byte(address_space &space, offs_t offset, uint8_t 
 }
 
 #if KEYBOARD_HACK
-INPUT_CHANGED_MEMBER(esq5505_state::key_stroke)
+void esq5505_state::key_stroke(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	int val = (uint8_t)(uintptr_t)param;
 	int cmp = 0x60;

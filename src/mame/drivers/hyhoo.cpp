@@ -56,7 +56,7 @@ static ADDRESS_MAP_START( hyhoo_io_map, AS_IO, 8, hyhoo_state )
 	AM_RANGE(0xf1, 0xf1) AM_DEVREAD("nb1413m3", nb1413m3_device, dipsw2_r)
 ADDRESS_MAP_END
 
-CUSTOM_INPUT_MEMBER( hyhoo_state::nb1413m3_busyflag_r )
+ioport_value hyhoo_state::nb1413m3_busyflag_r(ioport_field &field, void *param)
 {
 	return m_nb1413m3->m_busyflag & 0x01;
 }

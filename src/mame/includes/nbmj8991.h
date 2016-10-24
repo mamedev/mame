@@ -58,7 +58,7 @@ public:
 	void blitter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t clut_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void clut_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_CUSTOM_INPUT_MEMBER(nb1413m3_busyflag_r);
+	ioport_value nb1413m3_busyflag_r(ioport_field &field, void *param);
 
 	void init_galkaika();
 	void init_tokimbsj();

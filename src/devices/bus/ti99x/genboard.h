@@ -124,7 +124,7 @@ public:
 	void writem(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void setoffset(address_space &space, offs_t offset);
 
-	DECLARE_INPUT_CHANGED_MEMBER( settings_changed );
+	void settings_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 	void clock_in(int state);
 	void dbin_in(int state);

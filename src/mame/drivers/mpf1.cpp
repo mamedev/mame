@@ -102,17 +102,17 @@ ADDRESS_MAP_END
 
 /* Input Ports */
 
-INPUT_CHANGED_MEMBER( mpf1_state::trigger_nmi )
+void mpf1_state::trigger_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
-INPUT_CHANGED_MEMBER( mpf1_state::trigger_irq )
+void mpf1_state::trigger_irq(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(INPUT_LINE_IRQ0, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
-INPUT_CHANGED_MEMBER( mpf1_state::trigger_res )
+void mpf1_state::trigger_res(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 }

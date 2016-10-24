@@ -913,7 +913,7 @@ inline uint8_t x07_state::get_char(uint16_t pos)
 	}
 }
 
-INPUT_CHANGED_MEMBER( x07_state::kb_func_keys )
+void x07_state::kb_func_keys(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	uint8_t data = 0;
 	uint8_t idx = (uint8_t)(uintptr_t)param;
@@ -938,7 +938,7 @@ INPUT_CHANGED_MEMBER( x07_state::kb_func_keys )
 	}
 }
 
-INPUT_CHANGED_MEMBER( x07_state::kb_keys )
+void x07_state::kb_keys(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	uint8_t modifier;
 	uint8_t a1 = ioport("A1")->read();
@@ -972,12 +972,12 @@ INPUT_CHANGED_MEMBER( x07_state::kb_keys )
 	}
 }
 
-INPUT_CHANGED_MEMBER( x07_state::kb_update_udk )
+void x07_state::kb_update_udk(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	draw_udk();
 }
 
-INPUT_CHANGED_MEMBER( x07_state::kb_break )
+void x07_state::kb_break(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (newval)
 	{
@@ -1047,7 +1047,7 @@ inline void x07_state::draw_udk()
 		}
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( x07_state, x07_card )
+image_init_result x07_state::device_image_load_x07_card(device_image_interface &image)
 {
 	uint32_t size = m_card->common_get_size("rom");
 

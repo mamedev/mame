@@ -461,7 +461,7 @@ uint8_t m10_state::m11_a700_r(address_space &space, offs_t offset, uint8_t mem_m
  *
  *************************************/
 
-INPUT_CHANGED_MEMBER(m10_state::coin_inserted)
+void m10_state::coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	/* coin insertion causes an NMI */
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);

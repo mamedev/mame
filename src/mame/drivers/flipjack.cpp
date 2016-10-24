@@ -124,7 +124,7 @@ public:
 	void flipjack_soundlatch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void flipjack_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void flipjack_layer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_INPUT_CHANGED_MEMBER(flipjack_coin);
+	void flipjack_coin(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	uint8_t flipjack_soundlatch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void flipjack_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void machine_start() override;
@@ -290,7 +290,7 @@ void flipjack_state::flipjack_portc_w(address_space &space, offs_t offset, uint8
 	// watchdog?
 }
 
-INPUT_CHANGED_MEMBER(flipjack_state::flipjack_coin)
+void flipjack_state::flipjack_coin(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (newval)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);

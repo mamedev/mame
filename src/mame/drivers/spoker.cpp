@@ -82,7 +82,7 @@ public:
 	void magic_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t magic_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(hopper_r);
+	ioport_value hopper_r(ioport_field &field, void *param);
 
 	void init_spkleftover();
 	void init_spk116it();
@@ -152,7 +152,7 @@ uint32_t spoker_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
                                Misc Handlers
 ***************************************************************************/
 
-CUSTOM_INPUT_MEMBER(spoker_state::hopper_r)
+ioport_value spoker_state::hopper_r(ioport_field &field, void *param)
 {
 	if (m_hopper) return !(m_screen->frame_number()%10);
 	return machine().input().code_pressed(KEYCODE_H);

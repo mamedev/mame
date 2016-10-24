@@ -58,7 +58,7 @@ void mystston_state::irq_clear_w(address_space &space, offs_t offset, uint8_t da
  *
  *************************************/
 
-INPUT_CHANGED_MEMBER(mystston_state::coin_inserted)
+void mystston_state::coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	/* coin insertion causes an NMI */
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);

@@ -252,7 +252,7 @@ machine_config_constructor epson_ex800_t::device_mconfig_additions() const
 
 
 /* The ON LINE switch is directly connected to the INT1 input of the CPU */
-INPUT_CHANGED_MEMBER(epson_ex800_t::online_switch)
+void epson_ex800_t::online_switch(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (newval)
 	{

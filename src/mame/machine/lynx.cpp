@@ -2058,7 +2058,7 @@ image_verify_result lynx_state::lynx_verify_cart(char *header, int kind)
 	return image_verify_result::PASS;
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( lynx_state, lynx_cart )
+image_init_result lynx_state::device_image_load_lynx_cart(device_image_interface &image)
 {
 	/* Lynx carts have 19 address lines, the upper 8 used for bank select. The lower
 	11 bits are used to address data within the selected bank. Valid bank sizes are 256,

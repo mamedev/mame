@@ -66,10 +66,10 @@ public:
 	void exidy440_spriteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void exidy440_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void exidy440_interrupt_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_CUSTOM_INPUT_MEMBER(firq_beam_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(firq_vblank_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(hitnmiss_button1_r);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+	ioport_value firq_beam_r(ioport_field &field, void *param);
+	ioport_value firq_vblank_r(ioport_field &field, void *param);
+	ioport_value hitnmiss_button1_r(ioport_field &field, void *param);
+	void coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	void init_showdown();
 	void init_topsecex();
 	void init_yukon();

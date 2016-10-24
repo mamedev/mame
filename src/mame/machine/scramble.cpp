@@ -32,7 +32,7 @@ void scramble_state::machine_reset_explorer()
 }
 
 
-CUSTOM_INPUT_MEMBER(scramble_state::darkplnt_custom_r)
+ioport_value scramble_state::darkplnt_custom_r(ioport_field &field, void *param)
 {
 	static const uint8_t remap[] = {0x03, 0x02, 0x00, 0x01, 0x21, 0x20, 0x22, 0x23,
 								0x33, 0x32, 0x30, 0x31, 0x11, 0x10, 0x12, 0x13,

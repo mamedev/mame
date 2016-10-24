@@ -143,9 +143,9 @@ public:
 	void spr1_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void spr_xy_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void tileram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_CUSTOM_INPUT_MEMBER(collision_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(coin_r);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inc);
+	ioport_value collision_r(ioport_field &field, void *param);
+	ioport_value coin_r(ioport_field &field, void *param);
+	void coin_inc(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 	required_device<cpu_device> m_maincpu;
 	required_device<i8255_device> m_ppi0;
@@ -309,7 +309,7 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, istrebiteli_state)
 	AM_RANGE(0xc8, 0xcf) AM_WRITE(spr_xy_w)
 ADDRESS_MAP_END
 
-CUSTOM_INPUT_MEMBER(istrebiteli_state::collision_r)
+ioport_value istrebiteli_state::collision_r(ioport_field &field, void *param)
 {
 	// piece of HACK
 	// real hardware does per-pixel sprite collision detection
@@ -328,12 +328,12 @@ CUSTOM_INPUT_MEMBER(istrebiteli_state::collision_r)
 	return m_spr_collision[id];
 }
 
-CUSTOM_INPUT_MEMBER(istrebiteli_state::coin_r)
+ioport_value istrebiteli_state::coin_r(ioport_field &field, void *param)
 {
 	return coin_count;
 }
 
-INPUT_CHANGED_MEMBER(istrebiteli_state::coin_inc)
+void istrebiteli_state::coin_inc(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (oldval == 0 && newval == 1)
 		++coin_count;

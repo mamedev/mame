@@ -163,7 +163,7 @@ void rpunch_state::machine_reset()
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(rpunch_state::hi_bits_r)
+ioport_value rpunch_state::hi_bits_r(ioport_field &field, void *param)
 {
 	return ioport("SERVICE")->read();
 }

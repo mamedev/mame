@@ -81,8 +81,8 @@ public:
 	void gunbird_sound_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void psikyo_vram_0_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	void psikyo_vram_1_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
-	DECLARE_CUSTOM_INPUT_MEMBER(z80_nmi_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(mcu_status_r);
+	ioport_value z80_nmi_r(ioport_field &field, void *param);
+	ioport_value mcu_status_r(ioport_field &field, void *param);
 	void init_s1945a();
 	void init_s1945j();
 	void init_sngkace();

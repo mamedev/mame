@@ -126,7 +126,7 @@ public:
 	void batrider_textdata_dma_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void batrider_unknown_dma_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void batrider_objectbank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	DECLARE_CUSTOM_INPUT_MEMBER(c2map_r);
+	ioport_value c2map_r(ioport_field &field, void *param);
 	void oki_bankswitch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void oki1_bankswitch_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void init_bbakraid();

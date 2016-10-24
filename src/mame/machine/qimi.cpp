@@ -18,10 +18,10 @@ const device_type QIMI = &device_creator<qimi_t>;
 
 
 //-------------------------------------------------
-//  INPUT_CHANGED_MEMBER( mouse_x_changed )
+//  void mouse_x_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 //-------------------------------------------------
 
-INPUT_CHANGED_MEMBER( qimi_t::mouse_x_changed )
+void qimi_t::mouse_x_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (newval > oldval)
 	{
@@ -42,10 +42,10 @@ INPUT_CHANGED_MEMBER( qimi_t::mouse_x_changed )
 
 
 //-------------------------------------------------
-//  INPUT_CHANGED_MEMBER( mouse_y_changed )
+//  void mouse_y_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 //-------------------------------------------------
 
-INPUT_CHANGED_MEMBER( qimi_t::mouse_y_changed )
+void qimi_t::mouse_y_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (newval < oldval)
 	{

@@ -660,12 +660,12 @@ image_init_result gamecom_state::common_load(device_image_interface &image, gene
 	return image_init_result::PASS;
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( gamecom_state, gamecom_cart1 )
+image_init_result gamecom_state::device_image_load_gamecom_cart1(device_image_interface &image)
 {
 	return common_load(image, m_cart1);
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( gamecom_state, gamecom_cart2 )
+image_init_result gamecom_state::device_image_load_gamecom_cart2(device_image_interface &image)
 {
 	return common_load(image, m_cart2);
 }

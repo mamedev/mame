@@ -95,7 +95,7 @@ void cpc_transtape_device::map_enable()
 	}
 }
 
-INPUT_CHANGED_MEMBER(cpc_transtape_device::button_red_w)
+void cpc_transtape_device::button_red_w(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	// enables device ROM at 0x0000, RAM at 0xc000, generates NMI
 	if(newval & 0x01)
@@ -106,7 +106,7 @@ INPUT_CHANGED_MEMBER(cpc_transtape_device::button_red_w)
 	}
 }
 
-INPUT_CHANGED_MEMBER(cpc_transtape_device::button_black_w)
+void cpc_transtape_device::button_black_w(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	// enables device ROM at 0x0000, RAM at 0xc000(?), force execution to start at 0x0000
 	if(newval & 0x01)

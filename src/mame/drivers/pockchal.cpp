@@ -43,11 +43,11 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
 	uint32_t  m_rom_size;
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pockchalv1_cart);
+	image_init_result device_image_load_pockchalv1_cart(device_image_interface &image);
 };
 
 
-DEVICE_IMAGE_LOAD_MEMBER( pockchalv1_state, pockchalv1_cart )
+image_init_result pockchalv1_state::device_image_load_pockchalv1_cart(device_image_interface &image)
 {
 	m_rom_size = m_cart->common_get_size("rom");
 	m_cart->rom_alloc(m_rom_size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);

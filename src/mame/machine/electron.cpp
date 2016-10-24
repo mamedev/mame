@@ -405,7 +405,7 @@ void electron_state::machine_start()
 	m_tape_timer = timer_alloc(TIMER_TAPE_HANDLER);
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( electron_state, electron_cart )
+image_init_result electron_state::device_image_load_electron_cart(device_image_interface &image)
 {
 	if (image.software_entry() == nullptr)
 	{

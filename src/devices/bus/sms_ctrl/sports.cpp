@@ -90,7 +90,7 @@ void sms_sports_pad_device::th_pin_w(int state)
 }
 
 
-CUSTOM_INPUT_MEMBER( sms_sports_pad_device::rldu_pins_r )
+ioport_value sms_sports_pad_device::rldu_pins_r(ioport_field &field, void *param)
 {
 	uint8_t data = 0;
 

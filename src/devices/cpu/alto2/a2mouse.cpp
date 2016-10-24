@@ -143,7 +143,7 @@ uint16_t alto2_cpu_device::mouse_read()
  * @param oldval the old ioport_value
  * @param newval the new ioport_value
  */
-INPUT_CHANGED_MEMBER( alto2_cpu_device::mouse_motion_x )
+void alto2_cpu_device::mouse_motion_x(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	int16_t ox = static_cast<int16_t>(oldval);
 	int16_t nx = static_cast<int16_t>(newval);
@@ -157,7 +157,7 @@ INPUT_CHANGED_MEMBER( alto2_cpu_device::mouse_motion_x )
  * @param oldval the old ioport_value
  * @param newval the new ioport_value
  */
-INPUT_CHANGED_MEMBER( alto2_cpu_device::mouse_motion_y )
+void alto2_cpu_device::mouse_motion_y(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	int16_t oy = static_cast<int16_t>(oldval);
 	int16_t ny = static_cast<int16_t>(newval);
@@ -174,17 +174,17 @@ INPUT_CHANGED_MEMBER( alto2_cpu_device::mouse_motion_y )
  * @param oldval the old ioport_value
  * @param newval the new ioport_value
  */
-INPUT_CHANGED_MEMBER( alto2_cpu_device::mouse_button_0 )
+void alto2_cpu_device::mouse_button_0(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	X_WRBITS(m_hw.utilin,16,13,13,newval);
 }
 
-INPUT_CHANGED_MEMBER( alto2_cpu_device::mouse_button_1 )
+void alto2_cpu_device::mouse_button_1(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	X_WRBITS(m_hw.utilin,16,14,14,newval);
 }
 
-INPUT_CHANGED_MEMBER( alto2_cpu_device::mouse_button_2 )
+void alto2_cpu_device::mouse_button_2(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	X_WRBITS(m_hw.utilin,16,15,15,newval);
 }

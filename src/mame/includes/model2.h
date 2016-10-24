@@ -124,10 +124,10 @@ public:
 	uint8_t m_gearsel;
 	uint8_t m_lightgun_mux;
 
-	DECLARE_CUSTOM_INPUT_MEMBER(_1c00000_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(_1c0001c_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(srallyc_gearbox_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(rchase2_devices_r);
+	ioport_value _1c00000_r(ioport_field &field, void *param);
+	ioport_value _1c0001c_r(ioport_field &field, void *param);
+	ioport_value srallyc_gearbox_r(ioport_field &field, void *param);
+	ioport_value rchase2_devices_r(ioport_field &field, void *param);
 	uint32_t timers_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	void timers_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	uint16_t model2_palette_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);

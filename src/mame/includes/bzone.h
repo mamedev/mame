@@ -34,7 +34,7 @@ public:
 	void bzone_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t analog_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void analog_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_CUSTOM_INPUT_MEMBER(clock_r);
+	ioport_value clock_r(ioport_field &field, void *param);
 	uint8_t redbaron_joy_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void redbaron_joysound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_bradley();

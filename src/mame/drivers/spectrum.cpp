@@ -658,7 +658,7 @@ void spectrum_state::spec_interrupt(device_t &device)
 	timer_set(attotime::from_ticks(32, m_maincpu->clock()), 0, 0);
 }
 
-DEVICE_IMAGE_LOAD_MEMBER(spectrum_state, spectrum_cart)
+image_init_result spectrum_state::device_image_load_spectrum_cart(device_image_interface &image)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 

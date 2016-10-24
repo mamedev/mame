@@ -67,7 +67,7 @@ public:
 	uint16_t unk_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void mux_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	uint16_t mux_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
-	DECLARE_INPUT_CHANGED_MEMBER(touchscreen_press);
+	void touchscreen_press(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	void jpm_upd7759_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	uint16_t jpm_upd7759_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void ptm_irq(int state);

@@ -245,7 +245,7 @@ void hh_ucom4_state::set_interrupt(int state)
 	}
 }
 
-INPUT_CHANGED_MEMBER(hh_ucom4_state::single_interrupt_line)
+void hh_ucom4_state::single_interrupt_line(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	set_interrupt(newval);
 }
@@ -2077,7 +2077,7 @@ public:
 	uint8_t input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	void set_clock();
-	DECLARE_INPUT_CHANGED_MEMBER(difficulty_switch);
+	void difficulty_switch(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 protected:
 	virtual void machine_reset() override;
@@ -2156,7 +2156,7 @@ static INPUT_PORTS_START( tmtennis )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_D) PORT_NAME("P2 Button 6")
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER(tmtennis_state::difficulty_switch)
+void tmtennis_state::difficulty_switch(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	set_clock();
 }

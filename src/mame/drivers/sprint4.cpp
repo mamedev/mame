@@ -19,7 +19,7 @@ Atari Sprint 4 driver
 #define PIXEL_CLOCK    (MASTER_CLOCK / 2)
 
 
-CUSTOM_INPUT_MEMBER(sprint4_state::get_lever)
+ioport_value sprint4_state::get_lever(ioport_field &field, void *param)
 {
 	int n = (uintptr_t) param;
 
@@ -27,7 +27,7 @@ CUSTOM_INPUT_MEMBER(sprint4_state::get_lever)
 }
 
 
-CUSTOM_INPUT_MEMBER(sprint4_state::get_wheel)
+ioport_value sprint4_state::get_wheel(ioport_field &field, void *param)
 {
 	int n = (uintptr_t) param;
 
@@ -35,7 +35,7 @@ CUSTOM_INPUT_MEMBER(sprint4_state::get_wheel)
 }
 
 
-CUSTOM_INPUT_MEMBER(sprint4_state::get_collision)
+ioport_value sprint4_state::get_collision(ioport_field &field, void *param)
 {
 	int n = (uintptr_t) param;
 

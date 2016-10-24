@@ -35,7 +35,7 @@ public:
 	required_shared_ptr<uint8_t> m_vram;
 	required_shared_ptr<uint8_t> m_cram;
 	uint8_t m_hbeat;
-	DECLARE_CUSTOM_INPUT_MEMBER(rgum_heartbeat_r);
+	ioport_value rgum_heartbeat_r(ioport_field &field, void *param);
 	virtual void video_start() override;
 	uint32_t screen_update_royalgum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
@@ -91,7 +91,7 @@ static ADDRESS_MAP_START( rgum_map, AS_PROGRAM, 8, rgum_state )
 ADDRESS_MAP_END
 
 
-CUSTOM_INPUT_MEMBER(rgum_state::rgum_heartbeat_r)
+ioport_value rgum_state::rgum_heartbeat_r(ioport_field &field, void *param)
 {
 	m_hbeat ^= 1;
 

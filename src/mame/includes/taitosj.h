@@ -102,8 +102,8 @@ public:
 	void taitosj_characterram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void junglhbr_characterram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void taitosj_collision_reg_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_CUSTOM_INPUT_MEMBER(input_port_4_f0_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(kikstart_gear_r);
+	ioport_value input_port_4_f0_r(ioport_field &field, void *param);
+	ioport_value kikstart_gear_r(ioport_field &field, void *param);
 	void taitosj_sndnmi_msk_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void input_port_4_f0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void taitosj_dacvol_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);

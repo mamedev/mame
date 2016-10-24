@@ -108,7 +108,7 @@ void starwars_state::starwars_out_w(address_space &space, offs_t offset, uint8_t
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(starwars_state::matrix_flag_r)
+ioport_value starwars_state::matrix_flag_r(ioport_field &field, void *param)
 {
 	/* set the matrix processor flag */
 	return m_math_run ? 1 : 0;

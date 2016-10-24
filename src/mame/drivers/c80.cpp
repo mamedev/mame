@@ -72,12 +72,12 @@ ADDRESS_MAP_END
 
 /* Input Ports */
 
-INPUT_CHANGED_MEMBER( c80_state::trigger_reset )
+void c80_state::trigger_reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
-INPUT_CHANGED_MEMBER( c80_state::trigger_nmi )
+void c80_state::trigger_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }

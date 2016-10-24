@@ -196,7 +196,7 @@ public:
 	void sh7021_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	uint8_t bitmap_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void bitmap_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(loopy_cart);
+	image_init_result device_image_load_loopy_cart(device_image_interface &image);
 };
 
 
@@ -474,7 +474,7 @@ static const gfx_layout casloopy_8bpp_layoutROM =
 #endif
 
 
-DEVICE_IMAGE_LOAD_MEMBER( casloopy_state, loopy_cart )
+image_init_result casloopy_state::device_image_load_loopy_cart(device_image_interface &image)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 	uint8_t *SRC, *DST;

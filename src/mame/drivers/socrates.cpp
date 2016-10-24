@@ -195,7 +195,7 @@ public:
 	uint8_t video_regs_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void video_regs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_INPUT_CHANGED_MEMBER( send_input );
+	void send_input(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 protected:
 	virtual void machine_start() override;
@@ -945,7 +945,7 @@ void iqunlim_state::colors_w(address_space &space, offs_t offset, uint8_t data, 
 
 // IQ Unlimited keyboard MCU simulation
 
-INPUT_CHANGED_MEMBER( iqunlim_state::send_input )
+void iqunlim_state::send_input(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	uint8_t data = (uint8_t)(uintptr_t)param;
 

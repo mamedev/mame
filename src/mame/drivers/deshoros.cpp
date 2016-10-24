@@ -57,7 +57,7 @@ public:
 	void bank_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+	void coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 protected:
 	// driver_device overrides
@@ -149,7 +149,7 @@ void destiny_state::bank_select_w(address_space &space, offs_t offset, uint8_t d
 	membank("bank1")->set_base(memregion("answers")->base() + 0x6000 * (data & 3));
 }
 
-INPUT_CHANGED_MEMBER(destiny_state::coin_inserted)
+void destiny_state::coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	// NMI on Coin SW or Service SW
 	if (oldval)

@@ -119,11 +119,11 @@ public:
 	void u11_ca2_w(int state);
 	void u11_cb2_w(int state);
 	void u11_cb2_as2888_w(int state);
-	DECLARE_INPUT_CHANGED_MEMBER(activity_button);
-	DECLARE_INPUT_CHANGED_MEMBER(self_test);
-	DECLARE_CUSTOM_INPUT_MEMBER(outhole_x0);
-	DECLARE_CUSTOM_INPUT_MEMBER(drop_target_x0);
-	DECLARE_CUSTOM_INPUT_MEMBER(kickback_x3);
+	void activity_button(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void self_test(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	ioport_value outhole_x0(ioport_field &field, void *param);
+	ioport_value drop_target_x0(ioport_field &field, void *param);
+	ioport_value kickback_x3(ioport_field &field, void *param);
 	void machine_start_as2888();
 	void machine_reset_by35();
 	void timer_z_freq(timer_device &timer, void *ptr, int32_t param);
@@ -428,7 +428,7 @@ static INPUT_PORTS_START( playboy )
 INPUT_PORTS_END
 
 
-CUSTOM_INPUT_MEMBER( by35_state::outhole_x0 )
+ioport_value by35_state::outhole_x0(ioport_field &field, void *param)
 {
 	int bit_shift = ((uintptr_t)param & 0x07);
 	int port = (((uintptr_t)param >> 4) & 0x07);
@@ -441,7 +441,7 @@ CUSTOM_INPUT_MEMBER( by35_state::outhole_x0 )
 	return ((m_io_hold_x[port] >> bit_shift) & 1);
 }
 
-CUSTOM_INPUT_MEMBER( by35_state::kickback_x3 )
+ioport_value by35_state::kickback_x3(ioport_field &field, void *param)
 {
 	int bit_shift = ((uintptr_t)param & 0x07);
 	int port = (((uintptr_t)param >> 4) & 0x07);
@@ -454,7 +454,7 @@ CUSTOM_INPUT_MEMBER( by35_state::kickback_x3 )
 	return ((m_io_hold_x[port] >> bit_shift) & 1);
 }
 
-CUSTOM_INPUT_MEMBER( by35_state::drop_target_x0 )
+ioport_value by35_state::drop_target_x0(ioport_field &field, void *param)
 {
 	/* Here we simulate the Drop Target switch states so the Drop Target Reset Solenoid can also release the switches */
 
@@ -492,13 +492,13 @@ void by35_state::nibble_nvram_w(address_space &space, offs_t offset, uint8_t dat
 	m_nvram[offset] = (data | 0x0f);
 }
 
-INPUT_CHANGED_MEMBER( by35_state::activity_button )
+void by35_state::activity_button(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (newval != oldval)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, (newval ? ASSERT_LINE : CLEAR_LINE));
 }
 
-INPUT_CHANGED_MEMBER( by35_state::self_test )
+void by35_state::self_test(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_pia_u10->ca1_w(newval);
 }

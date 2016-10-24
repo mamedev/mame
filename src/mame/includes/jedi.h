@@ -68,7 +68,7 @@ public:
 	void nvram_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void jedi_vscroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void jedi_hscroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_CUSTOM_INPUT_MEMBER(jedi_audio_comm_stat_r);
+	ioport_value jedi_audio_comm_stat_r(ioport_field &field, void *param);
 	void irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void jedi_audio_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void jedi_audio_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);

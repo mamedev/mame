@@ -34,7 +34,7 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual ioport_constructor device_input_ports() const override;
 
-	DECLARE_INPUT_CHANGED_MEMBER( freeze );
+	void freeze(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 	// not really public
 	void pia_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);

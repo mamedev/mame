@@ -105,7 +105,7 @@ void dcheese_state::machine_start()
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(dcheese_state::sound_latch_state_r)
+ioport_value dcheese_state::sound_latch_state_r(ioport_field &field, void *param)
 {
 	return m_soundlatch_full;
 }

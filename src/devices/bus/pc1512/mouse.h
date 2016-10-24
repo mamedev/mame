@@ -118,10 +118,10 @@ public:
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;
 
-	DECLARE_INPUT_CHANGED_MEMBER( mouse_x_changed ) { m_port->x_w(newval); }
-	DECLARE_INPUT_CHANGED_MEMBER( mouse_y_changed ) { m_port->y_w(newval); }
-	DECLARE_INPUT_CHANGED_MEMBER( mouse_button_1_changed ) { m_port->m1_w(newval); }
-	DECLARE_INPUT_CHANGED_MEMBER( mouse_button_2_changed ) { m_port->m2_w(newval); }
+	void mouse_x_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval) { m_port->x_w(newval); }
+	void mouse_y_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval) { m_port->y_w(newval); }
+	void mouse_button_1_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval) { m_port->m1_w(newval); }
+	void mouse_button_2_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval) { m_port->m2_w(newval); }
 
 protected:
 	// device-level overrides

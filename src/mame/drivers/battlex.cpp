@@ -56,7 +56,7 @@ void battlex_state::battlex_interrupt(device_t &device)
 	device.execute().set_input_line(0, ASSERT_LINE);
 }
 
-CUSTOM_INPUT_MEMBER(battlex_state::battlex_in0_b4_r)
+ioport_value battlex_state::battlex_in0_b4_r(ioport_field &field, void *param)
 {
 	uint32_t ret = m_in0_b4;
 	if (m_in0_b4)

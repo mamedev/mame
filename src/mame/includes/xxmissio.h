@@ -38,7 +38,7 @@ public:
 	void scroll_x_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void scroll_y_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(status_r);
+	ioport_value status_r(ioport_field &field, void *param);
 
 	void interrupt_m(device_t &device);
 	void interrupt_s(device_t &device);

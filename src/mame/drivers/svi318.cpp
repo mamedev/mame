@@ -84,7 +84,7 @@ public:
 	uint8_t excs_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void excs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cartridge);
+	image_init_result device_image_load_cartridge(device_image_interface &image);
 
 protected:
 	virtual void machine_start() override;
@@ -498,7 +498,7 @@ void svi3x8_state::excs_w(address_space &space, offs_t offset, uint8_t data, uin
 //  CARTRIDGE
 //**************************************************************************
 
-DEVICE_IMAGE_LOAD_MEMBER( svi3x8_state, cartridge )
+image_init_result svi3x8_state::device_image_load_cartridge(device_image_interface &image)
 {
 	uint32_t size = m_cart_rom->common_get_size("rom");
 

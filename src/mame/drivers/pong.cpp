@@ -168,7 +168,7 @@ public:
 	required_device<netlist_mame_logic_input_t> m_sw1a;
 	required_device<netlist_mame_logic_input_t> m_sw1b;
 
-	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
+	void input_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 protected:
 
@@ -226,7 +226,7 @@ public:
 		machine().bookkeeping().coin_counter_w(0, (data > 2.0) ? 0 : 1);
 	}
 
-	DECLARE_INPUT_CHANGED_MEMBER(cb_free_play)
+	void cb_free_play(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 	{
 		m_sw1_1->write((newval>>0) & 1);
 		m_sw1_2->write((newval>>1) & 1);
@@ -253,7 +253,7 @@ static NETLIST_START(pong)
 
 NETLIST_END()
 
-INPUT_CHANGED_MEMBER(pong_state::input_changed)
+void pong_state::input_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	int numpad = (uintptr_t) (param);
 

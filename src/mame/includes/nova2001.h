@@ -36,7 +36,7 @@ public:
 	void nova2001_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void pkunwar_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(ninjakun_io_A002_ctrl_r);
+	ioport_value ninjakun_io_A002_ctrl_r(ioport_field &field, void *param);
 
 	void init_raiders5();
 	void init_pkunwar();

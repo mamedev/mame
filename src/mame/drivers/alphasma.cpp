@@ -49,7 +49,7 @@ public:
 	void palette_init_alphasmart(palette_device &palette);
 	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	DECLARE_INPUT_CHANGED_MEMBER(kb_irq);
+	void kb_irq(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	uint8_t kb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void kb_matrixl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void kb_matrixh_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -85,7 +85,7 @@ private:
 	uint8_t m_lcd_ctrl;
 };
 
-INPUT_CHANGED_MEMBER(alphasmart_state::kb_irq)
+void alphasmart_state::kb_irq(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(MC68HC11_IRQ_LINE, HOLD_LINE);
 }

@@ -63,7 +63,7 @@ public:
 	void sound_irq_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void xmen_18fa00_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void sound_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_CUSTOM_INPUT_MEMBER(xmen_frame_r);
+	ioport_value xmen_frame_r(ioport_field &field, void *param);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void video_start_xmen6p();

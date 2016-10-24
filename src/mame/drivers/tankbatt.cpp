@@ -189,7 +189,7 @@ void tankbatt_state::interrupt(device_t &device)
 	if (m_nmi_enable) device.execute().set_input_line(INPUT_LINE_NMI,PULSE_LINE);
 }
 
-INPUT_CHANGED_MEMBER(tankbatt_state::coin_inserted)
+void tankbatt_state::coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(0, ASSERT_LINE);
 }

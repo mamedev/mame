@@ -48,8 +48,8 @@ public:
 	uint8_t threeds_rom_readback_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void pastelg_romsel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(nb1413m3_busyflag_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(nb1413m3_hackbusyflag_r);
+	ioport_value nb1413m3_busyflag_r(ioport_field &field, void *param);
+	ioport_value nb1413m3_hackbusyflag_r(ioport_field &field, void *param);
 
 	virtual void machine_start() override;
 	virtual void video_start() override;

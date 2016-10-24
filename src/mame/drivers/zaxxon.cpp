@@ -292,7 +292,7 @@
  *
  *************************************/
 
-INPUT_CHANGED_MEMBER(zaxxon_state::service_switch)
+void zaxxon_state::service_switch(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	/* pressing the service switch sends an NMI */
 	if (newval)
@@ -348,7 +348,7 @@ uint8_t zaxxon_state::razmataz_counter_r(address_space &space, offs_t offset, ui
 }
 
 
-CUSTOM_INPUT_MEMBER(zaxxon_state::razmataz_dial_r)
+ioport_value zaxxon_state::razmataz_dial_r(ioport_field &field, void *param)
 {
 	int num = (uintptr_t)param;
 	int res;
@@ -395,7 +395,7 @@ void zaxxon_state::zaxxon_coin_enable_w(address_space &space, offs_t offset, uin
 }
 
 
-INPUT_CHANGED_MEMBER(zaxxon_state::zaxxon_coin_inserted)
+void zaxxon_state::zaxxon_coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (newval)
 	{
@@ -404,7 +404,7 @@ INPUT_CHANGED_MEMBER(zaxxon_state::zaxxon_coin_inserted)
 }
 
 
-CUSTOM_INPUT_MEMBER(zaxxon_state::zaxxon_coin_r)
+ioport_value zaxxon_state::zaxxon_coin_r(ioport_field &field, void *param)
 {
 	return m_coin_status[(int)(uintptr_t)param];
 }

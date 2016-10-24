@@ -717,7 +717,7 @@ INPUT_PORTS_END
                            Wheels Runner
 ***************************************************************************/
 
-CUSTOM_INPUT_MEMBER(fantland_state::wheelrun_wheel_r)
+ioport_value fantland_state::wheelrun_wheel_r(ioport_field &field, void *param)
 {
 	int player = (uintptr_t)param;
 	int delta = ioport(player ? "WHEEL1" : "WHEEL0")->read();

@@ -241,7 +241,7 @@ static ADDRESS_MAP_START(ti89t_mem, AS_PROGRAM, 16, ti68k_state)
 ADDRESS_MAP_END
 
 
-INPUT_CHANGED_MEMBER(ti68k_state::ti68k_on_key)
+void ti68k_state::ti68k_on_key(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_on_key = newval;
 

@@ -259,7 +259,7 @@ void bzone_state::bzone_interrupt(device_t &device)
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(bzone_state::clock_r)
+ioport_value bzone_state::clock_r(ioport_field &field, void *param)
 {
 	return (m_maincpu->total_cycles() & 0x100) ? 1 : 0;
 }

@@ -124,10 +124,10 @@ machine_config_constructor sandy_superqboard_t::device_mconfig_additions() const
 
 
 //-------------------------------------------------
-//  INPUT_CHANGED_MEMBER( mouse_x_changed )
+//  void mouse_x_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 //-------------------------------------------------
 
-INPUT_CHANGED_MEMBER( sandy_superqboard_t::mouse_x_changed )
+void sandy_superqboard_t::mouse_x_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (newval < oldval)
 	{
@@ -145,10 +145,10 @@ INPUT_CHANGED_MEMBER( sandy_superqboard_t::mouse_x_changed )
 
 
 //-------------------------------------------------
-//  INPUT_CHANGED_MEMBER( mouse_y_changed )
+//  void mouse_y_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 //-------------------------------------------------
 
-INPUT_CHANGED_MEMBER( sandy_superqboard_t::mouse_y_changed )
+void sandy_superqboard_t::mouse_y_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (newval < oldval)
 	{

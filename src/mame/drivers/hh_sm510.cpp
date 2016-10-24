@@ -41,7 +41,7 @@ public:
 	uint8_t read_inputs(int columns);
 
 	virtual void update_k_line();
-	virtual DECLARE_INPUT_CHANGED_MEMBER(input_changed);
+	virtual void input_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	virtual uint8_t input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	virtual void input_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void lcd_segment_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
@@ -125,7 +125,7 @@ void hh_sm510_state::update_k_line()
 	m_maincpu->set_input_line(SM510_INPUT_LINE_K, read_inputs(m_inp_lines) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-INPUT_CHANGED_MEMBER(hh_sm510_state::input_changed)
+void hh_sm510_state::input_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	update_k_line();
 }

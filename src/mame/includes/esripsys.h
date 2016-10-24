@@ -111,8 +111,8 @@ public:
 	void tms5220_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void esripsys_bg_intensity_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_INPUT_CHANGED_MEMBER(keypad_interrupt);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_interrupt);
+	void keypad_interrupt(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void coin_interrupt(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	void ptm_irq(int state);
 	void esripsys_dac_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_esripsys();

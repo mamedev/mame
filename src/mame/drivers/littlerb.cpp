@@ -94,7 +94,7 @@ public:
 	uint16_t m_sound_pointer_l,m_sound_pointer_r;
 	int m_soundframe;
 
-	DECLARE_CUSTOM_INPUT_MEMBER(littlerb_frame_step_r);
+	ioport_value littlerb_frame_step_r(ioport_field &field, void *param);
 	void littlerb_l_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void littlerb_r_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	uint8_t sound_data_shift();
@@ -145,7 +145,7 @@ static ADDRESS_MAP_START( littlerb_main, AS_PROGRAM, 16, littlerb_state )
 ADDRESS_MAP_END
 
 /* guess according to DASM code and checking the gameplay speed, could be different */
-CUSTOM_INPUT_MEMBER(littlerb_state::littlerb_frame_step_r)
+ioport_value littlerb_state::littlerb_frame_step_r(ioport_field &field, void *param)
 {
 	uint32_t ret = m_soundframe;
 

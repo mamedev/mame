@@ -87,7 +87,7 @@ ADDRESS_MAP_END
 
 /* Input Ports */
 
-INPUT_CHANGED_MEMBER( elf2_state::input_w )
+void elf2_state::input_w(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (newval)
 	{

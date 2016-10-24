@@ -115,7 +115,7 @@ public:
 
 	void external_operation(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_INPUT_CHANGED_MEMBER( load_interrupt );
+	void load_interrupt(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 	void usr9901_led0_w(int state);
 	void usr9901_led1_w(int state);
@@ -216,7 +216,7 @@ void tm990189_state::hold_load()
 /*
     LOAD interrupt switch
 */
-INPUT_CHANGED_MEMBER( tm990189_state::load_interrupt )
+void tm990189_state::load_interrupt(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	// When depressed, fire LOAD (neg logic)
 	if (newval==CLEAR_LINE) hold_load();

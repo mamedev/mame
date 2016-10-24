@@ -41,7 +41,7 @@ public:
 
 
 	void interrupt(device_t &device);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+	void coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 

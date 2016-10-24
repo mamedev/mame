@@ -106,7 +106,7 @@ public:
 	void pmd85_ppi_3_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void pmd85_ppi_3_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void pmd85_ppi_3_portc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_INPUT_CHANGED_MEMBER(pmd85_reset);
+	void pmd85_reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 protected:
 	required_device<cpu_device> m_maincpu;

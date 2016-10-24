@@ -310,7 +310,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(asteroid_state::clock_r)
+ioport_value asteroid_state::clock_r(ioport_field &field, void *param)
 {
 	return (m_maincpu->total_cycles() & 0x100) ? 1 : 0;
 }

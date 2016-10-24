@@ -389,7 +389,7 @@ void esripsys_state::g_ioadd_w(address_space &space, offs_t offset, uint8_t data
 	}
 }
 
-INPUT_CHANGED_MEMBER(esripsys_state::keypad_interrupt)
+void esripsys_state::keypad_interrupt(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (newval == 0)
 	{
@@ -399,7 +399,7 @@ INPUT_CHANGED_MEMBER(esripsys_state::keypad_interrupt)
 	}
 }
 
-INPUT_CHANGED_MEMBER(esripsys_state::coin_interrupt)
+void esripsys_state::coin_interrupt(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (newval == 1)
 	{

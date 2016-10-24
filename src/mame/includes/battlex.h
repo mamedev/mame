@@ -34,7 +34,7 @@ public:
 	void battlex_scroll_starfield_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void battlex_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void battlex_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_CUSTOM_INPUT_MEMBER(battlex_in0_b4_r);
+	ioport_value battlex_in0_b4_r(ioport_field &field, void *param);
 	void init_battlex();
 	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;

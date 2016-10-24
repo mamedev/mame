@@ -73,8 +73,8 @@ public:
 	void taiwanmb_gfxflag_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void taiwanmb_mcu_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(nb1413m3_busyflag_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(nb1413m3_outcoin_flag_r);
+	ioport_value nb1413m3_busyflag_r(ioport_field &field, void *param);
+	ioport_value nb1413m3_outcoin_flag_r(ioport_field &field, void *param);
 
 	void init_pairsten();
 	void init_telmahjn();

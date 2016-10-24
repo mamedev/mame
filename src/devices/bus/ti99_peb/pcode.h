@@ -34,7 +34,7 @@ public:
 	void clock_in(int state) override;
 
 	void ready_line(int state);
-	DECLARE_INPUT_CHANGED_MEMBER( switch_changed );
+	void switch_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 protected:
 	virtual void device_start() override;

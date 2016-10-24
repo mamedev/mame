@@ -113,7 +113,7 @@ void stactics_state::scroll_ram_w(address_space &space, offs_t offset, uint8_t d
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(stactics_state::get_frame_count_d3)
+ioport_value stactics_state::get_frame_count_d3(ioport_field &field, void *param)
 {
 	return (m_frame_count >> 3) & 0x01;
 }
@@ -163,13 +163,13 @@ void stactics_state::shot_flag_clear_w(address_space &space, offs_t offset, uint
 }
 
 
-CUSTOM_INPUT_MEMBER(stactics_state::get_shot_standby)
+ioport_value stactics_state::get_shot_standby(ioport_field &field, void *param)
 {
 	return m_shot_standby;
 }
 
 
-CUSTOM_INPUT_MEMBER(stactics_state::get_not_shot_arrive)
+ioport_value stactics_state::get_not_shot_arrive(ioport_field &field, void *param)
 {
 	return !m_shot_arrive;
 }

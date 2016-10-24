@@ -524,7 +524,7 @@ void md_cons_state::init_md_jpn()
 
 /****************************************** 32X emulation ****************************************/
 
-DEVICE_IMAGE_LOAD_MEMBER( md_cons_state, _32x_cart )
+image_init_result md_cons_state::device_image_load__32x_cart(device_image_interface &image)
 {
 	uint32_t length;
 	std::vector<uint8_t> temp_copy;

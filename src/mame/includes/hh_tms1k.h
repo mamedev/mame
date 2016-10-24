@@ -47,7 +47,7 @@ public:
 
 	uint8_t read_inputs(int columns);
 	uint8_t read_rotated_inputs(int columns, uint8_t rowmask = 0xf);
-	virtual DECLARE_INPUT_CHANGED_MEMBER(power_button);
+	virtual void power_button(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	virtual void auto_power_off(int state);
 
 	// display common

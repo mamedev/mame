@@ -252,7 +252,7 @@ uint32_t turrett_state::update_inputs(void)
 }
 
 
-INPUT_CHANGED_MEMBER( turrett_state::ipt_change )
+void turrett_state::ipt_change(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	int p = (uintptr_t)param;
 

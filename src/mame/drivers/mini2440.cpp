@@ -41,7 +41,7 @@ public:
 	void init_mini2440();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_INPUT_CHANGED_MEMBER(mini2440_input_changed);
+	void mini2440_input_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);
 	uint32_t s3c2440_gpio_port_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	void s3c2440_gpio_port_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
@@ -180,7 +180,7 @@ uint32_t mini2440_state::s3c2440_adc_data_r(address_space &space, offs_t offset,
 
 // TOUCH
 
-INPUT_CHANGED_MEMBER(mini2440_state::mini2440_input_changed)
+void mini2440_state::mini2440_input_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_s3c2440->s3c2440_touch_screen( (newval & 0x01) ? 1 : 0);
 }

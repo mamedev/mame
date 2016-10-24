@@ -219,7 +219,7 @@ void bang_state::bang_irq(timer_device &timer, void *ptr, int32_t param)
 ***************************************************************************/
 
 
-CUSTOM_INPUT_MEMBER(wrally2_state::wrally2_analog_bit_r)
+ioport_value wrally2_state::wrally2_analog_bit_r(ioport_field &field, void *param)
 {
 	int which = (uintptr_t)param;
 	return (m_analog_ports[which] >> 7) & 0x01;

@@ -103,8 +103,8 @@ public:
 	void init_opwolfp();
 
 
-	DECLARE_CUSTOM_INPUT_MEMBER(opwolf_gun_x_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(opwolf_gun_y_r);
+	ioport_value opwolf_gun_x_r(ioport_field &field, void *param);
+	ioport_value opwolf_gun_y_r(ioport_field &field, void *param);
 
 
 	virtual void machine_start() override;

@@ -97,7 +97,7 @@ uint8_t cop01_state::cop01_sound_command_r(address_space &space, offs_t offset, 
 }
 
 
-CUSTOM_INPUT_MEMBER(cop01_state::mightguy_area_r)
+ioport_value cop01_state::mightguy_area_r(ioport_field &field, void *param)
 {
 	int bit_mask = (uintptr_t)param;
 	return (ioport("FAKE")->read() & bit_mask) ? 0x01 : 0x00;

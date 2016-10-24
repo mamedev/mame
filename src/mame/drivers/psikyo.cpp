@@ -82,7 +82,7 @@ This was pointed out by Bart Puype
 
 ***************************************************************************/
 
-CUSTOM_INPUT_MEMBER(psikyo_state::z80_nmi_r)
+ioport_value psikyo_state::z80_nmi_r(ioport_field &field, void *param)
 {
 	int ret = 0x00;
 
@@ -99,7 +99,7 @@ CUSTOM_INPUT_MEMBER(psikyo_state::z80_nmi_r)
 	return ret;
 }
 
-CUSTOM_INPUT_MEMBER(psikyo_state::mcu_status_r)
+ioport_value psikyo_state::mcu_status_r(ioport_field &field, void *param)
 {
 	int ret = 0x00;
 

@@ -719,7 +719,7 @@ public:
 	void write_l(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void write_g(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
+	void reset_button(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 };
 
 // handlers
@@ -761,7 +761,7 @@ static INPUT_PORTS_START( funrlgl )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, funrlgl_state, reset_button, nullptr)
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER(funrlgl_state::reset_button)
+void funrlgl_state::reset_button(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	// middle button is directly tied to MCU reset pin
 	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);

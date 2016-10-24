@@ -71,13 +71,13 @@ uint16_t btoads_state::main_sound_r(address_space &space, offs_t offset, uint16_
 }
 
 
-CUSTOM_INPUT_MEMBER( btoads_state::main_to_sound_r )
+ioport_value btoads_state::main_to_sound_r(ioport_field &field, void *param)
 {
 	return m_main_to_sound_ready;
 }
 
 
-CUSTOM_INPUT_MEMBER( btoads_state::sound_to_main_r )
+ioport_value btoads_state::sound_to_main_r(ioport_field &field, void *param)
 {
 	return m_sound_to_main_ready;
 }

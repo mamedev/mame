@@ -42,7 +42,7 @@ void lviv_state::lviv_update_memory ()
 	}
 }
 
-INPUT_CHANGED_MEMBER(lviv_state::lviv_reset)
+void lviv_state::lviv_reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	machine().schedule_soft_reset();
 }

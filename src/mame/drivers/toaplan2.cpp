@@ -654,7 +654,7 @@ void toaplan2_state::toaplan2_hd647180_cpu_w(address_space &space, offs_t offset
 }
 
 
-CUSTOM_INPUT_MEMBER(toaplan2_state::c2map_r)
+ioport_value toaplan2_state::c2map_r(ioport_field &field, void *param)
 {
 	// For Teki Paki hardware
 	// bit 4 high signifies secondary CPU is ready

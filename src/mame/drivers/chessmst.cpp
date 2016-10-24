@@ -56,9 +56,9 @@ public:
 	void pio1_port_b_dm_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t pio2_port_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void pio2_port_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_INPUT_CHANGED_MEMBER(chessmst_sensor);
-	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
-	DECLARE_INPUT_CHANGED_MEMBER(view_monitor_button);
+	void chessmst_sensor(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void reset_button(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void view_monitor_button(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	void timer_555_w(int state);
 
 private:
@@ -99,13 +99,13 @@ void chessmst_state::timer_555_w(int state)
 	m_pia2->data_b_write(m_matrix);
 }
 
-INPUT_CHANGED_MEMBER(chessmst_state::reset_button)
+void chessmst_state::reset_button(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
 	machine_reset();
 }
 
-INPUT_CHANGED_MEMBER(chessmst_state::view_monitor_button)
+void chessmst_state::view_monitor_button(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	// pressing both VIEW and MONITOR buttons causes a reset
 	if ((m_extra->read() & 0x03) == 0x03)
@@ -115,7 +115,7 @@ INPUT_CHANGED_MEMBER(chessmst_state::view_monitor_button)
 	}
 }
 
-INPUT_CHANGED_MEMBER(chessmst_state::chessmst_sensor)
+void chessmst_state::chessmst_sensor(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	uint8_t pos = (uint8_t)(uintptr_t)param;
 

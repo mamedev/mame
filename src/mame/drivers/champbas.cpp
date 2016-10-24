@@ -95,7 +95,7 @@ TODO:
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(champbas_state::watchdog_bit2)
+ioport_value champbas_state::watchdog_bit2(ioport_field &field, void *param)
 {
 	return (0x10 - m_watchdog->get_vblank_counter()) >> 2 & 1;
 }

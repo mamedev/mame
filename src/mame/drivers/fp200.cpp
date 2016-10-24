@@ -60,7 +60,7 @@ public:
 	void fp200_lcd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t fp200_keyb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void fp200_keyb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_INPUT_CHANGED_MEMBER(keyb_irq);
+	void keyb_irq(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 	void sod_w(int state);
 	int sid_r();
@@ -420,7 +420,7 @@ static ADDRESS_MAP_START( fp200_io, AS_IO, 8, fp200_state )
 	AM_RANGE(0x00, 0xff) AM_READWRITE(fp200_io_r,fp200_io_w)
 ADDRESS_MAP_END
 
-INPUT_CHANGED_MEMBER(fp200_state::keyb_irq)
+void fp200_state::keyb_irq(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	/* a keyboard stroke causes a rst7.5 */
 	m_maincpu->set_input_line(I8085_RST75_LINE, (newval) ? ASSERT_LINE : CLEAR_LINE);

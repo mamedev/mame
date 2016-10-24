@@ -226,7 +226,7 @@ public:
 	virtual void machine_reset() override;
 
 	uint32_t screen_update_leapster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(leapster_cart);
+	image_init_result device_image_load_leapster_cart(device_image_interface &image);
 	void init_leapster();
 
 	uint32_t leapster_random_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff)
@@ -259,7 +259,7 @@ uint32_t leapster_state::screen_update_leapster(screen_device &screen, bitmap_rg
 	return 0;
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( leapster_state, leapster_cart )
+image_init_result leapster_state::device_image_load_leapster_cart(device_image_interface &image)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 

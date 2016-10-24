@@ -207,7 +207,7 @@ void taitosj_state::sound_semaphore_w(address_space &space, offs_t offset, uint8
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 }
 
-CUSTOM_INPUT_MEMBER(taitosj_state::input_port_4_f0_r)
+ioport_value taitosj_state::input_port_4_f0_r(ioport_field &field, void *param)
 {
 	return m_input_port_4_f0;
 }
@@ -264,7 +264,7 @@ ADDRESS_MAP_END
 
 /* seems the most logical way to do the gears */
 
-CUSTOM_INPUT_MEMBER(taitosj_state::kikstart_gear_r)
+ioport_value taitosj_state::kikstart_gear_r(ioport_field &field, void *param)
 {
 	const char *port_tag;
 

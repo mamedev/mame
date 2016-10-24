@@ -195,11 +195,11 @@ public:
 	void ngp_hblank_pin_w(int state);
 	void ngp_tlcs900_porta(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint32_t screen_update_ngp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_INPUT_CHANGED_MEMBER(power_callback);
+	void power_callback(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	void ngp_seconds_callback(void *ptr, int32_t param);
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( ngp_cart);
-	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( ngp_cart );
+	image_init_result device_image_load_ngp_cart(device_image_interface &image);
+	void device_image_unload_ngp_cart(device_image_interface &image);
 
 protected:
 	bool m_nvram_loaded;
@@ -596,7 +596,7 @@ static ADDRESS_MAP_START( z80_io, AS_IO, 8, ngp_state )
 ADDRESS_MAP_END
 
 
-INPUT_CHANGED_MEMBER(ngp_state::power_callback)
+void ngp_state::power_callback(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if ( m_io_reg[0x33] & 0x04 )
 	{
@@ -739,7 +739,7 @@ uint32_t ngp_state::screen_update_ngp(screen_device &screen, bitmap_ind16 &bitma
 }
 
 
-DEVICE_IMAGE_LOAD_MEMBER( ngp_state, ngp_cart )
+image_init_result ngp_state::device_image_load_ngp_cart(device_image_interface &image)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
@@ -786,7 +786,7 @@ DEVICE_IMAGE_LOAD_MEMBER( ngp_state, ngp_cart )
 }
 
 
-DEVICE_IMAGE_UNLOAD_MEMBER( ngp_state, ngp_cart )
+void ngp_state::device_image_unload_ngp_cart(device_image_interface &image)
 {
 	m_flash_chip[0].present = 0;
 	m_flash_chip[0].state = F_READ;

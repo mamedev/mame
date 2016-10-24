@@ -70,7 +70,7 @@ public:
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);
 	TMS340X0_SCANLINE_RGB32_CB_MEMBER(scanline);
-	DECLARE_CUSTOM_INPUT_MEMBER(prot_r);
+	ioport_value prot_r(ioport_field &field, void *param);
 	void init_shtstar();
 	void init_cheesech();
 	void init_ultennis();

@@ -110,7 +110,7 @@ void timeplt_state::chkun_sound_w(address_space &space, offs_t offset, uint8_t d
 		m_tc8830f->reset();
 }
 
-CUSTOM_INPUT_MEMBER(timeplt_state::chkun_hopper_status_r)
+ioport_value timeplt_state::chkun_hopper_status_r(ioport_field &field, void *param)
 {
 	// temp workaround, needs hopper
 	return machine().rand();

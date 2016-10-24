@@ -112,7 +112,7 @@ public:
 	uint8_t palette_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void palette_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void casino5_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_CUSTOM_INPUT_MEMBER(rndbit_r);
+	ioport_value rndbit_r(ioport_field &field, void *param);
 	void hsync_changed(int state);
 	void led1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void led2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -371,7 +371,7 @@ void merit_state::casino5_bank_w(address_space &space, offs_t offset, uint8_t da
 	}
 }
 
-CUSTOM_INPUT_MEMBER(merit_state::rndbit_r)
+ioport_value merit_state::rndbit_r(ioport_field &field, void *param)
 {
 	return machine().rand();
 }

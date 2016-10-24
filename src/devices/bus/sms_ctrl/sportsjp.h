@@ -33,7 +33,7 @@ public:
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;
 
-	DECLARE_CUSTOM_INPUT_MEMBER( rldu_pins_r ); // Right, Left, Down and Up lines.
+	ioport_value rldu_pins_r(ioport_field &field, void *param); // Right, Left, Down and Up lines.
 	int tl_pin_r();
 	int tr_pin_r();
 

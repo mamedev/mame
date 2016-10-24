@@ -204,7 +204,7 @@ static ADDRESS_MAP_START( popeye_io_map, AS_IO, 8, popeye_state )
 ADDRESS_MAP_END
 
 
-CUSTOM_INPUT_MEMBER(popeye_state::dsw1_read)
+ioport_value popeye_state::dsw1_read(ioport_field &field, void *param)
 {
 	return ioport("DSW1")->read() >> m_dswbit;
 }
@@ -294,7 +294,7 @@ static INPUT_PORTS_START( skyskipr )
 	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 INPUT_PORTS_END
 
-CUSTOM_INPUT_MEMBER( popeye_state::pop_field_r )
+ioport_value popeye_state::pop_field_r(ioport_field &field, void *param)
 {
 	return m_field ^ 1;
 }

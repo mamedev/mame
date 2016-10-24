@@ -104,7 +104,7 @@ void pastelg_state::threeds_inputportsel_w(address_space &space, offs_t offset, 
 	m_mux_data = ~data;
 }
 
-CUSTOM_INPUT_MEMBER( pastelg_state::nb1413m3_busyflag_r )
+ioport_value pastelg_state::nb1413m3_busyflag_r(ioport_field &field, void *param)
 {
 	return m_nb1413m3->m_busyflag & 0x01;
 }
@@ -210,7 +210,7 @@ static INPUT_PORTS_START( pastelg )
 INPUT_PORTS_END
 
 // stops the game hanging..
-CUSTOM_INPUT_MEMBER(pastelg_state::nb1413m3_hackbusyflag_r)
+ioport_value pastelg_state::nb1413m3_hackbusyflag_r(ioport_field &field, void *param)
 {
 	return machine().rand() & 3;
 }

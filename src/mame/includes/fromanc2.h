@@ -83,9 +83,9 @@ public:
 	void fromanc4_gfxreg_0_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void fromanc4_gfxreg_1_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void fromanc4_gfxreg_2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	DECLARE_CUSTOM_INPUT_MEMBER(subcpu_int_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(sndcpu_nmi_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(subcpu_nmi_r);
+	ioport_value subcpu_int_r(ioport_field &field, void *param);
+	ioport_value sndcpu_nmi_r(ioport_field &field, void *param);
+	ioport_value subcpu_nmi_r(ioport_field &field, void *param);
 	void init_fromanc4();
 	void init_fromanc2();
 	void fromanc2_get_v0_l0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);

@@ -57,9 +57,9 @@ public:
 	uint16_t coinlockout_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void coinlockout_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void audiocpu_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_drop_start);
-	DECLARE_CUSTOM_INPUT_MEMBER(coin_sensors_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(hopper_sensors_r);
+	void coin_drop_start(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	ioport_value coin_sensors_r(ioport_field &field, void *param);
+	ioport_value hopper_sensors_r(ioport_field &field, void *param);
 
 protected:
 
@@ -138,13 +138,13 @@ void segajw_state::audiocpu_cmd_w(address_space &space, offs_t offset, uint8_t d
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-INPUT_CHANGED_MEMBER( segajw_state::coin_drop_start )
+void segajw_state::coin_drop_start(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (newval && !m_coin_start_cycles)
 		m_coin_start_cycles = m_maincpu->total_cycles();
 }
 
-CUSTOM_INPUT_MEMBER( segajw_state::hopper_sensors_r )
+ioport_value segajw_state::hopper_sensors_r(ioport_field &field, void *param)
 {
 	uint8_t data = 0;
 
@@ -163,7 +163,7 @@ CUSTOM_INPUT_MEMBER( segajw_state::hopper_sensors_r )
 	return data;
 }
 
-CUSTOM_INPUT_MEMBER( segajw_state::coin_sensors_r )
+ioport_value segajw_state::coin_sensors_r(ioport_field &field, void *param)
 {
 	uint8_t data = 0;
 

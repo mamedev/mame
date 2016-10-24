@@ -590,7 +590,7 @@ public:
 	uint8_t gvram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void gvram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void pc9801rs_mouse_freq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_CUSTOM_INPUT_MEMBER(system_type_r);
+	ioport_value system_type_r(ioport_field &field, void *param);
 	uint16_t grcg_gvram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void grcg_gvram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	uint16_t grcg_gvram0_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
@@ -2443,7 +2443,7 @@ static ADDRESS_MAP_START( upd7220_grcg_2_map, AS_0, 16, pc9801_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_READWRITE(upd7220_grcg_r, upd7220_grcg_w) AM_SHARE("video_ram_2")
 ADDRESS_MAP_END
 
-CUSTOM_INPUT_MEMBER(pc9801_state::system_type_r)
+ioport_value pc9801_state::system_type_r(ioport_field &field, void *param)
 {
 //  System Type (0x00 stock PC-9801, 0xc0 PC-9801U / PC-98LT, PC-98HA, 0x80 others)
 	return m_sys_type;

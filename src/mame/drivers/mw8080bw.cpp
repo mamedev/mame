@@ -320,7 +320,7 @@ void mw8080bw_state::seawolf_periscope_lamp_w(address_space &space, offs_t offse
 }
 
 
-CUSTOM_INPUT_MEMBER(mw8080bw_state::seawolf_erase_input_r)
+ioport_value mw8080bw_state::seawolf_erase_input_r(ioport_field &field, void *param)
 {
 	return ioport(SEAWOLF_ERASE_SW_PORT_TAG)->read() &
 			ioport(SEAWOLF_ERASE_DIP_PORT_TAG)->read();
@@ -559,13 +559,13 @@ uint8_t mw8080bw_state::tornbase_get_cabinet_type()
 }
 
 
-CUSTOM_INPUT_MEMBER(mw8080bw_state::tornbase_hit_left_input_r)
+ioport_value mw8080bw_state::tornbase_hit_left_input_r(ioport_field &field, void *param)
 {
 	return ioport(TORNBASE_L_HIT_PORT_TAG)->read();
 }
 
 
-CUSTOM_INPUT_MEMBER(mw8080bw_state::tornbase_hit_right_input_r)
+ioport_value mw8080bw_state::tornbase_hit_right_input_r(ioport_field &field, void *param)
 {
 	uint32_t ret;
 
@@ -586,7 +586,7 @@ CUSTOM_INPUT_MEMBER(mw8080bw_state::tornbase_hit_right_input_r)
 }
 
 
-CUSTOM_INPUT_MEMBER(mw8080bw_state::tornbase_pitch_left_input_r)
+ioport_value mw8080bw_state::tornbase_pitch_left_input_r(ioport_field &field, void *param)
 {
 	uint32_t ret;
 
@@ -607,13 +607,13 @@ CUSTOM_INPUT_MEMBER(mw8080bw_state::tornbase_pitch_left_input_r)
 }
 
 
-CUSTOM_INPUT_MEMBER(mw8080bw_state::tornbase_pitch_right_input_r)
+ioport_value mw8080bw_state::tornbase_pitch_right_input_r(ioport_field &field, void *param)
 {
 	return ioport(TORNBASE_L_PITCH_PORT_TAG)->read();
 }
 
 
-CUSTOM_INPUT_MEMBER(mw8080bw_state::tornbase_score_input_r)
+ioport_value mw8080bw_state::tornbase_score_input_r(ioport_field &field, void *param)
 {
 	return ioport(TORNBASE_SCORE_SW_PORT_TAG)->read() &
 			ioport(TORNBASE_SCORE_DIP_PORT_TAG)->read();
@@ -1182,7 +1182,7 @@ void mw8080bw_state::machine_start_desertgu()
 }
 
 
-CUSTOM_INPUT_MEMBER(mw8080bw_state::desertgu_gun_input_r)
+ioport_value mw8080bw_state::desertgu_gun_input_r(ioport_field &field, void *param)
 {
 	uint32_t ret;
 
@@ -1195,7 +1195,7 @@ CUSTOM_INPUT_MEMBER(mw8080bw_state::desertgu_gun_input_r)
 }
 
 
-CUSTOM_INPUT_MEMBER(mw8080bw_state::desertgu_dip_sw_0_1_r)
+ioport_value mw8080bw_state::desertgu_dip_sw_0_1_r(ioport_field &field, void *param)
 {
 	uint32_t ret;
 
@@ -1313,7 +1313,7 @@ MACHINE_CONFIG_END
 #define DPLAY_CAB_TYPE_COCKTAIL     (1)
 
 
-CUSTOM_INPUT_MEMBER(mw8080bw_state::dplay_pitch_left_input_r)
+ioport_value mw8080bw_state::dplay_pitch_left_input_r(ioport_field &field, void *param)
 {
 	uint32_t ret;
 
@@ -1326,7 +1326,7 @@ CUSTOM_INPUT_MEMBER(mw8080bw_state::dplay_pitch_left_input_r)
 }
 
 
-CUSTOM_INPUT_MEMBER(mw8080bw_state::dplay_pitch_right_input_r)
+ioport_value mw8080bw_state::dplay_pitch_right_input_r(ioport_field &field, void *param)
 {
 	return ioport(DPLAY_L_PITCH_PORT_TAG)->read();
 }
@@ -1704,7 +1704,7 @@ void mw8080bw_state::machine_start_clowns()
 }
 
 
-CUSTOM_INPUT_MEMBER(mw8080bw_state::clowns_controller_r)
+ioport_value mw8080bw_state::clowns_controller_r(ioport_field &field, void *param)
 {
 	uint32_t ret;
 
@@ -2522,7 +2522,7 @@ void mw8080bw_state::machine_start_invaders()
 
 
 
-CUSTOM_INPUT_MEMBER(mw8080bw_state::invaders_coin_input_r)
+ioport_value mw8080bw_state::invaders_coin_input_r(ioport_field &field, void *param)
 {
 	uint32_t ret = ioport(INVADERS_COIN_INPUT_PORT_TAG)->read();
 
@@ -2532,7 +2532,7 @@ CUSTOM_INPUT_MEMBER(mw8080bw_state::invaders_coin_input_r)
 }
 
 
-CUSTOM_INPUT_MEMBER(mw8080bw_state::invaders_sw6_sw7_r)
+ioport_value mw8080bw_state::invaders_sw6_sw7_r(ioport_field &field, void *param)
 {
 	uint32_t ret;
 
@@ -2548,7 +2548,7 @@ CUSTOM_INPUT_MEMBER(mw8080bw_state::invaders_sw6_sw7_r)
 }
 
 
-CUSTOM_INPUT_MEMBER(mw8080bw_state::invaders_sw5_r)
+ioport_value mw8080bw_state::invaders_sw5_r(ioport_field &field, void *param)
 {
 	uint32_t ret;
 
@@ -2564,7 +2564,7 @@ CUSTOM_INPUT_MEMBER(mw8080bw_state::invaders_sw5_r)
 }
 
 
-CUSTOM_INPUT_MEMBER(mw8080bw_state::invaders_in0_control_r)
+ioport_value mw8080bw_state::invaders_in0_control_r(ioport_field &field, void *param)
 {
 	uint32_t ret;
 
@@ -2580,13 +2580,13 @@ CUSTOM_INPUT_MEMBER(mw8080bw_state::invaders_in0_control_r)
 }
 
 
-CUSTOM_INPUT_MEMBER(mw8080bw_state::invaders_in1_control_r)
+ioport_value mw8080bw_state::invaders_in1_control_r(ioport_field &field, void *param)
 {
 	return ioport(INVADERS_P1_CONTROL_PORT_TAG)->read();
 }
 
 
-CUSTOM_INPUT_MEMBER(mw8080bw_state::invaders_in2_control_r)
+ioport_value mw8080bw_state::invaders_in2_control_r(ioport_field &field, void *param)
 {
 	uint32_t ret;
 
@@ -2731,7 +2731,7 @@ MACHINE_CONFIG_END
 #define BLUESHRK_COIN_INPUT_PORT_TAG    ("COIN")
 
 
-CUSTOM_INPUT_MEMBER(mw8080bw_state::blueshrk_coin_input_r)
+ioport_value mw8080bw_state::blueshrk_coin_input_r(ioport_field &field, void *param)
 {
 	uint32_t ret = ioport(BLUESHRK_COIN_INPUT_PORT_TAG)->read();
 

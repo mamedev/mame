@@ -44,9 +44,9 @@ public:
 		m_triggers(*this, "TRIGGERS")
 	{ }
 
-	DECLARE_CUSTOM_INPUT_MEMBER(lightgun_pos_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(lightgun_trigger_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(lightgun_holster_r);
+	ioport_value lightgun_pos_r(ioport_field &field, void *param);
+	ioport_value lightgun_trigger_r(ioport_field &field, void *param);
+	ioport_value lightgun_holster_r(ioport_field &field, void *param);
 
 	void init_aplatoon();
 	void init_palr3();
@@ -134,7 +134,7 @@ void alg_state::potgo_w(uint16_t data)
 }
 
 
-CUSTOM_INPUT_MEMBER(alg_state::lightgun_pos_r)
+ioport_value alg_state::lightgun_pos_r(ioport_field &field, void *param)
 {
 	int x = 0, y = 0;
 
@@ -144,14 +144,14 @@ CUSTOM_INPUT_MEMBER(alg_state::lightgun_pos_r)
 }
 
 
-CUSTOM_INPUT_MEMBER(alg_state::lightgun_trigger_r)
+ioport_value alg_state::lightgun_trigger_r(ioport_field &field, void *param)
 {
 	/* read the trigger control based on the input select */
 	return (m_triggers->read() >> m_input_select) & 1;
 }
 
 
-CUSTOM_INPUT_MEMBER(alg_state::lightgun_holster_r)
+ioport_value alg_state::lightgun_holster_r(ioport_field &field, void *param)
 {
 	/* read the holster control based on the input select */
 	return (m_triggers->read() >> (2 + m_input_select)) & 1;

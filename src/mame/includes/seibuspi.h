@@ -118,7 +118,7 @@ public:
 	uint32_t rf2_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	uint32_t rfjet_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(ejanhs_encode);
+	ioport_value ejanhs_encode(ioport_field &field, void *param);
 
 	void ymf_irqhandler(int state);
 	int spi_irq_callback(device_t &device, int irqline);

@@ -176,8 +176,8 @@ public:
 	void bbc_hsync_changed(int state);
 	void bbc_vsync_changed(int state);
 	void bbc_de_changed(int state);
-	DECLARE_INPUT_CHANGED_MEMBER(monitor_changed);
-	DECLARE_INPUT_CHANGED_MEMBER(speech_changed);
+	void monitor_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void speech_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	void update_acia_rxd();
 	void update_acia_dcd();
 	void update_acia_cts();
@@ -186,7 +186,7 @@ public:
 	void write_rxd_serial(int state);
 	void write_dcd_serial(int state);
 	void write_cts_serial(int state);
-	DECLARE_INPUT_CHANGED_MEMBER(trigger_reset);
+	void trigger_reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	void fdc_intrq_w(int state);
 	void fdc_drq_w(int state);
 	void motor_w(int state);
@@ -199,14 +199,14 @@ public:
 	void bbcm_setup_banks(memory_bank *membank, int banks, uint32_t shift, uint32_t size);
 
 	image_init_result bbc_load_rom(device_image_interface &image, generic_slot_device *slot);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp1_load) { return bbc_load_rom(image, m_exp1); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp2_load) { return bbc_load_rom(image, m_exp2); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp3_load) { return bbc_load_rom(image, m_exp3); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp4_load) { return bbc_load_rom(image, m_exp4); }
+	image_init_result device_image_load_exp1_load(device_image_interface &image) { return bbc_load_rom(image, m_exp1); }
+	image_init_result device_image_load_exp2_load(device_image_interface &image) { return bbc_load_rom(image, m_exp2); }
+	image_init_result device_image_load_exp3_load(device_image_interface &image) { return bbc_load_rom(image, m_exp3); }
+	image_init_result device_image_load_exp4_load(device_image_interface &image) { return bbc_load_rom(image, m_exp4); }
 
 	image_init_result bbcm_load_cart(device_image_interface &image, generic_slot_device *slot);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(bbcm_exp1_load) { return bbcm_load_cart(image, m_exp1); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(bbcm_exp2_load) { return bbcm_load_cart(image, m_exp2); }
+	image_init_result device_image_load_bbcm_exp1_load(device_image_interface &image) { return bbcm_load_cart(image, m_exp1); }
+	image_init_result device_image_load_bbcm_exp2_load(device_image_interface &image) { return bbcm_load_cart(image, m_exp2); }
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 

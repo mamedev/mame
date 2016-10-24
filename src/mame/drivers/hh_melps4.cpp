@@ -37,7 +37,7 @@ public:
 	uint16_t m_inp_mux;                   // multiplexed inputs mask
 
 	uint8_t read_inputs(int columns);
-	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
+	void reset_button(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 	// display common
 	int m_display_wait;                 // led/lamp off-delay in microseconds (default 33ms)
@@ -205,7 +205,7 @@ uint8_t hh_melps4_state::read_inputs(int columns)
 	return ret;
 }
 
-INPUT_CHANGED_MEMBER(hh_melps4_state::reset_button)
+void hh_melps4_state::reset_button(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	// for when reset button is directly tied to MCU reset pin
 	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);

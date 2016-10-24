@@ -79,9 +79,9 @@ public:
 	void write(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	uint32_t read(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_INPUT_CHANGED_MEMBER( power_button );
-	DECLARE_INPUT_CHANGED_MEMBER( volume_down );
-	DECLARE_INPUT_CHANGED_MEMBER( volume_up );
+	void power_button(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void volume_down(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void volume_up(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 	void lower_local0_irq(uint8_t source_mask);
 	void raise_local0_irq(uint8_t source_mask);
@@ -525,7 +525,7 @@ void ioc2_device::handle_reset_reg_write(uint8_t data)
 	m_reset_reg = data;
 }
 
-INPUT_CHANGED_MEMBER( ioc2_device::power_button )
+void ioc2_device::power_button(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (!newval)
 	{
@@ -533,7 +533,7 @@ INPUT_CHANGED_MEMBER( ioc2_device::power_button )
 	}
 }
 
-INPUT_CHANGED_MEMBER( ioc2_device::volume_up )
+void ioc2_device::volume_up(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (!newval)
 	{
@@ -546,7 +546,7 @@ INPUT_CHANGED_MEMBER( ioc2_device::volume_up )
 	}
 }
 
-INPUT_CHANGED_MEMBER( ioc2_device::volume_down )
+void ioc2_device::volume_down(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (!newval)
 	{

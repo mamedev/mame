@@ -73,7 +73,7 @@ public:
 	void hwreg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t hwreg_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t rom_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pokemini_cart);
+	image_init_result device_image_load_pokemini_cart(device_image_interface &image);
 
 protected:
 	enum
@@ -1498,7 +1498,7 @@ uint8_t pokemini_state::hwreg_r(address_space &space, offs_t offset, uint8_t mem
 	return data;
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( pokemini_state, pokemini_cart )
+image_init_result pokemini_state::device_image_load_pokemini_cart(device_image_interface &image)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 

@@ -114,7 +114,7 @@ public:
 	void unk_reg_hi_w( int offset, uint8_t data, int reg );
 	void show_out();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(hopper_r);
+	ioport_value hopper_r(ioport_field &field, void *param);
 
 	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void get_reel1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
@@ -418,7 +418,7 @@ static ADDRESS_MAP_START( jackie_io_map, AS_IO, 8, jackie_state )
 	AM_RANGE(0x8000, 0xffff) AM_READ(expram_r)
 ADDRESS_MAP_END
 
-CUSTOM_INPUT_MEMBER(jackie_state::hopper_r)
+ioport_value jackie_state::hopper_r(ioport_field &field, void *param)
 {
 	if (m_hopper) return !(m_screen->frame_number()%10);
 	return machine().input().code_pressed(KEYCODE_H);

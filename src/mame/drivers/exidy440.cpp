@@ -253,7 +253,7 @@ Who Dunit            1988  6809
  *
  *************************************/
 
-INPUT_CHANGED_MEMBER(exidy440_state::coin_inserted)
+void exidy440_state::coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	/* if we got a coin, set the IRQ on the main CPU */
 	if (oldval)
@@ -268,19 +268,19 @@ INPUT_CHANGED_MEMBER(exidy440_state::coin_inserted)
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(exidy440_state::firq_beam_r)
+ioport_value exidy440_state::firq_beam_r(ioport_field &field, void *param)
 {
 	return m_firq_beam;
 }
 
 
-CUSTOM_INPUT_MEMBER(exidy440_state::firq_vblank_r)
+ioport_value exidy440_state::firq_vblank_r(ioport_field &field, void *param)
 {
 	return m_firq_vblank;
 }
 
 
-CUSTOM_INPUT_MEMBER(exidy440_state::hitnmiss_button1_r)
+ioport_value exidy440_state::hitnmiss_button1_r(ioport_field &field, void *param)
 {
 	/* button 1 shows up in two bits */
 	uint32_t button1 = ioport("HITNMISS_BUTTON1")->read();

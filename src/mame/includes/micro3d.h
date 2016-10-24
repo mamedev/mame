@@ -166,7 +166,7 @@ public:
 	void micro3d_fifo_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	void micro3d_alt_fifo_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	uint32_t micro3d_pipe_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
-	DECLARE_CUSTOM_INPUT_MEMBER(botss_hwchk_r);
+	ioport_value botss_hwchk_r(ioport_field &field, void *param);
 	void micro3d_snd_dac_a(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void micro3d_snd_dac_b(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void micro3d_sound_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);

@@ -133,14 +133,14 @@ Stephh's notes (based on the games Z80 code and some tests) :
  *************************************/
 
 /* Players inputs are muxed at 0xa000 */
-CUSTOM_INPUT_MEMBER(exerion_state::exerion_controls_r)
+ioport_value exerion_state::exerion_controls_r(ioport_field &field, void *param)
 {
 	static const char *const inname[2] = { "P1", "P2" };
 	return ioport(inname[m_cocktail_flip])->read() & 0x3f;
 }
 
 
-INPUT_CHANGED_MEMBER(exerion_state::coin_inserted)
+void exerion_state::coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	/* coin insertion causes an NMI */
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);

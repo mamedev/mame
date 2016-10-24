@@ -518,7 +518,7 @@ void model2_state::videoctl_w(address_space &space, offs_t offset, uint32_t data
 	COMBINE_DATA(&m_videocontrol);
 }
 
-CUSTOM_INPUT_MEMBER(model2_state::_1c00000_r)
+ioport_value model2_state::_1c00000_r(ioport_field &field, void *param)
 {
 	uint32_t ret = m_in0->read();
 
@@ -533,7 +533,7 @@ CUSTOM_INPUT_MEMBER(model2_state::_1c00000_r)
 	}
 }
 
-CUSTOM_INPUT_MEMBER(model2_state::_1c0001c_r)
+ioport_value model2_state::_1c0001c_r(ioport_field &field, void *param)
 {
 	uint32_t iptval = 0x00ff;
 	if(m_analog_channel < 4)
@@ -554,7 +554,7 @@ CUSTOM_INPUT_MEMBER(model2_state::_1c0001c_r)
     PORT_DIPSETTING(    0x70, "7" )*/
 
 /* Used specifically by Sega Rally, others might be different */
-CUSTOM_INPUT_MEMBER(model2_state::srallyc_gearbox_r)
+ioport_value model2_state::srallyc_gearbox_r(ioport_field &field, void *param)
 {
 	uint8_t res = m_gears.read_safe(0);
 	int i;
@@ -643,7 +643,7 @@ CUSTOM_INPUT_MEMBER(model2_state::srallyc_gearbox_r)
 */
 
 
-CUSTOM_INPUT_MEMBER(model2_state::rchase2_devices_r)
+ioport_value model2_state::rchase2_devices_r(ioport_field &field, void *param)
 {
 	return 0xffff;
 }

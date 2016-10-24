@@ -76,8 +76,8 @@ public:
 	void screen_update(bitmap_ind16 &bitmap, const rectangle &cliprect, int char_height);
 	uint8_t nascom1_hd6402_si(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void nascom1_hd6402_so(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( nascom1_cassette );
-	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( nascom1_cassette );
+	image_init_result device_image_load_nascom1_cassette(device_image_interface &image);
+	void device_image_unload_nascom1_cassette(device_image_interface &image);
 	DECLARE_SNAPSHOT_LOAD_MEMBER( nascom1 );
 
 protected:
@@ -117,8 +117,8 @@ public:
 	uint32_t screen_update_nascom(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot, int slot_id);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(socket1_load) { return load_cart(image, m_socket1, 1); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(socket2_load) { return load_cart(image, m_socket2, 2); }
+	image_init_result device_image_load_socket1_load(device_image_interface &image) { return load_cart(image, m_socket1, 1); }
+	image_init_result device_image_load_socket2_load(device_image_interface &image) { return load_cart(image, m_socket2, 2); }
 
 protected:
 	virtual void machine_reset() override;
@@ -205,7 +205,7 @@ void nascom_state::nascom1_hd6402_so(address_space &space, offs_t offset, uint8_
 {
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( nascom_state, nascom1_cassette )
+image_init_result nascom_state::device_image_load_nascom1_cassette(device_image_interface &image)
 {
 	m_tape_size = image.length();
 	m_tape_image = (uint8_t*)image.ptr();
@@ -217,7 +217,7 @@ DEVICE_IMAGE_LOAD_MEMBER( nascom_state, nascom1_cassette )
 	return image_init_result::PASS;
 }
 
-DEVICE_IMAGE_UNLOAD_MEMBER( nascom_state, nascom1_cassette )
+void nascom_state::device_image_unload_nascom1_cassette(device_image_interface &image)
 {
 	m_tape_image = nullptr;
 	m_tape_size = m_tape_index = 0;

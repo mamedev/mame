@@ -78,8 +78,8 @@ public:
 	void starshp1_ssadd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void starshp1_sspic_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void starshp1_playfield_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_CUSTOM_INPUT_MEMBER(starshp1_analog_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(collision_latch_r);
+	ioport_value starshp1_analog_r(ioport_field &field, void *param);
+	ioport_value collision_latch_r(ioport_field &field, void *param);
 	void starshp1_audio_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void starshp1_analog_out_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);

@@ -47,7 +47,7 @@ public:
 	uint8_t m_speech_bank;                // speech rom higher address bits
 
 	uint16_t read_inputs(int columns);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(scc_cartridge);
+	image_init_result device_image_load_scc_cartridge(device_image_interface &image);
 
 	// display common
 	int m_display_wait;                 // led/lamp off-delay in microseconds (default 33ms)

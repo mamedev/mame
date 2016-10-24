@@ -146,7 +146,7 @@ public:
 	void itech020_video_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	void drivedge_zbuf_control_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	uint32_t itech020_video_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
-	DECLARE_CUSTOM_INPUT_MEMBER(special_port_r);
+	ioport_value special_port_r(ioport_field &field, void *param);
 	void drivedge_portb_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void drivedge_turbo_light(int state);
 	void pia_portb_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);

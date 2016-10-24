@@ -51,7 +51,7 @@ public:
 	uint32_t policetr_video_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	void policetr_palette_offset_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	void policetr_palette_data_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
-	DECLARE_CUSTOM_INPUT_MEMBER(bsmt_status_r);
+	ioport_value bsmt_status_r(ioport_field &field, void *param);
 	void init_sshoot12();
 	void init_policetr();
 	void init_sshooter();

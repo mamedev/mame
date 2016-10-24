@@ -52,7 +52,7 @@ public:
 	uint16_t lethalj_gun_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void lethalj_blitter_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void do_blit();
-	DECLARE_CUSTOM_INPUT_MEMBER(cclownz_paddle);
+	ioport_value cclownz_paddle(ioport_field &field, void *param);
 	void init_cfarm();
 	void init_ripribit();
 	void init_cclownz();

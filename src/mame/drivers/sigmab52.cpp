@@ -161,7 +161,7 @@ public:
 	void tower_lamps_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void coin_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_jwildb52();
-	DECLARE_INPUT_CHANGED_MEMBER(coin_drop_start);
+	void coin_drop_start(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	void ptm2_irq(int state);
 	void audiocpu_irq_update();
 	virtual void machine_start() override;
@@ -376,7 +376,7 @@ static ADDRESS_MAP_START( jwildb52_hd63484_map, AS_0, 16, sigmab52_state )
 	AM_RANGE(0x20000, 0x3ffff) AM_ROM AM_REGION("gfx1", 0)
 ADDRESS_MAP_END
 
-INPUT_CHANGED_MEMBER( sigmab52_state::coin_drop_start )
+void sigmab52_state::coin_drop_start(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (newval && !m_coin_start_cycles)
 		m_coin_start_cycles = m_maincpu->total_cycles();

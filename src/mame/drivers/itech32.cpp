@@ -491,7 +491,7 @@ void itech32_state::machine_reset_drivedge()
  *************************************/
 
 
-CUSTOM_INPUT_MEMBER(itech32_state::special_port_r)
+ioport_value itech32_state::special_port_r(ioport_field &field, void *param)
 {
 	if (m_sound_int_state)
 		m_special_result ^= 1;

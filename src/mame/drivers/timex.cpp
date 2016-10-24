@@ -598,7 +598,7 @@ void spectrum_state::machine_reset_tc2048()
 }
 
 
-DEVICE_IMAGE_LOAD_MEMBER( spectrum_state, timex_cart )
+image_init_result spectrum_state::device_image_load_timex_cart(device_image_interface &image)
 {
 	uint32_t size = m_dock->common_get_size("rom");
 

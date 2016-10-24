@@ -342,7 +342,7 @@ public:
 	void namcos22_dspram16_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	uint16_t namcos22_dspram16_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void namcos22_dspram16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	DECLARE_CUSTOM_INPUT_MEMBER(alpine_motor_read);
+	ioport_value alpine_motor_read(ioport_field &field, void *param);
 	uint16_t pdp_status_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	uint16_t pdp_begin_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	uint16_t slave_external_ram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);

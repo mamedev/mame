@@ -77,7 +77,7 @@ void playch10_state::machine_start_playch10_hboard()
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(playch10_state::pc10_int_detect_r)
+ioport_value playch10_state::pc10_int_detect_r(ioport_field &field, void *param)
 {
 	return ~m_pc10_int_detect & 1;
 }

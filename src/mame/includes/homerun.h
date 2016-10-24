@@ -51,10 +51,10 @@ public:
 	void homerun_scrolly_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void homerun_scrollx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(homerun_sprite0_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(homerun_d7756_busy_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(ganjaja_d7756_busy_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(ganjaja_hopper_status_r);
+	ioport_value homerun_sprite0_r(ioport_field &field, void *param);
+	ioport_value homerun_d7756_busy_r(ioport_field &field, void *param);
+	ioport_value ganjaja_d7756_busy_r(ioport_field &field, void *param);
+	ioport_value ganjaja_hopper_status_r(ioport_field &field, void *param);
 
 	void get_homerun_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;

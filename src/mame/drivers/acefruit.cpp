@@ -44,9 +44,9 @@ public:
 	void acefruit_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void acefruit_lamp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void acefruit_solenoid_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_CUSTOM_INPUT_MEMBER(sidewndr_payout_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(starspnr_coinage_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(starspnr_payout_r);
+	ioport_value sidewndr_payout_r(ioport_field &field, void *param);
+	ioport_value starspnr_coinage_r(ioport_field &field, void *param);
+	ioport_value starspnr_payout_r(ioport_field &field, void *param);
 	void init_sidewndr();
 	virtual void video_start() override;
 	void palette_init_acefruit(palette_device &palette);
@@ -200,7 +200,7 @@ uint32_t acefruit_state::screen_update_acefruit(screen_device &screen, bitmap_in
 	return 0;
 }
 
-CUSTOM_INPUT_MEMBER(acefruit_state::sidewndr_payout_r)
+ioport_value acefruit_state::sidewndr_payout_r(ioport_field &field, void *param)
 {
 	int bit_mask = (uintptr_t)param;
 
@@ -216,7 +216,7 @@ CUSTOM_INPUT_MEMBER(acefruit_state::sidewndr_payout_r)
 	}
 }
 
-CUSTOM_INPUT_MEMBER(acefruit_state::starspnr_coinage_r)
+ioport_value acefruit_state::starspnr_coinage_r(ioport_field &field, void *param)
 {
 	int bit_mask = (uintptr_t)param;
 
@@ -236,7 +236,7 @@ CUSTOM_INPUT_MEMBER(acefruit_state::starspnr_coinage_r)
 	}
 }
 
-CUSTOM_INPUT_MEMBER(acefruit_state::starspnr_payout_r)
+ioport_value acefruit_state::starspnr_payout_r(ioport_field &field, void *param)
 {
 	int bit_mask = (uintptr_t)param;
 

@@ -67,8 +67,8 @@ public:
 	void pcjx_set_bank(int unk1, int unk2, int unk3);
 
 	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pcjr_cart1) { return load_cart(image, m_cart1); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pcjr_cart2) { return load_cart(image, m_cart2); }
+	image_init_result device_image_load_pcjr_cart1(device_image_interface &image) { return load_cart(image, m_cart1); }
+	image_init_result device_image_load_pcjr_cart2(device_image_interface &image) { return load_cart(image, m_cart2); }
 	void pc_speaker_set_spkrdata(uint8_t data);
 
 	uint8_t m_pc_spkrdata;

@@ -20,13 +20,13 @@ Atari Ultra Tank driver
 
 
 
-CUSTOM_INPUT_MEMBER(ultratnk_state::get_collision)
+ioport_value ultratnk_state::get_collision(ioport_field &field, void *param)
 {
 	return m_collision[(uintptr_t) param];
 }
 
 
-CUSTOM_INPUT_MEMBER(ultratnk_state::get_joystick)
+ioport_value ultratnk_state::get_joystick(ioport_field &field, void *param)
 {
 	uint8_t joy = ioport((const char *)param)->read() & 3;
 

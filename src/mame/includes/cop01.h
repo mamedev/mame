@@ -51,7 +51,7 @@ public:
 	void cop01_background_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void cop01_foreground_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void cop01_vreg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_CUSTOM_INPUT_MEMBER(mightguy_area_r);
+	ioport_value mightguy_area_r(ioport_field &field, void *param);
 	void init_mightguy();
 	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);

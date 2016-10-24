@@ -44,7 +44,7 @@ public:
 	void port_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void crbaloon_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void crbaloon_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_CUSTOM_INPUT_MEMBER(pc3092_r);
+	ioport_value pc3092_r(ioport_field &field, void *param);
 	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_reset() override;
 	virtual void video_start() override;

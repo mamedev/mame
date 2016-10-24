@@ -349,7 +349,7 @@ void ddragon_state::ddragonba_port_w(address_space &space, offs_t offset, uint8_
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(ddragon_state::subcpu_bus_free)
+ioport_value ddragon_state::subcpu_bus_free(ioport_field &field, void *param)
 {
 	// Corresponds to BA (Bus Available) on the HD63701
 	if (m_subcpu)

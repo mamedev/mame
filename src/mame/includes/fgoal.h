@@ -59,7 +59,7 @@ public:
 	void ypos_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void xpos_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(_80_r);
+	ioport_value _80_r(ioport_field &field, void *param);
 
 	void interrupt_callback(void *ptr, int32_t param);
 

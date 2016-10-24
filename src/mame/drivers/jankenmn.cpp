@@ -170,7 +170,7 @@ public:
 	void lamps2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void lamps3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(hopper_status_r);
+	ioport_value hopper_status_r(ioport_field &field, void *param);
 };
 
 
@@ -236,7 +236,7 @@ void jankenmn_state::lamps3_w(address_space &space, offs_t offset, uint8_t data,
 		logerror("payout: %02X\n", (data & 0x04));
 }
 
-CUSTOM_INPUT_MEMBER(jankenmn_state::hopper_status_r)
+ioport_value jankenmn_state::hopper_status_r(ioport_field &field, void *param)
 {
 	// temp workaround, needs hopper
 	return machine().rand();

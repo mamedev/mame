@@ -438,8 +438,8 @@ public:
 	void amiga_blitter_proc(void *ptr, int32_t param);
 	void update_irqs();
 
-	DECLARE_CUSTOM_INPUT_MEMBER( amiga_joystick_convert );
-	DECLARE_CUSTOM_INPUT_MEMBER( floppy_drive_status );
+	ioport_value amiga_joystick_convert(ioport_field &field, void *param);
+	ioport_value floppy_drive_status(ioport_field &field, void *param);
 
 	void m68k_reset(int state);
 	void kbreset_w(int state);

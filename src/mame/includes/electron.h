@@ -116,8 +116,8 @@ public:
 	inline uint8_t read_vram( uint16_t addr );
 	inline void electron_plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint32_t color);
 	void electron_interrupt_handler(int mode, int interrupt);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( electron_cart );
-	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
+	image_init_result device_image_load_electron_cart(device_image_interface &image);
+	void trigger_reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;

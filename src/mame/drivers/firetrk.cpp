@@ -29,19 +29,19 @@ void firetrk_state::set_service_mode(int enable)
 }
 
 
-INPUT_CHANGED_MEMBER(firetrk_state::service_mode_switch_changed)
+void firetrk_state::service_mode_switch_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	set_service_mode(newval);
 }
 
 
-INPUT_CHANGED_MEMBER(firetrk_state::firetrk_horn_changed)
+void firetrk_state::firetrk_horn_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_discrete->write(generic_space(), FIRETRUCK_HORN_EN, newval);
 }
 
 
-INPUT_CHANGED_MEMBER(firetrk_state::gear_changed)
+void firetrk_state::gear_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (newval)
 	{
@@ -177,19 +177,19 @@ uint8_t firetrk_state::montecar_dip_r(address_space &space, offs_t offset, uint8
 }
 
 
-CUSTOM_INPUT_MEMBER(firetrk_state::steer_dir_r)
+ioport_value firetrk_state::steer_dir_r(ioport_field &field, void *param)
 {
 	return m_steer_dir[(uintptr_t)param];
 }
 
 
-CUSTOM_INPUT_MEMBER(firetrk_state::steer_flag_r)
+ioport_value firetrk_state::steer_flag_r(ioport_field &field, void *param)
 {
 	return m_steer_flag[(uintptr_t)param];
 }
 
 
-CUSTOM_INPUT_MEMBER(firetrk_state::skid_r)
+ioport_value firetrk_state::skid_r(ioport_field &field, void *param)
 {
 	uint32_t ret;
 	int which = (uintptr_t)param;
@@ -203,7 +203,7 @@ CUSTOM_INPUT_MEMBER(firetrk_state::skid_r)
 }
 
 
-CUSTOM_INPUT_MEMBER(firetrk_state::crash_r)
+ioport_value firetrk_state::crash_r(ioport_field &field, void *param)
 {
 	uint32_t ret;
 	int which = (uintptr_t)param;
@@ -217,7 +217,7 @@ CUSTOM_INPUT_MEMBER(firetrk_state::crash_r)
 }
 
 
-CUSTOM_INPUT_MEMBER(firetrk_state::gear_r)
+ioport_value firetrk_state::gear_r(ioport_field &field, void *param)
 {
 	return (m_gear == (uintptr_t)param) ? 1 : 0;
 }

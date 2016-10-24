@@ -91,8 +91,8 @@ public:
 	void galaxi_500000_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void galaxi_500002_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void galaxi_500004_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	DECLARE_CUSTOM_INPUT_MEMBER(ticket_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(hopper_r);
+	ioport_value ticket_r(ioport_field &field, void *param);
+	ioport_value hopper_r(ioport_field &field, void *param);
 	void get_bg1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void get_bg2_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void get_bg3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
@@ -279,12 +279,12 @@ void galaxi_state::galaxi_500004_w(address_space &space, offs_t offset, uint16_t
 	show_out();
 }
 
-CUSTOM_INPUT_MEMBER(galaxi_state::ticket_r)
+ioport_value galaxi_state::ticket_r(ioport_field &field, void *param)
 {
 	return m_ticket && !(m_screen->frame_number() % 10);
 }
 
-CUSTOM_INPUT_MEMBER(galaxi_state::hopper_r)
+ioport_value galaxi_state::hopper_r(ioport_field &field, void *param)
 {
 	return m_hopper && !(m_screen->frame_number() % 10);
 }

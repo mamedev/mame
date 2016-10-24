@@ -158,10 +158,10 @@ public:
 	void screen_eof_spectrum(screen_device &screen, bool state);
 	void screen_eof_timex(screen_device &screen, bool state);
 	void spec_interrupt(device_t &device);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( spectrum_cart );
+	image_init_result device_image_load_spectrum_cart(device_image_interface &image);
 
 	// for timex cart only
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( timex_cart );
+	image_init_result device_image_load_timex_cart(device_image_interface &image);
 	int m_dock_cart_type, m_ram_chunks;
 	memory_region *m_dock_crt;
 

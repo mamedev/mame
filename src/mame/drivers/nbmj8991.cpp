@@ -229,7 +229,7 @@ static ADDRESS_MAP_START( nbmj8991_sound_io_map, AS_IO, 8, nbmj8991_state )
 	AM_RANGE(0x80, 0x81) AM_DEVWRITE("fmsnd", ym3812_device, write)
 ADDRESS_MAP_END
 
-CUSTOM_INPUT_MEMBER( nbmj8991_state::nb1413m3_busyflag_r )
+ioport_value nbmj8991_state::nb1413m3_busyflag_r(ioport_field &field, void *param)
 {
 	return m_nb1413m3->m_busyflag & 0x01;
 }

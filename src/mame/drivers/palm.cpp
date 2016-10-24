@@ -41,8 +41,8 @@ public:
 	uint16_t m_spim_data;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_INPUT_CHANGED_MEMBER(pen_check);
-	DECLARE_INPUT_CHANGED_MEMBER(button_check);
+	void pen_check(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void button_check(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	void palm_port_f_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t palm_port_c_in(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t palm_port_f_in(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
@@ -64,7 +64,7 @@ public:
     MACHINE HARDWARE
 ***************************************************************************/
 
-INPUT_CHANGED_MEMBER(palm_state::pen_check)
+void palm_state::pen_check(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	uint8_t button = m_io_penb->read();
 
@@ -74,7 +74,7 @@ INPUT_CHANGED_MEMBER(palm_state::pen_check)
 		m_lsi->set_penirq_line(0);
 }
 
-INPUT_CHANGED_MEMBER(palm_state::button_check)
+void palm_state::button_check(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	uint8_t button_state = m_io_portd->read();
 	m_lsi->set_port_d_lines(button_state, (int)(uintptr_t)param);

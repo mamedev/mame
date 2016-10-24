@@ -120,7 +120,7 @@ public:
 	uint8_t imola_draw_mode_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void vreg_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void vreg_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_CUSTOM_INPUT_MEMBER(imolagp_steerlatch_r);
+	ioport_value imolagp_steerlatch_r(ioport_field &field, void *param);
 	void slave_vblank_irq(device_t &device);
 	void imolagp_pot_callback(timer_device &timer, void *ptr, int32_t param);
 
@@ -363,7 +363,7 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-CUSTOM_INPUT_MEMBER(imolagp_state::imolagp_steerlatch_r)
+ioport_value imolagp_state::imolagp_steerlatch_r(ioport_field &field, void *param)
 {
 	return m_steerlatch & 0xf;
 }

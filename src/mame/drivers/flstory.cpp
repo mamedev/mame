@@ -118,7 +118,7 @@ static ADDRESS_MAP_START( onna34ro_map, AS_PROGRAM, 8, flstory_state )
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("workram") /* work RAM */
 ADDRESS_MAP_END
 
-CUSTOM_INPUT_MEMBER(flstory_state::victnine_mcu_status_bit01_r)
+ioport_value flstory_state::victnine_mcu_status_bit01_r(ioport_field &field, void *param)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 

@@ -360,7 +360,7 @@ public:
 		}
 	}
 
-	inline DECLARE_INPUT_CHANGED_MEMBER(input_changed)
+	inline void input_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 	{
 		if (m_auto_port)
 			write(((double) newval - (double) field.minval())/((double) (field.maxval()-field.minval()) ) );
@@ -433,7 +433,7 @@ public:
 			synchronize(0, v);
 	}
 
-	inline DECLARE_INPUT_CHANGED_MEMBER(input_changed) { write(newval); }
+	inline void input_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval) { write(newval); }
 	void write_line(int state)       { write(state);  }
 	void write8(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff)               { write(data);   }
 	void write16(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff)             { write(data);   }
@@ -479,7 +479,7 @@ public:
 			synchronize(0, v);
 	}
 
-	inline DECLARE_INPUT_CHANGED_MEMBER(input_changed) { write(newval); }
+	inline void input_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval) { write(newval); }
 	void write_line(int state)       { write(state);  }
 	void write8(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff)               { write(data);   }
 	void write16(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff)             { write(data);   }

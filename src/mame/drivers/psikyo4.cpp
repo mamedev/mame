@@ -169,7 +169,7 @@ void psikyo4_state::psikyosh_interrupt(device_t &device)
 	device.execute().set_input_line(4, HOLD_LINE);
 }
 
-CUSTOM_INPUT_MEMBER(psikyo4_state::mahjong_ctrl_r)/* used by hotgmck/hgkairak */
+ioport_value psikyo4_state::mahjong_ctrl_r(ioport_field &field, void *param)/* used by hotgmck/hgkairak */
 {
 	int player = (uintptr_t)param;
 	int ret = 0xff;

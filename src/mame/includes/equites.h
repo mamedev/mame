@@ -102,7 +102,7 @@ public:
 	void equites_flipb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void splndrbt_bg_scrollx_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void splndrbt_bg_scrolly_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	DECLARE_CUSTOM_INPUT_MEMBER(gekisou_unknown_bit_r);
+	ioport_value gekisou_unknown_bit_r(ioport_field &field, void *param);
 	void equites_8910porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void equites_8910portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_splndrbt();

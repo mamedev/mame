@@ -244,7 +244,7 @@ void nextkbd_device::kmdata_w(address_space &space, offs_t offset, uint32_t data
 	logerror("%s: kmdata_w %08x @ %08x (%08x)\n", tag(), data, mem_mask, (unsigned int)space.device().safe_pc());
 }
 
-INPUT_CHANGED_MEMBER( nextkbd_device::update )
+void nextkbd_device::update(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	int bank = (int)(uintptr_t)param;
 	switch(bank) {

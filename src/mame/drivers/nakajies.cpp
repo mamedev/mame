@@ -336,7 +336,7 @@ public:
 	uint8_t   m_bank[8];
 	uint8_t   *m_bank_base[8];
 	void palette_init_nakajies(palette_device &palette);
-	DECLARE_INPUT_CHANGED_MEMBER(trigger_irq);
+	void trigger_irq(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	void kb_timer(timer_device &timer, void *ptr, int32_t param);
 };
 
@@ -503,7 +503,7 @@ static ADDRESS_MAP_START( nakajies_io_map, AS_IO, 8, nakajies_state )
 ADDRESS_MAP_END
 
 
-INPUT_CHANGED_MEMBER(nakajies_state::trigger_irq)
+void nakajies_state::trigger_irq(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	uint8_t irqs = ioport( "debug" )->read();
 

@@ -107,7 +107,7 @@ public:
 	uint8_t question_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t laserdisc_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void laserdisc_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_CUSTOM_INPUT_MEMBER(latched_coin_r);
+	ioport_value latched_coin_r(ioport_field &field, void *param);
 	void ppi_portc_hi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_addr_xlh();
 	void init_addr_lhx();
@@ -266,7 +266,7 @@ uint8_t statriv2_state::question_data_r(address_space &space, offs_t offset, uin
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(statriv2_state::latched_coin_r)
+ioport_value statriv2_state::latched_coin_r(ioport_field &field, void *param)
 {
 	return m_latched_coin;
 }

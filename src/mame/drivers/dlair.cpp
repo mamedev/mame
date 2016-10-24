@@ -120,8 +120,8 @@ public:
 	void led_den2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t laserdisc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void laserdisc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_CUSTOM_INPUT_MEMBER(laserdisc_status_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(laserdisc_command_r);
+	ioport_value laserdisc_status_r(ioport_field &field, void *param);
+	ioport_value laserdisc_command_r(ioport_field &field, void *param);
 	void init_fixed();
 	void init_variable();
 	void machine_start_dlair();
@@ -324,13 +324,13 @@ void dlair_state::led_den2_w(address_space &space, offs_t offset, uint8_t data, 
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(dlair_state::laserdisc_status_r)
+ioport_value dlair_state::laserdisc_status_r(ioport_field &field, void *param)
 {
 	return laserdisc_status_r();
 }
 
 
-CUSTOM_INPUT_MEMBER(dlair_state::laserdisc_command_r)
+ioport_value dlair_state::laserdisc_command_r(ioport_field &field, void *param)
 {
 	return (laserdisc_ready_r() == ASSERT_LINE) ? 0 : 1;
 }

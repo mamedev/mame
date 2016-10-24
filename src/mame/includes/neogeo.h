@@ -79,8 +79,8 @@ public:
 	uint16_t in0_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	uint16_t in1_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(get_memcard_status);
-	DECLARE_CUSTOM_INPUT_MEMBER(get_audio_result);
+	ioport_value get_memcard_status(ioport_field &field, void *param);
+	ioport_value get_audio_result(ioport_field &field, void *param);
 
 	void display_position_interrupt_callback(void *ptr, int32_t param);
 	void display_position_vblank_callback(void *ptr, int32_t param);
@@ -88,7 +88,7 @@ public:
 
 	// MVS-specific
 	void save_ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	DECLARE_CUSTOM_INPUT_MEMBER(kizuna4p_start_r);
+	ioport_value kizuna4p_start_r(ioport_field &field, void *param);
 
 	uint32_t screen_update_neogeo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -248,7 +248,7 @@ class aes_state : public neogeo_state
 	{}
 
 	uint16_t aes_in2_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
-	DECLARE_INPUT_CHANGED_MEMBER(aes_jp1);
+	void aes_jp1(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	void machine_start_aes();
 
 protected:
@@ -275,7 +275,7 @@ class neopcb_state : public neogeo_state
 
 	void write_bankpvc(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_INPUT_CHANGED_MEMBER(select_bios);
+	void select_bios(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 	void init_ms5pcb();
 	void init_svcpcb();

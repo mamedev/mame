@@ -36,7 +36,7 @@ public:
 	virtual uint8_t iorq_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) override;
 	virtual void iorq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cartridge);
+	image_init_result device_image_load_cartridge(device_image_interface &image);
 
 protected:
 	virtual const tiny_rom_entry *device_rom_region() const override;

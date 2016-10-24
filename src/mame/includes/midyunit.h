@@ -115,9 +115,9 @@ public:
 	void midyunit_paletteram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	uint16_t midyunit_dma_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void midyunit_dma_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	DECLARE_CUSTOM_INPUT_MEMBER(narc_talkback_strobe_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(narc_talkback_data_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(adpcm_irq_state_r);
+	ioport_value narc_talkback_strobe_r(ioport_field &field, void *param);
+	ioport_value narc_talkback_data_r(ioport_field &field, void *param);
+	ioport_value adpcm_irq_state_r(ioport_field &field, void *param);
 	void yawdim_oki_bank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	TMS340X0_TO_SHIFTREG_CB_MEMBER(to_shiftreg);
 	TMS340X0_FROM_SHIFTREG_CB_MEMBER(from_shiftreg);

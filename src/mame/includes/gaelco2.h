@@ -117,5 +117,5 @@ public:
 	void wrally2_coin_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void wrally2_adc_clk(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void wrally2_adc_cs(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	DECLARE_CUSTOM_INPUT_MEMBER(wrally2_analog_bit_r);
+	ioport_value wrally2_analog_bit_r(ioport_field &field, void *param);
 };

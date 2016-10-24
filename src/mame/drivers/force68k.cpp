@@ -159,7 +159,7 @@ public:
 	void centronics_select_w(int state);
 	// User EPROM/SRAM slot(s)
 	image_init_result force68k_load_cart(device_image_interface &image, generic_slot_device *slot);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER (exp1_load) { return force68k_load_cart(image, m_cart); }
+	image_init_result device_image_load_exp1_load(device_image_interface &image) { return force68k_load_cart(image, m_cart); }
 	uint16_t read16_rom(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
 private:

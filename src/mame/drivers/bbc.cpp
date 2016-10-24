@@ -284,7 +284,7 @@ static ADDRESS_MAP_START(bbcm_mem, AS_PROGRAM, 8, bbc_state )
 ADDRESS_MAP_END
 
 
-INPUT_CHANGED_MEMBER(bbc_state::trigger_reset)
+void bbc_state::trigger_reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 	if (newval)
@@ -646,13 +646,13 @@ static INPUT_PORTS_START(bbcbp_links)
 INPUT_PORTS_END
 
 
-INPUT_CHANGED_MEMBER(bbc_state::monitor_changed)
+void bbc_state::monitor_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_monitortype = m_bbcconfig.read_safe(0) &0x03;
 }
 
 
-INPUT_CHANGED_MEMBER(bbc_state::speech_changed)
+void bbc_state::speech_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	// Switchable during runtime as some games (Hyper Sports, Space Fighter) are not compatible with Speech
 	m_Speech = m_bbcconfig.read_safe(0) & 0x04;

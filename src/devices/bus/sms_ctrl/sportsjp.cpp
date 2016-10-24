@@ -49,7 +49,7 @@ const device_type SMS_SPORTS_PAD_JP = &device_creator<sms_sports_pad_jp_device>;
 // The returned value is inverted due to IP_ACTIVE_LOW mapping.
 int sms_sports_pad_jp_device::tl_pin_r() { return ~m_tl_pin_state; }
 int sms_sports_pad_jp_device::tr_pin_r() { return ~m_tr_pin_state; }
-CUSTOM_INPUT_MEMBER( sms_sports_pad_jp_device::rldu_pins_r ) { return ~(m_rldu_pins_state & 0x0f); }
+ioport_value sms_sports_pad_jp_device::rldu_pins_r(ioport_field &field, void *param) { return ~(m_rldu_pins_state & 0x0f); }
 
 
 static INPUT_PORTS_START( sms_sports_pad_jp )

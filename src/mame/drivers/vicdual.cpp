@@ -97,7 +97,7 @@ void vicdual_state::assert_coin_status()
 	m_coin_status = 1;
 }
 
-CUSTOM_INPUT_MEMBER(vicdual_state::read_coin_status)
+ioport_value vicdual_state::read_coin_status(ioport_field &field, void *param)
 {
 	return m_coin_status;
 }
@@ -112,7 +112,7 @@ void vicdual_state::coin_in()
 	m_coinstate_timer->adjust(attotime::from_msec(70));
 }
 
-INPUT_CHANGED_MEMBER(vicdual_state::coin_changed)
+void vicdual_state::coin_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (newval)
 	{
@@ -155,25 +155,25 @@ int vicdual_state::get_vcounter()
 }
 
 
-CUSTOM_INPUT_MEMBER(vicdual_state::get_64v)
+ioport_value vicdual_state::get_64v(ioport_field &field, void *param)
 {
 	return (get_vcounter() >> 6) & 0x01;
 }
 
 
-CUSTOM_INPUT_MEMBER(vicdual_state::get_vblank_comp)
+ioport_value vicdual_state::get_vblank_comp(ioport_field &field, void *param)
 {
 	return (get_vcounter() < VICDUAL_VBSTART);
 }
 
 
-CUSTOM_INPUT_MEMBER(vicdual_state::get_composite_blank_comp)
+ioport_value vicdual_state::get_composite_blank_comp(ioport_field &field, void *param)
 {
 	return (get_vblank_comp(field, nullptr) && !m_screen->hblank());
 }
 
 
-CUSTOM_INPUT_MEMBER(vicdual_state::get_timer_value)
+ioport_value vicdual_state::get_timer_value(ioport_field &field, void *param)
 {
 	/* return the state of the timer (old code claims "4MHz square wave", but it was toggled once every 2msec, or 500Hz) */
 	return machine().time().as_ticks(500) & 1;
@@ -1296,7 +1296,7 @@ ADDRESS_MAP_END
 
 
 /* several of the games' lives DIPs are spread across two input ports */
-CUSTOM_INPUT_MEMBER(vicdual_state::fake_lives_r)
+ioport_value vicdual_state::fake_lives_r(ioport_field &field, void *param)
 {
 	/* use the low byte for the bitmask */
 	uint8_t bit_mask = ((uintptr_t)param) & 0xff;
@@ -2104,7 +2104,7 @@ void vicdual_state::samurai_protection_w(address_space &space, offs_t offset, ui
 }
 
 
-CUSTOM_INPUT_MEMBER(vicdual_state::samurai_protection_r)
+ioport_value vicdual_state::samurai_protection_r(ioport_field &field, void *param)
 {
 	int offset = (uintptr_t)param;
 	uint32_t answer = 0;
@@ -2278,7 +2278,7 @@ void vicdual_state::nsub_coin_pulse(timer_device &timer, void *ptr, int32_t para
 	}
 }
 
-INPUT_CHANGED_MEMBER(vicdual_state::nsub_coin_in)
+void vicdual_state::nsub_coin_in(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (newval)
 	{

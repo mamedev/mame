@@ -1079,7 +1079,7 @@ void balsente_state::balsente_register_addr_w(address_space &space, offs_t offse
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(balsente_state::nstocker_bits_r)
+ioport_value balsente_state::nstocker_bits_r(ioport_field &field, void *param)
 {
 	return m_nstocker_bits;
 }

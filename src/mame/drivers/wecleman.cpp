@@ -861,7 +861,7 @@ INPUT_PORTS_END
                             Hot Chase Input Ports
 ***************************************************************************/
 
-CUSTOM_INPUT_MEMBER(wecleman_state::hotchase_sound_status_r)
+ioport_value wecleman_state::hotchase_sound_status_r(ioport_field &field, void *param)
 {
 	return m_hotchase_sound_hs;
 }

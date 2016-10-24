@@ -136,7 +136,7 @@ ADDRESS_MAP_END
 *      Input ports       *
 *************************/
 
-INPUT_CHANGED_MEMBER(cdi_state::mcu_input)
+void cdi_state::mcu_input(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	bool send = false;
 

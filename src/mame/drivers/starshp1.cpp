@@ -65,7 +65,7 @@ void starshp1_state::starshp1_collision_reset_w(address_space &space, offs_t off
 }
 
 
-CUSTOM_INPUT_MEMBER(starshp1_state::starshp1_analog_r)
+ioport_value starshp1_state::starshp1_analog_r(ioport_field &field, void *param)
 {
 	int val = 0;
 
@@ -89,7 +89,7 @@ CUSTOM_INPUT_MEMBER(starshp1_state::starshp1_analog_r)
 }
 
 
-CUSTOM_INPUT_MEMBER(starshp1_state::collision_latch_r)
+ioport_value starshp1_state::collision_latch_r(ioport_field &field, void *param)
 {
 	return m_collision_latch & 0x0f;
 }

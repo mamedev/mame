@@ -80,7 +80,7 @@ public:
 	uint16_t m_sub_o;
 	uint16_t m_sub_r;
 
-	virtual DECLARE_INPUT_CHANGED_MEMBER(power_button) override;
+	virtual void power_button(ioport_field &field, void *param, ioport_value oldval, ioport_value newval) override;
 	void power_off();
 	void prepare_display();
 	bool vfd_filament_on() { return m_display_decay[15][16] != 0; }
@@ -241,7 +241,7 @@ void tispellb_state::rev2_write_r(address_space &space, offs_t offset, uint16_t 
 
 ***************************************************************************/
 
-INPUT_CHANGED_MEMBER(tispellb_state::power_button)
+void tispellb_state::power_button(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	int on = (int)(uintptr_t)param;
 

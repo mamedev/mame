@@ -436,7 +436,7 @@ public:
 	required_device<tms6100_device> m_tms6100;
 	optional_device<generic_slot_device> m_cart;
 
-	virtual DECLARE_INPUT_CHANGED_MEMBER(power_button) override;
+	virtual void power_button(ioport_field &field, void *param, ioport_value oldval, ioport_value newval) override;
 	void power_off();
 	void prepare_display();
 	bool vfd_filament_on() { return m_display_decay[15][16] != 0; }
@@ -461,7 +461,7 @@ public:
 	uint32_t m_cart_max_size;
 	uint8_t* m_cart_base;
 	void init_cartridge();
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(tispeak_cartridge);
+	image_init_result device_image_load_tispeak_cartridge(device_image_interface &image);
 	void init_snspell();
 	void init_tntell();
 	void init_lantutor();
@@ -502,7 +502,7 @@ void tispeak_state::init_cartridge()
 	}
 }
 
-DEVICE_IMAGE_LOAD_MEMBER(tispeak_state, tispeak_cartridge)
+image_init_result tispeak_state::device_image_load_tispeak_cartridge(device_image_interface &image)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
@@ -723,7 +723,7 @@ uint8_t tispeak_state::k28_read_k(address_space &space, offs_t offset, uint8_t m
 
 ***************************************************************************/
 
-INPUT_CHANGED_MEMBER(tispeak_state::power_button)
+void tispeak_state::power_button(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	int on = (int)(uintptr_t)param;
 

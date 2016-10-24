@@ -23,7 +23,7 @@ public:
 	void teletype_kbd_input(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void teletype_callback(void *ptr, int32_t param);
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( patinho_tape );
+	image_init_result device_image_load_patinho_tape(device_image_interface &image);
 	void load_tape(const char* name);
 	void load_raw_data(const char* name, unsigned int start_address, unsigned int data_length);
 	void update_panel(uint8_t ACC, uint8_t opcode, uint8_t mem_data, uint16_t mem_addr, uint16_t PC, uint8_t FLAGS, uint16_t RC, uint8_t mode);

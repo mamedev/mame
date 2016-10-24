@@ -100,7 +100,7 @@ uint8_t cinemat_state::switches_r(address_space &space, offs_t offset, uint8_t m
  *
  *************************************/
 
-INPUT_CHANGED_MEMBER(cinemat_state::coin_inserted)
+void cinemat_state::coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	/* on the falling edge of a new coin, set the coin_detected flag */
 	if (newval == 0)

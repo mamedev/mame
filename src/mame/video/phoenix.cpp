@@ -302,7 +302,7 @@ void phoenix_state::phoenix_scroll_w(address_space &space, offs_t offset, uint8_
 }
 
 
-CUSTOM_INPUT_MEMBER(phoenix_state::player_input_r)
+ioport_value phoenix_state::player_input_r(ioport_field &field, void *param)
 {
 	if (m_cocktail_mode)
 		return (ioport("CTRL")->read() & 0xf0) >> 4;
@@ -310,7 +310,7 @@ CUSTOM_INPUT_MEMBER(phoenix_state::player_input_r)
 		return (ioport("CTRL")->read() & 0x0f) >> 0;
 }
 
-CUSTOM_INPUT_MEMBER(phoenix_state::pleiads_protection_r)
+ioport_value phoenix_state::pleiads_protection_r(ioport_field &field, void *param)
 {
 	/* handle Pleiads protection */
 	switch (m_pleiads_protection_question)

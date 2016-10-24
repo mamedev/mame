@@ -194,10 +194,10 @@ machine_config_constructor abc99_device::device_mconfig_additions() const
 
 
 //-------------------------------------------------
-//  INPUT_CHANGED_MEMBER( keyboard_reset )
+//  void keyboard_reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 //-------------------------------------------------
 
-INPUT_CHANGED_MEMBER( abc99_device::keyboard_reset )
+void abc99_device::keyboard_reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (newval)
 	{

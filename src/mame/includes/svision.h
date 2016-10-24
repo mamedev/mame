@@ -72,7 +72,7 @@ public:
 	void svision_timer(void *ptr, int32_t param);
 	void svision_pet_timer_dev(timer_device &timer, void *ptr, int32_t param);
 	void svision_irq();
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(svision_cart);
+	image_init_result device_image_load_svision_cart(device_image_interface &image);
 
 protected:
 	required_device<cpu_device> m_maincpu;

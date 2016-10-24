@@ -46,7 +46,7 @@ public:
 	void scrollreg_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void charvideoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(pending_sound_r);
+	ioport_value pending_sound_r(ioport_field &field, void *param);
 
 	void init_quiz18k();
 	void init_welltris();

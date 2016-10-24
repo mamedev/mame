@@ -85,8 +85,8 @@ public:
 	void scrollyP1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(vblank_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(mcu_status_r);
+	ioport_value vblank_r(ioport_field &field, void *param);
+	ioport_value mcu_status_r(ioport_field &field, void *param);
 
 	tilemap_memory_index back_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
 	void get_bgram0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);

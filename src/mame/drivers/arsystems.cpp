@@ -68,8 +68,8 @@ public:
 	}
 
 	void arcadia_multibios_change_game(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	DECLARE_CUSTOM_INPUT_MEMBER(coin_counter_r);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_changed_callback);
+	ioport_value coin_counter_r(ioport_field &field, void *param);
+	void coin_changed_callback(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	void arcadia_cia_0_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void init_arcadia();
@@ -152,7 +152,7 @@ void arcadia_amiga_state::arcadia_cia_0_portb_w(address_space &space, offs_t off
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(arcadia_amiga_state::coin_counter_r)
+ioport_value arcadia_amiga_state::coin_counter_r(ioport_field &field, void *param)
 {
 	int coin = (uintptr_t)param;
 
@@ -161,7 +161,7 @@ CUSTOM_INPUT_MEMBER(arcadia_amiga_state::coin_counter_r)
 }
 
 
-INPUT_CHANGED_MEMBER(arcadia_amiga_state::coin_changed_callback)
+void arcadia_amiga_state::coin_changed_callback(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	int coin = (uintptr_t)param;
 

@@ -44,7 +44,7 @@ pc9801_kbd_device::pc9801_kbd_device(const machine_config &mconfig, const char *
 //  input_ports - device-specific input ports
 //-------------------------------------------------
 
-INPUT_CHANGED_MEMBER(pc9801_kbd_device::key_stroke)
+void pc9801_kbd_device::key_stroke(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if(newval && !oldval)
 		m_rx_buf[(uint8_t)(uintptr_t)(param) & 0x7f] = 1;

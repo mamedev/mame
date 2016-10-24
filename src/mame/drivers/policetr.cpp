@@ -187,7 +187,7 @@ void policetr_state::policetr_bsmt2000_data_w(address_space &space, offs_t offse
 }
 
 
-CUSTOM_INPUT_MEMBER(policetr_state::bsmt_status_r)
+ioport_value policetr_state::bsmt_status_r(ioport_field &field, void *param)
 {
 	return machine().device<bsmt2000_device>("bsmt")->read_status();
 }

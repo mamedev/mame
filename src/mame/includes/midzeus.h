@@ -56,8 +56,8 @@ public:
 	int PIC16C5X_T0_clk_r();
 	uint32_t zeus_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	void zeus_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
-	DECLARE_CUSTOM_INPUT_MEMBER(custom_49way_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(keypad_r);
+	ioport_value custom_49way_r(ioport_field &field, void *param);
+	ioport_value keypad_r(ioport_field &field, void *param);
 	uint32_t zeus2_timekeeper_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	void zeus2_timekeeper_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	void init_invasn();

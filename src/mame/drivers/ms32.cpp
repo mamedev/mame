@@ -178,7 +178,7 @@ Super Strong Warriors
 
 /********** READ INPUTS **********/
 
-CUSTOM_INPUT_MEMBER(ms32_state::mahjong_ctrl_r)
+ioport_value ms32_state::mahjong_ctrl_r(ioport_field &field, void *param)
 {
 	uint32_t mj_input;
 

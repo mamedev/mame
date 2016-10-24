@@ -67,7 +67,7 @@ public:
 	uint8_t m_cass_conf;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pv2000_cart);
+	image_init_result device_image_load_pv2000_cart(device_image_interface &image);
 };
 
 
@@ -360,7 +360,7 @@ void pv2000_state::machine_reset()
 	memset(&memregion("maincpu")->base()[0x7000], 0xff, 0x1000);    // initialize RAM
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( pv2000_state, pv2000_cart )
+image_init_result pv2000_state::device_image_load_pv2000_cart(device_image_interface &image)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 

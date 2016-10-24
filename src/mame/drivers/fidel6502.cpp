@@ -456,7 +456,7 @@ public:
 	uint8_t sc12_cart_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	// Excellence
-	DECLARE_INPUT_CHANGED_MEMBER(fexcelv_bankswitch);
+	void fexcelv_bankswitch(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	uint8_t fexcelv_speech_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void fexcel_ttl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t fexcelb_ttl_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
@@ -773,7 +773,7 @@ uint8_t fidel6502_state::sc12_cart_r(address_space &space, offs_t offset, uint8_
 
 // misc handlers
 
-INPUT_CHANGED_MEMBER(fidel6502_state::fexcelv_bankswitch)
+void fidel6502_state::fexcelv_bankswitch(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	// tied to speech ROM highest bits
 	m_speech->force_update();

@@ -17,7 +17,7 @@
 const device_type COLECO_HAND_CONTROLLER = &device_creator<coleco_hand_controller_t>;
 
 
-CUSTOM_INPUT_MEMBER( coleco_hand_controller_t::keypad_r )
+ioport_value coleco_hand_controller_t::keypad_r(ioport_field &field, void *param)
 {
 	uint8_t data = 0xf;
 	uint16_t keypad = m_io_keypad->read();

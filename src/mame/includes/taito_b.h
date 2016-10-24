@@ -97,7 +97,7 @@ public:
 	uint16_t tc0180vcu_framebuffer_word_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void tc0180vcu_framebuffer_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void mb87078_gain_changed(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_INPUT_CHANGED_MEMBER(realpunc_sensor);
+	void realpunc_sensor(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	void init_taito_b();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

@@ -236,11 +236,11 @@ public:
 	int m_from68k_st2;
 
 
-	DECLARE_CUSTOM_INPUT_MEMBER(kenseim_cmd_1234_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(kenseim_cmd_5678_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(kenseim_cmd_9_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(kenseim_cmd_req_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(kenseim_cmd_LVm_r);
+	ioport_value kenseim_cmd_1234_r(ioport_field &field, void *param);
+	ioport_value kenseim_cmd_5678_r(ioport_field &field, void *param);
+	ioport_value kenseim_cmd_9_r(ioport_field &field, void *param);
+	ioport_value kenseim_cmd_req_r(ioport_field &field, void *param);
+	ioport_value kenseim_cmd_LVm_r(ioport_field &field, void *param);
 
 	void set_leds(uint32_t ledstates);
 	int m_led_latch;
@@ -368,27 +368,27 @@ void kenseim_state::cpu_portc_w(address_space &space, offs_t offset, uint8_t dat
 
 /* 68k side COMMS reads */
 
-CUSTOM_INPUT_MEMBER(kenseim_state::kenseim_cmd_1234_r)
+ioport_value kenseim_state::kenseim_cmd_1234_r(ioport_field &field, void *param)
 {
 	return (m_to_68k_cmd_low & 0x0f) >> 0;
 }
 
-CUSTOM_INPUT_MEMBER(kenseim_state::kenseim_cmd_5678_r)
+ioport_value kenseim_state::kenseim_cmd_5678_r(ioport_field &field, void *param)
 {
 	return (m_to_68k_cmd_low & 0xf0) >> 4;
 }
 
-CUSTOM_INPUT_MEMBER(kenseim_state::kenseim_cmd_9_r)
+ioport_value kenseim_state::kenseim_cmd_9_r(ioport_field &field, void *param)
 {
 	return m_to_68k_cmd_d9;
 }
 
-CUSTOM_INPUT_MEMBER(kenseim_state::kenseim_cmd_req_r)
+ioport_value kenseim_state::kenseim_cmd_req_r(ioport_field &field, void *param)
 {
 	return m_to_68k_cmd_req;
 }
 
-CUSTOM_INPUT_MEMBER(kenseim_state::kenseim_cmd_LVm_r)
+ioport_value kenseim_state::kenseim_cmd_LVm_r(ioport_field &field, void *param)
 {
 	return m_to_68k_cmd_LVm;;
 }

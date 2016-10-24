@@ -937,7 +937,7 @@ ADDRESS_MAP_END
 //  GENERIC PORT DEFINITIONS
 //**************************************************************************
 
-CUSTOM_INPUT_MEMBER(segaorun_state::bankmotor_pos_r)
+ioport_value segaorun_state::bankmotor_pos_r(ioport_field &field, void *param)
 {
 	return m_bankmotor_pos >> 8 & 0xff;
 }

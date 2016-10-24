@@ -57,7 +57,7 @@ public:
 	void p1b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { }; // more lamps
 	void p2a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { }; // more lamps
 	void p2b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) { }; // more lamps
-	DECLARE_CUSTOM_INPUT_MEMBER(wolfman_replay_hs_r);
+	ioport_value wolfman_replay_hs_r(ioport_field &field, void *param);
 	void init_peyper();
 	void init_odin();
 	void init_wolfman();
@@ -172,7 +172,7 @@ void peyper_state::sol_w(address_space &space, offs_t offset, uint8_t data, uint
 }
 
 
-CUSTOM_INPUT_MEMBER(peyper_state::wolfman_replay_hs_r)
+ioport_value peyper_state::wolfman_replay_hs_r(ioport_field &field, void *param)
 {
 	int bit_mask = (uintptr_t)param;
 

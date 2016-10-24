@@ -81,7 +81,7 @@ public:
 	uint8_t input_bypass_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint16_t motor_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void motor_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	DECLARE_CUSTOM_INPUT_MEMBER(pedal_r);
+	ioport_value pedal_r(ioport_field &field, void *param);
 
 	void sound_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void msm5205_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);

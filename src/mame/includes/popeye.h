@@ -44,7 +44,7 @@ public:
 	void popeye_bitmap_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void skyskipr_bitmap_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void popeye_portB_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_CUSTOM_INPUT_MEMBER(dsw1_read);
+	ioport_value dsw1_read(ioport_field &field, void *param);
 	void init_skyskipr();
 	void init_popeye();
 	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
@@ -55,7 +55,7 @@ public:
 	void palette_init_skyskipr(palette_device &palette);
 	uint32_t screen_update_popeye(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void popeye_interrupt(device_t &device);
-	DECLARE_CUSTOM_INPUT_MEMBER( pop_field_r );
+	ioport_value pop_field_r(ioport_field &field, void *param);
 	void convert_color_prom(const uint8_t *color_prom);
 	void set_background_palette(int bank);
 	void draw_background(bitmap_ind16 &bitmap, const rectangle &cliprect);

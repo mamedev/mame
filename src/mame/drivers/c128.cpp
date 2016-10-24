@@ -183,7 +183,7 @@ public:
 	void exp_reset_w(int state);
 
 	void write_restore(int state);
-	DECLARE_INPUT_CHANGED_MEMBER( caps_lock );
+	void caps_lock(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER( cbm_c64 );
 
@@ -721,7 +721,7 @@ void c128_state::write_restore(int state)
 	check_interrupts();
 }
 
-INPUT_CHANGED_MEMBER( c128_state::caps_lock )
+void c128_state::caps_lock(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_caps_lock = newval;
 }

@@ -203,38 +203,38 @@ void mhavoc_state::mhavoc_rom_banksel_w(address_space &space, offs_t offset, uin
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(mhavoc_state::tms5220_r)
+ioport_value mhavoc_state::tms5220_r(ioport_field &field, void *param)
 {
 	tms5220_device *tms5220 = machine().device<tms5220_device>("tms");
 	return tms5220->readyq_r() ? 1 : 0;
 }
 
-CUSTOM_INPUT_MEMBER(mhavoc_state::mhavoc_bit67_r)
+ioport_value mhavoc_state::mhavoc_bit67_r(ioport_field &field, void *param)
 {
 	const char *tag1 = (const char *)param;
 	const char *tag2 = tag1 + strlen(tag1) + 1;
 	return ioport(m_player_1 ? tag2 : tag1)->read() & 0x03;
 }
 
-CUSTOM_INPUT_MEMBER(mhavoc_state::gamma_rcvd_r)
+ioport_value mhavoc_state::gamma_rcvd_r(ioport_field &field, void *param)
 {
 	/* Gamma rcvd flag */
 	return m_gamma_rcvd;
 }
 
-CUSTOM_INPUT_MEMBER(mhavoc_state::gamma_xmtd_r)
+ioport_value mhavoc_state::gamma_xmtd_r(ioport_field &field, void *param)
 {
 	/* Gamma xmtd flag */
 	return m_gamma_xmtd;
 }
 
-CUSTOM_INPUT_MEMBER(mhavoc_state::alpha_rcvd_r)
+ioport_value mhavoc_state::alpha_rcvd_r(ioport_field &field, void *param)
 {
 	/* Alpha rcvd flag */
 	return (m_has_gamma_cpu && m_alpha_rcvd);
 }
 
-CUSTOM_INPUT_MEMBER(mhavoc_state::alpha_xmtd_r)
+ioport_value mhavoc_state::alpha_xmtd_r(ioport_field &field, void *param)
 {
 	/* Alpha xmtd flag */
 	return (m_has_gamma_cpu && m_alpha_xmtd);

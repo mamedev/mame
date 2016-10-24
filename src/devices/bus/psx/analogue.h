@@ -15,7 +15,7 @@ public:
 	psx_analog_controller_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	virtual ioport_constructor device_input_ports() const override;
-	DECLARE_INPUT_CHANGED_MEMBER(change_mode);
+	void change_mode(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 protected:
 	virtual void device_reset() override;
 	virtual void device_start() override {}

@@ -143,12 +143,12 @@ public:
 	void scramble_background_green_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void scramble_background_blue_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void galaxian_gfxbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_CUSTOM_INPUT_MEMBER(scramble_protection_alt_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(gmgalax_port_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(azurian_port_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(kingball_muxbit_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(kingball_noise_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(moonwar_dial_r);
+	ioport_value scramble_protection_alt_r(ioport_field &field, void *param);
+	ioport_value gmgalax_port_r(ioport_field &field, void *param);
+	ioport_value azurian_port_r(ioport_field &field, void *param);
+	ioport_value kingball_muxbit_r(ioport_field &field, void *param);
+	ioport_value kingball_noise_r(ioport_field &field, void *param);
+	ioport_value moonwar_dial_r(ioport_field &field, void *param);
 	void irq_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void start_lamp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void coin_lock_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -198,7 +198,7 @@ public:
 	void tenspot_unk_e000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void artic_gfxbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t tenspot_dsw_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_INPUT_CHANGED_MEMBER(gmgalax_game_changed);
+	void gmgalax_game_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	void konami_sound_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t konami_sound_timer_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void konami_portc_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);

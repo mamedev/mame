@@ -394,7 +394,7 @@ uint16_t amiga_state::joy1dat_r()
 		return (m_p2_mouse_y.read_safe(0xff) << 8) | m_p2_mouse_x.read_safe(0xff);
 }
 
-CUSTOM_INPUT_MEMBER( amiga_state::amiga_joystick_convert )
+ioport_value amiga_state::amiga_joystick_convert(ioport_field &field, void *param)
 {
 	uint8_t bits = m_joy_ports[(int)(uintptr_t)param].read_safe(0xff);
 
@@ -1066,7 +1066,7 @@ void amiga_state::gayle_cia_w(address_space &space, offs_t offset, uint16_t data
 	cia_w(space, offset, data, mem_mask);
 }
 
-CUSTOM_INPUT_MEMBER( amiga_state::floppy_drive_status )
+ioport_value amiga_state::floppy_drive_status(ioport_field &field, void *param)
 {
 	return m_fdc->ciaapra_r();
 }

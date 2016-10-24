@@ -159,7 +159,7 @@
  *
  *************************************/
 
-INPUT_CHANGED_MEMBER(segag80v_state::service_switch)
+void segag80v_state::service_switch(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	/* pressing the service switch sends an NMI */
 	if (newval)
@@ -285,7 +285,7 @@ uint8_t segag80v_state::spinner_input_r(address_space &space, offs_t offset, uin
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(segag80v_state::elim4_joint_coin_r)
+ioport_value segag80v_state::elim4_joint_coin_r(ioport_field &field, void *param)
 {
 	return (ioport("COINS")->read() & 0xf) != 0xf;
 }

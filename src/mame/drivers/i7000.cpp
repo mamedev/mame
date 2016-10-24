@@ -78,7 +78,7 @@ public:
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
 	void init_i7000();
 	void palette_init_i7000(palette_device &palette);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( i7000_card );
+	image_init_result device_image_load_i7000_card(device_image_interface &image);
 
 	uint8_t i7000_kbd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void i7000_scanlines_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -275,7 +275,7 @@ static ADDRESS_MAP_START( i7000_io , AS_IO, 8, i7000_state)
 //  AM_RANGE(0xbb, 0xbb) AM_WRITE(i7000_io_?_w) //may be related to page-swapping...
 ADDRESS_MAP_END
 
-DEVICE_IMAGE_LOAD_MEMBER( i7000_state, i7000_card )
+image_init_result i7000_state::device_image_load_i7000_card(device_image_interface &image)
 {
 	uint32_t size = m_card->common_get_size("rom");
 

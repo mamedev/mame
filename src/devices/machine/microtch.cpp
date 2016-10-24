@@ -271,7 +271,7 @@ void microtouch_device::rcv_complete()
 	}
 }
 
-INPUT_CHANGED_MEMBER( microtouch_device::touch )
+void microtouch_device::touch(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if ( newval && ( m_mode == MODE_POINT ) )
 	{

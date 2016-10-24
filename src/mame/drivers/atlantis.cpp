@@ -145,7 +145,7 @@ public:
 	void uart0_irq_callback(int state);
 	void uart1_irq_callback(int state);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(port_mod_r);
+	ioport_value port_mod_r(ioport_field &field, void *param);
 	uint32_t port_ctrl_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	void port_ctrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	uint32_t m_port_ctrl_reg[0x8];
@@ -584,7 +584,7 @@ void atlantis_state::port_ctrl_w(address_space &space, offs_t offset, uint32_t d
 	}
 }
 
-CUSTOM_INPUT_MEMBER(atlantis_state::port_mod_r)
+ioport_value atlantis_state::port_mod_r(ioport_field &field, void *param)
 {
 	uint32_t bits = ioport((const char *)param)->read();
 	//bits &= m_port_ctrl_reg[1];

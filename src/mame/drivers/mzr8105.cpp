@@ -201,7 +201,7 @@ void write_updterm_clock(int state);
 #if CARDSLOT
 // User EPROM/SRAM slot(s)
 int mzr8105_load_cart(device_image_interface &image, generic_slot_device *slot);
-DECLARE_DEVICE_IMAGE_LOAD_MEMBER (exp1_load) { return mzr8105_load_cart(image, m_cart); }
+image_init_result device_image_load_exp1_load(device_image_interface &image) { return mzr8105_load_cart(image, m_cart); }
 uint16_t read16_rom(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 #endif
 

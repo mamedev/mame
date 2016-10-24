@@ -79,11 +79,11 @@ public:
 	void init_pegasus();
 	void pegasus_firq(timer_device &timer, void *ptr, int32_t param);
 	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot, const char *reg_tag);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp00_load) { return load_cart(image, m_exp_00, "0000"); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp01_load) { return load_cart(image, m_exp_01, "1000"); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp02_load) { return load_cart(image, m_exp_02, "2000"); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp0c_load) { return load_cart(image, m_exp_0c, "c000"); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(exp0d_load) { return load_cart(image, m_exp_0d, "d000"); }
+	image_init_result device_image_load_exp00_load(device_image_interface &image) { return load_cart(image, m_exp_00, "0000"); }
+	image_init_result device_image_load_exp01_load(device_image_interface &image) { return load_cart(image, m_exp_01, "1000"); }
+	image_init_result device_image_load_exp02_load(device_image_interface &image) { return load_cart(image, m_exp_02, "2000"); }
+	image_init_result device_image_load_exp0c_load(device_image_interface &image) { return load_cart(image, m_exp_0c, "c000"); }
+	image_init_result device_image_load_exp0d_load(device_image_interface &image) { return load_cart(image, m_exp_0d, "d000"); }
 private:
 	uint8_t m_kbd_row;
 	bool m_kbd_irq;

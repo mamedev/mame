@@ -95,7 +95,7 @@ uint8_t jedi_state::audio_latch_r(address_space &space, offs_t offset, uint8_t m
 }
 
 
-CUSTOM_INPUT_MEMBER(jedi_state::jedi_audio_comm_stat_r)
+ioport_value jedi_state::jedi_audio_comm_stat_r(ioport_field &field, void *param)
 {
 	return *m_audio_comm_stat >> 6;
 }

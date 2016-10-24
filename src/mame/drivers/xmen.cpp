@@ -236,7 +236,7 @@ static INPUT_PORTS_START( xmen2p )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_er5911_device, cs_write)
 INPUT_PORTS_END
 
-CUSTOM_INPUT_MEMBER(xmen_state::xmen_frame_r)
+ioport_value xmen_state::xmen_frame_r(ioport_field &field, void *param)
 {
 	return m_screen->frame_number() & 1;
 }

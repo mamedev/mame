@@ -130,7 +130,7 @@ public:
 	uint16_t read_inputs(int columns);
 	void refresh_interrupts(void);
 	void set_interrupt(int line, int state);
-	DECLARE_INPUT_CHANGED_MEMBER(single_interrupt_line);
+	void single_interrupt_line(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 	// display common
 	int m_display_wait;                 // led/lamp off-delay in microseconds (default 33ms)
@@ -339,7 +339,7 @@ void hh_hmcs40_state::set_interrupt(int line, int state)
 	}
 }
 
-INPUT_CHANGED_MEMBER(hh_hmcs40_state::single_interrupt_line)
+void hh_hmcs40_state::single_interrupt_line(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	set_interrupt((int)(uintptr_t)param, newval);
 }
@@ -623,7 +623,7 @@ public:
 	void grid_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	void update_int1();
-	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
+	void input_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 };
 
 // handlers
@@ -693,7 +693,7 @@ static INPUT_PORTS_START( bfriskyt )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)0)
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER(bfriskyt_state::input_changed)
+void bfriskyt_state::input_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	update_int1();
 }
@@ -866,7 +866,7 @@ public:
 	void grid_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	void update_int0();
-	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
+	void input_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 };
 
 // handlers
@@ -939,7 +939,7 @@ static INPUT_PORTS_START( msthawk )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)1) PORT_NAME("Fire")
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER(msthawk_state::input_changed)
+void msthawk_state::input_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	update_int0();
 }
@@ -994,7 +994,7 @@ public:
 	void grid_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	void update_int1();
-	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
+	void input_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 };
 
 // handlers
@@ -1061,7 +1061,7 @@ static INPUT_PORTS_START( bzaxxon )
 	PORT_BIT( 0xfff7, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER(bzaxxon_state::input_changed)
+void bzaxxon_state::input_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	update_int1();
 }
@@ -1115,7 +1115,7 @@ public:
 	void grid_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	void update_int0();
-	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
+	void input_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 };
 
 // handlers
@@ -1178,7 +1178,7 @@ static INPUT_PORTS_START( zackman )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)1)
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER(zackman_state::input_changed)
+void zackman_state::input_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	update_int0();
 }
@@ -1236,7 +1236,7 @@ public:
 	void grid_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	void update_int0();
-	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
+	void input_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 };
 
 // handlers
@@ -1306,7 +1306,7 @@ static INPUT_PORTS_START( bpengo )
 	PORT_BIT( 0xf7ff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER(bpengo_state::input_changed)
+void bpengo_state::input_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	update_int0();
 }
@@ -1365,7 +1365,7 @@ public:
 	void grid_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	void update_int0();
-	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
+	void input_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 };
 
 // handlers
@@ -1432,7 +1432,7 @@ static INPUT_PORTS_START( bbtime )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)1)
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER(bbtime_state::input_changed)
+void bbtime_state::input_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	update_int0();
 }
@@ -2176,7 +2176,7 @@ public:
 	void plate_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	uint8_t input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_INPUT_CHANGED_MEMBER(player_switch);
+	void player_switch(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 };
 
 // handlers
@@ -2241,7 +2241,7 @@ static INPUT_PORTS_START( cgalaxn )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)1)
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER(cgalaxn_state::player_switch)
+void cgalaxn_state::player_switch(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	// 2-player switch directly enables plate 14
 	m_plate = (m_plate & 0x3fff) | (newval ? 0 : 0x4000);
@@ -2872,7 +2872,7 @@ public:
 	uint8_t cop_ack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	void update_int();
-	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
+	void input_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 protected:
 	virtual void machine_start() override;
@@ -2983,7 +2983,7 @@ static INPUT_PORTS_START( eturtles )
 	PORT_CONFSETTING(    0x01, "2" )
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER(eturtles_state::input_changed)
+void eturtles_state::input_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	update_int();
 }
@@ -3286,7 +3286,7 @@ public:
 	void grid_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	void update_int1();
-	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
+	void input_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 };
 
 // handlers
@@ -3355,7 +3355,7 @@ static INPUT_PORTS_START( gckong )
 	PORT_BIT( 0xffef, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER(gckong_state::input_changed)
+void gckong_state::input_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	update_int1();
 }
@@ -3410,7 +3410,7 @@ public:
 	void grid_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	void update_int1();
-	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
+	void input_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 };
 
 // handlers
@@ -3475,7 +3475,7 @@ static INPUT_PORTS_START( gdigdug )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)0)
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER(gdigdug_state::input_changed)
+void gdigdug_state::input_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	update_int1();
 }
@@ -3784,7 +3784,7 @@ public:
 	void grid_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	void update_int0();
-	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
+	void input_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 };
 
 // handlers
@@ -3851,7 +3851,7 @@ static INPUT_PORTS_START( kingman )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)1)
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER(kingman_state::input_changed)
+void kingman_state::input_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	update_int0();
 }
@@ -3906,7 +3906,7 @@ public:
 	void grid_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	void update_int1();
-	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
+	void input_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 };
 
 // handlers
@@ -3973,7 +3973,7 @@ static INPUT_PORTS_START( tmtron )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_hmcs40_state, single_interrupt_line, (void *)0)
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER(tmtron_state::input_changed)
+void tmtron_state::input_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	update_int1();
 }

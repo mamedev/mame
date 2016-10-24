@@ -67,7 +67,7 @@ public:
 	void cat702_2_dataout(int state){ m_cat702_2_dataout = state; update_sio0_rxd(); }
 	void zndip_dataout(int state){ m_zndip_dataout = state; update_sio0_rxd(); }
 	void update_sio0_rxd() { m_sio0->write_rxd( m_cat702_1_dataout && m_cat702_2_dataout && m_zndip_dataout ); }
-	DECLARE_CUSTOM_INPUT_MEMBER(jdredd_gun_mux_read);
+	ioport_value jdredd_gun_mux_read(ioport_field &field, void *param);
 	uint8_t znsecsel_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void znsecsel_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t boardconfig_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
@@ -1813,7 +1813,7 @@ Notes:
       *         - Unpopulated DIP42 socket
 */
 
-CUSTOM_INPUT_MEMBER(zn_state::jdredd_gun_mux_read)
+ioport_value zn_state::jdredd_gun_mux_read(ioport_field &field, void *param)
 {
 	return m_jdredd_gun_mux;
 }

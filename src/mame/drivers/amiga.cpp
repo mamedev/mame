@@ -318,8 +318,8 @@ public:
 	void handle_joystick_cia(uint8_t pra, uint8_t dra);
 	uint16_t handle_joystick_potgor(uint16_t potgor);
 
-	DECLARE_CUSTOM_INPUT_MEMBER( cd32_input );
-	DECLARE_CUSTOM_INPUT_MEMBER( cd32_sel_mirror_input );
+	ioport_value cd32_input(ioport_field &field, void *param);
+	ioport_value cd32_sel_mirror_input(ioport_field &field, void *param);
 
 	void init_pal();
 	void init_ntsc();
@@ -900,12 +900,12 @@ uint16_t cd32_state::handle_joystick_potgor(uint16_t potgor)
 	return potgor;
 }
 
-CUSTOM_INPUT_MEMBER( cd32_state::cd32_input )
+ioport_value cd32_state::cd32_input(ioport_field &field, void *param)
 {
 	return handle_joystick_potgor(m_potgo_value) >> 8;
 }
 
-CUSTOM_INPUT_MEMBER( cd32_state::cd32_sel_mirror_input )
+ioport_value cd32_state::cd32_sel_mirror_input(ioport_field &field, void *param)
 {
 	uint8_t bits = m_player_ports[(int)(uintptr_t)param]->read();
 	return (bits & 0x20)>>5;

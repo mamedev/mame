@@ -60,7 +60,7 @@ public:
 	void ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff)       { COMBINE_DATA(&m_ram[offset]); }
 	uint16_t dsp_ram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void dsp_ram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	DECLARE_INPUT_CHANGED_MEMBER(key_irq);
+	void key_irq(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 private:
 	void assert_fiq(int num);
@@ -637,7 +637,7 @@ static ADDRESS_MAP_START( noki3310_map, AS_PROGRAM, 32, noki3310_state )
 ADDRESS_MAP_END
 
 
-INPUT_CHANGED_MEMBER( noki3310_state::key_irq )
+void noki3310_state::key_irq(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (!newval)    // TODO: COL/ROW IRQ mask
 		assert_irq(0);

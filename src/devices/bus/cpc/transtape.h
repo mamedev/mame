@@ -29,8 +29,8 @@ public:
 
 	uint8_t input_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_INPUT_CHANGED_MEMBER(button_red_w);
-	DECLARE_INPUT_CHANGED_MEMBER(button_black_w);
+	void button_red_w(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void button_black_w(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 protected:
 	// device-level overrides

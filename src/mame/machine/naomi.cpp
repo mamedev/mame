@@ -216,11 +216,11 @@ void naomi_state::init_naomi2()
 	create_pic_from_retdat();
 }
 
-INPUT_CHANGED_MEMBER(naomi_state::naomi_mp_w)
+void naomi_state::naomi_mp_w(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_mp_mux = newval;
 }
-CUSTOM_INPUT_MEMBER(naomi_state::naomi_mp_r)
+ioport_value naomi_state::naomi_mp_r(ioport_field &field, void *param)
 {
 	const char *tagptr = (const char *)param;
 	uint8_t retval = 0;

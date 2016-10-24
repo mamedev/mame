@@ -38,7 +38,7 @@ inputs + notes by stephh
 #include "includes/fcombat.h"
 
 
-INPUT_CHANGED_MEMBER(fcombat_state::coin_inserted)
+void fcombat_state::coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	/* coin insertion causes an NMI */
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);

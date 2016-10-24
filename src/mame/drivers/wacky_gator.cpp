@@ -54,8 +54,8 @@ public:
 	void sample_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void alligators_ctrl1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void alligators_ctrl2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_CUSTOM_INPUT_MEMBER(alligators_rear_sensors_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(alligators_front_sensors_r);
+	ioport_value alligators_rear_sensors_r(ioport_field &field, void *param);
+	ioport_value alligators_front_sensors_r(ioport_field &field, void *param);
 
 	void set_lamps(int p, uint8_t value);
 	void status_lamps_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -161,7 +161,7 @@ void wackygtr_state::pmm8713_ck(int i, int state)
 	}
 }
 
-CUSTOM_INPUT_MEMBER(wackygtr_state::alligators_rear_sensors_r)
+ioport_value wackygtr_state::alligators_rear_sensors_r(ioport_field &field, void *param)
 {
 	return  ((m_motors_pos[0] < 10) ? 0x01 : 0) |
 			((m_motors_pos[1] < 10) ? 0x02 : 0) |
@@ -171,7 +171,7 @@ CUSTOM_INPUT_MEMBER(wackygtr_state::alligators_rear_sensors_r)
 			(m_alligators_ctrl ^ 0x1f);
 }
 
-CUSTOM_INPUT_MEMBER(wackygtr_state::alligators_front_sensors_r)
+ioport_value wackygtr_state::alligators_front_sensors_r(ioport_field &field, void *param)
 {
 	return  ((m_motors_pos[0] < 5 || m_motors_pos[0] > 55) ? 0x01 : 0) |
 			((m_motors_pos[1] < 5 || m_motors_pos[1] > 55) ? 0x02 : 0) |

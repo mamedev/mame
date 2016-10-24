@@ -75,10 +75,10 @@ public:
 	void riot_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t riot_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void riot_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
+	void trigger_reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( beta_eprom );
-	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( beta_eprom );
+	image_init_result device_image_load_beta_eprom(device_image_interface &image);
+	void device_image_unload_beta_eprom(device_image_interface &image);
 
 	/* EPROM state */
 	int m_eprom_oe;
@@ -107,7 +107,7 @@ ADDRESS_MAP_END
 
 /* Input Ports */
 
-INPUT_CHANGED_MEMBER( beta_state::trigger_reset )
+void beta_state::trigger_reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 }
@@ -282,7 +282,7 @@ void beta_state::riot_pb_w(address_space &space, offs_t offset, uint8_t data, ui
 
 /* EPROM socket */
 
-DEVICE_IMAGE_LOAD_MEMBER( beta_state, beta_eprom )
+image_init_result beta_state::device_image_load_beta_eprom(device_image_interface &image)
 {
 	uint32_t size = m_eprom->common_get_size("rom");
 
@@ -298,7 +298,7 @@ DEVICE_IMAGE_LOAD_MEMBER( beta_state, beta_eprom )
 	return image_init_result::PASS;
 }
 
-DEVICE_IMAGE_UNLOAD_MEMBER( beta_state, beta_eprom )
+void beta_state::device_image_unload_beta_eprom(device_image_interface &image)
 {
 	if (image.software_entry() == nullptr)
 		image.fwrite(&m_eprom_rom[0], 0x800);

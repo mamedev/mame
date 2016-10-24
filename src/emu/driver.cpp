@@ -471,7 +471,7 @@ e.g. input ports which expect the same port
 repeated both in the upper and lower half
 -------------------------------------------------*/
 
-CUSTOM_INPUT_MEMBER(driver_device::custom_port_read)
+ioport_value driver_device::custom_port_read(ioport_field &field, void *param)
 {
 	const char *tag = (const char *)param;
 	return ioport(tag)->read();

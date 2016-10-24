@@ -174,12 +174,12 @@ ADDRESS_MAP_END
 //****************************************************************************
 // I/O Port Maps
 
-INPUT_CHANGED_MEMBER(bwing_state::coin_inserted)
+void bwing_state::coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
-INPUT_CHANGED_MEMBER(bwing_state::tilt_pressed)
+void bwing_state::tilt_pressed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(M6809_FIRQ_LINE, newval ? ASSERT_LINE : CLEAR_LINE);
 }

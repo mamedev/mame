@@ -66,8 +66,8 @@ public:
 	uint8_t quizshow_timing_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t quizshow_tape_signal_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void quizshow_main_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_CUSTOM_INPUT_MEMBER(quizshow_tape_headpos_r);
-	DECLARE_INPUT_CHANGED_MEMBER(quizshow_category_select);
+	ioport_value quizshow_tape_headpos_r(ioport_field &field, void *param);
+	void quizshow_category_select(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	void init_quizshow();
 	void get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_reset() override;
@@ -248,12 +248,12 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-CUSTOM_INPUT_MEMBER(quizshow_state::quizshow_tape_headpos_r)
+ioport_value quizshow_state::quizshow_tape_headpos_r(ioport_field &field, void *param)
 {
 	return 1 << m_tape_head_pos;
 }
 
-INPUT_CHANGED_MEMBER(quizshow_state::quizshow_category_select)
+void quizshow_state::quizshow_category_select(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (newval)
 	{

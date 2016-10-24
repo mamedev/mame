@@ -379,7 +379,7 @@ void hh_tms1k_state::auto_power_off(int state)
 	}
 }
 
-INPUT_CHANGED_MEMBER(hh_tms1k_state::power_button)
+void hh_tms1k_state::power_button(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_power_on = (bool)(uintptr_t)param;
 	m_maincpu->set_input_line(INPUT_LINE_RESET, m_power_on ? CLEAR_LINE : ASSERT_LINE);
@@ -1269,7 +1269,7 @@ public:
 	uint8_t read_k(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	void set_clock();
-	DECLARE_INPUT_CHANGED_MEMBER(skill_switch);
+	void skill_switch(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 protected:
 	virtual void machine_reset() override;
@@ -1343,7 +1343,7 @@ static INPUT_PORTS_START( h2hbaseb )
 	PORT_CONFSETTING(    0x01, "2" )
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER(h2hbaseb_state::skill_switch)
+void h2hbaseb_state::skill_switch(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	set_clock();
 }
@@ -2308,7 +2308,7 @@ public:
 	uint8_t read_k(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	void set_clock();
-	DECLARE_INPUT_CHANGED_MEMBER(skill_switch);
+	void skill_switch(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 protected:
 	virtual void machine_reset() override;
@@ -2403,7 +2403,7 @@ static INPUT_PORTS_START( ebball3 )
 	PORT_CONFSETTING(    0x01, "Professional" )
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER(ebball3_state::skill_switch)
+void ebball3_state::skill_switch(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	set_clock();
 }
@@ -2470,7 +2470,7 @@ public:
 	void write_o(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
 	void set_clock();
-	DECLARE_INPUT_CHANGED_MEMBER(skill_switch);
+	void skill_switch(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 protected:
 	virtual void machine_reset() override;
@@ -2515,7 +2515,7 @@ static INPUT_PORTS_START( einvader )
 	PORT_CONFSETTING(    0x08, "Professional" )
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER(einvader_state::skill_switch)
+void einvader_state::skill_switch(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	set_clock();
 }
@@ -2826,7 +2826,7 @@ public:
 	uint8_t read_k(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	void set_clock();
-	DECLARE_INPUT_CHANGED_MEMBER(skill_switch);
+	void skill_switch(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 protected:
 	virtual void machine_reset() override;
@@ -2886,7 +2886,7 @@ static INPUT_PORTS_START( raisedvl )
 	PORT_CONFSETTING(    0x21, "4" )
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER(raisedvl_state::skill_switch)
+void raisedvl_state::skill_switch(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	set_clock();
 }
@@ -4550,7 +4550,7 @@ public:
 	uint8_t read_k(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	void set_clock();
-	DECLARE_INPUT_CHANGED_MEMBER(speed_switch);
+	void speed_switch(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 protected:
 	virtual void machine_reset() override;
@@ -4628,7 +4628,7 @@ static INPUT_PORTS_START( ssimon )
 	PORT_CONFSETTING(    0x02, "Super" )
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER(ssimon_state::speed_switch)
+void ssimon_state::speed_switch(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	set_clock();
 }
@@ -6628,7 +6628,7 @@ public:
 	uint8_t read_k(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	void set_clock();
-	DECLARE_INPUT_CHANGED_MEMBER(skill_switch);
+	void skill_switch(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 protected:
 	virtual void machine_reset() override;
@@ -6720,7 +6720,7 @@ static INPUT_PORTS_START( tbreakup )
 	PORT_CONFSETTING(    0x01, "Pro 2" )
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER(tbreakup_state::skill_switch)
+void tbreakup_state::skill_switch(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	set_clock();
 }
@@ -6818,7 +6818,7 @@ public:
 	void write_o(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	uint8_t read_k(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_INPUT_CHANGED_MEMBER(flipper_button);
+	void flipper_button(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 };
 
 // handlers
@@ -6871,7 +6871,7 @@ static INPUT_PORTS_START( phpball )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Left Flipper") PORT_CHANGED_MEMBER(DEVICE_SELF, phpball_state, flipper_button, (void *)0)
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER(phpball_state::flipper_button)
+void phpball_state::flipper_button(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	// rectangular LEDs under LEDs D,F and E,G are directly connected
 	// to the left and right flipper buttons - output them to lamp90 and 91

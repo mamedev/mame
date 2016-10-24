@@ -404,7 +404,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, firetrap_state )
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-INPUT_CHANGED_MEMBER(firetrap_state::coin_inserted)
+void firetrap_state::coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	/* coin insertion causes an IRQ */
 	if(newval)

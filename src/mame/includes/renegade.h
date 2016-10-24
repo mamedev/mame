@@ -88,7 +88,7 @@ public:
 	void flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void scroll_lsb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void scroll_msb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_CUSTOM_INPUT_MEMBER(mcu_status_r);
+	ioport_value mcu_status_r(ioport_field &field, void *param);
 	void adpcm_start_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void adpcm_addr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void adpcm_stop_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);

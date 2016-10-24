@@ -38,7 +38,7 @@ public:
 	void cdata_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	void kmdata_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_INPUT_CHANGED_MEMBER(update);
+	void update(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 protected:
 	virtual void device_start() override;

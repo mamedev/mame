@@ -62,7 +62,7 @@ public:
 	void borntofi_nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t borntofi_inputs_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void borntofi_msm5205_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_CUSTOM_INPUT_MEMBER(wheelrun_wheel_r);
+	ioport_value wheelrun_wheel_r(ioport_field &field, void *param);
 	void machine_start_fantland();
 	void machine_reset_fantland();
 	void machine_start_borntofi();

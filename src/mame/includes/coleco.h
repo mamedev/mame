@@ -54,7 +54,7 @@ public:
 	void paddle_pulse_callback(void *ptr, int32_t param);
 	void paddle_update_callback(timer_device &timer, void *ptr, int32_t param);
 	void coleco_vdp_interrupt(int state);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(czz50_cart);
+	image_init_result device_image_load_czz50_cart(device_image_interface &image);
 
 	uint8_t coleco_paddle_read(int port, int joy_mode, uint8_t joy_status);
 	uint8_t coleco_scan_paddles(uint8_t *joy_status0, uint8_t *joy_status1);

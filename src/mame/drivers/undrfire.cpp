@@ -220,7 +220,7 @@ void undrfire_state::device_timer(emu_timer &timer, device_timer_id id, int para
             GAME INPUTS
 **********************************************************/
 
-CUSTOM_INPUT_MEMBER(undrfire_state::frame_counter_r)
+ioport_value undrfire_state::frame_counter_r(ioport_field &field, void *param)
 {
 	return m_frame_counter;
 }

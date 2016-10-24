@@ -277,8 +277,8 @@ public:
 
 	uint16_t input_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void mouse_pos_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	DECLARE_INPUT_CHANGED_MEMBER(send_input);
-	DECLARE_INPUT_CHANGED_MEMBER(send_mouse_input);
+	void send_input(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void send_mouse_input(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	void gfx_base_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void gfx_dest_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void gfx_color_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
@@ -288,8 +288,8 @@ public:
 
 	uint16_t unk0_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) { return 0; }
 	uint16_t unk_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff) { return machine().rand(); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( iq128_cart );
-	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( iq128_cart );
+	image_init_result device_image_load_iq128_cart(device_image_interface &image);
+	void device_image_unload_iq128_cart(device_image_interface &image);
 
 private:
 	uint16_t      m_gfx_y;
@@ -480,7 +480,7 @@ void geniusiq_state::queue_input(uint16_t data)
 	m_maincpu->set_input_line(M68K_IRQ_4, ASSERT_LINE);
 }
 
-INPUT_CHANGED_MEMBER( geniusiq_state::send_mouse_input )
+void geniusiq_state::send_mouse_input(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	uint8_t new_mouse_x = ioport("MOUSEX")->read();
 	uint8_t new_mouse_y = ioport("MOUSEY")->read();
@@ -496,7 +496,7 @@ INPUT_CHANGED_MEMBER( geniusiq_state::send_mouse_input )
 	queue_input(0x1000 | (delta_y & 0x3f));
 }
 
-INPUT_CHANGED_MEMBER( geniusiq_state::send_input )
+void geniusiq_state::send_input(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	uint16_t data = (uint16_t)(uintptr_t)param;
 
@@ -760,7 +760,7 @@ void geniusiq_state::machine_reset()
 	m_mouse_gfx_posy = 0;
 }
 
-DEVICE_IMAGE_LOAD_MEMBER(geniusiq_state,iq128_cart)
+image_init_result geniusiq_state::device_image_load_iq128_cart(device_image_interface &image)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
@@ -785,7 +785,7 @@ DEVICE_IMAGE_LOAD_MEMBER(geniusiq_state,iq128_cart)
 	return image_init_result::PASS;
 }
 
-DEVICE_IMAGE_UNLOAD_MEMBER(geniusiq_state,iq128_cart)
+void geniusiq_state::device_image_unload_iq128_cart(device_image_interface &image)
 {
 	m_cart_state = IQ128_NO_CART;
 }

@@ -52,8 +52,8 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	DECLARE_INPUT_CHANGED_MEMBER(trigger_reset);
-	DECLARE_INPUT_CHANGED_MEMBER(trigger_nmi);
+	void trigger_reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void trigger_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	void kim1_cassette_input(timer_device &timer, void *ptr, int32_t param);
 	void kim1_update_leds(timer_device &timer, void *ptr, int32_t param);
 

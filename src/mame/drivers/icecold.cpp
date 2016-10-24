@@ -24,8 +24,8 @@ public:
 			m_pia1(*this, "pia1")
 	{ }
 
-	DECLARE_INPUT_CHANGED_MEMBER( test_switch_press );
-	DECLARE_CUSTOM_INPUT_MEMBER( motors_limit_r );
+	void test_switch_press(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	ioport_value motors_limit_r(ioport_field &field, void *param);
 	void scanlines_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void digit_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t kbd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
@@ -172,7 +172,7 @@ void icecold_state::machine_reset()
 	m_ball_gate_sw = 1;
 }
 
-CUSTOM_INPUT_MEMBER( icecold_state::motors_limit_r )
+ioport_value icecold_state::motors_limit_r(ioport_field &field, void *param)
 {
 	uint8_t data = 0;
 
@@ -184,7 +184,7 @@ CUSTOM_INPUT_MEMBER( icecold_state::motors_limit_r )
 	return data;
 }
 
-INPUT_CHANGED_MEMBER( icecold_state::test_switch_press )
+void icecold_state::test_switch_press(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }

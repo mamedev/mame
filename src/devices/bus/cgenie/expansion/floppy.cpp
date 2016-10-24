@@ -165,7 +165,7 @@ void cgenie_fdc_device::timer_callback(timer_device &timer, void *ptr, int32_t p
 	m_slot->int_w(ASSERT_LINE);
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( cgenie_fdc_device, socket_load )
+image_init_result cgenie_fdc_device::device_image_load_socket_load(device_image_interface &image)
 {
 	uint32_t size = m_socket->common_get_size("rom");
 

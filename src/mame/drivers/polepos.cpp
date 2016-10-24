@@ -342,9 +342,9 @@ void polepos_state::polepos_z8002_nvi_enable_w(address_space &space, offs_t offs
 }
 
 
-CUSTOM_INPUT_MEMBER(polepos_state::high_port_r){ return ioport((const char *)param)->read() >> 4; }
-CUSTOM_INPUT_MEMBER(polepos_state::low_port_r){ return ioport((const char *)param)->read() & 0x0f; }
-CUSTOM_INPUT_MEMBER(polepos_state::auto_start_r)
+ioport_value polepos_state::high_port_r(ioport_field &field, void *param){ return ioport((const char *)param)->read() >> 4; }
+ioport_value polepos_state::low_port_r(ioport_field &field, void *param){ return ioport((const char *)param)->read() & 0x0f; }
+ioport_value polepos_state::auto_start_r(ioport_field &field, void *param)
 {
 	return m_auto_start_mask;
 }

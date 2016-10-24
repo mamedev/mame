@@ -191,7 +191,7 @@ ADDRESS_MAP_END
 
 /* Input Ports */
 
-INPUT_CHANGED_MEMBER( cosmicos_state::data )
+void cosmicos_state::data(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	uint8_t data = m_io_data->read();
 	int i;
@@ -206,7 +206,7 @@ INPUT_CHANGED_MEMBER( cosmicos_state::data )
 	}
 }
 
-INPUT_CHANGED_MEMBER( cosmicos_state::enter )
+void cosmicos_state::enter(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (!newval && !m_wait && !m_clear)
 	{
@@ -214,7 +214,7 @@ INPUT_CHANGED_MEMBER( cosmicos_state::enter )
 	}
 }
 
-INPUT_CHANGED_MEMBER( cosmicos_state::single_step )
+void cosmicos_state::single_step(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	// if in PAUSE mode, set RUN mode until TPB=active
 }
@@ -262,10 +262,10 @@ void cosmicos_state::set_cdp1802_mode(int mode)
 	}
 }
 
-INPUT_CHANGED_MEMBER( cosmicos_state::run )             { if (!newval) set_cdp1802_mode(MODE_RUN); }
-INPUT_CHANGED_MEMBER( cosmicos_state::load )            { if (!newval) set_cdp1802_mode(MODE_LOAD); }
-INPUT_CHANGED_MEMBER( cosmicos_state::cosmicos_pause )  { if (!newval) set_cdp1802_mode(MODE_PAUSE); }
-INPUT_CHANGED_MEMBER( cosmicos_state::reset )           { if (!newval) set_cdp1802_mode(MODE_RESET); }
+void cosmicos_state::run(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)             { if (!newval) set_cdp1802_mode(MODE_RUN); }
+void cosmicos_state::load(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)            { if (!newval) set_cdp1802_mode(MODE_LOAD); }
+void cosmicos_state::cosmicos_pause(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)  { if (!newval) set_cdp1802_mode(MODE_PAUSE); }
+void cosmicos_state::reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)           { if (!newval) set_cdp1802_mode(MODE_RESET); }
 
 void cosmicos_state::clear_input_data()
 {
@@ -279,17 +279,17 @@ void cosmicos_state::clear_input_data()
 	}
 }
 
-INPUT_CHANGED_MEMBER( cosmicos_state::clear_data )
+void cosmicos_state::clear_data(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	clear_input_data();
 }
 
-INPUT_CHANGED_MEMBER( cosmicos_state::memory_protect )
+void cosmicos_state::memory_protect(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_ram_protect = newval;
 }
 
-INPUT_CHANGED_MEMBER( cosmicos_state::memory_disable )
+void cosmicos_state::memory_disable(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_ram_disable = newval;
 }

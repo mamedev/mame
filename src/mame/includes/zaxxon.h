@@ -68,10 +68,10 @@ public:
 	void zaxxon_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void congo_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void congo_sprite_custom_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_CUSTOM_INPUT_MEMBER(razmataz_dial_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(zaxxon_coin_r);
-	DECLARE_INPUT_CHANGED_MEMBER(service_switch);
-	DECLARE_INPUT_CHANGED_MEMBER(zaxxon_coin_inserted);
+	ioport_value razmataz_dial_r(ioport_field &field, void *param);
+	ioport_value zaxxon_coin_r(ioport_field &field, void *param);
+	void service_switch(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void zaxxon_coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	void init_razmataz();
 	void init_zaxxonj();
 	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);

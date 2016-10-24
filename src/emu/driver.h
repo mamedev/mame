@@ -155,7 +155,7 @@ public:
 	uint32_t flip_screen_y() const { return m_flip_screen_y; }
 
 	// generic input port helpers
-	DECLARE_CUSTOM_INPUT_MEMBER( custom_port_read );
+	ioport_value custom_port_read(ioport_field &field, void *param);
 
 	// general fatal error handlers
 	uint8_t fatal_generic_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);

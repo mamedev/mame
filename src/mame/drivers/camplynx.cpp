@@ -152,7 +152,7 @@ public:
 	uint8_t port82_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff); // cassin for 128k
 	void port82_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff); // banking 128k
 	void port84_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff); // dac port 48k
-	DECLARE_INPUT_CHANGED_MEMBER(brk_key);
+	void brk_key(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	void machine_reset_lynx48k();
 	void machine_reset_lynx128k();
 	void init_lynx48k();
@@ -563,7 +563,7 @@ static INPUT_PORTS_START( lynx48k )
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Delete") PORT_CODE(KEYCODE_BACKSPACE) PORT_CHAR(8)
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER( camplynx_state::brk_key )
+void camplynx_state::brk_key(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(0, newval ? CLEAR_LINE : ASSERT_LINE);
 }

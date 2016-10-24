@@ -63,7 +63,7 @@ public:
 	uint8_t beep_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void beep_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void palette_init_pc2000(palette_device &palette);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pc2000_cart);
+	image_init_result device_image_load_pc2000_cart(device_image_interface &image);
 };
 
 class gl3000s_state : public pc2000_state
@@ -812,7 +812,7 @@ static GFXDECODE_START( pc2000 )
 GFXDECODE_END
 
 
-DEVICE_IMAGE_LOAD_MEMBER( pc2000_state, pc2000_cart )
+image_init_result pc2000_state::device_image_load_pc2000_cart(device_image_interface &image)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 

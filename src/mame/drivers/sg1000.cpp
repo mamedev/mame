@@ -226,10 +226,10 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 /*-------------------------------------------------
-    INPUT_CHANGED_MEMBER( trigger_nmi )
+    void trigger_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 -------------------------------------------------*/
 
-INPUT_CHANGED_MEMBER( sg1000_state::trigger_nmi )
+void sg1000_state::trigger_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }

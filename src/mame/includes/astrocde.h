@@ -166,9 +166,9 @@ public:
 	void profpac_screenram_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t profpac_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void profpac_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_CUSTOM_INPUT_MEMBER(ebases_trackball_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(demndragn_joystick_r);
-	DECLARE_INPUT_CHANGED_MEMBER(spacezap_monitor);
+	ioport_value ebases_trackball_r(ioport_field &field, void *param);
+	ioport_value demndragn_joystick_r(ioport_field &field, void *param);
+	void spacezap_monitor(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	void init_profpac();
 	void init_spacezap();
 	void init_robby();
@@ -197,11 +197,11 @@ public:
 
 	/*----------- defined in audio/wow.c -----------*/
 	uint8_t wow_speech_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	CUSTOM_INPUT_MEMBER( wow_speech_status_r );
+	ioport_value wow_speech_status_r(ioport_field &field, void *param);
 
 	/*----------- defined in audio/gorf.c -----------*/
 	uint8_t gorf_speech_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	CUSTOM_INPUT_MEMBER( gorf_speech_status_r );
+	ioport_value gorf_speech_status_r(ioport_field &field, void *param);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;

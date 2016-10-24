@@ -42,7 +42,7 @@ public:
 	uint8_t read_inputs(int columns);
 	void refresh_interrupts(void);
 	void set_interrupt(int state);
-	DECLARE_INPUT_CHANGED_MEMBER(single_interrupt_line);
+	void single_interrupt_line(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 	// display common
 	int m_display_wait;                 // led/lamp off-delay in microseconds (default 33ms)

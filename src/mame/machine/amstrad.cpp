@@ -3283,7 +3283,7 @@ SNAPSHOT_LOAD_MEMBER( amstrad_state,amstrad)
 }
 
 
-DEVICE_IMAGE_LOAD_MEMBER(amstrad_state, amstrad_plus_cartridge)
+image_init_result amstrad_state::device_image_load_amstrad_plus_cartridge(device_image_interface &image)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 	unsigned char header[12];

@@ -60,7 +60,7 @@ public:
 	void crshrace_videoram2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void crshrace_roz_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void crshrace_gfxctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	DECLARE_CUSTOM_INPUT_MEMBER(country_sndpending_r);
+	ioport_value country_sndpending_r(ioport_field &field, void *param);
 	void init_crshrace2();
 	void init_crshrace();
 	void get_tile_info1(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);

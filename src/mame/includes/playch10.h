@@ -107,7 +107,7 @@ public:
 	void hboard_rom_switch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void pc10_set_mirroring(int mirroring);
 	void playch10_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_CUSTOM_INPUT_MEMBER(pc10_int_detect_r);
+	ioport_value pc10_int_detect_r(ioport_field &field, void *param);
 	void init_playch10();
 	void init_pc_gun();
 	void init_pcaboard();

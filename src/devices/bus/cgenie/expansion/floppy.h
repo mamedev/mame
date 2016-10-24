@@ -33,7 +33,7 @@ public:
 
 	void timer_callback(timer_device &timer, void *ptr, int32_t param);
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(socket_load);
+	image_init_result device_image_load_socket_load(device_image_interface &image);
 
 	void intrq_w(int state);
 	uint8_t irq_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);

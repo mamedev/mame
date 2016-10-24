@@ -143,8 +143,8 @@ public:
 
 	DECLARE_FLOPPY_FORMATS(cd90_640_formats);
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( to7_cartridge );
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( mo5_cartridge );
+	image_init_result device_image_load_to7_cartridge(device_image_interface &image);
+	image_init_result device_image_load_mo5_cartridge(device_image_interface &image);
 
 	void to7_set_cassette_motor(int state);
 	void mo5_set_cassette_motor(int state);

@@ -1908,7 +1908,7 @@ void x1_state::io_write_byte(address_space &space, offs_t offset, uint8_t data, 
  *
  *************************************/
 
-INPUT_CHANGED_MEMBER(x1_state::ipl_reset)
+void x1_state::ipl_reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 
@@ -1918,7 +1918,7 @@ INPUT_CHANGED_MEMBER(x1_state::ipl_reset)
 }
 
 /* Apparently most games doesn't support this (not even the Konami ones!), one that does is...177 :o */
-INPUT_CHANGED_MEMBER(x1_state::nmi_reset)
+void x1_state::nmi_reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }

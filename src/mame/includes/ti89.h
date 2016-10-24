@@ -82,7 +82,7 @@ public:
 	uint16_t flash_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	uint64_t m_timer;
 	void palette_init_ti68k(palette_device &palette);
-	DECLARE_INPUT_CHANGED_MEMBER(ti68k_on_key);
+	void ti68k_on_key(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	void ti68k_timer_callback(timer_device &timer, void *ptr, int32_t param);
 };
 

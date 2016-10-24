@@ -93,16 +93,16 @@ public:
 	void q_w(int state);
 	uint8_t dma_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void sc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_INPUT_CHANGED_MEMBER( data );
-	DECLARE_INPUT_CHANGED_MEMBER( enter );
-	DECLARE_INPUT_CHANGED_MEMBER( single_step );
-	DECLARE_INPUT_CHANGED_MEMBER( run );
-	DECLARE_INPUT_CHANGED_MEMBER( load );
-	DECLARE_INPUT_CHANGED_MEMBER( cosmicos_pause );
-	DECLARE_INPUT_CHANGED_MEMBER( reset );
-	DECLARE_INPUT_CHANGED_MEMBER( clear_data );
-	DECLARE_INPUT_CHANGED_MEMBER( memory_protect );
-	DECLARE_INPUT_CHANGED_MEMBER( memory_disable );
+	void data(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void enter(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void single_step(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void run(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void load(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void cosmicos_pause(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void clear_data(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void memory_protect(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void memory_disable(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER( cosmicos );
 

@@ -81,10 +81,10 @@ public:
 	uint32_t magzun_rx_hack_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
 	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( stv_cart1 ) { return load_cart(image, m_cart1); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( stv_cart2 ) { return load_cart(image, m_cart2); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( stv_cart3 ) { return load_cart(image, m_cart3); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( stv_cart4 ) { return load_cart(image, m_cart4); }
+	image_init_result device_image_load_stv_cart1(device_image_interface &image) { return load_cart(image, m_cart1); }
+	image_init_result device_image_load_stv_cart2(device_image_interface &image) { return load_cart(image, m_cart2); }
+	image_init_result device_image_load_stv_cart3(device_image_interface &image) { return load_cart(image, m_cart3); }
+	image_init_result device_image_load_stv_cart4(device_image_interface &image) { return load_cart(image, m_cart4); }
 
 	void install_stvbios_speedups( void );
 

@@ -229,7 +229,7 @@ public:
 	void palette_init_aleste(palette_device &palette);
 	uint32_t screen_update_amstrad(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_amstrad(screen_device &screen, bool state);
-	DECLARE_INPUT_CHANGED_MEMBER(cpc_monitor_changed);
+	void cpc_monitor_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	void amstrad_pc2_low(void *ptr, int32_t param);
 	void amstrad_video_update_timer(void *ptr, int32_t param);
 	void cb_set_resolution(void *ptr, int32_t param);
@@ -251,7 +251,7 @@ public:
 
 	int amstrad_cpu_acknowledge_int(device_t &device, int irqline);
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( amstrad_plus_cartridge );
+	image_init_result device_image_load_amstrad_plus_cartridge(device_image_interface &image);
 
 	void amstrad_handle_snapshot(unsigned char *pSnapshot);
 	void amstrad_rethinkMemory();

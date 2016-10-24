@@ -42,7 +42,7 @@ public:
 	void fg0_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void bg0_videoram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(vblank_r);
+	ioport_value vblank_r(ioport_field &field, void *param);
 
 	void scanline(timer_device &timer, void *ptr, int32_t param);
 

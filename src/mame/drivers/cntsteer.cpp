@@ -100,7 +100,7 @@ public:
 	void cntsteer_main_irq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t cntsteer_adx_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void nmimask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+	void coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	void init_zerotrgt();
 	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
@@ -725,7 +725,7 @@ static INPUT_PORTS_START( zerotrgta )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_3C ) )
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER(cntsteer_state::coin_inserted)
+void cntsteer_state::coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_subcpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }

@@ -57,7 +57,7 @@ public:
 	uint8_t starwars_div_reh_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t starwars_div_rel_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void starwars_math_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_CUSTOM_INPUT_MEMBER(matrix_flag_r);
+	ioport_value matrix_flag_r(ioport_field &field, void *param);
 	uint8_t starwars_sin_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void starwars_sout_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t starwars_main_read_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);

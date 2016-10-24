@@ -57,7 +57,7 @@ machine_config_constructor sv603_device::device_mconfig_additions() const
 //  CARTRIDGE
 //**************************************************************************
 
-DEVICE_IMAGE_LOAD_MEMBER( sv603_device, cartridge )
+image_init_result sv603_device::device_image_load_cartridge(device_image_interface &image)
 {
 	uint32_t size = m_cart_rom->common_get_size("rom");
 

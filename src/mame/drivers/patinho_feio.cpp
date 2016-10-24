@@ -183,7 +183,7 @@ void patinho_feio_state::load_raw_data(const char* name, unsigned int start_addr
 	memcpy(&RAM[start_address], data, data_length);
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( patinho_feio_state, patinho_tape )
+image_init_result patinho_feio_state::device_image_load_patinho_tape(device_image_interface &image)
 {
 	if (image.software_entry() != nullptr){
 		paper_tape_length = image.get_software_region_length("rom");

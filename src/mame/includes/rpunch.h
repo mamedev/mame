@@ -50,7 +50,7 @@ public:
 	void rpunch_crtc_data_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void rpunch_crtc_register_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void rpunch_ins_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	DECLARE_CUSTOM_INPUT_MEMBER(hi_bits_r);
+	ioport_value hi_bits_r(ioport_field &field, void *param);
 	void upd_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void upd_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_rabiolep();

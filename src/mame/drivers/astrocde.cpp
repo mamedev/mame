@@ -234,7 +234,7 @@ void astrocde_state::seawolf2_sound_2_w(address_space &space, offs_t offset, uin
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(astrocde_state::ebases_trackball_r)
+ioport_value astrocde_state::ebases_trackball_r(ioport_field &field, void *param)
 {
 	return m_trackball[m_input_select]->read();
 }
@@ -440,7 +440,7 @@ uint8_t astrocde_state::demndrgn_io_r(address_space &space, offs_t offset, uint8
 
 
 
-CUSTOM_INPUT_MEMBER(astrocde_state::demndragn_joystick_r)
+ioport_value astrocde_state::demndragn_joystick_r(ioport_field &field, void *param)
 {
 	return m_joystick[m_input_select]->read();
 }
@@ -787,7 +787,7 @@ static INPUT_PORTS_START( ebases )
 INPUT_PORTS_END
 
 
-INPUT_CHANGED_MEMBER(astrocde_state::spacezap_monitor)
+void astrocde_state::spacezap_monitor(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (newval)
 		m_video_config &= ~AC_MONITOR_BW;

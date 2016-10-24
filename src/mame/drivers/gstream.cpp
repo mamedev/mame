@@ -190,9 +190,9 @@ public:
 	uint32_t gstream_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	uint32_t x2222_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	uint32_t x2222_speedup2_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
-	DECLARE_CUSTOM_INPUT_MEMBER(gstream_mirror_service_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(gstream_mirror_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(x2222_toggle_r);
+	ioport_value gstream_mirror_service_r(ioport_field &field, void *param);
+	ioport_value gstream_mirror_r(ioport_field &field, void *param);
+	ioport_value x2222_toggle_r(ioport_field &field, void *param);
 	void init_gstream();
 	void init_x2222();
 	virtual void machine_start() override;
@@ -208,14 +208,14 @@ public:
 	required_device<palette_device> m_palette;
 };
 
-CUSTOM_INPUT_MEMBER(gstream_state::x2222_toggle_r) // or the game hangs when starting, might be a status flag for the sound?
+ioport_value gstream_state::x2222_toggle_r(ioport_field &field, void *param) // or the game hangs when starting, might be a status flag for the sound?
 {
 	m_toggle ^= 0xffff;
 	return m_toggle;
 }
 
 
-CUSTOM_INPUT_MEMBER(gstream_state::gstream_mirror_service_r)
+ioport_value gstream_state::gstream_mirror_service_r(ioport_field &field, void *param)
 {
 	int result;
 
@@ -225,7 +225,7 @@ CUSTOM_INPUT_MEMBER(gstream_state::gstream_mirror_service_r)
 	return ~result;
 }
 
-CUSTOM_INPUT_MEMBER(gstream_state::gstream_mirror_r)
+ioport_value gstream_state::gstream_mirror_r(ioport_field &field, void *param)
 {
 	int result;
 

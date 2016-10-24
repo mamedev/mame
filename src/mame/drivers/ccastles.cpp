@@ -168,7 +168,7 @@ void ccastles_state::clock_irq(void *ptr, int32_t param)
 }
 
 
-CUSTOM_INPUT_MEMBER(ccastles_state::get_vblank)
+ioport_value ccastles_state::get_vblank(ioport_field &field, void *param)
 {
 	int scanline = m_screen->vpos();
 	return m_syncprom[scanline & 0xff] & 1;

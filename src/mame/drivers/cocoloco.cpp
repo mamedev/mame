@@ -220,7 +220,7 @@ public:
 	void vram_clear_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void coincounter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+	void coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 	void init_cocob();
 
@@ -445,7 +445,7 @@ ADDRESS_MAP_END
 *           Input Ports            *
 ***********************************/
 
-INPUT_CHANGED_MEMBER(cocoloco_state::coin_inserted)
+void cocoloco_state::coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if(newval)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);

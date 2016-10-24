@@ -60,9 +60,9 @@ public:
 	uint8_t m_schaser_background_select;
 	uint16_t m_claybust_gun_pos;
 
-	DECLARE_CUSTOM_INPUT_MEMBER(sflush_80_r);
-	DECLARE_INPUT_CHANGED_MEMBER(claybust_gun_trigger);
-	DECLARE_CUSTOM_INPUT_MEMBER(claybust_gun_on_r);
+	ioport_value sflush_80_r(ioport_field &field, void *param);
+	void claybust_gun_trigger(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	ioport_value claybust_gun_on_r(ioport_field &field, void *param);
 
 	uint8_t indianbt_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t polaris_port00_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);

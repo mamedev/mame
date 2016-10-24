@@ -206,7 +206,7 @@ void arkanoid_state::arkanoid_68705_ddr_c_w(address_space &space, offs_t offset,
 	m_ddrC = data|0xF0;
 }
 
-CUSTOM_INPUT_MEMBER(arkanoid_state::arkanoid_semaphore_input_r)
+ioport_value arkanoid_state::arkanoid_semaphore_input_r(ioport_field &field, void *param)
 {
 	int res = 0;
 
@@ -221,7 +221,7 @@ CUSTOM_INPUT_MEMBER(arkanoid_state::arkanoid_semaphore_input_r)
 	return res;
 }
 
-CUSTOM_INPUT_MEMBER(arkanoid_state::arkanoid_input_mux)
+ioport_value arkanoid_state::arkanoid_input_mux(ioport_field &field, void *param)
 {
 	const char *tag1 = (const char *)param;
 	const char *tag2 = tag1 + strlen(tag1) + 1; // the f***? is this right? are we intentionally pointer-mathing off the end of one array to hit another?

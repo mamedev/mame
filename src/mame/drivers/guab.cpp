@@ -80,7 +80,7 @@ public:
 	uint16_t ef9369_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	uint16_t io_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void io_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+	void coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	void ptm_irq(int state);
 	uint32_t screen_update_guab(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
@@ -296,7 +296,7 @@ uint16_t guab_state::io_r(address_space &space, offs_t offset, uint16_t mem_mask
 	}
 }
 
-INPUT_CHANGED_MEMBER(guab_state::coin_inserted)
+void guab_state::coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (newval == 0)
 	{

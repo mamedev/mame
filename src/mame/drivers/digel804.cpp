@@ -114,7 +114,7 @@ public:
 	void acia_irq_w(int state);
 	void ep804_acia_irq_w(int state);
 	void da_w(int state);
-	DECLARE_INPUT_CHANGED_MEMBER(mode_change);
+	void mode_change(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	// current speaker state for port 45
 	uint8_t m_speaker_state;
 	// ram stuff for banking
@@ -346,7 +346,7 @@ void digel804_state::op47(address_space &space, offs_t offset, uint8_t data, uin
 	logerror("Digel804: port 47, eprom timing/power and control had %02X written to it!\n", data);
 }
 
-INPUT_CHANGED_MEMBER( digel804_state::mode_change )
+void digel804_state::mode_change(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (!newval && !m_keyen_state)
 	{

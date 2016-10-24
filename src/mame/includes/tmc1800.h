@@ -131,7 +131,7 @@ public:
 	int rdata_r();
 	int bdata_r();
 	int gdata_r();
-	DECLARE_INPUT_CHANGED_MEMBER( run_pressed );
+	void run_pressed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 	void bankswitch();
 
@@ -177,8 +177,8 @@ public:
 	int ef2_r();
 	int ef3_r();
 	void q_w(int state);
-	DECLARE_INPUT_CHANGED_MEMBER( run_pressed );
-	DECLARE_INPUT_CHANGED_MEMBER( monitor_pressed );
+	void run_pressed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void monitor_pressed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 	/* keyboard state */
 	int m_keylatch;         /* key latch */

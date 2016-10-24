@@ -174,7 +174,7 @@ public:
 	void c001_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t atamanot_prot_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void atamanot_prot_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_CUSTOM_INPUT_MEMBER(controls_r);
+	ioport_value controls_r(ioport_field &field, void *param);
 	void init_ssingles();
 	virtual void video_start() override;
 	void atamanot_irq(device_t &device);
@@ -312,7 +312,7 @@ void ssingles_state::c001_w(address_space &space, offs_t offset, uint8_t data, u
 	m_prot_data^=data^0x11;
 }
 
-CUSTOM_INPUT_MEMBER(ssingles_state::controls_r)
+ioport_value ssingles_state::controls_r(ioport_field &field, void *param)
 {
 	int data = 7;
 	switch(ioport("EXTRA")->read())     //multiplexed

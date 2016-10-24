@@ -101,8 +101,8 @@ public:
 	void sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void solenoid1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void solenoid2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	INPUT_CHANGED_MEMBER(main_nmi);
-	INPUT_CHANGED_MEMBER(audio_nmi);
+	void main_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void audio_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 	static void static_set_cpuregion(device_t &device, const char *tag);
 

@@ -563,14 +563,14 @@ ADDRESS_MAP_END
 ***********************************************************/
 
 
-CUSTOM_INPUT_MEMBER(opwolf_state::opwolf_gun_x_r )
+ioport_value opwolf_state::opwolf_gun_x_r(ioport_field &field, void *param)
 {
 	/* P1X - Have to remap 8 bit input value, into 0-319 visible range */
 	int scaled = (ioport(P1X_PORT_TAG)->read() * 320 ) / 256;
 	return (scaled + 0x15 + m_opwolf_gun_xoffs);
 }
 
-CUSTOM_INPUT_MEMBER(opwolf_state::opwolf_gun_y_r )
+ioport_value opwolf_state::opwolf_gun_y_r(ioport_field &field, void *param)
 {
 	return (ioport(P1Y_PORT_TAG)->read() - 0x24 + m_opwolf_gun_yoffs);
 }

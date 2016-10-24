@@ -513,7 +513,7 @@ void micro3d_state::micro3d_adc_w(address_space &space, offs_t offset, uint16_t 
 	timer_set(attotime::from_usec(40), TIMER_ADC_DONE, data & ~4);
 }
 
-CUSTOM_INPUT_MEMBER(micro3d_state::botss_hwchk_r)
+ioport_value micro3d_state::botss_hwchk_r(ioport_field &field, void *param)
 {
 	return m_botss_latch;
 }

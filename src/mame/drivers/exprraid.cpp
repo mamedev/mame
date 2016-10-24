@@ -318,13 +318,13 @@ static ADDRESS_MAP_START( slave_map, AS_PROGRAM, 8, exprraid_state )
 ADDRESS_MAP_END
 
 
-INPUT_CHANGED_MEMBER(exprraid_state::coin_inserted_deco16)
+void exprraid_state::coin_inserted_deco16(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (oldval && !newval)
 		m_maincpu->set_input_line(DECO16_IRQ_LINE, ASSERT_LINE);
 }
 
-INPUT_CHANGED_MEMBER(exprraid_state::coin_inserted_nmi)
+void exprraid_state::coin_inserted_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, oldval ? ASSERT_LINE : CLEAR_LINE);
 }

@@ -252,10 +252,10 @@ ADDRESS_MAP_END
 //**************************************************************************
 
 //-------------------------------------------------
-//  INPUT_CHANGED_MEMBER( trigger_reset )
+//  void trigger_reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 //-------------------------------------------------
 
-INPUT_CHANGED_MEMBER( vidbrain_state::trigger_reset )
+void vidbrain_state::trigger_reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 }

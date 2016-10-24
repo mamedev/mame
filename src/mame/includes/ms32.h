@@ -89,7 +89,7 @@ public:
 	void to_main_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void ms32_brightness_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	void ms32_gfxctrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
-	DECLARE_CUSTOM_INPUT_MEMBER(mahjong_ctrl_r);
+	ioport_value mahjong_ctrl_r(ioport_field &field, void *param);
 	void init_ms32_common();
 	void init_ss92047_01();
 	void init_ss91022_10();

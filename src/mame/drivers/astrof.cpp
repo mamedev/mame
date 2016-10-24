@@ -102,7 +102,7 @@ void astrof_state::irq_callback(timer_device &timer, void *ptr, int32_t param)
  *
  *************************************/
 
-INPUT_CHANGED_MEMBER(astrof_state::coin_inserted)
+void astrof_state::coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	/* coin insertion causes an NMI */
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
@@ -110,20 +110,20 @@ INPUT_CHANGED_MEMBER(astrof_state::coin_inserted)
 }
 
 
-INPUT_CHANGED_MEMBER(astrof_state::service_coin_inserted)
+void astrof_state::service_coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	/* service coin insertion causes an NMI */
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
-CUSTOM_INPUT_MEMBER(astrof_state::astrof_p1_controls_r)
+ioport_value astrof_state::astrof_p1_controls_r(ioport_field &field, void *param)
 {
 	return ioport("P1")->read();
 }
 
 
-CUSTOM_INPUT_MEMBER(astrof_state::astrof_p2_controls_r)
+ioport_value astrof_state::astrof_p2_controls_r(ioport_field &field, void *param)
 {
 	uint32_t ret;
 
@@ -139,7 +139,7 @@ CUSTOM_INPUT_MEMBER(astrof_state::astrof_p2_controls_r)
 }
 
 
-CUSTOM_INPUT_MEMBER(astrof_state::tomahawk_controls_r)
+ioport_value astrof_state::tomahawk_controls_r(ioport_field &field, void *param)
 {
 	uint32_t ret;
 

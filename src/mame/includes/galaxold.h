@@ -150,10 +150,10 @@ public:
 	void galaxold_7474_9m_2_q_callback(int state);
 	void galaxold_7474_9m_1_callback(int state);
 	uint8_t rescueb_a002_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff) { return 0xfc; }
-	DECLARE_CUSTOM_INPUT_MEMBER(_4in1_fake_port_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(vpool_lives_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(ckongg_coinage_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(dkongjrm_coinage_r);
+	ioport_value _4in1_fake_port_r(ioport_field &field, void *param);
+	ioport_value vpool_lives_r(ioport_field &field, void *param);
+	ioport_value ckongg_coinage_r(ioport_field &field, void *param);
+	ioport_value dkongjrm_coinage_r(ioport_field &field, void *param);
 
 	void init_bullsdrtg();
 	void init_ladybugg();

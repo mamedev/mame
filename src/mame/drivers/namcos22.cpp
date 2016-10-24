@@ -3308,7 +3308,7 @@ INPUT_PORTS_END
 
 /*********************************************************************************************/
 
-CUSTOM_INPUT_MEMBER(namcos22_state::alpine_motor_read)
+ioport_value namcos22_state::alpine_motor_read(ioport_field &field, void *param)
 {
 	return m_motor_status >> (uintptr_t)param & 1;
 }

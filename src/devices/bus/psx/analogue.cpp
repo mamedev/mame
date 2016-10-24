@@ -263,7 +263,7 @@ ioport_constructor psx_analog_controller_device::device_input_ports() const
 	return INPUT_PORTS_NAME(psx_analog_controller);
 }
 
-INPUT_CHANGED_MEMBER(psx_analog_controller_device::change_mode)
+void psx_analog_controller_device::change_mode(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if(!m_analoglock)
 		m_analogmode = newval;

@@ -281,7 +281,7 @@ void wwfsstar_state::scanline(timer_device &timer, void *ptr, int32_t param)
 	}
 }
 
-CUSTOM_INPUT_MEMBER(wwfsstar_state::vblank_r)
+ioport_value wwfsstar_state::vblank_r(ioport_field &field, void *param)
 {
 	return m_vblank;
 }

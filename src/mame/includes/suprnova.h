@@ -117,7 +117,7 @@ public:
 	uint32_t sengekis_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	uint32_t sengekij_speedup_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(paddle_r);
+	ioport_value paddle_r(ioport_field &field, void *param);
 
 	void init_sengekis();
 	void init_cyvern();

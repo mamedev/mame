@@ -97,7 +97,7 @@ public:
 	iq151cart_slot_device * m_carts[5];
 	void init_iq151();
 	void iq151_vblank_interrupt(device_t &device);
-	DECLARE_INPUT_CHANGED_MEMBER(iq151_break);
+	void iq151_break(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	void cassette_timer(timer_device &timer, void *ptr, int32_t param);
 };
 
@@ -218,7 +218,7 @@ static ADDRESS_MAP_START(iq151_io, AS_IO, 8, iq151_state)
 ADDRESS_MAP_END
 
 
-INPUT_CHANGED_MEMBER(iq151_state::iq151_break)
+void iq151_state::iq151_break(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_pic->ir5_w(newval & 1);
 }

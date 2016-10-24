@@ -65,7 +65,7 @@ public:
 			m_bank_f800_w(*this, "bank_f800_w"),
 			m_config(*this, "CONFIG") { }
 
-	DECLARE_INPUT_CHANGED_MEMBER(nmi_pressed);
+	void nmi_pressed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	void via_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void via_b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void via_ca2_w(int state);
@@ -298,7 +298,7 @@ void oric_state::update_irq()
 	m_maincpu->set_input_line(m6502_device::IRQ_LINE, m_via_irq || m_ext_irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-INPUT_CHANGED_MEMBER(oric_state::nmi_pressed)
+void oric_state::nmi_pressed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(m6502_device::NMI_LINE, newval ? ASSERT_LINE : CLEAR_LINE);
 }

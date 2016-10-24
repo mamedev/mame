@@ -259,10 +259,10 @@ public:
 	void mjmyster_rtc_irq(int state);
 	void mjmyster_irq(timer_device &timer, void *ptr, int32_t param);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(ddenlovr_blitter_irq_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(ddenlovj_blitter_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(nettoqc_special_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(mjflove_blitter_r);
+	ioport_value ddenlovr_blitter_irq_r(ioport_field &field, void *param);
+	ioport_value ddenlovj_blitter_r(ioport_field &field, void *param);
+	ioport_value nettoqc_special_r(ioport_field &field, void *param);
+	ioport_value mjflove_blitter_r(ioport_field &field, void *param);
 	void ddenlovr_bgcolor_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void ddenlovr_bgcolor2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void ddenlovr16_bgcolor_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
@@ -1696,7 +1696,7 @@ uint32_t ddenlovr_state::screen_update_ddenlovr(screen_device &screen, bitmap_in
 	return 0;
 }
 
-CUSTOM_INPUT_MEMBER(ddenlovr_state::ddenlovr_blitter_irq_r)
+ioport_value ddenlovr_state::ddenlovr_blitter_irq_r(ioport_field &field, void *param)
 {
 	return m_ddenlovr_blitter_irq_flag;
 }
@@ -2021,7 +2021,7 @@ void ddenlovr_state::ddenlovj_coincounter_w(address_space &space, offs_t offset,
 	}
 }
 
-CUSTOM_INPUT_MEMBER(ddenlovr_state::ddenlovj_blitter_r)
+ioport_value ddenlovr_state::ddenlovj_blitter_r(ioport_field &field, void *param)
 {
 	return m_ddenlovr_blitter_irq_flag ? 0x03 : 0x00;       // bit 4 = 1 -> blitter busy
 }
@@ -2156,7 +2156,7 @@ static ADDRESS_MAP_START( ddenlovr_map, AS_PROGRAM, 16, ddenlovr_state )
 ADDRESS_MAP_END
 
 
-CUSTOM_INPUT_MEMBER(ddenlovr_state::nettoqc_special_r)
+ioport_value ddenlovr_state::nettoqc_special_r(ioport_field &field, void *param)
 {
 	return m_ddenlovr_blitter_irq_flag ? 0x03 : 0x00;
 }
@@ -3823,7 +3823,7 @@ uint8_t ddenlovr_state::mjflove_keyb_r(address_space &space, offs_t offset, uint
 	return val;
 }
 
-CUSTOM_INPUT_MEMBER(ddenlovr_state::mjflove_blitter_r)
+ioport_value ddenlovr_state::mjflove_blitter_r(ioport_field &field, void *param)
 {
 	// bit 7 = 1 -> blitter busy
 	// bit 6 = 0 -> VBLANK?

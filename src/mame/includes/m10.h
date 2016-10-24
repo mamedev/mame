@@ -95,7 +95,7 @@ public:
 	void m10_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void m10_chargen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void m15_chargen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+	void coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	void init_andromed();
 	void init_ipminva1();
 	tilemap_memory_index tilemap_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);

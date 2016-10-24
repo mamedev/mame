@@ -87,13 +87,13 @@ static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, ladybu
 	AM_RANGE(0x0000, 0x5fff) AM_ROM AM_SHARE("decrypted_opcodes")
 ADDRESS_MAP_END
 
-INPUT_CHANGED_MEMBER(ladybug_state::coin1_inserted)
+void ladybug_state::coin1_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	/* left coin insertion causes an NMI */
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
-INPUT_CHANGED_MEMBER(ladybug_state::coin2_inserted)
+void ladybug_state::coin2_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	/* right coin insertion causes an IRQ */
 	if (newval)
@@ -104,12 +104,12 @@ INPUT_CHANGED_MEMBER(ladybug_state::coin2_inserted)
 #define LADYBUG_P1_CONTROL_PORT_TAG ("CONTP1")
 #define LADYBUG_P2_CONTROL_PORT_TAG ("CONTP2")
 
-CUSTOM_INPUT_MEMBER(ladybug_state::ladybug_p1_control_r)
+ioport_value ladybug_state::ladybug_p1_control_r(ioport_field &field, void *param)
 {
 	return m_p1_control->read();
 }
 
-CUSTOM_INPUT_MEMBER(ladybug_state::ladybug_p2_control_r)
+ioport_value ladybug_state::ladybug_p2_control_r(ioport_field &field, void *param)
 {
 	uint32_t ret;
 

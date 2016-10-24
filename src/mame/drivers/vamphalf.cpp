@@ -123,7 +123,7 @@ public:
 	void finalgdr_prize_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	void boonggab_prize_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void boonggab_lamps_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	DECLARE_CUSTOM_INPUT_MEMBER(boonggab_photo_sensors_r);
+	ioport_value boonggab_photo_sensors_r(ioport_field &field, void *param);
 
 	uint16_t vamphalf_speedup_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	uint16_t vamphafk_speedup_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
@@ -789,7 +789,7 @@ uint32_t vamphalf_state::screen_update_aoh(screen_device &screen, bitmap_ind16 &
 	return 0;
 }
 
-CUSTOM_INPUT_MEMBER(vamphalf_state::boonggab_photo_sensors_r)
+ioport_value vamphalf_state::boonggab_photo_sensors_r(ioport_field &field, void *param)
 {
 	static const uint16_t photo_sensors_table[8] = { 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0x00 };
 	uint8_t res = ioport("PHOTO_SENSORS")->read();

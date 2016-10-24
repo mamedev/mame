@@ -81,7 +81,7 @@ public:
 	void fax_bank_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t exidy_interrupt_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(teetert_input_r);
+	ioport_value teetert_input_r(ioport_field &field, void *param);
 
 	void init_fax();
 	void init_sidetrac();

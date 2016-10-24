@@ -40,9 +40,9 @@ public:
 	void sprint4_da_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void sprint4_lamp_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void sprint4_video_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_CUSTOM_INPUT_MEMBER(get_lever);
-	DECLARE_CUSTOM_INPUT_MEMBER(get_wheel);
-	DECLARE_CUSTOM_INPUT_MEMBER(get_collision);
+	ioport_value get_lever(ioport_field &field, void *param);
+	ioport_value get_wheel(ioport_field &field, void *param);
+	ioport_value get_collision(ioport_field &field, void *param);
 	void sprint4_screech_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void sprint4_screech_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void sprint4_screech_3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);

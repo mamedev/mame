@@ -56,7 +56,7 @@ public:
 	void gameking_timer2(void *ptr, int32_t param);
 
 	uint32_t screen_update_gameking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(gameking_cart);
+	image_init_result device_image_load_gameking_cart(device_image_interface &image);
 
 	struct Gkio {
 		uint8_t input, input2;
@@ -227,7 +227,7 @@ void gameking_state::gameking_timer2(void *ptr, int32_t param)
 	timer1->reset(m_maincpu->cycles_to_attotime(io->timer * 300/*?*/));
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( gameking_state, gameking_cart )
+image_init_result gameking_state::device_image_load_gameking_cart(device_image_interface &image)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 

@@ -363,7 +363,7 @@ void taitob_state::gain_control_w(address_space &space, offs_t offset, uint16_t 
 	}
 }
 
-INPUT_CHANGED_MEMBER(taitob_state::realpunc_sensor)
+void taitob_state::realpunc_sensor(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(4, HOLD_LINE);
 }

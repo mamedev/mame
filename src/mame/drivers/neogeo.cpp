@@ -647,7 +647,7 @@ uint16_t neogeo_state::in1_r(address_space &space, offs_t offset, uint16_t mem_m
 	return ((m_edge->in1_r(space, offset) & m_ctrl2->ctrl_r(space, offset)) << 8) | 0xff;
 }
 
-CUSTOM_INPUT_MEMBER(neogeo_state::kizuna4p_start_r)
+ioport_value neogeo_state::kizuna4p_start_r(ioport_field &field, void *param)
 {
 	return (m_edge->read_start_sel() & 0x05) | ~0x05;
 }
@@ -751,7 +751,7 @@ void neogeo_state::save_ram_w(address_space &space, offs_t offset, uint16_t data
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(neogeo_state::get_memcard_status)
+ioport_value neogeo_state::get_memcard_status(ioport_field &field, void *param)
 {
 	// D0 and D1 are memcard 1 and 2 presence indicators, D2 indicates memcard
 	// write protect status (we are always write enabled)
@@ -814,7 +814,7 @@ uint8_t neogeo_state::audio_command_r(address_space &space, offs_t offset, uint8
 }
 
 
-CUSTOM_INPUT_MEMBER(neogeo_state::get_audio_result)
+ioport_value neogeo_state::get_audio_result(ioport_field &field, void *param)
 {
 	uint8_t ret = m_soundlatch2->read(m_audiocpu->space(AS_PROGRAM), 0);
 
@@ -1620,7 +1620,7 @@ INPUT_PORTS_START( aes )
 //  PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_OTHER ) // what is JP2 for? somehow related to system reset, disable watchdog?
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER(aes_state::aes_jp1)
+void aes_state::aes_jp1(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	// Shorting JP1 causes a 68000 /BERR (Bus Error). On Dev Bios, this pops up the debug monitor.
 	if (newval)

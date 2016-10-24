@@ -325,7 +325,7 @@ static INPUT_PORTS_START( tmc1800 )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_NAME("Run/Reset") PORT_CODE(KEYCODE_R) PORT_TOGGLE
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER( tmc2000_state::run_pressed )
+void tmc2000_state::run_pressed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (oldval && !newval)
 	{
@@ -418,7 +418,7 @@ static INPUT_PORTS_START( tmc2000 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER( nano_state::run_pressed )
+void nano_state::run_pressed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (oldval && !newval)
 	{
@@ -426,7 +426,7 @@ INPUT_CHANGED_MEMBER( nano_state::run_pressed )
 	}
 }
 
-INPUT_CHANGED_MEMBER( nano_state::monitor_pressed )
+void nano_state::monitor_pressed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (oldval && !newval)
 	{

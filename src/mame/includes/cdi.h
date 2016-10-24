@@ -99,7 +99,7 @@ public:
 
 	bitmap_rgb32 m_lcdbitmap;
 
-	DECLARE_INPUT_CHANGED_MEMBER(mcu_input);
+	void mcu_input(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 	virtual void machine_start() override { }
 	virtual void video_start() override;

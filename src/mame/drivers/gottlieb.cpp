@@ -272,7 +272,7 @@ void gottlieb_state::machine_reset()
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(gottlieb_state::analog_delta_r)
+ioport_value gottlieb_state::analog_delta_r(ioport_field &field, void *param)
 {
 	const char *string = (const char *)param;
 	int which = string[0] - '0';
@@ -289,7 +289,7 @@ void gottlieb_state::gottlieb_analog_reset_w(address_space &space, offs_t offset
 }
 
 
-CUSTOM_INPUT_MEMBER(gottlieb_state::stooges_joystick_r)
+ioport_value gottlieb_state::stooges_joystick_r(ioport_field &field, void *param)
 {
 	static const char *const joyport[] = { "P2JOY", "P3JOY", "P1JOY", nullptr };
 	return (joyport[m_joystick_select & 3] != nullptr) ? ioport(joyport[m_joystick_select & 3])->read() : 0xff;

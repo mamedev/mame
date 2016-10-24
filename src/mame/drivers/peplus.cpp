@@ -314,7 +314,7 @@ public:
 	uint8_t peplus_bgcolor_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t peplus_dropdoor_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t peplus_watchdog_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_CUSTOM_INPUT_MEMBER(peplus_input_r);
+	ioport_value peplus_input_r(ioport_field &field, void *param);
 	void peplus_crtc_mode_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void crtc_vsync(int state);
 	void i2c_nvram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -1059,7 +1059,7 @@ ADDRESS_MAP_END
 *      Input ports       *
 *************************/
 
-CUSTOM_INPUT_MEMBER(peplus_state::peplus_input_r)
+ioport_value peplus_state::peplus_input_r(ioport_field &field, void *param)
 {
 	uint8_t inp_ret = 0x00;
 	uint8_t inp_read = ioport((const char *)param)->read();

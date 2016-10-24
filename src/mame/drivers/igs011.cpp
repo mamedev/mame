@@ -200,7 +200,7 @@ public:
 	void vbowl_link_2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void vbowl_link_3_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	uint16_t igs_dips_r(int NUM);
-	DECLARE_CUSTOM_INPUT_MEMBER(igs_hopper_r);
+	ioport_value igs_hopper_r(ioport_field &field, void *param);
 	void lhb_okibank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	uint16_t ics2115_word_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void ics2115_word_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
@@ -624,7 +624,7 @@ void igs011_state::machine_start()
 // Inputs
 
 
-CUSTOM_INPUT_MEMBER(igs011_state::igs_hopper_r)
+ioport_value igs011_state::igs_hopper_r(ioport_field &field, void *param)
 {
 	return (m_igs_hopper && ((m_screen->frame_number()/5)&1)) ? 0x0000 : 0x0001;
 }

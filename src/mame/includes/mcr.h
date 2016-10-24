@@ -97,7 +97,7 @@ public:
 	uint8_t demoderb_ip2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void demoderb_op4_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_INPUT_CHANGED_MEMBER(dpoker_coin_in_hit);
+	void dpoker_coin_in_hit(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 	void init_mcr_91490();
 	void init_kroozr();

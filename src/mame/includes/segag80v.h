@@ -53,14 +53,14 @@ public:
 	uint8_t multiply_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void coin_count_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void unknown_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_CUSTOM_INPUT_MEMBER(elim4_joint_coin_r);
+	ioport_value elim4_joint_coin_r(ioport_field &field, void *param);
 	void elim1_sh_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void elim2_sh_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void zektor1_sh_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void zektor2_sh_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void spacfury1_sh_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void spacfury2_sh_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_INPUT_CHANGED_MEMBER(service_switch);
+	void service_switch(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	void usb_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_zektor();
 	void init_startrek();

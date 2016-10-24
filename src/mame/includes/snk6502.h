@@ -56,9 +56,9 @@ public:
 	void satansat_b002_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void satansat_backcolor_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(snk6502_music0_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(sasuke_count_r);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+	ioport_value snk6502_music0_r(ioport_field &field, void *param);
+	ioport_value sasuke_count_r(ioport_field &field, void *param);
+	void coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);

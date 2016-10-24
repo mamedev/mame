@@ -38,7 +38,7 @@ public:
 	void fgram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void bgram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(sound_r);
+	ioport_value sound_r(ioport_field &field, void *param);
 
 	tilemap_memory_index marvins_tx_scan_cols(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
 	void get_tx_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);

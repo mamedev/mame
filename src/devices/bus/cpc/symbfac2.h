@@ -35,9 +35,9 @@ public:
 	uint8_t mouse_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t rom_rewrite_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void rom_rewrite_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_INPUT_CHANGED_MEMBER(mouse_change_x);
-	DECLARE_INPUT_CHANGED_MEMBER(mouse_change_y);
-	DECLARE_INPUT_CHANGED_MEMBER(mouse_change_buttons);
+	void mouse_change_x(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void mouse_change_y(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void mouse_change_buttons(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 	enum
 	{

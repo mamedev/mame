@@ -39,7 +39,7 @@ public:
 	// I/O operations
 	void tx_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t rx_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
+	void key_stroke(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 protected:
 	// device-level overrides

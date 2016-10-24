@@ -122,17 +122,17 @@ static ADDRESS_MAP_START( homerun_iomap, AS_IO, 8, homerun_state )
 ADDRESS_MAP_END
 
 
-CUSTOM_INPUT_MEMBER(homerun_state::homerun_d7756_busy_r)
+ioport_value homerun_state::homerun_d7756_busy_r(ioport_field &field, void *param)
 {
 	return m_samples->playing(0) ? 0 : 1;
 }
 
-CUSTOM_INPUT_MEMBER(homerun_state::ganjaja_d7756_busy_r)
+ioport_value homerun_state::ganjaja_d7756_busy_r(ioport_field &field, void *param)
 {
 	return m_d7756->busy_r();
 }
 
-CUSTOM_INPUT_MEMBER(homerun_state::ganjaja_hopper_status_r)
+ioport_value homerun_state::ganjaja_hopper_status_r(ioport_field &field, void *param)
 {
 	// gives hopper error if not 0
 	return 0;

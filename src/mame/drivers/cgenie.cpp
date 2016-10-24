@@ -64,7 +64,7 @@ public:
 	uint8_t control_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	uint8_t keyboard_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_INPUT_CHANGED_MEMBER(rst_callback);
+	void rst_callback(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 	void rs232_rx_w(int state);
 	void rs232_dcd_w(int state);
@@ -228,7 +228,7 @@ uint8_t cgenie_state::keyboard_r(address_space &space, offs_t offset, uint8_t me
 	return data;
 }
 
-INPUT_CHANGED_MEMBER( cgenie_state::rst_callback )
+void cgenie_state::rst_callback(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval);
 }

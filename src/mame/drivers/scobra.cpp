@@ -61,7 +61,7 @@ public:
 	void scobra_type2_ppi8255_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void hustler_ppi8255_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void hustler_ppi8255_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_CUSTOM_INPUT_MEMBER(stratgyx_coinage_r);
+	ioport_value stratgyx_coinage_r(ioport_field &field, void *param);
 };
 
 
@@ -322,7 +322,7 @@ ADDRESS_MAP_END
 
 
 /* stratgyx coinage DIPs are spread across two input ports */
-CUSTOM_INPUT_MEMBER(scobra_state::stratgyx_coinage_r)
+ioport_value scobra_state::stratgyx_coinage_r(ioport_field &field, void *param)
 {
 	int bit_mask = (uintptr_t)param;
 	return (ioport("IN4")->read() & bit_mask) ? 0x01 : 0x00;

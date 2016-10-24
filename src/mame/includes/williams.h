@@ -68,7 +68,7 @@ public:
 	void sinistar_vram_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t williams_video_counter_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void williams_blitter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_CUSTOM_INPUT_MEMBER(williams_mux_r);
+	ioport_value williams_mux_r(ioport_field &field, void *param);
 	void init_sinistar();
 	void init_stargate();
 	void init_playball();

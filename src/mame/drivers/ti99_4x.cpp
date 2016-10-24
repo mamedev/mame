@@ -128,7 +128,7 @@ public:
 	void alphaW(int state);
 
 	// Interrupt triggers
-	DECLARE_INPUT_CHANGED_MEMBER( load_interrupt );
+	void load_interrupt(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 	// Used by EVPC
 	void video_interrupt_evpc_in(int state);
@@ -695,7 +695,7 @@ void ti99_4x_state::handset_interrupt_in(int state)
     One of the common hardware mods was to add a switch to trigger a LOAD
     interrupt
 */
-INPUT_CHANGED_MEMBER( ti99_4x_state::load_interrupt )
+void ti99_4x_state::load_interrupt(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	logerror("ti99_4x: LOAD interrupt, level=%d\n", newval);
 	m_cpu->set_input_line(INT_9900_LOAD, (newval==0)? ASSERT_LINE : CLEAR_LINE);

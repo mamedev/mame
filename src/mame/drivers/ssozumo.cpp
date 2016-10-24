@@ -65,7 +65,7 @@ static ADDRESS_MAP_START( ssozumo_sound_map, AS_PROGRAM, 8, ssozumo_state )
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-INPUT_CHANGED_MEMBER(ssozumo_state::coin_inserted)
+void ssozumo_state::coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }

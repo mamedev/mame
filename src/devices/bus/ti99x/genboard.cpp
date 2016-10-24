@@ -226,7 +226,7 @@ geneve_mapper_device::geneve_mapper_device(const machine_config &mconfig, const 
 	m_eprom = nullptr;
 }
 
-INPUT_CHANGED_MEMBER( geneve_mapper_device::settings_changed )
+void geneve_mapper_device::settings_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	int number = (int)((uint64_t)param&0x03);
 	int value = newval;

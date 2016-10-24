@@ -46,7 +46,7 @@ uint16_t qdrmfgp_state::inputs_r(address_space &space, offs_t offset, uint16_t m
 	return m_control & 0x0080 ? m_inputs_port->read() : m_dsw_port->read();
 }
 
-CUSTOM_INPUT_MEMBER(qdrmfgp_state::battery_sensor_r)
+ioport_value qdrmfgp_state::battery_sensor_r(ioport_field &field, void *param)
 {
 	/* bit 0-1  battery power sensor: 3=good, 2=low, other=bad */
 	return 0x0003;

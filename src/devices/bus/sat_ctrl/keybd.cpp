@@ -246,7 +246,7 @@ void saturn_keybd_device::device_reset()
 //-------------------------------------------------
 
 /* TODO: needs a proper keycode table */
-INPUT_CHANGED_MEMBER(saturn_keybd_device::key_stroke)
+void saturn_keybd_device::key_stroke(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (newval && !oldval)
 	{

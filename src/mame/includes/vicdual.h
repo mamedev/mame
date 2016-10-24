@@ -129,15 +129,15 @@ public:
 	void pulsar_audio_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void pulsar_audio_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(read_coin_status);
-	DECLARE_CUSTOM_INPUT_MEMBER(get_64v);
-	DECLARE_CUSTOM_INPUT_MEMBER(get_vblank_comp);
-	DECLARE_CUSTOM_INPUT_MEMBER(get_composite_blank_comp);
-	DECLARE_CUSTOM_INPUT_MEMBER(get_timer_value);
-	DECLARE_CUSTOM_INPUT_MEMBER(fake_lives_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(samurai_protection_r);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_changed);
-	DECLARE_INPUT_CHANGED_MEMBER(nsub_coin_in);
+	ioport_value read_coin_status(ioport_field &field, void *param);
+	ioport_value get_64v(ioport_field &field, void *param);
+	ioport_value get_vblank_comp(ioport_field &field, void *param);
+	ioport_value get_composite_blank_comp(ioport_field &field, void *param);
+	ioport_value get_timer_value(ioport_field &field, void *param);
+	ioport_value fake_lives_r(ioport_field &field, void *param);
+	ioport_value samurai_protection_r(ioport_field &field, void *param);
+	void coin_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void nsub_coin_in(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 	void clear_coin_status(timer_device &timer, void *ptr, int32_t param);
 	void nsub_coin_pulse(timer_device &timer, void *ptr, int32_t param);

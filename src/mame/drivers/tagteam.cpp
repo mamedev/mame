@@ -80,7 +80,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, tagteam_state )
 ADDRESS_MAP_END
 
 
-INPUT_CHANGED_MEMBER(tagteam_state::coin_inserted)
+void tagteam_state::coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }

@@ -97,7 +97,7 @@ void brkthru_state::brkthru_soundlatch_w(address_space &space, offs_t offset, ui
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-INPUT_CHANGED_MEMBER(brkthru_state::coin_inserted)
+void brkthru_state::coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	/* coin insertion causes an IRQ */
 	if (oldval)

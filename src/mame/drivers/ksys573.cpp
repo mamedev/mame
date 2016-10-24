@@ -398,9 +398,9 @@ public:
 	{
 	}
 
-	DECLARE_CUSTOM_INPUT_MEMBER( gn845pwbb_read );
-	DECLARE_CUSTOM_INPUT_MEMBER( gunmania_tank_shutter_sensor );
-	DECLARE_CUSTOM_INPUT_MEMBER( gunmania_cable_holder_sensor );
+	ioport_value gn845pwbb_read(ioport_field &field, void *param);
+	ioport_value gunmania_tank_shutter_sensor(ioport_field &field, void *param);
+	ioport_value gunmania_cable_holder_sensor(ioport_field &field, void *param);
 	uint16_t control_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void atapi_reset_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
@@ -1069,7 +1069,7 @@ void ksys573_state::gn845pwbb_clk_w( int offset, int data )
 		m_stage_state[ offset ].state, m_stage_state[ offset ].DO, m_stage_state[ offset ].shift, m_stage_state[ offset ].bit, m_stage_mask );
 }
 
-CUSTOM_INPUT_MEMBER( ksys573_state::gn845pwbb_read )
+ioport_value ksys573_state::gn845pwbb_read(ioport_field &field, void *param)
 {
 	return m_stage->read() & m_stage_mask;
 }
@@ -1949,7 +1949,7 @@ void ksys573_state::gunmania_w(address_space &space, offs_t offset, uint16_t dat
 	verboselog( 2, "gunmania_w %08x %08x %08x\n", offset, mem_mask, data );
 }
 
-CUSTOM_INPUT_MEMBER( ksys573_state::gunmania_tank_shutter_sensor )
+ioport_value ksys573_state::gunmania_tank_shutter_sensor(ioport_field &field, void *param)
 {
 	if( m_tank_shutter_position == 0 )
 	{
@@ -1959,7 +1959,7 @@ CUSTOM_INPUT_MEMBER( ksys573_state::gunmania_tank_shutter_sensor )
 	return 0;
 }
 
-CUSTOM_INPUT_MEMBER( ksys573_state::gunmania_cable_holder_sensor )
+ioport_value ksys573_state::gunmania_cable_holder_sensor(ioport_field &field, void *param)
 {
 	return m_cable_holder_release;
 }

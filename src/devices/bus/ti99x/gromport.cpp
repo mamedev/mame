@@ -690,7 +690,7 @@ machine_config_constructor multi_conn_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME( multi_slot );
 }
 
-INPUT_CHANGED_MEMBER( multi_conn_device::switch_changed )
+void multi_conn_device::switch_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (TRACE_CHANGE) logerror("Slot changed %d - %d\n", (int)((uint64_t)param & 0x07), newval);
 	m_active_slot = m_fixed_slot = newval - 1;
@@ -1009,7 +1009,7 @@ void gkracker_device::cruwrite(address_space &space, offs_t offset, uint8_t data
 	if (m_cartridge != nullptr) m_cartridge->cruwrite(space, offset, data);
 }
 
-INPUT_CHANGED_MEMBER( gkracker_device::gk_changed )
+void gkracker_device::gk_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (TRACE_GKRACKER) logerror("Input changed %d - %d\n", (int)((uint64_t)param & 0x07), newval);
 	m_gk_switch[(uint64_t)param & 0x07] = newval;

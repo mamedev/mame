@@ -176,13 +176,13 @@ ADDRESS_MAP_END
   Interrupts are still used, but they are related to coin
   slots. Left slot generates an IRQ, Right slot a NMI.
 */
-INPUT_CHANGED_MEMBER( redclash_state::left_coin_inserted )
+void redclash_state::left_coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if(newval)
 		m_maincpu->set_input_line(0, ASSERT_LINE);
 }
 
-INPUT_CHANGED_MEMBER( redclash_state::right_coin_inserted )
+void redclash_state::right_coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if(newval)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);

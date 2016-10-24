@@ -78,10 +78,10 @@ public:
 	void sound_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t m6803_port2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void m6803_port2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_INPUT_CHANGED_MEMBER(video_test);
-	DECLARE_INPUT_CHANGED_MEMBER(sound_test);
-	DECLARE_INPUT_CHANGED_MEMBER(activity_test);
-	DECLARE_INPUT_CHANGED_MEMBER(self_test);
+	void video_test(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void sound_test(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void activity_test(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void self_test(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	uint8_t u7_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void u7_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t u7_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
@@ -185,25 +185,25 @@ static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, by133_state )
 ADDRESS_MAP_END
 
 
-INPUT_CHANGED_MEMBER( by133_state::video_test )
+void by133_state::video_test(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if(newval)
 		m_videocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-INPUT_CHANGED_MEMBER( by133_state::sound_test )
+void by133_state::sound_test(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if(newval)
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-INPUT_CHANGED_MEMBER( by133_state::activity_test )
+void by133_state::activity_test(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if(newval)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-INPUT_CHANGED_MEMBER( by133_state::self_test )
+void by133_state::self_test(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_pia_u10->ca1_w(newval);
 }

@@ -48,7 +48,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void video_start_pecom();
-	DECLARE_INPUT_CHANGED_MEMBER(ef_w);
+	void ef_w(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	void reset_tick(void *ptr, int32_t param);
 	int clear_r();
 	int ef2_r();

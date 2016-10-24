@@ -73,7 +73,7 @@ public:
 	void audio_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t audio_answer_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void audio_answer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_CUSTOM_INPUT_MEMBER(get_ttl74123_output);
+	ioport_value get_ttl74123_output(ioport_field &field, void *param);
 	void main_cpu_irq(int state);
 	void AY8910_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t AY8910_port_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
@@ -229,7 +229,7 @@ void r2dtank_state::ttl74123_output_changed(address_space &space, offs_t offset,
 }
 
 
-CUSTOM_INPUT_MEMBER(r2dtank_state::get_ttl74123_output)
+ioport_value r2dtank_state::get_ttl74123_output(ioport_field &field, void *param)
 {
 	return m_ttl74123_output;
 }

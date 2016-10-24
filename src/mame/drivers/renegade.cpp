@@ -556,7 +556,7 @@ uint8_t renegade_state::mcu_r(address_space &space, offs_t offset, uint8_t mem_m
 	}
 }
 
-CUSTOM_INPUT_MEMBER(renegade_state::mcu_status_r)
+ioport_value renegade_state::mcu_status_r(ioport_field &field, void *param)
 {
 	uint8_t res = 0;
 

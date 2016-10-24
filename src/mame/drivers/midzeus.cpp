@@ -439,7 +439,7 @@ void midzeus_state::tms32031_control_w(address_space &space, offs_t offset, uint
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(midzeus_state::custom_49way_r)
+ioport_value midzeus_state::custom_49way_r(ioport_field &field, void *param)
 {
 	static const uint8_t translate49[7] = { 0x8, 0xc, 0xe, 0xf, 0x3, 0x1, 0x0 };
 	const char *namex = (const char *)param;
@@ -455,7 +455,7 @@ void midzeus_state::keypad_select_w(address_space &space, offs_t offset, uint32_
 }
 
 
-CUSTOM_INPUT_MEMBER(midzeus_state::keypad_r)
+ioport_value midzeus_state::keypad_r(ioport_field &field, void *param)
 {
 	uint32_t bits = ioport((const char *)param)->read();
 	uint8_t select = keypad_select;

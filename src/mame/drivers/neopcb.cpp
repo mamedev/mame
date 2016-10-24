@@ -38,7 +38,7 @@ MACHINE_CONFIG_END
 
 // Game specific input definitions
 
-INPUT_CHANGED_MEMBER(neopcb_state::select_bios)
+void neopcb_state::select_bios(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	membank("bios_bank")->set_entry(newval ? 0 : 1);
 }

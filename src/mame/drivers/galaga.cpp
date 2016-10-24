@@ -783,7 +783,7 @@ void galaga_state::bosco_latch_w(address_space &space, offs_t offset, uint8_t da
 	}
 }
 
-CUSTOM_INPUT_MEMBER(digdug_state::shifted_port_r){ return ioport((const char *)param)->read() >> 4; }
+ioport_value digdug_state::shifted_port_r(ioport_field &field, void *param){ return ioport((const char *)param)->read() >> 4; }
 
 void galaga_state::out_0(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {

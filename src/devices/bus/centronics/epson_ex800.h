@@ -51,7 +51,7 @@ public:
 	uint8_t gate7a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void gate7a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_INPUT_CHANGED_MEMBER(online_switch);
+	void online_switch(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 protected:
 	// device-level overrides

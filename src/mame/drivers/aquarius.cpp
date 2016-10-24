@@ -228,7 +228,7 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 /* the 'reset' key is directly tied to the reset line of the cpu */
-INPUT_CHANGED_MEMBER(aquarius_state::aquarius_reset)
+void aquarius_state::aquarius_reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 }

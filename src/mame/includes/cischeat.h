@@ -143,8 +143,8 @@ public:
 	void captflag_motor_command_right_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void captflag_motor_command_left_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void captflag_motor_move(int side, uint16_t data);
-	DECLARE_CUSTOM_INPUT_MEMBER(captflag_motor_busy_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(captflag_motor_pos_r);
+	ioport_value captflag_motor_busy_r(ioport_field &field, void *param);
+	ioport_value captflag_motor_pos_r(ioport_field &field, void *param);
 
 	optional_memory_bank m_oki1_bank;
 	optional_memory_bank m_oki2_bank;

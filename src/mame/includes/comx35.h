@@ -81,7 +81,7 @@ public:
 	void sc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void irq_w(int state);
 	void prd_w(int state);
-	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
+	void trigger_reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	DECLARE_QUICKLOAD_LOAD_MEMBER( comx35_comx );
 	void image_fread_memory(device_image_interface &image, uint16_t addr, uint32_t count);
 	CDP1869_CHAR_RAM_READ_MEMBER(comx35_charram_r);

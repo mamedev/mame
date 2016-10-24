@@ -783,13 +783,13 @@ void cischeat_state::captflag_motor_move(int side, uint16_t data)
 	output().set_value((side == RIGHT) ? "right" : "left", pos);
 }
 
-CUSTOM_INPUT_MEMBER(cischeat_state::captflag_motor_pos_r)
+ioport_value cischeat_state::captflag_motor_pos_r(ioport_field &field, void *param)
 {
 	const uint8_t pos[4] = {1,0,2,3}; // -> 2,3,1,0 offsets -> 0123
 	return ~pos[m_captflag_motor_pos[(uintptr_t)param]];
 }
 
-CUSTOM_INPUT_MEMBER(cischeat_state::captflag_motor_busy_r)
+ioport_value cischeat_state::captflag_motor_busy_r(ioport_field &field, void *param)
 {
 //  timer_device & dev = ((side == RIGHT) ? m_captflag_motor_right : m_captflag_motor_left);
 //  return (dev.time_left() == attotime::never) ? 0 : 1;

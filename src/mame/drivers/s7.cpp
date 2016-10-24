@@ -107,9 +107,9 @@ public:
 	void pia30_ca2_w(int state) { }; //ST4
 	void pia30_cb2_w(int state) { }; //ST3
 	void pia_irq(int state);
-	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
-	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
-	DECLARE_INPUT_CHANGED_MEMBER(diag_coin);
+	void main_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void audio_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void diag_coin(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	void machine_reset_s7();
 	void init_s7();
 private:
@@ -248,21 +248,21 @@ static INPUT_PORTS_START( s7 )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER( s7_state::main_nmi )
+void s7_state::main_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	// Diagnostic button sends a pulse to NMI pin
 	if (newval==CLEAR_LINE)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-INPUT_CHANGED_MEMBER( s7_state::audio_nmi )
+void s7_state::audio_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	// Diagnostic button sends a pulse to NMI pin
 	if (newval==CLEAR_LINE)
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-INPUT_CHANGED_MEMBER( s7_state::diag_coin )
+void s7_state::diag_coin(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_memprotect = newval;
 }

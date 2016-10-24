@@ -83,7 +83,7 @@ public:
 	uint16_t musobana_inputport_0_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void musobana_inputport_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(musobana_outcoin_flag_r);
+	ioport_value musobana_outcoin_flag_r(ioport_field &field, void *param);
 
 	void init_niyanpai();
 	virtual void video_start() override;

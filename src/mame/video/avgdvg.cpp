@@ -1304,7 +1304,7 @@ void avgdvg_device::run_state_machine(void *ptr, int32_t param)
  *
  ************************************/
 
-CUSTOM_INPUT_MEMBER( avgdvg_device::done_r )
+ioport_value avgdvg_device::done_r(ioport_field &field, void *param)
 {
 	return m_sync_halt ? 0x01 : 0x00;
 }

@@ -76,7 +76,7 @@ public:
 	void wolfpack_ship_pic_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void wolfpack_torpedo_h_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void wolfpack_torpedo_v_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_CUSTOM_INPUT_MEMBER(wolfpack_dial_r);
+	ioport_value wolfpack_dial_r(ioport_field &field, void *param);
 	void wolfpack_word_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void wolfpack_start_speech_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	virtual void machine_reset() override;

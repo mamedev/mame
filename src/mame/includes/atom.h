@@ -92,7 +92,7 @@ public:
 	uint8_t ppi_pc_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void ppi_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t vdg_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_INPUT_CHANGED_MEMBER( trigger_reset );
+	void trigger_reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	void atom_8271_interrupt_callback(int state);
 	void motor_w(int state);
 
@@ -113,7 +113,7 @@ public:
 	void cassette_output_tick(timer_device &timer, void *ptr, int32_t param);
 
 	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cart_load) { return load_cart(image, m_cart); }
+	image_init_result device_image_load_cart_load(device_image_interface &image) { return load_cart(image, m_cart); }
 	DECLARE_QUICKLOAD_LOAD_MEMBER(atom_atm);
 };
 
@@ -143,24 +143,24 @@ public:
 	required_device<generic_slot_device> m_e0;
 	required_device<generic_slot_device> m_e1;
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(a0_load) { return load_cart(image, m_ext[0x0]); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(a1_load) { return load_cart(image, m_ext[0x1]); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(a2_load) { return load_cart(image, m_ext[0x2]); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(a3_load) { return load_cart(image, m_ext[0x3]); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(a4_load) { return load_cart(image, m_ext[0x4]); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(a5_load) { return load_cart(image, m_ext[0x5]); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(a6_load) { return load_cart(image, m_ext[0x6]); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(a7_load) { return load_cart(image, m_ext[0x7]); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(a8_load) { return load_cart(image, m_ext[0x8]); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(a9_load) { return load_cart(image, m_ext[0x9]); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(aa_load) { return load_cart(image, m_ext[0xa]); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(ab_load) { return load_cart(image, m_ext[0xb]); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(ac_load) { return load_cart(image, m_ext[0xc]); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(ad_load) { return load_cart(image, m_ext[0xd]); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(ae_load) { return load_cart(image, m_ext[0xe]); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(af_load) { return load_cart(image, m_ext[0xf]); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(e0_load) { return load_cart(image, m_e0); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(e1_load) { return load_cart(image, m_e1); }
+	image_init_result device_image_load_a0_load(device_image_interface &image) { return load_cart(image, m_ext[0x0]); }
+	image_init_result device_image_load_a1_load(device_image_interface &image) { return load_cart(image, m_ext[0x1]); }
+	image_init_result device_image_load_a2_load(device_image_interface &image) { return load_cart(image, m_ext[0x2]); }
+	image_init_result device_image_load_a3_load(device_image_interface &image) { return load_cart(image, m_ext[0x3]); }
+	image_init_result device_image_load_a4_load(device_image_interface &image) { return load_cart(image, m_ext[0x4]); }
+	image_init_result device_image_load_a5_load(device_image_interface &image) { return load_cart(image, m_ext[0x5]); }
+	image_init_result device_image_load_a6_load(device_image_interface &image) { return load_cart(image, m_ext[0x6]); }
+	image_init_result device_image_load_a7_load(device_image_interface &image) { return load_cart(image, m_ext[0x7]); }
+	image_init_result device_image_load_a8_load(device_image_interface &image) { return load_cart(image, m_ext[0x8]); }
+	image_init_result device_image_load_a9_load(device_image_interface &image) { return load_cart(image, m_ext[0x9]); }
+	image_init_result device_image_load_aa_load(device_image_interface &image) { return load_cart(image, m_ext[0xa]); }
+	image_init_result device_image_load_ab_load(device_image_interface &image) { return load_cart(image, m_ext[0xb]); }
+	image_init_result device_image_load_ac_load(device_image_interface &image) { return load_cart(image, m_ext[0xc]); }
+	image_init_result device_image_load_ad_load(device_image_interface &image) { return load_cart(image, m_ext[0xd]); }
+	image_init_result device_image_load_ae_load(device_image_interface &image) { return load_cart(image, m_ext[0xe]); }
+	image_init_result device_image_load_af_load(device_image_interface &image) { return load_cart(image, m_ext[0xf]); }
+	image_init_result device_image_load_e0_load(device_image_interface &image) { return load_cart(image, m_e0); }
+	image_init_result device_image_load_e1_load(device_image_interface &image) { return load_cart(image, m_e1); }
 };
 
 #endif

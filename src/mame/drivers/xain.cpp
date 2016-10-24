@@ -272,7 +272,7 @@ void xain_state::m68705_w(address_space &space, offs_t offset, uint8_t data, uin
 		m_mcu->set_input_line(0, ASSERT_LINE);
 }
 
-CUSTOM_INPUT_MEMBER(xain_state::vblank_r)
+ioport_value xain_state::vblank_r(ioport_field &field, void *param)
 {
 	return m_vblank;
 }
@@ -354,7 +354,7 @@ void xain_state::m68705_ddr_c_w(address_space &space, offs_t offset, uint8_t dat
 	m_ddr_c = data;
 }
 
-CUSTOM_INPUT_MEMBER(xain_state::mcu_status_r)
+ioport_value xain_state::mcu_status_r(ioport_field &field, void *param)
 {
 	uint8_t res = 0;
 

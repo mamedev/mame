@@ -222,7 +222,7 @@ public:
 
 	void insert(int index, ti99_cartridge_device* cart) override;
 	void remove(int index) override;
-	DECLARE_INPUT_CHANGED_MEMBER( switch_changed );
+	void switch_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 	bool is_grom_idle() override;
 
@@ -261,7 +261,7 @@ public:
 
 	void insert(int index, ti99_cartridge_device* cart) override;
 	void remove(int index) override;
-	DECLARE_INPUT_CHANGED_MEMBER( gk_changed );
+	void gk_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 	// We may have a cartridge plugged into the GK
 	bool is_grom_idle() override;

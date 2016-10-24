@@ -155,7 +155,7 @@ public:
 	void metro_vram_2_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void metro_window_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void blt_write( address_space &space, const int tmap, const offs_t offs, const uint16_t data, const uint16_t mask );
-	DECLARE_CUSTOM_INPUT_MEMBER(custom_soundstatus_r);
+	ioport_value custom_soundstatus_r(ioport_field &field, void *param);
 	void gakusai_oki_bank_hi_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void gakusai_oki_bank_lo_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	uint16_t gakusai_eeprom_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);

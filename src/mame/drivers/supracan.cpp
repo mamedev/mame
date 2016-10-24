@@ -221,7 +221,7 @@ public:
 	void supracan_line_on_callback(void *ptr, int32_t param);
 	void supracan_line_off_callback(void *ptr, int32_t param);
 	void supracan_video_callback(void *ptr, int32_t param);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(supracan_cart);
+	image_init_result device_image_load_supracan_cart(device_image_interface &image);
 	inline void verboselog(const char *tag, int n_level, const char *s_fmt, ...) ATTR_PRINTF(4,5);
 	int supracan_tilemap_get_region(int layer);
 	void supracan_tilemap_get_info_common(int layer, tile_data &tileinfo, int count);
@@ -1741,7 +1741,7 @@ void supracan_state::video_w(address_space &space, offs_t offset, uint16_t data,
 }
 
 
-DEVICE_IMAGE_LOAD_MEMBER( supracan_state, supracan_cart )
+image_init_result supracan_state::device_image_load_supracan_cart(device_image_interface &image)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 

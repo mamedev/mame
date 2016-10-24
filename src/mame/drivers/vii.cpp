@@ -159,8 +159,8 @@ public:
 	void vii_vblank(device_t &device);
 	void tmb1_tick(void *ptr, int32_t param);
 	void tmb2_tick(void *ptr, int32_t param);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(vii_cart);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(vsmile_cart);
+	image_init_result device_image_load_vii_cart(device_image_interface &image);
+	image_init_result device_image_load_vsmile_cart(device_image_interface &image);
 
 protected:
 	optional_memory_region m_bios_rom;
@@ -965,7 +965,7 @@ void vii_state::test_centered(uint8_t *ROM)
 	}
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( vii_state, vii_cart )
+image_init_result vii_state::device_image_load_vii_cart(device_image_interface &image)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
@@ -983,7 +983,7 @@ DEVICE_IMAGE_LOAD_MEMBER( vii_state, vii_cart )
 	return image_init_result::PASS;
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( vii_state, vsmile_cart )
+image_init_result vii_state::device_image_load_vsmile_cart(device_image_interface &image)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 

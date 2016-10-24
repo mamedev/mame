@@ -1636,7 +1636,7 @@ MACHINE_CONFIG_END
 /*                                                     */
 /*******************************************************/
 
-CUSTOM_INPUT_MEMBER(_8080bw_state::sflush_80_r)
+ioport_value _8080bw_state::sflush_80_r(ioport_field &field, void *param)
 {
 	return (m_screen->vpos() & 0x80) ? 1 : 0;
 }
@@ -3009,12 +3009,12 @@ void _8080bw_state::claybust_gun_callback(timer_device &timer, void *ptr, int32_
 	m_claybust_gun_pos = 0;
 }
 
-CUSTOM_INPUT_MEMBER(_8080bw_state::claybust_gun_on_r)
+ioport_value _8080bw_state::claybust_gun_on_r(ioport_field &field, void *param)
 {
 	return (m_claybust_gun_pos != 0) ? 1 : 0;
 }
 
-INPUT_CHANGED_MEMBER(_8080bw_state::claybust_gun_trigger)
+void _8080bw_state::claybust_gun_trigger(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (newval)
 	{

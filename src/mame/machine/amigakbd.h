@@ -67,7 +67,7 @@ public:
 	uint8_t control_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_INPUT_CHANGED_MEMBER( check_reset );
+	void check_reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 protected:
 	// device-level overrides

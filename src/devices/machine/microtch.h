@@ -16,7 +16,7 @@ public:
 
 	virtual ioport_constructor device_input_ports() const override;
 	void rx(int state) { device_serial_interface::rx_w(state); }
-	DECLARE_INPUT_CHANGED_MEMBER(touch);
+	void touch(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 	typedef delegate<int (int *, int *)> touch_cb;
 	static void static_set_touch_callback(device_t &device, touch_cb object) { downcast<microtouch_device &>(device).m_out_touch_cb = object; }

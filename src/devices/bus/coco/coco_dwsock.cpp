@@ -51,7 +51,7 @@ ioport_constructor beckerport_device::device_input_ports() const
 //-------------------------------------------------
 //  drivewire_port_changed
 //-------------------------------------------------
-INPUT_CHANGED_MEMBER(beckerport_device::drivewire_port_changed)
+void beckerport_device::drivewire_port_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	this->update_port();
 }

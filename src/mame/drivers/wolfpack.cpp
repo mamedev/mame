@@ -46,7 +46,7 @@ void wolfpack_state::machine_reset()
 }
 
 
-CUSTOM_INPUT_MEMBER(wolfpack_state::wolfpack_dial_r)
+ioport_value wolfpack_state::wolfpack_dial_r(ioport_field &field, void *param)
 {
 	int bit = (uintptr_t)param;
 	return ((ioport("DIAL")->read() + bit) / 2) & 0x01;

@@ -195,7 +195,7 @@ void meadows_state::meadows_audio_w(address_space &space, offs_t offset, uint8_t
  *
  *************************************/
 
-INPUT_CHANGED_MEMBER(meadows_state::coin_inserted)
+void meadows_state::coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line_and_vector(0, (newval ? ASSERT_LINE : CLEAR_LINE), 0x82);
 }

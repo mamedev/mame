@@ -61,7 +61,7 @@ public:
 	void portff_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void brailab4_port7f_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void brailab4_portff_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_CUSTOM_INPUT_MEMBER(cass3_r);
+	ioport_value cass3_r(ioport_field &field, void *param);
 	const uint8_t *m_p_chargen;
 	const uint8_t *m_p_videoram;
 	bool m_nmi;
@@ -153,7 +153,7 @@ void homelab_state::brailab4_portff_w(address_space &space, offs_t offset, uint8
 	membank("bank1")->set_entry(1);
 }
 
-CUSTOM_INPUT_MEMBER( homelab_state::cass3_r )
+ioport_value homelab_state::cass3_r(ioport_field &field, void *param)
 {
 	return (m_cass->input() > 0.03);
 }

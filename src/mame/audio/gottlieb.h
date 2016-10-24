@@ -57,7 +57,7 @@ public:
 
 	// internal communications
 	uint8_t r6530b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
+	void audio_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 protected:
 	// device-level overrides
@@ -157,7 +157,7 @@ public:
 	uint8_t audio_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void signal_audio_nmi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void nmi_rate_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	CUSTOM_INPUT_MEMBER( speech_drq_custom_r );
+	ioport_value speech_drq_custom_r(ioport_field &field, void *param);
 	void speech_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void sp0250_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void psg_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);

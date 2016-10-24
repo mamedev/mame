@@ -100,7 +100,7 @@ public:
 	void konamigx_t4_psacmap_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	void vblank_irq_ack_w(int state);
 	void hblank_irq_ack_w(int state);
-	DECLARE_CUSTOM_INPUT_MEMBER(gx_rdport1_3_r);
+	ioport_value gx_rdport1_3_r(ioport_field &field, void *param);
 	void init_konamigx();
 	void get_gx_psac_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void get_gx_psac3_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);

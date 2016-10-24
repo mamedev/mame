@@ -81,8 +81,8 @@ class naomi_state : public dc_state
 	void aw_modem_w(address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask = U64(0xffffffffffffffff));
 
 	uint8_t m_mp_mux;
-	DECLARE_CUSTOM_INPUT_MEMBER(naomi_mp_r);
-	DECLARE_INPUT_CHANGED_MEMBER(naomi_mp_w);
+	ioport_value naomi_mp_r(ioport_field &field, void *param);
+	void naomi_mp_w(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 	inline int decode_reg32_64(uint32_t offset, uint64_t mem_mask, uint64_t *shift);
 

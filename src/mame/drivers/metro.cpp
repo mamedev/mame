@@ -292,7 +292,7 @@ uint16_t metro_state::metro_soundstatus_r(address_space &space, offs_t offset, u
 	return (m_busy_sndcpu ? 0x00 : 0x01);
 }
 
-CUSTOM_INPUT_MEMBER(metro_state::custom_soundstatus_r)
+ioport_value metro_state::custom_soundstatus_r(ioport_field &field, void *param)
 {
 	return (m_busy_sndcpu ? 0x01 : 0x00);
 }

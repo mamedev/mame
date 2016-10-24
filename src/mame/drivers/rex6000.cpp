@@ -114,7 +114,7 @@ public:
 	void serial_irq(int state);
 
 	void palette_init_rex6000(palette_device &palette);
-	DECLARE_INPUT_CHANGED_MEMBER(trigger_irq);
+	void trigger_irq(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	void irq_timer1(timer_device &timer, void *ptr, int32_t param);
 	void irq_timer2(timer_device &timer, void *ptr, int32_t param);
 	void sec_timer(timer_device &timer, void *ptr, int32_t param);
@@ -136,7 +136,7 @@ public:
 	uint8_t kb_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t kb_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void kb_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_INPUT_CHANGED_MEMBER(trigger_on_irq);
+	void trigger_on_irq(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(oz750);
 
 	virtual void machine_reset() override;
@@ -413,7 +413,7 @@ static ADDRESS_MAP_START( oz750_io, AS_IO, 8, oz750_state)
 	AM_RANGE( 0x40, 0x47 ) AM_MIRROR(0x08)  AM_DEVREADWRITE("ns16550", ns16550_device, ins8250_r, ins8250_w )
 ADDRESS_MAP_END
 
-INPUT_CHANGED_MEMBER(rex6000_state::trigger_irq)
+void rex6000_state::trigger_irq(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (!(m_irq_mask & IRQ_FLAG_KEYCHANGE))
 	{
@@ -423,7 +423,7 @@ INPUT_CHANGED_MEMBER(rex6000_state::trigger_irq)
 	}
 }
 
-INPUT_CHANGED_MEMBER(oz750_state::trigger_on_irq)
+void oz750_state::trigger_on_irq(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_uart->cts_w(!newval);
 

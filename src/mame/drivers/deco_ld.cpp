@@ -156,8 +156,8 @@ public:
 	uint8_t acia_status_hack_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t sound_status_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void decold_sound_cmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_CUSTOM_INPUT_MEMBER(begas_vblank_r);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+	ioport_value begas_vblank_r(ioport_field &field, void *param);
+	void coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	virtual void machine_start() override;
 	uint32_t screen_update_rblaster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void sound_interrupt(device_t &device);
@@ -313,12 +313,12 @@ static ADDRESS_MAP_START( rblaster_sound_map, AS_PROGRAM, 8, deco_ld_state )
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-CUSTOM_INPUT_MEMBER( deco_ld_state::begas_vblank_r )
+ioport_value deco_ld_state::begas_vblank_r(ioport_field &field, void *param)
 {
 	return m_screen->vpos() >= 240*2;
 }
 
-INPUT_CHANGED_MEMBER(deco_ld_state::coin_inserted)
+void deco_ld_state::coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }

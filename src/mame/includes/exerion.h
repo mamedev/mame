@@ -61,8 +61,8 @@ public:
 	void exerion_videoreg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void exerion_video_latch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t exerion_video_timing_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_CUSTOM_INPUT_MEMBER(exerion_controls_r);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+	ioport_value exerion_controls_r(ioport_field &field, void *param);
+	void coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	uint8_t exerion_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void exerion_portb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_exerion();

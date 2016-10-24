@@ -22,8 +22,8 @@ public:
 	uint16_t read(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void write(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( ti990_hd );
-	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( ti990_hd );
+	image_init_result device_image_load_ti990_hd(device_image_interface &image);
+	void device_image_unload_ti990_hd(device_image_interface &image);
 protected:
 	// device-level overrides
 	virtual void device_start() override;

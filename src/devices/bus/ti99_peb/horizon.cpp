@@ -412,7 +412,7 @@ void horizon_ramdisk_device::device_reset(void)
 	m_selected = false;
 }
 
-INPUT_CHANGED_MEMBER( horizon_ramdisk_device::hs_changed )
+void horizon_ramdisk_device::hs_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (TRACE_CONFIG) logerror("hideswitch changed %d\n", newval);
 	m_hideswitch = (newval!=0);

@@ -46,7 +46,7 @@ public:
 	void machine_reset_microvision();
 
 	void screen_vblank(screen_device &screen, bool state);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( microvsn_cart );
+	image_init_result device_image_load_microvsn_cart(device_image_interface &image);
 
 	// i8021 interface
 	void i8021_p0_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -502,7 +502,7 @@ static const uint16_t microvision_output_pla_1[0x20] =
 };
 
 
-DEVICE_IMAGE_LOAD_MEMBER(microvision_state, microvsn_cart)
+image_init_result microvision_state::device_image_load_microvsn_cart(device_image_interface &image)
 {
 	uint8_t *rom1 = memregion("maincpu1")->base();
 	uint8_t *rom2 = memregion("maincpu2")->base();

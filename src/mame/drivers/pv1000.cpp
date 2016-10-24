@@ -178,7 +178,7 @@ public:
 	uint32_t screen_update_pv1000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void d65010_irq_on_cb(void *ptr, int32_t param);
 	void d65010_irq_off_cb(void *ptr, int32_t param);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( pv1000_cart );
+	image_init_result device_image_load_pv1000_cart(device_image_interface &image);
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -303,7 +303,7 @@ static INPUT_PORTS_START( pv1000 )
 INPUT_PORTS_END
 
 
-DEVICE_IMAGE_LOAD_MEMBER( pv1000_state, pv1000_cart )
+image_init_result pv1000_state::device_image_load_pv1000_cart(device_image_interface &image)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 

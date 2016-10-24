@@ -392,7 +392,7 @@ void amigakbd_device::device_timer(emu_timer &timer, device_timer_id tid, int pa
 //  IMPLEMENTATION
 //**************************************************************************
 
-INPUT_CHANGED_MEMBER( amigakbd_device::check_reset )
+void amigakbd_device::check_reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	uint8_t keys = m_special->read();
 

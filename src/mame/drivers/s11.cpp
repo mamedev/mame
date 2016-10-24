@@ -165,14 +165,14 @@ void s11_state::machine_reset_s11()
 	membank("bank1")->set_entry(0);
 }
 
-INPUT_CHANGED_MEMBER( s11_state::main_nmi )
+void s11_state::main_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	// Diagnostic button sends a pulse to NMI pin
 	if (newval==CLEAR_LINE)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-INPUT_CHANGED_MEMBER( s11_state::audio_nmi )
+void s11_state::audio_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	// Diagnostic button sends a pulse to NMI pin
 	if (newval==CLEAR_LINE)

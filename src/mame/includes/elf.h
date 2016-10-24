@@ -60,7 +60,7 @@ public:
 	uint8_t dma_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void sc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void da_w(int state);
-	DECLARE_INPUT_CHANGED_MEMBER( input_w );
+	void input_w(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER( elf );
 	// display state

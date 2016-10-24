@@ -167,7 +167,7 @@ public:
 	void lynx_uart_loopback_timer(void *ptr, int32_t param);
 	void lynx_uart_timer(void *ptr, int32_t param);
 	void lynx_postload();
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( lynx_cart );
+	image_init_result device_image_load_lynx_cart(device_image_interface &image);
 	uint8_t lynx_read_ram(uint16_t address);
 	void lynx_write_ram(uint16_t address, uint8_t data);
 	inline void lynx_plot_pixel(const int mode, const int16_t x, const int y, const int color);

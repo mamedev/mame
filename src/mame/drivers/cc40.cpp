@@ -141,8 +141,8 @@ public:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	void palette_init_cc40(palette_device &palette);
-	DECLARE_INPUT_CHANGED_MEMBER(sysram_size_changed);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cc40_cartridge);
+	void sysram_size_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	image_init_result device_image_load_cc40_cartridge(device_image_interface &image);
 	HD44780_PIXEL_UPDATE(cc40_pixel_update);
 };
 
@@ -154,7 +154,7 @@ public:
 
 ***************************************************************************/
 
-DEVICE_IMAGE_LOAD_MEMBER(cc40_state, cc40_cartridge)
+image_init_result cc40_state::device_image_load_cc40_cartridge(device_image_interface &image)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
@@ -387,7 +387,7 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-INPUT_CHANGED_MEMBER(cc40_state::sysram_size_changed)
+void cc40_state::sysram_size_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	init_sysram((int)(uintptr_t)param, newval << 11);
 }

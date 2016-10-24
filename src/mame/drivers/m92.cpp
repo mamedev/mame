@@ -325,7 +325,7 @@ void m92_state::m92_bankswitch_w(address_space &space, offs_t offset, uint16_t d
 	}
 }
 
-CUSTOM_INPUT_MEMBER(m92_state::m92_sprite_busy_r)
+ioport_value m92_state::m92_sprite_busy_r(ioport_field &field, void *param)
 {
 	return m_sprite_buffer_busy;
 }

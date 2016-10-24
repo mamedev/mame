@@ -268,7 +268,7 @@ void tetrisp2_state::rocknms_main2sub_w(address_space &space, offs_t offset, uin
 		m_rocknms_main2sub = (data ^ 0xffff);
 }
 
-CUSTOM_INPUT_MEMBER(tetrisp2_state::rocknms_main2sub_status_r)
+ioport_value tetrisp2_state::rocknms_main2sub_status_r(ioport_field &field, void *param)
 {
 	return  m_rocknms_sub2main & 0x0003;
 }

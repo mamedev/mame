@@ -144,7 +144,7 @@ public:
 	void ms32_roz0_ram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	void ms32_roz1_ram_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	void bnstars1_mahjong_select_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
-	DECLARE_CUSTOM_INPUT_MEMBER(mahjong_ctrl_r);
+	ioport_value mahjong_ctrl_r(ioport_field &field, void *param);
 	void init_bnstars();
 	void get_ms32_tx0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void get_ms32_tx1_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
@@ -706,7 +706,7 @@ static GFXDECODE_START( bnstars )
 	GFXDECODE_ENTRY( "gfx7", 0, txlayout,     0x6000, 0x10 ) /* Tx scr2 */
 GFXDECODE_END
 
-CUSTOM_INPUT_MEMBER(bnstars_state::mahjong_ctrl_r)
+ioport_value bnstars_state::mahjong_ctrl_r(ioport_field &field, void *param)
 {
 	required_ioport_array<4> &keys = (((int)(uintptr_t)param) == 0) ? m_p1_keys : m_p2_keys;
 

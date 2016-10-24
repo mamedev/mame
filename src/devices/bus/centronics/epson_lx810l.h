@@ -98,7 +98,7 @@ public:
 	void e05a30_centronics_select(int state) { output_select(state); }
 
 	/* Panel buttons */
-	DECLARE_INPUT_CHANGED_MEMBER(online_sw);
+	void online_sw(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 	/* Video hardware (simulates paper) */
 	uint32_t screen_update_lx810l(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

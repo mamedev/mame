@@ -347,19 +347,19 @@ static ADDRESS_MAP_START( disco_audio_map, AS_PROGRAM, 8, btime_state )
 ADDRESS_MAP_END
 
 
-INPUT_CHANGED_MEMBER(btime_state::coin_inserted_irq_hi)
+void btime_state::coin_inserted_irq_hi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (newval)
 		m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
-INPUT_CHANGED_MEMBER(btime_state::coin_inserted_irq_lo)
+void btime_state::coin_inserted_irq_lo(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (!newval)
 		m_maincpu->set_input_line(0, HOLD_LINE);
 }
 
-INPUT_CHANGED_MEMBER(btime_state::coin_inserted_nmi_lo)
+void btime_state::coin_inserted_nmi_lo(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }

@@ -35,8 +35,8 @@ public:
 	// in drivers/btoads
 	void main_sound_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	uint16_t main_sound_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
-	DECLARE_CUSTOM_INPUT_MEMBER( main_to_sound_r );
-	DECLARE_CUSTOM_INPUT_MEMBER( sound_to_main_r );
+	ioport_value main_to_sound_r(ioport_field &field, void *param);
+	ioport_value sound_to_main_r(ioport_field &field, void *param);
 	void sound_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t sound_data_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t sound_ready_to_send_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);

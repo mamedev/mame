@@ -30,7 +30,7 @@ public:
 
 	static void static_set_vector_tag(device_t &device, const char *tag);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(done_r);
+	ioport_value done_r(ioport_field &field, void *param);
 	void go_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 

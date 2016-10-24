@@ -173,7 +173,7 @@ uint8_t astrocde_state::wow_speech_r(address_space &space, offs_t offset, uint8_
 }
 
 
-CUSTOM_INPUT_MEMBER( astrocde_state::wow_speech_status_r )
+ioport_value astrocde_state::wow_speech_status_r(ioport_field &field, void *param)
 {
 #if USE_FAKE_VOTRAX
 	return !m_samples->playing(0);

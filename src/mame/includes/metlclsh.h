@@ -49,7 +49,7 @@ public:
 	void metlclsh_gfxbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void metlclsh_bgram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void metlclsh_fgram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+	void coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	tilemap_memory_index metlclsh_bgtilemap_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
 	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);

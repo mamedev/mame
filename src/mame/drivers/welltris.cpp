@@ -338,7 +338,7 @@ void welltris_state::sound_command_w(address_space &space, offs_t offset, uint16
 	}
 }
 
-CUSTOM_INPUT_MEMBER(welltris_state::pending_sound_r)
+ioport_value welltris_state::pending_sound_r(ioport_field &field, void *param)
 {
 	return m_pending_command ? 1 : 0;
 }

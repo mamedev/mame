@@ -142,8 +142,8 @@ public:
 	void machine_start_z80net();
 	void machine_reset_z80net();
 	void machine_reset_z80ne_base();
-	DECLARE_INPUT_CHANGED_MEMBER(z80ne_reset);
-	DECLARE_INPUT_CHANGED_MEMBER(z80ne_nmi);
+	void z80ne_reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void z80ne_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	void z80ne_cassette_tc(void *ptr, int32_t param);
 	void z80ne_kbd_scan(void *ptr, int32_t param);
 	uint8_t lx388_mc6847_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);

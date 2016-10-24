@@ -452,7 +452,7 @@ void svision_state::init_svisions()
 	m_pet.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(svision_state::svision_pet_timer),this));
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( svision_state, svision_cart )
+image_init_result svision_state::device_image_load_svision_cart(device_image_interface &image)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 

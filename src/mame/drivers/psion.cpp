@@ -216,7 +216,7 @@ uint8_t psion_state::io_r(address_space &space, offs_t offset, uint8_t mem_mask)
 	return 0;
 }
 
-INPUT_CHANGED_MEMBER(psion_state::psion_on)
+void psion_state::psion_on(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	/* reset the CPU for resume from standby */
 	if (m_maincpu->suspended(SUSPEND_REASON_HALT))

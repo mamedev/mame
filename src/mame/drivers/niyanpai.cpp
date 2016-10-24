@@ -123,7 +123,7 @@ void niyanpai_state::tmp68301_parallel_port_w(address_space &space, offs_t offse
 	machine().bookkeeping().coin_lockout_w(0,data & 0x08);
 }
 
-CUSTOM_INPUT_MEMBER(niyanpai_state::musobana_outcoin_flag_r)
+ioport_value niyanpai_state::musobana_outcoin_flag_r(ioport_field &field, void *param)
 {
 	if (m_motor_on) m_musobana_outcoin_flag ^= 1;
 	else m_musobana_outcoin_flag = 1;

@@ -66,7 +66,7 @@ public:
 	uint8_t dipsw2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void barline_output_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(nb1413m3_busyflag_r);
+	ioport_value nb1413m3_busyflag_r(ioport_field &field, void *param);
 
 	void init_kyuhito();
 	void init_idhimitu();

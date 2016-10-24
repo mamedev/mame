@@ -72,7 +72,7 @@ public:
 	uint8_t ccastles_bitmode_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void ccastles_bitmode_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void ccastles_bitmode_addr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_CUSTOM_INPUT_MEMBER(get_vblank);
+	ioport_value get_vblank(ioport_field &field, void *param);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;

@@ -64,7 +64,7 @@ public:
 
 	uint8_t peripheral_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void peripheral_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_INPUT_CHANGED_MEMBER( trigger_nmi );
+	void trigger_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 	uint8_t omv_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void omv_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);

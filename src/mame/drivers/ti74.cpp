@@ -110,8 +110,8 @@ public:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	void palette_init_ti74(palette_device &palette);
-	DECLARE_INPUT_CHANGED_MEMBER(battery_status_changed);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(ti74_cartridge);
+	void battery_status_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	image_init_result device_image_load_ti74_cartridge(device_image_interface &image);
 	HD44780_PIXEL_UPDATE(ti74_pixel_update);
 	HD44780_PIXEL_UPDATE(ti95_pixel_update);
 };
@@ -124,7 +124,7 @@ public:
 
 ***************************************************************************/
 
-DEVICE_IMAGE_LOAD_MEMBER(ti74_state, ti74_cartridge)
+image_init_result ti74_state::device_image_load_ti74_cartridge(device_image_interface &image)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 
@@ -284,7 +284,7 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-INPUT_CHANGED_MEMBER(ti74_state::battery_status_changed)
+void ti74_state::battery_status_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (machine().phase() == MACHINE_PHASE_RUNNING)
 		update_battery_status(newval);

@@ -262,7 +262,7 @@ INPUT_PORTS_END
 
 
 /* Steph 2000-10-27 I remapped the 'Machine Name' Dip Switches (easier to understand) */
-INPUT_CHANGED_MEMBER(amstrad_state::cpc_monitor_changed)
+void amstrad_state::cpc_monitor_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if ( (m_io_green_display->read()) & 0x01 )
 	{

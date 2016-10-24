@@ -96,8 +96,8 @@ public:
 	void hotsmash_68705_ddr_c_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void hotsmash_Z80_mcu_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t hotsmash_Z80_mcu_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_CUSTOM_INPUT_MEMBER(pbillian_semaphore_input_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(superqix_semaphore_input_r);
+	ioport_value pbillian_semaphore_input_r(ioport_field &field, void *param);
+	ioport_value superqix_semaphore_input_r(ioport_field &field, void *param);
 	void pbillian_Z80_mcu_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void superqix_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void superqix_bitmapram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);

@@ -496,7 +496,7 @@ static INPUT_PORTS_START( panic )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_WRITE_LINE_DEVICE_MEMBER(DEVICE_SELF, cosmic_state, panic_coin_inserted)
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER(cosmic_state::cosmica_coin_inserted)
+void cosmic_state::cosmica_coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }
@@ -551,7 +551,7 @@ INPUT_PORTS_END
 
 /* Offsets are in BYTES, so bits 0-7 are at offset 0 etc.   */
 
-INPUT_CHANGED_MEMBER(cosmic_state::cosmicg_coin_inserted)
+void cosmic_state::cosmicg_coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(INT_9980A_LEVEL4, newval? ASSERT_LINE : CLEAR_LINE);
 }
@@ -598,12 +598,12 @@ static INPUT_PORTS_START( cosmicg )
 	PORT_DIPUNUSED_DIPLOC( 0x04, 0x00, "SW:6" )
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER(cosmic_state::coin_inserted_irq0)
+void cosmic_state::coin_inserted_irq0(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(0, newval ? HOLD_LINE : CLEAR_LINE);
 }
 
-INPUT_CHANGED_MEMBER(cosmic_state::coin_inserted_nmi)
+void cosmic_state::coin_inserted_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }

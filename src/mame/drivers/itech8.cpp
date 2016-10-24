@@ -718,7 +718,7 @@ void itech8_state::rimrockn_bank_w(address_space &space, offs_t offset, uint8_t 
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(itech8_state::special_r)
+ioport_value itech8_state::special_r(ioport_field &field, void *param)
 {
 	return m_pia_portb_data & 0x01;
 }
@@ -1100,7 +1100,7 @@ INPUT_PORTS_END
 
 
 
-CUSTOM_INPUT_MEMBER(itech8_state::gtg_mux)
+ioport_value itech8_state::gtg_mux(ioport_field &field, void *param)
 {
 	const char *tag1 = (const char *)param;
 	const char *tag2 = tag1 + strlen(tag1) + 1;

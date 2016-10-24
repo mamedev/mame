@@ -18,7 +18,7 @@
 #define SOUND_CLOCK XTAL_4MHz
 
 
-INPUT_CHANGED_MEMBER(madalien_state::coin_inserted)
+void madalien_state::coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	/* coin insertion causes an NMI */
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);

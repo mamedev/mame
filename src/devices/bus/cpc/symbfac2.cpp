@@ -250,17 +250,17 @@ uint8_t cpc_symbiface2_device::mouse_r(address_space &space, offs_t offset, uint
 	return ret;
 }
 
-INPUT_CHANGED_MEMBER(cpc_symbiface2_device::mouse_change_x)
+void cpc_symbiface2_device::mouse_change_x(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_mouse_state = PS2_MOUSE_X;
 }
 
-INPUT_CHANGED_MEMBER(cpc_symbiface2_device::mouse_change_y)
+void cpc_symbiface2_device::mouse_change_y(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_mouse_state = PS2_MOUSE_Y;
 }
 
-INPUT_CHANGED_MEMBER(cpc_symbiface2_device::mouse_change_buttons)
+void cpc_symbiface2_device::mouse_change_buttons(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_mouse_state = PS2_MOUSE_BUTTONS;
 }

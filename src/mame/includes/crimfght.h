@@ -50,7 +50,7 @@ public:
 	K052109_CB_MEMBER(tile_callback);
 	K051960_CB_MEMBER(sprite_callback);
 	void banking_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_CUSTOM_INPUT_MEMBER(system_r);
+	ioport_value system_r(ioport_field &field, void *param);
 
 private:
 	int m_woco;

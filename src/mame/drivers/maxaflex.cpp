@@ -66,7 +66,7 @@ public:
 	void mcu_tdr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t mcu_tcr_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void mcu_tcr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+	void coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	uint8_t pia_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t pia_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void pia_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) { mmu(data); }
@@ -280,7 +280,7 @@ void maxaflex_state::mcu_tcr_w(address_space &space, offs_t offset, uint8_t data
 	}
 }
 
-INPUT_CHANGED_MEMBER(maxaflex_state::coin_inserted)
+void maxaflex_state::coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (!newval)
 		m_mcu->set_input_line(M6805_IRQ_LINE, HOLD_LINE );

@@ -41,7 +41,7 @@ public:
 	void bg_tileram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	uint16_t genix_prot_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(prot_r);
+	ioport_value prot_r(ioport_field &field, void *param);
 
 	void init_pirates();
 	void init_genix();

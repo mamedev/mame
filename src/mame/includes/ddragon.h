@@ -104,7 +104,7 @@ public:
 	void irq_handler(int state);
 	void ddragon_bgvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void ddragon_fgvideoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_CUSTOM_INPUT_MEMBER(subcpu_bus_free);
+	ioport_value subcpu_bus_free(ioport_field &field, void *param);
 	void ddragon_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void toffy_bankswitch_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t darktowr_mcu_bank_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);

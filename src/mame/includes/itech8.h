@@ -117,8 +117,8 @@ public:
 	void pia_porta_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void ym2203_portb_out(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(special_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(gtg_mux);
+	ioport_value special_r(ioport_field &field, void *param);
+	ioport_value gtg_mux(ioport_field &field, void *param);
 
 	void init_rimrockn();
 	void init_grmatch();

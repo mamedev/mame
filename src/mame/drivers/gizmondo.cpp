@@ -56,7 +56,7 @@ public:
 	void init_gizmondo();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_INPUT_CHANGED_MEMBER(port_changed);
+	void port_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);
 	required_device<cpu_device> m_maincpu;
 	required_device<gf4500_device> m_gf4500;
@@ -129,7 +129,7 @@ void gizmondo_state::s3c2440_gpio_port_w(address_space &space, offs_t offset, ui
 	m_port[offset] = data;
 }
 
-INPUT_CHANGED_MEMBER(gizmondo_state::port_changed)
+void gizmondo_state::port_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_s3c2440->s3c2440_request_eint( 4);
 	//m_s3c2440->s3c2440_request_irq( S3C2440_INT_EINT1);

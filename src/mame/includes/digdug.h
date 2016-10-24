@@ -18,7 +18,7 @@ public:
 	uint8_t m_tx_color_mode;
 	uint8_t m_bg_disable;
 	uint8_t m_bg_color_bank;
-	DECLARE_CUSTOM_INPUT_MEMBER(shifted_port_r);
+	ioport_value shifted_port_r(ioport_field &field, void *param);
 	tilemap_memory_index tilemap_scan(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);
 	void bg_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void tx_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);

@@ -57,10 +57,10 @@ public:
 	void ladybug_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void ladybug_colorram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void ladybug_flipscreen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_CUSTOM_INPUT_MEMBER(ladybug_p1_control_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(ladybug_p2_control_r);
-	DECLARE_INPUT_CHANGED_MEMBER(coin1_inserted);
-	DECLARE_INPUT_CHANGED_MEMBER(coin2_inserted);
+	ioport_value ladybug_p1_control_r(ioport_field &field, void *param);
+	ioport_value ladybug_p2_control_r(ioport_field &field, void *param);
+	void coin1_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void coin2_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	void init_dorodon();
 	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void get_grid_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);

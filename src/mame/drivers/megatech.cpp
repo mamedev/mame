@@ -126,14 +126,14 @@ public:
 	void machine_reset_megatech();
 
 	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot, int gameno);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( mt_cart1 ) { return load_cart(image, m_cart1, 0); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( mt_cart2 ) { return load_cart(image, m_cart2, 1); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( mt_cart3 ) { return load_cart(image, m_cart3, 2); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( mt_cart4 ) { return load_cart(image, m_cart4, 3); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( mt_cart5 ) { return load_cart(image, m_cart5, 4); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( mt_cart6 ) { return load_cart(image, m_cart6, 5); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( mt_cart7 ) { return load_cart(image, m_cart7, 6); }
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( mt_cart8 ) { return load_cart(image, m_cart8, 7); }
+	image_init_result device_image_load_mt_cart1(device_image_interface &image) { return load_cart(image, m_cart1, 0); }
+	image_init_result device_image_load_mt_cart2(device_image_interface &image) { return load_cart(image, m_cart2, 1); }
+	image_init_result device_image_load_mt_cart3(device_image_interface &image) { return load_cart(image, m_cart3, 2); }
+	image_init_result device_image_load_mt_cart4(device_image_interface &image) { return load_cart(image, m_cart4, 3); }
+	image_init_result device_image_load_mt_cart5(device_image_interface &image) { return load_cart(image, m_cart5, 4); }
+	image_init_result device_image_load_mt_cart6(device_image_interface &image) { return load_cart(image, m_cart6, 5); }
+	image_init_result device_image_load_mt_cart7(device_image_interface &image) { return load_cart(image, m_cart7, 6); }
+	image_init_result device_image_load_mt_cart8(device_image_interface &image) { return load_cart(image, m_cart8, 7); }
 
 	uint32_t screen_update_main(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_menu(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);

@@ -60,7 +60,7 @@ public:
 	uint8_t madalien_sound_command_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void madalien_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void madalien_charram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+	void coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	void madalien_portA_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void madalien_portB_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	tilemap_memory_index scan_mode0(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows);

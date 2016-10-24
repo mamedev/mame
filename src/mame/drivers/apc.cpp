@@ -129,7 +129,7 @@ public:
 		uint8_t sig; //switch signal port
 		uint8_t sh; //shift switches
 	}m_keyb;
-	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
+	void key_stroke(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 	uint8_t get_slave_ack(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void apc_dma_hrq_changed(int state);
@@ -496,7 +496,7 @@ static ADDRESS_MAP_START( apc_io, AS_IO, 16, apc_state )
 ADDRESS_MAP_END
 
 /* TODO: key repeat, remove port impulse! */
-INPUT_CHANGED_MEMBER(apc_state::key_stroke)
+void apc_state::key_stroke(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if(newval && !oldval)
 	{

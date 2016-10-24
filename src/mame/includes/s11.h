@@ -76,8 +76,8 @@ public:
 	void pia30_cb2_w(int state) { }; // dummy to stop error log filling up
 	void ym2151_irq_w(int state);
 	void pia_irq(int state);
-	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
-	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
+	void main_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void audio_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	void machine_reset_s11();
 	void init_s11();
 protected:

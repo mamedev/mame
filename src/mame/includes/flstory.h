@@ -114,7 +114,7 @@ public:
 	uint8_t victnine_gfxctrl_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void victnine_gfxctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void flstory_scrlram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_CUSTOM_INPUT_MEMBER(victnine_mcu_status_bit01_r);
+	ioport_value victnine_mcu_status_bit01_r(ioport_field &field, void *param);
 	void sound_control_0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void sound_control_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void sound_control_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);

@@ -44,8 +44,8 @@ public:
 	void ultratnk_led_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void ultratnk_lockout_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void ultratnk_video_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_CUSTOM_INPUT_MEMBER(get_collision);
-	DECLARE_CUSTOM_INPUT_MEMBER(get_joystick);
+	ioport_value get_collision(ioport_field &field, void *param);
+	ioport_value get_joystick(ioport_field &field, void *param);
 	void ultratnk_fire_1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void ultratnk_fire_2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void ultratnk_attract_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);

@@ -308,7 +308,7 @@ uint8_t bwidow_state::spacduel_IN3_r(address_space &space, offs_t offset, uint8_
 	return res;
 }
 
-CUSTOM_INPUT_MEMBER(bwidow_state::clock_r)
+ioport_value bwidow_state::clock_r(ioport_field &field, void *param)
 {
 	return (m_maincpu->total_cycles() & 0x100) ? 1 : 0;
 }

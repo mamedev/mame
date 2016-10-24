@@ -683,7 +683,7 @@ void cave_state::korokoro_eeprom_msb_w(address_space &space, offs_t offset, uint
 	}
 }
 
-CUSTOM_INPUT_MEMBER(cave_state::korokoro_hopper_r)
+ioport_value cave_state::korokoro_hopper_r(ioport_field &field, void *param)
 {
 	return m_hopper ? 1 : 0;
 }
@@ -1039,7 +1039,7 @@ void cave_state::tjumpman_leds_w(address_space &space, offs_t offset, uint16_t d
 //  popmessage("led %04X", data);
 }
 
-CUSTOM_INPUT_MEMBER(cave_state::tjumpman_hopper_r)
+ioport_value cave_state::tjumpman_hopper_r(ioport_field &field, void *param)
 {
 	return (m_hopper && !(m_screen->frame_number() % 10)) ? 0 : 1;
 }

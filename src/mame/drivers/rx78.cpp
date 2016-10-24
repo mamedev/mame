@@ -87,7 +87,7 @@ public:
 	required_device<generic_slot_device> m_cart;
 	required_device<ram_device> m_ram;
 	required_device<palette_device> m_palette;
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( rx78_cart );
+	image_init_result device_image_load_rx78_cart(device_image_interface &image);
 };
 
 
@@ -414,7 +414,7 @@ void rx78_state::machine_reset()
 		prg.install_read_handler(0x2000, 0x5fff, read8_delegate(FUNC(generic_slot_device::read_rom),(generic_slot_device*)m_cart));
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( rx78_state, rx78_cart )
+image_init_result rx78_state::device_image_load_rx78_cart(device_image_interface &image)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 

@@ -117,7 +117,7 @@ void inufuku_state::inufuku_soundrombank_w(address_space &space, offs_t offset, 
 
 ******************************************************************************/
 
-CUSTOM_INPUT_MEMBER(inufuku_state::soundflag_r)
+ioport_value inufuku_state::soundflag_r(ioport_field &field, void *param)
 {
 	uint16_t soundflag = m_pending_command ? 0 : 1;
 

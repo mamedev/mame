@@ -143,7 +143,7 @@ void galaxold_state::_4in1_bank_w(address_space &space, offs_t offset, uint8_t d
 	membank("bank1")->set_entry(m__4in1_bank);
 }
 
-CUSTOM_INPUT_MEMBER(galaxold_state::_4in1_fake_port_r)
+ioport_value galaxold_state::_4in1_fake_port_r(ioport_field &field, void *param)
 {
 	static const char *const portnames[] = { "FAKE1", "FAKE2", "FAKE3", "FAKE4" };
 	int bit_mask = (uintptr_t)param;

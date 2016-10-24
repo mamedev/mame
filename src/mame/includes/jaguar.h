@@ -246,7 +246,7 @@ public:
 	image_init_result quickload(device_image_interface &image, const char *file_type, int quickload_size);
 	void cart_start();
 	int jaguar_irq_callback(device_t &device, int irqline);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( jaguar_cart );
+	image_init_result device_image_load_jaguar_cart(device_image_interface &image);
 	DECLARE_QUICKLOAD_LOAD_MEMBER( jaguar );
 protected:
 	// timer IDs

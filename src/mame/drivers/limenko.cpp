@@ -95,7 +95,7 @@ public:
 	void qs1000_p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void qs1000_p3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(spriteram_bit_r);
+	ioport_value spriteram_bit_r(ioport_field &field, void *param);
 
 	void init_common();
 	void init_sb2003();
@@ -143,7 +143,7 @@ void limenko_state::fg_videoram_w(address_space &space, offs_t offset, uint32_t 
 	m_fg_tilemap->mark_tile_dirty(offset);
 }
 
-CUSTOM_INPUT_MEMBER(limenko_state::spriteram_bit_r)
+ioport_value limenko_state::spriteram_bit_r(ioport_field &field, void *param)
 {
 	return m_spriteram_bit;
 }

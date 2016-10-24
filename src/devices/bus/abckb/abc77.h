@@ -42,7 +42,7 @@ public:
 	// abc_keyboard_interface overrides
 	virtual void txd_w(int state) override;
 
-	DECLARE_INPUT_CHANGED_MEMBER( keyboard_reset );
+	void keyboard_reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 	uint8_t p1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void p2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);

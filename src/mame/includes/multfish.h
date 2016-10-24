@@ -56,7 +56,7 @@ public:
 	void igrosoft_gamble_counters_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void igrosoft_gamble_f3_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void igrosoft_gamble_dispenable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_CUSTOM_INPUT_MEMBER(igrosoft_gamble_hopper_r);
+	ioport_value igrosoft_gamble_hopper_r(ioport_field &field, void *param);
 	uint8_t igrosoft_gamble_timekeeper_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void igrosoft_gamble_timekeeper_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_customl();

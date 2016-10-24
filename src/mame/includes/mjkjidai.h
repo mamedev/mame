@@ -35,7 +35,7 @@ public:
 	bool m_display_enable;
 	tilemap_t *m_bg_tilemap;
 
-	DECLARE_CUSTOM_INPUT_MEMBER(keyboard_r);
+	ioport_value keyboard_r(ioport_field &field, void *param);
 	void keyboard_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void mjkjidai_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void mjkjidai_ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);

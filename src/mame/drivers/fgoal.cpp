@@ -116,7 +116,7 @@ uint8_t fgoal_state::analog_r(address_space &space, offs_t offset, uint8_t mem_m
 }
 
 
-CUSTOM_INPUT_MEMBER(fgoal_state::_80_r)
+ioport_value fgoal_state::_80_r(ioport_field &field, void *param)
 {
 	uint8_t ret = (m_screen->vpos() & 0x80) ? 1 : 0;
 

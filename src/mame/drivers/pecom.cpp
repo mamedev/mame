@@ -50,7 +50,7 @@ on modern keyboards. Hence, we move by default Up/Down/Left/Right to Cursor Keys
 use LEft/Right Ctrl/Alt keys for the remaining keys. Due to the unnatural emulated keyboard
 mappings, this is another situation where natural keyboard comes very handy!          */
 
-INPUT_CHANGED_MEMBER(pecom_state::ef_w)
+void pecom_state::ef_w(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_cdp1802->set_input_line((int)(uintptr_t)param, newval);
 }

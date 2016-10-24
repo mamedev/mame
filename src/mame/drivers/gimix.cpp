@@ -114,7 +114,7 @@ public:
 	uint8_t pia_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void pia_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void test_timer_w(timer_device &timer, void *ptr, int32_t param);
-	DECLARE_INPUT_CHANGED_MEMBER(drive_size_cb);
+	void drive_size_cb(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
@@ -464,7 +464,7 @@ void gimix_state::fdc_drq_w(int state)
 		m_dma_status &= ~0x80;
 }
 
-INPUT_CHANGED_MEMBER(gimix_state::drive_size_cb)
+void gimix_state::drive_size_cb(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	// set FDC clock based on DIP Switch S2-9 (5.25"/8" drive select)
 	if(m_dma_dip->read() & 0x00000100)

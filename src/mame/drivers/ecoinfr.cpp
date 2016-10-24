@@ -104,9 +104,9 @@ public:
 	void ec_port16_out_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void ec_port17_out_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void ec_port18_out_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_CUSTOM_INPUT_MEMBER(ecoinfr_reel1_opto_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(ecoinfr_reel2_opto_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(ecoinfr_reel3_opto_r);
+	ioport_value ecoinfr_reel1_opto_r(ioport_field &field, void *param);
+	ioport_value ecoinfr_reel2_opto_r(ioport_field &field, void *param);
+	ioport_value ecoinfr_reel3_opto_r(ioport_field &field, void *param);
 
 	void init_ecoinfrbr();
 	void init_ecoinfr();
@@ -512,19 +512,19 @@ static ADDRESS_MAP_START( portmap, AS_IO, 8, ecoinfr_state )
 	AM_RANGE(0x18, 0x18) AM_WRITE(ec_port18_out_w) // 24 (Watchdog)
 ADDRESS_MAP_END
 
-CUSTOM_INPUT_MEMBER(ecoinfr_state::ecoinfr_reel1_opto_r)
+ioport_value ecoinfr_state::ecoinfr_reel1_opto_r(ioport_field &field, void *param)
 {
 	if (m_optic_pattern & 0x1) return 1;
 	return 0;
 }
 
-CUSTOM_INPUT_MEMBER(ecoinfr_state::ecoinfr_reel2_opto_r)
+ioport_value ecoinfr_state::ecoinfr_reel2_opto_r(ioport_field &field, void *param)
 {
 	if (m_optic_pattern & 0x2) return 1;
 	return 0;
 }
 
-CUSTOM_INPUT_MEMBER(ecoinfr_state::ecoinfr_reel3_opto_r)
+ioport_value ecoinfr_state::ecoinfr_reel3_opto_r(ioport_field &field, void *param)
 {
 	if (m_optic_pattern & 0x4) return 1;
 	return 0;

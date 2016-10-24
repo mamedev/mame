@@ -109,8 +109,8 @@ public:
 	uint8_t porte2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void write_centronics_ack(int state);
 	void write_centronics_busy(int state);
-	DECLARE_CUSTOM_INPUT_MEMBER(printer_ready_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(printer_ack_r);
+	ioport_value printer_ready_r(ioport_field &field, void *param);
+	ioport_value printer_ack_r(ioport_field &field, void *param);
 private:
 	virtual void machine_start() override;
 	int m_centronics_busy;
@@ -182,7 +182,7 @@ void pencil2_state::write_centronics_busy(int state)
 	m_centronics_busy = state;
 }
 
-CUSTOM_INPUT_MEMBER( pencil2_state::printer_ready_r )
+ioport_value pencil2_state::printer_ready_r(ioport_field &field, void *param)
 {
 	return m_centronics_busy;
 }
@@ -192,7 +192,7 @@ void pencil2_state::write_centronics_ack(int state)
 	m_centronics_ack = state;
 }
 
-CUSTOM_INPUT_MEMBER( pencil2_state::printer_ack_r )
+ioport_value pencil2_state::printer_ack_r(ioport_field &field, void *param)
 {
 	return m_centronics_ack;
 }

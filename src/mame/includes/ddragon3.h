@@ -113,8 +113,8 @@ public:
 	void wwfwfest_paletteram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void wwfwfest_soundwrite(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(dsw_3f_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(dsw_c0_r);
+	ioport_value dsw_3f_r(ioport_field &field, void *param);
+	ioport_value dsw_c0_r(ioport_field &field, void *param);
 	void get_fg0_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 
 	virtual void video_start() override;

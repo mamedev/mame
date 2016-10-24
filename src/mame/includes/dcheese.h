@@ -61,7 +61,7 @@ public:
 	void madmax_blitter_vidparam_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void madmax_blitter_unknown_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	uint16_t madmax_blitter_vidparam_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
-	DECLARE_CUSTOM_INPUT_MEMBER(sound_latch_state_r);
+	ioport_value sound_latch_state_r(ioport_field &field, void *param);
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	void palette_init_dcheese(palette_device &palette);

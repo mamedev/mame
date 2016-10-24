@@ -147,7 +147,7 @@ public:
 	//required_device<ram_device> m_ramdisk;
 	void init_brno();
 	DECLARE_SNAPSHOT_LOAD_MEMBER( brno );
-//  DECLARE_DEVICE_IMAGE_LOAD_MEMBER(m5_cart);
+//  image_init_result device_image_load_m5_cart(device_image_interface &image);
 
 
 	virtual void machine_start() override;

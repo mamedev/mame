@@ -25,7 +25,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_ssem(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_INPUT_CHANGED_MEMBER(panel_check);
+	void panel_check(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(ssem_store);
 	inline uint32_t reverse(uint32_t v);
 	void strlower(char *buf);
@@ -100,7 +100,7 @@ enum
 	PANEL_HALT
 };
 
-INPUT_CHANGED_MEMBER(ssem_state::panel_check)
+void ssem_state::panel_check(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	uint8_t edit0_state = ioport("EDIT0")->read();
 	uint8_t edit1_state = ioport("EDIT1")->read();

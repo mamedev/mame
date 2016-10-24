@@ -56,7 +56,7 @@ public:
 	virtual void machine_reset() override;
 	void line_update();
 	uint32_t screen_update_uzebox(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(uzebox_cart);
+	image_init_result device_image_load_uzebox_cart(device_image_interface &image);
 
 private:
 	int             m_vpos;
@@ -241,7 +241,7 @@ uint32_t uzebox_state::screen_update_uzebox(screen_device &screen, bitmap_rgb32 
 	return 0;
 }
 
-DEVICE_IMAGE_LOAD_MEMBER(uzebox_state, uzebox_cart)
+image_init_result uzebox_state::device_image_load_uzebox_cart(device_image_interface &image)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 

@@ -402,7 +402,7 @@ public:
 
 	void missile_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t missile_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_CUSTOM_INPUT_MEMBER(get_vblank);
+	ioport_value get_vblank(ioport_field &field, void *param);
 	void init_missilem();
 	void init_suprmatk();
 	virtual void machine_start() override;
@@ -488,7 +488,7 @@ void missile_state::clock_irq(void *ptr, int32_t param)
 }
 
 
-CUSTOM_INPUT_MEMBER(missile_state::get_vblank)
+ioport_value missile_state::get_vblank(ioport_field &field, void *param)
 {
 	int v = scanline_to_v(m_screen->vpos());
 	return v < 24;

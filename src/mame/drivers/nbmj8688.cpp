@@ -375,7 +375,7 @@ static ADDRESS_MAP_START( mmsikaku_io_map, AS_IO, 8, nbmj8688_state )
 	AM_RANGE(0xf0, 0xf0) AM_WRITE(scrolly_w)
 ADDRESS_MAP_END
 
-CUSTOM_INPUT_MEMBER( nbmj8688_state::nb1413m3_busyflag_r )
+ioport_value nbmj8688_state::nb1413m3_busyflag_r(ioport_field &field, void *param)
 {
 	return m_nb1413m3->m_busyflag & 0x01;
 }

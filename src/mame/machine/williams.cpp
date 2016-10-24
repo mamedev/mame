@@ -335,7 +335,7 @@ void williams_state::williams_port_select_w(int state)
 	m_port_select = state;
 }
 
-CUSTOM_INPUT_MEMBER(williams_state::williams_mux_r)
+ioport_value williams_state::williams_mux_r(ioport_field &field, void *param)
 {
 	const char *tag = (const char *)param;
 

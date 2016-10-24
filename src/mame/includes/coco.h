@@ -104,8 +104,8 @@ public:
 	optional_ioport                    m_beckerportconfig;
 
 	// driver update handlers
-	DECLARE_INPUT_CHANGED_MEMBER(keyboard_changed);
-	DECLARE_INPUT_CHANGED_MEMBER(joystick_mode_changed);
+	void keyboard_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void joystick_mode_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 	// IO
 	virtual uint8_t ff00_read(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);

@@ -175,8 +175,8 @@ public:
 	void cave_vram_1_8x8_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void cave_vram_2_8x8_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void cave_vram_3_8x8_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	DECLARE_CUSTOM_INPUT_MEMBER(korokoro_hopper_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(tjumpman_hopper_r);
+	ioport_value korokoro_hopper_r(ioport_field &field, void *param);
+	ioport_value tjumpman_hopper_r(ioport_field &field, void *param);
 	void cave_eeprom_msb_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void sailormn_eeprom_msb_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void hotdogst_eeprom_msb_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);

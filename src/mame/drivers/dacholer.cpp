@@ -93,7 +93,7 @@ public:
 	void snd_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void snd_irq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void music_irq_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_CUSTOM_INPUT_MEMBER(snd_ack_r);
+	ioport_value snd_ack_r(ioport_field &field, void *param);
 	void get_bg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
@@ -283,7 +283,7 @@ void dacholer_state::snd_ack_w(address_space &space, offs_t offset, uint8_t data
 	m_snd_ack = data;
 }
 
-CUSTOM_INPUT_MEMBER(dacholer_state::snd_ack_r)
+ioport_value dacholer_state::snd_ack_r(ioport_field &field, void *param)
 {
 	return m_snd_ack;       //guess ...
 }

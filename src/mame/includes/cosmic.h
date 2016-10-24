@@ -73,10 +73,10 @@ public:
 	void cosmic_color_register_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void cosmic_background_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void panic_coin_inserted(int state);
-	DECLARE_INPUT_CHANGED_MEMBER(cosmica_coin_inserted);
-	DECLARE_INPUT_CHANGED_MEMBER(cosmicg_coin_inserted);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_irq0);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_nmi);
+	void cosmica_coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void cosmicg_coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void coin_inserted_irq0(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void coin_inserted_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	void init_devzone();
 	void init_cosmicg();
 	void init_nomnlnd();

@@ -528,7 +528,7 @@ public:
 	optional_device<timer_device> m_beeper_off;
 	optional_device<beep_device> m_beeper;
 
-	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
+	void reset_button(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 	// CC10 and VCC/UVC
 	void vcc_prepare_display();
@@ -727,7 +727,7 @@ uint16_t fidelz80base_state::read_inputs(int columns)
 	return ret;
 }
 
-INPUT_CHANGED_MEMBER(fidelz80_state::reset_button)
+void fidelz80_state::reset_button(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	// when RE button is directly wired to RESET pin(s)
 	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? ASSERT_LINE : CLEAR_LINE);
@@ -739,7 +739,7 @@ INPUT_CHANGED_MEMBER(fidelz80_state::reset_button)
 
 // cartridge
 
-DEVICE_IMAGE_LOAD_MEMBER(fidelz80base_state, scc_cartridge)
+image_init_result fidelz80base_state::device_image_load_scc_cartridge(device_image_interface &image)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 

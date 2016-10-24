@@ -17,7 +17,7 @@
 const device_type VCS_LIGHTPEN = &device_creator<vcs_lightpen_device>;
 
 
-INPUT_CHANGED_MEMBER( vcs_lightpen_device::trigger )
+void vcs_lightpen_device::trigger(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	// TODO trigger timer at correct screen position
 	m_port->trigger_w(newval);

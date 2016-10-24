@@ -162,7 +162,7 @@ public:
 	int m_vrom4k;
 	uint8_t m_supergm3_prg_bank;
 	uint8_t m_supergm3_chr_bank;
-	DECLARE_CUSTOM_INPUT_MEMBER(multigam_inputs_r);
+	ioport_value multigam_inputs_r(ioport_field &field, void *param);
 	void multigam_nt_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t multigam_nt_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void sprite_dma_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -330,7 +330,7 @@ uint8_t multigam_state::multigam_IN1_r(address_space &space, offs_t offset, uint
 	return ((m_in_1 >> m_in_1_shift++) & 0x01) | 0x40;
 }
 
-CUSTOM_INPUT_MEMBER(multigam_state::multigam_inputs_r)
+ioport_value multigam_state::multigam_inputs_r(ioport_field &field, void *param)
 {
 	/* bit 0: serial input (dsw)
 	   bit 1: coin */

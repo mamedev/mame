@@ -90,8 +90,8 @@ public:
 	void nc200_fdc_interrupt(int state);
 
 	void init_nc();
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( nc_pcmcia_card );
-	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( nc_pcmcia_card );
+	image_init_result device_image_load_nc_pcmcia_card(device_image_interface &image);
+	void device_image_unload_nc_pcmcia_card(device_image_interface &image);
 
 protected:
 	virtual void machine_start() override;

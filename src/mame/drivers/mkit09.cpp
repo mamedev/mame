@@ -53,8 +53,8 @@ public:
 	uint8_t pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_INPUT_CHANGED_MEMBER(trigger_reset);
-	DECLARE_INPUT_CHANGED_MEMBER(trigger_nmi);
+	void trigger_reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void trigger_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 private:
 	uint8_t m_keydata;
 	virtual void machine_reset() override;
@@ -130,12 +130,12 @@ static INPUT_PORTS_START( mkit09 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("NMI") PORT_CODE(KEYCODE_F1) PORT_CHANGED_MEMBER(DEVICE_SELF, mkit09_state, trigger_nmi, 0)
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER( mkit09_state::trigger_reset )
+void mkit09_state::trigger_reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
-INPUT_CHANGED_MEMBER( mkit09_state::trigger_nmi )
+void mkit09_state::trigger_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }

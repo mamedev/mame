@@ -114,7 +114,7 @@ public:
 	uint8_t n7751_rom_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t n7751_command_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t n7751_t1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_INPUT_CHANGED_MEMBER(service_switch);
+	void service_switch(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	void usb_ram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void sindbadm_soundport_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void sindbadm_misc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);

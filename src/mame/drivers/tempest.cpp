@@ -328,9 +328,9 @@ public:
 	void wdclr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void tempest_led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void tempest_coin_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_CUSTOM_INPUT_MEMBER(tempest_knob_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(tempest_buttons_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(clock_r);
+	ioport_value tempest_knob_r(ioport_field &field, void *param);
+	ioport_value tempest_buttons_r(ioport_field &field, void *param);
+	ioport_value clock_r(ioport_field &field, void *param);
 	uint8_t input_port_1_bit_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t input_port_2_bit_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
@@ -363,18 +363,18 @@ void tempest_state::wdclr_w(address_space &space, offs_t offset, uint8_t data, u
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(tempest_state::tempest_knob_r)
+ioport_value tempest_state::tempest_knob_r(ioport_field &field, void *param)
 {
 	return (m_player_select == 0) ? m_knob_p1->read() : m_knob_p2->read();
 }
 
-CUSTOM_INPUT_MEMBER(tempest_state::tempest_buttons_r)
+ioport_value tempest_state::tempest_buttons_r(ioport_field &field, void *param)
 {
 	return (m_player_select == 0) ? m_buttons_p1->read() : m_buttons_p2->read();
 }
 
 
-CUSTOM_INPUT_MEMBER(tempest_state::clock_r)
+ioport_value tempest_state::clock_r(ioport_field &field, void *param)
 {
 	/* Emulate the 3kHz source on bit 7 (divide 1.5MHz by 512) */
 	return (m_maincpu->total_cycles() & 0x100) ? 1 : 0;

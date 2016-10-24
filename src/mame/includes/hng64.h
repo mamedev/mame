@@ -330,10 +330,10 @@ public:
 
 
 
-	DECLARE_CUSTOM_INPUT_MEMBER(left_handle_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(right_handle_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(acc_down_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(brake_down_r);
+	ioport_value left_handle_r(ioport_field &field, void *param);
+	ioport_value right_handle_r(ioport_field &field, void *param);
+	ioport_value acc_down_r(ioport_field &field, void *param);
+	ioport_value brake_down_r(ioport_field &field, void *param);
 
 	std::unique_ptr<hng64_poly_renderer> m_poly_renderer;
 

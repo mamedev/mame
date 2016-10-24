@@ -39,7 +39,7 @@ DIP locations verified for:
 #include "sound/volt_reg.h"
 
 
-INPUT_CHANGED_MEMBER(lasso_state::coin_inserted)
+void lasso_state::coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	/* coin insertion causes an NMI */
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);

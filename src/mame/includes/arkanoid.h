@@ -99,8 +99,8 @@ public:
 	void hexaa_f000_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void hexaa_sub_80_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t hexaa_sub_90_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_CUSTOM_INPUT_MEMBER(arkanoid_semaphore_input_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(arkanoid_input_mux);
+	ioport_value arkanoid_semaphore_input_r(ioport_field &field, void *param);
+	ioport_value arkanoid_input_mux(ioport_field &field, void *param);
 	void init_block2();
 	void init_arkblock();
 	void init_hexa();

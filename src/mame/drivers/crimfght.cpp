@@ -283,7 +283,7 @@ void crimfght_state::banking_callback(address_space &space, offs_t offset, uint8
 	m_init = BIT(data, 7);
 }
 
-CUSTOM_INPUT_MEMBER( crimfght_state::system_r )
+ioport_value crimfght_state::system_r(ioport_field &field, void *param)
 {
 	uint8_t data = 0;
 

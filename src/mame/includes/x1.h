@@ -270,8 +270,8 @@ public:
 	void palette_init_x1(palette_device &palette);
 	void machine_reset_x1turbo();
 	uint32_t screen_update_x1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_INPUT_CHANGED_MEMBER(ipl_reset);
-	DECLARE_INPUT_CHANGED_MEMBER(nmi_reset);
+	void ipl_reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void nmi_reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	void x1_rtc_increment(void *ptr, int32_t param);
 	void x1_cmt_wind_timer(timer_device &timer, void *ptr, int32_t param);
 	void x1_keyboard_callback(timer_device &timer, void *ptr, int32_t param);

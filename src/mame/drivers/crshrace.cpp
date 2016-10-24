@@ -153,7 +153,7 @@ void crshrace_state::sound_command_w(address_space &space, offs_t offset, uint16
 	}
 }
 
-CUSTOM_INPUT_MEMBER(crshrace_state::country_sndpending_r)
+ioport_value crshrace_state::country_sndpending_r(ioport_field &field, void *param)
 {
 	return m_pending_command;
 }

@@ -111,7 +111,7 @@ public:
 	void sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void i8257_CH0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void i8257_LMSR_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_CUSTOM_INPUT_MEMBER(prot_r);
+	ioport_value prot_r(ioport_field &field, void *param);
 	void init_ddayjlc();
 	void get_tile_info_bg(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
@@ -167,7 +167,7 @@ static const uint8_t prot_data[0x10] =
 	0x03, 0x01, 0x00, 0x03
 };
 
-CUSTOM_INPUT_MEMBER(ddayjlc_state::prot_r)
+ioport_value ddayjlc_state::prot_r(ioport_field &field, void *param)
 {
 	return prot_data[m_prot_addr];
 }

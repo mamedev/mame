@@ -99,8 +99,8 @@ public:
 	void exp_dma_out_w(int state);
 	void exp_dma_in_w(int state);
 
-	DECLARE_INPUT_CHANGED_MEMBER( reset_w );
-	DECLARE_INPUT_CHANGED_MEMBER( beeper_w );
+	void reset_w(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void beeper_w(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 	DECLARE_QUICKLOAD_LOAD_MEMBER( vip );
 	// memory state

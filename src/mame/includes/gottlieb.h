@@ -114,8 +114,8 @@ public:
 	void gottlieb_laserdisc_video_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void gottlieb_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void gottlieb_charram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_CUSTOM_INPUT_MEMBER(analog_delta_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(stooges_joystick_r);
+	ioport_value analog_delta_r(ioport_field &field, void *param);
+	ioport_value stooges_joystick_r(ioport_field &field, void *param);
 	void init_romtiles();
 	void init_screwloo();
 	void init_vidvince();

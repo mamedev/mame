@@ -53,8 +53,8 @@ public:
 	int m_speedup_scanline;
 	void speedup_read();
 	void init_speedup();
-	DECLARE_CUSTOM_INPUT_MEMBER(eolith_speedup_getvblank);
-	DECLARE_CUSTOM_INPUT_MEMBER(stealsee_speedup_getvblank);
+	ioport_value eolith_speedup_getvblank(ioport_field &field, void *param);
+	ioport_value stealsee_speedup_getvblank(ioport_field &field, void *param);
 
 	uint32_t eolith_custom_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	void systemcontrol_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);

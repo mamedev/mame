@@ -102,8 +102,8 @@ public:
 	void self_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void led_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void firefox_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_CUSTOM_INPUT_MEMBER(mainflag_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(soundflag_r);
+	ioport_value mainflag_r(ioport_field &field, void *param);
+	ioport_value soundflag_r(ioport_field &field, void *param);
 	uint8_t riot_porta_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void riot_porta_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void riot_irq(int state);
@@ -315,12 +315,12 @@ void firefox_state::firefox_objram_bank_w(address_space &space, offs_t offset, u
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(firefox_state::mainflag_r)
+ioport_value firefox_state::mainflag_r(ioport_field &field, void *param)
 {
 	return m_main_to_sound_flag;
 }
 
-CUSTOM_INPUT_MEMBER(firefox_state::soundflag_r)
+ioport_value firefox_state::soundflag_r(ioport_field &field, void *param)
 {
 	return m_sound_to_main_flag;
 }

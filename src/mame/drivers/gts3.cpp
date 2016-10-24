@@ -52,7 +52,7 @@ public:
 	uint8_t u4b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void u4b_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void nmi_w(int state);
-	DECLARE_INPUT_CHANGED_MEMBER(test_inp);
+	void test_inp(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 private:
 	bool m_dispclk;
 	bool m_lampclk;
@@ -203,7 +203,7 @@ static INPUT_PORTS_START( gts3 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER)
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER( gts3_state::test_inp )
+void gts3_state::test_inp(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_u4->write_ca1(newval);
 }

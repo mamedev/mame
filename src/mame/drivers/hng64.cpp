@@ -1079,22 +1079,22 @@ static INPUT_PORTS_START( hng64 )
 INPUT_PORTS_END
 
 
-CUSTOM_INPUT_MEMBER(hng64_state::left_handle_r)
+ioport_value hng64_state::left_handle_r(ioport_field &field, void *param)
 {
 	return (ioport("HANDLE")->read() == 0);
 }
 
-CUSTOM_INPUT_MEMBER(hng64_state::right_handle_r)
+ioport_value hng64_state::right_handle_r(ioport_field &field, void *param)
 {
 	return (ioport("HANDLE")->read() == 0xff);
 }
 
-CUSTOM_INPUT_MEMBER(hng64_state::acc_down_r)
+ioport_value hng64_state::acc_down_r(ioport_field &field, void *param)
 {
 	return (ioport("ACCELERATOR")->read() == 0);
 }
 
-CUSTOM_INPUT_MEMBER(hng64_state::brake_down_r)
+ioport_value hng64_state::brake_down_r(ioport_field &field, void *param)
 {
 	return (ioport("BRAKE")->read() == 0);
 }

@@ -17,7 +17,7 @@
 const device_type COLECO_SUPER_ACTION_CONTROLLER = &device_creator<coleco_super_action_controller_t>;
 
 
-CUSTOM_INPUT_MEMBER( coleco_super_action_controller_t::keypad_r )
+ioport_value coleco_super_action_controller_t::keypad_r(ioport_field &field, void *param)
 {
 	uint8_t data = 0xf;
 	uint16_t keypad = m_io_keypad->read();
@@ -40,7 +40,7 @@ CUSTOM_INPUT_MEMBER( coleco_super_action_controller_t::keypad_r )
 	return data;
 }
 
-INPUT_CHANGED_MEMBER( coleco_super_action_controller_t::slider_w )
+void coleco_super_action_controller_t::slider_w(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	// TODO
 }

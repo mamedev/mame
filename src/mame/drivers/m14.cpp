@@ -83,8 +83,8 @@ public:
 	uint8_t m14_rng_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t input_buttons_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void hopper_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_INPUT_CHANGED_MEMBER(left_coin_inserted);
-	DECLARE_INPUT_CHANGED_MEMBER(right_coin_inserted);
+	void left_coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void right_coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	void m14_get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -227,14 +227,14 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-INPUT_CHANGED_MEMBER(m14_state::left_coin_inserted)
+void m14_state::left_coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	/* left coin insertion causes a rst6.5 (vector 0x34) */
 	if (newval)
 		m_maincpu->set_input_line(I8085_RST65_LINE, HOLD_LINE);
 }
 
-INPUT_CHANGED_MEMBER(m14_state::right_coin_inserted)
+void m14_state::right_coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	/* right coin insertion causes a rst5.5 (vector 0x2c) */
 	if (newval)

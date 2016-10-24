@@ -177,7 +177,7 @@ public:
 	void balsente_palette_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void balsente_paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void shrike_sprite_select_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_CUSTOM_INPUT_MEMBER(nstocker_bits_r);
+	ioport_value nstocker_bits_r(ioport_field &field, void *param);
 	void init_otwalls();
 	void init_triviaes();
 	void init_nstocker();

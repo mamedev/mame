@@ -104,9 +104,9 @@ public:
 	void polepos_alpha16_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	uint8_t polepos_alpha_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void polepos_alpha_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_CUSTOM_INPUT_MEMBER(high_port_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(low_port_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(auto_start_r);
+	ioport_value high_port_r(ioport_field &field, void *param);
+	ioport_value low_port_r(ioport_field &field, void *param);
+	ioport_value auto_start_r(ioport_field &field, void *param);
 	void out_0(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void out_1(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t namco_52xx_rom_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);

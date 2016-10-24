@@ -24,7 +24,7 @@ public:
 	void bwidow_misc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void spacduel_coin_counter_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_CUSTOM_INPUT_MEMBER(clock_r);
+	ioport_value clock_r(ioport_field &field, void *param);
 	required_device<cpu_device> m_maincpu;
 	optional_ioport m_in3;
 	optional_ioport m_in4;

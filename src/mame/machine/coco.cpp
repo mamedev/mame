@@ -1008,7 +1008,7 @@ void coco_state::pia1_pb_changed(uint8_t data)
 //  keyboard_changed
 //-------------------------------------------------
 
-INPUT_CHANGED_MEMBER(coco_state::keyboard_changed)
+void coco_state::keyboard_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	poll_keyboard();
 }
@@ -1019,7 +1019,7 @@ INPUT_CHANGED_MEMBER(coco_state::keyboard_changed)
 //  joystick_mode_changed
 //-------------------------------------------------
 
-INPUT_CHANGED_MEMBER(coco_state::joystick_mode_changed)
+void coco_state::joystick_mode_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	poll_keyboard();
 }

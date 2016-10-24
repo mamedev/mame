@@ -419,7 +419,7 @@ public:
 	uint8_t m_seqram[0x10000];
 	uint8_t m_dosram[0x2000];
 	virtual void machine_reset() override;
-	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
+	void key_stroke(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 	void send_through_panel(uint8_t data);
 };
@@ -567,7 +567,7 @@ void esq1_state::send_through_panel(uint8_t data)
 	m_panel->xmit_char(data);
 }
 
-INPUT_CHANGED_MEMBER(esq1_state::key_stroke)
+void esq1_state::key_stroke(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (oldval == 0 && newval == 1)
 	{

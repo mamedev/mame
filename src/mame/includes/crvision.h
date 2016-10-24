@@ -64,7 +64,7 @@ public:
 	void pia_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t pia_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t pia_pb_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_INPUT_CHANGED_MEMBER( trigger_nmi );
+	void trigger_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 protected:
 	virtual void machine_start() override;

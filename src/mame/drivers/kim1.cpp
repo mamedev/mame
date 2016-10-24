@@ -76,12 +76,12 @@ static ADDRESS_MAP_START(kim1_map, AS_PROGRAM, 8, kim1_state)
 ADDRESS_MAP_END
 
 // RS and ST key input
-INPUT_CHANGED_MEMBER(kim1_state::trigger_reset)
+void kim1_state::trigger_reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 		m_maincpu->set_input_line(INPUT_LINE_RESET, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
-INPUT_CHANGED_MEMBER(kim1_state::trigger_nmi)
+void kim1_state::trigger_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 		m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }

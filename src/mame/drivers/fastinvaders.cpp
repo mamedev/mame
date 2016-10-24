@@ -81,17 +81,17 @@ public:
 	void io_f0_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-	DECLARE_INPUT_CHANGED_MEMBER(start);
-	DECLARE_INPUT_CHANGED_MEMBER(start2);
-	DECLARE_INPUT_CHANGED_MEMBER(tilt);
-	DECLARE_INPUT_CHANGED_MEMBER(in0);
-	DECLARE_INPUT_CHANGED_MEMBER(in1);
-	DECLARE_INPUT_CHANGED_MEMBER(in2);
-	DECLARE_INPUT_CHANGED_MEMBER(in3);
-	DECLARE_INPUT_CHANGED_MEMBER(in4);
-	DECLARE_INPUT_CHANGED_MEMBER(in5);
-	DECLARE_INPUT_CHANGED_MEMBER(in6);
+	void coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void start(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void start2(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void tilt(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void in0(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void in1(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void in2(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void in3(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void in4(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void in5(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void in6(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 	int sid_read();
 
@@ -356,7 +356,7 @@ int fastinvaders_state::sid_read()
 	return tmp;
 }
 
-INPUT_CHANGED_MEMBER(fastinvaders_state::tilt)
+void fastinvaders_state::tilt(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_trap=1;
 	if (newval)
@@ -364,7 +364,7 @@ INPUT_CHANGED_MEMBER(fastinvaders_state::tilt)
 }
 
 
-INPUT_CHANGED_MEMBER(fastinvaders_state::coin_inserted)
+void fastinvaders_state::coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_rest65=1;
 	if (newval)
@@ -372,14 +372,14 @@ INPUT_CHANGED_MEMBER(fastinvaders_state::coin_inserted)
 }
 
 
-INPUT_CHANGED_MEMBER(fastinvaders_state::start)
+void fastinvaders_state::start(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_rest55=1;
 	if (newval)
 		m_maincpu->set_input_line(I8085_RST55_LINE, HOLD_LINE);
 }
 
-INPUT_CHANGED_MEMBER(fastinvaders_state::start2)
+void fastinvaders_state::start2(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_rest55=1;
 	m_start2_value=1;
@@ -387,49 +387,49 @@ INPUT_CHANGED_MEMBER(fastinvaders_state::start2)
 		m_maincpu->set_input_line(I8085_RST55_LINE, HOLD_LINE);
 }
 
-INPUT_CHANGED_MEMBER(fastinvaders_state::in0)
+void fastinvaders_state::in0(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_irq0=1;
 	if (newval)
 		m_pic8259->ir0_w(HOLD_LINE);
 }
 
-INPUT_CHANGED_MEMBER(fastinvaders_state::in1)
+void fastinvaders_state::in1(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_irq1=1;
 	if (newval)
 		m_pic8259->ir1_w(HOLD_LINE);
 }
 
-INPUT_CHANGED_MEMBER(fastinvaders_state::in2)
+void fastinvaders_state::in2(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_irq2=1;
 	if (newval)
 		m_pic8259->ir2_w(HOLD_LINE);
 }
 
-INPUT_CHANGED_MEMBER(fastinvaders_state::in3)
+void fastinvaders_state::in3(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_irq3=1;
 	if (newval)
 		m_pic8259->ir3_w(HOLD_LINE);
 }
 
-INPUT_CHANGED_MEMBER(fastinvaders_state::in4)
+void fastinvaders_state::in4(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_irq4=1;
 	if (newval)
 		m_pic8259->ir4_w(HOLD_LINE);
 }
 
-INPUT_CHANGED_MEMBER(fastinvaders_state::in5)
+void fastinvaders_state::in5(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_irq5=1;
 	if (newval)
 		m_pic8259->ir5_w(HOLD_LINE);
 }
 
-INPUT_CHANGED_MEMBER(fastinvaders_state::in6)
+void fastinvaders_state::in6(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_irq6=1;
 	if (newval)

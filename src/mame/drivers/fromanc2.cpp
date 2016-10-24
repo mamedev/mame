@@ -70,17 +70,17 @@ uint16_t fromanc2_state::fromanc2_keymatrix_r(address_space &space, offs_t offse
 	return ret;
 }
 
-CUSTOM_INPUT_MEMBER(fromanc2_state::subcpu_int_r)
+ioport_value fromanc2_state::subcpu_int_r(ioport_field &field, void *param)
 {
 	return m_subcpu_int_flag & 0x01;
 }
 
-CUSTOM_INPUT_MEMBER(fromanc2_state::sndcpu_nmi_r)
+ioport_value fromanc2_state::sndcpu_nmi_r(ioport_field &field, void *param)
 {
 	return m_sndcpu_nmi_flag & 0x01;
 }
 
-CUSTOM_INPUT_MEMBER(fromanc2_state::subcpu_nmi_r)
+ioport_value fromanc2_state::subcpu_nmi_r(ioport_field &field, void *param)
 {
 	return m_subcpu_nmi_flag & 0x01;
 }

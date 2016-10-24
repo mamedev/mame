@@ -82,7 +82,7 @@ public:
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 
 	void interrupt(timer_device &timer, void *ptr, int32_t param);
-	DECLARE_CUSTOM_INPUT_MEMBER(mcu63705_busy_r);
+	ioport_value mcu63705_busy_r(ioport_field &field, void *param);
 
 	void mcu63705_update_inputs();
 	void spd_adpcm_int(msm5205_device *device, int chip);

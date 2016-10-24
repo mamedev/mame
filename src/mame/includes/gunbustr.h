@@ -55,7 +55,7 @@ public:
 	uint32_t gunbustr_gun_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	void gunbustr_gun_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	uint32_t main_cycle_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
-	DECLARE_CUSTOM_INPUT_MEMBER(coin_word_r);
+	ioport_value coin_word_r(ioport_field &field, void *param);
 	void init_gunbustrj();
 	void init_gunbustr();
 	virtual void video_start() override;

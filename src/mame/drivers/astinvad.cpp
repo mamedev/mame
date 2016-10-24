@@ -85,7 +85,7 @@ public:
 	void kamikaze_ppi_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void spaceint_sound1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void spaceint_sound2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_INPUT_CHANGED_MEMBER(spaceint_coin_inserted);
+	void spaceint_coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	void kamikaze_sound1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void kamikaze_sound2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void spcking2_sound1_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -286,7 +286,7 @@ void astinvad_state::machine_reset_spaceint()
 }
 
 
-INPUT_CHANGED_MEMBER(astinvad_state::spaceint_coin_inserted)
+void astinvad_state::spaceint_coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	/* coin insertion causes an NMI */
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);

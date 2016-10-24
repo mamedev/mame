@@ -2053,7 +2053,7 @@ void jaguar_state::cart_start()
 	memset(m_cart_base, 0, memshare("cart")->bytes());
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( jaguar_state, jaguar_cart )
+image_init_result jaguar_state::device_image_load_jaguar_cart(device_image_interface &image)
 {
 	uint32_t size, load_offset = 0;
 

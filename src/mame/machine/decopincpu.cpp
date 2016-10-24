@@ -80,14 +80,14 @@ void decocpu_type1_device::device_timer(emu_timer &timer, device_timer_id id, in
 	}
 }
 
-INPUT_CHANGED_MEMBER( decocpu_type1_device::main_nmi )
+void decocpu_type1_device::main_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	// Diagnostic button sends a pulse to NMI pin
 	if (newval==CLEAR_LINE)
 		m_cpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-INPUT_CHANGED_MEMBER( decocpu_type1_device::audio_nmi )
+void decocpu_type1_device::audio_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	// Not on DECO board?
 }

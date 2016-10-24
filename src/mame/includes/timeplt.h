@@ -58,7 +58,7 @@ public:
 	uint8_t psurge_protection_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
 	/* chkun */
-	DECLARE_CUSTOM_INPUT_MEMBER(chkun_hopper_status_r);
+	ioport_value chkun_hopper_status_r(ioport_field &field, void *param);
 	void chkun_sound_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void get_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);

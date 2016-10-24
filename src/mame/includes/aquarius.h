@@ -84,6 +84,6 @@ public:
 	virtual void video_start() override;
 	void palette_init_aquarius(palette_device &palette);
 	uint32_t screen_update_aquarius(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_INPUT_CHANGED_MEMBER(aquarius_reset);
+	void aquarius_reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 };
 #endif /* AQUARIUS_H_ */

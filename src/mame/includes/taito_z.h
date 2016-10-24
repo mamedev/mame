@@ -97,7 +97,7 @@ public:
 	uint16_t sci_spriteframe_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void sci_spriteframe_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void contcirc_out_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	DECLARE_CUSTOM_INPUT_MEMBER(taitoz_pedal_r);
+	ioport_value taitoz_pedal_r(ioport_field &field, void *param);
 	void init_taitoz();
 	void init_bshark();
 	void machine_start_taitoz();

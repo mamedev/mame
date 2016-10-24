@@ -118,7 +118,7 @@ public:
 	void v_via_pa_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void v_via_ca2_w(int state);
 	void v_via_cb2_w(int state);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( vectrex_cart );
+	image_init_result device_image_load_vectrex_cart(device_image_interface &image);
 	void vectrex_via_irq(int state);
 
 protected:

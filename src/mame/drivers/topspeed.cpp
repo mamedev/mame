@@ -204,7 +204,7 @@ uint8_t topspeed_state::input_bypass_r(address_space &space, offs_t offset, uint
 	}
 }
 
-CUSTOM_INPUT_MEMBER(topspeed_state::pedal_r)
+ioport_value topspeed_state::pedal_r(ioport_field &field, void *param)
 {
 	static const uint8_t retval[8] = { 0,1,3,2,6,7,5,4 };
 	ioport_port *port = ioport((const char *)param);

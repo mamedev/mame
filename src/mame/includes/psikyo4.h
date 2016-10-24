@@ -65,7 +65,7 @@ public:
 	void ps4_screen2_brt_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	void ps4_vidregs_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	void io_select_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
-	DECLARE_CUSTOM_INPUT_MEMBER(mahjong_ctrl_r);
+	ioport_value mahjong_ctrl_r(ioport_field &field, void *param);
 	void ps4_eeprom_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	uint32_t ps4_eeprom_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	virtual void machine_start() override;

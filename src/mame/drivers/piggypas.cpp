@@ -29,8 +29,8 @@ public:
 	virtual void machine_reset() override;
 	void ctrl_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void mcs51_tx_callback(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_INPUT_CHANGED_MEMBER(ball_sensor);
-	DECLARE_CUSTOM_INPUT_MEMBER(ticket_r);
+	void ball_sensor(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	ioport_value ticket_r(ioport_field &field, void *param);
 	HD44780_PIXEL_UPDATE(piggypas_pixel_update);
 
 	required_device<mcs51_cpu_device> m_maincpu;
@@ -76,12 +76,12 @@ static ADDRESS_MAP_START( piggypas_io, AS_IO, 8, piggypas_state )
 ADDRESS_MAP_END
 
 
-INPUT_CHANGED_MEMBER(piggypas_state::ball_sensor)
+void piggypas_state::ball_sensor(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(1, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
-CUSTOM_INPUT_MEMBER(piggypas_state::ticket_r)
+ioport_value piggypas_state::ticket_r(ioport_field &field, void *param)
 {
 	return m_ticket->line_r();
 }

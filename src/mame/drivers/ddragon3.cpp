@@ -287,13 +287,13 @@ void wwfwfest_state::wwfwfest_priority_w(address_space &space, offs_t offset, ui
 
 
 /* DIPs are spread across the other input ports */
-CUSTOM_INPUT_MEMBER(wwfwfest_state::dsw_3f_r)
+ioport_value wwfwfest_state::dsw_3f_r(ioport_field &field, void *param)
 {
 	const char *tag = (const char *)param;
 	return ioport(tag)->read() & 0x3f;
 }
 
-CUSTOM_INPUT_MEMBER(wwfwfest_state::dsw_c0_r)
+ioport_value wwfwfest_state::dsw_c0_r(ioport_field &field, void *param)
 {
 	const char *tag = (const char *)param;
 	return (ioport(tag)->read() & 0xc0) >> 6;

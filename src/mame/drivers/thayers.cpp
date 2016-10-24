@@ -89,8 +89,8 @@ public:
 	void den2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void ssi263_register_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t ssi263_register_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_CUSTOM_INPUT_MEMBER(laserdisc_enter_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(laserdisc_ready_r);
+	ioport_value laserdisc_enter_r(ioport_field &field, void *param);
+	ioport_value laserdisc_ready_r(ioport_field &field, void *param);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void check_interrupt();
@@ -622,14 +622,14 @@ ADDRESS_MAP_END
 
 /* Input Ports */
 
-CUSTOM_INPUT_MEMBER(thayers_state::laserdisc_enter_r)
+ioport_value thayers_state::laserdisc_enter_r(ioport_field &field, void *param)
 {
 	if (m_pr7820 != nullptr) return m_pr7820_enter;
 	if (m_ldv1000 != nullptr) return (m_ldv1000->status_strobe_r() == ASSERT_LINE) ? 0 : 1;
 	return 0;
 }
 
-CUSTOM_INPUT_MEMBER(thayers_state::laserdisc_ready_r)
+ioport_value thayers_state::laserdisc_ready_r(ioport_field &field, void *param)
 {
 	if (m_pr7820 != nullptr) return (m_pr7820->ready_r() == ASSERT_LINE) ? 0 : 1;
 	if (m_ldv1000 != nullptr) return (m_ldv1000->command_strobe_r() == ASSERT_LINE) ? 0 : 1;

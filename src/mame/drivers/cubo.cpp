@@ -334,8 +334,8 @@ public:
 	void handle_joystick_cia(uint8_t pra, uint8_t dra);
 	uint16_t handle_joystick_potgor(uint16_t potgor);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(cubo_input);
-	DECLARE_CUSTOM_INPUT_MEMBER(cd32_sel_mirror_input);
+	ioport_value cubo_input(ioport_field &field, void *param);
+	ioport_value cd32_sel_mirror_input(ioport_field &field, void *param);
 
 	void akiko_cia_0_port_a_write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
@@ -515,12 +515,12 @@ uint16_t cubo_state::handle_joystick_potgor(uint16_t potgor)
 	return potgor;
 }
 
-CUSTOM_INPUT_MEMBER( cubo_state::cubo_input )
+ioport_value cubo_state::cubo_input(ioport_field &field, void *param)
 {
 	return handle_joystick_potgor(m_potgo_value) >> 8;
 }
 
-CUSTOM_INPUT_MEMBER( cubo_state::cd32_sel_mirror_input )
+ioport_value cubo_state::cd32_sel_mirror_input(ioport_field &field, void *param)
 {
 	uint8_t bits = m_player_ports[(int)(uintptr_t)param]->read();
 	return (bits & 0x20)>>5;

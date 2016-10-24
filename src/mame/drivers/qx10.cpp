@@ -514,7 +514,7 @@ ADDRESS_MAP_END
 
 /* Input ports */
 /* TODO: shift break */
-/*INPUT_CHANGED_MEMBER(qx10_state::key_stroke)
+/*void qx10_state::key_stroke(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
     if(newval && !oldval)
     {

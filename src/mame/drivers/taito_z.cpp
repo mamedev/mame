@@ -1101,7 +1101,7 @@ void taitoz_state::spacegun_output_bypass_w(address_space &space, offs_t offset,
                        GAME INPUTS
 **********************************************************/
 
-CUSTOM_INPUT_MEMBER(taitoz_state::taitoz_pedal_r)
+ioport_value taitoz_state::taitoz_pedal_r(ioport_field &field, void *param)
 {
 	static const uint8_t retval[8] = { 0,1,3,2,6,7,5,4 };
 	ioport_port *port = ioport((const char *)param);

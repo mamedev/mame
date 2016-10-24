@@ -83,8 +83,8 @@ public:
 	void pia28_ca2_w(int state) { }; // comma3&4
 	void pia28_cb2_w(int state) { }; // comma1&2
 	void pia_irq(int state);
-	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
-	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
+	void main_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void audio_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	void machine_reset_s8();
 	void init_s8();
 private:
@@ -174,14 +174,14 @@ static INPUT_PORTS_START( s8 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Up/Down") PORT_CODE(KEYCODE_6_PAD) PORT_TOGGLE
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER( s8_state::main_nmi )
+void s8_state::main_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	// Diagnostic button sends a pulse to NMI pin
 	if (newval==CLEAR_LINE)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-INPUT_CHANGED_MEMBER( s8_state::audio_nmi )
+void s8_state::audio_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	// Diagnostic button sends a pulse to NMI pin
 	if (newval==CLEAR_LINE)

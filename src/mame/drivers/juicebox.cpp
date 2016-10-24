@@ -53,7 +53,7 @@ public:
 	void init_juicebox();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_INPUT_CHANGED_MEMBER(port_changed);
+	void port_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);
 	void smc_reset( );
 	void smc_init( );
@@ -241,7 +241,7 @@ void juicebox_state::juicebox_nand_w(address_space &space, offs_t offset, uint32
 
 // ...
 
-INPUT_CHANGED_MEMBER(juicebox_state::port_changed)
+void juicebox_state::port_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_s3c44b0->request_eint((uintptr_t)param);
 }

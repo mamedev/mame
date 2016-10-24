@@ -117,7 +117,7 @@ void cdislave_device::perform_mouse_update()
 	}
 }
 
-INPUT_CHANGED_MEMBER( cdislave_device::mouse_update )
+void cdislave_device::mouse_update(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	perform_mouse_update();
 }

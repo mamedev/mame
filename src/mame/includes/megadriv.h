@@ -173,7 +173,7 @@ public:
 
 	void screen_eof_console(screen_device &screen, bool state);
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( _32x_cart );
+	image_init_result device_image_load__32x_cart(device_image_interface &image);
 
 	void _32x_scanline_callback(int x, uint32_t priority, uint16_t &lineptr);
 	void _32x_interrupt_callback(int scanline, int irq6);

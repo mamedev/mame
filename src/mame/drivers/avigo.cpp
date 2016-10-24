@@ -508,7 +508,7 @@ static ADDRESS_MAP_START( avigo_io, AS_IO, 8, avigo_state)
 ADDRESS_MAP_END
 
 
-INPUT_CHANGED_MEMBER( avigo_state::pen_irq )
+void avigo_state::pen_irq(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	LOG(("pen pressed interrupt\n"));
 
@@ -519,7 +519,7 @@ INPUT_CHANGED_MEMBER( avigo_state::pen_irq )
 	refresh_ints();
 }
 
-INPUT_CHANGED_MEMBER( avigo_state::pen_move_irq )
+void avigo_state::pen_move_irq(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	// an irq is generated when the pen is down on the screen and is being moved
 	if (ioport("LINE3")->read() & 0x01)
@@ -531,7 +531,7 @@ INPUT_CHANGED_MEMBER( avigo_state::pen_move_irq )
 	}
 }
 
-INPUT_CHANGED_MEMBER( avigo_state::kb_irq )
+void avigo_state::kb_irq(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	LOG(("key pressed interrupt\n"));
 
@@ -543,7 +543,7 @@ INPUT_CHANGED_MEMBER( avigo_state::kb_irq )
 	}
 }
 
-INPUT_CHANGED_MEMBER( avigo_state::power_down_irq )
+void avigo_state::power_down_irq(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if(newval)
 	{

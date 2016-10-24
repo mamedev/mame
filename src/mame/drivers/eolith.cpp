@@ -1668,7 +1668,7 @@ void eolith_state::eolith_speedup(timer_device &timer, void *ptr, int32_t param)
 	}
 }
 
-CUSTOM_INPUT_MEMBER(eolith_state::eolith_speedup_getvblank)
+ioport_value eolith_state::eolith_speedup_getvblank(ioport_field &field, void *param)
 {
 //  printf("%s:eolith speedup_read data %02x\n",machine().describe_context(), m_speedup_vblank);
 
@@ -1677,7 +1677,7 @@ CUSTOM_INPUT_MEMBER(eolith_state::eolith_speedup_getvblank)
 }
 
 // StealSee doesn't use interrupts, just the vblank
-CUSTOM_INPUT_MEMBER(eolith_state::stealsee_speedup_getvblank)
+ioport_value eolith_state::stealsee_speedup_getvblank(ioport_field &field, void *param)
 {
 	int pc = m_maincpu->pc();
 

@@ -104,9 +104,9 @@ public:
 	uint8_t famibox_IN1_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t famibox_system_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void famibox_system_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_CUSTOM_INPUT_MEMBER(famibox_coin_r);
-	DECLARE_INPUT_CHANGED_MEMBER(famibox_keyswitch_changed);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+	ioport_value famibox_coin_r(ioport_field &field, void *param);
+	void famibox_keyswitch_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
@@ -390,7 +390,7 @@ ADDRESS_MAP_END
 
 *******************************************************/
 
-INPUT_CHANGED_MEMBER(famibox_state::famibox_keyswitch_changed)
+void famibox_state::famibox_keyswitch_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if ( BIT(m_exception_mask, 3) )
 	{
@@ -399,7 +399,7 @@ INPUT_CHANGED_MEMBER(famibox_state::famibox_keyswitch_changed)
 	}
 }
 
-INPUT_CHANGED_MEMBER(famibox_state::coin_inserted)
+void famibox_state::coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if ( newval )
 	{
@@ -417,7 +417,7 @@ INPUT_CHANGED_MEMBER(famibox_state::coin_inserted)
 	}
 }
 
-CUSTOM_INPUT_MEMBER(famibox_state::famibox_coin_r)
+ioport_value famibox_state::famibox_coin_r(ioport_field &field, void *param)
 {
 	return m_coins > 0;
 }

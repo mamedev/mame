@@ -923,7 +923,7 @@ uint8_t galaxian_state::scramble_protection_r(address_space &space, offs_t offse
 }
 
 
-CUSTOM_INPUT_MEMBER(galaxian_state::scramble_protection_alt_r)
+ioport_value galaxian_state::scramble_protection_alt_r(ioport_field &field, void *param)
 {
 	/*
 	    There are two additional bits that are derived from bit 7 of
@@ -1224,7 +1224,7 @@ void galaxian_state::scorpion_digitalker_control_w(address_space &space, offs_t 
  *
  *************************************/
 
-INPUT_CHANGED_MEMBER(galaxian_state::gmgalax_game_changed)
+void galaxian_state::gmgalax_game_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -1243,7 +1243,7 @@ INPUT_CHANGED_MEMBER(galaxian_state::gmgalax_game_changed)
 }
 
 
-CUSTOM_INPUT_MEMBER(galaxian_state::gmgalax_port_r)
+ioport_value galaxian_state::gmgalax_port_r(ioport_field &field, void *param)
 {
 	const char *portname = (const char *)param;
 	if (m_gmgalax_selected_game != 0)
@@ -1298,7 +1298,7 @@ void galaxian_state::zigzag_ay8910_w(address_space &space, offs_t offset, uint8_
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(galaxian_state::azurian_port_r)
+ioport_value galaxian_state::azurian_port_r(ioport_field &field, void *param)
 {
 	return (ioport("FAKE")->read() >> (uintptr_t)param) & 1;
 }
@@ -1311,14 +1311,14 @@ CUSTOM_INPUT_MEMBER(galaxian_state::azurian_port_r)
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(galaxian_state::kingball_muxbit_r)
+ioport_value galaxian_state::kingball_muxbit_r(ioport_field &field, void *param)
 {
 	/* multiplex the service mode switch with a speech DIP switch */
 	return (ioport("FAKE")->read() >> m_kingball_speech_dip) & 1;
 }
 
 
-CUSTOM_INPUT_MEMBER(galaxian_state::kingball_noise_r)
+ioport_value galaxian_state::kingball_noise_r(ioport_field &field, void *param)
 {
 	/* bit 5 is the NOISE line from the sound circuit.  The code just verifies
 	   that it's working, doesn't actually use return value, so we can just use
@@ -4892,7 +4892,7 @@ static INPUT_PORTS_START( scobras )
 INPUT_PORTS_END
 
 
-CUSTOM_INPUT_MEMBER(galaxian_state::moonwar_dial_r)
+ioport_value galaxian_state::moonwar_dial_r(ioport_field &field, void *param)
 {
 	static const char *const dialname[2] = { "P1_DIAL", "P2_DIAL" };
 	int p = (~m_moonwar_port_select >> 4) & 1;

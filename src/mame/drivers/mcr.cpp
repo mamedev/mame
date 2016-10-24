@@ -392,7 +392,7 @@ void mcr_state::dpoker_coin_in_callback(timer_device &timer, void *ptr, int32_t 
 	dpoker_coin_status &= ~2;
 }
 
-INPUT_CHANGED_MEMBER(mcr_state::dpoker_coin_in_hit)
+void mcr_state::dpoker_coin_in_hit(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (newval)
 	{

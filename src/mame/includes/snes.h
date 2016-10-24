@@ -426,8 +426,8 @@ public:
 	void snes_scanline_tick(void *ptr, int32_t param);
 	void snes_hblank_tick(void *ptr, int32_t param);
 	void snes_extern_irq_w(int state);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(snes_cart);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(sufami_cart);
+	image_init_result device_image_load_snes_cart(device_image_interface &image);
+	image_init_result device_image_load_sufami_cart(device_image_interface &image);
 	void snes_init_timers();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;

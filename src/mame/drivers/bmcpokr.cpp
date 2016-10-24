@@ -66,7 +66,7 @@ public:
 	uint16_t m_mux;
 	void mux_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	uint16_t dsw_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
-	DECLARE_CUSTOM_INPUT_MEMBER(hopper_r);
+	ioport_value hopper_r(ioport_field &field, void *param);
 	uint16_t mjmaglmp_dsw_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	uint16_t mjmaglmp_key_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 
@@ -347,7 +347,7 @@ uint16_t bmcpokr_state::dsw_r(address_space &space, offs_t offset, uint16_t mem_
 	return 0xff << 8;
 }
 
-CUSTOM_INPUT_MEMBER(bmcpokr_state::hopper_r)
+ioport_value bmcpokr_state::hopper_r(ioport_field &field, void *param)
 {
 	// motor off should clear the sense bit (I guess ticket.c should actually do this).
 	// Otherwise a hopper bit stuck low will prevent several keys from being registered.

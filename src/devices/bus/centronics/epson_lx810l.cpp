@@ -274,7 +274,7 @@ ioport_constructor epson_lx810l_t::device_input_ports() const
 	return INPUT_PORTS_NAME( epson_lx810l );
 }
 
-INPUT_CHANGED_MEMBER(epson_lx810l_t::online_sw)
+void epson_lx810l_t::online_sw(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(UPD7810_INTF2, newval ? CLEAR_LINE : ASSERT_LINE);
 }

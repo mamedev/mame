@@ -601,7 +601,7 @@ void equites_state::equites_8155_w(address_space &space, offs_t offset, uint8_t 
 /******************************************************************************/
 // CPU Handlers
 
-CUSTOM_INPUT_MEMBER(equites_state::gekisou_unknown_bit_r)
+ioport_value equites_state::gekisou_unknown_bit_r(ioport_field &field, void *param)
 {
 	return m_gekisou_unknown_bit;
 }

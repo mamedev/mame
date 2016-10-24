@@ -37,7 +37,7 @@ public:
 	void init_hp49gp();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_INPUT_CHANGED_MEMBER(port_changed);
+	void port_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	uint32_t s3c2410_gpio_port_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	void s3c2410_gpio_port_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);
@@ -236,7 +236,7 @@ void hp49gp_state::s3c2410_gpio_port_w(address_space &space, offs_t offset, uint
 
 // ...
 
-INPUT_CHANGED_MEMBER(hp49gp_state::port_changed)
+void hp49gp_state::port_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_s3c2410->s3c2410_request_eint( (uintptr_t)param + 8);
 }

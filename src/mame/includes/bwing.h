@@ -71,8 +71,8 @@ public:
 	void scrollreg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-	DECLARE_INPUT_CHANGED_MEMBER(tilt_pressed);
+	void coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void tilt_pressed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 	void get_fgtileinfo(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);
 	void get_bgtileinfo(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);

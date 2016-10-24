@@ -75,8 +75,8 @@ public:
 	void pia30_ca2_w(int state) { }; //ST4
 	void pia30_cb2_w(int state) { }; //ST3
 	void irq(timer_device &timer, void *ptr, int32_t param);
-	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
-	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
+	void main_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void audio_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	void machine_reset_s4();
 	void machine_reset_s4a();
 private:
@@ -266,14 +266,14 @@ void s4_state::machine_reset_s4a()
 	m_chimes = 0;
 }
 
-INPUT_CHANGED_MEMBER( s4_state::main_nmi )
+void s4_state::main_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	// Diagnostic button sends a pulse to NMI pin
 	if (newval==CLEAR_LINE)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-INPUT_CHANGED_MEMBER( s4_state::audio_nmi )
+void s4_state::audio_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	// Diagnostic button sends a pulse to NMI pin
 	if ((newval==CLEAR_LINE) && !m_chimes)

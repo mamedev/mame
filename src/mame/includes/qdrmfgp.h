@@ -51,7 +51,7 @@ public:
 	void sndram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	uint16_t gp2_ide_std_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	uint16_t inputs_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
-	DECLARE_CUSTOM_INPUT_MEMBER(battery_sensor_r);
+	ioport_value battery_sensor_r(ioport_field &field, void *param);
 
 	virtual void machine_reset() override;
 

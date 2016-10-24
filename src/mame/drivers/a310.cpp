@@ -96,7 +96,7 @@ public:
 	void init_a310();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_INPUT_CHANGED_MEMBER(key_stroke);
+	void key_stroke(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
 
@@ -167,7 +167,7 @@ static ADDRESS_MAP_START( a310_mem, AS_PROGRAM, 32, a310_state )
 ADDRESS_MAP_END
 
 
-INPUT_CHANGED_MEMBER(a310_state::key_stroke)
+void a310_state::key_stroke(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	uint8_t row_val = (uint8_t)(uintptr_t)(param) >> 4;
 	uint8_t col_val = (uint8_t)(uintptr_t)(param) & 0xf;

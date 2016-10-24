@@ -57,8 +57,8 @@ public:
 	void rotate_control_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	void motor_control_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	uint32_t irq_speedup_r_groundfx(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
-	DECLARE_CUSTOM_INPUT_MEMBER(frame_counter_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(coin_word_r);
+	ioport_value frame_counter_r(ioport_field &field, void *param);
+	ioport_value coin_word_r(ioport_field &field, void *param);
 	void init_groundfx();
 	virtual void video_start() override;
 	uint32_t screen_update_groundfx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

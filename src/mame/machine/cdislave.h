@@ -49,7 +49,7 @@ public:
 	cdislave_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// external callbacks
-	DECLARE_INPUT_CHANGED_MEMBER( mouse_update );
+	void mouse_update(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 	uint8_t* get_lcd_state() { return m_lcd_state; }
 

@@ -114,7 +114,7 @@ void pirates_state::out_w(address_space &space, offs_t offset, uint16_t data, ui
 //  logerror("%06x: out_w %04x\n",space.device().safe_pc(),data);
 }
 
-CUSTOM_INPUT_MEMBER(pirates_state::prot_r)
+ioport_value pirates_state::prot_r(ioport_field &field, void *param)
 {
 //  static int prot = 0xa3;
 //  offs_t pc;

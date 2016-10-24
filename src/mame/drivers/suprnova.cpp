@@ -494,7 +494,7 @@ void skns_state::irq(timer_device &timer, void *ptr, int32_t param)
 
 **********************************************************************************/
 
-CUSTOM_INPUT_MEMBER(skns_state::paddle_r)
+ioport_value skns_state::paddle_r(ioport_field &field, void *param)
 {
 	const char *tag = (const char *)param;
 	return ioport(tag)->read();

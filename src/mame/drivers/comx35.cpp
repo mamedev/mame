@@ -312,10 +312,10 @@ ADDRESS_MAP_END
 //**************************************************************************
 
 //-------------------------------------------------
-//  INPUT_CHANGED_MEMBER( comx35_reset )
+//  void comx35_reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 //-------------------------------------------------
 
-INPUT_CHANGED_MEMBER( comx35_state::trigger_reset )
+void comx35_state::trigger_reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (newval && BIT(m_d6->read(), 7))
 	{

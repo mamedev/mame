@@ -118,7 +118,7 @@ public:
 	void hotchase_draw_road(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	K051316_CB_MEMBER(hotchase_zoom_callback_1);
 	K051316_CB_MEMBER(hotchase_zoom_callback_2);
-	DECLARE_CUSTOM_INPUT_MEMBER(hotchase_sound_status_r);
+	ioport_value hotchase_sound_status_r(ioport_field &field, void *param);
 	void hotchase_sound_hs_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	required_device<cpu_device> m_maincpu;

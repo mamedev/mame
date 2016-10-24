@@ -50,7 +50,7 @@ void mjkjidai_state::adpcm_int(int state)
 	}
 }
 
-CUSTOM_INPUT_MEMBER(mjkjidai_state::keyboard_r)
+ioport_value mjkjidai_state::keyboard_r(ioport_field &field, void *param)
 {
 	int res = 0x3f;
 

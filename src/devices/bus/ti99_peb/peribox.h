@@ -63,7 +63,7 @@ public:
 	void set_prefix(int prefix) { m_address_prefix = prefix; }
 
 	// Genmod support
-	DECLARE_INPUT_CHANGED_MEMBER( genmod_changed );
+	void genmod_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	void set_genmod(bool set);
 
 protected:

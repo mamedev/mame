@@ -44,7 +44,7 @@ public:
 	uint8_t dmd_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void dmd_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void nmi_w(int state);
-	DECLARE_INPUT_CHANGED_MEMBER(test_inp);
+	void test_inp(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	void palette_init_gts3a(palette_device &palette);
 	required_device<palette_device> m_palette;
@@ -212,7 +212,7 @@ static INPUT_PORTS_START( gts3a )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_OTHER)
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER( gts3a_state::test_inp )
+void gts3a_state::test_inp(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_u4->write_ca1(newval);
 }

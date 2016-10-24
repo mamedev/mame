@@ -152,7 +152,7 @@ public:
 	uint16_t irq1_ack_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	uint16_t irq2_ack_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	uint16_t irq4_ack_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
+	void coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	uint16_t pntnpuzl_eeprom_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void pntnpuzl_eeprom_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void init_pip();
@@ -308,7 +308,7 @@ static ADDRESS_MAP_START( pntnpuzl_map, AS_PROGRAM, 16, pntnpuzl_state )
 ADDRESS_MAP_END
 
 
-INPUT_CHANGED_MEMBER(pntnpuzl_state::coin_inserted)
+void pntnpuzl_state::coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	/* TODO: change this! */
 	if(newval)

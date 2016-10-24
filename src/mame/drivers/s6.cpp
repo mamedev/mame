@@ -90,8 +90,8 @@ public:
 	void pia30_ca2_w(int state) { }; //ST4
 	void pia30_cb2_w(int state) { }; //ST3
 	void pia_irq(int state);
-	DECLARE_INPUT_CHANGED_MEMBER(main_nmi);
-	DECLARE_INPUT_CHANGED_MEMBER(audio_nmi);
+	void main_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void audio_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	void machine_reset_s6();
 	void init_s6();
 private:
@@ -233,14 +233,14 @@ static INPUT_PORTS_START( s6 )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER( s6_state::main_nmi )
+void s6_state::main_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	// Diagnostic button sends a pulse to NMI pin
 	if (newval==CLEAR_LINE)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-INPUT_CHANGED_MEMBER( s6_state::audio_nmi )
+void s6_state::audio_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	// Diagnostic button sends a pulse to NMI pin
 	if (newval==CLEAR_LINE)

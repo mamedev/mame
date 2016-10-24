@@ -325,12 +325,12 @@ void snk6502_state::sasuke_start_counter()
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(snk6502_state::snk6502_music0_r)
+ioport_value snk6502_state::snk6502_music0_r(ioport_field &field, void *param)
 {
 	return (m_sound->music0_playing() ? 0x01 : 0x00);
 }
 
-CUSTOM_INPUT_MEMBER(snk6502_state::sasuke_count_r)
+ioport_value snk6502_state::sasuke_count_r(ioport_field &field, void *param)
 {
 	return (m_sasuke_counter >> 4);
 }
@@ -447,7 +447,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-INPUT_CHANGED_MEMBER(snk6502_state::coin_inserted)
+void snk6502_state::coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }

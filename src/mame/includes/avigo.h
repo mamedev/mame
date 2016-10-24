@@ -79,10 +79,10 @@ public:
 	void speaker_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t port_04_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_INPUT_CHANGED_MEMBER(pen_irq);
-	DECLARE_INPUT_CHANGED_MEMBER(pen_move_irq);
-	DECLARE_INPUT_CHANGED_MEMBER(kb_irq);
-	DECLARE_INPUT_CHANGED_MEMBER(power_down_irq);
+	void pen_irq(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void pen_move_irq(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void kb_irq(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void power_down_irq(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 	// defined in video/avigo.c
 	virtual void video_start() override;

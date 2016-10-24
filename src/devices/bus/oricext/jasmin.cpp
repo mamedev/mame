@@ -126,7 +126,7 @@ void jasmin_device::remap()
 	}
 }
 
-INPUT_CHANGED_MEMBER(jasmin_device::boot_pressed)
+void jasmin_device::boot_pressed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if(newval) {
 		rom_access = true;

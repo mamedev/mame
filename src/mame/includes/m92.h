@@ -84,7 +84,7 @@ public:
 	void m92_pf2_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void m92_pf3_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void m92_master_control_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
-	DECLARE_CUSTOM_INPUT_MEMBER(m92_sprite_busy_r);
+	ioport_value m92_sprite_busy_r(ioport_field &field, void *param);
 	void oki_bank_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void init_majtitl2();
 	void init_ppan();

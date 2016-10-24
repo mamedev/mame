@@ -71,7 +71,7 @@ void gunbustr_state::gunbustr_interrupt(device_t &device)
 	device.execute().set_input_line(4, HOLD_LINE);
 }
 
-CUSTOM_INPUT_MEMBER(gunbustr_state::coin_word_r)
+ioport_value gunbustr_state::coin_word_r(ioport_field &field, void *param)
 {
 	return m_coin_word;
 }

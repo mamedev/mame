@@ -52,7 +52,7 @@ public:
 	void mcu_start_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t champbja_protection_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(watchdog_bit2);
+	ioport_value watchdog_bit2(ioport_field &field, void *param);
 
 	void vblank_irq(device_t &device);
 	void exctsccr_sound_irq(timer_device &timer, void *ptr, int32_t param);

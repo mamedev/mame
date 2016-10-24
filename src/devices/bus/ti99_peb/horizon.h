@@ -30,7 +30,7 @@ public:
 	DECLARE_READ8Z_MEMBER(crureadz) override;
 	void cruwrite(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff) override;
 
-	DECLARE_INPUT_CHANGED_MEMBER( hs_changed );
+	void hs_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 protected:
 	void device_start() override;

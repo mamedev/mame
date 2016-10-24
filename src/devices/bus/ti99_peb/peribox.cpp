@@ -338,7 +338,7 @@ void peribox_device::clock_in(int state)
     The Genmod modification is only of interest for the Geneve. It requires
     to modify the decoding of each single card.
 */
-INPUT_CHANGED_MEMBER( peribox_device::genmod_changed )
+void peribox_device::genmod_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	set_genmod(newval==1);
 }

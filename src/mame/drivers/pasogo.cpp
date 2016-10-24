@@ -167,7 +167,7 @@ public:
 	uint32_t screen_update_pasogo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void pasogo_interrupt(device_t &device);
 	void vg230_timer(timer_device &timer, void *ptr, int32_t param);
-	DECLARE_INPUT_CHANGED_MEMBER(contrast);
+	void contrast(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 	memory_region *m_cart_rom;
 	uint8_t m_ems_index;
@@ -474,7 +474,7 @@ static INPUT_PORTS_START( pasogo )
 	PORT_CONFSETTING(0x01, "Enhanced")
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER(pasogo_state::contrast)
+void pasogo_state::contrast(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if(newval)
 	{

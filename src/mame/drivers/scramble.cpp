@@ -537,7 +537,7 @@ static INPUT_PORTS_START( knockoutb )
 INPUT_PORTS_END
 
 /* ckongs coinage DIPs are spread across two input ports */
-CUSTOM_INPUT_MEMBER(scramble_state::ckongs_coinage_r)
+ioport_value scramble_state::ckongs_coinage_r(ioport_field &field, void *param)
 {
 	int bit_mask = (uintptr_t)param;
 	return (ioport("FAKE")->read() & bit_mask) ? 0x01 : 0x00;

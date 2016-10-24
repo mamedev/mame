@@ -40,7 +40,7 @@ int sms_light_phaser_device::th_pin_r()
 }
 
 
-INPUT_CHANGED_MEMBER( sms_light_phaser_device::position_changed )
+void sms_light_phaser_device::position_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (newval != oldval)
 		sensor_check();

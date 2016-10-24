@@ -12,7 +12,7 @@
 #include "sound/volt_reg.h"
 
 
-INPUT_CHANGED_MEMBER(cheekyms_state::coin_inserted)
+void cheekyms_state::coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	/* this starts a 556 one-shot timer (and triggers a sound effect) */
 	if (newval)

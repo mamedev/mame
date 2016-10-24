@@ -65,7 +65,7 @@ public:
 	uint8_t port2_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void port2_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void count_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_INPUT_CHANGED_MEMBER(ficha);
+	void ficha(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	void timer_r(timer_device &timer, void *ptr, int32_t param);
 private:
 	bool m_timer_r;
@@ -229,7 +229,7 @@ static INPUT_PORTS_START( ltd4 )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER( ltd_state::ficha )
+void ltd_state::ficha(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if(newval)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);

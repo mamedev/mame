@@ -144,10 +144,10 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	uint32_t screen_update_pockstat(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_INPUT_CHANGED_MEMBER(input_update);
+	void input_update(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	void timer_tick(void *ptr, int32_t param);
 	void rtc_tick(void *ptr, int32_t param);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( pockstat_flash );
+	image_init_result device_image_load_pockstat_flash(device_image_interface &image);
 	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
 	uint32_t ps_intc_get_interrupt_line(uint32_t line);
 	void ps_intc_set_interrupt_line(uint32_t line, int state);
@@ -766,7 +766,7 @@ void pockstat_state::ps_lcd_w(address_space &space, offs_t offset, uint32_t data
 	}
 }
 
-INPUT_CHANGED_MEMBER(pockstat_state::input_update)
+void pockstat_state::input_update(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	uint32_t buttons = ioport("BUTTONS")->read();
 
@@ -947,7 +947,7 @@ uint32_t pockstat_state::screen_update_pockstat(screen_device &screen, bitmap_rg
 	return 0;
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( pockstat_state, pockstat_flash )
+image_init_result pockstat_state::device_image_load_pockstat_flash(device_image_interface &image)
 {
 	static const char *gme_id = "123-456-STD";
 	char cart_id[0xf40];

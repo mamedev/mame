@@ -338,7 +338,7 @@ uint8_t snk_state::marvins_soundlatch_r(address_space &space, offs_t offset, uin
 	return m_soundlatch->read(space, 0);
 }
 
-CUSTOM_INPUT_MEMBER(snk_state::marvins_sound_busy)
+ioport_value snk_state::marvins_sound_busy(ioport_field &field, void *param)
 {
 	return m_marvins_sound_busy_flag;
 }
@@ -478,7 +478,7 @@ void snk_state::snk_soundlatch_w(address_space &space, offs_t offset, uint8_t da
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sndirq_update_callback),this), CMDIRQ_BUSY_ASSERT);
 }
 
-CUSTOM_INPUT_MEMBER(snk_state::snk_sound_busy)
+ioport_value snk_state::snk_sound_busy(ioport_field &field, void *param)
 {
 	return (m_sound_status & 4) ? 1 : 0;
 }
@@ -716,7 +716,7 @@ hand, always returning 0xf inbetween valid values confuses the game.
 
 *****************************************************************************/
 
-CUSTOM_INPUT_MEMBER(snk_state::gwar_rotary)
+ioport_value snk_state::gwar_rotary(ioport_field &field, void *param)
 {
 	static const char *const ports[] = { "P1ROT", "P2ROT" };
 	int which = (int)(uintptr_t)param;
@@ -733,7 +733,7 @@ CUSTOM_INPUT_MEMBER(snk_state::gwar_rotary)
 	return value;
 }
 
-CUSTOM_INPUT_MEMBER(snk_state::gwarb_rotary)
+ioport_value snk_state::gwarb_rotary(ioport_field &field, void *param)
 {
 	if (ioport("JOYSTICK_MODE")->read() == 1)
 	{
@@ -780,12 +780,12 @@ void snk_state::countryc_trackball_w(address_space &space, offs_t offset, uint8_
 	m_countryc_trackball = data & 1;
 }
 
-CUSTOM_INPUT_MEMBER(snk_state::countryc_trackball_x)
+ioport_value snk_state::countryc_trackball_x(ioport_field &field, void *param)
 {
 	return ioport(m_countryc_trackball ? "TRACKBALLX2" : "TRACKBALLX1")->read();
 }
 
-CUSTOM_INPUT_MEMBER(snk_state::countryc_trackball_y)
+ioport_value snk_state::countryc_trackball_y(ioport_field &field, void *param)
 {
 	return ioport(m_countryc_trackball ? "TRACKBALLY2" : "TRACKBALLY1")->read();
 }
@@ -793,7 +793,7 @@ CUSTOM_INPUT_MEMBER(snk_state::countryc_trackball_y)
 
 /************************************************************************/
 
-CUSTOM_INPUT_MEMBER(snk_state::snk_bonus_r)
+ioport_value snk_state::snk_bonus_r(ioport_field &field, void *param)
 {
 	int bit_mask = (uintptr_t)param;
 

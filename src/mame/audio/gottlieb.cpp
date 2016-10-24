@@ -335,7 +335,7 @@ INPUT_PORTS_START( gottlieb_sound_r0 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER) PORT_NAME("Music") PORT_CODE(KEYCODE_F2) PORT_TOGGLE
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER( gottlieb_sound_r0_device::audio_nmi )
+void gottlieb_sound_r0_device::audio_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	// Diagnostic button sends a pulse to NMI pin
 	if (newval==CLEAR_LINE)
@@ -796,7 +796,7 @@ void gottlieb_sound_r2_device::nmi_rate_w(address_space &space, offs_t offset, u
 //  request line as an input port bit
 //-------------------------------------------------
 
-CUSTOM_INPUT_MEMBER( gottlieb_sound_r2_device::speech_drq_custom_r )
+ioport_value gottlieb_sound_r2_device::speech_drq_custom_r(ioport_field &field, void *param)
 {
 	return m_sp0250->drq_r();
 }

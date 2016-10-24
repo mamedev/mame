@@ -85,7 +85,7 @@ public:
 	uint8_t neocd_transfer_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void neocd_transfer_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_INPUT_CHANGED_MEMBER(aes_jp1);
+	void aes_jp1(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 	void machine_start_neocd();
 	void machine_reset_neocd();

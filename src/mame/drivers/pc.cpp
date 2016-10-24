@@ -50,7 +50,7 @@ public:
 
 	void init_bondwell();
 
-	DECLARE_INPUT_CHANGED_MEMBER(pc_turbo_callback);
+	void pc_turbo_callback(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 	double m_turbo_off_speed;
 };
@@ -93,7 +93,7 @@ static ADDRESS_MAP_START(ibm5550_io, AS_IO, 16, pc_state )
 	AM_RANGE(0x0000, 0x00ff) AM_DEVICE8("mb", ibm5160_mb_device, map, 0xffff)
 ADDRESS_MAP_END
 
-INPUT_CHANGED_MEMBER(pc_state::pc_turbo_callback)
+void pc_state::pc_turbo_callback(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_clock_scale((newval & 2) ? 1 : m_turbo_off_speed);
 }

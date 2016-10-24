@@ -29,8 +29,8 @@ class x1twin_state : public x1_state
 		: x1_state(mconfig, type, tag)
 	{ }
 	uint32_t screen_update_x1pce(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	DECLARE_INPUT_CHANGED_MEMBER(ipl_reset);
-	DECLARE_INPUT_CHANGED_MEMBER(nmi_reset);
+	void ipl_reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void nmi_reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 };
 
 
@@ -77,7 +77,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-INPUT_CHANGED_MEMBER(x1twin_state::ipl_reset)
+void x1twin_state::ipl_reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	//address_space &space = m_maincpu->space(AS_PROGRAM);
 
@@ -89,7 +89,7 @@ INPUT_CHANGED_MEMBER(x1twin_state::ipl_reset)
 }
 
 /* Apparently most games doesn't support this (not even the Konami ones!), one that does is...177 :o */
-INPUT_CHANGED_MEMBER(x1twin_state::nmi_reset)
+void x1twin_state::nmi_reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_maincpu->set_input_line(INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }

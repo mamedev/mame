@@ -44,7 +44,7 @@ public:
 		, m_io_row3(*this, "ROW3")
 	{ }
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( cart );
+	image_init_result device_image_load_cart(device_image_interface &image);
 	uint8_t ay_port_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t ay_port_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void ay_port_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -140,7 +140,7 @@ void myvision_state::machine_reset()
 }
 
 
-DEVICE_IMAGE_LOAD_MEMBER( myvision_state, cart )
+image_init_result myvision_state::device_image_load_cart(device_image_interface &image)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 

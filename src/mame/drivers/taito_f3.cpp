@@ -43,7 +43,7 @@
 
 /******************************************************************************/
 
-CUSTOM_INPUT_MEMBER(taito_f3_state::f3_analog_r)
+ioport_value taito_f3_state::f3_analog_r(ioport_field &field, void *param)
 {
 	int num = (uintptr_t)param;
 	int data = m_dial[num]->read();
@@ -51,7 +51,7 @@ CUSTOM_INPUT_MEMBER(taito_f3_state::f3_analog_r)
 }
 
 
-CUSTOM_INPUT_MEMBER(taito_f3_state::f3_coin_r)
+ioport_value taito_f3_state::f3_coin_r(ioport_field &field, void *param)
 {
 	int num = (uintptr_t)param;
 	return m_coin_word[num];
@@ -208,7 +208,7 @@ ADDRESS_MAP_END
 
 /******************************************************************************/
 
-CUSTOM_INPUT_MEMBER( taito_f3_state::eeprom_read )
+ioport_value taito_f3_state::eeprom_read(ioport_field &field, void *param)
 {
 	return m_eepromin->read();
 }

@@ -130,7 +130,7 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 
-INPUT_CHANGED_MEMBER(metlclsh_state::coin_inserted)
+void metlclsh_state::coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (oldval)
 		m_subcpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);

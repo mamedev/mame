@@ -92,9 +92,9 @@ public:
 	void bnj_video_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void zoar_video_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void disco_video_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_irq_hi);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_irq_lo);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted_nmi_lo);
+	void coin_inserted_irq_hi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void coin_inserted_irq_lo(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void coin_inserted_nmi_lo(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	void ay_audio_nmi_enable_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void init_btime();

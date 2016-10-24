@@ -255,9 +255,9 @@ public:
 	uint16_t f3_lineram_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	void f3_lineram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void f3_palette_24bit_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
-	DECLARE_CUSTOM_INPUT_MEMBER(f3_analog_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(f3_coin_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(eeprom_read);
+	ioport_value f3_analog_r(ioport_field &field, void *param);
+	ioport_value f3_coin_r(ioport_field &field, void *param);
+	ioport_value eeprom_read(ioport_field &field, void *param);
 	void init_commandw();
 	void init_pbobble2();
 	void init_puchicar();

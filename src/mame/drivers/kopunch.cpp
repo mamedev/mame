@@ -49,14 +49,14 @@ void kopunch_state::vblank_interrupt(device_t &device)
 	device.execute().set_input_line(I8085_RST75_LINE, CLEAR_LINE);
 }
 
-INPUT_CHANGED_MEMBER(kopunch_state::left_coin_inserted)
+void kopunch_state::left_coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	// left coin insertion causes a rst6.5 (vector 0x34)
 	if (newval)
 		m_maincpu->set_input_line(I8085_RST65_LINE, HOLD_LINE);
 }
 
-INPUT_CHANGED_MEMBER(kopunch_state::right_coin_inserted)
+void kopunch_state::right_coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	// right coin insertion causes a rst5.5 (vector 0x2c)
 	if (newval)

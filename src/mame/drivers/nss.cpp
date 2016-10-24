@@ -342,7 +342,7 @@ public:
 
 	void init_nss();
 
-	DECLARE_CUSTOM_INPUT_MEMBER(game_over_flag_r);
+	ioport_value game_over_flag_r(ioport_field &field, void *param);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	void nss_vblank_irq(device_t &device);
@@ -635,7 +635,7 @@ void nss_state::machine_start()
 }
 
 
-CUSTOM_INPUT_MEMBER(nss_state::game_over_flag_r)
+ioport_value nss_state::game_over_flag_r(ioport_field &field, void *param)
 {
 	return m_game_over_flag;
 }

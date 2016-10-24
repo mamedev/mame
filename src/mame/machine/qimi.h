@@ -44,8 +44,8 @@ public:
 	uint8_t read(address_space &space, offs_t offset, uint8_t data);
 	void write(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_INPUT_CHANGED_MEMBER( mouse_x_changed );
-	DECLARE_INPUT_CHANGED_MEMBER( mouse_y_changed );
+	void mouse_x_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void mouse_y_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 protected:
 	// device-level overrides

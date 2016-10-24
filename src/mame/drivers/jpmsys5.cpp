@@ -372,7 +372,7 @@ void jpmsys5_state::touch_cb(void *ptr, int32_t param)
 	}
 }
 
-INPUT_CHANGED_MEMBER(jpmsys5_state::touchscreen_press)
+void jpmsys5_state::touchscreen_press(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (newval == 0)
 	{

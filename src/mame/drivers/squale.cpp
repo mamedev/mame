@@ -114,7 +114,7 @@ public:
 
 	void pia_u75_cb2_w(int state);
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( squale_cart );
+	image_init_result device_image_load_squale_cart(device_image_interface &image);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -588,7 +588,7 @@ void squale_state::pia_u72_cb2_w(int state)
 	#endif
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( squale_state, squale_cart )
+image_init_result squale_state::device_image_load_squale_cart(device_image_interface &image)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 

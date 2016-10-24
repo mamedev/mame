@@ -57,7 +57,7 @@ public:
 	void ic2_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t ic11_b_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	uint8_t ic2_a_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_INPUT_CHANGED_MEMBER(self_test);
+	void self_test(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	void timer_s(timer_device &timer, void *ptr, int32_t param);
 	void timer_x(timer_device &timer, void *ptr, int32_t param);
 private:
@@ -245,7 +245,7 @@ static INPUT_PORTS_START( hankin )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_STOP)
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER( hankin_state::self_test )
+void hankin_state::self_test(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_ic11->ca1_w(newval);
 }

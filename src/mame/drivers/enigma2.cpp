@@ -92,8 +92,8 @@ public:
 	uint8_t dip_switch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void sound_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void enigma2_flip_screen_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_CUSTOM_INPUT_MEMBER(p1_controls_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(p2_controls_r);
+	ioport_value p1_controls_r(ioport_field &field, void *param);
+	ioport_value p2_controls_r(ioport_field &field, void *param);
 	uint8_t sound_latch_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void protection_data_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void init_enigma2();
@@ -416,13 +416,13 @@ void enigma2_state::enigma2_flip_screen_w(address_space &space, offs_t offset, u
 }
 
 
-CUSTOM_INPUT_MEMBER(enigma2_state::p1_controls_r)
+ioport_value enigma2_state::p1_controls_r(ioport_field &field, void *param)
 {
 	return ioport("P1CONTROLS")->read();
 }
 
 
-CUSTOM_INPUT_MEMBER(enigma2_state::p2_controls_r)
+ioport_value enigma2_state::p2_controls_r(ioport_field &field, void *param)
 {
 	if (m_flip_screen)
 		return ioport("P2CONTROLS")->read();

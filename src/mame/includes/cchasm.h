@@ -67,7 +67,7 @@ public:
 	void ctc_timer_1_w(int state);
 	void ctc_timer_2_w(int state);
 
-	INPUT_CHANGED_MEMBER(set_coin_flag);
+	void set_coin_flag(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 	virtual void video_start() override;
 	virtual void sound_start() override;

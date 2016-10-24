@@ -133,7 +133,7 @@ uint8_t mainsnk_state::sound_ack_r(address_space &space, offs_t offset, uint8_t 
 	return 0xff;
 }
 
-CUSTOM_INPUT_MEMBER(mainsnk_state::sound_r)
+ioport_value mainsnk_state::sound_r(ioport_field &field, void *param)
 {
 	return (m_sound_cpu_busy) ? 0x01 : 0x00;
 }

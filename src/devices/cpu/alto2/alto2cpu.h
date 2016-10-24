@@ -203,13 +203,13 @@ public:
 	DECLARE_ADDRESS_MAP( iomem_map, 16 );
 
 	//! register a mouse motion in x direction
-	DECLARE_INPUT_CHANGED_MEMBER( mouse_motion_x );
+	void mouse_motion_x(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	//! register a mouse motion in y direction
-	DECLARE_INPUT_CHANGED_MEMBER( mouse_motion_y );
+	void mouse_motion_y(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	//! register a mouse button change
-	DECLARE_INPUT_CHANGED_MEMBER( mouse_button_0 );
-	DECLARE_INPUT_CHANGED_MEMBER( mouse_button_1 );
-	DECLARE_INPUT_CHANGED_MEMBER( mouse_button_2 );
+	void mouse_button_0(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void mouse_button_1(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void mouse_button_2(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 protected:
 	//! device-level override for start

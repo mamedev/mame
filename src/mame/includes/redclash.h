@@ -28,8 +28,8 @@ public:
 	uint8_t sraider_8005_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void sraider_misc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void sraider_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_INPUT_CHANGED_MEMBER(left_coin_inserted);
-	DECLARE_INPUT_CHANGED_MEMBER(right_coin_inserted);
+	void left_coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void right_coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	void init_redclash();
 	void machine_start_sraider();
 	void machine_reset_sraider();

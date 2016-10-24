@@ -87,7 +87,7 @@ public:
 	void lpt_irq(int state);
 
 	void vblank(device_t &device);
-	DECLARE_INPUT_CHANGED_MEMBER(color);
+	void color(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 private:
 	uint16_t tvi1111_regs[(0x100/2)+2];
 	emu_timer *m_rowtimer;
@@ -324,7 +324,7 @@ static INPUT_PORTS_START( tv990 )
 	PORT_CONFSETTING(    0x20, "White") PORT_CHANGED_MEMBER(DEVICE_SELF, tv990_state, color, nullptr)
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER(tv990_state::color)
+void tv990_state::color(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	rgb_t color;
 	if(newval == oldval)

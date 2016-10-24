@@ -159,7 +159,7 @@ Pin #11(+) | | R               |
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(lethalj_state::cclownz_paddle)
+ioport_value lethalj_state::cclownz_paddle(ioport_field &field, void *param)
 {
 	int value = m_paddle->read();
 	return ((value << 4) & 0xf00) | (value & 0x00f);

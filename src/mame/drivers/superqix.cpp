@@ -251,7 +251,7 @@ The MCU acts this way:
 
 **************************************************************************/
 
-CUSTOM_INPUT_MEMBER(superqix_state::superqix_semaphore_input_r) // similar to pbillian_semaphore_input_r below, but reverse order and polarity
+ioport_value superqix_state::superqix_semaphore_input_r(ioport_field &field, void *param) // similar to pbillian_semaphore_input_r below, but reverse order and polarity
 {
 	int res = 0;
 
@@ -876,7 +876,7 @@ uint8_t superqix_state::hotsmash_Z80_mcu_r(address_space &space, offs_t offset, 
 	return m_fromMCU;
 }
 
-CUSTOM_INPUT_MEMBER(superqix_state::pbillian_semaphore_input_r)
+ioport_value superqix_state::pbillian_semaphore_input_r(ioport_field &field, void *param)
 {
 	int res = 0;
 	/* bit 0x40 is PROBABLY latch 1 on 74ls74.7c, is high if m_Z80HasWritten is clear */

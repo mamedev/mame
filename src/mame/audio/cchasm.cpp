@@ -22,7 +22,7 @@ void cchasm_state::reset_coin_flag_w(address_space &space, offs_t offset, uint8_
 	}
 }
 
-INPUT_CHANGED_MEMBER(cchasm_state::set_coin_flag )
+void cchasm_state::set_coin_flag(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (!newval && !m_coin_flag)
 	{

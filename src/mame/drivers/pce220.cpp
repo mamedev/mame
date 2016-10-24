@@ -97,8 +97,8 @@ public:
 	void irq_ack_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void irq_mask_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void palette_init_pce220(palette_device &palette);
-	DECLARE_INPUT_CHANGED_MEMBER(kb_irq);
-	DECLARE_INPUT_CHANGED_MEMBER(on_irq);
+	void kb_irq(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void on_irq(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	void pce220_timer_callback(timer_device &timer, void *ptr, int32_t param);
 };
 
@@ -621,7 +621,7 @@ static ADDRESS_MAP_START( pcg850v_io , AS_IO, 8, pcg850v_state)
 	AM_RANGE(0x69, 0x69) AM_READWRITE(g850v_bank_r, g850v_bank_w)
 ADDRESS_MAP_END
 
-INPUT_CHANGED_MEMBER(pce220_state::kb_irq)
+void pce220_state::kb_irq(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (m_irq_mask & IRQ_FLAG_KEY)
 	{
@@ -631,7 +631,7 @@ INPUT_CHANGED_MEMBER(pce220_state::kb_irq)
 	}
 }
 
-INPUT_CHANGED_MEMBER(pce220_state::on_irq)
+void pce220_state::on_irq(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (m_irq_mask & IRQ_FLAG_ON)
 	{

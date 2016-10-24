@@ -248,8 +248,8 @@ public:
 	void gamecom_scanline(void *ptr, int32_t param);
 	void gamecom_handle_dma(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void gamecom_update_timers(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( gamecom_cart1 );
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( gamecom_cart2 );
+	image_init_result device_image_load_gamecom_cart1(device_image_interface &image);
+	image_init_result device_image_load_gamecom_cart2(device_image_interface &image);
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 private:
 	uint8_t *m_p_ram;

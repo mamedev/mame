@@ -97,8 +97,8 @@ public:
 	void galastrm_input_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	uint32_t galastrm_adstick_ctrl_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);
 	void galastrm_adstick_ctrl_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
-	DECLARE_CUSTOM_INPUT_MEMBER(frame_counter_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(coin_word_r);
+	ioport_value frame_counter_r(ioport_field &field, void *param);
+	ioport_value coin_word_r(ioport_field &field, void *param);
 	virtual void video_start() override;
 	uint32_t screen_update_galastrm(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void galastrm_interrupt(device_t &device);

@@ -46,7 +46,7 @@ public:
 	void llander_snd_reset_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void llander_sounds_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_CUSTOM_INPUT_MEMBER(clock_r);
+	ioport_value clock_r(ioport_field &field, void *param);
 
 	void asteroid_interrupt(device_t &device);
 	void asterock_interrupt(device_t &device);

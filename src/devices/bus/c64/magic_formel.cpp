@@ -115,10 +115,10 @@ machine_config_constructor c64_magic_formel_cartridge_device::device_mconfig_add
 
 
 //-------------------------------------------------
-//  INPUT_CHANGED_MEMBER( freeze )
+//  void freeze(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 //-------------------------------------------------
 
-INPUT_CHANGED_MEMBER( c64_magic_formel_cartridge_device::freeze )
+void c64_magic_formel_cartridge_device::freeze(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (newval && (!m_u9a && !m_u9b))
 	{

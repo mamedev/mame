@@ -30,7 +30,7 @@ public:
 	void speaker_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void palette_init_tama(palette_device &palette);
-	DECLARE_INPUT_CHANGED_MEMBER(input_changed);
+	void input_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 };
 
 
@@ -101,7 +101,7 @@ void tamag1_state::speaker_w(address_space &space, offs_t offset, uint8_t data, 
 
 ***************************************************************************/
 
-INPUT_CHANGED_MEMBER(tamag1_state::input_changed)
+void tamag1_state::input_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	// inputs are hooked up backwards here, because MCU input
 	// ports are all tied to its interrupt controller

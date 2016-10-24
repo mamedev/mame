@@ -395,7 +395,7 @@ void gaelco3d_state::sound_status_w(address_space &space, offs_t offset, uint16_
  *
  *************************************/
 
-CUSTOM_INPUT_MEMBER(gaelco3d_state::analog_bit_r)
+ioport_value gaelco3d_state::analog_bit_r(ioport_field &field, void *param)
 {
 	int which = (uintptr_t)param;
 	return (m_analog_ports[which] >> 7) & 0x01;

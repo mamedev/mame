@@ -21,7 +21,7 @@ void xxmissio_state::bank_sel_w(address_space &space, offs_t offset, uint8_t dat
 	membank("bank1")->set_entry(data & 7);
 }
 
-CUSTOM_INPUT_MEMBER(xxmissio_state::status_r)
+ioport_value xxmissio_state::status_r(ioport_field &field, void *param)
 {
 	int bit_mask = (uintptr_t)param;
 	return (m_status & bit_mask) ? 1 : 0;

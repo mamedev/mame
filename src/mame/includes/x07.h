@@ -188,10 +188,10 @@ public:
 	uint8_t x07_io_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void x07_io_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_INPUT_CHANGED_MEMBER( kb_keys );
-	DECLARE_INPUT_CHANGED_MEMBER( kb_func_keys );
-	DECLARE_INPUT_CHANGED_MEMBER( kb_break );
-	DECLARE_INPUT_CHANGED_MEMBER( kb_update_udk );
+	void kb_keys(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void kb_func_keys(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void kb_break(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void kb_update_udk(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 	void init_x07();
 	void nvram_init(nvram_device &nvram, void *data, size_t size);
@@ -213,7 +213,7 @@ public:
 	inline void draw_point(uint8_t x, uint8_t y, uint8_t color);
 	inline void draw_udk();
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( x07_card );
+	image_init_result device_image_load_x07_card(device_image_interface &image);
 
 	/* general */
 	uint8_t m_sleep;

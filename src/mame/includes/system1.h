@@ -85,8 +85,8 @@ public:
 	uint8_t system1_videoram_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void system1_videoram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void system1_paletteram_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_CUSTOM_INPUT_MEMBER(dakkochn_mux_data_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(dakkochn_mux_status_r);
+	ioport_value dakkochn_mux_data_r(ioport_field &field, void *param);
+	ioport_value dakkochn_mux_status_r(ioport_field &field, void *param);
 	void sound_control_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
 	void init_bank00();

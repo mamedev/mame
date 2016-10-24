@@ -454,9 +454,9 @@ public:
 				, m_smpc_nv(*this, "smpc_nv")
 	{ }
 
-	DECLARE_INPUT_CHANGED_MEMBER(nmi_reset);
-	DECLARE_INPUT_CHANGED_MEMBER(tray_open);
-	DECLARE_INPUT_CHANGED_MEMBER(tray_close);
+	void nmi_reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void tray_open(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void tray_close(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 	void machine_start_saturn();
 	void machine_reset_saturn();
@@ -542,7 +542,7 @@ ADDRESS_MAP_END
 
 
 
-INPUT_CHANGED_MEMBER(sat_console_state::nmi_reset)
+void sat_console_state::nmi_reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	/* TODO: correct? */
 	if(!m_NMI_reset)
@@ -553,13 +553,13 @@ INPUT_CHANGED_MEMBER(sat_console_state::nmi_reset)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-INPUT_CHANGED_MEMBER(sat_console_state::tray_open)
+void sat_console_state::tray_open(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if(newval)
 		stvcd_set_tray_open();
 }
 
-INPUT_CHANGED_MEMBER(sat_console_state::tray_close)
+void sat_console_state::tray_close(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if(newval)
 		stvcd_set_tray_close();

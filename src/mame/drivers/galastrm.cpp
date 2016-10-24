@@ -93,12 +93,12 @@ void galastrm_state::galastrm_tc0610_1_w(address_space &space, offs_t offset, ui
 }
 
 
-CUSTOM_INPUT_MEMBER(galastrm_state::frame_counter_r)
+ioport_value galastrm_state::frame_counter_r(ioport_field &field, void *param)
 {
 	return m_frame_counter;
 }
 
-CUSTOM_INPUT_MEMBER(galastrm_state::coin_word_r)
+ioport_value galastrm_state::coin_word_r(ioport_field &field, void *param)
 {
 	return m_coin_word;
 }

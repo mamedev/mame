@@ -237,8 +237,8 @@ public:
 	int ef3_r();
 	int ef4_r();
 	void q_w(int state);
-	DECLARE_INPUT_CHANGED_MEMBER( reset_w );
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( studio2_cart_load );
+	void reset_w(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	image_init_result device_image_load_studio2_cart_load(device_image_interface &image);
 
 	/* keyboard state */
 	uint8_t m_keylatch;
@@ -360,7 +360,7 @@ ADDRESS_MAP_END
 
 /* Input Ports */
 
-INPUT_CHANGED_MEMBER( studio2_state::reset_w )
+void studio2_state::reset_w(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (oldval && !newval)
 	{
@@ -526,7 +526,7 @@ void mpt02_state::machine_reset()
 	m_cti->reset();
 }
 
-DEVICE_IMAGE_LOAD_MEMBER( studio2_state, studio2_cart_load )
+image_init_result studio2_state::device_image_load_studio2_cart_load(device_image_interface &image)
 {
 	uint32_t size;
 

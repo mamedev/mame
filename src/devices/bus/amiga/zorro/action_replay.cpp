@@ -142,7 +142,7 @@ void action_replay_device::device_reset()
 //  IMPLEMENTATION
 //**************************************************************************
 
-INPUT_CHANGED_MEMBER( action_replay_device::freeze )
+void action_replay_device::freeze(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	// pushing the freeze button generates an nmi
 	m_slot->ipl_w(newval == 1 ? 7 : 0);

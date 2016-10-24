@@ -41,8 +41,8 @@ public:
 	void scroll_y_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void gfxbank_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_INPUT_CHANGED_MEMBER(left_coin_inserted);
-	DECLARE_INPUT_CHANGED_MEMBER(right_coin_inserted);
+	void left_coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void right_coin_inserted(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	void vblank_interrupt(device_t &device);
 
 	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);

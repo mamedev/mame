@@ -107,7 +107,7 @@ public:
 
 	void exelv_hblank_interrupt(timer_device &timer, void *ptr, int32_t param);
 
-	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( exelvision_cartridge );
+	image_init_result device_image_load_exelvision_cartridge(device_image_interface &image);
 };
 
 

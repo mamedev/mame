@@ -32,8 +32,8 @@ public:
 	void pleiads_videoreg_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void phoenix_scroll_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	uint8_t survival_input_port_0_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
-	DECLARE_CUSTOM_INPUT_MEMBER(player_input_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(pleiads_protection_r);
+	ioport_value player_input_r(ioport_field &field, void *param);
+	ioport_value pleiads_protection_r(ioport_field &field, void *param);
 	void init_condor();
 	void init_vautourza();
 	void get_fg_tile_info(tilemap_t &tilemap, tile_data &tileinfo, tilemap_memory_index tile_index);

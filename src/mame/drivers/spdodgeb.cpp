@@ -266,7 +266,7 @@ static ADDRESS_MAP_START( spdodgeb_sound_map, AS_PROGRAM, 8, spdodgeb_state )
 ADDRESS_MAP_END
 
 
-CUSTOM_INPUT_MEMBER(spdodgeb_state::mcu63705_busy_r)
+ioport_value spdodgeb_state::mcu63705_busy_r(ioport_field &field, void *param)
 {
 	m_toggle ^= 0x01;
 	return m_toggle;

@@ -365,7 +365,7 @@ void artmagic_state::stonebal_protection()
 }
 
 
-CUSTOM_INPUT_MEMBER(artmagic_state::prot_r)
+ioport_value artmagic_state::prot_r(ioport_field &field, void *param)
 {
 	return m_prot_output_bit;
 }

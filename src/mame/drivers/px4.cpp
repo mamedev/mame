@@ -108,7 +108,7 @@ public:
 	void swr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void ioctlr_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 
-	DECLARE_INPUT_CHANGED_MEMBER( key_callback );
+	void key_callback(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 
 	void ext_cassette_read(timer_device &timer, void *ptr, int32_t param);
 	void frc_tick(timer_device &timer, void *ptr, int32_t param);
@@ -1064,7 +1064,7 @@ void px4_state::upd7508_1sec_callback(timer_device &timer, void *ptr, int32_t pa
 	m_time.set(m_time.time + 1);
 }
 
-INPUT_CHANGED_MEMBER( px4_state::key_callback )
+void px4_state::key_callback(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	uint32_t oldvalue = oldval * field.mask(), newvalue = newval * field.mask();
 	uint32_t delta = oldvalue ^ newvalue;

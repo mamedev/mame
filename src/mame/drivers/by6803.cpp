@@ -59,8 +59,8 @@ public:
 	void pia0_ca2_w(int state);
 	void pia0_cb2_w(int state);
 	void pia1_cb2_w(int state);
-	DECLARE_INPUT_CHANGED_MEMBER(activity_test);
-	DECLARE_INPUT_CHANGED_MEMBER(self_test);
+	void activity_test(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void self_test(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	void pia0_timer(timer_device &timer, void *ptr, int32_t param);
 private:
 	uint8_t m_pia0_a;
@@ -151,13 +151,13 @@ static INPUT_PORTS_START( by6803 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_CODE(KEYCODE_STOP)
 INPUT_PORTS_END
 
-INPUT_CHANGED_MEMBER( by6803_state::activity_test )
+void by6803_state::activity_test(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if(newval)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-INPUT_CHANGED_MEMBER( by6803_state::self_test )
+void by6803_state::self_test(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_pia0->ca1_w(newval);
 }

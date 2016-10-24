@@ -59,9 +59,9 @@ public:
 	uint8_t ppi_pa_r(address_space &space, offs_t offset, uint8_t mem_mask = 0xff);
 	void ppi_pb_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void ppi_pc_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
-	DECLARE_INPUT_CHANGED_MEMBER( trigger_nmi );
-	DECLARE_INPUT_CHANGED_MEMBER( trigger_irq );
-	DECLARE_INPUT_CHANGED_MEMBER( trigger_res );
+	void trigger_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void trigger_irq(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
+	void trigger_res(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	offs_t mpf1_direct_update_handler(direct_read_data &direct, offs_t address);
 
 	int m_break;

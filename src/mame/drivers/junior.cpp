@@ -50,7 +50,7 @@ public:
 	uint8_t m_led_time[6];
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_INPUT_CHANGED_MEMBER(junior_reset);
+	void junior_reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	void junior_update_leds(timer_device &timer, void *ptr, int32_t param);
 	required_device<cpu_device> m_maincpu;
 };
@@ -68,7 +68,7 @@ static ADDRESS_MAP_START(junior_mem, AS_PROGRAM, 8, junior_state)
 ADDRESS_MAP_END
 
 
-INPUT_CHANGED_MEMBER(junior_state::junior_reset)
+void junior_state::junior_reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (newval == 0)
 		m_maincpu->reset();

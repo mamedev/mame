@@ -91,7 +91,7 @@ public:
 	void init_palmz22();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_INPUT_CHANGED_MEMBER(palmz22_input_changed);
+	void palmz22_input_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval);
 	inline void verboselog(int n_level, const char *s_fmt, ...) ATTR_PRINTF(3,4);
 	void s3c2410_nand_command_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
 	void s3c2410_nand_address_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask = 0xff);
@@ -235,7 +235,7 @@ uint32_t palmz22_state::s3c2410_adc_data_r(address_space &space, offs_t offset, 
 
 // INPUT
 
-INPUT_CHANGED_MEMBER(palmz22_state::palmz22_input_changed)
+void palmz22_state::palmz22_input_changed(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	if (((int)(uintptr_t)param) == 0)
 	{

@@ -128,7 +128,7 @@ public:
 	void gaelco3d_render_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
 	void gaelco3d_paletteram_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask = 0xffff);
 	void gaelco3d_paletteram_020_w(address_space &space, offs_t offset, uint32_t data, uint32_t mem_mask = 0xffffffff);
-	DECLARE_CUSTOM_INPUT_MEMBER(analog_bit_r);
+	ioport_value analog_bit_r(ioport_field &field, void *param);
 	void ser_irq(int state);
 	uint16_t eeprom_data_r(address_space &space, offs_t offset, uint16_t mem_mask = 0xffff);
 	uint32_t eeprom_data32_r(address_space &space, offs_t offset, uint32_t mem_mask = 0xffffffff);

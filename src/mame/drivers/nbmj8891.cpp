@@ -546,7 +546,7 @@ static ADDRESS_MAP_START( taiwanmb_io_map, AS_IO, 8, nbmj8891_state )
 	AM_RANGE(0xf1, 0xf1) AM_DEVREAD("nb1413m3", nb1413m3_device, dipsw1_r)
 ADDRESS_MAP_END
 
-CUSTOM_INPUT_MEMBER( nbmj8891_state::nb1413m3_busyflag_r )
+ioport_value nbmj8891_state::nb1413m3_busyflag_r(ioport_field &field, void *param)
 {
 	return m_nb1413m3->m_busyflag & 0x01;
 }
@@ -556,7 +556,7 @@ CUSTOM_INPUT_MEMBER( nbmj8891_state::nb1413m3_busyflag_r )
  * However, a few games (lovehous, maiko, mmaiko, hanaoji and the ones using inputport3_r below)
  * read nb1413m3_outcoin_flag also at inputport3! Is this the correct behaviour for these games
  * or should they only check the flag at inputport3? */
-CUSTOM_INPUT_MEMBER( nbmj8891_state::nb1413m3_outcoin_flag_r )
+ioport_value nbmj8891_state::nb1413m3_outcoin_flag_r(ioport_field &field, void *param)
 {
 	return m_nb1413m3->m_outcoin_flag & 0x01;
 }

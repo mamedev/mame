@@ -38,7 +38,7 @@ const device_type SMS_PADDLE = &device_creator<sms_paddle_device>;
 #define PADDLE_INTERVAL attotime::from_hz(XTAL_10_738635MHz/3/100)
 
 
-CUSTOM_INPUT_MEMBER( sms_paddle_device::rldu_pins_r )
+ioport_value sms_paddle_device::rldu_pins_r(ioport_field &field, void *param)
 {
 	uint8_t data = m_paddle_x->read();
 

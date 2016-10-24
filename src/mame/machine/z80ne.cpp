@@ -355,7 +355,7 @@ void z80ne_state::machine_reset_z80netf()
 	reset_lx388();
 }
 
-INPUT_CHANGED_MEMBER(z80ne_state::z80ne_reset)
+void z80ne_state::z80ne_reset(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	uint8_t rst;
 	rst = m_io_rst->read();
@@ -366,7 +366,7 @@ INPUT_CHANGED_MEMBER(z80ne_state::z80ne_reset)
 	}
 }
 
-INPUT_CHANGED_MEMBER(z80ne_state::z80ne_nmi)
+void z80ne_state::z80ne_nmi(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	uint8_t nmi;
 	nmi = m_io_lx388_brk->read();

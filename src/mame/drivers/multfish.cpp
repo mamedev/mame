@@ -351,7 +351,7 @@ uint8_t igrosoft_gamble_state::ray_r(address_space &space, offs_t offset, uint8_
 	return m_screen->vpos();
 }
 
-CUSTOM_INPUT_MEMBER(igrosoft_gamble_state::igrosoft_gamble_hopper_r)
+ioport_value igrosoft_gamble_state::igrosoft_gamble_hopper_r(ioport_field &field, void *param)
 {
 	if ( m_hopper_motor != 0 )
 	{

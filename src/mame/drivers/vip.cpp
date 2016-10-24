@@ -394,7 +394,7 @@ ADDRESS_MAP_END
 //  INPUT_PORTS( vip )
 //-------------------------------------------------
 
-INPUT_CHANGED_MEMBER( vip_state::reset_w )
+void vip_state::reset_w(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_exp->run_w(newval);
 
@@ -404,7 +404,7 @@ INPUT_CHANGED_MEMBER( vip_state::reset_w )
 	}
 }
 
-INPUT_CHANGED_MEMBER( vip_state::beeper_w )
+void vip_state::beeper_w(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 {
 	m_beeper->set_output_gain(0, newval ? 0.80 : 0);
 }
