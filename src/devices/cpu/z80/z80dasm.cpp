@@ -413,18 +413,16 @@ static int offs(int8_t offset)
 /****************************************************************************
  * Disassemble opcode at PC and return number of bytes it takes
  ****************************************************************************/
-CPU_DISASSEMBLE( z80 )
+static offs_t internal_disasm_z80(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
 {
 	const z80dasm *d;
 	const char *src, *ixy;
-	char *dst;
 	int8_t offset = 0;
 	uint8_t op, op1 = 0;
 	uint16_t ea;
 	int pos = 0;
 
 	ixy = "oops!!";
-	dst = buffer;
 
 	op = oprom[pos++];
 
@@ -467,66 +465,75 @@ CPU_DISASSEMBLE( z80 )
 
 	if( d->arguments )
 	{
-		dst += sprintf(dst, "%-4s ", s_mnemonic[d->mnemonic]);
+		util::stream_format(stream, "%-4s ", s_mnemonic[d->mnemonic]);
 		src = d->arguments;
 		while( *src )
 		{
 			switch( *src )
 			{
 			case '?':   /* illegal opcode */
-				dst += sprintf( dst, "$%02x,$%02x", op, op1 );
+				util::stream_format(stream, "$%02x,$%02x", op, op1 );
 				break;
 			case 'A':
 				ea = opram[pos+0] + ( opram[pos+1] << 8 );
 				pos += 2;
-				dst += sprintf( dst, "$%04X", ea );
+				util::stream_format(stream, "$%04X", ea );
 				break;
 			case 'B':   /* Byte op arg */
 				ea = opram[pos++];
-				dst += sprintf( dst, "$%02X", ea );
+				util::stream_format(stream, "$%02X", ea );
 				break;
 			case 'N':   /* Immediate 16 bit */
 				ea = opram[pos+0] + ( opram[pos+1] << 8 );
 				pos += 2;
-				dst += sprintf( dst, "$%04X", ea );
+				util::stream_format(stream, "$%04X", ea );
 				break;
 			case 'O':   /* Offset relative to PC */
 				offset = (int8_t) opram[pos++];
-				dst += sprintf( dst, "$%04X", (pc + offset + 2) & 0xffff );
+				util::stream_format(stream, "$%04X", (pc + offset + 2) & 0xffff);
 				break;
 			case 'P':   /* Port number */
 				ea = opram[pos++];
-				dst += sprintf( dst, "$%02X", ea );
+				util::stream_format(stream, "$%02X", ea );
 				break;
 			case 'V':   /* Restart vector */
 				ea = op & 0x38;
-				dst += sprintf( dst, "$%02X", ea );
+				util::stream_format(stream, "$%02X", ea );
 				break;
 			case 'W':   /* Memory address word */
 				ea = opram[pos+0] + ( opram[pos+1] << 8 );
 				pos += 2;
-				dst += sprintf( dst, "$%04X", ea );
+				util::stream_format(stream, "$%04X", ea );
 				break;
 			case 'X':
 				offset = (int8_t) opram[pos++];
 				/* fall through */
 			case 'Y':
-				dst += sprintf( dst,"(%s%c$%02x)", ixy, sign(offset), offs(offset) );
+				util::stream_format(stream,"(%s%c$%02x)", ixy, sign(offset), offs(offset) );
 				break;
 			case 'I':
-				dst += sprintf( dst, "%s", ixy);
+				util::stream_format(stream, "%s", ixy);
 				break;
 			default:
-				*dst++ = *src;
+				stream << *src;
 			}
 			src++;
 		}
-		*dst = '\0';
 	}
 	else
 	{
-		dst += sprintf(dst, "%s", s_mnemonic[d->mnemonic]);
+		util::stream_format(stream, "%s", s_mnemonic[d->mnemonic]);
 	}
 
 	return pos | s_flags[d->mnemonic] | DASMFLAG_SUPPORTED;
+}
+
+
+CPU_DISASSEMBLE(z80)
+{
+	std::ostringstream stream;
+	offs_t result = internal_disasm_z80(device, stream, pc, oprom, opram, options);
+	std::string stream_str = stream.str();
+	strcpy(buffer, stream_str.c_str());
+	return result;
 }
