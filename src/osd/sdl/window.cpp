@@ -298,7 +298,7 @@ void sdl_window_info::toggle_full_screen()
 	machine().ui().menu_reset();
 	// kill off the drawers
 	renderer_reset();
-//	set_platform_window(nullptr);
+//  set_platform_window(nullptr);
 	bool is_osx = false;
 #ifdef SDLMAME_MACOSX
 	// FIXME: This is weird behaviour and certainly a bug in SDL
