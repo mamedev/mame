@@ -802,7 +802,7 @@ Game cartridges
             <feature name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
-                <rom name="c92674-1.u1" size="8388608" crc="69b535f2" sha1="7785e4e92a0edbb90fd0e0a4f2de3afafae5e957" offset="0" />
+                <rom name="C92674-1.u1" size="8388608" crc="69b535f2" sha1="7785e4e92a0edbb90fd0e0a4f2de3afafae5e957" offset="0" />
             </dataarea>
         </part>
     </software>
@@ -1131,7 +1131,7 @@ Game cartridges
             <feature name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
-                <rom name="90024 ok.u1" size="8388608" crc="8358af57" sha1="f7886adb508413584df1abfc8bde68c830b3e487" offset="0" />
+                <rom name="90024 OK.u1" size="8388608" crc="8358af57" sha1="f7886adb508413584df1abfc8bde68c830b3e487" offset="0" />
             </dataarea>
         </part>
     </software>
@@ -1227,7 +1227,7 @@ Game cartridges
             <feature name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
-                <rom name="90164 ok.u1" size="8388608" crc="bf531c68" sha1="00c3a04282f3d1eb517fc6eb8c4af413bcb9587b" offset="0" />
+                <rom name="90164 OK.u1" size="8388608" crc="bf531c68" sha1="00c3a04282f3d1eb517fc6eb8c4af413bcb9587b" offset="0" />
             </dataarea>
         </part>
     </software>
@@ -1243,7 +1243,7 @@ Game cartridges
             <feature name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
-                <rom name="90144 ok.u1" size="8388608" crc="501a4c33" sha1="ebd3e8acd9e1e53409544b847cf508d75a8a0012" offset="0" />
+                <rom name="90144 OK.u1" size="8388608" crc="501a4c33" sha1="ebd3e8acd9e1e53409544b847cf508d75a8a0012" offset="0" />
             </dataarea>
         </part>
     </software>
@@ -1259,7 +1259,7 @@ Game cartridges
             <feature name="cart_type" value="lilac" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
-                <rom name="a90154.u1" size="8388608" crc="b1cf55cf" sha1="654b104e2ad8414a29db70bb9e07873b8eca8645" offset="0" />
+                <rom name="A90154.u1" size="8388608" crc="b1cf55cf" sha1="654b104e2ad8414a29db70bb9e07873b8eca8645" offset="0" />
             </dataarea>
         </part>
     </software>
@@ -1833,7 +1833,7 @@ Game cartridges
             <feature name="u2" value="U2" /> <!-- SRAM -->
             <feature name="u3" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="4194304">
-                <rom name="ger-509.u3" size="4194304" crc="ae5f4fe2" sha1="1c5428da7464182e6ee0585d1ebc211f91667238" offset="0" />
+                <rom name="GER-509.u3" size="4194304" crc="ae5f4fe2" sha1="1c5428da7464182e6ee0585d1ebc211f91667238" offset="0" />
             </dataarea>
             <dataarea name="vram" size="131072">
             </dataarea>

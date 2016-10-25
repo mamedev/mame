@@ -251,7 +251,7 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
             <feature name="pcb_model" value="708201-7" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
-                <rom name="c84604.u1" size="8388608" crc="0229cf3a" sha1="9c08e6370ecf08992924f067b64dd1950e3a2c6c" offset="0" />
+                <rom name="C84604.u1" size="8388608" crc="0229cf3a" sha1="9c08e6370ecf08992924f067b64dd1950e3a2c6c" offset="0" />
             </dataarea>
         </part>
     </software>
@@ -266,7 +266,7 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
             <feature name="pcb_model" value="708201-4" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
-                <rom name="84124 ok.u1" size="8388608" crc="16493095" sha1="07c75e46c294901ee9309d98c925a39dc1b5e384" offset="0" />
+                <rom name="84124 OK.u1" size="8388608" crc="16493095" sha1="07c75e46c294901ee9309d98c925a39dc1b5e384" offset="0" />
             </dataarea>
         </part>
     </software>
@@ -281,7 +281,7 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
             <feature name="pcb_model" value="708201-4" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
-                <rom name="84024 ok.u1" size="8388608" crc="6769cb8b" sha1="615177d959983cdb67acdb8f3be063b3d09cb5db" offset="0" />
+                <rom name="84024 OK.u1" size="8388608" crc="6769cb8b" sha1="615177d959983cdb67acdb8f3be063b3d09cb5db" offset="0" />
             </dataarea>
         </part>
     </software>
@@ -308,7 +308,7 @@ Smartbooks currently have no dumps available, hence they are temporarily listed 
             <feature name="pcb_model" value="708201-7" />
             <feature name="u1" value="" /> <!-- EPOXY BLOB ROM -->
             <dataarea name="rom" size="8388608">
-                <rom name="c84324.u1" size="8388608" crc="9e207566" sha1="bb3e180a2c69306b56f08909a05dc83309be0f09" offset="0" />
+                <rom name="C84324.u1" size="8388608" crc="9e207566" sha1="bb3e180a2c69306b56f08909a05dc83309be0f09" offset="0" />
             </dataarea>
         </part>
     </software>
