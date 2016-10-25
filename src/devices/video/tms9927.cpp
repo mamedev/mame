@@ -316,9 +316,7 @@ void tms9927_device::recompute_parameters(bool postload)
 
 	refresh = HZ_TO_ATTOSECONDS(m_clock) * m_total_hpix * m_total_vpix;
 
-	m_screen->configure(m_overscan_left+m_total_hpix+m_overscan_right, 
-	                    m_overscan_top+m_total_vpix+m_overscan_bottom,
-	                    visarea, refresh);
+	m_screen->configure(m_total_hpix, m_total_vpix, visarea, refresh);
 
 	m_vsyn = 0;
 	m_vsync_timer->adjust(m_screen->time_until_pos(0, 0));
