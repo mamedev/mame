@@ -23,45 +23,70 @@
 #include "includes/tranz330.h"
 #include "tranz330.lh"
 
-static ADDRESS_MAP_START( tranz330_mem, AS_PROGRAM, 8, tranz330_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xffff) AM_RAM
-ADDRESS_MAP_END
+static void construct_address_map_tranz330_mem(address_map &map, device_t &device)
+{
+	map.configure(AS_PROGRAM, 8);
 
-static ADDRESS_MAP_START( tranz330_io, AS_IO, 8, tranz330_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE(PIO_TAG, z80pio_device, read_alt, write_alt)
-	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE(CTC_TAG, z80ctc_device, read, write)
-	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE(DART_TAG, z80dart_device, ba_cd_r, ba_cd_w)
-	AM_RANGE(0x30, 0x3f) AM_DEVREADWRITE(RTC_TAG, msm6242_device, read, write)
-ADDRESS_MAP_END
+	address_map_entry8 *curentry = nullptr;
+	curentry = map.add(device, 0x0000, 0x7fff, curentry);
+	curentry->set_read_type(AMH_ROM);
 
+	curentry = map.add(device, 0x8000, 0xffff, curentry);
+	curentry->set_read_type(AMH_RAM);
+	curentry->set_write_type(AMH_RAM);
+}
 
-static INPUT_PORTS_START( tranz330 )
-	PORT_START("COL.0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CODE(KEYCODE_1)           PORT_NAME("1 QZ.")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CODE(KEYCODE_4)           PORT_NAME("4 GHI")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(KEYCODE_7)           PORT_NAME("7 PRS")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_CODE(KEYCODE_ASTERISK)    PORT_NAME("* ,'\"")
+static void construct_address_map_tranz330_io(address_map &map, device_t &device)
+{
+	map.configure(AS_IO, 8);
+	map.set_global_mask(0xff);
 
-	PORT_START("COL.1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CODE(KEYCODE_2)           PORT_NAME("2 ABC")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_CODE(KEYCODE_5)           PORT_NAME("5 JKL")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_CODE(KEYCODE_8)           PORT_NAME("8 TUV")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_CODE(KEYCODE_0)           PORT_NAME("0 -SP")
+	address_map_entry8 *curentry = nullptr;
+	curentry = map.add(device, 0x00, 0x03, curentry);
+	curentry->set_handler(read8_delegate(&z80pio_device::read_alt,  "z80pio_device::read_alt",  PIO_TAG, (z80pio_device *)nullptr),
+						 write8_delegate(&z80pio_device::write_alt, "z80pio_device::write_alt", PIO_TAG, (z80pio_device *)nullptr));
 
-	PORT_START("COL.2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_CODE(KEYCODE_3)           PORT_NAME("3 DEF")
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_CODE(KEYCODE_6)          PORT_NAME("6 MNO")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_CODE(KEYCODE_9)          PORT_NAME("9 WXY")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON13 ) PORT_CODE(KEYCODE_H)          PORT_NAME("#") // KEYCODE_H for 'hash mark'
+	curentry = map.add(device, 0x10, 0x13, curentry);
+	curentry->set_handler(read8_delegate(&z80ctc_device::read,  "z80ctc_device::read",  CTC_TAG, (z80ctc_device *)nullptr),
+						 write8_delegate(&z80ctc_device::write, "z80ctc_device::write", CTC_TAG, (z80ctc_device *)nullptr));
 
-	PORT_START("COL.3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON14 ) PORT_CODE(KEYCODE_C)          PORT_NAME("CLEAR") // KEYCODE_C so as to not collide with potentially-used UI keys
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON15 ) PORT_CODE(KEYCODE_BACKSPACE)  PORT_NAME("BACK SPACE")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON16 ) PORT_CODE(KEYCODE_A)          PORT_NAME("ALPHA")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 ) PORT_CODE(KEYCODE_ENTER)        PORT_NAME("FUNC | ENTER")
-INPUT_PORTS_END
+	curentry = map.add(device, 0x20, 0x23, curentry);
+	curentry->set_handler(read8_delegate(&z80dart_device::ba_cd_r, "z80dart_device::ba_cd_r", DART_TAG, (z80dart_device *)nullptr),
+						 write8_delegate(&z80dart_device::ba_cd_w, "z80dart_device::ba_cd_w", DART_TAG, (z80dart_device *)nullptr));
+
+	curentry = map.add(device, 0x30, 0x3f, curentry);
+	curentry->set_handler(read8_delegate(&msm6242_device::read,  "msm6242_device::read",  RTC_TAG, (msm6242_device *)nullptr),
+						 write8_delegate(&msm6242_device::write, "msm6242_device::write", RTC_TAG, (msm6242_device *)nullptr));
+}
+
+static void construct_ioport_tranz330(device_t &owner, ioport_list &portlist, std::string &errorbuf)
+{
+	ioport_configurer configurer(owner, portlist, errorbuf);
+
+	configurer.port_alloc("COL.0");
+	configurer.field_alloc(IPT_BUTTON1, IP_ACTIVE_LOW, 0x01).field_add_code(SEQ_TYPE_STANDARD, KEYCODE_1).field_set_name("1 QZ.");
+	configurer.field_alloc(IPT_BUTTON2, IP_ACTIVE_LOW, 0x02).field_add_code(SEQ_TYPE_STANDARD, KEYCODE_4).field_set_name("4 GHI");
+	configurer.field_alloc(IPT_BUTTON3, IP_ACTIVE_LOW, 0x04).field_add_code(SEQ_TYPE_STANDARD, KEYCODE_7).field_set_name("7 PRS");
+	configurer.field_alloc(IPT_BUTTON4, IP_ACTIVE_LOW, 0x08).field_add_code(SEQ_TYPE_STANDARD, KEYCODE_ASTERISK).field_set_name("* ,'\"");
+
+	configurer.port_alloc("COL.1");
+	configurer.field_alloc(IPT_BUTTON5, IP_ACTIVE_LOW, 0x01).field_add_code(SEQ_TYPE_STANDARD, KEYCODE_2).field_set_name("2 ABC");
+	configurer.field_alloc(IPT_BUTTON6, IP_ACTIVE_LOW, 0x02).field_add_code(SEQ_TYPE_STANDARD, KEYCODE_5).field_set_name("5 JKL");
+	configurer.field_alloc(IPT_BUTTON7, IP_ACTIVE_LOW, 0x04).field_add_code(SEQ_TYPE_STANDARD, KEYCODE_8).field_set_name("8 TUV");
+	configurer.field_alloc(IPT_BUTTON8, IP_ACTIVE_LOW, 0x08).field_add_code(SEQ_TYPE_STANDARD, KEYCODE_0).field_set_name("0 -SP");
+
+	configurer.port_alloc("COL.2");
+	configurer.field_alloc(IPT_BUTTON9,  IP_ACTIVE_LOW, 0x01).field_add_code(SEQ_TYPE_STANDARD, KEYCODE_3).field_set_name("3 DEF");
+	configurer.field_alloc(IPT_BUTTON10, IP_ACTIVE_LOW, 0x02).field_add_code(SEQ_TYPE_STANDARD, KEYCODE_6).field_set_name("6 MNO");
+	configurer.field_alloc(IPT_BUTTON11, IP_ACTIVE_LOW, 0x04).field_add_code(SEQ_TYPE_STANDARD, KEYCODE_9).field_set_name("9 WXY");
+	configurer.field_alloc(IPT_BUTTON12, IP_ACTIVE_LOW, 0x08).field_add_code(SEQ_TYPE_STANDARD, KEYCODE_H).field_set_name("#");  // KEYCODE_H for 'hash mark'
+
+	configurer.port_alloc("COL.3");
+	configurer.field_alloc(IPT_BUTTON13, IP_ACTIVE_LOW, 0x01).field_add_code(SEQ_TYPE_STANDARD, KEYCODE_C)        .field_set_name("CLEAR"); // KEYCODE_C so as to not collide with potentially-used UI keys like DEL
+	configurer.field_alloc(IPT_BUTTON14, IP_ACTIVE_LOW, 0x02).field_add_code(SEQ_TYPE_STANDARD, KEYCODE_BACKSPACE).field_set_name("BACK SPACE");
+	configurer.field_alloc(IPT_BUTTON15, IP_ACTIVE_LOW, 0x04).field_add_code(SEQ_TYPE_STANDARD, KEYCODE_A)        .field_set_name("ALPHA");
+	configurer.field_alloc(IPT_START1,   IP_ACTIVE_LOW, 0x08).field_add_code(SEQ_TYPE_STANDARD, KEYCODE_ENTER)    .field_set_name("FUNC | ENTER");  // KEYCODE_H for 'hash mark'
+}
 
 
 void tranz330_state::machine_start()
@@ -72,17 +97,17 @@ void tranz330_state::machine_reset()
 {
 }
 
-WRITE_LINE_MEMBER( tranz330_state::syncb_w )
+void tranz330_state::syncb_w(int state)
 {
 }
 
-WRITE_LINE_MEMBER( tranz330_state::sound_w )
+void tranz330_state::sound_w(int state)
 {
 	m_speaker->level_w(state);
 	m_ctc->trg3(state);
 }
 
-WRITE_LINE_MEMBER( tranz330_state::clock_w )
+void tranz330_state::clock_w(int state)
 {
 	// Ch 0 and 1 might be DART Ch A & B baud clocks
 	//m_ctc->trg0(state);
@@ -91,7 +116,7 @@ WRITE_LINE_MEMBER( tranz330_state::clock_w )
 	m_ctc->trg2(state);
 }
 
-READ8_MEMBER( tranz330_state::card_r )
+uint8_t tranz330_state::card_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	// return 0xff for a magstripe 0, return 0x00 for a magstripe 1.
 	// an interrupt should be triggered on the Z80 when magstripe reading begins.
@@ -99,7 +124,7 @@ READ8_MEMBER( tranz330_state::card_r )
 	return 0xff;
 }
 
-WRITE8_MEMBER( tranz330_state::pio_a_w )
+void tranz330_state::pio_a_w(address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 {
 	m_keypad_col_mask = data & 0xf;
 	m_vfd->por ((data >> 4) & 1);
@@ -107,7 +132,7 @@ WRITE8_MEMBER( tranz330_state::pio_a_w )
 	m_vfd->sclk((data >> 6) & 1);
 }
 
-READ8_MEMBER( tranz330_state::pio_b_r )
+uint8_t tranz330_state::pio_b_r(address_space &space, offs_t offset, uint8_t mem_mask)
 {
 	uint8_t input_mask = 0xf;
 	for (int i = 0; i < 4; i++)

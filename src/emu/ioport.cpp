@@ -2997,7 +2997,7 @@ const char *ioport_configurer::string_from_token(const char *string)
 //  port_alloc - allocate a new port
 //-------------------------------------------------
 
-void ioport_configurer::port_alloc(const char *tag)
+ioport_configurer& ioport_configurer::port_alloc(const char *tag)
 {
 	// create the full tag
 	std::string fulltag = m_owner.subtag(tag);
@@ -3008,6 +3008,7 @@ void ioport_configurer::port_alloc(const char *tag)
 	m_curport = m_portlist.find(fulltag)->second.get();
 	m_curfield = nullptr;
 	m_cursetting = nullptr;
+	return *this;
 }
 
 
@@ -3016,7 +3017,7 @@ void ioport_configurer::port_alloc(const char *tag)
 //  modify it
 //-------------------------------------------------
 
-void ioport_configurer::port_modify(const char *tag)
+ioport_configurer& ioport_configurer::port_modify(const char *tag)
 {
 	// create the full tag
 	std::string fulltag = m_owner.subtag(tag);
@@ -3030,6 +3031,7 @@ void ioport_configurer::port_modify(const char *tag)
 	m_curport->m_modcount++;
 	m_curfield = nullptr;
 	m_cursetting = nullptr;
+	return *this;
 }
 
 
@@ -3037,7 +3039,7 @@ void ioport_configurer::port_modify(const char *tag)
 //  field_alloc - allocate a new field
 //-------------------------------------------------
 
-void ioport_configurer::field_alloc(ioport_type type, ioport_value defval, ioport_value mask, const char *name)
+ioport_configurer& ioport_configurer::field_alloc(ioport_type type, ioport_value defval, ioport_value mask, const char *name)
 {
 	// make sure we have a port
 	if (m_curport == nullptr)
@@ -3049,6 +3051,7 @@ void ioport_configurer::field_alloc(ioport_type type, ioport_value defval, iopor
 
 	// reset the current setting
 	m_cursetting = nullptr;
+	return *this;
 }
 
 
@@ -3056,13 +3059,13 @@ void ioport_configurer::field_alloc(ioport_type type, ioport_value defval, iopor
 //  field_add_char - add a character to a field
 //-------------------------------------------------
 
-void ioport_configurer::field_add_char(char32_t ch)
+ioport_configurer& ioport_configurer::field_add_char(char32_t ch)
 {
 	for (int index = 0; index < ARRAY_LENGTH(m_curfield->m_chars); index++)
 		if (m_curfield->m_chars[index] == 0)
 		{
 			m_curfield->m_chars[index] = ch;
-			return;
+			return *this;
 		}
 
 	throw emu_fatalerror("PORT_CHAR(%d) could not be added - maximum amount exceeded\n", ch);
@@ -3073,9 +3076,10 @@ void ioport_configurer::field_add_char(char32_t ch)
 //  field_add_code - add a character to a field
 //-------------------------------------------------
 
-void ioport_configurer::field_add_code(input_seq_type which, input_code code)
+ioport_configurer& ioport_configurer::field_add_code(input_seq_type which, input_code code)
 {
 	m_curfield->m_seq[which] |= code;
+	return *this;
 }
 
 
@@ -3083,7 +3087,7 @@ void ioport_configurer::field_add_code(input_seq_type which, input_code code)
 //  setting_alloc - allocate a new setting
 //-------------------------------------------------
 
-void ioport_configurer::setting_alloc(ioport_value value, const char *name)
+ioport_configurer& ioport_configurer::setting_alloc(ioport_value value, const char *name)
 {
 	// make sure we have a field
 	if (m_curfield == nullptr)
@@ -3092,6 +3096,7 @@ void ioport_configurer::setting_alloc(ioport_value value, const char *name)
 	m_cursetting = global_alloc(ioport_setting(*m_curfield, value & m_curfield->mask(), string_from_token(name)));
 	// append a new setting
 	m_curfield->m_settinglist.append(*m_cursetting);
+	return *this;
 }
 
 
@@ -3100,10 +3105,11 @@ void ioport_configurer::setting_alloc(ioport_value value, const char *name)
 //  the current setting or field
 //-------------------------------------------------
 
-void ioport_configurer::set_condition(ioport_condition::condition_t condition, const char *tag, ioport_value mask, ioport_value value)
+ioport_configurer& ioport_configurer::set_condition(ioport_condition::condition_t condition, const char *tag, ioport_value mask, ioport_value value)
 {
 	ioport_condition &target = (m_cursetting != nullptr) ? m_cursetting->condition() : m_curfield->condition();
 	target.set(condition, tag, mask, value);
+	return *this;
 }
 
 
@@ -3111,7 +3117,7 @@ void ioport_configurer::set_condition(ioport_condition::condition_t condition, c
 //  onoff_alloc - allocate an on/off DIP switch
 //-------------------------------------------------
 
-void ioport_configurer::onoff_alloc(const char *name, ioport_value defval, ioport_value mask, const char *diplocation)
+ioport_configurer& ioport_configurer::onoff_alloc(const char *name, ioport_value defval, ioport_value mask, const char *diplocation)
 {
 	// allocate a field normally
 	field_alloc(IPT_DIPSWITCH, defval, mask, name);
@@ -3132,6 +3138,7 @@ void ioport_configurer::onoff_alloc(const char *name, ioport_value defval, iopor
 	setting_alloc(~defval & mask, DEF_STR(On));
 	// clear cursettings set by setting_alloc
 	m_cursetting = nullptr;
+	return *this;
 }
 
 
