@@ -74,32 +74,34 @@ public:
 	/* Set an input pin */
 	void set_input_pin( ay31015_input_pin_t pin, int data );
 
-
 	/* Get an output pin */
 	int get_output_pin( ay31015_output_pin_t pin );
-
 
 	/* Set a new transmitter clock (new_clock is in Hz) */
 	void set_transmitter_clock( double new_clock );
 
-
 	/* Set a new receiver clock (new_clock is in Hz) */
 	void set_receiver_clock( double new_clock );
-
 
 	/* Reead the received data */
 	/* The received data is available on RD8-RD1 (pins 5-12) */
 	uint8_t get_received_data();
 
-
 	/* Set the transmitter buffer */
 	/* The data to transmit is set on DB1-DB8 (pins 26-33) */
 	void set_transmit_data( uint8_t data );
 
+	void rx_process();
+	void tx_process();
+
 protected:
+	static const device_timer_id TIMER_RX = 0;
+	static const device_timer_id TIMER_TX = 1;
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	virtual void internal_reset();
 
@@ -111,8 +113,6 @@ protected:
 	void transfer_control_pins();
 	inline void update_rx_timer();
 	inline void update_tx_timer();
-	TIMER_CALLBACK_MEMBER(rx_process);
-	TIMER_CALLBACK_MEMBER(tx_process);
 
 	int m_pins[41];
 

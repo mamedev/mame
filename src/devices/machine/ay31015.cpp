@@ -168,10 +168,12 @@ void ay31015_device::device_start()
 	m_write_so_cb.resolve();
 	m_status_changed_cb.resolve();
 
-	m_rx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ay31015_device::rx_process),this));
-	m_tx_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(ay31015_device::tx_process),this));
-
+	m_rx_timer = timer_alloc(TIMER_RX);
+	m_rx_timer->adjust(attotime::never);
 	update_rx_timer();
+
+	m_tx_timer = timer_alloc(TIMER_TX);
+	m_tx_timer->adjust(attotime::never);
 	update_tx_timer();
 
 	save_item(NAME(m_pins));
@@ -265,6 +267,13 @@ void ay31015_device::update_status_pins()
 	}
 }
 
+void ay31015_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	if (id == TIMER_RX)
+		rx_process();
+	else if(id == TIMER_TX)
+		tx_process();
+}
 
 /*************************************************** RECEIVE CONTROLS *************************************************/
 
@@ -273,7 +282,7 @@ void ay31015_device::update_status_pins()
  ay31015_rx_process - convert serial to parallel
 -------------------------------------------------*/
 
-TIMER_CALLBACK_MEMBER( ay31015_device::rx_process )
+void ay31015_device::rx_process()
 {
 	switch (m_rx_state)
 	{
@@ -426,7 +435,7 @@ TIMER_CALLBACK_MEMBER( ay31015_device::rx_process )
  ay31015_tx_process - convert parallel to serial
 -------------------------------------------------*/
 
-TIMER_CALLBACK_MEMBER( ay31015_device::tx_process )
+void ay31015_device::tx_process()
 {
 	uint8_t t1;
 	switch (m_tx_state)
