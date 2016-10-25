@@ -57,13 +57,18 @@
 #include "machine/wd33c93.h"
 #include "machine/ds1386.h"
 #include "machine/z80scc.h"
+#include "bus/rs232/rs232.h"
 
 #define SCC_TAG		"scc"
 #define PI1_TAG		"pi1"
 #define KBDC_TAG	"kbdc"
 #define PIT_TAG		"pit"
 
-#define SCC_CLOCK	XTAL_10MHz
+#define SCC_PCLK	XTAL_10MHz
+#define SCC_RXA_CLK	XTAL_3_6864MHz // Needs verification
+#define SCC_TXA_CLK	0
+#define SCC_RXB_CLK	XTAL_3_6864MHz // Needs verification
+#define SCC_TXB_CLK	0
 
 #define MCFG_IOC2_GUINNESS_ADD(_tag)  \
 	MCFG_DEVICE_ADD(_tag, SGI_IOC2_GUINNESS, 0)
@@ -95,7 +100,7 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 
 	required_device<mips3_device> m_maincpu;
-	required_device<scc85C30_device> m_scc;
+	required_device<scc85230_device> m_scc;
 	required_device<pc_lpt_device> m_pi1; 	// we assume standard parallel port (SPP) mode
 											// TODO: SGI parallel port (SGIPP), HP BOISE high speed parallel port (HPBPP), and Ricoh scanner modes
 	required_device<kbdc8042_device> m_kbdc;
@@ -170,7 +175,29 @@ ioport_constructor ioc2_device::device_input_ports() const
 }
 
 MACHINE_CONFIG_FRAGMENT( ioc2_device )
-	MCFG_SCC85C30_ADD(SCC_TAG, SCC_CLOCK, 0, 0, 0, 0)
+	MCFG_SCC85230_ADD(SCC_TAG, SCC_PCLK, SCC_RXA_CLK, SCC_TXA_CLK, SCC_RXB_CLK, SCC_TXB_CLK)
+
+#if 0  // Why does MAME crash in reset device when I enable this??
+	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_txd))
+	MCFG_Z80SCC_OUT_DTRA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_dtr))
+	MCFG_Z80SCC_OUT_RTSA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_rts))
+
+	MCFG_RS232_PORT_ADD ("rs232a", default_rs232_devices, nullptr)
+	MCFG_RS232_CTS_HANDLER (DEVWRITELINE (SCC_TAG, scc85230_device, ctsa_w))
+	MCFG_RS232_DCD_HANDLER (DEVWRITELINE (SCC_TAG, scc85230_device, dcda_w))
+	MCFG_RS232_RXD_HANDLER (DEVWRITELINE (SCC_TAG, scc85230_device, rxa_w))
+#endif
+
+#if 1
+	MCFG_Z80SCC_OUT_TXDB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_txd))
+	MCFG_Z80SCC_OUT_DTRB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_dtr))
+	MCFG_Z80SCC_OUT_RTSB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_rts))
+
+	MCFG_RS232_PORT_ADD ("rs232b", default_rs232_devices, nullptr)
+	MCFG_RS232_CTS_HANDLER (DEVWRITELINE (SCC_TAG, scc85230_device, ctsb_w))
+	MCFG_RS232_DCD_HANDLER (DEVWRITELINE (SCC_TAG, scc85230_device, dcdb_w))
+	MCFG_RS232_RXD_HANDLER (DEVWRITELINE (SCC_TAG, scc85230_device, rxb_w))
+#endif
 
 	MCFG_DEVICE_ADD(PI1_TAG, PC_LPT, 0)
 
@@ -424,7 +451,7 @@ WRITE32_MEMBER( ioc2_device::write )
 		case 0x34/4: // Serial Port1 Data Transfer
 		case 0x38/4: // Serial Port2 Command Transfer
 		case 0x3c/4: // Serial Port2 Data Transfer
-			m_scc->ba_cd_w(space, (offset - 0x30/4) ^ 1, data & 0xff);
+			m_scc->ba_cd_w(space, (offset - 0x30/4) ^ 3, data & 0xff);
 			return;
 
 		case 0x40/4: // Keyboard/Mouse Registers
@@ -452,9 +479,10 @@ WRITE32_MEMBER( ioc2_device::write )
 				if (diff & DMA_SEL_CLOCK_SEL_EXT)
 				{
 					printf("External clock select %sselected\n", (old & DMA_SEL_CLOCK_SEL_EXT) != 0 ? "de" : "");
+					// TODO: verify the external Rx/Tx clock, is it fixed or programmable?
 				}
 			}
-			// TODO: Currently we always assume a 10MHz clock
+			// TODO: Currently we always assume a 10MHz clock as PCLK
 			return;
 		}
 
@@ -1505,6 +1533,35 @@ static MACHINE_CONFIG_DERIVED( ip244415, ip225015 )
 	MCFG_CPU_PROGRAM_MAP( ip225015_map)
 MACHINE_CONFIG_END
 
+/* SCC init ip225015
+ * Channel A
+ * 09 <- c0 Master Interrup Control: Force HW reset + enable SWI INTACK
+ * 04 <- 44 Clocks: x16 mode, 1 stop bits, no parity
+ * 03 <- c0 Receiver: 8 bit data, auto enables, Rx disabled
+ * 05 <- e2 Transmitter: DTR set, 8 bit data, RTS set, Tx disabled
+ * 0b <- 50 Clock Mode: TRxC: XTAL output, TRxC: Output, TxC from BRG, RxC from BRG
+ * 0c <- 0a Low const BRG  3.6864Mhz CLK => 9600 baud
+ * 0d <- 00 High Const BRG = (CLK / (2 x Desired Rate x BR Clock period)) - 2 
+ * 0e <- 01 Mics: BRG enable
+ * 03 <- c1 Receiver: as above + Receiver enable
+ * 05 <- ea Transmitter: as above + Transmitter enable
+ *
+ * Channel A and B init - only BRG low const differs 
+ * 09 <- 80 channel A reset
+ * 04 <- 44 Clocks: x16 mode, 1 stop bits, no parity
+ * 0f <- 81 External/Status Control: Break/Abort enabled, WR7 prime enabled
+ * 07p<- 40 External read enable (RR9=WR3, RR4=WR4, RR5=WR5, RR14=WR7 and RR11=WR10)
+ * 03 <- c0 Receiver: 8 bit data, auto enables, Rx disabled
+ * 05 <- e2 Transmitter: DTR set, 8 bit data, RTS set, Tx disabled
+ * 0b <- 50 Clock Mode: TRxC: XTAL output, TRxC: Output, TxC from BRG, RxC from BRG
+ * 0e <- 00 Mics: BRG disable
+ * 0c <- 0a/04 Low const BRG, 3.6864Mhz CLK => Chan A:9600 Chan B:38400
+ * 0d <- 00 High Const BRG = (CLK / (2 x Desired Rate x BR Clock period)) - 2 
+ * 0e <- 01 Mics: BRG enable
+ * 03 <- c1 Receiver: as above + Receiver enable
+ * 05 <- ea Transmitter: as above + Transmitetr enable
+ * 00 <- 10 Reset External/status IE
+*/
 ROM_START( ip225015 )
 	ROM_REGION( 0x80000, "user1", 0 )
 	ROM_LOAD( "ip225015.bin", 0x000000, 0x080000, CRC(aee5502e) SHA1(9243fef0a3508790651e0d6d2705c887629b1280) )
