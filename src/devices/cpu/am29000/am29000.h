@@ -20,8 +20,8 @@
 
 enum
 {
-	AM29000_PC = 1,
-	AM29000_VAB,
+	AM29000_PC = STATE_GENPC,
+	AM29000_VAB = 0,
 	AM29000_OPS,
 	AM29000_CPS,
 	AM29000_CFG,
@@ -462,7 +462,8 @@ protected:
 	}
 
 	// device_state_interface overrides
-	void state_string_export(const device_state_entry &entry, std::string &str) const override;
+	virtual void state_import(const device_state_entry &entry) override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	// device_disasm_interface overrides
 	virtual uint32_t disasm_min_opcode_bytes() const override { return 4; }

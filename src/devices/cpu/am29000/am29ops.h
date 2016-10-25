@@ -1298,7 +1298,7 @@ void am29000_cpu_device::CALL()
 		m_next_pc = m_exec_pc + JMP_SEX;
 
 	m_r[RA] = ret;
-m_next_pl_flags |= PFLAG_JUMP;
+	m_next_pl_flags |= PFLAG_JUMP;
 }
 
 void am29000_cpu_device::CALLI()
