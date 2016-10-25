@@ -63,6 +63,8 @@
 #define PI1_TAG     "pi1"
 #define KBDC_TAG    "kbdc"
 #define PIT_TAG     "pit"
+#define RS232A_TAG	"rs232a"
+#define RS232B_TAG	"rs232b"
 
 #define SCC_PCLK	XTAL_10MHz
 #define SCC_RXA_CLK	XTAL_3_6864MHz // Needs verification
@@ -176,28 +178,22 @@ ioport_constructor ioc2_device::device_input_ports() const
 
 MACHINE_CONFIG_FRAGMENT( ioc2_device )
 	MCFG_SCC85230_ADD(SCC_TAG, SCC_PCLK, SCC_RXA_CLK, SCC_TXA_CLK, SCC_RXB_CLK, SCC_TXB_CLK)
+	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(RS232A_TAG, rs232_port_device, write_txd))
+	MCFG_Z80SCC_OUT_DTRA_CB(DEVWRITELINE(RS232A_TAG, rs232_port_device, write_dtr))
+	MCFG_Z80SCC_OUT_RTSA_CB(DEVWRITELINE(RS232A_TAG, rs232_port_device, write_rts))
+	MCFG_Z80SCC_OUT_TXDB_CB(DEVWRITELINE(RS232B_TAG, rs232_port_device, write_txd))
+	MCFG_Z80SCC_OUT_DTRB_CB(DEVWRITELINE(RS232B_TAG, rs232_port_device, write_dtr))
+	MCFG_Z80SCC_OUT_RTSB_CB(DEVWRITELINE(RS232B_TAG, rs232_port_device, write_rts))
 
-#if 0  // Why does MAME crash in reset device when I enable this??
-	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_txd))
-	MCFG_Z80SCC_OUT_DTRA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_dtr))
-	MCFG_Z80SCC_OUT_RTSA_CB(DEVWRITELINE("rs232a", rs232_port_device, write_rts))
+	MCFG_RS232_PORT_ADD(RS232A_TAG, default_rs232_devices, nullptr)
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(SCC_TAG, scc85230_device, ctsa_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(SCC_TAG, scc85230_device, dcda_w))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(SCC_TAG, scc85230_device, rxa_w))
 
-	MCFG_RS232_PORT_ADD ("rs232a", default_rs232_devices, nullptr)
-	MCFG_RS232_CTS_HANDLER (DEVWRITELINE (SCC_TAG, scc85230_device, ctsa_w))
-	MCFG_RS232_DCD_HANDLER (DEVWRITELINE (SCC_TAG, scc85230_device, dcda_w))
-	MCFG_RS232_RXD_HANDLER (DEVWRITELINE (SCC_TAG, scc85230_device, rxa_w))
-#endif
-
-#if 1
-	MCFG_Z80SCC_OUT_TXDB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_txd))
-	MCFG_Z80SCC_OUT_DTRB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_dtr))
-	MCFG_Z80SCC_OUT_RTSB_CB(DEVWRITELINE("rs232b", rs232_port_device, write_rts))
-
-	MCFG_RS232_PORT_ADD ("rs232b", default_rs232_devices, nullptr)
-	MCFG_RS232_CTS_HANDLER (DEVWRITELINE (SCC_TAG, scc85230_device, ctsb_w))
-	MCFG_RS232_DCD_HANDLER (DEVWRITELINE (SCC_TAG, scc85230_device, dcdb_w))
-	MCFG_RS232_RXD_HANDLER (DEVWRITELINE (SCC_TAG, scc85230_device, rxb_w))
-#endif
+	MCFG_RS232_PORT_ADD(RS232B_TAG, default_rs232_devices, nullptr)
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(SCC_TAG, scc85230_device, ctsb_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(SCC_TAG, scc85230_device, dcdb_w))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(SCC_TAG, scc85230_device, rxb_w))
 
 	MCFG_DEVICE_ADD(PI1_TAG, PC_LPT, 0)
 
@@ -1541,12 +1537,12 @@ MACHINE_CONFIG_END
  * 05 <- e2 Transmitter: DTR set, 8 bit data, RTS set, Tx disabled
  * 0b <- 50 Clock Mode: TRxC: XTAL output, TRxC: Output, TxC from BRG, RxC from BRG
  * 0c <- 0a Low const BRG  3.6864Mhz CLK => 9600 baud
- * 0d <- 00 High Const BRG = (CLK / (2 x Desired Rate x BR Clock period)) - 2 
+ * 0d <- 00 High Const BRG = (CLK / (2 x Desired Rate x BR Clock period)) - 2
  * 0e <- 01 Mics: BRG enable
  * 03 <- c1 Receiver: as above + Receiver enable
  * 05 <- ea Transmitter: as above + Transmitter enable
  *
- * Channel A and B init - only BRG low const differs 
+ * Channel A and B init - only BRG low const differs
  * 09 <- 80 channel A reset
  * 04 <- 44 Clocks: x16 mode, 1 stop bits, no parity
  * 0f <- 81 External/Status Control: Break/Abort enabled, WR7 prime enabled
@@ -1556,7 +1552,7 @@ MACHINE_CONFIG_END
  * 0b <- 50 Clock Mode: TRxC: XTAL output, TRxC: Output, TxC from BRG, RxC from BRG
  * 0e <- 00 Mics: BRG disable
  * 0c <- 0a/04 Low const BRG, 3.6864Mhz CLK => Chan A:9600 Chan B:38400
- * 0d <- 00 High Const BRG = (CLK / (2 x Desired Rate x BR Clock period)) - 2 
+ * 0d <- 00 High Const BRG = (CLK / (2 x Desired Rate x BR Clock period)) - 2
  * 0e <- 01 Mics: BRG enable
  * 03 <- c1 Receiver: as above + Receiver enable
  * 05 <- ea Transmitter: as above + Transmitetr enable
