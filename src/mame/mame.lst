@@ -30006,6 +30006,7 @@ pex0002pa                       // (c) 1995 IGT - International Game Technology
 pex0006k                        // (c) 1997 IGT - International Game Technology
 pex0006p                        // (c) 1995 IGT - International Game Technology
 pex0013k                        // (c) 1997 IGT - International Game Technology
+pex0013ka                       // (c) 1997 IGT - International Game Technology
 pex0040p                        // (c) 1995 IGT - International Game Technology
 pex0042p                        // (c) 1995 IGT - International Game Technology
 pex0045p                        // (c) 1995 IGT - International Game Technology
@@ -30086,8 +30087,10 @@ pex0763p                        // (c) 1995 IGT - International Game Technology
 pex0764p                        // (c) 1995 IGT - International Game Technology
 pex0838s                        // (c) 1997 IGT - International Game Technology
 pex0841s                        // (c) 1997 IGT - International Game Technology
+pex0846s                        // (c) 1997 IGT - International Game Technology
 pex0998s                        // (c) 1997 IGT - International Game Technology
 pex1087s                        // (c) 1997 IGT - International Game Technology
+pex2002p                        // (c) 1995 IGT - International Game Technology
 pex2010p                        // (c) 1995 IGT - International Game Technology
 pex2016p                        // (c) 1995 IGT - International Game Technology
 pex2017p                        // (c) 1995 IGT - International Game Technology
@@ -30194,7 +30197,6 @@ pexmp017b                       // (c) 1997 IGT - International Game Technology
 pexmp022                        // (c) 1997 IGT - International Game Technology
 pexmp026                        // (c) 1997 IGT - International Game Technology
 pexmp030                        // (c) 1997 IGT - International Game Technology
-pexmp030a                       // (c) 1997 IGT - International Game Technology
 
 @source:pes.cpp
 pes                             //
