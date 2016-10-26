@@ -2097,7 +2097,7 @@ static char *shexstring(uint32_t value, int digits, bool always)
 	return buffer;
 }
 
-static void handle_sib_byte(std::ostream &stream, uint8_t mod )
+static void handle_sib_byte(std::ostream &stream, uint8_t mod)
 {
 	uint32_t i32;
 	uint8_t scale, i, base;
@@ -2109,14 +2109,14 @@ static void handle_sib_byte(std::ostream &stream, uint8_t mod )
 
 	if (base == 5 && mod == 0) {
 		i32 = FETCH32();
-		util::stream_format(stream, "%s", hexstring(i32, 0) );
+		util::stream_format(stream, "%s", hexstring(i32, 0));
 	} else if (base != 5 || mod != 3)
-		util::stream_format(stream, "%s", i386_reg[address_size][base] );
+		util::stream_format(stream, "%s", i386_reg[address_size][base]);
 
 	if ( i != 4 ) {
-		util::stream_format(stream, "+%s", i386_reg[address_size][i] );
+		util::stream_format(stream, "+%s", i386_reg[address_size][i]);
 		if (scale)
-			util::stream_format(stream, "*%d", 1 << scale );
+			util::stream_format(stream, "*%d", 1 << scale);
 	}
 }
 
@@ -2136,12 +2136,12 @@ static void handle_modrm(std::ostream &stream)
 
 	switch(segment)
 	{
-		case SEG_CS: util::stream_format(stream, "cs:" ); break;
-		case SEG_DS: util::stream_format(stream, "ds:" ); break;
-		case SEG_ES: util::stream_format(stream, "es:" ); break;
-		case SEG_FS: util::stream_format(stream, "fs:" ); break;
-		case SEG_GS: util::stream_format(stream, "gs:" ); break;
-		case SEG_SS: util::stream_format(stream, "ss:" ); break;
+		case SEG_CS: util::stream_format(stream, "cs:"); break;
+		case SEG_DS: util::stream_format(stream, "ds:"); break;
+		case SEG_ES: util::stream_format(stream, "es:"); break;
+		case SEG_FS: util::stream_format(stream, "fs:"); break;
+		case SEG_GS: util::stream_format(stream, "gs:"); break;
+		case SEG_SS: util::stream_format(stream, "ss:"); break;
 	}
 
 	util::stream_format(stream, "[" );
@@ -2150,7 +2150,7 @@ static void handle_modrm(std::ostream &stream)
 			handle_sib_byte(stream, mod );
 		else if ((rm & 7) == 5 && mod == 0) {
 			disp32 = FETCHD32();
-			util::stream_format(stream, "rip%s", shexstring(disp32, 0, true) );
+			util::stream_format(stream, "rip%s", shexstring(disp32, 0, true));
 		} else
 			util::stream_format(stream, "%s", i386_reg[2][rm]);
 		if( mod == 1 ) {
