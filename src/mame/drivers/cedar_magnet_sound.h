@@ -24,15 +24,19 @@ class cedar_magnet_sound_device :  public cedar_magnet_board_device
 public:
 	// construction/destruction
 	cedar_magnet_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
+	
 	required_device<z80ctc_device> m_ctc0;
 	required_device<z80ctc_device> m_ctc1;
 
-	DECLARE_READ8_MEMBER(top_port14_r);
+	DECLARE_READ8_MEMBER(soundlatch_r);
+	DECLARE_WRITE8_MEMBER(adpcm_latch_w);
+	DECLARE_WRITE8_MEMBER(ay1_porta_w);
+
+	uint8_t m_adpcm_data;
 
 	void write_command(uint8_t data);
 	uint8_t m_command;
-
+	
 	DECLARE_WRITE_LINE_MEMBER(ctc1_z0_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc1_z1_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc1_z2_w);
@@ -41,6 +45,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ctc0_z2_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc0_int_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc1_int_w);
+
+	TIMER_CALLBACK_MEMBER(reset_assert_callback) override;
+
+	int m_fake_counter;
+	INTERRUPT_GEN_MEMBER(fake_irq);
 
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;

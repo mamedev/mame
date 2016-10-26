@@ -22,14 +22,15 @@ public:
 
 	uint8_t* m_ram;
 	z80_device* m_cpu;
-
+	
 	virtual uint8_t read_cpu_bus(int offset);
 	virtual void write_cpu_bus(int offset, uint8_t data);
 
 	TIMER_CALLBACK_MEMBER(halt_assert_callback);
 	TIMER_CALLBACK_MEMBER(halt_clear_callback);
-	TIMER_CALLBACK_MEMBER(reset_assert_callback);
+	virtual TIMER_CALLBACK_MEMBER(reset_assert_callback);
 	TIMER_CALLBACK_MEMBER(reset_clear_callback);
+
 
 	void halt_assert(void);
 	void halt_clear(void);
@@ -39,7 +40,6 @@ public:
 	bool m_is_running;
 
 	INTERRUPT_GEN_MEMBER(irq);
-
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
