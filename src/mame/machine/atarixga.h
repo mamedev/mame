@@ -27,8 +27,8 @@ public:
 	virtual DECLARE_READ32_MEMBER(read) = 0;
 
 protected:
-	virtual void device_start() = 0;
-	virtual void device_reset() = 0;
+	virtual void device_start() override = 0;
+	virtual void device_reset() override = 0;
 
 	std::unique_ptr<uint16_t[]> m_ram; // CY7C185-45PC, only 16-Kbit used
 };
