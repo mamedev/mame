@@ -12,6 +12,7 @@ function dat.check(set, softlist)
 	if not status or not info then
 		return nil
 	end
+	info = info:gsub("\n\n", "\n")
 	return "Mameinfo"
 end
 
