@@ -281,7 +281,7 @@ if BASE_TARGETOS=="unix" then
 					"SDL2.framework",
 				}
 			else
-				local str = backtick(sdlconfigcmd() .. " --libs --static | sed 's/-lSDLmain//'")
+				local str = backtick(sdlconfigcmd() .. " --libs")
 				addlibfromstring(str)
 				addoptionsfromstring(str)
 			end
