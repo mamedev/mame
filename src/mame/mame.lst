@@ -28111,6 +28111,7 @@ timecrs2                        // April 1998
 timecrs2v1b                     // April 1998
 timecrs2v2b                     // April 1998
 timecrs2v4a                     // April 1998
+timecrs2v5a                     // April 1998
 
 @source:namcos86.cpp
 genpeitd                        // (c) 1986
