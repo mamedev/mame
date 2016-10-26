@@ -84,6 +84,9 @@
 #define MCFG_Z80SCC_OFFSETS(_rxa, _txa, _rxb, _txb) \
 	z80scc_device::configure_channels(*device, _rxa, _txa, _rxb, _txb);
 
+#define MCFG_Z80SCC_OUT_INT_CB(_devcb) \
+	devcb = &z80scc_device::set_out_int_callback(*device, DEVCB_##_devcb);
+
 // Port A callbacks
 #define MCFG_Z80SCC_OUT_TXDA_CB(_devcb) \
 	devcb = &z80scc_device::set_out_txda_callback(*device, DEVCB_##_devcb);
@@ -100,6 +103,12 @@
 #define MCFG_Z80SCC_OUT_SYNCA_CB(_devcb) \
 	devcb = &z80scc_device::set_out_synca_callback(*device, DEVCB_##_devcb);
 
+#define MCFG_Z80SCC_OUT_RXDRQA_CB(_devcb) \
+	devcb = &z80scc_device::set_out_rxdrqa_callback(*device, DEVCB_##_devcb);
+
+#define MCFG_Z80SCC_OUT_TXDRQA_CB(_devcb) \
+	devcb = &z80scc_device::set_out_txdrqa_callback(*device, DEVCB_##_devcb);
+
 // Port B callbacks
 #define MCFG_Z80SCC_OUT_TXDB_CB(_devcb) \
 	devcb = &z80scc_device::set_out_txdb_callback(*device, DEVCB_##_devcb);
@@ -115,15 +124,6 @@
 
 #define MCFG_Z80SCC_OUT_SYNCB_CB(_devcb) \
 	devcb = &z80scc_device::set_out_syncb_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_Z80SCC_OUT_INT_CB(_devcb) \
-	devcb = &z80scc_device::set_out_int_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_Z80SCC_OUT_RXDRQA_CB(_devcb) \
-	devcb = &z80scc_device::set_out_rxdrqa_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_Z80SCC_OUT_TXDRQA_CB(_devcb) \
-	devcb = &z80scc_device::set_out_txdrqa_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_Z80SCC_OUT_RXDRQB_CB(_devcb) \
 	devcb = &z80scc_device::set_out_rxdrqb_callback(*device, DEVCB_##_devcb);
@@ -546,7 +546,7 @@ protected:
 	unsigned int m_brg_rate;
 #endif
 	unsigned int m_delayed_tx_brg_change;
-	unsigned int m_brg_const;
+	unsigned int get_brg_rate();
 
 	void scc_register_write(uint8_t reg, uint8_t data);
 	uint8_t scc_register_read(uint8_t reg);
