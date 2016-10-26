@@ -242,7 +242,7 @@ void menu_select_software::handle()
 			// handle UI_DOWN_FILTER
 			highlight++;
 		}
-		else if (menu_event->iptkey == IPT_UI_DATS && mame_machine_manager::instance()->lua()->call_plugin("", "data_list"))
+		else if (menu_event->iptkey == IPT_UI_DATS)
 		{
 			// handle UI_DATS
 			ui_software_info *ui_swinfo = (ui_software_info *)menu_event->itemref;

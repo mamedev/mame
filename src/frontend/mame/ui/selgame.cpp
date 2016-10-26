@@ -341,7 +341,7 @@ void menu_select_game::handle()
 			m_search[0] = '\0';
 			reset(reset_options::SELECT_FIRST);
 		}
-		else if (menu_event->iptkey == IPT_UI_DATS && mame_machine_manager::instance()->lua()->call_plugin("", "data_list"))
+		else if (menu_event->iptkey == IPT_UI_DATS)
 		{
 			// handle UI_DATS
 			if (!isfavorite())
