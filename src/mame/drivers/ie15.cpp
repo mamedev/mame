@@ -106,7 +106,7 @@ public:
 private:
 	TIMER_CALLBACK_MEMBER(ie15_beepoff);
 	void update_leds();
-	uint32_t draw_scanline(uint32_t *p, uint16_t offset, uint8_t scanline);
+	void draw_scanline(uint32_t *p, uint16_t offset, uint8_t scanline);
 	std::unique_ptr<uint32_t[]> m_tmpbmp;
 
 	emu_timer *m_hblank_timer;
@@ -526,7 +526,7 @@ void ie15_state::video_start()
     XXX 'dotted look' is caused by strobe at 2x pixel clock -- use HLSL for this.
 */
 
-uint32_t ie15_state::draw_scanline(uint32_t *p, uint16_t offset, uint8_t scanline)
+void ie15_state::draw_scanline(uint32_t *p, uint16_t offset, uint8_t scanline)
 {
 	static const uint32_t palette[2] = { 0xff000000, 0xff00c000 };
 
@@ -571,7 +571,6 @@ uint32_t ie15_state::draw_scanline(uint32_t *p, uint16_t offset, uint8_t scanlin
 			*p++ = palette[0];
 		}
 	}
-	return 0;
 }
 
 void ie15_state::update_leds()

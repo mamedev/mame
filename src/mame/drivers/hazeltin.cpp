@@ -20,23 +20,49 @@ References:
 #include "machine/ay31015.h"
 #include "machine/kb3600.h"
 #include "machine/com8116.h"
-#include "machine/keyboard.h"
+#include "machine/am2847.h"
 
-#define KEYBOARD_TAG	"keyboard"
 #define CPU_TAG			"maincpu"
 #define UART_TAG		"uart"
 #define BAUDGEN_TAG		"baudgen"
 #define KBDC_TAG		"ay53600"
-#define BAUDPORT_TAG	"BAUD"
-#define MISCPORT_TAG	"MISC"
-#define MISCKEYS_TAG	"MISC_KEYS"
+#define CHARRAM_TAG		"chrram"
+#define CHARROM_TAG		"chargen"
+#define BAUDPORT_TAG	"baud"
+#define MISCPORT_TAG	"misc"
+#define MISCKEYS_TAG	"misc_keys"
+#define SCREEN_TAG		"screen"
+#define TMS3409A_TAG	"u67"
+#define TMS3409B_TAG	"u57"
+
+// Number of cycles to burn when fetching the next row of characters into the line buffer:
+// CPU clock is 18MHz / 9
+// Dot clock is 33.264MHz / 2
+// 9 dots per character
+// 80 visible characters per line
+// Total duration of fetch: 1440 33.264MHz clock cycles
+//
+//     2*9*80                    1         1440 * XTAL_2MHz
+// -------------- divided by ---------  =  ----------------  =  86.5 main CPU cycles per line fetch
+// XTAL_33_264MHz            XTAL_2MHz      XTAL_33_264MHz
+#define LINE_FETCH_CYCLES	(87)
 
 #define SR2_FULL_DUPLEX	(0x01)
 #define SR2_UPPER_ONLY	(0x08)
 
 #define SR3_PB_RESET	(0x04)
 
-#define KBD_STATUS_KBDR	(0x01)
+#define KBD_STATUS_KBDR		(0x01)
+#define KBD_STATUS_TV_INT	(0x40)
+#define KBD_STATUS_TV_UB	(0x80)
+
+#define SCREEN_HTOTAL	(9*100)
+#define SCREEN_HDISP	(9*80)
+#define SCREEN_HSTART	(9*5)
+
+#define SCREEN_VTOTAL	(28*11)
+#define SCREEN_VDISP	(24*11)
+#define SCREEN_VSTART	(0)
 
 class hazl1500_state : public driver_device
 {
@@ -49,11 +75,25 @@ public:
 		, m_baud_dips(*this, BAUDPORT_TAG)
 		, m_misc_dips(*this, MISCPORT_TAG)
 		, m_kbd_misc_keys(*this, MISCKEYS_TAG)
+		, m_char_ram(*this, CHARRAM_TAG)
+		, m_char_rom(*this, CHARROM_TAG)
+		, m_line_buffer_lsb(*this, TMS3409A_TAG)
+		, m_line_buffer_msb(*this, TMS3409B_TAG)
+		, m_screen(*this, SCREEN_TAG)
+		, m_hblank_timer(nullptr)
+		, m_scanline_timer(nullptr)
 		, m_status_reg_3(0)
 		, m_kbd_status_latch(0)
+        , m_refresh_address(0)
+		, m_vpos(0)
+        , m_hblank(false)
+        , m_vblank(false)
 	{
 	}
 
+	//m_maincpu->adjust_icount(-14);
+
+	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	uint32_t screen_update_hazl1500(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -64,13 +104,27 @@ public:
 	DECLARE_READ8_MEMBER(status_reg_2_r);
 	DECLARE_WRITE8_MEMBER(status_reg_3_w);
 
+	DECLARE_READ8_MEMBER(uart_r);
+	DECLARE_WRITE8_MEMBER(uart_w);
+
 	DECLARE_READ8_MEMBER(kbd_status_latch_r);
 	DECLARE_READ8_MEMBER(kbd_encoder_r);
 	DECLARE_READ_LINE_MEMBER(ay3600_shift_r);
 	DECLARE_READ_LINE_MEMBER(ay3600_control_r);
 	DECLARE_WRITE_LINE_MEMBER(ay3600_data_ready_w);
 
+    DECLARE_WRITE8_MEMBER(refresh_address_w);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	static const device_timer_id TIMER_HBLANK = 0;
+	static const device_timer_id TIMER_SCANLINE = 1;
+
 private:
+	void check_tv_interrupt();
+	void update_tv_unblank();
+	void scanline_tick();
+	void draw_scanline(uint32_t *pix);
+
 	required_device<cpu_device> m_maincpu;
 	required_device<ay31015_device> m_uart;
 	required_device<ay3600_device> m_kbdc;
@@ -78,15 +132,59 @@ private:
 	required_ioport m_misc_dips;
 	required_ioport m_kbd_misc_keys;
 
+	required_shared_ptr<uint8_t> m_char_ram;
+	required_region_ptr<uint8_t> m_char_rom;
+	required_device<tms3409_device> m_line_buffer_lsb;
+	required_device<tms3409_device> m_line_buffer_msb;
+	required_device<screen_device> m_screen;
+
+	std::unique_ptr<uint32_t[]> m_screen_pixbuf;
+
+	emu_timer *m_hblank_timer;
+	emu_timer *m_scanline_timer;
+
 	uint8_t m_status_reg_3;
 	uint8_t m_kbd_status_latch;
+
+    uint8_t m_refresh_address;
+	uint16_t m_vpos;
+	bool m_hblank;
+	bool m_vblank;
 };
+
+void hazl1500_state::machine_start()
+{
+	m_hblank_timer = timer_alloc(TIMER_HBLANK);
+	m_hblank_timer->adjust(attotime::never);
+
+	m_scanline_timer = timer_alloc(TIMER_SCANLINE);
+	m_scanline_timer->adjust(attotime::never);
+
+	m_screen_pixbuf = std::make_unique<uint32_t[]>(SCREEN_HTOTAL * SCREEN_VTOTAL);
+
+	save_item(NAME(m_status_reg_3));
+	save_item(NAME(m_kbd_status_latch));
+    save_item(NAME(m_refresh_address));
+	save_item(NAME(m_vpos));
+	save_item(NAME(m_hblank));
+	save_item(NAME(m_vblank));
+}
 
 void hazl1500_state::machine_reset()
 {
 	m_status_reg_3 = 0;
 	m_kbd_status_latch = 0;
+
+    m_refresh_address = 0;
+	m_vpos = m_screen->vpos();
+	m_vblank = (m_vpos >= SCREEN_VDISP);
+	if (!m_vblank)
+		m_kbd_status_latch |= KBD_STATUS_TV_UB;
+	m_hblank = true;
+	m_hblank_timer->adjust(m_screen->time_until_pos(m_vpos, SCREEN_HSTART));
+	m_scanline_timer->adjust(m_screen->time_until_pos(m_vpos + 1, 0));
 }
+
 
 WRITE_LINE_MEMBER( hazl1500_state::com5016_fr_w )
 {
@@ -96,6 +194,7 @@ WRITE_LINE_MEMBER( hazl1500_state::com5016_fr_w )
 
 uint32_t hazl1500_state::screen_update_hazl1500(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+	memcpy(&bitmap.pix32(0), &m_screen_pixbuf[0], sizeof(uint32_t) * SCREEN_HTOTAL * SCREEN_VTOTAL);
 	return 0;
 }
 
@@ -120,6 +219,16 @@ READ8_MEMBER( hazl1500_state::status_reg_2_r )
 WRITE8_MEMBER( hazl1500_state::status_reg_3_w )
 {
 	m_status_reg_3 = data;
+}
+
+READ8_MEMBER( hazl1500_state::uart_r )
+{
+	return m_uart->get_received_data();
+}
+
+WRITE8_MEMBER( hazl1500_state::uart_w )
+{
+	m_uart->set_transmit_data(data);
 }
 
 READ8_MEMBER( hazl1500_state::kbd_status_latch_r )
@@ -161,18 +270,131 @@ WRITE_LINE_MEMBER(hazl1500_state::ay3600_data_ready_w)
 		m_kbd_status_latch &= ~KBD_STATUS_KBDR;
 }
 
+void hazl1500_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch(id)
+	{
+		case TIMER_HBLANK:
+			if (m_hblank)
+			{
+				m_hblank_timer->adjust(m_screen->time_until_pos(m_vpos, SCREEN_HSTART + SCREEN_HDISP));
+			}
+			else
+			{
+				m_hblank_timer->adjust(m_screen->time_until_pos((m_vpos + 1) % SCREEN_VTOTAL, SCREEN_HSTART));
+			}
+			m_hblank ^= 1;
+			break;
+
+		case TIMER_SCANLINE:
+		{
+			scanline_tick();
+			break;
+		}
+	}
+}
+
+WRITE8_MEMBER(hazl1500_state::refresh_address_w)
+{
+    m_refresh_address = data;
+}
+
+void hazl1500_state::check_tv_interrupt()
+{
+    uint8_t char_row = m_vpos % 11;
+	bool bit_match = char_row == 2 || char_row == 3;
+    bool no_vblank = !m_vblank;
+    bool tv_interrupt = bit_match && no_vblank;
+
+    m_kbd_status_latch &= ~KBD_STATUS_TV_INT;
+    m_kbd_status_latch |= tv_interrupt ? KBD_STATUS_TV_INT : 0;
+
+    m_maincpu->set_input_line(INPUT_LINE_IRQ0, tv_interrupt ? ASSERT_LINE : CLEAR_LINE);
+}
+
+void hazl1500_state::update_tv_unblank()
+{
+	if (!m_vblank)
+	{
+		m_kbd_status_latch |= KBD_STATUS_TV_UB;
+	}
+	else
+	{
+		m_kbd_status_latch &= ~KBD_STATUS_TV_UB;
+	}
+}
+
+void hazl1500_state::scanline_tick()
+{
+	uint16_t old_vpos = m_vpos;
+	m_vpos = (m_vpos + 1) % SCREEN_VTOTAL;
+	m_vblank = (m_vpos >= SCREEN_VDISP);
+
+	check_tv_interrupt();
+	update_tv_unblank();
+
+	draw_scanline(&m_screen_pixbuf[old_vpos * SCREEN_HTOTAL + SCREEN_HSTART]);
+
+	m_scanline_timer->adjust(m_screen->time_until_pos((m_vpos + 1) % SCREEN_VTOTAL, 0));
+}
+
+void hazl1500_state::draw_scanline(uint32_t *pix)
+{
+	static const uint32_t palette[4] = { 0xff000000, 0xff006000, 0xff000000, 0xff00c000 };
+
+	uint16_t ram_offset = m_refresh_address << 4;
+	uint8_t char_row = m_vpos % 11;
+	uint8_t recycle = (char_row != 10 ? 0xff : 0x00);
+	m_line_buffer_lsb->rc_w(recycle & 0xf);
+	m_line_buffer_msb->rc_w(recycle >> 4);
+
+    if (recycle == 0)
+        m_maincpu->adjust_icount(-LINE_FETCH_CYCLES);
+
+	for (uint16_t x = 0; x < 80; x++)
+	{
+		uint8_t in = 0;
+        if (!m_vblank)
+            in = m_char_ram[ram_offset + x];
+
+		m_line_buffer_lsb->in_w(in & 0xf);
+		m_line_buffer_lsb->cp_w(1);
+		m_line_buffer_lsb->cp_w(0);
+
+		m_line_buffer_msb->in_w(in >> 4);
+		m_line_buffer_msb->cp_w(1);
+		m_line_buffer_msb->cp_w(0);
+
+		const uint8_t chr = (m_line_buffer_msb->out_r() << 4) | m_line_buffer_lsb->out_r();
+		const uint16_t chr_addr = (chr & 0x7f) << 4;
+		const uint8_t gfx = m_char_rom[chr_addr | char_row];
+		const uint8_t bright = (chr & 0x80) >> 6;
+
+		*pix++ = palette[0];
+		*pix++ = palette[BIT(gfx, 6) | bright];
+		*pix++ = palette[BIT(gfx, 5) | bright];
+		*pix++ = palette[BIT(gfx, 4) | bright];
+		*pix++ = palette[BIT(gfx, 3) | bright];
+		*pix++ = palette[BIT(gfx, 2) | bright];
+		*pix++ = palette[BIT(gfx, 1) | bright];
+		*pix++ = palette[BIT(gfx, 0) | bright];
+		*pix++ = palette[0];
+	}
+}
+
 static ADDRESS_MAP_START(hazl1500_mem, AS_PROGRAM, 8, hazl1500_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
-	AM_RANGE(0x3000, 0x377f) AM_RAM AM_SHARE("char_ram")
+	AM_RANGE(0x3000, 0x377f) AM_RAM AM_SHARE(CHARRAM_TAG)
 	AM_RANGE(0x3780, 0x37ff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(hazl1500_io, AS_IO, 8, hazl1500_state)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x7f, 0x7f) AM_READWRITE(status_reg_2_r, status_reg_3_w)
+	AM_RANGE(0xbf, 0xbf) AM_READWRITE(uart_r, uart_w)
 	AM_RANGE(0xdf, 0xdf) AM_READ(kbd_encoder_r)
-	AM_RANGE(0xef, 0xef) AM_READ(system_test_r)
+	AM_RANGE(0xef, 0xef) AM_READWRITE(system_test_r, refresh_address_w)
 	AM_RANGE(0xf7, 0xf7) AM_READ(kbd_status_latch_r)
 ADDRESS_MAP_END
 
@@ -376,16 +598,17 @@ GFXDECODE_END
 
 static MACHINE_CONFIG_START( hazl1500, hazl1500_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu",I8080, XTAL_1MHz) //unknown clock
+	MCFG_CPU_ADD(CPU_TAG, I8080, XTAL_18MHz/9) // 18MHz crystal on schematics, using an i8224 clock gen/driver IC
 	MCFG_CPU_PROGRAM_MAP(hazl1500_mem)
 	MCFG_CPU_IO_MAP(hazl1500_io)
+    MCFG_QUANTUM_PERFECT_CPU(CPU_TAG)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_SIZE(640, 384)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 384-1)
+	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
 	MCFG_SCREEN_UPDATE_DRIVER(hazl1500_state, screen_update_hazl1500)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_33_264MHz/2,
+		SCREEN_HTOTAL, SCREEN_HSTART, SCREEN_HSTART + SCREEN_HDISP,
+		SCREEN_VTOTAL, SCREEN_VSTART, SCREEN_VSTART + SCREEN_VDISP);
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hazl1500)
@@ -394,6 +617,9 @@ static MACHINE_CONFIG_START( hazl1500, hazl1500_state )
 	MCFG_COM8116_FR_HANDLER(WRITELINE(hazl1500_state, com5016_fr_w))
 
 	MCFG_DEVICE_ADD(UART_TAG, AY51013, 0)
+
+	MCFG_TMS3409_ADD(TMS3409A_TAG)
+	MCFG_TMS3409_ADD(TMS3409B_TAG)
 
 	/* keyboard controller */
 	MCFG_DEVICE_ADD(KBDC_TAG, AY3600, 0)
@@ -413,10 +639,10 @@ MACHINE_CONFIG_END
 
 
 ROM_START( hazl1500 )
-	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_REGION( 0x10000, CPU_TAG, ROMREGION_ERASEFF )
 	ROM_LOAD( "h15s-00I-10-3.bin", 0x0000, 0x0800, CRC(a2015f72) SHA1(357cde517c3dcf693de580881add058c7b26dfaa))
 
-	ROM_REGION( 0x800, "chargen", ROMREGION_ERASEFF )
+	ROM_REGION( 0x800, CHARROM_TAG, ROMREGION_ERASEFF )
 	ROM_LOAD( "u83_chr.bin", 0x0000, 0x0800, CRC(e0c6b734) SHA1(7c42947235c66c41059fd4384e09f4f3a17c9857))
 ROM_END
 

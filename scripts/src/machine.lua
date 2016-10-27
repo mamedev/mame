@@ -453,6 +453,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/am2847.h,MACHINES["AM2847"] = true
+---------------------------------------------------
+
+if (MACHINES["AM2847"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/am2847.cpp",
+		MAME_DIR .. "src/devices/machine/am2847.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/am53cf96.h,MACHINES["AM53CF96"] = true
 ---------------------------------------------------
 
