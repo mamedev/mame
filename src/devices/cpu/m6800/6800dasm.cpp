@@ -166,7 +166,7 @@ static const uint8_t table[0x104][3] = {
 #define ARG2    opram[2]
 #define ARGW    (opram[1]<<8) + opram[2]
 
-static unsigned Dasm680x (int subtype, char *buf, unsigned pc, const uint8_t *oprom, const uint8_t *opram)
+static unsigned Dasm680x (int subtype, std::ostream &stream, unsigned pc, const uint8_t *oprom, const uint8_t *opram)
 {
 	uint32_t flags = 0;
 	int invalid_mask;
@@ -209,44 +209,53 @@ static unsigned Dasm680x (int subtype, char *buf, unsigned pc, const uint8_t *op
 
 	if ( invalid & invalid_mask )   /* invalid for this cpu type ? */
 	{
-		strcpy(buf, "illegal");
+		stream << "illegal";
 		return 1 | flags | DASMFLAG_SUPPORTED;
 	}
 
-	buf += sprintf(buf, "%-5s", op_name_str[opcode]);
+	util::stream_format(stream, "%-5s", op_name_str[opcode]);
 
 	switch( args )
 	{
 		case rel:  /* relative */
-			sprintf (buf, "$%04X", pc + (int8_t)ARG1 + 2);
+			util::stream_format(stream, "$%04X", pc + (int8_t)ARG1 + 2);
 			return 2 | flags | DASMFLAG_SUPPORTED;
 		case imb:  /* immediate (byte) */
-			sprintf (buf, "#$%02X", ARG1);
+			util::stream_format(stream, "#$%02X", ARG1);
 			return 2 | flags | DASMFLAG_SUPPORTED;
 		case imw:  /* immediate (word) */
-			sprintf (buf, "#$%04X", ARGW);
+			util::stream_format(stream, "#$%04X", ARGW);
 			return 3 | flags | DASMFLAG_SUPPORTED;
 		case idx:  /* indexed + byte offset */
-			sprintf (buf, "(x+$%02X)", ARG1 );
+			util::stream_format(stream, "(x+$%02X)", ARG1);
 			return 2 | flags | DASMFLAG_SUPPORTED;
 		case imx:  /* immediate, indexed + byte offset */
-			sprintf (buf, "#$%02X,(x+$%02x)", ARG1, ARG2 );
+			util::stream_format(stream, "#$%02X,(x+$%02x)", ARG1, ARG2);
 			return 3 | flags | DASMFLAG_SUPPORTED;
 		case dir:  /* direct address */
-			sprintf (buf, "$%02X", ARG1 );
+			util::stream_format(stream, "$%02X", ARG1);
 			return 2 | flags | DASMFLAG_SUPPORTED;
 		case imd:  /* immediate, direct address */
-			sprintf (buf, "#$%02X,$%02X", ARG1, ARG2);
+			util::stream_format(stream, "#$%02X,$%02X", ARG1, ARG2);
 			return 3 | flags | DASMFLAG_SUPPORTED;
 		case ext:  /* extended address */
-			sprintf (buf, "$%04X", ARGW);
+			util::stream_format(stream, "$%04X", ARGW);
 			return 3 | flags | DASMFLAG_SUPPORTED;
 		case sx1:  /* byte from address (s + 1) */
-			sprintf (buf, "(s+1)");
+			util::stream_format(stream, "(s+1)");
 			return 1 | flags | DASMFLAG_SUPPORTED;
 		default:
 			return 1 | flags | DASMFLAG_SUPPORTED;
 	}
+}
+
+static unsigned Dasm680x(int subtype, char *buffer, unsigned pc, const uint8_t *oprom, const uint8_t *opram)
+{
+	std::ostringstream stream;
+	unsigned result = Dasm680x(subtype, stream, pc, oprom, opram);
+	std::string stream_str = stream.str();
+	strcpy(buffer, stream_str.c_str());
+	return result;
 }
 
 CPU_DISASSEMBLE( m6800 )
