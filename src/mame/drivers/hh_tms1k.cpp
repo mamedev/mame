@@ -25,7 +25,7 @@
  @MP0170   TMS1000   1979, Conic Football
  *MP0230   TMS1000?  1980, Entex Blast It (6015)
  @MP0914   TMS1000   1979, Entex Baseball 1
- *MP0915   TMS1000   1979, Bandai System Control Car: Cheetah/Palitoy The Incredible Brain Buggy
+ *MP0915   TMS1000   1979, Bandai System Control Car: Cheetah/The Incredible Brain Buggy
  @MP0919   TMS1000   1979, Tiger Copy Cat (model 7-520)
  *MP0920   TMS1000   1979, Entex Space Battle (6004)
  @MP0923   TMS1000   1979, Entex Baseball 2 (6002)
@@ -6021,11 +6021,11 @@ MACHINE_CONFIG_END
     9-button version, a clone of Mego Fabulous Fred)
 
   This handheld contains 12 minigames. It looks and plays like Game Robot 9 by
-  Gakken (aka Mego's Fabulous Fred) from 1980, which in turn is a mix of Merlin
-  and Simon. Unlike Merlin and Simon, spin-offs were not as successful in the USA.
-  There were releases with and without the prefix "Tandy-12", I don't know which
-  name was more common. Also not worth noting is that it needed five batteries;
-  four C-cells and a 9-volt.
+  Takatoku Toys (aka Mego's Fabulous Fred) from 1980, which in turn is a mix of
+  Merlin and Simon. Unlike Merlin and Simon, spin-offs were not as successful in
+  the USA. There were releases with and without the prefix "Tandy-12", I don't
+  know which name was more common. Also not worth noting is that it needed five
+  batteries; four C-cells and a 9-volt.
 
   Some of the games require accessories included with the toy (eg. the Baseball
   game is played with a board representing the playing field). To start a game,
