@@ -71,11 +71,11 @@ void hp_nanoprocessor_device::device_start()
 	state_add(NANO_REG_R13 , "R13" , m_reg_R[ 13 ]);
 	state_add(NANO_REG_R14 , "R14" , m_reg_R[ 14 ]);
 	state_add(NANO_REG_R15 , "R15" , m_reg_R[ 15 ]);
-	state_add(NANO_REG_PA , "PA" , m_reg_PA).formatstr("%03x");
+	state_add(NANO_REG_PA , "PA" , m_reg_PA).formatstr("%03X");
 	state_add(STATE_GENPC , "GENPC" , m_reg_PA).noshow();
 	state_add(STATE_GENPCBASE , "GENPCBASE" , m_reg_PA).noshow();
-	state_add(NANO_REG_SSR , "SSR" , m_reg_SSR).formatstr("%03x");
-	state_add(NANO_REG_ISR , "ISR" , m_reg_ISR).formatstr("%03x");
+	state_add(NANO_REG_SSR , "SSR" , m_reg_SSR).formatstr("%03X");
+	state_add(NANO_REG_ISR , "ISR" , m_reg_ISR).formatstr("%03X");
 	state_add(STATE_GENFLAGS , "GENFLAGS" , m_flags).noshow().formatstr("%10s");
 
 	m_program = &space(AS_PROGRAM);
