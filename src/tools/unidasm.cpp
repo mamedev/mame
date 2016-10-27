@@ -104,6 +104,7 @@ CPU_DISASSEMBLE( hd63701 );
 CPU_DISASSEMBLE( hmcs40 );
 CPU_DISASSEMBLE( hp_hybrid );
 CPU_DISASSEMBLE( hp_5061_3001 );
+CPU_DISASSEMBLE( hp_nanoprocessor );
 CPU_DISASSEMBLE( hyperstone_generic );
 CPU_DISASSEMBLE( i4004 );
 CPU_DISASSEMBLE( i8008 );
@@ -313,6 +314,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "mips3be",     _32be,  0, CPU_DISASSEMBLE_NAME(mips3be) },
 	{ "mips3le",     _32le,  0, CPU_DISASSEMBLE_NAME(mips3le) },
 	{ "mn10200",     _16le,  0, CPU_DISASSEMBLE_NAME(mn10200) },
+	{ "nanoprocessor",_8bit, 0, CPU_DISASSEMBLE_NAME(hp_nanoprocessor) },
 	{ "nec",         _8bit,  0, CPU_DISASSEMBLE_NAME(nec) },
 	{ "nsc8105",     _8bit,  0, CPU_DISASSEMBLE_NAME(nsc8105) },
 	{ "pdp1",        _32be,  0, CPU_DISASSEMBLE_NAME(pdp1) },
