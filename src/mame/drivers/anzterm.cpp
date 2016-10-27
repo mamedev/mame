@@ -54,22 +54,22 @@ C8209 CPU Board
 ==================
 
 Components:
-  IC1                 - SN75189N
+  IC1                 - SN75189N (quad EIA-232-F line receiver)
   IC3                 - unpopulated (16-pin DIP)
-  IC7                 - SN75174NG
-  IC8                 - SN75175N
-  IC9                 - MC6850P
-  IC12                - SN75189N
-  IC13                - SN75188N
+  IC7                 - SN75174NG (quad EIA-422-B differential line driver)
+  IC8                 - SN75175N (quad EIA-422-B differential line receiver)
+  IC9                 - MC6850P (Motorola ACIA)
+  IC12                - SN75189N (quad EIA-232-F line receiver)
+  IC13                - SN75188N (quad EIA-232-E line driver)
   IC14, IC15          - unpopulated (16-pin DIP)
-  IC16                - MC6854P
-  IC17                - MC6850P
-  IC18                - HD46850P
-  IC19                - MC6854P
+  IC16                - MC6854P (Motorola ADLC)
+  IC17                - MC6850P (Motorola ACIA)
+  IC18                - HD46850P (Hitachi ACIA clone)
+  IC19                - MC6854P (Motorola ADLC)
   IC20                - unpopulated (24-pin DIP)
   IC21                - SN74LS74AN
   IC22                - SN74LS51N
-  IC23                - SN75189N
+  IC23                - SN75189N (quad EIA-232-F line receiver)
   IC24                - unpopulated (16-pin DIP)
   IC25                - SN74LS08N
   IC26                - SN74LS00N
@@ -82,12 +82,12 @@ Components:
   IC36                - SN74LS367AN
   IC37                - SN74LS20N
   IC38                - SN74LS74AN
-  IC39                - P8214
+  IC39                - P8214 (Intel Priority Interrupt Control Unit)
   IC42                - SN74LS245N
   IC45                - SN74LS10N
   IC46                - SN74LS86N
   IC48                - 74LS05N
-  IC50                - WD200IAH-20
+  IC50                - WD200IAH-20 (DES encryption engine)
   IC51                - DM74LS04N
   IC52                - CD4093BE
   IC53                - SN74LS393N
@@ -139,20 +139,20 @@ Components:
   HP1                 - 24-pin DIP wired links - 1/2/16/22/24 3/4/5 6 7/8/9/10 11/12 13/14 15/17/18 19/20 21 23
   HP2                 - 16-pin DIP wired links - 1/2/3/16 4/6/7/8/14 5/9/10/12 11/13/15
   HP3                 - 16-pin DIP wired links - 1/4 2 3 5/12 6/11 7/10 8/9 13 14 15 16
-  IC1, IC2            - HM6116LP-3
+  IC1, IC2            - HM6116LP-3 (2048*8 CMOS SRAM)
   IC3, IC4            - unpopulated (24-pin DIP socket)
-  IC5, IC6, IC7, IC8  - HN482764G
-  IC9                 - HM6147LP-3 (18-pin DIP in 20-pin socket; overlay says "CMOS PARITY 1")
+  IC5, IC6, IC7, IC8  - HN482764G (8192*8 UV EPROM)
+  IC9                 - HM6147LP-3 (4096*1 CMOS SRAM; 18-pin DIP in 20-pin socket; overlay says "CMOS PARITY 1")
   IC10                - DM74LS156N
   IC11, IC12          - unpopulated (24-pin DIP socket)
-  IC13, IC14          - TMS2516JL-45
+  IC13, IC14          - TMS2516JL-45 (2048*8 UV EPROM)
   IC15                - unpopulated (28-pin DIP socket)
-  IC16, IC17, IC18    - HN482764G
+  IC16, IC17, IC18    - HN482764G (8192*8 UV EPROM)
   IC19                - unpopulated (20-pin DIP socket; overlay says "CMOS PARITY 2")
   IC20                - location for 14-pin DIP integrated transistor pack replacing Q1/Q2/Q3/Q4
   IC21                - SN74LS03N
   IC22                - DM74LS156N
-  IC23                - TBP28S166N
+  IC23                - TBP28S166N (2048*8 BPROM)
   IC24                - location for 16-pin DIP under IC23 (for smaller address decoding ROM/PLD?)
   IC25                - SN74LS367AN
   IC26                - DM74LS156N
@@ -173,10 +173,10 @@ Components:
   IC41                - SN74S02N
   IC42                - SN74LS245N
   IC43                - SN74S08N
-  IC44 - IC52         - HM4864P-2 (DRAM BANK 1 BIT 0 - 8 and PARITY, respectively)
+  IC44 - IC52         - HM4864P-2 (65536*1 DRAM; DRAM BANK 1 BIT 0 - 8 and PARITY, respectively)
   IC53, IC54          - SN74LS158N
   IC55                - SN74LS393N
-  IC56 - IC64         - HM4864P-2 (DRAM BANK 2 BIT 0 - 8 and PARITY, respectively)
+  IC56 - IC64         - HM4864P-2 (65536*1 DRAM; DRAM BANK 2 BIT 0 - 8 and PARITY, respectively)
   IC65, IC66          - SN74LS158N
   J1                  - System bus (50-pin DIL IDC)
   J2                  - Power (24-pin SIL)
@@ -219,7 +219,7 @@ Components:
   IC1, IC2            - SN74LS273N
   IC3, IC4            - SN74LS245N
   IC5                 - SN74LS273N
-  IC6                 - D2716D
+  IC6                 - D2716D (2048*8 UV EPROM)
   IC7                 - DM7404N
   IC8                 - SN74LS04N
   IC9                 - SN74LS74AN
@@ -228,29 +228,29 @@ Components:
   IC12                - SN74LS21N
   IC13                - SN74LS93N
   IC14                - SN74LS157N
-  IC15                - HD46505SP-1 HD68A45SP
-  IC16                - HD46850P HD6850P
-  IC17                - MC1488 75188N
+  IC15                - HD46505SP-1 HD68A45SP (Hitachi CRTC clone)
+  IC16                - HD46850P HD6850P (Hitachi ACIA clone)
+  IC17                - MC1488 75188N (quad EIA-232-E line driver)
   IC18                - SN74LS86N
   IC19                - SN74LS08N
   IC20                - SN74LS93N
   IC21                - SN74LS132N
   IC22                - SN74LS08N
-  IC23                - MC1489A SN75189AN
+  IC23                - MC1489A SN75189AN (quad EIA-232-F line receiver)
   IC24                - SN74LS157N
-  IC25                - D8251AC
+  IC25                - D8251AC (NEC Programmable Communications Interface)
   IC26                - SN74LS245N
   IC27                - SN7406N
   IC28                - NE555P
   IC29                - DM74LS00N
-  IC30, IC31, IC32    - MCM2114P20
+  IC30, IC31, IC32    - MCM2114P20 (1024*4 SRAM)
   IC33                - SN74LS157N
   IC34                - SN74LS273N
   IC35                - SN74LS27N
   IC36                - 74LS168
-  IC37                - D2716D
+  IC37                - D2716D (2048*8 UV EPROM)
   IC38                - SN74LS273N
-  IC39                - HD46821P HD6821P
+  IC39                - HD46821P HD6821P (Hitachi PIA clone)
   IC40                - SN74LS74AN
   IC41, IC42, IC43    - 74LS32
   IC44                - SN74LS04N
@@ -315,30 +315,30 @@ MICR Board
 Components:
   JP                  - Jumpers JP1, JP2, JP3, JP4
   K1                  - SPDT Relay
-  U1                  - TL497ACN
-  U3, U4              - DS0026CN
+  U1                  - TL497ACN (switching voltage regulator)
+  U3, U4              - DS0026CN (two-phase MOS clock driver)
   U5                  - CF11000A
   U6                  - CXO-043D 36.0000MHz 4E (oscillator module)
   U7                  - AMI 8336CK 5020056 CO4423
   U8                  - 5020884-002 853C
   U9                  - SN7414N
-  U10                 - ICL8211CPA
-  U11                 - ET2732Q-3
+  U10                 - ICL8211CPA (programmable voltage detector)
+  U11                 - ET2732Q-3 (4096*8 UV EPROM)
   U12                 - SN74LS00N
-  U13                 - MB63303A
-  U14                 - MK3870/42
-  U15                 - AM2716DC (24-pin DIP in 28-pin socket)
-  U16                 - ET2732Q-3 (24-pin DIP in 28-pin socket)
+  U13                 - MB63303A (Fujitsu mask-programmed gate array)
+  U14                 - MK3870/42 (Mostek integrated F8 - 4032 byte program mask ROM, 64 bytes program RAM, 64 byte scratchpad)
+  U15                 - AM2716DC (2048*8 UV EPROM; 24-pin DIP in 28-pin socket)
+  U16                 - ET2732Q-3 (4096*8 UV EPROM; 24-pin DIP in 28-pin socket)
   U17, U18, U19       - unpopulated (28-pin DIP socket)
-  U20                 - ET2732Q-3 (24-pin DIP in 28-pin socket)
+  U20                 - ET2732Q-3 (4096*8 UV EPROM; 24-pin DIP in 28-pin socket)
   U21                 - SN74LS26N
   U22                 - SN74LS245N
   U23                 - SN7406N
   U24                 - unpopulated (14-pin DIP socket)
   U25                 - SN74LS08N
-  U26, U27            - SN75189AN
+  U26, U27            - SN75189AN (quad EIA-232-F line receiver)
   U28                 - SN74LS367AN
-  U29                 - TMS2732AJL-45
+  U29                 - TMS2732AJL-45 (4096*8 UV EPROM)
   U30                 - unpopulated (20-pin SDIP socket)
   U31                 - SN74LS374N
 
@@ -371,7 +371,7 @@ public:
 
 gfx_layout const screenfont =
 {
-	8, 16,                                              // 8x8
+	8, 16,                                              // 8x16
 	RGN_FRAC(1, 1),                                     // whole region
 	1,                                                  // 1bpp
 	{ 0 },                                              // bitplane offset
