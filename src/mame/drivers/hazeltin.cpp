@@ -348,14 +348,14 @@ void hazl1500_state::draw_scanline(uint32_t *pix)
 	m_line_buffer_lsb->rc_w(recycle & 0xf);
 	m_line_buffer_msb->rc_w(recycle >> 4);
 
-    if (recycle == 0)
-        m_maincpu->adjust_icount(-LINE_FETCH_CYCLES);
+	if (recycle == 0)
+		m_maincpu->adjust_icount(-LINE_FETCH_CYCLES);
 
 	for (uint16_t x = 0; x < 80; x++)
 	{
 		uint8_t in = 0;
-        if (!m_vblank)
-            in = m_char_ram[ram_offset + x];
+		if (!m_vblank)
+			in = m_char_ram[ram_offset + x];
 
 		m_line_buffer_lsb->in_w(in & 0xf);
 		m_line_buffer_lsb->cp_w(1);
