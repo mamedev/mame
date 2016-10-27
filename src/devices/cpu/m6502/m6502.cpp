@@ -466,11 +466,11 @@ uint32_t m6502_device::disasm_max_opcode_bytes() const
 	return 4;
 }
 
-offs_t m6502_device::disassemble_generic(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options, const disasm_entry *table)
+offs_t m6502_device::disassemble_generic(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options, const disasm_entry *table)
 {
 	const disasm_entry &e = table[oprom[0] | inst_state_base];
 	uint32_t flags = e.flags | DASMFLAG_SUPPORTED;
-	buffer += sprintf(buffer, "%s", e.opcode);
+	util::stream_format(stream, "%s", e.opcode);
 
 	switch(e.mode) {
 	case DASM_non:
@@ -478,57 +478,57 @@ offs_t m6502_device::disassemble_generic(char *buffer, offs_t pc, const uint8_t 
 		break;
 
 	case DASM_aba:
-		sprintf(buffer, " $%02x%02x", opram[2], opram[1]);
+		util::stream_format(stream, " $%02x%02x", opram[2], opram[1]);
 		flags |= 3;
 		break;
 
 	case DASM_abx:
-		sprintf(buffer, " $%02x%02x, x", opram[2], opram[1]);
+		util::stream_format(stream, " $%02x%02x, x", opram[2], opram[1]);
 		flags |= 3;
 		break;
 
 	case DASM_aby:
-		sprintf(buffer, " $%02x%02x, y", opram[2], opram[1]);
+		util::stream_format(stream, " $%02x%02x, y", opram[2], opram[1]);
 		flags |= 3;
 		break;
 
 	case DASM_acc:
-		sprintf(buffer, " a");
+		util::stream_format(stream, " a");
 		flags |= 1;
 		break;
 
 	case DASM_adr:
-		sprintf(buffer, " $%02x%02x", opram[2], opram[1]);
+		util::stream_format(stream, " $%02x%02x", opram[2], opram[1]);
 		flags |= 3;
 		break;
 
 	case DASM_bzp:
-		sprintf(buffer, "%d $%02x", (oprom[0] >> 4) & 7, opram[1]);
+		util::stream_format(stream, "%d $%02x", (oprom[0] >> 4) & 7, opram[1]);
 		flags |= 2;
 		break;
 
 	case DASM_iax:
-		sprintf(buffer, " ($%02x%02x, x)", opram[2], opram[1]);
+		util::stream_format(stream, " ($%02x%02x, x)", opram[2], opram[1]);
 		flags |= 3;
 		break;
 
 	case DASM_idx:
-		sprintf(buffer, " ($%02x, x)", opram[1]);
+		util::stream_format(stream, " ($%02x, x)", opram[1]);
 		flags |= 2;
 		break;
 
 	case DASM_idy:
-		sprintf(buffer, " ($%02x), y", opram[1]);
+		util::stream_format(stream, " ($%02x), y", opram[1]);
 		flags |= 2;
 		break;
 
 	case DASM_idz:
-		sprintf(buffer, " ($%02x), z", opram[1]);
+		util::stream_format(stream, " ($%02x), z", opram[1]);
 		flags |= 2;
 		break;
 
 	case DASM_imm:
-		sprintf(buffer, " #$%02x", opram[1]);
+		util::stream_format(stream, " #$%02x", opram[1]);
 		flags |= 2;
 		break;
 
@@ -537,87 +537,87 @@ offs_t m6502_device::disassemble_generic(char *buffer, offs_t pc, const uint8_t 
 		break;
 
 	case DASM_ind:
-		sprintf(buffer, " ($%02x%02x)", opram[2], opram[1]);
+		util::stream_format(stream, " ($%02x%02x)", opram[2], opram[1]);
 		flags |= 3;
 		break;
 
 	case DASM_isy:
-		sprintf(buffer, " ($%02x, s), y", opram[1]);
+		util::stream_format(stream, " ($%02x, s), y", opram[1]);
 		flags |= 2;
 		break;
 
 	case DASM_iw2:
-		sprintf(buffer, " #$%02x%02x", opram[2], opram[1]);
+		util::stream_format(stream, " #$%02x%02x", opram[2], opram[1]);
 		flags |= 3;
 		break;
 
 	case DASM_iw3:
-		sprintf(buffer, " #$%02x%02x%02x", opram[3], opram[2], opram[1]);
+		util::stream_format(stream, " #$%02x%02x%02x", opram[3], opram[2], opram[1]);
 		flags |= 4;
 		break;
 
 	case DASM_rel:
-		sprintf(buffer, " $%04x", (pc & 0xf0000) | uint16_t(pc + 2 + int8_t(opram[1])));
+		util::stream_format(stream, " $%04x", (pc & 0xf0000) | uint16_t(pc + 2 + int8_t(opram[1])));
 		flags |= 2;
 		break;
 
 	case DASM_rw2:
-		sprintf(buffer, " $%04x", (pc & 0xf0000) | uint16_t(pc + 2 + int16_t((opram[2] << 8) | opram[1])));
+		util::stream_format(stream, " $%04x", (pc & 0xf0000) | uint16_t(pc + 2 + int16_t((opram[2] << 8) | opram[1])));
 		flags |= 3;
 		break;
 
 	case DASM_zpb:
-		sprintf(buffer, "%d $%02x, $%04x", (oprom[0] >> 4) & 7, opram[1], (pc & 0xf0000) | uint16_t(pc + 3 + int8_t(opram[2])));
+		util::stream_format(stream, "%d $%02x, $%04x", (oprom[0] >> 4) & 7, opram[1], (pc & 0xf0000) | uint16_t(pc + 3 + int8_t(opram[2])));
 		flags |= 3;
 		break;
 
 	case DASM_zpg:
-		sprintf(buffer, " $%02x", opram[1]);
+		util::stream_format(stream, " $%02x", opram[1]);
 		flags |= 2;
 		break;
 
 	case DASM_zpi:
-		sprintf(buffer, " ($%02x)", opram[1]);
+		util::stream_format(stream, " ($%02x)", opram[1]);
 		flags |= 2;
 		break;
 
 	case DASM_zpx:
-		sprintf(buffer, " $%02x, x", opram[1]);
+		util::stream_format(stream, " $%02x, x", opram[1]);
 		flags |= 2;
 		break;
 
 	case DASM_zpy:
-		sprintf(buffer, " $%02x, y", opram[1]);
+		util::stream_format(stream, " $%02x, y", opram[1]);
 		flags |= 2;
 		break;
 
 	case DASM_imz:
-		sprintf(buffer, " #$%02x, $%02x", opram[1], opram[2]);
+		util::stream_format(stream, " #$%02x, $%02x", opram[1], opram[2]);
 		flags |= 3;
 		break;
 
 	case DASM_spg:
-		sprintf(buffer, " \\$%02x", opram[1]);
+		util::stream_format(stream, " \\$%02x", opram[1]);
 		flags |= 2;
 		break;
 
 	case DASM_biz:
-		sprintf(buffer, " %d, $%02x", (opram[0] >> 5) & 7, opram[1]);
+		util::stream_format(stream, " %d, $%02x", (opram[0] >> 5) & 7, opram[1]);
 		flags |= 2;
 		break;
 
 	case DASM_bzr:
-		sprintf(buffer, " %d, $%02x, $%04x", (opram[0] >> 5) & 7, opram[1], (pc & 0xf0000) | uint16_t(pc + 3 + int8_t(opram[2])));
+		util::stream_format(stream, " %d, $%02x, $%04x", (opram[0] >> 5) & 7, opram[1], (pc & 0xf0000) | uint16_t(pc + 3 + int8_t(opram[2])));
 		flags |= 3;
 		break;
 
 	case DASM_bar:
-		sprintf(buffer, " %d, a, $%04x", (opram[0] >> 5) & 7, (pc & 0xf0000) | uint16_t(pc + 3 + int8_t(opram[1])));
+		util::stream_format(stream, " %d, a, $%04x", (opram[0] >> 5) & 7, (pc & 0xf0000) | uint16_t(pc + 3 + int8_t(opram[1])));
 		flags |= 2;
 		break;
 
 	case DASM_bac:
-		sprintf(buffer, " %d, a", (opram[0] >> 5) & 7);
+		util::stream_format(stream, " %d, a", (opram[0] >> 5) & 7);
 		flags |= 1;
 		break;
 
@@ -626,6 +626,15 @@ offs_t m6502_device::disassemble_generic(char *buffer, offs_t pc, const uint8_t 
 		abort();
 	}
 	return flags;
+}
+
+offs_t m6502_device::disassemble_generic(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options, const disasm_entry *table)
+{
+	std::ostringstream stream;
+	offs_t result = disassemble_generic(stream, pc, oprom, opram, options, table);
+	std::string stream_str = stream.str();
+	strcpy(buffer, stream_str.c_str());
+	return result;
 }
 
 void m6502_device::prefetch()
