@@ -1422,7 +1422,7 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 		}
 	}
 	if (logextra & logit && m_state->zeus_quad_size == 14) {
-		m_state->logerror("uknown: int16: %d %d %d %d %d %d %d %d float: %f %f %f %f\n",
+		m_state->logerror("unknown: int16: %d %d %d %d %d %d %d %d float: %f %f %f %f\n",
 			unknown[0], unknown[1], unknown[2], unknown[3], unknown[4], unknown[5], unknown[6], unknown[7],
 			unknownFloat[0], unknownFloat[1], unknownFloat[2], unknownFloat[3]);
 	}

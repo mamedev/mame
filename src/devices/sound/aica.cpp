@@ -372,7 +372,7 @@ void aica_device::StartSlot(AICA_SLOT *slot)
 	slot->active=1;
 	slot->Backwards=0;
 	slot->cur_addr=0; slot->nxt_addr=1<<SHIFT; slot->prv_addr=-1;
-	start_offset = SA(slot);    // AICA can play 16-bit samples from any boundry
+	start_offset = SA(slot);    // AICA can play 16-bit samples from any boundary
 	slot->base=&m_AICARAM[start_offset];
 	slot->step=Step(slot);
 	Compute_EG(slot);

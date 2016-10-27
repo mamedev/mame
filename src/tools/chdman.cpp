@@ -1915,7 +1915,7 @@ static void do_create_cd(parameters_t &params)
 	// process numprocessors
 	parse_numprocessors(params);
 
-	// pad each track to a 4-frame boundry. cdrom.c will deal with this on the read side
+	// pad each track to a 4-frame boundary. cdrom.c will deal with this on the read side
 	uint32_t origtotalsectors = 0;
 	uint32_t totalsectors = 0;
 	for (int tracknum = 0; tracknum < toc.numtrks; tracknum++)
