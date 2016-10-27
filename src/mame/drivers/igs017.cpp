@@ -3952,10 +3952,10 @@ ROM_START( lhzb2 )
 	ROM_REGION( 0x10000, "igs022data", 0 )  // INTERNATIONAL GAMES SYSTEM CO.,LTD
 	ROM_LOAD( "m1104.u11",0x0000, 0x10000, CRC(794d0276) SHA1(ac903d2faa3fb315438dc8da22c5337611a8790d) )
 
-	ROM_REGION( 0x400000, "sprites", 0 )    // adddress scrambling
+	ROM_REGION( 0x400000, "sprites", 0 )    // address scrambling
 	ROM_LOAD16_WORD_SWAP( "m1101.u6", 0x000000, 0x400000, CRC(0114e9d1) SHA1(5b16170d3cd8b8e1662c949b7234fbdd2ca927f7) )    // FIXED BITS (0xxxxxxxxxxxxxxx)
 
-	ROM_REGION( 0x80000, "tilemaps", 0 )    // adddress scrambling
+	ROM_REGION( 0x80000, "tilemaps", 0 )    // address scrambling
 	ROM_LOAD16_WORD_SWAP( "m1103.u8", 0x00000, 0x80000, CRC(4d3776b4) SHA1(fa9b311b1a6ad56e136b66d090bc62ed5003b2f2) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
@@ -3968,10 +3968,10 @@ ROM_START( lhzb2a )
 	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "p-4096", 0x00000, 0x80000, CRC(41293f32) SHA1(df4e993f4a458729ade13981e58f32d8116c0082) )
 
-	ROM_REGION( 0x400000, "sprites", 0 )    // adddress scrambling
+	ROM_REGION( 0x400000, "sprites", 0 )    // address scrambling
 	ROM_LOAD16_WORD_SWAP( "m1101.u6", 0x000000, 0x400000, CRC(0114e9d1) SHA1(5b16170d3cd8b8e1662c949b7234fbdd2ca927f7) )    // FIXED BITS (0xxxxxxxxxxxxxxx)
 
-	ROM_REGION( 0x80000, "tilemaps", 0 )    // adddress scrambling
+	ROM_REGION( 0x80000, "tilemaps", 0 )    // address scrambling
 	ROM_LOAD16_WORD_SWAP( "m1103.u8", 0x00000, 0x80000, CRC(4d3776b4) SHA1(fa9b311b1a6ad56e136b66d090bc62ed5003b2f2) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
@@ -4027,10 +4027,10 @@ ROM_START( slqz2 )
 	ROM_REGION( 0x10000, "igs022data", 0 )  // INTERNATIONAL GAMES SYSTEM CO.,LTD
 	ROM_LOAD( "m1103.u12", 0x00000, 0x10000, CRC(9f3b8d65) SHA1(5ee1ad025474399c2826f21d970e76f25d0fa1fd) )
 
-	ROM_REGION( 0x400000, "sprites", 0 )    // adddress scrambling
+	ROM_REGION( 0x400000, "sprites", 0 )    // address scrambling
 	ROM_LOAD16_WORD_SWAP( "m1101.u4", 0x000000, 0x400000, CRC(0114e9d1) SHA1(5b16170d3cd8b8e1662c949b7234fbdd2ca927f7) )    // FIXED BITS (0xxxxxxxxxxxxxxx)
 
-	ROM_REGION( 0x80000, "tilemaps", 0 )    // light adddress scrambling
+	ROM_REGION( 0x80000, "tilemaps", 0 )    // light address scrambling
 	ROM_LOAD( "text.u6", 0x00000, 0x80000, CRC(40d21adf) SHA1(18b202d6330ac89026bec2c9c8224b52540dd48d) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
