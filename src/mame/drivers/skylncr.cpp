@@ -176,8 +176,8 @@ public:
 	required_shared_ptr<uint8_t> m_reelscroll3;
 	required_shared_ptr<uint8_t> m_reelscroll4;
 	uint8_t m_nmi_enable;
-	int m_color;
-	int m_color2;
+	bool m_mbutrfly_prot;
+
 	DECLARE_WRITE8_MEMBER(skylncr_videoram_w);
 	DECLARE_WRITE8_MEMBER(skylncr_colorram_w);
 	DECLARE_WRITE8_MEMBER(reeltiles_1_w);
@@ -211,7 +211,6 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<ticket_dispenser_device> m_hopper;
-	bool m_mbutrfly_prot;
 };
 
 

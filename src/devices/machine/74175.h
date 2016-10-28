@@ -168,9 +168,6 @@ private:
 
 	uint8_t m_q5;
 	uint8_t m_q6;
-
-	uint8_t m_last_q5;
-	uint8_t m_last_q6;
 };
 
 class ttl74175_device : public ttl741745_device
