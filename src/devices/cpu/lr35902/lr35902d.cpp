@@ -220,13 +220,13 @@ static offs_t internal_disasm_lr35902(cpu_device *device, std::ostream &stream, 
 				util::stream_format(stream, "$%02X,$%02X", op, op1);
 				break;
 			case 'A':
-				ea = opram[pos] + ( opram[pos+1] << 8);
+				ea = opram[pos] + (opram[pos+1] << 8);
 				pos += 2;
-				util::stream_format(stream, "$%04X", ea );
+				util::stream_format(stream, "$%04X", ea);
 				break;
 			case 'B':   /* Byte op arg */
 				ea = opram[pos++];
-				util::stream_format(stream, "$%02X", ea );
+				util::stream_format(stream, "$%02X", ea);
 				break;
 			case '(':   /* Memory byte at (...) */
 				stream << *src;
@@ -236,30 +236,30 @@ static offs_t internal_disasm_lr35902(cpu_device *device, std::ostream &stream, 
 				} else if( !strncmp( src, "(sp)", 4) ) {
 				} else if( !strncmp( src, "(F)", 3) ) {
 					ea = 0xFF00 + opram[pos++];
-					util::stream_format(stream, "$%02X", ea );
+					util::stream_format(stream, "$%02X", ea);
 					src++;
 				} else if( !strncmp( src, "(C)", 3) ) {
-					util::stream_format(stream, "$FF00+c" );
+					util::stream_format(stream, "$FF00+c");
 					src++;
 				}
 				break;
 			case 'N':   /* Immediate 16 bit */
-				ea = opram[pos] + ( opram[pos+1] << 8 );
+				ea = opram[pos] + (opram[pos+1] << 8);
 				pos += 2;
-				util::stream_format(stream, "$%04X", ea );
+				util::stream_format(stream, "$%04X", ea);
 				break;
 			case 'O':   /* Offset relative to PC */
 				offset = (int8_t) opram[pos++];
-				util::stream_format(stream, "$%04X", pc + offset + 2 );
+				util::stream_format(stream, "$%04X", pc + offset + 2);
 				break;
 			case 'V':   /* Restart vector */
 				ea = op & 0x38;
-				util::stream_format(stream, "$%02X", ea );
+				util::stream_format(stream, "$%02X", ea);
 				break;
 			case 'W':   /* Memory address word */
-				ea = opram[pos] + ( opram[pos+1] << 8 );
+				ea = opram[pos] + (opram[pos+1] << 8);
 				pos += 2;
-				util::stream_format(stream, "$%04X", ea );
+				util::stream_format(stream, "$%04X", ea);
 				break;
 			default:
 				stream << *src;
