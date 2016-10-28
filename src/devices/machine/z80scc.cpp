@@ -85,7 +85,9 @@ DONE (x) (p=partly)         NMOS         CMOS       ESCC      EMSCC
 #define LOGSETUP(x) {} LOGPRINT(x)
 #define LOGINT(x)   {} LOGPRINT(x)
 #define LOGTX(x)    {} LOGPRINT(x)
-#define LOGRCV(x)   {}
+#define LOGRCV(x)   {} 
+#define LOGCTS(x)   {} LOGPRINT(x)
+#define LOGDCD(x)   {} LOGPRINT(x)
 #if VERBOSE == 2
 #define logerror printf
 #endif
@@ -821,8 +823,8 @@ z80scc_channel::z80scc_channel(const machine_config &mconfig, const char *tag, d
 		m_rx_break(0),
 		m_rx_rr0_latch(0),
 		m_rxd(0),
-		m_cts(0),
-		m_dcd(0),
+		m_cts(1),
+		m_dcd(1),
 		m_tx_clock(0),
 		m_dtr(0),
 		m_rts(0),
@@ -1319,12 +1321,14 @@ uint8_t z80scc_channel::do_sccreg_rr2()
 	{
 		int i = 0;
 
+		LOGINT((" - Channel B so we might need to update the vector modification\n"));
 		// loop over all interrupt sources
 		for (auto & elem : m_uart->m_int_state)
 		{
 			// find the first channel with an interrupt requested
 			if (elem & Z80_DAISY_INT)
 			{
+				LOGINT((" - Checking an INT source %d\n", i));
 				m_rr2 = m_uart->modify_vector(m_rr2, i < 3 ? z80scc_device::CHANNEL_A : z80scc_device::CHANNEL_B, m_uart->m_int_source[i] & 3);
 				if ((m_uart->m_variant & (SET_ESCC | SET_CMOS)) && (m_uart->m_wr9 & WR9_BIT_IACK))
 				{
@@ -1491,8 +1495,8 @@ uint8_t z80scc_channel::do_sccreg_rr14()
 uint8_t z80scc_channel::do_sccreg_rr15()
 {
 	LOGR(("%s\n", FUNCNAME));
-	logerror("%s() not implemented feature\n", FUNCNAME);
-	return m_wr15 & 0xf5; // Mask out the used bits
+
+	return m_wr15 & 0xfa; // Mask out the used bits
 }
 
 //-------------------------------------------------
@@ -2422,14 +2426,21 @@ WRITE_LINE_MEMBER( z80scc_channel::cts_w )
 	{
 		// enable transmitter if in auto enables mode
 		if (!state)
+		{
+			LOGCTS((" - CTS active\n"));
 			if (m_wr3 & WR3_AUTO_ENABLES)
+			{
+				LOGCTS((" - TX auto enabled\n"));
 				m_wr5 |= WR5_TX_ENABLE;
+			}
+		}
 
 		// set clear to send
 		m_cts = state;
 
 		if (!m_rx_rr0_latch)
 		{
+			LOGCTS((" - RR0 not latched so updating RR0 with CTS state\n"));
 			if (!m_cts)
 				m_rr0 |= RR0_CTS;
 			else
@@ -2444,9 +2455,11 @@ WRITE_LINE_MEMBER( z80scc_channel::cts_w )
 			if ((m_wr1 & WR1_EXT_INT_ENABLE) && (m_wr15 & WR15_CTS))
 			{
 				// trigger interrupt
+				LOGCTS((" - Trigger CTS interrupt\n"));
 				m_uart->trigger_interrupt(m_index, INT_EXTERNAL);
 
 				// latch read register 0
+				LOGCTS((" - Latches RR0\n"));
 				m_rx_rr0_latch = 1;
 			}
 		}
@@ -2465,9 +2478,11 @@ WRITE_LINE_MEMBER( z80scc_channel::dcd_w )
 	{
 		if (!state) 
 		{
+			LOGDCD((" - DCD active\n"));
 			// enable receiver if in auto enables mode
 			if (m_wr3 & WR3_AUTO_ENABLES)
 			{
+				LOGCTS((" - RX auto enabled\n"));
 				m_wr3 |= WR3_RX_ENABLE;
 #if START_BIT_HUNT
 				m_rcv_mode = RCV_SEEKING;
@@ -2485,6 +2500,7 @@ of transitions on the /DCD pin while another External/Status interrupt condition
 reset, this bit merely reports the current, unlatched state of the /DCD pin.*/
 		if (!m_rx_rr0_latch)
 		{
+			LOGDCD((" - RR0 not latched so updating RR0 with DCD state\n"));
 			if (m_dcd)
 				m_rr0 |= RR0_DCD;
 			else
@@ -2500,9 +2516,11 @@ reset, this bit merely reports the current, unlatched state of the /DCD pin.*/
 			if ((m_wr1 & WR1_EXT_INT_ENABLE) && (m_wr15 & WR15_DCD))
 			{
 				// trigger interrupt
+				LOGDCD((" - Trigger DCD interrupt\n"));
 				m_uart->trigger_interrupt(m_index, INT_EXTERNAL);
 
 				// latch read register 0
+				LOGDCD((" - Latches RR0\n"));
 				m_rx_rr0_latch = 1;
 			}
 		}
