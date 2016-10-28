@@ -63,33 +63,41 @@ void arc_device::device_start()
 
 	m_program = &space(AS_PROGRAM);
 
-	state_add( 0,  "PC", m_debugger_temp).callimport().callexport().formatstr("%08X");
-	state_add(STATE_GENPC, "GENPC", m_debugger_temp).callexport().noshow();
-	state_add(STATE_GENPCBASE, "CURPC", m_debugger_temp).callexport().noshow();
+	state_add(ARC_PC,  "PC", m_debugger_temp).callimport().callexport().formatstr("%08X");
+	state_add(STATE_GENPCBASE, "CURPC", m_debugger_temp).callimport().callexport().noshow();
 
 	m_icountptr = &m_icount;
 }
+
+
+//-------------------------------------------------
+//  state_export - export state from the device,
+//  to a known location where it can be read
+//-------------------------------------------------
 
 void arc_device::state_export(const device_state_entry &entry)
 {
 	switch (entry.index())
 	{
-		case 0:
-			m_debugger_temp = m_pc << 2;
-			break;
-
-		case STATE_GENPC:
+		case ARC_PC:
 		case STATE_GENPCBASE:
 			m_debugger_temp = m_pc << 2;
 			break;
 	}
 }
 
+
+//-------------------------------------------------
+//  state_import - import state into the device,
+//  after it has been set
+//-------------------------------------------------
+
 void arc_device::state_import(const device_state_entry &entry)
 {
 	switch (entry.index())
 	{
-		case 0:
+		case ARC_PC:
+		case STATE_GENPCBASE:
 			m_pc = (m_debugger_temp & 0xfffffffc) >> 2;
 			break;
 	}

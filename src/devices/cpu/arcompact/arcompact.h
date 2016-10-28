@@ -11,6 +11,15 @@
 #ifndef __ARCOMPACT_H__
 #define __ARCOMPACT_H__
 
+enum
+{
+	ARCOMPACT_PC = STATE_GENPC,
+	ARCOMPACT_STATUS32 = 0x10,
+	ARCOMPACT_LP_START,
+	ARCOMPACT_LP_END
+
+};
+
 #define ARCOMPACT_RETTYPE uint32_t
 #define OPS_32 uint32_t op
 #define OPS_16 uint16_t op
