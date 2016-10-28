@@ -1502,6 +1502,21 @@ ROM_START( utrn1024 )
 	ROM_LOAD16_BYTE( "macplus_mem_l.e7", 0x000001, 0x010000, CRC(fb766270) SHA1(679f529fbfc05f9cc98924c53457d2996dfcb1a7) )
 ROM_END
 
+/*
+ SCC init macplus.rom
+ * Channel B and A init - reset command and vector differs
+ * 09 <- 40/80 Master Interrup Control: channel B/A reset
+ * 04 <- 4c Clocks: x16 mode, 2 stop bits, no parity
+ * 02 <- 00 Interrupt vector (just for chan B)
+ * 03 <- c0 Receiver: 8 bit data, auto enables, Rx disabled
+ * 0f <- 08 External/Status Control: DCD ints enabled
+ * 00 <- 10 Reset External/status interrupts
+ * 00 <- 10 Reset External/status interrupts
+ * 01 <- 01 Enable External Interrupts
+ * Above init first for channel B and then for channel A
+ * 09 <- 0a Master Interrup Control: No vector and Interrupts enabled!
+*/
+
 ROM_START( mac512ke )
 	ROM_REGION16_BE(0x100000, "bootrom", 0)
 	ROM_LOAD16_WORD( "macplus.rom",  0x00000, 0x20000, CRC(b2102e8e) SHA1(7d2f808a045aa3a1b242764f0e2c7d13e288bf1f))
