@@ -588,11 +588,11 @@ void arm_cpu_device::HandleBranch( uint32_t insn )
 	/* Sign-extend the 24-bit offset in our calculations */
 	if (off & 0x2000000u)
 	{
-		R15 -= ((~(off | 0xfc000000u)) + 1) - 8;
+		R15 = ((R15 - (((~(off | 0xfc000000u)) + 1) - 8)) & ADDRESS_MASK) | (R15 & ~ADDRESS_MASK);
 	}
 	else
 	{
-		R15 += off + 8;
+		R15 = ((R15 + (off + 8)) & ADDRESS_MASK) | (R15 & ~ADDRESS_MASK);
 	}
 	m_icount -= 2 * S_CYCLE + N_CYCLE;
 }
@@ -1122,7 +1122,16 @@ void arm_cpu_device::HandleMemBlock( uint32_t insn )
 			/* Incrementing */
 			if (!(insn & INSN_BDT_P)) rbp = rbp + (- 4);
 
-			result = loadInc( insn & 0xffff, rbp, insn&INSN_BDT_S );
+			// S Flag Set, but R15 not in list = Transfers to User Bank
+			if ((insn & INSN_BDT_S) && !(insn & 0x8000))
+			{
+				int curmode = MODE;
+				R15 = R15 & ~MODE_MASK;
+				result = loadInc( insn & 0xffff, rbp, insn&INSN_BDT_S );
+				R15 = R15 | curmode;
+			}
+			else
+				result = loadInc( insn & 0xffff, rbp, insn&INSN_BDT_S );
 
 			if (insn & 0x8000)
 			{
@@ -1163,8 +1172,17 @@ void arm_cpu_device::HandleMemBlock( uint32_t insn )
 				rbp = rbp - (- 4);
 			}
 
-			result = loadDec( insn&0xffff, rbp, insn&INSN_BDT_S, &deferredR15, &defer );
-
+			// S Flag Set, but R15 not in list = Transfers to User Bank
+			if ((insn & INSN_BDT_S) && !(insn & 0x8000))
+			{
+				int curmode = MODE;
+				R15 = R15 & ~MODE_MASK;
+				result = loadDec( insn&0xffff, rbp, insn&INSN_BDT_S, &deferredR15, &defer );
+				R15 = R15 | curmode;
+			}
+			else
+				result = loadDec( insn&0xffff, rbp, insn&INSN_BDT_S, &deferredR15, &defer );
+		
 			if (insn & INSN_BDT_W)
 			{
 				if (rb==0xf)
@@ -1210,7 +1228,18 @@ void arm_cpu_device::HandleMemBlock( uint32_t insn )
 			{
 				rbp = rbp + (- 4);
 			}
-			result = storeInc( insn&0xffff, rbp );
+
+			// S bit set = Transfers to User Bank
+			if (insn & INSN_BDT_S)
+			{
+				int curmode = MODE;
+				R15 = R15 & ~MODE_MASK;
+				result = storeInc( insn&0xffff, rbp );
+				R15 = R15 | curmode;
+			}
+			else
+				result = storeInc( insn&0xffff, rbp );
+
 			if( insn & INSN_BDT_W )
 			{
 				SetRegister(rb,GetRegister(rb)+result*4);
@@ -1223,7 +1252,18 @@ void arm_cpu_device::HandleMemBlock( uint32_t insn )
 			{
 				rbp = rbp - (- 4);
 			}
-			result = storeDec( insn&0xffff, rbp );
+
+			// S bit set = Transfers to User Bank
+			if (insn & INSN_BDT_S)
+			{
+				int curmode = MODE;
+				R15 = R15 & ~MODE_MASK;
+				result = storeDec( insn&0xffff, rbp );
+				R15 = R15 | curmode;
+			}
+			else
+				result = storeDec( insn&0xffff, rbp );
+
 			if( insn & INSN_BDT_W )
 			{
 				SetRegister(rb,GetRegister(rb)-result*4);
