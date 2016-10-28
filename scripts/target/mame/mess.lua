@@ -1948,6 +1948,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/glasgow.cpp",
 	MAME_DIR .. "src/mame/drivers/mephisto.cpp",
 	MAME_DIR .. "src/mame/drivers/mmodular.cpp",
+	MAME_DIR .. "src/mame/drivers/risc2500.cpp",
 	MAME_DIR .. "src/mame/drivers/stratos.cpp",
 }
 
