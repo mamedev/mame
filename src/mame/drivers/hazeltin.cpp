@@ -17,8 +17,12 @@ References:
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "machine/7400.h"
+#include "machine/7404.h"
+#include "machine/7474.h"
 #include "machine/74161.h"
 #include "machine/74175.h"
+#include "machine/82s129.h"
 #include "machine/am2847.h"
 #include "machine/ay31015.h"
 #include "machine/clock.h"
@@ -39,14 +43,23 @@ References:
 #define TMS3409A_TAG	"u67"
 #define TMS3409B_TAG	"u57"
 #define DOTCLK_TAG		"dotclk"
+#define DOTCLK_DISP_TAG	"dotclk_dispatch"
+#define CHAR_CTR_CLK_TAG "ch_bucket_ctr_clk"
 #define U58_TAG			"u58"
+#define U59_TAG			"u59"
+#define VID_PROM_ADDR_RESET_TAG "u59_y5"
+#define U61_TAG			"u61"
 #define U68_TAG			"u68"
 #define U69_PROMMSB_TAG	"u69"
 #define U70_PROMLSB_TAG	"u70"
+#define U70_TC_LINE_TAG "u70_tc"
 #define U71_PROM_TAG	"u71"
 #define U72_PROMDEC_TAG	"u72"
 #define U81_TAG			"u81"
+#define U83_TAG			"u83"
 #define U84_DIV11_TAG	"u84"
+#define U85_VERT_DR_UB_TAG "u85"
+#define U87_TAG			"u87"
 #define U88_DIV9_TAG	"u88"
 #define U90_DIV14_TAG	"u90"
 #define BAUD_PROM_TAG	"u39"
@@ -96,12 +109,14 @@ public:
 		, m_kbd_misc_keys(*this, MISCKEYS_TAG)
 		, m_char_ram(*this, CHARRAM_TAG)
 		, m_char_rom(*this, CHARROM_TAG)
-		, m_u71_prom(*this, U71_PROM_TAG)
 		, m_line_buffer_lsb(*this, TMS3409A_TAG)
 		, m_line_buffer_msb(*this, TMS3409B_TAG)
 		, m_dotclk(*this, DOTCLK_TAG)
 		, m_vid_prom_msb(*this, U69_PROMMSB_TAG)
 		, m_vid_prom_lsb(*this, U70_PROMLSB_TAG)
+		, m_vid_prom(*this, U71_PROM_TAG)
+		, m_u59(*this, U59_TAG)
+		, m_u83(*this, U83_TAG)
 		, m_char_y(*this, U84_DIV11_TAG)
 		, m_char_x(*this, U88_DIV9_TAG)
 		, m_vid_div14(*this, U90_DIV14_TAG)
@@ -109,6 +124,8 @@ public:
 		, m_u58(*this, U58_TAG)
 		, m_u68(*this, U68_TAG)
 		, m_u81(*this, U81_TAG)
+		, m_u87(*this, U87_TAG)
+		, m_u61(*this, U61_TAG)
 		, m_screen(*this, SCREEN_TAG)
 		, m_hblank_timer(nullptr)
 		, m_scanline_timer(nullptr)
@@ -144,9 +161,6 @@ public:
 	DECLARE_READ_LINE_MEMBER(ay3600_control_r);
 	DECLARE_WRITE_LINE_MEMBER(ay3600_data_ready_w);
 
-	DECLARE_WRITE_LINE_MEMBER(dotclk_w);
-	DECLARE_WRITE_LINE_MEMBER(ch_bucket_ctr_clk_w);
-	DECLARE_WRITE_LINE_MEMBER(u70_tc_w);
     DECLARE_WRITE8_MEMBER(refresh_address_w);
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
@@ -169,12 +183,14 @@ private:
 
 	required_shared_ptr<uint8_t> m_char_ram;
 	required_region_ptr<uint8_t> m_char_rom;
-	required_region_ptr<uint8_t> m_u71_prom;
 	required_device<tms3409_device> m_line_buffer_lsb;
 	required_device<tms3409_device> m_line_buffer_msb;
 	required_device<clock_device> m_dotclk;
 	required_device<ttl74161_device> m_vid_prom_msb;
 	required_device<ttl74161_device> m_vid_prom_lsb;
+	required_device<prom82s129_device> m_vid_prom;
+	required_device<ttl7404_device> m_u59;
+	required_device<ttl7400_device> m_u83;
 	required_device<ttl74161_device> m_char_y;
 	required_device<ttl74161_device> m_char_x;
 	required_device<ttl74161_device> m_vid_div14;
@@ -182,6 +198,8 @@ private:
 	required_device<ttl74175_device> m_u58;
 	required_device<ttl74175_device> m_u68;
 	required_device<ttl74175_device> m_u81;
+	required_device<ttl7404_device> m_u87;
+	required_device<ttl7404_device> m_u61;
 
 	required_device<screen_device> m_screen;
 
@@ -347,24 +365,6 @@ void hazl1500_state::device_timer(emu_timer &timer, device_timer_id id, int para
 			break;
 		}
 	}
-}
-
-WRITE_LINE_MEMBER(hazl1500_state::dotclk_w)
-{
-	m_u81->clock_w(state);
-	m_char_x->clock_w(state);
-}
-
-WRITE_LINE_MEMBER(hazl1500_state::ch_bucket_ctr_clk_w)
-{
-	m_vid_prom_lsb->clock_w(state);
-	m_vid_prom_msb->clock_w(state);
-}
-
-WRITE_LINE_MEMBER(hazl1500_state::u70_tc_w)
-{
-	m_vid_prom_msb->cet_w(state);
-	m_vid_prom_msb->cep_w(state);
 }
 
 WRITE8_MEMBER(hazl1500_state::refresh_address_w)
@@ -697,11 +697,35 @@ static MACHINE_CONFIG_START( hazl1500, hazl1500_state )
 	MCFG_TMS3409_ADD(TMS3409B_TAG)
 
 	MCFG_CLOCK_ADD(DOTCLK_TAG, XTAL_33_264MHz/2)
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(hazl1500_state, dotclk_w))
+	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE(DOTCLK_DISP_TAG, devcb_line_dispatch_device<2>, in_w))
+
+	MCFG_LINE_DISPATCH_ADD(DOTCLK_DISP_TAG, 2)
+	MCFG_LINE_DISPATCH_FWD_CB(0, 2, DEVWRITELINE(U81_TAG, ttl74175_device, clock_w))
+	MCFG_LINE_DISPATCH_FWD_CB(1, 2, DEVWRITELINE(U88_DIV9_TAG, ttl74161_device, clock_w))
+
+	MCFG_74161_ADD(U70_PROMLSB_TAG)
+	MCFG_7416x_QA_CB(DEVWRITELINE(U71_PROM_TAG, prom82s129_device, a0_w))
+	MCFG_7416x_QB_CB(DEVWRITELINE(U71_PROM_TAG, prom82s129_device, a1_w))
+	MCFG_7416x_QC_CB(DEVWRITELINE(U71_PROM_TAG, prom82s129_device, a2_w))
+	MCFG_7416x_QD_CB(DEVWRITELINE(U71_PROM_TAG, prom82s129_device, a3_w))
+	MCFG_7416x_TC_CB(DEVWRITELINE(U70_TC_LINE_TAG, devcb_line_dispatch_device<2>, in_w))
+
+	MCFG_LINE_DISPATCH_ADD(U70_TC_LINE_TAG, 2)
+	MCFG_LINE_DISPATCH_FWD_CB(0, 2, DEVWRITELINE(U69_PROMMSB_TAG, ttl74161_device, cet_w))
+	MCFG_LINE_DISPATCH_FWD_CB(1, 2, DEVWRITELINE(U69_PROMMSB_TAG, ttl74161_device, cep_w))
 
 	MCFG_74161_ADD(U69_PROMMSB_TAG)
-	MCFG_74161_ADD(U70_PROMLSB_TAG)
-	MCFG_7416x_TC_CB(WRITELINE(hazl1500_state, u70_tc_w))
+	MCFG_7416x_QA_CB(DEVWRITELINE(U71_PROM_TAG, prom82s129_device, a4_w))
+	MCFG_7416x_QB_CB(DEVWRITELINE(U71_PROM_TAG, prom82s129_device, a5_w))
+	MCFG_7416x_QC_CB(DEVWRITELINE(U71_PROM_TAG, prom82s129_device, a6_w))
+
+	//MCFG_LINE_DISPATCH_ADD(CHAR_LINE_CNT_CLK_TAG, 3)
+	//MCFG_LINE_DISPATCH_FWD_CB(0, 3, DEVWRITELINE(U85_VERT_DR_UB_TAG, ttl7473_device, clk1_w))
+	//MCFG_LINE_DISPATCH_FWD_CB(1, 3, DEVWRITELINE(U85_VERT_DR_UB_TAG, ttl7473_device, clk2_w))
+	//MCFG_LINE_DISPATCH_FWD_CB(2, 3, DEVWRITELINE(U84_DIV11_TAG, ttl74161_device, clock_w))
+
+	MCFG_7400_ADD(U83_TAG)
+	//MCFG_7400_Y1_CB(DEVWRITELINE(CHAR_LINE_CNT_CLK_TAG, devcb_line_dispatch_device<4>, in_w))
 
 	MCFG_74161_ADD(U84_DIV11_TAG)
 	MCFG_74161_ADD(U90_DIV14_TAG)
@@ -710,13 +734,33 @@ static MACHINE_CONFIG_START( hazl1500, hazl1500_state )
 	MCFG_7416x_QC_CB(DEVWRITELINE(U81_TAG, ttl74175_device, d4_w))
 	MCFG_7416x_TC_CB(DEVWRITELINE(U81_TAG, ttl74175_device, d1_w))
 
+	MCFG_LINE_DISPATCH_ADD(CHAR_CTR_CLK_TAG, 2)
+	MCFG_LINE_DISPATCH_FWD_CB(0, 2, DEVWRITELINE(U70_PROMLSB_TAG, ttl74161_device, clock_w))
+	MCFG_LINE_DISPATCH_FWD_CB(1, 2, DEVWRITELINE(U69_PROMMSB_TAG, ttl74161_device, clock_w))
+
 	MCFG_74175_ADD(U58_TAG)
 	MCFG_74175_ADD(U68_TAG)
 	MCFG_74175_ADD(U81_TAG)
 	MCFG_74175_Q1_CB(DEVWRITELINE(U81_TAG, ttl74175_device, d2_w))
-	MCFG_74175_NOT_Q2_CB(WRITELINE(hazl1500_state, ch_bucket_ctr_clk_w))
+	MCFG_74175_NOT_Q2_CB(DEVWRITELINE(CHAR_CTR_CLK_TAG, devcb_line_dispatch_device<2>, in_w))
 
 	MCFG_DM9334_ADD(U72_PROMDEC_TAG)
+	MCFG_DM9334_Q4_CB(DEVWRITELINE(U83_TAG, ttl7400_device, b1_w))
+
+	MCFG_82S129_ADD(U71_PROM_TAG)
+	MCFG_82S129_O1_CB(DEVWRITELINE(U72_PROMDEC_TAG, dm9334_device, a0_w))
+	MCFG_82S129_O2_CB(DEVWRITELINE(U72_PROMDEC_TAG, dm9334_device, a1_w))
+	MCFG_82S129_O3_CB(DEVWRITELINE(U72_PROMDEC_TAG, dm9334_device, a2_w))
+	MCFG_82S129_O4_CB(DEVWRITELINE(U72_PROMDEC_TAG, dm9334_device, d_w))
+
+	MCFG_7404_ADD(U61_TAG)
+	MCFG_7404_ADD(U87_TAG)
+	MCFG_7404_ADD(U59_TAG)
+	MCFG_7404_Y5_CB(DEVWRITELINE(VID_PROM_ADDR_RESET_TAG, devcb_line_dispatch_device<2>, in_w))
+
+	MCFG_LINE_DISPATCH_ADD(VID_PROM_ADDR_RESET_TAG, 2)
+	MCFG_LINE_DISPATCH_FWD_CB(0, 2, DEVWRITELINE(U70_PROMLSB_TAG, ttl74161_device, pe_w))
+	MCFG_LINE_DISPATCH_FWD_CB(1, 2, DEVWRITELINE(U69_PROMMSB_TAG, ttl74161_device, pe_w))
 
 	/* keyboard controller */
 	MCFG_DEVICE_ADD(KBDC_TAG, AY3600, 0)

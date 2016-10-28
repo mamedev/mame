@@ -137,12 +137,22 @@ public:
 	DECLARE_READ_LINE_MEMBER( q6_r );
 	DECLARE_READ_LINE_MEMBER( q7_r );
 
+	uint8_t get_output() const { return m_out; }
+
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 private:
+	enum class mode_t
+	{
+		DEMUX = 0x00,
+		LATCH = 0x01,
+		CLEAR = 0x02,
+		MEMORY = 0x03
+	};
+
 	void init();
 	void tick();
 
@@ -158,16 +168,13 @@ private:
 	devcb_write_line m_q7_func;
 
 	// inputs
-	uint8_t m_e;
-	uint8_t m_c;
-	uint8_t m_d;
+	uint8_t m_e;		// pin 14
+	uint8_t m_c;		// pin 15
+	uint8_t m_d;		// pin 13
 	uint8_t m_a;		// pins 1-3 from LSB to MSB
 
 	// outputs
 	uint8_t m_out;		// pins 4-7 and 9-12 from LSB to MSB
-
-	// old state
-	uint8_t m_last_out;
 };
 
 // device type definition

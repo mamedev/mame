@@ -140,12 +140,6 @@ protected:
 	uint8_t m_q2;
 	uint8_t m_q3;
 	uint8_t m_q4;
-
-	uint8_t m_last_q1;
-	uint8_t m_last_q2;
-	uint8_t m_last_q3;
-	uint8_t m_last_q4;
-	uint8_t m_last_clock;
 };
 
 class ttl74174_device : public ttl741745_device

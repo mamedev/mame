@@ -28,11 +28,6 @@ ttl741745_device::ttl741745_device(const machine_config &mconfig, device_type ty
 	, m_q2(0)
 	, m_q3(0)
 	, m_q4(0)
-	, m_last_q1(0)
-	, m_last_q2(0)
-	, m_last_q3(0)
-	, m_last_q4(0)
-	, m_last_clock(0)
 {
 }
 
@@ -44,8 +39,6 @@ ttl74174_device::ttl74174_device(const machine_config &mconfig, const char *tag,
 	, m_d6(0)
 	, m_q5(0)
 	, m_q6(0)
-	, m_last_q5(0)
-	, m_last_q6(0)
 {
 }
 
@@ -68,10 +61,6 @@ void ttl741745_device::device_start()
 	save_item(NAME(m_q2));
 	save_item(NAME(m_q3));
 	save_item(NAME(m_q4));
-	save_item(NAME(m_last_q1));
-	save_item(NAME(m_last_q2));
-	save_item(NAME(m_last_q3));
-	save_item(NAME(m_last_q4));
 
 	m_q1_func.resolve_safe();
 	m_q2_func.resolve_safe();
@@ -92,8 +81,6 @@ void ttl74174_device::device_start()
 	save_item(NAME(m_d6));
 	save_item(NAME(m_q5));
 	save_item(NAME(m_q6));
-	save_item(NAME(m_last_q5));
-	save_item(NAME(m_last_q6));
 
 	m_q5_func.resolve_safe();
 	m_q6_func.resolve_safe();
@@ -126,20 +113,14 @@ void ttl741745_device::init()
 	m_q2 = 0;
 	m_q3 = 0;
 	m_q4 = 0;
-
-	m_last_q1 = 0;
-	m_last_q2 = 0;
-	m_last_q3 = 0;
-	m_last_q4 = 0;
-	m_last_clock = 0;
 }
 
 void ttl741745_device::tick()
 {
-	m_last_q1 = m_q1;
-	m_last_q2 = m_q2;
-	m_last_q3 = m_q3;
-	m_last_q4 = m_q4;
+	uint8_t last_q1 = m_q1;
+	uint8_t last_q2 = m_q2;
+	uint8_t last_q3 = m_q3;
+	uint8_t last_q4 = m_q4;
 
 	int q1 = m_d1;
 	int q2 = m_d2;
@@ -158,13 +139,13 @@ void ttl741745_device::tick()
 	m_q3 = q3;
 	m_q4 = q4;
 
-	if (m_last_q1 != m_q1)
+	if (last_q1 != m_q1)
 		m_q1_func(m_q1);
-	if (m_last_q2 != m_q2)
+	if (last_q2 != m_q2)
 		m_q2_func(m_q2);
-	if (m_last_q3 != m_q3)
+	if (last_q3 != m_q3)
 		m_q3_func(m_q3);
-	if (m_last_q4 != m_q4)
+	if (last_q4 != m_q4)
 		m_q4_func(m_q4);
 }
 
@@ -175,9 +156,9 @@ WRITE_LINE_MEMBER( ttl741745_device::clear_w )
 
 WRITE_LINE_MEMBER( ttl741745_device::clock_w )
 {
-	m_last_clock = m_clock;
+	uint8_t last_clock = m_clock;
 	m_clock = state;
-	if (m_clock != m_last_clock && m_clock != 0)
+	if (m_clock != last_clock && m_clock != 0)
 	{
 		tick();
 	}
@@ -221,17 +202,14 @@ void ttl74174_device::init()
 
 	m_q5 = 0;
 	m_q6 = 0;
-
-	m_last_q5 = 0;
-	m_last_q6 = 0;
 }
 
 void ttl74174_device::tick()
 {
 	ttl741745_device::tick();
 
-	m_last_q5 = m_q5;
-	m_last_q6 = m_q6;
+	uint8_t last_q5 = m_q5;
+	uint8_t last_q6 = m_q6;
 
 	int q5 = m_d5;
 	int q6 = m_d6;
@@ -244,22 +222,27 @@ void ttl74174_device::tick()
 	m_q5 = q5;
 	m_q6 = q6;
 
-	if (m_last_q5 != m_q5)
+	if (last_q5 != m_q5)
 		m_q5_func(m_q5);
-	if (m_last_q6 != m_q6)
+	if (last_q6 != m_q6)
 		m_q6_func(m_q6);
 }
 
 void ttl74175_device::tick()
 {
+	uint8_t last_q1 = m_q1;
+	uint8_t last_q2 = m_q2;
+	uint8_t last_q3 = m_q3;
+	uint8_t last_q4 = m_q4;
+
 	ttl741745_device::tick();
 
-	if (m_last_q1 != m_q1)
+	if (last_q1 != m_q1)
 		m_not_q1_func(m_q1 ^ 1);
-	if (m_last_q2 != m_q1)
+	if (last_q2 != m_q1)
 		m_not_q2_func(m_q2 ^ 1);
-	if (m_last_q3 != m_q1)
+	if (last_q3 != m_q1)
 		m_not_q3_func(m_q3 ^ 1);
-	if (m_last_q4 != m_q1)
+	if (last_q4 != m_q1)
 		m_not_q4_func(m_q4 ^ 1);
 }

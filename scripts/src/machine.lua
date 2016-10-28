@@ -284,6 +284,30 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/7400.h,MACHINES["TTL7400"] = true
+---------------------------------------------------
+
+if (MACHINES["TTL7400"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/7400.cpp",
+		MAME_DIR .. "src/devices/machine/7400.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/7404.h,MACHINES["TTL7404"] = true
+---------------------------------------------------
+
+if (MACHINES["TTL7404"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/7404.cpp",
+		MAME_DIR .. "src/devices/machine/7404.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/74123.h,MACHINES["TTL74123"] = true
 ---------------------------------------------------
 
@@ -376,6 +400,18 @@ if (MACHINES["TTL7474"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/machine/7474.cpp",
 		MAME_DIR .. "src/devices/machine/7474.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/machine/82s129.h,MACHINES["PROM82S129"] = true
+---------------------------------------------------
+
+if (MACHINES["PROM82S129"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/82s129.cpp",
+		MAME_DIR .. "src/devices/machine/82s129.h",
 	}
 end
 

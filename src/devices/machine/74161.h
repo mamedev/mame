@@ -148,11 +148,6 @@ private:
 	uint8_t m_out;		// pins 14-11 from LSB to MSB
 	uint8_t m_tc;		// pin 15
 
-	// old state
-	uint8_t m_last_clock;
-	uint8_t m_last_out;
-	uint8_t m_last_tc;
-
 	const bool		m_synchronous_reset;
 	const uint8_t	m_limit;
 };

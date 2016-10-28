@@ -30,9 +30,6 @@ ttl7416x_device::ttl7416x_device(const machine_config &mconfig, device_type type
 	, m_p(0)
 	, m_out(0)
 	, m_tc(0)
-	, m_last_clock(0)
-	, m_last_out(0)
-	, m_last_tc(0)
 	, m_synchronous_reset(synchronous_reset)
 	, m_limit(limit)
 {
@@ -68,9 +65,6 @@ void ttl7416x_device::device_start()
 	save_item(NAME(m_p));
 	save_item(NAME(m_out));
 	save_item(NAME(m_tc));
-	save_item(NAME(m_last_clock));
-	save_item(NAME(m_last_out));
-	save_item(NAME(m_last_tc));
 
 	m_output_func.resolve_safe();
 	m_tc_func.resolve_safe();
@@ -81,6 +75,21 @@ void ttl7416x_device::device_reset()
 	init();
 }
 
+void ttl7416x_device::init()
+{
+	m_clear = 0;
+	m_pe = 1;
+	m_cet = 0;
+	m_cep = 0;
+	m_clock = 0;
+	m_p = 0;
+
+	m_out = 0;
+	m_tc = 0;
+
+	m_tc = 0;
+}
+
 void ttl7416x_device::tick()
 {
 	if (m_synchronous_reset && m_clear)
@@ -89,8 +98,8 @@ void ttl7416x_device::tick()
 		return;
 	}
 
-	m_last_out = m_out;
-	m_last_tc = m_tc;
+	uint8_t last_out = m_out;
+	uint8_t last_tc = m_tc;
 
 	if (m_pe)
 	{
@@ -104,15 +113,13 @@ void ttl7416x_device::tick()
 		}
 	}
 
-	if (m_out != m_last_out)
+	if (m_out != last_out)
 	{
-		m_last_out = m_out;
 		m_output_func(m_out);
 	}
 
-	if (m_tc != m_last_tc)
+	if (m_tc != last_tc)
 	{
-		m_last_tc = m_tc;
 		m_tc_func(m_tc);
 	}
 }
@@ -137,7 +144,7 @@ WRITE_LINE_MEMBER( ttl7416x_device::clear_w )
 
 WRITE_LINE_MEMBER( ttl7416x_device::pe_w )
 {
-	m_pe = state;
+	m_pe = state ^ 1;
 }
 
 WRITE_LINE_MEMBER( ttl7416x_device::cet_w )
@@ -152,9 +159,9 @@ WRITE_LINE_MEMBER( ttl7416x_device::cep_w )
 
 WRITE_LINE_MEMBER( ttl7416x_device::clock_w )
 {
-	m_last_clock = m_clock;
+	uint8_t last_clock = m_clock;
 	m_clock = state;
-	if (m_clock != m_last_clock && m_clock != 0)
+	if (m_clock != last_clock && m_clock != 0)
 	{
 		tick();
 	}
@@ -197,20 +204,4 @@ READ_LINE_MEMBER( ttl7416x_device::output_r )
 READ_LINE_MEMBER( ttl7416x_device::tc_r )
 {
 	return m_tc;
-}
-
-void ttl7416x_device::init()
-{
-	m_clear = 0;
-	m_pe = 1;
-	m_cet = 0;
-	m_cep = 0;
-	m_clock = 0;
-	m_p = 0;
-
-	m_out = 0;
-	m_tc = 0;
-
-	m_last_out = 0;
-	m_tc = 0;
 }

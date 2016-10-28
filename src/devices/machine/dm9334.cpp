@@ -27,16 +27,12 @@ dm9334_device::dm9334_device(const machine_config &mconfig, const char *tag, dev
 	, m_d(0)
 	, m_a(0)
 	, m_out(0)
-	, m_last_out(0)
 {
 }
 
 void dm9334_device::device_start()
 {
-	m_e = 0;
-	m_c = 0;
-	m_d = 0;
-	m_a = 0;
+	init();
 
 	save_item(NAME(m_e));
 	save_item(NAME(m_c));
@@ -67,19 +63,40 @@ void dm9334_device::init()
 	m_d = 0;
 	m_a = 0;
 	m_out = 0;
-	m_last_out = 0;
 }
+
 void dm9334_device::tick()
 {
-	// TODO
-	if (m_out != m_last_out)
+	uint8_t last_out = m_out;
+
+	mode_t mode = static_cast<mode_t>((m_e << 1) | m_c);
+	switch(mode)
 	{
-		m_last_out = m_out;
+		case mode_t::CLEAR:
+			m_out = 0;
+			break;
+
+		case mode_t::DEMUX:
+			m_out = (m_d << m_a);
+			break;
+
+		case mode_t::MEMORY:
+			// Preserve previous state
+			break;
+
+		case mode_t::LATCH:
+			m_out &= ~(1 << m_a);
+			m_out |= (m_d << m_a);
+			break;
+	}
+
+	if (m_out != last_out)
+	{
 		m_out_func(m_out);
 
 		for (int bit = 0; bit < 8; bit++)
 		{
-			if (BIT(m_out, bit) == BIT(m_last_out, bit))
+			if (BIT(m_out, bit) == BIT(last_out, bit))
 				continue;
 
 			switch(bit)
@@ -99,40 +116,61 @@ void dm9334_device::tick()
 
 WRITE_LINE_MEMBER( dm9334_device::e_w )
 {
-	m_e = state;
-	tick();
+	uint8_t last_e = m_e;
+	m_e = state & 1;
+	if (last_e != m_e)
+		tick();
 }
 
 WRITE_LINE_MEMBER( dm9334_device::c_w )
 {
-	m_c = state;
-	tick();
+	uint8_t last_c = m_c;
+	m_c = state & 1;
+	if (last_c != m_c)
+		tick();
 }
 
 WRITE_LINE_MEMBER( dm9334_device::d_w )
 {
-	m_d = state;
+	uint8_t last_d = m_d;
+	m_d = state & 1;
+	if (last_d != m_d)
+		tick();
 }
 
 WRITE_LINE_MEMBER( dm9334_device::a0_w )
 {
+	uint8_t last_a = m_a;
 	m_a &= ~(1 << 0);
-	m_a |= state << 0;
-	tick();
+	m_a |= (state & 1) << 0;
+	if (last_a != m_a)
+		tick();
 }
 
 WRITE_LINE_MEMBER( dm9334_device::a1_w )
 {
+	uint8_t last_a = m_a;
 	m_a &= ~(1 << 1);
-	m_a |= state << 1;
-	tick();
+	m_a |= (state & 1) << 1;
+	if (last_a != m_a)
+		tick();
 }
 
 WRITE_LINE_MEMBER( dm9334_device::a2_w )
 {
+	uint8_t last_a = m_a;
 	m_a &= ~(1 << 2);
-	m_a |= state << 2;
-	tick();
+	m_a |= (state & 1) << 2;
+	if (last_a != m_a)
+		tick();
+}
+
+WRITE8_MEMBER( dm9334_device::a_w )
+{
+	uint8_t last_a = m_a;
+	m_a = data & 0x7;
+	if (last_a != m_a)
+		tick();
 }
 
 READ8_MEMBER( dm9334_device::output_r )
