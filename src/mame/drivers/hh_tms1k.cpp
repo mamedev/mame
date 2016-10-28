@@ -6017,7 +6017,7 @@ MACHINE_CONFIG_END
 
   known releases:
   - World: Tandy-12: Computerized Arcade
-  - Mexico: Fabuloso Fred, distributed by Ensueno Toys (also released as
+  - Mexico: Fabuloso Fred, distributed by Ensueño Toys (also released as
     9-button version, a clone of Mego Fabulous Fred)
 
   This handheld contains 12 minigames. It looks and plays like Game Robot 9 by
