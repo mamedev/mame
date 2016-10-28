@@ -43,11 +43,13 @@ References:
 #define U68_TAG			"u68"
 #define U69_PROMMSB_TAG	"u69"
 #define U70_PROMLSB_TAG	"u70"
-#define U72_PROM_TAG	"u72"
+#define U71_PROM_TAG	"u71"
+#define U72_PROMDEC_TAG	"u72"
 #define U81_TAG			"u81"
 #define U84_DIV11_TAG	"u84"
 #define U88_DIV9_TAG	"u88"
 #define U90_DIV14_TAG	"u90"
+#define BAUD_PROM_TAG	"u39"
 
 // Number of cycles to burn when fetching the next row of characters into the line buffer:
 // CPU clock is 18MHz / 9
@@ -89,10 +91,12 @@ public:
 		, m_uart(*this, UART_TAG)
 		, m_kbdc(*this, KBDC_TAG)
 		, m_baud_dips(*this, BAUDPORT_TAG)
+		, m_baud_prom(*this, BAUD_PROM_TAG)
 		, m_misc_dips(*this, MISCPORT_TAG)
 		, m_kbd_misc_keys(*this, MISCKEYS_TAG)
 		, m_char_ram(*this, CHARRAM_TAG)
 		, m_char_rom(*this, CHARROM_TAG)
+		, m_u71_prom(*this, U71_PROM_TAG)
 		, m_line_buffer_lsb(*this, TMS3409A_TAG)
 		, m_line_buffer_msb(*this, TMS3409B_TAG)
 		, m_dotclk(*this, DOTCLK_TAG)
@@ -101,7 +105,7 @@ public:
 		, m_char_y(*this, U84_DIV11_TAG)
 		, m_char_x(*this, U88_DIV9_TAG)
 		, m_vid_div14(*this, U90_DIV14_TAG)
-		, m_vid_decode(*this, U72_PROM_TAG)
+		, m_vid_decode(*this, U72_PROMDEC_TAG)
 		, m_u58(*this, U58_TAG)
 		, m_u68(*this, U68_TAG)
 		, m_u81(*this, U81_TAG)
@@ -159,11 +163,13 @@ private:
 	required_device<ay31015_device> m_uart;
 	required_device<ay3600_device> m_kbdc;
 	required_ioport m_baud_dips;
+	required_region_ptr<uint8_t> m_baud_prom;
 	required_ioport m_misc_dips;
 	required_ioport m_kbd_misc_keys;
 
 	required_shared_ptr<uint8_t> m_char_ram;
 	required_region_ptr<uint8_t> m_char_rom;
+	required_region_ptr<uint8_t> m_u71_prom;
 	required_device<tms3409_device> m_line_buffer_lsb;
 	required_device<tms3409_device> m_line_buffer_msb;
 	required_device<clock_device> m_dotclk;
@@ -710,7 +716,7 @@ static MACHINE_CONFIG_START( hazl1500, hazl1500_state )
 	MCFG_74175_Q1_CB(DEVWRITELINE(U81_TAG, ttl74175_device, d2_w))
 	MCFG_74175_NOT_Q2_CB(WRITELINE(hazl1500_state, ch_bucket_ctr_clk_w))
 
-	MCFG_DM9334_ADD(U72_PROM_TAG)
+	MCFG_DM9334_ADD(U72_PROMDEC_TAG)
 
 	/* keyboard controller */
 	MCFG_DEVICE_ADD(KBDC_TAG, AY3600, 0)
@@ -735,6 +741,12 @@ ROM_START( hazl1500 )
 
 	ROM_REGION( 0x800, CHARROM_TAG, ROMREGION_ERASEFF )
 	ROM_LOAD( "u83_chr.bin", 0x0000, 0x0800, CRC(e0c6b734) SHA1(7c42947235c66c41059fd4384e09f4f3a17c9857))
+
+	ROM_REGION( 0x100, BAUD_PROM_TAG, ROMREGION_ERASEFF )
+	ROM_LOAD( "u43_702129_82s129.bin", 0x0000, 0x0100, CRC(b35aea2b) SHA1(4702620cdef72b32a397580c22b75df36e24ac74))
+
+	ROM_REGION( 0x100, U71_PROM_TAG, ROMREGION_ERASEFF )
+	ROM_LOAD( "u90_702128_82s129.bin", 0x0000, 0x0100, CRC(277bc424) SHA1(528a0de3b54d159bc14411961961706bf9ec41bf))
 ROM_END
 
 /* Driver */
