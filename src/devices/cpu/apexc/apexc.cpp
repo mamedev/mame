@@ -771,7 +771,7 @@ void apexc_cpu_device::device_start()
 	state_add( APEXC_A, "A", m_a ).formatstr("%08X");
 	state_add( APEXC_R, "R", m_r ).formatstr("%08X");
 	state_add( APEXC_ML, "ML", m_ml ).mask(0xfff).callimport().formatstr("%03X");
-	state_add( APEXC_WS, "WS", m_working_store ).callimport().mask(0x01);
+	state_add( APEXC_WS, "WS", m_working_store ).callimport().mask(0xf);
 	state_add( APEXC_STATE, "CPU state", m_running ).mask(0x01);
 	state_add( STATE_GENPC, "PC", m_pc ).mask(0x7ffc).callimport().formatstr("%04X");
 	state_add( STATE_GENPCBASE, "CURPC", m_pc ).mask(0x7ffc).callimport().noshow();
