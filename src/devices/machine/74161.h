@@ -59,11 +59,23 @@
 
 #include "emu.h"
 
-#define MCFG_74161_OUTPUT_CB(_devcb) \
-	devcb = &ttl74161_device::set_output_cb(*device, DEVCB_##_devcb);
+#define MCFG_7416x_QA_CB(_devcb) \
+	devcb = &ttl7416x_device::set_qa_cb(*device, DEVCB_##_devcb);
 
-#define MCFG_74161_TC_CB(_devcb) \
-	devcb = &ttl74161_device::set_comp_output_cb(*device, DEVCB_##_devcb);
+#define MCFG_7416x_QB_CB(_devcb) \
+	devcb = &ttl7416x_device::set_qb_cb(*device, DEVCB_##_devcb);
+
+#define MCFG_7416x_QC_CB(_devcb) \
+	devcb = &ttl7416x_device::set_qc_cb(*device, DEVCB_##_devcb);
+
+#define MCFG_7416x_QD_CB(_devcb) \
+	devcb = &ttl7416x_device::set_qd_cb(*device, DEVCB_##_devcb);
+
+#define MCFG_7416x_OUTPUT_CB(_devcb) \
+	devcb = &ttl7416x_device::set_output_cb(*device, DEVCB_##_devcb);
+
+#define MCFG_7416x_TC_CB(_devcb) \
+	devcb = &ttl7416x_device::set_tc_cb(*device, DEVCB_##_devcb);
 
 #define MCFG_74160_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, TTL74160, 0)
@@ -84,6 +96,10 @@ public:
 	ttl7416x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, bool synchronous_reset, uint8_t limit);
 
 	// static configuration helpers
+	template<class _Object> static devcb_base &set_qa_cb(device_t &device, _Object object) { return downcast<ttl7416x_device &>(device).m_qa_func.set_callback(object); }
+	template<class _Object> static devcb_base &set_qb_cb(device_t &device, _Object object) { return downcast<ttl7416x_device &>(device).m_qb_func.set_callback(object); }
+	template<class _Object> static devcb_base &set_qc_cb(device_t &device, _Object object) { return downcast<ttl7416x_device &>(device).m_qc_func.set_callback(object); }
+	template<class _Object> static devcb_base &set_qd_cb(device_t &device, _Object object) { return downcast<ttl7416x_device &>(device).m_qd_func.set_callback(object); }
 	template<class _Object> static devcb_base &set_output_cb(device_t &device, _Object object) { return downcast<ttl7416x_device &>(device).m_output_func.set_callback(object); }
 	template<class _Object> static devcb_base &set_tc_cb(device_t &device, _Object object) { return downcast<ttl7416x_device &>(device).m_tc_func.set_callback(object); }
 
@@ -93,6 +109,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( cet_w );
 	DECLARE_WRITE_LINE_MEMBER( cep_w );
 	DECLARE_WRITE_LINE_MEMBER( clock_w );
+	DECLARE_WRITE8_MEMBER( p_w );
+	DECLARE_WRITE_LINE_MEMBER( p1_w );
+	DECLARE_WRITE_LINE_MEMBER( p2_w );
+	DECLARE_WRITE_LINE_MEMBER( p3_w );
+	DECLARE_WRITE_LINE_MEMBER( p4_w );
 
 	DECLARE_READ_LINE_MEMBER( output_r );
 	DECLARE_READ_LINE_MEMBER( tc_r );
@@ -108,6 +129,10 @@ private:
 	void increment();
 
 	// callbacks
+	devcb_write_line m_qa_func;
+	devcb_write_line m_qb_func;
+	devcb_write_line m_qc_func;
+	devcb_write_line m_qd_func;
 	devcb_write8 m_output_func;
 	devcb_write_line m_tc_func;
 

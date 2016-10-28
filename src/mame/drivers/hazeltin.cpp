@@ -17,10 +17,14 @@ References:
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
-#include "machine/ay31015.h"
-#include "machine/kb3600.h"
-#include "machine/com8116.h"
+#include "machine/74161.h"
+#include "machine/74175.h"
 #include "machine/am2847.h"
+#include "machine/ay31015.h"
+#include "machine/clock.h"
+#include "machine/com8116.h"
+#include "machine/dm9334.h"
+#include "machine/kb3600.h"
 
 #define CPU_TAG			"maincpu"
 #define UART_TAG		"uart"
@@ -34,6 +38,16 @@ References:
 #define SCREEN_TAG		"screen"
 #define TMS3409A_TAG	"u67"
 #define TMS3409B_TAG	"u57"
+#define DOTCLK_TAG		"dotclk"
+#define U58_TAG			"u58"
+#define U68_TAG			"u68"
+#define U69_PROMMSB_TAG	"u69"
+#define U70_PROMLSB_TAG	"u70"
+#define U72_PROM_TAG	"u72"
+#define U81_TAG			"u81"
+#define U84_DIV11_TAG	"u84"
+#define U88_DIV9_TAG	"u88"
+#define U90_DIV14_TAG	"u90"
 
 // Number of cycles to burn when fetching the next row of characters into the line buffer:
 // CPU clock is 18MHz / 9
@@ -53,8 +67,8 @@ References:
 #define SR3_PB_RESET	(0x04)
 
 #define KBD_STATUS_KBDR		(0x01)
-#define KBD_STATUS_TV_INT	(0x40)
-#define KBD_STATUS_TV_UB	(0x80)
+#define KBD_STATUS_TV_UB	(0x40)
+#define KBD_STATUS_TV_INT	(0x80)
 
 #define SCREEN_HTOTAL	(9*100)
 #define SCREEN_HDISP	(9*80)
@@ -63,6 +77,8 @@ References:
 #define SCREEN_VTOTAL	(28*11)
 #define SCREEN_VDISP	(24*11)
 #define SCREEN_VSTART	(0)
+
+#define VERT_UB_LINE	(24*11+8)
 
 class hazl1500_state : public driver_device
 {
@@ -79,6 +95,16 @@ public:
 		, m_char_rom(*this, CHARROM_TAG)
 		, m_line_buffer_lsb(*this, TMS3409A_TAG)
 		, m_line_buffer_msb(*this, TMS3409B_TAG)
+		, m_dotclk(*this, DOTCLK_TAG)
+		, m_vid_prom_msb(*this, U69_PROMMSB_TAG)
+		, m_vid_prom_lsb(*this, U70_PROMLSB_TAG)
+		, m_char_y(*this, U84_DIV11_TAG)
+		, m_char_x(*this, U88_DIV9_TAG)
+		, m_vid_div14(*this, U90_DIV14_TAG)
+		, m_vid_decode(*this, U72_PROM_TAG)
+		, m_u58(*this, U58_TAG)
+		, m_u68(*this, U68_TAG)
+		, m_u81(*this, U81_TAG)
 		, m_screen(*this, SCREEN_TAG)
 		, m_hblank_timer(nullptr)
 		, m_scanline_timer(nullptr)
@@ -88,6 +114,7 @@ public:
 		, m_vpos(0)
         , m_hblank(false)
         , m_vblank(false)
+        , m_delayed_vblank(false)
 	{
 	}
 
@@ -113,6 +140,9 @@ public:
 	DECLARE_READ_LINE_MEMBER(ay3600_control_r);
 	DECLARE_WRITE_LINE_MEMBER(ay3600_data_ready_w);
 
+	DECLARE_WRITE_LINE_MEMBER(dotclk_w);
+	DECLARE_WRITE_LINE_MEMBER(ch_bucket_ctr_clk_w);
+	DECLARE_WRITE_LINE_MEMBER(u70_tc_w);
     DECLARE_WRITE8_MEMBER(refresh_address_w);
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
@@ -136,6 +166,17 @@ private:
 	required_region_ptr<uint8_t> m_char_rom;
 	required_device<tms3409_device> m_line_buffer_lsb;
 	required_device<tms3409_device> m_line_buffer_msb;
+	required_device<clock_device> m_dotclk;
+	required_device<ttl74161_device> m_vid_prom_msb;
+	required_device<ttl74161_device> m_vid_prom_lsb;
+	required_device<ttl74161_device> m_char_y;
+	required_device<ttl74161_device> m_char_x;
+	required_device<ttl74161_device> m_vid_div14;
+	required_device<dm9334_device> m_vid_decode;
+	required_device<ttl74175_device> m_u58;
+	required_device<ttl74175_device> m_u68;
+	required_device<ttl74175_device> m_u81;
+
 	required_device<screen_device> m_screen;
 
 	std::unique_ptr<uint32_t[]> m_screen_pixbuf;
@@ -150,6 +191,7 @@ private:
 	uint16_t m_vpos;
 	bool m_hblank;
 	bool m_vblank;
+	bool m_delayed_vblank;
 };
 
 void hazl1500_state::machine_start()
@@ -168,6 +210,7 @@ void hazl1500_state::machine_start()
 	save_item(NAME(m_vpos));
 	save_item(NAME(m_hblank));
 	save_item(NAME(m_vblank));
+	save_item(NAME(m_delayed_vblank));
 }
 
 void hazl1500_state::machine_reset()
@@ -176,13 +219,18 @@ void hazl1500_state::machine_reset()
 	m_kbd_status_latch = 0;
 
     m_refresh_address = 0;
+    m_screen->reset_origin(0, 0);
 	m_vpos = m_screen->vpos();
 	m_vblank = (m_vpos >= SCREEN_VDISP);
+	m_delayed_vblank = m_vpos < VERT_UB_LINE;
 	if (!m_vblank)
 		m_kbd_status_latch |= KBD_STATUS_TV_UB;
 	m_hblank = true;
 	m_hblank_timer->adjust(m_screen->time_until_pos(m_vpos, SCREEN_HSTART));
 	m_scanline_timer->adjust(m_screen->time_until_pos(m_vpos + 1, 0));
+
+	m_vid_prom_lsb->p_w(generic_space(), 0, 0);
+	m_vid_prom_msb->p_w(generic_space(), 0, 0);
 }
 
 
@@ -233,6 +281,7 @@ WRITE8_MEMBER( hazl1500_state::uart_w )
 
 READ8_MEMBER( hazl1500_state::kbd_status_latch_r )
 {
+	//printf("m_kbd_status_latch r: %02x\n", m_kbd_status_latch);
 	return m_kbd_status_latch;
 }
 
@@ -294,17 +343,36 @@ void hazl1500_state::device_timer(emu_timer &timer, device_timer_id id, int para
 	}
 }
 
+WRITE_LINE_MEMBER(hazl1500_state::dotclk_w)
+{
+	m_u81->clock_w(state);
+	m_char_x->clock_w(state);
+}
+
+WRITE_LINE_MEMBER(hazl1500_state::ch_bucket_ctr_clk_w)
+{
+	m_vid_prom_lsb->clock_w(state);
+	m_vid_prom_msb->clock_w(state);
+}
+
+WRITE_LINE_MEMBER(hazl1500_state::u70_tc_w)
+{
+	m_vid_prom_msb->cet_w(state);
+	m_vid_prom_msb->cep_w(state);
+}
+
 WRITE8_MEMBER(hazl1500_state::refresh_address_w)
 {
     m_refresh_address = data;
+    //printf("m_refresh_address %x, vpos %d, screen vpos %d\n", m_refresh_address, m_vpos, m_screen->vpos());
 }
 
 void hazl1500_state::check_tv_interrupt()
 {
     uint8_t char_row = m_vpos % 11;
 	bool bit_match = char_row == 2 || char_row == 3;
-    bool no_vblank = !m_vblank;
-    bool tv_interrupt = bit_match && no_vblank;
+    bool tv_interrupt = bit_match && !m_delayed_vblank;
+	//printf("interrupt for line %d (%d): %s\n", m_vpos, char_row, tv_interrupt ? "yes" : "no");
 
     m_kbd_status_latch &= ~KBD_STATUS_TV_INT;
     m_kbd_status_latch |= tv_interrupt ? KBD_STATUS_TV_INT : 0;
@@ -329,6 +397,7 @@ void hazl1500_state::scanline_tick()
 	uint16_t old_vpos = m_vpos;
 	m_vpos = (m_vpos + 1) % SCREEN_VTOTAL;
 	m_vblank = (m_vpos >= SCREEN_VDISP);
+	m_delayed_vblank = m_vpos >= VERT_UB_LINE;
 
 	check_tv_interrupt();
 	update_tv_unblank();
@@ -620,6 +689,28 @@ static MACHINE_CONFIG_START( hazl1500, hazl1500_state )
 
 	MCFG_TMS3409_ADD(TMS3409A_TAG)
 	MCFG_TMS3409_ADD(TMS3409B_TAG)
+
+	MCFG_CLOCK_ADD(DOTCLK_TAG, XTAL_33_264MHz/2)
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(hazl1500_state, dotclk_w))
+
+	MCFG_74161_ADD(U69_PROMMSB_TAG)
+	MCFG_74161_ADD(U70_PROMLSB_TAG)
+	MCFG_7416x_TC_CB(WRITELINE(hazl1500_state, u70_tc_w))
+
+	MCFG_74161_ADD(U84_DIV11_TAG)
+	MCFG_74161_ADD(U90_DIV14_TAG)
+
+	MCFG_74161_ADD(U88_DIV9_TAG)
+	MCFG_7416x_QC_CB(DEVWRITELINE(U81_TAG, ttl74175_device, d4_w))
+	MCFG_7416x_TC_CB(DEVWRITELINE(U81_TAG, ttl74175_device, d1_w))
+
+	MCFG_74175_ADD(U58_TAG)
+	MCFG_74175_ADD(U68_TAG)
+	MCFG_74175_ADD(U81_TAG)
+	MCFG_74175_Q1_CB(DEVWRITELINE(U81_TAG, ttl74175_device, d2_w))
+	MCFG_74175_NOT_Q2_CB(WRITELINE(hazl1500_state, ch_bucket_ctr_clk_w))
+
+	MCFG_DM9334_ADD(U72_PROM_TAG)
 
 	/* keyboard controller */
 	MCFG_DEVICE_ADD(KBDC_TAG, AY3600, 0)

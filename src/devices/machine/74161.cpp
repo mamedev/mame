@@ -16,6 +16,10 @@ const device_type TTL74163 = &device_creator<ttl74163_device>;
 
 ttl7416x_device::ttl7416x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, bool synchronous_reset, uint8_t limit)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__)
+	, m_qa_func(*this)
+	, m_qb_func(*this)
+	, m_qc_func(*this)
+	, m_qd_func(*this)
 	, m_output_func(*this)
 	, m_tc_func(*this)
 	, m_clear(0)
@@ -154,6 +158,35 @@ WRITE_LINE_MEMBER( ttl7416x_device::clock_w )
 	{
 		tick();
 	}
+}
+
+WRITE8_MEMBER( ttl7416x_device::p_w )
+{
+	m_p = data & 0xf;
+}
+
+WRITE_LINE_MEMBER( ttl7416x_device::p1_w )
+{
+	m_p &= ~(1 << 0);
+	m_p |= (state << 0);
+}
+
+WRITE_LINE_MEMBER( ttl7416x_device::p2_w )
+{
+	m_p &= ~(1 << 1);
+	m_p |= (state << 1);
+}
+
+WRITE_LINE_MEMBER( ttl7416x_device::p3_w )
+{
+	m_p &= ~(1 << 2);
+	m_p |= (state << 2);
+}
+
+WRITE_LINE_MEMBER( ttl7416x_device::p4_w )
+{
+	m_p &= ~(1 << 3);
+	m_p |= (state << 3);
 }
 
 READ_LINE_MEMBER( ttl7416x_device::output_r )
