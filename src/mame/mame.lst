@@ -17457,10 +17457,7 @@ uccopsj                         // (c) 1992 Irem (Japan)
 uccopsu                         // (c) 1992 Irem (US)
 
 @source:mac.cpp
-mac128k                         // 1984 Apple Macintosh
 mac2fdhd                        // 1988 Apple Macintosh II (FDHD)
-mac512k                         // 1985 Apple Macintosh 512k
-mac512ke                        // 1986 Apple Macintosh 512ke
 maccclas                        // 1993 Apple Macintosh Color Classic
 macclas2                        // 1991 Apple Macintosh Classic II
 macclasc                        // 1990 Apple Macintosh Classic
@@ -17486,13 +17483,19 @@ macpb170                        // 1991 Apple Macintosh PowerBook 170
 macpb180                        // 1992 Apple Macintosh PowerBook 180
 macpb180c                       // 1992 Apple Macintosh PowerBook 180c
 macpd210                        // 1992 Apple Macintosh PowerBook Duo 210
-macplus                         // 1986 Apple Macintosh Plus
 macprtb                         // 1989 Apple Macintosh Portable
 macqd700                        // 1991 Apple Macintosh Quadra 700
 macse                           // 1987 Apple Macintosh SE
 macse30                         // 1989 Apple Macintosh SE/30
 macsefd                         // 1988 Apple Macintosh SE (FDHD)
 pmac6100                        // 1993 Apple Power Macintosh 6100
+
+@source:mac128.cpp
+mac128k                         // 1984 Apple Macintosh
+mac2fdhd                        // 1988 Apple Macintosh II (FDHD)
+mac512k                         // 1985 Apple Macintosh 512k
+mac512ke                        // 1986 Apple Macintosh 512ke
+macplus                         // 1986 Apple Macintosh Plus
 unitron                         // 1985 Unitron
 utrn1024                        // 1986 Unitron 1024
 
