@@ -17492,7 +17492,6 @@ pmac6100                        // 1993 Apple Power Macintosh 6100
 
 @source:mac128.cpp
 mac128k                         // 1984 Apple Macintosh
-mac2fdhd                        // 1988 Apple Macintosh II (FDHD)
 mac512k                         // 1985 Apple Macintosh 512k
 mac512ke                        // 1986 Apple Macintosh 512ke
 macplus                         // 1986 Apple Macintosh Plus
