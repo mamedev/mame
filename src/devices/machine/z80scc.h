@@ -643,6 +643,8 @@ public:
 		dev.m_txcb = txb;
 	}
 
+	DECLARE_READ8_MEMBER( cd_ab_r );
+	DECLARE_WRITE8_MEMBER( cd_ab_w );
 	DECLARE_READ8_MEMBER( cd_ba_r );
 	DECLARE_WRITE8_MEMBER( cd_ba_w );
 	DECLARE_READ8_MEMBER( ba_cd_r );
