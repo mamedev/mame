@@ -337,11 +337,10 @@ static inline unsigned int read_16_immediate(void)
 	return result | (*rombase++ << 8);
 }
 
-CPU_DISASSEMBLE( spc700 )
+static offs_t internal_disasm_spc700(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
 {
 	const spc700_opcode_struct* opcode;
 	uint32_t flags = 0;
-	char* ptr;
 	int var;
 	int i;
 
@@ -349,8 +348,7 @@ CPU_DISASSEMBLE( spc700 )
 	rombase = oprom;
 	opcode = g_opcodes + read_8_immediate();
 
-	sprintf(buffer, "%s ", g_opnames[opcode->name]);
-	ptr = buffer + strlen(buffer);
+	stream << g_opnames[opcode->name] << " ";
 
 	if (opcode->name == CALL)
 		flags = DASMFLAG_STEP_OVER;
@@ -361,77 +359,84 @@ CPU_DISASSEMBLE( spc700 )
 	{
 		int src = read_8_immediate();
 		int dst = read_8_immediate();
-		sprintf(ptr, "$%02x,%s$%02x", dst, (opcode->args[1] == IMM ? "#" : ""), src);
-		ptr += strlen(ptr);
+		util::stream_format(stream, "$%02x,%s$%02x", dst, (opcode->args[1] == IMM ? "#" : ""), src);
 	}
 	else for(i=0;i<2;i++)
 	{
 		if(i == 1 && opcode->args[0] != IMP && opcode->args[1] != IMP)
 		{
-			sprintf(ptr, ",");
-			ptr += strlen(ptr);
+			util::stream_format(stream, ",");
 		}
 
 		switch(opcode->args[i])
 		{
 			case IMP:  break;
-			case A:    sprintf(ptr, "A"); break;
-			case X:    sprintf(ptr, "X"); break;
-			case Y:    sprintf(ptr, "Y"); break;
-			case YA:   sprintf(ptr, "YA"); break;
-			case SP:   sprintf(ptr, "SP"); break;
-			case PSW:  sprintf(ptr, "PSW"); break;
-			case C:    sprintf(ptr, "C"); break;
-			case REL:  sprintf(ptr, "%04x", ((g_pc + (char)read_8_immediate())&0xffff)); break;
-			case UPAG: sprintf(ptr, "$%02x", read_8_immediate()); break;
-			case IMM:  sprintf(ptr, "#$%02x", read_8_immediate()); break;
-			case XI:   sprintf(ptr, "(X)"); break;
-			case XII:  sprintf(ptr, "(X)+"); break;
-			case YI:   sprintf(ptr, "(Y)"); break;
-			case DP:   sprintf(ptr, "$%02x", read_8_immediate()); break;
-			case DPX:  sprintf(ptr, "$%02x+X", read_8_immediate()); break;
-			case DPY:  sprintf(ptr, "$%02x+Y", read_8_immediate()); break;
-			case DPI:  sprintf(ptr, "($%02x)", read_8_immediate()); break;
-			case DXI:  sprintf(ptr, "($%02x+X)", read_8_immediate()); break;
-			case DIY:  sprintf(ptr, "($%02x)+Y", read_8_immediate()); break;
-			case ABS:  sprintf(ptr, "$%04x", read_16_immediate()); break;
-			case ABX:  sprintf(ptr, "$%04x+X", read_16_immediate()); break;
-			case ABY:  sprintf(ptr, "$%04x+Y", read_16_immediate()); break;
-			case AXI:  sprintf(ptr, "($%04x+X)", read_16_immediate()); break;
-			case N0:   sprintf(ptr, "0"); break;
-			case N1:   sprintf(ptr, "1"); break;
-			case N2:   sprintf(ptr, "2"); break;
-			case N3:   sprintf(ptr, "3"); break;
-			case N4:   sprintf(ptr, "4"); break;
-			case N5:   sprintf(ptr, "5"); break;
-			case N6:   sprintf(ptr, "6"); break;
-			case N7:   sprintf(ptr, "7"); break;
-			case N8:   sprintf(ptr, "8"); break;
-			case N9:   sprintf(ptr, "9"); break;
-			case N10:  sprintf(ptr, "10"); break;
-			case N11:  sprintf(ptr, "11"); break;
-			case N12:  sprintf(ptr, "12"); break;
-			case N13:  sprintf(ptr, "13"); break;
-			case N14:  sprintf(ptr, "14"); break;
-			case N15:  sprintf(ptr, "15"); break;
-			case DP0:  sprintf(ptr, "$%02x.0", read_8_immediate()); break;
-			case DP1:  sprintf(ptr, "$%02x.1", read_8_immediate()); break;
-			case DP2:  sprintf(ptr, "$%02x.2", read_8_immediate()); break;
-			case DP3:  sprintf(ptr, "$%02x.3", read_8_immediate()); break;
-			case DP4:  sprintf(ptr, "$%02x.4", read_8_immediate()); break;
-			case DP5:  sprintf(ptr, "$%02x.5", read_8_immediate()); break;
-			case DP6:  sprintf(ptr, "$%02x.6", read_8_immediate()); break;
-			case DP7:  sprintf(ptr, "$%02x.7", read_8_immediate()); break;
+			case A:    util::stream_format(stream, "A"); break;
+			case X:    util::stream_format(stream, "X"); break;
+			case Y:    util::stream_format(stream, "Y"); break;
+			case YA:   util::stream_format(stream, "YA"); break;
+			case SP:   util::stream_format(stream, "SP"); break;
+			case PSW:  util::stream_format(stream, "PSW"); break;
+			case C:    util::stream_format(stream, "C"); break;
+			case REL:  util::stream_format(stream, "%04x", ((g_pc + (char)read_8_immediate())&0xffff)); break;
+			case UPAG: util::stream_format(stream, "$%02x", read_8_immediate()); break;
+			case IMM:  util::stream_format(stream, "#$%02x", read_8_immediate()); break;
+			case XI:   util::stream_format(stream, "(X)"); break;
+			case XII:  util::stream_format(stream, "(X)+"); break;
+			case YI:   util::stream_format(stream, "(Y)"); break;
+			case DP:   util::stream_format(stream, "$%02x", read_8_immediate()); break;
+			case DPX:  util::stream_format(stream, "$%02x+X", read_8_immediate()); break;
+			case DPY:  util::stream_format(stream, "$%02x+Y", read_8_immediate()); break;
+			case DPI:  util::stream_format(stream, "($%02x)", read_8_immediate()); break;
+			case DXI:  util::stream_format(stream, "($%02x+X)", read_8_immediate()); break;
+			case DIY:  util::stream_format(stream, "($%02x)+Y", read_8_immediate()); break;
+			case ABS:  util::stream_format(stream, "$%04x", read_16_immediate()); break;
+			case ABX:  util::stream_format(stream, "$%04x+X", read_16_immediate()); break;
+			case ABY:  util::stream_format(stream, "$%04x+Y", read_16_immediate()); break;
+			case AXI:  util::stream_format(stream, "($%04x+X)", read_16_immediate()); break;
+			case N0:   util::stream_format(stream, "0"); break;
+			case N1:   util::stream_format(stream, "1"); break;
+			case N2:   util::stream_format(stream, "2"); break;
+			case N3:   util::stream_format(stream, "3"); break;
+			case N4:   util::stream_format(stream, "4"); break;
+			case N5:   util::stream_format(stream, "5"); break;
+			case N6:   util::stream_format(stream, "6"); break;
+			case N7:   util::stream_format(stream, "7"); break;
+			case N8:   util::stream_format(stream, "8"); break;
+			case N9:   util::stream_format(stream, "9"); break;
+			case N10:  util::stream_format(stream, "10"); break;
+			case N11:  util::stream_format(stream, "11"); break;
+			case N12:  util::stream_format(stream, "12"); break;
+			case N13:  util::stream_format(stream, "13"); break;
+			case N14:  util::stream_format(stream, "14"); break;
+			case N15:  util::stream_format(stream, "15"); break;
+			case DP0:  util::stream_format(stream, "$%02x.0", read_8_immediate()); break;
+			case DP1:  util::stream_format(stream, "$%02x.1", read_8_immediate()); break;
+			case DP2:  util::stream_format(stream, "$%02x.2", read_8_immediate()); break;
+			case DP3:  util::stream_format(stream, "$%02x.3", read_8_immediate()); break;
+			case DP4:  util::stream_format(stream, "$%02x.4", read_8_immediate()); break;
+			case DP5:  util::stream_format(stream, "$%02x.5", read_8_immediate()); break;
+			case DP6:  util::stream_format(stream, "$%02x.6", read_8_immediate()); break;
+			case DP7:  util::stream_format(stream, "$%02x.7", read_8_immediate()); break;
 			case MEMN:
 				var = read_16_immediate();
-				sprintf(ptr, "%04x.%d", var&0x1fff, var>>13);
+				util::stream_format(stream, "%04x.%d", var&0x1fff, var>>13);
 				break;
 			case MEMI:
 				var = read_16_immediate();
-				sprintf(ptr, "/%04x.%d", var&0x1fff, var>>13);
+				util::stream_format(stream, "/%04x.%d", var&0x1fff, var>>13);
 				break;
 		}
-		ptr += strlen(ptr);
 	}
 	return (g_pc - pc) | flags | DASMFLAG_SUPPORTED;
+}
+
+
+CPU_DISASSEMBLE(spc700)
+{
+	std::ostringstream stream;
+	offs_t result = internal_disasm_spc700(device, stream, pc, oprom, opram, options);
+	std::string stream_str = stream.str();
+	strcpy(buffer, stream_str.c_str());
+	return result;
 }
