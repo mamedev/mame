@@ -4,9 +4,9 @@
 
   ** subclass of hh_tms1k_state (includes/hh_tms1k.h, drivers/hh_tms1k.cpp) **
 
-  Texas Instruments TMS1xxx family handheld calculators (mostly single-chip).
-  For a comprehensive list of MCU serials, see Joerg Woerner's datamath.org:
-  http://www.datamath.org/IC_List.htm
+  Texas Instruments or 1st-party TMS1xxx family handheld calculators (mostly
+  single-chip). For a comprehensive list of MCU serials, see Joerg Woerner's
+  datamath.org: http://www.datamath.org/IC_List.htm
 
   Refer to the calculators/toys official manuals on how to use them.
 
