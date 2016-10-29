@@ -160,11 +160,12 @@ static const char *const opcode_strings[0x0100] =
 };
 #endif
 
-CPU_DISASSEMBLE( m6805 )
+static offs_t internal_disasm_m6805(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
 {
 	int code, bit;
 	uint16_t ea;
 	uint32_t flags = 0;
+	offs_t result;
 
 	code = oprom[0];
 
@@ -173,42 +174,63 @@ CPU_DISASSEMBLE( m6805 )
 	else if (disasm[code][0] == rts || disasm[code][0] == rti)
 		flags = DASMFLAG_STEP_OUT;
 
-	buffer += sprintf(buffer, "%-6s", op_name_str[disasm[code][0]]);
+	util::stream_format(stream, "%-6s", op_name_str[disasm[code][0]]);
 
 	switch( disasm[code][1] )
 	{
 	case _btr:  /* bit test and relative branch */
 		bit = (code >> 1) & 7;
-		sprintf (buffer, "%d,$%02X,$%03X", bit, opram[1], pc + 3 + (int8_t)opram[2]);
-		return 3 | flags | DASMFLAG_SUPPORTED;
+		util::stream_format(stream, "%d,$%02X,$%03X", bit, opram[1], pc + 3 + (int8_t)opram[2]);
+		result = 3 | flags | DASMFLAG_SUPPORTED;
+		break;
 	case _bit:  /* bit test */
 		bit = (code >> 1) & 7;
-		sprintf (buffer, "%d,$%03X", bit, opram[1]);
-		return 2 | flags | DASMFLAG_SUPPORTED;
+		util::stream_format(stream, "%d,$%03X", bit, opram[1]);
+		result = 2 | flags | DASMFLAG_SUPPORTED;
+		break;
 	case _rel:  /* relative */
-		sprintf (buffer, "$%03X", pc + 2 + (int8_t)opram[1]);
-		return 2 | flags | DASMFLAG_SUPPORTED;
+		util::stream_format(stream, "$%03X", pc + 2 + (int8_t)opram[1]);
+		result = 2 | flags | DASMFLAG_SUPPORTED;
+		break;
 	case _imm:  /* immediate */
-		sprintf (buffer, "#$%02X", opram[1]);
-		return 2 | flags | DASMFLAG_SUPPORTED;
+		util::stream_format(stream, "#$%02X", opram[1]);
+		result = 2 | flags | DASMFLAG_SUPPORTED;
+		break;
 	case _dir:  /* direct (zero page address) */
-		sprintf (buffer, "$%02X", opram[1]);
-		return 2 | flags | DASMFLAG_SUPPORTED;
+		util::stream_format(stream, "$%02X", opram[1]);
+		result = 2 | flags | DASMFLAG_SUPPORTED;
+		break;
 	case _ext:  /* extended (16 bit address) */
 		ea = (opram[1] << 8) + opram[2];
-		sprintf (buffer, "$%04X", ea);
-		return 3 | flags | DASMFLAG_SUPPORTED;
+		util::stream_format(stream, "$%04X", ea);
+		result = 3 | flags | DASMFLAG_SUPPORTED;
+		break;
 	case _idx:  /* indexed */
-		sprintf (buffer, "(x)");
-		return 1 | flags | DASMFLAG_SUPPORTED;
+		util::stream_format(stream, "(x)");
+		result = 1 | flags | DASMFLAG_SUPPORTED;
+		break;
 	case _ix1:  /* indexed + byte (zero page) */
-		sprintf (buffer, "(x+$%02X)", opram[1]);
-		return 2 | flags | DASMFLAG_SUPPORTED;
+		util::stream_format(stream, "(x+$%02X)", opram[1]);
+		result = 2 | flags | DASMFLAG_SUPPORTED;
+		break;
 	case _ix2:  /* indexed + word (16 bit address) */
 		ea = (opram[1] << 8) + opram[2];
-		sprintf (buffer, "(x+$%04X)", ea);
-		return 3 | flags | DASMFLAG_SUPPORTED;
+		util::stream_format(stream, "(x+$%04X)", ea);
+		result = 3 | flags | DASMFLAG_SUPPORTED;
+		break;
 	default:    /* implicit */
-		return 1 | flags | DASMFLAG_SUPPORTED;
+		result = 1 | flags | DASMFLAG_SUPPORTED;
+		break;
 	}
+	return result;
+}
+
+
+CPU_DISASSEMBLE(m6805)
+{
+	std::ostringstream stream;
+	offs_t result = internal_disasm_m6805(device, stream, pc, oprom, opram, options);
+	std::string stream_str = stream.str();
+	strcpy(buffer, stream_str.c_str());
+	return result;
 }
