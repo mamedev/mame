@@ -222,28 +222,6 @@ void cdda_device::get_audio_data(stream_sample_t *bufL, stream_sample_t *bufR, u
 }
 
 /*-------------------------------------------------
-    cdda_set_volume - sets CD-DA volume level
-    for both speakers, used for fade in/out effects
--------------------------------------------------*/
-
-void cdda_device::set_volume(int volume)
-{
-	m_stream->set_output_gain(0,volume / 100.0);
-	m_stream->set_output_gain(1,volume / 100.0);
-}
-
-/*-------------------------------------------------
-    cdda_set_channel_volume - sets CD-DA volume level
-    for either speaker, used for fade in/out effects
--------------------------------------------------*/
-
-void cdda_device::set_channel_volume(int channel, int volume)
-{
-	m_stream->set_output_gain(channel,volume / 100.0);
-}
-
-
-/*-------------------------------------------------
     cdda_get_channel_volume - sets CD-DA volume level
     for either speaker, used for volume control display
 -------------------------------------------------*/
