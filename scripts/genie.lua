@@ -377,6 +377,11 @@ newoption {
 	description = "Arguments for running debug build.",
 }
 
+newoption {
+	trigger = "WEBASSEMBLY",
+	description = "Produce WebAssembly output when building with Emscripten.",
+}
+
 dofile ("extlib.lua")
 
 if _OPTIONS["SHLIB"]=="1" then

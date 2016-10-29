@@ -742,6 +742,10 @@ endif
 ifdef DEBUG_ARGS
 PARAMS += --DEBUG_ARGS='$(DEBUG_ARGS)'
 endif
+
+ifdef WEBASSEMBLY
+PARAMS += --WEBASSEMBLY='$(WEBASSEMBLY)'
+endif
 #-------------------------------------------------
 # All scripts
 #-------------------------------------------------

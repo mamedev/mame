@@ -137,6 +137,11 @@ end
 					.. " -s DEMANGLE_SUPPORT=1"
 			end
 
+			if _OPTIONS["WEBASSEMBLY"] then
+				emccopts = emccopts
+					.. " -s BINARYEN=1"
+			end
+
 			if _OPTIONS["ARCHOPTS"] then
 				emccopts = emccopts .. " " .. _OPTIONS["ARCHOPTS"]
 			end
