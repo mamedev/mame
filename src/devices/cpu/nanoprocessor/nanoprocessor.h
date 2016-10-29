@@ -5,12 +5,14 @@
 // Emulator for HP nanoprocessor
 // *****************************
 //
+// http://www.hp9845.net/9845/downloads/manuals/Nanoprocessor.pdf
 #ifndef _NANOPROCESSOR_H_
 #define _NANOPROCESSOR_H_
 
 #define HP_NANO_REGS	16	// Number of GP registers
 #define HP_NANO_PC_MASK	0x7ff	// Mask of PC meaningful bits: 11 bits available
 #define HP_NANO_DC_NO	8	// Number of direct control lines (DC7 is typically used as interrupt mask)
+#define HP_NANO_IE_DC	7	// DC line used as interrupt enable/mask (DC7)
 
 // DC changed callback
 // The callback receives a 8-bit word holding the state of all DC lines.

@@ -37,7 +37,7 @@ static void param_reg(char *buffer , uint8_t opcode , const uint8_t* opram)
 static void param_11bit(char *buffer , uint8_t opcode , const uint8_t* opram)
 {
 	unsigned tmp = ((unsigned)(opcode & 7) << 8) | *opram;
-	sprintf(buffer , "0x%03x" , tmp);
+	sprintf(buffer , "$%03x" , tmp);
 }
 
 static void param_page_no(char *buffer , uint8_t opcode , const uint8_t* opram)
@@ -48,17 +48,17 @@ static void param_page_no(char *buffer , uint8_t opcode , const uint8_t* opram)
 
 static void param_byte(char *buffer , uint8_t opcode , const uint8_t* opram)
 {
-	sprintf(buffer , "0x%02x" , *opram);
+	sprintf(buffer , "$%02x" , *opram);
 }
 
 static void param_ds_byte(char *buffer , uint8_t opcode , const uint8_t* opram)
 {
-	sprintf(buffer , "DS%u,0x%02x" , opcode & 0xf , *opram);
+	sprintf(buffer , "DS%u,$%02x" , opcode & 0xf , *opram);
 }
 
 static void param_reg_byte(char *buffer , uint8_t opcode , const uint8_t* opram)
 {
-	sprintf(buffer , "R%u,0x%02x" , opcode & 0xf , *opram);
+	sprintf(buffer , "R%u,$%02x" , opcode & 0xf , *opram);
 }
 
 static const dis_entry_t dis_table[] = {

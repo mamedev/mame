@@ -38,7 +38,6 @@ enum {
 
 // Bits in m_flags
 #define NANO_DC0_BIT	0	// DC0
-#define NANO_IE_BIT (NANO_DC0_BIT + 7)	// DC7 is usually interrupt enable
 #define NANO_E_BIT	(NANO_DC0_BIT + HP_NANO_DC_NO)	// Extend flag
 #define NANO_I_BIT	(NANO_E_BIT + 1)	// Interrupt flag
 
@@ -116,8 +115,7 @@ void hp_nanoprocessor_device::execute_run()
 		if (BIT(m_flags , NANO_I_BIT)) {
 			m_reg_ISR = m_reg_PA;
 			m_reg_PA = (uint16_t)(standard_irq_callback(0) & 0xff);
-			BIT_CLR(m_flags, NANO_IE_BIT);
-			dc_update();
+			dc_clr(HP_NANO_IE_DC);
 			// Vector fetching takes 1 cycle
 			m_icount -= 1;
 		} else {
@@ -307,7 +305,7 @@ void hp_nanoprocessor_device::execute_one(uint8_t opcode)
 
 	case 0xb1:
 		// RTE
-		dc_set(NANO_IE_BIT);
+		dc_set(HP_NANO_IE_DC);
 		// Intentional fall-through to RTI!
 
 	case 0xb0:
@@ -327,7 +325,7 @@ void hp_nanoprocessor_device::execute_one(uint8_t opcode)
 
 	case 0xb9:
 		// RSE
-		dc_set(NANO_IE_BIT);
+		dc_set(HP_NANO_IE_DC);
 		// Intentional fall-through to RTS!
 
 	case 0xb8:
