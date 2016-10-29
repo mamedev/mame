@@ -43,10 +43,11 @@
 
 typedef enum bgfx_renderer_type
 {
-    BGFX_RENDERER_TYPE_NULL,
+    BGFX_RENDERER_TYPE_NOOP,
     BGFX_RENDERER_TYPE_DIRECT3D9,
     BGFX_RENDERER_TYPE_DIRECT3D11,
     BGFX_RENDERER_TYPE_DIRECT3D12,
+    BGFX_RENDERER_TYPE_GNM,
     BGFX_RENDERER_TYPE_METAL,
     BGFX_RENDERER_TYPE_OPENGLES,
     BGFX_RENDERER_TYPE_OPENGL,
@@ -406,6 +407,29 @@ typedef struct bgfx_caps_gpu
 
 } bgfx_caps_gpu_t;
 
+typedef struct bgfx_caps_limits
+{
+    uint32_t maxDrawCalls;
+    uint32_t maxBlits;
+    uint32_t maxTextureSize;
+    uint32_t maxViews;
+    uint32_t maxFrameBuffers;
+    uint32_t maxFBAttachments;
+    uint32_t maxPrograms;
+    uint32_t maxShaders;
+    uint32_t maxTextures;
+    uint32_t maxTextureSamplers;
+    uint32_t maxVertexDecls;
+    uint32_t maxVertexStreams;
+    uint32_t maxIndexBuffers;
+    uint32_t maxVertexBuffers;
+    uint32_t maxDynamicIndexBuffers;
+    uint32_t maxDynamicVertexBuffers;
+    uint32_t maxUniforms;
+    uint32_t maxOcclusionQueries;
+
+} bgfx_caps_limits_t;
+
 /**/
 typedef struct bgfx_caps
 {
@@ -413,17 +437,14 @@ typedef struct bgfx_caps
 
     uint64_t supported;
 
-    uint32_t maxDrawCalls;
-    uint16_t maxTextureSize;
-    uint16_t maxViews;
-    uint8_t  maxFBAttachments;
-    uint8_t  numGPUs;
-    bool     homogeneousDepth;
-    bool     originBottomLeft;
-
     uint16_t vendorId;
     uint16_t deviceId;
+    bool     homogeneousDepth;
+    bool     originBottomLeft;
+    uint8_t  numGPUs;
+
     bgfx_caps_gpu_t gpu[4];
+    bgfx_caps_limits_t limits;
 
     uint16_t formats[BGFX_TEXTURE_FORMAT_COUNT];
 
@@ -433,7 +454,6 @@ typedef struct bgfx_caps
 typedef enum bgfx_fatal
 {
     BGFX_FATAL_DEBUG_CHECK,
-    BGFX_FATAL_MINIMUM_REQUIRED_SPECS,
     BGFX_FATAL_INVALID_SHADER,
     BGFX_FATAL_UNABLE_TO_INITIALIZE,
     BGFX_FATAL_UNABLE_TO_CREATE_TEXTURE,
@@ -516,7 +536,7 @@ BGFX_C_API void bgfx_image_swizzle_bgra8(uint32_t _width, uint32_t _height, uint
 BGFX_C_API void bgfx_image_rgba8_downsample_2x2(uint32_t _width, uint32_t _height, uint32_t _pitch, const void* _src, void* _dst);
 
 /**/
-BGFX_C_API uint8_t bgfx_get_supported_renderers(bgfx_renderer_type_t _enum[BGFX_RENDERER_TYPE_COUNT]);
+BGFX_C_API uint8_t bgfx_get_supported_renderers(uint8_t _max, bgfx_renderer_type_t* _enum);
 
 /**/
 BGFX_C_API const char* bgfx_get_renderer_name(bgfx_renderer_type_t _type);
@@ -684,7 +704,7 @@ BGFX_C_API void bgfx_update_texture_3d(bgfx_texture_handle_t _handle, uint8_t _m
 BGFX_C_API void bgfx_update_texture_cube(bgfx_texture_handle_t _handle, uint16_t _layer, uint8_t _side, uint8_t _mip, uint16_t _x, uint16_t _y, uint16_t _width, uint16_t _height, const bgfx_memory_t* _mem, uint16_t _pitch);
 
 /**/
-BGFX_C_API uint32_t bgfx_read_texture(bgfx_texture_handle_t _handle, void* _data);
+BGFX_C_API uint32_t bgfx_read_texture(bgfx_texture_handle_t _handle, void* _data, uint8_t _mip);
 
 /**/
 BGFX_C_API uint32_t bgfx_read_frame_buffer(bgfx_frame_buffer_handle_t _handle, uint8_t _attachment, void* _data);

@@ -1619,9 +1619,11 @@ bgfx-tools:
 shaders: bgfx-tools
 	-$(call MKDIR,build/shaders/dx11)
 	-$(call MKDIR,build/shaders/dx9)
-	-$(call MKDIR,build/shaders/gles)
-	-$(call MKDIR,build/shaders/glsl)
+	-$(call MKDIR,build/shaders/pssl)
 	-$(call MKDIR,build/shaders/metal)
+	-$(call MKDIR,build/shaders/essl)
+	-$(call MKDIR,build/shaders/glsl)
+	-$(call MKDIR,build/shaders/spirv)
 	$(SILENT) $(MAKE) -C $(SRC)/osd/modules/render/bgfx/shaders rebuild CHAIN="$(CHAIN)"
 
 #-------------------------------------------------

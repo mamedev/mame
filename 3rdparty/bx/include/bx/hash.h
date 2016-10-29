@@ -162,6 +162,7 @@ namespace bx
 	template <typename Ty>
 	inline uint32_t hashMurmur2A(const Ty& _data)
 	{
+		BX_STATIC_ASSERT(BX_TYPE_IS_POD(Ty) );
 		return hashMurmur2A(&_data, sizeof(Ty) );
 	}
 

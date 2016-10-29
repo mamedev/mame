@@ -933,7 +933,7 @@ static void addquoted (luaL_Buffer *b, const char *s, size_t len) {
 static void checkdp (char *buff, int nb) {
   if (memchr(buff, '.', nb) == NULL) {  /* no dot? */
     char point = lua_getlocaledecpoint();  /* try locale point */
-    char *ppoint = memchr(buff, point, nb);
+    char *ppoint = (char*)memchr(buff, point, nb);
     if (ppoint) *ppoint = '.';  /* change it to a dot */
   }
 }

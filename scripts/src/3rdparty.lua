@@ -781,13 +781,15 @@ end
 		MAME_DIR .. "3rdparty/bgfx/src/glcontext_ppapi.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/glcontext_wgl.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/image.cpp",
+		MAME_DIR .. "3rdparty/bgfx/src/hmd.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/hmd_ovr.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/hmd_openvr.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_d3d12.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_d3d11.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_d3d9.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_gl.cpp",
-		MAME_DIR .. "3rdparty/bgfx/src/renderer_null.cpp",
+		MAME_DIR .. "3rdparty/bgfx/src/renderer_gnm.cpp",
+		MAME_DIR .. "3rdparty/bgfx/src/renderer_noop.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_vk.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/debug_renderdoc.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/shader.cpp",
@@ -812,7 +814,6 @@ end
 		MAME_DIR .. "3rdparty/bgfx/3rdparty/ib-compress/indexbufferdecompression.cpp",
 		MAME_DIR .. "3rdparty/bgfx/3rdparty/ocornut-imgui/imgui.cpp",
 		MAME_DIR .. "3rdparty/bgfx/3rdparty/ocornut-imgui/imgui_draw.cpp",
-		MAME_DIR .. "3rdparty/bgfx/3rdparty/ocornut-imgui/imgui_wm.cpp",
 	}
 	if _OPTIONS["targetos"]=="macosx" then
 		files {

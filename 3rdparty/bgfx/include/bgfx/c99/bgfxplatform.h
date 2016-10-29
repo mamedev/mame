@@ -39,6 +39,7 @@ typedef struct bgfx_platform_data
     void* context;
     void* backBuffer;
     void* backBufferDS;
+    void* session;
 
 } bgfx_platform_data_t;
 
@@ -81,7 +82,7 @@ typedef struct bgfx_interface_vtbl
     void (*topology_sort_tri_list)(bgfx_topology_sort_t _sort, void* _dst, uint32_t _dstSize, const float _dir[3], const float _pos[3], const void* _vertices, uint32_t _stride, const void* _indices, uint32_t _numIndices, bool _index32);
     void (*image_swizzle_bgra8)(uint32_t _width, uint32_t _height, uint32_t _pitch, const void* _src, void* _dst);
     void (*image_rgba8_downsample_2x2)(uint32_t _width, uint32_t _height, uint32_t _pitch, const void* _src, void* _dst);
-    uint8_t (*get_supported_renderers)(bgfx_renderer_type_t _enum[BGFX_RENDERER_TYPE_COUNT]);
+    uint8_t (*get_supported_renderers)(uint8_t _max, bgfx_renderer_type_t* _enum);
     const char* (*get_renderer_name)(bgfx_renderer_type_t _type);
     bool (*init)(bgfx_renderer_type_t _type, uint16_t _vendorId, uint16_t _deviceId, bgfx_callback_interface_t* _callback, bgfx_allocator_interface_t* _allocator);
     void (*shutdown)();
@@ -137,6 +138,8 @@ typedef struct bgfx_interface_vtbl
     void (*update_texture_2d)(bgfx_texture_handle_t _handle, uint16_t _layer, uint8_t _mip, uint16_t _x, uint16_t _y, uint16_t _width, uint16_t _height, const bgfx_memory_t* _mem, uint16_t _pitch);
     void (*update_texture_3d)(bgfx_texture_handle_t _handle, uint8_t _mip, uint16_t _x, uint16_t _y, uint16_t _z, uint16_t _width, uint16_t _height, uint16_t _depth, const bgfx_memory_t* _mem);
     void (*update_texture_cube)(bgfx_texture_handle_t _handle, uint16_t _layer, uint8_t _side, uint8_t _mip, uint16_t _x, uint16_t _y, uint16_t _width, uint16_t _height, const bgfx_memory_t* _mem, uint16_t _pitch);
+    uint32_t (*read_texture)(bgfx_texture_handle_t _handle, void* _data, uint8_t _mip);
+    uint32_t (*read_frame_buffer)(bgfx_frame_buffer_handle_t _handle, uint8_t _attachment, void* _data);
     void (*destroy_texture)(bgfx_texture_handle_t _handle);
     bgfx_frame_buffer_handle_t (*create_frame_buffer)(uint16_t _width, uint16_t _height, bgfx_texture_format_t _format, uint32_t _textureFlags);
     bgfx_frame_buffer_handle_t (*create_frame_buffer_scaled)(bgfx_backbuffer_ratio_t _ratio, bgfx_texture_format_t _format, uint32_t _textureFlags);

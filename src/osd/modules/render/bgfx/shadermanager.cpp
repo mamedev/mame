@@ -44,6 +44,7 @@ bgfx::ShaderHandle shader_manager::load_shader(std::string name)
 	std::string shader_path;
 	switch (bgfx::getRendererType())
 	{
+		case bgfx::RendererType::Noop:
 		case bgfx::RendererType::Direct3D9:
 			shader_path = m_options.bgfx_path() + std::string("/shaders/dx9/");
 			break;
@@ -53,16 +54,24 @@ bgfx::ShaderHandle shader_manager::load_shader(std::string name)
 			shader_path = m_options.bgfx_path() + std::string("/shaders/dx11/");
 			break;
 
-		case bgfx::RendererType::OpenGL:
-			shader_path = m_options.bgfx_path() + std::string("/shaders/glsl/");
+		case bgfx::RendererType::Gnm:
+			shader_path = m_options.bgfx_path() + std::string("/shaders/pssl/");
 			break;
 
 		case bgfx::RendererType::Metal:
 			shader_path = m_options.bgfx_path() + std::string("/shaders/metal/");
 			break;
 
+		case bgfx::RendererType::OpenGL:
+			shader_path = m_options.bgfx_path() + std::string("/shaders/glsl/");
+			break;
+
 		case bgfx::RendererType::OpenGLES:
-			shader_path = m_options.bgfx_path() + std::string("/shaders/gles/");
+			shader_path = m_options.bgfx_path() + std::string("/shaders/essl/");
+			break;
+
+		case bgfx::RendererType::Vulkan:
+			shader_path = m_options.bgfx_path() + std::string("/shaders/spirv/");
 			break;
 
 		default:

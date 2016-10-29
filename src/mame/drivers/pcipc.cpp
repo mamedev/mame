@@ -193,7 +193,7 @@ WRITE8_MEMBER(pcipc_state::boot_state_w)
 }
 
 static MACHINE_CONFIG_START(pcipc, pcipc_state)
-	MCFG_CPU_ADD("maincpu", PENTIUM, 66000000)
+	MCFG_CPU_ADD("maincpu", PENTIUM, 90000000)
 
 	MCFG_PCI_ROOT_ADD(    ":pci")
 	MCFG_I82439HX_ADD(    ":pci:00.0", ":maincpu", 256*1024*1024)

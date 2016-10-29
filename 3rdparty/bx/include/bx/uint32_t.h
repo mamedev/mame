@@ -263,9 +263,19 @@ namespace bx
 		return _a > _b ? _b : _a;
 	}
 
+	inline uint32_t uint32_min(uint32_t _a, uint32_t _b, uint32_t _c)
+	{
+		return uint32_min(_a, uint32_min(_b, _c) );
+	}
+
 	inline uint32_t uint32_max(uint32_t _a, uint32_t _b)
 	{
 		return _a > _b ? _a : _b;
+	}
+
+	inline uint32_t uint32_max(uint32_t _a, uint32_t _b, uint32_t _c)
+	{
+		return uint32_max(_a, uint32_max(_b, _c) );
 	}
 
 	inline uint32_t uint32_clamp(uint32_t _a, uint32_t _min, uint32_t _max)
@@ -690,6 +700,46 @@ namespace bx
 #else
 		return uint64_cnttz_ref(_val);
 #endif // BX_COMPILER_
+	}
+
+	inline uint64_t uint64_sll(uint64_t _a, int _sa)
+	{
+		return _a << _sa;
+	}
+
+	inline uint64_t uint64_srl(uint64_t _a, int _sa)
+	{
+		return _a >> _sa;
+	}
+
+	inline uint64_t uint64_sra(uint64_t _a, int _sa)
+	{
+		return ( (int64_t)_a) >> _sa;
+	}
+
+	inline uint64_t uint64_rol(uint64_t _a, int _sa)
+	{
+		return ( _a << _sa) | (_a >> (32-_sa) );
+	}
+
+	inline uint64_t uint64_ror(uint64_t _a, int _sa)
+	{
+		return ( _a >> _sa) | (_a << (32-_sa) );
+	}
+
+	inline uint64_t uint64_add(uint64_t _a, uint64_t _b)
+	{
+		return _a + _b;
+	}
+
+	inline uint64_t uint64_sub(uint64_t _a, uint64_t _b)
+	{
+		return _a - _b;
+	}
+
+	inline uint64_t uint64_mul(uint64_t _a, uint64_t _b)
+	{
+		return _a * _b;
 	}
 
 	/// Greatest common divisor.
