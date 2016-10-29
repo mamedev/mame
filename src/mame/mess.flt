@@ -139,6 +139,7 @@ d6800.cpp
 d6809.cpp
 dai.cpp
 daruma.cpp
+datum.cpp
 dccons.cpp
 dct11em.cpp
 dectalk.cpp
