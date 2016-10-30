@@ -49,18 +49,9 @@ static const char *FLOATOP_ROUND[4] =
 	"n", "z", "p", "m"
 };
 
-static char *output;
+static std::ostream *output;
 static const uint8_t *opdata;
 static int opbytes;
-
-static void ATTR_PRINTF(1,2) print(const char *fmt, ...)
-{
-	va_list vl;
-
-	va_start(vl, fmt);
-	output += vsprintf(output, fmt, vl);
-	va_end(vl);
-}
 
 static uint32_t fetch(void)
 {
@@ -201,9 +192,9 @@ static char* format_vector_op(uint32_t op, uint32_t imm32)
 	return buffer;
 }
 
-static offs_t tms32082_disasm_mp(char *buffer, offs_t pc, const uint8_t *oprom)
+static offs_t tms32082_disasm_mp(std::ostream &stream, offs_t pc, const uint8_t *oprom)
 {
-	output = buffer;
+	output = &stream;
 	opdata = oprom;
 	opbytes = 0;
 	uint32_t flags = 0;
@@ -228,87 +219,87 @@ static offs_t tms32082_disasm_mp(char *buffer, offs_t pc, const uint8_t *oprom)
 
 			switch (subop)
 			{
-				case 0x00:  print("illop0      "); break;
-				case 0x01:  print("trap        %d", UIMM15(uimm15)); break;
-				case 0x02:  print("cmnd        0x%04X", UIMM15(uimm15)); break;
+				case 0x00:  util::stream_format(*output, "illop0      "); break;
+				case 0x01:  util::stream_format(*output, "trap        %d", UIMM15(uimm15)); break;
+				case 0x02:  util::stream_format(*output, "cmnd        0x%04X", UIMM15(uimm15)); break;
 
 				case 0x04:
 					if (op == 0x00020000)
-						print("nop         ");
+						util::stream_format(*output, "nop         ");
 					else
-						print("rdcr        %s, R%d", get_creg_name(UIMM15(uimm15)), rd);
+						util::stream_format(*output, "rdcr        %s, R%d", get_creg_name(UIMM15(uimm15)), rd);
 					break;
 
-				case 0x05:  print("swcr        R%d, %s, R%d", rd, get_creg_name(UIMM15(uimm15)), rs); break;
-				case 0x06:  print("brcr        %s", get_creg_name(UIMM15(uimm15))); break;
-				case 0x08:  print("shift%s.dz   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
-				case 0x09:  print("shift%s.dm   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
-				case 0x0a:  print("shift%s.ds   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
-				case 0x0b:  print("shift%s.ez   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
-				case 0x0c:  print("shift%s.em   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
-				case 0x0d:  print("shift%s.es   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
-				case 0x0e:  print("shift%s.iz   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
-				case 0x0f:  print("shift%s.im   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
-				case 0x11:  print("and         0x%04X, R%d, R%d", UIMM15(uimm15), rs, rd); break;
-				case 0x12:  print("and.tf      0x%04X, R%d, R%d", UIMM15(uimm15), rs, rd); break;
-				case 0x14:  print("and.ft      0x%04X, R%d, R%d", UIMM15(uimm15), rs, rd); break;
-				case 0x16:  print("xor         0x%04X, R%d, R%d", UIMM15(uimm15), rs, rd); break;
-				case 0x17:  print("or          0x%04X, R%d, R%d", UIMM15(uimm15), rs, rd); break;
-				case 0x18:  print("and.ff      0x%04X, R%d, R%d", UIMM15(uimm15), rs, rd); break;
-				case 0x19:  print("xnor        0x%04X, R%d, R%d", UIMM15(uimm15), rs, rd); break;
-				case 0x1b:  print("or.tf       0x%04X, R%d, R%d", UIMM15(uimm15), rs, rd); break;
-				case 0x1d:  print("or.ft       0x%04X, R%d, R%d", UIMM15(uimm15), rs, rd); break;
-				case 0x1e:  print("or.ff       0x%04X, R%d, R%d", UIMM15(uimm15), rs, rd); break;
+				case 0x05:  util::stream_format(*output, "swcr        R%d, %s, R%d", rd, get_creg_name(UIMM15(uimm15)), rs); break;
+				case 0x06:  util::stream_format(*output, "brcr        %s", get_creg_name(UIMM15(uimm15))); break;
+				case 0x08:  util::stream_format(*output, "shift%s.dz   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
+				case 0x09:  util::stream_format(*output, "shift%s.dm   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
+				case 0x0a:  util::stream_format(*output, "shift%s.ds   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
+				case 0x0b:  util::stream_format(*output, "shift%s.ez   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
+				case 0x0c:  util::stream_format(*output, "shift%s.em   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
+				case 0x0d:  util::stream_format(*output, "shift%s.es   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
+				case 0x0e:  util::stream_format(*output, "shift%s.iz   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
+				case 0x0f:  util::stream_format(*output, "shift%s.im   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
+				case 0x11:  util::stream_format(*output, "and         0x%04X, R%d, R%d", UIMM15(uimm15), rs, rd); break;
+				case 0x12:  util::stream_format(*output, "and.tf      0x%04X, R%d, R%d", UIMM15(uimm15), rs, rd); break;
+				case 0x14:  util::stream_format(*output, "and.ft      0x%04X, R%d, R%d", UIMM15(uimm15), rs, rd); break;
+				case 0x16:  util::stream_format(*output, "xor         0x%04X, R%d, R%d", UIMM15(uimm15), rs, rd); break;
+				case 0x17:  util::stream_format(*output, "or          0x%04X, R%d, R%d", UIMM15(uimm15), rs, rd); break;
+				case 0x18:  util::stream_format(*output, "and.ff      0x%04X, R%d, R%d", UIMM15(uimm15), rs, rd); break;
+				case 0x19:  util::stream_format(*output, "xnor        0x%04X, R%d, R%d", UIMM15(uimm15), rs, rd); break;
+				case 0x1b:  util::stream_format(*output, "or.tf       0x%04X, R%d, R%d", UIMM15(uimm15), rs, rd); break;
+				case 0x1d:  util::stream_format(*output, "or.ft       0x%04X, R%d, R%d", UIMM15(uimm15), rs, rd); break;
+				case 0x1e:  util::stream_format(*output, "or.ff       0x%04X, R%d, R%d", UIMM15(uimm15), rs, rd); break;
 
 				case 0x24: case 0x20:
-							print("ld.b        0x%04X(R%d%s), R%d", UIMM15(uimm15), rs, MEMOP_M[m], rd);
+							util::stream_format(*output, "ld.b        0x%04X(R%d%s), R%d", UIMM15(uimm15), rs, MEMOP_M[m], rd);
 							break;
 				case 0x25: case 0x21:
-							print("ld.h        0x%04X(R%d%s), R%d", UIMM15(uimm15), rs, MEMOP_M[m], rd);
+							util::stream_format(*output, "ld.h        0x%04X(R%d%s), R%d", UIMM15(uimm15), rs, MEMOP_M[m], rd);
 							break;
 				case 0x26: case 0x22:
-							print("ld          0x%04X(R%d%s), R%d", UIMM15(uimm15), rs, MEMOP_M[m], rd);
+							util::stream_format(*output, "ld          0x%04X(R%d%s), R%d", UIMM15(uimm15), rs, MEMOP_M[m], rd);
 							break;
 				case 0x27: case 0x23:
-							print("ld.d        0x%04X(R%d%s), R%d", UIMM15(uimm15), rs, MEMOP_M[m], rd);
+							util::stream_format(*output, "ld.d        0x%04X(R%d%s), R%d", UIMM15(uimm15), rs, MEMOP_M[m], rd);
 							break;
 				case 0x2c: case 0x28:
-							print("ld.ub       0x%04X(R%d%s), R%d", UIMM15(uimm15), rs, MEMOP_M[m], rd);
+							util::stream_format(*output, "ld.ub       0x%04X(R%d%s), R%d", UIMM15(uimm15), rs, MEMOP_M[m], rd);
 							break;
 				case 0x2d: case 0x29:
-							print("ld.uh       0x%04X(R%d%s), R%d", UIMM15(uimm15), rs, MEMOP_M[m], rd);
+							util::stream_format(*output, "ld.uh       0x%04X(R%d%s), R%d", UIMM15(uimm15), rs, MEMOP_M[m], rd);
 							break;
 
 				case 0x34: case 0x30:
-							print("st.b        R%d, 0x%04X(R%d%s)", rd, UIMM15(uimm15), rs, MEMOP_M[m]);
+							util::stream_format(*output, "st.b        R%d, 0x%04X(R%d%s)", rd, UIMM15(uimm15), rs, MEMOP_M[m]);
 							break;
 				case 0x35: case 0x31:
-							print("st.h        R%d, 0x%04X(R%d%s)", rd, UIMM15(uimm15), rs, MEMOP_M[m]);
+							util::stream_format(*output, "st.h        R%d, 0x%04X(R%d%s)", rd, UIMM15(uimm15), rs, MEMOP_M[m]);
 							break;
 				case 0x36: case 0x32:
-							print("st          R%d, 0x%04X(R%d%s)", rd, UIMM15(uimm15), rs, MEMOP_M[m]);
+							util::stream_format(*output, "st          R%d, 0x%04X(R%d%s)", rd, UIMM15(uimm15), rs, MEMOP_M[m]);
 							break;
 				case 0x37: case 0x33:
-							print("st.d        R%d, 0x%04X(R%d%s)", rd, UIMM15(uimm15), rs, MEMOP_M[m]);
+							util::stream_format(*output, "st.d        R%d, 0x%04X(R%d%s)", rd, UIMM15(uimm15), rs, MEMOP_M[m]);
 							break;
 
-				case 0x40:  print("bsr         0x%08X, R%d", pc + (SIMM15(uimm15) * 4), link); break;
-				case 0x41:  print("bsr.a       0x%08X, R%d", pc + (SIMM15(uimm15) * 4), link); break;
-				case 0x44:  print("jsr         0x%04X(R%d), R%d", SIMM15(uimm15), rs, link); break;
-				case 0x45:  print("jsr.a       0x%04X(R%d), R%d", SIMM15(uimm15), rs, link); break;
-				case 0x48:  print("bbz         0x%08X, R%d, %s (%d)", pc + (SIMM15(uimm15) * 4), rs, BITNUM_CONDITION[bitnum], bitnum); break;
-				case 0x49:  print("bbz.a       0x%08X, R%d, %s (%d)", pc + (SIMM15(uimm15) * 4), rs, BITNUM_CONDITION[bitnum], bitnum); break;
-				case 0x4a:  print("bbo         0x%08X, R%d, %s (%d)", pc + (SIMM15(uimm15) * 4), rs, BITNUM_CONDITION[bitnum], bitnum); break;
-				case 0x4b:  print("bbo.a       0x%08X, R%d, %s (%d)", pc + (SIMM15(uimm15) * 4), rs, BITNUM_CONDITION[bitnum], bitnum); break;
-				case 0x4c:  print("bcnd        0x%08X, R%d, %s", pc + (SIMM15(uimm15) * 4), rs, BCND_CONDITION[rd]); break;
-				case 0x4d:  print("bcnd.a      0x%08X, R%d, %s", pc + (SIMM15(uimm15) * 4), rs, BCND_CONDITION[rd]); break;
-				case 0x50:  print("cmp         0x%08X, R%d, R%d", SIMM15(uimm15), rs, rd); break;
-				case 0x58:  print("add         0x%08X, R%d, R%d", SIMM15(uimm15), rs, rd); break;
-				case 0x59:  print("addu        0x%08X, R%d, R%d", SIMM15(uimm15), rs, rd); break;
-				case 0x5a:  print("sub         0x%08X, R%d, R%d", SIMM15(uimm15), rs, rd); break;
-				case 0x5b:  print("subu        0x%08X, R%d, R%d", SIMM15(uimm15), rs, rd); break;
+				case 0x40:  util::stream_format(*output, "bsr         0x%08X, R%d", pc + (SIMM15(uimm15) * 4), link); break;
+				case 0x41:  util::stream_format(*output, "bsr.a       0x%08X, R%d", pc + (SIMM15(uimm15) * 4), link); break;
+				case 0x44:  util::stream_format(*output, "jsr         0x%04X(R%d), R%d", SIMM15(uimm15), rs, link); break;
+				case 0x45:  util::stream_format(*output, "jsr.a       0x%04X(R%d), R%d", SIMM15(uimm15), rs, link); break;
+				case 0x48:  util::stream_format(*output, "bbz         0x%08X, R%d, %s (%d)", pc + (SIMM15(uimm15) * 4), rs, BITNUM_CONDITION[bitnum], bitnum); break;
+				case 0x49:  util::stream_format(*output, "bbz.a       0x%08X, R%d, %s (%d)", pc + (SIMM15(uimm15) * 4), rs, BITNUM_CONDITION[bitnum], bitnum); break;
+				case 0x4a:  util::stream_format(*output, "bbo         0x%08X, R%d, %s (%d)", pc + (SIMM15(uimm15) * 4), rs, BITNUM_CONDITION[bitnum], bitnum); break;
+				case 0x4b:  util::stream_format(*output, "bbo.a       0x%08X, R%d, %s (%d)", pc + (SIMM15(uimm15) * 4), rs, BITNUM_CONDITION[bitnum], bitnum); break;
+				case 0x4c:  util::stream_format(*output, "bcnd        0x%08X, R%d, %s", pc + (SIMM15(uimm15) * 4), rs, BCND_CONDITION[rd]); break;
+				case 0x4d:  util::stream_format(*output, "bcnd.a      0x%08X, R%d, %s", pc + (SIMM15(uimm15) * 4), rs, BCND_CONDITION[rd]); break;
+				case 0x50:  util::stream_format(*output, "cmp         0x%08X, R%d, R%d", SIMM15(uimm15), rs, rd); break;
+				case 0x58:  util::stream_format(*output, "add         0x%08X, R%d, R%d", SIMM15(uimm15), rs, rd); break;
+				case 0x59:  util::stream_format(*output, "addu        0x%08X, R%d, R%d", SIMM15(uimm15), rs, rd); break;
+				case 0x5a:  util::stream_format(*output, "sub         0x%08X, R%d, R%d", SIMM15(uimm15), rs, rd); break;
+				case 0x5b:  util::stream_format(*output, "subu        0x%08X, R%d, R%d", SIMM15(uimm15), rs, rd); break;
 
-				default:    print("?"); break;
+				default:    util::stream_format(*output, "?"); break;
 			}
 			break;
 		}
@@ -333,185 +324,194 @@ static offs_t tms32082_disasm_mp(char *buffer, offs_t pc, const uint8_t *oprom)
 
 			switch (subop)
 			{
-				case 0x02:  print("trap        %d", src1); break;
-				case 0x03:  print("trap        %d", imm32); break;
-				case 0x04:  print("cmnd        R%d", src1); break;
-				case 0x05:  print("cmnd        0x%08X", imm32); break;
-				case 0x08:  print("rdcr        R%d, R%d,", src1, rd); break;
-				case 0x09:  print("rdcr        %s, R%d", get_creg_name(imm32), rd); break;
-				case 0x0a:  print("swcr        R%d, R%d, R%d", rd, src1, rs); break;
-				case 0x0b:  print("swcr        R%d, %s, R%d", rd, get_creg_name(imm32), rs); break;
-				case 0x0c:  print("brcr        R%d", src1); break;
-				case 0x0d:  print("brcr        %s", get_creg_name(imm32)); break;
+				case 0x02:  util::stream_format(*output, "trap        %d", src1); break;
+				case 0x03:  util::stream_format(*output, "trap        %d", imm32); break;
+				case 0x04:  util::stream_format(*output, "cmnd        R%d", src1); break;
+				case 0x05:  util::stream_format(*output, "cmnd        0x%08X", imm32); break;
+				case 0x08:  util::stream_format(*output, "rdcr        R%d, R%d,", src1, rd); break;
+				case 0x09:  util::stream_format(*output, "rdcr        %s, R%d", get_creg_name(imm32), rd); break;
+				case 0x0a:  util::stream_format(*output, "swcr        R%d, R%d, R%d", rd, src1, rs); break;
+				case 0x0b:  util::stream_format(*output, "swcr        R%d, %s, R%d", rd, get_creg_name(imm32), rs); break;
+				case 0x0c:  util::stream_format(*output, "brcr        R%d", src1); break;
+				case 0x0d:  util::stream_format(*output, "brcr        %s", get_creg_name(imm32)); break;
 
-				case 0x10:  print("shift%s.dz   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
-				case 0x12:  print("shift%s.dm   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
-				case 0x14:  print("shift%s.ds   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
-				case 0x16:  print("shift%s.ez   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
-				case 0x18:  print("shift%s.em   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
-				case 0x1a:  print("shift%s.es   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
-				case 0x1c:  print("shift%s.iz   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
-				case 0x1e:  print("shift%s.im   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
+				case 0x10:  util::stream_format(*output, "shift%s.dz   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
+				case 0x12:  util::stream_format(*output, "shift%s.dm   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
+				case 0x14:  util::stream_format(*output, "shift%s.ds   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
+				case 0x16:  util::stream_format(*output, "shift%s.ez   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
+				case 0x18:  util::stream_format(*output, "shift%s.em   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
+				case 0x1a:  util::stream_format(*output, "shift%s.es   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
+				case 0x1c:  util::stream_format(*output, "shift%s.iz   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
+				case 0x1e:  util::stream_format(*output, "shift%s.im   %d, %d, R%d, R%d", (op & (1 << 10)) ? "r" : "l", rotate, endmask, rs, rd); break;
 
-				case 0x22:  print("and         R%d, R%d, R%d", src1, rs, rd); break;
-				case 0x23:  print("and         0x%08X, R%d, R%d", imm32, rs, rd); break;
-				case 0x24:  print("and.tf      R%d, R%d, R%d", src1, rs, rd); break;
-				case 0x25:  print("and.tf      0x%08X, R%d, R%d", imm32, rs, rd); break;
-				case 0x28:  print("and.ft      R%d, R%d, R%d", src1, rs, rd); break;
-				case 0x29:  print("and.ft      0x%08X, R%d, R%d", imm32, rs, rd); break;
-				case 0x2c:  print("xor         R%d, R%d, R%d", src1, rs, rd); break;
-				case 0x2d:  print("xor         0x%08X, R%d, R%d", imm32, rs, rd); break;
-				case 0x2e:  print("or          R%d, R%d, R%d", src1, rs, rd); break;
-				case 0x2f:  print("or          0x%08X, R%d, R%d", imm32, rs, rd); break;
-				case 0x30:  print("and.ff      R%d, R%d, R%d", src1, rs, rd); break;
-				case 0x31:  print("and.ff      0x%08X, R%d, R%d", imm32, rs, rd); break;
-				case 0x32:  print("xnor        R%d, R%d, R%d", src1, rs, rd); break;
-				case 0x33:  print("xnor        0x%08X, R%d, R%d", imm32, rs, rd); break;
-				case 0x36:  print("or.tf       R%d, R%d, R%d", src1, rs, rd); break;
-				case 0x37:  print("or.tf       0x%08X, R%d, R%d", imm32, rs, rd); break;
-				case 0x3a:  print("or.ft       R%d, R%d, R%d", src1, rs, rd); break;
-				case 0x3b:  print("or.ft       0x%08X, R%d, R%d", imm32, rs, rd); break;
-				case 0x3c:  print("or.ff       R%d, R%d, R%d", src1, rs, rd); break;
-				case 0x3d:  print("or.ff       0x%08X, R%d, R%d", imm32, rs, rd); break;
+				case 0x22:  util::stream_format(*output, "and         R%d, R%d, R%d", src1, rs, rd); break;
+				case 0x23:  util::stream_format(*output, "and         0x%08X, R%d, R%d", imm32, rs, rd); break;
+				case 0x24:  util::stream_format(*output, "and.tf      R%d, R%d, R%d", src1, rs, rd); break;
+				case 0x25:  util::stream_format(*output, "and.tf      0x%08X, R%d, R%d", imm32, rs, rd); break;
+				case 0x28:  util::stream_format(*output, "and.ft      R%d, R%d, R%d", src1, rs, rd); break;
+				case 0x29:  util::stream_format(*output, "and.ft      0x%08X, R%d, R%d", imm32, rs, rd); break;
+				case 0x2c:  util::stream_format(*output, "xor         R%d, R%d, R%d", src1, rs, rd); break;
+				case 0x2d:  util::stream_format(*output, "xor         0x%08X, R%d, R%d", imm32, rs, rd); break;
+				case 0x2e:  util::stream_format(*output, "or          R%d, R%d, R%d", src1, rs, rd); break;
+				case 0x2f:  util::stream_format(*output, "or          0x%08X, R%d, R%d", imm32, rs, rd); break;
+				case 0x30:  util::stream_format(*output, "and.ff      R%d, R%d, R%d", src1, rs, rd); break;
+				case 0x31:  util::stream_format(*output, "and.ff      0x%08X, R%d, R%d", imm32, rs, rd); break;
+				case 0x32:  util::stream_format(*output, "xnor        R%d, R%d, R%d", src1, rs, rd); break;
+				case 0x33:  util::stream_format(*output, "xnor        0x%08X, R%d, R%d", imm32, rs, rd); break;
+				case 0x36:  util::stream_format(*output, "or.tf       R%d, R%d, R%d", src1, rs, rd); break;
+				case 0x37:  util::stream_format(*output, "or.tf       0x%08X, R%d, R%d", imm32, rs, rd); break;
+				case 0x3a:  util::stream_format(*output, "or.ft       R%d, R%d, R%d", src1, rs, rd); break;
+				case 0x3b:  util::stream_format(*output, "or.ft       0x%08X, R%d, R%d", imm32, rs, rd); break;
+				case 0x3c:  util::stream_format(*output, "or.ff       R%d, R%d, R%d", src1, rs, rd); break;
+				case 0x3d:  util::stream_format(*output, "or.ff       0x%08X, R%d, R%d", imm32, rs, rd); break;
 
 				case 0x48: case 0x40:
-							print("ld.b        R%d%s(R%d%s), R%d", src1, MEMOP_S[s], rs, MEMOP_M[m], rd);
+							util::stream_format(*output, "ld.b        R%d%s(R%d%s), R%d", src1, MEMOP_S[s], rs, MEMOP_M[m], rd);
 							break;
 				case 0x49: case 0x41:
-							print("ld.b        0x%08X%s(R%d%s), R%d", imm32, MEMOP_S[s], rs, MEMOP_M[m], rd);
+							util::stream_format(*output, "ld.b        0x%08X%s(R%d%s), R%d", imm32, MEMOP_S[s], rs, MEMOP_M[m], rd);
 							break;
 				case 0x4a: case 0x42:
-							print("ld.h        R%d%s(R%d%s), R%d", src1, MEMOP_S[s], rs, MEMOP_M[m], rd);
+							util::stream_format(*output, "ld.h        R%d%s(R%d%s), R%d", src1, MEMOP_S[s], rs, MEMOP_M[m], rd);
 							break;
 				case 0x4b: case 0x43:
-							print("ld.h        0x%08X%s(R%d%s), R%d", imm32, MEMOP_S[s], rs, MEMOP_M[m], rd);
+							util::stream_format(*output, "ld.h        0x%08X%s(R%d%s), R%d", imm32, MEMOP_S[s], rs, MEMOP_M[m], rd);
 							break;
 				case 0x4c: case 0x44:
-							print("ld          R%d%s(R%d%s), R%d", src1, MEMOP_S[s], rs, MEMOP_M[m], rd);
+							util::stream_format(*output, "ld          R%d%s(R%d%s), R%d", src1, MEMOP_S[s], rs, MEMOP_M[m], rd);
 							break;
 				case 0x4d: case 0x45:
-							print("ld          0x%08X%s(R%d%s), R%d", imm32, MEMOP_S[s], rs,MEMOP_M[m], rd);
+							util::stream_format(*output, "ld          0x%08X%s(R%d%s), R%d", imm32, MEMOP_S[s], rs,MEMOP_M[m], rd);
 							break;
 				case 0x4e: case 0x46:
-							print("ld.d        R%d%s(R%d%s), R%d", src1, MEMOP_S[s], rs, MEMOP_M[m], rd);
+							util::stream_format(*output, "ld.d        R%d%s(R%d%s), R%d", src1, MEMOP_S[s], rs, MEMOP_M[m], rd);
 							break;
 				case 0x4f: case 0x47:
-							print("ld.d        0x%08X%s(R%d%s), R%d", imm32, MEMOP_S[s], rs, MEMOP_M[m], rd);
+							util::stream_format(*output, "ld.d        0x%08X%s(R%d%s), R%d", imm32, MEMOP_S[s], rs, MEMOP_M[m], rd);
 							break;
 				case 0x58: case 0x50:
-							print("ld.ub       R%d%s(R%d%s), R%d", src1, MEMOP_S[s], rs, MEMOP_M[m], rd);
+							util::stream_format(*output, "ld.ub       R%d%s(R%d%s), R%d", src1, MEMOP_S[s], rs, MEMOP_M[m], rd);
 							break;
 				case 0x59: case 0x51:
-							print("ld.ub       0x%08X%s(R%d%s), R%d", imm32, MEMOP_S[s], rs, MEMOP_M[m], rd);
+							util::stream_format(*output, "ld.ub       0x%08X%s(R%d%s), R%d", imm32, MEMOP_S[s], rs, MEMOP_M[m], rd);
 							break;
 				case 0x5a: case 0x52:
-							print("ld.uh       R%d%s(R%d%s), R%d", src1, MEMOP_S[s], rs, MEMOP_M[m], rd);
+							util::stream_format(*output, "ld.uh       R%d%s(R%d%s), R%d", src1, MEMOP_S[s], rs, MEMOP_M[m], rd);
 							break;
 				case 0x5b: case 0x53:
-							print("ld.uh       0x%08X%s(R%d%s), R%d", imm32, MEMOP_S[s], rs, MEMOP_M[m], rd);
+							util::stream_format(*output, "ld.uh       0x%08X%s(R%d%s), R%d", imm32, MEMOP_S[s], rs, MEMOP_M[m], rd);
 							break;
 
 				case 0x68: case 0x60:
-							print("st.b        R%d, R%d%s(R%d%s)", rd, src1, MEMOP_S[s], rs, MEMOP_M[m]);
+							util::stream_format(*output, "st.b        R%d, R%d%s(R%d%s)", rd, src1, MEMOP_S[s], rs, MEMOP_M[m]);
 							break;
 				case 0x69: case 0x61:
-							print("st.b        R%d, 0x%08X%s(R%d%s)", rd, imm32, MEMOP_S[s], rs, MEMOP_M[m]);
+							util::stream_format(*output, "st.b        R%d, 0x%08X%s(R%d%s)", rd, imm32, MEMOP_S[s], rs, MEMOP_M[m]);
 							break;
 				case 0x6a: case 0x62:
-							print("st.h        R%d, R%d%s(R%d%s)", rd, src1, MEMOP_S[s], rs, MEMOP_M[m]);
+							util::stream_format(*output, "st.h        R%d, R%d%s(R%d%s)", rd, src1, MEMOP_S[s], rs, MEMOP_M[m]);
 							break;
 				case 0x6b: case 0x63:
-							print("st.h        R%d, 0x%08X%s(R%d%s)", rd, imm32, MEMOP_S[s], rs, MEMOP_M[m]);
+							util::stream_format(*output, "st.h        R%d, 0x%08X%s(R%d%s)", rd, imm32, MEMOP_S[s], rs, MEMOP_M[m]);
 							break;
 				case 0x6c: case 0x64:
-							print("st          R%d, R%d%s(R%d%s)", rd, src1, MEMOP_S[s], rs, MEMOP_M[m]);
+							util::stream_format(*output, "st          R%d, R%d%s(R%d%s)", rd, src1, MEMOP_S[s], rs, MEMOP_M[m]);
 							break;
 				case 0x6d: case 0x65:
-							print("st          R%d, 0x%08X%s(R%d%s)", rd, imm32, MEMOP_S[s], rs, MEMOP_M[m]);
+							util::stream_format(*output, "st          R%d, 0x%08X%s(R%d%s)", rd, imm32, MEMOP_S[s], rs, MEMOP_M[m]);
 							break;
 				case 0x6e: case 0x66:
-							print("st.d        R%d, R%d%s(R%d%s)", rd, src1, MEMOP_S[s], rs, MEMOP_M[m]);
+							util::stream_format(*output, "st.d        R%d, R%d%s(R%d%s)", rd, src1, MEMOP_S[s], rs, MEMOP_M[m]);
 							break;
 				case 0x6f: case 0x67:
-							print("st.d        R%d, 0x%08X%s(R%d%s)", rd, imm32, MEMOP_S[s], rs, MEMOP_M[m]);
+							util::stream_format(*output, "st.d        R%d, 0x%08X%s(R%d%s)", rd, imm32, MEMOP_S[s], rs, MEMOP_M[m]);
 							break;
 
 				case 0x78: case 0x70:
-							print("dcache      R%d(R%d)", src1, rs);
+							util::stream_format(*output, "dcache      R%d(R%d)", src1, rs);
 							break;
 				case 0x79: case 0x71:
-							print("dcache      0x%08X(R%d)", imm32, rs);
+							util::stream_format(*output, "dcache      0x%08X(R%d)", imm32, rs);
 							break;
 
-				case 0x80:  print("bsr         R%d, R%d", src1, link); break;
-				case 0x81:  print("bsr         0x%08X, R%d", imm32, link); break;
-				case 0x82:  print("bsr.a       R%d, R%d", src1, rd); break;
-				case 0x83:  print("bsr.a       0x%08X, R%d", imm32, link); break;
-				case 0x88:  print("jsr         R%d, R%d", src1, link); break;
-				case 0x89:  print("jsr         0x%08X, R%d", imm32, link); break;
-				case 0x8a:  print("jsr.a       R%d, R%d", src1, link); break;
-				case 0x8b:  print("jsr.a       0x%08X, R%d", imm32, link); break;
-				case 0x90:  print("bbz         R%d, R%d, %s (%d)", src1, rs, BITNUM_CONDITION[bitnum], bitnum); break;
-				case 0x91:  print("bbz         0x%08X, R%d, %s (%d)", imm32, rs, BITNUM_CONDITION[bitnum], bitnum); break;
-				case 0x92:  print("bbz.a       R%d, R%d, %s (%d)", src1, rs, BITNUM_CONDITION[bitnum], bitnum); break;
-				case 0x93:  print("bbz.a       0x%08X, R%d, %s (%d)", imm32, rs, BITNUM_CONDITION[bitnum], bitnum); break;
-				case 0x94:  print("bbo         R%d, R%d, %s (%d)", src1, rs, BITNUM_CONDITION[bitnum], bitnum); break;
-				case 0x95:  print("bbo         0x%08X, R%d, %s (%d)", imm32, rs, BITNUM_CONDITION[bitnum], bitnum); break;
-				case 0x96:  print("bbo.a       R%d, R%d, %s (%d)", src1, rs, BITNUM_CONDITION[bitnum], bitnum); break;
-				case 0x97:  print("bbo.a       0x%08X, R%d, %s (%d)", imm32, rs, BITNUM_CONDITION[bitnum], bitnum); break;
-				case 0x98:  print("bcnd        R%d, R%d, %s", src1, rs, BCND_CONDITION[rd]); break;
-				case 0x99:  print("bcnd        0x%08X, R%d, %s", imm32, rs, BCND_CONDITION[rd]); break;
-				case 0x9a:  print("bcnd.a      R%d, R%d, %s", src1, rs, BCND_CONDITION[rd]); break;
-				case 0x9b:  print("bcnd.a      0x%08X, R%d, %s", imm32, rs, BCND_CONDITION[rd]); break;
-				case 0xa0:  print("cmp         R%d, R%d, R%d", src1, rs, rd); break;
-				case 0xa1:  print("cmp         0x%08X, R%d, R%d", imm32, rs, rd); break;
-				case 0xb0:  print("add         R%d, R%d, R%d", src1, rs, rd); break;
-				case 0xb1:  print("add         0x%08X, R%d, R%d", imm32, rs, rd); break;
-				case 0xb2:  print("addu        R%d, R%d, R%d", src1, rs, rd); break;
-				case 0xb3:  print("addu        0x%08X, R%d, R%d", imm32, rs, rd); break;
-				case 0xb4:  print("sub         R%d, R%d, R%d", src1, rs, rd); break;
-				case 0xb5:  print("sub         0x%08X, R%d, R%d", imm32, rs, rd); break;
-				case 0xb6:  print("subu        R%d, R%d, R%d", src1, rs, rd); break;
-				case 0xb7:  print("subu        0x%08X, R%d, R%d", imm32, rs, rd); break;
+				case 0x80:  util::stream_format(*output, "bsr         R%d, R%d", src1, link); break;
+				case 0x81:  util::stream_format(*output, "bsr         0x%08X, R%d", imm32, link); break;
+				case 0x82:  util::stream_format(*output, "bsr.a       R%d, R%d", src1, rd); break;
+				case 0x83:  util::stream_format(*output, "bsr.a       0x%08X, R%d", imm32, link); break;
+				case 0x88:  util::stream_format(*output, "jsr         R%d, R%d", src1, link); break;
+				case 0x89:  util::stream_format(*output, "jsr         0x%08X, R%d", imm32, link); break;
+				case 0x8a:  util::stream_format(*output, "jsr.a       R%d, R%d", src1, link); break;
+				case 0x8b:  util::stream_format(*output, "jsr.a       0x%08X, R%d", imm32, link); break;
+				case 0x90:  util::stream_format(*output, "bbz         R%d, R%d, %s (%d)", src1, rs, BITNUM_CONDITION[bitnum], bitnum); break;
+				case 0x91:  util::stream_format(*output, "bbz         0x%08X, R%d, %s (%d)", imm32, rs, BITNUM_CONDITION[bitnum], bitnum); break;
+				case 0x92:  util::stream_format(*output, "bbz.a       R%d, R%d, %s (%d)", src1, rs, BITNUM_CONDITION[bitnum], bitnum); break;
+				case 0x93:  util::stream_format(*output, "bbz.a       0x%08X, R%d, %s (%d)", imm32, rs, BITNUM_CONDITION[bitnum], bitnum); break;
+				case 0x94:  util::stream_format(*output, "bbo         R%d, R%d, %s (%d)", src1, rs, BITNUM_CONDITION[bitnum], bitnum); break;
+				case 0x95:  util::stream_format(*output, "bbo         0x%08X, R%d, %s (%d)", imm32, rs, BITNUM_CONDITION[bitnum], bitnum); break;
+				case 0x96:  util::stream_format(*output, "bbo.a       R%d, R%d, %s (%d)", src1, rs, BITNUM_CONDITION[bitnum], bitnum); break;
+				case 0x97:  util::stream_format(*output, "bbo.a       0x%08X, R%d, %s (%d)", imm32, rs, BITNUM_CONDITION[bitnum], bitnum); break;
+				case 0x98:  util::stream_format(*output, "bcnd        R%d, R%d, %s", src1, rs, BCND_CONDITION[rd]); break;
+				case 0x99:  util::stream_format(*output, "bcnd        0x%08X, R%d, %s", imm32, rs, BCND_CONDITION[rd]); break;
+				case 0x9a:  util::stream_format(*output, "bcnd.a      R%d, R%d, %s", src1, rs, BCND_CONDITION[rd]); break;
+				case 0x9b:  util::stream_format(*output, "bcnd.a      0x%08X, R%d, %s", imm32, rs, BCND_CONDITION[rd]); break;
+				case 0xa0:  util::stream_format(*output, "cmp         R%d, R%d, R%d", src1, rs, rd); break;
+				case 0xa1:  util::stream_format(*output, "cmp         0x%08X, R%d, R%d", imm32, rs, rd); break;
+				case 0xb0:  util::stream_format(*output, "add         R%d, R%d, R%d", src1, rs, rd); break;
+				case 0xb1:  util::stream_format(*output, "add         0x%08X, R%d, R%d", imm32, rs, rd); break;
+				case 0xb2:  util::stream_format(*output, "addu        R%d, R%d, R%d", src1, rs, rd); break;
+				case 0xb3:  util::stream_format(*output, "addu        0x%08X, R%d, R%d", imm32, rs, rd); break;
+				case 0xb4:  util::stream_format(*output, "sub         R%d, R%d, R%d", src1, rs, rd); break;
+				case 0xb5:  util::stream_format(*output, "sub         0x%08X, R%d, R%d", imm32, rs, rd); break;
+				case 0xb6:  util::stream_format(*output, "subu        R%d, R%d, R%d", src1, rs, rd); break;
+				case 0xb7:  util::stream_format(*output, "subu        0x%08X, R%d, R%d", imm32, rs, rd); break;
 
 				case 0xc0: case 0xc1: case 0xc2: case 0xc3: case 0xc4: case 0xc5:
 				case 0xc6: case 0xd6: case 0xc7: case 0xd7: case 0xc8: case 0xd8: case 0xc9: case 0xd9:
 				case 0xca: case 0xcb: case 0xcc: case 0xdc: case 0xcd: case 0xdd: case 0xce: case 0xde:
 				case 0xcf: case 0xdf:
 				{
-					print("%s", format_vector_op(op, imm32));
+					util::stream_format(*output, "%s", format_vector_op(op, imm32));
 					break;
 				}
 
-				case 0xe0:  print("fadd.%s%s%s    R%d, R%d, R%d", FLOATOP_PRECISION[p1], FLOATOP_PRECISION[p2], FLOATOP_PRECISION[pd], src1, rs, rd); break;
-				case 0xe1:  print("fadd.%s%s%s    0x%08X, R%d, R%d", FLOATOP_PRECISION[p1], FLOATOP_PRECISION[p2], FLOATOP_PRECISION[pd], imm32, rs, rd); break;
-				case 0xe2:  print("fsub.%s%s%s    R%d, R%d, R%d", FLOATOP_PRECISION[p1], FLOATOP_PRECISION[p2], FLOATOP_PRECISION[pd], src1, rs, rd); break;
-				case 0xe3:  print("fsub.%s%s%s    0x%08X, R%d, R%d", FLOATOP_PRECISION[p1], FLOATOP_PRECISION[p2], FLOATOP_PRECISION[pd], imm32, rs, rd); break;
-				case 0xe4:  print("fmpy.%s%s%s    R%d, R%d, R%d", FLOATOP_PRECISION[p1], FLOATOP_PRECISION[p2], FLOATOP_PRECISION[pd], src1, rs, rd); break;
-				case 0xe5:  print("fmpy.%s%s%s    0x%08X, R%d, R%d", FLOATOP_PRECISION[p1], FLOATOP_PRECISION[p2], FLOATOP_PRECISION[pd], imm32, rs, rd); break;
-				case 0xe6:  print("fdiv.%s%s%s    R%d, R%d, R%d", FLOATOP_PRECISION[p1], FLOATOP_PRECISION[p2], FLOATOP_PRECISION[pd], src1, rs, rd); break;
-				case 0xe7:  print("fdiv.%s%s%s    0x%08X, R%d, R%d", FLOATOP_PRECISION[p1], FLOATOP_PRECISION[p2], FLOATOP_PRECISION[pd], imm32, rs, rd); break;
-				case 0xe8:  print("frnd%s.%s%s    R%d, R%d", FLOATOP_ROUND[rndmode], FLOATOP_PRECISION[p1], FLOATOP_PRECISION[pd], src1, rd); break;
-				case 0xe9:  print("frnd%s.%s%s    0x%08X, R%d", FLOATOP_ROUND[rndmode], FLOATOP_PRECISION[p1], FLOATOP_PRECISION[pd], imm32, rd); break;
-				case 0xea:  print("fcmp        R%d, R%d, R%d", src1, rs, rd); break;
-				case 0xeb:  print("fcmp        0x%08X, R%d, R%d", imm32, rs, rd); break;
-				case 0xee:  print("fsqrt       R%d, R%d", src1, rd); break;
-				case 0xef:  print("fsqrt       0x%08X, R%d", imm32, rd); break;
-				case 0xf0:  print("lmo         R%d, R%d", rs, rd); break;
-				case 0xf2:  print("rmo         R%d, R%d", rs, rd); break;
-				case 0xfc:  print("estop       "); break;
+				case 0xe0:  util::stream_format(*output, "fadd.%s%s%s    R%d, R%d, R%d", FLOATOP_PRECISION[p1], FLOATOP_PRECISION[p2], FLOATOP_PRECISION[pd], src1, rs, rd); break;
+				case 0xe1:  util::stream_format(*output, "fadd.%s%s%s    0x%08X, R%d, R%d", FLOATOP_PRECISION[p1], FLOATOP_PRECISION[p2], FLOATOP_PRECISION[pd], imm32, rs, rd); break;
+				case 0xe2:  util::stream_format(*output, "fsub.%s%s%s    R%d, R%d, R%d", FLOATOP_PRECISION[p1], FLOATOP_PRECISION[p2], FLOATOP_PRECISION[pd], src1, rs, rd); break;
+				case 0xe3:  util::stream_format(*output, "fsub.%s%s%s    0x%08X, R%d, R%d", FLOATOP_PRECISION[p1], FLOATOP_PRECISION[p2], FLOATOP_PRECISION[pd], imm32, rs, rd); break;
+				case 0xe4:  util::stream_format(*output, "fmpy.%s%s%s    R%d, R%d, R%d", FLOATOP_PRECISION[p1], FLOATOP_PRECISION[p2], FLOATOP_PRECISION[pd], src1, rs, rd); break;
+				case 0xe5:  util::stream_format(*output, "fmpy.%s%s%s    0x%08X, R%d, R%d", FLOATOP_PRECISION[p1], FLOATOP_PRECISION[p2], FLOATOP_PRECISION[pd], imm32, rs, rd); break;
+				case 0xe6:  util::stream_format(*output, "fdiv.%s%s%s    R%d, R%d, R%d", FLOATOP_PRECISION[p1], FLOATOP_PRECISION[p2], FLOATOP_PRECISION[pd], src1, rs, rd); break;
+				case 0xe7:  util::stream_format(*output, "fdiv.%s%s%s    0x%08X, R%d, R%d", FLOATOP_PRECISION[p1], FLOATOP_PRECISION[p2], FLOATOP_PRECISION[pd], imm32, rs, rd); break;
+				case 0xe8:  util::stream_format(*output, "frnd%s.%s%s    R%d, R%d", FLOATOP_ROUND[rndmode], FLOATOP_PRECISION[p1], FLOATOP_PRECISION[pd], src1, rd); break;
+				case 0xe9:  util::stream_format(*output, "frnd%s.%s%s    0x%08X, R%d", FLOATOP_ROUND[rndmode], FLOATOP_PRECISION[p1], FLOATOP_PRECISION[pd], imm32, rd); break;
+				case 0xea:  util::stream_format(*output, "fcmp        R%d, R%d, R%d", src1, rs, rd); break;
+				case 0xeb:  util::stream_format(*output, "fcmp        0x%08X, R%d, R%d", imm32, rs, rd); break;
+				case 0xee:  util::stream_format(*output, "fsqrt       R%d, R%d", src1, rd); break;
+				case 0xef:  util::stream_format(*output, "fsqrt       0x%08X, R%d", imm32, rd); break;
+				case 0xf0:  util::stream_format(*output, "lmo         R%d, R%d", rs, rd); break;
+				case 0xf2:  util::stream_format(*output, "rmo         R%d, R%d", rs, rd); break;
+				case 0xfc:  util::stream_format(*output, "estop       "); break;
 
 				case 0xfe: case 0xff:
-							print("illopF      ");
+							util::stream_format(*output, "illopF      ");
 							break;
 
-				default:    print("?"); break;
+				default:    util::stream_format(*output, "?"); break;
 			}
 			break;
 		}
 	}
 
 	return opbytes | flags | DASMFLAG_SUPPORTED;
+}
+
+static offs_t tms32082_disasm_mp(char *buffer, offs_t pc, const uint8_t *oprom)
+{
+	std::ostringstream stream;
+	offs_t result = tms32082_disasm_mp(stream, pc, oprom);
+	std::string stream_str = stream.str();
+	strcpy(buffer, stream_str.c_str());
+	return result;
 }
 
 CPU_DISASSEMBLE(tms32082_mp)
