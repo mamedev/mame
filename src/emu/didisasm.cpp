@@ -70,7 +70,12 @@ offs_t device_disasm_interface::disassemble(char *buffer, offs_t pc, const uint8
 
 	// check for disassembler override
 	if (!m_dasm_override.isnull())
-		result = m_dasm_override(device(), buffer, pc, oprom, opram, options);
+	{
+		std::ostringstream stream;
+		result = m_dasm_override(device(), stream, pc, oprom, opram, options);
+		std::string stream_str = stream.str();
+		strcpy(buffer, stream_str.c_str());
+	}
 	if (result == 0)
 		result = disasm_disassemble(buffer, pc, oprom, opram, options);
 
