@@ -3181,7 +3181,7 @@ const char *lookup_trap(uint16_t opcode)
 
 
 
-offs_t mac_state::mac_dasm_override(device_t &device, char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+offs_t mac_state::mac_dasm_override(device_t &device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
 {
 	uint16_t opcode;
 	unsigned result = 0;
@@ -3191,9 +3191,9 @@ offs_t mac_state::mac_dasm_override(device_t &device, char *buffer, offs_t pc, c
 	if ((opcode & 0xF000) == 0xA000)
 	{
 		trap = lookup_trap(opcode);
-		if (trap)
+		if (trap != nullptr)
 		{
-			strcpy(buffer, trap);
+			stream << trap;
 			result = 2;
 		}
 	}

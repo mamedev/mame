@@ -56,7 +56,7 @@ public:
 	required_ioport m_io_penb;
 	required_ioport m_io_portd;
 
-	offs_t palm_dasm_override(device_t &device, char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options);
+	offs_t palm_dasm_override(device_t &device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options);
 };
 
 

@@ -1162,7 +1162,7 @@ static const char *lookup_trap(uint16_t opcode)
 	return nullptr;
 }
 
-offs_t palm_state::palm_dasm_override(device_t &device, char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+offs_t palm_state::palm_dasm_override(device_t &device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
 {
 	uint16_t opcode;
 	unsigned result = 0;
@@ -1176,18 +1176,11 @@ offs_t palm_state::palm_dasm_override(device_t &device, char *buffer, offs_t pc,
 		callnum = ((callnum >> 8) & 0x00ff) | ((callnum << 8) & 0xff00);
 		trap = lookup_trap(callnum);
 		result = 2;
-		if (trap)
-		{
-			strcpy(buffer, trap);
-		}
-		else
-		{
-			sprintf(buffer, "trap    #$f");
-		}
+		stream << (trap ? trap : "trap    #$f");
 	}
 	else if ((opcode & 0xF000) == 0xA000)
 	{
-		sprintf(buffer, "Call Index: %04x", opcode);
+		util::stream_format(stream, "Call Index: %04x", opcode);
 		result = 2;
 	}
 	return result;
