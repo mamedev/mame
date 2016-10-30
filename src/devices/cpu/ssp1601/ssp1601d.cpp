@@ -79,7 +79,7 @@ static char *get_cond(int op)
 }
 
 
-static unsigned dasm_ssp1601(char *buffer, unsigned pc, const uint8_t *oprom)
+static unsigned dasm_ssp1601(std::ostream &stream, unsigned pc, const uint8_t *oprom)
 {
 	const uint8_t *base_oprom;
 	uint16_t op;
@@ -96,66 +96,66 @@ static unsigned dasm_ssp1601(char *buffer, unsigned pc, const uint8_t *oprom)
 			if(op == 0)
 			{
 				// nop
-				sprintf(buffer, "nop");
+				util::stream_format(stream, "nop");
 			}
 			else if((op & 0xff) == 0x65)
 			{
 				// ret
-				sprintf(buffer, "ret");
+				util::stream_format(stream, "ret");
 				flags |= DASMFLAG_STEP_OUT;
 			}
 			else
 			{
 				// ld d, s
-				sprintf(buffer, "ld %s, %s", reg[(op >> 4) & 0xf], reg[op & 0xf]);
+				util::stream_format(stream, "ld %s, %s", reg[(op >> 4) & 0xf], reg[op & 0xf]);
 			}
 			break;
 
 		// ld d, (ri)
 		case 0x01:
-			sprintf(buffer, "ld %s, (%s%s)", reg[(op >> 4) & 0xf], RIJ, MODIFIER_LOW);
+			util::stream_format(stream, "ld %s, (%s%s)", reg[(op >> 4) & 0xf], RIJ, MODIFIER_LOW);
 			break;
 
 		// ld (ri), s
 		case 0x02:
-			sprintf(buffer, "ld (%s%s), %s", RIJ, MODIFIER_LOW, reg[(op >> 4) & 0xf]);
+			util::stream_format(stream, "ld (%s%s), %s", RIJ, MODIFIER_LOW, reg[(op >> 4) & 0xf]);
 			break;
 
 		// ld a, addr
 		case 0x03:
-			sprintf(buffer, "ld A, %X", op & 0x1ff);
+			util::stream_format(stream, "ld A, %X", op & 0x1ff);
 			break;
 
 		// ldi d, imm
 		case 0x04:
-			sprintf(buffer, "ld %s, %X", reg[(op >> 4) & 0xf], READ_OP_DASM(2));
+			util::stream_format(stream, "ld %s, %X", reg[(op >> 4) & 0xf], READ_OP_DASM(2));
 			size = 2;
 			break;
 
 		// ld d, ((ri))
 		case 0x05:
-			sprintf(buffer, "ld %s, ((%s%s))", reg[(op >> 4) & 0xf], RIJ, MODIFIER_LOW);
+			util::stream_format(stream, "ld %s, ((%s%s))", reg[(op >> 4) & 0xf], RIJ, MODIFIER_LOW);
 			break;
 
 		// ldi (ri), imm
 		case 0x06:
-			sprintf(buffer, "ld (%s%s), %X", RIJ, MODIFIER_LOW, READ_OP_DASM(2));
+			util::stream_format(stream, "ld (%s%s), %X", RIJ, MODIFIER_LOW, READ_OP_DASM(2));
 			size = 2;
 			break;
 
 		// ld addr, a
 		case 0x07:
-			sprintf(buffer, "ld %X, A", op & 0x1ff);
+			util::stream_format(stream, "ld %X, A", op & 0x1ff);
 			break;
 
 		// ld d, ri
 		case 0x09:
-			sprintf(buffer, "ld %s, %s%s", reg[(op >> 4) & 0xf], RIJ, MODIFIER_LOW);
+			util::stream_format(stream, "ld %s, %s%s", reg[(op >> 4) & 0xf], RIJ, MODIFIER_LOW);
 			break;
 
 		// ld ri, s
 		case 0x0a:
-			sprintf(buffer, "ld %s%s, %s", RIJ, MODIFIER_LOW, reg[(op >> 4) & 0xf]);
+			util::stream_format(stream, "ld %s%s, %s", RIJ, MODIFIER_LOW, reg[(op >> 4) & 0xf]);
 			break;
 
 		// ldi ri, simm
@@ -163,7 +163,7 @@ static unsigned dasm_ssp1601(char *buffer, unsigned pc, const uint8_t *oprom)
 		case 0x0d:
 		case 0x0e:
 		case 0x0f:
-			sprintf(buffer, "ldi %s, %X", rij[(op >> 8) & 7], op & 0xff);
+			util::stream_format(stream, "ldi %s, %X", rij[(op >> 8) & 7], op & 0xff);
 			break;
 
 		// op a, s
@@ -173,7 +173,7 @@ static unsigned dasm_ssp1601(char *buffer, unsigned pc, const uint8_t *oprom)
 		case 0x50:
 		case 0x60:
 		case 0x70:
-			sprintf(buffer, "%s A, %s", arith_ops[op >> 13], reg[op & 0xf]);
+			util::stream_format(stream, "%s A, %s", arith_ops[op >> 13], reg[op & 0xf]);
 			break;
 
 		// op a, (ri)
@@ -183,7 +183,7 @@ static unsigned dasm_ssp1601(char *buffer, unsigned pc, const uint8_t *oprom)
 		case 0x51:
 		case 0x61:
 		case 0x71:
-			sprintf(buffer, "%s A, (%s%s)", arith_ops[op >> 13], RIJ, MODIFIER_LOW);
+			util::stream_format(stream, "%s A, (%s%s)", arith_ops[op >> 13], RIJ, MODIFIER_LOW);
 			break;
 
 		// op a, adr
@@ -193,7 +193,7 @@ static unsigned dasm_ssp1601(char *buffer, unsigned pc, const uint8_t *oprom)
 		case 0x53:
 		case 0x63:
 		case 0x73:
-			sprintf(buffer, "%s A, %X", arith_ops[op >> 13], op & 0x1ff);
+			util::stream_format(stream, "%s A, %X", arith_ops[op >> 13], op & 0x1ff);
 			break;
 
 		// subi a, imm
@@ -203,7 +203,7 @@ static unsigned dasm_ssp1601(char *buffer, unsigned pc, const uint8_t *oprom)
 		case 0x54:
 		case 0x64:
 		case 0x74:
-			sprintf(buffer, "%si A, %X", arith_ops[op >> 13], READ_OP_DASM(2));
+			util::stream_format(stream, "%si A, %X", arith_ops[op >> 13], READ_OP_DASM(2));
 			size = 2;
 			break;
 
@@ -214,7 +214,7 @@ static unsigned dasm_ssp1601(char *buffer, unsigned pc, const uint8_t *oprom)
 		case 0x55:
 		case 0x65:
 		case 0x75:
-			sprintf(buffer, "%s A, ((%s%s))", arith_ops[op >> 13], RIJ, MODIFIER_LOW);
+			util::stream_format(stream, "%s A, ((%s%s))", arith_ops[op >> 13], RIJ, MODIFIER_LOW);
 			break;
 
 		// sub a, ri
@@ -224,12 +224,12 @@ static unsigned dasm_ssp1601(char *buffer, unsigned pc, const uint8_t *oprom)
 		case 0x59:
 		case 0x69:
 		case 0x79:
-			sprintf(buffer, "%s A, %s%s", arith_ops[op >> 13], RIJ, MODIFIER_LOW);
+			util::stream_format(stream, "%s A, %s%s", arith_ops[op >> 13], RIJ, MODIFIER_LOW);
 			break;
 
 		// mpys (rj), (ri), b
 		case 0x1b:
-			sprintf(buffer, "mpya (%s%s), (%s%s), %d", RJ(op >> 4), MODIFIER_HIGH, RI(op), MODIFIER_LOW, BIT_B);
+			util::stream_format(stream, "mpya (%s%s), (%s%s), %d", RJ(op >> 4), MODIFIER_HIGH, RI(op), MODIFIER_LOW, BIT_B);
 			break;
 
 		// subi simm
@@ -239,53 +239,62 @@ static unsigned dasm_ssp1601(char *buffer, unsigned pc, const uint8_t *oprom)
 		case 0x5c:
 		case 0x6c:
 		case 0x7c:
-			sprintf(buffer, "%si %X", arith_ops[op >> 13], op & 0xff);
+			util::stream_format(stream, "%si %X", arith_ops[op >> 13], op & 0xff);
 			break;
 
 		// call cond, addr
 		case 0x24:
-			sprintf(buffer, "call %s, %X", get_cond(op), READ_OP_DASM(2));
+			util::stream_format(stream, "call %s, %X", get_cond(op), READ_OP_DASM(2));
 			flags |= DASMFLAG_STEP_OVER;
 			size = 2;
 			break;
 
 		// ld d, (a)
 		case 0x25:
-			sprintf(buffer, "ld %s, (A)", reg[(op >> 4) & 0xf]);
+			util::stream_format(stream, "ld %s, (A)", reg[(op >> 4) & 0xf]);
 			break;
 
 		// bra cond, addr
 		case 0x26:
-			sprintf(buffer, "bra %s, %X", get_cond(op), READ_OP_DASM(2));
+			util::stream_format(stream, "bra %s, %X", get_cond(op), READ_OP_DASM(2));
 			size = 2;
 			break;
 
 		// mod cond, op
 		case 0x48:
-			sprintf(buffer, "mod %s, %s", get_cond(op), acc_op[op & 7]);
+			util::stream_format(stream, "mod %s, %s", get_cond(op), acc_op[op & 7]);
 			break;
 
 		// mod f, op
 		case 0x4a:
-			sprintf(buffer, "%s", flag_op[op & 0xf]);
+			util::stream_format(stream, "%s", flag_op[op & 0xf]);
 			break;
 
 		// mpya (rj), (ri), b
 		case 0x4b:
-			sprintf(buffer, "mpya (%s%s), (%s%s), %d", RJ(op >> 4), MODIFIER_HIGH, RI(op), MODIFIER_LOW, BIT_B);
+			util::stream_format(stream, "mpya (%s%s), (%s%s), %d", RJ(op >> 4), MODIFIER_HIGH, RI(op), MODIFIER_LOW, BIT_B);
 			break;
 
 		// mld (rj), (ri), b
 		case 0x5b:
-			sprintf(buffer, "mld (%s%s), (%s%s), %d", RJ(op >> 4), MODIFIER_HIGH, RI(op), MODIFIER_LOW, BIT_B);
+			util::stream_format(stream, "mld (%s%s), (%s%s), %d", RJ(op >> 4), MODIFIER_HIGH, RI(op), MODIFIER_LOW, BIT_B);
 			break;
 
 		default:
-			sprintf(buffer, "OP = %04X", op);
+			util::stream_format(stream, "OP = %04X", op);
 			break;
 	}
 
 	return size | flags | DASMFLAG_SUPPORTED;
+}
+
+static unsigned dasm_ssp1601(char *buffer, unsigned pc, const uint8_t *oprom)
+{
+	std::ostringstream stream;
+	offs_t result = dasm_ssp1601(stream, pc, oprom);
+	std::string stream_str = stream.str();
+	strcpy(buffer, stream_str.c_str());
+	return result;
 }
 
 // vim:ts=4
