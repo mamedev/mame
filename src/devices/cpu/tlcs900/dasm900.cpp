@@ -1433,10 +1433,9 @@ static const char *const s_cond[16] =
 };
 
 
-CPU_DISASSEMBLE( tlcs900 )
+static offs_t internal_disasm_tlcs900(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
 {
 	const tlcs900inst *dasm;
-	char *dst = buffer;
 	char buf[32];
 	uint8_t   op, op1;
 	uint32_t  imm;
@@ -1864,7 +1863,7 @@ CPU_DISASSEMBLE( tlcs900 )
 		break;
 	}
 
-	dst += sprintf( dst, "%s", s_mnemonic[ dasm->mnemonic ] );
+	util::stream_format(stream, "%s", s_mnemonic[ dasm->mnemonic ] );
 
 	switch( dasm->mnemonic )
 	{
@@ -1888,27 +1887,27 @@ CPU_DISASSEMBLE( tlcs900 )
 				break;
 
 	case O_A:
-		dst += sprintf( dst, " A" );
+		util::stream_format(stream, " A" );
 		break;
 
 	case O_C8:
-		dst += sprintf( dst, " %s", s_reg8[op & 0x07] );
+		util::stream_format(stream, " %s", s_reg8[op & 0x07] );
 		break;
 
 	case O_C16:
-		dst += sprintf( dst, " %s", s_reg16[op & 0x07] );
+		util::stream_format(stream, " %s", s_reg16[op & 0x07] );
 		break;
 
 	case O_C32:
-		dst += sprintf( dst, " %s", s_reg32[op & 0x07] );
+		util::stream_format(stream, " %s", s_reg32[op & 0x07] );
 		break;
 
 	case O_MC16:
-		dst += sprintf( dst, " %s", s_mulreg16[op & 0x07] );
+		util::stream_format(stream, " %s", s_mulreg16[op & 0x07] );
 		break;
 
 	case O_CC:
-		dst += sprintf( dst, " %s", s_cond[op & 0x0F] );
+		util::stream_format(stream, " %s", s_cond[op & 0x0F] );
 		break;
 
 	case O_CR8:
@@ -1916,19 +1915,19 @@ CPU_DISASSEMBLE( tlcs900 )
 		switch( imm )
 		{
 		case 0x22:
-			dst += sprintf( dst, " DMAM0" );
+			util::stream_format(stream, " DMAM0" );
 			break;
 		case 0x26:
-			dst += sprintf( dst, " DMAM1" );
+			util::stream_format(stream, " DMAM1" );
 			break;
 		case 0x2a:
-			dst += sprintf( dst, " DMAM2" );
+			util::stream_format(stream, " DMAM2" );
 			break;
 		case 0x2e:
-			dst += sprintf( dst, " DMAM3" );
+			util::stream_format(stream, " DMAM3" );
 			break;
 		default:
-			dst += sprintf( dst, " unknown" );
+			util::stream_format(stream, " unknown" );
 			break;
 		}
 		break;
@@ -1938,19 +1937,19 @@ CPU_DISASSEMBLE( tlcs900 )
 		switch( imm )
 		{
 		case 0x20:
-			dst += sprintf( dst, " DMAC0" );
+			util::stream_format(stream, " DMAC0" );
 			break;
 		case 0x24:
-			dst += sprintf( dst, " DMAC1" );
+			util::stream_format(stream, " DMAC1" );
 			break;
 		case 0x28:
-			dst += sprintf( dst, " DMAC2" );
+			util::stream_format(stream, " DMAC2" );
 			break;
 		case 0x2c:
-			dst += sprintf( dst, " DMAC3" );
+			util::stream_format(stream, " DMAC3" );
 			break;
 		default:
-			dst += sprintf( dst, " unknown" );
+			util::stream_format(stream, " unknown" );
 			break;
 		}
 		break;
@@ -1960,70 +1959,70 @@ CPU_DISASSEMBLE( tlcs900 )
 		switch( imm )
 		{
 		case 0x00:
-			dst += sprintf( dst, " DMAS0" );
+			util::stream_format(stream, " DMAS0" );
 			break;
 		case 0x04:
-			dst += sprintf( dst, " DMAS1" );
+			util::stream_format(stream, " DMAS1" );
 			break;
 		case 0x08:
-			dst += sprintf( dst, " DMAS2" );
+			util::stream_format(stream, " DMAS2" );
 			break;
 		case 0x0c:
-			dst += sprintf( dst, " DMAS3" );
+			util::stream_format(stream, " DMAS3" );
 			break;
 		case 0x10:
-			dst += sprintf( dst, " DMAD0" );
+			util::stream_format(stream, " DMAD0" );
 			break;
 		case 0x14:
-			dst += sprintf( dst, " DMAD1" );
+			util::stream_format(stream, " DMAD1" );
 			break;
 		case 0x18:
-			dst += sprintf( dst, " DMAD2" );
+			util::stream_format(stream, " DMAD2" );
 			break;
 		case 0x1c:
-			dst += sprintf( dst, " DMAD3" );
+			util::stream_format(stream, " DMAD3" );
 			break;
 		default:
-			dst += sprintf( dst, " unknown" );
+			util::stream_format(stream, " unknown" );
 			break;
 		}
 		break;
 
 	case O_D8:
 		imm = oprom[ pos++ ];
-		dst += sprintf( dst, " 0x%06x", ( pc + pos + (int8_t)imm ) & 0xFFFFFF );
+		util::stream_format(stream, " 0x%06x", ( pc + pos + (int8_t)imm ) & 0xFFFFFF );
 		break;
 
 	case O_D16:
 		imm = oprom[ pos++ ];
 		imm = imm | ( oprom[ pos++ ] << 8 );
-		dst += sprintf( dst, " 0x%06x", ( pc + pos + (int16_t)imm ) & 0xFFFFFF );
+		util::stream_format(stream, " 0x%06x", ( pc + pos + (int16_t)imm ) & 0xFFFFFF );
 		break;
 
 	case O_F:
-		dst += sprintf( dst, " F" );
+		util::stream_format(stream, " F" );
 		break;
 
 	case O_I3:
-		dst += sprintf( dst, " %d", op & 0x07 );
+		util::stream_format(stream, " %d", op & 0x07 );
 		break;
 
 	case O_I8:
 		imm = oprom[ pos++ ];
-		dst += sprintf( dst, " 0x%02x", imm );
+		util::stream_format(stream, " 0x%02x", imm );
 		break;
 
 	case O_I16:
 		imm = oprom[ pos++ ];
 		imm = imm | ( oprom[ pos++ ] << 8 );
-		dst += sprintf( dst, " 0x%04x", imm );
+		util::stream_format(stream, " 0x%04x", imm );
 		break;
 
 	case O_I24:
 		imm = oprom[ pos++ ];
 		imm = imm | ( oprom[ pos++ ] << 8 );
 		imm = imm | ( oprom[ pos++ ] << 16 );
-		dst += sprintf( dst, " 0x%06x", imm );
+		util::stream_format(stream, " 0x%06x", imm );
 		break;
 
 	case O_I32:
@@ -2031,7 +2030,7 @@ CPU_DISASSEMBLE( tlcs900 )
 		imm = imm | ( oprom[ pos++ ] << 8 );
 		imm = imm | ( oprom[ pos++ ] << 16 );
 		imm = imm | ( oprom[ pos++ ] << 24 );
-		dst += sprintf( dst, "0x%08x", imm );
+		util::stream_format(stream, "0x%08x", imm );
 		break;
 
 	case O_M:
@@ -2040,31 +2039,31 @@ CPU_DISASSEMBLE( tlcs900 )
 		case M_CALL:
 		case M_JP:
 		case M_LDA:
-			dst += sprintf( dst, " %s", buf );
+			util::stream_format(stream, " %s", buf );
 			break;
 		default:
-			dst += sprintf( dst, " (%s)", buf );
+			util::stream_format(stream, " (%s)", buf );
 			break;
 		}
 		break;
 
 	case O_M8:
 		imm = oprom[ pos++ ];
-		dst += sprintf( dst, " (0x%02x)", imm );
+		util::stream_format(stream, " (0x%02x)", imm );
 		break;
 
 	case O_M16:
 		imm = oprom[ pos++ ];
 		imm = imm | ( oprom[ pos++ ] << 8 );
-		dst += sprintf( dst, " (0x%04x)", imm );
+		util::stream_format(stream, " (0x%04x)", imm );
 		break;
 
 	case O_R:
-		dst += sprintf( dst, " %s", buf );
+		util::stream_format(stream, " %s", buf );
 		break;
 
 	case O_SR:
-		dst += sprintf( dst, " SR" );
+		util::stream_format(stream, " SR" );
 		break;
 	}
 
@@ -2074,27 +2073,27 @@ CPU_DISASSEMBLE( tlcs900 )
 				break;
 
 		case O_A:
-		dst += sprintf( dst, ",A" );
+		util::stream_format(stream, ",A" );
 		break;
 
 	case O_C8:
-		dst += sprintf( dst, ",%s", s_reg8[op & 0x07] );
+		util::stream_format(stream, ",%s", s_reg8[op & 0x07] );
 		break;
 
 	case O_C16:
-		dst += sprintf( dst, ",%s", s_reg16[op & 0x07] );
+		util::stream_format(stream, ",%s", s_reg16[op & 0x07] );
 		break;
 
 	case O_C32:
-		dst += sprintf( dst, ",%s", s_reg32[op & 0x07] );
+		util::stream_format(stream, ",%s", s_reg32[op & 0x07] );
 		break;
 
 	case O_MC16:
-		dst += sprintf( dst, ",%s", s_mulreg16[op & 0x07] );
+		util::stream_format(stream, ",%s", s_mulreg16[op & 0x07] );
 		break;
 
 	case O_CC:
-		dst += sprintf( dst, ",%s", s_cond[op & 0x0F] );
+		util::stream_format(stream, ",%s", s_cond[op & 0x0F] );
 		break;
 
 	case O_CR8:
@@ -2102,19 +2101,19 @@ CPU_DISASSEMBLE( tlcs900 )
 		switch( imm )
 		{
 		case 0x22:
-			dst += sprintf( dst, ",DMAM0" );
+			util::stream_format(stream, ",DMAM0" );
 			break;
 		case 0x26:
-			dst += sprintf( dst, ",DMAM1" );
+			util::stream_format(stream, ",DMAM1" );
 			break;
 		case 0x2a:
-			dst += sprintf( dst, ",DMAM2" );
+			util::stream_format(stream, ",DMAM2" );
 			break;
 		case 0x2e:
-			dst += sprintf( dst, ",DMAM3" );
+			util::stream_format(stream, ",DMAM3" );
 			break;
 		default:
-			dst += sprintf( dst, ",unknown" );
+			util::stream_format(stream, ",unknown" );
 			break;
 		}
 		break;
@@ -2124,19 +2123,19 @@ CPU_DISASSEMBLE( tlcs900 )
 		switch( imm )
 		{
 		case 0x20:
-			dst += sprintf( dst, ",DMAC0" );
+			util::stream_format(stream, ",DMAC0" );
 			break;
 		case 0x24:
-			dst += sprintf( dst, ",DMAC1" );
+			util::stream_format(stream, ",DMAC1" );
 			break;
 		case 0x28:
-			dst += sprintf( dst, ",DMAC2" );
+			util::stream_format(stream, ",DMAC2" );
 			break;
 		case 0x2c:
-			dst += sprintf( dst, ",DMAC3" );
+			util::stream_format(stream, ",DMAC3" );
 			break;
 		default:
-			dst += sprintf( dst, ",unknown" );
+			util::stream_format(stream, ",unknown" );
 			break;
 		}
 		break;
@@ -2146,70 +2145,70 @@ CPU_DISASSEMBLE( tlcs900 )
 		switch( imm )
 		{
 		case 0x00:
-			dst += sprintf( dst, ",DMAS0" );
+			util::stream_format(stream, ",DMAS0" );
 			break;
 		case 0x04:
-			dst += sprintf( dst, ",DMAS1" );
+			util::stream_format(stream, ",DMAS1" );
 			break;
 		case 0x08:
-			dst += sprintf( dst, ",DMAS2" );
+			util::stream_format(stream, ",DMAS2" );
 			break;
 		case 0x0c:
-			dst += sprintf( dst, ",DMAS3" );
+			util::stream_format(stream, ",DMAS3" );
 			break;
 		case 0x10:
-			dst += sprintf( dst, ",DMAD0" );
+			util::stream_format(stream, ",DMAD0" );
 			break;
 		case 0x14:
-			dst += sprintf( dst, ",DMAD1" );
+			util::stream_format(stream, ",DMAD1" );
 			break;
 		case 0x18:
-			dst += sprintf( dst, ",DMAD2" );
+			util::stream_format(stream, ",DMAD2" );
 			break;
 		case 0x1c:
-			dst += sprintf( dst, ",DMAD3" );
+			util::stream_format(stream, ",DMAD3" );
 			break;
 		default:
-			dst += sprintf( dst, ",unknown" );
+			util::stream_format(stream, ",unknown" );
 			break;
 		}
 		break;
 
 	case O_D8:
 		imm = oprom[ pos++ ];
-		dst += sprintf( dst, ",0x%06x", ( pc + pos + (int8_t)imm ) & 0xFFFFFF );
+		util::stream_format(stream, ",0x%06x", ( pc + pos + (int8_t)imm ) & 0xFFFFFF );
 		break;
 
 	case O_D16:
 		imm = oprom[ pos++ ];
 		imm = imm | ( oprom[ pos++ ] << 8 );
-		dst += sprintf( dst, ",0x%06x", ( pc + pos + (int16_t)imm ) & 0xFFFFFF );
+		util::stream_format(stream, ",0x%06x", ( pc + pos + (int16_t)imm ) & 0xFFFFFF );
 		break;
 
 	case O_F:
-		dst += sprintf( dst, ",F'" );
+		util::stream_format(stream, ",F'" );
 		break;
 
 	case O_I3:
-		dst += sprintf( dst, ",%d", op & 0x07 );
+		util::stream_format(stream, ",%d", op & 0x07 );
 		break;
 
 	case O_I8:
 		imm = oprom[ pos++ ];
-		dst += sprintf( dst, ",0x%02x", imm );
+		util::stream_format(stream, ",0x%02x", imm );
 		break;
 
 	case O_I16:
 		imm = oprom[ pos++ ];
 		imm = imm | ( oprom[ pos++ ] << 8 );
-		dst += sprintf( dst, ",0x%04x", imm );
+		util::stream_format(stream, ",0x%04x", imm );
 		break;
 
 	case O_I24:
 		imm = oprom[ pos++ ];
 		imm = imm | ( oprom[ pos++ ] << 8 );
 		imm = imm | ( oprom[ pos++ ] << 16 );
-		dst += sprintf( dst, ",0x%06x", imm );
+		util::stream_format(stream, ",0x%06x", imm );
 		break;
 
 	case O_I32:
@@ -2217,7 +2216,7 @@ CPU_DISASSEMBLE( tlcs900 )
 		imm = imm | ( oprom[ pos++ ] << 8 );
 		imm = imm | ( oprom[ pos++ ] << 16 );
 		imm = imm | ( oprom[ pos++ ] << 24 );
-		dst += sprintf( dst, ",0x%08x", imm );
+		util::stream_format(stream, ",0x%08x", imm );
 		break;
 
 	case O_M:
@@ -2226,33 +2225,43 @@ CPU_DISASSEMBLE( tlcs900 )
 		case M_CALL:
 		case M_JP:
 		case M_LDA:
-			dst += sprintf( dst, ",%s", buf );
+			util::stream_format(stream, ",%s", buf );
 			break;
 		default:
-			dst += sprintf( dst, ",(%s)", buf );
+			util::stream_format(stream, ",(%s)", buf );
 			break;
 		}
 		break;
 
 	case O_M8:
 		imm = oprom[ pos++ ];
-		dst += sprintf( dst, ",(0x%02x)", imm );
+		util::stream_format(stream, ",(0x%02x)", imm );
 		break;
 
 	case O_M16:
 		imm = oprom[ pos++ ];
 		imm = imm | ( oprom[ pos++ ] << 8 );
-		dst += sprintf( dst, ",(0x%04x)", imm );
+		util::stream_format(stream, ",(0x%04x)", imm );
 		break;
 
 	case O_R:
-		dst += sprintf( dst, ",%s", buf );
+		util::stream_format(stream, ",%s", buf );
 		break;
 
 	case O_SR:
-		dst += sprintf( dst, ",SR" );
+		util::stream_format(stream, ",SR" );
 		break;
 	}
 
 	return pos | flags | DASMFLAG_SUPPORTED;
+}
+
+
+CPU_DISASSEMBLE(tlcs900)
+{
+	std::ostringstream stream;
+	offs_t result = internal_disasm_tlcs900(device, stream, pc, oprom, opram, options);
+	std::string stream_str = stream.str();
+	strcpy(buffer, stream_str.c_str());
+	return result;
 }
