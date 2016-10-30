@@ -2579,6 +2579,12 @@ d3d_render_target::~d3d_render_target()
 		if (target_surface[index] != nullptr)
 			target_surface[index]->Release();
 	}
+
+	if (cache_texture != nullptr)
+		cache_texture->Release();
+
+	if (cache_surface != nullptr)
+		cache_surface->Release();
 }
 
 
