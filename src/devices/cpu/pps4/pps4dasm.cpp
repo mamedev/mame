@@ -367,49 +367,48 @@ static const uint16_t table[] = {
 /* ff */ t_TM | t_I6i | t_OVER
 };
 
-CPU_DISASSEMBLE( pps4 )
+static offs_t internal_disasm_pps4(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
 {
 	uint32_t flags = 0;
 	unsigned PC = pc;
 	uint8_t op = OP(pc++);
 	uint32_t tok = table[op];
-	char *dst = nullptr;
 
 	if (0 == (tok & t_MASK)) {
-		sprintf(buffer, "%s", token_str[tok & t_MASK]);
+		stream << token_str[tok & t_MASK];
 	} else {
-		dst = buffer + sprintf(buffer, "%-7s", token_str[tok & t_MASK]);
+		util::stream_format(stream, "%-7s", token_str[tok & t_MASK]);
 	}
 
 	if (tok & t_I3c) {
 		// 3 bit immediate, complemented
 		uint8_t i = ~op & 7;
 		if (0 != i)  // only print if non-zero
-			dst += sprintf(dst, "%x", i);
+			util::stream_format(stream, "%x", i);
 	}
 
 	if (tok & t_I4) {
 		// 4 bit immediate
 		uint8_t i = op & 15;
-		dst += sprintf(dst, "%x", i);
+		util::stream_format(stream, "%x", i);
 	}
 
 	if (tok & t_I4c) {
 		// 4 bit immediate, complemented
 		uint8_t i = ~op & 15;
-		dst += sprintf(dst, "%x", i);
+		util::stream_format(stream, "%x", i);
 	}
 
 	if (tok & t_I4p) {
 		// 4 bit immediate offset into page 3
 		uint8_t i = op & 15;
-		dst += sprintf(dst, "[%x]", 0x0c0 | i);
+		util::stream_format(stream, "[%x]", 0x0c0 | i);
 	}
 
 	if (tok & t_I6p) {
 		// 6 bit immediate offset into current page
 		uint8_t i = op & 63;
-		dst += sprintf(dst, "%x", (PC & ~63) | i);
+		util::stream_format(stream, "%x", (PC & ~63) | i);
 	}
 
 	if (tok & t_I6i) {
@@ -418,19 +417,19 @@ CPU_DISASSEMBLE( pps4 )
 		// 8 bit absolute offset at 0x0100
 		uint16_t addr = (1 << 8) | 0;     // ROM[ip3] can't be reached!?
 		(void)addr; // avoid unused variable warning
-		dst += sprintf(dst, "[%x]", i6p3);
+		util::stream_format(stream, "[%x]", i6p3);
 	}
 
 	if (tok & t_I8) {
 		// 8 bit immediate I/O port address
 		uint8_t arg = ARG(pc++);
-		dst += sprintf(dst, "%02x", arg);
+		util::stream_format(stream, "%02x", arg);
 	}
 
 	if (tok & t_I8c) {
 		// 8 bit immediate offset into page
 		uint16_t arg = ~ARG(pc++) & 255;
-		dst += sprintf(dst, "%02x", arg);
+		util::stream_format(stream, "%02x", arg);
 	}
 
 	if (tok & t_OVER)  // TL or TML
@@ -440,4 +439,13 @@ CPU_DISASSEMBLE( pps4 )
 			flags |= DASMFLAG_STEP_OUT;
 
 	return (pc - PC) | flags | DASMFLAG_SUPPORTED;
+}
+
+CPU_DISASSEMBLE(pps4)
+{
+	std::ostringstream stream;
+	offs_t result = internal_disasm_pps4(device, stream, pc, oprom, opram, options);
+	std::string stream_str = stream.str();
+	strcpy(buffer, stream_str.c_str());
+	return result;
 }
