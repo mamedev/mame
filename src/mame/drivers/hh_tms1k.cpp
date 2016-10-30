@@ -136,6 +136,7 @@
 #include "amaztron.lh" // clickable
 #include "astro.lh"
 #include "bankshot.lh"
+#include "bcheetah.lh"
 #include "bigtrak.lh"
 #include "bship.lh" // clickable
 #include "cnfball.lh"
@@ -707,7 +708,12 @@ MACHINE_CONFIG_END
 
   Bandai System Control Car: Cheetah 「システムコントロールカー チーター」
   * TMS1000NLL MP0915 (die label 1000B, MP0915)
-  * x
+  * 2 motors (one for back axis, one for steering), no sound
+  
+  It's a programmable buggy, like Big Track but much simpler. To add a command
+  step in program-mode, press a direction key and one of the time delay number
+  keys at the same time. To run the program(max 24 steps), switch to run-mode
+  and press the go-key.
 
   known releases:
   - Japan: System Control Car: Cheetah
@@ -723,7 +729,6 @@ public:
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
 	DECLARE_WRITE16_MEMBER(write_r);
 	DECLARE_WRITE16_MEMBER(write_o);
 	DECLARE_READ8_MEMBER(read_k);
@@ -731,45 +736,70 @@ public:
 
 // handlers
 
-void bcheetah_state::prepare_display()
-{
-}
-
 WRITE16_MEMBER(bcheetah_state::write_r)
 {
+	// R0-R4: input mux
+	// R5,R6: tied to K4??
+	m_inp_mux = data & 0x1f;
 }
 
 WRITE16_MEMBER(bcheetah_state::write_o)
 {
+	// O1: back motor (drive)
+	// O0: front motor steer left
+	// O2: front motor steer right
+	// O3: GND, other: N/C
+	output().set_value("motor1", data >> 1 & 1);
+	output().set_value("motor2_left", data & 1);
+	output().set_value("motor2_right", data >> 2 & 1);
 }
 
 READ8_MEMBER(bcheetah_state::read_k)
 {
 	// K: multiplexed inputs
-	return read_inputs(1);
+	return read_inputs(5);
 }
 
 
 // config
 
 static INPUT_PORTS_START( bcheetah )
-	PORT_START("IN.0") // R1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD )
+	PORT_START("IN.0") // R0
+	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_CONFNAME( 0x02, 0x02, "Mode")
+	PORT_CONFSETTING(    0x02, "Program" )
+	PORT_CONFSETTING(    0x00, "Run" )
+
+	PORT_START("IN.1") // R1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_LEFT) PORT_NAME("Left")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_UP) PORT_NAME("Forward")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_RIGHT) PORT_NAME("Right")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Go")
+
+	PORT_START("IN.2") // R2
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DOWN) PORT_NAME("Stop")
+
+	PORT_START("IN.3") // R3
+	PORT_BIT( 0x05, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
+
+	PORT_START("IN.4") // R4
+	PORT_BIT( 0x05, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( bcheetah, bcheetah_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1000, 325000) // approximation - RC osc. R=47K, C=47pf
+	MCFG_CPU_ADD("maincpu", TMS1000, 100000) // approximation - RC osc. R=47K, C=47pf
 	MCFG_TMS1XXX_READ_K_CB(READ8(bcheetah_state, read_k))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(bcheetah_state, write_r))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(bcheetah_state, write_o))
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_hh_tms1k_test)
+	MCFG_DEFAULT_LAYOUT(layout_bcheetah)
 
 	/* no sound! */
 MACHINE_CONFIG_END
@@ -2574,18 +2604,26 @@ WRITE16_MEMBER(esbattle_state::write_o)
 READ8_MEMBER(esbattle_state::read_k)
 {
 	// K: multiplexed inputs
-	return read_inputs(1);
+	return read_inputs(2);
 }
 
 
 // config
 
 static INPUT_PORTS_START( esbattle )
-	PORT_START("IN.0") // R1
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD )
+	PORT_START("IN.0") // R0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("P2 Fire 1") // F1
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL PORT_NAME("P2 Fire 2") // F2
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_COCKTAIL PORT_NAME("P2 Launch")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // R1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Fire 1") // F1
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 Fire 2") // F2
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P1 Launch")
+	PORT_CONFNAME( 0x08, 0x08, "Players" )
+	PORT_CONFSETTING(    0x08, "1" ) // Auto
+	PORT_CONFSETTING(    0x00, "2" ) // Manual
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( esbattle, esbattle_state )
@@ -6345,6 +6383,8 @@ MACHINE_CONFIG_END
   * 2 LEDs(one red, one green), 1-bit sound
   
   This is the TMS1000 version, the one from 1977 has a MM5780.
+  To play, enter an equation followed by the ?-key, and the calculator will
+  tell you if it was right(green) or wrong(red). For example 1+2=3?
 
   known releases:
   - USA(1): Monkey See
@@ -7953,7 +7993,7 @@ CONS( 1979, matchnum,  0,        0, matchnum,  matchnum,  driver_device, 0, "A-O
 
 COMP( 1980, mathmagi,  0,        0, mathmagi,  mathmagi,  driver_device, 0, "APF Electronics Inc.", "Mathemagician", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
-CONS( 1979, bcheetah,  0,        0, bcheetah,  bcheetah,  driver_device, 0, "Bandai", "System Control Car: Cheetah", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+CONS( 1979, bcheetah,  0,        0, bcheetah,  bcheetah,  driver_device, 0, "Bandai", "System Control Car: Cheetah", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_MECHANICAL ) // ***
 
 CONS( 1978, amaztron,  0,        0, amaztron,  amaztron,  driver_device, 0, "Coleco", "Amaze-A-Tron", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***
 COMP( 1979, zodiac,    0,        0, zodiac,    zodiac,    driver_device, 0, "Coleco", "Zodiac - The Astrology Computer", MACHINE_SUPPORTS_SAVE )
