@@ -1438,15 +1438,21 @@ void superfx_device::execute_run()
 	}
 }
 
-
 offs_t superfx_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
-extern offs_t superfx_dasm_one(char *buffer, offs_t pc, uint8_t op, uint8_t param0, uint8_t param1, uint16_t alt);
+	std::ostringstream stream;
+	offs_t result = disasm_disassemble(stream, pc, oprom, opram, options);
+	std::string stream_str = stream.str();
+	strcpy(buffer, stream_str.c_str());
+	return result;
+}
 
+offs_t superfx_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+{
 	uint8_t  op = *(uint8_t *)(opram + 0);
 	uint8_t  param0 = *(uint8_t *)(opram + 1);
 	uint8_t  param1 = *(uint8_t *)(opram + 2);
 	uint16_t alt = m_sfr & SUPERFX_SFR_ALT;
 
-	return superfx_dasm_one(buffer, pc, op, param0, param1, alt);
+	return superfx_dasm_one(stream, pc, op, param0, param1, alt);
 }

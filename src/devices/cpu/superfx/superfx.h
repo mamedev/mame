@@ -209,9 +209,13 @@ private:
 	inline void superfx_add_clocks_internal(uint32_t clocks);
 	void superfx_timing_reset();
 	inline void superfx_dreg_sfr_sz_update();
+
+	offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options);
 };
 
 
 extern const device_type SUPERFX;
+
+offs_t superfx_dasm_one(std::ostream &stream, offs_t pc, uint8_t op, uint8_t param0, uint8_t param1, uint16_t alt);
 
 #endif /* __SUPERFX_H__ */

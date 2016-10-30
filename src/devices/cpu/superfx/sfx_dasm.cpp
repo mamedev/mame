@@ -3,92 +3,80 @@
 #include "emu.h"
 #include "superfx.h"
 
-static char *output;
-
-static void ATTR_PRINTF(1,2) print(const char *fmt, ...)
-{
-	va_list vl;
-
-	va_start(vl, fmt);
-	output += vsprintf(output, fmt, vl);
-	va_end(vl);
-}
-
-offs_t superfx_dasm_one(char *buffer, offs_t pc, uint8_t op, uint8_t param0, uint8_t param1, uint16_t alt)
+offs_t superfx_dasm_one(std::ostream &stream, offs_t pc, uint8_t op, uint8_t param0, uint8_t param1, uint16_t alt)
 {
 	uint8_t bytes_consumed = 1;
-	output = buffer;
 
 	switch(op)
 	{
 		case 0x00: // STOP
-			print("STOP");
+			util::stream_format(stream, "STOP");
 			break;
 		case 0x01: // NOP
-			print("NOP");
+			util::stream_format(stream, "NOP");
 			break;
 		case 0x02: // CACHE
-			print("CACHE");
+			util::stream_format(stream, "CACHE");
 			break;
 		case 0x03: // LSR
-			print("LSR");
+			util::stream_format(stream, "LSR");
 			break;
 		case 0x04: // ROL
-			print("ROL");
+			util::stream_format(stream, "ROL");
 			break;
 		case 0x05: // BRA
-			print("BRA     %d", (int8_t)param0);
+			util::stream_format(stream, "BRA     %d", (int)(int8_t)param0);
 			bytes_consumed = 2;
 			break;
 		case 0x06: // BLT
-			print("BLT     %d", (int8_t)param0);
+			util::stream_format(stream, "BLT     %d", (int)(int8_t)param0);
 			bytes_consumed = 2;
 			break;
 		case 0x07: // BGE
-			print("BGE     %d", (int8_t)param0);
+			util::stream_format(stream, "BGE     %d", (int)(int8_t)param0);
 			bytes_consumed = 2;
 			break;
 		case 0x08: // BNE
-			print("BNE     %d", (int8_t)param0);
+			util::stream_format(stream, "BNE     %d", (int)(int8_t)param0);
 			bytes_consumed = 2;
 			break;
 		case 0x09: // BEQ
-			print("BEQ     %d", (int8_t)param0);
+			util::stream_format(stream, "BEQ     %d", (int)(int8_t)param0);
 			bytes_consumed = 2;
 			break;
 		case 0x0a: // BPL
-			print("BPL     %d", (int8_t)param0);
+			util::stream_format(stream, "BPL     %d", (int)(int8_t)param0);
 			bytes_consumed = 2;
 			break;
 		case 0x0b: // BMI
-			print("BMI     %d", (int8_t)param0);
+			util::stream_format(stream, "BMI     %d", (int)(int8_t)param0);
 			bytes_consumed = 2;
 			break;
 		case 0x0c: // BCC
-			print("BCC     %d", (int8_t)param0);
+			util::stream_format(stream, "BCC     %d", (int)(int8_t)param0);
 			bytes_consumed = 2;
 			break;
 		case 0x0d: // BCS
-			print("BCS     %d", (int8_t)param0);
+			util::stream_format(stream, "BCS     %d", (int)(int8_t)param0);
 			bytes_consumed = 2;
 			break;
 		case 0x0e: // BVC
-			print("BVC     %d", (int8_t)param0);
+			util::stream_format(stream, "BVC     %d", (int)(int8_t)param0);
 			bytes_consumed = 2;
 			break;
 		case 0x0f: // BVS
-			print("BVS     %d", (int8_t)param0);
+			util::stream_format(stream, "BVS     %d", (int)(int8_t)param0);
 			bytes_consumed = 2;
 			break;
 
 		case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15: case 0x16: case 0x17:
 		case 0x18: case 0x19: case 0x1a: case 0x1b: case 0x1c: case 0x1d: case 0x1e: case 0x1f: // TO
-			print("TO      R%d", op & 0xf);
+			util::stream_format(stream, "TO      R%d", op & 0xf);
 			break;
 
 		case 0x20: case 0x21: case 0x22: case 0x23: case 0x24: case 0x25: case 0x26: case 0x27:
 		case 0x28: case 0x29: case 0x2a: case 0x2b: case 0x2c: case 0x2d: case 0x2e: case 0x2f: // WITH
-			print("WITH    R%d", op & 0xf);
+			util::stream_format(stream, "WITH    R%d", op & 0xf);
 			break;
 
 		case 0x30: case 0x31: case 0x32: case 0x33: case 0x34: case 0x35:
@@ -97,26 +85,26 @@ offs_t superfx_dasm_one(char *buffer, offs_t pc, uint8_t op, uint8_t param0, uin
 			{
 				case SUPERFX_SFR_ALT0:
 				case SUPERFX_SFR_ALT2:
-					print("STW     (R%d)", op & 0xf);
+					util::stream_format(stream, "STW     (R%d)", op & 0xf);
 					break;
 				case SUPERFX_SFR_ALT1:
 				case SUPERFX_SFR_ALT3:
-					print("STB     (R%d)", op & 0xf);
+					util::stream_format(stream, "STB     (R%d)", op & 0xf);
 					break;
 			}
 			break;
 
 		case 0x3c: // LOOP
-			print("LOOP");
+			util::stream_format(stream, "LOOP");
 			break;
 		case 0x3d: // ALT1
-			print("ALT1");
+			util::stream_format(stream, "ALT1");
 			break;
 		case 0x3e: // ALT2
-			print("ALT2");
+			util::stream_format(stream, "ALT2");
 			break;
 		case 0x3f: // ALT3
-			print("ALT3");
+			util::stream_format(stream, "ALT3");
 			break;
 
 		case 0x40: case 0x41: case 0x42: case 0x43: case 0x44: case 0x45:
@@ -125,11 +113,11 @@ offs_t superfx_dasm_one(char *buffer, offs_t pc, uint8_t op, uint8_t param0, uin
 			{
 				case SUPERFX_SFR_ALT0:
 				case SUPERFX_SFR_ALT2:
-					print("LDW     (R%d)", op & 0xf);
+					util::stream_format(stream, "LDW     (R%d)", op & 0xf);
 					break;
 				case SUPERFX_SFR_ALT1:
 				case SUPERFX_SFR_ALT3:
-					print("LDB     (R%d)", op & 0xf);
+					util::stream_format(stream, "LDB     (R%d)", op & 0xf);
 					break;
 			}
 			break;
@@ -139,17 +127,17 @@ offs_t superfx_dasm_one(char *buffer, offs_t pc, uint8_t op, uint8_t param0, uin
 			{
 				case SUPERFX_SFR_ALT0:
 				case SUPERFX_SFR_ALT2:
-					print("PLOT");
+					util::stream_format(stream, "PLOT");
 					break;
 				case SUPERFX_SFR_ALT1:
 				case SUPERFX_SFR_ALT3:
-					print("RPIX");
+					util::stream_format(stream, "RPIX");
 					break;
 			}
 			break;
 
 		case 0x4d: // SWAP
-			print("SWAP");
+			util::stream_format(stream, "SWAP");
 			break;
 
 		case 0x4e: // COLOR / CMODE
@@ -157,17 +145,17 @@ offs_t superfx_dasm_one(char *buffer, offs_t pc, uint8_t op, uint8_t param0, uin
 			{
 				case SUPERFX_SFR_ALT0:
 				case SUPERFX_SFR_ALT2:
-					print("COLOR");
+					util::stream_format(stream, "COLOR");
 					break;
 				case SUPERFX_SFR_ALT1:
 				case SUPERFX_SFR_ALT3:
-					print("CMODE");
+					util::stream_format(stream, "CMODE");
 					break;
 			}
 			break;
 
 		case 0x4f: // NOT
-			print("NOT");
+			util::stream_format(stream, "NOT");
 			break;
 
 		case 0x50: case 0x51: case 0x52: case 0x53: case 0x54: case 0x55: case 0x56: case 0x57:
@@ -175,16 +163,16 @@ offs_t superfx_dasm_one(char *buffer, offs_t pc, uint8_t op, uint8_t param0, uin
 			switch(alt)
 			{
 				case SUPERFX_SFR_ALT0:
-					print("ADD     R%d", op &0xf);
+					util::stream_format(stream, "ADD     R%d", op &0xf);
 					break;
 				case SUPERFX_SFR_ALT1:
-					print("ADC     R%d", op &0xf);
+					util::stream_format(stream, "ADC     R%d", op &0xf);
 					break;
 				case SUPERFX_SFR_ALT2:
-					print("ADDI    R%d", op &0xf);
+					util::stream_format(stream, "ADDI    R%d", op &0xf);
 					break;
 				case SUPERFX_SFR_ALT3:
-					print("ADCI    R%d", op &0xf);
+					util::stream_format(stream, "ADCI    R%d", op &0xf);
 					break;
 			}
 			break;
@@ -194,22 +182,22 @@ offs_t superfx_dasm_one(char *buffer, offs_t pc, uint8_t op, uint8_t param0, uin
 			switch(alt)
 			{
 				case SUPERFX_SFR_ALT0:
-					print("SUB     R%d", op &0xf);
+					util::stream_format(stream, "SUB     R%d", op &0xf);
 					break;
 				case SUPERFX_SFR_ALT1:
-					print("SBC     R%d", op &0xf);
+					util::stream_format(stream, "SBC     R%d", op &0xf);
 					break;
 				case SUPERFX_SFR_ALT2:
-					print("SUBI    R%d", op &0xf);
+					util::stream_format(stream, "SUBI    R%d", op &0xf);
 					break;
 				case SUPERFX_SFR_ALT3:
-					print("CMP     R%d", op &0xf);
+					util::stream_format(stream, "CMP     R%d", op &0xf);
 					break;
 			}
 			break;
 
 		case 0x70: // MERGE
-			print("MERGE");
+			util::stream_format(stream, "MERGE");
 			break;
 
 					case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x77:
@@ -217,16 +205,16 @@ offs_t superfx_dasm_one(char *buffer, offs_t pc, uint8_t op, uint8_t param0, uin
 			switch(alt)
 			{
 				case SUPERFX_SFR_ALT0:
-					print("AND     R%d", op &0xf);
+					util::stream_format(stream, "AND     R%d", op &0xf);
 					break;
 				case SUPERFX_SFR_ALT1:
-					print("BIC     R%d", op &0xf);
+					util::stream_format(stream, "BIC     R%d", op &0xf);
 					break;
 				case SUPERFX_SFR_ALT2:
-					print("ANDI    R%d", op &0xf);
+					util::stream_format(stream, "ANDI    R%d", op &0xf);
 					break;
 				case SUPERFX_SFR_ALT3:
-					print("BICI    R%d", op &0xf);
+					util::stream_format(stream, "BICI    R%d", op &0xf);
 					break;
 			}
 			break;
@@ -236,30 +224,30 @@ offs_t superfx_dasm_one(char *buffer, offs_t pc, uint8_t op, uint8_t param0, uin
 			switch(alt)
 			{
 				case SUPERFX_SFR_ALT0:
-					print("MULT    R%d", op &0xf);
+					util::stream_format(stream, "MULT    R%d", op &0xf);
 					break;
 				case SUPERFX_SFR_ALT1:
-					print("UMULT   R%d", op &0xf);
+					util::stream_format(stream, "UMULT   R%d", op &0xf);
 					break;
 				case SUPERFX_SFR_ALT2:
-					print("MULTI   R%d", op &0xf);
+					util::stream_format(stream, "MULTI   R%d", op &0xf);
 					break;
 				case SUPERFX_SFR_ALT3:
-					print("UMULTI  R%d", op &0xf);
+					util::stream_format(stream, "UMULTI  R%d", op &0xf);
 					break;
 			}
 			break;
 
 		case 0x90: // SBK
-			print("SBK");
+			util::stream_format(stream, "SBK");
 			break;
 
 		case 0x91: case 0x92: case 0x93: case 0x94: // LINK
-			print("LINK    %d", op & 0xf);
+			util::stream_format(stream, "LINK    %d", op & 0xf);
 			break;
 
 		case 0x95: // SEX
-			print("SEX");
+			util::stream_format(stream, "SEX");
 			break;
 
 		case 0x96: // ASR / DIV2
@@ -267,17 +255,17 @@ offs_t superfx_dasm_one(char *buffer, offs_t pc, uint8_t op, uint8_t param0, uin
 			{
 				case SUPERFX_SFR_ALT0:
 				case SUPERFX_SFR_ALT2:
-					print("ASR");
+					util::stream_format(stream, "ASR");
 					break;
 				case SUPERFX_SFR_ALT1:
 				case SUPERFX_SFR_ALT3:
-					print("DIV2");
+					util::stream_format(stream, "DIV2");
 					break;
 			}
 			break;
 
 		case 0x97: // ROR
-			print("ROR");
+			util::stream_format(stream, "ROR");
 			break;
 
 		case 0x98: case 0x99: case 0x9a: case 0x9b: case 0x9c: case 0x9d: // JMP / LJMP
@@ -285,17 +273,17 @@ offs_t superfx_dasm_one(char *buffer, offs_t pc, uint8_t op, uint8_t param0, uin
 			{
 				case SUPERFX_SFR_ALT0:
 				case SUPERFX_SFR_ALT2:
-					print("JMP     R%d", op & 0xf);
+					util::stream_format(stream, "JMP     R%d", op & 0xf);
 					break;
 				case SUPERFX_SFR_ALT1:
 				case SUPERFX_SFR_ALT3:
-					print("LJMP    R%d", op & 0xf);
+					util::stream_format(stream, "LJMP    R%d", op & 0xf);
 					break;
 			}
 			break;
 
 		case 0x9e: // LOB
-			print("LOB");
+			util::stream_format(stream, "LOB");
 			break;
 
 		case 0x9f: // FMULT / LMULT
@@ -303,11 +291,11 @@ offs_t superfx_dasm_one(char *buffer, offs_t pc, uint8_t op, uint8_t param0, uin
 			{
 				case SUPERFX_SFR_ALT0:
 				case SUPERFX_SFR_ALT2:
-					print("FMULT");
+					util::stream_format(stream, "FMULT");
 					break;
 				case SUPERFX_SFR_ALT1:
 				case SUPERFX_SFR_ALT3:
-					print("LMULT");
+					util::stream_format(stream, "LMULT");
 					break;
 			}
 			break;
@@ -317,14 +305,14 @@ offs_t superfx_dasm_one(char *buffer, offs_t pc, uint8_t op, uint8_t param0, uin
 			switch(alt)
 			{
 				case SUPERFX_SFR_ALT0:
-					print("IBT     R%d,0x%02x", op & 0xf, param0);
+					util::stream_format(stream, "IBT     R%d,0x%02x", op & 0xf, param0);
 					break;
 				case SUPERFX_SFR_ALT2:
-					print("SMS     R%d,(0x%04x)", op & 0xf, param0 << 1);
+					util::stream_format(stream, "SMS     R%d,(0x%04x)", op & 0xf, param0 << 1);
 					break;
 				case SUPERFX_SFR_ALT1:
 				case SUPERFX_SFR_ALT3:
-					print("LMS     R%d,(0x%04x)", op & 0xf, param0 << 1);
+					util::stream_format(stream, "LMS     R%d,(0x%04x)", op & 0xf, param0 << 1);
 					break;
 			}
 			bytes_consumed = 2;
@@ -332,11 +320,11 @@ offs_t superfx_dasm_one(char *buffer, offs_t pc, uint8_t op, uint8_t param0, uin
 
 		case 0xb0: case 0xb1: case 0xb2: case 0xb3: case 0xb4: case 0xb5: case 0xb6: case 0xb7:
 		case 0xb8: case 0xb9: case 0xba: case 0xbb: case 0xbc: case 0xbd: case 0xbe: case 0xbf: // FROM
-			print("FROM    R%d", op & 0xf);
+			util::stream_format(stream, "FROM    R%d", op & 0xf);
 			break;
 
 		case 0xc0: // HIB
-			print("HIB");
+			util::stream_format(stream, "HIB");
 			break;
 
 					case 0xc1: case 0xc2: case 0xc3: case 0xc4: case 0xc5: case 0xc6: case 0xc7:
@@ -344,23 +332,23 @@ offs_t superfx_dasm_one(char *buffer, offs_t pc, uint8_t op, uint8_t param0, uin
 			switch(alt)
 			{
 				case SUPERFX_SFR_ALT0:
-					print("OR      R%d", op &0xf);
+					util::stream_format(stream, "OR      R%d", op &0xf);
 					break;
 				case SUPERFX_SFR_ALT1:
-					print("XOR     R%d", op &0xf);
+					util::stream_format(stream, "XOR     R%d", op &0xf);
 					break;
 				case SUPERFX_SFR_ALT2:
-					print("ORI     R%d", op &0xf);
+					util::stream_format(stream, "ORI     R%d", op &0xf);
 					break;
 				case SUPERFX_SFR_ALT3:
-					print("XORI    R%d", op &0xf);
+					util::stream_format(stream, "XORI    R%d", op &0xf);
 					break;
 			}
 			break;
 
 		case 0xd0: case 0xd1: case 0xd2: case 0xd3: case 0xd4: case 0xd5: case 0xd6: case 0xd7:
 		case 0xd8: case 0xd9: case 0xda: case 0xdb: case 0xdc: case 0xdd: case 0xde:            // INC
-			print("INC     R%d", op & 0xf);
+			util::stream_format(stream, "INC     R%d", op & 0xf);
 			break;
 
 		case 0xdf: // GETC / RAMB / ROMB
@@ -368,36 +356,36 @@ offs_t superfx_dasm_one(char *buffer, offs_t pc, uint8_t op, uint8_t param0, uin
 			{
 				case SUPERFX_SFR_ALT0:
 				case SUPERFX_SFR_ALT1:
-					print("GETC");
+					util::stream_format(stream, "GETC");
 					break;
 				case SUPERFX_SFR_ALT2:
-					print("RAMB");
+					util::stream_format(stream, "RAMB");
 					break;
 				case SUPERFX_SFR_ALT3:
-					print("ROMB");
+					util::stream_format(stream, "ROMB");
 					break;
 			}
 			break;
 
 		case 0xe0: case 0xe1: case 0xe2: case 0xe3: case 0xe4: case 0xe5: case 0xe6: case 0xe7:
 		case 0xe8: case 0xe9: case 0xea: case 0xeb: case 0xec: case 0xed: case 0xee:            // DEC
-			print("DEC     R%d", op & 0xf);
+			util::stream_format(stream, "DEC     R%d", op & 0xf);
 			break;
 
 		case 0xef: // GETB / GETBH / GETBL / GETBS
 			switch(alt)
 			{
 				case SUPERFX_SFR_ALT0:
-					print("GETB");
+					util::stream_format(stream, "GETB");
 					break;
 				case SUPERFX_SFR_ALT1:
-					print("GETBH");
+					util::stream_format(stream, "GETBH");
 					break;
 				case SUPERFX_SFR_ALT2:
-					print("GETBL");
+					util::stream_format(stream, "GETBL");
 					break;
 				case SUPERFX_SFR_ALT3:
-					print("GETBS");
+					util::stream_format(stream, "GETBS");
 					break;
 			}
 			break;
@@ -407,15 +395,15 @@ offs_t superfx_dasm_one(char *buffer, offs_t pc, uint8_t op, uint8_t param0, uin
 			switch(alt)
 			{
 				case SUPERFX_SFR_ALT0:
-					print("IWT     R%d,#%02x%02x", op & 0xf, param1, param0);
+					util::stream_format(stream, "IWT     R%d,#%02x%02x", op & 0xf, param1, param0);
 					bytes_consumed = 3;
 					break;
 				case SUPERFX_SFR_ALT2:
-					print("SM      R%d", op & 0xf);
+					util::stream_format(stream, "SM      R%d", op & 0xf);
 					break;
 				case SUPERFX_SFR_ALT1:
 				case SUPERFX_SFR_ALT3:
-					print("LM      R%d", op & 0xf);
+					util::stream_format(stream, "LM      R%d", op & 0xf);
 					break;
 			}
 			break;
