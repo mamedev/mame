@@ -139,7 +139,7 @@ static const int8_t s_next_pc[0x40] =
 
 // common disasm
 
-static offs_t sm510_common_disasm(const uint8_t *lut_mnemonic, const uint8_t *lut_extended, char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram)
+static offs_t sm510_common_disasm(const uint8_t *lut_mnemonic, const uint8_t *lut_extended, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram)
 {
 	// get raw opcode
 	uint8_t op = oprom[0];
@@ -163,34 +163,42 @@ static offs_t sm510_common_disasm(const uint8_t *lut_mnemonic, const uint8_t *lu
 		instr = lut_extended[param];
 
 	// disassemble it
-	char *dst = buffer;
-	dst += sprintf(dst, "%-6s ", s_mnemonics[instr]);
+	util::stream_format(stream, "%-6s ", s_mnemonics[instr]);
 	if (bits > 0)
 	{
 		if (bits <= 4)
 		{
 			if (param < 10)
-				dst += sprintf(dst, "%d", param);
+				util::stream_format(stream, "%d", param);
 			else
-				dst += sprintf(dst, "$%X", param);
+				util::stream_format(stream, "$%X", param);
 		}
 		else if (bits <= 8)
 		{
 			if (!is_extended)
-				dst += sprintf(dst, "$%02X", param);
+				util::stream_format(stream, "$%02X", param);
 		}
 		else
 		{
 			uint16_t address = (param << 4 & 0xc00) | (mask << 6 & 0x3c0) | (param & 0x03f);
-			dst += sprintf(dst, "$%03X", address);
+			util::stream_format(stream, "$%03X", address);
 		}
 
 		// show param offset
 		if (bits >= 8)
-			dst += sprintf(dst, " [$%03X]", pc + s_next_pc[pc & 0x3f]);
+			util::stream_format(stream, " [$%03X]", pc + s_next_pc[pc & 0x3f]);
 	}
 
 	return len | s_flags[instr] | DASMFLAG_SUPPORTED;
+}
+
+static offs_t sm510_common_disasm(const uint8_t *lut_mnemonic, const uint8_t *lut_extended, char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram)
+{
+	std::ostringstream stream;
+	offs_t result = sm510_common_disasm(lut_mnemonic, lut_extended, stream, pc, oprom, opram);
+	std::string stream_str = stream.str();
+	strcpy(buffer, stream_str.c_str());
+	return result;
 }
 
 
