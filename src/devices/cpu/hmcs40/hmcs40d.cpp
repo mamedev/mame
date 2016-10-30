@@ -184,26 +184,25 @@ static const uint8_t hmcs40_mnemonic[0x400] =
 
 
 
-CPU_DISASSEMBLE(hmcs40)
+static offs_t internal_disasm_hmcs40(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
 {
 	uint16_t op = (oprom[0] | oprom[1] << 8) & 0x3ff;
-	char *dst = buffer;
 	uint8_t instr = hmcs40_mnemonic[op];
 	int8_t bits = s_bits[instr];
 
 	// special case for (XY) opcode
 	if (bits == 99)
 	{
-		dst += sprintf(dst, "%s", s_mnemonics[instr]);
+		util::stream_format(stream, "%s", s_mnemonics[instr]);
 
 		if (op & 1)
-			dst += sprintf(dst, "X");
+			stream << "X";
 		if (op & 2)
-			dst += sprintf(dst, "Y");
+			stream << "Y";
 	}
 	else
 	{
-		dst += sprintf(dst, "%-6s ", s_mnemonics[instr]);
+		util::stream_format(stream, "%-6s ", s_mnemonics[instr]);
 
 		// opcode parameter
 		if (bits != 0)
@@ -221,12 +220,22 @@ CPU_DISASSEMBLE(hmcs40)
 			param &= ((1 << bits) - 1);
 
 			if (bits > 5)
-				dst += sprintf(dst, "$%02X", param);
+				util::stream_format(stream, "$%02X", param);
 			else
-				dst += sprintf(dst, "%d", param);
+				util::stream_format(stream, "%d", param);
 		}
 	}
 
 	int pos = s_next_pc[pc & 0x3f] & DASMFLAG_LENGTHMASK;
 	return pos | s_flags[instr] | DASMFLAG_SUPPORTED;
+}
+
+
+CPU_DISASSEMBLE(hmcs40)
+{
+	std::ostringstream stream;
+	offs_t result = internal_disasm_hmcs40(device, stream, pc, oprom, opram, options);
+	std::string stream_str = stream.str();
+	strcpy(buffer, stream_str.c_str());
+	return result;
 }
