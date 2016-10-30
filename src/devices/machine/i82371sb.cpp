@@ -5,7 +5,9 @@
 #include "i82371sb.h"
 #include "cpu/i386/i386.h"
 #include "bus/pc_kbd/keyboards.h"
-
+// VGA-HACK
+#include "video/pc_vga.h"
+// end-VGA-HACK
 const device_type I82371SB_ISA = &device_creator<i82371sb_isa_device>;
 
 DEVICE_ADDRESS_MAP_START(config_map, 32, i82371sb_isa_device)
@@ -38,7 +40,13 @@ DEVICE_ADDRESS_MAP_START(internal_io_map, 32, i82371sb_isa_device)
 	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r, at_page8_w, 0xffffffff);
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_slave", pic8259_device, read, write, 0xffffffff)
 	AM_RANGE(0x00c0, 0x00df) AM_READWRITE8(at_dma8237_2_r, at_dma8237_2_w, 0xffffffff);	
-	AM_RANGE(0x00ec, 0x00ef) AM_WRITE8     (nop_w,                     0x0000ff00) // Non-existing, used for delays by the bios/os
+	AM_RANGE(0x00e0, 0x00ef) AM_NOP
+
+	// VGA-HACK
+	AM_RANGE(0x3b0, 0x3bf) AM_DEVREADWRITE8("vga",vga_device,port_03b0_r, port_03b0_w, 0xffffffff);
+	AM_RANGE(0x3c0, 0x3cf) AM_DEVREADWRITE8("vga",vga_device,port_03c0_r, port_03c0_w, 0xffffffff);
+	AM_RANGE(0x3d0, 0x3df) AM_DEVREADWRITE8("vga",vga_device,port_03d0_r, port_03d0_w, 0xffffffff);
+	// end-VGA-HACK
 ADDRESS_MAP_END
 
 static MACHINE_CONFIG_FRAGMENT( southbridge )
@@ -138,6 +146,9 @@ static MACHINE_CONFIG_FRAGMENT( southbridge )
 //	MCFG_ISA16_SLOT_ADD("isabus","board1", pc_isa_onboard, "fdcsmc", true)
 //	MCFG_ISA16_SLOT_ADD("isabus","board2", pc_isa_onboard, "comat", true)
 //	MCFG_ISA16_SLOT_ADD("isabus","board3", pc_isa_onboard, "lpt", true)
+	// VGA-HACK
+	MCFG_FRAGMENT_ADD( pcvideo_vga );
+	// end-VGA-HACK
 MACHINE_CONFIG_END
 
 //-------------------------------------------------
@@ -166,6 +177,9 @@ i82371sb_isa_device::i82371sb_isa_device(const machine_config &mconfig, const ch
 	m_ds12885(*this, "rtc"),
 	m_pc_kbdc(*this, "pc_kbdc")
 	, m_at_spkrdata(0), m_pit_out2(0), m_dma_channel(0), m_cur_eop(false), m_dma_high_byte(0), m_at_speaker(0), m_refresh(false), m_channel_check(0), m_nmi_enabled(0)
+	// VGA-HACK	
+	,m_vga_region(*this, ":ibm_vga")
+	// end-VGA-HACK
 {
 }
 
@@ -413,7 +427,11 @@ void i82371sb_isa_device::map_extra(uint64_t memory_window_start, uint64_t memor
 {
 	map_bios(memory_space, 0xfffc0000, 0xffffffff);
 	map_bios(memory_space, 0x000e0000, 0x000fffff);
-
+    // VGA-HACK
+	vga_device *m_vga = subdevice<vga_device>("vga");
+	memory_space->install_rom(0x000c0000, 0x000c7fff, m_vga_region->base());
+	memory_space->install_readwrite_handler(0xa0000,0xbffff,read8_delegate(FUNC(vga_device::mem_r),m_vga),write8_delegate(FUNC(vga_device::mem_w),m_vga),0xffffffff);
+	// end-VGA-HACK
 	io_space->install_device(0, 0xffff, *this, &i82371sb_isa_device::internal_io_map);
 
 #if 0

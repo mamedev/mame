@@ -174,7 +174,8 @@ private:
 	uint8_t m_nmi_enabled;
 
 	void pc_select_dma_channel(int channel, bool state);
-	
+	// VGA-HACK
+	optional_memory_region m_vga_region;
 };
 
 extern const device_type I82371SB_ISA;

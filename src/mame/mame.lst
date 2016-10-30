@@ -29647,6 +29647,7 @@ pcfxga                          // PC-FX NEC 199? (PC-FX on a PC ISA Card)
 
 @source:pcipc.cpp
 pcipc                           //
+pcipctx                         //
 
 @source:pcktgal.cpp
 pcktgal                         // (c) 1987 Data East Corporation (Japan)
