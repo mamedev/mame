@@ -167,6 +167,11 @@ const opcodeinfo *m6x09_disassembler_base::fetch_opcode(const uint8_t *oprom, in
 			break;
 		}
 	};
+
+	// is this an HD6309 exclusive instruction, and we're not HD6309?  if so, reject it
+	if (op && (op->level() > m_level))
+		op = nullptr;
+
 	return op;
 }
 
