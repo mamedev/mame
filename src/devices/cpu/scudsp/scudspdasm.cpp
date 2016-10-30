@@ -237,12 +237,11 @@ static void scudsp_dasm_prefix( const char* format, char* buffer, uint32_t *data
 }
 
 
-CPU_DISASSEMBLE( scudsp )
+static offs_t internal_disasm_scudsp(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
 {
 	uint32_t op = oprom[0]<<24|oprom[1]<<16|oprom[2]<<8|oprom[3]<<0;
 	unsigned size = 1;
 //  const char *sym, *sym2;
-	char *my_buffer = buffer;
 	char temp_buffer[64];
 	uint32_t data[4];
 
@@ -251,13 +250,12 @@ CPU_DISASSEMBLE( scudsp )
 		case 0:
 			if ( (op & 0x3F8E3000) == 0 )
 			{
-				sprintf( buffer, "%-10s", "NOP" );
+				util::stream_format(stream, "%-10s", "NOP");
 				break;
 			}
 
 			/* ALU */
-			sprintf(my_buffer, "%s", ALU_Commands[ (op & 0x3c000000) >> 26] );
-			my_buffer += strlen( my_buffer );
+			util::stream_format(stream, "%s", ALU_Commands[ (op & 0x3c000000) >> 26]);
 
 			/* X-Bus */
 			data[0] = (op & 0x700000) >> 20;
@@ -269,12 +267,10 @@ CPU_DISASSEMBLE( scudsp )
 			{
 				*temp_buffer = 0;
 			}
-			sprintf( my_buffer, "%s", temp_buffer );
-			my_buffer += strlen( my_buffer );
+			util::stream_format(stream, "%s", temp_buffer);
 
 			scudsp_dasm_prefix( X_Commands[ (op & 0x1800000) >> 23 ], temp_buffer,  data );
-			sprintf( my_buffer, "%s", temp_buffer );
-			my_buffer += strlen( my_buffer );
+			util::stream_format(stream, "%s", temp_buffer);
 
 			data[0] = (op & 0x1C000 ) >> 14 ;
 			if ( op & 0x80000 )
@@ -285,12 +281,10 @@ CPU_DISASSEMBLE( scudsp )
 			{
 				*temp_buffer = 0;
 			}
-			sprintf( my_buffer, "%s", temp_buffer );
-			my_buffer += strlen( my_buffer );
+			util::stream_format(stream, "%s", temp_buffer);
 
 			scudsp_dasm_prefix( Y_Commands[ (op & 0x60000) >> 17 ], temp_buffer,  data );
-			sprintf( my_buffer, "%s", temp_buffer );
-			my_buffer += strlen( my_buffer );
+			util::stream_format(stream, "%s", temp_buffer);
 
 			/* D1-Bus */
 			switch( (op & 0x3000) >> 12 )
@@ -305,8 +299,8 @@ CPU_DISASSEMBLE( scudsp )
 					break;
 			}
 
-			scudsp_dasm_prefix( D1_Commands[ (op & 0x3000) >> 12 ], temp_buffer, data );
-			sprintf( my_buffer, "%s", temp_buffer );
+			scudsp_dasm_prefix( D1_Commands[ (op & 0x3000) >> 12 ], temp_buffer, data);
+			util::stream_format(stream, "%s", temp_buffer);
 			break;
 		case 2:
 			if ( (op & 0x2000000) )
@@ -314,13 +308,15 @@ CPU_DISASSEMBLE( scudsp )
 				data[0] = op & 0x7FFFF;
 				data[1] = (op & 0x3C000000) >> 26;
 				data[2] = (op & 0x3F80000 ) >> 19;
-				scudsp_dasm_prefix( MVI_Command[1], buffer, data ); /* TODO: bad mem*/
+				scudsp_dasm_prefix( MVI_Command[1], temp_buffer, data); /* TODO: bad mem*/
+				stream << temp_buffer;
 			}
 			else
 			{
 				data[0] = op & 0x1FFFFFF;
 				data[1] = (op & 0x3C000000) >> 26;
-				scudsp_dasm_prefix( MVI_Command[0], buffer, data ); /* TODO: bad mem*/
+				scudsp_dasm_prefix( MVI_Command[0], temp_buffer, data ); /* TODO: bad mem*/
+				stream << temp_buffer;
 			}
 			break;
 		case 3:
@@ -331,34 +327,47 @@ CPU_DISASSEMBLE( scudsp )
 					data[1] = (op & 0x38000) >> 15; /* A */
 					data[2] = (op & 0x700) >> 8; /* Mem */
 					data[3] = (op & 0xff);
-					scudsp_dasm_prefix( DMA_Command[(op & 0x3000) >> 12], buffer, data );
+					scudsp_dasm_prefix( DMA_Command[(op & 0x3000) >> 12], temp_buffer, data );
+					stream << temp_buffer;
 					break;
 				case 1:
 					if ( op & 0x3F80000 )
 					{
 						data[0] = (op & 0x3F80000) >> 19;
 						data[1] = op & 0xff;
-						scudsp_dasm_prefix( JMP_Command[1], buffer, data );
+						scudsp_dasm_prefix( JMP_Command[1], temp_buffer, data );
+						stream << temp_buffer;
 					}
 					else
 					{
 						data[0] = op & 0xff;
-						scudsp_dasm_prefix( JMP_Command[0], buffer, data );
+						scudsp_dasm_prefix( JMP_Command[0], temp_buffer, data );
+						stream << temp_buffer;
 					}
 					break;
 				case 2:
-					sprintf(buffer, op & 0x8000000 ? "LPS" : "BTM");
+					stream << (op & 0x8000000 ? "LPS" : "BTM");
 					break;
 				case 3:
-					sprintf(buffer, op & 0x8000000 ? "ENDI" : "END");
+					stream << (op & 0x8000000 ? "ENDI" : "END");
 					break;
 			}
 			break;
 
 		default:
-			sprintf(buffer, "???");
+			stream << "???";
 			break;
 	}
 
 	return size;
+}
+
+
+CPU_DISASSEMBLE(scudsp)
+{
+	std::ostringstream stream;
+	offs_t result = internal_disasm_scudsp(device, stream, pc, oprom, opram, options);
+	std::string stream_str = stream.str();
+	strcpy(buffer, stream_str.c_str());
+	return result;
 }
