@@ -1514,14 +1514,14 @@ static offs_t internal_disasm_tlcs900(cpu_device *device, std::ostream &stream, 
 
 		case 0x01:  /* 0xC1 */
 			imm = oprom[ pos++ ];
-			imm = imm | ( oprom[ pos++ ] << 8);
+			imm = imm | (oprom[ pos++ ] << 8);
 			buf = string_format("0x%04x", imm);
 			break;
 
 		case 0x02:  /* 0xC2 */
 			imm = oprom[ pos++ ];
-			imm = imm | ( oprom[ pos++ ] << 8);
-			imm = imm | ( oprom[ pos++ ] << 16);
+			imm = imm | (oprom[ pos++ ] << 8);
+			imm = imm | (oprom[ pos++ ] << 16);
 			buf = string_format("0x%06x", imm);
 			break;
 
@@ -1536,7 +1536,7 @@ static offs_t internal_disasm_tlcs900(cpu_device *device, std::ostream &stream, 
 			case 0x01:
 				op = imm;
 				imm = oprom[ pos++ ];
-				imm = imm | ( oprom[ pos++ ] << 8);
+				imm = imm | (oprom[ pos++ ] << 8);
 				buf = string_format("%s+0x%04x", s_allreg32[op], imm);
 				break;
 
@@ -1561,7 +1561,7 @@ static offs_t internal_disasm_tlcs900(cpu_device *device, std::ostream &stream, 
 
 				case 0x13:
 					imm = oprom[ pos++ ];
-					imm = imm | ( oprom[ pos++ ] << 8);
+					imm = imm | (oprom[ pos++ ] << 8);
 					buf = string_format("0x%06x", pc + pos + (int16_t)imm);
 					break;
 				}
@@ -1607,14 +1607,14 @@ static offs_t internal_disasm_tlcs900(cpu_device *device, std::ostream &stream, 
 
 		case 0x01:  /* 0xD1 */
 			imm = oprom[ pos++ ];
-			imm = imm | ( oprom[ pos++ ] << 8);
+			imm = imm | (oprom[ pos++ ] << 8);
 			buf = string_format("0x%04x", imm);
 			break;
 
 		case 0x02:  /* 0xD2 */
 			imm = oprom[ pos++ ];
-			imm = imm | ( oprom[ pos++ ] << 8);
-			imm = imm | ( oprom[ pos++ ] << 16);
+			imm = imm | (oprom[ pos++ ] << 8);
+			imm = imm | (oprom[ pos++ ] << 16);
 			buf = string_format("0x%06x", imm);
 			break;
 
@@ -1629,7 +1629,7 @@ static offs_t internal_disasm_tlcs900(cpu_device *device, std::ostream &stream, 
 			case 0x01:
 				op = imm;
 				imm = oprom[ pos++ ];
-				imm = imm | ( oprom[ pos++ ] << 8);
+				imm = imm | (oprom[ pos++ ] << 8);
 				buf = string_format("%s+0x%04x", s_allreg32[op], imm);
 				break;
 
@@ -1654,7 +1654,7 @@ static offs_t internal_disasm_tlcs900(cpu_device *device, std::ostream &stream, 
 
 				case 0x13:
 					imm = oprom[ pos++ ];
-					imm = imm | ( oprom[ pos++ ] << 8);
+					imm = imm | (oprom[ pos++ ] << 8);
 					buf = string_format("0x%06x", pc + pos + (int16_t)imm);
 					break;
 				}
@@ -1701,14 +1701,14 @@ static offs_t internal_disasm_tlcs900(cpu_device *device, std::ostream &stream, 
 
 		case 0x01:  /* 0xE1 */
 			imm = oprom[ pos++ ];
-			imm = imm | ( oprom[ pos++ ] << 8);
+			imm = imm | (oprom[ pos++ ] << 8);
 			buf = string_format("0x%04x", imm);
 			break;
 
 		case 0x02:  /* 0xE2 */
 			imm = oprom[ pos++ ];
-			imm = imm | ( oprom[ pos++ ] << 8);
-			imm = imm | ( oprom[ pos++ ] << 16);
+			imm = imm | (oprom[ pos++ ] << 8);
+			imm = imm | (oprom[ pos++ ] << 16);
 			buf = string_format("0x%06x", imm);
 			break;
 
@@ -1723,7 +1723,7 @@ static offs_t internal_disasm_tlcs900(cpu_device *device, std::ostream &stream, 
 			case 0x01:
 				op = imm;
 				imm = oprom[ pos++ ];
-				imm = imm | ( oprom[ pos++ ] << 8);
+				imm = imm | (oprom[ pos++ ] << 8);
 				buf = string_format("%s+0x%04x", s_allreg32[op], imm);
 				break;
 
@@ -1748,7 +1748,7 @@ static offs_t internal_disasm_tlcs900(cpu_device *device, std::ostream &stream, 
 
 				case 0x13:
 					imm = oprom[ pos++ ];
-					imm = imm | ( oprom[ pos++ ] << 8);
+					imm = imm | (oprom[ pos++ ] << 8);
 					buf = string_format("0x%06x", pc + pos + (int16_t)imm);
 					break;
 				}
@@ -1794,14 +1794,14 @@ static offs_t internal_disasm_tlcs900(cpu_device *device, std::ostream &stream, 
 
 		case 0x01:  /* 0xF1 */
 			imm = oprom[ pos++ ];
-			imm = imm | ( oprom[ pos++ ] << 8);
+			imm = imm | (oprom[ pos++ ] << 8);
 			buf = string_format("0x%04x", imm);
 			break;
 
 		case 0x02:  /* 0xF2 */
 			imm = oprom[ pos++ ];
-			imm = imm | ( oprom[ pos++ ] << 8);
-			imm = imm | ( oprom[ pos++ ] << 16);
+			imm = imm | (oprom[ pos++ ] << 8);
+			imm = imm | (oprom[ pos++ ] << 16);
 			buf = string_format("0x%06x", imm);
 			break;
 
@@ -1816,7 +1816,7 @@ static offs_t internal_disasm_tlcs900(cpu_device *device, std::ostream &stream, 
 			case 0x01:
 				op = imm;
 				imm = oprom[ pos++ ];
-				imm = imm | ( oprom[ pos++ ] << 8);
+				imm = imm | (oprom[ pos++ ] << 8);
 				buf = string_format("%s+0x%04x", s_allreg32[op], imm);
 				break;
 
@@ -1841,7 +1841,7 @@ static offs_t internal_disasm_tlcs900(cpu_device *device, std::ostream &stream, 
 
 				case 0x13:
 					imm = oprom[ pos++ ];
-					imm = imm | ( oprom[ pos++ ] << 8);
+					imm = imm | (oprom[ pos++ ] << 8);
 					buf = string_format("0x%06x", pc + pos + (int16_t)imm);
 					break;
 				}
@@ -1996,7 +1996,7 @@ static offs_t internal_disasm_tlcs900(cpu_device *device, std::ostream &stream, 
 
 	case O_D16:
 		imm = oprom[ pos++ ];
-		imm = imm | ( oprom[ pos++ ] << 8);
+		imm = imm | (oprom[ pos++ ] << 8);
 		util::stream_format(stream, " 0x%06x", ( pc + pos + (int16_t)imm ) & 0xFFFFFF);
 		break;
 
@@ -2015,22 +2015,22 @@ static offs_t internal_disasm_tlcs900(cpu_device *device, std::ostream &stream, 
 
 	case O_I16:
 		imm = oprom[ pos++ ];
-		imm = imm | ( oprom[ pos++ ] << 8);
+		imm = imm | (oprom[ pos++ ] << 8);
 		util::stream_format(stream, " 0x%04x", imm);
 		break;
 
 	case O_I24:
 		imm = oprom[ pos++ ];
-		imm = imm | ( oprom[ pos++ ] << 8);
-		imm = imm | ( oprom[ pos++ ] << 16);
+		imm = imm | (oprom[ pos++ ] << 8);
+		imm = imm | (oprom[ pos++ ] << 16);
 		util::stream_format(stream, " 0x%06x", imm);
 		break;
 
 	case O_I32:
 		imm = oprom[ pos++ ];
-		imm = imm | ( oprom[ pos++ ] << 8);
-		imm = imm | ( oprom[ pos++ ] << 16);
-		imm = imm | ( oprom[ pos++ ] << 24);
+		imm = imm | (oprom[ pos++ ] << 8);
+		imm = imm | (oprom[ pos++ ] << 16);
+		imm = imm | (oprom[ pos++ ] << 24);
 		util::stream_format(stream, "0x%08x", imm);
 		break;
 
@@ -2055,7 +2055,7 @@ static offs_t internal_disasm_tlcs900(cpu_device *device, std::ostream &stream, 
 
 	case O_M16:
 		imm = oprom[ pos++ ];
-		imm = imm | ( oprom[ pos++ ] << 8);
+		imm = imm | (oprom[ pos++ ] << 8);
 		util::stream_format(stream, " (0x%04x)", imm);
 		break;
 
@@ -2182,7 +2182,7 @@ static offs_t internal_disasm_tlcs900(cpu_device *device, std::ostream &stream, 
 
 	case O_D16:
 		imm = oprom[ pos++ ];
-		imm = imm | ( oprom[ pos++ ] << 8);
+		imm = imm | (oprom[ pos++ ] << 8);
 		util::stream_format(stream, ",0x%06x", ( pc + pos + (int16_t)imm ) & 0xFFFFFF);
 		break;
 
@@ -2201,22 +2201,22 @@ static offs_t internal_disasm_tlcs900(cpu_device *device, std::ostream &stream, 
 
 	case O_I16:
 		imm = oprom[ pos++ ];
-		imm = imm | ( oprom[ pos++ ] << 8);
+		imm = imm | (oprom[ pos++ ] << 8);
 		util::stream_format(stream, ",0x%04x", imm);
 		break;
 
 	case O_I24:
 		imm = oprom[ pos++ ];
-		imm = imm | ( oprom[ pos++ ] << 8);
-		imm = imm | ( oprom[ pos++ ] << 16);
+		imm = imm | (oprom[ pos++ ] << 8);
+		imm = imm | (oprom[ pos++ ] << 16);
 		util::stream_format(stream, ",0x%06x", imm);
 		break;
 
 	case O_I32:
 		imm = oprom[ pos++ ];
-		imm = imm | ( oprom[ pos++ ] << 8);
-		imm = imm | ( oprom[ pos++ ] << 16);
-		imm = imm | ( oprom[ pos++ ] << 24);
+		imm = imm | (oprom[ pos++ ] << 8);
+		imm = imm | (oprom[ pos++ ] << 16);
+		imm = imm | (oprom[ pos++ ] << 24);
 		util::stream_format(stream, ",0x%08x", imm);
 		break;
 
@@ -2241,7 +2241,7 @@ static offs_t internal_disasm_tlcs900(cpu_device *device, std::ostream &stream, 
 
 	case O_M16:
 		imm = oprom[ pos++ ];
-		imm = imm | ( oprom[ pos++ ] << 8);
+		imm = imm | (oprom[ pos++ ] << 8);
 		util::stream_format(stream, ",(0x%04x)", imm);
 		break;
 
