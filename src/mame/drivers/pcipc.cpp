@@ -115,6 +115,7 @@ const pcipc_state::boot_state_info pcipc_state::boot_state_infos[] = {
 	{ 0x64, "Jump to UserPatch1." },
 	{ 0x66, "Configure advanced cache registers." },
 	{ 0x68, "Enable external and CPU caches." },
+	{ 0x69, "Initialize SMI handler."},
 	{ 0x6A, "Display external cache size." },
 	{ 0x6C, "Display shadow message." },
 	{ 0x6E, "Display non-disposable segments." },
