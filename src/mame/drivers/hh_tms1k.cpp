@@ -155,6 +155,7 @@
 #include "einvader.lh" // test-layout(but still playable)
 #include "elecbowl.lh"
 #include "elecdet.lh"
+#include "esbattle.lh"
 #include "esoccer.lh"
 #include "fxmcr165.lh" // clickable
 #include "gjackpot.lh"
@@ -2561,16 +2562,16 @@ MACHINE_CONFIG_END
 
   led translation table: led zz from game PCB = MAME y.x:
 
-    00 = -     10 = 1.1   20 = 2.3   30 = 5.2
-    01 = 0.0   11 = 1.2   21 = 3.0   31 = 5.3
-    02 = 0.1   12 = 1.3   22 = 3.1   32 = 6.0
-    03 = 0.2   13 = 1.4   23 = 3.2   33 = 6.1
-    04 = 0.3   14 = 1.5   24 = 3.3   34 = 7.2
-    05 = 0.4   15 = 1.6   25 = 4.0   35 = 7.0
-    06 = 0.5   16 = 1.7   26 = 4.1   36 = 7.1
-    07 = 0.6   17 = 2.0   27 = 4.2
-    08 = 0.7   18 = 2.1   28 = 5.0
-    09 = 1.0   19 = 2.2   29 = 5.1
+    0 = -     10 = 1.1   20 = 2.3   30 = 5.2
+    1 = 0.0   11 = 1.2   21 = 3.0   31 = 5.3
+    2 = 0.1   12 = 1.3   22 = 3.1   32 = 6.0
+    3 = 0.2   13 = 1.4   23 = 3.2   33 = 6.1
+    4 = 0.3   14 = 1.5   24 = 3.3   34 = 6.2
+    5 = 0.4   15 = 1.6   25 = 4.0   35 = 7.0
+    6 = 0.5   16 = 1.7   26 = 4.1   36 = 7.1
+    7 = 0.6   17 = 2.0   27 = 4.2
+    8 = 0.7   18 = 2.1   28 = 5.0
+    9 = 1.0   19 = 2.2   29 = 5.1
 
 ***************************************************************************/
 
@@ -2650,7 +2651,7 @@ static MACHINE_CONFIG_START( esbattle, esbattle_state )
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(esbattle_state, write_o))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_hh_tms1k_test)
+	MCFG_DEFAULT_LAYOUT(layout_esbattle)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
