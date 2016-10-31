@@ -11,22 +11,6 @@
 
 #include "imagedev/snapquik.h"
 
-void spectrum_setup_sna(running_machine &machine, uint8_t *snapdata, uint32_t snapsize);
-void spectrum_setup_z80(running_machine &machine, uint8_t *snapdata, uint32_t snapsize);
-void spectrum_setup_sp(running_machine &machine, uint8_t *snapdata, uint32_t snapsize);
-void spectrum_setup_ach(running_machine &machine, uint8_t *snapdata, uint32_t snapsize);
-void spectrum_setup_prg(running_machine &machine, uint8_t *snapdata, uint32_t snapsize);
-void spectrum_setup_plusd(running_machine &machine, uint8_t *snapdata, uint32_t snapsize);
-void spectrum_setup_sem(running_machine &machine, uint8_t *snapdata, uint32_t snapsize);
-void spectrum_setup_sit(running_machine &machine, uint8_t *snapdata, uint32_t snapsize);
-void spectrum_setup_zx(running_machine &machine, uint8_t *snapdata, uint32_t snapsize);
-void spectrum_setup_snp(running_machine &machine, uint8_t *snapdata, uint32_t snapsize);
-void spectrum_setup_snx(running_machine &machine, uint8_t *snapdata, uint32_t snapsize);
-void spectrum_setup_frz(running_machine &machine, uint8_t *snapdata, uint32_t snapsize);
-
-void spectrum_setup_scr(running_machine &machine, uint8_t *quickdata, uint32_t quicksize);
-void spectrum_setup_raw(running_machine &machine, uint8_t *quickdata, uint32_t quicksize);
-
 #define BASE_RAM      0x4000
 #define SPECTRUM_BANK 0x4000
 
