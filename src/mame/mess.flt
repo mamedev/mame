@@ -316,6 +316,7 @@ m5.cpp
 m6805evs.cpp
 m79152pc.cpp
 mac.cpp
+mac128.cpp
 macpci.cpp
 mbc200.cpp
 mbc55x.cpp
