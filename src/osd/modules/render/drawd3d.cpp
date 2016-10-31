@@ -2438,7 +2438,6 @@ void texture_info::set_data(const render_texinfo *texsource, uint32_t flags)
 #endif
 	{
 		int miny = 0 - m_yborderpix;
-		int tex_format = PRIMFLAG_GET_TEXFORMAT(flags);
 		int maxy = texsource->height + m_yborderpix;
 
 		for (int dsty = miny; dsty < maxy; dsty++)
