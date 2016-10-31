@@ -46,6 +46,7 @@ const device_type HP_NANOPROCESSOR = &device_creator<hp_nanoprocessor_device>;
 hp_nanoprocessor_device::hp_nanoprocessor_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	cpu_device(mconfig , HP_NANOPROCESSOR , "HP-Nanoprocessor" , tag , owner , clock , "nanoprocessor" , __FILE__),
 	m_dc_changed_func(*this),
+	m_read_dc_func(*this),
 	m_program_config("program" , ENDIANNESS_BIG , 8 , 11),
 	m_io_config("io" , ENDIANNESS_BIG , 8 , 4)
 {
@@ -91,6 +92,7 @@ void hp_nanoprocessor_device::device_start()
 	m_icountptr = &m_icount;
 
 	m_dc_changed_func.resolve_safe();
+	m_read_dc_func.resolve_safe(0xff);
 }
 
 void hp_nanoprocessor_device::device_reset()
@@ -354,8 +356,12 @@ void hp_nanoprocessor_device::execute_one(uint8_t opcode)
 
 		case 0x18:
 			// SFS
-			if (BIT(m_flags , NANO_DC0_BIT + (opcode & 7))) {
-				skip();
+			{
+				uint8_t tmp = m_read_dc_func();
+				tmp &= (uint8_t)(m_flags >> NANO_DC0_BIT);
+				if (BIT(tmp , opcode & 7)) {
+					skip();
+				}
 			}
 			break;
 
@@ -378,8 +384,12 @@ void hp_nanoprocessor_device::execute_one(uint8_t opcode)
 
 		case 0x38:
 			// SFZ
-			if (!BIT(m_flags , NANO_DC0_BIT + (opcode & 7))) {
-				skip();
+			{
+				uint8_t tmp = m_read_dc_func();
+				tmp &= (uint8_t)(m_flags >> NANO_DC0_BIT);
+				if (!BIT(tmp , opcode & 7)) {
+					skip();
+				}
 			}
 			break;
 

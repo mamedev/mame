@@ -21,12 +21,18 @@
 #define MCFG_HP_NANO_DC_CHANGED(_devcb)									\
 	hp_nanoprocessor_device::set_dc_changed_func(*device , DEVCB_##_devcb);
 
+// Callback to read the input state of DC lines
+// All lines that are not in input are to be reported at "1"
+#define MCFG_HP_NANO_READ_DC_CB(_devcb)									\
+	hp_nanoprocessor_device::set_read_dc_func(*device , DEVCB_##_devcb);
+
 class hp_nanoprocessor_device : public cpu_device
 {
 public:
 	hp_nanoprocessor_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_dc_changed_func(device_t &device, _Object object) { return downcast<hp_nanoprocessor_device &>(device).m_dc_changed_func.set_callback(object); }
+	template<class _Object> static devcb_base &set_read_dc_func(device_t &device, _Object object) { return downcast<hp_nanoprocessor_device &>(device).m_read_dc_func.set_callback(object); }
 
 	// device_t overrides
 	virtual void device_start() override;
@@ -56,6 +62,7 @@ public:
 
 private:
 	devcb_write8 m_dc_changed_func;
+	devcb_read8 m_read_dc_func;
 	int m_icount;
 
 	// State of processor
