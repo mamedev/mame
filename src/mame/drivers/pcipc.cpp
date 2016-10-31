@@ -278,6 +278,7 @@ WRITE8_MEMBER(pcipc_state::boot_state_award_w)
 
 static MACHINE_CONFIG_START(pcipc, pcipc_state)
 	MCFG_CPU_ADD("maincpu", PENTIUM, 90000000)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pci:07.0:pic8259_master", pic8259_device, inta_cb)
 
 	MCFG_PCI_ROOT_ADD(    ":pci")
 	MCFG_I82439HX_ADD(    ":pci:00.0", ":maincpu", 256*1024*1024)
@@ -289,7 +290,8 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START(pcipctx, pcipc_state)
 	MCFG_CPU_ADD("maincpu", PENTIUM, 60000000)
-
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pci:07.0:pic8259_master", pic8259_device, inta_cb)
+	
 	MCFG_PCI_ROOT_ADD(    ":pci")
 	MCFG_I82439TX_ADD(    ":pci:00.0", ":maincpu", 256*1024*1024)
 	MCFG_I82371SB_ISA_ADD(":pci:07.0")
