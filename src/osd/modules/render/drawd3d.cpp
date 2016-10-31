@@ -2429,11 +2429,13 @@ void texture_info::set_data(const render_texinfo *texsource, uint32_t flags)
 
 	// loop over Y
 	int tex_format = PRIMFLAG_GET_TEXFORMAT(flags);
+#if 0
 	if (tex_format == TEXFORMAT_ARGB32 && texsource->palette == nullptr && texsource->width == texsource->rowpixels && m_xborderpix == 0 && m_yborderpix == 0)
 	{
 		memcpy((BYTE *)rect.pBits, texsource->base, sizeof(uint32_t) * texsource->width * texsource->height);
 	}
 	else
+#endif
 	{
 		int miny = 0 - m_yborderpix;
 		int tex_format = PRIMFLAG_GET_TEXFORMAT(flags);
