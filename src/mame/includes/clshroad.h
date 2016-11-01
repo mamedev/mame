@@ -24,8 +24,8 @@ public:
 	required_shared_ptr<uint8_t> m_vram_1;
 	required_shared_ptr<uint8_t> m_vregs;
 
-	UINT8 m_main_irq_mask;
-	UINT8 m_sound_irq_mask;
+	uint8_t m_main_irq_mask;
+	uint8_t m_sound_irq_mask;
 
 	tilemap_t *m_tilemap_0a;
 	tilemap_t *m_tilemap_0b;
