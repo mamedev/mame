@@ -13,8 +13,6 @@
 
     TODO (specific issues only):
     - Sound is currently ugly in both games, recognizable but still nowhere near perfection
-    - ertictac: 'music' dip-sw makes the game to just hang, BGM doesn't play either for
-                whatever reason (should be triggered as soon as it executes the POST)
     - poizone: video timings are off, causing various glitches.
     - Does this Arcade conversion have I2C device? It seems unused afaik.
     - Need PCB for identify the exact model of AA, available RAM, what kind of i/o "podule"

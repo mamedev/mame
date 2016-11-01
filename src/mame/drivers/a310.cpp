@@ -19,12 +19,8 @@
  *
  *  TODO:
  *  - Make floppies to work;
- *  - Attempting to load the GUI gives an exception;
- *  - Graphics in GUI misses some vram data on the right edges (for example white vertical stripe on the far right), rmw bug related to the above?
- *   - Apparently same deal happens to Arthur OS, on a bunch of icons;
- *  - Hook up mouse in AAKART;
- *  - Add shifted version of keyboard inputs, necessary especially for loading programs thru Supervisor Mode;
- *  - try to understand why bios 2 was working at some point and now isn't
+ *  - RISC OS Alarm app crash the whole OS
+ *  - RISC OS Draw app uses unimplemented copro instructions
  *
  *
  *
