@@ -94,6 +94,16 @@ void sega_fm_unit_device::device_start()
 
 
 //-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void sega_fm_unit_device::device_reset()
+{
+	set_audio_control(0x00);
+}
+
+
+//-------------------------------------------------
 //  peripheral_r - fm unit read
 //-------------------------------------------------
 
@@ -125,21 +135,7 @@ WRITE8_MEMBER(sega_fm_unit_device::peripheral_w)
 			break;
 		case 2: // control port
 		case 3: // mirror
-			m_audio_control = data & 0x01;
-			if (m_audio_control == 0x01)
-			{
-				m_ym->set_output_gain(ALL_OUTPUTS, 1.0);
-				// assume the PSG output is muted when FM is active.
-				// Out Run need this. Needs confirmation (see TODO).
-				if (m_psg.found())
-					m_psg->set_output_gain(ALL_OUTPUTS, 0.0);
-			}
-			else
-			{
-				m_ym->set_output_gain(ALL_OUTPUTS, 0.0);
-				if (m_psg.found())
-					m_psg->set_output_gain(ALL_OUTPUTS, 1.0);
-			}
+			set_audio_control(data);
 			break;
 		default:
 			break;
@@ -157,3 +153,24 @@ bool sega_fm_unit_device::is_writeable(uint8_t offset)
 {
 	return (offset <= 3) ? true : false;
 }
+
+
+void sega_fm_unit_device::set_audio_control(uint8_t data)
+{
+	m_audio_control = data & 0x01;
+	if (m_audio_control == 0x01)
+	{
+		m_ym->set_output_gain(ALL_OUTPUTS, 1.0);
+		// assume the PSG output is muted when FM is active.
+		// Out Run need this. Needs confirmation (see TODO).
+		if (m_psg.found())
+			m_psg->set_output_gain(ALL_OUTPUTS, 0.0);
+	}
+	else
+	{
+		m_ym->set_output_gain(ALL_OUTPUTS, 0.0);
+		if (m_psg.found())
+			m_psg->set_output_gain(ALL_OUTPUTS, 1.0);
+	}
+}
+
