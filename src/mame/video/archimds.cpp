@@ -190,8 +190,9 @@ uint32_t archimedes_state::screen_update(screen_device &screen, bitmap_rgb32 &bi
 						uint8_t cursor_dot;
 						pen = m_cursor_vram[count];
 
-						res_x = x+xi+xstart;
-						res_y = (y+ystart)*(m_vidc_interlace+1);
+						// FIXME: cursor is a couple of pixels out of position
+						res_x = xstart + m_vidc_regs[VIDC_HCSR] - (m_vidc_regs[VIDC_HDSR] * 2 + x_step[3 - (m_vidc_bpp_mode & 3)]) + x+xi;
+						res_y = (m_vidc_regs[VIDC_VCSR] - m_vidc_regs[VIDC_VDSR] + ystart + y) * (m_vidc_interlace + 1);
 
 						cursor_dot = ((pen>>(xi*2))&0x3);
 

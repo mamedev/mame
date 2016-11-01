@@ -53,6 +53,8 @@ public:
 	DECLARE_READ8_MEMBER( read );
 	void send_keycode_down(uint8_t row, uint8_t col);
 	void send_keycode_up(uint8_t row, uint8_t col);
+	void send_mouse(uint8_t x, uint8_t y);
+
 protected:
 	// device-level overrides
 	virtual void device_validity_check(validity_checker &valid) const override;
@@ -79,10 +81,8 @@ private:
 	uint8_t m_status;
 	uint8_t m_mouse_enable;
 	uint8_t m_keyb_enable;
-	uint8_t m_keyb_row;
-	uint8_t m_keyb_col;
-	uint8_t m_keyb_state;
-
+	int m_queue_size;
+	uint16_t m_queue[0x10];
 };
 
 
