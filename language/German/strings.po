@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-08-29 01:56+1000\n"
-"PO-Revision-Date: 2016-10-26 06:07+0200\n"
+"PO-Revision-Date: 2016-11-01 10:38+0100\n"
 "Last-Translator: Lothar Serra Mari <rootfather@scummvm.org>\n"
 "Language-Team: MAME Language Team\n"
 "Language: de\n"
@@ -1668,7 +1668,7 @@ msgstr "Informationen über automatisches Audit"
 
 #: src/frontend/mame/ui/submenu.cpp:35
 msgid "Hide romless machine from available list"
-msgstr "Maschine ohne ROMs"
+msgstr "Machine ohne ROMs aus Liste der verfügbaren Maschinen ausblenden"
 
 #: src/frontend/mame/ui/submenu.cpp:39
 msgid "Advanced Options"
@@ -1680,7 +1680,7 @@ msgstr "Leistungs-Optionen"
 
 #: src/frontend/mame/ui/submenu.cpp:41
 msgid "Auto frame skip"
-msgstr "Bilder automatisch auslassen"
+msgstr "Bilder automatisch überspringen"
 
 #: src/frontend/mame/ui/submenu.cpp:42
 msgid "Frame skip"
@@ -1688,7 +1688,7 @@ msgstr "Bilder auslassen"
 
 #: src/frontend/mame/ui/submenu.cpp:43
 msgid "Throttle"
-msgstr "Begrenzung"
+msgstr "Drosselung"
 
 #: src/frontend/mame/ui/submenu.cpp:44
 msgid "Sleep"
@@ -1700,7 +1700,7 @@ msgstr "Geschwindigkeit"
 
 #: src/frontend/mame/ui/submenu.cpp:46
 msgid "Refresh speed"
-msgstr "Auffrisch-Geschwindigkeit"
+msgstr "Spielgeschwindigkeit anpassen"
 
 #: src/frontend/mame/ui/submenu.cpp:48
 msgid "Rotation Options"
@@ -1712,7 +1712,7 @@ msgstr "Drehen"
 
 #: src/frontend/mame/ui/submenu.cpp:50
 msgid "Rotate right"
-msgstr "Nach recht rotieren"
+msgstr "Nach rechts drehen"
 
 #: src/frontend/mame/ui/submenu.cpp:51
 msgid "Rotate left"
@@ -1728,11 +1728,11 @@ msgstr "Automatisch nach links rotieren"
 
 #: src/frontend/mame/ui/submenu.cpp:54
 msgid "Flip X"
-msgstr "X umkehren"
+msgstr "Horizontal spiegeln"
 
 #: src/frontend/mame/ui/submenu.cpp:55
 msgid "Flip Y"
-msgstr "Y umkehren"
+msgstr "Vertikal spiegeln"
 
 #: src/frontend/mame/ui/submenu.cpp:57
 msgid "Artwork Options"
@@ -1744,7 +1744,7 @@ msgstr "Illustrationen beschneiden"
 
 #: src/frontend/mame/ui/submenu.cpp:59
 msgid "Use Backdrops"
-msgstr "Hintergründe verwenden"
+msgstr "Verwende Hintergründe"
 
 #: src/frontend/mame/ui/submenu.cpp:60
 msgid "Use Overlays"
@@ -1760,7 +1760,7 @@ msgstr "Verwende Steuerungselemente"
 
 #: src/frontend/mame/ui/submenu.cpp:63
 msgid "Use Marquees"
-msgstr "Verwende Laufschriften"
+msgstr "Verwende Marquees"
 
 #: src/frontend/mame/ui/submenu.cpp:65
 msgid "State/Playback Options"
@@ -1776,7 +1776,7 @@ msgstr "Bilineare Bildschirmfotos"
 
 #: src/frontend/mame/ui/submenu.cpp:68
 msgid "Burn-in"
-msgstr "Einbrennen"
+msgstr "Bildschirm eingebrannt"
 
 #: src/frontend/mame/ui/submenu.cpp:70
 msgid "Input Options"
@@ -1800,7 +1800,7 @@ msgstr "Lichtpistole"
 
 #: src/frontend/mame/ui/submenu.cpp:75
 msgid "Multi-keyboard"
-msgstr "Mehrfach-Tastatur"
+msgstr "Mehrere Tastaturen"
 
 #: src/frontend/mame/ui/submenu.cpp:76
 msgid "Multi-mouse"
@@ -1840,7 +1840,7 @@ msgstr "Münz-Impuls"
 
 #: src/frontend/mame/ui/submenu.cpp:88
 msgid "Device Mapping"
-msgstr "Gerätezuordnung"
+msgstr "Geräte-Zuordnung"
 
 #: src/frontend/mame/ui/submenu.cpp:89
 msgid "Lightgun Device Assignment"
@@ -1884,7 +1884,7 @@ msgstr "Anzahl der Bildschirme"
 
 #: src/frontend/mame/ui/submenu.cpp:104
 msgid "Triple Buffering"
-msgstr "Dreifache Pufferung"
+msgstr "Dreifachpufferung"
 
 #: src/frontend/mame/ui/submenu.cpp:105
 msgid "HLSL"
