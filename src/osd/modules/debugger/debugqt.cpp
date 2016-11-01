@@ -21,6 +21,7 @@
 
 #include "emu.h"
 #include "config.h"
+#include "uiinput.h"
 #include "debugger.h"
 #include "modules/lib/osdobj_common.h"
 
@@ -51,6 +52,7 @@ public:
 
 	virtual void init_debugger(running_machine &machine);
 	virtual void wait_for_debugger(device_t &device, bool firststop);
+	virtual bool debugger_break();
 	virtual void debugger_update();
 #if defined(WIN32) && !defined(SDLMAME_WIN32)
 	virtual bool nativeEventFilter(const QByteArray &eventType, void *message, long *) Q_DECL_OVERRIDE;
@@ -352,6 +354,12 @@ void debug_qt::wait_for_debugger(device_t &device, bool firststop)
 #if defined(WIN32) && !defined(SDLMAME_WIN32)
 		winwindow_update_cursor_state(*m_machine); // make sure the cursor isn't hidden while in debugger
 #endif
+}
+
+
+bool debug_qt::debugger_break()
+{
+	return m_machine->ui_input().pressed(IPT_UI_DEBUG_BREAK);
 }
 
 

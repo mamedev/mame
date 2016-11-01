@@ -28,6 +28,7 @@ public:
 
 	virtual void init_debugger(running_machine &machine) override;
 	virtual void wait_for_debugger(device_t &device, bool firststop) override;
+	virtual bool debugger_break() override { return false; }
 	virtual void debugger_update() override;
 
 private:

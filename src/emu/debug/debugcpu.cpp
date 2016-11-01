@@ -16,7 +16,6 @@
 #include "express.h"
 #include "debugvw.h"
 #include "debugger.h"
-#include "uiinput.h"
 #include "xmlfile.h"
 #include "coreutil.h"
 #include <ctype.h>
@@ -1574,7 +1573,7 @@ void debugger_cpu::start_hook(device_t *device, bool stop_on_vblank)
 			}
 		}
 		// check for debug keypresses
-		if (m_machine.ui_input().pressed(IPT_UI_DEBUG_BREAK))
+		if (m_machine.osd().debugger_break())
 			m_visiblecpu->debug()->halt_on_next_instruction("User-initiated break\n");
 	}
 }

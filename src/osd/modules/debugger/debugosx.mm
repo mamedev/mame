@@ -19,6 +19,7 @@
 // MAME headers
 #include "emu.h"
 #include "debugger.h"
+#include "uiinput.h"
 
 // MAMEOS headers
 #include "modules/lib/osdobj_common.h"
@@ -57,6 +58,7 @@ public:
 
 	virtual void init_debugger(running_machine &machine);
 	virtual void wait_for_debugger(device_t &device, bool firststop);
+	virtual bool debugger_break();
 	virtual void debugger_update();
 
 private:
@@ -235,6 +237,16 @@ void debugger_osx::wait_for_debugger(device_t &device, bool firststop)
 		[NSApp sendEvent:ev];
 
 	[pool release];
+}
+
+
+//============================================================
+//  debugger_break
+//============================================================
+
+bool debugger_osx::debugger_break()
+{
+	return m_machine->ui_input().pressed(IPT_UI_DEBUG_BREAK);
 }
 
 
