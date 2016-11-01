@@ -58,7 +58,7 @@ public:
 	void on_frame_done();
 
 	template<typename T, typename U>
-	bool call_plugin(const std::string &name, T in, U& out)
+	bool call_plugin(const std::string &name, const T in, U &out)
 	{
 		bool ret = false;
 		sol::object outobj = call_plugin(name, sol::make_object(sol(), in));
@@ -71,17 +71,43 @@ public:
 	}
 
 	template<typename T, typename U>
-	bool call_plugin_check(const std::string &name, U in)
+	bool call_plugin(const std::string &name, const T in, std::vector<U> &out)
+	{
+		bool ret = false;
+		sol::object outobj = call_plugin(name, sol::make_object(sol(), in));
+		if(outobj.is<sol::table>())
+		{
+			for(auto &entry : outobj.as<sol::table>())
+			{
+				if(entry.second.template is<U>())
+				{
+					out.push_back(entry.second.template as<U>());
+					ret = true;
+				}
+			}
+		}
+		return ret;
+	}
+
+	// this will also check if a returned table contains type T
+	template<typename T, typename U>
+	bool call_plugin_check(const std::string &name, const U in)
 	{
 		bool ret = false;
 		sol::object outobj = call_plugin(name, sol::make_object(sol(), in));
 		if(outobj.is<T>())
 			ret = true;
+		else if(outobj.is<sol::table>())
+		{
+			// check just one entry, checking the whole thing shouldn't be necessary as this only supports homogeneous tables
+			if(outobj.as<sol::table>().begin().operator*().second.template is<T>())
+				ret = true;
+		}
 		return ret;
 	}
 
 	template<typename T>
-	void call_plugin_set(const std::string &name, T in)
+	void call_plugin_set(const std::string &name, const T in)
 	{
 		call_plugin(name, sol::make_object(sol(), in));
 	}

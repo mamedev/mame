@@ -45,19 +45,16 @@ menu_dats_view::menu_dats_view(mame_ui_manager &mui, render_container &container
 			m_parent = image.software_entry()->parentname();
 		}
 	}
-	std::string lua_list;
+	std::vector<std::string> lua_list;
 	if(mame_machine_manager::instance()->lua()->call_plugin("data_list", driver ? driver->name : "", lua_list))
 	{
-		std::string list(lua_list);
-		char *token = strtok((char *)list.c_str(), ",");
 		int count = 0;
-		while(token)
+		for(std::string &item : lua_list)
 		{
-			std::string item;
-			mame_machine_manager::instance()->lua()->call_plugin("data_version", util::string_format("%d", count).c_str(), item);
-			m_items_list.emplace_back(_(token), count, item);
+			std::string version;
+			mame_machine_manager::instance()->lua()->call_plugin("data_version", count, version);
+			m_items_list.emplace_back(_(item.c_str()), count, std::move(version));
 			count++;
-			token = strtok(nullptr, ",");
 		}
 	}
 }
@@ -80,19 +77,16 @@ menu_dats_view::menu_dats_view(mame_ui_manager &mui, render_container &container
 {
 	if (swinfo != nullptr && !swinfo->usage.empty())
 		m_items_list.emplace_back(_("Software Usage"), 0, "");
-	std::string lua_list;
+	std::vector<std::string> lua_list;
 	if(mame_machine_manager::instance()->lua()->call_plugin("data_list", std::string(m_short).append(1, ',').append(m_list).c_str(), lua_list))
 	{
-		std::string list(lua_list);
-		char *token = strtok((char *)list.c_str(), ",");
 		int count = 1;
-		while(token)
+		for(std::string &item : lua_list)
 		{
-			std::string item;
-			mame_machine_manager::instance()->lua()->call_plugin("data_version", util::string_format("%d", count - 1).c_str(), item);
-			m_items_list.emplace_back(_(token), count, item);
+			std::string version;
+			mame_machine_manager::instance()->lua()->call_plugin("data_version", count - 1, version);
+			m_items_list.emplace_back(_(item.c_str()), count, std::move(version));
 			count++;
-			token = strtok(nullptr, ",");
 		}
 	}
 }
@@ -395,7 +389,7 @@ void menu_dats_view::get_data()
 {
 	std::vector<int> xstart, xend;
 	std::string buffer;
-	mame_machine_manager::instance()->lua()->call_plugin("data", util::string_format("%d", m_items_list[m_actual].option).c_str(), buffer);
+	mame_machine_manager::instance()->lua()->call_plugin("data", m_items_list[m_actual].option, buffer);
 
 
 	auto lines = ui().wrap_text(container(), buffer.c_str(), 0.0f, 0.0f, 1.0f - (4.0f * UI_BOX_LR_BORDER), xstart, xend);
@@ -414,7 +408,7 @@ void menu_dats_view::get_data_sw()
 	if (m_items_list[m_actual].option == 0)
 		buffer = m_swinfo->usage;
 	else
-		mame_machine_manager::instance()->lua()->call_plugin("data", util::string_format("data", "%d", m_items_list[m_actual].option - 1).c_str(), buffer);
+		mame_machine_manager::instance()->lua()->call_plugin("data", m_items_list[m_actual].option - 1, buffer);
 
 	auto lines = ui().wrap_text(container(), buffer.c_str(), 0.0f, 0.0f, 1.0f - (4.0f * UI_BOX_LR_BORDER), xstart, xend);
 	for (int x = 0; x < lines; ++x)

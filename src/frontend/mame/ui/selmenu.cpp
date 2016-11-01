@@ -1911,21 +1911,10 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 				m_info_view = 0;
 				m_info_software = software;
 				ui_globals::cur_sw_dats_view = 0;
-				ui_globals::cur_sw_dats_total = 1;
 
-				std::string lua_list;
-				mame_machine_manager::instance()->lua()->call_plugin("data_list", std::string(software->shortname).append(1, ',').append(software->listname).c_str(), lua_list);
 				m_items_list.clear();
-				if(lua_list.length())
-				{
-					char *token = strtok((char *)lua_list.c_str(), ",");
-					while(token)
-					{
-						ui_globals::cur_sw_dats_total++;
-						m_items_list.emplace_back(token);
-						token = strtok(nullptr, ",");
-					}
-				}
+				mame_machine_manager::instance()->lua()->call_plugin("data_list", std::string(software->shortname).append(1, ',').append(software->listname).c_str(), m_items_list);
+				ui_globals::cur_sw_dats_total = m_items_list.size() + 1;
 			}
 
 			if (m_info_view == 0)
@@ -1933,7 +1922,7 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 			else
 			{
 				m_info_buffer = "";
-				mame_machine_manager::instance()->lua()->call_plugin("data", util::string_format("%d", m_info_view - 1).c_str(), m_info_buffer);
+				mame_machine_manager::instance()->lua()->call_plugin("data", m_info_view - 1, m_info_buffer);
 			}
 		}
 		total = ui_globals::cur_sw_dats_total;
@@ -1955,21 +1944,10 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 				m_info_driver = driver;
 				m_info_view = 0;
 				ui_globals::curdats_view = 0;
-				ui_globals::curdats_total = 1;
 
-				std::string lua_list;
-				mame_machine_manager::instance()->lua()->call_plugin("data_list", driver->name, lua_list);
 				m_items_list.clear();
-				if(lua_list.length())
-				{
-					char *token = strtok((char *)lua_list.c_str(), ",");
-					while(token)
-					{
-						ui_globals::curdats_total++;
-						m_items_list.emplace_back(token);
-						token = strtok(nullptr, ",");
-					}
-				}
+				mame_machine_manager::instance()->lua()->call_plugin("data_list", driver->name, m_items_list);
+				ui_globals::curdats_total = m_items_list.size() + 1;
 			}
 
 			if (m_info_view == 0)
@@ -1977,7 +1955,7 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 			else
 			{
 				m_info_buffer = "";
-				mame_machine_manager::instance()->lua()->call_plugin("data", util::string_format("%d", m_info_view - 1).c_str(), m_info_buffer);
+				mame_machine_manager::instance()->lua()->call_plugin("data", m_info_view - 1, m_info_buffer);
 			}
 		}
 		total = ui_globals::curdats_total;
