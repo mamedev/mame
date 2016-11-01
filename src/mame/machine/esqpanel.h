@@ -9,6 +9,8 @@
 #include "machine/esqvfd.h"
 #include "machine/esqlcd.h"
 
+#include <vector>
+
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
@@ -29,6 +31,15 @@
 	MCFG_DEVICE_REPLACE(_tag, ESQPANEL2x40, 0)
 
 #define MCFG_ESQPANEL_2x40_REMOVE(_tag) \
+	MCFG_DEVICE_REMOVE(_tag)
+
+#define MCFG_ESQPANEL2x40_VFX_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, ESQPANEL2x40_VFX, 0)
+
+#define MCFG_ESQPANEL2x40_VFX_REPLACE(_tag) \
+	MCFG_DEVICE_REPLACE(_tag, ESQPANEL2x40_VFX, 0)
+
+#define MCFG_ESQPANEL_2x40_VFX_REMOVE(_tag) \
 	MCFG_DEVICE_REMOVE(_tag)
 
 #define MCFG_ESQPANEL2x16_SQ1_ADD(_tag) \
@@ -52,6 +63,8 @@
 
 // ======================> esqpanel_device
 
+class esqpanel_external_panel_server;
+
 class esqpanel_device :  public device_t, public device_serial_interface
 {
 public:
@@ -70,6 +83,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_stop() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// serial overrides
@@ -77,7 +91,17 @@ protected:
 	virtual void tra_complete() override;    // Tx completed sending byte
 	virtual void tra_callback() override;    // Tx send bit
 
+	void check_external_panel_server();
+
+	virtual bool write_front_panel_html(std::ostream &o) const { return false; }
+	virtual bool write_front_panel_js(std::ostream &o) const { return false; }
+	virtual bool write_contents(std::ostream &o) { return false; }
+
+	std::vector<uint8_t> m_light_states;
+
 	bool m_eps_mode;
+
+	esqpanel_external_panel_server *m_external_panel_server;
 
 private:
 	static const int XMIT_RING_SIZE = 16;
@@ -90,6 +114,8 @@ private:
 	uint8_t m_xmitring[XMIT_RING_SIZE];
 	int m_xmit_read, m_xmit_write;
 	bool m_tx_busy;
+
+	emu_timer *m_external_timer;
 };
 
 class esqpanel1x22_device : public esqpanel_device {
@@ -118,6 +144,26 @@ protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 private:
+};
+
+class esqpanel2x40_vfx_device : public esqpanel_device {
+public:
+	esqpanel2x40_vfx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	required_device<esq2x40_t> m_vfd;
+
+	virtual void send_to_display(uint8_t data) override { m_vfd->write_char(data); }
+
+protected:
+	virtual machine_config_constructor device_mconfig_additions() const override;
+
+	virtual bool write_front_panel_html(std::ostream &o) const override;
+	virtual bool write_front_panel_js(std::ostream &o) const override;
+	virtual bool write_contents(std::ostream &o) override;
+
+private:
+	static const char *html;
+	static const char *js;
 };
 
 class esqpanel2x40_sq1_device : public esqpanel_device {
@@ -151,6 +197,7 @@ private:
 
 extern const device_type ESQPANEL1x22;
 extern const device_type ESQPANEL2x40;
+extern const device_type ESQPANEL2x40_VFX;
 extern const device_type ESQPANEL2x16_SQ1;
 
 #endif

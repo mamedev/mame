@@ -1079,6 +1079,8 @@ function createMESSProjects(_target, _subtarget, _name)
 		MAME_DIR .. "src/lib/util",
 		MAME_DIR .. "src/lib/netlist",
 		MAME_DIR .. "3rdparty",
+		MAME_DIR .. "3rdparty/asio/include",
+		MAME_DIR .. "3rdparty/websocketpp",
 		GEN_DIR  .. "mess/layout",
 		GEN_DIR  .. "mame/layout",
 	}
