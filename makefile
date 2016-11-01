@@ -1425,7 +1425,7 @@ clean: genieclean
 	$(SILENT) $(MAKE) -C $(SRC)/devices/cpu/m68000 clean
 	-@rm -rf 3rdparty/bgfx/.build
 
-GEN_FOLDERS := $(GENDIR)/$(TARGET)/layout/ $(GENDIR)/$(TARGET)/$(SUBTARGET_FULL)/ $(GENDIR)/mame/drivers/
+GEN_FOLDERS := $(GENDIR)/$(TARGET)/layout/ $(GENDIR)/$(TARGET)/$(SUBTARGET_FULL)/ $(GENDIR)/mame/drivers/ $(GENDIR)/mame/machine/
 
 rwildcard=$(foreach d,$(wildcard $1*),$(call rwildcard,$d/,$2) $(filter $(subst *,%,$2),$d))
 LAYOUTS=$(wildcard $(SRC)/$(TARGET)/layout/*.lay)
@@ -1451,7 +1451,9 @@ generate: \
 		$(patsubst $(SRC)/%.lay,$(GENDIR)/%.lh,$(LAYOUTS)) \
 		$(GENDIR)/mame/drivers/ymmu100.hxx \
 		$(SRC)/devices/cpu/m68000/m68kops.cpp \
-		$(GENDIR)/includes/SDL2
+		$(GENDIR)/includes/SDL2 \
+		$(GENDIR)/mame/machine/esqpanel_vfx_html.h \
+		$(GENDIR)/mame/machine/esqpanel_vfx_js.h
 
 $(GENDIR)/includes/SDL2:
 	-$(call MKDIR,$@)
@@ -1490,6 +1492,14 @@ $(GENDIR)/%.lh: $(SRC)/%.lay scripts/build/complay.py | $(GEN_FOLDERS)
 $(GENDIR)/mame/drivers/ymmu100.hxx: $(SRC)/mame/drivers/ymmu100.ppm scripts/build/file2str.py
 	@echo Converting $<...
 	$(SILENT)$(PYTHON) scripts/build/file2str.py $< $@ ymmu100_bkg uint8_t
+
+$(GENDIR)/mame/machine/esqpanel_vfx_html.h: $(SRC)/mame/machine/esqpanel_vfx.html scripts/build/txt2str.py
+	@echo Converting $<...
+	$(SILENT)$(PYTHON) scripts/build/txt2str.py $< $@ esqpanel2x40_vfx_device::html char
+
+$(GENDIR)/mame/machine/esqpanel_vfx_js.h: $(SRC)/mame/machine/esqpanel_vfx.js scripts/build/txt2str.py
+	@echo Converting $<...
+	$(SILENT)$(PYTHON) scripts/build/txt2str.py $< $@ esqpanel2x40_vfx_device::js char
 
 $(SRC)/devices/cpu/m68000/m68kops.cpp: $(SRC)/devices/cpu/m68000/m68k_in.cpp $(SRC)/devices/cpu/m68000/m68kmake.cpp
 ifeq ($(TARGETOS),asmjs)

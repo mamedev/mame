@@ -54,6 +54,8 @@ softfloat - [U.C. Berkeley open-source license](https://github.com/mamedev/mame/
 
 sol2 - [The MIT License (MIT)](http://opensource.org/licenses/MIT)
 
+websocketpp - [The BSD license 3-Clause License](http://opensource.org/licenses/BSD-3-Clause)
+
 winpcap - [The BSD 3-Clause License](http://opensource.org/licenses/BSD-3-Clause)
 
 zlib - [zlib license](http://opensource.org/licenses/Zlib)
