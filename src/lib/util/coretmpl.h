@@ -431,7 +431,7 @@ public:
 		, m_tail(this->end())
 		, m_empty(true)
 	{
-		static_assert(0U < N);
+		static_assert(0U < N, "FIFO must have at least one element");
 	}
 	fifo(fifo<T, N, WriteWrap, ReadWrap> const &) = delete;
 	fifo(fifo<T, N, WriteWrap, ReadWrap> &&) = delete;
