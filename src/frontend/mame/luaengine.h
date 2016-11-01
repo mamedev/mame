@@ -56,7 +56,35 @@ public:
 	std::vector<std::string> &get_menu() { return m_menu; }
 	void attach_notifiers();
 	void on_frame_done();
-	const char *call_plugin(const char *data, const char *name);
+
+	template<typename T, typename U>
+	bool call_plugin(const std::string &name, T in, U& out)
+	{
+		bool ret = false;
+		sol::object outobj = call_plugin(name, sol::make_object(sol(), in));
+		if(outobj.is<U>())
+		{
+			out = outobj.as<U>();
+			ret = true;
+		}
+		return ret;
+	}
+
+	template<typename T, typename U>
+	bool call_plugin_check(const std::string &name, U in)
+	{
+		bool ret = false;
+		sol::object outobj = call_plugin(name, sol::make_object(sol(), in));
+		if(outobj.is<T>())
+			ret = true;
+		return ret;
+	}
+
+	template<typename T>
+	void call_plugin_set(const std::string &name, T in)
+	{
+		call_plugin(name, sol::make_object(sol(), in));
+	}
 
 private:
 	// internal state
@@ -82,6 +110,7 @@ private:
 
 	void register_function(sol::function func, const char *id);
 	bool execute_function(const char *id);
+	sol::object call_plugin(const std::string &name, sol::object in);
 
 	struct addr_space {
 		addr_space(address_space &space, device_memory_interface &dev) :

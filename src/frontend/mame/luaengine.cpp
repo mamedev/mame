@@ -724,32 +724,22 @@ lua_engine::~lua_engine()
 	close();
 }
 
-const char *lua_engine::call_plugin(const char *data, const char *name)
+sol::object lua_engine::call_plugin(const std::string &name, sol::object in)
 {
-	std::string field("cb_");
-	const char *ret = nullptr;
-	field += name;
-	lua_settop(m_lua_state, 0);
-	lua_getfield(m_lua_state, LUA_REGISTRYINDEX, field.c_str());
-
-	if(!lua_isfunction(m_lua_state, -1))
+	std::string field = "cb_" + name;
+	sol::object obj = sol().registry()[field];
+	if(obj.is<sol::protected_function>())
 	{
-		lua_pop(m_lua_state, 1);
-		return nullptr;
+		auto res = (obj.as<sol::protected_function>())(in);
+		if(!res.valid())
+		{
+			sol::error err = res;
+			osd_printf_error("[LUA ERROR] in call_plugin: %s\n", err.what());
+		}
+		else
+			return res.get<sol::object>();
 	}
-	lua_pushstring(m_lua_state, data);
-	int error;
-	if((error = lua_pcall(m_lua_state, 1, 1, 0)) != LUA_OK)
-	{
-		if(error == LUA_ERRRUN)
-			printf("%s\n", lua_tostring(m_lua_state, -1));
-		lua_pop(m_lua_state, 1);
-		return nullptr;
-	}
-	if(lua_isstring(m_lua_state, -1))
-		ret = lua_tostring(m_lua_state, -1);
-	lua_pop(m_lua_state, 1);
-	return ret;
+	return sol::make_object(sol(), sol::nil);
 }
 
 void lua_engine::menu_populate(const std::string &menu, std::vector<std::tuple<std::string, std::string, std::string>> &menu_list)
@@ -772,7 +762,7 @@ void lua_engine::menu_populate(const std::string &menu, std::vector<std::tuple<s
 				if(entry.second.is<sol::table>())
 				{
 					sol::table enttable = entry.second.as<sol::table>();
-					menu_list.emplace_back(std::make_tuple(enttable.get<const char*>(1), enttable.get<const char*>(2), enttable.get<const char*>(3)));
+					menu_list.emplace_back(enttable.get<std::string, std::string, std::string>(1, 2, 3));
 				}
 			}
 		}
@@ -1188,14 +1178,14 @@ void lua_engine::initialize()
  */
 
 	sol().new_usertype<game_driver>("game_driver", "new", sol::no_constructor,
-			"source_file", &game_driver::source_file,
-			"parent", &game_driver::parent,
-			"name", &game_driver::name,
-			"description", &game_driver::description,
-			"year", &game_driver::year,
-			"manufacturer", &game_driver::manufacturer,
-			"compatible_with", &game_driver::compatible_with,
-			"default_layout", &game_driver::default_layout);
+			"source_file", sol::readonly(&game_driver::source_file),
+			"parent", sol::readonly(&game_driver::parent),
+			"name", sol::readonly(&game_driver::name),
+			"description", sol::readonly(&game_driver::description),
+			"year", sol::readonly(&game_driver::year),
+			"manufacturer", sol::readonly(&game_driver::manufacturer),
+			"compatible_with", sol::readonly(&game_driver::compatible_with),
+			"default_layout", sol::readonly(&game_driver::default_layout));
 
 /* machine.devices[device_tag]
  * device:name() - device long name

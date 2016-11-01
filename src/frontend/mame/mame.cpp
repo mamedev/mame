@@ -341,7 +341,7 @@ void emulator_info::layout_file_cb(xml_data_node &layout)
 	{
 		xml_data_node *script = xml_get_sibling(mamelayout->child, "script");
 		if(script)
-			mame_machine_manager::instance()->lua()->call_plugin(script->value, "layout");
+			mame_machine_manager::instance()->lua()->call_plugin_set("layout", script->value);
 	}
 }
 
