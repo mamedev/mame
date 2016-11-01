@@ -1302,8 +1302,9 @@ uint32_t arm_cpu_device::decodeShift(uint32_t insn, uint32_t *pCarry)
 		if (ARM_DEBUG_CORE && (insn&0x80)==0x80)
 			logerror("%08x:  RegShift ERROR (p36)\n",R15);
 
-		//see p35 for check on this
-		k = GetRegister(k >> 1)&0x1f;
+		// Only the least significant byte of the contents of Rs is used to determine the shift amount
+		k = GetRegister(k >> 1) & 0xff;
+
 		m_icount -= S_CYCLE;
 		if( k == 0 ) /* Register shift by 0 is a no-op */
 		{
@@ -1316,7 +1317,13 @@ uint32_t arm_cpu_device::decodeShift(uint32_t insn, uint32_t *pCarry)
 	switch (t >> 1)
 	{
 	case 0:                     /* LSL */
-		if (pCarry)
+		if (k >= 32)
+		{
+			if (pCarry)
+				*pCarry = (k == 32) ? rm & 1 : 0;
+			return 0;
+		}
+		else if (pCarry)
 		{
 			*pCarry = k ? (rm & (1 << (32 - k))) : (R15 & C_MASK);
 		}
