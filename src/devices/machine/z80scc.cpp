@@ -85,7 +85,7 @@ DONE (x) (p=partly)         NMOS         CMOS       ESCC      EMSCC
 #define LOGSETUP(x) {} LOGPRINT(x)
 #define LOGINT(x)   {} LOGPRINT(x)
 #define LOGTX(x)    {} LOGPRINT(x)
-#define LOGRCV(x)   {} 
+#define LOGRCV(x)   {} LOGPRINT(x)
 #define LOGCTS(x)   {} LOGPRINT(x)
 #define LOGDCD(x)   {} LOGPRINT(x)
 #if VERBOSE == 2
@@ -288,13 +288,42 @@ void z80scc_device::device_reset()
 
 /*
  * Interrupts
-Each of the SCC's two channels contain three sources of interrupts, making a total of six interrupt
-sources. These three sources of interrupts are: 1) Receiver, 2) Transmitter, and 3) External/Status
-conditions. In addition, there are several conditions that may cause these interrupts.
+Each of the SCC's two channels contain three priority levels of interrupts, making a total of six interrupt
+levels. These three sources of interrupts are: 1) Receiver, 2) Transmitter, and 3) External/Status
+conditions. In addition, there are four sources per channel: 0) Transmitt 1) External 2) Receiver 3) Special
+which affects the way the interrupt vector is formed. The sources in more detail
+
+INT_RECEIVE:  The sources of receive interrupts consist of Receive Character Available and Special Receive Condition.
+		      The Special Receive Condition can be subdivided into Receive Overrun, Framing Error (Asynchronous) or
+			  End of Frame (SDLC). In addition, a parity error can be a special receive condition by programming
+
+INT_EXTERNAL: The External/status interrupts have several sources which may be individually enabled in WR15.
+              The sources are zero count, /DCD, Sync/Hunt, /CTS, transmitter under-run/EOM and Break/Abort.
+
+INT_TRANSMIT: The NMOS/CMOS version of the SCC only has a one byte deep transmit buffer. The status of the
+		      transmit buffer can be determined through TBE bit in RR0, bit D2, which shows whether the
+			  transmit buffer is empty or not. After a hardware reset (including a hardware reset by software), or
+			  a channel reset, this bit is set to 1.
+			  While transmit interrupts are enabled, the NMOS/CMOS version sets the Transmit Interrupt Pending
+			  (TxIP) bit whenever the transmit buffer becomes empty. This means that the transmit buffer
+			  must be full before the TxIP can be set. Thus, when transmit interrupts are first enabled, the TxIP
+			  will not be set until after the first character is written to the NMOS/CMOS.
+
+INT_SPECIAL:  This mode allows the receiver to interrupt only on
+              characters with a special receive condition. When an interrupt occurs, the data containing the error
+			  is held in the Receive FIFO until an Error Reset command is issued. When using this mode in conjunction
+			  with a DMA, the DMA is initialized and enabled before any characters have been
+			  received by the ESCC. This eliminates the time-critical section of code required in the Receive
+			  Interrupt on First Character or Special Condition mode. Hence, all data can be transferred via the
+			  DMA so that the CPU need not handle the first received character as a special case. In SDLC
+			  mode, if the SDLC Frame Status FIFO is enabled and an EOF is received, an interrupt with vector
+			  for receive data available is generated and the Receive FIFO is not locked.
 
 To allow for control over the daisy chain, the SCC has a Disable Lower Chain (DLC) software command (WR9 bit 2)
 that pulls IEO Low. This selectively deactivates parts of the daisy chain regardless of the interrupt status.
+
 */
+
 //-------------------------------------------------
 //  z80daisy_irq_state - get interrupt status
 //-------------------------------------------------
@@ -302,7 +331,7 @@ int z80scc_device::z80daisy_irq_state()
 {
 	int state = 0;
 
-	LOG(("%s %s A:%d%d%d B:%d%d%d ",tag(), FUNCNAME,
+	LOGINT(("%s %s A:%d%d%d B:%d%d%d ",tag(), FUNCNAME,
 			m_int_state[0], m_int_state[1], m_int_state[2],
 			m_int_state[3], m_int_state[4], m_int_state[5]));
 
@@ -321,7 +350,7 @@ int z80scc_device::z80daisy_irq_state()
 	// Last chance to keep the control of the interrupt line
 	state |= (m_wr9 & z80scc_channel::WR9_BIT_DLC) ? Z80_DAISY_IEO : 0;
 
-	LOG(("Interrupt State %u\n", state));
+	LOGINT(("- Interrupt State %u\n", state));
 
 	return state;
 }
@@ -330,9 +359,9 @@ int z80scc_device::z80daisy_irq_state()
 //-------------------------------------------------
 //  z80daisy_irq_ack - interrupt acknowledge
 //-------------------------------------------------
-
 int z80scc_device::z80daisy_irq_ack()
 {
+	LOGINT(("%s %s \n",tag(), FUNCNAME));
 	// loop over all interrupt sources
 	for (auto & elem : m_int_state)
 	{
@@ -355,8 +384,6 @@ int z80scc_device::z80daisy_irq_ack()
 		}
 	}
 
-	//logerror("z80scc_irq_ack: failed to find an interrupt to ack!\n");
-
 	return -1;
 }
 
@@ -373,6 +400,7 @@ daisy chain, the SCC has a Disable Lower Chain (DLC) software command (WR9 bit 2
 */
 void z80scc_device::z80daisy_irq_reti()
 {
+	LOGINT(("%s %s - No RETI detection needed on SCC\n",tag(), FUNCNAME));
 }
 
 
@@ -439,11 +467,25 @@ uint8_t z80scc_device::modify_vector(uint8_t vec, int i, uint8_t src)
 	return vec;
 }
 
+int z80scc_device::get_extint_priority(int type)
+{
+	int prio = 0;
+
+	switch(type)
+	 {
+	case z80scc_channel::INT_RECEIVE:  prio = z80scc_channel::INT_RECEIVE_PRIO;  break;
+	case z80scc_channel::INT_EXTERNAL: prio = z80scc_channel::INT_EXTERNAL_PRIO; break;
+	case z80scc_channel::INT_TRANSMIT: prio = z80scc_channel::INT_TRANSMIT_PRIO; break;
+	case z80scc_channel::INT_SPECIAL:  prio = z80scc_channel::INT_SPECIAL_PRIO;  break;
+	default: logerror("Bad interrupt source beeing prioritized!");
+	}
+	return prio;
+}
 
 //-------------------------------------------------
 //  trigger_interrupt -
 //-------------------------------------------------
-void z80scc_device::trigger_interrupt(int index, int state)
+void z80scc_device::trigger_interrupt(int index, int type)
 {
 	uint8_t vector = m_chanA->m_rr2;
 	uint8_t source = 0;
@@ -451,67 +493,29 @@ void z80scc_device::trigger_interrupt(int index, int state)
 
 	int prio_level = 0;
 
-	LOG(("%s %s:%c %02x \n",FUNCNAME, tag(), 'A' + index, state));
+	LOGINT(("%s %s:%c %02x \n",FUNCNAME, tag(), 'A' + index, type));
 
 	/* The Master Interrupt Enable (MIE) bit, WR9 D3, must be set to enable the SCC to generate interrupts.*/
 	if (!(m_wr9 & z80scc_channel::WR9_BIT_MIE))
 	{
-		LOG(("Master Interrupt Enable is not set, blocking attempt to interrupt\n"));
+		LOGINT(("Master Interrupt Enable is not set, blocking attempt to interrupt\n"));
 		return;
 	}
 
-	switch(state)
+	source = type;
+	prio_level = get_extint_priority(type);
+	if (source < z80scc_channel::INT_TRANSMIT || source > z80scc_channel::INT_SPECIAL || prio_level < 0 || prio_level > 2)
 	{
-	case z80scc_channel::INT_RECEIVE:
-		/*The sources of receive interrupts consist of Receive Character Available and Special Receive Condition.
-		  The Special Receive Condition can be subdivided into Receive Overrun, Framing Error (Asynchronous) or
-		  End of Frame (SDLC). In addition, a parity error can be a special receive condition by programming*/
-		source = 2;
-		prio_level = 2;
-		break;
-	case z80scc_channel::INT_EXTERNAL:
-		/* The External/status interrupts have several sources which may be individually enabled in WR15.
-		   The sources are zero count, /DCD, Sync/Hunt, /CTS, transmitter under-run/EOM and Break/Abort.*/
-		source = 1;
-		prio_level = 0;
-		break;
-	case z80scc_channel::INT_TRANSMIT:
-		/*The NMOS/CMOS version of the SCC only has a one byte deep transmit buffer. The status of the
-		  transmit buffer can be determined through TBE bit in RR0, bit D2, which shows whether the
-		  transmit buffer is empty or not. After a hardware reset (including a hardware reset by software), or
-		  a channel reset, this bit is set to 1.
-		  While transmit interrupts are enabled, the NMOS/CMOS version sets the Transmit Interrupt Pending
-		  (TxIP) bit whenever the transmit buffer becomes empty. This means that the transmit buffer
-		  must be full before the TxIP can be set. Thus, when transmit interrupts are first enabled, the TxIP
-		  will not be set until after the first character is written to the NMOS/CMOS.*/
-		source = 0;
-		prio_level = 1;
-		break;
-	case z80scc_channel::INT_SPECIAL:
-		/*This mode allows the receiver to interrupt only on
-		  characters with a special receive condition. When an interrupt occurs, the data containing the error
-		  is held in the Receive FIFO until an Error Reset command is issued. When using this mode in conjunction
-		  with a DMA, the DMA is initialized and enabled before any characters have been
-		  received by the ESCC. This eliminates the time-critical section of code required in the Receive
-		  Interrupt on First Character or Special Condition mode. Hence, all data can be transferred via the
-		  DMA so that the CPU need not handle the first received character as a special case. In SDLC
-		  mode, if the SDLC Frame Status FIFO is enabled and an EOF is received, an interrupt with vector
-		  for receive data available is generated and the Receive FIFO is not locked.*/
-		source = 3;
-		prio_level = 0;
-		break;
-	default:
-		logerror("Attempt to trigger interrupt of unknown origin blocked: %02x on channel %c\n", state, 'A' + index);
+		logerror("Attempt to trigger interrupt of unknown origin blocked: %02x/%02x on channel %c\n", source, prio_level, 'A' + index);
 		return;
 	}
-
 	// Vector modification requested?
 	if (m_wr9 & z80scc_channel::WR9_BIT_VIS)
 	{
 		vector = modify_vector(vector, index, source);
 	}
 
-	LOG(("   Interrupt Request fired of type %u and vector %02x\n", state, vector));
+	LOGINT(("   Interrupt Request fired of type %u and vector %02x\n", type, vector));
 
 	// update vector register
 	m_chanB->m_rr2 = vector;
@@ -526,7 +530,7 @@ void z80scc_device::trigger_interrupt(int index, int state)
 	  Channel B External/Status
 	*/
 	// Add channel offset to priority according to table above
-	priority = prio_level + (index == CHANNEL_A ? 3 : 0 );
+	priority = prio_level + (index == CHANNEL_A ? 0 : 3 );
 
 	// trigger interrupt
 	m_int_state[priority] |= Z80_DAISY_INT;
@@ -535,13 +539,38 @@ void z80scc_device::trigger_interrupt(int index, int state)
 	m_int_source[priority] = source;
 
 	// Based on the fact that prio levels are aligned with the bitorder of rr3 we can do this...
-	m_chanA->m_rr3 &= ~(      0x07 << (index == CHANNEL_A ? 3 : 0 ));
-	m_chanA->m_rr3 |=  (prio_level << (index == CHANNEL_A ? 3 : 0 ));
+	m_chanA->m_rr3 |=  ((1 << prio_level) + (index == CHANNEL_A ? 3 : 0 ));
 
 	// check for interrupt
 	check_interrupts();
 }
 
+int z80scc_device::update_extint(int index)
+{
+	int ret = 1; // Assume there is more interrupts to serve
+	uint8_t rr0  = (index == CHANNEL_A ? m_chanA->m_rr0  : m_chanB->m_rr0);
+	uint8_t wr15 = (index == CHANNEL_A ? m_chanA->m_wr15 : m_chanB->m_wr15);
+	uint8_t lrr0 = (index == CHANNEL_A ? m_chanA->m_extint_states : m_chanB->m_extint_states);
+
+	LOGINT(("%s(%02x)\n", FUNCNAME, index));
+	// Check if any of the enabled external interrupt sources has changed and requiresd service TODO: figure out Zero Count
+	if ( ((lrr0 & wr15 & 0xf8) ^ (rr0 & wr15 & 0xf8)) == 0 ) // mask off disabled and non relevant bits
+	{
+		LOGINT((" - All interrupts serviced\n"));
+
+		// Reset IP bit for external interrupts in both internal structure and rr3
+		// - External and Special interripts has the same prio, just add channel offset
+		m_int_state[z80scc_channel::INT_EXTERNAL_PRIO + (index == CHANNEL_A ? 0 : 3 )] = 0;
+		// Based on the fact that prio levels are aligned with the bitorder of rr3 we can do this...
+		m_chanA->m_rr3 &=  ~((1 << z80scc_channel::INT_EXTERNAL_PRIO) + (index == CHANNEL_A ? 3 : 0 ));
+		ret = 0; // indicate that we are done
+	}
+	else
+	{
+		LOGINT((" - More external/status interrupts to serve: %02x\n", ((lrr0 & wr15 & 0xf8) ^ (rr0 & wr15 & 0xf8))));
+	}
+	return ret;
+}
 
 //-------------------------------------------------
 //  m1_r - interrupt acknowledge
@@ -821,10 +850,9 @@ z80scc_channel::z80scc_channel(const machine_config &mconfig, const char *tag, d
 		m_rx_clock(0),
 		m_rx_first(0),
 		m_rx_break(0),
-		m_rx_rr0_latch(0),
+		m_extint_latch(0),
+		m_extint_states(0),
 		m_rxd(0),
-		m_cts(1),
-		m_dcd(1),
 		m_tx_clock(0),
 		m_dtr(0),
 		m_rts(0),
@@ -922,10 +950,9 @@ void z80scc_channel::device_start()
 	save_item(NAME(m_rx_clock));
 	save_item(NAME(m_rx_first));
 	save_item(NAME(m_rx_break));
-	save_item(NAME(m_rx_rr0_latch));
+	save_item(NAME(m_extint_latch));
+	save_item(NAME(m_extint_states));
 	save_item(NAME(m_ri));
-	save_item(NAME(m_cts));
-	save_item(NAME(m_dcd));
 	save_item(NAME(m_tx_clock));
 	save_item(NAME(m_dtr));
 	save_item(NAME(m_rts));
@@ -1290,8 +1317,21 @@ int z80scc_channel::get_tx_word_length()
  * Break/Abort latch. */
 uint8_t z80scc_channel::do_sccreg_rr0()
 {
-	LOGR(("%s %s <- %02x\n",tag(), FUNCNAME, m_rr0));
-	return m_rr0;
+	uint8_t rr0 = m_rr0;
+
+	LOGINT(("%s %c %s <- %02x\n",tag(), 'A' + m_index, FUNCNAME, m_rr0));
+	if (m_extint_latch == 1)
+	{
+		rr0 &=                     ((~m_wr15) | WR15_WR7PRIME | WR15_STATUS_FIFO);  // clear enabled bits, saving 2 unrelated bits
+		rr0 |= (m_extint_states & ~((~m_wr15) | WR15_WR7PRIME | WR15_STATUS_FIFO)); // set enabled bits to latched states
+		LOGINT(("- %c returning latched value RR0:%02x WR15:%02x => %02x\n", 'A' + m_index, m_rr0, m_wr15, rr0));
+	}
+	else
+	{
+		LOGINT(("- %c returning unlatched value: %02x\n", 'A' + m_index, rr0));
+	}
+
+	return rr0;
 }
 
 /*
@@ -1311,7 +1351,7 @@ on the state of the Status High/Status Low bit in WR9 and independent of the sta
 in WR9."*/
 uint8_t z80scc_channel::do_sccreg_rr2()
 {
-	LOGR(("%s\n", FUNCNAME));
+	LOGINT(("%s\n", FUNCNAME));
 
 	// Assume the unmodified in polled mode
 	m_rr2 = m_uart->m_chanA->m_wr2;
@@ -1351,7 +1391,7 @@ B, all 0s are returned. The two unused bits are always returned as 0. Figure dis
 */
 uint8_t z80scc_channel::do_sccreg_rr3()
 {
-	LOGR(("%s\n", FUNCNAME));
+	LOGINT(("%s(%02x)\n", FUNCNAME, m_rr3));
 	return m_rr3; // TODO Update all bits of this status register
 }
 
@@ -1564,7 +1604,7 @@ uint8_t z80scc_channel::scc_register_read( uint8_t reg)
 uint8_t z80scc_channel::control_read()
 {
 	uint8_t data = 0;
-	int reg = m_uart->m_wr0_ptrbits; 
+	int reg = m_uart->m_wr0_ptrbits;
 	int regmask = (WR0_REGISTER_MASK | (m_uart->m_wr0_ptrbits & WR0_POINT_HIGH));
 
 	LOGR(("%s(%02x) reg %02x, regmask %02x, WR0 %02x\n", FUNCNAME, data, reg, regmask, m_wr0));
@@ -1644,12 +1684,12 @@ void z80scc_channel::do_sccreg_wr0(uint8_t data)
 		  External/Status interrupt. However, if this second status change does not persist
 		  (there are two transitions), another interrupt is not generated. Exceptions to this
 		  rule are detailed in the RR0 description.*/
-		//        do_sccreg_wr0(data);
-		if (!m_zc)
-		{
-			m_rr0 |= RR0_ZC;
-		}
-		LOG(("\"%s\" %s: %c : %s - Reset External/Status Interrupt\n", m_owner->tag(), FUNCNAME, 'A' + m_index, FUNCNAME));
+
+		LOG(("%s %s %c - Reset External/Status Interrupt, latch %s\n", m_owner->tag(), FUNCNAME, 'A' + m_index,
+			 m_extint_latch == 1? "is released" : "was already released"));
+		// Release latch if no other external or status sources are active
+		if ((m_extint_latch = m_uart->update_extint(m_index)) == 0)
+			m_uart->check_interrupts();
 		break;
 	case WR0_RESET_HIGHEST_IUS:
 		/* This command resets the highest priority Interrupt Under Service (IUS) bit, allowing lower
@@ -1659,12 +1699,23 @@ void z80scc_channel::do_sccreg_wr0(uint8_t data)
 		if (m_uart->m_variant & (SET_NMOS))
 		{
 			logerror("WR0 SWI ack command not supported on NMOS\n");
-			LOG(("\"%s\" %s: %c : Reset Highest IUS command not available on NMOS!\n", m_owner->tag(), FUNCNAME, 'A' + m_index));
+			LOGINT(("\"%s\" %s: %c : Reset Highest IUS command not available on NMOS!\n", m_owner->tag(), FUNCNAME, 'A' + m_index));
 		}
 		else
 		{
-			m_uart->z80daisy_irq_ack();
-			LOG(("\"%s\" %s: %c : Reset Highest IUS\n", m_owner->tag(), FUNCNAME, 'A' + m_index));
+			LOGINT(("\"%s\" %s: %c : Reset Highest IUS\n", m_owner->tag(), FUNCNAME, 'A' + m_index));
+			// loop over all interrupt sources
+			for (auto & elem : m_uart->m_int_state)
+			{
+				// find the first channel with an interrupt requested
+				if (elem & Z80_DAISY_INT)
+				{
+					LOG(("- %c found IUS bit to clear\n", 'A' + m_index));
+					elem = 0; // Clear IUS bit (called IEO in z80 daisy lingo)
+					m_uart->check_interrupts();
+					break;
+				}
+			}
 		}
 		break;
 	case WR0_ERROR_RESET:
@@ -1839,15 +1890,15 @@ void z80scc_channel::do_sccreg_wr9(uint8_t data)
 		LOG(("\"%s\": %c : Master Interrupt Control - No reset  %02x\n", m_owner->tag(), 'A' + m_index, data));
 		break;
 	case WR9_CMD_CHNB_RESET:
-		LOG(("\"%s\": %c : Master Interrupt Control - Channel B reset  %02x\n", m_owner->tag(), 'A' + m_index, data));
+		LOGINT(("\"%s\": %c : Master Interrupt Control - Channel B reset  %02x\n", m_owner->tag(), 'A' + m_index, data));
 		m_uart->m_chanB->reset();
 		break;
 	case WR9_CMD_CHNA_RESET:
-		LOG(("\"%s\": %c : Master Interrupt Control - Channel A reset  %02x\n", m_owner->tag(), 'A' + m_index, data));
+		LOGINT(("\"%s\": %c : Master Interrupt Control - Channel A reset  %02x\n", m_owner->tag(), 'A' + m_index, data));
 		m_uart->m_chanA->reset();
 		break;
 	case WR9_CMD_HW_RESET:
-		LOG(("\"%s\": %c : Master Interrupt Control - Device reset  %02x\n", m_owner->tag(), 'A' + m_index, data));
+		LOGINT(("\"%s\": %c : Master Interrupt Control - Device reset  %02x\n", m_owner->tag(), 'A' + m_index, data));
 		/*"The effects of this command are identical to those of a hardware reset, except that the Shift Right/Shift Left bit is
 		  not changed and the MIE, Status High/Status Low and DLC bits take the programmed values that accompany this command."
 		*/
@@ -2304,7 +2355,7 @@ void z80scc_channel::data_write(uint8_t data)
 		if (m_tx_fifo_sz == 1)
 		{
 			LOGTX(("- TX FIFO has only one slot so is now completelly filled, clearing TBE bit\n"));
-			m_rr0 &= ~RR0_TX_BUFFER_EMPTY; // If only one FIFO position it is full now! 
+			m_rr0 &= ~RR0_TX_BUFFER_EMPTY; // If only one FIFO position it is full now!
 		}
 		else if (m_tx_fifo_wp + 1 == m_tx_fifo_rp || ( (m_tx_fifo_wp + 1 == m_tx_fifo_sz) && (m_tx_fifo_rp == 0) ))
 		{
@@ -2422,7 +2473,7 @@ WRITE_LINE_MEMBER( z80scc_channel::cts_w )
 {
 	LOG(("\"%s\" %s: %c : CTS %u\n", m_owner->tag(), FUNCNAME, 'A' + m_index, state));
 
-	if (m_cts != state)
+	if ((m_rr0 & RR0_CTS) != (state ? RR0_CTS : 0)) //  SCC change detection logic
 	{
 		// enable transmitter if in auto enables mode
 		if (!state)
@@ -2435,33 +2486,18 @@ WRITE_LINE_MEMBER( z80scc_channel::cts_w )
 			}
 		}
 
-		// set clear to send
-		m_cts = state;
+		if (state) m_rr0 |= RR0_CTS; else  m_rr0 &= ~RR0_CTS; // Raw pin/status value
 
-		if (!m_rx_rr0_latch)
-		{
-			LOGCTS((" - RR0 not latched so updating RR0 with CTS state\n"));
-			if (!m_cts)
-				m_rr0 |= RR0_CTS;
-			else
-				m_rr0 &= ~RR0_CTS;
+		if (m_extint_latch == 0 && (m_wr1 & WR1_EXT_INT_ENABLE) && (m_wr15 & WR15_CTS))
+	 	{
+			// trigger interrupt
+			LOGCTS((" - Trigger CTS interrupt\n"));
+			m_uart->trigger_interrupt(m_index, INT_EXTERNAL);
 
-			/* If the CTS IE bit in WR15 is set, this bit indicates the state of the /CTS pin while no interrupt is
-			   pending, latches the state of the /CTS pin and generates an External/Status interrupt. Any odd
-			   number of transitions on the /CTS pin causes another External/Status interrupt condition. If the
-			   CTS IE bit is reset, it merely reports the current unlatched state of the /CTS pin.
-
-			   Check that external interrupts are enabled and this one in particular and generate an interrupt on any change */
-			if ((m_wr1 & WR1_EXT_INT_ENABLE) && (m_wr15 & WR15_CTS))
-			{
-				// trigger interrupt
-				LOGCTS((" - Trigger CTS interrupt\n"));
-				m_uart->trigger_interrupt(m_index, INT_EXTERNAL);
-
-				// latch read register 0
-				LOGCTS((" - Latches RR0\n"));
-				m_rx_rr0_latch = 1;
-			}
+			// latch read register 0
+			LOGCTS((" - Latches RR0\n"));
+			m_extint_latch = 1;
+			m_extint_states = m_rr0;
 		}
 	}
 }
@@ -2472,17 +2508,17 @@ WRITE_LINE_MEMBER( z80scc_channel::cts_w )
 //-------------------------------------------------
 WRITE_LINE_MEMBER( z80scc_channel::dcd_w )
 {
-	LOG(("\"%s\": %c : DCD %u\n", m_owner->tag(), 'A' + m_index, state));
+	//	LOG(("\"%s\": %c : DCD %u\n", m_owner->tag(), 'A' + m_index, state));
 
-	if (m_dcd != state)
+	if ((m_rr0 & RR0_DCD) != (state ? RR0_DCD : 0)) //  SCC change detection logic
 	{
-		if (!state) 
+		// enable transmitter if in auto enables mode
+		if (!state)
 		{
-			LOGDCD((" - DCD active\n"));
-			// enable receiver if in auto enables mode
+			//			LOGDCD((" - DCD active\n"));
 			if (m_wr3 & WR3_AUTO_ENABLES)
 			{
-				LOGCTS((" - RX auto enabled\n"));
+				LOGDCD((" - RX auto enabled\n"));
 				m_wr3 |= WR3_RX_ENABLE;
 #if START_BIT_HUNT
 				m_rcv_mode = RCV_SEEKING;
@@ -2490,39 +2526,18 @@ WRITE_LINE_MEMBER( z80scc_channel::dcd_w )
 			}
 		}
 
-		// set data carrier detect
-		m_dcd = state;
+		if (state) m_rr0 |= RR0_DCD; else  m_rr0 &= ~RR0_DCD; // Raw pin/status value
 
-/*About RR0 D3: If the DCD IE bit in WR15 is set, this bit indicates the state of the /DCD pin the last time the
-Enabled External/Status bits changed. Any transition on the /DCD pin, while no interrupt is pending,
-latches the state of the /DCD pin and generates an External/Status interrupt. Any odd number
-of transitions on the /DCD pin while another External/Status interrupt condition. If the DCD IE is
-reset, this bit merely reports the current, unlatched state of the /DCD pin.*/
-		if (!m_rx_rr0_latch)
+		if (m_extint_latch == 0 && (m_wr1 & WR1_EXT_INT_ENABLE) && (m_wr15 & WR15_DCD))
 		{
-			LOGDCD((" - RR0 not latched so updating RR0 with DCD state\n"));
-			if (m_dcd)
-				m_rr0 |= RR0_DCD;
-			else
-				m_rr0 &= ~RR0_DCD;
+			// latch read register 0
+			LOGDCD((" - Latches RR0\n"));
+			m_extint_latch = 1;
+			m_extint_states = m_rr0;
 
-			/* If the DCD IE bit in WR15 is set, this bit indicates the state of the /DCD pin the last time the
-			   Enabled External/Status bits changed. Any transition on the /DCD pin, while no interrupt is pending,
-			   latches the state of the /DCD pin and generates an External/Status interrupt. Any odd number
-			   of transitions on the /DCD pin while another External/Status interrupt condition. If the DCD IE is
-			   reset, this bit merely reports the current, unlatched state of the /DCD pin.
-
-			   Check that external interrupts are enabled and this one in particular and generate an interrupt on any change */
-			if ((m_wr1 & WR1_EXT_INT_ENABLE) && (m_wr15 & WR15_DCD))
-			{
-				// trigger interrupt
-				LOGDCD((" - Trigger DCD interrupt\n"));
-				m_uart->trigger_interrupt(m_index, INT_EXTERNAL);
-
-				// latch read register 0
-				LOGDCD((" - Latches RR0\n"));
-				m_rx_rr0_latch = 1;
-			}
+			// trigger interrupt
+			LOGDCD((" - Trigger DCD interrupt\n"));
+			m_uart->trigger_interrupt(m_index, INT_EXTERNAL);
 		}
 	}
 }
@@ -2531,11 +2546,11 @@ reset, this bit merely reports the current, unlatched state of the /DCD pin.*/
 //-------------------------------------------------
 //  ri_w - ring indicator handler
 //-------------------------------------------------
-
 WRITE_LINE_MEMBER( z80scc_channel::ri_w )
 {
-	LOG(("\"%s\": %c : RI %u\n", m_owner->tag(), 'A' + m_index, state));
+	LOGINT(("\"%s\": %c : RI %u - not implemented\n", m_owner->tag(), 'A' + m_index, state));
 
+#if 0 // TODO: This code is inherited from another device driver and not correct for SCC
 	if (m_ri != state)
 	{
 		// set ring indicator state
@@ -2558,6 +2573,7 @@ WRITE_LINE_MEMBER( z80scc_channel::ri_w )
 			}
 		}
 	}
+#endif
 }
 
 //-------------------------------------------------
@@ -2565,7 +2581,7 @@ WRITE_LINE_MEMBER( z80scc_channel::ri_w )
 //-------------------------------------------------
 WRITE_LINE_MEMBER( z80scc_channel::sync_w )
 {
-	LOG(("\"%s\": %c : SYNC %u\n", m_owner->tag(), 'A' + m_index, state));
+	LOGINT(("\"%s\": %c : SYNC %u - not implemented\n", m_owner->tag(), 'A' + m_index, state));
 }
 
 //-------------------------------------------------
@@ -2744,11 +2760,11 @@ void z80scc_channel::update_serial()
 		set_rcv_rate(0);
 		set_tra_rate(0);
 	}
-	// TODO: Check registers for use of RTxC and TRxC, if used as direct Tx and/or Rx clocks set them to value as programmed 
+	// TODO: Check registers for use of RTxC and TRxC, if used as direct Tx and/or Rx clocks set them to value as programmed
 	// in m_uart->txca/txcb and rxca/rxcb respectivelly
 	if (m_rxc > 0)
 	{
-		set_rcv_rate(m_rxc / clocks); // TODO Check/Fix this to get the right tx/rx clocks, seems to be missing a divider or two 
+		set_rcv_rate(m_rxc / clocks); // TODO Check/Fix this to get the right tx/rx clocks, seems to be missing a divider or two
 		LOG(("   - Receiver clock: %d mode: %d rate: %d/%xh\n", m_rxc, clocks, m_rxc / clocks, m_rxc / clocks));
 	}
 
