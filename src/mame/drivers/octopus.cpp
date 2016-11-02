@@ -750,8 +750,16 @@ SCN2674_DRAW_CHARACTER_MEMBER(octopus_state::display_pixels)
 	{
 		uint8_t tile = m_vram[address & 0x0fff];
 		uint8_t data = m_fontram[(tile * 16) + linecount];
-		for (int z=0;z<8;z++)
-			bitmap.pix32(y,x + z) = BIT(data,z) ? rgb_t::white() : rgb_t::black();
+		if(cursor && !blink)
+		{
+			for (int z=0;z<8;z++)
+				bitmap.pix32(y,x + z) = BIT(data,z) ? rgb_t::black() : rgb_t::white();
+		}
+		else
+		{
+			for (int z=0;z<8;z++)
+				bitmap.pix32(y,x + z) = BIT(data,z) ? rgb_t::white() : rgb_t::black();
+		}
 	}
 }
 
