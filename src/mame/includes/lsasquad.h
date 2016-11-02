@@ -9,6 +9,7 @@ public:
 		m_videoram(*this, "videoram"),
 		m_scrollram(*this, "scrollram"),
 		m_spriteram(*this, "spriteram"),
+		m_priority_prom(*this, "prio_prom"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_mcu(*this, "mcu"),
@@ -19,7 +20,8 @@ public:
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_scrollram;
 	required_shared_ptr<uint8_t> m_spriteram;
-
+	required_region_ptr<uint8_t> m_priority_prom;
+	
 	/* misc */
 	int m_sound_pending;
 	int m_sound_nmi_enable;
@@ -75,5 +77,5 @@ public:
 	void draw_layer( bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *scrollram );
 	int draw_layer_daikaiju( bitmap_ind16 &bitmap, const rectangle &cliprect, int offs, int  * previd, int type );
 	void drawbg( bitmap_ind16 &bitmap, const rectangle &cliprect, int type );
-	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
+	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t priority );
 };

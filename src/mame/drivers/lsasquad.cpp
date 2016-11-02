@@ -725,12 +725,17 @@ ROM_START( lsasquad )
 	ROM_LOAD( "a64-15.25",    0x10000, 0x8000, CRC(01ed5851) SHA1(6034376d30d1d17fe9aab07cb40009c4f3c03690) )
 	ROM_LOAD( "a64-17.26",    0x18000, 0x8000, CRC(6eaf3735) SHA1(a91fd7c9a6f2f58d311e40edc29d1e4f97746146) )
 
-	ROM_REGION( 0x0a00, "proms", 0 )
-	ROM_LOAD( "a64-07.22",    0x0000, 0x0400, CRC(82802bbb) SHA1(4f54c9364a12809898eabd1eb13d16a6c9f0f532) )    /* red   (bottom half unused) */
-	ROM_LOAD( "a64-08.23",    0x0200, 0x0400, CRC(aa9e1dbd) SHA1(be7dfabf5306747fa3d5f1f735d0064673f19c91) )    /* green (bottom half unused) */
-	ROM_LOAD( "a64-09.24",    0x0400, 0x0400, CRC(dca86295) SHA1(a6f6af60caaad9f49d72a8c2ff1e6115471f8c63) )    /* blue  (bottom half unused) */
-	ROM_LOAD( "a64-06.9",     0x0600, 0x0400, CRC(7ced30ba) SHA1(f22de13d4fd49b7b2ffd06032eb5e14fbdeec91c) )    /* priority */
+	ROM_REGION( 0x0600, "proms", 0 )
+	ROM_LOAD( "a64-07.22",    0x0000, 0x0200, CRC(82802bbb) SHA1(4f54c9364a12809898eabd1eb13d16a6c9f0f532) )    /* red   (bottom half unused) */
+	ROM_IGNORE( 0x200 )
+	ROM_LOAD( "a64-08.23",    0x0200, 0x0200, CRC(aa9e1dbd) SHA1(be7dfabf5306747fa3d5f1f735d0064673f19c91) )    /* green (bottom half unused) */
+	ROM_IGNORE( 0x200 )
+	ROM_LOAD( "a64-09.24",    0x0400, 0x0200, CRC(dca86295) SHA1(a6f6af60caaad9f49d72a8c2ff1e6115471f8c63) )    /* blue  (bottom half unused) */
+	ROM_IGNORE( 0x200 )
 
+	ROM_REGION( 0x0400, "prio_prom", 0 )
+	ROM_LOAD( "a64-06.9",     0x0000, 0x0400, CRC(7ced30ba) SHA1(f22de13d4fd49b7b2ffd06032eb5e14fbdeec91c) )    /* priority */
+	
 	ROM_REGION( 0x0200, "plds", 0 )
 	ROM_LOAD( "pal16l8a.14", 0x0000, 0x0104, CRC(a7cc157d) SHA1(f06f750636d59a610e0b0eda8cb791780ebc57a5) )
 ROM_END
@@ -757,11 +762,16 @@ ROM_START( storming )
 	ROM_LOAD( "a64-15.25",    0x10000, 0x8000, CRC(01ed5851) SHA1(6034376d30d1d17fe9aab07cb40009c4f3c03690) )
 	ROM_LOAD( "a64-17.26",    0x18000, 0x8000, CRC(6eaf3735) SHA1(a91fd7c9a6f2f58d311e40edc29d1e4f97746146) )
 
-	ROM_REGION( 0x0a00, "proms", 0 )
-	ROM_LOAD( "a64-07.22",    0x0000, 0x0400, CRC(82802bbb) SHA1(4f54c9364a12809898eabd1eb13d16a6c9f0f532) )    /* red   (bottom half unused) */
-	ROM_LOAD( "a64-08.23",    0x0200, 0x0400, CRC(aa9e1dbd) SHA1(be7dfabf5306747fa3d5f1f735d0064673f19c91) )    /* green (bottom half unused) */
-	ROM_LOAD( "a64-09.24",    0x0400, 0x0400, CRC(dca86295) SHA1(a6f6af60caaad9f49d72a8c2ff1e6115471f8c63) )    /* blue  (bottom half unused) */
-	ROM_LOAD( "a64-06.9",     0x0600, 0x0400, CRC(7ced30ba) SHA1(f22de13d4fd49b7b2ffd06032eb5e14fbdeec91c) )    /* priority */
+	ROM_REGION( 0x0600, "proms", 0 )
+	ROM_LOAD( "a64-07.22",    0x0000, 0x0200, CRC(82802bbb) SHA1(4f54c9364a12809898eabd1eb13d16a6c9f0f532) )    /* red   (bottom half unused) */
+	ROM_IGNORE( 0x200 )
+	ROM_LOAD( "a64-08.23",    0x0200, 0x0200, CRC(aa9e1dbd) SHA1(be7dfabf5306747fa3d5f1f735d0064673f19c91) )    /* green (bottom half unused) */
+	ROM_IGNORE( 0x200 )
+	ROM_LOAD( "a64-09.24",    0x0400, 0x0200, CRC(dca86295) SHA1(a6f6af60caaad9f49d72a8c2ff1e6115471f8c63) )    /* blue  (bottom half unused) */
+	ROM_IGNORE( 0x200 )
+
+	ROM_REGION( 0x0400, "prio_prom", 0 )
+	ROM_LOAD( "a64-06.9",     0x0000, 0x0400, CRC(7ced30ba) SHA1(f22de13d4fd49b7b2ffd06032eb5e14fbdeec91c) )    /* priority */
 
 	ROM_REGION( 0x0200, "plds", 0 )
 	ROM_LOAD( "pal16l8a.14", 0x0000, 0x0104, CRC(a7cc157d) SHA1(f06f750636d59a610e0b0eda8cb791780ebc57a5) )
@@ -792,11 +802,16 @@ ROM_START( daikaiju )
 	ROM_LOAD( "a74_16.ic25",    0x10000, 0x8000, CRC(ef4d1945) SHA1(6b5e898e486d5786fc5d151f1fcca0015829365d) )
 	ROM_LOAD( "a74_17.ic26",    0x18000, 0x8000, CRC(d1077878) SHA1(e69893db6b63d5a5192b521d61a86f60b7029b7e) )
 
-	ROM_REGION( 0x0a00, "proms", 0 )
-	ROM_LOAD( "a74_07.ic22",    0x0000, 0x0400, CRC(66132341) SHA1(8c6723dfc4f856ef27998411a98c40783d13ac41) )  /* red   (bottom half unused) */
-	ROM_LOAD( "a74_08.ic23",    0x0200, 0x0400, CRC(fb3f0273) SHA1(591577c94865e2e6465e0016350450a19000e52d) )  /* green (bottom half unused) */
-	ROM_LOAD( "a74_09.ic24",    0x0400, 0x0400, CRC(bed6709d) SHA1(ba5435728d6b7847bc86878f6122ce1f86982f0a) )  /* blue  (bottom half unused) */
-	ROM_LOAD( "a74_06.ic9",     0x0600, 0x0400, CRC(cad554e7) SHA1(7890d948bfef198309df810f8401d224224a73a1) )  /* priority */
+	ROM_REGION( 0x0600, "proms", 0 )
+	ROM_LOAD( "a74_07.ic22",    0x0000, 0x0200, CRC(66132341) SHA1(8c6723dfc4f856ef27998411a98c40783d13ac41) )  /* red   (bottom half unused) */
+	ROM_IGNORE( 0x200 )
+	ROM_LOAD( "a74_08.ic23",    0x0200, 0x0200, CRC(fb3f0273) SHA1(591577c94865e2e6465e0016350450a19000e52d) )  /* green (bottom half unused) */
+	ROM_IGNORE( 0x200 )
+	ROM_LOAD( "a74_09.ic24",    0x0400, 0x0200, CRC(bed6709d) SHA1(ba5435728d6b7847bc86878f6122ce1f86982f0a) )  /* blue  (bottom half unused) */
+	ROM_IGNORE( 0x200 )
+
+	ROM_REGION( 0x0400, "prio_prom", 0 )
+	ROM_LOAD( "a74_06.ic9",     0x0000, 0x0400, CRC(cad554e7) SHA1(7890d948bfef198309df810f8401d224224a73a1) )  /* priority */
 ROM_END
 
 
