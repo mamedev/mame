@@ -676,7 +676,7 @@ void scn2674_device::device_timer(emu_timer &timer, device_timer_id id, int para
 				}
 			}
 
-			if((m_linecounter == (m_IR12_split_register_1 * m_IR0_scanline_per_char_row)) && m_linecounter) /* Split Screen 1 */
+			if((m_linecounter == ((m_IR12_split_register_1+1) * m_IR0_scanline_per_char_row)) && m_linecounter) /* Split Screen 1 */
 			{
 				m_status_register |= 0x04;
 				if(m_irq_mask & 0x04)
@@ -692,7 +692,7 @@ void scn2674_device::device_timer(emu_timer &timer, device_timer_id id, int para
 					dw = m_IR14_double_1;
 			}
 
-			if((m_linecounter == (m_IR13_split_register_2 * m_IR0_scanline_per_char_row)) && m_linecounter) /* Split Screen 2 */
+			if((m_linecounter == ((m_IR13_split_register_2+1) * m_IR0_scanline_per_char_row)) && m_linecounter) /* Split Screen 2 */
 			{
 				m_status_register |= 0x01;
 				if(m_irq_mask & 0x01)
