@@ -14,12 +14,11 @@
 #define _98035_H_
 
 #include "hp9845_io.h"
+#include "cpu/nanoprocessor/nanoprocessor.h"
+#include "dirtc.h"
 
-#define HP98035_IBUFFER_LEN 16  // Totally arbitrary
-#define HP98035_OBUFFER_LEN 16  // Totally arbitrary
-#define HP98035_UNIT_COUNT  4   // Count of counter/timer units
-
-class hp98035_io_card : public hp9845_io_card_device
+class hp98035_io_card : public hp9845_io_card_device,
+						public device_rtc_interface
 {
 public:
 	// construction/destruction
@@ -31,11 +30,48 @@ public:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	DECLARE_READ16_MEMBER(reg_r);
 	DECLARE_WRITE16_MEMBER(reg_w);
 
+	DECLARE_WRITE8_MEMBER(ram_addr_w);
+	DECLARE_READ8_MEMBER(ram_data_r);
+	DECLARE_WRITE8_MEMBER(ram_addr_data_w);
+	DECLARE_WRITE8_MEMBER(ram_data_w);
+
+	DECLARE_WRITE8_MEMBER(clock_key_w);
+	DECLARE_READ8_MEMBER(clock_digit_r);
+
+	DECLARE_WRITE8_MEMBER(odr_w);
+	DECLARE_READ8_MEMBER(idr_r);
+	DECLARE_READ8_MEMBER(np_status_r);
+	DECLARE_WRITE8_MEMBER(clear_np_irq_w);
+	DECLARE_READ8_MEMBER(clock_mux_r);
+	DECLARE_WRITE8_MEMBER(set_irq_w);
+	DECLARE_READ8_MEMBER(clr_inten_r);
+	DECLARE_WRITE8_MEMBER(clr_inten_w);
+
+	DECLARE_WRITE8_MEMBER(dc_w);
+
 private:
+	required_device<hp_nanoprocessor_device> m_cpu;
+
+	// Internal RAM & I/F
+	uint8_t m_np_ram[ 256 ];
+	uint8_t m_ram_addr;
+	uint8_t m_ram_data_in;
+
+	// DC lines
+	uint8_t m_dc;
+
+	// NP interrupt
+	bool m_np_irq;
+
+	// Periodic interrupt
+	emu_timer *m_msec_timer;
+
 	// Interface state
 	bool m_flg;
 	bool m_inten;
@@ -44,63 +80,40 @@ private:
 	bool m_idr_full;
 	uint8_t m_idr;  // Input Data Register
 	uint8_t m_odr;  // Output Data Register
-	uint8_t m_error;
-	uint8_t m_triggered;
-	uint8_t m_lost_irq;
-	uint8_t m_ibuffer[ HP98035_IBUFFER_LEN + 1 ];
-	unsigned m_ibuffer_ptr;
-	uint8_t m_obuffer[ HP98035_OBUFFER_LEN ];
-	unsigned m_obuffer_len;
-	unsigned m_obuffer_ptr;
 
-	// Clock/timer state
-	unsigned m_msec;    // Milliseconds
-	uint8_t m_sec;  // Seconds
-	uint8_t m_min;  // Minutes
-	uint8_t m_hrs;  // Hours
-	uint8_t m_dom;  // Day of month
-	uint8_t m_mon;  // Month
-	// Strangely enough this RTC has no notion of current year
-	emu_timer *m_msec_timer;
-
-	// Timer units
+	// Clock chip emulation
 	typedef enum {
-		UNIT_IDLE,  // Not active
-		UNIT_ACTIVE,    // Active (output units: waiting for date/time match)
-		UNIT_WAIT_FOR_TO    // Active, output units only: waiting for timeout
-	} unit_state_t;
+		CLOCK_OFF,	// Display OFF
+		CLOCK_HHMM,	// Show HH:mm
+		CLOCK_SS,	// Show   :SS
+		CLOCK_HH,	// Show HH: A/P
+		CLOCK_MIN,	// Show   :mm
+		CLOCK_MON,	// Show MM:
+		CLOCK_DOM,	// Show   :DD
+	} clock_state_t;
 
-	typedef struct {
-		unit_state_t m_state;   // State
-		bool m_input;   // Input or output
-		uint8_t m_port; // Assigned port # (0 if not assigned)
-		uint8_t m_match_datetime[ 4 ];  // Date&time to match (month is not included)
-		unsigned m_delay;   // Timer delay
-		unsigned m_period;  // Timer period (when != 0)
-		unsigned m_value;   // Current counter value
-
-		void init(void);
-		void deactivate(void);
-		void adv_state(bool reset = false);
-	} timer_unit_t;
-
-	timer_unit_t m_units[ HP98035_UNIT_COUNT ];
+	emu_timer *m_clock_timer;
+	unsigned m_clock_1s_div;
+	clock_state_t m_clock_state;
+	uint8_t m_clock_digits[ 3 ];
+	uint8_t m_clock_mux;
+	bool m_clock_segh;
+	uint8_t m_clock_keys;
+	uint8_t m_prev_clock_keys;
+	unsigned m_clock_key_cnt;
 
 	void half_init(void);
 	void set_flg(bool value);
 	void update_irq(void);
-	void update_ibuffer(void);
-	void process_ibuffer(void);
-	bool assign_unit(timer_unit_t& unit , const uint8_t*& p , bool input);
-	bool parse_unit_command(const uint8_t*& p, unsigned unit_no);
-	void clear_obuffer(void);
-	void set_obuffer(uint8_t b);
-	void set_obuffer(const char* s);
-	void update_obuffer(void);
-	void set_error(uint8_t mask);
-	bool parse_datetime(const uint8_t*& p, uint8_t *out) const;
-	bool parse_unit_no(const uint8_t*& p, unsigned& unit) const;
-	bool parse_msec(const uint8_t*& p, unsigned& msec) const;
+	void update_dc(void);
+
+	void set_lhs_digits(unsigned v);
+	void set_rhs_digits(unsigned v);
+	void regen_clock_image(void);
+	void clock_short_press(void);
+	void clock_long_press(void);
+	void log_current_time(void);
+	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override;
 };
 
 // device type definition
