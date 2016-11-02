@@ -259,9 +259,9 @@
 		_p('  endif')
 		_p('endif')
 		_p('')
-        
-        _p('MAKEFILE = %s', _MAKE.getmakefilename(prj, true))
-        _p('')
+--        
+--        _p('MAKEFILE = %s', _MAKE.getmakefilename(prj, true))
+--        _p('')
 	end
 
 --
