@@ -654,13 +654,15 @@ function dat.check(set, softlist)
 			local newbytes = {}
 			if skip == "odd" then
 				for i = 1, #bytes, 2 do
-					val = bytes[i]:byte(1)
-					newbytes[(i+1)/2] = string.char(((val & 0x0f) << 4) | (val & 0x0f))
+					val1 = bytes[i]:byte(1)
+					val2 = bytes[i+1]:byte(1)
+					newbytes[(i+1)/2] = string.char(((val1 & 0x0f) << 4) | (val2 & 0x0f))
 				end
 			elseif skip == "even" then
 				for i = 1, #bytes, 2 do
-					val = bytes[i]:byte(1)
-					newbytes[(i+1)/2] = string.char((val & 0xf0) | ((val & 0xf0) >> 4))
+					val1 = bytes[i]:byte(1)
+					val2 = bytes[i+1]:byte(1)
+					newbytes[(i+1)/2] = string.char((val1 & 0xf0) | ((val2 & 0xf0) >> 4))
 				end
 			end
 			return newbytes

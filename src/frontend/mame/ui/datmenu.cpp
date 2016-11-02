@@ -396,6 +396,8 @@ void menu_dats_view::get_data()
 	for (int x = 0; x < lines; ++x)
 	{
 		std::string tempbuf(buffer.substr(xstart[x], xend[x] - xstart[x]));
+		if((tempbuf[0] == '#') && !x)
+			continue;
 		item_append(tempbuf, "", (FLAG_UI_DATS | FLAG_DISABLE), (void *)(uintptr_t)(x + 1));
 	}
 }

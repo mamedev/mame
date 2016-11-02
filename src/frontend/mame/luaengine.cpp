@@ -56,13 +56,28 @@ namespace sol
 	class buffer
 	{
 	public:
+		// sol does lua_settop(0), save userdata buffer in registry if necessary
 		buffer(int size, lua_State *L)
 		{
 			ptr = luaL_buffinitsize(L, &buff, size);
 			len = size;
+			if(buff.b != buff.initb)
+			{
+				lua_pushvalue(L, -1);
+				lua_setfield(L, LUA_REGISTRYINDEX, "sol::buffer_temp");
+			}
 		}
 		~buffer()
 		{
+			lua_State *L = buff.L;
+			if(lua_getfield(L, LUA_REGISTRYINDEX, "sol::buffer_temp") != LUA_TNIL)
+			{
+				lua_pushnil(L);
+				lua_setfield(L, LUA_REGISTRYINDEX, "sol::buffer_temp");
+			}
+			else
+				lua_pop(L, -1); 
+
 			luaL_pushresultsize(&buff, len);
 		}
 		void set_len(int size) { len = size; }
@@ -85,7 +100,7 @@ namespace sol
 		{
 			static int push(lua_State *L, osd_file::error error)
 			{
-				std::string strerror;
+				const char *strerror;
 				switch(error)
 				{
 					case osd_file::error::NONE:
@@ -152,7 +167,7 @@ namespace sol
 		{
 			static int push(lua_State *L, map_handler_type type)
 			{
-				std::string typestr;
+				const char *typestr;
 				switch(type)
 				{
 					case AMH_NONE:
@@ -1658,7 +1673,8 @@ void lua_engine::initialize()
 			"single_step", sol::property(&mame_ui_manager::single_step, &mame_ui_manager::set_single_step),
 			"get_line_height", &mame_ui_manager::get_line_height,
 			"get_string_width", &mame_ui_manager::get_string_width,
-			"get_char_width", &mame_ui_manager::get_char_width);
+			// sol converts char32_t to a string
+			"get_char_width", [](mame_ui_manager &m, uint32_t utf8char) { return m.get_char_width(utf8char); });
 
 /* device.state[]
  * state:name() - get device state name
