@@ -89,15 +89,15 @@ public:
 		return ret;
 	}
 
-	// this will also check if a returned table contains type T
+	// this can also check if a returned table contains type T
 	template<typename T, typename U>
-	bool call_plugin_check(const std::string &name, const U in)
+	bool call_plugin_check(const std::string &name, const U in, bool table = false)
 	{
 		bool ret = false;
 		sol::object outobj = call_plugin(name, sol::make_object(sol(), in));
-		if(outobj.is<T>())
+		if(outobj.is<T>() && !table)
 			ret = true;
-		else if(outobj.is<sol::table>())
+		else if(outobj.is<sol::table>() && table)
 		{
 			// check just one entry, checking the whole thing shouldn't be necessary as this only supports homogeneous tables
 			if(outobj.as<sol::table>().begin().operator*().second.template is<T>())

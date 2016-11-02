@@ -125,7 +125,7 @@ namespace sol
 		struct checker<sol::buffer *>
 		{
 			template <typename Handler>
-			static bool check ( lua_State* L, int index, Handler&& handler, record& tracking )
+			static bool check (lua_State* L, int index, Handler&& handler, record& tracking)
 			{
 				return stack::check<int>(L, index, handler);
 			}
