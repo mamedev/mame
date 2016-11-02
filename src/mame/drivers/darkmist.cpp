@@ -17,8 +17,7 @@ $e000 - coins (two bytes)
 $e2b7 - player 1 energy
 
 TODO:
-
- - sprite/bg and sprite/sprite priorities (name entry screen, player on raft)
+ - when player soaks in water, color pen used is wrong (entry 1 at 0xf500 should be 0x0c and instead is 0x14), might be btanb?
  - cocktail mode
  - unknown bit in sprite attr (there's code used for OR-ing sprite attrib with some
    value (taken from ram) when one of coords is greater than 256-16 )
@@ -468,4 +467,4 @@ DRIVER_INIT_MEMBER(darkmist_state,darkmist)
 
 }
 
-GAME( 1986, darkmist, 0, darkmist, darkmist, darkmist_state, darkmist, ROT270, "Seibu Kaihatsu (Taito license)", "The Lost Castle In Darkmist", MACHINE_IMPERFECT_GRAPHICS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1986, darkmist, 0, darkmist, darkmist, darkmist_state, darkmist, ROT270, "Seibu Kaihatsu (Taito license)", "The Lost Castle In Darkmist", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

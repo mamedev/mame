@@ -142,7 +142,8 @@ void darkmist_state::mix_layer(screen_device &screen, bitmap_ind16 &bitmap, cons
 void darkmist_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i,fx,fy,tile,palette;
-	for(i=0;i<m_spriteram.bytes();i+=32)
+	// fetch from top to bottom
+	for(i=m_spriteram.bytes()-32;i>-1;i-=32)
 	{
 		fy=m_spriteram[i+1]&0x40;
 		fx=m_spriteram[i+1]&0x80;
