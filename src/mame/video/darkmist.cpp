@@ -143,7 +143,7 @@ void darkmist_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 {
 	int i,fx,fy,tile,palette;
 	// fetch from top to bottom
-	for(i=m_spriteram.bytes()-32;i>-1;i-=32)
+	for(i=m_spriteram.bytes()-32;i>=0;i-=32)
 	{
 		fy=m_spriteram[i+1]&0x40;
 		fx=m_spriteram[i+1]&0x80;
