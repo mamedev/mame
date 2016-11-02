@@ -8,7 +8,7 @@
 #include "debugger.h"
 #include "nanoprocessor.h"
 
-typedef void (*fn_dis_param)(char *buffer , uint8_t opcode , const uint8_t* opram);
+typedef void (*fn_dis_param)(std::ostream& stream , uint8_t opcode , const uint8_t* opram);
 
 typedef struct {
 	uint8_t m_op_mask;
@@ -18,47 +18,45 @@ typedef struct {
 	uint32_t m_dasm_flags;
 } dis_entry_t;
 
-static void param_bitno(char *buffer , uint8_t opcode , const uint8_t* opram)
+static void param_bitno(std::ostream& stream , uint8_t opcode , const uint8_t* opram)
 {
-	*buffer++ = '0' + (opcode & 7);
-	*buffer = '\0';
+	stream << (char)('0' + (opcode & 7));
 }
 
-static void param_ds(char *buffer , uint8_t opcode , const uint8_t* opram)
+static void param_ds(std::ostream& stream , uint8_t opcode , const uint8_t* opram)
 {
-	sprintf(buffer , "DS%u" , opcode & 0xf);
+	util::stream_format(stream , "DS%u" , opcode & 0xf);
 }
 
-static void param_reg(char *buffer , uint8_t opcode , const uint8_t* opram)
+static void param_reg(std::ostream& stream , uint8_t opcode , const uint8_t* opram)
 {
-	sprintf(buffer , "R%u" , opcode & 0xf);
+	util::stream_format(stream , "R%u" , opcode & 0xf);
 }
 
-static void param_11bit(char *buffer , uint8_t opcode , const uint8_t* opram)
+static void param_11bit(std::ostream& stream , uint8_t opcode , const uint8_t* opram)
 {
 	unsigned tmp = ((unsigned)(opcode & 7) << 8) | *opram;
-	sprintf(buffer , "$%03x" , tmp);
+	util::stream_format(stream , "$%03x" , tmp);
 }
 
-static void param_page_no(char *buffer , uint8_t opcode , const uint8_t* opram)
+static void param_page_no(std::ostream& stream , uint8_t opcode , const uint8_t* opram)
 {
-	*buffer++ = '0' + (opcode & 7);
-	*buffer = '\0';
+	stream << (char)('0' + (opcode & 7));
 }
 
-static void param_byte(char *buffer , uint8_t opcode , const uint8_t* opram)
+static void param_byte(std::ostream& stream , uint8_t opcode , const uint8_t* opram)
 {
-	sprintf(buffer , "$%02x" , *opram);
+	util::stream_format(stream , "$%02x" , *opram);
 }
 
-static void param_ds_byte(char *buffer , uint8_t opcode , const uint8_t* opram)
+static void param_ds_byte(std::ostream& stream , uint8_t opcode , const uint8_t* opram)
 {
-	sprintf(buffer , "DS%u,$%02x" , opcode & 0xf , *opram);
+	util::stream_format(stream , "DS%u,$%02x" , opcode & 0xf , *opram);
 }
 
-static void param_reg_byte(char *buffer , uint8_t opcode , const uint8_t* opram)
+static void param_reg_byte(std::ostream& stream , uint8_t opcode , const uint8_t* opram)
 {
-	sprintf(buffer , "R%u,$%02x" , opcode & 0xf , *opram);
+	util::stream_format(stream , "R%u,$%02x" , opcode & 0xf , *opram);
 }
 
 static const dis_entry_t dis_table[] = {
@@ -116,19 +114,19 @@ static const dis_entry_t dis_table[] = {
 
 CPU_DISASSEMBLE(hp_nanoprocessor)
 {
-	const uint8_t opcode = *oprom;
-	char operand[ 16 ];
+    std::ostringstream stream;
+    const uint8_t opcode = *oprom;
 
-	opram++;
+    opram++;
 
 	for (const dis_entry_t& ent : dis_table) {
 		if ((opcode & ent.m_op_mask) == ent.m_opcode) {
-			strcpy(buffer , ent.m_mnemonic);
-			strcat(buffer , " ");
+			stream << ent.m_mnemonic << ' ';
 			if (ent.m_param_fn != nullptr) {
-				ent.m_param_fn(operand , opcode , opram);
-				strcat(buffer , operand);
+				ent.m_param_fn(stream , opcode , opram);
 			}
+			std::string stream_str = stream.str();
+			strcpy(buffer, stream_str.c_str());
 			return ent.m_dasm_flags | DASMFLAG_SUPPORTED;
 		}
 	}
