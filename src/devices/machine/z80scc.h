@@ -273,7 +273,15 @@ protected:
 		INT_TRANSMIT = 0,
 		INT_EXTERNAL = 1,
 		INT_RECEIVE  = 2,
-		INT_SPECIAL  = 3
+		INT_SPECIAL  = 3,
+	};
+
+	enum
+	{
+		INT_TRANSMIT_PRIO = 1,
+		INT_EXTERNAL_PRIO = 0,
+		INT_RECEIVE_PRIO  = 2,
+		INT_SPECIAL_PRIO  = 0,
 	};
 
 	// Read registers
@@ -320,11 +328,10 @@ protected:
 
 	enum
 	{
-		RR0_RX_CHAR_AVAILABLE   = 0x01, // SIO bit
-		RR0_ZC          = 0x02, // SCC bit
-		RR0_TX_BUFFER_EMPTY = 0x04, // SIO
-		RR0_DCD         = 0x08, // SIO
-		RR0_RI          = 0x10, // DART bit?    TODO: investigate function and remove
+		RR0_RX_CHAR_AVAILABLE   = 0x01,
+		RR0_ZC          		= 0x02,
+		RR0_TX_BUFFER_EMPTY		= 0x04,
+		RR0_DCD        			= 0x08,
 		RR0_SYNC_HUNT       = 0x10, // SIO bit, not supported
 		RR0_CTS         = 0x20, // SIO bit
 		RR0_TX_UNDERRUN     = 0x40, // SIO bit, not supported
@@ -573,12 +580,12 @@ protected:
 	int m_rx_clock;         // receive clock pulse count
 	int m_rx_first;         // first character received
 	int m_rx_break;         // receive break condition
-	uint8_t m_rx_rr0_latch;   // read register 0 latched
+
+	uint8_t m_extint_latch;    // external/status Int latch enable
+	uint8_t m_extint_states;   // external/status Int latches state
 
 	int m_rxd;
 	int m_ri;       // ring indicator latch
-	int m_cts;      // clear to send latch
-	int m_dcd;      // data carrier detect latch
 
 	// transmitter state
 	uint8_t m_tx_data_fifo[4];   // data FIFO
@@ -587,7 +594,6 @@ protected:
 	int m_tx_fifo_wp;           // FIFO write pointer
 	int m_tx_fifo_sz;           // FIFO size
 	uint8_t m_tx_error;           // current error
-	//  uint8_t m_tx_data;    // transmit data register
 	int m_tx_clock;     // transmit clock pulse count
 
 	int m_dtr;      // data terminal ready
@@ -687,6 +693,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( rxtxcb_w ) { m_chanB->rxc_w(state); m_chanB->txc_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( synca_w ) { m_chanA->sync_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( syncb_w ) { m_chanB->sync_w(state); }
+	int update_extint(int i );
+	int get_extint_priority(int type);
+
 
 protected:
 	// device-level overrides
