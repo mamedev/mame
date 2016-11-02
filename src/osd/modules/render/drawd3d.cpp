@@ -1857,9 +1857,6 @@ void renderer_d3d9::primitive_flush_pending()
 			set_modmode(m_poly[polynum].modmode());
 		}
 
-		// set the blendmode if different
-		set_blendmode(PRIMFLAG_GET_BLENDMODE(flags));
-
 		if (vertnum + m_poly[polynum].numverts() > m_numverts)
 		{
 			osd_printf_error("Error: vertnum (%d) plus poly vertex count (%d) > %d\n", vertnum, m_poly[polynum].numverts(), m_numverts);
@@ -1870,10 +1867,16 @@ void renderer_d3d9::primitive_flush_pending()
 
 		if(m_shaders->enabled())
 		{
+			// reset blend mode (handled by shader passes)
+			set_blendmode(BLENDMODE_NONE);
+
 			m_shaders->render_quad(&m_poly[polynum], vertnum);
 		}
 		else
 		{
+			// set blend mode
+			set_blendmode(PRIMFLAG_GET_BLENDMODE(flags));
+
 			// add the primitives
 			result = m_device->DrawPrimitive(m_poly[polynum].type(), vertnum, m_poly[polynum].count());
 			if (FAILED(result))
