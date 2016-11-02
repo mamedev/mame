@@ -234,7 +234,7 @@ scc8523L_device::scc8523L_device(const machine_config &mconfig, const char *tag,
 
 void z80scc_device::device_start()
 {
-	LOG(("%s\n", FUNCNAME));
+	LOGSETUP(("%s\n", FUNCNAME));
 	// resolve callbacks
 	m_out_txda_cb.resolve_safe();
 	m_out_dtra_cb.resolve_safe();
@@ -267,7 +267,7 @@ void z80scc_device::device_start()
 
 void z80scc_device::device_reset()
 {
-	LOG(("%s %s \n",tag(), FUNCNAME));
+	LOGSETUP(("%s %s \n",tag(), FUNCNAME));
 
 	// Do channel reset on both channels
 	m_chanA->reset();
@@ -411,7 +411,7 @@ void z80scc_device::z80daisy_irq_reti()
 void z80scc_device::check_interrupts()
 {
 	int state = (z80daisy_irq_state() & Z80_DAISY_INT) ? ASSERT_LINE : CLEAR_LINE;
-	LOG(("%s %s \n",tag(), FUNCNAME));
+	LOGINT(("%s %s \n",tag(), FUNCNAME));
 	m_out_int_cb(state);
 }
 
@@ -422,7 +422,7 @@ void z80scc_device::check_interrupts()
 
 void z80scc_device::reset_interrupts()
 {
-	LOG(("%s %s \n",tag(), FUNCNAME));
+	LOGINT(("%s %s \n",tag(), FUNCNAME));
 	// reset internal interrupt sources
 	for (auto & elem : m_int_state)
 	{
@@ -547,7 +547,7 @@ void z80scc_device::trigger_interrupt(int index, int type)
 
 int z80scc_device::update_extint(int index)
 {
-	int ret = 1; // Assume there is more interrupts to serve
+	int ret = 1; // Assume there is more external/status interrupts to serve
 	uint8_t rr0  = (index == CHANNEL_A ? m_chanA->m_rr0  : m_chanB->m_rr0);
 	uint8_t wr15 = (index == CHANNEL_A ? m_chanA->m_wr15 : m_chanB->m_wr15);
 	uint8_t lrr0 = (index == CHANNEL_A ? m_chanA->m_extint_states : m_chanB->m_extint_states);
@@ -886,7 +886,7 @@ z80scc_channel::z80scc_channel(const machine_config &mconfig, const char *tag, d
 
 void z80scc_channel::device_start()
 {
-	LOG(("%s\n", FUNCNAME));
+	LOGSETUP(("%s\n", FUNCNAME));
 	m_uart = downcast<z80scc_device *>(owner());
 	m_index = m_uart->get_channel_index(this);
 
@@ -968,7 +968,7 @@ void z80scc_channel::device_start()
 
 void z80scc_channel::device_reset()
 {
-	LOG(("%s\n", FUNCNAME));
+	LOGSETUP(("%s\n", FUNCNAME));
 
 	// Reset RS232 emulation
 	receive_register_reset();
@@ -1006,6 +1006,7 @@ void z80scc_channel::device_reset()
 	{
 		m_uart->reset_interrupts();
 	}
+	m_extint_states = m_rr0;
 }
 
 void z80scc_channel::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -1685,7 +1686,7 @@ void z80scc_channel::do_sccreg_wr0(uint8_t data)
 		  (there are two transitions), another interrupt is not generated. Exceptions to this
 		  rule are detailed in the RR0 description.*/
 
-		LOG(("%s %s %c - Reset External/Status Interrupt, latch %s\n", m_owner->tag(), FUNCNAME, 'A' + m_index,
+		LOGINT(("%s %s %c - Reset External/Status Interrupt, latch %s\n", m_owner->tag(), FUNCNAME, 'A' + m_index,
 			 m_extint_latch == 1? "is released" : "was already released"));
 		// Release latch if no other external or status sources are active
 		if ((m_extint_latch = m_uart->update_extint(m_index)) == 0)
@@ -1710,7 +1711,7 @@ void z80scc_channel::do_sccreg_wr0(uint8_t data)
 				// find the first channel with an interrupt requested
 				if (elem & Z80_DAISY_INT)
 				{
-					LOG(("- %c found IUS bit to clear\n", 'A' + m_index));
+					LOGINT(("- %c found IUS bit to clear\n", 'A' + m_index));
 					elem = 0; // Clear IUS bit (called IEO in z80 daisy lingo)
 					m_uart->check_interrupts();
 					break;
@@ -2508,14 +2509,14 @@ WRITE_LINE_MEMBER( z80scc_channel::cts_w )
 //-------------------------------------------------
 WRITE_LINE_MEMBER( z80scc_channel::dcd_w )
 {
-	//	LOG(("\"%s\": %c : DCD %u\n", m_owner->tag(), 'A' + m_index, state));
+	LOGDCD(("\"%s\": %c : DCD %u\n", m_owner->tag(), 'A' + m_index, state));
 
 	if ((m_rr0 & RR0_DCD) != (state ? RR0_DCD : 0)) //  SCC change detection logic
 	{
 		// enable transmitter if in auto enables mode
 		if (!state)
 		{
-			//			LOGDCD((" - DCD active\n"));
+			LOGDCD((" - DCD active\n"));
 			if (m_wr3 & WR3_AUTO_ENABLES)
 			{
 				LOGDCD((" - RX auto enabled\n"));
@@ -2531,12 +2532,12 @@ WRITE_LINE_MEMBER( z80scc_channel::dcd_w )
 		if (m_extint_latch == 0 && (m_wr1 & WR1_EXT_INT_ENABLE) && (m_wr15 & WR15_DCD))
 		{
 			// latch read register 0
-			LOGDCD((" - Latches RR0\n"));
+			LOGINT((" - Latches RR0\n"));
 			m_extint_latch = 1;
 			m_extint_states = m_rr0;
 
 			// trigger interrupt
-			LOGDCD((" - Trigger DCD interrupt\n"));
+			LOGINT((" - Trigger DCD interrupt\n"));
 			m_uart->trigger_interrupt(m_index, INT_EXTERNAL);
 		}
 	}
