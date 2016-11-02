@@ -59,7 +59,7 @@ static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8, darkmist_state )
 	AM_RANGE(0xd681, 0xd681) AM_DEVREAD("t5182", t5182_device, sharedram_semaphore_snd_r)
 	AM_RANGE(0xd682, 0xd682) AM_DEVWRITE("t5182", t5182_device, sharedram_semaphore_main_acquire_w)
 	AM_RANGE(0xd683, 0xd683) AM_DEVWRITE("t5182", t5182_device, sharedram_semaphore_main_release_w)
-	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("videoram")
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(tx_vram_w) AM_SHARE("videoram")
 	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("workram")
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("spriteram")
 ADDRESS_MAP_END
@@ -214,10 +214,10 @@ static const gfx_layout tilelayout =
 
 
 static GFXDECODE_START( darkmist )
-	GFXDECODE_ENTRY( "tx_gfx", 0, charlayout,  0, 16*4 )
-	GFXDECODE_ENTRY( "bg_gfx", 0, tilelayout,  0, 16*4 )
-	GFXDECODE_ENTRY( "fg_gfx", 0, tilelayout,  0, 16*4 )
-	GFXDECODE_ENTRY( "spr_gfx", 0, tilelayout,  0, 16*4 )
+	GFXDECODE_ENTRY( "tx_gfx", 0, charlayout,  0x300, 16 )
+	GFXDECODE_ENTRY( "bg_gfx", 0, tilelayout,  0x000, 16 )
+	GFXDECODE_ENTRY( "fg_gfx", 0, tilelayout,  0x100, 16 )
+	GFXDECODE_ENTRY( "spr_gfx", 0, tilelayout, 0x200, 16 )
 GFXDECODE_END
 
 TIMER_DEVICE_CALLBACK_MEMBER(darkmist_state::scanline)
@@ -241,7 +241,6 @@ static MACHINE_CONFIG_START( darkmist, darkmist_state )
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", darkmist_state, scanline, "screen", 0, 1)
 
 	MCFG_DEVICE_ADD("t5182", T5182, 0)
-
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
