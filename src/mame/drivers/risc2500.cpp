@@ -5,7 +5,8 @@
 	Saitek RISC 2500
 
 	TODO:
-	 - sound
+	 - Sound is too short and high pitch, better when you underclock the cpu.
+	   Is cpu cycle timing wrong? or internal divider?
 
 ******************************************************************************/
 
@@ -14,6 +15,8 @@
 #include "cpu/arm/arm.h"
 #include "machine/ram.h"
 #include "machine/nvram.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
 
 #include "risc2500.lh"
 
@@ -26,6 +29,7 @@ public:
 			m_maincpu(*this, "maincpu"),
 			m_ram(*this, "ram"),
 			m_nvram(*this, "nvram"),
+			m_dac(*this, "dac"),
 			m_inputs(*this, "P%u", 0)
 		{ }
 
@@ -44,6 +48,7 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 	required_device<nvram_device> m_nvram;
+	required_device<dac_byte_interface> m_dac;
 	required_ioport_array<8> m_inputs;
 
 	uint32_t  m_p1000;
@@ -237,7 +242,9 @@ WRITE32_MEMBER(risc2500_state::p1000_w)
 	{
 		memset(m_vram, 0, sizeof(m_vram));
 	}
-
+	
+	m_dac->write(data >> 28 & 3);                   // Speaker
+	
 	m_p1000 = data;
 }
 
@@ -300,6 +307,12 @@ static MACHINE_CONFIG_START( risc2500, risc2500_state )
 	MCFG_RAM_EXTRA_OPTIONS("128K, 256K, 512K, 1M, 2M")
 
 	MCFG_NVRAM_ADD_NO_FILL("nvram")
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_2BIT_BINARY_WEIGHTED_ONES_COMPLEMENT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -312,4 +325,4 @@ ROM_END
 
 
 /*    YEAR  NAME      PARENT   COMPAT  MACHINE    INPUT     INIT                COMPANY   FULLNAME     FLAGS */
-CONS( 1992, risc,     0,       0,      risc2500,  risc2500, driver_device,  0,  "Saitek", "RISC 2500", MACHINE_NOT_WORKING | MACHINE_NO_SOUND | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1992, risc,     0,       0,      risc2500,  risc2500, driver_device,  0,  "Saitek", "RISC 2500", MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
