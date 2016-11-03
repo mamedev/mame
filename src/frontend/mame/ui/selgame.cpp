@@ -347,7 +347,7 @@ void menu_select_game::handle()
 			if (!isfavorite())
 			{
 				const game_driver *driver = (const game_driver *)menu_event->itemref;
-				if ((uintptr_t)driver > skip_main_items && mame_machine_manager::instance()->lua()->call_plugin(driver->name, "data_list"))
+				if ((uintptr_t)driver > skip_main_items && mame_machine_manager::instance()->lua()->call_plugin_check<const char *>("data_list", driver->name, true))
 					menu::stack_push<menu_dats_view>(ui(), container(), driver);
 			}
 			else
@@ -356,10 +356,10 @@ void menu_select_game::handle()
 
 				if ((uintptr_t)ui_swinfo > skip_main_items)
 				{
-					if (ui_swinfo->startempty == 1 && mame_machine_manager::instance()->lua()->call_plugin(ui_swinfo->driver->name, "data_list"))
+					if (ui_swinfo->startempty == 1 && mame_machine_manager::instance()->lua()->call_plugin_check<const char *>("data_list", ui_swinfo->driver->name, true))
 						menu::stack_push<menu_dats_view>(ui(), container(), ui_swinfo->driver);
-					else if (mame_machine_manager::instance()->lua()->call_plugin(std::string(ui_swinfo->shortname).append(1, ',').append(ui_swinfo->listname).c_str(), "data_list") || !ui_swinfo->usage.empty())
-						menu::stack_push<menu_dats_view>(ui(), container(), ui_swinfo);
+					else if (mame_machine_manager::instance()->lua()->call_plugin_check<const char *>("data_list", std::string(ui_swinfo->shortname).append(1, ',').append(ui_swinfo->listname).c_str()) || !ui_swinfo->usage.empty())
+							menu::stack_push<menu_dats_view>(ui(), container(), ui_swinfo);
 				}
 			}
 		}
