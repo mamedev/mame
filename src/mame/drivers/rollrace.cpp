@@ -51,6 +51,10 @@ WRITE8_MEMBER(rollrace_state::sound_nmi_mask_w)
 	m_sound_nmi_mask = data & 1;
 }
 
+WRITE8_MEMBER(rollrace_state::coin_w)
+{
+	machine().bookkeeping().coin_counter_w(offset, data);
+}
 
 static ADDRESS_MAP_START( rollrace_map, AS_PROGRAM, 8, rollrace_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
@@ -72,7 +76,7 @@ static ADDRESS_MAP_START( rollrace_map, AS_PROGRAM, 8, rollrace_state )
 	AM_RANGE(0xf805, 0xf805) AM_READ_PORT("DSW2")
 	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(flipx_w)
 	AM_RANGE(0xfc01, 0xfc01) AM_WRITE(nmi_mask_w)
-	AM_RANGE(0xfc02, 0xfc03) AM_WRITENOP /* coin counters */
+	AM_RANGE(0xfc02, 0xfc03) AM_WRITE(coin_w)
 	AM_RANGE(0xfc04, 0xfc05) AM_WRITE(charbank_w)
 	AM_RANGE(0xfc06, 0xfc06) AM_WRITE(spritebank_w)
 ADDRESS_MAP_END
