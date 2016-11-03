@@ -5,7 +5,51 @@
 // Emulator for HP nanoprocessor
 // *****************************
 //
+// Nanoprocessor is a very simple microcontroller developed by HP in 1974 for
+// its own internal use. It's used, for example, in HP9845 built-in printer, in
+// 98034 & 98035 modules, etc.
+// Here's a summary of its features:
+// * 8-bit word size
+// * 1 Accumulator
+// * 16 general purpose registers
+// * 11-bit Program Counter
+// * 2048 bytes of program space
+// * 16 input 8-bit ports (DS0-DS15)
+// * 15 output 8-bit ports (DS0-DS14)
+// * 8 "direct control" I/O lines that can be individually tested/set/cleared
+// * 1 interrupt input with 8-bit vector
+// * One level nesting of subroutine call through a 11-bit subroutine stack register (SSR)
+// * One level nesting of interruption through a 11-bit interrupt stack register (ISR)
+// * No built-in ROM or RAM
+// * All instructions execute in 2 clock cycles
+// * NO arithmetic capabilities, except binary/BCD increment/decrement, bit
+//   manipulation, left/right shift and comparison between A and R0
+// * Register access can be indexed to use GP registers as a "poor man's RAM"
+//                            _____   _____
+//                   PA0   1 |*    \_/     | 40  VGG
+//                   PA1   2 |             | 39  VDD
+//                   PA2   3 |             | 38  VBG
+//                   PA3   4 |             | 37  DC0
+//                   PA4   5 |             | 36  DC1
+//                   PA5   6 |             | 35  DC2
+//                   PA6   7 |             | 34  DC3
+//                   PA7   8 |             | 33  DC4
+//                   PA8   9 |             | 32  DC5
+//                   PA9  10 |Nanoprocessor| 31  DC6
+//                  PA10  11 |             | 30  DC7/INT ENA
+//                   DS3  12 |             | 29  _INT
+//                   DS2  13 |             | 28  ACK
+//                   DS1  14 |             | 27  CLK
+//                   DS0  15 |             | 26  STM
+//                  _R/W  16 |             | 25  DB7
+//                   GND  17 |             | 24  DB6
+//                   DB0  18 |             | 23  DB5
+//                   DB1  19 |             | 22  DB4
+//                   DB2  20 |_____________| 21  DB3
+//
+// The HP manual of Nanoprocessor is available here:
 // http://www.hp9845.net/9845/downloads/manuals/Nanoprocessor.pdf
+// Thanks to anyone who made the manual available.
 #ifndef _NANOPROCESSOR_H_
 #define _NANOPROCESSOR_H_
 
