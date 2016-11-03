@@ -118,6 +118,7 @@ public:
 	DECLARE_WRITE8_MEMBER(quizpun2_soundlatch_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
+	void log_protection(address_space &space, const char *warning);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	uint32_t screen_update_quizpun2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -213,11 +214,10 @@ void quizpun2_state::machine_reset()
 	prot.addr = 0;
 }
 
-static void log_protection( address_space &space, const char *warning )
+void quizpun2_state::log_protection( address_space &space, const char *warning )
 {
-	quizpun2_state *state = space.machine().driver_data<quizpun2_state>();
-	struct prot_t &prot = state->m_prot;
-	state->logerror("%04x: protection - %s (state %x, wait %x, param %02x, cmd %02x, addr %02x)\n", space.device().safe_pc(), warning,
+	struct prot_t &prot = m_prot;
+	logerror("%04x: protection - %s (state %x, wait %x, param %02x, cmd %02x, addr %02x)\n", space.device().safe_pc(), warning,
 		prot.state,
 		prot.wait_param,
 		prot.param,

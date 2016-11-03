@@ -165,6 +165,8 @@ public:
 	DECLARE_WRITE32_MEMBER(model2_5881prot_w);
 	int first_read;
 
+	void model2_3d_init(uint16_t *texture_rom);
+	void geo_init(uint32_t *polygon_rom);
 	DECLARE_READ32_MEMBER(maxx_r);
 	DECLARE_WRITE32_MEMBER(mode_w);
 	DECLARE_WRITE32_MEMBER(model2o_tex_w0);
@@ -396,8 +398,3 @@ struct quad_m2
 	uint16_t              texheader[4];
 	uint8_t               luma;
 };
-
-
-
-/*----------- defined in video/model2.c -----------*/
-void model2_3d_set_zclip( running_machine &machine, uint8_t clip );

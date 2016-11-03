@@ -275,13 +275,11 @@ struct raster_state
  *
  *******************************************/
 
-static void model2_3d_init( running_machine &machine, uint16_t *texture_rom )
+void model2_state::model2_3d_init( uint16_t *texture_rom )
 {
-	model2_state *state = machine.driver_data<model2_state>();
+	m_raster = auto_alloc_clear(machine(), <raster_state>());
 
-	state->m_raster = auto_alloc_clear( machine, <raster_state>() );
-
-	state->m_raster->texture_rom = texture_rom;
+	m_raster->texture_rom = texture_rom;
 }
 
 /*******************************************
@@ -290,10 +288,9 @@ static void model2_3d_init( running_machine &machine, uint16_t *texture_rom )
  *
  *******************************************/
 
-void model2_3d_set_zclip( running_machine &machine, uint8_t clip )
+WRITE32_MEMBER(model2_state::model2_3d_zclip_w)
 {
-	model2_state *state = machine.driver_data<model2_state>();
-	state->m_raster->master_z_clip = clip;
+	m_raster->master_z_clip = data;
 }
 
 /*******************************************
@@ -1194,14 +1191,13 @@ struct geo_state
  *
  *******************************************/
 
-static void geo_init( running_machine &machine, uint32_t *polygon_rom )
+void model2_state::geo_init( uint32_t *polygon_rom )
 {
-	model2_state *state = machine.driver_data<model2_state>();
-	state->m_geo = auto_alloc_clear(machine, <geo_state>());
-	state->m_geo->state = state;
+	m_geo = auto_alloc_clear(machine(), <geo_state>());
+	m_geo->state = this;
 
-	state->m_geo->raster = state->m_raster;
-	state->m_geo->polygon_rom = polygon_rom;
+	m_geo->raster = m_raster;
+	m_geo->polygon_rom = polygon_rom;
 }
 
 /*******************************************
@@ -2595,10 +2591,10 @@ VIDEO_START_MEMBER(model2_state,model2)
 	m_poly = auto_alloc(machine(), model2_renderer(*this));
 
 	/* initialize the hardware rasterizer */
-	model2_3d_init( machine(), (uint16_t*)memregion("user3")->base() );
+	model2_3d_init( (uint16_t*)memregion("user3")->base() );
 
 	/* initialize the geometry engine */
-	geo_init( machine(), (uint32_t*)memregion("user2")->base() );
+	geo_init( (uint32_t*)memregion("user2")->base() );
 
 	/* init various video-related pointers */
 	m_palram = make_unique_clear<uint16_t[]>(0x2000);

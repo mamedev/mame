@@ -733,7 +733,6 @@ JP4/5/6/7 - Jumpers to configure ROMs
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "cpu/powerpc/ppc.h"
 #include "machine/eepromser.h"
 #include "machine/53c810.h"
 #include "machine/nvram.h"
@@ -952,20 +951,19 @@ WRITE64_MEMBER(model3_state::mpc105_reg_w)
 	m_mpc105_regs[(offset*2)+1] = (uint32_t)data;
 }
 
-static void mpc105_init(running_machine &machine)
+void model3_state::mpc105_init()
 {
-	model3_state *state = machine.driver_data<model3_state>();
 	/* set reset values */
-	memset(state->m_mpc105_regs, 0, sizeof(state->m_mpc105_regs));
-	state->m_mpc105_regs[0x00/4] = 0x00011057;      /* Vendor ID & Device ID */
-	state->m_mpc105_regs[0x04/4] = 0x00800006;      /* PCI Command & PCI Status */
-	state->m_mpc105_regs[0x08/4] = 0x00060000;      /* Class code */
-	state->m_mpc105_regs[0xa8/4] = 0x0010ff00;      /* Processor interface configuration 1 */
-	state->m_mpc105_regs[0xac/4] = 0x060c000c;      /* Processor interface configuration 2 */
-	state->m_mpc105_regs[0xb8/4] = 0x04000000;
-	state->m_mpc105_regs[0xf0/4] = 0x0000ff02;      /* Memory control configuration 1 */
-	state->m_mpc105_regs[0xf4/4] = 0x00030000;      /* Memory control configuration 2 */
-	state->m_mpc105_regs[0xfc/4] = 0x00000010;      /* Memory control configuration 4 */
+	memset(m_mpc105_regs, 0, sizeof(m_mpc105_regs));
+	m_mpc105_regs[0x00/4] = 0x00011057;      /* Vendor ID & Device ID */
+	m_mpc105_regs[0x04/4] = 0x00800006;      /* PCI Command & PCI Status */
+	m_mpc105_regs[0x08/4] = 0x00060000;      /* Class code */
+	m_mpc105_regs[0xa8/4] = 0x0010ff00;      /* Processor interface configuration 1 */
+	m_mpc105_regs[0xac/4] = 0x060c000c;      /* Processor interface configuration 2 */
+	m_mpc105_regs[0xb8/4] = 0x04000000;
+	m_mpc105_regs[0xf0/4] = 0x0000ff02;      /* Memory control configuration 1 */
+	m_mpc105_regs[0xf4/4] = 0x00030000;      /* Memory control configuration 2 */
+	m_mpc105_regs[0xfc/4] = 0x00000010;      /* Memory control configuration 4 */
 }
 
 /*****************************************************************************/
@@ -1044,25 +1042,24 @@ WRITE64_MEMBER(model3_state::mpc106_reg_w)
 	m_mpc106_regs[(offset*2)+1] = (uint32_t)data;
 }
 
-static void mpc106_init(running_machine &machine)
+void model3_state::mpc106_init()
 {
-	model3_state *state = machine.driver_data<model3_state>();
 	/* set reset values */
-	memset(state->m_mpc106_regs, 0, sizeof(state->m_mpc106_regs));
-	state->m_mpc106_regs[0x00/4] = 0x00021057;      /* Vendor ID & Device ID */
-	state->m_mpc106_regs[0x04/4] = 0x00800006;      /* PCI Command & PCI Status */
-	state->m_mpc106_regs[0x08/4] = 0x00060000;      /* Class code */
-	state->m_mpc106_regs[0x0c/4] = 0x00000800;      /* Cache line size */
-	state->m_mpc106_regs[0x70/4] = 0x00cd0000;      /* Output driver control */
-	state->m_mpc106_regs[0xa8/4] = 0x0010ff00;      /* Processor interface configuration 1 */
-	state->m_mpc106_regs[0xac/4] = 0x060c000c;      /* Processor interface configuration 2 */
-	state->m_mpc106_regs[0xb8/4] = 0x04000000;
-	state->m_mpc106_regs[0xc0/4] = 0x00000100;      /* Error enabling 1 */
-	state->m_mpc106_regs[0xe0/4] = 0x00420fff;      /* Emulation support configuration 1 */
-	state->m_mpc106_regs[0xe8/4] = 0x00200000;      /* Emulation support configuration 2 */
-	state->m_mpc106_regs[0xf0/4] = 0x0000ff02;      /* Memory control configuration 1 */
-	state->m_mpc106_regs[0xf4/4] = 0x00030000;      /* Memory control configuration 2 */
-	state->m_mpc106_regs[0xfc/4] = 0x00000010;      /* Memory control configuration 4 */
+	memset(m_mpc106_regs, 0, sizeof(m_mpc106_regs));
+	m_mpc106_regs[0x00/4] = 0x00021057;      /* Vendor ID & Device ID */
+	m_mpc106_regs[0x04/4] = 0x00800006;      /* PCI Command & PCI Status */
+	m_mpc106_regs[0x08/4] = 0x00060000;      /* Class code */
+	m_mpc106_regs[0x0c/4] = 0x00000800;      /* Cache line size */
+	m_mpc106_regs[0x70/4] = 0x00cd0000;      /* Output driver control */
+	m_mpc106_regs[0xa8/4] = 0x0010ff00;      /* Processor interface configuration 1 */
+	m_mpc106_regs[0xac/4] = 0x060c000c;      /* Processor interface configuration 2 */
+	m_mpc106_regs[0xb8/4] = 0x04000000;
+	m_mpc106_regs[0xc0/4] = 0x00000100;      /* Error enabling 1 */
+	m_mpc106_regs[0xe0/4] = 0x00420fff;      /* Emulation support configuration 1 */
+	m_mpc106_regs[0xe8/4] = 0x00200000;      /* Emulation support configuration 2 */
+	m_mpc106_regs[0xf0/4] = 0x0000ff02;      /* Memory control configuration 1 */
+	m_mpc106_regs[0xf4/4] = 0x00030000;      /* Memory control configuration 2 */
+	m_mpc106_regs[0xfc/4] = 0x00000010;      /* Memory control configuration 4 */
 }
 
 /*****************************************************************************/
@@ -1260,14 +1257,13 @@ LSI53C810_DMA_CB(model3_state::real3d_dma_callback)
 
 /*****************************************************************************/
 
-static void configure_fast_ram(running_machine &machine)
+void model3_state::configure_fast_ram()
 {
-	model3_state *state = machine.driver_data<model3_state>();
 	/* set conservative DRC options */
-	machine.device<ppc_device>("maincpu")->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
+	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	machine.device<ppc_device>("maincpu")->ppcdrc_add_fastram(0x00000000, 0x007fffff, false, state->m_work_ram);
+	m_maincpu->ppcdrc_add_fastram(0x00000000, 0x007fffff, false, m_work_ram);
 }
 
 TIMER_CALLBACK_MEMBER(model3_state::model3_sound_timer_tick)
@@ -1285,28 +1281,28 @@ TIMER_CALLBACK_MEMBER(model3_state::real3d_dma_timer_callback)
 
 MACHINE_START_MEMBER(model3_state,model3_10)
 {
-	configure_fast_ram(machine());
+	configure_fast_ram();
 
 	m_sound_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::model3_sound_timer_tick),this));
 	m_real3d_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::real3d_dma_timer_callback),this));
 }
 MACHINE_START_MEMBER(model3_state,model3_15)
 {
-	configure_fast_ram(machine());
+	configure_fast_ram();
 
 	m_sound_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::model3_sound_timer_tick),this));
 	m_real3d_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::real3d_dma_timer_callback),this));
 }
 MACHINE_START_MEMBER(model3_state,model3_20)
 {
-	configure_fast_ram(machine());
+	configure_fast_ram();
 
 	m_sound_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::model3_sound_timer_tick),this));
 	m_real3d_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::real3d_dma_timer_callback),this));
 }
 MACHINE_START_MEMBER(model3_state,model3_21)
 {
-	configure_fast_ram(machine());
+	configure_fast_ram();
 
 	m_sound_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::model3_sound_timer_tick),this));
 	m_real3d_dma_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(model3_state::real3d_dma_timer_callback),this));
@@ -1338,17 +1334,17 @@ void model3_state::model3_init(int step)
 	{
 		if (m_step15_with_mpc106)
 		{
-			mpc106_init(machine());
+			mpc106_init();
 		}
 		else
 		{
-			mpc105_init(machine());
+			mpc105_init();
 		}
 		m_real3d_device_id = 0x16c311db; /* PCI Vendor ID (11db = SEGA), Device ID (16c3 = 315-5827) */
 	}
 	else
 	{
-		mpc106_init(machine());
+		mpc106_init();
 		// some step 2+ games need the older PCI ID (obvious symptom:
 		// vbl is enabled briefly then disabled so the game hangs)
 		if (m_step20_with_old_real3d)
@@ -5740,18 +5736,17 @@ static MACHINE_CONFIG_DERIVED( model3_21_5881, model3_21 )
 MACHINE_CONFIG_END
 
 
-static void interleave_vroms(running_machine &machine)
+void model3_state::interleave_vroms()
 {
-	model3_state *state = machine.driver_data<model3_state>();
 	int start;
 	int i,j,x;
-	uint16_t *vrom1 = (uint16_t*)state->memregion("user3")->base();
-	uint16_t *vrom2 = (uint16_t*)state->memregion("user4")->base();
-	int vrom_length = state->memregion("user3")->bytes();
+	uint16_t *vrom1 = (uint16_t*)memregion("user3")->base();
+	uint16_t *vrom2 = (uint16_t*)memregion("user4")->base();
+	int vrom_length = memregion("user3")->bytes();
 	uint16_t *vrom;
 
-	state->m_vrom = std::make_unique<uint32_t[]>(0x4000000/4);
-	vrom = (uint16_t *)state->m_vrom.get();
+	m_vrom = std::make_unique<uint32_t[]>(0x4000000/4);
+	vrom = (uint16_t *)m_vrom.get();
 
 	if( vrom_length <= 0x1000000 ) {
 		start = 0x1000000;
@@ -5783,7 +5778,7 @@ DRIVER_INIT_MEMBER(model3_state, genprot)
 
 DRIVER_INIT_MEMBER(model3_state,model3_10)
 {
-	interleave_vroms(machine());
+	interleave_vroms();
 
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc0000000, 0xc00000ff, read64_delegate(FUNC(model3_state::scsi_r),this), write64_delegate(FUNC(model3_state::scsi_w),this));
 
@@ -5796,7 +5791,7 @@ DRIVER_INIT_MEMBER(model3_state,model3_10)
 
 DRIVER_INIT_MEMBER(model3_state,model3_15)
 {
-	interleave_vroms(machine());
+	interleave_vroms();
 	m_maincpu->space(AS_PROGRAM).install_read_bank(0xff000000, 0xff7fffff, "bank1" );
 
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0800cf8, 0xf0800cff, read64_delegate(FUNC(model3_state::mpc105_addr_r),this), write64_delegate(FUNC(model3_state::mpc105_addr_w),this));
@@ -5806,7 +5801,7 @@ DRIVER_INIT_MEMBER(model3_state,model3_15)
 
 DRIVER_INIT_MEMBER(model3_state,model3_20)
 {
-	interleave_vroms(machine());
+	interleave_vroms();
 	m_maincpu->space(AS_PROGRAM).install_read_bank(0xff000000, 0xff7fffff, "bank1" );
 
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc2000000, 0xc20000ff, read64_delegate(FUNC(model3_state::real3d_dma_r),this), write64_delegate(FUNC(model3_state::real3d_dma_w),this));
@@ -5875,7 +5870,7 @@ DRIVER_INIT_MEMBER(model3_state,vs215)
 {
 	m_step15_with_mpc106 = true;
 
-	interleave_vroms(machine());
+	interleave_vroms();
 	m_maincpu->space(AS_PROGRAM).install_read_bank(0xff000000, 0xff7fffff, "bank1" );
 
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf9000000, 0xf90000ff, read64_delegate(FUNC(model3_state::scsi_r),this), write64_delegate(FUNC(model3_state::scsi_w),this));
@@ -5896,7 +5891,7 @@ DRIVER_INIT_MEMBER(model3_state,vs29815)
 	rom[(0x6028ec^4)/4] = 0x60000000;
 	rom[(0x60290c^4)/4] = 0x60000000;
 
-	interleave_vroms(machine());
+	interleave_vroms();
 	m_maincpu->space(AS_PROGRAM).install_read_bank(0xff000000, 0xff7fffff, "bank1" );
 
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf9000000, 0xf90000ff, read64_delegate(FUNC(model3_state::scsi_r),this), write64_delegate(FUNC(model3_state::scsi_w),this));
@@ -5912,7 +5907,7 @@ DRIVER_INIT_MEMBER(model3_state,bass)
 {
 	m_step15_with_mpc106 = true;
 
-	interleave_vroms(machine());
+	interleave_vroms();
 	m_maincpu->space(AS_PROGRAM).install_read_bank(0xff000000, 0xff7fffff, "bank1" );
 
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf9000000, 0xf90000ff, read64_delegate(FUNC(model3_state::scsi_r),this), write64_delegate(FUNC(model3_state::scsi_w),this));
@@ -5926,7 +5921,7 @@ DRIVER_INIT_MEMBER(model3_state,bass)
 
 DRIVER_INIT_MEMBER(model3_state,getbass)
 {
-	interleave_vroms(machine());
+	interleave_vroms();
 	m_maincpu->space(AS_PROGRAM).install_read_bank(0xff000000, 0xff7fffff, "bank1" );
 
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf9000000, 0xf90000ff, read64_delegate(FUNC(model3_state::scsi_r),this), write64_delegate(FUNC(model3_state::scsi_w),this));

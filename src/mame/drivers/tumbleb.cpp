@@ -425,17 +425,15 @@ command 1 - stop?
 */
 
 
-static void tumbleb2_playmusic( device_t *device )
+void tumbleb_state::tumbleb2_playmusic(okim6295_device *oki)
 {
-	tumbleb_state *state = device->machine().driver_data<tumbleb_state>();
-	okim6295_device *oki = downcast<okim6295_device *>(device);
 	int status = oki->read_status();
 
-	if (state->m_music_is_playing)
+	if (m_music_is_playing)
 	{
 		if (!BIT(status, 3))
 		{
-			oki->write_command(0x80 | state->m_music_command);
+			oki->write_command(0x80 | m_music_command);
 			oki->write_command(0x00 | 0x82);
 		}
 	}
