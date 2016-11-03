@@ -32,12 +32,9 @@ public:
 	~lua_engine();
 
 	void initialize();
-	void start_console();
 	void load_script(const char *filename);
 	void load_string(const char *value);
 
-	void serve_lua();
-	void periodic_check();
 	bool frame_hook();
 
 	void menu_populate(const std::string &menu, std::vector<std::tuple<std::string, std::string, std::string>> &menu_list);
@@ -116,8 +113,6 @@ private:
 
 	running_machine &machine() const { return *m_machine; }
 
-	void update_machine();
-
 	void on_machine_prestart();
 	void on_machine_start();
 	void on_machine_stop();
@@ -157,9 +152,6 @@ private:
 
 	void close();
 
-	int report(int status);
-	int incomplete(int status) ;
-	int docall(int narg, int nres);
 	void run(sol::load_result res);
 };
 
