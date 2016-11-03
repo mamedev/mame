@@ -21,7 +21,7 @@ Download (stable)
 
 [![Build Status](https://travis-ci.org/bkaradzic/GENie.svg?branch=master)](https://travis-ci.org/bkaradzic/GENie)
 
-	version 696 (commit bb4e3f69372e19c355468223da218eda6516ad3c)
+	version 699 (commit a785b1bbb570485da7eb73d52f59c7d6e3f24bf4)
 
 Linux:  
 https://github.com/bkaradzic/bx/raw/master/tools/bin/linux/genie
@@ -112,6 +112,7 @@ intention to keep it compatible with it.
  - Added support for QtCreator via Qbs build tool.
  - Added .natvis file type support for Visual Studio.
  - Added Swift language support for make and ninja build generators.
+ - Removed CodeBlocks and CodeLite support.
 
 Debugging GENie scripts
 -----------------------

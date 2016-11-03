@@ -2,6 +2,10 @@
 -- copyright-holders:MAMEdev Team
 STANDALONE = false
 
+-- Big project specific
+premake.make.makefile_ignore = true
+premake._checkgenerate = false
+
 newoption {
 	trigger = 'build-dir',
 	description = 'Build directory name',

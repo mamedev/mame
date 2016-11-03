@@ -40,16 +40,6 @@
 		"base/premake.lua",
 		"base/iter.lua",
 		"base/set.lua",
-		
-		-- CodeBlocks action
-		"actions/codeblocks/_codeblocks.lua",
-		"actions/codeblocks/codeblocks_workspace.lua",
-		"actions/codeblocks/codeblocks_cbp.lua",
-
-		-- CodeLite action
-		"actions/codelite/_codelite.lua",
-		"actions/codelite/codelite_workspace.lua",
-		"actions/codelite/codelite_project.lua",
 
 		-- CMake action
 		"actions/cmake/_cmake.lua",

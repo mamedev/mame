@@ -6,6 +6,8 @@
 
 	premake.make.cpp = { }
 	premake.make.override = { }
+	premake.make.makefile_ignore = false
+	
 	local cpp = premake.make.cpp
 	local make = premake.make
 
@@ -259,9 +261,11 @@
 		_p('  endif')
 		_p('endif')
 		_p('')
---        
---        _p('MAKEFILE = %s', _MAKE.getmakefilename(prj, true))
---        _p('')
+
+		if (not premake.make.makefile_ignore) then
+			_p('MAKEFILE = %s', _MAKE.getmakefilename(prj, true))
+			_p('')
+		end
 	end
 
 --
