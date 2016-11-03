@@ -8,10 +8,7 @@
 
 ***************************************************************************/
 
-#include <limits>
-#include <thread>
 #include <lua.hpp>
-#include <signal.h>
 #include "emu.h"
 #include "mame.h"
 #include "drivenum.h"
@@ -21,7 +18,6 @@
 #include "natkeyboard.h"
 #include "uiinput.h"
 #include "pluginopts.h"
-#include <mutex>
 
 #ifdef __clang__
 #pragma clang diagnostic ignored "-Wshift-count-overflow"

@@ -109,8 +109,6 @@ private:
 
 	std::vector<std::string> m_menu;
 
-	std::map<lua_State *, std::pair<lua_State *, int> > thread_registry;
-
 	running_machine &machine() const { return *m_machine; }
 
 	void on_machine_prestart();
