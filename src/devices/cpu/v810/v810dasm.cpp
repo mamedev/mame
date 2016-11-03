@@ -39,7 +39,7 @@ static const char *const dRegs[]=
 #define GET2s(opcode) dRegs[((opcode)>>5)&0x1f]
 #define GETRs(opcode) dRegs[32+((opcode)&0x1f)]
 
-CPU_DISASSEMBLE( v810 )
+static offs_t internal_disasm_v810(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
 {
 	uint32_t flags = 0;
 	uint32_t opc,opc2;
@@ -49,56 +49,56 @@ CPU_DISASSEMBLE( v810 )
 
 	switch(opc>>10)
 	{
-		case 0x00: sprintf(buffer,"MOV %s,%s",GET1s(opc),GET2s(opc)); size=2; break;
-		case 0x01: sprintf(buffer,"ADD %s,%s",GET1s(opc),GET2s(opc)); size=2; break;
-		case 0x02: sprintf(buffer,"SUB %s,%s",GET1s(opc),GET2s(opc)); size=2; break;
-		case 0x03: sprintf(buffer,"CMP %s,%s",GET1s(opc),GET2s(opc)); size=2; break;
-		case 0x04: sprintf(buffer,"SHL %s,%s",GET1s(opc),GET2s(opc)); size=2; break;
-		case 0x05: sprintf(buffer,"SHR %s,%s",GET1s(opc),GET2s(opc)); size=2; break;
-		case 0x06: sprintf(buffer,"JMP [%s]",GET1s(opc)); size=2; if ((opc&0x1f) == 31) flags = DASMFLAG_STEP_OUT; break;
-		case 0x07: sprintf(buffer,"SAR %s,%s",GET1s(opc),GET2s(opc)); size=2; break;
-		case 0x08: sprintf(buffer,"MUL %s,%s",GET1s(opc),GET2s(opc)); size=2; break;
-		case 0x09: sprintf(buffer,"DIV %s,%s",GET1s(opc),GET2s(opc)); size=2; break;
-		case 0x0a: sprintf(buffer,"MULU %s,%s",GET1s(opc),GET2s(opc)); size=2; break;
-		case 0x0b: sprintf(buffer,"DIVU %s,%s",GET1s(opc),GET2s(opc)); size=2; break;
-		case 0x0c: sprintf(buffer,"OR %s,%s",GET1s(opc),GET2s(opc));    size=2; break;
-		case 0x0d: sprintf(buffer,"AND %s,%s",GET1s(opc),GET2s(opc)); size=2; break;
-		case 0x0e: sprintf(buffer,"XOR %s,%s",GET1s(opc),GET2s(opc)); size=2; break;
-		case 0x0f: sprintf(buffer,"NOT %s,%s",GET1s(opc),GET2s(opc)); size=2; break;
-		case 0x10: sprintf(buffer,"MOV %X,%s",I5(opc),GET2s(opc)); size=2; break;
-		case 0x11: sprintf(buffer,"ADD %X,%s",I5(opc),GET2s(opc)); size=2; break;
-		case 0x12: sprintf(buffer,"SETF %X,%s",I5(opc),GET2s(opc)); size=2; break;
-		case 0x13: sprintf(buffer,"CMP %X,%s",I5(opc),GET2s(opc)); size=2; break;
-		case 0x14: sprintf(buffer,"SHL %X,%s",UI5(opc),GET2s(opc)); size=2; break;
-		case 0x15: sprintf(buffer,"SHR %X,%s",UI5(opc),GET2s(opc)); size=2; break;
-		case 0x16: sprintf(buffer,"EI"); size=2; break;
-		case 0x17: sprintf(buffer,"SAR %X,%s",UI5(opc),GET2s(opc)); size=2; break;
-		case 0x18: sprintf(buffer,"TRAP %X",I5(opc)); size=2; break;
-		case 0x19: sprintf(buffer,"RETI"); size=2; flags = DASMFLAG_STEP_OUT; break;
-		case 0x1a: sprintf(buffer,"HALT"); size=2; break;
-		case 0x1b: sprintf(buffer,"Unk 0x1B"); size=2; break;
-		case 0x1c: sprintf(buffer,"LDSR %s,%s",GET2s(opc),GETRs(opc));size=2; break;
-		case 0x1d: sprintf(buffer,"STSR %s,%s",GETRs(opc),GET2s(opc));size=2; break;
-		case 0x1e: sprintf(buffer,"DI"); size=2; break;
+		case 0x00: util::stream_format(stream,"MOV %s,%s",GET1s(opc),GET2s(opc)); size=2; break;
+		case 0x01: util::stream_format(stream,"ADD %s,%s",GET1s(opc),GET2s(opc)); size=2; break;
+		case 0x02: util::stream_format(stream,"SUB %s,%s",GET1s(opc),GET2s(opc)); size=2; break;
+		case 0x03: util::stream_format(stream,"CMP %s,%s",GET1s(opc),GET2s(opc)); size=2; break;
+		case 0x04: util::stream_format(stream,"SHL %s,%s",GET1s(opc),GET2s(opc)); size=2; break;
+		case 0x05: util::stream_format(stream,"SHR %s,%s",GET1s(opc),GET2s(opc)); size=2; break;
+		case 0x06: util::stream_format(stream,"JMP [%s]",GET1s(opc)); size=2; if ((opc&0x1f) == 31) flags = DASMFLAG_STEP_OUT; break;
+		case 0x07: util::stream_format(stream,"SAR %s,%s",GET1s(opc),GET2s(opc)); size=2; break;
+		case 0x08: util::stream_format(stream,"MUL %s,%s",GET1s(opc),GET2s(opc)); size=2; break;
+		case 0x09: util::stream_format(stream,"DIV %s,%s",GET1s(opc),GET2s(opc)); size=2; break;
+		case 0x0a: util::stream_format(stream,"MULU %s,%s",GET1s(opc),GET2s(opc)); size=2; break;
+		case 0x0b: util::stream_format(stream,"DIVU %s,%s",GET1s(opc),GET2s(opc)); size=2; break;
+		case 0x0c: util::stream_format(stream,"OR %s,%s",GET1s(opc),GET2s(opc));    size=2; break;
+		case 0x0d: util::stream_format(stream,"AND %s,%s",GET1s(opc),GET2s(opc)); size=2; break;
+		case 0x0e: util::stream_format(stream,"XOR %s,%s",GET1s(opc),GET2s(opc)); size=2; break;
+		case 0x0f: util::stream_format(stream,"NOT %s,%s",GET1s(opc),GET2s(opc)); size=2; break;
+		case 0x10: util::stream_format(stream,"MOV %X,%s",I5(opc),GET2s(opc)); size=2; break;
+		case 0x11: util::stream_format(stream,"ADD %X,%s",I5(opc),GET2s(opc)); size=2; break;
+		case 0x12: util::stream_format(stream,"SETF %X,%s",I5(opc),GET2s(opc)); size=2; break;
+		case 0x13: util::stream_format(stream,"CMP %X,%s",I5(opc),GET2s(opc)); size=2; break;
+		case 0x14: util::stream_format(stream,"SHL %X,%s",UI5(opc),GET2s(opc)); size=2; break;
+		case 0x15: util::stream_format(stream,"SHR %X,%s",UI5(opc),GET2s(opc)); size=2; break;
+		case 0x16: util::stream_format(stream,"EI"); size=2; break;
+		case 0x17: util::stream_format(stream,"SAR %X,%s",UI5(opc),GET2s(opc)); size=2; break;
+		case 0x18: util::stream_format(stream,"TRAP %X",I5(opc)); size=2; break;
+		case 0x19: util::stream_format(stream,"RETI"); size=2; flags = DASMFLAG_STEP_OUT; break;
+		case 0x1a: util::stream_format(stream,"HALT"); size=2; break;
+		case 0x1b: util::stream_format(stream,"Unk 0x1B"); size=2; break;
+		case 0x1c: util::stream_format(stream,"LDSR %s,%s",GET2s(opc),GETRs(opc));size=2; break;
+		case 0x1d: util::stream_format(stream,"STSR %s,%s",GETRs(opc),GET2s(opc));size=2; break;
+		case 0x1e: util::stream_format(stream,"DI"); size=2; break;
 		case 0x1f:
 					switch(opc&0x1f)
 						{
-							case 0x00:  sprintf(buffer,"SCH0BSU"); break;
-							case 0x01:  sprintf(buffer,"SCH0BSD"); break;
-							case 0x02:  sprintf(buffer,"SCH1BSU"); break;
-							case 0x03:  sprintf(buffer,"SCH1BSD"); break;
-							case 0x04:  sprintf(buffer,"UnkS 4"); break;
-							case 0x05:  sprintf(buffer,"UnkS 5"); break;
-							case 0x06:  sprintf(buffer,"UnkS 6"); break;
-							case 0x08:  sprintf(buffer,"ORBSU"); break;
-							case 0x09:  sprintf(buffer,"ANDBSU"); break;
-							case 0x0a:  sprintf(buffer,"XORBSU"); break;
-							case 0x0b:  sprintf(buffer,"MOVBSU"); break;
-							case 0x0c:  sprintf(buffer,"ORNBSU"); break;
-							case 0x0d:  sprintf(buffer,"ANDNBSU"); break;
-							case 0x0e:  sprintf(buffer,"XORNBSU"); break;
-							case 0x0f:  sprintf(buffer,"NOTBSU"); break;
-							default:        sprintf(buffer,"UnkBS 0x%X",opc&0x1f); break;
+							case 0x00:  util::stream_format(stream,"SCH0BSU"); break;
+							case 0x01:  util::stream_format(stream,"SCH0BSD"); break;
+							case 0x02:  util::stream_format(stream,"SCH1BSU"); break;
+							case 0x03:  util::stream_format(stream,"SCH1BSD"); break;
+							case 0x04:  util::stream_format(stream,"UnkS 4"); break;
+							case 0x05:  util::stream_format(stream,"UnkS 5"); break;
+							case 0x06:  util::stream_format(stream,"UnkS 6"); break;
+							case 0x08:  util::stream_format(stream,"ORBSU"); break;
+							case 0x09:  util::stream_format(stream,"ANDBSU"); break;
+							case 0x0a:  util::stream_format(stream,"XORBSU"); break;
+							case 0x0b:  util::stream_format(stream,"MOVBSU"); break;
+							case 0x0c:  util::stream_format(stream,"ORNBSU"); break;
+							case 0x0d:  util::stream_format(stream,"ANDNBSU"); break;
+							case 0x0e:  util::stream_format(stream,"XORNBSU"); break;
+							case 0x0f:  util::stream_format(stream,"NOTBSU"); break;
+							default:        util::stream_format(stream,"UnkBS 0x%X",opc&0x1f); break;
 						}
 					size=2;
 					break;
@@ -111,67 +111,77 @@ CPU_DISASSEMBLE( v810 )
 		case 0x26:
 		case 0x27: switch( (opc>>9) &0xf)
 								{
-									case 0x0: sprintf(buffer,"BV %X",pc+D9(opc));  break;
-									case 0x1: sprintf(buffer,"BL %X",pc+D9(opc));  break;
-									case 0x2: sprintf(buffer,"BE %X",pc+D9(opc));  break;
-									case 0x3: sprintf(buffer,"BNH %X",pc+D9(opc)); break;
-									case 0x4: sprintf(buffer,"BN %X",pc+D9(opc));  break;
-									case 0x5: sprintf(buffer,"BR %X",pc+D9(opc));  break;
-									case 0x6: sprintf(buffer,"BLT %X",pc+D9(opc)); break;
-									case 0x7: sprintf(buffer,"BLE %X",pc+D9(opc)); break;
-									case 0x8: sprintf(buffer,"BNV %X",pc+D9(opc)); break;
-									case 0x9: sprintf(buffer,"BNL %X",pc+D9(opc)); break;
-									case 0xa: sprintf(buffer,"BNE %X",pc+D9(opc)); break;
-									case 0xb: sprintf(buffer,"BH %X",pc+D9(opc));  break;
-									case 0xc: sprintf(buffer,"BP %X",pc+D9(opc));  break;
-									case 0xd: sprintf(buffer,"NOP"); break;
-									case 0xe: sprintf(buffer,"BGE %X",pc+D9(opc)); break;
-									case 0xf: sprintf(buffer,"BGT %X",pc+D9(opc)); break;
+									case 0x0: util::stream_format(stream,"BV %X",pc+D9(opc));  break;
+									case 0x1: util::stream_format(stream,"BL %X",pc+D9(opc));  break;
+									case 0x2: util::stream_format(stream,"BE %X",pc+D9(opc));  break;
+									case 0x3: util::stream_format(stream,"BNH %X",pc+D9(opc)); break;
+									case 0x4: util::stream_format(stream,"BN %X",pc+D9(opc));  break;
+									case 0x5: util::stream_format(stream,"BR %X",pc+D9(opc));  break;
+									case 0x6: util::stream_format(stream,"BLT %X",pc+D9(opc)); break;
+									case 0x7: util::stream_format(stream,"BLE %X",pc+D9(opc)); break;
+									case 0x8: util::stream_format(stream,"BNV %X",pc+D9(opc)); break;
+									case 0x9: util::stream_format(stream,"BNL %X",pc+D9(opc)); break;
+									case 0xa: util::stream_format(stream,"BNE %X",pc+D9(opc)); break;
+									case 0xb: util::stream_format(stream,"BH %X",pc+D9(opc));  break;
+									case 0xc: util::stream_format(stream,"BP %X",pc+D9(opc));  break;
+									case 0xd: util::stream_format(stream,"NOP"); break;
+									case 0xe: util::stream_format(stream,"BGE %X",pc+D9(opc)); break;
+									case 0xf: util::stream_format(stream,"BGT %X",pc+D9(opc)); break;
 								}
 								size=2;
 								break;
 
-		case 0x28:  sprintf(buffer,"MOVEA %X, %s, %s",I16(opc2),GET1s(opc),GET2s(opc));size=4; break;
-		case 0x29:  sprintf(buffer,"ADDI %X, %s, %s",I16(opc2),GET1s(opc),GET2s(opc));size=4; break;
-		case 0x2a:  sprintf(buffer,"JR %X",pc+D26(opc,opc2));size=4; break;
-		case 0x2b:  sprintf(buffer,"JAL %X",pc+D26(opc,opc2));size=4; flags = DASMFLAG_STEP_OVER; break;
-		case 0x2c:  sprintf(buffer,"ORI %X, %s, %s",UI16(opc2),GET1s(opc),GET2s(opc));size=4; break;
-		case 0x2d:  sprintf(buffer,"ANDI %X, %s, %s",UI16(opc2),GET1s(opc),GET2s(opc));size=4; break;
-		case 0x2e:  sprintf(buffer,"XORI %X, %s, %s",UI16(opc2),GET1s(opc),GET2s(opc));size=4; break;
-		case 0x2f:  sprintf(buffer,"MOVHI %X, %s, %s",UI16(opc2),GET1s(opc),GET2s(opc));size=4; break;
-		case 0x30:  sprintf(buffer,"LDB %X[%s], %s",D16(opc2),GET1s(opc),GET2s(opc));size=4; break;
-		case 0x31:  sprintf(buffer,"LDH %X[%s], %s",D16(opc2),GET1s(opc),GET2s(opc));size=4; break;
-		case 0x32:  sprintf(buffer,"Unk 0x32"); size=2; break;
-		case 0x33:  sprintf(buffer,"LDW %X[%s], %s",D16(opc2),GET1s(opc),GET2s(opc));size=4; break;
-		case 0x34:  sprintf(buffer,"STB %s, %X[%s]",GET2s(opc),D16(opc2),GET1s(opc));size=4; break;
-		case 0x35:  sprintf(buffer,"STH %s, %X[%s]",GET2s(opc),D16(opc2),GET1s(opc));size=4; break;
-		case 0x36:  sprintf(buffer,"Unk 0x36"); size=2; break;
-		case 0x37:  sprintf(buffer,"STW %s, %X[%s]",GET2s(opc),D16(opc2),GET1s(opc));size=4; break;
-		case 0x38:  sprintf(buffer,"INB %X[%s], %s",D16(opc2),GET1s(opc),GET2s(opc));size=4; break;
-		case 0x39:  sprintf(buffer,"INH %X[%s], %s",D16(opc2),GET1s(opc),GET2s(opc));size=4; break;
-		case 0x3a:  sprintf(buffer,"CAXI %X[%s], %s",D16(opc2),GET1s(opc),GET2s(opc));size=4; break;
-		case 0x3b:  sprintf(buffer,"INW %X[%s], %s",D16(opc2),GET1s(opc),GET2s(opc));size=4; break;
+		case 0x28:  util::stream_format(stream,"MOVEA %X, %s, %s",I16(opc2),GET1s(opc),GET2s(opc));size=4; break;
+		case 0x29:  util::stream_format(stream,"ADDI %X, %s, %s",I16(opc2),GET1s(opc),GET2s(opc));size=4; break;
+		case 0x2a:  util::stream_format(stream,"JR %X",pc+D26(opc,opc2));size=4; break;
+		case 0x2b:  util::stream_format(stream,"JAL %X",pc+D26(opc,opc2));size=4; flags = DASMFLAG_STEP_OVER; break;
+		case 0x2c:  util::stream_format(stream,"ORI %X, %s, %s",UI16(opc2),GET1s(opc),GET2s(opc));size=4; break;
+		case 0x2d:  util::stream_format(stream,"ANDI %X, %s, %s",UI16(opc2),GET1s(opc),GET2s(opc));size=4; break;
+		case 0x2e:  util::stream_format(stream,"XORI %X, %s, %s",UI16(opc2),GET1s(opc),GET2s(opc));size=4; break;
+		case 0x2f:  util::stream_format(stream,"MOVHI %X, %s, %s",UI16(opc2),GET1s(opc),GET2s(opc));size=4; break;
+		case 0x30:  util::stream_format(stream,"LDB %X[%s], %s",D16(opc2),GET1s(opc),GET2s(opc));size=4; break;
+		case 0x31:  util::stream_format(stream,"LDH %X[%s], %s",D16(opc2),GET1s(opc),GET2s(opc));size=4; break;
+		case 0x32:  util::stream_format(stream,"Unk 0x32"); size=2; break;
+		case 0x33:  util::stream_format(stream,"LDW %X[%s], %s",D16(opc2),GET1s(opc),GET2s(opc));size=4; break;
+		case 0x34:  util::stream_format(stream,"STB %s, %X[%s]",GET2s(opc),D16(opc2),GET1s(opc));size=4; break;
+		case 0x35:  util::stream_format(stream,"STH %s, %X[%s]",GET2s(opc),D16(opc2),GET1s(opc));size=4; break;
+		case 0x36:  util::stream_format(stream,"Unk 0x36"); size=2; break;
+		case 0x37:  util::stream_format(stream,"STW %s, %X[%s]",GET2s(opc),D16(opc2),GET1s(opc));size=4; break;
+		case 0x38:  util::stream_format(stream,"INB %X[%s], %s",D16(opc2),GET1s(opc),GET2s(opc));size=4; break;
+		case 0x39:  util::stream_format(stream,"INH %X[%s], %s",D16(opc2),GET1s(opc),GET2s(opc));size=4; break;
+		case 0x3a:  util::stream_format(stream,"CAXI %X[%s], %s",D16(opc2),GET1s(opc),GET2s(opc));size=4; break;
+		case 0x3b:  util::stream_format(stream,"INW %X[%s], %s",D16(opc2),GET1s(opc),GET2s(opc));size=4; break;
 
-		case 0x3c:  sprintf(buffer,"OUTB %s, %X[%s]",GET2s(opc),D16(opc2),GET1s(opc));size=4; break;
-		case 0x3d:  sprintf(buffer,"OUTH %s, %X[%s]",GET2s(opc),D16(opc2),GET1s(opc));size=4; break;
+		case 0x3c:  util::stream_format(stream,"OUTB %s, %X[%s]",GET2s(opc),D16(opc2),GET1s(opc));size=4; break;
+		case 0x3d:  util::stream_format(stream,"OUTH %s, %X[%s]",GET2s(opc),D16(opc2),GET1s(opc));size=4; break;
 		case 0x3e:
 								switch((opc2&0xfc00)>>10)
 								{
-									case 0x0: sprintf(buffer,"CMPF.S %s, %s",GET1s(opc),GET2s(opc)); break;
-									case 0x2: sprintf(buffer,"CVT.WS %s, %s",GET1s(opc),GET2s(opc)); break;
-									case 0x3: sprintf(buffer,"CVT.SW %s, %s",GET1s(opc),GET2s(opc)); break;
-									case 0x4: sprintf(buffer,"ADDF.S %s, %s",GET1s(opc),GET2s(opc)); break;
-									case 0x5: sprintf(buffer,"SUBF.S %s, %s",GET1s(opc),GET2s(opc)); break;
-									case 0x6: sprintf(buffer,"MULF.S %s, %s",GET1s(opc),GET2s(opc)); break;
-									case 0x7: sprintf(buffer,"DIVF.S %s, %s",GET1s(opc),GET2s(opc)); break;
-									case 0xb: sprintf(buffer,"TRNC.SW %s, %s",GET1s(opc),GET2s(opc)); break;
-									default : sprintf(buffer,"Unkf 0x%X",(opc2&0xfc00)>>10); break;
+									case 0x0: util::stream_format(stream,"CMPF.S %s, %s",GET1s(opc),GET2s(opc)); break;
+									case 0x2: util::stream_format(stream,"CVT.WS %s, %s",GET1s(opc),GET2s(opc)); break;
+									case 0x3: util::stream_format(stream,"CVT.SW %s, %s",GET1s(opc),GET2s(opc)); break;
+									case 0x4: util::stream_format(stream,"ADDF.S %s, %s",GET1s(opc),GET2s(opc)); break;
+									case 0x5: util::stream_format(stream,"SUBF.S %s, %s",GET1s(opc),GET2s(opc)); break;
+									case 0x6: util::stream_format(stream,"MULF.S %s, %s",GET1s(opc),GET2s(opc)); break;
+									case 0x7: util::stream_format(stream,"DIVF.S %s, %s",GET1s(opc),GET2s(opc)); break;
+									case 0xb: util::stream_format(stream,"TRNC.SW %s, %s",GET1s(opc),GET2s(opc)); break;
+									default : util::stream_format(stream,"Unkf 0x%X",(opc2&0xfc00)>>10); break;
 								}
 							size=4;
 							break;
-		case 0x3f:  sprintf(buffer,"OUTW %s, %X[%s]",GET2s(opc),D16(opc2),GET1s(opc));size=4; break;
+		case 0x3f:  util::stream_format(stream,"OUTW %s, %X[%s]",GET2s(opc),D16(opc2),GET1s(opc));size=4; break;
 
 		default : size=2;
 	}
 	return size | flags | DASMFLAG_SUPPORTED;
+}
+
+
+CPU_DISASSEMBLE(v810)
+{
+	std::ostringstream stream;
+	offs_t result = internal_disasm_v810(device, stream, pc, oprom, opram, options);
+	std::string stream_str = stream.str();
+	strcpy(buffer, stream_str.c_str());
+	return result;
 }
