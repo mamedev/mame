@@ -26,6 +26,54 @@
     For further info on this module see also:
     http://www.hp9825.com/html/real-time_clock.html
 
+    Here's what I know about the clock chip.
+    * Packaged in a 24-pin DIP
+    * Runs on a 2.4V NiCd battery
+    * Keeps time with a standard 32.768 kHz oscillator
+    * Drives a 3 1/2 digit LED display with 7-segment digits
+    * Multiplexes digits with a 32768 Hz / 64 clock
+    * Has 3 buttons to read/set time (READ, SET & CHG)
+    * Counts month, day, hour, minute & seconds (no year)
+    * Doesn't support leap years
+    * On Tony Duell's schematics the chip is marked "AC5954"
+
+    All my attempts to find something like a datasheet of this chip
+    failed.
+
+    This driver emulates the clock chip with a FSM that reacts to
+    "short" and "long" pressings of keys. Here's a summary of the FSM.
+
+    | State | Key pressed | New state | Display                        |
+    |-------+-------------+-----------+--------------------------------|
+    | OFF   |             |           | Blank, no multiplexing         |
+    |       | Short READ  | HHMM      |                                |
+    |       | Short SET   | HH        |                                |
+    | HHMM  |             |           | "HH:mm" (Hours 1-12 and mins.) |
+    |       |             |           | On real chip it probably       |
+    |       |             |           | returns to OFF after a couple  |
+    |       |             |           | of seconds.                    |
+    |       | Long READ   | SS        |                                |
+    | SS    |             |           | "  :SS" (just seconds)         |
+    |       | Short SET   | HH        |                                |
+    |       | Long SET    | OFF       |                                |
+    |       | READ + CHG  |           | seconds++                      |
+    | HH    |             |           | "HH: A/P" (hours & AM/PM)      |
+    |       | Short SET   | MIN       |                                |
+    |       | Long SET    | OFF       |                                |
+    |       | READ + CHG  |           | hours++                        |
+    | MIN   |             |           | "  :mm" (just minutes)         |
+    |       | Short SET   | MON       |                                |
+    |       | Long SET    | OFF       |                                |
+    |       | READ + CHG  |           | minutes++                      |
+    | MON   |             |           | "MM:  " (just month)           |
+    |       | Short SET   | DOM       |                                |
+    |       | Long SET    | OFF       |                                |
+    |       | READ + CHG  |           | month++                        |
+    | DOM   |             |           | "  :DD" (just day of month)    |
+    |       | Short SET   | OFF       |                                |
+    |       | Long SET    | OFF       |                                |
+    |       | READ + CHG  |           | day++                          |
+
     The main reference for this module is this manual:
     HP, 98035A Real Time Clock Installation and Operation Manual
 
@@ -35,7 +83,7 @@
 #include "coreutil.h"
 
 // Debugging
-#define VERBOSE 1
+#define VERBOSE 0
 #define LOG(x)  do { if (VERBOSE) logerror x; } while (0)
 
 #define BIT_MASK(n) (1U << (n))
@@ -514,13 +562,13 @@ void hp98035_io_card::regen_clock_image(void)
 		m_clock_state = CLOCK_OFF;
 		break;
 	}
-	logerror("St=%d segh=%d %02x:%02x:%02x\n" , m_clock_state ,  m_clock_segh , m_clock_digits[ 2 ] ,
-			 m_clock_digits[ 1 ] , m_clock_digits[ 0 ]);
+	LOG(("St=%d segh=%d %02x:%02x:%02x\n" , m_clock_state ,  m_clock_segh , m_clock_digits[ 2 ] ,
+		 m_clock_digits[ 1 ] , m_clock_digits[ 0 ]));
 }
 
 void hp98035_io_card::clock_short_press(void)
 {
-	logerror("Short press:%u\n" , m_clock_keys);
+	LOG(("Short press:%u\n" , m_clock_keys));
 
 	bool regen = false;
 	int tmp;
@@ -610,7 +658,7 @@ void hp98035_io_card::clock_short_press(void)
 		} else if (m_clock_keys == (KEY_CHG_MASK | KEY_READ_MASK)) {
 			tmp = get_clock_register(RTC_DAY);
 			tmp++;
-			if (tmp > gregorian_days_in_month(get_clock_register(RTC_MONTH) , 1)) {
+			if (tmp > gregorian_days_in_month(get_clock_register(RTC_MONTH) , 0)) {
 				tmp = 1;
 			}
 			set_clock_register(RTC_DAY , tmp);
@@ -630,7 +678,7 @@ void hp98035_io_card::clock_short_press(void)
 
 void hp98035_io_card::clock_long_press(void)
 {
-	logerror("Long press:%u\n" , m_clock_keys);
+	LOG(("Long press:%u\n" , m_clock_keys));
 
 	bool regen = false;
 
@@ -664,7 +712,9 @@ void hp98035_io_card::clock_long_press(void)
 
 void hp98035_io_card::log_current_time(void)
 {
-	logerror("Time = %d:%d:%d:%d:%d\n" , get_clock_register(RTC_MONTH) , get_clock_register(RTC_DAY) , get_clock_register(RTC_HOUR) , get_clock_register(RTC_MINUTE) , get_clock_register(RTC_SECOND));
+	LOG(("Time = %d:%d:%d:%d:%d\n" , get_clock_register(RTC_MONTH) ,
+		 get_clock_register(RTC_DAY) , get_clock_register(RTC_HOUR) ,
+		 get_clock_register(RTC_MINUTE) , get_clock_register(RTC_SECOND)));
 }
 
 void hp98035_io_card::rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second)
@@ -678,32 +728,32 @@ ROM_START(hp98035)
 ROM_END
 
 static ADDRESS_MAP_START(np_program_map , AS_PROGRAM , 8 , hp98035_io_card)
-ADDRESS_MAP_UNMAP_HIGH
-AM_RANGE(0x000 , 0x7ff) AM_ROM AM_REGION("np" , 0)
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x000 , 0x7ff) AM_ROM AM_REGION("np" , 0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(np_io_map , AS_IO , 8 , hp98035_io_card)
-ADDRESS_MAP_UNMAP_HIGH
-AM_RANGE(0x0 , 0x0) AM_WRITE(ram_addr_w)
-AM_RANGE(0x1 , 0x1) AM_READ(ram_data_r)
-AM_RANGE(0x2 , 0x2) AM_WRITE(ram_addr_data_w)
-AM_RANGE(0x3 , 0x3) AM_WRITE(ram_data_w)
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0 , 0x0) AM_WRITE(ram_addr_w)
+	AM_RANGE(0x1 , 0x1) AM_READ(ram_data_r)
+	AM_RANGE(0x2 , 0x2) AM_WRITE(ram_addr_data_w)
+	AM_RANGE(0x3 , 0x3) AM_WRITE(ram_data_w)
 	AM_RANGE(0x5 , 0x5) AM_WRITE(clock_key_w)
 	AM_RANGE(0x7 , 0x7) AM_READ(clock_digit_r)
-AM_RANGE(0x8 , 0x8) AM_WRITE(odr_w)
-AM_RANGE(0x9 , 0x9) AM_READ(idr_r)
-AM_RANGE(0xa , 0xa) AM_READ(np_status_r)
+	AM_RANGE(0x8 , 0x8) AM_WRITE(odr_w)
+	AM_RANGE(0x9 , 0x9) AM_READ(idr_r)
+	AM_RANGE(0xa , 0xa) AM_READ(np_status_r)
 	AM_RANGE(0xb , 0xb) AM_WRITE(clear_np_irq_w)
-AM_RANGE(0xc , 0xc) AM_READ(clock_mux_r)
+	AM_RANGE(0xc , 0xc) AM_READ(clock_mux_r)
 	AM_RANGE(0xd , 0xd) AM_WRITE(set_irq_w)
 	AM_RANGE(0xe , 0xe) AM_READWRITE(clr_inten_r , clr_inten_w)
 ADDRESS_MAP_END
 
 static MACHINE_CONFIG_FRAGMENT(hp98035)
-MCFG_CPU_ADD("np" , HP_NANOPROCESSOR , XTAL_1MHz)
-MCFG_CPU_PROGRAM_MAP(np_program_map)
-MCFG_CPU_IO_MAP(np_io_map)
-MCFG_HP_NANO_DC_CHANGED(WRITE8(hp98035_io_card , dc_w))
+	MCFG_CPU_ADD("np" , HP_NANOPROCESSOR , XTAL_1MHz)
+	MCFG_CPU_PROGRAM_MAP(np_program_map)
+	MCFG_CPU_IO_MAP(np_io_map)
+	MCFG_HP_NANO_DC_CHANGED(WRITE8(hp98035_io_card , dc_w))
 MACHINE_CONFIG_END
 
 const tiny_rom_entry *hp98035_io_card::device_rom_region() const
