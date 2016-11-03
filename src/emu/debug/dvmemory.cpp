@@ -137,14 +137,13 @@ void debug_view_memory::enumerate_sources()
 
 	// first add all the devices' address spaces
 	for (device_memory_interface &memintf : memory_interface_iterator(machine().root_device()))
-		if (&memintf.device() != &machine().root_device())
-			for (address_spacenum spacenum = AS_0; spacenum < ADDRESS_SPACES; ++spacenum)
-				if (memintf.has_space(spacenum))
-				{
-					address_space &space = memintf.space(spacenum);
-					name = string_format("%s '%s' %s space memory", memintf.device().name(), memintf.device().tag(), space.name());
-					m_source_list.append(*global_alloc(debug_view_memory_source(name.c_str(), space)));
-				}
+		for (address_spacenum spacenum = AS_0; spacenum < ADDRESS_SPACES; ++spacenum)
+			if (memintf.has_space(spacenum))
+			{
+				address_space &space = memintf.space(spacenum);
+				name = string_format("%s '%s' %s space memory", memintf.device().name(), memintf.device().tag(), space.name());
+				m_source_list.append(*global_alloc(debug_view_memory_source(name.c_str(), space)));
+			}
 
 	// then add all the memory regions
 	for (auto &region : machine().memory().regions())

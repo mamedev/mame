@@ -132,6 +132,32 @@ public:
 
 
 
+// ======================> dummy_space_device
+
+// a dummy address space for passing to handlers outside of the memory system
+
+class dummy_space_device : public device_t,
+	public device_memory_interface
+{
+public:
+	dummy_space_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	DECLARE_READ8_MEMBER(read);
+	DECLARE_WRITE8_MEMBER(write);
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+
+	// device_memory_interface overrides
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
+
+private:
+	const address_space_config  m_space_config;
+};
+
+
+
 // ======================> running_machine
 
 typedef delegate<void ()> machine_notify_delegate;
@@ -142,6 +168,7 @@ class running_machine
 	DISABLE_COPYING(running_machine);
 
 	friend class sound_manager;
+	friend class memory_manager;
 
 	typedef std::function<void(const char*)> logerror_callback;
 
@@ -230,6 +257,7 @@ public:
 	void set_rtc_datetime(const system_time &systime);
 
 	// misc
+	address_space &dummy_space() const { return m_dummy_space.space(AS_PROGRAM); }
 	void popmessage() const { popmessage(static_cast<char const *>(nullptr)); }
 	template <typename Format, typename... Params> void popmessage(Format &&fmt, Params &&... args) const;
 	template <typename Format, typename... Params> void logerror(Format &&fmt, Params &&... args) const;
@@ -356,6 +384,9 @@ private:
 
 	// string formatting buffer
 	mutable util::ovectorstream m_string_buffer;
+
+	// configuration state
+	dummy_space_device m_dummy_space;
 };
 
 

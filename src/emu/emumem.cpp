@@ -1553,6 +1553,20 @@ memory_manager::memory_manager(running_machine &machine)
 	memset(m_bank_ptr, 0, sizeof(m_bank_ptr));
 }
 
+//-------------------------------------------------
+//  allocate - allocate memory spaces
+//-------------------------------------------------
+
+void memory_manager::allocate(device_memory_interface &memory)
+{
+	for (address_spacenum spacenum = AS_0; spacenum < ADDRESS_SPACES; ++spacenum)
+	{
+		// if there is a configuration for this space, we need an address space
+		const address_space_config *spaceconfig = memory.space_config(spacenum);
+		if (spaceconfig != nullptr)
+			address_space::allocate(m_spacelist, *this, *spaceconfig, memory, spacenum);
+	}
+}
 
 //-------------------------------------------------
 //  initialize - initialize the memory system
@@ -1563,13 +1577,9 @@ void memory_manager::initialize()
 	// loop over devices and spaces within each device
 	memory_interface_iterator iter(machine().root_device());
 	for (device_memory_interface &memory : iter)
-		for (address_spacenum spacenum = AS_0; spacenum < ADDRESS_SPACES; ++spacenum)
-		{
-			// if there is a configuration for this space, we need an address space
-			const address_space_config *spaceconfig = memory.space_config(spacenum);
-			if (spaceconfig != nullptr)
-				address_space::allocate(m_spacelist,*this, *spaceconfig, memory, spacenum);
-		}
+		allocate(memory);
+
+	allocate(m_machine.m_dummy_space);
 
 	// construct and preprocess the address_map for each space
 	for (auto &space : m_spacelist)

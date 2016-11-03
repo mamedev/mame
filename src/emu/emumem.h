@@ -734,6 +734,7 @@ public:
 private:
 	// internal helpers
 	void bank_reattach();
+	void allocate(device_memory_interface &memory);
 
 	// internal state
 	running_machine &           m_machine;              // reference to the machine
