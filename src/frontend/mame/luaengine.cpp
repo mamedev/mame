@@ -26,6 +26,10 @@
 #ifdef __clang__
 #pragma clang diagnostic ignored "-Wshift-count-overflow"
 #endif
+#if defined(_MSC_VER)
+#pragma warning(disable:4503)
+#endif
+
 //**************************************************************************
 //  LUA ENGINE
 //**************************************************************************
