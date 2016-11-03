@@ -603,11 +603,6 @@ static ADDRESS_MAP_START ( msx2p_io_map, AS_IO, 8, msx_state )
 ADDRESS_MAP_END
 
 
-DEVICE_ADDRESS_MAP_START( switched_device_map, 8, msx_state )
-	ADDRESS_MAP_UNMAP_HIGH
-ADDRESS_MAP_END
-
-
 static INPUT_PORTS_START( msx_dips )
 	PORT_START("JOY0")
 	PORT_BIT (0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP)
