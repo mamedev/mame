@@ -280,12 +280,12 @@ static ADDRESS_MAP_START(risc2500_mem, AS_PROGRAM, 32, risc2500_state )
 	AM_RANGE( 0x00000000,  0x0001ffff )  AM_RAM
 	AM_RANGE( 0x01800000,  0x01800003 )  AM_READ(disable_boot_rom)
 	AM_RANGE( 0x01000000,  0x01000003 )  AM_READWRITE(p1000_r, p1000_w)
-	AM_RANGE( 0x02000000,  0x0201ffff )  AM_ROM AM_REGION("maincpu", 0)
+	AM_RANGE( 0x02000000,  0x0203ffff )  AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
 
 static MACHINE_CONFIG_START( risc2500, risc2500_state )
-	MCFG_CPU_ADD("maincpu", ARM, 14000000)      // VY86C010
+	MCFG_CPU_ADD("maincpu", ARM, XTAL_28_322MHz / 2)      // VY86C010
 	MCFG_CPU_PROGRAM_MAP(risc2500_mem)
 	MCFG_ARM_COPRO(ARM_COPRO_TYPE_VL86C020)
 	MCFG_CPU_PERIODIC_INT_DRIVER(risc2500_state, irq1_line_hold, 250)
@@ -319,10 +319,20 @@ MACHINE_CONFIG_END
 /* ROM definitions */
 
 ROM_START( risc )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD("s2500.bin", 0x000000, 0x20000, CRC(7a707e82) SHA1(87187fa58117a442f3abd30092cfcc2a4d7c7efc))
+	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE )
+	ROM_SYSTEM_BIOS( 0, "v104", "v1.04" )
+	ROMX_LOAD("s2500_v104.bin", 0x000000, 0x020000, CRC(84a06178) SHA1(66f4d9f53de6da865a3ebb4af1d6a3e245c59a3c), ROM_BIOS(1))
+	ROM_SYSTEM_BIOS( 1, "v103", "v1.03" )
+	ROMX_LOAD("s2500_v103.bin", 0x000000, 0x020000, CRC(7a707e82) SHA1(87187fa58117a442f3abd30092cfcc2a4d7c7efc), ROM_BIOS(2))
+ROM_END
+
+ROM_START( montreux )
+	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASE )
+	ROM_SYSTEM_BIOS( 0, "v100", "v1.00" )
+	ROMX_LOAD("montreux.bin", 0x000000, 0x040000, CRC(db374cf3) SHA1(44dd60d56779084326c3dfb41d2137ebf0b4e0ac), ROM_BIOS(1))
 ROM_END
 
 
-/*    YEAR  NAME      PARENT   COMPAT  MACHINE    INPUT     INIT                COMPANY   FULLNAME     FLAGS */
-CONS( 1992, risc,     0,       0,      risc2500,  risc2500, driver_device,  0,  "Saitek", "RISC 2500", MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
+/*    YEAR  NAME      PARENT   COMPAT  MACHINE    INPUT     INIT                COMPANY     FULLNAME     FLAGS */
+CONS( 1992, risc,     0,       0,      risc2500,  risc2500, driver_device,  0,  "Saitek"  , "RISC 2500", MACHINE_CLICKABLE_ARTWORK )
+CONS( 1995, montreux, 0,       0,      risc2500,  risc2500, driver_device,  0,  "Mephisto", "Montreux" , MACHINE_CLICKABLE_ARTWORK )
