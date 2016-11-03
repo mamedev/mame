@@ -113,14 +113,13 @@ static const uint8_t ucom4_mnemonic[0x100] =
 
 
 
-CPU_DISASSEMBLE(ucom4)
+static offs_t internal_disasm_ucom4(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
 {
 	int pos = 0;
 	uint8_t op = oprom[pos++];
 	uint8_t instr = ucom4_mnemonic[op];
 
-	char *dst = buffer;
-	dst += sprintf(dst, "%-4s ", s_mnemonics[instr]);
+	util::stream_format(stream,"%-4s ", s_mnemonics[instr]);
 
 	// opcode parameter
 	int bits = s_bits[instr];
@@ -142,12 +141,22 @@ CPU_DISASSEMBLE(ucom4)
 		}
 
 		if (bits <= 4)
-			dst += sprintf(dst, "%d", param);
+			util::stream_format(stream, "%d", param);
 		else if (bits <= 8)
-			dst += sprintf(dst, "$%02X", param);
+			util::stream_format(stream, "$%02X", param);
 		else
-			dst += sprintf(dst, "$%03X", param);
+			util::stream_format(stream, "$%03X", param);
 	}
 
 	return pos | s_flags[instr] | DASMFLAG_SUPPORTED;
+}
+
+
+CPU_DISASSEMBLE(ucom4)
+{
+	std::ostringstream stream;
+	offs_t result = internal_disasm_ucom4(device, stream, pc, oprom, opram, options);
+	std::string stream_str = stream.str();
+	strcpy(buffer, stream_str.c_str());
+	return result;
 }
