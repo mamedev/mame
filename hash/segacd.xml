@@ -1013,7 +1013,7 @@ See: http://rawdump.net/
 		</part>
 	</software>
 
-	<software name="eternalca" cloneof="eternalc">
+	<software name="eternalc">
 		<!-- Source: redump.org - http://redump.org/disc/2263/
 		<rom name="Eternal Champions - Challenge from the Dark Side (USA).cue" size="2813" crc="c12d13d7" />
 		<rom name="Eternal Champions - Challenge from the Dark Side (USA) (Track 01).bin" size="155641248" crc="5fd53235" />
@@ -1043,12 +1043,12 @@ See: http://rawdump.net/
 		<info name="ring_code" value="SEGA4427 R1J 11"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="eternal champions - challenge from the dark side (usa)" sha1="9df55bc7e446080684f35b1af5aa570b67a47f84"/>
+				<disk name="eternal champions - challenge from the dark side (usa)" sha1="cfdfda50429d14db0510fdfd8b2642c06d370b05"/>
 			</diskarea>
 		</part>
 	</software>
 
-	<software name="eternalc">
+	<software name="eternalca" cloneof="eternalc">
 		<!-- Source: redump.org - http://redump.org/disc/19031/
 		<rom name="Eternal Champions - Challenge from the Dark Side (USA) (RE).cue" size="2931" crc="c9279545" md5="bad0ff27158810a9b22d5ddeef28b172" sha1="58140771e4544b19bd29e8c979640272593df22f"/>
 		<rom name="Eternal Champions - Challenge from the Dark Side (USA) (RE) (Track 01).bin" size="155641248" crc="4a5ecc21" md5="44a65c6270861647d8711a8006209c02" sha1="06ccf19a9d84ed0efc4e8a0a40c22252411f6fe6"/>
@@ -1078,7 +1078,7 @@ See: http://rawdump.net/
 		<info name="ring_code" value="SEGA4427RE R1J"/>
 		<part name="cdrom" interface="scd_cdrom">
 			<diskarea name="cdrom">
-				<disk name="eternal champions - challenge from the dark side (usa, alt)" sha1="9fb665727fdc629df195ef315eef17eae9661f4d"/>
+				<disk name="eternal champions - challenge from the dark side (usa, alt)" sha1="6608bca9094b0412578a37b8250c9548f68bbbb1"/>
 			</diskarea>
 		</part>
 	</software>
