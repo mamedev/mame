@@ -7,6 +7,9 @@
 
 #include "emu.h"
 
+#define MCFG_CLOCK_ADD(_tag, _clock) \
+	MCFG_DEVICE_ADD(_tag, CLOCK, _clock)
+
 #define MCFG_CLOCK_SIGNAL_HANDLER(_devcb) \
 	devcb = &clock_device::set_signal_handler(*device, DEVCB_##_devcb);
 

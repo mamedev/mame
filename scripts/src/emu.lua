@@ -123,6 +123,8 @@ files {
 	MAME_DIR .. "src/emu/image.h",
 	MAME_DIR .. "src/emu/input.cpp",
 	MAME_DIR .. "src/emu/input.h",
+	MAME_DIR .. "src/emu/inputdev.cpp",
+	MAME_DIR .. "src/emu/inputdev.h",
 	MAME_DIR .. "src/emu/ioport.cpp",
 	MAME_DIR .. "src/emu/ioport.h",
 	MAME_DIR .. "src/emu/inpttype.h",

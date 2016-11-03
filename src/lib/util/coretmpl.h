@@ -7,19 +7,21 @@
     Core templates for basic non-string types.
 
 ***************************************************************************/
+#ifndef MAME_UTIL_CORETMPL_H
+#define MAME_UTIL_CORETMPL_H
 
 #pragma once
-
-#ifndef __CORETMPL_H__
-#define __CORETMPL_H__
 
 #include "osdcore.h"
 #include "corealloc.h"
 
+#include <array>
+#include <cstddef>
 #include <iterator>
 #include <stdexcept>
 #include <utility>
 #include <vector>
+
 
 // ======================> simple_list
 
@@ -418,6 +420,109 @@ private:
 	}
 };
 
+
+template <typename T, std::size_t N, bool WriteWrap = false, bool ReadWrap = WriteWrap>
+class fifo : protected std::array<T, N>
+{
+public:
+	fifo()
+		: std::array<T, N>()
+		, m_head(this->begin())
+		, m_tail(this->end())
+		, m_empty(true)
+	{
+		static_assert(0U < N, "FIFO must have at least one element");
+	}
+	fifo(fifo<T, N, WriteWrap, ReadWrap> const &) = delete;
+	fifo(fifo<T, N, WriteWrap, ReadWrap> &&) = delete;
+	fifo<T, N, WriteWrap, ReadWrap> &operator=(fifo<T, N, WriteWrap, ReadWrap> const &) = delete;
+	fifo<T, N, WriteWrap, ReadWrap> &operator=(fifo<T, N, WriteWrap, ReadWrap> &&) = delete;
+
+	template <bool W, bool R>
+	fifo(fifo<T, N, W, R> const &that)
+		: std::array<T, N>(that)
+		, m_head(std::advance(this->begin(), std::distance(that.begin(), that.m_head)))
+		, m_tail(std::advance(this->begin(), std::distance(that.begin(), that.m_tail)))
+		, m_empty(that.m_empty)
+	{
+	}
+
+	template <bool W, bool R>
+	fifo(fifo<T, N, W, R> &&that)
+		: std::array<T, N>(std::move(that))
+		, m_head(std::advance(this->begin(), std::distance(that.begin(), that.m_head)))
+		, m_tail(std::advance(this->begin(), std::distance(that.begin(), that.m_tail)))
+		, m_empty(that.m_empty)
+	{
+	}
+
+	template <bool W, bool R>
+	fifo<T, N, WriteWrap, ReadWrap> &operator=(fifo<T, N, W, R> const &that)
+	{
+		std::array<T, N>::operator=(that);
+		m_head = std::advance(this->begin(), std::distance(that.begin(), that.m_head));
+		m_tail = std::advance(this->begin(), std::distance(that.begin(), that.m_tail));
+		m_empty = that.m_empty;
+		return *this;
+	}
+
+	template <bool W, bool R>
+	fifo<T, N, WriteWrap, ReadWrap> &operator=(fifo<T, N, WriteWrap, ReadWrap> &&that)
+	{
+		std::array<T, N>::operator=(std::move(that));
+		m_head = std::advance(this->begin(), std::distance(that.begin(), that.m_head));
+		m_tail = std::advance(this->begin(), std::distance(that.begin(), that.m_tail));
+		m_empty = that.m_empty;
+		return *this;
+	}
+
+	bool full() const { return !m_empty && (m_head == m_tail); }
+	bool empty() const { return m_empty; }
+
+	void enqueue(T const &v)
+	{
+		if (WriteWrap || m_empty || (m_head != m_tail))
+		{
+			*m_tail = v;
+			if (this->end() == ++m_tail)
+				m_tail = this->begin();
+			m_empty = false;
+		}
+	}
+
+	void enqueue(T &&v)
+	{
+		if (WriteWrap || m_empty || (m_head != m_tail))
+		{
+			*m_tail = std::move(v);
+			if (this->end() == ++m_tail)
+				m_tail = this->begin();
+			m_empty = false;
+		}
+	}
+
+	T const &dequeue()
+	{
+		T const &result(*m_head);
+		if (ReadWrap || !m_empty)
+		{
+			if (this->end() == ++m_head)
+				m_head = this->begin();
+			m_empty = (m_head == m_tail);
+		}
+		return result;
+	}
+
+	T const &peek() const
+	{
+		return *m_head;
+	}
+
+private:
+	typename fifo::iterator m_head, m_tail;
+	bool                    m_empty;
+};
+
 }; // namespace util
 
-#endif
+#endif // MAME_UTIL_CORETMPL_H

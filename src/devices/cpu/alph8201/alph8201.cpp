@@ -441,6 +441,11 @@ void alpha8201_cpu_device::device_start()
 }
 
 
+//-------------------------------------------------
+//  state_import - import state into the device,
+//  after it has been set
+//-------------------------------------------------
+
 void alpha8201_cpu_device::state_import(const device_state_entry &entry)
 {
 	switch (entry.index())
@@ -498,6 +503,11 @@ void alpha8201_cpu_device::state_import(const device_state_entry &entry)
 }
 
 
+//-------------------------------------------------
+//  state_export - export state from the device,
+//  to a known location where it can be read
+//-------------------------------------------------
+
 void alpha8201_cpu_device::state_export(const device_state_entry &entry)
 {
 	switch (entry.index())
@@ -545,6 +555,11 @@ void alpha8201_cpu_device::state_export(const device_state_entry &entry)
 	}
 }
 
+
+//-------------------------------------------------
+//  state_string_export - export state as a string
+//  for the debugger
+//-------------------------------------------------
 
 void alpha8201_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {

@@ -27,7 +27,7 @@ public:
 	uint16_t          m_playfield_base;
 
 	required_device<atari_jsa_iiis_device> m_jsa;
-	required_device<atari_xga_device> m_xga;
+	optional_device<atari_xga_device> m_xga;
 
 	required_shared_ptr<uint32_t> m_mo_command;
 

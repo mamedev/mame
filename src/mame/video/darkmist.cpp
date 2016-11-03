@@ -21,7 +21,7 @@ TILE_GET_INFO_MEMBER(darkmist_state::get_bgtile_info)
 	attr=memregion("bg_map")->base()[(tile_index*2)+1]; /* -PPP--TT - FIXED BITS (0xxx00xx) */
 
 	code+=(attr&3)<<8;
-	pal=(attr>>4);
+	pal=(attr>>4) & 0xf;
 
 	SET_TILE_INFO_MEMBER(1,
 		code,
@@ -37,9 +37,7 @@ TILE_GET_INFO_MEMBER(darkmist_state::get_fgtile_info)
 	attr = memregion("fg_map")->base()[(tile_index*2)+1]; /* -PPP--TT - FIXED BITS (0xxx00xx) */
 
 	code+=(attr&3)<<8;
-	pal=attr>>4;
-
-	pal+=16;
+	pal=(attr>>4) & 0xf;
 
 	SET_TILE_INFO_MEMBER(2,
 		code,
@@ -57,22 +55,15 @@ TILE_GET_INFO_MEMBER(darkmist_state::get_txttile_info)
 
 	code+=(attr&1)<<8;
 
-	pal+=48;
-
 	SET_TILE_INFO_MEMBER(0,
 		code,
-		pal,
+		pal & 0xf,
 		0);
 }
 
 PALETTE_INIT_MEMBER(darkmist_state, darkmist)
 {
-	const uint8_t *bg_clut = memregion("bg_clut")->base();
-	const uint8_t *fg_clut = memregion("fg_clut")->base();
-	const uint8_t *spr_clut = memregion("spr_clut")->base();
-	const uint8_t *tx_clut = memregion("tx_clut")->base();
-
-	palette.set_indirect_color(0x100, rgb_t::black());
+//	palette.set_indirect_color(0x100, rgb_t::black());
 
 	for (int i = 0; i < 0x400; i++)
 	{
@@ -81,15 +72,15 @@ PALETTE_INIT_MEMBER(darkmist_state, darkmist)
 
 		switch (i & 0x300)
 		{
-			case 0x000:  clut = bg_clut[i&0xff]; break;
-			case 0x100:  clut = fg_clut[i&0xff]; break;
-			case 0x200:  clut = spr_clut[i&0xff]; break;
-			case 0x300:  clut = tx_clut[i&0xff]; break;
+			case 0x000:  clut = m_bg_clut[i&0xff]; break;
+			case 0x100:  clut = m_fg_clut[i&0xff]; break;
+			case 0x200:  clut = m_spr_clut[i&0xff]; break;
+			case 0x300:  clut = m_tx_clut[i&0xff]; break;
 		}
 
-		if (clut & 0x40) // 0x40 indicates non-transparent
-			ctabentry = 0x100;
-		else
+//		if (clut & 0x40) // 0x40 indicates transparent pen
+//			ctabentry = 0x100;
+//		else
 		{
 			ctabentry = (clut & 0x3f);
 
@@ -112,31 +103,31 @@ void darkmist_state::video_start()
 	m_bgtilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(darkmist_state::get_bgtile_info),this),TILEMAP_SCAN_ROWS,16,16,512,64 );
 	m_fgtilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(darkmist_state::get_fgtile_info),this),TILEMAP_SCAN_ROWS,16,16,64,256 );
 	m_txtilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(darkmist_state::get_txttile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32 );
-	m_fgtilemap->set_transparent_pen(0);
-	m_txtilemap->set_transparent_pen(0);
+//	m_fgtilemap->set_transparent_pen(0);
+//	m_txtilemap->set_transparent_pen(0);
 
 	save_item(NAME(m_hw));
+	m_screen->register_screen_bitmap(m_temp_bitmap);
 }
 
-uint32_t darkmist_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+// TODO: move this code into framework or substitute with a valid alternative
+void darkmist_state::mix_layer(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t* clut)
 {
-#define DM_GETSCROLL(n) (((m_scroll[(n)]<<1)&0xff) + ((m_scroll[(n)]&0x80)?1:0) +( ((m_scroll[(n)-1]<<4) | (m_scroll[(n)-1]<<12) )&0xff00))
-
-	m_bgtilemap->set_scrollx(0, DM_GETSCROLL(0x2));
-	m_bgtilemap->set_scrolly(0, DM_GETSCROLL(0x6));
-	m_fgtilemap->set_scrollx(0, DM_GETSCROLL(0xa));
-	m_fgtilemap->set_scrolly(0, DM_GETSCROLL(0xe));
-
-	bitmap.fill(m_palette->black_pen(), cliprect);
-
-	if(m_hw & DISPLAY_BG)
-		m_bgtilemap->draw(screen, bitmap, cliprect, 0,0);
-
-	if(m_hw & DISPLAY_FG)
-		m_fgtilemap->draw(screen, bitmap, cliprect, 0,0);
-
-	if(m_hw & DISPLAY_SPR)
+	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
+		uint16_t *dest = &bitmap.pix16(y);
+		uint16_t *src = &m_temp_bitmap.pix16(y);
+		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
+		{
+			uint16_t pix = (src[x] & 0xff);
+			uint16_t real = clut[pix];
+
+			if (!(real & 0x40))
+				dest[x] = src[x];
+		}
+	}
+}
+
 /*
     Sprites
 
@@ -148,40 +139,75 @@ uint32_t darkmist_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 3 - XXXX XXXX - x coord
 
 */
-		int i,fx,fy,tile,palette;
-		for(i=0;i<m_spriteram.bytes();i+=32)
-		{
-			fy=m_spriteram[i+1]&0x40;
-			fx=m_spriteram[i+1]&0x80;
+void darkmist_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	int i,fx,fy,tile,palette;
+	// fetch from top to bottom
+	for(i=m_spriteram.bytes()-32;i>=0;i-=32)
+	{
+		fy=m_spriteram[i+1]&0x40;
+		fx=m_spriteram[i+1]&0x80;
 
-			tile=m_spriteram[i+0];
+		tile=m_spriteram[i+0];
 
-			if(m_spriteram[i+1]&0x20)
-				tile += (*m_spritebank << 8);
+		if(m_spriteram[i+1]&0x20)
+			tile += (*m_spritebank << 8);
 
-			palette=((m_spriteram[i+1])>>1)&0xf;
+		palette=((m_spriteram[i+1])>>1)&0xf;
 
-			if(m_spriteram[i+1]&0x1)
-				palette=machine().rand()&15;
+		if(m_spriteram[i+1]&0x1)
+			palette=machine().rand()&15;
 
-			palette+=32;
+		m_gfxdecode->gfx(3)->transpen(
+		bitmap,cliprect,
+		tile,
+		palette,
+		fx,fy,
+		m_spriteram[i+3],m_spriteram[i+2],0 );
+	}	
+}
 
+uint32_t darkmist_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+#define DM_GETSCROLL(n) (((m_scroll[(n)]<<1)&0xff) + ((m_scroll[(n)]&0x80)?1:0) +( ((m_scroll[(n)-1]<<4) | (m_scroll[(n)-1]<<12) )&0xff00))
 
-				m_gfxdecode->gfx(3)->transpen(
-				bitmap,cliprect,
-				tile,
-				palette,
-				fx,fy,
-				m_spriteram[i+3],m_spriteram[i+2],0 );
-		}
+	m_bgtilemap->set_scrollx(0, DM_GETSCROLL(0x2));
+	m_bgtilemap->set_scrolly(0, DM_GETSCROLL(0x6));
+	m_fgtilemap->set_scrollx(0, DM_GETSCROLL(0xa));
+	m_fgtilemap->set_scrolly(0, DM_GETSCROLL(0xe));
+
+	m_temp_bitmap.fill(0,cliprect);
+	bitmap.fill(m_palette->black_pen(), cliprect);
+	
+	if(m_hw & DISPLAY_BG)
+	{
+		m_bgtilemap->draw(screen, m_temp_bitmap, cliprect, 0,0);
+		mix_layer(screen, bitmap, cliprect, m_bg_clut);
+	}
+	
+	if(m_hw & DISPLAY_FG)
+	{
+		m_fgtilemap->draw(screen, m_temp_bitmap, cliprect, 0,0);
+		mix_layer(screen, bitmap, cliprect, m_fg_clut);
+	}
+	
+	if(m_hw & DISPLAY_SPR)
+	{
+		draw_sprites(m_temp_bitmap,cliprect);
+		mix_layer(screen, bitmap, cliprect, m_spr_clut);
 	}
 
 	if(m_hw & DISPLAY_TXT)
 	{
-		m_txtilemap->mark_all_dirty();
-		m_txtilemap->draw(screen, bitmap, cliprect, 0,0);
+		m_txtilemap->draw(screen, m_temp_bitmap, cliprect, 0,0);
+		mix_layer(screen, bitmap, cliprect, m_tx_clut);
 	}
 
-
 	return 0;
+}
+
+WRITE8_MEMBER(darkmist_state::tx_vram_w)
+{
+	m_videoram[offset] = data;
+	m_txtilemap->mark_tile_dirty(offset & 0x3ff);
 }

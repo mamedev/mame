@@ -40,7 +40,7 @@ TODO:
  the programs are actually into the m68k program itself (like hachamf/tdragon/ddealer);
 -Video code could be optimized too (for example by calling the priority function only when
  priority number is updated), might also need a merging with Jaleco Mega System 1/NMK16 drivers;
- 
+
 Notes (1st MCU ver.):
 -$f000e is bogus,maybe the program snippets can modify this value,or the MCU itself can
  do that,returning the contents of D0 register seems enough for now...
@@ -54,7 +54,7 @@ Notes (1st MCU ver.):
 -$f0020 is for the sound program,same for all games, for example mjzoomin hasn't any clear
  write to $80040 area and the program jumps to $f0020 when there should be a sample.
 -Likewise, D0 upper byte is used but currently ignored.
- 
+
 ============================================================================================
 Debug cheats:
 

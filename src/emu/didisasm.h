@@ -53,7 +53,7 @@ const uint32_t DASMFLAG_LENGTHMASK    = 0x0000ffff;   // the low 16-bits contain
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-typedef device_delegate<offs_t (device_t &device, char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)> dasm_override_delegate;
+typedef device_delegate<offs_t (device_t &device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)> dasm_override_delegate;
 
 // ======================> device_disasm_interface
 

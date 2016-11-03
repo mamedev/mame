@@ -19,6 +19,9 @@
     There is a country code byte in the program to select between
     Seibu Kaihatsu/Fabtek/Taito licenses.
 
+    The Double Dynamites is an updated co-op version sporting different 
+    enemy patterns and drops.
+
     Emulation by Bryan McPhail, mish@tendril.co.uk
 
 
@@ -611,5 +614,5 @@ GAME( 1989, dynduke,  0,       dynduke, dynduke, driver_device, 0, ROT0, "Seibu 
 GAME( 1989, dyndukea, dynduke, dynduke, dynduke, driver_device, 0, ROT0, "Seibu Kaihatsu",                  "Dynamite Duke (Europe set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, dyndukej, dynduke, dynduke, dynduke, driver_device, 0, ROT0, "Seibu Kaihatsu",                  "Dynamite Duke (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, dyndukeu, dynduke, dynduke, dynduke, driver_device, 0, ROT0, "Seibu Kaihatsu (Fabtek license)", "Dynamite Duke (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, dbldynj,  dynduke, dbldyn,  dynduke, driver_device, 0, ROT0, "Seibu Kaihatsu",                  "The Double Dynamites (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, dbldynu,  dynduke, dynduke, dynduke, driver_device, 0, ROT0, "Seibu Kaihatsu (Fabtek license)", "The Double Dynamites (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dbldynj,  0,       dbldyn,  dynduke, driver_device, 0, ROT0, "Seibu Kaihatsu",                  "The Double Dynamites (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dbldynu,  dbldynj, dynduke, dynduke, driver_device, 0, ROT0, "Seibu Kaihatsu (Fabtek license)", "The Double Dynamites (US)", MACHINE_SUPPORTS_SAVE )

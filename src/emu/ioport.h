@@ -1508,43 +1508,43 @@ public:
 	static const char *string_from_token(const char *string);
 
 	// port helpers
-	void port_alloc(const char *tag);
-	void port_modify(const char *tag);
+	ioport_configurer& port_alloc(const char *tag);
+	ioport_configurer& port_modify(const char *tag);
 
 	// field helpers
-	void field_alloc(ioport_type type, ioport_value defval, ioport_value mask, const char *name = nullptr);
-	void field_add_char(char32_t ch);
-	void field_add_code(input_seq_type which, input_code code);
-	void field_set_way(int way) const { m_curfield->m_way = way; }
-	void field_set_rotated() const { m_curfield->m_flags |= ioport_field::FIELD_FLAG_ROTATED; }
-	void field_set_name(const char *name) const { m_curfield->m_name = string_from_token(name); }
-	void field_set_player(int player) const { m_curfield->m_player = player - 1; }
-	void field_set_cocktail() const { m_curfield->m_flags |= ioport_field::FIELD_FLAG_COCKTAIL; field_set_player(2); }
-	void field_set_toggle() const { m_curfield->m_flags |= ioport_field::FIELD_FLAG_TOGGLE; }
-	void field_set_impulse(uint8_t impulse) const { m_curfield->m_impulse = impulse; }
-	void field_set_analog_reverse() const { m_curfield->m_flags |= ioport_field::ANALOG_FLAG_REVERSE; }
-	void field_set_analog_reset() const { m_curfield->m_flags |= ioport_field::ANALOG_FLAG_RESET; }
-	void field_set_optional() const { m_curfield->m_flags |= ioport_field::FIELD_FLAG_OPTIONAL; }
-	void field_set_min_max(ioport_value minval, ioport_value maxval) const { m_curfield->m_min = minval; m_curfield->m_max = maxval; }
-	void field_set_sensitivity(int32_t sensitivity) const { m_curfield->m_sensitivity = sensitivity; }
-	void field_set_delta(int32_t delta) const { m_curfield->m_centerdelta = m_curfield->m_delta = delta; }
-	void field_set_centerdelta(int32_t delta) const { m_curfield->m_centerdelta = delta; }
-	void field_set_crosshair(crosshair_axis_t axis, double altaxis, double scale, double offset) const { m_curfield->m_crosshair_axis = axis; m_curfield->m_crosshair_altaxis = altaxis; m_curfield->m_crosshair_scale = scale; m_curfield->m_crosshair_offset = offset; }
-	void field_set_crossmapper(ioport_field_crossmap_delegate callback) const { m_curfield->m_crosshair_mapper = callback; }
-	void field_set_full_turn_count(uint16_t count) const { m_curfield->m_full_turn_count = count; }
-	void field_set_analog_wraps() const { m_curfield->m_flags |= ioport_field::ANALOG_FLAG_WRAPS; }
-	void field_set_remap_table(const ioport_value *table) { m_curfield->m_remap_table = table; }
-	void field_set_analog_invert() const { m_curfield->m_flags |= ioport_field::ANALOG_FLAG_INVERT; }
-	void field_set_dynamic_read(ioport_field_read_delegate delegate, void *param = nullptr) const { m_curfield->m_read = delegate; m_curfield->m_read_param = param; }
-	void field_set_dynamic_write(ioport_field_write_delegate delegate, void *param = nullptr) const { m_curfield->m_write = delegate; m_curfield->m_write_param = param; }
-	void field_set_diplocation(const char *location) const { m_curfield->expand_diplocation(location, m_errorbuf); }
+	ioport_configurer& field_alloc(ioport_type type, ioport_value defval, ioport_value mask, const char *name = nullptr);
+	ioport_configurer& field_add_char(char32_t ch);
+	ioport_configurer& field_add_code(input_seq_type which, input_code code);
+	ioport_configurer& field_set_way(int way) { m_curfield->m_way = way; return *this; }
+	ioport_configurer& field_set_rotated() { m_curfield->m_flags |= ioport_field::FIELD_FLAG_ROTATED; return *this; }
+	ioport_configurer& field_set_name(const char *name) { m_curfield->m_name = string_from_token(name); return *this; }
+	ioport_configurer& field_set_player(int player) { m_curfield->m_player = player - 1; return *this; }
+	ioport_configurer& field_set_cocktail() { m_curfield->m_flags |= ioport_field::FIELD_FLAG_COCKTAIL; field_set_player(2); return *this; }
+	ioport_configurer& field_set_toggle() { m_curfield->m_flags |= ioport_field::FIELD_FLAG_TOGGLE; return *this; }
+	ioport_configurer& field_set_impulse(uint8_t impulse) { m_curfield->m_impulse = impulse; return *this; }
+	ioport_configurer& field_set_analog_reverse() { m_curfield->m_flags |= ioport_field::ANALOG_FLAG_REVERSE; return *this; }
+	ioport_configurer& field_set_analog_reset() { m_curfield->m_flags |= ioport_field::ANALOG_FLAG_RESET; return *this; }
+	ioport_configurer& field_set_optional() { m_curfield->m_flags |= ioport_field::FIELD_FLAG_OPTIONAL; return *this; }
+	ioport_configurer& field_set_min_max(ioport_value minval, ioport_value maxval) { m_curfield->m_min = minval; m_curfield->m_max = maxval; return *this; }
+	ioport_configurer& field_set_sensitivity(int32_t sensitivity) { m_curfield->m_sensitivity = sensitivity; return *this; }
+	ioport_configurer& field_set_delta(int32_t delta) { m_curfield->m_centerdelta = m_curfield->m_delta = delta; return *this; }
+	ioport_configurer& field_set_centerdelta(int32_t delta) { m_curfield->m_centerdelta = delta; return *this; }
+	ioport_configurer& field_set_crosshair(crosshair_axis_t axis, double altaxis, double scale, double offset) { m_curfield->m_crosshair_axis = axis; m_curfield->m_crosshair_altaxis = altaxis; m_curfield->m_crosshair_scale = scale; m_curfield->m_crosshair_offset = offset; return *this; }
+	ioport_configurer& field_set_crossmapper(ioport_field_crossmap_delegate callback) { m_curfield->m_crosshair_mapper = callback; return *this; }
+	ioport_configurer& field_set_full_turn_count(uint16_t count) { m_curfield->m_full_turn_count = count; return *this; }
+	ioport_configurer& field_set_analog_wraps() { m_curfield->m_flags |= ioport_field::ANALOG_FLAG_WRAPS; return *this; }
+	ioport_configurer& field_set_remap_table(const ioport_value *table) { m_curfield->m_remap_table = table; return *this; }
+	ioport_configurer& field_set_analog_invert() { m_curfield->m_flags |= ioport_field::ANALOG_FLAG_INVERT; return *this; }
+	ioport_configurer& field_set_dynamic_read(ioport_field_read_delegate delegate, void *param = nullptr) { m_curfield->m_read = delegate; m_curfield->m_read_param = param; return *this; }
+	ioport_configurer& field_set_dynamic_write(ioport_field_write_delegate delegate, void *param = nullptr) { m_curfield->m_write = delegate; m_curfield->m_write_param = param; return *this; }
+	ioport_configurer& field_set_diplocation(const char *location) { m_curfield->expand_diplocation(location, m_errorbuf); return *this; }
 
 	// setting helpers
-	void setting_alloc(ioport_value value, const char *name);
+	ioport_configurer& setting_alloc(ioport_value value, const char *name);
 
 	// misc helpers
-	void set_condition(ioport_condition::condition_t condition, const char *tag, ioport_value mask, ioport_value value);
-	void onoff_alloc(const char *name, ioport_value defval, ioport_value mask, const char *diplocation);
+	ioport_configurer& set_condition(ioport_condition::condition_t condition, const char *tag, ioport_value mask, ioport_value value);
+	ioport_configurer& onoff_alloc(const char *name, ioport_value defval, ioport_value mask, const char *diplocation);
 
 private:
 	// internal state

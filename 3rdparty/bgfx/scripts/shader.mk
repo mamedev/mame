@@ -15,14 +15,17 @@ ifndef TARGET
 .PHONY: all
 all:
 	@echo Usage: make TARGET=# [clean, all, rebuild]
-	@echo "  TARGET=0 (hlsl  - dx9)"
-	@echo "  TARGET=1 (hlsl  - dx11)"
-	@echo "  TARGET=2 (glsl  - nacl)"
-	@echo "  TARGET=3 (glsl  - android)"
-	@echo "  TARGET=4 (glsl  - linux)"
-	@echo "  TARGET=5 (metal - OSX/iOS)"
-	@echo "  VERBOSE=1 show build commands."
+	@echo "  TARGET=0 (hlsl  - d3d9)"
+	@echo "  TARGET=1 (hlsl  - d3d11)"
+	@echo "  TARGET=2 (essl  - nacl)"
+	@echo "  TARGET=3 (essl  - android)"
+	@echo "  TARGET=4 (glsl)"
+	@echo "  TARGET=5 (metal)"
+	@echo "  TARGET=6 (pssl)"
+	@echo "  TARGET=7 (spriv)"
 else
+
+ADDITIONAL_INCLUDES?=
 
 ifeq ($(TARGET), 0)
 VS_FLAGS=--platform windows -p vs_3_0 -O 3
@@ -38,13 +41,13 @@ else
 ifeq ($(TARGET), 2)
 VS_FLAGS=--platform nacl
 FS_FLAGS=--platform nacl
-SHADER_PATH=shaders/gles
+SHADER_PATH=shaders/essl
 else
 ifeq ($(TARGET), 3)
 VS_FLAGS=--platform android
 FS_FLAGS=--platform android
 CS_FLAGS=--platform android
-SHADER_PATH=shaders/gles
+SHADER_PATH=shaders/essl
 else
 ifeq ($(TARGET), 4)
 VS_FLAGS=--platform linux -p 120
@@ -57,6 +60,20 @@ VS_FLAGS=--platform osx -p metal
 FS_FLAGS=--platform osx -p metal
 CS_FLAGS=--platform osx -p metal
 SHADER_PATH=shaders/metal
+else
+ifeq ($(TARGET), 6)
+VS_FLAGS=--platform orbis -p pssl
+FS_FLAGS=--platform orbis -p pssl
+CS_FLAGS=--platform orbis -p pssl
+SHADER_PATH=shaders/pssl
+else
+ifeq ($(TARGET), 7)
+VS_FLAGS=--platform linux -p spirv
+FS_FLAGS=--platform linux -p spirv
+CS_FLAGS=--platform linux -p spirv
+SHADER_PATH=shaders/spirv
+endif
+endif
 endif
 endif
 endif
@@ -65,9 +82,9 @@ endif
 endif
 
 THISDIR := $(dir $(lastword $(MAKEFILE_LIST)))
-VS_FLAGS+=-i $(THISDIR)../src/
-FS_FLAGS+=-i $(THISDIR)../src/
-CS_FLAGS+=-i $(THISDIR)../src/
+VS_FLAGS+=-i $(THISDIR)../src/ $(ADDITIONAL_INCLUDES)
+FS_FLAGS+=-i $(THISDIR)../src/ $(ADDITIONAL_INCLUDES)
+CS_FLAGS+=-i $(THISDIR)../src/ $(ADDITIONAL_INCLUDES)
 
 BUILD_OUTPUT_DIR=$(addprefix ./, $(RUNTIME_DIR)/$(SHADER_PATH))
 BUILD_INTERMEDIATE_DIR=$(addprefix $(BUILD_DIR)/, $(SHADER_PATH))

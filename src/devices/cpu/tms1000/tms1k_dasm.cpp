@@ -223,7 +223,7 @@ static const uint8_t i4_value[16] =
 	0x0, 0x8, 0x4, 0xc, 0x2, 0xa, 0x6, 0xe, 0x1, 0x9, 0x5, 0xd, 0x3, 0xb, 0x7, 0xf
 };
 
-static offs_t tms1k_dasm(char *dst, const uint8_t *oprom, const uint8_t *lut_mnemonic, uint16_t opcode_mask)
+static offs_t tms1k_dasm(std::ostream &stream, const uint8_t *oprom, const uint8_t *lut_mnemonic, uint16_t opcode_mask)
 {
 	// get current opcode
 	int pos = 0;
@@ -233,30 +233,39 @@ static offs_t tms1k_dasm(char *dst, const uint8_t *oprom, const uint8_t *lut_mne
 
 	// convert to mnemonic/param
 	uint16_t instr = lut_mnemonic[op];
-	dst += sprintf(dst, "%-8s ", s_mnemonic[instr]);
+	util::stream_format(stream, "%-8s ", s_mnemonic[instr]);
 
 	switch( s_addressing[instr] )
 	{
 		case zI2:
-			dst += sprintf(dst, "%d", i2_value[op & 0x03]);
+			util::stream_format(stream, "%d", i2_value[op & 0x03]);
 			break;
 		case zI3:
-			dst += sprintf(dst, "%d", i3_value[op & 0x07]);
+			util::stream_format(stream, "%d", i3_value[op & 0x07]);
 			break;
 		case zI4:
-			dst += sprintf(dst, "%d", i4_value[op & 0x0f]);
+			util::stream_format(stream, "%d", i4_value[op & 0x0f]);
 			break;
 		case zB7:
 			if (opcode_mask & 0x100)
-				dst += sprintf(dst, "$%02X", op << 1 & 0xfe);
+				util::stream_format(stream, "$%02X", op << 1 & 0xfe);
 			else
-				dst += sprintf(dst, "$%02X", op & 0x3f);
+				util::stream_format(stream, "$%02X", op & 0x3f);
 			break;
 		default:
 			break;
 	}
 
 	return pos | s_flags[instr] | DASMFLAG_SUPPORTED;
+}
+
+static offs_t tms1k_dasm(char *buffer, const uint8_t *oprom, const uint8_t *lut_mnemonic, uint16_t opcode_mask)
+{
+	std::ostringstream stream;
+	offs_t result = tms1k_dasm(stream, oprom, lut_mnemonic, opcode_mask);
+	std::string stream_str = stream.str();
+	strcpy(buffer, stream_str.c_str());
+	return result;
 }
 
 

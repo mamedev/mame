@@ -1002,6 +1002,7 @@ WRITE32_MEMBER(archimedes_state::archimedes_vidc_w)
 			case VIDC_HDSR: m_vidc_regs[VIDC_HDSR] = (val >> 14);   break;
 			case VIDC_HDER: m_vidc_regs[VIDC_HDER] = (val >> 14);   break;
 			case VIDC_HBER: m_vidc_regs[VIDC_HBER] = ((val >> 14)<<1)+1;    break;
+			case VIDC_HCSR: m_vidc_regs[VIDC_HCSR] = (val >> 13) & 0x7ff; break;
 //          #define VIDC_HCSR       0x98
 //          #define VIDC_HIR        0x9c
 
@@ -1011,6 +1012,8 @@ WRITE32_MEMBER(archimedes_state::archimedes_vidc_w)
 			case VIDC_VDSR: m_vidc_regs[VIDC_VDSR] = (val >> 14)+1; break;
 			case VIDC_VDER: m_vidc_regs[VIDC_VDER] = (val >> 14)+1; break;
 			case VIDC_VBER: m_vidc_regs[VIDC_VBER] = (val >> 14)+1; break;
+			case VIDC_VCSR: m_vidc_regs[VIDC_VCSR] = (val >> 14) & 0x3ff; break;
+			case VIDC_VCER: m_vidc_regs[VIDC_VCER] = (val >> 14) & 0x3ff; break;
 //          #define VIDC_VCSR       0xb8
 //          #define VIDC_VCER       0xbc
 		}
@@ -1067,7 +1070,7 @@ WRITE32_MEMBER(archimedes_state::archimedes_memc_w)
 				break;
 
 			case 3: /* cursor init */
-				//m_cursor_enabled = true;
+				m_cursor_enabled = true;
 				m_vidc_cinit = 0x2000000 | (((data>>2)&0x7fff)*16);
 				//printf("MEMC: CURSOR INIT %08x\n",((data>>2)&0x7fff)*16);
 				break;

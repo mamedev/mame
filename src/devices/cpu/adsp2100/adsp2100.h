@@ -88,8 +88,8 @@ const int ADSP2181_IRQL2        = 8;        // IRQL2
 // register enumeration
 enum
 {
-	ADSP2100_PC,
-	ADSP2100_AX0,
+	ADSP2100_PC = STATE_GENPC,
+	ADSP2100_AX0 = 0,
 	ADSP2100_AX1,
 	ADSP2100_AY0,
 	ADSP2100_AY1,

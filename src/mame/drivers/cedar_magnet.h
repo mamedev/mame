@@ -43,7 +43,7 @@ public:
 		m_cedplane0(*this, "cedplane0"),
 		m_cedplane1(*this, "cedplane1"),
 		m_cedsprite(*this, "cedsprite")
-		{ 
+		{
 			m_ic48_pio_pa_val = 0xff;
 			m_ic48_pio_pb_val = 0xff;
 			m_ic49_pio_pb_val = 0xff;

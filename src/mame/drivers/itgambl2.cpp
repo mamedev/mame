@@ -1077,7 +1077,7 @@ ROM_END
   1x 17x2 pins connector (J5)
   2x trimmer (P1-A/S)(P2-VOL)
   2x 8x2 switches DIP (SW1,SW2)
-  1x battery 3.6V (BT1) 
+  1x battery 3.6V (BT1)
 */
 
 ROM_START( granfrat )

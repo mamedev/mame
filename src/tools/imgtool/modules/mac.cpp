@@ -6182,7 +6182,7 @@ static imgtoolerr_t mac_image_geticoninfo(imgtool::partition &partition, const c
 	imgtoolerr_t err;
 	imgtool_attribute attr_values[3];
 	uint32_t type_code, creator_code, finder_flags;
-	imgtool::stream *stream = NULL;
+	imgtool::stream::ptr stream;
 	const void *resource_fork;
 	uint64_t resource_fork_length;
 	const void *bundle;
@@ -6198,7 +6198,7 @@ static imgtoolerr_t mac_image_geticoninfo(imgtool::partition &partition, const c
 	/* first retrieve type and creator code */
 	err = mac_image_getattrs(partition, path, attrs, attr_values);
 	if (err)
-		goto done;
+		return err;
 	type_code = (uint32_t) attr_values[0].i;
 	creator_code = (uint32_t) attr_values[1].i;
 	finder_flags = (uint32_t) attr_values[2].i;
@@ -6210,15 +6210,12 @@ static imgtoolerr_t mac_image_geticoninfo(imgtool::partition &partition, const c
 
 	stream = imgtool::stream::open_mem(NULL, 0);
 	if (!stream)
-	{
-		err = IMGTOOLERR_SUCCESS;
-		goto done;
-	}
+		return IMGTOOLERR_SUCCESS;
 
 	/* read in the resource fork */
 	err = mac_image_readfile(partition, path, "RESOURCE_FORK", *stream);
 	if (err)
-		goto done;
+		return err;
 	resource_fork = stream->getptr();
 	resource_fork_length = stream->size();
 
@@ -6226,7 +6223,7 @@ static imgtoolerr_t mac_image_geticoninfo(imgtool::partition &partition, const c
 	bundle = mac_walk_resources(resource_fork, resource_fork_length, /* BNDL */ 0x424E444C,
 		bundle_discriminator, &creator_code, NULL, &bundle_length);
 	if (!bundle)
-		goto done;
+		return err;
 
 	/* find the FREF and the icon family */
 	pos = 8;
@@ -6250,7 +6247,7 @@ static imgtoolerr_t mac_image_geticoninfo(imgtool::partition &partition, const c
 		pos += 6 + this_bundleentry_length * 4;
 	}
 	if (!fref_pos || !icn_pos)
-		goto done;
+		return err;
 
 	/* look up the FREF */
 	for (i = 0; i < fref_bundleentry_length; i++)
@@ -6267,7 +6264,7 @@ static imgtoolerr_t mac_image_geticoninfo(imgtool::partition &partition, const c
 		}
 	}
 	if (i >= fref_bundleentry_length)
-		goto done;
+		return err;
 
 	/* now look up the icon family */
 	resource_id = 0;
@@ -6280,7 +6277,7 @@ static imgtoolerr_t mac_image_geticoninfo(imgtool::partition &partition, const c
 		}
 	}
 	if (i >= icn_bundleentry_length)
-		goto done;
+		return err;
 
 	/* fetch 32x32 icons (ICN#, icl4, icl8) */
 	if (load_icon((uint32_t *) iconinfo->icon32x32, resource_fork, resource_fork_length,
@@ -6306,9 +6303,6 @@ static imgtoolerr_t mac_image_geticoninfo(imgtool::partition &partition, const c
 			/* ics8 */ 0x69637338, resource_id, 32, 32, 8, mac_palette_8bpp, false);
 	}
 
-done:
-	if (stream)
-		delete stream;
 	return err;
 }
 

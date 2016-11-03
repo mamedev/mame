@@ -1098,7 +1098,7 @@ WRITE16_MEMBER(subsino2_state::humlan_outputs_w)
 			break;
 	}
 
-//	popmessage("0: %04x", m_outputs16[0]);
+//  popmessage("0: %04x", m_outputs16[0]);
 }
 
 static ADDRESS_MAP_START( humlan_map, AS_PROGRAM, 16, subsino2_state )
@@ -2646,8 +2646,8 @@ DRIVER_INIT_MEMBER(subsino2_state,new2001)
 	rom[0x19A2/2] = 0x4066;
 
 	// rts -> rte
-	rom[0x45E8/2] = 0x5670;	// IRQ 8
-	rom[0x471C/2] = 0x5670;	// IRQ 0
+	rom[0x45E8/2] = 0x5670; // IRQ 8
+	rom[0x471C/2] = 0x5670; // IRQ 0
 }
 
 /***************************************************************************
@@ -2686,8 +2686,8 @@ DRIVER_INIT_MEMBER(subsino2_state,humlan)
 	rom[0x170A/2] = 0x4066;
 
 	// rts -> rte
-	rom[0x38B4/2] = 0x5670;	// IRQ 8
-	rom[0x3A08/2] = 0x5670;	// IRQ 0
+	rom[0x38B4/2] = 0x5670; // IRQ 8
+	rom[0x3A08/2] = 0x5670; // IRQ 0
 }
 
 /***************************************************************************

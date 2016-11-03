@@ -106,10 +106,8 @@ public:
 private:
 	TIMER_CALLBACK_MEMBER(ie15_beepoff);
 	void update_leds();
-	uint32_t draw_scanline(uint32_t *p, uint16_t offset, uint8_t scanline);
-	rectangle m_tmpclip;
-	bitmap_rgb32 m_tmpbmp;
-	bitmap_rgb32 m_offbmp;
+	void draw_scanline(uint32_t *p, uint16_t offset, uint8_t scanline);
+	std::unique_ptr<uint32_t[]> m_tmpbmp;
 
 	emu_timer *m_hblank_timer;
 
@@ -135,6 +133,7 @@ private:
 	uint8_t m_serial_tx_ready;
 	int m_hblank;
 	int m_vpos;
+	int m_marker_scanline;
 
 protected:
 	required_device<cpu_device> m_maincpu;
@@ -363,30 +362,24 @@ WRITE8_MEMBER( ie15_state::serial_speed_w ) {
 }
 
 READ8_MEMBER( ie15_state::flag_r ) {
-	uint8_t ret = 0;
-
 	switch (offset)
 	{
 		case 0: // hsync pulse (not hblank)
-			ret = m_hblank;
-			break;
+			return m_hblank;
 		case 1: // marker scanline
-			ret = (m_vpos % 11) > 7;
-			break;
+			return m_marker_scanline;
 		case 2: // vblank
-			ret = !m_screen->vblank();
-			break;
+			return !m_screen->vblank();
 		case 4:
-			ret = m_kb_ruslat;
-			break;
+			return m_kb_ruslat;
 		default:
 			break;
 	}
-	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0 && ret)
+	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
-		DBG_LOG(2,"flag",("read %d: %d\n", offset, ret));
+		DBG_LOG(2,"flag",("read %d: ?\n", offset));
 	}
-	return ret;
+	return 0;
 }
 
 WRITE8_MEMBER( ie15_state::flag_w ) {
@@ -484,6 +477,7 @@ void ie15_state::machine_reset()
 	m_hblank = 1;
 	m_hblank_timer->adjust(m_screen->time_until_pos(0, IE15_HORZ_START));
 	m_vpos = m_screen->vpos();
+	m_marker_scanline = (m_vpos % 11) > 7;
 
 	m_beeper->set_state(0);
 
@@ -499,12 +493,7 @@ void ie15_state::video_start()
 	m_p_videoram = memregion("video")->base();
 	m_video.ptr1 = m_video.ptr2 = m_latch = 0;
 
-	m_tmpclip = rectangle(0, IE15_DISP_HORZ-1, 0, IE15_DISP_VERT-1);
-	m_tmpbmp.allocate(IE15_DISP_HORZ, IE15_DISP_VERT);
-	m_offbmp.allocate(IE15_DISP_HORZ, 1);
-	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0) {
-		m_offbmp.fill(0);
-	}
+	m_tmpbmp = std::make_unique<uint32_t[]>(IE15_TOTAL_HORZ * IE15_TOTAL_VERT);
 }
 
 /*
@@ -537,7 +526,7 @@ void ie15_state::video_start()
     XXX 'dotted look' is caused by strobe at 2x pixel clock -- use HLSL for this.
 */
 
-uint32_t ie15_state::draw_scanline(uint32_t *p, uint16_t offset, uint8_t scanline)
+void ie15_state::draw_scanline(uint32_t *p, uint16_t offset, uint8_t scanline)
 {
 	static const uint32_t palette[2] = { 0xff000000, 0xff00c000 };
 
@@ -582,7 +571,6 @@ uint32_t ie15_state::draw_scanline(uint32_t *p, uint16_t offset, uint8_t scanlin
 			*p++ = palette[0];
 		}
 	}
-	return 0;
 }
 
 void ie15_state::update_leds()
@@ -608,6 +596,7 @@ void ie15_state::scanline_callback()
 
 	m_vpos++;
 	m_vpos %= IE15_TOTAL_VERT;
+	m_marker_scanline = (m_vpos % 11) > 7;
 
 	DBG_LOG(3,"scanline_cb",
 		("addr %03x frame %d x %.4d y %.3d row %.2d e:c:s %d:%d:%d\n",
@@ -619,16 +608,16 @@ void ie15_state::scanline_callback()
 	if (y >= IE15_DISP_VERT) return;
 
 	if (!m_video.enable || (y < IE15_STATUSLINE && m_video.line25)) {
-		copybitmap(m_tmpbmp, m_offbmp, 0, 0, 0, y, m_tmpclip);
+		memset(&m_tmpbmp[(y + IE15_VERT_START) * IE15_TOTAL_HORZ], 0, sizeof(uint32_t) * IE15_TOTAL_HORZ);
 	} else {
-		draw_scanline(&m_tmpbmp.pix32(y), m_video.ptr2, y % 11);
+		draw_scanline(&m_tmpbmp[(y + IE15_VERT_START) * IE15_TOTAL_HORZ + IE15_HORZ_START], m_video.ptr2, y % 11);
 	}
 }
 
 uint32_t ie15_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	update_leds();
-	copybitmap(bitmap, m_tmpbmp, 0, 0, IE15_HORZ_START, IE15_VERT_START, cliprect);
+	memcpy(&bitmap.pix32(0), &m_tmpbmp[0], sizeof(uint32_t) * IE15_TOTAL_HORZ * IE15_TOTAL_VERT);
 	return 0;
 }
 

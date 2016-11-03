@@ -134,12 +134,13 @@
 
 		valid_kinds     = { "ConsoleApp", "WindowedApp", "StaticLib", "SharedLib" },
 
-		valid_languages = { "C", "C++", "C#", "Vala" },
+		valid_languages = { "C", "C++", "C#", "Vala", "Swift" },
 
 		valid_tools     = {
 			cc     = { "gcc", "ghs" },
 			dotnet = { "mono", "msnet", "pnet" },
 			valac  = { "valac" },
+			swift  = { "swift" },
 		},
 
 		onsolution = function(sln)
@@ -152,6 +153,8 @@
 				premake.generate(prj, makefile, premake.make_csharp)
 			elseif premake.iscppproject(prj) then
 				premake.generate(prj, makefile, premake.make_cpp)
+			elseif premake.isswiftproject(prj) then
+				premake.generate(prj, makefile, premake.make_swift)
 			else
 				premake.generate(prj, makefile, premake.make_vala)
 			end

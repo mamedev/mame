@@ -687,8 +687,8 @@ static void decode_dssi_f_fill_area(device_t *device,uint16_t  ds, uint16_t si, 
 		device->logerror("Brush params\n");
 		device->logerror("Style=%04X,          StyleIndex=%04X\n",brush->style,brush->style_index);
 		device->logerror("Colour1=%04X,        Colour2=%04X\n",brush->colour1,brush->colour2);
-		device->logerror("transparency=%04X,   boundry_spec=%04X\n",brush->transparency,brush->boundary_spec);
-		device->logerror("boundry colour=%04X, save colour=%04X\n",brush->boundary_colour,brush->save_colour);
+		device->logerror("transparency=%04X,   boundary_spec=%04X\n",brush->transparency,brush->boundary_spec);
+		device->logerror("boundary colour=%04X, save colour=%04X\n",brush->boundary_colour,brush->save_colour);
 
 
 		OUTPUT_SEGOFS("SegData:OfsData",area_params->seg_data,area_params->ofs_data);

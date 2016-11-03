@@ -58,7 +58,14 @@ protected:
 	// device_disasm_interface overrides
 	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
 	virtual uint32_t disasm_max_opcode_bytes() const override { return 6; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override
+	{
+		std::ostringstream stream;
+		offs_t result = disasm_disassemble(stream, pc, oprom, opram, options);
+		std::string stream_str = stream.str();
+		strcpy(buffer, stream_str.c_str());
+		return result;
+	}
 
 private:
 	enum e_mode {
@@ -114,7 +121,7 @@ private:
 	inline uint16_t READ16();
 	void decode();
 	const char *internal_registers_names(uint16_t x);
-	int sprint_arg(char *buffer, uint32_t pc, const char *pre, const e_mode mode, const uint16_t r, const uint16_t rb);
+	bool stream_arg(std::ostream &stream, uint32_t pc, const char *pre, const e_mode mode, const uint16_t r, const uint16_t rb);
 	inline uint16_t r8( const uint16_t r );
 	inline void w8( const uint16_t r, uint16_t value );
 	inline uint16_t r16( const uint16_t r );
@@ -140,6 +147,7 @@ private:
 	void t90_stop_timer(int i);
 	void t90_stop_timer4();
 	void set_irq_line(int irq, int state);
+	offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options);
 };
 
 

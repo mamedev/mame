@@ -4,9 +4,9 @@
 
   ** subclass of hh_tms1k_state (includes/hh_tms1k.h, drivers/hh_tms1k.cpp) **
 
-  Texas Instruments TMS1xxx family handheld calculators (mostly single-chip).
-  For a comprehensive list of MCU serials, see Joerg Woerner's datamath.org:
-  http://www.datamath.org/IC_List.htm
+  Texas Instruments or 1st-party TMS1xxx family handheld calculators (mostly
+  single-chip). For a comprehensive list of MCU serials, see Joerg Woerner's
+  datamath.org: http://www.datamath.org/IC_List.htm
 
   Refer to the calculators/toys official manuals on how to use them.
 
@@ -78,7 +78,7 @@ void cmulti8_state::prepare_display()
 	// M-digit is on in memory mode, upper row is off in single mode
 	uint32_t m = (m_inp_matrix[10]->read() & 0x10) ? 0x100000 : 0;
 	uint32_t mask = (m_inp_matrix[10]->read() & 0x20) ? 0xfffff : 0xffc00;
-	
+
 	// R10 selects display row
 	uint32_t sel = (m_r & 0x400) ? (m_r & 0x3ff) : (m_r << 10 & 0xffc00);
 	display_matrix(8, 21, m_o, (sel & mask) | m);

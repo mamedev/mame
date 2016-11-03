@@ -37,7 +37,7 @@ READ8_MEMBER(sh7604_sci_device::serial_mode_r)
 WRITE8_MEMBER(sh7604_sci_device::serial_mode_w)
 {
 	m_smr = data;
-	
+
 	logerror("%s: serial mode set:\n",tag());
 	logerror("\tCommunication Mode: %s mode\n",data & 0x80 ? "clocked synchronous" : "asynchronous");
 	logerror("\tCharacter Length: %s mode\n",data & 0x40 ? "7-bit" : "8-bit");
@@ -56,7 +56,7 @@ READ8_MEMBER(sh7604_sci_device::serial_control_r)
 WRITE8_MEMBER(sh7604_sci_device::serial_control_w)
 {
 	m_scr = data;
-	
+
 	if(data & 0x30)
 		throw emu_fatalerror("%s: enabled serial control %02x\n", tag(),data);
 }

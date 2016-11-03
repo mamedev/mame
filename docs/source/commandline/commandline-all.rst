@@ -113,7 +113,9 @@ Note: By default, all the '**-list**' commands below write info to the screen. I
 
 **-listslots** [<*gamename|wildcard*>]
 
-        Show available slots and options for each slot (if available).  Primarily used for MESS to allow control over internal plug-in cards, much like PCs needing video, sound and other expansion cards.
+        Show available slots and options for each slot (if available).  Primarily used for MAME to allow control over internal plug-in cards, much like PCs needing video, sound and other expansion cards.
+		
+        The slot name (e.g. **ctrl1**) can be used from the command line (**-ctrl1** in this case) 
 
 **-listmedia** / **-lm** [<*gamename|wildcard*>]
 
@@ -365,7 +367,7 @@ Core state/playback options
 	
 	In addition to the above, for drivers using different media, like carts or floppy disks, you can also use the %d_[media] indicator.  Replace [media] with the media switch you want to use. 
 	
-	A few examples: if you use 'mame robby -snapname foo/%g%i' snapshots will be saved as 'snaps\\foo\\robby0000.png' , 'snaps\\foo\\robby0001.png' and so on; if you use 'mess nes -cart robby -snapname %g/%d_cart' snapshots will be saved as 'snaps\\nes\\robby.png' ; if you use 'mess c64 -flop1 robby -snapname %g/%d_flop1/%i' snapshots will be saved as 'snaps\\c64\\robby\\0000.png'.
+	A few examples: if you use 'mame robby -snapname foo/%g%i' snapshots will be saved as 'snaps\\foo\\robby0000.png' , 'snaps\\foo\\robby0001.png' and so on; if you use 'mame nes -cart robby -snapname %g/%d_cart' snapshots will be saved as 'snaps\\nes\\robby.png' ; if you use 'mame c64 -flop1 robby -snapname %g/%d_flop1/%i' snapshots will be saved as 'snaps\\c64\\robby\\0000.png'.
 
 **-snapsize** *<width>x<height>*
 
@@ -391,7 +393,7 @@ Core state/playback options
 	
 	In addition to the above, for drivers using different media, like carts or floppy disks, you can also use the %d_[media] indicator.  Replace [media] with the media switch you want to use. 
 	
-	A few examples: if you use 'mame robby -statename foo/%g' save states will be stored inside 'sta\\foo\\robby\\' ; if you use 'mess nes -cart robby -statename %g/%d_cart' save states will be stored inside 'sta\\nes\\robby\\' ; if you use 'mess c64 -flop1 robby -statename %g/%d_flop1' save states will be stored inside 'sta\\c64\\robby\\'.
+	A few examples: if you use 'mame robby -statename foo/%g' save states will be stored inside 'sta\\foo\\robby\\' ; if you use 'mame nes -cart robby -statename %g/%d_cart' save states will be stored inside 'sta\\nes\\robby\\' ; if you use 'mame c64 -flop1 robby -statename %g/%d_flop1' save states will be stored inside 'sta\\c64\\robby\\'.
 
 **-[no]burnin**
 

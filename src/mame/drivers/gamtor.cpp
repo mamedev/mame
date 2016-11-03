@@ -9,7 +9,7 @@
 
 
   preliminary video based on llcharm / g4u5 set ONLY
-  there is clearly a way to set the base adddress for the tiles, or they should get
+  there is clearly a way to set the base address for the tiles, or they should get
   DMAd elsewhere before use.
 
   ends up making some accesses to the rom area because the pointer it gets from RAM is 0

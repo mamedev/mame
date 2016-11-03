@@ -24,7 +24,6 @@
 
  misc non-modular/non-68K boards
 
- RISC 2500 (Skeleton, does not work, and not sure the same internal chessboard connections are used)
  Academy 65C02 4.9152mhz
  Monte Carlo IV, Mega IV and any others not listed above have correct ROM/RAM and maybe LCD, not much else for now
 
@@ -81,7 +80,6 @@ Bit 5+6  LED 1-8 enable
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6502/m65c02.h"
-#include "cpu/arm/arm.h"
 #include "sound/beep.h"
 //#include "machine/mos6551.h"
 #include "video/hd44780.h"
@@ -180,8 +178,6 @@ public:
 	DECLARE_WRITE16_MEMBER(write_unknown2);
 	DECLARE_READ32_MEMBER(read_unknown3_32);
 	DECLARE_READ16_MEMBER(read_unknown3);
-	DECLARE_READ32_MEMBER(read_1800000);
-	DECLARE_WRITE32_MEMBER(write_1000000);
 	DECLARE_DRIVER_INIT(polgar);
 	DECLARE_MACHINE_START(polgar);
 	DECLARE_MACHINE_RESET(polgar);
@@ -192,7 +188,6 @@ public:
 	DECLARE_MACHINE_RESET(monteciv);
 	DECLARE_MACHINE_START(diablo68);
 	DECLARE_MACHINE_START(van16);
-	DECLARE_MACHINE_START(risc);
 	DECLARE_MACHINE_RESET(academy);
 	DECLARE_PALETTE_INIT(chess_lcd);
 	TIMER_DEVICE_CALLBACK_MEMBER(cause_nmi);
@@ -957,16 +952,6 @@ READ16_MEMBER(polgar_state::read_unknown3)
 
 }
 
-READ32_MEMBER(polgar_state::read_1800000)
-{
-	logerror("Read from RISC2500 1800000\n");
-	return 0;
-}
-
-WRITE32_MEMBER(polgar_state::write_1000000)
-{
-	logerror("Write to  RISC2500 1000000\n");
-}
 
 TIMER_DEVICE_CALLBACK_MEMBER(polgar_state::timer_update_irq6)
 {
@@ -997,11 +982,6 @@ MACHINE_START_MEMBER(polgar_state,van32)
 	if(rom[0x870] == 0x0c && rom[0x871] == 0x78) {
 		rom[0x870] = 0x38;
 	}
-}
-
-
-MACHINE_START_MEMBER(polgar_state,risc)
-{
 }
 
 
@@ -1179,14 +1159,6 @@ static ADDRESS_MAP_START(alm32_mem, AS_PROGRAM, 32, polgar_state )
 
 	ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(risc_mem, AS_PROGRAM, 32, polgar_state )
-
-	AM_RANGE( 0x02000000,  0x0201ffff )  AM_ROM AM_REGION("maincpu", 0) // AM_MIRROR(0x2000000)
-	AM_RANGE( 0x01000000,  0x01000003 )  AM_WRITE(write_1000000 )
-	AM_RANGE( 0x01800000,  0x01800003 )  AM_READ(read_1800000 )
-	AM_RANGE( 0x00000000,  0x0001ffff )  AM_RAM
-
-	ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(van16_mem, AS_PROGRAM, 16, polgar_state )
 
@@ -1639,18 +1611,6 @@ static MACHINE_CONFIG_START( van32, polgar_state )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( risc, polgar_state )
-	MCFG_CPU_ADD("maincpu", ARM, 14000000)
-	MCFG_CPU_PROGRAM_MAP(risc_mem)
-	MCFG_MACHINE_START_OVERRIDE(polgar_state,risc)
-	MCFG_MACHINE_RESET_OVERRIDE(polgar_state,van16)
-	//MCFG_TIMER_DRIVER_ADD_PERIODIC("artwork_timer", polgar_state, mboard_update_artwork, attotime::from_hz(120))
-
-	MCFG_FRAGMENT_ADD( chess_common )
-//  MCFG_NVRAM_ADD_0FILL("nvram")
-
-MACHINE_CONFIG_END
-
 static MACHINE_CONFIG_START( gen32, polgar_state )
 	MCFG_CPU_ADD("maincpu", M68030, XTAL_33_333MHz)
 	MCFG_CPU_PROGRAM_MAP(gen32_mem)
@@ -1799,11 +1759,6 @@ ROM_START( van32 )
 ROM_END
 
 
-ROM_START( risc )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD("s2500.bin", 0x000000, 0x20000, CRC(7a707e82) SHA1(87187fa58117a442f3abd30092cfcc2a4d7c7efc))
-ROM_END
-
 ROM_START( gen32 )
 	ROM_REGION32_BE( 0x40000, "maincpu", 0 )
 	ROM_LOAD("gen32_4.bin", 0x00000, 0x40000,CRC(6CC4DA88) SHA1(EA72ACF9C67ED17C6AC8DE56A165784AA629C4A1))
@@ -1859,7 +1814,6 @@ DRIVER_INIT_MEMBER(polgar_state,polgar)
 	CONS(  1991, diablo68, 0,       0,      diablo68,  sfortea, driver_device,  0,       "Novag",                     "Novag Diablo 68000 Chess Computer", MACHINE_NO_SOUND|MACHINE_NOT_WORKING|MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
 	CONS(  1991, van16,    0,       0,      van16,     van16, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Vancouver 68000", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
 	CONS(  1991, van32,    van16,   0,      van32,     van32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Vancouver 68020", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
-	CONS(  1992, risc,     0,       0,      risc,      van16, driver_device,    0,       "Saitek",                    "RISC2500", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
 	CONS(  1993, gen32,    van16,   0,      gen32,     gen32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Genius030 V4.00", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
 	CONS(  1993, gen32_41, van16,   0,      gen32,     gen32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Genius030 V4.01", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
 	CONS(  1994, berlinp,  van16,   0,      bpl32,     bpl32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Berlin Pro 68020", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )

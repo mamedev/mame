@@ -80,13 +80,13 @@ public:
 	uint16_t m_sprite_flag;
 
 	// System B and C
-	uint16_t m_ip_latched; 
+	uint16_t m_ip_latched;
 
 	 // System C
 	uint16_t m_sprite_bank;
 
 	// System A only
-	int m_mcu_hs; 
+	int m_mcu_hs;
 	uint16_t m_mcu_hs_ram[0x10];
 
 	// peekaboo

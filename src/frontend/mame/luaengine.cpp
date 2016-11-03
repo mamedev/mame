@@ -11,911 +11,187 @@
 #include <limits>
 #include <thread>
 #include <lua.hpp>
-#include "luabridge/Source/LuaBridge/LuaBridge.h"
 #include <signal.h>
 #include "emu.h"
 #include "mame.h"
-#include "cheat.h"
 #include "drivenum.h"
 #include "emuopts.h"
 #include "ui/ui.h"
 #include "luaengine.h"
 #include "natkeyboard.h"
 #include "uiinput.h"
+#include "pluginopts.h"
 #include <mutex>
 
 #ifdef __clang__
 #pragma clang diagnostic ignored "-Wshift-count-overflow"
 #endif
+#if defined(_MSC_VER)
+#pragma warning(disable:4503)
+#endif
+
 //**************************************************************************
 //  LUA ENGINE
 //**************************************************************************
-
-#if !defined(LUA_PROMPT)
-#define LUA_PROMPT      "> "
-#define LUA_PROMPT2     ">> "
-#endif
-
-#if !defined(LUA_MAXINPUT)
-#define LUA_MAXINPUT        512
-#endif
-
-#define lua_readline(b,p) \
-	(fputs(p, stdout), fflush(stdout),  /* show prompt */ \
-	fgets(b, LUA_MAXINPUT, stdin) != nullptr)  /* get line */
-
-static lua_State *globalL = nullptr;
-
-#define luai_writestring(s,l)   fwrite((s), sizeof(char), (l), stdout)
-#define luai_writeline()    (luai_writestring("\n", 1), fflush(stdout))
-
-const char *const lua_engine::tname_ioport = "lua.ioport";
-lua_engine* lua_engine::luaThis = nullptr;
 
 extern "C" {
 	int luaopen_zlib(lua_State *L);
 	int luaopen_lfs(lua_State *L);
 }
 
-static void lstop(lua_State *L, lua_Debug *ar)
+namespace sol
 {
-	(void)ar;  /* unused arg. */
-	lua_sethook(L, nullptr, 0, 0);
-	luaL_error(L, "interrupted!");
-}
-
-
-static void laction(int i)
-{
-	signal(i, SIG_DFL); /* if another SIGINT happens before lstop,
-	                          terminate process (default action) */
-	lua_sethook(globalL, lstop, LUA_MASKCALL | LUA_MASKRET | LUA_MASKCOUNT, 1);
-}
-
-int lua_engine::report(int status) {
-	if (status != LUA_OK && !lua_isnil(m_lua_state, -1))
+	class buffer
 	{
-		const char *msg = lua_tostring(m_lua_state, -1);
-		if (msg == nullptr) msg = "(error object is not a string)";
-		lua_writestringerror("%s\n", msg);
-		lua_pop(m_lua_state, 1);
-		/* force a complete garbage collection in case of errors */
-		lua_gc(m_lua_state, LUA_GCCOLLECT, 0);
-	}
-	return status;
-}
-
-
-static int traceback (lua_State *L)
-{
-	const char *msg = lua_tostring(L, 1);
-	if (msg)
-	luaL_traceback(L, L, msg, 1);
-	else if (!lua_isnoneornil(L, 1))
-	{  /* is there an error object? */
-	if (!luaL_callmeta(L, 1, "__tostring"))  /* try its 'tostring' metamethod */
-		lua_pushliteral(L, "(no error message)");
-	}
-	return 1;
-}
-
-
-int lua_engine::docall(int narg, int nres)
-{
-	int status;
-	int base = lua_gettop(m_lua_state) - narg;  /* function index */
-	lua_pushcfunction(m_lua_state, traceback);  /* push traceback function */
-	lua_insert(m_lua_state, base);  /* put it under chunk and args */
-	globalL = m_lua_state;  /* to be available to 'laction' */
-	signal(SIGINT, laction);
-	status = lua_pcall(m_lua_state, narg, nres, base);
-	signal(SIGINT, SIG_DFL);
-	lua_remove(m_lua_state, base);  /* remove traceback function */
-	return status;
-}
-
-namespace luabridge
-{
-template <>
-struct Stack <osd_file::error>
-{
-	static void push(lua_State *L, osd_file::error error)
-	{
-		std::string strerror;
-		switch(error)
+	public:
+		// sol does lua_settop(0), save userdata buffer in registry if necessary
+		buffer(int size, lua_State *L)
 		{
-			case osd_file::error::NONE:
-				lua_pushboolean(L, false);
-				return;
-			case osd_file::error::FAILURE:
-				strerror = "failure";
-				break;
-			case osd_file::error::OUT_OF_MEMORY:
-				strerror = "out_of_memory";
-				break;
-			case osd_file::error::NOT_FOUND:
-				strerror = "not_found";
-				break;
-			case osd_file::error::ACCESS_DENIED:
-				strerror = "access_denied";
-				break;
-			case osd_file::error::ALREADY_OPEN:
-				strerror = "already_open";
-				break;
-			case osd_file::error::TOO_MANY_FILES:
-				strerror = "too_many_files";
-				break;
-			case osd_file::error::INVALID_DATA:
-				strerror = "invalid_data";
-				break;
-			case osd_file::error::INVALID_ACCESS:
-				strerror = "invalid_access";
-				break;
-			default:
-				strerror = "unknown_error";
-				break;
-		}
-		lua_pushstring(L, strerror.c_str());
-	}
-};
-template <>
-struct Stack <map_handler_type>
-{
-	static void push(lua_State *L, map_handler_type error)
-	{
-		std::string type;
-		switch(error)
-		{
-			case AMH_NONE:
-				type = "none";
-				break;
-			case AMH_RAM:
-				type = "ram";
-				break;
-			case AMH_ROM:
-				type = "rom";
-				break;
-			case AMH_NOP:
-				type = "nop";
-				break;
-			case AMH_UNMAP:
-				type = "unmap";
-				break;
-			case AMH_DEVICE_DELEGATE:
-				type = "delegate";
-				break;
-			case AMH_PORT:
-				type = "port";
-				break;
-			case AMH_BANK:
-				type = "bank";
-				break;
-			case AMH_DEVICE_SUBMAP:
-				type = "submap";
-				break;
-			default:
-				type = "unknown";
-				break;
-		}
-		lua_pushstring(L, type.c_str());
-	}
-};
-}
-/* mark in error messages for incomplete statements */
-#define EOFMARK     "<eof>"
-#define marklen     (sizeof(EOFMARK)/sizeof(char) - 1)
-
-int lua_engine::incomplete(int status)
-{
-	if (status == LUA_ERRSYNTAX)
-	{
-		size_t lmsg;
-		const char *msg = lua_tolstring(m_lua_state, -1, &lmsg);
-		if (lmsg >= marklen && strcmp(msg + lmsg - marklen, EOFMARK) == 0)
-		{
-			lua_pop(m_lua_state, 1);
-			return 1;
-		}
-	}
-	return 0;  /* else... */
-}
-
-lua_engine::hook::hook()
-{
-	L = nullptr;
-	cb = -1;
-}
-
-void lua_engine::hook::set(lua_State *lua, int idx)
-{
-	if (L)
-		luaL_unref(L, LUA_REGISTRYINDEX, cb);
-
-	if (lua_isnil(lua, idx)) {
-		L = nullptr;
-		cb = -1;
-
-	} else {
-		L = lua;
-		lua_pushvalue(lua, idx);
-		cb = luaL_ref(lua, LUA_REGISTRYINDEX);
-	}
-}
-
-lua_State *lua_engine::hook::precall()
-{
-	lua_State *T = lua_newthread(L);
-	lua_rawgeti(T, LUA_REGISTRYINDEX, cb);
-	return T;
-}
-
-void lua_engine::hook::call(lua_engine *engine, lua_State *T, int nparam)
-{
-	engine->resume(T, nparam, L);
-}
-
-void lua_engine::resume(lua_State *L, int nparam, lua_State *root)
-{
-	int s = lua_resume(L, nullptr, nparam);
-	switch(s) {
-	case LUA_OK:
-		if(!root) {
-			std::map<lua_State *, std::pair<lua_State *, int> >::iterator i = thread_registry.find(L);
-			if(i != thread_registry.end()) {
-				luaL_unref(i->second.first, LUA_REGISTRYINDEX, i->second.second);
-				thread_registry.erase(i);
-			}
-		} else
-			lua_pop(root, 1);
-		break;
-
-	case LUA_YIELD:
-		if(root) {
-			int id = luaL_ref(root, LUA_REGISTRYINDEX);
-			thread_registry[L] = std::pair<lua_State *, int>(root, id);
-		}
-		break;
-
-	default:
-		osd_printf_error("[LUA ERROR] %s\n", lua_tostring(L, -1));
-		lua_pop(L, 1);
-		break;
-	}
-}
-
-void lua_engine::resume(void *lua, int32_t param)
-{
-	resume(static_cast<lua_State *>(lua));
-}
-
-int lua_engine::l_ioport_write(lua_State *L)
-{
-	ioport_field *field = static_cast<ioport_field *>(getparam(L, 1, tname_ioport));
-	luaL_argcheck(L, lua_isnumber(L, 2), 2, "value expected");
-	field->set_value(lua_tointeger(L, 2));
-	return 0;
-}
-
-//-------------------------------------------------
-//  emu_app_name - return application name
-//-------------------------------------------------
-
-int lua_engine::l_emu_app_name(lua_State *L)
-{
-	lua_pushstring(L, emulator_info::get_appname_lower());
-	return 1;
-}
-
-//-------------------------------------------------
-//  emu_app_version - return application version
-//-------------------------------------------------
-
-int lua_engine::l_emu_app_version(lua_State *L)
-{
-	lua_pushstring(L, bare_build_version);
-	return 1;
-}
-
-
-//-------------------------------------------------
-//  emu_gamename - returns game full name
-//-------------------------------------------------
-
-int lua_engine::l_emu_gamename(lua_State *L)
-{
-	lua_pushstring(L, luaThis->machine().system().description);
-	return 1;
-}
-
-//-------------------------------------------------
-//  emu_romname - returns rom base name
-//-------------------------------------------------
-
-int lua_engine::l_emu_romname(lua_State *L)
-{
-	lua_pushstring(L, luaThis->machine().basename());
-	return 1;
-}
-
-//-------------------------------------------------
-//  emu_softname - returns softlist name
-//-------------------------------------------------
-
-int lua_engine::l_emu_softname(lua_State *L)
-{
-	lua_pushstring(L, luaThis->machine().options().software_name());
-	return 1;
-}
-
-//-------------------------------------------------
-//  emu_pause/emu_unpause - pause/unpause game
-//-------------------------------------------------
-
-int lua_engine::l_emu_pause(lua_State *L)
-{
-	luaThis->machine().pause();
-	return 0;
-}
-
-int lua_engine::l_emu_unpause(lua_State *L)
-{
-	luaThis->machine().resume();
-	return 0;
-}
-
-//-------------------------------------------------
-//  emu_keypost - post keys to natural keyboard
-//-------------------------------------------------
-
-int lua_engine::l_emu_keypost(lua_State *L)
-{
-	const char *keys = luaL_checkstring(L,1);
-	luaThis->machine().ioport().natkeyboard().post_utf8(keys);
-	return 1;
-}
-
-int lua_engine::l_emu_time(lua_State *L)
-{
-	lua_pushnumber(L, luaThis->machine().time().as_double());
-	return 1;
-}
-
-void lua_engine::emu_after_done(void *_h, int32_t param)
-{
-	hook *h = static_cast<hook *>(_h);
-	h->call(this, h->precall(), 0);
-	delete h;
-}
-
-int lua_engine::emu_after(lua_State *L)
-{
-	luaL_argcheck(L, lua_isnumber(L, 1), 1, "waiting duration expected");
-	struct hook *h = new hook;
-	h->set(L, 2);
-	machine().scheduler().timer_set(attotime::from_double(lua_tonumber(L, 1)), timer_expired_delegate(FUNC(lua_engine::emu_after_done), this), 0, h);
-	return 0;
-}
-
-int lua_engine::l_emu_after(lua_State *L)
-{
-	return luaThis->emu_after(L);
-}
-
-int lua_engine::emu_wait(lua_State *L)
-{
-	luaL_argcheck(L, lua_isnumber(L, 1), 1, "waiting duration expected");
-	machine().scheduler().timer_set(attotime::from_double(lua_tonumber(L, 1)), timer_expired_delegate(FUNC(lua_engine::resume), this), 0, L);
-	return lua_yieldk(L, 0, 0, nullptr);
-}
-
-int lua_engine::l_emu_wait(lua_State *L)
-{
-	return luaThis->emu_wait(L);
-}
-
-void lua_engine::output_notifier(const char *outname, int32_t value)
-{
-	if (hook_output_cb.active()) {
-		lua_State *L = hook_output_cb.precall();
-		lua_pushstring(L, outname);
-		lua_pushnumber(L, value);
-		hook_output_cb.call(this, L, 2);
-	}
-}
-
-void lua_engine::s_output_notifier(const char *outname, int32_t value, void *param)
-{
-	static_cast<lua_engine *>(param)->output_notifier(outname, value);
-}
-
-void lua_engine::emu_hook_output(lua_State *L)
-{
-	luaL_argcheck(L, lua_isfunction(L, 1), 1, "callback function expected");
-	hook_output_cb.set(L, 1);
-
-	if (!output_notifier_set) {
-		machine().output().set_notifier(nullptr, s_output_notifier, this);
-		output_notifier_set = true;
-	}
-}
-
-int lua_engine::l_emu_hook_output(lua_State *L)
-{
-	luaThis->emu_hook_output(L);
-	return 0;
-}
-
-int lua_engine::l_emu_set_hook(lua_State *L)
-{
-	luaThis->emu_set_hook(L);
-	return 0;
-}
-
-void lua_engine::emu_set_hook(lua_State *L)
-{
-	luaL_argcheck(L, lua_isfunction(L, 1) || lua_isnil(L, 1), 1, "callback function expected");
-	luaL_argcheck(L, lua_isstring(L, 2), 2, "message (string) expected");
-	const char *hookname = luaL_checkstring(L,2);
-
-	if (strcmp(hookname, "output") == 0) {
-		hook_output_cb.set(L, 1);
-		if (!output_notifier_set) {
-			machine().output().set_notifier(nullptr, s_output_notifier, this);
-			output_notifier_set = true;
-		}
-	} else if (strcmp(hookname, "frame") == 0) {
-		hook_frame_cb.set(L, 1);
-	} else {
-		lua_writestringerror("%s", "Unknown hook name, aborting.\n");
-	}
-}
-
-//-------------------------------------------------
-//  options_entry - return table of option entries
-//  -> manager:options().entries
-//  -> manager:machine():options().entries
-//  -> manager:machine():ui():options().entries
-//-------------------------------------------------
-
-template <typename T>
-luabridge::LuaRef lua_engine::l_options_get_entries(const T *o)
-{
-	T *options = const_cast<T *>(o);
-	lua_State *L = luaThis->m_lua_state;
-	luabridge::LuaRef entries_table = luabridge::LuaRef::newTable(L);
-
-	int unadorned_index = 0;
-	for (typename T::entry &curentry : *options)
-	{
-		const char *name = curentry.name();
-		bool is_unadorned = false;
-		// check if it's unadorned
-		if (name && strlen(name) && !strcmp(name, options->unadorned(unadorned_index)))
-		{
-			unadorned_index++;
-			is_unadorned = true;
-		}
-		if (!curentry.is_header() && !curentry.is_command() && !curentry.is_internal() && !is_unadorned)
-			entries_table[name] = &curentry;
-	}
-
-	return entries_table;
-}
-
-//-------------------------------------------------
-//  machine_get_screens - return table of available screens userdata
-//  -> manager:machine().screens[":screen"]
-//-------------------------------------------------
-
-luabridge::LuaRef lua_engine::l_machine_get_screens(const running_machine *r)
-{
-	lua_State *L = luaThis->m_lua_state;
-	luabridge::LuaRef screens_table = luabridge::LuaRef::newTable(L);
-
-	for (device_t *dev = r->first_screen(); dev != nullptr; dev = dev->next()) {
-		screen_device *sc = dynamic_cast<screen_device *>(dev);
-		if (sc && sc->configured() && sc->started() && sc->type()) {
-			screens_table[sc->tag()] = sc;
-		}
-	}
-
-	return screens_table;
-}
-
-//-------------------------------------------------
-//  machine_get_devices - return table of available devices userdata
-//  -> manager:machine().devices[":maincpu"]
-//-------------------------------------------------
-
-luabridge::LuaRef lua_engine::l_machine_get_devices(const running_machine *r)
-{
-	running_machine *m = const_cast<running_machine *>(r);
-	lua_State *L = luaThis->m_lua_state;
-	luabridge::LuaRef devs_table = luabridge::LuaRef::newTable(L);
-
-	device_t *root = &(m->root_device());
-	devs_table = devtree_dfs(root, devs_table);
-
-	return devs_table;
-}
-
-//-------------------------------------------------
-//  machine_get_images - return table of available image devices userdata
-//  -> manager:machine().images["flop1"]
-//-------------------------------------------------
-
-luabridge::LuaRef lua_engine::l_machine_get_images(const running_machine *r)
-{
-	lua_State *L = luaThis->m_lua_state;
-	luabridge::LuaRef image_table = luabridge::LuaRef::newTable(L);
-
-	for (device_image_interface &image : image_interface_iterator(r->root_device()))
-	{
-		image_table[image.brief_instance_name()] = &image;
-		image_table[image.instance_name()] = &image;
-	}
-
-	return image_table;
-}
-
-//-------------------------------------------------
-//  memory_banks - return memory_banks
-//  -> manager:machine():memory().banks["maincpu"]
-//-------------------------------------------------
-
-luabridge::LuaRef lua_engine::l_memory_get_banks(const memory_manager *m)
-{
-	memory_manager *mm = const_cast<memory_manager *>(m);
-	lua_State *L = luaThis->m_lua_state;
-	luabridge::LuaRef table = luabridge::LuaRef::newTable(L);
-
-	for (auto &bank : mm->banks()) {
-		table[bank.second->tag()] = bank.second.get();
-	}
-
-	return table;
-}
-
-//-------------------------------------------------
-//  memory_regions - return memory_regions
-//  -> manager:machine():memory().region[":maincpu"]
-//-------------------------------------------------
-
-luabridge::LuaRef lua_engine::l_memory_get_regions(const memory_manager *m)
-{
-	memory_manager *mm = const_cast<memory_manager *>(m);
-	lua_State *L = luaThis->m_lua_state;
-	luabridge::LuaRef table = luabridge::LuaRef::newTable(L);
-
-	for (auto &region: mm->regions()) {
-		table[region.second->name()] = region.second.get();
-	}
-
-	return table;
-}
-
-//-------------------------------------------------
-//  memory_shares - return memory_shares
-//  -> manager:machine():memory().share[":maincpu"]
-//-------------------------------------------------
-
-luabridge::LuaRef lua_engine::l_memory_get_shares(const memory_manager *m)
-{
-	memory_manager *mm = const_cast<memory_manager *>(m);
-	lua_State *L = luaThis->m_lua_state;
-	luabridge::LuaRef table = luabridge::LuaRef::newTable(L);
-
-	for (auto &share: mm->shares()) {
-		table[share.first] = share.second.get();
-	}
-
-	return table;
-}
-
-//-------------------------------------------------
-//  machine_cheat_entries - return cheat entries
-//  -> manager:machine():cheat().entries[0]
-//-------------------------------------------------
-
-luabridge::LuaRef lua_engine::l_cheat_get_entries(const cheat_manager *c)
-{
-	cheat_manager *cm = const_cast<cheat_manager *>(c);
-	lua_State *L = luaThis->m_lua_state;
-	luabridge::LuaRef entry_table = luabridge::LuaRef::newTable(L);
-
-	int cheatnum = 0;
-	for (auto &entry : cm->entries()) {
-		entry_table[cheatnum++] = entry.get();
-	}
-
-	return entry_table;
-}
-
-//-------------------------------------------------
-//  cheat_entry_state - return cheat entry state
-//  -> manager:machine():cheat().entries[0]:state()
-//-------------------------------------------------
-
-int lua_engine::lua_cheat_entry::l_get_state(lua_State *L)
-{
-	cheat_entry *ce = luabridge::Stack<cheat_entry *>::get(L, 1);
-
-	switch (ce->state())
-	{
-		case SCRIPT_STATE_ON:     lua_pushliteral(L, "on"); break;
-		case SCRIPT_STATE_RUN:    lua_pushliteral(L, "run"); break;
-		case SCRIPT_STATE_CHANGE: lua_pushliteral(L, "change"); break;
-		case SCRIPT_STATE_COUNT:  lua_pushliteral(L, "count"); break;
-		default:                  lua_pushliteral(L, "off"); break;
-	}
-
-	return 1;
-}
-
-//-------------------------------------------------
-//  machine_ioports - return table of ioports
-//  -> manager:machine():ioport().ports[':P1']
-//-------------------------------------------------
-
-luabridge::LuaRef lua_engine::l_ioport_get_ports(const ioport_manager *m)
-{
-	ioport_manager *im = const_cast<ioport_manager *>(m);
-	lua_State *L = luaThis->m_lua_state;
-	luabridge::LuaRef port_table = luabridge::LuaRef::newTable(L);
-
-	for (auto &port : im->ports()) {
-		port_table[port.second->tag()] = port.second.get();
-	}
-
-	return port_table;
-}
-
-//-------------------------------------------------
-//  ioport_fields - return table of ioport fields
-//  -> manager:machine().ioport().ports[':P1'].fields[':']
-//-------------------------------------------------
-
-luabridge::LuaRef lua_engine::l_ioports_port_get_fields(const ioport_port *i)
-{
-	ioport_port *p = const_cast<ioport_port *>(i);
-	lua_State *L = luaThis->m_lua_state;
-	luabridge::LuaRef f_table = luabridge::LuaRef::newTable(L);
-
-	for (ioport_field &field : p->fields()) {
-		if (field.type_class() != INPUT_CLASS_INTERNAL)
-			f_table[field.name()] = &field;
-	}
-
-	return f_table;
-}
-
-//-------------------------------------------------
-//  render_get_targets - return table of render targets
-//  -> manager:machine():render().targets[0]
-//-------------------------------------------------
-
-luabridge::LuaRef lua_engine::l_render_get_targets(const render_manager *r)
-{
-	lua_State *L = luaThis->m_lua_state;
-	luabridge::LuaRef target_table = luabridge::LuaRef::newTable(L);
-
-	int tc = 0;
-	for (render_target &curr_rt : r->targets())
-	{
-		target_table[tc++] = &curr_rt;
-	}
-
-	return target_table;
-}
-
-// private helper for get_devices - DFS visit all devices in a running machine
-luabridge::LuaRef lua_engine::devtree_dfs(device_t *root, luabridge::LuaRef devs_table)
-{
-	if (root) {
-		for (device_t &dev : root->subdevices()) {
-			if (dev.configured() && dev.started()) {
-				devs_table[dev.tag()] = &dev;
-				devtree_dfs(&dev, devs_table);
+			ptr = luaL_buffinitsize(L, &buff, size);
+			len = size;
+			if(buff.b != buff.initb)
+			{
+				lua_pushvalue(L, -1);
+				lua_setfield(L, LUA_REGISTRYINDEX, "sol::buffer_temp");
 			}
 		}
-	}
-	return devs_table;
-}
-
-//-------------------------------------------------
-//  device_get_memspaces - return table of available address spaces userdata
-//  -> manager:machine().devices[":maincpu"].spaces["program"]
-//-------------------------------------------------
-
-luabridge::LuaRef lua_engine::l_dev_get_memspaces(const device_t *d)
-{
-	device_t *dev = const_cast<device_t *>(d);
-	lua_State *L = luaThis->m_lua_state;
-	luabridge::LuaRef sp_table = luabridge::LuaRef::newTable(L);
-	device_memory_interface *memdev = dynamic_cast<device_memory_interface *>(dev);
-
-	if(!memdev)
-		return sp_table;
-
-	for (address_spacenum sp = AS_0; sp < ADDRESS_SPACES; ++sp) {
-		if (memdev->has_space(sp)) {
-			sp_table[memdev->space(sp).name()] = lua_addr_space(&memdev->space(sp), memdev);
-		}
-	}
-
-	return sp_table;
-}
-
-//-------------------------------------------------
-//  device_get_state - return table of available state userdata
-//  -> manager:machine().devices[":maincpu"].state
-//-------------------------------------------------
-
-luabridge::LuaRef lua_engine::l_dev_get_states(const device_t *d)
-{
-	device_t *dev = const_cast<device_t *>(d);
-	lua_State *L = luaThis->m_lua_state;
-	luabridge::LuaRef st_table = luabridge::LuaRef::newTable(L);
-
-	if(!dynamic_cast<device_state_interface *>(dev))
-		return st_table;
-
-	for (auto &s : dev->state().state_entries())
-	{
-		// XXX: refrain from exporting non-visible entries?
-		st_table[s->symbol()] = s.get();
-	}
-
-	return st_table;
-}
-
-//-------------------------------------------------
-//  device_get_item - return table of indexed items owned by this device
-//  -> manager:machine().devices[":maincpu"].items
-//-------------------------------------------------
-
-luabridge::LuaRef lua_engine::l_dev_get_items(const device_t *d)
-{
-	device_t *dev = const_cast<device_t *>(d);
-	lua_State *L = luaThis->m_lua_state;
-	luabridge::LuaRef table = luabridge::LuaRef::newTable(L);
-	std::string tag = dev->tag();
-
-	// 10000 is enough?
-	for(int i = 0; i < 10000; i++)
-	{
-		std::string name;
-		const char *item;
-		unsigned int size, count;
-		void *base;
-		item = dev->machine().save().indexed_item(i, base, size, count);
-		if(!item)
-			break;
-		name = &(strchr(item, '/')[1]);
-		if(name.substr(0, name.find("/")) == tag)
+		~buffer()
 		{
-			name = name.substr(name.find("/") + 1, std::string::npos);
-			table[name] = i;
+			lua_State *L = buff.L;
+			if(lua_getfield(L, LUA_REGISTRYINDEX, "sol::buffer_temp") != LUA_TNIL)
+			{
+				lua_pushnil(L);
+				lua_setfield(L, LUA_REGISTRYINDEX, "sol::buffer_temp");
+			}
+			else
+				lua_pop(L, -1); 
+
+			luaL_pushresultsize(&buff, len);
 		}
-	}
-	return table;
-}
-
-lua_engine::lua_item::lua_item(int index)
-{
-	std::string name;
-	const char *item;
-	item = luaThis->machine().save().indexed_item(index, l_item_base, l_item_size, l_item_count);
-	if(!item)
+		void set_len(int size) { len = size; }
+		int get_len() { return len; }
+		char *get_ptr() { return ptr; }
+	private:
+		luaL_Buffer buff;
+		int len;
+		char *ptr;
+	};
+	namespace meta
 	{
-		l_item_base = nullptr;
-		l_item_size = 0;
-		l_item_count= 0;
+		template<>
+		struct has_begin_end<core_options> : std::false_type {}; // don't convert core_optons to a table directly
 	}
-}
-
-int lua_engine::lua_item::l_item_read(lua_State *L)
-{
-	luaL_argcheck(L, lua_isnumber(L, 2), 2, "offset (integer) expected");
-	int offset = lua_tounsigned(L, 2);
-	int ret = 0;
-	if(!l_item_base || (offset > l_item_count))
+	namespace stack
 	{
-		lua_pushnil(L);
-		return 1;
-	}
-	switch(l_item_size)
-	{
-		case 1:
-		default:
-			ret = ((uint8_t *)l_item_base)[offset];
-			break;
-		case 2:
-			ret = ((uint16_t *)l_item_base)[offset];
-			break;
-		case 4:
-			ret = ((uint32_t *)l_item_base)[offset];
-			break;
-		case 8:
-			ret = ((uint64_t *)l_item_base)[offset];
-			break;
-	}
-	lua_pushunsigned(L, ret);
-	return 1;
-}
-
-int lua_engine::lua_item::l_item_write(lua_State *L)
-{
-	luaL_argcheck(L, lua_isnumber(L, 2), 2, "offset (integer) expected");
-	luaL_argcheck(L, lua_isnumber(L, 3), 3, "value (integer) expected");
-	int offset = lua_tounsigned(L, 2);
-	uint64_t value = lua_tounsigned(L, 3);
-	if(!l_item_base || (offset > l_item_count))
-		return 1;
-	switch(l_item_size)
-	{
-		case 1:
-		default:
-			((uint8_t *)l_item_base)[offset] = (uint8_t)value;
-			break;
-		case 2:
-			((uint16_t *)l_item_base)[offset] = (uint16_t)value;
-			break;
-		case 4:
-			((uint32_t *)l_item_base)[offset] = (uint32_t)value;
-			break;
-		case 8:
-			((uint64_t *)l_item_base)[offset] = (uint64_t)value;
-			break;
-	}
-	return 1;
-}
-
-int lua_engine::lua_item::l_item_read_block(lua_State *L)
-{
-	luaL_argcheck(L, lua_isnumber(L, 2), 2, "offset (integer) expected");
-	luaL_argcheck(L, lua_isnumber(L, 3), 3, "length (integer) expected");
-	int offset = lua_tounsigned(L, 2);
-	int len = lua_tonumber(L, 3);
-	if(!l_item_base || ((offset + len) > (l_item_size * l_item_count)))
-	{
-		lua_pushnil(L);
-		return 1;
-	}
-	luaL_Buffer buff;
-	char *ptr = luaL_buffinitsize(L, &buff, len);
-	memcpy(ptr, l_item_base, len);
-	luaL_pushresultsize(&buff, len);
-	return 1;
-}
-
-//-------------------------------------------------
-//  state_get_value - return value of a device state entry
-//  -> manager:machine().devices[":maincpu"].state["PC"].value
-//-------------------------------------------------
-
-uint64_t lua_engine::l_state_get_value(const device_state_entry *d)
-{
-	device_state_interface *state = d->parent_state();
-	if(state) {
-		luaThis->machine().save().dispatch_presave();
-		return state->state_int(d->index());
-	} else {
-		return 0;
-	}
-}
-
-//-------------------------------------------------
-//  state_set_value - set value of a device state entry
-//  -> manager:machine().devices[":maincpu"].state["D0"].value = 0x0c00
-//-------------------------------------------------
-
-void lua_engine::l_state_set_value(device_state_entry *d, uint64_t val)
-{
-	device_state_interface *state = d->parent_state();
-	if(state) {
-		state->set_state_int(d->index(), val);
-		luaThis->machine().save().dispatch_presave();
+		template <>
+		struct pusher<osd_file::error>
+		{
+			static int push(lua_State *L, osd_file::error error)
+			{
+				const char *strerror;
+				switch(error)
+				{
+					case osd_file::error::NONE:
+						return stack::push(L, sol::nil);
+					case osd_file::error::FAILURE:
+						strerror = "failure";
+						break;
+					case osd_file::error::OUT_OF_MEMORY:
+						strerror = "out_of_memory";
+						break;
+					case osd_file::error::NOT_FOUND:
+						strerror = "not_found";
+						break;
+					case osd_file::error::ACCESS_DENIED:
+						strerror = "access_denied";
+						break;
+					case osd_file::error::ALREADY_OPEN:
+						strerror = "already_open";
+						break;
+					case osd_file::error::TOO_MANY_FILES:
+						strerror = "too_many_files";
+						break;
+					case osd_file::error::INVALID_DATA:
+						strerror = "invalid_data";
+						break;
+					case osd_file::error::INVALID_ACCESS:
+						strerror = "invalid_access";
+						break;
+					default:
+						strerror = "unknown_error";
+						break;
+				}
+				return stack::push(L, strerror);
+			}
+		};
+		template <>
+		struct checker<sol::buffer *>
+		{
+			template <typename Handler>
+			static bool check (lua_State* L, int index, Handler&& handler, record& tracking)
+			{
+				return stack::check<int>(L, index, handler);
+			}
+		};
+		template <>
+		struct getter<sol::buffer *>
+		{
+			static sol::buffer *get(lua_State* L, int index, record& tracking)
+			{
+				return new sol::buffer(stack::get<int>(L, index), L);
+			}
+		};
+		template <>
+		struct pusher<sol::buffer *>
+		{
+			static int push(lua_State* L, sol::buffer *buff)
+			{
+				delete buff;
+				return 1;
+			}
+		};
+		template <>
+		struct pusher<map_handler_type>
+		{
+			static int push(lua_State *L, map_handler_type type)
+			{
+				const char *typestr;
+				switch(type)
+				{
+					case AMH_NONE:
+						typestr = "none";
+						break;
+					case AMH_RAM:
+						typestr = "ram";
+						break;
+					case AMH_ROM:
+						typestr = "rom";
+						break;
+					case AMH_NOP:
+						typestr = "nop";
+						break;
+					case AMH_UNMAP:
+						typestr = "unmap";
+						break;
+					case AMH_DEVICE_DELEGATE:
+						typestr = "delegate";
+						break;
+					case AMH_PORT:
+						typestr = "port";
+						break;
+					case AMH_BANK:
+						typestr = "bank";
+						break;
+					case AMH_DEVICE_SUBMAP:
+						typestr = "submap";
+						break;
+					default:
+						typestr = "unknown";
+						break;
+				}
+				return stack::push(L, typestr);
+			}
+		};
 	}
 }
 
@@ -925,53 +201,41 @@ void lua_engine::l_state_set_value(device_state_entry *d, uint64_t val)
 //-------------------------------------------------
 
 template <typename T>
-int lua_engine::lua_addr_space::l_mem_read(lua_State *L)
+T lua_engine::addr_space::mem_read(offs_t address, sol::object shift)
 {
-	lua_addr_space &lsp = luabridge::Stack<lua_addr_space &>::get(L, 1);
-	address_space &sp = lsp.space;
-	luaL_argcheck(L, lua_isnumber(L, 2), 2, "address (integer) expected");
-	luaL_argcheck(L, lua_isboolean(L, 3) || lua_isnone(L, 3), 3, "optional argument: disable address shift (bool) expected");
-	offs_t address = lua_tounsigned(L, 2);
 	T mem_content = 0;
-	if(!lua_toboolean(L, 3))
-		address = sp.address_to_byte(address);
+	if(!shift.as<bool>())
+		address = space.address_to_byte(address);
 	switch(sizeof(mem_content) * 8) {
 		case 8:
-			mem_content = sp.read_byte(address);
+			mem_content = space.read_byte(address);
 			break;
 		case 16:
 			if (WORD_ALIGNED(address)) {
-				mem_content = sp.read_word(address);
+				mem_content = space.read_word(address);
 			} else {
-				mem_content = sp.read_word_unaligned(address);
+				mem_content = space.read_word_unaligned(address);
 			}
 			break;
 		case 32:
 			if (DWORD_ALIGNED(address)) {
-				mem_content = sp.read_dword(address);
+				mem_content = space.read_dword(address);
 			} else {
-				mem_content = sp.read_dword_unaligned(address);
+				mem_content = space.read_dword_unaligned(address);
 			}
 			break;
 		case 64:
 			if (QWORD_ALIGNED(address)) {
-				mem_content = sp.read_qword(address);
+				mem_content = space.read_qword(address);
 			} else {
-				mem_content = sp.read_qword_unaligned(address);
+				mem_content = space.read_qword_unaligned(address);
 			}
 			break;
 		default:
 			break;
 	}
 
-	if (std::numeric_limits<T>::is_signed) {
-		lua_pushinteger(L, mem_content);
-	} else {
-		lua_pushunsigned(L, mem_content);
-	}
-
-	return 1;
-
+	return mem_content;
 }
 
 //-------------------------------------------------
@@ -980,47 +244,38 @@ int lua_engine::lua_addr_space::l_mem_read(lua_State *L)
 //-------------------------------------------------
 
 template <typename T>
-int lua_engine::lua_addr_space::l_mem_write(lua_State *L)
+void lua_engine::addr_space::mem_write(offs_t address, T val, sol::object shift)
 {
-	lua_addr_space &lsp = luabridge::Stack<lua_addr_space &>::get(L, 1);
-	address_space &sp = lsp.space;
-	luaL_argcheck(L, lua_isnumber(L, 2), 2, "address (integer) expected");
-	luaL_argcheck(L, lua_isnumber(L, 3), 3, "value (integer) expected");
-	luaL_argcheck(L, lua_isboolean(L, 4) || lua_isnone(L, 4), 4, "optional argument: disable address shift (bool) expected");
-	offs_t address = lua_tounsigned(L, 2);
-	T val = lua_tounsigned(L, 3);
-	if(!lua_toboolean(L, 4))
-		address = sp.address_to_byte(address);
+	if(!shift.as<bool>())
+		address = space.address_to_byte(address);
 	switch(sizeof(val) * 8) {
 		case 8:
-			sp.write_byte(address, val);
+			space.write_byte(address, val);
 			break;
 		case 16:
 			if (WORD_ALIGNED(address)) {
-				sp.write_word(address, val);
+				space.write_word(address, val);
 			} else {
-				sp.write_word_unaligned(address, val);
+				space.write_word_unaligned(address, val);
 			}
 			break;
 		case 32:
 			if (DWORD_ALIGNED(address)) {
-				sp.write_dword(address, val);
+				space.write_dword(address, val);
 			} else {
-				sp.write_dword_unaligned(address, val);
+				space.write_dword_unaligned(address, val);
 			}
 			break;
 		case 64:
 			if (QWORD_ALIGNED(address)) {
-				sp.write_qword(address, val);
+				space.write_qword(address, val);
 			} else {
-				sp.write_qword_unaligned(address, val);
+				space.write_qword_unaligned(address, val);
 			}
 			break;
 		default:
 			break;
 	}
-
-	return 0;
 }
 
 //-------------------------------------------------
@@ -1029,54 +284,43 @@ int lua_engine::lua_addr_space::l_mem_write(lua_State *L)
 //-------------------------------------------------
 
 template <typename T>
-int lua_engine::lua_addr_space::l_log_mem_read(lua_State *L)
+T lua_engine::addr_space::log_mem_read(offs_t address)
 {
-	lua_addr_space &lsp = luabridge::Stack<lua_addr_space &>::get(L, 1);
-	address_space &sp = lsp.space;
-	luaL_argcheck(L, lua_isnumber(L, 2), 2, "address (integer) expected");
-	offs_t address = lua_tounsigned(L, 2);
 	T mem_content = 0;
-	if(!lsp.dev->translate(sp.spacenum(), TRANSLATE_READ_DEBUG, address))
+	if(!dev.translate(space.spacenum(), TRANSLATE_READ_DEBUG, address))
 		return 0;
-	address = sp.address_to_byte(address);
+	address = space.address_to_byte(address);
 
 	switch(sizeof(mem_content) * 8) {
 		case 8:
-			mem_content = sp.read_byte(address);
+			mem_content = space.read_byte(address);
 			break;
 		case 16:
 			if (WORD_ALIGNED(address)) {
-				mem_content = sp.read_word(address);
+				mem_content = space.read_word(address);
 			} else {
-				mem_content = sp.read_word_unaligned(address);
+				mem_content = space.read_word_unaligned(address);
 			}
 			break;
 		case 32:
 			if (DWORD_ALIGNED(address)) {
-				mem_content = sp.read_dword(address);
+				mem_content = space.read_dword(address);
 			} else {
-				mem_content = sp.read_dword_unaligned(address);
+				mem_content = space.read_dword_unaligned(address);
 			}
 			break;
 		case 64:
 			if (QWORD_ALIGNED(address)) {
-				mem_content = sp.read_qword(address);
+				mem_content = space.read_qword(address);
 			} else {
-				mem_content = sp.read_qword_unaligned(address);
+				mem_content = space.read_qword_unaligned(address);
 			}
 			break;
 		default:
 			break;
 	}
 
-	if (std::numeric_limits<T>::is_signed) {
-		lua_pushinteger(L, mem_content);
-	} else {
-		lua_pushunsigned(L, mem_content);
-	}
-
-	return 1;
-
+	return mem_content;
 }
 
 //-------------------------------------------------
@@ -1085,49 +329,40 @@ int lua_engine::lua_addr_space::l_log_mem_read(lua_State *L)
 //-------------------------------------------------
 
 template <typename T>
-int lua_engine::lua_addr_space::l_log_mem_write(lua_State *L)
+void lua_engine::addr_space::log_mem_write(offs_t address, T val)
 {
-	lua_addr_space &lsp = luabridge::Stack<lua_addr_space &>::get(L, 1);
-	address_space &sp = lsp.space;
-	luaL_argcheck(L, lua_isnumber(L, 2), 2, "address (integer) expected");
-	luaL_argcheck(L, lua_isnumber(L, 3), 3, "value (integer) expected");
-	offs_t address = lua_tounsigned(L, 2);
-	T val = lua_tounsigned(L, 3);
-
-	if(!lsp.dev->translate(sp.spacenum(), TRANSLATE_WRITE_DEBUG, address))
-		return 0;
-	address = sp.address_to_byte(address);
+	if(!dev.translate(space.spacenum(), TRANSLATE_WRITE_DEBUG, address))
+		return;
+	address = space.address_to_byte(address);
 
 	switch(sizeof(val) * 8) {
 		case 8:
-			sp.write_byte(address, val);
+			space.write_byte(address, val);
 			break;
 		case 16:
 			if (WORD_ALIGNED(address)) {
-				sp.write_word(address, val);
+				space.write_word(address, val);
 			} else {
-				sp.write_word_unaligned(address, val);
+				space.write_word_unaligned(address, val);
 			}
 			break;
 		case 32:
 			if (DWORD_ALIGNED(address)) {
-				sp.write_dword(address, val);
+				space.write_dword(address, val);
 			} else {
-				sp.write_dword_unaligned(address, val);
+				space.write_dword_unaligned(address, val);
 			}
 			break;
 		case 64:
 			if (QWORD_ALIGNED(address)) {
-				sp.write_qword(address, val);
+				space.write_qword(address, val);
 			} else {
-				sp.write_qword_unaligned(address, val);
+				space.write_qword_unaligned(address, val);
 			}
 			break;
 		default:
 			break;
 	}
-
-	return 0;
 }
 
 //-------------------------------------------------
@@ -1136,34 +371,24 @@ int lua_engine::lua_addr_space::l_log_mem_write(lua_State *L)
 //-------------------------------------------------
 
 template <typename T>
-int lua_engine::lua_addr_space::l_direct_mem_read(lua_State *L)
+T lua_engine::addr_space::direct_mem_read(offs_t address)
 {
-	lua_addr_space &lsp = luabridge::Stack<lua_addr_space &>::get(L, 1);
-	address_space &sp = lsp.space;
-	luaL_argcheck(L, lua_isnumber(L, 2), 2, "address (integer) expected");
-	offs_t address = lua_tounsigned(L, 2);
 	T mem_content = 0;
-	offs_t lowmask = sp.data_width() / 8 - 1;
+	offs_t lowmask = space.data_width() / 8 - 1;
 	for(int i = 0; i < sizeof(T); i++)
 	{
-		int addr = sp.endianness() == ENDIANNESS_LITTLE ? address + sizeof(T) - 1 - i : address + i;
-		uint8_t *base = (uint8_t *)sp.get_read_ptr(sp.address_to_byte(addr & ~lowmask));
+		int addr = space.endianness() == ENDIANNESS_LITTLE ? address + sizeof(T) - 1 - i : address + i;
+		uint8_t *base = (uint8_t *)space.get_read_ptr(space.address_to_byte(addr & ~lowmask));
 		if(!base)
 			continue;
 		mem_content <<= 8;
-		if(sp.endianness() == ENDIANNESS_BIG)
+		if(space.endianness() == ENDIANNESS_BIG)
 			mem_content |= base[BYTE8_XOR_BE(addr) & lowmask];
 		else
 			mem_content |= base[BYTE8_XOR_LE(addr) & lowmask];
 	}
 
-	if (std::numeric_limits<T>::is_signed) {
-		lua_pushinteger(L, mem_content);
-	} else {
-		lua_pushunsigned(L, mem_content);
-	}
-
-	return 1;
+	return mem_content;
 }
 
 //-------------------------------------------------
@@ -1172,29 +397,21 @@ int lua_engine::lua_addr_space::l_direct_mem_read(lua_State *L)
 //-------------------------------------------------
 
 template <typename T>
-int lua_engine::lua_addr_space::l_direct_mem_write(lua_State *L)
+void lua_engine::addr_space::direct_mem_write(offs_t address, T val)
 {
-	lua_addr_space &lsp = luabridge::Stack<lua_addr_space &>::get(L, 1);
-	address_space &sp = lsp.space;
-	luaL_argcheck(L, lua_isnumber(L, 2), 2, "address (integer) expected");
-	luaL_argcheck(L, lua_isnumber(L, 3), 3, "value (integer) expected");
-	offs_t address = lua_tounsigned(L, 2);
-	T val = lua_tounsigned(L, 3);
-	offs_t lowmask = sp.data_width() / 8 - 1;
+	offs_t lowmask = space.data_width() / 8 - 1;
 	for(int i = 0; i < sizeof(T); i++)
 	{
-		int addr = sp.endianness() == ENDIANNESS_BIG ? address + sizeof(T) - 1 - i : address + i;
-		uint8_t *base = (uint8_t *)sp.get_read_ptr(sp.address_to_byte(addr & ~lowmask));
+		int addr = space.endianness() == ENDIANNESS_BIG ? address + sizeof(T) - 1 - i : address + i;
+		uint8_t *base = (uint8_t *)space.get_read_ptr(space.address_to_byte(addr & ~lowmask));
 		if(!base)
 			continue;
-		if(sp.endianness() == ENDIANNESS_BIG)
+		if(space.endianness() == ENDIANNESS_BIG)
 			base[BYTE8_XOR_BE(addr) & lowmask] = val & 0xff;
 		else
 			base[BYTE8_XOR_LE(addr) & lowmask] = val & 0xff;
 		val >>= 8;
 	}
-
-	return 0;
 }
 
 //-------------------------------------------------
@@ -1203,11 +420,8 @@ int lua_engine::lua_addr_space::l_direct_mem_write(lua_State *L)
 //-------------------------------------------------
 
 template <typename T>
-int lua_engine::lua_memory_region::l_region_read(lua_State *L)
+T lua_engine::region_read(memory_region &region, offs_t address)
 {
-	memory_region &region = luabridge::Stack<memory_region &>::get(L, 1);
-	luaL_argcheck(L, lua_isnumber(L, 2), 2, "address (integer) expected");
-	offs_t address = lua_tounsigned(L, 2);
 	T mem_content = 0;
 	offs_t lowmask = region.bytewidth() - 1;
 	for(int i = 0; i < sizeof(T); i++)
@@ -1222,13 +436,7 @@ int lua_engine::lua_memory_region::l_region_read(lua_State *L)
 			mem_content |= region.u8((BYTE8_XOR_LE(addr) & lowmask) | (addr & ~lowmask));
 	}
 
-	if (std::numeric_limits<T>::is_signed) {
-		lua_pushinteger(L, mem_content);
-	} else {
-		lua_pushunsigned(L, mem_content);
-	}
-
-	return 1;
+	return mem_content;
 }
 
 //-------------------------------------------------
@@ -1237,13 +445,8 @@ int lua_engine::lua_memory_region::l_region_read(lua_State *L)
 //-------------------------------------------------
 
 template <typename T>
-int lua_engine::lua_memory_region::l_region_write(lua_State *L)
+void lua_engine::region_write(memory_region &region, offs_t address, T val)
 {
-	memory_region &region = luabridge::Stack<memory_region &>::get(L, 1);
-	luaL_argcheck(L, lua_isnumber(L, 2), 2, "address (integer) expected");
-	luaL_argcheck(L, lua_isnumber(L, 3), 3, "value (integer) expected");
-	offs_t address = lua_tounsigned(L, 2);
-	T val = lua_tounsigned(L, 3);
 	offs_t lowmask = region.bytewidth() - 1;
 	for(int i = 0; i < sizeof(T); i++)
 	{
@@ -1256,8 +459,6 @@ int lua_engine::lua_memory_region::l_region_write(lua_State *L)
 			region.base()[(BYTE8_XOR_LE(addr) & lowmask) | (addr & ~lowmask)] = val & 0xff;
 		val >>= 8;
 	}
-
-	return 0;
 }
 
 //-------------------------------------------------
@@ -1266,11 +467,8 @@ int lua_engine::lua_memory_region::l_region_write(lua_State *L)
 //-------------------------------------------------
 
 template <typename T>
-int lua_engine::lua_memory_share::l_share_read(lua_State *L)
+T lua_engine::share_read(memory_share &share, offs_t address)
 {
-	memory_share &share = luabridge::Stack<memory_share &>::get(L, 1);
-	luaL_argcheck(L, lua_isnumber(L, 2), 2, "address (integer) expected");
-	offs_t address = lua_tounsigned(L, 2);
 	T mem_content = 0;
 	offs_t lowmask = share.bytewidth() - 1;
 	uint8_t* ptr = (uint8_t*)share.ptr();
@@ -1286,13 +484,7 @@ int lua_engine::lua_memory_share::l_share_read(lua_State *L)
 			mem_content |= ptr[(BYTE8_XOR_LE(addr) & lowmask) | (addr & ~lowmask)];
 	}
 
-	if (std::numeric_limits<T>::is_signed) {
-		lua_pushinteger(L, mem_content);
-	} else {
-		lua_pushunsigned(L, mem_content);
-	}
-
-	return 1;
+	return mem_content;
 }
 
 //-------------------------------------------------
@@ -1301,13 +493,8 @@ int lua_engine::lua_memory_share::l_share_read(lua_State *L)
 //-------------------------------------------------
 
 template <typename T>
-int lua_engine::lua_memory_share::l_share_write(lua_State *L)
+void lua_engine::share_write(memory_share &share, offs_t address, T val)
 {
-	memory_share &share = luabridge::Stack<memory_share &>::get(L, 1);
-	luaL_argcheck(L, lua_isnumber(L, 2), 2, "address (integer) expected");
-	luaL_argcheck(L, lua_isnumber(L, 3), 3, "value (integer) expected");
-	offs_t address = lua_tounsigned(L, 2);
-	T val = lua_tounsigned(L, 3);
 	offs_t lowmask = share.bytewidth() - 1;
 	uint8_t* ptr = (uint8_t*)share.ptr();
 	for(int i = 0; i < sizeof(T); i++)
@@ -1321,583 +508,6 @@ int lua_engine::lua_memory_share::l_share_write(lua_State *L)
 			ptr[(BYTE8_XOR_LE(addr) & lowmask) | (addr & ~lowmask)] = val & 0xff;
 		val >>= 8;
 	}
-
-	return 0;
-}
-
-luabridge::LuaRef lua_engine::l_addr_space_map(const lua_addr_space *sp)
-{
-	address_space &space = sp->space;
-	lua_State *L = luaThis->m_lua_state;
-	luabridge::LuaRef map = luabridge::LuaRef::newTable(L);
-
-	int i = 1;
-	for (address_map_entry &entry : space.map()->m_entrylist)
-	{
-		luabridge::LuaRef mapentry = luabridge::LuaRef::newTable(L);
-		mapentry["offset"] = space.address_to_byte(entry.m_addrstart) & space.bytemask();
-		mapentry["endoff"] = space.address_to_byte(entry.m_addrend) & space.bytemask();
-		mapentry["readtype"] = entry.m_read.m_type;
-		mapentry["writetype"] = entry.m_write.m_type;
-		map[i++] = mapentry;
-	}
-	return map;
-}
-
-int lua_engine::lua_options_entry::l_entry_value(lua_State *L)
-{
-	core_options::entry *e = luabridge::Stack<core_options::entry *>::get(L, 1);
-	if(!e) {
-		return 0;
-	}
-
-	luaL_argcheck(L, !lua_isfunction(L, 2), 2, "optional argument: unsupported value");
-
-	if (!lua_isnone(L, 2))
-	{
-		std::string error;
-		// FIXME: not working with ui_options::entry
-		// TODO: optional arg for priority
-		luaThis->machine().options().set_value(e->name(),
-				lua_isboolean(L, 2) ? (lua_toboolean(L, 2) ? "1" : "0") : lua_tostring(L, 2),
-				OPTION_PRIORITY_CMDLINE, error);
-
-		if (!error.empty())
-		{
-			luaL_error(L, "%s", error.c_str());
-		}
-	}
-
-	switch (e->type())
-	{
-		case OPTION_BOOLEAN:
-			lua_pushboolean(L, (atoi(e->value()) != 0));
-			break;
-		case OPTION_INTEGER:
-			lua_pushnumber(L, atoi(e->value()));
-			break;
-		case OPTION_FLOAT:
-			lua_pushnumber(L, atof(e->value()));
-			break;
-		default:
-			lua_pushstring(L, e->value());
-			break;
-	}
-
-	return 1;
-}
-
-//-------------------------------------------------
-//  begin_recording - start avi
-//  -> manager:machine():video():begin_recording()
-//-------------------------------------------------
-
-int lua_engine::lua_video::l_begin_recording(lua_State *L)
-{
-	video_manager *vm = luabridge::Stack<video_manager *>::get(L, 1);
-	if (!vm) {
-		return 0;
-	}
-
-	luaL_argcheck(L, lua_isstring(L, 2) || lua_isnone(L, 2), 2, "optional argument: filename, string expected");
-
-	const char *filename = lua_tostring(L, 2);
-	if (!lua_isnone(L, 2)) {
-		std::string vidname(filename);
-		strreplace(vidname, "/", PATH_SEPARATOR);
-		strreplace(vidname, "%g", luaThis->machine().basename());
-		filename = vidname.c_str();
-	} else {
-		filename = nullptr;
-	}
-	vm->begin_recording(filename, video_manager::MF_AVI);
-
-	return 1;
-}
-
-//-------------------------------------------------
-//  end_recording - start saving avi
-//  -> manager:machine():video():end_recording()
-//-------------------------------------------------
-
-int lua_engine::lua_video::l_end_recording(lua_State *L)
-{
-	video_manager *vm = luabridge::Stack<video_manager *>::get(L, 1);
-	if (!vm) {
-		return 0;
-	}
-
-	if (!vm->is_recording()) {
-		lua_writestringerror("%s", "No active recording to stop");
-		return 0;
-	}
-
-	vm->end_recording(video_manager::MF_AVI);
-	return 1;
-}
-
-//-------------------------------------------------
-//  screen_height - return screen visible height
-//  -> manager:machine().screens[":screen"]:height()
-//-------------------------------------------------
-
-int lua_engine::lua_screen::l_height(lua_State *L)
-{
-	screen_device *sc = luabridge::Stack<screen_device *>::get(L, 1);
-	if(!sc) {
-		return 0;
-	}
-
-	lua_pushunsigned(L, sc->visible_area().height());
-	return 1;
-}
-
-//-------------------------------------------------
-//  screen_width - return screen visible width
-//  -> manager:machine().screens[":screen"]:width()
-//-------------------------------------------------
-
-int lua_engine::lua_screen::l_width(lua_State *L)
-{
-	screen_device *sc = luabridge::Stack<screen_device *>::get(L, 1);
-	if(!sc) {
-		return 0;
-	}
-
-	lua_pushunsigned(L, sc->visible_area().width());
-	return 1;
-}
-
-
-//-------------------------------------------------
-//  screen_orientation - return screen orientation
-//  -> manager:machine().screens[":screen"]:orientation()
-//     -> rotation_angle (0, 90, 180, 270)
-//     -> flipx (true, false)
-//     -> flipy (true, false)
-//-------------------------------------------------
-
-int lua_engine::lua_screen::l_orientation(lua_State *L)
-{
-	uint32_t flags = (luaThis->machine().system().flags & ORIENTATION_MASK);
-
-	int rotation_angle = 0;
-	switch (flags)
-	{
-		case ORIENTATION_FLIP_X:
-			rotation_angle = 0;
-			break;
-		case ORIENTATION_SWAP_XY:
-		case ORIENTATION_SWAP_XY|ORIENTATION_FLIP_X:
-			rotation_angle = 90;
-			break;
-		case ORIENTATION_FLIP_Y:
-		case ORIENTATION_FLIP_X|ORIENTATION_FLIP_Y:
-			rotation_angle = 180;
-			break;
-		case ORIENTATION_SWAP_XY|ORIENTATION_FLIP_Y:
-		case ORIENTATION_SWAP_XY|ORIENTATION_FLIP_X|ORIENTATION_FLIP_Y:
-			rotation_angle = 270;
-			break;
-	}
-
-	lua_createtable(L, 2, 2);
-	lua_pushliteral(L, "rotation_angle");
-	lua_pushinteger(L, rotation_angle);
-
-	lua_settable(L, -3);
-	lua_pushliteral(L, "flipx");
-	lua_pushboolean(L, (flags & ORIENTATION_FLIP_X));
-
-	lua_settable(L, -3);
-	lua_pushliteral(L, "flipy");
-	lua_pushboolean(L, (flags & ORIENTATION_FLIP_Y));
-	lua_settable(L, -3);
-	return 1;
-}
-
-//-------------------------------------------------
-//  screen_refresh - return screen refresh rate
-//  -> manager:machine().screens[":screen"]:refresh()
-//-------------------------------------------------
-
-int lua_engine::lua_screen::l_refresh(lua_State *L)
-{
-	screen_device *sc = luabridge::Stack<screen_device *>::get(L, 1);
-	if(!sc) {
-		return 0;
-	}
-
-	lua_pushnumber(L, ATTOSECONDS_TO_HZ(sc->refresh_attoseconds()));
-	return 1;
-}
-
-//-------------------------------------------------
-//  screen_snapshot - save png bitmap of screen to snapshots folder
-//  -> manager:machine().screens[":screen"]:snapshot("filename.png")
-//-------------------------------------------------
-
-int lua_engine::lua_screen::l_snapshot(lua_State *L)
-{
-	screen_device *sc = luabridge::Stack<screen_device *>::get(L, 1);
-	if(!sc || !sc->machine().render().is_live(*sc))
-	{
-		return 0;
-	}
-
-	luaL_argcheck(L, lua_isstring(L, 2) || lua_isnone(L, 2), 2, "optional argument: filename, string expected");
-
-	emu_file file(sc->machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
-	osd_file::error filerr;
-
-	if (!lua_isnone(L, 2)) {
-		const char *filename = lua_tostring(L, 2);
-		std::string snapstr(filename);
-		strreplace(snapstr, "/", PATH_SEPARATOR);
-		strreplace(snapstr, "%g", sc->machine().basename());
-		filerr = file.open(snapstr.c_str());
-	}
-	else
-	{
-		filerr = sc->machine().video().open_next(file, "png");
-	}
-
-	if (filerr != osd_file::error::NONE)
-	{
-		luaL_error(L, "osd_file::error=%d", filerr);
-		return 0;
-	}
-
-	sc->machine().video().save_snapshot(sc, file);
-	lua_writestringerror("saved %s", file.fullpath());
-	file.close();
-	return 1;
-}
-
-//-------------------------------------------------
-//  screen_type - return human readable screen type
-//  -> manager:machine().screens[":screen"]:type()
-//-------------------------------------------------
-
-int lua_engine::lua_screen::l_type(lua_State *L)
-{
-	screen_device *sc = luabridge::Stack<screen_device *>::get(L, 1);
-	if(!sc) {
-		return 0;
-	}
-
-	switch (sc->screen_type())
-	{
-		case SCREEN_TYPE_RASTER:  lua_pushliteral(L, "raster"); break;
-		case SCREEN_TYPE_VECTOR:  lua_pushliteral(L, "vector"); break;
-		case SCREEN_TYPE_LCD:     lua_pushliteral(L, "lcd"); break;
-		case SCREEN_TYPE_SVG:     lua_pushliteral(L, "svg"); break;
-		default:                  lua_pushliteral(L, "unknown"); break;
-	}
-
-	return 1;
-}
-
-//-------------------------------------------------
-//  draw_box - draw a box on a screen container
-//  -> manager:machine().screens[":screen"]:draw_box(x1, y1, x2, y2, bgcolor, linecolor)
-//-------------------------------------------------
-
-int lua_engine::lua_screen::l_draw_box(lua_State *L)
-{
-	screen_device *sc = luabridge::Stack<screen_device *>::get(L, 1);
-	if(!sc) {
-		return 0;
-	}
-
-	// ensure that we got 6 numerical parameters
-	luaL_argcheck(L, lua_isnumber(L, 2), 2, "x1 (integer) expected");
-	luaL_argcheck(L, lua_isnumber(L, 3), 3, "y1 (integer) expected");
-	luaL_argcheck(L, lua_isnumber(L, 4), 4, "x2 (integer) expected");
-	luaL_argcheck(L, lua_isnumber(L, 5), 5, "y2 (integer) expected");
-	luaL_argcheck(L, lua_isnumber(L, 6), 6, "background color (integer) expected");
-	luaL_argcheck(L, lua_isnumber(L, 7), 7, "outline color (integer) expected");
-
-	// retrieve all parameters
-	int sc_width = sc->visible_area().width();
-	int sc_height = sc->visible_area().height();
-	float x1, y1, x2, y2;
-	x1 = std::min(std::max(0.0f, (float) lua_tonumber(L, 2)), float(sc_width-1)) / float(sc_width);
-	y1 = std::min(std::max(0.0f, (float) lua_tonumber(L, 3)), float(sc_height-1)) / float(sc_height);
-	x2 = std::min(std::max(0.0f, (float) lua_tonumber(L, 4)), float(sc_width-1)) / float(sc_width);
-	y2 = std::min(std::max(0.0f, (float) lua_tonumber(L, 5)), float(sc_height-1)) / float(sc_height);
-	uint32_t bgcolor = lua_tounsigned(L, 6);
-	uint32_t fgcolor = lua_tounsigned(L, 7);
-
-	// draw the box
-	render_container &rc = sc->container();
-	mame_machine_manager::instance()->ui().draw_outlined_box(rc, x1, y1, x2, y2, fgcolor, bgcolor);
-
-	return 0;
-}
-
-//-------------------------------------------------
-//  draw_line - draw a line on a screen container
-//  -> manager:machine().screens[":screen"]:draw_line(x1, y1, x2, y2, linecolor)
-//-------------------------------------------------
-
-int lua_engine::lua_screen::l_draw_line(lua_State *L)
-{
-	screen_device *sc = luabridge::Stack<screen_device *>::get(L, 1);
-	if(!sc) {
-		return 0;
-	}
-
-	// ensure that we got 5 numerical parameters
-	luaL_argcheck(L, lua_isnumber(L, 2), 2, "x1 (integer) expected");
-	luaL_argcheck(L, lua_isnumber(L, 3), 3, "y1 (integer) expected");
-	luaL_argcheck(L, lua_isnumber(L, 4), 4, "x2 (integer) expected");
-	luaL_argcheck(L, lua_isnumber(L, 5), 5, "y2 (integer) expected");
-	luaL_argcheck(L, lua_isnumber(L, 6), 6, "color (integer) expected");
-
-	// retrieve all parameters
-	int sc_width = sc->visible_area().width();
-	int sc_height = sc->visible_area().height();
-	float x1, y1, x2, y2;
-	x1 = std::min(std::max(0.0f, (float) lua_tonumber(L, 2)), float(sc_width-1)) / float(sc_width);
-	y1 = std::min(std::max(0.0f, (float) lua_tonumber(L, 3)), float(sc_height-1)) / float(sc_height);
-	x2 = std::min(std::max(0.0f, (float) lua_tonumber(L, 4)), float(sc_width-1)) / float(sc_width);
-	y2 = std::min(std::max(0.0f, (float) lua_tonumber(L, 5)), float(sc_height-1)) / float(sc_height);
-	uint32_t color = lua_tounsigned(L, 6);
-
-	// draw the line
-	sc->container().add_line(x1, y1, x2, y2, UI_LINE_WIDTH, rgb_t(color), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-	return 0;
-}
-
-//-------------------------------------------------
-//  draw_text - draw text on a screen container
-//  if x is a position, then y is a pixel position, otherwise x and y are screen size relative
-//  -> manager:machine().screens[":screen"]:draw_text(x, y, message)
-//-------------------------------------------------
-
-int lua_engine::lua_screen::l_draw_text(lua_State *L)
-{
-	screen_device *sc = luabridge::Stack<screen_device *>::get(L, 1);
-	if(!sc) {
-		return 0;
-	}
-
-	// ensure that we got proper parameters
-	luaL_argcheck(L, lua_isnumber(L, 2) || lua_isstring(L, 2), 2, "x (integer or string) expected");
-	luaL_argcheck(L, lua_isnumber(L, 3), 3, "y (integer) expected");
-	luaL_argcheck(L, lua_isstring(L, 4), 4, "message (string) expected");
-	luaL_argcheck(L, lua_isinteger(L, 5) || lua_isnone(L, 5), 5, "optional argument: text color, integer expected (default: 0xffffffff)");
-
-	// retrieve all parameters
-	int sc_width = sc->visible_area().width();
-	int sc_height = sc->visible_area().height();
-	auto justify = ui::text_layout::LEFT;
-	float y, x = 0;
-	if(lua_isnumber(L, 2))
-	{
-		x = std::min(std::max(0.0f, (float) lua_tonumber(L, 2)), float(sc_width-1)) / float(sc_width);
-		y = std::min(std::max(0.0f, (float) lua_tonumber(L, 3)), float(sc_height-1)) / float(sc_height);
-	}
-	else
-	{
-		std::string just_str = lua_tostring(L, 2);
-		if(just_str == "right")
-			justify = ui::text_layout::RIGHT;
-		else if(just_str == "center")
-			justify = ui::text_layout::CENTER;
-		y = lua_tonumber(L, 3);
-	}
-	const char *msg = luaL_checkstring(L,4);
-	rgb_t textcolor = UI_TEXT_COLOR;
-	rgb_t bgcolor = UI_TEXT_BG_COLOR;
-	if (!lua_isnone(L, 5)) {
-		textcolor = rgb_t(lua_tounsigned(L, 5));
-	}
-
-	// draw the text
-	render_container &rc = sc->container();
-	mame_machine_manager::instance()->ui().draw_text_full(rc, msg, x, y, (1.0f - x),
-						justify, ui::text_layout::WORD, mame_ui_manager::NORMAL, textcolor,
-						bgcolor, nullptr, nullptr);
-	return 0;
-}
-
-int lua_engine::lua_emu_file::l_emu_file_read(lua_State *L)
-{
-	emu_file *file = luabridge::Stack<emu_file *>::get(L, 1);
-	luaL_argcheck(L, lua_isnumber(L, 2), 2, "length (integer) expected");
-	int ret, len = lua_tonumber(L, 2);
-	luaL_Buffer buff;
-	char *ptr = luaL_buffinitsize(L, &buff, len);
-	ret = file->read(ptr, len);
-	luaL_pushresultsize(&buff, ret);
-	return 1;
-}
-
-int lua_engine::lua_ui_input::l_ui_input_find_mouse(lua_State *L)
-{
-	ui_input_manager *ui_input = luabridge::Stack<ui_input_manager *>::get(L, 1);
-	int32_t x, y;
-	bool button;
-	render_target *target = ui_input->find_mouse(&x, &y, &button);
-	lua_pushnumber(L, x);
-	lua_pushnumber(L, y);
-	lua_pushboolean(L, button);
-	luabridge::Stack<render_target *>::push(L, target);
-	return 4;
-}
-
-int lua_engine::lua_render_target::l_render_view_bounds(lua_State *L)
-{
-	render_target *target = luabridge::Stack<render_target *>::get(L, 1);
-	const render_bounds &bounds = target->current_view()->bounds();
-	lua_pushnumber(L, bounds.x0);
-	lua_pushnumber(L, bounds.x1);
-	lua_pushnumber(L, bounds.y0);
-	lua_pushnumber(L, bounds.y1);
-	return 4;
-}
-
-void *lua_engine::checkparam(lua_State *L, int idx, const char *tname)
-{
-	const char *name;
-
-	if(!lua_getmetatable(L, idx))
-	return nullptr;
-
-	lua_rawget(L, LUA_REGISTRYINDEX);
-	name = lua_tostring(L, -1);
-	if(!name || strcmp(name, tname)) {
-	lua_pop(L, 1);
-	return nullptr;
-	}
-	lua_pop(L, 1);
-
-	return *static_cast<void **>(lua_touserdata(L, idx));
-}
-
-void *lua_engine::getparam(lua_State *L, int idx, const char *tname)
-{
-	void *p = checkparam(L, idx, tname);
-	char msg[256];
-	sprintf(msg, "%s expected", tname);
-	luaL_argcheck(L, p, idx, msg);
-	return p;
-}
-
-void lua_engine::push(lua_State *L, void *p, const char *tname)
-{
-	void **pp = static_cast<void **>(lua_newuserdata(L, sizeof(void *)));
-	*pp = p;
-	luaL_getmetatable(L, tname);
-	lua_setmetatable(L, -2);
-}
-
-int lua_engine::l_emu_exit(lua_State *L)
-{
-	luaThis->machine().schedule_exit();
-	return 1;
-}
-
-int lua_engine::l_emu_start(lua_State *L)
-{
-	const char *system_name = luaL_checkstring(L,1);
-
-	int index = driver_list::find(system_name);
-	if (index != -1) {
-		mame_machine_manager::instance()->schedule_new_driver(driver_list::driver(index));
-		luaThis->machine().schedule_hard_reset();
-	}
-	return 1;
-}
-
-int lua_engine::luaopen_ioport(lua_State *L)
-{
-	static const struct luaL_Reg ioport_funcs [] = {
-		{ "write",       l_ioport_write },
-		{ nullptr, nullptr }  /* sentinel */
-	};
-
-	luaL_newmetatable(L, tname_ioport);
-	lua_pushvalue(L, -1);
-	lua_pushstring(L, tname_ioport);
-	lua_rawset(L, LUA_REGISTRYINDEX);
-	lua_pushstring(L, "__index");
-	lua_pushvalue(L, -2);
-	lua_settable(L, -3);
-	luaL_setfuncs(L, ioport_funcs, 0);
-	return 1;
-}
-
-struct msg {
-	std::string text;
-	int ready;
-	std::string response;
-	int status;
-	int done;
-} msg;
-
-static std::mutex g_mutex;
-
-void lua_engine::serve_lua()
-{
-	osd_sleep(osd_ticks_per_second() / 1000 * 50);
-	printf("%s v%s\n%s\n%s\n\n", emulator_info::get_appname(),build_version,emulator_info::get_copyright_info(),LUA_COPYRIGHT);
-	fflush(stdout);
-	char buff[LUA_MAXINPUT];
-	std::string oldbuff;
-
-	const char *b = LUA_PROMPT;
-
-	do {
-		// Wait for input
-		fputs(b, stdout); fflush(stdout);  /* show prompt */
-		fgets(buff, LUA_MAXINPUT, stdin);
-
-		// Create message
-		{
-			std::lock_guard<std::mutex> lock(g_mutex);
-			if (msg.ready == 0) {
-				msg.text = oldbuff;
-				if (oldbuff.length() != 0) msg.text.append("\n");
-				msg.text.append(buff);
-				msg.ready = 1;
-				msg.done = 0;
-			}
-		}
-
-		// Wait for response
-		int done;
-		do {
-			osd_sleep(osd_ticks_per_second() / 1000);
-			std::lock_guard<std::mutex> lock(g_mutex);
-			done = msg.done;
-		} while (done==0);
-
-		// Do action on client side
-		{
-			std::lock_guard<std::mutex> lock(g_mutex);
-
-			if (msg.status == -1) {
-				b = LUA_PROMPT2;
-				oldbuff = msg.response;
-			}
-			else {
-				b = LUA_PROMPT;
-				oldbuff = "";
-			}
-			msg.done = 0;
-		}
-
-	} while (1);
-}
-
-static void *serve_lua(void *param)
-{
-	lua_engine *engine = (lua_engine *)param;
-	engine->serve_lua();
-	return nullptr;
 }
 
 //-------------------------------------------------
@@ -1907,31 +517,18 @@ static void *serve_lua(void *param)
 lua_engine::lua_engine()
 {
 	m_machine = nullptr;
-	luaThis = this;
 	m_lua_state = luaL_newstate();  /* create state */
-	output_notifier_set = false;
+	m_sol_state = new sol::state_view(m_lua_state); // create sol view
 
 	luaL_checkversion(m_lua_state);
 	lua_gc(m_lua_state, LUA_GCSTOP, 0);  /* stop collector during initialization */
-	luaL_openlibs(m_lua_state);  /* open libraries */
+	sol().open_libraries();
 
-		// Get package.preload so we can store builtins in it.
-	lua_getglobal(m_lua_state, "package");
-	lua_getfield(m_lua_state, -1, "preload");
-	lua_remove(m_lua_state, -2); // Remove package
-
-	lua_pushcfunction(m_lua_state, luaopen_zlib);
-	lua_setfield(m_lua_state, -2, "zlib");
-
-	lua_pushcfunction(m_lua_state, luaopen_lfs);
-	lua_setfield(m_lua_state, -2, "lfs");
-
-	luaopen_ioport(m_lua_state);
+	// Get package.preload so we can store builtins in it.
+	sol()["package"]["preload"]["zlib"] = &luaopen_zlib;
+	sol()["package"]["preload"]["lfs"] = &luaopen_lfs;
 
 	lua_gc(m_lua_state, LUA_GCRESTART, 0);
-	msg.ready = 0;
-	msg.status = 0;
-	msg.done = 0;
 }
 
 //-------------------------------------------------
@@ -1943,215 +540,99 @@ lua_engine::~lua_engine()
 	close();
 }
 
-const char *lua_engine::call_plugin(const char *data, const char *name)
+sol::object lua_engine::call_plugin(const std::string &name, sol::object in)
 {
-	std::string field("cb_");
-	const char *ret = nullptr;
-	field += name;
-	lua_settop(m_lua_state, 0);
-	lua_getfield(m_lua_state, LUA_REGISTRYINDEX, field.c_str());
-
-	if(!lua_isfunction(m_lua_state, -1))
-	{
-		lua_pop(m_lua_state, 1);
-		return nullptr;
-	}
-	lua_pushstring(m_lua_state, data);
-	int error;
-	if((error = lua_pcall(m_lua_state, 1, 1, 0)) != LUA_OK)
-	{
-		if(error == LUA_ERRRUN)
-			printf("%s\n", lua_tostring(m_lua_state, -1));
-		lua_pop(m_lua_state, 1);
-		return nullptr;
-	}
-	if(lua_isstring(m_lua_state, -1))
-		ret = lua_tostring(m_lua_state, -1);
-	lua_pop(m_lua_state, 1);
-	return ret;
-}
-
-int lua_engine::l_emu_register_callback(lua_State *L)
-{
-	luaL_argcheck(L, lua_isfunction(L, 1), 1, "callback function expected");
-	luaL_argcheck(L, lua_isstring(L, 2), 2, "name (string) expected");
-	std::string name = luaL_checkstring(L, 2);
 	std::string field = "cb_" + name;
-	lua_pushvalue(L, 1);
-	lua_setfield(L, LUA_REGISTRYINDEX, field.c_str());
-	return 1;
+	sol::object obj = sol().registry()[field];
+	if(obj.is<sol::protected_function>())
+	{
+		auto res = (obj.as<sol::protected_function>())(in);
+		if(!res.valid())
+		{
+			sol::error err = res;
+			osd_printf_error("[LUA ERROR] in call_plugin: %s\n", err.what());
+		}
+		else
+			return res.get<sol::object>();
+	}
+	return sol::make_object(sol(), sol::nil);
 }
 
-void lua_engine::menu_populate(std::string &menu, std::vector<menu_item> &menu_list)
+void lua_engine::menu_populate(const std::string &menu, std::vector<std::tuple<std::string, std::string, std::string>> &menu_list)
 {
 	std::string field = "menu_pop_" + menu;
-	lua_settop(m_lua_state, 0);
-	lua_getfield(m_lua_state, LUA_REGISTRYINDEX, field.c_str());
-
-	if(!lua_isfunction(m_lua_state, -1))
+	sol::object obj = sol().registry()[field];
+	if(obj.is<sol::protected_function>())
 	{
-		lua_pop(m_lua_state, 1);
-		return;
-	}
-	int error;
-	if((error = lua_pcall(m_lua_state, 0, 1, 0)) != LUA_OK)
-	{
-		if(error == LUA_ERRRUN)
-			printf("%s\n", lua_tostring(m_lua_state, -1));
-		lua_pop(m_lua_state, 1);
-		return;
-	}
-	if(!lua_istable(m_lua_state, -1))
-	{
-		lua_pop(m_lua_state, 1);
-		return;
-	}
-
-	lua_pushnil(m_lua_state);
-	while(lua_next(m_lua_state, -2))
-	{
-		if(lua_istable(m_lua_state, -1))
+		auto res = (obj.as<sol::protected_function>())();
+		if(!res.valid())
 		{
-			menu_list.emplace_back();
-			menu_item &item = menu_list.back();
-			lua_rawgeti(m_lua_state, -1, 1);
-			item.text = lua_tostring(m_lua_state, -1);
-			lua_pop(m_lua_state, 1);
-			lua_rawgeti(m_lua_state, -1, 2);
-			item.subtext = lua_tostring(m_lua_state, -1);
-			lua_pop(m_lua_state, 1);
-			lua_rawgeti(m_lua_state, -1, 3);
-			item.flags = lua_tostring(m_lua_state, -1);
-			lua_pop(m_lua_state, 1);
+			sol::error err = res;
+			osd_printf_error("[LUA ERROR] in menu_populate: %s\n", err.what());
 		}
-		lua_pop(m_lua_state, 1);
+		else
+		{
+			sol::table table = res;
+			for(auto &entry : table)
+			{
+				if(entry.second.is<sol::table>())
+				{
+					sol::table enttable = entry.second.as<sol::table>();
+					menu_list.emplace_back(enttable.get<std::string, std::string, std::string>(1, 2, 3));
+				}
+			}
+		}
 	}
-	lua_pop(m_lua_state, 1);
 }
 
-bool lua_engine::menu_callback(std::string &menu, int index, std::string event)
+bool lua_engine::menu_callback(const std::string &menu, int index, const std::string &event)
 {
 	std::string field = "menu_cb_" + menu;
 	bool ret = false;
-	lua_settop(m_lua_state, 0);
-	lua_getfield(m_lua_state, LUA_REGISTRYINDEX, field.c_str());
-
-	if(lua_isfunction(m_lua_state, -1))
+	sol::object obj = sol().registry()[field];
+	if(obj.is<sol::protected_function>())
 	{
-		lua_pushinteger(m_lua_state, index);
-		lua_pushstring(m_lua_state, event.c_str());
-		int error;
-		if((error = lua_pcall(m_lua_state, 2, 1, 0)) != LUA_OK)
+		auto res = (obj.as<sol::protected_function>())(index, event);
+		if(!res.valid())
 		{
-			if(error == 2)
-				printf("%s\n", lua_tostring(m_lua_state, -1));
-			lua_pop(m_lua_state, 1);
-			return false;
+			sol::error err = res;
+			osd_printf_error("[LUA ERROR] in menu_callback: %s\n", err.what());
 		}
-		ret = lua_toboolean(m_lua_state, -1);
-		lua_pop(m_lua_state, 1);
+		else
+			ret = res;
 	}
 	return ret;
 }
 
-int lua_engine::l_emu_register_menu(lua_State *L)
+bool lua_engine::execute_function(const char *id)
 {
-	luaL_argcheck(L, lua_isfunction(L, 1), 1, "callback function expected");
-	luaL_argcheck(L, lua_isfunction(L, 2), 2, "callback function expected");
-	luaL_argcheck(L, lua_isstring(L, 3), 3, "name (string) expected");
-	std::string name = luaL_checkstring(L, 3);
-	std::string cbfield = "menu_cb_" + name;
-	std::string popfield = "menu_pop_" + name;
-	luaThis->m_menu.push_back(std::string(name));
-	lua_pushvalue(L, 1);
-	lua_setfield(L, LUA_REGISTRYINDEX, cbfield.c_str());
-	lua_pushvalue(L, 2);
-	lua_setfield(L, LUA_REGISTRYINDEX, popfield.c_str());
-	return 1;
-}
-
-void lua_engine::execute_function(const char *id)
-{
-	lua_settop(m_lua_state, 0);
-	lua_getfield(m_lua_state, LUA_REGISTRYINDEX, id);
-
-	if (lua_istable(m_lua_state, -1))
+	sol::object functable = sol().registry()[id];
+	if(functable.is<sol::table>())
 	{
-		lua_pushnil(m_lua_state);
-		while (lua_next(m_lua_state, -2) != 0)
+		for(auto &func : functable.as<sol::table>())
 		{
-			if (lua_isfunction(m_lua_state, -1))
+			if(func.second.is<sol::protected_function>())
 			{
-				int error;
-				if((error = lua_pcall(m_lua_state, 0, 0, 0)) != LUA_OK)
+				auto ret = (func.second.as<sol::protected_function>())();
+				if(!ret.valid())
 				{
-					if(error == 2)
-						printf("%s\n", lua_tostring(m_lua_state, -1));
-					lua_pop(m_lua_state, 1);
+					sol::error err = ret;
+					osd_printf_error("[LUA ERROR] in execute_function: %s\n", err.what());
 				}
 			}
-			else
-			{
-				lua_pop(m_lua_state, 1);
-			}
 		}
+		return true;
 	}
+	return false;
 }
 
-int lua_engine::register_function(lua_State *L, const char *id)
+void lua_engine::register_function(sol::function func, const char *id)
 {
-	if (!lua_isnil(L, 1))
-		luaL_checktype(L, 1, LUA_TFUNCTION);
-	lua_settop(L, 1);
-	lua_getfield(L, LUA_REGISTRYINDEX, id);
-	if (lua_isnil(L, -1))
-	{
-		lua_newtable(L);
-	}
-	luaL_checktype(L, -1, LUA_TTABLE);
-	int len = lua_rawlen(L, -1);
-	lua_pushnumber(L, len + 1);
-	lua_pushvalue(L, 1);
-	lua_rawset(L, -3);      /* Stores the pair in the table */
-
-	lua_pushvalue(L, -1);
-	lua_setfield(L, LUA_REGISTRYINDEX, id);
-	return 1;
-}
-
-int lua_engine::l_emu_register_prestart(lua_State *L)
-{
-	return register_function(L, "LUA_ON_PRESTART");
-}
-
-int lua_engine::l_emu_register_start(lua_State *L)
-{
-	return register_function(L, "LUA_ON_START");
-}
-
-int lua_engine::l_emu_register_stop(lua_State *L)
-{
-	return register_function(L, "LUA_ON_STOP");
-}
-
-int lua_engine::l_emu_register_pause(lua_State *L)
-{
-	return register_function(L, "LUA_ON_PAUSE");
-}
-
-int lua_engine::l_emu_register_resume(lua_State *L)
-{
-	return register_function(L, "LUA_ON_RESUME");
-}
-
-int lua_engine::l_emu_register_frame(lua_State *L)
-{
-	return register_function(L, "LUA_ON_FRAME");
-}
-
-int lua_engine::l_emu_register_frame_done(lua_State *L)
-{
-	return register_function(L, "LUA_ON_FRAME_DONE");
+	sol::object functable = sol().registry()[id];
+	if(functable.is<sol::table>())
+		functable.as<sol::table>().add(func);
+	else
+		sol().registry().create_named(id, 1, func);
 }
 
 void lua_engine::on_machine_prestart()
@@ -2189,27 +670,6 @@ void lua_engine::on_frame_done()
 	execute_function("LUA_ON_FRAME_DONE");
 }
 
-void lua_engine::update_machine()
-{
-	lua_newtable(m_lua_state);
-	if (m_machine!=nullptr)
-	{
-		// Create the ioport array
-		for (auto &port : machine().ioport().ports())
-		{
-			for (ioport_field &field : port.second->fields())
-			{
-				if (field.type_class() != INPUT_CLASS_INTERNAL)
-				{
-					push(m_lua_state, &field, tname_ioport);
-					lua_setfield(m_lua_state, -2, field.name());
-				}
-			}
-		}
-	}
-	lua_setglobal(m_lua_state, "ioport");
-}
-
 void lua_engine::attach_notifiers()
 {
 	machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(lua_engine::on_machine_prestart), this), true);
@@ -2220,507 +680,945 @@ void lua_engine::attach_notifiers()
 	machine().add_notifier(MACHINE_NOTIFY_FRAME, machine_notify_delegate(FUNC(lua_engine::on_machine_frame), this));
 }
 
-int lua_engine::lua_machine::l_popmessage(lua_State *L)
-{
-	running_machine *m = luabridge::Stack<running_machine *>::get(L, 1);
-	if(!lua_isstring(L, 2))
-		m->popmessage();
-	else
-		m->popmessage("%s", luaL_checkstring(L, 2));
-	return 0;
-}
-
-int lua_engine::lua_machine::l_logerror(lua_State *L)
-{
-	running_machine *m = luabridge::Stack<running_machine *>::get(L, 1);
-	luaL_argcheck(L, lua_isstring(L, 2), 2, "message (string) expected");
-	m->logerror("[luaengine] %s\n", luaL_checkstring(L, 2));
-	return 0;
-}
-
-std::string lua_engine::get_print_buffer(lua_State *L)
-{
-	int nargs = lua_gettop(L);
-
-	const std::string sep = " ";
-
-	std::ostringstream ss;
-	bool first = true;
-
-	for (int i = 1; i <= nargs; i++) {
-		const char* c = lua_tostring(L, i);
-		const std::string str = c ? c : "<nil>";
-		if (first) first = false;
-		else ss << sep;
-		ss << str;
-	}
-
-	return ss.str();
-}
-int lua_engine::l_osd_printf_verbose(lua_State *L)
-{
-	osd_printf_verbose("%s\n",get_print_buffer(L).c_str());
-	return 0;
-}
-
-int lua_engine::l_osd_printf_error(lua_State *L)
-{
-	osd_printf_error("%s\n",get_print_buffer(L).c_str());
-	return 0;
-}
-
-int lua_engine::l_osd_printf_info(lua_State *L)
-{
-	osd_printf_info("%s\n",get_print_buffer(L).c_str());
-	return 0;
-}
-
-int lua_engine::l_osd_printf_debug(lua_State *L)
-{
-	osd_printf_debug("%s\n",get_print_buffer(L).c_str());
-	return 0;
-}
-
-int lua_engine::l_driver_find(lua_State *L)
-{
-	luaL_argcheck(L, lua_isstring(L, 1), 1, "message (string) expected");
-	int index = driver_list::find(lua_tostring(L, 1));
-	if(index == -1)
-		lua_pushnil(L);
-	else
-		luabridge::Stack<const game_driver &>::push(L, driver_list::driver(index));
-	return 1;
-}
-
 //-------------------------------------------------
 //  initialize - initialize lua hookup to emu engine
 //-------------------------------------------------
 
 void lua_engine::initialize()
 {
-	luabridge::getGlobalNamespace (m_lua_state)
-		.beginNamespace ("emu")
-			.addCFunction ("app_name",    l_emu_app_name )
-			.addCFunction ("app_version", l_emu_app_version )
-			.addCFunction ("gamename",    l_emu_gamename )
-			.addCFunction ("romname",     l_emu_romname )
-			.addCFunction ("softname",    l_emu_softname )
-			.addCFunction ("keypost",     l_emu_keypost )
-			.addCFunction ("hook_output", l_emu_hook_output )
-			.addCFunction ("sethook",     l_emu_set_hook )
-			.addCFunction ("time",        l_emu_time )
-			.addCFunction ("wait",        l_emu_wait )
-			.addCFunction ("after",       l_emu_after )
-			.addCFunction ("exit",        l_emu_exit )
-			.addCFunction ("start",       l_emu_start )
-			.addCFunction ("pause",       l_emu_pause )
-			.addCFunction ("unpause",     l_emu_unpause )
-			.addCFunction ("register_prestart", l_emu_register_prestart )
-			.addCFunction ("register_start", l_emu_register_start )
-			.addCFunction ("register_stop",  l_emu_register_stop )
-			.addCFunction ("register_pause", l_emu_register_pause )
-			.addCFunction ("register_resume",l_emu_register_resume )
-			.addCFunction ("register_frame", l_emu_register_frame )
-			.addCFunction ("register_frame_done", l_emu_register_frame_done )
-			.addCFunction ("register_menu",  l_emu_register_menu )
-			.addCFunction ("register_callback",  l_emu_register_callback )
-			.addCFunction ("print_verbose", l_osd_printf_verbose )
-			.addCFunction ("print_error",   l_osd_printf_error )
-			.addCFunction ("print_info",    l_osd_printf_info )
-			.addCFunction ("print_debug",   l_osd_printf_debug )
-			.addCFunction ("driver_find",   l_driver_find )
-			.beginClass <machine_manager>("manager")
-				.addFunction("machine", &machine_manager::machine)
-				.addFunction("options", &machine_manager::options)
-			.endClass()
-			.beginClass <mame_machine_manager> ("mame_manager")
-				.addFunction ("plugins", &mame_machine_manager::plugins)
-				.addFunction ("cheat", &mame_machine_manager::cheat)
-				.addFunction ("ui", &mame_machine_manager::ui)
-			.endClass ()
-			.beginClass <lua_machine> ("lua_machine")
-				.addCFunction ("popmessage", &lua_machine::l_popmessage)
-				.addCFunction ("logerror", &lua_machine::l_logerror)
-			.endClass ()
-			.deriveClass <running_machine, lua_machine> ("machine")
-				.addFunction ("exit", &running_machine::schedule_exit)
-				.addFunction ("hard_reset", &running_machine::schedule_hard_reset)
-				.addFunction ("soft_reset", &running_machine::schedule_soft_reset)
-				.addFunction ("save", &running_machine::schedule_save)
-				.addFunction ("load", &running_machine::schedule_load)
-				.addFunction ("system", &running_machine::system)
-				.addFunction ("video", &running_machine::video)
-				.addFunction ("render", &running_machine::render)
-				.addFunction ("ioport", &running_machine::ioport)
-				.addFunction ("parameters", &running_machine::parameters)
-				.addFunction ("memory", &running_machine::memory)
-				.addFunction ("options", &running_machine::options)
-				.addFunction ("outputs", &running_machine::output)
-				.addFunction ("input", &running_machine::ui_input)
-				.addProperty <bool> ("paused", &running_machine::paused)
-				.addProperty <luabridge::LuaRef, void> ("devices", &lua_engine::l_machine_get_devices)
-				.addProperty <luabridge::LuaRef, void> ("screens", &lua_engine::l_machine_get_screens)
-				.addProperty <luabridge::LuaRef, void> ("images", &lua_engine::l_machine_get_images)
-			.endClass ()
-			.beginClass <game_driver> ("game_driver")
-				.addData ("source_file", &game_driver::source_file)
-				.addData ("parent", &game_driver::parent)
-				.addData ("name", &game_driver::name)
-				.addData ("description", &game_driver::description)
-				.addData ("year", &game_driver::year)
-				.addData ("manufacturer", &game_driver::manufacturer)
-				.addData ("compatible_with", &game_driver::compatible_with)
-				.addData ("default_layout", &game_driver::default_layout)
-			.endClass ()
-			.beginClass <device_t> ("device")
-				.addFunction ("name", &device_t::name)
-				.addFunction ("shortname", &device_t::shortname)
-				.addFunction ("tag", &device_t::tag)
-				.addFunction ("owner", &device_t::owner)
-				.addProperty <luabridge::LuaRef, void> ("spaces", &lua_engine::l_dev_get_memspaces)
-				.addProperty <luabridge::LuaRef, void> ("state", &lua_engine::l_dev_get_states)
-				.addProperty <luabridge::LuaRef, void> ("items", &lua_engine::l_dev_get_items)
-			.endClass()
-			.beginClass <cheat_manager> ("cheat")
-				.addProperty <bool, bool> ("enabled", &cheat_manager::enabled, &cheat_manager::set_enable)
-				.addFunction ("reload", &cheat_manager::reload)
-				.addFunction ("save_all", &cheat_manager::save_all)
-				.addProperty <luabridge::LuaRef, void> ("entries", &lua_engine::l_cheat_get_entries)
-			.endClass()
-			.beginClass <lua_cheat_entry> ("lua_cheat_entry")
-				.addCFunction ("state", &lua_cheat_entry::l_get_state)
-			.endClass()
-			.deriveClass <cheat_entry, lua_cheat_entry> ("cheat_entry")
-				.addFunction ("description", &cheat_entry::description)
-				.addFunction ("comment", &cheat_entry::comment)
-				.addFunction ("has_run_script", &cheat_entry::has_run_script)
-				.addFunction ("has_on_script", &cheat_entry::has_on_script)
-				.addFunction ("has_off_script", &cheat_entry::has_off_script)
-				.addFunction ("has_change_script", &cheat_entry::has_change_script)
-				.addFunction ("execute_off_script", &cheat_entry::execute_off_script)
-				.addFunction ("execute_on_script", &cheat_entry::execute_on_script)
-				.addFunction ("execute_run_script", &cheat_entry::execute_run_script)
-				.addFunction ("execute_change_script", &cheat_entry::execute_change_script)
-				.addFunction ("is_text_only", &cheat_entry::is_text_only)
-				.addFunction ("is_oneshot", &cheat_entry::is_oneshot)
-				.addFunction ("is_onoff", &cheat_entry::is_onoff)
-				.addFunction ("is_value_parameter", &cheat_entry::is_value_parameter)
-				.addFunction ("is_itemlist_parameter", &cheat_entry::is_itemlist_parameter)
-				.addFunction ("is_oneshot_parameter", &cheat_entry::is_oneshot_parameter)
-				.addFunction ("activate", &cheat_entry::activate)
-				.addFunction ("select_default_state", &cheat_entry::select_default_state)
-				.addFunction ("select_previous_state", &cheat_entry::select_previous_state)
-				.addFunction ("select_next_state", &cheat_entry::select_next_state)
-			.endClass()
-			.beginClass <ioport_manager> ("ioport")
-				.addFunction ("count_players", &ioport_manager::count_players)
-				.addProperty <luabridge::LuaRef, void> ("ports", &lua_engine::l_ioport_get_ports)
-			.endClass()
-			.beginClass <ioport_port> ("ioport_port")
-				.addFunction ("tag", &ioport_port::tag)
-				.addFunction ("active", &ioport_port::active)
-				.addFunction ("live", &ioport_port::live)
-				.addFunction ("read", &ioport_port::read)
-				.addFunction ("write", &ioport_port::write)
-				.addFunction ("field", &ioport_port::field)
-				.addProperty <luabridge::LuaRef, void> ("fields", &lua_engine::l_ioports_port_get_fields)
-			.endClass()
-			.beginClass <ioport_field> ("ioport_field")
-				.addFunction ("set_value", &ioport_field::set_value)
-				.addProperty ("device", &ioport_field::device)
-				.addProperty ("name", &ioport_field::name)
-				.addProperty <uint8_t, uint8_t> ("player", &ioport_field::player, &ioport_field::set_player)
-				.addProperty ("mask", &ioport_field::mask)
-				.addProperty ("defvalue", &ioport_field::defvalue)
-				.addProperty ("sensitivity", &ioport_field::sensitivity)
-				.addProperty ("way", &ioport_field::way)
-				.addProperty ("is_analog", &ioport_field::is_analog)
-				.addProperty ("is_digital_joystick", &ioport_field::is_digital_joystick)
-				.addProperty ("enabled", &ioport_field::enabled)
-				.addProperty ("optional", &ioport_field::optional)
-				.addProperty ("cocktail", &ioport_field::cocktail)
-				.addProperty ("toggle", &ioport_field::toggle)
-				.addProperty ("rotated", &ioport_field::rotated)
-				.addProperty ("analog_reverse", &ioport_field::analog_reverse)
-				.addProperty ("analog_reset", &ioport_field::analog_reset)
-				.addProperty ("analog_wraps", &ioport_field::analog_wraps)
-				.addProperty ("analog_invert", &ioport_field::analog_invert)
-				.addProperty ("impulse", &ioport_field::impulse)
-				.addProperty ("type", &ioport_field::type)
-				.addProperty <double, double> ("crosshair_scale", &ioport_field::crosshair_scale, &ioport_field::set_crosshair_scale)
-				.addProperty <double, double> ("crosshair_offset", &ioport_field::crosshair_offset, &ioport_field::set_crosshair_offset)
-			.endClass()
-			.beginClass <core_options> ("core_options")
-				.addFunction ("help", &core_options::output_help)
-				.addFunction ("command", &core_options::command)
-				.addProperty <luabridge::LuaRef, void> ("entries", &lua_engine::l_options_get_entries)
-			.endClass()
-			.beginClass <lua_options_entry> ("lua_options_entry")
-				.addCFunction ("value", &lua_options_entry::l_entry_value)
-			.endClass()
-			.deriveClass <core_options::entry, lua_options_entry> ("core_options_entry")
-				.addFunction ("description", &core_options::entry::description)
-				.addFunction ("default_value", &core_options::entry::default_value)
-				.addFunction ("minimum", &core_options::entry::minimum)
-				.addFunction ("maximum", &core_options::entry::maximum)
-				.addFunction ("has_range", &core_options::entry::has_range)
-			.endClass()
-			.deriveClass <emu_options, core_options> ("emu_options")
-			.endClass()
-			.deriveClass <ui_options, core_options> ("ui_options")
-			.endClass()
-			.deriveClass <plugin_options, core_options> ("plugin_options")
-			.endClass()
-			.beginClass <parameters_manager> ("parameters")
-				.addFunction ("add", &parameters_manager::add)
-				.addFunction ("lookup", &parameters_manager::lookup)
-			.endClass()
-			.beginClass <lua_video> ("lua_video_manager")
-				.addCFunction ("begin_recording", &lua_video::l_begin_recording)
-				.addCFunction ("end_recording", &lua_video::l_end_recording)
-			.endClass()
-			.deriveClass <video_manager, lua_video> ("video")
-				.addFunction ("snapshot", &video_manager::save_active_screen_snapshots)
-				.addFunction ("is_recording", &video_manager::is_recording)
-				.addFunction ("skip_this_frame", &video_manager::skip_this_frame)
-				.addFunction ("speed_factor", &video_manager::speed_factor)
-				.addFunction ("speed_percent", &video_manager::speed_percent)
-				.addProperty <int, int> ("frameskip", &video_manager::frameskip, &video_manager::set_frameskip)
-				.addProperty <bool, bool> ("throttled", &video_manager::throttled, &video_manager::set_throttled)
-				.addProperty <float, float> ("throttle_rate", &video_manager::throttle_rate, &video_manager::set_throttle_rate)
-			.endClass()
-			.beginClass <lua_addr_space> ("lua_addr_space")
-				.addConstructor <void (*)(address_space *, device_memory_interface *)> ()
-				.addCFunction ("read_i8", &lua_addr_space::l_mem_read<int8_t>)
-				.addCFunction ("read_u8", &lua_addr_space::l_mem_read<uint8_t>)
-				.addCFunction ("read_i16", &lua_addr_space::l_mem_read<int16_t>)
-				.addCFunction ("read_u16", &lua_addr_space::l_mem_read<uint16_t>)
-				.addCFunction ("read_i32", &lua_addr_space::l_mem_read<int32_t>)
-				.addCFunction ("read_u32", &lua_addr_space::l_mem_read<uint32_t>)
-				.addCFunction ("read_i64", &lua_addr_space::l_mem_read<int64_t>)
-				.addCFunction ("read_u64", &lua_addr_space::l_mem_read<uint64_t>)
-				.addCFunction ("write_i8", &lua_addr_space::l_mem_write<int8_t>)
-				.addCFunction ("write_u8", &lua_addr_space::l_mem_write<uint8_t>)
-				.addCFunction ("write_i16", &lua_addr_space::l_mem_write<int16_t>)
-				.addCFunction ("write_u16", &lua_addr_space::l_mem_write<uint16_t>)
-				.addCFunction ("write_i32", &lua_addr_space::l_mem_write<int32_t>)
-				.addCFunction ("write_u32", &lua_addr_space::l_mem_write<uint32_t>)
-				.addCFunction ("write_i64", &lua_addr_space::l_mem_write<int64_t>)
-				.addCFunction ("write_u64", &lua_addr_space::l_mem_write<uint64_t>)
-				.addCFunction ("read_log_i8", &lua_addr_space::l_log_mem_read<int8_t>)
-				.addCFunction ("read_log_u8", &lua_addr_space::l_log_mem_read<uint8_t>)
-				.addCFunction ("read_log_i16", &lua_addr_space::l_log_mem_read<int16_t>)
-				.addCFunction ("read_log_u16", &lua_addr_space::l_log_mem_read<uint16_t>)
-				.addCFunction ("read_log_i32", &lua_addr_space::l_log_mem_read<int32_t>)
-				.addCFunction ("read_log_u32", &lua_addr_space::l_log_mem_read<uint32_t>)
-				.addCFunction ("read_log_i64", &lua_addr_space::l_log_mem_read<int64_t>)
-				.addCFunction ("read_log_u64", &lua_addr_space::l_log_mem_read<uint64_t>)
-				.addCFunction ("write_log_i8", &lua_addr_space::l_log_mem_write<int8_t>)
-				.addCFunction ("write_log_u8", &lua_addr_space::l_log_mem_write<uint8_t>)
-				.addCFunction ("write_log_i16", &lua_addr_space::l_log_mem_write<int16_t>)
-				.addCFunction ("write_log_u16", &lua_addr_space::l_log_mem_write<uint16_t>)
-				.addCFunction ("write_log_i32", &lua_addr_space::l_log_mem_write<int32_t>)
-				.addCFunction ("write_log_u32", &lua_addr_space::l_log_mem_write<uint32_t>)
-				.addCFunction ("write_log_i64", &lua_addr_space::l_log_mem_write<int64_t>)
-				.addCFunction ("write_log_u64", &lua_addr_space::l_log_mem_write<uint64_t>)
-				.addCFunction ("read_direct_i8", &lua_addr_space::l_direct_mem_read<int8_t>)
-				.addCFunction ("read_direct_u8", &lua_addr_space::l_direct_mem_read<uint8_t>)
-				.addCFunction ("read_direct_i16", &lua_addr_space::l_direct_mem_read<int16_t>)
-				.addCFunction ("read_direct_u16", &lua_addr_space::l_direct_mem_read<uint16_t>)
-				.addCFunction ("read_direct_i32", &lua_addr_space::l_direct_mem_read<int32_t>)
-				.addCFunction ("read_direct_u32", &lua_addr_space::l_direct_mem_read<uint32_t>)
-				.addCFunction ("read_direct_i64", &lua_addr_space::l_direct_mem_read<int64_t>)
-				.addCFunction ("read_direct_u64", &lua_addr_space::l_direct_mem_read<uint64_t>)
-				.addCFunction ("write_direct_i8", &lua_addr_space::l_direct_mem_write<int8_t>)
-				.addCFunction ("write_direct_u8", &lua_addr_space::l_direct_mem_write<uint8_t>)
-				.addCFunction ("write_direct_i16", &lua_addr_space::l_direct_mem_write<int16_t>)
-				.addCFunction ("write_direct_u16", &lua_addr_space::l_direct_mem_write<uint16_t>)
-				.addCFunction ("write_direct_i32", &lua_addr_space::l_direct_mem_write<int32_t>)
-				.addCFunction ("write_direct_u32", &lua_addr_space::l_direct_mem_write<uint32_t>)
-				.addCFunction ("write_direct_i64", &lua_addr_space::l_direct_mem_write<int64_t>)
-				.addCFunction ("write_direct_u64", &lua_addr_space::l_direct_mem_write<uint64_t>)
-				.addProperty <const char *> ("name", &lua_addr_space::name)
-				.addProperty <luabridge::LuaRef, void> ("map", &lua_engine::l_addr_space_map)
-			.endClass()
-			.beginClass <lua_ui_input> ("lua_input")
-				.addCFunction ("find_mouse", &lua_ui_input::l_ui_input_find_mouse)
-			.endClass()
-			.deriveClass <ui_input_manager, lua_ui_input> ("input")
-				.addFunction ("pressed", &ui_input_manager::pressed)
-			.endClass()
-			.beginClass <lua_render_target> ("lua_target")
-				.addCFunction ("view_bounds", &lua_render_target::l_render_view_bounds)
-			.endClass()
-			.deriveClass <render_target, lua_render_target> ("target")
-				.addFunction ("width", &render_target::width)
-				.addFunction ("height", &render_target::height)
-				.addFunction ("pixel_aspect", &render_target::pixel_aspect)
-				.addFunction ("hidden", &render_target::hidden)
-				.addFunction ("is_ui_target", &render_target::is_ui_target)
-				.addFunction ("index", &render_target::index)
-				.addProperty <float, float> ("max_update_rate", &render_target::max_update_rate, &render_target::set_max_update_rate)
-				.addProperty <int, int> ("view", &render_target::view, &render_target::set_view)
-				.addProperty <int, int> ("orientation", &render_target::orientation, &render_target::set_orientation)
-				.addProperty <bool, bool> ("backdrops", &render_target::backdrops_enabled, &render_target::set_backdrops_enabled)
-				.addProperty <bool, bool> ("overlays", &render_target::overlays_enabled, &render_target::set_overlays_enabled)
-				.addProperty <bool, bool> ("bezels", &render_target::bezels_enabled, &render_target::set_bezels_enabled)
-				.addProperty <bool, bool> ("marquees", &render_target::marquees_enabled, &render_target::set_marquees_enabled)
-				.addProperty <bool, bool> ("screen_overlay", &render_target::screen_overlay_enabled, &render_target::set_screen_overlay_enabled)
-				.addProperty <bool, bool> ("zoom", &render_target::zoom_to_screen, &render_target::set_zoom_to_screen)
-			.endClass()
-			.beginClass <render_container> ("render_container")
-				.addFunction ("orientation", &render_container::orientation)
-				.addFunction ("xscale", &render_container::xscale)
-				.addFunction ("yscale", &render_container::yscale)
-				.addFunction ("xoffset", &render_container::xoffset)
-				.addFunction ("yoffset", &render_container::yoffset)
-				.addFunction ("is_empty", &render_container::is_empty)
-			.endClass()
-			.beginClass <render_manager> ("render")
-				.addFunction ("max_update_rate", &render_manager::max_update_rate)
-				.addFunction ("ui_target", &render_manager::ui_target)
-				.addFunction ("ui_container", &render_manager::ui_container)
-				.addProperty <luabridge::LuaRef, void> ("targets", &lua_engine::l_render_get_targets)
-			.endClass()
-			.beginClass <mame_ui_manager> ("ui")
-				.addFunction ("is_menu_active", &mame_ui_manager::is_menu_active)
-				.addFunction ("options", &mame_ui_manager::options)
-				.addProperty <bool, bool> ("show_fps", &mame_ui_manager::show_fps, &mame_ui_manager::set_show_fps)
-				.addProperty <bool, bool> ("show_profiler", &mame_ui_manager::show_profiler, &mame_ui_manager::set_show_profiler)
-				.addProperty <bool, bool> ("single_step", &mame_ui_manager::single_step, &mame_ui_manager::set_single_step)
-				.addFunction ("get_line_height", &mame_ui_manager::get_line_height)
-				.addFunction ("get_string_width", &mame_ui_manager::get_string_width)
-				.addFunction ("get_char_width", &mame_ui_manager::get_char_width)
-			.endClass()
-			.beginClass <lua_screen> ("lua_screen_dev")
-				.addCFunction ("draw_box",  &lua_screen::l_draw_box)
-				.addCFunction ("draw_line", &lua_screen::l_draw_line)
-				.addCFunction ("draw_text", &lua_screen::l_draw_text)
-				.addCFunction ("height", &lua_screen::l_height)
-				.addCFunction ("width", &lua_screen::l_width)
-				.addCFunction ("orientation", &lua_screen::l_orientation)
-				.addCFunction ("refresh", &lua_screen::l_refresh)
-				.addCFunction ("snapshot", &lua_screen::l_snapshot)
-				.addCFunction ("type", &lua_screen::l_type)
-			.endClass()
-			.deriveClass <screen_device, lua_screen> ("screen_dev")
-				.addFunction ("frame_number", &screen_device::frame_number)
-				.addFunction ("name", &screen_device::name)
-				.addFunction ("shortname", &screen_device::shortname)
-				.addFunction ("tag", &screen_device::tag)
-				.addFunction ("xscale", &screen_device::xscale)
-				.addFunction ("yscale", &screen_device::yscale)
-			.endClass()
-			.beginClass <device_state_entry> ("dev_space")
-				.addFunction ("name", &device_state_entry::symbol)
-				.addProperty <uint64_t, uint64_t> ("value", &lua_engine::l_state_get_value, &lua_engine::l_state_set_value)
-				.addFunction ("is_visible", &device_state_entry::visible)
-				.addFunction ("is_divider", &device_state_entry::divider)
-			.endClass()
-			.beginClass <memory_manager> ("memory")
-				.addProperty <luabridge::LuaRef, void> ("banks", &lua_engine::l_memory_get_banks)
-				.addProperty <luabridge::LuaRef, void> ("regions", &lua_engine::l_memory_get_regions)
-				.addProperty <luabridge::LuaRef, void> ("shares", &lua_engine::l_memory_get_shares)
-			.endClass()
-			.beginClass <lua_memory_region> ("lua_region")
-				.addCFunction ("read_i8", &lua_memory_region::l_region_read<int8_t>)
-				.addCFunction ("read_u8", &lua_memory_region::l_region_read<uint8_t>)
-				.addCFunction ("read_i16", &lua_memory_region::l_region_read<int16_t>)
-				.addCFunction ("read_u16", &lua_memory_region::l_region_read<uint16_t>)
-				.addCFunction ("read_i32", &lua_memory_region::l_region_read<int32_t>)
-				.addCFunction ("read_u32", &lua_memory_region::l_region_read<uint32_t>)
-				.addCFunction ("read_i64", &lua_memory_region::l_region_read<int64_t>)
-				.addCFunction ("read_u64", &lua_memory_region::l_region_read<uint64_t>)
-				.addCFunction ("write_i8", &lua_memory_region::l_region_write<int8_t>)
-				.addCFunction ("write_u8", &lua_memory_region::l_region_write<uint8_t>)
-				.addCFunction ("write_i16", &lua_memory_region::l_region_write<int16_t>)
-				.addCFunction ("write_u16", &lua_memory_region::l_region_write<uint16_t>)
-				.addCFunction ("write_i32", &lua_memory_region::l_region_write<int32_t>)
-				.addCFunction ("write_u32", &lua_memory_region::l_region_write<uint32_t>)
-				.addCFunction ("write_i64", &lua_memory_region::l_region_write<int64_t>)
-				.addCFunction ("write_u64", &lua_memory_region::l_region_write<uint64_t>)
-			.endClass()
-			.deriveClass <memory_region, lua_memory_region> ("region")
-				.addProperty <uint32_t> ("size", &memory_region::bytes)
-			.endClass()
-			.beginClass <lua_memory_share> ("lua_share")
-				.addCFunction ("read_i8", &lua_memory_share::l_share_read<int8_t>)
-				.addCFunction ("read_u8", &lua_memory_share::l_share_read<uint8_t>)
-				.addCFunction ("read_i16", &lua_memory_share::l_share_read<int16_t>)
-				.addCFunction ("read_u16", &lua_memory_share::l_share_read<uint16_t>)
-				.addCFunction ("read_i32", &lua_memory_share::l_share_read<int32_t>)
-				.addCFunction ("read_u32", &lua_memory_share::l_share_read<uint32_t>)
-				.addCFunction ("read_i64", &lua_memory_share::l_share_read<int64_t>)
-				.addCFunction ("read_u64", &lua_memory_share::l_share_read<uint64_t>)
-				.addCFunction ("write_i8", &lua_memory_share::l_share_write<int8_t>)
-				.addCFunction ("write_u8", &lua_memory_share::l_share_write<uint8_t>)
-				.addCFunction ("write_i16", &lua_memory_share::l_share_write<int16_t>)
-				.addCFunction ("write_u16", &lua_memory_share::l_share_write<uint16_t>)
-				.addCFunction ("write_i32", &lua_memory_share::l_share_write<int32_t>)
-				.addCFunction ("write_u32", &lua_memory_share::l_share_write<uint32_t>)
-				.addCFunction ("write_i64", &lua_memory_share::l_share_write<int64_t>)
-				.addCFunction ("write_u64", &lua_memory_share::l_share_write<uint64_t>)
-			.endClass()
-			.deriveClass <memory_share, lua_memory_share> ("region")
-				.addProperty <size_t> ("size", &memory_share::bytes)
-			.endClass()
-			.beginClass <output_manager> ("output")
-				.addFunction ("set_value", &output_manager::set_value)
-				.addFunction ("set_indexed_value", &output_manager::set_indexed_value)
-				.addFunction ("get_value", &output_manager::get_value)
-				.addFunction ("get_indexed_value", &output_manager::get_indexed_value)
-				.addFunction ("name_to_id", &output_manager::name_to_id)
-				.addFunction ("id_to_name", &output_manager::id_to_name)
-			.endClass()
-			.beginClass <device_image_interface> ("image")
-				.addFunction ("exists", &device_image_interface::exists)
-				.addFunction ("filename", &device_image_interface::filename)
-				.addFunction ("longname", &device_image_interface::longname)
-				.addFunction ("manufacturer", &device_image_interface::manufacturer)
-				.addFunction ("year", &device_image_interface::year)
-				.addFunction ("software_list_name", &device_image_interface::software_list_name)
-				.addFunction ("image_type_name", &device_image_interface::image_type_name)
-				.addFunction ("load", &device_image_interface::load)
-				.addFunction ("unload", &device_image_interface::unload)
-				.addFunction ("crc", &device_image_interface::crc)
-				.addProperty <const device_t &> ("device", static_cast<const device_t &(device_image_interface::*)() const>(&device_image_interface::device))
-				.addProperty <bool> ("is_readable", &device_image_interface::is_readable)
-				.addProperty <bool> ("is_writeable", &device_image_interface::is_writeable)
-				.addProperty <bool> ("is_creatable", &device_image_interface::is_creatable)
-				.addProperty <bool> ("is_reset_on_load", &device_image_interface::is_reset_on_load)
-			.endClass()
-			.beginClass <lua_emu_file> ("lua_file")
-				.addCFunction ("read", &lua_emu_file::l_emu_file_read)
-			.endClass()
-			.deriveClass <emu_file, lua_emu_file> ("file")
-				.addConstructor <void (*)(const char *, uint32_t)> ()
-				.addFunction ("open", static_cast<osd_file::error (emu_file::*)(const std::string &)>(&emu_file::open))
-				.addFunction ("open_next", &emu_file::open_next)
-				.addFunction ("seek", &emu_file::seek)
-				.addFunction ("size", &emu_file::size)
-				.addFunction ("filename", &emu_file::filename)
-				.addFunction ("fullpath", &emu_file::fullpath)
-			.endClass()
-			.beginClass <lua_item> ("item")
-				.addConstructor <void (*)(int)> ()
-				.addData ("size", &lua_item::l_item_size, false)
-				.addData ("count", &lua_item::l_item_count, false)
-				.addCFunction ("read", &lua_item::l_item_read)
-				.addCFunction ("read_block", &lua_item::l_item_read_block)
-				.addCFunction ("write", &lua_item::l_item_write)
-			.endClass()
-		.endNamespace();
 
-	luabridge::push (m_lua_state, (machine_manager*)mame_machine_manager::instance());
-	lua_setglobal(m_lua_state, "manager");
-	luabridge::push(m_lua_state, mame_machine_manager::instance());
-	lua_setglobal(m_lua_state, "mame_manager");
-}
+/*
+ * emu.app_name() - return application name
+ * emu.app_version() - return application version
+ * emu.gamename() - returns game full name
+ * emu.softname() - returns softlist name
+ * emu.keypost(keys) - post keys to natural keyboard
+ * emu.time() - return emulation time
+ * emu.start(driver) - start given driver
+ * emu.pause() - pause emulation
+ * emu.unpause() - unpause emulation
+ * emu.register_prestart(callback) - callback before reset
+ * emu.register_start(callback) - callback after reset
+ * emu.register_stop(callback) - callback after stopping
+ * emu.register_pause(callback) - callback at pause
+ * emu.register_resume(callback) - callback at resume
+ * emu.register_frame(callback) - callback at end of frame
+ * emu.register_frame_done(callback) - callback after frame is drawn to screen (for overlays)
+ * emu.register_menu(event_callback, populate_callback, name) - callbacks for plugin menu
+ * emu.print_verbose(str) -- output to stderr at verbose level
+ * emu.print_error(str) -- output to stderr at error level
+ * emu.print_info(str) -- output to stderr at info level
+ * emu.print_debug(str) -- output to stderr at debug level
+ * emu.driver_find(driver) -- find and return game_driver for driver
+ */
+	sol::table emu = sol().create_named_table("emu");
+	emu["app_name"] = &emulator_info::get_appname_lower;
+	emu["app_version"] = &emulator_info::get_bare_build_version;
+	emu["gamename"] = [this](){ return machine().system().description; };
+	emu["romname"] = [this](){ return machine().basename(); };
+	emu["softname"] = [this](){ return machine().options().software_name(); };
+	emu["keypost"] = [this](const char *keys){ machine().ioport().natkeyboard().post_utf8(keys); };
+	emu["time"] = [this](){ return machine().time().as_double(); };
+	emu["start"] = [this](const char *driver) {
+			int i = driver_list::find(driver);
+			if (i != -1)
+			{
+				mame_machine_manager::instance()->schedule_new_driver(driver_list::driver(i));
+				machine().schedule_hard_reset();
+			}
+			return 1;
+		};
+	emu["pause"] = [this](){ return machine().pause(); };
+	emu["unpause"] = [this](){ return machine().resume(); };
+	emu["register_prestart"] = [this](sol::function func){ register_function(func, "LUA_ON_PRESTART"); };
+	emu["register_start"] = [this](sol::function func){ register_function(func, "LUA_ON_START"); };
+	emu["register_stop"] = [this](sol::function func){ register_function(func, "LUA_ON_STOP"); };
+	emu["register_pause"] = [this](sol::function func){ register_function(func, "LUA_ON_PAUSE"); };
+	emu["register_resume"] = [this](sol::function func){ register_function(func, "LUA_ON_RESUME"); };
+	emu["register_frame"] = [this](sol::function func){ register_function(func, "LUA_ON_FRAME"); };
+	emu["register_frame_done"] = [this](sol::function func){ register_function(func, "LUA_ON_FRAME_DONE"); };
+	emu["register_menu"] = [this](sol::function cb, sol::function pop, const std::string &name) {
+			std::string cbfield = "menu_cb_" + name;
+			std::string popfield = "menu_pop_" + name;
+			sol().registry()[cbfield] = cb;
+			sol().registry()[popfield] = pop;
+			m_menu.push_back(name);
+		};
+	emu["register_callback"] = [this](sol::function cb, const std::string &name) {
+			std::string field = "cb_" + name;
+			sol().registry()[field] = cb;
+		};
+	emu["print_verbose"] = [](const char *str) { osd_printf_verbose("%s\n", str); };
+	emu["print_error"] = [](const char *str) { osd_printf_error("%s\n", str); };
+	emu["print_info"] = [](const char *str) { osd_printf_info("%s\n", str); };
+	emu["print_debug"] = [](const char *str) { osd_printf_debug("%s\n", str); };
+	emu["driver_find"] = [this](const char *driver) -> sol::object {
+			int i = driver_list::find(driver);
+			if(i == -1)
+				return sol::make_object(sol(), sol::nil);
+			return sol::make_object(sol(), driver_list::driver(i));
+		};
+	// this throws an error when implemented as an initializer
+	emu["item"] = [this](int index) {
+			save_item *item = new save_item;
+			if(!machine().save().indexed_item(index, item->base, item->size, item->count))
+			{
+				item->base = nullptr;
+				item->size = 0;
+				item->count= 0;
+			}
+			return item;
+		};
 
-void lua_engine::start_console()
-{
-	std::thread th(::serve_lua, this);
-	th.detach();
+	emu.new_usertype<emu_file>("file", sol::call_constructor, sol::constructors<sol::types<const char *, uint32_t>>(),
+			"read", [](emu_file &file, sol::buffer *buff) { buff->set_len(file.read(buff->get_ptr(), buff->get_len())); return buff; },
+			"open", static_cast<osd_file::error (emu_file::*)(const std::string &)>(&emu_file::open),
+			"open_next", &emu_file::open_next,
+			"seek", &emu_file::seek,
+			"size", &emu_file::size,
+			"filename", &emu_file::filename,
+			"fullpath", &emu_file::fullpath);
+
+	sol().new_usertype<save_item>("item",
+			sol::meta_function::garbage_collect, sol::destructor([](save_item *item) { delete item; }),
+			"size", sol::readonly(&save_item::size),
+			"count", sol::readonly(&save_item::count),
+			"read", [this](save_item &item, int offset) -> sol::object {
+					uint64_t ret = 0;
+					if(!item.base || (offset > item.count))
+						return sol::make_object(sol(), sol::nil);
+					switch(item.size)
+					{
+						case 1:
+						default:
+							ret = ((uint8_t *)item.base)[offset];
+							break;
+						case 2:
+							ret = ((uint16_t *)item.base)[offset];
+							break;
+						case 4:
+							ret = ((uint32_t *)item.base)[offset];
+							break;
+						case 8:
+							ret = ((uint64_t *)item.base)[offset];
+							break;
+					}
+					return sol::make_object(sol(), ret);
+				},
+			"read_block", [this](save_item &item, int offset, sol::buffer *buff) {
+					if(!item.base || ((offset + buff->get_len()) > (item.size * item.count)))
+						buff->set_len(0);
+					else
+						memcpy(buff->get_ptr(), item.base, buff->get_len());
+					return buff;
+				},
+			"write", [](save_item &item, int offset, uint64_t value) {
+					if(!item.base || (offset > item.count))
+						return;
+					switch(item.size)
+					{
+						case 1:
+						default:
+							((uint8_t *)item.base)[offset] = (uint8_t)value;
+							break;
+						case 2:
+							((uint16_t *)item.base)[offset] = (uint16_t)value;
+							break;
+						case 4:
+							((uint32_t *)item.base)[offset] = (uint32_t)value;
+							break;
+						case 8:
+							((uint64_t *)item.base)[offset] = (uint64_t)value;
+							break;
+					}
+				});
+
+/* manager:options()
+ * machine:options()
+ * machine:ui():options()
+ * options:help() - get help for options
+ * options:command(command) - return output for command
+ * options.entries[] - get table of option entries
+ */
+
+	sol().new_usertype<core_options>("core_options", "new", sol::no_constructor,
+			"help", &core_options::output_help,
+			"command", &core_options::command,
+			"entries", sol::property([this](core_options &options) {
+				sol::table table = sol().create_table();
+				int unadorned_index = 0;
+				for(core_options::entry &curentry : options)
+				{
+					const char *name = curentry.name();
+					bool is_unadorned = false;
+					// check if it's unadorned
+					if (name && strlen(name) && !strcmp(name, options.unadorned(unadorned_index)))
+					{
+						unadorned_index++;
+						is_unadorned = true;
+					}
+					if (!curentry.is_header() && !curentry.is_command() && !curentry.is_internal() && !is_unadorned)
+						table[name] = &curentry;
+				}
+				return table;
+			}));
+
+/* options.entries[entry_name]
+ * entry.value() - get value of entry
+ * entry.value(val) - set entry to val
+ * entry.description() - get info about entry
+ * entry.default_value() - get default for entry
+ * entry.minimum() - get min value for entry
+ * entry.maximum() - get max value for entry
+ * entry.has_range() - are min and max valid for entry
+ */
+
+	sol().new_usertype<core_options::entry>("core_options_entry", "new", sol::no_constructor,
+			"value", sol::overload([this](core_options::entry &e, bool val) {
+					if(e.type() != OPTION_BOOLEAN)
+						luaL_error(m_lua_state, "Cannot set option to wrong type");
+					else
+						e.set_value(val ? "1" : "0", OPTION_PRIORITY_CMDLINE);
+				},
+				[this](core_options::entry &e, float val) {
+					if(e.type() != OPTION_FLOAT)
+						luaL_error(m_lua_state, "Cannot set option to wrong type");
+					else
+						e.set_value(string_format("%f", val).c_str(), OPTION_PRIORITY_CMDLINE);
+				},
+				[this](core_options::entry &e, int val) {
+					if(e.type() != OPTION_INTEGER)
+						luaL_error(m_lua_state, "Cannot set option to wrong type");
+					else
+						e.set_value(string_format("%d", val).c_str(), OPTION_PRIORITY_CMDLINE);
+				},
+				[this](core_options::entry &e, const char *val) {
+					if(e.type() != OPTION_STRING)
+						luaL_error(m_lua_state, "Cannot set option to wrong type");
+					else
+						e.set_value(val, OPTION_PRIORITY_CMDLINE);
+				},
+				[this](core_options::entry &e) -> sol::object {
+					if(!e.type())
+						return sol::make_object(sol(), sol::nil);
+					switch(e.type())
+					{
+						case OPTION_BOOLEAN:
+							return sol::make_object(sol(), atoi(e.value()) != 0);
+						case OPTION_INTEGER:
+							return sol::make_object(sol(), atoi(e.value()));
+						case OPTION_FLOAT:
+							return sol::make_object(sol(), atof(e.value()));
+					}
+					return sol::make_object(sol(), e.value());
+				}),
+			"description", &core_options::entry::description,
+			"default_value", &core_options::entry::default_value,
+			"minimum", &core_options::entry::minimum,
+			"maximum", &core_options::entry::maximum,
+			"has_range", &core_options::entry::has_range);
+
+/* manager:machine()
+ * machine:exit() - close program
+ * machine:hard_reset() - hard reset emulation
+ * machine:soft_reset() - soft reset emulation
+ * machine:save(filename) - save state to filename
+ * machine:load(filename) - load state from filename
+ * machine:system() - get game_driver for running driver
+ * machine:video() - get video_manager
+ * machine:render() - get render_manager
+ * machine:ioport() - get ioport_manager
+ * machine:parameters() - get parameter_manager
+ * machine:options() - get machine core_options
+ * machine:output() - get output_manager
+ * machine:input() - get ui_input_manager
+ * machine.paused - get paused state
+ * machine.devices - get device table
+ * machine.screens - get screens table
+ * machine.images - get available image devices
+ * machine:popmessage(str) - print str as popup
+ * machine:logerror(str) - print str to log
+ */
+
+	sol().new_usertype<running_machine> ("machine", "new", sol::no_constructor,
+			"exit", &running_machine::schedule_exit,
+			"hard_reset", &running_machine::schedule_hard_reset,
+			"soft_reset", &running_machine::schedule_soft_reset,
+			"save", &running_machine::schedule_save,
+			"load", &running_machine::schedule_load,
+			"system", &running_machine::system,
+			"video", &running_machine::video,
+			"render", &running_machine::render,
+			"ioport", &running_machine::ioport,
+			"parameters", &running_machine::parameters,
+			"memory", &running_machine::memory,
+			"options", [](running_machine &m) { return static_cast<core_options *>(&m.options()); },
+			"outputs", &running_machine::output,
+			"input", &running_machine::ui_input,
+			"paused", sol::property(&running_machine::paused),
+			"devices", sol::property([this](running_machine &m) {
+					std::function<void(device_t &, sol::table)> tree;
+					sol::table table = sol().create_table();
+					tree = [&tree](device_t &root, sol::table table) {
+						for(device_t &dev : root.subdevices())
+						{
+							if(dev.configured() && dev.started())
+							{
+								table[dev.tag()] = &dev;
+								tree(dev, table);
+							}
+						}
+					};
+					tree(m.root_device(), table);
+					return table;
+				}),
+			"screens", sol::property([this](running_machine &r) {
+					sol::table table = sol().create_table();
+					for(device_t *dev = r.first_screen(); dev != nullptr; dev = dev->next())
+					{
+						screen_device *sc = dynamic_cast<screen_device *>(dev);
+						if (sc && sc->configured() && sc->started() && sc->type())
+							table[sc->tag()] = sc;
+					}
+					return table;
+				}),
+			"images", sol::property([this](running_machine &r) {
+					sol::table image_table = sol().create_table();
+					for(device_image_interface &image : image_interface_iterator(r.root_device()))
+					{
+						image_table[image.brief_instance_name()] = &image;
+						image_table[image.instance_name()] = &image;
+					}
+					return image_table;
+				}),
+			"popmessage", sol::overload([](running_machine &m, const char *str) { m.popmessage("%s", str); },
+					[](running_machine &m) { m.popmessage(); }),
+			"logerror", [](running_machine &m, const char *str) { m.logerror("[luaengine] %s\n", str); } );
+
+/* game_driver - this should be self explanatory
+ */
+
+	sol().new_usertype<game_driver>("game_driver", "new", sol::no_constructor,
+			"source_file", sol::readonly(&game_driver::source_file),
+			"parent", sol::readonly(&game_driver::parent),
+			"name", sol::readonly(&game_driver::name),
+			"description", sol::readonly(&game_driver::description),
+			"year", sol::readonly(&game_driver::year),
+			"manufacturer", sol::readonly(&game_driver::manufacturer),
+			"compatible_with", sol::readonly(&game_driver::compatible_with),
+			"default_layout", sol::readonly(&game_driver::default_layout));
+
+/* machine.devices[device_tag]
+ * device:name() - device long name
+ * device:shortname() - device short name
+ * device:tag() - device tree tag
+ * device:owner() - device parent tag
+ * device.spaces[] - device address spaces table
+ * device.state[] - device state entries table
+ * device.items[] - device save state items table
+ */
+
+	sol().new_usertype<device_t>("device", "new", sol::no_constructor,
+			"name", &device_t::name,
+			"shortname", &device_t::shortname,
+			"tag", &device_t::tag,
+			"owner", &device_t::owner,
+			"spaces", sol::property([this](device_t &dev) {
+					device_memory_interface *memdev = dynamic_cast<device_memory_interface *>(&dev);
+					sol::table sp_table = sol().create_table();
+					if(!memdev)
+						return sp_table;
+					for(address_spacenum sp = AS_0; sp < ADDRESS_SPACES; ++sp)
+					{
+						if(memdev->has_space(sp))
+							sp_table[memdev->space(sp).name()] = addr_space(memdev->space(sp), *memdev);
+					}
+					return sp_table;
+				}),
+			"state", sol::property([this](device_t &dev) {
+					sol::table st_table = sol().create_table();
+					if(!dynamic_cast<device_state_interface *>(&dev))
+						return st_table;
+					// XXX: refrain from exporting non-visible entries?
+					for(auto &s : dev.state().state_entries())
+						st_table[s->symbol()] = s.get();
+					return st_table;
+				}),
+			"items", sol::property([this](device_t &dev) {
+					sol::table table = sol().create_table();
+					std::string tag = dev.tag();
+					// 10000 is enough?
+					for(int i = 0; i < 10000; i++)
+					{
+						std::string name;
+						const char *item;
+						unsigned int size, count;
+						void *base;
+						item = dev.machine().save().indexed_item(i, base, size, count);
+						if(!item)
+							break;
+						name = &(strchr(item, '/')[1]);
+						if(name.substr(0, name.find("/")) == tag)
+						{
+							name = name.substr(name.find("/") + 1, std::string::npos);
+							table[name] = i;
+						}
+					}
+					return table;
+				}));
+
+	sol().new_usertype<addr_space>("addr_space", sol::call_constructor, sol::constructors<sol::types<address_space &, device_memory_interface &>>(),
+			"read_i8", &addr_space::mem_read<int8_t>,
+			"read_u8", &addr_space::mem_read<uint8_t>,
+			"read_i16", &addr_space::mem_read<int16_t>,
+			"read_u16", &addr_space::mem_read<uint16_t>,
+			"read_i32", &addr_space::mem_read<int32_t>,
+			"read_u32", &addr_space::mem_read<uint32_t>,
+			"read_i64", &addr_space::mem_read<int64_t>,
+			"read_u64", &addr_space::mem_read<uint64_t>,
+			"write_i8", &addr_space::mem_write<int8_t>,
+			"write_u8", &addr_space::mem_write<uint8_t>,
+			"write_i16", &addr_space::mem_write<int16_t>,
+			"write_u16", &addr_space::mem_write<uint16_t>,
+			"write_i32", &addr_space::mem_write<int32_t>,
+			"write_u32", &addr_space::mem_write<uint32_t>,
+			"write_i64", &addr_space::mem_write<int64_t>,
+			"write_u64", &addr_space::mem_write<uint64_t>,
+			"read_log_i8", &addr_space::log_mem_read<int8_t>,
+			"read_log_u8", &addr_space::log_mem_read<uint8_t>,
+			"read_log_i16", &addr_space::log_mem_read<int16_t>,
+			"read_log_u16", &addr_space::log_mem_read<uint16_t>,
+			"read_log_i32", &addr_space::log_mem_read<int32_t>,
+			"read_log_u32", &addr_space::log_mem_read<uint32_t>,
+			"read_log_i64", &addr_space::log_mem_read<int64_t>,
+			"read_log_u64", &addr_space::log_mem_read<uint64_t>,
+			"write_log_i8", &addr_space::log_mem_write<int8_t>,
+			"write_log_u8", &addr_space::log_mem_write<uint8_t>,
+			"write_log_i16", &addr_space::log_mem_write<int16_t>,
+			"write_log_u16", &addr_space::log_mem_write<uint16_t>,
+			"write_log_i32", &addr_space::log_mem_write<int32_t>,
+			"write_log_u32", &addr_space::log_mem_write<uint32_t>,
+			"write_log_i64", &addr_space::log_mem_write<int64_t>,
+			"write_log_u64", &addr_space::log_mem_write<uint64_t>,
+			"read_direct_i8", &addr_space::direct_mem_read<int8_t>,
+			"read_direct_u8", &addr_space::direct_mem_read<uint8_t>,
+			"read_direct_i16", &addr_space::direct_mem_read<int16_t>,
+			"read_direct_u16", &addr_space::direct_mem_read<uint16_t>,
+			"read_direct_i32", &addr_space::direct_mem_read<int32_t>,
+			"read_direct_u32", &addr_space::direct_mem_read<uint32_t>,
+			"read_direct_i64", &addr_space::direct_mem_read<int64_t>,
+			"read_direct_u64", &addr_space::direct_mem_read<uint64_t>,
+			"write_direct_i8", &addr_space::direct_mem_write<int8_t>,
+			"write_direct_u8", &addr_space::direct_mem_write<uint8_t>,
+			"write_direct_i16", &addr_space::direct_mem_write<int16_t>,
+			"write_direct_u16", &addr_space::direct_mem_write<uint16_t>,
+			"write_direct_i32", &addr_space::direct_mem_write<int32_t>,
+			"write_direct_u32", &addr_space::direct_mem_write<uint32_t>,
+			"write_direct_i64", &addr_space::direct_mem_write<int64_t>,
+			"write_direct_u64", &addr_space::direct_mem_write<uint64_t>,
+			"name", sol::property(&addr_space::name),
+			"map", sol::property([this](addr_space &sp) {
+					address_space &space = sp.space;
+					sol::table map = sol().create_table();
+					for (address_map_entry &entry : space.map()->m_entrylist)
+					{
+						sol::table mapentry = sol().create_table();
+						mapentry["offset"] = space.address_to_byte(entry.m_addrstart) & space.bytemask();
+						mapentry["endoff"] = space.address_to_byte(entry.m_addrend) & space.bytemask();
+						mapentry["readtype"] = entry.m_read.m_type;
+						mapentry["writetype"] = entry.m_write.m_type;
+						map.add(mapentry);
+					}
+					return map;
+				}));
+
+/* machine:ioport()
+ * ioport:count_players() - get count of player controllers
+ * ioport.ports[] - ioports table
+ */
+
+	sol().new_usertype<ioport_manager>("ioport", "new", sol::no_constructor,
+			"count_players", &ioport_manager::count_players,
+			"ports", sol::property([this](ioport_manager &im) {
+					sol::table port_table = sol().create_table();
+					for (auto &port : im.ports())
+						port_table[port.second->tag()] = port.second.get();
+					return port_table;
+				}));
+
+/* ioport.ports[port_tag]
+ * port:tag() - get port tag
+ * port:active() - get port status
+ * port:live() - get port ioport_port_live (TODO: not usable from lua as of now)
+ * port:read() - get port value
+ * port:write(val, mask) - set port to value & mask
+ * port:field(mask) - get ioport_field for port and mask
+ * port.field[] - get ioport_field table
+ */
+
+	sol().new_usertype<ioport_port>("ioport_port", "new", sol::no_constructor,
+			"tag", &ioport_port::tag,
+			"active", &ioport_port::active,
+			"live", &ioport_port::live,
+			"read", &ioport_port::read,
+			"write", &ioport_port::write,
+			"field", &ioport_port::field,
+			"fields", sol::property([this](ioport_port &p){
+					sol::table f_table = sol().create_table();
+					for(ioport_field &field : p.fields())
+					{
+						if (field.type_class() != INPUT_CLASS_INTERNAL)
+							f_table[field.name()] = &field;
+					}
+					return f_table;
+				}));
+
+/* port.field[field_tag] - this should be self explanatory
+ */
+
+	sol().new_usertype<ioport_field>("ioport_field", "new", sol::no_constructor,
+			"set_value", &ioport_field::set_value,
+			"device", sol::property(&ioport_field::device),
+			"name", sol::property(&ioport_field::name),
+			"player", sol::property(&ioport_field::player, &ioport_field::set_player),
+			"mask", sol::property(&ioport_field::mask),
+			"defvalue", sol::property(&ioport_field::defvalue),
+			"sensitivity", sol::property(&ioport_field::sensitivity),
+			"way", sol::property(&ioport_field::way),
+			"is_analog", sol::property(&ioport_field::is_analog),
+			"is_digital_joystick", sol::property(&ioport_field::is_digital_joystick),
+			"enabled", sol::property(&ioport_field::enabled),
+			"optional", sol::property(&ioport_field::optional),
+			"cocktail", sol::property(&ioport_field::cocktail),
+			"toggle", sol::property(&ioport_field::toggle),
+			"rotated", sol::property(&ioport_field::rotated),
+			"analog_reverse", sol::property(&ioport_field::analog_reverse),
+			"analog_reset", sol::property(&ioport_field::analog_reset),
+			"analog_wraps", sol::property(&ioport_field::analog_wraps),
+			"analog_invert", sol::property(&ioport_field::analog_invert),
+			"impulse", sol::property(&ioport_field::impulse),
+			"type", sol::property(&ioport_field::type),
+			"crosshair_scale", sol::property(&ioport_field::crosshair_scale, &ioport_field::set_crosshair_scale),
+			"crosshair_offset", sol::property(&ioport_field::crosshair_offset, &ioport_field::set_crosshair_offset));
+
+/* machine:parameters()
+ * parameter:add(tag, val) - add tag = val parameter
+ * parameter:lookup(tag) - get val for tag
+ */
+
+	sol().new_usertype<parameters_manager>("parameters", "new", sol::no_constructor,
+			"add", &parameters_manager::add,
+			"lookup", &parameters_manager::lookup);
+
+/* machine:video()
+ * video:begin_recording([opt] filename) - start recording to filename if given or default
+ * video:end_recording() - stop recording
+ * video:snapshot() - save shot of all screens
+ * video:is_recording() - get recording status
+ * video:skip_this_frame() - is current frame going to be skipped
+ * video:speed_factor() - get speed factor
+ * video:speed_percent() - get percent from realtime
+ * video.frameskip - current frameskip
+ * video.throttled - throttle state
+ * video.throttle_rate - throttle rate
+ */
+
+	sol().new_usertype<video_manager>("video", "new", sol::no_constructor,
+			"begin_recording", sol::overload([this](video_manager &vm, const char *filename) {
+					std::string fn = filename;
+					strreplace(fn, "/", PATH_SEPARATOR);
+					strreplace(fn, "%g", machine().basename());
+					vm.begin_recording(fn.c_str(), video_manager::MF_AVI);
+				},
+				[](video_manager &vm) { vm.begin_recording(nullptr, video_manager::MF_AVI); }),
+			"end_recording", [this](video_manager &vm) {
+					if(!vm.is_recording())
+					{
+						machine().logerror("[luaengine] No active recording to stop\n");
+						return;
+					}
+					vm.end_recording(video_manager::MF_AVI);
+				},
+			"snapshot", &video_manager::save_active_screen_snapshots,
+			"is_recording", &video_manager::is_recording,
+			"skip_this_frame", &video_manager::skip_this_frame,
+			"speed_factor", &video_manager::speed_factor,
+			"speed_percent", &video_manager::speed_percent,
+			"frameskip", sol::property(&video_manager::frameskip, &video_manager::set_frameskip),
+			"throttled", sol::property(&video_manager::throttled, &video_manager::set_throttled),
+			"throttle_rate", sol::property(&video_manager::throttle_rate, &video_manager::set_throttle_rate));
+
+/* machine:input()
+ * input:find_mouse() - returns x, y, button state, ui render target
+ * input:pressed(key) - get pressed state for key
+ */
+
+	sol().new_usertype<ui_input_manager>("input", "new", sol::no_constructor,
+			"find_mouse", [](ui_input_manager &ui) {
+					int32_t x, y;
+					bool button;
+					render_target *rt = ui.find_mouse(&x, &y, &button);
+					return std::tuple<int32_t, int32_t, bool, render_target *>(x, y, button, rt);
+				},
+			"pressed", &ui_input_manager::pressed);
+
+/* render.targets[target_index]
+ * render:ui_target()
+ * target:view_bounds() - get x0, x1, y0, y1 bounds for target
+ * target:width() - get target width
+ * target:height() - get target height
+ * target:pixel_aspect() - get target aspect
+ * target:hidden() - is target hidden
+ * target:is_ui_target() - is ui render target
+ * target:index() - target index
+ * target.max_update_rate -
+ * target.view - current target layout view
+ * target.orientation - current target orientation
+ * target.backdrops - enable backdrops
+ * target.bezels - enable bezels
+ * target.marquees - enable marquees
+ * target.screen_overlay - enable overlays
+ * target.zoom - enable zoom
+ */
+
+	sol().new_usertype<render_target>("target", "new", sol::no_constructor,
+			"view_bounds", [](render_target &rt) {
+					const render_bounds b = rt.current_view()->bounds();
+					return std::tuple<float, float, float, float>(b.x0, b.x1, b.y0, b.y1);
+				},
+			"width", &render_target::width,
+			"height", &render_target::height,
+			"pixel_aspect", &render_target::pixel_aspect,
+			"hidden", &render_target::hidden,
+			"is_ui_target", &render_target::is_ui_target,
+			"index", &render_target::index,
+			"max_update_rate", sol::property(&render_target::max_update_rate, &render_target::set_max_update_rate),
+			"view", sol::property(&render_target::view, &render_target::set_view),
+			"orientation", sol::property(&render_target::orientation, &render_target::set_orientation),
+			"backdrops", sol::property(&render_target::backdrops_enabled, &render_target::set_backdrops_enabled),
+			"overlays", sol::property(&render_target::overlays_enabled, &render_target::set_overlays_enabled),
+			"bezels", sol::property(&render_target::bezels_enabled, &render_target::set_bezels_enabled),
+			"marquees", sol::property(&render_target::marquees_enabled, &render_target::set_marquees_enabled),
+			"screen_overlay", sol::property(&render_target::screen_overlay_enabled, &render_target::set_screen_overlay_enabled),
+			"zoom", sol::property(&render_target::zoom_to_screen, &render_target::set_zoom_to_screen));
+
+/* render:ui_container() - this should be self explanatory
+ */
+
+	sol().new_usertype<render_container>("render_container", "new", sol::no_constructor,
+			"orientation", &render_container::orientation,
+			"xscale", &render_container::xscale,
+			"yscale", &render_container::yscale,
+			"xoffset", &render_container::xoffset,
+			"yoffset", &render_container::yoffset,
+			"is_empty", &render_container::is_empty);
+
+/* machine:render()
+ * render:max_update_rate() -
+ * render:ui_target() - target for ui drawing
+ * render:ui_container() - container for ui drawing
+ * render.target[] - render_target table
+ */
+
+	sol().new_usertype<render_manager>("render", "new", sol::no_constructor,
+			"max_update_rate", &render_manager::max_update_rate,
+			"ui_target", &render_manager::ui_target,
+			"ui_container", &render_manager::ui_container,
+			"targets", [this](render_manager &r) {
+					sol::table target_table = sol().create_table();
+					int tc = 0;
+					for(render_target &curr_rt : r.targets())
+						target_table[tc++] = &curr_rt;
+					return target_table;
+				});
+
+/* machine.screens[screen_tag]
+ * screen:draw_box(x1, y1, x2, y2, fillcol, linecol) - draw box from (x1, y1)-(x2, y2) colored linecol filled with fillcol
+ * screen:draw_line(x1, y1, x2, y2, linecol) - draw line from (x1, y1)-(x2, y2) colored linecol
+ * screen:draw_text(x || justify, y, message, [opt] color) - draw message at (x, y) or at line y with left, right, center justification
+ * screen:height() - screen height
+ * screen:width() - screen width
+ * screen:orientation() - screen angle, flipx, flipy
+ * screen:refresh() - screen refresh rate
+ * screen:snapshot() - save snap shot
+ * screen:type() - screen drawing type
+ * screen:frame_number() - screen frame count
+ * screen:name() - screen device full name
+ * screen:shortname() - screen device short name
+ * screen:tag() - screen device tag
+ * screen:xscale() - screen x scale factor
+ * screen:yscale() - screen y scale factor
+*/
+
+	sol().new_usertype<screen_device>("screen_dev", "new", sol::no_constructor,
+			"draw_box", [](screen_device &sdev, float x1, float y1, float x2, float y2, uint32_t bgcolor, uint32_t fgcolor) {
+					int sc_width = sdev.visible_area().width();
+					int sc_height = sdev.visible_area().height();
+					x1 = std::min(std::max(0.0f, x1), float(sc_width-1)) / float(sc_width);
+					y1 = std::min(std::max(0.0f, y1), float(sc_height-1)) / float(sc_height);
+					x2 = std::min(std::max(0.0f, x2), float(sc_width-1)) / float(sc_width);
+					y2 = std::min(std::max(0.0f, y2), float(sc_height-1)) / float(sc_height);
+					mame_machine_manager::instance()->ui().draw_outlined_box(sdev.container(), x1, y1, x2, y2, fgcolor, bgcolor);
+				},
+			"draw_line", [](screen_device &sdev, float x1, float y1, float x2, float y2, uint32_t color) {
+					int sc_width = sdev.visible_area().width();
+					int sc_height = sdev.visible_area().height();
+					x1 = std::min(std::max(0.0f, x1), float(sc_width-1)) / float(sc_width);
+					y1 = std::min(std::max(0.0f, y1), float(sc_height-1)) / float(sc_height);
+					x2 = std::min(std::max(0.0f, x2), float(sc_width-1)) / float(sc_width);
+					y2 = std::min(std::max(0.0f, y2), float(sc_height-1)) / float(sc_height);
+					sdev.container().add_line(x1, y1, x2, y2, UI_LINE_WIDTH, rgb_t(color), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+				},
+			"draw_text", [this](screen_device &sdev, sol::object xobj, float y, const char *msg, sol::object color) {
+					int sc_width = sdev.visible_area().width();
+					int sc_height = sdev.visible_area().height();
+					auto justify = ui::text_layout::LEFT;
+					float x = 0;
+					if(xobj.is<float>())
+					{
+						x = std::min(std::max(0.0f, xobj.as<float>()), float(sc_width-1)) / float(sc_width);
+						y = std::min(std::max(0.0f, y), float(sc_height-1)) / float(sc_height);
+					}
+					else if(xobj.is<const char *>())
+					{
+						std::string just_str = xobj.as<const char *>();
+						if(just_str == "right")
+							justify = ui::text_layout::RIGHT;
+						else if(just_str == "center")
+							justify = ui::text_layout::CENTER;
+					}
+					else
+					{
+						luaL_error(m_lua_state, "Error in param 1 to draw_text");
+						return;
+					}
+					rgb_t textcolor = UI_TEXT_COLOR;
+					rgb_t bgcolor = UI_TEXT_BG_COLOR;
+					if(color.is<uint32_t>())
+						textcolor = rgb_t(color.as<uint32_t>());
+					mame_machine_manager::instance()->ui().draw_text_full(sdev.container(), msg, x, y, (1.0f - x),
+										justify, ui::text_layout::WORD, mame_ui_manager::NORMAL, textcolor,
+										bgcolor, nullptr, nullptr);
+				},
+			"height", [](screen_device &sdev) { return sdev.visible_area().height(); },
+			"width", [](screen_device &sdev) { return sdev.visible_area().width(); },
+			"orientation", [](screen_device &sdev) {
+					uint32_t flags = sdev.machine().system().flags & ORIENTATION_MASK;
+					int rotation_angle = 0;
+					switch (flags)
+					{
+						case ORIENTATION_FLIP_X:
+							rotation_angle = 0;
+							break;
+						case ORIENTATION_SWAP_XY:
+						case ORIENTATION_SWAP_XY|ORIENTATION_FLIP_X:
+							rotation_angle = 90;
+							break;
+						case ORIENTATION_FLIP_Y:
+						case ORIENTATION_FLIP_X|ORIENTATION_FLIP_Y:
+							rotation_angle = 180;
+							break;
+						case ORIENTATION_SWAP_XY|ORIENTATION_FLIP_Y:
+						case ORIENTATION_SWAP_XY|ORIENTATION_FLIP_X|ORIENTATION_FLIP_Y:
+							rotation_angle = 270;
+							break;
+					}
+					return std::tuple<int, bool, bool>(rotation_angle, flags & ORIENTATION_FLIP_X, flags & ORIENTATION_FLIP_Y);
+				},
+			"refresh", [](screen_device &sdev) { return ATTOSECONDS_TO_HZ(sdev.refresh_attoseconds()); },
+			"snapshot", [this](screen_device &sdev, sol::object filename) -> sol::object {
+					emu_file file(machine().options().snapshot_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+					osd_file::error filerr;
+					if(filename.is<const char *>())
+					{
+						std::string snapstr(filename.as<const char *>());
+						strreplace(snapstr, "/", PATH_SEPARATOR);
+						strreplace(snapstr, "%g", machine().basename());
+						filerr = file.open(snapstr.c_str());
+					}
+					else
+						filerr = machine().video().open_next(file, "png");
+					if(filerr != osd_file::error::NONE)
+						return sol::make_object(sol(), filerr);
+					machine().video().save_snapshot(&sdev, file);
+					return sol::make_object(sol(), sol::nil);
+				},
+			"type", [](screen_device &sdev) {
+					switch (sdev.screen_type())
+					{
+						case SCREEN_TYPE_RASTER:  return "raster"; break;
+						case SCREEN_TYPE_VECTOR:  return "vector"; break;
+						case SCREEN_TYPE_LCD:     return "lcd"; break;
+						case SCREEN_TYPE_SVG:     return "svg"; break;
+						default: break;
+					}
+					return "unknown";
+				},
+			"frame_number", &screen_device::frame_number,
+			"name", &screen_device::name,
+			"shortname", &screen_device::shortname,
+			"tag", &screen_device::tag,
+			"xscale", &screen_device::xscale,
+			"yscale", &screen_device::yscale);
+
+/* mame_manager:ui()
+ * ui:is_menu_active() - ui menu state
+ * ui:options() - ui core_options
+ * ui.show_fps - fps display enabled
+ * ui.show_profiler - profiler display enabled
+ * ui:get_line_height() - current ui font height
+ * ui:get_string_width(str, scale) - get str width with ui font at scale factor of current font size
+ * ui:get_char_width(char) - get width of utf8 glyph char with ui font
+ */
+
+	sol().new_usertype<mame_ui_manager>("ui", "new", sol::no_constructor,
+			"is_menu_active", &mame_ui_manager::is_menu_active,
+			"options", [](mame_ui_manager &m) { return static_cast<core_options &>(m.options()); },
+			"show_fps", sol::property(&mame_ui_manager::show_fps, &mame_ui_manager::set_show_fps),
+			"show_profiler", sol::property(&mame_ui_manager::show_profiler, &mame_ui_manager::set_show_profiler),
+			"single_step", sol::property(&mame_ui_manager::single_step, &mame_ui_manager::set_single_step),
+			"get_line_height", &mame_ui_manager::get_line_height,
+			"get_string_width", &mame_ui_manager::get_string_width,
+			// sol converts char32_t to a string
+			"get_char_width", [](mame_ui_manager &m, uint32_t utf8char) { return m.get_char_width(utf8char); });
+
+/* device.state[]
+ * state:name() - get device state name
+ * state:value() - get device state value
+ * state:is_visible() - is state visible in debugger
+ * state:is_divider() - is state a divider
+ */
+
+	sol().new_usertype<device_state_entry>("dev_space", "new", sol::no_constructor,
+			"name", &device_state_entry::symbol,
+			"value", sol::property([this](device_state_entry &entry) -> uint64_t {
+					device_state_interface *state = entry.parent_state();
+					if(state)
+					{
+						machine().save().dispatch_presave();
+						return state->state_int(entry.index());
+					}
+					return 0;
+				},
+				[this](device_state_entry &entry, uint64_t val) {
+					device_state_interface *state = entry.parent_state();
+					if(state)
+					{
+						state->set_state_int(entry.index(), val);
+						machine().save().dispatch_presave();
+					}
+				}),
+			"is_visible", &device_state_entry::visible,
+			"is_divider", &device_state_entry::divider);
+
+/* machine:memory()
+ * memory.banks[] - table of memory banks
+ * memory.regions[] - table of memory regions
+ * memory.shares[] - table of memory shares
+ */
+
+	sol().new_usertype<memory_manager>("memory", "new", sol::no_constructor,
+			"banks", sol::property([this](memory_manager &mm) {
+					sol::table table = sol().create_table();
+					for (auto &bank : mm.banks())
+						table[bank.second->tag()] = bank.second.get();
+					return table;
+				}),
+			"regions", sol::property([this](memory_manager &mm) {
+					sol::table table = sol().create_table();
+					for (auto &region : mm.regions())
+						table[region.second->name()] = region.second.get();
+					return table;
+				}),
+			"shares", sol::property([this](memory_manager &mm) {
+					sol::table table = sol().create_table();
+					for (auto &share : mm.shares())
+						table[share.first] = share.second.get();
+					return table;
+				}));
+
+	sol().new_usertype<memory_region>("region", "new", sol::no_constructor,
+			"read_i8", &region_read<int8_t>,
+			"read_u8", &region_read<uint8_t>,
+			"read_i16", &region_read<int16_t>,
+			"read_u16", &region_read<uint16_t>,
+			"read_i32", &region_read<int32_t>,
+			"read_u32", &region_read<uint32_t>,
+			"read_i64", &region_read<int64_t>,
+			"read_u64", &region_read<uint64_t>,
+			"write_i8", &region_write<int8_t>,
+			"write_u8", &region_write<uint8_t>,
+			"write_i16", &region_write<int16_t>,
+			"write_u16", &region_write<uint16_t>,
+			"write_i32", &region_write<int32_t>,
+			"write_u32", &region_write<uint32_t>,
+			"write_i64", &region_write<int64_t>,
+			"write_u64", &region_write<uint64_t>,
+			"size", sol::property(&memory_region::bytes));
+
+	sol().new_usertype<memory_share>("share", "new", sol::no_constructor,
+			"read_i8", &share_read<int8_t>,
+			"read_u8", &share_read<uint8_t>,
+			"read_i16", &share_read<int16_t>,
+			"read_u16", &share_read<uint16_t>,
+			"read_i32", &share_read<int32_t>,
+			"read_u32", &share_read<uint32_t>,
+			"read_i64", &share_read<int64_t>,
+			"read_u64", &share_read<uint64_t>,
+			"write_i8", &share_write<int8_t>,
+			"write_u8", &share_write<uint8_t>,
+			"write_i16", &share_write<int16_t>,
+			"write_u16", &share_write<uint16_t>,
+			"write_i32", &share_write<int32_t>,
+			"write_u32", &share_write<uint32_t>,
+			"write_i64", &share_write<int64_t>,
+			"write_u64", &share_write<uint64_t>,
+			"size", sol::property(&memory_share::bytes));
+
+/* machine:output()
+ * output:set_value(name, val) - set output name to val
+ * output:set_indexed_value(index, val) - set output index to val
+ * output:get_value(name) - get output name value
+ * output:get_indexed_value(index) - get output index value
+ * output:name_to_id(name) - get index for name
+ * output:id_to_name(index) - get name for index
+ */
+
+	sol().new_usertype<output_manager>("output", "new", sol::no_constructor,
+			"set_value", &output_manager::set_value,
+			"set_indexed_value", &output_manager::set_indexed_value,
+			"get_value", &output_manager::get_value,
+			"get_indexed_value", &output_manager::get_indexed_value,
+			"name_to_id", &output_manager::name_to_id,
+			"id_to_name", &output_manager::id_to_name);
+
+/* machine.images[] - images are floppy/cart/cdrom/tape/hdd etc, otherwise this should be self explanatory
+ */
+
+	sol().new_usertype<device_image_interface>("image", "new", sol::no_constructor,
+			"exists", &device_image_interface::exists,
+			"filename", &device_image_interface::filename,
+			"longname", &device_image_interface::longname,
+			"manufacturer", &device_image_interface::manufacturer,
+			"year", &device_image_interface::year,
+			"software_list_name", &device_image_interface::software_list_name,
+			"image_type_name", &device_image_interface::image_type_name,
+			"load", &device_image_interface::load,
+			"unload", &device_image_interface::unload,
+			"crc", &device_image_interface::crc,
+			"device", sol::property(static_cast<const device_t &(device_image_interface::*)() const>(&device_image_interface::device)),
+			"is_readable", sol::property(&device_image_interface::is_readable),
+			"is_writeable", sol::property(&device_image_interface::is_writeable),
+			"is_creatable", sol::property(&device_image_interface::is_creatable),
+			"is_reset_on_load", sol::property(&device_image_interface::is_reset_on_load));
+
+	sol().new_usertype<mame_machine_manager>("manager", "new", sol::no_constructor,
+			"machine", &machine_manager::machine,
+			"options", [](machine_manager &m) { return static_cast<core_options *>(&m.options()); },
+			"plugins", [](mame_machine_manager &m) { return static_cast<core_options *>(&m.plugins()); },
+			"ui", &mame_machine_manager::ui);
+	sol()["manager"] = std::ref(*mame_machine_manager::instance());
+	sol()["mame_manager"] = std::ref(*mame_machine_manager::instance());
 }
 
 //-------------------------------------------------
@@ -2728,49 +1626,7 @@ void lua_engine::start_console()
 //-------------------------------------------------
 bool lua_engine::frame_hook()
 {
-	bool is_cb_hooked = false;
-	if (m_machine != nullptr) {
-		// invoke registered callback (if any)
-		is_cb_hooked = hook_frame_cb.active();
-		if (is_cb_hooked) {
-			lua_State *L = hook_frame_cb.precall();
-			hook_frame_cb.call(this, L, 0);
-		}
-	}
-	return is_cb_hooked;
-}
-
-void lua_engine::periodic_check()
-{
-	std::lock_guard<std::mutex> lock(g_mutex);
-	if (msg.ready == 1) {
-		lua_settop(m_lua_state, 0);
-		int status = luaL_loadbuffer(m_lua_state, msg.text.c_str(), msg.text.length(), "=stdin");
-		if (incomplete(status)==0)  /* cannot try to add lines? */
-		{
-			if (status == LUA_OK) status = docall(0, LUA_MULTRET);
-			report(status);
-			if (status == LUA_OK && lua_gettop(m_lua_state) > 0)   /* any result to print? */
-			{
-				luaL_checkstack(m_lua_state, LUA_MINSTACK, "too many results to print");
-				lua_getglobal(m_lua_state, "print");
-				lua_insert(m_lua_state, 1);
-				if (lua_pcall(m_lua_state, lua_gettop(m_lua_state) - 1, 0, 0) != LUA_OK)
-					lua_writestringerror("%s\n", lua_pushfstring(m_lua_state,
-					"error calling " LUA_QL("print") " (%s)",
-					lua_tostring(m_lua_state, -1)));
-			}
-		}
-		else
-		{
-			status = -1;
-		}
-		msg.status = status;
-		msg.response = msg.text;
-		msg.text = "";
-		msg.ready = 0;
-		msg.done = 1;
-	}
+	return execute_function("LUA_ON_FRAME_DONE");
 }
 
 //-------------------------------------------------
@@ -2783,16 +1639,28 @@ void lua_engine::close()
 	lua_close(m_lua_state);
 }
 
+void lua_engine::run(sol::load_result res)
+{
+	if(res.valid())
+	{
+		auto ret = (res.get<sol::protected_function>())();
+		if(!ret.valid())
+		{
+			sol::error err = ret;
+			osd_printf_error("[LUA ERROR] in run: %s\n", err.what());
+		}
+	}
+	else
+		osd_printf_error("[LUA ERROR] %d loading Lua script\n", (int)res.status());
+}
+
 //-------------------------------------------------
 //  execute - load and execute script
 //-------------------------------------------------
 
 void lua_engine::load_script(const char *filename)
 {
-	int s = luaL_loadfile(m_lua_state, filename);
-	report(s);
-	update_machine();
-	start();
+	run(sol().load_file(filename));
 }
 
 //-------------------------------------------------
@@ -2801,57 +1669,5 @@ void lua_engine::load_script(const char *filename)
 
 void lua_engine::load_string(const char *value)
 {
-	int s = luaL_loadstring(m_lua_state, value);
-	report(s);
-	update_machine();
-	start();
-}
-
-//-------------------------------------------------
-//  start - execute the loaded script
-//-------------------------------------------------
-
-void lua_engine::start()
-{
-	resume(m_lua_state);
-}
-
-
-//**************************************************************************
-//  LuaBridge Stack specializations
-//**************************************************************************
-
-namespace luabridge {
-	template <>
-	struct Stack <unsigned long long> {
-		static inline void push (lua_State* L, unsigned long long value) {
-			lua_pushunsigned(L, static_cast <lua_Unsigned> (value));
-		}
-
-		static inline unsigned long long get (lua_State* L, int index) {
-			return static_cast <unsigned long long> (luaL_checkunsigned (L, index));
-		}
-	};
-
-	template <>
-	struct Stack <char16_t> {
-		static inline void push(lua_State* L, char16_t value) {
-			lua_pushunsigned(L, static_cast <lua_Unsigned> (value));
-		}
-
-		static inline char16_t get(lua_State* L, int index) {
-			return static_cast <char16_t> (luaL_checkunsigned(L, index));
-		}
-	};
-
-	template <>
-	struct Stack <char32_t> {
-		static inline void push(lua_State* L, char32_t value) {
-			lua_pushunsigned(L, static_cast <lua_Unsigned> (value));
-		}
-
-		static inline char32_t get(lua_State* L, int index) {
-			return static_cast <char32_t> (luaL_checkunsigned(L, index));
-		}
-	};
+	run(sol().load(value));
 }

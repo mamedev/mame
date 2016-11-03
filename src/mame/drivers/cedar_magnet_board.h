@@ -28,8 +28,9 @@ public:
 
 	TIMER_CALLBACK_MEMBER(halt_assert_callback);
 	TIMER_CALLBACK_MEMBER(halt_clear_callback);
-	TIMER_CALLBACK_MEMBER(reset_assert_callback);
+	virtual TIMER_CALLBACK_MEMBER(reset_assert_callback);
 	TIMER_CALLBACK_MEMBER(reset_clear_callback);
+
 
 	void halt_assert(void);
 	void halt_clear(void);
@@ -39,7 +40,6 @@ public:
 	bool m_is_running;
 
 	INTERRUPT_GEN_MEMBER(irq);
-
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;

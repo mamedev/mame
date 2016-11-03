@@ -6,46 +6,46 @@
 
 ***********************************************************************
                _____________
-	/INTA   1 |             | 32  Vcc
-	/INTB   2 |             | 31  SQW
+    /INTA   1 |             | 32  Vcc
+    /INTB   2 |             | 31  SQW
    NC/A14   3 |             | 30  Vcc
-	  A12   4 |             | 29  /WE
-	   A7   5 |             | 28  NC/A13
-	   A6   6 |             | 27  A8
-	   A5   7 |             | 26  A9
-	   A4   8 |             | 25  A11
-	   A3   9 |             | 24  /OE
-	   A2  10 |             | 23  A10
-	   A1  11 |             | 22  /CE
-	   A0  12 |             | 21  DQ7
-	  DQ0  13 |             | 20  DQ6
-	  DQ1  14 |             | 19  DQ5
-	  DQ2  15 |             | 18  DQ4
-	  GND  16 |_____________| 17  DQ3
+      A12   4 |             | 29  /WE
+       A7   5 |             | 28  NC/A13
+       A6   6 |             | 27  A8
+       A5   7 |             | 26  A9
+       A4   8 |             | 25  A11
+       A3   9 |             | 24  /OE
+       A2  10 |             | 23  A10
+       A1  11 |             | 22  /CE
+       A0  12 |             | 21  DQ7
+      DQ0  13 |             | 20  DQ6
+      DQ1  14 |             | 19  DQ5
+      DQ2  15 |             | 18  DQ4
+      GND  16 |_____________| 17  DQ3
 
                DS1386 8k/32k x 8
 
-	         __________________________________
-	        /                                  |
-		   /                                   |
-	/INTB |  1                              34 | /INTA
-	   NC |  2                              33 | SQW
-	   NC |  3                              32 | NC/A13
-	 /PFO |  4                              31 | NC/A14
-	  Vcc |  5                              30 | A12
-	  /WE |  6                              29 | A11
-	  /OE |  7                              28 | A10
-	  /CE |  8                              27 | A9
-	  DQ7 |  9                              26 | A8
-	  DQ6 | 10                              25 | A7
-	  DQ5 | 11                              24 | A6
-	  DQ4 | 12                              23 | A5
-	  DQ3 | 13                              22 | A4
-	  DQ2 | 14   X1     GND   Vbat    X2    21 | A3
-	  DQ1 | 15  ____   ____   ____   ____   20 | A2
-	  DQ0 | 16 |    | |    | |    | |    |  19 | A1
-	  GND | 17 |____| |____| |____| |____|  18 | A0
-	      |____________________________________|
+             __________________________________
+            /                                  |
+           /                                   |
+    /INTB |  1                              34 | /INTA
+       NC |  2                              33 | SQW
+       NC |  3                              32 | NC/A13
+     /PFO |  4                              31 | NC/A14
+      Vcc |  5                              30 | A12
+      /WE |  6                              29 | A11
+      /OE |  7                              28 | A10
+      /CE |  8                              27 | A9
+      DQ7 |  9                              26 | A8
+      DQ6 | 10                              25 | A7
+      DQ5 | 11                              24 | A6
+      DQ4 | 12                              23 | A5
+      DQ3 | 13                              22 | A4
+      DQ2 | 14   X1     GND   Vbat    X2    21 | A3
+      DQ1 | 15  ____   ____   ____   ____   20 | A2
+      DQ0 | 16 |    | |    | |    | |    |  19 | A1
+      GND | 17 |____| |____| |____| |____|  18 | A0
+          |____________________________________|
 
      DS1386 8k/32k x 8, 34-Pin PowerCap Module Board
 
@@ -117,10 +117,10 @@ protected:
 
 	enum
 	{
-		ALARM_DAYS_MATCH	= 0x0,
-		ALARM_HOURS_MATCH	= 0x1,
+		ALARM_DAYS_MATCH    = 0x0,
+		ALARM_HOURS_MATCH   = 0x1,
 		ALARM_MINUTES_MATCH = 0x3,
-		ALARM_PER_MINUTE	= 0x7
+		ALARM_PER_MINUTE    = 0x7
 	};
 
 	// device-level overrides
@@ -174,17 +174,17 @@ protected:
 	std::unique_ptr<uint8_t[]> m_ram;
 	optional_region_ptr<uint8_t> m_default_data;
 
-	uint8_t	m_hundredths;
-	uint8_t	m_seconds;
-	uint8_t	m_minutes;
-	uint8_t	m_minutes_alarm;
-	uint8_t	m_hours;
-	uint8_t	m_hours_alarm;
-	uint8_t	m_days;
-	uint8_t	m_days_alarm;
-	uint8_t	m_date;
-	uint8_t	m_months_enables;
-	uint8_t	m_years;
+	uint8_t m_hundredths;
+	uint8_t m_seconds;
+	uint8_t m_minutes;
+	uint8_t m_minutes_alarm;
+	uint8_t m_hours;
+	uint8_t m_hours_alarm;
+	uint8_t m_days;
+	uint8_t m_days_alarm;
+	uint8_t m_date;
+	uint8_t m_months_enables;
+	uint8_t m_years;
 
 	const size_t m_ram_size;
 };

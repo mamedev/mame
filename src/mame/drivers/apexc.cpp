@@ -428,7 +428,7 @@ INTERRUPT_GEN_MEMBER(apexc_state::apexc_interrupt)
 
 	if (control_transitions & panel_run)
 	{   /* toggle run/stop state */
-		device.state().set_state_int(APEXC_STATE, ! device.state().state_int(APEXC_STATE));
+		m_maincpu->set_state_int(APEXC_STATE, ! m_maincpu->state_int(APEXC_STATE));
 	}
 
 	while (control_transitions & (panel_CR | panel_A | panel_R | panel_ML | panel_HB))
@@ -470,10 +470,10 @@ INTERRUPT_GEN_MEMBER(apexc_state::apexc_interrupt)
 			/* read/write register #reg_id */
 			if (control_keys & panel_write)
 				/* write reg */
-				device.state().set_state_int(reg_id, m_panel_data_reg);
+				m_maincpu->set_state_int(reg_id, m_panel_data_reg);
 			else
 				/* read reg */
-				m_panel_data_reg = device.state().state_int(reg_id);
+				m_panel_data_reg = m_maincpu->state_int(reg_id);
 		}
 	}
 
@@ -482,11 +482,11 @@ INTERRUPT_GEN_MEMBER(apexc_state::apexc_interrupt)
 
 		if (control_keys & panel_write) {
 			/* write memory */
-			space.write_dword(device.state().state_int(APEXC_ML_FULL)<<2, m_panel_data_reg);
+			space.write_dword(m_maincpu->pc(), m_panel_data_reg);
 		}
 		else {
 			/* read memory */
-			m_panel_data_reg = space.read_dword(device.state().state_int(APEXC_ML_FULL)<<2);
+			m_panel_data_reg = space.read_dword(m_maincpu->pc());
 		}
 	}
 

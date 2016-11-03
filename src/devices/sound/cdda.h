@@ -18,8 +18,6 @@ public:
 	void start_audio(uint32_t startlba, uint32_t numblocks);
 	void stop_audio();
 	void pause_audio(int pause);
-	void set_volume(int volume);
-	void set_channel_volume(int channel, int volume);
 	int16_t get_channel_volume(int channel);
 
 	uint32_t get_audio_lba();

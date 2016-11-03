@@ -48,7 +48,7 @@ const uint32_t MACHINE_IS_INCOMPLETE             = 0x01000000;   // any official
 const uint32_t MACHINE_NODEVICE_MICROPHONE       = 0x02000000;   // any game/system that has unemulated recording voice device peripheral
 const uint32_t MACHINE_NODEVICE_CAMERA           = 0x04000000;   // any game/system that has unemulated capturing image device peripheral
 const uint32_t MACHINE_NODEVICE_PRINTER          = 0x08000000;   // any game/system that has unemulated grabbing of screen content device
-const uint32_t MACHINE_NODEVICE_LAN              = 0x10000000;   // any game/system that has unemulated multi-linking capability 
+const uint32_t MACHINE_NODEVICE_LAN              = 0x10000000;   // any game/system that has unemulated multi-linking capability
 const uint32_t MACHINE_NODEVICE_WAN              = 0x20000000;   // any game/system that has unemulated networking capability
 
 // useful combinations of flags

@@ -72,9 +72,14 @@ namespace bx
 			return result;
 		}
 
-		bool operator==(ErrorResult _rhs) const
+		bool operator==(const ErrorResult& _rhs) const
 		{
 			return _rhs.code == m_code;
+		}
+
+		bool operator!=(const ErrorResult& _rhs) const
+		{
+			return _rhs.code != m_code;
 		}
 
 	private:

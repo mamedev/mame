@@ -45,9 +45,9 @@ console_frontend::~console_frontend()
 
 void console_frontend::completion(char const* prefix, linenoiseCompletions* lc)
 {
-	for (auto cmd : m_commands) 
+	for (auto cmd : m_commands)
 	{
-		if (strncmp(prefix, cmd.first.c_str(), strlen(prefix)) == 0) 
+		if (strncmp(prefix, cmd.first.c_str(), strlen(prefix)) == 0)
 		{
 			linenoiseAddCompletion(lc, cmd.first.c_str());
 		}
@@ -68,7 +68,7 @@ void console_frontend::read_console(std::string &cmdLine)
 		while (m_wait.load())
 		{
 			using namespace std::chrono_literals;
-			std::this_thread::sleep_for(100ms);			
+			std::this_thread::sleep_for(100ms);
 		}
 		if (!m_run.load()) break;
 		char* result = linenoise(m_prompt.c_str());
@@ -89,7 +89,7 @@ void console_frontend::read_console(std::string &cmdLine)
 	}
 }
 
-void console_frontend::split_command(std::vector<std::string>& arg, std::string command) 
+void console_frontend::split_command(std::vector<std::string>& arg, std::string command)
 {
 	int len = command.length();
 	bool qot = false, sqot = false;
@@ -152,7 +152,7 @@ void console_frontend::start_console()
 	printf("\n");
 	printf("%s v%s\n%s\n\n", emulator_info::get_appname(), build_version, emulator_info::get_copyright_info());
 
-	
+
 	std::thread cinThread(&console_frontend::read_console, this, std::ref(cmdLine));
 
 	while (m_run.load())

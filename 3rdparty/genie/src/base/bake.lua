@@ -129,6 +129,10 @@
 			end
 		end
 
+		if obj.allfiles ~= nil then
+			adjustpathlist(obj.allfiles)
+		end
+
 		for name, value in pairs(obj) do
 			local field = premake.fields[name]
 			if field and value and not keeprelative[name] then
@@ -605,8 +609,25 @@
   			end
   		end
   	end
-
-
+    
+--
+-- Build an inverse dictionary of literal vpaths for fast lookup
+--
+    
+    local function inverseliteralvpaths()
+        for sln in premake.solution.each() do
+            for _,prj in ipairs(sln.projects) do
+                prj.inversevpaths = {}
+                for replacement, patterns in pairs(prj.vpaths or {}) do
+                    for _, pattern in ipairs(patterns) do
+                        if string.find(pattern, "*") == nil then
+                            prj.inversevpaths[pattern] = replacement
+                        end
+                    end
+                end
+            end
+        end
+    end
 --
 -- Main function, controls the process of flattening the configurations.
 --
@@ -624,7 +645,16 @@
 			end
 			sln.location = sln.location or sln.basedir
 		end
+        
+        -- convert paths for imported projects to be relative to solution location
+		for sln in premake.solution.each() do
+			for _, iprj in ipairs(sln.importedprojects) do
+				iprj.location = path.getabsolute(iprj.location)
+			end
+		end
 
+        inverseliteralvpaths()
+        
 		-- collapse configuration blocks, so that there is only one block per build
 		-- configuration/platform pair, filtered to the current operating environment
 		for sln in premake.solution.each() do
@@ -718,6 +748,18 @@
 		end
 		cfg.files = files
 
+		-- remove excluded files from the project's allfiles list, and un-duplify
+		-- it
+		local allfiles = {}
+		for _, fname in ipairs(cfg.allfiles) do
+			if not table.icontains(allfiles, fname) then
+				if not table.icontains(removefiles, fname) then
+					table.insert(allfiles, fname)
+				end
+			end
+		end
+		cfg.allfiles = allfiles
+
 		-- fixup the data
 		for name, field in pairs(premake.fields) do
 			-- re-key flag fields for faster lookups
@@ -730,26 +772,36 @@
 		-- build configuration objects for all files
 		-- TODO: can I build this as a tree instead, and avoid the extra
 		-- step of building it later?
-		cfg.__fileconfigs = { }
-		for _, fname in ipairs(cfg.files) do
-			local fcfg = {}
+		local cfgfields = {
+			{"__fileconfigs",    cfg.files},
+			{"__allfileconfigs", cfg.allfiles},
+		}
 
-			-- Only do this if the script has called enablefilelevelconfig()
-			if premake._filelevelconfig then
-				cfg.terms.required = fname:lower()
-				for _, blk in ipairs(cfg.project.blocks) do
-					-- BK - `iskeywordsmatch` call is super slow for large projects...
-					if (premake.iskeywordsmatch(blk.keywords, cfg.terms)) then
-						mergeobject(fcfg, blk)
+		for _, cfgfield in ipairs(cfgfields) do
+			local fieldname = cfgfield[1]
+			local field     = cfgfield[2]
+
+			cfg[fieldname] = { }
+			for _, fname in ipairs(field) do
+				local fcfg = {}
+
+				-- Only do this if the script has called enablefilelevelconfig()
+				if premake._filelevelconfig then
+					cfg.terms.required = fname:lower()
+					for _, blk in ipairs(cfg.project.blocks) do
+						-- BK - `iskeywordsmatch` call is super slow for large projects...
+						if (premake.iskeywordsmatch(blk.keywords, cfg.terms)) then
+							mergeobject(fcfg, blk)
+						end
 					end
 				end
-			end
 
-			-- add indexed by name and integer
-			-- TODO: when everything is converted to trees I won't need
-			-- to index by name any longer
-			fcfg.name = fname
-			cfg.__fileconfigs[fname] = fcfg
-			table.insert(cfg.__fileconfigs, fcfg)
+				-- add indexed by name and integer
+				-- TODO: when everything is converted to trees I won't need
+				-- to index by name any longer
+				fcfg.name = fname
+				cfg[fieldname][fname] = fcfg
+				table.insert(cfg[fieldname], fcfg)
+			end
 		end
 	end

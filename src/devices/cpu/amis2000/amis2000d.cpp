@@ -100,14 +100,13 @@ static const uint8_t s2000_mnemonic[0x100] =
 
 
 
-CPU_DISASSEMBLE( amis2000 )
+static offs_t internal_disasm_amis2000(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
 {
 	int pos = 0;
 	uint8_t op = oprom[pos++];
 	uint8_t instr = s2000_mnemonic[op];
 
-	char *dst = buffer;
-	dst += sprintf(dst, "%-5s ", s_mnemonics[instr]);
+	util::stream_format(stream, "%-5s ", s_mnemonics[instr]);
 
 	// opcode parameter
 	int mask = s_bits[instr];
@@ -124,10 +123,20 @@ CPU_DISASSEMBLE( amis2000 )
 		param &= mask;
 
 		if (mask < 0x10)
-			dst += sprintf(dst, "%d", param);
+			util::stream_format(stream, "%d", param);
 		else
-			dst += sprintf(dst, "$%02X", param);
+			util::stream_format(stream, "$%02X", param);
 	}
 
 	return pos | s_flags[instr] | DASMFLAG_SUPPORTED;
+}
+
+
+CPU_DISASSEMBLE(amis2000)
+{
+	std::ostringstream stream;
+	offs_t result = internal_disasm_amis2000(device, stream, pc, oprom, opram, options);
+	std::string stream_str = stream.str();
+	strcpy(buffer, stream_str.c_str());
+	return result;
 }

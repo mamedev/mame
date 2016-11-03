@@ -6,6 +6,8 @@
 
 	premake.make.cpp = { }
 	premake.make.override = { }
+	premake.make.makefile_ignore = false
+	
 	local cpp = premake.make.cpp
 	local make = premake.make
 
@@ -25,12 +27,12 @@
 			end
 		end
 
-		table.sort(prj.files)
+		table.sort(prj.allfiles)
 
 		-- list object directories
 		local objdirs = {}
 		local additionalobjdirs = {}
-		for _, file in ipairs(prj.files) do
+		for _, file in ipairs(prj.allfiles) do
 			if path.isSourceFile(file) then
 				objdirs[_MAKE.esc(path.getdirectory(path.trimdots(file)))] = 1
 			end
@@ -53,7 +55,7 @@
 		_p('')
 
 		_p('RESOURCES := \\')
-		for _, file in ipairs(prj.files) do
+		for _, file in ipairs(prj.allfiles) do
 			if path.isresourcefile(file) then
 				_p('\t$(OBJDIR)/%s.res \\', _MAKE.esc(path.getbasename(file)))
 			end
@@ -162,7 +164,7 @@
 		cpp.pchrules(prj)
 
 		-- per-file build rules
-		cpp.fileRules(prj)
+		cpp.fileRules(prj, cc)
 
 		-- per-dependency build rules
 		cpp.dependencyRules(prj)
@@ -198,6 +200,7 @@
 		_p('-include $(OBJECTS:%%.o=%%.d)')
 		_p('ifneq (,$(PCH))')
 			_p('  -include $(OBJDIR)/$(notdir $(PCH)).d')
+			_p('  -include $(OBJDIR)/$(notdir $(PCH))_objc.d')
 		_p('endif')
 	end
 
@@ -258,11 +261,28 @@
 		_p('  endif')
 		_p('endif')
 		_p('')
+
+		if (not premake.make.makefile_ignore) then
+			_p('MAKEFILE = %s', _MAKE.getmakefilename(prj, true))
+			_p('')
+		end
 	end
 
 --
 -- Write a block of configuration settings.
 --
+
+	local function is_excluded(prj, cfg, file)
+		if table.icontains(prj.excludes, file) then
+			return true
+		end
+
+		if table.icontains(cfg.excludes, file) then
+			return true
+		end
+
+		return false
+	end
 
 	function premake.gmake_cpp_config(prj, cfg, cc)
 
@@ -271,12 +291,12 @@
 		-- if this platform requires a special compiler or linker, list it here
 		cpp.platformtools(cfg, cc)
 
-		_p('  ' .. (table.contains(premake.make.override,"OBJDIR") and "override " or "") ..    'OBJDIR         = %s', _MAKE.esc(cfg.objectsdir))
-		_p('  ' .. (table.contains(premake.make.override,"TARGETDIR") and "override " or "") .. 'TARGETDIR      = %s', _MAKE.esc(cfg.buildtarget.directory))
-		_p('  ' .. (table.contains(premake.make.override,"TARGET") and "override " or "") ..    'TARGET         = $(TARGETDIR)/%s', _MAKE.esc(cfg.buildtarget.name))
-		_p('  DEFINES       +=%s', make.list(cc.getdefines(cfg.defines)))
-		_p('  INCLUDES      +=%s', make.list(cc.getincludedirs(cfg.includedirs)))
-		_p('  INCLUDES      +=%s', make.list(cc.getquoteincludedirs(cfg.userincludedirs)))
+		_p('  ' .. (table.contains(premake.make.override,"OBJDIR") and "override " or "") ..    'OBJDIR              = %s', _MAKE.esc(cfg.objectsdir))
+		_p('  ' .. (table.contains(premake.make.override,"TARGETDIR") and "override " or "") .. 'TARGETDIR           = %s', _MAKE.esc(cfg.buildtarget.directory))
+		_p('  ' .. (table.contains(premake.make.override,"TARGET") and "override " or "") ..    'TARGET              = $(TARGETDIR)/%s', _MAKE.esc(cfg.buildtarget.name))
+		_p('  DEFINES            +=%s', make.list(cc.getdefines(cfg.defines)))
+		_p('  INCLUDES           +=%s', make.list(cc.getincludedirs(cfg.includedirs)))
+		_p('  INCLUDES           +=%s', make.list(cc.getquoteincludedirs(cfg.userincludedirs)))
 
 
 		-- set up precompiled headers
@@ -288,14 +308,14 @@
 		-- write out libraries, linker flags, and the link command
 		cpp.linker(prj, cfg, cc)
 
-		table.sort(prj.files)
+		table.sort(cfg.files)
 
 		-- add objects for compilation, and remove any that are excluded per config.
 		_p('  OBJECTS := \\')
-		for _, file in ipairs(prj.files) do
+		for _, file in ipairs(cfg.files) do
 			if path.isSourceFile(file) then
 				-- check if file is excluded.
-				if not table.icontains(cfg.excludes, file) then
+				if not is_excluded(prj, cfg, file) then
 					-- if not excluded, add it.
 					_p('\t$(OBJDIR)/%s.o \\'
 						, _MAKE.esc(path.trimdots(path.removeext(file)))
@@ -359,21 +379,24 @@
 	function cpp.flags(cfg, cc)
 
 		if cfg.pchheader and not cfg.flags.NoPCH then
-			_p('  FORCE_INCLUDE += -include $(OBJDIR)/$(notdir $(PCH))')
+			_p('  FORCE_INCLUDE      += -include $(OBJDIR)/$(notdir $(PCH))')
+			_p('  FORCE_INCLUDE_OBJC += -include $(OBJDIR)/$(notdir $(PCH))_objc')
 		end
 
 		if #cfg.forcedincludes > 0 then
-			_p('  FORCE_INCLUDE += -include %s'
+			_p('  FORCE_INCLUDE      += -include %s'
 					,_MAKE.esc(table.concat(cfg.forcedincludes, ";")))
 		end
 
-		_p('  ALL_CPPFLAGS  += $(CPPFLAGS) %s $(DEFINES) $(INCLUDES)', table.concat(cc.getcppflags(cfg), " "))
+		_p('  ALL_CPPFLAGS       += $(CPPFLAGS) %s $(DEFINES) $(INCLUDES)', table.concat(cc.getcppflags(cfg), " "))
 
-		_p('  ALL_CFLAGS    += $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH)%s', make.list(table.join(cc.getcflags(cfg), cfg.buildoptions, cfg.buildoptions_c)))
-		_p('  ALL_CXXFLAGS  += $(CXXFLAGS) $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH)%s', make.list(table.join(cc.getcflags(cfg), cc.getcxxflags(cfg), cfg.buildoptions, cfg.buildoptions_cpp)))
-		_p('  ALL_OBJCFLAGS += $(CXXFLAGS) $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH)%s', make.list(table.join(cc.getcflags(cfg), cc.getcxxflags(cfg), cfg.buildoptions, cfg.buildoptions_objc)))
+		_p('  ALL_ASMFLAGS       += $(ASMFLAGS) $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH)%s', make.list(table.join(cc.getcflags(cfg), cfg.buildoptions, cfg.buildoptions_asm)))
+		_p('  ALL_CFLAGS         += $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH)%s', make.list(table.join(cc.getcflags(cfg), cfg.buildoptions, cfg.buildoptions_c)))
+		_p('  ALL_CXXFLAGS       += $(CXXFLAGS) $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH)%s', make.list(table.join(cc.getcflags(cfg), cc.getcxxflags(cfg), cfg.buildoptions, cfg.buildoptions_cpp)))
+		_p('  ALL_OBJCFLAGS      += $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH)%s', make.list(table.join(cc.getcflags(cfg), cfg.buildoptions, cfg.buildoptions_objc)))
+		_p('  ALL_OBJCPPFLAGS    += $(CXXFLAGS) $(CFLAGS) $(ALL_CPPFLAGS) $(ARCH)%s', make.list(table.join(cc.getcflags(cfg), cc.getcxxflags(cfg), cfg.buildoptions, cfg.buildoptions_objcpp)))
 
-		_p('  ALL_RESFLAGS  += $(RESFLAGS) $(DEFINES) $(INCLUDES)%s',
+		_p('  ALL_RESFLAGS       += $(RESFLAGS) $(DEFINES) $(INCLUDES)%s',
 		        make.list(table.join(cc.getdefines(cfg.resdefines),
 		                                cc.getincludedirs(cfg.resincludedirs), cfg.resoptions)))
 	end
@@ -386,18 +409,18 @@
 
 	function cpp.linker(prj, cfg, cc)
 		-- Patch #3401184 changed the order
-		_p('  ALL_LDFLAGS   += $(LDFLAGS)%s', make.list(table.join(cc.getlibdirflags(cfg), cc.getldflags(cfg), cfg.linkoptions)))
+		_p('  ALL_LDFLAGS        += $(LDFLAGS)%s', make.list(table.join(cc.getlibdirflags(cfg), cc.getldflags(cfg), cfg.linkoptions)))
 
-		_p('  LDDEPS        +=%s', make.list(_MAKE.esc(premake.getlinks(cfg, "siblings", "fullpath"))))
-		_p('  LIBS          += $(LDDEPS)%s', make.list(cc.getlinkflags(cfg)))
-		_p('  EXTERNAL_LIBS +=%s', make.list(cc.getlibfiles(cfg)))
+		_p('  LDDEPS             +=%s', make.list(_MAKE.esc(premake.getlinks(cfg, "siblings", "fullpath"))))
+		_p('  LIBS               += $(LDDEPS)%s', make.list(cc.getlinkflags(cfg)))
+		_p('  EXTERNAL_LIBS      +=%s', make.list(cc.getlibfiles(cfg)))
 
 		if cfg.kind == "StaticLib" then
 			if (not prj.options.ArchiveSplit) then
-				_p('  LINKCMD        = $(AR) %s $(TARGET)', make.list(cc.getarchiveflags(prj, cfg, false)))
+				_p('  LINKCMD             = $(AR) %s $(TARGET)', make.list(cc.getarchiveflags(prj, cfg, false)))
 			else
-				_p('  LINKCMD        = $(AR) %s $(TARGET)', make.list(cc.getarchiveflags(prj, cfg, false)))
-				_p('  LINKCMD_NDX    = $(AR) %s $(TARGET)', make.list(cc.getarchiveflags(prj, cfg, true)))
+				_p('  LINKCMD             = $(AR) %s $(TARGET)', make.list(cc.getarchiveflags(prj, cfg, false)))
+				_p('  LINKCMD_NDX         = $(AR) %s $(TARGET)', make.list(cc.getarchiveflags(prj, cfg, true)))
 			end
 		else
 
@@ -407,7 +430,7 @@
 			-- $(LIBS) moved to end (http://sourceforge.net/p/premake/bugs/279/)
 
 			local tool = iif(cfg.language == "C", "CC", "CXX")
-			_p('  LINKCMD        = $(%s) -o $(TARGET) $(OBJECTS) $(RESOURCES) $(ARCH) $(ALL_LDFLAGS) $(LIBS)', tool)
+			_p('  LINKCMD             = $(%s) -o $(TARGET) $(OBJECTS) $(RESOURCES) $(ARCH) $(ALL_LDFLAGS) $(LIBS)', tool)
 
 		end
 	end
@@ -449,15 +472,16 @@
 			end
 		end
 
-		_p('  PCH            = %s', _MAKE.esc(pch))
-		_p('  GCH            = $(OBJDIR)/$(notdir $(PCH)).gch')
+		_p('  PCH                 = %s', _MAKE.esc(pch))
+		_p('  GCH                 = $(OBJDIR)/$(notdir $(PCH)).gch')
+		_p('  GCH_OBJC            = $(OBJDIR)/$(notdir $(PCH))_objc.gch')
 
 	end
 
 
 	function cpp.pchrules(prj)
 		_p('ifneq (,$(PCH))')
-		_p('$(GCH): $(PCH) | $(OBJDIR)')
+		_p('$(GCH): $(PCH) $(MAKEFILE) | $(OBJDIR)')
 		if prj.msgprecompile then
 			_p('\t@echo ' .. prj.msgprecompile)
 		else
@@ -465,6 +489,18 @@
 		end
 
 		local cmd = iif(prj.language == "C", "$(CC) $(ALL_CFLAGS) -x c-header", "$(CXX) $(ALL_CXXFLAGS) -x c++-header")
+		_p('\t$(SILENT) %s $(DEFINES) $(INCLUDES) -o "$@" -c "$<"', cmd)
+
+		_p('')
+
+		_p('$(GCH_OBJC): $(PCH) $(MAKEFILE) | $(OBJDIR)')
+		if prj.msgprecompile then
+			_p('\t@echo ' .. prj.msgprecompile)
+		else
+			_p('\t@echo $(notdir $<)')
+		end
+
+		local cmd = iif(prj.language == "C", "$(CC) $(ALL_OBJCFLAGS) -x objective-c-header", "$(CXX) $(ALL_OBJCPPFLAGS) -x objective-c++-header")
 		_p('\t$(SILENT) %s $(DEFINES) $(INCLUDES) -o "$@" -c "$<"', cmd)
 
 		_p('endif')
@@ -476,14 +512,24 @@
 -- Build command for a single file.
 --
 
-	function cpp.fileRules(prj)
-		table.sort(prj.files)
-		for _, file in ipairs(prj.files or {}) do
+	function cpp.fileRules(prj, cc)
+		local platforms = premake.filterplatforms(prj.solution, cc.platforms, "Native")
+
+		table.sort(prj.allfiles)
+
+		for _, file in ipairs(prj.allfiles or {}) do
 			if path.isSourceFile(file) then
-				_p('$(OBJDIR)/%s.o: %s $(GCH)'
-					, _MAKE.esc(path.trimdots(path.removeext(file)))
-					, _MAKE.esc(file)
-					)
+				if (path.isobjcfile(file)) then
+					_p('$(OBJDIR)/%s.o: %s $(GCH_OBJC) $(MAKEFILE)'
+						, _MAKE.esc(path.trimdots(path.removeext(file)))
+						, _MAKE.esc(file)
+						)
+				else
+					_p('$(OBJDIR)/%s.o: %s $(GCH) $(MAKEFILE)'
+						, _MAKE.esc(path.trimdots(path.removeext(file)))
+						, _MAKE.esc(file)
+						)
+				end
 				if (path.isobjcfile(file) and prj.msgcompile_objc) then
 					_p('\t@echo ' .. prj.msgcompile_objc)
 				elseif prj.msgcompile then
@@ -492,7 +538,13 @@
 					_p('\t@echo $(notdir $<)')
 				end
 				if (path.isobjcfile(file)) then
-					_p('\t$(SILENT) $(CXX) $(ALL_OBJCFLAGS) $(FORCE_INCLUDE) -o "$@" -c "$<"')
+					if (path.iscfile(file)) then
+						_p('\t$(SILENT) $(CXX) $(ALL_OBJCFLAGS) $(FORCE_INCLUDE_OBJC) -o "$@" -c "$<"')
+					else
+						_p('\t$(SILENT) $(CXX) $(ALL_OBJCPPFLAGS) $(FORCE_INCLUDE_OBJC) -o "$@" -c "$<"')
+					end
+				elseif (path.isasmfile(file)) then
+					_p('\t$(SILENT) $(CC) $(ALL_ASMFLAGS) -o "$@" -c "$<"')
 				else
 					cpp.buildcommand(path.iscfile(file) and not prj.options.ForceCPP, "o")
 				end

@@ -25,7 +25,7 @@
 			<bounds x="0.25" y="0.5" width="1.5" height="1.0" />
 		</text>
 	</element>
-	
+
 	<element name="radio" defstate="0">
 		<disk state="0">
 			<bounds x="0" y="0" width="2.0" height="2.0" />

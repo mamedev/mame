@@ -348,7 +348,6 @@ apexc_cpu_device::apexc_cpu_device(const machine_config &mconfig, const char *ta
 	, m_working_store(1)
 	, m_running(0)
 	, m_pc(0)
-	, m_ml_full(0)
 {
 }
 
@@ -497,7 +496,6 @@ void apexc_cpu_device::execute()
 	function = (m_cr >> 7) & 0x1F;
 	c6 = (m_cr >> 1) & 0x3F;
 	vector = m_cr & 1;
-	m_pc = y<<2;
 
 	function &= 0x1E;   /* this is a mere guess - the LSBit is reserved for future additions */
 
@@ -553,7 +551,6 @@ void apexc_cpu_device::execute()
 			{
 				/* load ml with X */
 				delay1 = load_ml(x, vector);
-				m_pc = x<<2;
 				/* burn pre-fetch delay if needed */
 				if (delay1)
 				{
@@ -749,6 +746,8 @@ void apexc_cpu_device::execute()
 	in order not to load ml with Y) */
 special_fetch:
 
+	m_pc = effective_address(m_ml) << 2;
+
 	/* fetch current instruction into control register */
 	m_cr = word_read(m_ml, 0);
 }
@@ -771,56 +770,44 @@ void apexc_cpu_device::device_start()
 	state_add( APEXC_CR, "CR", m_cr ).formatstr("%08X");
 	state_add( APEXC_A, "A", m_a ).formatstr("%08X");
 	state_add( APEXC_R, "R", m_r ).formatstr("%08X");
-	state_add( APEXC_ML, "ML", m_ml ).mask(0xfff).formatstr("%03X");
-	state_add( APEXC_WS, "WS", m_working_store ).mask(0x01);
+	state_add( APEXC_ML, "ML", m_ml ).mask(0x3ff).callimport().formatstr("%03X");
+	state_add( APEXC_WS, "WS", m_working_store ).mask(0xf).callimport();
 	state_add( APEXC_STATE, "CPU state", m_running ).mask(0x01);
-	state_add( APEXC_PC, "PC", m_pc ).callimport().callexport().formatstr("%03X");
-	state_add( APEXC_ML_FULL, "ML_FULL", m_ml_full ).callimport().callexport().noshow();
-	state_add(STATE_GENPCBASE, "CURPC", m_pc).noshow();
+	state_add( STATE_GENPC, "PC", m_pc ).mask(0x7ffc).callimport().formatstr("%04X");
+	state_add( STATE_GENPCBASE, "CURPC", m_pc ).mask(0x7ffc).callimport().noshow();
 
 	m_icountptr = &m_icount;
 }
 
 
+//-------------------------------------------------
+//  state_import - import state into the device,
+//  after it has been set
+//-------------------------------------------------
+
 void apexc_cpu_device::state_import(const device_state_entry &entry)
 {
 	switch (entry.index())
 	{
-		case APEXC_PC:
+		case STATE_GENPC:
+		case STATE_GENPCBASE:
 			/* keep address 9 LSBits - 10th bit depends on whether we are accessing the permanent
 			track group or a switchable one */
-			m_ml = m_pc & 0x1ff;
-			if (m_pc & 0x1e00)
-			{   /* we are accessing a switchable track group */
+			m_ml = (m_pc >> 2) & 0x1ff;
+			if ((m_pc >> 2) & 0x1e00)
+			{
+				/* we are accessing a switchable track group */
 				m_ml |= 0x200;  /* set 10th bit */
-
-				if (((m_pc >> 9) & 0xf) != m_working_store)
-				{   /* we need to do a store switch */
-					m_working_store = ((m_pc >> 9) & 0xf);
-				}
+				m_working_store = (m_pc >> 11) & 0xf;
 			}
+
+			/* fetch current instruction into control register */
+			m_cr = m_program->read_dword(m_pc);
 			break;
-	}
-}
 
-
-void apexc_cpu_device::state_export(const device_state_entry &entry)
-{
-	switch (entry.index())
-	{
-		case APEXC_ML_FULL:
-			m_ml_full = effective_address(m_ml);
-			break;
-	}
-}
-
-
-void apexc_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
-{
-	switch (entry.index())
-	{
-		case STATE_GENFLAGS:
-			str = string_format("%c", m_running ? 'R' : 'S');
+		case APEXC_ML:
+		case APEXC_WS:
+			m_pc = effective_address(m_ml) << 2;
 			break;
 	}
 }

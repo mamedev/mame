@@ -156,7 +156,7 @@
 		<backdrop name="button_back"  element="button_aux_back">  <bounds x="120" y=" 84" width="25" height="25"/></backdrop>
 		<backdrop name="button_alpha" element="button_aux_back">  <bounds x="120" y="118" width="25" height="25"/></backdrop>
 		<backdrop name="button_enter" element="button_enter_back"><bounds x="120" y="152" width="25" height="25"/></backdrop>
-		
+
 		<backdrop name="vfd_backdrop" element="vfd_back">         <bounds x=" 0" y=" 0" width="162" height="32"/></backdrop>
 
 		<bezel name="vfd0"  element="vfd0" state="0"><bounds x="  9" y="9" width="9" height="14"/></bezel>
@@ -175,7 +175,7 @@
 		<bezel name="vfd13" element="vfd0" state="0"><bounds x="126" y="9" width="9" height="14"/></bezel>
 		<bezel name="vfd14" element="vfd0" state="0"><bounds x="135" y="9" width="9" height="14"/></bezel>
 		<bezel name="vfd15" element="vfd0" state="0"><bounds x="144" y="9" width="9" height="14"/></bezel>
-		
+
 		<bezel name="button_1_text1"     element="button_1_text">    <bounds x=" 18" y=" 54" width="25" height="8"/></bezel>
 		<bezel name="button_1_text2"     element="button_1_num">     <bounds x=" 18" y=" 64" width="25" height="8"/></bezel>
 		<bezel name="button_2_text1"     element="button_2_text">    <bounds x=" 52" y=" 54" width="25" height="8"/></bezel>

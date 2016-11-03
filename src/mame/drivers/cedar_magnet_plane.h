@@ -19,15 +19,15 @@ class cedar_magnet_plane_device :  public cedar_magnet_board_device
 public:
 	// construction/destruction
 	cedar_magnet_plane_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	
+
 	DECLARE_READ8_MEMBER(pio0_pa_r);
 	DECLARE_WRITE8_MEMBER(pio0_pa_w);
-//	DECLARE_READ8_MEMBER(pio0_pb_r);
+//  DECLARE_READ8_MEMBER(pio0_pb_r);
 	DECLARE_WRITE8_MEMBER(pio0_pb_w);
 
-//	DECLARE_READ8_MEMBER(pio1_pa_r);
+//  DECLARE_READ8_MEMBER(pio1_pa_r);
 	DECLARE_WRITE8_MEMBER(pio1_pa_w);
-//	DECLARE_READ8_MEMBER(pio1_pb_r);
+//  DECLARE_READ8_MEMBER(pio1_pb_r);
 	DECLARE_WRITE8_MEMBER(pio1_pb_w);
 
 	DECLARE_WRITE8_MEMBER(plane_portcc_w);
@@ -51,7 +51,7 @@ public:
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual void device_start() override;
-//	virtual void device_reset() override;
+//  virtual void device_reset() override;
 
 private:
 };

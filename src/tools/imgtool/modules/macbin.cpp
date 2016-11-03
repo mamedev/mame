@@ -184,18 +184,15 @@ static imgtoolerr_t macbinary_readfile(imgtool::partition &partition, const char
 static imgtoolerr_t write_fork(imgtool::partition &partition, const char *filename, const char *fork,
 	imgtool::stream &sourcef, uint64_t pos, uint64_t fork_len, util::option_resolution *opts)
 {
-	imgtoolerr_t err = IMGTOOLERR_SUCCESS;
-	imgtool::stream *mem_stream = NULL;
+	imgtoolerr_t err;
+	imgtool::stream::ptr mem_stream;
 	size_t len;
 
 	if (fork_len > 0)
 	{
-		mem_stream = imgtool::stream::open_mem(NULL, 0);
+		mem_stream = imgtool::stream::open_mem(nullptr, 0);
 		if (!mem_stream)
-		{
-			err = IMGTOOLERR_OUTOFMEMORY;
-			goto done;
-		}
+			return IMGTOOLERR_OUTOFMEMORY;
 
 		sourcef.seek(pos, SEEK_SET);
 		len = imgtool::stream::transfer(*mem_stream, sourcef, fork_len);
@@ -205,13 +202,10 @@ static imgtoolerr_t write_fork(imgtool::partition &partition, const char *filena
 		mem_stream->seek(0, SEEK_SET);
 		err = partition.write_file(filename, fork, *mem_stream, opts, NULL);
 		if (err)
-			goto done;
+			return err;
 	}
 
-done:
-	if (mem_stream)
-		delete mem_stream;
-	return err;
+	return IMGTOOLERR_SUCCESS;
 }
 
 

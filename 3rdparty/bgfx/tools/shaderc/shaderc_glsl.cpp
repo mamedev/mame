@@ -6,9 +6,9 @@
 #include "shaderc.h"
 #include "glsl_optimizer.h"
 
-namespace bgfx
+namespace bgfx { namespace glsl
 {
-	bool compileGLSLShader(bx::CommandLine& _cmdLine, uint32_t _gles, const std::string& _code, bx::WriterI* _writer)
+	static bool compile(bx::CommandLine& _cmdLine, uint32_t _version, const std::string& _code, bx::WriterI* _writer)
 	{
 		char ch = char(tolower(_cmdLine.findOption('\0', "type")[0]) );
 		const glslopt_shader_type type = ch == 'f'
@@ -16,7 +16,7 @@ namespace bgfx
 			: (ch == 'c' ? kGlslOptShaderCompute : kGlslOptShaderVertex);
 
 		glslopt_target target = kGlslTargetOpenGL;
-		switch (_gles)
+		switch (_version)
 		{
 		case BX_MAKEFOURCC('M', 'T', 'L', 0):
 			target = kGlslTargetMetal;
@@ -42,20 +42,24 @@ namespace bgfx
 		if (!glslopt_get_status(shader) )
 		{
 			const char* log = glslopt_get_log(shader);
-			int32_t source = 0;
-			int32_t line = 0;
-			int32_t column = 0;
-			int32_t start = 0;
-			int32_t end = INT32_MAX;
+			int32_t source  = 0;
+			int32_t line    = 0;
+			int32_t column  = 0;
+			int32_t start   = 0;
+			int32_t end     = INT32_MAX;
 
-			if (3 == sscanf(log, "%u:%u(%u):", &source, &line, &column)
+			bool found = false
+				|| 3 == sscanf(log, "%u:%u(%u):", &source, &line, &column)
+				;
+
+			if (found
 			&&  0 != line)
 			{
 				start = bx::uint32_imax(1, line-10);
-				end = start + 20;
+				end   = start + 20;
 			}
 
-			printCode(_code.c_str(), line, start, end);
+			printCode(_code.c_str(), line, start, end, column);
 			fprintf(stderr, "Error: %s\n", log);
 			glslopt_cleanup(ctx);
 			return false;
@@ -69,7 +73,7 @@ namespace bgfx
 			optimizedShader = bx::strnl(optimizedShader);
 		}
 
-		if (0 != _gles)
+		if (0 != _version)
 		{
 			char* code = const_cast<char*>(optimizedShader);
 			strReplace(code, "gl_FragDepthEXT", "gl_FragDepth");
@@ -218,6 +222,13 @@ namespace bgfx
 		glslopt_cleanup(ctx);
 
 		return true;
+	}
+
+} // namespace glsl
+
+	bool compileGLSLShader(bx::CommandLine& _cmdLine, uint32_t _version, const std::string& _code, bx::WriterI* _writer)
+	{
+		return glsl::compile(_cmdLine, _version, _code, _writer);
 	}
 
 } // namespace bgfx

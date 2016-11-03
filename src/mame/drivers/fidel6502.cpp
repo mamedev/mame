@@ -4,7 +4,7 @@
 /******************************************************************************
 
     Fidelity Electronics 6502 based board driver
-    
+
     NOTE: MAME doesn't include a generalized implementation for boardpieces yet,
     greatly affecting user playability of emulated electronic board games.
     As workaround for the chess games, use an external chess GUI on the side,
@@ -238,7 +238,7 @@ CPU is a R65C02P4, running at 4MHz
 
 NE556 dual-timer IC:
 - timer#1, one-shot at power-on, to CPU _RESET
-- timer#2: R1=82K, R2=1K, C=22nf, to CPU _IRQ: ~780Hz, active low=15.25us
+- timer#2: R1=82K+50K pot at 26K, R2=1K, C=22nf, to CPU _IRQ: ~596Hz, active low=15.25us
 
 Memory map:
 -----------
@@ -356,11 +356,18 @@ Ricoh RP65C02G CPU, 3MHz XTAL
 PCB label 510-1129A01
 basically same as Excellence hardware, reskinned board
 
-Designer 1500 is on 80C50 hardware
+Designer 2100 (model 6103): same hardware, XTAL 5MHz?, ROMs unknown
 
 Designer 2100 Display (model 6106)
 ----------------
-TODO
+8KB RAM(MS6264L-10), 2*32KB ROM(27C256)
+WDC W65C02P-6 CPU, 6MHz XTAL
+4-digit LCD panel
+PCB label 510-1130A01
+
+Designer 2000 Display (model 6105): same hardware, XTAL and ROMs unknown
+
+Designer 1500 is on 80C50 hardware
 
 
 ******************************************************************************
@@ -375,7 +382,7 @@ Ricoh RP65C02G CPU, 5MHz XTAL
 8-bit DAC speech timed via IRQ, 128KB ROM(AMI custom label)
 PCB label 510-1141C01
 
-I/O is via TTL, see source code for more info
+I/O is via TTL, very similar to Designer Display
 
 ******************************************************************************/
 
@@ -392,7 +399,8 @@ I/O is via TTL, see source code for more info
 // internal artwork
 #include "fidel_chesster.lh" // clickable
 #include "fidel_csc.lh" // clickable, with preliminary boardpieces simulation
-#include "fidel_des2000.lh" // clickable
+#include "fidel_des.lh" // clickable
+#include "fidel_desdis.lh" // clickable
 #include "fidel_eag.lh" // clickable
 #include "fidel_eas.lh" // clickable
 #include "fidel_ex.lh" // clickable
@@ -419,7 +427,7 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(M6502_IRQ_LINE, ASSERT_LINE); }
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(M6502_IRQ_LINE, CLEAR_LINE); }
-
+	
 	// CSC, SU9, RSC
 	void csc_prepare_display();
 	DECLARE_READ8_MEMBER(csc_speech_r);
@@ -462,9 +470,14 @@ public:
 	DECLARE_READ8_MEMBER(fexcelb_ttl_r);
 	DECLARE_READ8_MEMBER(fexcel_ttl_r);
 
+	// Designer Display
+	DECLARE_WRITE8_MEMBER(fdesdis_control_w);
+	DECLARE_WRITE8_MEMBER(fdesdis_lcd_w);
+	DECLARE_READ8_MEMBER(fdesdis_input_r);
+	DECLARE_DRIVER_INIT(fdesdis);
+
 	// Chesster
 	DECLARE_WRITE8_MEMBER(chesster_control_w);
-	DECLARE_READ8_MEMBER(chesster_input_r);
 	DECLARE_DRIVER_INIT(chesster);
 };
 
@@ -802,7 +815,7 @@ WRITE8_MEMBER(fidel6502_state::fexcel_ttl_w)
 	uint8_t led_data = sel & 0xff;
 	m_inp_mux = sel & 0x1ff;
 
-	// 7442 9: speaker out (optional?)
+	// 7442 9: speaker out
 	m_dac->write(BIT(sel, 9));
 
 	// 74259 Q4-Q7,Q2,Q1: digit/led select (active low)
@@ -861,6 +874,70 @@ READ8_MEMBER(fidel6502_state::fexcel_ttl_r)
 
 
 /******************************************************************************
+    Designer Display
+******************************************************************************/
+
+// TTL/generic
+
+WRITE8_MEMBER(fidel6502_state::fdesdis_control_w)
+{
+	uint8_t q3_old = m_led_select & 8;
+	
+	// a0-a2,d7: 74259
+	uint8_t mask = 1 << offset;
+	m_led_select = (m_led_select & ~mask) | ((data & 0x80) ? mask : 0);
+
+	// 74259 Q4-Q7: 7442 a0-a3
+	// 7442 0-8: led data, input mux
+	uint16_t sel = 1 << (m_led_select >> 4 & 0xf) & 0x3ff;
+	m_inp_mux = sel & 0x1ff;
+
+	// 7442 9: speaker out
+	m_dac->write(BIT(sel, 9));
+
+	// 74259 Q0,Q1: led select (active low)
+	display_matrix(9, 2, m_inp_mux, ~m_led_select & 3, false);
+
+	// 74259 Q2: book rom A14
+	membank("bank1")->set_entry(~m_led_select >> 2 & 1);
+
+	// 74259 Q3: lcd common, update on rising edge
+	if (~q3_old & m_led_select & 8)
+	{
+		for (int i = 0; i < 4; i++)
+			m_display_state[i+2] = m_7seg_data >> (8*i) & 0xff;
+	}
+	
+	m_display_maxy += 4;
+	set_display_segmask(0x3c, 0x7f);
+	display_update();
+}
+
+WRITE8_MEMBER(fidel6502_state::fdesdis_lcd_w)
+{
+	// a0-a2,d0-d3: 4*74259 to lcd digit segments
+	uint32_t mask = BITSWAP8(1 << offset,3,7,6,0,1,2,4,5);
+	for (int i = 0; i < 4; i++)
+	{
+		m_7seg_data = (m_7seg_data & ~mask) | ((data >> i & 1) ? 0 : mask);
+		mask <<= 8;
+	}
+}
+
+READ8_MEMBER(fidel6502_state::fdesdis_input_r)
+{
+	// a0-a2,d7: multiplexed inputs (active low)
+	return (read_inputs(9) >> offset & 1) ? 0 : 0x80;
+}
+
+DRIVER_INIT_MEMBER(fidel6502_state, fdesdis)
+{
+	membank("bank1")->configure_entries(0, 2, memregion("user1")->base(), 0x4000);
+}
+
+
+
+/******************************************************************************
     Chesster
 ******************************************************************************/
 
@@ -886,15 +963,9 @@ WRITE8_MEMBER(fidel6502_state::chesster_control_w)
 	membank("bank1")->set_entry((m_led_select >> 2 & 3) | (m_speech_bank >> 1 & 4));
 }
 
-READ8_MEMBER(fidel6502_state::chesster_input_r)
-{
-	// a0-a2,d7: multiplexed inputs (active low)
-	return (read_inputs(9) >> offset & 1) ? 0 : 0x80;
-}
-
 DRIVER_INIT_MEMBER(fidel6502_state, chesster)
 {
-	membank("bank1")->configure_entries(0, 8, memregion("speech")->base(), 0x4000);
+	membank("bank1")->configure_entries(0, 8, memregion("user1")->base(), 0x4000);
 }
 
 
@@ -1013,11 +1084,19 @@ static ADDRESS_MAP_START( fexcelb_map, AS_PROGRAM, 8, fidel6502_state )
 ADDRESS_MAP_END
 
 
-// Chesster
+// Designer Display, Chesster
+
+static ADDRESS_MAP_START( fdesdis_map, AS_PROGRAM, 8, fidel6502_state )
+	AM_RANGE(0x0000, 0x1fff) AM_RAM
+	AM_RANGE(0x2000, 0x2007) AM_MIRROR(0x1ff8) AM_READWRITE(fdesdis_input_r, fdesdis_control_w)
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
+	AM_RANGE(0x6000, 0x6007) AM_MIRROR(0x1ff8) AM_WRITE(fdesdis_lcd_w)
+	AM_RANGE(0x8000, 0xffff) AM_ROM
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( chesster_map, AS_PROGRAM, 8, fidel6502_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
-	AM_RANGE(0x2000, 0x2007) AM_MIRROR(0x1ff8) AM_READWRITE(chesster_input_r, chesster_control_w)
+	AM_RANGE(0x2000, 0x2007) AM_MIRROR(0x1ff8) AM_READWRITE(fdesdis_input_r, chesster_control_w)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x1fff) AM_DEVWRITE("dac8", dac_byte_interface, write)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -1422,7 +1501,7 @@ static INPUT_PORTS_START( fexcel )
 	PORT_CONFSETTING(    0x00, DEF_STR( Normal ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( fdes2000 )
+static INPUT_PORTS_START( fdes )
 	PORT_INCLUDE( fexcel )
 
 	PORT_MODIFY("IN.9")
@@ -1430,18 +1509,28 @@ static INPUT_PORTS_START( fdes2000 )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( chesster )
+static INPUT_PORTS_START( fdesdis )
 	PORT_INCLUDE( cb_buttons )
 
 	PORT_START("IN.8")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_NAME("Clear")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H) PORT_NAME("Move / Alternate")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_NAME("Hint / Info")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F) PORT_NAME("Take Back / Replay")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_C) PORT_NAME("Level / New")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_B) PORT_NAME("Option / Time")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_NAME("Verify / Problem")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_NAME("Shift")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( chesster )
+	PORT_INCLUDE( fdesdis )
+
+	PORT_MODIFY("IN.8")
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_H) PORT_NAME("Move / No")
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_NAME("Hint / Yes")
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_F) PORT_NAME("Take Back / Repeat")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_C) PORT_NAME("Level / New")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_B) PORT_NAME("Option / Replay")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_NAME("Verify / Problem")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_LSHIFT) PORT_CODE(KEYCODE_RSHIFT) PORT_NAME("Shift")
 INPUT_PORTS_END
 
 
@@ -1572,9 +1661,9 @@ static MACHINE_CONFIG_START( sc9, fidel6502_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 1400000) // from ceramic resonator "681 JSA", measured
 	MCFG_CPU_PROGRAM_MAP(sc9_map)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidel6502_state, irq_on, attotime::from_hz(602)) // from 555 timer, measured
-	MCFG_TIMER_START_DELAY(attotime::from_hz(602) - attotime::from_usec(42)) // active for 42us
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel6502_state, irq_off, attotime::from_hz(602))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidel6502_state, irq_on, attotime::from_hz(610)) // from 555 timer (22nf, 102K, 2.7K)
+	MCFG_TIMER_START_DELAY(attotime::from_hz(610) - attotime::from_usec(41)) // active for 41us
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel6502_state, irq_off, attotime::from_hz(610))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelz80base_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_fidel_sc9)
@@ -1613,9 +1702,9 @@ static MACHINE_CONFIG_START( sc12, fidel6502_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", R65C02, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(sc12_map)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidel6502_state, irq_on, attotime::from_hz(780)) // from 556 timer (22nf, 82kohm, 1kohm)
-	MCFG_TIMER_START_DELAY(attotime::from_hz(780) - attotime::from_nsec(15250)) // active for 15.25us
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel6502_state, irq_off, attotime::from_hz(780))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidel6502_state, irq_on, attotime::from_hz(596)) // from 556 timer (22nf, 82K+26K, 1K)
+	MCFG_TIMER_START_DELAY(attotime::from_hz(596) - attotime::from_nsec(15250)) // active for 15.25us
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel6502_state, irq_off, attotime::from_hz(596))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelz80base_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_fidel_sc12)
@@ -1638,7 +1727,7 @@ static MACHINE_CONFIG_START( fexcel, fidel6502_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M65SC02, XTAL_12MHz/4) // G65SC102P-3, 12.0M ceramic resonator
 	MCFG_CPU_PROGRAM_MAP(fexcel_map)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidel6502_state, irq_on, attotime::from_hz(630)) // from 556 timer (22nf, 102kohm, 1kohm)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidel6502_state, irq_on, attotime::from_hz(630)) // from 556 timer (22nf, 102K, 1K)
 	MCFG_TIMER_START_DELAY(attotime::from_hz(630) - attotime::from_nsec(15250)) // active for 15.25us
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel6502_state, irq_off, attotime::from_hz(630))
 
@@ -1675,11 +1764,11 @@ static MACHINE_CONFIG_DERIVED( fdes2000, fexcel )
 	// change irq timer frequency
 	MCFG_DEVICE_REMOVE("irq_on")
 	MCFG_DEVICE_REMOVE("irq_off")
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidel6502_state, irq_on, attotime::from_hz(585)) // from 556 timer (22nf, 110kohm, 1kohm)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidel6502_state, irq_on, attotime::from_hz(585)) // from 556 timer (22nf, 110K, 1K)
 	MCFG_TIMER_START_DELAY(attotime::from_hz(585) - attotime::from_nsec(15250)) // active for 15.25us
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel6502_state, irq_off, attotime::from_hz(585))
 
-	MCFG_DEFAULT_LAYOUT(layout_fidel_des2000)
+	MCFG_DEFAULT_LAYOUT(layout_fidel_des)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( fexcelv, fexcelb )
@@ -1694,6 +1783,25 @@ static MACHINE_CONFIG_DERIVED( fexceld, fexcelb )
 
 	/* basic machine hardware */
 	MCFG_DEFAULT_LAYOUT(layout_fidel_exd)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_START( fdes2100d, fidel6502_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", M65C02, XTAL_6MHz) // W65C02P-6
+	MCFG_CPU_PROGRAM_MAP(fdesdis_map)
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidel6502_state, irq_on, attotime::from_hz(630)) // from 556 timer (22nf, 102K, 1K)
+	MCFG_TIMER_START_DELAY(attotime::from_hz(630) - attotime::from_nsec(15250)) // active for 15.25us
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_off", fidel6502_state, irq_off, attotime::from_hz(630))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelz80base_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_fidel_desdis)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( chesster, fidel6502_state )
@@ -2060,11 +2168,20 @@ ROM_START( fdes2000 )
 ROM_END
 
 
+ROM_START( fdes2100d ) // The 'rev B' dump came from a post-release bugfix by Fidelity
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("i9_orange.ic9", 0x8000, 0x8000, CRC(83fec02a) SHA1(6f43ab05bc605061989b05d0592dbd184efff9d4) ) // WSI 27C256L-12
+
+	ROM_REGION( 0x8000, "user1", 0 )
+	ROM_LOAD("bk3_white.ic10", 0x0000, 0x8000, CRC(3857cc35) SHA1(f073dafb9fd885c7ddb7fbff10e3653f343ef1c6) ) // WSI 27C256L-12
+ROM_END
+
+
 ROM_START( chesster )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("chesster.ic9", 0x8000, 0x8000, CRC(29f9a698) SHA1(4c83ca46fd5fc9c40302e9c7f16b4ae2c18b06e6) ) // M27C256B, sticker but no label
 
-	ROM_REGION( 0x20000, "speech", 0 )
+	ROM_REGION( 0x20000, "user1", 0 )
 	ROM_LOAD("101-1091a02.ic10", 0x0000, 0x20000, CRC(2b4d243c) SHA1(921e51978facb502b207b4f64a73b1e74127e826) ) // AMI, 27C010 or equivalent
 ROM_END
 
@@ -2112,8 +2229,10 @@ CONS( 1987, fexcelv,    fexcel,   0,      fexcelv,   fexcelv,   driver_device, 0
 CONS( 1987, fexceld,    fexcel,   0,      fexceld,   fexcelb,   driver_device, 0, "Fidelity Electronics", "Excel Display", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1985, fexcela,    fexcel,   0,      fexcel,    fexcel,    driver_device, 0, "Fidelity Electronics", "The Excellence (model EP12)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 1st version of The Excellence
 CONS( 1985, fexcelb,    fexcel,   0,      fexcel,    fexcel,    driver_device, 0, "Fidelity Electronics", "The Excellence (model 6080)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1986, fexcelp,    fexcel,   0,      fexcelp,   fexcel,    driver_device, 0, "Fidelity Electronics", "The Par Excellence", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1986, fexcelp,    0,        0,      fexcelp,   fexcel,    driver_device, 0, "Fidelity Electronics", "The Par Excellence", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1989, fdes2000,   0,        0,      fdes2000,  fdes2000,  driver_device, 0, "Fidelity Electronics", "Designer 2000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // Excellence series hardware
+CONS( 1989, fdes2000,   0,        0,      fdes2000,  fdes,      driver_device, 0, "Fidelity Electronics", "Designer 2000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // Excellence series hardware
+
+CONS( 1988, fdes2100d,  0,        0,      fdes2100d, fdesdis,   fidel6502_state, fdesdis, "Fidelity Electronics", "Designer 2100 Display (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1990, chesster,   0,        0,      chesster,  chesster,  fidel6502_state, chesster, "Fidelity Electronics", "Chesster Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

@@ -157,7 +157,7 @@ void lsasquad_state::drawbg( bitmap_ind16 &bitmap, const rectangle &cliprect, in
 	}
 }
 
-void lsasquad_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
+void lsasquad_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t priority )
 {
 	uint8_t *spriteram = m_spriteram;
 	int offs;
@@ -166,10 +166,10 @@ void lsasquad_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 	{
 		int sx, sy, attr, code, color, flipx, flipy;
 
-		sx = spriteram[offs + 3];
-		sy = 240 - spriteram[offs];
 		attr = spriteram[offs + 1];
 		code = spriteram[offs + 2] + ((attr & 0x30) << 4);
+		sx = spriteram[offs + 3];
+		sy = 240 - spriteram[offs];
 		color = attr & 0x0f;
 		flipx = attr & 0x40;
 		flipy = attr & 0x80;
@@ -202,7 +202,7 @@ uint32_t lsasquad_state::screen_update_lsasquad(screen_device &screen, bitmap_in
 
 	draw_layer(bitmap, cliprect, m_scrollram + 0x000);
 	draw_layer(bitmap, cliprect, m_scrollram + 0x080);
-	draw_sprites(bitmap, cliprect);
+	draw_sprites(bitmap, cliprect, 0);
 	draw_layer(bitmap, cliprect, m_scrollram + 0x100);
 	return 0;
 }
@@ -212,7 +212,7 @@ uint32_t lsasquad_state::screen_update_daikaiju(screen_device &screen, bitmap_in
 {
 	bitmap.fill(511, cliprect);
 	drawbg(bitmap, cliprect, 0); // bottom
-	draw_sprites(bitmap, cliprect);
+	draw_sprites(bitmap, cliprect, 0);
 	drawbg(bitmap, cliprect, 1); // top = palette $d ?
 	return 0;
 }

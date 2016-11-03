@@ -214,7 +214,7 @@ namespace bx
 		{
 			const Ty tmp1 = simd_div(_a, result);
 			const Ty tmp2 = simd_add(tmp1, result);
-			result              = simd_mul(tmp2, half);
+			result        = simd_mul(tmp2, half);
 		}
 
 		return result;
@@ -528,11 +528,11 @@ namespace bx
 	template<typename Ty>
 	BX_SIMD_INLINE bool simd_test_any_ni(Ty _a)
 	{
-		const Ty mask   = simd_sra(_a, 31);
-		const Ty zwxy   = simd_swiz_zwxy(mask);
-		const Ty tmp0   = simd_or(mask, zwxy);
-		const Ty tmp1   = simd_swiz_yyyy(tmp0);
-		const Ty tmp2   = simd_or(tmp0, tmp1);
+		const Ty mask = simd_sra(_a, 31);
+		const Ty zwxy = simd_swiz_zwxy(mask);
+		const Ty tmp0 = simd_or(mask, zwxy);
+		const Ty tmp1 = simd_swiz_yyyy(tmp0);
+		const Ty tmp2 = simd_or(tmp0, tmp1);
 		int res;
 		simd_stx(&res, tmp2);
 		return 0 != res;
@@ -541,13 +541,13 @@ namespace bx
 	template<typename Ty>
 	BX_SIMD_INLINE bool simd_test_all_ni(Ty _a)
 	{
-		const Ty bits   = simd_sra(_a, 31);
-		const Ty m1248  = simd_ild<Ty>(1, 2, 4, 8);
-		const Ty mask   = simd_and(bits, m1248);
-		const Ty zwxy   = simd_swiz_zwxy(mask);
-		const Ty tmp0   = simd_or(mask, zwxy);
-		const Ty tmp1   = simd_swiz_yyyy(tmp0);
-		const Ty tmp2   = simd_or(tmp0, tmp1);
+		const Ty bits  = simd_sra(_a, 31);
+		const Ty m1248 = simd_ild<Ty>(1, 2, 4, 8);
+		const Ty mask  = simd_and(bits, m1248);
+		const Ty zwxy  = simd_swiz_zwxy(mask);
+		const Ty tmp0  = simd_or(mask, zwxy);
+		const Ty tmp1  = simd_swiz_yyyy(tmp0);
+		const Ty tmp2  = simd_or(tmp0, tmp1);
 		int res;
 		simd_stx(&res, tmp2);
 		return 0xf == res;

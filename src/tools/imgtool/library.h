@@ -255,9 +255,9 @@ namespace imgtool
 		uint64_t block_count() const { return m_block_count; }
 
 	private:
-		imgtool_get_info	m_get_info;
-		uint64_t				m_base_block;
-		uint64_t				m_block_count;
+		imgtool_get_info    m_get_info;
+		uint64_t                m_base_block;
+		uint64_t                m_block_count;
 	};
 };
 

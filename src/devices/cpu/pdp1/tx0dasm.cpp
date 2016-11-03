@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "cpu/pdp1/tx0.h"
 
-CPU_DISASSEMBLE( tx0_64kw )
+static offs_t internal_disasm_tx0_64kw(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
 {
 	int md;
 	int x;
@@ -14,22 +14,31 @@ CPU_DISASSEMBLE( tx0_64kw )
 	switch (md >> 16)
 	{
 	case 0:
-		sprintf (buffer, "sto 0%06o", x);
+		util::stream_format(stream, "sto 0%06o", x);
 		break;
 	case 1:
-		sprintf (buffer, "add 0%06o", x);
+		util::stream_format(stream, "add 0%06o", x);
 		break;
 	case 2:
-		sprintf (buffer, "trn 0%06o", x);
+		util::stream_format(stream, "trn 0%06o", x);
 		break;
 	case 3:
-		sprintf (buffer, "opr 0%06o", x);
+		util::stream_format(stream, "opr 0%06o", x);
 		break;
 	}
 	return 1;
 }
 
-CPU_DISASSEMBLE( tx0_8kw )
+CPU_DISASSEMBLE(tx0_64kw)
+{
+	std::ostringstream stream;
+	offs_t result = internal_disasm_tx0_64kw(device, stream, pc, oprom, opram, options);
+	std::string stream_str = stream.str();
+	strcpy(buffer, stream_str.c_str());
+	return result;
+}
+
+static offs_t internal_disasm_tx0_8kw(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
 {
 	int md;
 	int x;
@@ -40,70 +49,70 @@ CPU_DISASSEMBLE( tx0_8kw )
 	switch (md >> 13)
 	{
 	case 0:
-		sprintf (buffer, "sto 0%05o", x);
+		util::stream_format(stream, "sto 0%05o", x);
 		break;
 	case 1:
-		sprintf (buffer, "stx 0%05o", x);
+		util::stream_format(stream, "stx 0%05o", x);
 		break;
 	case 2:
-		sprintf (buffer, "sxa 0%05o", x);
+		util::stream_format(stream, "sxa 0%05o", x);
 		break;
 	case 3:
-		sprintf (buffer, "ado 0%05o", x);
+		util::stream_format(stream, "ado 0%05o", x);
 		break;
 	case 4:
-		sprintf (buffer, "slr 0%05o", x);
+		util::stream_format(stream, "slr 0%05o", x);
 		break;
 	case 5:
-		sprintf (buffer, "slx 0%05o", x);
+		util::stream_format(stream, "slx 0%05o", x);
 		break;
 	case 6:
-		sprintf (buffer, "stz 0%05o", x);
+		util::stream_format(stream, "stz 0%05o", x);
 		break;
 	case 8:
-		sprintf (buffer, "add 0%05o", x);
+		util::stream_format(stream, "add 0%05o", x);
 		break;
 	case 9:
-		sprintf (buffer, "adx 0%05o", x);
+		util::stream_format(stream, "adx 0%05o", x);
 		break;
 	case 10:
-		sprintf (buffer, "ldx 0%05o", x);
+		util::stream_format(stream, "ldx 0%05o", x);
 		break;
 	case 11:
-		sprintf (buffer, "aux 0%05o", x);
+		util::stream_format(stream, "aux 0%05o", x);
 		break;
 	case 12:
-		sprintf (buffer, "llr 0%05o", x);
+		util::stream_format(stream, "llr 0%05o", x);
 		break;
 	case 13:
-		sprintf (buffer, "llx 0%05o", x);
+		util::stream_format(stream, "llx 0%05o", x);
 		break;
 	case 14:
-		sprintf (buffer, "lda 0%05o", x);
+		util::stream_format(stream, "lda 0%05o", x);
 		break;
 	case 15:
-		sprintf (buffer, "lax 0%05o", x);
+		util::stream_format(stream, "lax 0%05o", x);
 		break;
 	case 16:
-		sprintf (buffer, "trn 0%05o", x);
+		util::stream_format(stream, "trn 0%05o", x);
 		break;
 	case 17:
-		sprintf (buffer, "tze 0%05o", x);
+		util::stream_format(stream, "tze 0%05o", x);
 		break;
 	case 18:
-		sprintf (buffer, "tsx 0%05o", x);
+		util::stream_format(stream, "tsx 0%05o", x);
 		break;
 	case 19:
-		sprintf (buffer, "tix 0%05o", x);
+		util::stream_format(stream, "tix 0%05o", x);
 		break;
 	case 20:
-		sprintf (buffer, "tra 0%05o", x);
+		util::stream_format(stream, "tra 0%05o", x);
 		break;
 	case 21:
-		sprintf (buffer, "trx 0%05o", x);
+		util::stream_format(stream, "trx 0%05o", x);
 		break;
 	case 22:
-		sprintf (buffer, "tlv 0%05o", x);
+		util::stream_format(stream, "tlv 0%05o", x);
 		break;
 	case 24:
 	case 25:
@@ -113,11 +122,20 @@ CPU_DISASSEMBLE( tx0_8kw )
 	case 29:
 	case 30:
 	case 31:
-		sprintf (buffer, "opr 0%06o", md & 0177777);
+		util::stream_format(stream, "opr 0%06o", md & 0177777);
 		break;
 	default:
-		sprintf (buffer, "illegal");
+		util::stream_format(stream, "illegal");
 		break;
 	}
 	return 1;
+}
+
+CPU_DISASSEMBLE(tx0_8kw)
+{
+	std::ostringstream stream;
+	offs_t result = internal_disasm_tx0_8kw(device, stream, pc, oprom, opram, options);
+	std::string stream_str = stream.str();
+	strcpy(buffer, stream_str.c_str());
+	return result;
 }

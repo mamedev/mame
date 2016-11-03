@@ -1063,7 +1063,7 @@ void m68000_base_device::state_import(const device_state_entry &entry)
 		case STATE_GENPC:
 			ppc = pc;
 			break;
-		
+
 		case STATE_GENPCBASE:
 			pc = ppc;
 			break;

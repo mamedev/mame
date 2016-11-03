@@ -9,15 +9,15 @@ msgstr ""
 "Project-Id-Version: MAME\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-08-29 01:56+1000\n"
-"PO-Revision-Date: 2016-04-15 21:04+0200\n"
-"Last-Translator: Lothar Serra Mari <scummvm@rootfather.de>\n"
+"PO-Revision-Date: 2016-11-01 10:38+0100\n"
+"Last-Translator: Lothar Serra Mari <rootfather@scummvm.org>\n"
 "Language-Team: MAME Language Team\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 1.8.7\n"
+"X-Generator: Poedit 1.8.11\n"
 
 #: src/frontend/mame/ui/auditmenu.cpp:116
 msgid "Audit in progress..."
@@ -1083,7 +1083,7 @@ msgstr "Treiber"
 
 #: src/frontend/mame/ui/miscmenu.cpp:773
 msgid "This machine has no bios."
-msgstr ""
+msgstr "Diese Maschine besitzt kein BIOS."
 
 #: src/frontend/mame/ui/miscmenu.cpp:787
 msgid "Save machine configuration"
@@ -1644,11 +1644,11 @@ msgstr "Beim Verlassen Bestätigung fordern"
 
 #: src/frontend/mame/ui/submenu.cpp:29
 msgid "Skip information screen at startup"
-msgstr ""
+msgstr "Informations-Bildschirm beim Start überspringen"
 
 #: src/frontend/mame/ui/submenu.cpp:30
 msgid "Force 4:3 aspect for snapshot display"
-msgstr ""
+msgstr "4:3-Seitenverhältnis für Bildschirmfotos erzwingen"
 
 #: src/frontend/mame/ui/submenu.cpp:31
 msgid "Use image as background"
@@ -1664,47 +1664,47 @@ msgstr "Menü zur Softwareauswahl überspringen"
 
 #: src/frontend/mame/ui/submenu.cpp:34
 msgid "Info auto audit"
-msgstr ""
+msgstr "Informationen über automatisches Audit"
 
 #: src/frontend/mame/ui/submenu.cpp:35
 msgid "Hide romless machine from available list"
-msgstr ""
+msgstr "Machine ohne ROMs aus Liste der verfügbaren Maschinen ausblenden"
 
 #: src/frontend/mame/ui/submenu.cpp:39
 msgid "Advanced Options"
-msgstr ""
+msgstr "Erweiterte Optionen"
 
 #: src/frontend/mame/ui/submenu.cpp:40
 msgid "Performance Options"
-msgstr ""
+msgstr "Leistungs-Optionen"
 
 #: src/frontend/mame/ui/submenu.cpp:41
 msgid "Auto frame skip"
-msgstr ""
+msgstr "Bilder automatisch überspringen"
 
 #: src/frontend/mame/ui/submenu.cpp:42
 msgid "Frame skip"
-msgstr ""
+msgstr "Bilder auslassen"
 
 #: src/frontend/mame/ui/submenu.cpp:43
 msgid "Throttle"
-msgstr ""
+msgstr "Drosselung"
 
 #: src/frontend/mame/ui/submenu.cpp:44
 msgid "Sleep"
-msgstr ""
+msgstr "Schlafe"
 
 #: src/frontend/mame/ui/submenu.cpp:45
 msgid "Speed"
-msgstr ""
+msgstr "Geschwindigkeit"
 
 #: src/frontend/mame/ui/submenu.cpp:46
 msgid "Refresh speed"
-msgstr ""
+msgstr "Spielgeschwindigkeit anpassen"
 
 #: src/frontend/mame/ui/submenu.cpp:48
 msgid "Rotation Options"
-msgstr ""
+msgstr "Rotations-Optionen"
 
 #: src/frontend/mame/ui/submenu.cpp:49 src/frontend/mame/ui/videoopt.cpp:204
 msgid "Rotate"
@@ -1712,135 +1712,135 @@ msgstr "Drehen"
 
 #: src/frontend/mame/ui/submenu.cpp:50
 msgid "Rotate right"
-msgstr ""
+msgstr "Nach rechts drehen"
 
 #: src/frontend/mame/ui/submenu.cpp:51
 msgid "Rotate left"
-msgstr ""
+msgstr "Nach links rotieren"
 
 #: src/frontend/mame/ui/submenu.cpp:52
 msgid "Auto rotate right"
-msgstr ""
+msgstr "Automatisch nach rechts rotieren"
 
 #: src/frontend/mame/ui/submenu.cpp:53
 msgid "Auto rotate left"
-msgstr ""
+msgstr "Automatisch nach links rotieren"
 
 #: src/frontend/mame/ui/submenu.cpp:54
 msgid "Flip X"
-msgstr ""
+msgstr "Horizontal spiegeln"
 
 #: src/frontend/mame/ui/submenu.cpp:55
 msgid "Flip Y"
-msgstr ""
+msgstr "Vertikal spiegeln"
 
 #: src/frontend/mame/ui/submenu.cpp:57
 msgid "Artwork Options"
-msgstr ""
+msgstr "Illustrations-Optionen"
 
 #: src/frontend/mame/ui/submenu.cpp:58
 msgid "Artwork Crop"
-msgstr ""
+msgstr "Illustrationen beschneiden"
 
 #: src/frontend/mame/ui/submenu.cpp:59
 msgid "Use Backdrops"
-msgstr ""
+msgstr "Verwende Hintergründe"
 
 #: src/frontend/mame/ui/submenu.cpp:60
 msgid "Use Overlays"
-msgstr ""
+msgstr "Verwende Overlays"
 
 #: src/frontend/mame/ui/submenu.cpp:61
 msgid "Use Bezels"
-msgstr ""
+msgstr "Verwende Rahmen"
 
 #: src/frontend/mame/ui/submenu.cpp:62
 msgid "Use Control Panels"
-msgstr ""
+msgstr "Verwende Steuerungselemente"
 
 #: src/frontend/mame/ui/submenu.cpp:63
 msgid "Use Marquees"
-msgstr ""
+msgstr "Verwende Marquees"
 
 #: src/frontend/mame/ui/submenu.cpp:65
 msgid "State/Playback Options"
-msgstr ""
+msgstr "Status/Wiedergabe-Optionen"
 
 #: src/frontend/mame/ui/submenu.cpp:66
 msgid "Automatic save/restore"
-msgstr ""
+msgstr "Automatisch speichern/wiederherstellen"
 
 #: src/frontend/mame/ui/submenu.cpp:67
 msgid "Bilinear snapshot"
-msgstr ""
+msgstr "Bilineare Bildschirmfotos"
 
 #: src/frontend/mame/ui/submenu.cpp:68
 msgid "Burn-in"
-msgstr ""
+msgstr "Bildschirm eingebrannt"
 
 #: src/frontend/mame/ui/submenu.cpp:70
 msgid "Input Options"
-msgstr ""
+msgstr "Eingabe-Optionen"
 
 #: src/frontend/mame/ui/submenu.cpp:71
 msgid "Coin lockout"
-msgstr ""
+msgstr "Münzeinwurf sperren"
 
 #: src/frontend/mame/ui/submenu.cpp:72
 msgid "Mouse"
-msgstr ""
+msgstr "Maus"
 
 #: src/frontend/mame/ui/submenu.cpp:73
 msgid "Joystick"
-msgstr ""
+msgstr "Joystick"
 
 #: src/frontend/mame/ui/submenu.cpp:74
 msgid "Lightgun"
-msgstr ""
+msgstr "Lichtpistole"
 
 #: src/frontend/mame/ui/submenu.cpp:75
 msgid "Multi-keyboard"
-msgstr ""
+msgstr "Mehrere Tastaturen"
 
 #: src/frontend/mame/ui/submenu.cpp:76
 msgid "Multi-mouse"
-msgstr ""
+msgstr "Mehrfach-Maus"
 
 #: src/frontend/mame/ui/submenu.cpp:77
 msgid "Steadykey"
-msgstr ""
+msgstr "Mehrfacheingabe"
 
 #: src/frontend/mame/ui/submenu.cpp:78
 msgid "UI active"
-msgstr ""
+msgstr "Benutzeroberfläche aktiv"
 
 #: src/frontend/mame/ui/submenu.cpp:79
 msgid "Offscreen reload"
-msgstr ""
+msgstr "Nachladen außerhalb des Bildschirms"
 
 #: src/frontend/mame/ui/submenu.cpp:80
 msgid "Joystick deadzone"
-msgstr ""
+msgstr "Joystick-Totbereich"
 
 #: src/frontend/mame/ui/submenu.cpp:81
 msgid "Joystick saturation"
-msgstr ""
+msgstr "Joystick-Empfindlichkeit"
 
 #: src/frontend/mame/ui/submenu.cpp:82
 msgid "Natural keyboard"
-msgstr ""
+msgstr "Natürliche Tastatur"
 
 #: src/frontend/mame/ui/submenu.cpp:83
 msgid "Simultaneous contradictory"
-msgstr ""
+msgstr "Widersprüchliche Eingaben erkennen"
 
 #: src/frontend/mame/ui/submenu.cpp:84
 msgid "Coin impulse"
-msgstr ""
+msgstr "Münz-Impuls"
 
 #: src/frontend/mame/ui/submenu.cpp:88
 msgid "Device Mapping"
-msgstr "Gerätezuordnung"
+msgstr "Geräte-Zuordnung"
 
 #: src/frontend/mame/ui/submenu.cpp:89
 msgid "Lightgun Device Assignment"
@@ -1880,11 +1880,11 @@ msgstr "Videomodus"
 
 #: src/frontend/mame/ui/submenu.cpp:102
 msgid "Number Of Screens"
-msgstr ""
+msgstr "Anzahl der Bildschirme"
 
 #: src/frontend/mame/ui/submenu.cpp:104
 msgid "Triple Buffering"
-msgstr "Dreifache Pufferung"
+msgstr "Dreifachpufferung"
 
 #: src/frontend/mame/ui/submenu.cpp:105
 msgid "HLSL"

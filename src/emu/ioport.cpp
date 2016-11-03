@@ -96,6 +96,7 @@
 #include "xmlfile.h"
 #include "profiler.h"
 #include "ui/uimain.h"
+#include "inputdev.h"
 #include "natkeyboard.h"
 
 #include "osdepend.h"
@@ -1737,7 +1738,8 @@ time_t ioport_manager::initialize()
 			for (ioport_field &field : port.second->fields())
 				if (field.live().joystick != nullptr && field.rotated())
 				{
-					machine().input().set_global_joystick_map(joystick_map_4way_diagonal);
+					input_class_joystick &devclass = downcast<input_class_joystick &>(machine().input().device_class(DEVICE_CLASS_JOYSTICK));
+					devclass.set_global_joystick_map(input_class_joystick::map_4way_diagonal);
 					break;
 				}
 
@@ -1790,45 +1792,33 @@ void ioport_manager::init_autoselect_devices(int type1, int type2, int type3, co
 {
 	// if nothing specified, ignore the option
 	const char *stemp = machine().options().value(option);
-	if (stemp[0] == 0)
+	if (stemp[0] == 0 || strcmp(stemp, "none") == 0)
 		return;
 
 	// extract valid strings
-	const char *autostring = "keyboard";
-	input_device_class autoenable = DEVICE_CLASS_KEYBOARD;
-	if (strcmp(stemp, "mouse") == 0)
+	input_class *autoenable_class = nullptr;
+	for (input_device_class devclass = DEVICE_CLASS_FIRST_VALID; devclass <= DEVICE_CLASS_LAST_VALID; ++devclass)
+		if (strcmp(stemp, machine().input().device_class(devclass).name()) == 0)
+		{
+			autoenable_class = &machine().input().device_class(devclass);
+			break;
+		}
+	if (autoenable_class == nullptr)
 	{
-		autoenable = DEVICE_CLASS_MOUSE;
-		autostring = "mouse";
-	}
-	else if (strcmp(stemp, "joystick") == 0)
-	{
-		autoenable = DEVICE_CLASS_JOYSTICK;
-		autostring = "joystick";
-	}
-	else if (strcmp(stemp, "lightgun") == 0)
-	{
-		autoenable = DEVICE_CLASS_LIGHTGUN;
-		autostring = "lightgun";
-	}
-	else if (strcmp(stemp, "none") == 0)
-	{
-		// nothing specified
-		return;
-	}
-	else if (strcmp(stemp, "keyboard") != 0)
 		osd_printf_error("Invalid %s value %s; reverting to keyboard\n", option, stemp);
+		autoenable_class = &machine().input().device_class(DEVICE_CLASS_KEYBOARD);
+	}
 
 	// only scan the list if we haven't already enabled this class of control
-	if (!m_portlist.empty() && !machine().input().device_class(autoenable).enabled())
+	if (!autoenable_class->enabled())
 		for (auto &port : m_portlist)
 			for (ioport_field &field : port.second->fields())
 
 				// if this port type is in use, apply the autoselect criteria
 				if ((type1 != 0 && field.type() == type1) || (type2 != 0 && field.type() == type2) || (type3 != 0 && field.type() == type3))
 				{
-					osd_printf_verbose("Input: Autoenabling %s due to presence of a %s\n", autostring, ananame);
-					machine().input().device_class(autoenable).enable();
+					osd_printf_verbose("Input: Autoenabling %s due to presence of a %s\n", autoenable_class->name(), ananame);
+					autoenable_class->enable();
 					break;
 				}
 }
@@ -2997,7 +2987,7 @@ const char *ioport_configurer::string_from_token(const char *string)
 //  port_alloc - allocate a new port
 //-------------------------------------------------
 
-void ioport_configurer::port_alloc(const char *tag)
+ioport_configurer& ioport_configurer::port_alloc(const char *tag)
 {
 	// create the full tag
 	std::string fulltag = m_owner.subtag(tag);
@@ -3008,6 +2998,7 @@ void ioport_configurer::port_alloc(const char *tag)
 	m_curport = m_portlist.find(fulltag)->second.get();
 	m_curfield = nullptr;
 	m_cursetting = nullptr;
+	return *this;
 }
 
 
@@ -3016,7 +3007,7 @@ void ioport_configurer::port_alloc(const char *tag)
 //  modify it
 //-------------------------------------------------
 
-void ioport_configurer::port_modify(const char *tag)
+ioport_configurer& ioport_configurer::port_modify(const char *tag)
 {
 	// create the full tag
 	std::string fulltag = m_owner.subtag(tag);
@@ -3030,6 +3021,7 @@ void ioport_configurer::port_modify(const char *tag)
 	m_curport->m_modcount++;
 	m_curfield = nullptr;
 	m_cursetting = nullptr;
+	return *this;
 }
 
 
@@ -3037,7 +3029,7 @@ void ioport_configurer::port_modify(const char *tag)
 //  field_alloc - allocate a new field
 //-------------------------------------------------
 
-void ioport_configurer::field_alloc(ioport_type type, ioport_value defval, ioport_value mask, const char *name)
+ioport_configurer& ioport_configurer::field_alloc(ioport_type type, ioport_value defval, ioport_value mask, const char *name)
 {
 	// make sure we have a port
 	if (m_curport == nullptr)
@@ -3049,6 +3041,7 @@ void ioport_configurer::field_alloc(ioport_type type, ioport_value defval, iopor
 
 	// reset the current setting
 	m_cursetting = nullptr;
+	return *this;
 }
 
 
@@ -3056,13 +3049,13 @@ void ioport_configurer::field_alloc(ioport_type type, ioport_value defval, iopor
 //  field_add_char - add a character to a field
 //-------------------------------------------------
 
-void ioport_configurer::field_add_char(char32_t ch)
+ioport_configurer& ioport_configurer::field_add_char(char32_t ch)
 {
 	for (int index = 0; index < ARRAY_LENGTH(m_curfield->m_chars); index++)
 		if (m_curfield->m_chars[index] == 0)
 		{
 			m_curfield->m_chars[index] = ch;
-			return;
+			return *this;
 		}
 
 	throw emu_fatalerror("PORT_CHAR(%d) could not be added - maximum amount exceeded\n", ch);
@@ -3073,9 +3066,10 @@ void ioport_configurer::field_add_char(char32_t ch)
 //  field_add_code - add a character to a field
 //-------------------------------------------------
 
-void ioport_configurer::field_add_code(input_seq_type which, input_code code)
+ioport_configurer& ioport_configurer::field_add_code(input_seq_type which, input_code code)
 {
 	m_curfield->m_seq[which] |= code;
+	return *this;
 }
 
 
@@ -3083,7 +3077,7 @@ void ioport_configurer::field_add_code(input_seq_type which, input_code code)
 //  setting_alloc - allocate a new setting
 //-------------------------------------------------
 
-void ioport_configurer::setting_alloc(ioport_value value, const char *name)
+ioport_configurer& ioport_configurer::setting_alloc(ioport_value value, const char *name)
 {
 	// make sure we have a field
 	if (m_curfield == nullptr)
@@ -3092,6 +3086,7 @@ void ioport_configurer::setting_alloc(ioport_value value, const char *name)
 	m_cursetting = global_alloc(ioport_setting(*m_curfield, value & m_curfield->mask(), string_from_token(name)));
 	// append a new setting
 	m_curfield->m_settinglist.append(*m_cursetting);
+	return *this;
 }
 
 
@@ -3100,10 +3095,11 @@ void ioport_configurer::setting_alloc(ioport_value value, const char *name)
 //  the current setting or field
 //-------------------------------------------------
 
-void ioport_configurer::set_condition(ioport_condition::condition_t condition, const char *tag, ioport_value mask, ioport_value value)
+ioport_configurer& ioport_configurer::set_condition(ioport_condition::condition_t condition, const char *tag, ioport_value mask, ioport_value value)
 {
 	ioport_condition &target = (m_cursetting != nullptr) ? m_cursetting->condition() : m_curfield->condition();
 	target.set(condition, tag, mask, value);
+	return *this;
 }
 
 
@@ -3111,7 +3107,7 @@ void ioport_configurer::set_condition(ioport_condition::condition_t condition, c
 //  onoff_alloc - allocate an on/off DIP switch
 //-------------------------------------------------
 
-void ioport_configurer::onoff_alloc(const char *name, ioport_value defval, ioport_value mask, const char *diplocation)
+ioport_configurer& ioport_configurer::onoff_alloc(const char *name, ioport_value defval, ioport_value mask, const char *diplocation)
 {
 	// allocate a field normally
 	field_alloc(IPT_DIPSWITCH, defval, mask, name);
@@ -3132,6 +3128,7 @@ void ioport_configurer::onoff_alloc(const char *name, ioport_value defval, iopor
 	setting_alloc(~defval & mask, DEF_STR(On));
 	// clear cursettings set by setting_alloc
 	m_cursetting = nullptr;
+	return *this;
 }
 
 

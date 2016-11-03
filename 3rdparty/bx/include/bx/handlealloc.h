@@ -8,9 +8,11 @@
 
 #include "bx.h"
 #include "allocator.h"
+#include "uint32_t.h"
 
 namespace bx
 {
+	///
 	class HandleAlloc
 	{
 	public:
@@ -127,6 +129,7 @@ namespace bx
 		BX_FREE(_allocator, _handleAlloc);
 	}
 
+	///
 	template <uint16_t MaxHandlesT>
 	class HandleAllocT : public HandleAlloc
 	{
@@ -144,6 +147,7 @@ namespace bx
 		uint16_t m_padding[2*MaxHandlesT];
 	};
 
+	///
 	template <uint16_t MaxHandlesT>
 	class HandleListT
 	{
@@ -327,6 +331,7 @@ namespace bx
 		Link m_links[MaxHandlesT];
 	};
 
+	///
 	template <uint16_t MaxHandlesT>
 	class HandleAllocLruT
 	{
@@ -419,6 +424,319 @@ namespace bx
 
 	private:
 		HandleListT<MaxHandlesT>  m_list;
+		HandleAllocT<MaxHandlesT> m_alloc;
+	};
+
+	///
+	template <uint32_t MaxCapacityT, typename KeyT = uint32_t>
+	class HandleHashMapT
+	{
+	public:
+		static const uint16_t invalid = UINT16_MAX;
+
+		HandleHashMapT()
+			: m_maxCapacity(MaxCapacityT)
+		{
+			reset();
+		}
+
+		~HandleHashMapT()
+		{
+		}
+
+		bool insert(KeyT _key, uint16_t _handle)
+		{
+			if (invalid == _handle)
+			{
+				return false;
+			}
+
+			const KeyT hash = mix(_key);
+			const uint32_t firstIdx = hash % MaxCapacityT;
+			uint32_t idx = firstIdx;
+			do
+			{
+				if (m_handle[idx] == invalid)
+				{
+					m_key[idx]    = _key;
+					m_handle[idx] = _handle;
+					++m_numElements;
+					return true;
+				}
+
+				if (m_key[idx] == _key)
+				{
+					return false;
+				}
+
+				idx = (idx + 1) % MaxCapacityT;
+
+			} while (idx != firstIdx);
+
+			return false;
+		}
+
+		bool removeByKey(KeyT _key)
+		{
+			uint32_t idx = findIndex(_key);
+			if (UINT32_MAX != idx)
+			{
+				removeIndex(idx);
+				return true;
+			}
+
+			return false;
+		}
+
+		bool removeByHandle(uint16_t _handle)
+		{
+			if (invalid != _handle)
+			{
+				for (uint32_t idx = 0; idx < MaxCapacityT; ++idx)
+				{
+					if (m_handle[idx] == _handle)
+					{
+						removeIndex(idx);
+					}
+				}
+			}
+
+			return false;
+		}
+
+		uint16_t find(KeyT _key) const
+		{
+			uint32_t idx = findIndex(_key);
+			if (UINT32_MAX != idx)
+			{
+				return m_handle[idx];
+			}
+
+			return invalid;
+		}
+
+		void reset()
+		{
+			memset(m_handle, 0xff, sizeof(m_handle) );
+			m_numElements = 0;
+		}
+
+		uint32_t getNumElements() const
+		{
+			return m_numElements;
+		}
+
+		uint32_t getMaxCapacity() const
+		{
+			return m_maxCapacity;
+		}
+
+		struct Iterator
+		{
+			uint16_t handle;
+
+		private:
+			friend class HandleHashMapT<MaxCapacityT, KeyT>;
+			uint32_t pos;
+			uint32_t num;
+		};
+
+		Iterator first() const
+		{
+			Iterator it;
+			it.handle = invalid;
+			it.pos    = 0;
+			it.num    = m_numElements;
+
+			if (0 == it.num)
+			{
+				return it;
+			}
+
+			++it.num;
+			next(it);
+			return it;
+		}
+
+		bool next(Iterator& _it) const
+		{
+			if (0 == _it.num)
+			{
+				return false;
+			}
+
+			for (
+				;_it.pos < MaxCapacityT && invalid == m_handle[_it.pos]
+				; ++_it.pos
+				);
+			_it.handle = m_handle[_it.pos];
+			++_it.pos;
+			--_it.num;
+			return true;
+		}
+
+	private:
+		uint32_t findIndex(KeyT _key) const
+		{
+			const KeyT hash = mix(_key);
+
+			const uint32_t firstIdx = hash % MaxCapacityT;
+			uint32_t idx = firstIdx;
+			do
+			{
+				if (m_handle[idx] == invalid)
+				{
+					return UINT32_MAX;
+				}
+
+				if (m_key[idx] == _key)
+				{
+					return idx;
+				}
+
+				idx = (idx + 1) % MaxCapacityT;
+
+			} while (idx != firstIdx);
+
+			return UINT32_MAX;
+		}
+
+		void removeIndex(uint32_t _idx)
+		{
+			m_handle[_idx] = invalid;
+			--m_numElements;
+
+			for (uint32_t idx = (_idx + 1) % MaxCapacityT
+				; m_handle[idx] != invalid
+				; idx = (idx + 1) % MaxCapacityT)
+			{
+				if (m_handle[idx] != invalid)
+				{
+					const KeyT key = m_key[idx];
+					if (idx != findIndex(key) )
+					{
+						const uint16_t handle = m_handle[idx];
+						m_handle[idx] = invalid;
+						--m_numElements;
+						insert(key, handle);
+					}
+				}
+			}
+		}
+
+		uint32_t mix(uint32_t _x) const
+		{
+			const uint32_t tmp0   = uint32_mul(_x,   UINT32_C(2246822519) );
+			const uint32_t tmp1   = uint32_rol(tmp0, 13);
+			const uint32_t result = uint32_mul(tmp1, UINT32_C(2654435761) );
+			return result;
+		}
+
+		uint64_t mix(uint64_t _x) const
+		{
+			const uint64_t tmp0   = uint64_mul(_x,   UINT64_C(14029467366897019727) );
+			const uint64_t tmp1   = uint64_rol(tmp0, 31);
+			const uint64_t result = uint64_mul(tmp1, UINT64_C(11400714785074694791) );
+			return result;
+		}
+
+		uint32_t m_maxCapacity;
+		uint32_t m_numElements;
+
+		KeyT     m_key[MaxCapacityT];
+		uint16_t m_handle[MaxCapacityT];
+	};
+
+	///
+	template <uint16_t MaxHandlesT, typename KeyT = uint32_t>
+	class HandleHashMapAllocT
+	{
+	public:
+		static const uint16_t invalid = UINT16_MAX;
+
+		HandleHashMapAllocT()
+		{
+			reset();
+		}
+
+		~HandleHashMapAllocT()
+		{
+		}
+
+		uint16_t alloc(KeyT _key)
+		{
+			uint16_t handle = m_alloc.alloc();
+			if (invalid == handle)
+			{
+				return invalid;
+			}
+
+			bool ok = m_table.insert(_key, handle);
+			if (!ok)
+			{
+				m_alloc.free(handle);
+				return invalid;
+			}
+
+			return handle;
+		}
+
+		void free(KeyT _key)
+		{
+			uint16_t handle = m_table.find(_key);
+			if (invalid == handle)
+			{
+				return;
+			}
+
+			m_table.removeByKey(_key);
+			m_alloc.free(handle);
+		}
+
+		void free(uint16_t _handle)
+		{
+			m_table.removeByHandle(_handle);
+			m_alloc.free(_handle);
+		}
+
+		uint16_t find(KeyT _key) const
+		{
+			return m_table.find(_key);
+		}
+
+		const uint16_t* getHandles() const
+		{
+			return m_alloc.getHandles();
+		}
+
+		uint16_t getHandleAt(uint16_t _at) const
+		{
+			return m_alloc.getHandleAt(_at);
+		}
+
+		uint16_t getNumHandles() const
+		{
+			return m_alloc.getNumHandles();
+		}
+
+		uint16_t getMaxHandles() const
+		{
+			return m_alloc.getMaxHandles();
+		}
+
+		bool isValid(uint16_t _handle) const
+		{
+			return m_alloc.isValid(_handle);
+		}
+
+		void reset()
+		{
+			m_table.reset();
+			m_alloc.reset();
+		}
+
+	private:
+		HandleHashMapT<MaxHandlesT+MaxHandlesT/2, KeyT> m_table;
 		HandleAllocT<MaxHandlesT> m_alloc;
 	};
 

@@ -18,19 +18,11 @@
 #define __LUA_ENGINE_H__
 
 #include <map>
-
-// None is typedef'd already in SDL/X11 libs
-#ifdef None
-#undef None
-#endif
+#include "sol2/sol.hpp"
 
 class cheat_manager;
 
 struct lua_State;
-namespace luabridge
-{
-	class LuaRef;
-}
 
 class lua_engine
 {
@@ -40,62 +32,86 @@ public:
 	~lua_engine();
 
 	void initialize();
-	void start_console();
 	void load_script(const char *filename);
 	void load_string(const char *value);
 
-	void serve_lua();
-	void periodic_check();
 	bool frame_hook();
-	void execute_function(const char *id);
 
-	struct menu_item {
-		std::string text;
-		std::string subtext;
-		std::string flags;
-	};
-	void menu_populate(std::string &menu, std::vector<menu_item> &menu_list);
-	bool menu_callback(std::string &menu, int index, std::string event);
+	void menu_populate(const std::string &menu, std::vector<std::tuple<std::string, std::string, std::string>> &menu_list);
+	bool menu_callback(const std::string &menu, int index, const std::string &event);
 
-	void resume(lua_State *L, int nparam = 0, lua_State *root = nullptr);
-	void set_machine(running_machine *machine) { m_machine = machine; update_machine(); }
+	void set_machine(running_machine *machine) { m_machine = machine; }
 	std::vector<std::string> &get_menu() { return m_menu; }
 	void attach_notifiers();
 	void on_frame_done();
-	const char *call_plugin(const char *data, const char *name);
+
+	template<typename T, typename U>
+	bool call_plugin(const std::string &name, const T in, U &out)
+	{
+		bool ret = false;
+		sol::object outobj = call_plugin(name, sol::make_object(sol(), in));
+		if(outobj.is<U>())
+		{
+			out = outobj.as<U>();
+			ret = true;
+		}
+		return ret;
+	}
+
+	template<typename T, typename U>
+	bool call_plugin(const std::string &name, const T in, std::vector<U> &out)
+	{
+		bool ret = false;
+		sol::object outobj = call_plugin(name, sol::make_object(sol(), in));
+		if(outobj.is<sol::table>())
+		{
+			for(auto &entry : outobj.as<sol::table>())
+			{
+				if(entry.second.template is<U>())
+				{
+					out.push_back(entry.second.template as<U>());
+					ret = true;
+				}
+			}
+		}
+		return ret;
+	}
+
+	// this can also check if a returned table contains type T
+	template<typename T, typename U>
+	bool call_plugin_check(const std::string &name, const U in, bool table = false)
+	{
+		bool ret = false;
+		sol::object outobj = call_plugin(name, sol::make_object(sol(), in));
+		if(outobj.is<T>() && !table)
+			ret = true;
+		else if(outobj.is<sol::table>() && table)
+		{
+			// check just one entry, checking the whole thing shouldn't be necessary as this only supports homogeneous tables
+			if(outobj.as<sol::table>().begin().operator*().second.template is<T>())
+				ret = true;
+		}
+		return ret;
+	}
+
+	template<typename T>
+	void call_plugin_set(const std::string &name, const T in)
+	{
+		call_plugin(name, sol::make_object(sol(), in));
+	}
 
 private:
-	struct hook {
-		lua_State *L;
-		int cb;
-
-		hook();
-		void set(lua_State *L, int idx);
-		lua_State *precall();
-		void call(lua_engine *engine, lua_State *T, int nparam);
-		bool active() const { return L != nullptr; }
-	};
-
-	static const char *const tname_ioport;
-
 	// internal state
-	lua_State          *m_lua_state;
-	running_machine *   m_machine;
+	lua_State *m_lua_state;
+	sol::state_view *m_sol_state;
+	sol::state_view &sol() const { return *m_sol_state; }
+	running_machine *m_machine;
 
 	std::vector<std::string> m_menu;
-
-	hook hook_output_cb;
-	bool output_notifier_set;
-
-	hook hook_frame_cb;
-
-	static lua_engine*  luaThis;
 
 	std::map<lua_State *, std::pair<lua_State *, int> > thread_registry;
 
 	running_machine &machine() const { return *m_machine; }
-
-	void update_machine();
 
 	void on_machine_prestart();
 	void on_machine_start();
@@ -104,154 +120,39 @@ private:
 	void on_machine_resume();
 	void on_machine_frame();
 
-	void output_notifier(const char *outname, int32_t value);
-	static void s_output_notifier(const char *outname, int32_t value, void *param);
+	void register_function(sol::function func, const char *id);
+	bool execute_function(const char *id);
+	sol::object call_plugin(const std::string &name, sol::object in);
 
-	void emu_after_done(void *_h, int32_t param);
-	int emu_after(lua_State *L);
-	int emu_wait(lua_State *L);
-	void emu_hook_output(lua_State *L);
-	void emu_set_hook(lua_State *L);
-
-	static int l_ioport_write(lua_State *L);
-	static int l_emu_after(lua_State *L);
-	static int l_emu_app_name(lua_State *L);
-	static int l_emu_app_version(lua_State *L);
-	static int l_emu_wait(lua_State *L);
-	static int l_emu_time(lua_State *L);
-	static int l_emu_gamename(lua_State *L);
-	static int l_emu_romname(lua_State *L);
-	static int l_emu_softname(lua_State *L);
-	static int l_emu_keypost(lua_State *L);
-	static int l_emu_hook_output(lua_State *L);
-	static int l_emu_exit(lua_State *L);
-	static int l_emu_start(lua_State *L);
-	static int l_emu_pause(lua_State *L);
-	static int l_emu_unpause(lua_State *L);
-	static int l_emu_set_hook(lua_State *L);
-	static int l_emu_register_prestart(lua_State *L);
-	static int l_emu_register_start(lua_State *L);
-	static int l_emu_register_stop(lua_State *L);
-	static int l_emu_register_pause(lua_State *L);
-	static int l_emu_register_resume(lua_State *L);
-	static int l_emu_register_frame(lua_State *L);
-	static int l_emu_register_frame_done(lua_State *L);
-	static int l_emu_register_menu(lua_State *L);
-	static int l_emu_register_callback(lua_State *L);
-	static std::string get_print_buffer(lua_State *L);
-	static int l_osd_printf_verbose(lua_State *L);
-	static int l_osd_printf_error(lua_State *L);
-	static int l_osd_printf_info(lua_State *L);
-	static int l_osd_printf_debug(lua_State *L);
-	static int l_driver_find(lua_State *L);
-	static int register_function(lua_State *L, const char *id);
-
-	// "emu.machine" namespace
-	static luabridge::LuaRef l_machine_get_devices(const running_machine *r);
-	static luabridge::LuaRef l_machine_get_images(const running_machine *r);
-	static luabridge::LuaRef l_ioport_get_ports(const ioport_manager *i);
-	static luabridge::LuaRef l_render_get_targets(const render_manager *r);
-	static luabridge::LuaRef l_ioports_port_get_fields(const ioport_port *i);
-	static luabridge::LuaRef devtree_dfs(device_t *root, luabridge::LuaRef dev_table);
-	static luabridge::LuaRef l_dev_get_states(const device_t *d);
-	static uint64_t l_state_get_value(const device_state_entry *d);
-	static void l_state_set_value(device_state_entry *d, uint64_t v);
-	static luabridge::LuaRef l_dev_get_memspaces(const device_t *d);
-	struct lua_machine {
-		int l_popmessage(lua_State *L);
-		int l_logerror(lua_State *L);
-	};
-	struct lua_addr_space {
-		lua_addr_space(address_space *space, device_memory_interface *dev) :
-			space(*space), dev(dev) {}
-		template<typename T> int l_mem_read(lua_State *L);
-		template<typename T> int l_mem_write(lua_State *L);
-		template<typename T> int l_log_mem_read(lua_State *L);
-		template<typename T> int l_log_mem_write(lua_State *L);
-		template<typename T> int l_direct_mem_read(lua_State *L);
-		template<typename T> int l_direct_mem_write(lua_State *L);
+	struct addr_space {
+		addr_space(address_space &space, device_memory_interface &dev) :
+			space(space), dev(dev) {}
+		template<typename T> T mem_read(offs_t address, sol::object shift);
+		template<typename T> void mem_write(offs_t address, T val, sol::object shift);
+		template<typename T> T log_mem_read(offs_t address);
+		template<typename T> void log_mem_write(offs_t address, T val);
+		template<typename T> T direct_mem_read(offs_t address);
+		template<typename T> void direct_mem_write(offs_t address, T val);
 		const char *name() const { return space.name(); }
 
 		address_space &space;
-		device_memory_interface *dev;
-	};
-	static luabridge::LuaRef l_addr_space_map(const lua_addr_space *sp);
-
-	static luabridge::LuaRef l_machine_get_screens(const running_machine *r);
-	struct lua_screen {
-		int l_height(lua_State *L);
-		int l_width(lua_State *L);
-		int l_orientation(lua_State *L);
-		int l_refresh(lua_State *L);
-		int l_type(lua_State *L);
-		int l_snapshot(lua_State *L);
-		int l_draw_box(lua_State *L);
-		int l_draw_line(lua_State *L);
-		int l_draw_text(lua_State *L);
-	};
-	static luabridge::LuaRef l_dev_get_items(const device_t *d);
-
-	struct lua_video {
-		int l_begin_recording(lua_State *L);
-		int l_end_recording(lua_State *L);
+		device_memory_interface &dev;
 	};
 
-	static luabridge::LuaRef l_cheat_get_entries(const cheat_manager *c);
-	struct lua_cheat_entry {
-		int l_get_state(lua_State *L);
+	template<typename T> static T share_read(memory_share &share, offs_t address);
+	template<typename T> static void share_write(memory_share &share, offs_t address, T val);
+	template<typename T> static T region_read(memory_region &region, offs_t address);
+	template<typename T> static void region_write(memory_region &region, offs_t address, T val);
+
+	struct save_item {
+		void *base;
+		unsigned int size;
+		unsigned int count;
 	};
 
-	template<typename T> static luabridge::LuaRef l_options_get_entries(const T *o);
-	struct lua_options_entry {
-		int l_entry_value(lua_State *L);
-	};
-
-	static luabridge::LuaRef l_memory_get_banks(const memory_manager *m);
-	static luabridge::LuaRef l_memory_get_shares(const memory_manager *m);
-	struct lua_memory_share {
-		template<typename T> int l_share_read(lua_State *L);
-		template<typename T> int l_share_write(lua_State *L);
-	};
-	static luabridge::LuaRef l_memory_get_regions(const memory_manager *m);
-	struct lua_memory_region {
-		template<typename T> int l_region_read(lua_State *L);
-		template<typename T> int l_region_write(lua_State *L);
-	};
-
-	struct lua_ui_input {
-		int l_ui_input_find_mouse(lua_State *L);
-	};
-
-	struct lua_render_target {
-		int l_render_view_bounds(lua_State *L);
-	};
-
-	struct lua_emu_file {
-		int l_emu_file_read(lua_State *L);
-	};
-
-	struct lua_item {
-		lua_item(int index);
-		void *l_item_base;
-		unsigned int l_item_size;
-		unsigned int l_item_count;
-		int l_item_read(lua_State *L);
-		int l_item_read_block(lua_State *L);
-		int l_item_write(lua_State *L);
-	};
-
-	void resume(void *L, int32_t param);
-	void start();
-	static int luaopen_ioport(lua_State *L);
 	void close();
 
-	static void *checkparam(lua_State *L, int idx, const char *tname);
-	static void *getparam(lua_State *L, int idx, const char *tname);
-	static void push(lua_State *L, void *p, const char *tname);
-
-	int report(int status);
-	int docall(int narg, int nres);
-	int incomplete(int status) ;
+	void run(sol::load_result res);
 };
 
 #endif  /* __LUA_ENGINE_H__ */

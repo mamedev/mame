@@ -12,6 +12,7 @@ Supported project generators:
  * FASTBuild (experimental)
  * GNU Makefile
  * Ninja (experimental)
+ * Qbs / QtCreator (experimental)
  * Visual Studio 2008, 2010, 2012, 2013, 2015, 15
  * XCode
 
@@ -20,7 +21,7 @@ Download (stable)
 
 [![Build Status](https://travis-ci.org/bkaradzic/GENie.svg?branch=master)](https://travis-ci.org/bkaradzic/GENie)
 
-	version 545 (commit 34f239f24d8004777174a375b8f04ff21f2f5b8e)
+	version 699 (commit a785b1bbb570485da7eb73d52f59c7d6e3f24bf4)
 
 Linux:  
 https://github.com/bkaradzic/bx/raw/master/tools/bin/linux/genie
@@ -41,7 +42,8 @@ Building (dev)
 Documentation
 -------------
 
-[Scripting Reference](https://github.com/bkaradzic/genie/blob/master/docs/scripting-reference.md#scripting-reference)
+[Scripting Reference](https://github.com/bkaradzic/genie/blob/master/docs/scripting-reference.md#scripting-reference)  
+[Introduction to GENie - CppCon 2016](https://onedrive.live.com/view.aspx?cid=171ee76e679935c8&page=view&resid=171EE76E679935C8!139573&parId=171EE76E679935C8!18835&authkey=!AKv_SGrgJwxDGDg&app=PowerPoint)
 
 History
 -------
@@ -79,7 +81,8 @@ intention to keep it compatible with it.
  - Added `msgcompile`, `msgresource`, `msglinking` and `msgarchiving` as
    overrides for make messages.
  - Added `messageskip` list to disable some of compiler messages.
- - Added `buildoptions_c`, `buildoptions_cpp`, `buildoptions_objc` for
+ - Added `buildoptions_c`, `buildoptions_cpp`, `buildoptions_objc`,
+   `buildoptions_objcpp`, `buildoptions_asm`, `buildoptions_swift` for
    configuring language specific build options.
  - Split functionality of `excludes` in `removefiles` and `excludes`. With VS
    `excludes` will exclude files from build but files will be added to project
@@ -102,6 +105,14 @@ intention to keep it compatible with it.
  - Detect when generated project files are not changing, and skip writing over
    existing project files.
  - Added Ninja project generator.
+ - Added ability to specify MSVC "Old Style" debug info format with
+   `C7DebugInfo`.
+ - Added some support for per-configuration `files` lists.
+ - Removed `clean` action.
+ - Added support for QtCreator via Qbs build tool.
+ - Added .natvis file type support for Visual Studio.
+ - Added Swift language support for make and ninja build generators.
+ - Removed CodeBlocks and CodeLite support.
 
 Debugging GENie scripts
 -----------------------
@@ -157,14 +168,18 @@ https://github.com/andr3wmac/Torque6 Torque 6 is an MIT licensed 3D engine
 loosely based on Torque2D. Being neither Torque2D or Torque3D it is the 6th
 derivative of the original Torque Engine.
 
+http://mtuner.net/ is a memory profiler and memory leak finder for Windows, PS4,
+PS3.
+
 [License](https://github.com/bkaradzic/genie/blob/master/LICENSE)
 -----------------------------------------------------------------
 
 	GENie
 	Copyright (c) 2014-2016 Branimir Karadžić, Neil Richardson, Mike Popoloski,
 	Drew Solomon, Ted de Munnik, Miodrag Milanović, Brett Vickers, Bill Freist,
-	Terry Hendrix II, Ryan Juckett, Andrew Johnson, Johan Sköld, Alastair
-	Murray, Patrick Munns, Jan-Eric Duden, Phil Stevens, Stuart Carnie.
+	Terry Hendrix II, Ryan Juckett, Andrew Johnson, Johan Sköld,
+	Alastair Murray, Patrick Munns, Jan-Eric Duden, Phil Stevens, Stuart Carnie,
+	Nikolay Aleksiev.
 	All rights reserved.
 
 	https://github.com/bkaradzic/genie

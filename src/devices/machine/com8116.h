@@ -4,6 +4,9 @@
 
     COM8116 Dual Baud Rate Generator (Programmable Divider) emulation
 
+	COM5016 is a mostly-compatible clone of this chip, with +12V on
+	pin 9 rather than NC.
+
 **********************************************************************
                             _____   _____
              XTAL/EXT1   1 |*    \_/     | 18  XTAL/EXT2

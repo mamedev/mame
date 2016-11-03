@@ -1047,7 +1047,7 @@ static imgtoolerr_t open_image_lvl1(imgtool::stream::ptr &&file_handle, ti99_img
 		}
 	}
 
-	l1_img->file_handle = file_handle.release();	// we can only do this when we're sure we're successful
+	l1_img->file_handle = file_handle.release();    // we can only do this when we're sure we're successful
 
 	return (imgtoolerr_t)0;
 }
@@ -5246,7 +5246,7 @@ static imgtoolerr_t dsk_image_create(imgtool::image &image, imgtool::stream::ptr
 	int i;
 
 	l1_img.img_format = img_format;
-	l1_img.file_handle = stream.get();	// can't release here
+	l1_img.file_handle = stream.get();  // can't release here
 
 	/* read options */
 	volname = createoptions->lookup_string(dsk_createopts_volname).c_str();

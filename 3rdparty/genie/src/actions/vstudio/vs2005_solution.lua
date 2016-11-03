@@ -14,6 +14,8 @@
 
 		-- Precompute Visual Studio configurations
 		sln.vstudio_configs = premake.vstudio.buildconfigs(sln)
+		-- Prepare imported projects
+		premake.vstudio.bakeimports(sln)
 
 		-- Mark the file as Unicode
 		_p('\239\187\191')
@@ -29,7 +31,10 @@
 		for prj in premake.solution.eachproject(sln) do
 			sln2005.project(prj)
 		end
-
+        
+		for _,iprj in ipairs(sln.importedprojects) do
+			sln2005.importproject(iprj)
+		end
 		
 		_p('Global')
 		sln2005.platforms(sln)
@@ -105,6 +110,14 @@
 		_p('Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "%s", "%s", "{%s}"', grp.name, grp.name, grp.uuid)
 		_p('EndProject')
 	end
+    
+--
+-- Write out an entry for an imported project
+--
+	function sln2005.importproject(iprj)
+		_p('Project("{%s}") = "%s", "%s", "{%s}"', vstudio.tool(iprj), path.getbasename(iprj.location), iprj.relpath, iprj.uuid)
+		_p('EndProject')
+	end
 
 
 --
@@ -136,7 +149,43 @@
 		_p('\tEndGlobalSection')
 	end
 
+--
+-- Write the entries for a single project in the ProjectConfigurationPlatforms section, which maps
+-- the configuration/platform pairs into each project of the solution.
+--
 
+	function sln2005.project_platform(prj, sln)
+		for _, cfg in ipairs(sln.vstudio_configs) do
+
+			-- C# .NET projects always map to the "Any CPU" platform (for now, at
+			-- least). C++ .NET projects always map to x64. For native C++,
+			-- "Any CPU" and "Mixed Platforms" map to the first
+			-- C++ compatible target platform in the solution list.
+			local mapped
+			local buildfor
+			if premake.isdotnetproject(prj) then
+				buildfor = "x64"
+				mapped = "Any CPU"
+			elseif prj.flags and prj.flags.Managed then
+				mapped = "x64"
+			else
+				if cfg.platform == "Any CPU" or cfg.platform == "Mixed Platforms" then
+					mapped = sln.vstudio_configs[3].platform
+				else
+					mapped = cfg.platform
+				end
+			end
+
+			_p('\t\t{%s}.%s.ActiveCfg = %s|%s', prj.uuid, cfg.name, cfg.buildcfg, mapped)
+			if mapped == cfg.platform or cfg.platform == "Mixed Platforms" or buildfor == cfg.platform then
+				_p('\t\t{%s}.%s.Build.0 = %s|%s',  prj.uuid, cfg.name, cfg.buildcfg, mapped)
+			end
+				
+			if premake.vstudio.iswinrt() and prj.kind == "WindowedApp" then
+				_p('\t\t{%s}.%s.Deploy.0 = %s|%s',  prj.uuid, cfg.name, cfg.buildcfg, mapped)
+			end
+		end
+	end
 
 --
 -- Write out the contents of the ProjectConfigurationPlatforms section, which maps
@@ -146,32 +195,13 @@
 	function sln2005.project_platforms(sln)
 		_p('\tGlobalSection(ProjectConfigurationPlatforms) = postSolution')
 		for prj in premake.solution.eachproject(sln) do
-			for _, cfg in ipairs(sln.vstudio_configs) do
-
-				-- .NET projects always map to the "Any CPU" platform (for now, at
-				-- least). For C++, "Any CPU" and "Mixed Platforms" map to the first
-				-- C++ compatible target platform in the solution list.
-				local mapped
-				if premake.isdotnetproject(prj) then
-					mapped = "Any CPU"
-				else
-					if cfg.platform == "Any CPU" or cfg.platform == "Mixed Platforms" then
-						mapped = sln.vstudio_configs[3].platform
-					else
-						mapped = cfg.platform
-					end
-				end
-
-				_p('\t\t{%s}.%s.ActiveCfg = %s|%s', prj.uuid, cfg.name, cfg.buildcfg, mapped)
-				if mapped == cfg.platform or cfg.platform == "Mixed Platforms" then
-					_p('\t\t{%s}.%s.Build.0 = %s|%s',  prj.uuid, cfg.name, cfg.buildcfg, mapped)
-				end
-
-				if premake.vstudio.iswinrt() and prj.kind == "WindowedApp" then
-					_p('\t\t{%s}.%s.Deploy.0 = %s|%s',  prj.uuid, cfg.name, cfg.buildcfg, mapped)
-				end
-			end
+			sln2005.project_platform(prj, sln)
 		end
+		
+		for _,iprj in ipairs(sln.importedprojects) do
+			sln2005.project_platform(iprj, sln)
+		end
+		
 		_p('\tEndGlobalSection')
 	end
 
@@ -205,5 +235,11 @@
 			end
 		end
 
+		for _,iprj in ipairs(sln.importedprojects) do
+			if iprj.group ~= nil then
+				_p('\t\t{%s} = {%s}', iprj.uuid, iprj.group.uuid)
+			end
+		end
+        
 		_p('\tEndGlobalSection')
 	end

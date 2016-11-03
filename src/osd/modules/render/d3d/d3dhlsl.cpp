@@ -1271,6 +1271,8 @@ int shaders::screen_pass(d3d_render_target *rt, int source_index, poly_info *pol
 {
 	int next_index = source_index;
 
+	d3d->set_blendmode(PRIMFLAG_GET_BLENDMODE(poly->flags()));
+
 	curr_effect = default_effect;
 	curr_effect->update_uniforms();
 	curr_effect->set_technique("ScreenTechnique");
@@ -1301,6 +1303,8 @@ int shaders::screen_pass(d3d_render_target *rt, int source_index, poly_info *pol
 
 void shaders::ui_pass(poly_info *poly, int vertnum)
 {
+	d3d->set_blendmode(PRIMFLAG_GET_BLENDMODE(poly->flags()));
+
 	curr_effect = default_effect;
 	curr_effect->update_uniforms();
 	curr_effect->set_technique("UiTechnique");

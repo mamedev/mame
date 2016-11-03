@@ -407,10 +407,7 @@ void mame_ui_manager::update_and_render(render_container &container)
 
 	// render any cheat stuff at the bottom
 	if (machine().phase() >= MACHINE_PHASE_RESET)
-	{
-		mame_machine_manager::instance()->lua()->on_frame_done();
 		mame_machine_manager::instance()->cheat().render_text(*this, container);
-	}
 
 	// call the current UI handler
 	m_handler_param = m_handler_callback(container);

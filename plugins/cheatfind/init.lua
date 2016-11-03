@@ -52,7 +52,7 @@ function cheatfind.startplugin()
 	-- save data block
 	function cheat.save(space, start, size)
 		local data = { block = "", start = start, size = size, space = space }
-		if space.shortname then
+		if getmetatable(space).__name:match("device_t") then
 			if space:shortname() == "ram" then
 				data.block = emu.item(space.items["0/m_pointer"]):read_block(start, size)
 				if not data.block then

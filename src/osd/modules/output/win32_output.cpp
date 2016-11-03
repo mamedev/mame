@@ -110,7 +110,7 @@ int output_win32::init(const osd_options &options)
 	assert(result == 0);
 	(void)result; // to silence gcc 4.6
 
-	// allocate message ids before creating the window 
+	// allocate message ids before creating the window
 	// since the window proc gets called during creation
 	om_mame_start = RegisterWindowMessage(OM_MAME_START);
 	assert(om_mame_start != 0);

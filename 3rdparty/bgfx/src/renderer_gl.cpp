@@ -9,6 +9,7 @@
 #	include "renderer_gl.h"
 #	include <bx/timer.h>
 #	include <bx/uint32_t.h>
+#	include "hmd_ovr.h"
 
 #if BGFX_CONFIG_PROFILER_REMOTERY
 #	define BGFX_GPU_PROFILER_BIND() rmt_BindOpenGL()
@@ -1014,6 +1015,10 @@ namespace bgfx { namespace gl
 		}
 	}
 
+	static void GL_APIENTRY stubPolygonMode(GLenum /*_face*/, GLenum /*_mode*/)
+	{
+	}
+
 	typedef void (*PostSwapBuffersFn)(uint32_t _width, uint32_t _height);
 
 	static const char* getGLString(GLenum _name)
@@ -1131,7 +1136,7 @@ namespace bgfx { namespace gl
 
 	void flushGlError()
 	{
-		for (GLenum err = glGetError(); err != 0; err = glGetError());
+		for (GLenum err = glGetError(); err != 0; err = glGetError() );
 	}
 
 	GLenum initTestTexture(TextureFormat::Enum _format, bool _srgb, bool _mipmaps)
@@ -1352,6 +1357,47 @@ namespace bgfx { namespace gl
 		BX_UNUSED(supported);
 	}
 
+#if BGFX_CONFIG_USE_OVR
+	class VRImplOVRGL : public VRImplOVR
+	{
+	public:
+		VRImplOVRGL();
+
+		virtual bool createSwapChain(const VRDesc& _desc, int _msaaSamples, int _mirrorWidth, int _mirrorHeight) BX_OVERRIDE;
+		virtual void destroySwapChain() BX_OVERRIDE;
+		virtual void destroyMirror() BX_OVERRIDE;
+		virtual void renderEyeStart(const VRDesc& _desc, uint8_t _eye) BX_OVERRIDE;
+		virtual bool submitSwapChain(const VRDesc& _desc) BX_OVERRIDE;
+
+	private:
+		GLuint m_eyeFbo[2];
+		GLuint m_eyeTexId[2][4];
+		GLuint m_depthBuffer[2];
+		GLuint m_msaaEyeFbo[2];
+		GLuint m_msaaEyeTexId[2];
+		GLuint m_msaaDepthBuffer[2];
+		GLuint m_mirrorFbo;
+		GLint m_mirrorWidth;
+		GLint m_mirrorHeight;
+
+		ovrTextureSwapChain m_textureSwapChain[2];
+		ovrMirrorTexture m_mirrorTexture;
+	};
+#endif // BGFX_CONFIG_USE_OVR
+
+	struct VendorId
+	{
+		const char* name;
+		uint16_t id;
+	};
+
+	static const VendorId s_vendorIds[] =
+	{
+		{ "NVIDIA Corporation",           BGFX_PCI_ID_NVIDIA },
+		{ "Advanced Micro Devices, Inc.", BGFX_PCI_ID_AMD    },
+		{ "Intel",                        BGFX_PCI_ID_INTEL  },
+	};
+
 	struct RendererContextGL : public RendererContextI
 	{
 		RendererContextGL()
@@ -1401,12 +1447,26 @@ namespace bgfx { namespace gl
 			setRenderContextSize(BGFX_DEFAULT_WIDTH, BGFX_DEFAULT_HEIGHT);
 
 			// Must be after context is initialized?!
-			m_ovr.init();
+			VRImplI* vrImpl = NULL;
+#if BGFX_CONFIG_USE_OVR
+			vrImpl = &m_ovrRender;
+#endif
+			m_ovr.init(vrImpl);
 
 			m_vendor      = getGLString(GL_VENDOR);
 			m_renderer    = getGLString(GL_RENDERER);
 			m_version     = getGLString(GL_VERSION);
 			m_glslVersion = getGLString(GL_SHADING_LANGUAGE_VERSION);
+
+			for (uint32_t ii = 0; ii < BX_COUNTOF(s_vendorIds); ++ii)
+			{
+				const VendorId& vendorId = s_vendorIds[ii];
+				if (0 == strncmp(vendorId.name, m_vendor, strlen(vendorId.name) ) )
+				{
+					g_caps.vendorId = vendorId.id;
+					break;
+				}
+			}
 
 			GLint numCmpFormats = 0;
 			GL_CHECK(glGetIntegerv(GL_NUM_COMPRESSED_TEXTURE_FORMATS, &numCmpFormats) );
@@ -1872,6 +1932,11 @@ namespace bgfx { namespace gl
 				: 0
 				;
 
+			if (NULL == glPolygonMode)
+			{
+				glPolygonMode = stubPolygonMode;
+			}
+
 			if (s_extension[Extension::ARB_copy_image].m_supported
 			||  s_extension[Extension::EXT_copy_image].m_supported
 			||  s_extension[Extension:: NV_copy_image].m_supported
@@ -1904,14 +1969,14 @@ namespace bgfx { namespace gl
 				: 0
 				;
 
-			g_caps.maxTextureSize = uint16_t(glGet(GL_MAX_TEXTURE_SIZE) );
+			g_caps.limits.maxTextureSize = uint16_t(glGet(GL_MAX_TEXTURE_SIZE) );
 
 			if (BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGL)
 			||  BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGLES >= 30)
 			||  s_extension[Extension::EXT_draw_buffers  ].m_supported
 			||  s_extension[Extension::WEBGL_draw_buffers].m_supported)
 			{
-				g_caps.maxFBAttachments = uint8_t(bx::uint32_min(glGet(GL_MAX_DRAW_BUFFERS)
+				g_caps.limits.maxFBAttachments = uint8_t(bx::uint32_min(glGet(GL_MAX_DRAW_BUFFERS)
 						, BGFX_CONFIG_MAX_FRAME_BUFFER_ATTACHMENTS)
 						);
 			}
@@ -2205,15 +2270,8 @@ namespace bgfx { namespace gl
 					m_glctx.swap(m_frameBuffers[m_windows[ii].idx].m_swapChain);
 				}
 
-				switch (m_ovr.swap(_hmd, true) )
-				{
-				case OVR::DeviceLost:
-					ovrPreReset();
-					break;
-
-				default:
-					break;
-				}
+				m_ovr.flip();
+				m_ovr.swap(_hmd); // TODO - move this out of end-of-frame
 
 				// need to swap GL render context even if OVR is enabled to get the mirror texture in the output
 				m_glctx.swap();
@@ -2321,7 +2379,7 @@ namespace bgfx { namespace gl
 		{
 		}
 
-		void readTexture(TextureHandle _handle, void* _data) BX_OVERRIDE
+		void readTexture(TextureHandle _handle, void* _data, uint8_t _mip) BX_OVERRIDE
 		{
 			if (m_readBackSupported)
 			{
@@ -2333,14 +2391,14 @@ namespace bgfx { namespace gl
 				if (compressed)
 				{
 					GL_CHECK(glGetCompressedTexImage(texture.m_target
-						, 0
+						, _mip
 						, _data
 						) );
 				}
 				else
 				{
 					GL_CHECK(glGetTexImage(texture.m_target
-						, 0
+						, _mip
 						, texture.m_fmt
 						, texture.m_type
 						, _data
@@ -2439,6 +2497,7 @@ namespace bgfx { namespace gl
 		{
 			BX_FREE(g_allocator, m_uniforms[_handle.idx]);
 			m_uniforms[_handle.idx] = NULL;
+			m_uniformReg.remove(_handle);
 		}
 
 		void saveScreenShot(const char* _filePath) BX_OVERRIDE
@@ -2956,24 +3015,8 @@ namespace bgfx { namespace gl
 #if BGFX_CONFIG_USE_OVR
 			if (m_resolution.m_flags & (BGFX_RESET_HMD|BGFX_RESET_HMD_DEBUG) )
 			{
-				if (m_ovr.postReset() )
-				{
-					const uint32_t msaaSamples = 1 << ((m_resolution.m_flags&BGFX_RESET_MSAA_MASK) >> BGFX_RESET_MSAA_SHIFT);
-
-					for (uint32_t ii = 0; ii < 2; ++ii)
-					{
-						// eye buffers need to be initialized only once during application lifetime
-						if (NULL == m_ovr.m_eyeBuffers[ii])
-						{
-							m_ovr.m_eyeBuffers[ii] = &m_ovrBuffers[ii];
-							m_ovr.m_eyeBuffers[ii]->create(m_ovr.m_hmd, ii, msaaSamples);
-						}
-					}
-
-					// recreate mirror texture
-					m_ovr.m_mirror = &m_ovrMirror;
-					m_ovr.m_mirror->create(m_ovr.m_hmd, m_resolution.m_width, m_resolution.m_height);
-				}
+				const uint32_t msaaSamples = 1 << ( (m_resolution.m_flags&BGFX_RESET_MSAA_MASK) >> BGFX_RESET_MSAA_SHIFT);
+				m_ovr.postReset(msaaSamples, m_resolution.m_width, m_resolution.m_height);
 			}
 #endif // BGFX_CONFIG_USE_OVR
 		}
@@ -3404,10 +3447,9 @@ namespace bgfx { namespace gl
 		const char* m_version;
 		const char* m_glslVersion;
 
-		OVR m_ovr;
+		VR m_ovr;
 #if BGFX_CONFIG_USE_OVR
-		OVRMirrorGL m_ovrMirror;
-		OVRBufferGL m_ovrBuffers[2];
+		VRImplOVRGL m_ovrRender;
 #endif // BGFX_CONFIG_USE_OVR
 	};
 
@@ -3428,215 +3470,247 @@ namespace bgfx { namespace gl
 	}
 
 #if BGFX_CONFIG_USE_OVR
-	void OVRBufferGL::create(const ovrSession& _session, int _eyeIdx, int _msaaSamples)
+
+	VRImplOVRGL::VRImplOVRGL()
+		: m_mirrorTexture(NULL)
 	{
-		m_eyeFbo = 0;
-		m_eyeTexId = 0;
-		m_depthBuffer = 0;
-		m_msaaEyeFbo = 0;
-		m_msaaEyeTexId = 0;
-		m_msaaDepthBuffer = 0;
+		memset(&m_textureSwapChain, 0, sizeof(m_textureSwapChain) );
+	}
 
-		ovrHmdDesc hmdDesc = ovr_GetHmdDesc(_session);
-		m_eyeTextureSize = ovr_GetFovTextureSize(_session, ovrEyeType(_eyeIdx), hmdDesc.DefaultEyeFov[_eyeIdx], 1.0f);
-
-		ovrTextureSwapChainDesc desc = {};
-		desc.Type = ovrTexture_2D;
-		desc.ArraySize = 1;
-		desc.Width  = m_eyeTextureSize.w;
-		desc.Height = m_eyeTextureSize.h;
-		desc.MipLevels = 1;
-		desc.Format = OVR_FORMAT_R8G8B8A8_UNORM_SRGB;
-		desc.SampleCount = 1;
-		desc.StaticImage = ovrFalse;
-
-		ovr_CreateTextureSwapChainGL(_session, &desc, &m_textureSwapChain);
-
-		int textureCount = 0;
-		ovr_GetTextureSwapChainLength(_session, m_textureSwapChain, &textureCount);
-
-		for (int j = 0; j < textureCount; ++j)
-		{
-			GLuint chainTexId;
-			ovr_GetTextureSwapChainBufferGL(_session, m_textureSwapChain, j, &chainTexId);
-			GL_CHECK(glBindTexture(GL_TEXTURE_2D, chainTexId) );
-
-			GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR) );
-			GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR) );
-			GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE) );
-			GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE) );
-		}
-
-		GL_CHECK(glGenFramebuffers(1, &m_eyeFbo) );
-
-		// create depth buffer
-		GL_CHECK(glGenTextures(1, &m_depthBuffer) );
-		GL_CHECK(glBindTexture(GL_TEXTURE_2D, m_depthBuffer) );
+	static void setDefaultSamplerState()
+	{
 		GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR) );
 		GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR) );
 		GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE) );
 		GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE) );
-
-		GL_CHECK(glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, m_eyeTextureSize.w, m_eyeTextureSize.h, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, NULL) );
-
-		// create MSAA buffers
-		if (_msaaSamples > 1)
-		{
-			GL_CHECK(glGenFramebuffers(1, &m_msaaEyeFbo) );
-
-			// create color MSAA texture
-			GL_CHECK(glGenTextures(1, &m_msaaEyeTexId) );
-			GL_CHECK(glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, m_msaaEyeTexId) );
-
-			GL_CHECK(glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, _msaaSamples, GL_RGBA, m_eyeTextureSize.w, m_eyeTextureSize.h, false) );
-			GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER) );
-			GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER) );
-			GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR) );
-			GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR) );
-			GL_CHECK(glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_MAX_LEVEL, 0) );
-
-			// create MSAA depth buffer
-			GL_CHECK(glGenTextures(1, &m_msaaDepthBuffer) );
-			GL_CHECK(glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, m_msaaDepthBuffer) );
-
-			GL_CHECK(glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, _msaaSamples, GL_DEPTH_COMPONENT, m_eyeTextureSize.w, m_eyeTextureSize.h, false) );
-			GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT) );
-			GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT) );
-			GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR) );
-			GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR) );
-			GL_CHECK(glTexParameteri(GL_TEXTURE_2D_MULTISAMPLE, GL_TEXTURE_MAX_LEVEL, 0) );
-		}
 	}
 
-	void OVRBufferGL::render(const ovrSession& _session)
+	bool VRImplOVRGL::createSwapChain(const VRDesc& _desc, int _msaaSamples, int _mirrorWidth, int _mirrorHeight)
 	{
-		// set the current eye texture in swap chain
-		int curIndex;
-		ovr_GetTextureSwapChainCurrentIndex(_session, m_textureSwapChain, &curIndex);
-		ovr_GetTextureSwapChainBufferGL(_session, m_textureSwapChain, curIndex, &m_eyeTexId);
+		for (int eye = 0; eye < 2; ++eye)
+		{
+			if (NULL == m_textureSwapChain[eye])
+			{
+				m_eyeFbo[eye] = 0;
+				m_depthBuffer[eye] = 0;
+				m_msaaEyeFbo[eye] = 0;
+				m_msaaEyeTexId[eye] = 0;
+				m_msaaDepthBuffer[eye] = 0;
+				memset(&m_eyeTexId[eye], 0, sizeof(m_eyeTexId[eye]) );
 
-		if (0 != m_msaaEyeFbo)
-		{
-			GL_CHECK(glBindFramebuffer(GL_FRAMEBUFFER, m_msaaEyeFbo) );
-			GL_CHECK(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, m_msaaEyeTexId, 0) );
-			GL_CHECK(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D_MULTISAMPLE, m_msaaDepthBuffer, 0) );
+				ovrTextureSwapChainDesc swapchainDesc = {};
+				swapchainDesc.Type = ovrTexture_2D;
+				swapchainDesc.ArraySize = 1;
+				swapchainDesc.Width = _desc.m_eyeSize[eye].m_w;
+				swapchainDesc.Height = _desc.m_eyeSize[eye].m_h;
+				swapchainDesc.MipLevels = 1;
+				swapchainDesc.Format = OVR_FORMAT_R8G8B8A8_UNORM_SRGB;
+				swapchainDesc.SampleCount = 1;
+				swapchainDesc.StaticImage = ovrFalse;
+
+				ovrResult result = ovr_CreateTextureSwapChainGL(m_session, &swapchainDesc, &m_textureSwapChain[eye]);
+				if (!OVR_SUCCESS(result) )
+				{
+					destroySwapChain();
+					return false;
+				}
+
+				int textureCount = 0;
+				ovr_GetTextureSwapChainLength(m_session, m_textureSwapChain[eye], &textureCount);
+				for (int ii = 0; ii < textureCount; ++ii)
+				{
+					ovr_GetTextureSwapChainBufferGL(m_session, m_textureSwapChain[eye], ii, &m_eyeTexId[eye][ii]);
+					GL_CHECK(glBindTexture(GL_TEXTURE_2D, m_eyeTexId[eye][ii]) );
+					setDefaultSamplerState();
+				}
+
+				GL_CHECK(glGenFramebuffers(1, &m_eyeFbo[eye]) );
+
+				// create depth buffer
+				GL_CHECK(glGenTextures(1, &m_depthBuffer[eye]) );
+				GL_CHECK(glBindTexture(GL_TEXTURE_2D, m_depthBuffer[eye]) );
+				setDefaultSamplerState();
+
+				GL_CHECK(glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, _desc.m_eyeSize[eye].m_w, _desc.m_eyeSize[eye].m_h, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_INT, NULL) );
+
+				GL_CHECK(glBindFramebuffer(GL_READ_FRAMEBUFFER, m_eyeFbo[eye]) );
+				GL_CHECK(glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depthBuffer[eye], 0) );
+				GL_CHECK(glBindFramebuffer(GL_READ_FRAMEBUFFER, 0) );
+
+				// create MSAA targets if needed
+				if (_msaaSamples > 1)
+				{
+					GL_CHECK(glGenFramebuffers(1, &m_msaaEyeFbo[eye]) );
+
+					// create color MSAA texture
+					GL_CHECK(glGenTextures(1, &m_msaaEyeTexId[eye]) );
+					GL_CHECK(glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, m_msaaEyeTexId[eye]) );
+					GL_CHECK(glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, _msaaSamples, GL_RGBA, _desc.m_eyeSize[eye].m_w, _desc.m_eyeSize[eye].m_h, false) );
+					setDefaultSamplerState();
+
+					// create MSAA depth buffer
+					GL_CHECK(glGenTextures(1, &m_msaaDepthBuffer[eye]) );
+					GL_CHECK(glBindTexture(GL_TEXTURE_2D_MULTISAMPLE, m_depthBuffer[eye]) );
+					GL_CHECK(glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, _msaaSamples, GL_DEPTH_COMPONENT, _desc.m_eyeSize[eye].m_w, _desc.m_eyeSize[eye].m_h, false) );
+					setDefaultSamplerState();
+
+					GL_CHECK(glBindFramebuffer(GL_READ_FRAMEBUFFER, m_msaaEyeFbo[eye]) );
+					GL_CHECK(glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, m_msaaEyeTexId[eye], 0) );
+					GL_CHECK(glFramebufferRenderbuffer(GL_READ_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, 0) );
+					GL_CHECK(glBindFramebuffer(GL_READ_FRAMEBUFFER, 0) );
+				}
+
+				m_renderLayer.ColorTexture[eye] = m_textureSwapChain[eye];
+			}
 		}
-		else // MSAA disabled? render directly to eye buffer
+
+		m_renderLayer.Header.Flags |= ovrLayerFlag_TextureOriginAtBottomLeft;
+
+		if (NULL == m_mirrorTexture)
 		{
-			GL_CHECK(glBindFramebuffer(GL_FRAMEBUFFER, m_eyeFbo) );
-			GL_CHECK(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_eyeTexId, 0) );
-			GL_CHECK(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, m_depthBuffer, 0) );
+			m_mirrorFbo = 0;
+
+			ovrMirrorTextureDesc mirrorDesc = {};
+			mirrorDesc.Width = _mirrorWidth;
+			mirrorDesc.Height = _mirrorHeight;
+			mirrorDesc.Format = OVR_FORMAT_R8G8B8A8_UNORM_SRGB;
+
+			// Fallback to doing nothing if mirror was not created. This is to prevent errors with fast window resizes
+			ovr_CreateMirrorTextureGL(m_session, &mirrorDesc, &m_mirrorTexture);
+			if (m_mirrorTexture)
+			{
+				m_mirrorWidth = _mirrorWidth;
+				m_mirrorHeight = _mirrorHeight;
+
+				// Configure the mirror read buffer
+				GLuint texId;
+				ovr_GetMirrorTextureBufferGL(m_session, m_mirrorTexture, &texId);
+				GL_CHECK(glGenFramebuffers(1, &m_mirrorFbo) );
+				GL_CHECK(glBindFramebuffer(GL_READ_FRAMEBUFFER, m_mirrorFbo) );
+				GL_CHECK(glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texId, 0) );
+				GL_CHECK(glFramebufferRenderbuffer(GL_READ_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, 0) );
+				GL_CHECK(glBindFramebuffer(GL_READ_FRAMEBUFFER, 0) );
+
+				if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+				{
+					GL_CHECK(glDeleteFramebuffers(1, &m_mirrorFbo) );
+					ovr_DestroyMirrorTexture(m_session, m_mirrorTexture);
+					m_mirrorTexture = NULL;
+					BX_CHECK(false, "Could not initialize VR mirror buffers!");
+				}
+			}
 		}
-		GL_CHECK(glViewport(0, 0, m_eyeTextureSize.w, m_eyeTextureSize.h) );
-		GL_CHECK(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT) );
+
+		return true;
 	}
 
-	void OVRBufferGL::postRender(const ovrSession& /*_sesion*/)
+	void VRImplOVRGL::destroySwapChain()
 	{
-		if (0 != m_msaaEyeFbo && 0 != m_eyeTexId)
+		for (int eye = 0; eye < 2; ++eye)
 		{
-			// blit the contents of MSAA FBO to the regular eye buffer "connected" to the HMD
-			GL_CHECK(glBindFramebuffer(GL_READ_FRAMEBUFFER, m_msaaEyeFbo));
-			GL_CHECK(glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_MULTISAMPLE, m_msaaEyeTexId, 0) );
-			GL_CHECK(glFramebufferRenderbuffer(GL_READ_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, 0) );
+			if (NULL != m_textureSwapChain[eye])
+			{
+				GL_CHECK(glDeleteFramebuffers(1, &m_eyeFbo[eye]) );
+				GL_CHECK(glDeleteTextures(1, &m_depthBuffer[eye]) );
 
-			BX_CHECK(GL_FRAMEBUFFER_COMPLETE == glCheckFramebufferStatus(GL_READ_FRAMEBUFFER)
-					 , "glCheckFramebufferStatus failed 0x%08x"
-					 , glCheckFramebufferStatus(GL_READ_FRAMEBUFFER) );
+				ovr_DestroyTextureSwapChain(m_session, m_textureSwapChain[eye]);
+				m_textureSwapChain[eye] = NULL;
 
-			GL_CHECK(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_eyeFbo));
-			GL_CHECK(glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_eyeTexId, 0) );
-			GL_CHECK(glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, 0) );
-
-			BX_CHECK(GL_FRAMEBUFFER_COMPLETE == glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER)
-					 , "glCheckFramebufferStatus failed 0x%08x"
-					 , glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER) );
-
-			GL_CHECK(glBlitFramebuffer(0, 0, m_eyeTextureSize.w, m_eyeTextureSize.h,
-					 0, 0, m_eyeTextureSize.w, m_eyeTextureSize.h, GL_COLOR_BUFFER_BIT, GL_NEAREST) );
-
-			GL_CHECK(glBindFramebuffer(GL_FRAMEBUFFER, 0) );
+				if (0 != m_msaaEyeFbo[eye])
+				{
+					GL_CHECK(glDeleteFramebuffers(1, &m_msaaEyeFbo[eye]) );
+					GL_CHECK(glDeleteTextures(1, &m_msaaEyeTexId[eye]) );
+					GL_CHECK(glDeleteTextures(1, &m_msaaDepthBuffer[eye]) );
+					m_msaaEyeFbo[eye] = 0;
+				}
+			}
 		}
+
+		destroyMirror();
 	}
 
-	void OVRBufferGL::destroy(const ovrSession& _session)
-	{
-		GL_CHECK(glDeleteFramebuffers(1, &m_eyeFbo) );
-		GL_CHECK(glDeleteTextures(1, &m_depthBuffer) );
-
-		ovr_DestroyTextureSwapChain(_session, m_textureSwapChain);
-
-		if (0 != m_msaaEyeFbo)
-		{
-			GL_CHECK(glDeleteFramebuffers(1, &m_msaaEyeFbo) );
-			m_msaaEyeFbo = 0;
-		}
-
-		if (0 != m_msaaEyeTexId)
-		{
-			GL_CHECK(glDeleteTextures(1, &m_msaaEyeTexId));
-			m_msaaEyeTexId = 0;
-		}
-
-		if (0 != m_msaaDepthBuffer)
-		{
-			GL_CHECK(glDeleteTextures(1, &m_msaaDepthBuffer));
-			m_msaaDepthBuffer = 0;
-		}
-	}
-
-	void OVRMirrorGL::create(const ovrSession& _session, int _width, int _height)
-	{
-		memset(&m_mirrorTextureDesc, 0, sizeof(m_mirrorTextureDesc) );
-		m_mirrorTextureDesc.Width  = _width;
-		m_mirrorTextureDesc.Height = _height;
-		m_mirrorTextureDesc.Format = OVR_FORMAT_R8G8B8A8_UNORM_SRGB;
-
-		ovr_CreateMirrorTextureGL(_session, &m_mirrorTextureDesc, &m_mirrorTexture);
-
-		// Fallback to doing nothing if mirror was not created. This is to prevent errors with fast window resizes
-		if (!m_mirrorTexture)
-			return;
-
-		// Configure the mirror read buffer
-		GLuint texId;
-		ovr_GetMirrorTextureBufferGL(_session, m_mirrorTexture, &texId);
-		GL_CHECK(glGenFramebuffers(1, &m_mirrorFBO) );
-		GL_CHECK(glBindFramebuffer(GL_READ_FRAMEBUFFER, m_mirrorFBO) );
-		GL_CHECK(glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texId, 0) );
-		GL_CHECK(glFramebufferRenderbuffer(GL_READ_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, 0) );
-		GL_CHECK(glBindFramebuffer(GL_READ_FRAMEBUFFER, 0) );
-
-		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-		{
-			GL_CHECK(glDeleteFramebuffers(1, &m_mirrorFBO) );
-			BX_CHECK(false, "Could not initialize VR buffers!");
-		}
-	}
-
-	void OVRMirrorGL::destroy(const ovrSession& _session)
+	void VRImplOVRGL::destroyMirror()
 	{
 		if (NULL != m_mirrorTexture)
 		{
-			GL_CHECK(glDeleteFramebuffers(1, &m_mirrorFBO) );
-			ovr_DestroyMirrorTexture(_session, m_mirrorTexture);
+			GL_CHECK(glDeleteFramebuffers(1, &m_mirrorFbo) );
+			ovr_DestroyMirrorTexture(m_session, m_mirrorTexture);
 			m_mirrorTexture = NULL;
 		}
 	}
 
-	void OVRMirrorGL::blit(const ovrSession& /*_session*/)
+	void VRImplOVRGL::renderEyeStart(const VRDesc& _desc, uint8_t _eye)
 	{
-		if (NULL != m_mirrorTexture)
+		// set the current eye texture in the swap chain
+		if (0 != m_msaaEyeFbo[_eye])
 		{
-			// Blit mirror texture to back buffer
-			GL_CHECK(glBindFramebuffer(GL_READ_FRAMEBUFFER, m_mirrorFBO) );
+			GL_CHECK(glBindFramebuffer(GL_FRAMEBUFFER, m_msaaEyeFbo[_eye]) );
+		}
+		else
+		{
+			int texIndex;
+			ovr_GetTextureSwapChainCurrentIndex(m_session, m_textureSwapChain[_eye], &texIndex);
+
+			GL_CHECK(glBindFramebuffer(GL_FRAMEBUFFER, m_eyeFbo[_eye]) );
+			GL_CHECK(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_eyeTexId[_eye][texIndex], 0) );
+		}
+
+		GL_CHECK(glViewport(0, 0, _desc.m_eyeSize[_eye].m_w, _desc.m_eyeSize[_eye].m_h) );
+		GL_CHECK(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT) );
+	}
+
+	bool VRImplOVRGL::submitSwapChain(const VRDesc& _desc)
+	{
+		for (int eye = 0; eye < 2; ++eye)
+		{
+			if (0 != m_msaaEyeFbo[eye])
+			{
+				// blit the contents of MSAA FBO to the regulare eye buffer "connected" to the HMD
+				int destIndex;
+				ovr_GetTextureSwapChainCurrentIndex(m_session, m_textureSwapChain[eye], &destIndex);
+
+				GL_CHECK(glBindFramebuffer(GL_READ_FRAMEBUFFER, m_msaaEyeFbo[eye]) );
+				BX_CHECK(GL_FRAMEBUFFER_COMPLETE == glCheckFramebufferStatus(GL_READ_FRAMEBUFFER)
+						, "glCheckFramebufferStatus failed 0x%08x"
+						, glCheckFramebufferStatus(GL_READ_FRAMEBUFFER)
+						);
+
+				GL_CHECK(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_eyeFbo[eye]) );
+				GL_CHECK(glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_eyeTexId[eye][destIndex], 0) );
+				BX_CHECK(GL_FRAMEBUFFER_COMPLETE == glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER)
+						, "glCheckFramebufferStatus failed 0x%08x"
+						, glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER)
+						);
+
+				GL_CHECK(glBlitFramebuffer(0, 0, _desc.m_eyeSize[eye].m_w, _desc.m_eyeSize[eye].m_h, 0, 0, _desc.m_eyeSize[eye].m_w, _desc.m_eyeSize[eye].m_h, GL_COLOR_BUFFER_BIT, GL_NEAREST) );
+				GL_CHECK(glBindFramebuffer(GL_READ_FRAMEBUFFER, 0) );
+			}
+
+			ovrResult result = ovr_CommitTextureSwapChain(m_session, m_textureSwapChain[eye]);
+			if (!OVR_SUCCESS(result) )
+			{
+				return false;
+			}
+		}
+
+		ovrLayerHeader* layerList = &m_renderLayer.Header;
+		ovrResult result = ovr_SubmitFrame(m_session, 0, &m_viewScale, &layerList, 1);
+		if (!OVR_SUCCESS(result) )
+		{
+			return false;
+		}
+
+		if (result != ovrSuccess_NotVisible && NULL != m_mirrorTexture)
+		{
+			GL_CHECK(glBindFramebuffer(GL_READ_FRAMEBUFFER, m_mirrorFbo) );
 			GL_CHECK(glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0) );
-			GLint width  = m_mirrorTextureDesc.Width;
-			GLint height = m_mirrorTextureDesc.Height;
-			GL_CHECK(glBlitFramebuffer(0, height, width, 0, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST) );
+			GL_CHECK(glBlitFramebuffer(0, m_mirrorHeight, m_mirrorWidth, 0, 0, 0, m_mirrorWidth, m_mirrorHeight, GL_COLOR_BUFFER_BIT, GL_NEAREST) );
 			GL_CHECK(glBindFramebuffer(GL_READ_FRAMEBUFFER, 0) );
 		}
+
+		return true;
 	}
+
 #endif // BGFX_CONFIG_USE_OVR
 
 	const char* glslTypeName(GLuint _type)
@@ -3689,6 +3763,7 @@ namespace bgfx { namespace gl
 			GLSL_TYPE(GL_UNSIGNED_INT_IMAGE_1D);
 
 			GLSL_TYPE(GL_IMAGE_2D);
+			GLSL_TYPE(GL_IMAGE_2D_ARRAY);
 			GLSL_TYPE(GL_INT_IMAGE_2D);
 			GLSL_TYPE(GL_UNSIGNED_INT_IMAGE_2D);
 
@@ -3786,6 +3861,7 @@ namespace bgfx { namespace gl
 		case GL_UNSIGNED_INT_IMAGE_1D:
 
 		case GL_IMAGE_2D:
+		case GL_IMAGE_2D_ARRAY:
 		case GL_INT_IMAGE_2D:
 		case GL_UNSIGNED_INT_IMAGE_2D:
 
@@ -4285,6 +4361,11 @@ namespace bgfx { namespace gl
 		, const GLvoid* _data
 	)
 	{
+		if (NULL == _data)
+		{
+			return;
+		}
+
 		if (_target == GL_TEXTURE_3D
 		||  _target == GL_TEXTURE_2D_ARRAY
 		||  _target == GL_TEXTURE_CUBE_MAP_ARRAY)
@@ -4355,7 +4436,19 @@ namespace bgfx { namespace gl
 		else if (_target == GL_TEXTURE_2D_ARRAY
 			 ||  _target == GL_TEXTURE_CUBE_MAP_ARRAY)
 		{
-			texSubImage(_target, _level, 0, 0, _depth, _width, _height, 1, _format, _type, _data);
+			texSubImage(
+				  _target
+				, _level
+				, 0
+				, 0
+				, _depth
+				, _width
+				, _height
+				, 1
+				, _format
+				, _type
+				, _data
+				);
 		}
 		else if (_target == GL_TEXTURE_2D_MULTISAMPLE_ARRAY)
 		{
@@ -5456,7 +5549,7 @@ namespace bgfx { namespace gl
 
 						if (!!bx::findIdentifierMatch(code, "gl_FragData") )
 						{
-							for (uint32_t ii = 0, num = g_caps.maxFBAttachments; ii < num; ++ii)
+							for (uint32_t ii = 0, num = g_caps.limits.maxFBAttachments; ii < num; ++ii)
 							{
 								char tmpFragData[16];
 								bx::snprintf(tmpFragData, BX_COUNTOF(tmpFragData), "gl_FragData[%d]", ii);
@@ -5546,7 +5639,7 @@ namespace bgfx { namespace gl
 
 						if (!!bx::findIdentifierMatch(code, "gl_FragData") )
 						{
-							for (uint32_t ii = 0, num = g_caps.maxFBAttachments; ii < num; ++ii)
+							for (uint32_t ii = 0, num = g_caps.limits.maxFBAttachments; ii < num; ++ii)
 							{
 								char tmpFragData[16];
 								bx::snprintf(tmpFragData, BX_COUNTOF(tmpFragData), "gl_FragData[%d]", ii);
@@ -5568,7 +5661,7 @@ namespace bgfx { namespace gl
 							}
 						}
 
-						if (!!bx::findIdentifierMatch(code, s_ARB_texture_multisample))
+						if (!!bx::findIdentifierMatch(code, s_ARB_texture_multisample) )
 						{
 							writeString(&writer, "#extension GL_ARB_texture_multisample : enable\n");
 						}
@@ -5898,7 +5991,8 @@ namespace bgfx { namespace gl
 		uint32_t dsFlags = _flags & (BGFX_CLEAR_DISCARD_DEPTH|BGFX_CLEAR_DISCARD_STENCIL);
 		if (BGFX_CLEAR_NONE != dsFlags)
 		{
-			if ( (BGFX_CLEAR_DISCARD_DEPTH|BGFX_CLEAR_DISCARD_STENCIL) == dsFlags)
+			if (!BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGLES)
+			&&  (BGFX_CLEAR_DISCARD_DEPTH|BGFX_CLEAR_DISCARD_STENCIL) == dsFlags)
 			{
 				buffers[idx++] = GL_DEPTH_STENCIL_ATTACHMENT;
 			}
@@ -6035,7 +6129,8 @@ namespace bgfx { namespace gl
 		_render->m_hmdInitialized = m_ovr.isInitialized();
 
 		const bool hmdEnabled = m_ovr.isEnabled();
-		ViewState viewState(_render, hmdEnabled);
+		static ViewState viewState;
+		viewState.reset(_render, hmdEnabled);
 
 		uint16_t programIdx = invalidHandle;
 		SortKey key;
@@ -6055,10 +6150,16 @@ namespace bgfx { namespace gl
 
 		uint8_t primIndex;
 		{
-			const uint64_t pt = _render->m_debug&BGFX_DEBUG_WIREFRAME ? BGFX_STATE_PT_LINES : 0;
+			const uint64_t pt = 0;
 			primIndex = uint8_t(pt>>BGFX_STATE_PT_SHIFT);
 		}
 		PrimInfo prim = s_primInfo[primIndex];
+
+		GL_CHECK(glPolygonMode(GL_FRONT_AND_BACK
+			, _render->m_debug&BGFX_DEBUG_WIREFRAME
+			? GL_LINE
+			: GL_FILL
+			) );
 
 		uint32_t baseVertex = 0;
 		GLuint currentVao = 0;
@@ -6171,8 +6272,7 @@ namespace bgfx { namespace gl
 
 						if (m_ovr.isEnabled() )
 						{
-							m_ovr.getViewport(eye, &viewState.m_rect);
-							m_ovr.renderEyeStart(eye);
+							m_ovr.renderEyeStart(eye, &viewState.m_rect);
 						}
 						else
 						{
@@ -6291,7 +6391,7 @@ namespace bgfx { namespace gl
 										GL_CHECK(glBindImageTexture(ii
 											, texture.m_id
 											, bind.m_un.m_compute.m_mip
-											, GL_FALSE
+											, texture.isCubeMap()?GL_TRUE:GL_FALSE
 											, 0
 											, s_access[bind.m_un.m_compute.m_access]
 											, s_imageFormat[bind.m_un.m_compute.m_format])
@@ -6349,7 +6449,7 @@ namespace bgfx { namespace gl
 								uintptr_t args = compute.m_startIndirect * BGFX_CONFIG_DRAW_INDIRECT_STRIDE;
 								for (uint32_t ii = 0; ii < numDrawIndirect; ++ii)
 								{
-									GL_CHECK(glDispatchComputeIndirect((GLintptr)args) );
+									GL_CHECK(glDispatchComputeIndirect( (GLintptr)args) );
 									args += BGFX_CONFIG_DRAW_INDIRECT_STRIDE;
 								}
 							}
@@ -6560,38 +6660,39 @@ namespace bgfx { namespace gl
 						viewState.m_alphaRef = ref/255.0f;
 					}
 
-#if BGFX_CONFIG_RENDERER_OPENGL
-					if ( (BGFX_STATE_PT_POINTS|BGFX_STATE_POINT_SIZE_MASK) & changedFlags)
+					if (BX_ENABLED(BGFX_CONFIG_RENDERER_OPENGL) )
 					{
-						float pointSize = (float)(bx::uint32_max(1, (newFlags&BGFX_STATE_POINT_SIZE_MASK)>>BGFX_STATE_POINT_SIZE_SHIFT) );
-						GL_CHECK(glPointSize(pointSize) );
-					}
+						if ( (BGFX_STATE_PT_POINTS|BGFX_STATE_POINT_SIZE_MASK) & changedFlags)
+						{
+							float pointSize = (float)(bx::uint32_max(1, (newFlags&BGFX_STATE_POINT_SIZE_MASK)>>BGFX_STATE_POINT_SIZE_SHIFT) );
+							GL_CHECK(glPointSize(pointSize) );
+						}
 
-					if (BGFX_STATE_MSAA & changedFlags)
-					{
-						GL_CHECK(BGFX_STATE_MSAA & newFlags
-							? glEnable(GL_MULTISAMPLE)
-							: glDisable(GL_MULTISAMPLE)
-							);
-					}
+						if (BGFX_STATE_MSAA & changedFlags)
+						{
+							GL_CHECK(BGFX_STATE_MSAA & newFlags
+								? glEnable(GL_MULTISAMPLE)
+								: glDisable(GL_MULTISAMPLE)
+								);
+						}
 
-					if (BGFX_STATE_LINEAA & changedFlags)
-					{
-						GL_CHECK(BGFX_STATE_LINEAA & newFlags
-							? glEnable(GL_LINE_SMOOTH)
-							: glDisable(GL_LINE_SMOOTH)
-							);
-					}
+						if (BGFX_STATE_LINEAA & changedFlags)
+						{
+							GL_CHECK(BGFX_STATE_LINEAA & newFlags
+								? glEnable(GL_LINE_SMOOTH)
+								: glDisable(GL_LINE_SMOOTH)
+								);
+						}
 
-					if (m_conservativeRasterSupport
-					&&  BGFX_STATE_CONSERVATIVE_RASTER & changedFlags)
-					{
-						GL_CHECK(BGFX_STATE_CONSERVATIVE_RASTER & newFlags
-							? glEnable(GL_CONSERVATIVE_RASTERIZATION_NV)
-							: glDisable(GL_CONSERVATIVE_RASTERIZATION_NV)
-							);
+						if (m_conservativeRasterSupport
+						&&  BGFX_STATE_CONSERVATIVE_RASTER & changedFlags)
+						{
+							GL_CHECK(BGFX_STATE_CONSERVATIVE_RASTER & newFlags
+								? glEnable(GL_CONSERVATIVE_RASTERIZATION_NV)
+								: glDisable(GL_CONSERVATIVE_RASTERIZATION_NV)
+								);
+						}
 					}
-#endif // BGFX_CONFIG_RENDERER_OPENGL
 
 					if ( (BGFX_STATE_ALPHA_WRITE|BGFX_STATE_RGB_WRITE) & changedFlags)
 					{
@@ -6721,7 +6822,7 @@ namespace bgfx { namespace gl
 						blendFactor = draw.m_rgba;
 					}
 
-					const uint64_t pt = _render->m_debug&BGFX_DEBUG_WIREFRAME ? BGFX_STATE_PT_LINES : newFlags&BGFX_STATE_PT_MASK;
+					const uint64_t pt = newFlags&BGFX_STATE_PT_MASK;
 					primIndex = uint8_t(pt>>BGFX_STATE_PT_SHIFT);
 					prim = s_primInfo[primIndex];
 				}
@@ -6778,25 +6879,28 @@ namespace bgfx { namespace gl
 					}
 
 					if (0 != defaultVao
-					&&  0 == draw.m_startVertex
+					&&  0 == draw.m_stream[0].m_startVertex
 					&&  0 == draw.m_instanceDataOffset)
 					{
 						if (programChanged
-						||  baseVertex                        != draw.m_startVertex
-						||  currentState.m_vertexBuffer.idx   != draw.m_vertexBuffer.idx
-						||  currentState.m_indexBuffer.idx    != draw.m_indexBuffer.idx
-						||  currentState.m_instanceDataOffset != draw.m_instanceDataOffset
-						||  currentState.m_instanceDataStride != draw.m_instanceDataStride
+						||  baseVertex                            != draw.m_stream[0].m_startVertex
+						||  currentState.m_streamMask             != draw.m_streamMask
+						||  currentState.m_stream[0].m_handle.idx != draw.m_stream[0].m_handle.idx
+						||  currentState.m_indexBuffer.idx        != draw.m_indexBuffer.idx
+						||  currentState.m_instanceDataOffset     != draw.m_instanceDataOffset
+						||  currentState.m_instanceDataStride     != draw.m_instanceDataStride
 						||  currentState.m_instanceDataBuffer.idx != draw.m_instanceDataBuffer.idx)
 						{
 							bx::HashMurmur2A murmur;
 							murmur.begin();
-							murmur.add(draw.m_vertexBuffer.idx);
 
-							if (isValid(draw.m_vertexBuffer) )
+							const Stream& stream = draw.m_stream[0];
+							murmur.add(stream.m_handle.idx);
+
+							if (isValid(stream.m_handle) )
 							{
-								const VertexBufferGL& vb = m_vertexBuffers[draw.m_vertexBuffer.idx];
-								uint16_t decl = !isValid(vb.m_decl) ? draw.m_vertexDecl.idx : vb.m_decl.idx;
+								const VertexBufferGL& vb = m_vertexBuffers[stream.m_handle.idx];
+								uint16_t decl = !isValid(vb.m_decl) ? stream.m_decl.idx : vb.m_decl.idx;
 								murmur.add(decl);
 							}
 
@@ -6807,11 +6911,13 @@ namespace bgfx { namespace gl
 							murmur.add(programIdx);
 							uint32_t hash = murmur.end();
 
-							currentState.m_vertexBuffer = draw.m_vertexBuffer;
+							currentState.m_streamMask         = draw.m_streamMask;
+							currentState.m_stream[0].m_handle = stream.m_handle;
+							baseVertex                        = stream.m_startVertex;
+
 							currentState.m_indexBuffer = draw.m_indexBuffer;
 							currentState.m_instanceDataOffset = draw.m_instanceDataOffset;
 							currentState.m_instanceDataStride = draw.m_instanceDataStride;
-							baseVertex = draw.m_startVertex;
 
 							GLuint id = m_vaoStateCache.find(hash);
 							if (UINT32_MAX != id)
@@ -6827,14 +6933,14 @@ namespace bgfx { namespace gl
 
 								program.add(hash);
 
-								if (isValid(draw.m_vertexBuffer) )
+								if (isValid(stream.m_handle) )
 								{
-									VertexBufferGL& vb = m_vertexBuffers[draw.m_vertexBuffer.idx];
+									VertexBufferGL& vb = m_vertexBuffers[stream.m_handle.idx];
 									vb.add(hash);
 									GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, vb.m_id) );
 
-									uint16_t decl = !isValid(vb.m_decl) ? draw.m_vertexDecl.idx : vb.m_decl.idx;
-									program.bindAttributes(m_vertexDecls[decl], draw.m_startVertex);
+									uint16_t decl = !isValid(vb.m_decl) ? stream.m_decl.idx : vb.m_decl.idx;
+									program.bindAttributes(m_vertexDecls[decl], stream.m_startVertex);
 
 									if (isValid(draw.m_instanceDataBuffer) )
 									{
@@ -6868,24 +6974,27 @@ namespace bgfx { namespace gl
 						&&  0 != currentVao)
 						{
 							GL_CHECK(glBindVertexArray(defaultVao) );
-							currentState.m_vertexBuffer.idx = invalidHandle;
-							currentState.m_indexBuffer.idx = invalidHandle;
+							currentState.m_streamMask             = 0;
+							currentState.m_stream[0].m_handle.idx = invalidHandle;
+							currentState.m_indexBuffer.idx        = invalidHandle;
 							bindAttribs = true;
 							currentVao = 0;
 						}
 
 						if (programChanged
-						||  currentState.m_vertexBuffer.idx != draw.m_vertexBuffer.idx
+						||  currentState.m_streamMask             != draw.m_streamMask
+						||  currentState.m_stream[0].m_handle.idx != draw.m_stream[0].m_handle.idx
 						||  currentState.m_instanceDataBuffer.idx != draw.m_instanceDataBuffer.idx
-						||  currentState.m_instanceDataOffset != draw.m_instanceDataOffset
-						||  currentState.m_instanceDataStride != draw.m_instanceDataStride)
+						||  currentState.m_instanceDataOffset     != draw.m_instanceDataOffset
+						||  currentState.m_instanceDataStride     != draw.m_instanceDataStride)
 						{
-							currentState.m_vertexBuffer = draw.m_vertexBuffer;
+							currentState.m_streamMask             = draw.m_streamMask;
+							currentState.m_stream[0].m_handle     = draw.m_stream[0].m_handle;
 							currentState.m_instanceDataBuffer.idx = draw.m_instanceDataBuffer.idx;
-							currentState.m_instanceDataOffset = draw.m_instanceDataOffset;
-							currentState.m_instanceDataStride = draw.m_instanceDataStride;
+							currentState.m_instanceDataOffset     = draw.m_instanceDataOffset;
+							currentState.m_instanceDataStride     = draw.m_instanceDataStride;
 
-							uint16_t handle = draw.m_vertexBuffer.idx;
+							uint16_t handle = draw.m_stream[0].m_handle.idx;
 							if (invalidHandle != handle)
 							{
 								VertexBufferGL& vb = m_vertexBuffers[handle];
@@ -6914,15 +7023,15 @@ namespace bgfx { namespace gl
 							}
 						}
 
-						if (isValid(currentState.m_vertexBuffer) )
+						if (0 != currentState.m_streamMask)
 						{
-							if (baseVertex != draw.m_startVertex
+							if (baseVertex != draw.m_stream[0].m_startVertex
 							||  bindAttribs)
 							{
-								baseVertex = draw.m_startVertex;
-								const VertexBufferGL& vb = m_vertexBuffers[draw.m_vertexBuffer.idx];
-								uint16_t decl = !isValid(vb.m_decl) ? draw.m_vertexDecl.idx : vb.m_decl.idx;
-								program.bindAttributes(m_vertexDecls[decl], draw.m_startVertex);
+								baseVertex = draw.m_stream[0].m_startVertex;
+								const VertexBufferGL& vb = m_vertexBuffers[draw.m_stream[0].m_handle.idx];
+								uint16_t decl = !isValid(vb.m_decl) ? draw.m_stream[0].m_decl.idx : vb.m_decl.idx;
+								program.bindAttributes(m_vertexDecls[decl], draw.m_stream[0].m_startVertex);
 
 								if (isValid(draw.m_instanceDataBuffer) )
 								{
@@ -6933,13 +7042,13 @@ namespace bgfx { namespace gl
 						}
 					}
 
-					if (isValid(currentState.m_vertexBuffer) )
+					if (0 != currentState.m_streamMask)
 					{
 						uint32_t numVertices = draw.m_numVertices;
 						if (UINT32_MAX == numVertices)
 						{
-							const VertexBufferGL& vb = m_vertexBuffers[currentState.m_vertexBuffer.idx];
-							uint16_t decl = !isValid(vb.m_decl) ? draw.m_vertexDecl.idx : vb.m_decl.idx;
+							const VertexBufferGL& vb = m_vertexBuffers[currentState.m_stream[0].m_handle.idx];
+							uint16_t decl = !isValid(vb.m_decl) ? draw.m_stream[0].m_decl.idx : vb.m_decl.idx;
 							const VertexDecl& vertexDecl = m_vertexDecls[decl];
 							numVertices = vb.m_size/vertexDecl.m_stride;
 						}

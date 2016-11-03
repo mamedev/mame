@@ -176,7 +176,7 @@ void am29000_cpu_device::device_start()
 	save_item(NAME(m_next_pc));
 
 	// Register state for debugger
-	state_add( AM29000_PC,   "PC",   m_pc     ).formatstr("%08X");
+	state_add( AM29000_PC,   "PC",   m_pc     ).callimport().formatstr("%08X");
 	state_add( AM29000_VAB,  "VAB",  m_vab    ).formatstr("%08X");
 	state_add( AM29000_OPS,  "OPS",  m_ops    ).formatstr("%08X");
 	state_add( AM29000_CPS,  "CPS",  m_cps    ).formatstr("%08X");
@@ -397,13 +397,34 @@ void am29000_cpu_device::device_start()
 	state_add( AM29000_R254, "R254", m_r[254] ).formatstr("%08X");
 	state_add( AM29000_R255, "R255", m_r[255] ).formatstr("%08X");
 
-	state_add(STATE_GENPC, "GENPC", m_pc).formatstr("%08X").noshow();
-	state_add(STATE_GENPCBASE, "CURPC", m_pc).formatstr("%08X").noshow();
-	state_add(STATE_GENFLAGS, "GENFLAGS", m_alu).formatstr("%13s").noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_pc).callimport().noshow();
+	state_add(STATE_GENFLAGS, "CURFLAGS", m_alu).formatstr("%13s").noshow();
 
 	m_icountptr = &m_icount;
 }
 
+
+//-------------------------------------------------
+//  state_import - import state into the device,
+//  after it has been set
+//-------------------------------------------------
+
+void am29000_cpu_device::state_import(const device_state_entry &entry)
+{
+	switch (entry.index())
+	{
+	case AM29000_PC:
+	case STATE_GENPCBASE:
+		m_next_pc = m_pc;
+		break;
+	}
+}
+
+
+//-------------------------------------------------
+//  state_string_export - export state as a string
+//  for the debugger
+//-------------------------------------------------
 
 void am29000_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {

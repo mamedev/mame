@@ -14,6 +14,9 @@
 #include <string.h>
 #include <wchar.h>  // wchar_t
 
+#include <bx/allocator.h>
+#include <bx/hash.h>
+
 #ifndef va_copy
 #	define va_copy(_a, _b) (_a) = (_b)
 #endif // va_copy
@@ -40,9 +43,8 @@ namespace bx
 	///
 	inline size_t strnlen(const char* _str, size_t _max)
 	{
-		const char* end = _str + _max;
 		const char* ptr;
-		for (ptr = _str; ptr < end && *ptr != '\0'; ++ptr) {};
+		for (ptr = _str; 0 < _max && *ptr != '\0'; ++ptr, --_max) {};
 		return ptr - _str;
 	}
 
@@ -527,6 +529,153 @@ namespace bx
 
 		return(dlen + (s - _src)); /* count does not include NUL */
 	}
+
+	/// Non-zero-terminated string view.
+	class StringView
+	{
+	public:
+		StringView()
+		{
+			clear();
+		}
+
+		StringView(const StringView& _rhs)
+		{
+			set(_rhs.m_ptr, _rhs.m_len);
+		}
+
+		StringView& operator=(const StringView& _rhs)
+		{
+			set(_rhs.m_ptr, _rhs.m_len);
+			return *this;
+		}
+
+		StringView(const char* _ptr, uint32_t _len = UINT32_MAX)
+		{
+			set(_ptr, _len);
+		}
+
+		void set(const char* _ptr, uint32_t _len = UINT32_MAX)
+		{
+			clear();
+
+			if (NULL != _ptr)
+			{
+				uint32_t len = uint32_t(strnlen(_ptr, _len) );
+				if (0 != len)
+				{
+					m_len = len;
+					m_ptr = _ptr;
+				}
+			}
+		}
+
+		void clear()
+		{
+			m_ptr = "";
+			m_len = 0;
+		}
+
+		const char* getPtr() const
+		{
+			return m_ptr;
+		}
+
+		const char* getTerm() const
+		{
+			return m_ptr + m_len;
+		}
+
+		bool isEmpty() const
+		{
+			return 0 == m_len;
+		}
+
+		uint32_t getLength() const
+		{
+			return m_len;
+		}
+
+	protected:
+		friend uint32_t hashMurmur2A(const StringView& _data);
+
+		const char* m_ptr;
+		uint32_t    m_len;
+	};
+
+	inline uint32_t hashMurmur2A(const StringView& _data)
+	{
+		return hashMurmur2A(_data.m_ptr, _data.m_len);
+	}
+
+	inline uint32_t hashMurmur2A(const char* _data)
+	{
+		return hashMurmur2A(StringView(_data) );
+	}
+
+	/// ASCII string
+	template<bx::AllocatorI** AllocatorT>
+	class StringT : public StringView
+	{
+	public:
+		StringT()
+			: StringView("", 0)
+		{
+		}
+
+		StringT(const StringT<AllocatorT>& _rhs)
+		{
+			set(_rhs.m_ptr, _rhs.m_len);
+		}
+
+		StringT<AllocatorT>& operator=(const StringT<AllocatorT>& _rhs)
+		{
+			set(_rhs.m_ptr, _rhs.m_len);
+			return *this;
+		}
+
+		StringT(const char* _ptr, uint32_t _len = UINT32_MAX)
+		{
+			set(_ptr, _len);
+		}
+
+		StringT(const StringView& _rhs)
+		{
+			set(_rhs.getPtr(), _rhs.getLength() );
+		}
+
+		~StringT()
+		{
+			clear();
+		}
+
+		void set(const char* _ptr, uint32_t _len = UINT32_MAX)
+		{
+			clear();
+
+			if (0 != _len)
+			{
+				uint32_t len = uint32_t(strnlen(_ptr, _len) );
+				m_len = len;
+				char* ptr = (char*)BX_ALLOC(*AllocatorT, len+1);
+
+				memcpy(ptr, _ptr, len);
+				ptr[len] = '\0';
+
+				*const_cast<char**>(&m_ptr) = ptr;
+			}
+		}
+
+		void clear()
+		{
+			if (0 != m_len)
+			{
+				BX_FREE(*AllocatorT, const_cast<char*>(m_ptr) );
+
+				StringView::clear();
+			}
+		}
+	};
 
 } // namespace bx
 

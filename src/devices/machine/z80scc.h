@@ -84,6 +84,9 @@
 #define MCFG_Z80SCC_OFFSETS(_rxa, _txa, _rxb, _txb) \
 	z80scc_device::configure_channels(*device, _rxa, _txa, _rxb, _txb);
 
+#define MCFG_Z80SCC_OUT_INT_CB(_devcb) \
+	devcb = &z80scc_device::set_out_int_callback(*device, DEVCB_##_devcb);
+
 // Port A callbacks
 #define MCFG_Z80SCC_OUT_TXDA_CB(_devcb) \
 	devcb = &z80scc_device::set_out_txda_callback(*device, DEVCB_##_devcb);
@@ -100,6 +103,12 @@
 #define MCFG_Z80SCC_OUT_SYNCA_CB(_devcb) \
 	devcb = &z80scc_device::set_out_synca_callback(*device, DEVCB_##_devcb);
 
+#define MCFG_Z80SCC_OUT_RXDRQA_CB(_devcb) \
+	devcb = &z80scc_device::set_out_rxdrqa_callback(*device, DEVCB_##_devcb);
+
+#define MCFG_Z80SCC_OUT_TXDRQA_CB(_devcb) \
+	devcb = &z80scc_device::set_out_txdrqa_callback(*device, DEVCB_##_devcb);
+
 // Port B callbacks
 #define MCFG_Z80SCC_OUT_TXDB_CB(_devcb) \
 	devcb = &z80scc_device::set_out_txdb_callback(*device, DEVCB_##_devcb);
@@ -115,15 +124,6 @@
 
 #define MCFG_Z80SCC_OUT_SYNCB_CB(_devcb) \
 	devcb = &z80scc_device::set_out_syncb_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_Z80SCC_OUT_INT_CB(_devcb) \
-	devcb = &z80scc_device::set_out_int_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_Z80SCC_OUT_RXDRQA_CB(_devcb) \
-	devcb = &z80scc_device::set_out_rxdrqa_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_Z80SCC_OUT_TXDRQA_CB(_devcb) \
-	devcb = &z80scc_device::set_out_txdrqa_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_Z80SCC_OUT_RXDRQB_CB(_devcb) \
 	devcb = &z80scc_device::set_out_rxdrqb_callback(*device, DEVCB_##_devcb);
@@ -169,7 +169,7 @@ public:
 	uint8_t do_sccreg_rr5();
 	uint8_t do_sccreg_rr6();
 	uint8_t do_sccreg_rr7();
-	uint8_t do_sccreg_rr7p(){ return 0; } // Needs to be implemented for Synchronous mode 
+	uint8_t do_sccreg_rr7p(){ return 0; } // Needs to be implemented for Synchronous mode
 	// uint8_t do_sccreg_rr8(); Short cutted due to frequent use
 	uint8_t do_sccreg_rr9();
 	uint8_t do_sccreg_rr10();
@@ -189,7 +189,7 @@ public:
 	void do_sccreg_wr5(uint8_t data);
 	void do_sccreg_wr6(uint8_t data);
 	void do_sccreg_wr7(uint8_t data);
-	void do_sccreg_wr7p(uint8_t data){}; // Needs to be implemented for Synchronous mode 
+	void do_sccreg_wr7p(uint8_t data){}; // Needs to be implemented for Synchronous mode
 	void do_sccreg_wr8(uint8_t data);
 	void do_sccreg_wr9(uint8_t data);
 	void do_sccreg_wr10(uint8_t data);
@@ -250,9 +250,9 @@ public:
 	uint8_t m_wr5; // REG_WR5_TX_CONTROL
 	uint8_t m_wr6; // REG_WR6_SYNC_OR_SDLC_A
 	uint8_t m_wr7; // REG_WR7_SYNC_OR_SDLC_F
-	uint8_t m_wr7p; // 
+	uint8_t m_wr7p; //
 	uint8_t m_wr8;  // REG_WR8_TRANSMIT_DATA
-	//	uint8_t m_wr9;  // REG_WR9_MASTER_INT_CTRL
+	//  uint8_t m_wr9;  // REG_WR9_MASTER_INT_CTRL
 	uint8_t m_wr10; // REG_WR10_MSC_RX_TX_CTRL
 	uint8_t m_wr11; // REG_WR11_CLOCK_MODES
 	uint8_t m_wr12; // REG_WR12_LO_BAUD_GEN
@@ -273,7 +273,15 @@ protected:
 		INT_TRANSMIT = 0,
 		INT_EXTERNAL = 1,
 		INT_RECEIVE  = 2,
-		INT_SPECIAL  = 3
+		INT_SPECIAL  = 3,
+	};
+
+	enum
+	{
+		INT_TRANSMIT_PRIO = 1,
+		INT_EXTERNAL_PRIO = 0,
+		INT_RECEIVE_PRIO  = 2,
+		INT_SPECIAL_PRIO  = 0,
 	};
 
 	// Read registers
@@ -320,11 +328,10 @@ protected:
 
 	enum
 	{
-		RR0_RX_CHAR_AVAILABLE   = 0x01, // SIO bit
-		RR0_ZC          = 0x02, // SCC bit
-		RR0_TX_BUFFER_EMPTY = 0x04, // SIO
-		RR0_DCD         = 0x08, // SIO
-		RR0_RI          = 0x10, // DART bit?    TODO: investigate function and remove
+		RR0_RX_CHAR_AVAILABLE   = 0x01,
+		RR0_ZC          		= 0x02,
+		RR0_TX_BUFFER_EMPTY		= 0x04,
+		RR0_DCD        			= 0x08,
 		RR0_SYNC_HUNT       = 0x10, // SIO bit, not supported
 		RR0_CTS         = 0x20, // SIO bit
 		RR0_TX_UNDERRUN     = 0x40, // SIO bit, not supported
@@ -521,14 +528,14 @@ protected:
 
 	enum
 	{
-		WR15_WR7PRIME		= 0x01,
-		WR15_ZEROCOUNT		= 0x02,
-		WR15_STATUS_FIFO	= 0x04,
-		WR15_DCD     		= 0x08,
-		WR15_SYNC    		= 0x10,
-		WR15_CTS      		= 0x20,
-		WR15_TX_EOM      	= 0x40,
-		WR15_BREAK_ABORT	= 0x80
+		WR15_WR7PRIME       = 0x01,
+		WR15_ZEROCOUNT      = 0x02,
+		WR15_STATUS_FIFO    = 0x04,
+		WR15_DCD            = 0x08,
+		WR15_SYNC           = 0x10,
+		WR15_CTS            = 0x20,
+		WR15_TX_EOM         = 0x40,
+		WR15_BREAK_ABORT    = 0x80
 	};
 
 	enum
@@ -546,7 +553,7 @@ protected:
 	unsigned int m_brg_rate;
 #endif
 	unsigned int m_delayed_tx_brg_change;
-	unsigned int m_brg_const;
+	unsigned int get_brg_rate();
 
 	void scc_register_write(uint8_t reg, uint8_t data);
 	uint8_t scc_register_read(uint8_t reg);
@@ -573,12 +580,12 @@ protected:
 	int m_rx_clock;         // receive clock pulse count
 	int m_rx_first;         // first character received
 	int m_rx_break;         // receive break condition
-	uint8_t m_rx_rr0_latch;   // read register 0 latched
+
+	uint8_t m_extint_latch;    // external/status Int latch enable
+	uint8_t m_extint_states;   // external/status Int latches state
 
 	int m_rxd;
 	int m_ri;       // ring indicator latch
-	int m_cts;      // clear to send latch
-	int m_dcd;      // data carrier detect latch
 
 	// transmitter state
 	uint8_t m_tx_data_fifo[4];   // data FIFO
@@ -587,7 +594,6 @@ protected:
 	int m_tx_fifo_wp;           // FIFO write pointer
 	int m_tx_fifo_sz;           // FIFO size
 	uint8_t m_tx_error;           // current error
-	//	uint8_t m_tx_data;    // transmit data register
 	int m_tx_clock;     // transmit clock pulse count
 
 	int m_dtr;      // data terminal ready
@@ -643,6 +649,8 @@ public:
 		dev.m_txcb = txb;
 	}
 
+	DECLARE_READ8_MEMBER( cd_ab_r );
+	DECLARE_WRITE8_MEMBER( cd_ab_w );
 	DECLARE_READ8_MEMBER( cd_ba_r );
 	DECLARE_WRITE8_MEMBER( cd_ba_w );
 	DECLARE_READ8_MEMBER( ba_cd_r );
@@ -685,6 +693,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( rxtxcb_w ) { m_chanB->rxc_w(state); m_chanB->txc_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( synca_w ) { m_chanA->sync_w(state); }
 	DECLARE_WRITE_LINE_MEMBER( syncb_w ) { m_chanB->sync_w(state); }
+	int update_extint(int i );
+	int get_extint_priority(int type);
+
 
 protected:
 	// device-level overrides

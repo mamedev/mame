@@ -4851,6 +4851,26 @@ eprom:
 
 ;@s:equites.cpp
 
+;*** Splendor Blast II - you must exit game with top score on screen for save to work *** 
+splndrbt2:
+@:maincpu,program,40020,3,01,00
+@:maincpu,program,40840,168,53,01
+@:maincpu,program,201611,1,20,20
+@:maincpu,program,201691,1,01,01
+@:maincpu,program,201711,1,00,00
+@:maincpu,program,201791,1,00,00
+@:maincpu,program,201811,1,00,00
+@:maincpu,program,201891,1,00,00
+@:maincpu,program,201911,1,00,00
+@:maincpu,program,201921,1,20,20
+
+
+splndrbta:
+splndrbtb:
+@:maincpu,program,40840,168,53,01
+@:maincpu,program,40020,3,01,00
+
+
 ;(splendor blast) (by GeoMan)
 splndrbt:
 @:maincpu,program,40840,168,53,01
@@ -5631,6 +5651,10 @@ galaxiac:
 
 
 ;@s:galaxian.cpp
+
+uniwarsa:
+@:maincpu,program,40a8,3,00,00
+
 
 anteatergg:
 @:maincpu,program,40ef,3c,00,20
@@ -9682,6 +9706,11 @@ newsa:
 
 ;@s:ninjakd2.cpp
 
+mnightj:
+@:maincpu,program,c099,41,00,20
+@:maincpu,program,c0e6,3,00,00
+
+
 ;(ninja kid ii (set 1)) and clones (by GeoMan) 
 ninjakd2:
 ninjakd2a:
@@ -9768,6 +9797,10 @@ pclubysa:
 
 
 ;@s:nmk16.cpp
+
+bjtwinpa:
+@:maincpu,program,f9100,a0,00,4c
+
 
 ;tdragon:******Thunder Dragon (9th Jan. 1992)
 ;tdragon1:******Thunder Dragon (4th Jun. 1991)
@@ -11492,6 +11525,12 @@ sbrkoutct:
 
 
 ;@s:scobra.cpp
+
+hustlerb5:
+@:maincpu,program,84c0,f,00,00
+@:maincpu,program,80a8,3,00,02
+@:maincpu,program,8003,1,0a,0a
+
 
 ;(video hustler)
 hustler:
@@ -15602,6 +15641,10 @@ timepltc:
 
 ;@s:tmnt.cpp
 
+tmnta:
+@:maincpu,program,63500,f3,03,41
+
+
 tmntub:
 @:maincpu,program,63500,f3,03,41
 
@@ -15767,6 +15810,11 @@ tnzsjo:
 
 
 ;@s:toaplan1.cpp
+
+demonwld4:
+@:maincpu,program,c001c2,c8,00,2d
+@:maincpu,program,c001be,4,00,00
+
 
 ;***** truxton fixed (delete old truxton entry and replace).
 truxton:

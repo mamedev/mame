@@ -12,6 +12,11 @@
 #ifndef __ARC_H__
 #define __ARC_H__
 
+enum
+{
+	ARC_PC = STATE_GENPC
+};
+
 class arc_device : public cpu_device
 {
 public:

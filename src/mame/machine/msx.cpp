@@ -58,6 +58,15 @@ void msx_state::machine_reset()
 void msx_state::machine_start()
 {
 	m_port_c_old = 0xff;
+
+	for (device_t &device : device_iterator(*this))
+	{
+		msx_switched_interface *switched;
+		if (device.interface(switched))
+		{
+			m_switched.push_back(switched);
+		}
+	}
 }
 
 
@@ -195,7 +204,6 @@ void msx_state::driver_start()
 	save_item(NAME(m_secondary_slot));
 	save_item(NAME(m_port_c_old));
 	save_item(NAME(m_keylatch));
-	save_item(NAME(m_current_switched_device));
 	save_item(NAME(m_irq_state));
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(msx_state::post_load), this));
@@ -511,20 +519,20 @@ WRITE8_MEMBER( msx_state::msx_kanji_w )
 
 READ8_MEMBER( msx_state::msx_switched_r )
 {
-	// Read from selected switched device
-	return this->space().read_byte( (m_current_switched_device << 8) | offset );
+	uint8_t data = 0xff;
+
+	for (int i = 0; i < m_switched.size(); i++)
+	{
+		data &= m_switched[i]->switched_read(space, offset);
+	}
+
+	return data;
 }
 
 WRITE8_MEMBER( msx_state::msx_switched_w )
 {
-	if (offset == 0)
+	for (int i = 0; i < m_switched.size(); i++)
 	{
-		// Select switched device
-		m_current_switched_device = data;
-	}
-	else
-	{
-		// Write to selected switched device
-		this->space().write_byte( (m_current_switched_device << 8) | offset, data );
+		m_switched[i]->switched_write(space, offset, data);
 	}
 }

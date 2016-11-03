@@ -1911,27 +1911,19 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 				m_info_view = 0;
 				m_info_software = software;
 				ui_globals::cur_sw_dats_view = 0;
-				ui_globals::cur_sw_dats_total = 1;
 
-				const char *lua_list = mame_machine_manager::instance()->lua()->call_plugin(std::string(software->shortname).append(1, ',').append(software->listname).c_str(), "data_list");
 				m_items_list.clear();
-				if(lua_list)
-				{
-					std::string list(lua_list);
-					char *token = strtok((char *)list.c_str(), ",");
-					while(token)
-					{
-						ui_globals::cur_sw_dats_total++;
-						m_items_list.emplace_back(token);
-						token = strtok(nullptr, ",");
-					}
-				}
+				mame_machine_manager::instance()->lua()->call_plugin("data_list", std::string(software->shortname).append(1, ',').append(software->listname).c_str(), m_items_list);
+				ui_globals::cur_sw_dats_total = m_items_list.size() + 1;
 			}
 
 			if (m_info_view == 0)
 				m_info_buffer = software->usage;
 			else
-				m_info_buffer = mame_machine_manager::instance()->lua()->call_plugin(util::string_format("%d", m_info_view - 1).c_str(), "data");
+			{
+				m_info_buffer = "";
+				mame_machine_manager::instance()->lua()->call_plugin("data", m_info_view - 1, m_info_buffer);
+			}
 		}
 		total = ui_globals::cur_sw_dats_total;
 	}
@@ -1952,27 +1944,19 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 				m_info_driver = driver;
 				m_info_view = 0;
 				ui_globals::curdats_view = 0;
-				ui_globals::curdats_total = 1;
 
-				const char *lua_list = mame_machine_manager::instance()->lua()->call_plugin(driver->name, "data_list");
 				m_items_list.clear();
-				if(lua_list)
-				{
-					std::string list(lua_list);
-					char *token = strtok((char *)list.c_str(), ",");
-					while(token)
-					{
-						ui_globals::curdats_total++;
-						m_items_list.emplace_back(token);
-						token = strtok(nullptr, ",");
-					}
-				}
+				mame_machine_manager::instance()->lua()->call_plugin("data_list", driver->name, m_items_list);
+				ui_globals::curdats_total = m_items_list.size() + 1;
 			}
 
 			if (m_info_view == 0)
 				general_info(driver, m_info_buffer);
 			else
-				m_info_buffer = mame_machine_manager::instance()->lua()->call_plugin(util::string_format("%d", m_info_view - 1).c_str(), "data");
+			{
+				m_info_buffer = "";
+				mame_machine_manager::instance()->lua()->call_plugin("data", m_info_view - 1, m_info_buffer);
+			}
 		}
 		total = ui_globals::curdats_total;
 	}

@@ -34,20 +34,12 @@
 		"tools/ow.lua",
 		"tools/snc.lua",
 		"tools/valac.lua",
+		"tools/swift.lua",
 		"base/validate.lua",
 		"base/help.lua",
 		"base/premake.lua",
 		"base/iter.lua",
-
-		-- CodeBlocks action
-		"actions/codeblocks/_codeblocks.lua",
-		"actions/codeblocks/codeblocks_workspace.lua",
-		"actions/codeblocks/codeblocks_cbp.lua",
-
-		-- CodeLite action
-		"actions/codelite/_codelite.lua",
-		"actions/codelite/codelite_workspace.lua",
-		"actions/codelite/codelite_project.lua",
+		"base/set.lua",
 
 		-- CMake action
 		"actions/cmake/_cmake.lua",
@@ -60,6 +52,7 @@
 		"actions/make/make_cpp.lua",
 		"actions/make/make_csharp.lua",
 		"actions/make/make_vala.lua",
+		"actions/make/make_swift.lua",
 
 		-- Visual Studio actions
 		"actions/vstudio/_vstudio.lua",
@@ -83,17 +76,26 @@
 		-- Xcode4 action
 		"actions/xcode/xcode4_workspace.lua",
 
-		-- Clean action
-		"actions/clean/_clean.lua",
+		-- Xcode6 action
+		"actions/xcode/xcode6_project.lua",
+		"actions/xcode/xcode6_config.lua",
 
 		--FASTBuild action
 		"actions/fastbuild/_fastbuild.lua",
 		"actions/fastbuild/fastbuild_project.lua",
 		"actions/fastbuild/fastbuild_solution.lua",
-		
+
 		-- ninja action
 		"actions/ninja/_ninja.lua",
 		"actions/ninja/ninja_base.lua",
 		"actions/ninja/ninja_solution.lua",
 		"actions/ninja/ninja_cpp.lua",
+		"actions/ninja/ninja_swift.lua",
+		"actions/ninja/ninja_swift_incremental.lua",
+
+		-- qbs action
+		"actions/qbs/_qbs.lua",
+		"actions/qbs/qbs_base.lua",
+		"actions/qbs/qbs_solution.lua",
+		"actions/qbs/qbs_cpp.lua",
 	}

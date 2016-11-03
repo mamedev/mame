@@ -78,7 +78,7 @@ SLOT_INTERFACE_START(neogeo_cart)
 	SLOT_INTERFACE_INTERNAL("boot_cthd2k3",  NEOGEO_CTHD2K3_CART)
 	SLOT_INTERFACE_INTERNAL("boot_ct2k3sp",  NEOGEO_CT2K3SP_CART)
 	SLOT_INTERFACE_INTERNAL("boot_ct2k3sa",  NEOGEO_CT2K3SA_CART)
-	SLOT_INTERFACE_INTERNAL("boot_matrimbl", NEOGEO_MATRIMBL_CART)  // this also uses a CMC for SFIX & addditional prg scramble from kof2002
+	SLOT_INTERFACE_INTERNAL("boot_matrimbl", NEOGEO_MATRIMBL_CART)  // this also uses a CMC for SFIX & additional prg scramble from kof2002
 
 	// Bootleg logic for SVC clones
 	SLOT_INTERFACE_INTERNAL("boot_svcboot",  NEOGEO_SVCBOOT_CART)   // this also uses a PVC protection/encryption

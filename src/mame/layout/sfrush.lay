@@ -14,7 +14,7 @@
 			<bounds x="0.34" y="0.185" width="1.29" height="0.78" />
 		</text>
 	</element>
-	
+
 	<element name="music" defstate="0">
 		<rect state="0">
 			<bounds x="0" y="0" width="2.0" height="2.0" />
@@ -130,7 +130,7 @@
 			<bounds x="0.2" y="1.0" width="1.6" height="0.8" />
 		</text>
 	</element>
-	
+
 	<element name="leader" defstate="0">
 		<rect>
 			<bounds x="0" y="0" width="3.0" height="1.75" />
@@ -145,7 +145,7 @@
 			<bounds x="0.5" y="0.3" width="2.0" height="1.15" />
 		</text>
 	</element>
-	
+
 	<element name="winner" defstate="0">
 		<rect>
 			<bounds x="0" y="0" width="3.0" height="1.4" />
@@ -183,11 +183,11 @@
 		<bezel name="lamp7" element="view1" inputtag="IN1" inputmask="0x01">
 			<bounds x="0.024" y="3.248" width="0.2" height="0.2" />
 		</bezel>
-		
+
 		<bezel name="lamp8" element="leader">
 			<bounds x="1.45" y="3.1" width="0.5" height="0.23" />
 		</bezel>
-		
+
 		<bezel name="lamp9" element="winner">
 			<bounds x="2.05" y="3.1" width="0.5" height="0.23" />
 		</bezel>

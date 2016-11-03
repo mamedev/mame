@@ -74,12 +74,12 @@ ADDRESS_MAP_END
 
 void cedar_magnet_sprite_device::do_blit()
 {
-//	printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
-//	printf("~~~~~~~~~~~~~~~~~ drawing sprite with x:%02x y:%02x code:%04x size:%02x unk:%02x\n", m_loweraddr, m_upperaddr, (m_spritecodehigh << 8) | m_spritecodelow, m_spritesize, pio0_pb_data);
-//	printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+//  printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+//  printf("~~~~~~~~~~~~~~~~~ drawing sprite with x:%02x y:%02x code:%04x size:%02x unk:%02x\n", m_loweraddr, m_upperaddr, (m_spritecodehigh << 8) | m_spritecodelow, m_spritesize, pio0_pb_data);
+//  printf("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
 
-	int ysize;
-	int xsize;
+	int ysize = 0;
+	int xsize = 0;
 	int erase = 0;
 
 	// bit 0x80 is always set
@@ -114,10 +114,10 @@ void cedar_magnet_sprite_device::do_blit()
 			int ypos = (m_upperaddr + y);
 
 			uint8_t data = m_ram[source + ((m_uppersprite & 0x3) * 0x10000)];
-			
+
 			if (!(pio0_pb_data & 0x02))
 				data = rand();
-	
+
 			source++;
 
 			xpos &= 0xff;
@@ -159,7 +159,7 @@ void cedar_magnet_sprite_device::do_blit()
 WRITE8_MEMBER(cedar_magnet_sprite_device::sprite_port80_w)
 {
 	m_spritecodelow = data;
-//	printf("%s:sprite numlow / trigger %02x\n", machine().describe_context(), data);
+//  printf("%s:sprite numlow / trigger %02x\n", machine().describe_context(), data);
 
 	do_blit();
 }
@@ -168,20 +168,20 @@ WRITE8_MEMBER(cedar_magnet_sprite_device::sprite_port84_w)
 {
 	m_spritecodehigh = data;
 	m_high_write = 1;
-//	printf("%s:sprite numhigh %02x\n", machine().describe_context(), data);
+//  printf("%s:sprite numhigh %02x\n", machine().describe_context(), data);
 }
 
 WRITE8_MEMBER(cedar_magnet_sprite_device::sprite_port88_w)
 {
 // frequent
-//	printf("%s:sprite_y_coordinate %02x\n", machine().describe_context(), data);
+//  printf("%s:sprite_y_coordinate %02x\n", machine().describe_context(), data);
 	m_upperaddr = data;
 }
 
 WRITE8_MEMBER(cedar_magnet_sprite_device::pio2_pa_w)
 {
 // frequent
-//	printf("%s:sprite_x_coordinate %02x\n", machine().describe_context(), data);
+//  printf("%s:sprite_x_coordinate %02x\n", machine().describe_context(), data);
 	m_loweraddr = data;
 }
 
@@ -195,7 +195,7 @@ WRITE8_MEMBER(cedar_magnet_sprite_device::sprite_port8c_w)
 // possible watchdog?
 WRITE8_MEMBER(cedar_magnet_sprite_device::sprite_port9c_w)
 {
-//	printf("%s:sprite_port9c_w %02x\n", machine().describe_context(), data);
+//  printf("%s:sprite_port9c_w %02x\n", machine().describe_context(), data);
 }
 
 static MACHINE_CONFIG_FRAGMENT( cedar_magnet_sprite )
@@ -205,24 +205,24 @@ static MACHINE_CONFIG_FRAGMENT( cedar_magnet_sprite )
 	MCFG_CPU_VBLANK_INT_DRIVER(":screen", cedar_magnet_board_device,  irq)
 
 	MCFG_DEVICE_ADD("z80pio0", Z80PIO, 4000000/2)
-//	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+//  MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80PIO_IN_PA_CB(READ8(cedar_magnet_sprite_device, pio0_pa_r))
 	MCFG_Z80PIO_OUT_PA_CB(WRITE8(cedar_magnet_sprite_device, pio0_pa_w))
-//	MCFG_Z80PIO_IN_PB_CB(READ8(cedar_magnet_sprite_device, pio0_pb_r))
+//  MCFG_Z80PIO_IN_PB_CB(READ8(cedar_magnet_sprite_device, pio0_pb_r))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(cedar_magnet_sprite_device, pio0_pb_w))
-	
+
 	MCFG_DEVICE_ADD("z80pio1", Z80PIO, 4000000/2)
-//	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-//	MCFG_Z80PIO_IN_PA_CB(READ8(cedar_magnet_sprite_device, pio1_pa_r))
+//  MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+//  MCFG_Z80PIO_IN_PA_CB(READ8(cedar_magnet_sprite_device, pio1_pa_r))
 	MCFG_Z80PIO_OUT_PA_CB(WRITE8(cedar_magnet_sprite_device, pio1_pa_w))
-//	MCFG_Z80PIO_IN_PB_CB(READ8(cedar_magnet_sprite_device, pio1_pb_r))
+//  MCFG_Z80PIO_IN_PB_CB(READ8(cedar_magnet_sprite_device, pio1_pb_r))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(cedar_magnet_sprite_device, pio1_pb_w))
 
 	MCFG_DEVICE_ADD("z80pio2", Z80PIO, 4000000/2)
-//	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
-//	MCFG_Z80PIO_IN_PA_CB(READ8(cedar_magnet_sprite_device, pio2_pa_r))
+//  MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
+//  MCFG_Z80PIO_IN_PA_CB(READ8(cedar_magnet_sprite_device, pio2_pa_r))
 	MCFG_Z80PIO_OUT_PA_CB(WRITE8(cedar_magnet_sprite_device, pio2_pa_w))
-//	MCFG_Z80PIO_IN_PB_CB(READ8(cedar_magnet_sprite_device, pio2_pb_r))
+//  MCFG_Z80PIO_IN_PB_CB(READ8(cedar_magnet_sprite_device, pio2_pb_r))
 	MCFG_Z80PIO_OUT_PB_CB(WRITE8(cedar_magnet_sprite_device, pio2_pb_w))
 
 	MCFG_DEVICE_ADD("sp_sub_ram", ADDRESS_MAP_BANK, 0)
@@ -237,7 +237,7 @@ MACHINE_CONFIG_END
 READ8_MEMBER(cedar_magnet_sprite_device::pio0_pa_r)
 {
 //  actually read
-//	printf("%s: pio0_pa_r\n", machine().describe_context());
+//  printf("%s: pio0_pa_r\n", machine().describe_context());
 	return 0x00;
 }
 
@@ -309,15 +309,15 @@ void cedar_magnet_sprite_device::device_reset()
 
 uint32_t cedar_magnet_sprite_device::draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int palbase)
 {
-//	printf("-----------------------------------------------------------------------------------------------------------\n");
-//	printf("--------------------------------------------- FRAME -------------------------------------------------------\n");
-//	printf("-----------------------------------------------------------------------------------------------------------\n");
+//  printf("-----------------------------------------------------------------------------------------------------------\n");
+//  printf("--------------------------------------------- FRAME -------------------------------------------------------\n");
+//  printf("-----------------------------------------------------------------------------------------------------------\n");
 
 	uint8_t* mem = m_framebuffer;
 	int count = 0;
 
-//	if (!(m_m_spritesize & 0x40))
-//		return 0;
+//  if (!(m_m_spritesize & 0x40))
+//      return 0;
 
 	for (int y = 0;y < 256;y++)
 	{

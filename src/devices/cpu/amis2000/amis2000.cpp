@@ -68,8 +68,11 @@ amis2152_cpu_device::amis2152_cpu_device(const machine_config &mconfig, const ch
 { }
 
 
+//-------------------------------------------------
+//  state_string_export - export state as a string
+//  for the debugger
+//-------------------------------------------------
 
-// disasm
 void amis2000_base_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
@@ -81,11 +84,8 @@ void amis2000_base_device::state_string_export(const device_state_entry &entry, 
 				m_f & 0x08 ? '4':'.',
 				m_f & 0x04 ? '3':'.',
 				m_f & 0x02 ? '2':'.',
-				m_f & 0x01 ? '1':'.'
-			);
+				m_f & 0x01 ? '1':'.');
 			break;
-
-		default: break;
 	}
 }
 
@@ -103,7 +103,7 @@ offs_t amis2000_base_device::disasm_disassemble(char *buffer, offs_t pc, const u
 
 enum
 {
-	S2000_PC=1, S2000_BL, S2000_BU,
+	S2000_PC = STATE_GENPC, S2000_BL = 0, S2000_BU,
 	S2000_ACC, S2000_E, S2000_CY
 };
 
@@ -170,9 +170,8 @@ void amis2000_base_device::device_start()
 	state_add(S2000_E,      "E",      m_e     ).formatstr("%01X");
 	state_add(S2000_CY,     "CY",     m_carry ).formatstr("%01X");
 
-	state_add(STATE_GENPC, "GENPC", m_pc).formatstr("%04X").noshow();
-	state_add(STATE_GENPCBASE, "CURPC", m_pc).formatstr("%04X").noshow();
-	state_add(STATE_GENFLAGS, "GENFLAGS", m_f).formatstr("%6s").noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_pc).noshow();
+	state_add(STATE_GENFLAGS, "CURFLAGS", m_f).formatstr("%6s").noshow();
 
 	m_icountptr = &m_icount;
 }

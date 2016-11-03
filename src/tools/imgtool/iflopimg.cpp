@@ -128,7 +128,7 @@ static imgtoolerr_t imgtool_floppy_open_internal(imgtool::image &image, imgtool:
 		err = imgtool_floppy_error(ferr);
 		goto done;
 	}
-	f = nullptr;	// the floppy object has the stream now
+	f = nullptr;    // the floppy object has the stream now
 
 	if (open)
 	{
@@ -179,7 +179,7 @@ static imgtoolerr_t imgtool_floppy_create(imgtool::image &image, imgtool::stream
 		err = imgtool_floppy_error(ferr);
 		goto done;
 	}
-	f = nullptr;	// the floppy object has the stream now
+	f = nullptr;    // the floppy object has the stream now
 
 	// do we have to do extra stuff when creating the image?
 	if (create)

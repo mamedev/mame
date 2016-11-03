@@ -178,7 +178,7 @@ int mame_machine_manager::execute()
 	// loop across multiple hard resets
 	bool exit_pending = false;
 	int error = EMU_ERR_NONE;
-	
+
 	while (error == EMU_ERR_NONE && !exit_pending)
 	{
 		m_new_driver_pending = nullptr;
@@ -326,7 +326,6 @@ void emulator_info::draw_user_interface(running_machine& machine)
 
 void emulator_info::periodic_check()
 {
-	mame_machine_manager::instance()->lua()->periodic_check();
 }
 
 bool emulator_info::frame_hook()
@@ -341,7 +340,7 @@ void emulator_info::layout_file_cb(xml_data_node &layout)
 	{
 		xml_data_node *script = xml_get_sibling(mamelayout->child, "script");
 		if(script)
-			mame_machine_manager::instance()->lua()->call_plugin(script->value, "layout");
+			mame_machine_manager::instance()->lua()->call_plugin_set("layout", script->value);
 	}
 }
 

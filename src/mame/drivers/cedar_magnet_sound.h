@@ -28,7 +28,11 @@ public:
 	required_device<z80ctc_device> m_ctc0;
 	required_device<z80ctc_device> m_ctc1;
 
-	DECLARE_READ8_MEMBER(top_port14_r);
+	DECLARE_READ8_MEMBER(soundlatch_r);
+	DECLARE_WRITE8_MEMBER(adpcm_latch_w);
+	DECLARE_WRITE8_MEMBER(ay1_porta_w);
+
+	uint8_t m_adpcm_data;
 
 	void write_command(uint8_t data);
 	uint8_t m_command;
@@ -41,6 +45,11 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ctc0_z2_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc0_int_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc1_int_w);
+
+	TIMER_CALLBACK_MEMBER(reset_assert_callback) override;
+
+	int m_fake_counter;
+	INTERRUPT_GEN_MEMBER(fake_irq);
 
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;

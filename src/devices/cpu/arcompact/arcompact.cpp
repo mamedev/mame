@@ -88,14 +88,13 @@ void arcompact_device::device_start()
 	m_program = &space(AS_PROGRAM);
 	m_io = &space(AS_IO);
 
-	state_add( 0,  "PC", m_debugger_temp).callimport().callexport().formatstr("%08X");
+	state_add( ARCOMPACT_PC, "PC", m_debugger_temp).callimport().callexport().formatstr("%08X");
 
-	state_add( 0x10,  "STATUS32", m_debugger_temp).callimport().callexport().formatstr("%08X");
-	state_add( 0x11,  "LP_START", m_debugger_temp).callimport().callexport().formatstr("%08X");
-	state_add( 0x12,  "LP_END", m_debugger_temp).callimport().callexport().formatstr("%08X");
+	state_add( ARCOMPACT_STATUS32, "STATUS32", m_debugger_temp).callimport().callexport().formatstr("%08X");
+	state_add( ARCOMPACT_LP_START, "LP_START", m_debugger_temp).callimport().callexport().formatstr("%08X");
+	state_add( ARCOMPACT_LP_END, "LP_END", m_debugger_temp).callimport().callexport().formatstr("%08X");
 
-	state_add(STATE_GENPC, "GENPC", m_debugger_temp).callexport().noshow();
-	state_add(STATE_GENPCBASE, "CURPC", m_debugger_temp).callexport().noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_debugger_temp).callimport().callexport().noshow();
 
 	for (int i = 0x100; i < 0x140; i++)
 	{
@@ -106,25 +105,30 @@ void arcompact_device::device_start()
 	m_icountptr = &m_icount;
 }
 
+
+//-------------------------------------------------
+//  state_export - export state from the device,
+//  to a known location where it can be read
+//-------------------------------------------------
+
 void arcompact_device::state_export(const device_state_entry &entry)
 {
 	int index = entry.index();
 
 	switch (index)
 	{
-		case STATE_GENPC:
+		case ARCOMPACT_PC:
 		case STATE_GENPCBASE:
-		case 0:
 			m_debugger_temp = m_pc;
 			break;
 
-		case 0x10:
+		case ARCOMPACT_STATUS32:
 			m_debugger_temp = m_status32;
 			break;
-		case 0x11:
+		case ARCOMPACT_LP_START:
 			m_debugger_temp = m_LP_START;
 			break;
-		case 0x12:
+		case ARCOMPACT_LP_END:
 			m_debugger_temp = m_LP_END;
 			break;
 
@@ -138,23 +142,30 @@ void arcompact_device::state_export(const device_state_entry &entry)
 	}
 }
 
+
+//-------------------------------------------------
+//  state_import - import state into the device,
+//  after it has been set
+//-------------------------------------------------
+
 void arcompact_device::state_import(const device_state_entry &entry)
 {
 	int index = entry.index();
 
 	switch (index)
 	{
-		case 0:
+		case ARCOMPACT_PC:
+		case STATE_GENPCBASE:
 			m_pc = (m_debugger_temp & 0xfffffffe);
 			break;
 
-		case 0x10:
+		case ARCOMPACT_STATUS32:
 			m_status32 = m_debugger_temp;
 			break;
-		case 0x11:
+		case ARCOMPACT_LP_START:
 			m_LP_START = m_debugger_temp;
 			break;
-		case 0x12:
+		case ARCOMPACT_LP_END:
 			m_LP_END = m_debugger_temp;
 			break;
 
