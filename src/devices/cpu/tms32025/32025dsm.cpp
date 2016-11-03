@@ -387,7 +387,7 @@ static void InitDasm32025(void)
 	OpInizialized = 1;
 }
 
-CPU_DISASSEMBLE( tms32025 )
+static offs_t internal_disasm_tms32025(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
 {
 	uint32_t flags = 0;
 	int a, b, c, d, k, m, n, p, r, s, t, w; /* these can all be filled in by parsing an instruction */
@@ -417,7 +417,7 @@ CPU_DISASSEMBLE( tms32025 )
 	}
 	if (op == -1)
 	{
-		sprintf(buffer,"???? dw %04Xh",code);
+		util::stream_format(stream, "???? dw %04Xh",code);
 		return cnt | DASMFLAG_SUPPORTED;
 	}
 	//buffertmp = buffer;
@@ -474,7 +474,7 @@ CPU_DISASSEMBLE( tms32025 )
 	{
 		if (*cp == '%')
 		{
-			char num[30], *q;
+			char num[30];
 			cp++;
 			switch (*cp++)
 			{
@@ -494,14 +494,22 @@ CPU_DISASSEMBLE( tms32025 )
 				default:
 					fatalerror("illegal escape character in format '%s'\n",Op[op].fmt);
 			}
-			q = num; while (*q) *buffer++ = *q++;
-			*buffer = '\0';
+			stream << num;
 		}
 		else
 		{
-			*buffer++ = *cp++;
-			*buffer = '\0';
+			stream << *cp++;
 		}
 	}
 	return cnt | flags | DASMFLAG_SUPPORTED;
+}
+
+
+CPU_DISASSEMBLE(tms32025)
+{
+	std::ostringstream stream;
+	offs_t result = internal_disasm_tms32025(device, stream, pc, oprom, opram, options);
+	std::string stream_str = stream.str();
+	strcpy(buffer, stream_str.c_str());
+	return result;
 }
