@@ -758,6 +758,17 @@ void lua_engine::initialize()
 				return sol::make_object(sol(), sol::nil);
 			return sol::make_object(sol(), driver_list::driver(i));
 		};
+	// this throws an error when implemented as an initializer
+	emu["item"] = [this](int index) {
+			save_item *item = new save_item;
+			if(!machine().save().indexed_item(index, item->base, item->size, item->count))
+			{
+				item->base = nullptr;
+				item->size = 0;
+				item->count= 0;
+			}
+			return item;
+		};
 
 	emu.new_usertype<emu_file>("file", sol::call_constructor, sol::constructors<sol::types<const char *, uint32_t>>(),
 			"read", [](emu_file &file, sol::buffer *buff) { buff->set_len(file.read(buff->get_ptr(), buff->get_len())); return buff; },
@@ -768,14 +779,8 @@ void lua_engine::initialize()
 			"filename", &emu_file::filename,
 			"fullpath", &emu_file::fullpath);
 
-	emu.new_usertype<save_item>("item", sol::call_constructor, sol::factories([this](save_item &item, int index) {
-					if(!machine().save().indexed_item(index, item.base, item.size, item.count))
-					{
-						item.base = nullptr;
-						item.size = 0;
-						item.count= 0;
-					}
-				}),
+	sol().new_usertype<save_item>("item",
+			sol::meta_function::garbage_collect, sol::destructor([](save_item *item) { delete item; }),
 			"size", sol::readonly(&save_item::size),
 			"count", sol::readonly(&save_item::count),
 			"read", [this](save_item &item, int offset) -> sol::object {
