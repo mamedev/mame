@@ -56,7 +56,7 @@ static const char *const CONDITION_CODE[16] =
 #define B0L     (B0 & 0x0f)
 #define OPH     (opcode >> 4)
 
-#define ARG(_formatting, _value)    { if (argc) dst += sprintf(dst, ", "); dst += sprintf(dst, _formatting, _value); argc++; }
+#define ARG(_formatting, _value)    { if (argc) util::stream_format(stream, ", "); util::stream_format(stream, _formatting, _value); argc++; }
 
 #define arg_name(_value)            ARG("%s", REGISTER_NAME[_value])
 #define arg_cc                      ARG("%s", CONDITION_CODE[OPH])
@@ -70,10 +70,10 @@ static const char *const CONDITION_CODE[16] =
 #define arg_IM(_value)              ARG(IM, _value)
 #define arg_RA                      ARG(RA, pc + (int8_t)B0 + 2)
 #define arg_DA                      ARG(DA, B0 << 8 | B1)
-#define arg_X(_value1, _value2)     { if (argc) dst += sprintf(dst, ", "); dst += sprintf(dst, X, _value1, _value2); argc++; }
+#define arg_X(_value1, _value2)     { if (argc) util::stream_format(stream, ", "); util::stream_format(stream, X, _value1, _value2); argc++; }
 
-#define illegal                     dst += sprintf(dst, "Illegal")
-#define mnemonic(_mnemonic)         dst += sprintf(dst, "%-5s", _mnemonic)
+#define illegal                     util::stream_format(stream, "Illegal")
+#define mnemonic(_mnemonic)         util::stream_format(stream, "%-5s", _mnemonic)
 #define bytes(_count)               oprom += (_count - 1)
 #define step_over                   flags = DASMFLAG_STEP_OVER
 #define step_out                    flags = DASMFLAG_STEP_OUT
@@ -82,12 +82,11 @@ static const char *const CONDITION_CODE[16] =
     DISASSEMBLER
 ***************************************************************************/
 
-CPU_DISASSEMBLE( z8 )
+static offs_t internal_disasm_z8(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
 {
 	const uint8_t *startrom = oprom;
 	uint32_t flags = 0;
 	uint8_t opcode = *oprom++;
-	char *dst = buffer;
 	int argc = 0;
 
 	switch (pc)
@@ -98,7 +97,7 @@ CPU_DISASSEMBLE( z8 )
 	case 0x0006:
 	case 0x0008:
 	case 0x000a:
-		sprintf(buffer, "IRQ%u Vector %04Xh", pc / 2, opcode << 8 | *oprom++); break;
+		util::stream_format(stream, "IRQ%u Vector %04Xh", pc / 2, opcode << 8 | *oprom++); break;
 	default:
 		switch (opcode)
 		{
@@ -377,4 +376,14 @@ CPU_DISASSEMBLE( z8 )
 	}
 
 	return (oprom - startrom) | flags | DASMFLAG_SUPPORTED;
+}
+
+
+CPU_DISASSEMBLE(z8)
+{
+	std::ostringstream stream;
+	offs_t result = internal_disasm_z8(device, stream, pc, oprom, opram, options);
+	std::string stream_str = stream.str();
+	strcpy(buffer, stream_str.c_str());
+	return result;
 }
