@@ -32,8 +32,6 @@ lua - [The MIT License (MIT)](http://opensource.org/licenses/MIT)
 
 lua-zlib - [The MIT License (MIT)](http://opensource.org/licenses/MIT)
 
-luabridge - [The MIT License (MIT)](http://opensource.org/licenses/MIT)
-
 luafilesystem - [The MIT License (MIT)](http://opensource.org/licenses/MIT)
 
 lzma - [The GNU Lesser General Public License](http://opensource.org/licenses/LGPL-2.1)

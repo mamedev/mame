@@ -20,18 +20,9 @@
 #include <map>
 #include "sol2/sol.hpp"
 
-// None is typedef'd already in SDL/X11 libs
-#ifdef None
-#undef None
-#endif
-
 class cheat_manager;
 
 struct lua_State;
-namespace luabridge
-{
-	class LuaRef;
-}
 
 class lua_engine
 {
