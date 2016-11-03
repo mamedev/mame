@@ -2142,7 +2142,7 @@ void dcs_audio_device::fifo_notify(int count, int max)
 	if (transfer.state != 5 || transfer.fifo_entries == transfer.writes_left || transfer.fifo_entries >= 256)
 	{
 		for ( ; transfer.fifo_entries; transfer.fifo_entries--)
-			preprocess_write(m_fifo_data_r(machine().driver_data()->generic_space(),0, 0xffff));
+			preprocess_write(m_fifo_data_r(machine().dummy_space(), 0, 0xffff));
 	}
 }
 
@@ -2155,7 +2155,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( dcs_audio_device::transfer_watchdog_callback )
 	if (transfer.fifo_entries && starting_writes_left == transfer.writes_left)
 	{
 		for ( ; transfer.fifo_entries; transfer.fifo_entries--)
-			preprocess_write(m_fifo_data_r(machine().driver_data()->generic_space(),0, 0xffff));
+			preprocess_write(m_fifo_data_r(machine().dummy_space(), 0, 0xffff));
 	}
 	if (transfer.watchdog != nullptr)
 		transfer.watchdog->adjust(attotime::from_msec(1), transfer.writes_left);

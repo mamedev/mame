@@ -700,7 +700,7 @@ void midway_ioasic_device::ioasic_reset()
 
 void midway_ioasic_device::update_ioasic_irq()
 {
-	uint16_t fifo_state = fifo_status_r(machine().driver_data()->generic_space(),0);
+	uint16_t fifo_state = fifo_status_r(machine().dummy_space(), 0);
 	uint16_t irqbits = 0x2000;
 	uint8_t new_state;
 

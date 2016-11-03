@@ -265,7 +265,7 @@ WRITE8_MEMBER(contra_state::contra_K007121_ctrl_1_w)
 void contra_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, int bank )
 {
 	k007121_device *k007121 = bank ? m_k007121_2 : m_k007121_1;
-	address_space &space = machine().driver_data()->generic_space();
+	address_space &space = machine().dummy_space();
 	int base_color = (k007121->ctrlram_r(space, 6) & 0x30) * 2;
 	const uint8_t *source;
 
@@ -279,7 +279,7 @@ void contra_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect,
 
 uint32_t contra_state::screen_update_contra(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	address_space &space = machine().driver_data()->generic_space();
+	address_space &space = machine().dummy_space();
 	uint8_t ctrl_1_0 = m_k007121_1->ctrlram_r(space, 0);
 	uint8_t ctrl_1_2 = m_k007121_1->ctrlram_r(space, 2);
 	uint8_t ctrl_2_0 = m_k007121_2->ctrlram_r(space, 0);

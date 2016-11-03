@@ -51,7 +51,7 @@ WRITE16_MEMBER(vaportra_state::vaportra_palette_24bit_b_w)
 
 uint32_t vaportra_state::screen_update_vaportra(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	address_space &space = machine().driver_data()->generic_space();
+	address_space &space = machine().dummy_space();
 	uint16_t flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
 	int pri = m_priority[0] & 0x03;
 

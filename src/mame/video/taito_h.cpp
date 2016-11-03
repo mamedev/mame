@@ -76,7 +76,7 @@ void taitoh_state::syvalion_draw_sprites( bitmap_ind16 &bitmap, const rectangle 
 	/* Y chain size is 16/32?/64/64? pixels. X chain size
 	   is always 64 pixels. */
 
-	address_space &space = machine().driver_data()->generic_space();
+	address_space &space = machine().dummy_space();
 	static const int size[] = { 1, 2, 4, 4 };
 	int x0, y0, x, y, dx, ex, zx;
 	int ysize;
@@ -169,7 +169,7 @@ void taitoh_state::recordbr_draw_sprites( bitmap_ind16 &bitmap, const rectangle 
 	/* Y chain size is 16/32?/64/64? pixels. X chain size
 	   is always 64 pixels. */
 
-	address_space &space = machine().driver_data()->generic_space();
+	address_space &space = machine().dummy_space();
 	static const int size[] = { 1, 2, 4, 4 };
 	int x0, y0, x, y, dx, dy, ex, ey, zx, zy;
 	int ysize;
@@ -281,7 +281,7 @@ void taitoh_state::dleague_draw_sprites( bitmap_ind16 &bitmap, const rectangle &
 	/* Y chain size is 16/32?/64/64? pixels. X chain size
 	   is always 64 pixels. */
 
-	address_space &space = machine().driver_data()->generic_space();
+	address_space &space = machine().dummy_space();
 	static const int size[] = { 1, 2, 4, 4 };
 	int x0, y0, x, y, dx, ex, zx;
 	int ysize;

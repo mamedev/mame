@@ -84,8 +84,8 @@ void msm5232_device::device_reset()
 
 	for (i=0; i<8; i++)
 	{
-		write(machine().driver_data()->generic_space(),i,0x80);
-		write(machine().driver_data()->generic_space(),i,0x00);
+		write(machine().dummy_space(), i, 0x80);
+		write(machine().dummy_space(), i, 0x00);
 	}
 	m_noise_cnt     = 0;
 	m_noise_rng     = 1;

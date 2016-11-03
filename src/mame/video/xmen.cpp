@@ -151,7 +151,7 @@ void xmen_state::screen_eof_xmen6p(screen_device &screen, bool state)
 		cliprect.set(0, 64 * 8 - 1, 2 * 8, 30 * 8 - 1);
 
 
-		address_space &space = machine().driver_data()->generic_space();
+		address_space &space = machine().dummy_space();
 		if (m_screen->frame_number() & 0x01)
 		{
 			/* copy the desired spritelist to the chip */

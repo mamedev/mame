@@ -448,7 +448,7 @@ a bg layer given priority over some sprites.
 
 uint32_t slapshot_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	address_space &space = machine().driver_data()->generic_space();
+	address_space &space = machine().dummy_space();
 	uint8_t layer[5];
 	uint8_t tilepri[5];
 	uint8_t spritepri[4];

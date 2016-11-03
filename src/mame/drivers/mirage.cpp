@@ -92,7 +92,7 @@ void miragemi_state::video_start()
 
 uint32_t miragemi_state::screen_update_mirage(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	address_space &space = machine().driver_data()->generic_space();
+	address_space &space = machine().dummy_space();
 	uint16_t flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
 
 	flip_screen_set(BIT(flip, 7));

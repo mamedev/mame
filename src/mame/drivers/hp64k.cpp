@@ -895,9 +895,9 @@ WRITE8_MEMBER(hp64k_state::hp64k_floppy1_rdy)
 void hp64k_state::hp64k_floppy_idx_cb(floppy_image_device *floppy , int state)
 {
 		if (floppy == m_floppy0->get_device()) {
-				m_ss0->a_w(machine().driver_data()->generic_space() , 0 , !state);
+				m_ss0->a_w(machine().dummy_space(), 0, !state);
 		} else if (floppy == m_floppy1->get_device()) {
-				m_ss1->a_w(machine().driver_data()->generic_space() , 0 , !state);
+				m_ss1->a_w(machine().dummy_space(), 0, !state);
 		}
 
 		if (floppy == m_current_floppy) {

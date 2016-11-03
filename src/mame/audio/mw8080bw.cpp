@@ -565,7 +565,7 @@ void mw8080bw_state::maze_write_discrete(uint8_t maze_tone_timing_state)
 	/* controls need to be active low */
 	int controls = ~ioport("IN0")->read() & 0xff;
 
-	address_space &space = machine().driver_data()->generic_space();
+	address_space &space = machine().dummy_space();
 	m_discrete->write(space, MAZE_TONE_TIMING, maze_tone_timing_state);
 	m_discrete->write(space, MAZE_P1_DATA, controls & 0x0f);
 	m_discrete->write(space, MAZE_P2_DATA, (controls >> 4) & 0x0f);

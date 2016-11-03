@@ -27,7 +27,7 @@ void boogwing_state::mix_boogwing(screen_device &screen, bitmap_rgb32 &bitmap, c
 	bitmap_ind16 *sprite_bitmap1, *sprite_bitmap2;
 	bitmap_ind8* priority_bitmap;
 
-	address_space &space = machine().driver_data()->generic_space();
+	address_space &space = machine().dummy_space();
 	uint16_t priority = m_decocomn->priority_r(space, 0, 0xffff);
 
 	sprite_bitmap1 = &m_sprgen1->get_sprite_temp_bitmap();
@@ -179,7 +179,7 @@ void boogwing_state::mix_boogwing(screen_device &screen, bitmap_rgb32 &bitmap, c
 
 uint32_t boogwing_state::screen_update_boogwing(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	address_space &space = machine().driver_data()->generic_space();
+	address_space &space = machine().dummy_space();
 	uint16_t flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
 	uint16_t priority = m_decocomn->priority_r(space, 0, 0xffff);
 
