@@ -6,7 +6,7 @@
 
 	TODO:
 	 - Sound is too short and high pitch, better when you underclock the cpu.
-	   Is cpu cycle timing wrong? or internal divider?
+	   Is cpu cycle timing wrong? or waitstate on p1000_w?
 
 ******************************************************************************/
 
