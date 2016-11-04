@@ -78,7 +78,7 @@ DONE (x) (p=partly)         NMOS         CMOS       ESCC      EMSCC
 /* Useful temporary debug printout format */
 // printf("TAG %lld %s%s Data:%d\n", machine().firstcpu->total_cycles(), __PRETTY_FUNCTION__, m_owner->tag(), data);
 
-#define VERBOSE 0
+#define VERBOSE 2
 #define LOGPRINT(x) do { if (VERBOSE) logerror x; } while (0)
 #define LOG(x)      {} LOGPRINT(x)
 #define LOGR(x)     {} LOGPRINT(x)
@@ -1827,10 +1827,14 @@ void z80scc_channel::do_sccreg_wr4(uint8_t data)
 	else
 	{
 		m_wr4 = data;
-		LOG(("- Parity Enable %u\n", (data & WR4_PARITY_ENABLE) ? 1 : 0));
-		LOG(("- Parity %s\n", (data & WR4_PARITY_EVEN) ? "Even" : "Odd"));
-		LOG(("- Stop Bits %s\n", stop_bits_tostring(get_stop_bits())));
-		LOG(("- Clock Mode %uX\n", get_clock_mode()));
+		LOG(("- Parity    : %s\n", (data & WR4_PARITY_ENABLE) ? ((data & WR4_PARITY_EVEN) ? "Even" : "Odd") : "None"));
+		LOG(("- Stop Bits : %s\n", data & WR4_STOP_BITS_MASK ? stop_bits_tostring(get_stop_bits()) : "not used, sync modes enabled" ));
+		LOG(("- Sync Mode : %s\n", !(data & WR4_STOP_BITS_MASK) ? 
+			 (data & WR4_BIT5 ? 
+			  (data & WR4_BIT4 ? "External - not implemented" : "SDLC - not implemented") 
+			  : (data & WR4_BIT4 ? "16 bit" : "8 bit"))
+			 : "Disabled"));
+		LOG(("- Clock Mode: %uX\n", get_clock_mode()));
 		update_serial();
 		safe_transmit_register_reset();
 		receive_register_reset();
@@ -1924,13 +1928,21 @@ void z80scc_channel::do_sccreg_wr9(uint8_t data)
 	}
 }
 
-/* WR10 contains miscellaneous control bits for both the receiver and the transmitter. Bit positions
-for WR10 are displayed in Figure . On the ESCC and 85C30 with the Extended Read option
-enabled, this register may be read as RR11.*/
+/* WR10 contains miscellaneous control bits for both the receiver and the transmitter. 
+   On the ESCC and 85C30 with the Extended Read option enabled, this register may be read as RR11.*/
 void z80scc_channel::do_sccreg_wr10(uint8_t data)
 {
 	m_wr10 = data;
 	LOG(("\"%s\": %c : %s Misc Tx/Rx Control %02x - not implemented \n", m_owner->tag(), 'A' + m_index, FUNCNAME, data));
+	LOG(("- 6/8 bit sync %d\n", data & WR10_8_6_BIT_SYNC ? 1 : 0));
+	LOG(("- Loop Mode %d\n", data & WR10_LOOP_MODE ? 1 : 0));
+	LOG(("- Abort/Flag on underrun %d\n", data & WR10_ABORT_FLAG_UNDERRUN ? 1 : 0));
+	LOG(("- Mark/Flag Idle line %d\n", data & WR10_MARK_FLAG_IDLE ? 1 : 0));
+	LOG(("- Go active on poll %d\n", data & WR10_GO_ACTIVE_ON_POLL ? 1 : 0));
+	LOG(("- Encoding %s\n", data & WR10_BIT6 ?
+		 (data & WR10_BIT5 ? "FM0"  : "FM1") :
+		 (data & WR10_BIT5 ? "NRZI" : "NRZ") ));
+	LOG(("- CRC Preset %d\n", data & WR10_CRC_PRESET ? 1 : 0));
 }
 
 /* WR11 is the Clock Mode Control register. The bits in this register control the sources of both the
