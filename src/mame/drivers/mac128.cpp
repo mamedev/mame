@@ -107,6 +107,7 @@ c0   8 data bits, Rx disabled
 #define OVERLAY_TAG "bank1"
 
 #define C7M (7833600)
+#define C3_7M (3916800)
 
 // uncomment to run i8021 keyboard in original Mac/512(e)/Plus
 //#define MAC_USE_EMULATED_KBD (1)
@@ -1283,7 +1284,7 @@ static MACHINE_CONFIG_START( mac512ke, mac128_state )
 	MCFG_IWM_ADD("fdc", mac_iwm_interface)
 	MCFG_LEGACY_FLOPPY_SONY_2_DRIVES_ADD(mac_floppy_interface)
 
-	MCFG_SCC85C30_ADD("scc", C7M, 0, 0, 0, 0)
+	MCFG_SCC85C30_ADD("scc", C7M, C3_7M, 0, C3_7M, 0)
 	MCFG_Z80SCC_OUT_INT_CB(WRITELINE(mac128_state, set_scc_interrupt))
 
 	MCFG_DEVICE_ADD("via6522_0", VIA6522, 1000000)
@@ -1514,7 +1515,27 @@ ROM_END
  * 00 <- 10 Reset External/status interrupts
  * 01 <- 01 Enable External Interrupts
  * Above init first for channel B and then for channel A
- * 09 <- 0a Master Interrup Control: No vector and Interrupts enabled!
+ * 09 <- 0a Master Interrupt Control: No vector and Interrupts enabled!
+ *
+ SCC re-init of Channel B booting MacOS 7.0.0 (on Mac plus)
+ * 09 <- 40 Master Interrup Control: channel B reset
+ * 04 <- 20 x1 clock, Sync Modes Enable, SDLC Mode (01111110 Flag)
+ * 0a <- e0 CRC preset to '1's, FM0 encoding scheme
+ * 06 <- 00 Receiver SDLC ADR0-ADR7 bits
+ * 07 <- 7e Receiver SDLC Flag character (0x7e as expected) 
+ * 0c <- 06 Low baudrate divider
+ * 0d <- 00 Hi baudrate divider
+ * 0e <- c0 Set FM Mode Command
+ * 03 <- dd Rx 8 bit, Enter Hunt Mode, Rx CRC Enable, Enter SDLC Address Search Mode, Rx enable
+ * 02 <- 00 Interrupt vector
+ * 0f <- 08 External/Status Control: DCD interrupts enabled
+ * 01 <- 09 Enable External Interrupts + Rx Int On First Character or Special Condition
+ * 09 <- 0a Master Interrupt Control: No vector and Interrupts enabled! 
+ * 0b <- 70 Rx Clock is DPLL Output, Tx Clock is BRG output + TTL Clock on RTxC
+ * 0e <- 21 Enter Search Mode Command + BRG enable + RTxC as BRG clock
+ * 05 <- 60 Tx 8 bit, Tx disable, SDLC CRC Polynomial selected, Tx CRC disabled 
+ * 06 <- 01 Receiver SDLC ADR0-ADR7 bits updated
+ * 0f <- 88 External/Status Control: Abort/Break and DCD interrupts enabled
 */
 
 ROM_START( mac512ke )
