@@ -428,11 +428,10 @@ protected:
 	int get_tx_word_length();
 
 	// receiver state
-	uint8_t m_rx_data_fifo[3];    // receive data FIFO
-	uint8_t m_rx_error_fifo[3];   // receive error FIFO
-	uint8_t m_rx_error;           // current receive error
-	int m_rx_fifo;              // receive FIFO pointer
+	util::fifo<uint8_t, 3> m_rx_data_fifo;
+	util::fifo<uint8_t, 3> m_rx_error_fifo;
 
+	uint8_t m_rx_error;           // current receive error
 	int m_rx_clock;             // receive clock pulse count
 	int m_rx_first;             // first character received
 	int m_rx_break;             // receive break condition
