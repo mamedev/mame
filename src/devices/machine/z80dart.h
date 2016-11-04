@@ -241,61 +241,6 @@
 
 // ======================> z80dart_channel
 
-template <typename T, int N>
-class fifo
-{
-	T m_arr[N];
-	int m_wp;
-	int m_rp;
-	bool m_empty;
-public:
-	fifo()
-		: m_arr()
-		, m_wp(0)
-		, m_rp(0)
-		, m_empty(true)
-	{
-		static_assert(0U < N, "FIFO must have at least one element");
-	}
-
-	bool full() const { return !m_empty && (m_wp == m_rp); }
-	bool empty() const { return m_empty; }
-
-	void enqueue(T v)
-	{
-		if (m_empty || (m_wp != m_rp))
-		{
-			m_arr[m_wp] = v;
-			if (++m_wp == N) 
-				m_wp = 0;
-			m_empty = false;
-		}
-	}
-
-	T dequeue()
-	{
-		T result = -1;
-		if (!m_empty)
-		{
-			result = m_arr[m_rp];
-			if (++m_rp == N)
-				m_rp = 0;
-			m_empty = (m_rp == m_wp);
-		}
-		return result;
-	}
-
-	T const peek() const
-	{
-		return m_arr[m_rp];
-	}
-
-	void poke(T v)
-	{
-		m_arr[m_wp] = v;
-	}
-};
-
 class z80dart_device;
 
 class z80dart_channel : public device_t,
@@ -483,14 +428,9 @@ protected:
 	int get_tx_word_length();
 
 	// receiver state
-//#if 0
-	uint8_t m_rx_data_fifo[3];    // receive data FIFO
-	uint8_t m_rx_error_fifo[3];   // receive error FIFO
-	int m_rx_fifo;              // receive FIFO pointer
-//#else
-	fifo<uint8_t, 3> m_rx_data_fifot;
-	fifo<uint8_t, 3> m_rx_error_fifot;
-//#endif
+	util::fifo<uint8_t, 3> m_rx_data_fifo;
+	util::fifo<uint8_t, 3> m_rx_error_fifo;
+
 	uint8_t m_rx_error;           // current receive error
 	int m_rx_clock;             // receive clock pulse count
 	int m_rx_first;             // first character received
