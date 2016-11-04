@@ -2271,6 +2271,8 @@ static MACHINE_CONFIG_DERIVED( chokchok, htchctch )
 	MCFG_PALETTE_MODIFY("palette")
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 	// some PCBs have left factory with a 3.57mhz while some have a 4.096 which matches other games, assuming the former are factory errors
+	// TODO: MAME sound cores doesn't handle on-the-fly sound frequency changes, I guess best action here is to make the sound chip a slot option, 
+	//       assuming people bothers in emulating a factory error ...
 	MCFG_OKIM6295_REPLACE("oki", 4096000/4, OKIM6295_PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
