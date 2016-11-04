@@ -28,17 +28,14 @@ public:
 
 private:
 	void read_console(std::string &cmdLine);
-	void split_command(std::vector<std::string>& arg, std::string command);
 
-	void cmd_quit(std::vector<std::string>& arg);
+	void cmd_quit();
 	// internal state
-	//emu_options &       m_options;
-	//osd_interface &     m_osd;
 	std::atomic<bool>   m_run;
 	std::atomic<bool>   m_wait;
 	std::string         m_prompt;
-
-	std::unordered_map<std::string, std::function<void(std::vector<std::string>& arg)>> m_commands;
+	
+	std::vector<std::string> m_commands;
 };
 
 #endif  /* MAME_FRONTEND_CONSOLE_H */

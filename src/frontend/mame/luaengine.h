@@ -100,11 +100,11 @@ public:
 		call_plugin(name, sol::make_object(sol(), in));
 	}
 
+	sol::state_view &sol() const { return *m_sol_state; }
 private:
 	// internal state
 	lua_State *m_lua_state;
 	sol::state_view *m_sol_state;
-	sol::state_view &sol() const { return *m_sol_state; }
 	running_machine *m_machine;
 
 	std::vector<std::string> m_menu;

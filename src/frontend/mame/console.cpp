@@ -9,6 +9,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "luaengine.h"
 #include "console.h"
 #include "linenoise-ng/include/linenoise.h"
 #include "mame.h"
@@ -28,9 +29,10 @@ console_frontend::console_frontend(emu_options &options, osd_interface &osd)
 	  m_wait(false),
 	  m_prompt("\x1b[1;36m[MAME]\x1b[0m> ")
 {
-	using namespace std::placeholders;
-	m_commands.insert(std::make_pair("quit", std::bind(&console_frontend::cmd_quit, this, _1)));
-	m_commands.insert(std::make_pair("exit", std::bind(&console_frontend::cmd_quit, this, _1)));
+	mame_machine_manager::instance()->lua()->sol()["quit"] = [this]() { cmd_quit(); }; 
+	m_commands.push_back("quit()");
+	mame_machine_manager::instance()->lua()->sol()["exit"] = [this]() { cmd_quit(); };
+	m_commands.push_back("exit()");
 	gConsole = this;
 }
 
@@ -47,14 +49,14 @@ void console_frontend::completion(char const* prefix, linenoiseCompletions* lc)
 {
 	for (auto cmd : m_commands)
 	{
-		if (strncmp(prefix, cmd.first.c_str(), strlen(prefix)) == 0)
+		if (strncmp(prefix, cmd.c_str(), strlen(prefix)) == 0)
 		{
-			linenoiseAddCompletion(lc, cmd.first.c_str());
+			linenoiseAddCompletion(lc, cmd.c_str());
 		}
 	}
 }
 
-void console_frontend::cmd_quit(std::vector<std::string>& arg)
+void console_frontend::cmd_quit()
 {
 	printf("Exiting application\n");
 	m_run.store(false);
@@ -89,46 +91,6 @@ void console_frontend::read_console(std::string &cmdLine)
 	}
 }
 
-void console_frontend::split_command(std::vector<std::string>& arg, std::string command)
-{
-	int len = command.length();
-	bool qot = false, sqot = false;
-	int arglen;
-	for (int i = 0; i < len; i++) {
-		int start = i;
-		if (command[i] == '\"') {
-			qot = true;
-		}
-		else if (command[i] == '\'') sqot = true;
-
-		if (qot) {
-			i++;
-			start++;
-			while (i<len && command[i] != '\"')
-				i++;
-			if (i<len)
-				qot = false;
-			arglen = i - start;
-			i++;
-		}
-		else if (sqot) {
-			i++;
-			while (i<len && command[i] != '\'')
-				i++;
-			if (i<len)
-				sqot = false;
-			arglen = i - start;
-			i++;
-		}
-		else {
-			while (i<len && command[i] != ' ')
-				i++;
-			arglen = i - start;
-		}
-		arg.push_back(command.substr(start, arglen));
-	}
-}
-
 static void completionHook(char const* prefix, linenoiseCompletions* lc)
 {
 	gConsole->completion(prefix, lc);
@@ -159,16 +121,7 @@ void console_frontend::start_console()
 	{
 		if (m_wait.load())
 		{
-			std::vector<std::string> arg;
-			split_command(arg, cmdLine);
-			auto command = m_commands.find(arg[0]);
-			if (command != m_commands.end())
-			{
-				command->second(arg);
-			}
-			else {
-				printf("Unknown command: %s\n", arg[0].c_str());
-			}
+			mame_machine_manager::instance()->lua()->load_string(cmdLine.c_str());
 			cmdLine.clear();
 			m_wait.store(false);
 		} else {
