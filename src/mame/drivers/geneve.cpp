@@ -773,4 +773,4 @@ ROM_START(geneve)
 ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE      INPUT    INIT       COMPANY     FULLNAME */
-COMP( 1987,geneve,   0,     0,      geneve_60hz,  geneve, geneve_state,  geneve,        "Myarc",    "Geneve 9640" , 0)
+COMP( 1987,geneve,   0,     0,      geneve_60hz,  geneve, geneve_state,  geneve,        "Myarc",    "Geneve 9640" , MACHINE_SUPPORTS_SAVE)

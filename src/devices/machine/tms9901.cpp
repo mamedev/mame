@@ -654,6 +654,20 @@ void tms9901_device::device_start(void)
 	m_interrupt.resolve();
 
 	m_clock_register = 0;
+
+	save_item(NAME(m_int_state));
+	save_item(NAME(m_old_int_state));
+	save_item(NAME(m_enabled_ints));
+	save_item(NAME(m_int_pending));
+	save_item(NAME(m_timer_int_pending));
+	save_item(NAME(m_pio_direction));
+	save_item(NAME(m_pio_output));
+	save_item(NAME(m_pio_direction_mirror));
+	save_item(NAME(m_pio_output_mirror));
+	save_item(NAME(m_clock_mode));
+	save_item(NAME(m_clock_register));
+	save_item(NAME(m_decrementer_value));
+	save_item(NAME(m_clock_read_register));
 }
 
 const device_type TMS9901 = &device_creator<tms9901_device>;
