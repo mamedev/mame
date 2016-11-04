@@ -528,11 +528,10 @@ public:
 		return *m_head;
 	}
 
-	void clear() const
+	void clear()
 	{
 		m_head = m_tail = this->begin();
 		m_empty = true;
-		return *m_head;
 	}
 
 private:
