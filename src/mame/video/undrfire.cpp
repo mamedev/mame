@@ -347,7 +347,7 @@ void undrfire_state::draw_sprites_cbombers(screen_device &screen, bitmap_ind16 &
 
 uint32_t undrfire_state::screen_update_undrfire(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	address_space &space = machine().driver_data()->generic_space();
+	address_space &space = machine().dummy_space();
 	uint8_t layer[5];
 	uint8_t scclayer[3];
 	uint16_t priority;
@@ -488,7 +488,7 @@ uint32_t undrfire_state::screen_update_undrfire(screen_device &screen, bitmap_in
 
 uint32_t undrfire_state::screen_update_cbombers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	address_space &space = machine().driver_data()->generic_space();
+	address_space &space = machine().dummy_space();
 	uint8_t layer[5];
 	uint8_t scclayer[3];
 	uint16_t priority;

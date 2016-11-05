@@ -369,7 +369,7 @@ WRITE8_MEMBER(mgavegas_state::cso1_w)
 	update_custom();
 
 	hopper_data=(m_hop&0x01)<<7;
-	m_ticket->write(machine().driver_data()->generic_space(), 0, hopper_data);
+	m_ticket->write(machine().dummy_space(), 0, hopper_data);
 }
 
 WRITE8_MEMBER(mgavegas_state::cso2_w)

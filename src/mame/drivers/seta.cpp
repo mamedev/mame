@@ -1386,18 +1386,17 @@ Note: on screen copyright is (c)1998 Coinmaster.
 /*------------------------------
     update timer
 ------------------------------*/
-static void uPD71054_update_timer( running_machine &machine, device_t *cpu, int no )
+void seta_state::uPD71054_update_timer(device_t *cpu, int no)
 {
-	seta_state *state = machine.driver_data<seta_state>();
-	uPD71054_state *uPD71054 = &state->m_uPD71054;
+	uPD71054_state *uPD71054 = &m_uPD71054;
 	uint16_t max = uPD71054->max[no]&0xffff;
 
 	if( max != 0 ) {
-		attotime period = attotime::from_hz(machine.device("maincpu")->unscaled_clock()) * (16 * max);
+		attotime period = attotime::from_hz(m_maincpu->unscaled_clock()) * (16 * max);
 		uPD71054->timer[no]->adjust( period, no );
 	} else {
 		uPD71054->timer[no]->adjust( attotime::never, no);
-		state->logerror( "CPU #0 PC %06X: uPD71054 error, timer %d duration is 0\n",
+		logerror( "CPU #0 PC %06X: uPD71054 error, timer %d duration is 0\n",
 				(cpu != nullptr) ? cpu->safe_pc() : -1, no );
 	}
 }
@@ -1410,7 +1409,7 @@ static void uPD71054_update_timer( running_machine &machine, device_t *cpu, int 
 TIMER_CALLBACK_MEMBER(seta_state::uPD71054_timer_callback)
 {
 	m_maincpu->set_input_line(4, HOLD_LINE );
-	uPD71054_update_timer( machine(), nullptr, param );
+	uPD71054_update_timer( nullptr, param );
 }
 
 
@@ -1459,7 +1458,7 @@ WRITE16_MEMBER(seta_state::timer_regs_w)
 			uPD71054->max[offset] = (uPD71054->max[offset]&0x00ff)+(data<<8);
 		}
 		if( uPD71054->max[offset] != 0 ) {
-			uPD71054_update_timer( machine(), &space.device(), offset );
+			uPD71054_update_timer( &space.device(), offset );
 		}
 		break;
 		case 0x0003:

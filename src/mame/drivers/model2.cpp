@@ -1406,11 +1406,6 @@ WRITE32_MEMBER(model2_state::model2o_luma_w)
 	}
 }
 
-WRITE32_MEMBER(model2_state::model2_3d_zclip_w)
-{
-	model2_3d_set_zclip( machine(), data & 0xFF );
-}
-
 /* Top Skater reads here and discards the result */
 READ8_MEMBER(model2_state::tgpid_r)
 {

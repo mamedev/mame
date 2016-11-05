@@ -258,7 +258,7 @@ void taitob_state::draw_framebuffer( bitmap_ind16 &bitmap, const rectangle &clip
 {
 	rectangle myclip = cliprect;
 	int x, y;
-	address_space &space = machine().driver_data()->generic_space();
+	address_space &space = machine().dummy_space();
 	uint8_t video_control = m_tc0180vcu->get_videoctrl(space, 0);
 	uint8_t framebuffer_page = m_tc0180vcu->get_fb_page(space, 0);
 
@@ -361,7 +361,7 @@ g_profiler.stop();
 
 uint32_t taitob_state::screen_update_taitob(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	address_space &space = machine().driver_data()->generic_space();
+	address_space &space = machine().dummy_space();
 	uint8_t video_control = m_tc0180vcu->get_videoctrl(space, 0);
 
 	if ((video_control & 0x20) == 0)
@@ -397,7 +397,7 @@ uint32_t taitob_state::screen_update_taitob(screen_device &screen, bitmap_ind16 
 
 uint32_t taitob_state::screen_update_realpunc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	address_space &space = machine().driver_data()->generic_space();
+	address_space &space = machine().dummy_space();
 	const pen_t *palette = m_palette->pens();
 	uint8_t video_control = m_tc0180vcu->get_videoctrl(space, 0);
 	int x, y;
@@ -486,7 +486,7 @@ void taitob_state::screen_eof_taitob(screen_device &screen, bool state)
 	// rising edge
 	if (state)
 	{
-		address_space &space = machine().driver_data()->generic_space();
+		address_space &space = machine().dummy_space();
 		uint8_t video_control = m_tc0180vcu->get_videoctrl(space, 0);
 		uint8_t framebuffer_page = m_tc0180vcu->get_fb_page(space, 0);
 

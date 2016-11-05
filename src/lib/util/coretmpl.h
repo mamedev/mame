@@ -428,7 +428,7 @@ public:
 	fifo()
 		: std::array<T, N>()
 		, m_head(this->begin())
-		, m_tail(this->end())
+		, m_tail(this->begin())
 		, m_empty(true)
 	{
 		static_assert(0U < N, "FIFO must have at least one element");
@@ -513,9 +513,25 @@ public:
 		return result;
 	}
 
+	void poke(T &v)
+	{
+		*m_tail = v;
+	}
+
+	void poke(T &&v)
+	{
+		*m_tail = std::move(v);
+	}
+
 	T const &peek() const
 	{
 		return *m_head;
+	}
+
+	void clear()
+	{
+		m_head = m_tail = this->begin();
+		m_empty = true;
 	}
 
 private:

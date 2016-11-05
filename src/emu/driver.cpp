@@ -14,17 +14,6 @@
 
 
 //**************************************************************************
-//  ADDRESS_MAPS
-//**************************************************************************
-
-// default address map
-static ADDRESS_MAP_START( generic, AS_0, 8, driver_device )
-	AM_RANGE(0x00000000, 0xffffffff) AM_DEVREADWRITE(":", driver_device, fatal_generic_read, fatal_generic_write)
-ADDRESS_MAP_END
-
-
-
-//**************************************************************************
 //  DRIVER DEVICE
 //**************************************************************************
 
@@ -34,8 +23,6 @@ ADDRESS_MAP_END
 
 driver_device::driver_device(const machine_config &mconfig, device_type type, const char *tag)
 	: device_t(mconfig, type, "Driver Device", tag, nullptr, 0, "", __FILE__),
-		device_memory_interface(mconfig, *this),
-		m_space_config("generic", ENDIANNESS_LITTLE, 8, 32, 0, nullptr, *ADDRESS_MAP_NAME(generic)),
 		m_system(nullptr),
 		m_flip_screen_x(0),
 		m_flip_screen_y(0)
@@ -261,17 +248,6 @@ void driver_device::device_reset_after_children()
 }
 
 
-//-------------------------------------------------
-//  memory_space_config - return a description of
-//  any address spaces owned by this device
-//-------------------------------------------------
-
-const address_space_config *driver_device::memory_space_config(address_spacenum spacenum) const
-{
-	return (spacenum == 0) ? &m_space_config : nullptr;
-}
-
-
 
 //**************************************************************************
 //  INTERRUPT ENABLE AND VECTOR HELPERS
@@ -475,23 +451,4 @@ CUSTOM_INPUT_MEMBER(driver_device::custom_port_read)
 {
 	const char *tag = (const char *)param;
 	return ioport(tag)->read();
-}
-
-
-//**************************************************************************
-//  MISC READ/WRITE HANDLERS
-//**************************************************************************
-
-//-------------------------------------------------
-//  generic space fatal error handlers
-//-------------------------------------------------
-
-READ8_MEMBER( driver_device::fatal_generic_read )
-{
-	throw emu_fatalerror("Attempted to read from generic address space (offs %X)\n", offset);
-}
-
-WRITE8_MEMBER( driver_device::fatal_generic_write )
-{
-	throw emu_fatalerror("Attempted to write to generic address space (offs %X = %02X)\n", offset, data);
 }

@@ -555,6 +555,7 @@ project "lualibs"
 
 	includedirs {
 		MAME_DIR .. "3rdparty",
+		MAME_DIR .. "3rdparty/linenoise-ng/include",
 	}
 	includedirs {
 		ext_includedir("lua"),
@@ -564,6 +565,7 @@ project "lualibs"
 	files {
 		MAME_DIR .. "3rdparty/lua-zlib/lua_zlib.c",
 		MAME_DIR .. "3rdparty/luafilesystem/src/lfs.c",
+		MAME_DIR .. "3rdparty/lua-linenoise/linenoise.c",
 	}
 
 end

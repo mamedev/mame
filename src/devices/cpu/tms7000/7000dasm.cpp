@@ -367,7 +367,7 @@ static const tms7000_opcodeinfo opcodes[] = {
 	{0x00, "NOP", 23, 0 }
 };
 
-CPU_DISASSEMBLE( tms7000 )
+static offs_t internal_disasm_tms7000(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
 {
 	int opcode, i/*, size = 1*/;
 	int pos = 0;
@@ -387,7 +387,7 @@ CPU_DISASSEMBLE( tms7000 )
 			uint16_t  c;
 			int16_t   d;
 
-			buffer += sprintf (buffer, "%s", opcodes[i].name);
+			util::stream_format(stream, "%s", opcodes[i].name);
 
 			j=opcodes[i].operand;
 
@@ -398,39 +398,39 @@ CPU_DISASSEMBLE( tms7000 )
 					case DONE:
 						break;
 					case NONE:
-						buffer += sprintf (buffer, "%s", of[j].opstr[k]);
+						util::stream_format(stream, "%s", of[j].opstr[k]);
 						break;
 					case UI8:
 						a = (uint8_t)opram[pos++];
-						buffer += sprintf(buffer, of[j].opstr[k], (unsigned int)a);
+						util::stream_format(stream, of[j].opstr[k], (unsigned int)a);
 						break;
 					case I8:
 						b = (int8_t)opram[pos++];
-						buffer += sprintf (buffer, of[j].opstr[k], (int8_t)b);
+						util::stream_format(stream, of[j].opstr[k], (int8_t)b);
 						break;
 					case UI16:
 						c = (uint16_t)opram[pos++];
 						c <<= 8;
 						c += opram[pos++];
-						buffer += sprintf (buffer, of[j].opstr[k], (unsigned int)c);
+						util::stream_format(stream, of[j].opstr[k], (unsigned int)c);
 						break;
 					case I16:
 						d = (int16_t)opram[pos++];
 						d <<= 8;
 						d += opram[pos++];
-						buffer += sprintf (buffer, of[j].opstr[k], (signed int)d);
+						util::stream_format(stream, of[j].opstr[k], (signed int)d);
 						break;
 					case PCREL:
 						b = (int8_t)opram[pos++];
 						sprintf(tmpbuf, "$%04X", pc+2+k+b);
-						buffer += sprintf (buffer, of[j].opstr[k], tmpbuf);
+						util::stream_format(stream, of[j].opstr[k], tmpbuf);
 						break;
 					case PCABS:
 						c = (uint16_t)opram[pos++];
 						c <<= 8;
 						c += opram[pos++];
 						sprintf(tmpbuf, "$%04X", c);
-						buffer += sprintf (buffer, of[j].opstr[k], tmpbuf);
+						util::stream_format(stream, of[j].opstr[k], tmpbuf);
 						break;
 					case TRAP:
 						vector = 0xffff - ((0xff - opcode) * 2);
@@ -443,6 +443,16 @@ CPU_DISASSEMBLE( tms7000 )
 	}
 
 	/* No Match */
-	strcpy (buffer, "Illegal Opcode");
+	stream << "Illegal Opcode";
 	return pos | DASMFLAG_SUPPORTED;
+}
+
+
+CPU_DISASSEMBLE(tms7000)
+{
+	std::ostringstream stream;
+	offs_t result = internal_disasm_tms7000(device, stream, pc, oprom, opram, options);
+	std::string stream_str = stream.str();
+	strcpy(buffer, stream_str.c_str());
+	return result;
 }

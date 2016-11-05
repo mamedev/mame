@@ -250,6 +250,7 @@ public:
 	uint32_t screen_update_seta_layers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_seta_buffer_sprites(screen_device &screen, bool state);
 	void screen_eof_setaroul(screen_device &screen, bool state);
+	void uPD71054_update_timer(device_t *cpu, int no);
 	INTERRUPT_GEN_MEMBER(wrofaero_interrupt);
 	TIMER_CALLBACK_MEMBER(uPD71054_timer_callback);
 	TIMER_CALLBACK_MEMBER(keroppi_prize_hop_callback);

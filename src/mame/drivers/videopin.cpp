@@ -93,8 +93,8 @@ void videopin_state::machine_reset()
 
 	/* both output latches are cleared on reset */
 
-	out1_w(machine().driver_data()->generic_space(), 0, 0);
-	out2_w(machine().driver_data()->generic_space(), 0, 0);
+	out1_w(machine().dummy_space(), 0, 0);
+	out2_w(machine().dummy_space(), 0, 0);
 }
 
 

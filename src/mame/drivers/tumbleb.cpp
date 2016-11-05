@@ -425,17 +425,15 @@ command 1 - stop?
 */
 
 
-static void tumbleb2_playmusic( device_t *device )
+void tumbleb_state::tumbleb2_playmusic(okim6295_device *oki)
 {
-	tumbleb_state *state = device->machine().driver_data<tumbleb_state>();
-	okim6295_device *oki = downcast<okim6295_device *>(device);
 	int status = oki->read_status();
 
-	if (state->m_music_is_playing)
+	if (m_music_is_playing)
 	{
 		if (!BIT(status, 3))
 		{
-			oki->write_command(0x80 | state->m_music_command);
+			oki->write_command(0x80 | m_music_command);
 			oki->write_command(0x00 | 0x82);
 		}
 	}
@@ -2190,15 +2188,13 @@ static MACHINE_CONFIG_START( fncywld, tumbleb_state )
 	MCFG_VIDEO_START_OVERRIDE(tumbleb_state,fncywld)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_YM2151_ADD("ymsnd", 32220000/9)
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.20)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.20)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	MCFG_OKIM6295_ADD("oki", 1023924, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -2252,21 +2248,18 @@ static MACHINE_CONFIG_START( htchctch, tumbleb_state )
 	MCFG_VIDEO_START_OVERRIDE(tumbleb_state,tumblepb)
 
 	/* sound hardware - same as hyperpac */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	/* on at least hatch catch, cookie & bibi and choky choky the YM2151 clock is connected
-	       directly to the Z80 clock so the speed should match */
-		MCFG_YM2151_ADD("ymsnd", 15000000/4)
+	/* on at least hatch catch, cookie & bibi and choky choky the YM2151 clock is connected directly to the Z80 clock so the speed should match */
+	MCFG_YM2151_ADD("ymsnd", 15000000/4)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.10)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.10)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	/* correct for cookie & bibi and hatch catch, (4096000/4) */
 	MCFG_OKIM6295_ADD("oki", 1024000, OKIM6295_PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( cookbib, htchctch )
@@ -2275,12 +2268,13 @@ static MACHINE_CONFIG_DERIVED( cookbib, htchctch )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( chokchok, htchctch )
-		MCFG_PALETTE_MODIFY("palette")
-		MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
-
-		MCFG_OKIM6295_REPLACE("oki", 3579545/4, OKIM6295_PIN7_HIGH)
-		MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-		MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
+	// some PCBs have left factory with a 3.57mhz while some have a 4.096 which matches other games, assuming the former are factory errors
+	// TODO: MAME sound cores doesn't handle on-the-fly sound frequency changes, I guess best action here is to make the sound chip a slot option, 
+	//       assuming it's worth emulating a factory error in the first place.
+	MCFG_OKIM6295_REPLACE("oki", 4096000/4, OKIM6295_PIN7_HIGH)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( cookbib_mcu, htchctch )
@@ -2301,8 +2295,7 @@ static MACHINE_CONFIG_DERIVED( bcstory, htchctch )
 
 	MCFG_SOUND_REPLACE("ymsnd", YM2151, 3427190)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.10)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.10)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( semibase, bcstory )
@@ -2323,8 +2316,7 @@ static MACHINE_CONFIG_DERIVED( metlsavr, cookbib )
 
 	MCFG_SOUND_REPLACE("ymsnd", YM2151, 3427190)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(0, "lspeaker", 0.10)
-	MCFG_SOUND_ROUTE(1, "rspeaker", 0.10)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
 
 
@@ -2364,13 +2356,12 @@ static MACHINE_CONFIG_START( suprtrio, tumbleb_state )
 	MCFG_VIDEO_START_OVERRIDE(tumbleb_state,suprtrio)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_OKIM6295_ADD("oki", 875000, OKIM6295_PIN7_HIGH)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( pangpang, tumbleb_state )

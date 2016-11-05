@@ -129,7 +129,7 @@ uint32_t flkatck_state::screen_update_flkatck(screen_device &screen, bitmap_ind1
 	rectangle clip[2];
 	const rectangle &visarea = screen.visible_area();
 
-	address_space &space = machine().driver_data()->generic_space();
+	address_space &space = machine().dummy_space();
 	if (m_flipscreen)
 	{
 		clip[0] = visarea;

@@ -37,6 +37,7 @@ public:
 	DECLARE_WRITE8_MEMBER(fake_d800_w);
 	DECLARE_WRITE8_MEMBER(nmi_mask_w);
 	DECLARE_WRITE8_MEMBER(sound_nmi_mask_w);
+	DECLARE_WRITE8_MEMBER(coin_w);
 	DECLARE_WRITE8_MEMBER(charbank_w);
 	DECLARE_WRITE8_MEMBER(bkgpen_w);
 	DECLARE_WRITE8_MEMBER(spritebank_w);

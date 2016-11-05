@@ -110,8 +110,7 @@ nesapu_device::nesapu_device(const machine_config &mconfig, const char *tag, dev
 		m_samps_per_sync(0),
 		m_buffer_size(0),
 		m_real_rate(0),
-		m_stream(nullptr),
-		m_cpu_tag("")
+		m_stream(nullptr)
 {
 	for (auto & elem : m_noise_lut)
 	{
@@ -132,13 +131,6 @@ nesapu_device::nesapu_device(const machine_config &mconfig, const char *tag, dev
 	{
 		elem = 0;
 	}
-}
-
-void nesapu_device::set_tag_memory(const char *tag)
-{
-	/* Initialize individual chips */
-	if (tag)
-		(m_APU.dpcm).memory = &machine().device(tag)->memory().space(AS_PROGRAM);
 }
 
 void nesapu_device::device_clock_changed()
@@ -184,7 +176,7 @@ void nesapu_device::device_start()
 {
 	create_noise(m_noise_lut, 13, NOISE_LONG);
 
-	set_tag_memory(m_cpu_tag);
+	(m_APU.dpcm).memory = &downcast<n2a03_device &>(*owner()).space(AS_PROGRAM);
 
 	calculate_rates();
 

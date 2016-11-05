@@ -182,7 +182,7 @@ WRITE8_MEMBER(hcastle_state::hcastle_pf2_control_w)
 void hcastle_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, uint8_t *sbank, int bank )
 {
 	k007121_device *k007121 = bank ? m_k007121_2 : m_k007121_1;
-	address_space &space = machine().driver_data()->generic_space();
+	address_space &space = machine().dummy_space();
 	int base_color = (k007121->ctrlram_r(space, 6) & 0x30) * 2;
 	int bank_base = (bank == 0) ? 0x4000 * (m_gfx_bank & 1) : 0;
 
@@ -193,7 +193,7 @@ void hcastle_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect
 
 uint32_t hcastle_state::screen_update_hcastle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	address_space &space = machine().driver_data()->generic_space();
+	address_space &space = machine().dummy_space();
 
 	uint8_t ctrl_1_0 = m_k007121_1->ctrlram_r(space, 0);
 	uint8_t ctrl_1_1 = m_k007121_1->ctrlram_r(space, 1);

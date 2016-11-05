@@ -1192,6 +1192,11 @@ void vaquerro_device::device_start()
 	save_item(NAME(m_sry));
 	save_item(NAME(m_a14));
 	save_item(NAME(m_dbin_level));
+
+	// FIXME: In rare occasions, the saved state is invalid and restoring
+	// may crash the emulated 99/8 (e.g. with invalid opcodes)
+	// Saving the wait state logic does not affect the operation, as it seems,
+	// so we leave it out.
 }
 
 void vaquerro_device::device_reset()

@@ -84,7 +84,7 @@ int taitoair_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 	/* Y chain size is 16/32?/64/64? pixels. X chain size
 	   is always 64 pixels. */
 	//const uint16_t stop_values[4] = { 0xc00, 0, 0, 0 };
-	address_space &space = machine().driver_data()->generic_space();
+	address_space &space = machine().dummy_space();
 	static const int size[] = { 1, 2, 4, 4 };
 	int x0, y0, x, y, dx, dy, ex, ey, zx, zy;
 	int ysize;

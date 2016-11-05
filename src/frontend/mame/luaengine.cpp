@@ -8,10 +8,7 @@
 
 ***************************************************************************/
 
-#include <limits>
-#include <thread>
 #include <lua.hpp>
-#include <signal.h>
 #include "emu.h"
 #include "mame.h"
 #include "drivenum.h"
@@ -21,7 +18,6 @@
 #include "natkeyboard.h"
 #include "uiinput.h"
 #include "pluginopts.h"
-#include <mutex>
 
 #ifdef __clang__
 #pragma clang diagnostic ignored "-Wshift-count-overflow"
@@ -37,6 +33,7 @@
 extern "C" {
 	int luaopen_zlib(lua_State *L);
 	int luaopen_lfs(lua_State *L);
+	int luaopen_linenoise(lua_State *L);
 }
 
 namespace sol
@@ -527,6 +524,7 @@ lua_engine::lua_engine()
 	// Get package.preload so we can store builtins in it.
 	sol()["package"]["preload"]["zlib"] = &luaopen_zlib;
 	sol()["package"]["preload"]["lfs"] = &luaopen_lfs;
+	sol()["package"]["preload"]["linenoise"] = &luaopen_linenoise;
 
 	lua_gc(m_lua_state, LUA_GCRESTART, 0);
 }

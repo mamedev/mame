@@ -323,7 +323,7 @@ WRITE_LINE_MEMBER(r2dtank_state::display_enable_changed)
 WRITE8_MEMBER(r2dtank_state::pia_comp_w)
 {
 	device_t *device = machine().device("pia_main");
-	downcast<pia6821_device *>(device)->write(machine().driver_data()->generic_space(), offset, ~data);
+	downcast<pia6821_device *>(device)->write(machine().dummy_space(), offset, ~data);
 }
 
 

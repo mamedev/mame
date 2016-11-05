@@ -20423,7 +20423,6 @@ megaiv                          // 1989 Mephisto Mega IV Schachcomputer
 milano                          // 1989 Mephisto Milano Schachcomputer
 monteciv                        // 1990 Mephisto Monte Carlo IV LE Schachcomputer
 polgar                          // 1986 Mephisto Polgar Schachcomputer
-risc                            // Saitek 2500 14MHZ (skeleton)
 sexpertb                        // 1988 Novag Expert B Chess Computer
 sexpertc                        // 1989 Novag Super Expert C Chess Computer
 sfortea                         // 1987 Novag Super Forte A Chess Computer
@@ -27603,6 +27602,7 @@ murogmbl                        // ???
 
 @source:mustache.cpp
 mustache                        // (c) 1987 March
+mustachei                       // (c) 1987 IG SPA
 
 @source:mvme147.cpp
 mvme147                         // (c) 1989 Motorola
@@ -31537,6 +31537,10 @@ rex6000                         //
 
 @source:rgum.cpp
 rgum                            //
+
+@source:risc2500.cpp
+risc                            //
+montreux                        //
 
 @source:riscpc.cpp
 a7000                           // 1995 Acorn Archimedes 7000

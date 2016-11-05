@@ -130,9 +130,12 @@ running_machine::running_machine(const machine_config &_config, machine_manager 
 		m_memory(*this),
 		m_ioport(*this),
 		m_parameters(*this),
-		m_scheduler(*this)
+		m_scheduler(*this),
+		m_dummy_space(_config, "dummy_space", &root_device(), 0)
 {
 	memset(&m_base_time, 0, sizeof(m_base_time));
+
+	m_dummy_space.set_machine(*this);
 
 	// set the machine on all devices
 	device_iterator iter(root_device());
@@ -963,6 +966,8 @@ void running_machine::logfile_callback(const char *buffer)
 
 void running_machine::start_all_devices()
 {
+	m_dummy_space.start();
+
 	// iterate through the devices
 	int last_failed_starts = -1;
 	while (last_failed_starts != 0)
@@ -1225,6 +1230,48 @@ void system_time::full_time::set(struct tm &t)
 	is_dst  = t.tm_isdst;
 }
 
+
+
+//**************************************************************************
+//  DUMMY ADDRESS SPACE
+//**************************************************************************
+
+READ8_MEMBER(dummy_space_device::read)
+{
+	throw emu_fatalerror("Attempted to read from generic address space (offs %X)\n", offset);
+}
+
+WRITE8_MEMBER(dummy_space_device::write)
+{
+	throw emu_fatalerror("Attempted to write to generic address space (offs %X = %02X)\n", offset, data);
+}
+
+static ADDRESS_MAP_START(dummy, AS_0, 8, dummy_space_device)
+	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE(read, write)
+ADDRESS_MAP_END
+
+const device_type DUMMY_SPACE = &device_creator<dummy_space_device>;
+
+dummy_space_device::dummy_space_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, DUMMY_SPACE, "Dummy Space", tag, owner, clock, "dummy_space", __FILE__),
+	device_memory_interface(mconfig, *this),
+	m_space_config("dummy", ENDIANNESS_LITTLE, 8, 32, 0, nullptr, *ADDRESS_MAP_NAME(dummy))
+{
+}
+
+void dummy_space_device::device_start()
+{
+}
+
+//-------------------------------------------------
+//  memory_space_config - return a description of
+//  any address spaces owned by this device
+//-------------------------------------------------
+
+const address_space_config *dummy_space_device::memory_space_config(address_spacenum spacenum) const
+{
+	return (spacenum == 0) ? &m_space_config : nullptr;
+}
 
 
 //**************************************************************************

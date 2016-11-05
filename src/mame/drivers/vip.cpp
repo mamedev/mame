@@ -477,7 +477,7 @@ READ_LINE_MEMBER( vip_state::ef4_r )
 WRITE_LINE_MEMBER( vip_state::q_w )
 {
 	// sound output
-	m_beeper->write(machine().driver_data()->generic_space(), NODE_01, state);
+	m_beeper->write(machine().dummy_space(), NODE_01, state);
 
 	// Q led
 	output().set_led_value(LED_Q, state);
@@ -620,7 +620,7 @@ void vip_state::machine_start()
 	output().set_led_value(LED_POWER, 1);
 
 	// reset sound
-	m_beeper->write(machine().driver_data()->generic_space(), NODE_01, 0);
+	m_beeper->write(machine().dummy_space(), NODE_01, 0);
 
 	// state saving
 	save_item(NAME(m_8000));

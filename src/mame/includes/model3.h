@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont, Ville Linde
+#include "cpu/powerpc/ppc.h"
 #include "video/poly.h"
 #include "bus/scsi/scsi.h"
 #include "machine/53c810.h"
@@ -72,7 +73,7 @@ public:
 		m_step20_with_old_real3d = false;
 	}
 
-	required_device<cpu_device> m_maincpu;
+	required_device<ppc_device> m_maincpu;
 	optional_device<lsi53c810_device> m_lsi53c810;
 	required_device<cpu_device> m_audiocpu;
 	required_device<scsp_device> m_scsp1;
@@ -198,12 +199,14 @@ public:
 	DECLARE_WRITE64_MEMBER(mpc105_data_w);
 	DECLARE_READ64_MEMBER(mpc105_reg_r);
 	DECLARE_WRITE64_MEMBER(mpc105_reg_w);
+	void mpc105_init();
 	DECLARE_READ64_MEMBER(mpc106_addr_r);
 	DECLARE_WRITE64_MEMBER(mpc106_addr_w);
 	DECLARE_READ64_MEMBER(mpc106_data_r);
 	DECLARE_WRITE64_MEMBER(mpc106_data_w);
 	DECLARE_READ64_MEMBER(mpc106_reg_r);
 	DECLARE_WRITE64_MEMBER(mpc106_reg_w);
+	void mpc106_init();
 	DECLARE_READ64_MEMBER(scsi_r);
 	DECLARE_WRITE64_MEMBER(scsi_w);
 	DECLARE_READ64_MEMBER(real3d_dma_r);
@@ -222,6 +225,8 @@ public:
 	DECLARE_WRITE16_MEMBER(model3snd_ctrl);
 	uint32_t pci_device_get_reg();
 	void pci_device_set_reg(uint32_t value);
+	void configure_fast_ram();
+	void interleave_vroms();
 	DECLARE_DRIVER_INIT(genprot);
 	DECLARE_DRIVER_INIT(lemans24);
 	DECLARE_DRIVER_INIT(vs298);

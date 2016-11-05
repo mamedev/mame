@@ -155,7 +155,7 @@ WRITE8_MEMBER( ticket_dispenser_device::write )
 
 WRITE_LINE_MEMBER( ticket_dispenser_device::motor_w )
 {
-	write(machine().driver_data()->generic_space(), 0, state ? m_active_bit : 0);
+	write(machine().dummy_space(), 0, state ? m_active_bit : 0);
 }
 
 
