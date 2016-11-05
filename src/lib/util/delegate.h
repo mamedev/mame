@@ -419,7 +419,7 @@ public:
 	};
 	using functional_type = std::function<_ReturnType(Params...)>;
 	using generic_static_func = typename traits<delegate_generic_class>::static_func_type;
-	using generic_member_func = MEMBER_ABI generic_static_func;
+	typedef MEMBER_ABI generic_static_func generic_member_func;
 	// generic constructor
 	delegate_base()
 		: m_function(nullptr),
