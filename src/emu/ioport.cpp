@@ -304,7 +304,294 @@ u8 const inp_header::MAGIC[inp_header::OFFS_BASETIME - inp_header::OFFS_MAGIC] =
 //  BUILT-IN CORE MAPPINGS
 //**************************************************************************
 
-#include "inpttype.h"
+const char *input_type_entry::s_tokens[IPT_COUNT]
+{
+	nullptr, //INVALID
+	"UNUSED",
+	nullptr, //END
+	"UNKNOWN",
+	nullptr, //PORT
+	"DIPSWITCH",
+	"CONFIG",
+
+	"START1",
+	"START2",
+	"START3",
+	"START4",
+	"START5",
+	"START6",
+	"START7",
+	"START8",
+	"START9",
+	"START10",
+
+	"COIN1",
+	"COIN2",
+	"COIN3",
+	"COIN4",
+	"COIN5",
+	"COIN6",
+	"COIN7",
+	"COIN8",
+	"COIN9",
+	"COIN10",
+	"COIN11",
+	"COIN12",
+	"BILL1",
+
+	"SERVICE1",
+	"SERVICE2",
+	"SERVICE3",
+	"SERVICE4",
+
+	"TILT1",
+	"TILT2",
+	"TILT3",
+	"TILT4",
+
+	"POWER_ON",
+	"POWER_OFF",
+	"SERVICE",
+	"TILT",
+	"INTERLOCK",
+	"MEMORY_RESET",
+	"VOLUME_UP",
+	"VOLUME_DOWN",
+	"START",
+	"SELECT",
+	"KEYPAD",
+	"KEYBOARD",
+
+	nullptr, //DIGITAL_JOYSTICK_FIRST
+
+		"JOYSTICK_UP",
+		"JOYSTICK_DOWN",
+		"JOYSTICK_LEFT",
+		"JOYSTICK_RIGHT",
+
+		"JOYSTICKRIGHT_UP",
+		"JOYSTICKRIGHT_DOWN",
+		"JOYSTICKRIGHT_LEFT",
+		"JOYSTICKRIGHT_RIGHT",
+		"JOYSTICKLEFT_UP",
+		"JOYSTICKLEFT_DOWN",
+		"JOYSTICKLEFT_LEFT",
+		"JOYSTICKLEFT_RIGHT",
+
+	nullptr, //DIGITAL_JOYSTICK_LAST
+
+	"BUTTON1",
+	"BUTTON2",
+	"BUTTON3",
+	"BUTTON4",
+	"BUTTON5",
+	"BUTTON6",
+	"BUTTON7",
+	"BUTTON8",
+	"BUTTON9",
+	"BUTTON10",
+	"BUTTON11",
+	"BUTTON12",
+	"BUTTON13",
+	"BUTTON14",
+	"BUTTON15",
+	"BUTTON16",
+
+	nullptr, //MAHJONG_FIRST
+
+		"MAHJONG_A",
+		"MAHJONG_B",
+		"MAHJONG_C",
+		"MAHJONG_D",
+		"MAHJONG_E",
+		"MAHJONG_F",
+		"MAHJONG_G",
+		"MAHJONG_H",
+		"MAHJONG_I",
+		"MAHJONG_J",
+		"MAHJONG_K",
+		"MAHJONG_L",
+		"MAHJONG_M",
+		"MAHJONG_N",
+		"MAHJONG_O",
+		"MAHJONG_P",
+		"MAHJONG_Q",
+		"MAHJONG_KAN",
+		"MAHJONG_PON",
+		"MAHJONG_CHI",
+		"MAHJONG_REACH",
+		"MAHJONG_RON",
+		"MAHJONG_BET",
+		"MAHJONG_LAST_CHANCE",
+		"MAHJONG_SCORE",
+		"MAHJONG_DOUBLE_UP",
+		"MAHJONG_FLIP_FLOP",
+		"MAHJONG_BIG",
+		"MAHJONG_SMALL",
+
+	nullptr, //MAHJONG_LAST
+
+	nullptr, //HANAFUDA_FIRST
+
+		"HANAFUDA_A",
+		"HANAFUDA_B",
+		"HANAFUDA_C",
+		"HANAFUDA_D",
+		"HANAFUDA_E",
+		"HANAFUDA_F",
+		"HANAFUDA_G",
+		"HANAFUDA_H",
+		"HANAFUDA_YES",
+		"HANAFUDA_NO",
+
+	nullptr, //HANAFUDA_LAST
+
+	nullptr, //GAMBLING_FIRST
+
+		"GAMBLE_KEYIN",
+		"GAMBLE_KEYOUT",
+		"GAMBLE_SERVICE",
+		"GAMBLE_BOOK",
+		"GAMBLE_DOOR",
+
+		"GAMBLE_HIGH",
+		"GAMBLE_LOW",
+		"GAMBLE_HALF",
+		"GAMBLE_DEAL",
+		"GAMBLE_D_UP",
+		"GAMBLE_TAKE",
+		"GAMBLE_STAND",
+		"GAMBLE_BET",
+		"GAMBLE_PAYOUT",
+
+		"POKER_HOLD1",
+		"POKER_HOLD2",
+		"POKER_HOLD3",
+		"POKER_HOLD4",
+		"POKER_HOLD5",
+		"POKER_CANCEL",
+		"POKER_BET",
+
+		"SLOT_STOP1",
+		"SLOT_STOP2",
+		"SLOT_STOP3",
+		"SLOT_STOP4",
+		"SLOT_STOP_ALL",
+
+	nullptr, //GAMBLING_LAST
+
+	nullptr, //ANALOG_FIRST
+
+		nullptr, //ANALOG_ABSOLUTE_FIRST
+
+			"AD_STICK_X",
+			"AD_STICK_Y",
+			"AD_STICK_Z",
+			"PADDLE",
+			"PADDLE_V",
+			"PEDAL",
+			"PEDAL2",
+			"PEDAL3",
+			"LIGHTGUN_X",
+			"LIGHTGUN_Y",
+			"POSITIONAL",
+			"POSITIONAL_V",
+
+		nullptr, //ANALOG_ABSOLUTE_LAST
+
+		"DIAL",
+		"DIAL_V",
+		"TRACKBALL_X",
+		"TRACKBALL_Y",
+		"MOUSE_X",
+		"MOUSE_Y",
+
+	nullptr, //ANALOG_LAST
+
+	"ADJUSTER",
+
+	nullptr, //UI_FIRST
+
+		"UI_CONFIGURE",
+		"UI_ON_SCREEN_DISPLAY",
+		"UI_DEBUG_BREAK",
+		"UI_PAUSE",
+		"UI_PAUSE_SINGLE",
+		"UI_RESET_MACHINE",
+		"UI_SOFT_RESET",
+		"UI_SHOW_GFX",
+		"UI_FRAMESKIP_DEC",
+		"UI_FRAMESKIP_INC",
+		"UI_THROTTLE",
+		"UI_FAST_FORWARD",
+		"UI_SHOW_FPS",
+		"UI_SNAPSHOT",
+		"UI_TIMECODE",
+		"UI_RECORD_MOVIE",
+		"UI_TOGGLE_CHEAT",
+		"UI_UP",
+		"UI_DOWN",
+		"UI_LEFT",
+		"UI_RIGHT",
+		"UI_HOME",
+		"UI_END",
+		"UI_PAGE_UP",
+		"UI_PAGE_DOWN",
+		"UI_SELECT",
+		"UI_CANCEL",
+		"UI_DISPLAY_COMMENT",
+		"UI_CLEAR",
+		"UI_ZOOM_IN",
+		"UI_ZOOM_OUT",
+		"UI_PREV_GROUP",
+		"UI_NEXT_GROUP",
+		"UI_ROTATE",
+		"UI_SHOW_PROFILER",
+		"UI_TOGGLE_UI",
+		"UI_TOGGLE_DEBUG",
+		"UI_PASTE",
+		"UI_SAVE_STATE",
+		"UI_LOAD_STATE",
+		"UI_TAPE_START",
+		"UI_TAPE_STOP",
+		"UI_DATS",
+		"UI_FAVORITES",
+		"UI_UP_FILTER",
+		"UI_DOWN_FILTER",
+		"UI_LEFT_PANEL",
+		"UI_RIGHT_PANEL",
+		"UI_UP_PANEL",
+		"UI_DOWN_PANEL",
+		"UI_EXPORT",
+		"UI_AUDIT_FAST",
+		"UI_AUDIT_ALL",
+		"UI_TOGGLE_AUTOFIRE",
+
+		"OSD_1",
+		"OSD_2",
+		"OSD_3",
+		"OSD_4",
+		"OSD_5",
+		"OSD_6",
+		"OSD_7",
+		"OSD_8",
+		"OSD_9",
+		"OSD_10",
+		"OSD_11",
+		"OSD_12",
+		"OSD_13",
+		"OSD_14",
+		"OSD_15",
+		"OSD_16",
+
+	nullptr, //UI_LAST
+
+	"OTHER",
+
+	"SPECIAL",
+	nullptr, //CUSTOM
+	nullptr //OUTPUT
+};
 
 
 
@@ -349,41 +636,28 @@ void ioport_list::append(device_t &device, std::string &errorbuf)
 //  input_type_entry - constructors
 //-------------------------------------------------
 
-input_type_entry::input_type_entry(ioport_type type, ioport_group group, int player, const char *token, const char *name, input_seq standard)
+input_type_entry::input_type_entry(ioport_type type, ioport_group group, int player)
 	: m_next(nullptr),
 		m_type(type),
 		m_group(group),
-		m_player(player),
-		m_token(token),
-		m_name(name)
+		m_player(player)
 {
-	m_defseq[SEQ_TYPE_STANDARD] = m_seq[SEQ_TYPE_STANDARD] = standard;
-}
+	assert(s_tokens[type] != nullptr);
+	if (group >= IPG_PLAYER1 && group <= IPG_PLAYER_LAST)
+	{
+		assert(group == IPG_PLAYER1 + player);
+		m_token = util::string_format("P%d_%s", player + 1, s_tokens[type]);
+	}
+	else
+	{
+		assert(player == 0);
+		m_token = s_tokens[type];
+	}
 
-input_type_entry::input_type_entry(ioport_type type, ioport_group group, int player, const char *token, const char *name, input_seq standard, input_seq decrement, input_seq increment)
-	: m_next(nullptr),
-		m_type(type),
-		m_group(group),
-		m_player(player),
-		m_token(token),
-		m_name(name)
-{
-	m_defseq[SEQ_TYPE_STANDARD] = m_seq[SEQ_TYPE_STANDARD] = standard;
-	m_defseq[SEQ_TYPE_INCREMENT] = m_seq[SEQ_TYPE_INCREMENT] = increment;
-	m_defseq[SEQ_TYPE_DECREMENT] = m_seq[SEQ_TYPE_DECREMENT] = decrement;
-}
-
-
-//-------------------------------------------------
-//  configure_osd - set the token and name of an
-//  OSD entry
-//-------------------------------------------------
-
-void input_type_entry::configure_osd(const char *token, const char *name)
-{
-	assert(m_type >= IPT_OSD_1 && m_type <= IPT_OSD_16);
-	m_token = token;
-	m_name = name;
+	// for valid, non-OSD inputs, assign the token as a makeshift name
+	// (the frontend should replace this with a friendlier one)
+	if (group != IPG_INVALID && !is_osd())
+		m_name = m_token;
 }
 
 
@@ -715,7 +989,7 @@ ioport_type_class ioport_field::type_class() const
 {
 	// inputs associated with specific players
 	ioport_group group = manager().type_group(m_type, m_player);
-	if (group >= IPG_PLAYER1 && group <= IPG_PLAYER10)
+	if (group >= IPG_PLAYER1 && group <= IPG_PLAYER_LAST)
 		return INPUT_CLASS_CONTROLLER;
 
 	// keys (names derived from character codes)
@@ -1758,19 +2032,84 @@ time_t ioport_manager::initialize()
 
 
 //-------------------------------------------------
+//  type_alloc - insert a new entry into the list of
+//  core types
+//-------------------------------------------------
+
+void ioport_manager::type_alloc(ioport_type type, ioport_group group, int player)
+{
+	input_type_entry &entry = m_typelist.append(*global_alloc(input_type_entry(type, group, player)));
+
+	// customize the new entry for each input type class
+	for (input_device_class devclass = DEVICE_CLASS_FIRST_VALID; devclass <= DEVICE_CLASS_LAST_VALID; ++devclass)
+		machine().input().device_class(devclass).add_type_seq(entry);
+}
+
+
+//-------------------------------------------------
 //  init_port_types - initialize the default
 //  type list
 //-------------------------------------------------
 
 void ioport_manager::init_port_types()
 {
-	// convert the array into a list of type states that can be modified
-	construct_core_types(m_typelist);
+	// digital joysticks and buttons
+	for (int player = 0; player < MAX_PLAYERS; player++)
+	{
+		for (ioport_type type = ioport_type(IPT_DIGITAL_JOYSTICK_FIRST + 1); type < IPT_DIGITAL_JOYSTICK_LAST; ++type)
+			type_alloc(type, ioport_group(IPG_PLAYER1 + player), player);
+		for (ioport_type type = IPT_BUTTON1; type <= IPT_BUTTON16; ++type)
+			type_alloc(type, ioport_group(IPG_PLAYER1 + player), player);
+		type_alloc(IPT_START, ioport_group(IPG_PLAYER1 + player), player);
+		type_alloc(IPT_SELECT, ioport_group(IPG_PLAYER1 + player), player);
+	}
 
-	// customize the list for each input type class
-	for (input_type_entry &curtype : m_typelist)
-		for (input_device_class devclass = DEVICE_CLASS_FIRST_VALID; devclass <= DEVICE_CLASS_LAST_VALID; ++devclass)
-			machine().input().device_class(devclass).add_type_seq(curtype);
+	// mahjong and hanafuda
+	for (int player = 0; player < 2; player++)
+	{
+		for (ioport_type type = ioport_type(IPT_MAHJONG_FIRST + 1); type < IPT_MAHJONG_LAST; ++type)
+			type_alloc(type, ioport_group(IPG_PLAYER1 + player), player);
+		for (ioport_type type = ioport_type(IPT_HANAFUDA_FIRST + 1); type < IPT_HANAFUDA_LAST; ++type)
+			type_alloc(type, ioport_group(IPG_PLAYER1 + player), player);
+	}
+
+	// gambling (including poker and slots)
+	for (ioport_type type = ioport_type(IPT_GAMBLING_FIRST + 1); type < IPT_GAMBLING_LAST; ++type)
+		type_alloc(type, IPG_PLAYER1, 0);
+
+	// non-player input types (start, coin, service, tilt, etc.)
+	for (ioport_type type = IPT_START1; type <= IPT_VOLUME_DOWN; ++type)
+		type_alloc(type, IPG_OTHER, 0);
+
+	// analog types
+	for (int player = 0; player < MAX_PLAYERS; player++)
+	{
+		for (ioport_type type = ioport_type(IPT_ANALOG_ABSOLUTE_FIRST + 1); type < IPT_ANALOG_ABSOLUTE_LAST; ++type)
+			type_alloc(type, ioport_group(IPG_PLAYER1 + player), player);
+		type_alloc(IPT_DIAL, ioport_group(IPG_PLAYER1 + player), player);
+		type_alloc(IPT_DIAL_V, ioport_group(IPG_PLAYER1 + player), player);
+		type_alloc(IPT_TRACKBALL_X, ioport_group(IPG_PLAYER1 + player), player);
+		type_alloc(IPT_TRACKBALL_Y, ioport_group(IPG_PLAYER1 + player), player);
+		type_alloc(IPT_MOUSE_X, ioport_group(IPG_PLAYER1 + player), player);
+		type_alloc(IPT_MOUSE_Y, ioport_group(IPG_PLAYER1 + player), player);
+	}
+
+	// keypads & keyboards
+	type_alloc(IPT_KEYPAD, IPG_OTHER, 0);
+	type_alloc(IPT_KEYBOARD, IPG_OTHER, 0);
+
+	// UI/OSD types
+	for (ioport_type type = ioport_type(IPT_UI_FIRST + 1); type < IPT_UI_LAST; ++type)
+		type_alloc(type, IPG_UI, 0);
+
+	// miscellaneous invalid types
+	type_alloc(IPT_UNKNOWN, IPG_INVALID, 0);
+	type_alloc(IPT_UNUSED, IPG_INVALID, 0);
+	type_alloc(IPT_SPECIAL, IPG_INVALID, 0);
+	type_alloc(IPT_OTHER, IPG_INVALID, 0);
+	type_alloc(IPT_ADJUSTER, IPG_INVALID, 0);
+	type_alloc(IPT_DIPSWITCH, IPG_INVALID, 0);
+	type_alloc(IPT_CONFIG, IPG_INVALID, 0);
 
 	// ask the OSD to customize the list
 	machine().osd().customize_input_type_list(m_typelist);
@@ -1861,7 +2200,7 @@ const char *ioport_manager::type_name(ioport_type type, u8 player)
 {
 	// if we have a machine, use the live state and quick lookup
 	input_type_entry *entry = m_type_to_entry[type][player];
-	if (entry != nullptr && entry->name() != nullptr)
+	if (entry != nullptr && entry->name()[0] != 0)
 		return entry->name();
 
 	// if we find nothing, return a default string (not a null pointer)

@@ -53,7 +53,7 @@ void menu_input_groups::populate(float &customtop, float &custombottom)
 	item_append(_("User Interface"), "", 0, (void *)(IPG_UI + 1));
 	for (player = 0; player < MAX_PLAYERS; player++)
 	{
-		auto s = string_format("Player %d Controls", player + 1);
+		auto s = string_format(_("Player %d Controls"), player + 1);
 		item_append(s, "", 0, (void *)(uintptr_t)(IPG_PLAYER1 + player + 1));
 	}
 	item_append(_("Other Controls"), "", 0, (void *)(uintptr_t)(IPG_OTHER + 1));
@@ -103,7 +103,7 @@ void menu_input_general::populate(float &customtop, float &custombottom)
 	for (input_type_entry &entry : machine().ioport().types())
 
 		/* add if we match the group and we have a valid name */
-		if (entry.group() == group && entry.name() != nullptr && entry.name()[0] != 0)
+		if (entry.group() == group && entry.name()[0] != 0)
 		{
 			input_seq_type seqtype;
 
@@ -121,7 +121,7 @@ void menu_input_general::populate(float &customtop, float &custombottom)
 				item->seq = machine().ioport().type_seq(entry.type(), entry.player(), seqtype);
 				item->defseq = &entry.defseq(seqtype);
 				item->sortorder = sortorder * 4 + suborder[seqtype];
-				item->type = ioport_manager::type_is_analog(entry.type()) ? (INPUT_TYPE_ANALOG + seqtype) : INPUT_TYPE_DIGITAL;
+				item->type = entry.is_analog() ? (INPUT_TYPE_ANALOG + seqtype) : INPUT_TYPE_DIGITAL;
 				item->is_optional = false;
 				item->name = entry.name();
 				item->owner_name = nullptr;
@@ -386,9 +386,9 @@ void menu_input::populate_and_sort(input_item_data *itemlist)
 
 	/* create a mini lookup table for name format based on type */
 	nameformat[INPUT_TYPE_DIGITAL] = "%s";
-	nameformat[INPUT_TYPE_ANALOG] = "%s Analog";
-	nameformat[INPUT_TYPE_ANALOG_INC] = "%s Analog Inc";
-	nameformat[INPUT_TYPE_ANALOG_DEC] = "%s Analog Dec";
+	nameformat[INPUT_TYPE_ANALOG] = _("%s Analog");
+	nameformat[INPUT_TYPE_ANALOG_INC] = _("%s Analog Inc");
+	nameformat[INPUT_TYPE_ANALOG_DEC] = _("%s Analog Dec");
 
 	/* first count the number of items */
 	for (item = itemlist; item != nullptr; item = item->next)

@@ -54,6 +54,12 @@ public:
 
 	virtual void ui_initialize(running_machine& machine) override;
 
+	// input naming helpers
+	static std::string ioport_type_to_name(ioport_type type);
+	static const char *s_ipt_name_format_analog[MAX_PLAYERS + 1];
+	static const char *s_ipt_name_format_digital[MAX_PLAYERS + 1];
+	void name_input_types(const simple_list<input_type_entry> &types);
+
 	/* execute as configured by the OPTION_SYSTEMNAME option on the specified options */
 	int execute();
 	void start_luaengine();

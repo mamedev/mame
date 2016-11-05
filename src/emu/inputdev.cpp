@@ -1309,7 +1309,7 @@ input_class_mouse::input_class_mouse(input_manager &manager)
 
 void input_class_mouse::class_add_type_seq(input_type_entry &entry)
 {
-	if (entry.group() >= IPG_PLAYER1 && entry.group() <= IPG_PLAYER10)
+	if (entry.group() >= IPG_PLAYER1 && entry.group() <= IPG_PLAYER_LAST)
 	{
 		int p = entry.player();
 		switch (entry.type())
@@ -1368,7 +1368,7 @@ input_class_lightgun::input_class_lightgun(input_manager &manager)
 
 void input_class_lightgun::class_add_type_seq(input_type_entry &entry)
 {
-	if (entry.group() >= IPG_PLAYER1 && entry.group() <= IPG_PLAYER10)
+	if (entry.group() >= IPG_PLAYER1 && entry.group() <= IPG_PLAYER_LAST)
 	{
 		int p = entry.player();
 		switch (entry.type())
@@ -1411,7 +1411,7 @@ input_class_joystick::input_class_joystick(input_manager &manager)
 
 void input_class_joystick::class_add_type_seq(input_type_entry &entry)
 {
-	if (entry.group() >= IPG_PLAYER1 && entry.group() <= IPG_PLAYER10)
+	if (entry.group() >= IPG_PLAYER1 && entry.group() <= IPG_PLAYER_LAST)
 	{
 		int p = entry.player();
 		switch (entry.type())
