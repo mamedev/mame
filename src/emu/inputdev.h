@@ -279,6 +279,9 @@ public:
 	input_device *add_device(const char *name, const char *id, void *internal = nullptr);
 	input_device *add_device(std::unique_ptr<input_device> &&new_device);
 
+	// input type sequence management
+	void add_type_seq(input_type_entry &entry) { return class_add_type_seq(entry); }
+
 	// misc helpers
 	input_item_class standard_item_class(input_item_id itemid) const;
 	void remap_device_index(int oldindex, int newindex);
@@ -286,6 +289,7 @@ public:
 protected:
 	// specific overrides
 	virtual std::unique_ptr<input_device> make_device(const char *name, const char *id, void *internal) = 0;
+	virtual void class_add_type_seq(input_type_entry &entry) { }
 
 private:
 	// indexing helpers
@@ -317,6 +321,7 @@ protected:
 	{
 		return std::make_unique<input_device_keyboard>(manager(), name, id, internal);
 	}
+	virtual void class_add_type_seq(input_type_entry &entry) override;
 
 private:
 	// internal helpers
@@ -339,6 +344,7 @@ protected:
 	{
 		return std::make_unique<input_device_mouse>(manager(), name, id, internal);
 	}
+	virtual void class_add_type_seq(input_type_entry &entry) override;
 };
 
 
@@ -357,6 +363,7 @@ protected:
 	{
 		return std::make_unique<input_device_lightgun>(manager(), name, id, internal);
 	}
+	virtual void class_add_type_seq(input_type_entry &entry) override;
 };
 
 
@@ -382,6 +389,7 @@ protected:
 	{
 		return std::make_unique<input_device_joystick>(manager(), name, id, internal);
 	}
+	virtual void class_add_type_seq(input_type_entry &entry) override;
 };
 
 

@@ -1767,6 +1767,11 @@ void ioport_manager::init_port_types()
 	// convert the array into a list of type states that can be modified
 	construct_core_types(m_typelist);
 
+	// customize the list for each input type class
+	for (input_type_entry &curtype : m_typelist)
+		for (input_device_class devclass = DEVICE_CLASS_FIRST_VALID; devclass <= DEVICE_CLASS_LAST_VALID; ++devclass)
+			machine().input().device_class(devclass).add_type_seq(curtype);
+
 	// ask the OSD to customize the list
 	machine().osd().customize_input_type_list(m_typelist);
 

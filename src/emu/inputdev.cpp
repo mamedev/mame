@@ -604,12 +604,750 @@ void input_class_keyboard::frame_callback()
 
 
 //-------------------------------------------------
+//  class_add_type_seq - provide an input sequence
+//  of this class for the given input type
+//-------------------------------------------------
+
+void input_class_keyboard::class_add_type_seq(input_type_entry &entry)
+{
+	switch (entry.group())
+	{
+		case IPG_PLAYER1:
+			switch (entry.type())
+			{
+				case IPT_JOYSTICK_UP:
+					entry.defseq() |= KEYCODE_UP;
+					break;
+				case IPT_JOYSTICK_DOWN:
+					entry.defseq() |= KEYCODE_DOWN;
+					break;
+				case IPT_JOYSTICK_LEFT:
+					entry.defseq() |= KEYCODE_LEFT;
+					break;
+				case IPT_JOYSTICK_RIGHT:
+					entry.defseq() |= KEYCODE_RIGHT;
+					break;
+				case IPT_JOYSTICKRIGHT_UP:
+					entry.defseq() |= KEYCODE_I;
+					break;
+				case IPT_JOYSTICKRIGHT_DOWN:
+					entry.defseq() |= KEYCODE_K;
+					break;
+				case IPT_JOYSTICKRIGHT_LEFT:
+					entry.defseq() |= KEYCODE_J;
+					break;
+				case IPT_JOYSTICKRIGHT_RIGHT:
+					entry.defseq() |= KEYCODE_L;
+					break;
+				case IPT_JOYSTICKLEFT_UP:
+					entry.defseq() |= KEYCODE_E;
+					break;
+				case IPT_JOYSTICKLEFT_DOWN:
+					entry.defseq() |= KEYCODE_D;
+					break;
+				case IPT_JOYSTICKLEFT_LEFT:
+					entry.defseq() |= KEYCODE_S;
+					break;
+				case IPT_JOYSTICKLEFT_RIGHT:
+					entry.defseq() |= KEYCODE_F;
+					break;
+				case IPT_BUTTON1:
+				case IPT_MAHJONG_KAN:
+					entry.defseq() |= KEYCODE_LCONTROL;
+					break;
+				case IPT_BUTTON2:
+				case IPT_MAHJONG_PON:
+					entry.defseq() |= KEYCODE_LALT;
+					break;
+				case IPT_BUTTON3:
+				case IPT_MAHJONG_CHI:
+					entry.defseq() |= KEYCODE_SPACE;
+					break;
+				case IPT_BUTTON4:
+				case IPT_MAHJONG_REACH:
+					entry.defseq() |= KEYCODE_LSHIFT;
+					break;
+				case IPT_BUTTON5:
+				case IPT_MAHJONG_RON:
+				case IPT_POKER_HOLD1:
+				case IPT_SLOT_STOP_ALL:
+					entry.defseq() |= KEYCODE_Z;
+					break;
+				case IPT_BUTTON6:
+				case IPT_POKER_HOLD2:
+				case IPT_SLOT_STOP1:
+					entry.defseq() |= KEYCODE_X;
+					break;
+				case IPT_BUTTON7:
+				case IPT_POKER_HOLD3:
+				case IPT_SLOT_STOP2:
+					entry.defseq() |= KEYCODE_C;
+					break;
+				case IPT_BUTTON8:
+				case IPT_POKER_HOLD4:
+				case IPT_SLOT_STOP3:
+					entry.defseq() |= KEYCODE_V;
+					break;
+				case IPT_BUTTON9:
+				case IPT_POKER_HOLD5:
+				case IPT_SLOT_STOP4:
+					entry.defseq() |= KEYCODE_B;
+					break;
+				case IPT_BUTTON10:
+				case IPT_POKER_CANCEL:
+					entry.defseq() |= KEYCODE_N;
+					break;
+				case IPT_BUTTON11:
+				case IPT_GAMBLE_BET:
+					entry.defseq() |= KEYCODE_M;
+					break;
+				case IPT_BUTTON12:
+					entry.defseq() |= KEYCODE_COMMA;
+					break;
+				case IPT_BUTTON13:
+					entry.defseq() |= KEYCODE_STOP;
+					break;
+				case IPT_BUTTON14:
+					entry.defseq() |= KEYCODE_SLASH;
+					break;
+				case IPT_BUTTON15:
+					entry.defseq() |= KEYCODE_RSHIFT;
+					break;
+				case IPT_START:
+				case IPT_POKER_BET:
+					entry.defseq() |= KEYCODE_1;
+					break;
+				case IPT_SELECT:
+					entry.defseq() |= KEYCODE_5;
+					break;
+				case IPT_MAHJONG_A:
+				case IPT_HANAFUDA_A:
+					entry.defseq() |= KEYCODE_A;
+					break;
+				case IPT_MAHJONG_B:
+				case IPT_HANAFUDA_B:
+					entry.defseq() |= KEYCODE_B;
+					break;
+				case IPT_MAHJONG_C:
+				case IPT_HANAFUDA_C:
+					entry.defseq() |= KEYCODE_C;
+					break;
+				case IPT_MAHJONG_D:
+				case IPT_HANAFUDA_D:
+					entry.defseq() |= KEYCODE_D;
+					break;
+				case IPT_MAHJONG_E:
+				case IPT_HANAFUDA_E:
+					entry.defseq() |= KEYCODE_E;
+					break;
+				case IPT_MAHJONG_F:
+				case IPT_HANAFUDA_F:
+					entry.defseq() |= KEYCODE_F;
+					break;
+				case IPT_MAHJONG_G:
+				case IPT_HANAFUDA_G:
+					entry.defseq() |= KEYCODE_G;
+					break;
+				case IPT_MAHJONG_H:
+				case IPT_HANAFUDA_H:
+					entry.defseq() |= KEYCODE_H;
+					break;
+				case IPT_MAHJONG_I:
+					entry.defseq() |= KEYCODE_I;
+					break;
+				case IPT_MAHJONG_J:
+					entry.defseq() |= KEYCODE_J;
+					break;
+				case IPT_MAHJONG_K:
+					entry.defseq() |= KEYCODE_K;
+					break;
+				case IPT_MAHJONG_L:
+					entry.defseq() |= KEYCODE_L;
+					break;
+				case IPT_MAHJONG_M:
+				case IPT_HANAFUDA_YES:
+					entry.defseq() |= KEYCODE_M;
+					break;
+				case IPT_MAHJONG_N:
+				case IPT_HANAFUDA_NO:
+					entry.defseq() |= KEYCODE_N;
+					break;
+				case IPT_MAHJONG_O:
+					entry.defseq() |= KEYCODE_O;
+					break;
+				case IPT_MAHJONG_P:
+					entry.defseq() |= KEYCODE_COLON;
+					break;
+				case IPT_MAHJONG_Q:
+					entry.defseq() |= KEYCODE_Q;
+					break;
+				case IPT_MAHJONG_BET:
+					entry.defseq() |= KEYCODE_3;
+					break;
+				case IPT_MAHJONG_LAST_CHANCE:
+					entry.defseq() |= KEYCODE_RALT;
+					break;
+				case IPT_MAHJONG_SCORE:
+					entry.defseq() |= KEYCODE_RCONTROL;
+					break;
+				case IPT_MAHJONG_DOUBLE_UP:
+					entry.defseq() |= KEYCODE_RSHIFT;
+					break;
+				case IPT_MAHJONG_FLIP_FLOP:
+					entry.defseq() |= KEYCODE_Y;
+					break;
+				case IPT_MAHJONG_BIG:
+					entry.defseq() |= KEYCODE_ENTER;
+					break;
+				case IPT_MAHJONG_SMALL:
+					entry.defseq() |= KEYCODE_BACKSPACE;
+					break;
+				case IPT_GAMBLE_HIGH:
+					entry.defseq() |= KEYCODE_A;
+					break;
+				case IPT_GAMBLE_LOW:
+					entry.defseq() |= KEYCODE_S;
+					break;
+				case IPT_GAMBLE_HALF:
+					entry.defseq() |= KEYCODE_D;
+					break;
+				case IPT_GAMBLE_DEAL:
+					entry.defseq() |= KEYCODE_2;
+					break;
+				case IPT_GAMBLE_D_UP:
+					entry.defseq() |= KEYCODE_3;
+					break;
+				case IPT_GAMBLE_TAKE:
+					entry.defseq() |= KEYCODE_4;
+					break;
+				case IPT_GAMBLE_STAND:
+					entry.defseq() |= KEYCODE_L;
+					break;
+				case IPT_GAMBLE_KEYIN:
+					entry.defseq() |= KEYCODE_Q;
+					break;
+				case IPT_GAMBLE_KEYOUT:
+					entry.defseq() |= KEYCODE_W;
+					break;
+				case IPT_GAMBLE_PAYOUT:
+					entry.defseq() |= KEYCODE_I;
+					break;
+				case IPT_GAMBLE_DOOR:
+					entry.defseq() |= KEYCODE_O;
+					break;
+				case IPT_GAMBLE_SERVICE:
+					entry.defseq() |= KEYCODE_9;
+					break;
+				case IPT_GAMBLE_BOOK:
+					entry.defseq() |= KEYCODE_0;
+					break;
+				case IPT_PEDAL:
+					entry.defseq(SEQ_TYPE_INCREMENT) |= KEYCODE_LCONTROL;
+					break;
+				case IPT_PEDAL2:
+					entry.defseq(SEQ_TYPE_INCREMENT) |= KEYCODE_LALT;
+					break;
+				case IPT_PEDAL3:
+					entry.defseq(SEQ_TYPE_INCREMENT) |= KEYCODE_SPACE;
+					break;
+				case IPT_PADDLE:
+				case IPT_POSITIONAL:
+				case IPT_DIAL:
+				case IPT_TRACKBALL_X:
+				case IPT_AD_STICK_X:
+				case IPT_LIGHTGUN_X:
+				case IPT_MOUSE_X:
+					entry.defseq(SEQ_TYPE_DECREMENT) |= KEYCODE_LEFT;
+					entry.defseq(SEQ_TYPE_INCREMENT) |= KEYCODE_RIGHT;
+					break;
+				case IPT_PADDLE_V:
+				case IPT_POSITIONAL_V:
+				case IPT_DIAL_V:
+				case IPT_TRACKBALL_Y:
+				case IPT_AD_STICK_Y:
+				case IPT_LIGHTGUN_Y:
+				case IPT_MOUSE_Y:
+					entry.defseq(SEQ_TYPE_DECREMENT) |= KEYCODE_UP;
+					entry.defseq(SEQ_TYPE_INCREMENT) |= KEYCODE_DOWN;
+					break;
+				case IPT_AD_STICK_Z:
+					entry.defseq(SEQ_TYPE_DECREMENT) |= KEYCODE_A;
+					entry.defseq(SEQ_TYPE_INCREMENT) |= KEYCODE_Z;
+					break;
+				default:
+					break;
+			}
+			break;
+		case IPG_PLAYER2:
+			switch (entry.type())
+			{
+				case IPT_JOYSTICK_UP:
+					entry.defseq() |= KEYCODE_R;
+					break;
+				case IPT_JOYSTICK_DOWN:
+					entry.defseq() |= KEYCODE_F;
+					break;
+				case IPT_JOYSTICK_LEFT:
+					entry.defseq() |= KEYCODE_D;
+					break;
+				case IPT_JOYSTICK_RIGHT:
+					entry.defseq() |= KEYCODE_G;
+					break;
+				case IPT_BUTTON1:
+					entry.defseq() |= KEYCODE_A;
+					break;
+				case IPT_BUTTON2:
+					entry.defseq() |= KEYCODE_S;
+					break;
+				case IPT_BUTTON3:
+					entry.defseq() |= KEYCODE_Q;
+					break;
+				case IPT_BUTTON4:
+					entry.defseq() |= KEYCODE_W;
+					break;
+				case IPT_START:
+					entry.defseq() |= KEYCODE_2;
+					break;
+				case IPT_SELECT:
+					entry.defseq() |= KEYCODE_6;
+					break;
+				case IPT_PEDAL:
+					entry.defseq(SEQ_TYPE_INCREMENT) |= KEYCODE_A;
+					break;
+				case IPT_PEDAL2:
+					entry.defseq(SEQ_TYPE_INCREMENT) |= KEYCODE_S;
+					break;
+				case IPT_PEDAL3:
+					entry.defseq(SEQ_TYPE_INCREMENT) |= KEYCODE_Q;
+					break;
+				case IPT_PADDLE:
+				case IPT_POSITIONAL:
+				case IPT_DIAL:
+				case IPT_TRACKBALL_X:
+				case IPT_AD_STICK_X:
+				case IPT_LIGHTGUN_X:
+				case IPT_MOUSE_X:
+					entry.defseq(SEQ_TYPE_DECREMENT) |= KEYCODE_D;
+					entry.defseq(SEQ_TYPE_INCREMENT) |= KEYCODE_G;
+					break;
+				case IPT_PADDLE_V:
+				case IPT_POSITIONAL_V:
+				case IPT_DIAL_V:
+				case IPT_TRACKBALL_Y:
+				case IPT_AD_STICK_Y:
+				case IPT_LIGHTGUN_Y:
+				case IPT_MOUSE_Y:
+					entry.defseq(SEQ_TYPE_DECREMENT) |= KEYCODE_R;
+					entry.defseq(SEQ_TYPE_INCREMENT) |= KEYCODE_F;
+					break;
+				default:
+					break;
+			}
+			break;
+		case IPG_PLAYER3:
+			switch (entry.type())
+			{
+				case IPT_JOYSTICK_UP:
+					entry.defseq() |= KEYCODE_I;
+					break;
+				case IPT_JOYSTICK_DOWN:
+					entry.defseq() |= KEYCODE_K;
+					break;
+				case IPT_JOYSTICK_LEFT:
+					entry.defseq() |= KEYCODE_J;
+					break;
+				case IPT_JOYSTICK_RIGHT:
+					entry.defseq() |= KEYCODE_L;
+					break;
+				case IPT_BUTTON1:
+					entry.defseq() |= KEYCODE_RCONTROL;
+					break;
+				case IPT_BUTTON2:
+					entry.defseq() |= KEYCODE_RSHIFT;
+					break;
+				case IPT_BUTTON3:
+					entry.defseq() |= KEYCODE_ENTER;
+					break;
+				case IPT_START:
+					entry.defseq() |= KEYCODE_3;
+					break;
+				case IPT_SELECT:
+					entry.defseq() |= KEYCODE_7;
+					break;
+				case IPT_PEDAL:
+					entry.defseq(SEQ_TYPE_INCREMENT) |= KEYCODE_RCONTROL;
+					break;
+				case IPT_PEDAL2:
+					entry.defseq(SEQ_TYPE_INCREMENT) |= KEYCODE_RSHIFT;
+					break;
+				case IPT_PEDAL3:
+					entry.defseq(SEQ_TYPE_INCREMENT) |= KEYCODE_ENTER;
+					break;
+				case IPT_PADDLE:
+				case IPT_POSITIONAL:
+				case IPT_DIAL:
+				case IPT_TRACKBALL_X:
+				case IPT_AD_STICK_X:
+				case IPT_LIGHTGUN_X:
+				case IPT_MOUSE_X:
+					entry.defseq(SEQ_TYPE_DECREMENT) |= KEYCODE_J;
+					entry.defseq(SEQ_TYPE_INCREMENT) |= KEYCODE_L;
+					break;
+				case IPT_PADDLE_V:
+				case IPT_POSITIONAL_V:
+				case IPT_DIAL_V:
+				case IPT_TRACKBALL_Y:
+				case IPT_AD_STICK_Y:
+				case IPT_LIGHTGUN_Y:
+				case IPT_MOUSE_Y:
+					entry.defseq(SEQ_TYPE_DECREMENT) |= KEYCODE_I;
+					entry.defseq(SEQ_TYPE_INCREMENT) |= KEYCODE_K;
+					break;
+				default:
+					break;
+			}
+			break;
+		case IPG_PLAYER4:
+			switch (entry.type())
+			{
+				case IPT_JOYSTICK_UP:
+					entry.defseq() |= KEYCODE_8_PAD;
+					break;
+				case IPT_JOYSTICK_DOWN:
+					entry.defseq() |= KEYCODE_2_PAD;
+					break;
+				case IPT_JOYSTICK_LEFT:
+					entry.defseq() |= KEYCODE_4_PAD;
+					break;
+				case IPT_JOYSTICK_RIGHT:
+					entry.defseq() |= KEYCODE_6_PAD;
+					break;
+				case IPT_BUTTON1:
+					entry.defseq() |= KEYCODE_0_PAD;
+					break;
+				case IPT_BUTTON2:
+					entry.defseq() |= KEYCODE_DEL_PAD;
+					break;
+				case IPT_BUTTON3:
+					entry.defseq() |= KEYCODE_ENTER_PAD;
+					break;
+				case IPT_START:
+					entry.defseq() |= KEYCODE_4;
+					break;
+				case IPT_SELECT:
+					entry.defseq() |= KEYCODE_8;
+					break;
+				case IPT_PEDAL:
+					entry.defseq(SEQ_TYPE_INCREMENT) |= KEYCODE_0_PAD;
+					break;
+				case IPT_PEDAL2:
+					entry.defseq(SEQ_TYPE_INCREMENT) |= KEYCODE_DEL_PAD;
+					break;
+				case IPT_PEDAL3:
+					entry.defseq(SEQ_TYPE_INCREMENT) |= KEYCODE_ENTER_PAD;
+					break;
+				default:
+					break;
+			}
+			break;
+		case IPG_OTHER:
+			switch (entry.type())
+			{
+				case IPT_START1:
+					entry.defseq() |= KEYCODE_1;
+					break;
+				case IPT_START2:
+					entry.defseq() |= KEYCODE_2;
+					break;
+				case IPT_START3:
+					entry.defseq() |= KEYCODE_3;
+					break;
+				case IPT_START4:
+					entry.defseq() |= KEYCODE_4;
+					break;
+				case IPT_COIN1:
+					entry.defseq() |= KEYCODE_5;
+					break;
+				case IPT_COIN2:
+					entry.defseq() |= KEYCODE_6;
+					break;
+				case IPT_COIN3:
+					entry.defseq() |= KEYCODE_7;
+					break;
+				case IPT_COIN4:
+					entry.defseq() |= KEYCODE_8;
+					break;
+				case IPT_BILL1:
+					entry.defseq() |= KEYCODE_BACKSPACE;
+					break;
+				case IPT_SERVICE1:
+					entry.defseq() |= KEYCODE_9;
+					break;
+				case IPT_SERVICE2:
+					entry.defseq() |= KEYCODE_0;
+					break;
+				case IPT_SERVICE3:
+				case IPT_VOLUME_DOWN:
+					entry.defseq() |= KEYCODE_MINUS;
+					break;
+				case IPT_SERVICE4:
+				case IPT_VOLUME_UP:
+					entry.defseq() |= KEYCODE_EQUALS;
+					break;
+				case IPT_TILT:
+				case IPT_TILT1:
+					entry.defseq() |= KEYCODE_T;
+					break;
+				case IPT_POWER_ON:
+				case IPT_MEMORY_RESET:
+					entry.defseq() |= KEYCODE_F1;
+					break;
+				case IPT_POWER_OFF:
+				case IPT_SERVICE:
+					entry.defseq() |= KEYCODE_F2;
+					break;
+				default:
+					break;
+			}
+			break;
+		case IPG_UI:
+			switch (entry.type())
+			{
+				case IPT_UI_ON_SCREEN_DISPLAY:
+				case IPT_UI_DEBUG_BREAK:
+					entry.defseq() |= KEYCODE_TILDE;
+					break;
+				case IPT_UI_CONFIGURE:
+					entry.defseq() |= KEYCODE_TAB;
+					break;
+				case IPT_UI_PAUSE:
+					entry.defseq() |= KEYCODE_P;
+					entry.defseq() += input_seq::not_code;
+					entry.defseq() += KEYCODE_LSHIFT;
+					entry.defseq() += input_seq::not_code;
+					entry.defseq() += KEYCODE_RSHIFT;
+					break;
+				case IPT_UI_PAUSE_SINGLE:
+					entry.defseq() |= KEYCODE_P;
+					entry.defseq() += KEYCODE_LSHIFT;
+					entry.defseq() |= KEYCODE_P;
+					entry.defseq() += KEYCODE_RSHIFT;
+					break;
+				case IPT_UI_RESET_MACHINE:
+					entry.defseq() |= KEYCODE_F3;
+					entry.defseq() += KEYCODE_LSHIFT;
+					break;
+				case IPT_UI_SOFT_RESET:
+					entry.defseq() |= KEYCODE_F3;
+					entry.defseq() += input_seq::not_code;
+					entry.defseq() += KEYCODE_LSHIFT;
+					break;
+				case IPT_UI_SHOW_GFX:
+					entry.defseq() |= KEYCODE_F4;
+					break;
+				case IPT_UI_FRAMESKIP_DEC:
+					entry.defseq() |= KEYCODE_F8;
+					break;
+				case IPT_UI_FRAMESKIP_INC:
+					entry.defseq() |= KEYCODE_F9;
+					break;
+				case IPT_UI_THROTTLE:
+					entry.defseq() |= KEYCODE_F10;
+					break;
+				case IPT_UI_FAST_FORWARD:
+					entry.defseq() |= KEYCODE_INSERT;
+					break;
+				case IPT_UI_SHOW_FPS:
+					entry.defseq() |= KEYCODE_F11;
+					entry.defseq() += input_seq::not_code;
+					entry.defseq() += KEYCODE_LSHIFT;
+					break;
+				case IPT_UI_SNAPSHOT:
+				case IPT_UI_TIMECODE:
+					entry.defseq() |= KEYCODE_F12;
+					entry.defseq() += input_seq::not_code;
+					entry.defseq() += KEYCODE_LSHIFT;
+					break;
+				case IPT_UI_RECORD_MOVIE:
+					entry.defseq() |= KEYCODE_F12;
+					entry.defseq() += KEYCODE_LSHIFT;
+					break;
+				case IPT_UI_TOGGLE_CHEAT:
+					entry.defseq() |= KEYCODE_F6;
+					break;
+				case IPT_UI_UP:
+					entry.defseq() |= KEYCODE_UP;
+					break;
+				case IPT_UI_DOWN:
+					entry.defseq() |= KEYCODE_DOWN;
+					break;
+				case IPT_UI_LEFT:
+					entry.defseq() |= KEYCODE_LEFT;
+					break;
+				case IPT_UI_RIGHT:
+					entry.defseq() |= KEYCODE_RIGHT;
+					break;
+				case IPT_UI_HOME:
+					entry.defseq() |= KEYCODE_HOME;
+					break;
+				case IPT_UI_END:
+					entry.defseq() |= KEYCODE_END;
+					break;
+				case IPT_UI_PAGE_UP:
+					entry.defseq() |= KEYCODE_PGUP;
+					break;
+				case IPT_UI_PAGE_DOWN:
+					entry.defseq() |= KEYCODE_PGDN;
+					break;
+				case IPT_UI_SELECT:
+					entry.defseq() |= KEYCODE_ENTER;
+					entry.defseq() |= KEYCODE_ENTER_PAD;
+					break;
+				case IPT_UI_CANCEL:
+					entry.defseq() |= KEYCODE_ESC;
+					break;
+				case IPT_UI_DISPLAY_COMMENT:
+					entry.defseq() |= KEYCODE_SPACE;
+					break;
+				case IPT_UI_CLEAR:
+					entry.defseq() |= KEYCODE_DEL;
+					break;
+				case IPT_UI_ZOOM_IN:
+					entry.defseq() |= KEYCODE_EQUALS;
+					break;
+				case IPT_UI_ZOOM_OUT:
+					entry.defseq() |= KEYCODE_MINUS;
+					break;
+				case IPT_UI_PREV_GROUP:
+					entry.defseq() |= KEYCODE_OPENBRACE;
+					break;
+				case IPT_UI_NEXT_GROUP:
+					entry.defseq() |= KEYCODE_CLOSEBRACE;
+					break;
+				case IPT_UI_ROTATE:
+					entry.defseq() |= KEYCODE_R;
+					break;
+				case IPT_UI_SHOW_PROFILER:
+					entry.defseq() |= KEYCODE_F11;
+					entry.defseq() += KEYCODE_LSHIFT;
+					break;
+				case IPT_UI_TOGGLE_UI:
+					entry.defseq() |= KEYCODE_SCRLOCK;
+					entry.defseq() += input_seq::not_code;
+					entry.defseq() += KEYCODE_LSHIFT;
+					break;
+				case IPT_UI_PASTE:
+					entry.defseq() |= KEYCODE_SCRLOCK;
+					entry.defseq() += KEYCODE_LSHIFT;
+					break;
+				case IPT_UI_TOGGLE_DEBUG:
+					entry.defseq() |= KEYCODE_F5;
+					break;
+				case IPT_UI_SAVE_STATE:
+					entry.defseq() |= KEYCODE_F7;
+					entry.defseq() += KEYCODE_LSHIFT;
+					break;
+				case IPT_UI_LOAD_STATE:
+					entry.defseq() |= KEYCODE_F7;
+					entry.defseq() += input_seq::not_code;
+					entry.defseq() += KEYCODE_LSHIFT;
+					break;
+				case IPT_UI_TAPE_START:
+					entry.defseq() |= KEYCODE_F2;
+					entry.defseq() += input_seq::not_code;
+					entry.defseq() += KEYCODE_LSHIFT;
+					break;
+				case IPT_UI_TAPE_STOP:
+					entry.defseq() |= KEYCODE_F2;
+					entry.defseq() += KEYCODE_LSHIFT;
+					break;
+				case IPT_UI_DATS:
+					entry.defseq() |= KEYCODE_LALT;
+					entry.defseq() += KEYCODE_D;
+					break;
+				case IPT_UI_FAVORITES:
+					entry.defseq() |= KEYCODE_LALT;
+					entry.defseq() += KEYCODE_F;
+					break;
+				case IPT_UI_EXPORT:
+					entry.defseq() |= KEYCODE_LALT;
+					entry.defseq() += KEYCODE_E;
+					break;
+				case IPT_UI_AUDIT_FAST:
+					entry.defseq() |= KEYCODE_F1;
+					entry.defseq() += input_seq::not_code;
+					entry.defseq() += KEYCODE_LSHIFT;
+					break;
+				case IPT_UI_AUDIT_ALL:
+					entry.defseq() |= KEYCODE_F1;
+					entry.defseq() += KEYCODE_LSHIFT;
+					break;
+				default:
+					break;
+			}
+			break;
+		default:
+			break;
+	}
+}
+
+
+//-------------------------------------------------
 //  input_class_mouse - constructor
 //-------------------------------------------------
 
 input_class_mouse::input_class_mouse(input_manager &manager)
 	: input_class(manager, DEVICE_CLASS_MOUSE, "mouse", manager.machine().options().mouse(), manager.machine().options().multi_mouse())
 {
+}
+
+
+//-------------------------------------------------
+//  class_add_type_seq - provide an input sequence
+//  of this class for the given input type
+//-------------------------------------------------
+
+void input_class_mouse::class_add_type_seq(input_type_entry &entry)
+{
+	if (entry.group() >= IPG_PLAYER1 && entry.group() <= IPG_PLAYER10)
+	{
+		int p = entry.player();
+		switch (entry.type())
+		{
+			case IPT_BUTTON1:
+				if (p < 2)
+					entry.defseq() |= MOUSECODE_BUTTON1_INDEXED(p);
+				break;
+			case IPT_BUTTON2:
+				if (p < 2)
+					entry.defseq() |= MOUSECODE_BUTTON3_INDEXED(p);
+				break;
+			case IPT_BUTTON3:
+				if (p < 2)
+					entry.defseq() |= MOUSECODE_BUTTON2_INDEXED(p);
+				break;
+			case IPT_PADDLE:
+			case IPT_POSITIONAL:
+			case IPT_DIAL:
+			case IPT_TRACKBALL_X:
+			case IPT_AD_STICK_X:
+			case IPT_LIGHTGUN_X:
+			case IPT_MOUSE_X:
+				entry.defseq(SEQ_TYPE_STANDARD) |= MOUSECODE_X_INDEXED(p);
+				break;
+			case IPT_PADDLE_V:
+			case IPT_POSITIONAL_V:
+			case IPT_DIAL_V:
+			case IPT_TRACKBALL_Y:
+			case IPT_AD_STICK_Y:
+			case IPT_LIGHTGUN_Y:
+			case IPT_MOUSE_Y:
+				entry.defseq(SEQ_TYPE_STANDARD) |= MOUSECODE_Y_INDEXED(p);
+				break;
+			default:
+				break;
+		}
+	}
 }
 
 
@@ -624,12 +1362,239 @@ input_class_lightgun::input_class_lightgun(input_manager &manager)
 
 
 //-------------------------------------------------
+//  class_add_type_seq - provide an input sequence
+//  of this class for the given input type
+//-------------------------------------------------
+
+void input_class_lightgun::class_add_type_seq(input_type_entry &entry)
+{
+	if (entry.group() >= IPG_PLAYER1 && entry.group() <= IPG_PLAYER10)
+	{
+		int p = entry.player();
+		switch (entry.type())
+		{
+			case IPT_BUTTON1:
+				if (p < 3)
+					entry.defseq() |= GUNCODE_BUTTON1_INDEXED(p);
+				break;
+			case IPT_BUTTON2:
+				if (p < 3)
+					entry.defseq() |= GUNCODE_BUTTON2_INDEXED(p);
+				break;
+			case IPT_LIGHTGUN_X:
+				entry.defseq(SEQ_TYPE_STANDARD) |= GUNCODE_X_INDEXED(p);
+				break;
+			case IPT_LIGHTGUN_Y:
+				entry.defseq(SEQ_TYPE_STANDARD) |= GUNCODE_Y_INDEXED(p);
+				break;
+			default:
+				break;
+		}
+	}
+}
+
+
+//-------------------------------------------------
 //  input_class_joystick - constructor
 //-------------------------------------------------
 
 input_class_joystick::input_class_joystick(input_manager &manager)
 	: input_class(manager, DEVICE_CLASS_JOYSTICK, "joystick", manager.machine().options().joystick(), true)
 {
+}
+
+
+//-------------------------------------------------
+//  class_add_type_seq - provide an input sequence
+//  of this class for the given input type
+//-------------------------------------------------
+
+void input_class_joystick::class_add_type_seq(input_type_entry &entry)
+{
+	if (entry.group() >= IPG_PLAYER1 && entry.group() <= IPG_PLAYER10)
+	{
+		int p = entry.player();
+		switch (entry.type())
+		{
+			case IPT_JOYSTICK_UP:
+				entry.defseq() |= JOYCODE_Y_UP_SWITCH_INDEXED(p);
+				break;
+			case IPT_JOYSTICK_DOWN:
+				entry.defseq() |= JOYCODE_Y_DOWN_SWITCH_INDEXED(p);
+				break;
+			case IPT_JOYSTICK_RIGHT:
+				entry.defseq() |= JOYCODE_X_LEFT_SWITCH_INDEXED(p);
+				break;
+			case IPT_JOYSTICK_LEFT:
+				entry.defseq() |= JOYCODE_X_RIGHT_SWITCH_INDEXED(p);
+				break;
+			case IPT_JOYSTICKLEFT_UP:
+				if (p == 0)
+					entry.defseq() |= JOYCODE_Y_UP_SWITCH_INDEXED(p);
+				break;
+			case IPT_JOYSTICKLEFT_DOWN:
+				if (p == 0)
+					entry.defseq() |= JOYCODE_Y_DOWN_SWITCH_INDEXED(p);
+				break;
+			case IPT_JOYSTICKLEFT_RIGHT:
+				if (p == 0)
+					entry.defseq() |= JOYCODE_X_LEFT_SWITCH_INDEXED(p);
+				break;
+			case IPT_JOYSTICKLEFT_LEFT:
+				if (p == 0)
+					entry.defseq() |= JOYCODE_X_RIGHT_SWITCH_INDEXED(p);
+				break;
+			case IPT_JOYSTICKRIGHT_UP:
+				if (p == 0)
+					entry.defseq() |= JOYCODE_BUTTON2_INDEXED(p);
+				break;
+			case IPT_JOYSTICKRIGHT_DOWN:
+				if (p == 0)
+					entry.defseq() |= JOYCODE_BUTTON3_INDEXED(p);
+				break;
+			case IPT_JOYSTICKRIGHT_LEFT:
+				if (p == 0)
+					entry.defseq() |= JOYCODE_BUTTON1_INDEXED(p);
+				break;
+			case IPT_JOYSTICKRIGHT_RIGHT:
+				if (p == 0)
+					entry.defseq() |= JOYCODE_BUTTON4_INDEXED(p);
+				break;
+			case IPT_BUTTON1:
+				entry.defseq() |= JOYCODE_BUTTON1_INDEXED(p);
+				break;
+			case IPT_BUTTON2:
+				entry.defseq() |= JOYCODE_BUTTON2_INDEXED(p);
+				break;
+			case IPT_BUTTON3:
+				entry.defseq() |= JOYCODE_BUTTON3_INDEXED(p);
+				break;
+			case IPT_BUTTON4:
+				entry.defseq() |= JOYCODE_BUTTON4_INDEXED(p);
+				break;
+			case IPT_BUTTON5:
+				entry.defseq() |= JOYCODE_BUTTON5_INDEXED(p);
+				break;
+			case IPT_BUTTON6:
+				entry.defseq() |= JOYCODE_BUTTON6_INDEXED(p);
+				break;
+			case IPT_BUTTON7:
+				entry.defseq() |= JOYCODE_BUTTON7_INDEXED(p);
+				break;
+			case IPT_BUTTON8:
+				entry.defseq() |= JOYCODE_BUTTON8_INDEXED(p);
+				break;
+			case IPT_BUTTON9:
+				entry.defseq() |= JOYCODE_BUTTON9_INDEXED(p);
+				break;
+			case IPT_BUTTON10:
+				entry.defseq() |= JOYCODE_BUTTON10_INDEXED(p);
+				break;
+			case IPT_BUTTON11:
+				entry.defseq() |= JOYCODE_BUTTON11_INDEXED(p);
+				break;
+			case IPT_BUTTON12:
+				entry.defseq() |= JOYCODE_BUTTON12_INDEXED(p);
+				break;
+			case IPT_BUTTON13:
+				entry.defseq() |= JOYCODE_BUTTON13_INDEXED(p);
+				break;
+			case IPT_BUTTON14:
+				entry.defseq() |= JOYCODE_BUTTON14_INDEXED(p);
+				break;
+			case IPT_BUTTON15:
+				entry.defseq() |= JOYCODE_BUTTON15_INDEXED(p);
+				break;
+			case IPT_BUTTON16:
+				entry.defseq() |= JOYCODE_BUTTON16_INDEXED(p);
+				break;
+			case IPT_START:
+				entry.defseq() |= JOYCODE_START_INDEXED(p);
+				break;
+			case IPT_SELECT:
+				entry.defseq() |= JOYCODE_SELECT_INDEXED(p);
+				break;
+			case IPT_PEDAL:
+				entry.defseq(SEQ_TYPE_STANDARD) |= JOYCODE_Z_NEG_ABSOLUTE_INDEXED(p);
+				entry.defseq(SEQ_TYPE_INCREMENT) |= JOYCODE_BUTTON1_INDEXED(p);
+				break;
+			case IPT_PEDAL2:
+				entry.defseq(SEQ_TYPE_STANDARD) |= JOYCODE_Z_POS_ABSOLUTE_INDEXED(p);
+				entry.defseq(SEQ_TYPE_INCREMENT) |= JOYCODE_BUTTON2_INDEXED(p);
+				break;
+			case IPT_PEDAL3:
+				entry.defseq(SEQ_TYPE_INCREMENT) |= JOYCODE_BUTTON3_INDEXED(p);
+				break;
+			case IPT_PADDLE:
+			case IPT_POSITIONAL:
+			case IPT_DIAL:
+			case IPT_TRACKBALL_X:
+			case IPT_AD_STICK_X:
+			case IPT_LIGHTGUN_X:
+				entry.defseq(SEQ_TYPE_STANDARD) |= JOYCODE_X_INDEXED(p);
+				break;
+			case IPT_PADDLE_V:
+			case IPT_POSITIONAL_V:
+			case IPT_DIAL_V:
+			case IPT_TRACKBALL_Y:
+			case IPT_AD_STICK_Y:
+			case IPT_LIGHTGUN_Y:
+				entry.defseq(SEQ_TYPE_STANDARD) |= JOYCODE_Y_INDEXED(p);
+				break;
+			case IPT_AD_STICK_Z:
+				entry.defseq(SEQ_TYPE_STANDARD) |= JOYCODE_Z_INDEXED(p);
+				break;
+			default:
+				break;
+		}
+	}
+	else
+	{
+		switch (entry.type())
+		{
+			case IPT_START1:
+				entry.defseq() |= JOYCODE_START_INDEXED(0);
+				break;
+			case IPT_START2:
+				entry.defseq() |= JOYCODE_START_INDEXED(1);
+				break;
+			case IPT_START3:
+				entry.defseq() |= JOYCODE_START_INDEXED(2);
+				break;
+			case IPT_START4:
+				entry.defseq() |= JOYCODE_START_INDEXED(3);
+				break;
+			case IPT_COIN1:
+				entry.defseq() |= JOYCODE_SELECT_INDEXED(0);
+				break;
+			case IPT_COIN2:
+				entry.defseq() |= JOYCODE_SELECT_INDEXED(1);
+				break;
+			case IPT_COIN3:
+				entry.defseq() |= JOYCODE_SELECT_INDEXED(2);
+				break;
+			case IPT_COIN4:
+				entry.defseq() |= JOYCODE_SELECT_INDEXED(3);
+				break;
+			case IPT_UI_UP:
+				entry.defseq() |= JOYCODE_Y_UP_SWITCH_INDEXED(0);
+				break;
+			case IPT_UI_DOWN:
+				entry.defseq() |= JOYCODE_Y_DOWN_SWITCH_INDEXED(0);
+				break;
+			case IPT_UI_LEFT:
+				entry.defseq() |= JOYCODE_X_LEFT_SWITCH_INDEXED(0);
+				break;
+			case IPT_UI_RIGHT:
+				entry.defseq() |= JOYCODE_X_RIGHT_SWITCH_INDEXED(0);
+				break;
+			case IPT_UI_SELECT:
+				entry.defseq() |= JOYCODE_BUTTON1_INDEXED(0);
+				break;
+			default:
+				break;
+		}
+	}
 }
 
 
