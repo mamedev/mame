@@ -704,6 +704,22 @@ if (CPUS["HPHYBRID"]~=null or _OPTIONS["with-tools"]) then
 end
 
 --------------------------------------------------
+-- HP Nanoprocessor
+--@src/devices/cpu/nanoprocessor/nanoprocessor.h,CPUS["NANOPROCESSOR"] = true
+--------------------------------------------------
+
+if (CPUS["NANOPROCESSOR"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/cpu/nanoprocessor/nanoprocessor.cpp",
+		MAME_DIR .. "src/devices/cpu/nanoprocessor/nanoprocessor.h",
+	}
+end
+
+if (CPUS["NANOPROCESSOR"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/nanoprocessor/nanoprocessor_dasm.cpp")
+end
+
+--------------------------------------------------
 -- Hudsonsoft 6280
 --@src/devices/cpu/h6280/h6280.h,CPUS["H6280"] = true
 --------------------------------------------------

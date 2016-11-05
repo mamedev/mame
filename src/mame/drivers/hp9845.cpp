@@ -315,6 +315,7 @@ void hp9845b_state::machine_reset()
 	m_pa = 0;
 
 	sts_w(GVIDEO_PA , true);
+	update_graphic_bits();
 
 	memset(&m_kb_state[ 0 ] , 0 , sizeof(m_kb_state));
 	m_kb_scancode = 0x7f;

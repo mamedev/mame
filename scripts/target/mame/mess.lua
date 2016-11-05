@@ -133,6 +133,7 @@ CPUS["MELPS4"] = true
 CPUS["HPHYBRID"] = true
 CPUS["SM510"] = true
 CPUS["MB86901"] = true
+CPUS["NANOPROCESSOR"] = true
 
 --------------------------------------------------
 -- specify available sound cores; some of these are
