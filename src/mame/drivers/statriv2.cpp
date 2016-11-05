@@ -105,8 +105,6 @@ public:
 	uint8_t m_last_coin;
 	DECLARE_WRITE8_MEMBER(statriv2_videoram_w);
 	DECLARE_READ8_MEMBER(question_data_r);
-	DECLARE_READ8_MEMBER(laserdisc_io_r);
-	DECLARE_WRITE8_MEMBER(laserdisc_io_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(latched_coin_r);
 	DECLARE_WRITE8_MEMBER(ppi_portc_hi_w);
 	DECLARE_DRIVER_INIT(addr_xlh);
@@ -1141,25 +1139,23 @@ DRIVER_INIT_MEMBER(statriv2_state,addr_lmhe)
 	DRIVER_INIT_CALL(addr_lmh);
 }
 
-
-READ8_MEMBER(statriv2_state::laserdisc_io_r)
-{
-	uint8_t result = 0x00;
-	if (offset == 1)
-		result = 0x18;
-	osd_printf_debug("%s:ld read ($%02X) = %02X\n", machine().describe_context(), 0x28 + offset, result);
-	return result;
-}
-
-WRITE8_MEMBER(statriv2_state::laserdisc_io_w)
-{
-	osd_printf_debug("%s:ld write ($%02X) = %02X\n", machine().describe_context(), 0x28 + offset, data);
-}
-
 DRIVER_INIT_MEMBER(statriv2_state,laserdisc)
 {
 	address_space &iospace = m_maincpu->space(AS_IO);
-	iospace.install_readwrite_handler(0x28, 0x2b, read8_delegate(FUNC(statriv2_state::laserdisc_io_r), this), write8_delegate(FUNC(statriv2_state::laserdisc_io_w), this));
+	iospace.install_readwrite_handler(0x28, 0x2b, 
+		read8_delegate([this](address_space &space, offs_t offset, uint8_t mem_mask) -> uint8_t  
+		{
+			uint8_t result = 0x00;
+			if (offset == 1)
+				result = 0x18;
+			osd_printf_debug("%s:ld read ($%02X) = %02X\n", machine().describe_context(), 0x28 + offset, result);
+			return result;
+		}),
+		write8_delegate([this](address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) 
+		{
+			osd_printf_debug("%s:ld write ($%02X) = %02X\n", machine().describe_context(), 0x28 + offset, data);
+		})
+	);
 }
 
 
