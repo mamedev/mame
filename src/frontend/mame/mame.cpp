@@ -326,6 +326,7 @@ void emulator_info::draw_user_interface(running_machine& machine)
 
 void emulator_info::periodic_check()
 {
+	return mame_machine_manager::instance()->lua()->on_periodic();
 }
 
 bool emulator_info::frame_hook()
