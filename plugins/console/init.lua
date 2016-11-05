@@ -37,11 +37,12 @@ function console.startplugin()
 			return type(t) == 'table' or (mt and mt.__pairs)
 		end
 		local comps = ","
-		local table, last = str:match("([(]?[%w.:()]-)[:.]?([%w]*)$")
-		if last == "" then
-			return comps
-		end
+		local table = str:match("([(]?[%w.:()]-)[:.]?[%w_]*$")
+		local rest, last = str:match("(.-[:.]?)([%w_]*)$")
 		local err
+		if table == "" then
+			table = "_G"
+		end
 		err, tablef = pcall(load("return " .. table))
 		if (not err) or (not tablef) then
 			return comps
@@ -49,7 +50,15 @@ function console.startplugin()
 		if is_pair_iterable(tablef) then
 			for k, v in pairs(tablef) do
 				if k:match("^" .. last) then
-					comps = comps .. "," .. table
+					comps = comps .. "," .. rest .. k
+				end
+			end
+		end
+		local tablef = getmetatable(tablef)
+		if is_pair_iterable(tablef) then
+			for k, v in pairs(tablef) do
+				if k:match("^" .. last) then
+					comps = comps .. "," .. rest .. k
 				end
 			end
 		end
