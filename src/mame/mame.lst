@@ -27602,6 +27602,7 @@ murogmbl                        // ???
 
 @source:mustache.cpp
 mustache                        // (c) 1987 March
+mustachei                       // (c) 1987 IG SPA
 
 @source:mvme147.cpp
 mvme147                         // (c) 1989 Motorola
