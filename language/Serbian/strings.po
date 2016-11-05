@@ -19,6 +19,629 @@ msgstr ""
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Poedit 1.8.7\n"
 
+#: src/frontend/mame/mame.cpp:308
+#, c-format
+msgid "%d Players Start"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:310
+#, c-format
+msgid "Coin %d"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:312
+#, c-format
+msgid "Service %d"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:314
+#, c-format
+msgid "Tilt %d"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:316
+#, c-format
+msgid "Button %d"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:318
+#, c-format
+msgid "Mahjong %c"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:320
+#, c-format
+msgid "Hanafuda %c/%d"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:322
+#, c-format
+msgid "Hold %d"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:324
+#, c-format
+msgid "Stop Reel %d"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:326
+#, c-format
+msgid "Pedal %d"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:329
+msgid "Up"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:330
+msgid "Down"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:331
+msgid "Left"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:332
+msgid "Right"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:333
+msgid "Right Stick/Up"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:334
+msgid "Right Stick/Down"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:335
+msgid "Right Stick/Left"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:336
+msgid "Right Stick/Right"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:337
+msgid "Left Stick/Up"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:338
+msgid "Left Stick/Down"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:339
+msgid "Left Stick/Left"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:340
+msgid "Left Stick/Right"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:341
+msgid "Start"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:342
+msgid "Select"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:343
+msgid "Mahjong Kan"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:344
+msgid "Mahjong Chi"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:345
+msgid "Mahjong Pon"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:346
+msgid "Mahjong Reach"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:347
+msgid "Mahjong Ron"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:348
+msgid "Mahjong Bet"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:349
+msgid "Mahjong Last Chance"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:350
+msgid "Mahjong Score"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:351
+msgid "Mahjong Double Up"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:352
+msgid "Mahjong Flip Flop"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:353
+msgid "Mahjong Big"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:354
+msgid "Mahjong Small"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:355
+msgid "Hanafuda Yes"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:356
+msgid "Hanafuda No"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:357
+msgid "Key In"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:358
+msgid "Key Out"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:359 src/frontend/mame/mame.cpp:378
+msgid "Service"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:360
+msgid "Book-Keeping"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:361
+msgid "Door"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:362
+msgid "High"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:363
+msgid "Low"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:364
+msgid "Half Gamble"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:365
+msgid "Deal"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:366
+msgid "Double Up"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:367
+msgid "Take"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:368
+msgid "Stand"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:369 src/frontend/mame/mame.cpp:372
+msgid "Bet"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:370
+msgid "Payout"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:371
+msgid "Cancel"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:373
+msgid "Stop All Reels"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:374
+msgid "1 Player Start"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:375
+msgid "Bill 1"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:376
+msgid "Power On"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:377
+msgid "Power Off"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:379
+msgid "Tilt"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:380
+msgid "Door Interlock"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:381
+msgid "Memory Reset"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:382
+msgid "Volume Down"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:383
+msgid "Volume Up"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:384
+msgid "Keypad"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:385
+msgid "Keyboard"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:386
+msgid "Paddle"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:387
+msgid "Paddle V"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:388
+msgid "Positional"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:389
+msgid "Positional V"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:390
+msgid "Dial"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:391
+msgid "Dial V"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:392
+msgid "Track X"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:393
+msgid "Track Y"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:394
+msgid "AD Stick X"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:395
+msgid "AD Stick Y"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:396
+msgid "AD Stick Z"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:397
+msgid "Lightgun X"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:398
+msgid "Lightgun Y"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:399
+msgid "Mouse X"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:400
+msgid "Mouse Y"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:401
+msgid "On Screen Display"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:402
+msgid "Break in Debugger"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:403
+msgid "Config Menu"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:404
+msgid "Pause"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:405
+msgid "Pause - Single Step"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:406
+msgid "Reset Machine"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:407
+msgid "Soft Reset"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:408
+msgid "Show Gfx"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:409
+msgid "Frameskip Dec"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:410
+msgid "Frameskip Inc"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:411
+msgid "Throttle"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:412
+msgid "Fast Forward"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:413
+msgid "Show FPS"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:414
+msgid "Save Snapshot"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:415
+msgid "Write current timecode"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:416
+msgid "Record Movie"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:417
+msgid "Toggle Cheat"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:418
+msgid "Toggle Autofire"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:419
+msgid "UI Up"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:420
+msgid "UI Down"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:421
+msgid "UI Left"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:422
+msgid "UI Right"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:423
+msgid "UI Home"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:424
+msgid "UI End"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:425
+msgid "UI Page Up"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:426
+msgid "UI Page Down"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:427
+msgid "UI Select"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:428
+msgid "UI Cancel"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:429
+msgid "UI Display Comment"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:430
+msgid "UI Clear"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:431
+msgid "UI Zoom In"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:432
+msgid "UI Zoom Out"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:433
+msgid "UI Previous Group"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:434
+msgid "UI Next Group"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:435
+msgid "UI Rotate"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:436
+msgid "Show Profiler"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:437
+msgid "UI Toggle"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:438
+msgid "UI Paste Text"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:439
+msgid "Toggle Debugger"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:440
+msgid "Save State"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:441
+msgid "Load State"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:442
+msgid "UI (First) Tape Start"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:443
+msgid "UI (First) Tape Stop"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:444
+msgid "UI External DAT View"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:445
+msgid "UI Add/Remove favorites"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:452
+msgid "UI Export list"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:453
+msgid "UI Audit Unavailable"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:454
+msgid "UI Audit All"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:461 src/frontend/mame/mame.cpp:462
+#: src/frontend/mame/mame.cpp:476
+#, c-format
+msgid "%s"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:463
+#, c-format
+msgid "%s 2"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:464
+#, c-format
+msgid "%s 3"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:465
+#, c-format
+msgid "%s 4"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:466
+#, c-format
+msgid "%s 5"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:467
+#, c-format
+msgid "%s 6"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:468
+#, c-format
+msgid "%s 7"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:469
+#, c-format
+msgid "%s 8"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:470
+#, c-format
+msgid "%s 9"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:471
+#, c-format
+msgid "%s 10"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:477
+#, c-format
+msgid "P1 %s"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:478
+#, c-format
+msgid "P2 %s"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:479
+#, c-format
+msgid "P3 %s"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:480
+#, c-format
+msgid "P4 %s"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:481
+#, c-format
+msgid "P5 %s"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:482
+#, c-format
+msgid "P6 %s"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:483
+#, c-format
+msgid "P7 %s"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:484
+#, c-format
+msgid "P8 %s"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:485
+#, c-format
+msgid "P9 %s"
+msgstr ""
+
+#: src/frontend/mame/mame.cpp:486
+#, c-format
+msgid "P10 %s"
+msgstr ""
+
 #: src/frontend/mame/ui/auditmenu.cpp:116
 msgid "Audit in progress..."
 msgstr "Provera u toku..."
@@ -857,9 +1480,29 @@ msgstr "[neuspešno]"
 msgid "User Interface"
 msgstr "Korisnički interfejs"
 
+#: src/frontend/mame/ui/inputmap.cpp:56
+#, c-format
+msgid "Player %d Controls"
+msgstr ""
+
 #: src/frontend/mame/ui/inputmap.cpp:59
 msgid "Other Controls"
 msgstr "Ostale kontrole"
+
+#: src/frontend/mame/ui/inputmap.cpp:389
+#, c-format
+msgid "%s Analog"
+msgstr ""
+
+#: src/frontend/mame/ui/inputmap.cpp:390
+#, c-format
+msgid "%s Analog Inc"
+msgstr ""
+
+#: src/frontend/mame/ui/inputmap.cpp:391
+#, c-format
+msgid "%s Analog Dec"
+msgstr ""
 
 #: src/frontend/mame/ui/inputmap.cpp:621 src/frontend/mame/ui/miscmenu.cpp:96
 #: src/frontend/mame/ui/slotopt.cpp:174
