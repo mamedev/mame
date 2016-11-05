@@ -31,7 +31,7 @@ function console.startplugin()
 	scr = scr .. "end)\n"
 	scr = scr .. "return ln.linenoise('\x1b[1;36m[MAME]\x1b[0m> ')"
 
-	function get_completions(str)
+	local function get_completions(str)
 		local function is_pair_iterable(t)
 			local mt = getmetatable(t)
 			return type(t) == 'table' or (mt and mt.__pairs)
