@@ -71,8 +71,6 @@ void n2a03_device::device_start()
 	else
 		mintf = new mi_2a03_normal;
 
-	m_apu->set_tag_memory(tag());
-
 	init();
 }
 
