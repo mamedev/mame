@@ -23,6 +23,7 @@
 #define SOL_5_X_X_INL
 
 #include "version.hpp"
+#include "5.2.0.h"
 #include "5.1.0.h"
 #include "5.0.0.h"
 #include "5.x.x.h"

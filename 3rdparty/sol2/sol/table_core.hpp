@@ -244,7 +244,7 @@ namespace sol {
 
 		template<typename T>
 		basic_table_core& set_usertype(usertype<T>& user) {
-			return set_usertype(usertype_traits<T>::name, user);
+			return set_usertype(usertype_traits<T>::name(), user);
 		}
 
 		template<typename Key, typename T>
@@ -419,6 +419,7 @@ namespace sol {
 
 		template <typename... Args>
 		static inline table create_with(lua_State* L, Args&&... args) {
+			static_assert(sizeof...(Args) % 2 == 0, "You must have an even number of arguments for a key, value ... list.");
 			static const int narr = static_cast<int>(meta::count_2_for_pack<std::is_integral, Args...>::value);
 			return create(L, narr, static_cast<int>((sizeof...(Args) / 2) - narr), std::forward<Args>(args)...);
 		}

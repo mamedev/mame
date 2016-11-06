@@ -12,6 +12,7 @@ Browse the various function and classes :doc:`Sol<../index>` utilizes to make yo
    state
    table
    proxy
+   containers
    as_table
    usertype
    simple_usertype

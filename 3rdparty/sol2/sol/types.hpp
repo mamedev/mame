@@ -361,6 +361,7 @@ namespace sol {
 		new_index,
 		mode,
 		call,
+		call_function = call,
 		metatable,
 		to_string,
 		length,
@@ -377,7 +378,13 @@ namespace sol {
 		less_than,
 		less_than_or_equal_to,
 		garbage_collect,
-		call_function = call,
+		floor_division,
+		bitwise_left_shift,
+		bitwise_right_shift,
+		bitwise_not,
+		bitwise_and,
+		bitwise_or,
+		bitwise_xor,
 	};
 
 	typedef meta_function meta_method;
@@ -393,7 +400,7 @@ namespace sol {
 		"__newindex",
 		"__mode",
 		"__call",
-		"__metatable",
+		"__mt",
 		"__tostring",
 		"__len",
 		"__unm",
@@ -643,6 +650,12 @@ namespace sol {
 		template <typename T>
 		struct lua_type_of<T, std::enable_if_t<std::is_enum<T>::value>> : std::integral_constant<type, type::number> {};
 
+		template <typename T, typename C = void>
+		struct is_container : std::false_type {};
+
+		template <typename T>
+		struct is_container<T, std::enable_if_t<meta::has_begin_end<meta::unqualified_t<T>>::value>> : std::true_type {};
+
 		template <>
 		struct lua_type_of<meta_function> : std::integral_constant<type, type::string> {};
 
@@ -747,6 +760,9 @@ namespace sol {
 	template <typename T>
 	struct is_userdata<basic_userdata<T>> : std::true_type {};
 
+	template <typename T>
+	struct is_container : detail::is_container<T>{};
+	
 	template<typename T>
 	inline type type_of() {
 		return lua_type_of<meta::unqualified_t<T>>::value;

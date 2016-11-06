@@ -3,6 +3,10 @@ function
 calling functions bound to Lua
 ------------------------------
 
+.. note::
+
+	This abstraction assumes the function runs safely. If you expect your code to have errors (e.g., you don't always have explicit control over it or are trying to debug errors), please use :doc:`sol::protected_function<protected_function>`.
+
 .. code-block:: cpp
 	
 	class function : public reference;
@@ -81,6 +85,17 @@ Calls the function. The second ``operator()`` lets you specify the templated ret
 .. note::
 
 	All arguments are forwarded. Unlike :doc:`get/set/operator[] on sol::state<state>` or :doc:`sol::table<table>`, value semantics are not used here. It is forwarding reference semantics, which do not copy/move unless it is specifically done by the receiving functions / specifically done by the user.
+
+
+.. _function-argument-handling:
+
+.. note::
+
+	This also means that you should pass and receive arguments in certain ways to maximize efficiency. For example, ``sol::table``, ``sol::object``, ``sol::userdata`` and friends are fairly cheap to copy, and should simply by taken as values. This includes primitive types like ``int`` and ``double``. However, C++ types -- if you do not want copies -- should be taken as ``const type&`` or ``type&``, to save on copies if it's important. Note that taking references from Lua also means you can modify the data inside of Lua directly, so be careful. Lua by default deals with things mostly by reference (save for primitive types).
+
+	You can get even more speed out of ``sol::object`` style of types by taking a ``sol::stack_object`` (or ``sol::stack_...``, where ``...`` is ``userdata``, ``reference``, ``table``, etc.). These reference a stack position directly rather than cheaply/safely the internal Lua reference to make sure it can't be swept out from under you. Note that if you manipulate the stack out from under these objects, they may misbehave, so please do not blow up your Lua stack when working with these types.
+
+	``std::string`` (and ``std::wstring``) are special. Lua stores strings as ``const char*`` null-terminated strings. ``std::string`` will copy, so taking a ``std::string`` by value or by const reference still invokes a copy operation. You can take a ``const char*``, but that will mean you're exposed to what happens on the Lua stack (if you change it and start chopping off function arguments from it in your function calls and such, as warned about previously).
 
 
 function call safety

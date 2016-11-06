@@ -108,6 +108,9 @@ A few things of note about the implementation: First, there's an auxiliary param
 
 You can make something pushable into Lua, but not get-able in the same way if you only specialize one part of the system. If you need to retrieve it (as a return using one or multiple values from Lua), you should specialize the ``sol::stack::getter`` template class and the ``sol::stack::checker`` template class. If you need to push it into Lua at some point, then you'll want to specialize the ``sol::stack::pusher`` template class. The ``sol::lua_size`` template class trait needs to be specialized for both cases, unless it only pushes 1 item, in which case the default implementation will assume 1.
 
+.. note::
+
+	It is important to note here that the ``getter``, ``pusher`` and ``checker`` differentiate between a type ``T`` and a pointer to a type ``T*``. This means that if you want to work purely with, say, a ``T*`` handle that does not have the same semantics as just ``T``, you may need to specify checkers/getters/pushers for both ``T*`` and ``T``. The checkers for ``T*`` forward to the checkers for ``T``, but the getter for ``T*`` does not forward to the getter for ``T`` (e.g., because of ``int*`` not being quite the same as ``int``).
 
 In general, this is fine since most getters/checkers only use 1 stack point. But, if you're doing more complex nested classes, it would be useful to use ``tracking.last`` to understand how many stack indices the last getter/checker operation did and increment it by ``index + tracking.last`` after using a ``stack::check<..>( L, index, tracking)`` call.
 

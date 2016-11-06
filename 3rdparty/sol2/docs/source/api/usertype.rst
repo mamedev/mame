@@ -5,7 +5,7 @@ structures and classes from C++ made available to Lua code
 
 *Note: ``T`` refers to the type being turned into a usertype.*
 
-While other frameworks extend lua's syntax or create Data Structure Languages (DSLs) to create classes in lua, :doc:`sol<../index>` instead offers the ability to generate easy bindings. These use metatables and userdata in lua for their implementation. Given this C++ class:
+While other frameworks extend lua's syntax or create Data Structure Languages (DSLs) to create classes in lua, :doc:`Sol<../index>` instead offers the ability to generate easy bindings. These use metatables and userdata in lua for their implementation. If you need a usertype that is also extensible at runtime and has less compiler crunch to it, try the :doc:`simple version of this after reading these docs<simple_usertype>` Given this C++ class:
 
 .. code-block:: cpp
 	:linenos:

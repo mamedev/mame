@@ -1,6 +1,3 @@
 [submodule "Catch"]
 	path = Catch
 	url = https://github.com/philsquared/Catch.git
-[submodule "Optional"]
-	path = Optional
-	url = https://github.com/ThePhD/Optional.git

@@ -21,10 +21,7 @@
 # define TR2_OPTIONAL_REQUIRES(...) typename ::std::enable_if<__VA_ARGS__::value, bool>::type = false
 
 # if defined __GNUC__ // NOTE: GNUC is also defined for Clang
-#   if (__GNUC__ >= 5)
-#     define TR2_OPTIONAL_GCC_5_0_AND_HIGHER___
-#     define TR2_OPTIONAL_GCC_4_8_AND_HIGHER___
-#   elif (__GNUC__ == 4) && (__GNUC_MINOR__ >= 8)
+#   if (__GNUC__ == 4) && (__GNUC_MINOR__ >= 8)
 #     define TR2_OPTIONAL_GCC_4_8_AND_HIGHER___
 #   elif (__GNUC__ > 4)
 #     define TR2_OPTIONAL_GCC_4_8_AND_HIGHER___
@@ -259,98 +256,79 @@ public:
 
 
 template <class T>
+union storage_t
+{
+  unsigned char dummy_;
+  T value_;
+
+  constexpr storage_t( trivial_init_t ) noexcept : dummy_() {};
+
+  template <class... Args>
+  constexpr storage_t( Args&&... args ) : value_(constexpr_forward<Args>(args)...) {}
+
+  ~storage_t(){}
+};
+
+
+template <class T>
+union constexpr_storage_t
+{
+    unsigned char dummy_;
+    T value_;
+
+    constexpr constexpr_storage_t( trivial_init_t ) noexcept : dummy_() {};
+
+    template <class... Args>
+    constexpr constexpr_storage_t( Args&&... args ) : value_(constexpr_forward<Args>(args)...) {}
+
+    ~constexpr_storage_t() = default;
+};
+
+
+template <class T>
 struct optional_base
 {
     bool init_;
-	char storage_[sizeof(T)];
+    storage_t<T> storage_;
 
-    constexpr optional_base() noexcept : init_(false), storage_() {};
+    constexpr optional_base() noexcept : init_(false), storage_(trivial_init) {};
 
-    explicit optional_base(const T& v) : init_(true), storage_() {
-		new (&storage())T(v);
-	}
+    explicit constexpr optional_base(const T& v) : init_(true), storage_(v) {}
 
-    explicit optional_base(T&& v) : init_(true), storage_() {
-		new (&storage())T(constexpr_move(v));
-	}
+    explicit constexpr optional_base(T&& v) : init_(true), storage_(constexpr_move(v)) {}
 
     template <class... Args> explicit optional_base(in_place_t, Args&&... args)
-    : init_(true), storage_() {
-		new (&storage())T(constexpr_forward<Args>(args)...);
-	}
+        : init_(true), storage_(constexpr_forward<Args>(args)...) {}
 
     template <class U, class... Args, TR2_OPTIONAL_REQUIRES(::std::is_constructible<T, ::std::initializer_list<U>>)>
     explicit optional_base(in_place_t, ::std::initializer_list<U> il, Args&&... args)
-    : init_(true), storage_() {
-		new (&storage())T(il, constexpr_forward<Args>(args)...);
-	}
-#if defined __GNUC__ 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wstrict-aliasing"
-#endif
-	T& storage() {
-		return *reinterpret_cast<T*>(&storage_[0]);
-	}
+        : init_(true), storage_(il, ::std::forward<Args>(args)...) {}
 
-	constexpr const T& storage() const {
-		return *reinterpret_cast<T const*>(&storage_[0]);
-	}
-#if defined __GNUC__
-#pragma GCC diagnostic pop
-#endif
-
-	~optional_base() { if (init_) { storage().T::~T(); } }
+    ~optional_base() { if (init_) storage_.value_.T::~T(); }
 };
 
-#if defined __GNUC__ && !defined TR2_OPTIONAL_GCC_5_0_AND_HIGHER___
-// Sorry, GCC 4.x; you're just a piece of shit
-template <typename T>
-using constexpr_optional_base = optional_base<T>;
-#else
+
 template <class T>
 struct constexpr_optional_base
 {
-	bool init_;
-	char storage_[sizeof(T)];
-	constexpr constexpr_optional_base() noexcept : init_(false), storage_() {}
+    bool init_;
+    constexpr_storage_t<T> storage_;
 
-	explicit constexpr constexpr_optional_base(const T& v) : init_(true), storage_() {
-		new (&storage())T(v);
-	}
+    constexpr constexpr_optional_base() noexcept : init_(false), storage_(trivial_init) {};
 
-	explicit constexpr constexpr_optional_base(T&& v) : init_(true), storage_() {
-		new (&storage())T(constexpr_move(v));
-	}
+    explicit constexpr constexpr_optional_base(const T& v) : init_(true), storage_(v) {}
+
+    explicit constexpr constexpr_optional_base(T&& v) : init_(true), storage_(constexpr_move(v)) {}
 
     template <class... Args> explicit constexpr constexpr_optional_base(in_place_t, Args&&... args)
-		: init_(true), storage_() {
-		new (&storage())T(constexpr_forward<Args>(args)...);
-	}
+      : init_(true), storage_(constexpr_forward<Args>(args)...) {}
 
     template <class U, class... Args, TR2_OPTIONAL_REQUIRES(::std::is_constructible<T, ::std::initializer_list<U>>)>
-	OPTIONAL_CONSTEXPR_INIT_LIST explicit constexpr_optional_base(in_place_t, ::std::initializer_list<U> il, Args&&... args)
-		: init_(true), storage_() {
-		new (&storage())T(il, constexpr_forward<Args>(args)...);
-	}
-
-#if defined __GNUC__ 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wstrict-aliasing"
-#endif
-	T& storage() {
-		return (*reinterpret_cast<T*>(&storage_[0]));
-	}
-
-	constexpr const T& storage() const {
-		return (*reinterpret_cast<T const*>(&storage_[0]));
-	}
-#if defined __GNUC__
-#pragma GCC diagnostic pop
-#endif
+    OPTIONAL_CONSTEXPR_INIT_LIST explicit constexpr_optional_base(in_place_t, ::std::initializer_list<U> il, Args&&... args)
+      : init_(true), storage_(il, ::std::forward<Args>(args)...) {}
 
     ~constexpr_optional_base() = default;
 };
-#endif
 
 template <class T>
 using OptionalBase = typename ::std::conditional<
@@ -369,21 +347,21 @@ class optional : private OptionalBase<T>
   
 
   constexpr bool initialized() const noexcept { return OptionalBase<T>::init_; }
-  typename ::std::remove_const<T>::type* dataptr() {  return ::std::addressof(OptionalBase<T>::storage()); }
-  constexpr const T* dataptr() const { return detail_::static_addressof(OptionalBase<T>::storage()); }
+  typename ::std::remove_const<T>::type* dataptr() {  return ::std::addressof(OptionalBase<T>::storage_.value_); }
+  constexpr const T* dataptr() const { return detail_::static_addressof(OptionalBase<T>::storage_.value_); }
   
 # if OPTIONAL_HAS_THIS_RVALUE_REFS == 1
-  constexpr const T& contained_val() const& { return OptionalBase<T>::storage(); }
+  constexpr const T& contained_val() const& { return OptionalBase<T>::storage_.value_; }
 #   if OPTIONAL_HAS_MOVE_ACCESSORS == 1
-  OPTIONAL_MUTABLE_CONSTEXPR T&& contained_val() && { return ::std::move(OptionalBase<T>::storage()); }
-  OPTIONAL_MUTABLE_CONSTEXPR T& contained_val() & { return OptionalBase<T>::storage(); }
+  OPTIONAL_MUTABLE_CONSTEXPR T&& contained_val() && { return ::std::move(OptionalBase<T>::storage_.value_); }
+  OPTIONAL_MUTABLE_CONSTEXPR T& contained_val() & { return OptionalBase<T>::storage_.value_; }
 #   else
-  T& contained_val() & { return OptionalBase<T>::storage(); }
-  T&& contained_val() && { return ::std::move(OptionalBase<T>::storage()); }
+  T& contained_val() & { return OptionalBase<T>::storage_.value_; }
+  T&& contained_val() && { return ::std::move(OptionalBase<T>::storage_.value_); }
 #   endif
 # else
-  constexpr const T& contained_val() const { return OptionalBase<T>::storage(); }
-  T& contained_val() { return OptionalBase<T>::storage(); }
+  constexpr const T& contained_val() const { return OptionalBase<T>::storage_.value_; }
+  T& contained_val() { return OptionalBase<T>::storage_.value_; }
 # endif
 
   void clear() noexcept {
@@ -715,10 +693,10 @@ public:
     return ref != nullptr;
   }
   
-  template <typename V>
-  constexpr T& value_or(V&& v) const
+  template <class V>
+  constexpr typename ::std::decay<T>::type value_or(V&& v) const
   {
-    return *this ? **this : detail_::convert<T&>(constexpr_forward<V>(v));
+    return *this ? **this : detail_::convert<typename ::std::decay<T>::type>(constexpr_forward<V>(v));
   }
 };
 

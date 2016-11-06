@@ -53,6 +53,7 @@ This function takes a number of :ref:`sol::lib<lib-enum>` as arguments and opens
 
 .. code-block:: cpp
 	:caption: function: script / script_file
+	:name: state-script-function
 
 	sol::function_result script(const std::string& code);
 	sol::function_result script_file(const std::string& filename);
@@ -83,6 +84,15 @@ Thanks to `Eric (EToreo) for the suggestion on this one`_!
 These functions *load* the desired blob of either code that is in a string, or code that comes from a filename, on the ``lua_State*``. It will not run: it returns a ``load_result`` proxy that can be called to actually run the code, turned into a ``sol::function``, a ``sol::protected_function``, or some other abstraction. If it is called, it will run on the object's current ``lua_State*``: it is not isolated. If you need isolation, consider creating a new state or traditional Lua sandboxing techniques.
 
 .. code-block:: cpp
+	:caption: function: do_string / do_file
+	:name: state-do-code
+
+	sol::protected_function_result do_string(const std::string& code);
+	sol::protected_function_result do_file(const std::string& filename);
+
+These functions *loads and performs* the desired blob of either code that is in a string, or code that comes from a filename, on the ``lua_State*``. It *will* run, and then return a ``protected_function_result`` proxy that can be examined for either an error or the return value.
+
+.. code-block:: cpp
 	:caption: function: global table / registry table
 
 	sol::global_table globals() const;
@@ -97,7 +107,7 @@ Get either the global table or the Lua registry as a :doc:`sol::table<table>`, w
 
 	void set_panic(lua_CFunction panic);
 
-Overrides the panic function Lua calls when something unrecoverable or unexpected happens in the Lua VM. Must be a function of the that matches the ``int(*)(lua_State*)`` function signature.
+Overrides the panic function Lua calls when something unrecoverable or unexpected happens in the Lua VM. Must be a function of the that matches the ``int(lua_State*)`` function signature.
 
 .. code-block:: cpp
 	:caption: function: make a table

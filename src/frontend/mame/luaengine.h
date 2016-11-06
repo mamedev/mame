@@ -18,6 +18,8 @@
 #define __LUA_ENGINE_H__
 
 #include <map>
+#define SOL_SAFE_USERTYPE
+#define SOL_CHECK_ARGUMENTS
 #include "sol2/sol.hpp"
 
 class cheat_manager;
