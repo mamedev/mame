@@ -74,7 +74,6 @@ function console.startplugin()
 			return
 		elseif started then
 			local cmd = conth.result
-			ln.historyadd(cmd)
 			local func, err = load(cmd)
 			if not func then
 				if err:match("<eof>") then
