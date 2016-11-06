@@ -6,11 +6,11 @@
 
                     driver by   Luca Elia (l.elia@tin.it)
 
-Main  CPU   :   Z80A
+Main  CPU   :   Z80A (LH0080A)
 
 Video Chips :   ?
 
-Sound CPU   :   Z80A
+Sound CPU   :   Z80A (LH0080A)
 
 Sound Chips :   Custom (NAMCO)
 
@@ -367,33 +367,37 @@ MACHINE_CONFIG_END
  VID H2    TBP24S10     PROM12.BPR         0A90
  VID W8    TBP24S10     PROM13.BPR         0E7E
 
- Notes:   CPU - Top PCB       (SCO-102A 1983 GRC)
-          VID - Lower PCB     (GRP-109C 1984)
+ Notes:   CPU - Top PCB       (SCO-102A 1983 GRC) *
+          VID - Lower PCB     (GRP-109C 1984)     **
 
+ *  2 x NEC D780C
+ ** 18.??? MHz clock
+ 
 ***************************************************************************/
 
 ROM_START( firebatl )
-	ROM_REGION( 0x10000, "maincpu", 0 )     /* Main Z80 Code */
+	ROM_REGION( 0x8000, "maincpu", 0 )     /* Main Z80 Code */
 	ROM_LOAD( "rom01.e8", 0x00000, 0x2000, CRC(10e24ef6) SHA1(b6dae9824eb3cecececbdfdb416a90b1b61ff18d) )
 	ROM_LOAD( "rom02.d8", 0x02000, 0x2000, CRC(47f79bee) SHA1(23e64ff69ff5112b0413d12a283ca90cf3642389) )
 	ROM_LOAD( "rom03.c8", 0x04000, 0x2000, CRC(693459b9) SHA1(8bba526960f49c9e6c7bca40eb8fbbfc81588660) )
+	ROM_FILL(             0x06000, 0x2000, 0x00 ) // Accessed, could this range map to the Z4 device at A8 ?!
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )        /* Sound Z80 Code */
+	ROM_REGION( 0x2000, "audiocpu", 0 )        /* Sound Z80 Code */
 	ROM_LOAD( "rom04.r6", 0x0000, 0x2000, CRC(5f232d9a) SHA1(d0b9926cb02203f1a1f7fd0d0d7b1fe8eddc6511) )
 
-	ROM_REGION( 0x08000, "gfx1", ROMREGION_INVERT ) /* Sprites */
+	ROM_REGION( 0x8000, "gfx1", ROMREGION_INVERT ) /* Sprites */
 	ROM_LOAD( "rom14.f4", 0x0000, 0x2000, CRC(36a508a7) SHA1(9b2dede4332d2b8e55e7c5f916d8cf370d7e77fc) )
 	ROM_LOAD( "rom13.h4", 0x2000, 0x2000, CRC(a2ec508e) SHA1(a6dd7b9729f320ed3a28e0cd8ea7b26c2a639e1a) )
 	ROM_LOAD( "rom12.j4", 0x4000, 0x2000, CRC(f80ece92) SHA1(2cc4317b2c58be48dc285bb3a667863e2ca8d5b7) )
 	ROM_LOAD( "rom11.k4", 0x6000, 0x2000, CRC(b293e701) SHA1(9dacaa9897d91dc465f2c1907804fed9bfb7207b) )
 
-	ROM_REGION( 0x08000, "gfx2", ROMREGION_INVERT ) /* Layer 0 */
+	ROM_REGION( 0x8000, "gfx2", ROMREGION_INVERT ) /* Layer 0 */
 	ROM_LOAD( "rom09.n4", 0x0000, 0x2000, CRC(77ea3e39) SHA1(c897664bd4f4b163a557d39d12374dae08a0a0c2) )
 	ROM_LOAD( "rom08.p4", 0x2000, 0x2000, CRC(1b7585dd) SHA1(e402c879c5651bf0fa21dcf1ff3c4b7bf690cbaa) )
 	ROM_LOAD( "rom07.s4", 0x4000, 0x2000, CRC(e3ec9825) SHA1(ea266683a48e8515d40ed077fd55d15a1859c942) )
 	ROM_LOAD( "rom06.u4", 0x6000, 0x2000, CRC(d29fab5f) SHA1(de5f8d57d3dd9090e6c056ff7f1ab0bb59630863) )
 
-	ROM_REGION( 0x01000, "gfx3", 0 )    /* Layer 1 */
+	ROM_REGION( 0x1000, "gfx3", 0 )    /* Layer 1 */
 	ROM_LOAD( "rom15.m4", 0x0000, 0x1000, CRC(8b5464d6) SHA1(e65acd280c0d9776cb80073241cf260b76ff0ca6) )
 
 	ROM_REGION( 0x0a20, "proms", 0 )
@@ -418,21 +422,21 @@ ROM_START( firebatl )
 ROM_END
 
 ROM_START( clshroad )
-	ROM_REGION( 0x10000, "maincpu", 0 )     /* Main Z80 Code */
+	ROM_REGION( 0x8000, "maincpu", 0 )     /* Main Z80 Code */
 	ROM_LOAD( "clashr3.bin", 0x0000, 0x8000, CRC(865c32ae) SHA1(e5cdd2d624fe6dc8bd6bebf2bd1c79d287408c63) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )        /* Sound Z80 Code */
+	ROM_REGION( 0x2000, "audiocpu", 0 )        /* Sound Z80 Code */
 	ROM_LOAD( "clashr2.bin", 0x0000, 0x2000, CRC(e6389ec1) SHA1(6ec94d5e389e9104f40fc48df6f15674415851c0) )
 
-	ROM_REGION( 0x08000, "gfx1", ROMREGION_INVERT ) /* Sprites */
+	ROM_REGION( 0x8000, "gfx1", ROMREGION_INVERT ) /* Sprites */
 	ROM_LOAD( "clashr5.bin", 0x0000, 0x4000, CRC(094858b8) SHA1(a19f79cb665bbb1e25a94e9dd09a9e99f553afe8) )
 	ROM_LOAD( "clashr6.bin", 0x4000, 0x4000, CRC(daa1daf3) SHA1(cc24c97c9950adc0041f68832774e40c87d1d4b2) )
 
-	ROM_REGION( 0x08000, "gfx2", ROMREGION_INVERT ) /* Layer 0 */
+	ROM_REGION( 0x8000, "gfx2", ROMREGION_INVERT ) /* Layer 0 */
 	ROM_LOAD( "clashr8.bin", 0x0000, 0x4000, CRC(cbb66719) SHA1(2497575f84a956bc2b9e4c3f2c71ae42d036355e) )
 	ROM_LOAD( "clashr9.bin", 0x4000, 0x4000, CRC(c15e8eed) SHA1(3b1e7fa014d176a01d5f9214051b0c8cc5556684) )
 
-	ROM_REGION( 0x04000, "gfx3", ROMREGION_INVERT)  /* Layer 1 */
+	ROM_REGION( 0x4000, "gfx3", ROMREGION_INVERT)  /* Layer 1 */
 	ROM_LOAD( "clashr4.bin", 0x0000, 0x2000, CRC(664201d9) SHA1(4eb85306f0c9683d0e0cf787f6389df8fe4a3d9d) )
 	ROM_LOAD( "clashr7.bin", 0x2000, 0x2000, CRC(97973030) SHA1(cca7a9d2751add7f6dd9bac83f7f63ece8021dbc) )
 
@@ -455,25 +459,25 @@ ROM_START( clshroad )
 ROM_END
 
 ROM_START( clshroads )
-	ROM_REGION( 0x10000, "maincpu", 0 )     /* Main Z80 Code */
+	ROM_REGION( 0x8000, "maincpu", 0 )     /* Main Z80 Code */
 	ROM_LOAD( "cr-3",  0x0000, 0x8000, CRC(23559df2) SHA1(41a08a4fbad3da1898226e2ca1956a9f7c8f94b0) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )        /* Sound Z80 Code */
+	ROM_REGION( 0x2000, "audiocpu", 0 )        /* Sound Z80 Code */
 	ROM_LOAD( "clashr2.bin", 0x0000, 0x2000, CRC(e6389ec1) SHA1(6ec94d5e389e9104f40fc48df6f15674415851c0) )
 
-	ROM_REGION( 0x08000, "gfx1", ROMREGION_INVERT ) /* Sprites */
+	ROM_REGION( 0x8000, "gfx1", ROMREGION_INVERT ) /* Sprites */
 	ROM_LOAD( "cr-12", 0x0000, 0x2000, CRC(e5aa4c46) SHA1(c0ed717e263aca2d0ec8a078f0aa3377357b9e3d) )
 	ROM_LOAD( "cr-11", 0x2000, 0x2000, CRC(7fc11c7c) SHA1(e798c4abe87fd701f250625ae6545ab00bcfbef5) )
 	ROM_LOAD( "cr-10", 0x4000, 0x2000, CRC(6b1293b7) SHA1(3219c03e87be0f53d4556a45d82278fc712f4d0b) )
 	ROM_LOAD( "cr-9",  0x6000, 0x2000, CRC(d219722c) SHA1(e68a0883113db43a878a5529fa8deb7816573e35) )
 
-	ROM_REGION( 0x08000, "gfx2", ROMREGION_INVERT ) /* Layer 0 */
+	ROM_REGION( 0x8000, "gfx2", ROMREGION_INVERT ) /* Layer 0 */
 	ROM_LOAD( "cr-7",  0x0000, 0x2000, CRC(e8aa7ac3) SHA1(12f4f1041001ce6e77e9b0c691663f4a20969eaa) )
 	ROM_LOAD( "cr-6",  0x2000, 0x2000, CRC(037be475) SHA1(72a8c1da210239ecac96ea22e54a5d193f32ad83) )
 	ROM_LOAD( "cr-5",  0x4000, 0x2000, CRC(a4151734) SHA1(1ccf68270bbfd557cd8cca3f7f36e9e2de7e94e6) )
 	ROM_LOAD( "cr-4",  0x6000, 0x2000, CRC(5ef24757) SHA1(4c6a06fdadb0b52f62148642e0416c4f60c8048b) )
 
-	ROM_REGION( 0x04000, "gfx3", ROMREGION_INVERT)  /* Layer 1 */
+	ROM_REGION( 0x4000, "gfx3", ROMREGION_INVERT)  /* Layer 1 */
 	ROM_LOAD( "cr-13", 0x0000, 0x2000, CRC(012a6412) SHA1(ae9757e56f896e4158e6af7dc12eb6c2a3755f4d) )
 	ROM_LOAD( "cr-8",  0x2000, 0x2000, CRC(3c2b816c) SHA1(3df3d9f49475ccfbb0792d98c3d12c8fd15034bc) )
 
@@ -500,21 +504,21 @@ ROM_END
 //  set the Wood Place string is padded with several 0x20 (Space) characters to fit the same number of bytes
 //  in which the Data East Corporation string fits, suggesting that they always planned to put it there.
 ROM_START( clshroadd )
-	ROM_REGION( 0x10000, "maincpu", 0 )     /* Main Z80 Code */
+	ROM_REGION( 0x8000, "maincpu", 0 )     /* Main Z80 Code */
 	ROM_LOAD( "crdeco-3.bin",  0x0000, 0x8000, CRC(1d54195c) SHA1(4b1d7d333707b5ebd57572742eb74df5abe8a70d) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )        /* Sound Z80 Code */
+	ROM_REGION( 0x2000, "audiocpu", 0 )        /* Sound Z80 Code */
 	ROM_LOAD( "clashr2.bin", 0x0000, 0x2000, CRC(e6389ec1) SHA1(6ec94d5e389e9104f40fc48df6f15674415851c0) )
 
-	ROM_REGION( 0x08000, "gfx1", ROMREGION_INVERT ) /* Sprites */
+	ROM_REGION( 0x8000, "gfx1", ROMREGION_INVERT ) /* Sprites */
 	ROM_LOAD( "clashr5.bin", 0x0000, 0x4000, CRC(094858b8) SHA1(a19f79cb665bbb1e25a94e9dd09a9e99f553afe8) )
 	ROM_LOAD( "clashr6.bin", 0x4000, 0x4000, CRC(daa1daf3) SHA1(cc24c97c9950adc0041f68832774e40c87d1d4b2) )
 
-	ROM_REGION( 0x08000, "gfx2", ROMREGION_INVERT ) /* Layer 0 */
+	ROM_REGION( 0x8000, "gfx2", ROMREGION_INVERT ) /* Layer 0 */
 	ROM_LOAD( "clashr8.bin", 0x0000, 0x4000, CRC(cbb66719) SHA1(2497575f84a956bc2b9e4c3f2c71ae42d036355e) )
 	ROM_LOAD( "clashr9.bin", 0x4000, 0x4000, CRC(c15e8eed) SHA1(3b1e7fa014d176a01d5f9214051b0c8cc5556684) )
 
-	ROM_REGION( 0x04000, "gfx3", ROMREGION_INVERT)  /* Layer 1 */
+	ROM_REGION( 0x4000, "gfx3", ROMREGION_INVERT)  /* Layer 1 */
 	ROM_LOAD( "clashr4.bin", 0x0000, 0x2000, CRC(664201d9) SHA1(4eb85306f0c9683d0e0cf787f6389df8fe4a3d9d) )
 	ROM_LOAD( "clashr7.bin", 0x2000, 0x2000, CRC(97973030) SHA1(cca7a9d2751add7f6dd9bac83f7f63ece8021dbc) )
 
