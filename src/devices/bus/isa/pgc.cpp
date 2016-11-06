@@ -246,7 +246,7 @@ void isa8_pgc_device::device_start()
 
 	m_eram = std::make_unique<uint8_t[]>(0x8000);
 
-	machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(isa8_pgc_device::reset_common), this));
+	machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(&isa8_pgc_device::reset_common, this));
 }
 
 void isa8_pgc_device::reset_common()

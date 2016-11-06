@@ -41,7 +41,7 @@ void at_mb_device::device_reset()
 void at_mb_device::device_start()
 {
 	if(!strncmp(m_maincpu->shortname(), "i80286", 6))
-		i80286_cpu_device::static_set_a20_callback(*m_maincpu, i80286_cpu_device::a20_cb(FUNC(at_mb_device::a20_286), this));
+		i80286_cpu_device::static_set_a20_callback(*m_maincpu, i80286_cpu_device::a20_cb(&at_mb_device::a20_286, this));
 }
 
 MACHINE_CONFIG_FRAGMENT( at_softlists )

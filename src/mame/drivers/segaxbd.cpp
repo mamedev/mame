@@ -317,7 +317,7 @@ void segaxbd_state::device_start()
 	m_scanline_timer = timer_alloc(TID_SCANLINE);
 
 	// reset the custom handlers and other pointers
-	m_iochip_custom_io_w[0][3] = iowrite_delegate(FUNC(segaxbd_state::generic_iochip0_lamps_w), this);
+	m_iochip_custom_io_w[0][3] = iowrite_delegate(&segaxbd_state::generic_iochip0_lamps_w, this);
 
 
 	// save state
@@ -4736,8 +4736,8 @@ ROM_END
 void segaxbd_state::install_aburner2(void)
 {
 	m_road_priority = 0;
-	m_iochip_custom_io_r[0][0] = ioread_delegate(FUNC(segaxbd_state::aburner2_iochip0_motor_r), this);
-	m_iochip_custom_io_w[0][1] = iowrite_delegate(FUNC(segaxbd_state::aburner2_iochip0_motor_w), this);
+	m_iochip_custom_io_r[0][0] = ioread_delegate(&segaxbd_state::aburner2_iochip0_motor_r, this);
+	m_iochip_custom_io_w[0][1] = iowrite_delegate(&segaxbd_state::aburner2_iochip0_motor_w, this);
 }
 
 DRIVER_INIT_MEMBER(segaxbd_new_state,aburner2)
@@ -4747,8 +4747,8 @@ DRIVER_INIT_MEMBER(segaxbd_new_state,aburner2)
 
 void segaxbd_state::install_lastsurv(void)
 {
-	m_iochip_custom_io_r[1][1] = ioread_delegate(FUNC(segaxbd_state::lastsurv_iochip1_port_r), this);
-	m_iochip_custom_io_w[0][3] = iowrite_delegate(FUNC(segaxbd_state::lastsurv_iochip0_muxer_w), this);
+	m_iochip_custom_io_r[1][1] = ioread_delegate(&segaxbd_state::lastsurv_iochip1_port_r, this);
+	m_iochip_custom_io_w[0][3] = iowrite_delegate(&segaxbd_state::lastsurv_iochip0_muxer_w, this);
 }
 
 DRIVER_INIT_MEMBER(segaxbd_new_state,lastsurv)
@@ -4773,8 +4773,8 @@ DRIVER_INIT_MEMBER(segaxbd_new_state,loffire)
 
 void segaxbd_state::install_smgp(void)
 {
-	m_iochip_custom_io_r[0][0] = ioread_delegate(FUNC(segaxbd_state::smgp_iochip0_motor_r), this);
-	m_iochip_custom_io_w[0][1] = iowrite_delegate(FUNC(segaxbd_state::smgp_iochip0_motor_w), this);
+	m_iochip_custom_io_r[0][0] = ioread_delegate(&segaxbd_state::smgp_iochip0_motor_r, this);
+	m_iochip_custom_io_w[0][1] = iowrite_delegate(&segaxbd_state::smgp_iochip0_motor_w, this);
 
 	// map /EXCS space
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x2f0000, 0x2f3fff, read16_delegate(FUNC(segaxbd_state::smgp_excs_r), this), write16_delegate(FUNC(segaxbd_state::smgp_excs_w), this));

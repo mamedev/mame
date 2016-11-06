@@ -1178,10 +1178,10 @@ WRITE_LINE_MEMBER( wangpc_state::bus_irq2_w )
 void wangpc_state::machine_start()
 {
 	// connect floppy callbacks
-	m_floppy0->setup_load_cb(floppy_image_device::load_cb(FUNC(wangpc_state::on_disk0_load), this));
-	m_floppy0->setup_unload_cb(floppy_image_device::unload_cb(FUNC(wangpc_state::on_disk0_unload), this));
-	m_floppy1->setup_load_cb(floppy_image_device::load_cb(FUNC(wangpc_state::on_disk1_load), this));
-	m_floppy1->setup_unload_cb(floppy_image_device::unload_cb(FUNC(wangpc_state::on_disk1_unload), this));
+	m_floppy0->setup_load_cb(floppy_image_device::load_cb(&wangpc_state::on_disk0_load, this));
+	m_floppy0->setup_unload_cb(floppy_image_device::unload_cb(&wangpc_state::on_disk0_unload, this));
+	m_floppy1->setup_load_cb(floppy_image_device::load_cb(&wangpc_state::on_disk1_load, this));
+	m_floppy1->setup_unload_cb(floppy_image_device::unload_cb(&wangpc_state::on_disk1_unload, this));
 
 	// state saving
 	save_item(NAME(m_dma_page));

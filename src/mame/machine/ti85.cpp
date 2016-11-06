@@ -311,7 +311,7 @@ MACHINE_START_MEMBER(ti85_state,ti83p)
 	m_model = TI83P;
 	//address_space &space = m_maincpu->space(AS_PROGRAM);
 	//m_bios = memregion("flash")->base();
-	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(ti85_state::ti83p_direct_update_handler), this));
+	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(&ti85_state::ti83p_direct_update_handler, this));
 
 	m_timer_interrupt_mask = 0;
 	m_timer_interrupt_status = 0;
@@ -375,7 +375,7 @@ void ti85_state::ti8xpse_init_common()
 	m_flash_unlocked = 0;
 
 	ti85_state::update_ti83pse_memory();
-	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(ti85_state::ti83p_direct_update_handler), this));
+	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(&ti85_state::ti83p_direct_update_handler, this));
 
 
 	machine().scheduler().timer_pulse(attotime::from_hz(256), timer_expired_delegate(FUNC(ti85_state::ti83_timer1_callback),this));

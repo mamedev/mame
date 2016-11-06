@@ -1060,7 +1060,7 @@ void cobra_state::cobra_video_exit()
 
 void cobra_state::video_start()
 {
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(cobra_state::cobra_video_exit), this));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&cobra_state::cobra_video_exit, this));
 
 	m_renderer = std::make_unique<cobra_renderer>(*m_screen);
 	m_renderer->gfx_init();
@@ -2531,7 +2531,7 @@ void cobra_renderer::gfx_fifo_exec()
 					{
 						if (w2 & 0x00200000)
 						{
-							render_delegate rd = render_delegate(FUNC(cobra_renderer::render_texture_scan), this);
+							render_delegate rd = render_delegate(&cobra_renderer::render_texture_scan, this);
 							for (int i=2; i < units; i++)
 							{
 								render_triangle(visarea, rd, 8, vert[i-2], vert[i-1], vert[i]);
@@ -2539,7 +2539,7 @@ void cobra_renderer::gfx_fifo_exec()
 						}
 						else
 						{
-							render_delegate rd = render_delegate(FUNC(cobra_renderer::render_color_scan), this);
+							render_delegate rd = render_delegate(&cobra_renderer::render_color_scan, this);
 							for (int i=2; i < units; i++)
 							{
 								render_triangle(visarea, rd, 5, vert[i-2], vert[i-1], vert[i]);
@@ -3331,7 +3331,7 @@ DRIVER_INIT_MEMBER(cobra_state, cobra)
 								8192,
 								"GFXFIFO_IN",
 								GFXFIFO_IN_VERBOSE != 0,
-								cobra_fifo::event_delegate(FUNC(cobra_state::gfxfifo_in_event_callback), this))
+								cobra_fifo::event_delegate(&cobra_state::gfxfifo_in_event_callback, this))
 								);
 
 	m_gfxfifo_out = auto_alloc(machine(),
@@ -3339,7 +3339,7 @@ DRIVER_INIT_MEMBER(cobra_state, cobra)
 								8192,
 								"GFXFIFO_OUT",
 								GFXFIFO_OUT_VERBOSE != 0,
-								cobra_fifo::event_delegate(FUNC(cobra_state::gfxfifo_out_event_callback), this))
+								cobra_fifo::event_delegate(&cobra_state::gfxfifo_out_event_callback, this))
 								);
 
 	m_m2sfifo     = auto_alloc(machine(),
@@ -3347,7 +3347,7 @@ DRIVER_INIT_MEMBER(cobra_state, cobra)
 								2048,
 								"M2SFIFO",
 								M2SFIFO_VERBOSE != 0,
-								cobra_fifo::event_delegate(FUNC(cobra_state::m2sfifo_event_callback), this))
+								cobra_fifo::event_delegate(&cobra_state::m2sfifo_event_callback, this))
 								);
 
 	m_s2mfifo     = auto_alloc(machine(),
@@ -3355,7 +3355,7 @@ DRIVER_INIT_MEMBER(cobra_state, cobra)
 								2048,
 								"S2MFIFO",
 								S2MFIFO_VERBOSE != 0,
-								cobra_fifo::event_delegate(FUNC(cobra_state::s2mfifo_event_callback), this))
+								cobra_fifo::event_delegate(&cobra_state::s2mfifo_event_callback, this))
 								);
 
 	m_maincpu->ppc_set_dcstore_callback(write32_delegate(FUNC(cobra_state::main_cpu_dc_store),this));

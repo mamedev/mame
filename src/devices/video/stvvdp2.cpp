@@ -6099,7 +6099,7 @@ void saturn_state::stv_vdp2_exit ( void )
 
 int saturn_state::stv_vdp2_start ( void )
 {
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(saturn_state::stv_vdp2_exit), this));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&saturn_state::stv_vdp2_exit, this));
 
 	m_vdp2_regs = make_unique_clear<uint16_t[]>(0x040000/2 );
 	m_vdp2_vram = make_unique_clear<uint32_t[]>(0x100000/4 );

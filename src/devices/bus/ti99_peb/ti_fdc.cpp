@@ -380,7 +380,7 @@ void ti_fdc_device::device_start()
 	m_motor_on_timer = timer_alloc(MOTOR_TIMER);
 	m_cru_base = 0x1100;
 	// In case we implement a callback after all:
-	// m_fd1771->setup_ready_cb(wd_fdc_t::rline_cb(FUNC(ti_fdc_device::dvena_r), this));
+	// m_fd1771->setup_ready_cb(wd_fdc_t::rline_cb(&ti_fdc_device::dvena_r, this));
 
 	save_item(NAME(m_address));
 	save_item(NAME(m_DRQ));

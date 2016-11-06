@@ -1788,7 +1788,7 @@ MACHINE_START_MEMBER(bbc_state, bbcbp)
 	m_machinetype = BPLUS;
 	m_mc6850_clock = 0;
 
-	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(bbc_state::bbcbp_direct_handler), this));
+	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(&bbc_state::bbcbp_direct_handler, this));
 
 	bbc_setup_banks(m_bank4, 16, 0, 0x3000);
 	m_bank4->configure_entries(16, 1, m_region_maincpu->base() + 0x8000, 0x3000);   // additional bank for paged ram
@@ -1816,7 +1816,7 @@ MACHINE_START_MEMBER(bbc_state, bbcm)
 	m_machinetype = MASTER;
 	m_mc6850_clock = 0;
 
-	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(bbc_state::bbcm_direct_handler), this));
+	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(&bbc_state::bbcm_direct_handler, this));
 
 	bbcm_setup_banks(m_bank4, 16, 0, 0x1000);
 	m_bank4->configure_entries(16, 1, m_region_maincpu->base() + 0x8000, 0x1000);   // additional bank for paged ram

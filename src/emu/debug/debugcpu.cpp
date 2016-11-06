@@ -83,7 +83,7 @@ debugger_cpu::debugger_cpu(running_machine &machine)
 
 	/* add callback for breaking on VBLANK */
 	if (m_machine.first_screen() != nullptr)
-		m_machine.first_screen()->register_vblank_callback(vblank_state_delegate(FUNC(debugger_cpu::on_vblank), this));
+		m_machine.first_screen()->register_vblank_callback(vblank_state_delegate(&debugger_cpu::on_vblank, this));
 }
 
 void debugger_cpu::configure_memory(symbol_table &table)

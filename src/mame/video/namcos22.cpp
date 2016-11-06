@@ -497,7 +497,7 @@ void namcos22_renderer::poly3d_drawquad(screen_device &screen, bitmap_rgb32 &bit
 		}
 	}
 
-	render_triangle_fan(m_cliprect, render_delegate(FUNC(namcos22_renderer::renderscanline_uvi_full), this), 4, clipverts, clipv);
+	render_triangle_fan(m_cliprect, render_delegate(&namcos22_renderer::renderscanline_uvi_full, this), 4, clipverts, clipv);
 }
 
 
@@ -575,7 +575,7 @@ void namcos22_renderer::poly3d_drawsprite(
 			extra.fogcolor.set(0, m_state.m_fog_r, m_state.m_fog_g, m_state.m_fog_b);
 		}
 
-		render_triangle_fan(m_cliprect, render_delegate(FUNC(namcos22_renderer::renderscanline_sprite), this), 2, 4, vert);
+		render_triangle_fan(m_cliprect, render_delegate(&namcos22_renderer::renderscanline_sprite, this), 2, 4, vert);
 	}
 }
 

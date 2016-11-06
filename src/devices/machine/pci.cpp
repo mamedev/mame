@@ -446,7 +446,7 @@ void pci_bridge_device::device_start()
 		sub_devices[(id << 3) | fct] = downcast<pci_device *>(&d);
 	}
 
-	mapper_cb cf_cb(FUNC(pci_bridge_device::regenerate_config_mapping), this);
+	mapper_cb cf_cb(&pci_bridge_device::regenerate_config_mapping, this);
 
 	for(int i=0; i<32*8; i++)
 		if(sub_devices[i]) {
@@ -817,7 +817,7 @@ device_t *pci_host_device::bus_root()
 
 void pci_host_device::device_start()
 {
-	remap_cb = mapper_cb(FUNC(pci_host_device::regenerate_mapping), this);
+	remap_cb = mapper_cb(&pci_host_device::regenerate_mapping, this);
 
 	pci_bridge_device::device_start();
 

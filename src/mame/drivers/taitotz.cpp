@@ -768,7 +768,7 @@ void taitotz_state::video_start()
 	/* create renderer */
 	m_renderer = std::make_unique<taitotz_renderer>(*this, width, height, m_screen_ram.get(), m_texture_ram.get());
 
-	//machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(taitotz_exit), &machine()));
+	//machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&taitotz_exit, &machine()));
 }
 
 static const float dot3_tex_table[32] =
@@ -1322,7 +1322,7 @@ void taitotz_renderer::render_tnl_object(uint32_t address, float scale, uint8_t 
 
 		for (int i=2; i < num_verts; i++)
 		{
-			render_triangle(m_cliprect, render_delegate(FUNC(taitotz_renderer::draw_scanline), this), 6, v[0], v[i-1], v[i]);
+			render_triangle(m_cliprect, render_delegate(&taitotz_renderer::draw_scanline, this), 6, v[0], v[i-1], v[i]);
 		}
 	}
 	while (!end);
@@ -1412,7 +1412,7 @@ void taitotz_renderer::push_direct_poly_fifo(uint32_t data)
 
 		for (int i=2; i < num_verts; i++)
 		{
-			render_triangle(m_cliprect, render_delegate(FUNC(taitotz_renderer::draw_scanline_noz), this), 3, v[0], v[i-1], v[i]);
+			render_triangle(m_cliprect, render_delegate(&taitotz_renderer::draw_scanline_noz, this), 3, v[0], v[i-1], v[i]);
 		}
 
 		m_direct_fifo_ptr = 0;

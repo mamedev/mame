@@ -507,7 +507,7 @@ MACHINE_RESET_MEMBER(elwro800_state,elwro800)
 	// this is a reset of ls175 in mmu
 	elwro800jr_mmu_w(0);
 
-	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(elwro800_state::elwro800_direct_handler), this));
+	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(&elwro800_state::elwro800_direct_handler, this));
 }
 
 INTERRUPT_GEN_MEMBER(elwro800_state::elwro800jr_interrupt)

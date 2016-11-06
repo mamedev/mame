@@ -2284,13 +2284,13 @@ void namcos23_renderer::render_flush(bitmap_rgb32& bitmap)
 
 		// We should probably split the polygons into triangles ourselves to insure everything is being rendered properly
 		if (p->vertex_count == 3)
-			render_triangle(scissor, render_delegate(FUNC(namcos23_renderer::render_scanline), this), 4, p->pv[0], p->pv[1], p->pv[2]);
+			render_triangle(scissor, render_delegate(&namcos23_renderer::render_scanline, this), 4, p->pv[0], p->pv[1], p->pv[2]);
 		else if (p->vertex_count == 4)
-			render_polygon<4>(scissor, render_delegate(FUNC(namcos23_renderer::render_scanline), this), 4, p->pv);
+			render_polygon<4>(scissor, render_delegate(&namcos23_renderer::render_scanline, this), 4, p->pv);
 		else if (p->vertex_count == 5)
-			render_polygon<5>(scissor, render_delegate(FUNC(namcos23_renderer::render_scanline), this), 4, p->pv);
+			render_polygon<5>(scissor, render_delegate(&namcos23_renderer::render_scanline, this), 4, p->pv);
 		else if (p->vertex_count == 6)
-			render_polygon<6>(scissor, render_delegate(FUNC(namcos23_renderer::render_scanline), this), 4, p->pv);
+			render_polygon<6>(scissor, render_delegate(&namcos23_renderer::render_scanline, this), 4, p->pv);
 	}
 	render.poly_count = 0;
 }

@@ -320,7 +320,7 @@ void midvunit_renderer::process_dma_queue()
 	/* handle flat-shaded quads here */
 	if (!textured)
 	{
-		callback = render_delegate(FUNC(midvunit_renderer::render_flat), this);
+		callback = render_delegate(&midvunit_renderer::render_flat, this);
 		pixdata += (m_state.m_dma_data[0] & 0x00ff);
 	}
 	/* handle textured quads here */
@@ -339,23 +339,23 @@ void midvunit_renderer::process_dma_queue()
 		/* handle non-masked, non-transparent quads */
 		if ((m_state.m_dma_data[0] & 0xc00) == 0x000)
 		{
-			callback = render_delegate(FUNC(midvunit_renderer::render_tex), this);
+			callback = render_delegate(&midvunit_renderer::render_tex, this);
 		}
 		/* handle non-masked, transparent quads */
 		else if ((m_state.m_dma_data[0] & 0xc00) == 0x800)
 		{
-			callback = render_delegate(FUNC(midvunit_renderer::render_textrans), this);
+			callback = render_delegate(&midvunit_renderer::render_textrans, this);
 		}
 		/* handle masked, transparent quads */
 		else if ((m_state.m_dma_data[0] & 0xc00) == 0xc00)
 		{
-			callback = render_delegate(FUNC(midvunit_renderer::render_textransmask), this);
+			callback = render_delegate(&midvunit_renderer::render_textransmask, this);
 			pixdata += (m_state.m_dma_data[0] & 0x00ff);
 		}
 		/* handle masked, non-transparent quads (invalid?) */
 		else
 		{
-			callback = render_delegate(FUNC(midvunit_renderer::render_flat), this);
+			callback = render_delegate(&midvunit_renderer::render_flat, this);
 			pixdata += (m_state.m_dma_data[0] & 0x00ff);
 		}
 	}

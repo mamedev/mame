@@ -2740,7 +2740,7 @@ void n64_state::machine_start()
 	rsp->rsp_add_imem(m_rsp_imem);
 
 	/* add a hook for battery save */
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(n64_state::n64_machine_stop),this));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&n64_state::n64_machine_stop,this));
 }
 
 void n64_state::machine_reset()

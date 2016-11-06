@@ -435,7 +435,7 @@ void osd_common_t::init(running_machine &machine)
 		set_verbose(true);
 
 	// ensure we get called on the way out
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(osd_common_t::osd_exit), this));
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&osd_common_t::osd_exit, this));
 
 
 	/* now setup watchdog */
@@ -669,8 +669,8 @@ void osd_common_t::init_subsystems()
 
 	input_init();
 	// we need pause callbacks
-	machine().add_notifier(MACHINE_NOTIFY_PAUSE, machine_notify_delegate(FUNC(osd_common_t::input_pause), this));
-	machine().add_notifier(MACHINE_NOTIFY_RESUME, machine_notify_delegate(FUNC(osd_common_t::input_resume), this));
+	machine().add_notifier(MACHINE_NOTIFY_PAUSE, machine_notify_delegate(&osd_common_t::input_pause, this));
+	machine().add_notifier(MACHINE_NOTIFY_RESUME, machine_notify_delegate(&osd_common_t::input_resume, this));
 }
 
 bool osd_common_t::video_init()

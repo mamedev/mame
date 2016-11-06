@@ -80,7 +80,7 @@ void zeus2_device::device_start()
 	m_irq.resolve_safe();
 
 	/* we need to cleanup on exit */
-	//machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(zeus2_device::exit_handler2), this));
+	//machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&zeus2_device::exit_handler2, this));
 
 	int_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(zeus2_device::int_timer_callback), this));
 	vblank_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(zeus2_device::display_irq), this));
@@ -1550,11 +1550,11 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 	//       tests, but the (numverts == 5) statement below may actually be a quad fan instead of a 5-sided
 	//       polygon.
 	if (numverts == 3)
-		render_triangle(m_state->zeus_cliprect, render_delegate(FUNC(zeus2_renderer::render_poly_8bit), this), 4, clipvert[0], clipvert[1], clipvert[2]);
+		render_triangle(m_state->zeus_cliprect, render_delegate(&zeus2_renderer::render_poly_8bit, this), 4, clipvert[0], clipvert[1], clipvert[2]);
 	else if (numverts == 4)
-		render_polygon<4>(m_state->zeus_cliprect, render_delegate(FUNC(zeus2_renderer::render_poly_8bit), this), 4, clipvert);
+		render_polygon<4>(m_state->zeus_cliprect, render_delegate(&zeus2_renderer::render_poly_8bit, this), 4, clipvert);
 	else if (numverts == 5)
-		render_polygon<5>(m_state->zeus_cliprect, render_delegate(FUNC(zeus2_renderer::render_poly_8bit), this), 4, clipvert);
+		render_polygon<5>(m_state->zeus_cliprect, render_delegate(&zeus2_renderer::render_poly_8bit, this), 4, clipvert);
 }
 
 

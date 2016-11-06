@@ -196,7 +196,7 @@ void atari_rle_objects_device::device_start()
 	m_ram.set(*share, 2);
 
 	// register a VBLANK callback
-	m_screen->register_vblank_callback(vblank_state_delegate(FUNC(atari_rle_objects_device::vblank_callback), this));
+	m_screen->register_vblank_callback(vblank_state_delegate(&atari_rle_objects_device::vblank_callback, this));
 
 	// build and allocate the generic tables
 	build_rle_tables();

@@ -24,7 +24,7 @@
 network_manager::network_manager(running_machine &machine)
 	: m_machine(machine)
 {
-	machine.configuration().config_register("network", config_saveload_delegate(FUNC(network_manager::config_load), this), config_saveload_delegate(FUNC(network_manager::config_save), this));
+	machine.configuration().config_register("network", config_saveload_delegate(&network_manager::config_load, this), config_saveload_delegate(&network_manager::config_save, this));
 }
 
 //-------------------------------------------------

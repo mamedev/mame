@@ -2754,16 +2754,16 @@ DRIVER_INIT_MEMBER(segaybd_state,generic)
 DRIVER_INIT_MEMBER(segaybd_state,gforce2)
 {
 	DRIVER_INIT_CALL(generic);
-	m_output_cb1 = output_delegate(FUNC(segaybd_state::gforce2_output_cb1), this);
-	m_output_cb2 = output_delegate(FUNC(segaybd_state::gforce2_output_cb2), this);
+	m_output_cb1 = output_delegate(&segaybd_state::gforce2_output_cb1, this);
+	m_output_cb2 = output_delegate(&segaybd_state::gforce2_output_cb2, this);
 }
 
 DRIVER_INIT_MEMBER(segaybd_state,gloc)
 {
 	// because some of the output data isn't fully understood we need to "center" the rams
 	DRIVER_INIT_CALL(generic);
-	m_output_cb1 = output_delegate(FUNC(segaybd_state::gloc_output_cb1), this);
-	m_output_cb2 = output_delegate(FUNC(segaybd_state::gloc_output_cb2), this);
+	m_output_cb1 = output_delegate(&segaybd_state::gloc_output_cb1, this);
+	m_output_cb2 = output_delegate(&segaybd_state::gloc_output_cb2, this);
 
 	output().set_value("left_motor_position_nor", 16);
 	output().set_value("right_motor_position_nor", 16);
@@ -2772,21 +2772,21 @@ DRIVER_INIT_MEMBER(segaybd_state,gloc)
 DRIVER_INIT_MEMBER(segaybd_state,r360)
 {
 	DRIVER_INIT_CALL(generic);
-	m_output_cb2 = output_delegate(FUNC(segaybd_state::r360_output_cb2), this);
+	m_output_cb2 = output_delegate(&segaybd_state::r360_output_cb2, this);
 }
 
 DRIVER_INIT_MEMBER(segaybd_state,pdrift)
 {
 	// because some of the output data isn't fully understood we need to "center" the motor
 	DRIVER_INIT_CALL(generic);
-	m_output_cb1 = output_delegate(FUNC(segaybd_state::pdrift_output_cb1), this);
-	m_output_cb2 = output_delegate(FUNC(segaybd_state::pdrift_output_cb2), this);
+	m_output_cb1 = output_delegate(&segaybd_state::pdrift_output_cb1, this);
+	m_output_cb2 = output_delegate(&segaybd_state::pdrift_output_cb2, this);
 }
 
 DRIVER_INIT_MEMBER(segaybd_state,rchase)
 {
 	DRIVER_INIT_CALL(generic);
-	m_output_cb2 = output_delegate(FUNC(segaybd_state::rchase_output_cb2), this);
+	m_output_cb2 = output_delegate(&segaybd_state::rchase_output_cb2, this);
 }
 
 

@@ -585,7 +585,7 @@ input_class_keyboard::input_class_keyboard(input_manager &manager)
 	: input_class(manager, DEVICE_CLASS_KEYBOARD, "keyboard", true, manager.machine().options().multi_keyboard())
 {
 	// request a per-frame callback for the keyboard class
-	machine().add_notifier(MACHINE_NOTIFY_FRAME, machine_notify_delegate(FUNC(input_class_keyboard::frame_callback), this));
+	machine().add_notifier(MACHINE_NOTIFY_FRAME, machine_notify_delegate(&input_class_keyboard::frame_callback, this));
 }
 
 

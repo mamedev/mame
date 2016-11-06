@@ -1182,7 +1182,7 @@ MACHINE_START_MEMBER(stv_state,stv)
 
 	stv_register_protection_savestates(); // machine/stvprot.c
 
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(stv_state::stvcd_exit), this));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&stv_state::stvcd_exit, this));
 
 	m_smpc.rtc_data[0] = DectoBCD(systime.local_time.year /100);
 	m_smpc.rtc_data[1] = DectoBCD(systime.local_time.year %100);

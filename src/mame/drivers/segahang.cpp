@@ -1965,7 +1965,7 @@ DRIVER_INIT_MEMBER(segahang_state,sharrier)
 {
 	DRIVER_INIT_CALL(generic);
 	m_sharrier_video = true;
-	m_i8751_vblank_hook = i8751_sim_delegate(FUNC(segahang_state::sharrier_i8751_sim), this);
+	m_i8751_vblank_hook = i8751_sim_delegate(&segahang_state::sharrier_i8751_sim, this);
 }
 
 DRIVER_INIT_MEMBER(segahang_state,enduror)

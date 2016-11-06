@@ -383,7 +383,7 @@ void tms3203x_device::device_start()
 
 	// set up the internal boot loader ROM
 	m_bootrom = reinterpret_cast<uint32_t*>(memregion(shortname())->base());
-	m_direct->set_direct_update(direct_update_delegate(FUNC(tms3203x_device::direct_handler), this));
+	m_direct->set_direct_update(direct_update_delegate(&tms3203x_device::direct_handler, this));
 
 	// save state
 	save_item(NAME(m_pc));

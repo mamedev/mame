@@ -512,7 +512,7 @@ void firefox_state::machine_start()
 	m_nvram_1c = machine().device<x2212_device>("nvram_1c");
 	m_nvram_1d = machine().device<x2212_device>("nvram_1d");
 
-	m_laserdisc->set_data_ready_callback(phillips_22vp931_device::data_ready_delegate(FUNC(firefox_state::firq_gen), this));
+	m_laserdisc->set_data_ready_callback(phillips_22vp931_device::data_ready_delegate(&firefox_state::firq_gen, this));
 
 	m_control_num = 0;
 	m_sprite_bank = 0;

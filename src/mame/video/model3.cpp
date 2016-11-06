@@ -177,7 +177,7 @@ void model3_state::video_start()
 	m_tri_buffer = auto_alloc_array_clear(machine(), m3_triangle, TRI_BUFFER_SIZE);
 	m_tri_alpha_buffer = auto_alloc_array_clear(machine(), m3_triangle, TRI_ALPHA_BUFFER_SIZE);
 
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(model3_state::model3_exit), this));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&model3_state::model3_exit, this));
 
 	m_m3_char_ram = make_unique_clear<uint64_t[]>(0x100000/8);
 	m_m3_tile_ram = make_unique_clear<uint64_t[]>(0x8000/8);
@@ -2106,14 +2106,14 @@ void model3_renderer::draw_opaque_triangles(const m3_triangle* tris, int num_tri
 
 			if (tri->param & TRI_PARAM_ALPHA_TEST)
 			{
-				render_triangle(cliprect, render_delegate(FUNC(model3_renderer::draw_scanline_tex_contour), this), 5, v[0], v[1], v[2]);
+				render_triangle(cliprect, render_delegate(&model3_renderer::draw_scanline_tex_contour, this), 5, v[0], v[1], v[2]);
 			}
 			else
 			{
 				if (tri->param & TRI_PARAM_COLOR_MOD)
-					render_triangle(cliprect, render_delegate(FUNC(model3_renderer::draw_scanline_tex_colormod), this), 5, v[0], v[1], v[2]);
+					render_triangle(cliprect, render_delegate(&model3_renderer::draw_scanline_tex_colormod, this), 5, v[0], v[1], v[2]);
 				else
-					render_triangle(cliprect, render_delegate(FUNC(model3_renderer::draw_scanline_tex), this), 5, v[0], v[1], v[2]);
+					render_triangle(cliprect, render_delegate(&model3_renderer::draw_scanline_tex, this), 5, v[0], v[1], v[2]);
 			}
 		}
 		else
@@ -2129,7 +2129,7 @@ void model3_renderer::draw_opaque_triangles(const m3_triangle* tris, int num_tri
 			model3_polydata &extra = object_data_alloc();
 			extra.color = tri->color;
 
-			render_triangle(cliprect, render_delegate(FUNC(model3_renderer::draw_scanline_solid), this), 2, v[0], v[1], v[2]);
+			render_triangle(cliprect, render_delegate(&model3_renderer::draw_scanline_solid, this), 2, v[0], v[1], v[2]);
 		}
 	}
 }
@@ -2168,7 +2168,7 @@ void model3_renderer::draw_alpha_triangles(const m3_triangle* tris, int num_tris
 			extra.transparency = tri->transparency;
 			extra.texture_param = tri->param;
 
-			render_triangle(cliprect, render_delegate(FUNC(model3_renderer::draw_scanline_tex_alpha), this), 5, v[0], v[1], v[2]);
+			render_triangle(cliprect, render_delegate(&model3_renderer::draw_scanline_tex_alpha, this), 5, v[0], v[1], v[2]);
 		}
 		else
 		{
@@ -2184,7 +2184,7 @@ void model3_renderer::draw_alpha_triangles(const m3_triangle* tris, int num_tris
 			extra.color = tri->color;
 			extra.transparency = tri->transparency;
 
-			render_triangle(cliprect, render_delegate(FUNC(model3_renderer::draw_scanline_solid_trans), this), 2, v[0], v[1], v[2]);
+			render_triangle(cliprect, render_delegate(&model3_renderer::draw_scanline_solid_trans, this), 2, v[0], v[1], v[2]);
 		}
 	}
 }

@@ -864,11 +864,11 @@ void hp64k_state::hp64k_update_drv_ctrl(void)
 		if (new_drive != m_current_floppy) {
 				m_fdc->set_floppy(new_drive);
 
-				floppy0->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(FUNC(hp64k_state::hp64k_floppy_idx_cb) , this));
-				floppy1->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(FUNC(hp64k_state::hp64k_floppy_idx_cb) , this));
+				floppy0->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(&hp64k_state::hp64k_floppy_idx_cb, this));
+				floppy1->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(&hp64k_state::hp64k_floppy_idx_cb, this));
 
-				floppy0->setup_wpt_cb(floppy_image_device::wpt_cb(FUNC(hp64k_state::hp64k_floppy_wpt_cb) , this));
-				floppy1->setup_wpt_cb(floppy_image_device::wpt_cb(FUNC(hp64k_state::hp64k_floppy_wpt_cb) , this));
+				floppy0->setup_wpt_cb(floppy_image_device::wpt_cb(&hp64k_state::hp64k_floppy_wpt_cb, this));
+				floppy1->setup_wpt_cb(floppy_image_device::wpt_cb(&hp64k_state::hp64k_floppy_wpt_cb, this));
 
 				m_current_floppy = new_drive;
 		}

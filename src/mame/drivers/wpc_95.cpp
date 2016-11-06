@@ -376,7 +376,7 @@ DRIVER_INIT_MEMBER(wpc_95_state, afm)
 	pic->set_serial("541 123456 12345 123");
 	lamp->set_names(lamps_afm);
 	out->set_names(outputs_afm);
-	out->set_handler(wpc_out_device::handler_t(FUNC(wpc_95_state::afm_led_handler), this));
+	out->set_handler(wpc_out_device::handler_t(&wpc_95_state::afm_led_handler, this));
 	init();
 }
 
@@ -449,7 +449,7 @@ DRIVER_INIT_MEMBER(wpc_95_state, sc)
 	pic->set_serial("903 123456 12345 123");
 	lamp->set_names(lamps_sc);
 	out->set_names(outputs_sc);
-	out->set_handler(wpc_out_device::handler_t(FUNC(wpc_95_state::sc_aux_lamps_handler), this));
+	out->set_handler(wpc_out_device::handler_t(&wpc_95_state::sc_aux_lamps_handler, this));
 	init();
 }
 

@@ -39,7 +39,7 @@
 //**************************************************************************
 
 // timer callbacks look like this
-typedef delegate<void (void *, int32_t)> timer_expired_delegate;
+typedef named_delegate<void (void *, int32_t)> timer_expired_delegate;
 
 // ======================> emu_timer
 

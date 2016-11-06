@@ -383,7 +383,7 @@ MACHINE_START_MEMBER(a2600_state,a2600)
 		case A26_F6:
 		case A26_DPC:
 			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cart), write8_delegate(FUNC(vcs_cart_slot_device::write_bank),(vcs_cart_slot_device*)m_cart));
-			m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(vcs_cart_slot_device::cart_opbase),(vcs_cart_slot_device*)m_cart));
+			m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(&vcs_cart_slot_device::cart_opbase,(vcs_cart_slot_device*)m_cart));
 			break;
 		case A26_FE:
 			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x1000, 0x1fff, read8_delegate(FUNC(vcs_cart_slot_device::read_rom),(vcs_cart_slot_device*)m_cart), write8_delegate(FUNC(vcs_cart_slot_device::write_ram),(vcs_cart_slot_device*)m_cart));
