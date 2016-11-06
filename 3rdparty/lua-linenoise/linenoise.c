@@ -101,6 +101,14 @@ static int l_historyadd(lua_State *L)
     return handle_ln_ok(L);
 }
 
+static int l_preloadbuffer(lua_State *L)
+{
+    const char *line = luaL_checkstring(L, 1);
+    linenoisePreloadBuffer(line);
+
+    return handle_ln_ok(L);
+}
+
 static int l_historysetmaxlen(lua_State *L)
 {
     int len = luaL_checkinteger(L, 1);
@@ -168,6 +176,7 @@ luaL_Reg linenoise_funcs[] = {
     { "clearscreen", l_clearscreen },
     { "setcompletion", l_setcompletion},
     { "addcompletion", l_addcompletion },
+    { "preload", l_preloadbuffer },
 
     /* Aliases for more consistent function names */
     { "addhistory", l_historyadd },

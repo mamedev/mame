@@ -13,6 +13,7 @@ function console.startplugin()
 	local conth = emu.thread()
 	local started = false
 	local ln = require("linenoise")
+	local preload = false
 	print("    _/      _/    _/_/    _/      _/  _/_/_/_/");
 	print("   _/_/  _/_/  _/    _/  _/_/  _/_/  _/       ");
 	print("  _/  _/  _/  _/_/_/_/  _/  _/  _/  _/_/_/    ");
@@ -76,13 +77,24 @@ function console.startplugin()
 			ln.historyadd(cmd)
 			local func, err = load(cmd)
 			if not func then
-				print("error: ", err)
+				if err:match("<eof>") then
+					print("incomplete command")
+					ln.preload(cmd)
+					preload = true
+				else
+					print("error: ", err)
+					preload = false
+				end
 			else
+				preload = false
 				local status
 				status, err = pcall(func)
 				if not status then
 					print("error: ", err)
 				end
+			end
+			if not preload then
+				ln.historyadd(cmd)
 			end
 		end
 		conth:start(scr)
