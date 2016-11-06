@@ -276,6 +276,9 @@ namespace sol {
 			static int call(lua_State* L, Fx&& f) {
 				typedef std::conditional_t<std::is_void<T>::value, object_type, T> Ta;
 #ifdef SOL_SAFE_USERTYPE
+				if(type_of(L, 1) != sol::type::userdata) {
+					return luaL_error(L, "sol: received null for 'self' argument (use ':' for accessing member functions, make sure member variables are preceeded by the actual object with '.' syntax)");
+				}
 				object_type* o = static_cast<object_type*>(stack::get<Ta*>(L, 1));
 				if (o == nullptr) {
 					return luaL_error(L, "sol: received null for 'self' argument (use ':' for accessing member functions, make sure member variables are preceeded by the actual object with '.' syntax)");
