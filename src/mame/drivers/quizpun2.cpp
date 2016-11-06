@@ -772,7 +772,7 @@ ROM_START( quizpun2 )
 	ROM_LOAD( "u2", 0x10000, 0x10000, CRC(9294a19c) SHA1(cd7109262e5f68b946c84aa390108bcc47ee1300) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 ) // EEPROM (tied to the unknown DIP40)
-	ROM_LOAD( "93c46", 0x00, 0x80, CRC(4d244cc8) SHA1(6593d5b7ac1ebb77fee4648ad1d3d9b59a25fdc8) )
+	ROM_LOAD( "93c46", 0x00, 0x80, CRC(4d244cc8) SHA1(6593d5b7ac1ebb77fee4648ad1d3d9b59a25fdc8) BAD_DUMP ) // backup ram error
 
 	ROM_REGION( 0x2000, "unknown", 0 )
 	ROM_LOAD( "u2a", 0x0000, 0x2000, CRC(13afc2bd) SHA1(0d9c8813525dfc7a844e72d2cf84261db3d10a23) ) // 111xxxxxxxxxx = 0xFF
@@ -812,7 +812,7 @@ ROM_START( quizpun )
 	ROM_LOAD( "02.u2", 0x10000, 0x10000, CRC(9294a19c) SHA1(cd7109262e5f68b946c84aa390108bcc47ee1300) )
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
-	ROM_LOAD( "93c46eeprom.bin", 0, 0x80, CRC(4d244cc8) SHA1(6593d5b7ac1ebb77fee4648ad1d3d9b59a25fdc8) )
+	ROM_LOAD( "93c46eeprom.bin", 0, 0x80, CRC(4d244cc8) SHA1(6593d5b7ac1ebb77fee4648ad1d3d9b59a25fdc8) BAD_DUMP ) // backup ram error
 ROM_END
 
 GAME( 1988, quizpun,  0, quizpun,  quizpun2, driver_device, 0, ROT270, "Space Computer", "Quiz Punch",    MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
