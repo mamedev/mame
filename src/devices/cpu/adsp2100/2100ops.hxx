@@ -434,7 +434,7 @@ void adsp21xx_device::write_reg3(int regnum, int32_t val)
 				/* clear timer */
 				if (val & 0x0002) m_irq_latch[ADSP2181_IRQ0] = 0;
 				if (val & 0x0004) m_irq_latch[ADSP2181_IRQ1] = 0;
-				/* clear BDMA */
+				if (val & 0x0008) m_irq_latch[ADSP2181_BDMA] = 0;
 				if (val & 0x0010) m_irq_latch[ADSP2181_IRQE] = 0;
 				if (val & 0x0020) m_irq_latch[ADSP2181_SPORT0_RX] = 0;
 				if (val & 0x0040) m_irq_latch[ADSP2181_SPORT0_TX] = 0;
@@ -442,7 +442,7 @@ void adsp21xx_device::write_reg3(int regnum, int32_t val)
 				/* force timer */
 				if (val & 0x0200) m_irq_latch[ADSP2181_IRQ0] = 1;
 				if (val & 0x0400) m_irq_latch[ADSP2181_IRQ1] = 1;
-				/* force BDMA */
+				if (val & 0x0800) m_irq_latch[ADSP2181_BDMA] = 1;
 				if (val & 0x1000) m_irq_latch[ADSP2181_IRQE] = 1;
 				if (val & 0x2000) m_irq_latch[ADSP2181_SPORT0_RX] = 1;
 				if (val & 0x4000) m_irq_latch[ADSP2181_SPORT0_TX] = 1;
@@ -525,7 +525,7 @@ inline void adsp21xx_device::modify_address(uint32_t ireg, uint32_t mreg)
 	uint32_t i = m_i[ireg];
 	uint32_t l = m_l[ireg];
 
-	i += m_m[mreg];
+	i = (i + m_m[mreg]) & 0x3fff;
 	if (i < base) i += l;
 	else if (i >= base + l) i -= l;
 	m_i[ireg] = i;
@@ -553,9 +553,10 @@ inline void adsp21xx_device::data_write_dag1(uint32_t op, int32_t val)
 	else
 		data_write(i, val);
 
-	i += m_m[mreg];
+	i = (i + m_m[mreg]) & 0x3fff;
 	if (i < base) i += l;
 	else if (i >= base + l) i -= l;
+
 	m_i[ireg] = i;
 }
 
@@ -577,7 +578,7 @@ inline uint32_t adsp21xx_device::data_read_dag1(uint32_t op)
 	else
 		res = data_read(i);
 
-	i += m_m[mreg];
+	i = (i + m_m[mreg]) & 0x3fff;
 	if (i < base) i += l;
 	else if (i >= base + l) i -= l;
 	m_i[ireg] = i;
@@ -595,7 +596,7 @@ inline void adsp21xx_device::data_write_dag2(uint32_t op, int32_t val)
 
 	data_write(i, val);
 
-	i += m_m[mreg];
+	i = (i + m_m[mreg]) & 0x3fff;
 	if (i < base) i += l;
 	else if (i >= base + l) i -= l;
 	m_i[ireg] = i;
@@ -612,7 +613,7 @@ inline uint32_t adsp21xx_device::data_read_dag2(uint32_t op)
 
 	uint32_t res = data_read(i);
 
-	i += m_m[mreg];
+	i = (i + m_m[mreg]) & 0x3fff;
 	if (i < base) i += l;
 	else if (i >= base + l) i -= l;
 	m_i[ireg] = i;
@@ -634,7 +635,7 @@ inline void adsp21xx_device::pgm_write_dag2(uint32_t op, int32_t val)
 
 	program_write(i, (val << 8) | m_px);
 
-	i += m_m[mreg];
+	i = (i + m_m[mreg]) & 0x3fff;
 	if (i < base) i += l;
 	else if (i >= base + l) i -= l;
 	m_i[ireg] = i;
@@ -654,7 +655,7 @@ inline uint32_t adsp21xx_device::pgm_read_dag2(uint32_t op)
 	m_px = res;
 	res >>= 8;
 
-	i += m_m[mreg];
+	i = (i + m_m[mreg]) & 0x3fff;
 	if (i < base) i += l;
 	else if (i >= base + l) i -= l;
 	m_i[ireg] = i;

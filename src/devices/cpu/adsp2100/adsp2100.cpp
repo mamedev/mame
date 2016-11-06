@@ -631,7 +631,7 @@ void adsp21xx_device::device_reset()
 
 	// reset interrupts
 	m_imask = 0;
-	for (int irq = 0; irq < 8; irq++)
+	for (int irq = 0; irq < 10; irq++)
 		m_irq_state[irq] = m_irq_latch[irq] = CLEAR_LINE;
 }
 
@@ -986,9 +986,9 @@ void adsp2181_device::check_irqs()
 	if (check && generate_irq(ADSP2181_IRQL1, 1))
 		return;
 
-	// check IRQL2
-	check = m_irq_state[ADSP2181_IRQL2];
-	if (check && generate_irq(ADSP2181_IRQL2, 2))
+	// check IRQL0
+	check = m_irq_state[ADSP2181_IRQL0];
+	if (check && generate_irq(ADSP2181_IRQL0, 2))
 		return;
 
 	// check SPORT0 transmit
@@ -1007,6 +1007,9 @@ void adsp2181_device::check_irqs()
 		return;
 
 	// check BDMA interrupt
+	check = m_irq_latch[ADSP2181_BDMA];
+	if (check && generate_irq(ADSP2181_BDMA, 6))
+		return;
 
 	// check IRQ1/SPORT1 transmit
 	check = (m_icntl & 2) ? m_irq_latch[ADSP2181_IRQ1] : m_irq_state[ADSP2181_IRQ1];

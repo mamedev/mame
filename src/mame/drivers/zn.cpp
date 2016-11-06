@@ -30,6 +30,7 @@
 #include "sound/qsound.h"
 #include "sound/spu.h"
 #include "sound/ymf271.h"
+#include "audio/rax.h"
 #include "audio/taito_zm.h"
 
 #define VERBOSE_LEVEL ( 0 )
@@ -52,6 +53,7 @@ public:
 		m_cbaj_fifo2(*this, "cbaj_fifo2"),
 		m_mb3773(*this, "mb3773"),
 		m_zoom(*this, "taito_zoom"),
+		m_rax(*this, "rax"),
 		m_vt83c461(*this, "ide"),
 		m_soundlatch(*this, "soundlatch"),
 		m_soundlatch16(*this, "soundlatch16"),
@@ -90,6 +92,7 @@ public:
 	DECLARE_WRITE16_MEMBER(acpsx_10_w);
 	DECLARE_WRITE16_MEMBER(nbajamex_bank_w);
 	DECLARE_WRITE16_MEMBER(nbajamex_80_w);
+	DECLARE_WRITE8_MEMBER(nbajamex_backup_w);
 	DECLARE_READ16_MEMBER(nbajamex_08_r);
 	DECLARE_READ16_MEMBER(nbajamex_80_r);
 	DECLARE_WRITE8_MEMBER(coh1001l_bank_w);
@@ -104,6 +107,7 @@ public:
 	DECLARE_READ16_MEMBER(vt83c461_32_r);
 	DECLARE_WRITE16_MEMBER(vt83c461_32_w);
 	DECLARE_DRIVER_INIT(coh1000tb);
+	DECLARE_DRIVER_INIT(nbajamex);
 	DECLARE_MACHINE_RESET(coh1000c);
 	DECLARE_MACHINE_RESET(glpracr);
 	DECLARE_MACHINE_RESET(coh1000ta);
@@ -130,6 +134,9 @@ private:
 	int m_jdredd_gun_mux;
 
 	std::unique_ptr<uint8_t[]> m_fx1b_fram;
+	std::unique_ptr<uint8_t[]> m_nbajamex_sram;
+	
+	uint32_t m_nbajamex_rombank[2];
 
 	uint16_t m_vt83c461_latch;
 
@@ -146,6 +153,7 @@ private:
 	optional_device<fifo7200_device> m_cbaj_fifo2;
 	optional_device<mb3773_device> m_mb3773;
 	optional_device<taito_zoom_device> m_zoom;
+	optional_device<acclaim_rax_device> m_rax;
 	optional_device<vt83c461_device> m_vt83c461;
 	optional_device<generic_latch_8_device> m_soundlatch;
 	optional_device<generic_latch_16_device> m_soundlatch16;
@@ -1853,8 +1861,6 @@ WRITE16_MEMBER(zn_state::acpsx_00_w)
 
 WRITE16_MEMBER(zn_state::nbajamex_bank_w)
 {
-	uint32_t newbank = 0;
-
 	verboselog(0, "nbajamex_bank_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
 
 	if (offset > 1)
@@ -1862,30 +1868,32 @@ WRITE16_MEMBER(zn_state::nbajamex_bank_w)
 		logerror("Unknown banking offset %x!\n", offset);
 	}
 
-	if (offset == 1)
-	{
-		data -= 1;
-	}
-
-	if (data <= 1)
-	{
-		newbank = (data * 0x400000);
-	}
-	else if (data >= 0x10)
-	{
-		data -= 0x10;
-		newbank = (data * 0x400000);
-		newbank += 0x200000;
-	}
+	m_nbajamex_rombank[offset] = data;
+	
+	uint32_t bankbase0 = ((m_nbajamex_rombank[0] & 0x10) ? 0x200000 : 0) + (m_nbajamex_rombank[0] & 7) * 0x400000;
+	uint32_t bankbase1 = ((m_nbajamex_rombank[1] & 0x10) ? 0 : 0x200000) + (m_nbajamex_rombank[1] & 7) * 0x400000;
 
 	if (offset == 0)
 	{
-		membank( "bankedroms" )->set_base( memregion( "bankedroms" )->base() + newbank);
+		if (m_nbajamex_rombank[0] == 0)
+		{
+			m_maincpu->space(AS_PROGRAM).install_read_bank(0x1f200000, 0x1f207fff, "sram");
+			membank( "sram" )->set_base( m_nbajamex_sram.get() );
+		}
+		else
+		{
+			m_maincpu->space(AS_PROGRAM).install_read_bank(0x1f200000, 0x1f7fffff, "bankedroms2");
+			membank( "bankedroms2" )->set_base( memregion( "bankedroms" )->base() + bankbase1);
+		}
+		membank( "bankedroms" )->set_base( memregion( "bankedroms" )->base() + bankbase0);
 	}
 	else if (offset == 1)
 	{
-		newbank += 0x200000;
-		membank( "bankedroms2" )->set_base( memregion( "bankedroms" )->base() + newbank);
+		if (m_nbajamex_rombank[0] != 0)
+		{
+			m_maincpu->space(AS_PROGRAM).install_read_bank(0x1f200000, 0x1f7fffff, "bankedroms2");
+			membank( "bankedroms2" )->set_base( memregion( "bankedroms" )->base() + bankbase1);
+		}
 	}
 }
 
@@ -1897,25 +1905,28 @@ WRITE16_MEMBER(zn_state::acpsx_10_w)
 // all 16 bits goes to the external soundboard's latch (see sound test menu)
 WRITE16_MEMBER(zn_state::nbajamex_80_w)
 {
-	verboselog(0, "nbajamex_80_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
-	psxirq_device *psxirq = (psxirq_device *) machine().device("maincpu:irq");
-	psxirq->intin10(1);
+	m_rax->data_w(space, 0, data, 0xffff);
 }
 
 READ16_MEMBER(zn_state::nbajamex_08_r)
 {
-	uint32_t data = 0xffffffff;
-	verboselog(0, "nbajamex_08_r( %08x, %08x, %08x )\n", offset, data, mem_mask );
-	return data;
+	// Sound related
+	verboselog(0, "nbajamex_08_r( %08x, %08x, %08x )\n", offset, 0, mem_mask );
+	return 0x400;
 }
 
-// possibly a readback from the external soundboard?
 READ16_MEMBER(zn_state::nbajamex_80_r)
 {
-	uint32_t data = 0xffffffff;
-	verboselog(0, "nbajamex_80_r( %08x, %08x, %08x )\n", offset, data, mem_mask );
-	return data;
+	verboselog(0, "nbajamex_80_r( %08x, %08x, %08x )\n", offset, 0, mem_mask );
+	return 0xffff;
 }
+
+WRITE8_MEMBER(zn_state::nbajamex_backup_w)
+{
+	m_nbajamex_sram[offset] = data;
+}
+
+
 
 static ADDRESS_MAP_START(coh1000a_map, AS_PROGRAM, 32, zn_state)
 	AM_RANGE(0x1fbfff00, 0x1fbfff03) AM_WRITE16(acpsx_00_w, 0xffffffff)
@@ -1926,7 +1937,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(nbajamex_map, AS_PROGRAM, 32, zn_state)
 	AM_RANGE(0x1f000000, 0x1f1fffff) AM_ROMBANK("bankedroms")
-	AM_RANGE(0x1f200000, 0x1f7fffff) AM_ROMBANK("bankedroms2")
+	AM_RANGE(0x1f200000, 0x1f207fff) AM_WRITE8(nbajamex_backup_w, 0xffffffff)
 	AM_RANGE(0x1fbfff00, 0x1fbfff07) AM_WRITE16(nbajamex_bank_w, 0xffffffff)
 	AM_RANGE(0x1fbfff08, 0x1fbfff0b) AM_READ16(nbajamex_08_r, 0xffff)
 	AM_RANGE(0x1fbfff80, 0x1fbfff83) AM_READWRITE16(nbajamex_80_r, nbajamex_80_w, 0xffff)
@@ -1934,10 +1945,16 @@ static ADDRESS_MAP_START(nbajamex_map, AS_PROGRAM, 32, zn_state)
 	AM_IMPORT_FROM(coh1000a_map)
 ADDRESS_MAP_END
 
+DRIVER_INIT_MEMBER(zn_state,nbajamex)
+{
+	m_nbajamex_sram = std::make_unique<uint8_t[]>(0x80000);
+	machine().device<nvram_device>("71256")->set_base(m_nbajamex_sram.get(), 0x8000);
+}
+
+
 MACHINE_RESET_MEMBER(zn_state,nbajamex)
 {
 	membank( "bankedroms" )->set_base( memregion( "bankedroms" )->base() );
-	membank( "bankedroms2" )->set_base( memregion( "bankedroms" )->base() + 0x200000 );
 }
 
 static ADDRESS_MAP_START(jdredd_map, AS_PROGRAM, 32, zn_state)
@@ -1956,7 +1973,9 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( nbajamex, coh1000a )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(nbajamex_map)
+	MCFG_NVRAM_ADD_1FILL("71256")
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, nbajamex)
+	MCFG_DEVICE_ADD("rax", ACCLAIM_RAX, 0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( jdredd, coh1000a )
@@ -4865,13 +4884,10 @@ ROM_START( nbajamex )
 	ROM_LOAD16_BYTE( "nba6o.u5",    0x1a00001, 0x200000, CRC(b1dfb42e) SHA1(fb9627e228bf2a744842eb44afbca4a6232cadb2) )
 	ROM_LOAD16_BYTE( "nba6e.u19",   0x1a00000, 0x200000, CRC(6f17d8c1) SHA1(22cf263efb64cf62030e02b641c485debe75944d) )
 
-	ROM_REGION( 0x0a0000, "cpu1", 0 ) /* 512k for the audio CPU, ADSP-2181 (+banks) */
-	ROM_LOAD( "360snda1.u52", 0x000000, 0x08000, CRC(36d8a628) SHA1(944a01c9128f5e90c7dba3557a3ecb2c5ca90831) )
-	ROM_CONTINUE(             0x010000, 0x78000 )
-
-	ROM_REGION( 0x400000, "unknown", 0 )
-	ROM_LOAD( "sound0.u48",   0x000000, 0x200000, CRC(38873b67) SHA1(b2f8d32270ae604c099a1b9b71d2e06468c7d4a9) )
-	ROM_LOAD( "sound1.u49",   0x200000, 0x200000, CRC(57014589) SHA1(d360ff1c52424bd91a5a8d1a2a9c10bf7abb0602) )
+	ROM_REGION16_LE( 0x800000, "rax", 0 )
+	ROM_LOAD( "360snda1.u52", 0x000000, 0x080000, CRC(36d8a628) SHA1(944a01c9128f5e90c7dba3557a3ecb2c5ca90831) )
+	ROM_LOAD( "sound0.u48",   0x400000, 0x200000, CRC(38873b67) SHA1(b2f8d32270ae604c099a1b9b71d2e06468c7d4a9) )
+	ROM_LOAD( "sound1.u49",   0x600000, 0x200000, CRC(57014589) SHA1(d360ff1c52424bd91a5a8d1a2a9c10bf7abb0602) )
 
 	ROM_REGION( 0x8, "cat702_2", 0 )
 	ROM_LOAD( "ac02", 0x000000, 0x000008, CRC(1412d475) SHA1(c2f62232a261870f58353d09dc0d6ce2ad17a729) )
@@ -4898,16 +4914,17 @@ ROM_START( nbajamexa )
 	ROM_LOAD16_BYTE( "nba6o.u5",    0x1a00001, 0x200000, CRC(b1dfb42e) SHA1(fb9627e228bf2a744842eb44afbca4a6232cadb2) )
 	ROM_LOAD16_BYTE( "nba6e.u19",   0x1a00000, 0x200000, CRC(6f17d8c1) SHA1(22cf263efb64cf62030e02b641c485debe75944d) )
 
-	ROM_REGION( 0x0a0000, "cpu1", 0 ) /* 512k for the audio CPU, ADSP-2181 (+banks) */
-	ROM_LOAD( "360snda1.u52", 0x000000, 0x08000, CRC(36d8a628) SHA1(944a01c9128f5e90c7dba3557a3ecb2c5ca90831) )
-	ROM_CONTINUE(             0x010000, 0x78000 )
-
 	ROM_REGION( 0x400000, "unknown", 0 )
 	ROM_LOAD( "sound0.u48",   0x000000, 0x200000, CRC(38873b67) SHA1(b2f8d32270ae604c099a1b9b71d2e06468c7d4a9) )
 	ROM_LOAD( "sound1.u49",   0x200000, 0x200000, CRC(57014589) SHA1(d360ff1c52424bd91a5a8d1a2a9c10bf7abb0602) )
 
 	ROM_REGION( 0x8, "cat702_2", 0 )
 	ROM_LOAD( "ac02", 0x000000, 0x000008, CRC(1412d475) SHA1(c2f62232a261870f58353d09dc0d6ce2ad17a729) )
+
+	ROM_REGION16_LE( 0x800000, "rax", 0 )
+	ROM_LOAD( "360snda1.u52", 0x000000, 0x080000, CRC(36d8a628) SHA1(944a01c9128f5e90c7dba3557a3ecb2c5ca90831) )
+	ROM_LOAD( "sound0.u48",   0x400000, 0x200000, CRC(38873b67) SHA1(b2f8d32270ae604c099a1b9b71d2e06468c7d4a9) )
+	ROM_LOAD( "sound1.u49",   0x600000, 0x200000, CRC(57014589) SHA1(d360ff1c52424bd91a5a8d1a2a9c10bf7abb0602) )
 ROM_END
 
 ROM_START( jdredd )
@@ -5029,8 +5046,8 @@ GAME( 1996, primrag2,  coh1000w, coh1000w,    primrag2, driver_device, 0, ROT0, 
 
 /* Acclaim */
 GAME( 1995, coh1000a,  0,        coh1000a,    zn,       driver_device, 0, ROT0, "Acclaim", "Acclaim PSX", MACHINE_IS_BIOS_ROOT )
-GAME( 1996, nbajamex,  coh1000a, nbajamex,    zn,       driver_device, 0, ROT0, "Acclaim", "NBA Jam Extreme (ver. 1.10I)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1996, nbajamexa, nbajamex, nbajamex,    zn,       driver_device, 0, ROT0, "Acclaim", "NBA Jam Extreme (ver. 1.04)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1996, nbajamex,  coh1000a, nbajamex,    zn,       zn_state, nbajamex, ROT0, "Acclaim", "NBA Jam Extreme (ver. 1.10I)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, nbajamexa, nbajamex, nbajamex,    zn,       zn_state, nbajamex, ROT0, "Acclaim", "NBA Jam Extreme (ver. 1.04)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, jdredd,    coh1000a, jdredd,      jdredd,   driver_device, 0, ROT0, "Acclaim", "Judge Dredd (Rev C Dec. 17 1997)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1996, jdreddb,   jdredd,   jdredd,      jdredd,   driver_device, 0, ROT0, "Acclaim", "Judge Dredd (Rev B Nov. 26 1997)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
