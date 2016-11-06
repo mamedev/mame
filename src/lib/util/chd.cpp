@@ -2397,10 +2397,7 @@ chd_error chd_file::open_common(bool writeable)
 		if (memcmp(rawheader, "MComprHD", 8) != 0)
 			throw CHDERR_INVALID_FILE;
 
-		// only allow writes to the most recent version
 		m_version = be_read(&rawheader[12], 4);
-		if (writeable && m_version < HEADER_VERSION)
-			throw CHDERR_UNSUPPORTED_VERSION;
 
 		// read the header if we support it
 		util::sha1_t parentsha1 = util::sha1_t::null;
@@ -2411,6 +2408,10 @@ chd_error chd_file::open_common(bool writeable)
 			case 5:     parse_v5_header(rawheader, parentsha1); break;
 			default:    throw CHDERR_UNSUPPORTED_VERSION;
 		}
+
+		// only allow writes to the most recent version
+		if (m_version < HEADER_VERSION)
+			m_allow_writes = false;
 
 		if (writeable && !m_allow_writes)
 			throw CHDERR_FILE_NOT_WRITEABLE;
