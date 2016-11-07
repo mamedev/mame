@@ -612,7 +612,7 @@ READ8_MEMBER(ncr5390_device::command_r)
 
 WRITE8_MEMBER(ncr5390_device::command_w)
 {
-	//  logerror("%s: command_w %02x (%08x)\n", tag(), data, space.device().safe_pc());
+	logerror("%s: command_w %02x (%08x)\n", tag(), data, space.device().safe_pc());
 	if(command_pos == 2) {
 		status |= S_GROSS_ERROR;
 		check_irq();
@@ -676,6 +676,10 @@ void ncr5390_device::start_command()
 		break;
 
 	case CD_ENABLE_SEL:
+		command_pop_and_chain();
+		break;
+
+	case CD_DISABLE_SEL:
 		command_pop_and_chain();
 		break;
 
