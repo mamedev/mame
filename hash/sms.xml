@@ -6165,7 +6165,18 @@
 		</part>
 	</software>
 
-	<!-- Notes: This has a player 2 input bug: it reads part of player 1 data instead (see sportsjp.cpp) -->
+	<!-- Notes: -->
+	<!-- This Japanese version of Sports Pad Soccer has code to operate the
+	Sports Pad controller in two diffent modes. When it detects a Japanese SMS,
+	the operation is the same used by US Sports Pad games. Otherwise, it uses
+	a mode compatible with the Sega Mark III, that lacks the TH line used by
+	the US Sports Pad mode. This Mark III mode is also used on other non-SMSJ
+	consoles, like the Korean SMS2 version. The two controller modes are
+	significantly different from each other and no information was found about
+	support for both modes on the Japanese Sports Pad model, so that model is
+	currently emulated as a different device: sportspadjp. -->
+	<!-- This ROM has a player 2 input bug when operates in Mark III compatible
+	mode: it reads part of player 1 data instead (see sportsjp.cpp). -->
 	<software name="sportssc" cloneof="worldsoc">
 		<description>Sports Pad Soccer (Jpn)</description>
 		<year>1988</year>
@@ -6173,8 +6184,8 @@
 		<info name="serial" value="G-1365"/>
 		<info name="release" value="19881029"/>
 		<info name="alt_title" value="スポーツパッドサッカー" />
-		<sharedfeat name="ctrl1_default" value="sportspadjp" />
-		<sharedfeat name="ctrl2_default" value="sportspadjp" />
+		<sharedfeat name="ctrl1_default" value="sportspad" />
+		<sharedfeat name="ctrl2_default" value="sportspad" />
 		<part name="cart" interface="sms_cart">
 			<dataarea name="rom" size="131072">
 				<rom name="sports pad soccer (japan).bin" size="131072" crc="41c948bf" sha1="7634ce39e87049dad1ee4f32a80d728e4bd1f81f" offset="000000" />
