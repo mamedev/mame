@@ -199,8 +199,8 @@ end
 	}
 if (STANDALONE~=true) then
 	links {
-		"frontend",
-		"linenoise-ng",
+		"frontend",	
+		"http",
 	}
 end
 if (MACHINES["NETLIST"]~=null) then
@@ -233,6 +233,7 @@ if (STANDALONE~=true) then
 	links {
 		ext_lib("lua"),
 		"lualibs",
+		"linenoise-ng",
 	}
 end
 	links {
