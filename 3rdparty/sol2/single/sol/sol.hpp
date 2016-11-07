@@ -20,8 +20,8 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 // This file was generated with a script.
-// Generated 2016-11-06 03:40:31.664320 UTC
-// This header was generated with sol v2.14.12 (revision 1c73fb0)
+// Generated 2016-11-06 21:33:58.899927 UTC
+// This header was generated with sol v2.15.0 (revision 34fe8a1)
 // https://github.com/ThePhD/sol2
 
 #ifndef SOL_SINGLE_INCLUDE_HPP
@@ -7704,10 +7704,11 @@ namespace sol {
 			static int call(lua_State* L, Fx&& f) {
 				typedef std::conditional_t<std::is_void<T>::value, object_type, T> Ta;
 #ifdef SOL_SAFE_USERTYPE
-				object_type* o = static_cast<object_type*>(stack::get<Ta*>(L, 1));
-				if (o == nullptr) {
+				auto maybeo = stack::check_get<Ta*>(L, 1);
+				if (!maybeo || maybeo.value() == nullptr) {
 					return luaL_error(L, "sol: received null for 'self' argument (use ':' for accessing member functions, make sure member variables are preceeded by the actual object with '.' syntax)");
 				}
+				object_type* o = static_cast<object_type*>(maybeo.value());
 				return call(L, std::forward<Fx>(f), *o);
 #else
 				object_type& o = static_cast<object_type&>(*stack::get<non_null<Ta*>>(L, 1));
@@ -7733,13 +7734,14 @@ namespace sol {
 			static int call_assign(std::true_type, lua_State* L, V&& f) {
 				typedef std::conditional_t<std::is_void<T>::value, object_type, T> Ta;
 #ifdef SOL_SAFE_USERTYPE
-				object_type* o = static_cast<object_type*>(stack::get<Ta*>(L, 1));
-				if (o == nullptr) {
+				auto maybeo = stack::check_get<Ta*>(L, 1);
+				if (!maybeo || maybeo.value() == nullptr) {
 					if (is_variable) {
 						return luaL_error(L, "sol: received nil for 'self' argument (bad '.' access?)");
 					}
 					return luaL_error(L, "sol: received nil for 'self' argument (pass 'self' as first argument)");
 				}
+				object_type* o = static_cast<object_type*>(maybeo.value());
 				return call_assign(std::true_type(), L, f, *o);
 #else
 				object_type& o = static_cast<object_type&>(*stack::get<non_null<Ta*>>(L, 1));
@@ -7791,13 +7793,14 @@ namespace sol {
 			static int call(lua_State* L, V&& f) {
 				typedef std::conditional_t<std::is_void<T>::value, object_type, T> Ta;
 #ifdef SOL_SAFE_USERTYPE
-				object_type* o = static_cast<object_type*>(stack::get<Ta*>(L, 1));
-				if (o == nullptr) {
+				auto maybeo = stack::check_get<Ta*>(L, 1);
+				if (!maybeo || maybeo.value() == nullptr) {
 					if (is_variable) {
 						return luaL_error(L, "sol: 'self' argument is nil (bad '.' access?)");
 					}
 					return luaL_error(L, "sol: 'self' argument is nil (pass 'self' as first argument)");
 				}
+				object_type* o = static_cast<object_type*>(maybeo.value());
 				return call(L, f, *o);
 #else
 				object_type& o = static_cast<object_type&>(*stack::get<non_null<Ta*>>(L, 1));
@@ -7943,20 +7946,20 @@ namespace sol {
 				typedef meta::pop_front_type_t<typename traits_type::free_args_list> args_list;
 				typedef T Ta;
 #ifdef SOL_SAFE_USERTYPE
-				object_type* po = static_cast<object_type*>(stack::get<Ta*>(L, 1));
-				if (po == nullptr) {
+				auto maybeo = stack::check_get<Ta*>(L, 1);
+				if (!maybeo || maybeo.value() == nullptr) {
 					if (is_variable) {
 						return luaL_error(L, "sol: 'self' argument is nil (bad '.' access?)");
 					}
 					return luaL_error(L, "sol: 'self' argument is nil (pass 'self' as first argument)");
 				}
-				object_type& o = *po;
+				object_type* o = static_cast<object_type*>(maybeo.value());
 #else
-				object_type& o = static_cast<object_type&>(*stack::get<non_null<Ta*>>(L, 1));
+				object_type* o = static_cast<object_type*>(stack::get<non_null<Ta*>>(L, 1));
 #endif // Safety
 				typedef typename wrap::returns_list returns_list;
 				typedef typename wrap::caller caller;
-				return stack::call_into_lua<checked>(returns_list(), args_list(), L, boost + (is_variable ? 3 : 2), caller(), f, o);
+				return stack::call_into_lua<checked>(returns_list(), args_list(), L, boost + (is_variable ? 3 : 2), caller(), f, *o);
 			}
 
 			template <typename F, typename... Args>
@@ -10953,11 +10956,11 @@ namespace sol {
 
 		static auto& get_src(lua_State* L) {
 #ifdef SOL_SAFE_USERTYPE
-			auto p = stack::get<T*>(L, 1);
-			if (p == nullptr) {
-				luaL_error(L, "sol: 'self' argument is nil (pass 'self' as first argument or call on proper type)");
+			auto p = stack::check_get<T*>(L, 1);
+			if (!p || p.value() == nullptr) {
+				luaL_error(L, "sol: 'self' argument is not the proper type (pass 'self' as first argument with ':' or call on proper type)");
 			}
-			return *p;
+			return *p.value();
 #else
 			return stack::get<T>(L, 1);
 #endif
@@ -11137,11 +11140,11 @@ namespace sol {
 
 		static auto& get_src(lua_State* L) {
 #ifdef SOL_SAFE_USERTYPE
-			auto p = stack::get<T*>(L, 1);
-			if (p == nullptr) {
+			auto p = stack::check_get<T*>(L, 1);
+			if (!p || p.value() == nullptr) {
 				luaL_error(L, "sol: 'self' argument is nil (pass 'self' as first argument or call on proper type)");
 			}
-			return *p;
+			return *p.value();
 #else
 			return stack::get<T>(L, 1);
 #endif

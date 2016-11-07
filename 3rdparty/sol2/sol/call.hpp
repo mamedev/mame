@@ -276,13 +276,11 @@ namespace sol {
 			static int call(lua_State* L, Fx&& f) {
 				typedef std::conditional_t<std::is_void<T>::value, object_type, T> Ta;
 #ifdef SOL_SAFE_USERTYPE
-				if(type_of(L, 1) != sol::type::userdata) {
+				auto maybeo = stack::check_get<Ta*>(L, 1);
+				if (!maybeo || maybeo.value() == nullptr) {
 					return luaL_error(L, "sol: received null for 'self' argument (use ':' for accessing member functions, make sure member variables are preceeded by the actual object with '.' syntax)");
 				}
-				object_type* o = static_cast<object_type*>(stack::get<Ta*>(L, 1));
-				if (o == nullptr) {
-					return luaL_error(L, "sol: received null for 'self' argument (use ':' for accessing member functions, make sure member variables are preceeded by the actual object with '.' syntax)");
-				}
+				object_type* o = static_cast<object_type*>(maybeo.value());
 				return call(L, std::forward<Fx>(f), *o);
 #else
 				object_type& o = static_cast<object_type&>(*stack::get<non_null<Ta*>>(L, 1));
@@ -308,13 +306,14 @@ namespace sol {
 			static int call_assign(std::true_type, lua_State* L, V&& f) {
 				typedef std::conditional_t<std::is_void<T>::value, object_type, T> Ta;
 #ifdef SOL_SAFE_USERTYPE
-				object_type* o = static_cast<object_type*>(stack::get<Ta*>(L, 1));
-				if (o == nullptr) {
+				auto maybeo = stack::check_get<Ta*>(L, 1);
+				if (!maybeo || maybeo.value() == nullptr) {
 					if (is_variable) {
 						return luaL_error(L, "sol: received nil for 'self' argument (bad '.' access?)");
 					}
 					return luaL_error(L, "sol: received nil for 'self' argument (pass 'self' as first argument)");
 				}
+				object_type* o = static_cast<object_type*>(maybeo.value());
 				return call_assign(std::true_type(), L, f, *o);
 #else
 				object_type& o = static_cast<object_type&>(*stack::get<non_null<Ta*>>(L, 1));
@@ -366,13 +365,14 @@ namespace sol {
 			static int call(lua_State* L, V&& f) {
 				typedef std::conditional_t<std::is_void<T>::value, object_type, T> Ta;
 #ifdef SOL_SAFE_USERTYPE
-				object_type* o = static_cast<object_type*>(stack::get<Ta*>(L, 1));
-				if (o == nullptr) {
+				auto maybeo = stack::check_get<Ta*>(L, 1);
+				if (!maybeo || maybeo.value() == nullptr) {
 					if (is_variable) {
 						return luaL_error(L, "sol: 'self' argument is nil (bad '.' access?)");
 					}
 					return luaL_error(L, "sol: 'self' argument is nil (pass 'self' as first argument)");
 				}
+				object_type* o = static_cast<object_type*>(maybeo.value());
 				return call(L, f, *o);
 #else
 				object_type& o = static_cast<object_type&>(*stack::get<non_null<Ta*>>(L, 1));
@@ -518,20 +518,20 @@ namespace sol {
 				typedef meta::pop_front_type_t<typename traits_type::free_args_list> args_list;
 				typedef T Ta;
 #ifdef SOL_SAFE_USERTYPE
-				object_type* po = static_cast<object_type*>(stack::get<Ta*>(L, 1));
-				if (po == nullptr) {
+				auto maybeo = stack::check_get<Ta*>(L, 1);
+				if (!maybeo || maybeo.value() == nullptr) {
 					if (is_variable) {
 						return luaL_error(L, "sol: 'self' argument is nil (bad '.' access?)");
 					}
 					return luaL_error(L, "sol: 'self' argument is nil (pass 'self' as first argument)");
 				}
-				object_type& o = *po;
+				object_type* o = static_cast<object_type*>(maybeo.value());
 #else
-				object_type& o = static_cast<object_type&>(*stack::get<non_null<Ta*>>(L, 1));
+				object_type* o = static_cast<object_type*>(stack::get<non_null<Ta*>>(L, 1));
 #endif // Safety
 				typedef typename wrap::returns_list returns_list;
 				typedef typename wrap::caller caller;
-				return stack::call_into_lua<checked>(returns_list(), args_list(), L, boost + (is_variable ? 3 : 2), caller(), f, o);
+				return stack::call_into_lua<checked>(returns_list(), args_list(), L, boost + (is_variable ? 3 : 2), caller(), f, *o);
 			}
 
 			template <typename F, typename... Args>

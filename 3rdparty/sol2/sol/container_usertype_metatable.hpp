@@ -97,11 +97,11 @@ namespace sol {
 
 		static auto& get_src(lua_State* L) {
 #ifdef SOL_SAFE_USERTYPE
-			auto p = stack::get<T*>(L, 1);
-			if (p == nullptr) {
-				luaL_error(L, "sol: 'self' argument is nil (pass 'self' as first argument or call on proper type)");
+			auto p = stack::check_get<T*>(L, 1);
+			if (!p || p.value() == nullptr) {
+				luaL_error(L, "sol: 'self' argument is not the proper type (pass 'self' as first argument with ':' or call on proper type)");
 			}
-			return *p;
+			return *p.value();
 #else
 			return stack::get<T>(L, 1);
 #endif
@@ -281,11 +281,11 @@ namespace sol {
 
 		static auto& get_src(lua_State* L) {
 #ifdef SOL_SAFE_USERTYPE
-			auto p = stack::get<T*>(L, 1);
-			if (p == nullptr) {
+			auto p = stack::check_get<T*>(L, 1);
+			if (!p || p.value() == nullptr) {
 				luaL_error(L, "sol: 'self' argument is nil (pass 'self' as first argument or call on proper type)");
 			}
-			return *p;
+			return *p.value();
 #else
 			return stack::get<T>(L, 1);
 #endif
