@@ -1466,7 +1466,7 @@ static ADDRESS_MAP_START(type1space_map, AS_PROGRAM, 32, sun4_state)
 	AM_RANGE(0x07200000, 0x07200003) AM_READWRITE8(fdc_r, fdc_w, 0xffffffff)
 	AM_RANGE(0x08000000, 0x08000003) AM_READ(ss1_sl0_id)    // slot 0 contains SCSI/DMA/Ethernet
 	AM_RANGE(0x08400000, 0x0840000f) AM_READWRITE(dma_r, dma_w)
-	AM_RANGE(0x08800000, 0x0880001f) AM_DEVICE8("scsibus:7:ncr5390", ncr5390_device, map, 0xff0000)
+	AM_RANGE(0x08800000, 0x0880001f) AM_DEVICE8("scsibus:7:ncr5390", ncr5390_device, map, 0xff000000)
 	AM_RANGE(0x0e000000, 0x0e000003) AM_READ(ss1_sl3_id)    // slot 3 contains video board
 	AM_RANGE(0x0e800000, 0x0e8fffff) AM_RAM AM_SHARE("bw2_vram")
 ADDRESS_MAP_END
