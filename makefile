@@ -280,6 +280,9 @@ endif
 ifeq ($(firstword $(filter ppc64,$(UNAME))),ppc64)
 ARCHITECTURE := _x64
 endif
+ifeq ($(firstword $(filter ppc64le,$(UNAME))),ppc64le)
+ARCHITECTURE := _x64
+endif
 endif
 
 else
@@ -342,7 +345,11 @@ BIGENDIAN := 1
 endif
 # Linux
 ifneq (,$(findstring ppc,$(UNAME)))
+ifneq (,$(findstring ppc64le,$(UNAME)))
+BIGENDIAN := 0
+else
 BIGENDIAN := 1
+endif
 endif
 endif # BIGENDIAN
 
