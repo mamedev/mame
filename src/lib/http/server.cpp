@@ -21,7 +21,7 @@ server::server(const std::string& address, const std::string& port, const std::s
   m_signals.add(SIGINT);
   m_signals.add(SIGTERM);
 #if defined(SIGQUIT)
-  signals_.add(SIGQUIT);
+  m_signals.add(SIGQUIT);
 #endif // defined(SIGQUIT)
 
   do_await_stop();
