@@ -647,7 +647,6 @@ MACHINE_START_MEMBER(sat_console_state, saturn)
 
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
-		//printf("HI!\n");
 		using namespace std::placeholders;
 		machine().debugger().console().register_command("saturn", CMDFLAG_NONE, 0, 1, 4, std::bind(&saturn_state::debug_commands, this, _1, _2, _3));
 	}
