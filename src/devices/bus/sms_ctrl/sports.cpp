@@ -21,8 +21,10 @@ Notes:
   Games designed for the US model of the Sports Pad controller use the
   TH line of the controller port to select which nibble, of the two axis
   bytes, will be read at a time. The Japanese cartridge Sports Pad Soccer
-  uses a different mode, because the Sega Mark III lacks the TH line, so
-  there is a different Sports Pad model released in Japan (see sportsjp.c).
+  uses a different mode when not detect a SMSJ, because the Sega Mark III
+  lacks the TH line. There is a different Sports Pad model released in
+  Japan and no information was found about it supporting both modes, so
+  that model is currently emulated as a different device (see sportsjp.c).
 
   It was discovered that games designed for the Paddle Controller, released
   in Japan, switch to a mode incompatible with the original Paddle when

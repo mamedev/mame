@@ -17,13 +17,23 @@ TODO:
 
 Notes:
 
-  The Japanese Sports Pad controller is only required to play the cartridge
-  Sports Pad Soccer, released in Japan. It uses a different mode than the
-  used by the US model, due to the missing TH line on Sega Mark III
-  controller ports.
+  This Japanese Sports Pad controller device is only required to play the
+  cartridge Sports Pad Soccer, released in Japan, on non-SMSJ consoles without
+  ROM header validation, like the Sega Mark III and the Korean SMS2 version.
 
-  A bug was discovered in the player 2 input handling code of the only known
-  good ROM dump of Sports Pad Soccer (JP):
+  The Japanese version of Sports Pad Soccer has code to operate the Sports
+  Pad controller in two diffent modes. When it detects a Japanese SMS (testing
+  if port $F2 has two bits for mute control), the operation is the same used
+  by US Sports Pad games. Otherwise, it uses a mode that polls bits TR and TL
+  of the controller ports, compatible with the Sega Mark III, that lacks the
+  TH line used by the US Sports Pad mode. This Mark III mode is also used on
+  other non-SMSJ consoles, like the Korean SMS2 version. The two controller
+  modes are significantly different from each other and no information was
+  found about support for both modes on the Japanese Sports Pad model, so that
+  model is currently emulated as a different device.
+
+  A bug was discovered in the player 2 input handling code of the Mark III
+  compatible mode of the only known good ROM dump of Sports Pad Soccer (JP):
   size="131072" crc="41c948bf" sha1="7634ce39e87049dad1ee4f32a80d728e4bd1f81f"
   At address $12D1, instead read the upper 2 bits of port $DC and lower 2 bits
   of port $DD (to obtain the lower nibble of the current axis for player 2),

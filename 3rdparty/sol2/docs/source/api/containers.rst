@@ -53,7 +53,17 @@ Here's a complete working example of it working for Lua 5.3 and Lua 5.2, and how
 		return 0;
 	}
 
-Note that this will not work well in 5.1, as it has explicit table checks and does not check metamethods, even when ``pairs`` or ``ipairs`` is passed a table. In that case, you will need to use a more manual iteration scheme or you will have to convert it to a table. In C++, you can use :doc:`sol::as_table<as_table>` when passing something to the library to get a table out of it.
+
+Note that this will not work well in Lua 5.1, as it has explicit table checks and does not check metamethods, even when ``pairs`` or ``ipairs`` is passed a table. In that case, you will need to use a more manual iteration scheme or you will have to convert it to a table. In C++, you can use :doc:`sol::as_table<as_table>` when passing something to the library to get a table out of it: ``lua["arr"] = as_table( std::vector<int>{ ... });``. For manual iteration in Lua code without using ``as_table`` for something with indices, try:
+
+.. code-block:: lua
+	:caption: iteration.lua
+
+	for i = 1, #vec do
+		print(i, vec[i]) 
+	end
+
+There are also other ways to iterate over key/values, but they can be difficult due to not having proper support in Lua 5.1. We recommend that you upgrade to Lua 5.2 or 5.3.
 
 
 additional functions

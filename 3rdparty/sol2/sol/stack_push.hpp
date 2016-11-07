@@ -108,7 +108,7 @@ namespace sol {
 		};
 		
 		template<typename T>
-		struct pusher<T*, meta::disable_if_t<meta::all<meta::has_begin_end<meta::unqualified_t<T>>, meta::neg<meta::any<std::is_base_of<reference, meta::unqualified_t<T>>, std::is_base_of<stack_reference, meta::unqualified_t<T>>>>>::value>> {
+		struct pusher<T*, meta::disable_if_t<meta::all<is_container<T>, meta::neg<meta::any<std::is_base_of<reference, meta::unqualified_t<T>>, std::is_base_of<stack_reference, meta::unqualified_t<T>>>>>::value>> {
 			template <typename... Args>
 			static int push(lua_State* L, Args&&... args) {
 				return pusher<detail::as_pointer_tag<T>>{}.push(L, std::forward<Args>(args)...);

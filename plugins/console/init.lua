@@ -25,25 +25,56 @@ function console.startplugin()
 	-- that also means that bad things will happen if anything outside lua tries to use it
 	-- especially the completion callback
 	ln.historysetmaxlen(10)
-	local scr =  "local ln = require('linenoise')\n"
-	scr = scr .. "ln.setcompletion(function(c, str) status = str\n"
-	scr = scr .. "	yield()\n" -- coroutines can't yield in the middle of a callback so this is a real thread
-	scr = scr .. "	status:gsub('[^,]*', function(s) if s ~= '' then ln.addcompletion(c, s) end end)\n"
-	scr = scr .. "end)\n"
-	scr = scr .. "return ln.linenoise('\x1b[1;36m[MAME]\x1b[0m> ')"
+	local scr = [[
+local ln = require('linenoise')
+ln.setcompletion(function(c, str)
+	status = str
+	yield()
+	status:gsub('[^,]*', function(s) if s ~= '' then ln.addcompletion(c, s) end end)
+end)
+return ln.linenoise('\x1b[1;36m[MAME]\x1b[0m> ')
+]]
+
+	local function find_unmatch(str, openpar, pair)
+		local done = false
+		if not str:match(openpar) then
+			return str
+		end
+		local tmp = str:gsub(pair, "")
+		if not tmp:match(openpar) then
+			return str
+		end
+		repeat
+			str = str:gsub(".-" .. openpar .. "(.*)", function (s)
+				tmp = s:gsub(pair, "")
+				if not tmp:match(openpar) then
+					done = true
+				end
+				return s
+			end)
+		until done or str == ""
+		return str
+	end
 
 	local function get_completions(str)
 		local comps = ","
-		local table = str:match("([(]?[%w.:()]-)[:.][%w_]*$")
-		local rest, last = str:match("(.-[:.]?)([%w_]*)$")
+		local rest, dot, last = str:match("(.-)([.:]?)([^.:]*)$")
+		str = find_unmatch(str, "%(", "%b()")
+		str = find_unmatch(str, "%[", "%b[]")
+		local table = str:match("([%w_%.:%(%)%[%]]-)[:.][%w_]*$")
 		local err
-		if table == "" or not table then
-			table = "_G"
+		if rest == "" or not table then
+			if dot == "" then
+				table = "_G"
+			else
+				return comps
+			end
 		end
 		err, tablef = pcall(load("return " .. table))
 		if (not err) or (not tablef) then
 			return comps
 		end
+		rest = rest .. dot
 		if type(tablef) == 'table' then
 			for k, v in pairs(tablef) do
 				if k:match("^" .. last) then
