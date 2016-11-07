@@ -75,11 +75,8 @@ namespace sol
 		int len;
 		char *ptr;
 	};
-	namespace meta
-	{
-		template<>
-		struct has_begin_end<core_options> : std::false_type {}; // don't convert core_optons to a table directly
-	}
+	template<>
+	struct is_container<core_options> : std::false_type {}; // don't convert core_optons to a table directly
 	namespace stack
 	{
 		template <>

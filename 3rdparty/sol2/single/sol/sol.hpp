@@ -20,8 +20,8 @@
 // CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 // This file was generated with a script.
-// Generated 2016-11-06 21:33:58.899927 UTC
-// This header was generated with sol v2.15.0 (revision 34fe8a1)
+// Generated 2016-11-07 18:50:10.518977 UTC
+// This header was generated with sol v2.15.0 (revision 29f10c4)
 // https://github.com/ThePhD/sol2
 
 #ifndef SOL_SINGLE_INCLUDE_HPP
@@ -5922,7 +5922,7 @@ namespace sol {
 		};
 		
 		template<typename T>
-		struct pusher<T*, meta::disable_if_t<meta::all<meta::has_begin_end<meta::unqualified_t<T>>, meta::neg<meta::any<std::is_base_of<reference, meta::unqualified_t<T>>, std::is_base_of<stack_reference, meta::unqualified_t<T>>>>>::value>> {
+		struct pusher<T*, meta::disable_if_t<meta::all<is_container<T>, meta::neg<meta::any<std::is_base_of<reference, meta::unqualified_t<T>>, std::is_base_of<stack_reference, meta::unqualified_t<T>>>>>::value>> {
 			template <typename... Args>
 			static int push(lua_State* L, Args&&... args) {
 				return pusher<detail::as_pointer_tag<T>>{}.push(L, std::forward<Args>(args)...);

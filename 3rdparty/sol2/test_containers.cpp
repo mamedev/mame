@@ -359,3 +359,67 @@ a_ref = b.a_list[2]
 	REQUIRE(&b.a_list[1] == &a_ref);
 	REQUIRE(b.a_list[1].a == a_ref.a);
 }
+
+struct options {
+	static int livingcount;
+	static options* last;
+	options() {
+		++livingcount;
+		last = this;
+		INFO("constructor: " << this);
+	}
+
+	std::string output_help() {
+		last = this;
+		INFO("func: " << this);
+		return "";
+	}
+
+	void begin() {}
+	void end() {}
+
+	~options() {
+		last = this;
+		--livingcount;
+	}
+};
+
+options* options::last = nullptr;
+int options::livingcount = 0;
+
+struct machine {
+	options opt;
+};
+
+namespace sol {
+	template <>
+	struct is_container<options> : std::false_type {};
+}
+
+TEST_CASE("containers/is-container", "make sure the is_container trait behaves properly") {
+	sol::state lua;
+	lua.open_libraries();
+
+	lua.new_usertype<options>("options_type",
+		"output_help", &options::output_help
+		);
+
+	lua.new_usertype<machine>("machine_type",
+		"new", sol::no_constructor,
+		"opt", [](machine& m) { return &m.opt; },
+		"copy_opt", [](machine& m) { return m.opt; }
+	);
+
+	{ 
+		machine m;
+		lua["machine"] = &m;
+
+		lua.script(R"(
+	machine:opt():output_help()
+	)");
+
+		REQUIRE(options::last == &m.opt);
+		REQUIRE(options::livingcount == 1);
+	}
+	REQUIRE(options::livingcount == 0);
+}
