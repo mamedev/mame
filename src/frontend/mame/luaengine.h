@@ -18,11 +18,10 @@
 #define __LUA_ENGINE_H__
 
 #include <map>
+#include <condition_variable>
 #define SOL_SAFE_USERTYPE
 //#define SOL_CHECK_ARGUMENTS
 #include "sol2/sol.hpp"
-
-class cheat_manager;
 
 struct lua_State;
 
@@ -46,6 +45,7 @@ public:
 	std::vector<std::string> &get_menu() { return m_menu; }
 	void attach_notifiers();
 	void on_frame_done();
+	void on_periodic();
 
 	template<typename T, typename U>
 	bool call_plugin(const std::string &name, const T in, U &out)
@@ -153,6 +153,14 @@ private:
 	void close();
 
 	void run(sol::load_result res);
+
+	struct context
+	{
+		std::string result;
+		std::condition_variable sync;
+		bool busy;
+		bool yield;
+	};
 };
 
 #endif  /* __LUA_ENGINE_H__ */
