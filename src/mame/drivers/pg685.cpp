@@ -5,6 +5,7 @@
     Siemens Simatic PG-685
 
     driver skeleton by rfka01
+    more skeleton by R. Belmont
 
 ****************************************************************************
 
@@ -95,7 +96,9 @@ HD:             SRM2064C-15, WD2010B-AL, 10,000000 MHz crystal
 #include "cpu/nec/nec.h"
 //#include "cpu/i86/i86.h"
 #include "cpu/i86/i286.h"
-//#include "video/mc6845.h"
+#include "video/mc6845.h"
+
+#define CRTC_TAG "crtc"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -105,14 +108,23 @@ class pg685_state : public driver_device
 {
 public:
 	pg685_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu") { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_vram(*this, "framebuffer"),
+		m_vram16(*this, "framebuffer16"),
+		m_fontram(*this, "charcopy")
+		{ }
 
-	uint32_t screen_update_pg685(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	MC6845_UPDATE_ROW(crtc_update_row);
+	MC6845_UPDATE_ROW(crtc_update_row_oua12);
+	
 private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	required_device<cpu_device> m_maincpu;
+	optional_shared_ptr<uint8_t> m_vram;
+	optional_shared_ptr<uint16_t> m_vram16;
+	optional_shared_ptr<uint8_t> m_fontram;
 };
 
 //**************************************************************************
@@ -123,6 +135,8 @@ static ADDRESS_MAP_START(pg685_mem, AS_PROGRAM, 8, pg685_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000,0xbffff) AM_RAM
 	AM_RANGE(0xf0000,0xf1fff) AM_RAM
+	AM_RANGE(0xf9f02,0xf9f02) AM_DEVREADWRITE(CRTC_TAG, mc6845_device, status_r, address_w)
+    AM_RANGE(0xf9f03,0xf9f03) AM_DEVREADWRITE(CRTC_TAG, mc6845_device, register_r, register_w)
 	AM_RANGE(0xfa000,0xfa7ff) AM_RAM AM_SHARE ("charcopy")
 	AM_RANGE(0xfb000,0xfb7ff) AM_RAM AM_SHARE ("framebuffer")
 	AM_RANGE(0xfc000,0xfffff) AM_ROM AM_REGION("bios", 0)
@@ -131,10 +145,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(pg685oua12_mem, AS_PROGRAM, 16, pg685_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000,0xdffff) AM_RAM
-	AM_RANGE(0xe0000,0xeffff) AM_RAM AM_SHARE ("framebuffer")
+	AM_RANGE(0xe0000,0xeffff) AM_RAM AM_SHARE ("framebuffer16")
 	AM_RANGE(0xf0000,0xf1fff) AM_RAM
-	AM_RANGE(0xfa000,0xfa7ff) AM_RAM AM_SHARE ("charcopy")
-	AM_RANGE(0xfc000,0xfffff) AM_ROM AM_REGION("bios", 0)
+	AM_RANGE(0xf9f80,0xf9f81) AM_DEVREADWRITE8(CRTC_TAG, mc6845_device, status_r, address_w, 0x00ff)
+    AM_RANGE(0xf9f80,0xf9f81) AM_DEVREADWRITE8(CRTC_TAG, mc6845_device, register_r, register_w, 0xff00)
+	AM_RANGE(0xfc000,0xfffff) AM_RAM	// BIOS RAM shadow
+	AM_RANGE(0xffc000,0xffffff) AM_ROM AM_REGION("bios", 0)
 ADDRESS_MAP_END
 
 
@@ -165,11 +181,60 @@ void pg685_state::video_start()
 {
 }
 
-
-
-uint32_t pg685_state::screen_update_pg685(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+MC6845_UPDATE_ROW( pg685_state::crtc_update_row )
 {
-	return 0;
+	static const uint32_t palette[2] = { 0x00d000, 0 };
+	uint32_t  *p = &bitmap.pix32(y);
+	uint16_t  chr_base = ra;
+	int i;
+	uint8_t *vram = (uint8_t *)m_vram.target();
+	uint8_t *fontram = (uint8_t *)m_fontram.target();
+
+	for ( i = 0; i < x_count; i++ )
+	{
+		uint16_t offset = ( ma + i ) & 0x7ff;
+		uint8_t chr = vram[ offset ];
+		uint8_t data = fontram[ chr_base + chr * 16 ];
+		uint8_t fg = 1;
+		uint8_t bg = 0;
+	
+		*p = palette[( data & 0x80 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x40 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x20 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x10 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x08 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x04 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x02 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x01 ) ? fg : bg]; p++;
+	}
+}
+
+MC6845_UPDATE_ROW( pg685_state::crtc_update_row_oua12 )
+{
+	static const uint32_t palette[2] = { 0x00d000, 0 };
+	uint32_t  *p = &bitmap.pix32(y);
+	uint16_t  chr_base = ra;
+	int i;
+	uint16_t *vram = (uint16_t *)m_vram16.target();
+	uint8_t *fontram = (uint8_t *)memregion("chargen")->base();
+
+	for ( i = 0; i < x_count; i++ )
+	{
+		uint16_t offset = ( ma + i ) & 0x7ff;
+		uint16_t chr = vram[ offset ] & 0xff;
+		uint8_t data = fontram[ chr_base + chr * 16 ];
+		uint8_t fg = 1;
+		uint8_t bg = 0;
+	
+		*p = palette[( data & 0x80 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x40 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x20 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x10 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x08 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x04 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x02 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x01 ) ? fg : bg]; p++;
+	}
 }
 
 //**************************************************************************
@@ -186,6 +251,14 @@ static MACHINE_CONFIG_START( pg685, pg685_state )
 	// ram
 
 	// video hardware
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(12288000, 882, 0, 720, 370, 0, 350 ) // not real values
+	MCFG_SCREEN_UPDATE_DEVICE( CRTC_TAG, mc6845_device, screen_update )
+
+	MCFG_MC6845_ADD(CRTC_TAG, MC6845, "screen", 12288000)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_UPDATE_ROW_CB(pg685_state, crtc_update_row)
 
 	// sound hardware
 
@@ -212,6 +285,14 @@ static MACHINE_CONFIG_START( pg685oua12, pg685_state )
 	// ram
 
 	// video hardware
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(12288000, 882, 0, 720, 370, 0, 350 ) // not real values
+	MCFG_SCREEN_UPDATE_DEVICE( CRTC_TAG, mc6845_device, screen_update )
+
+	MCFG_MC6845_ADD(CRTC_TAG, MC6845, "screen", 12288000)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_UPDATE_ROW_CB(pg685_state, crtc_update_row_oua12)
 
 	// sound hardware
 
