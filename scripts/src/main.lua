@@ -239,6 +239,7 @@ end
 	links {
 		ext_lib("zlib"),
 		ext_lib("flac"),
+		ext_lib("sqlite3"),
 	}
 
 	if _OPTIONS["NO_USE_MIDI"]~="1" then

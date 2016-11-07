@@ -28,6 +28,8 @@ libjpeg - [Custom BSD-like](https://github.com/numenta/nupic/blob/master/externa
 
 linenoise-ng - [The BSD 3-Clause License](http://opensource.org/licenses/BSD-3-Clause)
 
+lsqlite3 - [The MIT License (MIT)](http://opensource.org/licenses/MIT)
+
 lua - [The MIT License (MIT)](http://opensource.org/licenses/MIT)
 
 lua-zlib - [The MIT License (MIT)](http://opensource.org/licenses/MIT)
@@ -51,6 +53,8 @@ sdl2 - [zlib license](http://opensource.org/licenses/Zlib)
 softfloat - [U.C. Berkeley open-source license](https://github.com/mamedev/mame/blob/master/3rdparty/softfloat/README.txt) MIT compatible
 
 sol2 - [The MIT License (MIT)](http://opensource.org/licenses/MIT)
+
+sqlite3 - Public Domain
 
 winpcap - [The BSD 3-Clause License](http://opensource.org/licenses/BSD-3-Clause)
 

@@ -560,13 +560,47 @@ project "lualibs"
 	includedirs {
 		ext_includedir("lua"),
 		ext_includedir("zlib"),
+		ext_includedir("sqlite3"),
 	}
 
 	files {
+		MAME_DIR .. "3rdparty/lsqlite3/lsqlite3.c",
 		MAME_DIR .. "3rdparty/lua-zlib/lua_zlib.c",
 		MAME_DIR .. "3rdparty/luafilesystem/src/lfs.c",
 		MAME_DIR .. "3rdparty/lua-linenoise/linenoise.c",
 	}
+
+--------------------------------------------------
+-- SQLite3 library objects
+--------------------------------------------------
+
+if not _OPTIONS["with-system-sqlite3"] then
+project "sqlite3"
+	uuid "5cb3d495-57ed-461c-81e5-80dc0857517d"
+	kind "StaticLib"
+
+	configuration { "gmake" }
+		buildoptions_c {
+			"-Wno-discarded-qualifiers",
+			"-Wno-unused-but-set-variable",
+			"-Wno-bad-function-cast",
+			"-Wno-undef",
+		}
+if _OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "clang") then
+		buildoptions_c {
+			"-Wno-incompatible-pointer-types-discards-qualifiers",
+		}
+end
+	configuration { }
+
+	files {
+		MAME_DIR .. "3rdparty/sqlite3/sqlite3.c",
+	}
+else
+links {
+	ext_lib("sqlite3"),
+}
+end
 
 end
 --------------------------------------------------

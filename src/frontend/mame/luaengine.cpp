@@ -35,6 +35,7 @@ extern "C" {
 	int luaopen_zlib(lua_State *L);
 	int luaopen_lfs(lua_State *L);
 	int luaopen_linenoise(lua_State *L);
+	int luaopen_lsqlite3(lua_State *L);
 }
 
 namespace sol
@@ -526,6 +527,7 @@ lua_engine::lua_engine()
 	sol()["package"]["preload"]["zlib"] = &luaopen_zlib;
 	sol()["package"]["preload"]["lfs"] = &luaopen_lfs;
 	sol()["package"]["preload"]["linenoise"] = &luaopen_linenoise;
+	sol()["package"]["preload"]["lsqlite3"] = &luaopen_lsqlite3;
 
 	lua_gc(m_lua_state, LUA_GCRESTART, 0);
 }
