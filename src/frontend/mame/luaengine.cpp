@@ -820,8 +820,13 @@ void lua_engine::initialize()
 										thstate["status"] = ctx.result;
 									};
 								auto ret = func();
-								if(ret.valid())
-									ctx.result = ret.get<const char *>();
+								if (ret.valid()) {
+									const char *tmp = ret.get<const char *>();
+									if (tmp != nullptr) 
+										ctx.result = tmp;
+									else
+										exit(0);
+								}
 							}
 							ctx.busy = false;
 						});
