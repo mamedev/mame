@@ -33,30 +33,26 @@ function console.startplugin()
 	scr = scr .. "return ln.linenoise('\x1b[1;36m[MAME]\x1b[0m> ')"
 
 	local function get_completions(str)
-		local function is_pair_iterable(t)
-			local mt = getmetatable(t)
-			return type(t) == 'table' or (mt and mt.__pairs)
-		end
 		local comps = ","
-		local table = str:match("([(]?[%w.:()]-)[:.]?[%w_]*$")
+		local table = str:match("([(]?[%w.:()]-)[:.][%w_]*$")
 		local rest, last = str:match("(.-[:.]?)([%w_]*)$")
 		local err
-		if table == "" then
+		if table == "" or not table then
 			table = "_G"
 		end
 		err, tablef = pcall(load("return " .. table))
 		if (not err) or (not tablef) then
 			return comps
 		end
-		if is_pair_iterable(tablef) then
+		if type(tablef) == 'table' then
 			for k, v in pairs(tablef) do
 				if k:match("^" .. last) then
 					comps = comps .. "," .. rest .. k
 				end
 			end
 		end
-		local tablef = getmetatable(tablef)
-		if is_pair_iterable(tablef) then
+		if type(tablef) == "userdata" then
+			local tablef = getmetatable(tablef)
 			for k, v in pairs(tablef) do
 				if k:match("^" .. last) then
 					comps = comps .. "," .. rest .. k
@@ -74,6 +70,7 @@ function console.startplugin()
 			return
 		elseif started then
 			local cmd = conth.result
+			preload = false
 			local func, err = load(cmd)
 			if not func then
 				if err:match("<eof>") then
@@ -82,10 +79,8 @@ function console.startplugin()
 					preload = true
 				else
 					print("error: ", err)
-					preload = false
 				end
 			else
-				preload = false
 				local status
 				status, err = pcall(func)
 				if not status then
