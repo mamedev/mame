@@ -662,6 +662,17 @@ ROM_START(phntmshp)
 ROM_END
 
 /*-------------------------------------------------------------------
+/ ??/86 Rider's Surf (JocMatic)
+/-------------------------------------------------------------------*/
+ROM_START(ridersrf)
+	ROM_REGION(0x4000, "maincpu", 0)
+	ROM_LOAD("cpu.bin", 0x0000, 0x2000, CRC(4941938e) SHA1(01e44054e65166d68602d6a38217eda7ea669761))
+
+	ROM_REGION(0x4000, "audiocpu", 0)
+	ROM_LOAD("sound.bin", 0x0000, 0x2000, CRC(2db2ecb2) SHA1(365fcac208607acc3e134affeababd6c89dbc74d))
+ROM_END
+
+/*-------------------------------------------------------------------
 / ??/87 Iron Balls (Stargame)
 /-------------------------------------------------------------------*/
 ROM_START(ironball)
@@ -698,6 +709,7 @@ GAME(1986,  fldragona, fldragon, play_3,   play_3,   driver_device, 0, ROT0, "Pl
 GAME(1987,  phntmshp,  0,        play_3,   play_3,   driver_device, 0, ROT0, "Playmatic", "Phantom Ship",              MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 GAME(1987,  sklflite,  0,        play_3,   play_3,   driver_device, 0, ROT0, "Playmatic", "Skill Flight (Playmatic)",  MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 // not by Playmatic, but same hardware
+GAME(1986,  ridersrf,  0,        play_3,   play_3,   driver_device, 0, ROT0, "JocMatic",  "Rider's Surf",              MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 GAME(1987,  ironball,  0,        play_3,   play_3,   driver_device, 0, ROT0, "Stargame",  "Iron Balls",                MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 // bingo hardware, to be split (?)
 GAME(1983,  msdisco,   0,        play_3,   play_3,   driver_device, 0, ROT0, "Playmatic", "Miss Disco (Bingo)",        MACHINE_IS_SKELETON_MECHANICAL)
