@@ -2,7 +2,7 @@
 // copyright-holders: rfka01
 /***************************************************************************
 
-    Siemens Simatic PG-685
+    Siemens Simatic PG-675 and PG-685
 
     driver skeleton by rfka01
     more skeleton by R. Belmont
@@ -97,8 +97,10 @@ HD:             SRM2064C-15, WD2010B-AL, 10,000000 MHz crystal
 //#include "cpu/i86/i86.h"
 #include "cpu/i86/i286.h"
 #include "video/mc6845.h"
+#include "machine/mm58167.h"
 
 #define CRTC_TAG "crtc"
+#define RTC_TAG "rtc"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -137,6 +139,7 @@ static ADDRESS_MAP_START(pg685_mem, AS_PROGRAM, 8, pg685_state)
 	AM_RANGE(0xf0000,0xf1fff) AM_RAM
 	AM_RANGE(0xf9f02,0xf9f02) AM_DEVREADWRITE(CRTC_TAG, mc6845_device, status_r, address_w)
     AM_RANGE(0xf9f03,0xf9f03) AM_DEVREADWRITE(CRTC_TAG, mc6845_device, register_r, register_w)
+    AM_RANGE(0xf9f40,0xf9f5f) AM_DEVREADWRITE(RTC_TAG, mm58167_device, read, write)
 	AM_RANGE(0xfa000,0xfa7ff) AM_RAM AM_SHARE ("charcopy")
 	AM_RANGE(0xfb000,0xfb7ff) AM_RAM AM_SHARE ("framebuffer")
 	AM_RANGE(0xfc000,0xfffff) AM_ROM AM_REGION("bios", 0)
@@ -260,6 +263,9 @@ static MACHINE_CONFIG_START( pg685, pg685_state )
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(pg685_state, crtc_update_row)
 
+	// RTC
+	MCFG_DEVICE_ADD(RTC_TAG, MM58167, XTAL_32_768kHz)
+	
 	// sound hardware
 
 	// devices
@@ -315,6 +321,11 @@ MACHINE_CONFIG_END
 //  ROM DEFINITIONS
 //**************************************************************************
 
+ROM_START( pg675 )
+	ROM_REGION( 0x4000, "bios", ROMREGION_ERASEFF )
+	ROM_LOAD( "p79004-a7021 a2-a1.bin", 0x2000, 0x2000, CRC(c7602d28) SHA1(a470e0457cc83f989995cfbca1ebce0878a3c4e3) )
+ROM_END
+
 ROM_START( pg685 )
 	ROM_REGION( 0x4000, "bios", ROMREGION_ERASEFF )
 	ROM_LOAD( "pg685_oua11_s79200-g2_a901-03.bin", 0x0000, 0x4000, CRC(db13f2db) SHA1(5f65ab14d9c8acdcc5482b27e727ca43b1a7daf3) )
@@ -332,5 +343,6 @@ ROM_END
 //  ROM DEFINITIONS
 //**************************************************************************
 /*    YEAR  NAME        PARENT    COMPAT  MACHINE     INPUT       CLASS          INIT        COMPANY FULLNAME                  FLAGS                */
+COMP( 198?, pg675,      0,        0,      pg685,      pg685,      driver_device,    0,       "Siemens", "Simatic PG675", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 COMP( 198?, pg685,      0,        0,      pg685,      pg685,      driver_device,    0,       "Siemens", "Simatic PG685 OUA11", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 COMP( 198?, pg685oua12, pg685,    0,      pg685oua12, pg685,      driver_device,    0,       "Siemens", "Simatic PG685 OUA12", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
