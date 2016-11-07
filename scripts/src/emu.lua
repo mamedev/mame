@@ -33,6 +33,7 @@ includedirs {
 	ext_includedir("zlib"),
 	ext_includedir("flac"),
 	ext_includedir("jpeg"),
+	MAME_DIR .. "3rdparty/asio/include",
 }
 
 files {

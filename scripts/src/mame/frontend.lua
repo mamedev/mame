@@ -40,6 +40,7 @@ includedirs {
 	ext_includedir("lua"),
 	ext_includedir("zlib"),
 	ext_includedir("flac"),
+	MAME_DIR .. "3rdparty/asio/include",
 }
 
 configuration { "vs*" }
