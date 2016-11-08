@@ -545,7 +545,7 @@ public:
 	}
 
 	// getters
-	bool has_object() const { return (object() != nullptr); }
+	bool has_object() const { return (object() != nullptr) || m_std_func; }
 
 	// helpers
 	bool isnull() const { return (m_raw_function == nullptr && m_raw_mfp.isnull() && !m_std_func); }
