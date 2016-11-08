@@ -57,7 +57,6 @@ function timer.startplugin()
 		end
 
 		local stmt, row
-		-- Get the articles that are contained in the invoice table itself.
 		stmt = db:prepare("SELECT total_time, play_count FROM timer WHERE driver = ? AND software = ?")
 		stmt:bind_values(emu.romname(), emu.softname())
 		if (stmt:step() == sqlite3.ROW) then
