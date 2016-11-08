@@ -15,6 +15,7 @@
 #include "drivenum.h"
 #include "emuopts.h"
 #include "ui/ui.h"
+#include "ui/pluginopt.h"
 #include "luaengine.h"
 #include "natkeyboard.h"
 #include "uiinput.h"
@@ -749,6 +750,11 @@ void lua_engine::initialize()
 			sol().registry()[popfield] = pop;
 			m_menu.push_back(name);
 		};
+	emu["show_menu"] = [this](const char *name) {
+			mame_ui_manager &mui = mame_machine_manager::instance()->ui();
+			render_container &container = machine().render().ui_container();
+			ui::menu_plugin::show_menu(mui, container, (char *)name);
+		};
 	emu["register_callback"] = [this](sol::function cb, const std::string &name) {
 			std::string field = "cb_" + name;
 			sol().registry()[field] = cb;
@@ -1340,6 +1346,7 @@ void lua_engine::initialize()
  * target:hidden() - is target hidden
  * target:is_ui_target() - is ui render target
  * target:index() - target index
+ * target:view_name(index) - current target layout view name
  * target.max_update_rate -
  * target.view - current target layout view
  * target.orientation - current target orientation
@@ -1361,6 +1368,7 @@ void lua_engine::initialize()
 			"hidden", &render_target::hidden,
 			"is_ui_target", &render_target::is_ui_target,
 			"index", &render_target::index,
+			"view_name", &render_target::view_name,
 			"max_update_rate", sol::property(&render_target::max_update_rate, &render_target::set_max_update_rate),
 			"view", sol::property(&render_target::view, &render_target::set_view),
 			"orientation", sol::property(&render_target::orientation, &render_target::set_orientation),

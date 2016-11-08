@@ -41,6 +41,21 @@ void menu_plugin::populate()
 	item_append(menu_item_type::SEPARATOR);
 }
 
+void menu_plugin::show_menu(mame_ui_manager &mui, render_container &container, char *menu)
+{
+	// reset the menu stack
+	menu::stack_reset(mui.machine());
+
+	// add the plugin menu entry
+	menu::stack_push<menu_plugin_opt>(mui, container, menu);
+
+	// force the menus on
+	mui.show_menu();
+
+	// make sure MAME is paused
+	mui.machine().pause();
+}
+
 menu_plugin::~menu_plugin()
 {
 }
