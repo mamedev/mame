@@ -1299,7 +1299,7 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/machine/ldp1000.h,MACHINES["LDP1450"] = true
+--@src/devices/machine/ldp1450.h,MACHINES["LDP1450"] = true
 ---------------------------------------------------
 
 if (MACHINES["LDP1450"]~=null) then
