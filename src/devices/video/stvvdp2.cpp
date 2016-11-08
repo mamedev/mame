@@ -4688,6 +4688,7 @@ void saturn_state::stv_vdp2_copy_roz_bitmap(bitmap_rgb32 &bitmap,
 
 		line = &bitmap.pix32(vcnt);
 
+		// TODO: nuke this spaghetti code
 		if ( !use_coeff_table || RP.dkax == 0 )
 		{
 			if ( use_coeff_table )
@@ -4805,9 +4806,7 @@ void saturn_state::stv_vdp2_copy_roz_bitmap(bitmap_rgb32 &bitmap,
 			}
 		}
 		else
-		{
-			popmessage("%08x",STV_VDP2_RPRCTL);
-			
+		{			
 			for (hcnt = cliprect.min_x; hcnt <= cliprect.max_x; hcnt++ )
 			{
 				switch( coeff_table_size )
