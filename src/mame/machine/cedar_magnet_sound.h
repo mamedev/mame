@@ -11,7 +11,7 @@
 #include "machine/z80ctc.h"
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
-#include "cedar_magnet_board.h"
+#include "machine/cedar_magnet_board.h"
 
 extern const device_type CEDAR_MAGNET_SOUND;
 

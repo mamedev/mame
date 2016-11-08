@@ -10,7 +10,7 @@
 #include "cpu/z80/z80daisy.h"
 #include "machine/z80pio.h"
 #include "machine/bankdev.h"
-#include "cedar_magnet_board.h"
+#include "machine/cedar_magnet_board.h"
 
 extern const device_type CEDAR_MAGNET_SPRITE;
 
