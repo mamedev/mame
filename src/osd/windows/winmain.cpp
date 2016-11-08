@@ -455,13 +455,7 @@ windows_osd_interface::~windows_osd_interface()
 
 void windows_osd_interface::video_register()
 {
-	video_options_add("gdi", nullptr);
-	video_options_add("d3d", nullptr);
-#if USE_OPENGL
-	video_options_add("opengl", nullptr);
-#endif
 	video_options_add("bgfx", nullptr);
-	//video_options_add("auto", nullptr); // making d3d video default one
 }
 
 //============================================================

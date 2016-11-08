@@ -124,32 +124,4 @@ struct osd_draw_callbacks
 	osd_renderer *(*create)(osd_window *window);
 };
 
-//============================================================
-//  PROTOTYPES
-//============================================================
-
-//============================================================
-// PROTOTYPES - drawsdl.c
-//============================================================
-
-int drawsdl_scale_mode(const char *s);
-
-//============================================================
-// PROTOTYPES - drawogl.c
-//============================================================
-
-int drawogl_init(running_machine &machine, osd_draw_callbacks *callbacks);
-
-//============================================================
-// PROTOTYPES - draw13.c
-//============================================================
-
-int drawsdl2_init(running_machine &machine, osd_draw_callbacks *callbacks);
-
-//============================================================
-// PROTOTYPES - drawbgfx.c
-//============================================================
-
-int drawbgfx_init(running_machine &machine, osd_draw_callbacks *callbacks);
-
 #endif /* __SDLWINDOW__ */

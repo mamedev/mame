@@ -426,11 +426,6 @@ project ("osd_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/sdl/window.h",
 		MAME_DIR .. "src/osd/modules/osdwindow.cpp",
 		MAME_DIR .. "src/osd/modules/osdwindow.h",
-		MAME_DIR .. "src/osd/modules/render/drawsdl.cpp",
-	}
-	files {
-		MAME_DIR .. "src/osd/modules/render/draw13.cpp",
-		MAME_DIR .. "src/osd/modules/render/blit13.h",
 	}
 
 

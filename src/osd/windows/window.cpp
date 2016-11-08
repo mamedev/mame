@@ -41,11 +41,6 @@ using namespace Windows::UI::Core;
 
 #include "modules/render/drawbgfx.h"
 #include "modules/render/drawnone.h"
-#include "modules/render/drawd3d.h"
-#include "modules/render/drawgdi.h"
-#if (USE_OPENGL)
-#include "modules/render/drawogl.h"
-#endif
 
 #define NOT_ALREADY_DOWN(x) (x & 0x40000000) == 0
 #define SCAN_CODE(x) ((x >> 16) & 0xff)
@@ -145,22 +140,6 @@ bool windows_osd_interface::window_init()
 	window_thread = GetCurrentThread();
 	window_threadid = main_threadid;
 
-	const int fallbacks[VIDEO_MODE_COUNT] = {
-		-1,                 // NONE -> no fallback
-		VIDEO_MODE_NONE,    // GDI -> NONE
-		VIDEO_MODE_D3D,     // BGFX -> D3D
-#if (USE_OPENGL)
-		VIDEO_MODE_GDI,     // OPENGL -> GDI
-#endif
-		-1,                 // No SDL2ACCEL on Windows OSD
-#if (USE_OPENGL)
-		VIDEO_MODE_OPENGL,  // D3D -> OPENGL
-#else
-		VIDEO_MODE_GDI,     // D3D -> GDI
-#endif
-		-1                  // No SOFT on Windows OSD
-	};
-
 	int current_mode = video_config.mode;
 	while (current_mode != VIDEO_MODE_NONE)
 	{
@@ -170,25 +149,8 @@ bool windows_osd_interface::window_init()
 			case VIDEO_MODE_NONE:
 				error = renderer_none::init(machine());
 				break;
-			case VIDEO_MODE_GDI:
-				error = renderer_gdi::init(machine());
-				break;
 			case VIDEO_MODE_BGFX:
 				error = renderer_bgfx::init(machine());
-				break;
-#if (USE_OPENGL)
-			case VIDEO_MODE_OPENGL:
-				renderer_ogl::init(machine());
-				break;
-#endif
-			case VIDEO_MODE_SDL2ACCEL:
-				fatalerror("SDL2-Accel renderer unavailable on Windows OSD.");
-				break;
-			case VIDEO_MODE_D3D:
-				error = renderer_d3d9::init(machine());
-				break;
-			case VIDEO_MODE_SOFT:
-				fatalerror("SDL1 renderer unavailable on Windows OSD.");
 				break;
 			default:
 				fatalerror("Unknown video mode.");
@@ -196,7 +158,7 @@ bool windows_osd_interface::window_init()
 		}
 		if (error)
 		{
-			current_mode = fallbacks[current_mode];
+			fatalerror("Video mode 'bgfx' is not supported by your hardware.\n");
 		}
 		else
 		{
@@ -277,19 +239,8 @@ void windows_osd_interface::window_exit()
 		case VIDEO_MODE_NONE:
 			renderer_none::exit();
 			break;
-		case VIDEO_MODE_GDI:
-			renderer_gdi::exit();
-			break;
 		case VIDEO_MODE_BGFX:
 			renderer_bgfx::exit();
-			break;
-#if (USE_OPENGL)
-		case VIDEO_MODE_OPENGL:
-			renderer_ogl::exit();
-			break;
-#endif
-		case VIDEO_MODE_D3D:
-			renderer_d3d9::exit();
 			break;
 		default:
 			break;

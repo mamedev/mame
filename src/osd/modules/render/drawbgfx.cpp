@@ -354,7 +354,7 @@ void renderer_bgfx::exit()
 }
 
 //============================================================
-//  drawsdl_xy_to_render_target
+//  renderer_bgfx::xy_to_render_target
 //============================================================
 
 #ifdef OSD_SDL

@@ -132,23 +132,6 @@ function osdmodulesbuild()
 		defines {
 			"USE_OPENGL=0",
 		}
-	else
-		files {
-			MAME_DIR .. "src/osd/modules/render/drawogl.cpp",
-			MAME_DIR .. "src/osd/modules/opengl/gl_shader_tool.cpp",
-			MAME_DIR .. "src/osd/modules/opengl/gl_shader_mgr.cpp",
-			MAME_DIR .. "src/osd/modules/opengl/gl_shader_mgr.h",
-			MAME_DIR .. "src/osd/modules/opengl/gl_shader_tool.h",
-			MAME_DIR .. "src/osd/modules/opengl/osd_opengl.h",
-		}
-		defines {
-			"USE_OPENGL=1",
-		}
-		if _OPTIONS["USE_DISPATCH_GL"]=="1" then
-			defines {
-				"USE_DISPATCH_GL=1",
-			}
-		end
 	end
 
 	defines {

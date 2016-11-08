@@ -36,12 +36,7 @@
 #include "window.h"
 #include "osdsdl.h"
 #include "modules/render/drawbgfx.h"
-#include "modules/render/drawsdl.h"
-#include "modules/render/draw13.h"
 #include "modules/monitor/monitor_common.h"
-#if (USE_OPENGL)
-#include "modules/render/drawogl.h"
-#endif
 
 //============================================================
 //  PARAMETERS
@@ -93,22 +88,9 @@ bool sdl_osd_interface::window_init()
 
 	// initialize the drawers
 
-	switch (video_config.mode)
+	if (video_config.mode == VIDEO_MODE_BGFX)
 	{
-		case VIDEO_MODE_BGFX:
-			renderer_bgfx::init(machine());
-			break;
-#if (USE_OPENGL)
-		case VIDEO_MODE_OPENGL:
-			renderer_ogl::init(machine());
-			break;
-#endif
-		case VIDEO_MODE_SDL2ACCEL:
-			renderer_sdl2::init(machine());
-			break;
-		case VIDEO_MODE_SOFT:
-			renderer_sdl1::init(machine());
-			break;
+		renderer_bgfx::init(machine());
 	}
 
 	/* We may want to set a number of the hints SDL2 provides.
@@ -191,24 +173,9 @@ void sdl_osd_interface::window_exit()
 		window->destroy();
 	}
 
-	switch(video_config.mode)
+	if (video_config.mode == VIDEO_MODE_BGFX)
 	{
-		case VIDEO_MODE_SDL2ACCEL:
-			renderer_sdl1::exit();
-			break;
-		case VIDEO_MODE_SOFT:
-			renderer_sdl1::exit();
-			break;
-		case VIDEO_MODE_BGFX:
-			renderer_bgfx::exit();
-			break;
-#if (USE_OPENGL)
-		case VIDEO_MODE_OPENGL:
-			renderer_ogl::exit();
-			break;
-#endif
-		default:
-			break;
+		renderer_bgfx::exit();
 	}
 	osd_printf_verbose("Leave sdlwindow_exit\n");
 }

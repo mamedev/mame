@@ -39,14 +39,7 @@ class render_primitive_list;
 enum
 {
 	VIDEO_MODE_NONE = 0,
-	VIDEO_MODE_GDI,
 	VIDEO_MODE_BGFX,
-#if defined(USE_OPENGL) && USE_OPENGL
-	VIDEO_MODE_OPENGL,
-#endif
-	VIDEO_MODE_SDL2ACCEL,
-	VIDEO_MODE_D3D,
-	VIDEO_MODE_SOFT,
 
 	VIDEO_MODE_COUNT
 };
@@ -287,9 +280,6 @@ struct osd_video_config
 
 	// X11 options
 	int                 restrictonemonitor; // in fullscreen, confine to Xinerama monitor 0
-
-	// YUV options
-	int                 scale_mode;
 };
 
 //============================================================

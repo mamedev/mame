@@ -99,11 +99,9 @@ std::vector<submenu::option> const submenu::video_options = {
 	{ submenu::option_type::HEAD, __("Video Options") },
 	{ submenu::option_type::OSD,  __("Video Mode"),                              OSDOPTION_VIDEO },
 	{ submenu::option_type::OSD,  __("Number Of Screens"),                       OSDOPTION_NUMSCREENS },
-#if defined(UI_WINDOWS) && !defined(UI_SDL)
-	{ submenu::option_type::OSD,  __("Triple Buffering"),                        WINOPTION_TRIPLEBUFFER },
-	{ submenu::option_type::OSD,  __("HLSL"),                                    WINOPTION_HLSL_ENABLE },
-#endif
+#if defined(UI_SDL)
 	{ submenu::option_type::OSD,  __("GLSL"),                                    OSDOPTION_GL_GLSL },
+#endif
 	{ submenu::option_type::OSD,  __("Bilinear Filtering"),                      OSDOPTION_FILTER },
 	{ submenu::option_type::OSD,  __("Bitmap Prescaling"),                       OSDOPTION_PRESCALE },
 	{ submenu::option_type::OSD,  __("Window Mode"),                             OSDOPTION_WINDOW },

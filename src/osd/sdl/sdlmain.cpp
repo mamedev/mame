@@ -83,7 +83,6 @@ const options_entry sdl_options::s_option_entries[] =
 	{ SDLOPTION_SDLVIDEOFPS,                  "0",        OPTION_BOOLEAN,    "show sdl video performance" },
 	// video options
 	{ nullptr,                                nullptr,       OPTION_HEADER,     "SDL VIDEO OPTIONS" },
-// OS X can be trusted to have working hardware OpenGL, so default to it on for the best user experience
 	{ SDLOPTION_CENTERH,                      "1",        OPTION_BOOLEAN,    "center horizontally within the view area" },
 	{ SDLOPTION_CENTERV,                      "1",        OPTION_BOOLEAN,    "center vertically within the view area" },
 	{ SDLOPTION_SCALEMODE ";sm",         OSDOPTVAL_NONE,  OPTION_STRING,     "Scale mode: none, hwblit, hwbest, yv12, yuy2, yv12x2, yuy2x2 (-video soft only)" },
@@ -149,9 +148,6 @@ const options_entry sdl_options::s_option_entries[] =
 	{ SDLOPTION_VIDEODRIVER ";vd",           OSDOPTVAL_AUTO,  OPTION_STRING,        "sdl video driver to use ('x11', 'directfb', ... or 'auto' for SDL default" },
 	{ SDLOPTION_RENDERDRIVER ";rd",          OSDOPTVAL_AUTO,  OPTION_STRING,        "sdl render driver to use ('software', 'opengl', 'directfb' ... or 'auto' for SDL default" },
 	{ SDLOPTION_AUDIODRIVER ";ad",           OSDOPTVAL_AUTO,  OPTION_STRING,        "sdl audio driver to use ('alsa', 'arts', ... or 'auto' for SDL default" },
-#if USE_OPENGL
-	{ SDLOPTION_GL_LIB,                      SDLOPTVAL_GLLIB, OPTION_STRING,        "alternative libGL.so to use; 'auto' for system default" },
-#endif
 
 	// End of list
 	{ nullptr }
@@ -297,7 +293,6 @@ static void defines_verbose(void)
 	osd_printf_verbose("\n");
 	osd_printf_verbose("SDL/OpenGL defines: ");
 	osd_printf_verbose("SDL_COMPILEDVERSION=%d ", SDL_COMPILEDVERSION);
-	MACRO_VERBOSE(USE_OPENGL);
 	MACRO_VERBOSE(USE_DISPATCH_GL);
 	osd_printf_verbose("\n");
 	osd_printf_verbose("Compiler defines A: ");
@@ -372,9 +367,6 @@ static void osd_sdl_info(void)
 void sdl_osd_interface::video_register()
 {
 	video_options_add("soft", nullptr);
-#if USE_OPENGL
-	video_options_add("opengl", nullptr);
-#endif
 	video_options_add("bgfx", nullptr);
 	//video_options_add("auto", nullptr); // making d3d video default one
 }
@@ -447,20 +439,6 @@ void sdl_osd_interface::init(running_machine &machine)
 #endif
 			}
 		}
-
-	/* Set the SDL environment variable for drivers wanting to load the
-	 * lib at startup.
-	 */
-#if USE_OPENGL
-	/* FIXME: move lib loading code from drawogl.c here */
-
-	stemp = options().gl_lib();
-	if (stemp != nullptr && strcmp(stemp, OSDOPTVAL_AUTO) != 0)
-	{
-		osd_setenv("SDL_VIDEO_GL_DRIVER", stemp, 1);
-		osd_printf_verbose("Setting SDL_VIDEO_GL_DRIVER = '%s' ...\n", stemp);
-	}
-#endif
 
 	/* get number of processors */
 	stemp = options().numprocessors();

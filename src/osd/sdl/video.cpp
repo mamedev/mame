@@ -148,15 +148,6 @@ static void check_osd_inputs(running_machine &machine)
 		machine.ui().popup_time(1, "Keepaspect %s", video_config.keepaspect? "enabled":"disabled");
 	}
 
-	#if (USE_OPENGL)
-		//FIXME: on a per window basis
-		if (machine.ui_input().pressed(IPT_OSD_5))
-		{
-			video_config.filter = !video_config.filter;
-			machine.ui().popup_time(1, "Filter %s", video_config.filter? "enabled":"disabled");
-		}
-	#endif
-
 	if (machine.ui_input().pressed(IPT_OSD_6))
 		std::static_pointer_cast<sdl_window_info>(window)->modify_prescale(-1);
 
@@ -207,23 +198,13 @@ void sdl_osd_interface::extract_video_config()
 		stemp = "soft";
 #endif
 	}
-	if (strcmp(stemp, SDLOPTVAL_SOFT) == 0)
-		video_config.mode = VIDEO_MODE_SOFT;
-	else if (strcmp(stemp, OSDOPTVAL_NONE) == 0)
+	if (strcmp(stemp, OSDOPTVAL_NONE) == 0)
 	{
-		video_config.mode = VIDEO_MODE_SOFT;
+		video_config.mode = VIDEO_MODE_NONE;
 		video_config.novideo = 1;
 
 		if (!emulator_info::standalone() && options().seconds_to_run() == 0)
 			osd_printf_warning("Warning: -video none doesn't make much sense without -seconds_to_run\n");
-	}
-#if (USE_OPENGL)
-	else if (strcmp(stemp, SDLOPTVAL_OPENGL) == 0)
-		video_config.mode = VIDEO_MODE_OPENGL;
-#endif
-	else if ((strcmp(stemp, SDLOPTVAL_SDL2ACCEL) == 0))
-	{
-		video_config.mode = VIDEO_MODE_SDL2ACCEL;
 	}
 	else if (strcmp(stemp, SDLOPTVAL_BGFX) == 0)
 	{
@@ -231,8 +212,8 @@ void sdl_osd_interface::extract_video_config()
 	}
 	else
 	{
-		osd_printf_warning("Invalid video value %s; reverting to software\n", stemp);
-		video_config.mode = VIDEO_MODE_SOFT;
+		osd_printf_warning("Invalid video value %s; reverting to bgfx\n", stemp);
+		video_config.mode = VIDEO_MODE_BGFX;
 	}
 
 	video_config.switchres     = options().switch_res();
@@ -251,64 +232,6 @@ void sdl_osd_interface::extract_video_config()
 		osd_printf_warning("Invalid prescale option, reverting to '1'\n");
 		video_config.prescale = 1;
 	}
-	#if (USE_OPENGL)
-		// default to working video please
-		video_config.forcepow2texture = options().gl_force_pow2_texture();
-		video_config.allowtexturerect = !(options().gl_no_texture_rect());
-		video_config.vbo         = options().gl_vbo();
-		video_config.pbo         = options().gl_pbo();
-		video_config.glsl        = options().gl_glsl();
-		if ( video_config.glsl )
-		{
-			int i;
-
-			video_config.glsl_filter = options().glsl_filter();
-
-			video_config.glsl_shader_mamebm_num=0;
-
-			for(i=0; i<GLSL_SHADER_MAX; i++)
-			{
-				stemp = options().shader_mame(i);
-				if (stemp && strcmp(stemp, OSDOPTVAL_NONE) != 0 && strlen(stemp)>0)
-				{
-					video_config.glsl_shader_mamebm[i] = (char *) malloc(strlen(stemp)+1);
-					strcpy(video_config.glsl_shader_mamebm[i], stemp);
-					video_config.glsl_shader_mamebm_num++;
-				} else {
-					video_config.glsl_shader_mamebm[i] = nullptr;
-				}
-			}
-
-			video_config.glsl_shader_scrn_num=0;
-
-			for(i=0; i<GLSL_SHADER_MAX; i++)
-			{
-				stemp = options().shader_screen(i);
-				if (stemp && strcmp(stemp, OSDOPTVAL_NONE) != 0 && strlen(stemp)>0)
-				{
-					video_config.glsl_shader_scrn[i] = (char *) malloc(strlen(stemp)+1);
-					strcpy(video_config.glsl_shader_scrn[i], stemp);
-					video_config.glsl_shader_scrn_num++;
-				} else {
-					video_config.glsl_shader_scrn[i] = nullptr;
-				}
-			}
-		} else {
-			int i;
-			video_config.glsl_filter = 0;
-			video_config.glsl_shader_mamebm_num=0;
-			for(i=0; i<GLSL_SHADER_MAX; i++)
-			{
-				video_config.glsl_shader_mamebm[i] = nullptr;
-			}
-			video_config.glsl_shader_scrn_num=0;
-			for(i=0; i<GLSL_SHADER_MAX; i++)
-			{
-				video_config.glsl_shader_scrn[i] = nullptr;
-			}
-		}
-
-	#endif /* USE_OPENGL */
 	// misc options: sanity check values
 
 	// global options: sanity check values
@@ -316,19 +239,6 @@ void sdl_osd_interface::extract_video_config()
 	{
 		osd_printf_warning("Invalid numscreens value %d; reverting to 1\n", video_config.numscreens);
 		video_config.numscreens = 1;
-	}
-	// yuv settings ...
-	stemp = options().scale_mode();
-	video_config.scale_mode = drawsdl_scale_mode(stemp);
-	if (video_config.scale_mode < 0)
-	{
-		osd_printf_warning("Invalid yuvmode value %s; reverting to none\n", stemp);
-		video_config.scale_mode = VIDEO_SCALE_MODE_NONE;
-	}
-	if ( (video_config.mode != VIDEO_MODE_SOFT) && (video_config.scale_mode != VIDEO_SCALE_MODE_NONE) )
-	{
-		osd_printf_warning("scalemode is only for -video soft, overriding\n");
-		video_config.scale_mode = VIDEO_SCALE_MODE_NONE;
 	}
 }
 
