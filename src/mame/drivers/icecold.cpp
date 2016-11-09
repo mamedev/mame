@@ -66,8 +66,7 @@ static ADDRESS_MAP_START( icecold_map, AS_PROGRAM, 8, icecold_state )
 	AM_RANGE(0x4010, 0x4013) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
 	AM_RANGE(0x4020, 0x4023) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
 	AM_RANGE(0x4040, 0x4043) AM_DEVREADWRITE("pia2", pia6821_device, read, write)   // not used
-	AM_RANGE(0x4080, 0x4080) AM_DEVREADWRITE("i8279", i8279_device, data_r, data_w )
-	AM_RANGE(0x4081, 0x4081) AM_DEVREADWRITE("i8279", i8279_device, status_r, cmd_w)
+	AM_RANGE(0x4080, 0x4081) AM_DEVREADWRITE("i8279", i8279_device, read, write)
 	AM_RANGE(0x4100, 0x4100) AM_WRITE(motors_w)
 	AM_RANGE(0xa000, 0xffff) AM_ROM
 ADDRESS_MAP_END
