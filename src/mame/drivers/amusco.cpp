@@ -42,8 +42,8 @@
   The program code reads from and writes to what must be a line printer and a RTC
   (probably a MSM5832), though neither is present on the main board. The I/O write
   patterns also suggest that each or both of these devices are accessed through an
-  unknown interface chip or gate array (not i8255-compatible). The printer appears to
-  use non-Epson control codes: ETB, DLE, DC4, DC2, SO, EM, DC1 and STX.
+  Intel 8155 or compatible interface chip. The printer appears to use non-Epson
+  control codes: ETB, DLE, DC4, DC2, SO, EM, DC1 and STX.
 
 *****************************************************************************************
 
@@ -81,6 +81,7 @@
 #include "emu.h"
 #include "cpu/i86/i86.h"
 #include "video/mc6845.h"
+#include "machine/i8155.h"
 #include "machine/i8255.h"
 #include "sound/sn76496.h"
 #include "machine/pic8259.h"
@@ -116,10 +117,10 @@ public:
 	DECLARE_WRITE8_MEMBER(output_b_w);
 	DECLARE_WRITE8_MEMBER(output_c_w);
 	DECLARE_WRITE8_MEMBER(vram_w);
-	DECLARE_READ8_MEMBER(lpt_r);
-	DECLARE_WRITE8_MEMBER(lpt_w);
-	DECLARE_READ8_MEMBER(rtc_r);
-	DECLARE_WRITE8_MEMBER(rtc_w);
+	DECLARE_READ8_MEMBER(lpt_status_r);
+	DECLARE_WRITE8_MEMBER(lpt_data_w);
+	DECLARE_WRITE8_MEMBER(rtc_control_w);
+	DECLARE_WRITE8_MEMBER(rtc_data_w);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
 	MC6845_UPDATE_ROW(update_row);
 
@@ -255,63 +256,37 @@ WRITE8_MEMBER(amusco_state::vram_w)
 //  printf("%04x %04x\n",m_video_update_address,data);
 }
 
-READ8_MEMBER(amusco_state::lpt_r)
+READ8_MEMBER(amusco_state::lpt_status_r)
 {
-	switch (offset)
-	{
-		case 2:
-			// Bit 0 = busy
-			// Bit 1 = paper jam (inverted)
-			// Bit 3 = out of paper
-			// Bit 4 = low paper
-			return 2;
-
-		default:
-			logerror("Reading from printer port 28%dh\n", offset);
-			return 0;
-	}
+	// Bit 0 = busy
+	// Bit 1 = paper jam (active low)
+	// Bit 3 = out of paper
+	// Bit 4 = low paper
+	return 2;
 }
 
-WRITE8_MEMBER(amusco_state::lpt_w)
+WRITE8_MEMBER(amusco_state::lpt_data_w)
 {
-	logerror("Writing %02Xh to printer port 28%dh\n", data, offset);
+	logerror("Writing %02Xh to printer\n", data);
 }
 
-READ8_MEMBER(amusco_state::rtc_r)
+WRITE8_MEMBER(amusco_state::rtc_control_w)
 {
-	switch (offset)
-	{
-		case 3:
-			return m_rtc->data_r(space, 0);
+	m_rtc->address_w(data & 0x0f);
+	m_rtc->cs_w(BIT(data, 6));
+	m_rtc->hold_w(BIT(data, 6));
+	m_rtc->write_w(BIT(data, 5));
+	m_rtc->read_w(BIT(data, 4));
 
-		default:
-			logerror("Reading from RTC port 38%dh\n", offset);
-			return 0;
-	}
+	// TO DO: MSM5832 WR emulation is inaccurate
+ 	if (BIT(data, 5))
+		m_rtc->data_w(space, 0, m_rtc_data);
 }
 
-WRITE8_MEMBER(amusco_state::rtc_w)
+WRITE8_MEMBER(amusco_state::rtc_data_w)
 {
-	switch (offset)
-	{
-		case 1:
-			m_rtc->address_w(data & 0x0f);
-			m_rtc->cs_w(BIT(data, 6));
-			m_rtc->hold_w(BIT(data, 6));
-			m_rtc->write_w(BIT(data, 5));
-			if (BIT(data, 5))
-				m_rtc->data_w(space, 0, m_rtc_data);
-			m_rtc->read_w(BIT(data, 4));
-			break;
-
-		case 3:
-			m_rtc_data = data;
-			break;
-
-		default:
-			logerror("Writing %02Xh to RTC port 38%dh\n", data, offset);
-			break;
-	}
+	// TO DO: MSM5832 should be able to latch this value itself
+	m_rtc_data = data;
 }
 
 static ADDRESS_MAP_START( amusco_io_map, AS_IO, 8, amusco_state )
@@ -322,8 +297,8 @@ static ADDRESS_MAP_START( amusco_io_map, AS_IO, 8, amusco_state )
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE("ppi_inputs", i8255_device, read, write)
 	AM_RANGE(0x0060, 0x0060) AM_DEVWRITE("sn", sn76489a_device, write)
 	AM_RANGE(0x0070, 0x0071) AM_WRITE(vram_w)
-	AM_RANGE(0x0280, 0x0283) AM_READWRITE(lpt_r, lpt_w)
-	AM_RANGE(0x0380, 0x0383) AM_READWRITE(rtc_r, rtc_w)
+	AM_RANGE(0x0280, 0x0283) AM_DEVREADWRITE("lpt_interface", i8155_device, io_r, io_w)
+	AM_RANGE(0x0380, 0x0383) AM_DEVREADWRITE("rtc_interface", i8155_device, io_r, io_w)
 ADDRESS_MAP_END
 
 /* I/O byte R/W
@@ -441,7 +416,17 @@ static MACHINE_CONFIG_START( amusco, amusco_state )
 	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
 
+	MCFG_DEVICE_ADD("lpt_interface", I8155, 0)
+	MCFG_I8155_OUT_PORTA_CB(WRITE8(amusco_state, lpt_data_w))
+	MCFG_I8155_IN_PORTB_CB(READ8(amusco_state, lpt_status_r))
+	// Port C uses ALT 3 mode, which MAME does not currently emulate
+
 	MCFG_MSM5832_ADD("rtc", XTAL_32_768kHz)
+
+	MCFG_DEVICE_ADD("rtc_interface", I8155, 0)
+	MCFG_I8155_OUT_PORTA_CB(WRITE8(amusco_state, rtc_control_w))
+	MCFG_I8155_IN_PORTC_CB(DEVREAD8("rtc", msm5832_device, data_r))
+	MCFG_I8155_OUT_PORTC_CB(WRITE8(amusco_state, rtc_data_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
