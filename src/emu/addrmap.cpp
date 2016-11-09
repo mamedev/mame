@@ -365,24 +365,7 @@ address_map::address_map(const address_space &space, offs_t start, offs_t end, i
 		m_unmapval(space.unmap()),
 		m_globalmask(space.bytemask())
 {
-	address_map_entry *e;
-	switch(m_databits) {
-	case 8:
-		e = add(start, end);
-		break;
-	case 16:
-		e = add(start, end);
-		break;
-	case 32:
-		e = add(start, end);
-		break;
-	case 64:
-		e = add(start, end);
-		break;
-	default:
-		throw emu_fatalerror("Trying to dynamically map a device on a space with a corrupt databits width");
-	}
-	e->set_submap(DEVICE_SELF, submap_delegate, bits, unitmask);
+	add(start, end)->set_submap(DEVICE_SELF, submap_delegate, bits, unitmask);
 }
 
 
