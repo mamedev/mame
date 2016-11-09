@@ -145,122 +145,30 @@ public:
 	offs_t                  m_bytemirror;           // byte-adjusted mirror bits
 	offs_t                  m_bytemask;             // byte-adjusted mask bits
 
-protected:
-	// internal handler setters for 8-bit functions
-	void internal_set_handler(read8_delegate func, uint64_t mask);
-	void internal_set_handler(write8_delegate func, uint64_t mask);
-	void internal_set_handler(read8_delegate rfunc, write8_delegate wfunc, uint64_t mask);
+	// handler setters for 8-bit functions
+	void set_handler(read8_delegate func, uint64_t mask = 0);
+	void set_handler(write8_delegate func, uint64_t mask = 0);
+	void set_handler(read8_delegate rfunc, write8_delegate wfunc, uint64_t mask = 0);
 
-	// internal handler setters for 16-bit functions
-	void internal_set_handler(read16_delegate func, uint64_t mask);
-	void internal_set_handler(write16_delegate func, uint64_t mask);
-	void internal_set_handler(read16_delegate rfunc, write16_delegate wfunc, uint64_t mask);
+	// handler setters for 16-bit functions
+	void set_handler(read16_delegate func, uint64_t mask = 0);
+	void set_handler(write16_delegate func, uint64_t mask = 0);
+	void set_handler(read16_delegate rfunc, write16_delegate wfunc, uint64_t mask = 0);
 
-	// internal handler setters for 32-bit functions
-	void internal_set_handler(read32_delegate func, uint64_t mask);
-	void internal_set_handler(write32_delegate func, uint64_t mask);
-	void internal_set_handler(read32_delegate rfunc, write32_delegate wfunc, uint64_t mask);
+	// handler setters for 32-bit functions
+	void set_handler(read32_delegate func, uint64_t mask = 0);
+	void set_handler(write32_delegate func, uint64_t mask = 0);
+	void set_handler(read32_delegate rfunc, write32_delegate wfunc, uint64_t mask = 0);
 
-	// internal handler setters for 64-bit functions
-	void internal_set_handler(read64_delegate func, uint64_t mask);
-	void internal_set_handler(write64_delegate func, uint64_t mask);
-	void internal_set_handler(read64_delegate rfunc, write64_delegate wfunc, uint64_t mask);
+	// handler setters for 64-bit functions
+	void set_handler(read64_delegate func, uint64_t mask = 0);
+	void set_handler(write64_delegate func, uint64_t mask = 0);
+	void set_handler(read64_delegate rfunc, write64_delegate wfunc, uint64_t mask = 0);
 
 private:
 	// helper functions
 	bool unitmask_is_appropriate(uint8_t width, uint64_t unitmask, const char *string);
 };
-
-
-// ======================> address_map_entry8
-
-// 8-bit address map version of address_map_entry which only permits valid 8-bit handlers
-class address_map_entry8 : public address_map_entry
-{
-public:
-	address_map_entry8(device_t &device, address_map &map, offs_t start, offs_t end);
-
-	// native-size handlers
-	void set_handler(read8_delegate func) { internal_set_handler(func, 0); }
-	void set_handler(write8_delegate func) { internal_set_handler(func, 0); }
-	void set_handler(read8_delegate rfunc, write8_delegate wfunc) { internal_set_handler(rfunc, wfunc, 0); }
-};
-
-
-// ======================> address_map_entry16
-
-// 16-bit address map version of address_map_entry which only permits valid 16-bit handlers
-class address_map_entry16 : public address_map_entry
-{
-public:
-	address_map_entry16(device_t &device, address_map &map, offs_t start, offs_t end);
-
-	// native-size handlers
-	void set_handler(read16_delegate func) { internal_set_handler(func, 0); }
-	void set_handler(write16_delegate func) { internal_set_handler(func, 0); }
-	void set_handler(read16_delegate rfunc, write16_delegate wfunc) { internal_set_handler(rfunc, wfunc, 0); }
-
-	// 8-bit handlers
-	void set_handler(read8_delegate func, uint16_t mask) { internal_set_handler(func, mask); }
-	void set_handler(write8_delegate func, uint16_t mask) { internal_set_handler(func, mask); }
-	void set_handler(read8_delegate rfunc, write8_delegate wfunc, uint16_t mask) { internal_set_handler(rfunc, wfunc, mask); }
-};
-
-
-// ======================> address_map_entry32
-
-// 32-bit address map version of address_map_entry which only permits valid 32-bit handlers
-class address_map_entry32 : public address_map_entry
-{
-public:
-	address_map_entry32(device_t &device, address_map &map, offs_t start, offs_t end);
-
-	// native-size handlers
-	void set_handler(read32_delegate func) { internal_set_handler(func, 0); }
-	void set_handler(write32_delegate func) { internal_set_handler(func, 0); }
-	void set_handler(read32_delegate rfunc, write32_delegate wfunc) { internal_set_handler(rfunc, wfunc, 0); }
-
-	// 16-bit handlers
-	void set_handler(read16_delegate func, uint32_t mask) { internal_set_handler(func, mask); }
-	void set_handler(write16_delegate func, uint32_t mask) { internal_set_handler(func, mask); }
-	void set_handler(read16_delegate rfunc, write16_delegate wfunc, uint32_t mask) { internal_set_handler(rfunc, wfunc, mask); }
-
-	// 8-bit handlers
-	void set_handler(read8_delegate func, uint32_t mask) { internal_set_handler(func, mask); }
-	void set_handler(write8_delegate func, uint32_t mask) { internal_set_handler(func, mask); }
-	void set_handler(read8_delegate rfunc, write8_delegate wfunc, uint32_t mask) { internal_set_handler(rfunc, wfunc, mask); }
-};
-
-
-// ======================> address_map_entry64
-
-// 64-bit address map version of address_map_entry which only permits valid 64-bit handlers
-class address_map_entry64 : public address_map_entry
-{
-public:
-	address_map_entry64(device_t &device, address_map &map, offs_t start, offs_t end);
-
-	// native-size handlers
-	void set_handler(read64_delegate func) { internal_set_handler(func, 0); }
-	void set_handler(write64_delegate func) { internal_set_handler(func, 0); }
-	void set_handler(read64_delegate rfunc, write64_delegate wfunc) { internal_set_handler(rfunc, wfunc, 0); }
-
-	// 32-bit handlers
-	void set_handler(read32_delegate func, uint64_t mask) { internal_set_handler(func, mask); }
-	void set_handler(write32_delegate func, uint64_t mask) { internal_set_handler(func, mask); }
-	void set_handler(read32_delegate rfunc, write32_delegate wfunc, uint64_t mask) { internal_set_handler(rfunc, wfunc, mask); }
-
-	// 16-bit handlers
-	void set_handler(read16_delegate func, uint64_t mask) { internal_set_handler(func, mask); }
-	void set_handler(write16_delegate func, uint64_t mask) { internal_set_handler(func, mask); }
-	void set_handler(read16_delegate rfunc, write16_delegate wfunc, uint64_t mask) { internal_set_handler(rfunc, wfunc, mask); }
-
-	// 8-bit handlers
-	void set_handler(read8_delegate func, uint64_t mask) { internal_set_handler(func, mask); }
-	void set_handler(write8_delegate func, uint64_t mask) { internal_set_handler(func, mask); }
-	void set_handler(read8_delegate rfunc, write8_delegate wfunc, uint64_t mask) { internal_set_handler(rfunc, wfunc, mask); }
-};
-
 
 // ======================> address_map
 
@@ -282,10 +190,7 @@ public:
 	void set_unmap_value(uint8_t value) { m_unmapval = value; }
 
 	// add a new entry of the given type
-	address_map_entry8 *add(offs_t start, offs_t end, address_map_entry8 *ptr);
-	address_map_entry16 *add(offs_t start, offs_t end, address_map_entry16 *ptr);
-	address_map_entry32 *add(offs_t start, offs_t end, address_map_entry32 *ptr);
-	address_map_entry64 *add(offs_t start, offs_t end, address_map_entry64 *ptr);
+	address_map_entry *add(offs_t start, offs_t end);
 
 	// public data
 	address_spacenum        m_spacenum;         // space number of the map
@@ -315,7 +220,7 @@ void ADDRESS_MAP_NAME(_name)(address_map &map) \
 { \
 	typedef read##_bits##_delegate read_delegate ATTR_UNUSED; \
 	typedef write##_bits##_delegate write_delegate ATTR_UNUSED; \
-	address_map_entry##_bits *curentry = nullptr; \
+	address_map_entry *curentry = nullptr; \
 	(void)curentry; \
 	map.configure(_space, _bits); \
 	typedef _class drivdata_class ATTR_UNUSED;
@@ -324,7 +229,7 @@ void _class :: _name(::address_map &map) \
 { \
 	typedef read##_bits##_delegate read_delegate ATTR_UNUSED; \
 	typedef write##_bits##_delegate write_delegate ATTR_UNUSED; \
-	address_map_entry##_bits *curentry = nullptr; \
+	address_map_entry *curentry = nullptr; \
 	(void)curentry; \
 	map.configure(AS_PROGRAM, _bits);  \
 	typedef _class drivdata_class ATTR_UNUSED;
@@ -358,7 +263,7 @@ void _class :: _name(::address_map &map) \
 
 // address ranges
 #define AM_RANGE(_start, _end) \
-	curentry = map.add(_start, _end, curentry);
+	curentry = map.add(_start, _end);
 #define AM_MASK(_mask) \
 	curentry->set_mask(_mask);
 #define AM_MIRROR(_mirror) \
