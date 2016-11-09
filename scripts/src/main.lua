@@ -233,8 +233,12 @@ if (STANDALONE~=true) then
 	links {
 		ext_lib("lua"),
 		"lualibs",
+	}
+if (_OPTIONS["osd"] ~= "uwp") then
+	links {
 		"linenoise-ng",
 	}
+end
 end
 	links {
 		ext_lib("zlib"),
