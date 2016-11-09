@@ -2,7 +2,7 @@ local dat = {}
 local ver, info
 
 local datread = require("data/load_dat")
-datread, ver = datread.open("messinfo.dat", "#     MESSINFO.DAT")
+datread, ver = datread.open("messinfo.dat", "#     MESSINFO.DAT", function(str) return str:gsub("\n\n", "\n") end)
 
 function dat.check(set, softlist)
 	if softlist or not datread then
@@ -18,7 +18,6 @@ function dat.check(set, softlist)
 	if drvinfo then
 		info = info .. "\n\n--- DRIVER INFO ---\nDriver: " .. sourcefile .. "\n\n" .. drvinfo
 	end
-	info = info:gsub("\n\n", "\n")
 	return "Messinfo"
 end
 
