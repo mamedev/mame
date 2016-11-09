@@ -80,31 +80,31 @@ public:
 	address_map_entry *next() const { return m_next; }
 
 	// simple inline setters
-	void set_mirror(offs_t _mirror) { m_addrmirror = _mirror; }
-	void set_select(offs_t _select) { m_addrselect = _select; }
-	void set_read_type(map_handler_type _type) { m_read.m_type = _type; }
-	void set_write_type(map_handler_type _type) { m_write.m_type = _type; }
-	void set_region(const char *tag, offs_t offset) { m_region = tag; m_rgnoffs = offset; }
-	void set_share(const char *tag) { m_share = tag; }
+	address_map_entry *set_mirror(offs_t _mirror) { m_addrmirror = _mirror; return this; }
+	address_map_entry *set_select(offs_t _select) { m_addrselect = _select; return this; }
+	address_map_entry *set_read_type(map_handler_type _type) { m_read.m_type = _type; return this; }
+	address_map_entry *set_write_type(map_handler_type _type) { m_write.m_type = _type; return this; }
+	address_map_entry *set_region(const char *tag, offs_t offset) { m_region = tag; m_rgnoffs = offset; return this; }
+	address_map_entry *set_share(const char *tag) { m_share = tag; return this; }
 
 	// mask setting
-	void set_mask(offs_t _mask);
+	address_map_entry *set_mask(offs_t _mask);
 
 	// I/O port configuration
-	void set_read_port(const char *tag) { m_read.m_type = AMH_PORT; m_read.m_tag = tag; }
-	void set_write_port(const char *tag) { m_write.m_type = AMH_PORT; m_write.m_tag = tag; }
-	void set_readwrite_port(const char *tag) { set_read_port(tag); set_write_port(tag); }
+	address_map_entry *set_read_port(const char *tag) { m_read.m_type = AMH_PORT; m_read.m_tag = tag; return this; }
+	address_map_entry *set_write_port(const char *tag) { m_write.m_type = AMH_PORT; m_write.m_tag = tag; return this; }
+	address_map_entry *set_readwrite_port(const char *tag) { set_read_port(tag); set_write_port(tag); return this; }
 
 	// memory bank configuration
-	void set_read_bank(const char *tag) { m_read.m_type = AMH_BANK; m_read.m_tag = tag; }
-	void set_write_bank(const char *tag) { m_write.m_type = AMH_BANK; m_write.m_tag = tag; }
-	void set_readwrite_bank(const char *tag) { set_read_bank(tag); set_write_bank(tag); }
+	address_map_entry *set_read_bank(const char *tag) { m_read.m_type = AMH_BANK; m_read.m_tag = tag; return this; }
+	address_map_entry *set_write_bank(const char *tag) { m_write.m_type = AMH_BANK; m_write.m_tag = tag; return this; }
+	address_map_entry *set_readwrite_bank(const char *tag) { set_read_bank(tag); set_write_bank(tag); return this; }
 
 	// set offset handler (only one version, since there is no data width to consider)
-	void set_handler(setoffset_delegate func);
+	address_map_entry *set_handler(setoffset_delegate func);
 
 	// submap referencing
-	void set_submap(const char *tag, address_map_delegate func, int bits, uint64_t mask);
+	address_map_entry *set_submap(const char *tag, address_map_delegate func, int bits, uint64_t mask);
 
 	// public state
 	address_map_entry *     m_next;                 // pointer to the next entry
@@ -146,24 +146,24 @@ public:
 	offs_t                  m_bytemask;             // byte-adjusted mask bits
 
 	// handler setters for 8-bit functions
-	void set_handler(read8_delegate func, uint64_t mask = 0);
-	void set_handler(write8_delegate func, uint64_t mask = 0);
-	void set_handler(read8_delegate rfunc, write8_delegate wfunc, uint64_t mask = 0);
+	address_map_entry *set_handler(read8_delegate func, uint64_t mask = 0);
+	address_map_entry *set_handler(write8_delegate func, uint64_t mask = 0);
+	address_map_entry *set_handler(read8_delegate rfunc, write8_delegate wfunc, uint64_t mask = 0);
 
 	// handler setters for 16-bit functions
-	void set_handler(read16_delegate func, uint64_t mask = 0);
-	void set_handler(write16_delegate func, uint64_t mask = 0);
-	void set_handler(read16_delegate rfunc, write16_delegate wfunc, uint64_t mask = 0);
+	address_map_entry *set_handler(read16_delegate func, uint64_t mask = 0);
+	address_map_entry *set_handler(write16_delegate func, uint64_t mask = 0);
+	address_map_entry *set_handler(read16_delegate rfunc, write16_delegate wfunc, uint64_t mask = 0);
 
 	// handler setters for 32-bit functions
-	void set_handler(read32_delegate func, uint64_t mask = 0);
-	void set_handler(write32_delegate func, uint64_t mask = 0);
-	void set_handler(read32_delegate rfunc, write32_delegate wfunc, uint64_t mask = 0);
+	address_map_entry *set_handler(read32_delegate func, uint64_t mask = 0);
+	address_map_entry *set_handler(write32_delegate func, uint64_t mask = 0);
+	address_map_entry *set_handler(read32_delegate rfunc, write32_delegate wfunc, uint64_t mask = 0);
 
 	// handler setters for 64-bit functions
-	void set_handler(read64_delegate func, uint64_t mask = 0);
-	void set_handler(write64_delegate func, uint64_t mask = 0);
-	void set_handler(read64_delegate rfunc, write64_delegate wfunc, uint64_t mask = 0);
+	address_map_entry *set_handler(read64_delegate func, uint64_t mask = 0);
+	address_map_entry *set_handler(write64_delegate func, uint64_t mask = 0);
+	address_map_entry *set_handler(read64_delegate rfunc, write64_delegate wfunc, uint64_t mask = 0);
 
 private:
 	// helper functions

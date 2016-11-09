@@ -65,11 +65,12 @@ address_map_entry::address_map_entry(device_t &device, address_map &map, offs_t 
 //  set_mask - set the mask value
 //-------------------------------------------------
 
-void address_map_entry::set_mask(offs_t _mask)
+address_map_entry *address_map_entry::set_mask(offs_t _mask)
 {
 	m_addrmask = _mask;
 	if (m_map.m_globalmask != 0)
 		m_addrmask &= m_map.m_globalmask;
+	return this;
 }
 
 
@@ -78,7 +79,7 @@ void address_map_entry::set_mask(offs_t _mask)
 //  retrieve a submap from a device
 //-------------------------------------------------
 
-void address_map_entry::set_submap(const char *tag, address_map_delegate func, int bits, uint64_t mask)
+address_map_entry *address_map_entry::set_submap(const char *tag, address_map_delegate func, int bits, uint64_t mask)
 {
 	if(!bits)
 		bits = m_map.m_databits;
@@ -93,6 +94,7 @@ void address_map_entry::set_submap(const char *tag, address_map_delegate func, i
 	m_write.m_mask = mask;
 	m_submap_delegate = func;
 	m_submap_bits = bits;
+	return this;
 }
 
 
@@ -101,7 +103,7 @@ void address_map_entry::set_submap(const char *tag, address_map_delegate func, i
 //  8-bit read/write handlers
 //-------------------------------------------------
 
-void address_map_entry::set_handler(read8_delegate func, uint64_t unitmask)
+address_map_entry *address_map_entry::set_handler(read8_delegate func, uint64_t unitmask)
 {
 	assert(!func.isnull());
 	assert(unitmask_is_appropriate(8, unitmask, func.name()));
@@ -110,10 +112,11 @@ void address_map_entry::set_handler(read8_delegate func, uint64_t unitmask)
 	m_read.m_mask = unitmask;
 	m_read.m_name = func.name();
 	m_rproto8 = func;
+	return this;
 }
 
 
-void address_map_entry::set_handler(write8_delegate func, uint64_t unitmask)
+address_map_entry *address_map_entry::set_handler(write8_delegate func, uint64_t unitmask)
 {
 	assert(!func.isnull());
 	assert(unitmask_is_appropriate(8, unitmask, func.name()));
@@ -122,13 +125,15 @@ void address_map_entry::set_handler(write8_delegate func, uint64_t unitmask)
 	m_write.m_mask = unitmask;
 	m_write.m_name = func.name();
 	m_wproto8 = func;
+	return this;
 }
 
 
-void address_map_entry::set_handler(read8_delegate rfunc, write8_delegate wfunc, uint64_t unitmask)
+address_map_entry *address_map_entry::set_handler(read8_delegate rfunc, write8_delegate wfunc, uint64_t unitmask)
 {
 	set_handler(rfunc, unitmask);
 	set_handler(wfunc, unitmask);
+	return this;
 }
 
 
@@ -137,7 +142,7 @@ void address_map_entry::set_handler(read8_delegate rfunc, write8_delegate wfunc,
 //  16-bit read/write handlers
 //-------------------------------------------------
 
-void address_map_entry::set_handler(read16_delegate func, uint64_t unitmask)
+address_map_entry *address_map_entry::set_handler(read16_delegate func, uint64_t unitmask)
 {
 	assert(!func.isnull());
 	assert(unitmask_is_appropriate(16, unitmask, func.name()));
@@ -146,10 +151,11 @@ void address_map_entry::set_handler(read16_delegate func, uint64_t unitmask)
 	m_read.m_mask = unitmask;
 	m_read.m_name = func.name();
 	m_rproto16 = func;
+	return this;
 }
 
 
-void address_map_entry::set_handler(write16_delegate func, uint64_t unitmask)
+address_map_entry *address_map_entry::set_handler(write16_delegate func, uint64_t unitmask)
 {
 	assert(!func.isnull());
 	assert(unitmask_is_appropriate(16, unitmask, func.name()));
@@ -158,13 +164,15 @@ void address_map_entry::set_handler(write16_delegate func, uint64_t unitmask)
 	m_write.m_mask = unitmask;
 	m_write.m_name = func.name();
 	m_wproto16 = func;
+	return this;
 }
 
 
-void address_map_entry::set_handler(read16_delegate rfunc, write16_delegate wfunc, uint64_t unitmask)
+address_map_entry *address_map_entry::set_handler(read16_delegate rfunc, write16_delegate wfunc, uint64_t unitmask)
 {
 	set_handler(rfunc, unitmask);
 	set_handler(wfunc, unitmask);
+	return this;
 }
 
 
@@ -173,7 +181,7 @@ void address_map_entry::set_handler(read16_delegate rfunc, write16_delegate wfun
 //  32-bit read/write handlers
 //-------------------------------------------------
 
-void address_map_entry::set_handler(read32_delegate func, uint64_t unitmask)
+address_map_entry *address_map_entry::set_handler(read32_delegate func, uint64_t unitmask)
 {
 	assert(!func.isnull());
 	assert(unitmask_is_appropriate(32, unitmask, func.name()));
@@ -182,10 +190,11 @@ void address_map_entry::set_handler(read32_delegate func, uint64_t unitmask)
 	m_read.m_mask = unitmask;
 	m_read.m_name = func.name();
 	m_rproto32 = func;
+	return this;
 }
 
 
-void address_map_entry::set_handler(write32_delegate func, uint64_t unitmask)
+address_map_entry *address_map_entry::set_handler(write32_delegate func, uint64_t unitmask)
 {
 	assert(!func.isnull());
 	assert(unitmask_is_appropriate(32, unitmask, func.name()));
@@ -194,13 +203,15 @@ void address_map_entry::set_handler(write32_delegate func, uint64_t unitmask)
 	m_write.m_mask = unitmask;
 	m_write.m_name = func.name();
 	m_wproto32 = func;
+	return this;
 }
 
 
-void address_map_entry::set_handler(read32_delegate rfunc, write32_delegate wfunc, uint64_t unitmask)
+address_map_entry *address_map_entry::set_handler(read32_delegate rfunc, write32_delegate wfunc, uint64_t unitmask)
 {
 	set_handler(rfunc, unitmask);
 	set_handler(wfunc, unitmask);
+	return this;
 }
 
 
@@ -209,7 +220,7 @@ void address_map_entry::set_handler(read32_delegate rfunc, write32_delegate wfun
 //  64-bit read/write handlers
 //-------------------------------------------------
 
-void address_map_entry::set_handler(read64_delegate func, uint64_t unitmask)
+address_map_entry *address_map_entry::set_handler(read64_delegate func, uint64_t unitmask)
 {
 	assert(!func.isnull());
 	assert(unitmask_is_appropriate(64, unitmask, func.name()));
@@ -218,10 +229,11 @@ void address_map_entry::set_handler(read64_delegate func, uint64_t unitmask)
 	m_read.m_mask = 0;
 	m_read.m_name = func.name();
 	m_rproto64 = func;
+	return this;
 }
 
 
-void address_map_entry::set_handler(write64_delegate func, uint64_t unitmask)
+address_map_entry *address_map_entry::set_handler(write64_delegate func, uint64_t unitmask)
 {
 	assert(!func.isnull());
 	assert(unitmask_is_appropriate(64, unitmask, func.name()));
@@ -230,13 +242,15 @@ void address_map_entry::set_handler(write64_delegate func, uint64_t unitmask)
 	m_write.m_mask = 0;
 	m_write.m_name = func.name();
 	m_wproto64 = func;
+	return this;
 }
 
 
-void address_map_entry::set_handler(read64_delegate rfunc, write64_delegate wfunc, uint64_t unitmask)
+address_map_entry *address_map_entry::set_handler(read64_delegate rfunc, write64_delegate wfunc, uint64_t unitmask)
 {
 	set_handler(rfunc, unitmask);
 	set_handler(wfunc, unitmask);
+	return this;
 }
 
 
@@ -244,7 +258,7 @@ void address_map_entry::set_handler(read64_delegate rfunc, write64_delegate wfun
 //  set_handler - handler setter for setoffset
 //-------------------------------------------------
 
-void address_map_entry::set_handler(setoffset_delegate func)
+address_map_entry *address_map_entry::set_handler(setoffset_delegate func)
 {
 	assert(!func.isnull());
 	m_setoffsethd.m_type = AMH_DEVICE_DELEGATE;
@@ -252,6 +266,7 @@ void address_map_entry::set_handler(setoffset_delegate func)
 	m_setoffsethd.m_mask = 0;
 	m_setoffsethd.m_name = func.name();
 	m_soproto = func;
+	return this;
 }
 
 //-------------------------------------------------
