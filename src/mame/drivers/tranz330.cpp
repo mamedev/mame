@@ -23,38 +23,38 @@
 #include "includes/tranz330.h"
 #include "tranz330.lh"
 
-static void construct_address_map_tranz330_mem(address_map &map, device_t &device)
+static void construct_address_map_tranz330_mem(address_map &map)
 {
 	map.configure(AS_PROGRAM, 8);
 
 	address_map_entry8 *curentry = nullptr;
-	curentry = map.add(device, 0x0000, 0x7fff, curentry);
+	curentry = map.add(0x0000, 0x7fff, curentry);
 	curentry->set_read_type(AMH_ROM);
 
-	curentry = map.add(device, 0x8000, 0xffff, curentry);
+	curentry = map.add(0x8000, 0xffff, curentry);
 	curentry->set_read_type(AMH_RAM);
 	curentry->set_write_type(AMH_RAM);
 }
 
-static void construct_address_map_tranz330_io(address_map &map, device_t &device)
+static void construct_address_map_tranz330_io(address_map &map)
 {
 	map.configure(AS_IO, 8);
 	map.set_global_mask(0xff);
 
 	address_map_entry8 *curentry = nullptr;
-	curentry = map.add(device, 0x00, 0x03, curentry);
+	curentry = map.add(0x00, 0x03, curentry);
 	curentry->set_handler(read8_delegate(&z80pio_device::read_alt,  "z80pio_device::read_alt",  PIO_TAG, (z80pio_device *)nullptr),
 						 write8_delegate(&z80pio_device::write_alt, "z80pio_device::write_alt", PIO_TAG, (z80pio_device *)nullptr));
 
-	curentry = map.add(device, 0x10, 0x13, curentry);
+	curentry = map.add(0x10, 0x13, curentry);
 	curentry->set_handler(read8_delegate(&z80ctc_device::read,  "z80ctc_device::read",  CTC_TAG, (z80ctc_device *)nullptr),
 						 write8_delegate(&z80ctc_device::write, "z80ctc_device::write", CTC_TAG, (z80ctc_device *)nullptr));
 
-	curentry = map.add(device, 0x20, 0x23, curentry);
+	curentry = map.add(0x20, 0x23, curentry);
 	curentry->set_handler(read8_delegate(&z80dart_device::ba_cd_r, "z80dart_device::ba_cd_r", DART_TAG, (z80dart_device *)nullptr),
 						 write8_delegate(&z80dart_device::ba_cd_w, "z80dart_device::ba_cd_w", DART_TAG, (z80dart_device *)nullptr));
 
-	curentry = map.add(device, 0x30, 0x3f, curentry);
+	curentry = map.add(0x30, 0x3f, curentry);
 	curentry->set_handler(read8_delegate(&msm6242_device::read,  "msm6242_device::read",  RTC_TAG, (msm6242_device *)nullptr),
 						 write8_delegate(&msm6242_device::write, "msm6242_device::write", RTC_TAG, (msm6242_device *)nullptr));
 }

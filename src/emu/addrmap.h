@@ -282,20 +282,21 @@ public:
 	void set_unmap_value(uint8_t value) { m_unmapval = value; }
 
 	// add a new entry of the given type
-	address_map_entry8 *add(device_t &device, offs_t start, offs_t end, address_map_entry8 *ptr);
-	address_map_entry16 *add(device_t &device, offs_t start, offs_t end, address_map_entry16 *ptr);
-	address_map_entry32 *add(device_t &device, offs_t start, offs_t end, address_map_entry32 *ptr);
-	address_map_entry64 *add(device_t &device, offs_t start, offs_t end, address_map_entry64 *ptr);
+	address_map_entry8 *add(offs_t start, offs_t end, address_map_entry8 *ptr);
+	address_map_entry16 *add(offs_t start, offs_t end, address_map_entry16 *ptr);
+	address_map_entry32 *add(offs_t start, offs_t end, address_map_entry32 *ptr);
+	address_map_entry64 *add(offs_t start, offs_t end, address_map_entry64 *ptr);
 
 	// public data
 	address_spacenum        m_spacenum;         // space number of the map
+	device_t *              m_device;           // associated device
 	uint8_t                   m_databits;         // data bits represented by the map
 	uint8_t                   m_unmapval;         // unmapped memory value
 	offs_t                  m_globalmask;       // global mask
 	simple_list<address_map_entry> m_entrylist; // list of entries
 
-	void uplift_submaps(running_machine &machine, device_t &device, device_t &owner, endianness_t endian);
-	void map_validity_check(validity_checker &valid, const device_t &device, address_spacenum spacenum) const;
+	void uplift_submaps(running_machine &machine, device_t &owner, endianness_t endian);
+	void map_validity_check(validity_checker &valid, address_spacenum spacenum) const;
 };
 
 
@@ -310,7 +311,7 @@ public:
 #define ADDRESS_MAP_NAME(_name) construct_address_map_##_name
 
 #define ADDRESS_MAP_START(_name, _space, _bits, _class) \
-void ADDRESS_MAP_NAME(_name)(address_map &map, device_t &device) \
+void ADDRESS_MAP_NAME(_name)(address_map &map) \
 { \
 	typedef read##_bits##_delegate read_delegate ATTR_UNUSED; \
 	typedef write##_bits##_delegate write_delegate ATTR_UNUSED; \
@@ -319,7 +320,7 @@ void ADDRESS_MAP_NAME(_name)(address_map &map, device_t &device) \
 	map.configure(_space, _bits); \
 	typedef _class drivdata_class ATTR_UNUSED;
 #define DEVICE_ADDRESS_MAP_START(_name, _bits, _class) \
-void _class :: _name(::address_map &map, device_t &device) \
+void _class :: _name(::address_map &map) \
 { \
 	typedef read##_bits##_delegate read_delegate ATTR_UNUSED; \
 	typedef write##_bits##_delegate write_delegate ATTR_UNUSED; \
@@ -332,12 +333,12 @@ void _class :: _name(::address_map &map, device_t &device) \
 
 // use this to declare external references to an address map
 #define ADDRESS_MAP_EXTERN(_name, _bits) \
-	extern void ADDRESS_MAP_NAME(_name)(address_map &map, device_t &device)
+	extern void ADDRESS_MAP_NAME(_name)(address_map &map)
 
 // use this to declare an address map as a member of a modern device class
 // need to qualify with :: to avoid a collision with descendants of device_memory_interface
 #define DECLARE_ADDRESS_MAP(_name, _bits) \
-	void _name(::address_map &map, device_t &device)
+	void _name(::address_map &map)
 
 
 // global controls
@@ -350,14 +351,14 @@ void _class :: _name(::address_map &map, device_t &device) \
 
 // importing data from other address maps
 #define AM_IMPORT_FROM(_name) \
-	ADDRESS_MAP_NAME(_name)(map, device);
+	ADDRESS_MAP_NAME(_name)(map);
 // importing data from inherited address maps
 #define AM_INHERIT_FROM(_name) \
-	_name(map, device);
+	_name(map);
 
 // address ranges
 #define AM_RANGE(_start, _end) \
-	curentry = map.add(device, _start, _end, curentry);
+	curentry = map.add(_start, _end, curentry);
 #define AM_MASK(_mask) \
 	curentry->set_mask(_mask);
 #define AM_MIRROR(_mirror) \

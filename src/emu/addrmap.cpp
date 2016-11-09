@@ -342,36 +342,41 @@ address_map_entry64::address_map_entry64(device_t &device, address_map &map, off
 
 address_map::address_map(device_t &device, address_spacenum spacenum)
 	: m_spacenum(spacenum),
+	    m_device(&device),
 		m_databits(0xff),
 		m_unmapval(0),
 		m_globalmask(0)
 {
 	// get our memory interface
 	const device_memory_interface *memintf;
-	if (!device.interface(memintf))
-		throw emu_fatalerror("No memory interface defined for device '%s'\n", device.tag());
+	if (!m_device->interface(memintf))
+		throw emu_fatalerror("No memory interface defined for device '%s'\n", m_device->tag());
 
 	// and then the configuration for the current address space
 	const address_space_config *spaceconfig = memintf->space_config(spacenum);
 	if (spaceconfig == nullptr)
-		throw emu_fatalerror("No memory address space configuration found for device '%s', space %d\n", device.tag(), spacenum);
+		throw emu_fatalerror("No memory address space configuration found for device '%s', space %d\n", m_device->tag(), spacenum);
 
 	// construct the internal device map (first so it takes priority)
 	if (spaceconfig->m_internal_map != nullptr)
-		(*spaceconfig->m_internal_map)(*this, device);
+		(*spaceconfig->m_internal_map)(*this);
 	if (!spaceconfig->m_internal_map_delegate.isnull())
-		spaceconfig->m_internal_map_delegate(*this, device);
+		spaceconfig->m_internal_map_delegate(*this);
 
 	// append the map provided by the owner
 	if (memintf->address_map(spacenum) != nullptr)
-		(*memintf->address_map(spacenum))(*this, *device.owner());
+	{
+		m_device = device.owner();
+		(*memintf->address_map(spacenum))(*this);
+		m_device = &device;
+	}
 	else
 	{
 		// if the owner didn't provide a map, use the default device map
 		if (spaceconfig->m_default_map != nullptr)
-			(*spaceconfig->m_default_map)(*this, device);
+			(*spaceconfig->m_default_map)(*this);
 		if (!spaceconfig->m_default_map_delegate.isnull())
-			spaceconfig->m_default_map_delegate(*this, device);
+			spaceconfig->m_default_map_delegate(*this);
 	}
 }
 
@@ -383,13 +388,14 @@ address_map::address_map(device_t &device, address_spacenum spacenum)
 
 address_map::address_map(device_t &device, address_map_entry *entry)
 	: m_spacenum(AS_PROGRAM),
+	    m_device(&device),
 		m_databits(0xff),
 		m_unmapval(0),
 		m_globalmask(0)
 {
 	// Retrieve the submap
-	entry->m_submap_delegate.late_bind(device);
-	entry->m_submap_delegate(*this, device);
+	entry->m_submap_delegate.late_bind(*m_device);
+	entry->m_submap_delegate(*this);
 }
 
 
@@ -400,6 +406,7 @@ address_map::address_map(device_t &device, address_map_entry *entry)
 
 address_map::address_map(const address_space &space, offs_t start, offs_t end, int bits, uint64_t unitmask, device_t &device, address_map_delegate submap_delegate)
 	: m_spacenum(space.spacenum()),
+	    m_device(&device),
 		m_databits(space.data_width()),
 		m_unmapval(space.unmap()),
 		m_globalmask(space.bytemask())
@@ -407,16 +414,16 @@ address_map::address_map(const address_space &space, offs_t start, offs_t end, i
 	address_map_entry *e;
 	switch(m_databits) {
 	case 8:
-		e = add(device, start, end, (address_map_entry8 *)nullptr);
+		e = add(start, end, (address_map_entry8 *)nullptr);
 		break;
 	case 16:
-		e = add(device, start, end, (address_map_entry16 *)nullptr);
+		e = add(start, end, (address_map_entry16 *)nullptr);
 		break;
 	case 32:
-		e = add(device, start, end, (address_map_entry32 *)nullptr);
+		e = add(start, end, (address_map_entry32 *)nullptr);
 		break;
 	case 64:
-		e = add(device, start, end, (address_map_entry64 *)nullptr);
+		e = add(start, end, (address_map_entry64 *)nullptr);
 		break;
 	default:
 		throw emu_fatalerror("Trying to dynamically map a device on a space with a corrupt databits width");
@@ -468,33 +475,33 @@ void address_map::set_global_mask(offs_t mask)
 //  add - add a new entry of the appropriate type
 //-------------------------------------------------
 
-address_map_entry8 *address_map::add(device_t &device, offs_t start, offs_t end, address_map_entry8 *ptr)
+address_map_entry8 *address_map::add(offs_t start, offs_t end, address_map_entry8 *ptr)
 {
-	ptr = global_alloc(address_map_entry8(device, *this, start, end));
+	ptr = global_alloc(address_map_entry8(*m_device, *this, start, end));
 	m_entrylist.append(*ptr);
 	return ptr;
 }
 
 
-address_map_entry16 *address_map::add(device_t &device, offs_t start, offs_t end, address_map_entry16 *ptr)
+address_map_entry16 *address_map::add(offs_t start, offs_t end, address_map_entry16 *ptr)
 {
-	ptr = global_alloc(address_map_entry16(device, *this, start, end));
+	ptr = global_alloc(address_map_entry16(*m_device, *this, start, end));
 	m_entrylist.append(*ptr);
 	return ptr;
 }
 
 
-address_map_entry32 *address_map::add(device_t &device, offs_t start, offs_t end, address_map_entry32 *ptr)
+address_map_entry32 *address_map::add(offs_t start, offs_t end, address_map_entry32 *ptr)
 {
-	ptr = global_alloc(address_map_entry32(device, *this, start, end));
+	ptr = global_alloc(address_map_entry32(*m_device, *this, start, end));
 	m_entrylist.append(*ptr);
 	return ptr;
 }
 
 
-address_map_entry64 *address_map::add(device_t &device, offs_t start, offs_t end, address_map_entry64 *ptr)
+address_map_entry64 *address_map::add(offs_t start, offs_t end, address_map_entry64 *ptr)
 {
-	ptr = global_alloc(address_map_entry64(device, *this, start, end));
+	ptr = global_alloc(address_map_entry64(*m_device, *this, start, end));
 	m_entrylist.append(*ptr);
 	return ptr;
 }
@@ -504,7 +511,7 @@ address_map_entry64 *address_map::add(device_t &device, offs_t start, offs_t end
 //  uplift_submaps - propagate in the device submaps
 //-------------------------------------------------
 
-void address_map::uplift_submaps(running_machine &machine, device_t &device, device_t &owner, endianness_t endian)
+void address_map::uplift_submaps(running_machine &machine, device_t &owner, endianness_t endian)
 {
 	address_map_entry *prev = nullptr;
 	address_map_entry *entry = m_entrylist.first();
@@ -515,13 +522,13 @@ void address_map::uplift_submaps(running_machine &machine, device_t &device, dev
 			std::string tag = owner.subtag(entry->m_read.m_tag);
 			device_t *mapdevice = machine.device(tag.c_str());
 			if (mapdevice == nullptr) {
-				throw emu_fatalerror("Attempted to submap a non-existent device '%s' in space %d of device '%s'\n", tag.c_str(), m_spacenum, device.basetag());
+				throw emu_fatalerror("Attempted to submap a non-existent device '%s' in space %d of device '%s'\n", tag.c_str(), m_spacenum, m_device->basetag());
 			}
 			// Grab the submap
 			address_map submap(*mapdevice, entry);
 
 			// Recursively uplift it if needed
-			submap.uplift_submaps(machine, device, *mapdevice, endian);
+			submap.uplift_submaps(machine, *mapdevice, endian);
 
 			// Compute the unit repartition characteristics
 			int entry_bits = entry->m_submap_bits;
@@ -645,10 +652,10 @@ void address_map::uplift_submaps(running_machine &machine, device_t &device, dev
 //  one of the device's address maps
 //-------------------------------------------------
 
-void address_map::map_validity_check(validity_checker &valid, const device_t &device, address_spacenum spacenum) const
+void address_map::map_validity_check(validity_checker &valid, address_spacenum spacenum) const
 {
 	// it's safe to assume here that the device has a memory interface and a config for this space
-	const address_space_config &spaceconfig = *device.memory().space_config(spacenum);
+	const address_space_config &spaceconfig = *m_device->memory().space_config(spacenum);
 	int datawidth = spaceconfig.m_databus_width;
 	int alignunit = datawidth / 8;
 
@@ -721,7 +728,7 @@ void address_map::map_validity_check(validity_checker &valid, const device_t &de
 		// if this is a program space, auto-assign implicit ROM entries
 		if (entry.m_read.m_type == AMH_ROM && entry.m_region == nullptr)
 		{
-			entry.m_region = device.tag();
+			entry.m_region = m_device->tag();
 			entry.m_rgnoffs = entry.m_addrstart;
 		}
 
@@ -733,7 +740,7 @@ void address_map::map_validity_check(validity_checker &valid, const device_t &de
 			std::string entry_region = entry.m_devbase.subtag(entry.m_region);
 
 			// look for the region
-			for (device_t &dev : device_iterator(device.mconfig().root_device()))
+			for (device_t &dev : device_iterator(m_device->mconfig().root_device()))
 				for (const rom_entry *romp = rom_first_region(dev); romp != nullptr && !found; romp = rom_next_region(romp))
 				{
 					if (rom_region_name(dev, romp) == entry_region)
