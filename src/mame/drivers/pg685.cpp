@@ -69,7 +69,7 @@ CPU/Video:      16KB BIOS/CHAR EPROM, NEC V20 CPU, SAB 8259AP, 12.288 MHz crysta
                 HD46505SP-1 (HD68A45SP), D8279C-2, D8251AFC
 Module/Floppy:  2xP8255A, 4xHM6116LP-3, D8251AFC, 4.000000 MHz crystal, SAB 1797-02P, MM58167AN
 HD:             4xD4016C, WD1010A-AL, 10,000000 MHz crystal
-Memory:         27xTMS27C256-15
+Memory:         27xTMS27C256-15, 9 empty sockets, 36 unsoldered pads
 
 
 6ES5685-OUA12
@@ -89,6 +89,17 @@ CPU/Mem.:       iR80286-10 CPU, N82C288, 19,660800 MHz crystal, 2x16KB EPROM (BI
                 RAM daughterbd:    4x514256-10
 Module/Floppy:  2xi8255A, 4xHM6116LP-3, D8251AFC, 4.000000 MHz crystal, SAB 1797-02P, MM58167AN
 HD:             SRM2064C-15, WD2010B-AL, 10,000000 MHz crystal
+
+
+6ES5675-OUA11
+
+The PG-675 shares the housing with the PG-685, but uses dual 48 tpi floppy drives instead of the harddisk/96 tpi 
+drive combo.
+
+CPU/Video:		8KB BIOS/CHAR EPROM, Intel 8088 CPU, SAB 8259AP, 12,288 MHz crystal, 2xHM6116LP-3,
+				HD46505SP-1 (HD68A45SP), D8279C-5, D8251AFC
+Module/Floppy:	Crystal 4.000 MHz, SAB 1797-02P, 2xP8255A, MM58167AN, 4xHM6116LP-3, D8251AFC
+Memory: 		54x 64KBit RAM, 18 empty sockets, 9 bit and 4 bit wire straps
 
 ****************************************************************************/
 
