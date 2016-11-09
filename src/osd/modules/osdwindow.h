@@ -144,7 +144,7 @@ public:
 	HDC                     m_dc;       // only used by GDI renderer!
 
 	int                     m_resize_state;
-#elif OSD_UWP
+#elif defined(OSD_UWP)
 	virtual bool win_has_menu() = 0;
 	Platform::Agile<Windows::UI::Core::CoreWindow^>	m_window;
 #endif
