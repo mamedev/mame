@@ -1274,12 +1274,12 @@ void rainbow_state::lower_8088_irq(int ref)
 // IRQ service for 7201 (commm / printer)
 void rainbow_state::update_mpsc_irq()
 {
-	if (m_mpsc_irq == 0)
-		lower_8088_irq(IRQ_COMM_PTR_INTR_L);
-	else
-		raise_8088_irq(IRQ_COMM_PTR_INTR_L);
+    if (m_mpsc_irq == 0) {
+        lower_8088_irq(IRQ_COMM_PTR_INTR_L);
+        m_mpsc->m1_r();  // interrupt acknowledge
+    } else
+        raise_8088_irq(IRQ_COMM_PTR_INTR_L);
 
-	m_mpsc->m1_r(); // interrupt acknowledge
 }
 
 WRITE_LINE_MEMBER(rainbow_state::mpsc_irq)

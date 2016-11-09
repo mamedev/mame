@@ -21,4 +21,8 @@ This function serves the purpose of ensuring that an object is pushed -- if poss
 	lua.script("for k, v in ipairs(my_table) do print(k, v) assert(k == v) end");
 	
 
-Note that any caveats with Lua tables apply the moment it is serialized, and the data cannot be gotten out back out in C++ as a vector without explicitly using the ``as_table_t`` marker for your get and conversion operations using Sol.
+Note that any caveats with Lua tables apply the moment it is serialized, and the data cannot be gotten out back out in C++ as a C++ type without explicitly using the ``as_table_t`` marker for your get and conversion operations using Sol.
+
+If you need this functionality with a member variable, use a :doc:`property on a getter function<property>` that returns the result of ``sol::as_table``.
+
+This marker does NOT apply to :doc:`usertypes<usertype>`.

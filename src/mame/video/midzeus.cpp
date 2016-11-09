@@ -292,7 +292,7 @@ VIDEO_START_MEMBER(midzeus_state,midzeus)
 	poly = auto_alloc(machine(), midzeus_renderer(*this));
 
 	/* we need to cleanup on exit */
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(midzeus_state::exit_handler), this));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&midzeus_state::exit_handler, this));
 
 	yoffs = 0;
 	texel_width = 256;
@@ -1269,14 +1269,14 @@ void midzeus_renderer::zeus_draw_quad(int long_fmt, const uint32_t *databuffer, 
 	//       a poly_render_quad_fan.  It appears as though the new code defaults to a fan if
 	//       the template argument is 4, but keep an eye out for missing quads.
 	poly->render_polygon<4>(zeus_cliprect,
-							render_delegate(FUNC(midzeus_renderer::render_poly), this),
+							render_delegate(&midzeus_renderer::render_poly, this),
 							4,
 							clipvert);
 }
 
 void midzeus_renderer::zeus_draw_debug_quad(const rectangle& rect, const vertex_t *vert)
 {
-	poly->render_polygon<4>(rect, render_delegate(FUNC(midzeus_renderer::render_poly_solid_fixedz), this), 0, vert);
+	poly->render_polygon<4>(rect, render_delegate(&midzeus_renderer::render_poly_solid_fixedz, this), 0, vert);
 }
 
 

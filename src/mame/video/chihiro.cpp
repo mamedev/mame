@@ -2900,13 +2900,13 @@ int nv2a_renderer::geforce_exec_method(address_space & space, uint32_t chanel, u
 		primitive_type = (NV2A_BEGIN_END)data;
 		if (data != 0) {
 			if (((channel[chanel][subchannel].object.method[0x1e60 / 4] & 7) > 0) && (combiner.used != 0)) {
-				render_spans_callback = render_delegate(FUNC(nv2a_renderer::render_register_combiners), this);
+				render_spans_callback = render_delegate(&nv2a_renderer::render_register_combiners, this);
 			}
 			else if (texture[0].enabled) {
-				render_spans_callback = render_delegate(FUNC(nv2a_renderer::render_texture_simple), this);
+				render_spans_callback = render_delegate(&nv2a_renderer::render_texture_simple, this);
 			}
 			else
-				render_spans_callback = render_delegate(FUNC(nv2a_renderer::render_color), this);
+				render_spans_callback = render_delegate(&nv2a_renderer::render_color, this);
 		}
 		countlen--;
 	}

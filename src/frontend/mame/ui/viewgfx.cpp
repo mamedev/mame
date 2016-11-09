@@ -140,7 +140,7 @@ void ui_gfx_init(running_machine &machine)
 	uint8_t rotate = machine.system().flags & ORIENTATION_MASK;
 
 	// make sure we clean up after ourselves
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(ui_gfx_exit), &machine));
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&ui_gfx_exit, &machine));
 
 	// initialize our global state
 	memset(state, 0, sizeof(*state));

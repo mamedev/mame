@@ -269,7 +269,7 @@ ui_manager* mame_machine_manager::create_ui(running_machine& machine)
 	m_ui = std::make_unique<mame_ui_manager>(machine);
 	m_ui->init();
 
-	machine.add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(mame_machine_manager::reset), this));
+	machine.add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(&mame_machine_manager::reset, this));
 
 	m_ui->set_startup_text("Initializing...", true);
 
@@ -326,6 +326,7 @@ void emulator_info::draw_user_interface(running_machine& machine)
 
 void emulator_info::periodic_check()
 {
+	return mame_machine_manager::instance()->lua()->on_periodic();
 }
 
 bool emulator_info::frame_hook()

@@ -542,8 +542,8 @@ drcbe_x86::drcbe_x86(drcuml_state &drcuml, device_t &device, drc_cache &cache, u
 		m_hashstacksave(nullptr),
 		m_reslo(0),
 		m_reshi(0),
-		m_fixup_label(FUNC(drcbe_x86::fixup_label), this),
-		m_fixup_exception(FUNC(drcbe_x86::fixup_exception), this)
+		m_fixup_label(&drcbe_x86::fixup_label, this),
+		m_fixup_exception(&drcbe_x86::fixup_exception, this)
 {
 	// compute hi pointers for each register
 	for (int regnum = 0; regnum < ARRAY_LENGTH(int_register_map); regnum++)

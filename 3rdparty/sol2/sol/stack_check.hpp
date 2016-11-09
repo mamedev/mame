@@ -34,7 +34,7 @@ namespace sol {
 		namespace stack_detail {
 			template <typename T, bool poptable = true>
 			inline bool check_metatable(lua_State* L, int index = -2) {
-				const auto& metakey = usertype_traits<T>::metatable;
+				const auto& metakey = usertype_traits<T>::metatable();
 				luaL_getmetatable(L, &metakey[0]);
 				const type expectedmetatabletype = static_cast<type>(lua_type(L, -1));
 				if (expectedmetatabletype != type::nil) {
@@ -72,6 +72,34 @@ namespace sol {
 				if (!success) {
 					// expected type, actual type
 					handler(L, index, expected, indextype);
+				}
+				return success;
+			}
+		};
+
+		template<typename T>
+		struct checker<T, type::number, std::enable_if_t<std::is_integral<T>::value>> {
+			template <typename Handler>
+			static bool check(lua_State* L, int index, Handler&& handler, record& tracking) {
+				tracking.use(1);
+				bool success = lua_isinteger(L, index) == 1;
+				if (!success) {
+					// expected type, actual type
+					handler(L, index, type::number, type_of(L, index));
+				}
+				return success;
+			}
+		};
+
+		template<typename T>
+		struct checker<T, type::number, std::enable_if_t<std::is_floating_point<T>::value>> {
+			template <typename Handler>
+			static bool check(lua_State* L, int index, Handler&& handler, record& tracking) {
+				tracking.use(1);
+				bool success = lua_isnumber(L, index) == 1;
+				if (!success) {
+					// expected type, actual type
+					handler(L, index, type::number, type_of(L, index));
 				}
 				return success;
 			}
@@ -239,21 +267,7 @@ namespace sol {
 		};
 
 		template <typename T, typename C>
-		struct checker<T*, type::userdata, C> {
-			template <typename Handler>
-			static bool check(lua_State* L, int index, Handler&& handler, record& tracking) {
-				const type indextype = type_of(L, index);
-				// Allow nil to be transformed to nullptr
-				if (indextype == type::nil) {
-					tracking.use(1);
-					return true;
-				}
-				return checker<meta::unqualified_t<T>, type::userdata, C>{}.check(types<meta::unqualified_t<T>>(), L, indextype, index, std::forward<Handler>(handler), tracking);
-			}
-		};
-
-		template <typename T, typename C>
-		struct checker<T, type::userdata, C> {
+		struct checker<detail::as_value_tag<T>, type::userdata, C> {
 			template <typename U, typename Handler>
 			static bool check(types<U>, lua_State* L, type indextype, int index, Handler&& handler, record& tracking) {
 				tracking.use(1);
@@ -292,11 +306,28 @@ namespace sol {
 				lua_pop(L, 1);
 				return true;
 			}
+		};
 
+		template <typename T, typename C>
+		struct checker<T, type::userdata, C> {
 			template <typename Handler>
 			static bool check(lua_State* L, int index, Handler&& handler, record& tracking) {
 				const type indextype = type_of(L, index);
-				return check(types<T>(), L, indextype, index, std::forward<Handler>(handler), tracking);
+				return checker<detail::as_value_tag<T>, type::userdata, C>{}.check(types<T>(), L, indextype, index, std::forward<Handler>(handler), tracking);
+			}
+		};
+
+		template <typename T, typename C>
+		struct checker<T*, type::userdata, C> {
+			template <typename Handler>
+			static bool check(lua_State* L, int index, Handler&& handler, record& tracking) {
+				const type indextype = type_of(L, index);
+				// Allow nil to be transformed to nullptr
+				if (indextype == type::nil) {
+					tracking.use(1);
+					return true;
+				}
+				return checker<meta::unqualified_t<T>, type::userdata, C>{}.check(L, index, std::forward<Handler>(handler), tracking);
 			}
 		};
 

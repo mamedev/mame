@@ -538,7 +538,7 @@ void sega_315_5195_mapper_device::device_start()
 	fd1094_device *fd1094 = dynamic_cast<fd1094_device *>(m_cpu.target());
 	if (fd1094 != nullptr)
 	{
-		fd1094->notify_state_change(fd1094_device::state_change_delegate(FUNC(sega_315_5195_mapper_device::fd1094_state_change), this));
+		fd1094->notify_state_change(fd1094_device::state_change_delegate(&sega_315_5195_mapper_device::fd1094_state_change, this));
 		for (auto & elem : m_banks)
 			elem.set_decrypt(fd1094);
 	}

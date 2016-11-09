@@ -162,13 +162,13 @@ void m68307cpu_device::init16_m68307(address_space &space)
 	m_direct = &space.direct();
 	opcode_xor = 0;
 
-	readimm16 = m68k_readimm16_delegate(FUNC(m68307cpu_device::simple_read_immediate_16_m68307), this);
-	read8 = m68k_read8_delegate(FUNC(m68307cpu_device::read_byte_m68307), this);
-	read16 = m68k_read16_delegate(FUNC(m68307cpu_device::read_word_m68307), this);
-	read32 = m68k_read32_delegate(FUNC(m68307cpu_device::read_dword_m68307), this);
-	write8 = m68k_write8_delegate(FUNC(m68307cpu_device::write_byte_m68307), this);
-	write16 = m68k_write16_delegate(FUNC(m68307cpu_device::write_word_m68307), this);
-	write32 = m68k_write32_delegate(FUNC(m68307cpu_device::write_dword_m68307), this);
+	readimm16 = m68k_readimm16_delegate(&m68307cpu_device::simple_read_immediate_16_m68307, this);
+	read8 = m68k_read8_delegate(&m68307cpu_device::read_byte_m68307, this);
+	read16 = m68k_read16_delegate(&m68307cpu_device::read_word_m68307, this);
+	read32 = m68k_read32_delegate(&m68307cpu_device::read_dword_m68307, this);
+	write8 = m68k_write8_delegate(&m68307cpu_device::write_byte_m68307, this);
+	write16 = m68k_write16_delegate(&m68307cpu_device::write_word_m68307, this);
+	write32 = m68k_write32_delegate(&m68307cpu_device::write_dword_m68307, this);
 }
 
 

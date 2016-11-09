@@ -641,7 +641,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED_CLASS( ldv1000, ldplayer_ntsc, ldv1000_state )
 	MCFG_LASERDISC_LDV1000_ADD("laserdisc")
-	MCFG_LASERDISC_GET_DISC(laserdisc_get_disc_delegate(FUNC(ldplayer_state::get_disc_static), device))
+	MCFG_LASERDISC_GET_DISC(laserdisc_get_disc_delegate(&ldplayer_state::get_disc_static, device))
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -653,7 +653,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED_CLASS( pr8210, ldplayer_ntsc, pr8210_state )
 	MCFG_LASERDISC_PR8210_ADD("laserdisc")
-	MCFG_LASERDISC_GET_DISC(laserdisc_get_disc_delegate(FUNC(ldplayer_state::get_disc_static), device))
+	MCFG_LASERDISC_GET_DISC(laserdisc_get_disc_delegate(&ldplayer_state::get_disc_static, device))
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

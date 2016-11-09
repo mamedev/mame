@@ -269,8 +269,8 @@ void debug_qt::init_debugger(running_machine &machine)
 	m_machine = &machine;
 	// Setup the configuration XML saving and loading
 	machine.configuration().config_register("debugger",
-					config_saveload_delegate(FUNC(xml_configuration_load), &machine),
-					config_saveload_delegate(FUNC(xml_configuration_save), &machine));
+					config_saveload_delegate(&xml_configuration_load, &machine),
+					config_saveload_delegate(&xml_configuration_save, &machine));
 }
 
 

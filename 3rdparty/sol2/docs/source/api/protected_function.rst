@@ -183,3 +183,5 @@ The error-handler that is called should a runtime error that Lua can detect occu
 .. note::
 
 	``protected_function_result`` safely pops its values off the stack when its destructor is called, keeping track of the index and number of arguments that were supposed to be returned. If you remove items below it using ``lua_remove``, for example, it will not behave as expected. Please do not perform fundamentally stack-rearranging operations until the destructor is called (pushing/popping above it is just fine).
+
+To know more about how function arguments are handled, see :ref:`this note<function-argument-handling>`.

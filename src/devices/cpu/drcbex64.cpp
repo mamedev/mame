@@ -622,8 +622,8 @@ drcbe_x64::drcbe_x64(drcuml_state &drcuml, device_t &device, drc_cache &cache, u
 		m_entry(nullptr),
 		m_exit(nullptr),
 		m_nocode(nullptr),
-		m_fixup_label(FUNC(drcbe_x64::fixup_label), this),
-		m_fixup_exception(FUNC(drcbe_x64::fixup_exception), this),
+		m_fixup_label(&drcbe_x64::fixup_label, this),
+		m_fixup_exception(&drcbe_x64::fixup_exception, this),
 		m_near(*(near_state *)cache.alloc_near(sizeof(m_near)))
 {
 	// build up necessary arrays

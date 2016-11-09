@@ -32,6 +32,7 @@
 
 @source:1945kiii.cpp
 1945kiii                        // (c) 2000 Oriental
+1945kiiin                       // (c) 2000 Oriental
 1945kiiio                       // (c) 1999 Oriental
 flagrall                        // ?
 
@@ -10333,6 +10334,7 @@ ddz                             // 200?
 donghaer                        //
 evosocc                         // 2001 Evoga. Evolution Soccer
 officeye                        //
+menghong                        // 2004? Sealy
 psattack                        // 2004 Uniana
 topbladv                        // 2002 Sonokong. Top Blade V
 trivrus                         // 2009 AGT. Trivia R Us
@@ -30276,6 +30278,7 @@ sonstwr2                        //
 wolfman                         //
 
 @source:pg685.cpp
+pg675							//
 pg685                           //
 pg685oua12                      //
 
@@ -30579,6 +30582,7 @@ megaatona                       //
 msdisco                         //
 nautilus                        //
 phntmshp                        //
+ridersrf                        //
 rock2500                        //
 sklflite                        //
 spain82                         //
@@ -37619,6 +37623,7 @@ locomotp                        //
 sshtlzac                        //
 stargod                         //
 stargoda                        //
+stargodb                        //
 strapids                        //
 wsports                         //
 

@@ -5,7 +5,7 @@
 //  drawbgfx.cpp - BGFX renderer
 //
 //============================================================
-#if defined(SDLMAME_WIN32) || defined(OSD_WINDOWS)
+#if defined(SDLMAME_WIN32) || defined(OSD_WINDOWS) || defined(OSD_UWP)
 // standard windows headers
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -133,7 +133,7 @@ inline void winSetHwnd(::HWND _window)
 	pd.backBufferDS = NULL;
 	bgfx::setPlatformData(pd);
 }
-#else
+#elif defined(OSD_SDL)
 static void* sdlNativeWindowHandle(SDL_Window* _window)
 {
 	SDL_SysWMinfo wmi;
@@ -186,6 +186,22 @@ inline bool sdlSetWindow(SDL_Window* _window)
 
 	return true;
 }
+#elif defined(OSD_UWP)
+inline void winrtSetWindow(::IUnknown* _window)
+{
+	bgfx::PlatformData pd;
+	pd.ndt = NULL;
+	pd.nwh = _window;
+	pd.context = NULL;
+	pd.backBuffer = NULL;
+	pd.backBufferDS = NULL;
+	bgfx::setPlatformData(pd);
+}
+
+IInspectable* AsInspectable(Platform::Object^ o)
+{
+	return reinterpret_cast<IInspectable*>(o);
+}
 #endif
 
 int renderer_bgfx::create()
@@ -211,6 +227,8 @@ int renderer_bgfx::create()
 		}
 #ifdef OSD_WINDOWS
 		winSetHwnd(win->platform_window<HWND>());
+#elif defined(OSD_UWP)
+		winrtSetWindow(AsInspectable(win->m_window.Get()));
 #else
 		sdlSetWindow(win->platform_window<SDL_Window*>());
 #endif
@@ -260,6 +278,8 @@ int renderer_bgfx::create()
 	{
 #ifdef OSD_WINDOWS
 		m_framebuffer = m_targets->create_backbuffer(win->platform_window<HWND>(), m_width[win->m_index], m_height[win->m_index]);
+#elif defined(OSD_UWP)
+		m_framebuffer = m_targets->create_backbuffer(&win->m_window, m_width[win->m_index], m_height[win->m_index]);
 #else
 		m_framebuffer = m_targets->create_backbuffer(sdlNativeWindowHandle(win->platform_window<SDL_Window*>()), m_width[win->m_index], m_height[win->m_index]);
 #endif
@@ -899,6 +919,8 @@ bool renderer_bgfx::update_dimensions()
 			delete m_framebuffer;
 #ifdef OSD_WINDOWS
 			m_framebuffer = m_targets->create_backbuffer(win->platform_window<HWND>(), width, height);
+#elif defined(OSD_UWP)
+			m_framebuffer = m_targets->create_backbuffer(&win->m_window, width, height);
 #else
 			m_framebuffer = m_targets->create_backbuffer(sdlNativeWindowHandle(win->platform_window<SDL_Window*>()), width, height);
 #endif

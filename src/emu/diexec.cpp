@@ -548,7 +548,7 @@ void device_execute_interface::interface_post_reset()
 		screen_device *screen = downcast<screen_device *>(device().machine().device(device().siblingtag(m_vblank_interrupt_screen).c_str()));
 
 		assert(screen != nullptr);
-		screen->register_vblank_callback(vblank_state_delegate(FUNC(device_execute_interface::on_vblank), this));
+		screen->register_vblank_callback(vblank_state_delegate(&device_execute_interface::on_vblank, this));
 	}
 
 	// reconfigure periodic interrupts

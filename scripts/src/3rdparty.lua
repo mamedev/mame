@@ -197,6 +197,11 @@ if _OPTIONS["vs"]=="intel-15" then
 		}
 end
 
+	configuration { "winstore*" }
+		defines {
+			"NO_GETENV"
+		}
+
 	configuration { }
 
 	files {
@@ -377,6 +382,10 @@ end
 			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
 			"/wd4457", -- warning C4457: declaration of 'xxx' hides function parameter
 		}
+	configuration { "winstore*" }
+		forcedincludes {
+			MAME_DIR .. "src/osd/uwp/uwpcompat.h"
+		}
 
 	configuration { }
 		defines {
@@ -463,6 +472,12 @@ if _OPTIONS["vs"]=="intel-15" then
 			"/Qwd592", -- error #592: variable "xxx" is used before its value is set
 		}
 end
+
+	configuration { "winstore*" }
+		forcedincludes {
+			MAME_DIR .. "src/osd/uwp/uwpcompat.h",
+		}
+
 	configuration { }
 		defines {
 			"LUA_COMPAT_ALL",
@@ -555,18 +570,72 @@ project "lualibs"
 
 	includedirs {
 		MAME_DIR .. "3rdparty",
+	}
+if (_OPTIONS["osd"] ~= "uwp") then
+	includedirs {
 		MAME_DIR .. "3rdparty/linenoise-ng/include",
 	}
+end
 	includedirs {
 		ext_includedir("lua"),
 		ext_includedir("zlib"),
+		ext_includedir("sqlite3"),
 	}
 
+	configuration { "winstore*" }
+		forcedincludes {
+			MAME_DIR .. "src/osd/uwp/uwpcompat.h"
+		}
+	
+	configuration {}
+
 	files {
+		MAME_DIR .. "3rdparty/lsqlite3/lsqlite3.c",
 		MAME_DIR .. "3rdparty/lua-zlib/lua_zlib.c",
 		MAME_DIR .. "3rdparty/luafilesystem/src/lfs.c",
+	}
+if (_OPTIONS["osd"] ~= "uwp") then
+	files {
 		MAME_DIR .. "3rdparty/lua-linenoise/linenoise.c",
 	}
+end
+
+--------------------------------------------------
+-- SQLite3 library objects
+--------------------------------------------------
+
+if not _OPTIONS["with-system-sqlite3"] then
+project "sqlite3"
+	uuid "5cb3d495-57ed-461c-81e5-80dc0857517d"
+	kind "StaticLib"
+
+	configuration { "gmake" }
+		buildoptions_c {
+			"-Wno-discarded-qualifiers",
+			"-Wno-unused-but-set-variable",
+			"-Wno-bad-function-cast",
+			"-Wno-undef",
+		}
+if _OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "clang") then
+		buildoptions_c {
+			"-Wno-incompatible-pointer-types-discards-qualifiers",
+		}
+end
+	configuration { "winstore*" }
+		defines {
+			"SQLITE_OS_WINRT",
+		}
+
+	configuration { }
+
+	files {
+		MAME_DIR .. "3rdparty/sqlite3/sqlite3.c",
+	}
+else
+links {
+	ext_lib("sqlite3"),
+}
+end
 
 end
 --------------------------------------------------
@@ -1480,7 +1549,7 @@ end
 --------------------------------------------------
 -- linenoise-ng library
 --------------------------------------------------
-
+if (_OPTIONS["osd"] ~= "uwp") then
 project "linenoise-ng"
 	uuid "7320ffc8-2748-4add-8864-ae29b72a8511"
 	kind (LIBTYPE)
@@ -1503,3 +1572,4 @@ project "linenoise-ng"
 		MAME_DIR .. "3rdparty/linenoise-ng/src/linenoise.cpp",
 		MAME_DIR .. "3rdparty/linenoise-ng/src/wcwidth.cpp",
 	}
+end

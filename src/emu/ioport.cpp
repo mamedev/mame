@@ -1681,8 +1681,8 @@ ioport_manager::ioport_manager(running_machine &machine)
 time_t ioport_manager::initialize()
 {
 	// add an exit callback and a frame callback
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(ioport_manager::exit), this));
-	machine().add_notifier(MACHINE_NOTIFY_FRAME, machine_notify_delegate(FUNC(ioport_manager::frame_update_callback), this));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&ioport_manager::exit, this));
+	machine().add_notifier(MACHINE_NOTIFY_FRAME, machine_notify_delegate(&ioport_manager::frame_update_callback, this));
 
 	// initialize the default port info from the OSD
 	init_port_types();
@@ -1747,7 +1747,7 @@ time_t ioport_manager::initialize()
 	m_natkeyboard = std::make_unique<natural_keyboard>(machine());
 
 	// register callbacks for when we load configurations
-	machine().configuration().config_register("input", config_saveload_delegate(FUNC(ioport_manager::load_config), this), config_saveload_delegate(FUNC(ioport_manager::save_config), this));
+	machine().configuration().config_register("input", config_saveload_delegate(&ioport_manager::load_config, this), config_saveload_delegate(&ioport_manager::save_config, this));
 
 	// open playback and record files if specified
 	time_t basetime = playback_init();

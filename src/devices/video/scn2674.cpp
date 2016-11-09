@@ -433,6 +433,12 @@ void scn2674_device::write_command(uint8_t data)
 			LOG2674(("DELAYED write at pointer address %02x\n",data));
 			break;
 
+		case 0xa6:  // used by the Octopus
+			/* write at pointer address */
+			space().write_byte((m_IR10_display_pointer_address_lower | (m_IR11_display_pointer_address_upper << 8)), m_buffer);
+			LOG2674(("DELAYED write at display pointer address %02x\n",data));
+			break;
+
 		case 0xa9:
 			/* increment cursor address */
 			if(!(++m_cursor_l))

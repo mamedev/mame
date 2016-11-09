@@ -219,7 +219,7 @@ end
 
 ---------------------------------------------------
 --
---@src/devices/bus/bbc/fds/fds.h,BUSES["BBC_FDC"] = true
+--@src/devices/bus/bbc/fdc/fdc.h,BUSES["BBC_FDC"] = true
 ---------------------------------------------------
 
 if (BUSES["BBC_FDC"]~=null) then

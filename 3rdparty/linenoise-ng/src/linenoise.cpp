@@ -1883,7 +1883,7 @@ static int cleanupCtrl(int c) {
 }
 
 // break characters that may precede items to be completed
-static const char breakChars[] = " =+-/\\*?\"'`&<>;|@{([])}";
+static const char breakChars[] = " =+-/\\*?\"'`&<>;|@{}";
 
 // maximum number of completions to display without asking
 static const size_t completionCountCutoff = 100;
@@ -2281,11 +2281,11 @@ int InputBuffer::incrementalHistorySearch(PromptBase& pi, int startChar) {
         break;
 
 // job control is its own thing
-//#ifndef _WIN32
+#ifndef _WIN32
       case ctrlChar('Z'):  // ctrl-Z, job control
         disableRawMode();  // Returning to Linux (whatever) shell, leave raw
                            // mode
-  //      raise(SIGSTOP);    // Break out in mid-line
+        raise(SIGSTOP);    // Break out in mid-line
         enableRawMode();   // Back from Linux shell, re-enter raw mode
         {
           bufferSize = historyLineLength + 1;
@@ -2295,9 +2295,9 @@ int InputBuffer::incrementalHistorySearch(PromptBase& pi, int startChar) {
           dynamicRefresh(dp, tempUnicode.get(), historyLineLength,
                          historyLinePosition);
         }
-		fprintf(stdout, "\n");
-		exit(0);
-//#endif
+        continue;
+        break;
+#endif
 
       // these characters update the search string, and hence the selected input
       // line
@@ -2929,18 +2929,16 @@ int InputBuffer::getInputLine(PromptBase& pi) {
         beep();
         break;
 
-//#ifndef _WIN32
+#ifndef _WIN32
       case ctrlChar('Z'):  // ctrl-Z, job control
         disableRawMode();  // Returning to Linux (whatever) shell, leave raw
                            // mode
-        //raise(SIGSTOP);    // Break out in mid-line
+        raise(SIGSTOP);    // Break out in mid-line
         enableRawMode();   // Back from Linux shell, re-enter raw mode
-        //if (!pi.write()) break;  // Redraw prompt
-        //refreshLine(pi);         // Refresh the line
-		fprintf(stdout,"\n");
-		exit(0);
-		//break;
-//#endif
+        if (!pi.write()) break;  // Redraw prompt
+        refreshLine(pi);         // Refresh the line
+        break;
+#endif
 
       // DEL, delete the character under the cursor
       case 127:

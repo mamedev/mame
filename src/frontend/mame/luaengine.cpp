@@ -8,12 +8,14 @@
 
 ***************************************************************************/
 
+#include <thread>
 #include <lua.hpp>
 #include "emu.h"
 #include "mame.h"
 #include "drivenum.h"
 #include "emuopts.h"
 #include "ui/ui.h"
+#include "ui/pluginopt.h"
 #include "luaengine.h"
 #include "natkeyboard.h"
 #include "uiinput.h"
@@ -34,6 +36,7 @@ extern "C" {
 	int luaopen_zlib(lua_State *L);
 	int luaopen_lfs(lua_State *L);
 	int luaopen_linenoise(lua_State *L);
+	int luaopen_lsqlite3(lua_State *L);
 }
 
 namespace sol
@@ -73,11 +76,8 @@ namespace sol
 		int len;
 		char *ptr;
 	};
-	namespace meta
-	{
-		template<>
-		struct has_begin_end<core_options> : std::false_type {}; // don't convert core_optons to a table directly
-	}
+	template<>
+	struct is_container<core_options> : std::false_type {}; // don't convert core_optons to a table directly
 	namespace stack
 	{
 		template <>
@@ -525,6 +525,7 @@ lua_engine::lua_engine()
 	sol()["package"]["preload"]["zlib"] = &luaopen_zlib;
 	sol()["package"]["preload"]["lfs"] = &luaopen_lfs;
 	sol()["package"]["preload"]["linenoise"] = &luaopen_linenoise;
+	sol()["package"]["preload"]["lsqlite3"] = &luaopen_lsqlite3;
 
 	lua_gc(m_lua_state, LUA_GCRESTART, 0);
 }
@@ -668,14 +669,19 @@ void lua_engine::on_frame_done()
 	execute_function("LUA_ON_FRAME_DONE");
 }
 
+void lua_engine::on_periodic()
+{
+	execute_function("LUA_ON_PERIODIC");
+}
+
 void lua_engine::attach_notifiers()
 {
-	machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(lua_engine::on_machine_prestart), this), true);
-	machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(lua_engine::on_machine_start), this));
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(lua_engine::on_machine_stop), this));
-	machine().add_notifier(MACHINE_NOTIFY_PAUSE, machine_notify_delegate(FUNC(lua_engine::on_machine_pause), this));
-	machine().add_notifier(MACHINE_NOTIFY_RESUME, machine_notify_delegate(FUNC(lua_engine::on_machine_resume), this));
-	machine().add_notifier(MACHINE_NOTIFY_FRAME, machine_notify_delegate(FUNC(lua_engine::on_machine_frame), this));
+	machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(&lua_engine::on_machine_prestart, this), true);
+	machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(&lua_engine::on_machine_start, this));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&lua_engine::on_machine_stop, this));
+	machine().add_notifier(MACHINE_NOTIFY_PAUSE, machine_notify_delegate(&lua_engine::on_machine_pause, this));
+	machine().add_notifier(MACHINE_NOTIFY_RESUME, machine_notify_delegate(&lua_engine::on_machine_resume, this));
+	machine().add_notifier(MACHINE_NOTIFY_FRAME, machine_notify_delegate(&lua_engine::on_machine_frame, this));
 }
 
 //-------------------------------------------------
@@ -702,6 +708,7 @@ void lua_engine::initialize()
  * emu.register_resume(callback) - callback at resume
  * emu.register_frame(callback) - callback at end of frame
  * emu.register_frame_done(callback) - callback after frame is drawn to screen (for overlays)
+ * emu.register_periodic(callback) - periodic callback while program is running
  * emu.register_menu(event_callback, populate_callback, name) - callbacks for plugin menu
  * emu.print_verbose(str) -- output to stderr at verbose level
  * emu.print_error(str) -- output to stderr at error level
@@ -735,12 +742,18 @@ void lua_engine::initialize()
 	emu["register_resume"] = [this](sol::function func){ register_function(func, "LUA_ON_RESUME"); };
 	emu["register_frame"] = [this](sol::function func){ register_function(func, "LUA_ON_FRAME"); };
 	emu["register_frame_done"] = [this](sol::function func){ register_function(func, "LUA_ON_FRAME_DONE"); };
+	emu["register_periodic"] = [this](sol::function func){ register_function(func, "LUA_ON_PERIODIC"); };
 	emu["register_menu"] = [this](sol::function cb, sol::function pop, const std::string &name) {
 			std::string cbfield = "menu_cb_" + name;
 			std::string popfield = "menu_pop_" + name;
 			sol().registry()[cbfield] = cb;
 			sol().registry()[popfield] = pop;
 			m_menu.push_back(name);
+		};
+	emu["show_menu"] = [this](const char *name) {
+			mame_ui_manager &mui = mame_machine_manager::instance()->ui();
+			render_container &container = machine().render().ui_container();
+			ui::menu_plugin::show_menu(mui, container, (char *)name);
 		};
 	emu["register_callback"] = [this](sol::function cb, const std::string &name) {
 			std::string field = "cb_" + name;
@@ -767,6 +780,7 @@ void lua_engine::initialize()
 			}
 			return item;
 		};
+	emu["thread"] = []() { context *ctx = new context; ctx->busy = false; ctx->yield = false; return ctx; };
 
 	emu.new_usertype<emu_file>("file", sol::call_constructor, sol::constructors<sol::types<const char *, uint32_t>>(),
 			"read", [](emu_file &file, sol::buffer *buff) { buff->set_len(file.read(buff->get_ptr(), buff->get_len())); return buff; },
@@ -776,6 +790,69 @@ void lua_engine::initialize()
 			"size", &emu_file::size,
 			"filename", &emu_file::filename,
 			"fullpath", &emu_file::fullpath);
+
+/*
+ * thread.start(scr) - run scr (string not function) in a seperate thread in a new empty (other then modules) lua context
+ * thread.continue(val) - resume thread and pass val to it
+ * thread.result() - get thread result as string
+ * thread.busy - check if thread is running
+ * thread.yield - check if thread is yielded
+*/
+
+	sol().new_usertype<context>("thread",
+			sol::meta_function::garbage_collect, sol::destructor([](context *ctx) { delete ctx; }),
+			"start", [this](context &ctx, const char *scr) {
+					std::string script(scr);
+					if(ctx.busy)
+						return false;
+					std::thread th([&ctx, script]() {
+							sol::state thstate;
+							thstate.open_libraries();
+							thstate["package"]["preload"]["zlib"] = &luaopen_zlib;
+							thstate["package"]["preload"]["lfs"] = &luaopen_lfs;
+							thstate["package"]["preload"]["linenoise"] = &luaopen_linenoise;
+							sol::load_result res = thstate.load(script);
+							if(res.valid())
+							{
+								sol::protected_function func = res.get<sol::protected_function>();
+								thstate["yield"] = [&ctx, &thstate]() {
+										std::mutex m;
+										std::unique_lock<std::mutex> lock(m);
+										ctx.result = thstate["status"];
+										ctx.yield = true;
+										ctx.sync.wait(lock);
+										ctx.yield = false;
+										thstate["status"] = ctx.result;
+									};
+								auto ret = func();
+								if (ret.valid()) {
+									const char *tmp = ret.get<const char *>();
+									if (tmp != nullptr) 
+										ctx.result = tmp;
+									else
+										exit(0);
+								}
+							}
+							ctx.busy = false;
+						});
+					ctx.busy = true;
+					ctx.yield = false;
+					th.detach();
+					return true;
+				},
+			"continue", [this](context &ctx, const char *val) {
+					if(!ctx.yield)
+						return;
+					ctx.result = val;
+					ctx.sync.notify_all();
+				},
+			"result", sol::property([this](context &ctx) -> std::string {
+					if(ctx.busy && !ctx.yield)
+						return "";
+					return ctx.result;
+				}),
+			"busy", sol::readonly(&context::busy),
+			"yield", sol::readonly(&context::yield));
 
 	sol().new_usertype<save_item>("item",
 			sol::meta_function::garbage_collect, sol::destructor([](save_item *item) { delete item; }),
@@ -1269,6 +1346,7 @@ void lua_engine::initialize()
  * target:hidden() - is target hidden
  * target:is_ui_target() - is ui render target
  * target:index() - target index
+ * target:view_name(index) - current target layout view name
  * target.max_update_rate -
  * target.view - current target layout view
  * target.orientation - current target orientation
@@ -1290,6 +1368,7 @@ void lua_engine::initialize()
 			"hidden", &render_target::hidden,
 			"is_ui_target", &render_target::is_ui_target,
 			"index", &render_target::index,
+			"view_name", &render_target::view_name,
 			"max_update_rate", sol::property(&render_target::max_update_rate, &render_target::set_max_update_rate),
 			"view", sol::property(&render_target::view, &render_target::set_view),
 			"orientation", sol::property(&render_target::orientation, &render_target::set_orientation),
@@ -1612,7 +1691,7 @@ void lua_engine::initialize()
 
 	sol().new_usertype<mame_machine_manager>("manager", "new", sol::no_constructor,
 			"machine", &machine_manager::machine,
-			"options", [](machine_manager &m) { return static_cast<core_options *>(&m.options()); },
+			"options", [](mame_machine_manager &m) { return static_cast<core_options *>(&m.options()); },
 			"plugins", [](mame_machine_manager &m) { return static_cast<core_options *>(&m.plugins()); },
 			"ui", &mame_machine_manager::ui);
 	sol()["manager"] = std::ref(*mame_machine_manager::instance());

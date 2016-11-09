@@ -1231,13 +1231,13 @@ void m68000_base_device::init8(address_space &space, address_space &ospace)
 //  m_cpustate = this;
 	opcode_xor = 0;
 
-	readimm16 = m68k_readimm16_delegate(FUNC(m68000_base_device::m68008_read_immediate_16), this);
-	read8 = m68k_read8_delegate(FUNC(address_space::read_byte), &space);
-	read16 = m68k_read16_delegate(FUNC(address_space::read_word), &space);
-	read32 = m68k_read32_delegate(FUNC(address_space::read_dword), &space);
-	write8 = m68k_write8_delegate(FUNC(address_space::write_byte), &space);
-	write16 = m68k_write16_delegate(FUNC(address_space::write_word), &space);
-	write32 = m68k_write32_delegate(FUNC(address_space::write_dword), &space);
+	readimm16 = m68k_readimm16_delegate(&m68000_base_device::m68008_read_immediate_16, this);
+	read8 = m68k_read8_delegate(&address_space::read_byte, &space);
+	read16 = m68k_read16_delegate(&address_space::read_word, &space);
+	read32 = m68k_read32_delegate(&address_space::read_dword, &space);
+	write8 = m68k_write8_delegate(&address_space::write_byte, &space);
+	write16 = m68k_write16_delegate(&address_space::write_word, &space);
+	write32 = m68k_write32_delegate(&address_space::write_dword, &space);
 }
 
 /****************************************************************************
@@ -1270,13 +1270,13 @@ void m68000_base_device::init16(address_space &space, address_space &ospace)
 
 	opcode_xor = 0;
 
-	readimm16 = m68k_readimm16_delegate(FUNC(m68000_base_device::simple_read_immediate_16), this);
-	read8 = m68k_read8_delegate(FUNC(address_space::read_byte), &space);
-	read16 = m68k_read16_delegate(FUNC(address_space::read_word), &space);
-	read32 = m68k_read32_delegate(FUNC(address_space::read_dword), &space);
-	write8 = m68k_write8_delegate(FUNC(m68000_base_device::m68000_write_byte), this);
-	write16 = m68k_write16_delegate(FUNC(address_space::write_word), &space);
-	write32 = m68k_write32_delegate(FUNC(address_space::write_dword), &space);
+	readimm16 = m68k_readimm16_delegate(&m68000_base_device::simple_read_immediate_16, this);
+	read8 = m68k_read8_delegate(&address_space::read_byte, &space);
+	read16 = m68k_read16_delegate(&address_space::read_word, &space);
+	read32 = m68k_read32_delegate(&address_space::read_dword, &space);
+	write8 = m68k_write8_delegate(&m68000_base_device::m68000_write_byte, this);
+	write16 = m68k_write16_delegate(&address_space::write_word, &space);
+	write32 = m68k_write32_delegate(&address_space::write_dword, &space);
 }
 
 
@@ -1296,13 +1296,13 @@ void m68000_base_device::init32(address_space &space, address_space &ospace)
 	m_odirect = &ospace.direct();
 	opcode_xor = WORD_XOR_BE(0);
 
-	readimm16 = m68k_readimm16_delegate(FUNC(m68000_base_device::read_immediate_16), this);
-	read8 = m68k_read8_delegate(FUNC(address_space::read_byte), &space);
-	read16 = m68k_read16_delegate(FUNC(address_space::read_word_unaligned), &space);
-	read32 = m68k_read32_delegate(FUNC(address_space::read_dword_unaligned), &space);
-	write8 = m68k_write8_delegate(FUNC(address_space::write_byte), &space);
-	write16 = m68k_write16_delegate(FUNC(address_space::write_word_unaligned), &space);
-	write32 = m68k_write32_delegate(FUNC(address_space::write_dword_unaligned), &space);
+	readimm16 = m68k_readimm16_delegate(&m68000_base_device::read_immediate_16, this);
+	read8 = m68k_read8_delegate(&address_space::read_byte, &space);
+	read16 = m68k_read16_delegate(&address_space::read_word_unaligned, &space);
+	read32 = m68k_read32_delegate(&address_space::read_dword_unaligned, &space);
+	write8 = m68k_write8_delegate(&address_space::write_byte, &space);
+	write16 = m68k_write16_delegate(&address_space::write_word_unaligned, &space);
+	write32 = m68k_write32_delegate(&address_space::write_dword_unaligned, &space);
 }
 
 /* interface for 32-bit data bus with PMMU (68EC020, 68020) */
@@ -1515,13 +1515,13 @@ void m68000_base_device::init32mmu(address_space &space, address_space &ospace)
 	m_odirect = &ospace.direct();
 	opcode_xor = WORD_XOR_BE(0);
 
-	readimm16 = m68k_readimm16_delegate(FUNC(m68000_base_device::read_immediate_16_mmu), this);
-	read8 = m68k_read8_delegate(FUNC(m68000_base_device::read_byte_32_mmu), this);
-	read16 = m68k_read16_delegate(FUNC(m68000_base_device::readword_d32_mmu), this);
-	read32 = m68k_read32_delegate(FUNC(m68000_base_device::readlong_d32_mmu), this);
-	write8 = m68k_write8_delegate(FUNC(m68000_base_device::write_byte_32_mmu), this);
-	write16 = m68k_write16_delegate(FUNC(m68000_base_device::writeword_d32_mmu), this);
-	write32 = m68k_write32_delegate(FUNC(m68000_base_device::writelong_d32_mmu), this);
+	readimm16 = m68k_readimm16_delegate(&m68000_base_device::read_immediate_16_mmu, this);
+	read8 = m68k_read8_delegate(&m68000_base_device::read_byte_32_mmu, this);
+	read16 = m68k_read16_delegate(&m68000_base_device::readword_d32_mmu, this);
+	read32 = m68k_read32_delegate(&m68000_base_device::readlong_d32_mmu, this);
+	write8 = m68k_write8_delegate(&m68000_base_device::write_byte_32_mmu, this);
+	write16 = m68k_write16_delegate(&m68000_base_device::writeword_d32_mmu, this);
+	write32 = m68k_write32_delegate(&m68000_base_device::writelong_d32_mmu, this);
 }
 
 
@@ -1643,13 +1643,13 @@ void m68000_base_device::init32hmmu(address_space &space, address_space &ospace)
 	m_odirect = &ospace.direct();
 	opcode_xor = WORD_XOR_BE(0);
 
-	readimm16 = m68k_readimm16_delegate(FUNC(m68000_base_device::read_immediate_16_hmmu), this);
-	read8 = m68k_read8_delegate(FUNC(m68000_base_device::read_byte_32_hmmu), this);
-	read16 = m68k_read16_delegate(FUNC(m68000_base_device::readword_d32_hmmu), this);
-	read32 = m68k_read32_delegate(FUNC(m68000_base_device::readlong_d32_hmmu), this);
-	write8 = m68k_write8_delegate(FUNC(m68000_base_device::write_byte_32_hmmu), this);
-	write16 = m68k_write16_delegate(FUNC(m68000_base_device::writeword_d32_hmmu), this);
-	write32 = m68k_write32_delegate(FUNC(m68000_base_device::writelong_d32_hmmu), this);
+	readimm16 = m68k_readimm16_delegate(&m68000_base_device::read_immediate_16_hmmu, this);
+	read8 = m68k_read8_delegate(&m68000_base_device::read_byte_32_hmmu, this);
+	read16 = m68k_read16_delegate(&m68000_base_device::readword_d32_hmmu, this);
+	read32 = m68k_read32_delegate(&m68000_base_device::readlong_d32_hmmu, this);
+	write8 = m68k_write8_delegate(&m68000_base_device::write_byte_32_hmmu, this);
+	write16 = m68k_write16_delegate(&m68000_base_device::writeword_d32_hmmu, this);
+	write32 = m68k_write32_delegate(&m68000_base_device::writelong_d32_hmmu, this);
 }
 
 void m68000_base_device::set_reset_callback(write_line_delegate callback)

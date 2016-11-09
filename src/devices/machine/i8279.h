@@ -15,17 +15,17 @@
                    RL6   7 |             | 34  SL2
                    RL7   8 |             | 33  SL1
                  RESET   9 |             | 32  SL0
-                   /RD  10 |     8279    | 31  B0
-                   /WR  11 |             | 30  B1
-                   DB0  12 |             | 29  B2
-                   DB1  13 |             | 28  B3
-                   DB2  14 |             | 27  A0
-                   DB3  15 |             | 26  A1
-                   DB4  16 |             | 25  A2
-                   DB5  17 |             | 24  A3
+                   /RD  10 |     8279    | 31  OUT B0
+                   /WR  11 |             | 30  OUT B1
+                   DB0  12 |             | 29  OUT B2
+                   DB1  13 |             | 28  OUT B3
+                   DB2  14 |             | 27  OUT A0
+                   DB3  15 |             | 26  OUT A1
+                   DB4  16 |             | 25  OUT A2
+                   DB5  17 |             | 24  OUT A3
                    DB6  18 |             | 23  /BD
                    DB7  19 |             | 22  /CS
-                   Vss  20 |_____________| 21  CTRL/DATA
+                   Vss  20 |_____________| 21  A0 (CTRL/DATA)
 
 
 ***************************************************************************/
@@ -85,8 +85,10 @@ public:
 	template<class _Object> static devcb_base &set_in_ctrl_callback(device_t &device, _Object object) { return downcast<i8279_device &>(device).m_in_ctrl_cb.set_callback(object); }
 
 	// read & write handlers
+	DECLARE_READ8_MEMBER(read);
 	DECLARE_READ8_MEMBER(status_r);
 	DECLARE_READ8_MEMBER(data_r);
+	DECLARE_WRITE8_MEMBER(write);
 	DECLARE_WRITE8_MEMBER(cmd_w);
 	DECLARE_WRITE8_MEMBER(data_w);
 	void timer_mainloop();
@@ -110,7 +112,7 @@ private:
 
 	devcb_write_line    m_out_irq_cb;       // IRQ
 	devcb_write8        m_out_sl_cb;        // Scanlines SL0-3
-	devcb_write8        m_out_disp_cb;      // B0-3,A0-3
+	devcb_write8        m_out_disp_cb;      // Display outputs B0-3, A0-3
 	devcb_write_line    m_out_bd_cb;        // BD
 	devcb_read8         m_in_rl_cb;         // kbd readlines RL0-7
 	devcb_read_line     m_in_shift_cb;      // Shift key

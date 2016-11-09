@@ -183,7 +183,7 @@ void gt64xxx_device::map_cpu_space()
 
 	// CS[0:3]
 	//m_cpu_space->install_device_delegate(0x16000000, 0x17ffffff, machine().root_device(), m_cs_map[3].map);
-	typedef void (gt64xxx_device::*tramp_t)(::address_map &, device_t &);
+	typedef void (gt64xxx_device::*tramp_t)(::address_map &);
 	static const tramp_t trampolines[4] = {
 		&gt64xxx_device::map_trampoline<0>,
 		&gt64xxx_device::map_trampoline<1>,

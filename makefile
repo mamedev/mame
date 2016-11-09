@@ -59,6 +59,7 @@
 # USE_SYSTEM_LIB_JPEG = 1
 # USE_SYSTEM_LIB_FLAC = 1
 # USE_SYSTEM_LIB_LUA = 1
+# USE_SYSTEM_LIB_SQLITE3 = 1
 # USE_SYSTEM_LIB_PORTMIDI = 1
 # USE_SYSTEM_LIB_PORTAUDIO = 1
 # USE_BUNDLED_LIB_SDL2 = 1
@@ -279,6 +280,12 @@ endif
 ifeq ($(firstword $(filter ppc64,$(UNAME))),ppc64)
 ARCHITECTURE := _x64
 endif
+ifeq ($(firstword $(filter ppc64le,$(UNAME))),ppc64le)
+ARCHITECTURE := _x64
+endif
+ifeq ($(firstword $(filter s390x,$(UNAME))),s390x)
+ARCHITECTURE := _x64
+endif
 endif
 
 else
@@ -324,6 +331,12 @@ ifndef NOASM
 endif
 endif
 
+ifeq ($(findstring s390x,$(UNAME)),s390x)
+ifndef NOASM
+	NOASM := 1
+endif
+endif
+
 # Emscripten
 ifeq ($(findstring emcc,$(CC)),emcc)
 TARGETOS := asmjs
@@ -341,6 +354,13 @@ BIGENDIAN := 1
 endif
 # Linux
 ifneq (,$(findstring ppc,$(UNAME)))
+ifneq (,$(findstring ppc64le,$(UNAME)))
+BIGENDIAN := 0
+else
+BIGENDIAN := 1
+endif
+endif
+ifneq (,$(findstring s390x,$(UNAME)))
 BIGENDIAN := 1
 endif
 endif # BIGENDIAN
@@ -419,6 +439,10 @@ endif
 
 ifdef USE_SYSTEM_LIB_LUA
 PARAMS += --with-system-lua='$(USE_SYSTEM_LIB_LUA)'
+endif
+
+ifdef USE_SYSTEM_LIB_SQLITE3
+PARAMS += --with-system-sqlite3='$(USE_SYSTEM_LIB_SQLITE3)'
 endif
 
 ifdef USE_SYSTEM_LIB_PORTMIDI
@@ -1019,7 +1043,7 @@ endif
 
 .PHONY: vs2015_uwp
 vs2015_uwp: generate
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=winstore82 --osd=windows --NO_USE_MIDI=1 --NO_OPENGL=1 --USE_QTDEBUG=0 --MODERN_WIN_API=1 vs2015
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=winstore82 --osd=uwp --NO_USE_MIDI=1 --NO_OPENGL=1 --USE_QTDEBUG=0 --MODERN_WIN_API=1 vs2015
 ifdef MSBUILD
 	$(SILENT) msbuild.exe $(PROJECTDIR_WIN)/vs2015-winstore82/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
 endif

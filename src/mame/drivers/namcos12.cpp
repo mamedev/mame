@@ -1677,7 +1677,7 @@ static MACHINE_CONFIG_START( coh700, namcos12_state )
 	MCFG_RAM_MODIFY("maincpu:ram")
 	MCFG_RAM_DEFAULT_SIZE("4M")
 
-	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psx_dma_read_delegate( FUNC( namcos12_state::namcos12_rom_read ), (namcos12_state *) owner ) )
+	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psx_dma_read_delegate(&namcos12_state::namcos12_rom_read, (namcos12_state *) owner ))
 
 	MCFG_CPU_ADD("sub", H83002, 16934400) // frequency based on research (superctr)
 	MCFG_CPU_PROGRAM_MAP(s12h8rwmap)
@@ -1700,7 +1700,7 @@ static MACHINE_CONFIG_START( coh700, namcos12_state )
 
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8654Q, 0x200000, XTAL_53_693175MHz )
-	MCFG_PSXGPU_VBLANK_CALLBACK( vblank_state_delegate( FUNC( namcos12_state::namcos12_sub_irq ), (namcos12_state *) owner ) )
+	MCFG_PSXGPU_VBLANK_CALLBACK(vblank_state_delegate(&namcos12_state::namcos12_sub_irq, (namcos12_state *) owner ) )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

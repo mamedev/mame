@@ -243,7 +243,7 @@ void device_memory_interface::interface_validity_check(validity_checker &valid) 
 			::address_map addrmap(const_cast<device_t &>(device()), spacenum);
 
 			// let the map check itself
-			addrmap.map_validity_check(valid, device(), spacenum);
+			addrmap.map_validity_check(valid, spacenum);
 		}
 	}
 }

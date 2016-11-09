@@ -21,12 +21,12 @@ Bars go up to the average execution time. Lower is better. Reported times are fo
 	:target: https://raw.githubusercontent.com/ThePhD/lua-bench/master/lua%20-%20results/lua%20bench%20graph%20-%20member%20function%20calls.png
 	:alt: bind several member functions to an object and call them in Lua code
 
-.. image:: https://raw.githubusercontent.com/ThePhD/lua-bench/master/lua%20-%20results/lua%20bench%20graph%20-%20member%20variable.png
-	:target: https://raw.githubusercontent.com/ThePhD/lua-bench/master/lua%20-%20results/lua%20bench%20graph%20-%20member%20variable.png
+.. image:: https://raw.githubusercontent.com/ThePhD/lua-bench/master/lua%20-%20results/lua%20bench%20graph%20-%20userdata%20variable%20access.png
+	:target: https://raw.githubusercontent.com/ThePhD/lua-bench/master/lua%20-%20results/lua%20bench%20graph%20-%20userdata%20variable%20access.png
 	:alt: bind a variable to an object and call it in Lua code
 
-.. image:: https://raw.githubusercontent.com/ThePhD/lua-bench/master/lua%20-%20results/lua%20bench%20graph%20-%20member%20variable.png
-	:target: https://raw.githubusercontent.com/ThePhD/lua-bench/master/lua%20-%20results/lua%20bench%20graph%20-%20many%20member%20variables.png
+.. image:: https://raw.githubusercontent.com/ThePhD/lua-bench/master/lua%20-%20results/lua%20bench%20graph%20-%20many%20userdata%20variables%20access.png
+	:target: https://raw.githubusercontent.com/ThePhD/lua-bench/master/lua%20-%20results/lua%20bench%20graph%20-%20many%20userdata%20variables%20access.png
 	:alt: bind MANY variables to an object and call it in Lua code
 
 .. image:: https://raw.githubusercontent.com/ThePhD/lua-bench/master/lua%20-%20results/lua%20bench%20graph%20-%20c%20function%20through%20lua.png

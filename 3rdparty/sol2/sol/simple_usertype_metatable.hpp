@@ -31,6 +31,8 @@
 namespace sol {
 
 	namespace usertype_detail {
+		const lua_Integer toplevel_magic = static_cast<lua_Integer>(0x00000001);
+
 		struct variable_wrapper {
 			virtual int index(lua_State* L) = 0;
 			virtual int new_index(lua_State* L) = 0;
@@ -68,8 +70,31 @@ namespace sol {
 
 		template <typename T>
 		inline int simple_metatable_newindex(lua_State* L) {
-			if (stack::stack_detail::check_metatable<T, false>(L, 1)) {
-				stack::set_field<false, true>(L, stack_reference(L, 2), stack_reference(L, 3), 1);
+			int isnum = 0;
+			lua_Integer magic = lua_tointegerx(L, lua_upvalueindex(4), &isnum);
+			if (isnum != 0 && magic == toplevel_magic) {
+				for (std::size_t i = 0; i < 3; lua_pop(L, 1), ++i) {
+					// Pointer types, AKA "references" from C++
+					const char* metakey = nullptr;
+					switch (i) {
+					case 0:
+						metakey = &usertype_traits<T*>::metatable()[0];
+						break;
+					case 1:
+						metakey = &usertype_traits<detail::unique_usertype<T>>::metatable()[0];
+						break;
+					case 2:
+					default:
+						metakey = &usertype_traits<T>::metatable()[0];
+						break;
+					}
+					luaL_getmetatable(L, metakey);
+					int tableindex = lua_gettop(L);
+					if (type_of(L, tableindex) == type::nil) {
+						continue;
+					}
+					stack::set_field<false, true>(L, stack_reference(L, 2), stack_reference(L, 3), tableindex);
+				}
 				lua_settop(L, 0);
 				return 0;
 			}
@@ -259,15 +284,15 @@ namespace sol {
 
 		template <typename... Bases>
 		void add(lua_State*, base_classes_tag, bases<Bases...>) {
-			static_assert(sizeof(usertype_detail::base_walk) <= sizeof(void*), "size of function pointer is greater than sizeof(void*); cannot work on this platform");
+			static_assert(sizeof(usertype_detail::base_walk) <= sizeof(void*), "size of function pointer is greater than sizeof(void*); cannot work on this platform. Please file a bug report.");
 			if (sizeof...(Bases) < 1) {
 				return;
 			}
 			mustindex = true;
 			(void)detail::swallow{ 0, ((detail::has_derived<Bases>::value = true), 0)... };
 
-			static_assert(sizeof(void*) <= sizeof(detail::inheritance_check_function), "The size of this data pointer is too small to fit the inheritance checking function: file a bug report.");
-			static_assert(sizeof(void*) <= sizeof(detail::inheritance_cast_function), "The size of this data pointer is too small to fit the inheritance checking function: file a bug report.");
+			static_assert(sizeof(void*) <= sizeof(detail::inheritance_check_function), "The size of this data pointer is too small to fit the inheritance checking function: Please file a bug report.");
+			static_assert(sizeof(void*) <= sizeof(detail::inheritance_cast_function), "The size of this data pointer is too small to fit the inheritance checking function: Please file a bug report.");
 			baseclasscheck = (void*)&detail::inheritance<T, Bases...>::type_check;
 			baseclasscast = (void*)&detail::inheritance<T, Bases...>::type_cast;
 			indexbaseclasspropogation = usertype_detail::walk_all_bases<true, Bases...>;
@@ -278,11 +303,11 @@ namespace sol {
 		template<std::size_t... I, typename Tuple>
 		simple_usertype_metatable(usertype_detail::verified_tag, std::index_sequence<I...>, lua_State* L, Tuple&& args)
 			: callconstructfunc(nil),
-			indexfunc(&usertype_detail::indexing_fail<true>), newindexfunc(&usertype_detail::simple_metatable_newindex<T>),
+			indexfunc(&usertype_detail::indexing_fail<true>), newindexfunc(&usertype_detail::indexing_fail<false>),
 			indexbase(&usertype_detail::simple_core_indexing_call<true>), newindexbase(&usertype_detail::simple_core_indexing_call<false>),
 			indexbaseclasspropogation(usertype_detail::walk_all_bases<true>), newindexbaseclasspropogation(&usertype_detail::walk_all_bases<false>),
 			baseclasscheck(nullptr), baseclasscast(nullptr),
-			mustindex(true), secondarymeta(true) {
+			mustindex(false), secondarymeta(false) {
 			(void)detail::swallow{ 0,
 				(add(L, detail::forward_get<I * 2>(args), detail::forward_get<I * 2 + 1>(args)),0)...
 			};
@@ -329,7 +354,7 @@ namespace sol {
 			
 			static usertype_detail::simple_map& make_cleanup(lua_State* L, umt_t& umx) {
 				static int uniqueness = 0;
-				std::string uniquegcmetakey = usertype_traits<T>::user_gc_metatable;
+				std::string uniquegcmetakey = usertype_traits<T>::user_gc_metatable();
 				// std::to_string doesn't exist in android still, with NDK, so this bullshit
 				// is necessary
 				// thanks, Android :v
@@ -340,8 +365,11 @@ namespace sol {
 				snprintf(uniquetarget, uniquegcmetakey.length(), "%d", uniqueness);
 				++uniqueness;
 
-				const char* gcmetakey = &usertype_traits<T>::gc_table[0];
-				stack::push<user<usertype_detail::simple_map>>(L, metatable_key, uniquegcmetakey, &usertype_traits<T>::metatable[0], umx.indexbaseclasspropogation, umx.newindexbaseclasspropogation, std::move(umx.varmap), std::move(umx.registrations));
+				const char* gcmetakey = &usertype_traits<T>::gc_table()[0];
+				stack::push<user<usertype_detail::simple_map>>(L, metatable_key, uniquegcmetakey, &usertype_traits<T>::metatable()[0], 
+					umx.indexbaseclasspropogation, umx.newindexbaseclasspropogation, 
+					std::move(umx.varmap), std::move(umx.registrations)
+				);
 				stack_reference stackvarmap(L, -1);
 				stack::set_field<true>(L, gcmetakey, stackvarmap);
 				stackvarmap.pop();
@@ -356,19 +384,53 @@ namespace sol {
 				bool hasequals = false;
 				bool hasless = false;
 				bool haslessequals = false;
+				auto register_kvp = [&](std::size_t i, stack_reference& t, const std::string& first, object& second) {
+					if (first == name_of(meta_function::equal_to)) {
+						hasequals = true;
+					}
+					else if (first == name_of(meta_function::less_than)) {
+						hasless = true;
+					}
+					else if (first == name_of(meta_function::less_than_or_equal_to)) {
+						haslessequals = true;
+					}
+					else if (first == name_of(meta_function::index)) {
+						umx.indexfunc = second.template as<lua_CFunction>();
+					}
+					else if (first == name_of(meta_function::new_index)) {
+						umx.newindexfunc = second.template as<lua_CFunction>();
+					}
+					switch (i) {
+					case 0:
+						if (first == name_of(meta_function::garbage_collect)) {
+							return;
+						}
+						break;
+					case 1:
+						if (first == name_of(meta_function::garbage_collect)) {
+							stack::set_field(L, first, detail::unique_destruct<T>, t.stack_index());
+							return;
+						}
+						break;
+					case 2:
+					default:
+						break;
+					}
+					stack::set_field(L, first, second, t.stack_index());
+				};
 				for (std::size_t i = 0; i < 3; ++i) {
 					// Pointer types, AKA "references" from C++
 					const char* metakey = nullptr;
 					switch (i) {
 					case 0:
-						metakey = &usertype_traits<T*>::metatable[0];
+						metakey = &usertype_traits<T*>::metatable()[0];
 						break;
 					case 1:
-						metakey = &usertype_traits<detail::unique_usertype<T>>::metatable[0];
+						metakey = &usertype_traits<detail::unique_usertype<T>>::metatable()[0];
 						break;
 					case 2:
 					default:
-						metakey = &usertype_traits<T>::metatable[0];
+						metakey = &usertype_traits<T>::metatable()[0];
 						break;
 					}
 					luaL_newmetatable(L, metakey);
@@ -376,38 +438,7 @@ namespace sol {
 					for (auto& kvp : varmap.functions) {
 						auto& first = std::get<0>(kvp);
 						auto& second = std::get<1>(kvp);
-						if (first == name_of(meta_function::equal_to)) {
-							hasequals = true;
-						}
-						else if (first == name_of(meta_function::less_than)) {
-							hasless = true;
-						}
-						else if (first == name_of(meta_function::less_than_or_equal_to)) {
-							haslessequals = true;
-						}
-						else if (first == name_of(meta_function::index)) {
-							umx.indexfunc = second.template as<lua_CFunction>();
-						}
-						else if (first == name_of(meta_function::new_index)) {
-							umx.newindexfunc = second.template as<lua_CFunction>();
-						}
-						switch (i) {
-						case 0:
-							if (first == name_of(meta_function::garbage_collect)) {
-								continue;
-							}
-							break;
-						case 1:
-							if (first == name_of(meta_function::garbage_collect)) {
-								stack::set_field(L, first, detail::unique_destruct<T>, t.stack_index());
-								continue;
-							}
-							break;
-						case 2:
-						default:
-							break;
-						}
-						stack::set_field(L, first, second, t.stack_index());
+						register_kvp(i, t, first, second);
 					}
 					luaL_Reg opregs[4]{};
 					int opregsindex = 0;
@@ -440,7 +471,6 @@ namespace sol {
 
 					if (umx.mustindex) {
 						// use indexing function
-						static_assert(sizeof(usertype_detail::base_walk) <= sizeof(void*), "The size of this data pointer is too small to fit the base class index propagation key: file a bug report.");
 						stack::set_field(L, meta_function::index,
 							make_closure(&usertype_detail::simple_index_call,
 								make_light(varmap),
@@ -460,7 +490,7 @@ namespace sol {
 					}
 					// metatable on the metatable
 					// for call constructor purposes and such
-					lua_createtable(L, 0, 1);
+					lua_createtable(L, 0, 2 * static_cast<int>(umx.secondarymeta) + static_cast<int>(umx.callconstructfunc.valid()));
 					stack_reference metabehind(L, -1);
 					if (umx.callconstructfunc.valid()) {
 						stack::set_field(L, sol::meta_function::call_function, umx.callconstructfunc, metabehind.stack_index());
@@ -482,9 +512,44 @@ namespace sol {
 					stack::set_field(L, metatable_key, metabehind, t.stack_index());
 					metabehind.pop();
 
-					if (i < 2)
-						t.pop();
+					t.pop();
 				}
+
+				// Now for the shim-table that actually gets pushed
+				luaL_newmetatable(L, &usertype_traits<T>::user_metatable()[0]);
+				stack_reference t(L, -1);
+				for (auto& kvp : varmap.functions) {
+					auto& first = std::get<0>(kvp);
+					auto& second = std::get<1>(kvp);
+					register_kvp(2, t, first, second);
+				}
+				{
+					lua_createtable(L, 0, 2 + static_cast<int>(umx.callconstructfunc.valid()));
+					stack_reference metabehind(L, -1);
+					if (umx.callconstructfunc.valid()) {
+						stack::set_field(L, sol::meta_function::call_function, umx.callconstructfunc, metabehind.stack_index());
+					}
+					// use indexing function
+					stack::set_field(L, meta_function::index,
+						make_closure(&usertype_detail::simple_index_call,
+							make_light(varmap),
+							&usertype_detail::simple_index_call,
+							&usertype_detail::simple_metatable_newindex<T>,
+							usertype_detail::toplevel_magic
+						), metabehind.stack_index());
+					stack::set_field(L, meta_function::new_index,
+						make_closure(&usertype_detail::simple_new_index_call,
+							make_light(varmap),
+							&usertype_detail::simple_index_call,
+							&usertype_detail::simple_metatable_newindex<T>,
+							usertype_detail::toplevel_magic
+						), metabehind.stack_index());
+					stack::set_field(L, metatable_key, metabehind, t.stack_index());
+					metabehind.pop();
+				}
+
+				// Don't pop the table when we're done;
+				// return it
 				return 1;
 			}
 		};

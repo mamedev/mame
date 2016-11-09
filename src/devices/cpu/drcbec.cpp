@@ -288,7 +288,7 @@ drcbe_c::drcbe_c(drcuml_state &drcuml, device_t &device, drc_cache &cache, uint3
 		m_hash(cache, modes, addrbits, ignorebits),
 		m_map(cache, 0),
 		m_labels(cache),
-		m_fixup_delegate(FUNC(drcbe_c::fixup_label), this)
+		m_fixup_delegate(&drcbe_c::fixup_label, this)
 {
 }
 

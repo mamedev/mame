@@ -72,7 +72,7 @@ sound_stream::sound_stream(device_t &device, int inputs, int outputs, int sample
 		throw emu_fatalerror("Attempted to create a sound_stream with a non-sound device");
 
 	if(m_callback.isnull())
-		m_callback = stream_update_delegate(FUNC(device_sound_interface::sound_stream_update),(device_sound_interface *)sound);
+		m_callback = stream_update_delegate(&device_sound_interface::sound_stream_update,(device_sound_interface *)sound);
 
 	// create a unique tag for saving
 	std::string state_tag = string_format("%d", m_device.machine().sound().m_stream_list.size());
@@ -835,11 +835,11 @@ sound_manager::sound_manager(running_machine &machine)
 #endif
 
 	// register callbacks
-	machine.configuration().config_register("mixer", config_saveload_delegate(FUNC(sound_manager::config_load), this), config_saveload_delegate(FUNC(sound_manager::config_save), this));
-	machine.add_notifier(MACHINE_NOTIFY_PAUSE, machine_notify_delegate(FUNC(sound_manager::pause), this));
-	machine.add_notifier(MACHINE_NOTIFY_RESUME, machine_notify_delegate(FUNC(sound_manager::resume), this));
-	machine.add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(sound_manager::reset), this));
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(sound_manager::stop_recording), this));
+	machine.configuration().config_register("mixer", config_saveload_delegate(&sound_manager::config_load, this), config_saveload_delegate(&sound_manager::config_save, this));
+	machine.add_notifier(MACHINE_NOTIFY_PAUSE, machine_notify_delegate(&sound_manager::pause, this));
+	machine.add_notifier(MACHINE_NOTIFY_RESUME, machine_notify_delegate(&sound_manager::resume, this));
+	machine.add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(&sound_manager::reset, this));
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&sound_manager::stop_recording, this));
 
 	// register global states
 	machine.save().save_item(NAME(m_last_update));

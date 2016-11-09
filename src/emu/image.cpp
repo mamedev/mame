@@ -76,7 +76,7 @@ image_manager::image_manager(running_machine &machine)
 		}
 	}
 
-	machine.configuration().config_register("image_directories", config_saveload_delegate(FUNC(image_manager::config_load), this), config_saveload_delegate(FUNC(image_manager::config_save), this));
+	machine.configuration().config_register("image_directories", config_saveload_delegate(&image_manager::config_load, this), config_saveload_delegate(&image_manager::config_save, this));
 }
 
 //-------------------------------------------------
@@ -233,5 +233,5 @@ void image_manager::postdevice_init()
 		}
 	}
 	/* add a callback for when we shut down */
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(image_manager::unload_all), this));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&image_manager::unload_all, this));
 }

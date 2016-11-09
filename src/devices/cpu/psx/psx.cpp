@@ -3391,8 +3391,8 @@ static MACHINE_CONFIG_FRAGMENT( psx )
 	MCFG_PSX_DMA_IRQ_HANDLER( DEVWRITELINE("irq", psxirq_device, intin3 ) )
 
 	MCFG_DEVICE_ADD( "mdec", PSX_MDEC, 0 )
-	MCFG_PSX_DMA_CHANNEL_WRITE( DEVICE_SELF, 0, psx_dma_write_delegate( FUNC( psxmdec_device::dma_write ), (psxmdec_device *) device ) )
-	MCFG_PSX_DMA_CHANNEL_READ( DEVICE_SELF, 1, psx_dma_read_delegate( FUNC( psxmdec_device::dma_read ), (psxmdec_device *) device ) )
+	MCFG_PSX_DMA_CHANNEL_WRITE( DEVICE_SELF, 0, psx_dma_write_delegate(&psxmdec_device::dma_write, (psxmdec_device *) device ) )
+	MCFG_PSX_DMA_CHANNEL_READ( DEVICE_SELF, 1, psx_dma_read_delegate(&psxmdec_device::dma_read, (psxmdec_device *) device ) )
 
 	MCFG_DEVICE_ADD( "rcnt", PSX_RCNT, 0 )
 	MCFG_PSX_RCNT_IRQ0_HANDLER( DEVWRITELINE( "irq", psxirq_device, intin4 ) )

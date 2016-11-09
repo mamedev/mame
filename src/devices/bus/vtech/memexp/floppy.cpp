@@ -157,7 +157,7 @@ WRITE8_MEMBER(floppy_controller_device::latch_w)
 		if(newflop) {
 			newflop->set_rpm(85);
 			newflop->mon_w(0);
-			newflop->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(FUNC(floppy_controller_device::index_callback), this));
+			newflop->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(&floppy_controller_device::index_callback, this));
 			m_current_cyl = newflop->get_cyl() << 1;
 		}
 		m_floppy = newflop;

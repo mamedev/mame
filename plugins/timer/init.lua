@@ -1,9 +1,10 @@
 -- license:BSD-3-Clause
 -- copyright-holders:Carl
 require('lfs')
+local sqlite3 = require('lsqlite3')
 local exports = {}
 exports.name = "timer"
-exports.version = "0.0.1"
+exports.version = "0.0.2"
 exports.description = "Game play timer"
 exports.license = "The BSD 3-Clause License"
 exports.author = { name = "Carl" }
@@ -11,35 +12,28 @@ exports.author = { name = "Carl" }
 local timer = exports
 
 function timer.startplugin()
-	local timer_path = "timer"
+	local timer_db = "timer/timer.db"
 	local timer_started = false
 	local total_time = 0
 	local start_time = 0
 	local play_count = 0
 
-	local function get_filename()
-		local path
-		if emu.softname() ~= "" then
-			path = timer_path .. '/' .. emu.romname() .. "_" .. emu.softname() .. ".time"
-		else
-			path = timer_path .. '/' .. emu.romname() .. ".time"
-		end
-		return path
-	end
-
 	local function save()
 		total_time = total_time + (os.time() - start_time)
-		os.remove(get_filename()) -- truncate file
-		file = io.open(get_filename(), "w")
-		if not file then
-			lfs.mkdir(timer_path)
-			file = io.open(get_filename(), "w")
-		end
-		if file then
-			file:write(total_time .. "\n")
-			file:write(play_count)
-			file:close()
-		end
+
+		local db = assert(sqlite3.open(timer_db))
+		
+		local insert_stmt = assert( db:prepare("INSERT OR IGNORE INTO timer VALUES (?, ?, 0, 0)") )
+		insert_stmt:bind_values(emu.romname(), emu.softname())
+		insert_stmt:step()
+		insert_stmt:reset()
+		
+		local update_stmt = assert( db:prepare("UPDATE timer SET total_time=?, play_count=? WHERE driver=? AND software=?") )
+		update_stmt:bind_values(total_time, play_count,emu.romname(), emu.softname())
+		update_stmt:step()
+		update_stmt:reset()
+				
+		assert(db:close() == sqlite3.OK) 
 	end
 
 
@@ -49,18 +43,33 @@ function timer.startplugin()
 			save()
 		end
 		timer_started = true
-		local file = io.open(get_filename(), "r")
-		if file then
-			total_time = file:read("n")
-			play_count = file:read("n")
-			file:close()
+		lfs.mkdir('timer')
+		local db = assert(sqlite3.open(timer_db))
+		local found=false
+		db:exec([[select * from sqlite_master where name='timer';]], function(...) found=true return 0 end)
+		if not found then 		
+			db:exec[[  CREATE TABLE timer (
+						driver		VARCHAR(32) PRIMARY KEY,
+						software 	VARCHAR(40),
+						total_time	INTEGER NOT NULL,
+						play_count	INTEGER NOT NULL
+					  ); ]] 
 		end
-		if not play_count then
+
+		local stmt, row
+		stmt = db:prepare("SELECT total_time, play_count FROM timer WHERE driver = ? AND software = ?")
+		stmt:bind_values(emu.romname(), emu.softname())
+		if (stmt:step() == sqlite3.ROW) then
+			row = stmt:get_named_values()
+			play_count = row.play_count
+			total_time = row.total_time
+		else
 			play_count = 0
-		end
-		if not total_time then
 			total_time = 0
 		end
+
+		assert(db:close() == sqlite3.OK) 
+
 		start_time = os.time()
 		play_count = play_count + 1
 	end)

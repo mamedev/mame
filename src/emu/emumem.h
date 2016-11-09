@@ -80,10 +80,10 @@ class address_table_setoffset;
 typedef uint32_t  offs_t;
 
 // address map constructors are functions that build up an address_map
-typedef void (*address_map_constructor)(address_map &map, device_t &devconfig);
+typedef void (*address_map_constructor)(address_map &map);
 
 // submap retriever delegate
-typedef delegate<void (address_map &, device_t &)> address_map_delegate;
+typedef named_delegate<void (address_map &)> address_map_delegate;
 
 // struct with function pointers for accessors; use is generally discouraged unless necessary
 struct data_accessors
@@ -384,7 +384,7 @@ public:
 	void install_ram(offs_t addrstart, offs_t addrend, offs_t addrmirror, void *baseptr = nullptr) { install_ram_generic(addrstart, addrend, addrmirror, ROW_READWRITE, baseptr); }
 
 	// install device memory maps
-	template <typename T> void install_device(offs_t addrstart, offs_t addrend, T &device, void (T::*map)(address_map &map, device_t &device), int bits = 0, uint64_t unitmask = 0) {
+	template <typename T> void install_device(offs_t addrstart, offs_t addrend, T &device, void (T::*map)(address_map &map), int bits = 0, uint64_t unitmask = 0) {
 		address_map_delegate delegate(map, "dynamic_device_install", &device);
 		install_device_delegate(addrstart, addrend, device, delegate, bits, unitmask);
 	}

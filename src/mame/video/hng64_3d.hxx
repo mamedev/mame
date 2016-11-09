@@ -1302,6 +1302,6 @@ void hng64_poly_renderer::drawShaded(polygon *p)
 		renderData = rOptions;
 
 		const rectangle& visibleArea = m_state.m_screen->visible_area();
-		render_triangle(visibleArea, render_delegate(FUNC(hng64_poly_renderer::render_scanline), this), 7, pVert[0], pVert[1], pVert[2]);
+		render_triangle(visibleArea, render_delegate(&hng64_poly_renderer::render_scanline, this), 7, pVert[0], pVert[1], pVert[2]);
 	}
 }

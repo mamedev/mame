@@ -649,7 +649,7 @@ void dc_state::machine_start()
 {
 	// dccons doesn't have a specific g1 device yet
 	if(m_naomig1)
-		m_naomig1->set_dma_cb(naomi_g1_device::dma_cb(FUNC(dc_state::generic_dma), this));
+		m_naomig1->set_dma_cb(naomi_g1_device::dma_cb(&dc_state::generic_dma, this));
 
 	// save states
 	save_pointer(NAME(dc_sysctrl_regs), 0x200/4);

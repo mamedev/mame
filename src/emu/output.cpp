@@ -28,8 +28,8 @@ output_manager::output_manager(running_machine &machine)
 		m_uniqueid(12345)
 {
 	/* add pause callback */
-	machine.add_notifier(MACHINE_NOTIFY_PAUSE, machine_notify_delegate(FUNC(output_manager::pause), this));
-	machine.add_notifier(MACHINE_NOTIFY_RESUME, machine_notify_delegate(FUNC(output_manager::resume), this));
+	machine.add_notifier(MACHINE_NOTIFY_PAUSE, machine_notify_delegate(&output_manager::pause, this));
+	machine.add_notifier(MACHINE_NOTIFY_RESUME, machine_notify_delegate(&output_manager::resume, this));
 }
 
 /*-------------------------------------------------

@@ -45,7 +45,7 @@ ui_input_manager::ui_input_manager(running_machine &machine)
 	m_current_mouse_y = -1;
 
 	/* add a frame callback to poll inputs */
-	machine.add_notifier(MACHINE_NOTIFY_FRAME, machine_notify_delegate(FUNC(ui_input_manager::frame_update), this));
+	machine.add_notifier(MACHINE_NOTIFY_FRAME, machine_notify_delegate(&ui_input_manager::frame_update, this));
 }
 
 

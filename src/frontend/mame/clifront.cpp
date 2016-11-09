@@ -29,7 +29,6 @@
 #include "ui/moptions.h"
 #include "language.h"
 #include "pluginopts.h"
-#include "console.h"
 
 #include <new>
 #include <ctype.h>
@@ -312,13 +311,7 @@ int cli_frontend::execute(int argc, char **argv)
 
 		manager->start_luaengine();
 
-		if (m_options.console()) {
-			//manager->lua()->start_console();
-			console_frontend console(m_options, m_osd);
-			console.start_console();
-		} else {
 			start_execution(manager, argc, argv, option_errors);
-		}
 	}
 	// handle exceptions of various types
 	catch (emu_fatalerror &fatal)

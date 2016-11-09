@@ -89,7 +89,7 @@ void watchdog_timer_device::device_start()
 		// fetch the screen
 		screen_device *screen = siblingdevice<screen_device>(m_screen_tag);
 		if (screen != nullptr)
-			screen->register_vblank_callback(vblank_state_delegate(FUNC(watchdog_timer_device::watchdog_vblank), this));
+			screen->register_vblank_callback(vblank_state_delegate(&watchdog_timer_device::watchdog_vblank, this));
 	}
 	save_item(NAME(m_enabled));
 	save_item(NAME(m_counter));

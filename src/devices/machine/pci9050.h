@@ -75,8 +75,8 @@ private:
 	void remap_local(int id);
 	void remap_rom();
 
-	template<int id> void map_trampoline(address_map &map, device_t &device) {
-		m_maps[id](map, *m_devices[id]);
+	template<int id> void map_trampoline(address_map &map) {
+		m_maps[id](map);
 	}
 
 	devcb_read32 m_user_input_handler;

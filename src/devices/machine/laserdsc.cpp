@@ -321,7 +321,7 @@ void laserdisc_device::device_start()
 	init_audio();
 
 	// register callbacks
-	machine().configuration().config_register("laserdisc", config_saveload_delegate(FUNC(laserdisc_device::config_load), this), config_saveload_delegate(FUNC(laserdisc_device::config_save), this));
+	machine().configuration().config_register("laserdisc", config_saveload_delegate(&laserdisc_device::config_load, this), config_saveload_delegate(&laserdisc_device::config_save, this));
 }
 
 
@@ -792,7 +792,7 @@ void laserdisc_device::init_disc()
 void laserdisc_device::init_video()
 {
 	// register for VBLANK callbacks
-	m_screen->register_vblank_callback(vblank_state_delegate(FUNC(laserdisc_device::vblank_state_changed), this));
+	m_screen->register_vblank_callback(vblank_state_delegate(&laserdisc_device::vblank_state_changed, this));
 
 	// allocate palette for applying brightness/contrast/gamma
 	m_videopalette = palette_t::alloc(256);

@@ -17,6 +17,13 @@
 #pragma GCC diagnostic ignored "-Wunused-variable"
 #endif
 
+#if defined(WIN32) && !defined(_WIN32_WINNT)
+#if defined(OSD_WINDOWS)
+#define _WIN32_WINNT 0x0501
+#else
+#define _WIN32_WINNT 0x0603
+#endif
+#endif
 #define ASIO_HEADER_ONLY
 #define ASIO_STANDALONE
 #define ASIO_SEPARATE_COMPILATION

@@ -82,8 +82,9 @@ const int ADSP2181_SPORT0_RX    = 3;        // SPORT0 receive IRQ
 const int ADSP2181_SPORT0_TX    = 4;        // SPORT0 transmit IRQ
 const int ADSP2181_TIMER        = 5;        // internal timer IRQ
 const int ADSP2181_IRQE         = 6;        // IRQE
-const int ADSP2181_IRQL1        = 7;        // IRQL1
-const int ADSP2181_IRQL2        = 8;        // IRQL2
+const int ADSP2181_BDMA         = 7;        // BDMA
+const int ADSP2181_IRQL1        = 8;        // IRQL1
+const int ADSP2181_IRQL0        = 9;        // IRQL0
 
 // register enumeration
 enum
@@ -424,8 +425,8 @@ protected:
 	uint16_t              m_imask;
 	uint8_t               m_icntl;
 	uint16_t              m_ifc;
-	uint8_t               m_irq_state[9];
-	uint8_t               m_irq_latch[9];
+	uint8_t               m_irq_state[10];
+	uint8_t               m_irq_latch[10];
 
 	// other internal states
 	int                 m_icount;

@@ -3246,19 +3246,19 @@ void n64_rdp::render_spans(int32_t start, int32_t end, int32_t tilenum, bool fli
 	switch(m_other_modes.cycle_type)
 	{
 		case CYCLE_TYPE_1:
-			render_triangle_custom(clip, render_delegate(FUNC(n64_rdp::span_draw_1cycle), this), start, (end - start) + 1, spans + offset);
+			render_triangle_custom(clip, render_delegate(&n64_rdp::span_draw_1cycle, this), start, (end - start) + 1, spans + offset);
 			break;
 
 		case CYCLE_TYPE_2:
-			render_triangle_custom(clip, render_delegate(FUNC(n64_rdp::span_draw_2cycle), this), start, (end - start) + 1, spans + offset);
+			render_triangle_custom(clip, render_delegate(&n64_rdp::span_draw_2cycle, this), start, (end - start) + 1, spans + offset);
 			break;
 
 		case CYCLE_TYPE_COPY:
-			render_triangle_custom(clip, render_delegate(FUNC(n64_rdp::span_draw_copy), this), start, (end - start) + 1, spans + offset);
+			render_triangle_custom(clip, render_delegate(&n64_rdp::span_draw_copy, this), start, (end - start) + 1, spans + offset);
 			break;
 
 		case CYCLE_TYPE_FILL:
-			render_triangle_custom(clip, render_delegate(FUNC(n64_rdp::span_draw_fill), this), start, (end - start) + 1, spans + offset);
+			render_triangle_custom(clip, render_delegate(&n64_rdp::span_draw_fill, this), start, (end - start) + 1, spans + offset);
 			break;
 	}
 	wait("render spans");

@@ -147,7 +147,7 @@ MACHINE_RESET_MEMBER(atm_state,atm)
 	{
 		m_beta->enable();
 	}
-	space.set_direct_update_handler(direct_update_delegate(FUNC(atm_state::atm_direct), this));
+	space.set_direct_update_handler(direct_update_delegate(&atm_state::atm_direct, this));
 
 	memset(messram,0,128*1024);
 

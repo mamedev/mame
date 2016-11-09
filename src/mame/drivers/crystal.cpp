@@ -26,7 +26,6 @@ The Crystal of Kings
 Brezza Soft Corporation (Japan), 2001
 
 This game runs on a small cartridge-based PCB known as the 'Crystal System'
-There are only two known games running on this system, Crystal of Kings and Evolution Soccer.
 The main PCB is small (approx 6" square) and contains only a few components. All of the processing
 work is done by the large IC in the middle of the PCB. The system looks a bit like IGS's PGM System, in
 that it's housed in a plastic case and has a single slot for insertion of a game cart. However this
@@ -216,7 +215,6 @@ public:
 	required_shared_ptr<uint32_t> m_textureram;
 	required_shared_ptr<uint32_t> m_frameram;
 	optional_shared_ptr<uint32_t> m_reset_patch; // not needed for trivrus
-//  uint32_t *  m_nvram;    // currently this uses generic nvram handling
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -231,12 +229,14 @@ public:
 	uint32_t    m_Bank;
 	uint8_t     m_FlipCount;
 	uint8_t     m_IntHigh;
-	uint32_t    m_Timerctrl[4];
-	emu_timer *m_Timer[4];
+	emu_timer  *m_Timer[4];
 	uint32_t    m_FlashCmd;
 	uint32_t    m_PIO;
 	uint32_t    m_DMActrl[2];
 	uint8_t     m_OldPort4;
+
+	uint32_t *TimerRegsPtr(int which) const;
+	void TimerStart(int which);
 
 	DECLARE_READ32_MEMBER(FlipCount_r);
 	DECLARE_WRITE32_MEMBER(FlipCount_w);
@@ -270,7 +270,9 @@ public:
 	DECLARE_WRITE32_MEMBER(trivrus_input_w);
 	uint8_t m_trivrus_input;
 
-	DECLARE_READ32_MEMBER(crzyddz2_4_r);
+	DECLARE_READ32_MEMBER(crzyddz2_key_r);
+	DECLARE_WRITE32_MEMBER(crzyddz2_PIO_w);
+	uint8_t m_crzyddz2_prot;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -387,31 +389,58 @@ WRITE32_MEMBER(crystal_state::Banksw_w)
 		membank("bank1")->set_base(memregion("user2")->base());
 }
 
+uint32_t *crystal_state::TimerRegsPtr(int which) const
+{
+	return &m_sysregs[0x1400/4 + which * 8/4];
+}
+
+void crystal_state::TimerStart(int which)
+{
+	uint32_t *regs = TimerRegsPtr(which);
+
+	int PD = (regs[0] >> 8) & 0xff;
+	int TCV = regs[1] & 0xffff;
+	attotime period = attotime::from_hz(43000000) * ((PD + 1) * (TCV + 1));
+	m_Timer[which]->adjust(period);
+
+//	printf("timer %d start, PD = %x TCV = %x period = %s\n", which, PD, TCV, period.as_string());
+}
+
 TIMER_CALLBACK_MEMBER(crystal_state::Timercb)
 {
 	int which = (int)(uintptr_t)ptr;
 	static const int num[] = { 0, 1, 9, 10 };
 
-	if (!(m_Timerctrl[which] & 2))
-		m_Timerctrl[which] &= ~1;
+	uint32_t *regs = TimerRegsPtr(which);
+
+	if (regs[0] & 2)
+		TimerStart(which);
+	else
+		regs[0] &= ~1;
 
 	IntReq(num[which]);
 }
 
 void crystal_state::Timer_w( address_space &space, int which, uint32_t data, uint32_t mem_mask )
 {
-	if (((data ^ m_Timerctrl[which]) & 1) && (data & 1)) //Timer activate
-	{
-		int PD = (data >> 8) & 0xff;
-		int TCV = space.read_dword(0x01801404 + which * 8);
-		attotime period = attotime::from_hz(43000000) * ((PD + 1) * (TCV + 1));
+	uint32_t *regs = TimerRegsPtr(which);
 
-		if (m_Timerctrl[which] & 2)
-			m_Timer[which]->adjust(period, 0, period);
+	uint32_t old = regs[0];
+	data = COMBINE_DATA(&regs[0]);
+
+	if ((data ^ old) & 1)
+	{
+		if (data & 1)
+		{
+			TimerStart(which);
+		}
 		else
-			m_Timer[which]->adjust(period);
+		{
+			// Timer stop
+			m_Timer[which]->adjust(attotime::never);
+//			printf("timer %d stop\n", which);
+		}
 	}
-	COMBINE_DATA(&m_Timerctrl[which]);
 }
 
 WRITE32_MEMBER(crystal_state::Timer0_w)
@@ -421,7 +450,7 @@ WRITE32_MEMBER(crystal_state::Timer0_w)
 
 READ32_MEMBER(crystal_state::Timer0_r)
 {
-	return m_Timerctrl[0];
+	return *TimerRegsPtr(0);
 }
 
 WRITE32_MEMBER(crystal_state::Timer1_w)
@@ -431,7 +460,7 @@ WRITE32_MEMBER(crystal_state::Timer1_w)
 
 READ32_MEMBER(crystal_state::Timer1_r)
 {
-	return m_Timerctrl[1];
+	return *TimerRegsPtr(1);
 }
 
 WRITE32_MEMBER(crystal_state::Timer2_w)
@@ -441,7 +470,7 @@ WRITE32_MEMBER(crystal_state::Timer2_w)
 
 READ32_MEMBER(crystal_state::Timer2_r)
 {
-	return m_Timerctrl[2];
+	return *TimerRegsPtr(2);
 }
 
 WRITE32_MEMBER(crystal_state::Timer3_w)
@@ -451,7 +480,7 @@ WRITE32_MEMBER(crystal_state::Timer3_w)
 
 READ32_MEMBER(crystal_state::Timer3_r)
 {
-	return m_Timerctrl[3];
+	return *TimerRegsPtr(3);
 }
 
 READ32_MEMBER(crystal_state::FlashCmd_r)
@@ -573,16 +602,17 @@ static ADDRESS_MAP_START( crystal_mem, AS_PROGRAM, 32, crystal_state )
 	AM_RANGE(0x01280000, 0x01280003) AM_WRITE(Banksw_w)
 	AM_RANGE(0x01400000, 0x0140ffff) AM_RAM AM_SHARE("nvram")
 
+	AM_RANGE(0x01800800, 0x01800803) AM_READWRITE(DMA0_r, DMA0_w)
+	AM_RANGE(0x01800810, 0x01800813) AM_READWRITE(DMA1_r, DMA1_w)
+
+	AM_RANGE(0x01800c04, 0x01800c07) AM_WRITE(IntAck_w)
+
 	AM_RANGE(0x01801400, 0x01801403) AM_READWRITE(Timer0_r, Timer0_w)
 	AM_RANGE(0x01801408, 0x0180140b) AM_READWRITE(Timer1_r, Timer1_w)
 	AM_RANGE(0x01801410, 0x01801413) AM_READWRITE(Timer2_r, Timer2_w)
 	AM_RANGE(0x01801418, 0x0180141b) AM_READWRITE(Timer3_r, Timer3_w)
 	AM_RANGE(0x01802004, 0x01802007) AM_READWRITE(PIO_r, PIO_w)
 
-	AM_RANGE(0x01800800, 0x01800803) AM_READWRITE(DMA0_r, DMA0_w)
-	AM_RANGE(0x01800810, 0x01800813) AM_READWRITE(DMA1_r, DMA1_w)
-
-	AM_RANGE(0x01800c04, 0x01800c07) AM_WRITE(IntAck_w)
 	AM_RANGE(0x01800000, 0x0180ffff) AM_RAM AM_SHARE("sysregs")
 	AM_RANGE(0x02000000, 0x027fffff) AM_RAM AM_SHARE("workram")
 
@@ -597,7 +627,6 @@ static ADDRESS_MAP_START( crystal_mem, AS_PROGRAM, 32, crystal_state )
 	AM_RANGE(0x05000000, 0x05ffffff) AM_ROMBANK("bank1")
 
 	AM_RANGE(0x44414F4C, 0x44414F7F) AM_RAM AM_SHARE("reset_patch")
-
 ADDRESS_MAP_END
 
 // Trivia R Us
@@ -637,16 +666,17 @@ static ADDRESS_MAP_START( trivrus_mem, AS_PROGRAM, 32, crystal_state )
 //  0x0150001c & 0x000000ff = year - 2000
 	AM_RANGE(0x01600000, 0x01607fff) AM_RAM AM_SHARE("nvram")
 
+	AM_RANGE(0x01800800, 0x01800803) AM_READWRITE(DMA0_r, DMA0_w)
+	AM_RANGE(0x01800810, 0x01800813) AM_READWRITE(DMA1_r, DMA1_w)
+
+	AM_RANGE(0x01800c04, 0x01800c07) AM_WRITE(IntAck_w)
+
 	AM_RANGE(0x01801400, 0x01801403) AM_READWRITE(Timer0_r, Timer0_w)
 	AM_RANGE(0x01801408, 0x0180140b) AM_READWRITE(Timer1_r, Timer1_w)
 	AM_RANGE(0x01801410, 0x01801413) AM_READWRITE(Timer2_r, Timer2_w)
 	AM_RANGE(0x01801418, 0x0180141b) AM_READWRITE(Timer3_r, Timer3_w)
 	AM_RANGE(0x01802004, 0x01802007) AM_READWRITE(PIO_r, PIO_w)
 
-	AM_RANGE(0x01800800, 0x01800803) AM_READWRITE(DMA0_r, DMA0_w)
-	AM_RANGE(0x01800810, 0x01800813) AM_READWRITE(DMA1_r, DMA1_w)
-
-	AM_RANGE(0x01800c04, 0x01800c07) AM_WRITE(IntAck_w)
 	AM_RANGE(0x01800000, 0x0180ffff) AM_RAM AM_SHARE("sysregs")
 	AM_RANGE(0x02000000, 0x027fffff) AM_RAM AM_SHARE("workram")
 
@@ -661,15 +691,47 @@ static ADDRESS_MAP_START( trivrus_mem, AS_PROGRAM, 32, crystal_state )
 	AM_RANGE(0x05000000, 0x05ffffff) AM_ROMBANK("bank1")
 
 //  AM_RANGE(0x44414F4C, 0x44414F7F) AM_RAM AM_SHARE("reset_patch")
-
 ADDRESS_MAP_END
 
 // Crazy Dou Di Zhu II
 // To do: HY04 (pic?) protection
 
-READ32_MEMBER(crystal_state::crzyddz2_4_r)
+WRITE32_MEMBER(crystal_state::crzyddz2_PIO_w)
 {
-	return 0xffffff3f | (machine().rand() & 0xc0);
+	COMBINE_DATA(&m_PIO);
+
+	if (ACCESSING_BITS_8_15)
+	{
+		int mux = (m_PIO >> 8) & 0x1f;
+		if (mux == 0x1f)
+		{
+			m_crzyddz2_prot = ((m_PIO >> 8) & 0xc0) ^ 0x40;
+			logerror("%s: PIO = %08x, prot = %02x\n", machine().describe_context(), m_PIO, m_crzyddz2_prot);
+		}
+	}
+}
+
+READ32_MEMBER(crystal_state::crzyddz2_key_r)
+{
+	static const char *const key_names[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4" };
+
+	int mux = (m_PIO >> 8) & 0x1f;
+
+	uint8_t data = 0x3f;
+	for (int i = 0; i < sizeof(key_names)/sizeof(key_names[0]); ++i)
+		if (!BIT(mux,i))
+			data = 	ioport(key_names[i])->read();
+
+/*
+crzyddz2	in		out
+			00		40
+			40		00
+			c0		80
+*/
+//	m_crzyddz2_prot = (m_PIO >> 8) & 0xc0) ^ 0x40;
+	m_crzyddz2_prot = (machine().rand() & 0xc0);
+
+	return 0xffffff00 | data | m_crzyddz2_prot;
 }
 
 static ADDRESS_MAP_START( crzyddz2_mem, AS_PROGRAM, 32, crystal_state )
@@ -678,18 +740,19 @@ static ADDRESS_MAP_START( crzyddz2_mem, AS_PROGRAM, 32, crystal_state )
 	AM_RANGE(0x01280000, 0x01280003) AM_WRITE(Banksw_w)
 	AM_RANGE(0x01400000, 0x0140ffff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x01500000, 0x01500003) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x01500004, 0x01500007) AM_READ(crzyddz2_4_r)
-
-	AM_RANGE(0x01801400, 0x01801403) AM_READWRITE(Timer0_r, Timer0_w)
-	AM_RANGE(0x01801408, 0x0180140b) AM_READWRITE(Timer1_r, Timer1_w)
-	AM_RANGE(0x01801410, 0x01801413) AM_READWRITE(Timer2_r, Timer2_w)
-	AM_RANGE(0x01801418, 0x0180141b) AM_READWRITE(Timer3_r, Timer3_w)
-	AM_RANGE(0x01802004, 0x01802007) AM_READWRITE(PIO_r, PIO_w)
+	AM_RANGE(0x01500004, 0x01500007) AM_READ(crzyddz2_key_r)
 
 	AM_RANGE(0x01800800, 0x01800803) AM_READWRITE(DMA0_r, DMA0_w)
 	AM_RANGE(0x01800810, 0x01800813) AM_READWRITE(DMA1_r, DMA1_w)
 
 	AM_RANGE(0x01800c04, 0x01800c07) AM_WRITE(IntAck_w)
+
+	AM_RANGE(0x01801400, 0x01801403) AM_READWRITE(Timer0_r, Timer0_w)
+	AM_RANGE(0x01801408, 0x0180140b) AM_READWRITE(Timer1_r, Timer1_w)
+	AM_RANGE(0x01801410, 0x01801413) AM_READWRITE(Timer2_r, Timer2_w)
+	AM_RANGE(0x01801418, 0x0180141b) AM_READWRITE(Timer3_r, Timer3_w)
+	AM_RANGE(0x01802004, 0x01802007) AM_READWRITE(PIO_r, crzyddz2_PIO_w)
+
 	AM_RANGE(0x01800000, 0x0180ffff) AM_RAM AM_SHARE("sysregs")
 	AM_RANGE(0x02000000, 0x027fffff) AM_RAM AM_SHARE("workram")
 
@@ -783,7 +846,6 @@ void crystal_state::machine_start()
 	save_item(NAME(m_Bank));
 	save_item(NAME(m_FlipCount));
 	save_item(NAME(m_IntHigh));
-	save_item(NAME(m_Timerctrl));
 	save_item(NAME(m_FlashCmd));
 	save_item(NAME(m_PIO));
 	save_item(NAME(m_DMActrl));
@@ -798,6 +860,7 @@ void crystal_state::machine_reset()
 
 	memset(m_sysregs, 0, 0x10000);
 	memset(m_vidregs, 0, 0x10000);
+
 	m_FlipCount = 0;
 	m_IntHigh = 0;
 	m_Bank = 0;
@@ -810,7 +873,7 @@ void crystal_state::machine_reset()
 
 	for (i = 0; i < 4; i++)
 	{
-		m_Timerctrl[i] = 0;
+		*TimerRegsPtr(i) = 0xff << 8;
 		m_Timer[i]->adjust(attotime::never);
 	}
 
@@ -820,6 +883,8 @@ void crystal_state::machine_reset()
 #endif
 
 	PatchReset();
+
+	m_crzyddz2_prot = 0x00;
 }
 
 uint16_t crystal_state::GetVidReg( address_space &space, uint16_t reg )
@@ -1176,6 +1241,71 @@ static INPUT_PORTS_START(trivrus)
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START(crzyddz2)
+	PORT_START("P1_P2")	// 1500002 & 1500000
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) // up
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) // down  (next secret code)
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) // left  (inc secret code)
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) // right (dec secret code)
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON1        ) // A
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON2        ) // B
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_BUTTON3        ) // C     (bet)
+	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_BUTTON4        ) // D
+	PORT_BIT( 0x0000ff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_START1         ) // start (secret code screen)
+	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_SERVICE2       ) // .. 2  (next secret code / stats)
+	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_SERVICE        ) // .. 1  (secret code screen / service mode)
+	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_SERVICE1       ) // .. 3  (inc secret code / credit)
+	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_SERVICE3       ) // .. 4  (exit secret screen / clear credits)
+	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_SERVICE4       ) //       (reset and clear ram?)
+	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_UNKNOWN        )
+	PORT_BIT( 0xff000000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	// 1500004 (multiplexed by 1802005)
+	PORT_START("KEY0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A         )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_E         )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_I         )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_M         )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_KAN       ) // kan
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) // start?
+
+	PORT_START("KEY1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_B         )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_F         )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_J         )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_N         )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_REACH     ) // ?
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_BET       ) // ? + C
+
+	PORT_START("KEY2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_C         )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_G         )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_K         )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_CHI       ) // chi
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_SCORE     ) // ?
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN           ) // nothing
+
+	PORT_START("KEY3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_D         )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_H         )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_L         )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_MAHJONG_PON       ) // pon
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN           ) // nothing
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN           ) // nothing
+
+	PORT_START("KEY4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN           ) // nothing
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_RON       ) // ron
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP ) // ?
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN           ) // nothing
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MAHJONG_BIG       ) // big
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL     ) // small + D
+INPUT_PORTS_END
+
+
 static MACHINE_CONFIG_START( crystal, crystal_state )
 
 	MCFG_CPU_ADD("maincpu", SE3208, 43000000)
@@ -1380,16 +1510,13 @@ Notes:
 
 ***************************************************************************/
 
-// if you bypass the hy04 error, if fails with "THERE IS NO IMAGE" as it tries to load files from the flash.
-// Indeed, apart from logo.bmp, the rest of the filenames it tries to load are not in the flash.
-
 ROM_START( crzyddz2 )
 	ROM_REGION32_LE( 0x3000000, "user1", ROMREGION_ERASEFF ) // Flash
-	ROM_LOAD( "rom.u48", 0x000000, 0x1000000, CRC(e24257c4) SHA1(569d79a61ff6d35100ba5727069363146df9e0b7) )
+	ROM_LOAD( "rom.u48", 0x000000, 0x1000000, CRC(0f3a1987) SHA1(6cad943846c79db31226676c7391f32216cfff79) )
 
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASEFF )
-	ROM_COPY( "user1",      0x000000, 0x000000, 0x1000000 ) // copy flash here
-	ROM_LOAD( "27c322.u36", 0x000000, 0x0200000, CRC(b3177f39) SHA1(2a28bf8045bd2e053d88549b79fbc11f30ef9a32) ) // 1ST AND 2ND HALF IDENTICAL
+	ROM_COPY( "user1",      0x000000, 0x000000, 0x1000000 )	// copy flash here
+	ROM_LOAD( "27c322.u49", 0x000000, 0x0200000, CRC(b3177f39) SHA1(2a28bf8045bd2e053d88549b79fbc11f30ef9a32) )	// 1ST AND 2ND HALF IDENTICAL
 	ROM_CONTINUE(           0x000000, 0x0200000 )
 
 	ROM_REGION( 0x4280, "pic", 0 ) // hy04
@@ -1398,6 +1525,28 @@ ROM_START( crzyddz2 )
 	ROM_REGION( 0x1000000, "user2", ROMREGION_ERASEFF ) // Unmapped flash
 ROM_END
 
+/***************************************************************************
+
+Meng Hong Lou (Dream of the Red Chamber)
+Sealy, 2004?
+
+Red PCB, very similar to crzyddz2
+
+***************************************************************************/
+
+ROM_START( menghong )
+	ROM_REGION32_LE( 0x3000000, "user1", ROMREGION_ERASEFF ) // Flash
+	ROM_LOAD( "rom.u48", 0x000000, 0x1000000, CRC(e24257c4) SHA1(569d79a61ff6d35100ba5727069363146df9e0b7) )
+
+	ROM_REGION( 0x1000000, "maincpu", 0 )
+	ROM_COPY( "user1",      0x000000, 0x000000, 0x1000000 )	// copy flash here
+	ROM_LOAD( "060511_08-01-18.u49",  0x000000, 0x0200000, CRC(b0c12107) SHA1(b1753757bbdb7d996df563ac6abdc6b46676704b) ) // 27C160
+
+	ROM_REGION( 0x4280, "pic", 0 ) // hy04
+	ROM_LOAD("menghong_hy04", 0x000000, 0x4280, NO_DUMP )
+
+	ROM_REGION( 0x1000000, "user2", ROMREGION_ERASEFF ) // Unmapped flash
+ROM_END
 
 
 DRIVER_INIT_MEMBER(crystal_state,crysking)
@@ -1522,15 +1671,16 @@ DRIVER_INIT_MEMBER(crystal_state,psattack)
 }
 
 
-GAME( 2001, crysbios,        0, crystal,  crystal, driver_device,         0, ROT0, "BrezzaSoft",          "Crystal System BIOS",                  MACHINE_IS_BIOS_ROOT )
-GAME( 2001, crysking, crysbios, crystal,  crystal, crystal_state,  crysking, ROT0, "BrezzaSoft",          "The Crystal of Kings",                 0 )
-GAME( 2001, evosocc,  crysbios, crystal,  crystal, crystal_state,  evosocc,  ROT0, "Evoga",               "Evolution Soccer",                     0 )
-GAME( 2003, topbladv, crysbios, crystal,  crystal, crystal_state,  topbladv, ROT0, "SonoKong / Expotato", "Top Blade V",                          0 )
-GAME( 2001, officeye,        0, crystal,  officeye,crystal_state,  officeye, ROT0, "Danbi",               "Office Yeo In Cheon Ha (version 1.2)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // still has some instability issues
-GAME( 2001, donghaer,        0, crystal,  crystal, crystal_state,  donghaer, ROT0, "Danbi",               "Donggul Donggul Haerong",              MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 2006, crzyddz2,        0, crzyddz2, crystal, driver_device,  0,        ROT0, "Sealy",               "Crazy Dou Di Zhu II",                  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 2009, trivrus,         0, trivrus,  trivrus, driver_device,         0, ROT0, "AGT",                 "Trivia R Us (v1.07)",                  0 )
+GAME( 2001, crysbios, 0,        crystal,  crystal,  driver_device, 0,        ROT0, "BrezzaSoft",          "Crystal System BIOS",                  MACHINE_IS_BIOS_ROOT )
+GAME( 2001, crysking, crysbios, crystal,  crystal,  crystal_state, crysking, ROT0, "BrezzaSoft",          "The Crystal of Kings",                 0 )
+GAME( 2001, evosocc,  crysbios, crystal,  crystal,  crystal_state, evosocc,  ROT0, "Evoga",               "Evolution Soccer",                     0 )
+GAME( 2003, topbladv, crysbios, crystal,  crystal,  crystal_state, topbladv, ROT0, "SonoKong / Expotato", "Top Blade V",                          0 )
+GAME( 2001, officeye, 0,        crystal,  officeye, crystal_state, officeye, ROT0, "Danbi",               "Office Yeo In Cheon Ha (version 1.2)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION ) // still has some instability issues
+GAME( 2001, donghaer, 0,        crystal,  crystal,  crystal_state, donghaer, ROT0, "Danbi",               "Donggul Donggul Haerong",              MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2004?,menghong, 0,        crzyddz2, crzyddz2, driver_device, 0,        ROT0, "Sealy",               "Meng Hong Lou",                        MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2006, crzyddz2, 0,        crzyddz2, crzyddz2, driver_device, 0,        ROT0, "Sealy",               "Crazy Dou Di Zhu II",                  MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 2009, trivrus,  0,        trivrus,  trivrus,  driver_device, 0,        ROT0, "AGT",                 "Trivia R Us (v1.07)",                  0 )
 // has a CF card instead of flash roms
-GAME( 2004, psattack, 0, crystal, crystal, crystal_state, psattack, ROT0, "Uniana", "P's Attack", MACHINE_IS_SKELETON )
+GAME( 2004, psattack, 0,        crystal,  crystal,  crystal_state, psattack, ROT0, "Uniana",              "P's Attack",                           MACHINE_IS_SKELETON )
 // looks like the same kind of hw from strings in the ROM, but scrambled / encrypted?
-GAME( 200?, ddz,    0,  crystal, crystal, driver_device, 0, ROT0, "IGS?", "Dou Di Zhu", MACHINE_IS_SKELETON )
+GAME( 200?, ddz,      0,        crystal,  crystal,  driver_device, 0,        ROT0, "IGS?",                "Dou Di Zhu",                           MACHINE_IS_SKELETON )

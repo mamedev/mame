@@ -199,8 +199,8 @@ end
 	}
 if (STANDALONE~=true) then
 	links {
-		"frontend",
-		"linenoise-ng",
+		"frontend",	
+		"http",
 	}
 end
 if (MACHINES["NETLIST"]~=null) then
@@ -234,10 +234,16 @@ if (STANDALONE~=true) then
 		ext_lib("lua"),
 		"lualibs",
 	}
+if (_OPTIONS["osd"] ~= "uwp") then
+	links {
+		"linenoise-ng",
+	}
+end
 end
 	links {
 		ext_lib("zlib"),
 		ext_lib("flac"),
+		ext_lib("sqlite3"),
 	}
 
 	if _OPTIONS["NO_USE_MIDI"]~="1" then

@@ -22,11 +22,12 @@
 #ifndef SOL_OPTIONAL_HPP
 #define SOL_OPTIONAL_HPP
 
+#include "compatibility.hpp"
 #include "in_place.hpp"
 #if defined(SOL_USE_BOOST)
 #include <boost/optional.hpp>
 #else
-#include "../Optional/optional.hpp"
+#include "optional_implementation.hpp"
 #endif // Boost vs. Better optional
 
 namespace sol {

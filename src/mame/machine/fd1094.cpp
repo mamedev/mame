@@ -581,7 +581,7 @@ fd1094_device::fd1094_device(const machine_config &mconfig, const char *tag, dev
 		if ((opcode & 0xff80) == 0x4e80 || (opcode & 0xf0f8) == 0x50c8 || (opcode & 0xf000) == 0x6000)
 			m_masked_opcodes_lookup[1][opcode >> 4] |= 1 << ((opcode >> 1) & 7);
 
-	m_state_change = state_change_delegate(FUNC(fd1094_device::default_state_change), this);
+	m_state_change = state_change_delegate(&fd1094_device::default_state_change, this);
 }
 
 

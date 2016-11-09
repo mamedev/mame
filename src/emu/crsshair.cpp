@@ -287,7 +287,7 @@ crosshair_manager::crosshair_manager(running_machine &machine)
 	, m_auto_time(CROSSHAIR_VISIBILITY_AUTOTIME_DEFAULT)
 {
 	/* request a callback upon exiting */
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(crosshair_manager::exit), this));
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&crosshair_manager::exit, this));
 
 	for (int player = 0; player < MAX_PLAYERS; player++)
 		m_crosshair[player] = std::make_unique<render_crosshair>(machine, player);
@@ -311,11 +311,11 @@ crosshair_manager::crosshair_manager(running_machine &machine)
 
 	/* register callbacks for when we load/save configurations */
 	if (m_usage)
-		machine.configuration().config_register("crosshairs", config_saveload_delegate(FUNC(crosshair_manager::config_load), this), config_saveload_delegate(FUNC(crosshair_manager::config_save), this));
+		machine.configuration().config_register("crosshairs", config_saveload_delegate(&crosshair_manager::config_load, this), config_saveload_delegate(&crosshair_manager::config_save, this));
 
 	/* register the animation callback */
 	if (machine.first_screen() != nullptr)
-		machine.first_screen()->register_vblank_callback(vblank_state_delegate(FUNC(crosshair_manager::animate), this));
+		machine.first_screen()->register_vblank_callback(vblank_state_delegate(&crosshair_manager::animate, this));
 }
 
 /*-------------------------------------------------

@@ -273,6 +273,57 @@ TEST_CASE("containers/arbitrary-creation", "userdata and tables should be usable
 	REQUIRE(c.get<std::string>("project") == "sol");
 }
 
+TEST_CASE("containers/extra-functions", "make sure the manipulation functions are present and usable and working across various container types") {
+	sol::state lua;
+	lua.open_libraries();
+
+	lua.script(R"(
+function g (x)
+	x:add(20)
+end
+
+function h (x)
+	x:add(20, 40)
+end
+
+function i (x)
+	x:clear()
+end
+)");
+
+	// Have the function we 
+	// just defined in Lua
+	sol::function g = lua["g"];
+	sol::function h = lua["h"];
+	sol::function i = lua["i"];
+
+	// Set a global variable called 
+	// "arr" to be a vector of 5 lements
+	lua["arr"] = std::vector<int>{ 2, 4, 6, 8, 10 };
+	lua["map"] = std::map<int, int>{ { 1 , 2 },{ 2, 4 },{ 3, 6 },{ 4, 8 },{ 5, 10 } };
+	lua["set"] = std::set<int>{ 2, 4, 6, 8, 10 };
+	std::vector<int>& arr = lua["arr"];
+	std::map<int, int>& map = lua["map"];
+	std::set<int>& set = lua["set"];
+	REQUIRE(arr.size() == 5);
+	REQUIRE(map.size() == 5);
+	REQUIRE(set.size() == 5);
+
+	g(lua["set"]);
+	g(lua["arr"]);
+	h(lua["map"]);
+	REQUIRE(arr.size() == 6);
+	REQUIRE(map.size() == 6);
+	REQUIRE(set.size() == 6);
+
+	i(lua["arr"]);
+	i(lua["map"]);
+	i(lua["set"]);	
+	REQUIRE(arr.empty());
+	REQUIRE(map.empty());
+	REQUIRE(set.empty());
+}
+
 TEST_CASE("containers/usertype-transparency", "Make sure containers pass their arguments through transparently and push the results as references, not new values") {
 	class A {
 	public:
@@ -307,4 +358,68 @@ a_ref = b.a_list[2]
 	A& a_ref = lua["a_ref"];
 	REQUIRE(&b.a_list[1] == &a_ref);
 	REQUIRE(b.a_list[1].a == a_ref.a);
+}
+
+struct options {
+	static int livingcount;
+	static options* last;
+	options() {
+		++livingcount;
+		last = this;
+		INFO("constructor: " << this);
+	}
+
+	std::string output_help() {
+		last = this;
+		INFO("func: " << this);
+		return "";
+	}
+
+	void begin() {}
+	void end() {}
+
+	~options() {
+		last = this;
+		--livingcount;
+	}
+};
+
+options* options::last = nullptr;
+int options::livingcount = 0;
+
+struct machine {
+	options opt;
+};
+
+namespace sol {
+	template <>
+	struct is_container<options> : std::false_type {};
+}
+
+TEST_CASE("containers/is-container", "make sure the is_container trait behaves properly") {
+	sol::state lua;
+	lua.open_libraries();
+
+	lua.new_usertype<options>("options_type",
+		"output_help", &options::output_help
+		);
+
+	lua.new_usertype<machine>("machine_type",
+		"new", sol::no_constructor,
+		"opt", [](machine& m) { return &m.opt; },
+		"copy_opt", [](machine& m) { return m.opt; }
+	);
+
+	{ 
+		machine m;
+		lua["machine"] = &m;
+
+		lua.script(R"(
+	machine:opt():output_help()
+	)");
+
+		REQUIRE(options::last == &m.opt);
+		REQUIRE(options::livingcount == 1);
+	}
+	REQUIRE(options::livingcount == 0);
 }

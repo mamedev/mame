@@ -1752,6 +1752,8 @@ TIMER_CALLBACK_MEMBER(saturn_state::vdp1_draw_end )
 	/* set CEF to 1*/
 	CEF_1;
 
+	// TODO: temporary for Batman Forever, presumably anonymous timer not behaving well.
+	#if 0
 	if(!(m_scu.ism & IRQ_VDP1_END))
 	{
 		m_maincpu->set_input_line_and_vector(0x2, HOLD_LINE, 0x4d);
@@ -1759,6 +1761,7 @@ TIMER_CALLBACK_MEMBER(saturn_state::vdp1_draw_end )
 	}
 	else
 		m_scu.ist |= (IRQ_VDP1_END);
+	#endif
 }
 
 

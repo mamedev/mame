@@ -40,6 +40,7 @@ includedirs {
 	ext_includedir("lua"),
 	ext_includedir("zlib"),
 	ext_includedir("flac"),
+	MAME_DIR .. "3rdparty/asio/include",
 }
 
 configuration { "vs*" }
@@ -66,8 +67,6 @@ files {
 	MAME_DIR .. "src/frontend/mame/cheat.h",
 	MAME_DIR .. "src/frontend/mame/clifront.cpp",
 	MAME_DIR .. "src/frontend/mame/clifront.h",
-	MAME_DIR .. "src/frontend/mame/console.cpp",
-	MAME_DIR .. "src/frontend/mame/console.h",
 	MAME_DIR .. "src/frontend/mame/info.cpp",
 	MAME_DIR .. "src/frontend/mame/info.h",
 	MAME_DIR .. "src/frontend/mame/language.cpp",

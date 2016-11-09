@@ -59,7 +59,7 @@ void pci9050_device::set_map(int id, address_map_constructor map, const char *na
 
 void pci9050_device::device_start()
 {
-	typedef void (pci9050_device::*tramp_t)(address_map &, device_t &);
+	typedef void (pci9050_device::*tramp_t)(address_map &);
 	static const tramp_t trampolines[4] = {
 		&pci9050_device::map_trampoline<0>,
 		&pci9050_device::map_trampoline<1>,

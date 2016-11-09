@@ -2618,7 +2618,7 @@ render_manager::render_manager(running_machine &machine)
 		m_ui_container(global_alloc(render_container(*this)))
 {
 	// register callbacks
-	machine.configuration().config_register("video", config_saveload_delegate(FUNC(render_manager::config_load), this), config_saveload_delegate(FUNC(render_manager::config_save), this));
+	machine.configuration().config_register("video", config_saveload_delegate(&render_manager::config_load, this), config_saveload_delegate(&render_manager::config_save, this));
 
 	// create one container per screen
 	for (screen_device &screen : screen_device_iterator(machine.root_device()))

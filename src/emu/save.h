@@ -39,7 +39,7 @@ enum save_error
 //**************************************************************************
 
 // callback delegate for presave/postload
-typedef delegate<void ()> save_prepost_delegate;
+typedef named_delegate<void ()> save_prepost_delegate;
 
 
 // use this to declare a given type is a simple, non-pointer type that can be

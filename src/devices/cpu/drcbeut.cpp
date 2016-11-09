@@ -435,7 +435,7 @@ uint32_t drc_map_variables::get_last_value(uint32_t mapvar)
 
 drc_label_list::drc_label_list(drc_cache &cache)
 	: m_cache(cache),
-		m_oob_callback_delegate(FUNC(drc_label_list::oob_callback), this)
+		m_oob_callback_delegate(&drc_label_list::oob_callback, this)
 {
 }
 

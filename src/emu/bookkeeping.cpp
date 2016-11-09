@@ -39,7 +39,7 @@ bookkeeping_manager::bookkeeping_manager(running_machine &machine)
 	machine.save().save_item(NAME(m_dispensed_tickets));
 
 	// register for configuration
-	machine.configuration().config_register("counters", config_saveload_delegate(FUNC(bookkeeping_manager::config_load), this), config_saveload_delegate(FUNC(bookkeeping_manager::config_save), this));
+	machine.configuration().config_register("counters", config_saveload_delegate(&bookkeeping_manager::config_load, this), config_saveload_delegate(&bookkeeping_manager::config_save, this));
 }
 
 

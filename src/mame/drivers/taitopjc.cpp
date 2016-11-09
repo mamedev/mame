@@ -239,7 +239,7 @@ void taitopjc_state::video_start()
 
 	m_gfxdecode->set_gfx(0, std::make_unique<gfx_element>(*m_palette, char_layout, (uint8_t*)m_screen_ram.get(), 0, m_palette->entries() / 256, 0));
 
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(taitopjc_state::video_exit), this));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&taitopjc_state::video_exit, this));
 }
 
 uint32_t taitopjc_state::screen_update_taitopjc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

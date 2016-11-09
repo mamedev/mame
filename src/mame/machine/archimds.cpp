@@ -432,7 +432,7 @@ void archimedes_state::archimedes_driver_init()
 {
 	m_archimedes_memc_physmem = reinterpret_cast<uint32_t *>(memshare("physicalram")->ptr());
 //  address_space &space = m_maincpu->space(AS_PROGRAM);
-//  space.set_direct_update_handler(direct_update_delegate(FUNC(a310_setopbase), &machine));
+//  space.set_direct_update_handler(direct_update_delegate(&a310_setopbase, &machine));
 }
 
 static const char *const ioc_regnames[] =

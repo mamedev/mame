@@ -151,11 +151,11 @@ void k001005_renderer::render_polygons()
 
 	float fog_density = 1.5f;
 
-	render_delegate rd_scan_2d = render_delegate(FUNC(k001005_renderer::draw_scanline_2d), this);
-	render_delegate rd_scan_tex2d = render_delegate(FUNC(k001005_renderer::draw_scanline_2d_tex), this);
-	render_delegate rd_scan = render_delegate(FUNC(k001005_renderer::draw_scanline), this);
-	render_delegate rd_scan_tex = render_delegate(FUNC(k001005_renderer::draw_scanline_tex), this);
-	render_delegate rd_scan_gour_blend = render_delegate(FUNC(k001005_renderer::draw_scanline_gouraud_blend), this);
+	render_delegate rd_scan_2d = render_delegate(&k001005_renderer::draw_scanline_2d, this);
+	render_delegate rd_scan_tex2d = render_delegate(&k001005_renderer::draw_scanline_2d_tex, this);
+	render_delegate rd_scan = render_delegate(&k001005_renderer::draw_scanline, this);
+	render_delegate rd_scan_tex = render_delegate(&k001005_renderer::draw_scanline_tex, this);
+	render_delegate rd_scan_gour_blend = render_delegate(&k001005_renderer::draw_scanline_gouraud_blend, this);
 
 	do
 	{
