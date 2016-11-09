@@ -74,9 +74,11 @@ DEVICE_ADDRESS_MAP_START(config_map, 32, i6300esb_lpc_device)
 ADDRESS_MAP_END
 
 DEVICE_ADDRESS_MAP_START(internal_io_map, 32, i6300esb_lpc_device)
+	;
 	if(lpc_en & 0x2000) {
 		AM_RANGE(0x004c, 0x004f) AM_READWRITE8(siu_config_port_r, siu_config_port_w, 0x00ff0000)
 		AM_RANGE(0x004c, 0x004f) AM_READWRITE8(siu_data_port_r,   siu_data_port_w,   0xff000000)
+		;
 	}
 
 	AM_RANGE(0x0060, 0x0063) AM_READWRITE8(    nmi_sc_r,          nmi_sc_w,          0x0000ff00)

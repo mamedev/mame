@@ -220,21 +220,17 @@ void ADDRESS_MAP_NAME(_name)(address_map &map) \
 { \
 	typedef read##_bits##_delegate read_delegate ATTR_UNUSED; \
 	typedef write##_bits##_delegate write_delegate ATTR_UNUSED; \
-	address_map_entry *curentry = nullptr; \
-	(void)curentry; \
 	map.configure(_space, _bits); \
-	typedef _class drivdata_class ATTR_UNUSED;
+	typedef _class drivdata_class ATTR_UNUSED
 #define DEVICE_ADDRESS_MAP_START(_name, _bits, _class) \
 void _class :: _name(::address_map &map) \
 { \
 	typedef read##_bits##_delegate read_delegate ATTR_UNUSED; \
 	typedef write##_bits##_delegate write_delegate ATTR_UNUSED; \
-	address_map_entry *curentry = nullptr; \
-	(void)curentry; \
 	map.configure(AS_PROGRAM, _bits);  \
-	typedef _class drivdata_class ATTR_UNUSED;
+	typedef _class drivdata_class ATTR_UNUSED
 #define ADDRESS_MAP_END \
-}
+;}
 
 // use this to declare external references to an address map
 #define ADDRESS_MAP_EXTERN(_name, _bits) \
@@ -248,155 +244,152 @@ void _class :: _name(::address_map &map) \
 
 // global controls
 #define ADDRESS_MAP_GLOBAL_MASK(_mask) \
-	map.set_global_mask(_mask);
+	;map.set_global_mask(_mask)
 #define ADDRESS_MAP_UNMAP_LOW \
-	map.set_unmap_value(0);
+	;map.set_unmap_value(0)
 #define ADDRESS_MAP_UNMAP_HIGH \
-	map.set_unmap_value(~0);
+	;map.set_unmap_value(~0)
 
 // importing data from other address maps
 #define AM_IMPORT_FROM(_name) \
-	ADDRESS_MAP_NAME(_name)(map);
+	;ADDRESS_MAP_NAME(_name)(map)
 // importing data from inherited address maps
 #define AM_INHERIT_FROM(_name) \
-	_name(map);
+	;_name(map)
 
 // address ranges
 #define AM_RANGE(_start, _end) \
-	curentry = map.add(_start, _end);
+	;map.add(_start, _end)
 #define AM_MASK(_mask) \
-	curentry->set_mask(_mask);
+	->set_mask(_mask)
 #define AM_MIRROR(_mirror) \
-	curentry->set_mirror(_mirror);
+	->set_mirror(_mirror)
 #define AM_SELECT(_select) \
-	curentry->set_select(_select);
+	->set_select(_select)
 
 // driver data reads
 #define AM_READ(_handler) \
-	curentry->set_handler(read_delegate(&drivdata_class::_handler, "driver_data::" #_handler, DEVICE_SELF, (drivdata_class *)nullptr));
+	->set_handler(read_delegate(&drivdata_class::_handler, "driver_data::" #_handler, DEVICE_SELF, (drivdata_class *)nullptr))
 #define AM_READ8(_handler, _unitmask) \
-	curentry->set_handler(read8_delegate(&drivdata_class::_handler, "driver_data::" #_handler, DEVICE_SELF, (drivdata_class *)nullptr), _unitmask);
+	->set_handler(read8_delegate(&drivdata_class::_handler, "driver_data::" #_handler, DEVICE_SELF, (drivdata_class *)nullptr), _unitmask)
 #define AM_READ16(_handler, _unitmask) \
-	curentry->set_handler(read16_delegate(&drivdata_class::_handler, "driver_data::" #_handler, DEVICE_SELF, (drivdata_class *)nullptr), _unitmask);
+	->set_handler(read16_delegate(&drivdata_class::_handler, "driver_data::" #_handler, DEVICE_SELF, (drivdata_class *)nullptr), _unitmask)
 #define AM_READ32(_handler, _unitmask) \
-	curentry->set_handler(read32_delegate(&drivdata_class::_handler, "driver_data::" #_handler, DEVICE_SELF, (drivdata_class *)nullptr), _unitmask);
+	->set_handler(read32_delegate(&drivdata_class::_handler, "driver_data::" #_handler, DEVICE_SELF, (drivdata_class *)nullptr), _unitmask)
 
 // driver data writes
 #define AM_WRITE(_handler) \
-	curentry->set_handler(write_delegate(&drivdata_class::_handler, "driver_data::" #_handler, DEVICE_SELF, (drivdata_class *)nullptr));
+	->set_handler(write_delegate(&drivdata_class::_handler, "driver_data::" #_handler, DEVICE_SELF, (drivdata_class *)nullptr))
 #define AM_WRITE8(_handler, _unitmask) \
-	curentry->set_handler(write8_delegate(&drivdata_class::_handler, "driver_data::" #_handler, DEVICE_SELF, (drivdata_class *)nullptr), _unitmask);
+	->set_handler(write8_delegate(&drivdata_class::_handler, "driver_data::" #_handler, DEVICE_SELF, (drivdata_class *)nullptr), _unitmask)
 #define AM_WRITE16(_handler, _unitmask) \
-	curentry->set_handler(write16_delegate(&drivdata_class::_handler, "driver_data::" #_handler, DEVICE_SELF, (drivdata_class *)nullptr), _unitmask);
+	->set_handler(write16_delegate(&drivdata_class::_handler, "driver_data::" #_handler, DEVICE_SELF, (drivdata_class *)nullptr), _unitmask)
 #define AM_WRITE32(_handler, _unitmask) \
-	curentry->set_handler(write32_delegate(&drivdata_class::_handler, "driver_data::" #_handler, DEVICE_SELF, (drivdata_class *)nullptr), _unitmask);
+	->set_handler(write32_delegate(&drivdata_class::_handler, "driver_data::" #_handler, DEVICE_SELF, (drivdata_class *)nullptr), _unitmask)
 
 // driver data reads/writes
 #define AM_READWRITE(_rhandler, _whandler) \
-	curentry->set_handler(read_delegate(&drivdata_class::_rhandler, "driver_data::" #_rhandler, DEVICE_SELF, (drivdata_class *)nullptr), write_delegate(&drivdata_class::_whandler, "driver_data::" #_whandler, DEVICE_SELF, (drivdata_class *)nullptr));
+	->set_handler(read_delegate(&drivdata_class::_rhandler, "driver_data::" #_rhandler, DEVICE_SELF, (drivdata_class *)nullptr), write_delegate(&drivdata_class::_whandler, "driver_data::" #_whandler, DEVICE_SELF, (drivdata_class *)nullptr))
 #define AM_READWRITE8(_rhandler, _whandler, _unitmask) \
-	curentry->set_handler(read8_delegate(&drivdata_class::_rhandler, "driver_data::" #_rhandler, DEVICE_SELF, (drivdata_class *)nullptr), write8_delegate(&drivdata_class::_whandler, "driver_data::" #_whandler, DEVICE_SELF, (drivdata_class *)nullptr), _unitmask);
+	->set_handler(read8_delegate(&drivdata_class::_rhandler, "driver_data::" #_rhandler, DEVICE_SELF, (drivdata_class *)nullptr), write8_delegate(&drivdata_class::_whandler, "driver_data::" #_whandler, DEVICE_SELF, (drivdata_class *)nullptr), _unitmask)
 #define AM_READWRITE16(_rhandler, _whandler, _unitmask) \
-	curentry->set_handler(read16_delegate(&drivdata_class::_rhandler, "driver_data::" #_rhandler, DEVICE_SELF, (drivdata_class *)nullptr), write16_delegate(&drivdata_class::_whandler, "driver_data::" #_whandler, DEVICE_SELF, (drivdata_class *)nullptr), _unitmask);
+	->set_handler(read16_delegate(&drivdata_class::_rhandler, "driver_data::" #_rhandler, DEVICE_SELF, (drivdata_class *)nullptr), write16_delegate(&drivdata_class::_whandler, "driver_data::" #_whandler, DEVICE_SELF, (drivdata_class *)nullptr), _unitmask)
 #define AM_READWRITE32(_rhandler, _whandler, _unitmask) \
-	curentry->set_handler(read32_delegate(&drivdata_class::_rhandler, "driver_data::" #_rhandler, DEVICE_SELF, (drivdata_class *)nullptr), write32_delegate(&drivdata_class::_whandler, "driver_data::" #_whandler, DEVICE_SELF, (drivdata_class *)nullptr), _unitmask);
+	->set_handler(read32_delegate(&drivdata_class::_rhandler, "driver_data::" #_rhandler, DEVICE_SELF, (drivdata_class *)nullptr), write32_delegate(&drivdata_class::_whandler, "driver_data::" #_whandler, DEVICE_SELF, (drivdata_class *)nullptr), _unitmask)
 
 // driver set offset. Upcast to base class because there are no data width variants,
 // and the compiler complains if we don't do it explicitly
 #define AM_SETOFFSET(_handler) \
-	((address_map_entry*)curentry)->set_handler(setoffset_delegate(&drivdata_class::_handler, "driver_data::" #_handler, DEVICE_SELF, (drivdata_class *)nullptr));
+	->set_handler(setoffset_delegate(&drivdata_class::_handler, "driver_data::" #_handler, DEVICE_SELF, (drivdata_class *)nullptr))
 
 // device reads
 #define AM_DEVREAD(_tag, _class, _handler) \
-	curentry->set_handler(read_delegate(&_class::_handler, #_class "::" #_handler, _tag, (_class *)nullptr));
+	->set_handler(read_delegate(&_class::_handler, #_class "::" #_handler, _tag, (_class *)nullptr))
 #define AM_DEVREAD8(_tag, _class, _handler, _unitmask) \
-	curentry->set_handler(read8_delegate(&_class::_handler, #_class "::" #_handler, _tag, (_class *)nullptr), _unitmask);
+	->set_handler(read8_delegate(&_class::_handler, #_class "::" #_handler, _tag, (_class *)nullptr), _unitmask)
 #define AM_DEVREAD16(_tag, _class, _handler, _unitmask) \
-	curentry->set_handler(read16_delegate(&_class::_handler, #_class "::" #_handler, _tag, (_class *)nullptr), _unitmask);
+	->set_handler(read16_delegate(&_class::_handler, #_class "::" #_handler, _tag, (_class *)nullptr), _unitmask)
 #define AM_DEVREAD32(_tag, _class, _handler, _unitmask) \
-	curentry->set_handler(read32_delegate(&_class::_handler, #_class "::" #_handler, _tag, (_class *)nullptr), _unitmask);
+	->set_handler(read32_delegate(&_class::_handler, #_class "::" #_handler, _tag, (_class *)nullptr), _unitmask)
 
 // device writes
 #define AM_DEVWRITE(_tag, _class, _handler) \
-	curentry->set_handler(write_delegate(&_class::_handler, #_class "::" #_handler, _tag, (_class *)nullptr));
+	->set_handler(write_delegate(&_class::_handler, #_class "::" #_handler, _tag, (_class *)nullptr))
 #define AM_DEVWRITE8(_tag, _class, _handler, _unitmask) \
-	curentry->set_handler(write8_delegate(&_class::_handler, #_class "::" #_handler, _tag, (_class *)nullptr), _unitmask);
+	->set_handler(write8_delegate(&_class::_handler, #_class "::" #_handler, _tag, (_class *)nullptr), _unitmask)
 #define AM_DEVWRITE16(_tag, _class, _handler, _unitmask) \
-	curentry->set_handler(write16_delegate(&_class::_handler, #_class "::" #_handler, _tag, (_class *)nullptr), _unitmask);
+	->set_handler(write16_delegate(&_class::_handler, #_class "::" #_handler, _tag, (_class *)nullptr), _unitmask)
 #define AM_DEVWRITE32(_tag, _class, _handler, _unitmask) \
-	curentry->set_handler(write32_delegate(&_class::_handler, #_class "::" #_handler, _tag, (_class *)nullptr), _unitmask);
+	->set_handler(write32_delegate(&_class::_handler, #_class "::" #_handler, _tag, (_class *)nullptr), _unitmask)
 
 // device reads/writes
 #define AM_DEVREADWRITE(_tag, _class, _rhandler, _whandler) \
-	curentry->set_handler(read_delegate(&_class::_rhandler, #_class "::" #_rhandler, _tag, (_class *)nullptr), write_delegate(&_class::_whandler, #_class "::" #_whandler, _tag, (_class *)nullptr));
+	->set_handler(read_delegate(&_class::_rhandler, #_class "::" #_rhandler, _tag, (_class *)nullptr), write_delegate(&_class::_whandler, #_class "::" #_whandler, _tag, (_class *)nullptr))
 #define AM_DEVREADWRITE8(_tag, _class, _rhandler, _whandler, _unitmask) \
-	curentry->set_handler(read8_delegate(&_class::_rhandler, #_class "::" #_rhandler, _tag, (_class *)nullptr), write8_delegate(&_class::_whandler, #_class "::" #_whandler, _tag, (_class *)nullptr), _unitmask);
+	->set_handler(read8_delegate(&_class::_rhandler, #_class "::" #_rhandler, _tag, (_class *)nullptr), write8_delegate(&_class::_whandler, #_class "::" #_whandler, _tag, (_class *)nullptr), _unitmask)
 #define AM_DEVREADWRITE16(_tag, _class, _rhandler, _whandler, _unitmask) \
-	curentry->set_handler(read16_delegate(&_class::_rhandler, #_class "::" #_rhandler, _tag, (_class *)nullptr), write16_delegate(&_class::_whandler, #_class "::" #_whandler, _tag, (_class *)nullptr), _unitmask);
+	->set_handler(read16_delegate(&_class::_rhandler, #_class "::" #_rhandler, _tag, (_class *)nullptr), write16_delegate(&_class::_whandler, #_class "::" #_whandler, _tag, (_class *)nullptr), _unitmask)
 #define AM_DEVREADWRITE32(_tag, _class, _rhandler, _whandler, _unitmask) \
-	curentry->set_handler(read32_delegate(&_class::_rhandler, #_class "::" #_rhandler, _tag, (_class *)nullptr), write32_delegate(&_class::_whandler, #_class "::" #_whandler, _tag, (_class *)nullptr), _unitmask);
+	->set_handler(read32_delegate(&_class::_rhandler, #_class "::" #_rhandler, _tag, (_class *)nullptr), write32_delegate(&_class::_whandler, #_class "::" #_whandler, _tag, (_class *)nullptr), _unitmask)
 
 // device set offset
 #define AM_DEVSETOFFSET(_tag, _class, _handler) \
-	((address_map_entry*)curentry)->set_handler(setoffset_delegate(&_class::_handler, #_class "::" #_handler, _tag, (_class *)nullptr));
+	->set_handler(setoffset_delegate(&_class::_handler, #_class "::" #_handler, _tag, (_class *)nullptr))
 
 
 // device mapping
 #define AM_DEVICE(_tag, _class, _handler) \
-	curentry->set_submap(_tag, address_map_delegate(&_class::_handler, #_class "::" #_handler, (_class *)nullptr), 0, 0);
+	->set_submap(_tag, address_map_delegate(&_class::_handler, #_class "::" #_handler, (_class *)nullptr), 0, 0)
 #define AM_DEVICE8(_tag, _class, _handler, _unitmask) \
-	curentry->set_submap(_tag, address_map_delegate(&_class::_handler, #_class "::" #_handler, (_class *)nullptr), 8, _unitmask);
+	->set_submap(_tag, address_map_delegate(&_class::_handler, #_class "::" #_handler, (_class *)nullptr), 8, _unitmask)
 #define AM_DEVICE16(_tag, _class, _handler, _unitmask) \
-	curentry->set_submap(_tag, address_map_delegate(&_class::_handler, #_class "::" #_handler, (_class *)nullptr), 16, _unitmask);
+	->set_submap(_tag, address_map_delegate(&_class::_handler, #_class "::" #_handler, (_class *)nullptr), 16, _unitmask)
 #define AM_DEVICE32(_tag, _class, _handler, _unitmask) \
-	curentry->set_submap(_tag, address_map_delegate(&_class::_handler, #_class "::" #_handler, (_class *)nullptr), 32, _unitmask);
+	->set_submap(_tag, address_map_delegate(&_class::_handler, #_class "::" #_handler, (_class *)nullptr), 32, _unitmask)
 
 // special-case accesses
 #define AM_ROM \
-	curentry->set_read_type(AMH_ROM);
+	->set_read_type(AMH_ROM)
 #define AM_RAM \
-	curentry->set_read_type(AMH_RAM); \
-	curentry->set_write_type(AMH_RAM);
+	->set_read_type(AMH_RAM)->set_write_type(AMH_RAM)
 #define AM_READONLY \
-	curentry->set_read_type(AMH_RAM);
+	->set_read_type(AMH_RAM)
 #define AM_WRITEONLY \
-	curentry->set_write_type(AMH_RAM);
+	->set_write_type(AMH_RAM)
 #define AM_UNMAP \
-	curentry->set_read_type(AMH_UNMAP); \
-	curentry->set_write_type(AMH_UNMAP);
+	->set_read_type(AMH_UNMAP)->set_write_type(AMH_UNMAP)
 #define AM_READUNMAP \
-	curentry->set_read_type(AMH_UNMAP);
+	->set_read_type(AMH_UNMAP)
 #define AM_WRITEUNMAP \
-	curentry->set_write_type(AMH_UNMAP);
+	->set_write_type(AMH_UNMAP)
 #define AM_NOP \
-	curentry->set_read_type(AMH_NOP); \
-	curentry->set_write_type(AMH_NOP);
+	->set_read_type(AMH_NOP)->set_write_type(AMH_NOP)
 #define AM_READNOP \
-	curentry->set_read_type(AMH_NOP);
+	->set_read_type(AMH_NOP)
 #define AM_WRITENOP \
-	curentry->set_write_type(AMH_NOP);
+	->set_write_type(AMH_NOP)
 
 // port accesses
 #define AM_READ_PORT(_tag) \
-	curentry->set_read_port(_tag);
+	->set_read_port(_tag)
 #define AM_WRITE_PORT(_tag) \
-	curentry->set_write_port(_tag);
+	->set_write_port(_tag)
 #define AM_READWRITE_PORT(_tag) \
-	curentry->set_readwrite_port(_tag);
+	->set_readwrite_port(_tag)
 
 // bank accesses
 #define AM_READ_BANK(_tag) \
-	curentry->set_read_bank(_tag);
+	->set_read_bank(_tag)
 #define AM_WRITE_BANK(_tag) \
-	curentry->set_write_bank(_tag);
+	->set_write_bank(_tag)
 #define AM_READWRITE_BANK(_tag) \
-	curentry->set_readwrite_bank(_tag);
+	->set_readwrite_bank(_tag)
 
 // attributes for accesses
 #define AM_REGION(_tag, _offs) \
-	curentry->set_region(_tag, _offs);
+	->set_region(_tag, _offs)
 #define AM_SHARE(_tag) \
-	curentry->set_share(_tag);
+	->set_share(_tag)
 
 // common shortcuts
 #define AM_ROMBANK(_bank)                   AM_READ_BANK(_bank)
