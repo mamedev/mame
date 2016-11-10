@@ -144,7 +144,7 @@ void devcb_read_base::resolve()
 	if (m_space_tag != nullptr)
 		resolve_space();
 	else
-		m_space = &downcast<driver_device &>(m_device.machine().root_device()).generic_space();
+		m_space = &m_device.machine().dummy_space();
 
 	// then handle the various types
 	const char *name = "unknown";
@@ -372,7 +372,7 @@ void devcb_write_base::resolve()
 	if (m_space_tag != nullptr)
 		resolve_space();
 	else
-		m_space = &downcast<driver_device &>(m_device.machine().root_device()).generic_space();
+		m_space = &m_device.machine().dummy_space();
 
 	// then handle the various types
 	const char *name = "unknown";
