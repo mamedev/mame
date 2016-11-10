@@ -64,8 +64,14 @@ project ("osd_" .. _OPTIONS["osd"])
 	}
 
 	files {
+		MAME_DIR .. "src/osd/uwp/video.cpp",
+		MAME_DIR .. "src/osd/uwp/video.h",
+		MAME_DIR .. "src/osd/uwp/window.cpp",
+		MAME_DIR .. "src/osd/uwp/window.h",
 		MAME_DIR .. "src/osd/modules/osdwindow.cpp",
 		MAME_DIR .. "src/osd/modules/osdwindow.h",
+		MAME_DIR .. "src/osd/windows/winmain.cpp",
+		MAME_DIR .. "src/osd/windows/winmain.h",
 		MAME_DIR .. "src/osd/modules/render/drawnone.cpp",
 		MAME_DIR .. "src/osd/modules/render/drawnone.h",
 		MAME_DIR .. "src/osd/uwp/uwpcompat.cpp",
