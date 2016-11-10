@@ -178,8 +178,14 @@ class layout_view;
 typedef void (*texture_scaler_func)(bitmap_argb32 &dest, bitmap_argb32 &source, const rectangle &sbounds, void *param);
 
 // render_bounds - floating point bounding rectangle
-struct render_bounds
+class render_bounds
 {
+public:
+	render_bounds() : x0(0.0), y0(0.0), x1(0.0), y1(0.0) { }
+
+	void apply_orientation(int orientation);
+	void normalize_bounds();
+
 	float               x0;                 // leftmost X coordinate
 	float               y0;                 // topmost Y coordinate
 	float               x1;                 // rightmost X coordinate
@@ -1016,6 +1022,7 @@ public:
 	const render_bounds &screen_bounds() const { return m_scrbounds; }
 	const render_screen_list &screens() const { return m_screens; }
 	bool layer_enabled(item_layer layer) const { return m_layenabled[layer]; }
+	item_layer get_layer_and_blendmode(int index, int &blendmode);
 
 	//
 	bool has_art() const { return (m_backdrop_list.count() + m_overlay_list.count() + m_bezel_list.count() + m_cpanel_list.count() + m_marquee_list.count() != 0); }
@@ -1046,6 +1053,8 @@ private:
 	simple_list<item>   m_marquee_list;     // list of marquee items
 
 	static const simple_list<item> s_null_list;
+	static const int s_layer_order_standard[6];
+	static const int s_layer_order_alternate[6];
 };
 
 
@@ -1071,6 +1080,13 @@ private:
 	layout_file *       m_next;             // pointer to the next file in the list
 	simple_list<layout_element> m_elemlist; // list of shared layout elements
 	simple_list<layout_view> m_viewlist;    // list of views
+};
+
+// ======================> render_util
+
+class render_util
+{
+public:
 };
 
 // ======================> render_target

@@ -439,10 +439,10 @@ layout_element::layout_element(running_machine &machine, xml_data_node &elemnode
 
 	// parse components in order
 	bool first = true;
-	render_bounds bounds = { 0 };
+	render_bounds bounds;
 	for (auto compnode = elemnode.child; compnode; compnode = compnode->next)
 	{
-		auto const make_func(s_make_component.find(compnode->name));
+		std::map<std::string, make_component_func>::iterator const make_func(s_make_component.find(compnode->name));
 		if (make_func == s_make_component.end())
 			throw emu_fatalerror("Unknown element component: %s", compnode->name);
 

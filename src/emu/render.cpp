@@ -108,41 +108,37 @@ static const render_quad_texuv oriented_texcoords[8] =
 };
 
 // layer orders
-static const int layer_order_standard[] = { ITEM_LAYER_SCREEN, ITEM_LAYER_OVERLAY, ITEM_LAYER_BACKDROP, ITEM_LAYER_BEZEL, ITEM_LAYER_CPANEL, ITEM_LAYER_MARQUEE };
-static const int layer_order_alternate[] = { ITEM_LAYER_BACKDROP, ITEM_LAYER_SCREEN, ITEM_LAYER_OVERLAY, ITEM_LAYER_BEZEL, ITEM_LAYER_CPANEL, ITEM_LAYER_MARQUEE };
+const int layout_view::s_layer_order_standard[] = { ITEM_LAYER_SCREEN, ITEM_LAYER_OVERLAY, ITEM_LAYER_BACKDROP, ITEM_LAYER_BEZEL, ITEM_LAYER_CPANEL, ITEM_LAYER_MARQUEE };
+const int layout_view::s_layer_order_alternate[] = { ITEM_LAYER_BACKDROP, ITEM_LAYER_SCREEN, ITEM_LAYER_OVERLAY, ITEM_LAYER_BEZEL, ITEM_LAYER_CPANEL, ITEM_LAYER_MARQUEE };
 
 
-
-//**************************************************************************
-//  INLINE FUNCTIONS
-//**************************************************************************
 
 //-------------------------------------------------
 //  apply_orientation - apply orientation to a
 //  set of bounds
 //-------------------------------------------------
 
-inline void apply_orientation(render_bounds &bounds, int orientation)
+void render_bounds::apply_orientation(int orientation)
 {
 	// swap first
 	if (orientation & ORIENTATION_SWAP_XY)
 	{
-		std::swap(bounds.x0, bounds.y0);
-		std::swap(bounds.x1, bounds.y1);
+		std::swap(x0, y0);
+		std::swap(x1, y1);
 	}
 
 	// apply X flip
 	if (orientation & ORIENTATION_FLIP_X)
 	{
-		bounds.x0 = 1.0f - bounds.x0;
-		bounds.x1 = 1.0f - bounds.x1;
+		x0 = 1.0f - x0;
+		x1 = 1.0f - x1;
 	}
 
 	// apply Y flip
 	if (orientation & ORIENTATION_FLIP_Y)
 	{
-		bounds.y0 = 1.0f - bounds.y0;
-		bounds.y1 = 1.0f - bounds.y1;
+		y0 = 1.0f - y0;
+		y1 = 1.0f - y1;
 	}
 }
 
@@ -152,12 +148,12 @@ inline void apply_orientation(render_bounds &bounds, int orientation)
 //  x0/y0 are less than x1/y1
 //-------------------------------------------------
 
-inline void normalize_bounds(render_bounds &bounds)
+void render_bounds::normalize_bounds()
 {
-	if (bounds.x0 > bounds.x1)
-		std::swap(bounds.x0, bounds.x1);
-	if (bounds.y0 > bounds.y1)
-		std::swap(bounds.y0, bounds.y1);
+	if (x0 > x1)
+		std::swap(x0, x1);
+	if (y0 > y1)
+		std::swap(y0, y1);
 }
 
 
@@ -166,24 +162,24 @@ inline void normalize_bounds(render_bounds &bounds)
 //  appropriate layer index and blendmode
 //-------------------------------------------------
 
-inline item_layer get_layer_and_blendmode(const layout_view &view, int index, int &blendmode)
+item_layer layout_view::get_layer_and_blendmode(int index, int &blendmode)
 {
 	//  if we have multiple backdrop pieces and no overlays, render:
 	//      backdrop (add) + screens (add) + bezels (alpha) + cpanels (alpha) + marquees (alpha)
 	//  else render:
 	//      screens (add) + overlays (RGB multiply) + backdrop (add) + bezels (alpha) + cpanels (alpha) + marquees (alpha)
 
-	const int *layer_order = layer_order_standard;
-	if (view.items(ITEM_LAYER_BACKDROP).count() > 1 && view.items(ITEM_LAYER_OVERLAY).empty())
-		layer_order = layer_order_alternate;
+	const int *layer_order = s_layer_order_standard;
+	if (items(ITEM_LAYER_BACKDROP).count() > 1 && items(ITEM_LAYER_OVERLAY).empty())
+		layer_order = s_layer_order_alternate;
 
 	// select the layer
 	int layer = layer_order[index];
 
 	// pick a blendmode
-	if (layer == ITEM_LAYER_SCREEN && layer_order == layer_order_standard)
+	if (layer == ITEM_LAYER_SCREEN && layer_order == s_layer_order_standard)
 		blendmode = -1;
-	else if (layer == ITEM_LAYER_SCREEN || (layer == ITEM_LAYER_BACKDROP && layer_order == layer_order_standard))
+	else if (layer == ITEM_LAYER_SCREEN || (layer == ITEM_LAYER_BACKDROP && layer_order == s_layer_order_standard))
 		blendmode = BLENDMODE_ADD;
 	else if (layer == ITEM_LAYER_OVERLAY)
 		blendmode = BLENDMODE_RGB_MULTIPLY;
@@ -1291,8 +1287,8 @@ void render_target::compute_minimum_size(int32_t &minwidth, int32_t &minheight)
 
 				// apply target orientation to the bounds
 				render_bounds bounds = curitem.bounds();
-				apply_orientation(bounds, m_orientation);
-				normalize_bounds(bounds);
+				bounds.apply_orientation(m_orientation);
+				bounds.normalize_bounds();
 
 				// based on the orientation of the screen container, check the bitmap
 				float xscale, yscale;
@@ -1364,7 +1360,7 @@ render_primitive_list &render_target::get_primitives()
 		for (item_layer layernum = ITEM_LAYER_FIRST; layernum < ITEM_LAYER_MAX; ++layernum)
 		{
 			int blendmode;
-			item_layer layer = get_layer_and_blendmode(*m_curview, layernum, blendmode);
+			item_layer layer = m_curview->get_layer_and_blendmode(layernum, blendmode);
 			if (m_curview->layer_enabled(layer))
 			{
 				// iterate over items in the layer
@@ -1372,8 +1368,8 @@ render_primitive_list &render_target::get_primitives()
 				{
 					// first apply orientation to the bounds
 					render_bounds bounds = curitem.bounds();
-					apply_orientation(bounds, root_xform.orientation);
-					normalize_bounds(bounds);
+					bounds.apply_orientation(root_xform.orientation);
+					bounds.normalize_bounds();
 
 					// apply the transform to the item
 					object_transform item_xform;
@@ -1821,7 +1817,7 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 	{
 		// compute the oriented bounds
 		render_bounds bounds = curitem.bounds();
-		apply_orientation(bounds, container_xform.orientation);
+		bounds.apply_orientation(container_xform.orientation);
 
 		float xscale = container_xform.xscale;
 		float yscale = container_xform.yscale;
@@ -1896,7 +1892,7 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 				prim->flags |= PRIMFLAG_TYPE_QUAD;
 
 				// normalize the bounds
-				normalize_bounds(prim->bounds);
+				prim->bounds.normalize_bounds();
 
 				// get the scaled bitmap and set the resulting palette
 				if (curitem.texture() != nullptr)
@@ -2139,7 +2135,7 @@ bool render_target::map_point_internal(int32_t target_x, int32_t target_y, rende
 	for (item_layer layernum = ITEM_LAYER_FIRST; layernum < ITEM_LAYER_MAX; ++layernum)
 	{
 		int blendmode;
-		item_layer layer = get_layer_and_blendmode(*m_curview, layernum, blendmode);
+		item_layer layer = m_curview->get_layer_and_blendmode(layernum, blendmode);
 		if (m_curview->layer_enabled(layer))
 		{
 			// iterate over items in the layer
