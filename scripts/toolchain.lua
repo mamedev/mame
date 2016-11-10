@@ -468,6 +468,9 @@ function toolchain(_buildDir, _subDir)
 			"StaticRuntime",
 			"NoExceptions",
 		}
+		flags {
+			"WinMain"
+		}
 
 	configuration { "mingw*" }
 		defines { "WIN32" }

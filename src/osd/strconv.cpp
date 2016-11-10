@@ -5,7 +5,7 @@
 //  strconv.cpp - Win32 string conversion
 //
 //============================================================
-#if defined(SDLMAME_WIN32) || defined(OSD_WINDOWS)
+#if defined(SDLMAME_WIN32) || defined(OSD_WINDOWS) || defined(OSD_UWP)
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #endif
@@ -16,7 +16,7 @@
 // MAMEOS headers
 #include "strconv.h"
 
-#if defined(SDLMAME_WIN32) || defined(OSD_WINDOWS)
+#if defined(SDLMAME_WIN32) || defined(OSD_WINDOWS) || defined(OSD_UWP)
 
 namespace
 {

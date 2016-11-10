@@ -70,6 +70,8 @@ project ("osd_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/modules/render/drawnone.h",
 		MAME_DIR .. "src/osd/uwp/uwpcompat.cpp",
 		MAME_DIR .. "src/osd/uwp/uwpcompat.h",
+		MAME_DIR .. "src/osd/uwp/uwpmain.cpp",
+		MAME_DIR .. "src/osd/uwp/uwpmain.h",
 		MAME_DIR .. "src/osd/osdepend.h",
 	}
 	
@@ -93,17 +95,21 @@ project ("ocore_" .. _OPTIONS["osd"])
 	}
 	
 	files {
-		MAME_DIR .. "src/osd/osdnet.cpp",
-		MAME_DIR .. "src/osd/osdnet.h",
+		MAME_DIR .. "src/osd/osdcomm.h",
 		MAME_DIR .. "src/osd/osdcore.cpp",
 		MAME_DIR .. "src/osd/osdcore.h",
-		MAME_DIR .. "src/osd/modules/osdmodule.cpp",
-		MAME_DIR .. "src/osd/modules/osdmodule.h",
 		MAME_DIR .. "src/osd/strconv.cpp",
 		MAME_DIR .. "src/osd/strconv.h",
 		MAME_DIR .. "src/osd/osdsync.cpp",
-		MAME_DIR .. "src/osd/osdsync.h",		
+		MAME_DIR .. "src/osd/osdsync.h",
 		MAME_DIR .. "src/osd/windows/winutil.cpp",
 		MAME_DIR .. "src/osd/windows/winutil.h",
-		--MAME_DIR .. "src/osd/modules/lib/osdlib_uwp.cpp",
+		MAME_DIR .. "src/osd/modules/osdmodule.cpp",
+		MAME_DIR .. "src/osd/modules/osdmodule.h",
+		MAME_DIR .. "src/osd/modules/file/winrtdir.cpp",
+		MAME_DIR .. "src/osd/modules/file/winrtfile.cpp",
+		MAME_DIR .. "src/osd/modules/file/winrtfile.h",
+		MAME_DIR .. "src/osd/modules/file/winrtptty.cpp",
+		MAME_DIR .. "src/osd/modules/file/winrtsocket.cpp",
+		MAME_DIR .. "src/osd/modules/lib/osdlib_uwp.cpp",
 	}

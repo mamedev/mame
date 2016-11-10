@@ -48,6 +48,10 @@ end
 			"ppapi_gles2",
 			"pthread",
 		}
+
+	configuration { "winstore*" }
+		kind "WindowedApp"
+
 	configuration {  }
 
 	addprojectflags()
@@ -68,6 +72,32 @@ end
 	flags {
 		"Unicode",
 	}
+
+	configuration { "winstore*" }
+		-- Windows Required Files
+		files {
+			-- Manifest file
+			MAME_DIR .. "src/osd/uwp/Package.appxmanifest",
+		}
+
+	configuration { "winstore*" }
+		files {
+			MAME_DIR .. "src/osd/uwp/assets/*.png"
+		}
+		configuration "**/src/osd/uwp/assets/*.png"
+			flags { "DeploymentContent" }
+	
+	-- Effects and Shaders
+	configuration { "winstore*" }
+		files {
+			MAME_DIR .. "artwork/**/*",
+			MAME_DIR .. "bgfx/**/*",
+			MAME_DIR .. "hash/*",
+			MAME_DIR .. "language/**/*",
+			MAME_DIR .. "plugins/**/*",
+		}
+		configuration "**/*"
+			flags { "DeploymentContent" }
 
 	configuration { "x64", "Release" }
 		targetsuffix "64"

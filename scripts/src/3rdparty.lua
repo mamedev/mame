@@ -594,7 +594,11 @@ end
 		MAME_DIR .. "3rdparty/lua-zlib/lua_zlib.c",
 		MAME_DIR .. "3rdparty/luafilesystem/src/lfs.c",
 	}
-if (_OPTIONS["osd"] ~= "uwp") then
+if (_OPTIONS["osd"] == "uwp") then
+	files {
+		MAME_DIR .. "3rdparty/lua-linenoise/linenoise_none.c",
+	}
+else
 	files {
 		MAME_DIR .. "3rdparty/lua-linenoise/linenoise.c",
 	}

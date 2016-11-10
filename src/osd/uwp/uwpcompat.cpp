@@ -16,15 +16,13 @@
 #include "emu.h"
 
 extern "C" {
-
-	int __cdecl system(const char *command)
+	
+	BOOL WINAPI GetVersionEx(
+		_Inout_ LPOSVERSIONINFO lpVersionInfo
+	)
 	{
-		return ENOENT;
-	}
-
-	const char *getenv(const char *varname)
-	{
-		return osd_getenv(varname);
+		lpVersionInfo->dwMajorVersion = 10;
+		return TRUE;
 	}
 
 	HANDLE
