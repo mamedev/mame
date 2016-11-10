@@ -620,7 +620,7 @@ project "sqlite3"
 			"-Wno-bad-function-cast",
 			"-Wno-undef",
 		}
-if _OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "clang") then
+if _OPTIONS["gcc"]~=nil and ((string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "asmjs") or string.find(_OPTIONS["gcc"], "android"))) then
 		buildoptions_c {
 			"-Wno-incompatible-pointer-types-discards-qualifiers",
 		}
