@@ -27,8 +27,8 @@ static void construct_address_map_tranz330_mem(address_map &map)
 {
 	map.configure(AS_PROGRAM, 8);
 
-	map.add(0x0000, 0x7fff)->set_read_type(AMH_ROM);
-	map.add(0x8000, 0xffff)->set_read_type(AMH_RAM)->set_write_type(AMH_RAM);
+	map.add(0x0000, 0x7fff).set_read_type(AMH_ROM);
+	map.add(0x8000, 0xffff).set_read_type(AMH_RAM).set_write_type(AMH_RAM);
 }
 
 static void construct_address_map_tranz330_io(address_map &map)
@@ -36,17 +36,17 @@ static void construct_address_map_tranz330_io(address_map &map)
 	map.configure(AS_IO, 8);
 	map.set_global_mask(0xff);
 
-	map.add(0x00, 0x03)->set_handler(read8_delegate(&z80pio_device::read_alt,  "z80pio_device::read_alt",  PIO_TAG, (z80pio_device *)nullptr),
-									 write8_delegate(&z80pio_device::write_alt, "z80pio_device::write_alt", PIO_TAG, (z80pio_device *)nullptr));
+	map.add(0x00, 0x03).set_handler(read8_delegate(&z80pio_device::read_alt,  "z80pio_device::read_alt",  PIO_TAG, (z80pio_device *)nullptr),
+									write8_delegate(&z80pio_device::write_alt, "z80pio_device::write_alt", PIO_TAG, (z80pio_device *)nullptr));
 
-	map.add(0x10, 0x13)->set_handler(read8_delegate(&z80ctc_device::read,  "z80ctc_device::read",  CTC_TAG, (z80ctc_device *)nullptr),
-									 write8_delegate(&z80ctc_device::write, "z80ctc_device::write", CTC_TAG, (z80ctc_device *)nullptr));
+	map.add(0x10, 0x13).set_handler(read8_delegate(&z80ctc_device::read,  "z80ctc_device::read",  CTC_TAG, (z80ctc_device *)nullptr),
+									write8_delegate(&z80ctc_device::write, "z80ctc_device::write", CTC_TAG, (z80ctc_device *)nullptr));
 
-	map.add(0x20, 0x23)->set_handler(read8_delegate(&z80dart_device::ba_cd_r, "z80dart_device::ba_cd_r", DART_TAG, (z80dart_device *)nullptr),
-									 write8_delegate(&z80dart_device::ba_cd_w, "z80dart_device::ba_cd_w", DART_TAG, (z80dart_device *)nullptr));
+	map.add(0x20, 0x23).set_handler(read8_delegate(&z80dart_device::ba_cd_r, "z80dart_device::ba_cd_r", DART_TAG, (z80dart_device *)nullptr),
+									write8_delegate(&z80dart_device::ba_cd_w, "z80dart_device::ba_cd_w", DART_TAG, (z80dart_device *)nullptr));
 
-	map.add(0x30, 0x3f)->set_handler(read8_delegate(&msm6242_device::read,  "msm6242_device::read",  RTC_TAG, (msm6242_device *)nullptr),
-									 write8_delegate(&msm6242_device::write, "msm6242_device::write", RTC_TAG, (msm6242_device *)nullptr));
+	map.add(0x30, 0x3f).set_handler(read8_delegate(&msm6242_device::read,  "msm6242_device::read",  RTC_TAG, (msm6242_device *)nullptr),
+									write8_delegate(&msm6242_device::write, "msm6242_device::write", RTC_TAG, (msm6242_device *)nullptr));
 }
 
 static void construct_ioport_tranz330(device_t &owner, ioport_list &portlist, std::string &errorbuf)
