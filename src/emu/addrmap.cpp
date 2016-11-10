@@ -65,7 +65,7 @@ address_map_entry::address_map_entry(device_t &device, address_map &map, offs_t 
 //  set_mask - set the mask value
 //-------------------------------------------------
 
-address_map_entry &address_map_entry::set_mask(offs_t _mask)
+address_map_entry &address_map_entry::mask(offs_t _mask)
 {
 	m_addrmask = _mask;
 	if (m_map.m_globalmask != 0)
@@ -380,7 +380,7 @@ address_map::address_map(const address_space &space, offs_t start, offs_t end, i
 		m_unmapval(space.unmap()),
 		m_globalmask(space.bytemask())
 {
-	add(start, end).set_submap(DEVICE_SELF, submap_delegate, bits, unitmask);
+	range(start, end).set_submap(DEVICE_SELF, submap_delegate, bits, unitmask);
 }
 
 
@@ -414,7 +414,7 @@ void address_map::configure(address_spacenum spacenum, uint8_t databits)
 //  list
 //-------------------------------------------------
 
-void address_map::set_global_mask(offs_t mask)
+void address_map::global_mask(offs_t mask)
 {
 //  if (m_entrylist != nullptr)
 //      throw emu_fatalerror("AM_GLOBALMASK must be specified before any entries");
@@ -427,7 +427,7 @@ void address_map::set_global_mask(offs_t mask)
 //  add - add a new entry
 //-------------------------------------------------
 
-address_map_entry &address_map::add(offs_t start, offs_t end)
+address_map_entry &address_map::range(offs_t start, offs_t end)
 {
 	address_map_entry *ptr = global_alloc(address_map_entry(*m_device, *this, start, end));
 	m_entrylist.append(*ptr);

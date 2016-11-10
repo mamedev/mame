@@ -80,28 +80,44 @@ public:
 	address_map_entry *next() const { return m_next; }
 
 	// simple inline setters
-	address_map_entry &set_mirror(offs_t _mirror) { m_addrmirror = _mirror; return *this; }
-	address_map_entry &set_select(offs_t _select) { m_addrselect = _select; return *this; }
-	address_map_entry &set_read_type(map_handler_type _type) { m_read.m_type = _type; return *this; }
-	address_map_entry &set_write_type(map_handler_type _type) { m_write.m_type = _type; return *this; }
-	address_map_entry &set_region(const char *tag, offs_t offset) { m_region = tag; m_rgnoffs = offset; return *this; }
-	address_map_entry &set_share(const char *tag) { m_share = tag; return *this; }
+	address_map_entry &mirror(offs_t _mirror) { m_addrmirror = _mirror; return *this; }
+	address_map_entry &select(offs_t _select) { m_addrselect = _select; return *this; }
+	address_map_entry &region(const char *tag, offs_t offset) { m_region = tag; m_rgnoffs = offset; return *this; }
+	address_map_entry &share(const char *tag) { m_share = tag; return *this; }
+
+	address_map_entry &rom() { m_read.m_type = AMH_ROM; return *this; }
+	address_map_entry &ram() { m_read.m_type = AMH_RAM; m_write.m_type = AMH_RAM; return *this; }
+	address_map_entry &readonly() { m_read.m_type = AMH_RAM; return *this; }
+	address_map_entry &writeonly() { m_write.m_type = AMH_RAM; return *this; }
+	address_map_entry &unmap() { m_read.m_type = AMH_UNMAP; m_write.m_type = AMH_UNMAP; return *this; }
+	address_map_entry &readunmap() { m_read.m_type = AMH_UNMAP; return *this; }
+	address_map_entry &writeunmap() { m_write.m_type = AMH_UNMAP; return *this; }
+	address_map_entry &nop() { m_read.m_type = AMH_NOP; m_write.m_type = AMH_NOP; return *this; }
+	address_map_entry &readnop() { m_read.m_type = AMH_NOP; return *this; }
+	address_map_entry &writenop() { m_write.m_type = AMH_NOP; return *this; }
 
 	// mask setting
-	address_map_entry &set_mask(offs_t _mask);
+	address_map_entry &mask(offs_t _mask);
 
 	// I/O port configuration
-	address_map_entry &set_read_port(const char *tag) { m_read.m_type = AMH_PORT; m_read.m_tag = tag; return *this; }
-	address_map_entry &set_write_port(const char *tag) { m_write.m_type = AMH_PORT; m_write.m_tag = tag; return *this; }
-	address_map_entry &set_readwrite_port(const char *tag) { set_read_port(tag); set_write_port(tag); return *this; }
+	address_map_entry &read_port(const char *tag) { m_read.m_type = AMH_PORT; m_read.m_tag = tag; return *this; }
+	address_map_entry &write_port(const char *tag) { m_write.m_type = AMH_PORT; m_write.m_tag = tag; return *this; }
+	address_map_entry &readwrite_port(const char *tag) { read_port(tag); write_port(tag); return *this; }
 
 	// memory bank configuration
-	address_map_entry &set_read_bank(const char *tag) { m_read.m_type = AMH_BANK; m_read.m_tag = tag; return *this; }
-	address_map_entry &set_write_bank(const char *tag) { m_write.m_type = AMH_BANK; m_write.m_tag = tag; return *this; }
-	address_map_entry &set_readwrite_bank(const char *tag) { set_read_bank(tag); set_write_bank(tag); return *this; }
+	address_map_entry &read_bank(const char *tag) { m_read.m_type = AMH_BANK; m_read.m_tag = tag; return *this; }
+	address_map_entry &write_bank(const char *tag) { m_write.m_type = AMH_BANK; m_write.m_tag = tag; return *this; }
+	address_map_entry &readwrite_bank(const char *tag) { read_bank(tag); write_bank(tag); return *this; }
+
+	address_map_entry &rombank(const char *tag) { return read_bank(tag); }
+	address_map_entry &rambank(const char *tag) { return readwrite_bank(tag); }
 
 	// set offset handler (only one version, since there is no data width to consider)
 	address_map_entry &set_handler(setoffset_delegate func);
+
+	// type setters
+	address_map_entry &set_read_type(map_handler_type _type) { m_read.m_type = _type; return *this; }
+	address_map_entry &set_write_type(map_handler_type _type) { m_write.m_type = _type; return *this; }
 
 	// submap referencing
 	address_map_entry &set_submap(const char *tag, address_map_delegate func, int bits, uint64_t mask);
@@ -186,11 +202,13 @@ public:
 	void configure(address_spacenum _spacenum, uint8_t _databits);
 
 	// setters
-	void set_global_mask(offs_t mask);
-	void set_unmap_value(uint8_t value) { m_unmapval = value; }
+	void global_mask(offs_t mask);
+	void unmap_value_low() { m_unmapval = 0; }
+	void unmap_value_high() { m_unmapval = ~0; }
+	void unmap_value(uint8_t value) { m_unmapval = value; }
 
 	// add a new entry of the given type
-	address_map_entry &add(offs_t start, offs_t end);
+	address_map_entry &range(offs_t start, offs_t end);
 
 	// public data
 	address_spacenum        m_spacenum;         // space number of the map
@@ -244,11 +262,11 @@ void _class :: _name(::address_map &map) \
 
 // global controls
 #define ADDRESS_MAP_GLOBAL_MASK(_mask) \
-	;map.set_global_mask(_mask)
+	;map.global_mask(_mask)
 #define ADDRESS_MAP_UNMAP_LOW \
-	;map.set_unmap_value(0)
+	;map.unmap_value_low()
 #define ADDRESS_MAP_UNMAP_HIGH \
-	;map.set_unmap_value(~0)
+	;map.unmap_value_high()
 
 // importing data from other address maps
 #define AM_IMPORT_FROM(_name) \
@@ -259,13 +277,13 @@ void _class :: _name(::address_map &map) \
 
 // address ranges
 #define AM_RANGE(_start, _end) \
-	;map.add(_start, _end)
+	;map.range(_start, _end)
 #define AM_MASK(_mask) \
-	.set_mask(_mask)
+	.mask(_mask)
 #define AM_MIRROR(_mirror) \
-	.set_mirror(_mirror)
+	.mirror(_mirror)
 #define AM_SELECT(_select) \
-	.set_select(_select)
+	.select(_select)
 
 // driver data reads
 #define AM_READ(_handler) \
@@ -349,51 +367,51 @@ void _class :: _name(::address_map &map) \
 
 // special-case accesses
 #define AM_ROM \
-	.set_read_type(AMH_ROM)
+	.rom()
 #define AM_RAM \
-	.set_read_type(AMH_RAM).set_write_type(AMH_RAM)
+	.ram()
 #define AM_READONLY \
-	.set_read_type(AMH_RAM)
+	.readonly()
 #define AM_WRITEONLY \
-	.set_write_type(AMH_RAM)
+	.writeonly()
 #define AM_UNMAP \
-	.set_read_type(AMH_UNMAP).set_write_type(AMH_UNMAP)
+	.unmap()
 #define AM_READUNMAP \
-	.set_read_type(AMH_UNMAP)
+	.readunmap()
 #define AM_WRITEUNMAP \
-	.set_write_type(AMH_UNMAP)
+	.writeunmap()
 #define AM_NOP \
-	.set_read_type(AMH_NOP).set_write_type(AMH_NOP)
+	.nop()
 #define AM_READNOP \
-	.set_read_type(AMH_NOP)
+	.readnop()
 #define AM_WRITENOP \
-	.set_write_type(AMH_NOP)
+	.writenop()
 
 // port accesses
 #define AM_READ_PORT(_tag) \
-	.set_read_port(_tag)
+	.read_port(_tag)
 #define AM_WRITE_PORT(_tag) \
-	.set_write_port(_tag)
+	.write_port(_tag)
 #define AM_READWRITE_PORT(_tag) \
-	.set_readwrite_port(_tag)
+	.readwrite_port(_tag)
 
 // bank accesses
 #define AM_READ_BANK(_tag) \
-	.set_read_bank(_tag)
+	.read_bank(_tag)
 #define AM_WRITE_BANK(_tag) \
-	.set_write_bank(_tag)
+	.write_bank(_tag)
 #define AM_READWRITE_BANK(_tag) \
-	.set_readwrite_bank(_tag)
+	.readwrite_bank(_tag)
 
 // attributes for accesses
 #define AM_REGION(_tag, _offs) \
-	.set_region(_tag, _offs)
+	.region(_tag, _offs)
 #define AM_SHARE(_tag) \
-	.set_share(_tag)
+	.share(_tag)
 
 // common shortcuts
-#define AM_ROMBANK(_bank)                   AM_READ_BANK(_bank)
-#define AM_RAMBANK(_bank)                   AM_READWRITE_BANK(_bank)
+#define AM_ROMBANK(_bank)                   .rombank(_bank)
+#define AM_RAMBANK(_bank)                   .rambank(_bank)
 #define AM_RAM_READ(_read)                  AM_READ(_read) AM_WRITEONLY
 #define AM_RAM_WRITE(_write)                AM_READONLY AM_WRITE(_write)
 #define AM_RAM_DEVREAD(_tag, _class, _read) AM_DEVREAD(_tag, _class, _read) AM_WRITEONLY
