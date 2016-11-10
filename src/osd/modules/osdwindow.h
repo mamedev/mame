@@ -25,8 +25,6 @@
 #ifdef OSD_SDL
 // forward declaration
 struct SDL_Window;
-#elif defined(OSD_UWP)
-#include <Agile.h>
 #endif
 #undef min
 #undef max
@@ -138,15 +136,13 @@ public:
 	virtual void update() = 0;
 	virtual void destroy() = 0;
 
+#if defined(OSD_WINDOWS) || defined(OSD_UWP)
+	virtual bool win_has_menu() = 0;
+#endif
+
 #ifdef OSD_WINDOWS
-	virtual bool win_has_menu() = 0;
-
 	HDC                     m_dc;       // only used by GDI renderer!
-
 	int                     m_resize_state;
-#elif defined(OSD_UWP)
-	virtual bool win_has_menu() = 0;
-	Platform::Agile<Windows::UI::Core::CoreWindow^>	m_window;
 #endif
 	render_primitive_list   *m_primlist;
 	osd_window_config       m_win_config;

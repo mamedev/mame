@@ -24,6 +24,7 @@
 // MAME headers
 #include "emu.h"
 #include "emuopts.h"
+#include "strconv.h"
 
 // MAMEOS headers
 #include "winmain.h"
@@ -99,10 +100,10 @@ public:
 			char buffer[1024];
 			vsnprintf(buffer, ARRAY_LENGTH(buffer), msg, args);
 
-			osd_unique_wstr wcbuffer(osd::text::to_wstring(buffer));
-			osd_unique_wstr wcappname(osd::text::to_wstring(emulator_info::get_appname()));
+			std::wstring wcbuffer(osd::text::to_wstring(buffer));
+			std::wstring wcappname(osd::text::to_wstring(emulator_info::get_appname()));
 
-			auto dlg = ref new MessageDialog(ref new Platform::String(wcbuffer.get()), ref new Platform::String(wcappname.get()));
+			auto dlg = ref new MessageDialog(ref new Platform::String(wcbuffer.data()), ref new Platform::String(wcbuffer.data()));
 			dlg->ShowAsync();
 		}
 		else
@@ -343,6 +344,15 @@ static BOOL WINAPI control_handler(DWORD type)
 
 #else
 
+// The main function is only used to initialize our IFrameworkView class.
+[Platform::MTAThread]
+int main(Platform::Array<Platform::String^>^ args)
+{
+	auto direct3DApplicationSource = ref new MameViewSource();
+	CoreApplication::Run(direct3DApplicationSource);
+	return 0;
+}
+
 MameMainApp::MameMainApp()
 {
 }
@@ -373,7 +383,7 @@ void MameMainApp::Run()
 
 	// parse config and cmdline options
 	m_options = std::make_unique<windows_options>();
-	m_osd = std::make_unique<windows_osd_interface>(m_options);
+	m_osd = std::make_unique<windows_osd_interface>(*m_options.get());
 
 	// Since we're a GUI app, out errors to message boxes
 	// Initialize this after the osd interface so that we are first in the

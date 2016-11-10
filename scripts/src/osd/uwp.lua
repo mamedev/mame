@@ -68,6 +68,8 @@ project ("osd_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/uwp/video.h",
 		MAME_DIR .. "src/osd/uwp/window.cpp",
 		MAME_DIR .. "src/osd/uwp/window.h",
+		MAME_DIR .. "src/osd/windows/winutf8.cpp",
+		MAME_DIR .. "src/osd/windows/winutf8.h",
 		MAME_DIR .. "src/osd/modules/osdwindow.cpp",
 		MAME_DIR .. "src/osd/modules/osdwindow.h",
 		MAME_DIR .. "src/osd/windows/winmain.cpp",
@@ -76,8 +78,6 @@ project ("osd_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/modules/render/drawnone.h",
 		MAME_DIR .. "src/osd/uwp/uwpcompat.cpp",
 		MAME_DIR .. "src/osd/uwp/uwpcompat.h",
-		MAME_DIR .. "src/osd/uwp/uwpmain.cpp",
-		MAME_DIR .. "src/osd/uwp/uwpmain.h",
 		MAME_DIR .. "src/osd/osdepend.h",
 	}
 	

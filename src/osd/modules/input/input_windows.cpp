@@ -8,8 +8,6 @@
 
 #include "input_module.h"
 
-#if defined(OSD_WINDOWS)
-
 // MAME headers
 #include "emu.h"
 #include "osdepend.h"
@@ -151,4 +149,3 @@ void windows_osd_interface::customize_input_type_list(simple_list<input_type_ent
 		}
 }
 
-#endif

@@ -65,11 +65,14 @@ bool windows_osd_interface::video_init()
 	windows_options &options = downcast<windows_options &>(machine().options());
 	for (int index = 0; index < video_config.numscreens; index++)
 	{
-		win_window_info::create(machine(), index, m_monitor_module->pick_monitor(options, index), &windows[index]);
+		uwp_window_info::create(machine(), index, m_monitor_module->pick_monitor(options, index), &windows[index]);
 	}
 
 	if (video_config.mode != VIDEO_MODE_NONE)
-		osd_common_t::s_window_list.front()->platform_window<Platform::Agile<CoreWindow^>>()->Activate();
+	{
+		auto win = std::static_pointer_cast<uwp_window_info>(osd_common_t::s_window_list.front());
+		win->uwp_window()->Activate();
+	}
 
 	return true;
 }

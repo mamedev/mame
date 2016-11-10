@@ -243,7 +243,7 @@ void windows_osd_interface::window_exit()
 		CloseHandle(ui_pause_event);
 }
 
-win_window_info::win_window_info(
+uwp_window_info::uwp_window_info(
 	running_machine &machine,
 	int index,
 	std::shared_ptr<osd_monitor_info> monitor,
@@ -273,11 +273,11 @@ win_window_info::win_window_info(
 	m_prescale = video_config.prescale;
 }
 
-POINT win_window_info::s_saved_cursor_pos = { -1, -1 };
+POINT uwp_window_info::s_saved_cursor_pos = { -1, -1 };
 
 #if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 
-void win_window_info::capture_pointer()
+void uwp_window_info::capture_pointer()
 {
 	RECT bounds;
 	GetClientRect(platform_window<HWND>(), &bounds);
@@ -286,12 +286,12 @@ void win_window_info::capture_pointer()
 	ClipCursor(&bounds);
 }
 
-void win_window_info::release_pointer()
+void uwp_window_info::release_pointer()
 {
 	ClipCursor(nullptr);
 }
 
-void win_window_info::hide_pointer()
+void uwp_window_info::hide_pointer()
 {
 	GetCursorPos(&s_saved_cursor_pos);
 
@@ -299,7 +299,7 @@ void win_window_info::hide_pointer()
 	ShowCursor(TRUE);
 }
 
-void win_window_info::show_pointer()
+void uwp_window_info::show_pointer()
 {
 	if (s_saved_cursor_pos.x != -1 || s_saved_cursor_pos.y != -1)
 	{
@@ -313,29 +313,29 @@ void win_window_info::show_pointer()
 
 #else
 
-CoreCursor^ win_window_info::s_cursor = nullptr;
+CoreCursor^ uwp_window_info::s_cursor = nullptr;
 
-void win_window_info::capture_pointer()
+void uwp_window_info::capture_pointer()
 {
-	platform_window<Platform::Agile<CoreWindow^>>()->SetPointerCapture();
+	uwp_window()->SetPointerCapture();
 }
 
-void win_window_info::release_pointer()
+void uwp_window_info::release_pointer()
 {
-	platform_window<Platform::Agile<CoreWindow^>>()->ReleasePointerCapture();
+	uwp_window()->ReleasePointerCapture();
 }
 
-void win_window_info::hide_pointer()
+void uwp_window_info::hide_pointer()
 {
-	auto window = platform_window<Platform::Agile<CoreWindow^>>();
-	win_window_info::s_cursor = window->PointerCursor;
+	auto window = uwp_window();
+	uwp_window_info::s_cursor = window->PointerCursor;
 	window->PointerCursor = nullptr;
 }
 
-void win_window_info::show_pointer()
+void uwp_window_info::show_pointer()
 {
-	auto window = platform_window<Platform::Agile<CoreWindow^>>();
-	window->PointerCursor = win_window_info::s_cursor;
+	auto window = uwp_window();
+	window->PointerCursor = uwp_window_info::s_cursor;
 }
 
 #endif
@@ -357,19 +357,15 @@ void winwindow_process_events_periodic(running_machine &machine)
 	winwindow_process_events(machine, TRUE, false);
 }
 
-
-
 //============================================================
-//  is_mame_window
+//  winwindow_has_focus
+//  (main or window thread)
 //============================================================
 
-static bool is_mame_window(HWND hwnd)
+BOOL winwindow_has_focus(void)
 {
-	//for (auto window : osd_common_t::s_window_list)
-		//if (window->platform_window<HWND>() == hwnd)
-			//return true;
-
-	return false;
+	// For now always act like we have focus
+	return TRUE;
 }
 
 inline static BOOL handle_mouse_button(windows_osd_interface *osd, int button, int down, int x, int y)
@@ -421,12 +417,12 @@ void winwindow_process_events(running_machine &machine, int ingame, bool nodispa
 //  (main thread)
 //============================================================
 
-void win_window_info::create(running_machine &machine, int index, std::shared_ptr<osd_monitor_info> monitor, const osd_window_config *config)
+void uwp_window_info::create(running_machine &machine, int index, std::shared_ptr<osd_monitor_info> monitor, const osd_window_config *config)
 {
 	assert(GetCurrentThreadId() == main_threadid);
 
 	// allocate a new window object
-	auto window = std::make_shared<win_window_info>(machine, index, monitor, config);
+	auto window = std::make_shared<uwp_window_info>(machine, index, monitor, config);
 
 	// set main window
 	if (window->m_index > 0)
@@ -485,7 +481,7 @@ void win_window_info::create(running_machine &machine, int index, std::shared_pt
 		fatalerror("Unable to complete window creation\n");
 }
 
-std::shared_ptr<osd_monitor_info> win_window_info::monitor_from_rect(const osd_rect* proposed) const
+std::shared_ptr<osd_monitor_info> uwp_window_info::monitor_from_rect(const osd_rect* proposed) const
 {
 	std::shared_ptr<osd_monitor_info> monitor;
 
@@ -513,7 +509,7 @@ std::shared_ptr<osd_monitor_info> win_window_info::monitor_from_rect(const osd_r
 //  (main thread)
 //============================================================
 
-void win_window_info::destroy()
+void uwp_window_info::destroy()
 {
 	assert(GetCurrentThreadId() == main_threadid);
 
@@ -535,7 +531,7 @@ void win_window_info::destroy()
 //  (main thread)
 //============================================================
 
-void win_window_info::update()
+void uwp_window_info::update()
 {
 	int targetview, targetorient;
 	render_layer_config targetlayerconfig;
@@ -598,7 +594,7 @@ void win_window_info::update()
 //  (main thread)
 //============================================================
 
-void win_window_info::set_starting_view(int index, const char *defview, const char *view)
+void uwp_window_info::set_starting_view(int index, const char *defview, const char *view)
 {
 	int viewindex;
 
@@ -678,7 +674,7 @@ int winwindow_ui_is_paused(running_machine &machine)
 //  (window thread)
 //============================================================
 
-int win_window_info::wnd_extra_width()
+int uwp_window_info::wnd_extra_width()
 {
 	RECT temprect = { 100, 100, 200, 200 };
 	if (fullscreen())
@@ -694,7 +690,7 @@ int win_window_info::wnd_extra_width()
 //  (window thread)
 //============================================================
 
-int win_window_info::wnd_extra_height()
+int uwp_window_info::wnd_extra_height()
 {
 	RECT temprect = { 100, 100, 200, 200 };
 	if (fullscreen())
@@ -709,7 +705,7 @@ int win_window_info::wnd_extra_height()
 //  (window thread)
 //============================================================
 
-int win_window_info::complete_create()
+int uwp_window_info::complete_create()
 {
 	int tempwidth, tempheight;
 
@@ -718,7 +714,9 @@ int win_window_info::complete_create()
 	// get the monitor bounds
 	osd_rect monitorbounds = m_monitor->position_size();
 
-	m_window = Windows::UI::Core::CoreWindow::GetForCurrentThread();
+	IInspectable* raw_window = reinterpret_cast<IInspectable*>(Windows::UI::Core::CoreWindow::GetForCurrentThread());
+	raw_window->AddRef(); // TODO: Should probably figure out a way to auto-release
+	set_platform_window(raw_window);
 
 	// skip the positioning stuff for -video none */
 	if (video_config.mode == VIDEO_MODE_NONE)
@@ -757,7 +755,7 @@ int win_window_info::complete_create()
 //  (window thread)
 //============================================================
 
-osd_rect win_window_info::constrain_to_aspect_ratio(const osd_rect &rect, int adjustment)
+osd_rect uwp_window_info::constrain_to_aspect_ratio(const osd_rect &rect, int adjustment)
 {
 	assert(GetCurrentThreadId() == window_threadid);
 
@@ -882,7 +880,7 @@ osd_rect win_window_info::constrain_to_aspect_ratio(const osd_rect &rect, int ad
 //  (window thread)
 //============================================================
 
-osd_dim win_window_info::get_min_bounds(int constrain)
+osd_dim uwp_window_info::get_min_bounds(int constrain)
 {
 	int32_t minwidth, minheight;
 
@@ -935,7 +933,7 @@ osd_dim win_window_info::get_min_bounds(int constrain)
 //  (window thread)
 //============================================================
 
-osd_dim win_window_info::get_max_bounds(int constrain)
+osd_dim uwp_window_info::get_max_bounds(int constrain)
 {
 	//assert(GetCurrentThreadId() == window_threadid);
 
@@ -975,7 +973,7 @@ osd_dim win_window_info::get_max_bounds(int constrain)
 //  (window thread)
 //============================================================
 
-void win_window_info::update_minmax_state()
+void uwp_window_info::update_minmax_state()
 {
 	assert(GetCurrentThreadId() == window_threadid);
 
@@ -1008,30 +1006,28 @@ void win_window_info::update_minmax_state()
 //  (window thread)
 //============================================================
 
-void win_window_info::minimize_window()
+void uwp_window_info::minimize_window()
 {
 	assert(GetCurrentThreadId() == window_threadid);
 
 	osd_dim newsize = get_min_bounds(video_config.keepaspect);
 
 	// get the window rect
-	RECT bounds;
+	//RECT bounds;
 	//GetWindowRect(platform_window<HWND>(), &bounds);
 
-	osd_rect newrect(bounds.left, bounds.top, newsize );
+	//osd_rect newrect(bounds.left, bounds.top, newsize );
 
 
 	//SetWindowPos(platform_window<HWND>(), nullptr, newrect.left(), newrect.top(), newrect.width(), newrect.height(), SWP_NOZORDER);
 }
-
-
 
 //============================================================
 //  maximize_window
 //  (window thread)
 //============================================================
 
-void win_window_info::maximize_window()
+void uwp_window_info::maximize_window()
 {
 	assert(GetCurrentThreadId() == window_threadid);
 
@@ -1053,7 +1049,7 @@ void win_window_info::maximize_window()
 //  (window thread)
 //============================================================
 
-void win_window_info::adjust_window_position_after_major_change()
+void uwp_window_info::adjust_window_position_after_major_change()
 {
 	RECT oldrect;
 
@@ -1100,7 +1096,7 @@ void win_window_info::adjust_window_position_after_major_change()
 //  (window thread)
 //============================================================
 
-void win_window_info::set_fullscreen(int fullscreen)
+void uwp_window_info::set_fullscreen(int fullscreen)
 {
 	assert(GetCurrentThreadId() == window_threadid);
 

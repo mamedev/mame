@@ -228,7 +228,7 @@ int renderer_bgfx::create()
 #ifdef OSD_WINDOWS
 		winSetHwnd(win->platform_window<HWND>());
 #elif defined(OSD_UWP)
-		winrtSetWindow(AsInspectable(win->m_window.Get()));
+		winrtSetWindow(win->platform_window<IInspectable*>());
 #else
 		sdlSetWindow(win->platform_window<SDL_Window*>());
 #endif
@@ -279,7 +279,7 @@ int renderer_bgfx::create()
 #ifdef OSD_WINDOWS
 		m_framebuffer = m_targets->create_backbuffer(win->platform_window<HWND>(), m_width[win->m_index], m_height[win->m_index]);
 #elif defined(OSD_UWP)
-		m_framebuffer = m_targets->create_backbuffer(&win->m_window, m_width[win->m_index], m_height[win->m_index]);
+		m_framebuffer = m_targets->create_backbuffer(win->platform_window<IInspectable*>(), m_width[win->m_index], m_height[win->m_index]);
 #else
 		m_framebuffer = m_targets->create_backbuffer(sdlNativeWindowHandle(win->platform_window<SDL_Window*>()), m_width[win->m_index], m_height[win->m_index]);
 #endif
@@ -920,7 +920,7 @@ bool renderer_bgfx::update_dimensions()
 #ifdef OSD_WINDOWS
 			m_framebuffer = m_targets->create_backbuffer(win->platform_window<HWND>(), width, height);
 #elif defined(OSD_UWP)
-			m_framebuffer = m_targets->create_backbuffer(&win->m_window, width, height);
+			m_framebuffer = m_targets->create_backbuffer(win->platform_window<IInspectable*>(), width, height);
 #else
 			m_framebuffer = m_targets->create_backbuffer(sdlNativeWindowHandle(win->platform_window<SDL_Window*>()), width, height);
 #endif
