@@ -76,7 +76,7 @@ READ8_MEMBER( hyprolyb_adpcm_device::data_r )
 	return m_soundlatch2->read(*m_space, offset);
 }
 
-static ADDRESS_MAP_START( hyprolyb_adpcm_map, AS_PROGRAM, 8, driver_device )
+static ADDRESS_MAP_START( hyprolyb_adpcm_map, AS_PROGRAM, 8, hyprolyb_adpcm_device )
 	AM_RANGE(0x0000, 0x007f) AM_RAM
 	AM_RANGE(0x1000, 0x1000) AM_DEVREAD("hyprolyb_adpcm", hyprolyb_adpcm_device, data_r)
 	AM_RANGE(0x1001, 0x1001) AM_DEVREAD("hyprolyb_adpcm", hyprolyb_adpcm_device, ready_r)

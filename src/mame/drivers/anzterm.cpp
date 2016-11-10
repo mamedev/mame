@@ -398,7 +398,7 @@ GFXDECODE_START( anzterm )
 GFXDECODE_END
 
 
-ADDRESS_MAP_START( anzterm, AS_PROGRAM, 8, driver_device )
+ADDRESS_MAP_START( anzterm, AS_PROGRAM, 8, anzterm_state )
 	// There are two battery-backed 2kB SRAM chips with a 4kb SRAM chip for parity
 	// There are two 64kB DRAM banks (with parity)
 	// There's also a whole lot of ROM
