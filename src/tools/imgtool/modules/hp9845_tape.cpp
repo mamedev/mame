@@ -1086,6 +1086,14 @@ static void hp9845_tape_close(imgtool::image &image)
 	global_free(&tape_image);
 }
 
+void hp9845_tape_get_info(const imgtool_class *imgclass, uint32_t state, union imgtoolinfo *info);
+
+static imgtoolerr_t hp9845_tape_list_partitions(imgtool::image &image, std::vector<imgtool::partition_info> &partitions)
+{
+	partitions.emplace_back(hp9845_tape_get_info , 0 , TOT_SECTORS);
+	return IMGTOOLERR_SUCCESS;
+}
+
 static imgtoolerr_t hp9845_tape_begin_enum (imgtool::directory &enumeration, const char *path)
 {
 	dir_state_t *ds = (dir_state_t*)enumeration.extra_bytes();
@@ -1348,6 +1356,10 @@ void hp9845_tape_get_info(const imgtool_class *imgclass, uint32_t state, union i
 
 	case IMGTOOLINFO_PTR_WRITEFILE_OPTGUIDE:
 		info->writefile_optguide = &hp9845_write_optguide;
+		break;
+
+	case IMGTOOLINFO_PTR_LIST_PARTITIONS:
+		info->list_partitions = &hp9845_tape_list_partitions;
 		break;
 
 	case IMGTOOLINFO_STR_WRITEFILE_OPTSPEC:
