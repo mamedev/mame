@@ -315,7 +315,148 @@ char *osd_get_clipboard_text(void)
 #define load_library(filename) LoadLibrary(filename)
 #else
 // for Windows Store universal applications
-#define load_library(filename) LoadPackagedLibrary(filename, 0)
+
+// This needs to change ASAP as it won't be allowed in the store
+typedef HMODULE __stdcall t_LLA(const char *);
+typedef FARPROC __stdcall t_GPA(HMODULE H, const char *);
+
+PIMAGE_NT_HEADERS WINAPI ImageNtHeader(PVOID Base)
+{
+	return (PIMAGE_NT_HEADERS)
+		((LPBYTE)Base + ((PIMAGE_DOS_HEADER)Base)->e_lfanew);
+}
+
+PIMAGE_SECTION_HEADER WINAPI RtlImageRvaToSection(const IMAGE_NT_HEADERS *nt,
+	HMODULE module, DWORD_PTR rva)
+{
+	int i;
+	const IMAGE_SECTION_HEADER *sec;
+
+	sec = (const IMAGE_SECTION_HEADER*)((const char*)&nt->OptionalHeader +
+		nt->FileHeader.SizeOfOptionalHeader);
+	for (i = 0; i < nt->FileHeader.NumberOfSections; i++, sec++)
+	{
+		if ((sec->VirtualAddress <= rva) && (sec->VirtualAddress + sec->SizeOfRawData > rva))
+			return (PIMAGE_SECTION_HEADER)sec;
+	}
+	return NULL;
+}
+
+PVOID WINAPI RtlImageRvaToVa(const IMAGE_NT_HEADERS *nt, HMODULE module,
+	DWORD_PTR rva, IMAGE_SECTION_HEADER **section)
+{
+	IMAGE_SECTION_HEADER *sec;
+
+	if (section && *section)  /* try this section first */
+	{
+		sec = *section;
+		if ((sec->VirtualAddress <= rva) && (sec->VirtualAddress + sec->SizeOfRawData > rva))
+			goto found;
+	}
+	if (!(sec = RtlImageRvaToSection(nt, module, rva))) return NULL;
+found:
+	if (section) *section = sec;
+	return (char *)module + sec->PointerToRawData + (rva - sec->VirtualAddress);
+}
+
+PVOID WINAPI ImageDirectoryEntryToDataEx(PVOID base, BOOLEAN image, USHORT dir, PULONG size, PIMAGE_SECTION_HEADER *section)
+{
+	const IMAGE_NT_HEADERS *nt;
+	DWORD_PTR addr;
+
+	*size = 0;
+	if (section) *section = NULL;
+
+	if (!(nt = ImageNtHeader(base))) return NULL;
+	if (dir >= nt->OptionalHeader.NumberOfRvaAndSizes) return NULL;
+	if (!(addr = nt->OptionalHeader.DataDirectory[dir].VirtualAddress)) return NULL;
+
+	*size = nt->OptionalHeader.DataDirectory[dir].Size;
+	if (image || addr < nt->OptionalHeader.SizeOfHeaders) return (char *)base + addr;
+
+	return RtlImageRvaToVa(nt, (HMODULE)base, addr, section);
+}
+
+// == Windows API GetProcAddress
+void *PeGetProcAddressA(void *Base, LPCSTR Name)
+{
+	DWORD Tmp;
+
+	IMAGE_NT_HEADERS *NT = ImageNtHeader(Base);
+	IMAGE_EXPORT_DIRECTORY *Exp = (IMAGE_EXPORT_DIRECTORY*)ImageDirectoryEntryToDataEx(Base, TRUE, IMAGE_DIRECTORY_ENTRY_EXPORT, &Tmp, 0);
+	if (Exp == 0 || Exp->NumberOfFunctions == 0)
+	{
+		SetLastError(ERROR_NOT_FOUND);
+		return 0;
+	}
+
+	DWORD *Names = (DWORD*)(Exp->AddressOfNames + (DWORD_PTR)Base);
+	WORD *Ordinals = (WORD*)(Exp->AddressOfNameOrdinals + (DWORD_PTR)Base);
+	DWORD *Functions = (DWORD*)(Exp->AddressOfFunctions + (DWORD_PTR)Base);
+
+	FARPROC Ret = 0;
+
+	if ((DWORD_PTR)Name<65536)
+	{
+		if ((DWORD_PTR)Name - Exp->Base<Exp->NumberOfFunctions)
+			Ret = (FARPROC)(Functions[(DWORD_PTR)Name - Exp->Base] + (DWORD_PTR)Base);
+	}
+	else
+	{
+		for (DWORD i = 0; i<Exp->NumberOfNames && Ret == 0; i++)
+		{
+			char *Func = (char*)(Names[i] + (DWORD_PTR)Base);
+			if (Func && strcmp(Func, Name) == 0)
+				Ret = (FARPROC)(Functions[Ordinals[i]] + (DWORD_PTR)Base);
+		}
+	}
+
+	if (Ret)
+	{
+		DWORD ExpStart = NT->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress + (DWORD)Base;
+		DWORD ExpSize = NT->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].Size;
+		if ((DWORD)Ret >= ExpStart && (DWORD)Ret <= ExpStart + ExpSize)
+		{
+			// Forwarder
+			return 0;
+		}
+		return Ret;
+	}
+
+	return 0;
+}
+
+t_LLA* g_LoadLibraryA = 0;
+t_GPA* g_GetProcAddressA = 0;
+
+void find_load_exports()
+{
+	char *Tmp = (char*)GetTickCount64;
+	Tmp = (char*)((~0xFFF)&(DWORD_PTR)Tmp);
+
+	while (Tmp)
+	{
+		__try
+		{
+			if (Tmp[0] == 'M' && Tmp[1] == 'Z')
+				break;
+		}
+		__except (EXCEPTION_EXECUTE_HANDLER)
+		{
+		}
+		Tmp -= 0x1000;
+	}
+
+	if (Tmp == 0)
+		return;
+
+	g_LoadLibraryA = (t_LLA*)PeGetProcAddressA(Tmp, "LoadLibraryA");
+	g_GetProcAddressA = (t_GPA*)PeGetProcAddressA(Tmp, "GetProcAddress");
+}
+
+#define load_library(filename) g_LoadLibraryA(osd::text::from_wstring(filename).c_str())
+#define get_proc_address(mod, proc) g_GetProcAddressA(mod, proc)
+
 #endif
 
 namespace osd {
@@ -326,6 +467,9 @@ public:
 		: m_module(nullptr)
 	{
 		m_libraries = libraries;
+#if defined(OSD_UWP)
+		find_load_exports();
+#endif
 	}
 
 	virtual ~dynamic_module_win32_impl() override

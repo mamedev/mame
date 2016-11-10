@@ -104,7 +104,7 @@ static int ui_temp_was_paused;
 static HANDLE window_thread;
 static DWORD window_threadid;
 
-static DWORD last_update_time;
+static std::chrono::time_point<std::chrono::high_resolution_clock> last_update_time;
 
 static HANDLE ui_pause_event;
 
@@ -559,33 +559,64 @@ void uwp_window_info::update()
 	}
 
 	// if we're visible and running and not in the middle of a resize, draw
-//	if (platform_window<HWND>() != nullptr && m_target != nullptr && has_renderer())
-//	{
-//		bool got_lock = true;
-//
-//		// only block if we're throttled
-//		//if (machine().video().throttled() || timeGetTime() - last_update_time > 250)
-////			m_render_lock.lock();
-//	//	else
-//			got_lock = m_render_lock.try_lock();
-//
-//		// only render if we were able to get the lock
-//		if (got_lock)
-//		{
-//			render_primitive_list *primlist;
-//
-//			// don't hold the lock; we just used it to see if rendering was still happening
-//			m_render_lock.unlock();
-//
-//			// ensure the target bounds are up-to-date, and then get the primitives
-//			primlist = renderer().get_primitives();
-//
-//			// post a redraw request with the primitive list as a parameter
-//		//	last_update_time = timeGetTime();
-//
-//			//SendMessage(platform_window<HWND>(), WM_USER_REDRAW, 0, (LPARAM)primlist);
-//		}
-//	}
+	if (platform_window<HWND>() != nullptr && m_target != nullptr && has_renderer())
+	{
+		bool got_lock = true;
+		auto clock = std::chrono::high_resolution_clock();
+
+		// only block if we're throttled
+		if (machine().video().throttled() || clock.now() - last_update_time > std::chrono::milliseconds(250))
+			m_render_lock.lock();
+		else
+			got_lock = m_render_lock.try_lock();
+
+		// only render if we were able to get the lock
+		if (got_lock)
+		{
+			render_primitive_list *primlist;
+
+			// don't hold the lock; we just used it to see if rendering was still happening
+			m_render_lock.unlock();
+
+			// ensure the target bounds are up-to-date, and then get the primitives
+			primlist = renderer().get_primitives();
+
+			// post a redraw request with the primitive list as a parameter
+			last_update_time = clock.now();
+
+			// Actually perform the redraw
+			m_primlist = primlist;
+			draw_video_contents(FALSE);
+		}
+	}
+}
+
+//============================================================
+//  draw_video_contents
+//  (window thread)
+//============================================================
+
+void uwp_window_info::draw_video_contents(int update)
+{
+	assert(GetCurrentThreadId() == window_threadid);
+
+	std::lock_guard<std::mutex> lock(m_render_lock);
+
+	// if we're iconic, don't bother
+	if (platform_window<HWND>() != nullptr)
+	{
+		// if no bitmap, just fill
+		if (m_primlist == nullptr)
+		{
+			// For now do nothing, eventually we need to clear the window
+		}
+
+		// otherwise, render with our drawing system
+		else
+		{
+			renderer().draw(update);
+		}
+	}
 }
 
 

@@ -60,7 +60,8 @@ public:
 
 	virtual osd_dim get_size() override
 	{
-		throw ref new Platform::NotImplementedException();
+		auto bounds = uwp_window()->Bounds;
+		return osd_dim(bounds.Width, bounds.Height);
 	}
 
 	bool win_has_menu() override
@@ -123,6 +124,7 @@ public:
 
 private:
 	int complete_create();
+	void draw_video_contents(int update);
 	void set_starting_view(int index, const char *defview, const char *view);
 	int wnd_extra_width();
 	int wnd_extra_height();
