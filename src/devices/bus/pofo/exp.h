@@ -64,9 +64,6 @@
 	MCFG_DEVICE_ADD(_tag, PORTFOLIO_EXPANSION_SLOT, _clock) \
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
-#define MCFG_PORTFOLIO_EXPANSION_SLOT_IINT_CALLBACK(_write) \
-	devcb = &portfolio_expansion_slot_t::set_iint_wr_callback(*device, DEVCB_##_write);
-
 #define MCFG_PORTFOLIO_EXPANSION_SLOT_EINT_CALLBACK(_write) \
 	devcb = &portfolio_expansion_slot_t::set_eint_wr_callback(*device, DEVCB_##_write);
 
@@ -103,7 +100,8 @@ public:
 	virtual uint8_t nrdi_r(address_space &space, offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1) { return data; };
 	virtual void nwri_w(address_space &space, offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1) { };
 
-	DECLARE_WRITE_LINE_MEMBER( iint_w );
+	virtual WRITE_LINE_MEMBER( iint_w ) { };
+
 	DECLARE_WRITE_LINE_MEMBER( eint_w );
 	DECLARE_WRITE_LINE_MEMBER( nmio_w );
 	DECLARE_WRITE_LINE_MEMBER( wake_w );
@@ -123,7 +121,6 @@ public:
 	portfolio_expansion_slot_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~portfolio_expansion_slot_t() { }
 
-	template<class _Object> static devcb_base &set_iint_wr_callback(device_t &device, _Object object) { return downcast<portfolio_expansion_slot_t &>(device).m_write_iint.set_callback(object); }
 	template<class _Object> static devcb_base &set_eint_wr_callback(device_t &device, _Object object) { return downcast<portfolio_expansion_slot_t &>(device).m_write_eint.set_callback(object); }
 	template<class _Object> static devcb_base &set_nmio_wr_callback(device_t &device, _Object object) { return downcast<portfolio_expansion_slot_t &>(device).m_write_nmio.set_callback(object); }
 	template<class _Object> static devcb_base &set_wake_wr_callback(device_t &device, _Object object) { return downcast<portfolio_expansion_slot_t &>(device).m_write_wake.set_callback(object); }
@@ -139,8 +136,9 @@ public:
 	uint8_t nrdi_r(address_space &space, offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1) { return (m_card != nullptr) ? m_card->nrdi_r(space, offset, data, iom, bcom, ncc1) : data; }
 	void nwri_w(address_space &space, offs_t offset, uint8_t data, bool iom, bool bcom, bool ncc1) { if (m_card != nullptr) m_card->nwri_w(space, offset, data, iom, bcom, ncc1); }
 
+	WRITE_LINE_MEMBER( iint_w ) { if (m_card != nullptr) m_card->iint_w(state); }
+
 	// peripheral interface
-	WRITE_LINE_MEMBER( iint_w ) { m_write_iint(state); }
 	WRITE_LINE_MEMBER( eint_w ) { m_write_eint(state); }
 	WRITE_LINE_MEMBER( nmio_w ) { m_write_nmio(state); }
 	WRITE_LINE_MEMBER( wake_w ) { m_write_wake(state); }
@@ -150,7 +148,6 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	devcb_write_line   m_write_iint;
 	devcb_write_line   m_write_eint;
 	devcb_write_line   m_write_nmio;
 	devcb_write_line   m_write_wake;
