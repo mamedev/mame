@@ -328,32 +328,6 @@ BOOL winwindow_has_focus(void)
 	return TRUE;
 }
 
-inline static BOOL handle_mouse_button(windows_osd_interface *osd, int button, int down, int x, int y)
-{
-	MouseButtonEventArgs args;
-	args.button = button;
-	args.keydown = down;
-	args.xpos = x;
-	args.ypos = y;
-
-	bool handled = osd->handle_input_event(INPUT_EVENT_MOUSE_BUTTON, &args);
-
-	// When in lightgun mode or mouse mode, the mouse click may be routed to the input system
-	// because the mouse interactions in the UI are routed from the video_window_proc below
-	// we need to make sure they aren't suppressed in these cases.
-	return handled && !osd->options().lightgun() && !osd->options().mouse();
-}
-
-inline static BOOL handle_keypress(windows_osd_interface *osd, int vkey, int down, int scancode, BOOL extended_key)
-{
-	KeyPressEventArgs args;
-	args.event_id = down ? INPUT_EVENT_KEYDOWN : INPUT_EVENT_KEYUP;
-	args.scancode = MAKE_DI_SCAN(scancode, extended_key);
-	args.vkey = vkey;
-
-	return osd->handle_input_event(args.event_id, &args);
-}
-
 //============================================================
 //  winwindow_process_events
 //  (main thread)
@@ -368,7 +342,15 @@ void winwindow_process_events(running_machine &machine, bool ingame, bool nodisp
 	// remember the last time we did this
 	last_event_check = std::chrono::system_clock::now();
 
-	CoreWindow::GetForCurrentThread()->Dispatcher->ProcessEvents(CoreProcessEventsOption::ProcessAllIfPresent);
+	try
+	{
+		CoreWindow^ window = CoreWindow::GetForCurrentThread();
+		window->Dispatcher->ProcessEvents(CoreProcessEventsOption::ProcessAllIfPresent);
+	}
+	catch (Platform::DisconnectedException^)
+	{
+		// This can get thrown when the window is being destroyed
+	}
 }
 
 

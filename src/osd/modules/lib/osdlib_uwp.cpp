@@ -270,17 +270,17 @@ void *PeGetProcAddressA(void *Base, LPCSTR Name)
 	{
 		for (DWORD i = 0; i<Exp->NumberOfNames && Ret == 0; i++)
 		{
-			char *Func = (char*)(Names[i] + (DWORD_PTR)Base);
+			char *Func = (char*)(Names[i] + std::uintptr_t(Base));
 			if (Func && strcmp(Func, Name) == 0)
-				Ret = (FARPROC)(Functions[Ordinals[i]] + (DWORD_PTR)Base);
+				Ret = (FARPROC)(Functions[Ordinals[i]] + std::uintptr_t(Base));
 		}
 	}
 
 	if (Ret)
 	{
-		DWORD ExpStart = NT->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress + (DWORD)Base;
-		DWORD ExpSize = NT->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].Size;
-		if ((DWORD)Ret >= ExpStart && (DWORD)Ret <= ExpStart + ExpSize)
+		std::uintptr_t ExpStart = NT->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].VirtualAddress + std::uintptr_t(Base);
+		std::uintptr_t ExpSize = NT->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_EXPORT].Size;
+		if (std::uintptr_t(Ret) >= ExpStart && std::uintptr_t(Ret) <= ExpStart + ExpSize)
 		{
 			// Forwarder
 			return 0;
