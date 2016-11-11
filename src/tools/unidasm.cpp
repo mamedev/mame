@@ -67,6 +67,7 @@ CPU_DISASSEMBLE( alpha8201 );
 CPU_DISASSEMBLE( am29000 );
 CPU_DISASSEMBLE( amis2000 );
 CPU_DISASSEMBLE( apexc );
+CPU_DISASSEMBLE( arcompact );
 CPU_DISASSEMBLE( arm );
 CPU_DISASSEMBLE( arm_be );
 CPU_DISASSEMBLE( arm7arm );
@@ -233,6 +234,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "am29000",     _32be,  0, CPU_DISASSEMBLE_NAME(am29000) },
 	{ "amis2000",    _8bit,  0, CPU_DISASSEMBLE_NAME(amis2000) },
 	{ "apexc",       _32be,  0, CPU_DISASSEMBLE_NAME(apexc) },
+	{ "arcompact",   _16le,  0, CPU_DISASSEMBLE_NAME(arcompact) },
 	{ "arm",         _32le,  0, CPU_DISASSEMBLE_NAME(arm) },
 	{ "arm_be",      _32be,  0, CPU_DISASSEMBLE_NAME(arm_be) },
 	{ "arm7",        _32le,  0, CPU_DISASSEMBLE_NAME(arm7arm) },
