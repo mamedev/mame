@@ -244,18 +244,26 @@ namespace imgtool
 	{
 	public:
 		partition_info(imgtool_get_info get_info, uint64_t base_block, uint64_t block_count)
-			: m_get_info(get_info)
+			: m_base_block(base_block)
+			, m_block_count(block_count)
+		{
+			memset(&m_imgclass, 0, sizeof(m_imgclass));
+			m_imgclass.get_info = get_info;
+		}
+
+		partition_info(imgtool_class imgclass, uint64_t base_block, uint64_t block_count)
+			: m_imgclass(imgclass)
 			, m_base_block(base_block)
 			, m_block_count(block_count)
 		{
 		}
 
-		imgtool_get_info get_info() const { return m_get_info; }
+		const imgtool_class &imgclass() const { return m_imgclass; }
 		uint64_t base_block() const { return m_base_block; }
 		uint64_t block_count() const { return m_block_count; }
 
 	private:
-		imgtool_get_info    m_get_info;
+		imgtool_class			m_imgclass;
 		uint64_t                m_base_block;
 		uint64_t                m_block_count;
 	};
