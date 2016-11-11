@@ -184,7 +184,7 @@ void osd_break_into_debugger(const char *message)
 
 static char *get_clipboard_text_by_format(UINT format, std::string (*convert)(LPCVOID data))
 {
-	/*DataPackageView^ dataPackageView;
+	DataPackageView^ dataPackageView;
 	IAsyncOperation<String^>^ getTextOp;
 	String^ clipboardText;
 
@@ -192,8 +192,7 @@ static char *get_clipboard_text_by_format(UINT format, std::string (*convert)(LP
 	getTextOp = dataPackageView->GetTextAsync();
 	clipboardText = getTextOp->GetResults();
 
-	return  osd::text::from_wstring(clipboardText->Data()).c_str();*/
-	return nullptr;
+	return (char *)convert(clipboardText->Data()).c_str();
 }
 
 //============================================================
