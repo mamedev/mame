@@ -33,26 +33,6 @@ using namespace Windows::ApplicationModel::DataTransfer;
 using namespace Windows::Foundation;
 
 #include <map>
-//============================================================
-//  MACROS
-//============================================================
-
-// presumed size of a page of memory
-#define PAGE_SIZE           4096
-
-// align allocations to start or end of the page?
-#define GUARD_ALIGN_START   0
-
-#if defined(__BIGGEST_ALIGNMENT__)
-#define MAX_ALIGNMENT       __BIGGEST_ALIGNMENT__
-#elif defined(__AVX__)
-#define MAX_ALIGNMENT       32
-#elif defined(__SSE__) || defined(__x86_64__) || defined(_M_X64)
-#define MAX_ALIGNMENT       16
-#else
-#define MAX_ALIGNMENT       sizeof(int64_t)
-#endif
-
 
 //============================================================
 //  GLOBAL VARIABLES
