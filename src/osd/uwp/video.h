@@ -2,12 +2,12 @@
 // copyright-holders:Aaron Giles
 //============================================================
 //
-//  video.h - Win32 implementation of MAME video routines
+//  video.h - UWP implementation of MAME video routines
 //
 //============================================================
 
-#ifndef __WIN_VIDEO__
-#define __WIN_VIDEO__
+#ifndef __UWP_VIDEO__
+#define __UWP_VIDEO__
 
 #include "modules/osdhelper.h"
 

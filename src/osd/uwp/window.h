@@ -2,12 +2,12 @@
 // copyright-holders:Aaron Giles, Brad Hughes
 //============================================================
 //
-//  window.h - Win32 window handling
+//  window.h - UWP window handling
 //
 //============================================================
 
-#ifndef __WIN_WINDOW__
-#define __WIN_WINDOW__
+#ifndef __UWP_WINDOW__
+#define __UWP_WINDOW__
 
 // standard windows headers
 #define WIN32_LEAN_AND_MEAN
@@ -140,9 +140,7 @@ private:
 
 	static POINT        s_saved_cursor_pos;
 
-#if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 	static Windows::UI::Core::CoreCursor^ s_cursor;
-#endif
 
 	running_machine &   m_machine;
 };

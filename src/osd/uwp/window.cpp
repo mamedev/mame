@@ -275,44 +275,6 @@ uwp_window_info::uwp_window_info(
 
 POINT uwp_window_info::s_saved_cursor_pos = { -1, -1 };
 
-#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
-
-void uwp_window_info::capture_pointer()
-{
-	RECT bounds;
-	GetClientRect(platform_window<HWND>(), &bounds);
-	ClientToScreen(platform_window<HWND>(), &reinterpret_cast<POINT *>(&bounds)[0]);
-	ClientToScreen(platform_window<HWND>(), &reinterpret_cast<POINT *>(&bounds)[1]);
-	ClipCursor(&bounds);
-}
-
-void uwp_window_info::release_pointer()
-{
-	ClipCursor(nullptr);
-}
-
-void uwp_window_info::hide_pointer()
-{
-	GetCursorPos(&s_saved_cursor_pos);
-
-	while (ShowCursor(FALSE) >= -1) {};
-	ShowCursor(TRUE);
-}
-
-void uwp_window_info::show_pointer()
-{
-	if (s_saved_cursor_pos.x != -1 || s_saved_cursor_pos.y != -1)
-	{
-		SetCursorPos(s_saved_cursor_pos.x, s_saved_cursor_pos.y);
-		s_saved_cursor_pos.x = s_saved_cursor_pos.y = -1;
-	}
-
-	while (ShowCursor(TRUE) < 1) {};
-	ShowCursor(FALSE);
-}
-
-#else
-
 CoreCursor^ uwp_window_info::s_cursor = nullptr;
 
 void uwp_window_info::capture_pointer()
@@ -337,8 +299,6 @@ void uwp_window_info::show_pointer()
 	auto window = uwp_window();
 	window->PointerCursor = uwp_window_info::s_cursor;
 }
-
-#endif
 
 //============================================================
 //  winwindow_process_events_periodic
