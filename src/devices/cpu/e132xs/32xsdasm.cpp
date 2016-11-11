@@ -392,7 +392,7 @@ static uint32_t RRdis_format(char *source, char *dest, uint16_t op, uint16_t nex
 	return ret;
 }
 
-unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsigned h_flag, int private_fp)
+unsigned dasm_hyperstone(std::ostream &stream, unsigned pc, const uint8_t *oprom, unsigned h_flag, int private_fp)
 {
 	uint16_t op;
 	uint8_t op_num;
@@ -425,7 +425,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 
 			if( source_bit && dest_bit && source_code == 0 && dest_code == 0 )
 			{
-				sprintf(buffer, "NOP");
+				util::stream_format(stream, "NOP");
 			}
 			else
 			{
@@ -433,11 +433,11 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 
 				if( !source_bit && source_code == SR_REGISTER )
 				{
-					sprintf(buffer, "CHKZ %s, 0", dest);
+					util::stream_format(stream, "CHKZ %s, 0", dest);
 				}
 				else
 				{
-					sprintf(buffer, "CHK %s, %s", dest, source);
+					util::stream_format(stream, "CHK %s, %s", dest, source);
 				}
 			}
 
@@ -452,16 +452,16 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 			{
 				global_fp = 0;
 				RR_format(source, dest, op, 0);
-				sprintf(buffer, "RET PC, %s", source);
+				util::stream_format(stream, "RET PC, %s", source);
 				flags = DASMFLAG_STEP_OUT;
 			}
 			else if( source_code == SR_REGISTER && !source_bit )
 			{
-				sprintf(buffer, "MOVD %s, 0", dest);
+				util::stream_format(stream, "MOVD %s, 0", dest);
 			}
 			else
 			{
-				sprintf(buffer, "MOVD %s, %s", dest, source);
+				util::stream_format(stream, "MOVD %s, %s", dest, source);
 			}
 
 			break;
@@ -470,7 +470,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 		case 0x08: case 0x09: case 0x0a: case 0x0b:
 
 			RR_format(source, dest, op, 0);
-			sprintf(buffer, "DIVU %s, %s", dest, source);
+			util::stream_format(stream, "DIVU %s, %s", dest, source);
 
 			break;
 
@@ -478,7 +478,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 		case 0x0c: case 0x0d: case 0x0e: case 0x0f:
 
 			RR_format(source, dest, op, 0);
-			sprintf(buffer, "DIVS %s, %s", dest, source);
+			util::stream_format(stream, "DIVS %s, %s", dest, source);
 
 			break;
 
@@ -516,12 +516,12 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 					lim = op & 0xfff;
 				}
 
-				sprintf(buffer, "XM%x %s, %s, $%x", (uint8_t)(float) pow(2.0, xcode), dest, source, lim);
+				util::stream_format(stream, "XM%x %s, %s, $%x", (uint8_t)(float) pow(2.0, xcode), dest, source, lim);
 
 			}
 			else
 			{
-				sprintf(buffer, "XX%x %s, %s, 0", (uint8_t)(float) pow(2.0, (xcode - 4)), dest, source);
+				util::stream_format(stream, "XX%x %s, %s, 0", (uint8_t)(float) pow(2.0, (xcode - 4)), dest, source);
 			}
 
 			break;
@@ -532,7 +532,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 		{
 			uint32_t const_val = RRconst_format(source, dest, op, &pc);
 
-			sprintf(buffer, "MASK %s, %s, $%x", dest, source, const_val);
+			util::stream_format(stream, "MASK %s, %s, $%x", dest, source, const_val);
 
 			break;
 		}
@@ -544,11 +544,11 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 
 			if( source_code == SR_REGISTER && !source_bit )
 			{
-				sprintf(buffer, "SUM %s, C, $%x", dest, const_val);
+				util::stream_format(stream, "SUM %s, C, $%x", dest, const_val);
 			}
 			else
 			{
-				sprintf(buffer, "SUM %s, %s, $%x", dest, source, const_val);
+				util::stream_format(stream, "SUM %s, %s, $%x", dest, source, const_val);
 			}
 
 			break;
@@ -561,11 +561,11 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 
 			if( source_code == SR_REGISTER && !source_bit )
 			{
-				sprintf(buffer, "SUMS %s, C, $%x", dest, const_val);
+				util::stream_format(stream, "SUMS %s, C, $%x", dest, const_val);
 			}
 			else
 			{
-				sprintf(buffer, "SUMS %s, %s, $%x", dest, source, const_val);
+				util::stream_format(stream, "SUMS %s, %s, $%x", dest, source, const_val);
 			}
 
 			break;
@@ -578,11 +578,11 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 
 			if( source_code == SR_REGISTER && !source_bit )
 			{
-				sprintf(buffer, "CMP %s, C", dest);
+				util::stream_format(stream, "CMP %s, C", dest);
 			}
 			else
 			{
-				sprintf(buffer, "CMP %s, %s", dest, source);
+				util::stream_format(stream, "CMP %s, %s", dest, source);
 			}
 
 			break;
@@ -591,7 +591,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 		case 0x24: case 0x25: case 0x26: case 0x27:
 
 			RR_format(source, dest, op, h_flag);
-			sprintf(buffer, "MOV %s, %s", dest, source);
+			util::stream_format(stream, "MOV %s, %s", dest, source);
 
 			break;
 
@@ -602,11 +602,11 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 
 			if( source_code == SR_REGISTER && !source_bit )
 			{
-				sprintf(buffer, "ADD %s, C", dest);
+				util::stream_format(stream, "ADD %s, C", dest);
 			}
 			else
 			{
-				sprintf(buffer, "ADD %s, %s", dest, source);
+				util::stream_format(stream, "ADD %s, %s", dest, source);
 			}
 
 			break;
@@ -618,11 +618,11 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 
 			if( source_code == SR_REGISTER && !source_bit )
 			{
-				sprintf(buffer, "ADDS %s, C", dest);
+				util::stream_format(stream, "ADDS %s, C", dest);
 			}
 			else
 			{
-				sprintf(buffer, "ADDS %s, %s", dest, source);
+				util::stream_format(stream, "ADDS %s, %s", dest, source);
 			}
 
 			break;
@@ -631,7 +631,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 		case 0x30: case 0x31: case 0x32: case 0x33:
 
 			RR_format(source, dest, op, 0);
-			sprintf(buffer, "CMPB %s, %s", dest, source);
+			util::stream_format(stream, "CMPB %s, %s", dest, source);
 
 			break;
 
@@ -639,7 +639,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 		case 0x34: case 0x35: case 0x36: case 0x37:
 
 			RR_format(source, dest, op, 0);
-			sprintf(buffer, "ANDN %s, %s", dest, source);
+			util::stream_format(stream, "ANDN %s, %s", dest, source);
 
 			break;
 
@@ -647,7 +647,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 		case 0x38: case 0x39: case 0x3a: case 0x3b:
 
 			RR_format(source, dest, op, 0);
-			sprintf(buffer, "OR %s, %s", dest, source);
+			util::stream_format(stream, "OR %s, %s", dest, source);
 
 			break;
 
@@ -655,7 +655,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 		case 0x3c: case 0x3d: case 0x3e: case 0x3f:
 
 			RR_format(source, dest, op, 0);
-			sprintf(buffer, "XOR %s, %s", dest, source);
+			util::stream_format(stream, "XOR %s, %s", dest, source);
 
 			break;
 
@@ -666,11 +666,11 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 
 			if( source_code == SR_REGISTER && !source_bit )
 			{
-				sprintf(buffer, "SUBC %s, C", dest);
+				util::stream_format(stream, "SUBC %s, C", dest);
 			}
 			else
 			{
-				sprintf(buffer, "SUBC %s, %s", dest, source);
+				util::stream_format(stream, "SUBC %s, %s", dest, source);
 			}
 
 			break;
@@ -680,7 +680,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 
 			RR_format(source, dest, op, 0);
 
-			sprintf(buffer, "NOT %s, %s", dest, source);
+			util::stream_format(stream, "NOT %s, %s", dest, source);
 
 			break;
 
@@ -691,11 +691,11 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 
 			if( source_code == SR_REGISTER && !source_bit )
 			{
-				sprintf(buffer, "SUB %s, C", dest);
+				util::stream_format(stream, "SUB %s, C", dest);
 			}
 			else
 			{
-				sprintf(buffer, "SUB %s, %s", dest, source);
+				util::stream_format(stream, "SUB %s, %s", dest, source);
 			}
 
 			break;
@@ -707,11 +707,11 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 
 			if( source_code == SR_REGISTER && !source_bit )
 			{
-				sprintf(buffer, "SUBS %s, C", dest);
+				util::stream_format(stream, "SUBS %s, C", dest);
 			}
 			else
 			{
-				sprintf(buffer, "SUBS %s, %s", dest, source);
+				util::stream_format(stream, "SUBS %s, %s", dest, source);
 			}
 
 			break;
@@ -723,11 +723,11 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 
 			if( source_code == SR_REGISTER && !source_bit )
 			{
-				sprintf(buffer, "ADDC %s, C", dest);
+				util::stream_format(stream, "ADDC %s, C", dest);
 			}
 			else
 			{
-				sprintf(buffer, "ADDC %s, %s", dest, source);
+				util::stream_format(stream, "ADDC %s, %s", dest, source);
 			}
 
 			break;
@@ -736,7 +736,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 		case 0x54: case 0x55: case 0x56: case 0x57:
 
 			RR_format(source, dest, op, 0);
-			sprintf(buffer, "AND %s, %s", dest, source);
+			util::stream_format(stream, "AND %s, %s", dest, source);
 
 			break;
 
@@ -747,11 +747,11 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 
 			if( source_code == SR_REGISTER && !source_bit )
 			{
-				sprintf(buffer, "NEG %s, C", dest);
+				util::stream_format(stream, "NEG %s, C", dest);
 			}
 			else
 			{
-				sprintf(buffer, "NEG %s, %s", dest, source);
+				util::stream_format(stream, "NEG %s, %s", dest, source);
 			}
 
 			break;
@@ -763,11 +763,11 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 
 			if( source_code == SR_REGISTER && !source_bit )
 			{
-				sprintf(buffer, "NEGS %s, C", dest);
+				util::stream_format(stream, "NEGS %s, C", dest);
 			}
 			else
 			{
-				sprintf(buffer, "NEGS %s, %s", dest, source);
+				util::stream_format(stream, "NEGS %s, %s", dest, source);
 			}
 
 			break;
@@ -777,7 +777,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 		{
 			uint32_t imm = Rimm_format(dest, op, &pc, 0);
 
-			sprintf(buffer, "CMPI %s, $%x", dest, imm);
+			util::stream_format(stream, "CMPI %s, $%x", dest, imm);
 
 			break;
 		}
@@ -787,7 +787,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 		{
 			uint32_t imm = Rimm_format(dest, op, &pc, h_flag);
 
-			sprintf(buffer, "MOVI %s, $%x", dest, imm);
+			util::stream_format(stream, "MOVI %s, $%x", dest, imm);
 
 			break;
 		}
@@ -799,11 +799,11 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 
 			if( !N_VALUE(op) )
 			{
-				sprintf(buffer, "ADDI %s, CZ", dest);
+				util::stream_format(stream, "ADDI %s, CZ", dest);
 			}
 			else
 			{
-				sprintf(buffer, "ADDI %s, $%x", dest, imm);
+				util::stream_format(stream, "ADDI %s, $%x", dest, imm);
 			}
 
 			break;
@@ -816,11 +816,11 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 
 			if( !N_VALUE(op) )
 			{
-				sprintf(buffer, "ADDSI %s, CZ", dest);
+				util::stream_format(stream, "ADDSI %s, CZ", dest);
 			}
 			else
 			{
-				sprintf(buffer, "ADDSI %s, $%x", dest, imm);
+				util::stream_format(stream, "ADDSI %s, $%x", dest, imm);
 			}
 
 			break;
@@ -833,14 +833,14 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 
 			if( !N_VALUE(op) )
 			{
-				sprintf(buffer, "CMPBI %s, ANYBZ", dest);
+				util::stream_format(stream, "CMPBI %s, ANYBZ", dest);
 			}
 			else
 			{
 				if( N_VALUE(op) == 31 )
 					imm = 0x7fffffff; //bit 31 = 0, others = 1
 
-				sprintf(buffer, "CMPBI %s, $%x", dest, imm);
+				util::stream_format(stream, "CMPBI %s, $%x", dest, imm);
 			}
 
 			break;
@@ -854,7 +854,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 			if( N_VALUE(op) == 31 )
 				imm = 0x7fffffff; //bit 31 = 0, others = 1
 
-			sprintf(buffer, "ANDNI %s, $%x", dest, imm);
+			util::stream_format(stream, "ANDNI %s, $%x", dest, imm);
 
 			break;
 		}
@@ -864,7 +864,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 		{
 			uint32_t imm = Rimm_format(dest, op, &pc, 0);
 
-			sprintf(buffer, "ORI %s, $%x", dest, imm);
+			util::stream_format(stream, "ORI %s, $%x", dest, imm);
 
 			break;
 		}
@@ -874,7 +874,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 		{
 			uint32_t imm = Rimm_format(dest, op, &pc, 0);
 
-			sprintf(buffer, "XORI %s, $%x", dest, imm);
+			util::stream_format(stream, "XORI %s, $%x", dest, imm);
 
 			break;
 		}
@@ -884,7 +884,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 		{
 			uint8_t n = Ln_format(dest, op);
 
-			sprintf(buffer, "SHRDI %s, $%x", dest, n);
+			util::stream_format(stream, "SHRDI %s, $%x", dest, n);
 
 			break;
 		}
@@ -894,7 +894,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 
 			LL_format(source, dest, op);
 
-			sprintf(buffer, "SHRD %s, %s", dest, source);
+			util::stream_format(stream, "SHRD %s, %s", dest, source);
 
 			break;
 
@@ -903,7 +903,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 
 			LL_format(source, dest, op);
 
-			sprintf(buffer, "SHR %s, %s", dest, source);
+			util::stream_format(stream, "SHR %s, %s", dest, source);
 
 			break;
 
@@ -912,7 +912,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 		{
 			uint8_t n = Ln_format(dest, op);
 
-			sprintf(buffer, "SARDI %s, $%x", dest, n);
+			util::stream_format(stream, "SARDI %s, $%x", dest, n);
 
 			break;
 		}
@@ -922,7 +922,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 
 			LL_format(source, dest, op);
 
-			sprintf(buffer, "SARD %s, %s", dest, source);
+			util::stream_format(stream, "SARD %s, %s", dest, source);
 
 			break;
 
@@ -931,7 +931,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 
 			LL_format(source, dest, op);
 
-			sprintf(buffer, "SAR %s, %s", dest, source);
+			util::stream_format(stream, "SAR %s, %s", dest, source);
 
 			break;
 
@@ -940,7 +940,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 		{
 			uint8_t n = Ln_format(dest, op);
 
-			sprintf(buffer, "SHLDI %s, $%x", dest, n);
+			util::stream_format(stream, "SHLDI %s, $%x", dest, n);
 
 			break;
 		}
@@ -950,7 +950,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 
 			LL_format(source, dest, op);
 
-			sprintf(buffer, "SHLD %s, %s", dest, source);
+			util::stream_format(stream, "SHLD %s, %s", dest, source);
 
 			break;
 
@@ -959,7 +959,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 
 			LL_format(source, dest, op);
 
-			sprintf(buffer, "SHL %s, %s", dest, source);
+			util::stream_format(stream, "SHL %s, %s", dest, source);
 
 			break;
 
@@ -967,7 +967,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 		case 0x8c: case 0x8d:
 		case 0xac: case 0xad: case 0xae: case 0xaf:
 
-			sprintf(buffer, "Reserved");
+			util::stream_format(stream, "Reserved");
 
 			break;
 
@@ -976,7 +976,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 
 			LL_format(source, dest, op);
 
-			sprintf(buffer, "TESTLZ %s, %s", dest, source);
+			util::stream_format(stream, "TESTLZ %s, %s", dest, source);
 
 			break;
 
@@ -985,7 +985,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 
 			LL_format(source, dest, op);
 
-			sprintf(buffer, "ROL %s, %s", dest, source);
+			util::stream_format(stream, "ROL %s, %s", dest, source);
 
 			break;
 
@@ -1004,24 +1004,24 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 				{
 					case 0:
 						// LDBS.A
-						sprintf(buffer, "LDBS.A 0, %s, $%x", source, dis);
+						util::stream_format(stream, "LDBS.A 0, %s, $%x", source, dis);
 						break;
 
 					case 1:
 						// LDBU.A
-						sprintf(buffer, "LDBU.A 0, %s, $%x", source, dis);
+						util::stream_format(stream, "LDBU.A 0, %s, $%x", source, dis);
 						break;
 
 					case 2:
 						// LDHS.A
 						if( dis & 1 )
 						{
-							sprintf(buffer, "LDHS.A 0, %s, $%x", source, dis & ~1);
+							util::stream_format(stream, "LDHS.A 0, %s, $%x", source, dis & ~1);
 						}
 						// LDHU.A
 						else
 						{
-							sprintf(buffer, "LDHU.A 0, %s, $%x", source, dis & ~1);
+							util::stream_format(stream, "LDHU.A 0, %s, $%x", source, dis & ~1);
 						}
 
 						break;
@@ -1030,22 +1030,22 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 						// LDD.IOA
 						if( (dis & 3) == 3 )
 						{
-							sprintf(buffer, "LDD.IOA 0, %s, $%x", source, dis & ~3);
+							util::stream_format(stream, "LDD.IOA 0, %s, $%x", source, dis & ~3);
 						}
 						// LDW.IOA
 						else if( (dis & 3) == 2 )
 						{
-							sprintf(buffer, "LDW.IOA 0, %s, $%x", source, dis & ~3);
+							util::stream_format(stream, "LDW.IOA 0, %s, $%x", source, dis & ~3);
 						}
 						// LDD.A
 						else if( (dis & 3) == 1 )
 						{
-							sprintf(buffer, "LDD.A 0, %s, $%x", source, dis & ~1);
+							util::stream_format(stream, "LDD.A 0, %s, $%x", source, dis & ~1);
 						}
 						// LDW.A
 						else
 						{
-							sprintf(buffer, "LDW.A 0, %s, $%x", source, dis & ~1);
+							util::stream_format(stream, "LDW.A 0, %s, $%x", source, dis & ~1);
 						}
 
 						break;
@@ -1057,24 +1057,24 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 				{
 					case 0:
 						// LDBS.D
-						sprintf(buffer, "LDBS.D %s, %s, $%x", dest, source, dis);
+						util::stream_format(stream, "LDBS.D %s, %s, $%x", dest, source, dis);
 						break;
 
 					case 1:
 						// LDBU.D
-						sprintf(buffer, "LDBU.D %s, %s, $%x", dest, source, dis);
+						util::stream_format(stream, "LDBU.D %s, %s, $%x", dest, source, dis);
 						break;
 
 					case 2:
 						// LDHS.D
 						if( dis & 1 )
 						{
-							sprintf(buffer, "LDHS.D %s, %s, $%x", dest, source, dis & ~1);
+							util::stream_format(stream, "LDHS.D %s, %s, $%x", dest, source, dis & ~1);
 						}
 						// LDHU.D
 						else
 						{
-							sprintf(buffer, "LDHU.D %s, %s, $%x", dest, source, dis & ~1);
+							util::stream_format(stream, "LDHU.D %s, %s, $%x", dest, source, dis & ~1);
 						}
 						break;
 
@@ -1082,22 +1082,22 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 						// LDD.IOD
 						if( (dis & 3) == 3 )
 						{
-							sprintf(buffer, "LDD.IOD %s, %s, $%x", dest, source, dis & ~3);
+							util::stream_format(stream, "LDD.IOD %s, %s, $%x", dest, source, dis & ~3);
 						}
 						// LDW.IOD
 						else if( (dis & 3) == 2 )
 						{
-							sprintf(buffer, "LDW.IOD %s, %s, $%x", dest, source, dis & ~3);
+							util::stream_format(stream, "LDW.IOD %s, %s, $%x", dest, source, dis & ~3);
 						}
 						// LDD.D
 						else if( (dis & 3) == 1 )
 						{
-							sprintf(buffer, "LDD.D %s, %s, $%x", dest, source, dis & ~1);
+							util::stream_format(stream, "LDD.D %s, %s, $%x", dest, source, dis & ~1);
 						}
 						// LDW.D
 						else
 						{
-							sprintf(buffer, "LDW.D %s, %s, $%x", dest, source, dis & ~1);
+							util::stream_format(stream, "LDW.D %s, %s, $%x", dest, source, dis & ~1);
 						}
 
 						break;
@@ -1118,7 +1118,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 
 			if( (dest_code == PC_REGISTER && !dest_bit) || (dest_code == SR_REGISTER && !dest_bit) )
 			{
-				sprintf(buffer, "Reserved");
+				util::stream_format(stream, "Reserved");
 				break;
 			}
 
@@ -1126,24 +1126,24 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 			{
 				case 0:
 					// LDBS.N
-					sprintf(buffer, "LDBS.N %s, %s, $%x", dest, source, dis);
+					util::stream_format(stream, "LDBS.N %s, %s, $%x", dest, source, dis);
 					break;
 
 				case 1:
 					// LDBU.N
-					sprintf(buffer, "LDBU.N %s, %s, $%x", dest, source, dis);
+					util::stream_format(stream, "LDBU.N %s, %s, $%x", dest, source, dis);
 					break;
 
 				case 2:
 					// LDHS.N
 					if( dis & 1 )
 					{
-						sprintf(buffer, "LDHS.N %s, %s, $%x", dest, source, dis & ~1);
+						util::stream_format(stream, "LDHS.N %s, %s, $%x", dest, source, dis & ~1);
 					}
 					// LDHU.N
 					else
 					{
-						sprintf(buffer, "LDHU.N %s, %s, $%x", dest, source, dis & ~1);
+						util::stream_format(stream, "LDHU.N %s, %s, $%x", dest, source, dis & ~1);
 					}
 
 					break;
@@ -1152,22 +1152,22 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 					// LDW.S
 					if( (dis & 3) == 3 )
 					{
-						sprintf(buffer, "LDW.S %s, %s, $%x", dest, source, dis & ~3);
+						util::stream_format(stream, "LDW.S %s, %s, $%x", dest, source, dis & ~3);
 					}
 					// Reserved
 					else if( (dis & 3) == 2 )
 					{
-						sprintf(buffer, "Reserved");
+						util::stream_format(stream, "Reserved");
 					}
 					// LDD.N
 					else if( (dis & 3) == 1 )
 					{
-						sprintf(buffer, "LDD.N %s, %s, $%x", dest, source, dis & ~1);
+						util::stream_format(stream, "LDD.N %s, %s, $%x", dest, source, dis & ~1);
 					}
 					// LDW.N
 					else
 					{
-						sprintf(buffer, "LDW.N %s, %s, $%x", dest, source, dis & ~1);
+						util::stream_format(stream, "LDW.N %s, %s, $%x", dest, source, dis & ~1);
 					}
 
 					break;
@@ -1194,24 +1194,24 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 				{
 					case 0:
 						// STBS.A
-						sprintf(buffer, "STBS.A 0, %s, $%x", source, dis);
+						util::stream_format(stream, "STBS.A 0, %s, $%x", source, dis);
 						break;
 
 					case 1:
 						// STBU.A
-						sprintf(buffer, "STBU.A 0, %s, $%x", source, dis);
+						util::stream_format(stream, "STBU.A 0, %s, $%x", source, dis);
 						break;
 
 					case 2:
 						// STHS.A
 						if( dis & 1 )
 						{
-							sprintf(buffer, "STHS.A 0, %s, $%x", source, dis & ~1);
+							util::stream_format(stream, "STHS.A 0, %s, $%x", source, dis & ~1);
 						}
 						// STHU.A
 						else
 						{
-							sprintf(buffer, "STHU.A 0, %s, $%x", source, dis & ~1);
+							util::stream_format(stream, "STHU.A 0, %s, $%x", source, dis & ~1);
 						}
 
 						break;
@@ -1220,22 +1220,22 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 						// STD.IOA
 						if( (dis & 3) == 3 )
 						{
-							sprintf(buffer, "STD.IOA 0, %s, $%x", source, dis & ~3);
+							util::stream_format(stream, "STD.IOA 0, %s, $%x", source, dis & ~3);
 						}
 						// STW.IOA
 						else if( (dis & 3) == 2 )
 						{
-							sprintf(buffer, "STW.IOA 0, %s, $%x", source, dis & ~3);
+							util::stream_format(stream, "STW.IOA 0, %s, $%x", source, dis & ~3);
 						}
 						// STD.A
 						else if( (dis & 3) == 1 )
 						{
-							sprintf(buffer, "STD.A 0, %s, $%x", source, dis & ~1);
+							util::stream_format(stream, "STD.A 0, %s, $%x", source, dis & ~1);
 						}
 						// STW.A
 						else
 						{
-							sprintf(buffer, "STW.A 0, %s, $%x", source, dis & ~1);
+							util::stream_format(stream, "STW.A 0, %s, $%x", source, dis & ~1);
 						}
 
 						break;
@@ -1247,24 +1247,24 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 				{
 					case 0:
 						// STBS.D
-						sprintf(buffer, "STBS.D %s, %s, $%x", dest, source, dis);
+						util::stream_format(stream, "STBS.D %s, %s, $%x", dest, source, dis);
 						break;
 
 					case 1:
 						// STBU.D
-						sprintf(buffer, "STBU.D %s, %s, $%x", dest, source, dis);
+						util::stream_format(stream, "STBU.D %s, %s, $%x", dest, source, dis);
 						break;
 
 					case 2:
 						// STHS.D
 						if( dis & 1 )
 						{
-							sprintf(buffer, "STHS.D %s, %s, $%x", dest, source, dis & ~1);
+							util::stream_format(stream, "STHS.D %s, %s, $%x", dest, source, dis & ~1);
 						}
 						// STHU.D
 						else
 						{
-							sprintf(buffer, "STHU.D %s, %s, $%x", dest, source, dis & ~1);
+							util::stream_format(stream, "STHU.D %s, %s, $%x", dest, source, dis & ~1);
 						}
 						break;
 
@@ -1272,22 +1272,22 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 						// STD.IOD
 						if( (dis & 3) == 3 )
 						{
-							sprintf(buffer, "STD.IOD %s, %s, $%x", dest, source, dis & ~3);
+							util::stream_format(stream, "STD.IOD %s, %s, $%x", dest, source, dis & ~3);
 						}
 						// STW.IOD
 						else if( (dis & 3) == 2 )
 						{
-							sprintf(buffer, "STW.IOD %s, %s, $%x", dest, source, dis & ~3);
+							util::stream_format(stream, "STW.IOD %s, %s, $%x", dest, source, dis & ~3);
 						}
 						// STD.D
 						else if( (dis & 3) == 1 )
 						{
-							sprintf(buffer, "STD.D %s, %s, $%x", dest, source, dis & ~1);
+							util::stream_format(stream, "STD.D %s, %s, $%x", dest, source, dis & ~1);
 						}
 						// STW.D
 						else
 						{
-							sprintf(buffer, "STW.D %s, %s, $%x", dest, source, dis & ~1);
+							util::stream_format(stream, "STW.D %s, %s, $%x", dest, source, dis & ~1);
 						}
 
 						break;
@@ -1311,7 +1311,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 
 			if( (dest_code == PC_REGISTER && !dest_bit) || (dest_code == SR_REGISTER && !dest_bit) )
 			{
-				sprintf(buffer, "Reserved");
+				util::stream_format(stream, "Reserved");
 				break;
 			}
 
@@ -1319,24 +1319,24 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 			{
 				case 0:
 					// STBS.N
-					sprintf(buffer, "STBS.N %s, %s, $%x", dest, source, dis);
+					util::stream_format(stream, "STBS.N %s, %s, $%x", dest, source, dis);
 					break;
 
 				case 1:
 					// STBU.N
-					sprintf(buffer, "STBU.N %s, %s, $%x", dest, source, dis);
+					util::stream_format(stream, "STBU.N %s, %s, $%x", dest, source, dis);
 					break;
 
 				case 2:
 					// STHS.N
 					if( dis & 1 )
 					{
-						sprintf(buffer, "STHS.N %s, %s, $%x", dest, source, dis & ~1);
+						util::stream_format(stream, "STHS.N %s, %s, $%x", dest, source, dis & ~1);
 					}
 					// STHU.N
 					else
 					{
-						sprintf(buffer, "STHU.N %s, %s, $%x", dest, source, dis & ~1);
+						util::stream_format(stream, "STHU.N %s, %s, $%x", dest, source, dis & ~1);
 					}
 
 					break;
@@ -1345,22 +1345,22 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 					// STW.S
 					if( (dis & 3) == 3 )
 					{
-						sprintf(buffer, "STW.S %s, %s, $%x", dest, source, dis & ~3);
+						util::stream_format(stream, "STW.S %s, %s, $%x", dest, source, dis & ~3);
 					}
 					// Reserved
 					else if( (dis & 3) == 2 )
 					{
-						sprintf(buffer, "Reserved");
+						util::stream_format(stream, "Reserved");
 					}
 					// STD.N
 					else if( (dis & 3) == 1 )
 					{
-						sprintf(buffer, "STD.N %s, %s, $%x", dest, source, dis & ~1);
+						util::stream_format(stream, "STD.N %s, %s, $%x", dest, source, dis & ~1);
 					}
 					// STW.N
 					else
 					{
-						sprintf(buffer, "STW.N %s, %s, $%x", dest, source, dis & ~1);
+						util::stream_format(stream, "STW.N %s, %s, $%x", dest, source, dis & ~1);
 					}
 
 					break;
@@ -1374,7 +1374,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 		{
 			uint8_t n = Rn_format(dest, op);
 
-			sprintf(buffer, "SHRI %s, $%x", dest, n);
+			util::stream_format(stream, "SHRI %s, $%x", dest, n);
 
 			break;
 		}
@@ -1384,7 +1384,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 		{
 			uint8_t n = Rn_format(dest, op);
 
-			sprintf(buffer, "SARI %s, $%x", dest, n);
+			util::stream_format(stream, "SARI %s, $%x", dest, n);
 
 			break;
 		}
@@ -1394,7 +1394,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 		{
 			uint8_t n = Rn_format(dest, op);
 
-			sprintf(buffer, "SHLI %s, $%x", dest, n);
+			util::stream_format(stream, "SHLI %s, $%x", dest, n);
 
 			break;
 		}
@@ -1404,7 +1404,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 
 			RR_format(source, dest, op, 0);
 
-			sprintf(buffer, "MULU %s, %s", dest, source);
+			util::stream_format(stream, "MULU %s, %s", dest, source);
 
 			break;
 
@@ -1413,7 +1413,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 
 			RR_format(source, dest, op, 0);
 
-			sprintf(buffer, "MULS %s, %s", dest, source);
+			util::stream_format(stream, "MULS %s, %s", dest, source);
 
 			break;
 
@@ -1424,15 +1424,15 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 
 			if( dest_code == PC_REGISTER && !dest_bit )
 			{
-				sprintf(buffer, "Illegal PC: $%x OP: $%x", pc, op);
+				util::stream_format(stream, "Illegal PC: $%x OP: $%x", pc, op);
 			}
 			else if( dest_code == SR_REGISTER && !dest_bit )
 			{
-				sprintf(buffer, "FETCH $%x", (n / 2) + 1);
+				util::stream_format(stream, "FETCH $%x", (n / 2) + 1);
 			}
 			else
 			{
-				sprintf(buffer, "%s %s", SETxx[n], dest);
+				util::stream_format(stream, "%s %s", SETxx[n], dest);
 			}
 
 			break;
@@ -1443,7 +1443,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 
 			RR_format(source, dest, op, 0);
 
-			sprintf(buffer, "MUL %s, %s", dest, source);
+			util::stream_format(stream, "MUL %s, %s", dest, source);
 
 			break;
 
@@ -1452,7 +1452,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 
 			LL_format(source, dest, op);
 
-			sprintf(buffer, "FADD %s, %s", dest, source);
+			util::stream_format(stream, "FADD %s, %s", dest, source);
 
 			break;
 
@@ -1461,7 +1461,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 
 			LL_format(source, dest, op);
 
-			sprintf(buffer, "FADDD %s, %s", dest, source);
+			util::stream_format(stream, "FADDD %s, %s", dest, source);
 
 			break;
 
@@ -1470,7 +1470,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 
 			LL_format(source, dest, op);
 
-			sprintf(buffer, "FSUB %s, %s", dest, source);
+			util::stream_format(stream, "FSUB %s, %s", dest, source);
 
 			break;
 
@@ -1479,7 +1479,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 
 			LL_format(source, dest, op);
 
-			sprintf(buffer, "FSUBD %s, %s", dest, source);
+			util::stream_format(stream, "FSUBD %s, %s", dest, source);
 
 			break;
 
@@ -1488,7 +1488,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 
 			LL_format(source, dest, op);
 
-			sprintf(buffer, "FMUL %s, %s", dest, source);
+			util::stream_format(stream, "FMUL %s, %s", dest, source);
 
 			break;
 
@@ -1497,7 +1497,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 
 			LL_format(source, dest, op);
 
-			sprintf(buffer, "FMULD %s, %s", dest, source);
+			util::stream_format(stream, "FMULD %s, %s", dest, source);
 
 			break;
 
@@ -1506,7 +1506,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 
 			LL_format(source, dest, op);
 
-			sprintf(buffer, "FDIV %s, %s", dest, source);
+			util::stream_format(stream, "FDIV %s, %s", dest, source);
 
 			break;
 
@@ -1515,7 +1515,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 
 			LL_format(source, dest, op);
 
-			sprintf(buffer, "FDIVD %s, %s", dest, source);
+			util::stream_format(stream, "FDIVD %s, %s", dest, source);
 
 			break;
 
@@ -1524,7 +1524,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 
 			LL_format(source, dest, op);
 
-			sprintf(buffer, "FCMP %s, %s", dest, source);
+			util::stream_format(stream, "FCMP %s, %s", dest, source);
 
 			break;
 
@@ -1533,7 +1533,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 
 			LL_format(source, dest, op);
 
-			sprintf(buffer, "FCMPD %s, %s", dest, source);
+			util::stream_format(stream, "FCMPD %s, %s", dest, source);
 
 			break;
 
@@ -1542,7 +1542,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 
 			LL_format(source, dest, op);
 
-			sprintf(buffer, "FCMPU %s, %s", dest, source);
+			util::stream_format(stream, "FCMPU %s, %s", dest, source);
 
 			break;
 
@@ -1551,7 +1551,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 
 			LL_format(source, dest, op);
 
-			sprintf(buffer, "FCMPUD %s, %s", dest, source);
+			util::stream_format(stream, "FCMPUD %s, %s", dest, source);
 
 			break;
 
@@ -1560,7 +1560,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 
 			LL_format(source, dest, op);
 
-			sprintf(buffer, "FCVT %s, %s", dest, source);
+			util::stream_format(stream, "FCVT %s, %s", dest, source);
 
 			break;
 
@@ -1569,7 +1569,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 
 			LL_format(source, dest, op);
 
-			sprintf(buffer, "FCVTD %s, %s", dest, source);
+			util::stream_format(stream, "FCVTD %s, %s", dest, source);
 
 			break;
 
@@ -1589,64 +1589,64 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 			{
 			case 0x100:
 			case EMUL:
-				sprintf(buffer, "EMUL %s, %s", dest, source);
+				util::stream_format(stream, "EMUL %s, %s", dest, source);
 				break;
 
 			case EMULU:
-				sprintf(buffer, "EMULU %s, %s", dest, source);
+				util::stream_format(stream, "EMULU %s, %s", dest, source);
 				break;
 
 			case EMULS:
-				sprintf(buffer, "EMULS %s, %s", dest, source);
+				util::stream_format(stream, "EMULS %s, %s", dest, source);
 				break;
 
 			case EMAC:
-				sprintf(buffer, "EMAC %s, %s", dest, source);
+				util::stream_format(stream, "EMAC %s, %s", dest, source);
 				break;
 
 			case EMACD:
-				sprintf(buffer, "EMACD %s, %s", dest, source);
+				util::stream_format(stream, "EMACD %s, %s", dest, source);
 				break;
 
 			case EMSUB:
-				sprintf(buffer, "EMSUB %s, %s", dest, source);
+				util::stream_format(stream, "EMSUB %s, %s", dest, source);
 				break;
 
 			case EMSUBD:
-				sprintf(buffer, "EMSUBD %s, %s", dest, source);
+				util::stream_format(stream, "EMSUBD %s, %s", dest, source);
 				break;
 
 			case EHMAC:
-				sprintf(buffer, "EHMAC %s, %s", dest, source);
+				util::stream_format(stream, "EHMAC %s, %s", dest, source);
 				break;
 
 			case EHMACD:
-				sprintf(buffer, "EHMACD %s, %s", dest, source);
+				util::stream_format(stream, "EHMACD %s, %s", dest, source);
 				break;
 
 			case EHCMULD:
-				sprintf(buffer, "EHCMULD %s, %s", dest, source);
+				util::stream_format(stream, "EHCMULD %s, %s", dest, source);
 				break;
 
 			case EHCMACD:
-				sprintf(buffer, "EHCMACD %s, %s", dest, source);
+				util::stream_format(stream, "EHCMACD %s, %s", dest, source);
 				break;
 
 			case EHCSUMD:
-				sprintf(buffer, "EHCSUMD %s, %s", dest, source);
+				util::stream_format(stream, "EHCSUMD %s, %s", dest, source);
 				break;
 
 			case EHCFFTD:
-				sprintf(buffer, "EHCFFTD %s, %s", dest, source);
+				util::stream_format(stream, "EHCFFTD %s, %s", dest, source);
 				break;
 
 			case EHCFFTSD:
-				sprintf(buffer, "EHCFFTSD %s, %s", dest, source);
+				util::stream_format(stream, "EHCFFTSD %s, %s", dest, source);
 				break;
 
 			default:
-				sprintf(buffer, "Ext. OP $%X @ %X\n", extended_op, pc);
-				osd_printf_verbose(buffer, "Illegal Extended Opcode: %X @ %X\n", extended_op, pc);
+				util::stream_format(stream, "Ext. OP $%X @ %X\n", extended_op, pc);
+				osd_printf_verbose("Illegal Extended Opcode: %X @ %X\n", extended_op, pc);
 				break;
 			}
 
@@ -1658,7 +1658,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 
 			LL_format(source, dest, op);
 
-			sprintf(buffer, "DO %s, %s", dest, source);
+			util::stream_format(stream, "DO %s, %s", dest, source);
 
 			break;
 
@@ -1667,7 +1667,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 
 			LR_format(source, dest, op);
 
-			sprintf(buffer, "LDW.R %s, %s", dest, source);
+			util::stream_format(stream, "LDW.R %s, %s", dest, source);
 
 			break;
 
@@ -1676,7 +1676,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 
 			LR_format(source, dest, op);
 
-			sprintf(buffer, "LDD.R %s, %s", dest, source);
+			util::stream_format(stream, "LDD.R %s, %s", dest, source);
 
 			break;
 
@@ -1685,7 +1685,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 
 			LR_format(source, dest, op);
 
-			sprintf(buffer, "LDW.P %s, %s", dest, source);
+			util::stream_format(stream, "LDW.P %s, %s", dest, source);
 
 			break;
 
@@ -1694,7 +1694,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 
 			LR_format(source, dest, op);
 
-			sprintf(buffer, "LDD.P %s, %s", dest, source);
+			util::stream_format(stream, "LDD.P %s, %s", dest, source);
 
 			break;
 
@@ -1706,7 +1706,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 			if( source_code == SR_REGISTER && !source_bit )
 				strcpy(source,"0");
 
-			sprintf(buffer, "STW.R %s, %s", dest, source);
+			util::stream_format(stream, "STW.R %s, %s", dest, source);
 
 			break;
 
@@ -1718,7 +1718,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 			if( source_code == SR_REGISTER && !source_bit )
 				strcpy(source,"0");
 
-			sprintf(buffer, "STD.R %s, %s", dest, source);
+			util::stream_format(stream, "STD.R %s, %s", dest, source);
 
 			break;
 
@@ -1730,7 +1730,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 			if( source_code == SR_REGISTER && !source_bit )
 				strcpy(source,"0");
 
-			sprintf(buffer, "STW.P %s, %s", dest, source);
+			util::stream_format(stream, "STW.P %s, %s", dest, source);
 
 			break;
 
@@ -1742,7 +1742,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 			if( source_code == SR_REGISTER && !source_bit )
 				strcpy(source,"0");
 
-			sprintf(buffer, "STD.P %s, %s", dest, source);
+			util::stream_format(stream, "STD.P %s, %s", dest, source);
 
 			break;
 
@@ -1751,7 +1751,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 		{
 			int32_t rel = PCrel_format(op, pc) + 2;
 
-			sprintf(buffer, "DBV $%x", rel);
+			util::stream_format(stream, "DBV $%x", rel);
 			flags = DASMFLAG_STEP_OVER | DASMFLAG_STEP_OVER_EXTRA(1);
 
 			break;
@@ -1762,7 +1762,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 		{
 			int32_t rel = PCrel_format(op, pc) + 2;
 
-			sprintf(buffer, "DBNV $%x", rel);
+			util::stream_format(stream, "DBNV $%x", rel);
 			flags = DASMFLAG_STEP_OVER | DASMFLAG_STEP_OVER_EXTRA(1);
 
 			break;
@@ -1773,7 +1773,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 		{
 			int32_t rel = PCrel_format(op, pc) + 2;
 
-			sprintf(buffer, "DBE $%x", rel);
+			util::stream_format(stream, "DBE $%x", rel);
 			flags = DASMFLAG_STEP_OVER | DASMFLAG_STEP_OVER_EXTRA(1);
 
 			break;
@@ -1784,7 +1784,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 		{
 			int32_t rel = PCrel_format(op, pc) + 2;
 
-			sprintf(buffer, "DBNE $%x", rel);
+			util::stream_format(stream, "DBNE $%x", rel);
 			flags = DASMFLAG_STEP_OVER | DASMFLAG_STEP_OVER_EXTRA(1);
 
 			break;
@@ -1795,7 +1795,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 		{
 			int32_t rel = PCrel_format(op, pc) + 2;
 
-			sprintf(buffer, "DBC $%x", rel);
+			util::stream_format(stream, "DBC $%x", rel);
 			flags = DASMFLAG_STEP_OVER | DASMFLAG_STEP_OVER_EXTRA(1);
 
 			break;
@@ -1806,7 +1806,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 		{
 			int32_t rel = PCrel_format(op, pc) + 2;
 
-			sprintf(buffer, "DBNC $%x", rel);
+			util::stream_format(stream, "DBNC $%x", rel);
 			flags = DASMFLAG_STEP_OVER | DASMFLAG_STEP_OVER_EXTRA(1);
 
 			break;
@@ -1817,7 +1817,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 		{
 			int32_t rel = PCrel_format(op, pc) + 2;
 
-			sprintf(buffer, "DBSE $%x", rel);
+			util::stream_format(stream, "DBSE $%x", rel);
 			flags = DASMFLAG_STEP_OVER | DASMFLAG_STEP_OVER_EXTRA(1);
 
 			break;
@@ -1828,7 +1828,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 		{
 			int32_t rel = PCrel_format(op, pc) + 2;
 
-			sprintf(buffer, "DBHT $%x", rel);
+			util::stream_format(stream, "DBHT $%x", rel);
 			flags = DASMFLAG_STEP_OVER | DASMFLAG_STEP_OVER_EXTRA(1);
 
 			break;
@@ -1839,7 +1839,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 		{
 			int32_t rel = PCrel_format(op, pc) + 2;
 
-			sprintf(buffer, "DBN $%x", rel);
+			util::stream_format(stream, "DBN $%x", rel);
 			flags = DASMFLAG_STEP_OVER | DASMFLAG_STEP_OVER_EXTRA(1);
 
 			break;
@@ -1850,7 +1850,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 		{
 			int32_t rel = PCrel_format(op, pc) + 2;
 
-			sprintf(buffer, "DBNN $%x", rel);
+			util::stream_format(stream, "DBNN $%x", rel);
 			flags = DASMFLAG_STEP_OVER | DASMFLAG_STEP_OVER_EXTRA(1);
 
 			break;
@@ -1861,7 +1861,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 		{
 			int32_t rel = PCrel_format(op, pc) + 2;
 
-			sprintf(buffer, "DBLE $%x", rel);
+			util::stream_format(stream, "DBLE $%x", rel);
 			flags = DASMFLAG_STEP_OVER | DASMFLAG_STEP_OVER_EXTRA(1);
 
 			break;
@@ -1872,7 +1872,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 		{
 			int32_t rel = PCrel_format(op, pc) + 2;
 
-			sprintf(buffer, "DBGT $%x", rel);
+			util::stream_format(stream, "DBGT $%x", rel);
 			flags = DASMFLAG_STEP_OVER | DASMFLAG_STEP_OVER_EXTRA(1);
 
 			break;
@@ -1883,7 +1883,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 		{
 			int32_t rel = PCrel_format(op, pc) + 2;
 
-			sprintf(buffer, "DBR $%x", rel);
+			util::stream_format(stream, "DBR $%x", rel);
 			flags = DASMFLAG_STEP_OVER | DASMFLAG_STEP_OVER_EXTRA(1);
 
 			break;
@@ -1895,7 +1895,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 			global_fp = 0;
 			LL_format(source, dest, op);
 
-			sprintf(buffer, "FRAME %s, %s", dest, source);
+			util::stream_format(stream, "FRAME %s, %s", dest, source);
 
 			break;
 
@@ -1906,12 +1906,12 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 
 			if( source_code == SR_REGISTER && !source_bit )
 			{
-				sprintf(buffer, "CALL %s, 0, $%x", dest, const_val);
+				util::stream_format(stream, "CALL %s, 0, $%x", dest, const_val);
 				flags = DASMFLAG_STEP_OVER;
 			}
 			else
 			{
-				sprintf(buffer, "CALL %s, %s, $%x", dest, source, const_val);
+				util::stream_format(stream, "CALL %s, %s, $%x", dest, source, const_val);
 				flags = DASMFLAG_STEP_OVER;
 			}
 
@@ -1923,7 +1923,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 		{
 			int32_t rel = PCrel_format(op, pc) + 2;
 
-			sprintf(buffer, "BV $%x", rel);
+			util::stream_format(stream, "BV $%x", rel);
 
 			break;
 		}
@@ -1933,7 +1933,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 		{
 			int32_t rel = PCrel_format(op, pc) + 2;
 
-			sprintf(buffer, "BNV $%x", rel);
+			util::stream_format(stream, "BNV $%x", rel);
 
 			break;
 		}
@@ -1943,7 +1943,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 		{
 			int32_t rel = PCrel_format(op, pc) + 2;
 
-			sprintf(buffer, "BE $%x", rel);
+			util::stream_format(stream, "BE $%x", rel);
 
 			break;
 		}
@@ -1953,7 +1953,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 		{
 			int32_t rel = PCrel_format(op, pc) + 2;
 
-			sprintf(buffer, "BNE $%x", rel);
+			util::stream_format(stream, "BNE $%x", rel);
 
 			break;
 		}
@@ -1963,7 +1963,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 		{
 			int32_t rel = PCrel_format(op, pc) + 2;
 
-			sprintf(buffer, "BC $%x", rel);
+			util::stream_format(stream, "BC $%x", rel);
 
 			break;
 		}
@@ -1973,7 +1973,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 		{
 			int32_t rel = PCrel_format(op, pc) + 2;
 
-			sprintf(buffer, "BNC $%x", rel);
+			util::stream_format(stream, "BNC $%x", rel);
 
 			break;
 		}
@@ -1983,7 +1983,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 		{
 			int32_t rel = PCrel_format(op, pc) + 2;
 
-			sprintf(buffer, "BSE $%x", rel);
+			util::stream_format(stream, "BSE $%x", rel);
 
 			break;
 		}
@@ -1993,7 +1993,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 		{
 			int32_t rel = PCrel_format(op, pc) + 2;
 
-			sprintf(buffer, "BHT $%x", rel);
+			util::stream_format(stream, "BHT $%x", rel);
 
 			break;
 		}
@@ -2003,7 +2003,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 		{
 			int32_t rel = PCrel_format(op, pc) + 2;
 
-			sprintf(buffer, "BN $%x", rel);
+			util::stream_format(stream, "BN $%x", rel);
 
 			break;
 		}
@@ -2013,7 +2013,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 		{
 			int32_t rel = PCrel_format(op, pc) + 2;
 
-			sprintf(buffer, "BNN $%x", rel);
+			util::stream_format(stream, "BNN $%x", rel);
 
 			break;
 		}
@@ -2023,7 +2023,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 		{
 			int32_t rel = PCrel_format(op, pc) + 2;
 
-			sprintf(buffer, "BLE $%x", rel);
+			util::stream_format(stream, "BLE $%x", rel);
 
 			break;
 		}
@@ -2033,7 +2033,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 		{
 			int32_t rel = PCrel_format(op, pc) + 2;
 
-			sprintf(buffer, "BGT $%x", rel);
+			util::stream_format(stream, "BGT $%x", rel);
 
 			break;
 		}
@@ -2043,7 +2043,7 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 		{
 			int32_t rel = PCrel_format(op, pc) + 2;
 
-			sprintf(buffer, "BR $%x", rel);
+			util::stream_format(stream, "BR $%x", rel);
 
 			break;
 		}
@@ -2057,73 +2057,73 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 			switch( code )
 			{
 				case TRAPLE:
-					sprintf(buffer, "TRAPLE %d", trapno);
+					util::stream_format(stream, "TRAPLE %d", trapno);
 					flags = DASMFLAG_STEP_OVER;
 
 					break;
 
 				case TRAPGT:
-					sprintf(buffer, "TRAPGT %d", trapno);
+					util::stream_format(stream, "TRAPGT %d", trapno);
 					flags = DASMFLAG_STEP_OVER;
 
 					break;
 
 				case TRAPLT:
-					sprintf(buffer, "TRAPLT %d", trapno);
+					util::stream_format(stream, "TRAPLT %d", trapno);
 					flags = DASMFLAG_STEP_OVER;
 
 					break;
 
 				case TRAPGE:
-					sprintf(buffer, "TRAPGE %d", trapno);
+					util::stream_format(stream, "TRAPGE %d", trapno);
 					flags = DASMFLAG_STEP_OVER;
 
 					break;
 
 				case TRAPSE:
-					sprintf(buffer, "TRAPSE %d", trapno);
+					util::stream_format(stream, "TRAPSE %d", trapno);
 					flags = DASMFLAG_STEP_OVER;
 
 					break;
 
 				case TRAPHT:
-					sprintf(buffer, "TRAPHT %d", trapno);
+					util::stream_format(stream, "TRAPHT %d", trapno);
 					flags = DASMFLAG_STEP_OVER;
 
 					break;
 
 				case TRAPST:
-					sprintf(buffer, "TRAPST %d", trapno);
+					util::stream_format(stream, "TRAPST %d", trapno);
 					flags = DASMFLAG_STEP_OVER;
 
 					break;
 
 				case TRAPHE:
-					sprintf(buffer, "TRAPHE %d", trapno);
+					util::stream_format(stream, "TRAPHE %d", trapno);
 					flags = DASMFLAG_STEP_OVER;
 
 					break;
 
 				case TRAPE:
-					sprintf(buffer, "TRAPE %d", trapno);
+					util::stream_format(stream, "TRAPE %d", trapno);
 					flags = DASMFLAG_STEP_OVER;
 
 					break;
 
 				case TRAPNE:
-					sprintf(buffer, "TRAPNE %d", trapno);
+					util::stream_format(stream, "TRAPNE %d", trapno);
 					flags = DASMFLAG_STEP_OVER;
 
 					break;
 
 				case TRAPV:
-					sprintf(buffer, "TRAPV %d", trapno);
+					util::stream_format(stream, "TRAPV %d", trapno);
 					flags = DASMFLAG_STEP_OVER;
 
 					break;
 
 				case TRAP:
-					sprintf(buffer, "TRAP %d", trapno);
+					util::stream_format(stream, "TRAP %d", trapno);
 					flags = DASMFLAG_STEP_OVER;
 
 					break;
@@ -2134,6 +2134,15 @@ unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsign
 	}
 
 	return size | flags | DASMFLAG_SUPPORTED;
+}
+
+static unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsigned h_flag, int private_fp)
+{
+	std::ostringstream stream;
+	unsigned result = dasm_hyperstone(stream, pc, oprom, h_flag, private_fp);
+	std::string stream_str = stream.str();
+	strcpy(buffer, stream_str.c_str());
+	return result;
 }
 
 CPU_DISASSEMBLE( hyperstone_generic )
