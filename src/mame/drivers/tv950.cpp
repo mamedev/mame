@@ -60,6 +60,7 @@ public:
 		, m_via(*this, VIA_TAG)
 		, m_crtc(*this, CRTC_TAG)
 		, m_vram(*this, "vram")
+		, m_gfx(*this, "graphics")
 	{ }
 
 	MC6845_UPDATE_ROW(crtc_update_row);
@@ -74,8 +75,10 @@ private:
 	required_device<via6522_device> m_via;
 	required_device<r6545_1_device> m_crtc;
 	required_shared_ptr<uint8_t> m_vram;
+	required_region_ptr<uint16_t> m_gfx;
 
 	int m_row_addr;
+	int m_row;
 };
 
 static ADDRESS_MAP_START(tv950_mem, AS_PROGRAM, 8, tv950_state)
@@ -100,6 +103,7 @@ INPUT_PORTS_END
 
 void tv950_state::machine_reset()
 {
+	m_row = 0;
 }
 
 WRITE_LINE_MEMBER(tv950_state::via_crtc_reset_w)
@@ -124,6 +128,31 @@ MC6845_ON_UPDATE_ADDR_CHANGED( tv950_state::crtc_update_addr )
 
 MC6845_UPDATE_ROW( tv950_state::crtc_update_row )
 {
+	uint32_t *p = &bitmap.pix32(m_row);
+	rgb_t fg(255,255,255,255);
+	rgb_t bg(0,0,0,0);
+
+	for(int i = 0; i < x_count; i++)
+	{
+		uint8_t chr = m_vram[ma + i];
+		uint16_t data = m_gfx[chr * 16 + (m_row % 10)];
+
+		*p = ( data & 0x2000 ) ? fg : bg; p++;
+		*p = ( data & 0x1000 ) ? fg : bg; p++;
+		*p = ( data & 0x0800 ) ? fg : bg; p++;
+		*p = ( data & 0x0400 ) ? fg : bg; p++;
+		*p = ( data & 0x0200 ) ? fg : bg; p++;
+		*p = ( data & 0x0100 ) ? fg : bg; p++;
+		*p = ( data & 0x0080 ) ? fg : bg; p++;
+		*p = ( data & 0x0040 ) ? fg : bg; p++;
+		*p = ( data & 0x0020 ) ? fg : bg; p++;
+		*p = ( data & 0x0010 ) ? fg : bg; p++;
+		*p = ( data & 0x0008 ) ? fg : bg; p++;
+		*p = ( data & 0x0004 ) ? fg : bg; p++;
+		*p = ( data & 0x0002 ) ? fg : bg; p++;
+		*p = ( data & 0x0001 ) ? fg : bg; p++;
+}
+	m_row = (m_row + 1) % 250;
 }
 
 static MACHINE_CONFIG_START( tv950, tv950_state )
@@ -132,16 +161,17 @@ static MACHINE_CONFIG_START( tv950, tv950_state )
 	MCFG_CPU_PROGRAM_MAP(tv950_mem)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK, 882, 0, 720, 370, 0, 350 ) // not real values
+	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK, 1200, 0, 1120, 370, 0, 250 )	// not real values
 	MCFG_SCREEN_UPDATE_DEVICE( CRTC_TAG, r6545_1_device, screen_update )
 
 	// there are many 6845 CRTC submodels, the Theory of Operation manual references the Rockwell R6545-1 specificially.
 	MCFG_MC6845_ADD(CRTC_TAG, R6545_1, "screen", MASTER_CLOCK/14)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_CHAR_WIDTH(14)
 	MCFG_MC6845_UPDATE_ROW_CB(tv950_state, crtc_update_row)
 	MCFG_MC6845_ADDR_CHANGED_CB(tv950_state, crtc_update_addr)
 	MCFG_MC6845_OUT_HSYNC_CB(DEVWRITELINE(VIA_TAG, via6522_device, write_pb6))
+	MCFG_VIDEO_SET_SCREEN(nullptr)
 
 	MCFG_DEVICE_ADD(VIA_TAG, VIA6522, MASTER_CLOCK/14)
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M6502_NMI_LINE))
@@ -163,7 +193,7 @@ ROM_START( tv950 )
 	ROM_LOAD( "180000-001a_a41_eb17.bin", 0x001000, 0x001000, CRC(b7187cc5) SHA1(41cc8fd51661314e03ee7e00cc1e206e9a694d92) )
 	ROM_LOAD( "180000-007a_a42_67d3.bin", 0x000000, 0x001000, CRC(3ef2e6fb) SHA1(21ccfd2b50c37b715eed67671b82faa4d75fc6bb) )
 
-	ROM_REGION(0x2000, "graphics", 0)
+	ROM_REGION16_LE(0x2000, "graphics", 0)
 	ROM_LOAD16_BYTE( "180000-002a_a33_9294.bin", 0x000001, 0x001000, CRC(eaf4f346) SHA1(b4c531626846f3f055ddc086ac24fdb1b34f3f8e) )
 	ROM_LOAD16_BYTE( "180000-003a_a32_7ebf.bin", 0x000000, 0x001000, CRC(783ca0b6) SHA1(1cec9a9a56ef5795809f7ca7cd2e3f61b27e698d) )
 
