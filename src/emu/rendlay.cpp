@@ -440,15 +440,14 @@ layout_element::layout_element(running_machine &machine, xml_data_node &elemnode
 	// parse components in order
 	bool first = true;
 	render_bounds bounds = { 0 };
-	for (auto compnode = elemnode.child; compnode; compnode = compnode->next)
+	for (xml_data_node *compnode = elemnode.child; compnode; compnode = compnode->next)
 	{
-		auto const make_func(s_make_component.find(compnode->name));
+		make_component_map::const_iterator const make_func(s_make_component.find(compnode->name));
 		if (make_func == s_make_component.end())
 			throw emu_fatalerror("Unknown element component: %s", compnode->name);
 
 		// insert the new component into the list
-		m_complist.emplace_back(make_func->second(machine, *compnode, dirname));
-		auto const &newcomp(*m_complist.back());
+		component const &newcomp(**m_complist.emplace(m_complist.end(), make_func->second(machine, *compnode, dirname)));
 
 		// accumulate bounds
 		if (first)
@@ -470,7 +469,7 @@ layout_element::layout_element(running_machine &machine, xml_data_node &elemnode
 		float yscale = 1.0f / (bounds.y1 - bounds.y0);
 
 		// normalize all the component bounds
-		for (auto &curcomp : m_complist)
+		for (component::ptr const &curcomp : m_complist)
 			curcomp->normalize_bounds(xoffs, yoffs, xscale, yscale);
 	}
 
