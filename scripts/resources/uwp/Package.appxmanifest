@@ -5,7 +5,7 @@
   <Properties>
     <DisplayName>MAME</DisplayName>
     <PublisherDisplayName>MAME Team</PublisherDisplayName>
-    <Logo>src\osd\uwp\assets\StoreLogo.png</Logo>
+    <Logo>scripts\resources\uwp\assets\StoreLogo.png</Logo>
   </Properties>
   <Dependencies>
     <TargetDeviceFamily Name="Windows.Universal" MinVersion="10.0.0.0" MaxVersionTested="10.0.0.0" />
@@ -15,13 +15,13 @@
   </Resources>
   <Applications>
     <Application Id="App" Executable="$targetnametoken$.exe" EntryPoint="Mameuwp.App">
-      <uap:VisualElements DisplayName="MAME" Square150x150Logo="src\osd\uwp\assets\Square150x150Logo.png" Square44x44Logo="src\osd\uwp\assets\Square44x44Logo.png" Description="MAME for Windows 10" BackgroundColor="transparent">
-        <uap:DefaultTile Wide310x150Logo="src\osd\uwp\assets\Wide310x150Logo.png">
+      <uap:VisualElements DisplayName="MAME" Square150x150Logo="scripts\resources\uwp\assets\Square150x150Logo.png" Square44x44Logo="scripts\resources\uwp\assets\Square44x44Logo.png" Description="MAME for Windows 10" BackgroundColor="transparent">
+        <uap:DefaultTile Wide310x150Logo="scripts\resources\uwp\assets\Wide310x150Logo.png">
           <uap:ShowNameOnTiles>
             <uap:ShowOn Tile="square150x150Logo" />
           </uap:ShowNameOnTiles>
         </uap:DefaultTile>
-        <uap:SplashScreen Image="src\osd\uwp\assets\SplashScreen.scale-200.png" />
+        <uap:SplashScreen Image="scripts\resources\uwp\assets\SplashScreen.scale-200.png" />
         <uap:InitialRotationPreference>
           <uap:Rotation Preference="landscape" />	
         </uap:InitialRotationPreference>

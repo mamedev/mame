@@ -77,14 +77,14 @@ end
 		-- Windows Required Files
 		files {
 			-- Manifest file
-			MAME_DIR .. "src/osd/uwp/Package.appxmanifest",
+			MAME_DIR .. "scripts/resources/uwp/Package.appxmanifest",
 		}
 
 	configuration { "winstore*" }
 		files {
-			MAME_DIR .. "src/osd/uwp/assets/*.png"
+			MAME_DIR .. "scripts/resources/uwp/assets/*.png"
 		}
-		configuration "**/src/osd/uwp/assets/*.png"
+		configuration "**/scripts/resources/uwp/assets/*.png"
 			flags { "DeploymentContent" }
 	
 	-- Effects and Shaders
