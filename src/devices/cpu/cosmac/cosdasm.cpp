@@ -18,10 +18,10 @@ enum
 };
 
 #define CDP1801_OPCODE(...) \
-	sprintf(buffer, __VA_ARGS__)
+	util::stream_format(stream, __VA_ARGS__)
 
 #define CDP1802_OPCODE(...) \
-	if (variant < TYPE_1802) sprintf(buffer, "illegal"); else sprintf(buffer, __VA_ARGS__)
+	if (variant < TYPE_1802) stream << "illegal"; else util::stream_format(stream, __VA_ARGS__)
 
 static offs_t implied(const uint8_t opcode)
 {
@@ -53,7 +53,7 @@ static offs_t long_skip(offs_t pc)
 	return pc + 3;
 }
 
-static uint32_t disassemble(device_t *device, char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t variant)
+static uint32_t disassemble(device_t *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t variant)
 {
 	const uint8_t *startram = opram;
 	uint32_t flags = 0;
@@ -182,6 +182,16 @@ static uint32_t disassemble(device_t *device, char *buffer, offs_t pc, const uin
 	}
 
 	return (opram - startram) | flags | DASMFLAG_SUPPORTED;
+}
+
+
+static uint32_t disassemble(device_t *device, char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t variant)
+{
+	std::ostringstream stream;
+	uint32_t result = disassemble(device, stream, pc, oprom, opram, variant);
+	std::string stream_str = stream.str();
+	strcpy(buffer, stream_str.c_str());
+	return result;
 }
 
 
