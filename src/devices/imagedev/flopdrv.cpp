@@ -355,7 +355,7 @@ void legacy_floppy_image_device::floppy_drive_read_sector_data(int side, int ind
 
 		floppy_read_indexed_sector(m_floppy, side, m_track, index1, 0, ptr, length);
 
-		if (LOG_FLOPPY)
+		if (IS_ENABLED(LOG_FLOPPY))
 			log_readwrite("sector_read", side, m_track, index1, (const char *)ptr, length);
 
 	}
@@ -368,7 +368,7 @@ void legacy_floppy_image_device::floppy_drive_write_sector_data(int side, int in
 		if (!m_floppy)
 			return;
 
-		if (LOG_FLOPPY)
+		if (IS_ENABLED(LOG_FLOPPY))
 			log_readwrite("sector_write", side, m_track, index1, (const char *)ptr, length);
 
 		floppy_write_indexed_sector(m_floppy, side, m_track, index1, 0, ptr, length, ddam);

@@ -634,7 +634,7 @@ void floppy_image_device::stp_w(int state)
 			}
 			if(ocyl != cyl)
 			{
-				if (TRACE_STEP) logerror("%s: track %d\n", tag(), cyl);
+				if (IS_ENABLED(TRACE_STEP)) logerror("%s: track %d\n", tag(), cyl);
 				// Do we want a stepper sound?
 				// We plan for 5 zones with possibly specific sounds
 				if (m_make_sound) m_sound_out->step(cyl*5/tracks);
@@ -1180,7 +1180,7 @@ void floppy_sound_device::step(int zone)
 			// Changing the pitch does not always sound convincing
 			if (!PITCH_SEEK_SAMPLES) m_seek_pitch = 1;
 
-			if (TRACE_AUDIO) logerror("Seek sample = %d, pitch = %f\n", m_seek_playback_sample, m_seek_pitch);
+			if (IS_ENABLED(TRACE_AUDIO)) logerror("Seek sample = %d, pitch = %f\n", m_seek_playback_sample, m_seek_pitch);
 
 			// Set the timeout for the seek sound. When it expires,
 			// we assume that the seek process is over, and we'll play the

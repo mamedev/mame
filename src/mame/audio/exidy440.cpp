@@ -131,7 +131,7 @@ void exidy440_sound_device::device_start()
 	m_mixer_buffer_left = make_unique_clear<int32_t[]>(clock());
 	m_mixer_buffer_right = make_unique_clear<int32_t[]>(clock());
 
-	if (SOUND_LOG)
+	if (IS_ENABLED(SOUND_LOG))
 		m_debuglog = fopen("sound.log", "w");
 }
 
@@ -141,7 +141,7 @@ void exidy440_sound_device::device_start()
 
 void exidy440_sound_device::device_stop()
 {
-	if (SOUND_LOG && m_debuglog)
+	if (IS_ENABLED(SOUND_LOG) && m_debuglog)
 		fclose(m_debuglog);
 }
 

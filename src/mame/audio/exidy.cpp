@@ -862,7 +862,7 @@ READ8_MEMBER( victory_sound_device::response_r )
 {
 	uint8_t ret = m_pia1->b_output();
 
-	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound response read = %02X\n", m_maincpu->pcbase(), ret);
+	if (IS_ENABLED(VICTORY_LOG_SOUND)) logerror("%04X:!!!! Sound response read = %02X\n", m_maincpu->pcbase(), ret);
 
 	m_pia1_cb1 = 0;
 	m_pia1->cb1_w(m_pia1_cb1);
@@ -875,7 +875,7 @@ READ8_MEMBER( victory_sound_device::status_r )
 {
 	uint8_t ret = (m_pia1_ca1 << 7) | (m_pia1_cb1 << 6);
 
-	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound status read = %02X\n", m_maincpu->pcbase(), ret);
+	if (IS_ENABLED(VICTORY_LOG_SOUND)) logerror("%04X:!!!! Sound status read = %02X\n", m_maincpu->pcbase(), ret);
 
 	return ret;
 }
@@ -890,7 +890,7 @@ TIMER_CALLBACK_MEMBER( victory_sound_device::delayed_command_w )
 
 WRITE8_MEMBER( victory_sound_device::command_w )
 {
-	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound command = %02X\n", m_maincpu->pcbase(), data);
+	if (IS_ENABLED(VICTORY_LOG_SOUND)) logerror("%04X:!!!! Sound command = %02X\n", m_maincpu->pcbase(), data);
 
 	space.machine().scheduler().synchronize(timer_expired_delegate(FUNC(victory_sound_device::delayed_command_w), this), data);
 }
@@ -898,7 +898,7 @@ WRITE8_MEMBER( victory_sound_device::command_w )
 
 WRITE_LINE_MEMBER( victory_sound_device::irq_clear_w )
 {
-	if (VICTORY_LOG_SOUND) logerror("%s:!!!! Sound IRQ clear = %02X\n", machine().describe_context(), state);
+	if (IS_ENABLED(VICTORY_LOG_SOUND)) logerror("%s:!!!! Sound IRQ clear = %02X\n", machine().describe_context(), state);
 
 	if (!state)
 	{
@@ -910,7 +910,7 @@ WRITE_LINE_MEMBER( victory_sound_device::irq_clear_w )
 
 WRITE_LINE_MEMBER( victory_sound_device::main_ack_w )
 {
-	if (VICTORY_LOG_SOUND) logerror("%s:!!!! Sound Main ACK W = %02X\n", machine().describe_context(), state);
+	if (IS_ENABLED(VICTORY_LOG_SOUND)) logerror("%s:!!!! Sound Main ACK W = %02X\n", machine().describe_context(), state);
 
 	if (m_victory_sound_response_ack_clk && !state)
 	{

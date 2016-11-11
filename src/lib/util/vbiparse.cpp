@@ -204,7 +204,7 @@ bool vbi_parse_white_flag(const uint16_t *source, int sourcewidth, int sourceshi
 			break;
 
 	/* this is useful for debugging issues with white flag detection */
-	if (PRINTF_WHITE_FLAG)
+	if (IS_ENABLED(PRINTF_WHITE_FLAG))
 	{
 		printf("Histo: min=%02X max=%02X\n", minval, maxval);
 		for (x = 0; x < 256; x++)
@@ -214,7 +214,7 @@ bool vbi_parse_white_flag(const uint16_t *source, int sourcewidth, int sourceshi
 	/* ignore if we have no dynamic range */
 	if (maxval - minval < 10)
 	{
-		if (PRINTF_WHITE_FLAG)
+		if (IS_ENABLED(PRINTF_WHITE_FLAG))
 			printf("White flag NOT detected; threshold too low\n");
 		return false;
 	}
@@ -242,7 +242,7 @@ bool vbi_parse_white_flag(const uint16_t *source, int sourcewidth, int sourceshi
 
 	/* return true if it is above the 90% mark */
 	result = (peakval > minval + 9 * (maxval - minval) / 10);
-	if (PRINTF_WHITE_FLAG)
+	if (IS_ENABLED(PRINTF_WHITE_FLAG))
 		printf("White flag %s: peak=%02X thresh=%02X\n", result ? "detected" : "NOT detected", peakval, minval + 9 * (maxval - minval) / 10);
 	return result;
 

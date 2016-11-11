@@ -1192,14 +1192,14 @@ offs_t cop400_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint
 
 READ8_MEMBER( cop400_cpu_device::microbus_rd )
 {
-	if (LOG_MICROBUS) logerror("%s %s MICROBUS RD %02x\n", machine().time().as_string(), machine().describe_context(), Q);
+	if (IS_ENABLED(LOG_MICROBUS)) logerror("%s %s MICROBUS RD %02x\n", machine().time().as_string(), machine().describe_context(), Q);
 
 	return Q;
 }
 
 WRITE8_MEMBER( cop400_cpu_device::microbus_wr )
 {
-	if (LOG_MICROBUS) logerror("%s %s MICROBUS WR %02x\n", machine().time().as_string(), machine().describe_context(), data);
+	if (IS_ENABLED(LOG_MICROBUS)) logerror("%s %s MICROBUS WR %02x\n", machine().time().as_string(), machine().describe_context(), data);
 
 	WRITE_G(G & 0xe);
 
