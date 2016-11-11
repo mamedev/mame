@@ -11,9 +11,6 @@
 //
 //    - osd_ticks
 //    - osd_sleep
-//    - osd_malloc
-//    - osd_malloc_array
-//    - osd_free
 //============================================================
 
 #ifndef __OSDLIB__
@@ -60,7 +57,7 @@ int osd_setenv(const char *name, const char *value, int overwrite);
 
     Return value:
 
-        the returned string needs to be osd_free()-ed!
+        the returned string needs to be free-ed!
 -----------------------------------------------------------------------------*/
 
 char *osd_get_clipboard_text(void);

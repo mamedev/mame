@@ -707,7 +707,7 @@ int main(int argc, char *argv[])
 		result = 1;
 	}
 
-	osd_free(data);
+	free(data);
 
 	return result;
 }

@@ -238,7 +238,7 @@ int main(int argc, char *argv[])
 	if (util::core_file::load(tempfilename.c_str(), &buffer, bufsize) == osd_file::error::NONE)
 	{
 		tempheader.assign((const char *)buffer, bufsize);
-		osd_free(buffer);
+		free(buffer);
 	}
 
 	/* verify the template */

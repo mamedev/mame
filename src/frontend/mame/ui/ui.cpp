@@ -900,7 +900,7 @@ bool mame_ui_manager::can_paste()
 
 	// free the string if allocated
 	if (text != nullptr)
-		osd_free(text);
+		free(text);
 
 	// did we have text?
 	return text != nullptr;
@@ -923,7 +923,7 @@ void mame_ui_manager::paste()
 		machine().ioport().natkeyboard().post_utf8(text);
 
 		// free the string
-		osd_free(text);
+		free(text);
 	}
 }
 

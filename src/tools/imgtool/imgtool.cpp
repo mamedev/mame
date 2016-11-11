@@ -1332,7 +1332,7 @@ done:
 	if (alloc_path != nullptr)
 		free(alloc_path);
 	if (new_fname != nullptr)
-		osd_free(new_fname);
+		free(new_fname);
 	return err;
 }
 
@@ -1376,7 +1376,7 @@ done:
 	if (alloc_path != nullptr)
 		free(alloc_path);
 	if (new_fname != nullptr)
-		osd_free(new_fname);
+		free(new_fname);
 	return err;
 }
 
@@ -1481,7 +1481,7 @@ done:
 	if (alloc_path)
 		free(alloc_path);
 	if (new_fname)
-		osd_free(new_fname);
+		free(new_fname);
 	return err;
 }
 
@@ -1920,7 +1920,7 @@ done:
 	if (alloc_dest != nullptr)
 		free(alloc_dest);
 	if (new_fname != nullptr)
-		osd_free(new_fname);
+		free(new_fname);
 	return err;
 }
 
@@ -1968,7 +1968,7 @@ imgtoolerr_t imgtool::partition::put_file(const char *newfname, const char *fork
 done:
 	/* clean up */
 	if (alloc_newfname != nullptr)
-		osd_free(alloc_newfname);
+		free(alloc_newfname);
 	return err;
 }
 
@@ -2016,7 +2016,7 @@ done:
 	if (alloc_path)
 		free(alloc_path);
 	if (new_fname)
-		osd_free(new_fname);
+		free(new_fname);
 	return err;
 }
 
@@ -2060,7 +2060,7 @@ done:
 	if (alloc_path)
 		free(alloc_path);
 	if (new_fname)
-		osd_free(new_fname);
+		free(new_fname);
 	return err;
 }
 
@@ -2105,7 +2105,7 @@ done:
 	if (alloc_path)
 		free(alloc_path);
 	if (new_path)
-		osd_free(new_path);
+		free(new_path);
 	return err;
 }
 
@@ -2150,7 +2150,7 @@ done:
 	if (alloc_path)
 		free(alloc_path);
 	if (new_path)
-		osd_free(new_path);
+		free(new_path);
 	return err;
 }
 
@@ -2466,7 +2466,7 @@ done:
 	if (alloc_path != nullptr)
 		free(alloc_path);
 	if (new_path != nullptr)
-		osd_free(new_path);
+		free(new_path);
 	return err;
 }
 
@@ -2509,7 +2509,7 @@ imgtoolerr_t imgtool::directory::get_next(imgtool_dirent &ent)
 			return IMGTOOLERR_BADFILENAME;
 
 		snprintf(ent.filename, ARRAY_LENGTH(ent.filename), "%s", new_fname);
-		osd_free(new_fname);
+		free(new_fname);
 	}
 
 	// don't trust the module!

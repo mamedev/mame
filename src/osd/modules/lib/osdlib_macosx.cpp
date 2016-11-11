@@ -58,48 +58,6 @@ void osd_process_kill()
 }
 
 //============================================================
-//  osd_malloc
-//============================================================
-
-void *osd_malloc(size_t size)
-{
-#ifndef MALLOC_DEBUG
-	return malloc(size);
-#else
-#error "MALLOC_DEBUG not yet supported"
-#endif
-}
-
-
-//============================================================
-//  osd_malloc_array
-//============================================================
-
-void *osd_malloc_array(size_t size)
-{
-#ifndef MALLOC_DEBUG
-	return malloc(size);
-#else
-#error "MALLOC_DEBUG not yet supported"
-#endif
-}
-
-
-//============================================================
-//  osd_free
-//============================================================
-
-void osd_free(void *ptr)
-{
-#ifndef MALLOC_DEBUG
-	free(ptr);
-#else
-#error "MALLOC_DEBUG not yet supported"
-#endif
-}
-
-
-//============================================================
 //  osd_alloc_executable
 //
 //  allocates "size" bytes of executable memory.  this must take
@@ -205,7 +163,7 @@ char *osd_get_clipboard_text(void)
 				CFIndex const length = CFDataGetLength(data_ref);
 				CFRange const range = CFRangeMake(0, length);
 
-				result = reinterpret_cast<char *>(osd_malloc_array(length + 1));
+				result = reinterpret_cast<char *>(malloc(length + 1));
 				if (result)
 				{
 					CFDataGetBytes(data_ref, range, reinterpret_cast<unsigned char *>(result));

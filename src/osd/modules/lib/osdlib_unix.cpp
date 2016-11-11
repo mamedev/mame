@@ -56,47 +56,6 @@ void osd_process_kill()
 }
 
 //============================================================
-//  osd_malloc
-//============================================================
-
-void *osd_malloc(size_t size)
-{
-#ifndef MALLOC_DEBUG
-	return malloc(size);
-#else
-#error "MALLOC_DEBUG not yet supported"
-#endif
-}
-
-
-//============================================================
-//  osd_malloc_array
-//============================================================
-
-void *osd_malloc_array(size_t size)
-{
-#ifndef MALLOC_DEBUG
-	return malloc(size);
-#else
-#error "MALLOC_DEBUG not yet supported"
-#endif
-}
-
-
-//============================================================
-//  osd_free
-//============================================================
-
-void osd_free(void *ptr)
-{
-#ifndef MALLOC_DEBUG
-	free(ptr);
-#else
-#error "MALLOC_DEBUG not yet supported"
-#endif
-}
-
-//============================================================
 //  osd_alloc_executable
 //
 //  allocates "size" bytes of executable memory.  this must take
@@ -160,7 +119,7 @@ char *osd_get_clipboard_text(void)
 	if (SDL_HasClipboardText())
 	{
 		char *temp = SDL_GetClipboardText();
-		result = (char *) osd_malloc_array(strlen(temp) + 1);
+		result = (char *) malloc(strlen(temp) + 1);
 		strcpy(result, temp);
 		SDL_free(temp);
 	}
