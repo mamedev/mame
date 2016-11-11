@@ -342,7 +342,7 @@ void osd_common_t::register_options()
 	update_option(OSDOPTION_VIDEO, m_video_names);
 }
 
-void osd_common_t::update_option(const char * key, std::vector<const char *> &values)
+void osd_common_t::update_option(const char * key, std::vector<const char *> &values) const
 {
 	std::string current_value(m_options.description(key));
 	std::string new_option_value("");
@@ -625,8 +625,7 @@ bool osd_common_t::execute_command(const char *command)
 
 static void output_notifier_callback(const char *outname, int32_t value, void *param)
 {
-	osd_common_t *osd = (osd_common_t*)param;
-	osd->notify(outname, value);
+	static_cast<osd_common_t*>(param)->notify(outname, value);
 }
 
 void osd_common_t::init_subsystems()

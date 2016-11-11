@@ -589,7 +589,7 @@ void windows_osd_interface::osd_exit()
 #endif
 
 	// one last pass at events
-	winwindow_process_events(machine(), 0, 0);
+	winwindow_process_events(machine(), false, false);
 }
 
 

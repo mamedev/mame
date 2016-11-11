@@ -41,9 +41,12 @@ class pcap_module : public osd_module, public netdev_module
 {
 public:
 	pcap_module()
-	: osd_module(OSD_NETDEV_PROVIDER, "pcap"), netdev_module()
+		: osd_module(OSD_NETDEV_PROVIDER, "pcap"), netdev_module(),
+		  pcap_findalldevs_dl(nullptr), pcap_open_live_dl(nullptr), pcap_next_ex_dl(nullptr), pcap_compile_dl(nullptr),
+		  pcap_close_dl(nullptr), pcap_setfilter_dl(nullptr), pcap_sendpacket_dl(nullptr), pcap_set_datalink_dl(nullptr), pcap_dispatch_dl(nullptr)
 	{
 	}
+
 	virtual ~pcap_module() { }
 
 	virtual int init(const osd_options &options) override;

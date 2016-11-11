@@ -97,7 +97,7 @@ void windows_osd_interface::update(bool skip_redraw)
 	}
 
 	// poll the joystick values here
-	winwindow_process_events(machine(), TRUE, FALSE);
+	winwindow_process_events(machine(), true, false);
 	poll_input(machine());
 	check_osd_inputs();
 	// if we're running, disable some parts of the debugger

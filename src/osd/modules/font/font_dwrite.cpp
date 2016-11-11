@@ -348,7 +348,7 @@ public:
 	{
 	}
 
-	virtual ~osd_font_dwrite() { close(); }
+	virtual ~osd_font_dwrite() { osd_font_dwrite::close(); }
 	
 	virtual bool open(std::string const &font_path, std::string const &_name, int &height) override
 	{
