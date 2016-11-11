@@ -83,7 +83,7 @@ static const instr_desc instructions[16] =
 	{ "A",      store },        { "S",      swap }
 };
 
-CPU_DISASSEMBLE( apexc )
+static offs_t internal_disasm_apexc(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
 {
 	uint32_t instruction;         /* 32-bit machine instruction */
 	int x, y, function, c6, vector; /* instruction fields */
@@ -114,7 +114,7 @@ CPU_DISASSEMBLE( apexc )
 	case two_address:
 	case branch:
 	case swap:
-		buffer += sprintf(buffer, "   %-10s", mnemonic);    /* 10 chars*/
+		util::stream_format(stream, "   %-10s", mnemonic);    /* 10 chars*/
 		break;
 
 	case shiftl:
@@ -123,32 +123,32 @@ CPU_DISASSEMBLE( apexc )
 			n = c6;
 		else
 			n = 64-c6;
-		buffer += sprintf(buffer, "   %-2s(%2d)    ", mnemonic, n); /* 10 chars */
+		util::stream_format(stream, "   %-2s(%2d)    ", mnemonic, n); /* 10 chars */
 		break;
 
 	case multiply:
 		n = 33-c6;
 		if (n == 32)
 			/* case "32" : do not show bit specifier */
-			buffer += sprintf(buffer, "   %-10s", mnemonic);    /* 10 chars */
+			util::stream_format(stream, "   %-10s", mnemonic);    /* 10 chars */
 		else
-			buffer += sprintf(buffer, "   %-2s(%2d)    ", mnemonic, n); /* 10 chars */
+			util::stream_format(stream, "   %-2s(%2d)    ", mnemonic, n); /* 10 chars */
 		break;
 
 	case store:
 		if (c6 == 0)
 		{   /* case "1-32" : do not show bit specifier */
-			buffer += sprintf(buffer, "   %-10s", mnemonic);    /* 10 chars*/
+			util::stream_format(stream, "   %-10s", mnemonic);    /* 10 chars*/
 		}
 		else if (c6 & 0x20)
 		{   /* case "1-n" */
 			n = c6-32;
-			buffer += sprintf(buffer, "   %-2s (1-%02d) ", mnemonic, n);    /* 10 chars */
+			util::stream_format(stream, "   %-2s (1-%02d) ", mnemonic, n);    /* 10 chars */
 		}
 		else
 		{   /* case "n-32" */
 			n = c6+1;
-			buffer += sprintf(buffer, "   %-2s(%02d-32) ", mnemonic, n);    /* 8 chars */
+			util::stream_format(stream, "   %-2s(%02d-32) ", mnemonic, n);    /* 8 chars */
 		}
 	}
 
@@ -156,29 +156,39 @@ CPU_DISASSEMBLE( apexc )
 	switch (the_desc->format)
 	{
 	case branch:
-		buffer--;   /* eat last char */
-		buffer += sprintf(buffer, "<%03X(%02d/%02d) >=", x<<2, (x >> 5) & 0x1f, x & 0x1f);  /* 10+1 chars */
+		stream.seekp(-1, std::ios_base::cur);   /* eat last char */
+		util::stream_format(stream, "<%03X(%02d/%02d) >=", x<<2, (x >> 5) & 0x1f, x & 0x1f);  /* 10+1 chars */
 		break;
 
 	case multiply:
 	case swap:
-		buffer += sprintf(buffer, "   (%02d)      ", (x >> 5) & 0x1f);  /* 10 chars */
+		util::stream_format(stream, "   (%02d)      ", (x >> 5) & 0x1f);  /* 10 chars */
 		break;
 
 	case one_address:
 	case shiftl:
 	case shiftr:
-		buffer += sprintf(buffer, "             "); /* 10 chars */
+		util::stream_format(stream, "             "); /* 10 chars */
 		break;
 
 	case two_address:
 	case store:
-		buffer += sprintf(buffer, "%03X(%02d/%02d)   ", x<<2, (x >> 5) & 0x1f, x & 0x1f);   /* 10 chars */
+		util::stream_format(stream, "%03X(%02d/%02d)   ", x<<2, (x >> 5) & 0x1f, x & 0x1f);   /* 10 chars */
 		break;
 	}
 
 	/* print Y address */
-	buffer += sprintf(buffer, "%03X(%02d/%02d)", y<<2, (y >> 5) & 0x1f, y & 0x1f);  /* 7 chars */
+	util::stream_format(stream, "%03X(%02d/%02d)", y<<2, (y >> 5) & 0x1f, y & 0x1f);  /* 7 chars */
 
 	return 4;
+}
+
+
+CPU_DISASSEMBLE(apexc)
+{
+	std::ostringstream stream;
+	offs_t result = internal_disasm_apexc(device, stream, pc, oprom, opram, options);
+	std::string stream_str = stream.str();
+	strcpy(buffer, stream_str.c_str());
+	return result;
 }
