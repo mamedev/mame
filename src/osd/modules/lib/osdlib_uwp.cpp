@@ -106,8 +106,6 @@ int osd_setenv(const char *name, const char *value, int overwrite)
 
 void osd_process_kill()
 {
-	std::fflush(stdout);
-	std::fflush(stderr);
 	TerminateProcess(GetCurrentProcess(), -1);
 }
 
