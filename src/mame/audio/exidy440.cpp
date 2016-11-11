@@ -775,7 +775,7 @@ void exidy440_sound_device::decode_and_filter_cvsd(uint8_t *input, int bytes, in
 	}
 
 	/* make sure the volume goes smoothly to 0 over the last 512 samples */
-	if (FADE_TO_ZERO)
+	if (IS_ENABLED(FADE_TO_ZERO))
 	{
 		int16_t *data;
 
