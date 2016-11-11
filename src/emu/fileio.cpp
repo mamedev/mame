@@ -473,13 +473,13 @@ bool emu_file::eof()
 {
 	// load the ZIP file now if we haven't yet
 	if (compressed_file_ready())
-		return 0;
+		return false;
 
 	// return EOF if we can
 	if (m_file)
 		return m_file->eof();
 
-	return 0;
+	return false;
 }
 
 
@@ -657,7 +657,7 @@ osd_file::error emu_file::attempt_zipped()
 	for (unsigned i = 0; i < ARRAY_LENGTH(suffixes); i++, m_fullpath = savepath, filename.clear())
 	{
 		// loop over directory parts up to the start of filename
-		while (1)
+		while (true)
 		{
 			// find the final path separator
 			auto const dirsep = m_fullpath.find_last_of(PATH_SEPARATOR[0]);

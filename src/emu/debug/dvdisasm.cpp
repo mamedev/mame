@@ -246,7 +246,7 @@ offs_t debug_view_disasm::find_pc_backwards(offs_t targetpc, int numinstrs)
 	offs_t targetpcbyte = source.m_space.address_to_byte(targetpc) & source.m_space.logbytemask();
 	offs_t fillpcbyte = targetpcbyte;
 	offs_t lastgoodpc = targetpc;
-	while (1)
+	while (true)
 	{
 		// fill the buffer up to the target
 		offs_t curpcbyte = source.m_space.address_to_byte(curpc) & source.m_space.logbytemask();

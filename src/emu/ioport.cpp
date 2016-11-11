@@ -1346,7 +1346,7 @@ ioport_field_live::ioport_field_live(ioport_field &field, analog_field *analog)
 		joystick(nullptr),
 		value(field.defvalue()),
 		impulse(0),
-		last(0),
+		last(false),
 		toggle(field.toggle()),
 		joydir(digital_joystick::JOYDIR_COUNT),
 		autofire(false),

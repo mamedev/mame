@@ -862,7 +862,7 @@ void parsed_expression::parse_symbol_or_number(parse_token &token, const char *&
 	// accumulate a lower-case version of the symbol
 	const char *stringstart = string;
 	std::string buffer;
-	while (1)
+	while (true)
 	{
 		static const char valid[] = "abcdefghijklmnopqrstuvwxyz0123456789_$#.:";
 		char val = tolower((uint8_t)string[0]);

@@ -137,4 +137,20 @@ using ssize_t = std::make_signed_t<size_t>;
 #endif
 #endif
 
+namespace osdcomm {
+	template<bool>
+	bool isEnabled()
+	{
+		return true;
+	}
+
+	template<>
+	inline bool isEnabled<false>()
+	{
+		return false;
+	}
+};
+
+#define IS_ENABLED(_x) osdcomm::isEnabled<!!(_x)>() 
+
 #endif  /* MAME_OSD_OSDCOMM_H */

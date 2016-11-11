@@ -813,7 +813,7 @@ void screen_device::device_start()
 		m_svg = std::make_unique<screen_device_svg_renderer>(reg);
 		machine().output().set_notifier(nullptr, screen_device_svg_renderer::output_notifier, m_svg.get());
 
-		if (0)
+		if (IS_ENABLED(0))
 		{
 			// The osd picks up the size before start is called, so that's useless
 			m_width = m_svg->width();

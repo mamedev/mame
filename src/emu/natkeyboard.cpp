@@ -397,7 +397,7 @@ void natural_keyboard::post(char32_t ch)
 		m_last_cr = (ch == '\r');
 
 	// logging
-	if (LOG_NATURAL_KEYBOARD)
+	if (IS_ENABLED(LOG_NATURAL_KEYBOARD))
 	{
 		const keycode_map_entry *code = find_code(ch);
 		machine().logerror("natural_keyboard::post(): code=%i (%s) field.name='%s'\n", int(ch), unicode_to_string(ch).c_str(), (code != nullptr && code->field[0] != nullptr) ? code->field[0]->name() : "<null>");
@@ -601,7 +601,7 @@ void natural_keyboard::build_codes(ioport_manager &manager)
 							newcode.ch = code;
 							m_keycode_map.push_back(newcode);
 
-							if (LOG_NATURAL_KEYBOARD)
+							if (IS_ENABLED(LOG_NATURAL_KEYBOARD))
 							{
 								machine().logerror("natural_keyboard: code=%i (%s) port=%p field.name='%s'\n", int(code), unicode_to_string(code).c_str(), (void *)&port, field.name());
 							}
@@ -686,7 +686,7 @@ void natural_keyboard::internal_post(char32_t ch)
 	if (empty())
 	{
 		m_timer->adjust(choose_delay(ch));
-		m_status_keydown = 0;
+		m_status_keydown = false;
 	}
 
 	// add to the buffer, resizing if necessary
