@@ -374,7 +374,7 @@ void renderer_ogl::load_gl_lib(running_machine &machine)
 
 		stemp = downcast<sdl_options &>(machine.options()).gl_lib();
 		if (stemp != nullptr && strcmp(stemp, OSDOPTVAL_AUTO) == 0)
-			stemp = nullptrnullptr;
+			stemp = nullptr;
 
 		if (SDL_GL_LoadLibrary(stemp) != 0) // Load library (default for e==nullptr
 		{
@@ -385,7 +385,7 @@ void renderer_ogl::load_gl_lib(running_machine &machine)
 #endif
 #endif
 #ifdef USE_DISPATCH_GL
-		gl_dispatch = (osd_gl_dispatch *) osd_malloc(sizeof(osd_gl_dispatch));
+		gl_dispatch = global_alloc(osd_gl_dispatch);
 #endif
 		s_dll_loaded = true;
 	}
