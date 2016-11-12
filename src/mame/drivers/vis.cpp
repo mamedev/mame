@@ -9,6 +9,7 @@
 #include "sound/volt_reg.h"
 #include "video/pc_vga.h"
 #include "bus/isa/isa_cards.h"
+#include "machine/8042kbdc.h"
 
 class vis_audio_device : public device_t,
 						 public device_isa16_card_interface
@@ -596,10 +597,16 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( at16_io, AS_IO, 16, vis_state )
 	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8("mb:dma8237_1", am9517a_device, read, write, 0xffff)
 	AM_RANGE(0x0026, 0x0027) AM_READWRITE8(unk_r, unk_w, 0xffff)
+	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("mb:pic8259_master", pic8259_device, read, write, 0xffff)
+	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8("mb:pit8254", pit8254_device, read, write, 0xffff)
+	AM_RANGE(0x0060, 0x0065) AM_DEVREADWRITE8("kbdc", kbdc8042_device, data_r, data_w, 0xffff)
 	AM_RANGE(0x006a, 0x006b) AM_READ8(unk2_r, 0x00ff)
 	AM_RANGE(0x0092, 0x0093) AM_READWRITE8(sysctl_r, sysctl_w, 0x00ff)
-	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", at_mb_device, map)
+	AM_RANGE(0x0080, 0x009f) AM_DEVREADWRITE8("mb", at_mb_device, page8_r, page8_w, 0xffff)
+	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("mb:pic8259_slave", pic8259_device, read, write, 0xffff)
+	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8("mb:dma8237_2", am9517a_device, read, write, 0x00ff)
 	AM_RANGE(0x023c, 0x023f) AM_READWRITE8(pad_r, pad_w, 0xffff)
 	AM_RANGE(0x031a, 0x031b) AM_READ8(unk3_r, 0x00ff)
 ADDRESS_MAP_END
@@ -608,6 +615,10 @@ static SLOT_INTERFACE_START(vis_cards)
 	SLOT_INTERFACE("visaudio", VIS_AUDIO)
 	SLOT_INTERFACE("visvga", VIS_VGA)
 SLOT_INTERFACE_END
+
+static INPUT_PORTS_START(vis)
+	PORT_INCLUDE( at_keyboard )
+INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( vis, vis_state )
 	/* basic machine hardware */
@@ -618,6 +629,15 @@ static MACHINE_CONFIG_START( vis, vis_state )
 	MCFG_80286_SHUTDOWN(DEVWRITELINE("mb", at_mb_device, shutdown))
 
 	MCFG_DEVICE_ADD("mb", AT_MB, 0)
+	// this doesn't have a real keyboard controller
+	MCFG_DEVICE_REMOVE("mb:keybc")
+	MCFG_DEVICE_REMOVE("mb:pc_kbdc")
+
+	MCFG_DEVICE_ADD("kbdc", KBDC8042, 0)
+	MCFG_KBDC8042_KEYBOARD_TYPE(KBDC8042_AT386)
+	MCFG_KBDC8042_SYSTEM_RESET_CB(INPUTLINE("maincpu", INPUT_LINE_RESET))
+	MCFG_KBDC8042_GATE_A20_CB(INPUTLINE("maincpu", INPUT_LINE_A20))
+	MCFG_KBDC8042_INPUT_BUFFER_FULL_CB(DEVWRITELINE("mb:pic8259_master", pic8259_device, ir1_w))
 
 	MCFG_ISA16_SLOT_ADD("mb:isabus", "mcd", pc_isa16_cards, "mcd", true)
 	MCFG_ISA16_SLOT_ADD("mb:isabus", "visaudio", vis_cards, "visaudio", true)
@@ -630,5 +650,5 @@ ROM_START(vis)
 	ROM_LOAD( "p513bk1b.bin", 0x80000, 0x80000, CRC(e18239c4) SHA1(a0262109e10a07a11eca43371be9978fff060bc5))
 ROM_END
 
-COMP ( 1992, vis,  0, 0, vis, 0, driver_device, 0, "Tandy/Memorex", "Video Information System MD-2500", MACHINE_NOT_WORKING )
+COMP ( 1992, vis,  0, 0, vis, vis, driver_device, 0, "Tandy/Memorex", "Video Information System MD-2500", MACHINE_NOT_WORKING )
 
