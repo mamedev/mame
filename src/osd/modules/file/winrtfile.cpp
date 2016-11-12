@@ -232,9 +232,7 @@ osd_file::error osd_file::open(std::string const &orig_path, uint32_t openflags,
 	// get the file size
 	FILE_STANDARD_INFO file_info;
 	GetFileInformationByHandleEx(h, FileStandardInfo, &file_info, sizeof(file_info));
-	auto lower = file_info.EndOfFile.QuadPart;
-
-	if (INVALID_FILE_SIZE == lower)
+	if (INVALID_FILE_SIZE == file_info.EndOfFile.LowPart)
 	{
 		DWORD const err = GetLastError();
 		if (NO_ERROR != err)
@@ -247,7 +245,7 @@ osd_file::error osd_file::open(std::string const &orig_path, uint32_t openflags,
 	try
 	{
 		file = std::make_unique<win_osd_file>(h);
-		filesize = lower;
+		filesize = file_info.EndOfFile.QuadPart;
 		return error::NONE;
 	}
 	catch (...)

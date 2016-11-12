@@ -93,6 +93,12 @@ extern "C" {
 		_Out_opt_ LPDWORD lpFileSizeHigh
 	)
 	{
-		return 0;
+		FILE_STANDARD_INFO file_info;
+		GetFileInformationByHandleEx(hFile, FileStandardInfo, &file_info, sizeof(file_info));
+		if(lpFileSizeHigh!=nullptr)
+		{
+			*lpFileSizeHigh = file_info.EndOfFile.HighPart;
+		}
+		return file_info.EndOfFile.LowPart;
 	}
 }
