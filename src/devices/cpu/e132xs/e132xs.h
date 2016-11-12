@@ -174,7 +174,7 @@ enum
 	E132XS_L60, E132XS_L61, E132XS_L62, E132XS_L63
 };
 
-extern unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsigned h_flag, int private_fp);
+extern unsigned dasm_hyperstone(std::ostream &stream, unsigned pc, const uint8_t *oprom, unsigned h_flag, int private_fp);
 
 /* Memory access */
 /* read byte */
