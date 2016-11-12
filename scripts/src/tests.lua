@@ -8,37 +8,6 @@
 --   Rules for building tests
 --
 ---------------------------------------------------------------------------
---------------------------------------------------
--- GoogleTest library objects
---------------------------------------------------
-
-project "gtest"
-	uuid "fa306a8d-fb10-4d4a-9d2e-fdb9076407b4"
-	kind "StaticLib"
-
-	configuration { "gmake or ninja" }
-		buildoptions {
-			"-Wno-undef",
-			"-Wno-unused-variable",
-		}
-
-	configuration { "vs*" }
-if _OPTIONS["vs"]=="intel-15" then
-		buildoptions {
-			"/Qwd1195",             -- error #1195: conversion from integer to smaller pointer
-		}
-end
-
-	configuration { }
-
-	includedirs {
-		MAME_DIR .. "3rdparty/googletest/googletest/include",
-		MAME_DIR .. "3rdparty/googletest/googletest",
-	}
-	files {
-		MAME_DIR .. "3rdparty/googletest/googletest/src/gtest-all.cc",
-	}
-
 
 project("mametests")
 	uuid ("66d4c639-196b-4065-a411-7ee9266564f5")
@@ -52,15 +21,9 @@ project("mametests")
 		targetdir(MAME_DIR)
 	end
 
-	configuration { "gmake or ninja" }
-		buildoptions {
-			"-Wno-undef",
-		}
-
 	configuration { }
 
 	links {
-		"gtest",
 		"utils",
 		ext_lib("expat"),
 		ext_lib("zlib"),
@@ -68,7 +31,7 @@ project("mametests")
 	}
 
 	includedirs {
-		MAME_DIR .. "3rdparty/googletest/googletest/include",
+		MAME_DIR .. "3rdparty/catch/single_include",
 		MAME_DIR .. "src/osd",
 		MAME_DIR .. "src/emu",
 		MAME_DIR .. "src/lib/util",

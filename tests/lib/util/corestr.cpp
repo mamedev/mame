@@ -1,51 +1,52 @@
-#include "gtest/gtest.h"
+#include "catch.hpp"
+
 #include "corestr.h"
 
-TEST(corestr,strmakeupper) 
+TEST_CASE("String make upper", "[util]")
 {
    std::string value = "test";
-   EXPECT_STREQ("TEST", strmakeupper(value).c_str());
+   REQUIRE("TEST" == strmakeupper(value));
 }
 
-TEST(corestr,strmakelower) 
+TEST_CASE("String make lower", "[util]")
 {
    std::string value = "ValUE";
-   EXPECT_STREQ("value", strmakelower(value).c_str());
+   REQUIRE("value" == strmakelower(value));
 }
 
-TEST(corestr,strreplace) 
+TEST_CASE("String replace", "[util]")
 {
    std::string value = "Main string";
-   EXPECT_EQ(1, strreplace(value,"str","aaa"));
-   EXPECT_STREQ("Main aaaing", value.c_str());
-   EXPECT_EQ(4, strreplace(value,"a","b"));
+   REQUIRE(1 == strreplace(value,"str","aaa"));
+   REQUIRE("Main aaaing" == value);
+   REQUIRE(4 == strreplace(value,"a","b"));
 }
 
-TEST(corestr,strtrimspace) 
+TEST_CASE("String trimming", "[util]")
 {
    std::string value = "    a value  for test  ";
-   EXPECT_STREQ("a value  for test", strtrimspace(value).c_str());
+   REQUIRE("a value  for test" == strtrimspace(value));
    value = "\r\n\ta value  for test\r\n\n\r";
-   EXPECT_STREQ("a value  for test", strtrimspace(value).c_str());
+   REQUIRE("a value  for test" == strtrimspace(value));
 }
 
-TEST(corestr,strreplacechr) 
+TEST_CASE("String replace chars", "[util]")
 {
    std::string value = "String for doing replaces";
    strreplacechr(value,'a','A');
    strreplacechr(value,'e','E');
    strreplacechr(value,'i','I');
    strreplacechr(value,'o','O');
-   EXPECT_STREQ("StrIng fOr dOIng rEplAcEs", value.c_str());
+   REQUIRE("StrIng fOr dOIng rEplAcEs" == value);
 }
 
-TEST(corestr,strdelchr) 
+TEST_CASE("String delete char", "[util]")
 {
    std::string value = "String for doing deletes";
    strdelchr(value,'a');
    strdelchr(value,'e');
    strdelchr(value,'i');
    strdelchr(value,'o');
-   EXPECT_STREQ("Strng fr dng dlts", value.c_str());
+   REQUIRE("Strng fr dng dlts" == value);
 }
 
