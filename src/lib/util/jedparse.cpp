@@ -137,7 +137,7 @@ static void process_field(jed_data *data, const uint8_t *cursrc, const uint8_t *
 		/* default fuse state (0 or 1) */
 		case 'F':
 			cursrc++;
-			if (IS_ENABLED(LOG_PARSE)) printf("F%c\n", *cursrc);
+			if (LOG_PARSE) printf("F%c\n", *cursrc);
 			if (*cursrc == '0')
 				memset(data->fusemap, 0x00, sizeof(data->fusemap));
 			else
@@ -152,14 +152,14 @@ static void process_field(jed_data *data, const uint8_t *cursrc, const uint8_t *
 			/* read the fuse number */
 			cursrc++;
 			curfuse = suck_number(&cursrc);
-			if (IS_ENABLED(LOG_PARSE)) printf("L%u\n", curfuse);
+			if (LOG_PARSE) printf("L%u\n", curfuse);
 
 			/* read digits, skipping delimiters */
 			for ( ; cursrc < srcend; cursrc++)
 				if (*cursrc == '0' || *cursrc == '1')
 				{
 					jed_set_fuse(data, curfuse, *cursrc - '0');
-					if (IS_ENABLED(LOG_PARSE)) printf("  fuse %u = %d\n", curfuse, 0);
+					if (LOG_PARSE) printf("  fuse %u = %d\n", curfuse, 0);
 					if (curfuse >= data->numfuses)
 						data->numfuses = curfuse + 1;
 					curfuse++;

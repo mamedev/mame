@@ -113,14 +113,14 @@ static bool process_terms(jed_data *data, const uint8_t **src, const uint8_t *sr
 					jed_set_fuse(data, data->numfuses++, 0);
 					jed_set_fuse(data, data->numfuses++, 1);
 
-					if (IS_ENABLED(LOG_PARSE)) printf("01");
+					if (LOG_PARSE) printf("01");
 					break;
 
 				case '1':
 					jed_set_fuse(data, data->numfuses++, 1);
 					jed_set_fuse(data, data->numfuses++, 0);
 
-					if (IS_ENABLED(LOG_PARSE)) printf("10");
+					if (LOG_PARSE) printf("10");
 					break;
 
 				// anything goes
@@ -128,7 +128,7 @@ static bool process_terms(jed_data *data, const uint8_t **src, const uint8_t *sr
 					jed_set_fuse(data, data->numfuses++, 1);
 					jed_set_fuse(data, data->numfuses++, 1);
 
-					if (IS_ENABLED(LOG_PARSE)) printf("11");
+					if (LOG_PARSE) printf("11");
 					break;
 
 				// this product term is inhibited
@@ -136,14 +136,14 @@ static bool process_terms(jed_data *data, const uint8_t **src, const uint8_t *sr
 					jed_set_fuse(data, data->numfuses++, 0);
 					jed_set_fuse(data, data->numfuses++, 0);
 
-					if (IS_ENABLED(LOG_PARSE)) printf("00");
+					if (LOG_PARSE) printf("00");
 					break;
 
 				case ' ': case '\t':
 					if (curinput > 0)
 					{
 						outputs = true;
-						if (IS_ENABLED(LOG_PARSE)) printf(" ");
+						if (LOG_PARSE) printf(" ");
 					}
 					break;
 
@@ -160,13 +160,13 @@ static bool process_terms(jed_data *data, const uint8_t **src, const uint8_t *sr
 				if (**src == '1')
 				{
 					jed_set_fuse(data, data->numfuses++, 0);
-					if (IS_ENABLED(LOG_PARSE)) printf("0");
+					if (LOG_PARSE) printf("0");
 				}
 				else
 				{
 					// write 1 for anything else
 					jed_set_fuse(data, data->numfuses++, 1);
-					if (IS_ENABLED(LOG_PARSE)) printf("1");
+					if (LOG_PARSE) printf("1");
 				}
 			}
 		}
@@ -174,7 +174,7 @@ static bool process_terms(jed_data *data, const uint8_t **src, const uint8_t *sr
 		if (iscrlf(**src) && outputs)
 		{
 			outputs = false;
-			if (IS_ENABLED(LOG_PARSE)) printf("\n");
+			if (LOG_PARSE) printf("\n");
 
 			if (curinput != pinfo->inputs || curoutput != pinfo->outputs)
 				return false;
@@ -241,7 +241,7 @@ static bool process_field(jed_data *data, const uint8_t **src, const uint8_t *sr
 			if (pinfo->inputs == 0 || pinfo->inputs >= (JED_MAX_FUSES/2))
 				return false;
 
-			if (IS_ENABLED(LOG_PARSE)) printf("Inputs: %u\n", pinfo->inputs);
+			if (LOG_PARSE) printf("Inputs: %u\n", pinfo->inputs);
 			break;
 
 		// number of outputs
@@ -250,7 +250,7 @@ static bool process_field(jed_data *data, const uint8_t **src, const uint8_t *sr
 			if (pinfo->outputs == 0 || pinfo->outputs >= (JED_MAX_FUSES/2))
 				return false;
 
-			if (IS_ENABLED(LOG_PARSE)) printf("Outputs: %u\n", pinfo->outputs);
+			if (LOG_PARSE) printf("Outputs: %u\n", pinfo->outputs);
 			break;
 
 		// number of product terms (optional)
@@ -259,12 +259,12 @@ static bool process_field(jed_data *data, const uint8_t **src, const uint8_t *sr
 			if (pinfo->terms == 0 || pinfo->terms >= (JED_MAX_FUSES/2))
 				return false;
 
-			if (IS_ENABLED(LOG_PARSE)) printf("Terms: %u\n", pinfo->terms);
+			if (LOG_PARSE) printf("Terms: %u\n", pinfo->terms);
 			break;
 
 		// output polarity (optional)
 		case KW_PHASE:
-			if (IS_ENABLED(LOG_PARSE)) printf("Phase...\n");
+			if (LOG_PARSE) printf("Phase...\n");
 			while (*src < srcend && !iscrlf(**src) && pinfo->xorptr < (JED_MAX_FUSES/2))
 			{
 				if (**src == '0' || **src == '1')
@@ -280,7 +280,7 @@ static bool process_field(jed_data *data, const uint8_t **src, const uint8_t *sr
 
 		// end of file (optional)
 		case KW_END:
-			if (IS_ENABLED(LOG_PARSE)) printf("End of file\n");
+			if (LOG_PARSE) printf("End of file\n");
 			break;
 	}
 
@@ -349,15 +349,15 @@ int pla_parse(const void *data, size_t length, jed_data *result)
 	// write output polarity
 	if (pinfo.xorptr > 0)
 	{
-		if (IS_ENABLED(LOG_PARSE)) printf("Polarity: ");
+		if (LOG_PARSE) printf("Polarity: ");
 
 		for (int i = 0; i < pinfo.outputs; i++)
 		{
 			int bit = pinfo.xorval[i/32] >> (i & 31) & 1;
 			jed_set_fuse(result, result->numfuses++, bit);
-			if (IS_ENABLED(LOG_PARSE)) printf("%d", bit);
+			if (LOG_PARSE) printf("%d", bit);
 		}
-		if (IS_ENABLED(LOG_PARSE)) printf("\n");
+		if (LOG_PARSE) printf("\n");
 	}
 
 	return JEDERR_NONE;

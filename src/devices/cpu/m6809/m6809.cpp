@@ -446,7 +446,7 @@ uint32_t m6809_base_device::execute_input_lines() const
 
 void m6809_base_device::execute_set_input(int inputnum, int state)
 {
-	if (IS_ENABLED(LOG_INTERRUPTS))
+	if (LOG_INTERRUPTS)
 		logerror("%s: inputnum=%s state=%d totalcycles=%d\n", machine().describe_context(), inputnum_string(inputnum), state, (int) attotime_to_clocks(machine().time()));
 
 	switch(inputnum)

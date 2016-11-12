@@ -155,7 +155,7 @@ void menu_file_create::custom_render(void *selectedref, float top, float bottom,
 void menu_file_create::populate()
 {
 	std::string buffer;
-	const image_device_format *format = nullptr;
+	const image_device_format *format;
 	const std::string *new_image_name;
 
 	// append the "New Image Name" item
@@ -171,8 +171,8 @@ void menu_file_create::populate()
 	item_append(_("New Image Name:"), *new_image_name, 0, ITEMREF_NEW_IMAGE_NAME);
 
 	// do we support multiple formats?
-	if (IS_ENABLED(ENABLE_FORMATS)) format = m_image->formatlist().front().get();
-	if (IS_ENABLED(ENABLE_FORMATS) && (format != nullptr))
+	if (ENABLE_FORMATS) format = m_image->formatlist().front().get();
+	if (ENABLE_FORMATS && (format != nullptr))
 	{
 		item_append(_("Image Format:"), m_current_format->description(), 0, ITEMREF_FORMAT);
 		m_current_format = format;

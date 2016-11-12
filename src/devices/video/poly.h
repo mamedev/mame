@@ -450,7 +450,7 @@ void poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::wait(const cha
 	osd_ticks_t time;
 
 	// remember the start time if we're logging
-	if (IS_ENABLED(LOG_WAITS))
+	if (LOG_WAITS)
 		time = get_profile_ticks();
 
 	// wait for all pending work items to complete
@@ -463,7 +463,7 @@ void poly_manager<_BaseType, _ObjectData, _MaxParams, _MaxPolys>::wait(const cha
 			work_item_callback(&m_unit[unitnum], 0);
 
 	// log any long waits
-	if (IS_ENABLED(LOG_WAITS))
+	if (LOG_WAITS)
 	{
 		time = get_profile_ticks() - time;
 		if (time > LOG_WAIT_THRESHOLD)

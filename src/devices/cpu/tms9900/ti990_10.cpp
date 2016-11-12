@@ -69,7 +69,7 @@ void ti990_10_device::device_start()
 
 void ti990_10_device::device_stop()
 {
-	if (IS_ENABLED(TRACE_SETUP)) logerror("ti990_10: Deleting lookup tables\n");
+	if (TRACE_SETUP) logerror("ti990_10: Deleting lookup tables\n");
 }
 
 /*
@@ -79,7 +79,7 @@ void ti990_10_device::device_stop()
 */
 void ti990_10_device::device_reset()
 {
-	if (IS_ENABLED(TRACE_EMU)) logerror("ti990_10: Device reset by emulator\n");
+	if (TRACE_EMU) logerror("ti990_10: Device reset by emulator\n");
 }
 
 const address_space_config *ti990_10_device::memory_space_config(address_spacenum spacenum) const

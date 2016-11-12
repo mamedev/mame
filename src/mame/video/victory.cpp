@@ -143,7 +143,7 @@ READ8_MEMBER(victory_state::video_control_r)
 	{
 		case 0x00:  /* 5XFIQ */
 			result = m_fgcollx;
-			if (IS_ENABLED(LOG_COLLISION)) logerror("%04X:5XFIQ read = %02X\n", space.device().safe_pcbase(), result);
+			if (LOG_COLLISION) logerror("%04X:5XFIQ read = %02X\n", space.device().safe_pcbase(), result);
 			return result;
 
 		case 0x01:  /* 5CLFIQ */
@@ -153,12 +153,12 @@ READ8_MEMBER(victory_state::video_control_r)
 				m_fgcoll = 0;
 				update_irq();
 			}
-			if (IS_ENABLED(LOG_COLLISION)) logerror("%04X:5CLFIQ read = %02X\n", space.device().safe_pcbase(), result);
+			if (LOG_COLLISION) logerror("%04X:5CLFIQ read = %02X\n", space.device().safe_pcbase(), result);
 			return result;
 
 		case 0x02:  /* 5BACKX */
 			result = m_bgcollx & 0xfc;
-			if (IS_ENABLED(LOG_COLLISION)) logerror("%04X:5BACKX read = %02X\n", space.device().safe_pcbase(), result);
+			if (LOG_COLLISION) logerror("%04X:5BACKX read = %02X\n", space.device().safe_pcbase(), result);
 			return result;
 
 		case 0x03:  /* 5BACKY */
@@ -168,7 +168,7 @@ READ8_MEMBER(victory_state::video_control_r)
 				m_bgcoll = 0;
 				update_irq();
 			}
-			if (IS_ENABLED(LOG_COLLISION)) logerror("%04X:5BACKY read = %02X\n", space.device().safe_pcbase(), result);
+			if (LOG_COLLISION) logerror("%04X:5BACKY read = %02X\n", space.device().safe_pcbase(), result);
 			return result;
 
 		case 0x04:  /* 5STAT */
@@ -183,7 +183,7 @@ READ8_MEMBER(victory_state::video_control_r)
 			result |= (~m_vblank_irq & 1) << 5;
 			result |= (~m_bgcoll & 1) << 4;
 			result |= (m_screen->vpos() & 0x100) >> 5;
-			if (IS_ENABLED(LOG_COLLISION)) logerror("%04X:5STAT read = %02X\n", space.device().safe_pcbase(), result);
+			if (LOG_COLLISION) logerror("%04X:5STAT read = %02X\n", space.device().safe_pcbase(), result);
 			return result;
 
 		default:
@@ -207,22 +207,22 @@ WRITE8_MEMBER(victory_state::video_control_w)
 	switch (offset)
 	{
 		case 0x00:  /* LOAD IL */
-			if (IS_ENABLED(LOG_MICROCODE)) logerror("%04X:IL=%02X\n", space.device().safe_pcbase(), data);
+			if (LOG_MICROCODE) logerror("%04X:IL=%02X\n", space.device().safe_pcbase(), data);
 			micro.i = (micro.i & 0xff00) | (data & 0x00ff);
 			break;
 
 		case 0x01:  /* LOAD IH */
-			if (IS_ENABLED(LOG_MICROCODE)) logerror("%04X:IH=%02X\n", space.device().safe_pcbase(), data);
+			if (LOG_MICROCODE) logerror("%04X:IH=%02X\n", space.device().safe_pcbase(), data);
 			micro.i = (micro.i & 0x00ff) | ((data << 8) & 0xff00);
 			if (micro.cmdlo == 5)
 			{
-				if (IS_ENABLED(LOG_MICROCODE)) logerror("  Command 5 triggered by write to IH\n");
+				if (LOG_MICROCODE) logerror("  Command 5 triggered by write to IH\n");
 				command5();
 			}
 			break;
 
 		case 0x02:  /* LOAD CMD */
-			if (IS_ENABLED(LOG_MICROCODE)) logerror("%04X:CMD=%02X\n", space.device().safe_pcbase(), data);
+			if (LOG_MICROCODE) logerror("%04X:CMD=%02X\n", space.device().safe_pcbase(), data);
 			micro.cmd = data;
 			micro.cmdlo = data & 7;
 			if (micro.cmdlo == 0)
@@ -231,63 +231,63 @@ WRITE8_MEMBER(victory_state::video_control_w)
 				logerror("  Command 1 triggered\n");
 			else if (micro.cmdlo == 6)
 			{
-				if (IS_ENABLED(LOG_MICROCODE)) logerror("  Command 6 triggered\n");
+				if (LOG_MICROCODE) logerror("  Command 6 triggered\n");
 				command6();
 			}
 			break;
 
 		case 0x03:  /* LOAD G */
-			if (IS_ENABLED(LOG_MICROCODE)) logerror("%04X:G=%02X\n", space.device().safe_pcbase(), data);
+			if (LOG_MICROCODE) logerror("%04X:G=%02X\n", space.device().safe_pcbase(), data);
 			micro.g = data;
 			break;
 
 		case 0x04:  /* LOAD X */
-			if (IS_ENABLED(LOG_MICROCODE)) logerror("%04X:X=%02X\n", space.device().safe_pcbase(), data);
+			if (LOG_MICROCODE) logerror("%04X:X=%02X\n", space.device().safe_pcbase(), data);
 			micro.xp = data;
 			if (micro.cmdlo == 3)
 			{
-				if (IS_ENABLED(LOG_MICROCODE)) logerror(" Command 3 triggered by write to X\n");
+				if (LOG_MICROCODE) logerror(" Command 3 triggered by write to X\n");
 				command3();
 			}
 			break;
 
 		case 0x05:  /* LOAD Y */
-			if (IS_ENABLED(LOG_MICROCODE)) logerror("%04X:Y=%02X\n", space.device().safe_pcbase(), data);
+			if (LOG_MICROCODE) logerror("%04X:Y=%02X\n", space.device().safe_pcbase(), data);
 			micro.yp = data;
 			if (micro.cmdlo == 4)
 			{
-				if (IS_ENABLED(LOG_MICROCODE)) logerror("  Command 4 triggered by write to Y\n");
+				if (LOG_MICROCODE) logerror("  Command 4 triggered by write to Y\n");
 				command4();
 			}
 			break;
 
 		case 0x06:  /* LOAD R */
-			if (IS_ENABLED(LOG_MICROCODE)) logerror("%04X:R=%02X\n", space.device().safe_pcbase(), data);
+			if (LOG_MICROCODE) logerror("%04X:R=%02X\n", space.device().safe_pcbase(), data);
 			micro.r = data;
 			break;
 
 		case 0x07:  /* LOAD B */
-			if (IS_ENABLED(LOG_MICROCODE)) logerror("%04X:B=%02X\n", space.device().safe_pcbase(), data);
+			if (LOG_MICROCODE) logerror("%04X:B=%02X\n", space.device().safe_pcbase(), data);
 			micro.b = data;
 			if (micro.cmdlo == 2)
 			{
-				if (IS_ENABLED(LOG_MICROCODE)) logerror("  Command 2 triggered by write to B\n");
+				if (LOG_MICROCODE) logerror("  Command 2 triggered by write to B\n");
 				command2();
 			}
 			else if (micro.cmdlo == 7)
 			{
-				if (IS_ENABLED(LOG_MICROCODE)) logerror("  Command 7 triggered by write to B\n");
+				if (LOG_MICROCODE) logerror("  Command 7 triggered by write to B\n");
 				command7();
 			}
 			break;
 
 		case 0x08:  /* SCROLLX */
-			if (IS_ENABLED(LOG_MICROCODE)) logerror("%04X:SCROLLX write = %02X\n", space.device().safe_pcbase(), data);
+			if (LOG_MICROCODE) logerror("%04X:SCROLLX write = %02X\n", space.device().safe_pcbase(), data);
 			m_scrollx = data;
 			break;
 
 		case 0x09:  /* SCROLLY */
-			if (IS_ENABLED(LOG_MICROCODE)) logerror("%04X:SCROLLY write = %02X\n", space.device().safe_pcbase(), data);
+			if (LOG_MICROCODE) logerror("%04X:SCROLLY write = %02X\n", space.device().safe_pcbase(), data);
 			m_scrolly = data;
 			break;
 
@@ -299,18 +299,18 @@ WRITE8_MEMBER(victory_state::video_control_w)
 			// D3 = SINVERT
 			// D2 = BIR12
 			// D1 = SELOVER
-			if (IS_ENABLED(LOG_MICROCODE)) logerror("%04X:CONTROL write = %02X\n", space.device().safe_pcbase(), data);
+			if (LOG_MICROCODE) logerror("%04X:CONTROL write = %02X\n", space.device().safe_pcbase(), data);
 			m_video_control = data;
 			break;
 
 		case 0x0b:  /* CLRVIRQ */
-			if (IS_ENABLED(LOG_MICROCODE)) logerror("%04X:CLRVIRQ write = %02X\n", space.device().safe_pcbase(), data);
+			if (LOG_MICROCODE) logerror("%04X:CLRVIRQ write = %02X\n", space.device().safe_pcbase(), data);
 			m_vblank_irq = 0;
 			update_irq();
 			break;
 
 		default:
-			if (IS_ENABLED(LOG_MICROCODE)) logerror("%04X:video_control_w(%02X) = %02X\n", space.device().safe_pcbase(), offset, data);
+			if (LOG_MICROCODE) logerror("%04X:video_control_w(%02X) = %02X\n", space.device().safe_pcbase(), offset, data);
 			break;
 	}
 }
@@ -701,7 +701,7 @@ int victory_state::command4()
 */
 	int keep_going = 0;
 
-	if (IS_ENABLED(LOG_MICROCODE)) logerror("================= EXECUTE BEGIN\n");
+	if (LOG_MICROCODE) logerror("================= EXECUTE BEGIN\n");
 
 	count_states(micro, 4);
 
@@ -714,7 +714,7 @@ int victory_state::command4()
 		micro.r = m_gram[0x2001 + micro.pc];
 		micro.xp = m_rram[0x2001 + micro.pc];
 		micro.yp = m_bram[0x2001 + micro.pc];
-		if (IS_ENABLED(LOG_MICROCODE)) logerror("PC=%03X  CMD=%02X I=%04X R=%02X X=%02X Y=%02X\n", micro.pc, micro.cmd, micro.i, micro.r, micro.xp, micro.yp);
+		if (LOG_MICROCODE) logerror("PC=%03X  CMD=%02X I=%04X R=%02X X=%02X Y=%02X\n", micro.pc, micro.cmd, micro.i, micro.r, micro.xp, micro.yp);
 		micro.pc = (micro.pc + 2) & 0x1ff;
 
 		switch (micro.cmdlo)
@@ -730,7 +730,7 @@ int victory_state::command4()
 		}
 	} while (keep_going);
 
-	if (IS_ENABLED(LOG_MICROCODE)) logerror("================= EXECUTE END\n");
+	if (LOG_MICROCODE) logerror("================= EXECUTE END\n");
 
 	return micro.cmd & 0x80;
 }

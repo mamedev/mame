@@ -509,7 +509,7 @@ cassette_image::error cassette_put_samples(cassette_image *cassette, int channel
 		cassette->sample_count = ranges.sample_last + 1;
 	cassette->flags |= CASSETTE_FLAG_DIRTY;
 
-	if (IS_ENABLED(LOG_PUT_SAMPLES))
+	if (LOG_PUT_SAMPLES)
 	{
 		LOG_FORMATS("cassette_put_samples(): Putting samples TIME=[%2.6g..%2.6g] INDEX=[%i..%i]\n",
 			time_index,             time_index + sample_period,

@@ -452,7 +452,7 @@ void cem3394_device::set_voltage(int input, double voltage)
 			else
 			{
 				temp = voltage * 0.5;
-				if (IS_ENABLED(LIMIT_WIDTH))
+				if (LIMIT_WIDTH)
 					temp = MINIMUM_WIDTH + (MAXIMUM_WIDTH - MINIMUM_WIDTH) * temp;
 				m_pulse_width = (uint32_t)(temp * FRACTION_ONE_D);
 				m_wave_select |= WAVE_PULSE;

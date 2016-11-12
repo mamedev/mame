@@ -990,7 +990,7 @@ void winwindow_ui_pause(running_machine &machine, int pause)
 		}
 	}
 
-	if (IS_ENABLED(LOG_TEMP_PAUSE))
+	if (LOG_TEMP_PAUSE)
 		osd_printf_verbose("winwindow_ui_pause(): %d --> %d\n", old_temp_pause, ui_temp_pause);
 }
 

@@ -241,7 +241,7 @@ FLOPPY_CONSTRUCT( fdi_dsk_construct )
 	tag->tracks = pick_integer_be(header.ltrack, 0, 2) + 1;
 	tag->heads = header.lhead + 1;
 
-	if (IS_ENABLED(LOG))
+	if (LOG)
 	{
 		LOG_FORMATS("FDI creator: %s\n", header.creator);
 		LOG_FORMATS("FDI comment: %s\n", header.comment);
@@ -264,7 +264,7 @@ FLOPPY_CONSTRUCT( fdi_dsk_construct )
 		uint8_t type = header.track[track].type;
 		int size = header.track[track].size * 256;
 
-		if (IS_ENABLED(LOG)) LOG_FORMATS("FDI track %d type %02x size %d offset %d\n", track, type, size, offset);
+		if (LOG) LOG_FORMATS("FDI track %d type %02x size %d offset %d\n", track, type, size, offset);
 
 		tag->track_offset[track] = offset;
 		tag->track_type[track] = type;
