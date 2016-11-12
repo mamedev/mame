@@ -133,7 +133,7 @@ void archimedes_state::vidc_video_tick()
 
 	size = m_vidc_vidend-m_vidc_vidstart+0x10;
 
-	offset_ptr = m_vidc_vidstart+m_vidc_vidinit;
+	offset_ptr = m_vidc_vidinit;
 	if(offset_ptr >= m_vidc_vidend+0x10) // TODO: correct?
 		offset_ptr = m_vidc_vidstart;
 
@@ -1055,7 +1055,7 @@ WRITE32_MEMBER(archimedes_state::archimedes_memc_w)
 		{
 			case 0: /* video init */
 				m_cursor_enabled = false;
-				m_vidc_vidinit = ((data>>2)&0x7fff)*16;
+				m_vidc_vidinit = 0x2000000 | ((data>>2)&0x7fff)*16;
 				//printf("MEMC: VIDINIT %08x\n",m_vidc_vidinit);
 				break;
 

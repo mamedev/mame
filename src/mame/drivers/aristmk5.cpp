@@ -173,24 +173,33 @@
 #include "includes/archimds.h"
 #include "cpu/arm/arm.h"
 #include "machine/watchdog.h"
+#include "machine/eepromser.h"
+#include "machine/ins8250.h"
 #include "sound/volt_reg.h"
 
 class aristmk5_state : public archimedes_state
 {
 public:
 	aristmk5_state(const machine_config &mconfig, device_type type, const char *tag)
-		: archimedes_state(mconfig, type, tag) { }
+		: archimedes_state(mconfig, type, tag)
+		, m_eeprom(*this, "eeprom%d", 0)
+		 { }
 
 	emu_timer *m_mk5_2KHz_timer;
 	emu_timer *m_mk5_VSYNC_timer;
 	uint8_t m_ext_latch;
 	uint8_t m_flyback;
+	required_device_array<eeprom_serial_93cxx_device, 2> m_eeprom;
+
 	DECLARE_WRITE32_MEMBER(Ns5w48);
 	DECLARE_READ32_MEMBER(Ns5x58);
 	DECLARE_READ32_MEMBER(mk5_ioc_r);
 	DECLARE_WRITE32_MEMBER(mk5_ioc_w);
 	DECLARE_READ32_MEMBER(Ns5r50);
 	DECLARE_WRITE32_MEMBER(sram_banksel_w);
+	DECLARE_WRITE32_MEMBER(eeprom_w);
+	DECLARE_READ32_MEMBER(eeprom_r);
+
 	DECLARE_DRIVER_INIT(aristmk5);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -347,6 +356,28 @@ READ32_MEMBER(aristmk5_state::Ns5r50)
 	return 0xf5; // checked inside the CPU check, unknown meaning
 }
 
+READ32_MEMBER(aristmk5_state::eeprom_r)
+{
+	uint8_t data = 0x00;
+	if (m_eeprom[0]->do_read() && m_eeprom[1]->do_read())
+		data |= 0x04;
+
+	return data;
+}
+
+WRITE32_MEMBER(aristmk5_state::eeprom_w)
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		m_eeprom[0]->cs_write(BIT(data, 5));
+		m_eeprom[1]->cs_write(BIT(data, 6));
+		m_eeprom[0]->di_write(BIT(data, 3));
+		m_eeprom[1]->di_write(BIT(data, 3));
+		m_eeprom[0]->clk_write(BIT(data, 4));
+		m_eeprom[1]->clk_write(BIT(data, 4));
+	}
+}
+
 WRITE32_MEMBER(aristmk5_state::sram_banksel_w)
 {
 	/*
@@ -413,8 +444,23 @@ static ADDRESS_MAP_START( aristmk5_map, AS_PROGRAM, 32, aristmk5_state )
 
 	/* MK-5 overrides */
 	AM_RANGE(0x03010420, 0x03010423) AM_WRITE(sram_banksel_w) // SRAM bank select write
+	AM_RANGE(0x03010450, 0x03010453) AM_WRITE(eeprom_w)
+	AM_RANGE(0x03010800, 0x03010803) AM_READ(eeprom_r)
 
-//  AM_RANGE(0x0301049c, 0x0301051f) AM_DEVREADWRITE_LEGACY("eeprom", eeprom_r, eeprom_w) // eeprom ???
+	AM_RANGE(0x03010580, 0x03010583) AM_READ_PORT("P3")
+	AM_RANGE(0x03012000, 0x03012003) AM_READ_PORT("P1")
+	AM_RANGE(0x03012010, 0x03012013) AM_READ_PORT("P2")
+	AM_RANGE(0x03012200, 0x03012203) AM_READ_PORT("DSW1")
+	AM_RANGE(0x03012210, 0x03012213) AM_READ_PORT("DSW2")
+
+	AM_RANGE(0x03010480, 0x0301049f) AM_DEVREADWRITE8("uart_0a", ins8250_uart_device, ins8250_r, ins8250_w, 0x000000ff)
+	AM_RANGE(0x03010500, 0x0301051f) AM_DEVREADWRITE8("uart_0b", ins8250_uart_device, ins8250_r, ins8250_w, 0x000000ff)
+	AM_RANGE(0x03010600, 0x0301061f) AM_DEVREADWRITE8("uart_1a", ins8250_uart_device, ins8250_r, ins8250_w, 0x000000ff)
+	AM_RANGE(0x03010680, 0x0301069f) AM_DEVREADWRITE8("uart_1b", ins8250_uart_device, ins8250_r, ins8250_w, 0x000000ff)
+	AM_RANGE(0x03012100, 0x0301211f) AM_DEVREADWRITE8("uart_2a", ins8250_uart_device, ins8250_r, ins8250_w, 0x000000ff)
+	AM_RANGE(0x03012140, 0x0301215f) AM_DEVREADWRITE8("uart_2b", ins8250_uart_device, ins8250_r, ins8250_w, 0x000000ff)
+	AM_RANGE(0x03012300, 0x0301231f) AM_DEVREADWRITE8("uart_3a", ins8250_uart_device, ins8250_r, ins8250_w, 0x000000ff)
+	AM_RANGE(0x03012340, 0x0301235f) AM_DEVREADWRITE8("uart_3b", ins8250_uart_device, ins8250_r, ins8250_w, 0x000000ff)
 
 	AM_RANGE(0x03010810, 0x03010813) AM_DEVREADWRITE("watchdog", watchdog_timer_device, reset32_r, reset32_w) //MK-5 specific, watchdog
 //  System Startup Code Enabled protection appears to be located at 0x3010400 - 0x30104ff
@@ -439,8 +485,23 @@ static ADDRESS_MAP_START( aristmk5_drame_map, AS_PROGRAM, 32, aristmk5_state )
 
 	/* MK-5 overrides */
 	AM_RANGE(0x03010420, 0x03010423) AM_WRITE(sram_banksel_w) // SRAM bank select write
+	AM_RANGE(0x03010450, 0x03010453) AM_WRITE(eeprom_w)
+	AM_RANGE(0x03010800, 0x03010803) AM_READ(eeprom_r)
 
-//  AM_RANGE(0x0301049c, 0x0301051f) AM_DEVREADWRITE_LEGACY("eeprom", eeprom_r, eeprom_w) // eeprom ???
+	AM_RANGE(0x03010580, 0x03010583) AM_READ_PORT("P3")
+	AM_RANGE(0x03012000, 0x03012003) AM_READ_PORT("P1")
+	AM_RANGE(0x03012010, 0x03012013) AM_READ_PORT("P2")
+	AM_RANGE(0x03012200, 0x03012203) AM_READ_PORT("DSW1")
+	AM_RANGE(0x03012210, 0x03012213) AM_READ_PORT("DSW2")
+
+	AM_RANGE(0x03010480, 0x0301049f) AM_DEVREADWRITE8("uart_0a", ins8250_uart_device, ins8250_r, ins8250_w, 0x000000ff)
+	AM_RANGE(0x03010500, 0x0301051f) AM_DEVREADWRITE8("uart_0b", ins8250_uart_device, ins8250_r, ins8250_w, 0x000000ff)
+	AM_RANGE(0x03010600, 0x0301061f) AM_DEVREADWRITE8("uart_1a", ins8250_uart_device, ins8250_r, ins8250_w, 0x000000ff)
+	AM_RANGE(0x03010680, 0x0301069f) AM_DEVREADWRITE8("uart_1b", ins8250_uart_device, ins8250_r, ins8250_w, 0x000000ff)
+	AM_RANGE(0x03012100, 0x0301211f) AM_DEVREADWRITE8("uart_2a", ins8250_uart_device, ins8250_r, ins8250_w, 0x000000ff)
+	AM_RANGE(0x03012140, 0x0301215f) AM_DEVREADWRITE8("uart_2b", ins8250_uart_device, ins8250_r, ins8250_w, 0x000000ff)
+	AM_RANGE(0x03012300, 0x0301231f) AM_DEVREADWRITE8("uart_3a", ins8250_uart_device, ins8250_r, ins8250_w, 0x000000ff)
+	AM_RANGE(0x03012340, 0x0301235f) AM_DEVREADWRITE8("uart_3b", ins8250_uart_device, ins8250_r, ins8250_w, 0x000000ff)
 
 	AM_RANGE(0x03010810, 0x03010813) AM_DEVREADWRITE("watchdog", watchdog_timer_device, reset32_r, reset32_w) //MK-5 specific, watchdog
 //  System Startup Code Enabled protection appears to be located at 0x3010400 - 0x30104ff
@@ -468,6 +529,56 @@ static INPUT_PORTS_START( aristmk5 )
 	PORT_CONFSETTING(    0x01, "Set Chip v4.4 Mode" )
 	PORT_CONFSETTING(    0x02, "Clear Chip Mode" )
 	PORT_CONFSETTING(    0x03, "Game Mode" )
+
+	PORT_START("DSW1")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSW1:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSW1:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DSW1:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DSW1:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "DSW1:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "DSW1:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "DSW1:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DSW1:8")
+
+	PORT_START("DSW2")
+	PORT_DIPUNKNOWN_DIPLOC(0x01, 0x01, "DSW2:1")
+	PORT_DIPUNKNOWN_DIPLOC(0x02, 0x02, "DSW2:2")
+	PORT_DIPUNKNOWN_DIPLOC(0x04, 0x04, "DSW2:3")
+	PORT_DIPUNKNOWN_DIPLOC(0x08, 0x08, "DSW2:4")
+	PORT_DIPUNKNOWN_DIPLOC(0x10, 0x10, "DSW2:5")
+	PORT_DIPUNKNOWN_DIPLOC(0x20, 0x20, "DSW2:6")
+	PORT_DIPUNKNOWN_DIPLOC(0x40, 0x40, "DSW2:7")
+	PORT_DIPUNKNOWN_DIPLOC(0x80, 0x80, "DSW2:8")
+
+	PORT_START("P1")
+	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_Q)
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_W)
+	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_E)
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_R)
+	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_T)
+	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_Y)
+	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_U)
+	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_I)
+
+	PORT_START("P2")
+	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_A)
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_S)
+	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_D)
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_F)
+	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_G)
+	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_H)
+	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_J)
+	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_K)
+
+	PORT_START("P3")
+	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_Z)
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_X)
+	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_C)
+	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_SERVICE)
+	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_V)
+	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_B)   // Bill acceptor door
+	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_N)   // Main door
+	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_M)   // Cashbox door
 INPUT_PORTS_END
 
 DRIVER_INIT_MEMBER(aristmk5_state,aristmk5)
@@ -545,6 +656,33 @@ static MACHINE_CONFIG_START( aristmk5, aristmk5_state )
 
 	MCFG_PALETTE_ADD("palette", 0x200)
 
+	MCFG_EEPROM_SERIAL_93C56_ADD("eeprom0")
+	MCFG_EEPROM_SERIAL_93C56_ADD("eeprom1")
+
+	// TL16C452FN U71
+	MCFG_DEVICE_ADD("uart_0a", NS16450, MASTER_CLOCK / 9)
+//	MCFG_INS8250_OUT_INT_CB(WRITELINE(aristmk5_state, uart_irq_callback))
+	MCFG_DEVICE_ADD("uart_0b", NS16450, MASTER_CLOCK / 9)
+//	MCFG_INS8250_OUT_INT_CB(WRITELINE(aristmk5_state, uart_irq_callback))
+
+	// TL16C452FN U72
+	MCFG_DEVICE_ADD("uart_1a", NS16450, MASTER_CLOCK / 9)
+//	MCFG_INS8250_OUT_INT_CB(WRITELINE(aristmk5_state, uart_irq_callback))
+	MCFG_DEVICE_ADD("uart_1b", NS16450, MASTER_CLOCK / 9)
+//	MCFG_INS8250_OUT_INT_CB(WRITELINE(aristmk5_state, uart_irq_callback))
+
+	// COMM port 4 - 5
+	MCFG_DEVICE_ADD("uart_2a", NS16450, MASTER_CLOCK / 9)
+//	MCFG_INS8250_OUT_INT_CB(WRITELINE(aristmk5_state, uart_irq_callback))
+	MCFG_DEVICE_ADD("uart_2b", NS16450, MASTER_CLOCK / 9)
+//	MCFG_INS8250_OUT_INT_CB(WRITELINE(aristmk5_state, uart_irq_callback))
+
+	// COMM port 6 - 7
+	MCFG_DEVICE_ADD("uart_3a", NS16450, MASTER_CLOCK / 9)
+//	MCFG_INS8250_OUT_INT_CB(WRITELINE(aristmk5_state, uart_irq_callback))
+	MCFG_DEVICE_ADD("uart_3b", NS16450, MASTER_CLOCK / 9)
+//	MCFG_INS8250_OUT_INT_CB(WRITELINE(aristmk5_state, uart_irq_callback))
+
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac0", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
 	MCFG_SOUND_ADD("dac1", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
@@ -587,6 +725,33 @@ static MACHINE_CONFIG_START( aristmk5_usa, aristmk5_state )
 
 	MCFG_PALETTE_ADD("palette", 0x200)
 
+	MCFG_EEPROM_SERIAL_93C56_ADD("eeprom0")        
+	MCFG_EEPROM_SERIAL_93C56_ADD("eeprom1")        
+
+	// TL16C452FN U71
+	MCFG_DEVICE_ADD("uart_0a", NS16450, MASTER_CLOCK / 9)
+//	MCFG_INS8250_OUT_INT_CB(WRITELINE(aristmk5_state, uart_irq_callback))
+	MCFG_DEVICE_ADD("uart_0b", NS16450, MASTER_CLOCK / 9)
+//	MCFG_INS8250_OUT_INT_CB(WRITELINE(aristmk5_state, uart_irq_callback))
+
+	// TL16C452FN U72
+	MCFG_DEVICE_ADD("uart_1a", NS16450, MASTER_CLOCK / 9)
+//	MCFG_INS8250_OUT_INT_CB(WRITELINE(aristmk5_state, uart_irq_callback))
+	MCFG_DEVICE_ADD("uart_1b", NS16450, MASTER_CLOCK / 9)
+//	MCFG_INS8250_OUT_INT_CB(WRITELINE(aristmk5_state, uart_irq_callback))
+
+	// COMM port 4 - 5
+	MCFG_DEVICE_ADD("uart_2a", NS16450, MASTER_CLOCK / 9)
+//	MCFG_INS8250_OUT_INT_CB(WRITELINE(aristmk5_state, uart_irq_callback))
+	MCFG_DEVICE_ADD("uart_2b", NS16450, MASTER_CLOCK / 9)
+//	MCFG_INS8250_OUT_INT_CB(WRITELINE(aristmk5_state, uart_irq_callback))
+
+	// COMM port 6 - 7
+	MCFG_DEVICE_ADD("uart_3a", NS16450, MASTER_CLOCK / 9)
+//	MCFG_INS8250_OUT_INT_CB(WRITELINE(aristmk5_state, uart_irq_callback))
+	MCFG_DEVICE_ADD("uart_3b", NS16450, MASTER_CLOCK / 9)
+//	MCFG_INS8250_OUT_INT_CB(WRITELINE(aristmk5_state, uart_irq_callback))
+
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac0", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
 	MCFG_SOUND_ADD("dac1", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
@@ -624,7 +789,9 @@ MACHINE_CONFIG_END
 	ROM_REGION( 0x600, "gals", 0 ) \
 	ROM_LOAD( "a562837.u36",  0x000000, 0x000157, CRC(1f269234) SHA1(29940dd50fb55c632935f62ff44ca724379c7a43) ) \
 	ROM_LOAD( "a562838.u65",  0x000200, 0x000157, CRC(f2f3c40a) SHA1(b795dfa5cc4e8127c3f3a0906664910d1325ec92) ) \
-	ROM_LOAD( "a562840.u22",  0x000400, 0x000157, CRC(941d4cdb) SHA1(1ca091fba69e92f262dbb3d40f515703c8981793) )
+	ROM_LOAD( "a562840.u22",  0x000400, 0x000157, CRC(941d4cdb) SHA1(1ca091fba69e92f262dbb3d40f515703c8981793) ) \
+	ROM_REGION16_BE( 0x100, "eeprom0", ROMREGION_ERASEFF ) \
+	ROM_REGION16_BE( 0x100, "eeprom1", ROMREGION_ERASEFF ) \
 
 ROM_START( aristmk5 )
 	ARISTOCRAT_MK5_BIOS
