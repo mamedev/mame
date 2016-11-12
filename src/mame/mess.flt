@@ -507,6 +507,7 @@ rd100.cpp
 rd110.cpp
 replicator.cpp
 rex6000.cpp
+risc2500.cpp
 riscpc.cpp
 rm380z.cpp
 rmnimbus.cpp
