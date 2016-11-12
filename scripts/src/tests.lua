@@ -21,6 +21,49 @@ project("mametests")
 		targetdir(MAME_DIR)
 	end
 
+	configuration { "x64", "Release" }
+		targetsuffix "64"
+		if _OPTIONS["PROFILE"] then
+			targetsuffix "64p"
+		end
+
+	configuration { "x64", "Debug" }
+		targetsuffix "64d"
+		if _OPTIONS["PROFILE"] then
+			targetsuffix "64dp"
+		end
+
+	configuration { "x32", "Release" }
+		targetsuffix ""
+		if _OPTIONS["PROFILE"] then
+			targetsuffix "p"
+		end
+
+	configuration { "x32", "Debug" }
+		targetsuffix "d"
+		if _OPTIONS["PROFILE"] then
+			targetsuffix "dp"
+		end
+
+	configuration { "Native", "Release" }
+		targetsuffix ""
+		if _OPTIONS["PROFILE"] then
+			targetsuffix "p"
+		end
+
+	configuration { "Native", "Debug" }
+		targetsuffix "d"
+		if _OPTIONS["PROFILE"] then
+			targetsuffix "dp"
+		end
+
+	configuration { "mingw*" or "vs*" }
+		targetextension ".exe"
+
+	configuration { "rpi" }
+		targetextension ""
+
+	
 	configuration { }
 
 	links {
@@ -42,6 +85,7 @@ project("mametests")
 	files {
 		MAME_DIR .. "tests/main.cpp",
 		MAME_DIR .. "tests/lib/util/corestr.cpp",
+		MAME_DIR .. "tests/lib/util/options.cpp",
 		MAME_DIR .. "tests/emu/attotime.cpp",
 	}
 

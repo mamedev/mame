@@ -5,29 +5,39 @@
 TEST_CASE("String make upper", "[util]")
 {
    std::string value = "test";
-   REQUIRE("TEST" == strmakeupper(value));
+   REQUIRE(strmakeupper(value) == "TEST");
 }
 
 TEST_CASE("String make lower", "[util]")
 {
    std::string value = "ValUE";
-   REQUIRE("value" == strmakelower(value));
+   REQUIRE(strmakelower(value) == "value");
 }
 
 TEST_CASE("String replace", "[util]")
 {
    std::string value = "Main string";
-   REQUIRE(1 == strreplace(value,"str","aaa"));
-   REQUIRE("Main aaaing" == value);
-   REQUIRE(4 == strreplace(value,"a","b"));
+   REQUIRE(strreplace(value,"str","aaa") == 1);
+   REQUIRE(value == "Main aaaing");
+   REQUIRE(strreplace(value,"a","b") == 4);
 }
 
-TEST_CASE("String trimming", "[util]")
+TEST_CASE("String replace counting", "[util]")
+{
+   std::string value = "Main aaaing";
+   REQUIRE(strreplace(value,"a","b") == 4);
+}
+
+TEST_CASE("String trimming spaces", "[util]")
 {
    std::string value = "    a value  for test  ";
-   REQUIRE("a value  for test" == strtrimspace(value));
-   value = "\r\n\ta value  for test\r\n\n\r";
-   REQUIRE("a value  for test" == strtrimspace(value));
+   REQUIRE(strtrimspace(value) == "a value  for test");
+}
+
+TEST_CASE("String trimming all special", "[util]")
+{
+   std::string value = "\r\n\ta value  for test\r\n\n\r";
+   REQUIRE(strtrimspace(value) == "a value  for test");
 }
 
 TEST_CASE("String replace chars", "[util]")
@@ -37,7 +47,7 @@ TEST_CASE("String replace chars", "[util]")
    strreplacechr(value,'e','E');
    strreplacechr(value,'i','I');
    strreplacechr(value,'o','O');
-   REQUIRE("StrIng fOr dOIng rEplAcEs" == value);
+   REQUIRE(value == "StrIng fOr dOIng rEplAcEs");
 }
 
 TEST_CASE("String delete char", "[util]")
@@ -47,6 +57,6 @@ TEST_CASE("String delete char", "[util]")
    strdelchr(value,'e');
    strdelchr(value,'i');
    strdelchr(value,'o');
-   REQUIRE("Strng fr dng dlts" == value);
+   REQUIRE(value == "Strng fr dng dlts");
 }
 
