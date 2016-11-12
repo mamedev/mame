@@ -110,7 +110,7 @@ static char* decode_param(uint16_t opcode, int param, char* buffer)
 }
 
 
-CPU_DISASSEMBLE(e0c6200)
+static offs_t internal_disasm_e0c6200(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
 {
 	uint16_t op = (oprom[1] | oprom[0] << 8) & 0xfff;
 
@@ -690,19 +690,28 @@ CPU_DISASSEMBLE(e0c6200)
 
 
 	// fetch mnemonic
-	char *dst = buffer;
-	dst += sprintf(dst, "%-6s", em_name[m]);
+	util::stream_format(stream, "%-6s", em_name[m]);
 
 	// fetch param(s)
 	char pbuffer[10];
 	if (p1 != -1)
 	{
-		dst += sprintf(dst, "%s", decode_param(op, p1, pbuffer));
+		util::stream_format(stream, "%s", decode_param(op, p1, pbuffer));
 		if (p2 != -1)
 		{
-			dst += sprintf(dst, ",%s", decode_param(op, p2, pbuffer));
+			util::stream_format(stream, ",%s", decode_param(op, p2, pbuffer));
 		}
 	}
 
 	return 1 | em_flags[m] | DASMFLAG_SUPPORTED;
+}
+
+
+CPU_DISASSEMBLE(e0c6200)
+{
+	std::ostringstream stream;
+	offs_t result = internal_disasm_e0c6200(device, stream, pc, oprom, opram, options);
+	std::string stream_str = stream.str();
+	strcpy(buffer, stream_str.c_str());
+	return result;
 }
