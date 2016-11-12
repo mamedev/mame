@@ -247,7 +247,7 @@ void driver_enumerator::include_all()
 	// always exclude the empty driver
 	int empty = find("___empty");
 	assert(empty != -1);
-	m_included[empty] = false;
+	m_included[empty] = 0;
 }
 
 

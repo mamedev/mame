@@ -201,7 +201,7 @@ double compute_resistor_weights(
 	}
 
 /* debug code */
-if (IS_ENABLED(VERBOSE))
+if (VERBOSE)
 {
 	osd_printf_info("compute_resistor_weights():  scaler = %15.10f\n",scale);
 	osd_printf_info("min val :%i  max val:%i  Total number of networks :%i\n", minval, maxval, networks_no );
@@ -391,7 +391,7 @@ double compute_resistor_net_outputs(
 	}
 
 /* debug code */
-if (IS_ENABLED(VERBOSE))
+if (VERBOSE)
 {
 	osd_printf_info("compute_resistor_net_outputs():  scaler = %15.10f\n",scale);
 	osd_printf_info("min val :%i  max val:%i  Total number of networks :%i\n", minval, maxval, networks_no );

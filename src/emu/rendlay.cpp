@@ -906,7 +906,7 @@ void layout_element::reel_component::draw(running_machine &machine, bitmap_argb3
 		// only render the symbol / text if it's atually in view because the code is SLOW
 		if ((endpos >= bounds.min_y) && (basey <= bounds.max_y))
 		{
-			while (true)
+			while (1)
 			{
 				width = font->string_width(ourheight / num_shown, aspect, m_stopnames[fruit].c_str());
 				if (width < bounds.width())
@@ -1064,7 +1064,7 @@ void layout_element::reel_component::draw_beltreel(running_machine &machine, bit
 		// only render the symbol / text if it's atually in view because the code is SLOW
 		if ((endpos >= bounds.min_x) && (basex <= bounds.max_x))
 		{
-			while (true)
+			while (1)
 			{
 				width = font->string_width(dest.height(), aspect, m_stopnames[fruit].c_str());
 				if (width < bounds.width())
@@ -1933,7 +1933,7 @@ void layout_element::component::draw_text(render_font &font, bitmap_argb32 &dest
 	float aspect = 1.0f;
 	int32_t width;
 
-	while (true)
+	while (1)
 	{
 		width = font.string_width(bounds.height(), aspect, str);
 		if (width < bounds.width())

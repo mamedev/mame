@@ -773,8 +773,8 @@ int device_image_interface::reopen_for_write(const std::string &path)
 		return image_error_from_file_error(filerr);
 
 	// success!
-	m_readonly = false;
-	m_created = true;
+	m_readonly = 0;
+	m_created = 1;
 	set_image_filename(revised_path);
 
 	return IMAGE_ERROR_SUCCESS;

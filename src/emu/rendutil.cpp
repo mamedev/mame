@@ -265,7 +265,7 @@ static void resample_argb_bitmap_bilinear(uint32_t *dest, uint32_t drowpixels, u
 bool render_clip_line(render_bounds *bounds, const render_bounds *clip)
 {
 	/* loop until we get a final result */
-	while (true)
+	while (1)
 	{
 		uint8_t code0 = 0, code1 = 0;
 		uint8_t thiscode;

@@ -23,8 +23,8 @@ palette_device::palette_device(const machine_config &mconfig, const char *tag, d
 	: device_t(mconfig, PALETTE, "palette", tag, owner, clock, "palette", __FILE__),
 		m_entries(0),
 		m_indirect_entries(0),
-		m_enable_shadows(false),
-		m_enable_hilights(false),
+		m_enable_shadows(0),
+		m_enable_hilights(0),
 		m_membits(0),
 		m_membits_supplied(false),
 		m_endianness(),
@@ -249,7 +249,7 @@ void palette_device::set_shadow_dRGB32(int mode, int dr, int dg, int db, bool no
 	stable.db = db;
 	stable.noclip = noclip;
 
-	if (IS_ENABLED(VERBOSE))
+	if (VERBOSE)
 		popmessage("shadow %d recalc %d %d %d %02x", mode, dr, dg, db, noclip);
 
 	// regenerate the table

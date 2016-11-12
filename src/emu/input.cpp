@@ -652,7 +652,7 @@ int32_t input_manager::code_value(input_code code)
 					break;
 			}
 		}
-	} while (false);
+	} while (0);
 
 	// stop the profiler before exiting
 	g_profiler.stop();
@@ -1562,7 +1562,7 @@ void input_manager::seq_from_tokens(input_seq &seq, const char *string)
 	// loop until we're done
 	std::string strcopy = string;
 	char *str = const_cast<char *>(strcopy.c_str());
-	while (true)
+	while (1)
 	{
 		// trim any leading spaces
 		while (*str != 0 && isspace((uint8_t)*str))

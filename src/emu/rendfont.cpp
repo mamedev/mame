@@ -595,7 +595,7 @@ bool render_font::load_bdf()
 				if (strncmp(ptr, "ENCODING ", 9) == 0)
 				{
 					if (sscanf(ptr + 9, "%d", &charnum) != 1)
-						return true;
+						return 1;
 				}
 
 				// DWIDTH tells us the width to the next character
@@ -603,14 +603,14 @@ bool render_font::load_bdf()
 				{
 					int dummy1;
 					if (sscanf(ptr + 7, "%d %d", &width, &dummy1) != 2)
-						return true;
+						return 1;
 				}
 
 				// BBX tells us the height/width of the bitmap and the offsets
 				else if (strncmp(ptr, "BBX ", 4) == 0)
 				{
 					if (sscanf(ptr + 4, "%d %d %d %d", &bmwidth, &bmheight, &xoffs, &yoffs) != 4)
-						return true;
+						return 1;
 				}
 
 				// BITMAP is the start of the data

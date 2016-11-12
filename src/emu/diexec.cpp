@@ -237,7 +237,7 @@ void device_execute_interface::suspend_resume_changed()
 
 void device_execute_interface::suspend(uint32_t reason, bool eatcycles)
 {
-	if (IS_ENABLED(TEMPLOG)) printf("suspend %s (%X)\n", device().tag(), reason);
+if (TEMPLOG) printf("suspend %s (%X)\n", device().tag(), reason);
 	// set the suspend reason and eat cycles flag
 	m_nextsuspend |= reason;
 	m_nexteatcycles = eatcycles;
@@ -252,7 +252,7 @@ void device_execute_interface::suspend(uint32_t reason, bool eatcycles)
 
 void device_execute_interface::resume(uint32_t reason)
 {
-	if (IS_ENABLED(TEMPLOG)) printf("resume %s (%X)\n", device().tag(), reason);
+if (TEMPLOG) printf("resume %s (%X)\n", device().tag(), reason);
 	// clear the suspend reason and eat cycles flag
 	m_nextsuspend &= ~reason;
 	suspend_resume_changed();
@@ -614,7 +614,7 @@ int device_execute_interface::standard_irq_callback(int irqline)
 	// get the default vector and acknowledge the interrupt if needed
 	int vector = m_input[irqline].default_irq_callback();
 
-	if (IS_ENABLED(VERBOSE)) device().logerror("standard_irq_callback('%s', %d) $%04x\n", device().tag(), irqline, vector);
+	if (VERBOSE) device().logerror("standard_irq_callback('%s', %d) $%04x\n", device().tag(), irqline, vector);
 
 	// if there's a driver callback, run it to get the vector
 	if (!m_driver_irq.isnull())
@@ -754,7 +754,7 @@ void device_execute_interface::device_input::set_state_synced(int state, int vec
 {
 	LOG(("set_state_synced('%s',%d,%d,%02x)\n", m_execute->device().tag(), m_linenum, state, vector));
 
-if (IS_ENABLED(TEMPLOG)) printf("setline(%s,%d,%d,%d)\n", m_execute->device().tag(), m_linenum, state, (vector == USE_STORED_VECTOR) ? 0 : vector);
+if (TEMPLOG) printf("setline(%s,%d,%d,%d)\n", m_execute->device().tag(), m_linenum, state, (vector == USE_STORED_VECTOR) ? 0 : vector);
 	assert(state == ASSERT_LINE || state == HOLD_LINE || state == CLEAR_LINE || state == PULSE_LINE);
 
 	// treat PULSE_LINE as ASSERT+CLEAR
@@ -799,7 +799,7 @@ if (IS_ENABLED(TEMPLOG)) printf("setline(%s,%d,%d,%d)\n", m_execute->device().ta
 
 TIMER_CALLBACK_MEMBER(device_execute_interface::device_input::empty_event_queue)
 {
-if (IS_ENABLED(TEMPLOG)) printf("empty_queue(%s,%d,%d)\n", m_execute->device().tag(), m_linenum, m_qindex);
+if (TEMPLOG) printf("empty_queue(%s,%d,%d)\n", m_execute->device().tag(), m_linenum, m_qindex);
 	// loop over all events
 	for (int curevent = 0; curevent < m_qindex; curevent++)
 	{
@@ -808,7 +808,7 @@ if (IS_ENABLED(TEMPLOG)) printf("empty_queue(%s,%d,%d)\n", m_execute->device().t
 		// set the input line state and vector
 		m_curstate = input_event & 0xff;
 		m_curvector = input_event >> 8;
-if (IS_ENABLED(TEMPLOG)) printf(" (%d,%d)\n", m_curstate, m_curvector);
+if (TEMPLOG) printf(" (%d,%d)\n", m_curstate, m_curvector);
 
 		assert(m_curstate == ASSERT_LINE || m_curstate == HOLD_LINE || m_curstate == CLEAR_LINE);
 

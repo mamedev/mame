@@ -3410,7 +3410,7 @@ uint16_t address_table::derive_range(offs_t byteaddress, offs_t &bytestart, offs
 	uint16_t curl1entry = l1entry;
 	uint16_t curentry = entry;
 	bytestart = byteaddress;
-	while (true)
+	while (1)
 	{
 		// if we need to scan the subtable, do it
 		if (curentry != curl1entry)
@@ -3448,7 +3448,7 @@ uint16_t address_table::derive_range(offs_t byteaddress, offs_t &bytestart, offs
 	curl1entry = l1entry;
 	curentry = entry;
 	byteend = byteaddress;
-	while (true)
+	while (1)
 	{
 		// if we need to scan the subtable, do it
 		if (curentry != curl1entry)
@@ -3512,7 +3512,7 @@ void address_table::mask_all_handlers(offs_t mask)
 uint16_t address_table::subtable_alloc()
 {
 	// loop
-	while (true)
+	while (1)
 	{
 		// find a subtable with a usecount of 0
 		for (uint16_t subindex = 0; subindex < SUBTABLE_COUNT; subindex++)

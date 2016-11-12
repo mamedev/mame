@@ -529,7 +529,7 @@ bool debugger_commands::debug_command_parameter_command(const char *param)
 	m_console.printf("Error in command: %s\n", param);
 	m_console.printf("                  %*s^", CMDERR_ERROR_OFFSET(err), "");
 	m_console.printf("%s\n", debugger_console::cmderr_to_string(err));
-	return false;
+	return 0;
 }
 
 /*-------------------------------------------------

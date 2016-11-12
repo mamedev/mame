@@ -105,7 +105,7 @@ void output_manager::set_value(const char *outname, int32_t value)
 	/* if the value is different, signal the notifier */
 	if (oldval != value)
 	{
-		if (IS_ENABLED(OUTPUT_VERBOSE))
+		if (OUTPUT_VERBOSE)
 			machine().logerror("Output %s = %d (was %d)\n", outname, value, oldval);
 
 		/* call the local notifiers first */

@@ -783,7 +783,7 @@ void video_manager::update_throttle(attotime emutime)
 	};
 
 	// outer scope so we can break out in case of a resync
-	while (true)
+	while (1)
 	{
 		// apply speed factor to emu time
 		if (m_speed != 0 && m_speed != 1000)

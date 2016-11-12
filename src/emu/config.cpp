@@ -200,7 +200,7 @@ int configuration_manager::load_xml(emu_file &file, config_type which_type)
 		}
 
 		/* log that we are processing this entry */
-		if (IS_ENABLED(DEBUG_CONFIG))
+		if (DEBUG_CONFIG)
 			osd_printf_debug("Entry: %s -- processing\n", name);
 
 		/* loop over all registrants and call their load function */
