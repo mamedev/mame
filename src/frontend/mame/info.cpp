@@ -248,10 +248,8 @@ void info_xml_creator::output_one()
 	// allocate input ports
 	machine_config &config = m_drivlist.config();
 	ioport_list portlist;
-	std::string errors;
 	device_iterator iter(config.root_device());
-	for (device_t &device : iter)
-		portlist.append(device, errors);
+	portlist.append(iter);
 
 	// renumber player numbers for controller ports
 	int player_offset = 0;
@@ -360,11 +358,11 @@ void info_xml_creator::output_one_device(device_t &device, const char *devtag)
 	sound_interface_iterator snditer(device);
 	if (snditer.first() != nullptr)
 		has_speaker = true;
+
 	// generate input list
 	ioport_list portlist;
-	std::string errors;
-	for (device_t &dev : device_iterator(device))
-		portlist.append(dev, errors);
+	portlist.append(device_iterator(device));
+
 	// check if the device adds player inputs (other than dsw and configs) to the system
 	for (auto &port : portlist)
 		for (ioport_field &field : port.second->fields())

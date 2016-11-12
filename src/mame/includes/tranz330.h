@@ -46,6 +46,7 @@ public:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	virtual void device_append_ports(ioport_list &portlist) override;
 
 	DECLARE_WRITE_LINE_MEMBER( syncb_w );
 	DECLARE_WRITE_LINE_MEMBER(clock_w);

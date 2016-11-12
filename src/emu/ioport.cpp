@@ -317,26 +317,18 @@ u8 const inp_header::MAGIC[inp_header::OFFS_BASETIME - inp_header::OFFS_MAGIC] =
 //**************************************************************************
 
 //-------------------------------------------------
-//  append - append the given device's input ports
-//  to the current list
+//  append - append the input ports of all devices
+//  falling under the iterator
 //-------------------------------------------------
 
-void ioport_list::append(device_t &device, std::string &errorbuf)
+void ioport_list::append(const device_iterator &iter)
 {
-	// no constructor, no list
-	ioport_constructor constructor = device.input_ports();
-	if (constructor == nullptr)
-		return;
+	for (device_t &device : iter)
+		device.append_ports(*this);
 
-	// reset error buffer
-	errorbuf.clear();
-
-	// detokenize into the list
-	(*constructor)(device, *this, errorbuf);
-
-	// collapse fields and sort the list
+	// collapse and sort input fields
 	for (auto &port : *this)
-		port.second->collapse_fields(errorbuf);
+		port.second->collapse_fields();
 }
 
 
@@ -1232,7 +1224,7 @@ void ioport_field::crosshair_position(float &x, float &y, bool &gotx, bool &goty
 //  descriptions
 //-------------------------------------------------
 
-void ioport_field::expand_diplocation(const char *location, std::string &errorbuf)
+void ioport_field::expand_diplocation(const char *location)
 {
 	// if nothing present, bail
 	if (location == nullptr)
@@ -1272,7 +1264,7 @@ void ioport_field::expand_diplocation(const char *location, std::string &errorbu
 		{
 			if (lastname == nullptr)
 			{
-				errorbuf.append(string_format("Switch location '%s' missing switch name!\n", location));
+				osd_printf_error("Switch location '%s' missing switch name!\n", location);
 				lastname = (char *)"UNK";
 			}
 			name.assign(lastname);
@@ -1289,7 +1281,7 @@ void ioport_field::expand_diplocation(const char *location, std::string &errorbu
 		// now scan the switch number
 		int swnum = -1;
 		if (sscanf(number, "%d", &swnum) != 1)
-			errorbuf.append(string_format("Switch location '%s' has invalid format!\n", location));
+			osd_printf_error("Switch location '%s' has invalid format!\n", location);
 
 		// allocate a new entry
 		m_diploclist.append(*global_alloc(ioport_diplocation(name.c_str(), swnum, invert)));
@@ -1307,7 +1299,7 @@ void ioport_field::expand_diplocation(const char *location, std::string &errorbu
 	for (bits = 0, temp = m_mask; temp != 0 && bits < 32; bits++)
 		temp &= temp - 1;
 	if (bits != entries)
-		errorbuf.append(string_format("Switch location '%s' does not describe enough bits for mask %X\n", location, m_mask));
+		osd_printf_error("Switch location '%s' does not describe enough bits for mask %X\n", location, m_mask);
 }
 
 
@@ -1511,7 +1503,7 @@ void ioport_port::frame_update()
 //  wholly overlapped by other fields
 //-------------------------------------------------
 
-void ioport_port::collapse_fields(std::string &errorbuf)
+void ioport_port::collapse_fields()
 {
 	ioport_value maskbits = 0;
 	int lastmodcount = -1;
@@ -1530,7 +1522,7 @@ void ioport_port::collapse_fields(std::string &errorbuf)
 		// reinsert this field
 		ioport_field *current = field;
 		field = field->next();
-		insert_field(*current, maskbits, errorbuf);
+		insert_field(*current, maskbits);
 	}
 }
 
@@ -1540,13 +1532,13 @@ void ioport_port::collapse_fields(std::string &errorbuf)
 //  for errors
 //-------------------------------------------------
 
-void ioport_port::insert_field(ioport_field &newfield, ioport_value &disallowedbits, std::string &errorbuf)
+void ioport_port::insert_field(ioport_field &newfield, ioport_value &disallowedbits)
 {
 	// verify against the disallowed bits, but only if we are condition-free
 	if (newfield.condition().none())
 	{
 		if ((newfield.mask() & disallowedbits) != 0)
-			errorbuf.append(string_format("INPUT_TOKEN_FIELD specifies duplicate port bits (port=%s mask=%X)\n", tag(), newfield.mask()));
+			osd_printf_error("INPUT_TOKEN_FIELD specifies duplicate port bits (port=%s mask=%X)\n", tag(), newfield.mask());
 		disallowedbits |= newfield.mask();
 	}
 
@@ -1689,13 +1681,7 @@ time_t ioport_manager::initialize()
 
 	// if we have a token list, proceed
 	device_iterator iter(machine().root_device());
-	for (device_t &device : iter)
-	{
-		std::string errors;
-		m_portlist.append(device, errors);
-		if (!errors.empty())
-			osd_printf_error("Input port errors:\n%s", errors.c_str());
-	}
+	m_portlist.append(iter);
 
 	// renumber player numbers for controller ports
 	int player_offset = 0;
@@ -2938,10 +2924,9 @@ void ioport_manager::record_port(ioport_port &port)
 //  ioport_configurer - constructor
 //-------------------------------------------------
 
-ioport_configurer::ioport_configurer(device_t &owner, ioport_list &portlist, std::string &errorbuf)
+ioport_configurer::ioport_configurer(device_t &owner, ioport_list &portlist)
 	: m_owner(owner),
 		m_portlist(portlist),
-		m_errorbuf(errorbuf),
 		m_curport(nullptr),
 		m_curfield(nullptr),
 		m_cursetting(nullptr)

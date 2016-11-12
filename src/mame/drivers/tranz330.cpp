@@ -49,9 +49,9 @@ static void construct_address_map_tranz330_io(address_map &map)
 									  write8_delegate(&msm6242_device::write, "msm6242_device::write", RTC_TAG, (msm6242_device *)nullptr));
 }
 
-static void construct_ioport_tranz330(device_t &owner, ioport_list &portlist, std::string &errorbuf)
+void tranz330_state::device_append_ports(ioport_list &portlist)
 {
-	ioport_configurer configurer(owner, portlist, errorbuf);
+	ioport_configurer configurer(*this, portlist);
 
 	configurer.port_alloc("COL.0");
 	configurer.field_alloc(IPT_BUTTON1, IP_ACTIVE_LOW, 0x01).field_add_code(SEQ_TYPE_STANDARD, KEYCODE_1).field_set_name("1 QZ.");
@@ -196,4 +196,4 @@ ROM_END
 
 
 //    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     CLASS             INIT    COMPANY     FULLNAME        FLAGS
-COMP( 1985, tranz330, 0,      0,      tranz330, tranz330, driver_device,    0,     "VeriFone",  "Tranz 330",    MACHINE_CLICKABLE_ARTWORK )
+COMP( 1985, tranz330, 0,      0,      tranz330, 0,        driver_device,    0,     "VeriFone",  "Tranz 330",    MACHINE_CLICKABLE_ARTWORK )

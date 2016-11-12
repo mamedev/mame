@@ -865,13 +865,15 @@ public:
 
 	static void push(osd_output *delegate);
 	static void pop(osd_output *delegate);
-protected:
 
+protected:
+	void output_via_delegate(osd_output_channel channel, const char *format, ...) ATTR_PRINTF(3,4);
 	void chain_output(osd_output_channel channel, const char *msg, va_list args) const
 	{
 		if (m_chain != nullptr)
 			m_chain->output_callback(channel, msg, args);
 	}
+
 private:
 	osd_output *m_chain;
 };

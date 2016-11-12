@@ -215,7 +215,7 @@ public:
 	const std::vector<rom_entry> &rom_region_vector() const;
 	const rom_entry *rom_region() const { return rom_region_vector().data(); }
 	machine_config_constructor machine_config_additions() const { return device_mconfig_additions(); }
-	ioport_constructor input_ports() const { return device_input_ports(); }
+	void append_ports(ioport_list &portlist) { device_append_ports(portlist); }
 	u8 default_bios() const { return m_default_bios; }
 	u8 system_bios() const { return m_system_bios; }
 	std::string default_bios_tag() const { return m_default_bios_tag; }
@@ -316,6 +316,7 @@ protected:
 	// device-level overrides
 	virtual const tiny_rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
+	virtual void device_append_ports(ioport_list &portlist);
 	virtual ioport_constructor device_input_ports() const;
 	virtual void device_config_complete();
 	virtual void device_validity_check(validity_checker &valid) const ATTR_COLD;
