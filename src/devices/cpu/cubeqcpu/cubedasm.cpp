@@ -58,7 +58,7 @@ static const char *const dst[] =
     SOUND DISASSEMBLY HOOK
 ***************************************************************************/
 
-CPU_DISASSEMBLE( cquestsnd )
+static offs_t internal_disasm_cquestsnd(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
 {
 	static const char *const jmps[] =
 	{
@@ -103,7 +103,7 @@ CPU_DISASSEMBLE( cquestsnd )
 	int _rin    = (inslow >> 26) & 1;
 
 
-	sprintf(buffer, "%s %s %s %x,%x,%c %.2x %s %s %.2x %s %s %s %c %c %c",
+	util::stream_format(stream, "%s %s %s %x,%x,%c %02x %s %s %02x %s %s %s %c %c %c",
 			ins[i5_3],
 			src[i2_0],
 			dst[i8_6],
@@ -125,11 +125,21 @@ CPU_DISASSEMBLE( cquestsnd )
 }
 
 
+CPU_DISASSEMBLE(cquestsnd)
+{
+	std::ostringstream stream;
+	offs_t result = internal_disasm_cquestsnd(device, stream, pc, oprom, opram, options);
+	std::string stream_str = stream.str();
+	strcpy(buffer, stream_str.c_str());
+	return result;
+}
+
+
 /***************************************************************************
     ROTATE DISASSEMBLY HOOK
 ***************************************************************************/
 
-CPU_DISASSEMBLE( cquestrot )
+static offs_t internal_disasm_cquestrot(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
 {
 	static const char *const jmps[] =
 	{
@@ -204,7 +214,7 @@ CPU_DISASSEMBLE( cquestrot )
 //  int _sex    = (inslow >> 19) & 0x1;
 	int i2_0    = (inslow >> 16) & 0x7;
 
-	sprintf(buffer, "%s %s,%s %x,%x,%c %d %s %s %s %.2x",
+	util::stream_format(stream, "%s %s,%s %x,%x,%c %d %s %s %s %02x",
 			ins[i5_3],
 			src[i2_0],
 			dst[i8_6],
@@ -220,11 +230,22 @@ CPU_DISASSEMBLE( cquestrot )
 	return 1 | DASMFLAG_SUPPORTED;
 }
 
+
+CPU_DISASSEMBLE(cquestrot)
+{
+	std::ostringstream stream;
+	offs_t result = internal_disasm_cquestrot(device, stream, pc, oprom, opram, options);
+	std::string stream_str = stream.str();
+	strcpy(buffer, stream_str.c_str());
+	return result;
+}
+
+
 /***************************************************************************
     LINE DRAWER DISASSEMBLY HOOK
 ***************************************************************************/
 
-CPU_DISASSEMBLE( cquestlin )
+static offs_t internal_disasm_cquestlin(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
 {
 	static const char *const jmps[] =
 	{
@@ -288,7 +309,7 @@ CPU_DISASSEMBLE( cquestlin )
 	int _pbcs   = (inslow >> 27) & 0x1;
 	int i2_0    = (inslow >> 24) & 0x7;
 
-	sprintf(buffer, "%s %s,%s %x,%x %c %s %.2x %s %s %s %s",
+	util::stream_format(stream, "%s %s,%s %x,%x %c %s %02x %s %s %s %s",
 			ins[i5_3],
 			src[i2_0],
 			dst[i8_6],
@@ -303,4 +324,14 @@ CPU_DISASSEMBLE( cquestlin )
 			spfs[spf]);
 
 	return 1 | DASMFLAG_SUPPORTED;
+}
+
+
+CPU_DISASSEMBLE(cquestlin)
+{
+	std::ostringstream stream;
+	offs_t result = internal_disasm_cquestlin(device, stream, pc, oprom, opram, options);
+	std::string stream_str = stream.str();
+	strcpy(buffer, stream_str.c_str());
+	return result;
 }
