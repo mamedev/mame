@@ -484,7 +484,7 @@ bool ipf_format::generate_block_data(const uint8_t *data, const uint8_t *dlimit,
 			if(16*param > tleft)
 				return false;
 			track_write_weak(tpos, 16*param);
-			context = false;
+			context = 0;
 			break;
 
 		default:

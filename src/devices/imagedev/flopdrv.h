@@ -107,11 +107,11 @@ public:
 
 	virtual iodevice_t image_type() const override { return IO_FLOPPY; }
 
-	virtual bool is_readable()  const override { return true; }
-	virtual bool is_writeable() const override { return true; }
+	virtual bool is_readable()  const override { return 1; }
+	virtual bool is_writeable() const override { return 1; }
 	virtual bool is_creatable() const override;
-	virtual bool must_be_loaded() const override { return false; }
-	virtual bool is_reset_on_load() const override { return false; }
+	virtual bool must_be_loaded() const override { return 0; }
+	virtual bool is_reset_on_load() const override { return 0; }
 	virtual const char *image_interface() const override;
 	virtual const char *file_extensions() const override { return m_extension_list; }
 	virtual const util::option_guide &create_option_guide() const override { return floppy_option_guide; }

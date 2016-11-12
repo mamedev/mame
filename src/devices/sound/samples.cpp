@@ -249,8 +249,8 @@ void samples_device::device_start()
 		chan.source = nullptr;
 		chan.source_num = -1;
 		chan.step = 0;
-		chan.loop = false;
-		chan.paused = false;
+		chan.loop = 0;
+		chan.paused = 0;
 
 		// register with the save state system
 		save_item(NAME(chan.source_length), channel);

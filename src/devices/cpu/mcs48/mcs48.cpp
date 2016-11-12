@@ -954,7 +954,7 @@ void mcs48_cpu_device::device_start()
 	m_t1_history = 0;
 	m_dbbi = 0;
 	m_dbbo = 0;
-	m_irq_state = false;
+	m_irq_state = 0;
 
 	/* FIXME: Current implementation suboptimal */
 	m_ea = (m_int_rom_size ? 0 : 1);

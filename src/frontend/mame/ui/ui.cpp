@@ -672,7 +672,7 @@ void mame_ui_manager::set_show_fps(bool show)
 	m_showfps = show;
 	if (!show)
 	{
-		m_showfps = false;
+		m_showfps = 0;
 		m_showfps_end = 0;
 	}
 }
