@@ -9,7 +9,7 @@
 #include "sound_module.h"
 #include "modules/osdmodule.h"
 
-#if defined(OSD_WINDOWS)
+#if defined(OSD_WINDOWS) || defined(OSD_UWP)
 
 // standard windows headers
 #define WIN32_LEAN_AND_MEAN
