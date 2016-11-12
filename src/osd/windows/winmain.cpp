@@ -439,6 +439,7 @@ windows_options::windows_options()
 	set_default_value(OPTION_DIFF_DIRECTORY, (osd::text::from_wstring((LPCWSTR)path->Data()) + diff_directory()).c_str());
 	set_default_value(OPTION_COMMENT_DIRECTORY, (osd::text::from_wstring((LPCWSTR)path->Data()) + comment_directory()).c_str());
 
+	set_default_value(OPTION_HOMEPATH, osd::text::from_wstring((LPCWSTR)path->Data()).c_str());
 	set_default_value(OPTION_MEDIAPATH, (osd::text::from_wstring((LPCWSTR)path->Data()) + media_path()).c_str());	
 #endif
 }
