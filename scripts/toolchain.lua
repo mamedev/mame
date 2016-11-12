@@ -1032,6 +1032,85 @@ function toolchain(_buildDir, _subDir)
 	configuration { "rpi" }
 		targetdir (_buildDir .. "rpi" .. "/bin")
 		objdir (_buildDir .. "rpi" .. "/obj")
+-- BEGIN libretro overrides to MAME's GENie build
+
+	configuration { "libretro*" }
+		objdir (_buildDir .. "libretro" .. "/obj")
+
+	-- $ARCH means something to Apple/Clang, so we can't use it here.
+		-- Instead, use ARCH="" LIBRETRO_CPU="$ARCH" on the make cmdline.
+		--
+		-- NB: $ARCH has caused libretro problems before, LIBRETRO_CPU will
+		--     replace it everywhere at some point.
+		newoption {
+			trigger = "LIBRETRO_CPU",
+			description = "libretro CPU/architecture variable",
+		}
+		if _OPTIONS["LIBRETRO_CPU"]~=nil then
+			LIBRETRO_CPU=_OPTIONS["LIBRETRO_CPU"]
+		end
+
+		-- $platform we could keep using, but $LIBRETRO_OS seems safer.
+		newoption {
+			trigger = "LIBRETRO_OS",
+			description = "libretro OS/platform variable",
+		}
+		if _OPTIONS["LIBRETRO_OS"]~=nil then
+			LIBRETRO_OS=_OPTIONS["LIBRETRO_OS"]
+		end
+
+		-- Set TARGETOS based on LIBRETRO_OS if we know
+		if LIBRETRO_OS~=nil then
+			-- most things are "linux" (ish).
+			local targetos = "linux"
+			if LIBRETRO_OS=="osx" then
+				targetos = "macosx"
+			elseif LIBRETRO_OS:sub(1, 4)=="armv" then
+				targetos = "android"
+                        elseif LIBRETRO_OS=="ios" then
+				targetos = "ios"
+                        elseif LIBRETRO_OS=="win32" then
+				targetos = "win32"
+			end
+			_OPTIONS["TARGETOS"] = targetos
+		end
+
+		-- FIXME: set BIGENDIAN and dynarec based on retro_platform/retro_arch
+		if LIBRETRO_CPU~=nil then
+			if LIBRETRO_CPU=="x86_64" or LIBRETRO_CPU=="ppc64" then
+				defines { "PTR64=1" }
+			end
+		end
+
+
+		-- MS and Apple don't need -fPIC, but pretty much everything else does.
+		if _OPTIONS["targetos"] ~= "windows" and _OPTIONS["targetos"] ~= "macosx" then
+			buildoptions { "-fPIC" }
+			linkoptions { "-fPIC" }
+		end
+
+		-- Don't use BGFX (Defaults to 1 for Windows if unset)
+		 USE_BGFX = 0
+-- _OPTIONS["USE_BGFX"] = "1"
+		-- libretro only supports the retro OSD
+		_OPTIONS["osd"] = "retro"
+
+		-- libretro does not (yet) support MIDI.
+		_OPTIONS["NO_USE_MIDI"] = "1"
+
+	configuration { "libretrodbg" }
+		targetdir (_buildDir .. "libretro"  .. "/debug")
+		flags {
+			"Symbols",
+		}
+	configuration { "libretro" }
+		targetdir (_buildDir .. "libretro" .. "/bin")
+		flags {
+			"Optimize",
+		}
+
+
+-- END   libretro overrides to MAME's GENie build
 
 	configuration {} -- reset configuration
 

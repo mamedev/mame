@@ -439,6 +439,10 @@ end
 configurations {
 	"Debug",
 	"Release",
+	-- BEGIN libretro overrides to MAME's GENie build
+	"libretrodbg",
+	"libretro",
+	-- END libretro overrides to MAME's GENie build
 }
 
 if _ACTION == "xcode4" then
@@ -489,10 +493,14 @@ if string.sub(_ACTION,1,4) == "vs20" and _OPTIONS["osd"]=="sdl" then
 	end
 end
 -- Build SDL2 for Android
+if _OPTIONS["osd"] == "retro" then
+-- RETRO HACK no sdl for libretro android
+else
 if _OPTIONS["targetos"] == "android" then
 	_OPTIONS["with-bundled-sdl2"] = "1"
 end
-
+end
+-- RETRO HACK END no sdl for libretro android
 configuration {}
 
 if _OPTIONS["osd"] == "uwp" then
@@ -528,6 +536,18 @@ configuration { "gmake or ninja" }
 	}
 
 dofile ("toolchain.lua")
+
+-- RETRO HACK
+if _OPTIONS["osd"]=="retro" then
+	buildoptions {
+		"-fPIC",
+	}
+	
+	defines {
+		"__LIBRETRO__",
+	}
+end
+-- RETRO HACK
 
 if _OPTIONS["targetos"]=="windows" then
 	configuration { "x64" }
