@@ -1550,7 +1550,7 @@ void lua_engine::initialize()
 
 	sol().new_usertype<mame_ui_manager>("ui", "new", sol::no_constructor,
 			"is_menu_active", &mame_ui_manager::is_menu_active,
-			"options", [](mame_ui_manager &m) { return static_cast<core_options &>(m.options()); },
+			"options", [](mame_ui_manager &m) { return static_cast<core_options *>(&m.options()); },
 			"show_fps", sol::property(&mame_ui_manager::show_fps, &mame_ui_manager::set_show_fps),
 			"show_profiler", sol::property(&mame_ui_manager::show_profiler, &mame_ui_manager::set_show_profiler),
 			"single_step", sol::property(&mame_ui_manager::single_step, &mame_ui_manager::set_single_step),
