@@ -264,7 +264,7 @@ WRITE8_MEMBER(amusco_state::output_b_w)
 /* Lamps and counters from port B
 
   7654 3210
-  ---- --x-  Unknown lamp (lits when all holds/disc are ON).
+  ---- --x-  Unknown lamp (lits when all holds/disc are ON. Could be a Cancel lamp in an inverted Hold system).
   ---- -x--  Start/Draw lamp.
   ---x ----  Coin counter.
   xxx- x--x  Unknown.
