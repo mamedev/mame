@@ -168,7 +168,7 @@ protected:
 	void init_generic(segas16b_rom_board rom_board);
 
 	// i8751 simulations
-	void altbeast_common_i8751_sim(offs_t soundoffs, offs_t inputoffs);
+	void altbeast_common_i8751_sim(offs_t soundoffs, offs_t inputoffs, int alt_bank);
 	void altbeasj_i8751_sim();
 	void altbeas5_i8751_sim();
 	void altbeast_i8751_sim();
