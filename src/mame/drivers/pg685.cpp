@@ -105,13 +105,17 @@ Memory: 		54x 64KBit RAM, 18 empty sockets, 9 bit and 4 bit wire straps
 
 #include "emu.h"
 #include "cpu/nec/nec.h"
-//#include "cpu/i86/i86.h"
 #include "cpu/i86/i286.h"
 #include "video/mc6845.h"
+#include "machine/i8251.h"
+#include "machine/i8255.h"
+#include "machine/i8279.h"
+#include "machine/mc2661.h"
 #include "machine/mm58167.h"
-
-#define CRTC_TAG "crtc"
-#define RTC_TAG "rtc"
+#include "machine/pic8259.h"
+#include "machine/pit8253.h"
+#include "machine/wd_fdc.h"
+#include "machine/wd2010.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -148,9 +152,22 @@ static ADDRESS_MAP_START(pg685_mem, AS_PROGRAM, 8, pg685_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000,0xbffff) AM_RAM
 	AM_RANGE(0xf0000,0xf1fff) AM_RAM
-	AM_RANGE(0xf9f02,0xf9f02) AM_DEVREADWRITE(CRTC_TAG, mc6845_device, status_r, address_w)
-    AM_RANGE(0xf9f03,0xf9f03) AM_DEVREADWRITE(CRTC_TAG, mc6845_device, register_r, register_w)
-    AM_RANGE(0xf9f40,0xf9f5f) AM_DEVREADWRITE(RTC_TAG, mm58167_device, read, write)
+	AM_RANGE(0xf9f00, 0xf9f01) AM_DEVREADWRITE("kbdc", i8279_device, read, write)
+	AM_RANGE(0xf9f02, 0xf9f02) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
+	AM_RANGE(0xf9f03, 0xf9f03) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
+	AM_RANGE(0xf9f06, 0xf9f07) AM_DEVREADWRITE("mainpic", pic8259_device, read, write)
+	AM_RANGE(0xf9f08, 0xf9f08) AM_DEVREADWRITE("mainuart", i8251_device, data_r, data_w)
+	AM_RANGE(0xf9f09, 0xf9f09) AM_DEVREADWRITE("mainuart", i8251_device, status_r, control_w)
+	AM_RANGE(0xf9f20, 0xf9f23) AM_DEVREADWRITE("fdc", wd2797_t, read, write)
+	AM_RANGE(0xf9f28, 0xf9f2b) AM_DEVREADWRITE("modppi1", i8255_device, read, write)
+	AM_RANGE(0xf9f2c, 0xf9f2f) AM_DEVREADWRITE("modppi2", i8255_device, read, write)
+	AM_RANGE(0xf9f30, 0xf9f30) AM_DEVREADWRITE("moduart", i8251_device, data_r, data_w)
+	AM_RANGE(0xf9f31, 0xf9f31) AM_DEVREADWRITE("moduart", i8251_device, status_r, control_w)
+	AM_RANGE(0xf9f34, 0xf9f37) AM_DEVREADWRITE("bppit", pit8253_device, read, write)
+	AM_RANGE(0xf9f38, 0xf9f3b) AM_DEVREADWRITE("bpuart", mc2661_device, read, write)
+	AM_RANGE(0xf9f3c, 0xf9f3d) AM_DEVREADWRITE("bppic", pic8259_device, read, write)
+	AM_RANGE(0xf9f40, 0xf9f5f) AM_DEVREADWRITE("rtc", mm58167_device, read, write)
+	AM_RANGE(0xf9f70, 0xf9f77) AM_DEVREADWRITE("hdc", wd2010_device, read, write)
 	AM_RANGE(0xfa000,0xfa7ff) AM_RAM AM_SHARE ("charcopy")
 	AM_RANGE(0xfb000,0xfb7ff) AM_RAM AM_SHARE ("framebuffer")
 	AM_RANGE(0xfc000,0xfffff) AM_ROM AM_REGION("bios", 0)
@@ -161,8 +178,22 @@ static ADDRESS_MAP_START(pg685oua12_mem, AS_PROGRAM, 16, pg685_state)
 	AM_RANGE(0x00000,0xdffff) AM_RAM
 	AM_RANGE(0xe0000,0xeffff) AM_RAM AM_SHARE ("framebuffer16")
 	AM_RANGE(0xf0000,0xf1fff) AM_RAM
-	AM_RANGE(0xf9f80,0xf9f81) AM_DEVREADWRITE8(CRTC_TAG, mc6845_device, status_r, address_w, 0x00ff)
-    AM_RANGE(0xf9f80,0xf9f81) AM_DEVREADWRITE8(CRTC_TAG, mc6845_device, register_r, register_w, 0xff00)
+	AM_RANGE(0xf9f00, 0xf9f01) AM_DEVREADWRITE8("kbdc", i8279_device, read, write, 0xffff)
+	AM_RANGE(0xf9f06, 0xf9f07) AM_DEVREADWRITE8("mainpic", pic8259_device, read, write, 0xffff)
+	AM_RANGE(0xf9f08, 0xf9f09) AM_DEVREADWRITE8("mainuart", i8251_device, data_r, data_w, 0x00ff)
+	AM_RANGE(0xf9f08, 0xf9f09) AM_DEVREADWRITE8("mainuart", i8251_device, status_r, control_w, 0xff00)
+	AM_RANGE(0xf9f20, 0xf9f23) AM_DEVREADWRITE8("fdc", wd2797_t, read, write, 0xffff)
+	AM_RANGE(0xf9f28, 0xf9f2b) AM_DEVREADWRITE8("modppi1", i8255_device, read, write, 0xffff)
+	AM_RANGE(0xf9f2c, 0xf9f2f) AM_DEVREADWRITE8("modppi2", i8255_device, read, write, 0xffff)
+	AM_RANGE(0xf9f30, 0xf9f31) AM_DEVREADWRITE8("moduart", i8251_device, data_r, data_w, 0x00ff)
+	AM_RANGE(0xf9f30, 0xf9f31) AM_DEVREADWRITE8("moduart", i8251_device, status_r, control_w, 0xff00)
+	AM_RANGE(0xf9f34, 0xf9f37) AM_DEVREADWRITE8("bppit", pit8253_device, read, write, 0xffff)
+	AM_RANGE(0xf9f38, 0xf9f3b) AM_DEVREADWRITE8("bpuart", mc2661_device, read, write, 0xffff)
+	AM_RANGE(0xf9f3c, 0xf9f3d) AM_DEVREADWRITE8("bppic", pic8259_device, read, write, 0xffff)
+	AM_RANGE(0xf9f40, 0xf9f5f) AM_DEVREADWRITE8("rtc", mm58167_device, read, write, 0xffff)
+	AM_RANGE(0xf9f70, 0xf9f77) AM_DEVREADWRITE8("hdc", wd2010_device, read, write, 0xffff)
+	AM_RANGE(0xf9f80, 0xf9f81) AM_DEVREADWRITE8("crtc", mc6845_device, status_r, address_w, 0x00ff)
+	AM_RANGE(0xf9f80, 0xf9f81) AM_DEVREADWRITE8("crtc", mc6845_device, register_r, register_w, 0xff00)
 	AM_RANGE(0xfc000,0xfffff) AM_RAM	// BIOS RAM shadow
 	AM_RANGE(0xffc000,0xffffff) AM_ROM AM_REGION("bios", 0)
 ADDRESS_MAP_END
@@ -255,10 +286,33 @@ MC6845_UPDATE_ROW( pg685_state::crtc_update_row_oua12 )
 //  MACHINE DRIVERS
 //**************************************************************************
 
+static MACHINE_CONFIG_FRAGMENT(pg685_backplane)
+	MCFG_DEVICE_ADD("bppit", PIT8253, 0)
+
+	MCFG_PIC8259_ADD("bppic", NOOP, VCC, NOOP) // ???
+
+	MCFG_DEVICE_ADD("bpuart", MC2661, XTAL_4_9152MHz) // internal clock
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_FRAGMENT(pg685_module)
+	MCFG_DEVICE_ADD("fdc", WD2797, XTAL_4MHz / 2) // divider guessed
+	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE("mainpic", pic8259_device, ir4_w))
+
+	MCFG_DEVICE_ADD("modppi1", I8255, 0)
+	MCFG_DEVICE_ADD("modppi2", I8255, 0)
+
+	MCFG_DEVICE_ADD("moduart", I8251, XTAL_4MHz / 2) // divider guessed
+
+	MCFG_DEVICE_ADD("rtc", MM58167, XTAL_32_768kHz)
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_START( pg685, pg685_state )
 	// main cpu
 	MCFG_CPU_ADD("maincpu", V20, XTAL_15MHz / 3)
 	MCFG_CPU_PROGRAM_MAP(pg685_mem)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mainpic", pic8259_device, inta_cb)
+
+	MCFG_PIC8259_ADD("mainpic", INPUTLINE("maincpu", 0), VCC, NOOP)
 
 	// i/o cpu
 
@@ -267,35 +321,43 @@ static MACHINE_CONFIG_START( pg685, pg685_state )
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(12288000, 882, 0, 720, 370, 0, 350 ) // not real values
-	MCFG_SCREEN_UPDATE_DEVICE( CRTC_TAG, mc6845_device, screen_update )
+	MCFG_SCREEN_UPDATE_DEVICE( "crtc", mc6845_device, screen_update )
 
-	MCFG_MC6845_ADD(CRTC_TAG, MC6845, "screen", 12288000)
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", 12288000)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(pg685_state, crtc_update_row)
-
-	// RTC
-	MCFG_DEVICE_ADD(RTC_TAG, MM58167, XTAL_32_768kHz)
 	
 	// sound hardware
 
 	// devices
+	MCFG_FRAGMENT_ADD(pg685_backplane)
+	MCFG_FRAGMENT_ADD(pg685_module)
+
+	MCFG_DEVICE_ADD("mainuart", I8251, XTAL_12_288MHz / 6) // divider guessed
 
 	// rs232 port
 
 	// keyboard
+	MCFG_DEVICE_ADD("kbdc", I8279, XTAL_12_288MHz / 6) // divider guessed
+	MCFG_I8279_OUT_IRQ_CB(DEVWRITELINE("mainpic", pic8259_device, ir0_w))
 
 	// printer
 
 	// floppy
 
 	// harddisk
+	MCFG_DEVICE_ADD("hdc", WD2010, XTAL_10MHz / 2) // divider guessed
+	MCFG_WD2010_OUT_INTRQ_CB(DEVWRITELINE("mainpic", pic8259_device, ir3_w))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( pg685oua12, pg685_state )
 	// main cpu
 	MCFG_CPU_ADD("maincpu", I80286, XTAL_20MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(pg685oua12_mem)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mainpic", pic8259_device, inta_cb)
+
+	MCFG_PIC8259_ADD("mainpic", INPUTLINE("maincpu", 0), VCC, NOOP)
 
 	// i/o cpu
 
@@ -304,9 +366,9 @@ static MACHINE_CONFIG_START( pg685oua12, pg685_state )
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(12288000, 882, 0, 720, 370, 0, 350 ) // not real values
-	MCFG_SCREEN_UPDATE_DEVICE( CRTC_TAG, mc6845_device, screen_update )
+	MCFG_SCREEN_UPDATE_DEVICE( "crtc", mc6845_device, screen_update )
 
-	MCFG_MC6845_ADD(CRTC_TAG, MC6845, "screen", 12288000)
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", 12288000)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(pg685_state, crtc_update_row_oua12)
@@ -314,16 +376,24 @@ static MACHINE_CONFIG_START( pg685oua12, pg685_state )
 	// sound hardware
 
 	// devices
+	MCFG_FRAGMENT_ADD(pg685_backplane)
+	MCFG_FRAGMENT_ADD(pg685_module)
+
+	MCFG_DEVICE_ADD("mainuart", I8251, 12288000 / 6) // wrong
 
 	// rs232 port
 
 	// keyboard
+	MCFG_DEVICE_ADD("kbdc", I8279, 12288000 / 6) // wrong
+	MCFG_I8279_OUT_IRQ_CB(DEVWRITELINE("mainpic", pic8259_device, ir0_w))
 
 	// printer
 
 	// floppy
 
 	// harddisk
+	MCFG_DEVICE_ADD("hdc", WD2010, XTAL_10MHz / 2) // divider guessed
+	MCFG_WD2010_OUT_INTRQ_CB(DEVWRITELINE("mainpic", pic8259_device, ir3_w))
 
 MACHINE_CONFIG_END
 

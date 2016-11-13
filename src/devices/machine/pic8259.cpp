@@ -369,9 +369,9 @@ WRITE8_MEMBER( pic8259_device::write )
 void pic8259_device::device_start()
 {
 	// resolve callbacks
-	m_out_int_func.resolve();
-	m_sp_en_func.resolve();
-	m_read_slave_ack_func.resolve();
+	m_out_int_func.resolve_safe();
+	m_sp_en_func.resolve_safe(1);
+	m_read_slave_ack_func.resolve_safe(0);
 
 	// Register save state items
 	save_item(NAME(m_state));
