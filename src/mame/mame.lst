@@ -12181,7 +12181,21 @@ fb01                            // 1986 FB-01
 fc100                           //
 
 @source:fccpu30.cpp
-fccpu30                         //
+fccpu30
+fccpu30x
+fccpu30xa
+fccpu30za
+fccpu30zbe
+fccpu30be8
+fccpu30be16
+fccpu30lite4
+fccpu30lite8
+fccpu30senr
+fccpu30senr501
+fccpu33
+
+//@source:fccpu40.cpp
+//fccpu40                         //
 
 @source:fcscsi.cpp
 fcscsi1                         //

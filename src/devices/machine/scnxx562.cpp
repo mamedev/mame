@@ -87,13 +87,13 @@ DONE (x) (p=partly)         NMOS         CMOS
 
 #define VERBOSE 0
 
-#define LOGPRINT(x)  do { if (VERBOSE) logerror x; } while (0)
-#define LOG(x) do {} while (0)
-#define LOGR(x)
-#define LOGTX(x)
-#define LOGRX(x)
-#define LOGSETUP(x)
-#define LOGINT(x) LOGPRINT(x)
+#define LOGPRINT(x) { do { if (VERBOSE) logerror x; } while (0); }
+#define LOG(x)		{} 
+#define LOGR(x)		{} 
+#define LOGTX(x)   	{} 
+#define LOGRX(x)	{} 
+#define LOGSETUP(x)	{} LOGPRINT(x)
+#define LOGINT(x)	{} 
 
 #if VERBOSE > 1
 #define logerror printf
@@ -824,11 +824,11 @@ void duscc_channel::device_timer(emu_timer &timer, device_timer_id id, int param
 			m_uart->m_out_trxcb_cb(m_trxc);
 		break;
 	default:
-		LOGR(("Unhandled Timer ID %d\n", id));
+		LOGR(("Unhandled Timer ID passed to device_serial_interface%d\n", id));
+		device_serial_interface::device_timer(timer, id, param, ptr);
 		break;
 	}
 	//  LOG(("%s %d\n", FUNCNAME, id));
-	device_serial_interface::device_timer(timer, id, param, ptr);
 }
 
 /*  The DUSCC 16 bit Timer
@@ -894,14 +894,12 @@ uint8_t duscc_channel::do_dusccreg_ctprh_r()
 	uint8_t ret = ((m_ctpr >> 8) & 0xff );
 	LOG(("%s(%02x)\n", FUNCNAME, ret));
 
-	//  return m_ctprh;
 	return ret;
 }
 
 void duscc_channel::do_dusccreg_ctprh_w(uint8_t data)
 {
-	LOG(("%s(%02x) -  not supported yet\n", FUNCNAME, data));
-	//  m_ctprh = data;
+	LOG(("%s(%02x)\n", FUNCNAME, data));
 	m_ctpr &= ~0x0000ff00;
 	m_ctpr |= ((data << 8) & 0x0000ff00);
 	return;
@@ -916,14 +914,12 @@ uint8_t duscc_channel::do_dusccreg_ctprl_r()
 {
 	uint8_t ret = (m_ctpr & 0xff);
 	LOG(("%s(%02x)\n", FUNCNAME, ret));
-	//  return m_ctprl;
 	return ret;
 }
 
 void duscc_channel::do_dusccreg_ctprl_w(uint8_t data)
 {
-	LOG(("%s(%02x) -  not supported yet\n", FUNCNAME, data));
-	//  m_ctprl = data;
+	LOG(("%s(%02x)\n", FUNCNAME, data));
 	m_ctpr &= ~0x000000ff;
 	m_ctpr |= (data & 0x000000ff);
 	return;
@@ -939,7 +935,6 @@ uint8_t duscc_channel::do_dusccreg_cth_r()
 {
 	uint8_t ret = ((m_ct >> 8) & 0xff );
 	LOG(("%s(%02x)\n", FUNCNAME, ret));
-
 	return ret;
 }
 
@@ -953,7 +948,6 @@ uint8_t duscc_channel::do_dusccreg_ctl_r()
 {
 	uint8_t ret = (m_ct & 0xff);
 	LOG(("%s(%02x)\n", FUNCNAME, ret));
-	//  return m_ctl;
 	return ret;
 }
 
@@ -1872,9 +1866,13 @@ void duscc_channel::do_dusccreg_omr_w(uint8_t data)
 	m_omr = data;
 	LOG(("- Tx Residual Character Length is "));
 	if ((m_omr & REG_OMR_TXRCL_MASK) == REG_OMR_TXRCL_8BIT)
+	{
 		LOG(("determined by TPR[1:0], the Transmitter Parameter Register\n"));
+	}
 	else
+	{
 		LOG(("%u bits\n", (((m_omr & REG_OMR_TXRCL_MASK) >> 5) & 0x07) + 1));
+	}
 	LOG(("- TxRDY activated by %s\n", m_omr & REG_OMR_TXRDY_ACTIVATED ? "FIFO empty" : "FIFO not full"));
 	LOG(("- RxRDY activated by %s\n", m_omr & REG_OMR_RXRDY_ACTIVATED ? "FIFO full"  : "FIFO not empty"));
 	LOG(("- GP02, if configured as output, is: %u\n", m_omr & REG_OMR_GP02 ? 0 : 1));
@@ -2279,7 +2277,7 @@ void duscc_channel::write(uint8_t data, offs_t &offset)
 {
 	int reg = (offset | m_a7) & ~0x20; // Add extended rgisters and remove the channel B bit from offset
 
-	LOGSETUP((" *  %c Reg %02x <- %02x  \n", 'A' + m_index, reg, data));
+	LOGSETUP((" *  %s%c Reg %02x <- %02x  \n", m_owner->tag(), 'A' + m_index, reg, data));
 	LOG(("\"%s\" %s: %c : Register write '%02x' -> [%02x]", m_owner->tag(), FUNCNAME, 'A' + m_index, data, reg ));
 	switch (reg)
 	{
