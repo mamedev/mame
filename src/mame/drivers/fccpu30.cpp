@@ -197,14 +197,14 @@
 #include "machine/clock.h"
 //#include "machine/timekpr.h"
 
-#define VERBOSE 0
+#define VERBOSE 2
 
-#define LOGPRINT(x)  do { if (VERBOSE) logerror x; } while (0)
-#define LOG(x) LOGPRINT(x)
-#define LOGINIT(x)
-#define LOGR(x)
-#define LOGSETUP(x)
-#define LOGINT(x) LOGPRINT(x)
+#define LOGPRINT(x)  { do { if (VERBOSE) logerror x; } while (0); }
+#define LOG(x) 		{}
+#define LOGINIT(x)	{} LOGPRINT(x)
+#define LOGR(x)		{}
+#define LOGSETUP(x)	{}
+#define LOGINT(x)	{}
 #if VERBOSE >= 2
 #define logerror printf
 #endif
@@ -318,7 +318,7 @@ INPUT_PORTS_END
 /* Start it up */
 void cpu30_state::machine_start ()
 {
-	LOG(("--->%s\n", FUNCNAME));
+	LOGINIT(("%s\n", FUNCNAME));
 
 	save_pointer (NAME (m_sysrom), sizeof(m_sysrom));
 	save_pointer (NAME (m_sysram), sizeof(m_sysram));
@@ -326,31 +326,29 @@ void cpu30_state::machine_start ()
 	/* setup ram */
 	m_maincpu->space(AS_PROGRAM).install_ram(0x08, m_ram->size() - 1, m_ram->pointer());
 
-	/* setup board ID */
-	m_board_id = 0x50;
-
 	/* Setup pointer to bootvector in ROM for bootvector handler bootvect_r */
 	m_sysrom = (uint32_t*)(memregion ("roms")->base () + 0x800000);
 }
 
 void cpu30_state::machine_reset ()
 {
-	LOG(("--->%s\n", FUNCNAME));
+	LOGINIT(("%s\n", FUNCNAME));
 
 	/* Reset pointer to bootvector in ROM for bootvector handler bootvect_r */
 	if (m_sysrom == &m_sysram[0]) /* Condition needed because memory map is not setup first time */
 		m_sysrom = (uint32_t*)(memregion ("roms")->base () + 0x800000);
 }
 
-DRIVER_INIT_MEMBER( cpu30_state, cpu30x )      { LOGINIT(("%s\n", FUNCNAME)); }
-DRIVER_INIT_MEMBER( cpu30_state, cpu30xa )     { LOGINIT(("%s\n", FUNCNAME)); }
-DRIVER_INIT_MEMBER( cpu30_state, cpu30za )     { LOGINIT(("%s\n", FUNCNAME)); }
-DRIVER_INIT_MEMBER( cpu30_state, cpu30zbe )    { LOGINIT(("%s\n", FUNCNAME)); }
-DRIVER_INIT_MEMBER( cpu30_state, cpu30be8 )    { LOGINIT(("%s\n", FUNCNAME)); }
-DRIVER_INIT_MEMBER( cpu30_state, cpu30be16 )   { LOGINIT(("%s\n", FUNCNAME)); }
-DRIVER_INIT_MEMBER( cpu30_state, cpu30lite4 )  { LOGINIT(("%s\n", FUNCNAME)); }
-DRIVER_INIT_MEMBER( cpu30_state, cpu30lite8 )  { LOGINIT(("%s\n", FUNCNAME)); }
-DRIVER_INIT_MEMBER( cpu30_state, cpu33 )  	   { LOGINIT(("%s\n", FUNCNAME)); }
+/* 																				setup board ID */
+DRIVER_INIT_MEMBER( cpu30_state, cpu30x )      { LOGINIT(("%s\n", FUNCNAME)); m_board_id = 0x50; }
+DRIVER_INIT_MEMBER( cpu30_state, cpu30xa )     { LOGINIT(("%s\n", FUNCNAME)); m_board_id = 0x50; }
+DRIVER_INIT_MEMBER( cpu30_state, cpu30za )     { LOGINIT(("%s\n", FUNCNAME)); m_board_id = 0x50; }
+DRIVER_INIT_MEMBER( cpu30_state, cpu30zbe )    { LOGINIT(("%s\n", FUNCNAME)); m_board_id = 0x50; }
+DRIVER_INIT_MEMBER( cpu30_state, cpu30be8 )    { LOGINIT(("%s\n", FUNCNAME)); m_board_id = 0x50; }
+DRIVER_INIT_MEMBER( cpu30_state, cpu30be16 )   { LOGINIT(("%s\n", FUNCNAME)); m_board_id = 0x50; }
+DRIVER_INIT_MEMBER( cpu30_state, cpu30lite4 )  { LOGINIT(("%s\n", FUNCNAME)); m_board_id = 0x50; }
+DRIVER_INIT_MEMBER( cpu30_state, cpu30lite8 )  { LOGINIT(("%s\n", FUNCNAME)); m_board_id = 0x50; }
+DRIVER_INIT_MEMBER( cpu30_state, cpu33 )  	   { LOGINIT(("%s\n", FUNCNAME)); m_board_id = 0x68; } // 0x60 skips FGA prompt
 
 /* Boot vector handler, the PCB hardwires the first 8 bytes from 0xff800000 to 0x0 at reset*/
 READ32_MEMBER (cpu30_state::bootvect_r){
