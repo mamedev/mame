@@ -971,7 +971,7 @@ u1601.bin     32M Mask       8642h  /  Gfx
 
 ROM_START( stonebal )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 64k for 68000 code */
-	ROM_LOAD16_BYTE( "u102",     0x00000, 0x40000, CRC(712feda1) SHA1(c5b385f425786566fa274fe166a7116615a8ce86) )
+	ROM_LOAD16_BYTE( "u102",     0x00000, 0x40000, CRC(712feda1) SHA1(c5b385f425786566fa274fe166a7116615a8ce86) ) /* 4 Players kit, v1-20 13/12/1994 */
 	ROM_LOAD16_BYTE( "u101",     0x00001, 0x40000, CRC(4f1656a9) SHA1(720717ae4166b3ec50bb572197a8c6c96b284648) )
 
 	ROM_REGION16_LE( 0x400000, "gfx1", 0 )
@@ -979,13 +979,13 @@ ROM_START( stonebal )
 	ROM_LOAD( "u1601.bin", 0x200000, 0x200000, CRC(dbe893f0) SHA1(71a8a022decc0ff7d4c65f7e6e0cbba9e0b5582c) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
-	ROM_LOAD( "u1801.bin", 0x00000, 0x80000, CRC(d98f7378) SHA1(700df7f29c039b96791c2704a67f01a722dc96dc) )
+	ROM_LOAD( "sb_snd_9-9-94.u1801", 0x00000, 0x80000, CRC(d98f7378) SHA1(700df7f29c039b96791c2704a67f01a722dc96dc) ) /* labeled  SB snd 9/9/94 */
 ROM_END
 
 
 ROM_START( stonebal2 )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 64k for 68000 code */
-	ROM_LOAD16_BYTE( "u102.bin", 0x00000, 0x40000, CRC(b3c4f64f) SHA1(6327e9f3cd9deb871a6910cf1f006c8ee143e859) )
+	ROM_LOAD16_BYTE( "u102.bin", 0x00000, 0x40000, CRC(b3c4f64f) SHA1(6327e9f3cd9deb871a6910cf1f006c8ee143e859) ) /* 2 Players kit, v1-20 7/11/1994 */
 	ROM_LOAD16_BYTE( "u101.bin", 0x00001, 0x40000, CRC(fe373f74) SHA1(bafac4bbd1aae4ccc4ae16205309483f1bbdd464) )
 
 	ROM_REGION16_LE( 0x400000, "gfx1", 0 )
@@ -993,7 +993,21 @@ ROM_START( stonebal2 )
 	ROM_LOAD( "u1601.bin", 0x200000, 0x200000, CRC(dbe893f0) SHA1(71a8a022decc0ff7d4c65f7e6e0cbba9e0b5582c) )
 
 	ROM_REGION( 0x80000, "oki", 0 )
-	ROM_LOAD( "u1801.bin", 0x00000, 0x80000, CRC(d98f7378) SHA1(700df7f29c039b96791c2704a67f01a722dc96dc) )
+	ROM_LOAD( "sb_snd_9-9-94.u1801", 0x00000, 0x80000, CRC(d98f7378) SHA1(700df7f29c039b96791c2704a67f01a722dc96dc) ) /* labeled  SB snd 9/9/94 */
+ROM_END
+
+
+ROM_START( stonebal2o )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 64k for 68000 code */
+	ROM_LOAD16_BYTE( "sb_o_2p_24-10.u102", 0x00000, 0x40000, CRC(ab58c6b2) SHA1(6e29646d4b0802733d04e722909c03b87761c759) ) /* 2 Players kit, v1-20 21/10/1994 */
+	ROM_LOAD16_BYTE( "sb_e_2p_24-10.u101", 0x00001, 0x40000, CRC(ea967835) SHA1(12655f0dc44981f4a49ed45f271d5eb24f2cc5c6) ) /* Yes the Odd / Even labels are backwards & chips dated 24/10 */
+
+	ROM_REGION16_LE( 0x400000, "gfx1", 0 )
+	ROM_LOAD( "u1600.bin", 0x000000, 0x200000, CRC(d2ffe9ff) SHA1(1c5dcbd8208e45458da9db7621f6b8602bca0fae) )
+	ROM_LOAD( "u1601.bin", 0x200000, 0x200000, CRC(dbe893f0) SHA1(71a8a022decc0ff7d4c65f7e6e0cbba9e0b5582c) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "sb_snd_9-9-94.u1801", 0x00000, 0x80000, CRC(d98f7378) SHA1(700df7f29c039b96791c2704a67f01a722dc96dc) ) /* labeled  SB snd 9/9/94 */
 ROM_END
 
 /*
@@ -1177,9 +1191,10 @@ DRIVER_INIT_MEMBER(artmagic_state,shtstar)
  *
  *************************************/
 
-GAME( 1993, ultennis, 0,        artmagic, ultennis, artmagic_state, ultennis, ROT0, "Art & Magic", "Ultimate Tennis", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, ultennisj,ultennis, artmagic, ultennis, artmagic_state, ultennis, ROT0, "Art & Magic (Banpresto license)", "Ultimate Tennis (v 1.4, Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, cheesech, 0,        cheesech, cheesech, artmagic_state, cheesech, ROT0, "Art & Magic", "Cheese Chase", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, stonebal, 0,        stonebal, stonebal, artmagic_state, stonebal, ROT0, "Art & Magic", "Stone Ball (4 Players)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, stonebal2,stonebal, stonebal, stoneba2, artmagic_state, stonebal, ROT0, "Art & Magic", "Stone Ball (2 Players)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, shtstar, 0, shtstar, shtstar, artmagic_state, shtstar, ROT0, "Nova", "Shooting Star", MACHINE_NOT_WORKING )
+GAME( 1993, ultennis,   0,        artmagic, ultennis, artmagic_state, ultennis, ROT0, "Art & Magic", "Ultimate Tennis", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, ultennisj,  ultennis, artmagic, ultennis, artmagic_state, ultennis, ROT0, "Art & Magic (Banpresto license)", "Ultimate Tennis (v 1.4, Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, cheesech,   0,        cheesech, cheesech, artmagic_state, cheesech, ROT0, "Art & Magic", "Cheese Chase", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, stonebal,   0,        stonebal, stonebal, artmagic_state, stonebal, ROT0, "Art & Magic", "Stone Ball (4 Players, v1-20 13/12/1994)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, stonebal2,  stonebal, stonebal, stoneba2, artmagic_state, stonebal, ROT0, "Art & Magic", "Stone Ball (2 Players, v1-20 7/11/1994)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, stonebal2o, stonebal, stonebal, stoneba2, artmagic_state, stonebal, ROT0, "Art & Magic", "Stone Ball (2 Players, v1-20 21/10/1994)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, shtstar,    0,        shtstar,  shtstar,  artmagic_state, shtstar,  ROT0, "Nova", "Shooting Star", MACHINE_NOT_WORKING )
