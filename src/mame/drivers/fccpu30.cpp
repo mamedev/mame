@@ -197,10 +197,10 @@
 #include "machine/clock.h"
 //#include "machine/timekpr.h"
 
-#define VERBOSE 2
+#define VERBOSE 0
 
 #define LOGPRINT(x)  { do { if (VERBOSE) logerror x; } while (0); }
-#define LOG(x) 		{}
+#define LOG(x) 		{} LOGPRINT(x)
 #define LOGINIT(x)	{} LOGPRINT(x)
 #define LOGR(x)		{}
 #define LOGSETUP(x)	{}
@@ -232,6 +232,13 @@ cpu30_state(const machine_config &mconfig, device_type type, const char *tag)
 	{
 	}
 
+	DECLARE_WRITE8_MEMBER (fdc_w);
+	DECLARE_READ8_MEMBER (fdc_r);
+	DECLARE_WRITE8_MEMBER (scsi_w);
+	DECLARE_READ8_MEMBER (scsi_r);
+	DECLARE_WRITE8_MEMBER (rtc_w);
+	DECLARE_READ8_MEMBER (rtc_r);
+	DECLARE_READ8_MEMBER (slot1_status_r);
 	DECLARE_READ32_MEMBER (bootvect_r);
 	DECLARE_WRITE32_MEMBER (bootvect_w);
 
@@ -299,10 +306,17 @@ static ADDRESS_MAP_START (cpu30_mem, AS_PROGRAM, 32, cpu30_state)
 	AM_RANGE (0x00000000, 0x00000007) AM_RAM AM_WRITE (bootvect_w)   /* After first write we act as RAM */
 //	AM_RANGE (0x00000008, 0x003fffff) AM_RAM /* RAM  installed in machine start */
 	AM_RANGE (0xff000000, 0xff7fffff) AM_ROM AM_REGION("roms", 0x000000)
-	AM_RANGE (0xff802000, 0xff8021ff) AM_DEVREADWRITE8("duscc", duscc68562_device, read, write, 0xffffffff) /* Port 1&2 - Dual serial port DUSCC   */
-	AM_RANGE (0xff802200, 0xff8023ff) AM_DEVREADWRITE8("duscc2", duscc68562_device, read, write, 0xffffffff) /* Port 3&4 - Dual serial port DUSCC   */
 	AM_RANGE (0xff800c00, 0xff800dff) AM_DEVREADWRITE8("pit1", pit68230_device, read, write, 0xffffffff)
 	AM_RANGE (0xff800e00, 0xff800fff) AM_DEVREADWRITE8("pit2", pit68230_device, read, write, 0xffffffff)
+	AM_RANGE (0xff802000, 0xff8021ff) AM_DEVREADWRITE8("duscc", duscc68562_device, read, write, 0xffffffff) /* Port 1&2 - Dual serial port DUSCC   */
+	AM_RANGE (0xff802200, 0xff8023ff) AM_DEVREADWRITE8("duscc2", duscc68562_device, read, write, 0xffffffff) /* Port 3&4 - Dual serial port DUSCC   */
+//	AM_RANGE (0xff803000, 0xff8031ff) AM_DEVREADWRITE8("rtc", rtc72423_device, read, write, 0xffffffff) /* TODO: implement Epson RT-72423 RTC (see also konendev.cpp) */
+	AM_RANGE (0xff803000, 0xff8031ff) AM_READWRITE8(rtc_r, rtc_w, 0x000000ff) /* mock driver to log calls to device */
+//	AM_RANGE (0xff803400, 0xff8035ff) AM_DEVREADWRITE8("scsi", mb87033_device, read, write, 0xffffffff) /* TODO: implement MB87344 SCSI device */
+	AM_RANGE (0xff803400, 0xff8035ff) AM_READWRITE8(scsi_r, scsi_w, 0x000000ff) /* mock driver to log calls to device */
+//	AM_RANGE (0xff803800, 0xff80397f) AM_DEVREADWRITE8("fdc", wd37c65c_device, read, write, 0xffffffff) /* TODO: implement WD3/C65C fdc controller */
+	AM_RANGE (0xff803800, 0xff80397f) AM_READWRITE8(fdc_r, fdc_w, 0x000000ff) /* mock driver to log calls to device */
+	AM_RANGE (0xff803980, 0xff8039ff) AM_READ8(slot1_status_r, 0x000000ff)
 	AM_RANGE (0xffc00000, 0xffcfffff) AM_RAM AM_SHARE ("nvram") /* On-board SRAM with battery backup (nvram) */
 	AM_RANGE (0xffd00000, 0xffdfffff) AM_DEVREADWRITE8("fga002", fga002_device, read, write, 0xffffffff)  /* FGA-002 Force Gate Array */
 	AM_RANGE (0xffe00000, 0xffefffff) AM_ROM AM_REGION("roms", 0x800000)
@@ -350,12 +364,50 @@ DRIVER_INIT_MEMBER( cpu30_state, cpu30lite4 )  { LOGINIT(("%s\n", FUNCNAME)); m_
 DRIVER_INIT_MEMBER( cpu30_state, cpu30lite8 )  { LOGINIT(("%s\n", FUNCNAME)); m_board_id = 0x50; }
 DRIVER_INIT_MEMBER( cpu30_state, cpu33 )  	   { LOGINIT(("%s\n", FUNCNAME)); m_board_id = 0x68; } // 0x60 skips FGA prompt
 
+/* Mock FDC driver */
+READ8_MEMBER (cpu30_state::fdc_r){
+	LOG(("%s\n * FDC read Offset: %04x\n", FUNCNAME, offset));
+	return 1;
+}
+
+WRITE8_MEMBER (cpu30_state::fdc_w){
+	LOG(("%s\n * FDC write Offset: %04x Data: %02x\n", FUNCNAME, offset, data));
+}
+
+/* Mock SCSI driver */
+READ8_MEMBER (cpu30_state::scsi_r){
+	LOG(("%s\n * SCSI read Offset: %04x\n", FUNCNAME, offset));
+	return 1;
+}
+
+WRITE8_MEMBER (cpu30_state::scsi_w){
+	LOG(("%s\n * SCSI write Offset: %04x Data: %02x\n", FUNCNAME, offset, data));
+}
+
+/* Mock RTC driver */
+READ8_MEMBER (cpu30_state::rtc_r){
+	LOG(("%s\n * RTC read Offset: %04x\n", FUNCNAME, offset));
+	return 1;
+}
+
+WRITE8_MEMBER (cpu30_state::rtc_w){
+	LOG(("%s\n * RTC write Offset: %04x Data: %02x\n", FUNCNAME, offset, data));
+}
+
+/* 1 = board is in slot 1, 0 = board is NOT in slot 1 */
+READ8_MEMBER (cpu30_state::slot1_status_r){
+	LOG(("%s\n", FUNCNAME));
+	return 1;
+}
+
 /* Boot vector handler, the PCB hardwires the first 8 bytes from 0xff800000 to 0x0 at reset*/
 READ32_MEMBER (cpu30_state::bootvect_r){
+	LOG(("%s\n", FUNCNAME));
 	return m_sysrom[offset];
 }
 
 WRITE32_MEMBER (cpu30_state::bootvect_w){
+	LOG(("%s\n", FUNCNAME));
 	m_sysram[offset % sizeof(m_sysram)] &= ~mem_mask;
 	m_sysram[offset % sizeof(m_sysram)] |= (data & mem_mask);
 	m_sysrom = &m_sysram[0]; // redirect all upcomming accesses to masking RAM until reset.
