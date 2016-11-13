@@ -10660,11 +10660,11 @@ ddragon3                        // TA-0030 (c) 1990
 ddragon3b                       // bootleg
 ddragon3j                       // TA-0030 (c) 1990 (Japan)
 ddragon3p                       // TA-0030 (c) 1990
-wwfwfest                        // TA-0031 (c) 1991 (US)
-wwfwfesta                       // TA-0031 (c) 1991 + Tecmo license (US)
+wwfwfest                        // TA-0031 (c) 1991 + Tecmo license (World)
 wwfwfestb                       // bootleg
-wwfwfestj                       // TA-0031 (c) 1991 (Japan)
-wwfwfestk                       // TA-0031 (c) 1991 (Korea)
+wwfwfestj                       // TA-0031 (c) 1991 + Tecmo license (Japan)
+wwfwfestk                       // TA-0031 (c) 1991 + Tecmo license (Korea)
+wwfwfestu                       // TA-0031 (c) 1991 (US)
 
 @source:ddribble.cpp
 ddribble                        // GX690 (c) 1986
