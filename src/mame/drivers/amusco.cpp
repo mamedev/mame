@@ -66,7 +66,7 @@
   - Make the 6845 transparent videoram addressing actually transparent.
     (IRQ1 changes the 6845 address twice but neither reads nor writes data?)
   - Add NVRAM in a way that won't trigger POST error message (needs NMI on shutdown?)
-  - Identify outputs from first PPI (these include button lamps?)
+  - Identify remaining outputs from first PPI (button lamps and coin counter are identified and implemented)
 
 *******************************************************************************/
 
@@ -87,6 +87,7 @@
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/msm5832.h"
+#include "amusco.lh"
 
 
 class amusco_state : public driver_device
@@ -236,17 +237,50 @@ WRITE8_MEMBER( amusco_state::mc6845_w)
 
 WRITE8_MEMBER(amusco_state::output_a_w)
 {
-	//logerror("Writing %02Xh to PPI output A\n", data);
+/* Lamps from port A
+
+  7654 3210
+  ---- ---x  Bet lamp.
+  ---- --x-  Hold/Discard 5 lamp.
+  ---- -x--  Hold/Discard 3 lamp.
+  ---- x---  Hold/Discard 1 lamp.
+  ---x ----  Hold/Discard 2 lamp.
+  --x- ----  Hold/Discard 4 lamp.
+  xx-- ----  Unknown.
+
+*/
+	output().set_lamp_value(0, (data) & 1);         // Lamp 0 (Bet)
+	output().set_lamp_value(1, (data >> 1) & 1);    // Lamp 1 (Hold/Disc 5)
+	output().set_lamp_value(2, (data >> 2) & 1);    // Lamp 2 (Hold/Disc 3)
+	output().set_lamp_value(3, (data >> 3) & 1);    // Lamp 3 (Hold/Disc 1)
+	output().set_lamp_value(4, (data >> 4) & 1);    // Lamp 4 (Hold/Disc 2)
+	output().set_lamp_value(5, (data >> 5) & 1);    // Lamp 5 (Hold/Disc 4)
+
+//	logerror("Writing %02Xh to PPI output A\n", data);
 }
 
 WRITE8_MEMBER(amusco_state::output_b_w)
 {
-	//logerror("Writing %02Xh to PPI output B\n", data);
+/* Lamps and counters from port B
+
+  7654 3210
+  ---- --x-  Unknown lamp (lits when all holds/disc are ON).
+  ---- -x--  Start/Draw lamp.
+  ---x ----  Coin counter.
+  xxx- x--x  Unknown.
+
+*/
+	output().set_lamp_value(6, (data >> 2) & 1);    // Lamp 6 (Start/Draw)
+	output().set_lamp_value(7, (data >> 1) & 1);    // Lamp 7 (Unknown)
+
+	machine().bookkeeping().coin_counter_w(0, ~data & 0x10);  // Coin counter
+
+//	logerror("Writing %02Xh to PPI output B\n", data);
 }
 
 WRITE8_MEMBER(amusco_state::output_c_w)
 {
-	//logerror("Writing %02Xh to PPI output C\n", data);
+//	logerror("Writing %02Xh to PPI output C\n", data);
 }
 
 WRITE8_MEMBER(amusco_state::vram_w)
@@ -502,6 +536,6 @@ ROM_END
 *      Game Drivers      *
 *************************/
 
-/*    YEAR  NAME        PARENT  MACHINE   INPUT     STATE          INIT  ROT    COMPANY      FULLNAME                      FLAGS */
-GAME( 1987, amusco,     0,      amusco,   amusco,   driver_device, 0,    ROT0, "Amusco",    "American Music Poker (V1.4)", MACHINE_IMPERFECT_COLORS | MACHINE_NODEVICE_PRINTER ) // runs much too fast; palette totally wrong
-GAME( 1988, draw88pkr,  0,      amusco,   amusco,   driver_device, 0,    ROT0, "BTE, Inc.", "Draw 88 Poker (V2.0)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_COLORS | MACHINE_NODEVICE_PRINTER )
+/*     YEAR  NAME        PARENT  MACHINE   INPUT     STATE          INIT  ROT    COMPANY      FULLNAME                      FLAGS                                                    LAYOUT    */
+GAMEL( 1987, amusco,     0,      amusco,   amusco,   driver_device, 0,    ROT0, "Amusco",    "American Music Poker (V1.4)", MACHINE_IMPERFECT_COLORS | MACHINE_NODEVICE_PRINTER,     layout_amusco ) // runs much too fast; palette totally wrong
+GAME(  1988, draw88pkr,  0,      amusco,   amusco,   driver_device, 0,    ROT0, "BTE, Inc.", "Draw 88 Poker (V2.0)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_COLORS | MACHINE_NODEVICE_PRINTER )
