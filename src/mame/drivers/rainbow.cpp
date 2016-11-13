@@ -1116,7 +1116,7 @@ void rainbow_state::machine_reset()
 			{
 				output().set_value("led1", 1);
 
-				UINT32 max_sector = (info->cylinders) * (info->heads) * (info->sectors);
+				uint32_t max_sector = (info->cylinders) * (info->heads) * (info->sectors);
 				printf("\n%u (%3.2f) MB HARD DISK MOUNTED. GEOMETRY: %d HEADS (1..%d ARE OK).\n%d CYLINDERS (151 to %d ARE OK).\n%d SECTORS / TRACK (up to %d ARE OK). \n%d BYTES / SECTOR (128 to 1024 ARE OK).\n", 
 					max_sector * info->sectorbytes / 1000000,
 					(float)max_sector * (float)info->sectorbytes / 1048576.0f,
@@ -1500,7 +1500,7 @@ hard_disk_file *(rainbow_state::rainbow_hdc_file(int drv))
 	{
 		printf("\n <<< === REJECTED = (SANITY CHECK FAILED) === >>> \n");
 
-		UINT32 max_sector = info->cylinders * info->heads * info->sectors;
+		uint32_t max_sector = info->cylinders * info->heads * info->sectors;
 				printf("\n%u (%3.2f) MB HARD DISK REJECTED. GEOMETRY: %d HEADS (1..%d ARE OK).\n%d CYLINDERS (151 to %d ARE OK).\n%d SECTORS / TRACK (up to %d ARE OK). \n%d BYTES / SECTOR (128 to 1024 ARE OK).\n", 
 					max_sector * info->sectorbytes / 1000000,
 					(float)max_sector * (float)info->sectorbytes / 1048576.0f,
