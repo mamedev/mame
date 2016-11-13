@@ -1160,6 +1160,7 @@ kccomp                          // VEB KC compact
 
 @source:amusco.cpp
 amusco                          // 1987, Amusco.
+draw88pkr                       // 1988, BTE, Inc.
 
 @source:amust.cpp
 amust                           //
