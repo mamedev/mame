@@ -478,10 +478,30 @@ ROM_START( amusco )
 	ROM_LOAD( "pal16l8a.u50", 0x0600, 0x0104, CRC(f5d80001) SHA1(ba0e55ebb45eceec256d432aee6d4123365a0af2) )
 ROM_END
 
+/*
+  Draw 88 Poker (V2.0) ??
+
+  U35 - TMS 27C128
+  U36 - TMS 27C128
+  U37 - TMS 27C128
+  U42 - TMS 27C256
+
+*/
+ROM_START( draw88pkr )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD( "u42.bin",  0xf8000, 0x08000, CRC(e98a7cfd) SHA1(8dc581c3e0cfd78bd33fbbbafd40307cf66f154d) )
+
+	ROM_REGION( 0xc000, "gfx1", 0 )
+	ROM_LOAD( "u35.bin",  0x0000, 0x4000, CRC(f608019a) SHA1(f0c5e10a03f39976d9bc6e8bc9f78e30ffefa03e) )
+	ROM_LOAD( "u36.bin",  0x4000, 0x4000, CRC(57d42a97) SHA1(b53b6419a48ecd111faf87fd6e480d82861fe512) )
+	ROM_LOAD( "u37.bin",  0x8000, 0x4000, CRC(6e23b9f2) SHA1(6916828d84d1ecb44dc454e6786f97801a8550c7) )
+ROM_END
+
 
 /*************************
 *      Game Drivers      *
 *************************/
 
-/*    YEAR  NAME      PARENT  MACHINE   INPUT     STATE          INIT  ROT    COMPANY   FULLNAME                      FLAGS */
-GAME( 1987, amusco,   0,      amusco,   amusco,   driver_device, 0,    ROT0, "Amusco", "American Music Poker (V1.4)", MACHINE_IMPERFECT_COLORS | MACHINE_NODEVICE_PRINTER ) // runs much too fast; palette totally wrong
+/*    YEAR  NAME        PARENT  MACHINE   INPUT     STATE          INIT  ROT    COMPANY      FULLNAME                      FLAGS */
+GAME( 1987, amusco,     0,      amusco,   amusco,   driver_device, 0,    ROT0, "Amusco",    "American Music Poker (V1.4)", MACHINE_IMPERFECT_COLORS | MACHINE_NODEVICE_PRINTER ) // runs much too fast; palette totally wrong
+GAME( 1988, draw88pkr,  0,      amusco,   amusco,   driver_device, 0,    ROT0, "BTE, Inc.", "Draw 88 Poker (V2.0)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_COLORS | MACHINE_NODEVICE_PRINTER )
