@@ -1324,8 +1324,8 @@ ROM_END
 
 ROM_START( wwfwfest )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Main CPU  (68000) */
-	ROM_LOAD16_BYTE( "31e13-0.ic19", 0x00000, 0x40000, CRC(933ea1a0) SHA1(61da142cfa7abd3b77ab21979c061a078c0d0c63) ) /* Euro label but shows FBI "Winners Don't Do drugs" logo */
-	ROM_LOAD16_BYTE( "31e14-0.ic18", 0x00001, 0x40000, CRC(bd02e3c4) SHA1(7ae63e48caf9919ce7b63b4c5aa9474ba8c336da) ) /* Euro label but shows FBI "Winners Don't Do drugs" logo */
+	ROM_LOAD16_BYTE( "31e13-0.ic19", 0x00001, 0x40000, CRC(bd02e3c4) SHA1(7ae63e48caf9919ce7b63b4c5aa9474ba8c336da) ) /* Euro label but shows FBI "Winners Don't Do drugs" logo */
+	ROM_LOAD16_BYTE( "31e14-0.ic18", 0x00000, 0x40000, CRC(933ea1a0) SHA1(61da142cfa7abd3b77ab21979c061a078c0d0c63) ) /* Euro label but shows FBI "Winners Don't Do drugs" logo */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Sound CPU (Z80)  */
 	ROM_LOAD( "31a11-2.ic42", 0x00000, 0x10000, CRC(5ddebfea) SHA1(30073963e965250d94f0dc3bd261a054850adf95) )
