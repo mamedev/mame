@@ -1,7 +1,9 @@
 #ifndef _LIBRETRO_SHARED_H
 #define _LIBRETRO_SHARED_H
 
+#if defined(HAVE_LIBCO)
 #include <libco.h>
+#endif
 #include "libretro.h"
 
 #ifndef RETRO_MAX_BUTTONS

@@ -105,9 +105,13 @@ project ("osd_" .. _OPTIONS["osd"])
 		}
 	end
 
-	
+	if _OPTIONS["USELIBCO"]=="1" then
+		files {
+			MAME_DIR .. "src/osd/libretro/libretro-internal/libco/libco.c",
+		}
+	end
+
 	files {
-		MAME_DIR .. "src/osd/libretro/libretro-internal/libco/libco.c",
 		MAME_DIR .. "src/osd/libretro/libretro-internal/retro_init.cpp",
 		MAME_DIR .. "src/osd/libretro/osdretro.h",
 		MAME_DIR .. "src/osd/libretro/retroprefix.h",

@@ -62,6 +62,9 @@ public:
 	cheat_manager &cheat() const { assert(m_cheat != nullptr); return *m_cheat; }
 	inifile_manager &inifile() const { assert(m_inifile != nullptr); return *m_inifile; }
 	favorite_manager &favorite() const { assert(m_favorite != nullptr); return *m_favorite; }
+#if defined(__LIBRETRO__) && !defined(HAVE_LIBCO)
+	void mmchange();
+#endif
 private:
 	std::unique_ptr<plugin_options> m_plugins;              // pointer to plugin options
 	lua_engine *            m_lua;

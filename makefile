@@ -770,6 +770,13 @@ endif
 ifdef WEBASSEMBLY
 PARAMS += --WEBASSEMBLY='$(WEBASSEMBLY)'
 endif
+
+## BEGIN libretro
+ifdef USELIBCO
+PARAMS += --USELIBCO='$(USELIBCO)'
+endif
+## END libretro
+
 #-------------------------------------------------
 # All scripts
 #-------------------------------------------------

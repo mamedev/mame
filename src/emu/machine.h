@@ -228,7 +228,10 @@ public:
 	// fetch items by name
 	inline device_t *device(const char *tag) const { return root_device().subdevice(tag); }
 	template<class _DeviceClass> inline _DeviceClass *device(const char *tag) { return downcast<_DeviceClass *>(device(tag)); }
-
+#if defined(__LIBRETRO__) && !defined(HAVE_LIBCO)
+void retro_machineexit();
+void retro_loop();
+#endif
 	// immediate operations
 	int run(bool quiet);
 	void pause();

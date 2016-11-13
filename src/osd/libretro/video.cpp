@@ -94,7 +94,9 @@ void retro_osd_interface::video_exit()
 //============================================================
 //  update
 //============================================================
-
+#if !defined(HAVE_LIBCO)
+extern int RLOOP;
+#endif
 void retro_osd_interface::update(bool skip_redraw)
 {
 	osd_common_t::update(skip_redraw);
@@ -126,8 +128,11 @@ void retro_osd_interface::update(bool skip_redraw)
    	process_mouse_state(machine());
    	process_keyboard_state(machine());
    	process_joypad_state(machine());
-
+#if !defined(HAVE_LIBCO)
+	RLOOP=0;
+#else
    	retro_switch_to_main_thread();
+#endif
 }
 
 //============================================================

@@ -44,7 +44,7 @@ int osd_setenv(const char *name, const char *value, int overwrite)
       if (osd_getenv(name) != NULL)
          return 0;
    }
-   buf = (char *) osd_malloc_array(strlen(name)+strlen(value)+2);
+   buf = (char *) malloc(strlen(name)+strlen(value)+2);
    sprintf(buf, "%s=%s", name, value);
    result = putenv(buf);
 
