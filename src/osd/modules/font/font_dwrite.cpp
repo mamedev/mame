@@ -9,7 +9,7 @@
 #include "modules/osdmodule.h"
 #include "modules/lib/osdlib.h"
 
-#if defined(OSD_WINDOWS)
+#if defined(OSD_WINDOWS) || defined(OSD_UWP)
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -348,6 +348,8 @@ public:
 	{
 	}
 
+	virtual ~osd_font_dwrite() { osd_font_dwrite::close(); }
+	
 	virtual bool open(std::string const &font_path, std::string const &_name, int &height) override
 	{
 		if (m_d2dfactory == nullptr || m_dwriteFactory == nullptr || m_wicFactory == nullptr)
@@ -429,7 +431,7 @@ public:
 
 		uint32_t tempChar = chnum;
 		uint16_t glyphIndex;
-		HR_RET0(face->GetGlyphIndicesW(&tempChar, 1, &glyphIndex));
+		HR_RET0(face->GetGlyphIndices(&tempChar, 1, &glyphIndex));
 
 		// get the width of this character
 		DWRITE_GLYPH_METRICS glyph_metrics = { 0 };

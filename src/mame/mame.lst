@@ -32,6 +32,7 @@
 
 @source:1945kiii.cpp
 1945kiii                        // (c) 2000 Oriental
+1945kiiin                       // (c) 2000 Oriental
 1945kiiio                       // (c) 1999 Oriental
 flagrall                        // ?
 
@@ -1159,6 +1160,7 @@ kccomp                          // VEB KC compact
 
 @source:amusco.cpp
 amusco                          // 1987, Amusco.
+draw88pkr                       // 1988, BTE, Inc.
 
 @source:amust.cpp
 amust                           //
@@ -1787,8 +1789,9 @@ ar_xeon                         // (c) 1988
 @source:artmagic.cpp
 cheesech                        // (c) 1994
 shtstar                         // (c) 1994 Nova
-stonebal                        // (c) 1994
-stonebal2                       // (c) 1994
+stonebal                        // (c) 1994 - 4 Players, v1-20 13/12/1994
+stonebal2                       // (c) 1994 - 2 Players, v1-20 7/11/1994
+stonebal2o                      // (c) 1994 - 2 Players, v1-20 21/10/1994
 ultennis                        // (c) 1993
 ultennisj                       // (c) 1993
 
@@ -9796,8 +9799,9 @@ ffightuc                        // 12/06/1990 (c) 1989 (USA)
 forgottn                        // 7/1988 (c) 1988 (World)
 forgottna                       // 7/1988 (c) 1988 (World)
 forgottnu                       // 7/1988 (c) 1988 (USA)
-forgottnu1                      // 7/1988 (c) 1988 (USA)
 forgottnua                      // 7/1988 (c) 1988 (USA)
+forgottnuc                      // 7/1988 (c) 1988 (USA)
+forgottnue                      // 7/1988 (c) 1988 (USA)
 forgottnuaa                     // 7/1988 (c) 1988 (USA)
 ganbare                         // 11/04/2000 (c) 2000 (Japan)
 ghouls                          // 12/1988 (c) 1988 (World)
@@ -10657,11 +10661,11 @@ ddragon3                        // TA-0030 (c) 1990
 ddragon3b                       // bootleg
 ddragon3j                       // TA-0030 (c) 1990 (Japan)
 ddragon3p                       // TA-0030 (c) 1990
-wwfwfest                        // TA-0031 (c) 1991 (US)
-wwfwfesta                       // TA-0031 (c) 1991 + Tecmo license (US)
+wwfwfest                        // TA-0031 (c) 1991 + Tecmo license (World)
 wwfwfestb                       // bootleg
-wwfwfestj                       // TA-0031 (c) 1991 (Japan)
-wwfwfestk                       // TA-0031 (c) 1991 (Korea)
+wwfwfestj                       // TA-0031 (c) 1991 + Tecmo license (Japan)
+wwfwfestk                       // TA-0031 (c) 1991 + Tecmo license (Korea)
+wwfwfestu                       // TA-0031 (c) 1991 (US)
 
 @source:ddribble.cpp
 ddribble                        // GX690 (c) 1986
@@ -12178,7 +12182,21 @@ fb01                            // 1986 FB-01
 fc100                           //
 
 @source:fccpu30.cpp
-fccpu30                         //
+fccpu30
+fccpu30x
+fccpu30xa
+fccpu30za
+fccpu30zbe
+fccpu30be8
+fccpu30be16
+fccpu30lite4
+fccpu30lite8
+fccpu30senr
+fccpu30senr501
+fccpu33
+
+//@source:fccpu40.cpp
+//fccpu40                         //
 
 @source:fcscsi.cpp
 fcscsi1                         //
@@ -30839,6 +30857,7 @@ polepos2                        // (c) 1983
 polepos2a                       // 136014   (c) 1983 + Atari license
 polepos2b                       // bootleg
 polepos2bi                      // bootleg
+polepos2bs                      // 1984, BCN Internacional S.A. (bootleg)
 poleposa1                       // 136014   (c) 1982 Atari
 poleposa2                       // 136014   (c) 1982 + Atari license
 poleposj                        // (c) 1982
@@ -30948,6 +30967,7 @@ gwnf                            // Genius Winner Notebook Fun (Germany)
 prestige                        // PreComputer Prestige Elite
 snotec                          // Bandai Super Note Club (Japan)
 snotecex                        // Bandai Super Note Club EX (Japan)
+snotecu                         // Bandai Super Note Club U (Japan)
 princ                           // Tomy Prin-C (Japan)
 
 @source:primo.cpp
@@ -31169,6 +31189,7 @@ s1945iii                        // (c) 1999
 sbomber                         // (c) 1998
 sbombera                        // (c) 1998
 soldivid                        // (c) 1997
+soldividk                       // (c) 1997 (Korea)
 tgm2                            // (c) 2000
 tgm2p                           // (c) 2000
 
@@ -35014,7 +35035,8 @@ raycris                         // 1998.12 Ray Crisis (V2.03J)
 rcdego                          // 1999.06 RC De Go (V2.03J)
 shanghss                        // 2000.07 Shanghai Shoryu Sairin (V2.03J)
 shangtou                        // 2002.02 Shanghai Sangokuhaitougi
-shikigam                        // 2001.09 Shikigami no Shiro
+shikigam                        // 2001.09 Shikigami no Shiro (V2.03J)
+shikigama                       // 2001.09 Shikigami no Shiro (V1.02J)
 sianniv                         // 2003.10 Space Invaders Anniversary (V2.02J)
 soutenry                        // 2001.02 Soutenryu (V2.07J)
 spuzbobl                        // 1999.?? Super Puzzle Bobble (V2.05O)
@@ -36034,6 +36056,9 @@ pyuuta                          // 1982 Tomy Pyuuta
 pyuutajr                        // 1982 Tomy Pyuuta Jr.
 tutor                           // 1983? Tomy Tutor
 
+@source:tv910.cpp
+tv910							//
+
 @source:tv950.cpp
 tv950                           //
 
@@ -36330,6 +36355,7 @@ vendetta2p                      // GX081 (c) 1991 (World)
 vendetta2pd                     // GX081 (c) 1991 (Asia)
 vendetta2peba                   // GX081 (c) 1991 (World)
 vendetta2pu                     // GX081 (c) 1991 (Asia)
+vendetta2pun                    // GX081 (c) 1991 (World)
 vendettaj                       // GX081 (c) 1991 (Japan)
 vendettar                       // GX081 (c) 1991 (World)
 vendettaz                       // GX081 (c) 1991 (World)

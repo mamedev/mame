@@ -782,13 +782,12 @@ SCN2674_DRAW_CHARACTER_MEMBER(octopus_state::display_pixels)
 	// b4 : GP2 (general purpose)
 	// b2 : High intensity
 	// b1 : Grey background
-	// b0 : Blank
+	// b0 : Blank (TODO)
 	//  - Colour
 	// b6,5,4 : background colour (RGB)
 	// b2,1,0 : foreground colour (RGB)
 	if(!lg)
 	{
-		// TODO: handle attributes
 		uint8_t tile = m_vram[address & 0x0fff];
 		uint8_t attr = m_vram[(address & 0x0fff) + 0x1000];
 		uint8_t data = m_fontram[(tile * 16) + linecount];
@@ -815,14 +814,13 @@ SCN2674_DRAW_CHARACTER_MEMBER(octopus_state::display_pixels)
 			else
 				bg = 0x000000;
 				
-			if(attr & 0x20)  // reverse video, for now, swap foreground and background
-			{
-				rgb_t temp;
-				temp = bg;
-				bg = fg;
-				fg = temp;
-			}
+			if(attr & 0x20)  // reverse video
+				data = ~data;
 		}
+		if(ul && (attr & 0x08))
+			data = 0xff;
+		if(blink && (attr & 0x80))
+			data = 0x00;
 		if(cursor && !blink)
 		{
 			bool inverse = true;
@@ -831,19 +829,13 @@ SCN2674_DRAW_CHARACTER_MEMBER(octopus_state::display_pixels)
 				inverse = false;
 			if(m_vidctrl & 0x40)  // not enabled
 				inverse = false;
-			for (int z=0;z<8;z++)
-			{
-				if(inverse)
-					bitmap.pix32(y,x + z) = BIT(data,z) ? bg : fg;
-				else
-					bitmap.pix32(y,x + z) = fg;
-			}
+			if(inverse)
+				data = ~data;
+			else
+				data = 0xff;
 		}
-		else
-		{
-			for (int z=0;z<8;z++)
-				bitmap.pix32(y,x + z) = BIT(data,z) ? fg : bg;
-		}
+		for (int z=0;z<8;z++)
+			bitmap.pix32(y,x + z) = BIT(data,z) ? fg : bg;
 	}
 }
 

@@ -41,7 +41,7 @@ BUGS
 Interaction of Upd7220 and Rainbow.cpp:
 - FIG directions / params appear to be odd (lines go 45 degrees up or down instead of straight dir.),
 - RDAT with MOD 2 is unimplemented. WDAT appears to set "m_bitmap_mod" wrongly ("2" means all pixels will be reset)...
-Some examples to try: MMIND (MasterMind, after BMP logo), SOLIT (Solitaire), CANON (all freeware games).
+Freeware to try: MMIND (MasterMind, after BMP logo), SOLIT (Solitaire), CANON (high resolution + vectors).
 
 UNIMPLEMENTED:
 // - Rainbow 100 A palette quirks (2 bit palette... applies to certain modes only)
@@ -54,11 +54,11 @@ UNKNOWN IMPLEMENTATION DETAILS:
    (PAGE 48 OF PDF HAS A SUPERFICIAL DESCRIPTION OF THE SCROLL BUFFER)
 
 // c. UNVERIFIED XTAL / CLOCK:
-// There is a 31.188 Mhz crystal in DUELL's hand written Option Graphics circuit (31.188 possibly measured, as it cannot be found in XTAL).
+// There is a 31.188 Mhz crystal in DUELL's hand written Option Graphics circuit (not to be found in XTAL).
 // According to the datasheet, the NEC 7220 was certified for  4.0 , 5.0, and 5.5 Mhz and the 7220A for 6.0, 7.0, and 8.0 Mhz
 
 // d. UPD7220 oddities: * refresh rate much too fast at 32Mhz/4 (Upd7220 LOG says 492 Mhz?!).
-//                      * 7220 pixel stretch / visible area looks odd (pixels stretched out too wide at 384 x 240. Compare the real SCRAM screenshot online)
+//                      * pixels are stretched out too wide at 384 x 240. Compare the real SCRAM screenshot online!
 
 // e. FIXME (MAME/MESS): what happens when the left screen is at 50 Hz and the right at 60 Hz?
 //  According to Haze: "if you have 2 screens running at different refresh rates one of them won't update properly
@@ -301,6 +301,9 @@ WIRE CONNECTORS - SEEN ON SCHEMATICS - NOT PRESENT ON DEC-100 B (-A only?):
 W16 pulls J2 printer port pin 1 to GND when set (chassis to logical GND).
 W17 pulls J1 serial  port pin 1 to GND when set (chassis to logical GND).
 ****************************************************************************/
+#define RD51_MAX_HEAD 8
+#define RD51_MAX_CYLINDER 1024
+#define RD51_SECTORS_PER_TRACK 17 // OLD: #define RD51_SECTORS_PER_TRACK 16
 
 #define RTC_BASE 0xFC000
 // Do not pretend to emulate newer RAM board; stick with the old one:
@@ -1114,9 +1117,14 @@ void rainbow_state::machine_reset()
 				output().set_value("led1", 1);
 
 				uint32_t max_sector = (info->cylinders) * (info->heads) * (info->sectors);
-				printf("\n%u MB HARD DISK MOUNTED. GEOMETRY: %d HEADS (1..8 ARE OK). %d CYLINDERS (151..1024 ARE OK). %d SECTORS / TRACK (16 ARE OK). %d BYTES / SECTOR (128 1024 ARE OK).\n", max_sector * 512 / 1000000,
-					info->heads, info->cylinders, info->sectors, info->sectorbytes);
-			}
+				printf("\n%u (%3.2f) MB HARD DISK MOUNTED. GEOMETRY: %d HEADS (1..%d ARE OK).\n%d CYLINDERS (151 to %d ARE OK).\n%d SECTORS / TRACK (up to %d ARE OK). \n%d BYTES / SECTOR (128 to 1024 ARE OK).\n", 
+					max_sector * info->sectorbytes / 1000000,
+					(float)max_sector * (float)info->sectorbytes / 1048576.0f,
+					info->heads, RD51_MAX_HEAD,
+					info->cylinders, RD51_MAX_CYLINDER,
+					info->sectors, RD51_SECTORS_PER_TRACK,
+					info->sectorbytes);
+			} 
 		}
 	}
 
@@ -1436,10 +1444,6 @@ READ8_MEMBER(rainbow_state::rtc_r)
 // ---------------------------- RD51 HARD DISK CONTROLLER ----------------------------------
 static const int SECTOR_SIZES[4] = { 256, 512, 1024, 128 };
 
-#define RD51_MAX_HEAD 8
-#define RD51_MAX_CYLINDER 1024
-#define RD51_SECTORS_PER_TRACK 16
-
 void rainbow_state::hdc_reset()
 {
 //  logerror(">> HARD DISC CONTROLLER RESET <<\n");
@@ -1482,9 +1486,9 @@ hard_disk_file *(rainbow_state::rainbow_hdc_file(int drv))
 	hard_disk_file *file = img->get_hard_disk_file();
 	hard_disk_info *info = hard_disk_get_info(file);
 
-	// ALWAYS 16 SECTORS / TRACK.
+	// MFM ALLOWS UP TO 17 SECTORS / TRACK.
 	// CYLINDERS: 151 (~ 5 MB) to 1024 (max. cylinders on WD1010 controller)
-	if (((info->sectors == RD51_SECTORS_PER_TRACK)) &&
+	if (((info->sectors <= RD51_SECTORS_PER_TRACK)) &&
 		((info->heads >= 1) && (info->heads <= RD51_MAX_HEAD)) &&            // HEADS WITHIN 1...8
 		((info->cylinders > 150) && (info->cylinders <= RD51_MAX_CYLINDER))
 		)
@@ -1494,9 +1498,16 @@ hard_disk_file *(rainbow_state::rainbow_hdc_file(int drv))
 	}
 	else
 	{
+		printf("\n <<< === REJECTED = (SANITY CHECK FAILED) === >>> \n");
+
 		uint32_t max_sector = info->cylinders * info->heads * info->sectors;
-		printf("%u MB HARD DISK: HEADS (1..8 OK) = %d / CYL. (151..1024 OK) = %d / SPT. (16 OK) = %d / SECTOR_BYTES (128..1024 OK) = %d\n", max_sector * 512 / 1000000,
-			info->heads, info->cylinders, info->sectors, info->sectorbytes);
+				printf("\n%u (%3.2f) MB HARD DISK REJECTED. GEOMETRY: %d HEADS (1..%d ARE OK).\n%d CYLINDERS (151 to %d ARE OK).\n%d SECTORS / TRACK (up to %d ARE OK). \n%d BYTES / SECTOR (128 to 1024 ARE OK).\n", 
+					max_sector * info->sectorbytes / 1000000,
+					(float)max_sector * (float)info->sectorbytes / 1048576.0f,
+					info->heads, RD51_MAX_HEAD,
+					info->cylinders, RD51_MAX_CYLINDER,
+					info->sectors, RD51_SECTORS_PER_TRACK,
+					info->sectorbytes);
 
 		printf("\n <<< === REJECTED = (SANITY CHECK FAILED) === >>> \n");
 		return nullptr;
@@ -2687,11 +2698,7 @@ READ16_MEMBER(rainbow_state::vram_r)
 	return 0;
 }
 
-// NOT PRESENT: enable line erase (10) / DMA scroll (11)
-// ??? VT 240 ???: LOGIC UNIT SELECT
-// SELECT_VECTOR_PATTERN_REGISTER  -> IS_VECTOR_MODE !
-
-// Rainbow has separate registers for fore and background.
+// NOTE: Rainbow has separate registers for fore and background.
 WRITE16_MEMBER(rainbow_state::vram_w)
 {
 	if(!(m_GDC_MODE_REGISTER & GDC_MODE_VECTOR)) 
@@ -2769,7 +2776,7 @@ WRITE16_MEMBER(rainbow_state::vram_w)
 				}
 
 				if(!(m_GDC_MODE_REGISTER & GDC_MODE_VECTOR)) // 0 : (NOT VECTOR MODE) Text Mode and Write Mask Batch
-					out = (out & ~m_GDC_WRITE_MASK) | (mem & m_GDC_WRITE_MASK); // // M_MASK (1st use)
+					out = (out & m_GDC_WRITE_MASK) | (mem & ~m_GDC_WRITE_MASK); // // M_MASK (1st use)
 				else
 					out = (out & data) | (mem & ~data); // VECTOR MODE !
 
@@ -2971,7 +2978,7 @@ WRITE8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_w)
 			// --------------------  WRITE BUFFER USED IN WORD MODE ONLY !
 			// "OUTPUT WRITE BUFFER IS THE INVERSE OF THE INPUT" (quote from 4-3 of the PDF)
 			//  BITSWAP SEEMS NECESSARY (see digits in DOODLE)... !
-			m_GDC_WRITE_BUFFER[m_GDC_write_buffer_index++] = ~BITSWAP8(data, 0, 1, 2, 3, 4, 5, 6, 7); // see BITSWAP on VT240;
+			m_GDC_WRITE_BUFFER[m_GDC_write_buffer_index++] = ~BITSWAP8(data, 0, 1, 2, 3, 4, 5, 6, 7); 
 			m_GDC_write_buffer_index &= 0xf; // write up to 16 bytes to port 52h.
 			break;
 
@@ -2999,10 +3006,10 @@ WRITE8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_w)
 		// NOTE: there is NO specific order for the WRITE_MASK (according to txt/code samples in PDF)!
 		// !! NEW: LOW... HI JUXTAPOSITION...!!
 		case 4: // 54h   Write Mask LOW
-			m_GDC_WRITE_MASK = ( BITSWAP8(data, 0, 1, 2, 3, 4, 5, 6, 7) << 8 )  | ( m_GDC_WRITE_MASK & 0x00FF );
+			m_GDC_WRITE_MASK = ( BITSWAP8(~data, 0, 1, 2, 3, 4, 5, 6, 7) << 8 )  | ( m_GDC_WRITE_MASK & 0x00FF );
 			break;
 		case 5: // 55h   Write Mask HIGH
-			m_GDC_WRITE_MASK = ( m_GDC_WRITE_MASK & 0xFF00 ) | BITSWAP8(data, 0, 1, 2, 3, 4, 5, 6, 7);
+			m_GDC_WRITE_MASK = ( m_GDC_WRITE_MASK & 0xFF00 ) | BITSWAP8(~data, 0, 1, 2, 3, 4, 5, 6, 7);
 			break;
 	}
 }

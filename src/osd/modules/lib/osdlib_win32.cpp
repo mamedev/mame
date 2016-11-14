@@ -31,27 +31,6 @@
 #endif
 
 //============================================================
-//  MACROS
-//============================================================
-
-// presumed size of a page of memory
-#define PAGE_SIZE           4096
-
-// align allocations to start or end of the page?
-#define GUARD_ALIGN_START   0
-
-#if defined(__BIGGEST_ALIGNMENT__)
-#define MAX_ALIGNMENT       __BIGGEST_ALIGNMENT__
-#elif defined(__AVX__)
-#define MAX_ALIGNMENT       32
-#elif defined(__SSE__) || defined(__x86_64__) || defined(_M_X64)
-#define MAX_ALIGNMENT       16
-#else
-#define MAX_ALIGNMENT       sizeof(int64_t)
-#endif
-
-
-//============================================================
 //  GLOBAL VARIABLES
 //============================================================
 
@@ -84,7 +63,7 @@ int osd_setenv(const char *name, const char *value, int overwrite)
 		if (osd_getenv(name) != nullptr)
 			return 0;
 	}
-	buf = (char *) osd_malloc_array(strlen(name)+strlen(value)+2);
+	buf = (char *) malloc(strlen(name)+strlen(value)+2);
 	sprintf(buf, "%s=%s", name, value);
 	result = putenv(buf);
 
@@ -101,103 +80,8 @@ int osd_setenv(const char *name, const char *value, int overwrite)
 
 void osd_process_kill()
 {
-	std::fflush(stdout);
-	std::fflush(stderr);
 	TerminateProcess(GetCurrentProcess(), -1);
 }
-
-//============================================================
-//  osd_malloc
-//============================================================
-
-void *osd_malloc(size_t size)
-{
-#ifndef MALLOC_DEBUG
-	return malloc(size);
-#else
-	// add in space for the size and offset
-	size += MAX_ALIGNMENT + sizeof(size_t) + 2;
-	size &= ~size_t(1);
-
-	// basic objects just come from the heap
-	uint8_t *const block = reinterpret_cast<uint8_t *>(HeapAlloc(GetProcessHeap(), 0, size));
-	if (block == nullptr)
-		return nullptr;
-	uint8_t *const result = reinterpret_cast<uint8_t *>(reinterpret_cast<uintptr_t>(block + sizeof(size_t) + MAX_ALIGNMENT) & ~(uintptr_t(MAX_ALIGNMENT) - 1));
-
-	// store the size and return and pointer to the data afterward
-	*reinterpret_cast<size_t *>(block) = size;
-	*(result - 1) = result - block;
-	return result;
-#endif
-}
-
-
-//============================================================
-//  osd_malloc_array
-//============================================================
-
-void *osd_malloc_array(size_t size)
-{
-#ifndef MALLOC_DEBUG
-	return malloc(size);
-#else
-	// add in space for the size and offset
-	size += MAX_ALIGNMENT + sizeof(size_t) + 2;
-	size &= ~size_t(1);
-
-	// round the size up to a page boundary
-	size_t const rounded_size = ((size + sizeof(void *) + PAGE_SIZE - 1) / PAGE_SIZE) * PAGE_SIZE;
-
-	// reserve that much memory, plus two guard pages
-	void *page_base = VirtualAlloc(nullptr, rounded_size + 2 * PAGE_SIZE, MEM_RESERVE, PAGE_NOACCESS);
-	if (page_base == nullptr)
-		return nullptr;
-
-	// now allow access to everything but the first and last pages
-	page_base = VirtualAlloc(reinterpret_cast<uint8_t *>(page_base) + PAGE_SIZE, rounded_size, MEM_COMMIT, PAGE_READWRITE);
-	if (page_base == nullptr)
-		return nullptr;
-
-	// work backwards from the page base to get to the block base
-	uint8_t *const block = GUARD_ALIGN_START ? reinterpret_cast<uint8_t *>(page_base) : (reinterpret_cast<uint8_t *>(page_base) + rounded_size - size);
-	uint8_t *const result = reinterpret_cast<uint8_t *>(reinterpret_cast<uintptr_t>(block + sizeof(size_t) + MAX_ALIGNMENT) & ~(uintptr_t(MAX_ALIGNMENT) - 1));
-
-	// store the size at the start with a flag indicating it has a guard page
-	*reinterpret_cast<size_t *>(block) = size | 1;
-	*(result - 1) = result - block;
-	return result;
-#endif
-}
-
-
-//============================================================
-//  osd_free
-//============================================================
-
-void osd_free(void *ptr)
-{
-#ifndef MALLOC_DEBUG
-	free(ptr);
-#else
-	uint8_t const offset = *(reinterpret_cast<uint8_t *>(ptr) - 1);
-	uint8_t *const block = reinterpret_cast<uint8_t *>(ptr) - offset;
-	size_t const size = *reinterpret_cast<size_t *>(block);
-
-	if ((size & 0x1) == 0)
-	{
-		// if no guard page, just free the pointer
-		HeapFree(GetProcessHeap(), 0, block);
-	}
-	else
-	{
-		// large items need more care
-		ULONG_PTR const page_base = reinterpret_cast<ULONG_PTR>(block) & ~(PAGE_SIZE - 1);
-		VirtualFree(reinterpret_cast<void *>(page_base - PAGE_SIZE), 0, MEM_RELEASE);
-	}
-#endif
-}
-
 
 //============================================================
 //  osd_alloc_executable
@@ -275,7 +159,7 @@ static char *get_clipboard_text_by_format(UINT format, std::string (*convert)(LP
 					std::string s = (*convert)(data);
 
 					// copy the string
-					result = (char *) osd_malloc(s.size() + 1);
+					result = (char *) malloc(s.size() + 1);
 					if (result != nullptr)
 						memcpy(result, s.data(), (s.size() + 1) * sizeof(*result));
 

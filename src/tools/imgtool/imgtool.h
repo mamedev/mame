@@ -144,7 +144,7 @@ namespace imgtool
 		typedef std::unique_ptr<partition> ptr;
 
 		// ctor/dtor
-		partition(imgtool::image &image, imgtool_class &imgclass, int partition_index, uint64_t base_block, uint64_t block_count);
+		partition(imgtool::image &image, const imgtool_class &imgclass, int partition_index, uint64_t base_block, uint64_t block_count);
 		~partition();
 
 		static imgtoolerr_t open(imgtool::image &image, int partition_index, ptr &partition);

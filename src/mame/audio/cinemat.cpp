@@ -1280,7 +1280,7 @@ SOUND_RESET_MEMBER( cinemat_state, demon )
 }
 
 
-static ADDRESS_MAP_START( demon_sound_map, AS_PROGRAM, 8, driver_device )
+static ADDRESS_MAP_START( demon_sound_map, AS_PROGRAM, 8, cinemat_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x3000, 0x33ff) AM_RAM
 	AM_RANGE(0x4000, 0x4001) AM_DEVREAD("ay1", ay8910_device, data_r)
@@ -1293,7 +1293,7 @@ static ADDRESS_MAP_START( demon_sound_map, AS_PROGRAM, 8, driver_device )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( demon_sound_ports, AS_IO, 8, driver_device )
+static ADDRESS_MAP_START( demon_sound_ports, AS_IO, 8, cinemat_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVWRITE("ctc", z80ctc_device, write)
 	AM_RANGE(0x1c, 0x1f) AM_DEVWRITE("ctc", z80ctc_device, write)

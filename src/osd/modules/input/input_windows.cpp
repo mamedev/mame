@@ -8,7 +8,7 @@
 
 #include "input_module.h"
 
-#if defined(OSD_WINDOWS)
+#if defined(OSD_WINDOWS) || defined(OSD_UWP)
 
 // MAME headers
 #include "emu.h"

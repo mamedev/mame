@@ -69,7 +69,7 @@ protected:
 	virtual uint8_t pc_vga_choosevideomode();
 	void recompute_params_clock(int divisor, int xtal);
 	uint8_t crtc_reg_read(uint8_t index);
-	void recompute_params();
+	virtual void recompute_params();
 	void crtc_reg_write(uint8_t index, uint8_t data);
 	void seq_reg_write(uint8_t index, uint8_t data);
 	uint8_t vga_vblank();

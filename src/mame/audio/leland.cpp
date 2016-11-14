@@ -861,20 +861,20 @@ WRITE8_MEMBER( leland_80186_sound_device::ataxx_80186_control_w )
  *
  *************************************/
 
-ADDRESS_MAP_START( leland_80186_map_program, AS_PROGRAM, 16, driver_device )
+ADDRESS_MAP_START( leland_80186_map_program, AS_PROGRAM, 16, leland_80186_sound_device )
 	AM_RANGE(0x00000, 0x03fff) AM_MIRROR(0x1c000) AM_RAM
 	AM_RANGE(0x20000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( ataxx_80186_map_io, AS_IO, 16, driver_device )
+ADDRESS_MAP_START( ataxx_80186_map_io, AS_IO, 16, leland_80186_sound_device )
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( redline_80186_map_io, AS_IO, 16, driver_device )
+ADDRESS_MAP_START( redline_80186_map_io, AS_IO, 16, leland_80186_sound_device )
 	AM_RANGE(0x0000, 0xffff) AM_DEVWRITE("custom", redline_80186_sound_device, redline_dac_w)
 ADDRESS_MAP_END
 
 
-ADDRESS_MAP_START( leland_80186_map_io, AS_IO, 16, driver_device )
+ADDRESS_MAP_START( leland_80186_map_io, AS_IO, 16, leland_80186_sound_device )
 	AM_RANGE(0x0000, 0xffff) AM_DEVWRITE("custom", leland_80186_sound_device, dac_w)
 ADDRESS_MAP_END
 

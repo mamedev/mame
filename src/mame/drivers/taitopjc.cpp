@@ -627,7 +627,7 @@ static ADDRESS_MAP_START( tlcs900h_mem, AS_PROGRAM, 16, taitopjc_state )
 	AM_RANGE(0xfc0000, 0xffffff) AM_ROM AM_REGION("io_cpu", 0)
 ADDRESS_MAP_END
 
-ADDRESS_MAP_START( mn10200_map, AS_PROGRAM, 16, driver_device )
+ADDRESS_MAP_START( mn10200_map, AS_PROGRAM, 16, taitopjc_state )
 	AM_RANGE(0x080000, 0x0fffff) AM_ROM AM_REGION("mn10200", 0)
 ADDRESS_MAP_END
 

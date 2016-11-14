@@ -14,7 +14,7 @@ ToDo:
  Some sprite flickers on attract mode
  totmejan: Are the "dots" behind the girls in attract mode correct?
 
-PCB Layout
+Tottemo E Jong PCB Layout
 
 |---------------------------------------------------------------|
 |LA4460  YM3812  M6295  E-JAN.U0911 6116        Z80A 7.15909MHz |
@@ -31,7 +31,7 @@ PCB Layout
 |                           TC110G21AF                          |
 |           82S135.U083                 PAL   6264              |
 |                                                               |
-|  DSW     DSW                                                  |
+|  DSW     DSW     SEI0220BP                                    |
 |                                              62256     62256  |
 |  E-JAN.U078                PAL                                |
 |                                                               |
@@ -48,6 +48,8 @@ Notes:
       M6295 clock - 1.000MHz [16/16], Pin 7 HIGH
       VSync - 60Hz
       HSync - 15.38kHz
+
+Good E Jong has SEI0211 instead of SEI0210, but PCB layout is otherwise identical.
 
 
 Diagnostic Menu:

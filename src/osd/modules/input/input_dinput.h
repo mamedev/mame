@@ -134,7 +134,7 @@ public:
 
 	HRESULT enum_attached_devices(int devclass, device_enum_interface *enumerate_interface, void *state) const;
 
-	const std::string guid_to_string(const GUID& guid)
+	std::string guid_to_string(const GUID& guid) const
 	{
 		char guid_string[37];
 		sprintf_s(

@@ -16,6 +16,8 @@
 #include "mb3773.h"
 
 
+#define WATCHDOG_DEBUG ( 0 )
+
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -57,7 +59,11 @@ void mb3773_device::device_reset()
 
 void mb3773_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
+#if WATCHDOG_DEBUG
+	machine().debug_break();
+#else
 	machine().schedule_soft_reset();
+#endif
 }
 
 void mb3773_device::reset_timer()

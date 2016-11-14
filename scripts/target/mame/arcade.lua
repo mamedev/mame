@@ -3433,8 +3433,8 @@ files {
 createMAMEProjects(_target, _subtarget, "sony")
 files {
 	MAME_DIR .. "src/mame/drivers/zn.cpp",
-	MAME_DIR .. "src/mame/machine/zndip.cpp",
-	MAME_DIR .. "src/mame/machine/zndip.h",
+	MAME_DIR .. "src/mame/machine/znmcu.cpp",
+	MAME_DIR .. "src/mame/machine/znmcu.h",
 	MAME_DIR .. "src/mame/machine/cat702.cpp",
 	MAME_DIR .. "src/mame/machine/cat702.h",
 }
@@ -4341,11 +4341,11 @@ files {
 	MAME_DIR .. "src/mame/machine/cdicdic.cpp",
 	MAME_DIR .. "src/mame/machine/cdicdic.h",
 	MAME_DIR .. "src/mame/drivers/cedar_magnet.cpp",
-	MAME_DIR .. "src/mame/drivers/cedar_magnet_sound.cpp",
-	MAME_DIR .. "src/mame/drivers/cedar_magnet_plane.cpp",
-	MAME_DIR .. "src/mame/drivers/cedar_magnet_sprite.cpp",
-	MAME_DIR .. "src/mame/drivers/cedar_magnet_board.cpp",
-	MAME_DIR .. "src/mame/drivers/cedar_magnet_flop.cpp",
+	MAME_DIR .. "src/mame/machine/cedar_magnet_sound.cpp",
+	MAME_DIR .. "src/mame/machine/cedar_magnet_plane.cpp",
+	MAME_DIR .. "src/mame/machine/cedar_magnet_sprite.cpp",
+	MAME_DIR .. "src/mame/machine/cedar_magnet_board.cpp",
+	MAME_DIR .. "src/mame/machine/cedar_magnet_flop.cpp",
 	MAME_DIR .. "src/mame/drivers/cesclass.cpp",
 	MAME_DIR .. "src/mame/drivers/chance32.cpp",
 	MAME_DIR .. "src/mame/drivers/chexx.cpp",

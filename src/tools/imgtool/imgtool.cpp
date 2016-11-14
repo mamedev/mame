@@ -518,7 +518,7 @@ imgtoolerr_t imgtool::image::list_partitions(std::vector<imgtool::partition_info
 	else
 	{
 		// default implementation
-		partitions.emplace_back(unknown_partition_get_info, 0, ~0);
+		partitions.emplace_back(module().imgclass, 0, ~0);
 	}
 	return IMGTOOLERR_SUCCESS;	
 }
@@ -560,9 +560,8 @@ uint64_t imgtool::image::rand()
 //  imgtool::partition ctor
 //-------------------------------------------------
 
-imgtool::partition::partition(imgtool::image &image, imgtool_class &imgclass, int partition_index, uint64_t base_block, uint64_t block_count)
+imgtool::partition::partition(imgtool::image &image, const imgtool_class &imgclass, int partition_index, uint64_t base_block, uint64_t block_count)
 	: m_image(image)
-	//, m_partition_index(partition_index)
 	, m_base_block(base_block)
 	, m_block_count(block_count)
 	, m_imgclass(imgclass)
@@ -635,9 +634,7 @@ imgtoolerr_t imgtool::partition::open(imgtool::image &image, int partition_index
 {
 	imgtoolerr_t err = (imgtoolerr_t)IMGTOOLERR_SUCCESS;
 	imgtool::partition::ptr p;
-	imgtool_class imgclass;
 	std::vector<imgtool::partition_info> partitions;
-	uint64_t base_block, block_count;
 	imgtoolerr_t (*open_partition)(imgtool::partition &partition, uint64_t first_block, uint64_t block_count);
 
 	// list the partitions
@@ -646,14 +643,13 @@ imgtoolerr_t imgtool::partition::open(imgtool::image &image, int partition_index
 		return err;
 
 	// is this an invalid index?
-	if ((partition_index < 0) || (partition_index >= partitions.size()) || !partitions[partition_index].get_info())
+	if ((partition_index < 0) || (partition_index >= partitions.size()) || (!partitions[partition_index].imgclass().get_info && !partitions[partition_index].imgclass().derived_get_info))
 		return IMGTOOLERR_INVALIDPARTITION;
 
 	// use this partition 
-	memset(&imgclass, 0, sizeof(imgclass));
-	imgclass.get_info = partitions[partition_index].get_info();
-	base_block = partitions[partition_index].base_block();
-	block_count = partitions[partition_index].block_count();
+	const imgtool_class &imgclass(partitions[partition_index].imgclass());
+	uint64_t base_block = partitions[partition_index].base_block();
+	uint64_t block_count = partitions[partition_index].block_count();
 
 	// allocate the new partition object
 	try { p = std::make_unique<imgtool::partition>(image, imgclass, partition_index, base_block, block_count); }
@@ -1332,7 +1328,7 @@ done:
 	if (alloc_path != nullptr)
 		free(alloc_path);
 	if (new_fname != nullptr)
-		osd_free(new_fname);
+		free(new_fname);
 	return err;
 }
 
@@ -1376,7 +1372,7 @@ done:
 	if (alloc_path != nullptr)
 		free(alloc_path);
 	if (new_fname != nullptr)
-		osd_free(new_fname);
+		free(new_fname);
 	return err;
 }
 
@@ -1481,7 +1477,7 @@ done:
 	if (alloc_path)
 		free(alloc_path);
 	if (new_fname)
-		osd_free(new_fname);
+		free(new_fname);
 	return err;
 }
 
@@ -1920,7 +1916,7 @@ done:
 	if (alloc_dest != nullptr)
 		free(alloc_dest);
 	if (new_fname != nullptr)
-		osd_free(new_fname);
+		free(new_fname);
 	return err;
 }
 
@@ -1968,7 +1964,7 @@ imgtoolerr_t imgtool::partition::put_file(const char *newfname, const char *fork
 done:
 	/* clean up */
 	if (alloc_newfname != nullptr)
-		osd_free(alloc_newfname);
+		free(alloc_newfname);
 	return err;
 }
 
@@ -2016,7 +2012,7 @@ done:
 	if (alloc_path)
 		free(alloc_path);
 	if (new_fname)
-		osd_free(new_fname);
+		free(new_fname);
 	return err;
 }
 
@@ -2060,7 +2056,7 @@ done:
 	if (alloc_path)
 		free(alloc_path);
 	if (new_fname)
-		osd_free(new_fname);
+		free(new_fname);
 	return err;
 }
 
@@ -2105,7 +2101,7 @@ done:
 	if (alloc_path)
 		free(alloc_path);
 	if (new_path)
-		osd_free(new_path);
+		free(new_path);
 	return err;
 }
 
@@ -2150,7 +2146,7 @@ done:
 	if (alloc_path)
 		free(alloc_path);
 	if (new_path)
-		osd_free(new_path);
+		free(new_path);
 	return err;
 }
 
@@ -2466,7 +2462,7 @@ done:
 	if (alloc_path != nullptr)
 		free(alloc_path);
 	if (new_path != nullptr)
-		osd_free(new_path);
+		free(new_path);
 	return err;
 }
 
@@ -2509,7 +2505,7 @@ imgtoolerr_t imgtool::directory::get_next(imgtool_dirent &ent)
 			return IMGTOOLERR_BADFILENAME;
 
 		snprintf(ent.filename, ARRAY_LENGTH(ent.filename), "%s", new_fname);
-		osd_free(new_fname);
+		free(new_fname);
 	}
 
 	// don't trust the module!

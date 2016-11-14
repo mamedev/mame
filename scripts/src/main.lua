@@ -48,6 +48,10 @@ end
 			"ppapi_gles2",
 			"pthread",
 		}
+
+	configuration { "winstore*" }
+		kind "WindowedApp"
+
 	configuration {  }
 
 	addprojectflags()
@@ -68,6 +72,36 @@ end
 	flags {
 		"Unicode",
 	}
+
+	configuration { "winstore*" }
+		-- Windows Required Files
+		files {
+			-- Manifest file
+			MAME_DIR .. "scripts/resources/uwp/Package.appxmanifest",
+		}
+
+	configuration { "winstore*" }
+		files {
+			MAME_DIR .. "scripts/resources/uwp/assets/*.png"
+		}
+		configuration "**/scripts/resources/uwp/assets/*.png"
+			flags { "DeploymentContent" }
+	
+	-- Effects and Shaders
+	configuration { "winstore*" }
+		files {
+			MAME_DIR .. "artwork/*",
+			MAME_DIR .. "artwork/**/*",
+			MAME_DIR .. "bgfx/*",
+			MAME_DIR .. "bgfx/**/*",
+			MAME_DIR .. "hash/*",
+			MAME_DIR .. "language/*",
+			MAME_DIR .. "language/**/*",
+			MAME_DIR .. "plugins/*",
+			MAME_DIR .. "plugins/**/*",
+		}
+		configuration "**/*"
+			flags { "DeploymentContent" }
 
 	configuration { "x64", "Release" }
 		targetsuffix "64"
@@ -233,8 +267,12 @@ if (STANDALONE~=true) then
 	links {
 		ext_lib("lua"),
 		"lualibs",
+	}
+if (_OPTIONS["osd"] ~= "uwp") then
+	links {
 		"linenoise-ng",
 	}
+end
 end
 	links {
 		ext_lib("zlib"),

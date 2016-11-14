@@ -21,13 +21,13 @@
 #include <windowsx.h>
 #include <mmsystem.h>
 #endif
-#undef min
-#undef max
 
 #ifdef OSD_SDL
 // forward declaration
 struct SDL_Window;
 #endif
+#undef min
+#undef max
 
 //============================================================
 //  TYPE DEFINITIONS
@@ -64,7 +64,7 @@ class osd_window : public std::enable_shared_from_this<osd_window>
 public:
 	osd_window(const osd_window_config &config)
 	:
-#ifndef OSD_SDL
+#ifdef OSD_WINDOWS
 		m_dc(nullptr), m_resize_state(0),
 #endif
 		m_primlist(nullptr),
@@ -75,6 +75,8 @@ public:
 		m_renderer(nullptr),
 		m_main(nullptr)
 		{}
+
+	virtual ~osd_window() { }
 
 	virtual render_target *target() = 0;
 	virtual int fullscreen() const = 0;
@@ -129,14 +131,14 @@ public:
 	virtual void update() = 0;
 	virtual void destroy() = 0;
 
-#ifndef OSD_SDL
+#if defined(OSD_WINDOWS) || defined(OSD_UWP)
 	virtual bool win_has_menu() = 0;
-
-	HDC                     m_dc;       // only used by GDI renderer!
-
-	int                     m_resize_state;
 #endif
 
+#ifdef OSD_WINDOWS
+	HDC                     m_dc;       // only used by GDI renderer!
+	int                     m_resize_state;
+#endif
 	render_primitive_list   *m_primlist;
 	osd_window_config       m_win_config;
 	int                     m_index;

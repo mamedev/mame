@@ -124,7 +124,7 @@ protected:
 
 	void skip_map_regs(int count);
 	void add_map(uint64_t size, int flags, address_map_delegate &map);
-	template <typename T> void add_map(uint64_t size, int flags, void (T::*map)(address_map &map, device_t &device), const char *name) {
+	template <typename T> void add_map(uint64_t size, int flags, void (T::*map)(address_map &map), const char *name) {
 		address_map_delegate delegate(map, name, static_cast<T *>(this));
 		add_map(size, flags, delegate);
 	}

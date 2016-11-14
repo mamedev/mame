@@ -343,7 +343,7 @@ static int join_file(const char *filename, const char *outname, int write_output
 			printf(" verified\n");
 
 		// release allocated memory
-		osd_free(splitbuffer);
+		free(splitbuffer);
 		splitbuffer = nullptr;
 	}
 	if (write_output)
@@ -366,7 +366,7 @@ cleanup:
 			remove(outfilename.c_str());
 	}
 	if (splitbuffer != nullptr)
-		osd_free(splitbuffer);
+		free(splitbuffer);
 	return error;
 }
 

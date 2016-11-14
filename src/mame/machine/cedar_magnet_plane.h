@@ -6,7 +6,7 @@
 #ifndef CEDAR_MAGNET_PLANE_DEF
 #define CEDAR_MAGNET_PLANE_DEF
 
-#include "cedar_magnet_board.h"
+#include "machine/cedar_magnet_board.h"
 
 extern const device_type CEDAR_MAGNET_PLANE;
 

@@ -129,7 +129,7 @@ void ram_device::device_validity_check(validity_checker &valid) const
 						p += 1;
 					}
 
-					osd_free(s);
+					free(s);
 				}
 
 			} else {

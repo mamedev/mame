@@ -16,15 +16,25 @@
 /*****************************/
 /* Main disassembly function */
 /*****************************/
-CPU_DISASSEMBLE( dsp56k )
+static offs_t internal_disasm_dsp56k(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
 {
 	const uint16_t w0 = oprom[0] | (oprom[1] << 8);
 	const uint16_t w1 = oprom[2] | (oprom[3] << 8);
 
 	// Decode and disassemble.
 	DSP56K::Opcode op(w0, w1);
-	sprintf(buffer, "%s", op.disassemble().c_str());
+	stream << op.disassemble();
 
 	const unsigned size = op.size();
 	return (size | DASMFLAG_SUPPORTED);
+}
+
+
+CPU_DISASSEMBLE(dsp56k)
+{
+	std::ostringstream stream;
+	offs_t result = internal_disasm_dsp56k(device, stream, pc, oprom, opram, options);
+	std::string stream_str = stream.str();
+	strcpy(buffer, stream_str.c_str());
+	return result;
 }

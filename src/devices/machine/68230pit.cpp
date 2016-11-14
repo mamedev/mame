@@ -27,12 +27,12 @@
 
 #define VERBOSE 0
 
-#define LOGPRINT(x) do { if (VERBOSE) logerror x; } while (0)
-#define LOG(x)
-#define LOGR(x)
-#define LOGINT(x)   LOGPRINT(x)
-#define LOGSETUP(x) LOGPRINT(x)
-#if VERBOSE == 2
+#define LOGPRINT(x) { do { if (VERBOSE) logerror x; } while (0); }
+#define LOG(x)   	{} LOGPRINT(x)
+#define LOGR(x)		{} LOGPRINT(x)
+#define LOGINT(x)   {} LOGPRINT(x)
+#define LOGSETUP(x) {} LOGPRINT(x)
+#if VERBOSE > 1
 #define logerror printf
 #endif
 
@@ -207,7 +207,7 @@ void pit68230_device::device_timer (emu_timer &timer, device_timer_id id, int32_
 		}
 		break;
 	default:
-		LOG(("Unhandled Timer ID %d\n", id));
+		LOGINT(("Unhandled Timer ID %d\n", id));
 		break;
 	}
 }
@@ -235,18 +235,29 @@ static int32_t ow_ofs = 0;
 void pit68230_device::wr_pitreg_pgcr(uint8_t data)
 {
 	LOG(("%s(%02x) \"%s\": %s - %02x\n", FUNCNAME, data, tag(), FUNCNAME, data));
+	LOGSETUP(("PGCR  - Mode %d,", (data >> 6) & 3 ));
+	LOGSETUP((" H34:%s, H12:%s,", (data & 0x20) ? "enabled" : "disabled", (data & 0x10) ? "enabled" : "disabled" ));
+	LOGSETUP((" Sense assert H4:%s, H3:%s, H2:%s, H1:%s\n", 
+			  data & 0x04 ? "Hi" : "Lo", data & 0x03 ? "Hi" : "Lo", 
+			  data & 0x02 ? "Hi" : "Lo", data & 0x01 ? "Hi" : "Lo"));
 	m_pgcr = data;
 }
 
 void pit68230_device::wr_pitreg_psrr(uint8_t data)
 {
 	LOG(("%s(%02x) \"%s\": %s - %02x\n", FUNCNAME, data, tag(), FUNCNAME, data));
+	LOGSETUP(("PSSR - %s pin activated,", data & 0x40 ? "DMA" : "PC4"));
+	LOGSETUP((" %s pin support %s interrupts,", data & 0x80 ? "PIRQ" : "PC5",
+			  data & 0x08 ? "no" : (data & 0x10 ? "vectored" : "autovectored" ) ));
+	LOGSETUP((" H prio mode:%d\n", data & 0x03 ));
+
 	m_psrr = data;
 }
 
 void pit68230_device::wr_pitreg_paddr(uint8_t data)
 {
 	LOG(("%s(%02x) \"%s\": %s - %02x\n", FUNCNAME, data, tag(), FUNCNAME, data));
+	LOGSETUP(("PADDR"));
 	m_paddr = data;
 }
 
@@ -508,11 +519,14 @@ WRITE8_MEMBER (pit68230_device::write)
 
 #if VERBOSE > 2
 	if (offset != ow_ofs || data != ow_data || ow_cnt >= 1000) {
-		logerror ("\npit68230_device::write: previous identical operation performed %02x times\n", ow_cnt);
+		if (ow_cnt > 1)
+		{
+			logerror ("\npit68230_device::write: previous identical operation performed %02x times\n", ow_cnt);
+			logerror ("pit68230_device::write: offset=%02x data=%02x %lld\n", offset, data, machine ().firstcpu->total_cycles ());
+		}
 		ow_cnt = 0;
 		ow_data = data;
 		ow_ofs = offset;
-		logerror ("pit68230_device::write: offset=%02x data=%02x %lld\n", ow_ofs, ow_data, machine ().firstcpu->total_cycles ());
 	}
 	else
 		ow_cnt++;
@@ -535,7 +549,7 @@ uint8_t pit68230_device::rr_pitreg_pgcr()
 uint8_t pit68230_device::rr_pitreg_psrr()
 {
 	LOGR(("%s %s <- %02x\n",tag(), FUNCNAME, m_psrr));
-	return m_psrr;
+	return m_psrr & 0x7f; // mask out unused bits
 }
 
 uint8_t pit68230_device::rr_pitreg_paddr()
@@ -731,14 +745,20 @@ READ8_MEMBER (pit68230_device::read){
 
 #if VERBOSE > 2
 	if (offset != or_ofs || data != or_data || or_cnt >= 1000) {
-		logerror ("\npit68230_device::read: previous identical operation performed %02x times\n", or_cnt);
+		LOGSETUP((" * %s Reg %02x -> %02x  \n", tag(), offset, data));
+		if (or_cnt > 1)
+		{
+			logerror ("\npit68230_device::read: previous identical operation performed %02x times\n", or_cnt);
+			logerror (" - pit68230_device::read: offset=%02x data=%02x %lld\n", offset, data, machine ().firstcpu->total_cycles ());
+		}
 		or_cnt = 0;
 		or_data = data;
 		or_ofs = offset;
-		logerror ("pit68230_device::read: offset=%02x data=%02x %lld\n", or_ofs, or_data, machine ().firstcpu->total_cycles ());
 	}
 	else
+	{
 		or_cnt++;
+	}
 #endif
 
 	return data;

@@ -196,12 +196,12 @@ void speech_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
  *
  *************************************/
 
-static ADDRESS_MAP_START( speech_map, AS_PROGRAM, 8, driver_device )
+static ADDRESS_MAP_START( speech_map, AS_PROGRAM, 8, speech_sound_device )
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x0800) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( speech_portmap, AS_IO, 8, driver_device )
+static ADDRESS_MAP_START( speech_portmap, AS_IO, 8, speech_sound_device )
 	AM_RANGE(0x00, 0xff) AM_DEVREAD("segaspeech", speech_sound_device, rom_r)
 	AM_RANGE(0x00, 0xff) AM_DEVWRITE("speech", sp0250_device, write)
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVREADWRITE("segaspeech", speech_sound_device, p1_r, p1_w)

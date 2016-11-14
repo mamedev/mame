@@ -6,13 +6,10 @@
 //
 //============================================================
 
-// MAMEOS headers
-#include "window.h"
-
-#pragma once
-
 #ifndef __DRAWNONE__
 #define __DRAWNONE__
+
+#include "window.h"
 
 class renderer_none : public osd_renderer
 {

@@ -83,8 +83,6 @@ static const char *const regnamee[] =
 	"r20e", "r21e", "dauce", "ioce", "res1ce", "r22e", "pcshe", "res1fe"
 };
 
-static char tempbuf[10][40];
-
 static inline char *signed_16bit_unary(int16_t val)
 {
 	static char temp[10];
@@ -126,8 +124,9 @@ static inline char *unsigned_16bit_size(int16_t val, uint8_t size)
 }
 
 static uint8_t lastp;
-static const char *dasm_XYZ(uint8_t bits, char *buffer)
+static std::string dasm_XYZ(uint8_t bits)
 {
+	std::string buffer;
 	uint8_t p = bits >> 3;
 	uint8_t i = bits & 7;
 
@@ -137,14 +136,14 @@ static const char *dasm_XYZ(uint8_t bits, char *buffer)
 		lastp = p;
 		switch (i)
 		{
-			case 0:     sprintf(buffer, "*r%d", p); break;
+			case 0:     buffer = util::string_format("*r%d", p); break;
 			case 1:
 			case 2:
 			case 3:
 			case 4:
-			case 5:     sprintf(buffer, "*r%d++r%d", p, i + 14); break;
-			case 6:     sprintf(buffer, "*r%d--", p); break;
-			case 7:     sprintf(buffer, "*r%d++", p); break;
+			case 5:     buffer = util::string_format("*r%d++r%d", p, i + 14); break;
+			case 6:     buffer = util::string_format("*r%d--", p); break;
+			case 7:     buffer = util::string_format("*r%d++", p); break;
 		}
 	}
 	else
@@ -154,19 +153,20 @@ static const char *dasm_XYZ(uint8_t bits, char *buffer)
 			case 0:
 			case 1:
 			case 2:
-			case 3:     sprintf(buffer, "a%d", i); break;
-			case 4:     sprintf(buffer, "ibuf"); break;
-			case 5:     sprintf(buffer, "obuf"); break;
-			case 6:     sprintf(buffer, "pdr"); break;
-			case 7:     buffer[0] = 0; break;
+			case 3:     buffer = util::string_format("a%d", i); break;
+			case 4:     buffer = util::string_format("ibuf"); break;
+			case 5:     buffer = util::string_format("obuf"); break;
+			case 6:     buffer = util::string_format("pdr"); break;
+			case 7:     break;
 		}
 	}
 	return buffer;
 }
 
 
-static const char *dasm_PI(uint16_t bits, char *buffer)
+static std::string dasm_PI(uint16_t bits)
 {
+	std::string buffer;
 	uint8_t p = bits >> 5;
 	uint8_t i = bits & 0x1f;
 
@@ -175,31 +175,31 @@ static const char *dasm_PI(uint16_t bits, char *buffer)
 		switch (i)
 		{
 			case 0:
-			case 16:    sprintf(buffer, "*%s", regname[p]); break;
-			case 22:    sprintf(buffer, "*%s--", regname[p]); break;
-			case 23:    sprintf(buffer, "*%s++", regname[p]); break;
-			default:    sprintf(buffer, "*%s++%s", regname[p], regname[i]); break;
+			case 16:    buffer = util::string_format("*%s", regname[p]); break;
+			case 22:    buffer = util::string_format("*%s--", regname[p]); break;
+			case 23:    buffer = util::string_format("*%s++", regname[p]); break;
+			default:    buffer = util::string_format("*%s++%s", regname[p], regname[i]); break;
 		}
 	}
 	else
 	{
 		switch (i)
 		{
-			case 4:     sprintf(buffer, "ibuf"); break;
-			case 5:     sprintf(buffer, "obuf"); break;
-			case 6:     sprintf(buffer, "pdr"); break;
-			case 14:    sprintf(buffer, "piop"); break;
-			case 20:    sprintf(buffer, "pdr2"); break;
-			case 22:    sprintf(buffer, "pir"); break;
-			case 30:    sprintf(buffer, "pcw"); break;
-			default:    sprintf(buffer, "????"); break;
+			case 4:     buffer = util::string_format("ibuf"); break;
+			case 5:     buffer = util::string_format("obuf"); break;
+			case 6:     buffer = util::string_format("pdr"); break;
+			case 14:    buffer = util::string_format("piop"); break;
+			case 20:    buffer = util::string_format("pdr2"); break;
+			case 22:    buffer = util::string_format("pir"); break;
+			case 30:    buffer = util::string_format("pcw"); break;
+			default:    buffer = util::string_format("????"); break;
 		}
 	}
 	return buffer;
 }
 
 
-static unsigned dasm_dsp32(char *buffer, unsigned pc, uint32_t op)
+static unsigned dasm_dsp32(std::ostream &stream, unsigned pc, uint32_t op)
 {
 	uint32_t flags = 0;
 
@@ -210,28 +210,28 @@ static unsigned dasm_dsp32(char *buffer, unsigned pc, uint32_t op)
 		case 0x14:  case 0x15:  case 0x16:  case 0x17:
 		case 0x18:  case 0x19:  case 0x1a:  case 0x1b:
 		{
-			const char *X = dasm_XYZ((op >> 14) & 0x7f, tempbuf[0]);
-			const char *Y = dasm_XYZ((op >> 7) & 0x7f, tempbuf[1]);
-			const char *Z = dasm_XYZ((op >> 0) & 0x7f, tempbuf[2]);
+			std::string X = dasm_XYZ((op >> 14) & 0x7f);
+			std::string Y = dasm_XYZ((op >> 7) & 0x7f);
+			std::string Z = dasm_XYZ((op >> 0) & 0x7f);
 			const char *aM = aMvals[(op >> 26) & 7];
 			uint8_t aN = (op >> 21) & 3;
 			if ((op & 0x7f) == 7)
 			{
 				if (aM[0] == '0')
-					sprintf(buffer, "a%d = %s%s", aN, unarysign[(op >> 24) & 1], Y);
+					util::stream_format(stream, "a%d = %s%s", aN, unarysign[(op >> 24) & 1], Y);
 				else if (aM[0] == '1')
-					sprintf(buffer, "a%d = %s%s %s %s", aN, unarysign[(op >> 24) & 1], Y, sign[(op >> 23) & 1], X);
+					util::stream_format(stream, "a%d = %s%s %s %s", aN, unarysign[(op >> 24) & 1], Y, sign[(op >> 23) & 1], X);
 				else
-					sprintf(buffer, "a%d = %s%s %s %s * %s", aN, unarysign[(op >> 24) & 1], Y, sign[(op >> 23) & 1], aM, X);
+					util::stream_format(stream, "a%d = %s%s %s %s * %s", aN, unarysign[(op >> 24) & 1], Y, sign[(op >> 23) & 1], aM, X);
 			}
 			else
 			{
 				if (aM[0] == '0')
-					sprintf(buffer, "%s = a%d = %s%s", Z, aN, unarysign[(op >> 24) & 1], Y);
+					util::stream_format(stream, "%s = a%d = %s%s", Z, aN, unarysign[(op >> 24) & 1], Y);
 				else if (aM[0] == '1')
-					sprintf(buffer, "%s = a%d = %s%s %s %s", Z, aN, unarysign[(op >> 24) & 1], Y, sign[(op >> 23) & 1], X);
+					util::stream_format(stream, "%s = a%d = %s%s %s %s", Z, aN, unarysign[(op >> 24) & 1], Y, sign[(op >> 23) & 1], X);
 				else
-					sprintf(buffer, "%s = a%d = %s%s %s %s * %s", Z, aN, unarysign[(op >> 24) & 1], Y, sign[(op >> 23) & 1], aM, X);
+					util::stream_format(stream, "%s = a%d = %s%s %s %s * %s", Z, aN, unarysign[(op >> 24) & 1], Y, sign[(op >> 23) & 1], aM, X);
 			}
 			break;
 		}
@@ -241,25 +241,25 @@ static unsigned dasm_dsp32(char *buffer, unsigned pc, uint32_t op)
 		case 0x24:  case 0x25:  case 0x26:  case 0x27:
 		case 0x28:  case 0x29:  case 0x2a:  case 0x2b:
 		{
-			const char *X = dasm_XYZ((op >> 14) & 0x7f, tempbuf[0]);
-			const char *Y = dasm_XYZ((op >> 7) & 0x7f, tempbuf[1]);
-			const char *Z = dasm_XYZ((op >> 0) & 0x7f, tempbuf[2]);
+			std::string X = dasm_XYZ((op >> 14) & 0x7f);
+			std::string Y = dasm_XYZ((op >> 7) & 0x7f);
+			std::string Z = dasm_XYZ((op >> 0) & 0x7f);
 			const char *aM = aMvals[(op >> 26) & 7];
 			uint8_t aN = (op >> 21) & 3;
 
 			if ((op & 0x7f) == 7)
 			{
 				if (aM[0] == '0')
-					sprintf(buffer, "a%d = %s%s * %s", aN, unarysign[(op >> 23) & 1], Y, X);
+					util::stream_format(stream, "a%d = %s%s * %s", aN, unarysign[(op >> 23) & 1], Y, X);
 				else
-					sprintf(buffer, "a%d = %s%s %s %s * %s", aN, unarysign[(op >> 24) & 1], aM, sign[(op >> 23) & 1], Y, X);
+					util::stream_format(stream, "a%d = %s%s %s %s * %s", aN, unarysign[(op >> 24) & 1], aM, sign[(op >> 23) & 1], Y, X);
 			}
 			else
 			{
 				if (aM[0] == '0')
-					sprintf(buffer, "a%d = %s(%s=%s) * %s", aN, unarysign[(op >> 23) & 1], Z, Y, X);
+					util::stream_format(stream, "a%d = %s(%s=%s) * %s", aN, unarysign[(op >> 23) & 1], Z, Y, X);
 				else
-					sprintf(buffer, "a%d = %s%s %s (%s=%s) * %s", aN, unarysign[(op >> 24) & 1], aM, sign[(op >> 23) & 1], Z, Y, X);
+					util::stream_format(stream, "a%d = %s%s %s (%s=%s) * %s", aN, unarysign[(op >> 24) & 1], aM, sign[(op >> 23) & 1], Z, Y, X);
 			}
 			break;
 		}
@@ -269,25 +269,25 @@ static unsigned dasm_dsp32(char *buffer, unsigned pc, uint32_t op)
 		case 0x34:  case 0x35:  case 0x36:  case 0x37:
 		case 0x38:  case 0x39:  case 0x3a:  case 0x3b:
 		{
-			const char *X = dasm_XYZ((op >> 14) & 0x7f, tempbuf[0]);
-			const char *Y = dasm_XYZ((op >> 7) & 0x7f, tempbuf[1]);
-			const char *Z = dasm_XYZ((op >> 0) & 0x7f, tempbuf[2]);
+			std::string X = dasm_XYZ((op >> 14) & 0x7f);
+			std::string Y = dasm_XYZ((op >> 7) & 0x7f);
+			std::string Z = dasm_XYZ((op >> 0) & 0x7f);
 			const char *aM = aMvals[(op >> 26) & 7];
 			uint8_t aN = (op >> 21) & 3;
 
 			if ((op & 0x7f) == 7)
 			{
 				if (aM[0] == '0')
-					sprintf(buffer, "a%d = %s%s * %s", aN, unarysign[(op >> 23) & 1], Y, X);
+					util::stream_format(stream, "a%d = %s%s * %s", aN, unarysign[(op >> 23) & 1], Y, X);
 				else
-					sprintf(buffer, "a%d = %s%s %s %s * %s", aN, unarysign[(op >> 24) & 1], aM, sign[(op >> 23) & 1], Y, X);
+					util::stream_format(stream, "a%d = %s%s %s %s * %s", aN, unarysign[(op >> 24) & 1], aM, sign[(op >> 23) & 1], Y, X);
 			}
 			else
 			{
 				if (aM[0] == '0')
-					sprintf(buffer, "%s = a%d = %s%s * %s", Z, aN, unarysign[(op >> 23) & 1], Y, X);
+					util::stream_format(stream, "%s = a%d = %s%s * %s", Z, aN, unarysign[(op >> 23) & 1], Y, X);
 				else
-					sprintf(buffer, "%s = a%d = %s%s %s %s * %s", Z, aN, unarysign[(op >> 24) & 1], aM, sign[(op >> 23) & 1], Y, X);
+					util::stream_format(stream, "%s = a%d = %s%s %s %s * %s", Z, aN, unarysign[(op >> 24) & 1], aM, sign[(op >> 23) & 1], Y, X);
 			}
 			break;
 		}
@@ -295,31 +295,31 @@ static unsigned dasm_dsp32(char *buffer, unsigned pc, uint32_t op)
 		/* DA format 4 */
 		case 0x1c:  case 0x1d:
 		{
-			const char *X = dasm_XYZ((op >> 14) & 0x7f, tempbuf[0]);
-			const char *Y = dasm_XYZ((op >> 7) & 0x7f, tempbuf[1]);
-			const char *Z = dasm_XYZ((op >> 0) & 0x7f, tempbuf[2]);
+			std::string X = dasm_XYZ((op >> 14) & 0x7f);
+			std::string Y = dasm_XYZ((op >> 7) & 0x7f);
+			std::string Z = dasm_XYZ((op >> 0) & 0x7f);
 			uint8_t aN = (op >> 21) & 3;
 
 			if ((op & 0x7f) == 7)
-				sprintf(buffer, "a%d = %s%s %s %s", aN, unarysign[(op >> 24) & 1], Y, sign[(op >> 23) & 1], X);
+				util::stream_format(stream, "a%d = %s%s %s %s", aN, unarysign[(op >> 24) & 1], Y, sign[(op >> 23) & 1], X);
 			else
-				sprintf(buffer, "a%d = %s(%s=%s) %s %s", aN, unarysign[(op >> 24) & 1], Z, Y, sign[(op >> 23) & 1], X);
+				util::stream_format(stream, "a%d = %s(%s=%s) %s %s", aN, unarysign[(op >> 24) & 1], Z, Y, sign[(op >> 23) & 1], X);
 			break;
 		}
 
 		/* DA format 5 */
 		case 0x3c:  case 0x3d:  case 0x3e:  case 0x3f:
 			if ((op & 0x7f) == 7)
-				sprintf(buffer, "a%d = %s(%s)",
+				util::stream_format(stream, "a%d = %s(%s)",
 						(op >> 21) & 3,                             // aN
 						functable[(op >> 23) & 15],                 // G
-						dasm_XYZ((op >> 7) & 0x7f, tempbuf[0]));    // Y
+						dasm_XYZ((op >> 7) & 0x7f));				// Y
 			else
-				sprintf(buffer, "%s = a%d = %s(%s)",
-						dasm_XYZ((op >> 0) & 0x7f, tempbuf[2]),     // Z
+				util::stream_format(stream, "%s = a%d = %s(%s)",
+						dasm_XYZ((op >> 0) & 0x7f),					// Z
 						(op >> 21) & 3,                             // aN
 						functable[(op >> 23) & 15],                 // G
-						dasm_XYZ((op >> 7) & 0x7f, tempbuf[0]));    // Y
+						dasm_XYZ((op >> 7) & 0x7f));			    // Y
 			break;
 
 		/* CA formats 0/1 */
@@ -330,37 +330,37 @@ static unsigned dasm_dsp32(char *buffer, unsigned pc, uint32_t op)
 			int16_t N = (int16_t)op;
 
 			if (op == 0)
-				sprintf(buffer, "nop");
+				util::stream_format(stream, "nop");
 			else if (C == 1 && N == 0 && ((op >> 16) & 0x1f) == 0x1e)
-				sprintf(buffer, "ireturn");
+				util::stream_format(stream, "ireturn");
 			else if (C == 1)
 			{
 				if (((op >> 16) & 0x1f) == 15)
-					sprintf(buffer, "goto %s%s [%x]", rH, signed_16bit_sep_nospace(N), (pc + 8 + N) & 0xffffff);
+					util::stream_format(stream, "goto %s%s [%x]", rH, signed_16bit_sep_nospace(N), (pc + 8 + N) & 0xffffff);
 				else if (N && rH[0] != '0')
-					sprintf(buffer, "goto %s%s", rH, signed_16bit_sep_nospace(N));
+					util::stream_format(stream, "goto %s%s", rH, signed_16bit_sep_nospace(N));
 				else if (N)
-					sprintf(buffer, "goto $%x", ((int32_t)N & 0xffffff));
+					util::stream_format(stream, "goto $%x", ((int32_t)N & 0xffffff));
 				else
 				{
 					if (((op >> 16) & 0x1f) == 20)
 						flags = DASMFLAG_STEP_OUT;
-					sprintf(buffer, "goto %s", rH);
+					util::stream_format(stream, "goto %s", rH);
 				}
 			}
 			else
 			{
 				if (((op >> 16) & 0x1f) == 15)
-					sprintf(buffer, "if (%s) goto %s%s [%x]", condtable[C], rH, signed_16bit_sep_nospace(N), (pc + 8 + N) & 0xffffff);
+					util::stream_format(stream, "if (%s) goto %s%s [%x]", condtable[C], rH, signed_16bit_sep_nospace(N), (pc + 8 + N) & 0xffffff);
 				else if (N && rH[0] != '0')
-					sprintf(buffer, "if (%s) goto %s%s", condtable[C], rH, signed_16bit_sep_nospace(N));
+					util::stream_format(stream, "if (%s) goto %s%s", condtable[C], rH, signed_16bit_sep_nospace(N));
 				else if (N)
-					sprintf(buffer, "if (%s) goto $%x", condtable[C], ((int32_t)N & 0xffffff));
+					util::stream_format(stream, "if (%s) goto $%x", condtable[C], ((int32_t)N & 0xffffff));
 				else
 				{
 					if (((op >> 16) & 0x1f) == 20)
 						flags = DASMFLAG_STEP_OUT;
-					sprintf(buffer, "if (%s) goto %s", condtable[C], rH);
+					util::stream_format(stream, "if (%s) goto %s", condtable[C], rH);
 				}
 			}
 			break;
@@ -375,21 +375,21 @@ static unsigned dasm_dsp32(char *buffer, unsigned pc, uint32_t op)
 
 			if (((op >> 16) & 0x1f) == 15)
 			{
-				sprintf(buffer, "if (%s-- >= 0) goto %s%s [%x]", rM, rH, signed_16bit_sep_nospace(N), (pc + 8 + N) & 0xffffff);
+				util::stream_format(stream, "if (%s-- >= 0) goto %s%s [%x]", rM, rH, signed_16bit_sep_nospace(N), (pc + 8 + N) & 0xffffff);
 				if (((pc + 8 + N) & 0xffffff) < pc)
 					flags = DASMFLAG_STEP_OVER;
 			}
 			else if (N && rH[0] != '0')
-				sprintf(buffer, "if (%s-- >= 0) goto %s%s", rM, rH, signed_16bit_sep_nospace(N));
+				util::stream_format(stream, "if (%s-- >= 0) goto %s%s", rM, rH, signed_16bit_sep_nospace(N));
 			else if (N)
 			{
-				sprintf(buffer, "if (%s-- >= 0) goto $%x", rM, ((int32_t)N & 0xffffff));
+				util::stream_format(stream, "if (%s-- >= 0) goto $%x", rM, ((int32_t)N & 0xffffff));
 				if (((int32_t)N & 0xffffff) < pc)
 					flags = DASMFLAG_STEP_OVER;
 			}
 			else
 			{
-				sprintf(buffer, "if (%s-- >= 0) goto %s", rM, rH);
+				util::stream_format(stream, "if (%s-- >= 0) goto %s", rM, rH);
 				if (((op >> 16) & 0x1f) == 20)
 					flags = DASMFLAG_STEP_OUT;
 			}
@@ -399,9 +399,9 @@ static unsigned dasm_dsp32(char *buffer, unsigned pc, uint32_t op)
 		/* CA format 3b/3c */
 		case 0x46:
 			if (((op >> 21) & 0x1f) == 0)
-				sprintf(buffer, "do %d,%d", (op >> 16) & 0x1f, op & 0x7ff);
+				util::stream_format(stream, "do %d,%d", (op >> 16) & 0x1f, op & 0x7ff);
 			else if (((op >> 21) & 0x1f) == 1)
-				sprintf(buffer, "do %d,%s", (op >> 16) & 0x1f, regname[op & 0x1f]);
+				util::stream_format(stream, "do %d,%s", (op >> 16) & 0x1f, regname[op & 0x1f]);
 			break;
 
 		/* CA format 4 */
@@ -412,13 +412,13 @@ static unsigned dasm_dsp32(char *buffer, unsigned pc, uint32_t op)
 			int16_t N = (int16_t)op;
 
 			if (((op >> 16) & 0x1f) == 15)
-				sprintf(buffer, "call %s%s (%s) [%x]", rH, signed_16bit_sep_nospace(N), rM, (pc + 8 + N) & 0xffffff);
+				util::stream_format(stream, "call %s%s (%s) [%x]", rH, signed_16bit_sep_nospace(N), rM, (pc + 8 + N) & 0xffffff);
 			else if (N && rH[0] != '0')
-				sprintf(buffer, "call %s%s (%s)", rH, signed_16bit_sep_nospace(N), rM);
+				util::stream_format(stream, "call %s%s (%s)", rH, signed_16bit_sep_nospace(N), rM);
 			else if (N)
-				sprintf(buffer, "call $%x (%s)", ((int32_t)N & 0xffffff), rM);
+				util::stream_format(stream, "call $%x (%s)", ((int32_t)N & 0xffffff), rM);
 			else
-				sprintf(buffer, "call %s (%s)", rH, rM);
+				util::stream_format(stream, "call %s (%s)", rH, rM);
 			flags = DASMFLAG_STEP_OVER | DASMFLAG_STEP_OVER_EXTRA(1);
 			break;
 		}
@@ -432,11 +432,11 @@ static unsigned dasm_dsp32(char *buffer, unsigned pc, uint32_t op)
 			const char *s = sizesuffix[(op >> 31) & 1];
 			int16_t N = (int16_t)op;
 			if (N == 0)
-				sprintf(buffer, "%s%s = %s%s", rD, s, rH, s);
+				util::stream_format(stream, "%s%s = %s%s", rD, s, rH, s);
 			else if (rH[0] == '0')
-				sprintf(buffer, "%s%s = %s", rD, s, signed_16bit_unary(N));
+				util::stream_format(stream, "%s%s = %s", rD, s, signed_16bit_unary(N));
 			else
-				sprintf(buffer, "%s%s = %s%s%s", rD, s, rH, s, signed_16bit_sep((int16_t)op));
+				util::stream_format(stream, "%s%s = %s%s%s", rD, s, rH, s, signed_16bit_sep((int16_t)op));
 			break;
 		}
 
@@ -460,108 +460,108 @@ static unsigned dasm_dsp32(char *buffer, unsigned pc, uint32_t op)
 					if (threeop)
 					{
 						if (rS1[0] == '0' && rS2[0] == '0')
-							sprintf(buffer, "%s%s%s = 0", condbuf, rD, s);
+							util::stream_format(stream, "%s%s%s = 0", condbuf, rD, s);
 						else if (rS1[0] == '0')
-							sprintf(buffer, "%s%s%s = %s%s", condbuf, rD, s, rS2, s);
+							util::stream_format(stream, "%s%s%s = %s%s", condbuf, rD, s, rS2, s);
 						else if (rS2[0] == '0')
-							sprintf(buffer, "%s%s%s = %s%s", condbuf, rD, s, rS1, s);
+							util::stream_format(stream, "%s%s%s = %s%s", condbuf, rD, s, rS1, s);
 						else
-							sprintf(buffer, "%s%s%s = %s%s + %s%s", condbuf, rD, s, rS2, s, rS1, s);
+							util::stream_format(stream, "%s%s%s = %s%s + %s%s", condbuf, rD, s, rS2, s, rS1, s);
 					}
 					else
 					{
 						if (rS1[0] == '0')
-							sprintf(buffer, "%s%s%s = %s%s", condbuf, rD, s, rD, s);
+							util::stream_format(stream, "%s%s%s = %s%s", condbuf, rD, s, rD, s);
 						else
-							sprintf(buffer, "%s%s%s = %s%s + %s%s", condbuf, rD, s, rD, s, rS1, s);
+							util::stream_format(stream, "%s%s%s = %s%s + %s%s", condbuf, rD, s, rD, s, rS1, s);
 					}
 					break;
 
 				case 1:
-					sprintf(buffer, "%s%s%s = %s%s * 2", condbuf, rD, s, rS1, s);
+					util::stream_format(stream, "%s%s%s = %s%s * 2", condbuf, rD, s, rS1, s);
 					break;
 
 				case 2:
 					if (threeop)
-						sprintf(buffer, "%s%s%s = %s%s - %s%s", condbuf, rD, s, rS1, s, rS2, s);
+						util::stream_format(stream, "%s%s%s = %s%s - %s%s", condbuf, rD, s, rS1, s, rS2, s);
 					else
-						sprintf(buffer, "%s%s%s = %s%s - %s%s", condbuf, rD, s, rS1, s, rD, s);
+						util::stream_format(stream, "%s%s%s = %s%s - %s%s", condbuf, rD, s, rS1, s, rD, s);
 					break;
 
 				case 3:
 					if (threeop)
-						sprintf(buffer, "%s%s%s = %s%s # %s%s", condbuf, rD, s, rS2, s, rS1, s);
+						util::stream_format(stream, "%s%s%s = %s%s # %s%s", condbuf, rD, s, rS2, s, rS1, s);
 					else
-						sprintf(buffer, "%s%s%s = %s%s # %s%s", condbuf, rD, s, rD, s, rS1, s);
+						util::stream_format(stream, "%s%s%s = %s%s # %s%s", condbuf, rD, s, rD, s, rS1, s);
 					break;
 
 				case 4:
 					if (threeop)
-						sprintf(buffer, "%s%s%s = %s%s - %s%s", condbuf, rD, s, rS2, s, rS1, s);
+						util::stream_format(stream, "%s%s%s = %s%s - %s%s", condbuf, rD, s, rS2, s, rS1, s);
 					else
-						sprintf(buffer, "%s%s%s = %s%s - %s%s", condbuf, rD, s, rD, s, rS1, s);
+						util::stream_format(stream, "%s%s%s = %s%s - %s%s", condbuf, rD, s, rD, s, rS1, s);
 					break;
 
 				case 5:
-					sprintf(buffer, "%s%s%s = -%s%s", condbuf, rD, s, rS1, s);
+					util::stream_format(stream, "%s%s%s = -%s%s", condbuf, rD, s, rS1, s);
 					break;
 
 				case 6:
 					if (threeop)
-						sprintf(buffer, "%s%s%s = %s%s &~ %s%s", condbuf, rD, s, rS2, s, rS1, s);
+						util::stream_format(stream, "%s%s%s = %s%s &~ %s%s", condbuf, rD, s, rS2, s, rS1, s);
 					else
-						sprintf(buffer, "%s%s%s = %s%s &~ %s%s", condbuf, rD, s, rD, s, rS1, s);
+						util::stream_format(stream, "%s%s%s = %s%s &~ %s%s", condbuf, rD, s, rD, s, rS1, s);
 					break;
 
 				case 7:
 //                  if (threeop)
-//                      sprintf(buffer, "%s%s%s - %s%s", condbuf, rS2, s, rS1, s);
+//                      util::stream_format(stream, "%s%s%s - %s%s", condbuf, rS2, s, rS1, s);
 //                  else
-						sprintf(buffer, "%s%s%s - %s%s", condbuf, rD, s, rS1, s);
+						util::stream_format(stream, "%s%s%s - %s%s", condbuf, rD, s, rS1, s);
 					break;
 
 				case 8:
 					if (threeop)
-						sprintf(buffer, "%s%s%s = %s%s ^ %s%s", condbuf, rD, s, rS2, s, rS1, s);
+						util::stream_format(stream, "%s%s%s = %s%s ^ %s%s", condbuf, rD, s, rS2, s, rS1, s);
 					else
-						sprintf(buffer, "%s%s%s = %s%s ^ %s%s", condbuf, rD, s, rD, s, rS1, s);
+						util::stream_format(stream, "%s%s%s = %s%s ^ %s%s", condbuf, rD, s, rD, s, rS1, s);
 					break;
 
 				case 9:
-					sprintf(buffer, "%s%s%s = %s%s >>> 1", condbuf, rD, s, rS1, s);
+					util::stream_format(stream, "%s%s%s = %s%s >>> 1", condbuf, rD, s, rS1, s);
 					break;
 
 				case 10:
 					if (threeop)
-						sprintf(buffer, "%s%s%s = %s%s | %s%s", condbuf, rD, s, rS2, s, rS1, s);
+						util::stream_format(stream, "%s%s%s = %s%s | %s%s", condbuf, rD, s, rS2, s, rS1, s);
 					else
-						sprintf(buffer, "%s%s%s = %s%s | %s%s", condbuf, rD, s, rD, s, rS1, s);
+						util::stream_format(stream, "%s%s%s = %s%s | %s%s", condbuf, rD, s, rD, s, rS1, s);
 					break;
 
 				case 11:
-					sprintf(buffer, "%s%s%s = %s%s <<< 1", condbuf, rD, s, rS1, s);
+					util::stream_format(stream, "%s%s%s = %s%s <<< 1", condbuf, rD, s, rS1, s);
 					break;
 
 				case 12:
-					sprintf(buffer, "%s%s%s = %s%s >> 1", condbuf, rD, s, rS1, s);
+					util::stream_format(stream, "%s%s%s = %s%s >> 1", condbuf, rD, s, rS1, s);
 					break;
 
 				case 13:
-					sprintf(buffer, "%s%s%s = %s%s / 2", condbuf, rD, s, rS1, s);
+					util::stream_format(stream, "%s%s%s = %s%s / 2", condbuf, rD, s, rS1, s);
 					break;
 
 				case 14:
 					if (threeop)
-						sprintf(buffer, "%s%s%s = %s%s & %s%s", condbuf, rD, s, rS2, s, rS1, s);
+						util::stream_format(stream, "%s%s%s = %s%s & %s%s", condbuf, rD, s, rS2, s, rS1, s);
 					else
-						sprintf(buffer, "%s%s%s = %s%s & %s%s", condbuf, rD, s, rD, s, rS1, s);
+						util::stream_format(stream, "%s%s%s = %s%s & %s%s", condbuf, rD, s, rD, s, rS1, s);
 					break;
 
 				case 15:
 //                  if (threeop)
-//                      sprintf(buffer, "%s%s%s & %s%s", condbuf, rS1, s, rS2, s);
+//                      util::stream_format(stream, "%s%s%s & %s%s", condbuf, rS1, s, rS2, s);
 //                  else
-						sprintf(buffer, "%s%s%s & %s%s", condbuf, rD, s, rS1, s);
+						util::stream_format(stream, "%s%s%s & %s%s", condbuf, rD, s, rS1, s);
 					break;
 			}
 			break;
@@ -583,43 +583,43 @@ static unsigned dasm_dsp32(char *buffer, unsigned pc, uint32_t op)
 				case 11:
 				case 12:
 				case 13:
-					sprintf(buffer, "Unexpected: %08X", op);
+					util::stream_format(stream, "Unexpected: %08X", op);
 					break;
 
 				case 2:
-					sprintf(buffer, "%s%s = %s - %s%s", rD, s, signed_16bit_unary(N), rD, s);
+					util::stream_format(stream, "%s%s = %s - %s%s", rD, s, signed_16bit_unary(N), rD, s);
 					break;
 
 				case 3:
-					sprintf(buffer, "%s%s = %s%s # %s", rD, s, rD, s, signed_16bit_unary(N));
+					util::stream_format(stream, "%s%s = %s%s # %s", rD, s, rD, s, signed_16bit_unary(N));
 					break;
 
 				case 4:
-					sprintf(buffer, "%s%s = %s%s - %s", rD, s, rD, s, signed_16bit_unary(N));
+					util::stream_format(stream, "%s%s = %s%s - %s", rD, s, rD, s, signed_16bit_unary(N));
 					break;
 
 				case 6:
-					sprintf(buffer, "%s%s = %s%s &~ %s", rD, s, rD, s, unsigned_16bit_size(N, (op >> 31) & 1));
+					util::stream_format(stream, "%s%s = %s%s &~ %s", rD, s, rD, s, unsigned_16bit_size(N, (op >> 31) & 1));
 					break;
 
 				case 7:
-					sprintf(buffer, "%s%s - %s", rD, s, signed_16bit_unary(N));
+					util::stream_format(stream, "%s%s - %s", rD, s, signed_16bit_unary(N));
 					break;
 
 				case 8:
-					sprintf(buffer, "%s%s = %s%s ^ %s", rD, s, rD, s, unsigned_16bit_size(N, (op >> 31) & 1));
+					util::stream_format(stream, "%s%s = %s%s ^ %s", rD, s, rD, s, unsigned_16bit_size(N, (op >> 31) & 1));
 					break;
 
 				case 10:
-					sprintf(buffer, "%s%s = %s%s | %s", rD, s, rD, s, unsigned_16bit_size(N, (op >> 31) & 1));
+					util::stream_format(stream, "%s%s = %s%s | %s", rD, s, rD, s, unsigned_16bit_size(N, (op >> 31) & 1));
 					break;
 
 				case 14:
-					sprintf(buffer, "%s%s = %s%s & %s", rD, s, rD, s, unsigned_16bit_size(N, (op >> 31) & 1));
+					util::stream_format(stream, "%s%s = %s%s & %s", rD, s, rD, s, unsigned_16bit_size(N, (op >> 31) & 1));
 					break;
 
 				case 15:
-					sprintf(buffer, "%s%s & %s", rD, s, unsigned_16bit_size(N, (op >> 31) & 1));
+					util::stream_format(stream, "%s%s & %s", rD, s, unsigned_16bit_size(N, (op >> 31) & 1));
 					break;
 			}
 			break;
@@ -628,17 +628,17 @@ static unsigned dasm_dsp32(char *buffer, unsigned pc, uint32_t op)
 		/* CA format 7a */
 		case 0x0e:
 			if ((op >> 24) & 1)
-				sprintf(buffer, "*%08X = %s%s", (int16_t)op, regname[(op >> 16) & 0x1f], memsuffix[(op >> 22) & 3]);
+				util::stream_format(stream, "*%08X = %s%s", (int16_t)op, regname[(op >> 16) & 0x1f], memsuffix[(op >> 22) & 3]);
 			else
-				sprintf(buffer, "%s%s = *%08X", regname[(op >> 16) & 0x1f], memsuffix[(op >> 22) & 3], (int16_t)op);
+				util::stream_format(stream, "%s%s = *%08X", regname[(op >> 16) & 0x1f], memsuffix[(op >> 22) & 3], (int16_t)op);
 			break;
 
 		/* CA format 7b */
 		case 0x0f:
 			if ((op >> 24) & 1)
-				sprintf(buffer, "%s = %s%s", dasm_PI(op & 0x3ff, tempbuf[0]), regname[(op >> 16) & 0x1f], memsuffix[(op >> 22) & 3]);
+				util::stream_format(stream, "%s = %s%s", dasm_PI(op & 0x3ff), regname[(op >> 16) & 0x1f], memsuffix[(op >> 22) & 3]);
 			else
-				sprintf(buffer, "%s%s = %s", regname[(op >> 16) & 0x1f], memsuffix[(op >> 22) & 3], dasm_PI(op & 0x3ff, tempbuf[0]));
+				util::stream_format(stream, "%s%s = %s", regname[(op >> 16) & 0x1f], memsuffix[(op >> 22) & 3], dasm_PI(op & 0x3ff));
 			break;
 
 		/* CA format 8a */
@@ -651,16 +651,16 @@ static unsigned dasm_dsp32(char *buffer, unsigned pc, uint32_t op)
 			const char *rH = regname[(op >> 16) & 0x1f];
 
 			if (((op >> 16) & 0x1f) == 15)
-				sprintf(buffer, "goto %s%s [%x]", rH, signed_16bit_sep_nospace(N), (pc + 8 + N) & 0xffffff);
+				util::stream_format(stream, "goto %s%s [%x]", rH, signed_16bit_sep_nospace(N), (pc + 8 + N) & 0xffffff);
 			else if (N && rH[0] != '0')
-				sprintf(buffer, "goto %s%s", rH, signed_16bit_sep_nospace(N));
+				util::stream_format(stream, "goto %s%s", rH, signed_16bit_sep_nospace(N));
 			else if (N)
-				sprintf(buffer, "goto $%x", ((int32_t)N & 0xffffff));
+				util::stream_format(stream, "goto $%x", ((int32_t)N & 0xffffff));
 			else
 			{
 				if (((op >> 16) & 0x1f) == 20)
 					flags = DASMFLAG_STEP_OUT;
-				sprintf(buffer, "goto %s", rH);
+				util::stream_format(stream, "goto %s", rH);
 			}
 			break;
 		}
@@ -672,7 +672,7 @@ static unsigned dasm_dsp32(char *buffer, unsigned pc, uint32_t op)
 		case 0x6c:  case 0x6d:  case 0x6e:  case 0x6f:
 		{
 			int32_t immed = (op & 0xffff) | ((int32_t)((op & 0x1fe00000) << 3) >> 8);
-			sprintf(buffer, "%s = $%x", regnamee[(op >> 16) & 0x1f], immed & 0xffffff);
+			util::stream_format(stream, "%s = $%x", regnamee[(op >> 16) & 0x1f], immed & 0xffffff);
 			break;
 		}
 
@@ -684,13 +684,23 @@ static unsigned dasm_dsp32(char *buffer, unsigned pc, uint32_t op)
 		{
 			int32_t N = (op & 0xffff) | ((int32_t)((op & 0x1fe00000) << 3) >> 8);
 			const char *rM = regname[(op >> 16) & 0x1f];
-			sprintf(buffer, "call $%x (%s)", N & 0xffffff, rM);
+			util::stream_format(stream, "call $%x (%s)", N & 0xffffff, rM);
 			flags = DASMFLAG_STEP_OVER | DASMFLAG_STEP_OVER_EXTRA(1);
 			break;
 		}
 	}
 
 	return 4 | flags | DASMFLAG_SUPPORTED;
+}
+
+
+static unsigned dasm_dsp32(char *buffer, unsigned pc, uint32_t op)
+{
+	std::ostringstream stream;
+	unsigned result = dasm_dsp32(stream, pc, op);
+	std::string stream_str = stream.str();
+	strcpy(buffer, stream_str.c_str());
+	return result;
 }
 
 

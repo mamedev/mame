@@ -50,6 +50,8 @@ public:
 	{
 	}
 
+	virtual ~wininput_module() { }
+
 	virtual bool should_hide_mouse()
 	{
 		if (winwindow_has_focus()  // has focus

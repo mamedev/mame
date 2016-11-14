@@ -111,10 +111,6 @@ if _OPTIONS["targetos"]=="windows" then
 			"_WIN32_WINNT=0x0501",
 		}
 
-	configuration { "Debug" }
-		defines {
-			"MALLOC_DEBUG",
-		}
 	configuration { }
 
 elseif _OPTIONS["targetos"]=="linux" then

@@ -12,7 +12,8 @@ exports.author = { name = "Carl" }
 local timer = exports
 
 function timer.startplugin()
-	local timer_db = "timer/timer.db"
+	local dir = lfs.env_replace(manager:options().entries.homepath:value())
+	local timer_db = dir .. "/timer/timer.db"
 	local timer_started = false
 	local total_time = 0
 	local start_time = 0
@@ -43,7 +44,7 @@ function timer.startplugin()
 			save()
 		end
 		timer_started = true
-		lfs.mkdir('timer')
+		lfs.mkdir(dir .. '/timer')
 		local db = assert(sqlite3.open(timer_db))
 		local found=false
 		db:exec([[select * from sqlite_master where name='timer';]], function(...) found=true return 0 end)

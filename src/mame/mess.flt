@@ -507,6 +507,7 @@ rd100.cpp
 rd110.cpp
 replicator.cpp
 rex6000.cpp
+risc2500.cpp
 riscpc.cpp
 rm380z.cpp
 rmnimbus.cpp
@@ -630,6 +631,7 @@ ts803.cpp
 ts816.cpp
 tsispch.cpp
 tutor.cpp
+tv910.cpp
 tv950.cpp
 tv990.cpp
 tvc.cpp
