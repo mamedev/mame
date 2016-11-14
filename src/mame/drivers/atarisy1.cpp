@@ -2488,7 +2488,7 @@ GAME( 1984, marble3,  marble,   marble,   marble, atarisy1_state,   marble,   RO
 GAME( 1984, marble4,  marble,   marble,   marble, atarisy1_state,   marble,   ROT0, "Atari Games", "Marble Madness (set 4)", 0 )
 GAME( 1984, marble5,  marble,   marble,   marble, atarisy1_state,   marble,   ROT0, "Atari Games", "Marble Madness (set 5 - LSI Cartridge)", 0 )
 
-GAME( 1984, peterpak, atarisy1, peterpak, peterpak, atarisy1_state, peterpak, ROT0, "Atari Games", "Peter Pack-Rat", 0 )
+GAME( 1984, peterpak, atarisy1, peterpak, peterpak, atarisy1_state, peterpak, ROT0, "Atari Games", "Peter Pack Rat", 0 )
 
 GAME( 1985, indytemp, atarisy1, indytemp, indytemp, atarisy1_state, indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (set 1)", 0 )
 GAME( 1985, indytemp2,indytemp, indytemp, indytemp, atarisy1_state, indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (set 2)", 0 )
