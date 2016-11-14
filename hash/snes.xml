@@ -2883,7 +2883,7 @@ Beyond that last category are the roms waiting to be classified.
 		</part>
 	</software>
 
-  <software name="syvalionp" cloneof="syvalion">
+	<software name="syvalionp" cloneof="syvalion">
 		<!-- TeamEurope -->
 		<description>Syvalion (Euro, Prototype)</description>
 		<year>1992</year>
