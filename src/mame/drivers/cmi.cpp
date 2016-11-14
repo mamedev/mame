@@ -2419,7 +2419,6 @@ WRITE8_MEMBER( cmi_state::q133_1_portb_w )
 	m_msm5832->hold_w(BIT(data, 0));
 	m_msm5832->read_w(BIT(data, 1));
 	m_msm5832->write_w(BIT(data, 2));
-	m_msm5832->cs_w(1);
 }
 
 /*
@@ -2720,6 +2719,8 @@ void cmi_state::machine_start()
 	/* Allocate 256B scratch RAM per CPU */
 	m_scratch_ram[0] = std::make_unique<uint8_t[]>(0x100);
 	m_scratch_ram[1] = std::make_unique<uint8_t[]>(0x100);
+
+	m_msm5832->cs_w(1);
 }
 
 INTERRUPT_GEN_MEMBER( cmi_state::cmi_iix_vblank )
