@@ -213,90 +213,88 @@ static const hd61700_dasm hd61700_ops[256] =
 };
 
 
-inline int dasm_im8(char *buffer, uint16_t pc, int arg, const uint8_t *oprom, int &pos, int type)
+static void dasm_im8(std::ostream &stream, uint16_t pc, int arg, const uint8_t *oprom, int &pos, int type)
 {
 	if (((arg>>5) & 0x03) == 0x03)
 	{
 		INC_POS;
-		uint8_t ret = sprintf( buffer, "0x%02x", oprom[POS] & 0x1f );
-		return ret;
+		util::stream_format(stream, "0x%02x", oprom[POS] & 0x1f);
 	}
 	else
 	{
-		return sprintf( buffer, "%s", reg_5b[(arg>>5) & 0x03] );
+		util::stream_format(stream, "%s", reg_5b[(arg>>5) & 0x03] );
 	}
 }
 
 
-inline int dasm_im8(char *buffer, uint16_t pc, int arg, int arg1, const uint8_t *oprom, int &pos)
+static void dasm_im8(std::ostream &stream, uint16_t pc, int arg, int arg1, const uint8_t *oprom, int &pos)
 {
 	if (((arg>>5) & 0x03) == 0x03)
 	{
-		return sprintf( buffer, "0x%02x", arg1 & 0x1f );
+		util::stream_format(stream, "0x%02x", arg1 & 0x1f);
 	}
 	else
 	{
-		return sprintf( buffer, "%s", reg_5b[(arg>>5) & 0x03] );
+		util::stream_format(stream, "%s", reg_5b[(arg>>5) & 0x03]);
 	}
 }
 
 
-int dasm_arg(char *buffer, uint8_t op, uint16_t pc, int arg, const uint8_t *oprom, int &pos)
+static void dasm_arg(std::ostream &stream, uint8_t op, uint16_t pc, int arg, const uint8_t *oprom, int &pos)
 {
-	char* buffer_start = buffer;
 	int type = EXT_ROM;
 
 	switch( arg )
 	{
 		case OP_MREG:
 		case OP_MREG2:
-			buffer += sprintf( buffer, "$%02u", oprom[POS] & 0x1f );
+			util::stream_format( stream, "$%02u", oprom[POS] & 0x1f );
 			if (arg == OP_MREG2) INC_POS;
 			break;
 
 		case OP_RSIR:
-			buffer += sprintf( buffer, "%s", reg_5b[(oprom[POS]>>5) & 0x03] );
+			util::stream_format( stream, "%s", reg_5b[(oprom[POS]>>5) & 0x03] );
 			break;
 
 		case OP_REG8:
 		case OP_REG8_:
-			buffer += sprintf( buffer, "%s", reg_8b[(BIT(op,0)<<2) + ((oprom[POS]>>5&3))]);
+			util::stream_format( stream, "%s", reg_8b[(BIT(op,0)<<2) + ((oprom[POS]>>5&3))]);
 			if (arg == OP_REG8_) INC_POS;
 			break;
 
 		case OP_MR_SIR:
-			buffer += dasm_im8(buffer, pc, oprom[POS], oprom, pos, type);
+			dasm_im8(stream, pc, oprom[POS], oprom, pos, type);
 			INC_POS;
 			break;
 
 		case OP_IR_IM8:
 		case OP_IR_IM8_:
-			buffer += sprintf( buffer, "(%s%s", (op&1) ? "iz": "ix", (oprom[POS]&0x80) ? "-": "+");
-			buffer += dasm_im8(buffer, pc, oprom[POS], oprom, pos, type);
-			buffer += sprintf( buffer, ")");
+			util::stream_format( stream, "(%s%s", (op&1) ? "iz": "ix", (oprom[POS]&0x80) ? "-": "+");
+			dasm_im8(stream, pc, oprom[POS], oprom, pos, type);
+			util::stream_format( stream, ")");
 			if (arg == OP_IR_IM8_) INC_POS;
 			break;
 
 		case OP_IM8_:
 			INC_POS;
 		case OP_IM8:
-			buffer += sprintf( buffer, "0x%02x", oprom[POS] );
+			util::stream_format( stream, "0x%02x", oprom[POS] );
 			INC_POS;
 			break;
 
 		case OP_IM8I:
-			buffer += sprintf( buffer, "(0x%02x)", oprom[POS] );
+			util::stream_format( stream, "(0x%02x)", oprom[POS] );
 			INC_POS;
 			break;
 
 		case OP_REGIM8:
-			buffer += sprintf( buffer, "(%s%s", (op&1) ? "iz": "ix", (oprom[POS]&0x80) ? "-": "+");
-			buffer += sprintf( buffer, "%x)", oprom[POS] & 0x1f);
+			util::stream_format( stream, "(%s%s", (op&1) ? "iz": "ix", (oprom[POS]&0x80) ? "-": "+");
+			util::stream_format( stream, "%x)", oprom[POS] & 0x1f);
 			INC_POS;
 			break;
 
 		case OP_JX_COND:
-			buffer += sprintf( buffer, "%s", jp_cond[op & 0x07] );
+			util::stream_format( stream, "%s", jp_cond[op & 0x07] );
 			break;
 
 
@@ -304,8 +302,8 @@ int dasm_arg(char *buffer, uint8_t op, uint16_t pc, int arg, const uint8_t *opro
 			{
 				uint8_t tmp = oprom[POS];
 				INC_POS;
-				buffer += dasm_im8(buffer, pc, tmp, oprom[POS], oprom, pos);
-				buffer += sprintf( buffer, ", 0x%02x", ((tmp>>5)&7)+1);
+				dasm_im8(stream, pc, tmp, oprom[POS], oprom, pos);
+				util::stream_format( stream, ", 0x%02x", ((tmp>>5)&7)+1);
 				INC_POS;
 			}
 			break;
@@ -314,22 +312,22 @@ int dasm_arg(char *buffer, uint8_t op, uint16_t pc, int arg, const uint8_t *opro
 			{
 				uint8_t tmp = oprom[POS];
 				INC_POS;
-				buffer += sprintf( buffer, "(%s%s", (op&1) ? "iz": "ix", (tmp&0x80) ? "-": "+");
-				buffer += dasm_im8(buffer, pc, tmp, oprom[POS], oprom, pos);
-				buffer += sprintf( buffer, "), 0x%02x", ((oprom[POS]>>5)&7)+1 );
+				util::stream_format( stream, "(%s%s", (op&1) ? "iz": "ix", (tmp&0x80) ? "-": "+");
+				dasm_im8(stream, pc, tmp, oprom[POS], oprom, pos);
+				util::stream_format( stream, "), 0x%02x", ((oprom[POS]>>5)&7)+1 );
 				INC_POS;
 			}
 			break;
 
 		case OP_IM3:
-			buffer += sprintf( buffer, "0x%02x", ((oprom[POS]>>5)&7)+1 );
+			util::stream_format( stream, "0x%02x", ((oprom[POS]>>5)&7)+1 );
 			INC_POS;
 			break;
 
 		case OP_MR_SIRI:
-			buffer += sprintf( buffer, "(");
-			buffer += dasm_im8(buffer, pc, oprom[POS], oprom, pos, type);
-			buffer += sprintf( buffer, ")");
+			util::stream_format( stream, "(");
+			dasm_im8(stream, pc, oprom[POS], oprom, pos, type);
+			util::stream_format( stream, ")");
 			INC_POS;
 			break;
 
@@ -338,19 +336,19 @@ int dasm_arg(char *buffer, uint8_t op, uint16_t pc, int arg, const uint8_t *opro
 				int tmp = oprom[POS];
 				if (tmp&0x80)       tmp = 0x80 - tmp;
 
-				buffer += sprintf( buffer, "0x%04x", (pc + tmp + EXT_ROM) & 0xffff );
+				util::stream_format( stream, "0x%04x", (pc + tmp + EXT_ROM) & 0xffff );
 				INC_POS;
 			}
 			break;
 
 		case OP_IM5:
-			buffer += sprintf( buffer, "0x%02x", oprom[POS]&0x1f );
+			util::stream_format( stream, "0x%02x", oprom[POS]&0x1f );
 			INC_POS;
 			break;
 
 		case OP_REG16:
 		case OP_REG16_:
-			buffer += sprintf( buffer, "%s", reg_16b[(BIT(op,0)<<2) + ((oprom[POS]>>5&3))]);
+			util::stream_format(stream, "%s", reg_16b[(BIT(op,0)<<2) + ((oprom[POS]>>5&3))]);
 			if (arg == OP_REG16_) INC_POS;
 			break;
 
@@ -361,7 +359,7 @@ int dasm_arg(char *buffer, uint8_t op, uint16_t pc, int arg, const uint8_t *opro
 				INC_POS;
 				if (!EXT_ROM && arg == OP_IM16A)    INC_POS;
 				uint8_t tmp2 = oprom[POS];
-				buffer += sprintf( buffer, "0x%04x", ((tmp2<<8) | tmp1));
+				util::stream_format(stream, "0x%04x", ((tmp2<<8) | tmp1));
 				INC_POS;
 			}
 			break;
@@ -369,8 +367,6 @@ int dasm_arg(char *buffer, uint8_t op, uint16_t pc, int arg, const uint8_t *opro
 		case OP_NULL:
 			break;
 	}
-
-	return buffer - buffer_start;
 }
 
 uint32_t get_dasmflags(uint8_t op)
@@ -396,7 +392,7 @@ uint32_t get_dasmflags(uint8_t op)
 }
 
 
-CPU_DISASSEMBLE( hd61700 )
+static offs_t internal_disasm_hd61700(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
 {
 	const hd61700_dasm *inst;
 	uint32_t dasmflags;
@@ -412,23 +408,23 @@ CPU_DISASSEMBLE( hd61700 )
 
 	inst = &hd61700_ops[op];
 
-	buffer += sprintf(buffer,"%-8s", inst->str);
+	util::stream_format(stream, "%-8s", inst->str);
 
 	//dasm first arg
-	buffer += dasm_arg(buffer, op, pc, inst->arg1, oprom, pos);
+	dasm_arg(stream, op, pc, inst->arg1, oprom, pos);
 
 	//if present dasm second arg
 	if (inst->arg2 != OP_NULL)
 	{
-		buffer += sprintf(buffer,", ");
-		buffer += dasm_arg(buffer, op, pc, inst->arg2, oprom, pos);
+		util::stream_format(stream, ", ");
+		dasm_arg(stream, op, pc, inst->arg2, oprom, pos);
 	}
 
 	//if required add the optional jr
 	if (inst->optjr == true && BIT(op1, 7))
 	{
-		buffer += sprintf( buffer, ", jr ");
-		buffer += dasm_arg(buffer, op, pc+1, OP_IM7, oprom, pos);
+		util::stream_format(stream, ", jr ");
+		dasm_arg(stream, op, pc+1, OP_IM7, oprom, pos);
 
 		dasmflags = DASMFLAG_STEP_OVER;
 	}
@@ -436,4 +432,14 @@ CPU_DISASSEMBLE( hd61700 )
 	if (pos&1) INC_POS;
 
 	return (pos>>1) | dasmflags | DASMFLAG_SUPPORTED;
+}
+
+
+CPU_DISASSEMBLE(hd61700)
+{
+	std::ostringstream stream;
+	offs_t result = internal_disasm_hd61700(device, stream, pc, oprom, opram, options);
+	std::string stream_str = stream.str();
+	strcpy(buffer, stream_str.c_str());
+	return result;
 }
