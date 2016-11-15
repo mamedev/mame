@@ -17,11 +17,6 @@
 #include "palloc.h"
 #include "plists.h"
 
-template<>
-pstr_t pstring_t<putf8_traits>::m_zero = pstr_t(0);
-template<>
-pstr_t pstring_t<pu8_traits>::m_zero = pstr_t(0);
-
 template<typename F>
 pstring_t<F>::~pstring_t()
 {
@@ -528,3 +523,7 @@ void pstring_t<F>::resetmem()
 
 template struct pstring_t<pu8_traits>;
 template struct pstring_t<putf8_traits>;
+
+const unsigned pu8_traits::MAXCODELEN;
+const unsigned putf8_traits::MAXCODELEN;
+const int pstringbuffer::DEFAULT_SIZE;
