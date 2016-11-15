@@ -350,7 +350,10 @@ int running_machine::run(bool quiet)
 			if (!m_paused)
 			{
 				m_scheduler.timeslice();
+#if !defined(__LIBRETRO__) 
+//FIXME: LUA PERIODIC TAKE TOO MUCH CPU 
 				emulator_info::periodic_check();
+#endif
 			}
 			// otherwise, just pump video updates through
 			else
@@ -449,7 +452,8 @@ void running_machine::retro_loop(){
 		if (!m_paused)
 		{
 			m_scheduler.timeslice();
-			emulator_info::periodic_check();
+			//emulator_info::periodic_check();
+			//FIXME: LUA PERIODIC TAKE TOO MUCH CPU 
 		}
 		// otherwise, just pump video updates through
 		else
