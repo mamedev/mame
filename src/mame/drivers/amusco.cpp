@@ -113,6 +113,7 @@ public:
 	virtual void machine_start() override;
 	DECLARE_READ8_MEMBER(hack_coin1_r);
 	DECLARE_READ8_MEMBER(hack_coin2_r);
+	DECLARE_READ8_MEMBER(hack_bill_r);
 	DECLARE_READ8_MEMBER(mc6845_r);
 	DECLARE_WRITE8_MEMBER(mc6845_w);
 	DECLARE_WRITE8_MEMBER(output_a_w);
@@ -189,6 +190,12 @@ READ8_MEMBER(amusco_state::hack_coin2_r)
 	return BIT(ioport("IN2")->read(), 2) ? 1 : 0;
 }
 
+READ8_MEMBER(amusco_state::hack_bill_r)
+{
+	// actually set by IRQ4
+	return BIT(ioport("IN1")->read(), 2) ? 0 : 1;
+}
+
 /*************************
 * Memory Map Information *
 *************************/
@@ -196,6 +203,15 @@ READ8_MEMBER(amusco_state::hack_coin2_r)
 static ADDRESS_MAP_START( amusco_mem_map, AS_PROGRAM, 8, amusco_state )
 	AM_RANGE(0x006a6, 0x006a6) AM_READ(hack_coin1_r)
 	AM_RANGE(0x006a8, 0x006a8) AM_READ(hack_coin2_r)
+	AM_RANGE(0x00000, 0x0ffff) AM_RAM
+	AM_RANGE(0xec000, 0xecfff) AM_RAM AM_SHARE("videoram")  // placeholder
+	AM_RANGE(0xf8000, 0xfffff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( draw88pkr_mem_map, AS_PROGRAM, 8, amusco_state )
+	AM_RANGE(0x006ae, 0x006ae) AM_READ(hack_coin1_r)
+	AM_RANGE(0x006b0, 0x006b0) AM_READ(hack_coin2_r)
+	AM_RANGE(0x0069a, 0x0069a) AM_READ(hack_bill_r)
 	AM_RANGE(0x00000, 0x0ffff) AM_RAM
 	AM_RANGE(0xec000, 0xecfff) AM_RAM AM_SHARE("videoram")  // placeholder
 	AM_RANGE(0xf8000, 0xfffff) AM_ROM
@@ -359,6 +375,16 @@ static INPUT_PORTS_START( amusco )
 	PORT_BIT( 0xf9, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( draw88pkr )
+	PORT_INCLUDE( amusco )
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BILL1 ) //PORT_WRITE_LINE_DEVICE_MEMBER("pic8259", pic8259_device, ir4_w)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+
 
 /*************************
 *    Graphics Layouts    *
@@ -468,6 +494,11 @@ static MACHINE_CONFIG_START( amusco, amusco_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( draw88pkr, amusco )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(draw88pkr_mem_map)
+MACHINE_CONFIG_END
+
 
 /*************************
 *        Rom Load        *
@@ -518,4 +549,4 @@ ROM_END
 
 /*     YEAR  NAME        PARENT  MACHINE   INPUT     STATE          INIT  ROT    COMPANY      FULLNAME                      FLAGS                                                    LAYOUT    */
 GAMEL( 1987, amusco,     0,      amusco,   amusco,   driver_device, 0,    ROT0, "Amusco",    "American Music Poker (V1.4)", MACHINE_IMPERFECT_COLORS | MACHINE_NODEVICE_PRINTER,     layout_amusco ) // palette totally wrong
-GAME(  1988, draw88pkr,  0,      amusco,   amusco,   driver_device, 0,    ROT0, "BTE, Inc.", "Draw 88 Poker (V2.0)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_COLORS | MACHINE_NODEVICE_PRINTER )
+GAMEL( 1988, draw88pkr,  0,      draw88pkr,draw88pkr,driver_device, 0,    ROT0, "BTE, Inc.", "Draw 88 Poker (V2.0)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_COLORS | MACHINE_NODEVICE_PRINTER, layout_amusco )
