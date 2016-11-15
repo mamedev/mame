@@ -8,7 +8,7 @@
 #include "debugger.h"
 #include "hphybrid.h"
 
-typedef void (*fn_dis_param)(char *buffer , offs_t pc , uint16_t opcode , bool is_3001);
+typedef void (*fn_dis_param)(std::ostream &stream , offs_t pc , uint16_t opcode , bool is_3001);
 
 typedef struct {
 		uint16_t m_op_mask;
@@ -18,239 +18,233 @@ typedef struct {
 		uint32_t m_dasm_flags;
 } dis_entry_t;
 
-static void addr_2_str(char *buffer , uint16_t addr , bool indirect , bool is_3001)
+static void addr_2_str(std::ostream &stream, uint16_t addr , bool indirect , bool is_3001)
 {
-				char *s = buffer + strlen(buffer);
+	util::stream_format(stream, "$%04x" , addr);
 
-				s += sprintf(s , "$%04x" , addr);
+	if (is_3001) {
+		switch (addr) {
+		case HP_REG_AR1_ADDR:
+			stream << "(Ar1)";
+			break;
 
-				if (is_3001) {
-						switch (addr) {
-						case HP_REG_AR1_ADDR:
-								strcpy(s , "(Ar1)");
-								break;
+		case HP_REG_AR1_ADDR + 1:
+			stream << "(Ar1_2)";
+			break;
 
-						case HP_REG_AR1_ADDR + 1:
-								strcpy(s , "(Ar1_2)");
-								break;
+		case HP_REG_AR1_ADDR + 2:
+			stream << "(Ar1_3)";
+			break;
 
-						case HP_REG_AR1_ADDR + 2:
-								strcpy(s , "(Ar1_3)");
-								break;
+		case HP_REG_AR1_ADDR + 3:
+			stream << "(Ar1_4)";
+			break;
 
-						case HP_REG_AR1_ADDR + 3:
-								strcpy(s , "(Ar1_4)");
-								break;
+		case HP_REG_AR2_ADDR:
+			stream << "(Ar2)";
+			break;
 
-						case HP_REG_AR2_ADDR:
-								strcpy(s , "(Ar2)");
-								break;
+		case HP_REG_AR2_ADDR + 1:
+			stream << "(Ar2_2)";
+			break;
 
-						case HP_REG_AR2_ADDR + 1:
-								strcpy(s , "(Ar2_2)");
-								break;
+		case HP_REG_AR2_ADDR + 2:
+			stream << "(Ar2_3)";
+			break;
 
-						case HP_REG_AR2_ADDR + 2:
-								strcpy(s , "(Ar2_3)");
-								break;
+		case HP_REG_AR2_ADDR + 3:
+			stream << "(Ar2_4)";
+			break;
 
-						case HP_REG_AR2_ADDR + 3:
-								strcpy(s , "(Ar2_4)");
-								break;
+		case HP_REG_SE_ADDR:
+			stream << "(SE)";
+			break;
 
-						case HP_REG_SE_ADDR:
-								strcpy(s , "(SE)");
-								break;
+		case HP_REG_R25_ADDR:
+			stream << "(R25)";
+			break;
 
-						case HP_REG_R25_ADDR:
-								strcpy(s , "(R25)");
-								break;
+		case HP_REG_R26_ADDR:
+			stream << "(R26)";
+			break;
 
-						case HP_REG_R26_ADDR:
-								strcpy(s , "(R26)");
-								break;
+		case HP_REG_R27_ADDR:
+			stream << "(R27)";
+			break;
 
-						case HP_REG_R27_ADDR:
-								strcpy(s , "(R27)");
-								break;
+		case HP_REG_R32_ADDR:
+			stream << "(R32)";
+			break;
 
-						case HP_REG_R32_ADDR:
-								strcpy(s , "(R32)");
-								break;
+		case HP_REG_R33_ADDR:
+			stream << "(R33)";
+			break;
 
-						case HP_REG_R33_ADDR:
-								strcpy(s , "(R33)");
-								break;
+		case HP_REG_R34_ADDR:
+			stream << "(R34)";
+			break;
 
-						case HP_REG_R34_ADDR:
-								strcpy(s , "(R34)");
-								break;
+		case HP_REG_R35_ADDR:
+			stream << "(R35)";
+			break;
 
-						case HP_REG_R35_ADDR:
-								strcpy(s , "(R35)");
-								break;
+		case HP_REG_R36_ADDR:
+			stream << "(R36)";
+			break;
 
-						case HP_REG_R36_ADDR:
-								strcpy(s , "(R36)");
-								break;
-
-						case HP_REG_R37_ADDR:
-								strcpy(s , "(R37)");
-								break;
-						}
-				}
-
-				switch (addr) {
-				case HP_REG_A_ADDR:
-								strcpy(s , "(A)");
-								break;
-
-				case HP_REG_B_ADDR:
-								strcpy(s , "(B)");
-								break;
-
-				case HP_REG_P_ADDR:
-								strcpy(s , "(P)");
-								break;
-
-				case HP_REG_R_ADDR:
-								strcpy(s , "(R)");
-								break;
-
-				case HP_REG_R4_ADDR:
-								strcpy(s , "(R4)");
-								break;
-
-				case HP_REG_R5_ADDR:
-								strcpy(s , "(R5)");
-								break;
-
-				case HP_REG_R6_ADDR:
-								strcpy(s , "(R6)");
-								break;
-
-				case HP_REG_R7_ADDR:
-								strcpy(s , "(R7)");
-								break;
-
-				case HP_REG_IV_ADDR:
-								strcpy(s , "(IV)");
-								break;
-
-				case HP_REG_PA_ADDR:
-								strcpy(s , "(PA)");
-								break;
-
-				case HP_REG_DMAPA_ADDR:
-								strcpy(s , "(DMAPA)");
-								break;
-
-				case HP_REG_DMAMA_ADDR:
-								strcpy(s , "(DMAMA)");
-								break;
-
-				case HP_REG_DMAC_ADDR:
-								strcpy(s , "(DMAC)");
-								break;
-
-				case HP_REG_C_ADDR:
-								strcpy(s , "(C)");
-								break;
-
-				case HP_REG_D_ADDR:
-								strcpy(s , "(D)");
-								break;
-				}
-
-				if (indirect) {
-								strcat(s , ",I");
-				}
-}
-
-static void param_none(char *buffer , offs_t pc , uint16_t opcode , bool is_3001)
-{
-}
-
-static void param_loc(char *buffer , offs_t pc , uint16_t opcode , bool is_3001)
-{
-		uint16_t base;
-		uint16_t off;
-
-		if (opcode & 0x0400) {
-				// Current page
-				base = pc;
-		} else {
-				// Base page
-				base = 0;
+		case HP_REG_R37_ADDR:
+			stream << "(R37)";
+			break;
 		}
+	}
 
-		off = opcode & 0x3ff;
-		if (off & 0x200) {
-				off -= 0x400;
-		}
+	switch (addr) {
+	case HP_REG_A_ADDR:
+		stream << "(A)";
+		break;
 
-		addr_2_str(buffer , base + off , (opcode & 0x8000) != 0 , is_3001);
+	case HP_REG_B_ADDR:
+		stream << "(B)";
+		break;
+
+	case HP_REG_P_ADDR:
+		stream << "(P)";
+		break;
+
+	case HP_REG_R_ADDR:
+		stream << "(R)";
+		break;
+
+	case HP_REG_R4_ADDR:
+		stream << "(R4)";
+		break;
+
+	case HP_REG_R5_ADDR:
+		stream << "(R5)";
+		break;
+
+	case HP_REG_R6_ADDR:
+		stream << "(R6)";
+		break;
+
+	case HP_REG_R7_ADDR:
+		stream << "(R7)";
+		break;
+
+	case HP_REG_IV_ADDR:
+		stream << "(IV)";
+		break;
+
+	case HP_REG_PA_ADDR:
+		stream << "(PA)";
+		break;
+
+	case HP_REG_DMAPA_ADDR:
+		stream << "(DMAPA)";
+		break;
+
+	case HP_REG_DMAMA_ADDR:
+		stream << "(DMAMA)";
+		break;
+
+	case HP_REG_DMAC_ADDR:
+		stream << "(DMAC)";
+		break;
+
+	case HP_REG_C_ADDR:
+		stream << "(C)";
+		break;
+
+	case HP_REG_D_ADDR:
+		stream << "(D)";
+		break;
+	}
+
+	if (indirect) {
+		stream << ",I";
+	}
 }
 
-static void param_addr32(char *buffer , offs_t pc , uint16_t opcode , bool is_3001)
+static void param_none(std::ostream &stream, offs_t pc , uint16_t opcode , bool is_3001)
 {
-		addr_2_str(buffer , opcode & 0x1f , (opcode & 0x8000) != 0 , is_3001);
 }
 
-static void param_skip(char *buffer , offs_t pc , uint16_t opcode , bool is_3001)
+static void param_loc(std::ostream &stream, offs_t pc , uint16_t opcode , bool is_3001)
 {
-		uint16_t off = opcode & 0x3f;
-		if (off & 0x20) {
-				off -= 0x40;
-		}
-		addr_2_str(buffer , pc + off , false , is_3001);
+	uint16_t base;
+	uint16_t off;
+
+	if (opcode & 0x0400) {
+		// Current page
+		base = pc;
+	} else {
+		// Base page
+		base = 0;
+	}
+
+	off = opcode & 0x3ff;
+	if (off & 0x200) {
+		off -= 0x400;
+	}
+
+	addr_2_str(stream, base + off , (opcode & 0x8000) != 0 , is_3001);
 }
 
-static void param_skip_sc(char *buffer , offs_t pc , uint16_t opcode , bool is_3001)
+static void param_addr32(std::ostream &stream, offs_t pc , uint16_t opcode , bool is_3001)
 {
-		param_skip(buffer, pc, opcode , is_3001);
-
-		if (opcode & 0x80) {
-				if (opcode & 0x40) {
-						strcat(buffer , ",S");
-				} else {
-						strcat(buffer , ",C");
-				}
-		}
+	addr_2_str(stream, opcode & 0x1f , (opcode & 0x8000) != 0 , is_3001);
 }
 
-static void param_ret(char *buffer , offs_t pc , uint16_t opcode , bool is_3001)
+static void param_skip(std::ostream &stream, offs_t pc , uint16_t opcode , bool is_3001)
 {
-		char *s = buffer + strlen(buffer);
+	uint16_t off = opcode & 0x3f;
+	if (off & 0x20) {
+		off -= 0x40;
+	}
+	addr_2_str(stream , pc + off , false , is_3001);
+}
 
-		int off = opcode & 0x3f;
+static void param_skip_sc(std::ostream &stream, offs_t pc , uint16_t opcode , bool is_3001)
+{
+	param_skip(stream, pc, opcode , is_3001);
 
-		if (off & 0x20) {
-				off -= 0x40;
-		}
-
-		s += sprintf(s , "%d" , off);
+	if (opcode & 0x80) {
 		if (opcode & 0x40) {
-				strcpy(s , ",P");
-		}
-}
-
-static void param_n16(char *buffer , offs_t pc , uint16_t opcode , bool is_3001)
-{
-		char *s = buffer + strlen(buffer);
-
-		sprintf(s , "%u" , (opcode & 0xf) + 1);
-}
-
-static void param_reg_id(char *buffer , offs_t pc , uint16_t opcode , bool is_3001)
-{
-		addr_2_str(buffer, opcode & 7, false , is_3001);
-
-		if (opcode & 0x80) {
-				strcat(buffer , ",D");
+			stream << ",S";
 		} else {
-				strcat(buffer , ",I");
+			stream << ",C";
 		}
+	}
+}
+
+static void param_ret(std::ostream &stream, offs_t pc , uint16_t opcode , bool is_3001)
+{
+	int off = opcode & 0x3f;
+
+	if (off & 0x20) {
+		off -= 0x40;
+	}
+
+	util::stream_format(stream , "%d" , off);
+	if (opcode & 0x40) {
+		stream << ",P";
+	}
+}
+
+static void param_n16(std::ostream &stream, offs_t pc , uint16_t opcode , bool is_3001)
+{
+	util::stream_format(stream , "%u" , (opcode & 0xf) + 1);
+}
+
+static void param_reg_id(std::ostream &stream, offs_t pc , uint16_t opcode , bool is_3001)
+{
+	addr_2_str(stream, opcode & 7, false , is_3001);
+
+	if (opcode & 0x80) {
+		stream << ",D";
+	} else {
+		stream << ",I";
+	}
 }
 
 static const dis_entry_t dis_table[] = {
@@ -362,15 +356,14 @@ static const dis_entry_t dis_table_emc[] = {
 		{0 , 0 , nullptr , nullptr , 0 }
 };
 
-static offs_t disassemble_table(uint16_t opcode , offs_t pc , const dis_entry_t *table , bool is_3001 , char *buffer)
+static offs_t disassemble_table(uint16_t opcode , offs_t pc , const dis_entry_t *table , bool is_3001 , std::ostream &stream)
 {
 	const dis_entry_t *p;
 
 	for (p = table; p->m_op_mask; p++) {
 		if ((opcode & p->m_op_mask) == p->m_opcode) {
-			strcpy(buffer , p->m_mnemonic);
-			strcat(buffer , " ");
-			p->m_param_fn(buffer , pc , opcode , is_3001);
+			stream << p->m_mnemonic << " ";
+			p->m_param_fn(stream , pc , opcode , is_3001);
 			return 1 | p->m_dasm_flags | DASMFLAG_SUPPORTED;
 		}
 	}
@@ -378,38 +371,60 @@ static offs_t disassemble_table(uint16_t opcode , offs_t pc , const dis_entry_t 
 	return 0;
 }
 
+static offs_t internal_disasm_hp_hybrid(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+{
+	uint16_t opcode = ((uint16_t)oprom[ 0 ] << 8) | oprom[ 1 ];
+	offs_t res;
+
+	res = disassemble_table(opcode, pc, dis_table, false, stream);
+
+	if (res == 0)
+	{
+		// Unknown opcode
+		stream << "???";
+		res = 1 | DASMFLAG_SUPPORTED;
+	}
+
+	return res;
+}
+
 CPU_DISASSEMBLE(hp_hybrid)
 {
-		uint16_t opcode = ((uint16_t)oprom[ 0 ] << 8) | oprom[ 1 ];
-		offs_t res;
-
-		res = disassemble_table(opcode , pc , dis_table , false , buffer);
-
-		if (res == 0) {
-				// Unknown opcode
-				strcpy(buffer , "???");
-				res = 1 | DASMFLAG_SUPPORTED;
-		}
-
-		return res;
+	std::ostringstream stream;
+	offs_t result = internal_disasm_hp_hybrid(device, stream, pc, oprom, opram, options);
+	std::string stream_str = stream.str();
+	strcpy(buffer, stream_str.c_str());
+	return result;
 }
+
+static offs_t internal_disasm_hp_5061_3001(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+{
+	uint16_t opcode = ((uint16_t)oprom[ 0 ] << 8) | oprom[ 1 ];
+	offs_t res;
+
+	res = disassemble_table(opcode, pc, dis_table_emc, true, stream);
+
+	if (res == 0)
+	{
+		res = disassemble_table(opcode, pc, dis_table, true, stream);
+	}
+
+	if (res == 0)
+	{
+		// Unknown opcode
+		stream << "???";
+		res = 1 | DASMFLAG_SUPPORTED;
+	}
+
+	return res;
+}
+
 
 CPU_DISASSEMBLE(hp_5061_3001)
 {
-		uint16_t opcode = ((uint16_t)oprom[ 0 ] << 8) | oprom[ 1 ];
-		offs_t res;
-
-		res = disassemble_table(opcode , pc , dis_table_emc , true , buffer);
-
-		if (res == 0) {
-				res = disassemble_table(opcode , pc , dis_table , true , buffer);
-		}
-
-		if (res == 0) {
-				// Unknown opcode
-				strcpy(buffer , "???");
-				res = 1 | DASMFLAG_SUPPORTED;
-		}
-
-		return res;
+	std::ostringstream stream;
+	offs_t result = internal_disasm_hp_5061_3001(device, stream, pc, oprom, opram, options);
+	std::string stream_str = stream.str();
+	strcpy(buffer, stream_str.c_str());
+	return result;
 }
