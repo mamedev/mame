@@ -482,6 +482,11 @@ internal:
 		}
 	}
 
+	void Reset() override
+	{
+		memset(&state, 0, sizeof(state));
+	}
+
 	void Configure()
 	{
 		// If the device has already been configured, don't do it again
