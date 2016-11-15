@@ -402,7 +402,7 @@ public:
 	int vkey_for_mame_code(input_code code) const;
 #elif defined(OSD_UWP)
 	input_item_id map_di_scancode_to_itemid(int di_scancode) const;
-	input_item_id map_vkey_to_itemid(Windows::System::VirtualKey vkey) const;
+	const char* ui_label_for_mame_key(input_item_id code) const;
 #endif
 
 	static keyboard_trans_table& instance()

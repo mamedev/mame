@@ -235,16 +235,19 @@ internal:
 	void Configure()
 	{
 		keyboard_trans_table &table = keyboard_trans_table::instance();
-		
-		char keyname[256];
 
 		// populate it
 		for (int keynum = 0; keynum < MAX_KEYS; keynum++)
 		{
 			input_item_id itemid = table.map_di_scancode_to_itemid(keynum);
-			
-			//if (GetKeyNameTextA(((keynum & 0x7f) << 16) | ((keynum & 0x80) << 17), keyname, ARRAY_LENGTH(keyname)) == 0)
-			snprintf(keyname, ARRAY_LENGTH(keyname), "Scan%03d", keynum);
+			const char *keyname = table.ui_label_for_mame_key(itemid);
+
+			char temp[256];
+			if (keyname == nullptr)
+			{
+				snprintf(temp, ARRAY_LENGTH(temp), "Scan%03d", keynum);
+				keyname = temp;
+			}
 
 			// add the item to the device
 			this->InputDevice->add_item(keyname, itemid, generic_button_get_state<std::uint8_t>, &keyboard.state[keynum]);

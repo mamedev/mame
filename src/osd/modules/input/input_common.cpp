@@ -270,17 +270,15 @@ int keyboard_trans_table::vkey_for_mame_code(input_code code) const
 
 #if defined(OSD_UWP)
 
-input_item_id keyboard_trans_table::map_vkey_to_itemid(Windows::System::VirtualKey vkey) const
+const char* keyboard_trans_table::ui_label_for_mame_key(input_item_id itemid) const
 {
-	int tablenum;
-
 	// scan the table for a match
-	for (tablenum = 0; tablenum < m_table_size; tablenum++)
-		if (m_table[tablenum].virtual_key == vkey)
-			return m_table[tablenum].mame_key;
+	for (int tablenum = 0; tablenum < m_table_size; tablenum++)
+		if (m_table[tablenum].mame_key == itemid)
+			return m_table[tablenum].ui_name;
 
-	// default to an "other" switch
-	return ITEM_ID_OTHER_SWITCH;
+	// We didn't find one
+	return nullptr;
 }
 
 #endif
