@@ -66,9 +66,18 @@
 	MCFG_DEVICE_ADD(_tag, Z80SIO, _clock) \
 	MCFG_Z80SIO_OFFSETS(_rxa, _txa, _rxb, _txb)
 
+#define MCFG_UPD7201_ADD(_tag, _clock, _rxa, _txa, _rxb, _txb) \
+	MCFG_DEVICE_ADD(_tag, UPD7201N, _clock) \
+	MCFG_Z80SIO_OFFSETS(_rxa, _txa, _rxb, _txb)
+
+/* Generic macros */
 #define MCFG_Z80SIO_OFFSETS(_rxa, _txa, _rxb, _txb) \
 	z80sio_device::configure_channels(*device, _rxa, _txa, _rxb, _txb);
 
+#define MCFG_Z80SIO_OUT_INT_CB(_devcb) \
+	devcb = &z80sio_device::set_out_int_callback(*device, DEVCB_##_devcb);
+
+// Port A callbacks
 #define MCFG_Z80SIO_OUT_TXDA_CB(_devcb) \
 	devcb = &z80sio_device::set_out_txda_callback(*device, DEVCB_##_devcb);
 
@@ -84,6 +93,13 @@
 #define MCFG_Z80SIO_OUT_SYNCA_CB(_devcb) \
 	devcb = &z80sio_device::set_out_synca_callback(*device, DEVCB_##_devcb);
 
+#define MCFG_Z80SIO_OUT_RXDRQA_CB(_devcb) \
+	devcb = &z80sio_device::set_out_rxdrqa_callback(*device, DEVCB_##_devcb);
+
+#define MCFG_Z80SIO_OUT_TXDRQA_CB(_devcb) \
+	devcb = &z80sio_device::set_out_txdrqa_callback(*device, DEVCB_##_devcb);
+
+// Port B callbacks
 #define MCFG_Z80SIO_OUT_TXDB_CB(_devcb) \
 	devcb = &z80sio_device::set_out_txdb_callback(*device, DEVCB_##_devcb);
 
@@ -98,15 +114,6 @@
 
 #define MCFG_Z80SIO_OUT_SYNCB_CB(_devcb) \
 	devcb = &z80sio_device::set_out_syncb_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_Z80SIO_OUT_INT_CB(_devcb) \
-	devcb = &z80sio_device::set_out_int_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_Z80SIO_OUT_RXDRQA_CB(_devcb) \
-	devcb = &z80sio_device::set_out_rxdrqa_callback(*device, DEVCB_##_devcb);
-
-#define MCFG_Z80SIO_OUT_TXDRQA_CB(_devcb) \
-	devcb = &z80sio_device::set_out_txdrqa_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_Z80SIO_OUT_RXDRQB_CB(_devcb) \
 	devcb = &z80sio_device::set_out_rxdrqb_callback(*device, DEVCB_##_devcb);
@@ -403,7 +410,7 @@ class z80sio_device :  public device_t,
 {
 	friend class z80sio_channel;
 
-	public:
+public:
 	// construction/destruction
 	z80sio_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint32_t variant, const char *shortname, const char *source);
 	z80sio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
@@ -486,7 +493,8 @@ protected:
 
 	enum
 	{
-		TYPE_Z80SIO
+		TYPE_Z80SIO		= 0x001,
+		TYPE_UPD7201	= 0x002
 	};
 
 	enum
@@ -526,8 +534,15 @@ protected:
 	int m_variant;
 };
 
+class upd7201N_device : public z80sio_device
+{
+public :
+	upd7201N_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
 
 // device type definition
 extern const device_type Z80SIO;
 extern const device_type Z80SIO_CHANNEL;
+extern const device_type UPD7201N;
+
 #endif
