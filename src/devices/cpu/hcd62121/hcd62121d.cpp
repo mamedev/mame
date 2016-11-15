@@ -129,7 +129,7 @@ static const hcd62121_dasm hcd62121_ops[256] =
 };
 
 
-CPU_DISASSEMBLE( hcd62121 )
+static offs_t internal_disasm_hcd62121(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
 {
 	uint8_t op;
 	uint8_t op1;
@@ -143,9 +143,9 @@ CPU_DISASSEMBLE( hcd62121 )
 
 	/* Special case for nibble shift instruction */
 	if ( inst->arg2 == _4 )
-		buffer += sprintf(buffer,"sh%c%c    ", ( oprom[pos] & 0x80 ) ? 'l' : 'r', inst->str[3]);
+		util::stream_format(stream, "sh%c%c    ", ( oprom[pos] & 0x80 ) ? 'l' : 'r', inst->str[3]);
 	else
-		buffer += sprintf(buffer,"%-8s", inst->str);
+		util::stream_format(stream, "%-8s", inst->str);
 
 	switch( inst->arg1 )
 	{
@@ -154,18 +154,18 @@ CPU_DISASSEMBLE( hcd62121 )
 		op2 = oprom[pos++];
 		if ( op1 & 0x80 )
 		{
-			buffer += sprintf( buffer, "r%02x,0x%02x", op1 & 0x7f, op2 );
+			util::stream_format( stream, "r%02x,0x%02x", op1 & 0x7f, op2 );
 		}
 		else
 		{
 			if ( op2 & 0x80 )
-				buffer += sprintf( buffer, "r%02x,r%02x", op1 & 0x7f, op2 & 0x7f );
+				util::stream_format( stream, "r%02x,r%02x", op1 & 0x7f, op2 & 0x7f );
 			else
-				buffer += sprintf( buffer, "r%02x,r%02x", op2 & 0x7f, op1 & 0x7f );
+				util::stream_format( stream, "r%02x,r%02x", op2 & 0x7f, op1 & 0x7f );
 		}
 		break;
 	case _REG:
-		buffer += sprintf( buffer, "r%02x", oprom[pos++] & 0x7f );
+		util::stream_format( stream, "r%02x", oprom[pos++] & 0x7f );
 		break;
 	case _IRGREG:
 		/* bit 6 = direction. 0 - regular, 1 - reverse */
@@ -173,73 +173,73 @@ CPU_DISASSEMBLE( hcd62121 )
 		op2 = oprom[pos++];
 		if ( op1 & 0x80 )
 		{
-			buffer += sprintf( buffer, "(r%02x),0x%02x", 0x40 | ( op1 & 0x3f ), op2 );
+			util::stream_format( stream, "(r%02x),0x%02x", 0x40 | ( op1 & 0x3f ), op2 );
 		}
 		else
 		{
 			if ( op2 & 0x80 )
-				buffer += sprintf( buffer, "(r%02x%s),r%02x", 0x40 | ( op1 & 0x3f ), (op1 & 0x40) ? ".r" : "", op2 & 0x7f );
+				util::stream_format( stream, "(r%02x%s),r%02x", 0x40 | ( op1 & 0x3f ), (op1 & 0x40) ? ".r" : "", op2 & 0x7f );
 			else
-				buffer += sprintf( buffer, "r%02x,(r%02x%s)", op2 & 0x7f, 0x40 | ( op1 & 0x3f ), (op1 & 0x40) ? ".r" : "" );
+				util::stream_format( stream, "r%02x,(r%02x%s)", op2 & 0x7f, 0x40 | ( op1 & 0x3f ), (op1 & 0x40) ? ".r" : "" );
 		}
 		break;
 	case _IRG:
 		/* bit 6 = direction. 0 - regular, 1 - reverse */
 		op1 = oprom[pos++];
-		buffer += sprintf( buffer, "(r%02x%s)", 0x40 | ( op1 & 0x3f ), (op1 & 0x40) ? ".r" : "" );
+		util::stream_format( stream, "(r%02x%s)", 0x40 | ( op1 & 0x3f ), (op1 & 0x40) ? ".r" : "" );
 		break;
 	case _F:
-		buffer += sprintf( buffer, "F" );
+		util::stream_format( stream, "F" );
 		break;
 	case _CS:
-		buffer += sprintf( buffer, "CS" );
+		util::stream_format( stream, "CS" );
 		break;
 	case _DS:
-		buffer += sprintf( buffer, "DS" );
+		util::stream_format( stream, "DS" );
 		break;
 	case _SS:
-		buffer += sprintf( buffer, "SS" );
+		util::stream_format( stream, "SS" );
 		break;
 	case _PC:
-		buffer += sprintf( buffer, "PC" );
+		util::stream_format( stream, "PC" );
 		break;
 	case _SP:
-		buffer += sprintf( buffer, "SP" );
+		util::stream_format( stream, "SP" );
 		break;
 	case _I8:
-		buffer += sprintf( buffer, "0x%02x", oprom[pos++] );
+		util::stream_format( stream, "0x%02x", oprom[pos++] );
 		break;
 	case _I16:
 	case _A16:
-		buffer += sprintf( buffer, "0x%02x", oprom[pos++] );
-		buffer += sprintf( buffer, "%02x", oprom[pos++] );
+		util::stream_format( stream, "0x%02x", oprom[pos++] );
+		util::stream_format( stream, "%02x", oprom[pos++] );
 		break;
 	case _I64:
-		buffer += sprintf( buffer, "0x%02x", oprom[pos++] );
-		buffer += sprintf( buffer, "%02x", oprom[pos++] );
-		buffer += sprintf( buffer, "%02x", oprom[pos++] );
-		buffer += sprintf( buffer, "%02x", oprom[pos++] );
-		buffer += sprintf( buffer, "%02x", oprom[pos++] );
-		buffer += sprintf( buffer, "%02x", oprom[pos++] );
-		buffer += sprintf( buffer, "%02x", oprom[pos++] );
-		buffer += sprintf( buffer, "%02x", oprom[pos++] );
+		util::stream_format( stream, "0x%02x", oprom[pos++] );
+		util::stream_format( stream, "%02x", oprom[pos++] );
+		util::stream_format( stream, "%02x", oprom[pos++] );
+		util::stream_format( stream, "%02x", oprom[pos++] );
+		util::stream_format( stream, "%02x", oprom[pos++] );
+		util::stream_format( stream, "%02x", oprom[pos++] );
+		util::stream_format( stream, "%02x", oprom[pos++] );
+		util::stream_format( stream, "%02x", oprom[pos++] );
 		break;
 	case _I80:
-		buffer += sprintf( buffer, "0x%02x", oprom[pos++] );
-		buffer += sprintf( buffer, "%02x", oprom[pos++] );
-		buffer += sprintf( buffer, "%02x", oprom[pos++] );
-		buffer += sprintf( buffer, "%02x", oprom[pos++] );
-		buffer += sprintf( buffer, "%02x", oprom[pos++] );
-		buffer += sprintf( buffer, "%02x", oprom[pos++] );
-		buffer += sprintf( buffer, "%02x", oprom[pos++] );
-		buffer += sprintf( buffer, "%02x", oprom[pos++] );
-		buffer += sprintf( buffer, "%02x", oprom[pos++] );
-		buffer += sprintf( buffer, "%02x", oprom[pos++] );
+		util::stream_format( stream, "0x%02x", oprom[pos++] );
+		util::stream_format( stream, "%02x", oprom[pos++] );
+		util::stream_format( stream, "%02x", oprom[pos++] );
+		util::stream_format( stream, "%02x", oprom[pos++] );
+		util::stream_format( stream, "%02x", oprom[pos++] );
+		util::stream_format( stream, "%02x", oprom[pos++] );
+		util::stream_format( stream, "%02x", oprom[pos++] );
+		util::stream_format( stream, "%02x", oprom[pos++] );
+		util::stream_format( stream, "%02x", oprom[pos++] );
+		util::stream_format( stream, "%02x", oprom[pos++] );
 		break;
 	case _A24:
-		buffer += sprintf( buffer, "0x%02x:", oprom[pos++] );
-		buffer += sprintf( buffer, "0x%02x", oprom[pos++] );
-		buffer += sprintf( buffer, "%02x", oprom[pos++] );
+		util::stream_format( stream, "0x%02x:", oprom[pos++] );
+		util::stream_format( stream, "0x%02x", oprom[pos++] );
+		util::stream_format( stream, "%02x", oprom[pos++] );
 		break;
 	case _ILR:
 		op1 = oprom[pos++];
@@ -247,28 +247,28 @@ CPU_DISASSEMBLE( hcd62121 )
 		if ( ( op1 & 0x80 ) || ( op2 & 0x80 ) )
 		{
 			/* (lar),reg */
-				buffer += sprintf( buffer, "(%slar%s),r%02x", (op1 & 0x20) ? ( (op1 & 0x40) ? "--" : "++" ) : "", (op1 & 0x20) ? "" : ( (op1 & 0x40) ? "--" : "++" ), op2 & 0x7f );
+				util::stream_format( stream, "(%slar%s),r%02x", (op1 & 0x20) ? ( (op1 & 0x40) ? "--" : "++" ) : "", (op1 & 0x20) ? "" : ( (op1 & 0x40) ? "--" : "++" ), op2 & 0x7f );
 		}
 		else
 		{
 			/* reg,(lar) */
-			buffer += sprintf( buffer, "r%02x,(%slar%s)", op2 & 0x7f, (op1 & 0x20) ? ( (op1 & 0x40) ? "--" : "++" ) : "", (op1 & 0x20) ? "" : ( (op1 & 0x40) ? "--" : "++" ) );
+			util::stream_format( stream, "r%02x,(%slar%s)", op2 & 0x7f, (op1 & 0x20) ? ( (op1 & 0x40) ? "--" : "++" ) : "", (op1 & 0x20) ? "" : ( (op1 & 0x40) ? "--" : "++" ) );
 		}
 		break;
 	case _LAR:
-		buffer += sprintf( buffer, "lar" );
+		util::stream_format( stream, "lar" );
 		break;
 	case _DSZ:
-		buffer += sprintf( buffer, "dsize" );
+		util::stream_format( stream, "dsize" );
 		break;
 	case _TIM:
-		buffer += sprintf( buffer, "TIM?" );
+		util::stream_format( stream, "TIM?" );
 		break;
 	case _KLO:
-		buffer += sprintf( buffer, "KOL" );
+		util::stream_format( stream, "KOL" );
 		break;
 	case _KHI:
-		buffer += sprintf( buffer, "KOH" );
+		util::stream_format( stream, "KOH" );
 		break;
 	default:
 		break;
@@ -277,82 +277,92 @@ CPU_DISASSEMBLE( hcd62121 )
 	switch( inst->arg2 )
 	{
 	case _REG:
-		buffer += sprintf( buffer, ",r%02x", oprom[pos++] & 0x7f );
+		util::stream_format( stream, ",r%02x", oprom[pos++] & 0x7f );
 		break;
 	case _F:
-		buffer += sprintf( buffer, ",F" );
+		util::stream_format( stream, ",F" );
 		break;
 	case _CS:
-		buffer += sprintf( buffer, ",CS" );
+		util::stream_format( stream, ",CS" );
 		break;
 	case _DS:
-		buffer += sprintf( buffer, ",DS" );
+		util::stream_format( stream, ",DS" );
 		break;
 	case _SS:
-		buffer += sprintf( buffer, ",SS" );
+		util::stream_format( stream, ",SS" );
 		break;
 	case _PC:
-		buffer += sprintf( buffer, ",PC" );
+		util::stream_format( stream, ",PC" );
 		break;
 	case _SP:
-		buffer += sprintf( buffer, ",SP" );
+		util::stream_format( stream, ",SP" );
 		break;
 	case _I8:
-		buffer += sprintf( buffer, ",0x%02x", oprom[pos++] );
+		util::stream_format( stream, ",0x%02x", oprom[pos++] );
 		break;
 	case _I16:
 	case _A16:
-		buffer += sprintf( buffer, ",0x%02x", oprom[pos++] );
-		buffer += sprintf( buffer, "%02x", oprom[pos++] );
+		util::stream_format( stream, ",0x%02x", oprom[pos++] );
+		util::stream_format( stream, "%02x", oprom[pos++] );
 		break;
 	case _I64:
-		buffer += sprintf( buffer, ",0x%02x", oprom[pos++] );
-		buffer += sprintf( buffer, "%02x", oprom[pos++] );
-		buffer += sprintf( buffer, "%02x", oprom[pos++] );
-		buffer += sprintf( buffer, "%02x", oprom[pos++] );
-		buffer += sprintf( buffer, "%02x", oprom[pos++] );
-		buffer += sprintf( buffer, "%02x", oprom[pos++] );
-		buffer += sprintf( buffer, "%02x", oprom[pos++] );
-		buffer += sprintf( buffer, "%02x", oprom[pos++] );
+		util::stream_format( stream, ",0x%02x", oprom[pos++] );
+		util::stream_format( stream, "%02x", oprom[pos++] );
+		util::stream_format( stream, "%02x", oprom[pos++] );
+		util::stream_format( stream, "%02x", oprom[pos++] );
+		util::stream_format( stream, "%02x", oprom[pos++] );
+		util::stream_format( stream, "%02x", oprom[pos++] );
+		util::stream_format( stream, "%02x", oprom[pos++] );
+		util::stream_format( stream, "%02x", oprom[pos++] );
 		break;
 	case _I80:
-		buffer += sprintf( buffer, ",0x%02x", oprom[pos++] );
-		buffer += sprintf( buffer, "%02x", oprom[pos++] );
-		buffer += sprintf( buffer, "%02x", oprom[pos++] );
-		buffer += sprintf( buffer, "%02x", oprom[pos++] );
-		buffer += sprintf( buffer, "%02x", oprom[pos++] );
-		buffer += sprintf( buffer, "%02x", oprom[pos++] );
-		buffer += sprintf( buffer, "%02x", oprom[pos++] );
-		buffer += sprintf( buffer, "%02x", oprom[pos++] );
-		buffer += sprintf( buffer, "%02x", oprom[pos++] );
-		buffer += sprintf( buffer, "%02x", oprom[pos++] );
+		util::stream_format( stream, ",0x%02x", oprom[pos++] );
+		util::stream_format( stream, "%02x", oprom[pos++] );
+		util::stream_format( stream, "%02x", oprom[pos++] );
+		util::stream_format( stream, "%02x", oprom[pos++] );
+		util::stream_format( stream, "%02x", oprom[pos++] );
+		util::stream_format( stream, "%02x", oprom[pos++] );
+		util::stream_format( stream, "%02x", oprom[pos++] );
+		util::stream_format( stream, "%02x", oprom[pos++] );
+		util::stream_format( stream, "%02x", oprom[pos++] );
+		util::stream_format( stream, "%02x", oprom[pos++] );
 		break;
 	case _A24:
-		buffer += sprintf( buffer, ",0x%02x:", oprom[pos++] );
-		buffer += sprintf( buffer, "0x%02x", oprom[pos++] );
-		buffer += sprintf( buffer, "%02x", oprom[pos++] );
+		util::stream_format( stream, ",0x%02x:", oprom[pos++] );
+		util::stream_format( stream, "0x%02x", oprom[pos++] );
+		util::stream_format( stream, "%02x", oprom[pos++] );
 		break;
 	case _ILR:
 		/* Implemented by _ILR section for arg1 */
 		break;
 	case _LAR:
-		buffer += sprintf( buffer, ",lar" );
+		util::stream_format( stream, ",lar" );
 		break;
 	case _DSZ:
-		buffer += sprintf( buffer, ",dsize" );
+		util::stream_format( stream, ",dsize" );
 		break;
 	case _TIM:
-		buffer += sprintf( buffer, ",TIM?" );
+		util::stream_format( stream, ",TIM?" );
 		break;
 	case _KI:
-		buffer += sprintf( buffer, ",KI" );
+		util::stream_format( stream, ",KI" );
 		break;
 	case _4:
-		buffer += sprintf( buffer, ",4" );
+		util::stream_format( stream, ",4" );
 		break;
 	default:
 		break;
 	}
 
 	return pos | DASMFLAG_SUPPORTED;
+}
+
+
+CPU_DISASSEMBLE(hcd62121)
+{
+	std::ostringstream stream;
+	offs_t result = internal_disasm_hcd62121(device, stream, pc, oprom, opram, options);
+	std::string stream_str = stream.str();
+	strcpy(buffer, stream_str.c_str());
+	return result;
 }
