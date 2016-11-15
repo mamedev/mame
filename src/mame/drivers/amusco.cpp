@@ -122,7 +122,6 @@ public:
 	DECLARE_READ8_MEMBER(lpt_status_r);
 	DECLARE_WRITE8_MEMBER(lpt_data_w);
 	DECLARE_WRITE8_MEMBER(rtc_control_w);
-	DECLARE_WRITE8_MEMBER(rtc_data_w);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
 	MC6845_UPDATE_ROW(update_row);
 
@@ -134,7 +133,6 @@ public:
 	required_device<screen_device> m_screen;
 	uint8_t m_mc6845_address;
 	uint16_t m_video_update_address;
-	uint8_t m_rtc_data;
 };
 
 
@@ -172,7 +170,6 @@ void amusco_state::video_start()
 
 void amusco_state::machine_start()
 {
-	m_rtc_data = 0;
 }
 
 
@@ -305,16 +302,6 @@ WRITE8_MEMBER(amusco_state::rtc_control_w)
 	m_rtc->hold_w(BIT(data, 6));
 	m_rtc->write_w(BIT(data, 5));
 	m_rtc->read_w(BIT(data, 4));
-
-	// TO DO: MSM5832 WR emulation is inaccurate
- 	if (BIT(data, 5))
-		m_rtc->data_w(space, 0, m_rtc_data);
-}
-
-WRITE8_MEMBER(amusco_state::rtc_data_w)
-{
-	// TO DO: MSM5832 should be able to latch this value itself
-	m_rtc_data = data;
 }
 
 static ADDRESS_MAP_START( amusco_io_map, AS_IO, 8, amusco_state )
@@ -454,7 +441,7 @@ static MACHINE_CONFIG_START( amusco, amusco_state )
 	MCFG_DEVICE_ADD("rtc_interface", I8155, 0)
 	MCFG_I8155_OUT_PORTA_CB(WRITE8(amusco_state, rtc_control_w))
 	MCFG_I8155_IN_PORTC_CB(DEVREAD8("rtc", msm5832_device, data_r))
-	MCFG_I8155_OUT_PORTC_CB(WRITE8(amusco_state, rtc_data_w))
+	MCFG_I8155_OUT_PORTC_CB(DEVWRITE8("rtc", msm5832_device, data_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

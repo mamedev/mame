@@ -267,6 +267,8 @@ void apricot_keyboard_hle_device::received_byte(uint8_t byte)
 		{
 			m_rtc->address_w(m_rtc_index--);
 			m_rtc->data_w(machine().dummy_space(), 0, byte);
+			m_rtc->write_w(1);
+			m_rtc->write_w(0);
 		}
 	}
 	else
@@ -303,7 +305,6 @@ void apricot_keyboard_hle_device::received_byte(uint8_t byte)
 
 			// make rtc chip ready
 			m_rtc->cs_w(1);
-			m_rtc->write_w(1);
 
 			break;
 
