@@ -188,7 +188,7 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/msm6242.h" // Supporting also Epson 62423 which is compatible to the Epson 72423
+#include "machine/msm6242.h"
 #include "machine/ram.h" // For variants that only differs in amount of RAM
 #include "machine/scnxx562.h"
 #include "machine/68230pit.h"
@@ -215,8 +215,6 @@
 #else
 #define FUNCNAME __PRETTY_FUNCTION__
 #endif
-
-const device_type EPS72423 = MSM6242; // Informative
 
 #define DUSCC_CLOCK XTAL_14_7456MHz /* Verified */
 
@@ -292,7 +290,7 @@ private:
 
 	required_device<fga002_device> m_fga002;
 
-	required_device <msm6242_device> m_rtc;
+	required_device<rtc72423_device> m_rtc;
 
 	// Helper functions
 	void update_irq_to_maincpu();
@@ -314,7 +312,7 @@ static ADDRESS_MAP_START (cpu30_mem, AS_PROGRAM, 32, cpu30_state)
 	AM_RANGE (0xff800e00, 0xff800fff) AM_DEVREADWRITE8("pit2", pit68230_device, read, write, 0xffffffff)
 	AM_RANGE (0xff802000, 0xff8021ff) AM_DEVREADWRITE8("duscc", duscc68562_device, read, write, 0xffffffff) /* Port 1&2 - Dual serial port DUSCC   */
 	AM_RANGE (0xff802200, 0xff8023ff) AM_DEVREADWRITE8("duscc2", duscc68562_device, read, write, 0xffffffff) /* Port 3&4 - Dual serial port DUSCC   */
-	AM_RANGE (0xff803000, 0xff8031ff) AM_DEVREADWRITE8("rtc", msm6242_device, read, write, 0xffffffff) /* device support Epson 62423 which is compatible with Epson 72423 */
+	AM_RANGE (0xff803000, 0xff8031ff) AM_DEVREADWRITE8("rtc", rtc72423_device, read, write, 0xffffffff)
 //	AM_RANGE (0xff803400, 0xff8035ff) AM_DEVREADWRITE8("scsi", mb87033_device, read, write, 0xffffffff) /* TODO: implement MB87344 SCSI device */
 	AM_RANGE (0xff803400, 0xff8035ff) AM_READWRITE8(scsi_r, scsi_w, 0x000000ff) /* mock driver to log calls to device */
 //	AM_RANGE (0xff803800, 0xff80397f) AM_DEVREADWRITE8("fdc", wd37c65c_device, read, write, 0xffffffff) /* TODO: implement WD3/C65C fdc controller */
@@ -716,7 +714,7 @@ static MACHINE_CONFIG_START (cpu30, cpu30_state)
 	MCFG_FGA002_OUT_LIACK5_CB(DEVREAD8("duscc2",  duscc_device, iack))
 
 	// RTC
-	MCFG_DEVICE_ADD("rtc", EPS72423, XTAL_32_768kHz) // Fake crystal value, the 72423 uses it own internal crystal
+	MCFG_DEVICE_ADD("rtc", RTC72423, XTAL_32_768kHz) // Fake crystal value, the 72423 uses it own internal crystal
 	MCFG_MSM6242_OUT_INT_HANDLER(DEVWRITELINE("fga002", fga002_device, lirq0_w))
 
 	// dual ported ram
