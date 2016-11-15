@@ -37,8 +37,8 @@
 #define KEY_TRANS_ENTRY0(mame, sdlsc, sdlkey, disc, virtual, uwp, ascii, UI) { ITEM_ID_##mame, SDL_SCANCODE_ ## sdlsc, SDLK_ ## sdlkey, ascii, "ITEM_ID_"#mame, (char *) UI }
 #define KEY_TRANS_ENTRY1(mame, sdlsc, sdlkey, disc, virtual, uwp, ascii)     { ITEM_ID_##mame, SDL_SCANCODE_ ## sdlsc, SDLK_ ## sdlkey, ascii, "ITEM_ID_"#mame, (char*) #mame }
 #elif defined(OSD_UWP)
-#define KEY_TRANS_ENTRY0(mame, sdlsc, sdlkey, disc, virtual, uwp, ascii, UI) { ITEM_ID_##mame, Windows::System::VirtualKey:: ## uwp, ascii, "ITEM_ID_"#mame, (char *) UI }
-#define KEY_TRANS_ENTRY1(mame, sdlsc, sdlkey, disc, virtual, uwp, ascii)     { ITEM_ID_##mame, Windows::System::VirtualKey:: ## uwp, ascii, "ITEM_ID_"#mame, (char*) #mame }
+#define KEY_TRANS_ENTRY0(mame, sdlsc, sdlkey, disc, virtual, uwp, ascii, UI) { ITEM_ID_##mame, KEY_ ## disc, Windows::System::VirtualKey:: ## uwp, ascii, "ITEM_ID_"#mame, (char *) UI }
+#define KEY_TRANS_ENTRY1(mame, sdlsc, sdlkey, disc, virtual, uwp, ascii)     { ITEM_ID_##mame, KEY_ ## disc, Windows::System::VirtualKey:: ## uwp, ascii, "ITEM_ID_"#mame, (char*) #mame }
 #else
 // osd mini
 #endif
@@ -227,7 +227,7 @@ input_item_id keyboard_trans_table::lookup_mame_code(const char *scode) const
 }
 
 // Windows specific lookup methods
-#if defined(OSD_WINDOWS)
+#if defined(OSD_WINDOWS) || defined(OSD_UWP)
 
 input_item_id keyboard_trans_table::map_di_scancode_to_itemid(int scancode) const
 {
@@ -241,6 +241,10 @@ input_item_id keyboard_trans_table::map_di_scancode_to_itemid(int scancode) cons
 	// default to an "other" switch
 	return ITEM_ID_OTHER_SWITCH;
 }
+
+#endif
+
+#if defined(OSD_WINDOWS)
 
 //============================================================
 //  wininput_vkey_for_mame_code
@@ -262,7 +266,9 @@ int keyboard_trans_table::vkey_for_mame_code(input_code code) const
 	return 0;
 }
 
-#elif defined(OSD_UWP)
+#endif
+
+#if defined(OSD_UWP)
 
 input_item_id keyboard_trans_table::map_vkey_to_itemid(Windows::System::VirtualKey vkey) const
 {
