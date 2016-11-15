@@ -328,6 +328,7 @@ Game                                          on cart    IC22#   # of SOP56  IC3
 ----------------------------------------------------------------------------------------------------------------------------------
 Club Kart: European Session (2003, prototype)   no cart  *       21 (64Mb)   present  315-6206  not present   * instead of EPROM have tiny PCB with 2 flashroms on it
 Crackin' DJ part 2                            840-0068C  23674   20 (64Mb)   present  315-6206  317-0311-COM  PCB have label 840-0068B-01 837-14124, requires regular 837-13551 and 837-13938 rotary JVS boards, and turntable simulation
+Crazy Taxi                                    840-0002C  ?       13 (64Mb)   ?        315-6206  ?             not dumped, likely same as regular 171-7919A cart
 Ferrari F355 Challenge (twin/deluxe, prototype) no cart  22848P* 21 (64Mb)   present  315-6206  317-0267-COM  * flash-PCB have CRC 330B A417, the rest is the same as regular cart, not dumped but known to exist
 /Ferrari F355 Challenge 2 - International
 \Course Edition (twin/deluxe, prototype)        no cart  23399   21 (64Mb)   present  315-6206  317-0287-COM  content is the same as regular 171-7919A cart
@@ -7923,7 +7924,7 @@ ROM_START( lupinsho )
 	DISK_IMAGE_READONLY( "gds-0018", 0, BAD_DUMP SHA1(0633a99a666f363ab30450a76b9753685d6b1f57) )
 
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
-	ROM_LOAD("317-0332-jpn.pic", 0x00, 0x4000, CRC(f71cb2fc) SHA1(281b3b3b03edf9a39e380976de528b7c9674de53) )
+	ROM_LOAD("317-0325-jpn.pic", 0x00, 0x4000, CRC(f71cb2fc) SHA1(281b3b3b03edf9a39e380976de528b7c9674de53) )
 ROM_END
 
 ROM_START( vathlete )
@@ -8087,13 +8088,12 @@ ROM_START( puyofev )
 ROM_END
 
 /*
-   note:
-   both Dragon Treasure game binaries have only first 16MB encrypted using DES key from security PIC provided with GD-ROMs.
-   the rest of data encrypted using some other key, same in both game versions.
-   presumably this data uploaded via network to satellite units and decrypted using DES key from their own security PICs.
+   Dragon Treasure 2 and 3 game binaries have only first 16MB encrypted using key from main unit security PIC.
+   data starting from 0x1000000 uploaded via network to satellite units and later decrypted using keys from satellite security PICs.
+   Dragon Treasure 2 binary also contain DIMM firmware updater ver 3.13 at 0x19000000
 */
 
-// requires 837-14381 "G2 EXPANSION BD" I/O board
+// requires 837-14381 "G2 EXPANSION BD" I/O board, NetDIMM, IC Card reader (unknown model) and coin mechanics
 ROM_START( dragntr2 )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
@@ -8102,11 +8102,15 @@ ROM_START( dragntr2 )
 	DISK_IMAGE_READONLY( "gds-0037a", 0, SHA1(ce65fe84cabaa1ac3f40bff9535a42c2055b5f1c) )
 
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
-	//PIC is missing
-	ROM_LOAD("317-xxxx-xxx.pic", 0x00, 0x4000, NO_DUMP )
+	//PIC16C621A (317-0389-COM)
+	ROM_LOAD("317-0389-com.pic", 0x00, 0x4000, CRC(35c511f9) SHA1(13073d6076d8b771f52a9cf461ed335471762574) )
+
+	ROM_REGION( 0x4000, "satl_pic", ROMREGION_ERASEFF)
+	//PIC16C621A (317-0390-COM)
+	ROM_LOAD("317-0390-com.pic", 0x00, 0x4000, CRC(92183b60) SHA1(1345a35ee4a3a02acc060f69d4faec5b72b7894b) )
 ROM_END
 
-// requires 837-14381 "G2 EXPANSION BD" I/O board
+// requires 837-14381 "G2 EXPANSION BD" I/O board, NetDIMM, IC Card reader (unknown model) and coin mechanics
 ROM_START( dragntr3 )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
@@ -8117,7 +8121,11 @@ ROM_START( dragntr3 )
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
 	//PIC16F628A
 	// copy, original labels unknown
-	ROM_LOAD("317-xxxx-xxx.pic", 0x00, 0x4000, CRC(8df4d33a) SHA1(0d27ec46a64af60b1e46ad4b3d34b6df5448f81a) )
+	ROM_LOAD("317-xxxx-com.pic", 0x00, 0x4000, CRC(8df4d33a) SHA1(0d27ec46a64af60b1e46ad4b3d34b6df5448f81a) )
+
+	ROM_REGION(0x4000, "satl_pic", ROMREGION_ERASEFF)
+	//PIC16C621A (317-0390-COM)
+	ROM_LOAD("317-0390-com.pic", 0x00, 0x4000, CRC(92183b60) SHA1(1345a35ee4a3a02acc060f69d4faec5b72b7894b) )
 ROM_END
 
 ROM_START( ndcfboxa )
@@ -8881,8 +8889,8 @@ ROM_START( wccf116 )
 	DISK_IMAGE_READONLY( "cdp-10001c", 0, SHA1(efa6ef20f278c99efbf7c3630b1c8e2cad0a05c0) ) // CD-R
 
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
-	//PIC is missing
-	ROM_LOAD("wccf1.pic", 0x00, 0x4000, NO_DUMP )
+	//PIC16C621A (317-0329-JPN)
+	ROM_LOAD("317-0329-jpn.pic", 0x00, 0x4000, CRC(097f5f92) SHA1(ffe7df06007bd99908db15c300dd53bbd321bdb8) )
 ROM_END
 
 ROM_START( wccf1dup )
@@ -8893,8 +8901,8 @@ ROM_START( wccf1dup )
 	DISK_IMAGE_READONLY( "cdp-10003", 0, SHA1(13064b6e03527f1222b6bd01c0ba9a063d7be949) )
 
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
-	//PIC is missing, same as CDP-10001C
-	ROM_LOAD("wccf1.pic", 0x00, 0x4000, NO_DUMP )
+	//PIC16C621A (317-0329-JPN)
+	ROM_LOAD("317-0329-jpn.pic", 0x00, 0x4000, CRC(097f5f92) SHA1(ffe7df06007bd99908db15c300dd53bbd321bdb8) )
 ROM_END
 
 ROM_START( wccf212e )
