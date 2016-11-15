@@ -470,6 +470,16 @@ internal:
 		// Get the trigger values
 		state.left_trigger = normalize_absolute_axis(reading.LeftTrigger, 0.0, 1.0);
 		state.right_trigger = normalize_absolute_axis(reading.RightTrigger, 0.0, 1.0);
+
+		// For the UI, triggering UI_CONFIGURE is odd. It requires a EVENT_CHAR first
+		static constexpr int menuhotkey = (int)(GamepadButtons::View | GamepadButtons::X);
+		if (((int)reading.Buttons & menuhotkey) == menuhotkey)
+		{
+			ui_event uiev;
+			memset(&uiev, 0, sizeof(uiev));
+			uiev.event_type = UI_EVENT_CHAR;
+			this->Machine.ui_input().push_event(uiev);
+		}
 	}
 
 	void Configure()
@@ -528,9 +538,13 @@ internal:
 
 private ref class UwpJoystickModule : public UwpInputModule
 {
+private:
+	boolean m_joysticks_discovered;
+
 internal:
 	UwpJoystickModule()
-		: UwpInputModule(OSD_JOYSTICKINPUT_PROVIDER, "uwp")
+		: UwpInputModule(OSD_JOYSTICKINPUT_PROVIDER, "uwp"),
+		m_joysticks_discovered(false)
 	{
 	}
 
@@ -574,13 +588,22 @@ private:
 		auto start = std::chrono::system_clock::now();
 
 		// We need to pause a bit and pump events so gamepads get discovered
-		while (std::chrono::system_clock::now() - start < std::chrono::milliseconds(500))
+		while (std::chrono::system_clock::now() - start < std::chrono::milliseconds(1000))
 			CoreWindow::GetForCurrentThread()->Dispatcher->ProcessEvents(CoreProcessEventsOption::ProcessAllIfPresent);
+
+		m_joysticks_discovered = true;
 	}
 
 	void OnGamepadAdded(Platform::Object ^sender, Gamepad ^pad)
 	{
-		osd_printf_verbose("Input: UWP Compatible %s gamepad discovered.\n", pad->IsWireless ? "Wireless" : "Wired");
+		if (m_joysticks_discovered)
+		{
+			osd_printf_error("Input: UWP Compatible %s gamepad plugged in AFTER discovery complete!\n", pad->IsWireless ? "Wireless" : "Wired");
+		}
+		else
+		{
+			osd_printf_verbose("Input: UWP Compatible %s gamepad discovered.\n", pad->IsWireless ? "Wireless" : "Wired");
+		}
 	}
 };
 

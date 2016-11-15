@@ -81,12 +81,23 @@ void windows_osd_interface::customize_input_type_list(simple_list<input_type_ent
 	for (input_type_entry &entry : typelist)
 		switch (entry.type())
 		{
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 			// disable the config menu if the ALT key is down
 			// (allows ALT-TAB to switch between windows apps)
 			case IPT_UI_CONFIGURE:
 				entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_TAB, input_seq::not_code, KEYCODE_LALT, input_seq::not_code, KEYCODE_RALT);
 				break;
+#else
+			// UWP: Hotkey Select + X => UI_CONFIGURE (Menu)
+			case IPT_UI_CONFIGURE:
+				entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_TAB, input_seq::or_code, JOYCODE_SELECT, JOYCODE_BUTTON3);
+				break;
 
+			// UWP: Hotkey Select + Start => CANCEL
+			case IPT_UI_CANCEL:
+				entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_ESC, input_seq::or_code, JOYCODE_SELECT, JOYCODE_START);
+				break;
+#endif
 			// configurable UI mode switch
 			case IPT_UI_TOGGLE_UI:
 				uimode = options().ui_mode_key();
