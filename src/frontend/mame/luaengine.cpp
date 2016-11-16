@@ -769,18 +769,6 @@ void lua_engine::initialize()
 				return sol::make_object(sol(), sol::nil);
 			return sol::make_object(sol(), driver_list::driver(i));
 		};
-	// this throws an error when implemented as an initializer
-	emu["item"] = [this](int index) {
-			save_item *item = new save_item;
-			if(!machine().save().indexed_item(index, item->base, item->size, item->count))
-			{
-				item->base = nullptr;
-				item->size = 0;
-				item->count= 0;
-			}
-			return item;
-		};
-	emu["thread"] = []() { context *ctx = new context; ctx->busy = false; ctx->yield = false; return ctx; };
 
 	emu.new_usertype<emu_file>("file", sol::call_constructor, sol::constructors<sol::types<const char *, uint32_t>>(),
 			"read", [](emu_file &file, sol::buffer *buff) { buff->set_len(file.read(buff->get_ptr(), buff->get_len())); return buff; },
@@ -799,8 +787,10 @@ void lua_engine::initialize()
  * thread.yield - check if thread is yielded
 */
 
-	sol().registry().new_usertype<context>("thread",
-			sol::meta_function::garbage_collect, sol::destructor([](context *ctx) { delete ctx; }),
+	emu.new_usertype<context>("thread", sol::call_constructor, sol::initializers([](context &ctx) {
+					ctx.busy = false;
+					ctx.yield = false;
+				}),
 			"start", [this](context &ctx, const char *scr) {
 					std::string script(scr);
 					if(ctx.busy)
@@ -854,8 +844,14 @@ void lua_engine::initialize()
 			"busy", sol::readonly(&context::busy),
 			"yield", sol::readonly(&context::yield));
 
-	sol().registry().new_usertype<save_item>("item",
-			sol::meta_function::garbage_collect, sol::destructor([](save_item *item) { delete item; }),
+	emu.new_usertype<save_item>("item", sol::call_constructor, sol::initializers([this](save_item &item, int index) {
+					if(!machine().save().indexed_item(index, item.base, item.size, item.count))
+					{
+						item.base = nullptr;
+						item.size = 0;
+						item.count= 0;
+					}
+				}),
 			"size", sol::readonly(&save_item::size),
 			"count", sol::readonly(&save_item::count),
 			"read", [this](save_item &item, int offset) -> sol::object {

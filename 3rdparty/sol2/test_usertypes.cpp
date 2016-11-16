@@ -1423,3 +1423,26 @@ TEST_CASE("usertype/destruction-test", "make sure usertypes are properly destruc
 		lua["testCrash"]();
 	}
 }
+
+TEST_CASE("usertype/call-initializers", "Ensure call constructors with initializers work well") {
+	struct A {
+		double f = 25.5;
+
+		static void init(A& x, double f) {
+			x.f = f;
+		}
+	};
+
+	sol::state lua;
+	lua.open_libraries();
+
+	lua.new_usertype<A>("A",
+		sol::call_constructor, sol::initializers(&A::init)
+		);
+
+	lua.script(R"(
+a = A(24.3)
+)");
+	A& a = lua["a"];
+	REQUIRE(a.f == 24.3);
+}
