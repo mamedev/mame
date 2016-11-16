@@ -1,23 +1,25 @@
 --
--- vs15.lua
--- Baseline support for Visual Studio 15.
+-- vs2015.lua
+-- Baseline support for Visual Studio 2017.
 --
 
+	premake.vstudio.vc2017 = {}
+	local vc2017 = premake.vstudio.vc2017
 	local vstudio = premake.vstudio
 
 
 ---
--- Register a command-line action for Visual Studio 15.
+-- Register a command-line action for Visual Studio 2017.
 ---
 
 	newaction
 	{
-		trigger         = "vs15",
-		shortname       = "Visual Studio 15",
-		description     = "Generate Microsoft Visual Studio 15 project files",
+		trigger         = "vs2017",
+		shortname       = "Visual Studio 2017",
+		description     = "Generate Microsoft Visual Studio 2017 project files",
 		os              = "windows",
 
-		valid_kinds     = { "ConsoleApp", "WindowedApp", "StaticLib", "SharedLib" },
+		valid_kinds     = { "ConsoleApp", "WindowedApp", "StaticLib", "SharedLib", "Bundle" },
 
 		valid_languages = { "C", "C++", "C#" },
 
@@ -35,21 +37,21 @@
 				premake.generate(prj, "%%.csproj", vstudio.cs2005.generate)
 				premake.generate(prj, "%%.csproj.user", vstudio.cs2005.generate_user)
 			else
-				vstudio.needAppxManifest = false
+				premake.vstudio.needAppxManifest = false
 				premake.generate(prj, "%%.vcxproj", premake.vs2010_vcxproj)
 				premake.generate(prj, "%%.vcxproj.user", premake.vs2010_vcxproj_user)
 				premake.generate(prj, "%%.vcxproj.filters", vstudio.vc2010.generate_filters)
 
-				if vstudio.needAppxManifest then
-					premake.generate(prj, "%%.appxmanifest", premake.vs2010_appxmanifest)
+				if premake.vstudio.needAppxManifest then
+					premake.generate(prj, "%%/Package.appxmanifest", premake.vs2010_appxmanifest)
 				end
 			end
 		end,
 
 
-		oncleansolution = vstudio.cleansolution,
-		oncleanproject  = vstudio.cleanproject,
-		oncleantarget   = vstudio.cleantarget,
+		oncleansolution = premake.vstudio.cleansolution,
+		oncleanproject  = premake.vstudio.cleanproject,
+		oncleantarget   = premake.vstudio.cleantarget,
 
 		vstudio = {
 			solutionVersion = "12",
