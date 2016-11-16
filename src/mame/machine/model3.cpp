@@ -290,76 +290,16 @@ void model3_state::tap_reset()
 /*****************************************************************************/
 /* Epson RTC-72421 */
 
-static uint8_t rtc_get_reg(running_machine &machine, int reg)
-{
-	system_time systime;
-
-	machine.current_datetime(systime);
-
-	switch(reg)
-	{
-		case 0:     // 1-second digit
-			return (systime.local_time.second % 10) & 0xf;
-
-		case 1:     // 10-seconds digit
-			return (systime.local_time.second / 10) & 0x7;
-
-		case 2:     // 1-minute digit
-			return (systime.local_time.minute % 10) & 0xf;
-
-		case 3:     // 10-minute digit
-			return (systime.local_time.minute / 10) & 0x7;
-
-		case 4:     // 1-hour digit
-			return (systime.local_time.hour % 10) & 0xf;
-
-		case 5:     // 10-hours digit
-			return (systime.local_time.hour / 10) & 0x7;
-
-		case 6:     // 1-day digit (days in month)
-			return (systime.local_time.mday % 10) & 0xf;
-
-		case 7:     // 10-days digit
-			return (systime.local_time.mday / 10) & 0x3;
-
-		case 8:     // 1-month digit
-			return ((systime.local_time.month + 1) % 10) & 0xf;
-
-		case 9:     // 10-months digit
-			return ((systime.local_time.month + 1) / 10) & 0x1;
-
-		case 10:    // 1-year digit
-			return (systime.local_time.year % 10) & 0xf;
-
-		case 11:    // 10-years digit
-			return ((systime.local_time.year % 100) / 10) & 0xf;
-
-		case 12:    // day of the week
-			return systime.local_time.weekday & 0x7;
-
-		case 13:
-			return 0;
-
-		case 14:
-			return 0;
-
-		case 15:
-			return 0;
-
-		default:
-			fatalerror("RTC-72421: Unknown reg %02X\n", reg);
-	}
-}
-
 READ32_MEMBER(model3_state::rtc72421_r)
 {
 	int reg = offset;
 	uint32_t data;
-	data = rtc_get_reg(machine(), reg) << 24;
+	data = m_rtc->read(space, reg) << 24;
 	data |= 0x30000;    /* these bits are set to pass the battery voltage test */
 	return data;
 }
 
 WRITE32_MEMBER(model3_state::rtc72421_w)
 {
+	m_rtc->write(space, offset, data >> 24);
 }

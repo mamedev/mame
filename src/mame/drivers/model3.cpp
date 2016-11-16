@@ -5548,6 +5548,7 @@ static MACHINE_CONFIG_START( model3_10, model3_state )
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_NVRAM_ADD_1FILL("backup")
+	MCFG_DEVICE_ADD("rtc", RTC72421, XTAL_32_768kHz) // internal oscillator
 
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -5593,6 +5594,7 @@ static MACHINE_CONFIG_START( model3_15, model3_state )
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_NVRAM_ADD_1FILL("backup")
+	MCFG_DEVICE_ADD("rtc", RTC72421, XTAL_32_768kHz) // internal oscillator
 
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -5646,6 +5648,7 @@ static MACHINE_CONFIG_START(model3_20, model3_state)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_NVRAM_ADD_1FILL("backup")
+	MCFG_DEVICE_ADD("rtc", RTC72421, XTAL_32_768kHz) // internal oscillator
 
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -5690,6 +5693,7 @@ static MACHINE_CONFIG_START(model3_21, model3_state)
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 	MCFG_NVRAM_ADD_1FILL("backup")
+	MCFG_DEVICE_ADD("rtc", RTC72421, XTAL_32_768kHz) // internal oscillator
 
 
 	MCFG_SCREEN_ADD("screen", RASTER)

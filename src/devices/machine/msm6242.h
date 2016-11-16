@@ -53,7 +53,7 @@ class msm6242_device :  public device_t,
 public:
 	// construction/destruction
 	msm6242_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
+	msm6242_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *filename);
 
 	template<class _Object> static devcb_base &set_out_int_handler(device_t &device, _Object object) { return downcast<msm6242_device &>(device).m_out_int_handler.set_callback(object); }
 
@@ -102,9 +102,49 @@ private:
 	static const char *irq_type_string(uint8_t irq_type);
 };
 
+// ======================> rtc62421_device
+
+class rtc62421_device : public msm6242_device
+{
+public:
+	// construction/destruction
+	rtc62421_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+// ======================> rtc62423_device
+
+class rtc62423_device : public msm6242_device
+{
+public:
+	// construction/destruction
+	rtc62423_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+// ======================> rtc72421_device
+
+class rtc72421_device : public msm6242_device
+{
+public:
+	// construction/destruction
+	rtc72421_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+// ======================> rtc72423_device
+
+class rtc72423_device : public msm6242_device
+{
+public:
+	// construction/destruction
+	rtc72423_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
 
 // device type definition
 extern const device_type MSM6242;
+extern const device_type RTC62421;
+extern const device_type RTC62423;
+extern const device_type RTC72421;
+extern const device_type RTC72423;
 
 
 #endif /* __MSM6242DEV_H__ */

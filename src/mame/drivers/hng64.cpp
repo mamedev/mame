@@ -1539,7 +1539,7 @@ static MACHINE_CONFIG_START(hng64, hng64_state)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("rtc", RTC62423, XTAL_32_768kHz)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hng64)
 
