@@ -11,7 +11,6 @@
 #include "psx.h"
 
 extern CPU_DISASSEMBLE( r3000le );
-extern unsigned dasmmips3(char *,unsigned, uint32_t);
 
 static struct
 {

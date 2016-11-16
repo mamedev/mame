@@ -965,7 +965,6 @@ bool mips3_device::memory_translate(address_spacenum spacenum, int intention, of
 
 offs_t mips3_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
-	extern unsigned dasmmips3(char *, unsigned, uint32_t);
 	uint32_t op = *(uint32_t *)oprom;
 	if (m_bigendian)
 		op = big_endianize_int32(op);
