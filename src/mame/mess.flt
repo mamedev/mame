@@ -333,6 +333,7 @@ mephisto.cpp
 mes.cpp
 mice.cpp
 micral.cpp
+micro20.cpp
 microdec.cpp
 microkit.cpp
 micronic.cpp

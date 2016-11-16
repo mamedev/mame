@@ -20118,6 +20118,9 @@ mice                            //
 @source:micral.cpp
 micral                          //
 
+@source:micro20.cpp
+micro20							// (c) 1984 GMX
+
 @source:micro3d.cpp
 botss                           // (c) 1992 Microprose Games Inc.
 botss11                         // (c) 1992 Microprose Games Inc.

@@ -3303,6 +3303,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/mes.cpp",
 	MAME_DIR .. "src/mame/drivers/mice.cpp",
 	MAME_DIR .. "src/mame/drivers/micral.cpp",
+	MAME_DIR .. "src/mame/drivers/micro20.cpp",
 	MAME_DIR .. "src/mame/drivers/micronic.cpp",
 	MAME_DIR .. "src/mame/includes/micronic.h",
 	MAME_DIR .. "src/mame/drivers/mini2440.cpp",
