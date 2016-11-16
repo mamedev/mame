@@ -7587,7 +7587,23 @@
 		</part>
 	</software>
 
-
+  <!-- This MASK rom was actually found on a larger arcade multi-game but appears to have been taken directly from a home cartridge.
+       The menu contained within it, and bank switching system used is ignored by the arcade board which just makes use of the game
+       data from it -->
+	<software name="smssgame">
+		<description>Super Game 11-in-1 (Kor)</description>
+		<year>1990</year>
+		<publisher>Seo Jin</publisher>
+		<part name="cart" interface="sms_cart">
+      <feature name="slot" value="seojin" />
+			<dataarea name="rom" size="0x080000">
+				<rom name="SG11004A 79ST0086END 9045" size="0x080000" crc="cdbfe86e" sha1="83d6f261471dca20f8d2e33b9807d670e9b4eb9c" offset="000000" />
+			</dataarea>
+			<dataarea name="ram" size="16384">
+			</dataarea> 
+		</part>
+	</software>
+    
 <!-- The next items have been compiled from original source code written by Jeroen Tel.
   It is unsure if Probe has ever written any game code for these licensed titles -->
 
