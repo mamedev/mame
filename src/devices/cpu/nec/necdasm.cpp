@@ -8,6 +8,7 @@
 */
 
 #include "emu.h"
+#include "nec_common.h"
 
 static const uint8_t *Iconfig;
 

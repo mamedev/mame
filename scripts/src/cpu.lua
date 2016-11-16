@@ -1515,6 +1515,7 @@ if (CPUS["NEC"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/cpu/nec/nec.cpp",
 		MAME_DIR .. "src/devices/cpu/nec/nec.h",
+		MAME_DIR .. "src/devices/cpu/nec/nec_common.h",
 		MAME_DIR .. "src/devices/cpu/nec/necea.h",
 		MAME_DIR .. "src/devices/cpu/nec/necinstr.h",
 		MAME_DIR .. "src/devices/cpu/nec/necinstr.hxx",
