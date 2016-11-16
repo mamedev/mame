@@ -663,7 +663,7 @@ const Entry Entry::table_fd[0x100]={
 } // anonymous namespace
 
 
-CPU_DISASSEMBLE( lh5801 )
+static offs_t internal_disasm_lh5801(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
 {
 	int pos = 0;
 	int oper;
@@ -680,70 +680,80 @@ CPU_DISASSEMBLE( lh5801 )
 	}
 	switch (entry->ins) {
 	case Entry::ILL:
-		sprintf(buffer,"%s %.2x", entry->ins_name(), oper);break;
+		util::stream_format(stream, "%s %02x", entry->ins_name(), oper);break;
 	case Entry::ILL2:
-		sprintf(buffer,"%s fd%.2x", entry->ins_name(), oper);break;
+		util::stream_format(stream, "%s fd%02x", entry->ins_name(), oper);break;
 	default:
 		switch(entry->adr) {
 		case Entry::Imp:
-			sprintf(buffer,"%s", entry->ins_name());break;
+			util::stream_format(stream, "%s", entry->ins_name());break;
 		case Entry::Reg:
-			sprintf(buffer,"%s %s", entry->ins_name(),entry->reg_name());break;
+			util::stream_format(stream, "%s %s", entry->ins_name(),entry->reg_name());break;
 		case Entry::RegImm:
-			sprintf(buffer,"%s %s,%.2x", entry->ins_name(),
+			util::stream_format(stream, "%s %s,%02x", entry->ins_name(),
 					entry->reg_name(), oprom[pos++]);
 			break;
 		case Entry::RegImm16:
 			absolut=oprom[pos++]<<8;
 			absolut|=oprom[pos++];
-			sprintf(buffer,"%s %s,%.4x", entry->ins_name(),entry->reg_name(),absolut );
+			util::stream_format(stream, "%s %s,%04x", entry->ins_name(),entry->reg_name(),absolut );
 			break;
 		case Entry::Vec:
-			sprintf(buffer,"%s (ff%.2x)", entry->ins_name(),oprom[pos++]);break;
+			util::stream_format(stream, "%s (ff%02x)", entry->ins_name(),oprom[pos++]);break;
 		case Entry::Vej:
-			sprintf(buffer,"%s (ff%.2x)", entry->ins_name(), oper);break;
+			util::stream_format(stream, "%s (ff%02x)", entry->ins_name(), oper);break;
 		case Entry::Imm:
-			sprintf(buffer,"%s %.2x", entry->ins_name(),oprom[pos++]);break;
+			util::stream_format(stream, "%s %02x", entry->ins_name(),oprom[pos++]);break;
 		case Entry::Imm16:
 			absolut=oprom[pos++]<<8;
 			absolut|=oprom[pos++];
-			sprintf(buffer,"%s %.4x", entry->ins_name(),absolut );break;
+			util::stream_format(stream, "%s %04x", entry->ins_name(),absolut);break;
 		case Entry::RelP:
 			temp=oprom[pos++];
-			sprintf(buffer,"%s %.4x", entry->ins_name(),pc+pos+temp );break;
+			util::stream_format(stream, "%s %04x", entry->ins_name(),pc+pos+temp);break;
 		case Entry::RelM:
 			temp=oprom[pos++];
-			sprintf(buffer,"%s %.4x", entry->ins_name(),pc+pos-temp );break;
+			util::stream_format(stream, "%s %04x", entry->ins_name(),pc+pos-temp);break;
 		case Entry::Abs:
 			absolut=oprom[pos++]<<8;
 			absolut|=oprom[pos++];
-			sprintf(buffer,"%s (%.4x)", entry->ins_name(),absolut );break;
+			util::stream_format(stream, "%s (%04x)", entry->ins_name(),absolut);break;
 		case Entry::ME1Abs:
 			absolut=oprom[pos++]<<8;
 			absolut|=oprom[pos++];
-			sprintf(buffer,"%s #(%.4x)", entry->ins_name(),absolut );break;
+			util::stream_format(stream, "%s #(%04x)", entry->ins_name(),absolut);break;
 		case Entry::AbsImm:
 			absolut=oprom[pos++]<<8;
 			absolut|=oprom[pos++];
-			sprintf(buffer,"%s (%.4x),%.2x", entry->ins_name(),absolut,
+			util::stream_format(stream, "%s (%04x),%02x", entry->ins_name(),absolut,
 					oprom[pos++]);break;
 		case Entry::ME1AbsImm:
 			absolut=oprom[pos++]<<8;
 			absolut|=oprom[pos++];
-			sprintf(buffer,"%s #(%.4x),%.2x", entry->ins_name(),absolut,
+			util::stream_format(stream, "%s #(%04x),%02x", entry->ins_name(),absolut,
 					oprom[pos++]);break;
 		case Entry::ME0:
-			sprintf(buffer,"%s (%s)", entry->ins_name(),entry->reg_name() );break;
+			util::stream_format(stream, "%s (%s)", entry->ins_name(),entry->reg_name());break;
 		case Entry::ME0Imm:
-			sprintf(buffer,"%s (%s),%.2x", entry->ins_name(),entry->reg_name(),oprom[pos++] );
+			util::stream_format(stream, "%s (%s),%02x", entry->ins_name(),entry->reg_name(),oprom[pos++]);
 			break;
 		case Entry::ME1:
-			sprintf(buffer,"%s #(%s)", entry->ins_name(),entry->reg_name() );break;
+			util::stream_format(stream, "%s #(%s)", entry->ins_name(),entry->reg_name());break;
 		case Entry::ME1Imm:
-			sprintf(buffer,"%s #(%s),%.2x", entry->ins_name(),entry->reg_name(),oprom[pos++] );
+			util::stream_format(stream, "%s #(%s),%02x", entry->ins_name(),entry->reg_name(),oprom[pos++]);
 			break;
 		}
 	}
 
 	return pos;
+}
+
+
+CPU_DISASSEMBLE(lh5801)
+{
+	std::ostringstream stream;
+	offs_t result = internal_disasm_lh5801(device, stream, pc, oprom, opram, options);
+	std::string stream_str = stream.str();
+	strcpy(buffer, stream_str.c_str());
+	return result;
 }
