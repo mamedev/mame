@@ -280,7 +280,7 @@ cpu30_state(const machine_config &mconfig, device_type type, const char *tag)
 protected:
 
 private:
-	required_device<cpu_device> m_maincpu;
+	required_device<m68000_base_device> m_maincpu;
 	required_device<ram_device> m_ram;
 
 	required_device<duscc68562_device> m_dusccterm;
@@ -473,11 +473,13 @@ WRITE8_MEMBER (cpu30_state::flop_dmac_w){
 	LOG(("%s(%02x)\n", FUNCNAME, data));
 }
 
-// PIT#1 Port C TODO: implement timer+port interrupts and 68882 sense
+#define FPCP_SENSE 0x40 /* Port C bit 6 is low if a Floating Point Co Processor is installed */
+// PIT#1 Port C TODO: implement timer+port interrupts
 // TODO: Connect PC0, PC1, PC4 and PC7 to B5 and/or P2 connector
 READ8_MEMBER (cpu30_state::pit1c_r){
 	LOG(("%s\n", FUNCNAME));
-	return 0xff;
+	m_maincpu->set_fpu_enable(1);    // Lets assume the FPCP is always installed ( which is default for 68030 atm )
+	return 0xff & ~FPCP_SENSE; // Should really be command line for the edge cases...
 }
 
 WRITE8_MEMBER (cpu30_state::pit1c_w){
