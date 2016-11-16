@@ -6,7 +6,7 @@
 
 static std::string COND(unsigned int cond)
 {
-	std::stringstream stream;
+	std::ostringstream stream;
 
 	switch(cond)
 	{
@@ -45,7 +45,7 @@ static std::string COND(unsigned int cond)
 
 static std::string REGS( uint32_t reg, int IsSource )
 {
-	std::stringstream stream;
+	std::ostringstream stream;
 	int         mode = (reg >> 6 ) & 0x07;
 
 	reg &= 0x3f;
@@ -184,7 +184,7 @@ static std::string REGS( uint32_t reg, int IsSource )
 
 static std::string INDIRECT( uint32_t reg, int IsSource )
 {
-	std::stringstream stream;
+	std::ostringstream stream;
 	int         mode = ( reg >> 6 ) & 0x07;
 
 	if ( mode == 0 || mode == 3 || mode == 1)
@@ -243,7 +243,7 @@ static std::string INDIRECT( uint32_t reg, int IsSource )
 
 static std::string ALU( uint32_t alu)
 {
-	std::stringstream stream;
+	std::ostringstream stream;
 
 	switch( alu )
 	{
