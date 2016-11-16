@@ -34,21 +34,21 @@ network_manager::network_manager(running_machine &machine)
 
 void network_manager::config_load(config_type cfg_type, xml_data_node *parentnode)
 {
-	xml_data_node *node;
+	xml_data_node const *node;
 	if ((cfg_type == config_type::CONFIG_TYPE_GAME) && (parentnode != nullptr))
 	{
-		for (node = xml_get_sibling(parentnode->child, "device"); node; node = xml_get_sibling(node->next, "device"))
+		for (node = parentnode->get_child("device"); node; node = node->get_next_sibling("device"))
 		{
-			const char *tag = xml_get_attribute_string(node, "tag", nullptr);
+			const char *tag = node->get_attribute_string("tag", nullptr);
 
 			if ((tag != nullptr) && (tag[0] != '\0'))
 			{
 				for (device_network_interface &network : network_interface_iterator(machine().root_device()))
 				{
 					if (!strcmp(tag, network.device().tag())) {
-						int interface = xml_get_attribute_int(node, "interface", 0);
+						int interface = node->get_attribute_int("interface", 0);
 						network.set_interface(interface);
-						const char *mac_addr = xml_get_attribute_string(node, "mac", nullptr);
+						const char *mac_addr = node->get_attribute_string("mac", nullptr);
 						if (mac_addr != nullptr && strlen(mac_addr) == 17) {
 							char mac[7];
 							unsigned int mac_num[6];
@@ -77,15 +77,15 @@ void network_manager::config_save(config_type cfg_type, xml_data_node *parentnod
 	{
 		for (device_network_interface &network : network_interface_iterator(machine().root_device()))
 		{
-			node = xml_add_child(parentnode, "device", nullptr);
+			node = parentnode->add_child("device", nullptr);
 			if (node != nullptr)
 			{
-				xml_set_attribute(node, "tag", network.device().tag());
-				xml_set_attribute_int(node, "interface", network.get_interface());
+				node->set_attribute("tag", network.device().tag());
+				node->set_attribute_int("interface", network.get_interface());
 				const char *mac = network.get_mac();
 				char mac_addr[6 * 3];
 				sprintf(mac_addr, "%02x:%02x:%02x:%02x:%02x:%02x", (uint8_t)mac[0], (uint8_t)mac[1], (uint8_t)mac[2], (uint8_t)mac[3], (uint8_t)mac[4], (uint8_t)mac[5]);
-				xml_set_attribute(node, "mac", mac_addr);
+				node->set_attribute("mac", mac_addr);
 			}
 		}
 	}

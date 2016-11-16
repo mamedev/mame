@@ -336,12 +336,12 @@ bool emulator_info::frame_hook()
 
 void emulator_info::layout_file_cb(xml_data_node &layout)
 {
-	xml_data_node *mamelayout = xml_get_sibling(layout.child, "mamelayout");
-	if(mamelayout)
+	xml_data_node const *const mamelayout = layout.get_child("mamelayout");
+	if (mamelayout)
 	{
-		xml_data_node *script = xml_get_sibling(mamelayout->child, "script");
+		xml_data_node const *const script = mamelayout->get_child("script");
 		if(script)
-			mame_machine_manager::instance()->lua()->call_plugin_set("layout", script->value);
+			mame_machine_manager::instance()->lua()->call_plugin_set("layout", script->get_value());
 	}
 }
 

@@ -385,7 +385,7 @@ void crosshair_manager::config_load(config_type cfg_type, xml_data_node *parentn
 {
 	/* Note: crosshair_load() is only registered if croshairs are used */
 
-	xml_data_node *crosshairnode;
+	xml_data_node const *crosshairnode;
 	int auto_time;
 
 	/* we only care about game files */
@@ -397,11 +397,11 @@ void crosshair_manager::config_load(config_type cfg_type, xml_data_node *parentn
 		return;
 
 	/* loop and get player crosshair info */
-	for (crosshairnode = xml_get_sibling(parentnode->child, "crosshair"); crosshairnode; crosshairnode = xml_get_sibling(crosshairnode->next, "crosshair"))
+	for (crosshairnode = parentnode->get_child("crosshair"); crosshairnode; crosshairnode = crosshairnode->get_next_sibling("crosshair"))
 	{
 		int  player, mode;
 
-		player = xml_get_attribute_int(crosshairnode, "player", -1);
+		player = crosshairnode->get_attribute_int("player", -1);
 
 		// check to make sure we have a valid player
 		if (player >= 0 && player < MAX_PLAYERS)
@@ -411,7 +411,7 @@ void crosshair_manager::config_load(config_type cfg_type, xml_data_node *parentn
 			if (crosshair.is_used())
 			{
 				// get, check, and store visibility mode
-				mode = xml_get_attribute_int(crosshairnode, "mode", CROSSHAIR_VISIBILITY_DEFAULT);
+				mode = crosshairnode->get_attribute_int("mode", CROSSHAIR_VISIBILITY_DEFAULT);
 				if (mode >= CROSSHAIR_VISIBILITY_OFF && mode <= CROSSHAIR_VISIBILITY_AUTO)
 				{
 					crosshair.set_mode((uint8_t)mode);
@@ -421,16 +421,16 @@ void crosshair_manager::config_load(config_type cfg_type, xml_data_node *parentn
 				}
 
 				// get and store crosshair pic name
-				crosshair.set_bitmap_name(xml_get_attribute_string(crosshairnode, "pic", ""));
+				crosshair.set_bitmap_name(crosshairnode->get_attribute_string("pic", ""));
 			}
 		}
 	}
 
 	/* get, check, and store auto visibility time */
-	crosshairnode = xml_get_sibling(parentnode->child, "autotime");
+	crosshairnode = parentnode->get_child("autotime");
 	if (crosshairnode != nullptr)
 	{
-		auto_time = xml_get_attribute_int(crosshairnode, "val", CROSSHAIR_VISIBILITY_AUTOTIME_DEFAULT);
+		auto_time = crosshairnode->get_attribute_int("val", CROSSHAIR_VISIBILITY_AUTOTIME_DEFAULT);
 		if ((auto_time >= CROSSHAIR_VISIBILITY_AUTOTIME_MIN) && (auto_time <= CROSSHAIR_VISIBILITY_AUTOTIME_MAX))
 			m_auto_time = (uint8_t)auto_time;
 	}
@@ -460,30 +460,30 @@ void crosshair_manager::config_save(config_type cfg_type, xml_data_node *parentn
 		if (crosshair.is_used())
 		{
 			/* create a node */
-			crosshairnode = xml_add_child(parentnode, "crosshair", nullptr);
+			crosshairnode = parentnode->add_child("crosshair", nullptr);
 
 			if (crosshairnode != nullptr)
 			{
 				bool changed = false;
 
-				xml_set_attribute_int(crosshairnode, "player", player);
+				crosshairnode->set_attribute_int("player", player);
 
 				if (crosshair.mode() != CROSSHAIR_VISIBILITY_DEFAULT)
 				{
-					xml_set_attribute_int(crosshairnode, "mode", crosshair.mode());
+					crosshairnode->set_attribute_int("mode", crosshair.mode());
 					changed = true;
 				}
 
 				// only save graphic name if not the default
 				if (*crosshair.bitmap_name() != '\0')
 				{
-					xml_set_attribute(crosshairnode, "pic", crosshair.bitmap_name());
+					crosshairnode->set_attribute("pic", crosshair.bitmap_name());
 					changed = true;
 				}
 
 				/* if nothing changed, kill the node */
 				if (!changed)
-					xml_delete_node(crosshairnode);
+					crosshairnode->delete_node();
 			}
 		}
 	}
@@ -492,10 +492,10 @@ void crosshair_manager::config_save(config_type cfg_type, xml_data_node *parentn
 	if (m_auto_time != CROSSHAIR_VISIBILITY_AUTOTIME_DEFAULT)
 	{
 		/* create a node */
-		crosshairnode = xml_add_child(parentnode, "autotime", nullptr);
+		crosshairnode = parentnode->add_child("autotime", nullptr);
 
 		if (crosshairnode != nullptr)
-			xml_set_attribute_int(crosshairnode, "val", m_auto_time);
+			crosshairnode->set_attribute_int("val", m_auto_time);
 	}
 
 }

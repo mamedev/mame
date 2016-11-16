@@ -76,7 +76,7 @@ class cheat_parameter
 {
 public:
 	// construction/destruction
-	cheat_parameter(cheat_manager &manager, symbol_table &symbols, const char *filename, xml_data_node &paramnode);
+	cheat_parameter(cheat_manager &manager, symbol_table &symbols, const char *filename, xml_data_node const &paramnode);
 
 	// queries
 	const char *text();
@@ -129,7 +129,7 @@ class cheat_script
 {
 public:
 	// construction/destruction
-	cheat_script(cheat_manager &manager, symbol_table &symbols, const char *filename, xml_data_node &scriptnode);
+	cheat_script(cheat_manager &manager, symbol_table &symbols, const char *filename, xml_data_node const &scriptnode);
 
 	// getters
 	script_state state() const { return m_state; }
@@ -144,7 +144,7 @@ private:
 	{
 	public:
 		// construction/destruction
-		script_entry(cheat_manager &manager, symbol_table &symbols, const char *filename, xml_data_node &entrynode, bool isaction);
+		script_entry(cheat_manager &manager, symbol_table &symbols, const char *filename, xml_data_node const &entrynode, bool isaction);
 
 		// actions
 		void execute(cheat_manager &manager, uint64_t &argindex);
@@ -156,7 +156,7 @@ private:
 		{
 		public:
 			// construction/destruction
-			output_argument(cheat_manager &manager, symbol_table &symbols, const char *filename, xml_data_node &argnode);
+			output_argument(cheat_manager &manager, symbol_table &symbols, const char *filename, xml_data_node const &argnode);
 
 			// getters
 			int count() const { return m_count; }
@@ -199,7 +199,7 @@ class cheat_entry
 {
 public:
 	// construction/destruction
-	cheat_entry(cheat_manager &manager, symbol_table &globaltable, const char *filename, xml_data_node &cheatnode);
+	cheat_entry(cheat_manager &manager, symbol_table &globaltable, const char *filename, xml_data_node const &cheatnode);
 	~cheat_entry();
 
 	// getters

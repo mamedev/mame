@@ -1153,20 +1153,20 @@ void laserdisc_device::config_load(config_type cfg_type, xml_data_node *parentno
 		return;
 
 	// iterate over overlay nodes
-	for (xml_data_node *ldnode = xml_get_sibling(parentnode->child, "device"); ldnode != nullptr; ldnode = xml_get_sibling(ldnode->next, "device"))
+	for (xml_data_node const *ldnode = parentnode->get_child("device"); ldnode != nullptr; ldnode = ldnode->get_next_sibling("device"))
 	{
-		const char *devtag = xml_get_attribute_string(ldnode, "tag", "");
+		const char *devtag = ldnode->get_attribute_string("tag", "");
 		if (strcmp(devtag, tag()) == 0)
 		{
 			// handle the overlay node
-			xml_data_node *overnode = xml_get_sibling(ldnode->child, "overlay");
+			xml_data_node const *const overnode = ldnode->get_child("overlay");
 			if (overnode != nullptr)
 			{
 				// fetch positioning controls
-				m_overposx = xml_get_attribute_float(overnode, "hoffset", m_overposx);
-				m_overscalex = xml_get_attribute_float(overnode, "hstretch", m_overscalex);
-				m_overposy = xml_get_attribute_float(overnode, "voffset", m_overposy);
-				m_overscaley = xml_get_attribute_float(overnode, "vstretch", m_overscaley);
+				m_overposx = overnode->get_attribute_float("hoffset", m_overposx);
+				m_overscalex = overnode->get_attribute_float("hstretch", m_overscalex);
+				m_overposy = overnode->get_attribute_float("voffset", m_overposy);
+				m_overscaley = overnode->get_attribute_float("vstretch", m_overscaley);
 			}
 		}
 	}
@@ -1185,45 +1185,45 @@ void laserdisc_device::config_save(config_type cfg_type, xml_data_node *parentno
 		return;
 
 	// create a node
-	xml_data_node *ldnode = xml_add_child(parentnode, "device", nullptr);
+	xml_data_node *const ldnode = parentnode->add_child("device", nullptr);
 	if (ldnode != nullptr)
 	{
 		// output the basics
-		xml_set_attribute(ldnode, "tag", tag());
+		ldnode->set_attribute("tag", tag());
 
 		// add an overlay node
-		xml_data_node *overnode = xml_add_child(ldnode, "overlay", nullptr);
+		xml_data_node *const overnode = ldnode->add_child("overlay", nullptr);
 		bool changed = false;
 		if (overnode != nullptr)
 		{
 			// output the positioning controls
 			if (m_overposx != m_orig_config.m_overposx)
 			{
-				xml_set_attribute_float(overnode, "hoffset", m_overposx);
+				overnode->set_attribute_float("hoffset", m_overposx);
 				changed = true;
 			}
 
 			if (m_overscalex != m_orig_config.m_overscalex)
 			{
-				xml_set_attribute_float(overnode, "hstretch", m_overscalex);
+				overnode->set_attribute_float("hstretch", m_overscalex);
 				changed = true;
 			}
 
 			if (m_overposy != m_orig_config.m_overposy)
 			{
-				xml_set_attribute_float(overnode, "voffset", m_overposy);
+				overnode->set_attribute_float("voffset", m_overposy);
 				changed = true;
 			}
 
 			if (m_overscaley != m_orig_config.m_overscaley)
 			{
-				xml_set_attribute_float(overnode, "vstretch", m_overscaley);
+				overnode->set_attribute_float("vstretch", m_overscaley);
 				changed = true;
 			}
 		}
 
 		// if nothing changed, kill the node
 		if (!changed)
-			xml_delete_node(ldnode);
+			ldnode->delete_node();
 	}
 }

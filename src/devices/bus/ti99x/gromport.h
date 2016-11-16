@@ -516,8 +516,8 @@ public:
 
 private:
 	int             find_file(util::archive_file &zip, const char *filename, uint32_t crc);
-	std::unique_ptr<rpk_socket> load_rom_resource(util::archive_file &zip, xml_data_node* rom_resource_node, const char* socketname);
-	std::unique_ptr<rpk_socket> load_ram_resource(emu_options &options, xml_data_node* ram_resource_node, const char* socketname, const char* system_name);
+	std::unique_ptr<rpk_socket> load_rom_resource(util::archive_file &zip, xml_data_node const* rom_resource_node, const char* socketname);
+	std::unique_ptr<rpk_socket> load_ram_resource(emu_options &options, xml_data_node const* ram_resource_node, const char* socketname, const char* system_name);
 	const pcb_type* m_types;
 };
 

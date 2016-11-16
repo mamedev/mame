@@ -82,7 +82,7 @@ void bookkeeping_manager::increment_dispensed_tickets(int delta)
 
 void bookkeeping_manager::config_load(config_type cfg_type, xml_data_node *parentnode)
 {
-	xml_data_node *coinnode, *ticketnode;
+	xml_data_node const *coinnode, *ticketnode;
 
 	/* on init, reset the counters */
 	if (cfg_type == config_type::CONFIG_TYPE_INIT)
@@ -100,17 +100,17 @@ void bookkeeping_manager::config_load(config_type cfg_type, xml_data_node *paren
 		return;
 
 	/* iterate over coins nodes */
-	for (coinnode = xml_get_sibling(parentnode->child, "coins"); coinnode; coinnode = xml_get_sibling(coinnode->next, "coins"))
+	for (coinnode = parentnode->get_child("coins"); coinnode; coinnode = coinnode->get_next_sibling("coins"))
 	{
-		int index = xml_get_attribute_int(coinnode, "index", -1);
+		int index = coinnode->get_attribute_int("index", -1);
 		if (index >= 0 && index < COIN_COUNTERS)
-			m_coin_count[index] = xml_get_attribute_int(coinnode, "number", 0);
+			m_coin_count[index] = coinnode->get_attribute_int("number", 0);
 	}
 
 	/* get the single tickets node */
-	ticketnode = xml_get_sibling(parentnode->child, "tickets");
+	ticketnode = parentnode->get_child("tickets");
 	if (ticketnode != nullptr)
-		m_dispensed_tickets = xml_get_attribute_int(ticketnode, "number", 0);
+		m_dispensed_tickets = ticketnode->get_attribute_int("number", 0);
 }
 
 
@@ -131,20 +131,20 @@ void bookkeeping_manager::config_save(config_type cfg_type, xml_data_node *paren
 	for (i = 0; i < COIN_COUNTERS; i++)
 		if (m_coin_count[i] != 0)
 		{
-			xml_data_node *coinnode = xml_add_child(parentnode, "coins", nullptr);
+			xml_data_node *coinnode = parentnode->add_child("coins", nullptr);
 			if (coinnode != nullptr)
 			{
-				xml_set_attribute_int(coinnode, "index", i);
-				xml_set_attribute_int(coinnode, "number", m_coin_count[i]);
+				coinnode->set_attribute_int("index", i);
+				coinnode->set_attribute_int("number", m_coin_count[i]);
 			}
 		}
 
 	/* output tickets */
 	if (m_dispensed_tickets != 0)
 	{
-		xml_data_node *tickets = xml_add_child(parentnode, "tickets", nullptr);
+		xml_data_node *tickets = parentnode->add_child("tickets", nullptr);
 		if (tickets != nullptr)
-			xml_set_attribute_int(tickets, "number", m_dispensed_tickets);
+			tickets->set_attribute_int("number", m_dispensed_tickets);
 	}
 }
 

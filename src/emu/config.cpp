@@ -136,17 +136,17 @@ int configuration_manager::load_xml(emu_file &file, config_type which_type)
 	int version, count;
 
 	/* read the file */
-	root = xml_file_read(file, nullptr);
+	root = xml_data_node::file_read(file, nullptr);
 	if (!root)
 		goto error;
 
 	/* find the config node */
-	confignode = xml_get_sibling(root->child, "mameconfig");
+	confignode = root->get_child("mameconfig");
 	if (!confignode)
 		goto error;
 
 	/* validate the config data version */
-	version = xml_get_attribute_int(confignode, "version", 0);
+	version = confignode->get_attribute_int("version", 0);
 	if (version != CONFIG_VERSION)
 		goto error;
 
@@ -163,10 +163,10 @@ int configuration_manager::load_xml(emu_file &file, config_type which_type)
 
 	/* loop over all system nodes in the file */
 	count = 0;
-	for (systemnode = xml_get_sibling(confignode->child, "system"); systemnode; systemnode = xml_get_sibling(systemnode->next, "system"))
+	for (systemnode = confignode->get_child("system"); systemnode; systemnode = systemnode->get_next_sibling("system"))
 	{
 		/* look up the name of the system here; skip if none */
-		const char *name = xml_get_attribute_string(systemnode, "name", "");
+		const char *name = systemnode->get_attribute_string("name", "");
 
 		/* based on the file type, determine whether we have a match */
 		switch (which_type)
@@ -205,7 +205,7 @@ int configuration_manager::load_xml(emu_file &file, config_type which_type)
 
 		/* loop over all registrants and call their load function */
 		for (auto type : m_typelist)
-			type.load(which_type, xml_get_sibling(systemnode->child, type.name.c_str()));
+			type.load(which_type, systemnode->get_child(type.name.c_str()));
 		count++;
 	}
 
@@ -214,12 +214,12 @@ int configuration_manager::load_xml(emu_file &file, config_type which_type)
 		goto error;
 
 	/* free the parser */
-	xml_file_free(root);
+	root->file_free();
 	return 1;
 
 error:
 	if (root)
-		xml_file_free(root);
+		root->file_free();
 	return 0;
 }
 
@@ -233,7 +233,7 @@ error:
 
 int configuration_manager::save_xml(emu_file &file, config_type which_type)
 {
-	xml_data_node *root = xml_file_create();
+	xml_data_node *const root = xml_data_node::file_create();
 	xml_data_node *confignode, *systemnode;
 
 	/* if we don't have a root, bail */
@@ -241,39 +241,39 @@ int configuration_manager::save_xml(emu_file &file, config_type which_type)
 		return 0;
 
 	/* create a config node */
-	confignode = xml_add_child(root, "mameconfig", nullptr);
+	confignode = root->add_child("mameconfig", nullptr);
 	if (!confignode)
 		goto error;
-	xml_set_attribute_int(confignode, "version", CONFIG_VERSION);
+	confignode->set_attribute_int("version", CONFIG_VERSION);
 
 	/* create a system node */
-	systemnode = xml_add_child(confignode, "system", nullptr);
+	systemnode = confignode->add_child("system", nullptr);
 	if (!systemnode)
 		goto error;
-	xml_set_attribute(systemnode, "name", (which_type == config_type::CONFIG_TYPE_DEFAULT) ? "default" : machine().system().name);
+	systemnode->set_attribute("name", (which_type == config_type::CONFIG_TYPE_DEFAULT) ? "default" : machine().system().name);
 
 	/* create the input node and write it out */
 	/* loop over all registrants and call their save function */
 	for (auto type : m_typelist)
 	{
-		xml_data_node *curnode = xml_add_child(systemnode, type.name.c_str(), nullptr);
+		xml_data_node *curnode = systemnode->add_child(type.name.c_str(), nullptr);
 		if (!curnode)
 			goto error;
 		type.save(which_type, curnode);
 
 		/* if nothing was added, just nuke the node */
-		if (!curnode->value && !curnode->child)
-			xml_delete_node(curnode);
+		if (!curnode->get_value() && !curnode->get_first_child())
+			curnode->delete_node();
 	}
 
 	/* flush the file */
-	xml_file_write(root, file);
+	root->file_write(file);
 
 	/* free and get out of here */
-	xml_file_free(root);
+	root->file_free();
 	return 1;
 
 error:
-	xml_file_free(root);
+	root->file_free();
 	return 0;
 }

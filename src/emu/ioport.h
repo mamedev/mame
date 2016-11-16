@@ -1437,9 +1437,9 @@ private:
 	static const char *const seqtypestrings[];
 
 	void load_config(config_type cfg_type, xml_data_node *parentnode);
-	void load_remap_table(xml_data_node *parentnode);
-	bool load_default_config(xml_data_node *portnode, int type, int player, const input_seq *newseq);
-	bool load_game_config(xml_data_node *portnode, int type, int player, const input_seq *newseq);
+	void load_remap_table(xml_data_node const *parentnode);
+	bool load_default_config(xml_data_node const *portnode, int type, int player, const input_seq *newseq);
+	bool load_game_config(xml_data_node const *portnode, int type, int player, const input_seq *newseq);
 
 	void save_config(config_type cfg_type, xml_data_node *parentnode);
 	void save_sequence(xml_data_node *parentnode, input_seq_type type, ioport_type porttype, const input_seq &seq);

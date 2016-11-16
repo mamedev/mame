@@ -243,7 +243,7 @@ public:
 	uint32_t comment_count() const { return m_comment_set.size(); }
 	uint32_t comment_change_count() const { return m_comment_change; }
 	bool comment_export(xml_data_node &node);
-	bool comment_import(xml_data_node &node,bool is_inline);
+	bool comment_import(xml_data_node const &node, bool is_inline);
 	uint32_t compute_opcode_crc32(offs_t pc) const;
 
 	// history
