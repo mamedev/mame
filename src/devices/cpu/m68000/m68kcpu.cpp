@@ -1208,6 +1208,16 @@ void m68000_base_device::set_hmmu_enable(int enable)
 	hmmu_enabled = enable;
 }
 
+void m68000_base_device::set_fpu_enable(int enable)
+{
+	has_fpu = enable;
+}
+
+int m68000_base_device::get_fpu_enable()
+{
+	return has_fpu;
+}
+
 void m68000_base_device::set_instruction_hook(read32_delegate ihook)
 {
 	instruction_hook = ihook;
