@@ -18,9 +18,9 @@ static inline void ea (void)
     }*/
 }
 
-#define IN if (ib) sprintf(buffer+strlen(buffer)," i")
+#define IN if (ib) util::stream_format(stream, " i")
 
-CPU_DISASSEMBLE( pdp1 )
+static offs_t internal_disasm_pdp1(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
 {
 	int md;
 	//int etime = 0;
@@ -33,156 +33,155 @@ CPU_DISASSEMBLE( pdp1 )
 	{
 	case AND:
 		ea ();
-		sprintf (buffer, "AND (0%06o)", y);
+		util::stream_format(stream, "AND (0%06o)", y);
 		IN;
 		//etime = 10;
 		break;
 	case IOR:
 		ea ();
-		sprintf (buffer, "IOR (0%06o)", y);
+		util::stream_format(stream, "IOR (0%06o)", y);
 		IN;
 		//etime = 10;
 		break;
 	case XOR:
 		ea ();
-		sprintf (buffer, "XOR (0%06o)", y);
+		util::stream_format(stream, "XOR (0%06o)", y);
 		IN;
 		//etime = 10;
 		break;
 	case XCT:
 		ea ();
-		sprintf (buffer, "XCT (0%06o)", y);
+		util::stream_format(stream, "XCT (0%06o)", y);
 		IN;
 		//etime = 5;
 		break;
 	case CALJDA:
 		{
 			if (ib == 1)
-				sprintf (buffer, "JDA 0%06o  ", y);
+				util::stream_format(stream, "JDA 0%06o  ", y);
 			if (ib == 0)
-				sprintf (buffer, "CAL         ");
+				util::stream_format(stream, "CAL         ");
 			//etime = 10;
 			break;
 		}
 	case LAC:
 		ea ();
-		sprintf (buffer, "LAC (0%06o)", y);
+		util::stream_format(stream, "LAC (0%06o)", y);
 		IN;
 		//etime = 10;
 		break;
 	case LIO:
 		ea ();
-		sprintf (buffer, "LIO (0%06o)", y);
+		util::stream_format(stream, "LIO (0%06o)", y);
 		IN;
 		//etime = 10;
 		break;
 	case DAC:
 		ea ();
-		sprintf (buffer, "DAC 0%06o  ", y);
+		util::stream_format(stream, "DAC 0%06o  ", y);
 		IN;
 		//etime = 10;
 		break;
 	case DAP:
 		ea ();
-		sprintf (buffer, "DAP 0%06o  ", y);
+		util::stream_format(stream, "DAP 0%06o  ", y);
 		IN;
 		//etime = 10;
 		break;
 	case DIP:
 		ea ();
-		sprintf (buffer, "DIP 0%06o  ", y);
+		util::stream_format(stream, "DIP 0%06o  ", y);
 		IN;
 		//etime = 10;
 		break;
 	case DIO:
 		ea ();
-		sprintf (buffer, "DIO 0%06o  ", y);
+		util::stream_format(stream, "DIO 0%06o  ", y);
 		IN;
 		//etime = 10;
 		break;
 	case DZM:
 		ea ();
-		sprintf (buffer, "DZM 0%06o  ", y);
+		util::stream_format(stream, "DZM 0%06o  ", y);
 		IN;
 		//etime = 10;
 		break;
 	case ADD:
 		ea ();
-		sprintf (buffer, "ADD (0%06o)", y);
+		util::stream_format(stream, "ADD (0%06o)", y);
 		IN;
 		//etime = 10;
 		break;
 	case SUB:
 		ea ();
-		sprintf (buffer, "SUB (0%06o)", y);
+		util::stream_format(stream, "SUB (0%06o)", y);
 		IN;
 		//etime = 10;
 		break;
 	case IDX:
 		ea ();
-		sprintf (buffer, "IDX (0%06o)", y);
+		util::stream_format(stream, "IDX (0%06o)", y);
 		IN;
 		//etime = 10;
 		break;
 	case ISP:
 		ea ();
-		sprintf (buffer, "ISP (0%06o)", y);
+		util::stream_format(stream, "ISP (0%06o)", y);
 		IN;
 		//etime = 10;
 		break;
 	case SAD:
 		ea ();
-		sprintf (buffer, "SAD (0%06o)", y);
+		util::stream_format(stream, "SAD (0%06o)", y);
 		IN;
 		//etime = 10;
 		break;
 	case SAS:
 		ea ();
-		sprintf (buffer, "SAS (0%06o)", y);
+		util::stream_format(stream, "SAS (0%06o)", y);
 		IN;
 		//etime = 10;
 		break;
 	case MUS_MUL:
 		ea ();
-		sprintf (buffer, "MUS (0%06o)", y);
+		util::stream_format(stream, "MUS (0%06o)", y);
 		IN;
 		//etime = 10;
 		break;
 	case DIS_DIV:
 		ea ();
-		sprintf (buffer, "DIS (0%06o)", y);
+		util::stream_format(stream, "DIS (0%06o)", y);
 		IN;
 		//etime = 10;
 		break;
 	case JMP:
 		ea ();
-		sprintf (buffer, "JMP 0%06o  ", y);
+		util::stream_format(stream, "JMP 0%06o  ", y);
 		IN;
 		//etime = 5;
 		break;
 	case JSP:
 		ea ();
-		sprintf (buffer, "JSP 0%06o  ", y);
+		util::stream_format(stream, "JSP 0%06o  ", y);
 		IN;
 		//etime = 5;
 		break;
 	case SKP:
 		{
-			buffer[0] = 0;
 			if ((y & 0100) == 0100)
-				sprintf (buffer, "SZA ");
+				util::stream_format(stream, "SZA ");
 			if ((y & 0200) == 0200)
-				sprintf (buffer + strlen (buffer), "SPA ");
+				util::stream_format(stream, "SPA ");
 			if ((y & 0400) == 0400)
-				sprintf (buffer + strlen (buffer), "SMA ");
+				util::stream_format(stream, "SMA ");
 			if ((y & 01000) == 01000)
-				sprintf (buffer + strlen (buffer), "SZO ");
+				util::stream_format(stream, "SZO ");
 			if ((y & 02000) == 02000)
-				sprintf (buffer + strlen (buffer), "SPI ");
+				util::stream_format(stream, "SPI ");
 			if (y & 070)
-				sprintf (buffer + strlen (buffer), "SZS 0%01o ", (y & 070));
+				util::stream_format(stream, "SZS 0%01o ", (y & 070));
 			if (y & 7)
-				sprintf (buffer + strlen (buffer), "SZF 0%01o ", (y & 7));
+				util::stream_format(stream, "SZF 0%01o ", (y & 7));
 			IN;
 			//etime = 5;
 			break;
@@ -200,95 +199,104 @@ CPU_DISASSEMBLE( pdp1 )
 			switch ((md >> 9) & 017)
 			{
 			case 1:
-				sprintf (buffer, "RAL 0%02o", nshift);
+				util::stream_format(stream, "RAL 0%02o", nshift);
 				//etime = 5;
 				break;
 			case 2:
-				sprintf (buffer, "RIL 0%02o", nshift);
+				util::stream_format(stream, "RIL 0%02o", nshift);
 				//etime = 5;
 				break;
 			case 3:
-				sprintf (buffer, "RCL 0%02o", nshift);
+				util::stream_format(stream, "RCL 0%02o", nshift);
 				//etime = 5;
 				break;
 			case 5:
-				sprintf (buffer, "SAL 0%02o", nshift);
+				util::stream_format(stream, "SAL 0%02o", nshift);
 				//etime = 5;
 				break;
 			case 6:
-				sprintf (buffer, "SIL 0%02o", nshift);
+				util::stream_format(stream, "SIL 0%02o", nshift);
 				//etime = 5;
 				break;
 			case 7:
-				sprintf (buffer, "SCL 0%02o", nshift);
+				util::stream_format(stream, "SCL 0%02o", nshift);
 				//etime = 5;
 				break;
 			case 9:
-				sprintf (buffer, "RAR 0%02o", nshift);
+				util::stream_format(stream, "RAR 0%02o", nshift);
 				//etime = 5;
 				break;
 			case 10:
-				sprintf (buffer, "RIR 0%02o", nshift);
+				util::stream_format(stream, "RIR 0%02o", nshift);
 				//etime = 5;
 				break;
 			case 11:
-				sprintf (buffer, "RCR 0%02o", nshift);
+				util::stream_format(stream, "RCR 0%02o", nshift);
 				//etime = 5;
 				break;
 			case 13:
-				sprintf (buffer, "SAR 0%02o", nshift);
+				util::stream_format(stream, "SAR 0%02o", nshift);
 				//etime = 5;
 				break;
 			case 14:
-				sprintf (buffer, "SIR 0%02o", nshift);
+				util::stream_format(stream, "SIR 0%02o", nshift);
 				//etime = 5;
 				break;
 			case 15:
-				sprintf (buffer, "SCR 0%02o", nshift);
+				util::stream_format(stream, "SCR 0%02o", nshift);
 				//etime = 5;
 				break;
 			default:
-				sprintf (buffer, "SKP ???");
+				util::stream_format(stream, "SKP ???");
 				//etime = 5;
 				break;
 			}
 			break;
 		}
 	case LAW:
-		sprintf (buffer, "LAW 0%06o", y);
+		util::stream_format(stream, "LAW 0%06o", y);
 		IN;
 		//etime = 5;
 		break;
 	case IOT:
-		sprintf (buffer, "IOT 0%06o", md);
+		util::stream_format(stream, "IOT 0%06o", md);
 		//etime = 10;
 		break;
 	case OPR:
 		{
-			buffer[0] = 0;
 			if ((y & 04000) == 04000)
-				sprintf (buffer + strlen (buffer), "CLI ");
+				util::stream_format(stream, "CLI ");
 			if ((y & 02000) == 02000)
-				sprintf (buffer + strlen (buffer), "LAT ");
+				util::stream_format(stream, "LAT ");
 			if ((y & 01000) == 01000)
-				sprintf (buffer + strlen (buffer), "CMA ");
+				util::stream_format(stream, "CMA ");
 			if ((y & 0400) == 0400)
-				sprintf (buffer + strlen (buffer), "HLT ");
+				util::stream_format(stream, "HLT ");
 			if ((y & 0100) == 0100)
-				sprintf (buffer + strlen (buffer), "LAP ");
+				util::stream_format(stream, "LAP ");
 			if ((y & 010) && (y & 7))
-				sprintf (buffer + strlen (buffer), "STF 0%01o ", (y & 7));
+				util::stream_format(stream, "STF 0%01o ", (y & 7));
 			if ((!(y & 010)) && (y & 7))
-				sprintf (buffer + strlen (buffer), "CLF 0%01o ", (y & 7));
+				util::stream_format(stream, "CLF 0%01o ", (y & 7));
 			if (!(y))
-				sprintf (buffer + strlen (buffer), "NOP ");
+				util::stream_format(stream, "NOP ");
 			//etime = 5;
 			break;
 		}
 	default:
-		sprintf (buffer, "ILLEGAL");
+		util::stream_format(stream, "ILLEGAL");
 		//etime = 5;
 		break;
 	}
 	return 4;
+}
+
+
+CPU_DISASSEMBLE(pdp1)
+{
+	std::ostringstream stream;
+	offs_t result = internal_disasm_pdp1(device, stream, pc, oprom, opram, options);
+	std::string stream_str = stream.str();
+	strcpy(buffer, stream_str.c_str());
+	return result;
 }
