@@ -5,7 +5,7 @@
 
 struct disassemble_t
 {
-	char        *buffer;    // output buffer
+	std::ostream    *stream;    // output stream
 	unsigned long   IP;
 	unsigned long   IPinc;
 	const uint8_t *oprom;
