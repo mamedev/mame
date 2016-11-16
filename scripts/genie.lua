@@ -1153,6 +1153,8 @@ configuration { "vs*" }
 			"_CRT_SECURE_NO_DEPRECATE",
 			"_CRT_STDIO_LEGACY_WIDE_SPECIFIERS",
 		}
+-- Windows Store/Phone projects already link against the available libraries.
+if not (string.startswith(_OPTIONS["vs"], "winstore8") or string.startswith(_OPTIONS["vs"], "winphone8")) then
 		links {
 			"user32",
 			"winmm",
@@ -1165,6 +1167,7 @@ configuration { "vs*" }
 			"shell32",
 			"userenv",
 		}
+end
 
 		buildoptions {
 			"/WX",     -- Treats all compiler warnings as errors.
@@ -1287,15 +1290,6 @@ configuration { "vs2015*" }
 			"/wd4592", -- warning C4592: symbol will be dynamically initialized (implementation limitation)
 		}
 configuration { "winphone8* or winstore8*" }
-	removelinks {
-		"DelayImp",
-		"gdi32",
-		"psapi"
-	}
-	links {
-		"d3d11",
-		"dxgi"
-	}
 	linkoptions {
 		"/ignore:4264" -- LNK4264: archiving object file compiled with /ZW into a static library; note that when authoring Windows Runtime types it is not recommended to link with a static library that contains Windows Runtime metadata
 	}
