@@ -790,38 +790,34 @@ static char* dasm_xfer3(uint64_t opcode)
 	return buffer;
 }
 
-static unsigned dasm_mb86235(char *buffer, uint32_t pc, uint64_t opcode)
+static unsigned dasm_mb86235(std::ostream &stream, uint32_t pc, uint64_t opcode)
 {
-	char *p = buffer;
-
-	p[0] = 0;
-
 	switch ((opcode >> 61) & 7)
 	{
 		case 0:     // ALU / MUL / double transfer (type 1)
-			p += sprintf(p, "%s : %s", dasm_alu_mul(opcode, true), dasm_double_xfer1(opcode));
+			util::stream_format(stream, "%s : %s", dasm_alu_mul(opcode, true), dasm_double_xfer1(opcode));
 			break;
 		case 1:     // ALU / MYL / transfer (type 1)
-			p += sprintf(p, "%s : %s", dasm_alu_mul(opcode, true), dasm_xfer1(opcode));
+			util::stream_format(stream, "%s : %s", dasm_alu_mul(opcode, true), dasm_xfer1(opcode));
 			break;
 		case 2:     // ALU / MUL / control
-			p += sprintf(p, "%s : %s", dasm_alu_mul(opcode, true), dasm_control(pc, opcode));
+			util::stream_format(stream, "%s : %s", dasm_alu_mul(opcode, true), dasm_control(pc, opcode));
 			break;
 		case 4:     // ALU or MUL / double transfer (type 2)
-			p += sprintf(p, "%s : %s", dasm_alu_mul(opcode, false), dasm_double_xfer2(opcode));
+			util::stream_format(stream, "%s : %s", dasm_alu_mul(opcode, false), dasm_double_xfer2(opcode));
 			break;
 		case 5:     // ALU or MUL / transfer (type 2)
-			p += sprintf(p, "%s : %s", dasm_alu_mul(opcode, false), dasm_xfer2(opcode));
+			util::stream_format(stream, "%s : %s", dasm_alu_mul(opcode, false), dasm_xfer2(opcode));
 			break;
 		case 6:     // ALU or MUL / control
-			p += sprintf(p, "%s : %s", dasm_alu_mul(opcode, false), dasm_control(pc, opcode));
+			util::stream_format(stream, "%s : %s", dasm_alu_mul(opcode, false), dasm_control(pc, opcode));
 			break;
 		case 7:     // transfer (type 3)
-			p += sprintf(p, "%s", dasm_xfer3(opcode));
+			util::stream_format(stream, "%s", dasm_xfer3(opcode));
 			break;
 
 		default:
-			p += sprintf(p, "???");
+			util::stream_format(stream, "???");
 			break;
 	}
 
@@ -830,10 +826,20 @@ static unsigned dasm_mb86235(char *buffer, uint32_t pc, uint64_t opcode)
 
 
 
-CPU_DISASSEMBLE( mb86235 )
+static offs_t internal_disasm_mb86235(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
 {
 	uint64_t op = *(uint64_t*)oprom;
 	op = little_endianize_int64(op);
 
-	return dasm_mb86235(buffer, pc, op);
+	return dasm_mb86235(stream, pc, op);
+}
+
+
+CPU_DISASSEMBLE(mb86235)
+{
+	std::ostringstream stream;
+	offs_t result = internal_disasm_mb86235(device, stream, pc, oprom, opram, options);
+	std::string stream_str = stream.str();
+	strcpy(buffer, stream_str.c_str());
+	return result;
 }
