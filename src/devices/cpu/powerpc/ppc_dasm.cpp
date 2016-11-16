@@ -835,7 +835,7 @@ static int Simplified(uint32_t op, uint32_t vpc, char *signed16, char *mnem, cha
 	return 1;
 }
 
-offs_t ppc_dasm_one(char *buffer, uint32_t pc, uint32_t op)
+offs_t ppc_dasm_one(std::ostream &stream, uint32_t pc, uint32_t op)
 {
 	char signed16[12];
 	uint32_t disp;
@@ -858,11 +858,11 @@ offs_t ppc_dasm_one(char *buffer, uint32_t pc, uint32_t op)
 	 */
 
 	if( Simplified(op, pc, signed16, mnem, oprs) ) {
-		buffer += sprintf(buffer, "%s", mnem);
+		util::stream_format(stream, "%s", mnem);
 		for( j = strlen(mnem); j < 10; j++ ) {
-			buffer += sprintf(buffer, " ");
+			util::stream_format(stream, " ");
 		}
-		buffer += sprintf(buffer, "%s", oprs);
+		util::stream_format(stream, "%s", oprs);
 		return 4 | flags;
 	}
 
@@ -1156,17 +1156,26 @@ offs_t ppc_dasm_one(char *buffer, uint32_t pc, uint32_t op)
 			else if (itab[i].flags & FL_SO)
 				flags |= DASMFLAG_STEP_OUT;
 
-			buffer += sprintf(buffer, "%s", mnem);
+			util::stream_format(stream, "%s", mnem);
 			for( j = strlen(mnem); j < 10; j++ ) {
-				buffer += sprintf(buffer, " ");
+				util::stream_format(stream, " ");
 			}
-			buffer += sprintf(buffer, "%s", oprs);
+			util::stream_format(stream, "%s", oprs);
 			return 4 | flags;
 		}
 	}
 
-	sprintf(buffer, "?");
+	util::stream_format(stream, "?");
 	return 4 | flags;
+}
+
+offs_t ppc_dasm_one(char *buffer, uint32_t pc, uint32_t op)
+{
+	std::ostringstream stream;
+	offs_t result = ppc_dasm_one(stream, pc, op);
+	std::string stream_str = stream.str();
+	strcpy(buffer, stream_str.c_str());
+	return result;
 }
 
 CPU_DISASSEMBLE( powerpc )
