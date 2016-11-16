@@ -661,7 +661,7 @@ class ioport_field;
 struct ioport_field_live;
 class ioport_manager;
 class natural_keyboard;
-struct xml_data_node;
+class xml_data_node;
 class analog_field;
 
 // constructor function pointer
