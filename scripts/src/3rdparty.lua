@@ -60,7 +60,7 @@ if _OPTIONS["vs"]=="intel-15" then
 			"/Qwd869",              -- remark #869: parameter "xxx" was never referenced
 		}
 end
-	configuration { "vs2015*" }
+	configuration { "vs201*" }
 		buildoptions {
 			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
 		}
@@ -289,7 +289,7 @@ end
 			"-include stdint.h"
 		}
 
-	configuration { "vs2015*" }
+	configuration { "vs201*" }
 		buildoptions {
 			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
 		}
@@ -377,7 +377,7 @@ if _OPTIONS["vs"]=="intel-15" then
 			"/Qwd869",              -- remark #869: parameter "xxx" was never referenced
 		}
 end
-	configuration { "vs2015*" }
+	configuration { "vs201*" }
 		buildoptions {
 			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
 			"/wd4457", -- warning C4457: declaration of 'xxx' hides function parameter
@@ -672,7 +672,7 @@ if _OPTIONS["vs"]=="intel-15" then
 		}
 end
 
-	configuration { "vs2015*" }
+	configuration { "vs201*" }
 		buildoptions {
 			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
 		}
@@ -924,7 +924,7 @@ end
 --          "/Qwd1879",             -- warning #1879: unimplemented pragma ignored
 --      }
 --end
---  configuration { "vs2015*" }
+--  configuration { "vs201*" }
 --      buildoptions {
 --          "/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
 --      }
