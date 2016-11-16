@@ -3829,7 +3829,7 @@ static void build_opcode_table(void)
 /* ======================================================================== */
 
 /* Disasemble one instruction at pc and store in str_buff */
-static unsigned int m68k_disassemble(char* str_buff, unsigned int pc, unsigned int cpu_type)
+static unsigned int m68k_disassemble(std::ostream &stream, unsigned int pc, unsigned int cpu_type)
 {
 	if(!g_initialized)
 	{
@@ -3875,7 +3875,7 @@ static unsigned int m68k_disassemble(char* str_buff, unsigned int pc, unsigned i
 	g_cpu_ir = read_imm_16();
 	g_opcode_type = 0;
 	g_instruction_table[g_cpu_ir]();
-	sprintf(str_buff, "%s%s", g_dasm_str, g_helper_str);
+	util::stream_format(stream, "%s%s", g_dasm_str, g_helper_str);
 	return COMBINE_OPCODE_FLAGS(g_cpu_pc - pc);
 }
 
@@ -3889,14 +3889,23 @@ char* m68ki_disassemble_quick(unsigned int pc, unsigned int cpu_type)
 }
 #endif
 
-unsigned int m68k_disassemble_raw(char* str_buff, unsigned int pc, const unsigned char* opdata, const unsigned char* argdata, unsigned int cpu_type)
+unsigned int m68k_disassemble_raw(std::ostream &stream, unsigned int pc, const unsigned char* opdata, const unsigned char* argdata, unsigned int cpu_type)
 {
 	unsigned int result;
 
 	g_rawop = opdata;
 	g_rawbasepc = pc;
-	result = m68k_disassemble(str_buff, pc, cpu_type);
+	result = m68k_disassemble(stream, pc, cpu_type);
 	g_rawop = nullptr;
+	return result;
+}
+
+unsigned int m68k_disassemble_raw(char* str_buff, unsigned int pc, const unsigned char* opdata, const unsigned char* argdata, unsigned int cpu_type)
+{
+	std::ostringstream stream;
+	unsigned int result = m68k_disassemble_raw(stream, pc, opdata, argdata, cpu_type);
+	std::string stream_str = stream.str();
+	strcpy(str_buff, stream_str.c_str());
 	return result;
 }
 
