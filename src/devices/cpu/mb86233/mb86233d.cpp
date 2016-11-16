@@ -4,57 +4,49 @@
 #include "debugger.h"
 #include "mb86233.h"
 
-static char * COND(unsigned int cond)
+static std::string COND(unsigned int cond)
 {
-	static char bufs[4][256];
-	static int bufindex = 0;
-	char *buf = &bufs[bufindex++][0];
-
-	bufindex &= 3;
+	std::ostringstream stream;
 
 	switch(cond)
 	{
 		case 0x16:
-			sprintf(buf,"always");
-			return buf;
+			util::stream_format(stream, "always");
+			return stream.str();
 
 		case 0x00:
-			sprintf(buf,"eq");
-			return buf;
+			util::stream_format(stream, "eq");
+			return stream.str();
 
 		case 0x01:
-			sprintf(buf,"ge");
-			return buf;
+			util::stream_format(stream, "ge");
+			return stream.str();
 
 		case 0x02:
-			sprintf(buf,"le");
-			return buf;
+			util::stream_format(stream, "le");
+			return stream.str();
 
 		case 0x06:
-			sprintf(buf,"never");
-			return buf;
+			util::stream_format(stream, "never");
+			return stream.str();
 
 		case 0x10:
-			sprintf(buf,"(--r12)!=0");
-			return buf;
+			util::stream_format(stream, "(--r12)!=0");
+			return stream.str();
 
 		case 0x11:
-			sprintf(buf,"(--r13)!=0");
-			return buf;
+			util::stream_format(stream, "(--r13)!=0");
+			return stream.str();
 	}
 
-	sprintf(buf,"unk (%x)",cond);
-	return buf;
+	util::stream_format(stream, "unk (%x)",cond);
+	return stream.str();
 }
 
-static char * REGS( uint32_t reg, int IsSource )
+static std::string REGS( uint32_t reg, int IsSource )
 {
-	static char bufs[4][256];
-	static int bufindex = 0;
-	char *buf = &bufs[bufindex++][0];
+	std::ostringstream stream;
 	int         mode = (reg >> 6 ) & 0x07;
-
-	bufindex &= 3;
 
 	reg &= 0x3f;
 
@@ -62,322 +54,304 @@ static char * REGS( uint32_t reg, int IsSource )
 	{
 		if ( reg < 0x10 )
 		{
-			sprintf(buf,"r%d",reg);
-			return buf;
+			util::stream_format(stream, "r%d",reg);
+			return stream.str();
 		}
 
 		switch(reg)
 		{
 			case 0x10:
-				sprintf(buf,"a");
+				util::stream_format(stream, "a");
 			break;
 
 			case 0x11:
-				sprintf(buf,"a.e");
+				util::stream_format(stream, "a.e");
 			break;
 
 			case 0x12:
-				sprintf(buf,"a.m");
+				util::stream_format(stream, "a.m");
 			break;
 
 			case 0x13:
-				sprintf(buf,"b");
+				util::stream_format(stream, "b");
 			break;
 
 			case 0x14:
-				sprintf(buf,"b.e");
+				util::stream_format(stream, "b.e");
 			break;
 
 			case 0x15:
-				sprintf(buf,"b.m");
+				util::stream_format(stream, "b.m");
 			break;
 
 			case 0x19:
-				sprintf(buf,"d");
+				util::stream_format(stream, "d");
 			break;
 
 			case 0x1a:
-				sprintf(buf,"d.e");
+				util::stream_format(stream, "d.e");
 			break;
 
 			case 0x1b:
-				sprintf(buf,"d.m");
+				util::stream_format(stream, "d.m");
 			break;
 
 			case 0x1c:
-				sprintf(buf,"p");
+				util::stream_format(stream, "p");
 			break;
 
 			case 0x1d:
-				sprintf(buf,"p.e");
+				util::stream_format(stream, "p.e");
 			break;
 
 			case 0x1e:
-				sprintf(buf,"p.m");
+				util::stream_format(stream, "p.m");
 			break;
 
 			case 0x1f:
-				sprintf(buf,"shift");
+				util::stream_format(stream, "shift");
 			break;
 
 			case 0x20:
-				sprintf(buf,"parport");
+				util::stream_format(stream, "parport");
 			break;
 
 			case 0x21:
-				sprintf(buf,"FIn");
+				util::stream_format(stream, "FIn");
 			break;
 
 			case 0x22:
-				sprintf(buf,"FOut");
+				util::stream_format(stream, "FOut");
 			break;
 
 			case 0x23:
-				sprintf(buf,"EB");
+				util::stream_format(stream, "EB");
 			break;
 
 			default:
-				sprintf(buf,"Unkreg (%x)",reg);
+				util::stream_format(stream, "Unkreg (%x)",reg);
 			break;
 		}
 	}
 	else if ( mode == 2 )
 	{
-		char *p = buf;
-
-		p += sprintf(p,"0x%x+",reg & 0x1f);
+		util::stream_format(stream, "0x%x+",reg & 0x1f);
 
 		if ( IsSource )
 		{
 			if ( !( reg & 0x20 ) )
-				p += sprintf(p,"r0+");
+				util::stream_format(stream, "r0+");
 
-			p += sprintf(p,"r2");
+			util::stream_format(stream, "r2");
 		}
 		else
 		{
 			if ( !( reg & 0x20 ) )
-				p += sprintf(p,"r1+");
+				util::stream_format(stream, "r1+");
 
-			p += sprintf(p,"r3");
+			util::stream_format(stream, "r3");
 		}
 	}
 	else if ( mode == 6 )
 	{
-		char *p = buf;
-
 		if ( IsSource )
 		{
 			if ( !( reg & 0x20 ) )
-				p += sprintf(p,"r0+");
+				util::stream_format(stream, "r0+");
 
-			p += sprintf(p,"r2");
+			util::stream_format(stream, "r2");
 		}
 		else
 		{
 			if ( !( reg & 0x20 ) )
-				p += sprintf(p,"r1+");
+				util::stream_format(stream, "r1+");
 
-			p += sprintf(p,"r3");
+			util::stream_format(stream, "r3");
 		}
 
 		if ( reg & 0x10 )
-			p += sprintf(p,"--%d", 0x20 - ( reg & 0x1f ) );
+			util::stream_format(stream, "--%d", 0x20 - ( reg & 0x1f ) );
 		else
-			p += sprintf(p,"++%d", reg & 0x1f );
+			util::stream_format(stream, "++%d", reg & 0x1f );
 	}
 	else
 	{
-		sprintf(buf,"UNKMOD %x (0x%x)", mode, reg);
+		util::stream_format(stream, "UNKMOD %x (0x%x)", mode, reg);
 	}
 
-	return buf;
+	return stream.str();
 }
 
-static char * INDIRECT( uint32_t reg, int IsSource )
+static std::string INDIRECT( uint32_t reg, int IsSource )
 {
-	static char bufs[4][256];
-	static int bufindex = 0;
-	char *buf = &bufs[bufindex++][0];
+	std::ostringstream stream;
 	int         mode = ( reg >> 6 ) & 0x07;
-
-	bufindex &= 3;
 
 	if ( mode == 0 || mode == 3 || mode == 1)
 	{
-		sprintf(buf,"0x%x",reg);
+		util::stream_format(stream, "0x%x", reg);
 	}
 	else if ( mode == 2 )
 	{
-		char *p = buf;
-
-		p += sprintf(p,"0x%x+",reg&0x1f);
+		util::stream_format(stream, "0x%x+",reg&0x1f);
 
 		if ( IsSource )
 		{
 			if ( !(reg & 0x20) )
-				p += sprintf(p,"r0+");
+				util::stream_format(stream, "r0+");
 
-			p += sprintf(p,"r2");
+			util::stream_format(stream, "r2");
 		}
 		else
 		{
 			if ( !(reg & 0x20) )
-				p += sprintf(p,"r1+");
+				util::stream_format(stream, "r1+");
 
-			p += sprintf(p,"r3");
+			util::stream_format(stream, "r3");
 		}
 	}
 	else if ( mode == 6 || mode == 7 )
 	{
-		char *p = buf;
-
 		if ( IsSource )
 		{
 			if ( !( reg & 0x20 ) )
-				p += sprintf(p,"r0+");
+				util::stream_format(stream, "r0+");
 
-			p += sprintf(p,"r2");
+			util::stream_format(stream, "r2");
 		}
 		else
 		{
 			if( !( reg & 0x20 ) )
-				p += sprintf(p,"r1+");
+				util::stream_format(stream, "r1+");
 
-			p += sprintf(p,"r3");
+			util::stream_format(stream, "r3");
 		}
 
 		if ( reg & 0x10 )
-			p += sprintf(p,"--%d",0x20 - ( reg & 0x1f ));
+			util::stream_format(stream, "--%d",0x20 - ( reg & 0x1f ));
 		else
-			p += sprintf(p,"++%d",reg & 0x1f);
+			util::stream_format(stream, "++%d",reg & 0x1f);
 	}
 	else
 	{
-		sprintf(buf,"UNKMOD %x (0x%x)", mode, reg);
+		util::stream_format(stream, "UNKMOD %x (0x%x)", mode, reg);
 	}
 
-	return buf;
+	return stream.str();
 }
 
 
-static char * ALU( uint32_t alu)
+static std::string ALU( uint32_t alu)
 {
-	static char bufs[4][256];
-	static int bufindex = 0;
-	char *buf = &bufs[bufindex++][0];
-
-	bufindex &= 3;
+	std::ostringstream stream;
 
 	switch( alu )
 	{
 		case 0x0:
-			buf[0] = 0;
 		break;
 
 		case 0x1:
-			sprintf(buf,"d=d&a");
+			util::stream_format(stream, "d=d&a");
 		break;
 
 		case 0x2:
-			sprintf(buf,"d=d|a");
+			util::stream_format(stream, "d=d|a");
 		break;
 
 		case 0x3:
-			sprintf(buf,"d=d^a");
+			util::stream_format(stream, "d=d^a");
 		break;
 
 		case 0x5:
-			sprintf(buf,"cmp d,a");
+			util::stream_format(stream, "cmp d,a");
 		break;
 
 		case 0x6:
-			sprintf(buf,"d=d+a");
+			util::stream_format(stream, "d=d+a");
 		break;
 
 		case 0x7:
-			sprintf(buf,"d=d-a");
+			util::stream_format(stream, "d=d-a");
 		break;
 
 		case 0x8:
-			sprintf(buf,"p=a*b");
+			util::stream_format(stream, "p=a*b");
 		break;
 
 		case 0x9:
-			sprintf(buf,"d=d+p, p=a*b");
+			util::stream_format(stream, "d=d+p, p=a*b");
 		break;
 
 		case 0xa:
-			sprintf(buf,"d=d-p, p=a*b");
+			util::stream_format(stream, "d=d-p, p=a*b");
 		break;
 
 		case 0xb:
-			sprintf(buf,"d=fabs d");
+			util::stream_format(stream, "d=fabs d");
 		break;
 
 		case 0xc:
-			sprintf(buf,"d=d+p");
+			util::stream_format(stream, "d=d+p");
 		break;
 
 		case 0xd:
-			sprintf(buf,"d=p, p=a*b");
+			util::stream_format(stream, "d=p, p=a*b");
 		break;
 
 		case 0xe:
-			sprintf(buf,"d=float(d)");
+			util::stream_format(stream, "d=float(d)");
 		break;
 
 		case 0xf:
-			sprintf(buf,"d=int(d)");
+			util::stream_format(stream, "d=int(d)");
 		break;
 
 		case 0x10:
-			sprintf(buf,"d=d/a");
+			util::stream_format(stream, "d=d/a");
 		break;
 
 		case 0x11:
-			sprintf(buf,"d=-d");
+			util::stream_format(stream, "d=-d");
 		break;
 
 		case 0x13:
-			sprintf(buf,"d=a+b");
+			util::stream_format(stream, "d=a+b");
 		break;
 
 		case 0x14:
-			sprintf(buf,"d=b-a");
+			util::stream_format(stream, "d=b-a");
 		break;
 
 		case 0x16:
-			sprintf(buf,"d=(lsr d,shift)");
+			util::stream_format(stream, "d=(lsr d,shift)");
 		break;
 
 		case 0x17:
-			sprintf(buf,"d=(lsl d,shift)");
+			util::stream_format(stream, "d=(lsl d,shift)");
 		break;
 
 		case 0x18:
-			sprintf(buf,"d=(asr d,shift)");
+			util::stream_format(stream, "d=(asr d,shift)");
 		break;
 
 		case 0x1a:
-			sprintf(buf,"d=d+a (int)");
+			util::stream_format(stream, "d=d+a (int)");
 		break;
 
 		case 0x1b:
-			sprintf(buf,"d=d-a (int)");
+			util::stream_format(stream, "d=d-a (int)");
 		break;
 
 		default:
-			sprintf(buf,"ALU UNK(%x)",alu);
+			util::stream_format(stream, "ALU UNK(%x)",alu);
 		break;
 	}
 
-	return buf;
+	return stream.str();
 }
 
-static unsigned dasm_mb86233(char *buffer, uint32_t opcode )
+static unsigned dasm_mb86233(std::ostream &stream, uint32_t opcode )
 {
-	char *p = buffer;
 	uint32_t  grp = ( opcode >> 26 ) & 0x3f;
 
 	switch( grp )
@@ -390,28 +364,28 @@ static unsigned dasm_mb86233(char *buffer, uint32_t opcode )
 			uint32_t op=(opcode>>16) & 0x1f;
 
 			if ( alu != 0 )
-				p += sprintf(p, "%s, ", ALU(alu) );
+				util::stream_format(stream, "%s, ", ALU(alu) );
 
 			switch( op )
 			{
 				case 0x0c:  /* a = RAM[addr], b = BRAM[addr] */
-					p += sprintf(p,"LAB RAM(0x%x)->a,BRAM(0x%x)->b",r1,r2);
+					util::stream_format(stream, "LAB RAM(0x%x)->a,BRAM(0x%x)->b",r1,r2);
 				break;
 
 				case 0x0d:  /* a = RAM[addr], b = BRAM[addr] */
-					p += sprintf(p,"LAB RAM(0x%x)->a,BRAM(%s)->b",r1,INDIRECT(r2|(2<<6),0));
+					util::stream_format(stream, "LAB RAM(0x%x)->a,BRAM(%s)->b",r1,INDIRECT(r2|(2<<6),0));
 				break;
 
 				case 0x0f:  /* a = RAM[addr], b = BRAM[reg] */
-					p += sprintf(p,"LAB RAM(0x%x)->a,BRAM(%s)->b",r1,INDIRECT(r2|(6<<6),0));
+					util::stream_format(stream, "LAB RAM(0x%x)->a,BRAM(%s)->b",r1,INDIRECT(r2|(6<<6),0));
 				break;
 
 				case 0x10:  /* a = BRAM[reg], b = RAM[addr] */
-					p += sprintf(p,"LAB BRAM(%s)->a,RAM(0x%x)->b",INDIRECT(r1,1),r2);
+					util::stream_format(stream, "LAB BRAM(%s)->a,RAM(0x%x)->b",INDIRECT(r1,1),r2);
 				break;
 
 				default:
-					p += sprintf(p,"UNKDUAL (%x)",op);
+					util::stream_format(stream, "UNKDUAL (%x)",op);
 				break;
 			}
 		}
@@ -426,37 +400,37 @@ static unsigned dasm_mb86233(char *buffer, uint32_t opcode )
 
 			if ( alu != 0 )
 			{
-				p += sprintf(p, "%s", ALU(alu) );
+				util::stream_format(stream, "%s", ALU(alu) );
 
 				if ( !(op == 0x1f && r1 == 0x10 && r2 == 0x0f) )
-					p += sprintf(p, ", ");
+					util::stream_format(stream, ", ");
 			}
 
 			switch(op)
 			{
 				case 0x03:  /* RAM->External Indirect */
 				{
-					p += sprintf(p,"MOV RAM(0x%x)->E(EB+%s)",r1,INDIRECT(r2|(6<<6),0));
+					util::stream_format(stream, "MOV RAM(0x%x)->E(EB+%s)",r1,INDIRECT(r2|(6<<6),0));
 				}
 				break;
 
 				case 0x04:  /* MOV RAM->External */
 				{
-					p += sprintf(p,"MOV RAM(0x%x)->E(EB+0x%x)",r1,r2);
+					util::stream_format(stream, "MOV RAM(0x%x)->E(EB+0x%x)",r1,r2);
 				}
 				break;
 
 				case 0x07:  /* RAMInd->External */
 				{
-					p += sprintf(p,"MOV RAM(%s)->E(EB+%s)",INDIRECT(r1,1),INDIRECT(r2|(6<<6),0));
+					util::stream_format(stream, "MOV RAM(%s)->E(EB+%s)",INDIRECT(r1,1),INDIRECT(r2|(6<<6),0));
 				}
 				break;
 
 				case 0x08:  /* External->RAM */
 				{
-					p += sprintf(p,"MOV EXT(EB+");
-					p += sprintf(p,"%s",INDIRECT(r1,1));
-					p += sprintf(p,")->RAM(0x%x)",r2);
+					util::stream_format(stream, "MOV EXT(EB+");
+					util::stream_format(stream, "%s",INDIRECT(r1,1));
+					util::stream_format(stream, ")->RAM(0x%x)",r2);
 				}
 				break;
 
@@ -464,44 +438,44 @@ static unsigned dasm_mb86233(char *buffer, uint32_t opcode )
 				{
 					int mode = ( r1 >> 6 ) & 0x07;
 
-					p += sprintf(p,"MOV EXT(EB+");
+					util::stream_format(stream, "MOV EXT(EB+");
 
 					if ( mode == 0 || mode == 3 || mode == 1 )
-						p += sprintf(p,"RAM(");
+						util::stream_format(stream, "RAM(");
 
-					p += sprintf(p,"%s",INDIRECT(r1,1));
+					util::stream_format(stream, "%s",INDIRECT(r1,1));
 
 					if ( mode == 0 || mode == 3 || mode == 1)
-						p += sprintf(p,")");
+						util::stream_format(stream, ")");
 
-					p += sprintf(p,")->RAM(%s)",INDIRECT(r2|(6<<6),0));
+					util::stream_format(stream, ")->RAM(%s)",INDIRECT(r2|(6<<6),0));
 				}
 				break;
 
 				case 0x0c:  /* MOV RAM->BRAM */
-					p += sprintf(p,"MOV RAM(0x%x)->BRAM(0x%x)",r1,r2);
+					util::stream_format(stream, "MOV RAM(0x%x)->BRAM(0x%x)",r1,r2);
 				break;
 
 				case 0x0f:  /* MOV RAMInd->BRAMInd */
-					p += sprintf(p,"MOV RAM(%s)->BRAM(%s)",INDIRECT(r1,1),INDIRECT(r2|(6<<6),0));
+					util::stream_format(stream, "MOV RAM(%s)->BRAM(%s)",INDIRECT(r1,1),INDIRECT(r2|(6<<6),0));
 				break;
 
 				case 0x10:  /* MOV BRAMInd->RAM */
-					p += sprintf(p,"MOV BRAM(%s)->RAM(0x%x)",INDIRECT(r1,1),r2);
+					util::stream_format(stream, "MOV BRAM(%s)->RAM(0x%x)",INDIRECT(r1,1),r2);
 				break;
 
 				case 0x13:  /* MOV BRAMInd->RAMInd */
-					p += sprintf(p,"MOV BRAM(%s)->RAM(%s)",INDIRECT(r1,1),INDIRECT(r2|(6<<6),0));
+					util::stream_format(stream, "MOV BRAM(%s)->RAM(%s)",INDIRECT(r1,1),INDIRECT(r2|(6<<6),0));
 				break;
 
 				case 0x1c:  /* MOV Reg->RAMInd */
 					if ( ( r2 >> 6 ) & 0x01)
 					{
-						p += sprintf(p,"MOV %s->EXT(EB+%s)",REGS(r2,1),INDIRECT(r1,0));
+						util::stream_format(stream, "MOV %s->EXT(EB+%s)",REGS(r2,1),INDIRECT(r1,0));
 					}
 					else
 					{
-						p += sprintf(p,"MOV %s->RAM(%s)",REGS(r2,1),INDIRECT(r1,0));
+						util::stream_format(stream, "MOV %s->RAM(%s)",REGS(r2,1),INDIRECT(r1,0));
 					}
 				break;
 
@@ -509,11 +483,11 @@ static unsigned dasm_mb86233(char *buffer, uint32_t opcode )
 				{
 					if ( r1 & 0x180 )
 					{
-						p += sprintf(p,"MOV RAM(%s)->%s",REGS(r1,0),REGS(r2,0));
+						util::stream_format(stream, "MOV RAM(%s)->%s",REGS(r1,0),REGS(r2,0));
 					}
 					else
 					{
-						p += sprintf(p,"MOV RAM(0x%x)->%s",r1,REGS(r2,0));
+						util::stream_format(stream, "MOV RAM(0x%x)->%s",r1,REGS(r2,0));
 					}
 				}
 				break;
@@ -521,19 +495,19 @@ static unsigned dasm_mb86233(char *buffer, uint32_t opcode )
 				case 0x1e:  /* External->Reg */
 				{
 					int     mode2 = (r2 >> 6) & 1;
-					p += sprintf(p,"MOV EXT(EB+%s)->%s",INDIRECT(r1,mode2),REGS(r2,0));
+					util::stream_format(stream, "MOV EXT(EB+%s)->%s",INDIRECT(r1,mode2),REGS(r2,0));
 				}
 				break;
 
 				case 0x1f:  /* MOV Reg->Reg */
 					if ( !(r1 == 0x10 && r2 == 0x0f) )
 					{
-						p += sprintf(p,"MOV %s->%s",REGS(r1,1),REGS(r2,0));
+						util::stream_format(stream, "MOV %s->%s",REGS(r1,1),REGS(r2,0));
 					}
 				break;
 
 				default:
-					p += sprintf(p,"UNKMV (0x%x)",op);
+					util::stream_format(stream, "UNKMV (0x%x)",op);
 				break;
 			}
 		}
@@ -544,7 +518,7 @@ static unsigned dasm_mb86233(char *buffer, uint32_t opcode )
 			uint32_t sub=(opcode>>24)&0x3;
 			static const char regs[4] = { 'p', 'a', 'b', 'd' };
 
-			p += sprintf(p,"LDIMM24 0x%X->%c",opcode&0xffffff, regs[sub]);
+			util::stream_format(stream, "LDIMM24 0x%X->%c",opcode&0xffffff, regs[sub]);
 		}
 		break;
 
@@ -554,31 +528,31 @@ static unsigned dasm_mb86233(char *buffer, uint32_t opcode )
 			uint32_t  sub2 = ( opcode >> 16 ) & 0x0f;
 
 			if ( alu != 0 )
-				p += sprintf(p, "%s, ", ALU(alu) );
+				util::stream_format(stream, "%s, ", ALU(alu) );
 
 			if ( sub2 == 0x00 )
 			{
-				p += sprintf(p,"CLEAR ");
+				util::stream_format(stream, "CLEAR ");
 
 				switch( opcode & 0x3f )
 				{
-					case 0x04: p += sprintf(p, "a" ); break;
-					case 0x08: p += sprintf(p, "b" ); break;
-					case 0x10: p += sprintf(p, "d" ); break;
-					default: p += sprintf(p, "UNKNOWN REG(%x)",opcode&0x3F); break;
+					case 0x04: util::stream_format(stream, "a" ); break;
+					case 0x08: util::stream_format(stream, "b" ); break;
+					case 0x10: util::stream_format(stream, "d" ); break;
+					default: util::stream_format(stream, "UNKNOWN REG(%x)",opcode&0x3F); break;
 				}
 			}
 			else if ( sub2 == 0x02 )
-				p += sprintf(p,"CLRFLAG 0x%x",opcode&0xffff);
+				util::stream_format(stream, "CLRFLAG 0x%x",opcode&0xffff);
 			else if ( sub2==0x4 )
 			{
 				if ( (opcode & 0xfff) == 0 )
-					p += sprintf(p,"REP 0x100");
+					util::stream_format(stream, "REP 0x100");
 				else
-					p += sprintf(p,"REP 0x%x",opcode&0xff);
+					util::stream_format(stream, "REP 0x%x",opcode&0xff);
 			}
 			else if ( sub2 == 0x06 )
-				p += sprintf(p,"SETFLAG 0x%x",opcode&0xffff);
+				util::stream_format(stream, "SETFLAG 0x%x",opcode&0xffff);
 		}
 		break;
 
@@ -588,9 +562,9 @@ static unsigned dasm_mb86233(char *buffer, uint32_t opcode )
 			uint32_t  imm=(opcode)&0xFFFF;
 
 			if ( dst <= 3 )
-				p += sprintf(p,"LDIMM 0x%x->r%d",imm,dst);
+				util::stream_format(stream, "LDIMM 0x%x->r%d",imm,dst);
 			else
-				p += sprintf(p,"LDIMM 0x%x->UNKDST(0x%x)",imm,dst);
+				util::stream_format(stream, "LDIMM 0x%x->UNKDST(0x%x)",imm,dst);
 		}
 		break;
 
@@ -598,11 +572,11 @@ static unsigned dasm_mb86233(char *buffer, uint32_t opcode )
 		{
 			uint32_t sub = ( opcode >> 24 ) & 0x03;
 
-			p += sprintf(p,"LDIMM 0x%X->",opcode&0xffffff);
+			util::stream_format(stream, "LDIMM 0x%X->",opcode&0xffffff);
 
-			if ( sub == 0 ) p += sprintf(p,"r12");
-			else if ( sub == 1 ) p += sprintf(p,"r13");
-			else p += sprintf(p,"UNKREG(%x)", sub);
+			if ( sub == 0 ) util::stream_format(stream, "r12");
+			else if ( sub == 1 ) util::stream_format(stream, "r13");
+			else util::stream_format(stream, "UNKREG(%x)", sub);
 		}
 		break;
 
@@ -610,12 +584,12 @@ static unsigned dasm_mb86233(char *buffer, uint32_t opcode )
 		{
 			uint32_t sub = ( opcode >> 24 ) & 0x03;
 
-			p += sprintf(p,"LDIMM 0x%X->",opcode&0xffffff);
+			util::stream_format(stream, "LDIMM 0x%X->",opcode&0xffffff);
 
-			if ( sub == 0 ) p += sprintf(p,"a.exp");
-			else if ( sub == 1 ) p += sprintf(p,"a.e");
-			else if ( sub == 2 ) p += sprintf(p,"a.m");
-			else p += sprintf(p,"UNKREG(%x)", sub);
+			if ( sub == 0 ) util::stream_format(stream, "a.exp");
+			else if ( sub == 1 ) util::stream_format(stream, "a.e");
+			else if ( sub == 2 ) util::stream_format(stream, "a.m");
+			else util::stream_format(stream, "UNKREG(%x)", sub);
 		}
 		break;
 
@@ -623,12 +597,12 @@ static unsigned dasm_mb86233(char *buffer, uint32_t opcode )
 		{
 			uint32_t sub = ( opcode >> 24 ) & 0x03;
 
-			p += sprintf(p,"LDIMM 0x%X->",opcode&0xffffff);
+			util::stream_format(stream, "LDIMM 0x%X->",opcode&0xffffff);
 
-			if ( sub == 0 ) p += sprintf(p,"b.exp");
-			else if ( sub == 1 ) p += sprintf(p,"b.e");
-			else if ( sub == 2 ) p += sprintf(p,"b.m");
-			else p += sprintf(p,"UNKREG(%x)", sub);
+			if ( sub == 0 ) util::stream_format(stream, "b.exp");
+			else if ( sub == 1 ) util::stream_format(stream, "b.e");
+			else if ( sub == 2 ) util::stream_format(stream, "b.m");
+			else util::stream_format(stream, "UNKREG(%x)", sub);
 		}
 		break;
 
@@ -636,11 +610,11 @@ static unsigned dasm_mb86233(char *buffer, uint32_t opcode )
 		{
 			uint32_t sub = ( opcode >> 24 ) & 0x03;
 
-			p += sprintf(p,"LDIMM 0x%X->",opcode&0xffffff);
+			util::stream_format(stream, "LDIMM 0x%X->",opcode&0xffffff);
 
-			if ( sub == 2 ) p += sprintf(p,"d.e");
-			else if ( sub == 3 ) p += sprintf(p,"d.m");
-			else p += sprintf(p,"UNKREG(%x)", sub);
+			if ( sub == 2 ) util::stream_format(stream, "d.e");
+			else if ( sub == 3 ) util::stream_format(stream, "d.m");
+			else util::stream_format(stream, "UNKREG(%x)", sub);
 		}
 		break;
 
@@ -648,10 +622,10 @@ static unsigned dasm_mb86233(char *buffer, uint32_t opcode )
 		{
 			uint32_t sub = ( opcode >> 24 ) & 0x03;
 
-			p += sprintf(p,"LDIMM 0x%X->",opcode&0xffffff);
+			util::stream_format(stream, "LDIMM 0x%X->",opcode&0xffffff);
 
-			if ( sub == 0x03 ) p += sprintf(p,"shift");
-			else p += sprintf(p,"UNKREG(%x)", sub);
+			if ( sub == 0x03 ) util::stream_format(stream, "shift");
+			else util::stream_format(stream, "UNKREG(%x)", sub);
 		}
 		break;
 
@@ -659,10 +633,10 @@ static unsigned dasm_mb86233(char *buffer, uint32_t opcode )
 		{
 			uint32_t sub = ( opcode >> 24 ) & 0x03;
 
-			p += sprintf(p,"LDIMM24 0x%X->",opcode&0xffffff);
+			util::stream_format(stream, "LDIMM24 0x%X->",opcode&0xffffff);
 
-			if ( sub == 0x03 ) p += sprintf(p,"EB");
-			else p += sprintf(p,"UNKREG(%x)", sub);
+			if ( sub == 0x03 ) util::stream_format(stream, "EB");
+			else util::stream_format(stream, "UNKREG(%x)", sub);
 		}
 		break;
 
@@ -675,43 +649,43 @@ static unsigned dasm_mb86233(char *buffer, uint32_t opcode )
 			switch( subtype )
 			{
 				case 0:
-					p += sprintf(p,"BRIF %s 0x%X", COND(cond), data);
+					util::stream_format(stream, "BRIF %s 0x%X", COND(cond), data);
 				break;
 
 				case 2:
-					p += sprintf(p,"BRIF %s ", COND(cond));
+					util::stream_format(stream, "BRIF %s ", COND(cond));
 					if ( data & 0x4000 )
-						p += sprintf(p,"%s",REGS(data&0x3f,0));
+						util::stream_format(stream, "%s",REGS(data&0x3f,0));
 					else
-						p += sprintf(p,"RAM(0x%x)",data);
+						util::stream_format(stream, "RAM(0x%x)",data);
 				break;
 
 				case 4:
-					p += sprintf(p,"BSIF %s 0x%X", COND(cond), data);
+					util::stream_format(stream, "BSIF %s 0x%X", COND(cond), data);
 				break;
 
 				case 0x6:
-					p += sprintf(p,"BSIF %s ", COND(cond));
+					util::stream_format(stream, "BSIF %s ", COND(cond));
 					if ( data & 0x4000 )
-						p += sprintf(p,"%s",REGS(data&0x3f,0));
+						util::stream_format(stream, "%s",REGS(data&0x3f,0));
 					else
-						p += sprintf(p,"RAM(0x%x)",data);
+						util::stream_format(stream, "RAM(0x%x)",data);
 				break;
 
 				case 0xa:
-					p += sprintf(p,"RTIF %s", COND(cond));
+					util::stream_format(stream, "RTIF %s", COND(cond));
 				break;
 
 				case 0xc:
-					p += sprintf(p,"LDIF %s RAM(0x%x)->%s", COND(cond),data&0x1ff,REGS((data>>9)&0x3f,0));
+					util::stream_format(stream, "LDIF %s RAM(0x%x)->%s", COND(cond),data&0x1ff,REGS((data>>9)&0x3f,0));
 				break;
 
 				case 0xe:
-					p += sprintf(p,"RIIF %s", COND(cond));
+					util::stream_format(stream, "RIIF %s", COND(cond));
 				break;
 
 				default:
-					p += sprintf(p,"UNKG5 (%x cond %x)",subtype,cond);
+					util::stream_format(stream, "UNKG5 (%x cond %x)",subtype,cond);
 				break;
 			}
 		}
@@ -726,59 +700,68 @@ static unsigned dasm_mb86233(char *buffer, uint32_t opcode )
 			switch( subtype )
 			{
 				case 0:
-					p += sprintf(p,"BRUL %s 0x%X", COND(cond), data);
+					util::stream_format(stream, "BRUL %s 0x%X", COND(cond), data);
 				break;
 
 				case 2:
-					p += sprintf(p,"BRUL %s ", COND(cond));
+					util::stream_format(stream, "BRUL %s ", COND(cond));
 					if ( data & 0x4000 )
-						p += sprintf(p,"%s",REGS(data&0x3f,0));
+						util::stream_format(stream, "%s",REGS(data&0x3f,0));
 					else
-						p += sprintf(p,"RAM(0x%x)",data);
+						util::stream_format(stream, "RAM(0x%x)",data);
 				break;
 
 				case 4:
-					p += sprintf(p,"BSUL %s 0x%X", COND(cond), data);
+					util::stream_format(stream, "BSUL %s 0x%X", COND(cond), data);
 				break;
 
 				case 0x6:
-					p += sprintf(p,"BSUL %s ", COND(cond));
+					util::stream_format(stream, "BSUL %s ", COND(cond));
 					if ( data & 0x4000 )
-						p += sprintf(p,"%s",REGS(data&0x3f,0));
+						util::stream_format(stream, "%s",REGS(data&0x3f,0));
 					else
-						p += sprintf(p,"RAM(0x%x)",data);
+						util::stream_format(stream, "RAM(0x%x)",data);
 				break;
 
 				case 0xa:
-					p += sprintf(p,"RTUL %s", COND(cond));
+					util::stream_format(stream, "RTUL %s", COND(cond));
 				break;
 
 				case 0xc:
-					p += sprintf(p,"LDUL %s RAM(0x%x)->%s", COND(cond),data&0x1ff,REGS((data>>9)&0x3f,0));
+					util::stream_format(stream, "LDUL %s RAM(0x%x)->%s", COND(cond),data&0x1ff,REGS((data>>9)&0x3f,0));
 				break;
 
 				case 0xe:
-					p += sprintf(p,"RIUL %s", COND(cond));
+					util::stream_format(stream, "RIUL %s", COND(cond));
 				break;
 
 				default:
-					p += sprintf(p,"UNKG5 (%x cond %x)",subtype,cond);
+					util::stream_format(stream, "UNKG5 (%x cond %x)",subtype,cond);
 				break;
 			}
 		}
 		break;
 
 		default:
-			p += sprintf(p,"UNKOP");
+			util::stream_format(stream, "UNKOP");
 		break;
 	}
 
 	return (1 | DASMFLAG_SUPPORTED);
 }
 
-CPU_DISASSEMBLE( mb86233 )
+static offs_t internal_disasm_mb86233(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
 {
 	uint32_t op = *(uint32_t *)oprom;
 	op = little_endianize_int32(op);
-	return dasm_mb86233(buffer, op);
+	return dasm_mb86233(stream, op);
+}
+
+CPU_DISASSEMBLE(mb86233)
+{
+	std::ostringstream stream;
+	offs_t result = internal_disasm_mb86233(device, stream, pc, oprom, opram, options);
+	std::string stream_str = stream.str();
+	strcpy(buffer, stream_str.c_str());
+	return result;
 }
