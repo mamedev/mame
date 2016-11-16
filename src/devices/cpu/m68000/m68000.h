@@ -109,6 +109,7 @@ enum
 	M68K_FPSR, M68K_FPCR
 };
 
+unsigned int m68k_disassemble_raw(std::ostream &stream, unsigned int pc, const unsigned char* opdata, const unsigned char* argdata, unsigned int cpu_type);
 unsigned int m68k_disassemble_raw(char* str_buff, unsigned int pc, const unsigned char* opdata, const unsigned char* argdata, unsigned int cpu_type);
 
 class m68000_base_device;
