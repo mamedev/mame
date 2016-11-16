@@ -478,7 +478,7 @@ WRITE8_MEMBER (cpu30_state::flop_dmac_w){
 // TODO: Connect PC0, PC1, PC4 and PC7 to B5 and/or P2 connector
 READ8_MEMBER (cpu30_state::pit1c_r){
 	LOG(("%s\n", FUNCNAME));
-	m_maincpu->has_fpu = 1;    // Lets assume the FPCP is always installed ( which is default for 68030 atm )
+	m_maincpu->set_fpu_enable(1);    // Lets assume the FPCP is always installed ( which is default for 68030 atm )
 	return 0xff & ~FPCP_SENSE; // Should really be command line for the edge cases...
 }
 
