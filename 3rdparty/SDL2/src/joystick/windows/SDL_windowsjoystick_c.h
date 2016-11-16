@@ -83,6 +83,10 @@ struct joystick_hwdata
     DWORD dwPacketNumber;
 };
 
+#if SDL_JOYSTICK_DINPUT
+extern const DIDATAFORMAT SDL_c_dfDIJoystick2;
+#endif
+
 extern void SDL_SYS_AddJoystickDevice(JoyStick_DeviceData *device);
 
 /* vi: set ts=4 sw=4 expandtab: */

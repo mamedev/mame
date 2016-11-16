@@ -1182,7 +1182,6 @@ end
 		MAME_DIR .. "3rdparty/SDL2/src/audio/SDL_audiocvt.c",
 		MAME_DIR .. "3rdparty/SDL2/src/audio/SDL_audiodev.c",
 		MAME_DIR .. "3rdparty/SDL2/src/audio/SDL_audiodev_c.h",
-		MAME_DIR .. "3rdparty/SDL2/src/audio/SDL_audiomem.h",
 		MAME_DIR .. "3rdparty/SDL2/src/audio/SDL_audiotypecvt.c",
 		MAME_DIR .. "3rdparty/SDL2/src/audio/SDL_mixer.c",
 		MAME_DIR .. "3rdparty/SDL2/src/audio/SDL_sysaudio.h",
@@ -1382,7 +1381,7 @@ end
 
 	if _OPTIONS["targetos"]=="macosx" then
 		files {
-			MAME_DIR .. "3rdparty/SDL2/src/audio/coreaudio/SDL_coreaudio.c",
+			MAME_DIR .. "3rdparty/SDL2/src/audio/coreaudio/SDL_coreaudio.m",
 			MAME_DIR .. "3rdparty/SDL2/src/audio/coreaudio/SDL_coreaudio.h",
 			MAME_DIR .. "3rdparty/SDL2/src/file/cocoa/SDL_rwopsbundlesupport.m",
 			MAME_DIR .. "3rdparty/SDL2/src/file/cocoa/SDL_rwopsbundlesupport.h",
@@ -1513,12 +1512,20 @@ end
 		}
 		buildoptions_c {
 			"-Wno-undef",
+			"-Wno-format",
+			"-Wno-format-security",
 			"-Wno-strict-prototypes",
 			"-Wno-bad-function-cast",
+			"-Wno-pointer-to-int-cast",
 			"-Wno-discarded-qualifiers",
 			"-Wno-unused-but-set-variable",
 		}
-
+	
+	configuration { "mingw-clang"}
+		buildoptions_c {
+			"-Wno-incompatible-pointer-types-discards-qualifiers"
+		}
+		
 	configuration { "osx*"}
 		buildoptions {
 			"-Wno-undef",

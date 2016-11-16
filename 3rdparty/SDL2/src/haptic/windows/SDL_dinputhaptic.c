@@ -325,20 +325,12 @@ SDL_DINPUT_HapticOpenFromDevice(SDL_Haptic * haptic, LPDIRECTINPUTDEVICE8 device
 
         /* Set data format. */
         ret = IDirectInputDevice8_SetDataFormat(haptic->hwdata->device,
-                                                &c_dfDIJoystick2);
+                                                &SDL_c_dfDIJoystick2);
         if (FAILED(ret)) {
             DI_SetError("Setting data format", ret);
             goto acquire_err;
         }
 
-        /* Get number of axes. */
-        ret = IDirectInputDevice8_EnumObjects(haptic->hwdata->device,
-                                              DI_DeviceObjectCallback,
-                                              haptic, DIDFT_AXIS);
-        if (FAILED(ret)) {
-            DI_SetError("Getting device axes", ret);
-            goto acquire_err;
-        }
 
         /* Acquire the device. */
         ret = IDirectInputDevice8_Acquire(haptic->hwdata->device);
@@ -346,6 +338,15 @@ SDL_DINPUT_HapticOpenFromDevice(SDL_Haptic * haptic, LPDIRECTINPUTDEVICE8 device
             DI_SetError("Acquiring DirectInput device", ret);
             goto acquire_err;
         }
+    }
+
+    /* Get number of axes. */
+    ret = IDirectInputDevice8_EnumObjects(haptic->hwdata->device,
+                                          DI_DeviceObjectCallback,
+                                          haptic, DIDFT_AXIS);
+    if (FAILED(ret)) {
+        DI_SetError("Getting device axes", ret);
+        goto acquire_err;
     }
 
     /* Reset all actuators - just in case. */

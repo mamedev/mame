@@ -24,6 +24,7 @@
 #define _SDL_emscriptenvideo_h
 
 #include "../SDL_sysvideo.h"
+#include "../../events/SDL_touch_c.h"
 #include <emscripten/emscripten.h>
 #include <emscripten/html5.h>
 
@@ -37,14 +38,15 @@ typedef struct SDL_WindowData
     SDL_Window *window;
     SDL_Surface *surface;
 
-    int windowed_width;
-    int windowed_height;
-
     float pixel_ratio;
 
     SDL_bool external_size;
 
     int requested_fullscreen_mode;
+    SDL_bool fullscreen_resize;
+
+    SDL_bool finger_touching;  /* for mapping touch events to mice */
+    SDL_FingerID first_finger;
 } SDL_WindowData;
 
 #endif /* _SDL_emscriptenvideo_h */

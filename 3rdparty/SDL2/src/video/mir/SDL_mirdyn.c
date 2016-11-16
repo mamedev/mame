@@ -84,9 +84,8 @@ MIR_GetSym(const char *fnname, int *pHasModule)
 /* Define all the function pointers and wrappers... */
 #define SDL_MIR_MODULE(modname) int SDL_MIR_HAVE_##modname = 0;
 #define SDL_MIR_SYM(rc,fn,params) SDL_DYNMIRFN_##fn MIR_##fn = NULL;
+#define SDL_MIR_SYM_CONST(type,name) SDL_DYMMIRCONST_##name MIR_##name = NULL;
 #include "SDL_mirsym.h"
-#undef SDL_MIR_MODULE
-#undef SDL_MIR_SYM
 
 static int mir_load_refcount = 0;
 
@@ -103,9 +102,8 @@ SDL_MIR_UnloadSymbols(void)
             /* set all the function pointers to NULL. */
 #define SDL_MIR_MODULE(modname) SDL_MIR_HAVE_##modname = 0;
 #define SDL_MIR_SYM(rc,fn,params) MIR_##fn = NULL;
+#define SDL_MIR_SYM_CONST(type,name) MIR_##name = NULL;
 #include "SDL_mirsym.h"
-#undef SDL_MIR_MODULE
-#undef SDL_MIR_SYM
 
 
 #ifdef SDL_VIDEO_DRIVER_MIR_DYNAMIC
@@ -138,16 +136,12 @@ SDL_MIR_LoadSymbols(void)
         }
 
 #define SDL_MIR_MODULE(modname) SDL_MIR_HAVE_##modname = 1; /* default yes */
-#define SDL_MIR_SYM(rc,fn,params)
 #include "SDL_mirsym.h"
-#undef SDL_MIR_MODULE
-#undef SDL_MIR_SYM
 
 #define SDL_MIR_MODULE(modname) thismod = &SDL_MIR_HAVE_##modname;
 #define SDL_MIR_SYM(rc,fn,params) MIR_##fn = (SDL_DYNMIRFN_##fn) MIR_GetSym(#fn,thismod);
+#define SDL_MIR_SYM_CONST(type,name) MIR_##name = *(SDL_DYMMIRCONST_##name*) MIR_GetSym(#name,thismod);
 #include "SDL_mirsym.h"
-#undef SDL_MIR_MODULE
-#undef SDL_MIR_SYM
 
         if ((SDL_MIR_HAVE_MIR_CLIENT) && (SDL_MIR_HAVE_XKBCOMMON)) {
             /* all required symbols loaded. */
@@ -162,9 +156,8 @@ SDL_MIR_LoadSymbols(void)
 
 #define SDL_MIR_MODULE(modname) SDL_MIR_HAVE_##modname = 1; /* default yes */
 #define SDL_MIR_SYM(rc,fn,params) MIR_##fn = fn;
+#define SDL_MIR_SYM_CONST(type,name) MIR_##name = name;
 #include "SDL_mirsym.h"
-#undef SDL_MIR_MODULE
-#undef SDL_MIR_SYM
 
 #endif
     }
