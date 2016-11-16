@@ -1137,7 +1137,7 @@ configuration { "mingw*" }
 
 configuration { "mingw-clang" }
 	local version = str_to_version(_OPTIONS["gcc_version"])
-	if string.find(_OPTIONS["gcc"], "clang") and ((version < 30900)) then
+	if _OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "clang") and ((version < 30900)) then
 		linkoptions {
 			"-pthread",
 		}
