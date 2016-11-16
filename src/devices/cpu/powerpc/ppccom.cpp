@@ -1234,7 +1234,6 @@ void ppc_device::device_reset()
 
 offs_t ppc_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
-	extern offs_t ppc_dasm_one(char *buffer, uint32_t pc, uint32_t op);
 	uint32_t op = *(uint32_t *)oprom;
 	op = big_endianize_int32(op);
 	return ppc_dasm_one(buffer, pc, op);
