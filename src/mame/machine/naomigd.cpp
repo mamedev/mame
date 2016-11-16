@@ -563,7 +563,13 @@ ROM_START( dimm )
 	ROM_LOAD("315-6334.ic11", 0x000000, 0x01ff01, CRC(534c342d) SHA1(3e879f432c82305487922ab28c07107cf0f3c5cf) ) // Net-DIMM
 
 	// unused and/or unknown security PICs
-	
+	// 253-5508-0352E 317-0352-EXP BFC.BIN unknown, presumable some mahjong game (MJ1 ?)
+	ROM_LOAD("317-0352-exp.pic", 0x00, 0x4000, CRC(b216fbfc) SHA1(da2341003b35d1600d63fbe34d13ff3b42bdc939) )
+	// 253-5508-0456J 317-0456-JPN BEG.BIN WCCF 2005-2006 undumped Japan version
+	ROM_LOAD("317-0456-jpn.pic", 0x00, 0x4000, CRC(cf3bd834) SHA1(6236cdb780260d34c02806478a39c9f3432a45e8) )
+	// 253-5508-0506J 317-0506-JPN BPK.BIN unknown, something Chihiro ?
+	ROM_LOAD("317-0506-jpn.pic", 0x00, 0x4000, CRC(e105c6c8) SHA1(63e17b330a2f7d30bf0c263b163469f7f8e6a495) )
+
 	// main firmwares
 	ROM_LOAD16_WORD_SWAP( "fpr-23489c.ic14", 0x000000, 0x200000, CRC(bc38bea1) SHA1(b36fcc6902f397d9749e9d02de1bbb7a5e29d468) )
 	ROM_LOAD16_WORD_SWAP( "203_203.bin",     0x000000, 0x200000, CRC(a738ea1c) SHA1(6f55f1ae0606816a4eca6645ed36eb7f9c7ad9cf) )
