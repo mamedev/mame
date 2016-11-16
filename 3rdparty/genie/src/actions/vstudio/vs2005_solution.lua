@@ -85,7 +85,11 @@
 	function sln2005.header(sln)
 		local action = premake.action.current()
 		_p('Microsoft Visual Studio Solution File, Format Version %d.00', action.vstudio.solutionVersion)
-		_p('# Visual Studio %s', _ACTION:sub(3))
+		if(_ACTION:sub(3) == "2015" or  _ACTION:sub(3) == "2017") then
+			_p('# Visual Studio %s', action.vstudio.toolsVersion:sub(1,2))
+		else
+			_p('# Visual Studio %s', _ACTION:sub(3))
+		end
 	end
 
 
