@@ -31,8 +31,6 @@
 #include "cpu/drcuml.h"
 #include "cpu/drcumlsh.h"
 
-extern unsigned dasmmips3(char *buffer, unsigned pc, uint32_t op);
-
 using namespace uml;
 
 
