@@ -44,75 +44,76 @@ static int32_t sign_ext(uint32_t x, int n)
 
 /* Basic integer 3-address register format:
  *   mnemonic %rs1,%rs2,%rd  */
-static void int_12d(char *buf, char *mnemonic, uint32_t pc, uint32_t insn)
+static void int_12d(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t insn)
 {
 	/* Possibly prefix shrd with 'd.' */
 	if (((insn & 0xfc000000) == 0xb0000000) && (insn & 0x200))
-		sprintf(buf, "d.%s\t%%r%d,%%r%d,%%r%d", mnemonic,
+		util::stream_format(stream, "d.%s\t%%r%d,%%r%d,%%r%d", mnemonic,
 			get_isrc1 (insn), get_isrc2 (insn), get_idest (insn));
 	else
-		sprintf(buf, "%s\t%%r%d,%%r%d,%%r%d", mnemonic,
+		util::stream_format(stream, "%s\t%%r%d,%%r%d,%%r%d", mnemonic,
 			get_isrc1 (insn), get_isrc2 (insn), get_idest (insn));
 }
 
 
 /* Basic integer 3-address imm16 format:
  *   mnemonic #imm16,%rs2,%rd  */
-static void int_i2d(char *buf, char *mnemonic, uint32_t pc, uint32_t insn)
+static void int_i2d(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t insn)
 {
 	/* Sign extend the 16-bit immediate.
 	   Print as hex for the bitwise operations.  */
 	int upper_6bits = (insn >> 26) & 0x3f;
 	if (upper_6bits >= 0x30 && upper_6bits <= 0x3f)
-		sprintf(buf, "%s\t0x%04x,%%r%d,%%r%d", mnemonic,
+		util::stream_format(stream, "%s\t0x%04x,%%r%d,%%r%d", mnemonic,
 			(uint32_t)(get_imm16 (insn)), get_isrc2 (insn), get_idest (insn));
 	else
-		sprintf(buf, "%s\t%d,%%r%d,%%r%d", mnemonic,
+		util::stream_format(stream, "%s\t%d,%%r%d,%%r%d", mnemonic,
 			sign_ext(get_imm16 (insn), 16), get_isrc2 (insn), get_idest (insn));
 }
 
 
 /* Integer (mixed) 2-address  isrc1ni,fdest.  */
-static void int_1d(char *buf, char *mnemonic, uint32_t pc, uint32_t insn)
+static void int_1d(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t insn)
 {
-	sprintf(buf, "%s\t%%r%d,%%f%d", mnemonic, get_isrc1 (insn), get_fdest (insn));
+	util::stream_format(stream, "%s\t%%r%d,%%f%d", mnemonic, get_isrc1 (insn), get_fdest (insn));
 }
 
 
 /* Integer (mixed) 2-address  csrc2,idest.  */
-static void int_cd(char *buf, char *mnemonic, uint32_t pc, uint32_t insn)
+static void int_cd(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t insn)
 {
-	sprintf(buf, "%s\t%%%s,%%r%d", mnemonic, cr2str[get_creg (insn)], get_idest (insn));
+	util::stream_format(stream, "%s\t%%%s,%%r%d", mnemonic, cr2str[get_creg (insn)], get_idest (insn));
 }
 
 
 /* Integer (mixed) 2-address  isrc1,csrc2.  */
-static void int_1c(char *buf, char *mnemonic, uint32_t pc, uint32_t insn)
+static void int_1c(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t insn)
 {
-	sprintf(buf, "%s\t%%r%d,%%%s", mnemonic, get_isrc1(insn), cr2str[get_creg (insn)]);
+	util::stream_format(stream, "%s\t%%r%d,%%%s", mnemonic, get_isrc1(insn), cr2str[get_creg (insn)]);
 }
 
 
 /* Integer 1-address register format:
  *   mnemonic %rs1  */
-static void int_1(char *buf, char *mnemonic, uint32_t pc, uint32_t insn)
+static void int_1(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t insn)
 {
-	sprintf(buf, "%s\t%%r%d", mnemonic, get_isrc1 (insn));
+	util::stream_format(stream, "%s\t%%r%d", mnemonic, get_isrc1 (insn));
 }
 
 
 /* Integer no-address register format:
  *   mnemonic  */
-static void int_0(char *buf, char *mnemonic, uint32_t pc, uint32_t insn)
+static void int_0(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t insn)
 {
-	sprintf(buf, "%s", mnemonic);
+	util::stream_format(stream, "%s", mnemonic);
 }
 
 
 /* Basic floating-point 3-address register format:
  *   mnemonic %fs1,%fs2,%fd  */
-static void flop_12d(char *buf, char *mnemonic, uint32_t pc, uint32_t insn)
+static void flop_12d(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t insn)
 {
+	char newname[256];
 	const char *const suffix[4] = { "ss", "sd", "ds", "dd" };
 	const char *prefix_d, *prefix_p;
 	prefix_p = (insn & 0x400) ? "p" : "";
@@ -126,7 +127,6 @@ static void flop_12d(char *buf, char *mnemonic, uint32_t pc, uint32_t insn)
 		int is_pfam = insn & 0x400;
 		if (!is_pfam)
 		{
-			char newname[256];
 			char *op = mnemonic;
 			char *np = newname + 1;
 			newname[0] = 'm';
@@ -151,13 +151,13 @@ static void flop_12d(char *buf, char *mnemonic, uint32_t pc, uint32_t insn)
 		const char *const mn[2] = { "fgt.", "fle." };
 		int r = (insn & 0x080) >> 7;
 		int s = (insn & 0x100) ? 3 : 0;
-		sprintf(buf, "%s%s%s%s\t%%f%d,%%f%d,%%f%d", prefix_d, prefix_p, mn[r],
+		util::stream_format(stream, "%s%s%s%s\t%%f%d,%%f%d,%%f%d", prefix_d, prefix_p, mn[r],
 			suffix[s], get_fsrc1 (insn), get_fsrc2 (insn), get_fdest (insn));
 	}
 	else
 	{
 		int s = (insn & 0x180) >> 7;
-		sprintf(buf, "%s%s%s%s\t%%f%d,%%f%d,%%f%d", prefix_d, prefix_p, mnemonic,
+		util::stream_format(stream, "%s%s%s%s\t%%f%d,%%f%d,%%f%d", prefix_d, prefix_p, mnemonic,
 			suffix[s], get_fsrc1 (insn), get_fsrc2 (insn), get_fdest (insn));
 	}
 }
@@ -165,80 +165,80 @@ static void flop_12d(char *buf, char *mnemonic, uint32_t pc, uint32_t insn)
 
 /* Floating-point 2-address register format:
  *   mnemonic %fs1,%fd  */
-static void flop_1d(char *buf, char *mnemonic, uint32_t pc, uint32_t insn)
+static void flop_1d(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t insn)
 {
 	const char *const suffix[4] = { "ss", "sd", "ds", "dd" };
 	const char *prefix_d, *prefix_p;
 	int s = (insn & 0x180) >> 7;
 	prefix_p = (insn & 0x400) ? "p" : "";
 	prefix_d = (insn & 0x200) ? "d." : "";
-	sprintf(buf, "%s%s%s%s\t%%f%d,%%f%d", prefix_d, prefix_p, mnemonic,
+	util::stream_format(stream, "%s%s%s%s\t%%f%d,%%f%d", prefix_d, prefix_p, mnemonic,
 		suffix[s], get_fsrc1 (insn), get_fdest (insn));
 }
 
 
 /* Floating-point 2-address register format:
  *   mnemonic %fs2,%fd  */
-static void flop_2d(char *buf, char *mnemonic, uint32_t pc, uint32_t insn)
+static void flop_2d(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t insn)
 {
 	const char *const suffix[4] = { "ss", "sd", "ds", "dd" };
 	const char *prefix_d;
 	int s = (insn & 0x180) >> 7;
 	prefix_d = (insn & 0x200) ? "d." : "";
-	sprintf(buf, "%s%s%s\t%%f%d,%%f%d", prefix_d, mnemonic, suffix[s],
+	util::stream_format(stream, "%s%s%s\t%%f%d,%%f%d", prefix_d, mnemonic, suffix[s],
 		get_fsrc2 (insn), get_fdest (insn));
 }
 
 
 /* Floating-point (mixed) 2-address register format:
  *  fxfr fsrc1,idest.  */
-static void flop_fxfr(char *buf, char *mnemonic, uint32_t pc, uint32_t insn)
+static void flop_fxfr(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t insn)
 {
 	const char *prefix_d = (insn & 0x200) ? "d." : "";
-	sprintf(buf, "%s%s\t%%f%d,%%r%d", prefix_d, mnemonic, get_fsrc1 (insn),
+	util::stream_format(stream, "%s%s\t%%f%d,%%r%d", prefix_d, mnemonic, get_fsrc1 (insn),
 		get_idest (insn));
 }
 
 
 /* Branch with reg,reg,sbroff format:
  *   mnemonic %rs1,%rs2,sbroff  */
-static void int_12S(char *buf, char *mnemonic, uint32_t pc, uint32_t insn)
+static void int_12S(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t insn)
 {
 	int32_t sbroff = sign_ext ((((insn >> 5) & 0xf800) | (insn & 0x07ff)), 16);
 	int32_t rel = (int32_t)pc + (sbroff << 2) + 4;
 
-	sprintf(buf, "%s\t%%r%d,%%r%d,0x%08x", mnemonic, get_isrc1 (insn),
+	util::stream_format(stream, "%s\t%%r%d,%%r%d,0x%08x", mnemonic, get_isrc1 (insn),
 		get_isrc2 (insn), (uint32_t)rel);
 }
 
 
 /* Branch with #const5,reg,sbroff format:
  *   mnemonic #const5,%rs2,sbroff  */
-static void int_i2S(char *buf, char *mnemonic, uint32_t pc, uint32_t insn)
+static void int_i2S(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t insn)
 {
 	int32_t sbroff = sign_ext ((((insn >> 5) & 0xf800) | (insn & 0x07ff)), 16);
 	int32_t rel = (int32_t)pc + (sbroff << 2) + 4;
 
-	sprintf(buf, "%s\t%d,%%r%d,0x%08x", mnemonic, ((insn >> 11) & 0x1f),
+	util::stream_format(stream, "%s\t%d,%%r%d,0x%08x", mnemonic, ((insn >> 11) & 0x1f),
 		get_isrc2 (insn), (uint32_t)rel);
 }
 
 
 /* Branch with lbroff format:
  *   mnemonic lbroff  */
-static void int_L(char *buf, char *mnemonic, uint32_t pc, uint32_t insn)
+static void int_L(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t insn)
 {
 	int32_t lbroff =  sign_ext ((insn & 0x03ffffff), 26);
 	int32_t rel = (int32_t)pc + (lbroff << 2) + 4;
 
-	sprintf(buf, "%s\t0x%08x", mnemonic, (uint32_t)rel);
+	util::stream_format(stream, "%s\t0x%08x", mnemonic, (uint32_t)rel);
 }
 
 
 /* Integer load.
  *  ld.{b,s,l} isrc1(isrc2),idest
  *  ld.{b,s,l} #const(isrc2),idest  */
-static void int_ldx(char *buf, char *mnemonic, uint32_t pc, uint32_t insn)
+static void int_ldx(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t insn)
 {
 	/* Operand size, in bytes.  */
 	int sizes[4] = { 1, 1, 2, 4 };
@@ -255,17 +255,17 @@ static void int_ldx(char *buf, char *mnemonic, uint32_t pc, uint32_t insn)
 		int32_t immsrc1 = sign_ext (get_imm16 (insn), 16);
 		int size = sizes[idx];
 		immsrc1 &= ~(size - 1);
-		sprintf(buf, "%s%s\t%d(%%r%d),%%r%d", mnemonic, suffix[idx],
+		util::stream_format(stream, "%s%s\t%d(%%r%d),%%r%d", mnemonic, suffix[idx],
 			immsrc1, get_isrc2 (insn), get_idest (insn));
 	}
 	else
-		sprintf(buf, "%s%s\t%%r%d(%%r%d),%%r%d", mnemonic, suffix[idx],
+		util::stream_format(stream, "%s%s\t%%r%d(%%r%d),%%r%d", mnemonic, suffix[idx],
 			get_isrc1 (insn), get_isrc2 (insn), get_idest (insn));
 }
 
 
 /* Integer store: st.b isrc1ni,#const(isrc2)  */
-static void int_stx(char *buf, char *mnemonic, uint32_t pc, uint32_t insn)
+static void int_stx(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t insn)
 {
 	/* Operand size, in bytes.  */
 	int sizes[4] = { 1, 1, 2, 4 };
@@ -280,7 +280,7 @@ static void int_stx(char *buf, char *mnemonic, uint32_t pc, uint32_t insn)
 	/* Chop off lower bits of displacement.  */
 	size = sizes[idx];
 	immsrc &= ~(size - 1);
-	sprintf(buf, "%s%s\t%%r%d,%d(%%r%d)", mnemonic, suffix[idx],
+	util::stream_format(stream, "%s%s\t%%r%d,%d(%%r%d)", mnemonic, suffix[idx],
 		get_isrc1 (insn), immsrc, get_isrc2 (insn));
 }
 
@@ -291,7 +291,7 @@ static void int_stx(char *buf, char *mnemonic, uint32_t pc, uint32_t insn)
  *  "fst.y fdest,isrc1(isrc2)", "fst.y fdest,isrc1(isrc2)++",
  *  "fst.y fdest,#const(isrc2)" or "fst.y fdest,#const(isrc2)++"
  *  Where y = {l,d,q}.  Note, there is no pfld.q, though.  */
-static void int_fldst(char *buf, char *mnemonic, uint32_t pc, uint32_t insn)
+static void int_fldst(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t insn)
 {
 	int32_t immsrc1 = sign_ext (get_imm16 (insn), 16);
 	/* Operand size, in bytes.  */
@@ -314,14 +314,14 @@ static void int_fldst(char *buf, char *mnemonic, uint32_t pc, uint32_t insn)
 	/* There is no pipelined load quad on XR.  */
 	if (piped && size == 16)
 	{
-		sprintf (buf, ".long\t%#08x; *", insn);
+		util::stream_format(stream, ".long\t%#08x; *", insn);
 		return;
 	}
 
 	/* There is only a 64-bit pixel store.  */
 	if ((upper_6bits == 15) && size != 8)
 	{
-		sprintf (buf, ".long\t%#08x", insn);
+		util::stream_format(stream, ".long\t%#08x", insn);
 		return;
 	}
 
@@ -331,21 +331,21 @@ static void int_fldst(char *buf, char *mnemonic, uint32_t pc, uint32_t insn)
 		/* Chop off lower bits of displacement.  */
 		immsrc1 &= ~(size - 1);
 		if (is_load)
-			sprintf(buf, "%s%s%s\t%d(%%r%d)%s,%%f%d", piped_suff[piped], mnemonic,
+			util::stream_format(stream, "%s%s%s\t%d(%%r%d)%s,%%f%d", piped_suff[piped], mnemonic,
 				suffix[idx], immsrc1, get_isrc2 (insn), auto_suff[auto_inc],
 				get_fdest (insn));
 		else
-			sprintf(buf, "%s%s\t%%f%d,%d(%%r%d)%s", mnemonic, suffix[idx],
+			util::stream_format(stream, "%s%s\t%%f%d,%d(%%r%d)%s", mnemonic, suffix[idx],
 				get_fdest (insn), immsrc1, get_isrc2 (insn), auto_suff[auto_inc]);
 	}
 	else
 	{
 		if (is_load)
-			sprintf(buf, "%s%s%s\t%%r%d(%%r%d)%s,%%f%d", piped_suff[piped],
+			util::stream_format(stream, "%s%s%s\t%%r%d(%%r%d)%s,%%f%d", piped_suff[piped],
 				mnemonic, suffix[idx], get_isrc1 (insn), get_isrc2 (insn),
 				auto_suff[auto_inc], get_fdest (insn));
 		else
-			sprintf(buf, "%s%s\t%%f%d,%%r%d(%%r%d)%s", mnemonic, suffix[idx],
+			util::stream_format(stream, "%s%s\t%%f%d,%%r%d(%%r%d)%s", mnemonic, suffix[idx],
 				get_fdest (insn), get_isrc1 (insn), get_isrc2 (insn),
 				auto_suff[auto_inc]);
 	}
@@ -353,12 +353,12 @@ static void int_fldst(char *buf, char *mnemonic, uint32_t pc, uint32_t insn)
 
 
 /* flush #const(isrc2)[++].  */
-static void int_flush(char *buf, char *mnemonic, uint32_t pc, uint32_t insn)
+static void int_flush(std::ostream &stream, char *mnemonic, uint32_t pc, uint32_t insn)
 {
 	const char *const auto_suff[2] = { "", "++" };
 	int32_t immsrc = sign_ext (get_imm16 (insn), 16);
 	immsrc &= ~(16-1);
-	sprintf(buf, "%s\t%d(%%r%d)%s", mnemonic, immsrc, get_isrc2 (insn),
+	util::stream_format(stream, "%s\t%d(%%r%d)%s", mnemonic, immsrc, get_isrc2 (insn),
 		auto_suff[(insn & 1)]);
 }
 
@@ -375,7 +375,7 @@ struct decode_tbl_t
 {
 	/* Disassembly function for this opcode.
 	   Call with buffer, mnemonic, pc, insn.  */
-	void (*insn_dis)(char *, char *, uint32_t, uint32_t);
+	void (*insn_dis)(std::ostream &, char *, uint32_t, uint32_t);
 
 	/* Flags for this opcode.  */
 	char flags;
@@ -613,38 +613,33 @@ static const decode_tbl_t fp_decode_tbl[128] =
 
 
 /* Replaces tabs with spaces.  */
-static void i860_dasm_tab_replacer(char* buf, int tab_size)
+static void i860_dasm_tab_replacer(std::ostream &stream, const std::string &buf, int tab_size)
 {
-	int i = 0;
 	int tab_count = 0;
-	char tab_buf[1024];
-	memset(tab_buf, 0, 1024);
 
-	while (i != strlen(buf))
+	for (char ch : buf)
 	{
-		if (buf[i] != '\t')
+		if (ch != '\t')
 		{
-			tab_buf[tab_count] = buf[i];
+			stream << ch;
 			tab_count++;
 		}
 		else
 		{
 			while (tab_count % tab_size != 0)
 			{
-				strcat(tab_buf, " ");
+				stream << ' ';
 				tab_count++;
 			}
 		}
-		i++;
 	}
-
-	tab_buf[tab_count] = 0x00;
-	strcpy(buf, tab_buf);
 }
 
 
-CPU_DISASSEMBLE( i860 )
+static offs_t internal_disasm_i860(cpu_device *device, std::ostream &main_stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
 {
+	std::stringstream stream;
+
 	uint32_t insn = (oprom[0] << 0) |
 		(oprom[1] << 8)  |
 		(oprom[2] << 16) |
@@ -656,7 +651,7 @@ CPU_DISASSEMBLE( i860 )
 	if (flags & DEC_DECODED)
 	{
 		const char *s = decode_tbl[upper_6bits].mnemonic;
-		decode_tbl[upper_6bits].insn_dis (buffer, (char *)s, pc, insn);
+		decode_tbl[upper_6bits].insn_dis (stream, (char *)s, pc, insn);
 		unrecognized_op = 0;
 	}
 	else if (flags & DEC_MORE)
@@ -668,7 +663,7 @@ CPU_DISASSEMBLE( i860 )
 			const char *s = fp_decode_tbl[insn & 0x7f].mnemonic;
 			if (fp_flags & DEC_DECODED)
 			{
-				fp_decode_tbl[insn & 0x7f].insn_dis (buffer, (char *)s, pc, insn);
+				fp_decode_tbl[insn & 0x7f].insn_dis (stream, (char *)s, pc, insn);
 				unrecognized_op = 0;
 			}
 		}
@@ -679,19 +674,29 @@ CPU_DISASSEMBLE( i860 )
 			const char *s = core_esc_decode_tbl[insn & 0x3].mnemonic;
 			if (esc_flags & DEC_DECODED)
 			{
-				core_esc_decode_tbl[insn & 0x3].insn_dis (buffer, (char *)s, pc, insn);
+				core_esc_decode_tbl[insn & 0x3].insn_dis (stream, (char *)s, pc, insn);
 				unrecognized_op = 0;
 			}
 		}
 	}
 
 	if (unrecognized_op)
-		sprintf (buffer, ".long\t%#08x", insn);
+		util::stream_format(stream, ".long\t%#08x", insn);
 
 	/* Replace tabs with spaces */
-	i860_dasm_tab_replacer(buffer, 10);
+	i860_dasm_tab_replacer(main_stream, stream.str(), 10);
 
 	/* Return number of bytes disassembled.  */
 	/* MAME dasm flags haven't been added yet */
 	return (4);
+}
+
+
+CPU_DISASSEMBLE(i860)
+{
+	std::ostringstream stream;
+	offs_t result = internal_disasm_i860(device, stream, pc, oprom, opram, options);
+	std::string stream_str = stream.str();
+	strcpy(buffer, stream_str.c_str());
+	return result;
 }
