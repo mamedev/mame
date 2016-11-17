@@ -475,6 +475,9 @@ enum
 #define G_TO(op)            ((op & M_TO) >> (31 - 10))
 #define G_XO(op)            ((op & M_XO) >> (31 - 30))
 
+extern offs_t ppc_dasm_one(std::ostream &stream, uint32_t pc, uint32_t op);
+extern offs_t ppc_dasm_one(char *buffer, uint32_t pc, uint32_t op);
+
 
 
 #endif /* __PPCCOM_H__ */
