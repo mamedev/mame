@@ -241,7 +241,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
       * 0x0002 (World) uses TAITO_COINAGE_WORLD
   - Notice screen only if region = 0x0001
   - I can't tell if it's an ingame bug or an emulation bug,
-    but boss are far much harder when "Difficulty" Dip Swicth
+    but boss are far much harder when "Difficulty" Dip Switch
     is set to "Easy" : put a watch on 0xf00a76.w for level 1 boss
     and you'll notice that MSB is set to 0x01 instead of 0x00
   - 'supermanu' has no Notice screen or FBI logo & statement

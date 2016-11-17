@@ -23,7 +23,7 @@ TODO:
  - kiinstb  : fix gfx glitches, missing texts
  - ffight2b : remove hack for starting credits (RAM - mainly 0x7eadce where credits are stored - is filled with 0x55,
    so you are awarded 55 credits on a hard reset)
- - sblast2b : dipswicthes
+ - sblast2b : dipswitches
  - sblast2b : pressing start during gameplay changes the character used. Intentional?
  - denseib  :  fix gfx glitches, missing texts
 

@@ -116,7 +116,7 @@ Notes:
   multiple times to select the spin. The flyer also says that the game "includes
   the unique feature of 2 distinct styles of game play, selectable by dipswitch
   setting. For the avid golfer, a more challenging style of swing.".
-  This feature only exists when "Language" Dip Swicth is set to "English"
+  This feature only exists when "Language" Dip Switch is set to "English"
 
 - fitegolfu:  An "SNK Fighting Golf Program Update" notice published in a trade
   journal outlines 3 improvements which is supposed to allow game players a bit
