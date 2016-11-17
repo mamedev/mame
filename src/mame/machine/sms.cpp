@@ -963,7 +963,8 @@ void sms_state::setup_media_slots()
 		if (m_cartslot->get_type() == SEGA8_BASIC_L3 ||
 			m_cartslot->get_type() == SEGA8_MUSIC_EDITOR ||
 			m_cartslot->get_type() == SEGA8_DAHJEE_TYPEA ||
-			m_cartslot->get_type() == SEGA8_DAHJEE_TYPEB)
+			m_cartslot->get_type() == SEGA8_DAHJEE_TYPEB ||
+			m_cartslot->get_type() == SEGA8_SEOJIN)
 		{
 			m_mem_device_enabled |= ENABLE_EXT_RAM;
 		}

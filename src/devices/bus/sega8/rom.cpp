@@ -40,6 +40,7 @@ const device_type SEGA8_ROM_JANGGUN = &device_creator<sega8_janggun_device>;
 const device_type SEGA8_ROM_HICOM = &device_creator<sega8_hicom_device>;
 const device_type SEGA8_ROM_KOREAN = &device_creator<sega8_korean_device>;
 const device_type SEGA8_ROM_KOREAN_NB = &device_creator<sega8_korean_nb_device>;
+const device_type SEGA8_ROM_SEOJIN = &device_creator<sega8_seojin_device>;
 
 
 
@@ -166,6 +167,12 @@ sega8_korean_device::sega8_korean_device(const machine_config &mconfig, const ch
 
 sega8_korean_nb_device::sega8_korean_nb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 					: sega8_rom_device(mconfig, SEGA8_ROM_KOREAN_NB, "SMS Korean No-Bank Mapper Carts", tag, owner, clock, "sega8_korean_nb", __FILE__)
+{
+}
+
+
+sega8_seojin_device::sega8_seojin_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+					: sega8_rom_device(mconfig, SEGA8_ROM_SEOJIN, "SMS Seo Jin Multi-cart", tag, owner, clock, "sega8_seojin", __FILE__)
 {
 }
 
@@ -938,3 +945,76 @@ WRITE8_MEMBER(sega8_korean_device::write_cart)
 	if (offset == 0xa000)
 		m_rom_bank_base[2] = data % m_rom_page_count;
 }
+
+/*-------------------------------------------------
+
+ Seo Jin Multi-Carts
+ have regular style bank switching with an overall
+ 'game select' register at 0xfff0
+
+ -------------------------------------------------*/
+
+
+void sega8_seojin_device::device_start()
+{
+	sega8_rom_device::device_start();
+	save_item(NAME(m_gamesel));
+	m_readxor = 0x80;
+}
+
+void sega8_seojin_device::device_reset()
+{
+	sega8_rom_device::device_reset();
+	m_gamesel = 0;
+	late_bank_setup();
+}
+
+
+READ8_MEMBER(sega8_seojin_device::read_cart)
+{
+	int bank = offset / 0x4000;
+
+	if (offset < 0x400) // first 1k is hardcoded
+		return m_rom[((m_gamesel&0xf)*0x8000)+offset]^m_readxor;
+
+	int bank_to_use = (((m_gamesel&0xf) << 1) | m_rom_bank_base[bank]) % m_rom_page_count;
+
+	return m_rom[bank_to_use * 0x4000 + (offset & 0x3fff)]^m_readxor;
+}
+
+WRITE8_MEMBER(sega8_seojin_device::write_cart)
+{
+}
+
+WRITE8_MEMBER(sega8_seojin_device::write_mapper)
+{
+	switch (offset)
+	{
+		case 0:
+			break;
+
+		case 1: // Select 16k ROM bank for 0000-3fff
+		case 2: // Select 16k ROM bank for 4000-7fff
+		case 3: // Select 16k ROM bank for 8000-bfff
+			m_rom_bank_base[offset - 1] = data;
+			break;
+	}
+}
+
+// it might not have RAM inside, but the only way to get 0xfff0 to fall through to the cart with the current hook-up
+// is by saying there is.
+WRITE8_MEMBER(sega8_seojin_device::write_ram)
+{
+	m_ram[offset & 0x3fff] = data;
+
+	if (offset == 0x3ff0)
+	{
+		m_gamesel = data;
+	}
+}
+
+READ8_MEMBER(sega8_seojin_device::read_ram)
+{
+	return m_ram[offset & 0x3fff];
+}
+
