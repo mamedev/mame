@@ -44,6 +44,7 @@ typedef uint32_t DWORD;
 
 #include "v25.h"
 #include "v25priv.h"
+#include "nec_common.h"
 
 const device_type V25 = &device_creator<v25_device>;
 const device_type V35 = &device_creator<v35_device>;
@@ -413,8 +414,6 @@ void v25_common_device::execute_set_input(int irqline, int state)
 
 offs_t v25_common_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
-	extern int necv_dasm_one(char *buffer, uint32_t eip, const uint8_t *oprom, const uint8_t *decryption_table);
-
 	return necv_dasm_one(buffer, pc, oprom, m_v25v35_decryptiontable);
 }
 
