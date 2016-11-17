@@ -217,7 +217,7 @@ private:
 	Platform::Agile<CoreWindow> m_coreWindow;
 
 internal:
-	UwpKeyboardDevice(CoreWindow ^coreWindow, running_machine& machine, char *name, const char *id, input_module &module)
+	UwpKeyboardDevice(Platform::Agile<CoreWindow> coreWindow, running_machine& machine, char *name, const char *id, input_module &module)
 		: UwpInputDevice(machine, name, id, DEVICE_CLASS_KEYBOARD, module),
 		keyboard({{0}}),
 		m_coreWindow(coreWindow)
@@ -292,16 +292,14 @@ internal:
 	void input_init(running_machine &machine) override
 	{
 		auto first_window = std::static_pointer_cast<uwp_window_info>(osd_common_t::s_window_list.front());
-		CoreWindow ^coreWindow = first_window->uwp_window();
-
-		uwp_input_device *devinfo;
+		auto coreWindow = first_window->platform_window();
 
 		// allocate the UWP implementation of the device object
 		UwpKeyboardDevice ^refdevice = ref new UwpKeyboardDevice(coreWindow, machine, "UWP Keyboard 1", "UWP Keyboard 1", *this->NativeModule);
 
 		// Allocate the wrapper and add it to the list
 		auto created_devinfo = std::make_unique<uwp_input_device>(refdevice);
-		devinfo = NativeModule->devicelist()->add_device<uwp_input_device>(machine, std::move(created_devinfo));
+		uwp_input_device *devinfo = NativeModule->devicelist()->add_device<uwp_input_device>(machine, std::move(created_devinfo));
 
 		// Give the UWP implementation a handle to the input_device
 		refdevice->InputDevice = devinfo->device();

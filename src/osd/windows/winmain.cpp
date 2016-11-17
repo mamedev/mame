@@ -80,7 +80,7 @@ public:
 				winwindow_toggle_full_screen();
 
 			vsnprintf(buffer, ARRAY_LENGTH(buffer), msg, args);
-			win_message_box_utf8(!osd_common_t::s_window_list.empty() ? osd_common_t::s_window_list.front()->platform_window<HWND>() : nullptr, buffer, emulator_info::get_appname(), MB_OK);
+			win_message_box_utf8(!osd_common_t::s_window_list.empty() ? std::static_pointer_cast<win_window_info>(osd_common_t::s_window_list.front())->platform_window() : nullptr, buffer, emulator_info::get_appname(), MB_OK);
 		}
 		else
 			chain_output(channel, msg, args);
@@ -410,7 +410,7 @@ void MameMainApp::Run()
 	// To satisfy the latter things, pass in the module path name
 	char exe_path[MAX_PATH];
 	GetModuleFileNameA(nullptr, exe_path, MAX_PATH);
-	char* args[2] = { exe_path, (char*)"-verbose" };
+	char* args[3] = { exe_path, (char*)"-verbose", (char*)"-mouse" };
 
 	DWORD result = emulator_info::start_frontend(*m_options.get(), *m_osd.get(), ARRAY_LENGTH(args), args);
 	osd_output::pop(&winerror);
