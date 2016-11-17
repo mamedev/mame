@@ -3873,7 +3873,7 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) )
 ROM_END
 
-ROM_START( pepp0188b ) /* Normal board : Standard Draw Poker (PP0188) - 11/04/99   @ IGT  L97-0126 - Tournament Mode capable - PSR Verified */
+ROM_START( pepp0188b ) /* Normal board : Standard Draw Poker (PP0188) - 11/04/96   @ IGT  L97-0126 - Tournament Mode capable - PSR Verified */
 /*
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 ----------------------------------------------------------
@@ -6985,7 +6985,7 @@ Player's Choice & Montana Choice games:
 
 Machines can come in a variety of configurations:
     Coin Hopper or Dot Matrix Printer
-    Button contorl, Touchscreen or both
+    Button control, Touchscreen or both
     Real Time Clock (RTC) functions via Dallas (Maxim) DS1216 SmartWatch RAM
 
 Configurations & specific CG character roms sets based on build version and game type.
