@@ -209,8 +209,8 @@ xml_data_node::xml_data_node(xml_data_node *parent, const char *name, const char
 	: line(0)
 	, m_next(nullptr)
 	, m_first_child(nullptr)
-	, m_name(name)
-	, m_value(value)
+	, m_name(name ? name : "")
+	, m_value(value ? value : "")
 	, m_parent(parent)
 	, m_attributes()
 {
@@ -237,7 +237,7 @@ xml_data_node::~xml_data_node()
 
 void xml_data_node::set_value(char const *value)
 {
-	m_value.assign(value);
+	m_value.assign(value ? value : "");
 }
 
 
