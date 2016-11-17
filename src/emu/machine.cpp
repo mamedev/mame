@@ -345,10 +345,7 @@ int running_machine::run(bool quiet)
 
 			// execute CPUs if not paused
 			if (!m_paused)
-			{
 				m_scheduler.timeslice();
-				emulator_info::periodic_check();
-			}
 			// otherwise, just pump video updates through
 			else
 				m_video->frame_update();
