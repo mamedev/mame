@@ -113,7 +113,7 @@ public:
 			return nullptr;
 
 #if defined(OSD_WINDOWS)
-		auto nearest = monitor_from_handle(reinterpret_cast<std::uintptr_t>(MonitorFromWindow(window.platform_window<HWND>(), MONITOR_DEFAULTTONEAREST)));
+		auto nearest = monitor_from_handle(reinterpret_cast<std::uintptr_t>(MonitorFromWindow(static_cast<const win_window_info &>(window).platform_window(), MONITOR_DEFAULTTONEAREST)));
 		assert(nearest != nullptr);
 		return nearest;
 #elif defined(OSD_UWP)

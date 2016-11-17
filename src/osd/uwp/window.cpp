@@ -247,7 +247,7 @@ uwp_window_info::uwp_window_info(
 	running_machine &machine,
 	int index,
 	std::shared_ptr<osd_monitor_info> monitor,
-	const osd_window_config *config) : osd_window(*config),
+	const osd_window_config *config) : osd_window_t(*config),
 		m_next(nullptr),
 		m_init_state(0),
 		m_startmaximized(0),
@@ -279,24 +279,24 @@ CoreCursor^ uwp_window_info::s_cursor = nullptr;
 
 void uwp_window_info::capture_pointer()
 {
-	uwp_window()->SetPointerCapture();
+	platform_window()->SetPointerCapture();
 }
 
 void uwp_window_info::release_pointer()
 {
-	uwp_window()->ReleasePointerCapture();
+	platform_window()->ReleasePointerCapture();
 }
 
 void uwp_window_info::hide_pointer()
 {
-	auto window = uwp_window();
+	auto window = platform_window();
 	uwp_window_info::s_cursor = window->PointerCursor;
 	window->PointerCursor = nullptr;
 }
 
 void uwp_window_info::show_pointer()
 {
-	auto window = uwp_window();
+	auto window = platform_window();
 	window->PointerCursor = uwp_window_info::s_cursor;
 }
 
@@ -501,7 +501,7 @@ void uwp_window_info::update()
 	}
 
 	// if we're visible and running and not in the middle of a resize, draw
-	if (platform_window<HWND>() != nullptr && m_target != nullptr && has_renderer())
+	if (platform_window() != nullptr && m_target != nullptr && has_renderer())
 	{
 		bool got_lock = true;
 		auto clock = std::chrono::high_resolution_clock();
@@ -545,7 +545,7 @@ void uwp_window_info::draw_video_contents(int update)
 	std::lock_guard<std::mutex> lock(m_render_lock);
 
 	// if we're iconic, don't bother
-	if (platform_window<HWND>() != nullptr)
+	if (platform_window() != nullptr)
 	{
 		// if no bitmap, just fill
 		if (m_primlist == nullptr)
@@ -687,9 +687,8 @@ int uwp_window_info::complete_create()
 	// get the monitor bounds
 	osd_rect monitorbounds = m_monitor->position_size();
 
-	IInspectable* raw_window = reinterpret_cast<IInspectable*>(Windows::UI::Core::CoreWindow::GetForCurrentThread());
-	raw_window->AddRef(); // TODO: Should probably figure out a way to auto-release
-	set_platform_window(raw_window);
+	auto coreWindow = Platform::Agile<CoreWindow>(CoreWindow::GetForCurrentThread());
+	set_platform_window(coreWindow);
 
 	// skip the positioning stuff for -video none */
 	if (video_config.mode == VIDEO_MODE_NONE)

@@ -78,7 +78,6 @@ public:
 		m_win_config(config),
 		m_index(0),
 		m_prescale(1),
-		m_platform_window(nullptr),
 		m_renderer(nullptr),
 		m_main(nullptr)
 		{}
@@ -114,15 +113,6 @@ public:
 
 	virtual osd_monitor_info *monitor() const = 0;
 
-	template <class TWindow>
-	TWindow platform_window() const { return static_cast<TWindow>(m_platform_window); }
-
-	void set_platform_window(void *window)
-	{
-		assert(window == nullptr || m_platform_window == nullptr);
-		m_platform_window = window;
-	}
-
 	std::shared_ptr<osd_window> main_window() const { return m_main;    }
 	void set_main_window(std::shared_ptr<osd_window> main) { m_main = main; }
 
@@ -152,10 +142,31 @@ public:
 protected:
 	int                     m_prescale;
 private:
-	void                           *m_platform_window;
 	std::unique_ptr<osd_renderer>  m_renderer;
 	std::shared_ptr<osd_window>    m_main;
 };
+
+template <class TWindowHandle>
+class osd_window_t : public osd_window
+{
+private:
+	TWindowHandle m_platform_window;
+public:
+	osd_window_t(const osd_window_config &config)
+		: osd_window(config),
+		m_platform_window(nullptr)
+	{
+	}
+
+	TWindowHandle platform_window() const { return m_platform_window; }
+
+	void set_platform_window(TWindowHandle window)
+	{
+		assert(window == nullptr || m_platform_window == nullptr);
+		m_platform_window = window;
+	}
+};
+
 
 class osd_renderer
 {

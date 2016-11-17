@@ -15,6 +15,7 @@
 #include <windowsx.h>
 #include <mmsystem.h>
 #include <inspectable.h>
+#include <agile.h>
 #undef min
 #undef max
 
@@ -46,7 +47,7 @@
 //  TYPE DEFINITIONS
 //============================================================
 
-class uwp_window_info  : public osd_window
+class uwp_window_info  : public osd_window_t<Platform::Agile<Windows::UI::Core::CoreWindow>>
 {
 public:
 	uwp_window_info(running_machine &machine, int index, std::shared_ptr<osd_monitor_info> monitor, const osd_window_config *config);
@@ -60,7 +61,7 @@ public:
 
 	virtual osd_dim get_size() override
 	{
-		auto bounds = uwp_window()->Bounds;
+		auto bounds = platform_window()->Bounds;
 		return osd_dim(bounds.Width, bounds.Height);
 	}
 
@@ -74,12 +75,6 @@ public:
 	void show_pointer() override;
 	void hide_pointer() override;
 
-	Windows::UI::Core::CoreWindow^ uwp_window()
-	{
-		auto inspectable = platform_window<IInspectable*>();
-		return reinterpret_cast<Windows::UI::Core::CoreWindow^>(inspectable);
-	}
-
 	virtual osd_monitor_info *monitor() const override { return m_monitor.get(); }
 
 	void destroy() override;
@@ -87,10 +82,6 @@ public:
 	// static
 
 	static void create(running_machine &machine, int index, std::shared_ptr<osd_monitor_info> monitor, const osd_window_config *config);
-
-	// static callbacks
-
-	static LRESULT CALLBACK video_window_proc(HWND wnd, UINT message, WPARAM wparam, LPARAM lparam);
 
 	// member variables
 

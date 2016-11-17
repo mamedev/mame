@@ -157,7 +157,7 @@ public:
 			mouse.lY = (cursor_info.ptScreenPos.y - win32_mouse.last_point.y) * INPUT_RELATIVE_PER_PIXEL;
 
 			RECT window_pos = {0};
-			GetWindowRect(osd_common_t::s_window_list.front()->platform_window<HWND>(), &window_pos);
+			GetWindowRect(std::static_pointer_cast<win_window_info>(osd_common_t::s_window_list.front())->platform_window(), &window_pos);
 
 			// We reset the cursor position to the middle of the window each frame
 			win32_mouse.last_point.x = window_pos.left + (window_pos.right - window_pos.left) / 2;
@@ -291,8 +291,9 @@ public:
 			RECT client_rect;
 
 			// get the position relative to the window
-			GetClientRect(osd_common_t::s_window_list.front()->platform_window<HWND>(), &client_rect);
-			ScreenToClient(osd_common_t::s_window_list.front()->platform_window<HWND>(), &mousepos);
+			HWND hwnd = std::static_pointer_cast<win_window_info>(osd_common_t::s_window_list.front())->platform_window();
+			GetClientRect(hwnd, &client_rect);
+			ScreenToClient(hwnd, &mousepos);
 
 			// convert to absolute coordinates
 			xpos = normalize_absolute_axis(mousepos.x, client_rect.left, client_rect.right);
@@ -352,10 +353,11 @@ private:
 			POINT mousepos;
 
 			// get the position relative to the window
-			GetClientRect(osd_common_t::s_window_list.front()->platform_window<HWND>(), &client_rect);
+			HWND hwnd = std::static_pointer_cast<win_window_info>(osd_common_t::s_window_list.front())->platform_window();
+			GetClientRect(hwnd, &client_rect);
 			mousepos.x = args.xpos;
 			mousepos.y = args.ypos;
-			ScreenToClient(osd_common_t::s_window_list.front()->platform_window<HWND>(), &mousepos);
+			ScreenToClient(hwnd, &mousepos);
 
 			// convert to absolute coordinates
 			mouse.lX = normalize_absolute_axis(mousepos.x, client_rect.left, client_rect.right);
