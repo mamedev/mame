@@ -122,15 +122,15 @@ void BreakpointsWindowQtConfig::applyToQWidget(QWidget* widget)
 }
 
 
-void BreakpointsWindowQtConfig::addToXmlDataNode(xml_data_node* node) const
+void BreakpointsWindowQtConfig::addToXmlDataNode(xml_data_node &node) const
 {
 	WindowQtConfig::addToXmlDataNode(node);
-	xml_set_attribute_int(node, "bwtype", m_bwType);
+	node.set_attribute_int("bwtype", m_bwType);
 }
 
 
-void BreakpointsWindowQtConfig::recoverFromXmlNode(xml_data_node* node)
+void BreakpointsWindowQtConfig::recoverFromXmlNode(xml_data_node const &node)
 {
 	WindowQtConfig::recoverFromXmlNode(node);
-	m_bwType = xml_get_attribute_int(node, "bwtype", m_bwType);
+	m_bwType = node.get_attribute_int("bwtype", m_bwType);
 }

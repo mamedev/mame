@@ -92,10 +92,10 @@ static void xml_configuration_load(running_machine &machine, config_type cfg_typ
 	xmlConfigurations.clear();
 
 	// Configuration load
-	xml_data_node* wnode = nullptr;
-	for (wnode = xml_get_sibling(parentnode->child, "window"); wnode != nullptr; wnode = xml_get_sibling(wnode->next, "window"))
+	xml_data_node const * wnode = nullptr;
+	for (wnode = parentnode->get_child("window"); wnode != nullptr; wnode = wnode->get_next_sibling("window"))
 	{
-		WindowQtConfig::WindowType type = (WindowQtConfig::WindowType)xml_get_attribute_int(wnode, "type", WindowQtConfig::WIN_TYPE_UNKNOWN);
+		WindowQtConfig::WindowType type = (WindowQtConfig::WindowType)wnode->get_attribute_int("type", WindowQtConfig::WIN_TYPE_UNKNOWN);
 		switch (type)
 		{
 			case WindowQtConfig::WIN_TYPE_MAIN:               xmlConfigurations.push_back(new MainWindowQtConfig()); break;
@@ -107,7 +107,7 @@ static void xml_configuration_load(running_machine &machine, config_type cfg_typ
 			case WindowQtConfig::WIN_TYPE_DEVICE_INFORMATION: xmlConfigurations.push_back(new DeviceInformationWindowQtConfig()); break;
 			default: continue;
 		}
-		xmlConfigurations.back()->recoverFromXmlNode(wnode);
+		xmlConfigurations.back()->recoverFromXmlNode(*wnode);
 	}
 }
 
@@ -123,13 +123,12 @@ static void xml_configuration_save(running_machine &machine, config_type cfg_typ
 		WindowQtConfig* config = xmlConfigurations[i];
 
 		// Create an xml node
-		xml_data_node *debugger_node;
-		debugger_node = xml_add_child(parentnode, "window", nullptr);
+		xml_data_node *const debugger_node = parentnode->add_child("window", nullptr);
 		if (debugger_node == nullptr)
 			continue;
 
 		// Insert the appropriate information
-		config->addToXmlDataNode(debugger_node);
+		config->addToXmlDataNode(*debugger_node);
 	}
 }
 

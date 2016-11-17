@@ -526,20 +526,20 @@ void MainWindowQtConfig::applyToQWidget(QWidget* widget)
 }
 
 
-void MainWindowQtConfig::addToXmlDataNode(xml_data_node* node) const
+void MainWindowQtConfig::addToXmlDataNode(xml_data_node &node) const
 {
 	WindowQtConfig::addToXmlDataNode(node);
-	xml_set_attribute_int(node, "rightbar", m_rightBar);
-	xml_set_attribute(node, "qtwindowstate", m_windowState.toPercentEncoding().data());
+	node.set_attribute_int("rightbar", m_rightBar);
+	node.set_attribute("qtwindowstate", m_windowState.toPercentEncoding().data());
 }
 
 
-void MainWindowQtConfig::recoverFromXmlNode(xml_data_node* node)
+void MainWindowQtConfig::recoverFromXmlNode(xml_data_node const &node)
 {
 	WindowQtConfig::recoverFromXmlNode(node);
-	const char* state = xml_get_attribute_string(node, "qtwindowstate", "");
+	const char* state = node.get_attribute_string("qtwindowstate", "");
 	m_windowState = QByteArray::fromPercentEncoding(state);
-	m_rightBar = xml_get_attribute_int(node, "rightbar", m_rightBar);
+	m_rightBar = node.get_attribute_int("rightbar", m_rightBar);
 }
 
 DasmDockWidget::~DasmDockWidget()
