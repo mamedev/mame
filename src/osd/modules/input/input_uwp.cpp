@@ -215,6 +215,7 @@ private ref class UwpKeyboardDevice : public UwpInputDevice
 private:
 	keyboard_state keyboard;
 	Platform::Agile<CoreWindow> m_coreWindow;
+	std::mutex m_state_lock;
 
 internal:
 	UwpKeyboardDevice(Platform::Agile<CoreWindow> coreWindow, running_machine& machine, char *name, const char *id, input_module &module)
@@ -229,6 +230,7 @@ internal:
 
 	void Reset() override
 	{
+		std::lock_guard<std::mutex> scope_lock(m_state_lock);
 		memset(&keyboard, 0, sizeof(keyboard));
 	}
 
@@ -236,8 +238,8 @@ internal:
 	{
 		keyboard_trans_table &table = keyboard_trans_table::instance();
 
-		// populate it
-		for (int keynum = 0; keynum < MAX_KEYS; keynum++)
+		// populate it indexed by the scancode
+		for (int keynum = KEY_UNKNOWN + 1; keynum < MAX_KEYS; keynum++)
 		{
 			input_item_id itemid = table.map_di_scancode_to_itemid(keynum);
 			const char *keyname = table.ui_label_for_mame_key(itemid);
@@ -256,6 +258,7 @@ internal:
 
 	void OnKeyDown(CoreWindow^ win, KeyEventArgs^ args)
 	{
+		std::lock_guard<std::mutex> scope_lock(m_state_lock);
 		CorePhysicalKeyStatus status = args->KeyStatus;
 		int discancode = (status.ScanCode & 0x7f) | (status.IsExtendedKey ? 0x80 : 0x00);
 		keyboard.state[discancode] = 0x80;
@@ -263,6 +266,7 @@ internal:
 
 	void OnKeyUp(CoreWindow^ win, KeyEventArgs^ args)
 	{
+		std::lock_guard<std::mutex> scope_lock(m_state_lock);
 		CorePhysicalKeyStatus status = args->KeyStatus;
 		int discancode = (status.ScanCode & 0x7f) | (status.IsExtendedKey ? 0x80 : 0x00);
 		keyboard.state[discancode] = 0;
