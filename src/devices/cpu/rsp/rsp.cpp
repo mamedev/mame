@@ -32,8 +32,6 @@ const device_type RSP = &device_creator<rsp_device>;
 							(uint32_t)( ( ACCUM(x) >> 32 ) & 0x00000000ffffffff ),    \
 							(uint32_t)(   ACCUM(x)         & 0x00000000ffffffff ))
 
-extern offs_t rsp_dasm_one(char *buffer, offs_t pc, uint32_t op);
-
 
 #define SIMM16      ((int32_t)(int16_t)(op))
 #define UIMM16      ((uint16_t)(op))

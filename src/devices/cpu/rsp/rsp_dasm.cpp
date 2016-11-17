@@ -74,32 +74,21 @@ static inline char *signed_imm16(uint32_t op)
 }
 
 
-static char *output;
-
-static void ATTR_PRINTF(1,2) print(const char *fmt, ...)
-{
-	va_list vl;
-
-	va_start(vl, fmt);
-	output += vsprintf(output, fmt, vl);
-	va_end(vl);
-}
-
-static void disasm_cop0(uint32_t op)
+static void disasm_cop0(std::ostream &stream, uint32_t op)
 {
 	int rt = (op >> 16) & 31;
 	int rd = (op >> 11) & 31;
 
 	switch ((op >> 21) & 0x1f)
 	{
-		case 0x00:  print("mfc0   %s, %s", reg[rt], cop0_regs[rd]); break;
-		case 0x04:  print("mtc0   %s, %s", reg[rt], cop0_regs[rd]); break;
+		case 0x00:  util::stream_format(stream, "mfc0   %s, %s", reg[rt], cop0_regs[rd]); break;
+		case 0x04:  util::stream_format(stream, "mtc0   %s, %s", reg[rt], cop0_regs[rd]); break;
 
-		default:    print("??? (COP0)"); break;
+		default:    util::stream_format(stream, "??? (COP0)"); break;
 	}
 }
 
-static void disasm_cop2(uint32_t op)
+static void disasm_cop2(std::ostream &stream, uint32_t op)
 {
 	int rt = (op >> 16) & 31;
 	int rd = (op >> 11) & 31;
@@ -110,83 +99,83 @@ static void disasm_cop2(uint32_t op)
 
 	switch ((op >> 21) & 0x1f)
 	{
-		case 0x00:  print("mfc2   %s, %s[%d]", reg[rt], vreg[rd], dest); break;
-		case 0x02:  print("cfc2   %s, FLAG%d", reg[rt], rd); break;
-		case 0x04:  print("mtc2   %s, %s[%d]", reg[rt], vreg[rd], dest); break;
-		case 0x06:  print("ctc2   %s, FLAG%d", reg[rt], rd); break;
+		case 0x00:  util::stream_format(stream, "mfc2   %s, %s[%d]", reg[rt], vreg[rd], dest); break;
+		case 0x02:  util::stream_format(stream, "cfc2   %s, FLAG%d", reg[rt], rd); break;
+		case 0x04:  util::stream_format(stream, "mtc2   %s, %s[%d]", reg[rt], vreg[rd], dest); break;
+		case 0x06:  util::stream_format(stream, "ctc2   %s, FLAG%d", reg[rt], rd); break;
 
 		case 0x10: case 0x11: case 0x12: case 0x13: case 0x14: case 0x15: case 0x16: case 0x17:
 		case 0x18: case 0x19: case 0x1a: case 0x1b: case 0x1c: case 0x1d: case 0x1e: case 0x1f:
 		{
 			switch (op & 0x3f)
 			{
-				case 0x00:  print("vmulf  %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
-				case 0x01:  print("vmulu  %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
-				case 0x02:  print("vrndp  %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
-				case 0x03:  print("vmulq  %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
-				case 0x04:  print("vmudl  %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
-				case 0x05:  print("vmudm  %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
-				case 0x06:  print("vmudn  %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
-				case 0x07:  print("vmudh  %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
-				case 0x08:  print("vmacf  %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
-				case 0x09:  print("vmacu  %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
-				case 0x0a:  print("vrndn  %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
-				case 0x0b:  print("vmacq  %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
-				case 0x0c:  print("vmadl  %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
-				case 0x0d:  print("vmadm  %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
-				case 0x0e:  print("vmadn  %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
-				case 0x0f:  print("vmadh  %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
-				case 0x10:  print("vadd   %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
-				case 0x11:  print("vsub   %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
-				case 0x12:  print("vsut???"); break;
-				case 0x13:  print("vabs   %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
-				case 0x14:  print("vaddc  %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
-				case 0x15:  print("vsubc  %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
+				case 0x00:  util::stream_format(stream, "vmulf  %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
+				case 0x01:  util::stream_format(stream, "vmulu  %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
+				case 0x02:  util::stream_format(stream, "vrndp  %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
+				case 0x03:  util::stream_format(stream, "vmulq  %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
+				case 0x04:  util::stream_format(stream, "vmudl  %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
+				case 0x05:  util::stream_format(stream, "vmudm  %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
+				case 0x06:  util::stream_format(stream, "vmudn  %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
+				case 0x07:  util::stream_format(stream, "vmudh  %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
+				case 0x08:  util::stream_format(stream, "vmacf  %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
+				case 0x09:  util::stream_format(stream, "vmacu  %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
+				case 0x0a:  util::stream_format(stream, "vrndn  %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
+				case 0x0b:  util::stream_format(stream, "vmacq  %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
+				case 0x0c:  util::stream_format(stream, "vmadl  %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
+				case 0x0d:  util::stream_format(stream, "vmadm  %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
+				case 0x0e:  util::stream_format(stream, "vmadn  %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
+				case 0x0f:  util::stream_format(stream, "vmadh  %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
+				case 0x10:  util::stream_format(stream, "vadd   %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
+				case 0x11:  util::stream_format(stream, "vsub   %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
+				case 0x12:  util::stream_format(stream, "vsut???"); break;
+				case 0x13:  util::stream_format(stream, "vabs   %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
+				case 0x14:  util::stream_format(stream, "vaddc  %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
+				case 0x15:  util::stream_format(stream, "vsubc  %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
 
 				case 0x1d:
 				{
 					switch (el)
 					{
-						case 8:     print("vsaw   %s, ACCUM_H", vreg[dest]); break;
-						case 9:     print("vsaw   %s, ACCUM_M", vreg[dest]); break;
-						case 10:    print("vsaw   %s, ACCUM_L", vreg[dest]); break;
-						default:    print("vsaw   %s, ???", vreg[dest]); break;
+						case 8:     util::stream_format(stream, "vsaw   %s, ACCUM_H", vreg[dest]); break;
+						case 9:     util::stream_format(stream, "vsaw   %s, ACCUM_M", vreg[dest]); break;
+						case 10:    util::stream_format(stream, "vsaw   %s, ACCUM_L", vreg[dest]); break;
+						default:    util::stream_format(stream, "vsaw   %s, ???", vreg[dest]); break;
 					}
 					break;
 				}
 
-				case 0x20:  print("vlt    %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
-				case 0x21:  print("veq    %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
-				case 0x22:  print("vne    %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
-				case 0x23:  print("vge    %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
-				case 0x24:  print("vcl    %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
-				case 0x25:  print("vch    %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
-				case 0x26:  print("vcr    %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
-				case 0x27:  print("vmrg   %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
-				case 0x28:  print("vand   %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
-				case 0x29:  print("vnand  %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
-				case 0x2a:  print("vor    %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
-				case 0x2b:  print("vnor   %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
-				case 0x2c:  print("vxor   %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
-				case 0x2d:  print("vnxor  %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
-				case 0x30:  print("vrcp   %s[%d], %s[%c]", vreg[dest], s1 & 7, vreg[s2], element2[el][7-(s1 & 7)]); break;
-				case 0x31:  print("vrcpl  %s[%d], %s[%c]", vreg[dest], s1 & 7, vreg[s2], element2[el][7-(s1 & 7)]); break;
-				case 0x32:  print("vrcph  %s[%d], %s[%c]", vreg[dest], s1 & 7, vreg[s2], element2[el][7-(s1 & 7)]); break;
-				case 0x33:  print("vmov   %s[%d], %s[%c]", vreg[dest], s1 & 7, vreg[s2], element2[el][7-(s1 & 7)]); break;
-				case 0x34:  print("vrsq   %s[%d], %s[%c]", vreg[dest], s1 & 7, vreg[s2], element2[el][7-(s1 & 7)]); break;
-				case 0x35:  print("vrsql  %s[%d], %s[%c]", vreg[dest], s1 & 7, vreg[s2], element2[el][7-(s1 & 7)]); break;
-				case 0x36:  print("vrsqh  %s[%d], %s[%c]", vreg[dest], s1 & 7, vreg[s2], element2[el][7-(s1 & 7)]); break;
-				case 0x37:  print("vnop"); break;
-				default:    print("??? (VECTOR OP)"); break;
+				case 0x20:  util::stream_format(stream, "vlt    %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
+				case 0x21:  util::stream_format(stream, "veq    %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
+				case 0x22:  util::stream_format(stream, "vne    %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
+				case 0x23:  util::stream_format(stream, "vge    %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
+				case 0x24:  util::stream_format(stream, "vcl    %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
+				case 0x25:  util::stream_format(stream, "vch    %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
+				case 0x26:  util::stream_format(stream, "vcr    %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
+				case 0x27:  util::stream_format(stream, "vmrg   %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
+				case 0x28:  util::stream_format(stream, "vand   %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
+				case 0x29:  util::stream_format(stream, "vnand  %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
+				case 0x2a:  util::stream_format(stream, "vor    %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
+				case 0x2b:  util::stream_format(stream, "vnor   %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
+				case 0x2c:  util::stream_format(stream, "vxor   %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
+				case 0x2d:  util::stream_format(stream, "vnxor  %s, %s, %s%s", vreg[dest], vreg[s1], vreg[s2], element[el]); break;
+				case 0x30:  util::stream_format(stream, "vrcp   %s[%d], %s[%c]", vreg[dest], s1 & 7, vreg[s2], element2[el][7-(s1 & 7)]); break;
+				case 0x31:  util::stream_format(stream, "vrcpl  %s[%d], %s[%c]", vreg[dest], s1 & 7, vreg[s2], element2[el][7-(s1 & 7)]); break;
+				case 0x32:  util::stream_format(stream, "vrcph  %s[%d], %s[%c]", vreg[dest], s1 & 7, vreg[s2], element2[el][7-(s1 & 7)]); break;
+				case 0x33:  util::stream_format(stream, "vmov   %s[%d], %s[%c]", vreg[dest], s1 & 7, vreg[s2], element2[el][7-(s1 & 7)]); break;
+				case 0x34:  util::stream_format(stream, "vrsq   %s[%d], %s[%c]", vreg[dest], s1 & 7, vreg[s2], element2[el][7-(s1 & 7)]); break;
+				case 0x35:  util::stream_format(stream, "vrsql  %s[%d], %s[%c]", vreg[dest], s1 & 7, vreg[s2], element2[el][7-(s1 & 7)]); break;
+				case 0x36:  util::stream_format(stream, "vrsqh  %s[%d], %s[%c]", vreg[dest], s1 & 7, vreg[s2], element2[el][7-(s1 & 7)]); break;
+				case 0x37:  util::stream_format(stream, "vnop"); break;
+				default:    util::stream_format(stream, "??? (VECTOR OP)"); break;
 			}
 			break;
 		}
 
-		default:    print("??? (COP2)"); break;
+		default:    util::stream_format(stream, "??? (COP2)"); break;
 	}
 }
 
-static void disasm_lwc2(uint32_t op)
+static void disasm_lwc2(std::ostream &stream, uint32_t op)
 {
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
@@ -197,23 +186,23 @@ static void disasm_lwc2(uint32_t op)
 
 	switch ((op >> 11) & 0x1f)
 	{
-		case 0x00:  print("lbv    %s[%d], %s(%s)", vreg[dest], del, signed_imm16(offset * 1), reg[base]); break;
-		case 0x01:  print("lsv    %s[%d], %s(%s)", vreg[dest], del, signed_imm16(offset * 2), reg[base]); break;
-		case 0x02:  print("llv    %s[%d], %s(%s)", vreg[dest], del, signed_imm16(offset * 4), reg[base]); break;
-		case 0x03:  print("ldv    %s[%d], %s(%s)", vreg[dest], del, signed_imm16(offset * 8), reg[base]); break;
-		case 0x04:  print("lqv    %s[%d], %s(%s)", vreg[dest], del, signed_imm16(offset * 16), reg[base]); break;
-		case 0x05:  print("lrv    %s[%d], %s(%s)", vreg[dest], del, signed_imm16(offset * 16), reg[base]); break;
-		case 0x06:  print("lpv    %s[%d], %s(%s)", vreg[dest], del, signed_imm16(offset * 8), reg[base]); break;
-		case 0x07:  print("luv    %s[%d], %s(%s)", vreg[dest], del, signed_imm16(offset * 8), reg[base]); break;
-		case 0x08:  print("lhv    %s[%d], %s(%s)", vreg[dest], del, signed_imm16(offset * 16), reg[base]); break;
-		case 0x09:  print("lfv    %s[%d], %s(%s)", vreg[dest], del, signed_imm16(offset * 16), reg[base]); break;
-		case 0x0a:  print("lwv    %s[%d], %s(%s)", vreg[dest], del, signed_imm16(offset * 16), reg[base]); break;
-		case 0x0b:  print("ltv    %s[%d], %s(%s)", vreg[dest], del, signed_imm16(offset * 16), reg[base]); break;
-		default:    print("??? (LWC2)"); break;
+		case 0x00:  util::stream_format(stream, "lbv    %s[%d], %s(%s)", vreg[dest], del, signed_imm16(offset * 1), reg[base]); break;
+		case 0x01:  util::stream_format(stream, "lsv    %s[%d], %s(%s)", vreg[dest], del, signed_imm16(offset * 2), reg[base]); break;
+		case 0x02:  util::stream_format(stream, "llv    %s[%d], %s(%s)", vreg[dest], del, signed_imm16(offset * 4), reg[base]); break;
+		case 0x03:  util::stream_format(stream, "ldv    %s[%d], %s(%s)", vreg[dest], del, signed_imm16(offset * 8), reg[base]); break;
+		case 0x04:  util::stream_format(stream, "lqv    %s[%d], %s(%s)", vreg[dest], del, signed_imm16(offset * 16), reg[base]); break;
+		case 0x05:  util::stream_format(stream, "lrv    %s[%d], %s(%s)", vreg[dest], del, signed_imm16(offset * 16), reg[base]); break;
+		case 0x06:  util::stream_format(stream, "lpv    %s[%d], %s(%s)", vreg[dest], del, signed_imm16(offset * 8), reg[base]); break;
+		case 0x07:  util::stream_format(stream, "luv    %s[%d], %s(%s)", vreg[dest], del, signed_imm16(offset * 8), reg[base]); break;
+		case 0x08:  util::stream_format(stream, "lhv    %s[%d], %s(%s)", vreg[dest], del, signed_imm16(offset * 16), reg[base]); break;
+		case 0x09:  util::stream_format(stream, "lfv    %s[%d], %s(%s)", vreg[dest], del, signed_imm16(offset * 16), reg[base]); break;
+		case 0x0a:  util::stream_format(stream, "lwv    %s[%d], %s(%s)", vreg[dest], del, signed_imm16(offset * 16), reg[base]); break;
+		case 0x0b:  util::stream_format(stream, "ltv    %s[%d], %s(%s)", vreg[dest], del, signed_imm16(offset * 16), reg[base]); break;
+		default:    util::stream_format(stream, "??? (LWC2)"); break;
 	}
 }
 
-static void disasm_swc2(uint32_t op)
+static void disasm_swc2(std::ostream &stream, uint32_t op)
 {
 	int dest = (op >> 16) & 0x1f;
 	int base = (op >> 21) & 0x1f;
@@ -224,31 +213,29 @@ static void disasm_swc2(uint32_t op)
 
 	switch ((op >> 11) & 0x1f)
 	{
-		case 0x00:  print("sbv    %s[%d], %s(%s)", vreg[dest], del, signed_imm16(offset * 1), reg[base]); break;
-		case 0x01:  print("ssv    %s[%d], %s(%s)", vreg[dest], del, signed_imm16(offset * 2), reg[base]); break;
-		case 0x02:  print("slv    %s[%d], %s(%s)", vreg[dest], del, signed_imm16(offset * 4), reg[base]); break;
-		case 0x03:  print("sdv    %s[%d], %s(%s)", vreg[dest], del, signed_imm16(offset * 8), reg[base]); break;
-		case 0x04:  print("sqv    %s[%d], %s(%s)", vreg[dest], del, signed_imm16(offset * 16), reg[base]); break;
-		case 0x05:  print("srv    %s[%d], %s(%s)", vreg[dest], del, signed_imm16(offset * 16), reg[base]); break;
-		case 0x06:  print("spv    %s[%d], %s(%s)", vreg[dest], del, signed_imm16(offset * 8), reg[base]); break;
-		case 0x07:  print("suv    %s[%d], %s(%s)", vreg[dest], del, signed_imm16(offset * 8), reg[base]); break;
-		case 0x08:  print("shv    %s[%d], %s(%s)", vreg[dest], del, signed_imm16(offset * 16), reg[base]); break;
-		case 0x09:  print("sfv    %s[%d], %s(%s)", vreg[dest], del, signed_imm16(offset * 16), reg[base]); break;
-		case 0x0a:  print("swv    %s[%d], %s(%s)", vreg[dest], del, signed_imm16(offset * 16), reg[base]); break;
-		case 0x0b:  print("stv    %s[%d], %s(%s)", vreg[dest], del, signed_imm16(offset * 16), reg[base]); break;
-		default:    print("??? (SWC2)"); break;
+		case 0x00:  util::stream_format(stream, "sbv    %s[%d], %s(%s)", vreg[dest], del, signed_imm16(offset * 1), reg[base]); break;
+		case 0x01:  util::stream_format(stream, "ssv    %s[%d], %s(%s)", vreg[dest], del, signed_imm16(offset * 2), reg[base]); break;
+		case 0x02:  util::stream_format(stream, "slv    %s[%d], %s(%s)", vreg[dest], del, signed_imm16(offset * 4), reg[base]); break;
+		case 0x03:  util::stream_format(stream, "sdv    %s[%d], %s(%s)", vreg[dest], del, signed_imm16(offset * 8), reg[base]); break;
+		case 0x04:  util::stream_format(stream, "sqv    %s[%d], %s(%s)", vreg[dest], del, signed_imm16(offset * 16), reg[base]); break;
+		case 0x05:  util::stream_format(stream, "srv    %s[%d], %s(%s)", vreg[dest], del, signed_imm16(offset * 16), reg[base]); break;
+		case 0x06:  util::stream_format(stream, "spv    %s[%d], %s(%s)", vreg[dest], del, signed_imm16(offset * 8), reg[base]); break;
+		case 0x07:  util::stream_format(stream, "suv    %s[%d], %s(%s)", vreg[dest], del, signed_imm16(offset * 8), reg[base]); break;
+		case 0x08:  util::stream_format(stream, "shv    %s[%d], %s(%s)", vreg[dest], del, signed_imm16(offset * 16), reg[base]); break;
+		case 0x09:  util::stream_format(stream, "sfv    %s[%d], %s(%s)", vreg[dest], del, signed_imm16(offset * 16), reg[base]); break;
+		case 0x0a:  util::stream_format(stream, "swv    %s[%d], %s(%s)", vreg[dest], del, signed_imm16(offset * 16), reg[base]); break;
+		case 0x0b:  util::stream_format(stream, "stv    %s[%d], %s(%s)", vreg[dest], del, signed_imm16(offset * 16), reg[base]); break;
+		default:    util::stream_format(stream, "??? (SWC2)"); break;
 	}
 }
 
-offs_t rsp_dasm_one(char *buffer, offs_t pc, uint32_t op)
+offs_t rsp_dasm_one(std::ostream &stream, offs_t pc, uint32_t op)
 {
 	int rs = (op >> 21) & 31;
 	int rt = (op >> 16) & 31;
 	int rd = (op >> 11) & 31;
 	int shift = (op >> 6) & 31;
 	uint32_t flags = 0;
-
-	output = buffer;
 
 	switch (op >> 26)
 	{
@@ -260,46 +247,46 @@ offs_t rsp_dasm_one(char *buffer, offs_t pc, uint32_t op)
 				{
 					if (op == 0)
 					{
-						print("nop");
+						util::stream_format(stream, "nop");
 					}
 					else
 					{
-						print("sll    %s, %s, %d", reg[rd], reg[rt], shift);
+						util::stream_format(stream, "sll    %s, %s, %d", reg[rd], reg[rt], shift);
 					}
 					break;
 				}
-				case 0x02:  print("srl    %s, %s, %d", reg[rd], reg[rt], shift); break;
-				case 0x03:  print("sra    %s, %s, %d", reg[rd], reg[rt], shift); break;
-				case 0x04:  print("sllv   %s, %s, %s", reg[rd], reg[rt], reg[rs]); break;
-				case 0x06:  print("srlv   %s, %s, %s", reg[rd], reg[rt], reg[rs]); break;
-				case 0x07:  print("srav   %s, %s, %s", reg[rd], reg[rt], reg[rs]); break;
-				case 0x08:  print("jr     %s", reg[rs]); if (rs == 31) flags = DASMFLAG_STEP_OUT; break;
+				case 0x02:  util::stream_format(stream, "srl    %s, %s, %d", reg[rd], reg[rt], shift); break;
+				case 0x03:  util::stream_format(stream, "sra    %s, %s, %d", reg[rd], reg[rt], shift); break;
+				case 0x04:  util::stream_format(stream, "sllv   %s, %s, %s", reg[rd], reg[rt], reg[rs]); break;
+				case 0x06:  util::stream_format(stream, "srlv   %s, %s, %s", reg[rd], reg[rt], reg[rs]); break;
+				case 0x07:  util::stream_format(stream, "srav   %s, %s, %s", reg[rd], reg[rt], reg[rs]); break;
+				case 0x08:  util::stream_format(stream, "jr     %s", reg[rs]); if (rs == 31) flags = DASMFLAG_STEP_OUT; break;
 				case 0x09:
 				{
 					if (rd == 31)
 					{
-						print("jalr   %s", reg[rs]);
+						util::stream_format(stream, "jalr   %s", reg[rs]);
 					}
 					else
 					{
-						print("jalr   %s, %s", reg[rs], reg[rd]);
+						util::stream_format(stream, "jalr   %s, %s", reg[rs], reg[rd]);
 					}
 					flags = DASMFLAG_STEP_OVER | DASMFLAG_STEP_OVER_EXTRA(1);
 					break;
 				}
-				case 0x0d:  print("break"); flags = DASMFLAG_STEP_OVER; break;
-				case 0x20:  print("add    %s, %s, %s", reg[rd], reg[rs], reg[rt]); break;
-				case 0x21:  print("addu   %s, %s, %s", reg[rd], reg[rs], reg[rt]); break;
-				case 0x22:  print("sub    %s, %s, %s", reg[rd], reg[rs], reg[rt]); break;
-				case 0x23:  print("subu   %s, %s, %s", reg[rd], reg[rs], reg[rt]); break;
-				case 0x24:  print("and    %s, %s, %s", reg[rd], reg[rs], reg[rt]); break;
-				case 0x25:  print("or     %s, %s, %s", reg[rd], reg[rs], reg[rt]); break;
-				case 0x26:  print("xor    %s, %s, %s", reg[rd], reg[rs], reg[rt]); break;
-				case 0x27:  print("nor    %s, %s, %s", reg[rd], reg[rs], reg[rt]); break;
-				case 0x2a:  print("slt    %s, %s, %s", reg[rd], reg[rs], reg[rt]); break;
-				case 0x2b:  print("sltu   %s, %s, %s", reg[rd], reg[rs], reg[rt]); break;
+				case 0x0d:  util::stream_format(stream, "break"); flags = DASMFLAG_STEP_OVER; break;
+				case 0x20:  util::stream_format(stream, "add    %s, %s, %s", reg[rd], reg[rs], reg[rt]); break;
+				case 0x21:  util::stream_format(stream, "addu   %s, %s, %s", reg[rd], reg[rs], reg[rt]); break;
+				case 0x22:  util::stream_format(stream, "sub    %s, %s, %s", reg[rd], reg[rs], reg[rt]); break;
+				case 0x23:  util::stream_format(stream, "subu   %s, %s, %s", reg[rd], reg[rs], reg[rt]); break;
+				case 0x24:  util::stream_format(stream, "and    %s, %s, %s", reg[rd], reg[rs], reg[rt]); break;
+				case 0x25:  util::stream_format(stream, "or     %s, %s, %s", reg[rd], reg[rs], reg[rt]); break;
+				case 0x26:  util::stream_format(stream, "xor    %s, %s, %s", reg[rd], reg[rs], reg[rt]); break;
+				case 0x27:  util::stream_format(stream, "nor    %s, %s, %s", reg[rd], reg[rs], reg[rt]); break;
+				case 0x2a:  util::stream_format(stream, "slt    %s, %s, %s", reg[rd], reg[rs], reg[rt]); break;
+				case 0x2b:  util::stream_format(stream, "sltu   %s, %s, %s", reg[rd], reg[rs], reg[rt]); break;
 
-				default:    print("???"); break;
+				default:    util::stream_format(stream, "???"); break;
 			}
 			break;
 		}
@@ -308,50 +295,59 @@ offs_t rsp_dasm_one(char *buffer, offs_t pc, uint32_t op)
 		{
 			switch ((op >> 16) & 0x1f)
 			{
-				case 0x00:  print("bltz   %s, $%08X", reg[rs], pc + 4 + ((int16_t)op << 2)); break;
-				case 0x01:  print("bgez   %s, $%08X", reg[rs], pc + 4 + ((int16_t)op << 2)); break;
-				case 0x10:  print("bltzal %s, $%08X", reg[rs], pc + 4 + ((int16_t)op << 2)); break;
-				case 0x11:  print("bgezal %s, $%08X", reg[rs], pc + 4 + ((int16_t)op << 2)); break;
+				case 0x00:  util::stream_format(stream, "bltz   %s, $%08X", reg[rs], pc + 4 + ((int16_t)op << 2)); break;
+				case 0x01:  util::stream_format(stream, "bgez   %s, $%08X", reg[rs], pc + 4 + ((int16_t)op << 2)); break;
+				case 0x10:  util::stream_format(stream, "bltzal %s, $%08X", reg[rs], pc + 4 + ((int16_t)op << 2)); break;
+				case 0x11:  util::stream_format(stream, "bgezal %s, $%08X", reg[rs], pc + 4 + ((int16_t)op << 2)); break;
 
-				default:    print("???"); break;
+				default:    util::stream_format(stream, "???"); break;
 			}
 			break;
 		}
 
-		case 0x02:  print("j      $%08X", (op & 0x03ffffff) << 2); break;
-		case 0x03:  print("jal    $%08X", (op & 0x03ffffff) << 2); break;
-		case 0x04:  print("beq    %s, %s, $%08X", reg[rs], reg[rt], pc + 4 + ((int16_t)(op) << 2)); break;
-		case 0x05:  print("bne    %s, %s, $%08X", reg[rs], reg[rt], pc + 4 + ((int16_t)(op) << 2)); break;
-		case 0x06:  print("blez   %s, $%08X", reg[rs], pc + 4 + ((int16_t)(op) << 2)); break;
-		case 0x07:  print("bgtz   %s, $%08X", reg[rs], pc + 4 + ((int16_t)(op) << 2)); break;
-		case 0x08:  print("addi   %s, %s, %s", reg[rt], reg[rs], signed_imm16(op)); break;
-		case 0x09:  print("addiu  %s, %s, %s", reg[rt], reg[rs], signed_imm16(op)); break;
-		case 0x0a:  print("slti   %s, %s, %s", reg[rt], reg[rs], signed_imm16(op)); break;
-		case 0x0b:  print("sltiu  %s, %s, %s", reg[rt], reg[rs], signed_imm16(op)); break;
-		case 0x0c:  print("andi   %s, %s, $%04X", reg[rt], reg[rs], (uint16_t)(op)); break;
-		case 0x0d:  print("ori    %s, %s, $%04X", reg[rt], reg[rs], (uint16_t)(op)); break;
-		case 0x0e:  print("xori   %s, %s, $%04X", reg[rt], reg[rs], (uint16_t)(op)); break;
-		case 0x0f:  print("lui    %s, %s, $%04X", reg[rt], reg[rs], (uint16_t)(op)); break;
+		case 0x02:  util::stream_format(stream, "j      $%08X", (op & 0x03ffffff) << 2); break;
+		case 0x03:  util::stream_format(stream, "jal    $%08X", (op & 0x03ffffff) << 2); break;
+		case 0x04:  util::stream_format(stream, "beq    %s, %s, $%08X", reg[rs], reg[rt], pc + 4 + ((int16_t)(op) << 2)); break;
+		case 0x05:  util::stream_format(stream, "bne    %s, %s, $%08X", reg[rs], reg[rt], pc + 4 + ((int16_t)(op) << 2)); break;
+		case 0x06:  util::stream_format(stream, "blez   %s, $%08X", reg[rs], pc + 4 + ((int16_t)(op) << 2)); break;
+		case 0x07:  util::stream_format(stream, "bgtz   %s, $%08X", reg[rs], pc + 4 + ((int16_t)(op) << 2)); break;
+		case 0x08:  util::stream_format(stream, "addi   %s, %s, %s", reg[rt], reg[rs], signed_imm16(op)); break;
+		case 0x09:  util::stream_format(stream, "addiu  %s, %s, %s", reg[rt], reg[rs], signed_imm16(op)); break;
+		case 0x0a:  util::stream_format(stream, "slti   %s, %s, %s", reg[rt], reg[rs], signed_imm16(op)); break;
+		case 0x0b:  util::stream_format(stream, "sltiu  %s, %s, %s", reg[rt], reg[rs], signed_imm16(op)); break;
+		case 0x0c:  util::stream_format(stream, "andi   %s, %s, $%04X", reg[rt], reg[rs], (uint16_t)(op)); break;
+		case 0x0d:  util::stream_format(stream, "ori    %s, %s, $%04X", reg[rt], reg[rs], (uint16_t)(op)); break;
+		case 0x0e:  util::stream_format(stream, "xori   %s, %s, $%04X", reg[rt], reg[rs], (uint16_t)(op)); break;
+		case 0x0f:  util::stream_format(stream, "lui    %s, %s, $%04X", reg[rt], reg[rs], (uint16_t)(op)); break;
 
-		case 0x10:  disasm_cop0(op); break;
-		case 0x12:  disasm_cop2(op); break;
+		case 0x10:  disasm_cop0(stream, op); break;
+		case 0x12:  disasm_cop2(stream, op); break;
 
-		case 0x20:  print("lb     %s, %s(%s)", reg[rt], signed_imm16(op), reg[rs]); break;
-		case 0x21:  print("lh     %s, %s(%s)", reg[rt], signed_imm16(op), reg[rs]); break;
-		case 0x23:  print("lw     %s, %s(%s)", reg[rt], signed_imm16(op), reg[rs]); break;
-		case 0x24:  print("lbu    %s, %s(%s)", reg[rt], signed_imm16(op), reg[rs]); break;
-		case 0x25:  print("lhu    %s, %s(%s)", reg[rt], signed_imm16(op), reg[rs]); break;
-		case 0x28:  print("sb     %s, %s(%s)", reg[rt], signed_imm16(op), reg[rs]); break;
-		case 0x29:  print("sh     %s, %s(%s)", reg[rt], signed_imm16(op), reg[rs]); break;
-		case 0x2b:  print("sw     %s, %s(%s)", reg[rt], signed_imm16(op), reg[rs]); break;
+		case 0x20:  util::stream_format(stream, "lb     %s, %s(%s)", reg[rt], signed_imm16(op), reg[rs]); break;
+		case 0x21:  util::stream_format(stream, "lh     %s, %s(%s)", reg[rt], signed_imm16(op), reg[rs]); break;
+		case 0x23:  util::stream_format(stream, "lw     %s, %s(%s)", reg[rt], signed_imm16(op), reg[rs]); break;
+		case 0x24:  util::stream_format(stream, "lbu    %s, %s(%s)", reg[rt], signed_imm16(op), reg[rs]); break;
+		case 0x25:  util::stream_format(stream, "lhu    %s, %s(%s)", reg[rt], signed_imm16(op), reg[rs]); break;
+		case 0x28:  util::stream_format(stream, "sb     %s, %s(%s)", reg[rt], signed_imm16(op), reg[rs]); break;
+		case 0x29:  util::stream_format(stream, "sh     %s, %s(%s)", reg[rt], signed_imm16(op), reg[rs]); break;
+		case 0x2b:  util::stream_format(stream, "sw     %s, %s(%s)", reg[rt], signed_imm16(op), reg[rs]); break;
 
-		case 0x32:  disasm_lwc2(op); break;
-		case 0x3a:  disasm_swc2(op); break;
+		case 0x32:  disasm_lwc2(stream, op); break;
+		case 0x3a:  disasm_swc2(stream, op); break;
 
-		default:    print("???"); break;
+		default:    util::stream_format(stream, "???"); break;
 	}
 
 	return 4 | flags | DASMFLAG_SUPPORTED;
+}
+
+offs_t rsp_dasm_one(char *buffer, offs_t pc, uint32_t op)
+{
+	std::ostringstream stream;
+	offs_t result = rsp_dasm_one(stream, pc, op);
+	std::string stream_str = stream.str();
+	strcpy(buffer, stream_str.c_str());
+	return result;
 }
 
 /*****************************************************************************/
