@@ -522,6 +522,7 @@ extern const device_type CXD8606CQ;
 #define CF_TLBP ( 8 )
 #define CF_RFE ( 16 )
 
+extern unsigned DasmPSXCPU( psxcpu_state *state, std::ostream &stream, uint32_t pc, const uint8_t *opram);
 extern unsigned DasmPSXCPU( psxcpu_state *state, char *buffer, uint32_t pc, const uint8_t *opram );
 
 #endif /* __PSXCPU_H__ */
