@@ -149,7 +149,7 @@ static void InitDasm16C5x(void)
 	OpInizialized = 1;
 }
 
-CPU_DISASSEMBLE( pic16c5x )
+static offs_t internal_disasm_pic16c5x(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
 {
 	int a, b, d, f, k;  /* these can all be filled in by parsing an instruction */
 	int i;
@@ -183,7 +183,7 @@ CPU_DISASSEMBLE( pic16c5x )
 	}
 	if (op == -1)
 	{
-		sprintf(buffer,"???? dw %04Xh",code);
+		util::stream_format(stream, "???? dw %04Xh",code);
 		return cnt;
 	}
 	//buffertmp = buffer;
@@ -231,26 +231,32 @@ CPU_DISASSEMBLE( pic16c5x )
 	{
 		if (*cp == '%')
 		{
-			char num[30], *q;
 			cp++;
 			switch (*cp++)
 			{
-				case 'A': sprintf(num,"$%03X",a); break;
-				case 'B': sprintf(num,"%d",b); break;
-				case 'D': sprintf(num,"%s",dest[d]); break;
-				case 'F': sprintf(num,"%s",regfile[f]); break;
-				case 'K': sprintf(num,"%02Xh",k); break;
+				case 'A': util::stream_format(stream, "$%03X", a); break;
+				case 'B': util::stream_format(stream, "%d", b); break;
+				case 'D': util::stream_format(stream, "%s", dest[d]); break;
+				case 'F': util::stream_format(stream, "%s", regfile[f]); break;
+				case 'K': util::stream_format(stream, "%02Xh", k); break;
 				default:
 					fatalerror("illegal escape character in format '%s'\n",Op[op].fmt);
 			}
-			q = num; while (*q) *buffer++ = *q++;
-			*buffer = '\0';
 		}
 		else
 		{
-			*buffer++ = *cp++;
-			*buffer = '\0';
+			stream << *cp++;
 		}
 	}
 	return cnt | flags | DASMFLAG_SUPPORTED;
+}
+
+
+CPU_DISASSEMBLE(pic16c5x)
+{
+	std::ostringstream stream;
+	offs_t result = internal_disasm_pic16c5x(device, stream, pc, oprom, opram, options);
+	std::string stream_str = stream.str();
+	strcpy(buffer, stream_str.c_str());
+	return result;
 }
