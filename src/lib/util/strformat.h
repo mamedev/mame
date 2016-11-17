@@ -592,10 +592,10 @@ private:
 	{ static constexpr bool value = std::is_integral<U>::value && std::is_signed<U>::value; };
 	template <typename U> struct unsigned_integer_semantics
 	{ static constexpr bool value = std::is_integral<U>::value && !std::is_signed<U>::value; };
-public:
 	template <typename U> struct default_semantics
 	{ static constexpr bool value = !signed_integer_semantics<U>::value && !unsigned_integer_semantics<U>::value; };
 
+public:
 	template <typename U>
 	static void apply(std::enable_if_t<signed_integer_semantics<U>::value, Stream> &str, format_flags const &flags, U const &value)
 	{
