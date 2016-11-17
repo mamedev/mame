@@ -31,8 +31,6 @@ using namespace uml;
 
 CPU_DISASSEMBLE( rsp );
 
-extern offs_t rsp_dasm_one(char *buffer, offs_t pc, uint32_t op);
-
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
