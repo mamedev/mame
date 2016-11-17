@@ -326,6 +326,7 @@ private:
 
 extern const device_type RSP;
 
+extern offs_t rsp_dasm_one(std::ostream &stream, offs_t pc, uint32_t op);
 extern offs_t rsp_dasm_one(char *buffer, offs_t pc, uint32_t op);
 
 
