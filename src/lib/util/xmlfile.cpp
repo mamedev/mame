@@ -11,6 +11,7 @@
 #include <assert.h>
 
 #include "xmlfile.h"
+
 #include <expat.h>
 
 #include <algorithm>
@@ -50,61 +51,6 @@ static bool expat_setup_parser(xml_parse_info &info, xml_parse_options const *op
 static void expat_element_start(void *data, const XML_Char *name, const XML_Char **attributes);
 static void expat_data(void *data, const XML_Char *s, int len);
 static void expat_element_end(void *data, const XML_Char *name);
-
-
-
-/***************************************************************************
-    CORE IMPLEMENTATION
-***************************************************************************/
-
-/*-------------------------------------------------
-    copystring - make an allocated copy of a
-    string
--------------------------------------------------*/
-
-static char *copystring(const char *input)
-{
-	char *newstr;
-
-	/* nullptr just passes through */
-	if (input == nullptr)
-		return nullptr;
-
-	/* make a lower-case copy if the allocation worked */
-	newstr = (char *)malloc(strlen(input) + 1);
-	if (newstr != nullptr)
-		strcpy(newstr, input);
-
-	return newstr;
-}
-
-
-/*-------------------------------------------------
-    copystring_lower - make an allocated copy of
-    a string and convert it to lowercase along
-    the way
--------------------------------------------------*/
-
-static char *copystring_lower(const char *input)
-{
-	char *newstr;
-	int i;
-
-	/* nullptr just passes through */
-	if (input == nullptr)
-		return nullptr;
-
-	/* make a lower-case copy if the allocation worked */
-	newstr = (char *)malloc(strlen(input) + 1);
-	if (newstr != nullptr)
-	{
-		for (i = 0; input[i] != 0; i++)
-			newstr[i] = tolower((uint8_t)input[i]);
-		newstr[i] = 0;
-	}
-
-	return newstr;
-}
 
 
 
@@ -161,8 +107,8 @@ xml_data_node *xml_data_node::file_read(util::core_file &file, xml_parse_options
 			XML_ParserFree(info.parser);
 			return nullptr;
 		}
-
-	} while (!done);
+	}
+	while (!done);
 
 	/* free the parser */
 	XML_ParserFree(info.parser);
@@ -252,8 +198,8 @@ xml_data_node::xml_data_node()
 	: line(0)
 	, m_next(nullptr)
 	, m_first_child(nullptr)
-	, m_name(nullptr)
-	, m_value(nullptr)
+	, m_name()
+	, m_value()
 	, m_parent(nullptr)
 	, m_attributes()
 {
@@ -263,11 +209,12 @@ xml_data_node::xml_data_node(xml_data_node *parent, const char *name, const char
 	: line(0)
 	, m_next(nullptr)
 	, m_first_child(nullptr)
-	, m_name(::copystring_lower(name))
-	, m_value(::copystring(value))
+	, m_name(name)
+	, m_value(value)
 	, m_parent(parent)
 	, m_attributes()
 {
+	std::transform(m_name.begin(), m_name.end(), m_name.begin(), [] (char ch) { return std::tolower(uint8_t(ch)); });
 }
 
 
@@ -278,12 +225,6 @@ xml_data_node::xml_data_node(xml_data_node *parent, const char *name, const char
 
 xml_data_node::~xml_data_node()
 {
-	/* free name/value */
-	if (m_name)
-		std::free((void *)m_name);
-	if (m_value)
-		std::free((void *)m_value);
-
 	/* free the children */
 	for (xml_data_node *nchild = nullptr; m_first_child; m_first_child = nchild)
 	{
@@ -296,67 +237,29 @@ xml_data_node::~xml_data_node()
 
 void xml_data_node::set_value(char const *value)
 {
-	if (m_value)
-		std::free((void *)m_value);
-
-	m_value = ::copystring(value);
+	m_value.assign(value);
 }
 
 
 void xml_data_node::append_value(char const *value, int length)
 {
-	if (length)
-	{
-		/* determine how much data we currently have */
-		int const oldlen = m_value ? int(std::strlen(m_value)) : 0;
-
-		/* realloc */
-		char *const newdata = reinterpret_cast<char *>(std::malloc(oldlen + length + 1));
-		if (newdata)
-		{
-			if (m_value)
-			{
-				std::memcpy(newdata, m_value, oldlen);
-				std::free((void *)m_value);
-			}
-			m_value = newdata;
-
-			/* copy in the new data and NUL-terminate */
-			std::memcpy(&newdata[oldlen], value, length);
-			newdata[oldlen + length] = '\0';
-		}
-	}
+	m_value.append(value, length);
 }
 
 
 void xml_data_node::trim_whitespace()
 {
-	if (m_value)
-	{
-		char *start = m_value;
-		char *end = start + strlen(m_value);
+	/* first strip leading spaces */
+	std::string::const_iterator start = m_value.begin();
+	while ((m_value.end() != start) && std::isspace(uint8_t(*start)))
+		++start;
+	m_value.replace(m_value.begin(), start, 0U, '\0');
 
-		/* first strip leading spaces */
-		while (*start && std::isspace(uint8_t(*start)))
-			start++;
-
-		/* then strip trailing spaces */
-		while ((end > start) && std::isspace(uint8_t(end[-1])))
-			end--;
-
-		if (start == end)
-		{
-			/* if nothing left, just free it */
-			std::free(m_value);
-			m_value = nullptr;
-		}
-		else
-		{
-			/* otherwise, memmove the data */
-			std::memmove(m_value, start, end - start);
-			m_value[end - start] = '\0';
-		}
-	}
+	/* then strip trailing spaces */
+	std::string::const_iterator end = m_value.end();
+	while ((m_value.begin() != end) && std::isspace(uint8_t(*std::prev(end))))
+		--end;
+	m_value.replace(end, m_value.end(), 0U, '\0');
 }
 
 
@@ -655,19 +558,20 @@ int xml_data_node::get_attribute_int(const char *attribute, int defvalue) const
     format of the given integer attribute
 -------------------------------------------------*/
 
-int xml_data_node::get_attribute_int_format(const char *attribute) const
+xml_data_node::int_format xml_data_node::get_attribute_int_format(const char *attribute) const
 {
 	char const *const string = get_attribute_string(attribute, nullptr);
 
-	if (string == nullptr)
-		return XML_INT_FORMAT_DECIMAL;
-	if (string[0] == '$')
-		return XML_INT_FORMAT_HEX_DOLLAR;
-	if (string[0] == '0' && string[1] == 'x')
-		return XML_INT_FORMAT_HEX_C;
+	if (!string)
+		return int_format::DECIMAL;
+	else if (string[0] == '$')
+		return int_format::HEX_DOLLAR;
+	else if (string[0] == '0' && string[1] == 'x')
+		return int_format::HEX_C;
 	if (string[0] == '#')
-		return XML_INT_FORMAT_DECIMAL_POUND;
-	return XML_INT_FORMAT_DECIMAL;
+		return int_format::DECIMAL_HASH;
+	else
+		return int_format::DECIMAL;
 }
 
 

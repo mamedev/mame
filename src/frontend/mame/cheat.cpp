@@ -74,7 +74,6 @@
 
 #include "emu.h"
 #include "emuopts.h"
-#include "xmlfile.h"
 #include "mame.h"
 #include "ui/ui.h"
 #include "ui/menu.h"
@@ -109,16 +108,16 @@ inline std::string number_and_format::format() const
 	switch (m_format)
 	{
 	default:
-	case XML_INT_FORMAT_DECIMAL:
+	case xml_data_node::int_format::DECIMAL:
 		return string_format("%d", uint32_t(m_value));
 
-	case XML_INT_FORMAT_DECIMAL_POUND:
+	case xml_data_node::int_format::DECIMAL_HASH:
 		return string_format("#%d", uint32_t(m_value));
 
-	case XML_INT_FORMAT_HEX_DOLLAR:
+	case xml_data_node::int_format::HEX_DOLLAR:
 		return string_format("$%X", uint32_t(m_value));
 
-	case XML_INT_FORMAT_HEX_C:
+	case xml_data_node::int_format::HEX_C:
 		return string_format("0x%X", uint32_t(m_value));
 	}
 }
@@ -153,8 +152,8 @@ cheat_parameter::cheat_parameter(cheat_manager &manager, symbol_table &symbols, 
 			throw emu_fatalerror("%s.xml(%d): item is value\n", filename, itemnode->line);
 
 		// extract the parameters
-		uint64_t value = itemnode->get_attribute_int("value", 0);
-		int format = itemnode->get_attribute_int_format("value");
+		uint64_t const value = itemnode->get_attribute_int("value", 0);
+		xml_data_node::int_format const format = itemnode->get_attribute_int_format("value");
 
 		// allocate and append a new item
 		auto curitem = std::make_unique<item>(itemnode->get_value(), value, format);

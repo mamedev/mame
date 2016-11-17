@@ -16,6 +16,7 @@
 #include "debug/express.h"
 #include "debug/debugcpu.h"
 #include "ui/text.h"
+#include "xmlfile.h"
 
 
 //**************************************************************************
@@ -49,7 +50,7 @@ class number_and_format
 {
 public:
 	// construction/destruction
-	number_and_format(uint64_t value = 0, int format = 0)
+	number_and_format(uint64_t value = 0, xml_data_node::int_format format = xml_data_node::int_format::DECIMAL)
 		: m_value(value)
 		, m_format(format)
 	{
@@ -64,8 +65,8 @@ public:
 
 private:
 	// internal state
-	uint64_t          m_value;
-	int             m_format;
+	uint64_t                    m_value;
+	xml_data_node::int_format   m_format;
 };
 
 
@@ -98,9 +99,10 @@ private:
 	{
 	public:
 		// construction/destruction
-		item(const char *text, uint64_t value, int valformat)
-			: m_text(text),
-				m_value(value, valformat) { }
+		item(const char *text, uint64_t value, xml_data_node::int_format valformat)
+			: m_text(text)
+			, m_value(value, valformat)
+		{ }
 
 		// getters
 		const number_and_format &value() const { return m_value; }

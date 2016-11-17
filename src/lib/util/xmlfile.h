@@ -31,16 +31,6 @@ enum
 };
 
 
-enum
-{
-	XML_INT_FORMAT_DECIMAL,
-	XML_INT_FORMAT_DECIMAL_POUND,
-	XML_INT_FORMAT_HEX_DOLLAR,
-	XML_INT_FORMAT_HEX_C
-};
-
-
-
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
@@ -71,6 +61,16 @@ struct xml_parse_options
 class xml_data_node
 {
 public:
+	enum class int_format
+	{
+		DECIMAL,
+		DECIMAL_HASH,
+		HEX_DOLLAR,
+		HEX_C
+	};
+
+
+
 	/* ----- XML file objects ----- */
 
 	// create a new empty xml file object
@@ -91,9 +91,9 @@ public:
 
 	/* ----- XML node management ----- */
 
-	char const *get_name() const { return m_name; }
+	char const *get_name() const { return m_name.empty() ? nullptr : m_name.c_str(); }
 
-	char const *get_value() const { return m_value; }
+	char const *get_value() const { return m_value.empty() ? nullptr : m_value.c_str(); }
 	void set_value(char const *value);
 	void append_value(char const *value, int length);
 	void trim_whitespace();
@@ -151,7 +151,7 @@ public:
 	int get_attribute_int(const char *attribute, int defvalue) const;
 
 	// return the format of the given integer attribute
-	int get_attribute_int_format(const char *attribute) const;
+	int_format get_attribute_int_format(const char *attribute) const;
 
 	// return the float value of an attribute, or the specified default if not present
 	float get_attribute_float(const char *attribute, float defvalue) const;
@@ -206,8 +206,8 @@ private:
 
 	xml_data_node *             m_next;
 	xml_data_node *             m_first_child;
-	char const *                m_name;
-	char *                      m_value;
+	std::string                 m_name;
+	std::string                 m_value;
 	xml_data_node *             m_parent;
 	std::list<attribute_node>   m_attributes;
 };
