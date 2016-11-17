@@ -587,7 +587,7 @@ void n64_periphs::sp_dma(int direction)
 			sp_mem_addr += length;
 			sp_dram_addr += length;
 
-			sp_mem_addr += sp_dma_skip;
+			sp_dram_addr += sp_dma_skip;
 		}
 	}
 	else                    // I/DMEM -> RDRAM
@@ -980,7 +980,7 @@ WRITE32_MEMBER( n64_periphs::dp_reg_w )
 TIMER_CALLBACK_MEMBER(n64_periphs::vi_scanline_callback)
 {
 	signal_rcp_interrupt(VI_INTERRUPT);
-	vi_scanline_timer->adjust(m_screen->time_until_pos(vi_intr >> 1));
+	vi_scanline_timer->adjust(m_screen->time_until_pos(vi_intr));
 }
 
 // Video Interface
@@ -995,7 +995,7 @@ void n64_periphs::vi_recalculate_resolution()
 
 	rectangle visarea = m_screen->visible_area();
 	// DACRATE is the quarter pixel clock and period will be for a field, not a frame
-	attoseconds_t period = (vi_hsync & 0xfff) * (vi_vsync & 0xfff) * HZ_TO_ATTOSECONDS(DACRATE_NTSC) / 2;
+	attoseconds_t period = (vi_hsync & 0xfff) * (vi_vsync & 0xfff) * HZ_TO_ATTOSECONDS(DACRATE_NTSC);
 
 	if (width == 0 || height == 0 || (vi_control & 3) == 0)
 	{
@@ -1116,7 +1116,7 @@ WRITE32_MEMBER( n64_periphs::vi_reg_w )
 
 		case 0x0c/4:        // VI_INTR_REG
 			vi_intr = data;
-			vi_scanline_timer->adjust(m_screen->time_until_pos(vi_intr)); // >> 1));
+			vi_scanline_timer->adjust(m_screen->time_until_pos(vi_intr));
 			break;
 
 		case 0x10/4:        // VI_CURRENT_REG
@@ -1268,7 +1268,7 @@ void n64_periphs::ai_dma()
 	ai_status |= 0x40000000;
 
 	// adjust the timer
-	period = attotime::from_hz(DACRATE_NTSC) * (ai_dacrate + 1) * (current->length / 4);
+	period = attotime::from_hz(DACRATE_NTSC) * (ai_dacrate + 1) * (current->length / 2);
 	ai_timer->adjust(period);
 }
 
@@ -1300,16 +1300,16 @@ READ32_MEMBER( n64_periphs::ai_reg_r )
 	{
 		case 0x04/4:        // AI_LEN_REG
 		{
-			if (ai_status & 0x80000001)
+			if (ai_status & 0x40000000)
+			{
+				double secs_left = (ai_timer->expire() - machine().time()).as_double();
+				ret = 2 * (uint32_t)(secs_left * (double)DACRATE_NTSC / (double)(ai_dacrate + 1));
+			}
+			else if (ai_status & 0x80000001)
 			{
 				ret = ai_len;
 			}
-			else if (ai_status & 0x40000000)
-			{
-				double secs_left = (ai_timer->expire() - machine().time()).as_double();
-				unsigned int samples_left = (uint32_t)(secs_left * (double)DACRATE_NTSC / (double)(ai_dacrate + 1));
-				ret = samples_left * 4;
-			}
+
 			else
 			{
 				ret = 0;
@@ -1340,12 +1340,12 @@ WRITE32_MEMBER( n64_periphs::ai_reg_w )
 			break;
 
 		case 0x04/4:        // AI_LEN_REG
-			ai_len = data & 0x3ffff;        // Hardware v2.0 has 18 bits, v1.0 has 15 bits
+			ai_len = data & 0x3fff8;        // Hardware v2.0 has 18 bits, v1.0 has 15 bits
 			ai_fifo_push(ai_dram_addr, ai_len);
 			break;
 
 		case 0x08/4:        // AI_CONTROL_REG
-			ai_control = data;
+			ai_control = data & 1;
 			break;
 
 		case 0x0c/4:
