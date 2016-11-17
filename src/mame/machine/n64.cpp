@@ -587,7 +587,7 @@ void n64_periphs::sp_dma(int direction)
 			sp_mem_addr += length;
 			sp_dram_addr += length;
 
-			sp_mem_addr += sp_dma_skip;
+			sp_dram_addr += sp_dma_skip;
 		}
 	}
 	else                    // I/DMEM -> RDRAM
