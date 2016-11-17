@@ -151,6 +151,7 @@ CPU_DISASSEMBLE( n8x300 );
 CPU_DISASSEMBLE( nec );
 CPU_DISASSEMBLE( nsc8105 );
 CPU_DISASSEMBLE( pdp1 );
+CPU_DISASSEMBLE( pdp8 );
 CPU_DISASSEMBLE( pic16c5x );
 CPU_DISASSEMBLE( pic16c62x );
 CPU_DISASSEMBLE( powerpc );
@@ -320,6 +321,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "nec",         _8bit,  0, CPU_DISASSEMBLE_NAME(nec) },
 	{ "nsc8105",     _8bit,  0, CPU_DISASSEMBLE_NAME(nsc8105) },
 	{ "pdp1",        _32be,  0, CPU_DISASSEMBLE_NAME(pdp1) },
+	{ "pdp8",        _16be,  0, CPU_DISASSEMBLE_NAME(pdp8) },
 	{ "pic16c5x",    _16le, -1, CPU_DISASSEMBLE_NAME(pic16c5x) },
 	{ "pic16c62x",   _16le, -1, CPU_DISASSEMBLE_NAME(pic16c62x) },
 	{ "powerpc",     _32be,  0, CPU_DISASSEMBLE_NAME(powerpc) },
