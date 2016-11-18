@@ -1300,15 +1300,15 @@ READ32_MEMBER( n64_periphs::ai_reg_r )
 	{
 		case 0x04/4:        // AI_LEN_REG
 		{
-			if (ai_status & 0x80000001)
+			if (ai_status & 0x40000000)
 			{
-				ret = ai_len;
-			}
-			else if (ai_status & 0x40000000)
-			{
-				double secs_left = (ai_timer->expire() - machine().time()).as_double();
+				double secs_left = (ai_timer->remaining()).as_double();
 				unsigned int samples_left = (uint32_t)(secs_left * (double)DACRATE_NTSC / (double)(ai_dacrate + 1));
 				ret = samples_left * 4;
+			}
+			else if (ai_status & 0x80000001)
+			{
+				ret = ai_len;
 			}
 			else
 			{
