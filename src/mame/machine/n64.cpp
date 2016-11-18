@@ -215,8 +215,6 @@ void n64_periphs::device_reset()
 	si_dma_dir = 0;
 	si_dma_timer->adjust(attotime::never);
 
-	//memset(m_save_data.eeprom, 0, 2048);
-
 	dp_clock = 0;
 
 	cic_status = 0;
@@ -980,7 +978,7 @@ WRITE32_MEMBER( n64_periphs::dp_reg_w )
 TIMER_CALLBACK_MEMBER(n64_periphs::vi_scanline_callback)
 {
 	signal_rcp_interrupt(VI_INTERRUPT);
-	vi_scanline_timer->adjust(m_screen->time_until_pos(vi_intr >> 1));
+	vi_scanline_timer->adjust(m_screen->time_until_pos(vi_intr));
 }
 
 // Video Interface
@@ -1116,7 +1114,7 @@ WRITE32_MEMBER( n64_periphs::vi_reg_w )
 
 		case 0x0c/4:        // VI_INTR_REG
 			vi_intr = data;
-			vi_scanline_timer->adjust(m_screen->time_until_pos(vi_intr)); // >> 1));
+			vi_scanline_timer->adjust(m_screen->time_until_pos(vi_intr));
 			break;
 
 		case 0x10/4:        // VI_CURRENT_REG
@@ -1205,7 +1203,6 @@ void n64_periphs::ai_fifo_push(uint32_t address, uint32_t length)
 
 	if (! (ai_status & 0x40000000))
 	{
-		//signal_rcp_interrupt(AI_INTERRUPT);
 		ai_dma();
 	}
 }
@@ -1228,7 +1225,6 @@ void n64_periphs::ai_fifo_pop()
 	if (ai_fifo_num < AUDIO_DMA_DEPTH)
 	{
 		ai_status &= ~0x80000001;   // FIFO not full
-		//signal_rcp_interrupt(AI_INTERRUPT);
 	}
 }
 
@@ -1372,7 +1368,6 @@ WRITE32_MEMBER( n64_periphs::ai_reg_w )
 TIMER_CALLBACK_MEMBER(n64_periphs::pi_dma_callback)
 {
 	pi_dma_tick();
-	//m_rsp->yield();
 }
 
 void n64_periphs::pi_dma_tick()
@@ -1552,7 +1547,6 @@ WRITE32_MEMBER( n64_periphs::pi_reg_w )
 
 			attotime dma_period = attotime::from_hz(93750000) * (int)((float)(pi_rd_len + 1) * 5.08f); // Measured as between 2.53 cycles per byte and 2.55 cycles per byte
 			pi_dma_timer->adjust(dma_period);
-			//pi_dma_tick();
 			break;
 		}
 
@@ -1565,8 +1559,6 @@ WRITE32_MEMBER( n64_periphs::pi_reg_w )
 
 			attotime dma_period = attotime::from_hz(93750000) * (int)((float)(pi_wr_len + 1) * 5.08f); // Measured as between 2.53 cycles per byte and 2.55 cycles per byte
 			pi_dma_timer->adjust(dma_period);
-
-			//pi_dma_tick();
 			break;
 		}
 
