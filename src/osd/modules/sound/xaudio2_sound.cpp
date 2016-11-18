@@ -123,8 +123,11 @@ public:
 typedef std::unique_ptr<IXAudio2MasteringVoice, xaudio2_custom_deleter> mastering_voice_ptr;
 typedef std::unique_ptr<IXAudio2SourceVoice, xaudio2_custom_deleter> src_voice_ptr;
 
-// Typedef for pointer to XAudio2Create
-typedef HRESULT (WINAPI *xaudio2_create_ptr)(IXAudio2 **, uint32_t, XAUDIO2_PROCESSOR);
+// XAudio2 API
+// 
+DYNAMIC_API_BEGIN(xaudio2, "XAudio2_9.dll", "XAudio2_8.dll")
+	DYNAMIC_API_FN(HRESULT, WINAPI, XAudio2Create, IXAudio2 **, uint32_t, XAUDIO2_PROCESSOR)
+DYNAMIC_API_END()
 
 //============================================================
 //  Helper classes
@@ -205,8 +208,6 @@ private:
 	uint32_t                           m_overflows;
 	uint32_t                           m_underflows;
 	BOOL                             m_in_underflow;
-	osd::dynamic_module::ptr         m_xaudio_dll;
-	xaudio2_create_ptr               XAudio2Create;
 	BOOL                             m_initialized;
 
 public:
@@ -228,7 +229,6 @@ public:
 		m_overflows(0),
 		m_underflows(0),
 		m_in_underflow(FALSE),
-		XAudio2Create(nullptr),
 		m_initialized(FALSE)
 	{
 	}
@@ -268,13 +268,7 @@ private:
 
 bool sound_xaudio2::probe()
 {
-	m_xaudio_dll = osd::dynamic_module::open({ "XAudio2_9.dll", "XAudio2_8.dll" });
-	if (m_xaudio_dll == nullptr)
-		return false;
-
-	XAudio2Create = m_xaudio_dll->bind<xaudio2_create_ptr>("XAudio2Create");
-
-	return (XAudio2Create ? true : false);
+	return DYNAMIC_API_TEST(xaudio2, XAudio2Create);
 }
 
 //============================================================
@@ -291,14 +285,14 @@ int sound_xaudio2::init(osd_options const &options)
 	CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 
 	// Make sure our XAudio2Create entrypoint is bound
-	if (!XAudio2Create)
+	if (!DYNAMIC_API_TEST(xaudio2, XAudio2Create))
 	{
 		osd_printf_error("Could not find XAudio2. Please try to reinstall DirectX runtime package.\n");
 		return 1;
 	}
 
 	// Create the IXAudio2 object
-	HR_GOERR(this->XAudio2Create(m_xAudio2.GetAddressOf(), 0, XAUDIO2_DEFAULT_PROCESSOR));
+	HR_GOERR(DYNAMIC_CALL(xaudio2, XAudio2Create, m_xAudio2.GetAddressOf(), 0, XAUDIO2_DEFAULT_PROCESSOR));
 
 	// make a format description for what we want
 	format.wBitsPerSample = 16;

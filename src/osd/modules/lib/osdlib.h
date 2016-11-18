@@ -98,4 +98,42 @@ protected:
 
 } // namespace osd
 
+//=========================================================================================================================
+// Dynamic API helpers. Useful in creating a singleton object that can be called with DYNAMIC_CALL macro for an entire API
+// Usage for defining an API is below
+//
+// DYNAMIC_API_BEGIN(dxgi, { "dxgi.dll" })
+//   DYNAMIC_API_FN(DWORD, WINAPI, CreateDXGIFactory1, REFIID, void**)
+// DYNAMIC_API_END()
+//
+// Calling then looks like: DYNAMIC_CALL(dxgi, CreateDXGIFactory1, p1, p2, etc)
+//=========================================================================================================================
+
+#if !defined(OSD_UWP)
+
+#define DYNAMIC_API_BEGIN(apiname, ...) namespace osd { namespace dynamicapi { \
+class apiname##_api { \
+private: \
+	osd::dynamic_module::ptr m_module = osd::dynamic_module::open( { __VA_ARGS__ } ); \
+public: \
+	static apiname##_api &instance() { static apiname##_api api; return api; }
+
+#define DYNAMIC_API_FN(ret, conv, apifunc, ...) ret(conv *m_##apifunc##_pfn)( __VA_ARGS__ ) = m_module->bind<ret(conv *)( __VA_ARGS__ )>(#apifunc);
+
+#define DYNAMIC_API_END() };}}
+
+#define DYNAMIC_CALL(apiname, fname, ...) (*osd::dynamicapi::##apiname##_api::instance().m_##fname##_pfn) ( __VA_ARGS__ )
+#define DYNAMIC_API_TEST(apiname, fname) (osd::dynamicapi::##apiname##_api::instance().m_##fname##_pfn != nullptr)
+
+#else
+
+#define DYNAMIC_API_BEGIN(apiname, ...)
+#define DYNAMIC_API_FN(ret, conv, apifunc, ...)
+#define DYNAMIC_API_END()
+
+#define DYNAMIC_CALL(apiname, fname, ...) fname( __VA_ARGS__ )
+#define DYNAMIC_API_TEST(apiname, fname) (true)
+
+#endif
+
 #endif  /* __OSDLIB__ */
