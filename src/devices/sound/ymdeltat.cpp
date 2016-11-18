@@ -458,7 +458,7 @@ void YM_DELTAT_postload(YM_DELTAT *DELTAT,uint8_t *regs)
 }
 void YM_DELTAT_savestate(device_t *device,YM_DELTAT *DELTAT)
 {
-#ifdef __SAVE_H__
+#ifdef MAME_EMU_SAVE_H
 	device->save_item(NAME(DELTAT->portstate));
 	device->save_item(NAME(DELTAT->now_addr));
 	device->save_item(NAME(DELTAT->now_step));
