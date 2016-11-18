@@ -441,7 +441,7 @@ static MACHINE_CONFIG_START( n64, n64_mess_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	/* Video DACRATE is for quarter pixels, so the horizontal is also given in quarter pixels.  However, the horizontal and vertical timing and sizing is adjustable by register and will be reset when the registers are written. */
-	MCFG_SCREEN_RAW_PARAMS(DACRATE_NTSC,3093,0,3093,525,0,525)
+	MCFG_SCREEN_RAW_PARAMS(DACRATE_NTSC*2,3093,0,3093,525,0,525)
 	//MCFG_SCREEN_REFRESH_RATE(60)
 	//MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	//MCFG_SCREEN_SIZE(640, 525)
