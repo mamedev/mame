@@ -980,6 +980,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"philips",
 		"pitronic",
 		"poly88",
+		"prodigy",
 		"psion",
 		"radio",
 		"rca",
