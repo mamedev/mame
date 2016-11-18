@@ -152,7 +152,7 @@ void model3_state::tap_write(int tck, int tms, int tdi, int trst)
 	case 3:     // Capture-DR
 		//printf("capture dr (IR = %08X%08X\n", (uint32_t)(m_ir >> 32),(uint32_t)(m_ir));
 
-		if (m_ir == U64(0x000023fffffffffe))
+		if (m_ir == 0x000023fffffffffeU)
 		{
 			for (auto & elem : m_id_data)
 			{
@@ -167,7 +167,7 @@ void model3_state::tap_write(int tck, int tms, int tdi, int trst)
 			for (int i = 41; i >= 0; i--)
 				insert_bit(m_id_data, start_bit++, ((uint64_t)(1 << i) & res) ? 1 : 0);
 		}
-		else if (m_ir == U64(0x00000c631f8c7ffe))
+		else if (m_ir == 0x00000c631f8c7ffeU)
 		{
 			tap_set_asic_ids();
 		}
@@ -205,7 +205,7 @@ void model3_state::tap_write(int tck, int tms, int tdi, int trst)
 		 * TCK)
 		 */
 
-		m_ir &= U64(0x3fffffffffff);
+		m_ir &= 0x3fffffffffffU;
 		break;
 
 	default:

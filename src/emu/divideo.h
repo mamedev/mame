@@ -14,8 +14,8 @@
 #error Dont include this file directly; include emu.h instead.
 #endif
 
-#ifndef __DIVIDEO_H__
-#define __DIVIDEO_H__
+#ifndef MAME_EMU_DIVIDEO_H
+#define MAME_EMU_DIVIDEO_H
 
 
 //**************************************************************************
@@ -65,4 +65,4 @@ protected:
 typedef device_interface_iterator<device_video_interface> video_interface_iterator;
 
 
-#endif  /* __DIVIDEO_H__ */
+#endif  /* MAME_EMU_DIVIDEO_H */

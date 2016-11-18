@@ -20,7 +20,7 @@
 //  devcb_base - constructor
 //-------------------------------------------------
 
-devcb_base::devcb_base(device_t &device, uint64_t defmask)
+devcb_base::devcb_base(device_t &device, u64 defmask)
 	: m_device(device),
 		m_rshift(0),
 		m_mask(defmask),
@@ -44,7 +44,7 @@ void devcb_base::reset(callback_type type)
 	m_space = nullptr;
 	m_target.ptr = nullptr;
 	m_rshift = 0;
-	m_mask = ~U64(0);
+	m_mask = ~u64(0);
 }
 
 
@@ -107,7 +107,7 @@ void devcb_base::resolve_space()
 //  devcb_read_base - constructor
 //-------------------------------------------------
 
-devcb_read_base::devcb_read_base(device_t &device, uint64_t defmask)
+devcb_read_base::devcb_read_base(device_t &device, u64 defmask)
 	: devcb_base(device, defmask),
 		m_adapter(nullptr)
 {
@@ -221,7 +221,7 @@ void devcb_read_base::resolve()
 //  the given value
 //-------------------------------------------------
 
-void devcb_read_base::resolve_safe(uint64_t none_constant_value)
+void devcb_read_base::resolve_safe(u64 none_constant_value)
 {
 	// convert to a constant if none specified
 	if (m_type == CALLBACK_NONE)
@@ -238,7 +238,7 @@ void devcb_read_base::resolve_safe(uint64_t none_constant_value)
 //  unresolved adapter
 //-------------------------------------------------
 
-uint64_t devcb_read_base::read_unresolved_adapter(address_space &space, offs_t offset, uint64_t mask)
+u64 devcb_read_base::read_unresolved_adapter(address_space &space, offs_t offset, u64 mask)
 {
 	throw emu_fatalerror("Attempted to read through an unresolved devcb item");
 }
@@ -248,7 +248,7 @@ uint64_t devcb_read_base::read_unresolved_adapter(address_space &space, offs_t o
 //  read_line_adapter - read from a line delegate
 //-------------------------------------------------
 
-uint64_t devcb_read_base::read_line_adapter(address_space &space, offs_t offset, uint64_t mask)
+u64 devcb_read_base::read_line_adapter(address_space &space, offs_t offset, u64 mask)
 {
 	return shift_mask_xor(m_readline() & 1);
 }
@@ -258,7 +258,7 @@ uint64_t devcb_read_base::read_line_adapter(address_space &space, offs_t offset,
 //  read8_adapter - read from an 8-bit delegate
 //-------------------------------------------------
 
-uint64_t devcb_read_base::read8_adapter(address_space &space, offs_t offset, uint64_t mask)
+u64 devcb_read_base::read8_adapter(address_space &space, offs_t offset, u64 mask)
 {
 	return shift_mask_xor(m_read8(space, offset, unshift_mask(mask)));
 }
@@ -268,7 +268,7 @@ uint64_t devcb_read_base::read8_adapter(address_space &space, offs_t offset, uin
 //  read16_adapter - read from a 16-bit delegate
 //-------------------------------------------------
 
-uint64_t devcb_read_base::read16_adapter(address_space &space, offs_t offset, uint64_t mask)
+u64 devcb_read_base::read16_adapter(address_space &space, offs_t offset, u64 mask)
 {
 	return shift_mask_xor(m_read16(space, offset, unshift_mask(mask)));
 }
@@ -278,7 +278,7 @@ uint64_t devcb_read_base::read16_adapter(address_space &space, offs_t offset, ui
 //  read32_adapter - read from a 32-bit delegate
 //-------------------------------------------------
 
-uint64_t devcb_read_base::read32_adapter(address_space &space, offs_t offset, uint64_t mask)
+u64 devcb_read_base::read32_adapter(address_space &space, offs_t offset, u64 mask)
 {
 	return shift_mask_xor(m_read32(space, offset, unshift_mask(mask)));
 }
@@ -288,7 +288,7 @@ uint64_t devcb_read_base::read32_adapter(address_space &space, offs_t offset, ui
 //  read64_adapter - read from a 64-bit delegate
 //-------------------------------------------------
 
-uint64_t devcb_read_base::read64_adapter(address_space &space, offs_t offset, uint64_t mask)
+u64 devcb_read_base::read64_adapter(address_space &space, offs_t offset, u64 mask)
 {
 	return shift_mask_xor(m_read64(space, offset, unshift_mask(mask)));
 }
@@ -298,7 +298,7 @@ uint64_t devcb_read_base::read64_adapter(address_space &space, offs_t offset, ui
 //  read_ioport - read from an I/O port
 //-------------------------------------------------
 
-uint64_t devcb_read_base::read_ioport_adapter(address_space &space, offs_t offset, uint64_t mask)
+u64 devcb_read_base::read_ioport_adapter(address_space &space, offs_t offset, u64 mask)
 {
 	return shift_mask_xor(m_target.ioport->read());
 }
@@ -309,7 +309,7 @@ uint64_t devcb_read_base::read_ioport_adapter(address_space &space, offs_t offse
 //  constant
 //-------------------------------------------------
 
-uint64_t devcb_read_base::read_logged_adapter(address_space &space, offs_t offset, uint64_t mask)
+u64 devcb_read_base::read_logged_adapter(address_space &space, offs_t offset, u64 mask)
 {
 	m_device.logerror("%s: read %s\n", m_device.machine().describe_context(), m_target_tag);
 	return shift_mask_xor(m_target_int);
@@ -320,7 +320,7 @@ uint64_t devcb_read_base::read_logged_adapter(address_space &space, offs_t offse
 //  read_constant - read from a constant
 //-------------------------------------------------
 
-uint64_t devcb_read_base::read_constant_adapter(address_space &space, offs_t offset, uint64_t mask)
+u64 devcb_read_base::read_constant_adapter(address_space &space, offs_t offset, u64 mask)
 {
 	return shift_mask_xor(m_target_int);
 }
@@ -335,7 +335,7 @@ uint64_t devcb_read_base::read_constant_adapter(address_space &space, offs_t off
 //  devcb_write_base - constructor
 //-------------------------------------------------
 
-devcb_write_base::devcb_write_base(device_t &device, uint64_t defmask)
+devcb_write_base::devcb_write_base(device_t &device, u64 defmask)
 	: devcb_base(device, defmask),
 		m_adapter(nullptr)
 {
@@ -458,7 +458,7 @@ void devcb_write_base::resolve_safe()
 //  unresolved adapter
 //-------------------------------------------------
 
-void devcb_write_base::write_unresolved_adapter(address_space &space, offs_t offset, uint64_t data, uint64_t mask)
+void devcb_write_base::write_unresolved_adapter(address_space &space, offs_t offset, u64 data, u64 mask)
 {
 	throw emu_fatalerror("Attempted to write through an unresolved devcb item");
 }
@@ -468,7 +468,7 @@ void devcb_write_base::write_unresolved_adapter(address_space &space, offs_t off
 //  write_line_adapter - write from a line delegate
 //-------------------------------------------------
 
-void devcb_write_base::write_line_adapter(address_space &space, offs_t offset, uint64_t data, uint64_t mask)
+void devcb_write_base::write_line_adapter(address_space &space, offs_t offset, u64 data, u64 mask)
 {
 	m_writeline(unshift_mask_xor(data) & 1);
 }
@@ -478,7 +478,7 @@ void devcb_write_base::write_line_adapter(address_space &space, offs_t offset, u
 //  write8_adapter - write from an 8-bit delegate
 //-------------------------------------------------
 
-void devcb_write_base::write8_adapter(address_space &space, offs_t offset, uint64_t data, uint64_t mask)
+void devcb_write_base::write8_adapter(address_space &space, offs_t offset, u64 data, u64 mask)
 {
 	m_write8(space, offset, unshift_mask_xor(data), unshift_mask(mask));
 }
@@ -488,7 +488,7 @@ void devcb_write_base::write8_adapter(address_space &space, offs_t offset, uint6
 //  write16_adapter - write from a 16-bit delegate
 //-------------------------------------------------
 
-void devcb_write_base::write16_adapter(address_space &space, offs_t offset, uint64_t data, uint64_t mask)
+void devcb_write_base::write16_adapter(address_space &space, offs_t offset, u64 data, u64 mask)
 {
 	m_write16(space, offset, unshift_mask_xor(data), unshift_mask(mask));
 }
@@ -498,7 +498,7 @@ void devcb_write_base::write16_adapter(address_space &space, offs_t offset, uint
 //  write32_adapter - write from a 32-bit delegate
 //-------------------------------------------------
 
-void devcb_write_base::write32_adapter(address_space &space, offs_t offset, uint64_t data, uint64_t mask)
+void devcb_write_base::write32_adapter(address_space &space, offs_t offset, u64 data, u64 mask)
 {
 	m_write32(space, offset, unshift_mask_xor(data), unshift_mask(mask));
 }
@@ -508,7 +508,7 @@ void devcb_write_base::write32_adapter(address_space &space, offs_t offset, uint
 //  write64_adapter - write from a 64-bit delegate
 //-------------------------------------------------
 
-void devcb_write_base::write64_adapter(address_space &space, offs_t offset, uint64_t data, uint64_t mask)
+void devcb_write_base::write64_adapter(address_space &space, offs_t offset, u64 data, u64 mask)
 {
 	m_write64(space, offset, unshift_mask_xor(data), unshift_mask(mask));
 }
@@ -518,7 +518,7 @@ void devcb_write_base::write64_adapter(address_space &space, offs_t offset, uint
 //  write_ioport - write from an I/O port
 //-------------------------------------------------
 
-void devcb_write_base::write_ioport_adapter(address_space &space, offs_t offset, uint64_t data, uint64_t mask)
+void devcb_write_base::write_ioport_adapter(address_space &space, offs_t offset, u64 data, u64 mask)
 {
 	if (m_target.ioport)
 		m_target.ioport->write(unshift_mask_xor(data));
@@ -530,7 +530,7 @@ void devcb_write_base::write_ioport_adapter(address_space &space, offs_t offset,
 //  adapter
 //-------------------------------------------------
 
-void devcb_write_base::write_logged_adapter(address_space &space, offs_t offset, uint64_t data, uint64_t mask)
+void devcb_write_base::write_logged_adapter(address_space &space, offs_t offset, u64 data, u64 mask)
 {
 	m_device.logerror("%s: unresolved devcb write\n", m_device.machine().describe_context());
 }
@@ -540,7 +540,7 @@ void devcb_write_base::write_logged_adapter(address_space &space, offs_t offset,
 //  write_constant - write from a constant
 //-------------------------------------------------
 
-void devcb_write_base::write_noop_adapter(address_space &space, offs_t offset, uint64_t data, uint64_t mask)
+void devcb_write_base::write_noop_adapter(address_space &space, offs_t offset, u64 data, u64 mask)
 {
 	// constant for writes is a no-op
 }
@@ -551,7 +551,7 @@ void devcb_write_base::write_noop_adapter(address_space &space, offs_t offset, u
 //  input line
 //-------------------------------------------------
 
-void devcb_write_base::write_inputline_adapter(address_space &space, offs_t offset, uint64_t data, uint64_t mask)
+void devcb_write_base::write_inputline_adapter(address_space &space, offs_t offset, u64 data, u64 mask)
 {
 	m_target.device->execute().set_input_line(m_target_int, unshift_mask_xor(data) & 1);
 }

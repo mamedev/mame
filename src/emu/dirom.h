@@ -14,21 +14,21 @@
 #error Dont include this file directly; include emu.h instead.
 #endif
 
-#ifndef __DIROM_H__
-#define __DIROM_H__
+#ifndef MAME_EMU_DIROM_H
+#define MAME_EMU_DIROM_H
 
 class device_rom_interface : public device_memory_interface
 {
 public:
-	device_rom_interface(const machine_config &mconfig, device_t &device, uint8_t addrwidth, endianness_t endian = ENDIANNESS_LITTLE, uint8_t datawidth = 8);
+	device_rom_interface(const machine_config &mconfig, device_t &device, u8 addrwidth, endianness_t endian = ENDIANNESS_LITTLE, u8 datawidth = 8);
 	virtual ~device_rom_interface();
 
-	inline uint8_t read_byte(offs_t byteaddress) { return m_rom_direct->read_byte(byteaddress); }
-	inline uint16_t read_word(offs_t byteaddress) { return m_rom_direct->read_word(byteaddress); }
-	inline uint32_t read_dword(offs_t byteaddress) { return m_rom_direct->read_dword(byteaddress); }
-	inline uint64_t read_qword(offs_t byteaddress) { return m_rom_direct->read_qword(byteaddress); }
+	inline u8 read_byte(offs_t byteaddress) { return m_rom_direct->read_byte(byteaddress); }
+	inline u16 read_word(offs_t byteaddress) { return m_rom_direct->read_word(byteaddress); }
+	inline u32 read_dword(offs_t byteaddress) { return m_rom_direct->read_dword(byteaddress); }
+	inline u64 read_qword(offs_t byteaddress) { return m_rom_direct->read_qword(byteaddress); }
 
-	void set_rom(const void *base, uint32_t size);
+	void set_rom(const void *base, u32 size);
 	void set_rom_bank(int bank);
 
 protected:
@@ -52,4 +52,4 @@ private:
 	void reset_bank();
 };
 
-#endif
+#endif // MAME_EMU_DIROM_H

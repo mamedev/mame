@@ -799,7 +799,7 @@ uint32_t h8_device::do_add32(uint32_t v1, uint32_t v2)
 		CCR |= F_N;
 	if(~(v1^v2) & (v1^res) & 0x80000000)
 		CCR |= F_V;
-	if(res & U64(0x100000000))
+	if(res & 0x100000000U)
 		CCR |= F_C;
 	return res;
 }
@@ -891,7 +891,7 @@ uint32_t h8_device::do_sub32(uint32_t v1, uint32_t v2)
 		CCR |= F_N;
 	if((v1^v2) & (v1^res) & 0x80000000)
 		CCR |= F_V;
-	if(res & U64(0x100000000))
+	if(res & 0x100000000U)
 		CCR |= F_C;
 	return res;
 }

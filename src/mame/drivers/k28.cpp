@@ -284,7 +284,7 @@ WRITE8_MEMBER(k28_state::mcu_p0_w)
 	// d5: VFD driver data enable
 	m_vfd_data_enable = ~data >> 5 & 1;
 	if (m_vfd_data_enable)
-		m_vfd_shiftreg = (m_vfd_shiftreg & U64(~1)) | m_vfd_data_in;
+		m_vfd_shiftreg = (m_vfd_shiftreg & ~u64(1)) | m_vfd_data_in;
 
 	// d4: VSM chip enable
 	// d6: VSM M0
@@ -325,7 +325,7 @@ WRITE8_MEMBER(k28_state::mcu_p2_w)
 	// d0: VFD driver serial data
 	m_vfd_data_in = data & 1;
 	if (m_vfd_data_enable)
-		m_vfd_shiftreg = (m_vfd_shiftreg & U64(~1)) | m_vfd_data_in;
+		m_vfd_shiftreg = (m_vfd_shiftreg & ~u64(1)) | m_vfd_data_in;
 
 	// d0-d3: VSM data, input mux and SC-01 phoneme lower nibble
 	m_tms6100->add_w(space, 0, data);

@@ -10,8 +10,8 @@
 
 #pragma once
 
-#ifndef __DEBUGCPU_H__
-#define __DEBUGCPU_H__
+#ifndef MAME_EMU_DEBUG_DEBUGCPU_H
+#define MAME_EMU_DEBUG_DEBUGCPU_H
 
 #include "express.h"
 
@@ -22,11 +22,11 @@
 //  CONSTANTS
 //**************************************************************************
 
-const uint8_t WATCHPOINT_READ             = 1;
-const uint8_t WATCHPOINT_WRITE            = 2;
-const uint8_t WATCHPOINT_READWRITE        = WATCHPOINT_READ | WATCHPOINT_WRITE;
+constexpr u8 WATCHPOINT_READ        = 1;
+constexpr u8 WATCHPOINT_WRITE       = 2;
+constexpr u8 WATCHPOINT_READWRITE   = WATCHPOINT_READ | WATCHPOINT_WRITE;
 
-const int COMMENT_VERSION               = 1;
+constexpr int COMMENT_VERSION       = 1;
 
 
 
@@ -127,7 +127,7 @@ public:
 		address_space &      m_space;                    // address space
 		int                  m_index;                    // user reported index
 		bool                 m_enabled;                  // enabled?
-		uint8_t                m_type;                     // type (read/write)
+		u8                   m_type;                     // type (read/write)
 		offs_t               m_address;                  // start address
 		offs_t               m_length;                   // length of watch area
 		parsed_expression    m_condition;                // condition
@@ -179,8 +179,8 @@ public:
 	void interrupt_hook(int irqline);
 	void exception_hook(int exception);
 	void instruction_hook(offs_t curpc);
-	void memory_read_hook(address_space &space, offs_t address, uint64_t mem_mask);
-	void memory_write_hook(address_space &space, offs_t address, uint64_t data, uint64_t mem_mask);
+	void memory_read_hook(address_space &space, offs_t address, u64 mem_mask);
+	void memory_write_hook(address_space &space, offs_t address, u64 data, u64 mem_mask);
 
 	// hooks into our operations
 	void set_instruction_hook(debug_instruction_hook_func hook);
@@ -199,7 +199,7 @@ public:
 	void go_vblank();
 	void go_interrupt(int irqline = -1);
 	void go_exception(int exception);
-	void go_milliseconds(uint64_t milliseconds);
+	void go_milliseconds(u64 milliseconds);
 	void go_next_device();
 
 	template <typename Format, typename... Params>
@@ -240,11 +240,11 @@ public:
 	void comment_add(offs_t address, const char *comment, rgb_t color);
 	bool comment_remove(offs_t addr);
 	const char *comment_text(offs_t addr) const;
-	uint32_t comment_count() const { return m_comment_set.size(); }
-	uint32_t comment_change_count() const { return m_comment_change; }
+	u32 comment_count() const { return m_comment_set.size(); }
+	u32 comment_change_count() const { return m_comment_change; }
 	bool comment_export(xml_data_node &node);
 	bool comment_import(xml_data_node const &node, bool is_inline);
-	uint32_t compute_opcode_crc32(offs_t pc) const;
+	u32 compute_opcode_crc32(offs_t pc) const;
 
 	// history
 	offs_t history_pc(int index) const;
@@ -259,7 +259,7 @@ public:
 	void set_track_mem(bool value) { m_track_mem = value; }
 	offs_t track_mem_pc_from_space_address_data(const address_spacenum& space,
 												const offs_t& address,
-												const uint64_t& data) const;
+												const u64& data) const;
 	void track_mem_data_clear() { m_track_mem_set.clear(); }
 
 	// tracing
@@ -279,24 +279,24 @@ private:
 
 	// internal helpers
 	void prepare_for_step_overout(offs_t pc);
-	uint32_t dasm_wrapped(std::string &buffer, offs_t pc);
+	u32 dasm_wrapped(std::string &buffer, offs_t pc);
 
 	// breakpoint and watchpoint helpers
 	void breakpoint_update_flags();
 	void breakpoint_check(offs_t pc);
 	void watchpoint_update_flags(address_space &space);
-	void watchpoint_check(address_space &space, int type, offs_t address, uint64_t value_to_write, uint64_t mem_mask);
+	void watchpoint_check(address_space &space, int type, offs_t address, u64 value_to_write, u64 mem_mask);
 	void hotspot_check(address_space &space, offs_t address);
 
 	// symbol get/set callbacks
-	static uint64_t get_current_pc(symbol_table &table, void *ref);
-	static uint64_t get_cycles(symbol_table &table, void *ref);
-	static uint64_t get_totalcycles(symbol_table &table, void *ref);
-	static uint64_t get_lastinstructioncycles(symbol_table &table, void *ref);
-	static uint64_t get_logunmap(symbol_table &table, void *ref);
-	static void set_logunmap(symbol_table &table, void *ref, uint64_t value);
-	static uint64_t get_state(symbol_table &table, void *ref);
-	static void set_state(symbol_table &table, void *ref, uint64_t value);
+	static u64 get_current_pc(symbol_table &table, void *ref);
+	static u64 get_cycles(symbol_table &table, void *ref);
+	static u64 get_totalcycles(symbol_table &table, void *ref);
+	static u64 get_lastinstructioncycles(symbol_table &table, void *ref);
+	static u64 get_logunmap(symbol_table &table, void *ref);
+	static void set_logunmap(symbol_table &table, void *ref, u64 value);
+	static u64 get_state(symbol_table &table, void *ref);
+	static void set_state(symbol_table &table, void *ref, u64 value);
 
 	// basic device information
 	device_t &                 m_device;                // device we are attached to
@@ -306,7 +306,7 @@ private:
 	device_disasm_interface *  m_disasm;                // disasm interface, if present
 
 	// global state
-	uint32_t                      m_flags;                // debugging flags for this CPU
+	u32                         m_flags;                // debugging flags for this CPU
 	symbol_table                m_symtable;             // symbol table for expression evaluation
 	debug_instruction_hook_func m_instrhook;            // per-instruction callback hook
 
@@ -320,12 +320,12 @@ private:
 	int                     m_stopirq;                  // stop IRQ number for DEBUG_FLAG_STOP_INTERRUPT
 	int                     m_stopexception;            // stop exception number for DEBUG_FLAG_STOP_EXCEPTION
 	attotime                m_endexectime;              // ending time of the current execution
-	uint64_t                  m_total_cycles;             // current total cycles
-	uint64_t                  m_last_total_cycles;        // last total cycles
+	u64                     m_total_cycles;             // current total cycles
+	u64                     m_last_total_cycles;        // last total cycles
 
 	// history
 	offs_t                  m_pc_history[HISTORY_SIZE]; // history of recent PCs
-	uint32_t                  m_pc_history_index;         // current history index
+	u32                     m_pc_history_index;         // current history index
 
 	// breakpoints and watchpoints
 	breakpoint *            m_bplist;                   // list of breakpoints
@@ -366,7 +366,7 @@ private:
 		offs_t              m_access;                   // access address
 		offs_t              m_pc;                       // PC of the access
 		address_space *     m_space;                    // space where the access occurred
-		uint32_t              m_count;                    // number of hits
+		u32                 m_count;                    // number of hits
 	};
 	std::vector<hotspot_entry> m_hotspots;            // hotspot list
 	int                     m_hotspot_threshhold;       // threshhold for the number of hits to print
@@ -375,7 +375,7 @@ private:
 	class dasm_pc_tag
 	{
 	public:
-		dasm_pc_tag(const offs_t& address, const uint32_t& crc);
+		dasm_pc_tag(const offs_t& address, const u32& crc);
 
 		// required to be included in a set
 		bool operator < (const dasm_pc_tag& rhs) const
@@ -386,7 +386,7 @@ private:
 		}
 
 		offs_t m_address;       // Stores [nothing] for a given address & crc32
-		uint32_t m_crc;
+		u32    m_crc;
 	};
 	std::set<dasm_pc_tag> m_track_pc_set;
 	bool m_track_pc;
@@ -395,13 +395,13 @@ private:
 	class dasm_comment : public dasm_pc_tag
 	{
 	public:
-		dasm_comment(offs_t address, uint32_t crc, const char *text, rgb_t color);
+		dasm_comment(offs_t address, u32 crc, const char *text, rgb_t color);
 
 		std::string  m_text;        // Stores comment text & color for a given address & crc32
-		rgb_t    m_color;
+		rgb_t        m_color;
 	};
 	std::set<dasm_comment> m_comment_set;               // collection of comments
-	uint32_t                 m_comment_change;            // change counter for comments
+	u32                 m_comment_change;            // change counter for comments
 
 	// memory tracking
 	class dasm_memory_access
@@ -409,7 +409,7 @@ private:
 	public:
 		dasm_memory_access(const address_spacenum& address_space,
 							const offs_t& address,
-							const uint64_t& data,
+							const u64& data,
 							const offs_t& pc);
 
 		// required to be included in a set
@@ -426,31 +426,31 @@ private:
 		// Stores the PC for a given address, memory region, and data value
 		address_spacenum m_address_space;
 		offs_t           m_address;
-		uint64_t           m_data;
+		u64              m_data;
 		mutable offs_t   m_pc;
 	};
 	std::set<dasm_memory_access> m_track_mem_set;
 	bool m_track_mem;
 
 	// internal flag values
-	static const uint32_t DEBUG_FLAG_OBSERVING        = 0x00000001;       // observing this CPU
-	static const uint32_t DEBUG_FLAG_HISTORY          = 0x00000002;       // tracking this CPU's history
-	static const uint32_t DEBUG_FLAG_TRACING          = 0x00000004;       // tracing this CPU
-	static const uint32_t DEBUG_FLAG_TRACING_OVER     = 0x00000008;       // tracing this CPU with step over behavior
-	static const uint32_t DEBUG_FLAG_HOOKED           = 0x00000010;       // per-instruction callback hook
-	static const uint32_t DEBUG_FLAG_STEPPING         = 0x00000020;       // CPU is single stepping
-	static const uint32_t DEBUG_FLAG_STEPPING_OVER    = 0x00000040;       // CPU is stepping over a function
-	static const uint32_t DEBUG_FLAG_STEPPING_OUT     = 0x00000080;       // CPU is stepping out of a function
-	static const uint32_t DEBUG_FLAG_STOP_PC          = 0x00000100;       // there is a pending stop at cpu->breakpc
-	static const uint32_t DEBUG_FLAG_STOP_INTERRUPT   = 0x00000400;       // there is a pending stop on the next interrupt
-	static const uint32_t DEBUG_FLAG_STOP_EXCEPTION   = 0x00000800;       // there is a pending stop on the next exception
-	static const uint32_t DEBUG_FLAG_STOP_VBLANK      = 0x00001000;       // there is a pending stop on the next VBLANK
-	static const uint32_t DEBUG_FLAG_STOP_TIME        = 0x00002000;       // there is a pending stop at cpu->stoptime
-	static const uint32_t DEBUG_FLAG_LIVE_BP          = 0x00010000;       // there are live breakpoints for this CPU
+	static constexpr u32 DEBUG_FLAG_OBSERVING       = 0x00000001;       // observing this CPU
+	static constexpr u32 DEBUG_FLAG_HISTORY         = 0x00000002;       // tracking this CPU's history
+	static constexpr u32 DEBUG_FLAG_TRACING         = 0x00000004;       // tracing this CPU
+	static constexpr u32 DEBUG_FLAG_TRACING_OVER    = 0x00000008;       // tracing this CPU with step over behavior
+	static constexpr u32 DEBUG_FLAG_HOOKED          = 0x00000010;       // per-instruction callback hook
+	static constexpr u32 DEBUG_FLAG_STEPPING        = 0x00000020;       // CPU is single stepping
+	static constexpr u32 DEBUG_FLAG_STEPPING_OVER   = 0x00000040;       // CPU is stepping over a function
+	static constexpr u32 DEBUG_FLAG_STEPPING_OUT    = 0x00000080;       // CPU is stepping out of a function
+	static constexpr u32 DEBUG_FLAG_STOP_PC         = 0x00000100;       // there is a pending stop at cpu->breakpc
+	static constexpr u32 DEBUG_FLAG_STOP_INTERRUPT  = 0x00000400;       // there is a pending stop on the next interrupt
+	static constexpr u32 DEBUG_FLAG_STOP_EXCEPTION  = 0x00000800;       // there is a pending stop on the next exception
+	static constexpr u32 DEBUG_FLAG_STOP_VBLANK     = 0x00001000;       // there is a pending stop on the next VBLANK
+	static constexpr u32 DEBUG_FLAG_STOP_TIME       = 0x00002000;       // there is a pending stop at cpu->stoptime
+	static constexpr u32 DEBUG_FLAG_LIVE_BP         = 0x00010000;       // there are live breakpoints for this CPU
 
-	static const uint32_t DEBUG_FLAG_STEPPING_ANY     = DEBUG_FLAG_STEPPING | DEBUG_FLAG_STEPPING_OVER | DEBUG_FLAG_STEPPING_OUT;
-	static const uint32_t DEBUG_FLAG_TRACING_ANY      = DEBUG_FLAG_TRACING | DEBUG_FLAG_TRACING_OVER;
-	static const uint32_t DEBUG_FLAG_TRANSIENT        = DEBUG_FLAG_STEPPING_ANY | DEBUG_FLAG_STOP_PC |
+	static constexpr u32 DEBUG_FLAG_STEPPING_ANY    = DEBUG_FLAG_STEPPING | DEBUG_FLAG_STEPPING_OVER | DEBUG_FLAG_STEPPING_OUT;
+	static constexpr u32 DEBUG_FLAG_TRACING_ANY     = DEBUG_FLAG_TRACING | DEBUG_FLAG_TRACING_OVER;
+	static constexpr u32 DEBUG_FLAG_TRANSIENT       = DEBUG_FLAG_STEPPING_ANY | DEBUG_FLAG_STOP_PC |
 			DEBUG_FLAG_STOP_INTERRUPT | DEBUG_FLAG_STOP_EXCEPTION | DEBUG_FLAG_STOP_VBLANK | DEBUG_FLAG_STOP_TIME;
 };
 
@@ -510,46 +510,46 @@ public:
 	/* ----- debugger memory accessors ----- */
 
 	/* return a byte from the specified memory space */
-	uint8_t read_byte(address_space &space, offs_t address, bool apply_translation);
+	u8 read_byte(address_space &space, offs_t address, bool apply_translation);
 
 	/* return a word from the specified memory space */
-	uint16_t read_word(address_space &space, offs_t address, bool apply_translation);
+	u16 read_word(address_space &space, offs_t address, bool apply_translation);
 
 	/* return a dword from the specified memory space */
-	uint32_t read_dword(address_space &space, offs_t address, bool apply_translation);
+	u32 read_dword(address_space &space, offs_t address, bool apply_translation);
 
 	/* return a qword from the specified memory space */
-	uint64_t read_qword(address_space &space, offs_t address, bool apply_translation);
+	u64 read_qword(address_space &space, offs_t address, bool apply_translation);
 
 	/* return 1,2,4 or 8 bytes from the specified memory space */
-	uint64_t read_memory(address_space &space, offs_t address, int size, bool apply_translation);
+	u64 read_memory(address_space &space, offs_t address, int size, bool apply_translation);
 
 	/* write a byte to the specified memory space */
-	void write_byte(address_space &space, offs_t address, uint8_t data, bool apply_translation);
+	void write_byte(address_space &space, offs_t address, u8 data, bool apply_translation);
 
 	/* write a word to the specified memory space */
-	void write_word(address_space &space, offs_t address, uint16_t data, bool apply_translation);
+	void write_word(address_space &space, offs_t address, u16 data, bool apply_translation);
 
 	/* write a dword to the specified memory space */
-	void write_dword(address_space &space, offs_t address, uint32_t data, bool apply_translation);
+	void write_dword(address_space &space, offs_t address, u32 data, bool apply_translation);
 
 	/* write a qword to the specified memory space */
-	void write_qword(address_space &space, offs_t address, uint64_t data, bool apply_translation);
+	void write_qword(address_space &space, offs_t address, u64 data, bool apply_translation);
 
 	/* write 1,2,4 or 8 bytes to the specified memory space */
-	void write_memory(address_space &space, offs_t address, uint64_t data, int size, bool apply_translation);
+	void write_memory(address_space &space, offs_t address, u64 data, int size, bool apply_translation);
 
 	/* read 1,2,4 or 8 bytes at the given offset from opcode space */
-	uint64_t read_opcode(address_space &space, offs_t offset, int size);
+	u64 read_opcode(address_space &space, offs_t offset, int size);
 
 	// getters
 	bool within_instruction_hook() const { return m_within_instruction_hook; }
 	bool memory_modified() const { return m_memory_modified; }
 	int execution_state() const { return m_execution_state; }
 	device_t *live_cpu() { return m_livecpu; }
-	uint32_t get_breakpoint_index() { return m_bpindex++; }
-	uint32_t get_watchpoint_index() { return m_wpindex++; }
-	uint32_t get_registerpoint_index() { return m_rpindex++; }
+	u32 get_breakpoint_index() { return m_bpindex++; }
+	u32 get_watchpoint_index() { return m_wpindex++; }
+	u32 get_registerpoint_index() { return m_rpindex++; }
 
 	// setters
 	void set_visible_cpu(device_t * visiblecpu) { m_visiblecpu = visiblecpu; }
@@ -568,26 +568,26 @@ public:
 	void ensure_comments_loaded();
 	void reset_transient_flags();
 	void process_source_file();
-	void watchpoint_check(address_space& space, int type, offs_t address, uint64_t value_to_write, uint64_t mem_mask, device_debug::watchpoint** wplist);
+	void watchpoint_check(address_space& space, int type, offs_t address, u64 value_to_write, u64 mem_mask, device_debug::watchpoint** wplist);
 
 private:
 	static const size_t NUM_TEMP_VARIABLES;
 
 	/* expression handlers */
-	uint64_t expression_read_memory(void *param, const char *name, expression_space space, uint32_t address, int size);
-	uint64_t expression_read_program_direct(address_space &space, int opcode, offs_t address, int size);
-	uint64_t expression_read_memory_region(const char *rgntag, offs_t address, int size);
-	void expression_write_memory(void *param, const char *name, expression_space space, uint32_t address, int size, uint64_t data);
-	void expression_write_program_direct(address_space &space, int opcode, offs_t address, int size, uint64_t data);
-	void expression_write_memory_region(const char *rgntag, offs_t address, int size, uint64_t data);
+	u64 expression_read_memory(void *param, const char *name, expression_space space, u32 address, int size);
+	u64 expression_read_program_direct(address_space &space, int opcode, offs_t address, int size);
+	u64 expression_read_memory_region(const char *rgntag, offs_t address, int size);
+	void expression_write_memory(void *param, const char *name, expression_space space, u32 address, int size, u64 data);
+	void expression_write_program_direct(address_space &space, int opcode, offs_t address, int size, u64 data);
+	void expression_write_memory_region(const char *rgntag, offs_t address, int size, u64 data);
 	expression_error::error_code expression_validate(void *param, const char *name, expression_space space);
 	device_t* expression_get_device(const char *tag);
 
 	/* variable getters/setters */
-	uint64_t get_cpunum(symbol_table &table, void *ref);
-	uint64_t get_beamx(symbol_table &table, void *ref);
-	uint64_t get_beamy(symbol_table &table, void *ref);
-	uint64_t get_frame(symbol_table &table, void *ref);
+	u64 get_cpunum(symbol_table &table, void *ref);
+	u64 get_beamx(symbol_table &table, void *ref);
+	u64 get_beamy(symbol_table &table, void *ref);
+	u64 get_frame(symbol_table &table, void *ref);
 
 	/* internal helpers */
 	void on_vblank(screen_device &device, bool vblank_state);
@@ -602,25 +602,25 @@ private:
 
 	std::unique_ptr<symbol_table> m_symtable;           // global symbol table
 
-	bool    m_within_instruction_hook;
-	bool    m_vblank_occurred;
-	bool    m_memory_modified;
-	bool    m_debugger_access;
+	bool        m_within_instruction_hook;
+	bool        m_vblank_occurred;
+	bool        m_memory_modified;
+	bool        m_debugger_access;
 
 	int         m_execution_state;
 	device_t *  m_stop_when_not_device; // stop execution when the device ceases to be this
 
-	uint32_t      m_bpindex;
-	uint32_t      m_wpindex;
-	uint32_t      m_rpindex;
+	u32         m_bpindex;
+	u32         m_wpindex;
+	u32         m_rpindex;
 
-	uint64_t      m_wpdata;
-	uint64_t      m_wpaddr;
-	std::unique_ptr<uint64_t[]> m_tempvar;
+	u64         m_wpdata;
+	u64         m_wpaddr;
+	std::unique_ptr<u64[]> m_tempvar;
 
 	osd_ticks_t m_last_periodic_update_time;
 
 	bool        m_comments_loaded;
 };
 
-#endif
+#endif // MAME_EMU_DEBUG_DEBUGCPU_H

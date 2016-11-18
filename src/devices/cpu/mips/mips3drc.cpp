@@ -2946,7 +2946,7 @@ bool mips3_device::generate_cop1_fr0(drcuml_block *block, compiler_state *compil
 						generate_get_cop1_reg64(block, compiler, desc, FSREG, F0);  // dmov    F0,<fsreg>
 						UML_FDNEG(block, F1, F0);                                   // fdneg   F1,F0
 						UML_DCMP(block, F0, 0);                                     // cmp     F0,0.0
-						UML_DMOVc(block, COND_E, F1, U64(0x8000000000000000));      // dmov    F1,-0.0,e
+						UML_DMOVc(block, COND_E, F1, 0x8000000000000000U);          // dmov    F1,-0.0,e
 						generate_set_cop1_reg64(block, compiler, desc, FDREG, F1);  // dmov    <fdreg>,F1
 					}
 					return true;

@@ -1875,7 +1875,7 @@ READ64_MEMBER(taitotz_state::ieee1394_r)
 {
 	if (offset == 4)
 	{
-		return U64(0xffffffffffffffff);
+		return 0xffffffffffffffffU;
 	}
 
 	//logerror("ieee1394_r: %08X, %08X%08X\n", offset, (uint32_t)(mem_mask >> 32), (uint32_t)(mem_mask));

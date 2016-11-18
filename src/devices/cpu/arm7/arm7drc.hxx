@@ -1362,7 +1362,7 @@ void arm7_cpu_device::saturate_qbit_overflow(drcuml_block *block)
 	UML_DCMP(block, uml::I0, 0x000000007fffffffL);
 	UML_MOVc(block, uml::COND_G, uml::I1, Q_MASK);
 	UML_MOVc(block, uml::COND_G, uml::I0, 0x7fffffff);
-	UML_DCMP(block, uml::I0, U64(0xffffffff80000000));
+	UML_DCMP(block, uml::I0, 0xffffffff80000000ULL);
 	UML_MOVc(block, uml::COND_L, uml::I1, Q_MASK);
 	UML_MOVc(block, uml::COND_L, uml::I0, 0x80000000);
 	UML_OR(block, DRC_CPSR, DRC_CPSR, uml::I1);

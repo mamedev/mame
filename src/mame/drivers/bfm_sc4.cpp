@@ -310,7 +310,7 @@ READ16_MEMBER(sc4_state::sc4_cs1_r)
 		}
 
 
-		return m_cpuregion->u16(offset);
+		return m_cpuregion->as_u16(offset);
 	}
 	else
 		logerror("%08x maincpu read access offset %08x mem_mask %04x cs %d\n", pc, offset*2, mem_mask, 1);

@@ -21,10 +21,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_EMU_PROFILER_H
+#define MAME_EMU_PROFILER_H
 
-#ifndef __PROFILER_H__
-#define __PROFILER_H__
+#pragma once
 
 #include "attotime.h"
 
@@ -212,4 +212,4 @@ typedef dummy_profiler_state profiler_state;
 extern profiler_state g_profiler;
 
 
-#endif  /* __PROFILER_H__ */
+#endif  /* MAME_EMU_PROFILER_H */

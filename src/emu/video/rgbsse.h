@@ -29,8 +29,8 @@ class rgbaint_t
 {
 public:
 	rgbaint_t() { }
-	explicit rgbaint_t(uint32_t rgba) { set(rgba); }
-	rgbaint_t(int32_t a, int32_t r, int32_t g, int32_t b) { set(a, r, g, b); }
+	explicit rgbaint_t(u32 rgba) { set(rgba); }
+	rgbaint_t(s32 a, s32 r, s32 g, s32 b) { set(a, r, g, b); }
 	explicit rgbaint_t(const rgb_t& rgb) { set(rgb); }
 	explicit rgbaint_t(__m128i rgba) { m_value = rgba; }
 
@@ -38,8 +38,8 @@ public:
 	rgbaint_t &operator=(const rgbaint_t& other) = default;
 
 	void set(const rgbaint_t& other) { m_value = other.m_value; }
-	void set(uint32_t rgba) { m_value = _mm_and_si128(_mm_set1_epi32(0xff), _mm_set_epi32(rgba >> 24, rgba >> 16, rgba >> 8, rgba)); }
-	void set(int32_t a, int32_t r, int32_t g, int32_t b) { m_value = _mm_set_epi32(a, r, g, b); }
+	void set(u32 rgba) { m_value = _mm_and_si128(_mm_set1_epi32(0xff), _mm_set_epi32(rgba >> 24, rgba >> 16, rgba >> 8, rgba)); }
+	void set(s32 a, s32 r, s32 g, s32 b) { m_value = _mm_set_epi32(a, r, g, b); }
 	void set(const rgb_t& rgb) { m_value = _mm_unpacklo_epi16(_mm_unpacklo_epi8(_mm_cvtsi32_si128(rgb), _mm_setzero_si128()), _mm_setzero_si128()); }
 
 	inline rgb_t to_rgba() const
@@ -53,32 +53,32 @@ public:
 	}
 
 #ifdef __SSE4_1__
-	void set_a(const int32_t value) { m_value = _mm_insert_epi32(m_value, value, 3); }
-	void set_r(const int32_t value) { m_value = _mm_insert_epi32(m_value, value, 2); }
-	void set_g(const int32_t value) { m_value = _mm_insert_epi32(m_value, value, 1); }
-	void set_b(const int32_t value) { m_value = _mm_insert_epi32(m_value, value, 0); }
+	void set_a(const s32 value) { m_value = _mm_insert_epi32(m_value, value, 3); }
+	void set_r(const s32 value) { m_value = _mm_insert_epi32(m_value, value, 2); }
+	void set_g(const s32 value) { m_value = _mm_insert_epi32(m_value, value, 1); }
+	void set_b(const s32 value) { m_value = _mm_insert_epi32(m_value, value, 0); }
 #else
-	void set_a(const int32_t value) { m_value = _mm_or_si128(_mm_and_si128(m_value, alpha_mask()), _mm_set_epi32(value, 0, 0, 0)); }
-	void set_r(const int32_t value) { m_value = _mm_or_si128(_mm_and_si128(m_value, red_mask()), _mm_set_epi32(0, value, 0, 0)); }
-	void set_g(const int32_t value) { m_value = _mm_or_si128(_mm_and_si128(m_value, green_mask()), _mm_set_epi32(0, 0, value, 0)); }
-	void set_b(const int32_t value) { m_value = _mm_or_si128(_mm_and_si128(m_value, blue_mask()), _mm_set_epi32(0, 0, 0, value)); }
+	void set_a(const s32 value) { m_value = _mm_or_si128(_mm_and_si128(m_value, alpha_mask()), _mm_set_epi32(value, 0, 0, 0)); }
+	void set_r(const s32 value) { m_value = _mm_or_si128(_mm_and_si128(m_value, red_mask()), _mm_set_epi32(0, value, 0, 0)); }
+	void set_g(const s32 value) { m_value = _mm_or_si128(_mm_and_si128(m_value, green_mask()), _mm_set_epi32(0, 0, value, 0)); }
+	void set_b(const s32 value) { m_value = _mm_or_si128(_mm_and_si128(m_value, blue_mask()), _mm_set_epi32(0, 0, 0, value)); }
 #endif
 
-	uint8_t get_a() const { return uint8_t(unsigned(_mm_extract_epi16(m_value, 6))); }
-	uint8_t get_r() const { return uint8_t(unsigned(_mm_extract_epi16(m_value, 4))); }
-	uint8_t get_g() const { return uint8_t(unsigned(_mm_extract_epi16(m_value, 2))); }
-	uint8_t get_b() const { return uint8_t(unsigned(_mm_extract_epi16(m_value, 0))); }
+	u8 get_a() const { return u8(unsigned(_mm_extract_epi16(m_value, 6))); }
+	u8 get_r() const { return u8(unsigned(_mm_extract_epi16(m_value, 4))); }
+	u8 get_g() const { return u8(unsigned(_mm_extract_epi16(m_value, 2))); }
+	u8 get_b() const { return u8(unsigned(_mm_extract_epi16(m_value, 0))); }
 
 #ifdef __SSE4_1__
-	int32_t get_a32() const { return _mm_extract_epi32(m_value, 3); }
-	int32_t get_r32() const { return _mm_extract_epi32(m_value, 2); }
-	int32_t get_g32() const { return _mm_extract_epi32(m_value, 1); }
-	int32_t get_b32() const { return _mm_extract_epi32(m_value, 0); }
+	s32 get_a32() const { return _mm_extract_epi32(m_value, 3); }
+	s32 get_r32() const { return _mm_extract_epi32(m_value, 2); }
+	s32 get_g32() const { return _mm_extract_epi32(m_value, 1); }
+	s32 get_b32() const { return _mm_extract_epi32(m_value, 0); }
 #else
-	int32_t get_a32() const { return (_mm_extract_epi16(m_value, 7) << 16) | _mm_extract_epi16(m_value, 6); }
-	int32_t get_r32() const { return (_mm_extract_epi16(m_value, 5) << 16) | _mm_extract_epi16(m_value, 4); }
-	int32_t get_g32() const { return (_mm_extract_epi16(m_value, 3) << 16) | _mm_extract_epi16(m_value, 2); }
-	int32_t get_b32() const { return (_mm_extract_epi16(m_value, 1) << 16) | _mm_extract_epi16(m_value, 0); }
+	s32 get_a32() const { return (_mm_extract_epi16(m_value, 7) << 16) | _mm_extract_epi16(m_value, 6); }
+	s32 get_r32() const { return (_mm_extract_epi16(m_value, 5) << 16) | _mm_extract_epi16(m_value, 4); }
+	s32 get_g32() const { return (_mm_extract_epi16(m_value, 3) << 16) | _mm_extract_epi16(m_value, 2); }
+	s32 get_b32() const { return (_mm_extract_epi16(m_value, 1) << 16) | _mm_extract_epi16(m_value, 0); }
 #endif
 
 	inline void add(const rgbaint_t& color2)
@@ -86,12 +86,12 @@ public:
 		m_value = _mm_add_epi32(m_value, color2.m_value);
 	}
 
-	inline void add_imm(const int32_t imm)
+	inline void add_imm(const s32 imm)
 	{
 		m_value = _mm_add_epi32(m_value, _mm_set1_epi32(imm));
 	}
 
-	inline void add_imm_rgba(const int32_t a, const int32_t r, const int32_t g, const int32_t b)
+	inline void add_imm_rgba(const s32 a, const s32 r, const s32 g, const s32 b)
 	{
 		m_value = _mm_add_epi32(m_value, _mm_set_epi32(a, r, g, b));
 	}
@@ -101,12 +101,12 @@ public:
 		m_value = _mm_sub_epi32(m_value, color2.m_value);
 	}
 
-	inline void sub_imm(const int32_t imm)
+	inline void sub_imm(const s32 imm)
 	{
 		m_value = _mm_sub_epi32(m_value, _mm_set1_epi32(imm));
 	}
 
-	inline void sub_imm_rgba(const int32_t a, const int32_t r, const int32_t g, const int32_t b)
+	inline void sub_imm_rgba(const s32 a, const s32 r, const s32 g, const s32 b)
 	{
 		m_value = _mm_sub_epi32(m_value, _mm_set_epi32(a, r, g, b));
 	}
@@ -116,12 +116,12 @@ public:
 		m_value = _mm_sub_epi32(color2.m_value, m_value);
 	}
 
-	inline void subr_imm(const int32_t imm)
+	inline void subr_imm(const s32 imm)
 	{
 		m_value = _mm_sub_epi32(_mm_set1_epi32(imm), m_value);
 	}
 
-	inline void subr_imm_rgba(const int32_t a, const int32_t r, const int32_t g, const int32_t b)
+	inline void subr_imm_rgba(const s32 a, const s32 r, const s32 g, const s32 b)
 	{
 		m_value = _mm_sub_epi32(_mm_set_epi32(a, r, g, b), m_value);
 	}
@@ -133,7 +133,7 @@ public:
 		m_value = _mm_unpacklo_epi32(_mm_shuffle_epi32(tmp1, _MM_SHUFFLE(0, 0, 2, 0)), _mm_shuffle_epi32(tmp2, _MM_SHUFFLE(0, 0, 2, 0)));
 	}
 
-	inline void mul_imm(const int32_t imm)
+	inline void mul_imm(const s32 imm)
 	{
 		__m128i immv = _mm_set1_epi32(imm);
 		__m128i tmp1 = _mm_mul_epu32(m_value, immv);
@@ -141,7 +141,7 @@ public:
 		m_value = _mm_unpacklo_epi32(_mm_shuffle_epi32(tmp1, _MM_SHUFFLE(0, 0, 2, 0)), _mm_shuffle_epi32(tmp2, _MM_SHUFFLE(0, 0, 2, 0)));
 	}
 
-	inline void mul_imm_rgba(const int32_t a, const int32_t r, const int32_t g, const int32_t b)
+	inline void mul_imm_rgba(const s32 a, const s32 r, const s32 g, const s32 b)
 	{
 		__m128i immv = _mm_set_epi32(a, r, g, b);
 		__m128i tmp1 = _mm_mul_epu32(m_value, immv);
@@ -166,7 +166,7 @@ public:
 		set(areg.get_a32(), rreg.get_r32(), greg.get_g32(), breg.get_b32());
 	}
 
-	inline void shl_imm(const uint8_t shift)
+	inline void shl_imm(const u8 shift)
 	{
 		m_value = _mm_slli_epi32(m_value, shift);
 	}
@@ -188,7 +188,7 @@ public:
 		set(areg.get_a32(), rreg.get_r32(), greg.get_g32(), breg.get_b32());
 	}
 
-	inline void shr_imm(const uint8_t shift)
+	inline void shr_imm(const u8 shift)
 	{
 		m_value = _mm_srli_epi32(m_value, shift);
 	}
@@ -210,7 +210,7 @@ public:
 		set(areg.get_a32(), rreg.get_r32(), greg.get_g32(), breg.get_b32());
 	}
 
-	inline void sra_imm(const uint8_t shift)
+	inline void sra_imm(const u8 shift)
 	{
 		m_value = _mm_srai_epi32(m_value, shift);
 	}
@@ -221,15 +221,15 @@ public:
 
 	void andnot_reg(const rgbaint_t& color2) { m_value = _mm_andnot_si128(color2.m_value, m_value); }
 
-	void or_imm(int32_t value) { m_value = _mm_or_si128(m_value, _mm_set1_epi32(value)); }
-	void and_imm(int32_t value) { m_value = _mm_and_si128(m_value, _mm_set1_epi32(value)); }
-	void xor_imm(int32_t value) { m_value = _mm_xor_si128(m_value, _mm_set1_epi32(value)); }
+	void or_imm(s32 value) { m_value = _mm_or_si128(m_value, _mm_set1_epi32(value)); }
+	void and_imm(s32 value) { m_value = _mm_and_si128(m_value, _mm_set1_epi32(value)); }
+	void xor_imm(s32 value) { m_value = _mm_xor_si128(m_value, _mm_set1_epi32(value)); }
 
-	void or_imm_rgba(int32_t a, int32_t r, int32_t g, int32_t b) { m_value = _mm_or_si128(m_value, _mm_set_epi32(a, r, g, b)); }
-	void and_imm_rgba(int32_t a, int32_t r, int32_t g, int32_t b) { m_value = _mm_and_si128(m_value, _mm_set_epi32(a, r, g, b)); }
-	void xor_imm_rgba(int32_t a, int32_t r, int32_t g, int32_t b) { m_value = _mm_xor_si128(m_value, _mm_set_epi32(a, r, g, b)); }
+	void or_imm_rgba(s32 a, s32 r, s32 g, s32 b) { m_value = _mm_or_si128(m_value, _mm_set_epi32(a, r, g, b)); }
+	void and_imm_rgba(s32 a, s32 r, s32 g, s32 b) { m_value = _mm_and_si128(m_value, _mm_set_epi32(a, r, g, b)); }
+	void xor_imm_rgba(s32 a, s32 r, s32 g, s32 b) { m_value = _mm_xor_si128(m_value, _mm_set_epi32(a, r, g, b)); }
 
-	inline void clamp_and_clear(const uint32_t sign)
+	inline void clamp_and_clear(const u32 sign)
 	{
 		__m128i vsign = _mm_set1_epi32(sign);
 		m_value = _mm_and_si128(m_value, _mm_cmpeq_epi32(_mm_and_si128(m_value, vsign), _mm_setzero_si128()));
@@ -247,7 +247,7 @@ public:
 		m_value = _mm_unpacklo_epi16(m_value, _mm_setzero_si128());
 	}
 
-	inline void sign_extend(const uint32_t compare, const uint32_t sign)
+	inline void sign_extend(const u32 compare, const u32 sign)
 	{
 		__m128i compare_vec = _mm_set1_epi32(compare);
 		__m128i compare_mask = _mm_cmpeq_epi32(_mm_and_si128(m_value, compare_vec), compare_vec);
@@ -255,7 +255,7 @@ public:
 		m_value = _mm_or_si128(m_value, compared);
 	}
 
-	inline void min(const int32_t value)
+	inline void min(const s32 value)
 	{
 		__m128i val = _mm_set1_epi32(value);
 		__m128i is_greater_than = _mm_cmpgt_epi32(m_value, val);
@@ -267,7 +267,7 @@ public:
 		m_value = _mm_or_si128(val_to_set, m_value);
 	}
 
-	inline void max(const int32_t value)
+	inline void max(const s32 value)
 	{
 		__m128i val = _mm_set1_epi32(value);
 		__m128i is_less_than = _mm_cmplt_epi32(m_value, val);
@@ -279,12 +279,12 @@ public:
 		m_value = _mm_or_si128(val_to_set, m_value);
 	}
 
-	void blend(const rgbaint_t& other, uint8_t factor);
+	void blend(const rgbaint_t& other, u8 factor);
 
 	void scale_and_clamp(const rgbaint_t& scale);
-	void scale_imm_and_clamp(const int32_t scale);
+	void scale_imm_and_clamp(const s32 scale);
 
-	inline void scale_imm_add_and_clamp(const int32_t scale, const rgbaint_t& other)
+	inline void scale_imm_add_and_clamp(const s32 scale, const rgbaint_t& other)
 	{
 		mul_imm(scale);
 		sra_imm(8);
@@ -315,13 +315,13 @@ public:
 	void cmpgt(const rgbaint_t& value) { m_value = _mm_cmpgt_epi32(m_value, value.m_value); }
 	void cmplt(const rgbaint_t& value) { m_value = _mm_cmplt_epi32(m_value, value.m_value); }
 
-	void cmpeq_imm(int32_t value) { m_value = _mm_cmpeq_epi32(m_value, _mm_set1_epi32(value)); }
-	void cmpgt_imm(int32_t value) { m_value = _mm_cmpgt_epi32(m_value, _mm_set1_epi32(value)); }
-	void cmplt_imm(int32_t value) { m_value = _mm_cmplt_epi32(m_value, _mm_set1_epi32(value)); }
+	void cmpeq_imm(s32 value) { m_value = _mm_cmpeq_epi32(m_value, _mm_set1_epi32(value)); }
+	void cmpgt_imm(s32 value) { m_value = _mm_cmpgt_epi32(m_value, _mm_set1_epi32(value)); }
+	void cmplt_imm(s32 value) { m_value = _mm_cmplt_epi32(m_value, _mm_set1_epi32(value)); }
 
-	void cmpeq_imm_rgba(int32_t a, int32_t r, int32_t g, int32_t b) { m_value = _mm_cmpeq_epi32(m_value, _mm_set_epi32(a, r, g, b)); }
-	void cmpgt_imm_rgba(int32_t a, int32_t r, int32_t g, int32_t b) { m_value = _mm_cmpgt_epi32(m_value, _mm_set_epi32(a, r, g, b)); }
-	void cmplt_imm_rgba(int32_t a, int32_t r, int32_t g, int32_t b) { m_value = _mm_cmplt_epi32(m_value, _mm_set_epi32(a, r, g, b)); }
+	void cmpeq_imm_rgba(s32 a, s32 r, s32 g, s32 b) { m_value = _mm_cmpeq_epi32(m_value, _mm_set_epi32(a, r, g, b)); }
+	void cmpgt_imm_rgba(s32 a, s32 r, s32 g, s32 b) { m_value = _mm_cmpgt_epi32(m_value, _mm_set_epi32(a, r, g, b)); }
+	void cmplt_imm_rgba(s32 a, s32 r, s32 g, s32 b) { m_value = _mm_cmplt_epi32(m_value, _mm_set_epi32(a, r, g, b)); }
 
 	inline rgbaint_t& operator+=(const rgbaint_t& other)
 	{
@@ -329,7 +329,7 @@ public:
 		return *this;
 	}
 
-	inline rgbaint_t& operator+=(const int32_t other)
+	inline rgbaint_t& operator+=(const s32 other)
 	{
 		m_value = _mm_add_epi32(m_value, _mm_set1_epi32(other));
 		return *this;
@@ -347,14 +347,14 @@ public:
 		return *this;
 	}
 
-	inline rgbaint_t& operator*=(const int32_t other)
+	inline rgbaint_t& operator*=(const s32 other)
 	{
 		const __m128i immv = _mm_set1_epi32(other);
 		m_value = _mm_unpacklo_epi32(_mm_shuffle_epi32(_mm_mul_epu32(m_value, immv), _MM_SHUFFLE(0, 0, 2, 0)), _mm_shuffle_epi32(_mm_mul_epu32(_mm_srli_si128(m_value, 4), _mm_srli_si128(immv, 4)), _MM_SHUFFLE(0, 0, 2, 0)));
 		return *this;
 	}
 
-	inline rgbaint_t& operator>>=(const int32_t shift)
+	inline rgbaint_t& operator>>=(const s32 shift)
 	{
 		m_value = _mm_srai_epi32(m_value, shift);
 		return *this;
@@ -370,7 +370,7 @@ public:
 #endif
 	}
 
-	static uint32_t bilinear_filter(uint32_t rgb00, uint32_t rgb01, uint32_t rgb10, uint32_t rgb11, uint8_t u, uint8_t v)
+	static u32 bilinear_filter(u32 rgb00, u32 rgb01, u32 rgb10, u32 rgb11, u8 u, u8 v)
 	{
 		__m128i color00 = _mm_cvtsi32_si128(rgb00);
 		__m128i color01 = _mm_cvtsi32_si128(rgb01);
@@ -394,7 +394,7 @@ public:
 		return _mm_cvtsi128_si32(color01);
 	}
 
-	void bilinear_filter_rgbaint(uint32_t rgb00, uint32_t rgb01, uint32_t rgb10, uint32_t rgb11, uint8_t u, uint8_t v)
+	void bilinear_filter_rgbaint(u32 rgb00, u32 rgb01, u32 rgb10, u32 rgb11, u8 u, u8 v)
 	{
 		__m128i color00 = _mm_cvtsi32_si128(rgb00);
 		__m128i color01 = _mm_cvtsi32_si128(rgb01);
@@ -419,18 +419,18 @@ protected:
 	struct _statics
 	{
 		__m128  dummy_for_alignment;
-		uint16_t   alpha_mask[8];
-		uint16_t   red_mask[8];
-		uint16_t   green_mask[8];
-		uint16_t   blue_mask[8];
-		int16_t   scale_table[256][8];
+		u16     alpha_mask[8];
+		u16     red_mask[8];
+		u16     green_mask[8];
+		u16     blue_mask[8];
+		s16     scale_table[256][8];
 	};
 
 	static __m128i alpha_mask() { return *(__m128i *)&statics.alpha_mask[0]; }
 	static __m128i red_mask() { return *(__m128i *)&statics.red_mask[0]; }
 	static __m128i green_mask() { return *(__m128i *)&statics.green_mask[0]; }
 	static __m128i blue_mask() { return *(__m128i *)&statics.blue_mask[0]; }
-	static __m128i scale_factor(uint8_t index) { return *(__m128i *)&statics.scale_table[index][0]; }
+	static __m128i scale_factor(u8 index) { return *(__m128i *)&statics.scale_table[index][0]; }
 
 	__m128i m_value;
 
@@ -438,4 +438,4 @@ protected:
 
 };
 
-#endif /* __RGBSSE__ */
+#endif /* MAME_EMU_VIDEO_RGBSSE_H */

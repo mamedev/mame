@@ -821,7 +821,7 @@ void tms57002_device::device_start()
 	state_add(TMS57002_ST1,   "ST1",    st1);
 	state_add(TMS57002_RPTC,  "RPTC",   rptc);
 	state_add(TMS57002_AACC,  "AACC",   aacc);
-	state_add(TMS57002_MACC,  "MACC",   macc).mask(U64(0xfffffffffffff));
+	state_add(TMS57002_MACC,  "MACC",   macc).mask(0xfffffffffffffU);
 	state_add(TMS57002_BA0,   "BA0",    ba0);
 	state_add(TMS57002_BA1,   "BA1",    ba1);
 	state_add(TMS57002_CREG,  "CREG",   creg);

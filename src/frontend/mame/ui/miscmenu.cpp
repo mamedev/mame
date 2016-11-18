@@ -250,7 +250,7 @@ void menu_bookkeeping::populate()
 		util::stream_format(tempstring, _("Tickets dispensed: %1$d\n\n"), tickets);
 
 	/* loop over coin counters */
-	for (ctrnum = 0; ctrnum < COIN_COUNTERS; ctrnum++)
+	for (ctrnum = 0; ctrnum < bookkeeping_manager::COIN_COUNTERS; ctrnum++)
 	{
 		int count = machine().bookkeeping().coin_counter_get_count(ctrnum);
 

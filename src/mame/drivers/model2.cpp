@@ -691,12 +691,12 @@ WRITE32_MEMBER(model2_state::copro_prg_w)
 		logerror("copro_prg_w: %08X:   %08X\n", m_coprocnt, data);
 		if (m_coprocnt & 1)
 		{
-			m_tgpx4_program[m_coprocnt / 2] &= U64(0xffffffff);
-			m_tgpx4_program[m_coprocnt / 2] |= (uint64_t)(data) << 32;
+			m_tgpx4_program[m_coprocnt / 2] &= 0xffffffffU;
+			m_tgpx4_program[m_coprocnt / 2] |= u64(data) << 32;
 		}
 		else
 		{
-			m_tgpx4_program[m_coprocnt / 2] &= U64(0xffffffff00000000);
+			m_tgpx4_program[m_coprocnt / 2] &= 0xffffffff00000000U;
 			m_tgpx4_program[m_coprocnt / 2] |= data;
 		}
 		m_coprocnt++;

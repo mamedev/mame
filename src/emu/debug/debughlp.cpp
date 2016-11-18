@@ -1518,7 +1518,7 @@ const char *debug_get_help(const char *tag)
 
 	/* make a lowercase copy of the tag */
 	for (i = 0; i <= taglen; i++)
-		tagcopy[i] = tolower((uint8_t)tag[i]);
+		tagcopy[i] = tolower(u8(tag[i]));
 
 	/* find a match */
 	for (i = 0; i < ARRAY_LENGTH(static_help_list); i++)

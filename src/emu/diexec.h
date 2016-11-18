@@ -14,8 +14,8 @@
 #error Dont include this file directly; include emu.h instead.
 #endif
 
-#ifndef __DIEXEC_H__
-#define __DIEXEC_H__
+#ifndef MAME_EMU_DIEXEC_H
+#define MAME_EMU_DIEXEC_H
 
 
 //**************************************************************************
@@ -23,14 +23,14 @@
 //**************************************************************************
 
 // suspension reasons for executing devices
-const uint32_t SUSPEND_REASON_HALT        = 0x0001;   // HALT line set (or equivalent)
-const uint32_t SUSPEND_REASON_RESET       = 0x0002;   // RESET line set (or equivalent)
-const uint32_t SUSPEND_REASON_SPIN        = 0x0004;   // currently spinning
-const uint32_t SUSPEND_REASON_TRIGGER     = 0x0008;   // waiting for a trigger
-const uint32_t SUSPEND_REASON_DISABLE     = 0x0010;   // disabled (due to disable flag)
-const uint32_t SUSPEND_REASON_TIMESLICE   = 0x0020;   // waiting for the next timeslice
-const uint32_t SUSPEND_REASON_CLOCK       = 0x0040;   // currently not clocked
-const uint32_t SUSPEND_ANY_REASON         = ~0;       // all of the above
+constexpr u32 SUSPEND_REASON_HALT       = 0x0001;   // HALT line set (or equivalent)
+constexpr u32 SUSPEND_REASON_RESET      = 0x0002;   // RESET line set (or equivalent)
+constexpr u32 SUSPEND_REASON_SPIN       = 0x0004;   // currently spinning
+constexpr u32 SUSPEND_REASON_TRIGGER    = 0x0008;   // waiting for a trigger
+constexpr u32 SUSPEND_REASON_DISABLE    = 0x0010;   // disabled (due to disable flag)
+constexpr u32 SUSPEND_REASON_TIMESLICE  = 0x0020;   // waiting for the next timeslice
+constexpr u32 SUSPEND_REASON_CLOCK      = 0x0040;   // currently not clocked
+constexpr u32 SUSPEND_ANY_REASON        = ~0;       // all of the above
 
 
 // I/O line states
@@ -71,7 +71,7 @@ enum
 //  MACROS
 //**************************************************************************
 
-#define TIMER_CALLBACK_MEMBER(name)     void name(void *ptr, int32_t param)
+#define TIMER_CALLBACK_MEMBER(name)     void name(void *ptr, s32 param)
 
 // IRQ callback to be called by device implementations when an IRQ is actually taken
 #define IRQ_CALLBACK_MEMBER(func)       int func(device_t &device, int irqline)
@@ -138,14 +138,14 @@ public:
 
 	// configuration access
 	bool disabled() const { return m_disabled; }
-	uint64_t clocks_to_cycles(uint64_t clocks) const { return execute_clocks_to_cycles(clocks); }
-	uint64_t cycles_to_clocks(uint64_t cycles) const { return execute_cycles_to_clocks(cycles); }
-	uint32_t min_cycles() const { return execute_min_cycles(); }
-	uint32_t max_cycles() const { return execute_max_cycles(); }
-	attotime cycles_to_attotime(uint64_t cycles) const { return device().clocks_to_attotime(cycles_to_clocks(cycles)); }
-	uint64_t attotime_to_cycles(const attotime &duration) const { return clocks_to_cycles(device().attotime_to_clocks(duration)); }
-	uint32_t input_lines() const { return execute_input_lines(); }
-	uint32_t default_irq_vector() const { return execute_default_irq_vector(); }
+	u64 clocks_to_cycles(u64 clocks) const { return execute_clocks_to_cycles(clocks); }
+	u64 cycles_to_clocks(u64 cycles) const { return execute_cycles_to_clocks(cycles); }
+	u32 min_cycles() const { return execute_min_cycles(); }
+	u32 max_cycles() const { return execute_max_cycles(); }
+	attotime cycles_to_attotime(u64 cycles) const { return device().clocks_to_attotime(cycles_to_clocks(cycles)); }
+	u64 attotime_to_cycles(const attotime &duration) const { return clocks_to_cycles(device().attotime_to_clocks(duration)); }
+	u32 input_lines() const { return execute_input_lines(); }
+	u32 default_irq_vector() const { return execute_default_irq_vector(); }
 
 	// static inline configuration helpers
 	static void static_set_disable(device_t &device);
@@ -156,7 +156,7 @@ public:
 	// execution management
 	device_scheduler &scheduler() const { assert(m_scheduler != nullptr); return *m_scheduler; }
 	bool executing() const;
-	int32_t cycles_remaining() const;
+	s32 cycles_remaining() const;
 	void eat_cycles(int cycles);
 	void adjust_icount(int delta);
 	void abort_timeslice();
@@ -168,9 +168,9 @@ public:
 	int input_state(int linenum) const { return m_input[linenum].m_curstate; }
 
 	// suspend/resume
-	void suspend(uint32_t reason, bool eatcycles);
-	void resume(uint32_t reason);
-	bool suspended(uint32_t reason = SUSPEND_ANY_REASON) const { return (m_nextsuspend & reason) != 0; }
+	void suspend(u32 reason, bool eatcycles);
+	void resume(u32 reason);
+	bool suspended(u32 reason = SUSPEND_ANY_REASON) const { return (m_nextsuspend & reason) != 0; }
 	void yield() { suspend(SUSPEND_REASON_TIMESLICE, false); }
 	void spin() { suspend(SUSPEND_REASON_TIMESLICE, true); }
 	void spin_until_trigger(int trigid) { suspend_until_trigger(trigid, true); }
@@ -184,7 +184,7 @@ public:
 
 	// time and cycle accounting
 	attotime local_time() const;
-	uint64_t total_cycles() const;
+	u64 total_cycles() const;
 
 	// required operation overrides
 	void run() { execute_run(); }
@@ -195,18 +195,18 @@ public:
 
 protected:
 	// clock and cycle information getters
-	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const;
-	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const;
-	virtual uint32_t execute_min_cycles() const;
-	virtual uint32_t execute_max_cycles() const;
+	virtual u64 execute_clocks_to_cycles(u64 clocks) const;
+	virtual u64 execute_cycles_to_clocks(u64 cycles) const;
+	virtual u32 execute_min_cycles() const;
+	virtual u32 execute_max_cycles() const;
 
 	// input line information getters
-	virtual uint32_t execute_input_lines() const;
-	virtual uint32_t execute_default_irq_vector() const;
+	virtual u32 execute_input_lines() const;
+	virtual u32 execute_default_irq_vector() const;
 
 	// optional operation overrides
 	virtual void execute_run() = 0;
-	virtual void execute_burn(int32_t cycles);
+	virtual void execute_burn(s32 cycles);
 	virtual void execute_set_input(int linenum, int state);
 
 	// interface-level overrides
@@ -239,10 +239,10 @@ protected:
 		device_execute_interface *m_execute;// pointer to the execute interface
 		int             m_linenum;          // which input line we are
 
-		int32_t           m_stored_vector;    // most recently written vector
-		int32_t           m_curvector;        // most recently processed vector
-		uint8_t           m_curstate;         // most recently processed state
-		int32_t           m_queue[32];        // queue of pending events
+		s32             m_stored_vector;    // most recently written vector
+		s32             m_curvector;        // most recently processed vector
+		u8              m_curstate;         // most recently processed state
+		s32             m_queue[32];        // queue of pending events
 		int             m_qindex;           // index within the queue
 
 	private:
@@ -274,19 +274,19 @@ protected:
 	int                     m_cycles_stolen;            // number of cycles we artificially stole
 
 	// suspend states
-	uint32_t                  m_suspend;                  // suspend reason mask (0 = not suspended)
-	uint32_t                  m_nextsuspend;              // pending suspend reason mask
-	uint8_t                   m_eatcycles;                // true if we eat cycles while suspended
-	uint8_t                   m_nexteatcycles;            // pending value
-	int32_t                   m_trigger;                  // pending trigger to release a trigger suspension
-	int32_t                   m_inttrigger;               // interrupt trigger index
+	u32                     m_suspend;                  // suspend reason mask (0 = not suspended)
+	u32                     m_nextsuspend;              // pending suspend reason mask
+	u8                      m_eatcycles;                // true if we eat cycles while suspended
+	u8                      m_nexteatcycles;            // pending value
+	s32                     m_trigger;                  // pending trigger to release a trigger suspension
+	s32                     m_inttrigger;               // interrupt trigger index
 
 	// clock and timing information
-	uint64_t                  m_totalcycles;              // total device cycles executed
+	u64                     m_totalcycles;              // total device cycles executed
 	attotime                m_localtime;                // local time, relative to the timer system's global time
-	int32_t                   m_divisor;                  // 32-bit attoseconds_per_cycle divisor
-	uint8_t                   m_divshift;                 // right shift amount to fit the divisor into 32 bits
-	uint32_t                  m_cycles_per_second;        // cycles per second, adjusted for multipliers
+	s32                     m_divisor;                  // 32-bit attoseconds_per_cycle divisor
+	u8                      m_divshift;                 // right shift amount to fit the divisor into 32 bits
+	u32                     m_cycles_per_second;        // cycles per second, adjusted for multipliers
 	attoseconds_t           m_attoseconds_per_cycle;    // attoseconds per adjusted clock cycle
 
 private:
@@ -305,4 +305,4 @@ private:
 typedef device_interface_iterator<device_execute_interface> execute_interface_iterator;
 
 
-#endif  /* __DIEXEC_H__ */
+#endif  /* MAME_EMU_DIEXEC_H */

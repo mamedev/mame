@@ -1633,7 +1633,7 @@ bool a2_edd_format::load(io_generic *io, uint32_t form_factor, floppy_image *ima
 			stream[splice >> 3] ^= 0x80 >> (splice & 7);
 
 		generate_track_from_bitstream(i >> 2, 0, stream, len, image, i & 3);
-		image->set_write_splice_position(i >> 2, 0, uint32_t(U64(200000000)*splice/len), i & 3);
+		image->set_write_splice_position(i >> 2, 0, uint32_t(uint64_t(200'000'000)*splice/len), i & 3);
 	}
 	free(img);
 	return true;

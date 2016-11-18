@@ -867,8 +867,8 @@ LOG(("scrollx_to_apply: %u\n", m_line.scrollx_to_apply));
 			else
 			{
 				// Interleave bits from plane0 and plane1
-				m_line.shift_register = (((((m_line.plane0 * U64(0x0101010101010101)) & U64(0x8040201008040201)) * U64(0x0102040810204081)) >> 49) & 0x5555)
-									  | (((((m_line.plane1 * U64(0x0101010101010101)) & U64(0x8040201008040201)) * U64(0x0102040810204081)) >> 48) & 0xAAAA);
+				m_line.shift_register = (((((m_line.plane0 * 0x0101010101010101U) & 0x8040201008040201U) * 0x0102040810204081U) >> 49) & 0x5555)
+									  | (((((m_line.plane1 * 0x0101010101010101U) & 0x8040201008040201U) * 0x0102040810204081U) >> 48) & 0xAAAA);
 			}
 			if (m_line.pixels_drawn < 8)
 			{

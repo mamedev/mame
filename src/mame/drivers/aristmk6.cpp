@@ -185,9 +185,9 @@ static ADDRESS_MAP_START( aristmk6_map, AS_PROGRAM, 64, aristmk6_state )
 	AM_RANGE(0x12000078, 0x1200007f) AM_WRITENOP // watchdog ??
 	AM_RANGE(0x12000080, 0x12000087) AM_WRITENOP // 0-1-2 written here repeatedly, diag LED or smth ?
 	AM_RANGE(0x120000E0, 0x120000E7) AM_READ(hwver_r)
-	AM_RANGE(0x12400010, 0x12400017) AM_DEVREADWRITE8("uart1", ns16550_device, ins8250_r, ins8250_w, U64(0xffffffffffffffff))
-	AM_RANGE(0x12400018, 0x1240001f) AM_DEVREADWRITE8("uart0", ns16550_device, ins8250_r, ins8250_w, U64(0xffffffffffffffff))
-	AM_RANGE(0x13800000, 0x13800007) AM_READ8(test_r, U64(0xffffffffffffffff))
+	AM_RANGE(0x12400010, 0x12400017) AM_DEVREADWRITE8("uart1", ns16550_device, ins8250_r, ins8250_w, 0xffffffffffffffffU)
+	AM_RANGE(0x12400018, 0x1240001f) AM_DEVREADWRITE8("uart0", ns16550_device, ins8250_r, ins8250_w, 0xffffffffffffffffU)
+	AM_RANGE(0x13800000, 0x13800007) AM_READ8(test_r, 0xffffffffffffffffU)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( aristmk6_port, AS_IO, 64, aristmk6_state )

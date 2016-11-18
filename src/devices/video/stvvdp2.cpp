@@ -3752,8 +3752,8 @@ void saturn_state::stv_vdp2_draw_basic_tilemap(bitmap_rgb32 &bitmap, const recta
 		}
 	}
 
-	scalex = (int32_t)((int64_t)S64(0x100000000) / (int64_t)stv2_current_tilemap.incx);
-	scaley = (int32_t)((int64_t)S64(0x100000000) / (int64_t)stv2_current_tilemap.incy);
+	scalex = s32(s64(0x100000000U) / s64(stv2_current_tilemap.incx));
+	scaley = s32(s64(0x100000000U) / s64(stv2_current_tilemap.incy));
 	tilesizex = scalex * 8;
 	tilesizey = scaley * 8;
 	drawypos = drawxpos = 0;

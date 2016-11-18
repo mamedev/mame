@@ -84,7 +84,7 @@ void network_manager::config_save(config_type cfg_type, xml_data_node *parentnod
 				node->set_attribute_int("interface", network.get_interface());
 				const char *mac = network.get_mac();
 				char mac_addr[6 * 3];
-				sprintf(mac_addr, "%02x:%02x:%02x:%02x:%02x:%02x", (uint8_t)mac[0], (uint8_t)mac[1], (uint8_t)mac[2], (uint8_t)mac[3], (uint8_t)mac[4], (uint8_t)mac[5]);
+				sprintf(mac_addr, "%02x:%02x:%02x:%02x:%02x:%02x", u8(mac[0]), u8(mac[1]), u8(mac[2]), u8(mac[3]), u8(mac[4]), u8(mac[5]));
 				node->set_attribute("mac", mac_addr);
 			}
 		}

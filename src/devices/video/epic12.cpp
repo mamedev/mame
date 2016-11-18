@@ -944,7 +944,7 @@ void epic12_device::install_handlers(int addr1, int addr2)
 		write = write32_delegate(FUNC(epic12_device::blitter_w), this);
 	}
 
-	space.install_readwrite_handler(addr1, addr2, read , write, U64(0xffffffffffffffff));
+	space.install_readwrite_handler(addr1, addr2, read , write, 0xffffffffffffffffU);
 }
 
 READ64_MEMBER( epic12_device::fpga_r )

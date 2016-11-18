@@ -142,7 +142,7 @@ void debug_view_state::recompute()
 	// count the entries and determine the maximum tag and value sizes
 	std::size_t count = 0;
 	std::size_t maxtaglen = 0;
-	uint8_t maxvallen = 0;
+	u8 maxvallen = 0;
 	for (auto const &item : m_state_list)
 	{
 		count++;
@@ -152,8 +152,8 @@ void debug_view_state::recompute()
 
 	// set the current divider and total cols
 	m_divider = unsigned(1U + maxtaglen + 1U);
-	m_total.x = uint32_t(1U + maxtaglen + 2U + maxvallen + 1U);
-	m_total.y = uint32_t(count);
+	m_total.x = u32(1U + maxtaglen + 2U + maxvallen + 1U);
+	m_total.y = u32(count);
 	m_topleft.x = 0;
 	m_topleft.y = 0;
 
@@ -187,17 +187,17 @@ void debug_view_state::view_update()
 
 	// get cycle count if we have an execute interface
 	debug_view_state_source const &source(downcast<debug_view_state_source const &>(*m_source));
-	uint64_t const total_cycles(source.m_execintf ? source.m_execintf->total_cycles() : 0);
+	u64 const total_cycles(source.m_execintf ? source.m_execintf->total_cycles() : 0);
 	bool const cycles_changed(m_last_update != total_cycles);
 
 	// loop over rows
 	auto it(m_state_list.begin());
 	screen_device const *const screen(machine().first_screen());
 	debug_view_char *dest(&m_viewdata[0]);
-	for (int32_t index = 0, limit = m_topleft.y + m_visible.y; (index < limit) || (it != m_state_list.end()); ++index)
+	for (s32 index = 0, limit = m_topleft.y + m_visible.y; (index < limit) || (it != m_state_list.end()); ++index)
 	{
 		bool const visible((index >= m_topleft.y) && (index < limit));
-		uint32_t col(0);
+		u32 col(0);
 
 		if (it != m_state_list.end())
 		{
@@ -254,11 +254,11 @@ void debug_view_state::view_update()
 			if (visible)
 			{
 				// see if we changed
-				const uint8_t attrib(curitem.changed() ? DCA_CHANGED: DCA_NORMAL);
+				const u8 attrib(curitem.changed() ? DCA_CHANGED: DCA_NORMAL);
 
 				// build up a string
 				char temp[256];
-				uint32_t len(0);
+				u32 len(0);
 				if (curitem.m_symbol.length() < (m_divider - 1))
 				{
 					memset(&temp[len], ' ', m_divider - 1 - curitem.m_symbol.length());
@@ -278,7 +278,7 @@ void debug_view_state::view_update()
 				temp[len] = 0;
 
 				// copy data
-				for (uint32_t effcol = m_topleft.x; (col < m_visible.x) && (effcol < len); ++dest, ++col)
+				for (u32 effcol = m_topleft.x; (col < m_visible.x) && (effcol < len); ++dest, ++col)
 				{
 					dest->byte = temp[effcol++];
 					dest->attrib = attrib | ((effcol <= m_divider) ? DCA_ANCILLARY : DCA_NORMAL);
@@ -305,7 +305,7 @@ void debug_view_state::view_update()
 //  state_item - constructor
 //-------------------------------------------------
 
-debug_view_state::state_item::state_item(int index, const char *name, uint8_t valuechars)
+debug_view_state::state_item::state_item(int index, const char *name, u8 valuechars)
 	: m_lastval(0)
 	, m_currval(0)
 	, m_index(index)
@@ -319,7 +319,7 @@ debug_view_state::state_item::state_item(int index, const char *name, uint8_t va
 //  update - update value and save previous
 //-------------------------------------------------
 
-void debug_view_state::state_item::update(uint64_t newval, bool save)
+void debug_view_state::state_item::update(u64 newval, bool save)
 {
 	if (save)
 		m_lastval = m_currval;

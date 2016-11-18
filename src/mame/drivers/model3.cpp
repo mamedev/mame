@@ -1398,13 +1398,13 @@ READ64_MEMBER(model3_state::model3_ctrl_r)
 			break;
 
 		case 2:
-			return U64(0xffffffffffffffff);
+			return 0xffffffffffffffffU;
 
 		case 3:
-			return U64(0xffffffffffffffff);     /* Dip switches */
+			return 0xffffffffffffffffU;     /* Dip switches */
 
 		case 4:
-			return U64(0xffffffffffffffff);
+			return 0xffffffffffffffffU;
 
 		case 5:
 			if (ACCESSING_BITS_24_31)                   /* Serial comm RX FIFO 1 */
@@ -1664,13 +1664,13 @@ WRITE64_MEMBER(model3_state::model3_rtc_w)
 
 READ64_MEMBER(model3_state::real3d_status_r)
 {
-	m_real3d_status ^= U64(0xffffffffffffffff);
+	m_real3d_status ^= 0xffffffffffffffffU;
 	if (offset == 0)
 	{
 		/* pretty sure this is VBLANK */
-		m_real3d_status &= ~U64(0x0000000200000000);
+		m_real3d_status &= ~0x0000000200000000U;
 		if (m_screen->vblank())
-			m_real3d_status |= U64(0x0000000200000000);
+			m_real3d_status |= 0x0000000200000000U;
 		return m_real3d_status;
 	}
 	return m_real3d_status;
@@ -1732,7 +1732,7 @@ WRITE8_MEMBER(model3_state::model3_sound_w)
 
 READ64_MEMBER(model3_state::model3_5881prot_r)
 {
-	uint64_t retvalue = U64(0xffffffffffffffff);
+	uint64_t retvalue = 0xffffffffffffffffU;
 
 	if (offset == 0x00 / 8)
 	{
@@ -1813,7 +1813,7 @@ static ADDRESS_MAP_START( model3_10_mem, AS_PROGRAM, 64, model3_state )
 	AM_RANGE(0x98000000, 0x980fffff) AM_WRITE(real3d_polygon_ram_w )
 
 	AM_RANGE(0xf0040000, 0xf004003f) AM_MIRROR(0x0e000000) AM_READWRITE(model3_ctrl_r, model3_ctrl_w )
-	AM_RANGE(0xf0080000, 0xf008ffff) AM_MIRROR(0x0e000000) AM_READWRITE8(model3_sound_r, model3_sound_w, U64(0xffffffffffffffff) )
+	AM_RANGE(0xf0080000, 0xf008ffff) AM_MIRROR(0x0e000000) AM_READWRITE8(model3_sound_r, model3_sound_w, 0xffffffffffffffffU )
 	AM_RANGE(0xf00c0000, 0xf00dffff) AM_MIRROR(0x0e000000) AM_RAM AM_SHARE("backup")    /* backup SRAM */
 	AM_RANGE(0xf0100000, 0xf010003f) AM_MIRROR(0x0e000000) AM_READWRITE(model3_sys_r, model3_sys_w )
 	AM_RANGE(0xf0140000, 0xf014003f) AM_MIRROR(0x0e000000) AM_READWRITE(model3_rtc_r, model3_rtc_w )
@@ -1828,7 +1828,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( model3_mem, AS_PROGRAM, 64, model3_state )
 	AM_IMPORT_FROM( model3_10_mem )
-	AM_RANGE(0xc0000000, 0xc003ffff) AM_DEVICE32("comm_board", m3comm_device, m3_map, U64(0xffffffffffffffff) )
+	AM_RANGE(0xc0000000, 0xc003ffff) AM_DEVICE32("comm_board", m3comm_device, m3_map, 0xffffffffffffffffU )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( common )

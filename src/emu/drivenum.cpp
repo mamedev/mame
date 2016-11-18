@@ -92,7 +92,7 @@ int driver_list::penalty_compare(const char *source, const char *target)
 	for ( ; *source && *target; target++)
 	{
 		// do a case insensitive match
-		bool match = (tolower((uint8_t)*source) == tolower((uint8_t)*target));
+		bool const match(tolower(u8(*source)) == tolower(u8(*target)));
 
 		// if we matched, advance the source
 		if (match)

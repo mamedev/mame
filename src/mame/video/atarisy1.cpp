@@ -511,8 +511,8 @@ uint32_t atarisy1_state::screen_update_atarisy1(screen_device &screen, bitmap_in
 
 void atarisy1_state::decode_gfx(uint16_t *pflookup, uint16_t *molookup)
 {
-	uint8_t *prom1 = &memregion("proms")->u8(0x000);
-	uint8_t *prom2 = &memregion("proms")->u8(0x200);
+	uint8_t *prom1 = &memregion("proms")->as_u8(0x000);
+	uint8_t *prom2 = &memregion("proms")->as_u8(0x200);
 	int obj, i;
 
 	/* reset the globals */
@@ -613,7 +613,7 @@ int atarisy1_state::get_bank(uint8_t prom1, uint8_t prom2, int bpp)
 	assert(gfx_index != MAX_GFX_ELEMENTS);
 
 	/* decode the graphics */
-	srcdata = &tiles->u8(0x80000 * (bank_index - 1));
+	srcdata = &tiles->as_u8(0x80000 * (bank_index - 1));
 	switch (bpp)
 	{
 	case 4:

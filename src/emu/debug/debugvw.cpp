@@ -506,7 +506,7 @@ bool debug_view_expression::recompute()
 		// recompute the value of the expression
 		try
 		{
-			uint64_t newresult = m_parsed.execute();
+			u64 newresult = m_parsed.execute();
 			if (newresult != m_result)
 			{
 				m_result = newresult;

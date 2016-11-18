@@ -129,9 +129,9 @@ const int SPACE_COUNT = 3;
 //  from a numerator and a denominator
 //-------------------------------------------------
 
-inline int64_t compute_scale(int32_t num, int32_t den)
+inline s64 compute_scale(s32 num, s32 den)
 {
-	return (int64_t(num) << 24) / den;
+	return (s64(num) << 24) / den;
 }
 
 
@@ -140,9 +140,9 @@ inline int64_t compute_scale(int32_t num, int32_t den)
 //  an 8.24 scale value
 //-------------------------------------------------
 
-inline int64_t recip_scale(int64_t scale)
+inline s64 recip_scale(s64 scale)
 {
-	return (int64_t(1) << 48) / scale;
+	return (s64(1) << 48) / scale;
 }
 
 
@@ -151,9 +151,9 @@ inline int64_t recip_scale(int64_t scale)
 //  a 32-bit value
 //-------------------------------------------------
 
-inline int32_t apply_scale(int32_t value, int64_t scale)
+inline s32 apply_scale(s32 value, s64 scale)
 {
-	return (int64_t(value) * scale) >> 24;
+	return (s64(value) * scale) >> 24;
 }
 
 
@@ -164,7 +164,7 @@ inline int32_t apply_scale(int32_t value, int64_t scale)
 
 const struct
 {
-	uint32_t id;
+	u32 id;
 	const char *string;
 } input_port_default_strings[] =
 {
@@ -296,7 +296,7 @@ const struct
 const char *const ioport_manager::seqtypestrings[] = { "standard", "increment", "decrement" };
 
 
-std::uint8_t const inp_header::MAGIC[inp_header::OFFS_BASETIME - inp_header::OFFS_MAGIC] = { 'M', 'A', 'M', 'E', 'I', 'N', 'P', 0 };
+u8 const inp_header::MAGIC[inp_header::OFFS_BASETIME - inp_header::OFFS_MAGIC] = { 'M', 'A', 'M', 'E', 'I', 'N', 'P', 0 };
 
 
 
@@ -573,7 +573,7 @@ ioport_setting::ioport_setting(ioport_field &field, ioport_value _value, const c
 //  ioport_diplocation - constructor
 //-------------------------------------------------
 
-ioport_diplocation::ioport_diplocation(const char *name, uint8_t swnum, bool invert)
+ioport_diplocation::ioport_diplocation(const char *name, u8 swnum, bool invert)
 	: m_next(nullptr),
 		m_name(name),
 		m_number(swnum),
@@ -1151,7 +1151,7 @@ void ioport_field::frame_update(ioport_value &result)
 	// additional logic to restrict digital joysticks
 	if (curstate && !m_digital_value && m_live->joystick != nullptr && m_way != 16 && !machine().options().joystick_contradictory())
 	{
-		uint8_t mask = (m_way == 4) ? m_live->joystick->current4way() : m_live->joystick->current();
+		u8 mask = (m_way == 4) ? m_live->joystick->current4way() : m_live->joystick->current();
 		if (!(mask & (1 << m_live->joydir)))
 			curstate = false;
 	}
@@ -1852,7 +1852,7 @@ ioport_manager::~ioport_manager()
 //  type/player
 //-------------------------------------------------
 
-const char *ioport_manager::type_name(ioport_type type, uint8_t player)
+const char *ioport_manager::type_name(ioport_type type, u8 player)
 {
 	// if we have a machine, use the live state and quick lookup
 	input_type_entry *entry = m_type_to_entry[type][player];
@@ -2063,7 +2063,7 @@ g_profiler.stop();
 //  values based on the time between frames
 //-------------------------------------------------
 
-int32_t ioport_manager::frame_interpolate(int32_t oldval, int32_t newval)
+s32 ioport_manager::frame_interpolate(s32 oldval, s32 newval)
 {
 	// if no last delta, just use new value
 	if (m_last_delta_nsec == 0)
@@ -2071,7 +2071,7 @@ int32_t ioport_manager::frame_interpolate(int32_t oldval, int32_t newval)
 
 	// otherwise, interpolate
 	attoseconds_t nsec_since_last = (machine().time() - m_last_frame_time).as_attoseconds() / ATTOSECONDS_PER_NANOSECOND;
-	return oldval + (int64_t(newval - oldval) * nsec_since_last / m_last_delta_nsec);
+	return oldval + (s64(newval - oldval) * nsec_since_last / m_last_delta_nsec);
 }
 
 
@@ -2504,7 +2504,7 @@ _Type ioport_manager::playback_read(_Type &result)
 template<>
 bool ioport_manager::playback_read<bool>(bool &result)
 {
-	uint8_t temp;
+	u8 temp;
 	playback_read(temp);
 	return result = bool(temp);
 }
@@ -2571,8 +2571,8 @@ void ioport_manager::playback_end(const char *message)
 		// display speed stats
 		if (m_playback_accumulated_speed > 0)
 			m_playback_accumulated_speed /= m_playback_accumulated_frames;
-		osd_printf_info("Total playback frames: %d\n", uint32_t(m_playback_accumulated_frames));
-		osd_printf_info("Average recorded speed: %d%%\n", uint32_t((m_playback_accumulated_speed * 200 + 1) >> 21));
+		osd_printf_info("Total playback frames: %d\n", u32(m_playback_accumulated_frames));
+		osd_printf_info("Average recorded speed: %d%%\n", u32((m_playback_accumulated_speed * 200 + 1) >> 21));
 
 		// close the program at the end of inp file playback
 		if (machine().options().exit_after_playback()) {
@@ -2603,7 +2603,7 @@ void ioport_manager::playback_frame(const attotime &curtime)
 			playback_end("Out of sync");
 
 		// then the speed
-		uint32_t curspeed;
+		u32 curspeed;
 		m_playback_accumulated_speed += playback_read(curspeed);
 		m_playback_accumulated_frames++;
 	}
@@ -2657,7 +2657,7 @@ void ioport_manager::record_write(_Type value)
 template<>
 void ioport_manager::record_write<bool>(bool value)
 {
-	uint8_t byte = uint8_t(value);
+	u8 byte = u8(value);
 	record_write(byte);
 }
 
@@ -2676,7 +2676,7 @@ void ioport_manager::timecode_write(_Type value)
 /*template<>
 void ioport_manager::timecode_write<bool>(bool value)
 {
-    uint8_t byte = uint8_t(value);
+    u8 byte = u8(value);
     timecode_write(byte);
 }*/
 template<>
@@ -2805,7 +2805,7 @@ void ioport_manager::record_frame(const attotime &curtime)
 		record_write(curtime.attoseconds());
 
 		// then the current speed
-		record_write(uint32_t(machine().video().speed_percent() * double(1 << 20)));
+		record_write(u32(machine().video().speed_percent() * double(1 << 20)));
 	}
 
 	if (m_timecode_file.is_open() && machine().video().get_timecode_write())
@@ -3382,12 +3382,12 @@ analog_field::analog_field(ioport_field &field)
 //  the appropriate min/max for the analog control
 //-------------------------------------------------
 
-inline int32_t analog_field::apply_min_max(int32_t value) const
+inline s32 analog_field::apply_min_max(s32 value) const
 {
 	// take the analog minimum and maximum values and apply the inverse of the
 	// sensitivity so that we can clamp against them before applying sensitivity
-	int32_t adjmin = apply_inverse_sensitivity(m_minimum);
-	int32_t adjmax = apply_inverse_sensitivity(m_maximum);
+	s32 adjmin = apply_inverse_sensitivity(m_minimum);
+	s32 adjmax = apply_inverse_sensitivity(m_maximum);
 
 	// for absolute devices, clamp to the bounds absolutely
 	if (!m_wraps)
@@ -3401,7 +3401,7 @@ inline int32_t analog_field::apply_min_max(int32_t value) const
 	// for relative devices, wrap around when we go past the edge
 	else
 	{
-		int32_t range = adjmax - adjmin;
+		s32 range = adjmax - adjmin;
 		// rolls to other end when 1 position past end.
 		value = (value - adjmin) % range;
 		if (value < 0)
@@ -3418,9 +3418,9 @@ inline int32_t analog_field::apply_min_max(int32_t value) const
 //  adjustment for a current value
 //-------------------------------------------------
 
-inline int32_t analog_field::apply_sensitivity(int32_t value) const
+inline s32 analog_field::apply_sensitivity(s32 value) const
 {
-	return int32_t((int64_t(value) * m_sensitivity) / 100.0 + 0.5);
+	return s32((s64(value) * m_sensitivity) / 100.0 + 0.5);
 }
 
 
@@ -3429,9 +3429,9 @@ inline int32_t analog_field::apply_sensitivity(int32_t value) const
 //  sensitivity adjustment for a current value
 //-------------------------------------------------
 
-inline int32_t analog_field::apply_inverse_sensitivity(int32_t value) const
+inline s32 analog_field::apply_inverse_sensitivity(s32 value) const
 {
-	return int32_t((int64_t(value) * 100) / m_sensitivity);
+	return s32((s64(value) * 100) / m_sensitivity);
 }
 
 
@@ -3440,7 +3440,7 @@ inline int32_t analog_field::apply_inverse_sensitivity(int32_t value) const
 //  analog input
 //-------------------------------------------------
 
-int32_t analog_field::apply_settings(int32_t value) const
+s32 analog_field::apply_settings(s32 value) const
 {
 	// apply the min/max and then the sensitivity
 	value = apply_min_max(value);
@@ -3477,7 +3477,7 @@ void analog_field::frame_update(running_machine &machine)
 
 	// get the new raw analog value and its type
 	input_item_class itemclass;
-	int32_t rawvalue = machine.input().seq_axis_value(m_field.seq(SEQ_TYPE_STANDARD), itemclass);
+	s32 rawvalue = machine.input().seq_axis_value(m_field.seq(SEQ_TYPE_STANDARD), itemclass);
 
 	// if we got an absolute input, it overrides everything else
 	if (itemclass == ITEM_CLASS_ABSOLUTE)
@@ -3525,14 +3525,14 @@ void analog_field::frame_update(running_machine &machine)
 
 	// if we got it from a relative device, use that as the starting delta
 	// also note that the last input was not a digital one
-	int32_t delta = 0;
+	s32 delta = 0;
 	if (itemclass == ITEM_CLASS_RELATIVE && rawvalue != 0)
 	{
 		delta = rawvalue;
 		m_lastdigital = false;
 	}
 
-	int64_t keyscale = (m_accum >= 0) ? m_keyscalepos : m_keyscaleneg;
+	s64 keyscale = (m_accum >= 0) ? m_keyscalepos : m_keyscaleneg;
 
 	// if the decrement code sequence is pressed, add the key delta to
 	// the accumulated delta; also note that the last input was a digital one
@@ -3575,7 +3575,7 @@ void analog_field::frame_update(running_machine &machine)
 	// was pressed, apply autocentering
 	if (m_autocenter)
 	{
-		int32_t center = apply_inverse_sensitivity(m_center);
+		s32 center = apply_inverse_sensitivity(m_center);
 		if (m_lastdigital && !keypressed)
 		{
 			// autocenter from positive values
@@ -3618,7 +3618,7 @@ void analog_field::read(ioport_value &result)
 		return;
 
 	// start with the raw value
-	int32_t value = m_accum;
+	s32 value = m_accum;
 
 	// interpolate if appropriate and if time has passed since the last update
 	if (m_interpolate)
@@ -3647,7 +3647,7 @@ void analog_field::read(ioport_value &result)
 
 float analog_field::crosshair_read()
 {
-	int32_t rawvalue = apply_settings(m_accum) & (m_field.mask() >> m_shift);
+	s32 rawvalue = apply_settings(m_accum) & (m_field.mask() >> m_shift);
 	return float(rawvalue - m_adjmin) / float(m_adjmax - m_adjmin);
 }
 

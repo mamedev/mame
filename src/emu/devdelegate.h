@@ -8,10 +8,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_EMU_DEVDELEGATE_H
+#define MAME_EMU_DEVDELEGATE_H
 
-#ifndef __DEVDELEGATE_H__
-#define __DEVDELEGATE_H__
+#pragma once
 
 #include "delegate.h"
 
@@ -104,4 +104,4 @@ public:
 };
 
 
-#endif  /* __DEVDELEGATE_H__ */
+#endif  /* MAME_EMU_DEVDELEGATE_H */

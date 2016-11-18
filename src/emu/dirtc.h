@@ -53,8 +53,8 @@ public:
 	bool has_battery() const { return rtc_battery_backed(); }
 
 protected:
-	static uint8_t convert_to_bcd(int val);
-	static int bcd_to_integer(uint8_t val);
+	static u8 convert_to_bcd(int val);
+	static int bcd_to_integer(u8 val);
 
 	void set_clock_register(int register, int value);
 	int get_clock_register(int register);

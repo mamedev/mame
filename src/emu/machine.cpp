@@ -817,7 +817,7 @@ void running_machine::set_rtc_datetime(const system_time &systime)
 //  rand - standardized random numbers
 //-------------------------------------------------
 
-uint32_t running_machine::rand()
+u32 running_machine::rand()
 {
 	m_rand_seed = 1664525 * m_rand_seed + 1013904223;
 
@@ -863,7 +863,7 @@ void running_machine::handle_saveload()
 		}
 		else
 		{
-			uint32_t const openflags = (m_saveload_schedule == SLS_LOAD) ? OPEN_FLAG_READ : (OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+			u32 const openflags = (m_saveload_schedule == SLS_LOAD) ? OPEN_FLAG_READ : (OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 
 			// open the file
 			emu_file file(m_saveload_searchpath, openflags);
@@ -927,7 +927,7 @@ void running_machine::handle_saveload()
 //  of the system
 //-------------------------------------------------
 
-void running_machine::soft_reset(void *ptr, int32_t param)
+void running_machine::soft_reset(void *ptr, s32 param)
 {
 	logerror("Soft reset\n");
 
@@ -1249,7 +1249,7 @@ ADDRESS_MAP_END
 
 const device_type DUMMY_SPACE = &device_creator<dummy_space_device>;
 
-dummy_space_device::dummy_space_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+dummy_space_device::dummy_space_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 	device_t(mconfig, DUMMY_SPACE, "Dummy Space", tag, owner, clock, "dummy_space", __FILE__),
 	device_memory_interface(mconfig, *this),
 	m_space_config("dummy", ENDIANNESS_LITTLE, 8, 32, 0, nullptr, *ADDRESS_MAP_NAME(dummy))

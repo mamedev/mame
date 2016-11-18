@@ -273,7 +273,7 @@ inline x86_memref drcbe_x64::MABS(const void *ptr)
 drcbe_x64::opcode_generate_func drcbe_x64::s_opcode_table[OP_MAX];
 
 // size-to-mask table
-//static const uint64_t size_to_mask[] = { 0, 0xff, 0xffff, 0, 0xffffffff, 0, 0, 0, U64(0xffffffffffffffff) };
+//static const uint64_t size_to_mask[] = { 0, 0xff, 0xffff, 0, 0xffffffff, 0, 0, 0, 0xffffffffffffffffU };
 
 // register mapping tables
 static const uint8_t int_register_map[REG_I_COUNT] =
@@ -642,7 +642,7 @@ drcbe_x64::drcbe_x64(drcuml_state &drcuml, device_t &device, drc_cache &cache, u
 	m_absmask32 = (uint32_t *)(((uintptr_t)m_absmask32 + 15) & ~15);
 	m_absmask32[0] = m_absmask32[1] = m_absmask32[2] = m_absmask32[3] = 0x7fffffff;
 	m_absmask64 = (uint64_t *)&m_absmask32[4];
-	m_absmask64[0] = m_absmask64[1] = U64(0x7fffffffffffffff);
+	m_absmask64[0] = m_absmask64[1] = 0x7fffffffffffffffU;
 
 	// get pointers to C functions we need to call
 	m_near.debug_cpu_instruction_hook = (x86code *)debugger_instruction_hook;
@@ -1975,7 +1975,7 @@ void drcbe_x64::emit_and_r64_p64(x86code *&dst, uint8_t reg, const be_parameter 
 {
 	if (param.is_immediate())
 	{
-		if (inst.flags() != 0 || param.immediate() != U64(0xffffffffffffffff))
+		if (inst.flags() != 0 || param.immediate() != 0xffffffffffffffffU)
 		{
 			if (short_immediate(param.immediate()))
 				emit_and_r64_imm(dst, reg, param.immediate());                          // and   reg,param
@@ -2002,7 +2002,7 @@ void drcbe_x64::emit_and_m64_p64(x86code *&dst, x86_memref memref, const be_para
 {
 	if (param.is_immediate())
 	{
-		if (inst.flags() != 0 || param.immediate() != U64(0xffffffffffffffff))
+		if (inst.flags() != 0 || param.immediate() != 0xffffffffffffffffU)
 		{
 			if (short_immediate(param.immediate()))
 				emit_and_m64_imm(dst, memref, param.immediate());                   // and   [mem],param
@@ -2132,7 +2132,7 @@ void drcbe_x64::emit_xor_r64_p64(x86code *&dst, uint8_t reg, const be_parameter 
 	{
 		if (inst.flags() != 0 || param.immediate() != 0)
 		{
-			if (param.immediate() == U64(0xffffffffffffffff))
+			if (param.immediate() == 0xffffffffffffffffU)
 				emit_not_r64(dst, reg);                                                 // not   reg
 			else if (short_immediate(param.immediate()))
 				emit_xor_r64_imm(dst, reg, param.immediate());                          // xor   reg,param
@@ -2161,7 +2161,7 @@ void drcbe_x64::emit_xor_m64_p64(x86code *&dst, x86_memref memref, const be_para
 	{
 		if (inst.flags() != 0 || param.immediate() != 0)
 		{
-			if (param.immediate() == U64(0xffffffffffffffff))
+			if (param.immediate() == 0xffffffffffffffffU)
 				emit_not_m64(dst, memref);                                          // not   [mem]
 			else if (short_immediate(param.immediate()))
 				emit_xor_m64_imm(dst, memref, param.immediate());                   // xor   [mem],param

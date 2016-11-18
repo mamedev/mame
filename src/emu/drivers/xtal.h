@@ -39,6 +39,11 @@
 
 **************************************************************************/
 
+#ifndef MAME_EMU_DRIVERS_XTAL_H
+#define MAME_EMU_DRIVERS_XTAL_H
+
+#pragma once
+
 enum
 {
 /*
@@ -618,3 +623,5 @@ reveals the following shipping frequencies as of 1/1/2008:
 100.00MHz
 
 */
+
+#endif // MAME_EMU_DRIVERS_XTAL_H

@@ -1363,7 +1363,7 @@ void rsp_cop2_drc::vmulf()
 		if (s1 == -32768 && s2 == -32768)
 		{
 			// overflow
-			ACCUM(i) = S64(0x0000800080000000);
+			ACCUM(i) = s64(0x0000800080000000U);
 			m_vres[i] = 0x7fff;
 		}
 		else

@@ -8,8 +8,8 @@
 
 ***************************************************************************/
 
-#ifndef __DVDISASM_H__
-#define __DVDISASM_H__
+#ifndef MAME_EMU_DEBUG_DVDISASM_H
+#define MAME_EMU_DEBUG_DVDISASM_H
 
 #include "debugvw.h"
 
@@ -69,15 +69,15 @@ public:
 	// getters
 	const char *expression() const { return m_expression.string(); }
 	disasm_right_column right_column() const { return m_right_column; }
-	uint32_t backward_steps() const { return m_backwards_steps; }
-	uint32_t disasm_width() const { return m_dasm_width; }
+	u32 backward_steps() const { return m_backwards_steps; }
+	u32 disasm_width() const { return m_dasm_width; }
 	offs_t selected_address();
 
 	// setters
 	void set_expression(const char *expression);
 	void set_right_column(disasm_right_column contents);
-	void set_backward_steps(uint32_t steps);
-	void set_disasm_width(uint32_t width);
+	void set_backward_steps(u32 steps);
+	void set_disasm_width(u32 width);
 	void set_selected_address(offs_t address);
 
 protected:
@@ -96,11 +96,11 @@ private:
 
 	// internal state
 	disasm_right_column m_right_column;         // right column contents
-	uint32_t              m_backwards_steps;      // number of backwards steps
-	uint32_t              m_dasm_width;           // width of the disassembly area
-	uint8_t *             m_last_direct_raw;      // last direct raw value
-	uint8_t *             m_last_direct_decrypted;// last direct decrypted value
-	uint32_t              m_last_change_count;    // last comment change count
+	u32                 m_backwards_steps;      // number of backwards steps
+	u32                 m_dasm_width;           // width of the disassembly area
+	u8 *                m_last_direct_raw;      // last direct raw value
+	u8 *                m_last_direct_decrypted;// last direct decrypted value
+	u32                 m_last_change_count;    // last comment change count
 	offs_t              m_last_pcbyte;          // last PC byte value
 	int                 m_divider1, m_divider2; // left and right divider columns
 	int                 m_divider3;             // comment divider column
@@ -115,4 +115,4 @@ private:
 };
 
 
-#endif
+#endif // MAME_EMU_DEBUG_DVDISASM_H
