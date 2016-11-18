@@ -787,10 +787,7 @@ void lua_engine::initialize()
  * thread.yield - check if thread is yielded
 */
 
-	emu.new_usertype<context>("thread", sol::call_constructor, sol::initializers([](context &ctx) {
-					ctx.busy = false;
-					ctx.yield = false;
-				}),
+	emu.new_usertype<context>("thread", sol::call_constructor, sol::constructors<sol::types<>>(),
 			"start", [this](context &ctx, const char *scr) {
 					std::string script(scr);
 					if(ctx.busy)
