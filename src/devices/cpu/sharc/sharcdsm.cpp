@@ -1176,7 +1176,7 @@ static void build_dasm_table(void)
 	}
 }
 
-static uint32_t sharc_dasm_one(char *buffer, offs_t pc, uint64_t opcode)
+static uint32_t sharc_dasm_one(std::ostream &stream, offs_t pc, uint64_t opcode)
 {
 	#define DEFAULT_DASM_WIDTH  (64)
 
@@ -1198,11 +1198,21 @@ static uint32_t sharc_dasm_one(char *buffer, offs_t pc, uint64_t opcode)
 
 	flags = (*sharcdasm_table[op])(pc, opcode);
 
-	for (i=0; i < DEFAULT_DASM_WIDTH; i++)
+	for (i=0; i < DEFAULT_DASM_WIDTH && dasm_buffer[i]; i++)
 	{
-		buffer[i] = dasm_buffer[i];
+		stream << dasm_buffer[i];
 	}
 	return flags;
+}
+
+
+static uint32_t sharc_dasm_one(char *buffer, offs_t pc, uint64_t opcode)
+{
+	std::ostringstream stream;
+	uint32_t result = sharc_dasm_one(stream, pc, opcode);
+	std::string stream_str = stream.str();
+	strcpy(buffer, stream_str.c_str());
+	return result;
 }
 
 
