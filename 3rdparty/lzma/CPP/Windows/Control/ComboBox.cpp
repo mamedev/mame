@@ -51,7 +51,7 @@ LRESULT CComboBox::GetLBText(int index, UString &s)
       return len;
     if (len > len2)
       len = len2;
-    s.ReleaseBuf_CalcLen(len);
+    s.ReleaseBuf_CalcLen((unsigned)len);
     return len;
   }
   AString sa;
