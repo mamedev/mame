@@ -2465,6 +2465,11 @@ files {
 	MAME_DIR .. "src/mame/video/poly88.cpp",
 }
 
+createMESSProjects(_target, _subtarget, "prodigy")
+files {
+	MAME_DIR .. "src/mame/drivers/prodigy.cpp",
+}
+
 createMESSProjects(_target, _subtarget, "psion")
 files {
 	MAME_DIR .. "src/mame/drivers/psion.cpp",

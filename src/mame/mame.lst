@@ -31126,6 +31126,9 @@ pr_whlft                        // Wheel Of Fortune (Project)
 pr_wldkn                        // Wild Kings (Project)
 pr_wnstk                        // Winning Streak (Coinworld)
 
+@source:prodigy.cpp
+prodigy                        // ACI Destiny Prodigy, 1981
+
 @source:prof180x.cpp
 prof180x                        //
 prof181x                        //
