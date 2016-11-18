@@ -1302,9 +1302,7 @@ READ32_MEMBER( n64_periphs::ai_reg_r )
 		{
 			if (ai_status & 0x40000000)
 			{
-				double secs_left = (ai_timer->remaining()).as_double();
-				unsigned int samples_left = (uint32_t)(secs_left * (double)DACRATE_NTSC / (double)(ai_dacrate + 1));
-				ret = samples_left * 4;
+				ret = 4 * (uint32_t)(ai_timer->remaining().as_double() * (double)DACRATE_NTSC / (double)(ai_dacrate + 1));
 			}
 			else if (ai_status & 0x80000001)
 			{
