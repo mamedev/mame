@@ -501,7 +501,6 @@ WRITE8_MEMBER(vis_vga_device::vga_w)
 						vga.gc.shift256 = m_shift256;
 						vga.crtc.dw = m_dw;
 					}
-					printf("%d %d %d %d %x\n", m_shift256, vga.gc.shift256, m_dw, vga.crtc.dw, data);
 					break;
 			}
 			break;
