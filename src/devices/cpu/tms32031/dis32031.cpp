@@ -172,11 +172,11 @@ static void append_indirect(uint8_t ma, int8_t disp, std::ostream &stream)
 	}
 }
 
-static void append_indirect(uint8_t ma, int8_t disp, std::string &string)
+static std::string get_indirect(uint8_t ma, int8_t disp)
 {
 	std::ostringstream stream;
 	append_indirect(ma, disp, stream);
-	string = stream.str();
+	return stream.str();
 }
 
 static void append_immediate(uint16_t data, int is_float, int is_unsigned, std::ostream &stream)
@@ -306,10 +306,8 @@ static void disasm_parallel_3op3op(const char *opstring1, const char *opstring2,
 
 	src[1].assign(regname[(op >> 19) & 7]);
 	src[2].assign(regname[(op >> 16) & 7]);
-
-	append_indirect(op >> 8, 1, src[3]);
-
-	append_indirect(op, 1, src[4]);
+	src[3] = get_indirect(op >> 8, 1);
+	src[4] = get_indirect(op, 1);
 
 	util::stream_format(stream, "%s %s,%s,R%d || %s %s,%s,R%d",
 			opstring1, src[s[0]], src[s[1]], d1,
@@ -322,11 +320,9 @@ static void disasm_parallel_3opstore(const char *opstring1, const char *opstring
 	int d1 = (op >> 22) & 7;
 	int s1 = (op >> 19) & 7;
 	int s3 = (op >> 16) & 7;
-	std::string dst2, src2;
 
-	append_indirect(op >> 8, 1, dst2);
-
-	append_indirect(op, 1, src2);
+	std::string dst2 = get_indirect(op >> 8, 1);
+	std::string src2 = get_indirect(op, 1);
 
 	if (!(flags & NOSOURCE1))
 		util::stream_format(stream, "%s R%d,%s,R%d || %s R%d,%s",
@@ -343,11 +339,9 @@ static void disasm_parallel_loadload(const char *opstring1, const char *opstring
 {
 	int d2 = (op >> 22) & 7;
 	int d1 = (op >> 19) & 7;
-	std::string src1, src2;
 
-	append_indirect(op >> 8, 1, src1);
-
-	append_indirect(op, 1, src2);
+	std::string src1 = get_indirect(op >> 8, 1);
+	std::string src2 = get_indirect(op >> 0, 1);
 
 	util::stream_format(stream, "%s %s,R%d || %s %s,R%d",
 			opstring1, src2, d2,
@@ -359,11 +353,9 @@ static void disasm_parallel_storestore(const char *opstring1, const char *opstri
 {
 	int s2 = (op >> 22) & 7;
 	int s1 = (op >> 16) & 7;
-	std::string dst1, dst2;
 
-	append_indirect(op >> 8, 1, dst1);
-
-	append_indirect(op, 1, dst2);
+	std::string dst1 = get_indirect(op >> 8, 1);
+	std::string dst2 = get_indirect(op, 1);
 
 	util::stream_format(stream, "%s R%d,%s || %s R%d,%s",
 			opstring1, s2, dst2,
