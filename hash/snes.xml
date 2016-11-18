@@ -59528,19 +59528,6 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		</part>
 	</software>
 
-  <!-- Most likely this is simply a bad dump of syvalionp. -->
-	<software name="syvalionp2" cloneof="syvalion">
-		<description>Syvalion (Euro, Prototype 2)</description>
-		<year>1992</year>
-		<publisher>Toshiba EMI</publisher>
-		<part name="cart" interface="snes_cart">
-			<feature name="slot" value="lorom" />
-			<dataarea name="rom" size="1048576">
-				<rom name="syvalion (europe) (beta).sfc" size="1048576" crc="be122755" sha1="ddfa611f1177f371c1107dbd8e8ecdb19011a232" offset="0x000000" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="syvalion">
 		<description>Syvalion (Euro)</description>
 		<year>1992</year>

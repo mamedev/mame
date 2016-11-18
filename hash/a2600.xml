@@ -5036,7 +5036,7 @@ Info from Atariage and Atarimania
 	</software>
 
 	<software name="dodgeeme2" cloneof="dodgeem">
-		<description>Dodge 'Em (PAL, Alt)</description>
+		<description>Dodge 'Em (PAL, Earlier)</description>
 		<year>1980</year>
 		<publisher>Atari</publisher>
 		<part name="cart" interface="a2600_cart">
@@ -5047,7 +5047,7 @@ Info from Atariage and Atarimania
 	</software>
 
 	<software name="dodgeeme" cloneof="dodgeem">
-		<description>Dodge 'Em (PAL)</description>
+		<description>Dodge 'Em (PAL, Later)</description>
 		<year>1987</year>
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX2637" />
