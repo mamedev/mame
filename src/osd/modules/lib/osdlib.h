@@ -102,7 +102,7 @@ protected:
 // Dynamic API helpers. Useful in creating a singleton object that can be called with DYNAMIC_CALL macro for an entire API
 // Usage for defining an API is below
 //
-// DYNAMIC_API_BEGIN(dxgi, { "dxgi.dll" })
+// DYNAMIC_API_BEGIN(dxgi, "dxgi.dll")
 //   DYNAMIC_API_FN(DWORD, WINAPI, CreateDXGIFactory1, REFIID, void**)
 // DYNAMIC_API_END()
 //
@@ -122,8 +122,8 @@ public: \
 
 #define DYNAMIC_API_END() };}}
 
-#define DYNAMIC_CALL(apiname, fname, ...) (*osd::dynamicapi::##apiname##_api::instance().m_##fname##_pfn) ( __VA_ARGS__ )
-#define DYNAMIC_API_TEST(apiname, fname) (osd::dynamicapi::##apiname##_api::instance().m_##fname##_pfn != nullptr)
+#define DYNAMIC_CALL(apiname, fname, ...) (*osd::dynamicapi::apiname##_api::instance().m_##fname##_pfn) ( __VA_ARGS__ )
+#define DYNAMIC_API_TEST(apiname, fname) (osd::dynamicapi::apiname##_api::instance().m_##fname##_pfn != nullptr)
 
 #else
 
