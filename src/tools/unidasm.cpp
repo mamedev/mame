@@ -378,7 +378,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "tx0_8kw",     _32be, -2, CPU_DISASSEMBLE_NAME(tx0_8kw) },
 	{ "ucom4",       _8bit,  0, CPU_DISASSEMBLE_NAME(ucom4) },
 	{ "unsp",        _16be,  0, CPU_DISASSEMBLE_NAME(unsp) },
-	{ "upd7725",     _32be,  0, CPU_DISASSEMBLE_NAME(unsp) },
+	{ "upd7725",     _32be,  0, CPU_DISASSEMBLE_NAME(upd7725) },
 	{ "upd7801",     _8bit,  0, CPU_DISASSEMBLE_NAME(upd7801) },
 	{ "upd7807",     _8bit,  0, CPU_DISASSEMBLE_NAME(upd7807) },
 	{ "upd7810",     _8bit,  0, CPU_DISASSEMBLE_NAME(upd7810) },
