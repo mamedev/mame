@@ -1728,7 +1728,7 @@ static void FMsave_state_st(device_t *device,fm2612_FM_ST *ST)
 	device->save_item(NAME(ST->TB)  );
 	device->save_item(NAME(ST->TBC)  );
 }
-#endif /* FM_BUSY_FLAG_SUPPORT */
+#endif /* MAME_EMU_SAVE_H */
 
 #if BUILD_OPN
 /* write a OPN mode register 0x20-0x2f */
