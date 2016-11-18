@@ -1689,7 +1689,7 @@ static inline void CSMKeyControll(fm2612_FM_OPN *OPN, fm2612_FM_CH *CH)
 	OPN->SL3.key_csm = 1;
 }
 
-#ifdef __SAVE_H__
+#ifdef MAME_EMU_SAVE_H
 /* FM channel save , internal state only */
 static void FMsave_state_channel(device_t *device,fm2612_FM_CH *CH,int num_ch)
 {
@@ -1728,7 +1728,7 @@ static void FMsave_state_st(device_t *device,fm2612_FM_ST *ST)
 	device->save_item(NAME(ST->TB)  );
 	device->save_item(NAME(ST->TBC)  );
 }
-#endif /* _STATE_H */
+#endif /* FM_BUSY_FLAG_SUPPORT */
 
 #if BUILD_OPN
 /* write a OPN mode register 0x20-0x2f */
