@@ -33294,14 +33294,14 @@ Alternate board (XL-1)
 		<info name="serial" value="SNSP-LV-SCN" />
 		<info name="release" value="19931028" />
 		<part name="cart" interface="snes_cart">
-      <feature name="pcb" value="SHVC-1A0N-20" />
-      <feature name="u1" value="U1 MASK ROM" />
-      <feature name="u2" value="U2 CIC" />
-      <feature name="lockout" value="" />
-      <feature name="cart_model" value="SNSP-006" />
-      <feature name="cart_back_label" value="SNSP-UKV" />
-      <feature name="slot" value="lorom" />
-      <dataarea name="rom" size="1048576">
+			<feature name="pcb" value="SHVC-1A0N-20" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="lockout" value="" />
+			<feature name="cart_model" value="SNSP-006" />
+			<feature name="cart_back_label" value="SNSP-UKV" />
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
 				<rom name="SPAL-LV-0.u1" size="1048576" crc="66989491" sha1="2bd4c2af6e5d7252d16342fd1a64454dca3ce557" offset="0x000000" />
 			</dataarea>
 		</part>

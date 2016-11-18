@@ -5052,8 +5052,8 @@ Info from Atariage and Atarimania
 		<publisher>Atari</publisher>
 		<info name="serial" value="CX2637" />
 		<part name="cart" interface="a2600_cart">
-												<feature name="pcb" value="C011885 REV F" />
-												<feature name="u1" value="" /> <!-- ROM -->
+			<feature name="pcb" value="C011885 REV F" />
+			<feature name="u1" value="" /> <!-- ROM -->
 			<dataarea name="rom" size="4096">
 				<rom name="AIP.u1" size="4096" crc="10cfc6c0" sha1="b26674d6e30d1a0bb2719b9bb1b3ccfa346260cf" offset="0" />
 			</dataarea>
@@ -10666,7 +10666,7 @@ Info from Atariage and Atarimania
 		<info name="serial" value="CX-2605-P" />
 		<part name="cart" interface="a2600_cart">
 			<feature name="pcb" value="C010789" />
-												<feature name="u1" value="" /> <!-- ROM -->
+			<feature name="u1" value="" /> <!-- ROM -->
 			<dataarea name="rom" size="2048">
 				<rom name="B113.u1" size="2048" crc="64f136d2" sha1="4a1514a7cf4279fded1b0db6f5b31818b9ff011c" offset="0" />
 			</dataarea>
@@ -16880,7 +16880,7 @@ Info from Atariage and Atarimania
 		<info name="alt_title" value="Vogel Flieh (Quelle)"/>
 		<part name="cart" interface="a2600_cart">
 			<feature name="pcb" value="21003A" />
-												<feature name="u1" value="" /> <!-- Epoxy blob ROM -->
+			<feature name="u1" value="" /> <!-- Epoxy blob ROM -->
 			<dataarea name="rom" size="4096">
 				<rom name="u1" size="4096" crc="1ca034ca" sha1="f4f941b779bcb7902df0eb7cf6b985f56e751183" offset="0" />
 			</dataarea>
@@ -17555,7 +17555,7 @@ Info from Atariage and Atarimania
 		<info name="alt_title" value="Laaser Voley"/>
 		<part name="cart" interface="a2600_cart">
 			<feature name="pcb" value="0019" />
-												<feature name="u1" value="" /> <!-- Epoxy blob ROM -->
+			<feature name="u1" value="" /> <!-- Epoxy blob ROM -->
 			<dataarea name="rom" size="4096">
 				<rom name="u1" size="4096" crc="dc1d3627" sha1="c513703d638c01b0c26922d5e3e7bfb65ea597da" offset="0" />
 			</dataarea>
