@@ -955,11 +955,18 @@ static MACHINE_CONFIG_START( octopus, octopus_state )
 
 	MCFG_Z80SIO2_ADD("serial", XTAL_16MHz / 4, 0, 0, 0, 0) // clock rate not mentioned in tech manual
 	MCFG_Z80DART_OUT_INT_CB(DEVWRITELINE("pic_master",pic8259_device, ir1_w))
+	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("serial_a",rs232_port_device, write_txd))
+	MCFG_Z80DART_OUT_TXDB_CB(DEVWRITELINE("serial_b",rs232_port_device, write_txd))
+	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE("serial_a",rs232_port_device, write_rts))
+	MCFG_Z80DART_OUT_RTSB_CB(DEVWRITELINE("serial_b",rs232_port_device, write_rts))
+	
 	MCFG_RS232_PORT_ADD("serial_a", default_rs232_devices, nullptr)
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("serial",z80sio2_device, ctsa_w))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("serial",z80sio2_device, rxa_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("serial",z80sio2_device, ctsa_w)) MCFG_DEVCB_INVERT
 	MCFG_RS232_RI_HANDLER(DEVWRITELINE("serial",z80sio2_device, ria_w)) MCFG_DEVCB_INVERT
 	MCFG_RS232_PORT_ADD("serial_b", default_rs232_devices, nullptr)
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("serial",z80sio2_device, ctsb_w))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("serial",z80sio2_device, rxb_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("serial",z80sio2_device, ctsb_w)) MCFG_DEVCB_INVERT
 	MCFG_RS232_RI_HANDLER(DEVWRITELINE("serial",z80sio2_device, rib_w)) MCFG_DEVCB_INVERT
 
 	MCFG_CENTRONICS_ADD("parallel", octopus_centronics_devices, "printer")
@@ -1008,4 +1015,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY             FULLNAME       FLAGS */
-COMP( 1986, octopus,  0,      0,       octopus,   octopus, driver_device, 0,  "Digital Microsystems", "LSI Octopus", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1986, octopus,  0,      0,       octopus,   octopus, driver_device, 0,  "Digital Microsystems", "LSI Octopus", MACHINE_NOT_WORKING)
