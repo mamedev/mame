@@ -4816,11 +4816,12 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Mega Games I (Euro)</description>
 		<year>1992</year>
 		<publisher>Sega</publisher>
+		<info name="release" value="19921001"/>
 		<part name="cart" interface="megadriv_cart">
-			<feature name="pcb" value="171-5978BA"/>
+			<feature name="pcb" value="171-5978BA"/> <!-- Also found with 171-5978B -->
 			<feature name="u1" value="MPR-15009 W50"/> <!-- location not really marked on PCB, using u1 for consistency -->
 			<dataarea name="rom" width="16" endianness="big" size="1048576">
-				<rom name="mpr-15009 w50.u1" size="1048576" crc="db753224" sha1="076df34a01094ce0893f32600e24323567e2a23b" offset="0x000000"/>
+				<rom name="MPR-15009 W50.u1" size="1048576" crc="db753224" sha1="076df34a01094ce0893f32600e24323567e2a23b" offset="0x000000"/>
 			</dataarea>
 		</part>
 	</software>
@@ -7385,11 +7386,12 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		<description>Sonic the Hedgehog (Euro, USA)</description>
 		<year>1991</year>
 		<publisher>Sega</publisher>
+		<info name="release" value="19910623"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="pcb" value="171-5703"/>
 			<feature name="ic1" value="MPR-13913-F, MPR-13913 W33"/>
 			<dataarea name="rom" width="16" endianness="big" size="524288">
-				<rom name="mpr-13913-f.ic1" size="524288" crc="f9394e97" sha1="6ddb7de1e17e7f6cdb88927bd906352030daa194" offset="0x000000"/>
+				<rom name="MPR-13913-F.ic1" size="524288" crc="f9394e97" sha1="6ddb7de1e17e7f6cdb88927bd906352030daa194" offset="0x000000"/>
 			</dataarea>
 		</part>
 	</software>
