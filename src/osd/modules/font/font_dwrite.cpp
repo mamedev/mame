@@ -94,17 +94,11 @@ HRESULT SaveBitmap(IWICBitmap* bitmap, GUID pixelFormat, const WCHAR *filename)
 	ComPtr<IDWriteFactory> dwriteFactory;
 	ComPtr<IWICImagingFactory> wicFactory;
 
-	osd::dynamic_module::ptr d2d1_dll = osd::dynamic_module::open({ "d2d1.dll" });
-	osd::dynamic_module::ptr dwrite_dll = osd::dynamic_module::open({ "dwrite.dll" });
-
-	d2d_create_factory_fn pfn_D2D1CreateFactory = d2d1_dll->bind<d2d_create_factory_fn>("D2D1CreateFactory");
-	dwrite_create_factory_fn pfn_DWriteCreateFactory = dwrite_dll->bind<dwrite_create_factory_fn>("DWriteCreateFactory");
-
-	if (!pfn_D2D1CreateFactory || !pfn_DWriteCreateFactory)
+	if (!DYNAMIC_API_TEST(d2d1, D2D1CreateFactory) || !DYNAMIC_API_TEST(dwrite, DWriteCreateFactory))
 		return ERROR_DLL_NOT_FOUND;
 
 	// Create a Direct2D factory
-	HR_RETHR((*pfn_D2D1CreateFactory)(
+	HR_RETHR(DYNAMIC_CALL(d2d1, D2D1CreateFactory,
 		D2D1_FACTORY_TYPE_SINGLE_THREADED,
 		__uuidof(ID2D1Factory1),
 		nullptr,
@@ -114,7 +108,7 @@ HRESULT SaveBitmap(IWICBitmap* bitmap, GUID pixelFormat, const WCHAR *filename)
 	CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
 
 	// Create a DirectWrite factory.
-	HR_RETHR((*pfn_DWriteCreateFactory)(
+	HR_RETHR(DYNAMIC_CALL(dwrite, DWriteCreateFactory,
 		DWRITE_FACTORY_TYPE_SHARED,
 		__uuidof(IDWriteFactory),
 		reinterpret_cast<IUnknown **>(dwriteFactory.GetAddressOf())));
