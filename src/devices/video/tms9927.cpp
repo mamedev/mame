@@ -112,7 +112,7 @@ void tms9927_device::device_reset()
 
 void tms9927_device::device_stop()
 {
-	osd_printf_debug("TMS9937: Final params: (%d, %d, %d, %d, %d, %d, %d)\n",
+	osd_printf_debug("TMS9927: Final params: (%d, %d, %d, %d, %d, %d, %d)\n",
 						m_clock,
 						m_total_hpix,
 						0, m_visible_hpix,
@@ -289,7 +289,7 @@ void tms9927_device::recompute_parameters(bool postload)
 
 	m_start_datarow = (LAST_DISP_DATA_ROW + 1) % DATA_ROWS_PER_FRAME;
 
-	osd_printf_debug("TMS9937: Total = %dx%d, Visible = %dx%d, Skew=%d, Upscroll=%d\n", m_total_hpix, m_total_vpix, m_visible_hpix, m_visible_vpix, SKEW_BITS, m_start_datarow);
+	osd_printf_debug("TMS9927: Total = %dx%d, Visible = %dx%d, Skew=%d, Upscroll=%d\n", m_total_hpix, m_total_vpix, m_visible_hpix, m_visible_vpix, SKEW_BITS, m_start_datarow);
 
 	/* see if it all makes sense */
 	m_valid_config = true;
