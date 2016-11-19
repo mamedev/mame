@@ -145,10 +145,10 @@ u64 device_state_entry::value() const
 	switch (m_datasize)
 	{
 		default:
-		case 1: result = *m_dataptr.u8;     break;
-		case 2: result = *m_dataptr.u16;    break;
-		case 4: result = *m_dataptr.u32;    break;
-		case 8: result = *m_dataptr.u64;    break;
+		case 1: result = *static_cast<u8  *>(m_dataptr); break;
+		case 2: result = *static_cast<u16 *>(m_dataptr); break;
+		case 4: result = *static_cast<u32 *>(m_dataptr); break;
+		case 8: result = *static_cast<u64 *>(m_dataptr); break;
 	}
 	return result & m_datamask;
 }
@@ -360,10 +360,10 @@ void device_state_entry::set_value(u64 value) const
 	switch (m_datasize)
 	{
 		default:
-		case 1: *m_dataptr.u8 = value;      break;
-		case 2: *m_dataptr.u16 = value;     break;
-		case 4: *m_dataptr.u32 = value;     break;
-		case 8: *m_dataptr.u64 = value;     break;
+		case 1: *static_cast<u8  *>(m_dataptr) = value; break;
+		case 2: *static_cast<u16 *>(m_dataptr) = value; break;
+		case 4: *static_cast<u32 *>(m_dataptr) = value; break;
+		case 8: *static_cast<u64 *>(m_dataptr) = value; break;
 	}
 }
 

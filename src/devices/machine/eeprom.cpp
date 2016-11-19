@@ -81,7 +81,7 @@ void eeprom_base_device::static_set_default_data(device_t &device, const uint8_t
 {
 	eeprom_base_device &eeprom = downcast<eeprom_base_device &>(device);
 	assert(eeprom.m_data_bits == 8);
-	eeprom.m_default_data.u8 = const_cast<uint8_t *>(data);
+	eeprom.m_default_data = data;
 	eeprom.m_default_data_size = size;
 }
 
@@ -89,7 +89,7 @@ void eeprom_base_device::static_set_default_data(device_t &device, const uint16_
 {
 	eeprom_base_device &eeprom = downcast<eeprom_base_device &>(device);
 	assert(eeprom.m_data_bits == 16);
-	eeprom.m_default_data.u16 = const_cast<uint16_t *>(data);
+	eeprom.m_default_data = data;
 	eeprom.m_default_data_size = size / 2;
 }
 
@@ -245,15 +245,15 @@ void eeprom_base_device::nvram_default()
 		internal_write(offs, default_value);
 
 	// handle hard-coded data from the driver
-	if (m_default_data.u8 != nullptr)
+	if (m_default_data != nullptr)
 	{
 		osd_printf_verbose("Warning: Driver-specific EEPROM defaults are going away soon.\n");
 		for (offs_t offs = 0; offs < m_default_data_size; offs++)
 		{
 			if (m_data_bits == 8)
-				internal_write(offs, m_default_data.u8[offs]);
+				internal_write(offs, static_cast<const u8 *>(m_default_data)[offs]);
 			else
-				internal_write(offs, m_default_data.u16[offs]);
+				internal_write(offs, static_cast<const u16 *>(m_default_data)[offs]);
 		}
 	}
 

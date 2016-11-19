@@ -83,22 +83,6 @@ class running_machine;
 //  USEFUL COMPOSITE TYPES
 //**************************************************************************
 
-// generic_ptr is a union of pointers to various sizes
-union generic_ptr
-{
-	generic_ptr(void *value) { v = value; }
-	void *  v;
-	s8 *    i8;
-	u8 *    u8;
-	s16 *   i16;
-	u16 *   u16;
-	s32 *   i32;
-	u32 *   u32;
-	s64 *   i64;
-	u64 *   u64;
-};
-
-
 // PAIR is an endian-safe union useful for representing 32-bit CPU registers
 union PAIR
 {

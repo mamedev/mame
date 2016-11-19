@@ -60,7 +60,7 @@ public:
 
 	// query information
 	int index() const { return m_index; }
-	void *dataptr() const { return m_dataptr.v; }
+	void *dataptr() const { return m_dataptr; }
 	const char *symbol() const { return m_symbol.c_str(); }
 	bool visible() const { return ((m_flags & DSF_NOSHOW) == 0); }
 	bool divider() const { return m_flags & DSF_DIVIDER; }
@@ -95,7 +95,7 @@ protected:
 	// public state description
 	device_state_interface *m_device_state;         // link to parent device state
 	u32                     m_index;                // index by which this item is referred
-	generic_ptr             m_dataptr;              // pointer to where the data lives
+	void *                  m_dataptr;              // pointer to where the data lives
 	u64                     m_datamask;             // mask that applies to the data
 	u8                      m_datasize;             // size of the data
 	u8                      m_flags;                // flags for this data
