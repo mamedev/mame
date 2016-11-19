@@ -366,7 +366,6 @@ u8 debugger_cpu::read_byte(address_space &space, offs_t address, bool apply_tran
 
 	/* all accesses from this point on are for the debugger */
 	m_debugger_access = true;
-	space.set_debugger_access(true);
 
 	/* translate if necessary; if not mapped, return 0xff */
 	u64 custom;
@@ -386,7 +385,6 @@ u8 debugger_cpu::read_byte(address_space &space, offs_t address, bool apply_tran
 
 	/* no longer accessing via the debugger */
 	m_debugger_access = false;
-	space.set_debugger_access(false);
 	return result;
 }
 
@@ -419,7 +417,6 @@ u16 debugger_cpu::read_word(address_space &space, offs_t address, bool apply_tra
 
 		/* all accesses from this point on are for the debugger */
 		m_debugger_access = true;
-		space.set_debugger_access(true);
 
 		/* translate if necessary; if not mapped, return 0xffff */
 		u64 custom;
@@ -438,7 +435,6 @@ u16 debugger_cpu::read_word(address_space &space, offs_t address, bool apply_tra
 
 		/* no longer accessing via the debugger */
 		m_debugger_access = false;
-		space.set_debugger_access(false);
 	}
 
 	return result;
@@ -473,7 +469,6 @@ u32 debugger_cpu::read_dword(address_space &space, offs_t address, bool apply_tr
 
 		/* all accesses from this point on are for the debugger */
 		m_debugger_access = true;
-		space.set_debugger_access(true);
 
 		u64 custom;
 		if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_READ_DEBUG, address))
@@ -491,7 +486,6 @@ u32 debugger_cpu::read_dword(address_space &space, offs_t address, bool apply_tr
 
 		/* no longer accessing via the debugger */
 		m_debugger_access = false;
-		space.set_debugger_access(false);
 	}
 
 	return result;
@@ -526,7 +520,6 @@ u64 debugger_cpu::read_qword(address_space &space, offs_t address, bool apply_tr
 
 		/* all accesses from this point on are for the debugger */
 		m_debugger_access = true;
-		space.set_debugger_access(true);
 
 		/* translate if necessary; if not mapped, return 0xffffffffffffffff */
 		u64 custom;
@@ -545,7 +538,6 @@ u64 debugger_cpu::read_qword(address_space &space, offs_t address, bool apply_tr
 
 		/* no longer accessing via the debugger */
 		m_debugger_access = false;
-		space.set_debugger_access(false);
 	}
 
 	return result;
@@ -585,7 +577,6 @@ void debugger_cpu::write_byte(address_space &space, offs_t address, u8 data, boo
 
 	/* all accesses from this point on are for the debugger */
 	m_debugger_access = true;
-	space.set_debugger_access(true);
 
 	/* translate if necessary; if not mapped, we're done */
 	if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_WRITE_DEBUG, address))
@@ -601,7 +592,6 @@ void debugger_cpu::write_byte(address_space &space, offs_t address, u8 data, boo
 
 	/* no longer accessing via the debugger */
 	m_debugger_access = false;
-	space.set_debugger_access(false);
 
 	m_memory_modified = true;
 }
@@ -639,7 +629,6 @@ void debugger_cpu::write_word(address_space &space, offs_t address, u16 data, bo
 
 		/* all accesses from this point on are for the debugger */
 		m_debugger_access = true;
-		space.set_debugger_access(true);
 
 		/* translate if necessary; if not mapped, we're done */
 		if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_WRITE_DEBUG, address))
@@ -655,7 +644,6 @@ void debugger_cpu::write_word(address_space &space, offs_t address, u16 data, bo
 
 		/* no longer accessing via the debugger */
 		m_debugger_access = false;
-		space.set_debugger_access(false);
 
 		m_memory_modified = true;
 	}
@@ -693,7 +681,7 @@ void debugger_cpu::write_dword(address_space &space, offs_t address, u32 data, b
 		device_memory_interface &memory = space.device().memory();
 
 		/* all accesses from this point on are for the debugger */
-		space.set_debugger_access(m_debugger_access = true);
+		m_debugger_access = true;
 
 		/* translate if necessary; if not mapped, we're done */
 		if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_WRITE_DEBUG, address))
@@ -709,7 +697,6 @@ void debugger_cpu::write_dword(address_space &space, offs_t address, u32 data, b
 
 		/* no longer accessing via the debugger */
 		m_debugger_access = false;
-		space.set_debugger_access(false);
 
 		m_memory_modified = true;
 	}
@@ -748,7 +735,6 @@ void debugger_cpu::write_qword(address_space &space, offs_t address, u64 data, b
 
 		/* all accesses from this point on are for the debugger */
 		m_debugger_access = true;
-		space.set_debugger_access(true);
 
 		/* translate if necessary; if not mapped, we're done */
 		if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_WRITE_DEBUG, address))
@@ -764,7 +750,6 @@ void debugger_cpu::write_qword(address_space &space, offs_t address, u64 data, b
 
 		/* no longer accessing via the debugger */
 		m_debugger_access = false;
-		space.set_debugger_access(false);
 
 		m_memory_modified = true;
 	}
@@ -804,11 +789,9 @@ u64 debugger_cpu::read_opcode(address_space &space, offs_t address, int size)
 
 	/* return early if we got the result directly */
 	m_debugger_access = true;
-	space.set_debugger_access(true);
 	if (memory.readop(address, size, result2))
 	{
 		m_debugger_access = false;
-		space.set_debugger_access(false);
 		return result2;
 	}
 
@@ -885,11 +868,7 @@ u64 debugger_cpu::read_opcode(address_space &space, offs_t address, int size)
 	}
 
 	/* turn on debugger access */
-	if (!m_debugger_access)
-	{
-		m_debugger_access = true;
-		space.set_debugger_access(true);
-	}
+	m_debugger_access = true;
 
 	/* switch off the size and handle unaligned accesses */
 	switch (size)
@@ -939,7 +918,6 @@ u64 debugger_cpu::read_opcode(address_space &space, offs_t address, int size)
 
 	/* no longer accessing via the debugger */
 	m_debugger_access = false;
-	space.set_debugger_access(false);
 
 	return result;
 }

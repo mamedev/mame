@@ -322,7 +322,7 @@ READ16_MEMBER( ti99_datamux_device::read )
 	uint16_t value = 0;
 
 	// Care for debugger
-	if (space.debugger_access())
+	if (machine().debugger_access())
 	{
 		return debugger_read(space, offset);
 	}
@@ -371,7 +371,7 @@ READ16_MEMBER( ti99_datamux_device::read )
 */
 WRITE16_MEMBER( ti99_datamux_device::write )
 {
-	if (space.debugger_access())
+	if (machine().debugger_access())
 	{
 		debugger_write(space, offset, data);
 		return;

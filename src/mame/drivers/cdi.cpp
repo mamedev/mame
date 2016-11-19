@@ -417,7 +417,7 @@ MACHINE_RESET_MEMBER( cdi_state, quizard4r42 )
 
 READ8_MEMBER( cdi_state::servo_io_r )
 {
-	if (space.debugger_access())
+	if (machine().debugger_access())
 	{
 		return 0;
 	}
@@ -617,7 +617,7 @@ WRITE8_MEMBER( cdi_state::servo_io_w )
 
 READ8_MEMBER( cdi_state::slave_io_r )
 {
-	if (space.debugger_access())
+	if (machine().debugger_access())
 	{
 		return 0;
 	}

@@ -515,7 +515,7 @@ WRITE8_MEMBER( amigakbd_device::latch_w )
 
 READ8_MEMBER( amigakbd_device::counter_r )
 {
-	if (!space.debugger_access())
+	if (!machine().debugger_access())
 	{
 		m_control &= ~COUNTER_OVERFLOW;
 		update_irqs();

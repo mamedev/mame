@@ -4208,7 +4208,7 @@ READ16_MEMBER(megasys1_state::megasys1A_mcu_hs_r)
 {
 	if(m_mcu_hs && ((m_mcu_hs_ram[8/2] << 6) & 0x3ffc0) == ((offset*2) & 0x3ffc0))
 	{
-		if(MCU_HS_LOG && !space.debugger_access())
+		if(MCU_HS_LOG && !machine().debugger_access())
 			printf("MCU HS R (%04x) <- [%02x]\n",mem_mask,offset*2);
 
 		return 0x889e;
@@ -4236,7 +4236,7 @@ WRITE16_MEMBER(megasys1_state::megasys1A_mcu_hs_w)
 	else
 		m_mcu_hs = 0;
 
-	if(MCU_HS_LOG && !space.debugger_access())
+	if(MCU_HS_LOG && !machine().debugger_access())
 		printf("MCU HS W %04x (%04x) -> [%02x]\n",data,mem_mask,offset*2);
 }
 
@@ -4355,7 +4355,7 @@ READ16_MEMBER(megasys1_state::iganinju_mcu_hs_r)
 {
 	if(m_mcu_hs && ((m_mcu_hs_ram[8/2] << 6) & 0x3ffc0) == ((offset*2) & 0x3ffc0))
 	{
-		if(MCU_HS_LOG && !space.debugger_access())
+		if(MCU_HS_LOG && !machine().debugger_access())
 			printf("MCU HS R (%04x) <- [%02x]\n",mem_mask,offset*2);
 
 		return 0x835d;
@@ -4380,7 +4380,7 @@ WRITE16_MEMBER(megasys1_state::iganinju_mcu_hs_w)
 	else
 		m_mcu_hs = 0;
 
-	if(MCU_HS_LOG && !space.debugger_access())
+	if(MCU_HS_LOG && !machine().debugger_access())
 		printf("MCU HS W %04x (%04x) -> [%02x]\n",data,mem_mask,offset*2);
 }
 
@@ -4504,7 +4504,7 @@ READ16_MEMBER(megasys1_state::stdragon_mcu_hs_r)
 {
 	if(m_mcu_hs && ((m_mcu_hs_ram[8/2] << 6) & 0x3ffc0) == ((offset*2) & 0x3ffc0))
 	{
-		if(MCU_HS_LOG && !space.debugger_access())
+		if(MCU_HS_LOG && !machine().debugger_access())
 			printf("MCU HS R (%04x) <- [%02x]\n",mem_mask,offset*2);
 
 		return 0x835d;
@@ -4522,7 +4522,7 @@ WRITE16_MEMBER(megasys1_state::stdragon_mcu_hs_w)
 	else
 		m_mcu_hs = 0;
 
-	if(MCU_HS_LOG && !space.debugger_access())
+	if(MCU_HS_LOG && !machine().debugger_access())
 		printf("MCU HS W %04x (%04x) -> [%02x]\n",data,mem_mask,offset*2);
 }
 

@@ -212,7 +212,7 @@ uint8_t c64_currah_speech_cartridge_device::c64_cd_r(address_space &space, offs_
 		data = m_nsp->sby_r() << 7;
 	}
 
-	if (!space.debugger_access() && (offset == 0xa7f0))
+	if (!machine().debugger_access() && (offset == 0xa7f0))
 	{
 		m_game = !m_game;
 		m_exrom = !m_exrom;

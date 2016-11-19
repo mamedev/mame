@@ -153,7 +153,7 @@ void ti_pcode_card_device::debugger_read(address_space& space, uint16_t offset, 
 READ8Z_MEMBER( ti_pcode_card_device::readz )
 {
 	// Care for debugger
-	if (space.debugger_access())
+	if (machine().debugger_access())
 	{
 		debugger_read(space, offset, *value);
 	}
@@ -196,7 +196,7 @@ READ8Z_MEMBER( ti_pcode_card_device::readz )
 */
 WRITE8_MEMBER( ti_pcode_card_device::write )
 {
-	if (space.debugger_access()) return;
+	if (machine().debugger_access()) return;
 	if (m_active && m_isgrom && m_selected)
 	{
 		for (auto & elem : m_grom) elem->write(space, m_address, data);

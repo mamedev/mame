@@ -68,7 +68,7 @@ READ8_MEMBER(mb8421_device::left_r)
 {
 	offset &= 0x7ff;
 
-	if (offset == 0x7fe && !space.debugger_access())
+	if (offset == 0x7fe && !machine().debugger_access())
 		m_intl_handler(0);
 
 	return m_ram[offset];
@@ -87,7 +87,7 @@ READ8_MEMBER(mb8421_device::right_r)
 {
 	offset &= 0x7ff;
 
-	if (offset == 0x7ff && !space.debugger_access())
+	if (offset == 0x7ff && !machine().debugger_access())
 		m_intr_handler(0);
 
 	return m_ram[offset];

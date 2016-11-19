@@ -22,8 +22,6 @@
 #include "i386priv.h"
 #include "i386.h"
 
-#include "debug/debugcpu.h"
-
 /* seems to be defined on mingw-gcc */
 #undef i386
 

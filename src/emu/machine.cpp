@@ -767,6 +767,16 @@ void running_machine::strlog(const char *str) const
 
 
 //-------------------------------------------------
+//  debugger_access - return true if the debugger
+//  is accessing memory
+//-------------------------------------------------
+
+bool running_machine::debugger_access() const
+{
+	return m_debugger->cpu().debugger_access();
+}
+
+//-------------------------------------------------
 //  debug_break - breaks into the debugger, if
 //  enabled
 //-------------------------------------------------

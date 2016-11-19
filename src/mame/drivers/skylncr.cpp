@@ -432,8 +432,7 @@ READ_LINE_MEMBER(skylncr_state::mbutrfly_prot_r)
 
 READ8_MEMBER(skylncr_state::bdream97_opcode_r)
 {
-	address_space_debug_wrapper program(m_maincpu->space(AS_PROGRAM), space.debugger_access());
-	return program.space().read_byte(offset) ^ 0x80;
+	return m_maincpu->space(AS_PROGRAM).read_byte(offset) ^ 0x80;
 }
 
 

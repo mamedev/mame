@@ -258,6 +258,7 @@ public:
 
 	// misc
 	address_space &dummy_space() const { return m_dummy_space.space(AS_PROGRAM); }
+	bool debugger_access() const;
 	void popmessage() const { popmessage(static_cast<char const *>(nullptr)); }
 	template <typename Format, typename... Params> void popmessage(Format &&fmt, Params &&... args) const;
 	template <typename Format, typename... Params> void logerror(Format &&fmt, Params &&... args) const;

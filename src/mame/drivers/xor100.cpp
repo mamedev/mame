@@ -184,7 +184,7 @@ READ8_MEMBER( xor100_state::fdc_wait_r )
 
 	*/
 
-	if (!space.debugger_access())
+	if (!machine().debugger_access())
 	{
 		if (!m_fdc_irq && !m_fdc_drq)
 		{

@@ -45,7 +45,7 @@ public:
 
 READ8_MEMBER( sc2_state::sc2_beep )
 {
-	//if (!space.debugger_access())
+	//if (!machine().debugger_access())
 	{
 		m_beep_state = ~m_beep_state;
 

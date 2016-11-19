@@ -627,7 +627,7 @@ READ8_MEMBER(e0c6s46_device::io_r)
 		{
 			// irq flags are reset(acked) when read
 			uint8_t flag = m_irqflag[offset];
-			if (!space.debugger_access())
+			if (!machine().debugger_access())
 				m_irqflag[offset] = 0;
 			return flag;
 		}
@@ -704,7 +704,7 @@ READ8_MEMBER(e0c6s46_device::io_r)
 			break;
 
 		default:
-			if (!space.debugger_access())
+			if (!machine().debugger_access())
 				logerror("%s unknown io_r from $0F%02X at $%04X\n", tag(), offset, m_prev_pc);
 			break;
 	}

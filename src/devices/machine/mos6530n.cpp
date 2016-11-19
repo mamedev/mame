@@ -633,7 +633,7 @@ WRITE8_MEMBER( mos6530_base_t::pb_ddr_w )
 
 READ8_MEMBER( mos6530_base_t::timer_off_r )
 {
-	if (space.debugger_access())
+	if (machine().debugger_access())
 		return 0;
 
 	return timer_r(false);
@@ -641,7 +641,7 @@ READ8_MEMBER( mos6530_base_t::timer_off_r )
 
 READ8_MEMBER( mos6530_base_t::timer_on_r )
 {
-	if (space.debugger_access())
+	if (machine().debugger_access())
 		return 0;
 
 	return timer_r(true);
@@ -678,7 +678,7 @@ READ8_MEMBER( mos6530_base_t::irq_r )
 {
 	uint8_t data = get_irq_flags();
 
-	if (!space.debugger_access()) {
+	if (!machine().debugger_access()) {
 		if (m_irq_edge) {
 			m_irq_edge = false;
 			update_irq();

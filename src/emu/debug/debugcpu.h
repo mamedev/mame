@@ -482,6 +482,8 @@ public:
 	/* return true if the current execution state is stopped */
 	bool is_stopped();
 
+	/* return true if the debugger is accessing memory */
+	bool debugger_access() { return m_debugger_access; }
 
 	/* ----- symbol table interfaces ----- */
 
