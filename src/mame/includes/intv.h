@@ -85,6 +85,8 @@ public:
 	DECLARE_WRITE8_MEMBER(intvkbd_dualport8_lsb_w);
 	DECLARE_READ8_MEMBER(intvkbd_dualport8_msb_r);
 	DECLARE_WRITE8_MEMBER(intvkbd_dualport8_msb_w);
+	DECLARE_READ8_MEMBER(intvkbd_periph_r);
+	DECLARE_WRITE8_MEMBER(intvkbd_periph_w);
 
 	int m_intvkbd_text_blanked;
 	int m_intvkbd_keyboard_col;
