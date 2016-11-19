@@ -605,7 +605,7 @@ template <typename T> inline void sparc_disassembler::add_vis_op_desc(const T &d
 
 inline void sparc_disassembler::pad_op_field(std::ostream &stream, std::streampos start_position) const
 {
-	std::streamoff difference = stream.tellp() - start_position;
+	const std::streamoff difference(stream.tellp() - start_position);
 	for (std::streamoff i = difference; i < m_op_field_width; i++)
 		stream << ' ';
 }
@@ -1053,7 +1053,7 @@ offs_t sparc_disassembler::dasm(std::ostream &stream, offs_t pc, uint32_t op) co
 offs_t sparc_disassembler::dasm(char *buf, offs_t pc, uint32_t op) const
 {
 	std::ostringstream stream;
-	offs_t result = dasm(stream, pc, op);
+	const offs_t result(dasm(stream, pc, op));
 	std::string stream_str = stream.str();
 	strcpy(buf, stream_str.c_str());
 	return result;
@@ -1088,7 +1088,7 @@ offs_t sparc_disassembler::dasm_invalid(std::ostream &stream, offs_t pc, uint32_
 
 offs_t sparc_disassembler::dasm_branch(std::ostream &stream, offs_t pc, uint32_t op) const
 {
-	std::streampos start_position = stream.tellp();
+	const std::streampos start_position(stream.tellp());
 	const branch_desc &desc(m_branch_desc[OP2]);
 	const char * const mnemonic(desc.mnemonic[COND]);
 	if (!mnemonic || (desc.use_cc && !desc.reg_cc[BRCC])) return dasm_invalid(stream, pc, op);
@@ -1249,7 +1249,7 @@ offs_t sparc_disassembler::dasm_move_cond(std::ostream &stream, offs_t pc, uint3
 {
 	if ((m_version < 9) || !MOVCC_CC_NAMES[MOVCC]) return dasm_invalid(stream, pc, op);
 
-	std::streampos start_position = stream.tellp();
+	const std::streampos start_position(stream.tellp());
 	util::stream_format(stream, "mov%s", MOVCC_COND_NAMES[MOVCOND | ((MOVCC << 2) & 16)]);
 	pad_op_field(stream, start_position);
 	if (USEIMM)
@@ -1302,7 +1302,7 @@ offs_t sparc_disassembler::dasm_fpop2(std::ostream &stream, offs_t pc, uint32_t 
 		}
 		if (mnemonic)
 		{
-			std::streampos start_position = stream.tellp();
+			const std::streampos start_position(stream.tellp());
 			util::stream_format(stream, "%s%s", mnemonic, MOVCC_COND_NAMES[MOVCOND | ((OPFCC << 2) & 16)]);
 			pad_op_field(stream, start_position);
 			util::stream_format(stream, "%s,%%f%d,%%f%d", MOVCC_CC_NAMES[OPFCC], freg(RS2, shift), freg(RD, shift));
