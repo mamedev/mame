@@ -48,41 +48,41 @@ READ8_MEMBER( intv_state::intvkbd_dualport8_msb_r )
 		{
 			case 0x000:
 				rv = m_io_test->read() & 0x80;
-				logerror("TAPE: Read %02x from 0x40%02x - XOR Data?\n",rv,offset);
+				//logerror("TAPE: Read %02x from 0x40%02x - XOR Data?\n",rv,offset);
 				break;
 			case 0x001:
 				rv = (m_io_test->read() & 0x40) << 1;
-				logerror("TAPE: Read %02x from 0x40%02x - Sense 1?\n",rv,offset);
+				//logerror("TAPE: Read %02x from 0x40%02x - Sense 1?\n",rv,offset);
 				break;
 			case 0x002:
 				rv = (m_io_test->read() & 0x20) << 2;
-				logerror("TAPE: Read %02x from 0x40%02x - Sense 2?\n",rv,offset);
+				//logerror("TAPE: Read %02x from 0x40%02x - Sense 2?\n",rv,offset);
 				break;
 			case 0x003:
 				rv = (m_io_test->read() & 0x10) << 3;
-				logerror("TAPE: Read %02x from 0x40%02x - Tape Present\n",rv,offset);
+				//logerror("TAPE: Read %02x from 0x40%02x - Tape Present\n",rv,offset);
 				break;
 			case 0x004:
 				rv = (m_io_test->read() & 0x08) << 4;
-				logerror("TAPE: Read %02x from 0x40%02x - Comp (339/1)\n",rv,offset);
+				//logerror("TAPE: Read %02x from 0x40%02x - Comp (339/1)\n",rv,offset);
 				break;
 			case 0x005:
 				rv = (m_io_test->read() & 0x04) << 5;
-				logerror("TAPE: Read %02x from 0x40%02x - Clocked Comp (339/13)\n",rv,offset);
+				//logerror("TAPE: Read %02x from 0x40%02x - Clocked Comp (339/13)\n",rv,offset);
 				break;
 			case 0x006:
 				if (m_sr1_int_pending)
 					rv = 0x00;
 				else
 					rv = 0x80;
-				logerror("TAPE: Read %02x from 0x40%02x - SR1 Int Pending\n",rv,offset);
+				//logerror("TAPE: Read %02x from 0x40%02x - SR1 Int Pending\n",rv,offset);
 				break;
 			case 0x007:
 				if (m_tape_int_pending)
 					rv = 0x00;
 				else
 					rv = 0x80;
-				logerror("TAPE: Read %02x from 0x40%02x - Tape? Int Pending\n",rv,offset);
+				//logerror("TAPE: Read %02x from 0x40%02x - Tape? Int Pending\n",rv,offset);
 				break;
 			case 0x060: /* Keyboard Read */
 				rv = 0xff;
@@ -91,12 +91,12 @@ READ8_MEMBER( intv_state::intvkbd_dualport8_msb_r )
 				break;
 			case 0x80:
 				rv = 0x00;
-				logerror("TAPE: Read %02x from 0x40%02x, clear tape int pending\n",rv,offset);
+				//logerror("TAPE: Read %02x from 0x40%02x, clear tape int pending\n",rv,offset);
 				m_tape_int_pending = 0;
 				break;
 			case 0xa0:
 				rv = 0x00;
-				logerror("TAPE: Read %02x from 0x40%02x, clear SR1 int pending\n",rv,offset);
+				//logerror("TAPE: Read %02x from 0x40%02x, clear SR1 int pending\n",rv,offset);
 				m_sr1_int_pending = 0;
 				break;
 			case 0xc0:
@@ -120,13 +120,69 @@ READ8_MEMBER( intv_state::intvkbd_dualport8_msb_r )
 				break;
 			default:
 				rv = (m_intvkbd_dualport_ram[offset]&0x0300)>>8;
-				logerror("Unknown read %02x from 0x40%02x\n",rv,offset);
+				//logerror("Unknown read %02x from 0x40%02x\n",rv,offset);
 				break;
 		}
 		return rv;
 	}
 	else
 		return (m_intvkbd_dualport_ram[offset]&0x0300)>>8;
+}
+
+static bool not_busy = 1;	// printer state
+static bool not_paper = 0; // printer state - we always have paper
+static bool not_busy_enable = 0;  // interface state?
+
+READ8_MEMBER( intv_state::intvkbd_periph_r )
+{
+	uint8_t value = 0;
+	switch(offset) {
+		case 0x06:
+			if (not_busy_enable)
+				if (not_busy)
+					value |= 0x80;
+			if (not_paper)
+				value |= 0x10;
+			//logerror("PeriphRead:  0x%04x->0x%02x\n",offset,value);
+			
+			// After one query of busy, 
+			// next time the state is not_busy
+			if (not_busy == 0) 
+				not_busy = 1;
+				
+			return value;
+		break;
+		case 0x07:
+		
+		default:
+			//logerror("PeriphRead:  0x%04x->0x%02x\n",offset,0xff);
+			return 0xff;
+		break;
+	}
+}
+
+WRITE8_MEMBER( intv_state::intvkbd_periph_w )
+{
+	static FILE *fp = fopen("printer.txt","wb");
+	
+	switch(offset) {
+		case 0x06:
+			//logerror("PeriphWrite: 0x%04x->0x%02x\n",offset,data);
+			if (data & 0x20)
+				not_busy_enable = 1;
+			else
+				not_busy_enable = 0;
+		break;
+		case 0x07:
+			//logerror("Printing: 0x%02x, %c\n",data,data);
+			fputc(data, fp);
+			fflush(fp);
+			not_busy = 0;
+		break;
+		default:
+			//logerror("PeriphWrite: 0x%04x->0x%02x\n",offset,data);
+		break;
+	}
 }
 
 static const char *const tape_motor_mode_desc[8] =
@@ -147,19 +203,19 @@ WRITE8_MEMBER( intv_state::intvkbd_dualport8_msb_w )
 				m_tape_motor_mode &= 3;
 				if (data & 1)
 					m_tape_motor_mode |= 4;
-				logerror("TAPE: Motor Mode: %s\n",tape_motor_mode_desc[m_tape_motor_mode]);
+				//logerror("TAPE: Motor Mode: %s\n",tape_motor_mode_desc[m_tape_motor_mode]);
 				break;
 			case 0x021:
 				m_tape_motor_mode &= 5;
 				if (data & 1)
 					m_tape_motor_mode |= 2;
-				logerror("TAPE: Motor Mode: %s\n",tape_motor_mode_desc[m_tape_motor_mode]);
+				//logerror("TAPE: Motor Mode: %s\n",tape_motor_mode_desc[m_tape_motor_mode]);
 				break;
 			case 0x022:
 				m_tape_motor_mode &= 6;
 				if (data & 1)
 					m_tape_motor_mode |= 1;
-				logerror("TAPE: Motor Mode: %s\n",tape_motor_mode_desc[m_tape_motor_mode]);
+				//logerror("TAPE: Motor Mode: %s\n",tape_motor_mode_desc[m_tape_motor_mode]);
 				break;
 			case 0x023:
 			case 0x024:
@@ -172,17 +228,17 @@ WRITE8_MEMBER( intv_state::intvkbd_dualport8_msb_w )
 				m_tape_unknown_write[5] = (data & 1);
 				break;
 			case 0x041:
-				if (data & 1)
-					logerror("TAPE: Tape Interrupts Enabled\n");
-				else
-					logerror("TAPE: Tape Interrupts Disabled\n");
+				//if (data & 1)
+					//logerror("TAPE: Tape Interrupts Enabled\n");
+				//else
+					//logerror("TAPE: Tape Interrupts Disabled\n");
 				m_tape_interrupts_enabled = (data & 1);
 				break;
 			case 0x042:
-				if (data & 1)
-					logerror("TAPE: Cart Bus Interrupts Disabled\n");
-				else
-					logerror("TAPE: Cart Bus Interrupts Enabled\n");
+				//if (data & 1)
+					//logerror("TAPE: Cart Bus Interrupts Disabled\n");
+				//else
+					//logerror("TAPE: Cart Bus Interrupts Enabled\n");
 				break;
 			case 0x043:
 				if (data & 0x01)
@@ -207,11 +263,11 @@ WRITE8_MEMBER( intv_state::intvkbd_dualport8_msb_w )
 				m_intvkbd_keyboard_col |= ((data&0x01)<<3);
 				break;
 			case 0x80:
-				logerror("TAPE: Write to 0x40%02x, clear tape int pending\n",offset);
+				//logerror("TAPE: Write to 0x40%02x, clear tape int pending\n",offset);
 				m_tape_int_pending = 0;
 				break;
 			case 0xa0:
-				logerror("TAPE: Write to 0x40%02x, clear SR1 int pending\n",offset);
+				//logerror("TAPE: Write to 0x40%02x, clear SR1 int pending\n",offset);
 				m_sr1_int_pending = 0;
 				break;
 			case 0xc0:
@@ -234,7 +290,7 @@ WRITE8_MEMBER( intv_state::intvkbd_dualport8_msb_w )
 				m_crtc->write(space, offset-0xc0, data);
 				break;
 			default:
-				logerror("%04X: Unknown write %02x to 0x40%02x\n",space.device().safe_pc(),data,offset);
+				//logerror("%04X: Unknown write %02x to 0x40%02x\n",space.device().safe_pc(),data,offset);
 				break;
 		}
 	}
