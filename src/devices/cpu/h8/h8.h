@@ -208,8 +208,9 @@ protected:
 
 	static const disasm_entry disasm_entries[];
 
+	offs_t disassemble_generic(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options, const disasm_entry *table);
 	offs_t disassemble_generic(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options, const disasm_entry *table);
-	void disassemble_am(char *&buffer, int am, offs_t pc, const uint8_t *oprom, uint32_t opcode, int slot, int offset);
+	void disassemble_am(std::ostream &stream, int am, offs_t pc, const uint8_t *oprom, uint32_t opcode, int slot, int offset);
 
 	virtual void do_exec_full();
 	virtual void do_exec_partial();
