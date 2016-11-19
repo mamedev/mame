@@ -10,10 +10,22 @@
 
 <softwarelist name="bbcmc_flop" description="BBC Master Compact disks">
 
+	<software name="alps24">
+		<description>ALPS - Adventure Language Programming System</description>
+		<year>1988</year>
+		<publisher>Alpine Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="655360">
+				<rom name="alps24.adl" size="655360" crc="82b20916" sha1="fcf1c0290afb523cbab11069373fef28478b1ad3" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="elite">
 		<description>Elite</description>
 		<year>1986</year>
 		<publisher>Superior Software/Acornsoft</publisher>
+		<info name="release" value="SUG60" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
 				<rom name="elite.adm" size="327680" crc="4668a225" sha1="0716a525820045f6b2092dda2eca2fa6a651b381" offset="0"/>
@@ -22,7 +34,7 @@
 	</software>
 
 	<software name="welcome">
-		<description>BBC Master Compact Welcome Disc</description>
+		<description>Welcome &amp; Utilities Disc for Master Compact</description>
 		<year>1986</year>
 		<publisher>Acorn</publisher>
 		<part name="flop1" interface="floppy_3_5">

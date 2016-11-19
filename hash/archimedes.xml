@@ -735,7 +735,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<software name="ego" supported="no">
-		<description>EGO - Repton 4</description>
+		<description>EGO: Repton 4</description>
 		<year>1992</year>
 		<publisher>ProAction</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -796,6 +796,17 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
 				<rom name="enigma (1993)(archimedes world)[a2].adf" size="819200" crc="979f5998" sha1="9228630e3858caed9f108b1a35036957d4efa720" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="enthar7" supported="no">
+		<description>Enthar Seven</description>
+		<year>1988</year>
+		<publisher>Robico</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="Enthar7 (Robico).adf" size="819200" crc="701c8e07" sha1="621abffd8aad89c79cfaf57ee65a8ee5de2a2e98" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -895,6 +906,17 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
 				<rom name="hero quest (1991)(krisalis)[h].adf" size="819200" crc="f9ef486d" sha1="4f92efecfc1e3a510a816f570ccb7082f0154e37" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hostages" supported="no">
+		<description>Hostages</description>
+		<year>1990</year>
+		<publisher>Superior Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="Hostages (Superior Software).adf" size="819200" crc="f42a6fa3" sha1="0c8bce397205bcb3f1d285570086572cd1ca0cc0" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1016,6 +1038,17 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
+	<software name="leedsutd" supported="no">
+		<description>Leeds United Champions!</description>
+		<year>19??</year>
+		<publisher>CDS</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="leeds utd - champions! (19xx)(cds).adf" size="819200" crc="d4631873" sha1="4ba0835c415bde82742c61328acf711d821619e2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="losttmpl" supported="no">
 		<description>Legend of the Lost Temple</description>
 		<year>19??</year>
@@ -1102,11 +1135,11 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 
 	<software name="mastbrek" supported="no">
 		<description>Master Break</description>
-		<year>19??</year>
+		<year>1989</year>
 		<publisher>Superior Software</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="798720">
-				<rom name="master break (19xx)(superior software).adf" size="798720" crc="c956b33b" sha1="219557031bb57a21891f637eb073120befa493fa" offset="0" />
+				<rom name="Master Break (19xx)(Superior Software).adf" size="798720" crc="c956b33b" sha1="219557031bb57a21891f637eb073120befa493fa" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1382,6 +1415,17 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
 				<rom name="small.adf" size="819200" crc="de79f51d" sha1="24db6ffb82e8e82262fe99ef55774a692569a8c8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="speech" supported="no">
+		<description>Speech!</description>
+		<year>1991</year>
+		<publisher>Superior Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="337920">
+				<rom name="Speech! v1.3 (1991)(Superior Software).adf" size="337920" crc="afa0caf6" sha1="6bf70e521a803c00665d9402e484ada5decc80dd" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1925,10 +1969,9 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<software name="deskhack" supported="no">
-		<description>DesktopHacker (v1.01)</description>
+		<description>Desktop Hacker (v1.01)</description>
 		<year>1994</year>
-		<publisher>&lt;homebrew&gt;</publisher>
-		<info name="author" value="DoggySoft" />
+		<publisher>DoggySoft</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
 				<rom name="desktophacker v1.01 (1994)(doggysoft).adf" size="819200" crc="367b4cd5" sha1="96e92a2af874197470d56aa87f881f77512066f9" offset="0" />
@@ -1951,8 +1994,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	<software name="fruitz" supported="no">
 		<description>Fruitz</description>
 		<year>19??</year>
-		<publisher>&lt;homebrew&gt;</publisher>
-		<info name="author" value="Digital Fantasy" />
+		<publisher>Digital Fantasy</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
 				<rom name="fruitz (19xx)(digital fantasy).adf" size="819200" crc="91365bf9" sha1="386af18d06bdd1c8cecfc34a94c241c3c1ee9907" offset="0" />
@@ -2015,30 +2057,6 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<software name="impresjr" supported="no">
-		<description>Impression Jr</description>
-		<year>19??</year>
-		<publisher>&lt;homebrew&gt;</publisher>
-		<info name="author" value="Computer Concepts" />
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="814080">
-				<rom name="impression jr (19xx)(computer concepts).adf" size="814080" crc="1fe45813" sha1="8eacd5856d3e8fcf643ecc575d668fda3fe530ca" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="leedsutd" supported="no">
-		<description>Leeds Utd - Champions!</description>
-		<year>19??</year>
-		<publisher>&lt;homebrew&gt;</publisher>
-		<info name="author" value="CDS" />
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="819200">
-				<rom name="leeds utd - champions! (19xx)(cds).adf" size="819200" crc="d4631873" sha1="4ba0835c415bde82742c61328acf711d821619e2" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="maddash2" supported="no">
 		<description>MadDash 2</description>
 		<year>2001</year>
@@ -2071,18 +2089,6 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
 				<rom name="pd lemings (19xx)(cooper, tom).adf" size="819200" crc="48cf93ab" sha1="41db87bc9d9b0cc7709557a9266ef998440fb45c" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="pendown" supported="no">
-		<description>Pen Down (v1.72)</description>
-		<year>1992</year>
-		<publisher>&lt;homebrew&gt;</publisher>
-		<info name="author" value="Logtron" />
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="819200">
-				<rom name="pen down v1.72 (1992)(logotron).adf" size="819200" crc="7fb203fe" sha1="51ac647d3934482f8a6aaf72819eba96b2d72bc4" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2148,18 +2154,6 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<software name="startwri" supported="no">
-		<description>Startwrite (Bad Dump?)</description>
-		<year>1992</year>
-		<publisher>&lt;homebrew&gt;</publisher>
-		<info name="author" value="Icon Technology" />
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="814080">
-				<rom name="startwrite (1992)(icon technology)[b].adf" size="814080" crc="d915e78c" sha1="8ca4289ac423d4878129cb17d6177123b321108f" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="sysintd" supported="no">
 		<description>System Interrupt Demos 1-5</description>
 		<year>1989</year>
@@ -2191,44 +2185,6 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
 				<rom name="time zone (19xx)(cobra).adf" size="819200" crc="a21f92e4" sha1="371b30787a782cb1fe6cb6ad2217a832a06e1e96" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-
-
-	<software name="riscapps" supported="no">
-		<description>Acorn Archimedes RISC OS Application Suite (v1.00)</description>
-		<year>19??</year>
-		<publisher>Acorn</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1"/>
-			<dataarea name="flop" size="819200">
-				<rom name="acorn archimedes risc os application suite v1.00 (19xx)(acorn)(disk 1 of 2)[req risc os].adf" size="819200" crc="28144dfa" sha1="af61deeb2a8e33085ab3087e3464843396fffc92" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2"/>
-			<dataarea name="flop" size="820224">
-				<rom name="acorn archimedes risc os application suite v1.00 (19xx)(acorn)(disk 2 of 2)[req risc os].adf" size="820224" crc="d5fdf2ca" sha1="bfc96eff8cab5b61f6db82dd135dd95b32f40d4f" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="riscappsa" cloneof="riscapps" supported="no">
-		<description>Acorn Archimedes RISC OS Application Suite (v1.00, Alt)</description>
-		<year>19??</year>
-		<publisher>Acorn</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1"/>
-			<dataarea name="flop" size="819200">
-				<rom name="acorn archimedes risc os application suite v1.00 (19xx)(acorn)(disk 1 of 2)[a][req risc os].adf" size="819200" crc="e43166b9" sha1="e03f1c8d48c3d0dc907e624b9546922b67584e6c" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2"/>
-			<dataarea name="flop" size="820224">
-				<rom name="acorn archimedes risc os application suite v1.00 (19xx)(acorn)(disk 2 of 2)[a][req risc os].adf" size="820224" crc="45ff05fd" sha1="0a926620d68688766e81593b8150dbcebdb51b11" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2280,17 +2236,6 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 			<feature name="part_id" value="Disk 2"/>
 			<dataarea name="flop" size="819200">
 				<rom name="spectrum emulator (19xx)(-)(disk 2 of 2).adf" size="819200" crc="859b9d4d" sha1="8d73d75979fd9229d9555e3391f80bcac74be8f5" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="speech" supported="no">
-		<description>Speech! (v1.3)</description>
-		<year>1991</year>
-		<publisher>Superior Software</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="337920">
-				<rom name="speech! v1.3 (1991)(superior microcomputing).adf" size="337920" crc="afa0caf6" sha1="6bf70e521a803c00665d9402e484ada5decc80dd" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2664,6 +2609,169 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 
+	<!-- Business -->
+
+	<software name="1stwordp" supported="no">
+		<description>1st Word Plus (Release 2)</description>
+		<year>1989</year>
+		<publisher>Acorn</publisher>
+		<info name="release" value="SKB70" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="1stWordPlus (Acorn).adf" size="819200" crc="13ed6a6f" sha1="615e540dd4586bf633cad597a6e9b09c4011cc40" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="apecutil" supported="no">
+		<description>APEC Utils Disk v1.3</description>
+		<year>1989</year>
+		<publisher>Atomwide Ltd</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="797117">
+				<rom name="APECUtilsDisk(Atomwide).imd" size="797117" crc="b653550b" sha1="9071600281b8c7cc9ab475652105b2749e827c1b" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wehdutil" supported="no">
+		<description>Archimedes Hard Disc Utilities Disc</description>
+		<year>1989</year>
+		<publisher>Watford Electronics</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="20045">
+				<rom name="WEHardDiscUtilities(Watford).imd" size="20045" crc="5534fe62" sha1="ad13796bde83749cf4e926e8027d247ad3d5f0cd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="acorndtp" supported="no">
+		<description>Acorn Desktop Publisher</description>
+		<year>1989</year>
+		<publisher>Acorn</publisher>
+		<info name="release" value="SKB69" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="819200">
+				<rom name="AcornDTP_1 (Acorn).adf" size="819200" crc="e2dbdab0" sha1="2268bb317fdd41dfa55151fd8f48373628cb2681" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="819200">
+				<rom name="AcornDTP_2 (Acorn).adf" size="819200" crc="77715969" sha1="06abbdd620e76789aa9d199bf75be3aba41ee654" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="euclid" supported="no">
+		<description>Euclid</description>
+		<year>1988</year>
+		<publisher>Ace Computing</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Euclid"/>
+			<dataarea name="flop" size="819200">
+				<rom name="Euclid(AceComputing).adf" size="819200" crc="8e56205d" sha1="f6763276cd7272f381465903ecfbcb517ced7ff0" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="ArcLight"/>
+			<dataarea name="flop" size="819200">
+				<rom name="ArcLight(AceComputing).adf" size="819200" crc="87e0ada9" sha1="ba4c2fee1713ad0772f02080c3866e33ebe49a55" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Mogul"/>
+			<dataarea name="flop" size="819200">
+				<rom name="Mogul(AceComputing).adf" size="819200" crc="b9673c77" sha1="519f786dc9c3d430811b89ea48c5eb1d2dcc926d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Qrt"/>
+			<dataarea name="flop" size="819200">
+				<rom name="Qrt(AceComputing).adf" size="819200" crc="ff59946f" sha1="eac22852f022ef5ce47067e680c97e0c0fa713dc" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Splice"/>
+			<dataarea name="flop" size="819200">
+				<rom name="Splice(AceComputing).adf" size="819200" crc="d4dd51ea" sha1="3f96c5c0e407053d2302542db1d12fa19d6b912f" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Tween"/>
+			<dataarea name="flop" size="819200">
+				<rom name="Tween(AceComputing).adf" size="819200" crc="2d28048d" sha1="c622b732b424d136090be93438a614ad96d5f4bf" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="impresjr" supported="no">
+		<description>Impression Junior</description>
+		<year>1989</year>
+		<publisher>Computer Concepts</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="814080">
+				<rom name="Impression Jr (19xx)(Computer Concepts).adf" size="814080" crc="1fe45813" sha1="8eacd5856d3e8fcf643ecc575d668fda3fe530ca" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magpie" supported="no">
+		<description>Archimedes Magpie</description>
+		<year>1992</year>
+		<publisher>Logotron</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="Magpie(1992)(Logotron).adf" size="819200" crc="51a556c5" sha1="c25db02c22e46500635cf3a0328f7c3c21ee73bb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pendown" supported="no">
+		<description>Pen Down (v1.72)</description>
+		<year>1992</year>
+		<publisher>Logotron</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="Pen Down v1.72 (1992)(Logotron).adf" size="819200" crc="7fb203fe" sha1="51ac647d3934482f8a6aaf72819eba96b2d72bc4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pipedrm3" supported="no">
+		<description>PipeDream 3</description>
+		<year>1989</year>
+		<publisher>Colton Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="Pipedream3(1989)(Colton).adf" size="819200" crc="24df7612" sha1="3ced346942645806c4f13b83679befb20e9e72b3" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pipedrm4d" supported="no">
+		<description>PipeDream 4 Demonstration Disc</description>
+		<year>1991</year>
+		<publisher>Colton Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="820649">
+				<rom name="Pipedream4Demo(1991)(Colton).imd" size="820649" crc="b921eb00" sha1="6df9c9886fe9632cf23f27e8be1330ca6f9000ef" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="startwri" supported="no">
+		<description>StartWrite (Bad Dump?)</description>
+		<year>1992</year>
+		<publisher>Icon Technology</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="814080">
+				<rom name="startwrite (1992)(icon technology)[b].adf" size="814080" crc="d915e78c" sha1="8ca4289ac423d4878129cb17d6177123b321108f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<!-- Educational -->
 
 	<software name="dinosaur" supported="no">
@@ -2888,6 +2996,1339 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
 				<rom name="10 out of 10 - words (1997).adf" size="819200" crc="007e280c" sha1="e541a88667e1b6c4bc216bdaa4c0787e95f8fe46" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Languages -->
+
+	<software name="ansicr2" supported="no">
+		<description>Acorn ANSI C (Release 2)</description>
+		<year>1988</year>
+		<publisher>Acorn</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="0281,881"/>
+			<dataarea name="flop" size="635470">
+				<rom name="Acorn ANSI C Release 2.imd" size="635470" crc="c487249c" sha1="d8690806b1d6ee4dfc893065241bfd93b21439af" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ansicr3" supported="no">
+		<description>Acorn ANSI C (Release 3)</description>
+		<year>1989</year>
+		<publisher>Acorn</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="819200">
+				<rom name="Acorn C Release 3 - Disc 1.adf" size="819200" crc="7e7fbab4" sha1="13634be2476f0b546efab3f23d89e4095ca98b2d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="819200">
+				<rom name="Acorn C Release 3 - Disc 2.adf" size="819200" crc="ee0235dd" sha1="b06ba5b9eb7caecbdac914ef948b4e23463575e7" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="819200">
+				<rom name="Acorn C Release 3 - Disc 3.adf" size="819200" crc="c714c7e8" sha1="df941f11c06518305b7e3f287bbda44b4a53b15d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="acppr5" supported="no">
+		<description>Acorn C/C++ (Release 5)</description>
+		<year>1995</year>
+		<publisher>Acorn</publisher>
+		<info name="release" value="SKB78" />
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="819200">
+				<rom name="Acorn C Release 5 - Disc 1.adf" size="819200" crc="ec608570" sha1="1b558ad616440ec4a2b174a5d03e197c83b62c10" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="819200">
+				<rom name="Acorn C Release 5 - Disc 2.adf" size="819200" crc="e55d7876" sha1="3f0b212584247895c844c3c9935c7cba2e58f3c7" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="819200">
+				<rom name="Acorn C Release 5 - Disc 3.adf" size="819200" crc="a9099124" sha1="27d1a9d83b02b3a7b974cf585a48ff5b0b2a7a9d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 4"/>
+			<dataarea name="flop" size="819200">
+				<rom name="Acorn C Release 5 - Disc 4.adf" size="819200" crc="a761b3be" sha1="14e98c427c8b88a29d12a2efc3a95f737c39d536" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 5"/>
+			<dataarea name="flop" size="819200">
+				<rom name="Acorn C Release 5 - Disc 5.adf" size="819200" crc="1d76482e" sha1="1c3711a4ef8557ae0331c3015b75e7a11d028b7a" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Disk 6"/>
+			<dataarea name="flop" size="819200">
+				<rom name="Acorn C Release 5 - Disc 6.adf" size="819200" crc="e81d8f6e" sha1="aff94384df5216df51aa7f942b7fb8523cb75dfa" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- Magazines -->
+
+	<software name="ac_oct92">
+		<description>Acorn Computing MegaDisk: Vol.10 No.8</description>
+		<year>1992</year>
+		<publisher>Acorn Computing</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AC_Oct92_01.adf" size="819200" crc="09da255a" sha1="4091c1570882ef30c15682e2f3aedaa0f42a9a20" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ac_nov92">
+		<description>Acorn Computing MegaDisk: Vol.10 No.9</description>
+		<year>1992</year>
+		<publisher>Acorn Computing</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AC_Nov92.adf" size="819200" crc="4e7ec356" sha1="1f5930d492a6a4bb0f19eb6f67f1cebfb98399d9" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ac_dec92">
+		<description>Acorn Computing MegaDisk: Vol.10 No.10</description>
+		<year>1992</year>
+		<publisher>Acorn Computing</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AC_Dec92_03.adf" size="819200" crc="7263783d" sha1="a1e881cb70786485944843074e15bbd2de89a680" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ac_jan93">
+		<description>Acorn Computing MegaDisk: Vol.10 No.11</description>
+		<year>1993</year>
+		<publisher>Acorn Computing</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AC_Jan93.adf" size="819200" crc="8f8f8e9a" sha1="9ddf6d4490c06c159e73c919856a579dc9ab9f0f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ac_feb93">
+		<description>Acorn Computing MegaDisk: Vol.10 No.12</description>
+		<year>1993</year>
+		<publisher>Acorn Computing</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AC_Feb93.adf" size="819200" crc="dc945b95" sha1="4602f3c28e96f10da40e22fffb6c7842e192f5dc" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ac_mar93">
+		<description>Acorn Computing MegaDisk: Vol.11 No.1</description>
+		<year>1993</year>
+		<publisher>Acorn Computing</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AC_Mar93.adf" size="819200" crc="e9f4aafb" sha1="401ffc234a3261a2283ee37ae1ccee514694cb9f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ac_apr93">
+		<description>Acorn Computing MegaDisk: Vol.11 No.2</description>
+		<year>1993</year>
+		<publisher>Acorn Computing</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AC_Apr93.adf" size="819200" crc="ff1725ef" sha1="76eda0ee2f58de85163b0b233f2dfaf16c950a9f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ac_may93">
+		<description>Acorn Computing MegaDisk: Vol.11 No.3</description>
+		<year>1993</year>
+		<publisher>Acorn Computing</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AC_May93.adf" size="819200" crc="2a10c392" sha1="2738e261c6510d1348390ba3af14eadc5151db30" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ac_jun93">
+		<description>Acorn Computing MegaDisk: Vol.11 No.4</description>
+		<year>1993</year>
+		<publisher>Acorn Computing</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="ACJun93.adf" size="819200" crc="47a74746" sha1="26090aec4b2586ac2a5ebaca9c1e9e621c492dcc" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ac_jul93">
+		<description>Acorn Computing MegaDisk: Vol.11 No.5</description>
+		<year>1993</year>
+		<publisher>Acorn Computing</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AC_Jul93.adf" size="819200" crc="a14c8f0d" sha1="aa1613a0b9e01ec0b9be530dfe0a3368fc4c3906" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ac_aug93">
+		<description>Acorn Computing MegaDisk: Vol.11 No.6</description>
+		<year>1993</year>
+		<publisher>Acorn Computing</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AC_Aug93.adf" size="819200" crc="6d054d10" sha1="0aca3029e0f2987414bd61dc9dbf3ec9d775b1a2" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ac_sep93">
+		<description>Acorn Computing MegaDisk: Vol.11 No.7</description>
+		<year>1993</year>
+		<publisher>Acorn Computing</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AC_Sep93.adf" size="819200" crc="a7956bda" sha1="a065cd30c8e365cacbbdfdb0eb44188e382e2d26" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ac_oct93">
+		<description>Acorn Computing MegaDisk: Vol.11 No.8</description>
+		<year>1993</year>
+		<publisher>Acorn Computing</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AC_Oct93.adf" size="819200" crc="b5079a41" sha1="75d80c5b1c5982f64a8f5ea36ea308a6c1206011" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ac_dec93">
+		<description>Acorn Computing MegaDisk: Vol.11 No.10</description>
+		<year>1993</year>
+		<publisher>Acorn Computing</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AC_Dec93_1.adf" size="819200" crc="05d79f11" sha1="28bf6c3eb9834fa1bae1d0b35a2b9b655569f6bb" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AC_Dec93_2.adf" size="819200" crc="49b245a0" sha1="935675911e1ee8b2b6022a5d04786da162c268d4" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ac_spec93">
+		<description>Acorn Computing MegaDisk: Vol.11 No.11 Special</description>
+		<year>1993</year>
+		<publisher>Acorn Computing</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AC_Special93_1.adf" size="819200" crc="a851b5ae" sha1="7fd69e0a29c8161592e8a323414f5c7794b66aa0" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AC_Special93_2.adf" size="819200" crc="4356f46d" sha1="b429f70583d0d073fbee8946c977ee20f3b96c69" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ac_feb94">
+		<description>Acorn Computing MegaDisk: Vol.11 No.13</description>
+		<year>1994</year>
+		<publisher>Acorn Computing</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AC_Feb94.adf" size="819200" crc="4ae63d54" sha1="9b9f280625d8d0f56fedf6e21ac603f99750df82" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ac_apr94">
+		<description>Acorn Computing MegaDisk: Vol.12 No.2</description>
+		<year>1994</year>
+		<publisher>Acorn Computing</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AC_Apr94.adf" size="819200" crc="4f5b154e" sha1="5ea5c770f4eac370a60dc67bdffa8b8c83fd9037" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ac_jun94">
+		<description>Acorn Computing MegaDisk: Vol.12 No.4</description>
+		<year>1994</year>
+		<publisher>Acorn Computing</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AC_Jun94.adf" size="819200" crc="efb19662" sha1="3e45f8d53b7df0fcaefa5f0799e0fb94a08e321b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ac_jul94">
+		<description>Acorn Computing MegaDisk: Vol.12 No.5</description>
+		<year>1994</year>
+		<publisher>Acorn Computing</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AC_Jul94.adf" size="819200" crc="4f6f25a4" sha1="c4824b386219621b3d6365cc68d1c7268855b76a" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ac_aug94">
+		<description>Acorn Computing MegaDisk: Vol.12 No.6</description>
+		<year>1994</year>
+		<publisher>Acorn Computing</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AC_Aug94.adf" size="819200" crc="da38933a" sha1="ca90d9c899cd2c07458a430f350bb1cea0e77905" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ac_sep94">
+		<description>Acorn Computing MegaDisk: Vol.12 No.7</description>
+		<year>1994</year>
+		<publisher>Acorn Computing</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AC_Sep94.adf" size="819200" crc="ee2a0bb6" sha1="50a90dff775dad4e738bfbd2b2e38eb4df1f8dae" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ac_mar95">
+		<description>Acorn Computing MegaDisk: Vol.13 No.1</description>
+		<year>1995</year>
+		<publisher>Acorn Computing</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AC_Mar95.adf" size="819200" crc="5f20ab54" sha1="2ed1356caa1c3bed3210d7ad7268aa770be98cf5" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="au_oct93">
+		<description>Acorn User Issue 135 (Oct 1993)</description>
+		<year>1993</year>
+		<publisher>Acorn User</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AU_Oct93.adf" size="819200" crc="83c25895" sha1="cf130fe6390b8a6ad75071ec72d1818c5b3c89c1" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="au_nov93">
+		<description>Acorn User Issue 136 (Nov 1993)</description>
+		<year>1993</year>
+		<publisher>Acorn User</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AU_Nov93.adf" size="819200" crc="c5e631e7" sha1="26ede6b8dd15e781b4c2d5d31e6eec137c6a00b5" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="au_jan94">
+		<description>Acorn User Issue 138 (Jan 1994)</description>
+		<year>1994</year>
+		<publisher>Acorn User</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AU_Jan94.adf" size="819200" crc="14b7fed4" sha1="7caa312374af626060e08a0fbfeb69ec27fbcd0d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="au_feb94">
+		<description>Acorn User Issue 139 (Feb 1994)</description>
+		<year>1994</year>
+		<publisher>Acorn User</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AU_Feb94.adf" size="819200" crc="79715fe8" sha1="a2e370d6e4f123623d643195057685852596d923" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="au_mar94">
+		<description>Acorn User Issue 140 (Mar 1994)</description>
+		<year>1994</year>
+		<publisher>Acorn User</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AU_Mar94.adf" size="819200" crc="9ee71521" sha1="1586d1ce122b110adfd51c7eabae9b1ba183df04" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="au_may94">
+		<description>Acorn User Issue 142 (May 1994)</description>
+		<year>1994</year>
+		<publisher>Acorn User</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AU_May94.adf" size="819200" crc="28489add" sha1="de04bddc808f961fadb76c8e55cbe3c228587f7d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="au_jun94">
+		<description>Acorn User Issue 143 (Jun 1994)</description>
+		<year>1994</year>
+		<publisher>Acorn User</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AU_Jun94.adf" size="819200" crc="662c87f0" sha1="ae4c92015e5930c4e1b377dfe0a353bad5d14e34" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="au_jul94">
+		<description>Acorn User Issue 144 (Jul 1994)</description>
+		<year>1994</year>
+		<publisher>Acorn User</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AU_Jul94.adf" size="819200" crc="5dd3e2c0" sha1="090db6c006c15813907f048e21096167724f2ccd" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="au_aug94">
+		<description>Acorn User Issue 145 (Aug 1994)</description>
+		<year>1994</year>
+		<publisher>Acorn User</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AU_Aug94.adf" size="819200" crc="9603a89b" sha1="57865dd58dcf957f4dadab1af145013d4b7cdb65" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="au_sep94">
+		<description>Acorn User Issue 146 (Sep 1994)</description>
+		<year>1994</year>
+		<publisher>Acorn User</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AU_Sep94.adf" size="819200" crc="125a1be2" sha1="08d45a0a7f2682f8dc08651bf38576f8e2d98751" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="au_oct94">
+		<description>Acorn User Issue 147 (Oct 1994)</description>
+		<year>1994</year>
+		<publisher>Acorn User</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AU_Oct94.adf" size="819200" crc="191470d1" sha1="6414901a8c6d7a4b14f9ac258f4728dbc5349118" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="au_nov94">
+		<description>Acorn User Issue 148 (Nov 1994)</description>
+		<year>1994</year>
+		<publisher>Acorn User</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AU_Nov94.adf" size="819200" crc="f95be54a" sha1="ed6ea4605e7d13b3462e4109591af577168d23f0" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="au_dec94">
+		<description>Acorn User Issue 149 (Dec 1994)</description>
+		<year>1994</year>
+		<publisher>Acorn User</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AU_Dec94.adf" size="819200" crc="5f5288de" sha1="3d24ca78362b4eabbacaba90a10b194aa54476d3" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="au_jan95">
+		<description>Acorn User Issue 151 (Jan 1995)</description>
+		<year>1995</year>
+		<publisher>Acorn User</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AU_Jan95.adf" size="819200" crc="86b63c53" sha1="3e3fce0f68fd789f9544c008043fe9ee3fafbf0d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="au_feb95">
+		<description>Acorn User Issue 152 (Feb 1995)</description>
+		<year>1995</year>
+		<publisher>Acorn User</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AU_Feb95.adf" size="819200" crc="73176e4c" sha1="42d1b63ede116c4626c860e445350af52990eeaa" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="au_mar95">
+		<description>Acorn User Issue 153 (Mar 1995)</description>
+		<year>1995</year>
+		<publisher>Acorn User</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AU_Mar95.adf" size="819200" crc="7ddd4a34" sha1="0304c8ee12e66dde17453366285ee360586d830d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="au_apr95">
+		<description>Acorn User Issue 154 (Apr 1995)</description>
+		<year>1995</year>
+		<publisher>Acorn User</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AU_Apr95.adf" size="819200" crc="f22528ba" sha1="a56e200b54fad0a1df7b1df31a8b0461bcdc7d47" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="au_may95">
+		<description>Acorn User Issue 155 (May 1995)</description>
+		<year>1995</year>
+		<publisher>Acorn User</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AU_May95.adf" size="819200" crc="db0e4c20" sha1="5f3e2ba22d78173578dc9a0b099e53b0dee3caa0" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="au_jun95">
+		<description>Acorn User Issue 156 (Jun 1995)</description>
+		<year>1995</year>
+		<publisher>Acorn User</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AU_Jun95.adf" size="819200" crc="5c5db5a9" sha1="80f2b49f0f740e7a3a1ef78ecdbd6755dab8bbe5" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="au_jul95">
+		<description>Acorn User Issue 157 (Jul 1995)</description>
+		<year>1995</year>
+		<publisher>Acorn User</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AU_Jul95.adf" size="819200" crc="53b5a1c4" sha1="0c0b6891be3ec6182d68510c4d147cf8e0012490" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="au_aug95">
+		<description>Acorn User Issue 158 (Aug 1995)</description>
+		<year>1995</year>
+		<publisher>Acorn User</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AU_Aug95.adf" size="819200" crc="21f05319" sha1="3bdf92c8b254ecc17f9d0a62f0b511e07a53a05e" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="au_sep95">
+		<description>Acorn User Issue 159 (Sep 1995)</description>
+		<year>1995</year>
+		<publisher>Acorn User</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AU_Sep95.adf" size="819200" crc="2ff8d8ed" sha1="121a26125c089ec073fc95f6dcd746483e43fdd0" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="au_oct95">
+		<description>Acorn User Issue 160 (Oct 1995)</description>
+		<year>1995</year>
+		<publisher>Acorn User</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AU_Oct95.adf" size="819200" crc="b90db5e2" sha1="e64d5bc8c5cec51b0ce2a7c376197915e34a8bdb" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="au_nov95">
+		<description>Acorn User Issue 161 (Nov 1995)</description>
+		<year>1995</year>
+		<publisher>Acorn User</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AU_Nov95.adf" size="819200" crc="ea32f184" sha1="01209fa489df8173abea405161bcd7cfc44fd3fd" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="au_dec95">
+		<description>Acorn User Issue 162 (Dec 1995)</description>
+		<year>1995</year>
+		<publisher>Acorn User</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AU_Dec95.adf" size="819200" crc="e125f00f" sha1="eb39318e7c3a0def77c26135a439b93180467520" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="au_xmas95">
+		<description>Acorn User Issue 163 (Xmas 1995)</description>
+		<year>1995</year>
+		<publisher>Acorn User</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AU_Xmas95A.adf" size="819200" crc="949087ae" sha1="5e8a97b1f2c5df1de2de2b6bab0b104dec59bb9a" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="au_jan96">
+		<description>Acorn User Issue 164 (Jan 1996)</description>
+		<year>1996</year>
+		<publisher>Acorn User</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AU_Jan96.adf" size="819200" crc="4e3358fd" sha1="4a96aa2b5ba424d6db36e23dfe2c9bc3f68746ee" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="au_feb96">
+		<description>Acorn User Issue 165 (Feb 1996)</description>
+		<year>1996</year>
+		<publisher>Acorn User</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AU_Feb96.adf" size="819200" crc="bb7b9ac5" sha1="6fa96deb91eeb928fa324ecdff6e03f1b8808a9a" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="au_dec98">
+		<description>Acorn User Issue 201 (Dec 1998)</description>
+		<year>1998</year>
+		<publisher>Acorn User</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AU_Dec98.adf" size="819200" crc="f16f5af6" sha1="5347ef009138aa82e33ef51ad748c6f5851b907c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aw_feb91">
+		<description>Archimedes World February 1991</description>
+		<year>1991</year>
+		<publisher>Archimedes World</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AW_Feb91.adf" size="819200" crc="ea499fd7" sha1="2c901b0cabc8157ea0d2d7c66cec306e80d1d52b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aw_apr91">
+		<description>Archimedes World April 1991</description>
+		<year>1991</year>
+		<publisher>Archimedes World</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AW_apr91.adf" size="819200" crc="6e0dd6ab" sha1="e9d07849b08d9b30c1e53bb59a40075b7081cff6" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aw_may91">
+		<description>Archimedes World May 1991</description>
+		<year>1991</year>
+		<publisher>Archimedes World</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AW_May91.adf" size="819200" crc="d892fbeb" sha1="9d34a7ba51898269ce549d209fb2b0a92e424673" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aw_jun91">
+		<description>Archimedes World June 1991</description>
+		<year>1991</year>
+		<publisher>Archimedes World</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AW_Jun91.adf" size="819200" crc="31f4d996" sha1="c5beae362e9245b5dedf408e2df508c01765b4a0" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aw_jul91">
+		<description>Archimedes World July 1991</description>
+		<year>1991</year>
+		<publisher>Archimedes World</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AW_Jul91.adf" size="819200" crc="cfdb9d8e" sha1="3ad27011e719be8b612bdb9b7a4c5cebc2ef845d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aw_aug91">
+		<description>Archimedes World August 1991</description>
+		<year>1991</year>
+		<publisher>Archimedes World</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AW_Aug91.adf" size="819200" crc="5f692fed" sha1="0bcf5e75e0ba8fd9ee50843e3e05d4b4bd97cc9a" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aw_sep91">
+		<description>Archimedes World September 1991</description>
+		<year>1991</year>
+		<publisher>Archimedes World</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AW_Sep91.adf" size="819200" crc="d4e11ee6" sha1="28bb63f3ca87e93854d95d6b4837aab3362609fb" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aw_oct91">
+		<description>Archimedes World October 1991</description>
+		<year>1991</year>
+		<publisher>Archimedes World</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AW_Oct91.adf" size="819200" crc="bd74e04f" sha1="0a7afef59fdd44ab09cf5573f8250067379444d6" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aw_nov91">
+		<description>Archimedes World November 1991</description>
+		<year>1991</year>
+		<publisher>Archimedes World</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AW_Nov91.adf" size="819200" crc="c587b155" sha1="a728276bc66a63cca2a42e3cc72a8deab621b71d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aw_dec91">
+		<description>Archimedes World December 1991</description>
+		<year>1991</year>
+		<publisher>Archimedes World</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AW_Dec91.adf" size="819200" crc="9fa9463a" sha1="a48aa5d74a2d3a233536c3432026777bb844ed40" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aw_mar92">
+		<description>Archimedes World March 1992</description>
+		<year>1992</year>
+		<publisher>Archimedes World</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AW_Mar92.adf" size="819200" crc="15780dcd" sha1="5414ea47379a3aef0add3e01af0303980a223363" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aw_apr92">
+		<description>Archimedes World April 1992</description>
+		<year>1992</year>
+		<publisher>Archimedes World</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AW_Apr92.adf" size="819200" crc="f4a19923" sha1="22929d22970a01c88244e3e295bee41c8bd50377" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aw_jul92">
+		<description>Archimedes World July 1992</description>
+		<year>1992</year>
+		<publisher>Archimedes World</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AW_Jul92.adf" size="819200" crc="2fb1ff74" sha1="6245af4eb36fdd9a0715149bf3f62be310f67583" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aw_aug92">
+		<description>Archimedes World August 1992</description>
+		<year>1992</year>
+		<publisher>Archimedes World</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AW_Aug92.adf" size="819200" crc="c0e8d1be" sha1="dfa2a20ec22278e2a8b82d284e196b70ba508677" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aw_sep92">
+		<description>Archimedes World September 1992</description>
+		<year>1992</year>
+		<publisher>Archimedes World</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AW_Sep92.adf" size="819200" crc="76460335" sha1="3cfb94e238a9ae637765feee58f895faaa9f1ae4" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aw_nov92">
+		<description>Archimedes World November 1992</description>
+		<year>1992</year>
+		<publisher>Archimedes World</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AW_Nov92.adf" size="819200" crc="0278d551" sha1="5c353829bb8fe8407f98374d37e8e926300f5e3d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aw_dec92">
+		<description>Archimedes World December 1992</description>
+		<year>1992</year>
+		<publisher>Archimedes World</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AW_Dec92.adf" size="819200" crc="0dab5759" sha1="2fb8c0cc238ab942e3844150c7f16182711196a3" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aw_jan93">
+		<description>Archimedes World January 1993</description>
+		<year>1993</year>
+		<publisher>Archimedes World</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AW_Jan93.adf" size="819200" crc="32fa2786" sha1="93aa6570d705ba8f6d79f16b7330366176ac3fe4" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aw_feb93">
+		<description>Archimedes World February 1993</description>
+		<year>1993</year>
+		<publisher>Archimedes World</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AW_Feb93.adf" size="819200" crc="9167820b" sha1="751b0f91a801be94005af08d20feb1836627fe0a" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aw_mar93">
+		<description>Archimedes World March 1993</description>
+		<year>1993</year>
+		<publisher>Archimedes World</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AW_Mar93.adf" size="819200" crc="420bde8e" sha1="1f798bb262206777b9ebe1bba555de0a21ea00c5" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aw_apr93">
+		<description>Archimedes World April 1993</description>
+		<year>1993</year>
+		<publisher>Archimedes World</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AW_Apr93.adf" size="819200" crc="4bd1f3fd" sha1="adb69f5be4f4a5aad01ab29efda9159a70cb982c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aw_may93">
+		<description>Archimedes World May 1993</description>
+		<year>1993</year>
+		<publisher>Archimedes World</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AW_May93.adf" size="819200" crc="56a7bc58" sha1="a6a0c7ce5d87b5ecab6d285cd17c3c0521c47f95" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aw_jun93">
+		<description>Archimedes World June 1993</description>
+		<year>1993</year>
+		<publisher>Archimedes World</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AW_Jun93.adf" size="819200" crc="0615ffca" sha1="ae8deeafe5ac8668503fba4a86611b9e1437baa6" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aw_jul93">
+		<description>Archimedes World July 1993</description>
+		<year>1993</year>
+		<publisher>Archimedes World</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AW_Jul93.adf" size="819200" crc="cc98c8e3" sha1="5ead65a5499ace638e2e15693b6b9250219822c1" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aw_aug93">
+		<description>Archimedes World August 1993</description>
+		<year>1993</year>
+		<publisher>Archimedes World</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AW_Aug93.adf" size="819200" crc="7b65fb32" sha1="e4be746fc64cde4ec61280f0f775713a1f65440a" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aw_sep93">
+		<description>Archimedes World September 1993</description>
+		<year>1993</year>
+		<publisher>Archimedes World</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AW_Sep93.adf" size="819200" crc="4ad7a503" sha1="bec38624edf41e185ad852d9447713316f873fa1" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aw_oct93">
+		<description>Archimedes World October 1993</description>
+		<year>1993</year>
+		<publisher>Archimedes World</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AW_Oct93.adf" size="819200" crc="628c84ac" sha1="466966d367d565cfe0f5c3f4a620e7c9dc72edfb" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aw_nov93">
+		<description>Archimedes World November 1993</description>
+		<year>1993</year>
+		<publisher>Archimedes World</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AW_Nov93.adf" size="819200" crc="7b606bac" sha1="219b440518133925e5205a028dae4cd559bacaa9" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aw_dec93">
+		<description>Archimedes World December 1993</description>
+		<year>1993</year>
+		<publisher>Archimedes World</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AW_Dec93.adf" size="819200" crc="2f19ae6c" sha1="1a5f22deddddd4d91b20b58b9091aed262ef4b07" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aw_jan94">
+		<description>Archimedes World January 1994</description>
+		<year>1994</year>
+		<publisher>Archimedes World</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AW_Jan94.adf" size="819200" crc="5e750a53" sha1="b58c152a973143a08d4f80689acad638c23f9a72" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aw_feb94">
+		<description>Archimedes World February 1994</description>
+		<year>1994</year>
+		<publisher>Archimedes World</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AW_1994-02_Disc1.adf" size="819200" crc="8f46c61c" sha1="c077964bcda85d1c68bea2981d5c99fe29b97929" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aw_mar94">
+		<description>Archimedes World March 1994</description>
+		<year>1994</year>
+		<publisher>Archimedes World</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AW_1994-03_Disc1.adf" size="819200" crc="840950f8" sha1="89b7c231729c91fdd63816a0defe676ffccc54b9" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AW_1994-03_Disc2.adf" size="819200" crc="89338a77" sha1="444e2d922e7fb04357afe9b3863880411a3f680d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aw_apr94">
+		<description>Archimedes World April 1994</description>
+		<year>1994</year>
+		<publisher>Archimedes World</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AW_1994-04_Disc1.adf" size="819200" crc="91fe890a" sha1="7351cf0077007372c1f0111d1a18943ccee69f59" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AW_1994-04_Disc2.adf" size="819200" crc="cf69a16e" sha1="5ac5785e36d390987d329fe57786240f457258a3" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aw_may94">
+		<description>Archimedes World May 1994</description>
+		<year>1994</year>
+		<publisher>Archimedes World</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AW_1994-05_Disk1.adf" size="819200" crc="600a53cd" sha1="8290cbf7b5a43792f213e4876c8dc8a69e713413" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AW_1994-05_Disk2.adf" size="819200" crc="cf78e2fb" sha1="46e66ba5527eee4c1516db5c56898be43c83b944" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aw_jun94">
+		<description>Archimedes World June 1994</description>
+		<year>1994</year>
+		<publisher>Archimedes World</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AW_1994-06_Disc1.adf" size="819200" crc="b858824e" sha1="937db539e85cad187ea0f491b0c35ee1c474f186" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AW_1994-06_Disc2.adf" size="819200" crc="b526edce" sha1="8d958cc1f4f5f952276a68f2ac8b87cd352ece64" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aw_jul94">
+		<description>Archimedes World July 1994</description>
+		<year>1994</year>
+		<publisher>Archimedes World</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AW_1994-07_Disc1.adf" size="819200" crc="8d9c464f" sha1="5822a8bdb189f140b9578e177dd77beeb1a8daa1" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AW_1994-07_Disc2.adf" size="819200" crc="213cbaa1" sha1="32f8f228d24c8686f937b839c22e161e71f4162e" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aw_aug94">
+		<description>Archimedes World August 1994</description>
+		<year>1994</year>
+		<publisher>Archimedes World</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AW_1994-08_Disc1.adf" size="819200" crc="390dff8e" sha1="0af609d7585320caf84c713434f71aab08a35710" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AW_1994-08_Disc2.adf" size="819200" crc="41eb9f27" sha1="c50f7b0f280be93dfc7cb28c6ce3fde6462296e2" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aw_sep94">
+		<description>Archimedes World September 1994</description>
+		<year>1994</year>
+		<publisher>Archimedes World</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AW_1994-09_Disc1.adf" size="819200" crc="825b5900" sha1="68726ea01ec3b9259d7c9fa32d4e841142b3c813" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AW_1994-09_Disc2.adf" size="819200" crc="61ef9189" sha1="e59f3b6681feb6b56c93ea6653bfa00b193cefc7" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aw_oct94">
+		<description>Archimedes World October 1994</description>
+		<year>1994</year>
+		<publisher>Archimedes World</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AW_1994-10_Disc1.adf" size="819200" crc="1aeb00df" sha1="3115f0f728d2c5c53cd0c69c1521cfcd46e6feb0" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AW_1994-10_Disc2.adf" size="819200" crc="4991cbed" sha1="c79b6d2a1909f82ab384625e89c734f70e7f6fd2" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aw_nov94">
+		<description>Archimedes World November 1994</description>
+		<year>1994</year>
+		<publisher>Archimedes World</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AW_1994-11_Disc1.adf" size="819200" crc="e85167a2" sha1="ca6040a379d4f9917b73230044dc3c7d26da7b2c" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AW_1994-11_Disc2.adf" size="819200" crc="8b6e7efe" sha1="a587b47cbf0594b7e28ad5d07f72eba32c67adcc" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aw_dec94">
+		<description>Archimedes World December 1994</description>
+		<year>1994</year>
+		<publisher>Archimedes World</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AW_1994-12_Disc1.adf" size="819200" crc="0c3c1ff3" sha1="eefadde3818f4566a4a36b216cedf342ef990417" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AW_1994-12_Disc2.adf" size="819200" crc="e1d68b2c" sha1="dc7525dca1995cc5ca0c000ea62f2a54245cdac1" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aw_jan95">
+		<description>Archimedes World January 1995</description>
+		<year>1995</year>
+		<publisher>Archimedes World</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AW_1995-01_Disc1.adf" size="819200" crc="a0767a6c" sha1="955d4376a567ecdebf92f1d32ec7063bf92a37d0" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AW_1995-01_Disc2.adf" size="819200" crc="988ead77" sha1="bb8c174a13cdfc2dea7a83534fc7e9fe132d8b7f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aw_feb95">
+		<description>Archimedes World February 1995</description>
+		<year>1995</year>
+		<publisher>Archimedes World</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AW_1995-02_Disc1.adf" size="819200" crc="e289549b" sha1="50af856545e02175d2b1c89fefe2211ab03842de" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AW_1995-02_Disc2.adf" size="819200" crc="20da13b5" sha1="176a113f0383173bc3f6ae56c30d5c9347bbce4b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aw_mar95">
+		<description>Archimedes World March 1995</description>
+		<year>1995</year>
+		<publisher>Archimedes World</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AW_1995-03_Disc1.adf" size="819200" crc="11460a0d" sha1="76867393e5494dcbde79c8e4914496c458903428" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AW_1995-03_Disc2.adf" size="819200" crc="0b5c6a35" sha1="7b8267c364a5d74c3123f28e7032890146975a7f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aw_apr95">
+		<description>Archimedes World April 1995</description>
+		<year>1995</year>
+		<publisher>Archimedes World</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AW_1995-04_Disc1.adf" size="819200" crc="33b81e71" sha1="e7050d7fe0e57db81c96eb790e9fde8599b7bc90" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AW_1995-04_Disc2.adf" size="819200" crc="28517484" sha1="38816954757905f5bd7e03b6534c7729c7bea374" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aw_may95">
+		<description>Archimedes World May 1995</description>
+		<year>1995</year>
+		<publisher>Archimedes World</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AW_1995-05_Disc1.adf" size="819200" crc="8a547b1f" sha1="fb90be30104be3f0fa0264ae23d0eeefe31d3e12" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AW_1995-05_Disc2.adf" size="819200" crc="615dfedc" sha1="bc98e9dc4a434eb2e90cb3705e9608094fb3e2a6" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aw_jun95">
+		<description>Archimedes World June 1995</description>
+		<year>1995</year>
+		<publisher>Archimedes World</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AW_1995-06_Disc1.adf" size="819200" crc="4b50a4f5" sha1="dd241bbc3d6d006cf40726b4e633bf302780564c" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AW_1995-06_Disc2.adf" size="819200" crc="8ded8d25" sha1="8f3bcb430e2712bab94a091eeefd382fc15913cf" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aw_jul95">
+		<description>Archimedes World July 1995</description>
+		<year>1995</year>
+		<publisher>Archimedes World</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AW_Jul95.adf" size="819200" crc="6377c797" sha1="4c4f3e4c2ff25677be6ced98a7f67d1628c8e88f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aw_nov95">
+		<description>Archimedes World November 1995</description>
+		<year>1995</year>
+		<publisher>Archimedes World</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AW_Nov95.adf" size="819200" crc="dade144b" sha1="e2192a4fa0bd736153d9876cf36117382fb0c6ac" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="aw_v15i7">
+		<description>Archimedes World Vol.15 Iss.7</description>
+		<year>199?</year>
+		<publisher>Archimedes World</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "819200">
+				<rom name="AW_Vol15_Issue7.adf" size="819200" crc="52a58327" sha1="61d06f2a857d592b0d556ccc58b4ee593360c4c5" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- System -->
+
+	<software name="welcomea" supported="no">
+		<description>Welcome (Arthur)</description>
+		<year>1987</year>
+		<publisher>Acorn</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="Welcome.adf" size="819200" crc="0ab1cb85" sha1="8ff58ba7491610e975e7f0b9da9f67ebc4fde80b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="riscapps" supported="no">
+		<description>Acorn Archimedes RISC OS Application Suite (v1.00)</description>
+		<year>1988</year>
+		<publisher>Acorn</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disc 1"/>
+			<dataarea name="flop" size="819200">
+				<rom name="acorn archimedes risc os application suite v1.00 (19xx)(acorn)(disk 1 of 2)[req risc os].adf" size="819200" crc="28144dfa" sha1="af61deeb2a8e33085ab3087e3464843396fffc92" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disc 2"/>
+			<dataarea name="flop" size="820224">
+				<rom name="acorn archimedes risc os application suite v1.00 (19xx)(acorn)(disk 2 of 2)[req risc os].adf" size="820224" crc="d5fdf2ca" sha1="bfc96eff8cab5b61f6db82dd135dd95b32f40d4f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="riscappsa" cloneof="riscapps" supported="no">
+		<description>Acorn Archimedes RISC OS Application Suite (v1.00, Alt)</description>
+		<year>1988</year>
+		<publisher>Acorn</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Disc 1"/>
+			<dataarea name="flop" size="819200">
+				<rom name="acorn archimedes risc os application suite v1.00 (19xx)(acorn)(disk 1 of 2)[a][req risc os].adf" size="819200" crc="e43166b9" sha1="e03f1c8d48c3d0dc907e624b9546922b67584e6c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Disc 2"/>
+			<dataarea name="flop" size="820224">
+				<rom name="acorn archimedes risc os application suite v1.00 (19xx)(acorn)(disk 2 of 2)[a][req risc os].adf" size="820224" crc="45ff05fd" sha1="0a926620d68688766e81593b8150dbcebdb51b11" offset="0" />
 			</dataarea>
 		</part>
 	</software>
