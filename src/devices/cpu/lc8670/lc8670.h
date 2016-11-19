@@ -260,6 +260,8 @@ private:
 		OP_RII8
 	};
 
+	offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options);
+
 	// disasm table
 	struct dasm_entry
 	{
