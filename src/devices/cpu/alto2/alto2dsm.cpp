@@ -209,7 +209,6 @@ static const char *addrname(int a)
 offs_t alto2_cpu_device::disasm_disassemble(std::ostream &main_stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	std::ostringstream stream;
-	size_t len = 128;
 
 	uint32_t mir = (static_cast<uint32_t>(oprom[0]) << 24) |
 			(static_cast<uint32_t>(oprom[1]) << 16) |
