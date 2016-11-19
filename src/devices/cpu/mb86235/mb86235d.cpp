@@ -86,29 +86,35 @@ static const char *ai2f_field[32] =
 { "AA0", "AA1", "AA2", "AA3", "AA4", "AA5", "AA6", "AA7", "AB0", "AB1", "AB2", "AB3", "AB4", "AB5", "AB6", "AB7",
 	"PR", "PR++", "PR--", "PR#0", "???", "???", "???", "???", "-1.0E+0", "0.0E+0", "0.5E+0", "1.0E+0", "1.5E+0", "2.0E+0", "3.0E+0", "5.0E+0" };
 
-static std::string get_ea(int md, int arx, int ary, int disp)
+static void dasm_ea(std::ostream &stream, int md, int arx, int ary, int disp)
 {
+	if (arx & 0x20)
+		stream << "B(";
+	else
+		stream << "A(";
+
+	arx &= 7;
 	switch (md)
 	{
-		case 0x0: return util::string_format("@AR%d", arx);
-		case 0x1: return util::string_format("@AR%d++", arx);
-		case 0x2: return util::string_format("@AR%d--", arx);
-		case 0x3: return util::string_format("@AR%d++%04X", arx, disp);
-		case 0x4: return util::string_format("@AR%d+AR%d", arx, ary);
-		case 0x5: return util::string_format("@AR%d+AR%d++", arx, ary);
-		case 0x6: return util::string_format("@AR%d+AR%d--", arx, ary);
-		case 0x7: return util::string_format("@AR%d+AR%d++%04X", arx, ary, disp);
-		case 0x8: return util::string_format("@AR%d+AR%dU", arx, ary);
-		case 0x9: return util::string_format("@AR%d+AR%dL", arx, ary);
-		case 0xa: return util::string_format("@AR%d+%04X", arx, disp);
-		case 0xb: return util::string_format("@AR%d+AR%d+%04X", arx, ary, disp);
-		case 0xc: return util::string_format("%04X", disp);
-		case 0xd: return util::string_format("@AR%d+[AR%d++]", arx, ary);
-		case 0xe: return util::string_format("@AR%d+[AR%d--]", arx, ary);
-		case 0xf: return util::string_format("@AR%d+[AR%d++%04X]", arx, ary, disp);
+		case 0x0: util::stream_format(stream, "@AR%d", arx); break;
+		case 0x1: util::stream_format(stream, "@AR%d++", arx); break;
+		case 0x2: util::stream_format(stream, "@AR%d--", arx); break;
+		case 0x3: util::stream_format(stream, "@AR%d++%04X", arx, disp); break;
+		case 0x4: util::stream_format(stream, "@AR%d+AR%d", arx, ary); break;
+		case 0x5: util::stream_format(stream, "@AR%d+AR%d++", arx, ary); break;
+		case 0x6: util::stream_format(stream, "@AR%d+AR%d--", arx, ary); break;
+		case 0x7: util::stream_format(stream, "@AR%d+AR%d++%04X", arx, ary, disp); break;
+		case 0x8: util::stream_format(stream, "@AR%d+AR%dU", arx, ary); break;
+		case 0x9: util::stream_format(stream, "@AR%d+AR%dL", arx, ary); break;
+		case 0xa: util::stream_format(stream, "@AR%d+%04X", arx, disp); break;
+		case 0xb: util::stream_format(stream, "@AR%d+AR%d+%04X", arx, ary, disp); break;
+		case 0xc: util::stream_format(stream, "%04X", disp); break;
+		case 0xd: util::stream_format(stream, "@AR%d+[AR%d++]", arx, ary); break;
+		case 0xe: util::stream_format(stream, "@AR%d+[AR%d--]", arx, ary); break;
+		case 0xf: util::stream_format(stream, "@AR%d+[AR%d++%04X]", arx, ary, disp); break;
 	}
 
-	return "???";
+	stream << ')';
 }
 
 static void dasm_alu_mul(std::ostream &stream, uint64_t opcode, bool twoop)
@@ -223,7 +229,6 @@ static void dasm_control(std::ostream &stream, uint32_t pc, uint64_t opcode)
 
 	int rel12 = (opcode & 0x800) ? (0xfffff000 | (opcode & 0xfff)) : (opcode & 0xfff);
 
-
 	switch (cop)
 	{
 		case 0x00: stream << "NOP";
@@ -334,6 +339,8 @@ static void dasm_double_xfer1(std::ostream &stream, uint64_t opcode)
 {
 	int sd = (opcode >> 25) & 3;
 
+	stream << "MVD1 ";
+
 	switch (sd)
 	{
 		case 0:
@@ -342,7 +349,7 @@ static void dasm_double_xfer1(std::ostream &stream, uint64_t opcode)
 			int ad = (opcode >> 15) & 0x1f;
 			int bs = (opcode >> 10) & 0x1f;
 			int bd = (opcode >> 5) & 0x1f;
-			util::stream_format(stream, "MVD1 %s, %s, %s, %s", regname[as], regname[ad], regname[bs], regname[bd]);
+			util::stream_format(stream, "%s, %s, %s, %s", regname[as], regname[ad], regname[bs], regname[bd]);
 			break;
 		}
 
@@ -355,8 +362,6 @@ static void dasm_double_xfer1(std::ostream &stream, uint64_t opcode)
 			int barx = (opcode >> 7) & 7;
 			int bary = (opcode >> 4) & 7;
 			int md = opcode & 0xf;
-
-			stream << "MVD1 ";
 
 			switch (md)
 			{
@@ -384,8 +389,6 @@ static void dasm_double_xfer1(std::ostream &stream, uint64_t opcode)
 			int barx = (opcode >> 7) & 7;
 			int bary = (opcode >> 4) & 7;
 			int md = opcode & 0xf;
-
-			stream << "MVD1 ";
 
 			switch (md)
 			{
@@ -420,91 +423,53 @@ static void dasm_xfer1(std::ostream &stream, uint64_t opcode)
 	int trm = (opcode >> 26) & 1;
 	int dir = (opcode >> 25) & 1;
 
+	stream << "MOV1 ";
+
 	if (trm == 0)
 	{
 		if (sr == 0x58)
 		{
-			util::stream_format(stream, "MOV1 #%03X, %s", (uint32_t)(opcode & 0xfff), regname[dr]);
+			util::stream_format(stream, "#%03X, %s", (uint32_t)(opcode & 0xfff), regname[dr]);
 		}
 		else
 		{
-			stream << "MOV1 ";
-
 			if ((sr & 0x40) == 0)
-			{
 				stream << regname[sr];
-			}
 			else
-			{
-				if (sr & 0x20)
-					stream << "B";
-				else
-					stream << "A";
-
-				util::stream_format(stream, "(%s)", get_ea(md, sr & 7, ary, disp5));
-			}
+				dasm_ea(stream, md, sr, ary, disp5);
 
 			stream << ", ";
 
 			if ((dr & 0x40) == 0)
-			{
 				stream << regname[dr];
-			}
 			else
-			{
-				if (dr & 0x20)
-					stream << "B";
-				else
-					stream << "A";
-
-				util::stream_format(stream, "(%s)", get_ea(md, dr & 7, ary, disp5));
-			}
+				dasm_ea(stream, md, dr, ary, disp5);
 		}
 	}
 	else
 	{
 		if (dir == 0)
 		{
-			stream << "MOV1 ";
-
 			if ((dr & 0x40) == 0)
-			{
 				util::stream_format(stream, "%s, ", regname[dr]);
-			}
 			else
-			{
-				if (dr & 0x20)
-					stream << "B";
-				else
-					stream << "A";
-
-				util::stream_format(stream, "(%s)", get_ea(md, dr & 7, ary, disp5));
-			}
+				dasm_ea(stream, md, dr, ary, disp5);
 
 			util::stream_format(stream, "E(@EB+EO++%02X)", sr);
 		}
 		else
 		{
-			util::stream_format(stream, "MOV1 E(@EB+EO++%02X), ", sr);
+			util::stream_format(stream, "E(@EB+EO++%02X), ", sr);
 
 			if ((dr & 0x40) == 0)
-			{
 				stream << regname[dr];
-			}
 			else
-			{
-				if (dr & 0x20)
-					stream << "B";
-				else
-					stream << "A";
-
-				util::stream_format(stream, "(%s)", get_ea(md, dr & 7, ary, disp5));
-			}
+				dasm_ea(stream, md, dr, ary, disp5);
 		}
 	}
 }
 
-static std::string double_xfer2_field(int sd, uint32_t field)
+static void dasm_double_xfer2_field(std::ostream &stream, int sd, uint32_t field)
 {
 	switch (sd)
 	{
@@ -512,7 +477,8 @@ static std::string double_xfer2_field(int sd, uint32_t field)
 		{
 			int s = (field >> 13) & 0x1f;
 			int d = (field >> 8) & 0x1f;
-			return util::string_format("%s, %s", regname[s], regname[d]);
+			util::stream_format(stream, "%s, %s", regname[s], regname[d]);
+			break;
 		}
 
 		case 1:
@@ -525,18 +491,19 @@ static std::string double_xfer2_field(int sd, uint32_t field)
 
 			switch (md)
 			{
-				case 0x0: return util::string_format("%s, A(@AR%d)", regname[reg], arx);
-				case 0x1: return util::string_format("%s, A(@AR%d++)", regname[reg], arx);
-				case 0x2: return util::string_format("%s, A(@AR%d--)", regname[reg], arx);
-				case 0x4: return util::string_format("%s, A(@AR%d+AR%d))", regname[reg], arx, ary);
-				case 0x5: return util::string_format("%s, A(@AR%d+AR%d++)", regname[reg], arx, ary);
-				case 0x6: return util::string_format("%s, A(@AR%d+AR%d--)", regname[reg], arx, ary);
-				case 0x8: return util::string_format("%s, A(@AR%d+AR%dU)", regname[reg], arx, ary);
-				case 0x9: return util::string_format("%s, A(@AR%d+AR%dL)", regname[reg], arx, ary);
-				case 0xd: return util::string_format("%s, A(@AR%d+[AR%d++])", regname[reg], arx, ary);
-				case 0xe: return util::string_format("%s, A(@AR%d+[AR%d--]", regname[reg], arx, ary);
-				default: return "???";
+				case 0x0: util::stream_format(stream, "%s, A(@AR%d)", regname[reg], arx); break;
+				case 0x1: util::stream_format(stream, "%s, A(@AR%d++)", regname[reg], arx); break;
+				case 0x2: util::stream_format(stream, "%s, A(@AR%d--)", regname[reg], arx); break;
+				case 0x4: util::stream_format(stream, "%s, A(@AR%d+AR%d))", regname[reg], arx, ary); break;
+				case 0x5: util::stream_format(stream, "%s, A(@AR%d+AR%d++)", regname[reg], arx, ary); break;
+				case 0x6: util::stream_format(stream, "%s, A(@AR%d+AR%d--)", regname[reg], arx, ary); break;
+				case 0x8: util::stream_format(stream, "%s, A(@AR%d+AR%dU)", regname[reg], arx, ary); break;
+				case 0x9: util::stream_format(stream, "%s, A(@AR%d+AR%dL)", regname[reg], arx, ary); break;
+				case 0xd: util::stream_format(stream, "%s, A(@AR%d+[AR%d++])", regname[reg], arx, ary); break;
+				case 0xe: util::stream_format(stream, "%s, A(@AR%d+[AR%d--]", regname[reg], arx, ary); break;
+				default: stream << "???"; break;
 			}
+			break;
 		}
 
 		case 2:
@@ -549,23 +516,24 @@ static std::string double_xfer2_field(int sd, uint32_t field)
 
 			switch (md)
 			{
-				case 0x0: return util::string_format("A(@AR%d), %s", arx, regname[reg]);
-				case 0x1: return util::string_format("A(@AR%d++), %s", arx, regname[reg]);
-				case 0x2: return util::string_format("A(@AR%d--), %s", arx, regname[reg]);
-				case 0x4: return util::string_format("A(@AR%d+AR%d), %s", arx, ary, regname[reg]);
-				case 0x5: return util::string_format("A(@AR%d+AR%d++), %s", arx, ary, regname[reg]);
-				case 0x6: return util::string_format("A(@AR%d+AR%d--), %s", arx, ary, regname[reg]);
-				case 0x8: return util::string_format("A(@AR%d+AR%dU), %s", arx, ary, regname[reg]);
-				case 0x9: return util::string_format("A(@AR%d+AR%dL), %s", arx, ary, regname[reg]);
-				case 0xd: return util::string_format("A(@AR%d+[AR%d++]), %s", arx, ary, regname[reg]);
-				case 0xe: return util::string_format("A(@AR%d+[AR%d--]), %s", arx, ary, regname[reg]);
-				default: return "???"; break;
+				case 0x0: util::stream_format(stream, "A(@AR%d), %s", arx, regname[reg]); break;
+				case 0x1: util::stream_format(stream, "A(@AR%d++), %s", arx, regname[reg]); break;
+				case 0x2: util::stream_format(stream, "A(@AR%d--), %s", arx, regname[reg]); break;
+				case 0x4: util::stream_format(stream, "A(@AR%d+AR%d), %s", arx, ary, regname[reg]); break;
+				case 0x5: util::stream_format(stream, "A(@AR%d+AR%d++), %s", arx, ary, regname[reg]); break;
+				case 0x6: util::stream_format(stream, "A(@AR%d+AR%d--), %s", arx, ary, regname[reg]); break;
+				case 0x8: util::stream_format(stream, "A(@AR%d+AR%dU), %s", arx, ary, regname[reg]); break;
+				case 0x9: util::stream_format(stream, "A(@AR%d+AR%dL), %s", arx, ary, regname[reg]); break;
+				case 0xd: util::stream_format(stream, "A(@AR%d+[AR%d++]), %s", arx, ary, regname[reg]); break;
+				case 0xe: util::stream_format(stream, "A(@AR%d+[AR%d--]), %s", arx, ary, regname[reg]); break;
+				default: stream << "???"; break;
 			}
+			break;
 		}
 
 		case 3:
-		default:
-			return "???";
+			stream << "???";
+			break;
 	}
 }
 
@@ -608,7 +576,10 @@ static void dasm_double_xfer2(std::ostream &stream, uint64_t opcode)
 	}
 	else
 	{
-		util::stream_format(stream, "MVD2 %s, %s", double_xfer2_field(asd, (opcode >> 20) & 0x3ffff), double_xfer2_field(bsd, opcode & 0x3ffff));
+		stream << "MVD2 ";
+		dasm_double_xfer2_field(stream, asd, (opcode >> 20) & 0x3ffff);
+		stream << ", ";
+		dasm_double_xfer2_field(stream, bsd, opcode & 0x3ffff);
 	}
 }
 
@@ -625,96 +596,58 @@ static void dasm_xfer2(std::ostream &stream, uint64_t opcode)
 
 	if (op == 0)
 	{
+		stream << "MOV2 ";
+
 		if (trm == 0)
 		{
 			if (sr == 0x58)
 			{
-				util::stream_format(stream, "MOV2 #%06X, %s", (uint32_t)(opcode & 0xffffff), regname[dr]);
+				util::stream_format(stream, "#%06X, %s", (uint32_t)(opcode & 0xffffff), regname[dr]);
 			}
 			else
 			{
-				stream << "MOV2 ";
-
 				if ((sr & 0x40) == 0)
-				{
 					stream << regname[sr];
-				}
 				else
-				{
-					if (sr & 0x20)
-						stream << "B";
-					else
-						stream << "A";
-
-					util::stream_format(stream, "(%s)", get_ea(md, sr & 7, ary, disp14));
-				}
+					dasm_ea(stream, md, sr, ary, disp14);
 
 				stream << ", ";
 
 				if ((dr & 0x40) == 0)
-				{
 					stream << regname[dr];
-				}
 				else
-				{
-					if (dr & 0x20)
-						stream << "B";
-					else
-						stream << "A";
-
-					util::stream_format(stream, "(%s)", get_ea(md, dr & 7, ary, disp14));
-				}
+					dasm_ea(stream, md, dr, ary, disp14);
 			}
 		}
 		else
 		{
 			if (dir == 0)
-			{
-				util::stream_format(stream, "MOV2 %s, E(@EB+EO++%02X)", regname[dr], sr);
-			}
+				util::stream_format(stream, "%s, E(@EB+EO++%02X)", regname[dr], sr);
 			else
-			{
-				util::stream_format(stream, "MOV2 E(@EB+EO++%02X), %s", sr, regname[dr]);
-			}
+				util::stream_format(stream, "E(@EB+EO++%02X), %s", sr, regname[dr]);
 		}
 	}
 	else if (op == 2)
 	{
+		stream << "MOV4 ";
+
 		if (trm == 0)
 		{
 			if ((sr & 0x40) == 0)
-			{
-				util::stream_format(stream, "MOV4 %s, ICDTR%d", regname[sr], dr & 7);
-			}
+				stream << regname[sr];
+			else if (sr == 0x58)
+				util::stream_format(stream, "#%06X", (uint32_t)(opcode & 0xffffff));
 			else
-			{
-				if (sr == 0x58)
-				{
-					util::stream_format(stream, "MOV4 #%06X, ICDTR%d", (uint32_t)(opcode & 0xffffff), dr & 7);
-				}
-				else
-				{
-					stream << "MOV4 ";
+				dasm_ea(stream, md, sr, ary, disp14);
 
-					if (sr & 0x20)
-						stream << "B";
-					else
-						stream << "A";
-
-					util::stream_format(stream, "(%s), ICDTR%d", get_ea(md, sr & 7, ary, disp14), dr & 7);
-				}
-			}
+			util::stream_format(stream, ", ICDTR%d", dr & 7);
 		}
 		else
 		{
 			if (dir == 0)
-			{
-				util::stream_format(stream, "MOV4 ICDTR%d, E(@EB+EO++%02X)", dr & 7, sr);
-			}
+				util::stream_format(stream, "ICDTR%d, E(@EB+EO++%02X)", dr & 7, sr);
 			else
-			{
-				util::stream_format(stream, "MOV4 E(@EB+EO++%02X), ICDTR%d", sr, dr & 7);
-			}
+				util::stream_format(stream, "E(@EB+EO++%02X), ICDTR%d", sr, dr & 7);
 		}
 	}
 }
@@ -730,18 +663,9 @@ static void dasm_xfer3(std::ostream &stream, uint64_t opcode)
 	util::stream_format(stream, "MOV3 #%08X, ", imm);
 
 	if ((dr & 0x40) == 0)
-	{
 		stream << regname[dr];
-	}
 	else
-	{
-		if (dr & 0x20)
-			stream << "B";
-		else
-			stream << "A";
-
-		util::stream_format(stream, "(%s)", get_ea(md, dr & 7, ary, disp));
-	}
+		dasm_ea(stream, md, dr, ary, disp);
 }
 
 static unsigned dasm_mb86235(std::ostream &stream, uint32_t pc, uint64_t opcode)
