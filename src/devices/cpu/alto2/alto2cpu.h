@@ -913,6 +913,8 @@ private:
 
 	uint8_t m_ether_id;                               //!< configured Ethernet ID for this machine
 
+	offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options);
+
 //*******************************************
 // inline the sub-devices
 //*******************************************
