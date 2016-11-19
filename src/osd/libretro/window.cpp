@@ -403,6 +403,23 @@ int retro_window_info::window_init()
 
 	retro_fps = ATTOSECONDS_TO_HZ(machine().first_screen()->refresh_attoseconds());
 
+
+	if(alternate_renderer==false){
+	//test correct aspect
+		render_layer_config temp=m_target->layer_config();
+		retro_aspect =m_target->current_view()->effective_aspect(temp);
+		int tempwidth, tempheight;
+		m_target->compute_minimum_size(tempwidth, tempheight);
+		fb_width=tempwidth;
+		fb_pitch=tempwidth;
+		fb_height=tempheight;
+
+		if(fb_width>max_width || fb_height>max_height)
+			NEWGAME_FROM_OSD = 1;
+		else NEWGAME_FROM_OSD = 2;
+
+	}
+
 	// handle error conditions
 	if (result == 1)
 		goto error;
@@ -546,9 +563,14 @@ void retro_window_info::update()
 	{
 		int tempwidth, tempheight;
 
+		if(alternate_renderer==false){
+			render_layer_config temp=m_target->layer_config();
+			view_aspect =m_target->current_view()->effective_aspect(temp);
+		}
+
 		// see if the games video mode has changed
 		m_target->compute_minimum_size(tempwidth, tempheight);
-		if (osd_dim(tempwidth, tempheight) != m_minimum_dim)
+		if (osd_dim(tempwidth, tempheight) != m_minimum_dim || view_aspect!=retro_aspect)
 		{
 			m_minimum_dim = osd_dim(tempwidth, tempheight);
 
@@ -560,11 +582,19 @@ void retro_window_info::update()
 				fb_pitch=tempwidth;
 				fb_height=tempheight;
 
-				if(video_changed==true)
+				//if(video_changed==true)
 				{
-					retro_aspect = (float)tempwidth/(float)tempheight;
+				//retro_aspect = (float)tempwidth/(float)tempheight;
+				render_layer_config temp=m_target->layer_config();
+				retro_aspect =m_target->current_view()->effective_aspect(temp);
+				view_aspect =retro_aspect;
+				monitor()->refresh();
+				monitor()->update_resolution(tempwidth, tempheight);
 
+				if(fb_width>max_width || fb_height>max_height)
 					NEWGAME_FROM_OSD = 1;
+				else NEWGAME_FROM_OSD = 2;
+
 					video_changed=false;
 				}
 

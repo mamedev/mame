@@ -91,9 +91,11 @@ extern int ui_ipt_pushchar;
 extern int fb_width;
 extern int fb_height;
 extern int fb_pitch;
+extern int max_width;
+extern int max_height;
 extern float retro_aspect;
 extern float retro_fps;
-
+extern float view_aspect;
 static const char core[] = "mame";
 
 /* libretro callbacks */

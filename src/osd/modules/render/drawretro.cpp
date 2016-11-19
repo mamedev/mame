@@ -91,7 +91,7 @@ int renderer_retro::draw(const int update)
 
 	// draw the primitives to the bitmap
 	win->m_primlist->acquire_lock();
-	software_renderer<uint32_t, 0,0,0, 16,8,0>::draw_primitives(*win->m_primlist, m_bmdata, width, height, pitch);
+	software_renderer<uint32_t, 0,0,0, 16,8,0>::draw_primitives(*win->m_primlist, m_bmdata, width, height, width/*pitch*/);
 	win->m_primlist->release_lock();
 
 	return 0;

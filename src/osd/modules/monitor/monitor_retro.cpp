@@ -31,7 +31,12 @@ private:
 		m_pos_size = osd_rect(0,0, fb_width, fb_height);
 		m_usuable_pos_size = osd_rect(0,0, fb_width, fb_height);
 		m_is_primary = (oshandle() == 0);
+
+	if(alternate_renderer==false)
+		set_aspect(retro_aspect);
+		//printf("refreshmonitor  (%d x %d) a:%f\n", fb_width, fb_height,retro_aspect);
 	}
+
 };
 
 //============================================================

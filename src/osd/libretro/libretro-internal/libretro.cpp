@@ -29,8 +29,11 @@ static cothread_t emuThread;
 int fb_width   = 640;
 int fb_height  = 480;
 int fb_pitch   = 640;
+int max_width   = 640;
+int max_height  = 480;
 float retro_aspect =(float)4.0f/(float)3.0f ;
 float retro_fps = 60.0;
+float view_aspect=1.0f; // aspect for current view
 
 int SHIFTON           = -1;
 int NEWGAME_FROM_OSD  = 0;
@@ -439,6 +442,15 @@ void retro_get_system_info(struct retro_system_info *info)
    info->block_extract    = true;
 }
 
+void update_geometry()
+{
+   struct retro_system_av_info system_av_info;
+   system_av_info.geometry.base_width = fb_width;
+   system_av_info.geometry.base_height = fb_height;
+   system_av_info.geometry.aspect_ratio = retro_aspect;
+   environ_cb(RETRO_ENVIRONMENT_SET_GEOMETRY, &system_av_info);
+}
+
 void retro_get_system_av_info(struct retro_system_av_info *info)
 {
    check_variables();
@@ -451,12 +463,8 @@ void retro_get_system_av_info(struct retro_system_av_info *info)
 
    info->geometry.max_width  = fb_width;
    info->geometry.max_height = fb_height;
-
-// use fixed res so no need to handle res switching and max res
-/*
-   info->geometry.max_width   = 1600;
-   info->geometry.max_height  = 1200;
-*/
+   max_width=fb_width;
+   max_height=fb_height;
 
    if (log_cb)
       log_cb(RETRO_LOG_INFO, "AV_INFO: max_width=%d max_height=%d\n",info->geometry.max_width,info->geometry.max_height);
@@ -483,12 +491,7 @@ static void retro_wrap_emulator(void)
 
    retro_pause = -1;
 
-   /* this is not really needed */
-
-//R-TYPE: depend point of view,i want RA shutdown when i exit game .
-// and i choose new game through OSD. 
-// BTW , why add RETRO_ENVIRONMENT_SHUTDOWN if core can't use it ?
-
+   //FIXME add core opt for this
    //environ_cb(RETRO_ENVIRONMENT_SHUTDOWN, 0);
 
    /* Were done here. */
@@ -628,6 +631,11 @@ void retro_run (void)
          log_cb(RETRO_LOG_INFO, "ChangeAV: w:%d h:%d ra:%f.\n",
                ninfo.geometry.base_width, ninfo.geometry.base_height, ninfo.geometry.aspect_ratio);
 
+      NEWGAME_FROM_OSD=0;
+   }
+   else if (NEWGAME_FROM_OSD == 2){
+      update_geometry();
+printf("w:%d h:%d a:%f\n",fb_width,fb_height,retro_aspect);
       NEWGAME_FROM_OSD=0;
    }
 
