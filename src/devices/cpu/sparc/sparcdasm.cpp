@@ -1054,7 +1054,7 @@ offs_t sparc_disassembler::dasm(char *buf, offs_t pc, uint32_t op) const
 {
 	std::ostringstream stream;
 	const offs_t result(dasm(stream, pc, op));
-	std::string stream_str = stream.str();
+	const std::string stream_str(stream.str());
 	strcpy(buf, stream_str.c_str());
 	return result;
 }
