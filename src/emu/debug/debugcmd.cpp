@@ -2401,11 +2401,11 @@ void debugger_commands::execute_dasm(int ref, int params, const char *param[])
 
 	/* now write the data out */
 	util::ovectorstream output;
+	util::ovectorstream disasm;
 	output.reserve(512);
 	for (u64 i = 0; i < length; )
 	{
 		int pcbyte = space->address_to_byte(offset + i) & space->bytemask();
-		std::string disasm;
 		const char *comment;
 		offs_t tempaddr;
 		int numbytes = 0;
@@ -2429,6 +2429,8 @@ void debugger_commands::execute_dasm(int ref, int params, const char *param[])
 			}
 
 			/* disassemble the result */
+			disasm.clear();
+			disasm.seekp(0);
 			i += numbytes = dasmintf->disassemble(disasm, offset + i, opbuf, argbuf) & DASMFLAG_LENGTHMASK;
 		}
 
@@ -2445,7 +2447,8 @@ void debugger_commands::execute_dasm(int ref, int params, const char *param[])
 		}
 
 		/* add the disassembly */
-		stream_format(output, "%s", disasm);
+		disasm.put('\0');
+		stream_format(output, "%s", &disasm.vec()[0]);
 
 		/* attempt to add the comment */
 		comment = space->device().debug()->comment_text(tempaddr);
@@ -2604,10 +2607,11 @@ void debugger_commands::execute_history(int ref, int params, const char *param[]
 			argbuf[numbytes] = m_cpu.read_opcode(*space, pcbyte + numbytes, 1);
 		}
 
-		std::string buffer;
+		util::ovectorstream buffer;
 		dasmintf->disassemble(buffer, pc, opbuf, argbuf);
+		buffer.put('\0');
 
-		m_console.printf("%0*X: %s\n", space->logaddrchars(), pc, buffer.c_str());
+		m_console.printf("%0*X: %s\n", space->logaddrchars(), pc, &buffer.vec()[0]);
 	}
 }
 

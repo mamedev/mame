@@ -74,7 +74,6 @@ public:
 
 	// interface for disassembly
 	offs_t disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options = 0);
-	offs_t disassemble(std::string &buffer, offs_t pc, const u8 *oprom, const u8 *opram, u32 options = 0);
 
 protected:
 	// required operation overrides

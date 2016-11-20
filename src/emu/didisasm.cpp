@@ -90,16 +90,3 @@ offs_t device_disasm_interface::disassemble(std::ostream &stream, offs_t pc, con
 
 	return result;
 }
-
-
-//-------------------------------------------------
-//  disassemble - interface for disassembly
-//-------------------------------------------------
-
-offs_t device_disasm_interface::disassemble(std::string &buffer, offs_t pc, const u8 *oprom, const u8 *opram, uint32_t options)
-{
-	std::stringstream stream;
-	offs_t result = disassemble(stream, pc, oprom, opram, options);
-	buffer = stream.str();
-	return result;
-}

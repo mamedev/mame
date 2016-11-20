@@ -2627,7 +2627,7 @@ u32 device_debug::compute_opcode_crc32(offs_t pc) const
 	if (m_disasm != nullptr)
 	{
 		// disassemble to our buffer
-		std::string diasmbuf;
+		std::ostringstream diasmbuf;
 		numbytes = m_disasm->disassemble(diasmbuf, pc, opbuf, argbuf) & DASMFLAG_LENGTHMASK;
 	}
 
@@ -3026,7 +3026,9 @@ u32 device_debug::dasm_wrapped(std::string &buffer, offs_t pc)
 	}
 
 	// disassemble to our buffer
-	uint32_t result = m_disasm->disassemble(buffer, pc, opbuf, argbuf);
+	std::ostringstream stream;
+	uint32_t result = m_disasm->disassemble(stream, pc, opbuf, argbuf);
+	buffer = stream.str();
 	return result;
 }
 
