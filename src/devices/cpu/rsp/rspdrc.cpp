@@ -1283,8 +1283,8 @@ void rsp_device::log_add_disasm_comment(drcuml_block *block, uint32_t pc, uint32
 {
 	if (m_drcuml->logging())
 	{
-		char buffer[100];
+		std::string buffer;
 		rsp_dasm_one(buffer, pc, op);
-		block->append_comment("%08X: %s", pc, buffer);                                  // comment
+		block->append_comment("%08X: %s", pc, buffer.c_str());                                  // comment
 	}
 }

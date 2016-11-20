@@ -133,9 +133,10 @@ void rsp_cop2_drc::cfunc_unimplemented_opcode()
 	const uint32_t ppc = m_rsp.m_ppc;
 	if ((m_machine.debug_flags & DEBUG_FLAG_ENABLED) != 0)
 	{
-		char string[200];
-		rsp_dasm_one(string, ppc, m_rspcop2_state->op);
-		osd_printf_debug("%08X: %s\n", ppc, string);
+		std::ostringstream stream;
+		rsp_dasm_one(stream, ppc, m_rspcop2_state->op);
+		const std::string stream_string = stream.str();
+		osd_printf_debug("%08X: %s\n", ppc, stream_string.c_str());
 	}
 	fatalerror("RSP: unknown opcode %02X (%08X) at %08X\n", m_rspcop2_state->op >> 26, m_rspcop2_state->op, ppc);
 }
