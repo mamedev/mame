@@ -108,7 +108,6 @@ namespace
 		}
 
 		offs_t disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram);
-		offs_t disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram);
 
 	protected:
 		virtual void indirect(std::ostream &stream, uint8_t pb, const uint8_t *opram, int &p) = 0;
@@ -173,20 +172,6 @@ const opcodeinfo *m6x09_disassembler_base::fetch_opcode(const uint8_t *oprom, in
 		op = nullptr;
 
 	return op;
-}
-
-
-//-------------------------------------------------
-//  disassemble - core of the disassembler
-//-------------------------------------------------
-
-offs_t m6x09_disassembler_base::disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram)
-{
-	std::ostringstream stream;
-	offs_t result = disassemble(stream, pc, oprom, opram);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
 }
 
 
@@ -1098,7 +1083,7 @@ CPU_DISASSEMBLE(m6809)
 		"A", "B", "CC", "DP", "inv", "inv", "inv", "inv"
 	};
 	m6x09_disassembler disasm(M6x09_GENERAL, m6809_teregs);
-	return disasm.disassemble(buffer, pc, oprom, opram);
+	return disasm.disassemble(stream, pc, oprom, opram);
 }
 
 
@@ -1114,7 +1099,7 @@ CPU_DISASSEMBLE(hd6309)
 		"A", "B", "CC", "DP", "0",  "0", "E", "F"
 	};
 	m6x09_disassembler disasm(HD6309_EXCLUSIVE, hd6309_teregs);
-	return disasm.disassemble(buffer, pc, oprom, opram);
+	return disasm.disassemble(stream, pc, oprom, opram);
 }
 
 
@@ -1562,5 +1547,5 @@ void konami_disassembler::register_register(std::ostream &stream, uint8_t pb)
 CPU_DISASSEMBLE(konami)
 {
 	konami_disassembler disasm;
-	return disasm.disassemble(buffer, pc, oprom, opram);
+	return disasm.disassemble(stream, pc, oprom, opram);
 }

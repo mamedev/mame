@@ -248,7 +248,7 @@ bool disasmSIField(const uint8_t& SI)
 }
 
 
-static offs_t internal_disasm_dsp16a(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+CPU_DISASSEMBLE(dsp16a)
 {
 	uint8_t opSize = 1;
 	uint32_t dasmflags = 0;
@@ -583,14 +583,4 @@ static offs_t internal_disasm_dsp16a(cpu_device *device, std::ostream &stream, o
 	}
 
 	return opSize | dasmflags | DASMFLAG_SUPPORTED;
-}
-
-
-CPU_DISASSEMBLE(dsp16a)
-{
-	std::ostringstream stream;
-	offs_t result = internal_disasm_dsp16a(device, stream, pc, oprom, opram, options);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
 }

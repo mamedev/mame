@@ -1752,57 +1752,57 @@ void m6801_cpu_device::m6801_clock_serial()
 	}
 }
 
-offs_t m6800_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t m6800_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( m6800 );
-	return CPU_DISASSEMBLE_NAME(m6800)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(m6800)(this, stream, pc, oprom, opram, options);
 }
 
 
-offs_t m6801_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t m6801_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( m6801 );
-	return CPU_DISASSEMBLE_NAME(m6801)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(m6801)(this, stream, pc, oprom, opram, options);
 }
 
 
-offs_t m6802_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t m6802_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( m6802 );
-	return CPU_DISASSEMBLE_NAME(m6802)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(m6802)(this, stream, pc, oprom, opram, options);
 }
 
 
-offs_t m6803_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t m6803_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( m6803 );
-	return CPU_DISASSEMBLE_NAME(m6803)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(m6803)(this, stream, pc, oprom, opram, options);
 }
 
 
-offs_t m6808_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t m6808_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( m6808 );
-	return CPU_DISASSEMBLE_NAME(m6808)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(m6808)(this, stream, pc, oprom, opram, options);
 }
 
 
-offs_t hd6301_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t hd6301_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( hd6301 );
-	return CPU_DISASSEMBLE_NAME(hd6301)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(hd6301)(this, stream, pc, oprom, opram, options);
 }
 
 
-offs_t hd63701_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t hd63701_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( hd63701 );
-	return CPU_DISASSEMBLE_NAME(hd63701)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(hd63701)(this, stream, pc, oprom, opram, options);
 }
 
 
-offs_t nsc8105_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t nsc8105_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( nsc8105 );
-	return CPU_DISASSEMBLE_NAME(nsc8105)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(nsc8105)(this, stream, pc, oprom, opram, options);
 }

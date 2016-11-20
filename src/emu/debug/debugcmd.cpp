@@ -2405,7 +2405,7 @@ void debugger_commands::execute_dasm(int ref, int params, const char *param[])
 	for (u64 i = 0; i < length; )
 	{
 		int pcbyte = space->address_to_byte(offset + i) & space->bytemask();
-		char disasm[200];
+		std::string disasm;
 		const char *comment;
 		offs_t tempaddr;
 		int numbytes = 0;
@@ -2604,10 +2604,10 @@ void debugger_commands::execute_history(int ref, int params, const char *param[]
 			argbuf[numbytes] = m_cpu.read_opcode(*space, pcbyte + numbytes, 1);
 		}
 
-		char buffer[200];
+		std::string buffer;
 		dasmintf->disassemble(buffer, pc, opbuf, argbuf);
 
-		m_console.printf("%0*X: %s\n", space->logaddrchars(), pc, buffer);
+		m_console.printf("%0*X: %s\n", space->logaddrchars(), pc, buffer.c_str());
 	}
 }
 

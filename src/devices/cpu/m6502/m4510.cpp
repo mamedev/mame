@@ -26,9 +26,9 @@ m4510_device::m4510_device(const machine_config &mconfig, const char *tag, devic
 	sprogram_config.m_page_shift = 13;
 }
 
-offs_t m4510_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t m4510_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
-	return disassemble_generic(buffer, pc, oprom, opram, options, disasm_entries);
+	return disassemble_generic(stream, pc, oprom, opram, options, disasm_entries);
 }
 
 void m4510_device::device_start()

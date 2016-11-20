@@ -1904,13 +1904,10 @@ uint32_t hyperstone_device::disasm_max_opcode_bytes() const
 //  helper function
 //-------------------------------------------------
 
-offs_t hyperstone_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t hyperstone_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
-	std::ostringstream stream;
-	offs_t result = dasm_hyperstone(stream, pc, oprom, GET_H, GET_FP);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
+	extern CPU_DISASSEMBLE( hyperstone );
+	return dasm_hyperstone(stream, pc, oprom, GET_H, GET_FP );
 }
 
 /* Opcodes */

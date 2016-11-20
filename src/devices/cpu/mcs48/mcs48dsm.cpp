@@ -315,23 +315,13 @@ static uint32_t common_dasm(device_t *device, std::ostream &stream, offs_t pc, c
 }
 
 
-static uint32_t common_dasm(device_t *device, char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, bool upi41)
-{
-	std::ostringstream stream;
-	offs_t result = common_dasm(device, stream, pc, oprom, opram, upi41);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
-}
-
-
 CPU_DISASSEMBLE( mcs48 )
 {
-	return common_dasm(device, buffer, pc, oprom, opram, false);
+	return common_dasm(device, stream, pc, oprom, opram, false);
 }
 
 
 CPU_DISASSEMBLE( upi41 )
 {
-	return common_dasm(device, buffer, pc, oprom, opram, true);
+	return common_dasm(device, stream, pc, oprom, opram, true);
 }

@@ -536,21 +536,11 @@ unsigned dasmmips3(std::ostream &stream, unsigned pc, uint32_t op)
 }
 
 
-unsigned dasmmips3(char *buffer, unsigned pc, uint32_t op)
-{
-	std::ostringstream stream;
-	unsigned result = dasmmips3(stream, pc, op);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
-}
-
-
 CPU_DISASSEMBLE( mips3be )
 {
 	uint32_t op = *(uint32_t *)oprom;
 	op = big_endianize_int32(op);
-	return dasmmips3(buffer, pc, op);
+	return dasmmips3(stream, pc, op);
 }
 
 
@@ -558,5 +548,5 @@ CPU_DISASSEMBLE( mips3le )
 {
 	uint32_t op = *(uint32_t *)oprom;
 	op = little_endianize_int32(op);
-	return dasmmips3(buffer, pc, op);
+	return dasmmips3(stream, pc, op);
 }

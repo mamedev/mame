@@ -568,18 +568,9 @@ offs_t h8_device::disassemble_generic(std::ostream &stream, offs_t pc, const uin
 	return e.flags | DASMFLAG_SUPPORTED;
 }
 
-offs_t h8_device::disassemble_generic(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options, const disasm_entry *table)
+offs_t h8_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
-	std::ostringstream stream;
-	offs_t result = disassemble_generic(stream, pc, oprom, opram, options, table);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
-}
-
-offs_t h8_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
-{
-	return disassemble_generic(buffer, pc, oprom, opram, options, disasm_entries);
+	return disassemble_generic(stream, pc, oprom, opram, options, disasm_entries);
 }
 
 uint16_t h8_device::read16i(uint32_t adr)

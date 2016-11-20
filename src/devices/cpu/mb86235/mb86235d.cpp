@@ -825,21 +825,10 @@ static unsigned dasm_mb86235(std::ostream &stream, uint32_t pc, uint64_t opcode)
 }
 
 
-
-static offs_t internal_disasm_mb86235(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+CPU_DISASSEMBLE(mb86235)
 {
 	uint64_t op = *(uint64_t*)oprom;
 	op = little_endianize_int64(op);
 
 	return dasm_mb86235(stream, pc, op);
-}
-
-
-CPU_DISASSEMBLE(mb86235)
-{
-	std::ostringstream stream;
-	offs_t result = internal_disasm_mb86235(device, stream, pc, oprom, opram, options);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
 }

@@ -412,9 +412,9 @@ void v25_common_device::execute_set_input(int irqline, int state)
 	}
 }
 
-offs_t v25_common_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t v25_common_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
-	return necv_dasm_one(buffer, pc, oprom, m_v25v35_decryptiontable);
+	return necv_dasm_one(stream, pc, oprom, m_v25v35_decryptiontable);
 }
 
 void v25_common_device::device_start()

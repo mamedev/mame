@@ -1484,23 +1484,7 @@ static int (*const dasm_optable[256])(unsigned ipc, unsigned pc, std::ostream &s
 	/* 0xFF */ dopCLRTLB
 };
 
-static offs_t internal_disasm_v60(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
-{
-	rombase = oprom;
-	pcbase = pc;
-	return dasm_optable[oprom[0]](pc, pc+1, stream) | DASMFLAG_SUPPORTED;
-}
-
 CPU_DISASSEMBLE(v60)
-{
-	std::ostringstream stream;
-	offs_t result = internal_disasm_v60(device, stream, pc, oprom, opram, options);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
-}
-
-static offs_t internal_disasm_v70(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
 {
 	rombase = oprom;
 	pcbase = pc;
@@ -1509,10 +1493,7 @@ static offs_t internal_disasm_v70(cpu_device *device, std::ostream &stream, offs
 
 CPU_DISASSEMBLE(v70)
 {
-	std::ostringstream stream;
-	offs_t result = internal_disasm_v70(device, stream, pc, oprom, opram, options);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
+	rombase = oprom;
+	pcbase = pc;
+	return dasm_optable[oprom[0]](pc, pc+1, stream) | DASMFLAG_SUPPORTED;
 }
-

@@ -1225,6 +1225,8 @@ CPU_DISASSEMBLE( sharc )
 			((uint64_t)oprom[2] << 16) | ((uint64_t)oprom[3] << 24) |
 			((uint64_t)oprom[4] << 32) | ((uint64_t)oprom[5] << 40);
 
+	char buffer[256];
 	flags = sharc_dasm_one(buffer, pc, op);
+	stream << buffer;
 	return 1 | flags | DASMFLAG_SUPPORTED;
 }

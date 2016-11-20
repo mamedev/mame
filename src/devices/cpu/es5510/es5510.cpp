@@ -933,7 +933,7 @@ uint32_t es5510_device::disasm_max_opcode_bytes() const
 	return 6;
 }
 
-offs_t es5510_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t es5510_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	return pc;
 }

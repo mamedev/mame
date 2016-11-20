@@ -25,7 +25,7 @@
 #define ACONST6(op)     ((((op) >> 5) & 0x0030) | ((op) & 0x000f))
 #define MULCONST2(op)   ((((op) >> 6) & 0x0002) | (((op) >> 3) & 0x0001))
 
-static offs_t internal_disasm_avr8(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+CPU_DISASSEMBLE(avr8)
 {
 	int pos = 0;
 	uint32_t op = oprom[pos++];
@@ -670,14 +670,4 @@ static offs_t internal_disasm_avr8(cpu_device *device, std::ostream &stream, off
 	}
 
 	return pos | DASMFLAG_SUPPORTED;
-}
-
-
-CPU_DISASSEMBLE(avr8)
-{
-	std::ostringstream stream;
-	offs_t result = internal_disasm_avr8(device, stream, pc, oprom, opram, options);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
 }

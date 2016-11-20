@@ -1438,15 +1438,6 @@ void superfx_device::execute_run()
 	}
 }
 
-offs_t superfx_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
-{
-	std::ostringstream stream;
-	offs_t result = disasm_disassemble(stream, pc, oprom, opram, options);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
-}
-
 offs_t superfx_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	uint8_t  op = *(uint8_t *)(opram + 0);

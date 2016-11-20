@@ -694,21 +694,11 @@ static unsigned dasm_dsp32(std::ostream &stream, unsigned pc, uint32_t op)
 }
 
 
-static unsigned dasm_dsp32(char *buffer, unsigned pc, uint32_t op)
-{
-	std::ostringstream stream;
-	unsigned result = dasm_dsp32(stream, pc, op);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
-}
-
-
 /***************************************************************************
     DISASSEMBLY HOOK
 ***************************************************************************/
 
 CPU_DISASSEMBLE( dsp32c )
 {
-	return dasm_dsp32(buffer, pc, oprom[0] | (oprom[1] << 8) | (oprom[2] << 16) | (oprom[3] << 24));
+	return dasm_dsp32(stream, pc, oprom[0] | (oprom[1] << 8) | (oprom[2] << 16) | (oprom[3] << 24));
 }

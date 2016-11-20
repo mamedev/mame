@@ -273,7 +273,7 @@ static void dasm_group_bf(uint16_t opcode)
 	}
 }
 
-static offs_t internal_disasm_tms32051(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+CPU_DISASSEMBLE(tms32051)
 {
 	uint32_t flags = 0;
 	uint16_t opcode;
@@ -582,14 +582,4 @@ static offs_t internal_disasm_tms32051(cpu_device *device, std::ostream &stream,
 	}
 
 	return (npc-pc) | flags | DASMFLAG_SUPPORTED;
-}
-
-
-CPU_DISASSEMBLE(tms32051)
-{
-	std::ostringstream stream;
-	offs_t result = internal_disasm_tms32051(device, stream, pc, oprom, opram, options);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
 }

@@ -17,7 +17,7 @@
     DISASSEMBLY HOOK (TODO: FINISH)
 ***************************************************************************/
 
-static offs_t internal_disasm_esrip(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+CPU_DISASSEMBLE(esrip)
 {
 #if 0
 	static const char* const jmp_types[] =
@@ -92,14 +92,4 @@ static offs_t internal_disasm_esrip(cpu_device *device, std::ostream &stream, of
 			);
 
 	return 1 | DASMFLAG_SUPPORTED;
-}
-
-
-CPU_DISASSEMBLE(esrip)
-{
-	std::ostringstream stream;
-	offs_t result = internal_disasm_esrip(device, stream, pc, oprom, opram, options);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
 }

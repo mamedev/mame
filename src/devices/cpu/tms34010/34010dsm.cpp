@@ -1717,21 +1717,12 @@ static unsigned Dasm340x0(std::ostream &stream, uint32_t pc, bool is_34020)
 	return (_pc - __pc) | flags | DASMFLAG_SUPPORTED;
 }
 
-static unsigned Dasm340x0(char *buff, uint32_t pc, bool is_34020)
-{
-	std::ostringstream stream;
-	unsigned result = Dasm340x0(stream, pc, is_34020);
-	std::string stream_str = stream.str();
-	strcpy(buff, stream_str.c_str());
-	return result;
-}
-
 CPU_DISASSEMBLE( tms34010 )
 {
 	rombase = oprom;
 	rambase = opram;
 	pcbase = pc;
-	return Dasm340x0(buffer, pc, false);
+	return Dasm340x0(stream, pc, false);
 }
 
 CPU_DISASSEMBLE( tms34020 )
@@ -1739,5 +1730,5 @@ CPU_DISASSEMBLE( tms34020 )
 	rombase = oprom;
 	rambase = opram;
 	pcbase = pc;
-	return Dasm340x0(buffer, pc, true);
+	return Dasm340x0(stream, pc, true);
 }

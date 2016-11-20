@@ -73,13 +73,14 @@ public:
 	static void static_set_dasm_override(device_t &device, dasm_override_delegate dasm_override);
 
 	// interface for disassembly
-	offs_t disassemble(char *buffer, offs_t pc, const u8 *oprom, const u8 *opram, u32 options = 0);
+	offs_t disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options = 0);
+	offs_t disassemble(std::string &buffer, offs_t pc, const u8 *oprom, const u8 *opram, u32 options = 0);
 
 protected:
 	// required operation overrides
 	virtual u32 disasm_min_opcode_bytes() const = 0;
 	virtual u32 disasm_max_opcode_bytes() const = 0;
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const u8 *oprom, const u8 *opram, u32 options) = 0;
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options) = 0;
 
 	// interface-level overrides
 	virtual void interface_pre_start() override;

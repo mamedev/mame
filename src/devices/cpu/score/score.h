@@ -55,14 +55,7 @@ protected:
 	// device_disasm_interface overrides
 	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; }
 	virtual uint32_t disasm_max_opcode_bytes() const override { return 4; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override
-	{
-		std::ostringstream stream;
-		offs_t result = disasm_disassemble(stream, pc, oprom, opram, options);
-		std::string stream_str = stream.str();
-		strcpy(buffer, stream_str.c_str());
-		return result;
-	}
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 private:
 	// helpers
@@ -150,8 +143,6 @@ private:
 	static const char *const m_i1a_op[8];
 	static const char *const m_i1b_op[8];
 	static const char *const m_cr_op[2];
-
-	offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options);
 };
 
 extern const device_type SCORE7;

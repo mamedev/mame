@@ -45,7 +45,7 @@ static inline char *src2(uint32_t op, int scale)
 	return temp;
 }
 
-static offs_t internal_disasm_asap(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+CPU_DISASSEMBLE(asap)
 {
 	uint32_t op = oprom[0] | (oprom[1] << 8) | (oprom[2] << 16) | (oprom[3] << 24);
 	int opcode = op >> 27;
@@ -141,16 +141,6 @@ static offs_t internal_disasm_asap(cpu_device *device, std::ostream &stream, off
 						util::stream_format(stream, "jmp%s  %s[%s]", setcond[cond], reg[rsrc1], src2(op,2));
 			break;
 		case 0x1f:  util::stream_format(stream, "trap   $1f"); flags = DASMFLAG_STEP_OVER;                              break;
-	}
+	}	
 	return 4 | flags | DASMFLAG_SUPPORTED;
-}
-
-
-CPU_DISASSEMBLE(asap)
-{
-	std::ostringstream stream;
-	offs_t result = internal_disasm_asap(device, stream, pc, oprom, opram, options);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
 }

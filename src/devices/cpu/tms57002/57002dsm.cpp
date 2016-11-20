@@ -31,7 +31,7 @@ static std::string get_memadr(uint32_t opcode, char type)
 }
 
 
-static offs_t internal_disasm_tms57002(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+CPU_DISASSEMBLE(tms57002)
 {
 	std::streampos original_pos = stream.tellp();
 	uint32_t opcode = opram[0] | (opram[1] << 8) | (opram[2] << 16);
@@ -82,14 +82,4 @@ static offs_t internal_disasm_tms57002(cpu_device *device, std::ostream &stream,
 	}
 
 	return 1;
-}
-
-
-CPU_DISASSEMBLE(tms57002)
-{
-	std::ostringstream stream;
-	offs_t result = internal_disasm_tms57002(device, stream, pc, oprom, opram, options);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
 }

@@ -784,26 +784,17 @@ static unsigned Dasm9900 (std::ostream &stream, unsigned pc, int model_id, const
 	return (PC - pc) | DASMFLAG_SUPPORTED | dasmflags;
 }
 
-static unsigned Dasm9900(char *buffer, unsigned pc, int model_id, const uint8_t *oprom, const uint8_t *opram)
-{
-	std::ostringstream stream;
-	unsigned result = Dasm9900(stream, pc, model_id, oprom, opram);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
-}
-
 CPU_DISASSEMBLE( tms9900 )
 {
-	return Dasm9900(buffer, pc, TMS9900_ID, oprom, opram);
+	return Dasm9900(stream, pc, TMS9900_ID, oprom, opram);
 }
 
 CPU_DISASSEMBLE( tms9980 )
 {
-	return Dasm9900(buffer, pc, TMS9980_ID, oprom, opram);
+	return Dasm9900(stream, pc, TMS9980_ID, oprom, opram);
 }
 
 CPU_DISASSEMBLE( tms9995 )
 {
-	return Dasm9900(buffer, pc, TMS9995_ID, oprom, opram);
+	return Dasm9900(stream, pc, TMS9995_ID, oprom, opram);
 }

@@ -227,7 +227,7 @@ protected:
 	// device_disasm_interface overrides
 	virtual uint32_t disasm_min_opcode_bytes() const override { return 4; }
 	virtual uint32_t disasm_max_opcode_bytes() const override { return 8; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	// CPU registers
 	uint32_t m_pc;
@@ -522,7 +522,6 @@ extern const device_type CXD8606CQ;
 #define CF_TLBP ( 8 )
 #define CF_RFE ( 16 )
 
-extern unsigned DasmPSXCPU( psxcpu_state *state, std::ostream &stream, uint32_t pc, const uint8_t *opram);
-extern unsigned DasmPSXCPU( psxcpu_state *state, char *buffer, uint32_t pc, const uint8_t *opram );
+extern unsigned DasmPSXCPU(psxcpu_state *state, std::ostream &stream, uint32_t pc, const uint8_t *opram);
 
 #endif /* __PSXCPU_H__ */

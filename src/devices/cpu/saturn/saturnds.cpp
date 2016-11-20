@@ -1267,7 +1267,7 @@ static const int field_adr_a[]=
 static const int field_adr_b[]=
 { FieldP, FieldWP, FieldXS, FieldX, FieldS, FieldM, FieldB, FieldW };
 
-static offs_t internal_disasm_saturn(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+CPU_DISASSEMBLE(saturn)
 {
 	int adr=0;
 
@@ -1467,14 +1467,4 @@ static offs_t internal_disasm_saturn(cpu_device *device, std::ostream &stream, o
 	}
 
 	return pos;
-}
-
-
-CPU_DISASSEMBLE(saturn)
-{
-	std::ostringstream stream;
-	offs_t result = internal_disasm_saturn(device, stream, pc, oprom, opram, options);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
 }

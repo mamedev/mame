@@ -85,7 +85,8 @@ public:
 
 	virtual uint32_t disasm_min_opcode_bytes() const override;
 	virtual uint32_t disasm_max_opcode_bytes() const override;
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options);
 
 	READ8_MEMBER(segapcm_rom_r);
 	READ8_MEMBER(multipcma_rom_r);
@@ -563,6 +564,14 @@ uint32_t vgmplay_device::disasm_min_opcode_bytes() const
 uint32_t vgmplay_device::disasm_max_opcode_bytes() const
 {
 	return 9;
+}
+
+offs_t vgmplay_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+{
+	char buffer[256];
+	offs_t result = disasm_disassemble(buffer, pc, oprom, opram, options);
+	stream << buffer;
+	return result;	
 }
 
 offs_t vgmplay_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)

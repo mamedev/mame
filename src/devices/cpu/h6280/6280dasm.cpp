@@ -144,7 +144,7 @@ static const unsigned char op6280[512]=
 /*****************************************************************************
  *  Disassemble a single command and return the number of bytes it uses.
  *****************************************************************************/
-static offs_t internal_disasm_h6280(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+CPU_DISASSEMBLE(h6280)
 {
 	uint32_t flags = 0;
 	int PC, OP, opc, arg;
@@ -249,16 +249,6 @@ static offs_t internal_disasm_h6280(cpu_device *device, std::ostream &stream, of
 
 		default:
 			util::stream_format(stream, "%-5s$%02X", token[opc], OP >> 1);
-	}
+	}	
 	return (PC - pc) | flags | DASMFLAG_SUPPORTED;
-}
-
-
-CPU_DISASSEMBLE(h6280)
-{
-	std::ostringstream stream;
-	offs_t result = internal_disasm_h6280(device, stream, pc, oprom, opram, options);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
 }

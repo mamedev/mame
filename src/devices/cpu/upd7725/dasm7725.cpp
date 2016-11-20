@@ -12,7 +12,7 @@
 #include "emu.h"
 #include "upd7725.h"
 
-static offs_t internal_disasm_upd7725(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+CPU_DISASSEMBLE(upd7725)
 {
 	uint32_t opcode = oprom[2] | (oprom[1] << 8) | (oprom[0] << 16);
 	uint32_t type = (opcode >> 22);
@@ -221,14 +221,4 @@ static offs_t internal_disasm_upd7725(cpu_device *device, std::ostream &stream, 
 	}
 
 	return 1 | DASMFLAG_SUPPORTED;
-}
-
-
-CPU_DISASSEMBLE(upd7725)
-{
-	std::ostringstream stream;
-	offs_t result = internal_disasm_upd7725(device, stream, pc, oprom, opram, options);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
 }

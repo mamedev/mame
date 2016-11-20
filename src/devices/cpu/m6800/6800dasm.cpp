@@ -249,51 +249,42 @@ static unsigned Dasm680x (int subtype, std::ostream &stream, unsigned pc, const 
 	}
 }
 
-static unsigned Dasm680x(int subtype, char *buffer, unsigned pc, const uint8_t *oprom, const uint8_t *opram)
-{
-	std::ostringstream stream;
-	unsigned result = Dasm680x(subtype, stream, pc, oprom, opram);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
-}
-
 CPU_DISASSEMBLE( m6800 )
 {
-	return Dasm680x(6800,buffer,pc,oprom,opram);
+	return Dasm680x(6800,stream,pc,oprom,opram);
 }
 
 CPU_DISASSEMBLE( m6801 )
 {
-	return Dasm680x(6801,buffer,pc,oprom,opram);
+	return Dasm680x(6801,stream,pc,oprom,opram);
 }
 
 CPU_DISASSEMBLE( m6802 )
 {
-	return Dasm680x(6802,buffer,pc,oprom,opram);
+	return Dasm680x(6802,stream,pc,oprom,opram);
 }
 
 CPU_DISASSEMBLE( m6803 )
 {
-	return Dasm680x(6803,buffer,pc,oprom,opram);
+	return Dasm680x(6803,stream,pc,oprom,opram);
 }
 
 CPU_DISASSEMBLE( m6808 )
 {
-	return Dasm680x(6808,buffer,pc,oprom,opram);
+	return Dasm680x(6808,stream,pc,oprom,opram);
 }
 
 CPU_DISASSEMBLE( hd6301 )
 {
-	return Dasm680x(6301,buffer,pc,oprom,opram);
+	return Dasm680x(6301,stream,pc,oprom,opram);
 }
 
 CPU_DISASSEMBLE( hd63701 )
 {
-	return Dasm680x(63701,buffer,pc,oprom,opram);
+	return Dasm680x(63701,stream,pc,oprom,opram);
 }
 
 CPU_DISASSEMBLE( nsc8105 )
 {
-	return Dasm680x(8105,buffer,pc,oprom,opram);
+	return Dasm680x(8105,stream,pc,oprom,opram);
 }

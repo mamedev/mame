@@ -1433,7 +1433,7 @@ static const char *const s_cond[16] =
 };
 
 
-static offs_t internal_disasm_tlcs900(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+CPU_DISASSEMBLE(tlcs900)
 {
 	const tlcs900inst *dasm;
 	std::string buf;
@@ -2255,14 +2255,4 @@ static offs_t internal_disasm_tlcs900(cpu_device *device, std::ostream &stream, 
 	}
 
 	return pos | flags | DASMFLAG_SUPPORTED;
-}
-
-
-CPU_DISASSEMBLE(tlcs900)
-{
-	std::ostringstream stream;
-	offs_t result = internal_disasm_tlcs900(device, stream, pc, oprom, opram, options);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
 }

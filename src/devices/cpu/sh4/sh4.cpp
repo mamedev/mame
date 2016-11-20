@@ -151,27 +151,27 @@ sh4be_device::sh4be_device(const machine_config &mconfig, const char *tag, devic
 }
 
 
-offs_t sh34_base_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t sh34_base_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( sh4 );
 
-	return CPU_DISASSEMBLE_NAME(sh4)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(sh4)(this, stream, pc, oprom, opram, options);
 }
 
 
-offs_t sh3be_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t sh3be_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( sh4be );
 
-	return CPU_DISASSEMBLE_NAME(sh4be)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(sh4be)(this, stream, pc, oprom, opram, options);
 }
 
 
-offs_t sh4be_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t sh4be_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( sh4be );
 
-	return CPU_DISASSEMBLE_NAME(sh4be)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(sh4be)(this, stream, pc, oprom, opram, options);
 }
 
 

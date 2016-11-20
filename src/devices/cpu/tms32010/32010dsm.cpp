@@ -222,7 +222,7 @@ static void InitDasm32010(void)
 	OpInizialized = 1;
 }
 
-static offs_t internal_disasm_tms32010(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+CPU_DISASSEMBLE(tms32010)
 {
 	uint32_t flags = 0;
 	int a, b, d, k, m, n, p, r, s, w;   /* these can all be filled in by parsing an instruction */
@@ -331,14 +331,4 @@ static offs_t internal_disasm_tms32010(cpu_device *device, std::ostream &stream,
 		}
 	}
 	return cnt | flags | DASMFLAG_SUPPORTED;
-}
-
-
-CPU_DISASSEMBLE(tms32010)
-{
-	std::ostringstream stream;
-	offs_t result = internal_disasm_tms32010(device, stream, pc, oprom, opram, options);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
 }

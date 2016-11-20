@@ -1232,11 +1232,11 @@ void ppc_device::device_reset()
     CPU
 -------------------------------------------------*/
 
-offs_t ppc_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t ppc_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	uint32_t op = *(uint32_t *)oprom;
 	op = big_endianize_int32(op);
-	return ppc_dasm_one(buffer, pc, op);
+	return ppc_dasm_one(stream, pc, op);
 }
 
 

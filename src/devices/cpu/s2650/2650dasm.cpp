@@ -221,7 +221,7 @@ static char *ADR(int pc)
 }
 
 /* disassemble one instruction at PC into buff. return byte size of instr */
-static offs_t internal_disasm_s2650(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+CPU_DISASSEMBLE(s2650)
 {
 	uint32_t flags = 0;
 	int PC = pc;
@@ -865,14 +865,4 @@ static offs_t internal_disasm_s2650(cpu_device *device, std::ostream &stream, of
 			break;
 	}
 	return (pc - PC) | flags | DASMFLAG_SUPPORTED;
-}
-
-
-CPU_DISASSEMBLE(s2650)
-{
-	std::ostringstream stream;
-	offs_t result = internal_disasm_s2650(device, stream, pc, oprom, opram, options);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
 }
