@@ -15,7 +15,7 @@ uint32_t archimedes_state::screen_update(screen_device &screen, bitmap_rgb32 &bi
 	int res_x,res_y;
 	int xsize,ysize;
 	int calc_dxs = 0,calc_dxe = 0;
-	const uint8_t x_step[4] = { 5, 7, 11, 19 };
+	const uint8_t x_step[4] = { 19, 11, 7, 5 };
 
 	/* border color */
 	bitmap.fill(m_palette->pen(0x10), cliprect);
@@ -181,7 +181,8 @@ uint32_t archimedes_state::screen_update(screen_device &screen, bitmap_rgb32 &bi
 		if(m_cursor_enabled == true)
 		{
 			count = 0;
-			for(y=0;y<16;y++)
+			int cursor_h = m_vidc_regs[VIDC_VCER] - m_vidc_regs[VIDC_VCSR];
+			for(y=0; y<cursor_h; y++)
 			{
 				for(x=0;x<32;x+=4)
 				{
@@ -190,9 +191,8 @@ uint32_t archimedes_state::screen_update(screen_device &screen, bitmap_rgb32 &bi
 						uint8_t cursor_dot;
 						pen = m_cursor_vram[count];
 
-						// FIXME: cursor is a couple of pixels out of position
-						res_x = xstart + m_vidc_regs[VIDC_HCSR] - (m_vidc_regs[VIDC_HDSR] * 2 + x_step[3 - (m_vidc_bpp_mode & 3)]) + x+xi;
-						res_y = (m_vidc_regs[VIDC_VCSR] - m_vidc_regs[VIDC_VDSR] + ystart + y) * (m_vidc_interlace + 1);
+						res_x = m_vidc_regs[VIDC_HCSR] - m_vidc_regs[VIDC_HBSR] + x + xi;
+						res_y = (m_vidc_regs[VIDC_VCSR] - m_vidc_regs[VIDC_VBSR] + y) * (m_vidc_interlace + 1);
 
 						cursor_dot = ((pen>>(xi*2))&0x3);
 

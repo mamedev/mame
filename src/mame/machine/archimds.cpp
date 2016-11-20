@@ -131,7 +131,7 @@ void archimedes_state::vidc_video_tick()
 	uint32_t m_vidc_ccur;
 	uint32_t offset_ptr;
 
-	size = m_vidc_vidend-m_vidc_vidstart+0x10;
+	size = (m_vidc_vidend - m_vidc_vidstart + 0x10) & 0x1fffff;
 
 	offset_ptr = m_vidc_vidinit;
 	if(offset_ptr >= m_vidc_vidend+0x10) // TODO: correct?
@@ -1002,8 +1002,7 @@ WRITE32_MEMBER(archimedes_state::archimedes_vidc_w)
 			case VIDC_HDSR: m_vidc_regs[VIDC_HDSR] = (val >> 14);   break;
 			case VIDC_HDER: m_vidc_regs[VIDC_HDER] = (val >> 14);   break;
 			case VIDC_HBER: m_vidc_regs[VIDC_HBER] = ((val >> 14)<<1)+1;    break;
-			case VIDC_HCSR: m_vidc_regs[VIDC_HCSR] = (val >> 13) & 0x7ff; break;
-//          #define VIDC_HCSR       0x98
+			case VIDC_HCSR: m_vidc_regs[VIDC_HCSR] = ((val >> 13) & 0x7ff) + 6; break;
 //          #define VIDC_HIR        0x9c
 
 			case VIDC_VCR:  m_vidc_regs[VIDC_VCR] = ((val >> 14)<<1)+1; break;
@@ -1012,10 +1011,8 @@ WRITE32_MEMBER(archimedes_state::archimedes_vidc_w)
 			case VIDC_VDSR: m_vidc_regs[VIDC_VDSR] = (val >> 14)+1; break;
 			case VIDC_VDER: m_vidc_regs[VIDC_VDER] = (val >> 14)+1; break;
 			case VIDC_VBER: m_vidc_regs[VIDC_VBER] = (val >> 14)+1; break;
-			case VIDC_VCSR: m_vidc_regs[VIDC_VCSR] = (val >> 14) & 0x3ff; break;
-			case VIDC_VCER: m_vidc_regs[VIDC_VCER] = (val >> 14) & 0x3ff; break;
-//          #define VIDC_VCSR       0xb8
-//          #define VIDC_VCER       0xbc
+			case VIDC_VCSR: m_vidc_regs[VIDC_VCSR] = ((val >> 14) & 0x3ff) + 1; break;
+			case VIDC_VCER: m_vidc_regs[VIDC_VCER] = ((val >> 14) & 0x3ff) + 1; break;
 		}
 
 
