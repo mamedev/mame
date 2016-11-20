@@ -159,7 +159,7 @@ int mmain(int argc, char *argv[])
 #endif
 #if defined(RETROMAME_ANDROID)
 	/* Enable standard application logging */
-	SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_VERBOSE);
+//	SDL_LogSetPriority(SDL_LOG_CATEGORY_APPLICATION, SDL_LOG_PRIORITY_VERBOSE);
 #endif
 
 	// FIXME: this should be done differently

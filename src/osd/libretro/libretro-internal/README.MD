@@ -13,6 +13,17 @@ compilation win64 :
 export MINGW64=/mingw64
 make OSD="retro" verbose=1 RETRO=1 NOWERROR=1 TARGETOS="windows" CONFIG="libretro" NO_USE_MIDI="1" PTR64=1 TARGET=mame GCC="mingw64-gcc" -j4
 
+compilation android-arm32 :
+
+export ANDROID_NDK_ARM and ANDROID_NDK_ROOT and ANDROID_NDK_LLVM
+to fit your ndk root and toolchain.
+
+export ANDROID_NDK_LLVM="/opt/ndk/toolchains/llvm-3.5/prebuilt/linux-x86_64"
+export ANDROID_NDK_ARM="/opt/ndk/toolchains/arm-linux-androideabi-4.8/prebuilt/linux-x86_64"
+export ANDROID_NDK_ROOT="/opt/ndk"
+
+make OSD="retro" verbose=1 RETRO=1 NOWERROR=1  NOASM="1" gcc="android-arm" OS="linux" TARGETOS="android-arm" CONFIG=libretro NO_USE_MIDI="1" TARGET=mame -j4
+
 to build only drivers atetris add :
 
 SUBTARGET=atetris SOURCES=src/mame/drivers/atetris.cpp

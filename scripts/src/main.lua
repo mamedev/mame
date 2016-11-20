@@ -197,7 +197,7 @@ end
 	configuration { "libretro*" }
 		kind "SharedLib"	
 		targetsuffix "_libretro"
-		if _OPTIONS["targetos"]=="android-arm" then
+		if _OPTIONS["targetos"]=="android" then
 			targetsuffix "_libretro_android"
 			defines {
  				"SDLMAME_ARM=1",
@@ -237,6 +237,9 @@ end
 -- RETRO HACK no sdl for libretro android
 if _OPTIONS["osd"] == "retro" then
 
+		if _OPTIONS["SEPARATE_BIN"]~="1" then
+			targetdir(MAME_DIR)
+		end
 else
 		includedirs {
 			MAME_DIR .. "3rdparty/SDL2/include",
@@ -245,8 +248,7 @@ else
 		files {
 			MAME_DIR .. "3rdparty/SDL2/src/main/android/SDL_android_main.c",
 		}
-end
--- RETRO HACK END no sdl for libretro android
+
 		targetsuffix ""
 		if _OPTIONS["SEPARATE_BIN"]~="1" then
 			if _OPTIONS["PLATFORM"]=="arm" then
@@ -268,6 +270,8 @@ end
 				targetdir(MAME_DIR .. "android-project/app/src/main/libs/x86_64")
 			end
 		end
+end
+-- RETRO HACK END no sdl for libretro android
 	else
 		if _OPTIONS["SEPARATE_BIN"]~="1" then
 			targetdir(MAME_DIR)
