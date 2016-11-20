@@ -1170,15 +1170,6 @@ offs_t ppc_dasm_one(std::ostream &stream, uint32_t pc, uint32_t op)
 }
 
 
-offs_t ppc_dasm_one(std::string &string, uint32_t pc, uint32_t op)
-{
-	std::ostringstream stream;
-	offs_t result = ppc_dasm_one(stream, pc, op);
-	string = stream.str();
-	return result;
-}
-
-
 CPU_DISASSEMBLE( powerpc )
 {
 	uint32_t op = *(uint32_t *)oprom;

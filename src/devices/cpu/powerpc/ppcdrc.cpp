@@ -3919,6 +3919,8 @@ void ppc_device::log_register_list(drcuml_state *drcuml, const char *string, con
 
 void ppc_device::log_opcode_desc(drcuml_state *drcuml, const opcode_desc *desclist, int indent)
 {
+	util::ovectorstream buffer;
+
 	/* open the file, creating it if necessary */
 	if (indent == 0)
 		drcuml->log_printf("\nDescriptor list @ %08X\n", desclist->pc);
@@ -3926,20 +3928,22 @@ void ppc_device::log_opcode_desc(drcuml_state *drcuml, const opcode_desc *descli
 	/* output each descriptor */
 	for ( ; desclist != nullptr; desclist = desclist->next())
 	{
-		std::string buffer;
+		buffer.clear();
+		buffer.seekp(0);
 
 		/* disassemble the current instruction and output it to the log */
 		if (drcuml->logging() || drcuml->logging_native())
 		{
 			if (desclist->flags & OPFLAG_VIRTUAL_NOOP)
-				buffer = "<virtual nop>";
+				buffer << "<virtual nop>";
 			else
 				ppc_dasm_one(buffer, desclist->pc, desclist->opptr.l[0]);
 		}
 		else
-			buffer = "???";
+			buffer << "???";
 
-		drcuml->log_printf("%08X [%08X] t:%08X f:%s: %-30s", desclist->pc, desclist->physpc, desclist->targetpc, log_desc_flags_to_string(desclist->flags), buffer.c_str());
+		buffer.put('\0');
+		drcuml->log_printf("%08X [%08X] t:%08X f:%s: %-30s", desclist->pc, desclist->physpc, desclist->targetpc, log_desc_flags_to_string(desclist->flags), buffer.vec());
 
 		/* output register states */
 		log_register_list(drcuml, "use", desclist->regin, nullptr);
