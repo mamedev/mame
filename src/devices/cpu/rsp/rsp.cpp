@@ -308,9 +308,10 @@ void rsp_device::unimplemented_opcode(uint32_t op)
 {
 	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 	{
-		std::string string;
+		util::ovectorstream string;
 		rsp_dasm_one(string, m_ppc, op);
-		osd_printf_debug("%08X: %s\n", m_ppc, string.c_str());
+		string.put('\0');
+		osd_printf_debug("%08X: %s\n", m_ppc, &string.vec()[0]);
 	}
 
 #if SAVE_DISASM
@@ -734,12 +735,14 @@ void rsp_device::execute_run()
 		{
 			int i, l;
 			static uint32_t prev_regs[32];
-			std::string string;
+			
+			util::ovectorstream string;
 			rsp_dasm_one(string, m_ppc, op);
+			string.put('\0');
 
-			fprintf(m_exec_output, "%08X: %s", m_ppc, string.c_str());
+			fprintf(m_exec_output, "%08X: %s", m_ppc, &string.vec()[0]);
 
-			l = string.length();
+			l = string.vec().size() - 1;
 			if (l < 36)
 			{
 				for (i=l; i < 36; i++)
