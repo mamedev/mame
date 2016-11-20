@@ -2003,6 +2003,20 @@ ROM_START( pcplat )
 ROM_END
 
 
+ROM_START( pcorig )
+	ARISTMK6_BIOS
+	ROM_REGION( 0x2000000, "game_rom", ROMREGION_ERASEFF)
+	ROM_LOAD32_WORD("30143011.u21", 0x0000000, 0x0400000, CRC(457aa378) SHA1(248e636e33ea68a724ee074febdd7a3ed1b5d4e7) )
+	ROM_LOAD32_WORD("30143011.u11", 0x0000002, 0x0400000, CRC(4caa461b) SHA1(b7b5770e9c0f4c7924f071d59eff94eea950b9c8) )
+	ROM_LOAD32_WORD("30143011.u22", 0x0800000, 0x0400000, CRC(6f590385) SHA1(fc6229e1a45eaed819ec87fb1777b4ae508200a9) )
+	ROM_LOAD32_WORD("30143011.u12", 0x0800002, 0x0400000, CRC(27941b7b) SHA1(5b5dbc8198b70d2965483e95f073213faa819d2e) )
+	ROM_LOAD32_WORD("30143011.u23", 0x1000000, 0x0400000, CRC(17445b58) SHA1(f281b36ef9a72cf3e798993a7a80bf7fda1a6e8b) )
+	ROM_LOAD32_WORD("30143011.u13", 0x1000002, 0x0400000, CRC(7eb0f277) SHA1(6a0ede9f64556223f284df4d015e200d98ec97fa) )
+	ROM_LOAD32_WORD("30143011.u24", 0x1800000, 0x0400000, CRC(d4f04391) SHA1(3eb4b16518b3980505c8ee08542ae184c829f79d) )
+	ROM_LOAD32_WORD("30143011.u14", 0x1800002, 0x0400000, CRC(e3b54c33) SHA1(4f1d22353b1114e476340dbec2d7d96e60d55cc2) )
+ROM_END
+
+
 ROM_START( pwsuper )
 	ARISTMK6_BIOS
 	ROM_REGION( 0x3000000, "game_rom", ROMREGION_ERASEFF)
@@ -2945,6 +2959,7 @@ GAME( 2006, pcbydem,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, RO
 GAME( 2006, pcmostw,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Player's Choice - Most Wanted (20234911, NSW/ACT)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // MG0010,    C - 09/11/06
 GAME( 2010, pcgold,   aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Player's Choice - Gold Edition (30291411, New Zealand)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // MG0047,    A - 09/04/10
 GAME( 2009, pcplat,   aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Player's Choice - Platinum (20282111, New Zealand)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // MG0031,    B - 04/02/09
+GAME( 2004, pcorig,   aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Player's Choice - Original (30143011, NSW/ACT)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // MG001, C - 12/01/04
 GAME( 200?, pwsuper,  aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Player's World - Super (0154019, US)",          MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // MG0016,    (no data)
 GAME( 2001, pompeia6, aristmk6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Pompeii (10002211, NSW/ACT)",                   MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // 628/5,    A - 22/01/01
 GAME( 2002, pompeia6u,pompeia6,   aristmk6,    aristmk6, driver_device,    0, ROT0, "Aristocrat", "Pompeii (0251010, US)",                         MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // US008,    A - 04/03/02
