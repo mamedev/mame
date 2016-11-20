@@ -1831,11 +1831,13 @@ ROM_START( eforsta5u )
 		0x0a5234-0x15dbdf is the non-Checksummed range still containing data but NOT covered by Checksum
 		0x0a5234-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
+
+	// if you enable the additional debug output you get 'Error in graphics EPROMs' so these ROMs are also bad even if the above passes
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
-	ROM_LOAD32_WORD( "jhg041503.u7",  0x000000, 0x80000, CRC(cae1fb55) SHA1(386913ddf9be406f46aab06cf3e27c3c38a4d52d) )  // 94.97%
-	ROM_LOAD32_WORD( "jhg041503.u11", 0x000002, 0x80000, CRC(a71b7b3c) SHA1(26c3438398b6a3cc9946a1cd1c92d317a8e2738e) )  // 94.97%
-	ROM_LOAD32_WORD( "jhg041503.u8",  0x100000, 0x80000, CRC(002dec6c) SHA1(fb3f4ce9cd8cd9e0e3133376ed014db83db041c5) )  // base
-	ROM_LOAD32_WORD( "jhg041503.u12", 0x100002, 0x80000, CRC(c968471f) SHA1(9d54a5c396e6f83690db2fcb7ddcc8a47a7dd777) )  // base
+	ROM_LOAD32_WORD( "jhg041503.u7",  0x000000, 0x80000, BAD_DUMP CRC(cae1fb55) SHA1(386913ddf9be406f46aab06cf3e27c3c38a4d52d) )  // 94.97%
+	ROM_LOAD32_WORD( "jhg041503.u11", 0x000002, 0x80000, BAD_DUMP CRC(a71b7b3c) SHA1(26c3438398b6a3cc9946a1cd1c92d317a8e2738e) )  // 94.97%
+	ROM_LOAD32_WORD( "jhg041503.u8",  0x100000, 0x80000, BAD_DUMP CRC(002dec6c) SHA1(fb3f4ce9cd8cd9e0e3133376ed014db83db041c5) )  // base
+	ROM_LOAD32_WORD( "jhg041503.u12", 0x100002, 0x80000, BAD_DUMP CRC(c968471f) SHA1(9d54a5c396e6f83690db2fcb7ddcc8a47a7dd777) )  // base
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
 	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
@@ -1884,7 +1886,7 @@ ROM_START( gambler )
 		0x08f46c-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
-	// checksum passes, but marking as BAD_DUMP due to other dumps from this source being bad (it doesn't seem happy with the data)
+	// if you enable the additional debug output you get 'Error2 in graphics EPROMs' so these ROMs are also bad even if the above passes
 	ROM_LOAD32_WORD( "ehg091602.u7",  0x000000, 0x80000, BAD_DUMP CRC(7524c954) SHA1(0a895d1e2d09a2c873bbbbeb37bc59c25f3c577c) )  // 92.268%
 	ROM_LOAD32_WORD( "ehg091602.u11", 0x000002, 0x80000, BAD_DUMP CRC(f29a6932) SHA1(17761218a04d36a599c987b4e13c0e3f46b7793f) )  // 92.268%
 	ROM_LOAD32_WORD( "ehg091602.u8",  0x100000, 0x80000, BAD_DUMP CRC(e2221fdf) SHA1(8a7b2d5de68ae66fe1915a6faac6277249e3fb53) )  // base
