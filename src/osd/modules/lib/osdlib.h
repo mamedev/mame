@@ -121,7 +121,7 @@ private: \
 public: \
 	static apiname##_api &instance() { \
 		std::call_once( apiname##_api::s_once, [](std::unique_ptr<apiname##_api> &inst) { \
-			inst = std::make_unique<apiname##_api>(); },  s_instance); \
+			inst = std::make_unique<apiname##_api>(); }, std::ref(s_instance)); \
 		return *apiname##_api::s_instance.get(); }
 
 #define DYNAMIC_API_FN(ret, conv, apifunc, ...) ret(conv *m_##apifunc##_pfn)( __VA_ARGS__ ) = m_module->bind<ret(conv *)( __VA_ARGS__ )>(#apifunc);
