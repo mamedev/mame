@@ -771,7 +771,6 @@ private:
 ***************************************************************************/
 
 unsigned dasmmips3(std::ostream &stream, unsigned pc, uint32_t op);
-unsigned dasmmips3(char *buffer, unsigned pc, uint32_t op);
 
 
 #endif /* __MIPS3_H__ */

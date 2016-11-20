@@ -3947,9 +3947,10 @@ void mips3_device::log_add_disasm_comment(drcuml_block *block, uint32_t pc, uint
 {
 	if (m_drcuml->logging())
 	{
-		char buffer[100];
-		dasmmips3(buffer, pc, op);
-		block->append_comment("%08X: %s", pc, buffer);                                  // comment
+		std::ostringstream stream;
+		dasmmips3(stream, pc, op);
+		const std::string stream_string = stream.str();
+		block->append_comment("%08X: %s", pc, stream_string.c_str());                                  // comment
 	}
 }
 
@@ -4077,19 +4078,21 @@ void mips3_device::log_opcode_desc(drcuml_state *drcuml, const opcode_desc *desc
 	/* output each descriptor */
 	for ( ; desclist != nullptr; desclist = desclist->next())
 	{
-		char buffer[100];
+		std::ostringstream buffer;
 
 		/* disassemle the current instruction and output it to the log */
 		if (drcuml->logging() || drcuml->logging_native())
 		{
 			if (desclist->flags & OPFLAG_VIRTUAL_NOOP)
-				strcpy(buffer, "<virtual nop>");
+				buffer << "<virtual nop>";
 			else
 				dasmmips3(buffer, desclist->pc, desclist->opptr.l[0]);
 		}
 		else
-			strcpy(buffer, "???");
-		drcuml->log_printf("%08X [%08X] t:%08X f:%s: %-30s", desclist->pc, desclist->physpc, desclist->targetpc, log_desc_flags_to_string(desclist->flags), buffer);
+			buffer << "???";
+		
+		const std::string buffer_string = buffer.str();
+		drcuml->log_printf("%08X [%08X] t:%08X f:%s: %-30s", desclist->pc, desclist->physpc, desclist->targetpc, log_desc_flags_to_string(desclist->flags), buffer_string.c_str());
 
 		/* output register states */
 		log_register_list(drcuml, "use", desclist->regin, nullptr);
