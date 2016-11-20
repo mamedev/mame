@@ -3745,11 +3745,11 @@ bool ppc_device::generate_instruction_3f(drcuml_block *block, compiler_state *co
 
 void ppc_device::log_add_disasm_comment(drcuml_block *block, uint32_t pc, uint32_t op)
 {
-	char buffer[100];
+	std::string buffer;
 	if (m_drcuml->logging())
 	{
 		ppc_dasm_one(buffer, pc, op);
-		block->append_comment("%08X: %s", pc, buffer);                                  // comment
+		block->append_comment("%08X: %s", pc, buffer.c_str());                                  // comment
 	}
 }
 
@@ -3926,20 +3926,20 @@ void ppc_device::log_opcode_desc(drcuml_state *drcuml, const opcode_desc *descli
 	/* output each descriptor */
 	for ( ; desclist != nullptr; desclist = desclist->next())
 	{
-		char buffer[100];
+		std::string buffer;
 
-		/* disassemle the current instruction and output it to the log */
+		/* disassemble the current instruction and output it to the log */
 		if (drcuml->logging() || drcuml->logging_native())
 		{
 			if (desclist->flags & OPFLAG_VIRTUAL_NOOP)
-				strcpy(buffer, "<virtual nop>");
+				buffer = "<virtual nop>";
 			else
 				ppc_dasm_one(buffer, desclist->pc, desclist->opptr.l[0]);
 		}
 		else
-			strcpy(buffer, "???");
+			buffer = "???";
 
-		drcuml->log_printf("%08X [%08X] t:%08X f:%s: %-30s", desclist->pc, desclist->physpc, desclist->targetpc, log_desc_flags_to_string(desclist->flags), buffer);
+		drcuml->log_printf("%08X [%08X] t:%08X f:%s: %-30s", desclist->pc, desclist->physpc, desclist->targetpc, log_desc_flags_to_string(desclist->flags), buffer.c_str());
 
 		/* output register states */
 		log_register_list(drcuml, "use", desclist->regin, nullptr);
