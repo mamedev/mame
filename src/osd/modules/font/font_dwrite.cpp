@@ -69,15 +69,15 @@ static const float POINTS_PER_DIP = (3.0f / 4.0f);
 // Dynamic APIs
 DYNAMIC_API_BEGIN(d2d1, "d2d1.dll")
 	DYNAMIC_API_FN(HRESULT, WINAPI, D2D1CreateFactory, D2D1_FACTORY_TYPE, REFIID, const D2D1_FACTORY_OPTIONS *, void **)
-DYNAMIC_API_END()
+DYNAMIC_API_END(d2d1)
 
 DYNAMIC_API_BEGIN(dwrite, "dwrite.dll")
 	DYNAMIC_API_FN(HRESULT, WINAPI, DWriteCreateFactory, DWRITE_FACTORY_TYPE, REFIID, IUnknown **)
-DYNAMIC_API_END()
+DYNAMIC_API_END(dwrite)
 
 DYNAMIC_API_BEGIN(locale, "kernel32.dll")
 	DYNAMIC_API_FN(int, WINAPI, GetUserDefaultLocaleName, LPWSTR, int)
-DYNAMIC_API_END()
+DYNAMIC_API_END(locale)
 
 // Debugging functions
 #ifdef DWRITE_DEBUGGING

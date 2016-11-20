@@ -127,7 +127,7 @@ typedef std::unique_ptr<IXAudio2SourceVoice, xaudio2_custom_deleter> src_voice_p
 // 
 DYNAMIC_API_BEGIN(xaudio2, "XAudio2_9.dll", "XAudio2_8.dll")
 	DYNAMIC_API_FN(HRESULT, WINAPI, XAudio2Create, IXAudio2 **, uint32_t, XAUDIO2_PROCESSOR)
-DYNAMIC_API_END()
+DYNAMIC_API_END(xaudio2)
 
 //============================================================
 //  Helper classes

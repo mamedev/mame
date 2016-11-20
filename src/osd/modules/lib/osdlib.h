@@ -19,6 +19,7 @@
 #include <string>
 #include <type_traits>
 #include <vector>
+#include <memory>
 
 /*-----------------------------------------------------------------------------
     osd_process_kill: kill the current process
@@ -104,7 +105,7 @@ protected:
 //
 // DYNAMIC_API_BEGIN(dxgi, "dxgi.dll")
 //   DYNAMIC_API_FN(DWORD, WINAPI, CreateDXGIFactory1, REFIID, void**)
-// DYNAMIC_API_END()
+// DYNAMIC_API_END(dxgi)
 //
 // Calling then looks like: DYNAMIC_CALL(dxgi, CreateDXGIFactory1, p1, p2, etc)
 //=========================================================================================================================
@@ -115,12 +116,19 @@ protected:
 class apiname##_api { \
 private: \
 	osd::dynamic_module::ptr m_module = osd::dynamic_module::open( { __VA_ARGS__ } ); \
+	static std::unique_ptr<apiname##_api> s_instance; \
+	static std::once_flag s_once; \
 public: \
-	static apiname##_api &instance() { static apiname##_api api; return api; }
+	static apiname##_api &instance() { \
+		std::call_once( apiname##_api::s_once, [](std::unique_ptr<apiname##_api> &inst) { \
+			inst = std::make_unique<apiname##_api>(); },  s_instance); \
+		return *apiname##_api::s_instance.get(); }
 
 #define DYNAMIC_API_FN(ret, conv, apifunc, ...) ret(conv *m_##apifunc##_pfn)( __VA_ARGS__ ) = m_module->bind<ret(conv *)( __VA_ARGS__ )>(#apifunc);
 
-#define DYNAMIC_API_END() };}}
+#define DYNAMIC_API_END(apiname) }; \
+std::once_flag apiname##_api::s_once; \
+std::unique_ptr<apiname##_api> apiname##_api::s_instance = nullptr; }}
 
 #define DYNAMIC_CALL(apiname, fname, ...) (*osd::dynamicapi::apiname##_api::instance().m_##fname##_pfn) ( __VA_ARGS__ )
 #define DYNAMIC_API_TEST(apiname, fname) (osd::dynamicapi::apiname##_api::instance().m_##fname##_pfn != nullptr)
@@ -129,7 +137,7 @@ public: \
 
 #define DYNAMIC_API_BEGIN(apiname, ...)
 #define DYNAMIC_API_FN(ret, conv, apifunc, ...)
-#define DYNAMIC_API_END()
+#define DYNAMIC_API_END(apiname)
 
 #define DYNAMIC_CALL(apiname, fname, ...) fname( __VA_ARGS__ )
 #define DYNAMIC_API_TEST(apiname, fname) (true)

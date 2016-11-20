@@ -27,7 +27,7 @@
 
 DYNAMIC_API_BEGIN(dxgi, "dxgi.dll")
 	DYNAMIC_API_FN(DWORD, WINAPI, CreateDXGIFactory1, REFIID, void**)
-DYNAMIC_API_END()
+DYNAMIC_API_END(dxgi)
 
 using namespace Microsoft::WRL;
 
