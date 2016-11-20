@@ -37,7 +37,9 @@ public:
 		m_uart0(*this, "uart0"),
 		m_uart1(*this, "uart1"),
 		m_eeprom0(*this, "eeprom0"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette"),
+		m_vram(*this, "vram")
+	{ }
 
 	uint32_t m_test_x,m_test_y,m_start_offs;
 	uint8_t m_type;
@@ -51,6 +53,7 @@ public:
 	required_device<ns16550_device> m_uart1;
 	required_device<eeprom_serial_93cxx_device> m_eeprom0;
 	required_device<palette_device> m_palette;
+	required_shared_ptr<uint64_t> m_vram;
 };
 
 
@@ -60,6 +63,7 @@ void aristmk6_state::video_start()
 
 uint32_t aristmk6_state::screen_update_aristmk6(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
+#if 0
 	int x,y,count;
 	const uint8_t *blit_ram = memregion("maincpu")->base();
 
@@ -133,6 +137,33 @@ uint32_t aristmk6_state::screen_update_aristmk6(screen_device &screen, bitmap_rg
 			}
 		}
 	}
+#else
+
+	int count = 0;
+	for (int y = 0;y < 480;y++)
+	{
+		for (int x = 0;x < 640/2;x++)
+		{
+			uint64_t pix = m_vram[count];
+
+			uint32_t pix1;
+			int col;
+			
+			pix1 = pix & 0xffffffff;
+			col = 0;
+			if (pix1) col = 1;
+			bitmap.pix32(y, x*2) = m_palette->pen(col);
+
+			pix1 = pix >> 32;
+			col = 0;
+			if (pix1) col = 1;
+			bitmap.pix32(y, x*2+1) = m_palette->pen(col);
+
+
+			count++;
+		}
+	}
+#endif
 
 	return 0;
 }
@@ -174,7 +205,7 @@ READ64_MEMBER(aristmk6_state::hwver_r)
 
 static ADDRESS_MAP_START( aristmk6_map, AS_PROGRAM, 64, aristmk6_state )
 	AM_RANGE(0x00000000, 0x003fffff) AM_ROM AM_REGION("maincpu", 0)
-	AM_RANGE(0x04000000, 0x05ffffff) AM_RAM // VRAM 32MB
+	AM_RANGE(0x04000000, 0x05ffffff) AM_RAM AM_SHARE("vram") // VRAM 32MB
 	AM_RANGE(0x08000000, 0x097fffff) AM_ROM AM_REGION("game_rom", 0)
 	AM_RANGE(0x0c000000, 0x0cffffff) AM_RAM // Main RAM 16MB
 	AM_RANGE(0x10800000, 0x1087ffff) AM_RAM // SRAM0 512KB
