@@ -741,7 +741,7 @@ void aristmk5_state::machine_reset()
 		uint8_t *PRG;// = memregion("prg_code")->base();
 		int i;
 		uint8_t op_mode;
-		static const char *const rom_region[] = { "set_chip_4.04", "set_chip_4.4", "clear_chip", "game_prg" };
+		static const char *const rom_region[] = { "set_4.04.09", "set_4.04.00", "set_4.02.04", "game_prg" };
 
 		op_mode = ioport("ROM_LOAD")->read();
 
@@ -753,6 +753,7 @@ void aristmk5_state::machine_reset()
 			ROM[i] = PRG[i];
 	}
 }
+
 
 #if 0
 #define NVRAM_SIZE 256
