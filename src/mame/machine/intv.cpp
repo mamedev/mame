@@ -280,7 +280,7 @@ READ8_MEMBER( intv_state::intvkbd_periph_r )
 
 WRITE8_MEMBER( intv_state::intvkbd_periph_w )
 {
-	static FILE *fp = fopen("printer.txt","wb");
+	static FILE *fp = 0;
 	
 	switch(offset) {
 		case 0x06:
@@ -292,6 +292,8 @@ WRITE8_MEMBER( intv_state::intvkbd_periph_w )
 		break;
 		case 0x07:
 			//logerror("Printing: 0x%02x, %c\n",data,data);
+			if (fp == 0)
+				fp = fopen("printer.txt","wb");
 			fputc(data, fp);
 			fflush(fp);
 			not_busy = 0;
