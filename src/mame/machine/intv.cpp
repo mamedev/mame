@@ -36,8 +36,6 @@ WRITE8_MEMBER( intv_state::intvkbd_dualport8_lsb_w )
 	RAM[offset] = data;
 }
 
-
-
 READ8_MEMBER( intv_state::intvkbd_dualport8_msb_r )
 {
 	unsigned char rv;
@@ -46,31 +44,44 @@ READ8_MEMBER( intv_state::intvkbd_dualport8_msb_r )
 	{
 		switch (offset)
 		{
+			// These next 8 locations all map to bit7
 			case 0x000:
+				// "Data from Cassette"
+				// Tape drive does the decoding to bits
 				rv = m_io_test->read() & 0x80;
-				//logerror("TAPE: Read %02x from 0x40%02x - XOR Data?\n",rv,offset);
 				break;
 			case 0x001:
+				// "Watermark"
+				// 0 = Drive Busy Executing Command?, 1 = Drive Ok?
 				rv = (m_io_test->read() & 0x40) << 1;
-				//logerror("TAPE: Read %02x from 0x40%02x - Sense 1?\n",rv,offset);
 				break;
 			case 0x002:
+				// "End of Tape"
+				// 0 = Recordable surface, 1 = Leader Detect
+				// (Leader is transparent, optical sensor)
 				rv = (m_io_test->read() & 0x20) << 2;
 				//logerror("TAPE: Read %02x from 0x40%02x - Sense 2?\n",rv,offset);
 				break;
 			case 0x003:
+				// "Cassette Present"
+				// 0 = Tape Present, 1 = Tape Not Present
 				rv = (m_io_test->read() & 0x10) << 3;
 				//logerror("TAPE: Read %02x from 0x40%02x - Tape Present\n",rv,offset);
 				break;
 			case 0x004:
+				// "NOT Inter Record Gap (IRG)"
+				// 0 = Not Playing/Recording?, 1 = Playing/Recording?
 				rv = (m_io_test->read() & 0x08) << 4;
 				//logerror("TAPE: Read %02x from 0x40%02x - Comp (339/1)\n",rv,offset);
 				break;
 			case 0x005:
+				// "Dropout"
+				// 0 = Data Detect, 1 = No Data
 				rv = (m_io_test->read() & 0x04) << 5;
 				//logerror("TAPE: Read %02x from 0x40%02x - Clocked Comp (339/13)\n",rv,offset);
 				break;
 			case 0x006:
+				// "NOT Clock Interrupt"
 				if (m_sr1_int_pending)
 					rv = 0x00;
 				else
@@ -78,23 +89,27 @@ READ8_MEMBER( intv_state::intvkbd_dualport8_msb_r )
 				//logerror("TAPE: Read %02x from 0x40%02x - SR1 Int Pending\n",rv,offset);
 				break;
 			case 0x007:
+				// "NOT Tape Interrupt"
 				if (m_tape_int_pending)
 					rv = 0x00;
 				else
 					rv = 0x80;
 				//logerror("TAPE: Read %02x from 0x40%02x - Tape? Int Pending\n",rv,offset);
 				break;
-			case 0x060: /* Keyboard Read */
+			case 0x060:
+				// "Read Keyboard"
 				rv = 0xff;
 				if (m_intvkbd_keyboard_col < 10)
 					rv = m_intv_keyboard[m_intvkbd_keyboard_col]->read();
 				break;
 			case 0x80:
+				// "Clear Tape Interrupt"
 				rv = 0x00;
 				//logerror("TAPE: Read %02x from 0x40%02x, clear tape int pending\n",rv,offset);
 				m_tape_int_pending = 0;
 				break;
 			case 0xa0:
+				// "Clear Clock Interrupt"
 				rv = 0x00;
 				//logerror("TAPE: Read %02x from 0x40%02x, clear SR1 int pending\n",rv,offset);
 				m_sr1_int_pending = 0;
@@ -199,35 +214,58 @@ WRITE8_MEMBER( intv_state::intvkbd_dualport8_msb_w )
 	{
 		switch (offset)
 		{
+			// Bits from offset $20 to $47 are all bit0, write only
+			// These are all set to zero by system reset
 			case 0x020:
+				// "Tape Drive Control: Enable"
 				m_tape_motor_mode &= 3;
 				if (data & 1)
 					m_tape_motor_mode |= 4;
 				//logerror("TAPE: Motor Mode: %s\n",tape_motor_mode_desc[m_tape_motor_mode]);
 				break;
 			case 0x021:
+				// "Tape Drive Control: Forward"
 				m_tape_motor_mode &= 5;
 				if (data & 1)
 					m_tape_motor_mode |= 2;
 				//logerror("TAPE: Motor Mode: %s\n",tape_motor_mode_desc[m_tape_motor_mode]);
 				break;
 			case 0x022:
+				// "Tape Drive Control: Fast"
 				m_tape_motor_mode &= 6;
 				if (data & 1)
 					m_tape_motor_mode |= 1;
 				//logerror("TAPE: Motor Mode: %s\n",tape_motor_mode_desc[m_tape_motor_mode]);
 				break;
 			case 0x023:
+				// "Tape Drive Control: Record"
+				// 0=Read, 1=Write
+				break;
 			case 0x024:
+				// "Tape Drive Control: Mute 1"
+				// 0=Enable Channel B Audio, 1=Mute
+				break;
 			case 0x025:
+				// "Tape Drive Control: Mute 2"
+				// 0=Enable Channel A Audio, 1=Mute	
+				break;
 			case 0x026:
+				// "Tape Drive Control: Mode"
+				// If read mode:
+				//	0=Read Channel B Data, 1 = Read Channel A Data
+				// If write mode:
+				//  0=Write Channel B data, 1 = Record Channel B Audio	
+				break;
 			case 0x027:
+				// "Tape Drive Control: Erase"
 				m_tape_unknown_write[offset - 0x23] = (data & 1);
 				break;
 			case 0x040:
+				// Data to Tape
 				m_tape_unknown_write[5] = (data & 1);
 				break;
 			case 0x041:
+				// "Tape Interrupt Enable"
 				//if (data & 1)
 					//logerror("TAPE: Tape Interrupts Enabled\n");
 				//else
@@ -235,12 +273,14 @@ WRITE8_MEMBER( intv_state::intvkbd_dualport8_msb_w )
 				m_tape_interrupts_enabled = (data & 1);
 				break;
 			case 0x042:
+				// "NOT External Interrupt Enable"
 				//if (data & 1)
 					//logerror("TAPE: Cart Bus Interrupts Disabled\n");
 				//else
 					//logerror("TAPE: Cart Bus Interrupts Enabled\n");
 				break;
 			case 0x043:
+				// "NOT Blank Screen"
 				if (data & 0x01)
 					m_intvkbd_text_blanked = 0;
 				else
@@ -263,10 +303,12 @@ WRITE8_MEMBER( intv_state::intvkbd_dualport8_msb_w )
 				m_intvkbd_keyboard_col |= ((data&0x01)<<3);
 				break;
 			case 0x80:
+				// "Clear Tape Interrupt"
 				//logerror("TAPE: Write to 0x40%02x, clear tape int pending\n",offset);
 				m_tape_int_pending = 0;
 				break;
 			case 0xa0:
+				// "Clear Clock Interrupt"
 				//logerror("TAPE: Write to 0x40%02x, clear SR1 int pending\n",offset);
 				m_sr1_int_pending = 0;
 				break;
