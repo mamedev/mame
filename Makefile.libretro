@@ -1,0 +1,158 @@
+
+VERBOSE ?= 1
+RETRO ?= 1
+NOWERROR ?= 1
+CONFIG ?= libretro"
+NO_USE_MIDI ?= 1
+PTR64 ?= 1 
+TARGET ?= mame
+# OS ?= linux
+# TARGETOS ?= linux
+PYTHON_EXECUTABLE ?= python2
+REGENIE ?= 1
+USELIBCO ?= 1
+
+###########################################################################
+#
+#   LIBRETRO PLATFORM GUESSING
+#
+#   If the caller doesn't specify $platform and $ARCH, we guess
+#
+###########################################################################
+
+UNAME_S = $(shell uname -s)
+UNAME_M = $(shell uname -m)
+ifeq ($(platform),)
+	platform = unix
+	ifeq ($(UNAME_S),)
+		platform = win
+	else ifneq ($(findstring MINGW,$(UNAME_S)),)
+		platform = win
+	else ifneq ($(findstring Darwin,$(UNAME_S)),)
+		platform = osx
+	else ifneq ($(findstring win,$(UNAME_S)),)
+		platform = win
+	endif
+endif
+ifeq ($(ARCH),)
+	LIBRETRO_CPU = $(ARCH)
+endif
+ifeq ($(LIBRETRO_CPU),)
+	ifeq ($(UNAME_M),)
+		ifeq ($(PROCESSOR_ARCHITECTURE),AMD64)
+			LIBRETRO_CPU = x86_64
+		endif
+		ifeq ($(PROCESSOR_ARCHITEW6432),AMD64)
+			LIBRETRO_CPU = x86_64
+		endif
+	else ifeq ($(UNAME_M),amd64)
+		LIBRETRO_CPU = x86_64
+	else
+		LIBRETRO_CPU = $(UNAME_M)
+	endif
+endif
+
+###########################################################################
+#
+#   LIBRETRO PLATFORM-SPECIFIC CONFIGURATION
+#
+#   Settings needed to get MAME to build everywhere we build it
+#
+###########################################################################
+
+ifeq ($(platform), android)
+#	PTR64 = 0
+	# FIXME: Pass these to GENie and test...
+#	CROSS_BUILD = 1
+#	FORCE_DRC_C_BACKEND = 1
+else ifeq ($(platform), osx)
+	PYTHON_EXECUTABLE = python
+else ifneq (,$(findstring ios,$(platform)))
+#	PTR64 = 0
+        LIBRETRO_CPU=arm
+	PYTHON_EXECUTABLE = python
+	# FIXME: Pass these to GENie and test...
+#	CROSS_BUILD = 1
+#	FORCE_DRC_C_BACKEND = 1
+endif
+
+
+###########################################################################
+#
+#   BUILD FLAGS
+#
+###########################################################################
+
+BUILDFLAGS = RETRO=$(RETRO) REGENIE=$(REGENIE) VERBOSE=$(VERBOSE) NOWERROR=$(NOWERROR) OSD="retro" NO_USE_MIDI=$(NO_USE_MIDI) 
+
+ifneq ($(PYTHON_EXECUTABLE),)
+	BUILDFLAGS += PYTHON_EXECUTABLE=$(PYTHON_EXECUTABLE)
+endif
+ifeq ($(DEBUG),1)
+	BUILDFLAGS += CONFIG=libretrodbg
+else
+	BUILDFLAGS += CONFIG=libretro
+endif
+
+
+###########################################################################
+#
+#   PLATFORM FLAGS
+#
+###########################################################################
+
+PLATFLAGS =
+ifneq ($(PTR64),)
+	PLATFLAGS += PTR64=$(PTR64)
+endif
+ifneq ($(platform),)
+	PLATFLAGS += LIBRETRO_OS="$(platform)"
+endif
+ifeq ($(platform),win)
+	ifeq ($(MSYSTEM),MINGW64)
+		MINGW64 ?= /mingw64
+		PLATFLAGS += MINGW64="$(MINGW64)"
+	else ifeq ($(MSYSTEM),MINGW32)
+		MINGW32 ?= /mingw32
+		PLATFLAGS += MINGW32="$(MINGW32)"
+	endif
+endif
+ifneq ($(LIBRETRO_CPU),)
+	PLATFLAGS += ARCH="" LIBRETRO_CPU="$(LIBRETRO_CPU)"
+endif
+ifneq ($(FORCE_DRC_C_BACKEND),)
+	PLATFLAGS += FORCE_DRC_C_BACKEND="$(FORCE_DRC_C_BACKEND)"
+endif
+
+###########################################################################
+#
+#   TARGET FLAGS
+#
+###########################################################################
+
+TARGETFLAGS =
+ifneq ($(TARGET),)
+	TARGETFLAGS += TARGET=$(TARGET)
+endif
+ifneq ($(SUBTARGET),)
+	TARGETFLAGS += SUBTARGET=$(SUBTARGET)
+endif
+
+
+###########################################################################
+#
+#   MAKE RULES
+#
+#   We just call upstream GENie here with appropriate args
+#
+###########################################################################
+
+all: build
+
+build:
+	$(MAKE) $(BUILDFLAGS) $(PLATFLAGS) $(TARGETFLAGS)
+
+clean:
+	$(MAKE) $(BUILDFLAGS) $(PLATFLAGS) $(TARGETFLAGS) clean
+
+.PHONY: all build clean
