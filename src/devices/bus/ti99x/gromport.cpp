@@ -118,6 +118,7 @@
 #define TRACE_GROM 0
 #define TRACE_GKRACKER 0
 #define TRACE_CRU 0
+#define TRACE_BANKSWITCH 0
 
 #define GROM3_TAG "grom3"
 #define GROM4_TAG "grom4"
@@ -1654,7 +1655,7 @@ WRITE8_MEMBER(ti99_cartridge_pcb::write)
 {
 	if (m_romspace_selected)
 	{
-		if (TRACE_ILLWRITE) space.device().logerror("Cannot write to ROM space at %04x\n", offset);
+		if (TRACE_ILLWRITE) m_cart->logerror("Cannot write to ROM space at %04x\n", offset);
 	}
 	else
 	{
@@ -1760,6 +1761,7 @@ WRITE8_MEMBER(ti99_paged12k_cartridge::write)
 	if (m_romspace_selected)
 	{
 		m_rom_page = (offset >> 1) & 1;
+		if (TRACE_BANKSWITCH) if ((offset & 1)==0) m_cart->logerror("Set ROM page = %d (writing to %04x)\n", m_rom_page, (offset | 0x6000));
 	}
 	else
 	{
@@ -1807,6 +1809,7 @@ WRITE8_MEMBER(ti99_paged16k_cartridge::write)
 	if (m_romspace_selected)
 	{
 		m_rom_page = (offset >> 1) & 1;
+		if (TRACE_BANKSWITCH) if ((offset & 1)==0) m_cart->logerror("Set ROM page = %d (writing to %04x)\n", m_rom_page, (offset | 0x6000));
 	}
 	else
 	{
@@ -1863,7 +1866,7 @@ WRITE8_MEMBER(ti99_minimem_cartridge::write)
 	{
 		if ((offset & 0x1000)==0x0000)
 		{
-			if (TRACE_ILLWRITE) space.device().logerror("Write access to cartridge ROM at address %04x ignored", offset);
+			if (TRACE_ILLWRITE) m_cart->logerror("Write access to cartridge ROM at address %04x ignored", offset);
 		}
 		else
 		{
@@ -1969,7 +1972,7 @@ READ8Z_MEMBER(ti99_super_cartridge::crureadz)
 
 	if ((offset & 0xfff0) == 0x0800)
 	{
-		if (TRACE_CRU) space.device().logerror("CRU accessed at %04x\n", offset);
+		if (TRACE_CRU) m_cart->logerror("CRU accessed at %04x\n", offset);
 		uint8_t val = 0x02 << (m_ram_page << 1);
 		*value = (val >> ((offset - 0x0800)>>1)) & 0xff;
 	}
@@ -1979,9 +1982,12 @@ WRITE8_MEMBER(ti99_super_cartridge::cruwrite)
 {
 	if ((offset & 0xfff0) == 0x0800)
 	{
-		if (TRACE_CRU) space.device().logerror("CRU accessed at %04x\n", offset);
+		if (TRACE_CRU) m_cart->logerror("CRU accessed at %04x\n", offset);
 		if (data != 0)
+		{
 			m_ram_page = (offset-0x0802)>>2;
+			if (TRACE_BANKSWITCH) if ((offset & 1)==0) m_cart->logerror("Set RAM page = %d (CRU address %04x)\n", m_ram_page, offset);
+		}
 	}
 }
 
@@ -2034,7 +2040,7 @@ READ8Z_MEMBER(ti99_mbx_cartridge::readz)
 		{
 			// Also reads the value of 6ffe
 			*value = m_ram_ptr[offset & 0x03ff];
-			if (TRACE_READ) space.device().logerror("%04x (RAM) -> %02x\n", offset + 0x6000, *value);
+			if (TRACE_READ) m_cart->logerror("%04x (RAM) -> %02x\n", offset + 0x6000, *value);
 		}
 		else
 		{
@@ -2045,7 +2051,7 @@ READ8Z_MEMBER(ti99_mbx_cartridge::readz)
 				else  // 7000 area
 					*value = m_rom_ptr[(offset & 0x0fff) | (m_rom_page << 12)];
 
-				if (TRACE_READ) space.device().logerror("%04x(%04x) -> %02x\n", offset + 0x6000, offset | (m_rom_page<<13), *value);
+				if (TRACE_READ) m_cart->logerror("%04x(%04x) -> %02x\n", offset + 0x6000, offset | (m_rom_page<<13), *value);
 			}
 		}
 	}
@@ -2066,13 +2072,13 @@ WRITE8_MEMBER(ti99_mbx_cartridge::write)
 			{
 				// Valid values are 0, 1, 2, 3
 				m_rom_page = data & 3;
-				if (TRACE_WRITE) if ((offset & 1)==0) space.device().logerror("Set ROM page = %d\n", data);
+				if (TRACE_BANKSWITCH) if ((offset & 1)==0) m_cart->logerror("Set ROM page = %d (writing to %04x)\n", m_rom_page, (offset | 0x6000));
 			}
 
 			if (m_ram_ptr != nullptr)
 				m_ram_ptr[offset & 0x03ff] = data;
 			else
-				if (TRACE_ILLWRITE) space.device().logerror("Write access to %04x but no RAM present\n", offset+0x6000);
+				if (TRACE_ILLWRITE) m_cart->logerror("Write access to %04x but no RAM present\n", offset+0x6000);
 		}
 	}
 	else
@@ -2150,6 +2156,7 @@ WRITE8_MEMBER(ti99_paged379i_cartridge::write)
 
 		// The page is determined by the inverted outputs.
 		m_rom_page = (~offset)>>1 & mask;
+		if (TRACE_BANKSWITCH) if ((offset & 1)==0) m_cart->logerror("Set ROM page = %d (writing to %04x)\n", m_rom_page, (offset | 0x6000));
 	}
 }
 
@@ -2190,6 +2197,7 @@ WRITE8_MEMBER(ti99_paged378_cartridge::write)
 	if (m_romspace_selected)
 	{
 		m_rom_page = ((offset >> 1)&0x003f);
+		if (TRACE_BANKSWITCH) if ((offset & 1)==0) m_cart->logerror("Set ROM page = %d (writing to %04x)\n", m_rom_page, (offset | 0x6000));
 	}
 }
 
@@ -2226,7 +2234,10 @@ WRITE8_MEMBER(ti99_paged377_cartridge::write)
 	// Bits: 011x xxxb bbbb bbbx
 	// x = don't care, bbbb = bank
 	if (m_romspace_selected)
+	{
 		m_rom_page = ((offset >> 1)&0x00ff);
+		if (TRACE_BANKSWITCH) if ((offset & 1)==0) m_cart->logerror("Set ROM page = %d (writing to %04x)\n", m_rom_page, (offset | 0x6000));
+	}
 }
 
 /*****************************************************************************
@@ -2298,6 +2309,7 @@ WRITE8_MEMBER(ti99_pagedcru_cartridge::cruwrite)
 		if (data != 0 && bit > 0)
 		{
 			m_rom_page = (bit-1)/2;
+			if (TRACE_BANKSWITCH) m_cart->logerror("Set ROM page = %d (CRU address %d)\n", m_rom_page, offset);
 		}
 	}
 }
@@ -2394,6 +2406,7 @@ WRITE8_MEMBER(ti99_gromemu_cartridge::write)
 			return; // no paging
 		}
 		m_rom_page = (offset >> 1) & 1;
+		if (TRACE_BANKSWITCH) if ((offset & 1)==0) m_cart->logerror("Set ROM page = %d (writing to %04x)\n", m_rom_page, (offset | 0x6000));
 	}
 	else
 	{
@@ -2445,7 +2458,7 @@ WRITE8_MEMBER(ti99_gromemu_cartridge::gromemuwrite)
 	}
 	else
 	{
-		if (TRACE_ILLWRITE) space.device().logerror("Ignoring write to GROM area at address %04x\n", m_grom_address);
+		if (TRACE_ILLWRITE) m_cart->logerror("Ignoring write to GROM area at address %04x\n", m_grom_address);
 	}
 }
 
