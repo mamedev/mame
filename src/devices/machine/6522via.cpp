@@ -495,7 +495,7 @@ void via6522_device::output_pb()
 READ8_MEMBER( via6522_device::read )
 {
 	int val = 0;
-	if (machine().debugger_access())
+	if (space.debugger_access())
 		return 0;
 
 	offset &= 0xf;

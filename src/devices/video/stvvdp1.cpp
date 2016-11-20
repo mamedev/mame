@@ -174,7 +174,7 @@ READ16_MEMBER( saturn_state::saturn_vdp1_regs_r )
 
 			return modr;
 		default:
-			if(!machine().debugger_access())
+			if(!space.debugger_access())
 				printf ("cpu %s (PC=%08X) VDP1: Read from Registers, Offset %04x\n", space.device().tag(), space.device().safe_pc(), offset*2);
 			break;
 	}

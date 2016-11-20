@@ -413,7 +413,7 @@ WRITE8_MEMBER(superqix_state::sqixu_mcu_p2_w)
 READ8_MEMBER(superqix_state::sqixu_mcu_p3_r)
 {
 //  logerror("%04x: read Z80 command %02x\n",space.device().safe_pc(),m_fromZ80);
-	if(!machine().debugger_access())
+	if(!space.debugger_access())
 	{
 		m_Z80HasWritten = 0;
 	}
@@ -423,7 +423,7 @@ READ8_MEMBER(superqix_state::sqixu_mcu_p3_r)
 
 READ8_MEMBER(superqix_state::nmi_ack_r)
 {
-	if(!machine().debugger_access())
+	if(!space.debugger_access())
 	{
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
 	}

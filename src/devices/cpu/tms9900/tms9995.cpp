@@ -90,7 +90,6 @@
 */
 
 #include "tms9995.h"
-#include "debug/debugcpu.h"
 
 #define NOPRG -1
 
@@ -364,10 +363,10 @@ void tms9995_device::device_reset()
 
 const char* tms9995_device::s_statename[20] =
 {
-	"PC", "WP", "ST", "IR",
-	"R0", "R1", "R2", "R3",
-	"R4", "R5", "R6", "R7",
-	"R8", "R9", "R10", "R11",
+	"PC ", "WP ", "ST ", "IR ",
+	"R0 ", "R1 ", "R2 ", "R3 ",
+	"R4 ", "R5 ", "R6 ", "R7 ",
+	"R8 ", "R9 ", "R10", "R11",
 	"R12", "R13", "R14", "R15"
 };
 
@@ -462,19 +461,29 @@ void tms9995_device::state_string_export(const device_state_entry &entry, std::s
 */
 uint16_t tms9995_device::read_workspace_register_debug(int reg)
 {
+	int temp = m_icount;
+	uint16_t value;
+
 	int addrb = (WP + (reg << 1)) & 0xfffe;
 
 	if (is_onchip(addrb))
 	{
-		return (m_onchip_memory[addrb & 0x00fe]<<8) | m_onchip_memory[(addrb & 0x00fe) + 1];
+		value = (m_onchip_memory[addrb & 0x00fe]<<8) | m_onchip_memory[(addrb & 0x00fe) + 1];
 	}
-
-	return (machine().debugger().cpu().read_byte(*m_prgspace, addrb, true) << 8) |
-		machine().debugger().cpu().read_byte(*m_prgspace, addrb + 1, true);
+	else
+	{
+		m_prgspace->set_debugger_access(true);
+		value = (m_prgspace->read_byte(addrb) << 8) & 0xff00;
+		value |= m_prgspace->read_byte(addrb+1);
+		m_prgspace->set_debugger_access(false);
+	}
+	m_icount = temp;
+	return value;
 }
 
 void tms9995_device::write_workspace_register_debug(int reg, uint16_t data)
 {
+	int temp = m_icount;
 	int addrb = (WP + (reg << 1)) & 0xfffe;
 
 	if (is_onchip(addrb))
@@ -484,9 +493,12 @@ void tms9995_device::write_workspace_register_debug(int reg, uint16_t data)
 	}
 	else
 	{
-		machine().debugger().cpu().write_byte(*m_prgspace, addrb, (data >> 8) & 0xff, true);
-		machine().debugger().cpu().write_byte(*m_prgspace, addrb + 1, data & 0xff, true);
+		m_prgspace->set_debugger_access(true);
+		m_prgspace->write_byte(addrb, (data >> 8) & 0xff);
+		m_prgspace->write_byte(addrb+1, data & 0xff);
+		m_prgspace->set_debugger_access(false);
 	}
+	m_icount = temp;
 }
 
 const address_space_config *tms9995_device::memory_space_config(address_spacenum spacenum) const

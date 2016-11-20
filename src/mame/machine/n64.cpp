@@ -2656,7 +2656,7 @@ WRITE32_MEMBER( n64_periphs::dd_reg_w )
 
 READ32_MEMBER( n64_periphs::pif_ram_r )
 {
-	if(!machine().debugger_access())
+	if(!space.debugger_access())
 	{
 		if( offset == ( 0x24 / 4 ) )
 		{

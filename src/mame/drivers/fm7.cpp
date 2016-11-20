@@ -366,7 +366,7 @@ READ8_MEMBER(fm7_state::fm7_fd04_r)
  */
 READ8_MEMBER(fm7_state::fm7_rom_en_r)
 {
-	if(!machine().debugger_access())
+	if(!space.debugger_access())
 	{
 		uint8_t* RAM = memregion("maincpu")->base();
 

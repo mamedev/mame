@@ -473,7 +473,7 @@ uint32_t napple2_state::screen_update_jp(screen_device &screen, bitmap_ind16 &bi
 // most softswitches don't care about read vs write, so handle them here
 void napple2_state::do_io(address_space &space, int offset)
 {
-	if(machine().debugger_access())
+	if(space.debugger_access())
 	{
 		return;
 	}
@@ -642,7 +642,7 @@ WRITE8_MEMBER(napple2_state::c000_w)
 
 READ8_MEMBER(napple2_state::c080_r)
 {
-	if(!machine().debugger_access())
+	if(!space.debugger_access())
 	{
 		int slot;
 
@@ -679,7 +679,7 @@ READ8_MEMBER(napple2_state::c100_r)
 
 	if (m_slotdevice[slotnum] != nullptr)
 	{
-		if ((m_slotdevice[slotnum]->take_c800()) && (!machine().debugger_access()))
+		if ((m_slotdevice[slotnum]->take_c800()) && (!space.debugger_access()))
 		{
 			m_cnxx_slot = slotnum;
 		}
@@ -698,7 +698,7 @@ WRITE8_MEMBER(napple2_state::c100_w)
 
 	if (m_slotdevice[slotnum] != nullptr)
 	{
-		if ((m_slotdevice[slotnum]->take_c800()) && (!machine().debugger_access()))
+		if ((m_slotdevice[slotnum]->take_c800()) && (!space.debugger_access()))
 		{
 			m_cnxx_slot = slotnum;
 		}
@@ -711,7 +711,7 @@ READ8_MEMBER(napple2_state::c800_r)
 {
 	if (offset == 0x7ff)
 	{
-		if (!machine().debugger_access())
+		if (!space.debugger_access())
 		{
 			m_cnxx_slot = -1;
 		}
@@ -731,7 +731,7 @@ WRITE8_MEMBER(napple2_state::c800_w)
 {
 	if (offset == 0x7ff)
 	{
-		if (!machine().debugger_access())
+		if (!space.debugger_access())
 		{
 			m_cnxx_slot = -1;
 		}

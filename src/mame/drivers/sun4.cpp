@@ -712,7 +712,7 @@ uint32_t sun4_state::read_insn_data_4c(uint8_t asi, address_space &space, uint32
 	}
 	else
 	{
-		if (!machine().debugger_access())
+		if (!space.debugger_access())
 		{
 			printf("sun4c: INVALID PTE entry %d %08x accessed!  vaddr=%x PC=%x\n", entry, m_pagemap[entry], offset <<2, m_maincpu->pc());
 			//m_maincpu->trap(SPARC_DATA_ACCESS_EXCEPTION);
@@ -779,7 +779,7 @@ READ32_MEMBER( sun4_state::sun4c_mmu_r )
 	uint32_t retval = 0;
 
 	// make debugger fetches emulate supervisor program for best compatibility with boot PROM execution
-	if (machine().debugger_access()) asi = 9;
+	if (space.debugger_access()) asi = 9;
 
 	// supervisor program fetches in boot state are special
 	if ((!(m_system_enable & ENA_NOTBOOT)) && (asi == 9))
@@ -858,7 +858,7 @@ READ32_MEMBER( sun4_state::sun4c_mmu_r )
 		return read_insn_data_4c(asi, space, offset, mem_mask);
 
 	default:
-		if (!machine().debugger_access()) printf("sun4c: ASI %d unhandled read @ %x (PC=%x)\n", asi, offset<<2, m_maincpu->pc());
+		if (!space.debugger_access()) printf("sun4c: ASI %d unhandled read @ %x (PC=%x)\n", asi, offset<<2, m_maincpu->pc());
 		return 0;
 	}
 
@@ -1003,7 +1003,7 @@ uint32_t sun4_state::read_insn_data(uint8_t asi, address_space &space, uint32_t 
 	}
 	else
 	{
-		if (!machine().debugger_access())
+		if (!space.debugger_access())
 		{
 			printf("sun4: INVALID PTE entry %d %08x accessed!  vaddr=%x PC=%x\n", entry, m_pagemap[entry], offset <<2, m_maincpu->pc());
 			//m_maincpu->trap(SPARC_DATA_ACCESS_EXCEPTION);
@@ -1060,7 +1060,7 @@ READ32_MEMBER( sun4_state::sun4_mmu_r )
 	int page;
 
 	// make debugger fetches emulate supervisor program for best compatibility with boot PROM execution
-	if (machine().debugger_access()) asi = 9;
+	if (space.debugger_access()) asi = 9;
 
 	// supervisor program fetches in boot state are special
 	if ((!(m_system_enable & ENA_NOTBOOT)) && (asi == 9))
@@ -1139,7 +1139,7 @@ READ32_MEMBER( sun4_state::sun4_mmu_r )
 		return read_insn_data(asi, space, offset, mem_mask);
 
 	default:
-		if (!machine().debugger_access()) printf("sun4: ASI %d unhandled read @ %x (PC=%x)\n", asi, offset<<2, m_maincpu->pc());
+		if (!space.debugger_access()) printf("sun4: ASI %d unhandled read @ %x (PC=%x)\n", asi, offset<<2, m_maincpu->pc());
 		return 0;
 	}
 
@@ -1474,7 +1474,7 @@ ADDRESS_MAP_END
 
 READ8_MEMBER( sun4_state::fdc_r )
 {
-	if (machine().debugger_access())
+	if (space.debugger_access())
 		return 0;
 
 	switch(offset)

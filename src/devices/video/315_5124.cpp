@@ -565,7 +565,7 @@ READ8_MEMBER( sega315_5124_device::vram_read )
 	/* Return read buffer contents */
 	temp = m_buffer;
 
-	if ( !machine().debugger_access() )
+	if ( !space.debugger_access() )
 	{
 		/* Load read buffer */
 		m_buffer = this->space().read_byte(m_addr & 0x3fff);
@@ -632,7 +632,7 @@ READ8_MEMBER( sega315_5124_device::register_read )
 	check_pending_flags();
 	temp = m_status;
 
-	if ( !machine().debugger_access() )
+	if ( !space.debugger_access() )
 	{
 		/* Clear pending write flag */
 		m_pending_reg_write = 0;

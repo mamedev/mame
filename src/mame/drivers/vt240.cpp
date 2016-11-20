@@ -374,7 +374,7 @@ WRITE8_MEMBER(vt240_state::vom_w)
 
 READ16_MEMBER(vt240_state::vram_r)
 {
-	if(!BIT(m_reg0, 3) || machine().debugger_access())
+	if(!BIT(m_reg0, 3) || space.debugger_access())
 	{
 		offset = ((offset & 0x18000) >> 1) | (offset & 0x3fff);
 		return m_video_ram[offset & 0x7fff];

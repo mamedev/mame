@@ -184,7 +184,7 @@ READ8_MEMBER(c65_state::vic4567_dummy_r)
 			return m_VIC3_ControlB;
 	}
 
-	if(!machine().debugger_access())
+	if(!space.debugger_access())
 		printf("%02x\n",offset); // TODO: PC
 	return res;
 }
@@ -219,7 +219,7 @@ WRITE8_MEMBER(c65_state::vic4567_dummy_w)
 			m_VIC3_ControlB = data;
 			break;
 		default:
-			if(!machine().debugger_access())
+			if(!space.debugger_access())
 				printf("%02x %02x\n",offset,data);
 			break;
 	}

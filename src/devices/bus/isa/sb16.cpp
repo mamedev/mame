@@ -12,7 +12,7 @@ const device_type ISA16_SB16 = &device_creator<sb16_lle_device>;
 
 READ8_MEMBER( sb16_lle_device::dsp_data_r )
 {
-	if(!machine().debugger_access())
+	if(!space.debugger_access())
 		m_data_in = false;
 
 	return m_in_byte;

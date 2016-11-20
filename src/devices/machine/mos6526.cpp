@@ -801,7 +801,7 @@ void mos6526_device::execute_run()
 
 READ8_MEMBER( mos6526_device::read )
 {
-	if (machine().debugger_access())
+	if (space.debugger_access())
 		return 0xff;
 
 	uint8_t data = 0;

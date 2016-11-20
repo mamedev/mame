@@ -90,7 +90,7 @@ public:
 
 READ16_MEMBER(symbolics_state::buserror_r)
 {
-	if(!machine().debugger_access())
+	if(!space.debugger_access())
 	{
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);

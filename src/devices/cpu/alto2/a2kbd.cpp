@@ -31,11 +31,11 @@ READ16_MEMBER( alto2_cpu_device::kbd_ad_r )
 		break;
 	}
 	m_kbd.matrix[offset & 03] = data;
-	if (!machine().debugger_access()) {
+	if (!space.debugger_access()) {
 		LOG((this,LOG_KBD,2,"    read KBDAD+%o (%#o)\n", offset & 3, data));
 	}
 	if (0 == (offset & 3) && (m_kbd.bootkey != 0177777)) {
-		if (!machine().debugger_access()) {
+		if (!space.debugger_access()) {
 			LOG((this,0,2,"  boot keys (%#o & %#o)\n", data, m_kbd.bootkey));
 		}
 		data &= m_kbd.bootkey;

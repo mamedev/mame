@@ -326,9 +326,8 @@ field:      X address   D           Function    Y address   D (part 2)
 */
 
 #include "emu.h"
-#include "apexc.h"
 #include "debugger.h"
-#include "debug/debugcpu.h"
+#include "apexc.h"
 
 
 const device_type APEXC = &device_creator<apexc_cpu_device>;
@@ -803,7 +802,7 @@ void apexc_cpu_device::state_import(const device_state_entry &entry)
 			}
 
 			/* fetch current instruction into control register */
-			m_cr = machine().debugger().cpu().read_dword(*m_program, m_pc, true);
+			m_cr = m_program->read_dword(m_pc);
 			break;
 
 		case APEXC_ML:

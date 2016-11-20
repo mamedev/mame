@@ -94,7 +94,7 @@ void zx_state::recalc_hsync()
 READ8_MEMBER(zx_state::ula_low_r)
 {
 	uint8_t cdata = m_program->read_byte(offset);
-	if(machine().debugger_access())
+	if(space.debugger_access())
 		return cdata;
 
 	if(m_maincpu->state_int(Z80_HALT))
@@ -113,7 +113,7 @@ READ8_MEMBER(zx_state::ula_high_r)
 {
 	uint8_t cdata = m_program->read_byte(offset);
 
-	if(machine().debugger_access())
+	if(space.debugger_access())
 		return cdata;
 
 	if(m_maincpu->state_int(Z80_HALT))

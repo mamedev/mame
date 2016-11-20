@@ -377,7 +377,7 @@ void mos6551_device::write_command(uint8_t data)
 
 READ8_MEMBER( mos6551_device::read )
 {
-	if (machine().debugger_access())
+	if (space.debugger_access())
 		return 0xff;
 
 	switch (offset & 0x03)

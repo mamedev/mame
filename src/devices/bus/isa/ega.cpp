@@ -963,7 +963,7 @@ READ8_MEMBER( isa8_ega_device::read )
 {
 	uint8_t data = 0xFF;
 
-	if ( !machine().debugger_access() && ! ( m_sequencer.data[4] & 0x04 ) )
+	if ( !space.debugger_access() && ! ( m_sequencer.data[4] & 0x04 ) )
 	{
 		/* Fill read latches */
 		m_read_latch[0] = m_plane[0][offset & 0xffff];

@@ -6,7 +6,6 @@
  *
  *****************************************************************************/
 #include "alto2cpu.h"
-#include "debug/debugcpu.h"
 
 #define PUT_EVEN(dword,word)            X_WRBITS(dword,32, 0,15,word)
 #define GET_EVEN(dword)                 X_RDBITS(dword,32, 0,15)
@@ -485,7 +484,7 @@ uint32_t alto2_cpu_device::hamming_code(bool write, uint32_t dw_addr, uint32_t d
 READ16_MEMBER( alto2_cpu_device::mear_r )
 {
 	int data = m_mem.error ? m_mem.mear : m_mem.mar;
-	if (!machine().debugger_access()) {
+	if (!space.debugger_access()) {
 		LOG((this,LOG_MEM,2,"    MEAR read %07o\n", data));
 	}
 	return data;
@@ -510,7 +509,7 @@ READ16_MEMBER( alto2_cpu_device::mear_r )
 READ16_MEMBER( alto2_cpu_device::mesr_r )
 {
 	uint16_t data = m_mem.mesr ^ 0177777;
-	if (!machine().debugger_access()) {
+	if (!space.debugger_access()) {
 		LOG((this,LOG_MEM,2,"    MESR read %07o\n", data));
 		LOG((this,LOG_MEM,6,"        Hamming code read    : %#o\n", GET_MESR_HAMMING(data)));
 		LOG((this,LOG_MEM,6,"        Parity error         : %o\n", GET_MESR_PERR(data)));
@@ -523,7 +522,7 @@ READ16_MEMBER( alto2_cpu_device::mesr_r )
 
 WRITE16_MEMBER( alto2_cpu_device::mesr_w )
 {
-	if (!machine().debugger_access()) {
+	if (!space.debugger_access()) {
 		LOG((this,LOG_MEM,2,"    MESR write %07o (clear MESR; was %07o)\n", data, m_mem.mesr));
 		m_mem.mesr = 0;     // set all bits to 0
 		m_mem.error = 0;    // reset the error flag
@@ -558,7 +557,7 @@ WRITE16_MEMBER( alto2_cpu_device::mecr_w )
 	// clear spare bits
 	X_WRBITS(m_mem.mecr,16, 0, 3,0);
 	X_WRBITS(m_mem.mecr,16,15,15,0);
-	if (!machine().debugger_access()) {
+	if (!space.debugger_access()) {
 		LOG((this,LOG_MEM,2,"    MECR write %07o\n", data));
 		LOG((this,LOG_MEM,6,"        Test Hamming code    : %#o\n", GET_MECR_TEST_CODE(m_mem.mecr)));
 		LOG((this,LOG_MEM,6,"        Test mode            : %s\n", GET_MECR_TEST_MODE(m_mem.mecr) ? "on" : "off"));
@@ -575,7 +574,7 @@ READ16_MEMBER( alto2_cpu_device::mecr_r )
 {
 	uint16_t data = m_mem.mecr ^ 0177777;
 	// all spare bits are set
-	if (!machine().debugger_access()) {
+	if (!space.debugger_access()) {
 		LOG((this,LOG_MEM,2,"    MECR read %07o\n", data));
 		LOG((this,LOG_MEM,6,"        Test Hamming code    : %#o\n", GET_MECR_TEST_CODE(data)));
 		LOG((this,LOG_MEM,6,"        Test mode            : %s\n", GET_MECR_TEST_MODE(data) ? "on" : "off"));
@@ -772,7 +771,9 @@ uint16_t alto2_cpu_device::debug_read_mem(uint32_t addr)
 	int base_addr = addr & 0177777;
 	int data;
 	if (addr >= ALTO2_IO_PAGE_BASE && addr < ALTO2_RAM_SIZE) {
-		data = machine().debugger().cpu().read_word(*m_iomem, m_iomem->address_to_byte(base_addr), true);
+		space(AS_2).set_debugger_access(true);
+		data = m_iomem->read_word(m_iomem->address_to_byte(base_addr));
+		space(AS_2).set_debugger_access(false);
 	} else {
 		data = (addr & ALTO2_MEM_ODD) ? GET_ODD(m_mem.ram[addr/2]) : GET_EVEN(m_mem.ram[addr/2]);
 	}
@@ -789,7 +790,9 @@ void alto2_cpu_device::debug_write_mem(uint32_t addr, uint16_t data)
 {
 	int base_addr = addr & 0177777;
 	if (addr >= ALTO2_IO_PAGE_BASE && addr < ALTO2_RAM_SIZE) {
-		machine().debugger().cpu().write_word(*m_iomem, m_iomem->address_to_byte(base_addr), data, true);
+		space(AS_2).set_debugger_access(true);
+		m_iomem->write_word(m_iomem->address_to_byte(base_addr), data);
+		space(AS_2).set_debugger_access(false);
 	} else if (addr & ALTO2_MEM_ODD) {
 		PUT_ODD(m_mem.ram[addr/2], data);
 	} else {

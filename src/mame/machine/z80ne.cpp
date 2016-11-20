@@ -179,11 +179,12 @@ DIRECT_UPDATE_MEMBER(z80ne_state::z80ne_nmi_delay_count)
  */
 DIRECT_UPDATE_MEMBER(z80ne_state::z80ne_reset_delay_count)
 {
+	address_space &space = m_maincpu->space(AS_PROGRAM);
 	/*
 	 * TODO: when debugger is active, his memory access causes this callback
 	 *
 	 */
-	if(!machine().debugger_access())
+	if(!space.debugger_access())
 		m_reset_delay_counter--;
 
 	if (!m_reset_delay_counter)

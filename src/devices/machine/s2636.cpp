@@ -414,7 +414,7 @@ READ8_MEMBER( s2636_device::read_data )
 	{
 	case REG_COL_BG_CMPL:
 	case REG_VBL_COL_OBJ:
-		if (!machine().debugger_access())
+		if (!space.debugger_access())
 			m_registers[offset] = 0x00; // collision/completion/VRESET flags reset on read
 		break;
 	}

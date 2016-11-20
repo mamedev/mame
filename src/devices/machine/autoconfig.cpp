@@ -123,7 +123,7 @@ READ16_MEMBER( amiga_autoconfig::autoconfig_read )
 {
 	uint16_t data = m_cfg[offset] | 0x0fff;
 
-	if (VERBOSE && !space.machine().debugger_access())
+	if (VERBOSE && !space.debugger_access())
 		space.device().logerror("autoconfig_read %04x @ %02x [mask = %04x]\n", data, offset, mem_mask);
 
 	return data;
@@ -131,7 +131,7 @@ READ16_MEMBER( amiga_autoconfig::autoconfig_read )
 
 WRITE16_MEMBER( amiga_autoconfig::autoconfig_write )
 {
-	if (VERBOSE && !space.machine().debugger_access())
+	if (VERBOSE && !space.debugger_access())
 		space.device().logerror("autoconfig_write %04x @ %02x [mask = %04x]\n", data, offset, mem_mask);
 
 	switch (offset)
