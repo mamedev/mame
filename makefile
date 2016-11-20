@@ -1083,6 +1083,9 @@ endif
 ifdef RETRO
 ##RETRO HACK no sdl for libretro android
 $(PROJECTDIR)/$(MAKETYPE)-android-arm/Makefile: makefile $(SCRIPTS) $(GENIE)
+ifndef ANDROID_NDK_ARM
+	$(error ANDROID_NDK_ARM is not set)
+endif
 	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --gcc=android-arm --gcc_version=3.8.0 --targetos=android --PLATFORM=arm --NO_USE_MIDI=1 --NO_OPENGL=1 --USE_QTDEBUG=0 --DONT_USE_NETWORK=1 --NOASM=1 $(MAKETYPE)
 
 .PHONY: android-arm
