@@ -79,7 +79,7 @@ DONE (x) (p=partly)         NMOS         CMOS       ESCC      EMSCC
 // printf("TAG %lld %s%s Data:%d\n", machine().firstcpu->total_cycles(), __PRETTY_FUNCTION__, m_owner->tag(), data);
 
 #define VERBOSE 0
-#define LOGPRINT(x) { do { if (VERBOSE) logerror x; } while (0); }
+#define LOGPRINT(x) do { if (VERBOSE) logerror x; } while (0);
 #define LOG(x)      {} LOGPRINT(x)
 #define LOGR(x)     {} LOGPRINT(x)
 #define LOGSETUP(x) {} LOGPRINT(x)
