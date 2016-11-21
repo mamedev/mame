@@ -61,7 +61,7 @@ endif
 ###########################################################################
 
 ifeq ($(platform), android)
-#	PTR64 = 0
+	#PTR64 = 0
 	# FIXME: Pass these to GENie and test...
 #	CROSS_BUILD = 1
 #	FORCE_DRC_C_BACKEND = 1
@@ -83,7 +83,7 @@ endif
 #
 ###########################################################################
 
-BUILDFLAGS = RETRO=$(RETRO) REGENIE=$(REGENIE) VERBOSE=$(VERBOSE) NOWERROR=$(NOWERROR) OSD="retro" NO_USE_MIDI=$(NO_USE_MIDI) 
+BUILDFLAGS = RETRO=$(RETRO) REGENIE=$(REGENIE) VERBOSE=$(VERBOSE) NOWERROR=$(NOWERROR) OSD="retro" NO_USE_MIDI=$(NO_USE_MIDI) USELIBCO=$(USELIBCO) 
 
 ifneq ($(PYTHON_EXECUTABLE),)
 	BUILDFLAGS += PYTHON_EXECUTABLE=$(PYTHON_EXECUTABLE)
@@ -102,11 +102,14 @@ endif
 ###########################################################################
 
 PLATFLAGS =
+
+ifneq ($(platform),android)
 ifneq ($(PTR64),)
 	PLATFLAGS += PTR64=$(PTR64)
 endif
 ifneq ($(platform),)
 	PLATFLAGS += LIBRETRO_OS="$(platform)"
+endif
 endif
 ifeq ($(platform),win)
 	ifeq ($(MSYSTEM),MINGW64)
@@ -116,6 +119,18 @@ ifeq ($(platform),win)
 		MINGW32 ?= /mingw32
 		PLATFLAGS += MINGW32="$(MINGW32)"
 	endif
+endif
+ifeq ($(platform),android)
+	ANDROID_NDK_LLVM ?= /opt/ndk/toolchains/llvm-3.5/prebuilt/linux-x86_64
+	ANDROID_NDK_ARM  ?= /opt/ndk/toolchains/arm-linux-androideabi-4.8/prebuilt/linux-x86_64
+	ANDROID_NDK_ROOT ?= /opt/ndk
+	PLATFLAGS += TARGETOS="android-arm" gcc="android-arm"
+	PLATFLAGS +=  ANDROID_NDK_LLVM="$(ANDROID_NDK_LLVM)"
+	PLATFLAGS +=  ANDROID_NDK_ARM="$(ANDROID_NDK_ARM)"
+	PLATFLAGS +=  ANDROID_NDK_ROOT="$(ANDROID_NDK_ROOT)"
+ 	LIBRETRO_CPU :=
+	ARCH :=
+	LIBRETRO_OS :=
 endif
 ifneq ($(LIBRETRO_CPU),)
 	PLATFLAGS += ARCH="" LIBRETRO_CPU="$(LIBRETRO_CPU)"
@@ -137,7 +152,9 @@ endif
 ifneq ($(SUBTARGET),)
 	TARGETFLAGS += SUBTARGET=$(SUBTARGET)
 endif
-
+ifneq ($(SOURCES),)
+	TARGETFLAGS += SOURCES=$(SOURCES)
+endif
 
 ###########################################################################
 #

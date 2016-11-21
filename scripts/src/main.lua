@@ -27,6 +27,11 @@ end
 	kind "ConsoleApp"
 
 	configuration { "android*" }
+if _OPTIONS["osd"] == "retro" then
+		linkoptions {
+			"-shared",
+		}
+else
 		targetprefix "lib"
 		targetname "main"
 		targetextension ".so"
@@ -34,6 +39,7 @@ end
 			"-shared",
 			"-Wl,-soname,libmain.so"
 		}
+end
 		links {
 			"EGL",
 			"GLESv1_CM",
