@@ -3943,7 +3943,7 @@ void ppc_device::log_opcode_desc(drcuml_state *drcuml, const opcode_desc *descli
 			buffer << "???";
 
 		buffer.put('\0');
-		drcuml->log_printf("%08X [%08X] t:%08X f:%s: %-30s", desclist->pc, desclist->physpc, desclist->targetpc, log_desc_flags_to_string(desclist->flags), buffer.vec());
+		drcuml->log_printf("%08X [%08X] t:%08X f:%s: %-30s", desclist->pc, desclist->physpc, desclist->targetpc, log_desc_flags_to_string(desclist->flags), &buffer.vec()[0]);
 
 		/* output register states */
 		log_register_list(drcuml, "use", desclist->regin, nullptr);
