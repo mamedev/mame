@@ -1061,7 +1061,10 @@ static const std::string &disassemble(m68000_base_device *m68k, offs_t pc, std::
 			return sb;
 		}
 	}
-	m68k->disassemble(sb, pc, oprom, opram, options);
+
+	std::ostringstream stream;
+	m68k->disassemble(stream, pc, oprom, opram, options);
+	sb = stream.str();
 
 	// restore previous bus error state
 	m68k->mmu_tmp_buserror_occurred = tmp_buserror_occurred;
