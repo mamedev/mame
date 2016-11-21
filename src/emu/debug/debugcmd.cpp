@@ -2411,6 +2411,8 @@ void debugger_commands::execute_dasm(int ref, int params, const char *param[])
 		int numbytes = 0;
 		output.clear();
 		output.rdbuf()->clear();
+		disasm.clear();
+		disasm.seekp(0);
 
 		/* print the address */
 		stream_format(output, "%0*X: ", space->logaddrchars(), u32(space->byte_to_address(pcbyte)));
@@ -2429,8 +2431,6 @@ void debugger_commands::execute_dasm(int ref, int params, const char *param[])
 			}
 
 			/* disassemble the result */
-			disasm.clear();
-			disasm.seekp(0);
 			i += numbytes = dasmintf->disassemble(disasm, offset + i, opbuf, argbuf) & DASMFLAG_LENGTHMASK;
 		}
 
