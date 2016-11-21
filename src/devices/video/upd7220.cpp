@@ -816,6 +816,7 @@ void upd7220_device::draw_line(int x, int y)
 {
 	int xi, yi;
 	int d = (m_figs.m_d & 0x2000) ? (int16_t)(m_figs.m_d | 0xe000) : m_figs.m_d;
+	int d1 = (m_figs.m_d1 & 0x2000) ? (int16_t)(m_figs.m_d1 | 0xe000) : m_figs.m_d1;
 	int d2 = (m_figs.m_d2 & 0x2000) ? (int16_t)(m_figs.m_d2 | 0xe000) : m_figs.m_d2;
 	uint16_t pattern = (m_ra[8]) | (m_ra[9]<<8);
 	const int dot_dir[4] = {1, -1, -1, 1};
@@ -840,7 +841,7 @@ void upd7220_device::draw_line(int x, int y)
 			d += d2;
 		}
 		else
-			d += m_figs.m_d1;
+			d += d1;
 	}
 
 	switch(m_figs.m_dir & 3)
