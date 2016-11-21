@@ -4,7 +4,7 @@
 #include "debugger.h"
 #include "cp1610.h"
 
-static offs_t internal_disasm_cp1610(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+CPU_DISASSEMBLE(cp1610)
 {
 	uint16_t oprom16[4]={ static_cast<uint16_t>((oprom[0] << 8) | oprom[1]), static_cast<uint16_t>((oprom[2] << 8) | oprom[3]), static_cast<uint16_t>((oprom[4] << 8) | oprom[5]), static_cast<uint16_t>((oprom[6] << 8) | oprom[7]) };
 	uint16_t op = oprom16[0]; uint16_t subop;
@@ -1487,14 +1487,4 @@ static offs_t internal_disasm_cp1610(cpu_device *device, std::ostream &stream, o
 	}
 
 	return size;
-}
-
-
-CPU_DISASSEMBLE(cp1610)
-{
-	std::ostringstream stream;
-	offs_t result = internal_disasm_cp1610(device, stream, pc, oprom, opram, options);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
 }

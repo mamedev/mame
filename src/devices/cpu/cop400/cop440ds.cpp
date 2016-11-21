@@ -10,7 +10,7 @@
 
 #include "emu.h"
 
-static offs_t internal_disasm_cop444(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+CPU_DISASSEMBLE(cop444)
 {
 	uint8_t opcode = oprom[0];
 	uint8_t next_opcode = oprom[1];
@@ -412,14 +412,4 @@ static offs_t internal_disasm_cop444(cpu_device *device, std::ostream &stream, o
 	}
 
 	return bytes | flags | DASMFLAG_SUPPORTED;
-}
-
-
-CPU_DISASSEMBLE(cop444)
-{
-	std::ostringstream stream;
-	offs_t result = internal_disasm_cop444(device, stream, pc, oprom, opram, options);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
 }

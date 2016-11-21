@@ -694,9 +694,5 @@ static offs_t internal_disasm_i860(cpu_device *device, std::ostream &main_stream
 
 CPU_DISASSEMBLE(i860)
 {
-	std::ostringstream stream;
-	offs_t result = internal_disasm_i860(device, stream, pc, oprom, opram, options);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
+	return internal_disasm_i860(device, stream, pc, oprom, opram, options);
 }

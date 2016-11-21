@@ -110,7 +110,6 @@ enum
 };
 
 unsigned int m68k_disassemble_raw(std::ostream &stream, unsigned int pc, const unsigned char* opdata, const unsigned char* argdata, unsigned int cpu_type);
-unsigned int m68k_disassemble_raw(char* str_buff, unsigned int pc, const unsigned char* opdata, const unsigned char* argdata, unsigned int cpu_type);
 
 class m68000_base_device;
 
@@ -137,7 +136,7 @@ public:
 
 	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; };
 	virtual uint32_t disasm_max_opcode_bytes() const override { return 10; };
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 
 
@@ -413,7 +412,7 @@ public:
 
 	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; };
 	virtual uint32_t disasm_max_opcode_bytes() const override { return 10; };
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	virtual uint32_t execute_min_cycles() const override { return 4; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
@@ -432,7 +431,7 @@ public:
 
 	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; };
 	virtual uint32_t disasm_max_opcode_bytes() const override { return 10; };
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	virtual uint32_t execute_min_cycles() const override { return 4; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
@@ -454,7 +453,7 @@ public:
 
 	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; };
 	virtual uint32_t disasm_max_opcode_bytes() const override { return 10; };
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	virtual uint32_t execute_min_cycles() const override { return 4; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
@@ -473,7 +472,7 @@ public:
 
 	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; };
 	virtual uint32_t disasm_max_opcode_bytes() const override { return 10; };
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	virtual uint32_t execute_min_cycles() const override { return 4; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
@@ -492,7 +491,7 @@ public:
 
 	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; };
 	virtual uint32_t disasm_max_opcode_bytes() const override { return 10; };
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	virtual uint32_t execute_min_cycles() const override { return 4; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
@@ -511,7 +510,7 @@ public:
 
 	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; };
 	virtual uint32_t disasm_max_opcode_bytes() const override { return 20; };
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	virtual uint32_t execute_min_cycles() const override { return 2; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
@@ -530,7 +529,7 @@ public:
 
 	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; };
 	virtual uint32_t disasm_max_opcode_bytes() const override { return 20; };
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	virtual uint32_t execute_min_cycles() const override { return 2; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
@@ -549,7 +548,7 @@ public:
 
 	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; };
 	virtual uint32_t disasm_max_opcode_bytes() const override { return 20; };
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	virtual uint32_t execute_min_cycles() const override { return 2; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
@@ -568,7 +567,7 @@ public:
 
 	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; };
 	virtual uint32_t disasm_max_opcode_bytes() const override { return 20; };
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	virtual uint32_t execute_min_cycles() const override { return 2; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
@@ -587,7 +586,7 @@ public:
 
 	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; };
 	virtual uint32_t disasm_max_opcode_bytes() const override { return 20; };
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	virtual uint32_t execute_min_cycles() const override { return 2; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
@@ -608,7 +607,7 @@ public:
 
 	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; };
 	virtual uint32_t disasm_max_opcode_bytes() const override { return 20; };
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	virtual uint32_t execute_min_cycles() const override { return 2; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
@@ -627,7 +626,7 @@ public:
 
 	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; };
 	virtual uint32_t disasm_max_opcode_bytes() const override { return 20; };
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	virtual uint32_t execute_min_cycles() const override { return 2; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
@@ -646,7 +645,7 @@ public:
 
 	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; };
 	virtual uint32_t disasm_max_opcode_bytes() const override { return 20; };
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	virtual uint32_t execute_min_cycles() const override { return 2; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
@@ -665,7 +664,7 @@ public:
 
 	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; };
 	virtual uint32_t disasm_max_opcode_bytes() const override { return 20; };
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	virtual uint32_t execute_min_cycles() const override { return 2; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
@@ -684,7 +683,7 @@ public:
 
 	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; };
 	virtual uint32_t disasm_max_opcode_bytes() const override { return 20; };
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	virtual uint32_t execute_min_cycles() const override { return 2; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
@@ -703,7 +702,7 @@ public:
 
 	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; };
 	virtual uint32_t disasm_max_opcode_bytes() const override { return 10; };
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	virtual uint32_t execute_min_cycles() const override { return 4; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
@@ -728,7 +727,7 @@ public:
 
 	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; };
 	virtual uint32_t disasm_max_opcode_bytes() const override { return 20; };
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	virtual uint32_t execute_min_cycles() const override { return 2; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };
@@ -749,7 +748,7 @@ public:
 
 	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; };
 	virtual uint32_t disasm_max_opcode_bytes() const override { return 20; };
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	virtual uint32_t execute_min_cycles() const override { return 2; };
 	virtual uint32_t execute_max_cycles() const override { return 158; };

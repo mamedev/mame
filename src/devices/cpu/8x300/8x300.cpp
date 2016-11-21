@@ -581,8 +581,8 @@ void n8x300_cpu_device::execute_run()
 	} while (m_icount > 0);
 }
 
-offs_t n8x300_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t n8x300_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( n8x300 );
-	return CPU_DISASSEMBLE_NAME(n8x300)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(n8x300)(this, stream, pc, oprom, opram, options);
 }

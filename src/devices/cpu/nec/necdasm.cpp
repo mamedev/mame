@@ -1596,16 +1596,7 @@ int necv_dasm_one(std::ostream &stream, uint32_t eip, const uint8_t *oprom, cons
 	return (pc-eip) | dasm_flags | DASMFLAG_SUPPORTED;
 }
 
-int necv_dasm_one(char *buffer, uint32_t eip, const uint8_t *oprom, const uint8_t *decryption_table)
-{
-	std::ostringstream stream;
-	int result = necv_dasm_one(stream, eip, oprom, decryption_table);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
-}
-
 CPU_DISASSEMBLE( nec )
 {
-	return necv_dasm_one(buffer, pc, oprom, nullptr);
+	return necv_dasm_one(stream, pc, oprom, nullptr);
 }

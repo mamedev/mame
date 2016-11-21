@@ -1050,16 +1050,6 @@ offs_t sparc_disassembler::dasm(std::ostream &stream, offs_t pc, uint32_t op) co
 }
 
 
-offs_t sparc_disassembler::dasm(char *buf, offs_t pc, uint32_t op) const
-{
-	std::ostringstream stream;
-	const offs_t result(dasm(stream, pc, op));
-	const std::string stream_str(stream.str());
-	strcpy(buf, stream_str.c_str());
-	return result;
-}
-
-
 offs_t sparc_disassembler::dasm_invalid(std::ostream &stream, offs_t pc, uint32_t op) const
 {
 	util::stream_format(stream, "%-*s0x%08x ! ", m_op_field_width, ".word", op);

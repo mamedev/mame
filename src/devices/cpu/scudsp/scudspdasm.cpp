@@ -237,7 +237,7 @@ static void scudsp_dasm_prefix( const char* format, char* buffer, uint32_t *data
 }
 
 
-static offs_t internal_disasm_scudsp(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+CPU_DISASSEMBLE(scudsp)
 {
 	uint32_t op = oprom[0]<<24|oprom[1]<<16|oprom[2]<<8|oprom[3]<<0;
 	unsigned size = 1;
@@ -360,14 +360,4 @@ static offs_t internal_disasm_scudsp(cpu_device *device, std::ostream &stream, o
 	}
 
 	return size;
-}
-
-
-CPU_DISASSEMBLE(scudsp)
-{
-	std::ostringstream stream;
-	offs_t result = internal_disasm_scudsp(device, stream, pc, oprom, opram, options);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
 }

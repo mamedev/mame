@@ -939,13 +939,13 @@ void m37710_cpu_device::m37710_set_irq_line(int line, int state)
 
 CPU_DISASSEMBLE( m37710 )
 {
-	return m7700_disassemble(buffer, (pc&0xffff), pc>>16, oprom, 0, 0);
+	return m7700_disassemble(stream, (pc&0xffff), pc>>16, oprom, 0, 0);
 }
 
 
-offs_t m37710_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t m37710_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
-	return m7700_disassemble(buffer, (pc&0xffff), pc>>16, oprom, FLAG_M, FLAG_X);
+	return m7700_disassemble(stream, (pc&0xffff), pc>>16, oprom, FLAG_M, FLAG_X);
 }
 
 

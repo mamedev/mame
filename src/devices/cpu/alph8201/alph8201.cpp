@@ -688,8 +688,8 @@ void alpha8201_cpu_device::execute_set_input(int inputnum, int state)
 }
 
 
-offs_t alpha8201_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t alpha8201_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( alpha8201 );
-	return CPU_DISASSEMBLE_NAME(alpha8201)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(alpha8201)(this, stream, pc, oprom, opram, options);
 }

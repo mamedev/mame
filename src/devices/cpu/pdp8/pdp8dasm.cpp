@@ -160,14 +160,6 @@ static offs_t pdp8_dasm_one(std::ostream &stream, offs_t pc, uint16_t op)
 	return 2 | DASMFLAG_SUPPORTED;
 }
 
-static offs_t pdp8_dasm_one(char *buffer, offs_t pc, uint16_t op)
-{
-	std::ostringstream stream;
-	offs_t result = pdp8_dasm_one(stream, pc, op);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
-}
 
 /*****************************************************************************/
 
@@ -175,5 +167,5 @@ CPU_DISASSEMBLE( pdp8 )
 {
 	uint16_t op = (*(uint8_t *)(opram + 0) << 8) |
 				(*(uint8_t *)(opram + 1) << 0);
-	return pdp8_dasm_one(buffer, pc, op);
+	return pdp8_dasm_one(stream, pc, op);
 }

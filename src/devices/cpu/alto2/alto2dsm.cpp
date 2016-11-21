@@ -394,13 +394,3 @@ offs_t alto2_cpu_device::disasm_disassemble(std::ostream &main_stream, offs_t pc
 
 	return result;
 }
-
-
-offs_t alto2_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
-{
-	std::ostringstream stream;
-	offs_t result = disasm_disassemble(stream, pc, oprom, opram, options);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
-}

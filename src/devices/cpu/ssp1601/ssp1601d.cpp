@@ -288,20 +288,11 @@ static unsigned dasm_ssp1601(std::ostream &stream, unsigned pc, const uint8_t *o
 	return size | flags | DASMFLAG_SUPPORTED;
 }
 
-static unsigned dasm_ssp1601(char *buffer, unsigned pc, const uint8_t *oprom)
-{
-	std::ostringstream stream;
-	offs_t result = dasm_ssp1601(stream, pc, oprom);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
-}
-
 // vim:ts=4
 
 CPU_DISASSEMBLE( ssp1601 )
 {
 	//ssp1601_state_t *ssp1601_state = get_safe_token(device);
 
-	return dasm_ssp1601(buffer, pc, oprom);
+	return dasm_ssp1601(stream, pc, oprom);
 }

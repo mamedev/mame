@@ -3991,13 +3991,9 @@ bool i386_device::memory_translate(address_spacenum spacenum, int intention, off
 	return ret;
 }
 
-offs_t i386_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t i386_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
-	std::ostringstream stream;
-	offs_t result = i386_dasm_one(stream, pc, oprom, m_sreg[CS].d ? 32 : 16);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
+	return i386_dasm_one(stream, pc, oprom, m_sreg[CS].d ? 32 : 16);
 }
 
 

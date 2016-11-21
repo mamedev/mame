@@ -129,7 +129,7 @@ static const hcd62121_dasm hcd62121_ops[256] =
 };
 
 
-static offs_t internal_disasm_hcd62121(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+CPU_DISASSEMBLE(hcd62121)
 {
 	uint8_t op;
 	uint8_t op1;
@@ -357,12 +357,3 @@ static offs_t internal_disasm_hcd62121(cpu_device *device, std::ostream &stream,
 	return pos | DASMFLAG_SUPPORTED;
 }
 
-
-CPU_DISASSEMBLE(hcd62121)
-{
-	std::ostringstream stream;
-	offs_t result = internal_disasm_hcd62121(device, stream, pc, oprom, opram, options);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
-}

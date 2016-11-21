@@ -698,16 +698,7 @@ static offs_t tms32082_disasm_pp(std::ostream &stream, offs_t pc, const uint8_t 
 	return 8 | flags | DASMFLAG_SUPPORTED;
 }
 
-static offs_t tms32082_disasm_pp(char *buffer, offs_t pc, const uint8_t *oprom)
-{
-	std::ostringstream stream;
-	offs_t result = tms32082_disasm_pp(stream, pc, oprom);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
-}
-
 CPU_DISASSEMBLE(tms32082_pp)
 {
-	return tms32082_disasm_pp(buffer, pc, oprom);
+	return tms32082_disasm_pp(stream, pc, oprom);
 }

@@ -259,32 +259,23 @@ static offs_t tms1k_dasm(std::ostream &stream, const uint8_t *oprom, const uint8
 	return pos | s_flags[instr] | DASMFLAG_SUPPORTED;
 }
 
-static offs_t tms1k_dasm(char *buffer, const uint8_t *oprom, const uint8_t *lut_mnemonic, uint16_t opcode_mask)
-{
-	std::ostringstream stream;
-	offs_t result = tms1k_dasm(stream, oprom, lut_mnemonic, opcode_mask);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
-}
-
 
 CPU_DISASSEMBLE(tms1000)
 {
-	return tms1k_dasm(buffer, oprom, tms1000_mnemonic, 0xff);
+	return tms1k_dasm(stream, oprom, tms1000_mnemonic, 0xff);
 }
 
 CPU_DISASSEMBLE(tms1100)
 {
-	return tms1k_dasm(buffer, oprom, tms1100_mnemonic, 0xff);
+	return tms1k_dasm(stream, oprom, tms1100_mnemonic, 0xff);
 }
 
 CPU_DISASSEMBLE(tms0980)
 {
-	return tms1k_dasm(buffer, oprom, tms0980_mnemonic, 0x1ff);
+	return tms1k_dasm(stream, oprom, tms0980_mnemonic, 0x1ff);
 }
 
 CPU_DISASSEMBLE(tp0320)
 {
-	return tms1k_dasm(buffer, oprom, tp0320_mnemonic, 0x1ff);
+	return tms1k_dasm(stream, oprom, tp0320_mnemonic, 0x1ff);
 }

@@ -271,7 +271,7 @@ offs_t debug_view_disasm::find_pc_backwards(offs_t targetpc, int numinstrs)
 			instlen = 1;
 			if (source.m_space.device().memory().translate(source.m_space.spacenum(), TRANSLATE_FETCH, physpcbyte))
 			{
-				char dasmbuffer[100];
+				std::ostringstream dasmbuffer;
 				instlen = source.m_disasmintf->disassemble(dasmbuffer, scanpc, &opbuf[1000 + scanpcbyte - targetpcbyte], &argbuf[1000 + scanpcbyte - targetpcbyte]) & DASMFLAG_LENGTHMASK;
 			}
 
@@ -335,6 +335,7 @@ void debug_view_disasm::generate_bytes(offs_t pcbyte, int numbytes, int minbytes
 
 bool debug_view_disasm::recompute(offs_t pc, int startline, int lines)
 {
+	util::ovectorstream buffer;
 	bool changed = false;
 	const debug_view_disasm_source &source = downcast<const debug_view_disasm_source &>(*m_source);
 	const int char_num = source.m_space.is_octal() ? 3 : 2;
@@ -392,7 +393,8 @@ bool debug_view_disasm::recompute(offs_t pc, int startline, int lines)
 			source.m_space.logaddrchars()/2*char_num, source.m_space.byte_to_address(pcbyte));
 
 		// make sure we can translate the address, and then disassemble the result
-		char buffer[100];
+		buffer.clear();
+		buffer.seekp(0);
 		int numbytes = 0;
 		offs_t physpcbyte = pcbyte;
 		if (source.m_space.device().memory().translate(source.m_space.spacenum(), TRANSLATE_FETCH_DEBUG, physpcbyte))
@@ -410,10 +412,12 @@ bool debug_view_disasm::recompute(offs_t pc, int startline, int lines)
 			pc += numbytes = source.m_disasmintf->disassemble(buffer, pc & source.m_space.logaddrmask(), opbuf, argbuf) & DASMFLAG_LENGTHMASK;
 		}
 		else
-			strcpy(buffer, "<unmapped>");
+			buffer << "<unmapped>";
+
+		buffer.put('\0');
 
 		// append the disassembly to the buffer
-		util::stream_format(m_dasm.seekp(base + m_divider1 + 1), "%2$-*1$.*1$s  ", m_dasm_width, buffer);
+		util::stream_format(m_dasm.seekp(base + m_divider1 + 1), "%2$-*1$.*1$s  ", m_dasm_width, &buffer.vec()[0]);
 
 		// output the right column
 		if (m_right_column == DASM_RIGHTCOL_RAW || m_right_column == DASM_RIGHTCOL_ENCRYPTED)

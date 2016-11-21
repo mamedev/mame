@@ -683,16 +683,8 @@ unsigned DasmPSXCPU( psxcpu_state *state, std::ostream &stream, uint32_t pc, con
 	return ( opram - oldopram ) | flags | DASMFLAG_SUPPORTED;
 }
 
-unsigned DasmPSXCPU(psxcpu_state *state, char *buffer, uint32_t pc, const uint8_t *opram)
-{
-	std::ostringstream stream;
-	unsigned result = DasmPSXCPU(state, stream, pc, opram);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
-}
 
 CPU_DISASSEMBLE( psxcpu_generic )
 {
-	return DasmPSXCPU( nullptr, buffer, pc, opram );
+	return DasmPSXCPU( nullptr, stream, pc, opram );
 }

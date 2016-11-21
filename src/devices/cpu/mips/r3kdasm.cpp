@@ -378,21 +378,11 @@ static unsigned dasmr3k(std::ostream &stream, unsigned pc, uint32_t op)
 }
 
 
-static unsigned dasmr3k(char *buffer, unsigned pc, uint32_t op)
-{
-	std::ostringstream stream;
-	unsigned result = dasmr3k(stream, pc, op);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
-}
-
-
 CPU_DISASSEMBLE( r3000be )
 {
 	uint32_t op = *(uint32_t *)oprom;
 	op = big_endianize_int32(op);
-	return dasmr3k(buffer, pc, op);
+	return dasmr3k(stream, pc, op);
 }
 
 
@@ -400,5 +390,5 @@ CPU_DISASSEMBLE( r3000le )
 {
 	uint32_t op = *(uint32_t *)oprom;
 	op = little_endianize_int32(op);
-	return dasmr3k(buffer, pc, op);
+	return dasmr3k(stream, pc, op);
 }

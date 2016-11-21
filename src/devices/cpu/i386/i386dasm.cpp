@@ -3115,26 +3115,17 @@ int i386_dasm_one(std::ostream &stream, offs_t eip, const uint8_t *oprom, int mo
 	return i386_dasm_one_ex(stream, eip, oprom, mode);
 }
 
-static int i386_dasm_one_ex(char *buffer, uint64_t eip, const uint8_t *oprom, int mode)
-{
-	std::ostringstream stream;
-	int result = i386_dasm_one_ex(stream, eip, oprom, mode);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
-}
-
 CPU_DISASSEMBLE( x86_16 )
 {
-	return i386_dasm_one_ex(buffer, pc, oprom, 16);
+	return i386_dasm_one_ex(stream, pc, oprom, 16);
 }
 
 CPU_DISASSEMBLE( x86_32 )
 {
-	return i386_dasm_one_ex(buffer, pc, oprom, 32);
+	return i386_dasm_one_ex(stream, pc, oprom, 32);
 }
 
 CPU_DISASSEMBLE( x86_64 )
 {
-	return i386_dasm_one_ex(buffer, pc, oprom, 64);
+	return i386_dasm_one_ex(stream, pc, oprom, 64);
 }

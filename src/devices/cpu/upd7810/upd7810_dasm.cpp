@@ -5483,33 +5483,24 @@ offs_t Dasm( std::ostream &stream, offs_t pc, const dasm_s (&dasmXX)[256], const
 	return idx | flags | DASMFLAG_SUPPORTED;
 }
 
-offs_t Dasm(char *buffer, offs_t pc, const dasm_s(&dasmXX)[256], const uint8_t *oprom, const uint8_t *opram, bool is_7810)
-{
-	std::ostringstream stream;
-	offs_t result = Dasm(stream, pc, dasmXX, oprom, opram, is_7810);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
-}
-
 } // anonymous namespace
 
 CPU_DISASSEMBLE( upd7810 )
 {
-	return Dasm( buffer, pc, dasm_s::XX_7810, oprom, opram, true );
+	return Dasm( stream, pc, dasm_s::XX_7810, oprom, opram, true );
 }
 
 CPU_DISASSEMBLE( upd7807 )
 {
-	return Dasm( buffer, pc, dasm_s::XX_7807, oprom, opram, true );
+	return Dasm( stream, pc, dasm_s::XX_7807, oprom, opram, true );
 }
 
 CPU_DISASSEMBLE( upd7801 )
 {
-	return Dasm( buffer, pc, dasm_s::XX_7801, oprom, opram, false );
+	return Dasm( stream, pc, dasm_s::XX_7801, oprom, opram, false );
 }
 
 CPU_DISASSEMBLE( upd78c05 )
 {
-	return Dasm( buffer, pc, dasm_s::XX_78c05, oprom, opram, false );
+	return Dasm( stream, pc, dasm_s::XX_78c05, oprom, opram, false );
 }

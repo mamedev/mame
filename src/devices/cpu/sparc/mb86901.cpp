@@ -548,10 +548,10 @@ uint32_t mb86901_device::disasm_max_opcode_bytes() const
 //  helper function
 //-------------------------------------------------
 
-offs_t mb86901_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t mb86901_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	uint32_t op = *reinterpret_cast<const uint32_t *>(oprom);
-	return m_dasm.dasm(buffer, pc, big_endianize_int32(op));
+	return m_dasm.dasm(stream, pc, big_endianize_int32(op));
 }
 
 

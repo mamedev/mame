@@ -107,7 +107,6 @@ public:
 	}
 
 	offs_t dasm(std::ostream &stream, offs_t pc, uint32_t op) const;
-	offs_t dasm(char *buf, offs_t pc, uint32_t op) const;
 
 private:
 	struct branch_desc

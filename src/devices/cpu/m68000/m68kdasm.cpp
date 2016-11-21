@@ -3900,15 +3900,6 @@ unsigned int m68k_disassemble_raw(std::ostream &stream, unsigned int pc, const u
 	return result;
 }
 
-unsigned int m68k_disassemble_raw(char* str_buff, unsigned int pc, const unsigned char* opdata, const unsigned char* argdata, unsigned int cpu_type)
-{
-	std::ostringstream stream;
-	unsigned int result = m68k_disassemble_raw(stream, pc, opdata, argdata, cpu_type);
-	std::string stream_str = stream.str();
-	strcpy(str_buff, stream_str.c_str());
-	return result;
-}
-
 #ifdef UNUSED_FUNCTION
 /* Check if the instruction is a valid one */
 unsigned int m68k_is_valid_instruction(unsigned int instruction, unsigned int cpu_type)
@@ -4123,42 +4114,42 @@ unsigned int m68k_is_valid_instruction(unsigned int instruction, unsigned int cp
 
 CPU_DISASSEMBLE( m68000 )
 {
-	return m68k_disassemble_raw(buffer, pc, oprom, opram, M68K_CPU_TYPE_68000);
+	return m68k_disassemble_raw(stream, pc, oprom, opram, M68K_CPU_TYPE_68000);
 }
 
 CPU_DISASSEMBLE( m68008 )
 {
-	return m68k_disassemble_raw(buffer, pc, oprom, opram, M68K_CPU_TYPE_68008);
+	return m68k_disassemble_raw(stream, pc, oprom, opram, M68K_CPU_TYPE_68008);
 }
 
 CPU_DISASSEMBLE( m68010 )
 {
-	return m68k_disassemble_raw(buffer, pc, oprom, opram, M68K_CPU_TYPE_68010);
+	return m68k_disassemble_raw(stream, pc, oprom, opram, M68K_CPU_TYPE_68010);
 }
 
 CPU_DISASSEMBLE( m68020 )
 {
-	return m68k_disassemble_raw(buffer, pc, oprom, opram, M68K_CPU_TYPE_68020);
+	return m68k_disassemble_raw(stream, pc, oprom, opram, M68K_CPU_TYPE_68020);
 }
 
 CPU_DISASSEMBLE( m68030 )
 {
-	return m68k_disassemble_raw(buffer, pc, oprom, opram, M68K_CPU_TYPE_68030);
+	return m68k_disassemble_raw(stream, pc, oprom, opram, M68K_CPU_TYPE_68030);
 }
 
 CPU_DISASSEMBLE( m68040 )
 {
-	return m68k_disassemble_raw(buffer, pc, oprom, opram, M68K_CPU_TYPE_68040);
+	return m68k_disassemble_raw(stream, pc, oprom, opram, M68K_CPU_TYPE_68040);
 }
 
 CPU_DISASSEMBLE( m68340 )
 {
-	return m68k_disassemble_raw(buffer, pc, oprom, opram, M68K_CPU_TYPE_FSCPU32);
+	return m68k_disassemble_raw(stream, pc, oprom, opram, M68K_CPU_TYPE_FSCPU32);
 }
 
 CPU_DISASSEMBLE( coldfire )
 {
-	return m68k_disassemble_raw(buffer, pc, oprom, opram, M68K_CPU_TYPE_COLDFIRE);
+	return m68k_disassemble_raw(stream, pc, oprom, opram, M68K_CPU_TYPE_COLDFIRE);
 }
 
 /* ======================================================================== */

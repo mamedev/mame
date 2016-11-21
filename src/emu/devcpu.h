@@ -54,8 +54,8 @@
 //**************************************************************************
 
 #define CPU_DISASSEMBLE_NAME(name)      cpu_disassemble_##name
-#define CPU_DISASSEMBLE(name)           offs_t CPU_DISASSEMBLE_NAME(name)(cpu_device *device, char *buffer, offs_t pc, const u8 *oprom, const u8 *opram, int options)
-#define CPU_DISASSEMBLE_CALL(name)      CPU_DISASSEMBLE_NAME(name)(device, buffer, pc, oprom, opram, options)
+#define CPU_DISASSEMBLE(name)           offs_t CPU_DISASSEMBLE_NAME(name)(cpu_device *device, std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, int options)
+#define CPU_DISASSEMBLE_CALL(name)      CPU_DISASSEMBLE_NAME(name)(device, stream, pc, oprom, opram, options)
 
 
 //**************************************************************************
@@ -88,7 +88,7 @@ private:
 };
 
 
-typedef offs_t (*cpu_disassemble_func)(cpu_device *device, char *buffer, offs_t pc, const u8 *oprom, const u8 *opram, int options);
+typedef offs_t (*cpu_disassemble_func)(cpu_device *device, std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, int options);
 
 
 #endif  /* MAME_EMU_DEVCPU_H */

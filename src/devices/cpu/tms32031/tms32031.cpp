@@ -589,10 +589,10 @@ uint32_t tms3203x_device::disasm_max_opcode_bytes() const
 //  helper function
 //-------------------------------------------------
 
-offs_t tms3203x_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t tms3203x_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( tms3203x );
-	return CPU_DISASSEMBLE_NAME(tms3203x)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(tms3203x)(this, stream, pc, oprom, opram, options);
 }
 
 

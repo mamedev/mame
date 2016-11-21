@@ -480,15 +480,15 @@ uint32_t r3000_device::disasm_max_opcode_bytes() const
 //  helper function
 //-------------------------------------------------
 
-offs_t r3000_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t r3000_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( r3000le );
 	extern CPU_DISASSEMBLE( r3000be );
 
 	if (m_endianness == ENDIANNESS_BIG)
-		return CPU_DISASSEMBLE_NAME(r3000be)(this, buffer, pc, oprom, opram, options);
+		return CPU_DISASSEMBLE_NAME(r3000be)(this, stream, pc, oprom, opram, options);
 	else
-		return CPU_DISASSEMBLE_NAME(r3000le)(this, buffer, pc, oprom, opram, options);
+		return CPU_DISASSEMBLE_NAME(r3000le)(this, stream, pc, oprom, opram, options);
 }
 
 

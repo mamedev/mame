@@ -1430,15 +1430,15 @@ WRITE32_MEMBER( jaguardsp_cpu_device::ctrl_w )
 }
 
 
-offs_t jaguargpu_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t jaguargpu_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( jaguargpu );
-	return CPU_DISASSEMBLE_NAME(jaguargpu)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(jaguargpu)(this, stream, pc, oprom, opram, options);
 }
 
 
-offs_t jaguardsp_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t jaguardsp_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( jaguardsp );
-	return CPU_DISASSEMBLE_NAME(jaguardsp)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(jaguardsp)(this, stream, pc, oprom, opram, options);
 }

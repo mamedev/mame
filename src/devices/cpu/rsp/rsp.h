@@ -189,7 +189,7 @@ protected:
 	// device_disasm_interface overrides
 	virtual uint32_t disasm_min_opcode_bytes() const override { return 4; }
 	virtual uint32_t disasm_max_opcode_bytes() const override { return 4; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	void unimplemented_opcode(uint32_t op);
 
@@ -327,7 +327,6 @@ private:
 extern const device_type RSP;
 
 extern offs_t rsp_dasm_one(std::ostream &stream, offs_t pc, uint32_t op);
-extern offs_t rsp_dasm_one(char *buffer, offs_t pc, uint32_t op);
 
 
 #endif /* __RSP_H__ */

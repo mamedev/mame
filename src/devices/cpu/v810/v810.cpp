@@ -46,10 +46,10 @@ v810_device::v810_device(const machine_config &mconfig, const char *tag, device_
 }
 
 
-offs_t v810_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t v810_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( v810 );
-	return CPU_DISASSEMBLE_NAME(v810)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(v810)(this, stream, pc, oprom, opram, options);
 }
 
 

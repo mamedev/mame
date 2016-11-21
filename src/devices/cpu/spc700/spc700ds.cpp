@@ -337,7 +337,7 @@ static inline unsigned int read_16_immediate(void)
 	return result | (*rombase++ << 8);
 }
 
-static offs_t internal_disasm_spc700(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+CPU_DISASSEMBLE(spc700)
 {
 	const spc700_opcode_struct* opcode;
 	uint32_t flags = 0;
@@ -429,14 +429,4 @@ static offs_t internal_disasm_spc700(cpu_device *device, std::ostream &stream, o
 		}
 	}
 	return (g_pc - pc) | flags | DASMFLAG_SUPPORTED;
-}
-
-
-CPU_DISASSEMBLE(spc700)
-{
-	std::ostringstream stream;
-	offs_t result = internal_disasm_spc700(device, stream, pc, oprom, opram, options);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
 }

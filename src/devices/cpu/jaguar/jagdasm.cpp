@@ -182,24 +182,16 @@ static unsigned dasmjag(int variant, std::ostream &stream, unsigned pc, const ui
 					util::stream_format(stream, "addqmod $%x,r%d", convert_zero[reg1], reg2);
 					break;
 	}
-	return size | flags | DASMFLAG_SUPPORTED;
-}
 
-static unsigned dasmjag(int variant, char *buffer, unsigned pc, const uint8_t *oprom)
-{
-	std::ostringstream stream;
-	unsigned result = dasmjag(variant, stream, pc, oprom);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
+	return size | flags | DASMFLAG_SUPPORTED;
 }
 
 CPU_DISASSEMBLE( jaguargpu )
 {
-	return dasmjag(JAGUAR_VARIANT_GPU, buffer, pc, oprom);
+	return dasmjag(JAGUAR_VARIANT_GPU, stream, pc, oprom);
 }
 
 CPU_DISASSEMBLE( jaguardsp )
 {
-	return dasmjag(JAGUAR_VARIANT_DSP, buffer, pc, oprom);
+	return dasmjag(JAGUAR_VARIANT_DSP, stream, pc, oprom);
 }

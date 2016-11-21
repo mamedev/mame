@@ -540,10 +540,10 @@ uint32_t m6805_base_device::disasm_max_opcode_bytes() const
 //  helper function
 //-------------------------------------------------
 
-offs_t m6805_base_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t m6805_base_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( m6805 );
-	return CPU_DISASSEMBLE_NAME(m6805)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(m6805)(this, stream, pc, oprom, opram, options);
 }
 
 

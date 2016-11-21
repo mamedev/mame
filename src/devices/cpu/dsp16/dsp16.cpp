@@ -348,10 +348,10 @@ uint32_t dsp16_device::disasm_max_opcode_bytes() const
 //  helper function
 //-------------------------------------------------
 
-offs_t dsp16_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t dsp16_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( dsp16a );
-	return CPU_DISASSEMBLE_NAME(dsp16a)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(dsp16a)(this, stream, pc, oprom, opram, options);
 }
 
 

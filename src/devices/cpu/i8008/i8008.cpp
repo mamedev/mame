@@ -226,10 +226,10 @@ uint32_t i8008_device::disasm_max_opcode_bytes() const
 //  helper function
 //-------------------------------------------------
 
-offs_t i8008_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t i8008_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( i8008 );
-	return CPU_DISASSEMBLE_NAME(i8008)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(i8008)(this, stream, pc, oprom, opram, options);
 }
 
 //**************************************************************************

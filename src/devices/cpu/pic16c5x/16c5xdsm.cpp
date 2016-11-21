@@ -149,7 +149,7 @@ static void InitDasm16C5x(void)
 	OpInizialized = 1;
 }
 
-static offs_t internal_disasm_pic16c5x(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+CPU_DISASSEMBLE(pic16c5x)
 {
 	int a, b, d, f, k;  /* these can all be filled in by parsing an instruction */
 	int i;
@@ -249,14 +249,4 @@ static offs_t internal_disasm_pic16c5x(cpu_device *device, std::ostream &stream,
 		}
 	}
 	return cnt | flags | DASMFLAG_SUPPORTED;
-}
-
-
-CPU_DISASSEMBLE(pic16c5x)
-{
-	std::ostringstream stream;
-	offs_t result = internal_disasm_pic16c5x(device, stream, pc, oprom, opram, options);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
 }

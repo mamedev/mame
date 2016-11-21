@@ -13,7 +13,7 @@
 #include "mb88xx.h"
 
 
-static offs_t internal_disasm_mb88(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+CPU_DISASSEMBLE(mb88)
 {
 	unsigned startpc = pc;
 	uint8_t op = oprom[pc++ - startpc];
@@ -221,14 +221,4 @@ static offs_t internal_disasm_mb88(cpu_device *device, std::ostream &stream, off
 	}
 
 	return (pc - startpc) | DASMFLAG_SUPPORTED;
-}
-
-
-CPU_DISASSEMBLE(mb88)
-{
-	std::ostringstream stream;
-	offs_t result = internal_disasm_mb88(device, stream, pc, oprom, opram, options);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
 }

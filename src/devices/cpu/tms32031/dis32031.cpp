@@ -724,18 +724,8 @@ static unsigned dasm_tms3203x(std::ostream &stream, unsigned pc, uint32_t op)
 }
 
 
-static unsigned dasm_tms3203x(char *buffer, unsigned pc, uint32_t op)
-{
-	std::ostringstream stream;
-	unsigned result = dasm_tms3203x(stream, pc, op);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
-}
-
-
 CPU_DISASSEMBLE( tms3203x )
 {
 	uint32_t op = oprom[0] | (oprom[1] << 8) | (oprom[2] << 16) | (oprom[3] << 24);
-	return dasm_tms3203x(buffer, pc, op);
+	return dasm_tms3203x(stream, pc, op);
 }

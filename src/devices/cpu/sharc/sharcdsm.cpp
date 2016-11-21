@@ -1206,16 +1206,6 @@ static uint32_t sharc_dasm_one(std::ostream &stream, offs_t pc, uint64_t opcode)
 }
 
 
-static uint32_t sharc_dasm_one(char *buffer, offs_t pc, uint64_t opcode)
-{
-	std::ostringstream stream;
-	uint32_t result = sharc_dasm_one(stream, pc, opcode);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
-}
-
-
 CPU_DISASSEMBLE( sharc )
 {
 	uint64_t op;
@@ -1225,6 +1215,6 @@ CPU_DISASSEMBLE( sharc )
 			((uint64_t)oprom[2] << 16) | ((uint64_t)oprom[3] << 24) |
 			((uint64_t)oprom[4] << 32) | ((uint64_t)oprom[5] << 40);
 
-	flags = sharc_dasm_one(buffer, pc, op);
+	flags = sharc_dasm_one(stream, pc, op);
 	return 1 | flags | DASMFLAG_SUPPORTED;
 }

@@ -24,7 +24,7 @@ protected:
 	virtual uint32_t decode_fixed(uint16_t op) override { return 0; } // not yet
 	virtual uint32_t decode_micro(uint8_t sel) override;
 	virtual void device_reset() override;
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	virtual machine_config_constructor device_mconfig_additions() const override;
 };
