@@ -3745,11 +3745,12 @@ bool ppc_device::generate_instruction_3f(drcuml_block *block, compiler_state *co
 
 void ppc_device::log_add_disasm_comment(drcuml_block *block, uint32_t pc, uint32_t op)
 {
-	std::string buffer;
 	if (m_drcuml->logging())
 	{
-		ppc_dasm_one(buffer, pc, op);
-		block->append_comment("%08X: %s", pc, buffer.c_str());                                  // comment
+		util::ovectorstream stream;
+		ppc_dasm_one(stream, pc, op);
+		stream.put('\0');
+		block->append_comment("%08X: %s", pc, &stream.vec()[0]);                                  // comment
 	}
 }
 
