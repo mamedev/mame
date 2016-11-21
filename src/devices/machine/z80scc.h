@@ -310,10 +310,10 @@ protected:
 	{
 		REG_WR0_COMMAND_REGPT   = 0,
 		REG_WR1_INT_DMA_ENABLE  = 1,
-		REG_WR2_INT_VECTOR  = 2,
-		REG_WR3_RX_CONTROL  = 3,
-		REG_WR4_RX_TX_MODES = 4,
-		REG_WR5_TX_CONTROL  = 5,
+		REG_WR2_INT_VECTOR  	= 2,
+		REG_WR3_RX_CONTROL  	= 3,
+		REG_WR4_RX_TX_MODES 	= 4,
+		REG_WR5_TX_CONTROL  	= 5,
 		REG_WR6_SYNC_OR_SDLC_A  = 6,
 		REG_WR7_SYNC_OR_SDLC_F  = 7,
 		REG_WR8_TRANSMIT_DATA   = 8,
@@ -322,7 +322,7 @@ protected:
 		REG_WR11_CLOCK_MODES    = 11,
 		REG_WR12_LO_BAUD_GEN    = 12,
 		REG_WR13_HI_BAUD_GEN    = 13,
-		REG_WR14_MISC_CTRL  = 14,
+		REG_WR14_MISC_CTRL  	= 14,
 		REG_WR15_EXT_ST_INT_CTRL= 15
 	};
 
@@ -332,24 +332,24 @@ protected:
 		RR0_ZC          		= 0x02,
 		RR0_TX_BUFFER_EMPTY		= 0x04,
 		RR0_DCD        			= 0x08,
-		RR0_SYNC_HUNT       = 0x10, // SIO bit, not supported
-		RR0_CTS         = 0x20, // SIO bit
-		RR0_TX_UNDERRUN     = 0x40, // SIO bit, not supported
-		RR0_BREAK_ABORT     = 0x80  // SIO bit, not supported
+		RR0_SYNC_HUNT       	= 0x10,
+		RR0_CTS         		= 0x20,
+		RR0_TX_UNDERRUN     	= 0x40,
+		RR0_BREAK_ABORT     	= 0x80 
 	};
 
 	enum
 	{
-		RR1_ALL_SENT        = 0x01, // SIO/SCC bit
-		RR1_RESIDUE_CODE_MASK   = 0x0e, // SIO/SCC bits, not supported
-		RR1_PARITY_ERROR    = 0x10, // SIO/SCC bits
-		RR1_RX_OVERRUN_ERROR    = 0x20, // SIO/SCC bits
-		RR1_CRC_FRAMING_ERROR   = 0x40, // SIO/SCC bits
-		RR1_END_OF_FRAME    = 0x80  // SIO/SCC bits, not supported
+		RR1_ALL_SENT        	= 0x01,
+		RR1_RESIDUE_CODE_MASK   = 0x0e,
+		RR1_PARITY_ERROR    	= 0x10,
+		RR1_RX_OVERRUN_ERROR    = 0x20,
+		RR1_CRC_FRAMING_ERROR   = 0x40,
+		RR1_END_OF_FRAME    	= 0x80 
 	};
 
 	enum
-	{             // TODO: overload SIO functionality
+	{
 		RR2_INT_VECTOR_MASK = 0xff, // SCC channel A, SIO channel B (special case)
 		RR2_INT_VECTOR_V1   = 0x02, // SIO (special case) /SCC Channel B
 		RR2_INT_VECTOR_V2   = 0x04, // SIO (special case) /SCC Channel B
@@ -418,12 +418,12 @@ protected:
 
 	enum
 	{
-		WR3_RX_ENABLE           = 0x01,
+		WR3_RX_ENABLE           	= 0x01,
 		WR3_SYNC_CHAR_LOAD_INHIBIT  = 0x02,
 		WR3_ADDRESS_SEARCH_MODE     = 0x04,
-		WR3_RX_CRC_ENABLE       = 0x08,
-		WR3_ENTER_HUNT_PHASE        = 0x10,
-		WR3_AUTO_ENABLES        = 0x20,
+		WR3_RX_CRC_ENABLE			= 0x08,
+		WR3_ENTER_HUNT_MODE         = 0x10,
+		WR3_AUTO_ENABLES        	= 0x20,
 		WR3_RX_WORD_LENGTH_MASK     = 0xc0,
 		WR3_RX_WORD_LENGTH_5        = 0x00,
 		WR3_RX_WORD_LENGTH_7        = 0x40,
@@ -619,7 +619,7 @@ protected:
 	int m_rts;      // request to send
 
 	// synchronous state
-	uint16_t m_sync;      // sync character
+	uint16_t m_sync_pattern;      // sync character
 
 	int m_rcv_mode;
 	int m_index;
