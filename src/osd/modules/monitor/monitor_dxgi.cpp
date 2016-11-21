@@ -25,10 +25,6 @@
 #include "window.h"
 #include "windows/video.h"
 
-DYNAMIC_API_BEGIN(dxgi, "dxgi.dll")
-	DYNAMIC_API_FN(DWORD, WINAPI, CreateDXGIFactory1, REFIID, void**)
-DYNAMIC_API_END(dxgi)
-
 using namespace Microsoft::WRL;
 
 class dxgi_monitor_info : public osd_monitor_info
@@ -61,6 +57,9 @@ public:
 
 class dxgi_monitor_module : public monitor_module_base
 {
+private:
+	DYNAMIC_API(dxgi, "dxgi.dll");
+	DYNAMIC_API_FN(dxgi, DWORD, WINAPI, CreateDXGIFactory1, REFIID, void**);
 public:
 	dxgi_monitor_module()
 		: monitor_module_base(OSD_MONITOR_PROVIDER, "dxgi")
@@ -69,7 +68,7 @@ public:
 
 	bool probe() override
 	{
-		if(!DYNAMIC_API_TEST(dxgi, CreateDXGIFactory1))
+		if(!DYNAMIC_API_TEST(CreateDXGIFactory1))
 			return false;
 
 		return true;
@@ -129,7 +128,7 @@ protected:
 		ComPtr<IDXGIFactory2> factory;
 		ComPtr<IDXGIAdapter> adapter;
 
-		result = DYNAMIC_CALL(dxgi, CreateDXGIFactory1, __uuidof(IDXGIFactory2), reinterpret_cast<void**>(factory.GetAddressOf())); // m_create_factory_fn();
+		result = DYNAMIC_CALL(CreateDXGIFactory1, __uuidof(IDXGIFactory2), reinterpret_cast<void**>(factory.GetAddressOf())); // m_create_factory_fn();
 		if (result != ERROR_SUCCESS)
 		{
 			osd_printf_error("CreateDXGIFactory1 failed with error 0x%x\n", static_cast<unsigned int>(result));

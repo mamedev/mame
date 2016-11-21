@@ -99,48 +99,28 @@ protected:
 
 } // namespace osd
 
-//=========================================================================================================================
-// Dynamic API helpers. Useful in creating a singleton object that can be called with DYNAMIC_CALL macro for an entire API
-// Usage for defining an API is below
+//=========================================================================================================
+// Dynamic API helpers. Useful in creating a class members that expose dynamically bound API functions.
 //
-// DYNAMIC_API_BEGIN(dxgi, "dxgi.dll")
-//   DYNAMIC_API_FN(DWORD, WINAPI, CreateDXGIFactory1, REFIID, void**)
-// DYNAMIC_API_END(dxgi)
+// DYNAMIC_API(dxgi, "dxgi.dll")
+// DYNAMIC_API_FN(dxgi, DWORD, WINAPI, CreateDXGIFactory1, REFIID, void**)
 //
-// Calling then looks like: DYNAMIC_CALL(dxgi, CreateDXGIFactory1, p1, p2, etc)
-//=========================================================================================================================
+// Calling then looks like: DYNAMIC_CALL(CreateDXGIFactory1, p1, p2, etc)
+//=========================================================================================================
 
 #if !defined(OSD_UWP)
 
-#define DYNAMIC_API_BEGIN(apiname, ...) namespace osd { namespace dynamicapi { \
-class apiname##_api { \
-private: \
-	osd::dynamic_module::ptr m_module = osd::dynamic_module::open( { __VA_ARGS__ } ); \
-	static std::unique_ptr<apiname##_api> s_instance; \
-	static std::once_flag s_once; \
-public: \
-	static apiname##_api &instance() { \
-		std::call_once( apiname##_api::s_once, [](std::unique_ptr<apiname##_api> &inst) { \
-			inst = std::make_unique<apiname##_api>(); }, std::ref(s_instance)); \
-		return *apiname##_api::s_instance.get(); }
-
-#define DYNAMIC_API_FN(ret, conv, apifunc, ...) ret(conv *m_##apifunc##_pfn)( __VA_ARGS__ ) = m_module->bind<ret(conv *)( __VA_ARGS__ )>(#apifunc);
-
-#define DYNAMIC_API_END(apiname) }; \
-std::once_flag apiname##_api::s_once; \
-std::unique_ptr<apiname##_api> apiname##_api::s_instance = nullptr; }}
-
-#define DYNAMIC_CALL(apiname, fname, ...) (*osd::dynamicapi::apiname##_api::instance().m_##fname##_pfn) ( __VA_ARGS__ )
-#define DYNAMIC_API_TEST(apiname, fname) (osd::dynamicapi::apiname##_api::instance().m_##fname##_pfn != nullptr)
+#define DYNAMIC_API(apiname, ...) osd::dynamic_module::ptr m_##apiname##module = osd::dynamic_module::open( { __VA_ARGS__ } )
+#define DYNAMIC_API_FN(apiname, ret, conv, fname, ...) ret(conv *m_##fname##_pfn)( __VA_ARGS__ ) = m_##apiname##module->bind<ret(conv *)( __VA_ARGS__ )>(#fname)
+#define DYNAMIC_CALL(fname, ...) (*m_##fname##_pfn) ( __VA_ARGS__ )
+#define DYNAMIC_API_TEST(fname) (m_##fname##_pfn != nullptr)
 
 #else
 
-#define DYNAMIC_API_BEGIN(apiname, ...)
-#define DYNAMIC_API_FN(ret, conv, apifunc, ...)
-#define DYNAMIC_API_END(apiname)
-
-#define DYNAMIC_CALL(apiname, fname, ...) fname( __VA_ARGS__ )
-#define DYNAMIC_API_TEST(apiname, fname) (true)
+#define DYNAMIC_API(apiname, ...)
+#define DYNAMIC_API_FN(apiname, ret, conv, fname, ...)
+#define DYNAMIC_CALL(fname, ...) fname( __VA_ARGS__ )
+#define DYNAMIC_API_TEST(fname) (true)
 
 #endif
 

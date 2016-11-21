@@ -123,12 +123,6 @@ public:
 typedef std::unique_ptr<IXAudio2MasteringVoice, xaudio2_custom_deleter> mastering_voice_ptr;
 typedef std::unique_ptr<IXAudio2SourceVoice, xaudio2_custom_deleter> src_voice_ptr;
 
-// XAudio2 API
-// 
-DYNAMIC_API_BEGIN(xaudio2, "XAudio2_9.dll", "XAudio2_8.dll")
-	DYNAMIC_API_FN(HRESULT, WINAPI, XAudio2Create, IXAudio2 **, uint32_t, XAUDIO2_PROCESSOR)
-DYNAMIC_API_END(xaudio2)
-
 //============================================================
 //  Helper classes
 //============================================================
@@ -209,6 +203,8 @@ private:
 	uint32_t                           m_underflows;
 	BOOL                             m_in_underflow;
 	BOOL                             m_initialized;
+	DYNAMIC_API(xaudio2, "dwrite.dll");
+	DYNAMIC_API_FN(xaudio2, HRESULT, WINAPI, XAudio2Create, IXAudio2 **, uint32_t, XAUDIO2_PROCESSOR);
 
 public:
 	sound_xaudio2() :
@@ -268,7 +264,7 @@ private:
 
 bool sound_xaudio2::probe()
 {
-	return DYNAMIC_API_TEST(xaudio2, XAudio2Create);
+	return DYNAMIC_API_TEST(XAudio2Create);
 }
 
 //============================================================
@@ -285,14 +281,14 @@ int sound_xaudio2::init(osd_options const &options)
 	CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 
 	// Make sure our XAudio2Create entrypoint is bound
-	if (!DYNAMIC_API_TEST(xaudio2, XAudio2Create))
+	if (!DYNAMIC_API_TEST(XAudio2Create))
 	{
 		osd_printf_error("Could not find XAudio2. Please try to reinstall DirectX runtime package.\n");
 		return 1;
 	}
 
 	// Create the IXAudio2 object
-	HR_GOERR(DYNAMIC_CALL(xaudio2, XAudio2Create, m_xAudio2.GetAddressOf(), 0, XAUDIO2_DEFAULT_PROCESSOR));
+	HR_GOERR(DYNAMIC_CALL(XAudio2Create, m_xAudio2.GetAddressOf(), 0, XAUDIO2_DEFAULT_PROCESSOR));
 
 	// make a format description for what we want
 	format.wBitsPerSample = 16;

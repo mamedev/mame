@@ -66,19 +66,6 @@ static const float POINTS_PER_DIP = (3.0f / 4.0f);
 #define HR_RET0( CALL ) HR_RET(CALL, 0)
 #define HR_RET1( CALL ) HR_RET(CALL, 1)
 
-// Dynamic APIs
-DYNAMIC_API_BEGIN(d2d1, "d2d1.dll")
-	DYNAMIC_API_FN(HRESULT, WINAPI, D2D1CreateFactory, D2D1_FACTORY_TYPE, REFIID, const D2D1_FACTORY_OPTIONS *, void **)
-DYNAMIC_API_END(d2d1)
-
-DYNAMIC_API_BEGIN(dwrite, "dwrite.dll")
-	DYNAMIC_API_FN(HRESULT, WINAPI, DWriteCreateFactory, DWRITE_FACTORY_TYPE, REFIID, IUnknown **)
-DYNAMIC_API_END(dwrite)
-
-DYNAMIC_API_BEGIN(locale, "kernel32.dll")
-	DYNAMIC_API_FN(int, WINAPI, GetUserDefaultLocaleName, LPWSTR, int)
-DYNAMIC_API_END(locale)
-
 // Debugging functions
 #ifdef DWRITE_DEBUGGING
 
@@ -93,12 +80,17 @@ HRESULT SaveBitmap(IWICBitmap* bitmap, GUID pixelFormat, const WCHAR *filename)
 	ComPtr<ID2D1Factory1> d2dfactory;
 	ComPtr<IDWriteFactory> dwriteFactory;
 	ComPtr<IWICImagingFactory> wicFactory;
+	
+	DYNAMIC_API(dwrite, "dwrite.dll");
+	DYNAMIC_API(d2d1, "d2d1.dll");
+	DYNAMIC_API_FN(dwrite, HRESULT, WINAPI, DWriteCreateFactory, DWRITE_FACTORY_TYPE, REFIID, IUnknown **);
+	DYNAMIC_API_FN(d2d1, HRESULT, WINAPI, D2D1CreateFactory, D2D1_FACTORY_TYPE, REFIID, const D2D1_FACTORY_OPTIONS *, void **);
 
-	if (!DYNAMIC_API_TEST(d2d1, D2D1CreateFactory) || !DYNAMIC_API_TEST(dwrite, DWriteCreateFactory))
+	if (!DYNAMIC_API_TEST(D2D1CreateFactory) || !DYNAMIC_API_TEST(DWriteCreateFactory))
 		return ERROR_DLL_NOT_FOUND;
 
 	// Create a Direct2D factory
-	HR_RETHR(DYNAMIC_CALL(d2d1, D2D1CreateFactory,
+	HR_RETHR(DYNAMIC_CALL(D2D1CreateFactory,
 		D2D1_FACTORY_TYPE_SINGLE_THREADED,
 		__uuidof(ID2D1Factory1),
 		nullptr,
@@ -108,7 +100,7 @@ HRESULT SaveBitmap(IWICBitmap* bitmap, GUID pixelFormat, const WCHAR *filename)
 	CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
 
 	// Create a DirectWrite factory.
-	HR_RETHR(DYNAMIC_CALL(dwrite, DWriteCreateFactory,
+	HR_RETHR(DYNAMIC_CALL(DWriteCreateFactory,
 		DWRITE_FACTORY_TYPE_SHARED,
 		__uuidof(IDWriteFactory),
 		reinterpret_cast<IUnknown **>(dwriteFactory.GetAddressOf())));
@@ -655,6 +647,12 @@ private:
 class font_dwrite : public osd_module, public font_module
 {
 private:
+	DYNAMIC_API(dwrite, "dwrite.dll");
+	DYNAMIC_API(d2d1, "d2d1.dll");
+	DYNAMIC_API(locale, "kernel32.dll");
+	DYNAMIC_API_FN(dwrite, HRESULT, WINAPI, DWriteCreateFactory, DWRITE_FACTORY_TYPE, REFIID, IUnknown **);
+	DYNAMIC_API_FN(d2d1, HRESULT, WINAPI, D2D1CreateFactory, D2D1_FACTORY_TYPE, REFIID, const D2D1_FACTORY_OPTIONS *, void **);
+	DYNAMIC_API_FN(locale, int, WINAPI, GetUserDefaultLocaleName, LPWSTR, int);
 	ComPtr<ID2D1Factory>         m_d2dfactory;
 	ComPtr<IDWriteFactory>       m_dwriteFactory;
 	ComPtr<IWICImagingFactory>   m_wicFactory;
@@ -672,7 +670,7 @@ public:
 	virtual bool probe() override
 	{
 		// This module is available if it can load the expected API Functions
-		if (!DYNAMIC_API_TEST(d2d1, D2D1CreateFactory) || !DYNAMIC_API_TEST(dwrite, DWriteCreateFactory))
+		if (!DYNAMIC_API_TEST(D2D1CreateFactory) || !DYNAMIC_API_TEST(DWriteCreateFactory))
 			return false;
 
 		return true;
@@ -685,16 +683,16 @@ public:
 		osd_printf_verbose("FontProvider: Initializing DirectWrite\n");
 
 		// Make sure we can initialize our api functions
-		if (!DYNAMIC_API_TEST(d2d1, D2D1CreateFactory) || !DYNAMIC_API_TEST(dwrite, DWriteCreateFactory))
+		if (!DYNAMIC_API_TEST(D2D1CreateFactory) || !DYNAMIC_API_TEST(DWriteCreateFactory))
 		{
 			osd_printf_error("ERROR: FontProvider: Failed to load DirectWrite functions.\n");
 			return -1;
 		}
 
-		assert(DYNAMIC_API_TEST(locale, GetUserDefaultLocaleName));
+		assert(DYNAMIC_API_TEST(GetUserDefaultLocaleName));
 
 		// Create a Direct2D factory.
-		HR_RET1(DYNAMIC_CALL(d2d1, D2D1CreateFactory,
+		HR_RET1(DYNAMIC_CALL(D2D1CreateFactory,
 			D2D1_FACTORY_TYPE_SINGLE_THREADED,
 			__uuidof(ID2D1Factory),
 			nullptr,
@@ -704,7 +702,7 @@ public:
 		CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
 
 		// Create a DirectWrite factory.
-		HR_RET1(DYNAMIC_CALL(dwrite, DWriteCreateFactory,
+		HR_RET1(DYNAMIC_CALL(DWriteCreateFactory,
 			DWRITE_FACTORY_TYPE_SHARED,
 			__uuidof(IDWriteFactory),
 			reinterpret_cast<IUnknown **>(m_dwriteFactory.GetAddressOf())));
@@ -793,10 +791,10 @@ private:
 
 		// Get the default locale for this user if possible.
 		// GetUserDefaultLocaleName doesn't exist on XP, so don't assume.
-		if (DYNAMIC_API_TEST(locale, GetUserDefaultLocaleName))
+		if (DYNAMIC_API_TEST(GetUserDefaultLocaleName))
 		{
 			wchar_t name_buffer[LOCALE_NAME_MAX_LENGTH];
-			int len = DYNAMIC_CALL(locale, GetUserDefaultLocaleName, name_buffer, LOCALE_NAME_MAX_LENGTH);
+			int len = DYNAMIC_CALL(GetUserDefaultLocaleName, name_buffer, LOCALE_NAME_MAX_LENGTH);
 			if (len != 0)
 				locale_name = name_buffer;
 		}
