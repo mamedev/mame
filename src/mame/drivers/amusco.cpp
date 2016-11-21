@@ -39,11 +39,10 @@
   CPU socket. Some of the other chips on this board were replaced with clones (e.g.
   AMD P8253, SY6545-1).
 
-  The program code reads from and writes to what must be a line printer and a RTC
+  The program code reads from and writes to a 40-column line printer and a RTC
   (probably a MSM5832), though neither is present on the main board. The I/O write
   patterns also suggest that each or both of these devices are accessed through an
-  Intel 8155 or compatible interface chip. The printer appears to use non-Epson
-  control codes: ETB, DLE, DC4, DC2, SO, EM, DC1 and STX.
+  Intel 8155 or compatible interface chip. The printer uses NCR-style control codes.
 
 *****************************************************************************************
 
@@ -66,7 +65,8 @@
   - Make the 6845 transparent videoram addressing actually transparent.
     (IRQ1 changes the 6845 address twice but neither reads nor writes data?)
   - Add NVRAM in a way that won't trigger POST error message (needs NMI on shutdown?)
-  - Identify remaining outputs from first PPI (button lamps and coin counter are identified and implemented)
+  - Identify remaining outputs from first PPI (button lamps are identified and implemented)
+  - Draw 88 Poker fails POST memory test for some weird reason (IRQ interference?)
 
 *******************************************************************************/
 
@@ -79,6 +79,8 @@
 #define SND_CLOCK           SECOND_CLOCK / 8    /* guess */
 #define PIT_CLOCK0          SECOND_CLOCK / 8    /* guess */
 #define PIT_CLOCK1          SECOND_CLOCK / 8    /* guess */
+
+#define COIN_IMPULSE        3
 
 #include "emu.h"
 #include "cpu/i86/i86.h"
@@ -111,9 +113,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;
 	virtual void machine_start() override;
-	DECLARE_READ8_MEMBER(hack_coin1_r);
-	DECLARE_READ8_MEMBER(hack_coin2_r);
-	DECLARE_READ8_MEMBER(hack_bill_r);
+	DECLARE_WRITE_LINE_MEMBER(coin_irq);
 	DECLARE_READ8_MEMBER(mc6845_r);
 	DECLARE_WRITE8_MEMBER(mc6845_w);
 	DECLARE_WRITE8_MEMBER(output_a_w);
@@ -174,44 +174,11 @@ void amusco_state::machine_start()
 }
 
 
-/**************************
-*  Read / Write Handlers  *
-**************************/
-
-READ8_MEMBER(amusco_state::hack_coin1_r)
-{
-	// actually set by IRQ4
-	return BIT(ioport("IN2")->read(), 1) ? 1 : 0;
-}
-
-READ8_MEMBER(amusco_state::hack_coin2_r)
-{
-	// actually set by IRQ4
-	return BIT(ioport("IN2")->read(), 2) ? 1 : 0;
-}
-
-READ8_MEMBER(amusco_state::hack_bill_r)
-{
-	// actually set by IRQ4
-	return BIT(ioport("IN1")->read(), 2) ? 0 : 1;
-}
-
 /*************************
 * Memory Map Information *
 *************************/
 
 static ADDRESS_MAP_START( amusco_mem_map, AS_PROGRAM, 8, amusco_state )
-	AM_RANGE(0x006a6, 0x006a6) AM_READ(hack_coin1_r)
-	AM_RANGE(0x006a8, 0x006a8) AM_READ(hack_coin2_r)
-	AM_RANGE(0x00000, 0x0ffff) AM_RAM
-	AM_RANGE(0xec000, 0xecfff) AM_RAM AM_SHARE("videoram")  // placeholder
-	AM_RANGE(0xf8000, 0xfffff) AM_ROM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( draw88pkr_mem_map, AS_PROGRAM, 8, amusco_state )
-	AM_RANGE(0x006ae, 0x006ae) AM_READ(hack_coin1_r)
-	AM_RANGE(0x006b0, 0x006b0) AM_READ(hack_coin2_r)
-	AM_RANGE(0x0069a, 0x0069a) AM_READ(hack_bill_r)
 	AM_RANGE(0x00000, 0x0ffff) AM_RAM
 	AM_RANGE(0xec000, 0xecfff) AM_RAM AM_SHARE("videoram")  // placeholder
 	AM_RANGE(0xf8000, 0xfffff) AM_ROM
@@ -273,14 +240,16 @@ WRITE8_MEMBER(amusco_state::output_b_w)
   7654 3210
   ---- --x-  Unknown lamp (lits when all holds/disc are ON. Could be a Cancel lamp in an inverted Hold system).
   ---- -x--  Start/Draw lamp.
-  ---x ----  Coin counter.
-  xxx- x--x  Unknown.
+  ---x ----  Low when sound data queued.
+  --x- ----  Safe to shutdown?
+  -x-- ----  Allow NMI?
+  x--- x--x  Unknown.
 
 */
 	output().set_lamp_value(6, (data >> 2) & 1);    // Lamp 6 (Start/Draw)
 	output().set_lamp_value(7, (data >> 1) & 1);    // Lamp 7 (Unknown)
 
-	machine().bookkeeping().coin_counter_w(0, ~data & 0x10);  // Coin counter
+	//machine().bookkeeping().coin_counter_w(0, ~data & 0x10); // Probably not coin-related
 
 //	logerror("Writing %02Xh to PPI output B\n", data);
 }
@@ -308,7 +277,39 @@ READ8_MEMBER(amusco_state::lpt_status_r)
 
 WRITE8_MEMBER(amusco_state::lpt_data_w)
 {
-	logerror("Writing %02Xh to printer\n", data);
+	switch (data)
+	{
+		case 0x10: // NCR: Clear all printer and interface functions
+			logerror("Writing DLE to printer\n");
+			break;
+
+		case 0x11:
+			logerror("Writing DC1 to printer\n");
+			break;
+
+		case 0x12: // NCR: Select double-wide characters for one line
+			logerror("Writing DC2 to printer\n");
+			break;
+
+		case 0x14: // NCR: Feed n print lines (where n is following byte)
+			logerror("Writing DC4 to printer\n");
+			break;
+
+		case 0x17: // NCR: Print buffer contents; advance one line
+			logerror("Writing ETB to printer\n");
+			break;
+
+		case 0x19: // NCR: Perform full knife cut
+			logerror("Writing EM to printer\n");
+			break;
+
+		default:
+			if (data >= 0x20 && data < 0x7f)
+				logerror("Writing '%c' to printer\n", data);
+			else
+				logerror("Writing %02Xh to printer\n", data);
+			break;
+	}
 }
 
 WRITE8_MEMBER(amusco_state::rtc_control_w)
@@ -369,20 +370,25 @@ static INPUT_PORTS_START( amusco )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD4 ) // move down in service mode
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_POKER_HOLD3 ) // move up in service mode
 
-	PORT_START("IN2") // TO DO: enabling IRQ4 produces COIN ERROR message
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 ) //PORT_WRITE_LINE_DEVICE_MEMBER("pic8259", pic8259_device, ir4_w)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 ) //PORT_WRITE_LINE_DEVICE_MEMBER("pic8259", pic8259_device, ir4_w)
-	PORT_BIT( 0xf9, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_START("IN2")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(COIN_IMPULSE) PORT_WRITE_LINE_DEVICE_MEMBER(":", amusco_state, coin_irq)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(COIN_IMPULSE) PORT_WRITE_LINE_DEVICE_MEMBER(":", amusco_state, coin_irq)
+	PORT_BIT( 0xf9, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( draw88pkr )
 	PORT_INCLUDE( amusco )
 
-	PORT_MODIFY("IN1")
+	PORT_MODIFY("IN1") // Doors probably still exist, though code does nothing with them
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BILL1 ) //PORT_WRITE_LINE_DEVICE_MEMBER("pic8259", pic8259_device, ir4_w)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BILL1 ) PORT_IMPULSE(COIN_IMPULSE) PORT_WRITE_LINE_DEVICE_MEMBER(":", amusco_state, coin_irq)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
+
+WRITE_LINE_MEMBER(amusco_state::coin_irq)
+{
+	m_pic->ir4_w(state ? CLEAR_LINE : HOLD_LINE);
+}
 
 
 
@@ -495,8 +501,7 @@ static MACHINE_CONFIG_START( amusco, amusco_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( draw88pkr, amusco )
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(draw88pkr_mem_map)
+	//MCFG_DEVICE_MODIFY("ppi_outputs") // Some bits are definitely different
 MACHINE_CONFIG_END
 
 
@@ -549,4 +554,4 @@ ROM_END
 
 /*     YEAR  NAME        PARENT  MACHINE   INPUT     STATE          INIT  ROT    COMPANY      FULLNAME                      FLAGS                                                    LAYOUT    */
 GAMEL( 1987, amusco,     0,      amusco,   amusco,   driver_device, 0,    ROT0, "Amusco",    "American Music Poker (V1.4)", MACHINE_IMPERFECT_COLORS | MACHINE_NODEVICE_PRINTER,     layout_amusco ) // palette totally wrong
-GAMEL( 1988, draw88pkr,  0,      draw88pkr,draw88pkr,driver_device, 0,    ROT0, "BTE, Inc.", "Draw 88 Poker (V2.0)",        MACHINE_NOT_WORKING | MACHINE_IMPERFECT_COLORS | MACHINE_NODEVICE_PRINTER, layout_amusco )
+GAMEL( 1988, draw88pkr,  0,      draw88pkr,draw88pkr,driver_device, 0,    ROT0, "BTE, Inc.", "Draw 88 Poker (V2.0)",        MACHINE_IMPERFECT_COLORS | MACHINE_NODEVICE_PRINTER, layout_amusco ) // palette totally wrong
