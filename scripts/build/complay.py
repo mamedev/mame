@@ -88,7 +88,7 @@ class XmlError(Exception):
 def compressLayout(src, dst, comp):
     state = [0, 0]
     def write(block):
-        for ch in block:
+        for ch in bytearray(block):
             if 0 == state[0]:
                 dst('\t')
             elif 0 == (state[0] % 32):
@@ -96,7 +96,7 @@ def compressLayout(src, dst, comp):
             else:
                 dst(', ')
             state[0] += 1
-            dst('%3u' % (ord(ch)))
+            dst('%3u' % (ch))
 
     def output(text):
         block = text.encode('UTF-8')
