@@ -23,8 +23,8 @@
 	Clocks and timings verified on 86612-A-2 board, serial no. 39646
 	by scope measurement at clock pins
 
-	Note; Protection MCU is labelled "TS" without a number and without a coloured
-	      stripe. Maybe its code is not region dependant.
+    Note: Protection MCU is labelled "TS" without a number and without a coloured
+          stripe. Maybe its code is not region dependant.
     Note: Euro rom labels (IE: "TSE") had a blue stripe, while those labeled
           as USA (TSU) had an red stripe on the sticker.  The intermixing
           of TSE and TSU roms in the parent set is correct and verified.
