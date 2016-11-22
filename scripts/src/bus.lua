@@ -2919,8 +2919,9 @@ end
 if (BUSES["HP9845_IO"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/hp9845_io/hp9845_io.cpp",
-				MAME_DIR .. "src/devices/bus/hp9845_io/98035.cpp"
-		}
+		MAME_DIR .. "src/devices/bus/hp9845_io/98034.cpp",
+		MAME_DIR .. "src/devices/bus/hp9845_io/98035.cpp",
+	}
 end
 
 ---------------------------------------------------
