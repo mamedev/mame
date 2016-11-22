@@ -230,7 +230,7 @@ startup codes
 it reads 00/36/0e/11/33/34/2d, fetching some code copied to RAM,
 and a value which is used as an offset to point to the code in RAM.
 19/12/31/28 are read repeatedly, from the interrupt, and the returned
-value chanes, some kind of mode set command?
+value changes, some kind of mode set command?
 
 level codes
 
@@ -838,7 +838,7 @@ static MACHINE_CONFIG_START( drgnbowl, gaiden_state )
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
-	/* NOT using Tecmo Sprite device - signifcant changes, maybe a clone of something else */
+	/* NOT using Tecmo Sprite device - significant changes, maybe a clone of something else */
 
 	MCFG_VIDEO_START_OVERRIDE(gaiden_state,drgnbowl)
 
@@ -1666,7 +1666,7 @@ GAME( 1988, gaiden,    shadoww,  shadoww,  common, gaiden_state,   shadoww,  ROT
 GAME( 1989, ryukendn,  shadoww,  shadoww,  common, gaiden_state,   shadoww,  ROT0,   "Tecmo", "Ninja Ryukenden (Japan, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, ryukendna, shadoww,  shadoww,  common, gaiden_state,   shadoww,  ROT0,   "Tecmo", "Ninja Ryukenden (Japan, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, mastninj,  shadoww,  mastninj, common, gaiden_state,   mastninj, ROT0,   "bootleg", "Master Ninja (bootleg of Shadow Warriors / Ninja Gaiden)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // sprites need fixing, sound and yscroll too. - it is confirmed the curtains don't scroll on the pcb
-GAME( 1992, drgnbowl,  0,        drgnbowl, drgnbowl, gaiden_state, drgnbowl, ROT0,   "Nics",  "Dragon Bowl (set 1, encrypted program)", MACHINE_SUPPORTS_SAVE ) // Draogn Bowl is based on Ninja Gaiden code
+GAME( 1992, drgnbowl,  0,        drgnbowl, drgnbowl, gaiden_state, drgnbowl, ROT0,   "Nics",  "Dragon Bowl (set 1, encrypted program)", MACHINE_SUPPORTS_SAVE ) // Dragon Bowl is based on Ninja Gaiden code
 GAME( 1992, drgnbowla, drgnbowl, drgnbowl, drgnbowl, gaiden_state, drgnbowla,ROT0,   "Nics",  "Dragon Bowl (set 2, unencrypted program)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1989, wildfang,  0,        shadoww,  wildfang, gaiden_state, wildfang, ROT0,   "Tecmo", "Wild Fang / Tecmo Knight", MACHINE_SUPPORTS_SAVE )
