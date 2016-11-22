@@ -10,6 +10,7 @@ TODO:
 - kurufev: column scrolling garbage on map and matchup screens. (btanb?)
 - mayjin3: static noise during gameplay.
 - starsldr: credit display is busted, it displays a 0 if credit is between 0 and 9. Silly protection/core bug? <- fixed as per 060916
+- vivdolls: PCB actually supports analogue joystick or JAMMA standard, dip 5 - currently only analogue controls are supported in driver
 
 
 If you want to boot eleven beat on any n64 emu ?(tested on nemu, 1964 and project64) patch the rom :
@@ -480,6 +481,59 @@ static INPUT_PORTS_START( aleck64 )
 	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Service Button") PORT_CODE(KEYCODE_7)
 	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_COIN1 )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( vivdolls )
+	PORT_INCLUDE( aleck64 )
+
+	PORT_MODIFY("IN0")
+	PORT_DIPNAME( 0x80000000, 0x80000000, "Unused" ) PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING( 0x80000000, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40000000, 0x40000000, "Unused" ) PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING( 0x40000000, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20000000, 0x20000000, "Unused" ) PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING( 0x20000000, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10000000, 0x10000000, "Unused" ) PORT_DIPLOCATION("SW1:5")
+	PORT_DIPSETTING( 0x10000000, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08000000, 0x08000000, "Unused" ) PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING( 0x08000000, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x07000000, 0x07000000, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:3,2,1")
+	PORT_DIPSETTING( 0x07000000, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING( 0x03000000, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING( 0x05000000, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING( 0x01000000, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING( 0x06000000, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING( 0x02000000, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING( 0x04000000, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING( 0x00000000, DEF_STR( 5C_1C ) )
+	PORT_DIPNAME( 0x00800000, 0x00800000, "Test Mode" ) PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING( 0x00800000, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00400000, 0x00400000, "Unused" ) PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING( 0x00400000, DEF_STR( Off ) )
+	PORT_DIPSETTING( 0x00000000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00200000, 0x00200000, "Qualify Area" ) PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING( 0x00200000, "70%" )
+	PORT_DIPSETTING( 0x00000000, "80%" )
+	PORT_DIPNAME( 0x00100000, 0x00100000, "Controls" ) PORT_DIPLOCATION("SW2:5") // Marked as unused always-off in manual, but off won't work on a JAMMA cabinet
+	PORT_DIPSETTING( 0x00100000, "JOYSTICK" )
+	PORT_DIPSETTING( 0x00000000, "JAMMASTICK" )
+	PORT_DIPNAME( 0x000c0000, 0x000c0000, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:4,3")
+	PORT_DIPSETTING( 0x000c0000, "4" )
+	PORT_DIPSETTING( 0x00040000, "3" )
+	PORT_DIPSETTING( 0x00080000, "2" )
+	PORT_DIPSETTING( 0x00000000, "1" )
+	PORT_DIPNAME( 0x00030000, 0x00030000, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:2,1")
+	PORT_DIPSETTING( 0x00030000, DEF_STR( Normal ) )
+	PORT_DIPSETTING( 0x00010000, DEF_STR( Easy ) )
+	PORT_DIPSETTING( 0x00020000, DEF_STR( Hard ) )
+	PORT_DIPSETTING( 0x00000000, DEF_STR( Hardest ) )
+	PORT_BIT(0x0000ffff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( 11beat )
@@ -1172,7 +1226,7 @@ GAME( 1998, aleck64,  0,        aleck64, aleck64, aleck64_state,  aleck64, ROT0,
 GAME( 1998, 11beat,   aleck64,  aleck64, 11beat, aleck64_state,   aleck64, ROT0, "Hudson", "Eleven Beat", MACHINE_IMPERFECT_GRAPHICS ) // crashes at kick off / during attract with DRC
 GAME( 1998, mtetrisc, aleck64,  a64_e90, mtetrisc, aleck64_state, aleck64, ROT0, "Capcom", "Magical Tetris Challenge (981009 Japan)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS ) // missing E90 gfxs (playfield)
 GAME( 1998, starsldr, aleck64,  aleck64, starsldr, aleck64_state, aleck64, ROT0, "Hudson / Seta", "Star Soldier: Vanishing Earth", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1998, vivdolls, aleck64,  aleck64, aleck64, aleck64_state,  aleck64, ROT0, "Visco", "Vivid Dolls", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1998, vivdolls, aleck64,  aleck64, vivdolls, aleck64_state,  aleck64, ROT0, "Visco", "Vivid Dolls", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1999, srmvs,    aleck64,  aleck64, srmvs, aleck64_state,    aleck64, ROT0, "Seta", "Super Real Mahjong VS", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 2000, mayjin3,  aleck64,  aleck64, aleck64, aleck64_state,  aleck64, ROT0, "Seta / Able Corporation", "Mayjinsen 3", MACHINE_IMPERFECT_SOUND|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 2003, twrshaft, aleck64,  aleck64, twrshaft, aleck64_state, aleck64, ROT0, "Aruze", "Tower & Shaft", MACHINE_IMPERFECT_GRAPHICS )
