@@ -14532,6 +14532,7 @@ hyperspt                        // GX330 (c) 1984 + Centuri
 hypersptb                       // bootleg
 roadf                           // GX461 (c) 1984
 roadf2                          // GX461 (c) 1984
+roadf3                          // hack on GX330 board
 
 @source:hyprduel.cpp
 hyprduel                        // (c) 1993 Technosoft (Japan)
