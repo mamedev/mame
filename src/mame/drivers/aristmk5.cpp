@@ -172,6 +172,7 @@
 #include "emu.h"
 #include "includes/archimds.h"
 #include "cpu/arm/arm.h"
+#include "machine/ds1302.h"
 #include "machine/watchdog.h"
 #include "machine/eepromser.h"
 #include "machine/ins8250.h"
@@ -183,13 +184,11 @@ public:
 	aristmk5_state(const machine_config &mconfig, device_type type, const char *tag)
 		: archimedes_state(mconfig, type, tag)
 		, m_eeprom(*this, "eeprom%d", 0)
+		, m_rtc(*this, "rtc")
+		, m_sram_bank(*this, "sram_bank")
+		, m_sram_bank_nz(*this, "sram_bank_nz")
+		, m_extra_ports(*this, "EXTRA")
 		 { }
-
-	emu_timer *m_mk5_2KHz_timer;
-	emu_timer *m_mk5_VSYNC_timer;
-	uint8_t m_ext_latch;
-	uint8_t m_flyback;
-	required_device_array<eeprom_serial_93cxx_device, 2> m_eeprom;
 
 	DECLARE_WRITE32_MEMBER(Ns5w48);
 	DECLARE_READ32_MEMBER(Ns5x58);
@@ -198,13 +197,33 @@ public:
 	DECLARE_READ32_MEMBER(Ns5r50);
 	DECLARE_WRITE32_MEMBER(sram_banksel_w);
 	DECLARE_WRITE32_MEMBER(eeprom_w);
+	DECLARE_WRITE32_MEMBER(rtc_w);
 	DECLARE_READ32_MEMBER(eeprom_r);
+	DECLARE_READ32_MEMBER(ldor_r);
+	DECLARE_WRITE32_MEMBER(ldor_clk_w);
 
 	DECLARE_DRIVER_INIT(aristmk5);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	TIMER_CALLBACK_MEMBER(mk5_VSYNC_callback);
 	TIMER_CALLBACK_MEMBER(mk5_2KHz_callback);
+
+	INPUT_CHANGED_MEMBER(coin_start);
+	CUSTOM_INPUT_MEMBER(coin_r);
+
+private:
+	required_device_array<eeprom_serial_93cxx_device, 2> m_eeprom;
+	required_device<ds1302_device> m_rtc;
+	required_memory_bank m_sram_bank;
+	required_memory_bank m_sram_bank_nz;
+	required_ioport m_extra_ports;
+
+	emu_timer *     m_mk5_2KHz_timer;
+	emu_timer *     m_mk5_VSYNC_timer;
+	uint8_t         m_ext_latch;
+	uint8_t         m_flyback;
+	uint8_t         m_ldor_shift_reg;
+	uint64_t        m_coin_start_cycles;
 };
 
 
@@ -362,7 +381,23 @@ READ32_MEMBER(aristmk5_state::eeprom_r)
 	if (m_eeprom[0]->do_read() && m_eeprom[1]->do_read())
 		data |= 0x04;
 
+	if (m_rtc->io_r())
+		data |= 0x02;
+
 	return data;
+}
+
+WRITE32_MEMBER(aristmk5_state::rtc_w)
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		m_rtc->ce_w(BIT(data, 5));
+
+		if (BIT(data, 6))
+			m_rtc->io_w(BIT(data, 3));
+
+		m_rtc->sclk_w(BIT(data, 4));
+	}
 }
 
 WRITE32_MEMBER(aristmk5_state::eeprom_w)
@@ -376,6 +411,19 @@ WRITE32_MEMBER(aristmk5_state::eeprom_w)
 		m_eeprom[0]->clk_write(BIT(data, 4));
 		m_eeprom[1]->clk_write(BIT(data, 4));
 	}
+}
+
+READ32_MEMBER(aristmk5_state::ldor_r)
+{
+	if (m_extra_ports->read() & 0x01)
+		m_ldor_shift_reg = 0;   // open the Logic door clears the shift register
+
+	return (m_ldor_shift_reg & 0x80);
+}
+
+WRITE32_MEMBER(aristmk5_state::ldor_clk_w)
+{
+	m_ldor_shift_reg = (m_ldor_shift_reg << 1) | BIT(data, 0);
 }
 
 WRITE32_MEMBER(aristmk5_state::sram_banksel_w)
@@ -433,17 +481,16 @@ WRITE32_MEMBER(aristmk5_state::sram_banksel_w)
 
 	     4 pages of 32k for each sram chip.
 	*/
-	membank("sram_bank")->set_entry((data & 0xc0) >> 6);
-	membank("sram_bank_nz")->set_entry((data & 0xc0) >> 6);
+	m_sram_bank->set_entry((data & 0xc0) >> 6);
+	m_sram_bank_nz->set_entry((data & 0xc0) >> 6);
 }
 
-/* U.S games have no dram emulator enabled */
 static ADDRESS_MAP_START( aristmk5_map, AS_PROGRAM, 32, aristmk5_state )
-	AM_RANGE(0x00000000, 0x01ffffff) AM_READWRITE(archimedes_memc_logical_r, archimedes_memc_logical_w)
 	AM_RANGE(0x02000000, 0x02ffffff) AM_RAM AM_SHARE("physicalram") /* physical RAM - 16 MB for now, should be 512k for the A310 */
 
 	/* MK-5 overrides */
 	AM_RANGE(0x03010420, 0x03010423) AM_WRITE(sram_banksel_w) // SRAM bank select write
+	AM_RANGE(0x03010440, 0x03010443) AM_WRITE(rtc_w)
 	AM_RANGE(0x03010450, 0x03010453) AM_WRITE(eeprom_w)
 	AM_RANGE(0x03010800, 0x03010803) AM_READ(eeprom_r)
 
@@ -452,6 +499,11 @@ static ADDRESS_MAP_START( aristmk5_map, AS_PROGRAM, 32, aristmk5_state )
 	AM_RANGE(0x03012010, 0x03012013) AM_READ_PORT("P2")
 	AM_RANGE(0x03012200, 0x03012203) AM_READ_PORT("DSW1")
 	AM_RANGE(0x03012210, 0x03012213) AM_READ_PORT("DSW2")
+	AM_RANGE(0x03010584, 0x03010587) AM_READ_PORT("P4")
+	AM_RANGE(0x03012184, 0x03012187) AM_READ_PORT("P5")
+
+	AM_RANGE(0x03012020, 0x03012023) AM_READ(ldor_r)
+	AM_RANGE(0x03012070, 0x03012073) AM_WRITE(ldor_clk_w)
 
 	AM_RANGE(0x03010480, 0x0301049f) AM_DEVREADWRITE8("uart_0a", ins8250_uart_device, ins8250_r, ins8250_w, 0x000000ff)
 	AM_RANGE(0x03010500, 0x0301051f) AM_DEVREADWRITE8("uart_0b", ins8250_uart_device, ins8250_r, ins8250_w, 0x000000ff)
@@ -476,50 +528,53 @@ static ADDRESS_MAP_START( aristmk5_map, AS_PROGRAM, 32, aristmk5_state )
 	AM_RANGE(0x03400000, 0x035fffff) AM_ROM AM_REGION("maincpu", 0) AM_WRITE(archimedes_vidc_w)
 	AM_RANGE(0x03600000, 0x037fffff) AM_READWRITE(archimedes_memc_r, archimedes_memc_w)
 	AM_RANGE(0x03800000, 0x039fffff) AM_WRITE(archimedes_memc_page_w)
+ADDRESS_MAP_END
+
+/* U.S games have no dram emulator enabled */
+static ADDRESS_MAP_START( aristmk5_usa_map, AS_PROGRAM, 32, aristmk5_state )
+	AM_RANGE(0x00000000, 0x01ffffff) AM_READWRITE(archimedes_memc_logical_r, archimedes_memc_logical_w)
+	AM_IMPORT_FROM(aristmk5_map)
 ADDRESS_MAP_END
 
 /* with dram emulator enabled */
 static ADDRESS_MAP_START( aristmk5_drame_map, AS_PROGRAM, 32, aristmk5_state )
 	AM_RANGE(0x00000000, 0x01ffffff) AM_READWRITE(aristmk5_drame_memc_logical_r, archimedes_memc_logical_w)
-	AM_RANGE(0x02000000, 0x02ffffff) AM_RAM AM_SHARE("physicalram") /* physical RAM - 16 MB for now, should be 512k for the A310 */
-
-	/* MK-5 overrides */
-	AM_RANGE(0x03010420, 0x03010423) AM_WRITE(sram_banksel_w) // SRAM bank select write
-	AM_RANGE(0x03010450, 0x03010453) AM_WRITE(eeprom_w)
-	AM_RANGE(0x03010800, 0x03010803) AM_READ(eeprom_r)
-
-	AM_RANGE(0x03010580, 0x03010583) AM_READ_PORT("P3")
-	AM_RANGE(0x03012000, 0x03012003) AM_READ_PORT("P1")
-	AM_RANGE(0x03012010, 0x03012013) AM_READ_PORT("P2")
-	AM_RANGE(0x03012200, 0x03012203) AM_READ_PORT("DSW1")
-	AM_RANGE(0x03012210, 0x03012213) AM_READ_PORT("DSW2")
-
-	AM_RANGE(0x03010480, 0x0301049f) AM_DEVREADWRITE8("uart_0a", ins8250_uart_device, ins8250_r, ins8250_w, 0x000000ff)
-	AM_RANGE(0x03010500, 0x0301051f) AM_DEVREADWRITE8("uart_0b", ins8250_uart_device, ins8250_r, ins8250_w, 0x000000ff)
-	AM_RANGE(0x03010600, 0x0301061f) AM_DEVREADWRITE8("uart_1a", ins8250_uart_device, ins8250_r, ins8250_w, 0x000000ff)
-	AM_RANGE(0x03010680, 0x0301069f) AM_DEVREADWRITE8("uart_1b", ins8250_uart_device, ins8250_r, ins8250_w, 0x000000ff)
-	AM_RANGE(0x03012100, 0x0301211f) AM_DEVREADWRITE8("uart_2a", ins8250_uart_device, ins8250_r, ins8250_w, 0x000000ff)
-	AM_RANGE(0x03012140, 0x0301215f) AM_DEVREADWRITE8("uart_2b", ins8250_uart_device, ins8250_r, ins8250_w, 0x000000ff)
-	AM_RANGE(0x03012300, 0x0301231f) AM_DEVREADWRITE8("uart_3a", ins8250_uart_device, ins8250_r, ins8250_w, 0x000000ff)
-	AM_RANGE(0x03012340, 0x0301235f) AM_DEVREADWRITE8("uart_3b", ins8250_uart_device, ins8250_r, ins8250_w, 0x000000ff)
-
-	AM_RANGE(0x03010810, 0x03010813) AM_DEVREADWRITE("watchdog", watchdog_timer_device, reset32_r, reset32_w) //MK-5 specific, watchdog
-//  System Startup Code Enabled protection appears to be located at 0x3010400 - 0x30104ff
-	AM_RANGE(0x03220000, 0x0323ffff) AM_RAMBANK("sram_bank") //AM_BASE_SIZE_GENERIC(nvram) // nvram 32kbytes x 3
-
-	// bank5 slow
-	AM_RANGE(0x03250048, 0x0325004b) AM_WRITE(Ns5w48) //IOEB control register
-	AM_RANGE(0x03250050, 0x03250053) AM_READ(Ns5r50)  //IOEB ID register
-	AM_RANGE(0x03250058, 0x0325005b) AM_READ(Ns5x58)  //IOEB interrupt Latch
-
-
-	AM_RANGE(0x03000000, 0x0331ffff) AM_READWRITE(mk5_ioc_r, mk5_ioc_w)
-	AM_RANGE(0x03320000, 0x0333ffff) AM_RAMBANK("sram_bank_nz") // AM_BASE_SIZE_GENERIC(nvram) // nvram 32kbytes x 3 NZ
-	AM_RANGE(0x03400000, 0x035fffff) AM_ROM AM_REGION("maincpu", 0) AM_WRITE(archimedes_vidc_w)
-	AM_RANGE(0x03600000, 0x037fffff) AM_READWRITE(archimedes_memc_r, archimedes_memc_w)
-	AM_RANGE(0x03800000, 0x039fffff) AM_WRITE(archimedes_memc_page_w)
+	AM_IMPORT_FROM(aristmk5_map)
 ADDRESS_MAP_END
 
+
+CUSTOM_INPUT_MEMBER(aristmk5_state::coin_r)
+{
+	//  ---x  Coin Acceptor
+	//  --x-  Credit Sense
+	//  -x--  Error Signal
+	//  x---  Diverter Optic
+
+	uint8_t data = 0x07;
+
+	if (m_coin_start_cycles)
+	{
+		attotime diff = m_maincpu->cycles_to_attotime(m_maincpu->total_cycles() - m_coin_start_cycles);
+
+		if (diff > attotime::from_msec(40) && diff < attotime::from_msec(80))
+			data &= ~0x01;
+		if (diff > attotime::from_msec(120) && diff < attotime::from_msec(150))
+			data &= ~0x02;
+		if (diff <= attotime::from_msec(20))
+			data |= 0x08;
+
+		if (diff > attotime::from_msec(300))
+			m_coin_start_cycles = 0;
+	}
+
+	return data;
+}
+
+INPUT_CHANGED_MEMBER(aristmk5_state::coin_start)
+{
+	if (newval && !m_coin_start_cycles)
+		m_coin_start_cycles = m_maincpu->total_cycles();
+}
 
 static INPUT_PORTS_START( aristmk5 )
 	/* This simulates the ROM swap */
@@ -576,9 +631,19 @@ static INPUT_PORTS_START( aristmk5 )
 	PORT_BIT(0x00000004, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_C)
 	PORT_BIT(0x00000008, IP_ACTIVE_HIGH, IPT_SERVICE)
 	PORT_BIT(0x00000010, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_V)
-	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_B)   // Bill acceptor door
-	PORT_BIT(0x00000040, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_N)   // Main door
-	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_M)   // Cashbox door
+	PORT_BIT(0x00000020, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_B) PORT_TOGGLE PORT_NAME("Bill acceptor door")
+	PORT_BIT(0x00000040, IP_ACTIVE_LOW , IPT_KEYPAD)  PORT_CODE(KEYCODE_M) PORT_TOGGLE PORT_NAME("Main door")
+	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_C) PORT_TOGGLE PORT_NAME("Cashbox door")
+
+	PORT_START("P4")
+	PORT_BIT(0x00000078, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, aristmk5_state, coin_r, nullptr)
+
+	PORT_START("P5")
+	PORT_BIT(0x00000008, IP_ACTIVE_LOW,  IPT_KEYPAD)  // Meters
+
+	PORT_START("EXTRA")
+	PORT_BIT(0x00000001, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_TOGGLE PORT_CODE(KEYCODE_L)   PORT_NAME("Logic door")
+	PORT_BIT(0x00000002, IP_ACTIVE_HIGH, IPT_COIN1)   PORT_CHANGED_MEMBER(DEVICE_SELF, aristmk5_state, coin_start, nullptr)
 INPUT_PORTS_END
 
 DRIVER_INIT_MEMBER(aristmk5_state,aristmk5)
@@ -588,8 +653,8 @@ DRIVER_INIT_MEMBER(aristmk5_state,aristmk5)
 
 	archimedes_driver_init();
 
-	membank("sram_bank")->configure_entries(0, 4,    &SRAM[0],    0x20000);
-	membank("sram_bank_nz")->configure_entries(0, 4, &SRAM_NZ[0], 0x20000);
+	m_sram_bank->configure_entries(0, 4,    &SRAM[0],    0x20000);
+	m_sram_bank_nz->configure_entries(0, 4, &SRAM_NZ[0], 0x20000);
 
 	int do_debug = 0;
 
@@ -752,6 +817,9 @@ void aristmk5_state::machine_reset()
 		for(i=0;i<0x400000;i++)
 			ROM[i] = PRG[i];
 	}
+
+	m_ldor_shift_reg = 0x55;
+	m_coin_start_cycles = 0;
 }
 
 
@@ -810,6 +878,8 @@ static MACHINE_CONFIG_START( aristmk5, aristmk5_state )
 	MCFG_DEVICE_ADD("uart_3b", NS16450, MASTER_CLOCK / 9)
 //	MCFG_INS8250_OUT_INT_CB(WRITELINE(aristmk5_state, uart_irq_callback))
 
+	MCFG_DS1302_ADD("rtc", XTAL_32_768kHz)
+
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("dac0", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
 	MCFG_SOUND_ADD("dac1", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
@@ -830,73 +900,9 @@ static MACHINE_CONFIG_START( aristmk5, aristmk5_state )
 	MCFG_SOUND_ROUTE_EX(0, "dac7", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac7", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( aristmk5_usa, aristmk5_state )
-	MCFG_CPU_ADD("maincpu", ARM, MASTER_CLOCK/6)    // 12000000
-	MCFG_CPU_PROGRAM_MAP(aristmk5_map)
-
-	MCFG_WATCHDOG_ADD("watchdog")
-	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(2))  /* 1.6 - 2 seconds */
-
-//  MCFG_I2CMEM_ADD("i2cmem")
-//  MCFG_I2CMEM_PAGE_SIZE(NVRAM_PAGE_SIZE)
-//  MCFG_I2CMEM_DATA_SIZE(NVRAM_SIZE)
-	/* TODO: this isn't supposed to access a keyboard ... */
-	MCFG_DEVICE_ADD("kart", AAKART, 12000000/128) // TODO: frequency
-
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(640, 400)
-	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 400-1)
-	MCFG_SCREEN_UPDATE_DRIVER(archimedes_state, screen_update)
-
-	MCFG_PALETTE_ADD("palette", 0x200)
-
-	MCFG_EEPROM_SERIAL_93C56_ADD("eeprom0")        
-	MCFG_EEPROM_SERIAL_93C56_ADD("eeprom1")        
-
-	// TL16C452FN U71
-	MCFG_DEVICE_ADD("uart_0a", NS16450, MASTER_CLOCK / 9)
-//	MCFG_INS8250_OUT_INT_CB(WRITELINE(aristmk5_state, uart_irq_callback))
-	MCFG_DEVICE_ADD("uart_0b", NS16450, MASTER_CLOCK / 9)
-//	MCFG_INS8250_OUT_INT_CB(WRITELINE(aristmk5_state, uart_irq_callback))
-
-	// TL16C452FN U72
-	MCFG_DEVICE_ADD("uart_1a", NS16450, MASTER_CLOCK / 9)
-//	MCFG_INS8250_OUT_INT_CB(WRITELINE(aristmk5_state, uart_irq_callback))
-	MCFG_DEVICE_ADD("uart_1b", NS16450, MASTER_CLOCK / 9)
-//	MCFG_INS8250_OUT_INT_CB(WRITELINE(aristmk5_state, uart_irq_callback))
-
-	// COMM port 4 - 5
-	MCFG_DEVICE_ADD("uart_2a", NS16450, MASTER_CLOCK / 9)
-//	MCFG_INS8250_OUT_INT_CB(WRITELINE(aristmk5_state, uart_irq_callback))
-	MCFG_DEVICE_ADD("uart_2b", NS16450, MASTER_CLOCK / 9)
-//	MCFG_INS8250_OUT_INT_CB(WRITELINE(aristmk5_state, uart_irq_callback))
-
-	// COMM port 6 - 7
-	MCFG_DEVICE_ADD("uart_3a", NS16450, MASTER_CLOCK / 9)
-//	MCFG_INS8250_OUT_INT_CB(WRITELINE(aristmk5_state, uart_irq_callback))
-	MCFG_DEVICE_ADD("uart_3b", NS16450, MASTER_CLOCK / 9)
-//	MCFG_INS8250_OUT_INT_CB(WRITELINE(aristmk5_state, uart_irq_callback))
-
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("dac0", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
-	MCFG_SOUND_ADD("dac1", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
-	MCFG_SOUND_ADD("dac2", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
-	MCFG_SOUND_ADD("dac3", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
-	MCFG_SOUND_ADD("dac4", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
-	MCFG_SOUND_ADD("dac5", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
-	MCFG_SOUND_ADD("dac6", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
-	MCFG_SOUND_ADD("dac7", DAC_16BIT_R2R_TWOS_COMPLEMENT, 0) MCFG_SOUND_ROUTE(0, "speaker", 0.1) // unknown DAC
-	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
-	MCFG_SOUND_ROUTE_EX(0, "dac0", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac0", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac3", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac3", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac4", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac4", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac5", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac5", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac6", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac6", -1.0, DAC_VREF_NEG_INPUT)
-	MCFG_SOUND_ROUTE_EX(0, "dac7", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac7", -1.0, DAC_VREF_NEG_INPUT)
+static MACHINE_CONFIG_DERIVED( aristmk5_usa, aristmk5 )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(aristmk5_usa_map)
 MACHINE_CONFIG_END
 
 #define ARISTOCRAT_MK5_BIOS \
