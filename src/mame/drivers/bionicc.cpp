@@ -11,14 +11,20 @@
     Graphics ROM board: 86612-B-2
      Program ROM board: 86612-C-2
 
-      Main CPU: 68000CP10
-     Sound CPU: Z80A
-           MCU: Intel C8751H-88
+      Main CPU: 68000CP10        @ 24MHz / 2 = 12MHz
+     Sound CPU: Z80A             @ 14.31818 / 4 = 3.579545MHz
+           MCU: Intel C8751H-88  @ 24MHz / 4 = 6MHz
     Sound Chip: YM2151 & YM3012
            OSC: 24.000 MHz (on the 86612-B-2 PCB)
         Custom: CAPCOM DL-010D-103 (on the 86612-B-2 PCB)
 
+	Horizontal scan rate: 15.625kHz
+	Vertical scan rate: 60.093Hz
+	Clocks and timings verified on 86612-A-2 board, serial no. 39646
+	by scope measurement at clock pins
 
+	Note; Protection MCU is labelled "TS" without a number and without a coloured
+	      stripe. Maybe its code is not region dependant.
     Note: Euro rom labels (IE: "TSE") had a blue stripe, while those labeled
           as USA (TSU) had an red stripe on the sticker.  The intermixing
           of TSE and TSU roms in the parent set is correct and verified.
@@ -349,6 +355,8 @@ static MACHINE_CONFIG_START( bionicc, bionicc_state )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", bionicc_state, bionicc_scanline, "screen", 0, 1)
 
+	/* Protection MCU Intel C8751H-88 runs at 24MHz / 4 = 6MHz */
+	
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_14_31818MHz / 4)   /* EXO3 C,B=GND, A=5V ==> Divisor 2^2 */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	/* FIXME: interrupt timing
