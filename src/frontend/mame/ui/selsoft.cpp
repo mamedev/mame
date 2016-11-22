@@ -417,7 +417,7 @@ void menu_select_software::handle()
 //  populate
 //-------------------------------------------------
 
-void menu_select_software::populate()
+void menu_select_software::populate(float &customtop, float &custombottom)
 {
 	uint32_t flags_ui = FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW;
 	m_has_empty_start = true;
@@ -1265,7 +1265,7 @@ software_parts::~software_parts()
 //  populate
 //-------------------------------------------------
 
-void software_parts::populate()
+void software_parts::populate(float &customtop, float &custombottom)
 {
 	for (auto & elem : m_parts)
 		item_append(elem.first, elem.second, 0, (void *)&elem);
@@ -1363,7 +1363,7 @@ bios_selection::~bios_selection()
 //  populate
 //-------------------------------------------------
 
-void bios_selection::populate()
+void bios_selection::populate(float &customtop, float &custombottom)
 {
 	for (auto & elem : m_bios)
 		item_append(elem.first, "", 0, (void *)&elem.first);

@@ -152,7 +152,7 @@ void menu_custom_filter::handle()
 //-------------------------------------------------
 //  populate
 //-------------------------------------------------
-void menu_custom_filter::populate()
+void menu_custom_filter::populate(float &customtop, float &custombottom)
 {
 	// add main filter
 	uint32_t arrow_flags = get_arrow_flags<uint16_t>(FILTER_ALL, FILTER_UNAVAILABLE, custfltr::main);
@@ -439,7 +439,7 @@ void menu_swcustom_filter::handle()
 //-------------------------------------------------
 //  populate
 //-------------------------------------------------
-void menu_swcustom_filter::populate()
+void menu_swcustom_filter::populate(float &customtop, float &custombottom)
 {
 	// add main filter
 	uint32_t arrow_flags = get_arrow_flags<uint16_t>(UI_SW_ALL, UI_SW_UNAVAILABLE, sw_custfltr::main);

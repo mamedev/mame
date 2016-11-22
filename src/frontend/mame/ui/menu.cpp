@@ -233,6 +233,8 @@ menu::menu(mame_ui_manager &mui, render_container &container)
 	, m_parent()
 	, m_event()
 	, m_pool(nullptr)
+	, m_customtop(0.0f)
+	, m_custombottom(0.0f)
 	, m_resetpos(0)
 	, m_resetref(nullptr)
 {
@@ -400,6 +402,17 @@ void menu::item_append(std::string &&text, std::string &&subtext, uint32_t flags
 
 
 //-------------------------------------------------
+//  repopulate - repopulate menu items
+//-------------------------------------------------
+
+void menu::repopulate(reset_options options)
+{
+	reset(options);
+	populate(m_customtop, m_custombottom);
+}
+
+
+//-------------------------------------------------
 //  process - process a menu, drawing it
 //  and returning any interesting events
 //-------------------------------------------------
@@ -541,7 +554,7 @@ void menu::draw(uint32_t flags)
 	}
 
 	// account for extra space at the top and bottom
-	float const visible_extra_menu_height = customtop + custombottom;
+	float const visible_extra_menu_height = m_customtop + m_custombottom;
 
 	// add a little bit of slop for rounding
 	visible_width += 0.01f;
@@ -560,7 +573,7 @@ void menu::draw(uint32_t flags)
 
 	// compute top/left of inner menu area by centering
 	float const visible_left = (1.0f - visible_width) * 0.5f;
-	float const visible_top = ((1.0f - visible_main_menu_height - visible_extra_menu_height) * 0.5f) + customtop;
+	float const visible_top = ((1.0f - visible_main_menu_height - visible_extra_menu_height) * 0.5f) + m_customtop;
 
 	// first add us a box
 	float const x1 = visible_left - UI_BOX_LR_BORDER;
@@ -776,7 +789,7 @@ void menu::draw(uint32_t flags)
 	}
 
 	// if there is something special to add, do it by calling the virtual method
-	custom_render(get_selection_ref(), customtop, custombottom, x1, y1, x2, y2);
+	custom_render(get_selection_ref(), m_customtop, m_custombottom, x1, y1, x2, y2);
 }
 
 void menu::custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2)
@@ -1135,7 +1148,7 @@ void menu::validate_selection(int scandir)
 void menu::do_handle()
 {
 	if (item.size() < 2)
-		populate();
+		populate(m_customtop, m_custombottom);
 	handle();
 }
 

@@ -220,7 +220,7 @@ void menu_game_options::handle()
 //  populate
 //-------------------------------------------------
 
-void menu_game_options::populate()
+void menu_game_options::populate(float &customtop, float &custombottom)
 {
 	if (machine().options().ui() != emu_options::UI_SIMPLE)
 	{

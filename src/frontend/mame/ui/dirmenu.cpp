@@ -98,7 +98,7 @@ void menu_directory::handle()
 //  populate
 //-------------------------------------------------
 
-void menu_directory::populate()
+void menu_directory::populate(float &customtop, float &custombottom)
 {
 	for (auto & elem : s_folders)
 		item_append(_(elem.name), "", 0, (void *)(uintptr_t)elem.action);
@@ -181,7 +181,7 @@ void menu_display_actual::handle()
 //  populate
 //-------------------------------------------------
 
-void menu_display_actual::populate()
+void menu_display_actual::populate(float &customtop, float &custombottom)
 {
 	m_tempbuf = string_format(_("Current %1$s Folders"), _(s_folders[m_ref].name));
 	if (ui().options().exists(s_folders[m_ref].option))
@@ -446,7 +446,7 @@ void menu_add_change_folder::handle()
 //  populate
 //-------------------------------------------------
 
-void menu_add_change_folder::populate()
+void menu_add_change_folder::populate(float &customtop, float &custombottom)
 {
 	// open a path
 	const char *volume_name = nullptr;
@@ -608,7 +608,7 @@ void menu_remove_folder::handle()
 //  populate menu
 //-------------------------------------------------
 
-void menu_remove_folder::populate()
+void menu_remove_folder::populate(float &customtop, float &custombottom)
 {
 	int folders_count = 0;
 	for (auto & elem : m_folders)

@@ -493,7 +493,7 @@ void menu_select_game::handle()
 //  populate
 //-------------------------------------------------
 
-void menu_select_game::populate()
+void menu_select_game::populate(float &customtop, float &custombottom)
 {
 	ui_globals::redraw_icon = true;
 	ui_globals::switch_image = true;

@@ -137,7 +137,7 @@ void menu_custom_ui::handle()
 //  populate
 //-------------------------------------------------
 
-void menu_custom_ui::populate()
+void menu_custom_ui::populate(float &customtop, float &custombottom)
 {
 	uint32_t arrow_flags;
 	item_append(_("Fonts"), "", 0, (void *)(uintptr_t)FONT_MENU);
@@ -338,7 +338,7 @@ void menu_font_ui::handle()
 //  populate
 //-------------------------------------------------
 
-void menu_font_ui::populate()
+void menu_font_ui::populate(float &customtop, float &custombottom)
 {
 	// set filter arrow
 	uint32_t arrow_flags;
@@ -501,7 +501,7 @@ void menu_colors_ui::handle()
 //  populate
 //-------------------------------------------------
 
-void menu_colors_ui::populate()
+void menu_colors_ui::populate(float &customtop, float &custombottom)
 {
 	item_append(_("Normal text"), "", 0, (void *)(uintptr_t)MUI_TEXT_COLOR);
 	item_append(_("Selected color"), "", 0, (void *)(uintptr_t)MUI_SELECTED_COLOR);
@@ -824,7 +824,7 @@ void menu_rgb_ui::handle()
 //  populate
 //-------------------------------------------------
 
-void menu_rgb_ui::populate()
+void menu_rgb_ui::populate(float &customtop, float &custombottom)
 {
 	// set filter arrow
 	uint32_t arrow_flags = FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW;
@@ -1035,7 +1035,7 @@ void menu_palette_sel::handle()
 //  populate
 //-------------------------------------------------
 
-void menu_palette_sel::populate()
+void menu_palette_sel::populate(float &customtop, float &custombottom)
 {
 	for (unsigned x = 0; x < ARRAY_LENGTH(s_palette); ++x)
 		item_append(_(s_palette[x].first), s_palette[x].second, 0, (void *)(uintptr_t)(x + 1));
@@ -1087,7 +1087,7 @@ void menu_palette_sel::draw(uint32_t flags)
 	}
 
 	// account for extra space at the top and bottom
-	auto visible_extra_menu_height = customtop + custombottom;
+	auto visible_extra_menu_height = get_customtop() + get_custombottom();
 
 	// add a little bit of slop for rounding
 	visible_width += 0.01f;
@@ -1109,7 +1109,7 @@ void menu_palette_sel::draw(uint32_t flags)
 	float visible_top = (1.0f - (visible_main_menu_height + visible_extra_menu_height)) * 0.5f;
 
 	// if the menu is at the bottom of the extra, adjust
-	visible_top += customtop;
+	visible_top += get_customtop();
 
 	// first add us a box
 	float x1 = visible_left - UI_BOX_LR_BORDER;
@@ -1231,7 +1231,7 @@ void menu_palette_sel::draw(uint32_t flags)
 	}
 
 	// if there is something special to add, do it by calling the virtual method
-	custom_render(get_selection_ref(), customtop, custombottom, x1, y1, x2, y2);
+	custom_render(get_selection_ref(), get_customtop(), get_custombottom(), x1, y1, x2, y2);
 
 	// return the number of visible lines, minus 1 for top arrow and 1 for bottom arrow
 	m_visible_items = visible_lines - (top_line != 0) - (top_line + visible_lines != item.size());

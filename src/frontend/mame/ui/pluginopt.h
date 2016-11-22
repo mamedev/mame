@@ -31,7 +31,7 @@ public:
 	virtual ~menu_plugin();
 
 private:
-	virtual void populate() override;
+	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 
 	std::vector<std::string> &m_plugins;
@@ -44,7 +44,7 @@ public:
 	virtual ~menu_plugin_opt();
 
 private:
-	virtual void populate() override;
+	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 
 	std::string m_menu;

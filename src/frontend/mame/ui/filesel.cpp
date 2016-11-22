@@ -288,7 +288,7 @@ void menu_file_selector::append_entry_menu_item(const file_selector_entry *entry
 //  populate
 //-------------------------------------------------
 
-void menu_file_selector::populate()
+void menu_file_selector::populate(float &customtop, float &custombottom)
 {
 	util::zippath_directory *directory = nullptr;
 	osd_file::error err;
@@ -507,7 +507,7 @@ menu_select_rw::~menu_select_rw()
 //  populate
 //-------------------------------------------------
 
-void menu_select_rw::populate()
+void menu_select_rw::populate(float &customtop, float &custombottom)
 {
 	item_append(_("Select access mode"), "", FLAG_DISABLE, nullptr);
 	item_append(_("Read-only"), "", 0, itemref_from_result(result::READONLY));

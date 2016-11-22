@@ -51,8 +51,6 @@ public:
 	virtual ~menu();
 
 	int                     hover;        // which item is being hovered over
-	float                   customtop;    // amount of extra height to add at the top
-	float                   custombottom; // amount of extra height to add at the bottom
 	std::vector<menu_item>  item;         // array of items
 
 	// append a new item to the end of the menu
@@ -136,7 +134,7 @@ protected:
 		void                *itemref;   // reference for the selected item
 		menu_item_type      type;       // item type (eventually will go away when itemref is proper ui_menu_item class rather than void*)
 		int                 iptkey;     // one of the IPT_* values from inptport.h
-		char32_t        unichar;    // unicode character if iptkey == IPT_SPECIAL
+		char32_t            unichar;    // unicode character if iptkey == IPT_SPECIAL
 		render_bounds       mouse;      // mouse position if iptkey == IPT_CUSTOM
 	};
 
@@ -170,6 +168,9 @@ protected:
 
 	void add_cleanup_callback(cleanup_callback &&callback) { m_global_state->add_cleanup_callback(std::move(callback)); }
 
+	// repopulate the menu items
+	void repopulate(reset_options options);
+
 	// process a menu, drawing it and returning any interesting events
 	const event *process(uint32_t flags, float x0 = 0.0f, float y0 = 0.0f);
 	void process_parent() { m_parent->process(PROCESS_NOINPUT); }
@@ -188,6 +189,10 @@ protected:
 
 	// test if the given key is pressed and we haven't already reported a key
 	bool exclusive_input_pressed(int &iptkey, int key, int repeat);
+
+	// layout
+	float get_customtop() const { return m_customtop; }
+	float get_custombottom() const { return m_custombottom; }
 
 	// highlight
 	void highlight(float x0, float y0, float x1, float y1, rgb_t bgcolor);
@@ -225,8 +230,6 @@ protected:
 	{
 		return ((actual > min) ? FLAG_LEFT_ARROW : 0) | ((actual < max) ? FLAG_RIGHT_ARROW : 0);
 	}
-
-	int right_visible_lines;  // right box lines
 
 private:
 	class global_state : public widgets_manager
@@ -270,9 +273,9 @@ private:
 
 	struct pool
 	{
-		pool   *next;    // chain to next one
-		uint8_t  *top;     // top of the pool
-		uint8_t  *end;     // end of the pool
+		pool       *next;    // chain to next one
+		uint8_t    *top;     // top of the pool
+		uint8_t    *end;     // end of the pool
 	};
 
 	// request the specific handling of the game selection main menu
@@ -280,7 +283,7 @@ private:
 	void set_special_main_menu(bool disable);
 
 	// To be reimplemented in the menu subclass
-	virtual void populate() = 0;
+	virtual void populate(float &customtop, float &custombottom) = 0;
 
 	// To be reimplemented in the menu subclass
 	virtual void handle() = 0;
@@ -303,6 +306,9 @@ private:
 	std::unique_ptr<menu>   m_parent;           // pointer to parent menu
 	event                   m_event;            // the UI event that occurred
 	pool                    *m_pool;            // list of memory pools
+
+	float                   m_customtop;        // amount of extra height to add at the top
+	float                   m_custombottom;     // amount of extra height to add at the bottom
 
 	int                     m_resetpos;         // reset position
 	void                    *m_resetref;        // reset reference

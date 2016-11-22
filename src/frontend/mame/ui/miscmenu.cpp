@@ -37,7 +37,7 @@ menu_keyboard_mode::menu_keyboard_mode(mame_ui_manager &mui, render_container &c
 {
 }
 
-void menu_keyboard_mode::populate()
+void menu_keyboard_mode::populate(float &customtop, float &custombottom)
 {
 	bool natural = machine().ioport().natkeyboard().in_use();
 	item_append(_("Keyboard Mode:"), natural ? _("Natural") : _("Emulated"), natural ? FLAG_LEFT_ARROW : FLAG_RIGHT_ARROW, nullptr);
@@ -74,7 +74,7 @@ menu_bios_selection::menu_bios_selection(mame_ui_manager &mui, render_container 
 {
 }
 
-void menu_bios_selection::populate()
+void menu_bios_selection::populate(float &customtop, float &custombottom)
 {
 	/* cycle through all devices for this system */
 	for (device_t &device : device_iterator(machine().root_device()))
@@ -156,7 +156,7 @@ menu_network_devices::~menu_network_devices()
     network device menu
 -------------------------------------------------*/
 
-void menu_network_devices::populate()
+void menu_network_devices::populate(float &customtop, float &custombottom)
 {
 	/* cycle through all devices for this system */
 	for (device_network_interface &network : network_interface_iterator(machine().root_device()))
@@ -211,9 +211,8 @@ void menu_bookkeeping::handle()
 	curtime = machine().time();
 	if (prevtime.seconds() != curtime.seconds())
 	{
-		reset(reset_options::SELECT_FIRST);
 		prevtime = curtime;
-		populate();
+		repopulate(reset_options::SELECT_FIRST);
 	}
 
 	/* process the menu */
@@ -233,7 +232,7 @@ menu_bookkeeping::~menu_bookkeeping()
 {
 }
 
-void menu_bookkeeping::populate()
+void menu_bookkeeping::populate(float &customtop, float &custombottom)
 {
 	int tickets = machine().bookkeeping().get_dispensed_tickets();
 	std::ostringstream tempstring;
@@ -375,7 +374,7 @@ menu_crosshair::menu_crosshair(mame_ui_manager &mui, render_container &container
 {
 }
 
-void menu_crosshair::populate()
+void menu_crosshair::populate(float &customtop, float &custombottom)
 {
 	crosshair_item_data *data;
 	char temp_text[16];
@@ -532,7 +531,7 @@ menu_quit_game::~menu_quit_game()
 {
 }
 
-void menu_quit_game::populate()
+void menu_quit_game::populate(float &customtop, float &custombottom)
 {
 }
 
@@ -662,7 +661,7 @@ void menu_export::handle()
 //  populate
 //-------------------------------------------------
 
-void menu_export::populate()
+void menu_export::populate(float &customtop, float &custombottom)
 {
 	// add options items
 	item_append(_("Export list in XML format (like -listxml)"), "", 0, (void *)(uintptr_t)1);
@@ -769,7 +768,7 @@ void menu_machine_configure::handle()
 //  populate
 //-------------------------------------------------
 
-void menu_machine_configure::populate()
+void menu_machine_configure::populate(float &customtop, float &custombottom)
 {
 	// add options items
 	item_append(_("Bios"), "", FLAG_DISABLE | FLAG_UI_HEADING, nullptr);
@@ -934,7 +933,7 @@ void menu_plugins_configure::handle()
 //  populate
 //-------------------------------------------------
 
-void menu_plugins_configure::populate()
+void menu_plugins_configure::populate(float &customtop, float &custombottom)
 {
 	plugin_options& plugins = mame_machine_manager::instance()->plugins();
 

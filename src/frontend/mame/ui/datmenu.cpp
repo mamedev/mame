@@ -126,7 +126,7 @@ void menu_dats_view::handle()
 //  populate
 //-------------------------------------------------
 
-void menu_dats_view::populate()
+void menu_dats_view::populate(float &customtop, float &custombottom)
 {
 	bool paused = machine().paused();
 	if (!paused)
@@ -160,7 +160,7 @@ void menu_dats_view::draw(uint32_t flags)
 	hover = item.size() + 1;
 	visible_items = item.size() - 2;
 	float extra_height = 2.0f * line_height;
-	float visible_extra_menu_height = customtop + custombottom + extra_height;
+	float visible_extra_menu_height = get_customtop() + get_custombottom() + extra_height;
 
 	// locate mouse
 	mouse_hit = false;
@@ -179,7 +179,7 @@ void menu_dats_view::draw(uint32_t flags)
 	float visible_top = (1.0f - (visible_main_menu_height + visible_extra_menu_height)) * 0.5f;
 
 	// if the menu is at the bottom of the extra, adjust
-	visible_top += customtop;
+	visible_top += get_customtop();
 
 	// compute left box size
 	float x1 = visible_left;
@@ -277,7 +277,7 @@ void menu_dats_view::draw(uint32_t flags)
 	}
 
 	// if there is something special to add, do it by calling the virtual method
-	custom_render(get_selection_ref(), customtop, custombottom, x1, y1, x2, y2);
+	custom_render(get_selection_ref(), get_customtop(), get_custombottom(), x1, y1, x2, y2);
 
 	// return the number of visible lines, minus 1 for top arrow and 1 for bottom arrow
 	m_visible_items = m_visible_lines - (top_line != 0) - (top_line + m_visible_lines != visible_items);

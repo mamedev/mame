@@ -163,6 +163,7 @@ menu_select_launch::menu_select_launch(mame_ui_manager &mui, render_container &c
 	, m_focus(focused_menu::main)
 	, m_pressed(false)
 	, m_repeat(0)
+	, m_right_visible_lines(0)
 {
 	// set up persistent cache for machine run
 	{
@@ -876,7 +877,7 @@ void menu_select_launch::handle_keys(uint32_t flags, int &iptkey)
 		if (!rightclose && m_focus == focused_menu::rightbottom)
 		{
 			iptkey = IPT_UI_DOWN_PANEL;
-			m_topline_datsview -= right_visible_lines - 1;
+			m_topline_datsview -= m_right_visible_lines - 1;
 			return;
 		}
 
@@ -898,7 +899,7 @@ void menu_select_launch::handle_keys(uint32_t flags, int &iptkey)
 		if (!rightclose && m_focus == focused_menu::rightbottom)
 		{
 			iptkey = IPT_UI_DOWN_PANEL;
-			m_topline_datsview += right_visible_lines - 1;
+			m_topline_datsview += m_right_visible_lines - 1;
 			return;
 		}
 
@@ -1041,9 +1042,9 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 					else if (hover == HOVER_UI_LEFT)
 						ev.iptkey = IPT_UI_LEFT;
 					else if (hover == HOVER_DAT_DOWN)
-						m_topline_datsview += right_visible_lines - 1;
+						m_topline_datsview += m_right_visible_lines - 1;
 					else if (hover == HOVER_DAT_UP)
-						m_topline_datsview -= right_visible_lines - 1;
+						m_topline_datsview -= m_right_visible_lines - 1;
 					else if (hover == HOVER_LPANEL_ARROW)
 					{
 						if (ui_globals::panels_status == HIDE_LEFT_PANEL)
@@ -1200,7 +1201,7 @@ void menu_select_launch::draw(uint32_t flags)
 	hover = item.size() + 1;
 	visible_items = (m_is_swlist) ? item.size() - 2 : item.size() - 2 - skip_main_items;
 	float extra_height = (m_is_swlist) ? 2.0f * line_height : (2.0f + skip_main_items) * line_height;
-	float visible_extra_menu_height = customtop + custombottom + extra_height;
+	float visible_extra_menu_height = get_customtop() + get_custombottom() + extra_height;
 
 	// locate mouse
 	mouse_hit = false;
@@ -1228,7 +1229,7 @@ void menu_select_launch::draw(uint32_t flags)
 	float visible_top = (1.0f - (visible_main_menu_height + visible_extra_menu_height)) * 0.5f;
 
 	// if the menu is at the bottom of the extra, adjust
-	visible_top += customtop;
+	visible_top += get_customtop();
 
 	// compute left box size
 	float x1 = visible_left - UI_BOX_LR_BORDER;
@@ -1408,7 +1409,7 @@ void menu_select_launch::draw(uint32_t flags)
 	x2 = primary_left + primary_width + UI_BOX_LR_BORDER;
 
 	// if there is something special to add, do it by calling the virtual method
-	custom_render(get_selection_ref(), customtop, custombottom, x1, y1, x2, y2);
+	custom_render(get_selection_ref(), get_customtop(), get_custombottom(), x1, y1, x2, y2);
 
 	// return the number of visible lines, minus 1 for top arrow and 1 for bottom arrow
 	m_visible_items = m_visible_lines - (top_line != 0) - (top_line + m_visible_lines != visible_items);
@@ -2066,7 +2067,7 @@ void menu_select_launch::infos_render(float origx1, float origy1, float origx2, 
 		oy1 += (line_height * text_size);
 	}
 	// return the number of visible lines, minus 1 for top arrow and 1 for bottom arrow
-	right_visible_lines = r_visible_lines - (m_topline_datsview != 0) - (m_topline_datsview + r_visible_lines != m_total_lines);
+	m_right_visible_lines = r_visible_lines - (m_topline_datsview != 0) - (m_topline_datsview + r_visible_lines != m_total_lines);
 }
 
 } // namespace ui

@@ -8,10 +8,10 @@
 
 ***************************************************************************/
 
-#pragma once
-
 #ifndef MAME_FRONTEND_UI_CUSTUI_H
 #define MAME_FRONTEND_UI_CUSTUI_H
+
+#pragma once
 
 #include "ui/menu.h"
 
@@ -38,7 +38,7 @@ private:
 		HIDE_MENU
 	};
 
-	virtual void populate() override;
+	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 
 	static const char *const    HIDE_STATUS[];
@@ -70,7 +70,7 @@ private:
 		MUI_ITALIC
 	};
 
-	virtual void populate() override;
+	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 
 	void list();
@@ -126,7 +126,7 @@ private:
 		const char  *option;
 	};
 
-	virtual void populate() override;
+	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 
 	s_color_table m_color_table[MUI_RESTORE];
@@ -156,7 +156,7 @@ private:
 		PALETTE_CHOOSE
 	};
 
-	virtual void populate() override;
+	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 
 	void inkey_special(const event *menu_event);
@@ -185,7 +185,7 @@ private:
 	// draw palette menu
 	virtual void draw(uint32_t flags) override;
 
-	virtual void populate() override;
+	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 
 	static std::pair<const char *, const char *> const s_palette[];
