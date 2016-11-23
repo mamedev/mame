@@ -210,9 +210,6 @@ void menu_dats_view::draw(uint32_t flags)
 		// if we're on the top line, display the up arrow
 		if (linenum == 0 && top_line != 0)
 		{
-			draw_arrow(0.5f * (x1 + x2) - 0.5f * ud_arrow_width, line_y + 0.25f * line_height,
-				0.5f * (x1 + x2) + 0.5f * ud_arrow_width, line_y + 0.75f * line_height, fgcolor, ROT0);
-
 			if (mouse_in_rect(line_x0, line_y0, line_x1, line_y1))
 			{
 				fgcolor = UI_MOUSEOVER_COLOR;
@@ -220,13 +217,14 @@ void menu_dats_view::draw(uint32_t flags)
 				highlight(line_x0, line_y0, line_x1, line_y1, bgcolor);
 				hover = HOVER_ARROW_UP;
 			}
+
+			draw_arrow(0.5f * (x1 + x2) - 0.5f * ud_arrow_width, line_y + 0.25f * line_height,
+					   0.5f * (x1 + x2) + 0.5f * ud_arrow_width, line_y + 0.75f * line_height, fgcolor, ROT0);
+
 		}
 		// if we're on the bottom line, display the down arrow
 		else if (linenum == m_visible_lines - 1 && itemnum != visible_items - 1)
 		{
-			draw_arrow(0.5f * (x1 + x2) - 0.5f * ud_arrow_width, line_y + 0.25f * line_height,
-				0.5f * (x1 + x2) + 0.5f * ud_arrow_width, line_y + 0.75f * line_height, fgcolor, ROT0 ^ ORIENTATION_FLIP_Y);
-
 			if (mouse_in_rect(line_x0, line_y0, line_x1, line_y1))
 			{
 				fgcolor = UI_MOUSEOVER_COLOR;
@@ -234,6 +232,9 @@ void menu_dats_view::draw(uint32_t flags)
 				highlight(line_x0, line_y0, line_x1, line_y1, bgcolor);
 				hover = HOVER_ARROW_DOWN;
 			}
+
+			draw_arrow(0.5f * (x1 + x2) - 0.5f * ud_arrow_width, line_y + 0.25f * line_height,
+					   0.5f * (x1 + x2) + 0.5f * ud_arrow_width, line_y + 0.75f * line_height, fgcolor, ROT0 ^ ORIENTATION_FLIP_Y);
 		}
 
 		// draw dats text
