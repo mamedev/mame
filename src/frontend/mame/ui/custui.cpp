@@ -485,7 +485,7 @@ void menu_colors_ui::handle()
 	if (menu_event != nullptr && menu_event->itemref != nullptr && menu_event->iptkey == IPT_UI_SELECT)
 	{
 		if ((uintptr_t)menu_event->itemref != MUI_RESTORE)
-			menu::stack_push<menu_rgb_ui>(ui(), container(), &m_color_table[(uintptr_t)menu_event->itemref].color, item[selected].text);
+			menu::stack_push<menu_rgb_ui>(ui(), container(), &m_color_table[(uintptr_t)menu_event->itemref].color, selected_item().text);
 		else
 		{
 			changed = true;
@@ -1024,7 +1024,7 @@ void menu_palette_sel::handle()
 	{
 		if (menu_event->iptkey == IPT_UI_SELECT)
 		{
-			m_original = rgb_t((uint32_t)strtoul(item[selected].subtext.c_str(), nullptr, 16));
+			m_original = rgb_t(uint32_t(strtoul(selected_item().subtext.c_str(), nullptr, 16)));
 			reset_parent(reset_options::SELECT_FIRST);
 			stack_pop();
 		}
@@ -1118,7 +1118,7 @@ void menu_palette_sel::draw(uint32_t flags)
 	ui().draw_outlined_box(container(), x1, y1, x2, y2, UI_BACKGROUND_COLOR);
 
 	// determine the first visible line based on the current selection
-	int top_line = selected - visible_lines / 2;
+	int top_line = selected_index() - visible_lines / 2;
 	if (top_line < 0)
 		top_line = 0;
 	if (top_line + visible_lines >= item.size())
@@ -1151,7 +1151,7 @@ void menu_palette_sel::draw(uint32_t flags)
 
 		rgb_t fgcolor = UI_TEXT_COLOR;
 		rgb_t bgcolor = UI_TEXT_BG_COLOR;
-		if (itemnum == selected)
+		if (is_selected(itemnum))
 		{
 			// if we're selected, draw with a different background
 			fgcolor = UI_SELECTED_COLOR;

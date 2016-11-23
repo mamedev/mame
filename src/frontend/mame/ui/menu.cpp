@@ -449,7 +449,7 @@ const menu::event *menu::process(uint32_t flags, float x0, float y0)
 	// update the selected item in the event
 	if ((m_event.iptkey != IPT_INVALID) && selection_valid())
 	{
-		m_event.itemref = item[selected].ref;
+		m_event.itemref = get_selection_ref();
 		m_event.type = item[selected].type;
 		return &m_event;
 	}
@@ -591,7 +591,7 @@ void menu::draw(uint32_t flags)
 		top_line = 0;
 	if (selected >= (top_line + m_visible_lines))
 		top_line = selected - (m_visible_lines / 2);
-	if ((top_line > (item.size() - m_visible_lines)) || (selected == (item.size() - 1)))
+	if ((top_line > (item.size() - m_visible_lines)) || is_last_selected())
 		top_line = item.size() - m_visible_lines;
 
 	// if scrolling, show arrows
@@ -635,7 +635,7 @@ void menu::draw(uint32_t flags)
 				hover = itemnum;
 
 			// if we're selected, draw with a different background
-			if (itemnum == selected)
+			if (is_selected(itemnum))
 			{
 				fgcolor = fgcolor2 = fgcolor3 = UI_SELECTED_COLOR;
 				bgcolor = UI_SELECTED_BG_COLOR;
@@ -713,7 +713,7 @@ void menu::draw(uint32_t flags)
 				if (ui().get_string_width(subitem_text) > effective_width - item_width)
 				{
 					subitem_text = "...";
-					if (itemnum == selected)
+					if (is_selected(itemnum))
 						selected_subitem_too_big = true;
 				}
 
@@ -732,7 +732,7 @@ void menu::draw(uint32_t flags)
 							ui::text_layout::RIGHT, ui::text_layout::TRUNCATE, mame_ui_manager::NORMAL, subitem_invert ? fgcolor3 : fgcolor2, bgcolor, &subitem_width, nullptr);
 
 				// apply arrows
-				if (itemnum == selected && (pitem.flags & FLAG_LEFT_ARROW))
+				if (is_selected(itemnum) && (pitem.flags & FLAG_LEFT_ARROW))
 				{
 					draw_arrow(
 								effective_left + effective_width - subitem_width - gutter_width,
@@ -742,7 +742,7 @@ void menu::draw(uint32_t flags)
 								fgcolor,
 								ROT90 ^ ORIENTATION_FLIP_X);
 				}
-				if (itemnum == selected && (pitem.flags & FLAG_RIGHT_ARROW))
+				if (is_selected(itemnum) && (pitem.flags & FLAG_RIGHT_ARROW))
 				{
 					draw_arrow(
 								effective_left + effective_width + gutter_width - lr_arrow_width,
@@ -759,7 +759,7 @@ void menu::draw(uint32_t flags)
 	// if the selected subitem is too big, display it in a separate offset box
 	if (selected_subitem_too_big)
 	{
-		menu_item const &pitem = item[selected];
+		menu_item const &pitem = selected_item();
 		bool const subitem_invert(pitem.flags & FLAG_INVERT);
 		auto const linenum = selected - top_line;
 		float const line_y = visible_top + (float)linenum * line_height;
@@ -934,7 +934,7 @@ void menu::handle_events(uint32_t flags, event &ev)
 							top_line += m_visible_lines - 2;
 							return;
 						}
-						selected += m_visible_lines - 2 + (selected == 0);
+						selected += m_visible_lines - 2 + is_first_selected();
 						if (selected > item.size() - 1)
 							selected = item.size() - 1;
 						top_line += m_visible_lines - 2;
@@ -1046,8 +1046,8 @@ void menu::handle_keys(uint32_t flags, int &iptkey)
 	validate_selection(1);
 
 	// swallow left/right keys if they are not appropriate
-	bool ignoreleft = ((item[selected].flags & FLAG_LEFT_ARROW) == 0);
-	bool ignoreright = ((item[selected].flags & FLAG_RIGHT_ARROW) == 0);
+	bool ignoreleft = ((selected_item().flags & FLAG_LEFT_ARROW) == 0);
+	bool ignoreright = ((selected_item().flags & FLAG_RIGHT_ARROW) == 0);
 
 	if ((item[0].flags & FLAG_UI_DATS))
 		ignoreleft = ignoreright = false;
@@ -1101,7 +1101,7 @@ void menu::handle_keys(uint32_t flags, int &iptkey)
 	// page down advances by m_visible_items
 	if (exclusive_input_pressed(iptkey, IPT_UI_PAGE_DOWN, 6))
 	{
-		selected += m_visible_lines - 2 + (selected == 0);
+		selected += m_visible_lines - 2 + is_first_selected();
 		top_line += m_visible_lines - 2;
 
 		if (selected > item.size() - 1)

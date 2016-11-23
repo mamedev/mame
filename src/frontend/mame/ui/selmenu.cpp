@@ -413,7 +413,7 @@ void menu_select_launch::inkey_navigation()
 	case focused_menu::main:
 		if (selected <= visible_items)
 		{
-			m_prev_selected = item[selected].ref;
+			m_prev_selected = get_selection_ref();
 			selected = visible_items + 1;
 		}
 		else
@@ -794,8 +794,8 @@ void menu_select_launch::handle_keys(uint32_t flags, int &iptkey)
 	validate_selection(1);
 
 	// swallow left/right keys if they are not appropriate
-	bool ignoreleft = ((item[selected].flags & FLAG_LEFT_ARROW) == 0);
-	bool ignoreright = ((item[selected].flags & FLAG_RIGHT_ARROW) == 0);
+	bool ignoreleft = ((selected_item().flags & FLAG_LEFT_ARROW) == 0);
+	bool ignoreright = ((selected_item().flags & FLAG_RIGHT_ARROW) == 0);
 	bool leftclose = (ui_globals::panels_status == HIDE_BOTH || ui_globals::panels_status == HIDE_LEFT_PANEL);
 	bool rightclose = (ui_globals::panels_status == HIDE_BOTH || ui_globals::panels_status == HIDE_RIGHT_PANEL);
 
@@ -1017,7 +1017,7 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 					if (hover >= 0 && hover < item.size())
 					{
 						if (hover >= visible_items - 1 && selected < visible_items)
-							m_prev_selected = item[selected].ref;
+							m_prev_selected = get_selection_ref();
 						selected = hover;
 						m_focus = focused_menu::main;
 					}
@@ -1111,7 +1111,7 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 					ev.iptkey = IPT_UI_SELECT;
 				}
 
-				if (selected == item.size() - 1)
+				if (is_last_selected())
 				{
 					ev.iptkey = IPT_UI_CANCEL;
 					stack_pop();
@@ -1125,7 +1125,7 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 				{
 					if (local_menu_event.zdelta > 0)
 					{
-						if (selected >= visible_items || selected == 0 || m_ui_error)
+						if (selected >= visible_items || is_first_selected() || m_ui_error)
 							break;
 						selected -= local_menu_event.num_lines;
 						if (selected < top_line + (top_line != 0))
@@ -1163,7 +1163,7 @@ void menu_select_launch::handle_events(uint32_t flags, event &ev)
 				if (hover >= 0 && hover < item.size() - skip_main_items - 1)
 				{
 					selected = hover;
-					m_prev_selected = item[selected].ref;
+					m_prev_selected = get_selection_ref();
 					m_focus = focused_menu::main;
 					ev.iptkey = IPT_CUSTOM;
 					ev.mouse.x0 = local_menu_event.mouse_x;
@@ -1275,7 +1275,7 @@ void menu_select_launch::draw(uint32_t flags)
 			hover = itemnum;
 
 		// if we're selected, draw with a different background
-		if (itemnum == selected && m_focus == focused_menu::main)
+		if (is_selected(itemnum) && m_focus == focused_menu::main)
 		{
 			fgcolor = rgb_t(0xff, 0xff, 0x00);
 			bgcolor = rgb_t(0xff, 0xff, 0xff);
@@ -1366,7 +1366,7 @@ void menu_select_launch::draw(uint32_t flags)
 			hover = count;
 
 		// if we're selected, draw with a different background
-		if (count == selected && m_focus == focused_menu::main)
+		if (is_selected(count) && m_focus == focused_menu::main)
 		{
 			fgcolor = rgb_t(0xff, 0xff, 0x00);
 			bgcolor = rgb_t(0xff, 0xff, 0xff);

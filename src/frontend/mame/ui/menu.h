@@ -50,9 +50,6 @@ public:
 
 	virtual ~menu();
 
-	int                     hover;        // which item is being hovered over
-	std::vector<menu_item>  item;         // array of items
-
 	// append a new item to the end of the menu
 	void item_append(const std::string &text, const std::string &subtext, uint32_t flags, void *ref, menu_item_type type = menu_item_type::UNKNOWN);
 	void item_append(std::string &&text, std::string &&subtext, uint32_t flags, void *ref, menu_item_type type = menu_item_type::UNKNOWN);
@@ -131,6 +128,9 @@ protected:
 		render_bounds       mouse;      // mouse position if iptkey == IPT_CUSTOM
 	};
 
+	int                     hover;        // which item is being hovered over
+	std::vector<menu_item>  item;         // array of items
+
 	int top_line;           // main box top line
 	int l_sw_hover;
 	int l_hover;
@@ -170,7 +170,12 @@ protected:
 
 	// retrieves the ref of the currently selected menu item or nullptr
 	void *get_selection_ref() const { return selection_valid() ? item[selected].ref : nullptr; }
+
+	menu_item &selected_item() { return item[selected]; }
+	menu_item const &selected_item() const { return item[selected]; }
+	int selected_index() const { return selected; }
 	bool selection_valid() const { return (0 <= selected) && (item.size() > selected); }
+	bool is_selected(int index) const { return selection_valid() && (selected == index); }
 	bool is_first_selected() const { return 0 == selected; }
 	bool is_last_selected() const { return (item.size() - 1) == selected; }
 
@@ -235,7 +240,7 @@ protected:
 
 	// get arrows status
 	template <typename T>
-	uint32_t get_arrow_flags(T min, T max, T actual)
+	static uint32_t get_arrow_flags(T min, T max, T actual)
 	{
 		return ((actual > min) ? FLAG_LEFT_ARROW : 0) | ((actual < max) ? FLAG_RIGHT_ARROW : 0);
 	}
