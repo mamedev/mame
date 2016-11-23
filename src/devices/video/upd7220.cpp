@@ -641,7 +641,7 @@ upd7220_device::upd7220_device(const machine_config &mconfig, const char *tag, d
 	m_br(0),
 	m_ctop(0),
 	m_cbot(0),
-	m_lr(0),
+	m_lr(1),
 	m_disp(0),
 	m_gchr(0),
 	m_bitmap_mod(0),
