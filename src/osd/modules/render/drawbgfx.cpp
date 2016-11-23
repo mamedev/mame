@@ -9,9 +9,10 @@
 // standard windows headers
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#if defined(SDLMAME_WIN32)
-#include <SDL2/SDL_syswm.h>
 #endif
+
+#if defined(SDL2_BOUNDLED)
+#include <SDL_syswm.h>
 #else
 #include <SDL2/SDL_syswm.h>
 #endif

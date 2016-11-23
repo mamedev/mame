@@ -24,7 +24,11 @@
 #include "osdcore.h"
 #include "osdlib.h"
 
+#if defined(SDL2_BOUNDLED)
+#include <SDL.h>
+#else
 #include <SDL2/SDL.h>
+#endif
 
 //============================================================
 //  osd_getenv

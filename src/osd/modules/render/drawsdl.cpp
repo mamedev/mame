@@ -20,7 +20,11 @@
 #include "rendersw.hxx"
 
 // standard SDL headers
+#if defined(SDL2_BOUNDLED)
+#include <SDL.h>
+#else
 #include <SDL2/SDL.h>
+#endif
 
 // OSD headers
 #include "osdsdl.h"

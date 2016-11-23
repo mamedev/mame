@@ -33,7 +33,11 @@
 #include <windows.h>
 #endif
 
+#if defined(SDL2_BOUNDLED)
+#include <SDL.h>
+#else
 #include <SDL2/SDL.h>
+#endif
 
 // MAME headers
 #include "osdepend.h"

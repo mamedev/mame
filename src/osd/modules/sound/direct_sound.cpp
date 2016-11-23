@@ -30,7 +30,11 @@
 
 #ifdef SDLMAME_WIN32
 #include "../../sdl/osdsdl.h"
+#if defined(SDL2_BOUNDLED)
+#include <SDL_syswm.h>
+#else
 #include <SDL2/SDL_syswm.h>
+#endif
 #include "../../sdl/window.h"
 #else
 #include "winmain.h"

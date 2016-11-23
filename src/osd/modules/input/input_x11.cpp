@@ -19,7 +19,12 @@
 #include <X11/Xutil.h>
 
 // standard sdl header
+#if defined(SDL2_BOUNDLED)
+#include <SDL.h>
+#else
 #include <SDL2/SDL.h>
+#endif
+
 #include <ctype.h>
 #include <stddef.h>
 #include <mutex>

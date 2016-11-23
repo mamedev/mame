@@ -14,7 +14,11 @@
 #endif
 
 // standard SDL headers
+#if defined(SDL2_BOUNDLED)
+#include <SDL.h>
+#else
 #include <SDL2/SDL.h>
+#endif
 
 // standard C headers
 #include <math.h>
