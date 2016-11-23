@@ -1163,15 +1163,12 @@ void cheat_manager::reload()
 				break;
 			}
 			// else we are loading outside the software list, try to load machine_basename/crc32.xml
-			else
-			{
-				uint32_t crc = image.crc();
-				if (crc != 0)
-				{
-					load_cheats(string_format("%s%s%08X", machine().basename(), PATH_SEPARATOR, crc).c_str());
-					break;
-				}
-			}
+		    uint32_t crc = image.crc();
+		    if (crc != 0)
+		    {
+		        load_cheats(string_format("%s%s%08X", machine().basename(), PATH_SEPARATOR, crc).c_str());
+		        break;
+		    }
 		}
 
 	// if we haven't found the cheats yet, load by basename

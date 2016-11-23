@@ -68,10 +68,8 @@ bool menu::exclusive_input_pressed(int &iptkey, int key, int repeat)
 		iptkey = key;
 		return true;
 	}
-	else
-	{
-		return false;
-	}
+    
+    return false;
 }
 
 

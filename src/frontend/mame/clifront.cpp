@@ -975,12 +975,9 @@ void cli_frontend::verifyroms(const char *gamename)
 	}
 
 	// otherwise, print a summary
-	else
-	{
-		if (incorrect > 0)
-			throw emu_fatalerror(EMU_ERR_MISSING_FILES, "%u romsets found, %u were OK.\n", correct + incorrect, correct);
-		osd_printf_info("%u romsets found, %u were OK.\n", correct, correct);
-	}
+    if (incorrect > 0)
+        throw emu_fatalerror(EMU_ERR_MISSING_FILES, "%u romsets found, %u were OK.\n", correct + incorrect, correct);
+    osd_printf_info("%u romsets found, %u were OK.\n", correct, correct);
 }
 
 
@@ -1034,12 +1031,9 @@ void cli_frontend::verifysamples(const char *gamename)
 	}
 
 	// otherwise, print a summary
-	else
-	{
-		if (incorrect > 0)
-			throw emu_fatalerror(EMU_ERR_MISSING_FILES, "%u samplesets found, %u were OK.\n", correct + incorrect, correct);
-		osd_printf_info("%u samplesets found, %u were OK.\n", correct, correct);
-	}
+    if (incorrect > 0)
+        throw emu_fatalerror(EMU_ERR_MISSING_FILES, "%u samplesets found, %u were OK.\n", correct + incorrect, correct);
+    osd_printf_info("%u samplesets found, %u were OK.\n", correct, correct);
 }
 #define SOFTLIST_XML_BEGIN "<?xml version=\"1.0\"?>\n" \
 				"<!DOCTYPE softwarelists [\n" \
@@ -1316,14 +1310,11 @@ void cli_frontend::verifysoftware(const char *gamename)
 	{
 		throw emu_fatalerror(EMU_ERR_MISSING_FILES, "romset \"%s\" has no software entries defined!\n", gamename);
 	}
-	// otherwise, print a summary
-	else
-	{
-		if (incorrect > 0)
-			throw emu_fatalerror(EMU_ERR_MISSING_FILES, "%u romsets found in %u software lists, %u were OK.\n", correct + incorrect, nrlists, correct);
-		osd_printf_info("%u romsets found in %u software lists, %u romsets were OK.\n", correct, nrlists, correct);
-	}
 
+	// otherwise, print a summary
+    if (incorrect > 0)
+        throw emu_fatalerror(EMU_ERR_MISSING_FILES, "%u romsets found in %u software lists, %u were OK.\n", correct + incorrect, nrlists, correct);
+    osd_printf_info("%u romsets found in %u software lists, %u romsets were OK.\n", correct, nrlists, correct);
 }
 
 /*-------------------------------------------------
@@ -1408,13 +1399,11 @@ void cli_frontend::verifysoftlist(const char *gamename)
 	{
 		throw emu_fatalerror(EMU_ERR_MISSING_FILES, "no romsets found for software list \"%s\"!\n", gamename);
 	}
+
 	// otherwise, print a summary
-	else
-	{
-		if (incorrect > 0)
-			throw emu_fatalerror(EMU_ERR_MISSING_FILES, "%u romsets found in %u software lists, %u were OK.\n", correct + incorrect, matched, correct);
-		osd_printf_info("%u romsets found in %u software lists, %u romsets were OK.\n", correct, matched, correct);
-	}
+    if (incorrect > 0)
+        throw emu_fatalerror(EMU_ERR_MISSING_FILES, "%u romsets found in %u software lists, %u were OK.\n", correct + incorrect, matched, correct);
+    osd_printf_info("%u romsets found in %u software lists, %u romsets were OK.\n", correct, matched, correct);
 }
 
 //-------------------------------------------------

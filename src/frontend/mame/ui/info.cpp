@@ -335,8 +335,8 @@ std::string machine_info::get_screen_desc(screen_device &screen)
 {
 	if (screen_device_iterator(m_machine.root_device()).count() > 1)
 		return string_format(_("Screen '%1$s'"), screen.tag());
-	else
-		return _("Screen");
+    
+    return _("Screen");
 }
 
 
