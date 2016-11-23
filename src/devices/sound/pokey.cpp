@@ -14,7 +14,7 @@
  *  - changed audio emulation to emulate borrow 3 clock delay and
  *    proper channel reset. New frequency only becomes effective
  *    after the counter hits 0. Emulation also treats counters
- *    as 8 bit counters which are linked now instead of monolytic
+ *    as 8 bit counters which are linked now instead of monolithic
  *    16 bit counters.
  *
  *  4.51:
