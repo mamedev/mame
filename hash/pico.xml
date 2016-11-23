@@ -651,6 +651,19 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 		</part>
 	</software>
 
+ 	<software name="cookpico">
+		<description>Cooking Pico (Jpn)</description>
+		<year>1999</year>
+		<publisher>Sega Toys</publisher>
+		<part name="cart" interface="pico_cart">
+			<feature name="pcb" value="171-7967" />
+			<feature name="ic1" value="9K0-0001A-RV" />
+			<dataarea name="rom" size="2097152">
+				<rom name="9k0-0001a-rv.ic1" size="2097152" crc="b94f7d54" sha1="dabeb440adbb7477cc880c51fb0cfc1e5f99d23b" offset="000000" loadflag="load16_word_swap" />
+			</dataarea>
+		</part>
+	</software> 
+    
 	<software name="crayola">
 		<description>Crayola - Create a World (USA)</description>
 		<year>19??</year>
