@@ -97,13 +97,6 @@ private:
 	virtual void draw(uint32_t flags);
 	void draw_text_box();
 
-public:
-	// mouse handling
-	bool mouse_hit, mouse_button;
-	render_target *mouse_target;
-	int32_t mouse_target_x, mouse_target_y;
-	float mouse_x, mouse_y;
-
 protected:
 	using cleanup_callback = std::function<void(running_machine &)>;
 	using bitmap_ptr = widgets_manager::bitmap_ptr;
@@ -211,6 +204,22 @@ protected:
 	// configure the menu for custom rendering
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2);
 
+	// map mouse to menu coordinates
+	void map_mouse();
+
+	// clear the mouse position
+	void ignore_mouse();
+
+	bool is_mouse_hit() const { return m_mouse_hit; }   // is mouse pointer inside menu's render container?
+	float get_mouse_x() const { return m_mouse_x; }     // mouse x location in menu coordinates
+	float get_mouse_y() const { return m_mouse_y; }     // mouse y location in menu coordinates
+
+	// mouse hit test - checks whether mouse_x is in [x0, x1) and mouse_y is in [y0, y1)
+	bool mouse_in_rect(float x0, float y0, float x1, float y1) const
+	{
+		return m_mouse_hit && (m_mouse_x >= x0) && (m_mouse_x < x1) && (m_mouse_y >= y0) && (m_mouse_y < y1);
+	}
+
 	// overridable event handling
 	virtual void handle_events(uint32_t flags, event &ev);
 	virtual void handle_keys(uint32_t flags, int &iptkey);
@@ -312,6 +321,11 @@ private:
 
 	int                     m_resetpos;         // reset position
 	void                    *m_resetref;        // reset reference
+
+	bool                    m_mouse_hit;
+	bool                    m_mouse_button;
+	float                   m_mouse_x;
+	float                   m_mouse_y;
 
 	static std::mutex       s_global_state_guard;
 	static global_state_map s_global_states;

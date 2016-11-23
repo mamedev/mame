@@ -237,6 +237,10 @@ menu::menu(mame_ui_manager &mui, render_container &container)
 	, m_custombottom(0.0f)
 	, m_resetpos(0)
 	, m_resetref(nullptr)
+	, m_mouse_hit(false)
+	, m_mouse_button(false)
+	, m_mouse_x(-1.0f)
+	, m_mouse_y(-1.0f)
 {
 	assert(m_global_state); // not calling init is bad
 
@@ -602,16 +606,10 @@ void menu::draw(uint32_t flags)
 	float const effective_left = visible_left + gutter_width;
 
 	// locate mouse
-	mouse_hit = false;
-	mouse_button = false;
 	if (!customonly && !noinput)
-	{
-		int32_t mouse_target_x, mouse_target_y;
-		render_target *mouse_target = machine().ui_input().find_mouse(&mouse_target_x, &mouse_target_y, &mouse_button);
-		if (mouse_target != nullptr)
-			if (mouse_target->map_point_container(mouse_target_x, mouse_target_y, container(), mouse_x, mouse_y))
-				mouse_hit = true;
-	}
+		map_mouse();
+	else
+		ignore_mouse();
 
 	// loop over visible lines
 	hover = item.size() + 1;
@@ -633,7 +631,7 @@ void menu::draw(uint32_t flags)
 			float const line_y1 = line_y0 + line_height;
 
 			// set the hover if this is our item
-			if (mouse_hit && line_x0 <= mouse_x && line_x1 > mouse_x && line_y0 <= mouse_y && line_y1 > mouse_y && is_selectable(pitem))
+			if (mouse_in_rect(line_x0, line_y0, line_x1, line_y1) && is_selectable(pitem))
 				hover = itemnum;
 
 			// if we're selected, draw with a different background
@@ -858,6 +856,38 @@ void menu::draw_text_box()
 
 	// artificially set the hover to the last item so a double-click exits
 	hover = item.size() - 1;
+}
+
+
+//-------------------------------------------------
+//  map_mouse - map mouse pointer location to menu
+//  coordinates
+//-------------------------------------------------
+
+void menu::map_mouse()
+{
+	ignore_mouse();
+	int32_t mouse_target_x, mouse_target_y;
+	render_target *const mouse_target = machine().ui_input().find_mouse(&mouse_target_x, &mouse_target_y, &m_mouse_button);
+	if (mouse_target)
+	{
+		if (mouse_target->map_point_container(mouse_target_x, mouse_target_y, container(), m_mouse_x, m_mouse_y))
+			m_mouse_hit = true;
+	}
+}
+
+
+//-------------------------------------------------
+//  ignore_mouse - set members to ignore mouse
+//  input
+//-------------------------------------------------
+
+void menu::ignore_mouse()
+{
+	m_mouse_hit = false;
+	m_mouse_button = false;
+	m_mouse_x = -1.0f;
+	m_mouse_y = -1.0f;
 }
 
 

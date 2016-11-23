@@ -1060,19 +1060,18 @@ void menu_palette_sel::draw(uint32_t flags)
 	auto line_height = ui().get_line_height();
 	auto lr_arrow_width = 0.4f * line_height * machine().render().ui_aspect();
 	auto ud_arrow_width = line_height * machine().render().ui_aspect();
-	auto gutter_width = lr_arrow_width * 1.3f;
-	int itemnum, linenum;
+	float const gutter_width = lr_arrow_width * 1.3f;
 
 	if (&machine().system() == &GAME_NAME(___empty))
 		draw_background();
 
 	// compute the width and height of the full menu
-	auto visible_width = 0.0f;
-	auto visible_main_menu_height = 0.0f;
-	for (auto & pitem : item)
+	float visible_width = 0.0f;
+	float visible_main_menu_height = 0.0f;
+	for (auto &pitem : item)
 	{
 		// compute width of left hand side
-		auto total_width = gutter_width + ui().get_string_width(pitem.text.c_str()) + gutter_width;
+		float total_width = gutter_width + ui().get_string_width(pitem.text.c_str()) + gutter_width;
 
 		// add in width of right hand side
 		if (!pitem.subtext.empty())
@@ -1087,7 +1086,7 @@ void menu_palette_sel::draw(uint32_t flags)
 	}
 
 	// account for extra space at the top and bottom
-	auto visible_extra_menu_height = get_customtop() + get_custombottom();
+	float const visible_extra_menu_height = get_customtop() + get_custombottom();
 
 	// add a little bit of slop for rounding
 	visible_width += 0.01f;
@@ -1112,10 +1111,10 @@ void menu_palette_sel::draw(uint32_t flags)
 	visible_top += get_customtop();
 
 	// first add us a box
-	float x1 = visible_left - UI_BOX_LR_BORDER;
-	float y1 = visible_top - UI_BOX_TB_BORDER;
-	float x2 = visible_left + visible_width + UI_BOX_LR_BORDER;
-	float y2 = visible_top + visible_main_menu_height + UI_BOX_TB_BORDER;
+	float const x1 = visible_left - UI_BOX_LR_BORDER;
+	float const y1 = visible_top - UI_BOX_TB_BORDER;
+	float const x2 = visible_left + visible_width + UI_BOX_LR_BORDER;
+	float const y2 = visible_top + visible_main_menu_height + UI_BOX_TB_BORDER;
 	ui().draw_outlined_box(container(), x1, y1, x2, y2, UI_BACKGROUND_COLOR);
 
 	// determine the first visible line based on the current selection
@@ -1130,43 +1129,37 @@ void menu_palette_sel::draw(uint32_t flags)
 	float effective_left = visible_left + gutter_width;
 
 	// locate mouse
-	mouse_hit = false;
-	mouse_button = false;
-	mouse_target = machine().ui_input().find_mouse(&mouse_target_x, &mouse_target_y, &mouse_button);
-	if (mouse_target != nullptr)
-		if (mouse_target->map_point_container(mouse_target_x, mouse_target_y, container(), mouse_x, mouse_y))
-			mouse_hit = true;
+	map_mouse();
 
 	// loop over visible lines
 	hover = item.size() + 1;
-	float line_x0 = x1 + 0.5f * UI_LINE_WIDTH;
-	float line_x1 = x2 - 0.5f * UI_LINE_WIDTH;
+	float const line_x0 = x1 + 0.5f * UI_LINE_WIDTH;
+	float const line_x1 = x2 - 0.5f * UI_LINE_WIDTH;
 
-	for (linenum = 0; linenum < visible_lines; linenum++)
+	for (int linenum = 0; linenum < visible_lines; linenum++)
 	{
-		float line_y = visible_top + (float)linenum * line_height;
-		itemnum = top_line + linenum;
-		const menu_item &pitem = item[itemnum];
-		const char *itemtext = pitem.text.c_str();
-		rgb_t fgcolor = UI_TEXT_COLOR;
-		rgb_t bgcolor = UI_TEXT_BG_COLOR;
-		float line_y0 = line_y;
-		float line_y1 = line_y + line_height;
+		float const line_y = visible_top + float(linenum) * line_height;
+		int const itemnum = top_line + linenum;
+		menu_item const &pitem = item[itemnum];
+		char const *const itemtext = pitem.text.c_str();
+		float const line_y0 = line_y;
+		float const line_y1 = line_y + line_height;
 
 		// set the hover if this is our item
-		if (mouse_hit && line_x0 <= mouse_x && line_x1 > mouse_x && line_y0 <= mouse_y && line_y1 > mouse_y && is_selectable(pitem))
+		if (mouse_in_rect(line_x0, line_y0, line_x1, line_y1) && is_selectable(pitem))
 			hover = itemnum;
 
-		// if we're selected, draw with a different background
+		rgb_t fgcolor = UI_TEXT_COLOR;
+		rgb_t bgcolor = UI_TEXT_BG_COLOR;
 		if (itemnum == selected)
 		{
+			// if we're selected, draw with a different background
 			fgcolor = UI_SELECTED_COLOR;
 			bgcolor = UI_SELECTED_BG_COLOR;
 		}
-
-		// else if the mouse is over this item, draw with a different background
 		else if (itemnum == hover)
 		{
+			// else if the mouse is over this item, draw with a different background
 			fgcolor = UI_MOUSEOVER_COLOR;
 			bgcolor = UI_MOUSEOVER_BG_COLOR;
 		}
@@ -1175,46 +1168,46 @@ void menu_palette_sel::draw(uint32_t flags)
 		if (bgcolor != UI_TEXT_BG_COLOR)
 			highlight(line_x0, line_y0, line_x1, line_y1, bgcolor);
 
-		// if we're on the top line, display the up arrow
 		if (linenum == 0 && top_line != 0)
 		{
+			// if we're on the top line, display the up arrow
 			draw_arrow(
-				0.5f * (x1 + x2) - 0.5f * ud_arrow_width,
-				line_y + 0.25f * line_height,
-				0.5f * (x1 + x2) + 0.5f * ud_arrow_width,
-				line_y + 0.75f * line_height,
-				fgcolor,
-				ROT0);
+					0.5f * (x1 + x2) - 0.5f * ud_arrow_width,
+					line_y + 0.25f * line_height,
+					0.5f * (x1 + x2) + 0.5f * ud_arrow_width,
+					line_y + 0.75f * line_height,
+					fgcolor,
+					ROT0);
 			if (hover == itemnum)
 				hover = HOVER_ARROW_UP;
 		}
-
-		// if we're on the bottom line, display the down arrow
 		else if (linenum == visible_lines - 1 && itemnum != item.size() - 1)
 		{
+			// if we're on the bottom line, display the down arrow
 			draw_arrow(
-				0.5f * (x1 + x2) - 0.5f * ud_arrow_width,
-				line_y + 0.25f * line_height,
-				0.5f * (x1 + x2) + 0.5f * ud_arrow_width,
-				line_y + 0.75f * line_height,
-				fgcolor,
-				ROT0 ^ ORIENTATION_FLIP_Y);
+					0.5f * (x1 + x2) - 0.5f * ud_arrow_width,
+					line_y + 0.25f * line_height,
+					0.5f * (x1 + x2) + 0.5f * ud_arrow_width,
+					line_y + 0.75f * line_height,
+					fgcolor,
+					ROT0 ^ ORIENTATION_FLIP_Y);
 			if (hover == itemnum)
 				hover = HOVER_ARROW_DOWN;
 		}
-
-		// if we're just a divider, draw a line
 		else if (pitem.type == menu_item_type::SEPARATOR)
+		{
+			// if we're just a divider, draw a line
 			container().add_line(visible_left, line_y + 0.5f * line_height, visible_left + visible_width, line_y + 0.5f * line_height, UI_LINE_WIDTH, UI_BORDER_COLOR, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-
-		// if we don't have a subitem, just draw the string centered
+		}
 		else if (pitem.subtext.empty())
+		{
+			// if we don't have a subitem, just draw the string centered
 			ui().draw_text_full(container(), itemtext, effective_left, line_y, effective_width,
-				ui::text_layout::CENTER, ui::text_layout::TRUNCATE, mame_ui_manager::NORMAL, fgcolor, bgcolor, nullptr, nullptr);
-
-		// otherwise, draw the item on the left and the subitem text on the right
+					ui::text_layout::CENTER, ui::text_layout::TRUNCATE, mame_ui_manager::NORMAL, fgcolor, bgcolor, nullptr, nullptr);
+		}
 		else
 		{
+			// otherwise, draw the item on the left and the subitem text on the right
 			const char *subitem_text = pitem.subtext.c_str();
 			rgb_t color = rgb_t((uint32_t)strtoul(subitem_text, nullptr, 16));
 

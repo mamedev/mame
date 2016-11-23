@@ -151,7 +151,6 @@ void menu_dats_view::draw(uint32_t flags)
 	auto line_height = ui().get_line_height();
 	auto ud_arrow_width = line_height * machine().render().ui_aspect();
 	auto gutter_width = 0.52f * line_height * machine().render().ui_aspect();
-	mouse_x = -1, mouse_y = -1;
 	float visible_width = 1.0f - 2.0f * UI_BOX_LR_BORDER;
 	float visible_left = (1.0f - visible_width) * 0.5f;
 
@@ -163,12 +162,7 @@ void menu_dats_view::draw(uint32_t flags)
 	float visible_extra_menu_height = get_customtop() + get_custombottom() + extra_height;
 
 	// locate mouse
-	mouse_hit = false;
-	mouse_button = false;
-	mouse_target = machine().ui_input().find_mouse(&mouse_target_x, &mouse_target_y, &mouse_button);
-	if (mouse_target != nullptr)
-		if (mouse_target->map_point_container(mouse_target_x, mouse_target_y, container(), mouse_x, mouse_y))
-			mouse_hit = true;
+	map_mouse();
 
 	// account for extra space at the top and bottom
 	float visible_main_menu_height = 1.0f - 2.0f * UI_BOX_TB_BORDER - visible_extra_menu_height;
@@ -219,7 +213,7 @@ void menu_dats_view::draw(uint32_t flags)
 			draw_arrow(0.5f * (x1 + x2) - 0.5f * ud_arrow_width, line_y + 0.25f * line_height,
 				0.5f * (x1 + x2) + 0.5f * ud_arrow_width, line_y + 0.75f * line_height, fgcolor, ROT0);
 
-			if (mouse_hit && line_x0 <= mouse_x && line_x1 > mouse_x && line_y0 <= mouse_y && line_y1 > mouse_y)
+			if (mouse_in_rect(line_x0, line_y0, line_x1, line_y1))
 			{
 				fgcolor = UI_MOUSEOVER_COLOR;
 				bgcolor = UI_MOUSEOVER_BG_COLOR;
@@ -233,7 +227,7 @@ void menu_dats_view::draw(uint32_t flags)
 			draw_arrow(0.5f * (x1 + x2) - 0.5f * ud_arrow_width, line_y + 0.25f * line_height,
 				0.5f * (x1 + x2) + 0.5f * ud_arrow_width, line_y + 0.75f * line_height, fgcolor, ROT0 ^ ORIENTATION_FLIP_Y);
 
-			if (mouse_hit && line_x0 <= mouse_x && line_x1 > mouse_x && line_y0 <= mouse_y && line_y1 > mouse_y)
+			if (mouse_in_rect(line_x0, line_y0, line_x1, line_y1))
 			{
 				fgcolor = UI_MOUSEOVER_COLOR;
 				bgcolor = UI_MOUSEOVER_BG_COLOR;
@@ -261,7 +255,7 @@ void menu_dats_view::draw(uint32_t flags)
 		rgb_t fgcolor = UI_SELECTED_COLOR;
 		rgb_t bgcolor = UI_SELECTED_BG_COLOR;
 
-		if (mouse_hit && line_x0 <= mouse_x && line_x1 > mouse_x && line_y0 <= mouse_y && line_y1 > mouse_y && is_selectable(pitem))
+		if (mouse_in_rect(line_x0, line_y0, line_x1, line_y1) && is_selectable(pitem))
 			hover = count;
 
 		if (pitem.type == menu_item_type::SEPARATOR)
