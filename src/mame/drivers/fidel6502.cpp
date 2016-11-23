@@ -17,9 +17,6 @@
       can be removed together with this note when we implement it across MAME.
     - verify cpu speed and rom labels where unknown
     - EAG missing bankswitch? where is the 2nd half of the 32KB ROM used, if at all?
-    - Why does fexcelp give error beeps at start? As if chessboard buttons are
-      pressed (button logic is not inverted). It works fine after pressing clear.
-      This also happens on real hardware if you manually upgrade model 6080.
 
 ******************************************************************************
 
@@ -2159,7 +2156,7 @@ ROM_END
 
 ROM_START( fexcelp )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD("par_ex.ic5", 0x8000, 0x8000, CRC(274d6aff) SHA1(c8d943b2f15422ac62f539b568f5509cbce568a3) ) // GI 27C256, no label
+	ROM_LOAD("par_ex.ic5", 0x8000, 0x8000, CRC(0d17b0f0) SHA1(3a6070fd4718c62b62ff0f08637bb6eb84eb9a1c) ) // GI 27C256, no label
 ROM_END
 
 ROM_START( fdes2000 )
