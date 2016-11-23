@@ -18,10 +18,27 @@
            OSC: 24.000 MHz (on the 86612-B-2 PCB)
         Custom: CAPCOM DL-010D-103 (on the 86612-B-2 PCB)
 
-	Horizontal scan rate: 15.625kHz
-	Vertical scan rate: 60.093Hz
-	Clocks and timings verified on 86612-A-2 board, serial no. 39646
-	by scope measurement at clock pins
+    Horizontal scan rate: 15.606kHz
+    Vertical scan rate: 60.024Hz
+	
+    pixel clock:         6.000MHz, 166ns per pixel
+
+    htotal:             64.076us, 386 pixels
+    hsync:               5.312us,  32 pixels
+    back porch + sync:  15.106us,  91 pixels
+    active video:       42.662us, 257 pixels (it looks like the first pixel is repeated)
+    front porch:         6.308us,  38 pixels
+
+    vtotal:             16.660ms, 260 lines
+    vsync:             256.304us,   4 lines
+    back porch + sync:   1.282ms,  20 lines
+    active video:       14.353ms, 224 lines
+    back porch:          1.025ms,  16 lines
+
+    Clocks verified on 86612-A-2 and 86612-B-2 boards, serial no. 39646
+    ("Bionic Commando", US region) by scope measurement at clock pins.
+    Timings verified at SYNC pin and BLUE pin (jamma edge),
+    using an Agilent DSO9404A scope and two N2873A 500MHz probes
 
     Note: Protection MCU is labelled "TS" without a number and without a coloured
           stripe. Maybe its code is not region dependant.
