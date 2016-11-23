@@ -48,6 +48,35 @@ WRITE8_MEMBER( intv_state::intvkbd_dualport8_msb_w )
 }
 
 // I/O for the Tape Drive
+struct tape_drive_state_type
+{
+	/* read state */
+	int read_data;			/* 0x4000 */
+	int ready;				/* 0x4001 */
+	int leader_detect;		/* 0x4002 */
+	int tape_missing;		/* 0x4003 */
+	int playing;			/* 0x4004 */
+	int no_data;			/* 0x4005 */
+
+	/* write state */
+	int motor_state;		/* 0x4020-0x4022 */
+	int writing;			/* 0x4023 */
+	int audio_b_mute;		/* 0x4024 */
+	int audio_a_mute;		/* 0x4025 */
+	int channel_select;		/* 0x4026 */
+	int erase;				/* 0x4027 */
+	int write_data;			/* 0x4040 */
+
+	/* bit_counter */
+	int bit_counter;
+} tape_drive;
+
+//static const char *const tape_motor_mode_desc[8] =
+//{
+//	"IDLE", "IDLE", "IDLE", "IDLE",
+//	"EJECT", "PLAY/RECORD", "REWIND", "FF"
+//};
+
 
 READ8_MEMBER( intv_state::intvkbd_io_r )
 {
@@ -59,36 +88,42 @@ READ8_MEMBER( intv_state::intvkbd_io_r )
 		case 0x000:
 			// "Data from Cassette"
 			// Tape drive does the decoding to bits
-			rv = m_io_test->read() & 0x80;
+			//rv = m_io_test->read() & 0x80;
+			rv = tape_drive.read_data << 7;
 			break;
 		case 0x001:
 			// "Watermark"
 			// 0 = Drive Busy Executing Command?, 1 = Drive Ok?
-			rv = (m_io_test->read() & 0x40) << 1;
+			//rv = (m_io_test->read() & 0x40) << 1;
+			rv = tape_drive.ready << 7;
 			break;
 		case 0x002:
 			// "End of Tape"
 			// 0 = Recordable surface, 1 = Leader Detect
 			// (Leader is transparent, optical sensor)
-			rv = (m_io_test->read() & 0x20) << 2;
+			//rv = (m_io_test->read() & 0x20) << 2;
+			rv = tape_drive.leader_detect << 7;
 			//logerror("TAPE: Read %02x from 0x40%02x - Sense 2?\n",rv,offset);
 			break;
 		case 0x003:
 			// "Cassette Present"
 			// 0 = Tape Present, 1 = Tape Not Present
-			rv = (m_io_test->read() & 0x10) << 3;
+			//rv = (m_io_test->read() & 0x10) << 3;
+			rv = tape_drive.tape_missing << 7;
 			//logerror("TAPE: Read %02x from 0x40%02x - Tape Present\n",rv,offset);
 			break;
 		case 0x004:
 			// "NOT Inter Record Gap (IRG)"
 			// 0 = Not Playing/Recording?, 1 = Playing/Recording?
-			rv = (m_io_test->read() & 0x08) << 4;
+			//rv = (m_io_test->read() & 0x08) << 4;
+			rv = tape_drive.playing << 7;
 			//logerror("TAPE: Read %02x from 0x40%02x - Comp (339/1)\n",rv,offset);
 			break;
 		case 0x005:
 			// "Dropout"
 			// 0 = Data Detect, 1 = No Data
-			rv = (m_io_test->read() & 0x04) << 5;
+			//rv = (m_io_test->read() & 0x04) << 5;
+			rv = tape_drive.no_data << 7;
 			//logerror("TAPE: Read %02x from 0x40%02x - Clocked Comp (339/13)\n",rv,offset);
 			break;
 		case 0x006:
@@ -132,12 +167,6 @@ READ8_MEMBER( intv_state::intvkbd_io_r )
 	return rv;
 }
 
-//static const char *const tape_motor_mode_desc[8] =
-//{
-//	"IDLE", "IDLE", "IDLE", "IDLE",
-//	"EJECT", "PLAY/RECORD", "REWIND", "FF"
-//};
-
 WRITE8_MEMBER( intv_state::intvkbd_io_w )
 {
 	switch (offset)
@@ -146,51 +175,55 @@ WRITE8_MEMBER( intv_state::intvkbd_io_w )
 		// These are all set to zero by system reset
 		case 0x020:
 			// "Tape Drive Control: Enable"
-			m_tape_motor_mode &= 3;
+			tape_drive.motor_state &= 3;
 			if (data & 1)
-				m_tape_motor_mode |= 4;
+				tape_drive.motor_state |= 4;
 			//logerror("TAPE: Motor Mode: %s\n",tape_motor_mode_desc[m_tape_motor_mode]);
 			break;
 		case 0x021:
 			// "Tape Drive Control: Forward"
-			m_tape_motor_mode &= 5;
+			tape_drive.motor_state &= 5;
 			if (data & 1)
-				m_tape_motor_mode |= 2;
+				tape_drive.motor_state |= 2;
 			//logerror("TAPE: Motor Mode: %s\n",tape_motor_mode_desc[m_tape_motor_mode]);
 			break;
 		case 0x022:
 			// "Tape Drive Control: Fast"
-			m_tape_motor_mode &= 6;
+			tape_drive.motor_state &= 6;
 			if (data & 1)
-				m_tape_motor_mode |= 1;
+				tape_drive.motor_state |= 1;
 			//logerror("TAPE: Motor Mode: %s\n",tape_motor_mode_desc[m_tape_motor_mode]);
 			break;
 		case 0x023:
 			// "Tape Drive Control: Record"
 			// 0=Read, 1=Write
+			tape_drive.writing = (data & 1);
 			break;
 		case 0x024:
 			// "Tape Drive Control: Mute 1"
 			// 0=Enable Channel B Audio, 1=Mute
+			tape_drive.audio_b_mute = (data & 1);
 			break;
 		case 0x025:
 			// "Tape Drive Control: Mute 2"
-			// 0=Enable Channel A Audio, 1=Mute	
+			// 0=Enable Channel A Audio, 1=Mute
+			tape_drive.audio_a_mute = (data & 1);
 			break;
 		case 0x026:
 			// "Tape Drive Control: Mode"
 			// If read mode:
 			//	0=Read Channel B Data, 1 = Read Channel A Data
 			// If write mode:
-			//  0=Write Channel B data, 1 = Record Channel B Audio	
-			break;
+			//  0=Write Channel B data, 1 = Record Channel B Audio
+			tape_drive.channel_select = (data & 1);
 		case 0x027:
+			break;
 			// "Tape Drive Control: Erase"
-			m_tape_unknown_write[offset - 0x23] = (data & 1);
+			tape_drive.erase = (data & 1);
 			break;
 		case 0x040:
 			// Data to Tape
-			m_tape_unknown_write[5] = (data & 1);
+			tape_drive.write_data = (data & 1);
 			break;
 		case 0x041:
 			// "Tape Interrupt Enable"
@@ -245,6 +278,154 @@ WRITE8_MEMBER( intv_state::intvkbd_io_w )
 			break;
 	}
 }
+
+static int max_bits = 0;
+static unsigned char *tape_data;
+
+void get_tape_bit(int position, int channel, int *data_present, int *data)
+{
+	int byte = (position >> 2)*2 + channel;
+	int data_present_mask = 1 << ((3-(position % 4))*2 + 1);
+	int data_mask = 1 << ((3-(position % 4))*2);
+
+	//printf("%d\t0x%02x 0x%02x\n",byte,data_present_mask,data_mask);
+
+	if (tape_data[byte] & data_present_mask)
+		*data_present = 1;
+	else
+		*data_present = 0;
+
+	if (tape_data[byte] & data_mask)
+		*data = 1;
+	else
+		*data = 0;
+}
+
+void set_tape_bit(int position, int data)
+{
+	int byte = (position >> 2)*2 + 1;
+	int data_present_mask = 1 << ((3-(position % 4))*2 + 1);
+	int data_mask = 1 << ((3-(position % 4))*2);
+
+	tape_data[byte] |= data_present_mask;
+	if (data)
+		tape_data[byte] |= data_mask;
+	else
+		tape_data[byte] &= (~data_mask);
+}
+
+#if defined(LATER)
+int intvkbd_tape_init(int id)
+{
+	FILE *tapefile;
+	int filesize;
+
+	if (!(tapefile = image_fopen (IO_CASSETTE, id, OSD_FILETYPE_IMAGE, OSD_FOPEN_READ)))
+	{
+		return INIT_FAIL;
+	}
+
+	filesize = osd_fsize(tapefile);
+	tape_data = (unsigned char *)malloc(filesize);
+	osd_fread(tapefile, tape_data, filesize);
+
+	osd_fclose(tapefile);
+
+	max_bits = 2*filesize;
+
+	tape_drive.tape_missing = 0;
+	tape_drive.leader_detect = 0;
+	tape_drive.ready = 1;
+
+	tape_drive.bit_counter = 0;
+	return INIT_PASS;
+}
+
+void intvkbd_tape_exit(int id)
+{
+	FILE *tapefile;
+	int filesize;
+
+	if (tape_data)
+	{
+		if (!(tapefile = image_fopen (IO_CASSETTE, id, OSD_FILETYPE_IMAGE, OSD_FOPEN_RW)))
+		{
+			filesize = osd_fsize(tapefile);
+			osd_fwrite(tapefile, tape_data, filesize);
+			osd_fclose(tapefile);
+
+			free(tape_data);
+			tape_data = 0;
+
+			max_bits = 0;
+			tape_drive.tape_missing = 1;
+			tape_drive.bit_counter = 0;
+		}
+	}
+}
+#endif
+
+void update_tape_drive(void)
+{
+	/* temp */
+
+	if (tape_drive.writing)
+	{
+		if (tape_drive.channel_select == 0) /* data */
+		{
+			set_tape_bit(tape_drive.bit_counter,tape_drive.write_data);
+		}
+		else
+		{
+			/* recording audio - TBD */
+		}
+	}
+	else
+	{
+		int channel;
+		int data_present;
+		int data;
+
+		channel = tape_drive.channel_select ^ 1;
+
+		get_tape_bit(tape_drive.bit_counter,channel,&data_present,&data);
+
+		tape_drive.no_data = data_present ^ 1;
+		tape_drive.read_data = data;
+
+		/* temporary */
+		tape_drive.playing = data_present ^ 1;
+	}
+
+	if (tape_drive.motor_state == 5) /* Playing */
+	{
+		tape_drive.bit_counter++;
+		if (tape_drive.bit_counter >= max_bits)
+			tape_drive.bit_counter = max_bits-1;
+	}
+
+	if (tape_drive.motor_state == 6) /* Rewinding */
+	{
+		tape_drive.bit_counter-=4;
+		//tape_drive.bit_counter--;
+		if (tape_drive.bit_counter < 0)
+			tape_drive.bit_counter = 0;
+	}
+	if (tape_drive.motor_state == 7) /* FastFwd */
+	{
+		tape_drive.bit_counter+=2;
+		//tape_drive.bit_counter++;
+		if (tape_drive.bit_counter >= max_bits)
+			tape_drive.bit_counter = max_bits-1;
+	}
+
+	if ((tape_drive.bit_counter == 0) || (tape_drive.bit_counter == max_bits-1))
+		tape_drive.leader_detect = 1;
+	else
+		tape_drive.leader_detect = 0;
+}
+
+////////////
 
 static bool not_busy = 1;	// printer state
 static bool not_paper = 0; // printer state - we always have paper
@@ -405,7 +586,6 @@ void intv_state::machine_start()
 		save_item(NAME(m_intvkbd_keyboard_col));
 		save_item(NAME(m_tape_int_pending));
 		save_item(NAME(m_tape_interrupts_enabled));
-		save_item(NAME(m_tape_unknown_write));
 		save_item(NAME(m_tape_motor_mode));
 	}
 
@@ -491,3 +671,39 @@ INTERRUPT_GEN_MEMBER(intv_state::intv_interrupt)
 
 	m_stic->screenrefresh();
 }
+
+#if defined(LATER)
+
+INTERRUPT_GEN( intvkbd_interrupt2 )
+{
+	static int tape_interrupt_divider = 0;
+
+	tape_interrupt_divider++;
+	tape_interrupt_divider = tape_interrupt_divider % 50;
+
+	if (tape_interrupt_divider == 0)
+	{
+#if 0
+			update_tape_drive();
+
+		/* do sr1 interrupt plus possible tape interrupt */
+		if (tape_interrupts_enabled)
+			tape_int_pending = 1;
+#endif
+		sr1_int_pending = 1;
+		cpu_set_irq_line(1, 0, PULSE_LINE);
+	}
+	else
+	{
+			update_tape_drive();
+
+		/* do only possible tape interrupt */
+		if (tape_interrupts_enabled)
+		{
+			tape_int_pending = 1;
+			cpu_set_irq_line(1, 0, PULSE_LINE);
+		}
+	}
+
+}
+#endif

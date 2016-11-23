@@ -94,7 +94,6 @@ public:
 	int m_intvkbd_keyboard_col;
 	int m_tape_int_pending;
 	int m_tape_interrupts_enabled;
-	int m_tape_unknown_write[6];
 	int m_tape_motor_mode;
 	DECLARE_DRIVER_INIT(intvecs);
 	DECLARE_DRIVER_INIT(intvkbd);
