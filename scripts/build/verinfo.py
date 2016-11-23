@@ -11,7 +11,7 @@ import sys
 
 def parse_args():
     def usage():
-        sys.stderr.write('Usage: verinfo.py [-b mame|mess|ume|ldplayer] [-r|-p] [-o <outfile>] <srcfile>\n')
+        sys.stderr.write('Usage: verinfo.py [-b mame|mess|ume] [-r|-p] [-o <outfile>] <srcfile>\n')
         sys.exit(1)
 
     flags = True

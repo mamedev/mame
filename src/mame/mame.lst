@@ -37913,3 +37913,6 @@ zx97                            //
 @source:vgmplay.cpp
 vgmplay
 
+@source:ldplayer.cpp
+ldv1000                         // Pioneer LD-V1000
+pr8210                          // Pioneer PR-8210
