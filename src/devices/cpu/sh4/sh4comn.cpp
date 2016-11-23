@@ -676,10 +676,56 @@ WRITE32_MEMBER( sh4_base_device::sh4_internal_w )
 
 //  printf("sh4_internal_w:  Write %08x (%x), %08x @ %08x\n", 0xfe000000+((offset & 0x3fc0) << 11)+((offset & 0x3f) << 2), offset, data, mem_mask);
 
-	switch( offset )
+	switch( offset ) 
 	{
+	case PTEH: // for use with LDTLB opcode
+		m_m[PTEH] &= 0xffffffff;
+		/*
+			NNNN NNNN NNNN NNNN NNNN NN-- AAAA AAAA
+
+			N = VPM = Virtual Page Number
+			A = ASID = Address Space Identifier
+
+			same as the address table part of the utlb but with 2 unused bits (these are sourced from PTEL instead when LDTLB is called)
+		*/
+
+
+		break;
+
+	case PTEL:
+		m_m[PTEL] &= 0xffffffff;
+		/*
+			 ---P PPPP PPPP PPPP PPPP PP-V zRRz CDHW
+
+			 same format as data array 1 of the utlb
+		*/
+		break;
+
+	case PTEA:
+		m_m[PTEA] &= 0xffffffff;
+		/*
+			---- ---- ---- ---- ---- ---- ---- TSSS
+
+			same format as data array 2 of the utlb
+		*/
+		break;
+
 	case MMUCR: // MMU Control
 		logerror("MMUCR %08x\n", data);
+		m_m[MMUCR] &= 0xffffffff;
+		/*
+			LLLL LL-- BBBB BB-- CCCC CCQV ---- -T-A
+
+			L = LRUI = Least recently used ITLB
+			B = URB = UTLB replace boundary
+			C = URC = UTLB replace counter
+			Q = SQMD = Store Queue Mode Bit
+			V = SV = Single Virtual Mode Bit
+			T = TI = TLB invaldiate
+			A = AT = Address translation bit (enable)			
+		*/
+
+		
 
 		if (data & MMUCR_AT)
 		{

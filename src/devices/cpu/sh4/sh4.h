@@ -469,7 +469,7 @@ protected:
 	void LDSMMACH(const uint16_t opcode);
 	void LDSMMACL(const uint16_t opcode);
 	void LDSMPR(const uint16_t opcode);
-	void LDTLB(const uint16_t opcode);
+	virtual void LDTLB(const uint16_t opcode);
 	void MAC_L(const uint16_t opcode);
 	void MAC_W(const uint16_t opcode);
 	void MOV(const uint16_t opcode);
@@ -761,6 +761,8 @@ public:
 	DECLARE_WRITE64_MEMBER( sh4_utlb_data_array1_w );
 	DECLARE_READ64_MEMBER( sh4_utlb_data_array2_r );
 	DECLARE_WRITE64_MEMBER( sh4_utlb_data_array2_w );
+
+	virtual void LDTLB(const uint16_t opcode) override;
 
 	virtual uint32_t sh4_getsqremap(uint32_t address) override;
 	sh4_utlb m_utlb[64];

@@ -186,9 +186,34 @@ void sh34_base_device::TODO(const uint16_t opcode)
 
 void sh34_base_device::LDTLB(const uint16_t opcode)
 {
-	logerror("unhandled LDTLB\n");
+	logerror("unhandled LDTLB for this CPU type\n");
 }
 
+void sh4_base_device::LDTLB(const uint16_t opcode)
+{
+	int replace = (m_m[MMUCR] & 0x0000fc00) >> 10;
+
+	logerror("using LDTLB to replace UTLB entry %02x\n", replace);
+
+	// these come from PTEH
+	m_utlb[replace].VPN =  (m_m[PTEH] & 0xfffffc00) >> 10;
+//	m_utlb[replace].D =    (m_m[PTEH] & 0x00000200) >> 9; // from PTEL
+//	m_utlb[replace].V =    (m_m[PTEH] & 0x00000100) >> 8; // from PTEL
+	m_utlb[replace].ASID = (m_m[PTEH] & 0x000000ff) >> 0;
+	// these come from PTEL
+	m_utlb[replace].PPN = (m_m[PTEL] & 0x1ffffc00) >> 10;
+	m_utlb[replace].V =   (m_m[PTEL] & 0x00000100) >> 8;
+	m_utlb[replace].PSZ = (m_m[PTEL] & 0x00000080) >> 6;
+	m_utlb[replace].PSZ |=(m_m[PTEL] & 0x00000010) >> 4;
+	m_utlb[replace].PPR=  (m_m[PTEL] & 0x00000060) >> 5;
+	m_utlb[replace].C =   (m_m[PTEL] & 0x00000008) >> 3;
+	m_utlb[replace].D =   (m_m[PTEL] & 0x00000004) >> 2;
+	m_utlb[replace].SH =  (m_m[PTEL] & 0x00000002) >> 1;
+	m_utlb[replace].WT =  (m_m[PTEL] & 0x00000001) >> 0;
+	// these come from PTEA
+	m_utlb[replace].TC = (m_m[PTEA] & 0x00000008) >> 3;
+	m_utlb[replace].SA = (m_m[PTEA] & 0x00000007) >> 0;
+}
 
 #if 0
 int sign_of(int n)
