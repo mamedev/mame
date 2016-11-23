@@ -679,6 +679,8 @@ WRITE32_MEMBER( sh4_base_device::sh4_internal_w )
 	switch( offset )
 	{
 	case MMUCR: // MMU Control
+		logerror("MMUCR %08x\n", data);
+
 		if (data & MMUCR_AT)
 		{
 			printf("SH4 MMU Enabled\n");
@@ -686,16 +688,7 @@ WRITE32_MEMBER( sh4_base_device::sh4_internal_w )
 			printf("The MMU emulation is a hack specific to that system\n");
 			m_sh4_mmu_enabled = 1;
 
-			// should be a different bit!
-			{
-				int i;
-				for (i=0;i<64;i++)
-				{
-					m_sh4_tlb_address[i] = 0;
-					m_sh4_tlb_data[i] = 0;
-				}
 
-			}
 		}
 		else
 		{
@@ -1186,6 +1179,11 @@ void sh34_base_device::sh4_parse_configuration()
 
 uint32_t sh34_base_device::sh4_getsqremap(uint32_t address)
 {
+	return address;
+}
+
+uint32_t sh4_base_device::sh4_getsqremap(uint32_t address)
+{
 	if (!m_sh4_mmu_enabled)
 		return address;
 	else
@@ -1195,9 +1193,9 @@ uint32_t sh34_base_device::sh4_getsqremap(uint32_t address)
 
 		for (i=0;i<64;i++)
 		{
-			uint32_t topcmp = m_sh4_tlb_address[i]&0xfff00000;
+			uint32_t topcmp = (m_utlb[i].VPN<<10)&0xfff00000;
 			if (topcmp==topaddr)
-				return (address&0x000fffff) | ((m_sh4_tlb_data[i])&0xfff00000);
+				return (address&0x000fffff) | ((m_utlb[i].PPN<<10)&0xfff00000);
 		}
 
 	}
@@ -1205,34 +1203,147 @@ uint32_t sh34_base_device::sh4_getsqremap(uint32_t address)
 	return address;
 }
 
-READ64_MEMBER( sh4_base_device::sh4_tlb_r )
-{
-	int offs = offset*8;
 
-	if (offs >= 0x01000000)
+WRITE64_MEMBER( sh4_base_device::sh4_utlb_address_array_w )
+{
+/*	uses bits 13:8 of address to select which UTLB entry we're addressing
+    bit 7 of the address enables 'associative' mode, causing a search
+	operation rather than a direct write.
+
+	NNNN NNNN NNNN NNNN NNNN NNDV AAAA AAAA
+
+	N = VPM = Virtual Page Number
+	D = Dirty Bit
+	V = Validity Bit
+	A = ASID = Address Space Identifier
+*/
+
+	logerror("sh4_utlb_address_array_w %08x %08x\n", offset, data);
+	int offs = offset << 3;
+
+	uint8_t associative = (offs >> 7) & 1;
+
+	if (!associative)
 	{
-		uint8_t i = (offs>>8)&63;
-		return m_sh4_tlb_data[i];
+		// non-associative mode
+		uint8_t i = (offs >> 8) & 63;
+
+		m_utlb[i].VPN =  (data & 0xfffffc00) >> 10;
+		m_utlb[i].D =    (data & 0x00000200) >> 9;
+		m_utlb[i].V =    (data & 0x00000100) >> 8;
+		m_utlb[i].ASID = (data & 0x000000ff) >> 0;
 	}
 	else
 	{
-		uint8_t i = (offs>>8)&63;
-		return m_sh4_tlb_address[i];
+		// associative mode
+		fatalerror("SH4MMU: associative mode writes unsupported\n");
 	}
 }
 
-WRITE64_MEMBER( sh4_base_device::sh4_tlb_w )
+READ64_MEMBER( sh4_base_device::sh4_utlb_address_array_r )
 {
+	// associative bit is ignored for reads
 	int offs = offset*8;
 
-	if (offs >= 0x01000000)
-	{
-		uint8_t i = (offs>>8)&63;
-		m_sh4_tlb_data[i]  = data&0xffffffff;
-	}
-	else
-	{
-		uint8_t i = (offs>>8)&63;
-		m_sh4_tlb_address[i] = data&0xffffffff;
-	}
+	uint32_t ret = 0;
+
+	uint8_t i = (offs >> 8) & 63;
+
+	ret |= m_utlb[i].VPN << 10;
+	ret |= m_utlb[i].D << 9;
+	ret |= m_utlb[i].V << 8;
+	ret |= m_utlb[i].ASID << 0;
+
+	return ret;
+}
+
+
+WRITE64_MEMBER( sh4_base_device::sh4_utlb_data_array1_w )
+{
+/*  uses bits 13:8 of address to select which UTLB entry we're addressing
+
+    ---P PPPP PPPP PPPP PPPP PP-V zRRz CDHW
+
+    P = PPN = Physical page number
+    V = Validity bit
+    z = SZ = Page Size (2 bits, split)
+    D = Dirty Bit
+    R = PR = Protection Key Data
+    C = Cacheable bit
+    H = Share status
+    W = Write through
+    - = unused (should be 0)
+*/
+	logerror("sh4_utlb_data_array1_w %08x %08x\n", offset, data);
+	int offs = offset*8;
+
+	uint8_t i = (offs>>8)&63;
+
+	m_utlb[i].PPN = (data & 0x1ffffc00) >> 10;
+	m_utlb[i].V =   (data & 0x00000100) >> 8;
+	m_utlb[i].PSZ = (data & 0x00000080) >> 6;
+	m_utlb[i].PSZ |=(data & 0x00000010) >> 4;
+	m_utlb[i].PPR=  (data & 0x00000060) >> 5;
+	m_utlb[i].C =   (data & 0x00000008) >> 3;
+	m_utlb[i].D =   (data & 0x00000004) >> 2;
+	m_utlb[i].SH =  (data & 0x00000002) >> 1;
+	m_utlb[i].WT =  (data & 0x00000001) >> 0;
+}
+
+
+READ64_MEMBER(sh4_base_device::sh4_utlb_data_array1_r)
+{
+	uint32_t ret = 0;
+	int offs = offset*8;
+
+	uint8_t i = (offs>>8)&63;
+
+	ret |= m_utlb[i].PPN << 10;
+	ret |= m_utlb[i].V << 8;
+	ret |= (m_utlb[i].PSZ & 2) << 6;
+	ret |= (m_utlb[i].PSZ & 1) << 4;
+	ret |= m_utlb[i].PPR << 5;
+	ret |= m_utlb[i].C << 3;
+	ret |= m_utlb[i].D << 2;
+	ret |= m_utlb[i].SH << 1;
+	ret |= m_utlb[i].WT << 0;
+
+	return ret;
+}
+
+
+
+WRITE64_MEMBER( sh4_base_device::sh4_utlb_data_array2_w )
+{
+/*  uses bits 13:8 of address to select which UTLB entry we're addressing
+
+	---- ---- ---- ---- ---- ---- ---- TSSS
+
+	T = TC = Timing Control
+	S = SA = Space attributes
+	- = unused (should be 0)
+
+*/
+
+	logerror("sh4_utlb_data_array2_w %08x %08x\n", offset, data);
+	int offs = offset*8;
+
+	uint8_t i = (offs>>8)&63;
+
+	m_utlb[i].TC = (data & 0x00000008) >> 3;
+	m_utlb[i].SA = (data & 0x00000007) >> 0;
+}
+
+
+READ64_MEMBER(sh4_base_device::sh4_utlb_data_array2_r)
+{
+	uint32_t ret = 0;
+	int offs = offset*8;
+
+	uint8_t i = (offs>>8)&63;
+
+	ret |= m_utlb[i].TC << 3;
+	ret |= m_utlb[i].SA << 0;
+
+	return ret;
 }

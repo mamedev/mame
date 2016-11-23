@@ -75,7 +75,11 @@ static ADDRESS_MAP_START( sh4_internal_map, AS_PROGRAM, 64, sh4_base_device )
 	AM_RANGE(0x1C000000, 0x1C000FFF) AM_RAM AM_MIRROR(0x01FFF000)
 	AM_RANGE(0x1E000000, 0x1E000FFF) AM_RAM AM_MIRROR(0x01FFF000)
 	AM_RANGE(0xE0000000, 0xE000003F) AM_RAM AM_MIRROR(0x03FFFFC0) // todo: store queues should be write only on DC's SH4, executing PREFM shouldn't cause an actual memory read access!
-	AM_RANGE(0xF6000000, 0xF7FFFFFF) AM_READWRITE(sh4_tlb_r,sh4_tlb_w)
+
+	AM_RANGE(0xF6000000, 0xF6FFFFFF) AM_READWRITE(sh4_utlb_address_array_r,sh4_utlb_address_array_w)
+	AM_RANGE(0xF7000000, 0xF77FFFFF) AM_READWRITE(sh4_utlb_data_array1_r,sh4_utlb_data_array1_w)
+	AM_RANGE(0xF7800000, 0xF7FFFFFF) AM_READWRITE(sh4_utlb_data_array2_r,sh4_utlb_data_array2_w)
+
 	AM_RANGE(0xFE000000, 0xFFFFFFFF) AM_READWRITE32(sh4_internal_r, sh4_internal_w, 0xffffffffffffffffU)
 ADDRESS_MAP_END
 
@@ -179,6 +183,12 @@ offs_t sh4be_device::disasm_disassemble(std::ostream &stream, offs_t pc, const u
 void sh34_base_device::TODO(const uint16_t opcode)
 {
 }
+
+void sh34_base_device::LDTLB(const uint16_t opcode)
+{
+	logerror("unhandled LDTLB\n");
+}
+
 
 #if 0
 int sign_of(int n)
@@ -3331,7 +3341,7 @@ inline void sh34_base_device::execute_one_0000(const uint16_t opcode)
 		case 0x08:  CLRT(opcode); break;
 		case 0x18:  SETT(opcode); break;
 		case 0x28:  CLRMAC(opcode); break;
-		case 0x38:  TODO(opcode); break;
+		case 0x38:  LDTLB(opcode); break;
 		case 0x48:  CLRS(opcode); break;
 		case 0x58:  SETS(opcode); break;
 		case 0x68:  NOP(opcode); break;
@@ -3339,7 +3349,7 @@ inline void sh34_base_device::execute_one_0000(const uint16_t opcode)
 		case 0x88:  CLRT(opcode); break;
 		case 0x98:  SETT(opcode); break;
 		case 0xa8:  CLRMAC(opcode); break;
-		case 0xb8:  TODO(opcode); break;
+		case 0xb8:  LDTLB(opcode); break;
 		case 0xc8:  CLRS(opcode); break;
 		case 0xd8:  SETS(opcode); break;
 		case 0xe8:  NOP(opcode); break;
@@ -4028,6 +4038,47 @@ void sh4be_device::execute_run()
 	} while( m_sh4_icount > 0 );
 }
 
+void sh4_base_device::device_start()
+{
+	sh34_base_device::device_start();
+
+	int i;
+	for (i=0;i<64;i++)
+	{
+		m_utlb[i].ASID = 0;
+		m_utlb[i].VPN = 0;
+		m_utlb[i].V = 0;
+		m_utlb[i].PPN = 0;
+		m_utlb[i].PSZ = 0;
+		m_utlb[i].SH = 0;
+		m_utlb[i].C = 0;
+		m_utlb[i].PPR = 0;
+		m_utlb[i].D = 0;
+		m_utlb[i].WT = 0;
+		m_utlb[i].SA = 0;
+		m_utlb[i].TC = 0;
+	}
+
+	for (i=0;i<64;i++)
+	{
+		save_item(NAME(m_utlb[i].ASID), i);
+		save_item(NAME(m_utlb[i].VPN), i);
+		save_item(NAME(m_utlb[i].V), i);
+		save_item(NAME(m_utlb[i].PPN), i);
+		save_item(NAME(m_utlb[i].PSZ), i);
+		save_item(NAME(m_utlb[i].SH), i);
+		save_item(NAME(m_utlb[i].C), i);
+		save_item(NAME(m_utlb[i].PPR), i);
+		save_item(NAME(m_utlb[i].D), i);
+		save_item(NAME(m_utlb[i].WT), i);
+		save_item(NAME(m_utlb[i].SA), i);
+		save_item(NAME(m_utlb[i].TC), i);
+	}
+
+}
+
+
+
 void sh34_base_device::device_start()
 {
 	for (int i=0; i<3; i++)
@@ -4134,8 +4185,6 @@ void sh34_base_device::device_start()
 	save_item(NAME( m_ioport16_direction));
 	save_item(NAME(m_ioport4_pullup));
 	save_item(NAME(m_ioport4_direction));
-	save_item(NAME(m_sh4_tlb_address));
-	save_item(NAME(m_sh4_tlb_data));
 	save_item(NAME(m_sh4_mmu_enabled));
 	save_item(NAME(m_sh3internal_upper));
 	save_item(NAME(m_sh3internal_lower));

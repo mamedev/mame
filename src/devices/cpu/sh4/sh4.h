@@ -136,6 +136,26 @@ struct sh4_ddt_dma
 	int mode;
 };
 
+
+// ASID [7:0] | VPN [31:10] | V |    | PPN [28:10] | SZ[1:0] | SH | C | PR[1:0] | D | WT | SA[2:0] | TC 
+
+struct sh4_utlb
+{
+	uint8_t ASID;
+	uint32_t VPN;
+	uint8_t V;
+	uint32_t PPN;
+	uint8_t PSZ;
+	uint8_t SH;
+	uint8_t C;
+	uint8_t PPR;
+	uint8_t D;
+	uint8_t WT;
+	uint8_t SA;
+	uint8_t TC;
+};
+
+
 typedef void (*sh4_ftcsr_callback)(uint32_t);
 
 
@@ -358,8 +378,6 @@ protected:
 	void    (*m_ftcsr_read_callback)(uint32_t data);
 
 	/* This MMU simulation is good for the simple remap used on Naomi GD-ROM SQ access *ONLY* */
-	uint32_t m_sh4_tlb_address[64];
-	uint32_t m_sh4_tlb_data[64];
 	uint8_t m_sh4_mmu_enabled;
 
 	int m_cpu_type;
@@ -451,6 +469,7 @@ protected:
 	void LDSMMACH(const uint16_t opcode);
 	void LDSMMACL(const uint16_t opcode);
 	void LDSMPR(const uint16_t opcode);
+	void LDTLB(const uint16_t opcode);
 	void MAC_L(const uint16_t opcode);
 	void MAC_W(const uint16_t opcode);
 	void MOV(const uint16_t opcode);
@@ -627,7 +646,7 @@ protected:
 	void increment_rtc_time(int mode);
 	void sh4_dmac_nmi();
 	void sh4_handler_ipra_w(uint32_t data, uint32_t mem_mask);
-	uint32_t sh4_getsqremap(uint32_t address);
+	virtual uint32_t sh4_getsqremap(uint32_t address);
 	void sh4_parse_configuration();
 	void sh4_timer_recompute(int which);
 	uint32_t sh4_handle_tcnt0_addr_r(uint32_t mem_mask);
@@ -736,10 +755,18 @@ public:
 	DECLARE_WRITE32_MEMBER( sh4_internal_w );
 	DECLARE_READ32_MEMBER( sh4_internal_r );
 
-	DECLARE_READ64_MEMBER( sh4_tlb_r );
-	DECLARE_WRITE64_MEMBER( sh4_tlb_w );
+	DECLARE_READ64_MEMBER( sh4_utlb_address_array_r );
+	DECLARE_WRITE64_MEMBER( sh4_utlb_address_array_w );
+	DECLARE_READ64_MEMBER( sh4_utlb_data_array1_r );
+	DECLARE_WRITE64_MEMBER( sh4_utlb_data_array1_w );
+	DECLARE_READ64_MEMBER( sh4_utlb_data_array2_r );
+	DECLARE_WRITE64_MEMBER( sh4_utlb_data_array2_w );
+
+	virtual uint32_t sh4_getsqremap(uint32_t address) override;
+	sh4_utlb m_utlb[64];
 
 protected:
+	virtual void device_start() override;
 	virtual void device_reset() override;
 };
 
