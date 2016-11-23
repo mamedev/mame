@@ -234,7 +234,6 @@ end
 if (STANDALONE~=true) then
 	links {
 		"frontend",	
-		"http",
 	}
 end
 if (MACHINES["NETLIST"]~=null) then
