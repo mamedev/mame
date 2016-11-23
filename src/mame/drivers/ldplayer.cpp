@@ -15,6 +15,7 @@
 #include "machine/ldpr8210.h"
 #include "machine/ldv1000.h"
 #include <ctype.h>
+#include "ui/uimain.h"
 
 #include "pr8210.lh"
 
@@ -189,8 +190,10 @@ chd_file *ldplayer_state::get_disc()
 	}
 
 	// if we failed, pop a message and exit
-	if (found == false)
-		throw emu_fatalerror("No valid image file found!\n");
+	if (found == false) {
+		machine().ui().popup_time(10, "No valid image file found!\n");
+		return nullptr;
+	}
 
 	return machine().rom_load().get_disk_handle("laserdisc");
 }
