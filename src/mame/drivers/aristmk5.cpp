@@ -175,6 +175,7 @@
 #include "machine/ds1302.h"
 #include "machine/watchdog.h"
 #include "machine/eepromser.h"
+#include "machine/nvram.h"
 #include "machine/ins8250.h"
 #include "sound/volt_reg.h"
 
@@ -185,8 +186,8 @@ public:
 		: archimedes_state(mconfig, type, tag)
 		, m_eeprom(*this, "eeprom%d", 0)
 		, m_rtc(*this, "rtc")
-		, m_sram_bank(*this, "sram_bank")
-		, m_sram_bank_nz(*this, "sram_bank_nz")
+		, m_nvram(*this, "nvram")
+		, m_sram(*this, "sram")
 		, m_extra_ports(*this, "EXTRA")
 		 { }
 
@@ -201,6 +202,8 @@ public:
 	DECLARE_READ32_MEMBER(eeprom_r);
 	DECLARE_READ32_MEMBER(ldor_r);
 	DECLARE_WRITE32_MEMBER(ldor_clk_w);
+	DECLARE_READ8_MEMBER(sram_r);
+	DECLARE_WRITE8_MEMBER(sram_w);
 
 	DECLARE_DRIVER_INIT(aristmk5);
 	virtual void machine_start() override;
@@ -214,13 +217,14 @@ public:
 private:
 	required_device_array<eeprom_serial_93cxx_device, 2> m_eeprom;
 	required_device<ds1302_device> m_rtc;
-	required_memory_bank m_sram_bank;
-	required_memory_bank m_sram_bank_nz;
+	required_device<nvram_device> m_nvram;
+	required_memory_region m_sram;
 	required_ioport m_extra_ports;
 
 	emu_timer *     m_mk5_2KHz_timer;
 	emu_timer *     m_mk5_VSYNC_timer;
 	uint8_t         m_ext_latch;
+	uint8_t         m_sram_bank;
 	uint8_t         m_flyback;
 	uint8_t         m_ldor_shift_reg;
 	uint64_t        m_coin_start_cycles;
@@ -231,6 +235,16 @@ TIMER_CALLBACK_MEMBER(aristmk5_state::mk5_VSYNC_callback)
 {
 	m_ioc_regs[IRQ_STATUS_A] |= 0x08; //turn vsync bit on
 	m_mk5_VSYNC_timer->adjust(attotime::never);
+}
+
+READ8_MEMBER(aristmk5_state::sram_r)
+{
+	return m_sram->base()[(m_sram_bank << 14) | (offset & 0x3fff)];
+}
+
+WRITE8_MEMBER(aristmk5_state::sram_w)
+{
+	m_sram->base()[(m_sram_bank << 14) | (offset & 0x3fff)] = data;
 }
 
 WRITE32_MEMBER(aristmk5_state::Ns5w48)
@@ -481,8 +495,8 @@ WRITE32_MEMBER(aristmk5_state::sram_banksel_w)
 
 	     4 pages of 32k for each sram chip.
 	*/
-	m_sram_bank->set_entry((data & 0xc0) >> 6);
-	m_sram_bank_nz->set_entry((data & 0xc0) >> 6);
+
+	m_sram_bank = ((data & 0xc0) >> 3) | (data & 0x07);
 }
 
 static ADDRESS_MAP_START( aristmk5_map, AS_PROGRAM, 32, aristmk5_state )
@@ -495,6 +509,7 @@ static ADDRESS_MAP_START( aristmk5_map, AS_PROGRAM, 32, aristmk5_state )
 	AM_RANGE(0x03010800, 0x03010803) AM_READ(eeprom_r)
 
 	AM_RANGE(0x03010580, 0x03010583) AM_READ_PORT("P3")
+	AM_RANGE(0x03010700, 0x03010703) AM_READ_PORT("P6")
 	AM_RANGE(0x03012000, 0x03012003) AM_READ_PORT("P1")
 	AM_RANGE(0x03012010, 0x03012013) AM_READ_PORT("P2")
 	AM_RANGE(0x03012200, 0x03012203) AM_READ_PORT("DSW1")
@@ -515,8 +530,7 @@ static ADDRESS_MAP_START( aristmk5_map, AS_PROGRAM, 32, aristmk5_state )
 	AM_RANGE(0x03012340, 0x0301235f) AM_DEVREADWRITE8("uart_3b", ins8250_uart_device, ins8250_r, ins8250_w, 0x000000ff)
 
 	AM_RANGE(0x03010810, 0x03010813) AM_DEVREADWRITE("watchdog", watchdog_timer_device, reset32_r, reset32_w) //MK-5 specific, watchdog
-//  System Startup Code Enabled protection appears to be located at 0x3010400 - 0x30104ff
-	AM_RANGE(0x03220000, 0x0323ffff) AM_RAMBANK("sram_bank") //AM_BASE_SIZE_GENERIC(nvram) // nvram 32kbytes x 3
+	AM_RANGE(0x03220000, 0x0323ffff) AM_READWRITE8(sram_r, sram_w, 0x000000ff)
 
 	// bank5 slow
 	AM_RANGE(0x03250048, 0x0325004b) AM_WRITE(Ns5w48) //IOEB control register
@@ -525,7 +539,7 @@ static ADDRESS_MAP_START( aristmk5_map, AS_PROGRAM, 32, aristmk5_state )
 
 
 	AM_RANGE(0x03000000, 0x0331ffff) AM_READWRITE(mk5_ioc_r, mk5_ioc_w)
-	AM_RANGE(0x03320000, 0x0333ffff) AM_RAMBANK("sram_bank_nz") // AM_BASE_SIZE_GENERIC(nvram) // nvram 32kbytes x 3 NZ
+	AM_RANGE(0x03320000, 0x0333ffff) AM_READWRITE8(sram_r, sram_w, 0x000000ff)
 
 	AM_RANGE(0x03400000, 0x035fffff) AM_WRITE(archimedes_vidc_w)
 	AM_RANGE(0x03600000, 0x037fffff) AM_WRITE(archimedes_memc_w)
@@ -639,6 +653,9 @@ static INPUT_PORTS_START( aristmk5 )
 	PORT_BIT(0x00000040, IP_ACTIVE_LOW , IPT_KEYPAD)  PORT_CODE(KEYCODE_M) PORT_TOGGLE PORT_NAME("Main door")
 	PORT_BIT(0x00000080, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_CODE(KEYCODE_C) PORT_TOGGLE PORT_NAME("Cashbox door")
 
+	PORT_START("P6")
+	PORT_BIT(0x00000002, IP_ACTIVE_LOW, IPT_KEYPAD)   // Battery
+
 	PORT_START("P4")
 	PORT_BIT(0x00000078, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, aristmk5_state, coin_r, nullptr)
 
@@ -652,13 +669,7 @@ INPUT_PORTS_END
 
 DRIVER_INIT_MEMBER(aristmk5_state,aristmk5)
 {
-	uint8_t *SRAM    = memregion("sram")->base();
-	uint8_t *SRAM_NZ = memregion("sram")->base();
-
 	archimedes_driver_init();
-
-	m_sram_bank->configure_entries(0, 4,    &SRAM[0],    0x20000);
-	m_sram_bank_nz->configure_entries(0, 4, &SRAM_NZ[0], 0x20000);
 
 	int do_debug = 0;
 
@@ -790,6 +801,8 @@ DRIVER_INIT_MEMBER(aristmk5_state,aristmk5)
 
 void aristmk5_state::machine_start()
 {
+	m_nvram->set_base(m_sram->base(), m_sram->bytes());
+
 	archimedes_init();
 
 	m_mk5_2KHz_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(aristmk5_state::mk5_2KHz_callback),this));
@@ -824,6 +837,7 @@ void aristmk5_state::machine_reset()
 
 	m_ldor_shift_reg = 0x55;
 	m_coin_start_cycles = 0;
+	m_sram_bank = 0;
 }
 
 
@@ -857,6 +871,8 @@ static MACHINE_CONFIG_START( aristmk5, aristmk5_state )
 
 	MCFG_EEPROM_SERIAL_93C56_ADD("eeprom0")
 	MCFG_EEPROM_SERIAL_93C56_ADD("eeprom1")
+
+	MCFG_NVRAM_ADD_NO_FILL("nvram")
 
 	// TL16C452FN U71
 	MCFG_DEVICE_ADD("uart_0a", NS16450, MASTER_CLOCK / 9)
