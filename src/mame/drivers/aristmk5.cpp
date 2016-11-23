@@ -523,11 +523,15 @@ static ADDRESS_MAP_START( aristmk5_map, AS_PROGRAM, 32, aristmk5_state )
 	AM_RANGE(0x03250050, 0x03250053) AM_READ(Ns5r50)  //IOEB ID register
 	AM_RANGE(0x03250058, 0x0325005b) AM_READ(Ns5x58)  //IOEB interrupt Latch
 
+
 	AM_RANGE(0x03000000, 0x0331ffff) AM_READWRITE(mk5_ioc_r, mk5_ioc_w)
 	AM_RANGE(0x03320000, 0x0333ffff) AM_RAMBANK("sram_bank_nz") // AM_BASE_SIZE_GENERIC(nvram) // nvram 32kbytes x 3 NZ
-	AM_RANGE(0x03400000, 0x035fffff) AM_ROM AM_REGION("maincpu", 0) AM_WRITE(archimedes_vidc_w)
-	AM_RANGE(0x03600000, 0x037fffff) AM_READWRITE(archimedes_memc_r, archimedes_memc_w)
+
+	AM_RANGE(0x03400000, 0x035fffff) AM_WRITE(archimedes_vidc_w)
+	AM_RANGE(0x03600000, 0x037fffff) AM_WRITE(archimedes_memc_w)
 	AM_RANGE(0x03800000, 0x039fffff) AM_WRITE(archimedes_memc_page_w)
+
+	AM_RANGE(0x03400000, 0x03bfffff) AM_ROM AM_REGION("maincpu", 0)
 ADDRESS_MAP_END
 
 /* U.S games have no dram emulator enabled */
