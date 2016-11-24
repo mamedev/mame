@@ -334,7 +334,7 @@ static void InitDasm8201(void)
 		Op[i].type  = type;
 
 		/* 2 byte code ? */
-		while (isspace((uint8_t)*p)) p++;
+		while (isspace(u8(*p))) p++;
 		if( (*p) )
 			Op[i].type |= 0x10;
 		/* number of param */

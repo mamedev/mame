@@ -7595,7 +7595,7 @@
 		<year>1990</year>
 		<publisher>Seo Jin</publisher>
 		<part name="cart" interface="sms_cart">
-      <feature name="slot" value="seojin" />
+			<feature name="slot" value="seojin" />
 			<dataarea name="rom" size="0x080000">
 				<rom name="SG11004A 79ST0086END 9045" size="0x080000" crc="cdbfe86e" sha1="83d6f261471dca20f8d2e33b9807d670e9b4eb9c" offset="000000" />
 			</dataarea>

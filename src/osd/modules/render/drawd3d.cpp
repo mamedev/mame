@@ -852,7 +852,7 @@ try_again:
 		m_adapter, D3DDEVTYPE_HAL, device_hwnd, D3DCREATE_SOFTWARE_VERTEXPROCESSING | D3DCREATE_FPU_PRESERVE, &m_presentation, &m_device);
 	if (FAILED(result))
 	{
-		// if we got a "DEVICELOST" error, it may be transistory; count it and only fail if
+		// if we got a "DEVICELOST" error, it may be transitory; count it and only fail if
 		// we exceed a threshold
 		if (result == D3DERR_DEVICELOST)
 		{
