@@ -692,11 +692,13 @@ private:
 
 	// FULL RANGE video levels for 100-B model, taken from page 46 of PDF
 	const uint8_t video_levels[16] = { 255, 217,  201,186, 171, 156, 140, 125, 110, 97, 79, 66, 54, 31, 18, 0 };
+	uint8_t m_PORT50;
 };
 
 
 // GDC RESET MACRO - used in  "machine_reset"  & GDC_EXTRA_REGISTER_w   !
 #define GDC_RESET_MACRO                                     \
+m_PORT50 = 0;                                               \												\
 m_GDC_INDIRECT_REGISTER = 0;                                \
 m_GDC_MODE_REGISTER = 0;                                    \
 m_GDC_WRITE_MASK = 0;                                       \
@@ -2234,7 +2236,7 @@ WRITE8_MEMBER(rainbow_state::z80_diskcontrol_w)
 		m_floppy = con->get_device();
 		if (m_floppy)
 			selected_drive = drive;
-		printf("%i <- SELECTED DRIVE...\n", m_unit);
+//		printf("%i <- SELECTED DRIVE...\n", m_unit);
 	}
 
 	if (selected_drive == INVALID_DRIVE)
@@ -2766,7 +2768,7 @@ WRITE16_MEMBER(rainbow_state::vram_w)
 				}
 
 				if(!(m_GDC_MODE_REGISTER & GDC_MODE_VECTOR)) // 0 : (NOT VECTOR MODE) Text Mode and Write Mask Batch
-					out = (out & m_GDC_WRITE_MASK) | (mem & ~m_GDC_WRITE_MASK); // // M_MASK (1st use)
+					out = (out & ~m_GDC_WRITE_MASK) | (mem & m_GDC_WRITE_MASK); // // M_MASK (1st use)
 				else
 					out = (out & ~data) | (mem & data); // VECTOR MODE !
 
@@ -2789,17 +2791,21 @@ READ8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_r)
 	uint8_t out = 0;
 	switch(offset)
 	{
+		case 0:
+			out = m_PORT50;
+			break;
+				
 		case 1:
-				if(m_GDC_INDIRECT_REGISTER & GDC_SELECT_SCROLL_MAP ) // 0x80
-				{	
-						// Documentation says it is always incremented, no matter if read or write:
-						out = m_GDC_SCROLL_BUFFER_PRELOAD[m_GDC_scroll_index++]; // // * READ * SCROLL_MAP ( 256 x 8 )   
-						m_GDC_scroll_index &= 0xFF; // 0...255  (CPU accesses 256 bytes)
-						break;
-				}
-				else
-					printf("\n * UNEXPECTED CASE: READ REGISTER 50..55 with INDIRECT_REGISTER $%02x and OFFSET $%02x *", m_GDC_INDIRECT_REGISTER, offset);
+			if(m_GDC_INDIRECT_REGISTER & GDC_SELECT_SCROLL_MAP ) // 0x80
+			{	
+				// Documentation says it is always incremented (read and write):
+				out = m_GDC_SCROLL_BUFFER_PRELOAD[m_GDC_scroll_index++]; // // * READ * SCROLL_MAP ( 256 x 8 )   
+				m_GDC_scroll_index &= 0xFF; // 0...255  (CPU accesses 256 bytes)
 				break;
+			}
+			else
+				printf("\n * UNEXPECTED CASE: READ REGISTER 50..55 with INDIRECT_REGISTER $%02x and OFFSET $%02x *", m_GDC_INDIRECT_REGISTER, offset);
+			break;
 
 		default:
 			printf("\n * UNHANDLED CASE: READ REGISTER 50..55 with INDIRECT_REGISTER $%02x and OFFSET $%02x *", m_GDC_INDIRECT_REGISTER, offset);
@@ -2826,10 +2832,15 @@ WRITE8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_w)
 
 	switch(offset)
 	{
-		case 0:  // Mode Register must be reloaded following any write to port 50 (software reset).
-			//       Graphics option software reset.  Any write to this port also resynchronizes the
-			//       read/modify/write memory cycles of the Graphics Option to those of the GDC.
-			GDC_RESET_MACRO
+		case 0: // Mode register must be reloaded following any write to port 50 (software reset). 
+			// FIXME: "Any write to this port also resynchronizes the 
+			//        read/modify/write memory cycles of the Graphics Option to those of the GDC." (?) 
+			if( data & 1 ) // PDF QV069 suggests 1 -> 0 -> 1; most programs just set bit 0.
+			{	
+				GDC_RESET_MACRO // Graphics option software reset (separate from GDC reset...)
+				printf("(PC=%x)\n", machine().device("maincpu")->safe_pc());
+			} 
+			m_PORT50  = data;
 			break;
 
 		case 1: //  51h - DATA loaded into register previously written to 53h.
@@ -2993,13 +3004,13 @@ WRITE8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_w)
 			break;
 
 		// --------- WRITE MASK (2 x 8 = 16 bits) USED IN WORD MODE ONLY !
-		// NOTE: there is NO specific order for the WRITE_MASK (according to txt/code samples in PDF)!
-		// !! NEW: LOW... HI JUXTAPOSITION...!!
+		// There is no specific order for the WRITE_MASK (according to txt/code samples in DEC's PDF).
+		// NOTE: LOW <-> HI JUXTAPOSITION!
 		case 4: // 54h   Write Mask LOW
-			m_GDC_WRITE_MASK = ( BITSWAP8(~data, 0, 1, 2, 3, 4, 5, 6, 7) << 8 )  | ( m_GDC_WRITE_MASK & 0x00FF );
+			m_GDC_WRITE_MASK = ( BITSWAP8(data, 0, 1, 2, 3, 4, 5, 6, 7) << 8 )  | ( m_GDC_WRITE_MASK & 0x00FF ); 
 			break;
 		case 5: // 55h   Write Mask HIGH
-			m_GDC_WRITE_MASK = ( m_GDC_WRITE_MASK & 0xFF00 ) | BITSWAP8(~data, 0, 1, 2, 3, 4, 5, 6, 7);
+			m_GDC_WRITE_MASK = ( m_GDC_WRITE_MASK & 0xFF00 ) | BITSWAP8(data, 0, 1, 2, 3, 4, 5, 6, 7);
 			break;
 	}
 }
@@ -3060,7 +3071,7 @@ MCFG_VT_VIDEO_RAM_CALLBACK(READ8(rainbow_state, read_video_ram_r))
 MCFG_VT_VIDEO_CLEAR_VIDEO_INTERRUPT_CALLBACK(WRITELINE(rainbow_state, clear_video_interrupt))
 
 // *************************** COLOR GRAPHICS (OPTION) **************************************
-MCFG_DEVICE_ADD("upd7220", UPD7220, XTAL_32MHz / 4) // WAR: 31188000  / 4   TO BE VERIFIED. Duell schematics shows 31.188 (?) Mhz (/ 4 = 7.797 Mhz)
+MCFG_DEVICE_ADD("upd7220", UPD7220, 31188000 / 4) // Duell schematics shows a 31.188 Mhz clock (confirmed by RFKA; not in XTAL)
 MCFG_UPD7220_VSYNC_CALLBACK(WRITELINE(rainbow_state, GDC_vblank_irq)) // "The vsync callback line needs to be below the 7220 DEVICE_ADD line."
 
 MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_map)
