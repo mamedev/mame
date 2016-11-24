@@ -202,7 +202,7 @@ protected:
 		}
 	};
 
-	// artificator internal class
+	// artificater internal class
 	class artifacter
 	{
 	public:

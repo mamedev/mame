@@ -184,7 +184,7 @@ const device_type ALPHA8301L = &device_creator<alpha8301_cpu_device>;
 #define FN(x) &alpha8201_cpu_device::x
 
 
-alpha8201_cpu_device::alpha8201_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+alpha8201_cpu_device::alpha8201_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: cpu_device(mconfig, ALPHA8201L, "ALPHA-8201L", tag, owner, clock, "alpha8201l", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 10, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 6, 0)
@@ -193,7 +193,7 @@ alpha8201_cpu_device::alpha8201_cpu_device(const machine_config &mconfig, const 
 }
 
 
-alpha8201_cpu_device::alpha8201_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
+alpha8201_cpu_device::alpha8201_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, const char *shortname, const char *source)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 10, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 8, 6, 0)
@@ -201,7 +201,7 @@ alpha8201_cpu_device::alpha8201_cpu_device(const machine_config &mconfig, device
 {
 }
 
-alpha8301_cpu_device::alpha8301_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+alpha8301_cpu_device::alpha8301_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: alpha8201_cpu_device(mconfig, ALPHA8301L, "ALPHA-8301L", tag, owner, clock, "alpha8301l", __FILE__)
 {
 	m_opmap = opcode_8301;
@@ -217,49 +217,49 @@ unsigned alpha8201_cpu_device::M_RDMEM_OPCODE()
 	return retval;
 }
 
-void alpha8201_cpu_device::M_ADD(uint8_t dat)
+void alpha8201_cpu_device::M_ADD(u8 dat)
 {
-	uint16_t temp = m_A + dat;
+	u16 temp = m_A + dat;
 	m_A = temp & 0xff;
 	m_zf = (m_A==0);
 	m_cf = temp>>8;
 }
 
-void alpha8201_cpu_device::M_ADDB(uint8_t dat)
+void alpha8201_cpu_device::M_ADDB(u8 dat)
 {
-	uint16_t temp = m_B + dat;
+	u16 temp = m_B + dat;
 	m_B = temp & 0xff;
 	m_zf = (m_B==0);
 	m_cf = temp>>8;
 }
 
-void alpha8201_cpu_device::M_SUB(uint8_t dat)
+void alpha8201_cpu_device::M_SUB(u8 dat)
 {
 	m_cf = (m_A>=dat);  // m_cf is No Borrow
 	m_A -= dat;
 	m_zf = (m_A==0);
 }
 
-void alpha8201_cpu_device::M_AND(uint8_t dat)
+void alpha8201_cpu_device::M_AND(u8 dat)
 {
 	m_A &= dat;
 	m_zf = (m_A==0);
 }
 
-void alpha8201_cpu_device::M_OR(uint8_t dat)
+void alpha8201_cpu_device::M_OR(u8 dat)
 {
 	m_A |= dat;
 	m_zf = (m_A==0);
 }
 
-void alpha8201_cpu_device::M_XOR(uint8_t dat)
+void alpha8201_cpu_device::M_XOR(u8 dat)
 {
 	m_A ^= dat;
 	m_zf = (m_A==0);
 	m_cf = 0;
 }
 
-void alpha8201_cpu_device::M_JMP(uint8_t dat)
+void alpha8201_cpu_device::M_JMP(u8 dat)
 {
 	m_pc.b.l = dat;
 	/* update pc page */
@@ -279,8 +279,8 @@ void alpha8201_cpu_device::M_UNDEFINED()
 
 void alpha8201_cpu_device::M_UNDEFINED2()
 {
-	uint8_t op  = M_RDOP(m_pc.w.l-1);
-	uint8_t imm = M_RDMEM_OPCODE();
+	u8 op  = M_RDOP(m_pc.w.l-1);
+	u8 imm = M_RDMEM_OPCODE();
 	logerror("alpha8201:  PC = %03x,  Unimplemented opcode = %02x,%02x\n", m_pc.w.l-2, op,imm);
 #if SHOW_MESSAGE_CONSOLE
 	osd_printf_debug("alpha8201:  PC = %03x,  Unimplemented opcode = %02x,%02x\n", m_pc.w.l-2, op,imm);
@@ -293,7 +293,7 @@ void alpha8201_cpu_device::M_UNDEFINED2()
 
 void alpha8201_cpu_device::stop()
 {
-	uint8_t pcptr = M_RDMEM(0x001) & 0x1f;
+	u8 pcptr = M_RDMEM(0x001) & 0x1f;
 	M_WRMEM(pcptr,(M_RDMEM(pcptr)&0xf)+0x08); /* mark entry point ODD to HALT */
 	m_mb |= 0x08;        /* mark internal HALT state */
 }
@@ -600,7 +600,7 @@ void alpha8201_cpu_device::device_reset()
 void alpha8201_cpu_device::execute_run()
 {
 	unsigned opcode;
-	uint8_t pcptr;
+	u8 pcptr;
 
 	if(m_halt)
 	{
@@ -688,7 +688,7 @@ void alpha8201_cpu_device::execute_set_input(int inputnum, int state)
 }
 
 
-offs_t alpha8201_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t alpha8201_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options)
 {
 	extern CPU_DISASSEMBLE( alpha8201 );
 	return CPU_DISASSEMBLE_NAME(alpha8201)(this, stream, pc, oprom, opram, options);
