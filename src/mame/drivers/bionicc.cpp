@@ -33,7 +33,7 @@
     vsync:             256.304us,   4 lines
     back porch + sync:   1.282ms,  20 lines
     active video:       14.353ms, 224 lines
-    back porch:          1.025ms,  16 lines
+    front porch:         1.025ms,  16 lines
 
     Clocks verified on 86612-A-2 and 86612-B-2 boards, serial no. 39646
     ("Bionic Commando", US region) by scope measurement at clock pins.
