@@ -710,8 +710,19 @@ WRITE32_MEMBER( sh4_base_device::sh4_internal_w )
 		*/
 		break;
 
+	case TTB:
+		m_m[TTB] &= 0xffffffff;
+		logerror("TTB set to %08x\n", data);
+		break;
+
+	case TEA:
+		m_m[TEA] &= 0xffffffff;
+		logerror("TEA set to %08x\n", data);
+		break;
+
+
 	case MMUCR: // MMU Control
-		logerror("MMUCR %08x\n", data);
+		logerror("%s: MMUCR %08x\n", machine().describe_context(), data);
 		m_m[MMUCR] &= 0xffffffff;
 		/*
 			LLLL LL-- BBBB BB-- CCCC CCQV ---- -T-A
@@ -729,10 +740,40 @@ WRITE32_MEMBER( sh4_base_device::sh4_internal_w )
 
 		if (data & MMUCR_AT)
 		{
-			printf("SH4 MMU Enabled\n");
-			printf("If you're seeing this, but running something other than a Naomi GD-ROM game then chances are it won't work\n");
-			printf("The MMU emulation is a hack specific to that system\n");
 			m_sh4_mmu_enabled = 1;
+
+
+			if (m_mmuhack == 1)
+			{
+				printf("SH4 MMU Enabled\n");
+				printf("If you're seeing this, but running something other than a Naomi GD-ROM game then chances are it won't work\n");
+				printf("The MMU emulation is a hack specific to that system\n");
+			}
+
+			
+			if (m_mmuhack == 2)
+			{
+				for (int i = 0;i < 64;i++)
+				{
+					if (m_utlb[i].V)
+					{
+						printf("(entry %02x | ASID: %02x VPN: %08x V: %02x PPN: %08x SZ: %02x SH: %02x C: %02x PPR: %02x D: %02x WT %02x: SA: %02x TC: %02x)\n",
+							i,
+							m_utlb[i].ASID,
+							m_utlb[i].VPN << 10,
+							m_utlb[i].V,
+							m_utlb[i].PPN << 10,
+							m_utlb[i].PSZ,
+							m_utlb[i].SH,
+							m_utlb[i].C,
+							m_utlb[i].PPR,
+							m_utlb[i].D,
+							m_utlb[i].WT,
+							m_utlb[i].SA,
+							m_utlb[i].TC);
+					}
+				}
+			}
 
 
 		}
@@ -1223,6 +1264,36 @@ void sh34_base_device::sh4_parse_configuration()
 	}
 }
 
+uint32_t sh34_base_device::get_remap(uint32_t address)
+{
+	return address;
+}
+
+uint32_t sh4_base_device::get_remap(uint32_t address)
+{
+	if (m_mmuhack != 2)
+		return address;
+
+	// is this the correct way around?
+	int i;
+	uint32_t topaddr = address&0xfff00000;
+
+	for (i=0;i<64;i++)
+	{
+		if (m_utlb[i].V)
+		{
+			uint32_t topcmp = (m_utlb[i].PPN << 10) & 0xfff00000;
+			if (topcmp == topaddr)
+				return (address & 0x000fffff) | ((m_utlb[i].VPN << 10) & 0xfff00000);
+		}
+	}
+
+	//printf("address not in UTLB? %08x\n", address);
+
+
+	return address;
+}
+
 uint32_t sh34_base_device::sh4_getsqremap(uint32_t address)
 {
 	return address;
@@ -1230,7 +1301,7 @@ uint32_t sh34_base_device::sh4_getsqremap(uint32_t address)
 
 uint32_t sh4_base_device::sh4_getsqremap(uint32_t address)
 {
-	if (!m_sh4_mmu_enabled)
+	if (!m_sh4_mmu_enabled || (m_mmuhack != 1))
 		return address;
 	else
 	{
@@ -1243,7 +1314,6 @@ uint32_t sh4_base_device::sh4_getsqremap(uint32_t address)
 			if (topcmp==topaddr)
 				return (address&0x000fffff) | ((m_utlb[i].PPN<<10)&0xfff00000);
 		}
-
 	}
 
 	return address;
@@ -1258,7 +1328,7 @@ WRITE64_MEMBER( sh4_base_device::sh4_utlb_address_array_w )
 
 	NNNN NNNN NNNN NNNN NNNN NNDV AAAA AAAA
 
-	N = VPM = Virtual Page Number
+	N = VPN = Virtual Page Number
 	D = Dirty Bit
 	V = Validity Bit
 	A = ASID = Address Space Identifier
