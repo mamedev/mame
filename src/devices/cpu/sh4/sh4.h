@@ -190,6 +190,10 @@ typedef void (*sh4_ftcsr_callback)(uint32_t);
 	sh34_base_device::set_sh4_clock(*device, _clock);
 
 
+#define MCFG_MMU_HACK_TYPE(_hacktype) \
+	sh34_base_device::set_mmu_hacktype(*device, _hacktype);
+
+
 class sh34_base_device : public cpu_device
 {
 public:
@@ -210,6 +214,8 @@ public:
 	static void set_md7(device_t &device, int md0) { downcast<sh34_base_device &>(device).c_md7 = md0; }
 	static void set_md8(device_t &device, int md0) { downcast<sh34_base_device &>(device).c_md8 = md0; }
 	static void set_sh4_clock(device_t &device, int clock) { downcast<sh34_base_device &>(device).c_clock = clock; }
+
+	static void set_mmu_hacktype(device_t &device, int hacktype) { downcast<sh34_base_device &>(device).m_mmuhack = hacktype; }
 
 	TIMER_CALLBACK_MEMBER( sh4_refresh_timer_callback );
 	TIMER_CALLBACK_MEMBER( sh4_rtc_timer_callback );
@@ -261,6 +267,9 @@ protected:
 	int c_md7;
 	int c_md8;
 	int c_clock;
+
+	// hack 1 = Naomi hack, hack 2 = Work in Progress implementation
+	int m_mmuhack;
 
 	uint32_t  m_ppc;
 	uint32_t  m_pc;
@@ -646,6 +655,7 @@ protected:
 	void increment_rtc_time(int mode);
 	void sh4_dmac_nmi();
 	void sh4_handler_ipra_w(uint32_t data, uint32_t mem_mask);
+	virtual uint32_t get_remap(uint32_t address);
 	virtual uint32_t sh4_getsqremap(uint32_t address);
 	void sh4_parse_configuration();
 	void sh4_timer_recompute(int which);
@@ -764,6 +774,7 @@ public:
 
 	virtual void LDTLB(const uint16_t opcode) override;
 
+	virtual uint32_t get_remap(uint32_t address) override;
 	virtual uint32_t sh4_getsqremap(uint32_t address) override;
 	sh4_utlb m_utlb[64];
 
