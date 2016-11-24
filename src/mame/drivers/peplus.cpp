@@ -1544,9 +1544,9 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 	ROM_RELOAD(                     0x08000, 0x8000) /* 32K version build for the original PE boards (non-plus) */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mr0-cg791.u52",   0x00000, 0x4000, CRC(95abe335) SHA1(63e7589750e4e05846cf1a19042ac59074dbb13e) ) /* El Cortez custom card backs */
-	ROM_LOAD( "mg0-cg791.u53",   0x08000, 0x4000, CRC(35575d1d) SHA1(a9b3e4b7470e139215cd45db32130c70e5c7f98a) ) /* PKxxxx PE (non-plus) Poker */
-	ROM_LOAD( "mb0-cg791.u54",   0x10000, 0x4000, CRC(7115d318) SHA1(6d4bc79ddacd63a768d06fd304b1727314bd44a4) ) /* 16K 27C128 roms */
+	ROM_LOAD( "mr0-cg791.u52",   0x00000, 0x4000, CRC(95abe335) SHA1(63e7589750e4e05846cf1a19042ac59074dbb13e) ) /* Custom El Cortez card backs */
+	ROM_LOAD( "mg0-cg791.u53",   0x08000, 0x4000, CRC(35575d1d) SHA1(a9b3e4b7470e139215cd45db32130c70e5c7f98a) )
+	ROM_LOAD( "mb0-cg791.u54",   0x10000, 0x4000, CRC(7115d318) SHA1(6d4bc79ddacd63a768d06fd304b1727314bd44a4) )
 	ROM_LOAD( "mx0-cg791.u55",   0x18000, 0x4000, CRC(4e428454) SHA1(98454ff3145fc8e851c9f5962964faaa8029d294) )
 
 	ROM_REGION( 0x100, "proms", 0 )
@@ -1610,7 +1610,7 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 	ROM_RELOAD(                     0x08000, 0x8000) /* 32K version build for the original PE boards (non-plus) */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg857.u72",   0x00000, 0x8000, CRC(0b6c5f96) SHA1(f4cf7bfb715af8b88d9dbbad0c42b65a2c4d341b) )
+	ROM_LOAD( "mro-cg857.u72",   0x00000, 0x8000, CRC(0b6c5f96) SHA1(f4cf7bfb715af8b88d9dbbad0c42b65a2c4d341b) ) /* Custom El Cortez card backs */
 	ROM_LOAD( "mgo-cg857.u73",   0x08000, 0x8000, CRC(c49d2258) SHA1(9dd5cc75999f46da84f4331fcd6857dd78768592) )
 	ROM_LOAD( "mbo-cg857.u74",   0x10000, 0x8000, CRC(2c229fcf) SHA1(24d948470d91ede475859f52679fe826547cd248) )
 	ROM_LOAD( "mxo-cg857.u75",   0x18000, 0x8000, CRC(3c216808) SHA1(51fa59710128d6bd653d482d506f383dd671a19f) )
@@ -2297,7 +2297,7 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) )
 ROM_END
 
-ROM_START( pepp0008 ) /* Normal board : Standard Draw Poker (PP0002) - PSR Verified */
+ROM_START( pepp0008 ) /* Normal board : Standard Draw Poker (PP0008) - PSR Verified */
 /*
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 ----------------------------------------------------------
@@ -2977,7 +2977,7 @@ PayTable   Ks+  2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
      Programs Available: PP0050, X002441P
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "pp0048_944-964.u68",   0x00000, 0x10000, CRC(671bc06c) SHA1(1b2454b3c2723560498bd0ce04d48d08b89953c4) ) /* Game Version: 944, Library Version: 964 */
+	ROM_LOAD( "pp0050_944-964.u68",   0x00000, 0x10000, CRC(671bc06c) SHA1(1b2454b3c2723560498bd0ce04d48d08b89953c4) ) /* Game Version: 944, Library Version: 964 */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "mro-cg2004.u72",  0x00000, 0x8000, CRC(e5e40ea5) SHA1(e0d9e50b30cc0c25c932b2bf444990df1fb2c38c) ) /*  08/31/94   @ IGT  L95-0146  */
@@ -3088,7 +3088,7 @@ PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
 ------------------------------------------------------------
   P21A      1    2    2   3   4   8  10  20 200 250    800
   % Range: 87.4-89.4%  Optimum: 91.4%  Hit Frequency: 45.1%
-     Programs Available: PP0055, X000055P, PP0723
+     Programs Available: PP0054
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pp0054_600-550.u68",   0x00000, 0x8000, CRC(40e13a1a) SHA1(ea2aeccb23e8fc80bab8db51c857f2c21da1a6da) ) /* Game Version: 600, Library Version: 550, Video Lib Ver: 550 */
@@ -4411,7 +4411,7 @@ PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
 	ROM_LOAD( "pp0190_642-623.u68",   0x00000, 0x10000, CRC(3b8a3203) SHA1(33bd285def754df34f4815cd713e2ff599c74f11) ) /* Game Version: 642, Library Version: 623 */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg773.u72",   0x00000, 0x8000, CRC(73827e49) SHA1(f2b3f58aeac62b36ba60a408cf04c691b0564ace) ) /*  10-06-88   @ IGT  L88-2023  */ /* Should be MxO-CG2023.U7x & CAP773 (or CAP2023)?? */
+	ROM_LOAD( "mro-cg773.u72",   0x00000, 0x8000, CRC(73827e49) SHA1(f2b3f58aeac62b36ba60a408cf04c691b0564ace) ) /*  10-06-88   @ IGT  L88-2023  */
 	ROM_LOAD( "mgo-cg773.u73",   0x08000, 0x8000, CRC(af569952) SHA1(d28ae1c216a99bedc4315e61151934f53b932ef4) )
 	ROM_LOAD( "mbo-cg773.u74",   0x10000, 0x8000, CRC(3b59799b) SHA1(b6da6e719f5cc475f2f7112d6a8fe346ea5d511e) )
 	ROM_LOAD( "mxo-cg773.u75",   0x18000, 0x8000, CRC(75da0cd8) SHA1(4fb4eda9ae8e59884201368c7d8e4ff8b9967a4f) )
@@ -7614,15 +7614,130 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 	ROM_LOAD( "cap656.u50", 0x0000, 0x0100, CRC(038cabc6) SHA1(c6514b4f9dbed6ab2631f563f7e00648661ebdbb) )
 ROM_END
 
+/*
+
+Player's Choice & Montana Choice games:
+
+Machines can come in a variety of configurations:
+    Coin Hopper or Dot Matrix Printer
+    Button control, Touchscreen or both
+    Real Time Clock (RTC) functions via Dallas (Maxim) DS1216 SmartWatch RAM
+
+Configurations & specific CG character roms sets based on build version and game type.
+
+The printer for ticket payout (no coins) made by Star Micronics Co. Ltd. (Piscataway, NJ)
+  40-column dot matrix
+  3.25" wide, 2-ply paper roll
+  One ply is the customer copy, the other is a carbon copy for auditing
+
+  Printer PCB consists of a SCN8039HCBN40  Signetics / Intel (8048 compatible Single-Chip 8-Bit Microcontroller, ROM-less version) MCU
+  8.00MHz OSC and the LP 86 (handwritten label) EPROM.  There is known to exist later versions like LP 89 and higher
+
+*/
+
+ROM_START( pemg0025 ) /* Normal board : Player's Choice Multi-Game MG0025 - Requires a Printer (not yet supported) */
+/*
+
+MG0025 has 4 games:
+  Joker Poker
+  Home Run (Slots)
+  Super Sevens (Slots)
+  Jacks or Better
+
+Currently stalls with "PRINTER ERROR"
+
+*/
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "mg0025_603-727.u68",   0x00000, 0x10000, CRC(9ec078ae) SHA1(dc4e81091ada648edc7ef80802cbdb5f297de99a) ) /* Game Version: 603, Library Version: 727 */
+
+	ROM_REGION( 0x020000, "gfx1", 0 )
+	ROM_LOAD( "mro-cgxxxx.u72",  0x00000, 0x8000, NO_DUMP ) /* Requires a COMPLETELY UNKNOWN CG graphics set */
+	ROM_LOAD( "mgo-cgxxxx.u73",  0x08000, 0x8000, NO_DUMP )
+	ROM_LOAD( "mbo-cgxxxx.u74",  0x10000, 0x8000, NO_DUMP )
+	ROM_LOAD( "mxo-cgxxxx.u75",  0x18000, 0x8000, NO_DUMP )
+	ROM_LOAD( "mro-cg2073.u72",   0x00000, 0x8000, CRC(43806d98) SHA1(7665c1efedd90b9caf7d43545368e97200c95062) ) /* COMPLETELY WRONG!!!  Use these for now ONLY to show something */
+	ROM_LOAD( "mgo-cg2073.u73",   0x08000, 0x8000, CRC(c0276eb5) SHA1(1789ea651fa0728abbc31f7de4b9cd49b0a164b6) )
+	ROM_LOAD( "mbo-cg2073.u74",   0x10000, 0x8000, CRC(f5f769b9) SHA1(37cd65f49be3a54bbe1e21428c2823c7d2505184) )
+	ROM_LOAD( "mxo-cg2073.u75",   0x18000, 0x8000, CRC(d61d36b4) SHA1(1c020f1c50f4023925d4dba0b940b4e02843573f) )
+
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "cap1327.u50", 0x0000, 0x0100, CRC(afcccf99) SHA1(138995bf4c691f8ab18926fe095678e115de55e0) ) /* Unknown CAP color prom needed for this set */
+
+	ROM_REGION( 0x1000, "printer", 0 ) /* ROM from the printer driver PCB */
+	ROM_LOAD( "lp_86.u9", 0x0000, 0x1000, CRC(cdd93c06) SHA1(96f0a6e231f355a0b82bb0e1e698edbd66ff3020) ) /* 2732 EPROM */
+ROM_END
+
+ROM_START( pemg0026 ) /* Normal board : Player's Choice Multi-Game MG0026 - Requires a Printer (not yet supported) */
+/*
+
+MG0026 has 3 games:
+  Jackpot Jungle (Slots)
+  Jacks or Better
+  Double Diamonds (Slots)
+
+Currently stalls with "PRINTER ERROR"
+
+*/
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "mg0026_602-610.u68",   0x00000, 0x10000, CRC(c818d25e) SHA1(57e19a0d4b47bad96ca0e969c81ab97854b9c3b9) ) /* Game Version: 602, Library Version: 610 */
+
+	ROM_REGION( 0x020000, "gfx1", 0 )
+	ROM_LOAD( "mro-cgxxxx.u72",  0x00000, 0x8000, NO_DUMP ) /* Requires a COMPLETELY UNKNOWN CG graphics set */
+	ROM_LOAD( "mgo-cgxxxx.u73",  0x08000, 0x8000, NO_DUMP )
+	ROM_LOAD( "mbo-cgxxxx.u74",  0x10000, 0x8000, NO_DUMP )
+	ROM_LOAD( "mxo-cgxxxx.u75",  0x18000, 0x8000, NO_DUMP )
+	ROM_LOAD( "mro-cg2073.u72",   0x00000, 0x8000, CRC(43806d98) SHA1(7665c1efedd90b9caf7d43545368e97200c95062) ) /* COMPLETELY WRONG!!!  Use these for now ONLY to show something */
+	ROM_LOAD( "mgo-cg2073.u73",   0x08000, 0x8000, CRC(c0276eb5) SHA1(1789ea651fa0728abbc31f7de4b9cd49b0a164b6) )
+	ROM_LOAD( "mbo-cg2073.u74",   0x10000, 0x8000, CRC(f5f769b9) SHA1(37cd65f49be3a54bbe1e21428c2823c7d2505184) )
+	ROM_LOAD( "mxo-cg2073.u75",   0x18000, 0x8000, CRC(d61d36b4) SHA1(1c020f1c50f4023925d4dba0b940b4e02843573f) )
+
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "cap1327.u50", 0x0000, 0x0100, CRC(afcccf99) SHA1(138995bf4c691f8ab18926fe095678e115de55e0) ) /* Unknown CAP color prom needed for this set */
+
+	ROM_REGION( 0x1000, "printer", 0 ) /* ROM from the printer driver PCB */
+	ROM_LOAD( "lp_86.u9", 0x0000, 0x1000, CRC(cdd93c06) SHA1(96f0a6e231f355a0b82bb0e1e698edbd66ff3020) ) /* 2732 EPROM */
+ROM_END
+
+ROM_START( pemg0182 ) /* Normal board : Player's Choice Multi-Game MG0182 - Requires a Printer & Touchscreen controller (not yet supported) */
+/*
+
+MG0182 has 4 poker games:
+  Jacks or Better
+  Joker Wild Poker
+  Four of a Kind Bonus Poker
+  Deuces Wild Poker
+
+Build version 755-781 requires touchscreen controls currently not supported
+
+Currently stalls with "GAME MISMATCH" due to missing Touchscreen controller
+
+*/
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "mg0182_755-781.u68",   0x00000, 0x10000, CRC(61ce46d6) SHA1(951a0d4fd0219d66009faba1a80870600dd1a977) ) /* Game Version: 755, Library Version: 781 */
+
+	ROM_REGION( 0x020000, "gfx1", 0 )
+	ROM_LOAD( "mro-cg1209.u72",   0x00000, 0x8000, CRC(39b0cc43) SHA1(0a95a7122e64fed7355e762ff2eda2a7246d4693) )
+	ROM_LOAD( "mgo-cg1209.u73",   0x08000, 0x8000, CRC(5285ffab) SHA1(e959bf2fec46ee62d7a625eb64f74635fd697643) )
+	ROM_LOAD( "mbo-cg1209.u74",   0x10000, 0x8000, CRC(4604ac16) SHA1(b3a7c6c807eb2be7f451d2fcbb6455a66c155a46) )
+	ROM_LOAD( "mxo-cg1209.u75",   0x18000, 0x8000, CRC(da344256) SHA1(1320c4a8b48a9e61a4607e0a9d08083fde2bd334) )
+
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "cap1144.u50", 0x0000, 0x0100, CRC(c80e88ef) SHA1(51c62a07f660a2f3be46a8fbb5af01cff2660e8d) )
+
+	ROM_REGION( 0x1000, "printer", 0 ) /* ROM from the printer driver PCB */
+	ROM_LOAD( "lp_86.u9", 0x0000, 0x1000, CRC(cdd93c06) SHA1(96f0a6e231f355a0b82bb0e1e698edbd66ff3020) ) /* 2732 EPROM */
+ROM_END
+
 ROM_START( pemg0183 ) /* Normal board : Montana Choice Multi-Game MG0183 - Requires a Printer (not yet supported) */
 /*
+
 MG0183 has 4 poker games:
   Jacks or Better
   Joker Wild Poker
   Four of a Kind Bonus Poker
   Deuces Wild Poker
 
-Also uses a Dallas (Maxim) DS1216 SmartWatch RAM for RTC (Real Time Clock) functions
+Also uses a Dallas DS1216 SmartWatch RAM for RTC functions
 
 Came out of an IGT machine with belly glass calling it Montana Choice
 
@@ -7645,23 +7760,48 @@ Currently stalls with "PRINTER ERROR"
 	ROM_LOAD( "lp_86.u9", 0x0000, 0x1000, CRC(cdd93c06) SHA1(96f0a6e231f355a0b82bb0e1e698edbd66ff3020) ) /* 2732 EPROM */
 ROM_END
 
+ROM_START( pemg0213 ) /* Normal board : Montana Choice Multi-Game MG0213 - Requires a Printer (not yet supported) */
+/*
+
+MG0213 has 4 poker games:
+  Lucky Deal
+  Shock Wave
+  Deuces Joker Wild
+  Double Double Bonus
+
+Also uses a Dallas DS1216 SmartWatch RAM for RTC functions
+
+Currently stalls with "PRINTER ERROR"
+
+*/
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "mg0213_817-842.u68",   0x00000, 0x10000, CRC(d6574fa1) SHA1(e88ba7caf53f8cc3694579578a1db06fee9b41b2) ) /* Game Version: 817, Library Version: 842 */
+
+	ROM_REGION( 0x020000, "gfx1", 0 )
+	ROM_LOAD( "mro-cg2329.u72",   0x00000, 0x8000, CRC(27096c65) SHA1(dae4528269cef058847777b279554eee98c48687) )
+	ROM_LOAD( "mgo-cg2329.u73",   0x08000, 0x8000, CRC(ffde87e0) SHA1(4f4fcdeb14b56921a9cd77e565029545e3e2b0fe) )
+	ROM_LOAD( "mbo-cg2329.u74",   0x10000, 0x8000, CRC(cbe77ee0) SHA1(fb9da8266533dbd3084abba5f75d3b583cf986c2) )
+	ROM_LOAD( "mxo-cg2329.u75",   0x18000, 0x8000, CRC(b9e1b47c) SHA1(25fe7f974742a89d0a812bbc4f732f826b168fef) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "capx2329.u50", 0x0000, 0x0200, NO_DUMP )
+	ROM_LOAD( "capx1144.u50", 0x0000, 0x0200, CRC(c27fb8ec) SHA1(fd724f48d7126b3cc1fbd238e8182479b8bbac67) )
+
+	ROM_REGION( 0x1000, "printer", 0 ) /* ROM from the printer driver PCB */
+	ROM_LOAD( "lp_89.u9", 0x0000, 0x1000, NO_DUMP ) /* Should be LP0089 or higher - 2732 EPROM */
+	ROM_LOAD( "lp_86.u9", 0x0000, 0x1000, CRC(cdd93c06) SHA1(96f0a6e231f355a0b82bb0e1e698edbd66ff3020) ) /* 2732 EPROM */
+ROM_END
+
 ROM_START( pemg0252 ) /* Normal board : Player's Choice Multi-Game MG0252 - Requires a Printer (not yet supported) */
 /*
+
 MG0252 has 4 poker games:
   Deuces Wild
   Jacks Better Bonus
   Deuces / Joker Wild
   Jacks or Better
 
-Requires a printer for ticket payout (no coins) made by Star Micronics Co. Ltd. (Piscataway, NJ)
-  40-column dot matrix
-  3.25" wide, 2-ply paper roll
-  One ply is the customer copy, the other is a carbon copy for auditing
-
-  Printer PCB consists of a SCN8039HCBN40  Signetics / Intel (8048 compatible Single-Chip 8-Bit Microcontroller, ROM-less version) MCU
-  8.00MHz OSC and the LP 86 (handwritten label) EPROM
-
-  Some Player's Choice machines contain and use a touchscreen for input
+Build version 752-778 is for the South Carolina Lottery jurisdiction
 
 Currently stalls with "PRINTER ERROR"
 
@@ -14072,8 +14212,12 @@ GAMEL(1987, peip0118,  peip0031, peplus,  peplus_poker, peplus_state, nonplus,  
 GAMEL(1987, peip0120,  peip0031, peplus,  peplus_poker, peplus_state, nonplus,  ROT0,  "IGT - International Game Technology", "Player's Edge Plus (IP0120) Standard Draw Poker - French",  0, layout_pe_poker )
 
 /* Normal board : Multi-Game - Player's Choice - Some sets require a printer (not yet supported) */
-GAMEL(1994, pemg0183,  0,        peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Montana Choice (MG0183) Multi-Game",                        MACHINE_NOT_WORKING, layout_pe_poker) /* Needs printer support */
-GAMEL(1994, pemg0252,  0,        peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Choice (MG0252) Multi-Game",                       MACHINE_NOT_WORKING, layout_pe_poker) /* Needs printer support */
+GAMEL(1994, pemg0025,  0,        peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Montana Choice (MG0025) Multi-Game",                        MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER, layout_pe_poker) /* Needs printer */
+GAMEL(1994, pemg0026,  0,        peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Montana Choice (MG0026) Multi-Game",                        MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER, layout_pe_poker) /* Needs printer */
+GAMEL(1994, pemg0182,  0,        peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Montana Choice (MG0182) Multi-Game",                        MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER, layout_pe_poker) /* Needs printer & touchscreen support */
+GAMEL(1994, pemg0183,  0,        peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Montana Choice (MG0183) Multi-Game",                        MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER, layout_pe_poker) /* Needs printer support */
+GAMEL(1994, pemg0213,  0,        peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Choice (MG0213) Multi-Game",                       MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_NODEVICE_PRINTER, layout_pe_poker) /* Needs printer support & CAPX2329 not dumped*/
+GAMEL(1994, pemg0252,  0,        peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Choice (MG0252) Multi-Game",                       MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER, layout_pe_poker) /* Needs printer support */
 
 /* Normal board : Blackjack */
 GAMEL(1994, pebe0014,  0,        peplus, peplus_bjack,  peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (BE0014) Blackjack",                     0, layout_pe_bjack )
