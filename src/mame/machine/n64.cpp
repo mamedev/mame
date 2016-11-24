@@ -170,6 +170,7 @@ void n64_periphs::device_reset()
 	ai_dacrate = 0;
 	ai_bitrate = 0;
 	ai_status = 0;
+	ai_delayed_carry = false;
 
 	pi_dma_timer->adjust(attotime::never);
 	pi_rd_len = 0;
@@ -1255,6 +1256,9 @@ void n64_periphs::ai_dma()
 	//
 	//fwrite(&ram[current->address/2],current->length,1,audio_dump);
 
+	if (ai_delayed_carry)
+		current->address += 0x2000;
+
 	ram = &ram[current->address/2];
 
 	//osd_printf_debug("DACDMA: %x for %x bytes\n", current->address, current->length);
@@ -1266,6 +1270,11 @@ void n64_periphs::ai_dma()
 	// adjust the timer
 	period = attotime::from_hz(DACRATE_NTSC) * (ai_dacrate + 1) * (current->length / 4);
 	ai_timer->adjust(period);
+
+	if (((current->address + current->length) & 0x1FFF) == 0)
+		ai_delayed_carry = true;
+	else
+		ai_delayed_carry = false;
 }
 
 TIMER_CALLBACK_MEMBER(n64_periphs::ai_timer_callback)
@@ -1286,6 +1295,7 @@ void n64_periphs::ai_timer_tick()
 	else
 	{
 		ai_status &= ~0x40000000;
+		ai_delayed_carry = false;
 	}
 }
 

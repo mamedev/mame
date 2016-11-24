@@ -189,6 +189,7 @@ private:
 	AUDIO_DMA *ai_fifo_get_top();
 	void ai_fifo_push(uint32_t address, uint32_t length);
 	void ai_fifo_pop();
+	bool ai_delayed_carry;
 
 	dmadac_sound_device *ai_dac[2];
 	uint32_t ai_dram_addr;
