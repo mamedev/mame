@@ -499,7 +499,7 @@ INTERRUPT_GEN_MEMBER(apexc_state::apexc_interrupt)
 
     Since the APEXC has no video display, we display the control panel.
 
-    Additionnally, We display one page of teletyper output.
+    Additionally, We display one page of teletyper output.
 */
 
 static const rgb_t apexc_palette[] =

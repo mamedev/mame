@@ -643,7 +643,7 @@ struct FM_OPN
 	uint32_t  eg_cnt;         /* global envelope generator counter */
 	uint32_t  eg_timer;       /* global envelope generator counter works at frequency = chipclock/64/3 */
 	uint32_t  eg_timer_add;   /* step of eg_timer */
-	uint32_t  eg_timer_overflow;/* envelope generator timer overlfows every 3 samples (on real chip) */
+	uint32_t  eg_timer_overflow;/* envelope generator timer overflows every 3 samples (on real chip) */
 
 
 	/* there are 2048 FNUMs that can be generated using FNUM/BLK registers
@@ -2982,7 +2982,7 @@ void * ym2608_init(void *param, device_t *device, int clock, int rate,
 	F2608->deltaT.status_change_which_chip = F2608;
 	F2608->deltaT.status_change_EOS_bit = 0x04; /* status flag: set bit2 on End Of Sample */
 	F2608->deltaT.status_change_BRDY_bit = 0x08;    /* status flag: set bit3 on BRDY */
-	F2608->deltaT.status_change_ZERO_bit = 0x10;    /* status flag: set bit4 if silence continues for more than 290 miliseconds while recording the ADPCM */
+	F2608->deltaT.status_change_ZERO_bit = 0x10;    /* status flag: set bit4 if silence continues for more than 290 milliseconds while recording the ADPCM */
 
 	/* ADPCM Rhythm */
 	F2608->pcmbuf = device->memregion("ym2608")->base();

@@ -50,7 +50,7 @@
 #define RES_NET_VCC_CUSTOM          0x0008
 #define RES_NET_VCC_MASK            0x0008
 
-/* VBias prebuils - per channel but may be specified globally as default */
+/* VBias prebuilds - per channel but may be specified globally as default */
 
 #define RES_NET_VBIAS_USE_GLOBAL    0x0000
 #define RES_NET_VBIAS_5V            0x0010

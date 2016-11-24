@@ -47,7 +47,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
 
 2) 'magicbua'
 
-  - Additionnal 1P Vs COM mode with always only 1 winning round.
+  - Additional 1P Vs COM mode with always only 1 winning round.
   - Starting in 1P Vs 2P mode costs 2 credits. If no "Continue Play", the winner continues.
     And when a player joins in, if no "Continue Play", the winner also continues.
   - There is an ingame bug when in 1P Vs 2P mode : whatever the settings are, there will

@@ -353,7 +353,7 @@ protected:
 		CRC_VICTOR_HDR_START,   //!< Start a Victor 9000 checksum calculation, p1 = crc id
 		CRC_VICTOR_DATA_START,  //!< Start a Victor 9000 checksum calculation, p1 = crc id
 		CRC_END,                //!< End the checksum, p1 = crc id
-		CRC,                    //!< Write a checksum in the apporpriate format, p1 = crc id
+		CRC,                    //!< Write a checksum in the appropriate format, p1 = crc id
 
 		SECTOR_LOOP_START,      //!< Start of the per-sector loop, sector number goes from p1 to p2 inclusive
 		SECTOR_LOOP_END,        //!< End of the per-sector loop

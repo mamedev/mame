@@ -17,7 +17,7 @@
 
     tms99000 is the successor to both ti9900 and ti990/10.  It supports
     privileges, and has a coprocessor interface which enables the use of an
-    external memory mapper.  Additionnally,  it can use a Macrostore ROM to
+    external memory mapper.  Additionally,  it can use a Macrostore ROM to
     emulate additional instructions.
 
     **** This is WORK IN PROGRESS ****

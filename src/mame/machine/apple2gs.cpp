@@ -41,7 +41,7 @@
 
     C027 - KMSTATUS (GLU system status)
         bit 7 - set if mouse register full
-        bit 6 - mouse interupt enable flag
+        bit 6 - mouse interrupt enable flag
         bit 5 - set if data register full
         bit 4 - data interrupt enabled
         bit 3 - set if key data full

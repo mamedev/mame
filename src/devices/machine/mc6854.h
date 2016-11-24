@@ -151,7 +151,7 @@ extern const device_type MC6854;
    It passes bytes directly from one end to the other without bothering with
    the actual bit-encoding, synchronization, and CRC.
    Once completed, a frame is sent through out_frame. Aborted frames are not
-   transmitted at all. No start flag, stop flag, or crc bits are trasmitted.
+   transmitted at all. No start flag, stop flag, or crc bits are transmitted.
    send_frame makes a frame available to the CPU through the 6854 (it may
    fail and return -1 if the 6854 is not ready to accept the frame; even
    if the frame is accepted and 0 is returned, the CPU may abort it). Ony

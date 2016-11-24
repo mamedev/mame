@@ -120,7 +120,7 @@ private:
 
 	// input pins
 	bool m_bStart;
-	uint8_t m_uWord;              // 6 bit word noumber to be spoken
+	uint8_t m_uWord;              // 6 bit word number to be spoken
 
 	// emulator variables
 	// statistics

@@ -2,7 +2,7 @@
 // copyright-holders:Bryan McPhail, Nicola Salmoria
 /*******************************************************************************
 
-    Input port macros used by many games in mutiple IREM drivers
+    Input port macros used by many games in multiple IREM drivers
 
 *******************************************************************************/
 

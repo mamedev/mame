@@ -32,7 +32,7 @@ public:
 private:
 	sound_stream *m_stream;   /* stream number */
 	int m_enable;             /* enable beep */
-	int m_frequency;          /* set frequency - this can be changed using the appropiate function */
+	int m_frequency;          /* set frequency - this can be changed using the appropriate function */
 	int m_incr;               /* initial wave state */
 	int16_t m_signal;           /* current signal */
 };

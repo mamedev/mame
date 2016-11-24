@@ -900,7 +900,7 @@ Game modes explained:
 
 
 NOTE: Speakers should be connected serially to Speaker (+) and Speaker (-).
-      You must avoid connecting speakers parallelly or connecting speakers
+      You must avoid connecting speakers parallely or connecting speakers
       to Speaker (+) and GND, to keep the amplifier from being damaged or
       from malfunctioning.
 

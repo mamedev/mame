@@ -383,8 +383,8 @@ protected:
 	uint8_t m_lp0;       /* 8bit loop reg.             */
 	uint8_t m_lp1;       /* 8bit loop reg.             */
 	uint8_t m_lp2;       /* 8bit loop reg.             */
-	uint8_t m_A;         /* 8bit accumerator           */
-	uint8_t m_B;         /* 8bit regiser               */
+	uint8_t m_A;         /* 8bit accumulator           */
+	uint8_t m_B;         /* 8bit register               */
 //
 	uint8_t m_halt;     /* halt input line                        */
 

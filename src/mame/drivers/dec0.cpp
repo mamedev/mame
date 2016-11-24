@@ -2318,7 +2318,7 @@ the music and circuit design from an earlier
 capcom game, i can't work out whcih one, but
 what an odd thing to do!
 
-you can see a youtube video of it runnign here:
+you can see a youtube video of it running here:
 http://uk.youtube.com/watch?v=Y-KvbKtqzaQ
 
 Rom 21 is full of 0's... i cleaned and re-dumped

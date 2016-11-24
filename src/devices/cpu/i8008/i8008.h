@@ -67,7 +67,7 @@ protected:
 	void take_interrupt();
 	void init_tables(void);
 
-	int m_pc_pos; // PC possition in ADDR
+	int m_pc_pos; // PC position in ADDR
 	int m_icount;
 
 	// configuration

@@ -225,9 +225,9 @@ field:      X address   D           Function    Y address   D (part 2)
     n last bits of a word, leaving other bits in memory unaffected.
 
     The LSBits are transferred first, since this enables to perform bit-per-bit add and
-    substract.  Otherwise, the CPU would need an additionnal register to store the second
+    substract.  Otherwise, the CPU would need an additional register to store the second
     operand, and it would be probably slower, since the operation could only
-    take place after all the data has been transfered.
+    take place after all the data has been transferred.
 
     Memory operations are synchronous with 2 clocks found on the memory controller:
     * word clock: a pulse on each word boundary (3750rpm*32 -> 2kHz)
@@ -294,7 +294,7 @@ field:      X address   D           Function    Y address   D (part 2)
       although it appears that this delay is not applied when X is not read (cf cross-track
       B in Booth p. 49).
         However, and here comes the wacky part, analysis of Booth p. 55 shows that
-      no additionnal delay is caused by an X instruction having its X operand
+      no additional delay is caused by an X instruction having its X operand
       on another track.  Maybe, just maybe, this is related to the fact that X does not
       need to take the word count into account, any word in track is as good as any (yet,
       this leaves the question of why this optimization could not be applied to vector
@@ -450,7 +450,7 @@ uint32_t apexc_cpu_device::load_ml(uint32_t address, uint32_t vector)
 {
 	int delay;
 
-	/* additionnal delay appears if we switch tracks */
+	/* additional delay appears if we switch tracks */
 	if (((m_ml & 0x3E0) != (address & 0x3E0)) /*|| vector*/)
 		delay = 6;  /* if tracks are different, delay to allow for track switching */
 	else

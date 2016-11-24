@@ -113,7 +113,7 @@ static const int RamConfigurations[8 * 4] =
 /* this contains the colours in machine.pens form.*/
 /* this is updated from the eventlist and reflects the current state
 of the render colours - these may be different to the current colour palette values */
-/* colours can be changed at any time and will take effect immediatly */
+/* colours can be changed at any time and will take effect immediately */
 
 
 
@@ -3237,7 +3237,7 @@ MACHINE_RESET_MEMBER(amstrad_state,kccomp)
 	/* bit 1 = /TEST. When 0, KC compact will enter data transfer
 	sequence, where another system using the expansion port signals
 	DATA2,DATA1, /STROBE and DATA7 can transfer 256 bytes of program.
-	When the program has been transfered, it will be executed. This
+	When the program has been transferred, it will be executed. This
 	is not supported in the driver */
 	/* bit 3,4 are tied to +5V, bit 2 is tied to 0V */
 	m_ppi_port_inputs[amstrad_ppi_PortB] = (1<<4) | (1<<3) | 2;

@@ -696,7 +696,7 @@ class tilemap_manager
 	friend class tilemap_t;
 
 public:
-	// construction/destuction
+	// construction/destruction
 	tilemap_manager(running_machine &machine);
 	~tilemap_manager();
 

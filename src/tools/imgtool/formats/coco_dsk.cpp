@@ -262,7 +262,7 @@ static FLOPPY_CONSTRUCT(coco_jvc_construct)
  *                 $04 value
  * $0B     2       owner's user number; normally 0
  * $0D     1       disk attributes; normally $FF
- * $0E     2       psuedo random number for identification
+ * $0E     2       pseudo random number for identification
  * $10     1       disk format; typical is 3
  *                 %00000001 0=single side 1=double side
  *                 %00000010 0=single density (non Coco) 1=double density

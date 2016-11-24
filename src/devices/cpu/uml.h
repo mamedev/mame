@@ -225,7 +225,7 @@ namespace uml
 		OP_MAX
 	};
 
-	// C function callback deinition
+	// C function callback definition
 	typedef void (*c_function)(void *ptr);
 
 	// class describing a global code handle
@@ -274,7 +274,7 @@ namespace uml
 		uint32_t m_label;
 	};
 
-	// a parameter for a UML instructon is encoded like this
+	// a parameter for a UML instruction is encoded like this
 	class parameter
 	{
 	public:
@@ -392,7 +392,7 @@ namespace uml
 		parameter_info      param[4];           // information about parameters
 	};
 
-	// a single UML instructon is encoded like this
+	// a single UML instruction is encoded like this
 	class instruction
 	{
 	public:

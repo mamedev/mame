@@ -62,10 +62,10 @@ Stephh's notes (based on the game TMS9995 code and some tests) :
         When you continue, only the balls aren't reset, while score, time and level (GASP !) are.
         If you want to continue in a 2 players game, BOTH players will have to continue, which means that
         you must have at least 2 credits ("REPLAY") and that you can't continue player 2 without player 1.
-      * If you manage to get a score, use BUTTON1 to cycle through avaiable symbols (letters A-Z and '.'),
+      * If you manage to get a score, use BUTTON1 to cycle through available symbols (letters A-Z and '.'),
         and pull the plunger to at least 63% (the code expects a value >= 0xa0) to go to next initial.
         Be aware that again there is a timer to do so, but that again the timer is not displayed.
-  - Usefull addresses :
+  - Useful addresses :
       * 0xe001.b : level (0x00-0x04 : 0x01 = level 1 - 0x02 = level 2 - 0x00 = level 3 - 0x3 = bonus - 0x04 = level 4)
       * 0xe00f.b : player (0x00 = P1 - 0x01 = P2)
       * 0xe016.w : P1 balls (MSB first)

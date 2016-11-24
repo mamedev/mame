@@ -5,7 +5,7 @@
  * Object auto-discovery helpers
  * \defgroup devfind
  * \{
- * Object auto-disovery helpers
+ * Object auto-discovery helpers
  */
 
 #ifndef __EMU_H__
@@ -134,14 +134,14 @@ class finder_base
 public:
 	/// \brief Destructor
 	///
-	/// Destruction via base class pointer and dynmaic type behaviour
+	/// Destruction via base class pointer and dynamic type behaviour
 	/// are allowed.
 	virtual ~finder_base();
 
 	/// \brief Get next registered object discovery helper
 	///
 	/// Implementation of basic single-linked list behaviour.
-	/// \return Pointer to the next registerd object discovery helper,
+	/// \return Pointer to the next registered object discovery helper,
 	///   or nullptr if this is the last.
 	finder_base *next() const { return m_next; }
 
@@ -203,7 +203,7 @@ protected:
 	/// \param [in] required Whether warning message should be printed
 	///   if a region with matching tag of incorrect width/length is
 	///   found.
-	/// \return Base pointer of the memeroy region if a matching region
+	/// \return Base pointer of the memory region if a matching region
 	///   is found, or nullptr otherwise.
 	void *find_memregion(u8 width, size_t &length, bool required) const;
 
@@ -343,7 +343,7 @@ protected:
 	/// \brief Pointer to target object
 	///
 	/// Pointer to target object, or nullptr if resolution has not been
-	/// attempted or the seach failed.  Concrete derived classes must
+	/// attempted or the search failed.  Concrete derived classes must
 	/// set this in their implementation of the findit member function.
 	ObjectClass *m_target;
 };

@@ -86,7 +86,7 @@ struct lisa_features_t
 										I simply don't understand : in one case the VIA is
 										connected to the 68k E clock, which is CPUCK/10, and in
 										another case, to a generated PH2 clock which is CPUCK/4,
-										with additionnal logic to keep it in phase with the 68k
+										with additional logic to keep it in phase with the 68k
 										memory cycle.  After hearing the beep when MacWorks XL
 										boots, I bet the correct values are .625 MHz and .5 MHz.
 										Maybe the schematics are wrong, and PH2 is CPUCK/8.

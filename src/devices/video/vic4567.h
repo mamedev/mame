@@ -32,7 +32,7 @@ struct vic3_sprite
 
 	/* buffer for currently painted line */
 	int paintedline[8];
-	uint8_t bitmap[8][SPRITE_BASE_X_SIZE * 2 / 8 + 1  /*for simplier sprite collision detection*/];
+	uint8_t bitmap[8][SPRITE_BASE_X_SIZE * 2 / 8 + 1  /*for simpler sprite collision detection*/];
 };
 
 

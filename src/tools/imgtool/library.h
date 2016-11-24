@@ -4,7 +4,7 @@
 
     library.h
 
-    Code relevant to the Imgtool library; analgous to the MESS/MAME driver
+    Code relevant to the Imgtool library; analogous to the MESS/MAME driver
     list.
 
     Unlike MESS and MAME which have static driver lists, Imgtool has a

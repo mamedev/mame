@@ -519,7 +519,7 @@ READ8_MEMBER( isa8_mda_device::io_read)
 
 /*
 When the Hercules changes to graphics mode, the number of pixels per access and
-clock divider should be changed. The currect mc6845 implementation does not
+clock divider should be changed. The correct mc6845 implementation does not
 allow this.
 
 The divder/pixels per 6845 clock is 9 for text mode and 16 for graphics mode.

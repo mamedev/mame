@@ -28,7 +28,7 @@ a A
 
 0 0 0 H V Z IE C
 
-TM 9bit polynominal?
+TM 9bit polynomial?
 
 pu pv disp flipflops
 

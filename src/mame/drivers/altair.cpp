@@ -97,7 +97,7 @@ WRITE_LINE_MEMBER(altair_state::write_acia_clock)
 
 void altair_state::machine_reset()
 {
-	// Set startup addess done by turn-key
+	// Set startup address done by turn-key
 	m_maincpu->set_state_int(I8085_PC, 0xFD00);
 }
 

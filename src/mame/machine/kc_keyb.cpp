@@ -45,7 +45,7 @@ available but I never found the specs on the web. The SAB 3021 was
 produced by Valvo which doesn't exist anymore (bought by Phillips
 if I remember correctly). If you have more luck finding the specs
 I'm still interested.
-There also was a complementary chip for the recieving side but that
+There also was a complementary chip for the receiving side but that
 was not used in the KC unfortunately. They choosed to measure the
 pulses sent by the U807 via PIO and CTC.
 

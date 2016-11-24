@@ -522,7 +522,7 @@ READ8_MEMBER(atarisy2_state::leta_r)
     Also the CH1 output is referenced to 2.5V.  Anything
     above is positive, below is negative.  Then amplified
     by 6.556 and clipped to -15V and (15V-1.5V=13.5V).
-    This is usefull to work out the relative signal levels
+    This is useful to work out the relative signal levels
     of each effect.
 
     This then goes to the stage you were asking about.  We

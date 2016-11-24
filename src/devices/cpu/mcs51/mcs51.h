@@ -138,10 +138,10 @@ protected:
 	int     m_num_interrupts;     /* number of interrupts supported */
 	int     m_recalc_parity;      /* recalculate parity before next instruction */
 	uint32_t  m_last_line_state;    /* last state of input lines line */
-	int     m_t0_cnt;             /* number of 0->1 transistions on T0 line */
-	int     m_t1_cnt;             /* number of 0->1 transistions on T1 line */
-	int     m_t2_cnt;             /* number of 0->1 transistions on T2 line */
-	int     m_t2ex_cnt;           /* number of 0->1 transistions on T2EX line */
+	int     m_t0_cnt;             /* number of 0->1 transitions on T0 line */
+	int     m_t1_cnt;             /* number of 0->1 transitions on T1 line */
+	int     m_t2_cnt;             /* number of 0->1 transitions on T2 line */
+	int     m_t2ex_cnt;           /* number of 0->1 transitions on T2EX line */
 	int     m_cur_irq_prio;       /* Holds value of the current IRQ Priority Level; -1 if no irq */
 	uint8_t   m_irq_active;         /* mask which irq levels are serviced */
 	uint8_t   m_irq_prio[8];        /* interrupt priority */

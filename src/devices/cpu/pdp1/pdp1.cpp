@@ -15,7 +15,7 @@
  * mid-instruction sequence break.  And it enables us to emulate the control panel fairly
  * accurately.
  *
- * Additionnally, IOT functions have been modified to be external: IOT callback pointers are set
+ * Additionally, IOT functions have been modified to be external: IOT callback pointers are set
  * at emulation initiation, and most IOT callback functions are part of the machine emulation.
  *
  *
@@ -425,7 +425,7 @@ offs_t pdp1_device::disasm_disassemble(std::ostream &stream, offs_t pc, const ui
     There are several interrupt lines.  With the standard sequence break system, all lines
     are logically or'ed to trigger a single interrupt level.  Interrupts can be triggered
     by either a pulse or a level on the interrupt lines.  With the optional type 120 sequence
-    break system, each of 16 lines triggers is wired to a different priority level: additionnally,
+    break system, each of 16 lines triggers is wired to a different priority level: additionally,
     each interrupt line can be masked out, and interrupt can be triggered through software.
 
     Also, instructions can be interrupted in the middle of execution.  This is done by
@@ -837,7 +837,7 @@ void pdp1_device::execute_run()
 					{   /* there is a discrepancy: the pdp1 handbook tells that only dio should be used,
 					    but the lisp tape uses the dac instruction instead */
 						/* Yet maintenance manual p. 6-25 states clearly that the data is located
-						in IO and transfered to MB, so DAC is likely to be a mistake. */
+						in IO and transferred to MB, so DAC is likely to be a mistake. */
 						m_rim_step = 2;
 					}
 					else
@@ -1125,7 +1125,7 @@ void pdp1_device::execute_instruction()
 		{   /* maintenance manual 7-14 seems to imply that substract does not test for -0.
 		      The sim 2.3 source says so explicitely, though they do not give a reference.
 		      It sounds a bit weird, but the reason is probably that doing so would
-		      require additionnal logic that does not exist. */
+		      require additional logic that does not exist. */
 			/* overflow is set if the 2 operands have the same sign and the final result has another */
 			int ov2;    /* 1 if the operands have the same sign*/
 
@@ -1252,7 +1252,7 @@ void pdp1_device::execute_instruction()
 			/* As a side note, the order of -0 detection and overflow checking does not matter,
 			because the sum of two positive number cannot give 0777777 (since positive
 			numbers are 0377777 at most, their sum is 0777776 at most).
-			Additionnally, we cannot have carry set and a result equal to 0777777  (since numbers
+			Additionally, we cannot have carry set and a result equal to 0777777  (since numbers
 			are 0777777 at most, their sum is 01777776 at most): this is nice, because it makes
 			the sequence:
 			    AC = (AC + (AC >> 18)) & 0777777;   // propagate carry around

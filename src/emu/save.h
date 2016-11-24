@@ -174,7 +174,7 @@ private:
 	bool                    m_reg_allowed;          // are registrations allowed?
 	int                     m_illegal_regs;         // number of illegal registrations
 
-	std::vector<std::unique_ptr<state_entry>> m_entry_list;          // list of reigstered entries
+	std::vector<std::unique_ptr<state_entry>> m_entry_list;          // list of registered entries
 	std::vector<std::unique_ptr<state_callback>> m_presave_list;     // list of pre-save functions
 	std::vector<std::unique_ptr<state_callback>> m_postload_list;    // list of post-load functions
 };

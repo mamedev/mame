@@ -252,7 +252,7 @@ void v53_base_device::install_peripheral_io()
 		}
 	}
 
-	if (m_OPSEL & 0x02) // Interupt Control Unit available
+	if (m_OPSEL & 0x02) // Interrupt Control Unit available
 	{
 		uint16_t base = (m_OPHA << 8) | m_IULA;
 		base &= 0xfffe;

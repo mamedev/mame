@@ -1844,7 +1844,7 @@ void mcs51_cpu_device::execute_set_input(int irqline, int state)
 	 *
 	 */
 	uint32_t new_state = (m_last_line_state & ~(1 << irqline)) | ((state != CLEAR_LINE) << irqline);
-	/* detect 0->1 transistions */
+	/* detect 0->1 transitions */
 	uint32_t tr_state = (~m_last_line_state) & new_state;
 
 	switch( irqline )

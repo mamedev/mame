@@ -90,7 +90,7 @@ TODO:
 
   Hangul ROM
    8KB each is divided by a consonant and consonant and neutral.
-   - Inital (Choseong)  SS151-1223: 8 types of intial character (actual 6 types)
+   - Initial (Choseong)  SS151-1223: 8 types of intial character (actual 6 types)
    - Middle (Jungseong) SS152-1224: 2 types of middle character
    - Final  (Jongseong) SS153-1225: 2 types of final character
 

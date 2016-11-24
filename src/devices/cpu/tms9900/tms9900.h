@@ -197,7 +197,7 @@ protected:
 	// full range 0000-fffe for its CRU operations.
 	//
 	// We could realize this via the CRU access as well, but the data bus access
-	// is not that simple to emulate. For the sake of homogenity between the
+	// is not that simple to emulate. For the sake of homogeneity between the
 	// chip emulations we use a dedicated callback.
 	devcb_write8   m_external_operation;
 

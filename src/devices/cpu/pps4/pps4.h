@@ -133,7 +133,7 @@ private:
 	void iXBMX();        //!< Exchange BM and X registers
 	void iXAX();         //!< Exchange accumulator and X
 	void iXS();          //!< Eychange SA and SB registers
-	void iCYS();         //!< Cycle SA register and accumulaor
+	void iCYS();         //!< Cycle SA register and accumulator
 	void iLB();          //!< Load B indirect
 	void iLBL();         //!< Load B long
 	void iINCB();        //!< Increment BL

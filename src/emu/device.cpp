@@ -323,7 +323,7 @@ void device_t::set_machine(running_machine &machine)
 }
 
 //-------------------------------------------------
-//  findit - seach for all objects in auto finder
+//  findit - search for all objects in auto finder
 //  list and return status
 //-------------------------------------------------
 
@@ -564,7 +564,7 @@ ioport_constructor device_t::device_input_ports() const
 
 //-------------------------------------------------
 //  device_reset - actually handle resetting of
-//  a device; designed to be overriden by the
+//  a device; designed to be overridden by the
 //  actual device implementation
 //-------------------------------------------------
 
@@ -577,7 +577,7 @@ void device_t::device_reset()
 //-------------------------------------------------
 //  device_reset_after_children - hook to do
 //  reset logic that must happen after the children
-//  are reset; designed to be overriden by the
+//  are reset; designed to be overridden by the
 //  actual device implementation
 //-------------------------------------------------
 

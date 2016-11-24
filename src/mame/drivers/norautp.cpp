@@ -250,7 +250,7 @@
   7654 3210
   ---- ---x  * DEAL / DRAW Lamp.
   ---- --x-  * BET / COLLECT Lamp.
-  ---- -x--  + PANEL LIGHTS RESET (always activated after initalize).
+  ---- -x--  + PANEL LIGHTS RESET (always activated after initialize).
   ---- x---  + PANEL LAMPS CLOCK
   xxxx ----  * Discrete Sound Lines.
 
@@ -381,7 +381,7 @@
   [2009-08-23/26]
 
   - Added a default NVRAM to Noraut Joker Poker to bypass the 'F U' screen.
-    This is due to the phisical keyboard limitation when needs to enter
+    This is due to the physical keyboard limitation when needs to enter
     4 simultaneous inputs.
   - Executed a trojan on 2 noraut systems to confirm the way 16x32 tiles are decoded.
   - Fixed the x-offset for 32x32 tiles lines.
@@ -481,7 +481,7 @@
   - Added Poker / Black Jack (Model 7521).
   - Added Kimble Joker Poker.
   - Added DRHL Poker (v.2.89).
-  - Renamed norautpn descripion to Noraut Deluxe Poker (bootleg).
+  - Renamed norautpn description to Noraut Deluxe Poker (bootleg).
   - Added a placeholder for tpoker2's undumped 68705 MCU.
   - Reorganized the driver, plus some clean-ups.
   - Renamed kimblejp to kimbldhl. Changed game description to Kimble Double HI-LO.
@@ -665,7 +665,7 @@ WRITE8_MEMBER(norautp_state::soundlamps_w)
   7654 3210
   ---- ---x  * DEAL / DRAW Lamp.
   ---- --x-  * BET / COLLECT Lamp.
-  ---- -x--  + PANEL LIGHTS RESET (always activated after initalize).
+  ---- -x--  + PANEL LIGHTS RESET (always activated after initialize).
   ---- x---  + PANEL LAMPS CLOCK
   xxxx ----  * Discrete Sound Lines.
 */

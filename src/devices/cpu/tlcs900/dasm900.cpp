@@ -65,7 +65,7 @@ static const char *const s_mnemonic[] =
 enum e_operand
 {
 		O_NONE,
-	O_A,        /* currect register set register A */
+	O_A,        /* current register set register A */
 	O_C8,       /* current register set byte */
 	O_C16,      /* current register set word */
 	O_C32,      /* current register set long word */

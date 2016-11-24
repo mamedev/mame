@@ -48,7 +48,7 @@ protected:
 
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
-	// hanlders
+	// handlers
 	void inkey_navigation();
 
 	// draw arrow

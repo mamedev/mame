@@ -72,7 +72,7 @@ DONE:
   - 256k of shared ram maps at 00000-3ffff for both cpus with special mem regs at fffec,fffee. the ram mirrors 4 times on the emulatorcpu only, iocpu the 40000-fffff area is open bus.
   - framebuffer, at least for bios 1.5, lives from 0x4000-0xd5ff, exactly 640x480 pixels 1bpp, interlaced (even? plane is at 4000-8aff, odd? plane is at 8b00-d5ff); however the starting address of the framebuffer is configurable to any address within the 0x0000-0x1ffff range? (this exact range is unclear)
 * figure out how the emulation-cpu boots and where its 8k of local ram maps to - done
-  - both cpus boot, reset and system int controls are accessed at fffea from either cpu; emulatorcpu's 8k of ram lives at the beginning of its address space, but can be disabled in favor of mainram at the same addressses
+  - both cpus boot, reset and system int controls are accessed at fffea from either cpu; emulatorcpu's 8k of ram lives at the beginning of its address space, but can be disabled in favor of mainram at the same addresses
 */
 
 #include "cpu/i86/i86.h"

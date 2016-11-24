@@ -23,7 +23,7 @@ public:
 	enum
 	{
 		/* receive is waiting for start bit. The transition from high-low indicates
-		start of start bit. This is used to synchronise with the data being transfered */
+		start of start bit. This is used to synchronise with the data being transferred */
 		RECEIVE_REGISTER_WAITING_FOR_START_BIT = 0x01,
 
 		/* receive is synchronised with data, data bits will be clocked in */

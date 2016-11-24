@@ -16,7 +16,7 @@ To Do:
 
 Survival:
 
-- Check background visibile area.  When the background scrolls up, it
+- Check background visible area.  When the background scrolls up, it
   currently shows below the top and bottom of the border of the play area.
 
 

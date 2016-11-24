@@ -660,7 +660,7 @@ struct fm2612_FM_OPN
 	uint32_t  eg_cnt;         /* global envelope generator counter */
 	uint32_t  eg_timer;       /* global envelope generator counter works at frequency = chipclock/144/3 */
 	uint32_t  eg_timer_add;   /* step of eg_timer */
-	uint32_t  eg_timer_overflow;/* envelope generator timer overlfows every 3 samples (on real chip) */
+	uint32_t  eg_timer_overflow;/* envelope generator timer overflows every 3 samples (on real chip) */
 
 
 	/* there are 2048 FNUMs that can be generated using FNUM/BLK registers

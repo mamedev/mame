@@ -7,7 +7,7 @@
     uses NES emulation by Brad Olivier
 
     Hardware is based around Nintendo NES. After coin up, it allows to play one of
-    35 NES games (choosen from text menu). Manufacturer is unknown, code for title
+    35 NES games (chosen from text menu). Manufacturer is unknown, code for title
     screen and game selection contains string:
     "Programed by SANG  HO  ENG. K. B. KIM 1986/1/ 1"
 

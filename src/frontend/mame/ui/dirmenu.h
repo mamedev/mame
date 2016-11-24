@@ -113,6 +113,6 @@ private:
 	std::vector<std::string> m_folders;
 };
 
-} // namesapce ui
+} // namespace ui
 
 #endif /* MAME_FRONTEND_UI_DIRMENU_H */

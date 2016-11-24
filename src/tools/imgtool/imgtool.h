@@ -48,7 +48,7 @@ enum
  * marking up return codes with the source.  In addition, some of the img_*
  * calls are high level calls that simply image manipulation
  *
- * Calls that return 'int' that are not explictly noted otherwise return
+ * Calls that return 'int' that are not explicitly noted otherwise return
  * imgtool error codes
  * ---------------------------------------------------------------------------
  */
@@ -124,7 +124,7 @@ namespace imgtool
 		object_pool *m_pool;
 		void *m_extra_bytes;
 
-		// because of an idiosycracy of how imgtool::image::internal_open() works, we are only "okay to close"
+		// because of an idiosyncrasy of how imgtool::image::internal_open() works, we are only "okay to close"
 		// by invoking the module's close function once internal_open() succeeds.  the long term solution is
 		// better C++ adoption (e.g. - std::unique_ptr<>, std:move() etc)
 		bool m_okay_to_close;

@@ -124,7 +124,7 @@ private:
 	int m_counter[12];    // tone frequency counter
 	int m_frequency[12];  // tone frequency
 	int m_output;         // output signal bits
-	int m_enable;         // mask which harmoics
+	int m_enable;         // mask which harmonics
 
 	int m_tune_num;       // tune currently playing
 	int m_tune_ofs;       // note currently playing

@@ -1607,7 +1607,7 @@ void f8_cpu_device::device_reset()
 	ROMC_00(cS);
 
 	/* initialize the timer shift register
-	 * this is an 8 bit polynome counter which can be loaded parallel
+	 * this is an 8 bit polynomial counter which can be loaded parallel
 	 * with 0xff the outputs never change and thus the timer is disabled.
 	 * with 0xfe the shifter starts cycling through 255 states until it
 	 * reaches 0xfe again (and then issues an interrupt).

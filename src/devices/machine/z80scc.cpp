@@ -1133,7 +1133,7 @@ void z80scc_channel::tra_complete()
 			{
 				m_uart->trigger_interrupt(m_index, INT_TRANSMIT); // Set TXIP bit
 			}
-			else if(m_rr0 & RR0_TX_BUFFER_EMPTY)  // Check TBE bit and interrupt if one or more FIFO slots availble
+			else if(m_rr0 & RR0_TX_BUFFER_EMPTY)  // Check TBE bit and interrupt if one or more FIFO slots available
 			{
 				m_uart->trigger_interrupt(m_index, INT_TRANSMIT); // Set TXIP bit
 			}
@@ -2437,7 +2437,7 @@ void z80scc_channel::data_write(uint8_t data)
 		{
 			m_uart->trigger_interrupt(m_index, INT_TRANSMIT); // Set TXIP bit
 		}
-		else if(m_rr0 & RR0_TX_BUFFER_EMPTY)  // Check TBE bit and interrupt if one or more FIFO slots availble
+		else if(m_rr0 & RR0_TX_BUFFER_EMPTY)  // Check TBE bit and interrupt if one or more FIFO slots available
 		{
 			m_uart->trigger_interrupt(m_index, INT_TRANSMIT); // Set TXIP bit
 		}

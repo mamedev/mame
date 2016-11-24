@@ -30,7 +30,7 @@
  * [This information is part of the GIICM]
  *
  * Pin 8 and 9 are connected to an EXOR gate and the inverted
- * output (EXNOR) is fed back to pin 1 (and the pseudo polynome output).
+ * output (EXNOR) is fed back to pin 1 (and the pseudo polynomial output).
  *
  *      1D5          1Q1  2D4       2Q0  3D4       3Q0  4D5      4Q1 4Q0
  *      +--+--+--+--+--+  +--+--+--+--+  +--+--+--+--+  +--+--+--+--+--+

@@ -1856,7 +1856,7 @@ void sega_32x_device::device_reset()
 	// start in a reset state
 	m_sh2_are_running = 0;
 
-	m_32x_a1518a_reg = 0x00; // inital value
+	m_32x_a1518a_reg = 0x00; // initial value
 	m_32x_68k_a15104_reg = 0x00;
 
 	m_32x_autofill_length = 0;

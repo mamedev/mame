@@ -173,6 +173,6 @@ private:
 	virtual void handle() override;
 };
 
-} // namesapce ui
+} // namespace ui
 
 #endif  /* MAME_FRONTEND_UI_INPUTMAP_H */

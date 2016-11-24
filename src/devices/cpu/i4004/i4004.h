@@ -96,7 +96,7 @@ protected:
 	address_space *m_data;
 	address_space *m_io;
 	int                 m_icount;
-	int                 m_pc_pos; // PC possition in ADDR
+	int                 m_pc_pos; // PC position in ADDR
 	int                 m_addr_mask;
 };
 

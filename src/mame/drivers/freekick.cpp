@@ -838,7 +838,7 @@ ROM_START( freekick )
 	ROM_LOAD( "24s10n.7h", 0x0500, 0x0100, CRC(a507f941) SHA1(97619959ee4c366cb010525636ab5eefe5a3127a) )
 ROM_END
 
-ROM_START( freekicka ) /* The bootlegs are derived from this set, "freekbl8.q7" is identical but includes more addresss space then needed */
+ROM_START( freekicka ) /* The bootlegs are derived from this set, "freekbl8.q7" is identical but includes more address space then needed */
 	ROM_REGION( 0x0d000, "maincpu", 0 ) /* Z80 Code, internal program RAM is 52K in custom cpu module */
 	ROM_LOAD( "ns6201-a_1987.9_free_kick.cpu", 0x00000, 0x0d000, CRC(acc0a278) SHA1(27675870ece29ccd5135ca20fb2fa91125945ec5) )
 

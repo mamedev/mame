@@ -183,7 +183,7 @@ namespace netlist
 	//  Exceptions
 	//============================================================
 
-	/*! Generic netlist expection.
+	/*! Generic netlist exception.
 	 *  The exception is used in all events which are considered fatal.
 	 */
 	class nl_exception : public plib::pexception
@@ -327,7 +327,7 @@ namespace netlist
 	};
 
 	// -----------------------------------------------------------------------------
-	// State variables - predefined and c++11 non-optioanl
+	// State variables - predefined and c++11 non-optional
 	// -----------------------------------------------------------------------------
 
 	/*! predefined state variable type for uint_fast8_t */

@@ -526,7 +526,7 @@ void duscc_device::trigger_interrupt(int index, int state)
 	m_int_state[priority_level] |= Z80_DAISY_INT;
 	LOGINT((" - Interrupt Priority Level %d, caused by Source %02x with vector %02x\n",priority_level, source, m_ivrm ));
 
-	// check for interupts
+	// check for interrupts
 	check_interrupts();
 }
 

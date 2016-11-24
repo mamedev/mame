@@ -26,7 +26,7 @@
 #define MCFG_AMI_S2000_WRITE_D_CB(_devcb) \
 	amis2000_base_device::set_write_d_callback(*device, DEVCB_##_devcb);
 
-// 13-bit external addressbus coupled as output pins
+// 13-bit external address bus coupled as output pins
 #define MCFG_AMI_S2000_WRITE_A_CB(_devcb) \
 	amis2000_base_device::set_write_a_callback(*device, DEVCB_##_devcb);
 

@@ -354,7 +354,7 @@ void copybitmap_trans(bitmap_rgb32 &dest, const bitmap_rgb32 &src, int flipx, in
 /*
   Copy a bitmap onto another with scroll and wraparound.
   These functions support multiple independently scrolling rows/columns.
-  "rows" is the number of indepentently scrolling rows. "rowscroll" is an
+  "rows" is the number of independently scrolling rows. "rowscroll" is an
   array of integers telling how much to scroll each row. Same thing for
   "numcols" and "colscroll".
   If the bitmap cannot scroll in one direction, set numrows or columns to 0.

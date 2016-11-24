@@ -196,7 +196,7 @@ struct delegate_traits
 
 // delegate_mfp is a class that wraps a generic member function pointer
 // in a static buffer, and can effectively recast itself back for later use;
-// it hides some of the gross details involved in copying artibtrary member
+// it hides some of the gross details involved in copying arbitrary member
 // function pointers around
 class delegate_mfp
 {

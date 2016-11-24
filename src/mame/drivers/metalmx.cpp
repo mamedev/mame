@@ -433,7 +433,7 @@ READ32_MEMBER(metalmx_state::dsp32c_2_r)
 
 /*************************************
  *
- *  Host/TMS34020 accesors
+ *  Host/TMS34020 accessors
  *
  *************************************/
 

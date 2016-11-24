@@ -35,7 +35,7 @@
 	else m_iospace->write_byte(port,value)
 
 /***************************************************************
- * MMU calculate the memory managemant lookup table
+ * MMU calculate the memory management lookup table
  * bb and cb specify a 4K page
  * If the 4 most significant bits of an 16 bit address are
  * greater or equal to the bank base, the bank base register
@@ -126,7 +126,7 @@ uint32_t z180_device::ARG16()
 }
 
 /***************************************************************
- * Calculate the effective addess m_ea of an opcode using
+ * Calculate the effective address m_ea of an opcode using
  * IX+offset resp. IY+offset addressing.
  ***************************************************************/
 #define EAX() m_ea = (uint32_t)(uint16_t)(_IX + (int8_t)ARG())

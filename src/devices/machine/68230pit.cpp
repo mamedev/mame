@@ -2,7 +2,7 @@
 // copyright-holders:Joakim Larsson Edstrom
 /**********************************************************************
 *
-*   Motorola MC68230 PI/T Parallell Interface and Timer
+*   Motorola MC68230 PI/T Parallel Interface and Timer
 *
 * PORT MODES INCLUDE :
 * - BIT I/O

@@ -237,7 +237,7 @@ public:
 		return object;
 	}
 
-	// deatch the entire list, returning the head, but don't free memory
+	// detach the entire list, returning the head, but don't free memory
 	_ElementType *detach_all() noexcept
 	{
 		_ElementType *result = m_head;

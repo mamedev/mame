@@ -160,7 +160,7 @@ struct nvidia_object_data
 };
 
 /*
- * geforce 3d (NV2A) accellerator
+ * geforce 3d (NV2A) accelerator
  */
 /* very simplified view
 there is a set of context objects
@@ -211,7 +211,7 @@ public:
 	};
 	enum class NV2A_VERTEX_ATTR {
 		POS = 0, // position
-		WEIGHT = 1, // blend weigth
+		WEIGHT = 1, // blend weight
 		NORMAL = 2,
 		COLOR0 = 3, // diffuse
 		COLOR1 = 4, // specular

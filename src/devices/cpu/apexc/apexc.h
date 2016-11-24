@@ -9,7 +9,7 @@
 enum
 {
 	APEXC_CR =1,    /* control register */
-	APEXC_A,        /* acumulator */
+	APEXC_A,        /* accumulator */
 	APEXC_R,        /* register */
 	APEXC_ML,       /* memory location */
 	APEXC_WS,       /* working store */

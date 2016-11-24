@@ -677,7 +677,7 @@ public:
 	DECLARE_READ8_MEMBER( ba_cd_inv_r );
 	DECLARE_WRITE8_MEMBER( ba_cd_inv_w );
 
-	/* Definitions moved to z80scc.c for enhencements */
+	/* Definitions moved to z80scc.c for enhancements */
 	DECLARE_READ8_MEMBER( da_r );  // { return m_chanA->data_read(); }
 	DECLARE_WRITE8_MEMBER( da_w ); // { m_chanA->data_write(data); }
 	DECLARE_READ8_MEMBER( db_r );  // { return m_chanB->data_read(); }
