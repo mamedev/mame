@@ -20,6 +20,9 @@
 #include "machine/ram.h"
 #include "machine/nvram.h"
 #include "machine/fm_scsi.h"
+#include "bus/generic/slot.h"
+#include "bus/generic/carts.h"
+#include "machine/fmt_icmem.h"
 
 #define IRQ_LOG 0  // set to 1 to log IRQ line activity
 
@@ -92,6 +95,7 @@ class towns_state : public driver_device
 			m_fdc(*this, "fdc"),
 			m_flop0(*this, "fdc:0"),
 			m_flop1(*this, "fdc:1"),
+			m_icmemcard(*this, "icmemcard"),
 			m_nvram(*this, "nvram"),
 			m_nvram16(*this, "nvram16"),
 			m_ctrltype(*this, "ctrltype"),
@@ -124,6 +128,7 @@ class towns_state : public driver_device
 	required_device<mb8877_t> m_fdc;
 	required_device<floppy_connector> m_flop0;
 	required_device<floppy_connector> m_flop1;
+	required_device<fmt_icmem_device> m_icmemcard;
 	ram_device* m_messram;
 	cdrom_image_device* m_cdrom;
 	cdda_device* m_cdda;

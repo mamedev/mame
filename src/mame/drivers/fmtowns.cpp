@@ -181,6 +181,7 @@ Notes:
 #include "bus/scsi/scsihd.h"
 #include "softlist.h"
 
+
 // CD controller IRQ types
 #define TOWNS_CD_IRQ_MPU 1
 #define TOWNS_CD_IRQ_DMA 2
@@ -2143,8 +2144,8 @@ static ADDRESS_MAP_START(towns_mem, AS_PROGRAM, 32, towns_state)
 //  AM_RANGE(0x00100000, 0x005fffff) AM_RAM  // some extra RAM
 	AM_RANGE(0x80000000, 0x8007ffff) AM_READWRITE8(towns_gfx_high_r,towns_gfx_high_w,0xffffffff) AM_MIRROR(0x180000) // VRAM
 	AM_RANGE(0x81000000, 0x8101ffff) AM_READWRITE8(towns_spriteram_r,towns_spriteram_w,0xffffffff) // Sprite RAM
-	// 0xc0000000 - 0xc0ffffff  // IC Memory Card (static, first 16MB only)
-	// 0xc1000000 - 0xc1ffffff  // IC Memory Card (banked, can show any of 4 banks), JEIDA v4 only (UX and later)
+	AM_RANGE(0xc0000000, 0xc0ffffff) AM_DEVREADWRITE8("icmemcard", fmt_icmem_device, static_mem_read, static_mem_write, 0xffffffff)
+	AM_RANGE(0xc1000000, 0xc1ffffff) AM_DEVREADWRITE8("icmemcard", fmt_icmem_device, mem_read, mem_write, 0xffffffff)
 	AM_RANGE(0xc2000000, 0xc207ffff) AM_ROM AM_REGION("user",0x000000)  // OS ROM
 	AM_RANGE(0xc2080000, 0xc20fffff) AM_ROM AM_REGION("user",0x100000)  // DIC ROM
 	AM_RANGE(0xc2100000, 0xc213ffff) AM_ROM AM_REGION("user",0x180000)  // FONT ROM
@@ -2172,7 +2173,7 @@ static ADDRESS_MAP_START(marty_mem, AS_PROGRAM, 16, towns_state)
 	AM_RANGE(0x00a00000, 0x00a7ffff) AM_READWRITE8(towns_gfx_high_r,towns_gfx_high_w,0xffff) AM_MIRROR(0x180000) // VRAM
 	AM_RANGE(0x00b00000, 0x00b7ffff) AM_ROM AM_REGION("user",0x180000)  // FONT
 	AM_RANGE(0x00c00000, 0x00c1ffff) AM_READWRITE8(towns_spriteram_r,towns_spriteram_w,0xffff) // Sprite RAM
-	AM_RANGE(0x00d00000, 0x00dfffff) AM_RAM // IC Memory Card (is this usable on the Marty?)
+	AM_RANGE(0x00d00000, 0x00dfffff) AM_DEVREADWRITE8("icmemcard", fmt_icmem_device, mem_read, mem_write, 0xffff)
 	AM_RANGE(0x00e80000, 0x00efffff) AM_ROM AM_REGION("user",0x100000)  // DIC ROM
 	AM_RANGE(0x00f00000, 0x00f7ffff) AM_ROM AM_REGION("user",0x180000)  // FONT
 	AM_RANGE(0x00f80000, 0x00f8ffff) AM_DEVREADWRITE8("pcm", rf5c68_device, rf5c68_mem_r, rf5c68_mem_w, 0xffff)  // WAVE RAM
@@ -2195,7 +2196,7 @@ static ADDRESS_MAP_START(ux_mem, AS_PROGRAM, 16, towns_state)
 	AM_RANGE(0x00a00000, 0x00a7ffff) AM_READWRITE8(towns_gfx_high_r,towns_gfx_high_w,0xffff) AM_MIRROR(0x180000) // VRAM
 	AM_RANGE(0x00b00000, 0x00b7ffff) AM_ROM AM_REGION("user",0x180000)  // FONT
 	AM_RANGE(0x00c00000, 0x00c1ffff) AM_READWRITE8(towns_spriteram_r,towns_spriteram_w,0xffff) // Sprite RAM
-	AM_RANGE(0x00d00000, 0x00dfffff) AM_RAM // IC Memory Card
+	AM_RANGE(0x00d00000, 0x00dfffff) AM_DEVREADWRITE8("icmemcard", fmt_icmem_device, mem_read, mem_write, 0xffff)
 	AM_RANGE(0x00e00000, 0x00e7ffff) AM_ROM AM_REGION("user",0x000000)  // OS
 	AM_RANGE(0x00e80000, 0x00efffff) AM_ROM AM_REGION("user",0x100000)  // DIC ROM
 	AM_RANGE(0x00f00000, 0x00f7ffff) AM_ROM AM_REGION("user",0x180000)  // FONT
@@ -2229,6 +2230,9 @@ static ADDRESS_MAP_START( towns_io , AS_IO, 32, towns_state)
 	AM_RANGE(0x0440,0x045f) AM_READWRITE8(towns_video_440_r, towns_video_440_w, 0xffffffff)
 	// System port
 	AM_RANGE(0x0480,0x0483) AM_READWRITE8(towns_sys480_r,towns_sys480_w,0x000000ff)  // R/W (0x480)
+	// IC Memory Card
+	AM_RANGE(0x0488,0x048b) AM_DEVREAD8("icmemcard",fmt_icmem_device,status_r,0x00ff0000)
+	AM_RANGE(0x0490,0x0493) AM_DEVREADWRITE8("icmemcard",fmt_icmem_device,bank_r,bank_w,0x0000ffff)
 	// CD-ROM
 	AM_RANGE(0x04c0,0x04cf) AM_READWRITE8(towns_cdrom_r,towns_cdrom_w,0x00ff00ff)
 	// Joystick / Mouse ports
@@ -2281,6 +2285,9 @@ static ADDRESS_MAP_START( towns16_io , AS_IO, 16, towns_state)  // for the 386SX
 	AM_RANGE(0x0440,0x045f) AM_READWRITE8(towns_video_440_r, towns_video_440_w, 0xffff)
 	// System port
 	AM_RANGE(0x0480,0x0481) AM_READWRITE8(towns_sys480_r,towns_sys480_w,0x00ff)  // R/W (0x480)
+	// IC Memory Card
+	AM_RANGE(0x048a,0x048b) AM_DEVREAD8("icmemcard",fmt_icmem_device,status_r,0x00ff)
+	AM_RANGE(0x0490,0x0491) AM_DEVREADWRITE8("icmemcard",fmt_icmem_device,bank_r,bank_w,0xffff)
 	// CD-ROM
 	AM_RANGE(0x04c0,0x04cf) AM_READWRITE8(towns_cdrom_r,towns_cdrom_w,0x00ff)
 	// Joystick / Mouse ports
@@ -2322,7 +2329,7 @@ static INPUT_PORTS_START( towns )
 	PORT_CONFSETTING(0x20, "Mouse")
 	PORT_CONFSETTING(0x40, "6-button joystick")
 
-// Keyboard
+	// Keyboard
 	PORT_START( "key1" )  // scancodes 0x00-0x1f
 	PORT_BIT(0x00000001,IP_ACTIVE_HIGH,IPT_UNUSED)
 	PORT_BIT(0x00000002,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("ESC") PORT_CODE(KEYCODE_TILDE) PORT_CHAR(27)
@@ -2767,6 +2774,8 @@ static MACHINE_CONFIG_FRAGMENT( towns_base )
 	MCFG_UPD71071_DMA_WRITE_1_CB(WRITE16(towns_state, towns_scsi_dma_w))
 
 	//MCFG_VIDEO_START_OVERRIDE(towns_state,towns)
+
+	MCFG_FMT_ICMEMCARD_ADD("icmemcard")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
