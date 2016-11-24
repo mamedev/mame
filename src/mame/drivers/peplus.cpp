@@ -11665,7 +11665,7 @@ Also compatible with:
 	ROM_LOAD( "capx1321.u43", 0x0000, 0x0200, CRC(4b57569f) SHA1(fa29c0f627e7ce79951ec6dadec114864144f37d) )
 ROM_END
 
-ROM_START( pex2240p ) /* Superboard : Joker Poker (X002440P+XP000038) - PSR Verified */
+ROM_START( pex2240p ) /* Superboard : Joker Poker (X002240P+XP000038) - PSR Verified */
 /*
                                        w/J     w/oJ
 PayTable   2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
