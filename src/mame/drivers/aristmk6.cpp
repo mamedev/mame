@@ -41,12 +41,23 @@ public:
 		m_vram(*this, "vram")
 	{ }
 
-	uint32_t m_test_x,m_test_y,m_start_offs;
-	uint8_t m_type;
+	u32 m_test_x,m_test_y,m_start_offs;
+	u8 m_type;
+
+	u8 irl0pend, irl0en;
+	u8 irl1pend, irl1en;
+	u8 irl2pend, irl2en;	// UARTs ?
+	u8 irl3pend0, irl3en0;
+	u8 irl3pend1, irl3en1;
+	void testIrq();
+
+	DECLARE_READ8_MEMBER(irqpend_r);
+	DECLARE_WRITE8_MEMBER(irqen_w);
 	DECLARE_READ8_MEMBER(test_r);
 	DECLARE_WRITE64_MEMBER(eeprom_w);
 	DECLARE_READ64_MEMBER(hwver_r);
 	virtual void video_start() override;
+	virtual void machine_reset() override;
 	uint32_t screen_update_aristmk6(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<ns16550_device> m_uart0;
@@ -60,12 +71,21 @@ public:
 void aristmk6_state::video_start()
 {
 }
+void aristmk6_state::machine_reset()
+{
+	irl0pend = irl0en = irl1pend = irl1en = irl2pend = irl2en = irl3pend0 = irl3en0 = irl3pend1 = irl3en1 = 0;
+}
 
 uint32_t aristmk6_state::screen_update_aristmk6(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 #if 0
 	int x,y,count;
 	const uint8_t *blit_ram = memregion("maincpu")->base();
+
+	if (machine().input().code_pressed(KEYCODE_U)) {
+		irl2pend |= 2;
+		testIrq();
+	}
 
 	if(machine().input().code_pressed(KEYCODE_Z))
 		m_test_x++;
@@ -168,6 +188,68 @@ uint32_t aristmk6_state::screen_update_aristmk6(screen_device &screen, bitmap_rg
 	return 0;
 }
 
+void aristmk6_state::testIrq()
+{
+	m_maincpu->set_input_line(SH4_IRL0, (irl0pend & irl0en) ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(SH4_IRL1, (irl1pend & irl1en) ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(SH4_IRL2, (irl2pend & irl2en) ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(SH4_IRL3, ((irl3pend0 & irl3en0) || (irl3pend1 & irl3en1)) ? ASSERT_LINE : CLEAR_LINE);
+}
+
+READ8_MEMBER(aristmk6_state::irqpend_r)
+{
+	switch (offset)
+	{
+	case 0x00e8 - 0x00e8:
+		return irl0pend;
+	case 0x00f0 - 0x00e8:
+		return irl1pend;
+	case 0x00f8 - 0x00e8:
+		return irl2pend;
+	case 0x0100 - 0x00e8:
+		return irl3pend0;
+	case 0x0101 - 0x00e8:
+		return irl3pend1;
+	default:
+		logerror("Unhandled read %08x\n", 0x120000e8 + offset);
+		return 0;
+	}
+}
+
+WRITE8_MEMBER(aristmk6_state::irqen_w)
+{
+	switch (offset)
+	{
+	case 0x0108 - 0x0108:
+		irl0en = data;
+		irl0pend &= ~data;
+		testIrq();
+		break;
+	case 0x0110 - 0x0108:
+		irl1en = data;
+		irl1pend &= ~data;
+		testIrq();
+		break;
+	case 0x0118 - 0x0108:
+		irl2en = data;
+		irl2pend &= ~data;
+		testIrq();
+		break;
+	case 0x0120 - 0x0108:
+		irl3en0 = data;
+		irl3pend0 &= ~data;
+		testIrq();
+		break;
+	case 0x0121 - 0x0108:
+		irl3en1 = data;
+		irl3pend1 &= ~data;
+		testIrq();
+		break;
+	default:
+		logerror("Unhandled write %08x %02x\n", 0x12000108 + offset, data);
+	}
+}
+
 READ8_MEMBER(aristmk6_state::test_r)
 {
 	static int flip;
@@ -216,6 +298,8 @@ static ADDRESS_MAP_START( aristmk6_map, AS_PROGRAM, 64, aristmk6_state )
 	AM_RANGE(0x12000078, 0x1200007f) AM_WRITENOP // watchdog ??
 	AM_RANGE(0x12000080, 0x12000087) AM_WRITENOP // 0-1-2 written here repeatedly, diag LED or smth ?
 	AM_RANGE(0x120000E0, 0x120000E7) AM_READ(hwver_r)
+	AM_RANGE(0x120000E8, 0x12000107) AM_READ8(irqpend_r, 0xffffffffffffffffU)
+	AM_RANGE(0x12000108, 0x12000127) AM_WRITE8(irqen_w, 0xffffffffffffffffU)
 	AM_RANGE(0x12400010, 0x12400017) AM_DEVREADWRITE8("uart1", ns16550_device, ins8250_r, ins8250_w, 0xffffffffffffffffU)
 	AM_RANGE(0x12400018, 0x1240001f) AM_DEVREADWRITE8("uart0", ns16550_device, ins8250_r, ins8250_w, 0xffffffffffffffffU)
 	AM_RANGE(0x13800000, 0x13800007) AM_READ8(test_r, 0xffffffffffffffffU)
