@@ -42,7 +42,7 @@ protected:
 private:
 	enum { VISIBLE_GAMES_IN_SEARCH = 200 };
 
-	virtual void populate() override;
+	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 
 	void find_matches(const char *str);

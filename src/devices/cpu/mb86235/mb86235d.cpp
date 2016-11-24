@@ -86,39 +86,39 @@ static const char *ai2f_field[32] =
 { "AA0", "AA1", "AA2", "AA3", "AA4", "AA5", "AA6", "AA7", "AB0", "AB1", "AB2", "AB3", "AB4", "AB5", "AB6", "AB7",
 	"PR", "PR++", "PR--", "PR#0", "???", "???", "???", "???", "-1.0E+0", "0.0E+0", "0.5E+0", "1.0E+0", "1.5E+0", "2.0E+0", "3.0E+0", "5.0E+0" };
 
-static char* get_ea(int md, int arx, int ary, int disp)
+static void dasm_ea(std::ostream &stream, int md, int arx, int ary, int disp)
 {
-	static char buffer[40];
-	char *p = buffer;
+	if (arx & 0x20)
+		stream << "B(";
+	else
+		stream << "A(";
 
+	arx &= 7;
 	switch (md)
 	{
-		case 0x0: p += sprintf(p, "@AR%d", arx); break;
-		case 0x1: p += sprintf(p, "@AR%d++", arx); break;
-		case 0x2: p += sprintf(p, "@AR%d--", arx); break;
-		case 0x3: p += sprintf(p, "@AR%d++%04X", arx, disp); break;
-		case 0x4: p += sprintf(p, "@AR%d+AR%d", arx, ary); break;
-		case 0x5: p += sprintf(p, "@AR%d+AR%d++", arx, ary); break;
-		case 0x6: p += sprintf(p, "@AR%d+AR%d--", arx, ary); break;
-		case 0x7: p += sprintf(p, "@AR%d+AR%d++%04X", arx, ary, disp); break;
-		case 0x8: p += sprintf(p, "@AR%d+AR%dU", arx, ary); break;
-		case 0x9: p += sprintf(p, "@AR%d+AR%dL", arx, ary); break;
-		case 0xa: p += sprintf(p, "@AR%d+%04X", arx, disp); break;
-		case 0xb: p += sprintf(p, "@AR%d+AR%d+%04X", arx, ary, disp); break;
-		case 0xc: p += sprintf(p, "%04X", disp); break;
-		case 0xd: p += sprintf(p, "@AR%d+[AR%d++]", arx, ary); break;
-		case 0xe: p += sprintf(p, "@AR%d+[AR%d--]", arx, ary); break;
-		case 0xf: p += sprintf(p, "@AR%d+[AR%d++%04X]", arx, ary, disp); break;
+		case 0x0: util::stream_format(stream, "@AR%d", arx); break;
+		case 0x1: util::stream_format(stream, "@AR%d++", arx); break;
+		case 0x2: util::stream_format(stream, "@AR%d--", arx); break;
+		case 0x3: util::stream_format(stream, "@AR%d++%04X", arx, disp); break;
+		case 0x4: util::stream_format(stream, "@AR%d+AR%d", arx, ary); break;
+		case 0x5: util::stream_format(stream, "@AR%d+AR%d++", arx, ary); break;
+		case 0x6: util::stream_format(stream, "@AR%d+AR%d--", arx, ary); break;
+		case 0x7: util::stream_format(stream, "@AR%d+AR%d++%04X", arx, ary, disp); break;
+		case 0x8: util::stream_format(stream, "@AR%d+AR%dU", arx, ary); break;
+		case 0x9: util::stream_format(stream, "@AR%d+AR%dL", arx, ary); break;
+		case 0xa: util::stream_format(stream, "@AR%d+%04X", arx, disp); break;
+		case 0xb: util::stream_format(stream, "@AR%d+AR%d+%04X", arx, ary, disp); break;
+		case 0xc: util::stream_format(stream, "%04X", disp); break;
+		case 0xd: util::stream_format(stream, "@AR%d+[AR%d++]", arx, ary); break;
+		case 0xe: util::stream_format(stream, "@AR%d+[AR%d--]", arx, ary); break;
+		case 0xf: util::stream_format(stream, "@AR%d+[AR%d++%04X]", arx, ary, disp); break;
 	}
 
-	return buffer;
+	stream << ')';
 }
 
-static char* dasm_alu_mul(uint64_t opcode, bool twoop)
+static void dasm_alu_mul(std::ostream &stream, uint64_t opcode, bool twoop)
 {
-	static char buffer[80];
-	char *p = buffer;
-
 	int ma = (opcode & ((uint64_t)(1) << 41)) ? 1 : 0;
 	int o = (opcode >> 42) & 0x1f;
 	int i2 = (opcode >> 47) & 0x1f;
@@ -130,69 +130,69 @@ static char* dasm_alu_mul(uint64_t opcode, bool twoop)
 		int aluop = (opcode >> 56) & 0x1f;
 		switch (aluop)
 		{
-			case 0x00: p += sprintf(p, "FADD %s, %s, %s", ai1_field[i1], ai2f_field[i2], mo_field[o]);
+			case 0x00: util::stream_format(stream, "FADD %s, %s, %s", ai1_field[i1], ai2f_field[i2], mo_field[o]);
 				break;
-			case 0x01: p += sprintf(p, "FADDZ %s, %s, %s", ai1_field[i1], ai2f_field[i2], mo_field[o]);
+			case 0x01: util::stream_format(stream, "FADDZ %s, %s, %s", ai1_field[i1], ai2f_field[i2], mo_field[o]);
 				break;
-			case 0x02: p += sprintf(p, "FSUB %s, %s, %s", ai1_field[i1], ai2f_field[i2], mo_field[o]);
+			case 0x02: util::stream_format(stream, "FSUB %s, %s, %s", ai1_field[i1], ai2f_field[i2], mo_field[o]);
 				break;
-			case 0x03: p += sprintf(p, "FSUBZ %s, %s, %s", ai1_field[i1], ai2f_field[i2], mo_field[o]);
+			case 0x03: util::stream_format(stream, "FSUBZ %s, %s, %s", ai1_field[i1], ai2f_field[i2], mo_field[o]);
 				break;
-			case 0x04: p += sprintf(p, "FCMP %s, %s", ai1_field[i1], ai2f_field[i2]);
+			case 0x04: util::stream_format(stream, "FCMP %s, %s", ai1_field[i1], ai2f_field[i2]);
 				break;
-			case 0x05: p += sprintf(p, "FABS %s, %s", ai1_field[i1], mo_field[o]);
+			case 0x05: util::stream_format(stream, "FABS %s, %s", ai1_field[i1], mo_field[o]);
 				break;
-			case 0x06: p += sprintf(p, "FABC %s, %s, %s", ai1_field[i1], ai2f_field[i2], mo_field[o]);
+			case 0x06: util::stream_format(stream, "FABC %s, %s, %s", ai1_field[i1], ai2f_field[i2], mo_field[o]);
 				break;
-			case 0x07: p += sprintf(p, "NOP");
+			case 0x07: stream << "NOP";
 				break;
-			case 0x08: p += sprintf(p, "FEA %s, #%02X, %s", ai1_field[i1], i2, mo_field[o]);
+			case 0x08: util::stream_format(stream, "FEA %s, #%02X, %s", ai1_field[i1], i2, mo_field[o]);
 				break;
-			case 0x09: p += sprintf(p, "FES %s, #%02X, %s", ai1_field[i1], i2, mo_field[o]);
+			case 0x09: util::stream_format(stream, "FES %s, #%02X, %s", ai1_field[i1], i2, mo_field[o]);
 				break;
-			case 0x0a: p += sprintf(p, "FRCP %s, %s", ai1_field[i1], mo_field[o]);
+			case 0x0a: util::stream_format(stream, "FRCP %s, %s", ai1_field[i1], mo_field[o]);
 				break;
-			case 0x0b: p += sprintf(p, "FRSQ %s, %s", ai1_field[i1], mo_field[o]);
+			case 0x0b: util::stream_format(stream, "FRSQ %s, %s", ai1_field[i1], mo_field[o]);
 				break;
-			case 0x0c: p += sprintf(p, "FLOG %s, %s", ai1_field[i1], mo_field[o]);
+			case 0x0c: util::stream_format(stream, "FLOG %s, %s", ai1_field[i1], mo_field[o]);
 				break;
-			case 0x0d: p += sprintf(p, "CIF %s, %s", ai1_field[i1], mo_field[o]);
+			case 0x0d: util::stream_format(stream, "CIF %s, %s", ai1_field[i1], mo_field[o]);
 				break;
-			case 0x0e: p += sprintf(p, "CFI %s, %s", ai1_field[i1], mo_field[o]);
+			case 0x0e: util::stream_format(stream, "CFI %s, %s", ai1_field[i1], mo_field[o]);
 				break;
-			case 0x0f: p += sprintf(p, "CFIB %s, %s", ai1_field[i1], mo_field[o]);
+			case 0x0f: util::stream_format(stream, "CFIB %s, %s", ai1_field[i1], mo_field[o]);
 				break;
-			case 0x10: p += sprintf(p, "ADD %s, %s, %s", ai1_field[i1], ai2_field[i2], mo_field[o]);
+			case 0x10: util::stream_format(stream, "ADD %s, %s, %s", ai1_field[i1], ai2_field[i2], mo_field[o]);
 				break;
-			case 0x11: p += sprintf(p, "ADDZ %s, %s, %s", ai1_field[i1], ai2_field[i2], mo_field[o]);
+			case 0x11: util::stream_format(stream, "ADDZ %s, %s, %s", ai1_field[i1], ai2_field[i2], mo_field[o]);
 				break;
-			case 0x12: p += sprintf(p, "SUB %s, %s, %s", ai1_field[i1], ai2_field[i2], mo_field[o]);
+			case 0x12: util::stream_format(stream, "SUB %s, %s, %s", ai1_field[i1], ai2_field[i2], mo_field[o]);
 				break;
-			case 0x13: p += sprintf(p, "SUBZ %s, %s, %s", ai1_field[i1], ai2_field[i2], mo_field[o]);
+			case 0x13: util::stream_format(stream, "SUBZ %s, %s, %s", ai1_field[i1], ai2_field[i2], mo_field[o]);
 				break;
-			case 0x14: p += sprintf(p, "CMP %s, %s", ai1_field[i1], ai2_field[i2]);
+			case 0x14: util::stream_format(stream, "CMP %s, %s", ai1_field[i1], ai2_field[i2]);
 				break;
-			case 0x15: p += sprintf(p, "ABS %s, %s", ai1_field[i1], mo_field[o]);
+			case 0x15: util::stream_format(stream, "ABS %s, %s", ai1_field[i1], mo_field[o]);
 				break;
-			case 0x16: p += sprintf(p, "ATR %s, %s", ai1_field[i1], mo_field[o]);
+			case 0x16: util::stream_format(stream, "ATR %s, %s", ai1_field[i1], mo_field[o]);
 				break;
-			case 0x17: p += sprintf(p, "ATRZ %s, %s", ai1_field[i1], mo_field[o]);
+			case 0x17: util::stream_format(stream, "ATRZ %s, %s", ai1_field[i1], mo_field[o]);
 				break;
-			case 0x18: p += sprintf(p, "AND %s, %s, %s", ai1_field[i1], ai2_field[i2], mo_field[o]);
+			case 0x18: util::stream_format(stream, "AND %s, %s, %s", ai1_field[i1], ai2_field[i2], mo_field[o]);
 				break;
-			case 0x19: p += sprintf(p, "OR %s, %s, %s", ai1_field[i1], ai2_field[i2], mo_field[o]);
+			case 0x19: util::stream_format(stream, "OR %s, %s, %s", ai1_field[i1], ai2_field[i2], mo_field[o]);
 				break;
-			case 0x1a: p += sprintf(p, "XOR %s, %s, %s", ai1_field[i1], ai2_field[i2], mo_field[o]);
+			case 0x1a: util::stream_format(stream, "XOR %s, %s, %s", ai1_field[i1], ai2_field[i2], mo_field[o]);
 				break;
-			case 0x1b: p += sprintf(p, "NOT %s, %s", ai1_field[i1], mo_field[o]);
+			case 0x1b: util::stream_format(stream, "NOT %s, %s", ai1_field[i1], mo_field[o]);
 				break;
-			case 0x1c: p += sprintf(p, "LSR %s, #%02X, %s", ai1_field[i1], i2, mo_field[o]);
+			case 0x1c: util::stream_format(stream, "LSR %s, #%02X, %s", ai1_field[i1], i2, mo_field[o]);
 				break;
-			case 0x1d: p += sprintf(p, "LSL %s, #%02X, %s", ai1_field[i1], i2, mo_field[o]);
+			case 0x1d: util::stream_format(stream, "LSL %s, #%02X, %s", ai1_field[i1], i2, mo_field[o]);
 				break;
-			case 0x1e: p += sprintf(p, "ASR %s, #%02X, %s", ai1_field[i1], i2, mo_field[o]);
+			case 0x1e: util::stream_format(stream, "ASR %s, #%02X, %s", ai1_field[i1], i2, mo_field[o]);
 				break;
-			case 0x1f: p += sprintf(p, "ASL %s, #%02X, %s", ai1_field[i1], i2, mo_field[o]);
+			case 0x1f: util::stream_format(stream, "ASL %s, #%02X, %s", ai1_field[i1], i2, mo_field[o]);
 				break;
 		}
 	}
@@ -204,29 +204,24 @@ static char* dasm_alu_mul(uint64_t opcode, bool twoop)
 		int mi1 = (opcode >> 37) & 0xf;
 		int mo = (opcode >> 27) & 0x1f;
 		if (opcode & ((uint64_t)(1) << 41))
-			p += sprintf(p, " : FMUL %s, %s, %s", mi1_field[mi1], mi2_field[mi2], mo_field[mo]);
+			util::stream_format(stream, " : FMUL %s, %s, %s", mi1_field[mi1], mi2_field[mi2], mo_field[mo]);
 		else
-			p += sprintf(p, " : MUL %s, %s, %s", mi1_field[mi1], mi2_field[mi2], mo_field[mo]);
+			util::stream_format(stream, " : MUL %s, %s, %s", mi1_field[mi1], mi2_field[mi2], mo_field[mo]);
 	}
 	else
 	{
 		if (ma == 0)
 		{
 			if (opcode & ((uint64_t)(1) << 56))
-				p += sprintf(p, "FMUL %s, %s, %s", mi1_field[i1], mi2_field[i2], mo_field[o]);
+				util::stream_format(stream, "FMUL %s, %s, %s", mi1_field[i1], mi2_field[i2], mo_field[o]);
 			else
-				p += sprintf(p, "MUL %s, %s, %s", mi1_field[i1], mi2_field[i2], mo_field[o]);
+				util::stream_format(stream, "MUL %s, %s, %s", mi1_field[i1], mi2_field[i2], mo_field[o]);
 		}
 	}
-
-	return buffer;
 }
 
-static char* dasm_control(uint32_t pc, uint64_t opcode)
+static void dasm_control(std::ostream &stream, uint32_t pc, uint64_t opcode)
 {
-	static char buffer[80];
-	char *p = buffer;
-
 	int ef1 = (opcode >> 16) & 0x3f;
 	int ef2 = opcode & 0xffff;
 
@@ -234,66 +229,65 @@ static char* dasm_control(uint32_t pc, uint64_t opcode)
 
 	int rel12 = (opcode & 0x800) ? (0xfffff000 | (opcode & 0xfff)) : (opcode & 0xfff);
 
-
 	switch (cop)
 	{
-		case 0x00: p += sprintf(p, "NOP");
+		case 0x00: stream << "NOP";
 			break;
 		case 0x01:
 			if (ef1 == 0)
-				p += sprintf(p, "REP #%04X", ef2);
+				util::stream_format(stream, "REP #%04X", ef2);
 			else
-				p += sprintf(p, "REP AR%d", (ef2 >> 12) & 7);
+				util::stream_format(stream, "REP AR%d", (ef2 >> 12) & 7);
 			break;
 		case 0x02:
 			if (ef1 == 0)
-				p += sprintf(p, "SETL #%04X", ef2);
+				util::stream_format(stream, "SETL #%04X", ef2);
 			else
-				p += sprintf(p, "SETL AR%d", (ef2 >> 12) & 7);
+				util::stream_format(stream, "SETL AR%d", (ef2 >> 12) & 7);
 			break;
 		case 0x03:
 			if (ef1 == 1)
-				p += sprintf(p, "CLRFI");
+				stream << "CLRFI";
 			else if (ef1 == 2)
-				p += sprintf(p, "CLRFO");
+				stream << "CLRFO";
 			else if (ef1 == 3)
-				p += sprintf(p, "CLRF");
+				stream << "CLRF";
 			break;
 		case 0x04:
-			p += sprintf(p, "PUSH %s", regname[(ef2 >> 6) & 0x3f]);
+			util::stream_format(stream, "PUSH %s", regname[(ef2 >> 6) & 0x3f]);
 			break;
 		case 0x05:
-			p += sprintf(p, "POP %s", regname[(ef2 >> 6) & 0x3f]);
+			util::stream_format(stream, "POP %s", regname[(ef2 >> 6) & 0x3f]);
 			break;
 		case 0x08:
-			p += sprintf(p, "SETM #%04X", ef2);
+			util::stream_format(stream, "SETM #%04X", ef2);
 			break;
 		case 0x09:
-			p += sprintf(p, "SETM #%01X, CBSA", (ef2 >> 12) & 7);
+			util::stream_format(stream, "SETM #%01X, CBSA", (ef2 >> 12) & 7);
 			break;
 		case 0x0a:
-			p += sprintf(p, "SETM #%01X, CBSB", (ef2 >> 8) & 7);
+			util::stream_format(stream, "SETM #%01X, CBSB", (ef2 >> 8) & 7);
 			break;
 		case 0x0b:
-			p += sprintf(p, "SETM #%d, RF", (ef2 >> 7) & 1);
+			util::stream_format(stream, "SETM #%d, RF", (ef2 >> 7) & 1);
 			break;
 		case 0x0c:
-			p += sprintf(p, "SETM #%d, RDY", (ef2 >> 4) & 1);
+			util::stream_format(stream, "SETM #%d, RDY", (ef2 >> 4) & 1);
 			break;
 		case 0x0d:
-			p += sprintf(p, "SETM #%01X, WAIT", ef2 & 7);
+			util::stream_format(stream, "SETM #%01X, WAIT", ef2 & 7);
 			break;
 		case 0x13:
-			p += sprintf(p, "DBLP %04X", pc + rel12);
+			util::stream_format(stream, "DBLP %04X", pc + rel12);
 			break;
 		case 0x14:
-			p += sprintf(p, "DBBC AR%d:%d, %04X", (uint32_t)((opcode >> 13) & 7), (uint32_t)((opcode >> 16) & 0xf), pc + rel12);
+			util::stream_format(stream, "DBBC AR%d:%d, %04X", (uint32_t)((opcode >> 13) & 7), (uint32_t)((opcode >> 16) & 0xf), pc + rel12);
 			break;
 		case 0x15:
-			p += sprintf(p, "DBBS AR%d:%d, %04X", (uint32_t)((opcode >> 13) & 7), (uint32_t)((opcode >> 16) & 0xf), pc + rel12);
+			util::stream_format(stream, "DBBS AR%d:%d, %04X", (uint32_t)((opcode >> 13) & 7), (uint32_t)((opcode >> 16) & 0xf), pc + rel12);
 			break;
 		case 0x1b:
-			p += sprintf(p, "DRET");
+			stream << "DRET";
 			break;
 
 		case 0x10:      // DBcc
@@ -304,51 +298,48 @@ static char* dasm_control(uint32_t pc, uint64_t opcode)
 		case 0x12:      // DJMP
 		{
 			if (cop == 0x10)
-				p += sprintf(p, "%s ", db_mnemonic[ef1]);
+				util::stream_format(stream, "%s ", db_mnemonic[ef1]);
 			else if (cop == 0x11)
-				p += sprintf(p, "%s ", dbn_mnemonic[ef1]);
+				util::stream_format(stream, "%s ", dbn_mnemonic[ef1]);
 			else if (cop == 0x18)
-				p += sprintf(p, "%s ", dc_mnemonic[ef1]);
+				util::stream_format(stream, "%s ", dc_mnemonic[ef1]);
 			else if (cop == 0x19)
-				p += sprintf(p, "%s ", dcn_mnemonic[ef1]);
+				util::stream_format(stream, "%s ", dcn_mnemonic[ef1]);
 			else if (cop == 0x12)
-				p += sprintf(p, "DJMP ");
+				stream << "DJMP ";
 			else if (cop == 0x1a)
-				p += sprintf(p, "DCALL ");
+				stream << "DCALL ";
 
 			switch ((opcode >> 12) & 0xf)
 			{
-				case 0x0: p += sprintf(p, "%03X", ef2 & 0xfff); break;
-				case 0x1: p += sprintf(p, "%04X", pc + rel12); break;
-				case 0x2: p += sprintf(p, "%s", regname[(ef2 >> 6) & 0x3f]); break;
-				case 0x3: p += sprintf(p, "+%s", regname[(ef2 >> 6) & 0x3f]); break;
-				case 0x4: p += sprintf(p, "%s", regname[(ef2 >> 6) & 0x3f]); break;
-				case 0x5: p += sprintf(p, "+%s", regname[(ef2 >> 6) & 0x3f]); break;
-				case 0x6: p += sprintf(p, "%s", regname[(ef2 >> 6) & 0x3f]); break;
-				case 0x7: p += sprintf(p, "+%s", regname[(ef2 >> 6) & 0x3f]); break;
-				case 0x8: p += sprintf(p, "A(%03X)", ef2 & 0x3ff); break;
-				case 0x9: p += sprintf(p, "+A(%03X)", ef2 & 0x3ff); break;
-				case 0xa: p += sprintf(p, "B(%03X)", ef2 & 0x3ff); break;
-				case 0xb: p += sprintf(p, "+B(%03X)", ef2 & 0x3ff); break;
-				case 0xc: p += sprintf(p, "A(%s)", regname[(ef2 >> 6) & 0x3f]); break;
-				case 0xd: p += sprintf(p, "+A(%s)", regname[(ef2 >> 6) & 0x3f]); break;
-				case 0xe: p += sprintf(p, "B(%s)", regname[(ef2 >> 6) & 0x3f]); break;
-				case 0xf: p += sprintf(p, "+B(%s)", regname[(ef2 >> 6) & 0x3f]); break;
+				case 0x0: util::stream_format(stream, "%03X", ef2 & 0xfff); break;
+				case 0x1: util::stream_format(stream, "%04X", pc + rel12); break;
+				case 0x2: util::stream_format(stream, "%s", regname[(ef2 >> 6) & 0x3f]); break;
+				case 0x3: util::stream_format(stream, "+%s", regname[(ef2 >> 6) & 0x3f]); break;
+				case 0x4: util::stream_format(stream, "%s", regname[(ef2 >> 6) & 0x3f]); break;
+				case 0x5: util::stream_format(stream, "+%s", regname[(ef2 >> 6) & 0x3f]); break;
+				case 0x6: util::stream_format(stream, "%s", regname[(ef2 >> 6) & 0x3f]); break;
+				case 0x7: util::stream_format(stream, "+%s", regname[(ef2 >> 6) & 0x3f]); break;
+				case 0x8: util::stream_format(stream, "A(%03X)", ef2 & 0x3ff); break;
+				case 0x9: util::stream_format(stream, "+A(%03X)", ef2 & 0x3ff); break;
+				case 0xa: util::stream_format(stream, "B(%03X)", ef2 & 0x3ff); break;
+				case 0xb: util::stream_format(stream, "+B(%03X)", ef2 & 0x3ff); break;
+				case 0xc: util::stream_format(stream, "A(%s)", regname[(ef2 >> 6) & 0x3f]); break;
+				case 0xd: util::stream_format(stream, "+A(%s)", regname[(ef2 >> 6) & 0x3f]); break;
+				case 0xe: util::stream_format(stream, "B(%s)", regname[(ef2 >> 6) & 0x3f]); break;
+				case 0xf: util::stream_format(stream, "+B(%s)", regname[(ef2 >> 6) & 0x3f]); break;
 			}
 
 			break;
 		}
 	}
-
-	return buffer;
 }
 
-static char* dasm_double_xfer1(uint64_t opcode)
+static void dasm_double_xfer1(std::ostream &stream, uint64_t opcode)
 {
-	static char buffer[80];
-	char *p = buffer;
-
 	int sd = (opcode >> 25) & 3;
+
+	stream << "MVD1 ";
 
 	switch (sd)
 	{
@@ -358,7 +349,7 @@ static char* dasm_double_xfer1(uint64_t opcode)
 			int ad = (opcode >> 15) & 0x1f;
 			int bs = (opcode >> 10) & 0x1f;
 			int bd = (opcode >> 5) & 0x1f;
-			p += sprintf(p, "MVD1 %s, %s, %s, %s", regname[as], regname[ad], regname[bs], regname[bd]);
+			util::stream_format(stream, "%s, %s, %s, %s", regname[as], regname[ad], regname[bs], regname[bd]);
 			break;
 		}
 
@@ -372,21 +363,19 @@ static char* dasm_double_xfer1(uint64_t opcode)
 			int bary = (opcode >> 4) & 7;
 			int md = opcode & 0xf;
 
-			p += sprintf(p, "MVD1 ");
-
 			switch (md)
 			{
-				case 0x0: p += sprintf(p, "%s, A(@AR%d), %s, B(@AR%d)", regname[areg], aarx, regname[breg], barx); break;
-				case 0x1: p += sprintf(p, "%s, A(@AR%d++), %s, B(@AR%d++)", regname[areg], aarx, regname[breg], barx); break;
-				case 0x2: p += sprintf(p, "%s, A(@AR%d--), %s, B(@AR%d--)", regname[areg], aarx, regname[breg], barx); break;
-				case 0x4: p += sprintf(p, "%s, A(@AR%d+AR%d), %s, B(@AR%d+AR%d)", regname[areg], aarx, aary, regname[breg], barx, bary); break;
-				case 0x5: p += sprintf(p, "%s, A(@AR%d+AR%d++), %s, B(@AR%d+AR%d++)", regname[areg], aarx, aary, regname[breg], barx, bary); break;
-				case 0x6: p += sprintf(p, "%s, A(@AR%d+AR%d--), %s, B(@AR%d+AR%d--)", regname[areg], aarx, aary, regname[breg], barx, bary); break;
-				case 0x8: p += sprintf(p, "%s, A(@AR%d+AR%dU), %s, B(@AR%d+AR%dL)", regname[areg], aarx, aary, regname[breg], barx, bary); break;
-				case 0x9: p += sprintf(p, "%s, A(@AR%d+AR%dL), %s, B(@AR%d+AR%dU)", regname[areg], aarx, aary, regname[breg], barx, bary); break;
-				case 0xd: p += sprintf(p, "%s, A(@AR%d+[AR%d++]), %s, B(@AR%d+[AR%d++])", regname[areg], aarx, aary, regname[breg], barx, bary); break;
-				case 0xe: p += sprintf(p, "%s, A(@AR%d+[AR%d--]), %s, B(@AR%d+[AR%d--])", regname[areg], aarx, aary, regname[breg], barx, bary); break;
-				default: p += sprintf(p, "???"); break;
+				case 0x0: util::stream_format(stream, "%s, A(@AR%d), %s, B(@AR%d)", regname[areg], aarx, regname[breg], barx); break;
+				case 0x1: util::stream_format(stream, "%s, A(@AR%d++), %s, B(@AR%d++)", regname[areg], aarx, regname[breg], barx); break;
+				case 0x2: util::stream_format(stream, "%s, A(@AR%d--), %s, B(@AR%d--)", regname[areg], aarx, regname[breg], barx); break;
+				case 0x4: util::stream_format(stream, "%s, A(@AR%d+AR%d), %s, B(@AR%d+AR%d)", regname[areg], aarx, aary, regname[breg], barx, bary); break;
+				case 0x5: util::stream_format(stream, "%s, A(@AR%d+AR%d++), %s, B(@AR%d+AR%d++)", regname[areg], aarx, aary, regname[breg], barx, bary); break;
+				case 0x6: util::stream_format(stream, "%s, A(@AR%d+AR%d--), %s, B(@AR%d+AR%d--)", regname[areg], aarx, aary, regname[breg], barx, bary); break;
+				case 0x8: util::stream_format(stream, "%s, A(@AR%d+AR%dU), %s, B(@AR%d+AR%dL)", regname[areg], aarx, aary, regname[breg], barx, bary); break;
+				case 0x9: util::stream_format(stream, "%s, A(@AR%d+AR%dL), %s, B(@AR%d+AR%dU)", regname[areg], aarx, aary, regname[breg], barx, bary); break;
+				case 0xd: util::stream_format(stream, "%s, A(@AR%d+[AR%d++]), %s, B(@AR%d+[AR%d++])", regname[areg], aarx, aary, regname[breg], barx, bary); break;
+				case 0xe: util::stream_format(stream, "%s, A(@AR%d+[AR%d--]), %s, B(@AR%d+[AR%d--])", regname[areg], aarx, aary, regname[breg], barx, bary); break;
+				default: stream << "???"; break;
 			}
 			break;
 		}
@@ -401,38 +390,31 @@ static char* dasm_double_xfer1(uint64_t opcode)
 			int bary = (opcode >> 4) & 7;
 			int md = opcode & 0xf;
 
-			p += sprintf(p, "MVD1 ");
-
 			switch (md)
 			{
-				case 0x0: p += sprintf(p, "A(@AR%d), %s, B(@AR%d), %s", aarx, regname[areg], barx, regname[breg]); break;
-				case 0x1: p += sprintf(p, "A(@AR%d++), %s, B(@AR%d++), %s", aarx, regname[areg], barx, regname[breg]); break;
-				case 0x2: p += sprintf(p, "A(@AR%d--), %s, B(@AR%d--), %s", aarx, regname[areg], barx, regname[breg]); break;
-				case 0x4: p += sprintf(p, "A(@AR%d+AR%d), %s, B(@AR%d+AR%d), %s", aarx, aary, regname[areg], barx, bary, regname[breg]); break;
-				case 0x5: p += sprintf(p, "A(@AR%d+AR%d++), %s, B(@AR%d+AR%d++), %s", aarx, aary, regname[areg], barx, bary, regname[breg]); break;
-				case 0x6: p += sprintf(p, "A(@AR%d+AR%d--), %s, B(@AR%d+AR%d--), %s", aarx, aary, regname[areg], barx, bary, regname[breg]); break;
-				case 0x8: p += sprintf(p, "A(@AR%d+AR%dU), %s, B(@AR%d+AR%dL), %s", aarx, aary, regname[areg], barx, bary, regname[breg]); break;
-				case 0x9: p += sprintf(p, "A(@AR%d+AR%dL), %s, B(@AR%d+AR%dU), %s", aarx, aary, regname[areg], barx, bary, regname[breg]); break;
-				case 0xd: p += sprintf(p, "A(@AR%d+[AR%d++]), %s, B(@AR%d+[AR%d++]), %s", aarx, aary, regname[areg], barx, bary, regname[breg]); break;
-				case 0xe: p += sprintf(p, "A(@AR%d+[AR%d--]), %s, B(@AR%d+[AR%d--]), %s", aarx, aary, regname[areg], barx, bary, regname[breg]); break;
-				default: p += sprintf(p, "???"); break;
+				case 0x0: util::stream_format(stream, "A(@AR%d), %s, B(@AR%d), %s", aarx, regname[areg], barx, regname[breg]); break;
+				case 0x1: util::stream_format(stream, "A(@AR%d++), %s, B(@AR%d++), %s", aarx, regname[areg], barx, regname[breg]); break;
+				case 0x2: util::stream_format(stream, "A(@AR%d--), %s, B(@AR%d--), %s", aarx, regname[areg], barx, regname[breg]); break;
+				case 0x4: util::stream_format(stream, "A(@AR%d+AR%d), %s, B(@AR%d+AR%d), %s", aarx, aary, regname[areg], barx, bary, regname[breg]); break;
+				case 0x5: util::stream_format(stream, "A(@AR%d+AR%d++), %s, B(@AR%d+AR%d++), %s", aarx, aary, regname[areg], barx, bary, regname[breg]); break;
+				case 0x6: util::stream_format(stream, "A(@AR%d+AR%d--), %s, B(@AR%d+AR%d--), %s", aarx, aary, regname[areg], barx, bary, regname[breg]); break;
+				case 0x8: util::stream_format(stream, "A(@AR%d+AR%dU), %s, B(@AR%d+AR%dL), %s", aarx, aary, regname[areg], barx, bary, regname[breg]); break;
+				case 0x9: util::stream_format(stream, "A(@AR%d+AR%dL), %s, B(@AR%d+AR%dU), %s", aarx, aary, regname[areg], barx, bary, regname[breg]); break;
+				case 0xd: util::stream_format(stream, "A(@AR%d+[AR%d++]), %s, B(@AR%d+[AR%d++]), %s", aarx, aary, regname[areg], barx, bary, regname[breg]); break;
+				case 0xe: util::stream_format(stream, "A(@AR%d+[AR%d--]), %s, B(@AR%d+[AR%d--]), %s", aarx, aary, regname[areg], barx, bary, regname[breg]); break;
+				default: stream << "???"; break;
 			}
 			break;
 		}
 
 		case 3:
-			p += sprintf(p, "???");
+			stream << "???";
 			break;
 	}
-
-	return buffer;
 }
 
-static char* dasm_xfer1(uint64_t opcode)
+static void dasm_xfer1(std::ostream &stream, uint64_t opcode)
 {
-	static char buffer[80];
-	char *p = buffer;
-
 	int dr = (opcode >> 12) & 0x7f;
 	int sr = (opcode >> 19) & 0x7f;
 	int md = opcode & 0xf;
@@ -441,104 +423,61 @@ static char* dasm_xfer1(uint64_t opcode)
 	int trm = (opcode >> 26) & 1;
 	int dir = (opcode >> 25) & 1;
 
+	stream << "MOV1 ";
+
 	if (trm == 0)
 	{
 		if (sr == 0x58)
 		{
-			p += sprintf(p, "MOV1 #%03X, %s", (uint32_t)(opcode & 0xfff), regname[dr]);
+			util::stream_format(stream, "#%03X, %s", (uint32_t)(opcode & 0xfff), regname[dr]);
 		}
 		else
 		{
-			p += sprintf(p, "MOV1 ");
-
 			if ((sr & 0x40) == 0)
-			{
-				p += sprintf(p, "%s", regname[sr]);
-			}
+				stream << regname[sr];
 			else
-			{
-				if (sr & 0x20)
-					p += sprintf(p, "B");
-				else
-					p += sprintf(p, "A");
+				dasm_ea(stream, md, sr, ary, disp5);
 
-				p += sprintf(p, "(%s)", get_ea(md, sr & 7, ary, disp5));
-			}
-
-			p += sprintf(p, ", ");
+			stream << ", ";
 
 			if ((dr & 0x40) == 0)
-			{
-				p += sprintf(p, "%s", regname[dr]);
-			}
+				stream << regname[dr];
 			else
-			{
-				if (dr & 0x20)
-					p += sprintf(p, "B");
-				else
-					p += sprintf(p, "A");
-
-				p += sprintf(p, "(%s)", get_ea(md, dr & 7, ary, disp5));
-			}
+				dasm_ea(stream, md, dr, ary, disp5);
 		}
 	}
 	else
 	{
 		if (dir == 0)
 		{
-			p += sprintf(p, "MOV1 ");
-
 			if ((dr & 0x40) == 0)
-			{
-				p += sprintf(p, "%s, ", regname[dr]);
-			}
+				util::stream_format(stream, "%s, ", regname[dr]);
 			else
-			{
-				if (dr & 0x20)
-					p += sprintf(p, "B");
-				else
-					p += sprintf(p, "A");
+				dasm_ea(stream, md, dr, ary, disp5);
 
-				p += sprintf(p, "(%s)", get_ea(md, dr & 7, ary, disp5));
-			}
-
-			p += sprintf(p, "E(@EB+EO++%02X)", sr);
+			util::stream_format(stream, "E(@EB+EO++%02X)", sr);
 		}
 		else
 		{
-			p += sprintf(p, "MOV1 E(@EB+EO++%02X), ", sr);
+			util::stream_format(stream, "E(@EB+EO++%02X), ", sr);
 
 			if ((dr & 0x40) == 0)
-			{
-				p += sprintf(p, "%s", regname[dr]);
-			}
+				stream << regname[dr];
 			else
-			{
-				if (dr & 0x20)
-					p += sprintf(p, "B");
-				else
-					p += sprintf(p, "A");
-
-				p += sprintf(p, "(%s)", get_ea(md, dr & 7, ary, disp5));
-			}
+				dasm_ea(stream, md, dr, ary, disp5);
 		}
 	}
-
-	return buffer;
 }
 
-static char* double_xfer2_field(int sd, uint32_t field)
+static void dasm_double_xfer2_field(std::ostream &stream, int sd, uint32_t field)
 {
-	static char buffer[40];
-	char *p = buffer;
-
 	switch (sd)
 	{
 		case 0:
 		{
 			int s = (field >> 13) & 0x1f;
 			int d = (field >> 8) & 0x1f;
-			p += sprintf(p, "%s, %s", regname[s], regname[d]);
+			util::stream_format(stream, "%s, %s", regname[s], regname[d]);
 			break;
 		}
 
@@ -552,17 +491,17 @@ static char* double_xfer2_field(int sd, uint32_t field)
 
 			switch (md)
 			{
-				case 0x0: p += sprintf(p, "%s, A(@AR%d)", regname[reg], arx); break;
-				case 0x1: p += sprintf(p, "%s, A(@AR%d++)", regname[reg], arx); break;
-				case 0x2: p += sprintf(p, "%s, A(@AR%d--)", regname[reg], arx); break;
-				case 0x4: p += sprintf(p, "%s, A(@AR%d+AR%d))", regname[reg], arx, ary); break;
-				case 0x5: p += sprintf(p, "%s, A(@AR%d+AR%d++)", regname[reg], arx, ary); break;
-				case 0x6: p += sprintf(p, "%s, A(@AR%d+AR%d--)", regname[reg], arx, ary); break;
-				case 0x8: p += sprintf(p, "%s, A(@AR%d+AR%dU)", regname[reg], arx, ary); break;
-				case 0x9: p += sprintf(p, "%s, A(@AR%d+AR%dL)", regname[reg], arx, ary); break;
-				case 0xd: p += sprintf(p, "%s, A(@AR%d+[AR%d++])", regname[reg], arx, ary); break;
-				case 0xe: p += sprintf(p, "%s, A(@AR%d+[AR%d--]", regname[reg], arx, ary); break;
-				default: p += sprintf(p, "???"); break;
+				case 0x0: util::stream_format(stream, "%s, A(@AR%d)", regname[reg], arx); break;
+				case 0x1: util::stream_format(stream, "%s, A(@AR%d++)", regname[reg], arx); break;
+				case 0x2: util::stream_format(stream, "%s, A(@AR%d--)", regname[reg], arx); break;
+				case 0x4: util::stream_format(stream, "%s, A(@AR%d+AR%d))", regname[reg], arx, ary); break;
+				case 0x5: util::stream_format(stream, "%s, A(@AR%d+AR%d++)", regname[reg], arx, ary); break;
+				case 0x6: util::stream_format(stream, "%s, A(@AR%d+AR%d--)", regname[reg], arx, ary); break;
+				case 0x8: util::stream_format(stream, "%s, A(@AR%d+AR%dU)", regname[reg], arx, ary); break;
+				case 0x9: util::stream_format(stream, "%s, A(@AR%d+AR%dL)", regname[reg], arx, ary); break;
+				case 0xd: util::stream_format(stream, "%s, A(@AR%d+[AR%d++])", regname[reg], arx, ary); break;
+				case 0xe: util::stream_format(stream, "%s, A(@AR%d+[AR%d--]", regname[reg], arx, ary); break;
+				default: stream << "???"; break;
 			}
 			break;
 		}
@@ -577,34 +516,29 @@ static char* double_xfer2_field(int sd, uint32_t field)
 
 			switch (md)
 			{
-				case 0x0: p += sprintf(p, "A(@AR%d), %s", arx, regname[reg]); break;
-				case 0x1: p += sprintf(p, "A(@AR%d++), %s", arx, regname[reg]); break;
-				case 0x2: p += sprintf(p, "A(@AR%d--), %s", arx, regname[reg]); break;
-				case 0x4: p += sprintf(p, "A(@AR%d+AR%d), %s", arx, ary, regname[reg]); break;
-				case 0x5: p += sprintf(p, "A(@AR%d+AR%d++), %s", arx, ary, regname[reg]); break;
-				case 0x6: p += sprintf(p, "A(@AR%d+AR%d--), %s", arx, ary, regname[reg]); break;
-				case 0x8: p += sprintf(p, "A(@AR%d+AR%dU), %s", arx, ary, regname[reg]); break;
-				case 0x9: p += sprintf(p, "A(@AR%d+AR%dL), %s", arx, ary, regname[reg]); break;
-				case 0xd: p += sprintf(p, "A(@AR%d+[AR%d++]), %s", arx, ary, regname[reg]); break;
-				case 0xe: p += sprintf(p, "A(@AR%d+[AR%d--]), %s", arx, ary, regname[reg]); break;
-				default: p += sprintf(p, "???"); break;
+				case 0x0: util::stream_format(stream, "A(@AR%d), %s", arx, regname[reg]); break;
+				case 0x1: util::stream_format(stream, "A(@AR%d++), %s", arx, regname[reg]); break;
+				case 0x2: util::stream_format(stream, "A(@AR%d--), %s", arx, regname[reg]); break;
+				case 0x4: util::stream_format(stream, "A(@AR%d+AR%d), %s", arx, ary, regname[reg]); break;
+				case 0x5: util::stream_format(stream, "A(@AR%d+AR%d++), %s", arx, ary, regname[reg]); break;
+				case 0x6: util::stream_format(stream, "A(@AR%d+AR%d--), %s", arx, ary, regname[reg]); break;
+				case 0x8: util::stream_format(stream, "A(@AR%d+AR%dU), %s", arx, ary, regname[reg]); break;
+				case 0x9: util::stream_format(stream, "A(@AR%d+AR%dL), %s", arx, ary, regname[reg]); break;
+				case 0xd: util::stream_format(stream, "A(@AR%d+[AR%d++]), %s", arx, ary, regname[reg]); break;
+				case 0xe: util::stream_format(stream, "A(@AR%d+[AR%d--]), %s", arx, ary, regname[reg]); break;
+				default: stream << "???"; break;
 			}
 			break;
 		}
 
 		case 3:
-			p += sprintf(p, "???");
+			stream << "???";
 			break;
 	}
-
-	return buffer;
 }
 
-static char* dasm_double_xfer2(uint64_t opcode)
+static void dasm_double_xfer2(std::ostream &stream, uint64_t opcode)
 {
-	static char buffer[80];
-	char *p = buffer;
-
 	int asd = (opcode >> 38) & 3;
 	int bsd = (opcode >> 18) & 3;
 
@@ -616,43 +550,41 @@ static char* dasm_double_xfer2(uint64_t opcode)
 		int bmd = opcode & 0xf;
 		int arx = (opcode >> 30) & 7;
 
-		p += sprintf(p, "MOVI ");
+		stream << "MOVI ";
 
 		switch (bmd)
 		{
-			case 0x0: p += sprintf(p, "B(@BAR%d)", barx); break;
-			case 0x1: p += sprintf(p, "B(@BAR%d++)", barx); break;
-			case 0x2: p += sprintf(p, "B(@BAR%d--)", barx); break;
-			case 0x3: p += sprintf(p, "B(@BAR%d++%02X)", barx, disp3); break;
-			case 0x4: p += sprintf(p, "B(@BAR%d+BAR%d)", barx, bary); break;
-			case 0x5: p += sprintf(p, "B(@BAR%d+BAR%d++)", barx, bary); break;
-			case 0x6: p += sprintf(p, "B(@BAR%d+BAR%d--)", barx, bary); break;
-			case 0x7: p += sprintf(p, "B(@BAR%d+BAR%d++%02X)", barx, bary, disp3); break;
-			case 0x8: p += sprintf(p, "B(@BAR%d+BAR%dU)", barx, bary); break;
-			case 0x9: p += sprintf(p, "B(@BAR%d+BAR%dL)", barx, bary); break;
-			case 0xa: p += sprintf(p, "B(@BAR%d+%02X)", barx, disp3); break;
-			case 0xb: p += sprintf(p, "B(@BAR%d+BAR%d+%02X)", barx, bary, disp3); break;
-			case 0xc: p += sprintf(p, "???"); break;
-			case 0xd: p += sprintf(p, "B(@BAR%d+[BAR%d++])", barx, bary); break;
-			case 0xe: p += sprintf(p, "B(@BAR%d+[BAR%d--])", barx, bary); break;
-			case 0xf: p += sprintf(p, "B(@BAR%d+[BAR%d++%02X])", barx, bary, disp3); break;
+			case 0x0: util::stream_format(stream, "B(@BAR%d)", barx); break;
+			case 0x1: util::stream_format(stream, "B(@BAR%d++)", barx); break;
+			case 0x2: util::stream_format(stream, "B(@BAR%d--)", barx); break;
+			case 0x3: util::stream_format(stream, "B(@BAR%d++%02X)", barx, disp3); break;
+			case 0x4: util::stream_format(stream, "B(@BAR%d+BAR%d)", barx, bary); break;
+			case 0x5: util::stream_format(stream, "B(@BAR%d+BAR%d++)", barx, bary); break;
+			case 0x6: util::stream_format(stream, "B(@BAR%d+BAR%d--)", barx, bary); break;
+			case 0x7: util::stream_format(stream, "B(@BAR%d+BAR%d++%02X)", barx, bary, disp3); break;
+			case 0x8: util::stream_format(stream, "B(@BAR%d+BAR%dU)", barx, bary); break;
+			case 0x9: util::stream_format(stream, "B(@BAR%d+BAR%dL)", barx, bary); break;
+			case 0xa: util::stream_format(stream, "B(@BAR%d+%02X)", barx, disp3); break;
+			case 0xb: util::stream_format(stream, "B(@BAR%d+BAR%d+%02X)", barx, bary, disp3); break;
+			case 0xc: stream << "???"; break;
+			case 0xd: util::stream_format(stream, "B(@BAR%d+[BAR%d++])", barx, bary); break;
+			case 0xe: util::stream_format(stream, "B(@BAR%d+[BAR%d--])", barx, bary); break;
+			case 0xf: util::stream_format(stream, "B(@BAR%d+[BAR%d++%02X])", barx, bary, disp3); break;
 		}
 
-		p += sprintf(p, ", I(@AR%d++)", arx);
+		util::stream_format(stream, ", I(@AR%d++)", arx);
 	}
 	else
 	{
-		p += sprintf(p, "MVD2 %s, %s", double_xfer2_field(asd, (opcode >> 20) & 0x3ffff), double_xfer2_field(bsd, opcode & 0x3ffff));
+		stream << "MVD2 ";
+		dasm_double_xfer2_field(stream, asd, (opcode >> 20) & 0x3ffff);
+		stream << ", ";
+		dasm_double_xfer2_field(stream, bsd, opcode & 0x3ffff);
 	}
-
-	return buffer;
 }
 
-static char* dasm_xfer2(uint64_t opcode)
+static void dasm_xfer2(std::ostream &stream, uint64_t opcode)
 {
-	static char buffer[80];
-	char *p = buffer;
-
 	int op = (opcode >> 39) & 3;
 	int trm = (opcode >> 38) & 1;
 	int dir = (opcode >> 37) & 1;
@@ -664,130 +596,76 @@ static char* dasm_xfer2(uint64_t opcode)
 
 	if (op == 0)
 	{
+		stream << "MOV2 ";
+
 		if (trm == 0)
 		{
 			if (sr == 0x58)
 			{
-				p += sprintf(p, "MOV2 #%06X, %s", (uint32_t)(opcode & 0xffffff), regname[dr]);
+				util::stream_format(stream, "#%06X, %s", (uint32_t)(opcode & 0xffffff), regname[dr]);
 			}
 			else
 			{
-				p += sprintf(p, "MOV2 ");
-
 				if ((sr & 0x40) == 0)
-				{
-					p += sprintf(p, "%s", regname[sr]);
-				}
+					stream << regname[sr];
 				else
-				{
-					if (sr & 0x20)
-						p += sprintf(p, "B");
-					else
-						p += sprintf(p, "A");
+					dasm_ea(stream, md, sr, ary, disp14);
 
-					p += sprintf(p, "(%s)", get_ea(md, sr & 7, ary, disp14));
-				}
-
-				p += sprintf(p, ", ");
+				stream << ", ";
 
 				if ((dr & 0x40) == 0)
-				{
-					p += sprintf(p, "%s", regname[dr]);
-				}
+					stream << regname[dr];
 				else
-				{
-					if (dr & 0x20)
-						p += sprintf(p, "B");
-					else
-						p += sprintf(p, "A");
-
-					p += sprintf(p, "(%s)", get_ea(md, dr & 7, ary, disp14));
-				}
+					dasm_ea(stream, md, dr, ary, disp14);
 			}
 		}
 		else
 		{
 			if (dir == 0)
-			{
-				p += sprintf(p, "MOV2 %s, E(@EB+EO++%02X)", regname[dr], sr);
-			}
+				util::stream_format(stream, "%s, E(@EB+EO++%02X)", regname[dr], sr);
 			else
-			{
-				p += sprintf(p, "MOV2 E(@EB+EO++%02X), %s", sr, regname[dr]);
-			}
+				util::stream_format(stream, "E(@EB+EO++%02X), %s", sr, regname[dr]);
 		}
 	}
 	else if (op == 2)
 	{
+		stream << "MOV4 ";
+
 		if (trm == 0)
 		{
 			if ((sr & 0x40) == 0)
-			{
-				p += sprintf(p, "MOV4 %s, ICDTR%d", regname[sr], dr & 7);
-			}
+				stream << regname[sr];
+			else if (sr == 0x58)
+				util::stream_format(stream, "#%06X", (uint32_t)(opcode & 0xffffff));
 			else
-			{
-				if (sr == 0x58)
-				{
-					p += sprintf(p, "MOV4 #%06X, ICDTR%d", (uint32_t)(opcode & 0xffffff), dr & 7);
-				}
-				else
-				{
-					p += sprintf(p, "MOV4 ");
+				dasm_ea(stream, md, sr, ary, disp14);
 
-					if (sr & 0x20)
-						p += sprintf(p, "B");
-					else
-						p += sprintf(p, "A");
-
-					p += sprintf(p, "(%s), ICDTR%d", get_ea(md, sr & 7, ary, disp14), dr & 7);
-				}
-			}
+			util::stream_format(stream, ", ICDTR%d", dr & 7);
 		}
 		else
 		{
 			if (dir == 0)
-			{
-				p += sprintf(p, "MOV4 ICDTR%d, E(@EB+EO++%02X)", dr & 7, sr);
-			}
+				util::stream_format(stream, "ICDTR%d, E(@EB+EO++%02X)", dr & 7, sr);
 			else
-			{
-				p += sprintf(p, "MOV4 E(@EB+EO++%02X), ICDTR%d", sr, dr & 7);
-			}
+				util::stream_format(stream, "E(@EB+EO++%02X), ICDTR%d", sr, dr & 7);
 		}
 	}
-
-	return buffer;
 }
 
-static char* dasm_xfer3(uint64_t opcode)
+static void dasm_xfer3(std::ostream &stream, uint64_t opcode)
 {
-	static char buffer[80];
-	char *p = buffer;
-
 	uint32_t imm = (uint32_t)(opcode >> 27);
 	int dr = (opcode >> 19) & 0x7f;
 	int disp = (opcode >> 7) & 0xfff;
 	int ary = (opcode >> 4) & 7;
 	int md = opcode & 0xf;
 
-	p += sprintf(p, "MOV3 #%08X, ", imm);
+	util::stream_format(stream, "MOV3 #%08X, ", imm);
 
 	if ((dr & 0x40) == 0)
-	{
-		p += sprintf(p, "%s", regname[dr]);
-	}
+		stream << regname[dr];
 	else
-	{
-		if (dr & 0x20)
-			p += sprintf(p, "B");
-		else
-			p += sprintf(p, "A");
-
-		p += sprintf(p, "(%s)", get_ea(md, dr & 7, ary, disp));
-	}
-
-	return buffer;
+		dasm_ea(stream, md, dr, ary, disp);
 }
 
 static unsigned dasm_mb86235(std::ostream &stream, uint32_t pc, uint64_t opcode)
@@ -795,29 +673,41 @@ static unsigned dasm_mb86235(std::ostream &stream, uint32_t pc, uint64_t opcode)
 	switch ((opcode >> 61) & 7)
 	{
 		case 0:     // ALU / MUL / double transfer (type 1)
-			util::stream_format(stream, "%s : %s", dasm_alu_mul(opcode, true), dasm_double_xfer1(opcode));
+			dasm_alu_mul(stream, opcode, true);
+			stream << " : ";
+			dasm_double_xfer1(stream, opcode);
 			break;
 		case 1:     // ALU / MYL / transfer (type 1)
-			util::stream_format(stream, "%s : %s", dasm_alu_mul(opcode, true), dasm_xfer1(opcode));
+			dasm_alu_mul(stream, opcode, true);
+			stream << " : ";
+			dasm_xfer1(stream, opcode);
 			break;
 		case 2:     // ALU / MUL / control
-			util::stream_format(stream, "%s : %s", dasm_alu_mul(opcode, true), dasm_control(pc, opcode));
+			dasm_alu_mul(stream, opcode, true);
+			stream << " : ";
+			dasm_control(stream, pc, opcode);
 			break;
 		case 4:     // ALU or MUL / double transfer (type 2)
-			util::stream_format(stream, "%s : %s", dasm_alu_mul(opcode, false), dasm_double_xfer2(opcode));
+			dasm_alu_mul(stream, opcode, false);
+			stream << " : ";
+			dasm_double_xfer2(stream, opcode);
 			break;
 		case 5:     // ALU or MUL / transfer (type 2)
-			util::stream_format(stream, "%s : %s", dasm_alu_mul(opcode, false), dasm_xfer2(opcode));
+			dasm_alu_mul(stream, opcode, false);
+			stream << " : ";
+			dasm_xfer2(stream, opcode);
 			break;
 		case 6:     // ALU or MUL / control
-			util::stream_format(stream, "%s : %s", dasm_alu_mul(opcode, false), dasm_control(pc, opcode));
+			dasm_alu_mul(stream, opcode, false);
+			stream << " : ";
+			dasm_control(stream, pc, opcode);
 			break;
 		case 7:     // transfer (type 3)
-			util::stream_format(stream, "%s", dasm_xfer3(opcode));
+			dasm_xfer3(stream, opcode);
 			break;
 
 		default:
-			util::stream_format(stream, "???");
+			stream << "???";
 			break;
 	}
 
@@ -825,21 +715,10 @@ static unsigned dasm_mb86235(std::ostream &stream, uint32_t pc, uint64_t opcode)
 }
 
 
-
-static offs_t internal_disasm_mb86235(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+CPU_DISASSEMBLE(mb86235)
 {
 	uint64_t op = *(uint64_t*)oprom;
 	op = little_endianize_int64(op);
 
 	return dasm_mb86235(stream, pc, op);
-}
-
-
-CPU_DISASSEMBLE(mb86235)
-{
-	std::ostringstream stream;
-	offs_t result = internal_disasm_mb86235(device, stream, pc, oprom, opram, options);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
 }

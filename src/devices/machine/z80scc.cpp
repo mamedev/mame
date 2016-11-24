@@ -88,6 +88,7 @@ DONE (x) (p=partly)         NMOS         CMOS       ESCC      EMSCC
 #define LOGRCV(x)   {} LOGPRINT(x)
 #define LOGCTS(x)   {} LOGPRINT(x)
 #define LOGDCD(x)   {} LOGPRINT(x)
+#define LOGSYNC(x)  {} LOGPRINT(x)
 #if VERBOSE == 2
 #define logerror printf
 #endif
@@ -856,7 +857,7 @@ z80scc_channel::z80scc_channel(const machine_config &mconfig, const char *tag, d
 		m_tx_clock(0),
 		m_dtr(0),
 		m_rts(0),
-		m_sync(0)
+		m_sync_pattern(0)
 #if START_BIT_HUNT
 		,m_rcv_mode(RCV_IDLE)
 #endif
@@ -956,7 +957,7 @@ void z80scc_channel::device_start()
 	save_item(NAME(m_tx_clock));
 	save_item(NAME(m_dtr));
 	save_item(NAME(m_rts));
-	save_item(NAME(m_sync));
+	save_item(NAME(m_sync_pattern));
 
 	device_serial_interface::register_save_state(machine().save(), this);
 }
@@ -1434,6 +1435,7 @@ uint8_t z80scc_channel::do_sccreg_rr6()
 	LOGR(("%s\n", FUNCNAME));
 	if (m_wr15 & WR15_STATUS_FIFO)
 	{
+		LOGSYNC((" - Status FIFO for synchronous mode - not implemented\n"));
 		logerror(" - Status FIFO for synchronous mode - not implemented\n");
 		return 0;
 	}
@@ -1635,13 +1637,13 @@ void z80scc_channel::do_sccreg_wr0_resets(uint8_t data)
 		LOG((" CRC_RESET_NULL\n"));
 		break;
 	case WR0_CRC_RESET_RX: /* In Synchronous mode: all Os (zeros) (CCITT-O CRC-16) */
-		LOG((" CRC_RESET_RX - not implemented\n"));
+		LOGSYNC((" CRC_RESET_RX - not implemented\n"));
 		break;
 	case WR0_CRC_RESET_TX: /* In HDLC mode: all 1s (ones) (CCITT-1) */
-		LOG((" CRC_RESET_TX - not implemented\n"));
+		LOGSYNC((" CRC_RESET_TX - not implemented\n"));
 		break;
 	case WR0_CRC_RESET_TX_UNDERRUN: /* Resets Tx underrun/EOM bit (D6 of the RRO register) */
-		LOG((" CRC_RESET_TX_UNDERRUN - not implemented\n"));
+		LOGSYNC((" CRC_RESET_TX_UNDERRUN - not implemented\n"));
 		break;
 	default: /* Will not happen unless someone messes with the mask */
 		logerror(" Wrong CRC reset/init command:%02x\n", data & WR0_CRC_RESET_CODE_MASK);
@@ -1793,9 +1795,9 @@ void z80scc_channel::do_sccreg_wr1(uint8_t data)
 	m_uart->check_interrupts();
 }
 
-/*WR2 is the interrupt vector register. Only one vector register exists in the SCC, and it can be
-accessed through either channel. The interrupt vector can be modified by status information. This
-is controlled by the Vector Includes Status (VIS) and the Status High/Status Low bits in WR9.*/
+/* WR2 is the interrupt vector register. Only one vector register exists in the SCC, and it can be
+   accessed through either channel. The interrupt vector can be modified by status information. This
+   is controlled by the Vector Includes Status (VIS) and the Status High/Status Low bits in WR9.*/
 void z80scc_channel::do_sccreg_wr2(uint8_t data)
 {
 	LOG(("%s(%02x) Setting the interrupt vector\n", FUNCNAME, data));
@@ -1806,13 +1808,29 @@ void z80scc_channel::do_sccreg_wr2(uint8_t data)
 	m_uart->check_interrupts();
 }
 
+/*
+  In the SDLC modes, the Sync/Hunt bit is initially set by the Enter Hunt Mode command or when
+  the receiver is disabled. It is reset when the opening flag of the first frame is detected by the SCC.
+  An External/Status interrupt is also generated if the Sync/Hunt IE bit is set. Unlike the Monosync
+  and Bisync modes, once the Sync/Hunt bit is reset in SDLC mode, it does not need to be set when
+  the end of the frame is detected. The SCC automatically maintains synchronization. The only way
+  the Sync/Hunt bit is set again is by the Enter Hunt Mode command or by disabling the receiver.*/
 void z80scc_channel::do_sccreg_wr3(uint8_t data)
 {
 	LOG(("%s(%02x) Setting up the receiver\n", FUNCNAME, data));
 	m_wr3 = data;
-	LOG(("- Receiver Enable %u\n", (data & WR3_RX_ENABLE) ? 1 : 0));
-	LOG(("- Auto Enables %u\n", (data & WR3_AUTO_ENABLES) ? 1 : 0));
+	LOG(("- Receiver Enable:        %u\n", (data & WR3_RX_ENABLE) ? 1 : 0));
+	LOG(("- Sync Char Load Inhibit  %u\n", (data & WR3_SYNC_CHAR_LOAD_INHIBIT) ? 1 : 0));
+	LOG(("- Address Search Mode     %u\n", (data & WR3_ADDRESS_SEARCH_MODE) ? 1 : 0));
+	LOG(("- Rx CRC Enable           %u\n", (data & WR3_RX_CRC_ENABLE) ? 1 : 0));
+	LOG(("- Enter Hunt Mode         %u\n", (data & WR3_ENTER_HUNT_MODE) ? 1 : 0));
+	LOG(("- Auto Enables            %u\n", (data & WR3_AUTO_ENABLES) ? 1 : 0));
 	LOG(("- Receiver Bits/Character %u\n", get_rx_word_length()));
+
+	if ((m_wr3 & WR3_ENTER_HUNT_MODE) || ((m_wr3 & WR3_RX_ENABLE) == 0))
+	{
+		m_rr0 |= RR0_SYNC_HUNT; // Set the sync/hunt bit
+	}
 	update_serial();
 	receive_register_reset();
 }
@@ -1827,10 +1845,14 @@ void z80scc_channel::do_sccreg_wr4(uint8_t data)
 	else
 	{
 		m_wr4 = data;
-		LOG(("- Parity Enable %u\n", (data & WR4_PARITY_ENABLE) ? 1 : 0));
-		LOG(("- Parity %s\n", (data & WR4_PARITY_EVEN) ? "Even" : "Odd"));
-		LOG(("- Stop Bits %s\n", stop_bits_tostring(get_stop_bits())));
-		LOG(("- Clock Mode %uX\n", get_clock_mode()));
+		LOG(("- Parity    : %s\n", (data & WR4_PARITY_ENABLE) ? ((data & WR4_PARITY_EVEN) ? "Even" : "Odd") : "None"));
+		LOG(("- Stop Bits : %s\n", data & WR4_STOP_BITS_MASK ? stop_bits_tostring(get_stop_bits()) : "not used, sync modes enabled" ));
+		LOG(("- Sync Mode : %s\n", !(data & WR4_STOP_BITS_MASK) ? 
+			 (data & WR4_BIT5 ? 
+			  (data & WR4_BIT4 ? "External Sync Mode - /SYNC is used as input!" : "SDLC - not implemented") 
+			  : (data & WR4_BIT4 ? "16 bit" : "8 bit"))
+			 : "Disabled"));
+		LOG(("- Clock Mode: %uX\n", get_clock_mode()));
 		update_serial();
 		safe_transmit_register_reset();
 		receive_register_reset();
@@ -1861,13 +1883,13 @@ void z80scc_channel::do_sccreg_wr5(uint8_t data)
 void z80scc_channel::do_sccreg_wr6(uint8_t data)
 {
 	LOG(("%s(%02x) Transmit sync\n", FUNCNAME, data));
-	m_sync = (m_sync & 0xff00) | data;
+	m_sync_pattern = (m_sync_pattern & 0xff00) | data;
 }
 
 void z80scc_channel::do_sccreg_wr7(uint8_t data)
 {
 	LOG(("%s(%02x) Receive sync\n", FUNCNAME, data));
-	m_sync = (data << 8) | (m_sync & 0xff);
+	m_sync_pattern = (data << 8) | (m_sync_pattern & 0xff);
 }
 
 /* WR8 is the transmit buffer register */
@@ -1924,13 +1946,21 @@ void z80scc_channel::do_sccreg_wr9(uint8_t data)
 	}
 }
 
-/* WR10 contains miscellaneous control bits for both the receiver and the transmitter. Bit positions
-for WR10 are displayed in Figure . On the ESCC and 85C30 with the Extended Read option
-enabled, this register may be read as RR11.*/
+/* WR10 contains miscellaneous control bits for both the receiver and the transmitter. 
+   On the ESCC and 85C30 with the Extended Read option enabled, this register may be read as RR11.*/
 void z80scc_channel::do_sccreg_wr10(uint8_t data)
 {
 	m_wr10 = data;
 	LOG(("\"%s\": %c : %s Misc Tx/Rx Control %02x - not implemented \n", m_owner->tag(), 'A' + m_index, FUNCNAME, data));
+	LOG(("- 6/8 bit sync %d\n", data & WR10_8_6_BIT_SYNC ? 1 : 0));
+	LOG(("- Loop Mode %d\n", data & WR10_LOOP_MODE ? 1 : 0));
+	LOG(("- Abort/Flag on underrun %d\n", data & WR10_ABORT_FLAG_UNDERRUN ? 1 : 0));
+	LOG(("- Mark/Flag Idle line %d\n", data & WR10_MARK_FLAG_IDLE ? 1 : 0));
+	LOG(("- Go active on poll %d\n", data & WR10_GO_ACTIVE_ON_POLL ? 1 : 0));
+	LOG(("- Encoding %s\n", data & WR10_BIT6 ?
+		 (data & WR10_BIT5 ? "FM0"  : "FM1") :
+		 (data & WR10_BIT5 ? "NRZI" : "NRZ") ));
+	LOG(("- CRC Preset %d\n", data & WR10_CRC_PRESET ? 1 : 0));
 }
 
 /* WR11 is the Clock Mode Control register. The bits in this register control the sources of both the
@@ -1948,7 +1978,7 @@ void z80scc_channel::do_sccreg_wr11(uint8_t data)
 	  /SYNC pin is unavailable for other use. The /SYNC signal is forced to zero internally. A hardware
 	  reset forces /NO XTAL. (At least 20 ms should be allowed after this bit is set to allow the oscillator
 	  to stabilize.)*/
-	LOG(("  Clock type %s\n", data & WR11_RCVCLK_TYPE ? "Crystal oscillator between RTxC and /SYNC pins" : "TTL level on RTxC pin"));
+	LOG(("  Clock type %s\n", data & WR11_RCVCLK_TYPE ? "Crystal oscillator between RTxC and /SYNC pins" : "TTL level on RTxC pin and /SYNC can be used"));
 	/*Bits 6 and 5: Receiver Clock select bits 1 and 0
 	  These bits determine the source of the receive clock as listed below. They do not
 	  interfere with any of the modes of operation in the SCC, but simply control a multiplexer just
@@ -2137,16 +2167,16 @@ void z80scc_channel::do_sccreg_wr14(uint8_t data)
 #define WR15NO "not implemented"
 void z80scc_channel::do_sccreg_wr15(uint8_t data)
 {
-	LOGINT(("%s(%02x) \"%s\": %c : External/Status Control Bits\n",
+	LOG(("%s(%02x) \"%s\": %c : External/Status Control Bits\n",
 			FUNCNAME, data, m_owner->tag(), 'A' + m_index));
-	LOGINT(("WR7 prime ints     : %s\n", data & WR15_WR7PRIME    ? WR15NO : "disabled"));
-	LOGINT(("Zero count ints    : %s\n", data & WR15_ZEROCOUNT   ? WR15NO : "disabled"));
-	LOGINT(("14 bit Status FIFO : %s\n", data & WR15_STATUS_FIFO ? WR15NO : "disabled"));
-	LOGINT(("DCD ints           : %s\n", data & WR15_DCD         ? WR15EN : "disabled"));
-	LOGINT(("SYNC/Hunt ints     : %s\n", data & WR15_SYNC        ? WR15NO : "disabled"));
-	LOGINT(("CTS ints           : %s\n", data & WR15_CTS         ? WR15EN : "disabled"));
-	LOGINT(("Tx underr./EOM ints: %s\n", data & WR15_TX_EOM      ? WR15NO : "disabled"));
-	LOGINT(("Break/Abort ints   : %s\n", data & WR15_BREAK_ABORT ? WR15NO : "disabled"));
+	LOG(("WR7 prime ints     : %s\n", data & WR15_WR7PRIME    ? WR15NO : "disabled"));
+	LOG(("Zero count ints    : %s\n", data & WR15_ZEROCOUNT   ? WR15NO : "disabled"));
+	LOG(("14 bit Status FIFO : %s\n", data & WR15_STATUS_FIFO ? WR15NO : "disabled"));
+	LOG(("DCD ints           : %s\n", data & WR15_DCD         ? WR15EN : "disabled"));
+	LOG(("SYNC/Hunt ints     : %s\n", data & WR15_SYNC        ? WR15NO : "disabled"));
+	LOG(("CTS ints           : %s\n", data & WR15_CTS         ? WR15EN : "disabled"));
+	LOG(("Tx underr./EOM ints: %s\n", data & WR15_TX_EOM      ? WR15NO : "disabled"));
+	LOG(("Break/Abort ints   : %s\n", data & WR15_BREAK_ABORT ? WR15NO : "disabled"));
 	m_wr15 = data;
 }
 
@@ -2578,11 +2608,15 @@ WRITE_LINE_MEMBER( z80scc_channel::ri_w )
 }
 
 //-------------------------------------------------
-//  sync_w - sync handler
+//  sync_w - sync handler for external sync mode
 //-------------------------------------------------
 WRITE_LINE_MEMBER( z80scc_channel::sync_w )
 {
-	LOGINT(("\"%s\": %c : SYNC %u - not implemented\n", m_owner->tag(), 'A' + m_index, state));
+	LOGSYNC(("\"%s\": %c : SYNC %u\n", m_owner->tag(), 'A' + m_index, state));
+	if ((m_rr0 & RR0_SYNC_HUNT) != (state ? RR0_SYNC_HUNT : 0)) //  SCC change detection logic
+	{
+		if (state) m_rr0 |= RR0_SYNC_HUNT; else  m_rr0 &= ~RR0_SYNC_HUNT; // Raw pin/status value
+	}
 }
 
 //-------------------------------------------------

@@ -14,8 +14,8 @@
 #error Dont include this file directly; include emu.h instead.
 #endif
 
-#ifndef __INPUT_H__
-#define __INPUT_H__
+#ifndef MAME_EMU_INPUT_H
+#define MAME_EMU_INPUT_H
 
 
 //**************************************************************************
@@ -23,19 +23,19 @@
 //**************************************************************************
 
 // relative devices return ~512 units per onscreen pixel
-const int32_t INPUT_RELATIVE_PER_PIXEL = 512;
+constexpr s32 INPUT_RELATIVE_PER_PIXEL = 512;
 
 // absolute devices return values between -65536 and +65536
-const int32_t INPUT_ABSOLUTE_MIN = -65536;
-const int32_t INPUT_ABSOLUTE_MAX = 65536;
+constexpr s32 INPUT_ABSOLUTE_MIN = -65536;
+constexpr s32 INPUT_ABSOLUTE_MAX = 65536;
 
 // maximum number of axis/buttons/hats with ITEM_IDs for use by osd layer
-const int INPUT_MAX_AXIS = 8;
-const int INPUT_MAX_BUTTONS = 32;
-const int INPUT_MAX_HATS = 4;
-const int INPUT_MAX_ADD_SWITCH = 16;
-const int INPUT_MAX_ADD_ABSOLUTE = 16;
-const int INPUT_MAX_ADD_RELATIVE = 16;
+constexpr int INPUT_MAX_AXIS = 8;
+constexpr int INPUT_MAX_BUTTONS = 32;
+constexpr int INPUT_MAX_HATS = 4;
+constexpr int INPUT_MAX_ADD_SWITCH = 16;
+constexpr int INPUT_MAX_ADD_ABSOLUTE = 16;
+constexpr int INPUT_MAX_ADD_RELATIVE = 16;
 
 
 // device classes
@@ -395,7 +395,7 @@ public:
 
 private:
 	// internal state
-	uint32_t      m_internal;
+	u32 m_internal;
 };
 
 
@@ -459,7 +459,7 @@ public:
 	input_class &device_class(input_device_class devclass) { assert(devclass >= DEVICE_CLASS_FIRST_VALID && devclass <= DEVICE_CLASS_LAST_VALID); return *m_class[devclass]; }
 
 	// input code readers
-	int32_t code_value(input_code code);
+	s32 code_value(input_code code);
 	bool code_pressed(input_code code) { return code_value(code) != 0; }
 	bool code_pressed_once(input_code code);
 
@@ -480,7 +480,7 @@ public:
 
 	// input sequence readers
 	bool seq_pressed(const input_seq &seq);
-	int32_t seq_axis_value(const input_seq &seq, input_item_class &itemclass);
+	s32 seq_axis_value(const input_seq &seq, input_item_class &itemclass);
 
 	// input sequence polling
 	void seq_poll_start(input_item_class itemclass, const input_seq *startseq = nullptr);
@@ -962,4 +962,4 @@ private:
 
 
 
-#endif  // __INPUT_H__
+#endif  // MAME_EMU_INPUT_H

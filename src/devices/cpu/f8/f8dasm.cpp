@@ -9,7 +9,7 @@ static const char *const rname[16] = {
 	"R8", "J",  "HU", "HL", "KU", "KL", "QU", "QL"
 };
 
-static offs_t internal_disasm_f8(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+CPU_DISASSEMBLE(f8)
 {
 	unsigned size = 0;
 	uint8_t op = oprom[size++];
@@ -531,14 +531,4 @@ static offs_t internal_disasm_f8(cpu_device *device, std::ostream &stream, offs_
 	}
 
 	return size;
-}
-
-
-CPU_DISASSEMBLE(f8)
-{
-	std::ostringstream stream;
-	offs_t result = internal_disasm_f8(device, stream, pc, oprom, opram, options);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
 }

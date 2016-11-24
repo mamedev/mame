@@ -512,16 +512,16 @@ uint32_t cosmac_device::disasm_max_opcode_bytes() const
 //  helper function
 //-------------------------------------------------
 
-offs_t cdp1801_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t cdp1801_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( cdp1801 );
-	return CPU_DISASSEMBLE_NAME( cdp1801 )(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME( cdp1801 )(this, stream, pc, oprom, opram, options);
 }
 
-offs_t cdp1802_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t cdp1802_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( cdp1802 );
-	return CPU_DISASSEMBLE_NAME( cdp1802 )(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME( cdp1802 )(this, stream, pc, oprom, opram, options);
 }
 
 

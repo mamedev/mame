@@ -11,14 +11,37 @@
     Graphics ROM board: 86612-B-2
      Program ROM board: 86612-C-2
 
-      Main CPU: 68000CP10
-     Sound CPU: Z80A
-           MCU: Intel C8751H-88
+      Main CPU: 68000CP10        @ 24MHz / 2 = 12MHz
+     Sound CPU: Z80A             @ 14.31818 / 4 = 3.579545MHz
+           MCU: Intel C8751H-88  @ 24MHz / 4 = 6MHz
     Sound Chip: YM2151 & YM3012
            OSC: 24.000 MHz (on the 86612-B-2 PCB)
         Custom: CAPCOM DL-010D-103 (on the 86612-B-2 PCB)
 
+    Horizontal scan rate: 15.606kHz
+    Vertical scan rate: 60.024Hz
+	
+    pixel clock:         6.000MHz, 166ns per pixel
 
+    htotal:             64.076us, 386 pixels
+    hsync:               5.312us,  32 pixels
+    back porch + sync:  15.106us,  91 pixels
+    active video:       42.662us, 257 pixels (it looks like the first pixel is repeated)
+    front porch:         6.308us,  38 pixels
+
+    vtotal:             16.660ms, 260 lines
+    vsync:             256.304us,   4 lines
+    back porch + sync:   1.282ms,  20 lines
+    active video:       14.353ms, 224 lines
+    front porch:         1.025ms,  16 lines
+
+    Clocks verified on 86612-A-2 and 86612-B-2 boards, serial no. 39646
+    ("Bionic Commando", US region) by scope measurement at clock pins.
+    Timings verified at SYNC pin and BLUE pin (jamma edge),
+    using an Agilent DSO9404A scope and two N2873A 500MHz probes
+
+    Note: Protection MCU is labelled "TS" without a number and without a coloured
+          stripe. Maybe its code is not region dependant.
     Note: Euro rom labels (IE: "TSE") had a blue stripe, while those labeled
           as USA (TSU) had an red stripe on the sticker.  The intermixing
           of TSE and TSU roms in the parent set is correct and verified.
@@ -349,6 +372,8 @@ static MACHINE_CONFIG_START( bionicc, bionicc_state )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", bionicc_state, bionicc_scanline, "screen", 0, 1)
 
+	/* Protection MCU Intel C8751H-88 runs at 24MHz / 4 = 6MHz */
+	
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_14_31818MHz / 4)   /* EXO3 C,B=GND, A=5V ==> Divisor 2^2 */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	/* FIXME: interrupt timing
@@ -360,10 +385,8 @@ static MACHINE_CONFIG_START( bionicc, bionicc_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	/* FIXME: should be 257 visible horizontal pixels, first visible pixel should be repeated, back porch/front porch should be separated */
+	MCFG_SCREEN_RAW_PARAMS(XTAL_24MHz / 4, 386, 0, 256, 260, 0, 224)
 	MCFG_SCREEN_UPDATE_DRIVER(bionicc_state, screen_update_bionicc)
 	MCFG_SCREEN_VBLANK_DEVICE("spriteram", buffered_spriteram16_device, vblank_copy_rising)
 	MCFG_SCREEN_PALETTE("palette")

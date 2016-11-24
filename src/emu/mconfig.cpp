@@ -103,7 +103,7 @@ screen_device *machine_config::first_screen() const
 //  new device
 //-------------------------------------------------
 
-device_t *machine_config::device_add(device_t *owner, const char *tag, device_type type, uint32_t clock)
+device_t *machine_config::device_add(device_t *owner, const char *tag, device_type type, u32 clock)
 {
 	const char *orig_tag = tag;
 
@@ -149,7 +149,7 @@ device_t *machine_config::device_add(device_t *owner, const char *tag, device_ty
 //  replace one device with a new device
 //-------------------------------------------------
 
-device_t *machine_config::device_replace(device_t *owner, const char *tag, device_type type, uint32_t clock)
+device_t *machine_config::device_replace(device_t *owner, const char *tag, device_type type, u32 clock)
 {
 	// find the original device by relative tag (must exist)
 	assert(owner != nullptr);

@@ -22,7 +22,7 @@
 
 #define ARCOMPACT_OPERATION ((op & 0xf800) >> 11)
 
-static offs_t internal_disasm_arcompact(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+CPU_DISASSEMBLE(arcompact)
 {
 	int size;
 
@@ -86,14 +86,4 @@ static offs_t internal_disasm_arcompact(cpu_device *device, std::ostream &stream
 	}
 
 	return size | DASMFLAG_SUPPORTED;
-}
-
-
-CPU_DISASSEMBLE(arcompact)
-{
-	std::ostringstream stream;
-	offs_t result = internal_disasm_arcompact(device, stream, pc, oprom, opram, options);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
 }

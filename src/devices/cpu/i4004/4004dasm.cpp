@@ -13,7 +13,7 @@
 #define OP(A)   oprom[(A) - PC]
 #define ARG(A)  opram[(A) - PC]
 
-static offs_t internal_disasm_i4004(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+CPU_DISASSEMBLE(i4004)
 {
 	uint32_t flags = 0;
 	uint8_t op;
@@ -130,14 +130,4 @@ static offs_t internal_disasm_i4004(cpu_device *device, std::ostream &stream, of
 		default : util::stream_format(stream, "illegal"); break;
 	}
 	return (pc - PC) | flags | DASMFLAG_SUPPORTED;
-}
-
-
-CPU_DISASSEMBLE(i4004)
-{
-	std::ostringstream stream;
-	offs_t result = internal_disasm_i4004(device, stream, pc, oprom, opram, options);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
 }

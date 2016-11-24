@@ -2946,7 +2946,7 @@ bool mips3_device::generate_cop1_fr0(drcuml_block *block, compiler_state *compil
 						generate_get_cop1_reg64(block, compiler, desc, FSREG, F0);  // dmov    F0,<fsreg>
 						UML_FDNEG(block, F1, F0);                                   // fdneg   F1,F0
 						UML_DCMP(block, F0, 0);                                     // cmp     F0,0.0
-						UML_DMOVc(block, COND_E, F1, U64(0x8000000000000000));      // dmov    F1,-0.0,e
+						UML_DMOVc(block, COND_E, F1, 0x8000000000000000U);          // dmov    F1,-0.0,e
 						generate_set_cop1_reg64(block, compiler, desc, FDREG, F1);  // dmov    <fdreg>,F1
 					}
 					return true;
@@ -3947,9 +3947,10 @@ void mips3_device::log_add_disasm_comment(drcuml_block *block, uint32_t pc, uint
 {
 	if (m_drcuml->logging())
 	{
-		char buffer[100];
-		dasmmips3(buffer, pc, op);
-		block->append_comment("%08X: %s", pc, buffer);                                  // comment
+		std::ostringstream stream;
+		dasmmips3(stream, pc, op);
+		const std::string stream_string = stream.str();
+		block->append_comment("%08X: %s", pc, stream_string.c_str());                                  // comment
 	}
 }
 
@@ -4077,19 +4078,21 @@ void mips3_device::log_opcode_desc(drcuml_state *drcuml, const opcode_desc *desc
 	/* output each descriptor */
 	for ( ; desclist != nullptr; desclist = desclist->next())
 	{
-		char buffer[100];
+		std::ostringstream buffer;
 
 		/* disassemle the current instruction and output it to the log */
 		if (drcuml->logging() || drcuml->logging_native())
 		{
 			if (desclist->flags & OPFLAG_VIRTUAL_NOOP)
-				strcpy(buffer, "<virtual nop>");
+				buffer << "<virtual nop>";
 			else
 				dasmmips3(buffer, desclist->pc, desclist->opptr.l[0]);
 		}
 		else
-			strcpy(buffer, "???");
-		drcuml->log_printf("%08X [%08X] t:%08X f:%s: %-30s", desclist->pc, desclist->physpc, desclist->targetpc, log_desc_flags_to_string(desclist->flags), buffer);
+			buffer << "???";
+		
+		const std::string buffer_string = buffer.str();
+		drcuml->log_printf("%08X [%08X] t:%08X f:%s: %-30s", desclist->pc, desclist->physpc, desclist->targetpc, log_desc_flags_to_string(desclist->flags), buffer_string.c_str());
 
 		/* output register states */
 		log_register_list(drcuml, "use", desclist->regin, nullptr);

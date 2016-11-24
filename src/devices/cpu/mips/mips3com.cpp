@@ -389,7 +389,7 @@ void mips3_device::tlb_write_common(int tlbindex)
 
 		/* fill in the new TLB entry from the COP0 registers */
 		entry->page_mask = m_core->cpr[0][COP0_PageMask];
-		entry->entry_hi = m_core->cpr[0][COP0_EntryHi] & ~(entry->page_mask & U64(0x0000000001ffe000));
+		entry->entry_hi = m_core->cpr[0][COP0_EntryHi] & ~(entry->page_mask & u64(0x0000000001ffe000U));
 		entry->entry_lo[0] = m_core->cpr[0][COP0_EntryLo0];
 		entry->entry_lo[1] = m_core->cpr[0][COP0_EntryLo1];
 

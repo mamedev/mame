@@ -382,16 +382,7 @@ unsigned g65816_disassemble(std::ostream &stream, unsigned int pc, unsigned int 
 	return length | DASMFLAG_SUPPORTED | dasm_flags;
 }
 
-unsigned g65816_disassemble(char *buffer, unsigned int pc, unsigned int pb, const uint8_t *oprom, int m_flag, int x_flag)
-{
-	std::ostringstream stream;
-	unsigned result = g65816_disassemble(stream, pc, pb, oprom, m_flag, x_flag);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
-}
-
 CPU_DISASSEMBLE( g65816_generic )
 {
-	return g65816_disassemble(buffer, (pc & 0x00ffff), (pc & 0xff0000) >> 16, oprom, 0, 0);
+	return g65816_disassemble(stream, (pc & 0x00ffff), (pc & 0xff0000) >> 16, oprom, 0, 0);
 }

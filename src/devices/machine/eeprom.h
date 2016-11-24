@@ -101,7 +101,7 @@ protected:
 	uint32_t                  m_cells;
 	uint8_t                   m_address_bits;
 	uint8_t                   m_data_bits;
-	generic_ptr             m_default_data;
+	const void *            m_default_data;
 	uint32_t                  m_default_data_size;
 	uint32_t                  m_default_value;
 	bool                    m_default_value_set;

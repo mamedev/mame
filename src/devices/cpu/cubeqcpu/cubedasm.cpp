@@ -58,7 +58,7 @@ static const char *const dst[] =
     SOUND DISASSEMBLY HOOK
 ***************************************************************************/
 
-static offs_t internal_disasm_cquestsnd(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+CPU_DISASSEMBLE(cquestsnd)
 {
 	static const char *const jmps[] =
 	{
@@ -125,21 +125,11 @@ static offs_t internal_disasm_cquestsnd(cpu_device *device, std::ostream &stream
 }
 
 
-CPU_DISASSEMBLE(cquestsnd)
-{
-	std::ostringstream stream;
-	offs_t result = internal_disasm_cquestsnd(device, stream, pc, oprom, opram, options);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
-}
-
-
 /***************************************************************************
     ROTATE DISASSEMBLY HOOK
 ***************************************************************************/
 
-static offs_t internal_disasm_cquestrot(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+CPU_DISASSEMBLE(cquestrot)
 {
 	static const char *const jmps[] =
 	{
@@ -231,21 +221,11 @@ static offs_t internal_disasm_cquestrot(cpu_device *device, std::ostream &stream
 }
 
 
-CPU_DISASSEMBLE(cquestrot)
-{
-	std::ostringstream stream;
-	offs_t result = internal_disasm_cquestrot(device, stream, pc, oprom, opram, options);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
-}
-
-
 /***************************************************************************
     LINE DRAWER DISASSEMBLY HOOK
 ***************************************************************************/
 
-static offs_t internal_disasm_cquestlin(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+CPU_DISASSEMBLE(cquestlin)
 {
 	static const char *const jmps[] =
 	{
@@ -324,14 +304,4 @@ static offs_t internal_disasm_cquestlin(cpu_device *device, std::ostream &stream
 			spfs[spf]);
 
 	return 1 | DASMFLAG_SUPPORTED;
-}
-
-
-CPU_DISASSEMBLE(cquestlin)
-{
-	std::ostringstream stream;
-	offs_t result = internal_disasm_cquestlin(device, stream, pc, oprom, opram, options);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
 }

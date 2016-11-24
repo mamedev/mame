@@ -114,7 +114,6 @@ static const dis_entry_t dis_table[] = {
 
 CPU_DISASSEMBLE(hp_nanoprocessor)
 {
-    std::ostringstream stream;
     const uint8_t opcode = *oprom;
 
     opram++;
@@ -125,8 +124,6 @@ CPU_DISASSEMBLE(hp_nanoprocessor)
 			if (ent.m_param_fn != nullptr) {
 				ent.m_param_fn(stream , opcode , opram);
 			}
-			std::string stream_str = stream.str();
-			strcpy(buffer, stream_str.c_str());
 			return ent.m_dasm_flags | DASMFLAG_SUPPORTED;
 		}
 	}

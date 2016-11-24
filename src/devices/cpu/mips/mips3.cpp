@@ -963,14 +963,14 @@ bool mips3_device::memory_translate(address_spacenum spacenum, int intention, of
 }
 
 
-offs_t mips3_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t mips3_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	uint32_t op = *(uint32_t *)oprom;
 	if (m_bigendian)
 		op = big_endianize_int32(op);
 	else
 		op = little_endianize_int32(op);
-	return dasmmips3(buffer, pc, op);
+	return dasmmips3(stream, pc, op);
 }
 
 
@@ -2983,7 +2983,7 @@ void mips3_device::ldl_be(uint32_t op)
 {
 	offs_t offs = SIMMVAL + RSVAL32;
 	int shift = 8 * (offs & 7);
-	uint64_t mask = U64(0xffffffffffffffff) << shift;
+	uint64_t mask = 0xffffffffffffffffU << shift;
 	uint64_t temp;
 
 	if (RDOUBLE_MASKED(offs & ~7, &temp, mask >> shift) && RTREG)
@@ -2994,7 +2994,7 @@ void mips3_device::ldr_be(uint32_t op)
 {
 	offs_t offs = SIMMVAL + RSVAL32;
 	int shift = 8 * (~offs & 7);
-	uint64_t mask = U64(0xffffffffffffffff) >> shift;
+	uint64_t mask = 0xffffffffffffffffU >> shift;
 	uint64_t temp;
 
 	if (RDOUBLE_MASKED(offs & ~7, &temp, mask << shift) && RTREG)
@@ -3021,7 +3021,7 @@ void mips3_device::sdl_be(uint32_t op)
 {
 	offs_t offs = SIMMVAL + RSVAL32;
 	int shift = 8 * (offs & 7);
-	uint64_t mask = U64(0xffffffffffffffff) >> shift;
+	uint64_t mask = 0xffffffffffffffffU >> shift;
 	WDOUBLE_MASKED(offs & ~7, RTVAL64 >> shift, mask);
 }
 
@@ -3029,7 +3029,7 @@ void mips3_device::sdr_be(uint32_t op)
 {
 	offs_t offs = SIMMVAL + RSVAL32;
 	int shift = 8 * (~offs & 7);
-	uint64_t mask = U64(0xffffffffffffffff) << shift;
+	uint64_t mask = 0xffffffffffffffffU << shift;
 	WDOUBLE_MASKED(offs & ~7, RTVAL64 << shift, mask);
 }
 
@@ -3061,7 +3061,7 @@ void mips3_device::ldl_le(uint32_t op)
 {
 	offs_t offs = SIMMVAL + RSVAL32;
 	int shift = 8 * (~offs & 7);
-	uint64_t mask = U64(0xffffffffffffffff) << shift;
+	uint64_t mask = 0xffffffffffffffffU << shift;
 	uint64_t temp;
 
 	if (RDOUBLE_MASKED(offs & ~7, &temp, mask >> shift) && RTREG)
@@ -3072,7 +3072,7 @@ void mips3_device::ldr_le(uint32_t op)
 {
 	offs_t offs = SIMMVAL + RSVAL32;
 	int shift = 8 * (offs & 7);
-	uint64_t mask = U64(0xffffffffffffffff) >> shift;
+	uint64_t mask = 0xffffffffffffffffU >> shift;
 	uint64_t temp;
 
 	if (RDOUBLE_MASKED(offs & ~7, &temp, mask << shift) && RTREG)
@@ -3099,7 +3099,7 @@ void mips3_device::sdl_le(uint32_t op)
 {
 	offs_t offs = SIMMVAL + RSVAL32;
 	int shift = 8 * (~offs & 7);
-	uint64_t mask = U64(0xffffffffffffffff) >> shift;
+	uint64_t mask = 0xffffffffffffffffU >> shift;
 	WDOUBLE_MASKED(offs & ~7, RTVAL64 >> shift, mask);
 }
 
@@ -3107,6 +3107,6 @@ void mips3_device::sdr_le(uint32_t op)
 {
 	offs_t offs = SIMMVAL + RSVAL32;
 	int shift = 8 * (offs & 7);
-	uint64_t mask = U64(0xffffffffffffffff) << shift;
+	uint64_t mask = 0xffffffffffffffffU << shift;
 	WDOUBLE_MASKED(offs & ~7, RTVAL64 << shift, mask);
 }

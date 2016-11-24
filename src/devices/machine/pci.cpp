@@ -150,7 +150,7 @@ WRITE32_MEMBER(pci_device::address_base_w)
 	if(bank_reg_infos[offset].hi)
 		bank_infos[bid].adr = (bank_infos[bid].adr & 0xffffffff) | (uint64_t(data) << 32);
 	else {
-		bank_infos[bid].adr = (bank_infos[bid].adr & U64(0xffffffff00000000)) | data;
+		bank_infos[bid].adr = (bank_infos[bid].adr & 0xffffffff00000000U) | data;
 	}
 	remap_cb();
 }

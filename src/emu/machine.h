@@ -14,8 +14,8 @@
 #error Dont include this file directly; include emu.h instead.
 #endif
 
-#ifndef __MACHINE_H__
-#define __MACHINE_H__
+#ifndef MAME_EMU_MACHINE_H
+#define MAME_EMU_MACHINE_H
 
 #include <functional>
 
@@ -114,18 +114,18 @@ public:
 	{
 		void set(struct tm &t);
 
-		uint8_t       second;     // seconds (0-59)
-		uint8_t       minute;     // minutes (0-59)
-		uint8_t       hour;       // hours (0-23)
-		uint8_t       mday;       // day of month (1-31)
-		uint8_t       month;      // month (0-11)
-		int32_t       year;       // year (1=1 AD)
-		uint8_t       weekday;    // day of week (0-6)
-		uint16_t      day;        // day of year (0-365)
-		uint8_t       is_dst;     // is this daylight savings?
+		u8          second;     // seconds (0-59)
+		u8          minute;     // minutes (0-59)
+		u8          hour;       // hours (0-23)
+		u8          mday;       // day of month (1-31)
+		u8          month;      // month (0-11)
+		s32         year;       // year (1=1 AD)
+		u8          weekday;    // day of week (0-6)
+		u16         day;        // day of year (0-365)
+		u8          is_dst;     // is this daylight savings?
 	};
 
-	int64_t           time;       // number of seconds elapsed since midnight, January 1 1970 UTC
+	s64           time;       // number of seconds elapsed since midnight, January 1 1970 UTC
 	full_time       local_time; // local time
 	full_time       utc_time;   // UTC coordinated time
 };
@@ -140,7 +140,7 @@ class dummy_space_device : public device_t,
 	public device_memory_interface
 {
 public:
-	dummy_space_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	dummy_space_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
@@ -262,7 +262,7 @@ public:
 	template <typename Format, typename... Params> void popmessage(Format &&fmt, Params &&... args) const;
 	template <typename Format, typename... Params> void logerror(Format &&fmt, Params &&... args) const;
 	void strlog(const char *str) const;
-	uint32_t rand();
+	u32 rand();
 	const char *describe_context();
 	std::string compose_saveload_filename(const char *base_filename, const char **searchpath = nullptr);
 
@@ -275,7 +275,7 @@ private:
 
 public:
 	// debugger-related information
-	uint32_t                  debug_flags;        // the current debug flags
+	u32                     debug_flags;        // the current debug flags
 
 private:
 	// internal helpers
@@ -285,7 +285,7 @@ private:
 	void set_saveload_filename(const char *filename);
 	std::string get_statename(const char *statename_opt) const;
 	void handle_saveload();
-	void soft_reset(void *ptr = nullptr, int32_t param = 0);
+	void soft_reset(void *ptr = nullptr, s32 param = 0);
 	std::string nvram_filename(device_t &device) const;
 	void nvram_load();
 	void nvram_save();
@@ -332,7 +332,7 @@ private:
 	emu_timer *             m_soft_reset_timer;     // timer used to schedule a soft reset
 
 	// misc state
-	uint32_t                  m_rand_seed;            // current random number seed
+	u32                     m_rand_seed;            // current random number seed
 	bool                    m_ui_active;            // ui active or not (useful for games / systems with keyboard inputs)
 	time_t                  m_base_time;            // real time at initial emulation time
 	std::string             m_basename;             // basename used for game-related paths
@@ -436,4 +436,4 @@ inline void running_machine::logerror(Format &&fmt, Params &&... args) const
 	}
 }
 
-#endif  /* __MACHINE_H__ */
+#endif  /* MAME_EMU_MACHINE_H */

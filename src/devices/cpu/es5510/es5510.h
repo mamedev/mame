@@ -134,7 +134,7 @@ protected:
 	virtual void execute_run() override;
 	virtual uint32_t disasm_min_opcode_bytes() const override;
 	virtual uint32_t disasm_max_opcode_bytes() const override;
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 	virtual void execute_set_input(int linenum, int state) override;
 
 	int32_t alu_operation(uint8_t op, int32_t aValue, int32_t bValue, uint8_t &flags);

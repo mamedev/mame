@@ -341,20 +341,11 @@ offs_t rsp_dasm_one(std::ostream &stream, offs_t pc, uint32_t op)
 	return 4 | flags | DASMFLAG_SUPPORTED;
 }
 
-offs_t rsp_dasm_one(char *buffer, offs_t pc, uint32_t op)
-{
-	std::ostringstream stream;
-	offs_t result = rsp_dasm_one(stream, pc, op);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
-}
-
 /*****************************************************************************/
 
 CPU_DISASSEMBLE( rsp )
 {
 	uint32_t op = *(uint32_t *)opram;
 	op = big_endianize_int32(op);
-	return rsp_dasm_one(buffer, pc, op);
+	return rsp_dasm_one(stream, pc, op);
 }

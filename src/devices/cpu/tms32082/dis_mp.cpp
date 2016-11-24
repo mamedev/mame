@@ -505,16 +505,7 @@ static offs_t tms32082_disasm_mp(std::ostream &stream, offs_t pc, const uint8_t 
 	return opbytes | flags | DASMFLAG_SUPPORTED;
 }
 
-static offs_t tms32082_disasm_mp(char *buffer, offs_t pc, const uint8_t *oprom)
-{
-	std::ostringstream stream;
-	offs_t result = tms32082_disasm_mp(stream, pc, oprom);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
-}
-
 CPU_DISASSEMBLE(tms32082_mp)
 {
-	return tms32082_disasm_mp(buffer, pc, oprom);
+	return tms32082_disasm_mp(stream, pc, oprom);
 }

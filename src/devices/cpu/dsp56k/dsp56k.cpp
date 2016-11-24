@@ -293,8 +293,8 @@ void dsp56k_device::device_start()
 	state_add(DSP56K_X,      "X", m_dsp56k_core.ALU.x.d).mask(0xffffffff).formatstr("%9s");
 	state_add(DSP56K_Y,      "Y", m_dsp56k_core.ALU.y.d).mask(0xffffffff).formatstr("%9s");
 
-	state_add(DSP56K_A,      "A", m_dsp56k_core.ALU.a.q).mask((uint64_t)U64(0xffffffffffffffff)).formatstr("%12s"); /* could benefit from a better mask? */
-	state_add(DSP56K_B,      "B", m_dsp56k_core.ALU.b.q).mask((uint64_t)U64(0xffffffffffffffff)).formatstr("%12s"); /* could benefit from a better mask? */
+	state_add(DSP56K_A,      "A", m_dsp56k_core.ALU.a.q).mask(u64(0xffffffffffffffffU)).formatstr("%12s"); /* could benefit from a better mask? */
+	state_add(DSP56K_B,      "B", m_dsp56k_core.ALU.b.q).mask(u64(0xffffffffffffffffU)).formatstr("%12s"); /* could benefit from a better mask? */
 
 	state_add(DSP56K_R0,     "R0", m_dsp56k_core.AGU.r0).formatstr("%04X");
 	state_add(DSP56K_R1,     "R1", m_dsp56k_core.AGU.r1).formatstr("%04X");
@@ -494,8 +494,8 @@ void dsp56k_device::execute_run()
 }
 
 
-offs_t dsp56k_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t dsp56k_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( dsp56k );
-	return CPU_DISASSEMBLE_NAME(dsp56k)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(dsp56k)(this, stream, pc, oprom, opram, options);
 }

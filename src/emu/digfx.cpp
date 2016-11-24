@@ -124,23 +124,23 @@ void device_gfx_interface::decode_gfx(const gfx_decode_entry *gfxdecodeinfo)
 
 	// local variables to hold mutable copies of gfx layout data
 	gfx_layout glcopy;
-	std::vector<uint32_t> extxoffs(0);
-	std::vector<uint32_t> extyoffs(0);
+	std::vector<u32> extxoffs(0);
+	std::vector<u32> extyoffs(0);
 
 	// loop over all elements
-	for (uint8_t curgfx = 0; curgfx < MAX_GFX_ELEMENTS && gfxdecodeinfo[curgfx].gfxlayout != nullptr; curgfx++)
+	for (u8 curgfx = 0; curgfx < MAX_GFX_ELEMENTS && gfxdecodeinfo[curgfx].gfxlayout != nullptr; curgfx++)
 	{
 		const gfx_decode_entry &gfx = gfxdecodeinfo[curgfx];
 
 		// extract the scale factors and xormask
-		uint32_t xscale = GFXENTRY_GETXSCALE(gfx.flags);
-		uint32_t yscale = GFXENTRY_GETYSCALE(gfx.flags);
-		uint32_t xormask = GFXENTRY_ISREVERSE(gfx.flags) ? 7 : 0;
+		u32 xscale = GFXENTRY_GETXSCALE(gfx.flags);
+		u32 yscale = GFXENTRY_GETYSCALE(gfx.flags);
+		u32 xormask = GFXENTRY_ISREVERSE(gfx.flags) ? 7 : 0;
 
 		// resolve the region
-		uint32_t       region_length;
-		const uint8_t *region_base;
-		uint8_t        region_width;
+		u32          region_length;
+		const u8     *region_base;
+		u8           region_width;
 		endianness_t region_endianness;
 
 		if (gfx.memory_region != nullptr)
@@ -151,7 +151,7 @@ void device_gfx_interface::decode_gfx(const gfx_decode_entry *gfxdecodeinfo)
 				memory_share *share = basedevice.memshare(gfx.memory_region);
 				assert(share != nullptr);
 				region_length = 8 * share->bytes();
-				region_base = reinterpret_cast<uint8_t *>(share->ptr());
+				region_base = reinterpret_cast<u8 *>(share->ptr());
 				region_width = share->bytewidth();
 				region_endianness = share->endianness();
 			}
@@ -205,8 +205,8 @@ void device_gfx_interface::decode_gfx(const gfx_decode_entry *gfxdecodeinfo)
 			// copy the X and Y offsets into our temporary arrays
 			extxoffs.resize(glcopy.width * xscale);
 			extyoffs.resize(glcopy.height * yscale);
-			memcpy(&extxoffs[0], (glcopy.extxoffs != nullptr) ? glcopy.extxoffs : glcopy.xoffset, glcopy.width * sizeof(uint32_t));
-			memcpy(&extyoffs[0], (glcopy.extyoffs != nullptr) ? glcopy.extyoffs : glcopy.yoffset, glcopy.height * sizeof(uint32_t));
+			memcpy(&extxoffs[0], (glcopy.extxoffs != nullptr) ? glcopy.extxoffs : glcopy.xoffset, glcopy.width * sizeof(u32));
+			memcpy(&extyoffs[0], (glcopy.extyoffs != nullptr) ? glcopy.extyoffs : glcopy.yoffset, glcopy.height * sizeof(u32));
 
 			// always use the extended offsets here
 			glcopy.extxoffs = &extxoffs[0];
@@ -229,7 +229,7 @@ void device_gfx_interface::decode_gfx(const gfx_decode_entry *gfxdecodeinfo)
 			// loop over all the planes, converting fractions
 			for (int j = 0; j < glcopy.planes; j++)
 			{
-				uint32_t value1 = glcopy.planeoffset[j];
+				u32 value1 = glcopy.planeoffset[j];
 				if (IS_FRAC(value1))
 				{
 					assert(region_length != 0);
@@ -240,7 +240,7 @@ void device_gfx_interface::decode_gfx(const gfx_decode_entry *gfxdecodeinfo)
 			// loop over all the X/Y offsets, converting fractions
 			for (int j = 0; j < glcopy.width; j++)
 			{
-				uint32_t value2 = extxoffs[j];
+				u32 value2 = extxoffs[j];
 				if (IS_FRAC(value2))
 				{
 					assert(region_length != 0);
@@ -250,7 +250,7 @@ void device_gfx_interface::decode_gfx(const gfx_decode_entry *gfxdecodeinfo)
 
 			for (int j = 0; j < glcopy.height; j++)
 			{
-				uint32_t value3 = extyoffs[j];
+				u32 value3 = extyoffs[j];
 				if (IS_FRAC(value3))
 				{
 					assert(region_length != 0);
@@ -328,7 +328,7 @@ void device_gfx_interface::interface_validity_check(validity_checker &valid) con
 			else
 				gfxregion = device().owner()->subtag(region);
 
-			uint32_t region_length = valid.region_length(gfxregion.c_str());
+			u32 region_length = valid.region_length(gfxregion.c_str());
 			if (region_length == 0)
 				osd_printf_error("gfx[%d] references nonexistent region '%s'\n", gfxnum, gfxregion.c_str());
 

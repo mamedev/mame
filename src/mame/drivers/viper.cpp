@@ -528,25 +528,25 @@ static void mpc8240_pci_w(device_t *busdevice, device_t *device, int function, i
 READ64_MEMBER(viper_state::pci_config_addr_r)
 {
 	pci_bus_legacy_device *device = machine().device<pci_bus_legacy_device>("pcibus");
-	return device->read_64be(space, 0, U64(0xffffffff00000000));
+	return device->read_64be(space, 0, 0xffffffff00000000U);
 }
 
 WRITE64_MEMBER(viper_state::pci_config_addr_w)
 {
 	pci_bus_legacy_device *device = machine().device<pci_bus_legacy_device>("pcibus");
-	device->write_64be(space, 0, data, U64(0xffffffff00000000));
+	device->write_64be(space, 0, data, 0xffffffff00000000U);
 }
 
 READ64_MEMBER(viper_state::pci_config_data_r)
 {
 	pci_bus_legacy_device *device = machine().device<pci_bus_legacy_device>("pcibus");
-	return device->read_64be(space, 1, U64(0x00000000ffffffff)) << 32;
+	return device->read_64be(space, 1, 0x00000000ffffffffU) << 32;
 }
 
 WRITE64_MEMBER(viper_state::pci_config_data_w)
 {
 	pci_bus_legacy_device *device = machine().device<pci_bus_legacy_device>("pcibus");
-	device->write_64be(space, 1, data >> 32, U64(0x00000000ffffffff));
+	device->write_64be(space, 1, data >> 32, 0x00000000ffffffffU);
 }
 
 
@@ -1756,9 +1756,9 @@ TIMER_CALLBACK_MEMBER(viper_state::ds2430_timer_callback)
 READ64_MEMBER(viper_state::unk1_r)
 {
 	uint64_t r = 0;
-	//return 0;//U64(0x0000400000000000);
+	//return 0;//0x0000400000000000U;
 
-	r |= U64(0xffff00000000ffff);
+	r |= 0xffff00000000ffffU;
 
 	if (ACCESSING_BITS_40_47)
 	{
@@ -1771,10 +1771,10 @@ READ64_MEMBER(viper_state::unk1_r)
 		r |= reg << 40;
 
 		//r |= (uint64_t)(unk1_bit << 5) << 40;
-		//r |= U64(0x0000400000000000);
+		//r |= 0x0000400000000000U;
 
-		//r |= U64(0x0000040000000000); // screen flip
-		//r |= U64(0x0000080000000000); // memory card check (1 = enable)
+		//r |= 0x0000040000000000U; // screen flip
+		//r |= 0x0000080000000000U; // memory card check (1 = enable)
 	}
 	if (ACCESSING_BITS_32_39)
 	{
@@ -1984,7 +1984,7 @@ WRITE64_MEMBER(viper_state::e00008_w)
 
 READ64_MEMBER(viper_state::e00000_r)
 {
-	uint64_t r = 0;//U64(0xffffffffffffffff);
+	uint64_t r = 0;//0xffffffffffffffffU;
 	return r;
 }
 
@@ -2056,7 +2056,7 @@ WRITE64_MEMBER(viper_state::unk_serial_w)
 
 static ADDRESS_MAP_START(viper_map, AS_PROGRAM, 64, viper_state )
 	AM_RANGE(0x00000000, 0x00ffffff) AM_MIRROR(0x1000000) AM_RAM AM_SHARE("workram")
-	AM_RANGE(0x80000000, 0x800fffff) AM_READWRITE32(epic_r, epic_w,U64(0xffffffffffffffff))
+	AM_RANGE(0x80000000, 0x800fffff) AM_READWRITE32(epic_r, epic_w,0xffffffffffffffffU)
 	AM_RANGE(0x82000000, 0x83ffffff) AM_READWRITE(voodoo3_r, voodoo3_w)
 	AM_RANGE(0x84000000, 0x85ffffff) AM_READWRITE(voodoo3_lfb_r, voodoo3_lfb_w)
 	AM_RANGE(0xfe800000, 0xfe8000ff) AM_READWRITE(voodoo3_io_r, voodoo3_io_w)
@@ -2068,7 +2068,7 @@ static ADDRESS_MAP_START(viper_map, AS_PROGRAM, 64, viper_state )
 	AM_RANGE(0xffe00000, 0xffe00007) AM_READ(e00000_r)
 	AM_RANGE(0xffe00008, 0xffe0000f) AM_READWRITE(e00008_r, e00008_w)
 	AM_RANGE(0xffe10000, 0xffe10007) AM_READ(unk1_r)
-	AM_RANGE(0xffe30000, 0xffe31fff) AM_DEVREADWRITE8("m48t58", timekeeper_device, read, write, U64(0xffffffffffffffff))
+	AM_RANGE(0xffe30000, 0xffe31fff) AM_DEVREADWRITE8("m48t58", timekeeper_device, read, write, 0xffffffffffffffffU)
 	AM_RANGE(0xffe40000, 0xffe4000f) AM_NOP
 	AM_RANGE(0xffe50000, 0xffe50007) AM_WRITE(unk2_w)
 	AM_RANGE(0xffe70000, 0xffe7000f) AM_READWRITE(e70000_r, e70000_w)

@@ -72,7 +72,7 @@ static ADDRESS_MAP_START(pippin_mem, AS_PROGRAM, 64, macpci_state)
 	AM_RANGE(0xf00dfff8, 0xf00dffff) AM_READ(unk2_r)
 	AM_RANGE(0xf3008800, 0xf3008807) AM_READ(unk1_r)
 
-	AM_RANGE(0xf3016000, 0xf3017fff) AM_READWRITE16(mac_via_r, mac_via_w, U64(0xffffffffffffffff))
+	AM_RANGE(0xf3016000, 0xf3017fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffffffffffffU)
 
 	AM_RANGE(0xffc00000, 0xffffffff) AM_ROM AM_REGION("bootrom",0)
 ADDRESS_MAP_END

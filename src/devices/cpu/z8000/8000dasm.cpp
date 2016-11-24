@@ -48,7 +48,7 @@ static const char *const ints[4] = {
 int z8k_segm;                               /* Current disassembler mode: 0 - non-segmented, 1 - segmented */
 int z8k_segm_mode = Z8K_SEGM_MODE_AUTO;     /* User disassembler mode setting: segmented, non-segmented, auto */
 
-static offs_t internal_disasm_z8000(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+CPU_DISASSEMBLE(z8000)
 {
 	int new_pc = pc, i, j, tmp;
 	const char *src;
@@ -310,14 +310,4 @@ static offs_t internal_disasm_z8000(cpu_device *device, std::ostream &stream, of
 			break;
 	}
 	return (new_pc - pc) | flags | DASMFLAG_SUPPORTED;
-}
-
-
-CPU_DISASSEMBLE(z8000)
-{
-	std::ostringstream stream;
-	offs_t result = internal_disasm_z8000(device, stream, pc, oprom, opram, options);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
 }

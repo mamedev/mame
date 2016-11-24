@@ -1147,15 +1147,6 @@ static offs_t mcs51_dasm( const char **mem_names, std::ostream &stream, offs_t p
 	return (PC - pc) | flags | DASMFLAG_SUPPORTED;
 }
 
-static offs_t mcs51_dasm(const char **mem_names, char *dst, offs_t pc, const uint8_t *oprom, const uint8_t *opram)
-{
-	std::ostringstream stream;
-	offs_t result = mcs51_dasm(mem_names, stream, pc, oprom, opram);
-	std::string stream_str = stream.str();
-	strcpy(dst, stream_str.c_str());
-	return result;
-}
-
 CPU_DISASSEMBLE( i8051 )
 {
 	static const char *mem_names[0x200];
@@ -1166,7 +1157,7 @@ CPU_DISASSEMBLE( i8051 )
 		init_mem_names( FEATURE_NONE, mem_names);
 		mem_names_initialized = 1;
 	}
-	return mcs51_dasm(mem_names, buffer, pc, oprom, opram);
+	return mcs51_dasm(mem_names, stream, pc, oprom, opram);
 }
 
 CPU_DISASSEMBLE( i8052 )
@@ -1179,7 +1170,7 @@ CPU_DISASSEMBLE( i8052 )
 		init_mem_names( FEATURE_I8052, mem_names);
 		mem_names_initialized = 1;
 	}
-	return mcs51_dasm(mem_names, buffer, pc, oprom, opram);
+	return mcs51_dasm(mem_names, stream, pc, oprom, opram);
 }
 
 CPU_DISASSEMBLE( i80c51 )
@@ -1192,7 +1183,7 @@ CPU_DISASSEMBLE( i80c51 )
 		init_mem_names( FEATURE_CMOS, mem_names);
 		mem_names_initialized = 1;
 	}
-	return mcs51_dasm(mem_names, buffer, pc, oprom, opram);
+	return mcs51_dasm(mem_names, stream, pc, oprom, opram);
 }
 
 CPU_DISASSEMBLE( i80c52 )
@@ -1205,7 +1196,7 @@ CPU_DISASSEMBLE( i80c52 )
 		init_mem_names( FEATURE_I8052 | FEATURE_CMOS | FEATURE_I80C52, mem_names);
 		mem_names_initialized = 1;
 	}
-	return mcs51_dasm(mem_names, buffer, pc, oprom, opram);
+	return mcs51_dasm(mem_names, stream, pc, oprom, opram);
 }
 
 CPU_DISASSEMBLE( ds5002fp )
@@ -1218,5 +1209,5 @@ CPU_DISASSEMBLE( ds5002fp )
 		init_mem_names( FEATURE_DS5002FP | FEATURE_CMOS, mem_names);
 		mem_names_initialized = 1;
 	}
-	return mcs51_dasm(mem_names, buffer, pc, oprom, opram);
+	return mcs51_dasm(mem_names, stream, pc, oprom, opram);
 }

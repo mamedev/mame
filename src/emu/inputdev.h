@@ -25,7 +25,7 @@ class input_manager;
 
 
 // callback for getting the value of an item on a device
-typedef int32_t (*item_get_state_func)(void *device_internal, void *item_internal);
+typedef s32 (*item_get_state_func)(void *device_internal, void *item_internal);
 
 // ======================> joystick_map
 
@@ -47,15 +47,15 @@ public:
 	std::string to_string() const;
 
 	// update the state of a live map
-	uint8_t update(int32_t xaxisval, int32_t yaxisval);
+	u8 update(s32 xaxisval, s32 yaxisval);
 
 	// joystick mapping codes
-	static const uint8_t JOYSTICK_MAP_NEUTRAL = 0x00;
-	static const uint8_t JOYSTICK_MAP_LEFT    = 0x01;
-	static const uint8_t JOYSTICK_MAP_RIGHT   = 0x02;
-	static const uint8_t JOYSTICK_MAP_UP      = 0x04;
-	static const uint8_t JOYSTICK_MAP_DOWN    = 0x08;
-	static const uint8_t JOYSTICK_MAP_STICKY  = 0x0f;
+	static constexpr u8 JOYSTICK_MAP_NEUTRAL = 0x00;
+	static constexpr u8 JOYSTICK_MAP_LEFT    = 0x01;
+	static constexpr u8 JOYSTICK_MAP_RIGHT   = 0x02;
+	static constexpr u8 JOYSTICK_MAP_UP      = 0x04;
+	static constexpr u8 JOYSTICK_MAP_DOWN    = 0x08;
+	static constexpr u8 JOYSTICK_MAP_STICKY  = 0x0f;
 
 private:
 	// internal helpers
@@ -67,8 +67,8 @@ private:
 	}
 
 	// internal state
-	uint8_t                   m_map[9][9];            // 9x9 grid
-	uint8_t                   m_lastmap;              // last value returned (for sticky tracking)
+	u8                      m_map[9][9];            // 9x9 grid
+	u8                      m_lastmap;              // last value returned (for sticky tracking)
 	std::string             m_origstring;           // originally parsed string
 };
 
@@ -95,17 +95,17 @@ public:
 	input_item_class itemclass() const { return m_itemclass; }
 	input_code code() const;
 	const char *token() const { return m_token.c_str(); }
-	int32_t current() const { return m_current; }
-	int32_t memory() const { return m_memory; }
+	s32 current() const { return m_current; }
+	s32 memory() const { return m_memory; }
 
 	// helpers
-	int32_t update_value();
-	void set_memory(int32_t value) { m_memory = value; }
+	s32 update_value();
+	void set_memory(s32 value) { m_memory = value; }
 
 	// readers
-	virtual int32_t read_as_switch(input_item_modifier modifier) = 0;
-	virtual int32_t read_as_relative(input_item_modifier modifier) = 0;
-	virtual int32_t read_as_absolute(input_item_modifier modifier) = 0;
+	virtual s32 read_as_switch(input_item_modifier modifier) = 0;
+	virtual s32 read_as_relative(input_item_modifier modifier) = 0;
+	virtual s32 read_as_absolute(input_item_modifier modifier) = 0;
 
 protected:
 	// internal state
@@ -118,8 +118,8 @@ protected:
 	std::string             m_token;                // tokenized name for non-standard items
 
 	// live state
-	int32_t                   m_current;              // current raw value
-	int32_t                   m_memory;               // "memory" value, to remember where we started during polling
+	s32                     m_current;              // current raw value
+	s32                     m_memory;               // "memory" value, to remember where we started during polling
 };
 
 
@@ -155,13 +155,13 @@ public:
 	input_item_id add_item(const char *name, input_item_id itemid, item_get_state_func getstate, void *internal = nullptr);
 
 	// helpers
-	int32_t adjust_absolute(int32_t value) const { return adjust_absolute_value(value); }
+	s32 adjust_absolute(s32 value) const { return adjust_absolute_value(value); }
 	bool match_device_id(const char *deviceid);
 
 protected:
 	// specific overrides
 	virtual input_device_class device_class() const = 0;
-	virtual int32_t adjust_absolute_value(int32_t value) const { return value; }
+	virtual s32 adjust_absolute_value(s32 value) const { return value; }
 
 private:
 	// internal state
@@ -241,13 +241,13 @@ public:
 protected:
 	// specific overrides
 	virtual input_device_class device_class() const override { return DEVICE_CLASS_JOYSTICK; }
-	virtual int32_t adjust_absolute_value(int32_t value) const override;
+	virtual s32 adjust_absolute_value(s32 value) const override;
 
 private:
 	// joystick information
 	joystick_map            m_joymap;               // joystick map for this device
-	int32_t                 m_joystick_deadzone;    // deadzone for joystick
-	int32_t                 m_joystick_saturation;  // saturation position for joystick
+	s32                     m_joystick_deadzone;    // deadzone for joystick
+	s32                     m_joystick_saturation;  // saturation position for joystick
 };
 
 
@@ -393,7 +393,7 @@ protected:
 inline input_manager &input_device_item::manager() const { return m_device.manager(); }
 inline running_machine &input_device_item::machine() const { return m_device.machine(); }
 inline input_code input_device_item::code() const { return input_code(m_device.devclass(), m_device.devindex(), m_itemclass, ITEM_MODIFIER_NONE, m_itemid); }
-inline int32_t input_device_item::update_value() { return m_current = (*m_getstate)(m_device.internal(), m_internal); }
+inline s32 input_device_item::update_value() { return m_current = (*m_getstate)(m_device.internal(), m_internal); }
 
 
 

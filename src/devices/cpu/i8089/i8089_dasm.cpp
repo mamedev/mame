@@ -437,20 +437,10 @@ const char *i8089_instruction::m_reg[] =
 	"ga", "gb", "gc", "bc", "tp", "ix", "cc", "mc"
 };
 
-static offs_t internal_disasm_i8089(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+CPU_DISASSEMBLE(i8089)
 {
 	std::unique_ptr<i8089_instruction> i = std::make_unique<i8089_instruction>(pc, oprom);
 	stream << i->buffer();
 	offs_t result = i->length() | i->flags();
-	return result;
-}
-
-
-CPU_DISASSEMBLE(i8089)
-{
-	std::ostringstream stream;
-	offs_t result = internal_disasm_i8089(device, stream, pc, oprom, opram, options);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
 	return result;
 }

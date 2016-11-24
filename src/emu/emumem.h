@@ -14,8 +14,8 @@
 #error Dont include this file directly; include emu.h instead.
 #endif
 
-#ifndef __EMUMEM_H__
-#define __EMUMEM_H__
+#ifndef MAME_EMU_EMUMEM_H
+#define MAME_EMU_EMUMEM_H
 
 
 
@@ -77,7 +77,7 @@ class address_table_setoffset;
 
 
 // offsets and addresses are 32-bit (for now...)
-typedef uint32_t  offs_t;
+typedef u32 offs_t;
 
 // address map constructors are functions that build up an address_map
 typedef void (*address_map_constructor)(address_map &map);
@@ -88,21 +88,21 @@ typedef named_delegate<void (address_map &)> address_map_delegate;
 // struct with function pointers for accessors; use is generally discouraged unless necessary
 struct data_accessors
 {
-	uint8_t       (*read_byte)(address_space &space, offs_t byteaddress);
-	uint16_t      (*read_word)(address_space &space, offs_t byteaddress);
-	uint16_t      (*read_word_masked)(address_space &space, offs_t byteaddress, uint16_t mask);
-	uint32_t      (*read_dword)(address_space &space, offs_t byteaddress);
-	uint32_t      (*read_dword_masked)(address_space &space, offs_t byteaddress, uint32_t mask);
-	uint64_t      (*read_qword)(address_space &space, offs_t byteaddress);
-	uint64_t      (*read_qword_masked)(address_space &space, offs_t byteaddress, uint64_t mask);
+	u8      (*read_byte)(address_space &space, offs_t byteaddress);
+	u16     (*read_word)(address_space &space, offs_t byteaddress);
+	u16     (*read_word_masked)(address_space &space, offs_t byteaddress, u16 mask);
+	u32     (*read_dword)(address_space &space, offs_t byteaddress);
+	u32     (*read_dword_masked)(address_space &space, offs_t byteaddress, u32 mask);
+	u64     (*read_qword)(address_space &space, offs_t byteaddress);
+	u64     (*read_qword_masked)(address_space &space, offs_t byteaddress, u64 mask);
 
-	void        (*write_byte)(address_space &space, offs_t byteaddress, uint8_t data);
-	void        (*write_word)(address_space &space, offs_t byteaddress, uint16_t data);
-	void        (*write_word_masked)(address_space &space, offs_t byteaddress, uint16_t data, uint16_t mask);
-	void        (*write_dword)(address_space &space, offs_t byteaddress, uint32_t data);
-	void        (*write_dword_masked)(address_space &space, offs_t byteaddress, uint32_t data, uint32_t mask);
-	void        (*write_qword)(address_space &space, offs_t byteaddress, uint64_t data);
-	void        (*write_qword_masked)(address_space &space, offs_t byteaddress, uint64_t data, uint64_t mask);
+	void    (*write_byte)(address_space &space, offs_t byteaddress, u8 data);
+	void    (*write_word)(address_space &space, offs_t byteaddress, u16 data);
+	void    (*write_word_masked)(address_space &space, offs_t byteaddress, u16 data, u16 mask);
+	void    (*write_dword)(address_space &space, offs_t byteaddress, u32 data);
+	void    (*write_dword_masked)(address_space &space, offs_t byteaddress, u32 data, u32 mask);
+	void    (*write_qword)(address_space &space, offs_t byteaddress, u64 data);
+	void    (*write_qword_masked)(address_space &space, offs_t byteaddress, u64 data, u64 mask);
 };
 
 
@@ -115,19 +115,19 @@ typedef delegate<offs_t (direct_read_data &, offs_t)> direct_update_delegate;
 // ======================> read_delegate
 
 // declare delegates for each width
-typedef device_delegate<uint8_t (address_space &, offs_t, uint8_t)> read8_delegate;
-typedef device_delegate<uint16_t (address_space &, offs_t, uint16_t)> read16_delegate;
-typedef device_delegate<uint32_t (address_space &, offs_t, uint32_t)> read32_delegate;
-typedef device_delegate<uint64_t (address_space &, offs_t, uint64_t)> read64_delegate;
+typedef device_delegate<u8 (address_space &, offs_t, u8)> read8_delegate;
+typedef device_delegate<u16 (address_space &, offs_t, u16)> read16_delegate;
+typedef device_delegate<u32 (address_space &, offs_t, u32)> read32_delegate;
+typedef device_delegate<u64 (address_space &, offs_t, u64)> read64_delegate;
 
 
 // ======================> write_delegate
 
 // declare delegates for each width
-typedef device_delegate<void (address_space &, offs_t, uint8_t, uint8_t)> write8_delegate;
-typedef device_delegate<void (address_space &, offs_t, uint16_t, uint16_t)> write16_delegate;
-typedef device_delegate<void (address_space &, offs_t, uint32_t, uint32_t)> write32_delegate;
-typedef device_delegate<void (address_space &, offs_t, uint64_t, uint64_t)> write64_delegate;
+typedef device_delegate<void (address_space &, offs_t, u8, u8)> write8_delegate;
+typedef device_delegate<void (address_space &, offs_t, u16, u16)> write16_delegate;
+typedef device_delegate<void (address_space &, offs_t, u32, u32)> write32_delegate;
+typedef device_delegate<void (address_space &, offs_t, u64, u64)> write64_delegate;
 
 // ======================> setoffset_delegate
 
@@ -165,14 +165,14 @@ public:
 
 	// getters
 	address_space &space() const { return m_space; }
-	uint8_t *ptr() const { return m_ptr; }
+	u8 *ptr() const { return m_ptr; }
 
 	// see if an address is within bounds, or attempt to update it if not
 	bool address_is_valid(offs_t byteaddress) { return EXPECTED(byteaddress >= m_bytestart && byteaddress <= m_byteend) || set_direct_region(byteaddress); }
 
 	// force a recomputation on the next read
 	void force_update() { m_byteend = 0; m_bytestart = 1; }
-	void force_update(uint16_t if_match) { if (m_entry == if_match) force_update(); }
+	void force_update(u16 if_match) { if (m_entry == if_match) force_update(); }
 
 	// custom update callbacks and configuration
 	direct_update_delegate set_direct_update(direct_update_delegate function);
@@ -180,24 +180,24 @@ public:
 
 	// accessor methods
 	void *read_ptr(offs_t byteaddress, offs_t directxor = 0);
-	uint8_t read_byte(offs_t byteaddress, offs_t directxor = 0);
-	uint16_t read_word(offs_t byteaddress, offs_t directxor = 0);
-	uint32_t read_dword(offs_t byteaddress, offs_t directxor = 0);
-	uint64_t read_qword(offs_t byteaddress, offs_t directxor = 0);
+	u8 read_byte(offs_t byteaddress, offs_t directxor = 0);
+	u16 read_word(offs_t byteaddress, offs_t directxor = 0);
+	u32 read_dword(offs_t byteaddress, offs_t directxor = 0);
+	u64 read_qword(offs_t byteaddress, offs_t directxor = 0);
 
 private:
 	// internal helpers
 	bool set_direct_region(offs_t &byteaddress);
-	direct_range *find_range(offs_t byteaddress, uint16_t &entry);
+	direct_range *find_range(offs_t byteaddress, u16 &entry);
 	void remove_intersecting_ranges(offs_t bytestart, offs_t byteend);
 
 	// internal state
 	address_space &             m_space;
-	uint8_t *                     m_ptr;                  // direct access data pointer
+	u8 *                        m_ptr;                  // direct access data pointer
 	offs_t                      m_bytemask;             // byte address mask
 	offs_t                      m_bytestart;            // minimum valid byte address
 	offs_t                      m_byteend;              // maximum valid byte address
-	uint16_t                      m_entry;                // live entry
+	u16                         m_entry;                // live entry
 	std::list<direct_range>     m_rangelist[TOTAL_MEMORY_BANKS];  // list of ranges for each entry
 	direct_update_delegate      m_directupdate;         // fast direct-access update callback
 };
@@ -211,10 +211,10 @@ class address_space_config
 public:
 	// construction/destruction
 	address_space_config();
-	address_space_config(const char *name, endianness_t endian, uint8_t datawidth, uint8_t addrwidth, int8_t addrshift = 0, address_map_constructor internal = nullptr, address_map_constructor defmap = nullptr);
-	address_space_config(const char *name, endianness_t endian, uint8_t datawidth, uint8_t addrwidth, int8_t addrshift, uint8_t logwidth, uint8_t pageshift, address_map_constructor internal = nullptr, address_map_constructor defmap = nullptr);
-	address_space_config(const char *name, endianness_t endian, uint8_t datawidth, uint8_t addrwidth, int8_t addrshift, address_map_delegate internal, address_map_delegate defmap = address_map_delegate());
-	address_space_config(const char *name, endianness_t endian, uint8_t datawidth, uint8_t addrwidth, int8_t addrshift, uint8_t logwidth, uint8_t pageshift, address_map_delegate internal, address_map_delegate defmap = address_map_delegate());
+	address_space_config(const char *name, endianness_t endian, u8 datawidth, u8 addrwidth, s8 addrshift = 0, address_map_constructor internal = nullptr, address_map_constructor defmap = nullptr);
+	address_space_config(const char *name, endianness_t endian, u8 datawidth, u8 addrwidth, s8 addrshift, u8 logwidth, u8 pageshift, address_map_constructor internal = nullptr, address_map_constructor defmap = nullptr);
+	address_space_config(const char *name, endianness_t endian, u8 datawidth, u8 addrwidth, s8 addrshift, address_map_delegate internal, address_map_delegate defmap = address_map_delegate());
+	address_space_config(const char *name, endianness_t endian, u8 datawidth, u8 addrwidth, s8 addrshift, u8 logwidth, u8 pageshift, address_map_delegate internal, address_map_delegate defmap = address_map_delegate());
 
 	// getters
 	const char *name() const { return m_name; }
@@ -231,11 +231,11 @@ public:
 	// state
 	const char *        m_name;
 	endianness_t        m_endianness;
-	uint8_t               m_databus_width;
-	uint8_t               m_addrbus_width;
-	int8_t                m_addrbus_shift;
-	uint8_t               m_logaddr_width;
-	uint8_t               m_page_shift;
+	u8                  m_databus_width;
+	u8                  m_addrbus_width;
+	s8                  m_addrbus_shift;
+	u8                  m_logaddr_width;
+	u8                  m_page_shift;
 	bool                m_is_octal;                 // to determine if messages/debugger will show octal or hex
 
 	address_map_constructor m_internal_map;
@@ -278,15 +278,15 @@ public:
 	int data_width() const { return m_config.data_width(); }
 	int addr_width() const { return m_config.addr_width(); }
 	endianness_t endianness() const { return m_config.endianness(); }
-	uint64_t unmap() const { return m_unmap; }
+	u64 unmap() const { return m_unmap; }
 	bool is_octal() const { return m_config.m_is_octal; }
 
 	offs_t addrmask() const { return m_addrmask; }
 	offs_t bytemask() const { return m_bytemask; }
-	uint8_t addrchars() const { return m_addrchars; }
+	u8 addrchars() const { return m_addrchars; }
 	offs_t logaddrmask() const { return m_logaddrmask; }
 	offs_t logbytemask() const { return m_logbytemask; }
-	uint8_t logaddrchars() const { return m_logaddrchars; }
+	u8 logaddrchars() const { return m_logaddrchars; }
 
 	// debug helpers
 	const char *get_handler_string(read_or_write readorwrite, offs_t byteaddress);
@@ -306,34 +306,34 @@ public:
 	virtual void *get_write_ptr(offs_t byteaddress) = 0;
 
 	// read accessors
-	virtual uint8_t read_byte(offs_t byteaddress) = 0;
-	virtual uint16_t read_word(offs_t byteaddress) = 0;
-	virtual uint16_t read_word(offs_t byteaddress, uint16_t mask) = 0;
-	virtual uint16_t read_word_unaligned(offs_t byteaddress) = 0;
-	virtual uint16_t read_word_unaligned(offs_t byteaddress, uint16_t mask) = 0;
-	virtual uint32_t read_dword(offs_t byteaddress) = 0;
-	virtual uint32_t read_dword(offs_t byteaddress, uint32_t mask) = 0;
-	virtual uint32_t read_dword_unaligned(offs_t byteaddress) = 0;
-	virtual uint32_t read_dword_unaligned(offs_t byteaddress, uint32_t mask) = 0;
-	virtual uint64_t read_qword(offs_t byteaddress) = 0;
-	virtual uint64_t read_qword(offs_t byteaddress, uint64_t mask) = 0;
-	virtual uint64_t read_qword_unaligned(offs_t byteaddress) = 0;
-	virtual uint64_t read_qword_unaligned(offs_t byteaddress, uint64_t mask) = 0;
+	virtual u8 read_byte(offs_t byteaddress) = 0;
+	virtual u16 read_word(offs_t byteaddress) = 0;
+	virtual u16 read_word(offs_t byteaddress, u16 mask) = 0;
+	virtual u16 read_word_unaligned(offs_t byteaddress) = 0;
+	virtual u16 read_word_unaligned(offs_t byteaddress, u16 mask) = 0;
+	virtual u32 read_dword(offs_t byteaddress) = 0;
+	virtual u32 read_dword(offs_t byteaddress, u32 mask) = 0;
+	virtual u32 read_dword_unaligned(offs_t byteaddress) = 0;
+	virtual u32 read_dword_unaligned(offs_t byteaddress, u32 mask) = 0;
+	virtual u64 read_qword(offs_t byteaddress) = 0;
+	virtual u64 read_qword(offs_t byteaddress, u64 mask) = 0;
+	virtual u64 read_qword_unaligned(offs_t byteaddress) = 0;
+	virtual u64 read_qword_unaligned(offs_t byteaddress, u64 mask) = 0;
 
 	// write accessors
-	virtual void write_byte(offs_t byteaddress, uint8_t data) = 0;
-	virtual void write_word(offs_t byteaddress, uint16_t data) = 0;
-	virtual void write_word(offs_t byteaddress, uint16_t data, uint16_t mask) = 0;
-	virtual void write_word_unaligned(offs_t byteaddress, uint16_t data) = 0;
-	virtual void write_word_unaligned(offs_t byteaddress, uint16_t data, uint16_t mask) = 0;
-	virtual void write_dword(offs_t byteaddress, uint32_t data) = 0;
-	virtual void write_dword(offs_t byteaddress, uint32_t data, uint32_t mask) = 0;
-	virtual void write_dword_unaligned(offs_t byteaddress, uint32_t data) = 0;
-	virtual void write_dword_unaligned(offs_t byteaddress, uint32_t data, uint32_t mask) = 0;
-	virtual void write_qword(offs_t byteaddress, uint64_t data) = 0;
-	virtual void write_qword(offs_t byteaddress, uint64_t data, uint64_t mask) = 0;
-	virtual void write_qword_unaligned(offs_t byteaddress, uint64_t data) = 0;
-	virtual void write_qword_unaligned(offs_t byteaddress, uint64_t data, uint64_t mask) = 0;
+	virtual void write_byte(offs_t byteaddress, u8 data) = 0;
+	virtual void write_word(offs_t byteaddress, u16 data) = 0;
+	virtual void write_word(offs_t byteaddress, u16 data, u16 mask) = 0;
+	virtual void write_word_unaligned(offs_t byteaddress, u16 data) = 0;
+	virtual void write_word_unaligned(offs_t byteaddress, u16 data, u16 mask) = 0;
+	virtual void write_dword(offs_t byteaddress, u32 data) = 0;
+	virtual void write_dword(offs_t byteaddress, u32 data, u32 mask) = 0;
+	virtual void write_dword_unaligned(offs_t byteaddress, u32 data) = 0;
+	virtual void write_dword_unaligned(offs_t byteaddress, u32 data, u32 mask) = 0;
+	virtual void write_qword(offs_t byteaddress, u64 data) = 0;
+	virtual void write_qword(offs_t byteaddress, u64 data, u64 mask) = 0;
+	virtual void write_qword_unaligned(offs_t byteaddress, u64 data) = 0;
+	virtual void write_qword_unaligned(offs_t byteaddress, u64 data, u64 mask) = 0;
 
 	// Set address. This will invoke setoffset handlers for the respective entries.
 	virtual void set_address(offs_t byteaddress) = 0;
@@ -384,44 +384,44 @@ public:
 	void install_ram(offs_t addrstart, offs_t addrend, offs_t addrmirror, void *baseptr = nullptr) { install_ram_generic(addrstart, addrend, addrmirror, ROW_READWRITE, baseptr); }
 
 	// install device memory maps
-	template <typename T> void install_device(offs_t addrstart, offs_t addrend, T &device, void (T::*map)(address_map &map), int bits = 0, uint64_t unitmask = 0) {
+	template <typename T> void install_device(offs_t addrstart, offs_t addrend, T &device, void (T::*map)(address_map &map), int bits = 0, u64 unitmask = 0) {
 		address_map_delegate delegate(map, "dynamic_device_install", &device);
 		install_device_delegate(addrstart, addrend, device, delegate, bits, unitmask);
 	}
 
-	void install_device_delegate(offs_t addrstart, offs_t addrend, device_t &device, address_map_delegate &map, int bits = 0, uint64_t unitmask = 0);
+	void install_device_delegate(offs_t addrstart, offs_t addrend, device_t &device, address_map_delegate &map, int bits = 0, u64 unitmask = 0);
 
 	// install setoffset handler
-	void install_setoffset_handler(offs_t addrstart, offs_t addrend, setoffset_delegate sohandler, uint64_t unitmask = 0) { install_setoffset_handler(addrstart, addrend, 0, 0, 0, sohandler, unitmask); }
-	void install_setoffset_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, setoffset_delegate sohandler, uint64_t unitmask = 0);
+	void install_setoffset_handler(offs_t addrstart, offs_t addrend, setoffset_delegate sohandler, u64 unitmask = 0) { install_setoffset_handler(addrstart, addrend, 0, 0, 0, sohandler, unitmask); }
+	void install_setoffset_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, setoffset_delegate sohandler, u64 unitmask = 0);
 
 	// install new-style delegate handlers (short form)
-	void install_read_handler(offs_t addrstart, offs_t addrend, read8_delegate rhandler, uint64_t unitmask = 0) { install_read_handler(addrstart, addrend, 0, 0, 0, rhandler, unitmask); }
-	void install_write_handler(offs_t addrstart, offs_t addrend, write8_delegate whandler, uint64_t unitmask = 0) { install_write_handler(addrstart, addrend, 0, 0, 0, whandler, unitmask); }
-	void install_readwrite_handler(offs_t addrstart, offs_t addrend, read8_delegate rhandler, write8_delegate whandler, uint64_t unitmask = 0) { return install_readwrite_handler(addrstart, addrend, 0, 0, 0, rhandler, whandler, unitmask); }
-	void install_read_handler(offs_t addrstart, offs_t addrend, read16_delegate rhandler, uint64_t unitmask = 0) { install_read_handler(addrstart, addrend, 0, 0, 0, rhandler, unitmask); }
-	void install_write_handler(offs_t addrstart, offs_t addrend, write16_delegate whandler, uint64_t unitmask = 0) { install_write_handler(addrstart, addrend, 0, 0, 0, whandler, unitmask); }
-	void install_readwrite_handler(offs_t addrstart, offs_t addrend, read16_delegate rhandler, write16_delegate whandler, uint64_t unitmask = 0) { return install_readwrite_handler(addrstart, addrend, 0, 0, 0, rhandler, whandler, unitmask); }
-	void install_read_handler(offs_t addrstart, offs_t addrend, read32_delegate rhandler, uint64_t unitmask = 0) { install_read_handler(addrstart, addrend, 0, 0, 0, rhandler, unitmask); }
-	void install_write_handler(offs_t addrstart, offs_t addrend, write32_delegate whandler, uint64_t unitmask = 0) { install_write_handler(addrstart, addrend, 0, 0, 0, whandler, unitmask); }
-	void install_readwrite_handler(offs_t addrstart, offs_t addrend, read32_delegate rhandler, write32_delegate whandler, uint64_t unitmask = 0) { return install_readwrite_handler(addrstart, addrend, 0, 0, 0, rhandler, whandler, unitmask); }
-	void install_read_handler(offs_t addrstart, offs_t addrend, read64_delegate rhandler, uint64_t unitmask = 0) { install_read_handler(addrstart, addrend, 0, 0, 0, rhandler, unitmask); }
-	void install_write_handler(offs_t addrstart, offs_t addrend, write64_delegate whandler, uint64_t unitmask = 0) { install_write_handler(addrstart, addrend, 0, 0, 0, whandler, unitmask); }
-	void install_readwrite_handler(offs_t addrstart, offs_t addrend, read64_delegate rhandler, write64_delegate whandler, uint64_t unitmask = 0) { install_readwrite_handler(addrstart, addrend, 0, 0, 0, rhandler, whandler, unitmask); }
+	void install_read_handler(offs_t addrstart, offs_t addrend, read8_delegate rhandler, u64 unitmask = 0) { install_read_handler(addrstart, addrend, 0, 0, 0, rhandler, unitmask); }
+	void install_write_handler(offs_t addrstart, offs_t addrend, write8_delegate whandler, u64 unitmask = 0) { install_write_handler(addrstart, addrend, 0, 0, 0, whandler, unitmask); }
+	void install_readwrite_handler(offs_t addrstart, offs_t addrend, read8_delegate rhandler, write8_delegate whandler, u64 unitmask = 0) { return install_readwrite_handler(addrstart, addrend, 0, 0, 0, rhandler, whandler, unitmask); }
+	void install_read_handler(offs_t addrstart, offs_t addrend, read16_delegate rhandler, u64 unitmask = 0) { install_read_handler(addrstart, addrend, 0, 0, 0, rhandler, unitmask); }
+	void install_write_handler(offs_t addrstart, offs_t addrend, write16_delegate whandler, u64 unitmask = 0) { install_write_handler(addrstart, addrend, 0, 0, 0, whandler, unitmask); }
+	void install_readwrite_handler(offs_t addrstart, offs_t addrend, read16_delegate rhandler, write16_delegate whandler, u64 unitmask = 0) { return install_readwrite_handler(addrstart, addrend, 0, 0, 0, rhandler, whandler, unitmask); }
+	void install_read_handler(offs_t addrstart, offs_t addrend, read32_delegate rhandler, u64 unitmask = 0) { install_read_handler(addrstart, addrend, 0, 0, 0, rhandler, unitmask); }
+	void install_write_handler(offs_t addrstart, offs_t addrend, write32_delegate whandler, u64 unitmask = 0) { install_write_handler(addrstart, addrend, 0, 0, 0, whandler, unitmask); }
+	void install_readwrite_handler(offs_t addrstart, offs_t addrend, read32_delegate rhandler, write32_delegate whandler, u64 unitmask = 0) { return install_readwrite_handler(addrstart, addrend, 0, 0, 0, rhandler, whandler, unitmask); }
+	void install_read_handler(offs_t addrstart, offs_t addrend, read64_delegate rhandler, u64 unitmask = 0) { install_read_handler(addrstart, addrend, 0, 0, 0, rhandler, unitmask); }
+	void install_write_handler(offs_t addrstart, offs_t addrend, write64_delegate whandler, u64 unitmask = 0) { install_write_handler(addrstart, addrend, 0, 0, 0, whandler, unitmask); }
+	void install_readwrite_handler(offs_t addrstart, offs_t addrend, read64_delegate rhandler, write64_delegate whandler, u64 unitmask = 0) { install_readwrite_handler(addrstart, addrend, 0, 0, 0, rhandler, whandler, unitmask); }
 
 	// install new-style delegate handlers (with mirror/mask)
-	void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read8_delegate rhandler, uint64_t unitmask = 0);
-	void install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write8_delegate whandler, uint64_t unitmask = 0);
-	void install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read8_delegate rhandler, write8_delegate whandler, uint64_t unitmask = 0);
-	void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read16_delegate rhandler, uint64_t unitmask = 0);
-	void install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write16_delegate whandler, uint64_t unitmask = 0);
-	void install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read16_delegate rhandler, write16_delegate whandler, uint64_t unitmask = 0);
-	void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read32_delegate rhandler, uint64_t unitmask = 0);
-	void install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write32_delegate whandler, uint64_t unitmask = 0);
-	void install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read32_delegate rhandler, write32_delegate whandler, uint64_t unitmask = 0);
-	void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read64_delegate rhandler, uint64_t unitmask = 0);
-	void install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write64_delegate whandler, uint64_t unitmask = 0);
-	void install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read64_delegate rhandler, write64_delegate whandler, uint64_t unitmask = 0);
+	void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read8_delegate rhandler, u64 unitmask = 0);
+	void install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write8_delegate whandler, u64 unitmask = 0);
+	void install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read8_delegate rhandler, write8_delegate whandler, u64 unitmask = 0);
+	void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read16_delegate rhandler, u64 unitmask = 0);
+	void install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write16_delegate whandler, u64 unitmask = 0);
+	void install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read16_delegate rhandler, write16_delegate whandler, u64 unitmask = 0);
+	void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read32_delegate rhandler, u64 unitmask = 0);
+	void install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write32_delegate whandler, u64 unitmask = 0);
+	void install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read32_delegate rhandler, write32_delegate whandler, u64 unitmask = 0);
+	void install_read_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read64_delegate rhandler, u64 unitmask = 0);
+	void install_write_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, write64_delegate whandler, u64 unitmask = 0);
+	void install_readwrite_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, read64_delegate rhandler, write64_delegate whandler, u64 unitmask = 0);
 
 	// setup
 	void prepare_map();
@@ -446,7 +446,7 @@ private:
 	bool needs_backing_store(const address_map_entry &entry);
 	memory_bank &bank_find_or_allocate(const char *tag, offs_t addrstart, offs_t addrend, offs_t addrmirror, read_or_write readorwrite);
 	memory_bank *bank_find_anonymous(offs_t bytestart, offs_t byteend) const;
-	address_map_entry *block_assign_intersecting(offs_t bytestart, offs_t byteend, uint8_t *base);
+	address_map_entry *block_assign_intersecting(offs_t bytestart, offs_t byteend, u8 *base);
 	void check_optimize_all(const char *function, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, offs_t addrselect, offs_t &nstart, offs_t &nend, offs_t &nmask, offs_t &nmirror);
 	void check_optimize_mirror(const char *function, offs_t addrstart, offs_t addrend, offs_t addrmirror, offs_t &nstart, offs_t &nend, offs_t &nmask, offs_t &nmirror);
 	void check_address(const char *function, offs_t addrstart, offs_t addrend);
@@ -455,19 +455,19 @@ protected:
 	// private state
 	const address_space_config &m_config;       // configuration of this space
 	device_t &              m_device;           // reference to the owning device
-	std::unique_ptr<address_map> m_map;            // original memory map
+	std::unique_ptr<address_map> m_map;              // original memory map
 	offs_t                  m_addrmask;         // physical address mask
 	offs_t                  m_bytemask;         // byte-converted physical address mask
 	offs_t                  m_logaddrmask;      // logical address mask
 	offs_t                  m_logbytemask;      // byte-converted logical address mask
-	uint64_t                  m_unmap;            // unmapped value
+	u64                     m_unmap;            // unmapped value
 	address_spacenum        m_spacenum;         // address space index
 	bool                    m_debugger_access;  // treat accesses as coming from the debugger
 	bool                    m_log_unmap;        // log unmapped accesses in this space?
 	std::unique_ptr<direct_read_data> m_direct;    // fast direct-access read info
 	const char *            m_name;             // friendly name of the address space
-	uint8_t                   m_addrchars;        // number of characters to use for physical addresses
-	uint8_t                   m_logaddrchars;     // number of characters to use for logical addresses
+	u8                      m_addrchars;        // number of characters to use for physical addresses
+	u8                      m_logaddrchars;     // number of characters to use for logical addresses
 
 private:
 	memory_manager &        m_manager;          // reference to the owning manager
@@ -518,7 +518,7 @@ public:
 	running_machine &machine() const { return m_machine; }
 	offs_t bytestart() const { return m_bytestart; }
 	offs_t byteend() const { return m_byteend; }
-	uint8_t *data() const { return m_data; }
+	u8 *data() const { return m_data; }
 
 	// is the given range contained by this memory block?
 	bool contains(address_space &space, offs_t bytestart, offs_t byteend) const
@@ -531,8 +531,8 @@ private:
 	running_machine &       m_machine;              // need the machine to free our memory
 	address_space &         m_space;                // which address space are we associated with?
 	offs_t                  m_bytestart, m_byteend; // byte-normalized start/end for verifying a match
-	uint8_t *                 m_data;                 // pointer to the data for this block
-	std::vector<uint8_t>          m_allocated;            // pointer to the actually allocated block
+	u8 *                    m_data;                 // pointer to the data for this block
+	std::vector<u8>         m_allocated;            // pointer to the actually allocated block
 };
 
 
@@ -568,7 +568,7 @@ class memory_bank
 	// a bank_entry contains a pointer
 	struct bank_entry
 	{
-		uint8_t *         m_ptr;
+		u8 *    m_ptr;
 	};
 
 public:
@@ -611,8 +611,8 @@ private:
 
 	// internal state
 	running_machine &       m_machine;              // need the machine to free our memory
-	uint8_t **                m_baseptr;              // pointer to our base pointer in the global array
-	uint16_t                  m_index;                // array index for this handler
+	u8 **                   m_baseptr;              // pointer to our base pointer in the global array
+	u16                     m_index;                // array index for this handler
 	bool                    m_anonymous;            // are we anonymous or explicit?
 	offs_t                  m_bytestart;            // byte-adjusted start offset
 	offs_t                  m_byteend;              // byte-adjusted end offset
@@ -631,7 +631,7 @@ class memory_share
 {
 public:
 	// construction/destruction
-	memory_share(uint8_t width, size_t bytes, endianness_t endianness, void *ptr = nullptr)
+	memory_share(u8 width, size_t bytes, endianness_t endianness, void *ptr = nullptr)
 		: m_ptr(ptr),
 			m_bytes(bytes),
 			m_endianness(endianness),
@@ -643,8 +643,8 @@ public:
 	void *ptr() const { return m_ptr; }
 	size_t bytes() const { return m_bytes; }
 	endianness_t endianness() const { return m_endianness; }
-	uint8_t bitwidth() const { return m_bitwidth; }
-	uint8_t bytewidth() const { return m_bytewidth; }
+	u8 bitwidth() const { return m_bitwidth; }
+	u8 bytewidth() const { return m_bytewidth; }
 
 	// setters
 	void set_ptr(void *ptr) { m_ptr = ptr; }
@@ -654,8 +654,8 @@ private:
 	void *                  m_ptr;                  // pointer to the memory backing the region
 	size_t                  m_bytes;                // size of the shared region in bytes
 	endianness_t            m_endianness;           // endianness of the memory
-	uint8_t                   m_bitwidth;             // width of the shared region in bits
-	uint8_t                   m_bytewidth;            // width in bytes, rounded up to a power of 2
+	u8                      m_bitwidth;             // width of the shared region in bits
+	u8                      m_bytewidth;            // width in bytes, rounded up to a power of 2
 
 };
 
@@ -670,34 +670,34 @@ class memory_region
 	friend class memory_manager;
 public:
 	// construction/destruction
-	memory_region(running_machine &machine, const char *name, uint32_t length, uint8_t width, endianness_t endian);
+	memory_region(running_machine &machine, const char *name, u32 length, u8 width, endianness_t endian);
 
 	// getters
 	running_machine &machine() const { return m_machine; }
-	uint8_t *base() { return (m_buffer.size() > 0) ? &m_buffer[0] : nullptr; }
-	uint8_t *end() { return base() + m_buffer.size(); }
-	uint32_t bytes() const { return m_buffer.size(); }
+	u8 *base() { return (m_buffer.size() > 0) ? &m_buffer[0] : nullptr; }
+	u8 *end() { return base() + m_buffer.size(); }
+	u32 bytes() const { return m_buffer.size(); }
 	const char *name() const { return m_name.c_str(); }
 
 	// flag expansion
 	endianness_t endianness() const { return m_endianness; }
-	uint8_t bitwidth() const { return m_bitwidth; }
-	uint8_t bytewidth() const { return m_bytewidth; }
+	u8 bitwidth() const { return m_bitwidth; }
+	u8 bytewidth() const { return m_bytewidth; }
 
 	// data access
-	uint8_t &u8(offs_t offset = 0) { return m_buffer[offset]; }
-	uint16_t &u16(offs_t offset = 0) { return reinterpret_cast<uint16_t *>(base())[offset]; }
-	uint32_t &u32(offs_t offset = 0) { return reinterpret_cast<uint32_t *>(base())[offset]; }
-	uint64_t &u64(offs_t offset = 0) { return reinterpret_cast<uint64_t *>(base())[offset]; }
+	u8 &as_u8(offs_t offset = 0) { return m_buffer[offset]; }
+	u16 &as_u16(offs_t offset = 0) { return reinterpret_cast<u16 *>(base())[offset]; }
+	u32 &as_u32(offs_t offset = 0) { return reinterpret_cast<u32 *>(base())[offset]; }
+	u64 &as_u64(offs_t offset = 0) { return reinterpret_cast<u64 *>(base())[offset]; }
 
 private:
 	// internal data
 	running_machine &       m_machine;
 	std::string             m_name;
-	std::vector<uint8_t>          m_buffer;
+	std::vector<u8>         m_buffer;
 	endianness_t            m_endianness;
-	uint8_t                   m_bitwidth;
-	uint8_t                   m_bytewidth;
+	u8                      m_bitwidth;
+	u8                      m_bytewidth;
 };
 
 
@@ -708,7 +708,7 @@ private:
 class memory_manager
 {
 	friend class address_space;
-	friend memory_region::memory_region(running_machine &machine, const char *name, uint32_t length, uint8_t width, endianness_t endian);
+	friend memory_region::memory_region(running_machine &machine, const char *name, u32 length, u8 width, endianness_t endian);
 public:
 	// construction/destruction
 	memory_manager(running_machine &machine);
@@ -724,10 +724,10 @@ public:
 	void dump(FILE *file);
 
 	// pointers to a bank pointer (internal usage only)
-	uint8_t **bank_pointer_addr(uint8_t index) { return &m_bank_ptr[index]; }
+	u8 **bank_pointer_addr(u8 index) { return &m_bank_ptr[index]; }
 
 	// regions
-	memory_region *region_alloc(const char *name, uint32_t length, uint8_t width, endianness_t endian);
+	memory_region *region_alloc(const char *name, u32 length, u8 width, endianness_t endian);
 	void region_free(const char *name);
 	memory_region *region_containing(const void *memory, offs_t bytes) const;
 
@@ -740,13 +740,13 @@ private:
 	running_machine &           m_machine;              // reference to the machine
 	bool                        m_initialized;          // have we completed initialization?
 
-	uint8_t *                     m_bank_ptr[TOTAL_MEMORY_BANKS];  // array of bank pointers
+	u8 *                        m_bank_ptr[TOTAL_MEMORY_BANKS];  // array of bank pointers
 
 	std::vector<std::unique_ptr<address_space>>  m_spacelist;            // list of address spaces
 	std::vector<std::unique_ptr<memory_block>>   m_blocklist;            // head of the list of memory blocks
 
 	std::unordered_map<std::string,std::unique_ptr<memory_bank>>    m_banklist;             // data gathered for each bank
-	uint16_t                      m_banknext;             // next bank to allocate
+	u16                      m_banknext;             // next bank to allocate
 
 	std::unordered_map<std::string, std::unique_ptr<memory_share>>   m_sharelist;            // map for share lookups
 
@@ -760,32 +760,32 @@ private:
 //**************************************************************************
 
 // opcode base adjustment handler function macro
-#define DIRECT_UPDATE_MEMBER(name)      offs_t name(ATTR_UNUSED direct_read_data &direct, ATTR_UNUSED offs_t address)
+#define DIRECT_UPDATE_MEMBER(name)          offs_t name(ATTR_UNUSED direct_read_data &direct, ATTR_UNUSED offs_t address)
 #define DECLARE_DIRECT_UPDATE_MEMBER(name)  offs_t name(ATTR_UNUSED direct_read_data &direct, ATTR_UNUSED offs_t address)
 
 
 
 // space read/write handler function macros
-#define READ8_MEMBER(name)              uint8_t  name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED uint8_t mem_mask)
-#define WRITE8_MEMBER(name)             void   name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED uint8_t data, ATTR_UNUSED uint8_t mem_mask)
-#define READ16_MEMBER(name)             uint16_t name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED uint16_t mem_mask)
-#define WRITE16_MEMBER(name)            void   name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED uint16_t data, ATTR_UNUSED uint16_t mem_mask)
-#define READ32_MEMBER(name)             uint32_t name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED uint32_t mem_mask)
-#define WRITE32_MEMBER(name)            void   name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED uint32_t data, ATTR_UNUSED uint32_t mem_mask)
-#define READ64_MEMBER(name)             uint64_t name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED uint64_t mem_mask)
-#define WRITE64_MEMBER(name)            void   name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED uint64_t data, ATTR_UNUSED uint64_t mem_mask)
+#define READ8_MEMBER(name)              u8     name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED u8 mem_mask)
+#define WRITE8_MEMBER(name)             void   name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED u8 data, ATTR_UNUSED u8 mem_mask)
+#define READ16_MEMBER(name)             u16    name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED u16 mem_mask)
+#define WRITE16_MEMBER(name)            void   name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED u16 data, ATTR_UNUSED u16 mem_mask)
+#define READ32_MEMBER(name)             u32    name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED u32 mem_mask)
+#define WRITE32_MEMBER(name)            void   name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED u32 data, ATTR_UNUSED u32 mem_mask)
+#define READ64_MEMBER(name)             u64    name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED u64 mem_mask)
+#define WRITE64_MEMBER(name)            void   name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED u64 data, ATTR_UNUSED u64 mem_mask)
 
-#define DECLARE_READ8_MEMBER(name)      uint8_t  name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED uint8_t mem_mask = 0xff)
-#define DECLARE_WRITE8_MEMBER(name)     void   name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED uint8_t data, ATTR_UNUSED uint8_t mem_mask = 0xff)
-#define DECLARE_READ16_MEMBER(name)     uint16_t name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED uint16_t mem_mask = 0xffff)
-#define DECLARE_WRITE16_MEMBER(name)    void   name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED uint16_t data, ATTR_UNUSED uint16_t mem_mask = 0xffff)
-#define DECLARE_READ32_MEMBER(name)     uint32_t name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED uint32_t mem_mask = 0xffffffff)
-#define DECLARE_WRITE32_MEMBER(name)    void   name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED uint32_t data, ATTR_UNUSED uint32_t mem_mask = 0xffffffff)
-#define DECLARE_READ64_MEMBER(name)     uint64_t name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED uint64_t mem_mask = U64(0xffffffffffffffff))
-#define DECLARE_WRITE64_MEMBER(name)    void   name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED uint64_t data, ATTR_UNUSED uint64_t mem_mask = U64(0xffffffffffffffff))
+#define DECLARE_READ8_MEMBER(name)      u8     name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED u8 mem_mask = 0xff)
+#define DECLARE_WRITE8_MEMBER(name)     void   name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED u8 data, ATTR_UNUSED u8 mem_mask = 0xff)
+#define DECLARE_READ16_MEMBER(name)     u16    name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED u16 mem_mask = 0xffff)
+#define DECLARE_WRITE16_MEMBER(name)    void   name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED u16 data, ATTR_UNUSED u16 mem_mask = 0xffff)
+#define DECLARE_READ32_MEMBER(name)     u32    name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED u32 mem_mask = 0xffffffff)
+#define DECLARE_WRITE32_MEMBER(name)    void   name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED u32 data, ATTR_UNUSED u32 mem_mask = 0xffffffff)
+#define DECLARE_READ64_MEMBER(name)     u64    name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED u64 mem_mask = 0xffffffffffffffffU)
+#define DECLARE_WRITE64_MEMBER(name)    void   name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED u64 data, ATTR_UNUSED u64 mem_mask = 0xffffffffffffffffU)
 
-#define SETOFFSET_MEMBER(name)          void  name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset)
-#define DECLARE_SETOFFSET_MEMBER(name)      void  name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset)
+#define SETOFFSET_MEMBER(name)          void   name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset)
+#define DECLARE_SETOFFSET_MEMBER(name)  void   name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset)
 
 // device delegate macros
 #define READ8_DELEGATE(_class, _member)                     read8_delegate(FUNC(_class::_member), this)
@@ -810,22 +810,22 @@ private:
 // helper macro for merging data with the memory mask
 #define COMBINE_DATA(varptr)            (*(varptr) = (*(varptr) & ~mem_mask) | (data & mem_mask))
 
-#define ACCESSING_BITS_0_7              ((mem_mask & 0x000000ff) != 0)
-#define ACCESSING_BITS_8_15             ((mem_mask & 0x0000ff00) != 0)
-#define ACCESSING_BITS_16_23            ((mem_mask & 0x00ff0000) != 0)
-#define ACCESSING_BITS_24_31            ((mem_mask & 0xff000000) != 0)
-#define ACCESSING_BITS_32_39            ((mem_mask & U64(0x000000ff00000000)) != 0)
-#define ACCESSING_BITS_40_47            ((mem_mask & U64(0x0000ff0000000000)) != 0)
-#define ACCESSING_BITS_48_55            ((mem_mask & U64(0x00ff000000000000)) != 0)
-#define ACCESSING_BITS_56_63            ((mem_mask & U64(0xff00000000000000)) != 0)
+#define ACCESSING_BITS_0_7              ((mem_mask & 0x000000ffU) != 0)
+#define ACCESSING_BITS_8_15             ((mem_mask & 0x0000ff00U) != 0)
+#define ACCESSING_BITS_16_23            ((mem_mask & 0x00ff0000U) != 0)
+#define ACCESSING_BITS_24_31            ((mem_mask & 0xff000000U) != 0)
+#define ACCESSING_BITS_32_39            ((mem_mask & 0x000000ff00000000U) != 0)
+#define ACCESSING_BITS_40_47            ((mem_mask & 0x0000ff0000000000U) != 0)
+#define ACCESSING_BITS_48_55            ((mem_mask & 0x00ff000000000000U) != 0)
+#define ACCESSING_BITS_56_63            ((mem_mask & 0xff00000000000000U) != 0)
 
-#define ACCESSING_BITS_0_15             ((mem_mask & 0x0000ffff) != 0)
-#define ACCESSING_BITS_16_31            ((mem_mask & 0xffff0000) != 0)
-#define ACCESSING_BITS_32_47            ((mem_mask & U64(0x0000ffff00000000)) != 0)
-#define ACCESSING_BITS_48_63            ((mem_mask & U64(0xffff000000000000)) != 0)
+#define ACCESSING_BITS_0_15             ((mem_mask & 0x0000ffffU) != 0)
+#define ACCESSING_BITS_16_31            ((mem_mask & 0xffff0000U) != 0)
+#define ACCESSING_BITS_32_47            ((mem_mask & 0x0000ffff00000000U) != 0)
+#define ACCESSING_BITS_48_63            ((mem_mask & 0xffff000000000000U) != 0)
 
-#define ACCESSING_BITS_0_31             ((mem_mask & 0xffffffff) != 0)
-#define ACCESSING_BITS_32_63            ((mem_mask & U64(0xffffffff00000000)) != 0)
+#define ACCESSING_BITS_0_31             ((mem_mask & 0xffffffffU) != 0)
+#define ACCESSING_BITS_32_63            ((mem_mask & 0xffffffff00000000U) != 0)
 
 
 // macros for accessing bytes and words within larger chunks
@@ -885,7 +885,7 @@ inline void *direct_read_data::read_ptr(offs_t byteaddress, offs_t directxor)
 //  direct_read_data class
 //-------------------------------------------------
 
-inline uint8_t direct_read_data::read_byte(offs_t byteaddress, offs_t directxor)
+inline u8 direct_read_data::read_byte(offs_t byteaddress, offs_t directxor)
 {
 	if (address_is_valid(byteaddress))
 		return m_ptr[(byteaddress ^ directxor) & m_bytemask];
@@ -898,10 +898,10 @@ inline uint8_t direct_read_data::read_byte(offs_t byteaddress, offs_t directxor)
 //  direct_read_data class
 //-------------------------------------------------
 
-inline uint16_t direct_read_data::read_word(offs_t byteaddress, offs_t directxor)
+inline u16 direct_read_data::read_word(offs_t byteaddress, offs_t directxor)
 {
 	if (address_is_valid(byteaddress))
-		return *reinterpret_cast<uint16_t *>(&m_ptr[(byteaddress ^ directxor) & m_bytemask]);
+		return *reinterpret_cast<u16 *>(&m_ptr[(byteaddress ^ directxor) & m_bytemask]);
 	return m_space.read_word(byteaddress);
 }
 
@@ -911,10 +911,10 @@ inline uint16_t direct_read_data::read_word(offs_t byteaddress, offs_t directxor
 //  direct_read_data class
 //-------------------------------------------------
 
-inline uint32_t direct_read_data::read_dword(offs_t byteaddress, offs_t directxor)
+inline u32 direct_read_data::read_dword(offs_t byteaddress, offs_t directxor)
 {
 	if (address_is_valid(byteaddress))
-		return *reinterpret_cast<uint32_t *>(&m_ptr[(byteaddress ^ directxor) & m_bytemask]);
+		return *reinterpret_cast<u32 *>(&m_ptr[(byteaddress ^ directxor) & m_bytemask]);
 	return m_space.read_dword(byteaddress);
 }
 
@@ -924,11 +924,11 @@ inline uint32_t direct_read_data::read_dword(offs_t byteaddress, offs_t directxo
 //  direct_read_data class
 //-------------------------------------------------
 
-inline uint64_t direct_read_data::read_qword(offs_t byteaddress, offs_t directxor)
+inline u64 direct_read_data::read_qword(offs_t byteaddress, offs_t directxor)
 {
 	if (address_is_valid(byteaddress))
-		return *reinterpret_cast<uint64_t *>(&m_ptr[(byteaddress ^ directxor) & m_bytemask]);
+		return *reinterpret_cast<u64 *>(&m_ptr[(byteaddress ^ directxor) & m_bytemask]);
 	return m_space.read_qword(byteaddress);
 }
 
-#endif  /* __EMUMEM_H__ */
+#endif  /* MAME_EMU_EMUMEM_H */

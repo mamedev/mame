@@ -896,18 +896,10 @@ unsigned DasmSH4(std::ostream &stream, unsigned pc, uint16_t opcode)
 
 CPU_DISASSEMBLE(sh4)
 {
-	std::ostringstream stream;
-	offs_t result = DasmSH4(stream, pc, (oprom[1] << 8) | oprom[0]);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
+	return DasmSH4(stream, pc, (oprom[1] << 8) | oprom[0]);
 }
 
 CPU_DISASSEMBLE(sh4be)
 {
-	std::ostringstream stream;
-	offs_t result = DasmSH4(stream, pc, (oprom[0] << 8) | oprom[1]);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
+	return DasmSH4(stream, pc, (oprom[0] << 8) | oprom[1]);
 }

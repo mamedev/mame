@@ -1169,18 +1169,10 @@ offs_t ppc_dasm_one(std::ostream &stream, uint32_t pc, uint32_t op)
 	return 4 | flags;
 }
 
-offs_t ppc_dasm_one(char *buffer, uint32_t pc, uint32_t op)
-{
-	std::ostringstream stream;
-	offs_t result = ppc_dasm_one(stream, pc, op);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
-}
 
 CPU_DISASSEMBLE( powerpc )
 {
 	uint32_t op = *(uint32_t *)oprom;
 	op = big_endianize_int32(op);
-	return ppc_dasm_one(buffer, pc, op);
+	return ppc_dasm_one(stream, pc, op);
 }

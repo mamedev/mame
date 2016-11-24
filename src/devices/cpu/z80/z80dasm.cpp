@@ -413,7 +413,7 @@ static int offs(int8_t offset)
 /****************************************************************************
  * Disassemble opcode at PC and return number of bytes it takes
  ****************************************************************************/
-static offs_t internal_disasm_z80(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+CPU_DISASSEMBLE(z80)
 {
 	const z80dasm *d;
 	const char *src, *ixy;
@@ -526,14 +526,4 @@ static offs_t internal_disasm_z80(cpu_device *device, std::ostream &stream, offs
 	}
 
 	return pos | s_flags[d->mnemonic] | DASMFLAG_SUPPORTED;
-}
-
-
-CPU_DISASSEMBLE(z80)
-{
-	std::ostringstream stream;
-	offs_t result = internal_disasm_z80(device, stream, pc, oprom, opram, options);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
 }

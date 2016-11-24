@@ -227,7 +227,7 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			switch (subop)
 			{
 				case 0x00:          // NOP / idle                       |000|00000|
-					if (opcode & U64(0x008000000000))
+					if (opcode & 0x008000000000U)
 					{
 						// IDLE
 						desc.flags |= OPFLAG_END_SEQUENCE;
@@ -608,7 +608,7 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 
 				case 0x16:          // I register modify / bit-reverse      |000|10110|
 				{
-					if (opcode & U64(0x008000000000))   // bit reverse
+					if (opcode & 0x008000000000U)   // bit reverse
 					{
 						fatalerror("sharc_frontend::describe: bit reverse unimplemented");
 					}
@@ -737,7 +737,7 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 			if (!describe_compute(desc, opcode))
 				return false;
 
-			if (opcode & U64(0x100000000000))   // compute / ureg <-> ureg                          |011|1|
+			if (opcode & 0x100000000000U)   // compute / ureg <-> ureg                          |011|1|
 			{
 				int src_ureg = (opcode >> 36) & 0xff;
 				int dst_ureg = (opcode >> 23) & 0xff;
@@ -798,7 +798,7 @@ bool sharc_frontend::describe(opcode_desc &desc, const opcode_desc *prev)
 
 		case 4:
 		{
-			if (opcode & U64(0x100000000000))   // immediate data -> DM|PM                          |100|1|
+			if (opcode & 0x100000000000U)   // immediate data -> DM|PM                          |100|1|
 			{
 				int i = (opcode >> 41) & 0x7;
 				int m = (opcode >> 38) & 0x7;

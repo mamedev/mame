@@ -36,10 +36,10 @@ sm510_device::sm510_device(const machine_config &mconfig, const char *tag, devic
 
 
 // disasm
-offs_t sm510_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t sm510_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE(sm510);
-	return CPU_DISASSEMBLE_NAME(sm510)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(sm510)(this, stream, pc, oprom, opram, options);
 }
 
 

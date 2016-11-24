@@ -628,15 +628,6 @@ offs_t m6502_device::disassemble_generic(std::ostream &stream, offs_t pc, const 
 	return flags;
 }
 
-offs_t m6502_device::disassemble_generic(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options, const disasm_entry *table)
-{
-	std::ostringstream stream;
-	offs_t result = disassemble_generic(stream, pc, oprom, opram, options, table);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
-}
-
 void m6502_device::prefetch()
 {
 	sync = true;
@@ -673,9 +664,9 @@ void m6502_device::set_nz(uint8_t v)
 		P |= F_Z;
 }
 
-offs_t m6502_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t m6502_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
-	return disassemble_generic(buffer, pc, oprom, opram, options, disasm_entries);
+	return disassemble_generic(stream, pc, oprom, opram, options, disasm_entries);
 }
 
 

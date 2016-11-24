@@ -274,10 +274,7 @@ private:
 
 
 static ADDRESS_MAP_START( octopus_mem, AS_PROGRAM, 8, octopus_state )
-	AM_RANGE(0x00000, 0x1ffff) AM_RAMBANK("main_ram_bank")
-	// second 128kB for 256kB system
-	// expansion RAM, up to 512kB extra
-	AM_RANGE(0x20000, 0xcffff) AM_NOP
+	AM_RANGE(0x00000, 0xcffff) AM_RAMBANK("main_ram_bank")
 	AM_RANGE(0xd0000, 0xdffff) AM_RAM AM_SHARE("vram")
 	AM_RANGE(0xe0000, 0xe3fff) AM_NOP
 	AM_RANGE(0xe4000, 0xe5fff) AM_RAM AM_SHARE("fram")
@@ -729,9 +726,9 @@ void octopus_state::machine_start()
 {
 	m_timer_beep = timer_alloc(BEEP_TIMER);
 
-	// install extra RAM
-	if(m_ram->size() > 0x20000)
-		m_maincpu->space(AS_PROGRAM).install_readwrite_bank(0x20000,m_ram->size()-1,"extra_ram_bank");
+	// install RAM
+	m_maincpu->space(AS_PROGRAM).install_readwrite_bank(0x0000,m_ram->size()-1,"main_ram_bank");
+	m_maincpu->space(AS_PROGRAM).nop_readwrite(m_ram->size(),0xcffff);
 }
 
 void octopus_state::machine_reset()
@@ -744,8 +741,6 @@ void octopus_state::machine_reset()
 	m_rtc_address = true;
 	m_rtc_data = false;
 	membank("main_ram_bank")->set_base(m_ram->pointer());
-	if(m_ram->size() > 0x20000)
-		membank("extra_ram_bank")->set_base(m_ram->pointer()+0x20000);
 	m_kb_uart->write_dsr(1);  // DSR is used to determine if a keyboard is connected?  If DSR is high, then the CHAR_OUT BIOS function will not output to the screen.
 }
 

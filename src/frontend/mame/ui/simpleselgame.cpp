@@ -214,7 +214,7 @@ void simple_menu_select_game::inkey_special(const event *menu_event)
 //  populate - populate the game select menu
 //-------------------------------------------------
 
-void simple_menu_select_game::populate()
+void simple_menu_select_game::populate(float &customtop, float &custombottom)
 {
 	int matchcount;
 	int curitem;

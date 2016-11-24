@@ -1904,13 +1904,10 @@ uint32_t hyperstone_device::disasm_max_opcode_bytes() const
 //  helper function
 //-------------------------------------------------
 
-offs_t hyperstone_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t hyperstone_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
-	std::ostringstream stream;
-	offs_t result = dasm_hyperstone(stream, pc, oprom, GET_H, GET_FP);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
+	extern CPU_DISASSEMBLE( hyperstone );
+	return dasm_hyperstone(stream, pc, oprom, GET_H, GET_FP);
 }
 
 /* Opcodes */
@@ -2858,7 +2855,7 @@ void hyperstone_device::hyperstone_sardi(struct hyperstone_device::regs_decode *
 		int i;
 		for( i = 0; i < N_VALUE; i++ )
 		{
-			val |= (U64(0x8000000000000000) >> i);
+			val |= (0x8000000000000000U >> i);
 		}
 	}
 
@@ -2908,7 +2905,7 @@ void hyperstone_device::hyperstone_sard(struct hyperstone_device::regs_decode *d
 			int i;
 			for( i = 0; i < n; i++ )
 			{
-				val |= (U64(0x8000000000000000) >> i);
+				val |= (0x8000000000000000U >> i);
 			}
 		}
 
@@ -2965,7 +2962,7 @@ void hyperstone_device::hyperstone_shldi(struct hyperstone_device::regs_decode *
 	low_order  = DREGF;
 
 	val  = concat_64(high_order, low_order);
-	SET_C( (N_VALUE)?(((val<<(N_VALUE-1))&U64(0x8000000000000000))?1:0):0);
+	SET_C( (N_VALUE)?(((val<<(N_VALUE-1))&0x8000000000000000U)?1:0):0);
 	mask = ((((uint64_t)1) << (32 - N_VALUE)) - 1) ^ 0xffffffff;
 	tmp  = high_order << N_VALUE;
 
@@ -3009,7 +3006,7 @@ void hyperstone_device::hyperstone_shld(struct hyperstone_device::regs_decode *d
 		mask = ((((uint64_t)1) << (32 - n)) - 1) ^ 0xffffffff;
 
 		val = concat_64(high_order, low_order);
-		SET_C( (n)?(((val<<(n-1))&U64(0x8000000000000000))?1:0):0);
+		SET_C( (n)?(((val<<(n-1))&0x8000000000000000U)?1:0):0);
 		tmp = high_order << n;
 
 		if( ((high_order & mask) && (!(tmp & 0x80000000))) ||

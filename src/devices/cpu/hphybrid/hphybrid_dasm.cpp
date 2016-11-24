@@ -371,7 +371,7 @@ static offs_t disassemble_table(uint16_t opcode , offs_t pc , const dis_entry_t 
 	return 0;
 }
 
-static offs_t internal_disasm_hp_hybrid(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+CPU_DISASSEMBLE(hp_hybrid)
 {
 	uint16_t opcode = ((uint16_t)oprom[ 0 ] << 8) | oprom[ 1 ];
 	offs_t res;
@@ -388,16 +388,7 @@ static offs_t internal_disasm_hp_hybrid(cpu_device *device, std::ostream &stream
 	return res;
 }
 
-CPU_DISASSEMBLE(hp_hybrid)
-{
-	std::ostringstream stream;
-	offs_t result = internal_disasm_hp_hybrid(device, stream, pc, oprom, opram, options);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
-}
-
-static offs_t internal_disasm_hp_5061_3001(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+CPU_DISASSEMBLE(hp_5061_3001)
 {
 	uint16_t opcode = ((uint16_t)oprom[ 0 ] << 8) | oprom[ 1 ];
 	offs_t res;
@@ -417,14 +408,4 @@ static offs_t internal_disasm_hp_5061_3001(cpu_device *device, std::ostream &str
 	}
 
 	return res;
-}
-
-
-CPU_DISASSEMBLE(hp_5061_3001)
-{
-	std::ostringstream stream;
-	offs_t result = internal_disasm_hp_5061_3001(device, stream, pc, oprom, opram, options);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
 }

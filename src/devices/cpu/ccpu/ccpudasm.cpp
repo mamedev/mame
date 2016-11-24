@@ -14,7 +14,7 @@
 #include "ccpu.h"
 
 
-static offs_t internal_disasm_ccpu(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+CPU_DISASSEMBLE(ccpu)
 {
 	unsigned startpc = pc;
 	uint8_t opcode = oprom[pc++ - startpc];
@@ -327,14 +327,4 @@ static offs_t internal_disasm_ccpu(cpu_device *device, std::ostream &stream, off
 	}
 
 	return (pc - startpc) | DASMFLAG_SUPPORTED;
-}
-
-
-CPU_DISASSEMBLE(ccpu)
-{
-	std::ostringstream stream;
-	offs_t result = internal_disasm_ccpu(device, stream, pc, oprom, opram, options);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
 }

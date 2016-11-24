@@ -14,8 +14,8 @@
 #error Dont include this file directly; include emu.h instead.
 #endif
 
-#ifndef __DRIVER_H__
-#define __DRIVER_H__
+#ifndef MAME_EMU_DRIVER_H
+#define MAME_EMU_DRIVER_H
 
 
 //**************************************************************************
@@ -180,13 +180,13 @@ public:
 
 
 	// generic video
-	void flip_screen_set(uint32_t on);
-	void flip_screen_set_no_update(uint32_t on);
-	void flip_screen_x_set(uint32_t on);
-	void flip_screen_y_set(uint32_t on);
-	uint32_t flip_screen() const { return m_flip_screen_x; }
-	uint32_t flip_screen_x() const { return m_flip_screen_x; }
-	uint32_t flip_screen_y() const { return m_flip_screen_y; }
+	void flip_screen_set(u32 on);
+	void flip_screen_set_no_update(u32 on);
+	void flip_screen_x_set(u32 on);
+	void flip_screen_y_set(u32 on);
+	u32 flip_screen() const { return m_flip_screen_x; }
+	u32 flip_screen_x() const { return m_flip_screen_x; }
+	u32 flip_screen_y() const { return m_flip_screen_y; }
 
 	// generic input port helpers
 	DECLARE_CUSTOM_INPUT_MEMBER( custom_port_read );
@@ -212,22 +212,22 @@ protected:
 
 private:
 	// helpers
-	void irq_pulse_clear(void *ptr, int32_t param);
+	void irq_pulse_clear(void *ptr, s32 param);
 	void updateflip();
 
 	// internal state
-	const game_driver *     m_system;                   // pointer to the game driver
-	driver_callback_delegate m_callbacks[CB_COUNT];     // start/reset callbacks
+	const game_driver *         m_system;               // pointer to the game driver
+	driver_callback_delegate    m_callbacks[CB_COUNT];  // start/reset callbacks
 
 	// generic video
-	uint8_t                   m_flip_screen_x;
-	uint8_t                   m_flip_screen_y;
+	u8                          m_flip_screen_x;
+	u8                          m_flip_screen_y;
 };
 
 
 // this template function creates a stub which constructs a device
 template<class _DriverClass>
-device_t *driver_device_creator(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+device_t *driver_device_creator(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 {
 	assert(owner == nullptr);
 	assert(clock == 0);
@@ -235,4 +235,4 @@ device_t *driver_device_creator(const machine_config &mconfig, const char *tag, 
 }
 
 
-#endif  /* __DRIVER_H__ */
+#endif  /* MAME_EMU_DRIVER_H */

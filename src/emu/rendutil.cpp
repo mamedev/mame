@@ -19,8 +19,8 @@
 ***************************************************************************/
 
 /* utilities */
-static void resample_argb_bitmap_average(uint32_t *dest, uint32_t drowpixels, uint32_t dwidth, uint32_t dheight, const uint32_t *source, uint32_t srowpixels, uint32_t swidth, uint32_t sheight, const render_color &color, uint32_t dx, uint32_t dy);
-static void resample_argb_bitmap_bilinear(uint32_t *dest, uint32_t drowpixels, uint32_t dwidth, uint32_t dheight, const uint32_t *source, uint32_t srowpixels, uint32_t swidth, uint32_t sheight, const render_color &color, uint32_t dx, uint32_t dy);
+static void resample_argb_bitmap_average(u32 *dest, u32 drowpixels, u32 dwidth, u32 dheight, const u32 *source, u32 srowpixels, u32 swidth, u32 sheight, const render_color &color, u32 dx, u32 dy);
+static void resample_argb_bitmap_bilinear(u32 *dest, u32 drowpixels, u32 dwidth, u32 dheight, const u32 *source, u32 srowpixels, u32 swidth, u32 sheight, const render_color &color, u32 dx, u32 dy);
 static bool copy_png_to_bitmap(bitmap_argb32 &bitmap, const png_info *png);
 static bool copy_png_alpha_to_bitmap(bitmap_argb32 &bitmap, const png_info *png);
 
@@ -41,15 +41,15 @@ void render_resample_argb_bitmap_hq(bitmap_argb32 &dest, bitmap_argb32 &source, 
 		return;
 
 	/* adjust the source base */
-	const uint32_t *sbase = &source.pix32(0);
+	const u32 *sbase = &source.pix32(0);
 
 	/* determine the steppings */
-	uint32_t swidth = source.width();
-	uint32_t sheight = source.height();
-	uint32_t dwidth = dest.width();
-	uint32_t dheight = dest.height();
-	uint32_t dx = (swidth << 12) / dwidth;
-	uint32_t dy = (sheight << 12) / dheight;
+	u32 swidth = source.width();
+	u32 sheight = source.height();
+	u32 dwidth = dest.width();
+	u32 dheight = dest.height();
+	u32 dx = (swidth << 12) / dwidth;
+	u32 dy = (sheight << 12) / dheight;
 
 	/* if the source is higher res than the target, use full averaging */
 	if (dx > 0x1000 || dy > 0x1000 || force)
@@ -65,11 +65,11 @@ void render_resample_argb_bitmap_hq(bitmap_argb32 &dest, bitmap_argb32 &source, 
     all contributing pixels
 -------------------------------------------------*/
 
-static void resample_argb_bitmap_average(uint32_t *dest, uint32_t drowpixels, uint32_t dwidth, uint32_t dheight, const uint32_t *source, uint32_t srowpixels, uint32_t swidth, uint32_t sheight, const render_color &color, uint32_t dx, uint32_t dy)
+static void resample_argb_bitmap_average(u32 *dest, u32 drowpixels, u32 dwidth, u32 dheight, const u32 *source, u32 srowpixels, u32 swidth, u32 sheight, const render_color &color, u32 dx, u32 dy)
 {
-	uint64_t sumscale = (uint64_t)dx * (uint64_t)dy;
-	uint32_t r, g, b, a;
-	uint32_t x, y;
+	u64 sumscale = u64(dx) * u64(dy);
+	u32 r, g, b, a;
+	u32 x, y;
 
 	/* precompute premultiplied R/G/B/A factors */
 	r = color.r * color.a * 256.0f;
@@ -80,22 +80,22 @@ static void resample_argb_bitmap_average(uint32_t *dest, uint32_t drowpixels, ui
 	/* loop over the target vertically */
 	for (y = 0; y < dheight; y++)
 	{
-		uint32_t starty = y * dy;
+		u32 starty = y * dy;
 
 		/* loop over the target horizontally */
 		for (x = 0; x < dwidth; x++)
 		{
-			uint64_t sumr = 0, sumg = 0, sumb = 0, suma = 0;
-			uint32_t startx = x * dx;
-			uint32_t xchunk, ychunk;
-			uint32_t curx, cury;
+			u64 sumr = 0, sumg = 0, sumb = 0, suma = 0;
+			u32 startx = x * dx;
+			u32 xchunk, ychunk;
+			u32 curx, cury;
 
-			uint32_t yremaining = dy;
+			u32 yremaining = dy;
 
 			/* accumulate all source pixels that contribute to this pixel */
 			for (cury = starty; yremaining; cury += ychunk)
 			{
-				uint32_t xremaining = dx;
+				u32 xremaining = dx;
 
 				/* determine the Y contribution, clamping to the amount remaining */
 				ychunk = 0x1000 - (cury & 0xfff);
@@ -106,7 +106,7 @@ static void resample_argb_bitmap_average(uint32_t *dest, uint32_t drowpixels, ui
 				/* loop over all source pixels in the X direction */
 				for (curx = startx; xremaining; curx += xchunk)
 				{
-					uint32_t factor;
+					u32 factor;
 
 					/* determine the X contribution, clamping to the amount remaining */
 					xchunk = 0x1000 - (curx & 0xfff);
@@ -156,11 +156,11 @@ static void resample_argb_bitmap_average(uint32_t *dest, uint32_t drowpixels, ui
     sampling via a bilinear filter
 -------------------------------------------------*/
 
-static void resample_argb_bitmap_bilinear(uint32_t *dest, uint32_t drowpixels, uint32_t dwidth, uint32_t dheight, const uint32_t *source, uint32_t srowpixels, uint32_t swidth, uint32_t sheight, const render_color &color, uint32_t dx, uint32_t dy)
+static void resample_argb_bitmap_bilinear(u32 *dest, u32 drowpixels, u32 dwidth, u32 dheight, const u32 *source, u32 srowpixels, u32 swidth, u32 sheight, const render_color &color, u32 dx, u32 dy)
 {
-	uint32_t maxx = swidth << 12, maxy = sheight << 12;
-	uint32_t r, g, b, a;
-	uint32_t x, y;
+	u32 maxx = swidth << 12, maxy = sheight << 12;
+	u32 r, g, b, a;
+	u32 x, y;
 
 	/* precompute premultiplied R/G/B/A factors */
 	r = color.r * color.a * 256.0f;
@@ -171,17 +171,17 @@ static void resample_argb_bitmap_bilinear(uint32_t *dest, uint32_t drowpixels, u
 	/* loop over the target vertically */
 	for (y = 0; y < dheight; y++)
 	{
-		uint32_t starty = y * dy;
+		u32 starty = y * dy;
 
 		/* loop over the target horizontally */
 		for (x = 0; x < dwidth; x++)
 		{
-			uint32_t startx = x * dx;
+			u32 startx = x * dx;
 			rgb_t pix0, pix1, pix2, pix3;
-			uint32_t sumr, sumg, sumb, suma;
-			uint32_t nextx, nexty;
-			uint32_t curx, cury;
-			uint32_t factor;
+			u32 sumr, sumg, sumb, suma;
+			u32 nextx, nexty;
+			u32 curx, cury;
+			u32 factor;
 
 			/* adjust start to the center; note that this math will tend to produce */
 			/* negative results on the first pixel, which is why we clamp below */
@@ -194,13 +194,13 @@ static void resample_argb_bitmap_bilinear(uint32_t *dest, uint32_t drowpixels, u
 
 			/* fetch the four relevant pixels */
 			pix0 = pix1 = pix2 = pix3 = 0;
-			if ((int32_t)cury >= 0 && cury < maxy && (int32_t)curx >= 0 && curx < maxx)
+			if (s32(cury) >= 0 && cury < maxy && s32(curx) >= 0 && curx < maxx)
 				pix0 = source[(cury >> 12) * srowpixels + (curx >> 12)];
-			if ((int32_t)cury >= 0 && cury < maxy && (int32_t)nextx >= 0 && nextx < maxx)
+			if (s32(cury) >= 0 && cury < maxy && s32(nextx) >= 0 && nextx < maxx)
 				pix1 = source[(cury >> 12) * srowpixels + (nextx >> 12)];
-			if ((int32_t)nexty >= 0 && nexty < maxy && (int32_t)curx >= 0 && curx < maxx)
+			if (s32(nexty) >= 0 && nexty < maxy && s32(curx) >= 0 && curx < maxx)
 				pix2 = source[(nexty >> 12) * srowpixels + (curx >> 12)];
-			if ((int32_t)nexty >= 0 && nexty < maxy && (int32_t)nextx >= 0 && nextx < maxx)
+			if (s32(nexty) >= 0 && nexty < maxy && s32(nextx) >= 0 && nextx < maxx)
 				pix3 = source[(nexty >> 12) * srowpixels + (nextx >> 12)];
 
 			/* compute the x/y scaling factors */
@@ -267,8 +267,8 @@ bool render_clip_line(render_bounds *bounds, const render_bounds *clip)
 	/* loop until we get a final result */
 	while (1)
 	{
-		uint8_t code0 = 0, code1 = 0;
-		uint8_t thiscode;
+		u8 code0 = 0, code1 = 0;
+		u8 thiscode;
 		float x, y;
 
 		/* compute Cohen Sutherland bits for first coordinate */
@@ -569,7 +569,7 @@ void render_load_jpeg(bitmap_argb32 &bitmap, emu_file &file, const char *dirname
 	jpeg_create_decompress(&cinfo);
 
 	// allocates a buffer for the image
-	uint32_t jpg_size = file.size();
+	u32 jpg_size = file.size();
 	std::unique_ptr<unsigned char[]> jpg_buffer = std::make_unique<unsigned char[]>(jpg_size);
 
 	// read data from the file and set them in the buffer
@@ -696,8 +696,8 @@ bool render_load_png(bitmap_argb32 &bitmap, emu_file &file, const char *dirname,
 
 static bool copy_png_to_bitmap(bitmap_argb32 &bitmap, const png_info *png)
 {
-	uint8_t accumalpha = 0xff;
-	uint8_t *src;
+	u8 accumalpha = 0xff;
+	u8 *src;
 	int x, y;
 
 	/* handle 8bpp palettized case */
@@ -709,7 +709,7 @@ static bool copy_png_to_bitmap(bitmap_argb32 &bitmap, const png_info *png)
 			for (x = 0; x < png->width; x++, src++)
 			{
 				/* determine alpha and expand to 32bpp */
-				uint8_t alpha = (*src < png->num_trans) ? png->trans[*src] : 0xff;
+				u8 alpha = (*src < png->num_trans) ? png->trans[*src] : 0xff;
 				accumalpha &= alpha;
 				bitmap.pix32(y, x) = rgb_t(alpha, png->palette[*src * 3], png->palette[*src * 3 + 1], png->palette[*src * 3 + 2]);
 			}
@@ -760,8 +760,8 @@ static bool copy_png_to_bitmap(bitmap_argb32 &bitmap, const png_info *png)
 
 static bool copy_png_alpha_to_bitmap(bitmap_argb32 &bitmap, const png_info *png)
 {
-	uint8_t accumalpha = 0xff;
-	uint8_t *src;
+	u8 accumalpha = 0xff;
+	u8 *src;
 	int x, y;
 
 	/* handle 8bpp palettized case */
@@ -773,7 +773,7 @@ static bool copy_png_alpha_to_bitmap(bitmap_argb32 &bitmap, const png_info *png)
 			for (x = 0; x < png->width; x++, src++)
 			{
 				rgb_t pixel = bitmap.pix32(y, x);
-				uint8_t alpha = rgb_t(png->palette[*src * 3], png->palette[*src * 3 + 1], png->palette[*src * 3 + 2]).brightness();
+				u8 alpha = rgb_t(png->palette[*src * 3], png->palette[*src * 3 + 1], png->palette[*src * 3 + 2]).brightness();
 				accumalpha &= alpha;
 				bitmap.pix32(y, x) = rgb_t(alpha, pixel.r(), pixel.g(), pixel.b());
 			}
@@ -802,7 +802,7 @@ static bool copy_png_alpha_to_bitmap(bitmap_argb32 &bitmap, const png_info *png)
 			for (x = 0; x < png->width; x++, src += 3)
 			{
 				rgb_t pixel = bitmap.pix32(y, x);
-				uint8_t alpha = rgb_t(src[0], src[1], src[2]).brightness();
+				u8 alpha = rgb_t(src[0], src[1], src[2]).brightness();
 				accumalpha &= alpha;
 				bitmap.pix32(y, x) = rgb_t(alpha, pixel.r(), pixel.g(), pixel.b());
 			}
@@ -817,7 +817,7 @@ static bool copy_png_alpha_to_bitmap(bitmap_argb32 &bitmap, const png_info *png)
 			for (x = 0; x < png->width; x++, src += 4)
 			{
 				rgb_t pixel = bitmap.pix32(y, x);
-				uint8_t alpha = rgb_t(src[0], src[1], src[2]).brightness();
+				u8 alpha = rgb_t(src[0], src[1], src[2]).brightness();
 				accumalpha &= alpha;
 				bitmap.pix32(y, x) = rgb_t(alpha, pixel.r(), pixel.g(), pixel.b());
 			}

@@ -636,26 +636,7 @@ int m7700_disassemble(std::ostream &stream, unsigned int pc, unsigned int pb, co
 	return length | flags | DASMFLAG_SUPPORTED;
 }
 
-int m7700_disassemble(char *buffer, unsigned int pc, unsigned int pb, const uint8_t *oprom, int m_flag, int x_flag)
-{
-	std::ostringstream stream;
-	offs_t result = m7700_disassemble(stream, pc, pb, oprom, m_flag, x_flag);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
-}
-
-static offs_t internal_disasm_m37710_generic(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
-{
-	return m7700_disassemble(stream, (pc&0xffff), pc>>16, oprom, 0, 0);
-}
-
-
 CPU_DISASSEMBLE(m37710_generic)
 {
-	std::ostringstream stream;
-	offs_t result = internal_disasm_m37710_generic(device, stream, pc, oprom, opram, options);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
+	return m7700_disassemble(stream, (pc&0xffff), pc>>16, oprom, 0, 0);
 }

@@ -12,6 +12,7 @@
 #define __SOFTLIST_H_
 
 #include <list>
+#include "emucore.h"
 #include "romentry.h"
 #include "corefile.h"
 
@@ -120,7 +121,7 @@ public:
 	const std::string &publisher() const { return m_publisher; }
 	const std::list<feature_list_item> &other_info() const { return m_other_info; }
 	const std::list<feature_list_item> &shared_info() const { return m_shared_info; }
-	uint32_t supported() const { return m_supported; }
+	u32 supported() const { return m_supported; }
 	const std::list<software_part> &parts() const { return m_partdata; }
 
 	// additional operations
@@ -129,7 +130,7 @@ public:
 
 private:
 	// internal state
-	uint32_t                  m_supported;
+	u32                     m_supported;
 	std::string             m_shortname;
 	std::string             m_longname;
 	std::string             m_parentname;
@@ -174,7 +175,7 @@ private:
 	// internal helpers
 	template <typename T> std::vector<std::string> parse_attributes(const char **attributes, const T &attrlist);
 	bool parse_name_and_value(const char **attributes, std::string &name, std::string &value);
-	void add_rom_entry(std::string &&name, std::string &&hashdata, uint32_t offset, uint32_t length, uint32_t flags);
+	void add_rom_entry(std::string &&name, std::string &&hashdata, u32 offset, u32 length, u32 flags);
 
 	// expat callbacks
 	static void start_handler(void *data, const char *tagname, const char **attributes);

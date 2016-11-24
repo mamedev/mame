@@ -29,7 +29,7 @@
 ***************************************************************************/
 
 /* raw bitmap */
-static const uint8_t crosshair_raw_top[] =
+static const u8 crosshair_raw_top[] =
 {
 	0x00,0x20,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x40,0x00,
 	0x00,0x70,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0xe0,0x00,
@@ -206,8 +206,8 @@ void render_crosshair::create_bitmap()
 		for (y = 0; y < CROSSHAIR_RAW_SIZE / 2; y++)
 		{
 			/* assume it is mirrored vertically */
-			uint32_t *dest0 = &m_bitmap->pix32(y);
-			uint32_t *dest1 = &m_bitmap->pix32(CROSSHAIR_RAW_SIZE - 1 - y);
+			u32 *dest0 = &m_bitmap->pix32(y);
+			u32 *dest1 = &m_bitmap->pix32(CROSSHAIR_RAW_SIZE - 1 - y);
 
 			/* extract to two rows simultaneously */
 			for (x = 0; x < CROSSHAIR_RAW_SIZE; x++)
@@ -225,7 +225,7 @@ void render_crosshair::create_bitmap()
 //  animate - update the crosshair state
 //-------------------------------------------------
 
-void render_crosshair::animate(uint16_t auto_time)
+void render_crosshair::animate(u16 auto_time)
 {
 	// read all the port values
 	if (m_used)
@@ -263,7 +263,7 @@ void render_crosshair::animate(uint16_t auto_time)
 //  draw - render the crosshair to the container
 //-------------------------------------------------
 
-void render_crosshair::draw(render_container &container, uint8_t fade)
+void render_crosshair::draw(render_container &container, u8 fade)
 {
 	// add a quad assuming a 4:3 screen (this is not perfect)
 	container.add_quad(m_x - 0.03f, m_y - 0.04f, m_x + 0.03f, m_y + 0.04f,
@@ -414,7 +414,7 @@ void crosshair_manager::config_load(config_type cfg_type, xml_data_node *parentn
 				mode = crosshairnode->get_attribute_int("mode", CROSSHAIR_VISIBILITY_DEFAULT);
 				if (mode >= CROSSHAIR_VISIBILITY_OFF && mode <= CROSSHAIR_VISIBILITY_AUTO)
 				{
-					crosshair.set_mode((uint8_t)mode);
+					crosshair.set_mode(u8(mode));
 					/* set visibility as specified by mode */
 					/* auto mode starts with visibility off */
 					crosshair.set_visible(mode == CROSSHAIR_VISIBILITY_ON);
@@ -432,7 +432,7 @@ void crosshair_manager::config_load(config_type cfg_type, xml_data_node *parentn
 	{
 		auto_time = crosshairnode->get_attribute_int("val", CROSSHAIR_VISIBILITY_AUTOTIME_DEFAULT);
 		if ((auto_time >= CROSSHAIR_VISIBILITY_AUTOTIME_MIN) && (auto_time <= CROSSHAIR_VISIBILITY_AUTOTIME_MAX))
-			m_auto_time = (uint8_t)auto_time;
+			m_auto_time = u8(auto_time);
 	}
 }
 

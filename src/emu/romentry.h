@@ -8,11 +8,12 @@
 
 *********************************************************************/
 
-#ifndef MAME_EMU_ROMENTRY_H_
-#define MAME_EMU_ROMENTRY_H_
+#ifndef MAME_EMU_ROMENTRY_H
+#define MAME_EMU_ROMENTRY_H
 
 #include <string>
 
+#include "emucore.h"
 #include "osdcomm.h"
 
 /***************************************************************************
@@ -121,9 +122,9 @@ struct tiny_rom_entry
 {
 	const char *name;
 	const char *hashdata;
-	uint32_t offset;
-	uint32_t length;
-	uint32_t flags;
+	u32 offset;
+	u32 length;
+	u32 flags;
 };
 
 
@@ -133,7 +134,7 @@ class rom_entry
 {
 public:
 	rom_entry(const tiny_rom_entry &ent);
-	rom_entry(std::string &&name, std::string &&hashdata, uint32_t offset, uint32_t length, uint32_t flags);
+	rom_entry(std::string &&name, std::string &&hashdata, u32 offset, u32 length, u32 flags);
 	rom_entry(rom_entry const &) = default;
 	rom_entry(rom_entry &&) = default;
 	rom_entry &operator=(rom_entry const &) = default;
@@ -142,18 +143,18 @@ public:
 	// accessors
 	const std::string &name() const { return m_name; }
 	const std::string &hashdata() const { return m_hashdata; }
-	uint32_t offset() const { return m_offset; }
-	uint32_t length() const { return m_length; }
-	uint32_t flags() const { return m_flags; }
-	void set_flags(uint32_t flags) { m_flags = flags; }
+	u32 offset() const { return m_offset; }
+	u32 length() const { return m_length; }
+	u32 flags() const { return m_flags; }
+	void set_flags(u32 flags) { m_flags = flags; }
 
 private:
 	std::string     m_name;
 	std::string     m_hashdata;
-	uint32_t          m_offset;
-	uint32_t          m_length;
-	uint32_t          m_flags;
+	u32             m_offset;
+	u32             m_length;
+	u32             m_flags;
 };
 
 
-#endif // MAME_EMU_ROMENTRY_H_
+#endif // MAME_EMU_ROMENTRY_H

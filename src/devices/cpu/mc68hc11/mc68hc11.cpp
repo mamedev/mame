@@ -54,10 +54,10 @@ mc68hc11_cpu_device::mc68hc11_cpu_device(const machine_config &mconfig, const ch
 }
 
 
-offs_t mc68hc11_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t mc68hc11_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( hc11 );
-	return CPU_DISASSEMBLE_NAME(hc11)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(hc11)(this, stream, pc, oprom, opram, options);
 }
 
 

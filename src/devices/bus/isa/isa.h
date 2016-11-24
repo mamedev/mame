@@ -216,7 +216,7 @@ public:
 	}
 
 	void install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler);
-	template<typename T> void install_device(offs_t addrstart, offs_t addrend, T &device, void (T::*map)(class address_map &map), int bits = 8, uint64_t unitmask = U64(0xffffffffffffffff))
+	template<typename T> void install_device(offs_t addrstart, offs_t addrend, T &device, void (T::*map)(class address_map &map), int bits = 8, uint64_t unitmask = 0xffffffffffffffffU)
 	{
 		m_iospace->install_device(addrstart, addrend, device, map, bits, unitmask);
 	}

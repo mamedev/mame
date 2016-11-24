@@ -392,7 +392,7 @@ uint32_t get_dasmflags(uint8_t op)
 }
 
 
-static offs_t internal_disasm_hd61700(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+CPU_DISASSEMBLE(hd61700)
 {
 	const hd61700_dasm *inst;
 	uint32_t dasmflags;
@@ -432,14 +432,4 @@ static offs_t internal_disasm_hd61700(cpu_device *device, std::ostream &stream, 
 	if (pos&1) INC_POS;
 
 	return (pos>>1) | dasmflags | DASMFLAG_SUPPORTED;
-}
-
-
-CPU_DISASSEMBLE(hd61700)
-{
-	std::ostringstream stream;
-	offs_t result = internal_disasm_hd61700(device, stream, pc, oprom, opram, options);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
 }

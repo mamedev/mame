@@ -50,7 +50,7 @@ private:
 
 	const game_driver *m_searchlist[VISIBLE_GAMES_IN_SEARCH + 1];
 
-	virtual void populate() override;
+	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 
 	// draw left panel

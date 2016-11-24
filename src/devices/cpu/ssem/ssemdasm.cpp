@@ -62,17 +62,6 @@ static offs_t ssem_dasm_one(std::ostream &stream, offs_t pc, uint32_t op)
 	return 4 | DASMFLAG_SUPPORTED;
 }
 
-
-static offs_t ssem_dasm_one(char *buffer, offs_t pc, uint32_t op)
-{
-	std::ostringstream stream;
-	offs_t result = ssem_dasm_one(stream, pc, op);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
-}
-
-
 /*****************************************************************************/
 
 CPU_DISASSEMBLE( ssem )
@@ -81,5 +70,5 @@ CPU_DISASSEMBLE( ssem )
 				(*(uint8_t *)(opram + 1) << 16) |
 				(*(uint8_t *)(opram + 2) <<  8) |
 				(*(uint8_t *)(opram + 3) <<  0);
-	return ssem_dasm_one(buffer, pc, op);
+	return ssem_dasm_one(stream, pc, op);
 }

@@ -20,7 +20,7 @@ static inline void ea (void)
 
 #define IN if (ib) util::stream_format(stream, " i")
 
-static offs_t internal_disasm_pdp1(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+CPU_DISASSEMBLE(pdp1)
 {
 	int md;
 	//int etime = 0;
@@ -289,14 +289,4 @@ static offs_t internal_disasm_pdp1(cpu_device *device, std::ostream &stream, off
 		break;
 	}
 	return 4;
-}
-
-
-CPU_DISASSEMBLE(pdp1)
-{
-	std::ostringstream stream;
-	offs_t result = internal_disasm_pdp1(device, stream, pc, oprom, opram, options);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
 }

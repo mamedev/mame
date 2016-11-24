@@ -14,8 +14,8 @@
 #error Dont include this file directly; include emu.h instead.
 #endif
 
-#ifndef __DEVCPU_H__
-#define __DEVCPU_H__
+#ifndef MAME_EMU_DEVCPU_H
+#define MAME_EMU_DEVCPU_H
 
 //**************************************************************************
 //  CPU DEVICE CONFIGURATION MACROS
@@ -54,8 +54,8 @@
 //**************************************************************************
 
 #define CPU_DISASSEMBLE_NAME(name)      cpu_disassemble_##name
-#define CPU_DISASSEMBLE(name)           offs_t CPU_DISASSEMBLE_NAME(name)(cpu_device *device, char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
-#define CPU_DISASSEMBLE_CALL(name)      CPU_DISASSEMBLE_NAME(name)(device, buffer, pc, oprom, opram, options)
+#define CPU_DISASSEMBLE(name)           offs_t CPU_DISASSEMBLE_NAME(name)(cpu_device *device, std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, int options)
+#define CPU_DISASSEMBLE_CALL(name)      CPU_DISASSEMBLE_NAME(name)(device, stream, pc, oprom, opram, options)
 
 
 //**************************************************************************
@@ -79,7 +79,7 @@ public:
 
 protected:
 	// construction/destruction
-	cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+	cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, const char *shortname, const char *source);
 	virtual ~cpu_device();
 
 private:
@@ -88,7 +88,7 @@ private:
 };
 
 
-typedef offs_t (*cpu_disassemble_func)(cpu_device *device, char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options);
+typedef offs_t (*cpu_disassemble_func)(cpu_device *device, std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, int options);
 
 
-#endif  /* __CPUINTRF_H__ */
+#endif  /* MAME_EMU_DEVCPU_H */

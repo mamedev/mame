@@ -367,7 +367,7 @@ static const tms7000_opcodeinfo opcodes[] = {
 	{0x00, "NOP", 23, 0 }
 };
 
-static offs_t internal_disasm_tms7000(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+CPU_DISASSEMBLE(tms7000)
 {
 	int opcode, i/*, size = 1*/;
 	int pos = 0;
@@ -445,14 +445,4 @@ static offs_t internal_disasm_tms7000(cpu_device *device, std::ostream &stream, 
 	/* No Match */
 	stream << "Illegal Opcode";
 	return pos | DASMFLAG_SUPPORTED;
-}
-
-
-CPU_DISASSEMBLE(tms7000)
-{
-	std::ostringstream stream;
-	offs_t result = internal_disasm_tms7000(device, stream, pc, oprom, opram, options);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
 }

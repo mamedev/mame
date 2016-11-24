@@ -307,7 +307,7 @@ READ8_MEMBER( intv_state::intvkb_iocart_r )
 	else if (m_iocart2->exists())
 		return m_iocart2->read_rom(space, offset, mem_mask);
 	else
-		return m_region_keyboard->u8(offset + 0xe000);
+		return m_region_keyboard->as_u8(offset + 0xe000);
 }
 
 

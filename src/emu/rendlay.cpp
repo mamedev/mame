@@ -867,15 +867,15 @@ void layout_element::reel_component::draw(running_machine &machine, bitmap_argb3
 	int use_state = (state + m_stateoffset) % max_state_used;
 
 	// compute premultiplied colors
-	uint32_t r = color().r * 255.0f;
-	uint32_t g = color().g * 255.0f;
-	uint32_t b = color().b * 255.0f;
-	uint32_t a = color().a * 255.0f;
+	u32 r = color().r * 255.0f;
+	u32 g = color().g * 255.0f;
+	u32 b = color().b * 255.0f;
+	u32 a = color().a * 255.0f;
 
 	// get the width of the string
 	render_font *font = machine.render().font_alloc("default");
 	float aspect = 1.0f;
-	int32_t width;
+	s32 width;
 
 	int curry = 0;
 	int num_shown = m_numsymbolsvisible;
@@ -914,7 +914,7 @@ void layout_element::reel_component::draw(running_machine &machine, bitmap_argb3
 				aspect *= 0.9f;
 			}
 
-			int32_t curx;
+			s32 curx;
 			curx = bounds.min_x + (bounds.width() - width) / 2;
 
 			if (m_file[fruit])
@@ -935,14 +935,14 @@ void layout_element::reel_component::draw(running_machine &machine, bitmap_argb3
 
 						if (effy >= bounds.min_y && effy <= bounds.max_y)
 						{
-							uint32_t *src = &tempbitmap2.pix32(y);
-							uint32_t *d = &dest.pix32(effy);
+							u32 *src = &tempbitmap2.pix32(y);
+							u32 *d = &dest.pix32(effy);
 							for (int x = 0; x < dest.width(); x++)
 							{
 								int effx = x;
 								if (effx >= bounds.min_x && effx <= bounds.max_x)
 								{
-									uint32_t spix = rgb_t(src[x]).a();
+									u32 spix = rgb_t(src[x]).a();
 									if (spix != 0)
 									{
 										d[effx] = src[x];
@@ -982,21 +982,21 @@ void layout_element::reel_component::draw(running_machine &machine, bitmap_argb3
 
 						if (effy >= bounds.min_y && effy <= bounds.max_y)
 						{
-							uint32_t *src = &tempbitmap.pix32(y);
-							uint32_t *d = &dest.pix32(effy);
+							u32 *src = &tempbitmap.pix32(y);
+							u32 *d = &dest.pix32(effy);
 							for (int x = 0; x < chbounds.width(); x++)
 							{
 								int effx = curx + x + chbounds.min_x;
 								if (effx >= bounds.min_x && effx <= bounds.max_x)
 								{
-									uint32_t spix = rgb_t(src[x]).a();
+									u32 spix = rgb_t(src[x]).a();
 									if (spix != 0)
 									{
 										rgb_t dpix = d[effx];
-										uint32_t ta = (a * (spix + 1)) >> 8;
-										uint32_t tr = (r * ta + dpix.r() * (0x100 - ta)) >> 8;
-										uint32_t tg = (g * ta + dpix.g() * (0x100 - ta)) >> 8;
-										uint32_t tb = (b * ta + dpix.b() * (0x100 - ta)) >> 8;
+										u32 ta = (a * (spix + 1)) >> 8;
+										u32 tr = (r * ta + dpix.r() * (0x100 - ta)) >> 8;
+										u32 tg = (g * ta + dpix.g() * (0x100 - ta)) >> 8;
+										u32 tb = (b * ta + dpix.b() * (0x100 - ta)) >> 8;
 										d[effx] = rgb_t(tr, tg, tb);
 									}
 								}
@@ -1027,15 +1027,15 @@ void layout_element::reel_component::draw_beltreel(running_machine &machine, bit
 	int use_state = (state + m_stateoffset) % max_state_used;
 
 	// compute premultiplied colors
-	uint32_t r = color().r * 255.0f;
-	uint32_t g = color().g * 255.0f;
-	uint32_t b = color().b * 255.0f;
-	uint32_t a = color().a * 255.0f;
+	u32 r = color().r * 255.0f;
+	u32 g = color().g * 255.0f;
+	u32 b = color().b * 255.0f;
+	u32 a = color().a * 255.0f;
 
 	// get the width of the string
 	render_font *font = machine.render().font_alloc("default");
 	float aspect = 1.0f;
-	int32_t width;
+	s32 width;
 	int currx = 0;
 	int num_shown = m_numsymbolsvisible;
 
@@ -1072,7 +1072,7 @@ void layout_element::reel_component::draw_beltreel(running_machine &machine, bit
 				aspect *= 0.9f;
 			}
 
-			int32_t curx;
+			s32 curx;
 			curx = bounds.min_x;
 
 			if (m_file[fruit])
@@ -1093,14 +1093,14 @@ void layout_element::reel_component::draw_beltreel(running_machine &machine, bit
 
 						if (effy >= bounds.min_y && effy <= bounds.max_y)
 						{
-							uint32_t *src = &tempbitmap2.pix32(y);
-							uint32_t *d = &dest.pix32(effy);
+							u32 *src = &tempbitmap2.pix32(y);
+							u32 *d = &dest.pix32(effy);
 							for (int x = 0; x < ourwidth/num_shown; x++)
 							{
 								int effx = basex + x;
 								if (effx >= bounds.min_x && effx <= bounds.max_x)
 								{
-									uint32_t spix = rgb_t(src[x]).a();
+									u32 spix = rgb_t(src[x]).a();
 									if (spix != 0)
 									{
 										d[effx] = src[x];
@@ -1142,21 +1142,21 @@ void layout_element::reel_component::draw_beltreel(running_machine &machine, bit
 
 						if (effy >= bounds.min_y && effy <= bounds.max_y)
 						{
-							uint32_t *src = &tempbitmap.pix32(y);
-							uint32_t *d = &dest.pix32(effy);
+							u32 *src = &tempbitmap.pix32(y);
+							u32 *d = &dest.pix32(effy);
 							for (int x = 0; x < chbounds.width(); x++)
 							{
 								int effx = basex + curx + x;
 								if (effx >= bounds.min_x && effx <= bounds.max_x)
 								{
-									uint32_t spix = rgb_t(src[x]).a();
+									u32 spix = rgb_t(src[x]).a();
 									if (spix != 0)
 									{
 										rgb_t dpix = d[effx];
-										uint32_t ta = (a * (spix + 1)) >> 8;
-										uint32_t tr = (r * ta + dpix.r() * (0x100 - ta)) >> 8;
-										uint32_t tg = (g * ta + dpix.g() * (0x100 - ta)) >> 8;
-										uint32_t tb = (b * ta + dpix.b() * (0x100 - ta)) >> 8;
+										u32 ta = (a * (spix + 1)) >> 8;
+										u32 tr = (r * ta + dpix.r() * (0x100 - ta)) >> 8;
+										u32 tg = (g * ta + dpix.g() * (0x100 - ta)) >> 8;
+										u32 tb = (b * ta + dpix.b() * (0x100 - ta)) >> 8;
 										d[effx] = rgb_t(tr, tg, tb);
 									}
 								}
@@ -1825,19 +1825,19 @@ layout_element::rect_component::rect_component(running_machine &machine, xml_dat
 void layout_element::rect_component::draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state)
 {
 	// compute premultiplied colors
-	uint32_t r = color().r * color().a * 255.0f;
-	uint32_t g = color().g * color().a * 255.0f;
-	uint32_t b = color().b * color().a * 255.0f;
-	uint32_t inva = (1.0f - color().a) * 255.0f;
+	u32 r = color().r * color().a * 255.0f;
+	u32 g = color().g * color().a * 255.0f;
+	u32 b = color().b * color().a * 255.0f;
+	u32 inva = (1.0f - color().a) * 255.0f;
 
 	// iterate over X and Y
-	for (uint32_t y = bounds.min_y; y <= bounds.max_y; y++)
+	for (u32 y = bounds.min_y; y <= bounds.max_y; y++)
 	{
-		for (uint32_t x = bounds.min_x; x <= bounds.max_x; x++)
+		for (u32 x = bounds.min_x; x <= bounds.max_x; x++)
 		{
-			uint32_t finalr = r;
-			uint32_t finalg = g;
-			uint32_t finalb = b;
+			u32 finalr = r;
+			u32 finalg = g;
+			u32 finalb = b;
 
 			// if we're translucent, add in the destination pixel contribution
 			if (inva > 0)
@@ -1872,10 +1872,10 @@ layout_element::disk_component::disk_component(running_machine &machine, xml_dat
 void layout_element::disk_component::draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state)
 {
 	// compute premultiplied colors
-	uint32_t r = color().r * color().a * 255.0f;
-	uint32_t g = color().g * color().a * 255.0f;
-	uint32_t b = color().b * color().a * 255.0f;
-	uint32_t inva = (1.0f - color().a) * 255.0f;
+	u32 r = color().r * color().a * 255.0f;
+	u32 g = color().g * color().a * 255.0f;
+	u32 b = color().b * color().a * 255.0f;
+	u32 inva = (1.0f - color().a) * 255.0f;
 
 	// find the center
 	float xcenter = float(bounds.xcenter());
@@ -1885,21 +1885,21 @@ void layout_element::disk_component::draw(running_machine &machine, bitmap_argb3
 	float ooyradius2 = 1.0f / (yradius * yradius);
 
 	// iterate over y
-	for (uint32_t y = bounds.min_y; y <= bounds.max_y; y++)
+	for (u32 y = bounds.min_y; y <= bounds.max_y; y++)
 	{
 		float ycoord = ycenter - ((float)y + 0.5f);
 		float xval = xradius * sqrtf(1.0f - (ycoord * ycoord) * ooyradius2);
 
 		// compute left/right coordinates
-		int32_t left = (int32_t)(xcenter - xval + 0.5f);
-		int32_t right = (int32_t)(xcenter + xval + 0.5f);
+		s32 left = s32(xcenter - xval + 0.5f);
+		s32 right = s32(xcenter + xval + 0.5f);
 
 		// draw this scanline
-		for (uint32_t x = left; x < right; x++)
+		for (u32 x = left; x < right; x++)
 		{
-			uint32_t finalr = r;
-			uint32_t finalg = g;
-			uint32_t finalb = b;
+			u32 finalr = r;
+			u32 finalg = g;
+			u32 finalb = b;
 
 			// if we're translucent, add in the destination pixel contribution
 			if (inva > 0)
@@ -1924,14 +1924,14 @@ void layout_element::disk_component::draw(running_machine &machine, bitmap_argb3
 void layout_element::component::draw_text(render_font &font, bitmap_argb32 &dest, const rectangle &bounds, const char *str, int align)
 {
 	// compute premultiplied colors
-	uint32_t r = color().r * 255.0f;
-	uint32_t g = color().g * 255.0f;
-	uint32_t b = color().b * 255.0f;
-	uint32_t a = color().a * 255.0f;
+	u32 r = color().r * 255.0f;
+	u32 g = color().g * 255.0f;
+	u32 b = color().b * 255.0f;
+	u32 a = color().a * 255.0f;
 
 	// get the width of the string
 	float aspect = 1.0f;
-	int32_t width;
+	s32 width;
 
 	while (1)
 	{
@@ -1942,7 +1942,7 @@ void layout_element::component::draw_text(render_font &font, bitmap_argb32 &dest
 	}
 
 	// get alignment
-	int32_t curx;
+	s32 curx;
 	switch (align)
 	{
 		// left
@@ -1988,21 +1988,21 @@ void layout_element::component::draw_text(render_font &font, bitmap_argb32 &dest
 			int effy = bounds.min_y + y;
 			if (effy >= bounds.min_y && effy <= bounds.max_y)
 			{
-				uint32_t *src = &tempbitmap.pix32(y);
-				uint32_t *d = &dest.pix32(effy);
+				u32 *src = &tempbitmap.pix32(y);
+				u32 *d = &dest.pix32(effy);
 				for (int x = 0; x < chbounds.width(); x++)
 				{
 					int effx = curx + x + chbounds.min_x;
 					if (effx >= bounds.min_x && effx <= bounds.max_x)
 					{
-						uint32_t spix = rgb_t(src[x]).a();
+						u32 spix = rgb_t(src[x]).a();
 						if (spix != 0)
 						{
 							rgb_t dpix = d[effx];
-							uint32_t ta = (a * (spix + 1)) >> 8;
-							uint32_t tr = (r * ta + dpix.r() * (0x100 - ta)) >> 8;
-							uint32_t tg = (g * ta + dpix.g() * (0x100 - ta)) >> 8;
-							uint32_t tb = (b * ta + dpix.b() * (0x100 - ta)) >> 8;
+							u32 ta = (a * (spix + 1)) >> 8;
+							u32 tr = (r * ta + dpix.r() * (0x100 - ta)) >> 8;
+							u32 tg = (g * ta + dpix.g() * (0x100 - ta)) >> 8;
+							u32 tb = (b * ta + dpix.b() * (0x100 - ta)) >> 8;
 							d[effx] = rgb_t(tr, tg, tb);
 						}
 					}
@@ -2028,8 +2028,8 @@ void layout_element::component::draw_segment_horizontal_caps(bitmap_argb32 &dest
 	// loop over the width of the segment
 	for (int y = 0; y < width / 2; y++)
 	{
-		uint32_t *d0 = &dest.pix32(midy - y);
-		uint32_t *d1 = &dest.pix32(midy + y);
+		u32 *d0 = &dest.pix32(midy - y);
+		u32 *d1 = &dest.pix32(midy + y);
 		int ty = (y < width / 8) ? width / 8 : y;
 
 		// loop over the length of the segment
@@ -2061,8 +2061,8 @@ void layout_element::component::draw_segment_vertical_caps(bitmap_argb32 &dest, 
 	// loop over the width of the segment
 	for (int x = 0; x < width / 2; x++)
 	{
-		uint32_t *d0 = &dest.pix32(0, midx - x);
-		uint32_t *d1 = &dest.pix32(0, midx + x);
+		u32 *d0 = &dest.pix32(0, midx - x);
+		u32 *d1 = &dest.pix32(0, midx + x);
 		int tx = (x < width / 8) ? width / 8 : x;
 
 		// loop over the length of the segment
@@ -2098,7 +2098,7 @@ void layout_element::component::draw_segment_diagonal_1(bitmap_argb32 &dest, int
 	for (int x = minx; x < maxx; x++)
 		if (x >= 0 && x < dest.width())
 		{
-			uint32_t *d = &dest.pix32(0, x);
+			u32 *d = &dest.pix32(0, x);
 			int step = (x - minx) * ratio;
 
 			for (int y = maxy - width - step; y < maxy - step; y++)
@@ -2123,7 +2123,7 @@ void layout_element::component::draw_segment_diagonal_2(bitmap_argb32 &dest, int
 	for (int x = minx; x < maxx; x++)
 		if (x >= 0 && x < dest.width())
 		{
-			uint32_t *d = &dest.pix32(0, x);
+			u32 *d = &dest.pix32(0, x);
 			int step = (x - minx) * ratio;
 
 			for (int y = miny + step; y < miny + step + width; y++)
@@ -2144,19 +2144,19 @@ void layout_element::component::draw_segment_decimal(bitmap_argb32 &dest, int mi
 	float ooradius2 = 1.0f / (float)(width * width);
 
 	// iterate over y
-	for (uint32_t y = 0; y <= width; y++)
+	for (u32 y = 0; y <= width; y++)
 	{
-		uint32_t *d0 = &dest.pix32(midy - y);
-		uint32_t *d1 = &dest.pix32(midy + y);
+		u32 *d0 = &dest.pix32(midy - y);
+		u32 *d1 = &dest.pix32(midy + y);
 		float xval = width * sqrt(1.0f - (float)(y * y) * ooradius2);
-		int32_t left, right;
+		s32 left, right;
 
 		// compute left/right coordinates
-		left = midx - (int32_t)(xval + 0.5f);
-		right = midx + (int32_t)(xval + 0.5f);
+		left = midx - s32(xval + 0.5f);
+		right = midx + s32(xval + 0.5f);
 
 		// draw this scanline
-		for (uint32_t x = left; x < right; x++)
+		for (u32 x = left; x < right; x++)
 			d0[x] = d1[x] = color;
 	}
 }
@@ -2175,7 +2175,7 @@ void layout_element::component::draw_segment_comma(bitmap_argb32 &dest, int minx
 	// draw line
 	for (int x = minx; x < maxx; x++)
 	{
-		uint32_t *d = &dest.pix32(0, x);
+		u32 *d = &dest.pix32(0, x);
 		int step = (x - minx) * ratio;
 
 		for (int y = maxy; y < maxy  - width - step; y--)
@@ -2192,7 +2192,7 @@ void layout_element::component::apply_skew(bitmap_argb32 &dest, int skewwidth)
 {
 	for (int y = 0; y < dest.height(); y++)
 	{
-		uint32_t *destrow = &dest.pix32(y);
+		u32 *destrow = &dest.pix32(y);
 		int offs = skewwidth * (dest.height() - y) / dest.height();
 		for (int x = dest.width() - skewwidth - 1; x >= 0; x--)
 			destrow[x + offs] = destrow[x];

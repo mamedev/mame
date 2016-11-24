@@ -149,7 +149,7 @@ static inline int32_t fast_reciplog(int64_t value, int32_t *log2)
 	}
 
 	/* if we've spilled out of 32 bits, push it down under 32 */
-	if (value & U64(0xffff00000000))
+	if (value & 0xffff00000000U)
 	{
 		temp = (uint32_t)(value >> 16);
 		exp -= 16;
@@ -250,7 +250,7 @@ static inline int64_t float_to_int64(uint32_t data, int fixedbits)
 		if (exponent < 64)
 			result <<= exponent;
 		else
-			result = U64(0x7fffffffffffffff);
+			result = 0x7fffffffffffffffU;
 	}
 	if (data & 0x80000000)
 		result = -result;
@@ -1846,9 +1846,9 @@ do                                                                              
 		if (FBZMODE_STIPPLE_PATTERN(FBZMODE) == 0)                              \
 		{                                                                       \
 			vd->reg[stipple].u = (vd->reg[stipple].u << 1) | (vd->reg[stipple].u >> 31);\
-			if ((vd->reg[stipple].u & 0x80000000) == 0)                       \
+			if ((vd->reg[stipple].u & 0x80000000) == 0)                         \
 			{                                                                   \
-				vd->stats.total_stippled++;                                   \
+				vd->stats.total_stippled++;                                     \
 				goto skipdrawdepth;                                             \
 			}                                                                   \
 		}                                                                       \
@@ -1857,21 +1857,21 @@ do                                                                              
 		else                                                                    \
 		{                                                                       \
 			int stipple_index = (((YY) & 3) << 3) | (~(XX) & 7);                \
-			if (((vd->reg[stipple].u >> stipple_index) & 1) == 0)             \
+			if (((vd->reg[stipple].u >> stipple_index) & 1) == 0)               \
 			{                                                                   \
-				vd->stats.total_stippled++;                                   \
+				vd->stats.total_stippled++;                                     \
 				goto skipdrawdepth;                                             \
 			}                                                                   \
 		}                                                                       \
 	}                                                                           \
 																				\
 	/* compute "floating point" W value (used for depth and fog) */             \
-	if ((ITERW) & U64(0xffff00000000))                                          \
+	if ((ITERW) & 0xffff00000000U)                                              \
 		wfloat = 0x0000;                                                        \
 	else                                                                        \
 	{                                                                           \
-		uint32_t temp = (uint32_t)(ITERW);                                \
-		if (!(temp & 0xffff0000))                                           \
+		uint32_t temp = (uint32_t)(ITERW);                                      \
+		if (!(temp & 0xffff0000))                                               \
 			wfloat = 0xffff;                                                    \
 		else                                                                    \
 		{                                                                       \
@@ -1879,7 +1879,7 @@ do                                                                              
 			wfloat = ((exp << 12) | ((~temp >> (19 - exp)) & 0xfff)) + 1;       \
 		}                                                                       \
 	}                                                                           \
-	fogdepth = wfloat;                                                         \
+	fogdepth = wfloat;                                                          \
 	/* add the bias for fog selection*/                                         \
 	if (FBZMODE_ENABLE_DEPTH_BIAS(FBZMODE))                                     \
 	{                                                                           \
@@ -1900,8 +1900,8 @@ do                                                                              
 			depthval = 0x0000;                                                  \
 		else                                                                    \
 		{                                                                       \
-			uint32_t temp = (ITERZ << 4);                             \
-			if (!(temp & 0xffff0000))                                                           \
+			uint32_t temp = (ITERZ << 4);                                       \
+			if (!(temp & 0xffff0000))                                           \
 				depthval = 0xffff;                                              \
 			else                                                                \
 			{                                                                   \
@@ -1909,7 +1909,7 @@ do                                                                              
 				depthval = ((exp << 12) | ((~temp >> (19 - exp)) & 0xfff)) + 1; \
 			}                                                                   \
 		}                                                                       \
-	}                                                                            \
+	}                                                                           \
 	/* add the bias */                                                          \
 	biasdepth = depthval;                                                     \
 	if (FBZMODE_ENABLE_DEPTH_BIAS(FBZMODE))                                     \

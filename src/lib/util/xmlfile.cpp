@@ -250,13 +250,13 @@ void xml_data_node::append_value(char const *value, int length)
 void xml_data_node::trim_whitespace()
 {
 	/* first strip leading spaces */
-	std::string::const_iterator start = m_value.begin();
+	std::string::iterator start = m_value.begin();
 	while ((m_value.end() != start) && std::isspace(uint8_t(*start)))
 		++start;
 	m_value.replace(m_value.begin(), start, 0U, '\0');
 
 	/* then strip trailing spaces */
-	std::string::const_iterator end = m_value.end();
+	std::string::iterator end = m_value.end();
 	while ((m_value.begin() != end) && std::isspace(uint8_t(*std::prev(end))))
 		--end;
 	m_value.replace(end, m_value.end(), 0U, '\0');

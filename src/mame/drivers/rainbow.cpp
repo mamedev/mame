@@ -2695,7 +2695,7 @@ READ16_MEMBER(rainbow_state::vram_r)
 
 		return m_video_ram[ (offset & 0x7fff)  + (0x8000 * readback_plane)];
 	}  
-	return 0;
+	return 0xffff;
 }
 
 // NOTE: Rainbow has separate registers for fore and background.
@@ -2708,16 +2708,6 @@ WRITE16_MEMBER(rainbow_state::vram_w)
 			offset = ( m_GDC_SCROLL_BUFFER[ (offset & 0x3FC0) >> 6 ] << 6) |  (offset & 0x3F);
 		else
 			offset = ( m_GDC_SCROLL_BUFFER[ (offset & 0x1FC0) >> 6 ] << 6) |  (offset & 0x3F);
-	}
-	 else
-	{
-		if(data & 0xff00)
-		{	
-			data >>= 8;
-			offset += 1;
-		}
-		else
-			data &= 0xff;
 	}
 
 	offset &= 0xffff; // same as in VT240?
@@ -2778,7 +2768,7 @@ WRITE16_MEMBER(rainbow_state::vram_w)
 				if(!(m_GDC_MODE_REGISTER & GDC_MODE_VECTOR)) // 0 : (NOT VECTOR MODE) Text Mode and Write Mask Batch
 					out = (out & m_GDC_WRITE_MASK) | (mem & ~m_GDC_WRITE_MASK); // // M_MASK (1st use)
 				else
-					out = (out & data) | (mem & ~data); // VECTOR MODE !
+					out = (out & ~data) | (mem & data); // VECTOR MODE !
 
 				if(m_GDC_MODE_REGISTER & GDC_MODE_ENABLE_WRITES) // 0x10
 					m_video_ram[(offset & 0xffff) + (0x8000 * i)] = out;

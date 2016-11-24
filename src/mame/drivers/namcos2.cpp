@@ -3653,8 +3653,9 @@ ROM_START( marvland )
 	ROM_LOAD16_BYTE( "mv2_spr0",  0x000000, 0x010000, CRC(aa418f29) SHA1(413798d9c1d98cfcadb045a5436aaee61ce6718f) )
 	ROM_LOAD16_BYTE( "mv2_spr1",  0x000001, 0x010000, CRC(dbd94def) SHA1(56a8d7acd483bc4d12c8bc5b7e90ffdb132be670) )
 
+	// This needs re-dumping, sound is very poor in this version and doesn't match Japanese version or any of the ports.  High res photos of PCB required too.
 	ROM_REGION( 0x030000, "audiocpu", 0 ) /* Sound CPU (Banked) */
-	ROM_LOAD( "mv2_snd0",  0x00c000, 0x004000, CRC(a5b99162) SHA1(cafe8d1dae1e981c7ff9b70076b3e1d52cd806f7) )
+	ROM_LOAD( "mv2_snd0",  0x00c000, 0x004000, BAD_DUMP CRC(a5b99162) SHA1(cafe8d1dae1e981c7ff9b70076b3e1d52cd806f7) )
 	ROM_CONTINUE(          0x010000, 0x01c000 )
 	ROM_RELOAD(            0x010000, 0x020000 )
 
@@ -5718,7 +5719,7 @@ GAME( 1989, finehour,   0,        default2, default,  namcos2_state, finehour, R
 GAME( 1989, burnforc,   0,        default3, default,  namcos2_state, burnforc, ROT0,   "Namco", "Burning Force (Japan, new version (Rev C))", 0 )
 GAME( 1989, burnforco,  burnforc, default3, default,  namcos2_state, burnforc, ROT0,   "Namco", "Burning Force (Japan, old version)", 0 )
 
-GAME( 1989, marvland,   0,        default,  default,  namcos2_state, marvland, ROT0,   "Namco", "Marvel Land (US)", 0 )
+GAME( 1989, marvland,   0,        default,  default,  namcos2_state, marvland, ROT0,   "Namco", "Marvel Land (US)", MACHINE_IMPERFECT_SOUND )
 GAME( 1989, marvlandj,  marvland, default,  default,  namcos2_state, marvlanj, ROT0,   "Namco", "Marvel Land (Japan)", 0 )
 
 GAME( 1990, kyukaidk,   0,        default,  kyukaidk, namcos2_state, kyukaidk, ROT0,   "Namco", "Kyuukai Douchuuki (Japan, new version (Rev B))", 0 )

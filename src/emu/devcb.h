@@ -14,8 +14,8 @@
 #error Dont include this file directly; include emu.h instead.
 #endif
 
-#ifndef __DEVCB_H__
-#define __DEVCB_H__
+#ifndef MAME_EMU_DEVCB_H
+#define MAME_EMU_DEVCB_H
 
 
 //**************************************************************************
@@ -63,7 +63,7 @@
 #define MCFG_DEVCB_RSHIFT(_shift) devcb->set_rshift(_shift);
 #define MCFG_DEVCB_MASK(_mask) devcb->set_mask(_mask);
 #define MCFG_DEVCB_XOR(_xor) devcb->set_xor(_xor);
-#define MCFG_DEVCB_INVERT devcb->set_xor(~U64(0));
+#define MCFG_DEVCB_INVERT devcb->set_xor(~u64(0));
 #define MCFG_DEVCB_ADDRESS_SPACE(_device, _spacenum) devcb->set_space(_device, _spacenum);
 
 
@@ -98,7 +98,7 @@ protected:
 	};
 
 	// construction/destruction
-	devcb_base(device_t &device, uint64_t defmask);
+	devcb_base(device_t &device, u64 defmask);
 
 public:
 	// getters
@@ -107,8 +107,8 @@ public:
 	// additional configuration
 	devcb_base &set_space(const char *device, address_spacenum space = AS_0) { m_space_tag = device; m_space_num = space; return *this; }
 	devcb_base &set_rshift(int rshift) { m_rshift = rshift; return *this; }
-	devcb_base &set_mask(uint64_t mask) { m_mask = mask; return *this; }
-	devcb_base &set_xor(uint64_t xorval) { m_xor = xorval; return *this; }
+	devcb_base &set_mask(u64 mask) { m_mask = mask; return *this; }
+	devcb_base &set_xor(u64 xorval) { m_xor = xorval; return *this; }
 
 	// construction helper classes
 	class null_desc
@@ -127,16 +127,16 @@ public:
 	class constant_desc
 	{
 	public:
-		constant_desc(uint64_t value) { m_value = value; }
-		uint64_t m_value;
+		constant_desc(u64 value) { m_value = value; }
+		u64 m_value;
 	};
 
 	class logger_desc
 	{
 	public:
-		logger_desc(const char *string, uint64_t value = 0) { m_string = string; m_value = value; }
+		logger_desc(const char *string, u64 value = 0) { m_string = string; m_value = value; }
 		const char *m_string;
-		uint64_t m_value;
+		u64 m_value;
 	};
 
 	class inputline_desc
@@ -156,9 +156,9 @@ public:
 
 protected:
 	// internal helpers
-	inline uint64_t shift_mask_xor(uint64_t value) const { return (((m_rshift < 0) ? (value << -m_rshift) : (value >> m_rshift)) ^ m_xor) & m_mask; }
-	inline uint64_t unshift_mask(uint64_t value) const { return (m_rshift < 0) ? ((value & m_mask) >> -m_rshift) : ((value & m_mask) << m_rshift); }
-	inline uint64_t unshift_mask_xor(uint64_t value) const { return (m_rshift < 0) ? (((value ^ m_xor) & m_mask) >> -m_rshift) : (((value ^ m_xor) & m_mask) << m_rshift); }
+	inline u64 shift_mask_xor(u64 value) const { return (((m_rshift < 0) ? (value << -m_rshift) : (value >> m_rshift)) ^ m_xor) & m_mask; }
+	inline u64 unshift_mask(u64 value) const { return (m_rshift < 0) ? ((value & m_mask) >> -m_rshift) : ((value & m_mask) << m_rshift); }
+	inline u64 unshift_mask_xor(u64 value) const { return (m_rshift < 0) ? (((value ^ m_xor) & m_mask) >> -m_rshift) : (((value ^ m_xor) & m_mask) << m_rshift); }
 	void reset(callback_type type = CALLBACK_NONE);
 	void resolve_ioport();
 	void resolve_inputline();
@@ -176,7 +176,7 @@ protected:
 	device_t &          m_device;               // reference to our owning device
 	callback_type       m_type;                 // type of callback registered
 	const char *        m_target_tag;           // tag of target object
-	uint64_t              m_target_int;           // integer value of target object
+	u64                 m_target_int;           // integer value of target object
 	const char *        m_space_tag;            // tag of address space device
 	address_spacenum    m_space_num;            // address space number of space device
 
@@ -184,8 +184,8 @@ protected:
 	address_space *     m_space;                // target address space
 	callback_target     m_target;               // resolved pointer to target object
 	int                 m_rshift;               // right shift to apply to data read
-	uint64_t              m_mask;                 // mask to apply to data read
-	uint64_t              m_xor;                  // XOR to apply to data read
+	u64                 m_mask;                 // mask to apply to data read
+	u64                 m_xor;                  // XOR to apply to data read
 };
 
 
@@ -195,7 +195,7 @@ class devcb_read_base : public devcb_base
 {
 protected:
 	// construction/destruction
-	devcb_read_base(device_t &device, uint64_t defmask);
+	devcb_read_base(device_t &device, u64 defmask);
 
 public:
 	// callback configuration
@@ -208,22 +208,22 @@ public:
 
 	// resolution
 	void resolve();
-	void resolve_safe(uint64_t none_constant_value);
+	void resolve_safe(u64 none_constant_value);
 
 protected:
 	// internal helpers
 	void reset(callback_type type = CALLBACK_NONE);
 
 	// adapters
-	uint64_t read_unresolved_adapter(address_space &space, offs_t offset, uint64_t mask);
-	uint64_t read_line_adapter(address_space &space, offs_t offset, uint64_t mask);
-	uint64_t read8_adapter(address_space &space, offs_t offset, uint64_t mask);
-	uint64_t read16_adapter(address_space &space, offs_t offset, uint64_t mask);
-	uint64_t read32_adapter(address_space &space, offs_t offset, uint64_t mask);
-	uint64_t read64_adapter(address_space &space, offs_t offset, uint64_t mask);
-	uint64_t read_ioport_adapter(address_space &space, offs_t offset, uint64_t mask);
-	uint64_t read_logged_adapter(address_space &space, offs_t offset, uint64_t mask);
-	uint64_t read_constant_adapter(address_space &space, offs_t offset, uint64_t mask);
+	u64 read_unresolved_adapter(address_space &space, offs_t offset, u64 mask);
+	u64 read_line_adapter(address_space &space, offs_t offset, u64 mask);
+	u64 read8_adapter(address_space &space, offs_t offset, u64 mask);
+	u64 read16_adapter(address_space &space, offs_t offset, u64 mask);
+	u64 read32_adapter(address_space &space, offs_t offset, u64 mask);
+	u64 read64_adapter(address_space &space, offs_t offset, u64 mask);
+	u64 read_ioport_adapter(address_space &space, offs_t offset, u64 mask);
+	u64 read_logged_adapter(address_space &space, offs_t offset, u64 mask);
+	u64 read_constant_adapter(address_space &space, offs_t offset, u64 mask);
 
 	// configuration
 	read_line_delegate  m_readline;             // copy of registered line reader
@@ -233,7 +233,7 @@ protected:
 	read64_delegate     m_read64;               // copy of registered 64-bit reader
 
 	// derived state
-	typedef uint64_t (devcb_read_base::*adapter_func)(address_space &, offs_t, uint64_t);
+	typedef u64 (devcb_read_base::*adapter_func)(address_space &, offs_t, u64);
 	adapter_func        m_adapter;              // actual callback to invoke
 };
 
@@ -244,7 +244,7 @@ class devcb_write_base : public devcb_base
 {
 protected:
 	// construction/destruction
-	devcb_write_base(device_t &device, uint64_t defmask);
+	devcb_write_base(device_t &device, u64 defmask);
 
 public:
 	// callback configuration
@@ -264,16 +264,16 @@ protected:
 	void reset(callback_type type = CALLBACK_NONE);
 
 	// adapters
-	void write_unresolved_adapter(address_space &space, offs_t offset, uint64_t data, uint64_t mask);
-	void write_line_adapter(address_space &space, offs_t offset, uint64_t data, uint64_t mask);
-	void write8_adapter(address_space &space, offs_t offset, uint64_t data, uint64_t mask);
-	void write16_adapter(address_space &space, offs_t offset, uint64_t data, uint64_t mask);
-	void write32_adapter(address_space &space, offs_t offset, uint64_t data, uint64_t mask);
-	void write64_adapter(address_space &space, offs_t offset, uint64_t data, uint64_t mask);
-	void write_ioport_adapter(address_space &space, offs_t offset, uint64_t data, uint64_t mask);
-	void write_logged_adapter(address_space &space, offs_t offset, uint64_t data, uint64_t mask);
-	void write_noop_adapter(address_space &space, offs_t offset, uint64_t data, uint64_t mask);
-	void write_inputline_adapter(address_space &space, offs_t offset, uint64_t data, uint64_t mask);
+	void write_unresolved_adapter(address_space &space, offs_t offset, u64 data, u64 mask);
+	void write_line_adapter(address_space &space, offs_t offset, u64 data, u64 mask);
+	void write8_adapter(address_space &space, offs_t offset, u64 data, u64 mask);
+	void write16_adapter(address_space &space, offs_t offset, u64 data, u64 mask);
+	void write32_adapter(address_space &space, offs_t offset, u64 data, u64 mask);
+	void write64_adapter(address_space &space, offs_t offset, u64 data, u64 mask);
+	void write_ioport_adapter(address_space &space, offs_t offset, u64 data, u64 mask);
+	void write_logged_adapter(address_space &space, offs_t offset, u64 data, u64 mask);
+	void write_noop_adapter(address_space &space, offs_t offset, u64 data, u64 mask);
+	void write_inputline_adapter(address_space &space, offs_t offset, u64 data, u64 mask);
 
 	// configuration
 	write_line_delegate m_writeline;            // copy of registered line writer
@@ -283,7 +283,7 @@ protected:
 	write64_delegate    m_write64;              // copy of registered 64-bit writer
 
 	// derived state
-	typedef void (devcb_write_base::*adapter_func)(address_space &, offs_t, uint64_t, uint64_t);
+	typedef void (devcb_write_base::*adapter_func)(address_space &, offs_t, u64, u64);
 	adapter_func        m_adapter;              // actual callback to invoke
 };
 
@@ -294,8 +294,8 @@ class devcb_read_line : public devcb_read_base
 {
 public:
 	devcb_read_line(device_t &device) : devcb_read_base(device, 0xff) { }
-	int operator()() { return (this->*m_adapter)(*m_space, 0, U64(0xff)) & 1; }
-	int operator()(address_space &space) { return (this->*m_adapter)((m_space_tag != nullptr) ? *m_space : space, 0, U64(0xff)) & 1; }
+	int operator()() { return (this->*m_adapter)(*m_space, 0, 0xffU) & 1; }
+	int operator()(address_space &space) { return (this->*m_adapter)((m_space_tag != nullptr) ? *m_space : space, 0, 0xffU) & 1; }
 };
 
 
@@ -305,8 +305,8 @@ class devcb_read8 : public devcb_read_base
 {
 public:
 	devcb_read8(device_t &device) : devcb_read_base(device, 0xff) { }
-	uint8_t operator()(offs_t offset = 0, uint8_t mask = 0xff) { return (this->*m_adapter)(*m_space, offset, mask) & mask; }
-	uint8_t operator()(address_space &space, offs_t offset = 0, uint8_t mask = 0xff) { return (this->*m_adapter)((m_space_tag != nullptr) ? *m_space : space, offset, mask) & mask; }
+	u8 operator()(offs_t offset = 0, u8 mask = 0xff) { return (this->*m_adapter)(*m_space, offset, mask) & mask; }
+	u8 operator()(address_space &space, offs_t offset = 0, u8 mask = 0xff) { return (this->*m_adapter)((m_space_tag != nullptr) ? *m_space : space, offset, mask) & mask; }
 };
 
 
@@ -316,8 +316,8 @@ class devcb_read16 : public devcb_read_base
 {
 public:
 	devcb_read16(device_t &device) : devcb_read_base(device, 0xffff) { }
-	uint16_t operator()(offs_t offset = 0, uint16_t mask = 0xffff) { return (this->*m_adapter)(*m_space, offset, mask) & mask; }
-	uint16_t operator()(address_space &space, offs_t offset = 0, uint16_t mask = 0xffff) { return (this->*m_adapter)((m_space_tag != nullptr) ? *m_space : space, offset, mask) & mask; }
+	u16 operator()(offs_t offset = 0, u16 mask = 0xffff) { return (this->*m_adapter)(*m_space, offset, mask) & mask; }
+	u16 operator()(address_space &space, offs_t offset = 0, u16 mask = 0xffff) { return (this->*m_adapter)((m_space_tag != nullptr) ? *m_space : space, offset, mask) & mask; }
 };
 
 
@@ -327,8 +327,8 @@ class devcb_read32 : public devcb_read_base
 {
 public:
 	devcb_read32(device_t &device) : devcb_read_base(device, 0xffffffff) { }
-	uint32_t operator()(offs_t offset = 0, uint32_t mask = 0xffffffff) { return (this->*m_adapter)(*m_space, offset, mask) & mask; }
-	uint32_t operator()(address_space &space, offs_t offset = 0, uint32_t mask = 0xffffffff) { return (this->*m_adapter)((m_space_tag != nullptr) ? *m_space : space, offset, mask) & mask; }
+	u32 operator()(offs_t offset = 0, u32 mask = 0xffffffff) { return (this->*m_adapter)(*m_space, offset, mask) & mask; }
+	u32 operator()(address_space &space, offs_t offset = 0, u32 mask = 0xffffffff) { return (this->*m_adapter)((m_space_tag != nullptr) ? *m_space : space, offset, mask) & mask; }
 };
 
 
@@ -337,9 +337,9 @@ public:
 class devcb_read64 : public devcb_read_base
 {
 public:
-	devcb_read64(device_t &device) : devcb_read_base(device, U64(0xffffffffffffffff)) { }
-	uint64_t operator()(offs_t offset = 0, uint64_t mask = U64(0xffffffffffffffff)) { return (this->*m_adapter)(*m_space, offset, mask) & mask; }
-	uint64_t operator()(address_space &space, offs_t offset = 0, uint64_t mask = U64(0xffffffffffffffff)) { return (this->*m_adapter)((m_space_tag != nullptr) ? *m_space : space, offset, mask) & mask; }
+	devcb_read64(device_t &device) : devcb_read_base(device, 0xffffffffffffffffU) { }
+	u64 operator()(offs_t offset = 0, u64 mask = 0xffffffffffffffffU) { return (this->*m_adapter)(*m_space, offset, mask) & mask; }
+	u64 operator()(address_space &space, offs_t offset = 0, u64 mask = 0xffffffffffffffffU) { return (this->*m_adapter)((m_space_tag != nullptr) ? *m_space : space, offset, mask) & mask; }
 };
 
 
@@ -349,8 +349,8 @@ class devcb_write_line : public devcb_write_base
 {
 public:
 	devcb_write_line(device_t &device) : devcb_write_base(device, 0xff) { }
-	void operator()(int state) { (this->*m_adapter)(*m_space, 0, state & 1, U64(0xff)); }
-	void operator()(address_space &space, int state) { (this->*m_adapter)((m_space_tag != nullptr) ? *m_space : space, 0, state & 1, U64(0xff)); }
+	void operator()(int state) { (this->*m_adapter)(*m_space, 0, state & 1, 0xffU); }
+	void operator()(address_space &space, int state) { (this->*m_adapter)((m_space_tag != nullptr) ? *m_space : space, 0, state & 1, 0xffU); }
 };
 
 
@@ -360,9 +360,9 @@ class devcb_write8 : public devcb_write_base
 {
 public:
 	devcb_write8(device_t &device) : devcb_write_base(device, 0xff) { }
-	void operator()(uint8_t data, uint8_t mask = 0xff) { (this->*m_adapter)(*m_space, 0, data, mask); }
-	void operator()(offs_t offset, uint8_t data, uint8_t mask = 0xff) { (this->*m_adapter)(*m_space, offset, data, mask); }
-	void operator()(address_space &space, offs_t offset, uint8_t data, uint8_t mask = 0xff) { (this->*m_adapter)((m_space_tag != nullptr) ? *m_space : space, offset, data, mask); }
+	void operator()(u8 data, u8 mask = 0xff) { (this->*m_adapter)(*m_space, 0, data, mask); }
+	void operator()(offs_t offset, u8 data, u8 mask = 0xff) { (this->*m_adapter)(*m_space, offset, data, mask); }
+	void operator()(address_space &space, offs_t offset, u8 data, u8 mask = 0xff) { (this->*m_adapter)((m_space_tag != nullptr) ? *m_space : space, offset, data, mask); }
 };
 
 
@@ -372,9 +372,9 @@ class devcb_write16 : public devcb_write_base
 {
 public:
 	devcb_write16(device_t &device) : devcb_write_base(device, 0xffff) { }
-	void operator()(uint16_t data, uint16_t mask = 0xffff) { (this->*m_adapter)(*m_space, 0, data, mask); }
-	void operator()(offs_t offset, uint16_t data, uint16_t mask = 0xffff) { (this->*m_adapter)(*m_space, offset, data, mask); }
-	void operator()(address_space &space, offs_t offset, uint16_t data, uint16_t mask = 0xffff) { (this->*m_adapter)((m_space_tag != nullptr) ? *m_space : space, offset, data, mask); }
+	void operator()(u16 data, u16 mask = 0xffff) { (this->*m_adapter)(*m_space, 0, data, mask); }
+	void operator()(offs_t offset, u16 data, u16 mask = 0xffff) { (this->*m_adapter)(*m_space, offset, data, mask); }
+	void operator()(address_space &space, offs_t offset, u16 data, u16 mask = 0xffff) { (this->*m_adapter)((m_space_tag != nullptr) ? *m_space : space, offset, data, mask); }
 };
 
 
@@ -384,9 +384,9 @@ class devcb_write32 : public devcb_write_base
 {
 public:
 	devcb_write32(device_t &device) : devcb_write_base(device, 0xffffffff) { }
-	void operator()(uint32_t data, uint32_t mask = 0xffffffff) { (this->*m_adapter)(*m_space, 0, data, mask); }
-	void operator()(offs_t offset, uint32_t data, uint32_t mask = 0xffffffff) { (this->*m_adapter)(*m_space, offset, data, mask); }
-	void operator()(address_space &space, offs_t offset, uint32_t data, uint32_t mask = 0xffffffff) { (this->*m_adapter)((m_space_tag != nullptr) ? *m_space : space, offset, data, mask); }
+	void operator()(u32 data, u32 mask = 0xffffffff) { (this->*m_adapter)(*m_space, 0, data, mask); }
+	void operator()(offs_t offset, u32 data, u32 mask = 0xffffffff) { (this->*m_adapter)(*m_space, offset, data, mask); }
+	void operator()(address_space &space, offs_t offset, u32 data, u32 mask = 0xffffffff) { (this->*m_adapter)((m_space_tag != nullptr) ? *m_space : space, offset, data, mask); }
 };
 
 
@@ -395,11 +395,11 @@ public:
 class devcb_write64 : public devcb_write_base
 {
 public:
-	devcb_write64(device_t &device) : devcb_write_base(device, U64(0xffffffffffffffff)) { }
-	void operator()(uint64_t data, uint64_t mask = U64(0xffffffffffffffff)) { (this->*m_adapter)(*m_space, 0, data, mask); }
-	void operator()(offs_t offset, uint64_t data, uint64_t mask = U64(0xffffffffffffffff)) { (this->*m_adapter)(*m_space, offset, data, mask); }
-	void operator()(address_space &space, offs_t offset, uint64_t data, uint64_t mask = U64(0xffffffffffffffff)) { (this->*m_adapter)((m_space_tag != nullptr) ? *m_space : space, offset, data, mask); }
+	devcb_write64(device_t &device) : devcb_write_base(device, 0xffffffffffffffffU) { }
+	void operator()(u64 data, u64 mask = 0xffffffffffffffffU) { (this->*m_adapter)(*m_space, 0, data, mask); }
+	void operator()(offs_t offset, u64 data, u64 mask = 0xffffffffffffffffU) { (this->*m_adapter)(*m_space, offset, data, mask); }
+	void operator()(address_space &space, offs_t offset, u64 data, u64 mask = 0xffffffffffffffffU) { (this->*m_adapter)((m_space_tag != nullptr) ? *m_space : space, offset, data, mask); }
 };
 
 
-#endif  /* __DEVCB_H__ */
+#endif  /* MAME_EMU_DEVCB_H */

@@ -295,7 +295,7 @@ void device_serial_interface::receive_register_update_bit(int bit)
 
 void device_serial_interface::receive_register_extract()
 {
-	uint8_t data;
+	u8 data;
 
 	receive_register_reset();
 
@@ -369,7 +369,7 @@ void device_serial_interface::transmit_register_add_bit(int bit)
 
 
 /* generate data in stream format ready for transfer */
-void device_serial_interface::transmit_register_setup(uint8_t data_byte)
+void device_serial_interface::transmit_register_setup(u8 data_byte)
 {
 	int i;
 	unsigned char transmit_data;
@@ -434,7 +434,7 @@ void device_serial_interface::transmit_register_setup(uint8_t data_byte)
 
 
 /* get a bit from the transmit register */
-uint8_t device_serial_interface::transmit_register_get_data_bit()
+u8 device_serial_interface::transmit_register_get_data_bit()
 {
 	int bit;
 

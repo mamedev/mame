@@ -180,7 +180,7 @@ static const char *regnames[0x40] =
 #define ARC_REGOP_SHIMM     ((op & 0x000001ff) >> 0  ) // aka D
 
 
-static offs_t internal_disasm_arc(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+CPU_DISASSEMBLE(arc) 
 {
 	uint32_t op = oprom[0] | (oprom[1] << 8) | (oprom[2] << 16) | (oprom[3] << 24);
 	op = big_endianize_int32(op);
@@ -207,14 +207,3 @@ static offs_t internal_disasm_arc(cpu_device *device, std::ostream &stream, offs
 
 	return 4 | DASMFLAG_SUPPORTED;
 }
-
-
-CPU_DISASSEMBLE(arc)
-{
-	std::ostringstream stream;
-	offs_t result = internal_disasm_arc(device, stream, pc, oprom, opram, options);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
-}
-

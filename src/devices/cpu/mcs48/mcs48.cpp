@@ -324,17 +324,17 @@ i8742_device::i8742_device(const machine_config &mconfig, const char *tag, devic
 }
 
 
-offs_t mcs48_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t mcs48_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( mcs48 );
-	return CPU_DISASSEMBLE_NAME(mcs48)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(mcs48)(this, stream, pc, oprom, opram, options);
 }
 
 
-offs_t upi41_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t upi41_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( upi41 );
-	return CPU_DISASSEMBLE_NAME(upi41)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(upi41)(this, stream, pc, oprom, opram, options);
 }
 
 /***************************************************************************

@@ -112,24 +112,24 @@ class integer_symbol_entry : public symbol_entry
 {
 public:
 	// construction/destruction
-	integer_symbol_entry(symbol_table &table, const char *name, symbol_table::read_write rw, uint64_t *ptr = nullptr);
-	integer_symbol_entry(symbol_table &table, const char *name, uint64_t constval);
+	integer_symbol_entry(symbol_table &table, const char *name, symbol_table::read_write rw, u64 *ptr = nullptr);
+	integer_symbol_entry(symbol_table &table, const char *name, u64 constval);
 	integer_symbol_entry(symbol_table &table, const char *name, void *ref, symbol_table::getter_func getter, symbol_table::setter_func setter);
 
 	// symbol access
 	virtual bool is_lval() const override;
-	virtual uint64_t value() const override;
-	virtual void set_value(uint64_t newvalue) override;
+	virtual u64 value() const override;
+	virtual void set_value(u64 newvalue) override;
 
 private:
 	// internal helpers
-	static uint64_t internal_getter(symbol_table &table, void *symref);
-	static void internal_setter(symbol_table &table, void *symref, uint64_t value);
+	static u64 internal_getter(symbol_table &table, void *symref);
+	static void internal_setter(symbol_table &table, void *symref, u64 value);
 
 	// internal state
 	symbol_table::getter_func   m_getter;
 	symbol_table::setter_func   m_setter;
-	uint64_t                      m_value;
+	u64                         m_value;
 };
 
 
@@ -142,16 +142,16 @@ public:
 
 	// symbol access
 	virtual bool is_lval() const override;
-	virtual uint64_t value() const override;
-	virtual void set_value(uint64_t newvalue) override;
+	virtual u64 value() const override;
+	virtual void set_value(u64 newvalue) override;
 
 	// execution helper
-	virtual uint64_t execute(int numparams, const uint64_t *paramlist);
+	virtual u64 execute(int numparams, const u64 *paramlist);
 
 private:
 	// internal state
-	uint16_t                      m_minparams;
-	uint16_t                      m_maxparams;
+	u16                         m_minparams;
+	u16                         m_maxparams;
 	symbol_table::execute_func  m_execute;
 };
 
@@ -231,7 +231,7 @@ symbol_entry::~symbol_entry()
 //  integer_symbol_entry - constructor
 //-------------------------------------------------
 
-integer_symbol_entry::integer_symbol_entry(symbol_table &table, const char *name, symbol_table::read_write rw, uint64_t *ptr)
+integer_symbol_entry::integer_symbol_entry(symbol_table &table, const char *name, symbol_table::read_write rw, u64 *ptr)
 	: symbol_entry(table, SMT_INTEGER, name, (ptr == nullptr) ? &m_value : ptr),
 		m_getter(internal_getter),
 		m_setter((rw == symbol_table::READ_ONLY) ? nullptr : internal_setter),
@@ -240,7 +240,7 @@ integer_symbol_entry::integer_symbol_entry(symbol_table &table, const char *name
 }
 
 
-integer_symbol_entry::integer_symbol_entry(symbol_table &table, const char *name, uint64_t constval)
+integer_symbol_entry::integer_symbol_entry(symbol_table &table, const char *name, u64 constval)
 	: symbol_entry(table, SMT_INTEGER, name, &m_value),
 		m_getter(internal_getter),
 		m_setter(nullptr),
@@ -272,7 +272,7 @@ bool integer_symbol_entry::is_lval() const
 //  value - return the value of this symbol
 //-------------------------------------------------
 
-uint64_t integer_symbol_entry::value() const
+u64 integer_symbol_entry::value() const
 {
 	return m_getter(m_table, m_ref);
 }
@@ -282,7 +282,7 @@ uint64_t integer_symbol_entry::value() const
 //  set_value - set the value of this symbol
 //-------------------------------------------------
 
-void integer_symbol_entry::set_value(uint64_t newvalue)
+void integer_symbol_entry::set_value(u64 newvalue)
 {
 	if (m_setter != nullptr)
 		m_setter(m_table, m_ref, newvalue);
@@ -296,9 +296,9 @@ void integer_symbol_entry::set_value(uint64_t newvalue)
 //  returning the value of a variable
 //-------------------------------------------------
 
-uint64_t integer_symbol_entry::internal_getter(symbol_table &table, void *symref)
+u64 integer_symbol_entry::internal_getter(symbol_table &table, void *symref)
 {
-	return *(uint64_t *)symref;
+	return *(u64 *)symref;
 }
 
 
@@ -307,9 +307,9 @@ uint64_t integer_symbol_entry::internal_getter(symbol_table &table, void *symref
 //  the value of a variable
 //-------------------------------------------------
 
-void integer_symbol_entry::internal_setter(symbol_table &table, void *symref, uint64_t value)
+void integer_symbol_entry::internal_setter(symbol_table &table, void *symref, u64 value)
 {
-	*(uint64_t *)symref = value;
+	*(u64 *)symref = value;
 }
 
 
@@ -345,7 +345,7 @@ bool function_symbol_entry::is_lval() const
 //  value - return the value of this symbol
 //-------------------------------------------------
 
-uint64_t function_symbol_entry::value() const
+u64 function_symbol_entry::value() const
 {
 	throw emu_fatalerror("Symbol '%s' is a function and cannot be used in this context", m_name.c_str());
 }
@@ -355,7 +355,7 @@ uint64_t function_symbol_entry::value() const
 //  set_value - set the value of this symbol
 //-------------------------------------------------
 
-void function_symbol_entry::set_value(uint64_t newvalue)
+void function_symbol_entry::set_value(u64 newvalue)
 {
 	throw emu_fatalerror("Symbol '%s' is a function and cannot be written", m_name.c_str());
 }
@@ -365,7 +365,7 @@ void function_symbol_entry::set_value(uint64_t newvalue)
 //  execute - execute the function
 //-------------------------------------------------
 
-uint64_t function_symbol_entry::execute(int numparams, const uint64_t *paramlist)
+u64 function_symbol_entry::execute(int numparams, const u64 *paramlist)
 {
 	if (numparams < m_minparams)
 		throw emu_fatalerror("Function '%s' requires at least %d parameters", m_name.c_str(), m_minparams);
@@ -396,7 +396,7 @@ symbol_table::symbol_table(void *globalref, symbol_table *parent)
 
 
 //-------------------------------------------------
-//  add - add a new uint64_t pointer symbol
+//  add - add a new u64 pointer symbol
 //-------------------------------------------------
 
 void symbol_table::configure_memory(void *param, valid_func valid, read_func read, write_func write)
@@ -409,10 +409,10 @@ void symbol_table::configure_memory(void *param, valid_func valid, read_func rea
 
 
 //-------------------------------------------------
-//  add - add a new uint64_t pointer symbol
+//  add - add a new u64 pointer symbol
 //-------------------------------------------------
 
-void symbol_table::add(const char *name, read_write rw, uint64_t *ptr)
+void symbol_table::add(const char *name, read_write rw, u64 *ptr)
 {
 	m_symlist.erase(name);
 	m_symlist.emplace(name, std::make_unique<integer_symbol_entry>(*this, name, rw, ptr));
@@ -423,7 +423,7 @@ void symbol_table::add(const char *name, read_write rw, uint64_t *ptr)
 //  add - add a new value symbol
 //-------------------------------------------------
 
-void symbol_table::add(const char *name, uint64_t value)
+void symbol_table::add(const char *name, u64 value)
 {
 	m_symlist.erase(name);
 	m_symlist.emplace(name, std::make_unique<integer_symbol_entry>(*this, name, value));
@@ -474,7 +474,7 @@ symbol_entry *symbol_table::find_deep(const char *symbol)
 //  value - return the value of a symbol
 //-------------------------------------------------
 
-uint64_t symbol_table::value(const char *symbol)
+u64 symbol_table::value(const char *symbol)
 {
 	symbol_entry *entry = find_deep(symbol);
 	return (entry != nullptr) ? entry->value() : 0;
@@ -485,7 +485,7 @@ uint64_t symbol_table::value(const char *symbol)
 //  set_value - set the value of a symbol
 //-------------------------------------------------
 
-void symbol_table::set_value(const char *symbol, uint64_t value)
+void symbol_table::set_value(const char *symbol, u64 value)
 {
 	symbol_entry *entry = find_deep(symbol);
 	if (entry != nullptr)
@@ -516,7 +516,7 @@ expression_error::error_code symbol_table::memory_valid(const char *name, expres
 //  memory_value - return a value read from memory
 //-------------------------------------------------
 
-uint64_t symbol_table::memory_value(const char *name, expression_space space, uint32_t offset, int size)
+u64 symbol_table::memory_value(const char *name, expression_space space, u32 offset, int size)
 {
 	// walk up the table hierarchy to find the owner
 	for (symbol_table *symtable = this; symtable != nullptr; symtable = symtable->m_parent)
@@ -535,7 +535,7 @@ uint64_t symbol_table::memory_value(const char *name, expression_space space, ui
 //  set_memory_value - write a value to memory
 //-------------------------------------------------
 
-void symbol_table::set_memory_value(const char *name, expression_space space, uint32_t offset, int size, uint64_t value)
+void symbol_table::set_memory_value(const char *name, expression_space space, u32 offset, int size, u64 value)
 {
 	// walk up the table hierarchy to find the owner
 	for (symbol_table *symtable = this; symtable != nullptr; symtable = symtable->m_parent)
@@ -558,7 +558,7 @@ void symbol_table::set_memory_value(const char *name, expression_space space, ui
 //  parsed_expression - constructor
 //-------------------------------------------------
 
-parsed_expression::parsed_expression(symbol_table *symtable, const char *expression, uint64_t *result)
+parsed_expression::parsed_expression(symbol_table *symtable, const char *expression, u64 *result)
 	: m_symtable(symtable),
 	m_token_stack_ptr(0)
 {
@@ -627,7 +627,7 @@ void parsed_expression::print_tokens(FILE *out)
 				break;
 
 			case parse_token::NUMBER:
-				fprintf(out, "NUMBER: %08X%08X\n", (uint32_t)(token->value.i >> 32), (uint32_t)token->value.i);
+				fprintf(out, "NUMBER: %08X%08X\n", (u32)(token->value.i >> 32), u32(token->value.i));
 				break;
 
 			case parse_token::STRING:
@@ -635,7 +635,7 @@ void parsed_expression::print_tokens(FILE *out)
 				break;
 
 			case parse_token::SYMBOL:
-				fprintf(out, "SYMBOL: %08X%08X\n", (uint32_t)(token->value.i >> 32), (uint32_t)token->value.i);
+				fprintf(out, "SYMBOL: %08X%08X\n", u32(token->value.i >> 32), u32(token->value.i));
 				break;
 
 			case parse_token::OPERATOR:
@@ -708,7 +708,7 @@ void parsed_expression::parse_string_into_tokens()
 	while (string[0] != 0)
 	{
 		// ignore any whitespace
-		while (string[0] != 0 && isspace((uint8_t)string[0]))
+		while (string[0] != 0 && isspace(u8(string[0])))
 			string++;
 		if (string[0] == 0)
 			break;
@@ -717,7 +717,7 @@ void parsed_expression::parse_string_into_tokens()
 		parse_token &token = m_tokenlist.append(*global_alloc(parse_token(string - stringstart)));
 
 		// switch off the first character
-		switch (tolower((uint8_t)string[0]))
+		switch (tolower(u8(string[0])))
 		{
 			case '(':
 				string += 1, token.configure_operator(TVL_LPAREN, 0);
@@ -865,7 +865,7 @@ void parsed_expression::parse_symbol_or_number(parse_token &token, const char *&
 	while (1)
 	{
 		static const char valid[] = "abcdefghijklmnopqrstuvwxyz0123456789_$#.:";
-		char val = tolower((uint8_t)string[0]);
+		char val = tolower(u8(string[0]));
 		if (val == 0 || strchr(valid, val) == nullptr)
 			break;
 		buffer.append(&val, 1);
@@ -965,12 +965,12 @@ void parsed_expression::parse_symbol_or_number(parse_token &token, const char *&
 void parsed_expression::parse_number(parse_token &token, const char *string, int base, expression_error::error_code errcode)
 {
 	// parse the actual value
-	uint64_t value = 0;
+	u64 value = 0;
 	while (*string != 0)
 	{
 		// look up the number's value, stopping if not valid
 		static const char numbers[] = "0123456789abcdef";
-		const char *ptr = strchr(numbers, tolower((uint8_t)*string));
+		const char *ptr = strchr(numbers, tolower(u8(*string)));
 		if (ptr == nullptr)
 			break;
 
@@ -980,7 +980,7 @@ void parsed_expression::parse_number(parse_token &token, const char *string, int
 			break;
 
 		// shift previous digits up and add in new digit
-		value = (value * (uint64_t)base) + digit;
+		value = (value * u64(base)) + digit;
 		string++;
 	}
 
@@ -1001,7 +1001,7 @@ void parsed_expression::parse_quoted_char(parse_token &token, const char *&strin
 {
 	// accumulate the value of the character token
 	string++;
-	uint64_t value = 0;
+	u64 value = 0;
 	while (string[0] != 0)
 	{
 		// allow '' to mean a nested single quote
@@ -1011,7 +1011,7 @@ void parsed_expression::parse_quoted_char(parse_token &token, const char *&strin
 				break;
 			string++;
 		}
-		value = (value << 8) | (uint8_t)*string++;
+		value = (value << 8) | u8(*string++);
 	}
 
 	// if we didn't find the ending quote, report an error
@@ -1388,7 +1388,7 @@ inline void parsed_expression::pop_token_rval(parse_token &token)
 //  of tokens
 //-------------------------------------------------
 
-uint64_t parsed_expression::execute_tokens()
+u64 parsed_expression::execute_tokens()
 {
 	// reset the token stack
 	m_token_stack_ptr = 0;
@@ -1674,7 +1674,7 @@ parsed_expression::parse_token::parse_token(int offset)
 //  for a SYMBOL token
 //-------------------------------------------------
 
-uint64_t parsed_expression::parse_token::get_lval_value(symbol_table *table)
+u64 parsed_expression::parse_token::get_lval_value(symbol_table *table)
 {
 	// get the value of a symbol
 	if (is_symbol())
@@ -1693,7 +1693,7 @@ uint64_t parsed_expression::parse_token::get_lval_value(symbol_table *table)
 //  for a SYMBOL token
 //-------------------------------------------------
 
-inline void parsed_expression::parse_token::set_lval_value(symbol_table *table, uint64_t value)
+inline void parsed_expression::parse_token::set_lval_value(symbol_table *table, u64 value)
 {
 	// set the value of a symbol
 	if (is_symbol())
@@ -1713,7 +1713,7 @@ inline void parsed_expression::parse_token::set_lval_value(symbol_table *table, 
 void parsed_expression::execute_function(parse_token &token)
 {
 	// pop off all pushed parameters
-	uint64_t funcparams[MAX_FUNCTION_PARAMS];
+	u64 funcparams[MAX_FUNCTION_PARAMS];
 	symbol_entry *symbol = nullptr;
 	int paramcount = 0;
 	while (paramcount < MAX_FUNCTION_PARAMS)

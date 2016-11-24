@@ -116,7 +116,7 @@ void menu_selector::handle()
 //  populate
 //-------------------------------------------------
 
-void menu_selector::populate()
+void menu_selector::populate(float &customtop, float &custombottom)
 {
 	if (!m_search.empty())
 	{

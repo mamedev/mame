@@ -164,7 +164,7 @@ const struct rgbaint_t::_statics rgbaint_t::statics =
     HIGHER LEVEL OPERATIONS
 ***************************************************************************/
 
-void rgbaint_t::blend(const rgbaint_t& other, uint8_t factor)
+void rgbaint_t::blend(const rgbaint_t& other, u8 factor)
 {
 	const __m128i scale1 = _mm_set1_epi32(factor);
 	const rgbaint_t scale2(_mm_sub_epi32(_mm_set1_epi32(0x100), scale1));
@@ -184,7 +184,7 @@ void rgbaint_t::scale_and_clamp(const rgbaint_t& scale)
 	clamp_to_uint8();
 }
 
-void rgbaint_t::scale_imm_and_clamp(const int32_t scale)
+void rgbaint_t::scale_imm_and_clamp(const s32 scale)
 {
 	mul_imm(scale);
 	sra_imm(8);

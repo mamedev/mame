@@ -91,11 +91,11 @@
  *
  *************************************/
 
-static const floatx80 fx80_zero =   { 0x0000, U64(0x0000000000000000) };
-static const floatx80 fx80_one =    { 0x3fff, U64(0x8000000000000000) };
+static const floatx80 fx80_zero =   { 0x0000, 0x0000000000000000U };
+static const floatx80 fx80_one =    { 0x3fff, 0x8000000000000000U };
 
-static const floatx80 fx80_ninf =   { 0xffff, U64(0x8000000000000000) };
-static const floatx80 fx80_inan =   { 0xffff, U64(0xc000000000000000) };
+static const floatx80 fx80_ninf =   { 0xffff, 0x8000000000000000U };
+static const floatx80 fx80_inan =   { 0xffff, 0xc000000000000000U };
 
 /* Maps x87 round modes to SoftFloat round modes */
 static const int x87_to_sf_rc[4] =
@@ -141,7 +141,7 @@ static inline int floatx80_is_inf(floatx80 fx)
 static inline int floatx80_is_denormal(floatx80 fx)
 {
 	return (((fx.high & 0x7fff) == 0) &&
-			((fx.low & U64(0x8000000000000000)) == 0) &&
+			((fx.low & 0x8000000000000000U) == 0) &&
 			((fx.low << 1) != 0));
 }
 
@@ -3104,21 +3104,21 @@ void i386_device::x87_fistp_m64int(uint8_t modrm)
 	if (X87_IS_ST_EMPTY(0))
 	{
 		x87_set_stack_underflow();
-		m64int = U64(0x8000000000000000);
+		m64int = 0x8000000000000000U;
 	}
 	else
 	{
 		floatx80 fx80 = floatx80_round_to_int(ST(0));
 
-		floatx80 lowerLim = int64_to_floatx80(U64(0x8000000000000000));
-		floatx80 upperLim = int64_to_floatx80(U64(0x7fffffffffffffff));
+		floatx80 lowerLim = int64_to_floatx80(0x8000000000000000U);
+		floatx80 upperLim = int64_to_floatx80(0x7fffffffffffffffU);
 
 		m_x87_sw &= ~X87_SW_C1;
 
 		if (!floatx80_lt(fx80, lowerLim) && floatx80_le(fx80, upperLim))
 			m64int = floatx80_to_int64(fx80);
 		else
-			m64int = U64(0x8000000000000000);
+			m64int = 0x8000000000000000U;
 	}
 
 	uint32_t ea = GetEA(modrm, 1);
@@ -3210,9 +3210,9 @@ void i386_device::x87_fldl2t(uint8_t modrm)
 		value.high = 0x4000;
 
 		if (X87_RC == X87_CW_RC_UP)
-			value.low =  U64(0xd49a784bcd1b8aff);
+			value.low =  0xd49a784bcd1b8affU;
 		else
-			value.low = U64(0xd49a784bcd1b8afe);
+			value.low = 0xd49a784bcd1b8afeU;
 
 		m_x87_sw &= ~X87_SW_C1;
 	}
@@ -3243,9 +3243,9 @@ void i386_device::x87_fldl2e(uint8_t modrm)
 		value.high = 0x3fff;
 
 		if (rc == X87_CW_RC_UP || rc == X87_CW_RC_NEAREST)
-			value.low = U64(0xb8aa3b295c17f0bc);
+			value.low = 0xb8aa3b295c17f0bcU;
 		else
-			value.low = U64(0xb8aa3b295c17f0bb);
+			value.low = 0xb8aa3b295c17f0bbU;
 
 		m_x87_sw &= ~X87_SW_C1;
 	}
@@ -3276,9 +3276,9 @@ void i386_device::x87_fldpi(uint8_t modrm)
 		value.high = 0x4000;
 
 		if (rc == X87_CW_RC_UP || rc == X87_CW_RC_NEAREST)
-			value.low = U64(0xc90fdaa22168c235);
+			value.low = 0xc90fdaa22168c235U;
 		else
-			value.low = U64(0xc90fdaa22168c234);
+			value.low = 0xc90fdaa22168c234U;
 
 		m_x87_sw &= ~X87_SW_C1;
 	}
@@ -3309,9 +3309,9 @@ void i386_device::x87_fldlg2(uint8_t modrm)
 		value.high = 0x3ffd;
 
 		if (rc == X87_CW_RC_UP || rc == X87_CW_RC_NEAREST)
-			value.low = U64(0x9a209a84fbcff799);
+			value.low = 0x9a209a84fbcff799U;
 		else
-			value.low = U64(0x9a209a84fbcff798);
+			value.low = 0x9a209a84fbcff798U;
 
 		m_x87_sw &= ~X87_SW_C1;
 	}
@@ -3342,9 +3342,9 @@ void i386_device::x87_fldln2(uint8_t modrm)
 		value.high = 0x3ffe;
 
 		if (rc == X87_CW_RC_UP || rc == X87_CW_RC_NEAREST)
-			value.low = U64(0xb17217f7d1cf79ac);
+			value.low = 0xb17217f7d1cf79acU;
 		else
-			value.low = U64(0xb17217f7d1cf79ab);
+			value.low = 0xb17217f7d1cf79abU;
 
 		m_x87_sw &= ~X87_SW_C1;
 	}

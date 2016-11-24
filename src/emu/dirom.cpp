@@ -1,7 +1,7 @@
 #include "emu.h"
 
 
-device_rom_interface::device_rom_interface(const machine_config &mconfig, device_t &device, uint8_t addrwidth, endianness_t endian, uint8_t datawidth) :
+device_rom_interface::device_rom_interface(const machine_config &mconfig, device_t &device, u8 addrwidth, endianness_t endian, u8 datawidth) :
 	device_memory_interface(mconfig, device),
 	m_rom_config("rom", endian, datawidth, addrwidth)
 {
@@ -41,10 +41,10 @@ void device_rom_interface::reset_bank()
 		m_bank->set_entry(m_cur_bank);
 }
 
-void device_rom_interface::set_rom(const void *base, uint32_t size)
+void device_rom_interface::set_rom(const void *base, u32 size)
 {
-	uint32_t mend = m_rom_config.addr_width() == 32 ? 0xffffffff : (1 << m_rom_config.addr_width()) - 1;
-	uint32_t rend = size-1;
+	u32 mend = m_rom_config.addr_width() == 32 ? 0xffffffff : (1 << m_rom_config.addr_width()) - 1;
+	u32 rend = size-1;
 	m_bank_count = mend == 0xffffffff ? 1 : (rend+1) / (mend+1);
 	if(m_bank_count < 1)
 		m_bank_count = 1;
@@ -57,7 +57,7 @@ void device_rom_interface::set_rom(const void *base, uint32_t size)
 
 	} else {
 		// Round up to the nearest power-of-two-minus-one
-		uint32_t rmask = rend;
+		u32 rmask = rend;
 		rmask |= rmask >> 1;
 		rmask |= rmask >> 2;
 		rmask |= rmask >> 4;
@@ -85,7 +85,7 @@ void device_rom_interface::interface_pre_start()
 		if(reg)
 			set_rom(reg->base(), reg->bytes());
 		else {
-			uint32_t end = m_rom_config.addr_width() == 32 ? 0xffffffff : (1 << m_rom_config.addr_width()) - 1;
+			u32 end = m_rom_config.addr_width() == 32 ? 0xffffffff : (1 << m_rom_config.addr_width()) - 1;
 			space().unmap_read(0, end);
 		}
 	}

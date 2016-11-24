@@ -91,14 +91,14 @@ void menu_directory::handle()
 	const event *menu_event = process(0);
 
 	if (menu_event != nullptr && menu_event->itemref != nullptr && menu_event->iptkey == IPT_UI_SELECT)
-		menu::stack_push<menu_display_actual>(ui(), container(), selected);
+		menu::stack_push<menu_display_actual>(ui(), container(), selected_index());
 }
 
 //-------------------------------------------------
 //  populate
 //-------------------------------------------------
 
-void menu_directory::populate()
+void menu_directory::populate(float &customtop, float &custombottom)
 {
 	for (auto & elem : s_folders)
 		item_append(_(elem.name), "", 0, (void *)(uintptr_t)elem.action);
@@ -181,7 +181,7 @@ void menu_display_actual::handle()
 //  populate
 //-------------------------------------------------
 
-void menu_display_actual::populate()
+void menu_display_actual::populate(float &customtop, float &custombottom)
 {
 	m_tempbuf = string_format(_("Current %1$s Folders"), _(s_folders[m_ref].name));
 	if (ui().options().exists(s_folders[m_ref].option))
@@ -391,7 +391,7 @@ void menu_add_change_folder::handle()
 			// check for entries which matches our search buffer
 			if (update_selected)
 			{
-				const int cur_selected = selected;
+				const int cur_selected = selected_index();
 				int entry, bestmatch = 0;
 
 				// from current item to the end
@@ -446,7 +446,7 @@ void menu_add_change_folder::handle()
 //  populate
 //-------------------------------------------------
 
-void menu_add_change_folder::populate()
+void menu_add_change_folder::populate(float &customtop, float &custombottom)
 {
 	// open a path
 	const char *volume_name = nullptr;
@@ -583,7 +583,7 @@ void menu_remove_folder::handle()
 	if (menu_event != nullptr && menu_event->itemref != nullptr && menu_event->iptkey == IPT_UI_SELECT)
 	{
 		std::string tmppath, error_string;
-		m_folders.erase(m_folders.begin() + selected);
+		m_folders.erase(m_folders.begin() + selected_index());
 		for (int x = 0; x < m_folders.size(); ++x)
 		{
 			tmppath.append(m_folders[x]);
@@ -608,7 +608,7 @@ void menu_remove_folder::handle()
 //  populate menu
 //-------------------------------------------------
 
-void menu_remove_folder::populate()
+void menu_remove_folder::populate(float &customtop, float &custombottom)
 {
 	int folders_count = 0;
 	for (auto & elem : m_folders)

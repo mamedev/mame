@@ -13,7 +13,7 @@
 #define OP(A)   oprom[(A) - PC]
 #define ARG(A)  opram[(A) - PC]
 
-static offs_t internal_disasm_scmp(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+CPU_DISASSEMBLE(scmp)
 {
 	unsigned PC = pc;
 	uint8_t op = OP(pc++);
@@ -150,14 +150,4 @@ static offs_t internal_disasm_scmp(cpu_device *device, std::ostream &stream, off
 	}
 
 	return (pc - PC);
-}
-
-
-CPU_DISASSEMBLE(scmp)
-{
-	std::ostringstream stream;
-	offs_t result = internal_disasm_scmp(device, stream, pc, oprom, opram, options);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
 }

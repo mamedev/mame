@@ -173,7 +173,7 @@ static const sm8500dasm mnemonic[256] = {
 
 };
 
-static offs_t internal_disasm_sm8500(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+CPU_DISASSEMBLE(sm8500)
 {
 	const sm8500dasm *instr;
 	uint8_t op;
@@ -578,14 +578,4 @@ static offs_t internal_disasm_sm8500(cpu_device *device, std::ostream &stream, o
 	}
 
 	return pos | s_flags[instr->mnemonic] | DASMFLAG_SUPPORTED;
-}
-
-
-CPU_DISASSEMBLE(sm8500)
-{
-	std::ostringstream stream;
-	offs_t result = internal_disasm_sm8500(device, stream, pc, oprom, opram, options);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
 }

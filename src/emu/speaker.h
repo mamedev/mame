@@ -14,8 +14,8 @@
 #error Dont include this file directly; include emu.h instead.
 #endif
 
-#ifndef __SPEAKER_H__
-#define __SPEAKER_H__
+#ifndef MAME_EMU_SPEAKER_H
+#define MAME_EMU_SPEAKER_H
 
 
 //**************************************************************************
@@ -57,14 +57,14 @@ class speaker_device : public device_t,
 
 public:
 	// construction/destruction
-	speaker_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	speaker_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 	virtual ~speaker_device();
 
 	// inline configuration helpers
 	static void static_set_position(device_t &device, double x, double y, double z);
 
 	// internally for use by the sound system
-	void mix(int32_t *leftmix, int32_t *rightmix, int &samples_this_update, bool suppress);
+	void mix(s32 *leftmix, s32 *rightmix, int &samples_this_update, bool suppress);
 
 protected:
 	// device-level overrides
@@ -77,9 +77,9 @@ protected:
 
 	// internal state
 #ifdef MAME_DEBUG
-	int32_t               m_max_sample;           // largest sample value we've seen
-	int32_t               m_clipped_samples;      // total number of clipped samples
-	int32_t               m_total_samples;        // total number of samples
+	s32                 m_max_sample;           // largest sample value we've seen
+	s32                 m_clipped_samples;      // total number of clipped samples
+	s32                 m_total_samples;        // total number of samples
 #endif
 };
 
@@ -88,4 +88,4 @@ protected:
 typedef device_type_iterator<&device_creator<speaker_device>, speaker_device> speaker_device_iterator;
 
 
-#endif  /* __SOUND_H__ */
+#endif  /* MAME_EMU_SPEAKER_H */

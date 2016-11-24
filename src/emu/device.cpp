@@ -23,7 +23,7 @@
 //  from the provided config
 //-------------------------------------------------
 
-device_t::device_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
+device_t::device_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, const char *shortname, const char *source)
 	: m_type(type),
 		m_name(name),
 		m_shortname(shortname),
@@ -157,7 +157,7 @@ std::string device_t::parameter(const char *tag) const
 //  a device
 //-------------------------------------------------
 
-void device_t::static_set_clock(device_t &device, uint32_t clock)
+void device_t::static_set_clock(device_t &device, u32 clock)
 {
 	// derive the clock from our owner if requested
 	if ((clock & 0xff000000) == 0xff000000)
@@ -237,7 +237,7 @@ void device_t::reset()
 //  unscaled clock
 //-------------------------------------------------
 
-void device_t::set_unscaled_clock(uint32_t clock)
+void device_t::set_unscaled_clock(u32 clock)
 {
 	m_unscaled_clock = clock;
 	m_clock = m_unscaled_clock * m_clock_scale;
@@ -265,15 +265,15 @@ void device_t::set_clock_scale(double clockscale)
 //  clock ticks to an attotime
 //-------------------------------------------------
 
-attotime device_t::clocks_to_attotime(uint64_t numclocks) const
+attotime device_t::clocks_to_attotime(u64 numclocks) const
 {
 	if (numclocks < m_clock)
 		return attotime(0, numclocks * m_attoseconds_per_clock);
 	else
 	{
-		uint32_t remainder;
-		uint32_t quotient = divu_64x32_rem(numclocks, m_clock, &remainder);
-		return attotime(quotient, (uint64_t)remainder * (uint64_t)m_attoseconds_per_clock);
+		u32 remainder;
+		u32 quotient = divu_64x32_rem(numclocks, m_clock, &remainder);
+		return attotime(quotient, u64(remainder) * u64(m_attoseconds_per_clock));
 	}
 }
 
@@ -283,9 +283,9 @@ attotime device_t::clocks_to_attotime(uint64_t numclocks) const
 //  attotime to CPU clock ticks
 //-------------------------------------------------
 
-uint64_t device_t::attotime_to_clocks(const attotime &duration) const
+u64 device_t::attotime_to_clocks(const attotime &duration) const
 {
-	return mulu_32x32(duration.seconds(), m_clock) + (uint64_t)duration.attoseconds() / (uint64_t)m_attoseconds_per_clock;
+	return mulu_32x32(duration.seconds(), m_clock) + u64(duration.attoseconds()) / u64(m_attoseconds_per_clock);
 }
 
 

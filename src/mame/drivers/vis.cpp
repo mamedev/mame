@@ -71,9 +71,8 @@ void vis_audio_device::device_reset()
 
 void vis_audio_device::dack16_w(int line, uint16_t data)
 {
-	if(m_samples < ((m_dmalen & 2) ? 1 : 2))
-		m_sample[m_samples++] = data;
-	else
+	m_sample[m_samples++] = data;
+	if(m_samples >= ((m_dmalen & 2) ? 1 : 2))
 		m_isa->drq7_w(CLEAR_LINE);
 }
 
@@ -184,19 +183,19 @@ WRITE8_MEMBER(vis_audio_device::pcm_w)
 			break;
 		case 0x02:
 			m_data[0][m_index[0] & 0xf] = data;
-			break;
+			return;
 		case 0x03:
 			m_index[0] = data;
-			break;
+			return;
 		case 0x04:
 			m_data[1][m_index[1] & 0xf] = data;
-			break;
+			return;
 		case 0x05:
 			m_index[1] = data;
-			break;
+			return;
 		case 0x09:
 			m_dmalen = data;
-			break;
+			return;
 		case 0x0c:
 			m_count = (m_count & 0xff00) | data;
 			break;
@@ -205,10 +204,10 @@ WRITE8_MEMBER(vis_audio_device::pcm_w)
 			break;
 		case 0x0f:
 			//cdrom related?
-			break;
+			return;
 		default:
 			logerror("unknown pcm write %04x %02x\n", offset, data);
-			break;
+			return;
 	}
 	if((m_mode & 0x10) && (m_count != 0xffff))
 	{
@@ -766,5 +765,5 @@ ROM_START(vis)
 	ROM_LOAD( "p513bk1b.bin", 0x80000, 0x80000, CRC(e18239c4) SHA1(a0262109e10a07a11eca43371be9978fff060bc5))
 ROM_END
 
-COMP ( 1992, vis,  0, 0, vis, vis, driver_device, 0, "Tandy/Memorex", "Video Information System MD-2500", MACHINE_NOT_WORKING )
+COMP ( 1992, vis,  0, 0, vis, vis, driver_device, 0, "Tandy/Memorex", "Video Information System MD-2500", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 

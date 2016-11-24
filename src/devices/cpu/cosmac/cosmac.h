@@ -451,7 +451,7 @@ public:
 
 protected:
 	// device_disasm_interface overrides
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	virtual cosmac_device::ophandler get_ophandler(uint8_t opcode) override;
 
@@ -469,7 +469,7 @@ public:
 
 protected:
 	// device_disasm_interface overrides
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	virtual cosmac_device::ophandler get_ophandler(uint8_t opcode) override;
 

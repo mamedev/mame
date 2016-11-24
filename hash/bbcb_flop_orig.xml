@@ -1679,7 +1679,7 @@
 	</software>
 
 	<software name="tmsys86" cloneof="tmsys">
-		<description>The Music System (1986)</description>
+		<description>The Music System (BBC B/Master Series)</description>
 		<year>1986</year>
 		<publisher>Island Logic</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -3432,32 +3432,33 @@
 	</software>
 
 	<software name="farmman">
-		<description>Farm Management Suite</description>
-		<year>198?</year>
+		<description>Farm Management Package</description>
+		<year>1986</year>
 		<publisher>Acornsoft</publisher>
+		<info name="release" value="SNX05" />
 		<info name="protection" value="None" />
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="FarmCash Setup"/>
-			<dataarea name="flop" size="204800">
-				<rom name="240 farmcash.ssd" size="204800" crc="ba011313" sha1="5f502b669b83dd80ef524addc75875b946ae0121" offset="0" />
+			<feature name="part_id" value="FarmCash V1.3 Master Disc"/>
+			<dataarea name="flop" size="409600">
+				<rom name="FarmCash.ssd" size="409600" crc="d3dda956" sha1="982003ffcf936d5c78bd58d936415845580ec1b2" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="FieldFile Setup"/>
-			<dataarea name="flop" size="204800">
-				<rom name="241 fieldfile.ssd" size="204800" crc="61938782" sha1="50ede0e4380043268a9b010587a4bdb5285ea0f2" offset="0" />
+			<feature name="part_id" value="FieldFile V1.3 Master Disc"/>
+			<dataarea name="flop" size="409600">
+				<rom name="FieldFile.ssd" size="409600" crc="ad6281b5" sha1="0367fd795837eabbefb4f5ff17249ccfed0b5375" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="CapCost Setup"/>
-			<dataarea name="flop" size="204800">
-				<rom name="242 capcost.ssd" size="204800" crc="78f00286" sha1="d747ca27c7490c7638870a099e7660d623eaf54e" offset="0" />
+			<feature name="part_id" value="CapCost V1.3 Master Disc"/>
+			<dataarea name="flop" size="409600">
+				<rom name="CapCost.ssd" size="409600" crc="a0b4988d" sha1="257cb404e950e3db56be3707f7735044f281f395" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="FarmPlanner Setup"/>
-			<dataarea name="flop" size="204800">
-				<rom name="243 farmplanner.ssd" size="204800" crc="142493ad" sha1="3dc58f3d23893f9a926858ff16edf3418ba1b0fd" offset="0" />
+			<feature name="part_id" value="FarmPlanner V1.3 Master Disc"/>
+			<dataarea name="flop" size="409600">
+				<rom name="FarmPlanner.ssd" size="409600" crc="718c2f28" sha1="26022cd451649eca19f9a3b780f59749d38432b9" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3521,7 +3522,7 @@
 
 	<software name="dinodisc">
 		<description>Dinosaur Discovery</description>
-		<year>198?</year>
+		<year>1986</year>
 		<publisher>4mation</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="102506">
@@ -3727,7 +3728,7 @@
 
 	<software name="happynum">
 		<description>Happy Numbers</description>
-		<year>198?</year>
+		<year>1983</year>
 		<publisher>Bourne Educational Software</publisher>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="15829">

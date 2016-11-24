@@ -37,18 +37,18 @@
 // frameskipping tables
 const bool video_manager::s_skiptable[FRAMESKIP_LEVELS][FRAMESKIP_LEVELS] =
 {
-	{ false,false,false,false,false,false,false,false,false,false,false,false },
-	{ false,false,false,false,false,false,false,false,false,false,false,true },
-	{ false,false,false,false,false,true ,false,false,false,false,false,true },
-	{ false,false,false,true ,false,false,false,true ,false,false,false,true },
-	{ false,false,true ,false,false,true ,false,false,true ,false,false,true },
-	{ false,true ,false,false,true ,false,true ,false,false,true ,false,true },
-	{ false,true ,false,true ,false,true ,false,true ,false,true ,false,true },
-	{ false,true ,false,true ,true ,false,true ,false,true ,true ,false,true },
-	{ false,true ,true ,false,true ,true ,false,true ,true ,false,true ,true },
-	{ false,true ,true ,true ,false,true ,true ,true ,false,true ,true ,true },
-	{ false,true ,true ,true ,true ,true ,false,true ,true ,true ,true ,true },
-	{ false,true ,true ,true ,true ,true ,true ,true ,true ,true ,true ,true }
+	{ false, false, false, false, false, false, false, false, false, false, false, false },
+	{ false, false, false, false, false, false, false, false, false, false, false, true  },
+	{ false, false, false, false, false, true , false, false, false, false, false, true  },
+	{ false, false, false, true , false, false, false, true , false, false, false, true  },
+	{ false, false, true , false, false, true , false, false, true , false, false, true  },
+	{ false, true , false, false, true , false, true , false, false, true , false, true  },
+	{ false, true , false, true , false, true , false, true , false, true , false, true  },
+	{ false, true , false, true , true , false, true , false, true , true , false, true  },
+	{ false, true , true , false, true , true , false, true , true , false, true , true  },
+	{ false, true , true , true , false, true , true , true , false, true , true , true  },
+	{ false, true , true , true , true , true , false, true , true , true , true , true  },
+	{ false, true , true , true , true , true , true , true , true , true , true , true  }
 };
 
 
@@ -57,7 +57,7 @@ const bool video_manager::s_skiptable[FRAMESKIP_LEVELS][FRAMESKIP_LEVELS] =
 //  VIDEO MANAGER
 //**************************************************************************
 
-static void video_notifier_callback(const char *outname, int32_t value, void *param)
+static void video_notifier_callback(const char *outname, s32 value, void *param)
 {
 	video_manager *vm = (video_manager *)param;
 
@@ -553,7 +553,7 @@ void video_manager::end_recording(movie_format format)
 //  recording
 //-------------------------------------------------
 
-void video_manager::add_sound_to_recording(const int16_t *sound, int numsamples)
+void video_manager::add_sound_to_recording(const s16 *sound, int numsamples)
 {
 	// only record if we have a file
 	if (m_avi_file != nullptr)
@@ -770,7 +770,7 @@ void video_manager::update_throttle(attotime emutime)
            restoring from a saved state
 
 */
-	static const uint8_t popcount[256] =
+	static const u8 popcount[256] =
 	{
 		0,1,1,2,1,2,2,3, 1,2,2,3,2,3,3,4, 1,2,2,3,2,3,3,4, 2,3,3,4,3,4,4,5,
 		1,2,2,3,2,3,3,4, 2,3,3,4,3,4,4,5, 2,3,3,4,3,4,4,5, 3,4,4,5,4,5,5,6,
@@ -1017,8 +1017,8 @@ void video_manager::update_refresh_speed()
 			// compute a target speed as an integral percentage
 			// note that we lop 0.25Hz off of the minrefresh when doing the computation to allow for
 			// the fact that most refresh rates are not accurate to 10 digits...
-			uint32_t target_speed = floor((minrefresh - 0.25) * 1000.0 / ATTOSECONDS_TO_HZ(min_frame_period));
-			uint32_t original_speed = original_speed_setting();
+			u32 target_speed = floor((minrefresh - 0.25) * 1000.0 / ATTOSECONDS_TO_HZ(min_frame_period));
+			u32 original_speed = original_speed_setting();
 			target_speed = std::min(target_speed, original_speed);
 
 			// if we changed, log that verbosely
@@ -1102,8 +1102,8 @@ void video_manager::recompute_speed(const attotime &emutime)
 //  given screen
 //-------------------------------------------------
 
-typedef software_renderer<uint32_t, 0,0,0, 16,8,0, false, true> snap_renderer_bilinear;
-typedef software_renderer<uint32_t, 0,0,0, 16,8,0, false, false> snap_renderer;
+typedef software_renderer<u32, 0,0,0, 16,8,0, false, true> snap_renderer_bilinear;
+typedef software_renderer<u32, 0,0,0, 16,8,0, false, false> snap_renderer;
 
 void video_manager::create_snapshot_bitmap(screen_device *screen)
 {
@@ -1117,8 +1117,8 @@ void video_manager::create_snapshot_bitmap(screen_device *screen)
 	}
 
 	// get the minimum width/height and set it on the target
-	int32_t width = m_snap_width;
-	int32_t height = m_snap_height;
+	s32 width = m_snap_width;
+	s32 height = m_snap_height;
 	if (width == 0 || height == 0)
 		m_snap_target->compute_minimum_size(width, height);
 	m_snap_target->set_bounds(width, height);
@@ -1146,7 +1146,7 @@ void video_manager::create_snapshot_bitmap(screen_device *screen)
 
 osd_file::error video_manager::open_next(emu_file &file, const char *extension)
 {
-	uint32_t origflags = file.openflags();
+	u32 origflags = file.openflags();
 
 	// handle defaults
 	const char *snapname = machine().options().snap_name();

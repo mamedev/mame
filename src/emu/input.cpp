@@ -27,7 +27,7 @@
 //**************************************************************************
 
 // invalid memory value for axis polling
-const int32_t INVALID_AXIS_VALUE      = 0x7fffffff;
+const s32 INVALID_AXIS_VALUE      = 0x7fffffff;
 
 // additional expanded input codes for sequences
 const input_code input_seq::end_code(DEVICE_CLASS_INTERNAL, 0, ITEM_CLASS_INVALID, ITEM_MODIFIER_NONE, ITEM_ID_SEQ_END);
@@ -49,7 +49,7 @@ const input_seq input_seq::empty_seq;
 // simple class to match codes to strings
 struct code_string_table
 {
-	uint32_t operator[](const char *string) const
+	u32 operator[](const char *string) const
 	{
 		for (const code_string_table *current = this; current->m_code != ~0; current++)
 			if (strcmp(current->m_string, string) == 0)
@@ -57,7 +57,7 @@ struct code_string_table
 		return ~0;
 	}
 
-	const char *operator[](uint32_t code) const
+	const char *operator[](u32 code) const
 	{
 		for (const code_string_table *current = this; current->m_code != ~0; current++)
 			if (current->m_code == code)
@@ -65,7 +65,7 @@ struct code_string_table
 		return nullptr;
 	}
 
-	uint32_t                  m_code;
+	u32                     m_code;
 	const char *            m_string;
 };
 
@@ -594,10 +594,10 @@ input_manager::~input_manager()
 //  input code
 //-------------------------------------------------
 
-int32_t input_manager::code_value(input_code code)
+s32 input_manager::code_value(input_code code)
 {
 	g_profiler.start(PROFILER_INPUT);
-	int32_t result = 0;
+	s32 result = 0;
 
 	// dummy loop to allow clean early exits
 	do
@@ -859,14 +859,14 @@ bool input_manager::code_check_axis(input_device_item &item, input_code code)
 
 	// ignore min/max for lightguns
 	// so the selection will not be affected by a gun going out of range
-	int32_t curval = code_value(code);
+	s32 curval = code_value(code);
 	if (code.device_class() == DEVICE_CLASS_LIGHTGUN &&
 		(code.item_id() == ITEM_ID_XAXIS || code.item_id() == ITEM_ID_YAXIS) &&
 		(curval == INPUT_ABSOLUTE_MAX || curval == INPUT_ABSOLUTE_MIN))
 		return false;
 
 	// compute the diff against memory
-	int32_t diff = curval - item.memory();
+	s32 diff = curval - item.memory();
 	if (diff < 0)
 		diff = -diff;
 
@@ -1174,7 +1174,7 @@ input_code input_manager::code_from_token(const char *_token)
 	// if we have another token, it is the item class
 	if (curtok < numtokens)
 	{
-		uint32_t temp = (*itemclass_token_table)[token[curtok].c_str()];
+		u32 temp = (*itemclass_token_table)[token[curtok].c_str()];
 		if (temp != ~0)
 		{
 			curtok++;
@@ -1259,14 +1259,14 @@ bool input_manager::seq_pressed(const input_seq &seq)
 //  defined in an input sequence
 //-------------------------------------------------
 
-int32_t input_manager::seq_axis_value(const input_seq &seq, input_item_class &itemclass)
+s32 input_manager::seq_axis_value(const input_seq &seq, input_item_class &itemclass)
 {
 	// start with no valid classes
 	input_item_class itemclasszero = ITEM_CLASS_INVALID;
 	itemclass = ITEM_CLASS_INVALID;
 
 	// iterate over all of the codes
-	int32_t result = 0;
+	s32 result = 0;
 	bool invert = false;
 	bool enable = true;
 	for (int codenum = 0; ; codenum++)
@@ -1303,7 +1303,7 @@ int32_t input_manager::seq_axis_value(const input_seq &seq, input_item_class &it
 			// non-switch codes are analog values
 			else
 			{
-				int32_t value = code_value(code);
+				s32 value = code_value(code);
 
 				// if we got a 0 value, don't do anything except remember the first type
 				if (value == 0)
@@ -1565,7 +1565,7 @@ void input_manager::seq_from_tokens(input_seq &seq, const char *string)
 	while (1)
 	{
 		// trim any leading spaces
-		while (*str != 0 && isspace((uint8_t)*str))
+		while (*str != 0 && isspace(u8(*str)))
 			str++;
 
 		// bail if we're done
@@ -1574,8 +1574,8 @@ void input_manager::seq_from_tokens(input_seq &seq, const char *string)
 
 		// find the end of the token and make it upper-case along the way
 		char *strtemp;
-		for (strtemp = str; *strtemp != 0 && !isspace((uint8_t)*strtemp); strtemp++)
-			*strtemp = toupper((uint8_t)*strtemp);
+		for (strtemp = str; *strtemp != 0 && !isspace(u8(*strtemp)); strtemp++)
+			*strtemp = toupper(u8(*strtemp));
 		char origspace = *strtemp;
 		*strtemp = 0;
 

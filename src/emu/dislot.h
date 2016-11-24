@@ -6,8 +6,8 @@
 #error Dont include this file directly; include emu.h instead.
 #endif
 
-#ifndef __DISLOT_H__
-#define __DISLOT_H__
+#ifndef MAME_EMU_DISLOT_H
+#define MAME_EMU_DISLOT_H
 
 //**************************************************************************
 //  LEGACY MACROS
@@ -77,7 +77,7 @@ public:
 	const char *default_bios() const { return m_default_bios; }
 	machine_config_constructor machine_config() const { return m_machine_config; }
 	const input_device_default *input_device_defaults() const { return m_input_device_defaults; }
-	uint32_t clock() const { return m_clock; }
+	u32 clock() const { return m_clock; }
 
 private:
 	// internal state
@@ -87,7 +87,7 @@ private:
 	const char *m_default_bios;
 	machine_config_constructor m_machine_config;
 	const input_device_default *m_input_device_defaults;
-	uint32_t m_clock;
+	u32 m_clock;
 };
 
 
@@ -108,7 +108,7 @@ public:
 	static void static_set_option_default_bios(device_t &device, const char *option, const char *default_bios) { static_option(device, option)->m_default_bios = default_bios; }
 	static void static_set_option_machine_config(device_t &device, const char *option, const machine_config_constructor machine_config) { static_option(device, option)->m_machine_config = machine_config; }
 	static void static_set_option_device_input_defaults(device_t &device, const char *option, const input_device_default *default_input) { static_option(device, option)->m_input_device_defaults = default_input; }
-	static void static_set_option_clock(device_t &device, const char *option, uint32_t default_clock) { static_option(device, option)->m_clock = default_clock; }
+	static void static_set_option_clock(device_t &device, const char *option, u32 default_clock) { static_option(device, option)->m_clock = default_clock; }
 	bool fixed() const { return m_fixed; }
 	const char *default_option() const { return m_default_option; }
 	const std::unordered_map<std::string, std::unique_ptr<device_slot_option>> &option_list() const { return m_options; }
@@ -137,4 +137,4 @@ public:
 	virtual ~device_slot_card_interface();
 };
 
-#endif  /* __DISLOT_H__ */
+#endif  /* MAME_EMU_DISLOT_H */

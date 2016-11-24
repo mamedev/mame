@@ -1127,7 +1127,7 @@ void ppc_device::static_generate_memory_accessor(int mode, int size, int iswrite
 						{
 							UML_DLOAD(block, I3, fastbase, I0, SIZE_QWORD, SCALE_x1);   // dload   i3,fastbase,i0,qword_x1
 							UML_DAND(block, I1, I1, I2);                            // dand    i1,i1,i2
-							UML_DXOR(block, I2, I2, U64(0xffffffffffffffff));   // dxor    i2,i2,0xfffffffffffffffff
+							UML_DXOR(block, I2, I2, 0xffffffffffffffffU);   // dxor    i2,i2,0xfffffffffffffffff
 							UML_DAND(block, I3, I3, I2);                            // dand    i3,i3,i2
 							UML_DOR(block, I1, I1, I3);                         // dor     i1,i1,i3
 						}
@@ -1209,29 +1209,29 @@ void ppc_device::static_generate_memory_accessor(int mode, int size, int iswrite
 		{
 			if (iswrite)
 			{
-				UML_MOV(block, mem(&m_core->tempaddr), I0);                      // mov     [tempaddr],i0
-				UML_MOV(block, mem(&m_core->tempdata.w.l), I1);                  // mov     [tempdata],i1
+				UML_MOV(block, mem(&m_core->tempaddr), I0);                 // mov     [tempaddr],i0
+				UML_MOV(block, mem(&m_core->tempdata.w.l), I1);             // mov     [tempdata],i1
 				UML_SUB(block, I0, I0, 1);                                  // sub     i0,i0,1
 				UML_SHR(block, I1, I1, 8);                                  // shr     i1,i1,8
-				UML_MOV(block, I2, 0x00ff);                                     // mov     i2,0x00ff
-				UML_CALLH(block, *masked);                                                  // callh   masked
-				UML_ADD(block, I0, mem(&m_core->tempaddr), 1);               // add     i0,[tempaddr],1
-				UML_SHL(block, I1, mem(&m_core->tempdata.w.l), 8);           // shl     i1,[tempdata],8
-				UML_MOV(block, I2, 0xff00);                                     // mov     i2,0xff00
-				UML_CALLH(block, *masked);                                                  // callh   masked
+				UML_MOV(block, I2, 0x00ff);                                 // mov     i2,0x00ff
+				UML_CALLH(block, *masked);                                  // callh   masked
+				UML_ADD(block, I0, mem(&m_core->tempaddr), 1);              // add     i0,[tempaddr],1
+				UML_SHL(block, I1, mem(&m_core->tempdata.w.l), 8);          // shl     i1,[tempdata],8
+				UML_MOV(block, I2, 0xff00);                                 // mov     i2,0xff00
+				UML_CALLH(block, *masked);                                  // callh   masked
 			}
 			else
 			{
-				UML_MOV(block, mem(&m_core->tempaddr), I0);                      // mov     [tempaddr],i0
+				UML_MOV(block, mem(&m_core->tempaddr), I0);                 // mov     [tempaddr],i0
 				UML_SUB(block, I0, I0, 1);                                  // sub     i0,i0,1
-				UML_MOV(block, I2, 0x00ff);                                     // mov     i2,0x00ff
-				UML_CALLH(block, *masked);                                                  // callh   masked
-				UML_SHL(block, mem(&m_core->tempdata.w.l), I0, 8);           // shl     [tempdata],i0,8
-				UML_ADD(block, I0, mem(&m_core->tempaddr), 1);               // add     i0,[tempaddr],1
-				UML_MOV(block, I2, 0xff00);                                     // mov     i2,0xff00
-				UML_CALLH(block, *masked);                                                  // callh   masked
+				UML_MOV(block, I2, 0x00ff);                                 // mov     i2,0x00ff
+				UML_CALLH(block, *masked);                                  // callh   masked
+				UML_SHL(block, mem(&m_core->tempdata.w.l), I0, 8);          // shl     [tempdata],i0,8
+				UML_ADD(block, I0, mem(&m_core->tempaddr), 1);              // add     i0,[tempaddr],1
+				UML_MOV(block, I2, 0xff00);                                 // mov     i2,0xff00
+				UML_CALLH(block, *masked);                                  // callh   masked
 				UML_SHR(block, I0, I0, 8);                                  // shr     i0,i0,8
-				UML_OR(block, I0, I0, mem(&m_core->tempdata.w.l));           // or      i0,i0,[tempdata]
+				UML_OR(block, I0, I0, mem(&m_core->tempdata.w.l));          // or      i0,i0,[tempdata]
 			}
 		}
 		else if (size == 4)
@@ -1239,108 +1239,108 @@ void ppc_device::static_generate_memory_accessor(int mode, int size, int iswrite
 			int offs2, offs3;
 			if (iswrite)
 			{
-				UML_MOV(block, mem(&m_core->tempaddr), I0);                      // mov     [tempaddr],i0
-				UML_MOV(block, mem(&m_core->tempdata.w.l), I1);                  // mov     [tempdata],i1
-				UML_TEST(block, I0, 2);                                         // test    i0,i0,2
-				UML_JMPc(block, COND_NZ, offs2 = label++);                                  // jnz     offs2
+				UML_MOV(block, mem(&m_core->tempaddr), I0);                 // mov     [tempaddr],i0
+				UML_MOV(block, mem(&m_core->tempdata.w.l), I1);             // mov     [tempdata],i1
+				UML_TEST(block, I0, 2);                                     // test    i0,i0,2
+				UML_JMPc(block, COND_NZ, offs2 = label++);                  // jnz     offs2
 				UML_SUB(block, I0, I0, 1);                                  // sub     i0,i0,1
 				UML_SHR(block, I1, I1, 8);                                  // shr     i1,i1,8
-				UML_MOV(block, I2, 0x00ffffff);                                 // mov     i2,0x00ffffff
-				UML_CALLH(block, *masked);                                                  // callh   masked
-				UML_ADD(block, I0, mem(&m_core->tempaddr), 3);               // add     i0,[tempaddr],3
-				UML_SHL(block, I1, mem(&m_core->tempdata.w.l), 24);      // shl     i1,[tempdata],24
-				UML_MOV(block, I2, 0xff000000);                                 // mov     i2,0xff000000
-				UML_CALLH(block, *masked);                                                  // callh   masked
-				UML_RET(block);                                                             // ret
-				UML_LABEL(block, offs2);                                                // offs2:
-				UML_TEST(block, I0, 1);                                         // test    i0,i0,1
-				UML_JMPc(block, COND_NZ, offs3 = label++);                                  // jnz     offs3
+				UML_MOV(block, I2, 0x00ffffff);                             // mov     i2,0x00ffffff
+				UML_CALLH(block, *masked);                                  // callh   masked
+				UML_ADD(block, I0, mem(&m_core->tempaddr), 3);              // add     i0,[tempaddr],3
+				UML_SHL(block, I1, mem(&m_core->tempdata.w.l), 24);         // shl     i1,[tempdata],24
+				UML_MOV(block, I2, 0xff000000);                             // mov     i2,0xff000000
+				UML_CALLH(block, *masked);                                  // callh   masked
+				UML_RET(block);                                             // ret
+				UML_LABEL(block, offs2);                                    // offs2:
+				UML_TEST(block, I0, 1);                                     // test    i0,i0,1
+				UML_JMPc(block, COND_NZ, offs3 = label++);                  // jnz     offs3
 				UML_SUB(block, I0, I0, 2);                                  // sub     i0,i0,2
 				UML_SHR(block, I1, I1, 16);                                 // shr     i1,i1,16
-				UML_MOV(block, I2, 0x0000ffff);                                 // mov     i2,0x0000ffff
-				UML_CALLH(block, *masked);                                                  // callh   masked
-				UML_ADD(block, I0, mem(&m_core->tempaddr), 2);               // add     i0,[tempaddr],2
-				UML_SHL(block, I1, mem(&m_core->tempdata.w.l), 16);      // shl     i1,[tempdata],16
-				UML_MOV(block, I2, 0xffff0000);                                 // mov     i2,0xffff0000
-				UML_CALLH(block, *masked);                                                  // callh   masked
-				UML_RET(block);                                                             // ret
-				UML_LABEL(block, offs3);                                                // offs3:
+				UML_MOV(block, I2, 0x0000ffff);                             // mov     i2,0x0000ffff
+				UML_CALLH(block, *masked);                                  // callh   masked
+				UML_ADD(block, I0, mem(&m_core->tempaddr), 2);              // add     i0,[tempaddr],2
+				UML_SHL(block, I1, mem(&m_core->tempdata.w.l), 16);         // shl     i1,[tempdata],16
+				UML_MOV(block, I2, 0xffff0000);                             // mov     i2,0xffff0000
+				UML_CALLH(block, *masked);                                  // callh   masked
+				UML_RET(block);                                             // ret
+				UML_LABEL(block, offs3);                                    // offs3:
 				UML_SUB(block, I0, I0, 3);                                  // sub     i0,i0,3
 				UML_SHR(block, I1, I1, 24);                                 // shr     i1,i1,24
-				UML_MOV(block, I2, 0x000000ff);                                 // mov     i2,0x000000ff
-				UML_CALLH(block, *masked);                                                  // callh   masked
-				UML_ADD(block, I0, mem(&m_core->tempaddr), 1);               // add     i0,[tempaddr],1
-				UML_SHL(block, I1, mem(&m_core->tempdata.w.l), 8);           // shl     i1,[tempdata],8
-				UML_MOV(block, I2, 0xffffff00);                                 // mov     i2,0xffffff00
-				UML_CALLH(block, *masked);                                                  // callh   masked
+				UML_MOV(block, I2, 0x000000ff);                             // mov     i2,0x000000ff
+				UML_CALLH(block, *masked);                                  // callh   masked
+				UML_ADD(block, I0, mem(&m_core->tempaddr), 1);              // add     i0,[tempaddr],1
+				UML_SHL(block, I1, mem(&m_core->tempdata.w.l), 8);          // shl     i1,[tempdata],8
+				UML_MOV(block, I2, 0xffffff00);                             // mov     i2,0xffffff00
+				UML_CALLH(block, *masked);                                  // callh   masked
 			}
 			else
 			{
-				UML_MOV(block, mem(&m_core->tempaddr), I0);                      // mov     [tempaddr],i0
-				UML_TEST(block, I0, 2);                                         // test    i0,i0,2
-				UML_JMPc(block, COND_NZ, offs2 = label++);                                  // jnz     offs2
+				UML_MOV(block, mem(&m_core->tempaddr), I0);                 // mov     [tempaddr],i0
+				UML_TEST(block, I0, 2);                                     // test    i0,i0,2
+				UML_JMPc(block, COND_NZ, offs2 = label++);                  // jnz     offs2
 				UML_SUB(block, I0, I0, 1);                                  // sub     i0,i0,1
-				UML_MOV(block, I2, 0x00ffffff);                                 // mov     i2,0x00ffffff
-				UML_CALLH(block, *masked);                                                  // callh   masked
-				UML_SHL(block, mem(&m_core->tempdata.w.l), I0, 8);           // shl     [tempdata],i0,8
-				UML_ADD(block, I0, mem(&m_core->tempaddr), 3);               // add     i0,[tempaddr],3
-				UML_MOV(block, I2, 0xff000000);                                 // mov     i2,0xff000000
-				UML_CALLH(block, *masked);                                                  // callh   masked
+				UML_MOV(block, I2, 0x00ffffff);                             // mov     i2,0x00ffffff
+				UML_CALLH(block, *masked);                                  // callh   masked
+				UML_SHL(block, mem(&m_core->tempdata.w.l), I0, 8);          // shl     [tempdata],i0,8
+				UML_ADD(block, I0, mem(&m_core->tempaddr), 3);              // add     i0,[tempaddr],3
+				UML_MOV(block, I2, 0xff000000);                             // mov     i2,0xff000000
+				UML_CALLH(block, *masked);                                  // callh   masked
 				UML_SHR(block, I0, I0, 24);                                 // shr     i0,i0,24
-				UML_OR(block, I0, I0, mem(&m_core->tempdata.w.l));           // or      i0,i0,[tempdata]
-				UML_RET(block);                                                             // ret
-				UML_LABEL(block, offs2);                                                // offs2:
-				UML_TEST(block, I0, 1);                                         // test    i0,i0,1
-				UML_JMPc(block, COND_NZ, offs3 = label++);                                  // jnz     offs3
+				UML_OR(block, I0, I0, mem(&m_core->tempdata.w.l));          // or      i0,i0,[tempdata]
+				UML_RET(block);                                             // ret
+				UML_LABEL(block, offs2);                                    // offs2:
+				UML_TEST(block, I0, 1);                                     // test    i0,i0,1
+				UML_JMPc(block, COND_NZ, offs3 = label++);                  // jnz     offs3
 				UML_SUB(block, I0, I0, 2);                                  // sub     i0,i0,2
-				UML_MOV(block, I2, 0x0000ffff);                                 // mov     i2,0x0000ffff
-				UML_CALLH(block, *masked);                                                  // callh   masked
-				UML_SHL(block, mem(&m_core->tempdata.w.l), I0, 16);      // shl     [tempdata],i0,16
-				UML_ADD(block, I0, mem(&m_core->tempaddr), 2);               // add     i0,[tempaddr],2
-				UML_MOV(block, I2, 0xffff0000);                                 // mov     i2,0xffff0000
-				UML_CALLH(block, *masked);                                                  // callh   masked
+				UML_MOV(block, I2, 0x0000ffff);                             // mov     i2,0x0000ffff
+				UML_CALLH(block, *masked);                                  // callh   masked
+				UML_SHL(block, mem(&m_core->tempdata.w.l), I0, 16);         // shl     [tempdata],i0,16
+				UML_ADD(block, I0, mem(&m_core->tempaddr), 2);              // add     i0,[tempaddr],2
+				UML_MOV(block, I2, 0xffff0000);                             // mov     i2,0xffff0000
+				UML_CALLH(block, *masked);                                  // callh   masked
 				UML_SHR(block, I0, I0, 16);                                 // shr     i0,i0,16
-				UML_OR(block, I0, I0, mem(&m_core->tempdata.w.l));           // or      i0,i0,[tempdata]
-				UML_RET(block);                                                             // ret
-				UML_LABEL(block, offs3);                                                // offs3:
+				UML_OR(block, I0, I0, mem(&m_core->tempdata.w.l));          // or      i0,i0,[tempdata]
+				UML_RET(block);                                             // ret
+				UML_LABEL(block, offs3);                                    // offs3:
 				UML_SUB(block, I0, I0, 3);                                  // sub     i0,i0,3
-				UML_MOV(block, I2, 0x000000ff);                                 // mov     i2,0x000000ff
-				UML_CALLH(block, *masked);                                                  // callh   masked
-				UML_SHL(block, mem(&m_core->tempdata.w.l), I0, 24);      // shl     [tempdata],i0,24
-				UML_ADD(block, I0, mem(&m_core->tempaddr), 1);               // add     i0,[tempaddr],1
-				UML_MOV(block, I2, 0xffffff00);                                 // mov     i2,0xffffff00
-				UML_CALLH(block, *masked);                                                  // callh   masked
+				UML_MOV(block, I2, 0x000000ff);                             // mov     i2,0x000000ff
+				UML_CALLH(block, *masked);                                  // callh   masked
+				UML_SHL(block, mem(&m_core->tempdata.w.l), I0, 24);         // shl     [tempdata],i0,24
+				UML_ADD(block, I0, mem(&m_core->tempaddr), 1);              // add     i0,[tempaddr],1
+				UML_MOV(block, I2, 0xffffff00);                             // mov     i2,0xffffff00
+				UML_CALLH(block, *masked);                                  // callh   masked
 				UML_SHR(block, I0, I0, 8);                                  // shr     i0,i0,8
-				UML_OR(block, I0, I0, mem(&m_core->tempdata.w.l));           // or      i0,i0,[tempdata]
+				UML_OR(block, I0, I0, mem(&m_core->tempdata.w.l));          // or      i0,i0,[tempdata]
 			}
 		}
 		else if (size == 8)
 		{
 			if (iswrite)
 			{
-				UML_MOV(block, mem(&m_core->tempaddr), I0);                      // mov     [tempaddr],i0
-				UML_DMOV(block, mem(&m_core->tempdata.d), I1);                   // dmov    [tempdata],i1
-				UML_DSHR(block, I1, I1, 32);                                            // dshr    i1,i1,32
-				UML_AND(block, I0, I0, ~7);                                             // and     i0,i0,~7
-				UML_DMOV(block, I2, U64(0x00000000ffffffff));                           // dmov    i2,0x00000000ffffffff
-				UML_CALLH(block, *masked);                                              // callh   masked
-				UML_ADD(block, I0, mem(&m_core->tempaddr), 4);                   // add     i0,[tempaddr],4
-				UML_DSHL(block, I1, mem(&m_core->tempdata.d), 32);               // dshl    i1,[tempdata],32
-				UML_DMOV(block, I2, U64(0xffffffff00000000));                           // dmov    i2,0xffffffff00000000
-				UML_CALLH(block, *masked);                                              // callh   masked
+				UML_MOV(block, mem(&m_core->tempaddr), I0);                 // mov     [tempaddr],i0
+				UML_DMOV(block, mem(&m_core->tempdata.d), I1);              // dmov    [tempdata],i1
+				UML_DSHR(block, I1, I1, 32);                                // dshr    i1,i1,32
+				UML_AND(block, I0, I0, ~7);                                 // and     i0,i0,~7
+				UML_DMOV(block, I2, 0x00000000ffffffffU);                   // dmov    i2,0x00000000ffffffff
+				UML_CALLH(block, *masked);                                  // callh   masked
+				UML_ADD(block, I0, mem(&m_core->tempaddr), 4);              // add     i0,[tempaddr],4
+				UML_DSHL(block, I1, mem(&m_core->tempdata.d), 32);          // dshl    i1,[tempdata],32
+				UML_DMOV(block, I2, 0xffffffff00000000U);                   // dmov    i2,0xffffffff00000000
+				UML_CALLH(block, *masked);                                  // callh   masked
 			}
 			else
 			{
-				UML_MOV(block, mem(&m_core->tempaddr), I0);                      // mov     [tempaddr],i0
-				UML_DMOV(block, I2, U64(0x00000000ffffffff));                           // mov     i2,0x00000000ffffffff
-				UML_AND(block, I0, I0, ~7);                                             // and     i0,i0,~7
-				UML_CALLH(block, *masked);                                              // callh   masked
-				UML_DSHL(block, mem(&m_core->tempdata.d), I0, 32);               // dshl    [tempdata],i0,32
-				UML_ADD(block, I0, mem(&m_core->tempaddr), 4);                   // add     i0,[tempaddr],4
-				UML_DMOV(block, I2, U64(0xffffffff00000000));                           // dmov    i2,0xffffffff00000000
-				UML_CALLH(block, *masked);                                              // callh   masked
-				UML_DSHR(block, I0, I0, 32);                                            // dshr    i0,i0,32
-				UML_DOR(block, I0, I0, mem(&m_core->tempdata.d));                // dor     i0,i0,[tempdata]
+				UML_MOV(block, mem(&m_core->tempaddr), I0);                 // mov     [tempaddr],i0
+				UML_DMOV(block, I2, 0x00000000ffffffffU);                   // mov     i2,0x00000000ffffffff
+				UML_AND(block, I0, I0, ~7);                                 // and     i0,i0,~7
+				UML_CALLH(block, *masked);                                  // callh   masked
+				UML_DSHL(block, mem(&m_core->tempdata.d), I0, 32);          // dshl    [tempdata],i0,32
+				UML_ADD(block, I0, mem(&m_core->tempaddr), 4);              // add     i0,[tempaddr],4
+				UML_DMOV(block, I2, 0xffffffff00000000U);                   // dmov    i2,0xffffffff00000000
+				UML_CALLH(block, *masked);                                  // callh   masked
+				UML_DSHR(block, I0, I0, 32);                                // dshr    i0,i0,32
+				UML_DOR(block, I0, I0, mem(&m_core->tempdata.d));           // dor     i0,i0,[tempdata]
 			}
 		}
 		UML_RET(block);                                                                     // ret
@@ -3745,11 +3745,12 @@ bool ppc_device::generate_instruction_3f(drcuml_block *block, compiler_state *co
 
 void ppc_device::log_add_disasm_comment(drcuml_block *block, uint32_t pc, uint32_t op)
 {
-	char buffer[100];
 	if (m_drcuml->logging())
 	{
-		ppc_dasm_one(buffer, pc, op);
-		block->append_comment("%08X: %s", pc, buffer);                                  // comment
+		util::ovectorstream stream;
+		ppc_dasm_one(stream, pc, op);
+		stream.put('\0');
+		block->append_comment("%08X: %s", pc, &stream.vec()[0]);                                  // comment
 	}
 }
 
@@ -3919,6 +3920,8 @@ void ppc_device::log_register_list(drcuml_state *drcuml, const char *string, con
 
 void ppc_device::log_opcode_desc(drcuml_state *drcuml, const opcode_desc *desclist, int indent)
 {
+	util::ovectorstream buffer;
+
 	/* open the file, creating it if necessary */
 	if (indent == 0)
 		drcuml->log_printf("\nDescriptor list @ %08X\n", desclist->pc);
@@ -3926,20 +3929,22 @@ void ppc_device::log_opcode_desc(drcuml_state *drcuml, const opcode_desc *descli
 	/* output each descriptor */
 	for ( ; desclist != nullptr; desclist = desclist->next())
 	{
-		char buffer[100];
+		buffer.clear();
+		buffer.seekp(0);
 
-		/* disassemle the current instruction and output it to the log */
+		/* disassemble the current instruction and output it to the log */
 		if (drcuml->logging() || drcuml->logging_native())
 		{
 			if (desclist->flags & OPFLAG_VIRTUAL_NOOP)
-				strcpy(buffer, "<virtual nop>");
+				buffer << "<virtual nop>";
 			else
 				ppc_dasm_one(buffer, desclist->pc, desclist->opptr.l[0]);
 		}
 		else
-			strcpy(buffer, "???");
+			buffer << "???";
 
-		drcuml->log_printf("%08X [%08X] t:%08X f:%s: %-30s", desclist->pc, desclist->physpc, desclist->targetpc, log_desc_flags_to_string(desclist->flags), buffer);
+		buffer.put('\0');
+		drcuml->log_printf("%08X [%08X] t:%08X f:%s: %-30s", desclist->pc, desclist->physpc, desclist->targetpc, log_desc_flags_to_string(desclist->flags), &buffer.vec()[0]);
 
 		/* output register states */
 		log_register_list(drcuml, "use", desclist->regin, nullptr);

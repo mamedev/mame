@@ -3044,7 +3044,7 @@ WRITE64_MEMBER(cobra_state::gfx_buf_w)
 
 	m_renderer->gfx_fifo_exec();
 
-	if (data == U64(0x00a0000110500018))
+	if (data == 0x00a0000110500018U)
 	{
 		m_gfxfifo_out->flush();
 
@@ -3055,7 +3055,7 @@ WRITE64_MEMBER(cobra_state::gfx_buf_w)
 		m_gfxfifo_out->push(&space.device(), (uint32_t)(regdata >> 32));
 		m_gfxfifo_out->push(&space.device(), (uint32_t)(regdata));
 	}
-	else if (data == U64(0x00a0000110520800))
+	else if (data == 0x00a0000110520800U)
 	{
 		// in teximage_load()
 		// some kind of busy flag for mbuslib_tex_ints()...
@@ -3067,7 +3067,7 @@ WRITE64_MEMBER(cobra_state::gfx_buf_w)
 
 		m_gfx_unk_status &= ~0x400;
 	}
-	else if (data != U64(0x00a0000110520200))       // mbuslib_regread()
+	else if (data != 0x00a0000110520200U)       // mbuslib_regread()
 	{
 		// prc_read always expects a value...
 
@@ -3375,8 +3375,8 @@ DRIVER_INIT_MEMBER(cobra_state, cobra)
 	m_sound_dma_buffer_r = std::make_unique<int16_t[]>(DMA_SOUND_BUFFER_SIZE);
 
 	// setup fake pagetable until we figure out what really maps there...
-	//m_gfx_pagetable[0x80 / 8] = U64(0x800001001e0001a8);
-	m_gfx_pagetable[0x80 / 8] = U64(0x80000100200001a8);        // should this map to 0x1e000000?
+	//m_gfx_pagetable[0x80 / 8] = 0x800001001e0001a8U;
+	m_gfx_pagetable[0x80 / 8] = 0x80000100200001a8U;        // should this map to 0x1e000000?
 }
 
 DRIVER_INIT_MEMBER(cobra_state,bujutsu)

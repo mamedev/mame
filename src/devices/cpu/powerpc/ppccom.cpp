@@ -26,9 +26,9 @@
     CONSTANTS
 ***************************************************************************/
 
-#define DOUBLE_SIGN     (U64(0x8000000000000000))
-#define DOUBLE_EXP      (U64(0x7ff0000000000000))
-#define DOUBLE_FRAC     (U64(0x000fffffffffffff))
+#define DOUBLE_SIGN     (0x8000000000000000U)
+#define DOUBLE_EXP      (0x7ff0000000000000U)
+#define DOUBLE_FRAC     (0x000fffffffffffffU)
 #define DOUBLE_ZERO     (0)
 
 
@@ -473,8 +473,8 @@ static inline int is_qnan_double(double x)
 {
 	uint64_t xi = *(uint64_t*)&x;
 	return( ((xi & DOUBLE_EXP) == DOUBLE_EXP) &&
-			((xi & U64(0x0007fffffffffff)) == U64(0x000000000000000)) &&
-			((xi & U64(0x000800000000000)) == U64(0x000800000000000)) );
+			((xi & 0x0007fffffffffffU) == 0x000000000000000U) &&
+			((xi & 0x000800000000000U) == 0x000800000000000U) );
 }
 
 
@@ -489,7 +489,7 @@ static inline int is_snan_double(double x)
 	uint64_t xi = *(uint64_t*)&x;
 	return( ((xi & DOUBLE_EXP) == DOUBLE_EXP) &&
 			((xi & DOUBLE_FRAC) != DOUBLE_ZERO) &&
-			((xi & U64(0x0008000000000000)) == DOUBLE_ZERO) );
+			((xi & 0x0008000000000000U) == DOUBLE_ZERO) );
 }
 #endif
 
@@ -1010,11 +1010,11 @@ void ppc_device::state_import(const device_state_entry &entry)
 			break;
 
 		case PPC_TBL:
-			set_timebase((get_timebase() & ~U64(0x00ffffff00000000)) | m_debugger_temp);
+			set_timebase((get_timebase() & ~u64(0x00ffffff00000000U)) | m_debugger_temp);
 			break;
 
 		case PPC_TBH:
-			set_timebase((get_timebase() & ~U64(0x00000000ffffffff)) | ((uint64_t)(m_debugger_temp & 0x00ffffff) << 32));
+			set_timebase((get_timebase() & ~u64(0x00000000ffffffffU)) | ((uint64_t)(m_debugger_temp & 0x00ffffff) << 32));
 			break;
 
 		case PPC_DEC:
@@ -1232,11 +1232,11 @@ void ppc_device::device_reset()
     CPU
 -------------------------------------------------*/
 
-offs_t ppc_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t ppc_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	uint32_t op = *(uint32_t *)oprom;
 	op = big_endianize_int32(op);
-	return ppc_dasm_one(buffer, pc, op);
+	return ppc_dasm_one(stream, pc, op);
 }
 
 
@@ -1763,10 +1763,10 @@ void ppc_device::ppccom_execute_mtspr()
 
 			/* timebase */
 			case SPR603_TBL_W:
-				set_timebase((get_timebase() & ~U64(0xffffffff00000000)) | m_core->param1);
+				set_timebase((get_timebase() & ~u64(0xffffffff00000000U)) | m_core->param1);
 				return;
 			case SPR603_TBU_W:
-				set_timebase((get_timebase() & ~U64(0x00000000ffffffff)) | ((uint64_t)m_core->param1 << 32));
+				set_timebase((get_timebase() & ~u64(0x00000000ffffffffU)) | ((uint64_t)m_core->param1 << 32));
 				return;
 		}
 	}
@@ -1822,10 +1822,10 @@ void ppc_device::ppccom_execute_mtspr()
 
 			/* timebase */
 			case SPR4XX_TBLO:
-				set_timebase((get_timebase() & ~U64(0x00ffffff00000000)) | m_core->param1);
+				set_timebase((get_timebase() & ~u64(0x00ffffff00000000U)) | m_core->param1);
 				return;
 			case SPR4XX_TBHI:
-				set_timebase((get_timebase() & ~U64(0x00000000ffffffff)) | ((uint64_t)(m_core->param1 & 0x00ffffff) << 32));
+				set_timebase((get_timebase() & ~u64(0x00000000ffffffffU)) | ((uint64_t)(m_core->param1 & 0x00ffffff) << 32));
 				return;
 		}
 	}

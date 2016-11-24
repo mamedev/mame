@@ -12,6 +12,7 @@
 
 #pragma once
 
+#include "osdcomm.h"
 #include "osdcore.h"
 #include "corealloc.h"
 
@@ -353,6 +354,17 @@ private:
 // ======================> contiguous_sequence_wrapper
 
 namespace util {
+
+using osd::u8;
+using osd::u16;
+using osd::u32;
+using osd::u64;
+
+using osd::s8;
+using osd::s16;
+using osd::s32;
+using osd::s64;
+
 
 // wraps an existing sequence of values
 template<typename T>
