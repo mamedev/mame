@@ -648,12 +648,12 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-ROM_START( ldv1000 )
+ROM_START( simldv1000 )
 	DISK_REGION( "laserdisc" )
 ROM_END
 
 
-ROM_START( pr8210 )
+ROM_START( simpr8210 )
 	DISK_REGION( "laserdisc" )
 ROM_END
 
@@ -665,5 +665,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 2008, ldv1000, 0, ldv1000, ldplayer, driver_device, 0, ROT0, "MAME", "Pioneer LDV-1000 Simulator", 0 )
-GAMEL(2008, pr8210,  0, pr8210,  ldplayer, driver_device, 0, ROT0, "MAME", "Pioneer PR-8210 Simulator", 0, layout_pr8210 )
+GAME( 2008, simldv1000, 0, ldv1000, ldplayer, driver_device, 0, ROT0, "MAME", "Pioneer LDV-1000 Simulator", 0 )
+GAMEL(2008, simpr8210,  0, pr8210,  ldplayer, driver_device, 0, ROT0, "MAME", "Pioneer PR-8210 Simulator", 0, layout_pr8210 )
