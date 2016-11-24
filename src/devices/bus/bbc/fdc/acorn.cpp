@@ -65,8 +65,10 @@ ROM_START( acorn8271 )
 	// Acorn
 	ROM_SYSTEM_BIOS(0, "dfs090", "Acorn DFS 0.90")
 	ROMX_LOAD("dfs090.rom", 0x0000, 0x2000, CRC(3ce609cf) SHA1(5cc0f14b8f46855c70eaa653cca4ad079b458732), ROM_BIOS(1))
+	ROM_RELOAD(             0x2000, 0x2000)
 	ROM_SYSTEM_BIOS(1, "dfs098", "Acorn DFS 0.98")
 	ROMX_LOAD("dfs098.rom", 0x0000, 0x2000, CRC(90852e7d) SHA1(6df3552d5426f3a4625b9a0c7829bdba03f05e84), ROM_BIOS(2))
+	ROM_RELOAD(             0x2000, 0x2000)
 	ROM_SYSTEM_BIOS(2, "dnfs100", "Acorn DFS 1.00")
 	ROMX_LOAD("dnfs100.rom", 0x0000, 0x4000, CRC(7e367e8c) SHA1(161f585dc45665ea77433c84afd2f95049f7f5a0), ROM_BIOS(3))
 	ROM_SYSTEM_BIOS(3, "dnfs120", "Acorn DFS 1.20")
@@ -74,14 +76,19 @@ ROM_START( acorn8271 )
 	// Pace/Amcom
 	ROM_SYSTEM_BIOS(4, "amdfs0000", "Amcom DFS 00000")
 	ROMX_LOAD("amcomdfs_00000.rom", 0x0000, 0x2000, CRC(28947e95) SHA1(43eb9bfc70bb710e01c0c9d48703ea812f9266e4), ROM_BIOS(5))
+	ROM_RELOAD(                     0x2000, 0x2000)
 	ROM_SYSTEM_BIOS(5, "amdfs7259", "Amcom DFS A7259")
 	ROMX_LOAD("amcomdfs_a7259.rom", 0x0000, 0x2000, CRC(a3366a98) SHA1(7b8b08edf5ebf17fcbcfbb2af0c189ac903285c2), ROM_BIOS(6))
+	ROM_RELOAD(                     0x2000, 0x2000)
 	ROM_SYSTEM_BIOS(6, "amdfs4084", "Amcom DFS B4084")
 	ROMX_LOAD("amcomdfs_b4084.rom", 0x0000, 0x2000, CRC(487b049b) SHA1(559e056fe77ede2c87a314fcd8d3e2cab2b49b09), ROM_BIOS(7))
+	ROM_RELOAD(                     0x2000, 0x2000)
 	ROM_SYSTEM_BIOS(7, "amdfs4088", "Amcom DFS B4088")
 	ROMX_LOAD("amcomdfs_b4088.rom", 0x0000, 0x2000, CRC(3b6e2f82) SHA1(3f5e5039a926c980957f169de2112793eb1a9890), ROM_BIOS(8))
+	ROM_RELOAD(                     0x2000, 0x2000)
 	ROM_SYSTEM_BIOS(8, "amdfs4218", "Amcom DFS B4218")
 	ROMX_LOAD("amcomdfs_b4218.rom", 0x0000, 0x2000, CRC(98248af5) SHA1(17986b029d641047555eedc538d6790f0cf911a9), ROM_BIOS(9))
+	ROM_RELOAD(                     0x2000, 0x2000)
 	// Watford Electronics
 	ROM_SYSTEM_BIOS(9, "wdfs110", "Watford Electronics DFS 1.10")
 	ROMX_LOAD("wedfs110.rom", 0x0000, 0x4000, CRC(73c47a91) SHA1(658eb78b104806e76a0e51de9eb238a51daf646d), ROM_BIOS(10))
@@ -95,7 +102,7 @@ ROM_START( acorn8271 )
 	ROMX_LOAD("wedfs143.rom", 0x0000, 0x4000, CRC(3755ee18) SHA1(69bc258880b8e163ff85a293a25e5f00931d030b), ROM_BIOS(14))
 	ROM_SYSTEM_BIOS(14, "wdfs144", "Watford Electronics DFS 1.44")
 	ROMX_LOAD("wedfs144.rom", 0x0000, 0x4000, CRC(9fb8d13f) SHA1(387d2468c6e1360f5b531784ce95d5f71a50c2b5), ROM_BIOS(15))
-	// Business Systems
+	// Computer Users Club
 	ROM_SYSTEM_BIOS(15, "bsdos219", "BS-DOS 2.19")
 	ROMX_LOAD("bs-dos219.rom", 0x0000, 0x4000, CRC(299b17b2) SHA1(175fdcc802a7d94d7c36d6f3fd52a192a7cfbc98), ROM_BIOS(16))
 	ROM_SYSTEM_BIOS(16, "bsdos222", "BS-DOS 2.22")
@@ -103,11 +110,13 @@ ROM_START( acorn8271 )
 	// Others
 	ROM_SYSTEM_BIOS(17, "cucdos", "C.U.C DOS 1.00")
 	ROMX_LOAD("cucdos.rom", 0x0000, 0x2000, CRC(4adf8ecb) SHA1(ca3c1f9e89799459b6fd5197304129441443ca54), ROM_BIOS(18))
+	ROM_RELOAD(             0x2000, 0x2000)
 ROM_END
 
 ROM_START( acorn1770 )
 	ROM_REGION(0x4000, "dfs_rom", 0)
 	ROM_DEFAULT_BIOS("dfs223")
+	// Acorn
 	ROM_SYSTEM_BIOS(0, "dfs210", "Acorn DFS 2.10")
 	ROMX_LOAD("dfs v2.10 (1985)(acorn).bin", 0x0000, 0x4000, CRC(4f828787) SHA1(112a315e1598cb4db2abcfe9d89fcd97444b276d), ROM_BIOS(1))
 	ROM_SYSTEM_BIOS(1, "dfs220", "Acorn DFS 2.20")
@@ -118,6 +127,11 @@ ROM_START( acorn1770 )
 	ROMX_LOAD("dfs v2.25 (1986)(acorn).bin", 0x0000, 0x4000, CRC(f855a75b) SHA1(f11271748e6303c60182955e5fa478624b616fcf), ROM_BIOS(4))
 	ROM_SYSTEM_BIOS(4, "dfs226", "Acorn DFS 2.26")
 	ROMX_LOAD("dfs v2.26 (1986)(acorn).bin", 0x0000, 0x4000, CRC(5ae33e94) SHA1(cf2ebc422a8d24ec6f1a0320520c38a0e704109a), ROM_BIOS(5))
+	// Advanced Computer Products
+	ROM_SYSTEM_BIOS(5, "acp108", "Advanced 1770 DFS 1.08")
+	ROMX_LOAD("advanced 1770 dfs 1.08 (acp).rom", 0x0000, 0x4000, CRC(eb0eaa34) SHA1(d16ba3c8ed5e5ab6af62aad13a8e567b1c3639c2), ROM_BIOS(6))
+	ROM_SYSTEM_BIOS(6, "acp200", "Advanced 1770 DFS 2.00")
+	ROMX_LOAD("advanced 1770 dfs 2.00 (acp).rom", 0x0000, 0x4000, CRC(65c0d170) SHA1(6907806e2b5b904a6f2041c11f8ccbd298d63ab9), ROM_BIOS(7))
 ROM_END
 
 
@@ -225,26 +239,14 @@ void bbc_acorn1770_device::device_reset()
 
 WRITE_LINE_MEMBER(bbc_acorn8271_device::motor_w)
 {
-	for (int i = 0; i != 2; i++) {
-		char devname[8];
-		sprintf(devname, "%d", i);
-		floppy_connector *con = m_fdc->subdevice<floppy_connector>(devname);
-		if (con) {
-			con->get_device()->mon_w(!state);
-		}
-	}
+	if (m_floppy0->get_device()) m_floppy0->get_device()->mon_w(!state);
+	if (m_floppy1->get_device()) m_floppy1->get_device()->mon_w(!state);
 }
 
 WRITE_LINE_MEMBER(bbc_acorn8271_device::side_w)
 {
-	for (int i = 0; i != 2; i++) {
-		char devname[8];
-		sprintf(devname, "%d", i);
-		floppy_connector *con = m_fdc->subdevice<floppy_connector>(devname);
-		if (con) {
-			con->get_device()->ss_w(state);
-		}
-	}
+	if (m_floppy0->get_device()) m_floppy0->get_device()->ss_w(state);
+	if (m_floppy1->get_device()) m_floppy1->get_device()->ss_w(state);
 }
 
 WRITE_LINE_MEMBER(bbc_acorn8271_device::fdc_intrq_w)
@@ -265,8 +267,8 @@ WRITE8_MEMBER(bbc_acorn1770_device::wd1770l_write)
 	m_drive_control = data;
 
 	// bit 0, 1: drive select
-	if (BIT(data, 0)) floppy = m_fdc->subdevice<floppy_connector>("0")->get_device();
-	if (BIT(data, 1)) floppy = m_fdc->subdevice<floppy_connector>("1")->get_device();
+	if (BIT(data, 0)) floppy = m_floppy0->get_device();
+	if (BIT(data, 1)) floppy = m_floppy1->get_device();
 	m_fdc->set_floppy(floppy);
 
 	// bit 2: side select

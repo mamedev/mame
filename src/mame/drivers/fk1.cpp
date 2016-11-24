@@ -411,7 +411,7 @@ static MACHINE_CONFIG_START( fk1, fk1_state )
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(fk1_state,fk1_irq_callback)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_UPDATE_DRIVER(fk1_state, screen_update)

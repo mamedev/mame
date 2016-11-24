@@ -236,7 +236,7 @@ machine_config_constructor sns_pfest94_device::device_mconfig_additions() const
 }
 
 //-------------------------------------------------
-//  Dipswicth
+//  Dipswitch
 //-------------------------------------------------
 
 static INPUT_PORTS_START( pfest94_dsw )

@@ -353,10 +353,14 @@ MACHINES["ACIA6850"] = true
 MACHINES["68681"] = true
 MACHINES["7200FIFO"] = true
 --MACHINES["8530SCC"] = true
+--MACHINES["TTL7400"] = true
+--MACHINES["TTL7404"] = true
 MACHINES["TTL74123"] = true
 MACHINES["TTL74145"] = true
 MACHINES["TTL74148"] = true
 MACHINES["TTL74153"] = true
+--MACHINES["TTL74161"] = true
+--MACHINES["TTL74175"] = true
 MACHINES["TTL74181"] = true
 MACHINES["TTL7474"] = true
 MACHINES["KBDC8042"] = true
@@ -368,6 +372,7 @@ MACHINES["ADC083X"] = true
 MACHINES["ADC1038"] = true
 MACHINES["ADC1213X"] = true
 MACHINES["AICARTC"] = true
+--MACHINES["AM2847"] = true
 MACHINES["AM53CF96"] = true
 MACHINES["AM9517A"] = true
 MACHINES["AMIGAFDC"] = true
@@ -386,6 +391,7 @@ MACHINES["COM8116"] = true
 MACHINES["CR589"] = true
 --MACHINES["CS4031"] = true
 --MACHINES["CS8221"] = true
+--MACHINES["DM9334"] = true
 --MACHINES["DP8390"] = true
 MACHINES["DS1204"] = true
 MACHINES["DS1302"] = true
@@ -498,6 +504,7 @@ MACHINES["PIC8259"] = true
 MACHINES["PIT8253"] = true
 MACHINES["PLA"] = true
 --MACHINES["PROFILE"] = true
+--MACHINES["PROM82S129"] = true
 MACHINES["R10696"] = true
 MACHINES["R10788"] = true
 MACHINES["RA17XX"] = true
@@ -3426,8 +3433,8 @@ files {
 createMAMEProjects(_target, _subtarget, "sony")
 files {
 	MAME_DIR .. "src/mame/drivers/zn.cpp",
-	MAME_DIR .. "src/mame/machine/zndip.cpp",
-	MAME_DIR .. "src/mame/machine/zndip.h",
+	MAME_DIR .. "src/mame/machine/znmcu.cpp",
+	MAME_DIR .. "src/mame/machine/znmcu.h",
 	MAME_DIR .. "src/mame/machine/cat702.cpp",
 	MAME_DIR .. "src/mame/machine/cat702.h",
 }
@@ -4334,11 +4341,11 @@ files {
 	MAME_DIR .. "src/mame/machine/cdicdic.cpp",
 	MAME_DIR .. "src/mame/machine/cdicdic.h",
 	MAME_DIR .. "src/mame/drivers/cedar_magnet.cpp",
-	MAME_DIR .. "src/mame/drivers/cedar_magnet_sound.cpp",
-	MAME_DIR .. "src/mame/drivers/cedar_magnet_plane.cpp",
-	MAME_DIR .. "src/mame/drivers/cedar_magnet_sprite.cpp",
-	MAME_DIR .. "src/mame/drivers/cedar_magnet_board.cpp",
-	MAME_DIR .. "src/mame/drivers/cedar_magnet_flop.cpp",
+	MAME_DIR .. "src/mame/machine/cedar_magnet_sound.cpp",
+	MAME_DIR .. "src/mame/machine/cedar_magnet_plane.cpp",
+	MAME_DIR .. "src/mame/machine/cedar_magnet_sprite.cpp",
+	MAME_DIR .. "src/mame/machine/cedar_magnet_board.cpp",
+	MAME_DIR .. "src/mame/machine/cedar_magnet_flop.cpp",
 	MAME_DIR .. "src/mame/drivers/cesclass.cpp",
 	MAME_DIR .. "src/mame/drivers/chance32.cpp",
 	MAME_DIR .. "src/mame/drivers/chexx.cpp",
@@ -4567,6 +4574,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/pse.cpp",
 	MAME_DIR .. "src/mame/drivers/quizo.cpp",
 	MAME_DIR .. "src/mame/drivers/quizpun2.cpp",
+	MAME_DIR .. "src/mame/audio/rax.cpp",
+	MAME_DIR .. "src/mame/audio/rax.h",	
 	MAME_DIR .. "src/mame/drivers/rbmk.cpp",
 	MAME_DIR .. "src/mame/drivers/rcorsair.cpp",
 	MAME_DIR .. "src/mame/drivers/re900.cpp",

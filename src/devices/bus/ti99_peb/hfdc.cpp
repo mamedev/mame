@@ -728,7 +728,7 @@ void myarc_hfdc_device::connect_floppy_unit(int index)
 		// The controller fetches the state with the auxbus access
 		if (TRACE_LINES) logerror("Connect index callback DSK%d\n", index+1);
 		if (m_current_floppy != nullptr)
-			m_current_floppy->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(FUNC(myarc_hfdc_device::floppy_index_callback), this));
+			m_current_floppy->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(&myarc_hfdc_device::floppy_index_callback, this));
 		else
 			logerror("Connection to DSK%d failed because no drive is connected\n", index+1);
 		m_hdc9234->connect_floppy_drive(m_floppy_unit[index]);
@@ -753,9 +753,9 @@ void myarc_hfdc_device::connect_harddisk_unit(int index)
 		if (TRACE_LINES) logerror("Connect index callback WDS%d\n", index+1);
 		if (m_current_harddisk != nullptr)
 		{
-			m_current_harddisk->setup_index_pulse_cb(mfm_harddisk_device::index_pulse_cb(FUNC(myarc_hfdc_device::harddisk_index_callback), this));
-			m_current_harddisk->setup_ready_cb(mfm_harddisk_device::ready_cb(FUNC(myarc_hfdc_device::harddisk_ready_callback), this));
-			m_current_harddisk->setup_seek_complete_cb(mfm_harddisk_device::seek_complete_cb(FUNC(myarc_hfdc_device::harddisk_skcom_callback), this));
+			m_current_harddisk->setup_index_pulse_cb(mfm_harddisk_device::index_pulse_cb(&myarc_hfdc_device::harddisk_index_callback, this));
+			m_current_harddisk->setup_ready_cb(mfm_harddisk_device::ready_cb(&myarc_hfdc_device::harddisk_ready_callback, this));
+			m_current_harddisk->setup_seek_complete_cb(mfm_harddisk_device::seek_complete_cb(&myarc_hfdc_device::harddisk_skcom_callback, this));
 		}
 		else
 			logerror("Connection to WDS%d failed because no drive is connected\n", index+1);

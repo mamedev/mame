@@ -59,6 +59,7 @@
 # USE_SYSTEM_LIB_JPEG = 1
 # USE_SYSTEM_LIB_FLAC = 1
 # USE_SYSTEM_LIB_LUA = 1
+# USE_SYSTEM_LIB_SQLITE3 = 1
 # USE_SYSTEM_LIB_PORTMIDI = 1
 # USE_SYSTEM_LIB_PORTAUDIO = 1
 # USE_BUNDLED_LIB_SDL2 = 1
@@ -279,6 +280,12 @@ endif
 ifeq ($(firstword $(filter ppc64,$(UNAME))),ppc64)
 ARCHITECTURE := _x64
 endif
+ifeq ($(firstword $(filter ppc64le,$(UNAME))),ppc64le)
+ARCHITECTURE := _x64
+endif
+ifeq ($(firstword $(filter s390x,$(UNAME))),s390x)
+ARCHITECTURE := _x64
+endif
 endif
 
 else
@@ -324,6 +331,12 @@ ifndef NOASM
 endif
 endif
 
+ifeq ($(findstring s390x,$(UNAME)),s390x)
+ifndef NOASM
+	NOASM := 1
+endif
+endif
+
 # Emscripten
 ifeq ($(findstring emcc,$(CC)),emcc)
 TARGETOS := asmjs
@@ -341,6 +354,13 @@ BIGENDIAN := 1
 endif
 # Linux
 ifneq (,$(findstring ppc,$(UNAME)))
+ifneq (,$(findstring ppc64le,$(UNAME)))
+BIGENDIAN := 0
+else
+BIGENDIAN := 1
+endif
+endif
+ifneq (,$(findstring s390x,$(UNAME)))
 BIGENDIAN := 1
 endif
 endif # BIGENDIAN
@@ -419,6 +439,10 @@ endif
 
 ifdef USE_SYSTEM_LIB_LUA
 PARAMS += --with-system-lua='$(USE_SYSTEM_LIB_LUA)'
+endif
+
+ifdef USE_SYSTEM_LIB_SQLITE3
+PARAMS += --with-system-sqlite3='$(USE_SYSTEM_LIB_SQLITE3)'
 endif
 
 ifdef USE_SYSTEM_LIB_PORTMIDI
@@ -742,6 +766,10 @@ endif
 ifdef DEBUG_ARGS
 PARAMS += --DEBUG_ARGS='$(DEBUG_ARGS)'
 endif
+
+ifdef WEBASSEMBLY
+PARAMS += --WEBASSEMBLY='$(WEBASSEMBLY)'
+endif
 #-------------------------------------------------
 # All scripts
 #-------------------------------------------------
@@ -1015,7 +1043,7 @@ endif
 
 .PHONY: vs2015_uwp
 vs2015_uwp: generate
-	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=winstore82 --osd=windows --NO_USE_MIDI=1 --NO_OPENGL=1 --USE_QTDEBUG=0 --MODERN_WIN_API=1 vs2015
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=winstore82 --osd=uwp --NO_USE_MIDI=1 --NO_OPENGL=1 --USE_QTDEBUG=0 --MODERN_WIN_API=1 vs2015
 ifdef MSBUILD
 	$(SILENT) msbuild.exe $(PROJECTDIR_WIN)/vs2015-winstore82/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
 endif
@@ -1025,6 +1053,45 @@ vs2015_fastbuild: generate
 	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) vs2015-fastbuild
 ifdef FASTBUILD
 	$(SILENT) fbuild.exe -config $(PROJECTDIR_WIN)/vs2015-fastbuild/ftbuild.bff $(FASTBUILD_PARAMS)
+endif
+
+#-------------------------------------------------
+# Visual Studio 2017
+#-------------------------------------------------
+
+.PHONY: vs2017
+vs2017: generate
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) vs2017
+ifdef MSBUILD
+	$(SILENT) msbuild.exe $(PROJECTDIR_WIN)/vs2017/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
+endif
+
+.PHONY: vs2017_intel
+vs2017_intel: generate
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=intel-15 vs2017
+ifdef MSBUILD
+	$(SILENT) msbuild.exe $(PROJECTDIR_WIN)/vs2017-intel/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
+endif
+
+.PHONY: vs2017_xp
+vs2017_xp: generate
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=vs2017-xp vs2017
+ifdef MSBUILD
+	$(SILENT) msbuild.exe $(PROJECTDIR_WIN)/vs2017-xp/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
+endif
+
+.PHONY: vs2017_uwp
+vs2017_uwp: generate
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) --vs=winstore82 --osd=uwp --NO_USE_MIDI=1 --NO_OPENGL=1 --USE_QTDEBUG=0 --MODERN_WIN_API=1 vs2015
+ifdef MSBUILD
+	$(SILENT) msbuild.exe $(PROJECTDIR_WIN)/vs2017-winstore82/$(PROJECT_NAME).sln $(MSBUILD_PARAMS)
+endif
+
+.PHONY: vs2017_fastbuild
+vs2017_fastbuild: generate
+	$(SILENT) $(GENIE) $(PARAMS) $(TARGET_PARAMS) vs2017-fastbuild
+ifdef FASTBUILD
+	$(SILENT) fbuild.exe -config $(PROJECTDIR_WIN)/vs2017-fastbuild/ftbuild.bff $(FASTBUILD_PARAMS)
 endif
 
 #-------------------------------------------------
@@ -1464,14 +1531,14 @@ endif
 
 ifeq (posix,$(SHELLTYPE))
 $(GENDIR)/version.cpp: $(GENDIR)/git_desc | $(GEN_FOLDERS)
-	@echo '#define BARE_BUILD_VERSION "0.178"' > $@
+	@echo '#define BARE_BUILD_VERSION "0.179"' > $@
 	@echo 'extern const char bare_build_version[];' >> $@
 	@echo 'extern const char build_version[];' >> $@
 	@echo 'const char bare_build_version[] = BARE_BUILD_VERSION;' >> $@
 	@echo 'const char build_version[] = BARE_BUILD_VERSION " ($(NEW_GIT_VERSION))";' >> $@
 else
 $(GENDIR)/version.cpp: $(GENDIR)/git_desc
-	@echo #define BARE_BUILD_VERSION "0.178" > $@
+	@echo #define BARE_BUILD_VERSION "0.179" > $@
 	@echo extern const char bare_build_version[]; >> $@
 	@echo extern const char build_version[]; >> $@
 	@echo const char bare_build_version[] = BARE_BUILD_VERSION; >> $@
@@ -1615,9 +1682,11 @@ bgfx-tools:
 shaders: bgfx-tools
 	-$(call MKDIR,build/shaders/dx11)
 	-$(call MKDIR,build/shaders/dx9)
-	-$(call MKDIR,build/shaders/gles)
-	-$(call MKDIR,build/shaders/glsl)
+	-$(call MKDIR,build/shaders/pssl)
 	-$(call MKDIR,build/shaders/metal)
+	-$(call MKDIR,build/shaders/essl)
+	-$(call MKDIR,build/shaders/glsl)
+	-$(call MKDIR,build/shaders/spirv)
 	$(SILENT) $(MAKE) -C $(SRC)/osd/modules/render/bgfx/shaders rebuild CHAIN="$(CHAIN)"
 
 #-------------------------------------------------

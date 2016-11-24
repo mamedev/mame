@@ -902,7 +902,7 @@ M68KMAKE_OP(1111, 0, ., .)
 
 M68KMAKE_OP(040fpu0, 32, ., .)
 {
-	if((mc68kcpu)->has_fpu)
+	if((mc68kcpu)->get_fpu_enable())
 	{
 		m68040_fpu_op0(mc68kcpu);
 		return;
@@ -913,7 +913,7 @@ M68KMAKE_OP(040fpu0, 32, ., .)
 
 M68KMAKE_OP(040fpu1, 32, ., .)
 {
-	if((mc68kcpu)->has_fpu)
+	if((mc68kcpu)->get_fpu_enable())
 	{
 		m68040_fpu_op1(mc68kcpu);
 		return;
@@ -4437,7 +4437,7 @@ M68KMAKE_OP(cpdbcc, 32, ., .)
 
 M68KMAKE_OP(cpgen, 32, ., .)
 {
-	if(CPU_TYPE_IS_EC020_PLUS((mc68kcpu)->cpu_type) && (mc68kcpu->has_fpu || mc68kcpu->has_pmmu))
+	if(CPU_TYPE_IS_EC020_PLUS((mc68kcpu)->cpu_type) && (mc68kcpu->get_fpu_enable() || mc68kcpu->has_pmmu))
 	{
 		mc68kcpu->logerror("%s at %08x: called unimplemented instruction %04x (cpgen)\n",
 						(mc68kcpu)->tag(), REG_PC(mc68kcpu) - 2, (mc68kcpu)->ir);
@@ -4472,7 +4472,7 @@ M68KMAKE_OP(cptrapcc, 32, ., .)
 
 M68KMAKE_OP(ftrapcc, 32, ., .)
 {
-	if((mc68kcpu)->has_fpu)
+	if((mc68kcpu)->get_fpu_enable())
 	{
 		m68881_ftrap(mc68kcpu);
 		return;

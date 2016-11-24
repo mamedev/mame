@@ -151,7 +151,7 @@ menu_slot_devices::menu_slot_devices(mame_ui_manager &mui, render_container &con
 {
 }
 
-void menu_slot_devices::populate()
+void menu_slot_devices::populate(float &customtop, float &custombottom)
 {
 	/* cycle through all devices for this system */
 	for (device_slot_interface &slot : slot_interface_iterator(machine().root_device()))

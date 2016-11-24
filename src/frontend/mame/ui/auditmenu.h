@@ -28,7 +28,7 @@ public:
 	virtual ~menu_audit() override;
 
 private:
-	virtual void populate() override;
+	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 
 	void save_available_machines();

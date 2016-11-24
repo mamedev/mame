@@ -19,11 +19,11 @@
 	MCFG_DEVICE_ADD(_tag, HP9845_IO_SLOT, 0) \
 	MCFG_DEVICE_SLOT_INTERFACE(hp9845_io_slot_devices, nullptr, false)
 
-#define HP9845_IO_FIRST_SC	1	// Lowest SC used by I/O cards
+#define HP9845_IO_FIRST_SC  1   // Lowest SC used by I/O cards
 
-#define MCFG_HP9845_IO_SC\
+#define MCFG_HP9845_IO_SC(_default_sc)				\
 	PORT_START("SC") \
-	PORT_CONFNAME(0xf , 0 , "Select Code") \
+	PORT_CONFNAME(0xf , (_default_sc) - HP9845_IO_FIRST_SC , "Select Code")	\
 	PORT_CONFSETTING(0 , "1")\
 	PORT_CONFSETTING(1 , "2")\
 	PORT_CONFSETTING(2 , "3")\

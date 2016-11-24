@@ -121,7 +121,7 @@ public:
 		}
 
 		// set the cooperative level
-		result = devinfo->dinput.device->SetCooperativeLevel(osd_common_t::s_window_list.front()->platform_window<HWND>(), cooperative_level);
+		result = devinfo->dinput.device->SetCooperativeLevel(std::static_pointer_cast<win_window_info>(osd_common_t::s_window_list.front())->platform_window(), cooperative_level);
 		if (result != DI_OK)
 			goto error;
 
@@ -134,7 +134,7 @@ public:
 
 	HRESULT enum_attached_devices(int devclass, device_enum_interface *enumerate_interface, void *state) const;
 
-	const std::string guid_to_string(const GUID& guid)
+	std::string guid_to_string(const GUID& guid) const
 	{
 		char guid_string[37];
 		sprintf_s(

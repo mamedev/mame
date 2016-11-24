@@ -238,7 +238,7 @@ private:
 	// DRAM access
 	bool m_skdrcs;
 
-	// Holds the decoding result; essentially names the selected line
+	// Indicates the UP level of the GROMCLK
 	bool m_gromclk_up;
 
 	// Have we got the upper word of the address?

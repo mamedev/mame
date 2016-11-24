@@ -2292,7 +2292,7 @@ bool adsp21062_device::generate_opcode(drcuml_block *block, compiler_state *comp
 			switch (subop)
 			{
 				case 0x00:          // NOP / idle                       |000|00000|
-					if (opcode & U64(0x008000000000))
+					if (opcode & 0x008000000000U)
 					{
 						// IDLE
 						UML_MOV(block, mem(&m_core->idle), 1);
@@ -3060,7 +3060,7 @@ bool adsp21062_device::generate_opcode(drcuml_block *block, compiler_state *comp
 
 				case 0x16:          // I register modify / bit-reverse      |000|10110|
 				{
-					if (opcode & U64(0x008000000000))   // bit reverse
+					if (opcode & 0x008000000000U)   // bit reverse
 					{
 						return false;
 					}
@@ -3087,28 +3087,28 @@ bool adsp21062_device::generate_opcode(drcuml_block *block, compiler_state *comp
 
 				case 0x17:          // push|pop stacks / flush cache        |000|10111|
 				{
-					if (opcode & U64(0x008000000000))
+					if (opcode & 0x008000000000U)
 					{
 						fatalerror("sharcdrc: push/pop stacks: push loop not implemented\n");
 					}
-					if (opcode & U64(0x004000000000))
+					if (opcode & 0x004000000000U)
 					{
 						fatalerror("sharcdrc: push/pop stacks: pop loop not implemented\n");
 					}
-					if (opcode & U64(0x002000000000))
+					if (opcode & 0x002000000000U)
 					{
 						UML_CALLH(block, *m_push_status);
 					}
-					if (opcode & U64(0x001000000000))
+					if (opcode & 0x001000000000U)
 					{
 						UML_CALLH(block, *m_pop_status);
 					}
-					if (opcode & U64(0x000800000000))
+					if (opcode & 0x000800000000U)
 					{
 						UML_MOV(block, I0, PCSTK);
 						UML_CALLH(block, *m_push_pc);
 					}
-					if (opcode & U64(0x000400000000))
+					if (opcode & 0x000400000000U)
 					{
 						UML_CALLH(block, *m_pop_pc);
 					}
@@ -3295,7 +3295,7 @@ bool adsp21062_device::generate_opcode(drcuml_block *block, compiler_state *comp
 
 		case 3:
 		{
-			if (opcode & U64(0x100000000000))   // compute / ureg <-> ureg                          |011|1|
+			if (opcode & 0x100000000000U)   // compute / ureg <-> ureg                          |011|1|
 			{
 				int src_ureg = (opcode >> 36) & 0xff;
 				int dst_ureg = (opcode >> 23) & 0xff;
@@ -3420,7 +3420,7 @@ bool adsp21062_device::generate_opcode(drcuml_block *block, compiler_state *comp
 
 		case 4:
 		{
-			if (opcode & U64(0x100000000000))   // immediate data -> DM|PM                          |100|1|
+			if (opcode & 0x100000000000U)   // immediate data -> DM|PM                          |100|1|
 			{
 				int i = (opcode >> 41) & 0x7;
 				int m = (opcode >> 38) & 0x7;
@@ -3722,22 +3722,22 @@ void adsp21062_device::generate_compute(drcuml_block *block, compiler_state *com
 				switch (ai)
 				{
 					case 0x00:  // MR0F
-						UML_DAND(block, MRF, MRF, U64(0xffffffff00000000));
+						UML_DAND(block, MRF, MRF, 0xffffffff00000000U);
 						UML_AND(block, I0, REG(rn), 0xffffffff);
 						UML_DOR(block, MRF, MRF, I0);
 						break;
 					case 0x01:  // MR1F
-						UML_DAND(block, MRF, MRF, U64(0x00000000ffffffff));
+						UML_DAND(block, MRF, MRF, 0x00000000ffffffffU);
 						UML_DSHL(block, I0, REG(rn), 32);
 						UML_DOR(block, MRF, MRF, I0);
 						break;
 					case 0x04:  // MR0B
-						UML_DAND(block, MRB, MRB, U64(0xffffffff00000000));
+						UML_DAND(block, MRB, MRB, 0xffffffff00000000U);
 						UML_AND(block, I0, REG(rn), 0xffffffff);
 						UML_DOR(block, MRB, MRB, I0);
 						break;
 					case 0x05:  // MR1B
-						UML_DAND(block, MRB, MRB, U64(0x00000000ffffffff));
+						UML_DAND(block, MRB, MRB, 0x00000000ffffffffU);
 						UML_DSHL(block, I0, REG(rn), 32);
 						UML_DOR(block, MRB, MRB, I0);
 						break;

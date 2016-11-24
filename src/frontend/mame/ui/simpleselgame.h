@@ -8,10 +8,10 @@
 
 ***************************************************************************/
 
-#pragma once
-
 #ifndef MAME_FRONTEND_UI_SIMPLESELGAME_H
 #define MAME_FRONTEND_UI_SIMPLESELGAME_H
+
+#pragma once
 
 #include "menu.h"
 
@@ -33,7 +33,7 @@ protected:
 private:
 	enum { VISIBLE_GAMES_IN_LIST = 15 };
 
-	virtual void populate() override;
+	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 
 	// internal methods

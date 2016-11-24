@@ -211,17 +211,40 @@
 
 geneve_mapper_device::geneve_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 : device_t(mconfig, GENEVE_MAPPER, "Geneve Gate Array", tag, owner, clock, "geneve_mapper", __FILE__), m_gromwaddr_LSB(false),
-	m_gromraddr_LSB(false), m_grom_address(0), m_video_waitstates(false),
-	m_extra_waitstates(false), m_ready_asserted(false), m_read_mode(false),
-	m_debug_no_ws(false), m_geneve_mode(false), m_direct_mode(false),
-	m_cartridge_size(0), m_cartridge_secondpage(false),
-	m_cartridge6_writable(false), m_cartridge7_writable(false),
-	m_turbo(false), m_genmod(false), m_timode(false), m_pfm_mode(0),
-	m_pfm_bank(0), m_pfm_output_enable(false), m_sram_mask(0), m_sram_val(0),
-	m_ready(*this), m_waitcount(0), m_ext_waitcount(0),
-	m_clock(nullptr), m_cpu(nullptr), m_pfm512(nullptr),
-	m_pfm512a(nullptr), m_sound(nullptr), m_keyboard(nullptr),
-	m_video(nullptr), m_peribox(nullptr), m_sram(*this, SRAM_PAR_TAG), m_dram(*this, DRAM_PAR_TAG)
+	m_gromraddr_LSB(false),
+	m_grom_address(0),
+	m_video_waitstates(false),
+	m_extra_waitstates(false),
+	m_ready_asserted(false),
+	m_read_mode(false),
+	m_debug_no_ws(false),
+	m_geneve_mode(false),
+	m_direct_mode(false),
+	m_cartridge_size(0),
+	m_cartridge_secondpage(false),
+	m_cartridge6_writable(false),
+	m_cartridge7_writable(false),
+	m_turbo(false),
+	m_genmod(false),
+	m_timode(false),
+	m_pfm_mode(0),
+	m_pfm_bank(0),
+	m_pfm_output_enable(false),
+	m_sram_mask(0),
+	m_sram_val(0),
+	m_ready(*this),
+	m_waitcount(0),
+	m_ext_waitcount(0),
+	m_clock(*owner, GCLOCK_TAG),
+	m_cpu(*owner, "maincpu"),
+	m_pfm512(*owner, PFM512_TAG),
+	m_pfm512a(*owner, PFM512A_TAG),
+	m_sound(*owner, TISOUNDCHIP_TAG),
+	m_keyboard(*owner, GKEYBOARD_TAG),
+	m_video(*owner, VDP_TAG),
+	m_peribox(*owner, PERIBOX_TAG),
+	m_sram(*this, SRAM_PAR_TAG),
+	m_dram(*this, DRAM_PAR_TAG)
 {
 	m_eprom = nullptr;
 }
@@ -1384,19 +1407,7 @@ WRITE_LINE_MEMBER( geneve_mapper_device::pfm_output_enable )
 
 void geneve_mapper_device::device_start()
 {
-	// Get pointers
-	m_peribox = machine().device<peribox_device>(PERIBOX_TAG);
-	m_keyboard = machine().device<geneve_keyboard_device>(GKEYBOARD_TAG);
-	m_video = machine().device<v9938_device>(VDP_TAG);
-	m_sound = machine().device<sn76496_base_device>(TISOUNDCHIP_TAG);
-	m_clock = machine().device<mm58274c_device>(GCLOCK_TAG);
-
-	// PFM expansion
-	m_pfm512 = machine().device<at29c040_device>(PFM512_TAG);
-	m_pfm512a = machine().device<at29c040a_device>(PFM512A_TAG);
-
 	m_ready.resolve();
-	m_cpu = static_cast<tms9995_device*>(machine().device("maincpu"));
 
 	m_geneve_mode = false;
 	m_direct_mode = true;
@@ -1416,6 +1427,13 @@ void geneve_mapper_device::device_start()
 	save_item(NAME(m_cartridge_secondpage));
 	save_item(NAME(m_cartridge6_writable));
 	save_item(NAME(m_cartridge7_writable));
+	save_pointer(NAME(m_map), 8);
+	save_item(NAME(m_decoded.function));
+	save_item(NAME(m_decoded.offset));
+	save_item(NAME(m_decoded.physaddr));
+	save_item(NAME(m_turbo));
+	save_item(NAME(m_genmod));
+	save_item(NAME(m_timode));
 	save_item(NAME(m_pfm_mode));
 	save_item(NAME(m_pfm_bank));
 	save_item(NAME(m_pfm_output_enable));

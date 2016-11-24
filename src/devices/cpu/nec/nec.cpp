@@ -161,10 +161,10 @@ v33a_device::v33a_device(const machine_config &mconfig, const char *tag, device_
 }
 
 
-offs_t nec_common_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t nec_common_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( nec );
-	return CPU_DISASSEMBLE_NAME(nec)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(nec)(this, stream, pc, oprom, opram, options);
 }
 
 

@@ -215,8 +215,6 @@ void n64_periphs::device_reset()
 	si_dma_dir = 0;
 	si_dma_timer->adjust(attotime::never);
 
-	//memset(m_save_data.eeprom, 0, 2048);
-
 	dp_clock = 0;
 
 	cic_status = 0;
@@ -239,7 +237,7 @@ void n64_periphs::device_reset()
 	cic_type=2;
 	m_mem_map->write_dword(0x00000318, 0x800000); /* RDRAM Size */
 
-	if (boot_checksum == U64(0x00000000001ff230))
+	if (boot_checksum == 0x00000000001ff230U)
 	{
 		pif_ram[0x24] = 0x00;
 		pif_ram[0x25] = 0x08;
@@ -247,7 +245,7 @@ void n64_periphs::device_reset()
 		pif_ram[0x27] = 0x3f;
 		cic_type=0xd;
 	}
-	else if (boot_checksum == U64(0x000000cffb830843) || boot_checksum == U64(0x000000d0027fdf31))
+	else if (boot_checksum == 0x000000cffb830843U || boot_checksum == 0x000000d0027fdf31U)
 	{
 		// CIC-NUS-6101
 		pif_ram[0x24] = 0x00;
@@ -256,7 +254,7 @@ void n64_periphs::device_reset()
 		pif_ram[0x27] = 0x3f;
 		cic_type=1;
 	}
-	else if (boot_checksum == U64(0x000000d6499e376b))
+	else if (boot_checksum == 0x000000d6499e376bU)
 	{
 		// CIC-NUS-6103
 		pif_ram[0x24] = 0x00;
@@ -265,7 +263,7 @@ void n64_periphs::device_reset()
 		pif_ram[0x27] = 0x3f;
 		cic_type=3;
 	}
-	else if (boot_checksum == U64(0x0000011a4a1604b6))
+	else if (boot_checksum == 0x0000011a4a1604b6U)
 	{
 		// CIC-NUS-6105
 		pif_ram[0x24] = 0x00;
@@ -275,7 +273,7 @@ void n64_periphs::device_reset()
 		cic_type=5;
 		m_mem_map->write_dword(0x000003f0, 0x800000);
 	}
-	else if (boot_checksum == U64(0x000000d6d5de4ba0))
+	else if (boot_checksum == 0x000000d6d5de4ba0U)
 	{
 		// CIC-NUS-6106
 		pif_ram[0x24] = 0x00;
@@ -587,7 +585,7 @@ void n64_periphs::sp_dma(int direction)
 			sp_mem_addr += length;
 			sp_dram_addr += length;
 
-			sp_mem_addr += sp_dma_skip;
+			sp_dram_addr += sp_dma_skip;
 		}
 	}
 	else                    // I/DMEM -> RDRAM
@@ -980,7 +978,7 @@ WRITE32_MEMBER( n64_periphs::dp_reg_w )
 TIMER_CALLBACK_MEMBER(n64_periphs::vi_scanline_callback)
 {
 	signal_rcp_interrupt(VI_INTERRUPT);
-	vi_scanline_timer->adjust(m_screen->time_until_pos(vi_intr >> 1));
+	vi_scanline_timer->adjust(m_screen->time_until_pos(vi_intr));
 }
 
 // Video Interface
@@ -1116,7 +1114,7 @@ WRITE32_MEMBER( n64_periphs::vi_reg_w )
 
 		case 0x0c/4:        // VI_INTR_REG
 			vi_intr = data;
-			vi_scanline_timer->adjust(m_screen->time_until_pos(vi_intr)); // >> 1));
+			vi_scanline_timer->adjust(m_screen->time_until_pos(vi_intr));
 			break;
 
 		case 0x10/4:        // VI_CURRENT_REG
@@ -1205,7 +1203,6 @@ void n64_periphs::ai_fifo_push(uint32_t address, uint32_t length)
 
 	if (! (ai_status & 0x40000000))
 	{
-		//signal_rcp_interrupt(AI_INTERRUPT);
 		ai_dma();
 	}
 }
@@ -1228,7 +1225,6 @@ void n64_periphs::ai_fifo_pop()
 	if (ai_fifo_num < AUDIO_DMA_DEPTH)
 	{
 		ai_status &= ~0x80000001;   // FIFO not full
-		//signal_rcp_interrupt(AI_INTERRUPT);
 	}
 }
 
@@ -1300,15 +1296,13 @@ READ32_MEMBER( n64_periphs::ai_reg_r )
 	{
 		case 0x04/4:        // AI_LEN_REG
 		{
-			if (ai_status & 0x80000001)
+			if (ai_status & 0x40000000)
+			{
+				ret = 4 * (uint32_t)(ai_timer->remaining().as_double() * (double)DACRATE_NTSC / (double)(ai_dacrate + 1));
+			}
+			else if (ai_status & 0x80000001)
 			{
 				ret = ai_len;
-			}
-			else if (ai_status & 0x40000000)
-			{
-				double secs_left = (ai_timer->expire() - machine().time()).as_double();
-				unsigned int samples_left = (uint32_t)(secs_left * (double)DACRATE_NTSC / (double)(ai_dacrate + 1));
-				ret = samples_left * 4;
 			}
 			else
 			{
@@ -1374,7 +1368,6 @@ WRITE32_MEMBER( n64_periphs::ai_reg_w )
 TIMER_CALLBACK_MEMBER(n64_periphs::pi_dma_callback)
 {
 	pi_dma_tick();
-	//m_rsp->yield();
 }
 
 void n64_periphs::pi_dma_tick()
@@ -1554,7 +1547,6 @@ WRITE32_MEMBER( n64_periphs::pi_reg_w )
 
 			attotime dma_period = attotime::from_hz(93750000) * (int)((float)(pi_rd_len + 1) * 5.08f); // Measured as between 2.53 cycles per byte and 2.55 cycles per byte
 			pi_dma_timer->adjust(dma_period);
-			//pi_dma_tick();
 			break;
 		}
 
@@ -1567,8 +1559,6 @@ WRITE32_MEMBER( n64_periphs::pi_reg_w )
 
 			attotime dma_period = attotime::from_hz(93750000) * (int)((float)(pi_wr_len + 1) * 5.08f); // Measured as between 2.53 cycles per byte and 2.55 cycles per byte
 			pi_dma_timer->adjust(dma_period);
-
-			//pi_dma_tick();
 			break;
 		}
 
@@ -2740,7 +2730,7 @@ void n64_state::machine_start()
 	rsp->rsp_add_imem(m_rsp_imem);
 
 	/* add a hook for battery save */
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(n64_state::n64_machine_stop),this));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&n64_state::n64_machine_stop,this));
 }
 
 void n64_state::machine_reset()

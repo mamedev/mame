@@ -95,7 +95,7 @@
   0v            15   Half Gamble switch
   0v            16   Change Card switch
   Refil         17   Coin count/sense from hopper
-  Low Switch    18   High swicth
+  Low Switch    18   High switch
   Hold 3 Switch 19   Hold 2 switch
   Hold 5 Switch 20   Hold 4 switch
   10p coin      21   Deflect

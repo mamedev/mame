@@ -91,8 +91,8 @@ public:
 
 	void buildFromQWidget(QWidget* widget);
 	void applyToQWidget(QWidget* widget);
-	void addToXmlDataNode(xml_data_node* node) const;
-	void recoverFromXmlNode(xml_data_node* node);
+	void addToXmlDataNode(xml_data_node &node) const;
+	void recoverFromXmlNode(xml_data_node const &node);
 };
 
 

@@ -217,7 +217,7 @@ public:
 	emu_timer *m_overlay_timeout;
 	TIMER_CALLBACK_MEMBER(overlay_timeout_func);
 	DECLARE_READ32_MEMBER(rom_switch_r);
-	
+
 	TIMER_DEVICE_CALLBACK_MEMBER(mac_scanline);
 	bool m_snd_enable;
 	bool m_main_buffer;
@@ -421,7 +421,7 @@ private:
 	optional_device<screen_device> m_screen;
 	optional_device<palette_device> m_palette;
 	optional_device<dac_8bit_pwm_device> m_dac;
-	
+
 public:
 	emu_timer *m_scanline_timer;
 	emu_timer *m_adb_timer;
@@ -438,12 +438,9 @@ public:
 	DECLARE_DRIVER_INIT(maciifx);
 	DECLARE_DRIVER_INIT(maclc);
 	DECLARE_DRIVER_INIT(macpb160);
-	DECLARE_DRIVER_INIT(macplus);
 	DECLARE_DRIVER_INIT(macse);
 	DECLARE_DRIVER_INIT(macpb140);
-	DECLARE_DRIVER_INIT(mac128k512k);
 	DECLARE_DRIVER_INIT(macpm6100);
-	DECLARE_DRIVER_INIT(mac512ke);
 	DECLARE_DRIVER_INIT(maclc520);
 	DECLARE_DRIVER_INIT(maciici);
 	DECLARE_DRIVER_INIT(maciix);
@@ -524,7 +521,7 @@ public:
 	void mac_driver_init(model_t model);
 	void mac_install_memory(offs_t memory_begin, offs_t memory_end,
 		offs_t memory_size, void *memory_data, int is_rom, const char *bank);
-	offs_t mac_dasm_override(device_t &device, char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options);
+	offs_t mac_dasm_override(device_t &device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options);
 };
 
 #endif /* MAC_H_ */

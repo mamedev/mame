@@ -90,22 +90,22 @@ void render_font::render_font_command_glyph()
 		load_cached_cmd(ramfile, 0);
 }
 
-bool render_font::load_cached_cmd(emu_file &file, uint32_t hash)
+bool render_font::load_cached_cmd(emu_file &file, u32 hash)
 {
-	uint64_t filesize = file.size();
-	uint8_t header[CACHED_HEADER_SIZE];
-	uint32_t bytes_read = file.read(header, CACHED_HEADER_SIZE);
+	u64 filesize = file.size();
+	u8 header[CACHED_HEADER_SIZE];
+	u32 bytes_read = file.read(header, CACHED_HEADER_SIZE);
 
 	if (bytes_read != CACHED_HEADER_SIZE)
 		return false;
 
 	if (header[0] != 'f' || header[1] != 'o' || header[2] != 'n' || header[3] != 't')
 		return false;
-	if (header[4] != (uint8_t)(hash >> 24) || header[5] != (uint8_t)(hash >> 16) || header[6] != (uint8_t)(hash >> 8) || header[7] != (uint8_t)hash)
+	if (header[4] != u8(hash >> 24) || header[5] != u8(hash >> 16) || header[6] != u8(hash >> 8) || header[7] != u8(hash))
 		return false;
 	m_height_cmd = (header[8] << 8) | header[9];
-	m_yoffs_cmd = (int16_t)((header[10] << 8) | header[11]);
-	uint32_t numchars = (header[12] << 24) | (header[13] << 16) | (header[14] << 8) | header[15];
+	m_yoffs_cmd = s16((header[10] << 8) | header[11]);
+	u32 numchars = (header[12] << 24) | (header[13] << 16) | (header[14] << 8) | header[15];
 	if (filesize - CACHED_HEADER_SIZE < numchars * CACHED_CHAR_SIZE)
 		return false;
 
@@ -117,10 +117,10 @@ bool render_font::load_cached_cmd(emu_file &file, uint32_t hash)
 		return false;
 	}
 
-	uint64_t offset = numchars * CACHED_CHAR_SIZE;
+	u64 offset = numchars * CACHED_CHAR_SIZE;
 	for (int chindex = 0; chindex < numchars; chindex++)
 	{
-		const uint8_t *info = reinterpret_cast<uint8_t *>(&m_rawdata_cmd[chindex * CACHED_CHAR_SIZE]);
+		const u8 *info = reinterpret_cast<u8 *>(&m_rawdata_cmd[chindex * CACHED_CHAR_SIZE]);
 		int chnum = (info[0] << 8) | info[1];
 
 		if (!m_glyphs_cmd[chnum / 256])
@@ -132,8 +132,8 @@ bool render_font::load_cached_cmd(emu_file &file, uint32_t hash)
 			gl.color = color_table[chnum - COMMAND_UNICODE];
 
 		gl.width = (info[2] << 8) | info[3];
-		gl.xoffs = (int16_t)((info[4] << 8) | info[5]);
-		gl.yoffs = (int16_t)((info[6] << 8) | info[7]);
+		gl.xoffs = s16((info[4] << 8) | info[5]);
+		gl.yoffs = s16((info[6] << 8) | info[7]);
 		gl.bmwidth = (info[8] << 8) | info[9];
 		gl.bmheight = (info[10] << 8) | info[11];
 		gl.rawdata = &m_rawdata_cmd[offset];

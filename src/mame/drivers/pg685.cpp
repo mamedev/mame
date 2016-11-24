@@ -2,9 +2,10 @@
 // copyright-holders: rfka01
 /***************************************************************************
 
-    Siemens Simatic PG-685
+    Siemens Simatic PG-675 and PG-685
 
     driver skeleton by rfka01
+    more skeleton by R. Belmont
 
 ****************************************************************************
 
@@ -68,7 +69,7 @@ CPU/Video:      16KB BIOS/CHAR EPROM, NEC V20 CPU, SAB 8259AP, 12.288 MHz crysta
                 HD46505SP-1 (HD68A45SP), D8279C-2, D8251AFC
 Module/Floppy:  2xP8255A, 4xHM6116LP-3, D8251AFC, 4.000000 MHz crystal, SAB 1797-02P, MM58167AN
 HD:             4xD4016C, WD1010A-AL, 10,000000 MHz crystal
-Memory:         27xTMS27C256-15
+Memory:         27xTMS27C256-15, 9 empty sockets, 36 unsoldered pads
 
 
 6ES5685-OUA12
@@ -89,13 +90,32 @@ CPU/Mem.:       iR80286-10 CPU, N82C288, 19,660800 MHz crystal, 2x16KB EPROM (BI
 Module/Floppy:  2xi8255A, 4xHM6116LP-3, D8251AFC, 4.000000 MHz crystal, SAB 1797-02P, MM58167AN
 HD:             SRM2064C-15, WD2010B-AL, 10,000000 MHz crystal
 
+
+6ES5675-OUA11
+
+The PG-675 shares the housing with the PG-685, but uses dual 48 tpi floppy drives instead of the harddisk/96 tpi 
+drive combo.
+
+CPU/Video:		8KB BIOS/CHAR EPROM, Intel 8088 CPU, SAB 8259AP, 12,288 MHz crystal, 2xHM6116LP-3,
+				HD46505SP-1 (HD68A45SP), D8279C-5, D8251AFC
+Module/Floppy:	Crystal 4.000 MHz, SAB 1797-02P, 2xP8255A, MM58167AN, 4xHM6116LP-3, D8251AFC
+Memory: 		54x 64KBit RAM, 18 empty sockets, 9 bit and 4 bit wire straps
+
 ****************************************************************************/
 
 #include "emu.h"
 #include "cpu/nec/nec.h"
-//#include "cpu/i86/i86.h"
 #include "cpu/i86/i286.h"
-//#include "video/mc6845.h"
+#include "video/mc6845.h"
+#include "machine/i8251.h"
+#include "machine/i8255.h"
+#include "machine/i8279.h"
+#include "machine/mc2661.h"
+#include "machine/mm58167.h"
+#include "machine/pic8259.h"
+#include "machine/pit8253.h"
+#include "machine/wd_fdc.h"
+#include "machine/wd2010.h"
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -105,14 +125,23 @@ class pg685_state : public driver_device
 {
 public:
 	pg685_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu") { }
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this, "maincpu"),
+		m_vram(*this, "framebuffer"),
+		m_vram16(*this, "framebuffer16"),
+		m_fontram(*this, "charcopy")
+		{ }
 
-	uint32_t screen_update_pg685(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	MC6845_UPDATE_ROW(crtc_update_row);
+	MC6845_UPDATE_ROW(crtc_update_row_oua12);
+	
 private:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	required_device<cpu_device> m_maincpu;
+	optional_shared_ptr<uint8_t> m_vram;
+	optional_shared_ptr<uint16_t> m_vram16;
+	optional_shared_ptr<uint8_t> m_fontram;
 };
 
 //**************************************************************************
@@ -123,6 +152,22 @@ static ADDRESS_MAP_START(pg685_mem, AS_PROGRAM, 8, pg685_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000,0xbffff) AM_RAM
 	AM_RANGE(0xf0000,0xf1fff) AM_RAM
+	AM_RANGE(0xf9f00, 0xf9f01) AM_DEVREADWRITE("kbdc", i8279_device, read, write)
+	AM_RANGE(0xf9f02, 0xf9f02) AM_DEVREADWRITE("crtc", mc6845_device, status_r, address_w)
+	AM_RANGE(0xf9f03, 0xf9f03) AM_DEVREADWRITE("crtc", mc6845_device, register_r, register_w)
+	AM_RANGE(0xf9f06, 0xf9f07) AM_DEVREADWRITE("mainpic", pic8259_device, read, write)
+	AM_RANGE(0xf9f08, 0xf9f08) AM_DEVREADWRITE("mainuart", i8251_device, data_r, data_w)
+	AM_RANGE(0xf9f09, 0xf9f09) AM_DEVREADWRITE("mainuart", i8251_device, status_r, control_w)
+	AM_RANGE(0xf9f20, 0xf9f23) AM_DEVREADWRITE("fdc", wd2797_t, read, write)
+	AM_RANGE(0xf9f28, 0xf9f2b) AM_DEVREADWRITE("modppi1", i8255_device, read, write)
+	AM_RANGE(0xf9f2c, 0xf9f2f) AM_DEVREADWRITE("modppi2", i8255_device, read, write)
+	AM_RANGE(0xf9f30, 0xf9f30) AM_DEVREADWRITE("moduart", i8251_device, data_r, data_w)
+	AM_RANGE(0xf9f31, 0xf9f31) AM_DEVREADWRITE("moduart", i8251_device, status_r, control_w)
+	AM_RANGE(0xf9f34, 0xf9f37) AM_DEVREADWRITE("bppit", pit8253_device, read, write)
+	AM_RANGE(0xf9f38, 0xf9f3b) AM_DEVREADWRITE("bpuart", mc2661_device, read, write)
+	AM_RANGE(0xf9f3c, 0xf9f3d) AM_DEVREADWRITE("bppic", pic8259_device, read, write)
+	AM_RANGE(0xf9f40, 0xf9f5f) AM_DEVREADWRITE("rtc", mm58167_device, read, write)
+	AM_RANGE(0xf9f70, 0xf9f77) AM_DEVREADWRITE("hdc", wd2010_device, read, write)
 	AM_RANGE(0xfa000,0xfa7ff) AM_RAM AM_SHARE ("charcopy")
 	AM_RANGE(0xfb000,0xfb7ff) AM_RAM AM_SHARE ("framebuffer")
 	AM_RANGE(0xfc000,0xfffff) AM_ROM AM_REGION("bios", 0)
@@ -131,10 +176,26 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(pg685oua12_mem, AS_PROGRAM, 16, pg685_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000,0xdffff) AM_RAM
-	AM_RANGE(0xe0000,0xeffff) AM_RAM AM_SHARE ("framebuffer")
+	AM_RANGE(0xe0000,0xeffff) AM_RAM AM_SHARE ("framebuffer16")
 	AM_RANGE(0xf0000,0xf1fff) AM_RAM
-	AM_RANGE(0xfa000,0xfa7ff) AM_RAM AM_SHARE ("charcopy")
-	AM_RANGE(0xfc000,0xfffff) AM_ROM AM_REGION("bios", 0)
+	AM_RANGE(0xf9f00, 0xf9f01) AM_DEVREADWRITE8("kbdc", i8279_device, read, write, 0xffff)
+	AM_RANGE(0xf9f06, 0xf9f07) AM_DEVREADWRITE8("mainpic", pic8259_device, read, write, 0xffff)
+	AM_RANGE(0xf9f08, 0xf9f09) AM_DEVREADWRITE8("mainuart", i8251_device, data_r, data_w, 0x00ff)
+	AM_RANGE(0xf9f08, 0xf9f09) AM_DEVREADWRITE8("mainuart", i8251_device, status_r, control_w, 0xff00)
+	AM_RANGE(0xf9f20, 0xf9f23) AM_DEVREADWRITE8("fdc", wd2797_t, read, write, 0xffff)
+	AM_RANGE(0xf9f28, 0xf9f2b) AM_DEVREADWRITE8("modppi1", i8255_device, read, write, 0xffff)
+	AM_RANGE(0xf9f2c, 0xf9f2f) AM_DEVREADWRITE8("modppi2", i8255_device, read, write, 0xffff)
+	AM_RANGE(0xf9f30, 0xf9f31) AM_DEVREADWRITE8("moduart", i8251_device, data_r, data_w, 0x00ff)
+	AM_RANGE(0xf9f30, 0xf9f31) AM_DEVREADWRITE8("moduart", i8251_device, status_r, control_w, 0xff00)
+	AM_RANGE(0xf9f34, 0xf9f37) AM_DEVREADWRITE8("bppit", pit8253_device, read, write, 0xffff)
+	AM_RANGE(0xf9f38, 0xf9f3b) AM_DEVREADWRITE8("bpuart", mc2661_device, read, write, 0xffff)
+	AM_RANGE(0xf9f3c, 0xf9f3d) AM_DEVREADWRITE8("bppic", pic8259_device, read, write, 0xffff)
+	AM_RANGE(0xf9f40, 0xf9f5f) AM_DEVREADWRITE8("rtc", mm58167_device, read, write, 0xffff)
+	AM_RANGE(0xf9f70, 0xf9f77) AM_DEVREADWRITE8("hdc", wd2010_device, read, write, 0xffff)
+	AM_RANGE(0xf9f80, 0xf9f81) AM_DEVREADWRITE8("crtc", mc6845_device, status_r, address_w, 0x00ff)
+	AM_RANGE(0xf9f80, 0xf9f81) AM_DEVREADWRITE8("crtc", mc6845_device, register_r, register_w, 0xff00)
+	AM_RANGE(0xfc000,0xfffff) AM_RAM	// BIOS RAM shadow
+	AM_RANGE(0xffc000,0xffffff) AM_ROM AM_REGION("bios", 0)
 ADDRESS_MAP_END
 
 
@@ -165,67 +226,174 @@ void pg685_state::video_start()
 {
 }
 
-
-
-uint32_t pg685_state::screen_update_pg685(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+MC6845_UPDATE_ROW( pg685_state::crtc_update_row )
 {
-	return 0;
+	static const uint32_t palette[2] = { 0x00d000, 0 };
+	uint32_t  *p = &bitmap.pix32(y);
+	uint16_t  chr_base = ra;
+	int i;
+	uint8_t *vram = (uint8_t *)m_vram.target();
+	uint8_t *fontram = (uint8_t *)m_fontram.target();
+
+	for ( i = 0; i < x_count; i++ )
+	{
+		uint16_t offset = ( ma + i ) & 0x7ff;
+		uint8_t chr = vram[ offset ];
+		uint8_t data = fontram[ chr_base + chr * 16 ];
+		uint8_t fg = 1;
+		uint8_t bg = 0;
+	
+		*p = palette[( data & 0x80 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x40 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x20 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x10 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x08 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x04 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x02 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x01 ) ? fg : bg]; p++;
+	}
+}
+
+MC6845_UPDATE_ROW( pg685_state::crtc_update_row_oua12 )
+{
+	static const uint32_t palette[2] = { 0x00d000, 0 };
+	uint32_t  *p = &bitmap.pix32(y);
+	uint16_t  chr_base = ra;
+	int i;
+	uint16_t *vram = (uint16_t *)m_vram16.target();
+	uint8_t *fontram = (uint8_t *)memregion("chargen")->base();
+
+	for ( i = 0; i < x_count; i++ )
+	{
+		uint16_t offset = ( ma + i ) & 0x7ff;
+		uint16_t chr = vram[ offset ] & 0xff;
+		uint8_t data = fontram[ chr_base + chr * 16 ];
+		uint8_t fg = 1;
+		uint8_t bg = 0;
+	
+		*p = palette[( data & 0x80 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x40 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x20 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x10 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x08 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x04 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x02 ) ? fg : bg]; p++;
+		*p = palette[( data & 0x01 ) ? fg : bg]; p++;
+	}
 }
 
 //**************************************************************************
 //  MACHINE DRIVERS
 //**************************************************************************
 
+static MACHINE_CONFIG_FRAGMENT(pg685_backplane)
+	MCFG_DEVICE_ADD("bppit", PIT8253, 0)
+
+	MCFG_PIC8259_ADD("bppic", NOOP, VCC, NOOP) // ???
+
+	MCFG_DEVICE_ADD("bpuart", MC2661, XTAL_4_9152MHz) // internal clock
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_FRAGMENT(pg685_module)
+	MCFG_DEVICE_ADD("fdc", WD2797, XTAL_4MHz / 2) // divider guessed
+	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE("mainpic", pic8259_device, ir4_w))
+
+	MCFG_DEVICE_ADD("modppi1", I8255, 0)
+	MCFG_DEVICE_ADD("modppi2", I8255, 0)
+
+	MCFG_DEVICE_ADD("moduart", I8251, XTAL_4MHz / 2) // divider guessed
+
+	MCFG_DEVICE_ADD("rtc", MM58167, XTAL_32_768kHz)
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_START( pg685, pg685_state )
 	// main cpu
 	MCFG_CPU_ADD("maincpu", V20, XTAL_15MHz / 3)
 	MCFG_CPU_PROGRAM_MAP(pg685_mem)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mainpic", pic8259_device, inta_cb)
+
+	MCFG_PIC8259_ADD("mainpic", INPUTLINE("maincpu", 0), VCC, NOOP)
 
 	// i/o cpu
 
 	// ram
 
 	// video hardware
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(12288000, 882, 0, 720, 370, 0, 350 ) // not real values
+	MCFG_SCREEN_UPDATE_DEVICE( "crtc", mc6845_device, screen_update )
 
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", 12288000)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_UPDATE_ROW_CB(pg685_state, crtc_update_row)
+	
 	// sound hardware
 
 	// devices
+	MCFG_FRAGMENT_ADD(pg685_backplane)
+	MCFG_FRAGMENT_ADD(pg685_module)
+
+	MCFG_DEVICE_ADD("mainuart", I8251, XTAL_12_288MHz / 6) // divider guessed
 
 	// rs232 port
 
 	// keyboard
+	MCFG_DEVICE_ADD("kbdc", I8279, XTAL_12_288MHz / 6) // divider guessed
+	MCFG_I8279_OUT_IRQ_CB(DEVWRITELINE("mainpic", pic8259_device, ir0_w))
 
 	// printer
 
 	// floppy
 
 	// harddisk
+	MCFG_DEVICE_ADD("hdc", WD2010, XTAL_10MHz / 2) // divider guessed
+	MCFG_WD2010_OUT_INTRQ_CB(DEVWRITELINE("mainpic", pic8259_device, ir3_w))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( pg685oua12, pg685_state )
 	// main cpu
 	MCFG_CPU_ADD("maincpu", I80286, XTAL_20MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(pg685oua12_mem)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mainpic", pic8259_device, inta_cb)
+
+	MCFG_PIC8259_ADD("mainpic", INPUTLINE("maincpu", 0), VCC, NOOP)
 
 	// i/o cpu
 
 	// ram
 
 	// video hardware
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(12288000, 882, 0, 720, 370, 0, 350 ) // not real values
+	MCFG_SCREEN_UPDATE_DEVICE( "crtc", mc6845_device, screen_update )
+
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", 12288000)
+	MCFG_MC6845_SHOW_BORDER_AREA(false)
+	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_UPDATE_ROW_CB(pg685_state, crtc_update_row_oua12)
 
 	// sound hardware
 
 	// devices
+	MCFG_FRAGMENT_ADD(pg685_backplane)
+	MCFG_FRAGMENT_ADD(pg685_module)
+
+	MCFG_DEVICE_ADD("mainuart", I8251, 12288000 / 6) // wrong
 
 	// rs232 port
 
 	// keyboard
+	MCFG_DEVICE_ADD("kbdc", I8279, 12288000 / 6) // wrong
+	MCFG_I8279_OUT_IRQ_CB(DEVWRITELINE("mainpic", pic8259_device, ir0_w))
 
 	// printer
 
 	// floppy
 
 	// harddisk
+	MCFG_DEVICE_ADD("hdc", WD2010, XTAL_10MHz / 2) // divider guessed
+	MCFG_WD2010_OUT_INTRQ_CB(DEVWRITELINE("mainpic", pic8259_device, ir3_w))
 
 MACHINE_CONFIG_END
 
@@ -233,6 +401,11 @@ MACHINE_CONFIG_END
 //**************************************************************************
 //  ROM DEFINITIONS
 //**************************************************************************
+
+ROM_START( pg675 )
+	ROM_REGION( 0x4000, "bios", ROMREGION_ERASEFF )
+	ROM_LOAD( "p79004-a7021 a2-a1.bin", 0x2000, 0x2000, CRC(c7602d28) SHA1(a470e0457cc83f989995cfbca1ebce0878a3c4e3) )
+ROM_END
 
 ROM_START( pg685 )
 	ROM_REGION( 0x4000, "bios", ROMREGION_ERASEFF )
@@ -251,5 +424,6 @@ ROM_END
 //  ROM DEFINITIONS
 //**************************************************************************
 /*    YEAR  NAME        PARENT    COMPAT  MACHINE     INPUT       CLASS          INIT        COMPANY FULLNAME                  FLAGS                */
+COMP( 198?, pg675,      0,        0,      pg685,      pg685,      driver_device,    0,       "Siemens", "Simatic PG675", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 COMP( 198?, pg685,      0,        0,      pg685,      pg685,      driver_device,    0,       "Siemens", "Simatic PG685 OUA11", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 COMP( 198?, pg685oua12, pg685,    0,      pg685oua12, pg685,      driver_device,    0,       "Siemens", "Simatic PG685 OUA12", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)

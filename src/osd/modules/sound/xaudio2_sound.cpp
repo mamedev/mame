@@ -9,7 +9,7 @@
 #include "sound_module.h"
 #include "modules/osdmodule.h"
 
-#if defined(OSD_WINDOWS)
+#if defined(OSD_WINDOWS) || defined(OSD_UWP)
 
 // standard windows headers
 #define WIN32_LEAN_AND_MEAN
@@ -232,6 +232,8 @@ public:
 		m_initialized(FALSE)
 	{
 	}
+	
+	virtual ~sound_xaudio2() { }
 
 	bool probe() override;
 	int init(osd_options const &options) override;

@@ -862,6 +862,18 @@ TIMER_DEVICE_CALLBACK_MEMBER(saturn_state::saturn_scanline)
 			m_vdp1.framebuffer_clear_on_next_frame = 1;
 	}
 
+	// TODO: temporary for Batman Forever, presumably anonymous timer not behaving well.
+	//       VDP1 timing needs some HW work anyway so I'm currently firing VDP1 after 8 scanlines for now, will de-anon the timers in a later stage.
+	if(scanline == (vblank_line+8)*y_step)
+	{
+		if(!(m_scu.ism & IRQ_VDP1_END))
+		{
+			m_maincpu->set_input_line_and_vector(0x2, HOLD_LINE, 0x4d);
+			scu_do_transfer(6);
+		}
+		else
+			m_scu.ist |= (IRQ_VDP1_END);
+	}
 
 	if(scanline == (m_scu_regs[36] & 0x3ff)*y_step)
 	{

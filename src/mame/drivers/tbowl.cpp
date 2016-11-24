@@ -137,7 +137,7 @@ WRITE8_MEMBER(tbowl_state::adpcm_end_w)
 WRITE8_MEMBER(tbowl_state::adpcm_vol_w)
 {
 	msm5205_device *adpcm = (offset & 1) ? m_msm2 : m_msm1;
-	adpcm->set_volume((data & 0x7f) * 100 / 0x7f);
+	adpcm->set_output_gain(ALL_OUTPUTS, (data & 127) / 127.0);
 }
 
 void tbowl_state::adpcm_int( msm5205_device *device, int num )

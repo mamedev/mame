@@ -57,7 +57,7 @@ inline void _8080bw_state::set_pixel( bitmap_rgb32 &bitmap, uint8_t y, uint8_t x
 	if (y >= MW8080BW_VCOUNTER_START_NO_VBLANK)
 	{
 		if (m_flip_screen)
-			bitmap.pix32(MW8080BW_VBSTART - 1 - (y - MW8080BW_VCOUNTER_START_NO_VBLANK), MW8080BW_HPIXCOUNT - 1 - x) = color;
+			bitmap.pix32(MW8080BW_VBSTART - 1 - (y - MW8080BW_VCOUNTER_START_NO_VBLANK), MW8080BW_HPIXCOUNT - 1 - x) = m_palette->pen_color(color);
 		else
 			bitmap.pix32(y - MW8080BW_VCOUNTER_START_NO_VBLANK, x) = m_palette->pen_color(color);
 	}

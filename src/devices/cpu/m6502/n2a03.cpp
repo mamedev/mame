@@ -56,9 +56,9 @@ n2a03_device::n2a03_device(const machine_config &mconfig, const char *tag, devic
 {
 }
 
-offs_t n2a03_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t n2a03_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
-	return disassemble_generic(buffer, pc, oprom, opram, options, disasm_entries);
+	return disassemble_generic(stream, pc, oprom, opram, options, disasm_entries);
 }
 
 void n2a03_device::device_start()
@@ -70,8 +70,6 @@ void n2a03_device::device_start()
 		mintf = new mi_2a03_nd;
 	else
 		mintf = new mi_2a03_normal;
-
-	m_apu->set_tag_memory(tag());
 
 	init();
 }

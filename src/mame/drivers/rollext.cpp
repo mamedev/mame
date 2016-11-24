@@ -153,7 +153,7 @@ void rollext_renderer::process_display_list(uint32_t* disp_ram)
 {
 	const rectangle& visarea = screen().visible_area();
 
-	render_delegate rd = render_delegate(FUNC(rollext_renderer::render_texture_scan), this);
+	render_delegate rd = render_delegate(&rollext_renderer::render_texture_scan, this);
 
 	int num = disp_ram[0xffffc/4];
 

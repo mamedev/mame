@@ -257,21 +257,21 @@ void WindowQtConfig::applyToQWidget(QWidget* widget)
 }
 
 
-void WindowQtConfig::addToXmlDataNode(xml_data_node* node) const
+void WindowQtConfig::addToXmlDataNode(xml_data_node &node) const
 {
-	xml_set_attribute_int(node, "type", m_type);
-	xml_set_attribute_int(node, "position_x", m_position.x());
-	xml_set_attribute_int(node, "position_y", m_position.y());
-	xml_set_attribute_int(node, "size_x", m_size.x());
-	xml_set_attribute_int(node, "size_y", m_size.y());
+	node.set_attribute_int("type", m_type);
+	node.set_attribute_int("position_x", m_position.x());
+	node.set_attribute_int("position_y", m_position.y());
+	node.set_attribute_int("size_x", m_size.x());
+	node.set_attribute_int("size_y", m_size.y());
 }
 
 
-void WindowQtConfig::recoverFromXmlNode(xml_data_node* node)
+void WindowQtConfig::recoverFromXmlNode(xml_data_node const &node)
 {
-	m_size.setX(xml_get_attribute_int(node, "size_x", m_size.x()));
-	m_size.setY(xml_get_attribute_int(node, "size_y", m_size.y()));
-	m_position.setX(xml_get_attribute_int(node, "position_x", m_position.x()));
-	m_position.setY(xml_get_attribute_int(node, "position_y", m_position.y()));
-	m_type = (WindowQtConfig::WindowType)xml_get_attribute_int(node, "type", m_type);
+	m_size.setX(node.get_attribute_int("size_x", m_size.x()));
+	m_size.setY(node.get_attribute_int("size_y", m_size.y()));
+	m_position.setX(node.get_attribute_int("position_x", m_position.x()));
+	m_position.setY(node.get_attribute_int("position_y", m_position.y()));
+	m_type = (WindowQtConfig::WindowType)node.get_attribute_int("type", m_type);
 }

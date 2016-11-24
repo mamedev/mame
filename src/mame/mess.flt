@@ -139,6 +139,7 @@ d6800.cpp
 d6809.cpp
 dai.cpp
 daruma.cpp
+datum.cpp
 dccons.cpp
 dct11em.cpp
 dectalk.cpp
@@ -223,6 +224,7 @@ h19.cpp
 h8.cpp
 h89.cpp
 harriet.cpp
+hazeltin.cpp
 hec2hrp.cpp
 hh_amis2k.cpp
 hh_cop400.cpp
@@ -295,6 +297,7 @@ kc.cpp
 kim1.cpp
 konin.cpp
 kramermc.cpp
+kron.cpp
 kyocera.cpp
 laser3k.cpp
 lc80.cpp
@@ -313,6 +316,7 @@ m5.cpp
 m6805evs.cpp
 m79152pc.cpp
 mac.cpp
+mac128.cpp
 macpci.cpp
 mbc200.cpp
 mbc55x.cpp
@@ -329,6 +333,7 @@ mephisto.cpp
 mes.cpp
 mice.cpp
 micral.cpp
+micro20.cpp
 microdec.cpp
 microkit.cpp
 micronic.cpp
@@ -472,6 +477,7 @@ pp01.cpp
 prestige.cpp
 primo.cpp
 pro80.cpp
+prodigy.cpp
 prof180x.cpp
 prof80.cpp
 prophet600.cpp
@@ -503,6 +509,7 @@ rd100.cpp
 rd110.cpp
 replicator.cpp
 rex6000.cpp
+risc2500.cpp
 riscpc.cpp
 rm380z.cpp
 rmnimbus.cpp
@@ -626,6 +633,7 @@ ts803.cpp
 ts816.cpp
 tsispch.cpp
 tutor.cpp
+tv910.cpp
 tv950.cpp
 tv990.cpp
 tvc.cpp

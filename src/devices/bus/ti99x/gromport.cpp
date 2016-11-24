@@ -118,6 +118,7 @@
 #define TRACE_GROM 0
 #define TRACE_GKRACKER 0
 #define TRACE_CRU 0
+#define TRACE_BANKSWITCH 0
 
 #define GROM3_TAG "grom3"
 #define GROM4_TAG "grom4"
@@ -1654,7 +1655,7 @@ WRITE8_MEMBER(ti99_cartridge_pcb::write)
 {
 	if (m_romspace_selected)
 	{
-		if (TRACE_ILLWRITE) space.device().logerror("Cannot write to ROM space at %04x\n", offset);
+		if (TRACE_ILLWRITE) m_cart->logerror("Cannot write to ROM space at %04x\n", offset);
 	}
 	else
 	{
@@ -1760,6 +1761,7 @@ WRITE8_MEMBER(ti99_paged12k_cartridge::write)
 	if (m_romspace_selected)
 	{
 		m_rom_page = (offset >> 1) & 1;
+		if (TRACE_BANKSWITCH) if ((offset & 1)==0) m_cart->logerror("Set ROM page = %d (writing to %04x)\n", m_rom_page, (offset | 0x6000));
 	}
 	else
 	{
@@ -1807,6 +1809,7 @@ WRITE8_MEMBER(ti99_paged16k_cartridge::write)
 	if (m_romspace_selected)
 	{
 		m_rom_page = (offset >> 1) & 1;
+		if (TRACE_BANKSWITCH) if ((offset & 1)==0) m_cart->logerror("Set ROM page = %d (writing to %04x)\n", m_rom_page, (offset | 0x6000));
 	}
 	else
 	{
@@ -1863,7 +1866,7 @@ WRITE8_MEMBER(ti99_minimem_cartridge::write)
 	{
 		if ((offset & 0x1000)==0x0000)
 		{
-			if (TRACE_ILLWRITE) space.device().logerror("Write access to cartridge ROM at address %04x ignored", offset);
+			if (TRACE_ILLWRITE) m_cart->logerror("Write access to cartridge ROM at address %04x ignored", offset);
 		}
 		else
 		{
@@ -1969,7 +1972,7 @@ READ8Z_MEMBER(ti99_super_cartridge::crureadz)
 
 	if ((offset & 0xfff0) == 0x0800)
 	{
-		if (TRACE_CRU) space.device().logerror("CRU accessed at %04x\n", offset);
+		if (TRACE_CRU) m_cart->logerror("CRU accessed at %04x\n", offset);
 		uint8_t val = 0x02 << (m_ram_page << 1);
 		*value = (val >> ((offset - 0x0800)>>1)) & 0xff;
 	}
@@ -1979,9 +1982,12 @@ WRITE8_MEMBER(ti99_super_cartridge::cruwrite)
 {
 	if ((offset & 0xfff0) == 0x0800)
 	{
-		if (TRACE_CRU) space.device().logerror("CRU accessed at %04x\n", offset);
+		if (TRACE_CRU) m_cart->logerror("CRU accessed at %04x\n", offset);
 		if (data != 0)
+		{
 			m_ram_page = (offset-0x0802)>>2;
+			if (TRACE_BANKSWITCH) if ((offset & 1)==0) m_cart->logerror("Set RAM page = %d (CRU address %04x)\n", m_ram_page, offset);
+		}
 	}
 }
 
@@ -2034,7 +2040,7 @@ READ8Z_MEMBER(ti99_mbx_cartridge::readz)
 		{
 			// Also reads the value of 6ffe
 			*value = m_ram_ptr[offset & 0x03ff];
-			if (TRACE_READ) space.device().logerror("%04x (RAM) -> %02x\n", offset + 0x6000, *value);
+			if (TRACE_READ) m_cart->logerror("%04x (RAM) -> %02x\n", offset + 0x6000, *value);
 		}
 		else
 		{
@@ -2045,7 +2051,7 @@ READ8Z_MEMBER(ti99_mbx_cartridge::readz)
 				else  // 7000 area
 					*value = m_rom_ptr[(offset & 0x0fff) | (m_rom_page << 12)];
 
-				if (TRACE_READ) space.device().logerror("%04x(%04x) -> %02x\n", offset + 0x6000, offset | (m_rom_page<<13), *value);
+				if (TRACE_READ) m_cart->logerror("%04x(%04x) -> %02x\n", offset + 0x6000, offset | (m_rom_page<<13), *value);
 			}
 		}
 	}
@@ -2066,13 +2072,13 @@ WRITE8_MEMBER(ti99_mbx_cartridge::write)
 			{
 				// Valid values are 0, 1, 2, 3
 				m_rom_page = data & 3;
-				if (TRACE_WRITE) if ((offset & 1)==0) space.device().logerror("Set ROM page = %d\n", data);
+				if (TRACE_BANKSWITCH) if ((offset & 1)==0) m_cart->logerror("Set ROM page = %d (writing to %04x)\n", m_rom_page, (offset | 0x6000));
 			}
 
 			if (m_ram_ptr != nullptr)
 				m_ram_ptr[offset & 0x03ff] = data;
 			else
-				if (TRACE_ILLWRITE) space.device().logerror("Write access to %04x but no RAM present\n", offset+0x6000);
+				if (TRACE_ILLWRITE) m_cart->logerror("Write access to %04x but no RAM present\n", offset+0x6000);
 		}
 	}
 	else
@@ -2150,6 +2156,7 @@ WRITE8_MEMBER(ti99_paged379i_cartridge::write)
 
 		// The page is determined by the inverted outputs.
 		m_rom_page = (~offset)>>1 & mask;
+		if (TRACE_BANKSWITCH) if ((offset & 1)==0) m_cart->logerror("Set ROM page = %d (writing to %04x)\n", m_rom_page, (offset | 0x6000));
 	}
 }
 
@@ -2190,6 +2197,7 @@ WRITE8_MEMBER(ti99_paged378_cartridge::write)
 	if (m_romspace_selected)
 	{
 		m_rom_page = ((offset >> 1)&0x003f);
+		if (TRACE_BANKSWITCH) if ((offset & 1)==0) m_cart->logerror("Set ROM page = %d (writing to %04x)\n", m_rom_page, (offset | 0x6000));
 	}
 }
 
@@ -2226,7 +2234,10 @@ WRITE8_MEMBER(ti99_paged377_cartridge::write)
 	// Bits: 011x xxxb bbbb bbbx
 	// x = don't care, bbbb = bank
 	if (m_romspace_selected)
+	{
 		m_rom_page = ((offset >> 1)&0x00ff);
+		if (TRACE_BANKSWITCH) if ((offset & 1)==0) m_cart->logerror("Set ROM page = %d (writing to %04x)\n", m_rom_page, (offset | 0x6000));
+	}
 }
 
 /*****************************************************************************
@@ -2298,6 +2309,7 @@ WRITE8_MEMBER(ti99_pagedcru_cartridge::cruwrite)
 		if (data != 0 && bit > 0)
 		{
 			m_rom_page = (bit-1)/2;
+			if (TRACE_BANKSWITCH) m_cart->logerror("Set ROM page = %d (CRU address %d)\n", m_rom_page, offset);
 		}
 	}
 }
@@ -2394,6 +2406,7 @@ WRITE8_MEMBER(ti99_gromemu_cartridge::write)
 			return; // no paging
 		}
 		m_rom_page = (offset >> 1) & 1;
+		if (TRACE_BANKSWITCH) if ((offset & 1)==0) m_cart->logerror("Set ROM page = %d (writing to %04x)\n", m_rom_page, (offset | 0x6000));
 	}
 	else
 	{
@@ -2445,7 +2458,7 @@ WRITE8_MEMBER(ti99_gromemu_cartridge::gromemuwrite)
 	}
 	else
 	{
-		if (TRACE_ILLWRITE) space.device().logerror("Ignoring write to GROM area at address %04x\n", m_grom_address);
+		if (TRACE_ILLWRITE) m_cart->logerror("Ignoring write to GROM area at address %04x\n", m_grom_address);
 	}
 }
 
@@ -2615,7 +2628,7 @@ int rpk_reader::find_file(util::archive_file &zip, const char *filename, uint32_
 /*
     Load a rom resource and put it in a pcb socket instance.
 */
-std::unique_ptr<rpk_socket> rpk_reader::load_rom_resource(util::archive_file &zip, xml_data_node* rom_resource_node, const char* socketname)
+std::unique_ptr<rpk_socket> rpk_reader::load_rom_resource(util::archive_file &zip, xml_data_node const* rom_resource_node, const char* socketname)
 {
 	const char* file;
 	const char* crcstr;
@@ -2627,13 +2640,13 @@ std::unique_ptr<rpk_socket> rpk_reader::load_rom_resource(util::archive_file &zi
 	int header;
 
 	// find the file attribute (required)
-	file = xml_get_attribute_string(rom_resource_node, "file", nullptr);
+	file = rom_resource_node->get_attribute_string("file", nullptr);
 	if (file == nullptr) throw rpk_exception(RPK_INVALID_LAYOUT, "<rom> must have a 'file' attribute");
 
 	if (TRACE_RPK) printf("gromport/RPK: Loading ROM contents for socket '%s' from file %s\n", socketname, file);
 
 	// check for crc
-	crcstr = xml_get_attribute_string(rom_resource_node, "crc", nullptr);
+	crcstr = rom_resource_node->get_attribute_string("crc", nullptr);
 	if (crcstr==nullptr)
 	{
 		// no CRC, just find the file in the RPK
@@ -2661,7 +2674,7 @@ std::unique_ptr<rpk_socket> rpk_reader::load_rom_resource(util::archive_file &zi
 	}
 
 	// check for sha1
-	sha1 = xml_get_attribute_string(rom_resource_node, "sha1", nullptr);
+	sha1 = rom_resource_node->get_attribute_string("sha1", nullptr);
 	if (sha1 != nullptr)
 	{
 		util::hash_collection actual_hashes;
@@ -2680,7 +2693,7 @@ std::unique_ptr<rpk_socket> rpk_reader::load_rom_resource(util::archive_file &zi
 /*
     Load a ram resource and put it in a pcb socket instance.
 */
-std::unique_ptr<rpk_socket> rpk_reader::load_ram_resource(emu_options &options, xml_data_node* ram_resource_node, const char* socketname, const char* system_name)
+std::unique_ptr<rpk_socket> rpk_reader::load_ram_resource(emu_options &options, xml_data_node const* ram_resource_node, const char* socketname, const char* system_name)
 {
 	const char* length_string;
 	const char* ram_type;
@@ -2690,7 +2703,7 @@ std::unique_ptr<rpk_socket> rpk_reader::load_ram_resource(emu_options &options, 
 	uint8_t* contents;
 
 	// find the length attribute
-	length_string = xml_get_attribute_string(ram_resource_node, "length", nullptr);
+	length_string = ram_resource_node->get_attribute_string("length", nullptr);
 	if (length_string == nullptr) throw rpk_exception(RPK_MISSING_RAM_LENGTH);
 
 	// parse it
@@ -2725,13 +2738,13 @@ std::unique_ptr<rpk_socket> rpk_reader::load_ram_resource(emu_options &options, 
 	// That's it for pure RAM. Now check whether the RAM is "persistent", i.e. NVRAM.
 	// In that case we must load it from the NVRAM directory.
 	// The file name is given in the RPK file; the subdirectory is the system name.
-	ram_type = xml_get_attribute_string(ram_resource_node, "type", nullptr);
+	ram_type = ram_resource_node->get_attribute_string("type", nullptr);
 	if (ram_type != nullptr)
 	{
 		if (strcmp(ram_type, "persistent")==0)
 		{
 			// Get the file name (required if persistent)
-			ram_filename = xml_get_attribute_string(ram_resource_node, "file", nullptr);
+			ram_filename = ram_resource_node->get_attribute_string("file", nullptr);
 			if (ram_filename==nullptr)
 			{
 				global_free_array(contents);
@@ -2771,21 +2784,10 @@ rpk* rpk_reader::open(emu_options &options, const char *filename, const char *sy
 {
 	util::archive_file::error ziperr;
 
-	const char *pcb_type;
-	const char *id;
-	const char *uses_name;
-	const char *resource_name;
-
 	util::archive_file::ptr zipfile;
 
 	std::vector<char> layout_text;
 	xml_data_node *layout_xml = nullptr;
-	xml_data_node *romset_node;
-	xml_data_node *configuration_node;
-	xml_data_node *resources_node;
-	xml_data_node *resource_node;
-	xml_data_node *socket_node;
-	xml_data_node *pcb_node;
 
 	int i;
 
@@ -2814,30 +2816,30 @@ rpk* rpk_reader::open(emu_options &options, const char *filename, const char *sy
 		layout_text[zipfile->current_uncompressed_length()] = '\0';  // Null-terminate
 
 		/* parse the layout text */
-		layout_xml = xml_string_read(&layout_text[0], nullptr);
-		if (layout_xml == nullptr) throw rpk_exception(RPK_XML_ERROR);
+		layout_xml = xml_data_node::string_read(&layout_text[0], nullptr);
+		if (!layout_xml) throw rpk_exception(RPK_XML_ERROR);
 
 		// Now we work within the XML tree
 
 		// romset is the root node
-		romset_node = xml_get_sibling(layout_xml->child, "romset");
-		if (romset_node==nullptr) throw rpk_exception(RPK_INVALID_LAYOUT, "document element must be <romset>");
+		xml_data_node const *const romset_node = layout_xml->get_child("romset");
+		if (!romset_node) throw rpk_exception(RPK_INVALID_LAYOUT, "document element must be <romset>");
 
 		// resources is a child of romset
-		resources_node = xml_get_sibling(romset_node->child, "resources");
-		if (resources_node==nullptr) throw rpk_exception(RPK_INVALID_LAYOUT, "<romset> must have a <resources> child");
+		xml_data_node const *const resources_node = romset_node->get_child("resources");
+		if (!resources_node) throw rpk_exception(RPK_INVALID_LAYOUT, "<romset> must have a <resources> child");
 
 		// configuration is a child of romset; we're actually interested in ...
-		configuration_node = xml_get_sibling(romset_node->child, "configuration");
-		if (configuration_node==nullptr) throw rpk_exception(RPK_INVALID_LAYOUT, "<romset> must have a <configuration> child");
+		xml_data_node const *const configuration_node = romset_node->get_child("configuration");
+		if (!configuration_node) throw rpk_exception(RPK_INVALID_LAYOUT, "<romset> must have a <configuration> child");
 
 		// ... pcb, which is a child of configuration
-		pcb_node = xml_get_sibling(configuration_node->child, "pcb");
-		if (pcb_node==nullptr) throw rpk_exception(RPK_INVALID_LAYOUT, "<configuration> must have a <pcb> child");
+		xml_data_node const *const pcb_node = configuration_node->get_child("pcb");
+		if (!pcb_node) throw rpk_exception(RPK_INVALID_LAYOUT, "<configuration> must have a <pcb> child");
 
 		// We'll try to find the PCB type on the provided type list.
-		pcb_type = xml_get_attribute_string(pcb_node, "type", nullptr);
-		if (pcb_type==nullptr) throw rpk_exception(RPK_INVALID_LAYOUT, "<pcb> must have a 'type' attribute");
+		char const *const pcb_type = pcb_node->get_attribute_string("type", nullptr);
+		if (!pcb_type) throw rpk_exception(RPK_INVALID_LAYOUT, "<pcb> must have a 'type' attribute");
 		if (TRACE_RPK) printf("gromport/RPK: Cartridge says it has PCB type '%s'\n", pcb_type);
 
 		i=0;
@@ -2854,31 +2856,31 @@ rpk* rpk_reader::open(emu_options &options, const char *filename, const char *sy
 		if (m_types[i].id==0) throw rpk_exception(RPK_UNKNOWN_PCB_TYPE);
 
 		// Find the sockets and load their respective resource
-		for (socket_node = pcb_node->child;  socket_node != nullptr; socket_node = socket_node->next)
+		for (xml_data_node const *socket_node = pcb_node->get_first_child();  socket_node != nullptr; socket_node = socket_node->get_next_sibling())
 		{
-			if (strcmp(socket_node->name, "socket")!=0) throw rpk_exception(RPK_INVALID_LAYOUT, "<pcb> element has only <socket> children");
-			id = xml_get_attribute_string(socket_node, "id", nullptr);
-			if (id == nullptr) throw rpk_exception(RPK_INVALID_LAYOUT, "<socket> must have an 'id' attribute");
-			uses_name = xml_get_attribute_string(socket_node, "uses", nullptr);
-			if (uses_name == nullptr) throw rpk_exception(RPK_INVALID_LAYOUT, "<socket> must have a 'uses' attribute");
+			if (strcmp(socket_node->get_name(), "socket")!=0) throw rpk_exception(RPK_INVALID_LAYOUT, "<pcb> element has only <socket> children");
+			char const *const id = socket_node->get_attribute_string("id", nullptr);
+			if (!id) throw rpk_exception(RPK_INVALID_LAYOUT, "<socket> must have an 'id' attribute");
+			char const *const uses_name = socket_node->get_attribute_string("uses", nullptr);
+			if (!uses_name) throw rpk_exception(RPK_INVALID_LAYOUT, "<socket> must have a 'uses' attribute");
 
 			bool found = false;
 			// Locate the resource node
-			for (resource_node = resources_node->child; resource_node != nullptr; resource_node = resource_node->next)
+			for (xml_data_node const *resource_node = resources_node->get_first_child(); resource_node != nullptr; resource_node = resource_node->get_next_sibling())
 			{
-				resource_name = xml_get_attribute_string(resource_node, "id", nullptr);
-				if (resource_name == nullptr) throw rpk_exception(RPK_INVALID_LAYOUT, "resource node must have an 'id' attribute");
+				char const *const resource_name = resource_node->get_attribute_string("id", nullptr);
+				if (!resource_name) throw rpk_exception(RPK_INVALID_LAYOUT, "resource node must have an 'id' attribute");
 
 				if (strcmp(resource_name, uses_name)==0)
 				{
 					// found it
-					if (strcmp(resource_node->name, "rom")==0)
+					if (strcmp(resource_node->get_name(), "rom")==0)
 					{
 						newrpk->add_socket(id, load_rom_resource(*zipfile, resource_node, id));
 					}
 					else
 					{
-						if (strcmp(resource_node->name, "ram")==0)
+						if (strcmp(resource_node->get_name(), "ram")==0)
 						{
 							newrpk->add_socket(id, load_ram_resource(options, resource_node, id, system_name));
 						}
@@ -2893,13 +2895,13 @@ rpk* rpk_reader::open(emu_options &options, const char *filename, const char *sy
 	catch (rpk_exception &)
 	{
 		newrpk->close();
-		if (layout_xml != nullptr)     xml_file_free(layout_xml);
+		if (layout_xml) layout_xml->file_free();
 
 		// rethrow the exception
 		throw;
 	}
 
-	if (layout_xml != nullptr)     xml_file_free(layout_xml);
+	if (layout_xml) layout_xml->file_free();
 
 	return newrpk;
 }

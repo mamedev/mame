@@ -3873,6 +3873,27 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) )
 ROM_END
 
+ROM_START( pepp0188b ) /* Normal board : Standard Draw Poker (PP0188) - 11/04/96   @ IGT  L97-0126 - Tournament Mode capable - PSR Verified */
+/*
+PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
+----------------------------------------------------------
+  P40A      1    2    3    4    6   9  15  40 250    800
+  % Range: 86.5-88.5%  Optimum: 92.5%  Hit Frequency: 45.5%
+     Programs Available: PP0188, X000188P
+*/
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "pp0188_a53-a7t.u68",   0x00000, 0x10000, CRC(92b4802e) SHA1(aa5289e0b7845e42501a4df6854a4d1b7612e1e5) ) /* Game Version: A53, Library Version: A7T */
+
+	ROM_REGION( 0x020000, "gfx1", 0 )
+	ROM_LOAD( "mro-cg2004.u72",  0x00000, 0x8000, CRC(e5e40ea5) SHA1(e0d9e50b30cc0c25c932b2bf444990df1fb2c38c) ) /*  08/31/94   @ IGT  L95-0146  */
+	ROM_LOAD( "mgo-cg2004.u73",  0x08000, 0x8000, CRC(12607f1e) SHA1(248e1ecee4e735f5943c50f8c350ca95b81509a7) )
+	ROM_LOAD( "mbo-cg2004.u74",  0x10000, 0x8000, CRC(78c3fb9f) SHA1(2b9847c511888de507a008dec981778ca4dbcd6c) )
+	ROM_LOAD( "mxo-cg2004.u75",  0x18000, 0x8000, CRC(5aaa4480) SHA1(353c4ce566c944406fce21f2c5045c856ef7a609) )
+
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) )
+ROM_END
+
 ROM_START( pepp0189 ) /* Normal board : Standard Draw Poker (PP0189) */
 /*
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
@@ -5038,7 +5059,7 @@ PayTable   Ks+  2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "mro-cg2004.u72",  0x00000, 0x8000, CRC(e5e40ea5) SHA1(e0d9e50b30cc0c25c932b2bf444990df1fb2c38c) ) /*  08/31/94   @ IGT  L95-0146  */
 	ROM_LOAD( "mgo-cg2004.u73",  0x08000, 0x8000, CRC(12607f1e) SHA1(248e1ecee4e735f5943c50f8c350ca95b81509a7) )
-	ROM_LOAD( "mbo-cg2004.u74",  0x10000, 0x8000, CRC(78c3fb9f) SHA1(2b9847c511888de507a008dec981778ca4dbcd6c) ) /* Supersedes CG740 */
+	ROM_LOAD( "mbo-cg2004.u74",  0x10000, 0x8000, CRC(78c3fb9f) SHA1(2b9847c511888de507a008dec981778ca4dbcd6c) )
 	ROM_LOAD( "mxo-cg2004.u75",  0x18000, 0x8000, CRC(5aaa4480) SHA1(353c4ce566c944406fce21f2c5045c856ef7a609) )
 
 	ROM_REGION( 0x100, "proms", 0 )
@@ -5060,7 +5081,7 @@ PayTable   Ks+  2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "mro-cg2004.u72",  0x00000, 0x8000, CRC(e5e40ea5) SHA1(e0d9e50b30cc0c25c932b2bf444990df1fb2c38c) ) /*  08/31/94   @ IGT  L95-0146  */
 	ROM_LOAD( "mgo-cg2004.u73",  0x08000, 0x8000, CRC(12607f1e) SHA1(248e1ecee4e735f5943c50f8c350ca95b81509a7) )
-	ROM_LOAD( "mbo-cg2004.u74",  0x10000, 0x8000, CRC(78c3fb9f) SHA1(2b9847c511888de507a008dec981778ca4dbcd6c) ) /* Supersedes CG740 */
+	ROM_LOAD( "mbo-cg2004.u74",  0x10000, 0x8000, CRC(78c3fb9f) SHA1(2b9847c511888de507a008dec981778ca4dbcd6c) )
 	ROM_LOAD( "mxo-cg2004.u75",  0x18000, 0x8000, CRC(5aaa4480) SHA1(353c4ce566c944406fce21f2c5045c856ef7a609) )
 
 	ROM_REGION( 0x100, "proms", 0 )
@@ -5082,7 +5103,7 @@ PayTable   As   2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "mro-cg2004.u72",  0x00000, 0x8000, CRC(e5e40ea5) SHA1(e0d9e50b30cc0c25c932b2bf444990df1fb2c38c) ) /*  08/31/94   @ IGT  L95-0146  */
 	ROM_LOAD( "mgo-cg2004.u73",  0x08000, 0x8000, CRC(12607f1e) SHA1(248e1ecee4e735f5943c50f8c350ca95b81509a7) )
-	ROM_LOAD( "mbo-cg2004.u74",  0x10000, 0x8000, CRC(78c3fb9f) SHA1(2b9847c511888de507a008dec981778ca4dbcd6c) ) /* Supersedes CG740 */
+	ROM_LOAD( "mbo-cg2004.u74",  0x10000, 0x8000, CRC(78c3fb9f) SHA1(2b9847c511888de507a008dec981778ca4dbcd6c) )
 	ROM_LOAD( "mxo-cg2004.u75",  0x18000, 0x8000, CRC(5aaa4480) SHA1(353c4ce566c944406fce21f2c5045c856ef7a609) )
 
 	ROM_REGION( 0x100, "proms", 0 )
@@ -5213,7 +5234,28 @@ PayTable   Js+  2PR  3K  STR  FL  FH  4K  SF  RF  (Bonus)
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "mro-cg2004.u72",  0x00000, 0x8000, CRC(e5e40ea5) SHA1(e0d9e50b30cc0c25c932b2bf444990df1fb2c38c) ) /*  08/31/94   @ IGT  L95-0146  */
 	ROM_LOAD( "mgo-cg2004.u73",  0x08000, 0x8000, CRC(12607f1e) SHA1(248e1ecee4e735f5943c50f8c350ca95b81509a7) )
-	ROM_LOAD( "mbo-cg2004.u74",  0x10000, 0x8000, CRC(78c3fb9f) SHA1(2b9847c511888de507a008dec981778ca4dbcd6c) ) /* Supersedes CG740 */
+	ROM_LOAD( "mbo-cg2004.u74",  0x10000, 0x8000, CRC(78c3fb9f) SHA1(2b9847c511888de507a008dec981778ca4dbcd6c) )
+	ROM_LOAD( "mxo-cg2004.u75",  0x18000, 0x8000, CRC(5aaa4480) SHA1(353c4ce566c944406fce21f2c5045c856ef7a609) )
+
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) ) /* BPROM type DM74LS471 (compatible with N82S135N) verified */
+ROM_END
+
+ROM_START( pepp0447b ) /* Normal board : Standard Draw Poker (PP0447) - 10/06/97   @ IGT  L97-2422 - Tournament Mode capable - PSR Verified */
+/*
+PayTable   Js+  2PR  3K  STR  FL  FH  4K  SF  RF  (Bonus)
+---------------------------------------------------------
+  CA        1    2    3   4    6   9  25  50 250    800
+  % Range: 95.5-97.5%  Optimum: 99.5%  Hit Frequency: 45.5%
+     Programs Available: PP0447, X000447P
+*/
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "pp0447_a6h-a8h.u68",   0x00000, 0x10000, CRC(d52c0917) SHA1(0fd774152bfa9a287fd606d52bd1e331720bbb4a) ) /* Game Version: A6H, Library Version: A8H */
+
+	ROM_REGION( 0x020000, "gfx1", 0 )
+	ROM_LOAD( "mro-cg2004.u72",  0x00000, 0x8000, CRC(e5e40ea5) SHA1(e0d9e50b30cc0c25c932b2bf444990df1fb2c38c) ) /*  08/31/94   @ IGT  L95-0146  */
+	ROM_LOAD( "mgo-cg2004.u73",  0x08000, 0x8000, CRC(12607f1e) SHA1(248e1ecee4e735f5943c50f8c350ca95b81509a7) )
+	ROM_LOAD( "mbo-cg2004.u74",  0x10000, 0x8000, CRC(78c3fb9f) SHA1(2b9847c511888de507a008dec981778ca4dbcd6c) )
 	ROM_LOAD( "mxo-cg2004.u75",  0x18000, 0x8000, CRC(5aaa4480) SHA1(353c4ce566c944406fce21f2c5045c856ef7a609) )
 
 	ROM_REGION( 0x100, "proms", 0 )
@@ -5385,7 +5427,7 @@ PayTable   Ks+  2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "mro-cg2004.u72",  0x00000, 0x8000, CRC(e5e40ea5) SHA1(e0d9e50b30cc0c25c932b2bf444990df1fb2c38c) ) /*  08/31/94   @ IGT  L95-0146  */
 	ROM_LOAD( "mgo-cg2004.u73",  0x08000, 0x8000, CRC(12607f1e) SHA1(248e1ecee4e735f5943c50f8c350ca95b81509a7) )
-	ROM_LOAD( "mbo-cg2004.u74",  0x10000, 0x8000, CRC(78c3fb9f) SHA1(2b9847c511888de507a008dec981778ca4dbcd6c) ) /* Supersedes CG740 */
+	ROM_LOAD( "mbo-cg2004.u74",  0x10000, 0x8000, CRC(78c3fb9f) SHA1(2b9847c511888de507a008dec981778ca4dbcd6c) )
 	ROM_LOAD( "mxo-cg2004.u75",  0x18000, 0x8000, CRC(5aaa4480) SHA1(353c4ce566c944406fce21f2c5045c856ef7a609) )
 
 	ROM_REGION( 0x100, "proms", 0 )
@@ -5405,7 +5447,7 @@ PayTable   Js+  2P  3K  STR  FL  FH  4K  ?? SF  RF  (Bonus)
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "mro-cg2004.u72",  0x00000, 0x8000, CRC(e5e40ea5) SHA1(e0d9e50b30cc0c25c932b2bf444990df1fb2c38c) ) /*  08/31/94   @ IGT  L95-0146  */
 	ROM_LOAD( "mgo-cg2004.u73",  0x08000, 0x8000, CRC(12607f1e) SHA1(248e1ecee4e735f5943c50f8c350ca95b81509a7) )
-	ROM_LOAD( "mbo-cg2004.u74",  0x10000, 0x8000, CRC(78c3fb9f) SHA1(2b9847c511888de507a008dec981778ca4dbcd6c) ) /* Supersedes CG740 */
+	ROM_LOAD( "mbo-cg2004.u74",  0x10000, 0x8000, CRC(78c3fb9f) SHA1(2b9847c511888de507a008dec981778ca4dbcd6c) )
 	ROM_LOAD( "mxo-cg2004.u75",  0x18000, 0x8000, CRC(5aaa4480) SHA1(353c4ce566c944406fce21f2c5045c856ef7a609) )
 
 	ROM_REGION( 0x100, "proms", 0 )
@@ -5471,7 +5513,7 @@ PayTable   Js+  TP  3K  STR  FL  FH  4K  SF  RF  (Bonus)
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "mro-cg2004.u72",  0x00000, 0x8000, CRC(e5e40ea5) SHA1(e0d9e50b30cc0c25c932b2bf444990df1fb2c38c) ) /*  08/31/94   @ IGT  L95-0146  */
 	ROM_LOAD( "mgo-cg2004.u73",  0x08000, 0x8000, CRC(12607f1e) SHA1(248e1ecee4e735f5943c50f8c350ca95b81509a7) )
-	ROM_LOAD( "mbo-cg2004.u74",  0x10000, 0x8000, CRC(78c3fb9f) SHA1(2b9847c511888de507a008dec981778ca4dbcd6c) ) /* Supersedes CG740 */
+	ROM_LOAD( "mbo-cg2004.u74",  0x10000, 0x8000, CRC(78c3fb9f) SHA1(2b9847c511888de507a008dec981778ca4dbcd6c) )
 	ROM_LOAD( "mxo-cg2004.u75",  0x18000, 0x8000, CRC(5aaa4480) SHA1(353c4ce566c944406fce21f2c5045c856ef7a609) )
 
 	ROM_REGION( 0x100, "proms", 0 )
@@ -5492,7 +5534,7 @@ PayTable   Js+  TP  3K  STR  FL  FH  4K  SF  RF  (Bonus)
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "mro-cg2004.u72",  0x00000, 0x8000, CRC(e5e40ea5) SHA1(e0d9e50b30cc0c25c932b2bf444990df1fb2c38c) ) /*  08/31/94   @ IGT  L95-0146  */
 	ROM_LOAD( "mgo-cg2004.u73",  0x08000, 0x8000, CRC(12607f1e) SHA1(248e1ecee4e735f5943c50f8c350ca95b81509a7) )
-	ROM_LOAD( "mbo-cg2004.u74",  0x10000, 0x8000, CRC(78c3fb9f) SHA1(2b9847c511888de507a008dec981778ca4dbcd6c) ) /* Supersedes CG740 */
+	ROM_LOAD( "mbo-cg2004.u74",  0x10000, 0x8000, CRC(78c3fb9f) SHA1(2b9847c511888de507a008dec981778ca4dbcd6c) )
 	ROM_LOAD( "mxo-cg2004.u75",  0x18000, 0x8000, CRC(5aaa4480) SHA1(353c4ce566c944406fce21f2c5045c856ef7a609) )
 
 	ROM_REGION( 0x100, "proms", 0 )
@@ -5756,7 +5798,7 @@ PayTable   Ks+  2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "mro-cg2004.u72",  0x00000, 0x8000, CRC(e5e40ea5) SHA1(e0d9e50b30cc0c25c932b2bf444990df1fb2c38c) ) /*  08/31/94   @ IGT  L95-0146  */
 	ROM_LOAD( "mgo-cg2004.u73",  0x08000, 0x8000, CRC(12607f1e) SHA1(248e1ecee4e735f5943c50f8c350ca95b81509a7) )
-	ROM_LOAD( "mbo-cg2004.u74",  0x10000, 0x8000, CRC(78c3fb9f) SHA1(2b9847c511888de507a008dec981778ca4dbcd6c) ) /* Supersedes CG740 */
+	ROM_LOAD( "mbo-cg2004.u74",  0x10000, 0x8000, CRC(78c3fb9f) SHA1(2b9847c511888de507a008dec981778ca4dbcd6c) )
 	ROM_LOAD( "mxo-cg2004.u75",  0x18000, 0x8000, CRC(5aaa4480) SHA1(353c4ce566c944406fce21f2c5045c856ef7a609) )
 
 	ROM_REGION( 0x100, "proms", 0 )
@@ -5910,7 +5952,7 @@ PayTable   2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "mro-cg2004.u72",  0x00000, 0x8000, CRC(e5e40ea5) SHA1(e0d9e50b30cc0c25c932b2bf444990df1fb2c38c) ) /*  08/31/94   @ IGT  L95-0146  */
 	ROM_LOAD( "mgo-cg2004.u73",  0x08000, 0x8000, CRC(12607f1e) SHA1(248e1ecee4e735f5943c50f8c350ca95b81509a7) )
-	ROM_LOAD( "mbo-cg2004.u74",  0x10000, 0x8000, CRC(78c3fb9f) SHA1(2b9847c511888de507a008dec981778ca4dbcd6c) ) /* Supersedes CG740 */
+	ROM_LOAD( "mbo-cg2004.u74",  0x10000, 0x8000, CRC(78c3fb9f) SHA1(2b9847c511888de507a008dec981778ca4dbcd6c) )
 	ROM_LOAD( "mxo-cg2004.u75",  0x18000, 0x8000, CRC(5aaa4480) SHA1(353c4ce566c944406fce21f2c5045c856ef7a609) )
 
 	ROM_REGION( 0x100, "proms", 0 )
@@ -5934,7 +5976,7 @@ Internally the program reports a 99.40% return.
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "mro-cg2004.u72",  0x00000, 0x8000, CRC(e5e40ea5) SHA1(e0d9e50b30cc0c25c932b2bf444990df1fb2c38c) ) /*  08/31/94   @ IGT  L95-0146  */
 	ROM_LOAD( "mgo-cg2004.u73",  0x08000, 0x8000, CRC(12607f1e) SHA1(248e1ecee4e735f5943c50f8c350ca95b81509a7) )
-	ROM_LOAD( "mbo-cg2004.u74",  0x10000, 0x8000, CRC(78c3fb9f) SHA1(2b9847c511888de507a008dec981778ca4dbcd6c) ) /* Supersedes CG740 */
+	ROM_LOAD( "mbo-cg2004.u74",  0x10000, 0x8000, CRC(78c3fb9f) SHA1(2b9847c511888de507a008dec981778ca4dbcd6c) )
 	ROM_LOAD( "mxo-cg2004.u75",  0x18000, 0x8000, CRC(5aaa4480) SHA1(353c4ce566c944406fce21f2c5045c856ef7a609) )
 
 	ROM_REGION( 0x100, "proms", 0 )
@@ -5956,7 +5998,7 @@ PayTable   As   2P  3K  STR  FL  FH  4K  SF  RF  5K  RF  (Bonus)
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "mro-cg2004.u72",  0x00000, 0x8000, CRC(e5e40ea5) SHA1(e0d9e50b30cc0c25c932b2bf444990df1fb2c38c) ) /*  08/31/94   @ IGT  L95-0146  */
 	ROM_LOAD( "mgo-cg2004.u73",  0x08000, 0x8000, CRC(12607f1e) SHA1(248e1ecee4e735f5943c50f8c350ca95b81509a7) )
-	ROM_LOAD( "mbo-cg2004.u74",  0x10000, 0x8000, CRC(78c3fb9f) SHA1(2b9847c511888de507a008dec981778ca4dbcd6c) ) /* Supersedes CG740 */
+	ROM_LOAD( "mbo-cg2004.u74",  0x10000, 0x8000, CRC(78c3fb9f) SHA1(2b9847c511888de507a008dec981778ca4dbcd6c) )
 	ROM_LOAD( "mxo-cg2004.u75",  0x18000, 0x8000, CRC(5aaa4480) SHA1(353c4ce566c944406fce21f2c5045c856ef7a609) )
 
 	ROM_REGION( 0x100, "proms", 0 )
@@ -5977,7 +6019,7 @@ PayTable  10s+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "mro-cg2004.u72",  0x00000, 0x8000, CRC(e5e40ea5) SHA1(e0d9e50b30cc0c25c932b2bf444990df1fb2c38c) ) /*  08/31/94   @ IGT  L95-0146  */
 	ROM_LOAD( "mgo-cg2004.u73",  0x08000, 0x8000, CRC(12607f1e) SHA1(248e1ecee4e735f5943c50f8c350ca95b81509a7) )
-	ROM_LOAD( "mbo-cg2004.u74",  0x10000, 0x8000, CRC(78c3fb9f) SHA1(2b9847c511888de507a008dec981778ca4dbcd6c) ) /* Supersedes CG740 */
+	ROM_LOAD( "mbo-cg2004.u74",  0x10000, 0x8000, CRC(78c3fb9f) SHA1(2b9847c511888de507a008dec981778ca4dbcd6c) )
 	ROM_LOAD( "mxo-cg2004.u75",  0x18000, 0x8000, CRC(5aaa4480) SHA1(353c4ce566c944406fce21f2c5045c856ef7a609) )
 
 	ROM_REGION( 0x100, "proms", 0 )
@@ -6021,7 +6063,7 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "mro-cg2004.u72",  0x00000, 0x8000, CRC(e5e40ea5) SHA1(e0d9e50b30cc0c25c932b2bf444990df1fb2c38c) ) /*  08/31/94   @ IGT  L95-0146  */
 	ROM_LOAD( "mgo-cg2004.u73",  0x08000, 0x8000, CRC(12607f1e) SHA1(248e1ecee4e735f5943c50f8c350ca95b81509a7) )
-	ROM_LOAD( "mbo-cg2004.u74",  0x10000, 0x8000, CRC(78c3fb9f) SHA1(2b9847c511888de507a008dec981778ca4dbcd6c) ) /* Supersedes CG740 */
+	ROM_LOAD( "mbo-cg2004.u74",  0x10000, 0x8000, CRC(78c3fb9f) SHA1(2b9847c511888de507a008dec981778ca4dbcd6c) )
 	ROM_LOAD( "mxo-cg2004.u75",  0x18000, 0x8000, CRC(5aaa4480) SHA1(353c4ce566c944406fce21f2c5045c856ef7a609) )
 
 	ROM_REGION( 0x100, "proms", 0 )
@@ -6937,15 +6979,130 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 	ROM_LOAD( "cap656.u50", 0x0000, 0x0100, CRC(038cabc6) SHA1(c6514b4f9dbed6ab2631f563f7e00648661ebdbb) )
 ROM_END
 
+/*
+
+Player's Choice & Montana Choice games:
+
+Machines can come in a variety of configurations:
+    Coin Hopper or Dot Matrix Printer
+    Button control, Touchscreen or both
+    Real Time Clock (RTC) functions via Dallas (Maxim) DS1216 SmartWatch RAM
+
+Configurations & specific CG character roms sets based on build version and game type.
+
+The printer for ticket payout (no coins) made by Star Micronics Co. Ltd. (Piscataway, NJ)
+  40-column dot matrix
+  3.25" wide, 2-ply paper roll
+  One ply is the customer copy, the other is a carbon copy for auditing
+
+  Printer PCB consists of a SCN8039HCBN40  Signetics / Intel (8048 compatible Single-Chip 8-Bit Microcontroller, ROM-less version) MCU
+  8.00MHz OSC and the LP 86 (handwritten label) EPROM.  There is known to exist later versions like LP 89 and higher
+
+*/
+
+ROM_START( pemg0025 ) /* Normal board : Player's Choice Multi-Game MG0025 - Requires a Printer (not yet supported) */
+/*
+
+MG0025 has 4 games:
+  Joker Poker
+  Home Run (Slots)
+  Super Sevens (Slots)
+  Jacks or Better
+
+Currently stalls with "PRINTER ERROR"
+
+*/
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "mg0025_603-727.u68",   0x00000, 0x10000, CRC(9ec078ae) SHA1(dc4e81091ada648edc7ef80802cbdb5f297de99a) ) /* Game Version: 603, Library Version: 727 */
+
+	ROM_REGION( 0x020000, "gfx1", 0 )
+	ROM_LOAD( "mro-cgxxxx.u72",  0x00000, 0x8000, NO_DUMP ) /* Requires a COMPLETELY UNKNOWN CG graphics set */
+	ROM_LOAD( "mgo-cgxxxx.u73",  0x08000, 0x8000, NO_DUMP )
+	ROM_LOAD( "mbo-cgxxxx.u74",  0x10000, 0x8000, NO_DUMP )
+	ROM_LOAD( "mxo-cgxxxx.u75",  0x18000, 0x8000, NO_DUMP )
+	ROM_LOAD( "mro-cg2073.u72",   0x00000, 0x8000, CRC(43806d98) SHA1(7665c1efedd90b9caf7d43545368e97200c95062) ) /* COMPLETELY WRONG!!!  Use these for now ONLY to show something */
+	ROM_LOAD( "mgo-cg2073.u73",   0x08000, 0x8000, CRC(c0276eb5) SHA1(1789ea651fa0728abbc31f7de4b9cd49b0a164b6) )
+	ROM_LOAD( "mbo-cg2073.u74",   0x10000, 0x8000, CRC(f5f769b9) SHA1(37cd65f49be3a54bbe1e21428c2823c7d2505184) )
+	ROM_LOAD( "mxo-cg2073.u75",   0x18000, 0x8000, CRC(d61d36b4) SHA1(1c020f1c50f4023925d4dba0b940b4e02843573f) )
+
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "cap1327.u50", 0x0000, 0x0100, CRC(afcccf99) SHA1(138995bf4c691f8ab18926fe095678e115de55e0) ) /* Unknown CAP color prom needed for this set */
+
+	ROM_REGION( 0x1000, "printer", 0 ) /* ROM from the printer driver PCB */
+	ROM_LOAD( "lp_86.u9", 0x0000, 0x1000, CRC(cdd93c06) SHA1(96f0a6e231f355a0b82bb0e1e698edbd66ff3020) ) /* 2732 EPROM */
+ROM_END
+
+ROM_START( pemg0026 ) /* Normal board : Player's Choice Multi-Game MG0026 - Requires a Printer (not yet supported) */
+/*
+
+MG0026 has 3 games:
+  Jackpot Jungle (Slots)
+  Jacks or Better
+  Double Diamonds (Slots)
+
+Currently stalls with "PRINTER ERROR"
+
+*/
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "mg0026_602-610.u68",   0x00000, 0x10000, CRC(c818d25e) SHA1(57e19a0d4b47bad96ca0e969c81ab97854b9c3b9) ) /* Game Version: 602, Library Version: 610 */
+
+	ROM_REGION( 0x020000, "gfx1", 0 )
+	ROM_LOAD( "mro-cgxxxx.u72",  0x00000, 0x8000, NO_DUMP ) /* Requires a COMPLETELY UNKNOWN CG graphics set */
+	ROM_LOAD( "mgo-cgxxxx.u73",  0x08000, 0x8000, NO_DUMP )
+	ROM_LOAD( "mbo-cgxxxx.u74",  0x10000, 0x8000, NO_DUMP )
+	ROM_LOAD( "mxo-cgxxxx.u75",  0x18000, 0x8000, NO_DUMP )
+	ROM_LOAD( "mro-cg2073.u72",   0x00000, 0x8000, CRC(43806d98) SHA1(7665c1efedd90b9caf7d43545368e97200c95062) ) /* COMPLETELY WRONG!!!  Use these for now ONLY to show something */
+	ROM_LOAD( "mgo-cg2073.u73",   0x08000, 0x8000, CRC(c0276eb5) SHA1(1789ea651fa0728abbc31f7de4b9cd49b0a164b6) )
+	ROM_LOAD( "mbo-cg2073.u74",   0x10000, 0x8000, CRC(f5f769b9) SHA1(37cd65f49be3a54bbe1e21428c2823c7d2505184) )
+	ROM_LOAD( "mxo-cg2073.u75",   0x18000, 0x8000, CRC(d61d36b4) SHA1(1c020f1c50f4023925d4dba0b940b4e02843573f) )
+
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "cap1327.u50", 0x0000, 0x0100, CRC(afcccf99) SHA1(138995bf4c691f8ab18926fe095678e115de55e0) ) /* Unknown CAP color prom needed for this set */
+
+	ROM_REGION( 0x1000, "printer", 0 ) /* ROM from the printer driver PCB */
+	ROM_LOAD( "lp_86.u9", 0x0000, 0x1000, CRC(cdd93c06) SHA1(96f0a6e231f355a0b82bb0e1e698edbd66ff3020) ) /* 2732 EPROM */
+ROM_END
+
+ROM_START( pemg0182 ) /* Normal board : Player's Choice Multi-Game MG0182 - Requires a Printer & Touchscreen controller (not yet supported) */
+/*
+
+MG0182 has 4 poker games:
+  Jacks or Better
+  Joker Wild Poker
+  Four of a Kind Bonus Poker
+  Deuces Wild Poker
+
+Build version 755-781 requires touchscreen controls currently not supported
+
+Currently stalls with "GAME MISMATCH" due to missing Touchscreen controller
+
+*/
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "mg0182_755-781.u68",   0x00000, 0x10000, CRC(61ce46d6) SHA1(951a0d4fd0219d66009faba1a80870600dd1a977) ) /* Game Version: 755, Library Version: 781 */
+
+	ROM_REGION( 0x020000, "gfx1", 0 )
+	ROM_LOAD( "mro-cg1209.u72",   0x00000, 0x8000, CRC(39b0cc43) SHA1(0a95a7122e64fed7355e762ff2eda2a7246d4693) )
+	ROM_LOAD( "mgo-cg1209.u73",   0x08000, 0x8000, CRC(5285ffab) SHA1(e959bf2fec46ee62d7a625eb64f74635fd697643) )
+	ROM_LOAD( "mbo-cg1209.u74",   0x10000, 0x8000, CRC(4604ac16) SHA1(b3a7c6c807eb2be7f451d2fcbb6455a66c155a46) )
+	ROM_LOAD( "mxo-cg1209.u75",   0x18000, 0x8000, CRC(da344256) SHA1(1320c4a8b48a9e61a4607e0a9d08083fde2bd334) )
+
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "cap1144.u50", 0x0000, 0x0100, CRC(c80e88ef) SHA1(51c62a07f660a2f3be46a8fbb5af01cff2660e8d) )
+
+	ROM_REGION( 0x1000, "printer", 0 ) /* ROM from the printer driver PCB */
+	ROM_LOAD( "lp_86.u9", 0x0000, 0x1000, CRC(cdd93c06) SHA1(96f0a6e231f355a0b82bb0e1e698edbd66ff3020) ) /* 2732 EPROM */
+ROM_END
+
 ROM_START( pemg0183 ) /* Normal board : Montana Choice Multi-Game MG0183 - Requires a Printer (not yet supported) */
 /*
+
 MG0183 has 4 poker games:
   Jacks or Better
   Joker Wild Poker
   Four of a Kind Bonus Poker
   Deuces Wild Poker
 
-Also uses a Dallas (Maxim) DS1216 SmartWatch RAM for RTC (Real Time Clock) functions
+Also uses a Dallas DS1216 SmartWatch RAM for RTC functions
 
 Came out of an IGT machine with belly glass calling it Montana Choice
 
@@ -6968,23 +7125,48 @@ Currently stalls with "PRINTER ERROR"
 	ROM_LOAD( "lp_86.u9", 0x0000, 0x1000, CRC(cdd93c06) SHA1(96f0a6e231f355a0b82bb0e1e698edbd66ff3020) ) /* 2732 EPROM */
 ROM_END
 
+ROM_START( pemg0213 ) /* Normal board : Montana Choice Multi-Game MG0213 - Requires a Printer (not yet supported) */
+/*
+
+MG0213 has 4 poker games:
+  Lucky Deal
+  Shock Wave
+  Deuces Joker Wild
+  Double Double Bonus
+
+Also uses a Dallas DS1216 SmartWatch RAM for RTC functions
+
+Currently stalls with "PRINTER ERROR"
+
+*/
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "mg0213_817-842.u68",   0x00000, 0x10000, CRC(d6574fa1) SHA1(e88ba7caf53f8cc3694579578a1db06fee9b41b2) ) /* Game Version: 817, Library Version: 842 */
+
+	ROM_REGION( 0x020000, "gfx1", 0 )
+	ROM_LOAD( "mro-cg2329.u72",   0x00000, 0x8000, CRC(27096c65) SHA1(dae4528269cef058847777b279554eee98c48687) )
+	ROM_LOAD( "mgo-cg2329.u73",   0x08000, 0x8000, CRC(ffde87e0) SHA1(4f4fcdeb14b56921a9cd77e565029545e3e2b0fe) )
+	ROM_LOAD( "mbo-cg2329.u74",   0x10000, 0x8000, CRC(cbe77ee0) SHA1(fb9da8266533dbd3084abba5f75d3b583cf986c2) )
+	ROM_LOAD( "mxo-cg2329.u75",   0x18000, 0x8000, CRC(b9e1b47c) SHA1(25fe7f974742a89d0a812bbc4f732f826b168fef) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "capx2329.u50", 0x0000, 0x0200, NO_DUMP )
+	ROM_LOAD( "capx1144.u50", 0x0000, 0x0200, CRC(c27fb8ec) SHA1(fd724f48d7126b3cc1fbd238e8182479b8bbac67) )
+
+	ROM_REGION( 0x1000, "printer", 0 ) /* ROM from the printer driver PCB */
+	ROM_LOAD( "lp_89.u9", 0x0000, 0x1000, NO_DUMP ) /* Should be LP0089 or higher - 2732 EPROM */
+	ROM_LOAD( "lp_86.u9", 0x0000, 0x1000, CRC(cdd93c06) SHA1(96f0a6e231f355a0b82bb0e1e698edbd66ff3020) ) /* 2732 EPROM */
+ROM_END
+
 ROM_START( pemg0252 ) /* Normal board : Player's Choice Multi-Game MG0252 - Requires a Printer (not yet supported) */
 /*
+
 MG0252 has 4 poker games:
   Deuces Wild
   Jacks Better Bonus
   Deuces / Joker Wild
   Jacks or Better
 
-Requires a printer for ticket payout (no coins) made by Star Micronics Co. Ltd. (Piscataway, NJ)
-  40-column dot matrix
-  3.25" wide, 2-ply paper roll
-  One ply is the customer copy, the other is a carbon copy for auditing
-
-  Printer PCB consists of a SCN8039HCBN40  Signetics / Intel (8048 compatible Single-Chip 8-Bit Microcontroller, ROM-less version) MCU
-  8.00MHz OSC and the LP 86 (handwritten label) EPROM
-
-  Some Player's Choice machines contain and use a touchscreen for input
+Build version 752-778 is for the South Carolina Lottery jurisdiction
 
 Currently stalls with "PRINTER ERROR"
 
@@ -7098,7 +7280,7 @@ ROM_START( peke0017 ) /* Normal board : Keno 1-10 Spot (KE0017) */
 	ROM_LOAD( "cap1016.u50", 0x0000, 0x0100, CRC(12e1be25) SHA1(501487bc729eb80fcf9e61705d3546de5e0d7cde) )
 ROM_END
 
-ROM_START( peke1001 ) /* Normal board : Keno 2-10 Spot (KE1001) - Payout 85.02%, Paytable 85-H */
+ROM_START( peke1001 ) /* Normal board : Keno 2-10 Spot (KE1001) - Payout 85.02%, Paytable 85-H - PSR Verified */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ke1001_590-a77.u68",   0x00000, 0x10000, CRC(a3dfee24) SHA1(f6c4822dbaab67319fc05ac0a0b2cd03313eb1e6) ) /* Game Version: 590, Library Version: A77 - 09/08/99   IGT  L99-1902 */
 
@@ -7112,7 +7294,7 @@ ROM_START( peke1001 ) /* Normal board : Keno 2-10 Spot (KE1001) - Payout 85.02%,
 	ROM_LOAD( "cap1267.u50", 0x0000, 0x0100, CRC(7051db57) SHA1(76751a3cc47d506983205decb07e99ca0c178a42) )
 ROM_END
 
-ROM_START( peke1006 ) /* Normal board : Keno 2-10 Spot (KE1006) - Payout 87.61%, Paytable 87-C */
+ROM_START( peke1006 ) /* Normal board : Keno 2-10 Spot (KE1006) - Payout 87.61%, Paytable 87-C - PSR Verified */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ke1006_590-a77.u68",   0x00000, 0x10000, CRC(5f2a9aac) SHA1(67d24e376d0dcea30d68c3019919e02261c38d7d) ) /* Game Version: 590, Library Version: A77 */
 
@@ -7126,7 +7308,7 @@ ROM_START( peke1006 ) /* Normal board : Keno 2-10 Spot (KE1006) - Payout 87.61%,
 	ROM_LOAD( "cap1267.u50", 0x0000, 0x0100, CRC(7051db57) SHA1(76751a3cc47d506983205decb07e99ca0c178a42) )
 ROM_END
 
-ROM_START( peke1012 ) /* Normal board : Keno 1-10 Spot (KE1012) - Payout 90.27%, Paytable 90-P */
+ROM_START( peke1012 ) /* Normal board : Keno 1-10 Spot (KE1012) - Payout 90.27%, Paytable 90-P - PSR Verified */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ke1012_590-a77.u68",   0x00000, 0x10000, CRC(18ec2146) SHA1(6a5bae2accd15f8e5efa18d26dcadb2bec7b6163) ) /* Game Version: 582, Library Version: A77 - 09/09/99   IGT MNI S */
 
@@ -7140,7 +7322,7 @@ ROM_START( peke1012 ) /* Normal board : Keno 1-10 Spot (KE1012) - Payout 90.27%,
 	ROM_LOAD( "cap1267.u50", 0x0000, 0x0100, CRC(7051db57) SHA1(76751a3cc47d506983205decb07e99ca0c178a42) )
 ROM_END
 
-ROM_START( peke1012a ) /* Normal board : Keno 1-10 Spot (KE1012) - Payout 90.27%, Paytable 90-P */
+ROM_START( peke1012a ) /* Normal board : Keno 1-10 Spot (KE1012) - Payout 90.27%, Paytable 90-P - PSR Verified */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ke1012_582-a77.u68",   0x00000, 0x10000, CRC(87f696ba) SHA1(de6cc7ff799218ae6fb75521243534484ef4b9a8) ) /* Game Version: 582, Library Version: A77 - 10/23/95   IGT  L95-2454 */
 
@@ -7182,7 +7364,7 @@ ROM_START( peke1013 ) /* Normal board : Keno 2-10 Spot (KE1013) - Payout 91.97%,
 	ROM_LOAD( "cap1267.u50", 0x0000, 0x0100, CRC(7051db57) SHA1(76751a3cc47d506983205decb07e99ca0c178a42) )
 ROM_END
 
-ROM_START( peke1013a ) /* Normal board : Keno 2-10 Spot (KE1013) - Payout 91.97%, Paytable 91-D */
+ROM_START( peke1013a ) /* Normal board : Keno 2-10 Spot (KE1013) - Payout 91.97%, Paytable 91-D - PSR Verified */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "ke1013_590-a77.u68",   0x00000, 0x10000, CRC(3b178f94) SHA1(c601150a728d750b73f949ba6e2d2979c4c4be2e) ) /* Game Version: 590, Library Version: A77 */
 
@@ -9624,6 +9806,34 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
 
 	ROM_REGION( 0x10000, "user1", 0 )
 	ROM_LOAD( "x000764p.u66",   0x00000, 0x10000, CRC(0a1213d7) SHA1(208262fa3e9642789dcedcd3551ad876e5390707) ) /* 4 of a Kind Bonus Poker */
+
+	ROM_REGION( 0x020000, "gfx1", 0 )
+	ROM_LOAD( "mro-cg2242.u77",  0x00000, 0x8000, CRC(963a7e7d) SHA1(ebb159f6c731a3f912382745ef9a9c6d4fa2fc99) ) /*  03/19/96   @ IGT  L96-0703 */
+	ROM_LOAD( "mgo-cg2242.u78",  0x08000, 0x8000, CRC(53eed56f) SHA1(e79f31c5c817b8b96b4970c1a702d1892961d441) )
+	ROM_LOAD( "mbo-cg2242.u79",  0x10000, 0x8000, CRC(af092f50) SHA1(53a3536593bb14c4072e8a5ee9e05af332feceb1) )
+	ROM_LOAD( "mxo-cg2242.u80",  0x18000, 0x8000, CRC(ecacb6b2) SHA1(32660adcc266fbbb3702a0cd30e25d11b953d23d) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "capx1321.u43", 0x0000, 0x0200, CRC(4b57569f) SHA1(fa29c0f627e7ce79951ec6dadec114864144f37d) )
+ROM_END
+
+ROM_START( pex2002p ) /* Superboard : Double Double Bonus Poker (X002002P+XP000038) PSR Verified */
+/*
+                                                   2-4    4A
+                                      5-K 2-4      4K    with
+PayTable   Js+  2PR  3K  STR  FL  FH  4K  4K  4A  with A  2-4  SF  RF  (Bonus)
+------------------------------------------------------------------------------
+  P506A     1    1    3   4    5   8  50  80 160   160    400  50 250    800
+  % Range: 92.7-94.7%  Optimum: 96.7%  Hit Frequency: 44.8%
+     Programs Available: X002002P
+
+NOTE: Same payout as X002068P but internally reports a return of 96.7% instead of 96.8%
+*/
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /*  09/05/95   @ IGT  L95-2452 */
+
+	ROM_REGION( 0x10000, "user1", 0 )
+	ROM_LOAD( "x002002p.u66",   0x00000, 0x10000, CRC(4af4b14a) SHA1(f6695dea3267c80ea5b2ccb06b98bb8ff7a81a98) ) /* Double Double Bonus Poker - 01/19/95   @IGT  L95-0364 */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "mro-cg2242.u77",  0x00000, 0x8000, CRC(963a7e7d) SHA1(ebb159f6c731a3f912382745ef9a9c6d4fa2fc99) ) /*  03/19/96   @ IGT  L96-0703 */
@@ -12327,7 +12537,24 @@ ROM_START( pex0013k ) /* Superboard : Keno (X000013K+XK000011) Paytable: 91-D, P
 	ROM_LOAD( "xk000011.u67",   0x00000, 0x10000, CRC(bad69e8d) SHA1(b742ba30654636e8f339cabcd13793f5452caf5a) ) /* 09/09/99   IGT IN */
 
 	ROM_REGION( 0x10000, "user1", 0 )
-	ROM_LOAD( "x000013k.u66",   0x00000, 0x10000, CRC(e8ed1053) SHA1(9f373ad28c341a0a586f4d077fbab4c93e4c0632) ) /* 01/22/95   IGT IN */
+	ROM_LOAD( "x000013k.u66",   0x00000, 0x10000, CRC(e8ed1053) SHA1(9f373ad28c341a0a586f4d077fbab4c93e4c0632) ) /* 01/22/95   L95-0617 */
+
+	ROM_REGION( 0x020000, "gfx1", 0 )
+	ROM_LOAD( "mro-cg2120.u77",  0x00000, 0x8000, CRC(bb607f11) SHA1(575b5a0bea07864c2f7a42f4e5ff5c8d586b652d) ) /* 04/25/95   IGT  L95-1503 */
+	ROM_LOAD( "mgo-cg2120.u78",  0x08000, 0x8000, CRC(aa5fc2a4) SHA1(576b06e01751d78bd948c4b0eef9c519750028c8) )
+	ROM_LOAD( "mbo-cg2120.u79",  0x10000, 0x8000, CRC(1f2f7d66) SHA1(56e0b6d05c148aa9262350cfcd0ae3a2fa7974c3) )
+	ROM_LOAD( "mxo-cg2120.u80",  0x18000, 0x8000, CRC(c4696495) SHA1(45b5ecba73cf590ac5685d951664bc73fdb02940) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "capx1267.u43", 0x0000, 0x0200, CRC(ce920b36) SHA1(1ddac0e227ac8210b314acbe92c6adb86800a45e) )
+ROM_END
+
+ROM_START( pex0013ka ) /* Superboard : Keno (X000013K+XK000012) Paytable: 91-D, Payout Percentage: 91.97 */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "xk000012.u67",   0x00000, 0x10000, CRC(435a6393) SHA1(5b4684750228c4264aea896a91a52bc13bb28516) ) /* 09/09/99   IGT  L99-1811 */
+
+	ROM_REGION( 0x10000, "user1", 0 )
+	ROM_LOAD( "x000013k.u66",   0x00000, 0x10000, CRC(e8ed1053) SHA1(9f373ad28c341a0a586f4d077fbab4c93e4c0632) ) /* 01/22/95   L95-0617 */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "mro-cg2120.u77",  0x00000, 0x8000, CRC(bb607f11) SHA1(575b5a0bea07864c2f7a42f4e5ff5c8d586b652d) ) /* 04/25/95   IGT  L95-1503 */
@@ -12371,6 +12598,23 @@ ROM_START( pex0841s ) /* Superboard : Five Times Pay Slots (X000841S+XS000002) -
 
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "capx2351.u43", 0x0000, 0x0200, CRC(34c59e88) SHA1(bf4d7a54c964b1b723ec65a4ede40ad900dd0f08) )
+ROM_END
+
+ROM_START( pex0846s ) /* Superboard : Wild Star Red White & Blue Slots (X000846S+XS000006) - Payout 89.99% */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "xs000006.u67",   0x00000, 0x10000, CRC(4b11ca18) SHA1(f64a1fbd089c01bc35a5484e60b8834a2db4a79f) )
+
+	ROM_REGION( 0x10000, "user1", 0 )
+	ROM_LOAD( "x000864s.u66",   0x00000, 0x10000, CRC(5c16b18d) SHA1(b5dead3e87c7ea99d95f125be5fe8b8f12f91410) ) /* Wild Star Red White & Blue Slots - 3 Coins Max / 1 Pay Line */
+
+	ROM_REGION( 0x020000, "gfx1", 0 )
+	ROM_LOAD( "mro-cgxxxx.u77",  0x00000, 0x8000, BAD_DUMP CRC(c0eba866) SHA1(8f217aeb3e8028a5633d95e5612f1b55e601650f) ) /* Wrong CG set for X000864S, but IGT recycled graphics */
+	ROM_LOAD( "mgo-cgxxxx.u78",  0x08000, 0x8000, BAD_DUMP CRC(345eaea2) SHA1(18ebb94a323e1cf671201db8b9f85d4f30d8b5ec) ) /* so many CG rom sets can support many different games */
+	ROM_LOAD( "mbo-cgxxxx.u79",  0x10000, 0x8000, BAD_DUMP CRC(fa130af6) SHA1(aca5e52e00bc75a4801fd3f6c564e62ed4251d8e) ) /* but the colors will be completly wrong               */
+	ROM_LOAD( "mxo-cgxxxx.u80",  0x18000, 0x8000, BAD_DUMP CRC(7de1812c) SHA1(c7e23a10f20fc8b618df21dd33ac456e1d2cfe33) ) /* The actual correct CG rom set is currently unknown   */
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "capxxxxx.u43", 0x0000, 0x0200, BAD_DUMP CRC(93057296) SHA1(534bbf8ee80a22822d577f6685501f4c929987ef) ) /* Wrong CAPX color chip for X000864S */
 ROM_END
 
 ROM_START( pex0998s ) /* Superboard : Triple Triple Diamond Slots (X000998S+XS000006) - Payout 92.47% */
@@ -12976,7 +13220,7 @@ ROM_START( pexmp026 ) /* Superboard : 5-in-1 Wingboard (XMP00026) Program in Spa
 	ROM_LOAD( "capx2346.u43", 0x0000, 0x0200, CRC(8df8ad29) SHA1(2d6a598fdc4290abe83a3d95c0ec8da6eb0f0e84) )
 ROM_END
 
-ROM_START( pexmp030 ) /* Superboard : 5-in-1 Wingboard (XMP00030) */
+ROM_START( pexmp030 ) /* Superboard : 5-in-1 Wingboard (XMP00030) - PSR Verified */
 /*
 
 The CG2451 set supersedes CG2298 & CG2426 and adds graphics support for the following XnnnnnnP Data game types (as displayed):
@@ -12987,7 +13231,7 @@ The CG2451 set supersedes CG2298 & CG2426 and adds graphics support for the foll
 	ROM_LOAD( "xmp00030.u67",   0x00000, 0x10000, CRC(da3fcb6f) SHA1(114e581e5ebb5c40c3f3da2784122d3281f269ee) ) /*  11/12/00   @ IGT  L01-0197  */
 
 	ROM_REGION( 0x10000, "user1", 0 )
-	ROM_LOAD( "x002037p.u66",   0x00000, 0x10000, CRC(12aea90e) SHA1(26ff0e7b81271252573739f26db9d20f35af274b) ) /* Nevada Bonus Poker */
+	ROM_LOAD( "x002377p.u66",   0x00000, 0x10000, CRC(541320d2) SHA1(670b17432e994fe1937091e5e96e1d58b9afbf29) ) /* Super Double Bonus Poker */
 
 	ROM_REGION( 0x10000, "user2", 0 )
 	ROM_LOAD( "x002111p.u66",   0x00000, 0x10000, CRC(f19dd63e) SHA1(0fe16cd0c75a9759e34bf95ce428e5b2da236215) ) /* 4 of a Kind Bonus Poker with Sequential Royal Flush */
@@ -13006,35 +13250,6 @@ The CG2451 set supersedes CG2298 & CG2426 and adds graphics support for the foll
 	ROM_LOAD( "mgo-cg2451.u78",  0x10000, 0x10000, CRC(b1a746b5) SHA1(64bb1a4e57d693010004a585503e46892afecb8f) )
 	ROM_LOAD( "mbo-cg2451.u79",  0x20000, 0x10000, CRC(ecfd6737) SHA1(4b563dbf76e81b49d2736c6eaeab243173e8e51b) )
 	ROM_LOAD( "mxo-cg2451.u80",  0x30000, 0x10000, CRC(ac1395c9) SHA1(ce1fb78b0440c80da0d6b99b6f6369861da212df) )
-
-	ROM_REGION( 0x200, "proms", 0 )
-	ROM_LOAD( "capx2298.u43", 0x0000, 0x0200, CRC(77856036) SHA1(820487c8494965408402ddee6a54511906218e66) )
-ROM_END
-
-ROM_START( pexmp030a ) /* Superboard : 5-in-1 Wingboard (XMP00030) */
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "xmp00030.u67",   0x00000, 0x10000, CRC(da3fcb6f) SHA1(114e581e5ebb5c40c3f3da2784122d3281f269ee) ) /*  11/12/00   @ IGT  L01-0197  */
-
-	ROM_REGION( 0x10000, "user1", 0 )
-	ROM_LOAD( "x002066p.u66",   0x00000, 0x10000, CRC(01236011) SHA1(3edfee014705b3540386c5e42026ab93628b2597) ) /* Double Double Bonus Poker */
-
-	ROM_REGION( 0x10000, "user2", 0 )
-	ROM_LOAD( "x000158p.u66",   0x00000, 0x10000, CRC(51a8a294) SHA1(f76992729ceaca18af82ab2fb3403dc5a48b7e8a) ) /* 4 of a Kind Bonus Poker */
-
-	ROM_REGION( 0x10000, "user3", 0 )
-	ROM_LOAD( "x000536p.u66",   0x00000, 0x10000, CRC(0b18dc1b) SHA1(07350fe258441f8565bfd875342823149b7757f1) ) /* Joker Poker */
-
-	ROM_REGION( 0x10000, "user4", 0 )
-	ROM_LOAD( "x002377p.u66",   0x00000, 0x10000, CRC(541320d2) SHA1(670b17432e994fe1937091e5e96e1d58b9afbf29) ) /* Super Double Bonus Poker */
-
-	ROM_REGION( 0x10000, "user5", 0 )
-	ROM_LOAD( "x002440p.u66",   0x00000, 0x10000, CRC(2ecb28cc) SHA1(a7b902bdfbf8f5ceedc778b8408c39ee279a1a1d) ) /* Deuces Wild Poker */
-
-	ROM_REGION( 0x040000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg2426.u77",  0x00000, 0x10000, CRC(e7622901) SHA1(f653aaf02de840aef56d3efd7680572356e94da7) ) /*  05/29/98   @ IGT  L98-1765  */
-	ROM_LOAD( "mgo-cg2426.u78",  0x10000, 0x10000, CRC(5c8388a0) SHA1(c883bf7969850d07f37fa0fd58f82cda4cf15654) )
-	ROM_LOAD( "mbo-cg2426.u79",  0x20000, 0x10000, CRC(dc6e39aa) SHA1(7a7188757f5be25521a023d1315cfd7c395b6c25) )
-	ROM_LOAD( "mxo-cg2426.u80",  0x30000, 0x10000, CRC(a32f42a2) SHA1(87ddc4dda7c198ed62a2a065507efe4d3a016236) )
 
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "capx2298.u43", 0x0000, 0x0200, CRC(77856036) SHA1(820487c8494965408402ddee6a54511906218e66) )
@@ -13165,6 +13380,7 @@ GAMEL(1987, pepp0178,  pepp0158, peplus,  peplus_poker, peplus_state, peplus,   
 GAMEL(1987, pepp0181,  pepp0002, peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0181) Standard Draw Poker",           0, layout_pe_poker )
 GAMEL(1987, pepp0188,  pepp0002, peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0188) Standard Draw Poker (set 1)",   0, layout_pe_poker )
 GAMEL(1987, pepp0188a, pepp0002, peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0188) Standard Draw Poker (set 2)",   0, layout_pe_poker )
+GAMEL(1987, pepp0188b, pepp0002, peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0188) Standard Draw Poker (set 3)",   0, layout_pe_poker )
 GAMEL(1987, pepp0189,  pepp0002, peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0189) Standard Draw Poker",           0, layout_pe_poker )
 GAMEL(1987, pepp0190,  pepp0055, peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0190) Deuces Wild Poker (set 1)",     0, layout_pe_poker )
 GAMEL(1987, pepp0190a, pepp0055, peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0190) Deuces Wild Poker (set 2)",     0, layout_pe_poker )
@@ -13226,6 +13442,7 @@ GAMEL(1987, pepp0431,  pepp0127, peplus,  peplus_poker, peplus_state, peplus,   
 GAMEL(1987, pepp0434,  0,        peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0434) Bonus Poker Deluxe",            0, layout_pe_poker )
 GAMEL(1987, pepp0447,  pepp0002, peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0447) Standard Draw Poker (set 1)",   0, layout_pe_poker )
 GAMEL(1987, pepp0447a, pepp0002, peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0447) Standard Draw Poker (set 2)",   0, layout_pe_poker )
+GAMEL(1987, pepp0447b, pepp0002, peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0447) Standard Draw Poker (set 3)",   0, layout_pe_poker )
 GAMEL(1987, pepp0449,  pepp0002, peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0449) Standard Draw Poker",           0, layout_pe_poker )
 GAMEL(1987, pepp0449a, pepp0002, peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0449) Standard Draw Poker (International English/Spanish)", 0, layout_pe_poker )
 GAMEL(1987, pepp0452,  0,        peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0452) Double Deuces Wild Poker",      0, layout_pe_poker )
@@ -13306,8 +13523,12 @@ GAMEL(1987, peip0118,  peip0031, peplus,  peplus_poker, peplus_state, nonplus,  
 GAMEL(1987, peip0120,  peip0031, peplus,  peplus_poker, peplus_state, nonplus,  ROT0,  "IGT - International Game Technology", "Player's Edge Plus (IP0120) Standard Draw Poker - French",  0, layout_pe_poker )
 
 /* Normal board : Multi-Game - Player's Choice - Some sets require a printer (not yet supported) */
-GAMEL(1994, pemg0183,  0,        peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Montana Choice (MG0183) Multi-Game",                        MACHINE_NOT_WORKING, layout_pe_poker) /* Needs printer support */
-GAMEL(1994, pemg0252,  0,        peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Choice (MG0252) Multi-Game",                       MACHINE_NOT_WORKING, layout_pe_poker) /* Needs printer support */
+GAMEL(1994, pemg0025,  0,        peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Montana Choice (MG0025) Multi-Game",                        MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER, layout_pe_poker) /* Needs printer */
+GAMEL(1994, pemg0026,  0,        peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Montana Choice (MG0026) Multi-Game",                        MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER, layout_pe_poker) /* Needs printer */
+GAMEL(1994, pemg0182,  0,        peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Montana Choice (MG0182) Multi-Game",                        MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER, layout_pe_poker) /* Needs printer & touchscreen support */
+GAMEL(1994, pemg0183,  0,        peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Montana Choice (MG0183) Multi-Game",                        MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER, layout_pe_poker) /* Needs printer support */
+GAMEL(1994, pemg0213,  0,        peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Choice (MG0213) Multi-Game",                       MACHINE_NOT_WORKING | MACHINE_WRONG_COLORS | MACHINE_NODEVICE_PRINTER, layout_pe_poker) /* Needs printer support & CAPX2329 not dumped*/
+GAMEL(1994, pemg0252,  0,        peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Choice (MG0252) Multi-Game",                       MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER, layout_pe_poker) /* Needs printer support */
 
 /* Normal board : Blackjack */
 GAMEL(1994, pebe0014,  0,        peplus, peplus_bjack,  peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (BE0014) Blackjack",                     0, layout_pe_bjack )
@@ -13316,13 +13537,13 @@ GAMEL(1994, pebe0014a, pebe0014, peplus, peplus_bjack,  peplus_state, peplus,   
 /* Normal board : Keno */
 GAMEL(1994, peke0004,  0,        peplus, peplus_keno,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (KE0004) Keno",                          MACHINE_NOT_WORKING, layout_pe_keno )
 GAMEL(1994, peke0017,  peke0004, peplus, peplus_keno,   peplus_state, nonplus,  ROT0,  "IGT - International Game Technology", "Player's Edge Plus (KE0017) Keno",                          MACHINE_NOT_WORKING, layout_pe_keno )
-GAMEL(1994, peke1001,  0,        peplus, peplus_keno,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (KE1001) Keno",                          0, layout_pe_keno )
-GAMEL(1994, peke1006,  peke1001, peplus, peplus_keno,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (KE1006) Keno",                          0, layout_pe_keno )
-GAMEL(1994, peke1012,  peke1001, peplus, peplus_keno,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (KE1012) Keno (set 1)",                  0, layout_pe_keno )
-GAMEL(1994, peke1012a, peke1001, peplus, peplus_keno,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (KE1012) Keno (set 2)",                  0, layout_pe_keno )
-GAMEL(1994, peke1012b, peke1001, peplus, peplus_keno,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (KE1012) Keno (set 3)",                  0, layout_pe_keno )
-GAMEL(1994, peke1013,  peke1001, peplus, peplus_keno,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (KE1013) Keno (set 1)",                  0, layout_pe_keno )
-GAMEL(1994, peke1013a, peke1001, peplus, peplus_keno,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (KE1013) Keno (set 2)",                  0, layout_pe_keno )
+GAMEL(1994, peke1001,  0,        peplus, peplus_keno,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (KE1001) Keno",                          MACHINE_NOT_WORKING, layout_pe_keno )
+GAMEL(1994, peke1006,  peke1001, peplus, peplus_keno,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (KE1006) Keno",                          MACHINE_NOT_WORKING, layout_pe_keno )
+GAMEL(1994, peke1012,  peke1001, peplus, peplus_keno,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (KE1012) Keno (set 1)",                  MACHINE_NOT_WORKING, layout_pe_keno )
+GAMEL(1994, peke1012a, peke1001, peplus, peplus_keno,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (KE1012) Keno (set 2)",                  MACHINE_NOT_WORKING, layout_pe_keno )
+GAMEL(1994, peke1012b, peke1001, peplus, peplus_keno,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (KE1012) Keno (set 3)",                  MACHINE_NOT_WORKING, layout_pe_keno )
+GAMEL(1994, peke1013,  peke1001, peplus, peplus_keno,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (KE1013) Keno (set 1)",                  MACHINE_NOT_WORKING, layout_pe_keno )
+GAMEL(1994, peke1013a, peke1001, peplus, peplus_keno,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (KE1013) Keno (set 2)",                  MACHINE_NOT_WORKING, layout_pe_keno )
 
 /* Normal board : Slots machine */
 GAMEL(1996, peps0014, 0,        peplus, peplus_slots,   peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PS0014) Super Joker Slots",                0, layout_pe_slots )
@@ -13437,6 +13658,7 @@ GAMEL(1995, pex0726p,  0,         peplus,  peplus_poker, peplus_state, peplussb,
 GAMEL(1995, pex0727p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X000727P+XP000038) Double Bonus Poker",  0, layout_pe_poker )
 GAMEL(1995, pex0763p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X000763P+XP000038) 4 of a Kind Bonus Poker", 0,layout_pe_poker )
 GAMEL(1995, pex0764p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X000764P+XP000038) 4 of a Kind Bonus Poker", 0,layout_pe_poker )
+GAMEL(1995, pex2002p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X002002P+XP000038) Double Double Bonus Poker", 0, layout_pe_poker )
 GAMEL(1995, pex2010p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X002010P+XP000038) Nevada Bonus Poker",  0, layout_pe_poker )
 GAMEL(1995, pex2016p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X002016P+XP000038) Full House Bonus Poker", 0, layout_pe_poker )
 GAMEL(1995, pex2017p,  0,         peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X002017P+XP000038) Full House Bonus Poker", 0, layout_pe_poker )
@@ -13560,14 +13782,15 @@ GAMEL(1995, pexmp017b, pexmp017, peplus,  peplus_poker, peplus_state, peplussbw,
 GAMEL(1995, pexmp022,  0,        peplus,  peplus_poker, peplus_state, peplussbw,ROT0,  "IGT - International Game Technology", "Player's Edge Plus (XMP00022) 5-in-1 Wingboard (CG2346) - Spanish", 0, layout_pe_poker )
 GAMEL(1995, pexmp026,  0,        peplus,  peplus_poker, peplus_state, peplussbw,ROT0,  "IGT - International Game Technology", "Player's Edge Plus (XMP00026) 5-in-1 Wingboard (CG2346) - Spanish", 0, layout_pe_poker )
 GAMEL(1995, pexmp030,  0,        peplus,  peplus_poker, peplus_state, peplussbw,ROT0,  "IGT - International Game Technology", "Player's Edge Plus (XMP00030) 5-in-1 Wingboard (CG2451)",   0, layout_pe_poker )
-GAMEL(1995, pexmp030a, pexmp030, peplus,  peplus_poker, peplus_state, peplussbw,ROT0,  "IGT - International Game Technology", "Player's Edge Plus (XMP00030) 5-in-1 Wingboard (CG2426)",   0, layout_pe_poker )
 
 /* Superboard : Keno */
 GAMEL(1995, pex0006k,  0,        peplus,  peplus_keno,  peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X000006K+XK000001) Keno",               MACHINE_NOT_WORKING, layout_pe_keno )
 GAMEL(1995, pex0013k,  pex0006k, peplus,  peplus_keno,  peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X000013K+XK000011) Keno",               MACHINE_NOT_WORKING, layout_pe_keno )
+GAMEL(1995, pex0013ka, pex0006k, peplus,  peplus_keno,  peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X000013K+XK000012) Keno",               MACHINE_NOT_WORKING, layout_pe_keno )
 
 /* Superboard : Slots machine */
-GAMEL(1997, pex0838s, 0,        peplus,  peplus_slots, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X000838S+XS000002) Five Times Pay Slots",        0, layout_pe_slots )
-GAMEL(1997, pex0841s, pex0838s, peplus,  peplus_slots, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X000841S+XS000002) Five Times Pay Slots",        0, layout_pe_slots )
-GAMEL(1997, pex0998s, 0,        peplus,  peplus_slots, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X000998S+XS000006) Triple Triple Diamond Slots", 0, layout_pe_slots )
-GAMEL(1997, pex1087s, 0,        peplus,  peplus_slots, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X001087S+XS000006) Double Double Diamond Slots", MACHINE_WRONG_COLORS, layout_pe_slots ) /* CAPX2415 not dumped */
+GAMEL(1997, pex0838s, 0,        peplus,  peplus_slots, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X000838S+XS000002) Five Times Pay Slots",             0, layout_pe_slots )
+GAMEL(1997, pex0841s, pex0838s, peplus,  peplus_slots, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X000841S+XS000002) Five Times Pay Slots",             0, layout_pe_slots )
+GAMEL(1997, pex0846s, 0,        peplus,  peplus_slots, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X000846S+XS000006) Wild Star Red White & Blue Slots", MACHINE_WRONG_COLORS, layout_pe_slots ) /* Wrong CG graphics and CAPX color chip */
+GAMEL(1997, pex0998s, 0,        peplus,  peplus_slots, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X000998S+XS000006) Triple Triple Diamond Slots",      0, layout_pe_slots )
+GAMEL(1997, pex1087s, 0,        peplus,  peplus_slots, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (X001087S+XS000006) Double Double Diamond Slots",      MACHINE_WRONG_COLORS, layout_pe_slots ) /* CAPX2415 not dumped */

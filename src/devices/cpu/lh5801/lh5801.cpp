@@ -248,8 +248,8 @@ void lh5801_cpu_device::execute_set_input(int irqline, int state)
 	}
 }
 
-offs_t lh5801_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t lh5801_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( lh5801 );
-	return CPU_DISASSEMBLE_NAME(lh5801)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(lh5801)(this, stream, pc, oprom, opram, options);
 }

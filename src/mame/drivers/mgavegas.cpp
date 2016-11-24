@@ -369,7 +369,7 @@ WRITE8_MEMBER(mgavegas_state::cso1_w)
 	update_custom();
 
 	hopper_data=(m_hop&0x01)<<7;
-	m_ticket->write(machine().driver_data()->generic_space(), 0, hopper_data);
+	m_ticket->write(machine().dummy_space(), 0, hopper_data);
 }
 
 WRITE8_MEMBER(mgavegas_state::cso2_w)
@@ -486,7 +486,7 @@ INPUT_PORTS_END
 void mgavegas_state::machine_reset()
 {
 	m_int=1;
-	m_custom_data=U64(0xffffffffffffffff);
+	m_custom_data=0xffffffffffffffffU;
 
 	m_old_ckmod=1;
 	m_old_emod=0;

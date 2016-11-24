@@ -540,13 +540,13 @@ void COutArchive::WriteHeader(
   */
   _useAlign = true;
 
-  unsigned i;
-  
-  UInt64 packedSize = 0;
-  for (i = 0; i < db.PackSizes.Size(); i++)
-    packedSize += db.PackSizes[i];
+  {
+    UInt64 packSize = 0;
+    FOR_VECTOR (i, db.PackSizes)
+      packSize += db.PackSizes[i];
+    headerOffset = packSize;
+  }
 
-  headerOffset = packedSize;
 
   WriteByte(NID::kHeader);
 
@@ -560,7 +560,7 @@ void COutArchive::WriteHeader(
 
     CRecordVector<UInt64> unpackSizes;
     CUInt32DefVector digests;
-    for (i = 0; i < db.Files.Size(); i++)
+    FOR_VECTOR (i, db.Files)
     {
       const CFileItem &file = db.Files[i];
       if (!file.HasStream)
@@ -588,14 +588,17 @@ void COutArchive::WriteHeader(
     CBoolVector emptyStreamVector;
     emptyStreamVector.ClearAndSetSize(db.Files.Size());
     unsigned numEmptyStreams = 0;
-    for (i = 0; i < db.Files.Size(); i++)
-      if (db.Files[i].HasStream)
-        emptyStreamVector[i] = false;
-      else
-      {
-        emptyStreamVector[i] = true;
-        numEmptyStreams++;
-      }
+    {
+      FOR_VECTOR (i, db.Files)
+        if (db.Files[i].HasStream)
+          emptyStreamVector[i] = false;
+        else
+        {
+          emptyStreamVector[i] = true;
+          numEmptyStreams++;
+        }
+    }
+
     if (numEmptyStreams != 0)
     {
       WritePropBoolVector(NID::kEmptyStream, emptyStreamVector);
@@ -605,7 +608,8 @@ void COutArchive::WriteHeader(
       antiVector.ClearAndSetSize(numEmptyStreams);
       bool thereAreEmptyFiles = false, thereAreAntiItems = false;
       unsigned cur = 0;
-      for (i = 0; i < db.Files.Size(); i++)
+      
+      FOR_VECTOR (i, db.Files)
       {
         const CFileItem &file = db.Files[i];
         if (file.HasStream)
@@ -672,17 +676,21 @@ void COutArchive::WriteHeader(
     CBoolVector boolVector;
     boolVector.ClearAndSetSize(db.Files.Size());
     unsigned numDefined = 0;
-    for (i = 0; i < db.Files.Size(); i++)
+    
     {
-      bool defined = db.Files[i].AttribDefined;
-      boolVector[i] = defined;
-      if (defined)
-        numDefined++;
+      FOR_VECTOR (i, db.Files)
+      {
+        bool defined = db.Files[i].AttribDefined;
+        boolVector[i] = defined;
+        if (defined)
+          numDefined++;
+      }
     }
+    
     if (numDefined != 0)
     {
       WriteAlignedBoolHeader(boolVector, numDefined, NID::kWinAttrib, 4);
-      for (i = 0; i < db.Files.Size(); i++)
+      FOR_VECTOR (i, db.Files)
       {
         const CFileItem &file = db.Files[i];
         if (file.AttribDefined)

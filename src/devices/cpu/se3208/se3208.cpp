@@ -1803,7 +1803,7 @@ void se3208_device::device_start()
 	state_add(STATE_GENPC, "GENPC", m_PC).noshow();
 	state_add(STATE_GENPCBASE, "CURPC", m_PPC).noshow();
 	state_add(STATE_GENSP, "GENSP", m_SP).noshow();
-	state_add(STATE_GENFLAGS, "GENFLAGS", m_SR).formatstr("%10s").noshow();	
+	state_add(STATE_GENFLAGS, "GENFLAGS", m_SR).formatstr("%10s").noshow();
 
 	m_icountptr = &m_icount;
 }
@@ -1838,8 +1838,8 @@ void se3208_device::execute_set_input( int line, int state )
 		m_IRQ=state;
 }
 
-offs_t se3208_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t se3208_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( se3208 );
-	return CPU_DISASSEMBLE_NAME(se3208)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(se3208)(this, stream, pc, oprom, opram, options);
 }

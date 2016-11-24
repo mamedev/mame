@@ -156,7 +156,7 @@ private:
 };
 
 #define MCFG_80286_A20(_class, _a20_cb) \
-		i80286_cpu_device::static_set_a20_callback(*device, i80286_cpu_device::a20_cb(FUNC(_class::_a20_cb), (_class *)owner));
+		i80286_cpu_device::static_set_a20_callback(*device, i80286_cpu_device::a20_cb(&_class::_a20_cb, (_class *)owner));
 
 #define MCFG_80286_SHUTDOWN(_devcb) \
 	devcb = &i80286_cpu_device::static_set_shutdown_callback(*device, DEVCB_##_devcb);

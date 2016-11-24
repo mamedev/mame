@@ -167,7 +167,7 @@ DIRECT_UPDATE_MEMBER(z80ne_state::z80ne_nmi_delay_count)
 
 	if (!m_nmi_delay_counter)
 	{
-		m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(z80ne_state::z80ne_default), this));
+		m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(&z80ne_state::z80ne_default, this));
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 	return address;
@@ -190,7 +190,7 @@ DIRECT_UPDATE_MEMBER(z80ne_state::z80ne_reset_delay_count)
 	if (!m_reset_delay_counter)
 	{
 		/* remove this callback */
-		m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(z80ne_state::z80ne_default), this));
+		m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(&z80ne_state::z80ne_default, this));
 		/* and switch to RAM bank at address 0x0000 */
 		m_bank1->set_entry( 0 ); /* RAM at 0x0000 (bank 1) */
 	}
@@ -211,7 +211,7 @@ void z80ne_state::reset_lx382_banking()
 
 	/* after the first 3 bytes have been read from ROM, switch the RAM back in */
 	m_reset_delay_counter = 2;
-	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(z80ne_state::z80ne_reset_delay_count), this));
+	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(&z80ne_state::z80ne_reset_delay_count, this));
 }
 
 void z80ne_state::reset_lx390_banking()
@@ -228,7 +228,7 @@ void z80ne_state::reset_lx390_banking()
 		m_bank4->set_entry(0);  /* RAM   at 0xF000 */
 		/* after the first 3 bytes have been read from ROM, switch the RAM back in */
 		m_reset_delay_counter = 2;
-		m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(z80ne_state::z80ne_reset_delay_count), this));
+		m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(&z80ne_state::z80ne_reset_delay_count, this));
 		break;
 	case 0x02: /* EP548  16k BASIC */
 		if (VERBOSE)
@@ -237,7 +237,7 @@ void z80ne_state::reset_lx390_banking()
 		m_bank2->set_entry(1);  /* ep548 at 0x0400-0x3FFF */
 		m_bank3->set_entry(0);  /* RAM   at 0x8000 */
 		m_bank4->set_entry(0);  /* RAM   at 0xF000 */
-		m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(z80ne_state::z80ne_default), this));
+		m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(&z80ne_state::z80ne_default, this));
 		break;
 	case 0x03: /* EP390  Boot Loader for 5.5k floppy BASIC */
 		if (VERBOSE)
@@ -246,7 +246,7 @@ void z80ne_state::reset_lx390_banking()
 		m_bank2->set_entry(0);  /* RAM   at 0x0400-0x3FFF */
 		m_bank3->set_entry(0);  /* RAM   at 0x8000 */
 		m_bank4->set_entry(1);  /* ep390 at 0xF000 */
-		m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(z80ne_state::z80ne_default), this));
+		m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(&z80ne_state::z80ne_default, this));
 		break;
 	case 0x04: /* EP1390 Boot Loader for NE DOS 1.0/1.5 */
 		if (VERBOSE)
@@ -255,7 +255,7 @@ void z80ne_state::reset_lx390_banking()
 		m_bank2->set_entry(0);  /* RAM   at 0x0400-0x3FFF */
 		m_bank3->set_entry(0);  /* RAM   at 0x8000 */
 		m_bank4->set_entry(2);  /* ep1390 at 0xF000 */
-		m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(z80ne_state::z80ne_default), this));
+		m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(&z80ne_state::z80ne_default, this));
 		break;
 	case 0x05: /* EP2390 Boot Loader for NE DOS G.1 */
 		if (VERBOSE)
@@ -264,7 +264,7 @@ void z80ne_state::reset_lx390_banking()
 		m_bank2->set_entry(0);  /* RAM   at 0x0400-0x3FFF */
 		m_bank3->set_entry(0);  /* RAM   at 0x8000 */
 		m_bank4->set_entry(3);  /* ep2390 at 0xF000 */
-		m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(z80ne_state::z80ne_default), this));
+		m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(&z80ne_state::z80ne_default, this));
 		break;
 	}
 
@@ -467,7 +467,7 @@ WRITE8_MEMBER(z80ne_state::lx383_w)
 	{
 		/* after writing to port 0xF8 and the first ~M1 cycles strike a NMI for single step execution */
 		m_nmi_delay_counter = 1;
-		m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(z80ne_state::z80ne_nmi_delay_count), this));
+		m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(&z80ne_state::z80ne_nmi_delay_count, this));
 	}
 }
 

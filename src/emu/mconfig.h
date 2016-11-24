@@ -15,8 +15,8 @@
 #error Dont include this file directly; include emu.h instead.
 #endif
 
-#ifndef __MCONFIG_H__
-#define __MCONFIG_H__
+#ifndef MAME_EMU_MCONFIG_H
+#define MAME_EMU_MCONFIG_H
 
 //**************************************************************************
 //  CONSTANTS
@@ -38,8 +38,8 @@ struct internal_layout
 {
 	size_t decompressed_size;
 	size_t compressed_size;
-	uint8_t compression_type;
-	const uint8_t* data;
+	u8 compression_type;
+	const u8* data;
 };
 
 
@@ -73,8 +73,8 @@ public:
 	const internal_layout *            m_default_layout;           // default layout for this machine
 
 	// helpers during configuration; not for general use
-	device_t *device_add(device_t *owner, const char *tag, device_type type, uint32_t clock);
-	device_t *device_replace(device_t *owner, const char *tag, device_type type, uint32_t clock);
+	device_t *device_add(device_t *owner, const char *tag, device_type type, u32 clock);
+	device_t *device_replace(device_t *owner, const char *tag, device_type type, u32 clock);
 	device_t *device_remove(device_t *owner, const char *tag);
 	device_t *device_find(device_t *owner, const char *tag);
 
@@ -211,5 +211,5 @@ References an external machine config.
 #define MCFG_DEVICE_MODIFY(_tag)    \
 	device = config.device_find(owner, _tag);
 
-#endif  /* __MCONFIG_H__ */
-	/** @} */
+#endif  /* MAME_EMU_MCONFIG_H */
+/** @} */

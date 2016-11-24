@@ -366,7 +366,7 @@ READ8_MEMBER( svi3x8_state::mreq_r )
 	uint8_t data = m_expander->mreq_r(space, offset);
 
 	if (ROMCS)
-		data = m_basic->u8(offset);
+		data = m_basic->as_u8(offset);
 
 	if (m_bk21 == 0 && IS_SVI328 && offset < 0x8000)
 		data = m_ram->read(offset);

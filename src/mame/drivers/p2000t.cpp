@@ -78,10 +78,10 @@ static const gfx_layout p2000m_charlayout =
 
 PALETTE_INIT_MEMBER(p2000t_state,p2000m)
 {
-	palette.set_pen_color(0,rgb_t::white); /* white */
-	palette.set_pen_color(1,rgb_t::black); /* black */
-	palette.set_pen_color(2,rgb_t::black); /* black */
-	palette.set_pen_color(3,rgb_t::white); /* white */
+	palette.set_pen_color(0,rgb_t::white()); /* white */
+	palette.set_pen_color(1,rgb_t::black()); /* black */
+	palette.set_pen_color(2,rgb_t::black()); /* black */
+	palette.set_pen_color(3,rgb_t::white()); /* white */
 }
 
 static GFXDECODE_START( p2000m )

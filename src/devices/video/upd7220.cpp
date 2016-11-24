@@ -816,11 +816,12 @@ void upd7220_device::draw_line(int x, int y)
 {
 	int xi, yi;
 	int d = (m_figs.m_d & 0x2000) ? (int16_t)(m_figs.m_d | 0xe000) : m_figs.m_d;
+	int d1 = (m_figs.m_d1 & 0x2000) ? (int16_t)(m_figs.m_d1 | 0xe000) : m_figs.m_d1;
 	int d2 = (m_figs.m_d2 & 0x2000) ? (int16_t)(m_figs.m_d2 | 0xe000) : m_figs.m_d2;
 	uint16_t pattern = (m_ra[8]) | (m_ra[9]<<8);
 	const int dot_dir[4] = {1, -1, -1, 1};
 
-	LOG(("uPD7220 line check: %d %d %02x %08x %d %d %d\n",x,y,m_figs.m_dir,m_ead,m_figs.m_d1,m_figs.m_dc,m_bitmap_mod));
+	LOG(("uPD7220 line check: %d %d %02x %08x %d %d %d\n",x,y,m_figs.m_dir,m_ead,d1,m_figs.m_dc,m_bitmap_mod));
 
 	for(yi = xi = 0; yi <= m_figs.m_dc; yi++)
 	{
@@ -840,7 +841,7 @@ void upd7220_device::draw_line(int x, int y)
 			d += d2;
 		}
 		else
-			d += m_figs.m_d1;
+			d += d1;
 	}
 
 	switch(m_figs.m_dir & 3)
@@ -866,48 +867,34 @@ void upd7220_device::draw_line(int x, int y)
 
 void upd7220_device::draw_arc(int x, int y)
 {
-	int xi = m_figs.m_d + 1, yi = 0, err = -m_figs.m_d;
-	int x0, y0;
+	int xi = 0, err = -m_figs.m_d, d = m_figs.m_d + 1;
 	uint16_t pattern = (m_ra[8]) | (m_ra[9]<<8);
 	const int dot_dir[4] = {1, -1, -1, 1};
 
-	switch(m_figs.m_dir & 3)
-	{
-		case 1:
-		case 2:
-			x0 = x;
-			y0 = y + xi * dot_dir[m_figs.m_dir >> 1];
-			break;
-		default:
-			x0 = x + xi * dot_dir[((m_figs.m_dir >> 1) + 3) & 3];
-			y0 = y;
-			break;
-	}
-
 	LOG(("uPD7220 arc check: %d %d %02x %08x %d %d %d\n",x,y,m_figs.m_dir,m_ead,m_figs.m_dm,m_figs.m_dc,m_figs.m_d));
 
-	for(int i = 0; i <= m_figs.m_dc; i++)
+	for(int yi = 0; yi <= m_figs.m_dc; yi++)
 	{
-		if(i >= m_figs.m_dm)
+		if(yi >= m_figs.m_dm)
 		{
 			switch(m_figs.m_dir & 3)
 			{
 				case 1:
 				case 2:
-					draw_pixel(yi * dot_dir[((m_figs.m_dir >> 1) + 3) & 3] + x0, xi * dot_dir[m_figs.m_dir >> 1] + y0, i, pattern);
+					draw_pixel(yi * dot_dir[((m_figs.m_dir >> 1) + 3) & 3] + x, xi * dot_dir[m_figs.m_dir >> 1] + y, yi, pattern);
 					break;
 				default:
-					draw_pixel(xi * dot_dir[m_figs.m_dir >> 1] + x0, yi * dot_dir[((m_figs.m_dir >> 1) + 3) & 3] + y0, i, pattern);
+					draw_pixel(xi * dot_dir[((m_figs.m_dir >> 1) + 3) & 3] + x, yi * dot_dir[m_figs.m_dir >> 1] + y, yi, pattern);
 					break;
 			}
 		}
-		yi++;
 		if(err < 0)
 			err += (yi + 1) << 1;
 		else
 		{
-			xi--;
-			err += (yi - xi + 1) << 1;
+			xi++;
+			d--;
+			err += (yi - d + 1) << 1;
 		}
 	}
 	switch(m_figs.m_dir & 3)

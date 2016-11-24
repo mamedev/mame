@@ -109,7 +109,7 @@ int core_strwildcmp(const char *sp1, const char *sp2)
 
 
 /*-------------------------------------------------
-    core_strdup - string duplication via osd_malloc
+    core_strdup - string duplication via malloc
 -------------------------------------------------*/
 
 char *core_strdup(const char *str)
@@ -117,7 +117,7 @@ char *core_strdup(const char *str)
 	char *cpy = nullptr;
 	if (str != nullptr)
 	{
-		cpy = (char *)osd_malloc_array(strlen(str) + 1);
+		cpy = (char *)malloc(strlen(str) + 1);
 		if (cpy != nullptr)
 			strcpy(cpy, str);
 	}

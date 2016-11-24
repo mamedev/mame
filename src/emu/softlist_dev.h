@@ -132,7 +132,7 @@ class software_list_device : public device_t
 
 public:
 	// construction/destruction
-	software_list_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	software_list_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 	// inline configuration helpers
 	static void static_set_type(device_t &device, const char *list, softlist_type list_type);

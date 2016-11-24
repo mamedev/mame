@@ -588,11 +588,11 @@ void arm_cpu_device::HandleBranch( uint32_t insn )
 	/* Sign-extend the 24-bit offset in our calculations */
 	if (off & 0x2000000u)
 	{
-		R15 -= ((~(off | 0xfc000000u)) + 1) - 8;
+		R15 = ((R15 - (((~(off | 0xfc000000u)) + 1) - 8)) & ADDRESS_MASK) | (R15 & ~ADDRESS_MASK);
 	}
 	else
 	{
-		R15 += off + 8;
+		R15 = ((R15 + (off + 8)) & ADDRESS_MASK) | (R15 & ~ADDRESS_MASK);
 	}
 	m_icount -= 2 * S_CYCLE + N_CYCLE;
 }
@@ -675,7 +675,7 @@ void arm_cpu_device::HandleMemSingle( uint32_t insn )
 		{
 			if (rd == eR15)
 			{
-				R15 = (cpu_read32(rnv) & ADDRESS_MASK) | (R15 & PSR_MASK) | (R15 & MODE_MASK);
+				R15 = (cpu_read32(rnv) & ADDRESS_MASK) | (R15 & PSR_MASK) | (R15 & IRQ_MASK) | (R15 & MODE_MASK);
 
 				/*
 				The docs are explicit in that the bottom bits should be masked off
@@ -1122,7 +1122,16 @@ void arm_cpu_device::HandleMemBlock( uint32_t insn )
 			/* Incrementing */
 			if (!(insn & INSN_BDT_P)) rbp = rbp + (- 4);
 
-			result = loadInc( insn & 0xffff, rbp, insn&INSN_BDT_S );
+			// S Flag Set, but R15 not in list = Transfers to User Bank
+			if ((insn & INSN_BDT_S) && !(insn & 0x8000))
+			{
+				int curmode = MODE;
+				R15 = R15 & ~MODE_MASK;
+				result = loadInc( insn & 0xffff, rbp, insn&INSN_BDT_S );
+				R15 = R15 | curmode;
+			}
+			else
+				result = loadInc( insn & 0xffff, rbp, insn&INSN_BDT_S );
 
 			if (insn & 0x8000)
 			{
@@ -1163,8 +1172,17 @@ void arm_cpu_device::HandleMemBlock( uint32_t insn )
 				rbp = rbp - (- 4);
 			}
 
-			result = loadDec( insn&0xffff, rbp, insn&INSN_BDT_S, &deferredR15, &defer );
-
+			// S Flag Set, but R15 not in list = Transfers to User Bank
+			if ((insn & INSN_BDT_S) && !(insn & 0x8000))
+			{
+				int curmode = MODE;
+				R15 = R15 & ~MODE_MASK;
+				result = loadDec( insn&0xffff, rbp, insn&INSN_BDT_S, &deferredR15, &defer );
+				R15 = R15 | curmode;
+			}
+			else
+				result = loadDec( insn&0xffff, rbp, insn&INSN_BDT_S, &deferredR15, &defer );
+		
 			if (insn & INSN_BDT_W)
 			{
 				if (rb==0xf)
@@ -1210,7 +1228,18 @@ void arm_cpu_device::HandleMemBlock( uint32_t insn )
 			{
 				rbp = rbp + (- 4);
 			}
-			result = storeInc( insn&0xffff, rbp );
+
+			// S bit set = Transfers to User Bank
+			if (insn & INSN_BDT_S)
+			{
+				int curmode = MODE;
+				R15 = R15 & ~MODE_MASK;
+				result = storeInc( insn&0xffff, rbp );
+				R15 = R15 | curmode;
+			}
+			else
+				result = storeInc( insn&0xffff, rbp );
+
 			if( insn & INSN_BDT_W )
 			{
 				SetRegister(rb,GetRegister(rb)+result*4);
@@ -1223,7 +1252,18 @@ void arm_cpu_device::HandleMemBlock( uint32_t insn )
 			{
 				rbp = rbp - (- 4);
 			}
-			result = storeDec( insn&0xffff, rbp );
+
+			// S bit set = Transfers to User Bank
+			if (insn & INSN_BDT_S)
+			{
+				int curmode = MODE;
+				R15 = R15 & ~MODE_MASK;
+				result = storeDec( insn&0xffff, rbp );
+				R15 = R15 | curmode;
+			}
+			else
+				result = storeDec( insn&0xffff, rbp );
+
 			if( insn & INSN_BDT_W )
 			{
 				SetRegister(rb,GetRegister(rb)-result*4);
@@ -1262,8 +1302,9 @@ uint32_t arm_cpu_device::decodeShift(uint32_t insn, uint32_t *pCarry)
 		if (ARM_DEBUG_CORE && (insn&0x80)==0x80)
 			logerror("%08x:  RegShift ERROR (p36)\n",R15);
 
-		//see p35 for check on this
-		k = GetRegister(k >> 1)&0x1f;
+		// Only the least significant byte of the contents of Rs is used to determine the shift amount
+		k = GetRegister(k >> 1) & 0xff;
+
 		m_icount -= S_CYCLE;
 		if( k == 0 ) /* Register shift by 0 is a no-op */
 		{
@@ -1276,7 +1317,13 @@ uint32_t arm_cpu_device::decodeShift(uint32_t insn, uint32_t *pCarry)
 	switch (t >> 1)
 	{
 	case 0:                     /* LSL */
-		if (pCarry)
+		if (k >= 32)
+		{
+			if (pCarry)
+				*pCarry = (k == 32) ? rm & 1 : 0;
+			return 0;
+		}
+		else if (pCarry)
 		{
 			*pCarry = k ? (rm & (1 << (32 - k))) : (R15 & C_MASK);
 		}
@@ -1317,7 +1364,7 @@ uint32_t arm_cpu_device::decodeShift(uint32_t insn, uint32_t *pCarry)
 		if (k)
 		{
 			while (k > 32) k -= 32;
-			if (pCarry) *pCarry = rm & SIGN_BIT;
+			if (pCarry) *pCarry = rm & (1 << (k - 1));
 			return ROR(rm, k);
 		}
 		else
@@ -1506,15 +1553,15 @@ void arm_cpu_device::HandleCoPro( uint32_t insn )
 }
 
 
-offs_t arm_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t arm_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( arm );
-	return CPU_DISASSEMBLE_NAME(arm)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(arm)(this, stream, pc, oprom, opram, options);
 }
 
 
-offs_t arm_be_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t arm_be_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( arm_be );
-	return CPU_DISASSEMBLE_NAME(arm_be)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(arm_be)(this, stream, pc, oprom, opram, options);
 }

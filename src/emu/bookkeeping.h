@@ -8,19 +8,12 @@
 
 *********************************************************************/
 
+#ifndef MAME_EMU_BOOKKEEPING_H
+#define MAME_EMU_BOOKKEEPING_H
+
 #pragma once
 
-#ifndef __BOOKKEEPING_H__
-#define __BOOKKEEPING_H__
 
-
-
-/***************************************************************************
-    CONSTANTS
-***************************************************************************/
-
-/* total # of coin counters */
-#define COIN_COUNTERS           8
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -34,6 +27,9 @@ enum class config_type;
 class bookkeeping_manager
 {
 public:
+	// total # of coin counters
+	static constexpr size_t COIN_COUNTERS = 8;
+
 	// construction/destruction
 	bookkeeping_manager(running_machine &machine);
 
@@ -69,10 +65,10 @@ private:
 	// internal state
 	running_machine &   m_machine;                  // reference to our machine
 
-	uint32_t      m_dispensed_tickets;
-	uint32_t      m_coin_count[COIN_COUNTERS];
-	uint32_t      m_coinlockedout[COIN_COUNTERS];
-	uint32_t      m_lastcoin[COIN_COUNTERS];
+	u32                 m_dispensed_tickets;
+	u32                 m_coin_count[COIN_COUNTERS];
+	u32                 m_coinlockedout[COIN_COUNTERS];
+	u32                 m_lastcoin[COIN_COUNTERS];
 };
 
-#endif  /* __BOOKKEEPING_H__ */
+#endif  /* MAME_EMU_BOOKKEEPING_H */

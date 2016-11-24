@@ -123,7 +123,7 @@ WRITE8_MEMBER(ms0515_state::ms0515_sys_w)
 void ms0515_state::machine_reset()
 {
 	uint8_t *ram = m_ram->pointer();
-	ms0515_bank_w(machine().driver_data()->generic_space(),0,0);
+	ms0515_bank_w(machine().dummy_space(), 0, 0);
 
 	m_video_ram = ram + 0000000 + 0340000;
 	m_blink = 0;

@@ -25,6 +25,7 @@
 #define OPTION_WRITECONFIG          "writeconfig"
 
 // core search path options
+#define OPTION_HOMEPATH             "homepath"
 #define OPTION_MEDIAPATH            "rompath"
 #define OPTION_HASHPATH             "hashpath"
 #define OPTION_SAMPLEPATH           "samplepath"
@@ -214,6 +215,7 @@ public:
 	bool write_config() const { return bool_value(OPTION_WRITECONFIG); }
 
 	// core search path options
+	const char *home_path() const { return value(OPTION_HOMEPATH); }
 	const char *media_path() const { return value(OPTION_MEDIAPATH); }
 	const char *hash_path() const { return value(OPTION_HASHPATH); }
 	const char *sample_path() const { return value(OPTION_SAMPLEPATH); }

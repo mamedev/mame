@@ -153,7 +153,7 @@ namespace bgfx
 						case LCT_GREY:
 							for (uint32_t ii = 0, num = width*height; ii < num; ++ii)
 							{
-								uint16_t* rgba = (uint16_t*)out + ii*4;
+								uint16_t* rgba = (uint16_t*)out + ii;
 								rgba[0] = bx::toHostEndian(rgba[0], false);
 							}
 							format = bgfx::TextureFormat::R16;
@@ -163,12 +163,12 @@ namespace bgfx
 						case LCT_GREY_ALPHA:
 							for (uint32_t ii = 0, num = width*height; ii < num; ++ii)
 							{
-								uint16_t* rgba = (uint16_t*)out + ii*4;
+								uint16_t* rgba = (uint16_t*)out + ii*2;
 								rgba[0] = bx::toHostEndian(rgba[0], false);
 								rgba[1] = bx::toHostEndian(rgba[1], false);
 							}
-							format = bgfx::TextureFormat::R16;
-							bpp    = 16;
+							format = bgfx::TextureFormat::RG16;
+							bpp    = 32;
 							break;
 
 						case LCT_RGBA:
@@ -207,19 +207,20 @@ namespace bgfx
 
 			if (loaded)
 			{
-				_imageContainer.m_data     = *_out;
-				_imageContainer.m_size     = width*height*bpp/8;
-				_imageContainer.m_offset   = 0;
-				_imageContainer.m_width    = width;
-				_imageContainer.m_height   = height;
-				_imageContainer.m_depth    = 1;
-				_imageContainer.m_format   = format;
-				_imageContainer.m_numMips  = 1;
-				_imageContainer.m_hasAlpha = true;
-				_imageContainer.m_cubeMap  = false;
-				_imageContainer.m_ktx      = false;
-				_imageContainer.m_ktxLE    = false;
-				_imageContainer.m_srgb     = false;
+				_imageContainer.m_data      = *_out;
+				_imageContainer.m_size      = width*height*bpp/8;
+				_imageContainer.m_offset    = 0;
+				_imageContainer.m_width     = width;
+				_imageContainer.m_height    = height;
+				_imageContainer.m_depth     = 1;
+				_imageContainer.m_numLayers = 1;
+				_imageContainer.m_format    = format;
+				_imageContainer.m_numMips   = 1;
+				_imageContainer.m_hasAlpha  = true;
+				_imageContainer.m_cubeMap   = false;
+				_imageContainer.m_ktx       = false;
+				_imageContainer.m_ktxLE     = false;
+				_imageContainer.m_srgb      = false;
 			}
 		}
 
@@ -662,10 +663,10 @@ int main(int _argc, const char* _argv[])
 							{
 								const uint32_t offset = (yy*mip.m_width + xx) * 4;
 								float* inout = &rgba[offset];
-								inout[0] = inout[0] * 2.0f/255.0f - 1.0f;
-								inout[1] = inout[1] * 2.0f/255.0f - 1.0f;
-								inout[2] = inout[2] * 2.0f/255.0f - 1.0f;
-								inout[3] = inout[3] * 2.0f/255.0f - 1.0f;
+								inout[0] = inout[0] * 2.0f - 1.0f;
+								inout[1] = inout[1] * 2.0f - 1.0f;
+								inout[2] = inout[2] * 2.0f - 1.0f;
+								inout[3] = inout[3] * 2.0f - 1.0f;
 							}
 						}
 					}
@@ -851,6 +852,11 @@ int main(int _argc, const char* _argv[])
 				}
 
 				imageFree(output);
+			}
+			else
+			{
+				help("No output generated.");
+				return EXIT_FAILURE;
 			}
 		}
 		else

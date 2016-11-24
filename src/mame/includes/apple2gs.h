@@ -18,8 +18,12 @@
 #include "machine/nvram.h"
 #include "cpu/g65816/g65816.h"
 #include "cpu/m6502/m5074x.h"
+#include "machine/z80scc.h"
 
 #define ADBMICRO_TAG    "adbmicro"
+#define SCC_TAG		"scc"
+#define RS232A_TAG	"printer"
+#define RS232B_TAG	"modem"
 
 // IIgs clocks as marked on the schematics
 #define APPLE2GS_28M  (XTAL_28_63636MHz) // IIGS master clock
@@ -95,6 +99,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_es5503(*this, "es5503"),
 		m_fdc(*this, "fdc"),
+		m_scc(*this, "scc"),
 		#if RUN_ADB_MICRO
 		m_adbmicro(*this, ADBMICRO_TAG),
 		#endif
@@ -106,6 +111,7 @@ public:
 	required_device<g65816_device> m_maincpu;
 	required_device<es5503_device> m_es5503;
 	required_device<applefdc_base_device> m_fdc;
+	required_device<z80scc_device> m_scc;
 	#if RUN_ADB_MICRO
 	optional_device<m5074x_device> m_adbmicro;
 	#endif

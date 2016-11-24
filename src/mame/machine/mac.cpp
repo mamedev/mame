@@ -2163,9 +2163,6 @@ DRIVER_INIT_MEMBER(mac_state,label)     \
 	mac_driver_init(model); \
 }
 
-MAC_DRIVER_INIT(mac128k512k, MODEL_MAC_128K512K)
-MAC_DRIVER_INIT(mac512ke, MODEL_MAC_512KE)
-MAC_DRIVER_INIT(macplus, MODEL_MAC_PLUS)
 MAC_DRIVER_INIT(macse, MODEL_MAC_SE)
 MAC_DRIVER_INIT(macclassic, MODEL_MAC_CLASSIC)
 MAC_DRIVER_INIT(maclc, MODEL_MAC_LC)
@@ -3184,7 +3181,7 @@ const char *lookup_trap(uint16_t opcode)
 
 
 
-offs_t mac_state::mac_dasm_override(device_t &device, char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+offs_t mac_state::mac_dasm_override(device_t &device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
 {
 	uint16_t opcode;
 	unsigned result = 0;
@@ -3194,9 +3191,9 @@ offs_t mac_state::mac_dasm_override(device_t &device, char *buffer, offs_t pc, c
 	if ((opcode & 0xF000) == 0xA000)
 	{
 		trap = lookup_trap(opcode);
-		if (trap)
+		if (trap != nullptr)
 		{
-			strcpy(buffer, trap);
+			stream << trap;
 			result = 2;
 		}
 	}

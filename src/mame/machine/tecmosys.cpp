@@ -121,7 +121,7 @@ void tecmosys_state::prot_init(int which)
 	case 2: m_device_data = &tkdensha_data; break;
 	}
 
-	machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(tecmosys_state::prot_reset),this));
+	machine().add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(&tecmosys_state::prot_reset,this));
 }
 
 READ16_MEMBER(tecmosys_state::prot_status_r)

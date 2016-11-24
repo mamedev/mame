@@ -171,10 +171,10 @@ uint32_t ie15_device::disasm_max_opcode_bytes() const
 //  helper function
 //-------------------------------------------------
 
-offs_t ie15_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t ie15_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( ie15 );
-	return CPU_DISASSEMBLE_NAME(ie15)(nullptr, buffer, pc, oprom, opram, 0);
+	return CPU_DISASSEMBLE_NAME(ie15)(nullptr, stream, pc, oprom, opram, 0);
 }
 
 //**************************************************************************
@@ -207,11 +207,22 @@ uint32_t ie15_device::execute_max_cycles() const
 
 void ie15_device::execute_run()
 {
-	do
+	// Removing the hook entirely is considerably faster than calling it for every instruction if the debugger is disabled entirely
+	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
-		debugger_instruction_hook(this, m_PC.d);
-		execute_one(rop());
-	} while (m_icount > 0);
+		do
+		{
+			debugger_instruction_hook(this, m_PC.d);
+			execute_one(rop());
+		} while (m_icount > 0);
+	}
+	else
+	{
+		do
+		{
+			execute_one(rop());
+		} while (m_icount > 0);
+	}
 }
 
 inline void ie15_device::illegal(uint8_t opcode)

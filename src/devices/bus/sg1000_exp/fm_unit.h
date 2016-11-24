@@ -35,6 +35,7 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
+	virtual void device_reset() override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// device_sg1000_expansion_slot_interface overrides
@@ -42,6 +43,7 @@ protected:
 	virtual DECLARE_WRITE8_MEMBER(peripheral_w) override;
 	virtual bool is_readable(uint8_t offset) override;
 	virtual bool is_writeable(uint8_t offset) override;
+	void set_audio_control(uint8_t data);
 
 private:
 	required_device<ym2413_device> m_ym;

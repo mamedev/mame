@@ -636,25 +636,25 @@ void lsi53c810_device::device_start()
 
 	for (auto & elem : dma_opcode)
 	{
-		elem = opcode_handler_delegate(FUNC(lsi53c810_device::dmaop_invalid), this);
+		elem = opcode_handler_delegate(&lsi53c810_device::dmaop_invalid, this);
 	}
 
-	add_opcode(0x00, 0xc0, opcode_handler_delegate(FUNC( lsi53c810_device::dmaop_block_move ), this));
-	add_opcode(0x40, 0xf8, opcode_handler_delegate(FUNC( lsi53c810_device::dmaop_select ), this));
-	add_opcode(0x48, 0xf8, opcode_handler_delegate(FUNC( lsi53c810_device::dmaop_wait_disconnect ), this));
-	add_opcode(0x50, 0xf8, opcode_handler_delegate(FUNC( lsi53c810_device::dmaop_wait_reselect ), this));
-	add_opcode(0x58, 0xf8, opcode_handler_delegate(FUNC( lsi53c810_device::dmaop_set ), this));
-	add_opcode(0x60, 0xf8, opcode_handler_delegate(FUNC( lsi53c810_device::dmaop_clear ), this));
-	add_opcode(0x68, 0xf8, opcode_handler_delegate(FUNC( lsi53c810_device::dmaop_move_from_sfbr ), this));
-	add_opcode(0x70, 0xf8, opcode_handler_delegate(FUNC( lsi53c810_device::dmaop_move_to_sfbr ), this));
-	add_opcode(0x78, 0xf8, opcode_handler_delegate(FUNC( lsi53c810_device::dmaop_read_modify_write ), this));
-	add_opcode(0x80, 0xf8, opcode_handler_delegate(FUNC( lsi53c810_device::dmaop_jump ), this));
-	add_opcode(0x88, 0xf8, opcode_handler_delegate(FUNC( lsi53c810_device::dmaop_call ), this));
-	add_opcode(0x90, 0xf8, opcode_handler_delegate(FUNC( lsi53c810_device::dmaop_return ), this));
-	add_opcode(0x98, 0xf8, opcode_handler_delegate(FUNC( lsi53c810_device::dmaop_interrupt ), this));
-	add_opcode(0xc0, 0xfe, opcode_handler_delegate(FUNC( lsi53c810_device::dmaop_move_memory ), this));
-	add_opcode(0xe0, 0xed, opcode_handler_delegate(FUNC( lsi53c810_device::dmaop_store ), this));
-	add_opcode(0xe1, 0xed, opcode_handler_delegate(FUNC( lsi53c810_device::dmaop_load ), this));
+	add_opcode(0x00, 0xc0, opcode_handler_delegate(&lsi53c810_device::dmaop_block_move, this));
+	add_opcode(0x40, 0xf8, opcode_handler_delegate(&lsi53c810_device::dmaop_select, this));
+	add_opcode(0x48, 0xf8, opcode_handler_delegate(&lsi53c810_device::dmaop_wait_disconnect, this));
+	add_opcode(0x50, 0xf8, opcode_handler_delegate(&lsi53c810_device::dmaop_wait_reselect, this));
+	add_opcode(0x58, 0xf8, opcode_handler_delegate(&lsi53c810_device::dmaop_set, this));
+	add_opcode(0x60, 0xf8, opcode_handler_delegate(&lsi53c810_device::dmaop_clear, this));
+	add_opcode(0x68, 0xf8, opcode_handler_delegate(&lsi53c810_device::dmaop_move_from_sfbr, this));
+	add_opcode(0x70, 0xf8, opcode_handler_delegate(&lsi53c810_device::dmaop_move_to_sfbr, this));
+	add_opcode(0x78, 0xf8, opcode_handler_delegate(&lsi53c810_device::dmaop_read_modify_write, this));
+	add_opcode(0x80, 0xf8, opcode_handler_delegate(&lsi53c810_device::dmaop_jump, this));
+	add_opcode(0x88, 0xf8, opcode_handler_delegate(&lsi53c810_device::dmaop_call, this));
+	add_opcode(0x90, 0xf8, opcode_handler_delegate(&lsi53c810_device::dmaop_return, this));
+	add_opcode(0x98, 0xf8, opcode_handler_delegate(&lsi53c810_device::dmaop_interrupt, this));
+	add_opcode(0xc0, 0xfe, opcode_handler_delegate(&lsi53c810_device::dmaop_move_memory, this));
+	add_opcode(0xe0, 0xed, opcode_handler_delegate(&lsi53c810_device::dmaop_store, this));
+	add_opcode(0xe1, 0xed, opcode_handler_delegate(&lsi53c810_device::dmaop_load, this));
 }
 
 /*************************************

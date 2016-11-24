@@ -66,6 +66,7 @@ lua53.dll
 main.exe
 main.o
 lua-5.3.3/
-*.pdf
 main.lua
 LuaJIT-2.1.0/
+lua-5.3.3-cxx/
+lua-5.3.3.vcxproj-cxx.filters

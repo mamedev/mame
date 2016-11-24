@@ -37,6 +37,7 @@ namespace sol {
 		std::string w;
 	public:
 		error(const std::string& str) : error(detail::direct_error, "lua: error: " + str) {}
+		error(std::string&& str) : error(detail::direct_error, "lua: error: " + std::move(str)) {}
 		error(detail::direct_error_tag, const std::string& str) : std::runtime_error(""), w(str) {}
 		error(detail::direct_error_tag, std::string&& str) : std::runtime_error(""), w(std::move(str)) {}
 

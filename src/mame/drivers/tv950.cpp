@@ -60,8 +60,13 @@ public:
 		, m_via(*this, VIA_TAG)
 		, m_crtc(*this, CRTC_TAG)
 		, m_vram(*this, "vram")
+		, m_gfx(*this, "graphics")
 	{ }
 
+	DECLARE_WRITE8_MEMBER(via_a_w);
+	DECLARE_WRITE8_MEMBER(via_b_w);
+	DECLARE_READ8_MEMBER(via_b_r);
+	DECLARE_WRITE_LINE_MEMBER(crtc_vs_w);
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr);
 
@@ -69,21 +74,26 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(via_crtc_reset_w);
 
 private:
+	uint8_t m_via_row;
+	uint8_t m_attr_row;
+	uint8_t m_attr_screen;
 	virtual void machine_reset() override;
 	required_device<m6502_device> m_maincpu;
 	required_device<via6522_device> m_via;
 	required_device<r6545_1_device> m_crtc;
 	required_shared_ptr<uint8_t> m_vram;
+	required_region_ptr<uint16_t> m_gfx;
 
 	int m_row_addr;
+	int m_row;
 };
 
 static ADDRESS_MAP_START(tv950_mem, AS_PROGRAM, 8, tv950_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("vram") // VRAM
-	AM_RANGE(0x8000, 0x8100) AM_DEVREADWRITE(CRTC_TAG, r6545_1_device, status_r, address_w)
-	AM_RANGE(0x8001, 0x8101) AM_DEVREADWRITE(CRTC_TAG, r6545_1_device, register_r, register_w)
+	AM_RANGE(0x8100, 0x8100) AM_DEVREADWRITE(CRTC_TAG, r6545_1_device, status_r, address_w)
+	AM_RANGE(0x8101, 0x8101) AM_DEVREADWRITE(CRTC_TAG, r6545_1_device, register_r, register_w)
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(row_addr_w)
 	AM_RANGE(0x9300, 0x9303) AM_DEVREADWRITE(ACIA1_TAG, mos6551_device, read, write)
 	AM_RANGE(0x9500, 0x9503) AM_DEVREADWRITE(ACIA2_TAG, mos6551_device, read, write)
@@ -95,11 +105,91 @@ ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( tv950 )
+	PORT_START("DSW0")
+	PORT_DIPNAME( 0x01, 0x00, "S01")
+	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ))
+	PORT_DIPNAME( 0x02, 0x00, "S02")
+	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ))
+	PORT_DIPNAME( 0x04, 0x00, "S03")
+	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ))
+	PORT_DIPNAME( 0x08, 0x00, "S04")
+	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ))
+	PORT_DIPNAME( 0x10, 0x00, "S05")
+	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ))
+	PORT_DIPNAME( 0x20, 0x20, "S06")
+	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ))
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x00, "S07")
+	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ))
+	PORT_DIPNAME( 0x02, 0x00, "S08")
+	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ))
+	PORT_DIPNAME( 0x04, 0x00, "S09")
+	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ))
+	PORT_DIPNAME( 0x08, 0x00, "S10")
+	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ))
+	PORT_DIPNAME( 0x10, 0x00, "S11")
+	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ))
+	PORT_DIPNAME( 0x20, 0x20, "S12")
+	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ))
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x00, "S13")
+	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ))
+	PORT_DIPNAME( 0x02, 0x00, "S14")
+	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ))
+	PORT_DIPNAME( 0x04, 0x00, "S15")
+	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ))
+	PORT_DIPNAME( 0x08, 0x00, "S16")
+	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ))
+	PORT_DIPNAME( 0x10, 0x00, "S17")
+	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ))
+	PORT_DIPNAME( 0x20, 0x20, "S18")
+	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ))
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("DSW3")
+	PORT_DIPNAME( 0x01, 0x00, "S19")
+	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ))
+	PORT_DIPNAME( 0x02, 0x00, "S20")
+	PORT_DIPSETTING(    0x00, DEF_STR( On ))
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ))
+	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
 void tv950_state::machine_reset()
 {
+	m_row = 0;
+	m_via_row = 0;
+	m_attr_row = 0;
+	m_attr_screen = 0;
+}
+
+WRITE_LINE_MEMBER(tv950_state::crtc_vs_w)
+{
+	m_attr_screen = 0;
 }
 
 WRITE_LINE_MEMBER(tv950_state::via_crtc_reset_w)
@@ -118,12 +208,61 @@ WRITE8_MEMBER(tv950_state::row_addr_w)
 	m_row_addr = data;
 }
 
+WRITE8_MEMBER(tv950_state::via_a_w)
+{
+	m_via_row = ~data & 15;
+	m_maincpu->set_input_line(M6502_IRQ_LINE, BIT(data, 6) ? CLEAR_LINE : ASSERT_LINE);
+	// PA4, 5, 7 to do
+}
+
+WRITE8_MEMBER(tv950_state::via_b_w)
+{
+// bit 7 = speaker, and bit 3 of m_via_row must be active as well
+}
+
+READ8_MEMBER(tv950_state::via_b_r)
+{
+	uint8_t data = 0xff;
+	if (BIT(m_via_row, 0))
+		data &= ioport("DSW0")->read();
+	if (BIT(m_via_row, 1))
+		data &= ioport("DSW1")->read();
+	if (BIT(m_via_row, 2))
+		data &= ioport("DSW2")->read();
+	if (BIT(m_via_row, 3))
+		data &= ioport("DSW3")->read();
+	return data;
+}
+
 MC6845_ON_UPDATE_ADDR_CHANGED( tv950_state::crtc_update_addr )
 {
 }
 
 MC6845_UPDATE_ROW( tv950_state::crtc_update_row )
 {
+	if (ra)
+		m_attr_row = m_attr_screen;
+	else
+		m_attr_screen = m_attr_row;
+
+	uint32_t *p = &bitmap.pix32(m_row);
+	rgb_t fg(255,255,255,255);
+	rgb_t bg(0,0,0,0);
+
+	for(uint8_t x = 0; x < x_count; x++)
+	{
+		uint8_t chr = m_vram[ma + x];
+		if ((chr & 0x90)==0x90)
+			m_attr_row = chr & 15;
+		uint16_t data = m_gfx[chr * 16 + (m_row % 10)];
+		if (x == cursor_x)
+			data ^= 0xff;
+		// apply attributes...
+
+		for (uint8_t i = 0; i < 14; i++)
+			*p++ = BIT( data, 13-i ) ? fg : bg;
+	}
+	m_row = (m_row + 1) % 250;
 }
 
 static MACHINE_CONFIG_START( tv950, tv950_state )
@@ -132,20 +271,26 @@ static MACHINE_CONFIG_START( tv950, tv950_state )
 	MCFG_CPU_PROGRAM_MAP(tv950_mem)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK, 882, 0, 720, 370, 0, 350 ) // not real values
+	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK, 1200, 0, 1120, 370, 0, 250 )	// not real values
 	MCFG_SCREEN_UPDATE_DEVICE( CRTC_TAG, r6545_1_device, screen_update )
 
 	// there are many 6845 CRTC submodels, the Theory of Operation manual references the Rockwell R6545-1 specificially.
 	MCFG_MC6845_ADD(CRTC_TAG, R6545_1, "screen", MASTER_CLOCK/14)
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
-	MCFG_MC6845_CHAR_WIDTH(8)
+	MCFG_MC6845_CHAR_WIDTH(14)
 	MCFG_MC6845_UPDATE_ROW_CB(tv950_state, crtc_update_row)
 	MCFG_MC6845_ADDR_CHANGED_CB(tv950_state, crtc_update_addr)
 	MCFG_MC6845_OUT_HSYNC_CB(DEVWRITELINE(VIA_TAG, via6522_device, write_pb6))
+	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(tv950_state, crtc_vs_w))
+	MCFG_VIDEO_SET_SCREEN(nullptr)
 
 	MCFG_DEVICE_ADD(VIA_TAG, VIA6522, MASTER_CLOCK/14)
 	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M6502_NMI_LINE))
+	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(tv950_state, via_a_w))
+	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(tv950_state, via_b_w))
+	MCFG_VIA6522_READPB_HANDLER(READ8(tv950_state, via_b_r))
 	MCFG_VIA6522_CA2_HANDLER(WRITELINE(tv950_state, via_crtc_reset_w))
+	//MCFG_VIA6522_CB2_HANDLER(WRITELINE(tv950_state, via_blink_rate_w))
 
 	MCFG_DEVICE_ADD(ACIA1_TAG, MOS6551, 0)
 	MCFG_MOS6551_XTAL(MASTER_CLOCK/13)
@@ -163,7 +308,7 @@ ROM_START( tv950 )
 	ROM_LOAD( "180000-001a_a41_eb17.bin", 0x001000, 0x001000, CRC(b7187cc5) SHA1(41cc8fd51661314e03ee7e00cc1e206e9a694d92) )
 	ROM_LOAD( "180000-007a_a42_67d3.bin", 0x000000, 0x001000, CRC(3ef2e6fb) SHA1(21ccfd2b50c37b715eed67671b82faa4d75fc6bb) )
 
-	ROM_REGION(0x2000, "graphics", 0)
+	ROM_REGION16_LE(0x2000, "graphics", 0)
 	ROM_LOAD16_BYTE( "180000-002a_a33_9294.bin", 0x000001, 0x001000, CRC(eaf4f346) SHA1(b4c531626846f3f055ddc086ac24fdb1b34f3f8e) )
 	ROM_LOAD16_BYTE( "180000-003a_a32_7ebf.bin", 0x000000, 0x001000, CRC(783ca0b6) SHA1(1cec9a9a56ef5795809f7ca7cd2e3f61b27e698d) )
 

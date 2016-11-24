@@ -342,7 +342,7 @@ static MACHINE_CONFIG_START( ksm, ksm_state )
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", ksm_state, scanline_callback, "screen", 0, 1)
 
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_UPDATE_DRIVER(ksm_state, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_15_4MHz, KSM_TOTAL_HORZ, KSM_HORZ_START,
 		KSM_HORZ_START+KSM_DISP_HORZ, KSM_TOTAL_VERT, KSM_VERT_START,

@@ -75,7 +75,7 @@ PALETTE_INIT_MEMBER(mcr3_state,spyhunt)
 
 	for (i = 0; i < palette.entries(); i++)
 	{
-		palette.set_pen_color(i,rgb_t::black); /* black */
+		palette.set_pen_color(i,rgb_t::black());
 	}
 
 	/* alpha colors are hard-coded */

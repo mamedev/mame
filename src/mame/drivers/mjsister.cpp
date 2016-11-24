@@ -360,7 +360,7 @@ static INPUT_PORTS_START( mjsister )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("DSW2")		/* not on PCB */
+	PORT_START("DSW2")      /* not on PCB */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN0")

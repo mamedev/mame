@@ -46,7 +46,7 @@ private:
 		SAVE_CONFIG
 	};
 
-	virtual void populate() override;
+	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 
 	uint16_t m_main;

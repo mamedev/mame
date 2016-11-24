@@ -76,12 +76,12 @@ static ADDRESS_MAP_START( sh4_internal_map, AS_PROGRAM, 64, sh4_base_device )
 	AM_RANGE(0x1E000000, 0x1E000FFF) AM_RAM AM_MIRROR(0x01FFF000)
 	AM_RANGE(0xE0000000, 0xE000003F) AM_RAM AM_MIRROR(0x03FFFFC0) // todo: store queues should be write only on DC's SH4, executing PREFM shouldn't cause an actual memory read access!
 	AM_RANGE(0xF6000000, 0xF7FFFFFF) AM_READWRITE(sh4_tlb_r,sh4_tlb_w)
-	AM_RANGE(0xFE000000, 0xFFFFFFFF) AM_READWRITE32(sh4_internal_r, sh4_internal_w, U64(0xffffffffffffffff))
+	AM_RANGE(0xFE000000, 0xFFFFFFFF) AM_READWRITE32(sh4_internal_r, sh4_internal_w, 0xffffffffffffffffU)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sh3_internal_map, AS_PROGRAM, 64, sh3_base_device )
-	AM_RANGE(SH3_LOWER_REGBASE, SH3_LOWER_REGEND) AM_READWRITE32(sh3_internal_r, sh3_internal_w, U64(0xffffffffffffffff))
-	AM_RANGE(SH3_UPPER_REGBASE, SH3_UPPER_REGEND) AM_READWRITE32(sh3_internal_high_r, sh3_internal_high_w, U64(0xffffffffffffffff))
+	AM_RANGE(SH3_LOWER_REGBASE, SH3_LOWER_REGEND) AM_READWRITE32(sh3_internal_r, sh3_internal_w, 0xffffffffffffffffU)
+	AM_RANGE(SH3_UPPER_REGBASE, SH3_UPPER_REGEND) AM_READWRITE32(sh3_internal_high_r, sh3_internal_high_w, 0xffffffffffffffffU)
 ADDRESS_MAP_END
 
 
@@ -151,27 +151,27 @@ sh4be_device::sh4be_device(const machine_config &mconfig, const char *tag, devic
 }
 
 
-offs_t sh34_base_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t sh34_base_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( sh4 );
 
-	return CPU_DISASSEMBLE_NAME(sh4)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(sh4)(this, stream, pc, oprom, opram, options);
 }
 
 
-offs_t sh3be_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t sh3be_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( sh4be );
 
-	return CPU_DISASSEMBLE_NAME(sh4be)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(sh4be)(this, stream, pc, oprom, opram, options);
 }
 
 
-offs_t sh4be_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t sh4be_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( sh4be );
 
-	return CPU_DISASSEMBLE_NAME(sh4be)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(sh4be)(this, stream, pc, oprom, opram, options);
 }
 
 

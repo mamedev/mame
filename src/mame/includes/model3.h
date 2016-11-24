@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont, Ville Linde
+#include "cpu/powerpc/ppc.h"
 #include "video/poly.h"
 #include "bus/scsi/scsi.h"
 #include "machine/53c810.h"
@@ -7,6 +8,7 @@
 #include "machine/eepromser.h"
 #include "sound/scsp.h"
 #include "machine/315-5881_crypt.h"
+#include "machine/msm6242.h"
 
 typedef float MATRIX[4][4];
 typedef float VECTOR[4];
@@ -59,6 +61,7 @@ public:
 		m_scsp1(*this, "scsp1"),
 		m_eeprom(*this, "eeprom"),
 		m_screen(*this, "screen"),
+		m_rtc(*this, "rtc"),
 		m_adc_ports(*this, {"AN0", "AN1", "AN2", "AN3", "AN4", "AN5", "AN6", "AN7"}),
 		m_work_ram(*this, "work_ram"),
 		m_paletteram64(*this, "paletteram64"),
@@ -72,12 +75,13 @@ public:
 		m_step20_with_old_real3d = false;
 	}
 
-	required_device<cpu_device> m_maincpu;
+	required_device<ppc_device> m_maincpu;
 	optional_device<lsi53c810_device> m_lsi53c810;
 	required_device<cpu_device> m_audiocpu;
 	required_device<scsp_device> m_scsp1;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<screen_device> m_screen;
+	required_device<rtc72421_device> m_rtc;
 
 	optional_ioport_array<8> m_adc_ports;
 
@@ -198,12 +202,14 @@ public:
 	DECLARE_WRITE64_MEMBER(mpc105_data_w);
 	DECLARE_READ64_MEMBER(mpc105_reg_r);
 	DECLARE_WRITE64_MEMBER(mpc105_reg_w);
+	void mpc105_init();
 	DECLARE_READ64_MEMBER(mpc106_addr_r);
 	DECLARE_WRITE64_MEMBER(mpc106_addr_w);
 	DECLARE_READ64_MEMBER(mpc106_data_r);
 	DECLARE_WRITE64_MEMBER(mpc106_data_w);
 	DECLARE_READ64_MEMBER(mpc106_reg_r);
 	DECLARE_WRITE64_MEMBER(mpc106_reg_w);
+	void mpc106_init();
 	DECLARE_READ64_MEMBER(scsi_r);
 	DECLARE_WRITE64_MEMBER(scsi_w);
 	DECLARE_READ64_MEMBER(real3d_dma_r);
@@ -222,6 +228,8 @@ public:
 	DECLARE_WRITE16_MEMBER(model3snd_ctrl);
 	uint32_t pci_device_get_reg();
 	void pci_device_set_reg(uint32_t value);
+	void configure_fast_ram();
+	void interleave_vroms();
 	DECLARE_DRIVER_INIT(genprot);
 	DECLARE_DRIVER_INIT(lemans24);
 	DECLARE_DRIVER_INIT(vs298);

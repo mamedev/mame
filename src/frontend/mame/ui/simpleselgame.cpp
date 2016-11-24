@@ -214,7 +214,7 @@ void simple_menu_select_game::inkey_special(const event *menu_event)
 //  populate - populate the game select menu
 //-------------------------------------------------
 
-void simple_menu_select_game::populate()
+void simple_menu_select_game::populate(float &customtop, float &custombottom)
 {
 	int matchcount;
 	int curitem;
@@ -288,7 +288,7 @@ void simple_menu_select_game::custom_render(void *selectedref, float top, float 
 
 	// get the size of the text
 	ui().draw_text_full(container(), tempbuf[0].c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
-						mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
+						mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
 	maxwidth = std::max(width, origx2 - origx1);
 
@@ -378,7 +378,7 @@ void simple_menu_select_game::custom_render(void *selectedref, float top, float 
 	for (line = 0; line < 4; line++)
 	{
 		ui().draw_text_full(container(), tempbuf[line].c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
-							mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
+							mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), &width, nullptr);
 		width += 2 * UI_BOX_LR_BORDER;
 		maxwidth = std::max(maxwidth, width);
 	}

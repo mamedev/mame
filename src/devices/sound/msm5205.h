@@ -61,7 +61,6 @@ public:
 	// option , selected pin seletor
 	void playmode_w(int select);
 
-	void set_volume(int volume);
 	void change_clock_w(int32_t clock);
 
 protected:

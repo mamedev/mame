@@ -16,8 +16,11 @@
 // 3. This notice may not be removed or altered from any source distribution.
 //
 
+#include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+#include <memory.h>
+
 #include "nanovg.h"
 
 #include <bx/macros.h>
@@ -64,6 +67,10 @@ BX_PRAGMA_DIAGNOSTIC_PUSH();
 BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG_GCC("-Wmissing-field-initializers");
 BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG_GCC("-Wshadow");
 BX_PRAGMA_DIAGNOSTIC_IGNORED_CLANG_GCC("-Wint-to-pointer-cast")
+#if BX_COMPILER_GCC >= 60000
+BX_PRAGMA_DIAGNOSTIC_IGNORED_GCC("-Wmisleading-indentation");
+BX_PRAGMA_DIAGNOSTIC_IGNORED_GCC("-Wshift-negative-value");
+#endif // BX_COMPILER_GCC >= 60000_
 #define STBI_MALLOC(_size)        lodepng_malloc(_size)
 #define STBI_REALLOC(_ptr, _size) lodepng_realloc(_ptr, _size)
 #define STBI_FREE(_ptr)           lodepng_free(_ptr)
@@ -250,7 +257,6 @@ static void nvg__setDevicePixelRatio(NVGcontext* ctx, float ratio)
 
 static NVGcompositeOperationState nvg__compositeOperationState(int op)
 {
-	// NVG_SOURCE_OVER
 	int sfactor = NVG_ONE;
 	int dfactor = NVG_ONE_MINUS_SRC_ALPHA;
 
@@ -2306,6 +2312,18 @@ int nvgFindFont(NVGcontext* ctx, const char* name)
 {
 	if (name == NULL) return -1;
 	return fonsGetFontByName(ctx->fs, name);
+}
+
+
+int nvgAddFallbackFontId(NVGcontext* ctx, int baseFont, int fallbackFont)
+{
+	if(baseFont == -1 || fallbackFont == -1) return 0;
+	return fonsAddFallbackFont(ctx->fs, baseFont, fallbackFont);
+}
+
+int nvgAddFallbackFont(NVGcontext* ctx, const char* baseFont, const char* fallbackFont)
+{
+	return nvgAddFallbackFontId(ctx, nvgFindFont(ctx, baseFont), nvgFindFont(ctx, fallbackFont));
 }
 
 // State setting

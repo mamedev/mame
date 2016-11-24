@@ -38,7 +38,7 @@ const tiny_rom_entry *sv806_device::device_rom_region() const
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( sv806 )
-	MCFG_SCREEN_ADD_MONOCHROME("80col", RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME("80col", RASTER, rgb_t::green())
 	MCFG_SCREEN_RAW_PARAMS((XTAL_12MHz / 6) * 8, 864, 0, 640, 317, 0, 192)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", hd6845_device, screen_update)
 
@@ -98,7 +98,7 @@ MC6845_UPDATE_ROW( sv806_device::crtc_update_row )
 
 	for (int i = 0; i < x_count; i++)
 	{
-		uint8_t data = m_gfx->u8((m_ram[(ma + i) & 0x7ff] << 4) | ra);
+		uint8_t data = m_gfx->as_u8((m_ram[(ma + i) & 0x7ff] << 4) | ra);
 
 		if (i == cursor_x)
 			data = 0xff;

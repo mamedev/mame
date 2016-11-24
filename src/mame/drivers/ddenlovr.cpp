@@ -9752,7 +9752,7 @@ static MACHINE_CONFIG_START( ddenlovr, ddenlovr_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
-	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("rtc", RTC72421, XTAL_32_768kHz) // internal oscillator
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ddenlovj, ddenlovr )
@@ -9760,6 +9760,8 @@ static MACHINE_CONFIG_DERIVED( ddenlovj, ddenlovr )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(ddenlovj_map)
+
+	MCFG_DEVICE_REPLACE("rtc", RTC62421, XTAL_32_768kHz) // internal oscillator
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ddenlovrk, ddenlovr )
@@ -9767,7 +9769,7 @@ static MACHINE_CONFIG_DERIVED( ddenlovrk, ddenlovr )
 	MCFG_CPU_PROGRAM_MAP(ddenlovrk_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( akamaru, ddenlovr )
+static MACHINE_CONFIG_DERIVED( akamaru, ddenlovj )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -10202,7 +10204,7 @@ static MACHINE_CONFIG_START( mjschuka, ddenlovr_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
-	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("rtc", RTC62421, XTAL_32_768kHz) // internal oscillator
 	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(ddenlovr_state, hginga_rtc_irq))
 MACHINE_CONFIG_END
 
@@ -10431,7 +10433,7 @@ static MACHINE_CONFIG_DERIVED( mjflove, quizchq )
 
 	MCFG_MACHINE_START_OVERRIDE(ddenlovr_state,mjflove)
 
-	MCFG_DEVICE_MODIFY("rtc")
+	MCFG_DEVICE_REPLACE("rtc", RTC72421, XTAL_32_768kHz)
 	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(ddenlovr_state, mjflove_rtc_irq))
 
 	MCFG_VIDEO_START_OVERRIDE(ddenlovr_state,mjflove)  // blitter commands in the roms are shuffled around
@@ -10550,7 +10552,7 @@ static MACHINE_CONFIG_START( sryudens, ddenlovr_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* devices */
-	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("rtc", RTC62421, XTAL_32_768kHz) // internal oscillator
 	MCFG_MSM6242_OUT_INT_HANDLER(WRITELINE(ddenlovr_state, mjchuuka_rtc_irq))
 MACHINE_CONFIG_END
 

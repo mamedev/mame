@@ -2883,6 +2883,31 @@ Beyond that last category are the roms waiting to be classified.
 		</part>
 	</software>
 
+	<software name="syvalionp" cloneof="syvalion">
+		<!-- TeamEurope -->
+		<description>Syvalion (Euro, Prototype)</description>
+		<year>1992</year>
+		<publisher>Toshiba EMI</publisher>
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-2P3B-01" />
+			<feature name="u1" value="U1 EPROM(J)" />
+			<feature name="u2" value="U2 EPROM(J)" />
+			<feature name="u3" value="U3 SRAM" />
+			<feature name="u4" value="U4 74F139" />
+			<feature name="u5" value="U5 CIC" />
+			<feature name="lockout" value="D413 9208 C" />
+			<feature name="battery" value="BATT CR2032" />
+			<feature name="cart_model" value="SHVC-006" />
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="SY PAL 0.u1" size="524288" crc="466f4e49" sha1="aed93ef5c31371b3278dcb59d8a116416f2994ed" offset="0x000000" />
+				<rom name="SY PAL 1.u2" size="524288" crc="c3e1dac2" sha1="750f1f3dd5d2863fcb128edccc4841faf24813cc" offset="0x080000" />
+			</dataarea>
+			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+  
 	<software name="tecmonbaup" cloneof="tecmonba">
 		<!-- i2a2n2 -->
 		<description>Tecmo Super NBA Basketball (USA, Prototype 19921026)</description>
@@ -59495,14 +59520,15 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 		</part>
 	</software>
 
-	<software name="syvalionp" cloneof="syvalion">
-		<description>Syvalion (Euro, Prototype)</description>
+  <!-- Most likely this is simply a bad dump of syvalionp. -->
+	<software name="syvalionp2" cloneof="syvalion">
+		<description>Syvalion (Euro, Prototype 2)</description>
 		<year>1992</year>
 		<publisher>Toshiba EMI</publisher>
 		<part name="cart" interface="snes_cart">
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
-				<rom name="syvalion (europe) (beta).sfc" size="1048576" crc="be122755" sha1="ddfa611f1177f371c1107dbd8e8ecdb19011a232" offset="0x000000" />
+				<rom name="syvalion (europe) (beta).sfc" size="1048576" crc="be122755" sha1="ddfa611f1177f371c1107dbd8e8ecdb19011a232" offset="0x000000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>

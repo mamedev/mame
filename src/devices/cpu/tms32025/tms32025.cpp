@@ -242,10 +242,10 @@ tms32026_device::tms32026_device(const machine_config &mconfig, const char *tag,
 }
 
 
-offs_t tms32025_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t tms32025_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( tms32025 );
-	return CPU_DISASSEMBLE_NAME(tms32025)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(tms32025)(this, stream, pc, oprom, opram, options);
 }
 
 

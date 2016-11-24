@@ -164,13 +164,13 @@ void DevicesWindowQtConfig::applyToQWidget(QWidget* widget)
 }
 
 
-void DevicesWindowQtConfig::addToXmlDataNode(xml_data_node* node) const
+void DevicesWindowQtConfig::addToXmlDataNode(xml_data_node &node) const
 {
 	WindowQtConfig::addToXmlDataNode(node);
 }
 
 
-void DevicesWindowQtConfig::recoverFromXmlNode(xml_data_node* node)
+void DevicesWindowQtConfig::recoverFromXmlNode(xml_data_node const &node)
 {
 	WindowQtConfig::recoverFromXmlNode(node);
 }

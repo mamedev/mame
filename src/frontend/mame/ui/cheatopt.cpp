@@ -126,7 +126,7 @@ menu_cheat::menu_cheat(mame_ui_manager &mui, render_container &container) : menu
 {
 }
 
-void menu_cheat::populate()
+void menu_cheat::populate(float &customtop, float &custombottom)
 {
 	/* iterate over cheats */
 	std::string text;
@@ -264,7 +264,7 @@ void menu_autofire::handle()
     menu
 -------------------------------------------------*/
 
-void menu_autofire::populate()
+void menu_autofire::populate(float &customtop, float &custombottom)
 {
 	char temp_text[64];
 

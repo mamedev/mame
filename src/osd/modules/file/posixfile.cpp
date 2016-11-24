@@ -276,7 +276,7 @@ osd_file::error osd_file::open(std::string const &path, std::uint32_t openflags,
 			}
 		}
 
-		// if we still failed, clean up and osd_free
+		// if we still failed, clean up and free
 		if (fd < 0)
 		{
 			return errno_to_file_error(errno);

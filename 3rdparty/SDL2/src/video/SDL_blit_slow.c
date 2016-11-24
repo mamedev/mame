@@ -46,6 +46,8 @@ SDL_Blit_Slow(SDL_BlitInfo * info)
     SDL_PixelFormat *dst_fmt = info->dst_fmt;
     int srcbpp = src_fmt->BytesPerPixel;
     int dstbpp = dst_fmt->BytesPerPixel;
+    Uint32 rgbmask = ~src_fmt->Amask;
+    Uint32 ckey = info->colorkey & rgbmask;
 
     srcy = 0;
     posy = 0;
@@ -85,7 +87,7 @@ SDL_Blit_Slow(SDL_BlitInfo * info)
                     srcpixel = (srcR << src_fmt->Rshift) |
                         (srcG << src_fmt->Gshift) | (srcB << src_fmt->Bshift);
                 }
-                if (srcpixel == info->colorkey) {
+                if ((srcpixel & rgbmask) == ckey) {
                     posx += incx;
                     dst += dstbpp;
                     continue;
@@ -127,6 +129,7 @@ SDL_Blit_Slow(SDL_BlitInfo * info)
                 dstR = srcR + ((255 - srcA) * dstR) / 255;
                 dstG = srcG + ((255 - srcA) * dstG) / 255;
                 dstB = srcB + ((255 - srcA) * dstB) / 255;
+                dstA = srcA + ((255 - srcA) * dstA) / 255;
                 break;
             case SDL_COPY_ADD:
                 dstR = srcR + dstR;

@@ -479,9 +479,7 @@ static ADDRESS_MAP_START( m1_memmap, AS_PROGRAM, 8, maygay1b_state )
 	AM_RANGE(0x2020, 0x2020) AM_WRITE(reel56_w)
 
 	// there is actually an 8279 and an 8051 (which I guess is the MCU?).
-	AM_RANGE(0x2030, 0x2030) AM_DEVREADWRITE("i8279", i8279_device, data_r, data_w )
-	AM_RANGE(0x2031, 0x2031) AM_DEVREADWRITE("i8279", i8279_device, status_r, cmd_w)
-
+	AM_RANGE(0x2030, 0x2031) AM_DEVREADWRITE("i8279", i8279_device, read, write)
 
 #ifdef USE_MCU
 	//8051
@@ -489,8 +487,7 @@ static ADDRESS_MAP_START( m1_memmap, AS_PROGRAM, 8, maygay1b_state )
 	AM_RANGE(0x2041, 0x2041) AM_WRITE( main_to_mcu_1_w )
 #else
 	//8051
-	AM_RANGE(0x2040, 0x2040) AM_DEVREADWRITE("i8279_2", i8279_device, data_r, data_w )
-	AM_RANGE(0x2041, 0x2041) AM_DEVREADWRITE("i8279_2", i8279_device, status_r, cmd_w)
+	AM_RANGE(0x2040, 0x2041) AM_DEVREADWRITE("i8279_2", i8279_device, read, write)
 //  AM_RANGE(0x2050, 0x2050)// SCAN on M1B
 #endif
 
@@ -567,8 +564,7 @@ static ADDRESS_MAP_START( m1_nec_memmap, AS_PROGRAM, 8, maygay1b_state )
 	AM_RANGE(0x2020, 0x2020) AM_WRITE(reel56_w)
 
 	// there is actually an 8279 and an 8051 (which I guess is the MCU?).
-	AM_RANGE(0x2030, 0x2030) AM_DEVREADWRITE("i8279", i8279_device, data_r, data_w )
-	AM_RANGE(0x2031, 0x2031) AM_DEVREADWRITE("i8279", i8279_device, status_r, cmd_w)
+	AM_RANGE(0x2030, 0x2031) AM_DEVREADWRITE("i8279", i8279_device, read, write)
 
 #ifdef USE_MCU
 	//8051
@@ -576,8 +572,7 @@ static ADDRESS_MAP_START( m1_nec_memmap, AS_PROGRAM, 8, maygay1b_state )
 	AM_RANGE(0x2041, 0x2041) AM_WRITE( main_to_mcu_1_w )
 #else
 	//8051
-	AM_RANGE(0x2040, 0x2040) AM_DEVREADWRITE("i8279_2", i8279_device, data_r, data_w )
-	AM_RANGE(0x2041, 0x2041) AM_DEVREADWRITE("i8279_2", i8279_device, status_r, cmd_w)
+	AM_RANGE(0x2040, 0x2041) AM_DEVREADWRITE("i8279_2", i8279_device, read, write)
 //  AM_RANGE(0x2050, 0x2050)// SCAN on M1B
 #endif
 

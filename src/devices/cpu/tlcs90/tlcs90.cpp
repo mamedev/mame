@@ -991,55 +991,55 @@ const char *tlcs90_device::internal_registers_names(uint16_t x)
 		return ir_names[ir];
 	return nullptr;
 }
-int tlcs90_device::sprint_arg(char *buffer, uint32_t pc, const char *pre, const e_mode mode, const uint16_t r, const uint16_t rb)
+bool tlcs90_device::stream_arg(std::ostream &stream, uint32_t pc, const char *pre, const e_mode mode, const uint16_t r, const uint16_t rb)
 {
 	const char *reg_name;
 	switch ( mode )
 	{
-		case MODE_NONE:     return 0;
+		case MODE_NONE:     return false;
 
-		case MODE_BIT8:     return  sprintf( buffer, "%s%d",            pre,    r                                   );
-		case MODE_I8:       return  sprintf( buffer, "%s$%02X",         pre,    r                                   );
-		case MODE_D8:       return  sprintf( buffer, "%s$%04X",         pre,    (pc+2+(r&0x7f)-(r&0x80))&0xffff     );
-		case MODE_I16:      return  sprintf( buffer, "%s$%04X",         pre,    r                                   );
-		case MODE_D16:      return  sprintf( buffer, "%s$%04X",         pre,    (pc+2+(r&0x7fff)-(r&0x8000))&0xffff );
+		case MODE_BIT8:     util::stream_format(stream, "%s%d",            pre,    r                                   );	return true;
+		case MODE_I8:       util::stream_format(stream, "%s$%02X",         pre,    r                                   );	return true;
+		case MODE_D8:       util::stream_format(stream, "%s$%04X",         pre,    (pc+2+(r&0x7f)-(r&0x80))&0xffff     );	return true;
+		case MODE_I16:      util::stream_format(stream, "%s$%04X",         pre,    r                                   );	return true;
+		case MODE_D16:      util::stream_format(stream, "%s$%04X",         pre,    (pc+2+(r&0x7fff)-(r&0x8000))&0xffff );	return true;
 		case MODE_MI16:
 			reg_name = internal_registers_names(r);
-			return  (reg_name) ?    sprintf( buffer, "%s(%s)",          pre,    reg_name                            ):
-									sprintf( buffer, "%s($%04X)",       pre,    r                                   );
-		case MODE_R8:       return  sprintf( buffer, "%s%s",            pre,    r8_names[r]                         );
-		case MODE_R16:      return  sprintf( buffer, "%s%s",            pre,    r16_names[r]                        );
-		case MODE_MR16:     return  sprintf( buffer, "%s(%s)",          pre,    r16_names[r]                        );
+			if (reg_name)
+				util::stream_format(stream, "%s(%s)", pre, reg_name);
+			else
+				util::stream_format(stream, "%s($%04X)",       pre,    r                                   );
+			return true;
+		case MODE_R8:       util::stream_format(stream, "%s%s",            pre,    r8_names[r]                         );	return true;
+		case MODE_R16:      util::stream_format(stream, "%s%s",            pre,    r16_names[r]                        );	return true;
+		case MODE_MR16:     util::stream_format(stream, "%s(%s)",          pre,    r16_names[r]                        );	return true;
 
-		case MODE_MR16R8:   return  sprintf( buffer, "%s(%s+%s)",       pre,    r16_names[r],   r8_names[rb]        );
-		case MODE_MR16D8:   return  sprintf( buffer, "%s(%s%c$%02X)",   pre,    r16_names[r],   (rb&0x80)?'-':'+',  (rb&0x80)?((rb^0xff)+1):rb  );
+		case MODE_MR16R8:   util::stream_format(stream, "%s(%s+%s)",       pre,    r16_names[r],   r8_names[rb]        );	return true;
+		case MODE_MR16D8:   util::stream_format(stream, "%s(%s%c$%02X)",   pre,    r16_names[r],   (rb&0x80)?'-':'+',  (rb&0x80)?((rb^0xff)+1):rb  );	return true;
 
-		case MODE_CC:       return  sprintf( buffer, "%s%s",            pre,    cc_names[r]                         );
+		case MODE_CC:       util::stream_format(stream, "%s%s",            pre,    cc_names[r]                         );	return true;
 
-		case MODE_R16R8:    return  sprintf( buffer, "%s%s+%s",         pre,    r16_names[r],   r8_names[rb]        );
-		case MODE_R16D8:    return  sprintf( buffer, "%s%s%c$%02X",     pre,    r16_names[r],   (rb&0x80)?'-':'+',  (rb&0x80)?((rb^0xff)+1):rb  );
+		case MODE_R16R8:    util::stream_format(stream, "%s%s+%s",         pre,    r16_names[r],   r8_names[rb]        );	return true;
+		case MODE_R16D8:    util::stream_format(stream, "%s%s%c$%02X",     pre,    r16_names[r],   (rb&0x80)?'-':'+',  (rb&0x80)?((rb^0xff)+1):rb  );	return true;
 
 		default:
 			fatalerror("%04x: unimplemented addr mode = %d\n",pc,mode);
 	}
 
 	// never executed
-	//return 0;
+	return false;
 }
 
-offs_t tlcs90_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t tlcs90_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
-	int len;
-
 	m_addr = pc;
 
 	decode();
 	m_op &= ~OP_16;
 
-	buffer  +=  sprintf     ( buffer,           "%-5s",             op_names[ m_op ] ); // strlen("callr") == 5
-	len     =   sprint_arg  ( buffer, pc,       " ",                m_mode1, m_r1, m_r1b );
-	buffer  +=  len;
-	buffer  +=  sprint_arg  ( buffer, pc,       (len>1)?",":"",     m_mode2, m_r2, m_r2b );
+	util::stream_format			(stream, "%-5s",				op_names[ m_op ] ); // strlen("callr") == 5
+	bool streamed = stream_arg	(stream, pc,       " ",         m_mode1, m_r1, m_r1b );
+	stream_arg					(stream, pc, streamed ?",":"",	m_mode2, m_r2, m_r2b );
 
 	return (m_addr - pc) | DASMFLAG_SUPPORTED;
 }

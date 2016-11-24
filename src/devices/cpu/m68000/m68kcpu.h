@@ -153,7 +153,7 @@ class m68000_base_device;
 #define GET_MSB_16(A) ((A) & 0x8000)
 #define GET_MSB_17(A) ((A) & 0x10000)
 #define GET_MSB_32(A) ((A) & 0x80000000)
-#define GET_MSB_33(A) ((A) & U64(0x100000000))
+#define GET_MSB_33(A) ((A) & 0x100000000U)
 
 /* Isolate nibbles */
 #define LOW_NIBBLE(A)  ((A) & 0x0f)
@@ -168,8 +168,8 @@ class m68000_base_device;
 #define MASK_OUT_BELOW_16(A) ((A) & ~0xffff)
 
 /* No need to mask if we are 32 bit */
-#define MASK_OUT_ABOVE_32(A) ((A) & U64(0xffffffff))
-#define MASK_OUT_BELOW_32(A) ((A) & ~U64(0xffffffff))
+#define MASK_OUT_ABOVE_32(A) ((A) & u64(0xffffffffU))
+#define MASK_OUT_BELOW_32(A) ((A) & ~u64(0xffffffffU))
 
 /* Shift & Rotate Macros. */
 #define LSL(A, C) ((A) << (C))

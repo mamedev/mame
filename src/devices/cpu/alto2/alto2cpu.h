@@ -20,7 +20,7 @@
  */
 enum {
 	// micro code task, micro program counter, next and next2
-	A2_TASK, A2_MPC, A2_NEXT, A2_NEXT2,
+	A2_MPC = STATE_GENPC, A2_TASK = 0, A2_NEXT, A2_NEXT2,
 	// BUS, ALU, temp, latch, memory latch and carry flags
 	A2_BUS, A2_T, A2_ALU, A2_ALUC0, A2_L, A2_SHIFTER, A2_LALUC0, A2_M,
 	A2_R,   // 32 R registers
@@ -233,12 +233,12 @@ protected:
 	//! device (P)ROMs
 	virtual const tiny_rom_entry *device_rom_region() const override;
 	//! device_state_interface overrides
-	void state_string_export(const device_state_entry &entry, std::string &str) const override;
+	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	//! device_disasm_interface overrides
 	virtual uint32_t disasm_min_opcode_bytes() const override { return 4; }
 	virtual uint32_t disasm_max_opcode_bytes() const override { return 4; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 private:
 

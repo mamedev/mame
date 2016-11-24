@@ -82,10 +82,10 @@ enum
 	static_cast<generic_slot_device *>(device)->set_extensions(_ext);
 
 #define MCFG_GENERIC_LOAD(_class, _method)                                \
-	generic_slot_device::static_set_device_load(*device, device_image_load_delegate(&DEVICE_IMAGE_LOAD_NAME(_class,_method), #_class "::device_image_load_" #_method, downcast<_class *>(owner)));
+	generic_slot_device::static_set_device_load(*device, device_image_load_delegate(&DEVICE_IMAGE_LOAD_NAME(_class,_method), downcast<_class *>(owner)));
 
 #define MCFG_GENERIC_UNLOAD(_class, _method)                            \
-	generic_slot_device::static_set_device_unload(*device, device_image_func_delegate(&DEVICE_IMAGE_UNLOAD_NAME(_class,_method), #_class "::device_image_unload_" #_method, downcast<_class *>(owner)));
+	generic_slot_device::static_set_device_unload(*device, device_image_func_delegate(&DEVICE_IMAGE_UNLOAD_NAME(_class,_method), downcast<_class *>(owner)));
 
 
 

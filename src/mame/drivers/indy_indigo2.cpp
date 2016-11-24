@@ -57,13 +57,20 @@
 #include "machine/wd33c93.h"
 #include "machine/ds1386.h"
 #include "machine/z80scc.h"
+#include "bus/rs232/rs232.h"
 
-#define SCC_TAG		"scc"
-#define PI1_TAG		"pi1"
-#define KBDC_TAG	"kbdc"
-#define PIT_TAG		"pit"
+#define SCC_TAG     "scc"
+#define PI1_TAG     "pi1"
+#define KBDC_TAG    "kbdc"
+#define PIT_TAG     "pit"
+#define RS232A_TAG	"rs232a"
+#define RS232B_TAG	"rs232b"
 
-#define SCC_CLOCK	XTAL_10MHz
+#define SCC_PCLK	XTAL_10MHz
+#define SCC_RXA_CLK	XTAL_3_6864MHz // Needs verification
+#define SCC_TXA_CLK	0
+#define SCC_RXB_CLK	XTAL_3_6864MHz // Needs verification
+#define SCC_TXB_CLK	0
 
 #define MCFG_IOC2_GUINNESS_ADD(_tag)  \
 	MCFG_DEVICE_ADD(_tag, SGI_IOC2_GUINNESS, 0)
@@ -95,7 +102,7 @@ protected:
 	virtual ioport_constructor device_input_ports() const override;
 
 	required_device<mips3_device> m_maincpu;
-	required_device<scc85C30_device> m_scc;
+	required_device<scc85230_device> m_scc;
 	required_device<pc_lpt_device> m_pi1; 	// we assume standard parallel port (SPP) mode
 											// TODO: SGI parallel port (SGIPP), HP BOISE high speed parallel port (HPBPP), and Ricoh scanner modes
 	required_device<kbdc8042_device> m_kbdc;
@@ -123,9 +130,9 @@ protected:
 	uint8_t m_int3_timer_clear_reg;
 	uint8_t m_int3_err_status_reg;
 
-	uint32_t	m_par_read_cnt;
-	uint32_t	m_par_cntl;
-	uint8_t	m_system_id;
+	uint32_t    m_par_read_cnt;
+	uint32_t    m_par_cntl;
+	uint8_t m_system_id;
 };
 
 class ioc2_guinness_device : public ioc2_device
@@ -159,9 +166,9 @@ ioc2_full_house_device::ioc2_full_house_device(const machine_config &mconfig, co
 
 static INPUT_PORTS_START( front_panel )
 	PORT_START("panel_buttons")
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Power")		PORT_CHANGED_MEMBER(DEVICE_SELF, ioc2_device, power_button, 0)
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Volume Down")	PORT_CHANGED_MEMBER(DEVICE_SELF, ioc2_device, volume_down, 0)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Volume Up")	PORT_CHANGED_MEMBER(DEVICE_SELF, ioc2_device, volume_up, 0)
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Power")        PORT_CHANGED_MEMBER(DEVICE_SELF, ioc2_device, power_button, 0)
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Volume Down")  PORT_CHANGED_MEMBER(DEVICE_SELF, ioc2_device, volume_down, 0)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_NAME("Volume Up")    PORT_CHANGED_MEMBER(DEVICE_SELF, ioc2_device, volume_up, 0)
 INPUT_PORTS_END
 
 ioport_constructor ioc2_device::device_input_ports() const
@@ -170,7 +177,23 @@ ioport_constructor ioc2_device::device_input_ports() const
 }
 
 MACHINE_CONFIG_FRAGMENT( ioc2_device )
-	MCFG_SCC85C30_ADD(SCC_TAG, SCC_CLOCK, 0, 0, 0, 0)
+	MCFG_SCC85230_ADD(SCC_TAG, SCC_PCLK, SCC_RXA_CLK, SCC_TXA_CLK, SCC_RXB_CLK, SCC_TXB_CLK)
+	MCFG_Z80SCC_OUT_TXDA_CB(DEVWRITELINE(RS232A_TAG, rs232_port_device, write_txd))
+	MCFG_Z80SCC_OUT_DTRA_CB(DEVWRITELINE(RS232A_TAG, rs232_port_device, write_dtr))
+	MCFG_Z80SCC_OUT_RTSA_CB(DEVWRITELINE(RS232A_TAG, rs232_port_device, write_rts))
+	MCFG_Z80SCC_OUT_TXDB_CB(DEVWRITELINE(RS232B_TAG, rs232_port_device, write_txd))
+	MCFG_Z80SCC_OUT_DTRB_CB(DEVWRITELINE(RS232B_TAG, rs232_port_device, write_dtr))
+	MCFG_Z80SCC_OUT_RTSB_CB(DEVWRITELINE(RS232B_TAG, rs232_port_device, write_rts))
+
+	MCFG_RS232_PORT_ADD(RS232A_TAG, default_rs232_devices, nullptr)
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(SCC_TAG, scc85230_device, ctsa_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(SCC_TAG, scc85230_device, dcda_w))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(SCC_TAG, scc85230_device, rxa_w))
+
+	MCFG_RS232_PORT_ADD(RS232B_TAG, default_rs232_devices, nullptr)
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(SCC_TAG, scc85230_device, ctsb_w))
+	MCFG_RS232_DCD_HANDLER(DEVWRITELINE(SCC_TAG, scc85230_device, dcdb_w))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(SCC_TAG, scc85230_device, rxb_w))
 
 	MCFG_DEVICE_ADD(PI1_TAG, PC_LPT, 0)
 
@@ -220,12 +243,12 @@ ioc2_device::ioc2_device(const machine_config &mconfig, device_type type, const 
 {
 }
 
-#define FRONT_PANEL_POWER_STATE			(0x01)
-#define FRONT_PANEL_POWER_BUTTON_INT	(0x02)
-#define FRONT_PANEL_VOL_DOWN_INT		(0x10)
-#define FRONT_PANEL_VOL_DOWN_HOLD		(0x20)
-#define FRONT_PANEL_VOL_UP_INT			(0x40)
-#define FRONT_PANEL_VOL_UP_HOLD			(0x80)
+#define FRONT_PANEL_POWER_STATE         (0x01)
+#define FRONT_PANEL_POWER_BUTTON_INT    (0x02)
+#define FRONT_PANEL_VOL_DOWN_INT        (0x10)
+#define FRONT_PANEL_VOL_DOWN_HOLD       (0x20)
+#define FRONT_PANEL_VOL_UP_INT          (0x40)
+#define FRONT_PANEL_VOL_UP_HOLD         (0x80)
 
 void ioc2_device::device_start()
 {
@@ -318,7 +341,7 @@ READ32_MEMBER( ioc2_device::read )
 		case 0x34/4: // Serial Port1 Data Transfer
 		case 0x38/4: // Serial Port2 Command Transfer
 		case 0x3c/4: // Serial Port2 Data Transfer
-			return m_scc->ba_cd_r(space, (offset - 0x30/4) ^ 1);
+			return m_scc->ba_cd_r(space, (offset - 0x30/4) ^ 3);
 
 		case 0x40/4: // Keyboard/Mouse Registers
 		case 0x44/4: // Keyboard/Mouse Registers
@@ -336,9 +359,9 @@ READ32_MEMBER( ioc2_device::read )
 		case 0x68/4: // DMA_SEL Register
 			// Bits 2-0 not quite understood, seem to be copy/paste error in SGI's own documents:
 			//
-			// 2	RW		Parallel Port DMA Select. A high bit selects the Parallel Port DMA channel. 0\h is the default after reset. [this makes sense. -ed.]
-			// 1	RW		ISDN Channel B DMA Select. A high bit selects the Parallel Port DMA channel. 0\h is the default after reset. [is this a copy/paste error? perhaps "Parallel Port" should be "ISDN Channel B"?]
-			// 0	RW		[same text as above. Another copy/paste error, maybe? Should be channel A, with the bit selecting DMA channel 0/1 for ISDN channel A, the and the same for ISDN channel B in bit 1?]
+			// 2    RW      Parallel Port DMA Select. A high bit selects the Parallel Port DMA channel. 0\h is the default after reset. [this makes sense. -ed.]
+			// 1    RW      ISDN Channel B DMA Select. A high bit selects the Parallel Port DMA channel. 0\h is the default after reset. [is this a copy/paste error? perhaps "Parallel Port" should be "ISDN Channel B"?]
+			// 0    RW      [same text as above. Another copy/paste error, maybe? Should be channel A, with the bit selecting DMA channel 0/1 for ISDN channel A, the and the same for ISDN channel B in bit 1?]
 			return m_dma_sel;
 
 		case 0x70/4: // Reset Register
@@ -347,15 +370,15 @@ READ32_MEMBER( ioc2_device::read )
 		case 0x78/4: // Write Register
 			// Not yet implemented, some bits unnecessary:
 			//
-			// Bit	Oper	Description
-			// 7	RW		Margin High. Set low for normal +5V operation, high to step supply up to +5.5V. Cleared at reset.
-			// 6	RW		Margin Low. Set lowf or normal +5V operation, high to step supply down to +4.5V. Cleared at reset.
-			// 5	RW		UART1 PC Mode. Set low to configure Port1 for RS422 Mac mode, high to select RS232 PC mode. Cleared at reset.
-			// 4	RW		UART2 PC Mode. Set low to configure Port2 for RS422 Mac mode, high to select RS232 PC mode. Cleared at reset.
-			// 3	RW		Ethernet Auto Select (active high). Set low for manual mode, high to have LXT901 automatically select TP or AUI based on link integrity. Cleared at reset.
-			// 2	RW		Ethernet Port Select. Set low for TP, high for AUI. This setting is only used when Auto Select is in manual mode. Cleared at reset.
-			// 1	RW		Ethernet UTP/STP select. Set low to select 150 ohm termination fro shielded TP (default), set high to select 100 ohm termination for unshielded TP. Cleared at reset.
-			// 0	RW		Ethernet Normal Threshold (NTH) select. Set low to select the normal TP squelch threshold (default), high to reduce threshold by 4.5 dB (set low when reset).
+			// Bit  Oper    Description
+			// 7    RW      Margin High. Set low for normal +5V operation, high to step supply up to +5.5V. Cleared at reset.
+			// 6    RW      Margin Low. Set lowf or normal +5V operation, high to step supply down to +4.5V. Cleared at reset.
+			// 5    RW      UART1 PC Mode. Set low to configure Port1 for RS422 Mac mode, high to select RS232 PC mode. Cleared at reset.
+			// 4    RW      UART2 PC Mode. Set low to configure Port2 for RS422 Mac mode, high to select RS232 PC mode. Cleared at reset.
+			// 3    RW      Ethernet Auto Select (active high). Set low for manual mode, high to have LXT901 automatically select TP or AUI based on link integrity. Cleared at reset.
+			// 2    RW      Ethernet Port Select. Set low for TP, high for AUI. This setting is only used when Auto Select is in manual mode. Cleared at reset.
+			// 1    RW      Ethernet UTP/STP select. Set low to select 150 ohm termination fro shielded TP (default), set high to select 100 ohm termination for unshielded TP. Cleared at reset.
+			// 0    RW      Ethernet Normal Threshold (NTH) select. Set low to select the normal TP squelch threshold (default), high to reduce threshold by 4.5 dB (set low when reset).
 			return m_write_reg;
 
 		case 0x80/4: // INT3 Local0 Status Register
@@ -398,10 +421,10 @@ READ32_MEMBER( ioc2_device::read )
 	return 0;
 }
 
-#define DMA_SEL_CLOCK_SEL_MASK		(0x30)
-#define DMA_SEL_CLOCK_SEL_10MHz 	(0x00)
-#define DMA_SEL_CLOCK_SEL_6_67MHz	(0x10)
-#define DMA_SEL_CLOCK_SEL_EXT		(0x20)
+#define DMA_SEL_CLOCK_SEL_MASK      (0x30)
+#define DMA_SEL_CLOCK_SEL_10MHz     (0x00)
+#define DMA_SEL_CLOCK_SEL_6_67MHz   (0x10)
+#define DMA_SEL_CLOCK_SEL_EXT       (0x20)
 
 WRITE32_MEMBER( ioc2_device::write )
 {
@@ -424,7 +447,7 @@ WRITE32_MEMBER( ioc2_device::write )
 		case 0x34/4: // Serial Port1 Data Transfer
 		case 0x38/4: // Serial Port2 Command Transfer
 		case 0x3c/4: // Serial Port2 Data Transfer
-			m_scc->ba_cd_w(space, (offset - 0x30/4) ^ 1, data & 0xff);
+			m_scc->ba_cd_w(space, (offset - 0x30/4) ^ 3, data & 0xff);
 			return;
 
 		case 0x40/4: // Keyboard/Mouse Registers
@@ -440,10 +463,10 @@ WRITE32_MEMBER( ioc2_device::write )
 		{
 			// Bits 2-0 not quite understood, seem to be copy/paste error in SGI's own documents:
 			//
-			// 5:4	RW		Serial Port Clock Select: 00 selects a 10MHz internal clock (default), 01 selects a 6.67MHz internal clock, and 02 or 03 selects the external clock input.
-			// 2	RW		Parallel Port DMA Select. A high bit selects the Parallel Port DMA channel. 0\h is the default after reset. [this makes sense. -ed.]
-			// 1	RW		ISDN Channel B DMA Select. A high bit selects the Parallel Port DMA channel. 0\h is the default after reset. [is this a copy/paste error? perhaps "Parallel Port" should be "ISDN Channel B"?]
-			// 0	RW		[same text as above. Another copy/paste error, maybe? Should be channel A, with the bit selecting DMA channel 0/1 for ISDN channel A, the and the same for ISDN channel B in bit 1?]
+			// 5:4  RW      Serial Port Clock Select: 00 selects a 10MHz internal clock (default), 01 selects a 6.67MHz internal clock, and 02 or 03 selects the external clock input.
+			// 2    RW      Parallel Port DMA Select. A high bit selects the Parallel Port DMA channel. 0\h is the default after reset. [this makes sense. -ed.]
+			// 1    RW      ISDN Channel B DMA Select. A high bit selects the Parallel Port DMA channel. 0\h is the default after reset. [is this a copy/paste error? perhaps "Parallel Port" should be "ISDN Channel B"?]
+			// 0    RW      [same text as above. Another copy/paste error, maybe? Should be channel A, with the bit selecting DMA channel 0/1 for ISDN channel A, the and the same for ISDN channel B in bit 1?]
 			uint8_t old = m_dma_sel;
 			m_dma_sel = data;
 			uint8_t diff = old ^ m_dma_sel;
@@ -452,9 +475,10 @@ WRITE32_MEMBER( ioc2_device::write )
 				if (diff & DMA_SEL_CLOCK_SEL_EXT)
 				{
 					printf("External clock select %sselected\n", (old & DMA_SEL_CLOCK_SEL_EXT) != 0 ? "de" : "");
+					// TODO: verify the external Rx/Tx clock, is it fixed or programmable?
 				}
 			}
-			// TODO: Currently we always assume a 10MHz clock
+			// TODO: Currently we always assume a 10MHz clock as PCLK
 			return;
 		}
 
@@ -559,8 +583,8 @@ INPUT_CHANGED_MEMBER( ioc2_device::volume_down )
 	}
 }
 
-#define IOC2_TAG	"ioc2"
-#define RTC_TAG		"ds1386"
+#define IOC2_TAG    "ioc2"
+#define RTC_TAG     "ds1386"
 
 struct hpc3_t
 {
@@ -1505,6 +1529,35 @@ static MACHINE_CONFIG_DERIVED( ip244415, ip225015 )
 	MCFG_CPU_PROGRAM_MAP( ip225015_map)
 MACHINE_CONFIG_END
 
+/* SCC init ip225015
+ * Channel A
+ * 09 <- c0 Master Interrup Control: Force HW reset + enable SWI INTACK
+ * 04 <- 44 Clocks: x16 mode, 1 stop bits, no parity
+ * 03 <- c0 Receiver: 8 bit data, auto enables, Rx disabled
+ * 05 <- e2 Transmitter: DTR set, 8 bit data, RTS set, Tx disabled
+ * 0b <- 50 Clock Mode: TRxC: XTAL output, TRxC: Output, TxC from BRG, RxC from BRG
+ * 0c <- 0a Low const BRG  3.6864Mhz CLK => 9600 baud
+ * 0d <- 00 High Const BRG = (CLK / (2 x Desired Rate x BR Clock period)) - 2
+ * 0e <- 01 Mics: BRG enable
+ * 03 <- c1 Receiver: as above + Receiver enable
+ * 05 <- ea Transmitter: as above + Transmitter enable
+ *
+ * Channel A and B init - only BRG low const differs
+ * 09 <- 80 channel A reset
+ * 04 <- 44 Clocks: x16 mode, 1 stop bits, no parity
+ * 0f <- 81 External/Status Control: Break/Abort enabled, WR7 prime enabled
+ * 07p<- 40 External read enable (RR9=WR3, RR4=WR4, RR5=WR5, RR14=WR7 and RR11=WR10)
+ * 03 <- c0 Receiver: 8 bit data, auto enables, Rx disabled
+ * 05 <- e2 Transmitter: DTR set, 8 bit data, RTS set, Tx disabled
+ * 0b <- 50 Clock Mode: TRxC: XTAL output, TRxC: Output, TxC from BRG, RxC from BRG
+ * 0e <- 00 Mics: BRG disable
+ * 0c <- 0a/04 Low const BRG, 3.6864Mhz CLK => Chan A:9600 Chan B:38400
+ * 0d <- 00 High Const BRG = (CLK / (2 x Desired Rate x BR Clock period)) - 2
+ * 0e <- 01 Mics: BRG enable
+ * 03 <- c1 Receiver: as above + Receiver enable
+ * 05 <- ea Transmitter: as above + Transmitetr enable
+ * 00 <- 10 Reset External/status IE
+*/
 ROM_START( ip225015 )
 	ROM_REGION( 0x80000, "user1", 0 )
 	ROM_LOAD( "ip225015.bin", 0x000000, 0x080000, CRC(aee5502e) SHA1(9243fef0a3508790651e0d6d2705c887629b1280) )

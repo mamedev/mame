@@ -3,63 +3,121 @@
 #include "emu.h"
 #include "msx_s1985.h"
 
+const uint8_t manufacturer_id = 0xfe;
 
 const device_type MSX_S1985 = &device_creator<msx_s1985_device>;
 
-
 msx_s1985_device::msx_s1985_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: msx_switched_device(mconfig, MSX_S1985, "MSX-Engine S1985", tag, owner, clock, "msx_s1985", __FILE__)
-	, m_6_1(0)
-	, m_6_2(0)
-	, m_7(0)
+	: device_t(mconfig, MSX_S1985, "MSX-Engine S1985", tag, owner, clock, "msx_s1985", __FILE__)
+	, device_nvram_interface(mconfig, *this)
+	, m_selected(false)
+	, m_backup_ram_address(0)
+	, m_color1(0)
+	, m_color2(0)
+	, m_pattern(0)
 {
 }
 
 
-uint8_t msx_s1985_device::get_id()
+void msx_s1985_device::device_start()
 {
-	return 0xFE;
+	save_item(NAME(m_selected));
+	save_item(NAME(m_backup_ram_address));
+	save_item(NAME(m_backup_ram));
+	save_item(NAME(m_color1));
+	save_item(NAME(m_color2));
+	save_item(NAME(m_pattern));
 }
 
 
-READ8_MEMBER(msx_s1985_device::io_read)
+void msx_s1985_device::nvram_default()
 {
-	switch (offset)
+	memset(m_backup_ram, 0xff, sizeof(m_backup_ram));
+}
+
+
+void msx_s1985_device::nvram_read(emu_file &file)
+{
+	file.read(m_backup_ram, sizeof(m_backup_ram));
+}
+
+
+void msx_s1985_device::nvram_write(emu_file &file)
+{
+	file.write(m_backup_ram, sizeof(m_backup_ram));
+}
+
+
+READ8_MEMBER(msx_s1985_device::switched_read)
+{
+	if (m_selected)
 	{
+		switch (offset)
+		{
 		case 0:
-			return ~get_id();
+			/// Manufacturer ID number register
+			return manufacturer_id ^ 0xff;
+
+		case 2:
+			/// Back-up RAM read
+			return m_backup_ram[m_backup_ram_address];
 
 		case 7:
-			{
-				uint8_t data = (m_7 & 0x80) ? m_6_2 : m_6_1;
-				m_7 = ( m_7 << 1 ) | ( m_7 >> 7 );
-				return data;
-			}
+		{
+			// Pattern and foreground/background color read
+			uint8_t data = (m_pattern & 0x80) ? m_color2 : m_color1;
+
+			if(!space.debugger_access())
+				m_pattern = (m_pattern << 1) | (m_pattern >> 7);
+
+			return data;
+		}
 
 		default:
 			printf("msx_s1985: unhandled read from offset %02x\n", offset);
 			break;
+		}
 	}
 
-	return 0xFF;
+	return 0xff;
 }
 
 
-WRITE8_MEMBER(msx_s1985_device::io_write)
+WRITE8_MEMBER(msx_s1985_device::switched_write)
 {
-	switch (offset)
+	if (offset == 0)
 	{
+		/// Manufacturer ID number register
+		m_selected = (data == manufacturer_id);
+	}
+	else if (m_selected)
+	{
+		switch (offset)
+		{
+		case 1:
+			/// Back-up RAM address latch
+			m_backup_ram_address = data & 0x0f;
+			break;
+
+		case 2:
+			/// Back-up RAM write
+			m_backup_ram[m_backup_ram_address] = data;
+			break;
+
 		case 6:
-			m_6_2 = m_6_1;
-			m_6_1 = data;
+			// Foreground/background color write
+			m_color2 = m_color1;
+			m_color1 = data;
 			break;
 
 		case 7:
-			m_7 = data;
+			// Pattern write
+			m_pattern = data;
 			break;
 
 		default:
 			printf("msx_s1985: unhandled write %02x to offset %02x\n", data, offset);
 			break;
+		}
 	}
 }

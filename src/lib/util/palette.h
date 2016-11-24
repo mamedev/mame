@@ -35,19 +35,19 @@ class rgb_t
 {
 public:
 	// construction/destruction
-	rgb_t(): m_data(0) { }
-	rgb_t(uint32_t data) { m_data = data; }
-	rgb_t(uint8_t r, uint8_t g, uint8_t b) { m_data = (255 << 24) | (r << 16) | (g << 8) | b; }
-	rgb_t(uint8_t a, uint8_t r, uint8_t g, uint8_t b) { m_data = (a << 24) | (r << 16) | (g << 8) | b; }
+	constexpr rgb_t() : m_data(0) { }
+	constexpr rgb_t(uint32_t data) : m_data(data) { }
+	constexpr rgb_t(uint8_t r, uint8_t g, uint8_t b) : m_data((255 << 24) | (r << 16) | (g << 8) | b) { }
+	constexpr rgb_t(uint8_t a, uint8_t r, uint8_t g, uint8_t b) : m_data((a << 24) | (r << 16) | (g << 8) | b) { }
 
 	// getters
-	uint8_t a() const { return m_data >> 24; }
-	uint8_t r() const { return m_data >> 16; }
-	uint8_t g() const { return m_data >> 8; }
-	uint8_t b() const { return m_data >> 0; }
-	rgb15_t as_rgb15() const { return ((r() >> 3) << 10) | ((g() >> 3) << 5) | ((b() >> 3) << 0); }
-	uint8_t brightness() const { return (r() * 222 + g() * 707 + b() * 71) / 1000; }
-	uint32_t const *ptr() const { return &m_data; }
+	constexpr uint8_t a() const { return m_data >> 24; }
+	constexpr uint8_t r() const { return m_data >> 16; }
+	constexpr uint8_t g() const { return m_data >> 8; }
+	constexpr uint8_t b() const { return m_data >> 0; }
+	constexpr rgb15_t as_rgb15() const { return ((r() >> 3) << 10) | ((g() >> 3) << 5) | ((b() >> 3) << 0); }
+	constexpr uint8_t brightness() const { return (r() * 222 + g() * 707 + b() * 71) / 1000; }
+	constexpr uint32_t const *ptr() const { return &m_data; }
 
 	// setters
 	rgb_t &set_a(uint8_t a) { m_data &= ~0xff000000; m_data |= a << 24; return *this; }
@@ -56,31 +56,31 @@ public:
 	rgb_t &set_b(uint8_t b) { m_data &= ~0x000000ff; m_data |= b <<  0; return *this; }
 
 	// implicit conversion operators
-	operator uint32_t() const { return m_data; }
+	constexpr operator uint32_t() const { return m_data; }
 
 	// operations
 	rgb_t &scale8(uint8_t scale) { m_data = rgb_t(clamphi((a() * scale) >> 8), clamphi((r() * scale) >> 8), clamphi((g() * scale) >> 8), clamphi((b() * scale) >> 8)); return *this; }
 
 	// assignment operators
 	rgb_t &operator=(uint32_t rhs) { m_data = rhs; return *this; }
-	rgb_t &operator+=(const rgb_t &rhs) { m_data = rgb_t(clamphi(a() + rhs.a()), clamphi(r() + rhs.r()), clamphi(g() + rhs.g()), clamphi(b() + rhs.b())); return *this; }
-	rgb_t &operator-=(const rgb_t &rhs) { m_data = rgb_t(clamplo(a() - rhs.a()), clamplo(r() - rhs.r()), clamplo(g() - rhs.g()), clamplo(b() - rhs.b())); return *this; }
+	rgb_t &operator+=(const rgb_t &rhs) { m_data = uint32_t(*this + rhs); return *this; }
+	rgb_t &operator-=(const rgb_t &rhs) { m_data = uint32_t(*this - rhs); return *this; }
 
 	// arithmetic operators
-	rgb_t operator+(const rgb_t &rhs) const { rgb_t result = *this; result += rhs; return result; }
-	rgb_t operator-(const rgb_t &rhs) const { rgb_t result = *this; result -= rhs; return result; }
+	constexpr rgb_t operator+(const rgb_t &rhs) const { return rgb_t(clamphi(a() + rhs.a()), clamphi(r() + rhs.r()), clamphi(g() + rhs.g()), clamphi(b() + rhs.b())); }
+	constexpr rgb_t operator-(const rgb_t &rhs) const { return rgb_t(clamplo(a() - rhs.a()), clamplo(r() - rhs.r()), clamplo(g() - rhs.g()), clamplo(b() - rhs.b())); }
 
 	// static helpers
-	static uint8_t clamp(int32_t value) { return (value < 0) ? 0 : (value > 255) ? 255 : value; }
-	static uint8_t clamphi(int32_t value) { return (value > 255) ? 255 : value; }
-	static uint8_t clamplo(int32_t value) { return (value < 0) ? 0 : value; }
+	static constexpr uint8_t clamp(int32_t value) { return (value < 0) ? 0 : (value > 255) ? 255 : value; }
+	static constexpr uint8_t clamphi(int32_t value) { return (value > 255) ? 255 : value; }
+	static constexpr uint8_t clamplo(int32_t value) { return (value < 0) ? 0 : value; }
 
-	// constants
-	static const rgb_t black;
-	static const rgb_t white;
-	static const rgb_t green;
-	static const rgb_t amber;
-	static const rgb_t transparent;
+	// constant factories
+	static constexpr rgb_t black() { return rgb_t(0, 0, 0); }
+	static constexpr rgb_t white() { return rgb_t(255, 255, 255); }
+	static constexpr rgb_t green() { return rgb_t(0, 255, 0); }
+	static constexpr rgb_t amber() { return rgb_t(247, 170, 0); }
+	static constexpr rgb_t transparent() { return rgb_t(0, 0, 0, 0); }
 
 private:
 	uint32_t  m_data;
@@ -163,8 +163,8 @@ public:
 	void set_gamma(float gamma);
 
 	// entry getters
-	rgb_t entry_color(uint32_t index) const { return (index < m_numcolors) ? m_entry_color[index] : rgb_t::black; }
-	rgb_t entry_adjusted_color(uint32_t index) const { return (index < m_numcolors * m_numgroups) ? m_adjusted_color[index] : rgb_t::black; }
+	rgb_t entry_color(uint32_t index) const { return (index < m_numcolors) ? m_entry_color[index] : rgb_t::black(); }
+	rgb_t entry_adjusted_color(uint32_t index) const { return (index < m_numcolors * m_numgroups) ? m_adjusted_color[index] : rgb_t::black(); }
 	float entry_contrast(uint32_t index) const { return (index < m_numcolors) ? m_entry_contrast[index] : 1.0f; }
 
 	// entry setters

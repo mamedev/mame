@@ -1050,4 +1050,4 @@ ROM_START(ti99_4p)
 ROM_END
 
 /*    YEAR  NAME      PARENT   COMPAT   MACHINE      INPUT    INIT      COMPANY     FULLNAME */
-COMP( 1996, ti99_4p,  0,       0,       ti99_4p_60hz, ti99_4p, driver_device, 0, "System-99 User Group",       "SGCPU (aka TI-99/4P)" , 0 )
+COMP( 1996, ti99_4p,  0,       0,       ti99_4p_60hz, ti99_4p, driver_device, 0, "System-99 User Group",       "SGCPU (aka TI-99/4P)" , MACHINE_SUPPORTS_SAVE )

@@ -554,8 +554,7 @@ public:
 
 	static const device_timer_id TIMER_0 = 0;
 	static const device_timer_id TIMER_1 = 1;
-	static const device_timer_id TIMER_DMA = 2;
-	static const device_timer_id TIMER_RESET = 3;
+	static const device_timer_id TIMER_RESET = 2;
 
 	DECLARE_READ32_MEMBER( sun4_mmu_r );
 	DECLARE_WRITE32_MEMBER( sun4_mmu_w );
@@ -611,8 +610,9 @@ protected:
 	uint32_t m_buserr[4];
 	uint32_t m_counter[4];
 	uint32_t m_dma[4];
+	bool m_dma_tc_read;
+	uint32_t m_dma_pack_register;
 	int m_scsi_irq;
-	int m_scsi_drq;
 
 private:
 	uint32_t *m_ram_ptr;
@@ -629,7 +629,6 @@ private:
 	int m_arch;
 
 	emu_timer *m_c0_timer, *m_c1_timer;
-	emu_timer *m_dma_timer;
 	emu_timer *m_reset_timer;
 
 	uint32_t read_insn_data(uint8_t asi, address_space &space, uint32_t offset, uint32_t mem_mask);
@@ -637,10 +636,10 @@ private:
 	uint32_t read_insn_data_4c(uint8_t asi, address_space &space, uint32_t offset, uint32_t mem_mask);
 	void write_insn_data_4c(uint8_t asi, address_space &space, uint32_t offset, uint32_t data, uint32_t mem_mask);
 
-	void dma_set_int_pend(int state);
-	void dma_update_irq();
-	void dma_tick();
-	void dma_setup_timer(bool continuing);
+	void dma_check_interrupts();
+	void dma_transfer();
+	void dma_transfer_write();
+	void dma_transfer_read();
 
 	void start_timer(int num);
 
@@ -1340,7 +1339,8 @@ void sun4_state::machine_reset()
 	m_irq_reg = 0;
 	m_scc1_int = m_scc2_int = 0;
 	m_scsi_irq = 0;
-	m_scsi_drq = 0;
+	m_dma_tc_read = false;
+	m_dma_pack_register = 0;
 
 	memset(m_counter, 0, sizeof(m_counter));
 	memset(m_dma, 0, sizeof(m_dma));
@@ -1371,10 +1371,6 @@ void sun4_state::machine_start()
 	// allocate timer for system reset
 	m_reset_timer = timer_alloc(TIMER_RESET);
 	m_reset_timer->adjust(attotime::never);
-
-	// allocate timer for DMA controller
-	m_dma_timer = timer_alloc(TIMER_DMA);
-	m_dma_timer->adjust(attotime::never);
 }
 
 READ32_MEMBER( sun4_state::ram_r )
@@ -1466,7 +1462,7 @@ static ADDRESS_MAP_START(type1space_map, AS_PROGRAM, 32, sun4_state)
 	AM_RANGE(0x07200000, 0x07200003) AM_READWRITE8(fdc_r, fdc_w, 0xffffffff)
 	AM_RANGE(0x08000000, 0x08000003) AM_READ(ss1_sl0_id)    // slot 0 contains SCSI/DMA/Ethernet
 	AM_RANGE(0x08400000, 0x0840000f) AM_READWRITE(dma_r, dma_w)
-	AM_RANGE(0x08800000, 0x0880001f) AM_DEVICE8("scsibus:7:ncr5390", ncr5390_device, map, 0xff0000)
+	AM_RANGE(0x08800000, 0x0880001f) AM_DEVICE8("scsibus:7:ncr5390", ncr5390_device, map, 0xff000000)
 	AM_RANGE(0x0e000000, 0x0e000003) AM_READ(ss1_sl3_id)    // slot 3 contains video board
 	AM_RANGE(0x0e800000, 0x0e8fffff) AM_RAM AM_SHARE("bw2_vram")
 ADDRESS_MAP_END
@@ -1575,10 +1571,6 @@ void sun4_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 			}
 			break;
 
-		case TIMER_DMA:
-			dma_tick();
-			break;
-
 		case TIMER_RESET:
 			m_reset_timer->adjust(attotime::never);
 			m_maincpu->set_input_line(SPARC_RESET, CLEAR_LINE);
@@ -1665,22 +1657,15 @@ WRITE32_MEMBER( sun4_state::timer_w )
 	}
 }
 
-void sun4_state::dma_set_int_pend(int state)
+void sun4_state::dma_check_interrupts()
 {
-	if (!state)
-	{
-		m_dma[DMA_CTRL] &= ~DMA_INT_PEND;
-	}
-	else
-	{
+	bool tc_interrupt = (m_dma[DMA_CTRL] & DMA_TC) != 0 && !m_dma_tc_read;
+	bool scsi_interrupt = m_scsi_irq != 0;
+
+	m_dma[DMA_CTRL] &= ~DMA_INT_PEND;
+	if (tc_interrupt || scsi_interrupt)
 		m_dma[DMA_CTRL] |= DMA_INT_PEND;
-	}
 
-	dma_update_irq();
-}
-
-void sun4_state:: dma_update_irq()
-{
 	int irq_or_err_pending = (m_dma[DMA_CTRL] & (DMA_INT_PEND | DMA_ERR_PEND)) ? 1 : 0;
 	int irq_enabled = (m_dma[DMA_CTRL] & DMA_INT_EN) ? 1 : 0;
 	if (irq_or_err_pending && irq_enabled)
@@ -1693,152 +1678,108 @@ void sun4_state:: dma_update_irq()
 	}
 }
 
-void sun4_state::dma_tick()
+void sun4_state::dma_transfer_write()
 {
-	uint32_t transfer_size = (m_dma[DMA_BYTE_COUNT] > PAGE_SIZE ? PAGE_SIZE : m_dma[DMA_BYTE_COUNT]);
+	logerror("DMAing from device to RAM\n");
+
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 
-	if (m_dma[DMA_CTRL] & DMA_WRITE)
+	uint8_t pack_cnt = (m_dma[DMA_CTRL] & DMA_PACK_CNT) >> DMA_PACK_CNT_SHIFT;
+	while (m_dma[DMA_CTRL] & DMA_REQ_PEND)
 	{
-		uint32_t data = 0;
-		uint32_t byte_cnt = 3;
-		uint32_t mem_mask = 0;
-		while (transfer_size > 0)
+		int bit_index = (3 - pack_cnt) * 8;
+		uint8_t dma_value = m_scsi->dma_r();
+		logerror("Read from device: %02x\n", dma_value);
+		m_dma_pack_register |= dma_value << bit_index;
+
+		if ((m_dma[DMA_CTRL] & DMA_EN_CNT) != 0)
+			m_dma[DMA_BYTE_COUNT]--;
+
+		pack_cnt++;
+		if (pack_cnt == 4)
 		{
-			uint8_t value = m_scsi->dma_r();
-			data |= value << (byte_cnt * 8);
-			mem_mask |= 0xff << (byte_cnt * 8);
-			transfer_size--;
-
-			if (byte_cnt == 0)
+			logerror("Writing pack register %08x\n", m_dma_pack_register);
+			if (m_arch == ARCH_SUN4C)
 			{
-				if (m_arch == ARCH_SUN4C)
-				{
-					write_insn_data_4c(11, space, m_dma[DMA_ADDR] >> 2, data, mem_mask);
-				}
-				else
-				{
-					write_insn_data(11, space, m_dma[DMA_ADDR] >> 2, data, mem_mask);
-				}
-				m_dma[DMA_ADDR] += 4;
-				m_dma[DMA_BYTE_COUNT] -= 4;
-
-				byte_cnt = 3;
-				data = 0;
-				mem_mask = 0;
+				write_insn_data_4c(11, space, m_dma[DMA_ADDR] >> 2, m_dma_pack_register, ~0);
 			}
 			else
 			{
-				byte_cnt--;
+				write_insn_data(11, space, m_dma[DMA_ADDR] >> 2, m_dma_pack_register, ~0);
 			}
-		}
 
-		if (byte_cnt != 0)
+			pack_cnt = 0;
+			m_dma_pack_register = 0;
+		}
+	}
+
+	m_dma[DMA_CTRL] &= ~DMA_PACK_CNT;
+	m_dma[DMA_CTRL] |= pack_cnt << DMA_PACK_CNT_SHIFT;
+}
+
+void sun4_state::dma_transfer_read()
+{
+	logerror("DMAing from RAM to device\n");
+
+	address_space &space = m_maincpu->space(AS_PROGRAM);
+
+	bool word_cached = false;
+	uint32_t current_word = 0;
+	while (m_dma[DMA_CTRL] & DMA_REQ_PEND)
+	{
+		if (!word_cached)
 		{
 			if (m_arch == ARCH_SUN4C)
 			{
-				write_insn_data_4c(11, space, m_dma[DMA_ADDR] >> 2, data, mem_mask);
+				current_word = read_insn_data_4c(11, space, m_dma[DMA_ADDR] >> 2, ~0);
 			}
 			else
 			{
-				write_insn_data(11, space, m_dma[DMA_ADDR] >> 2, data, mem_mask);
+				current_word = read_insn_data(11, space, m_dma[DMA_ADDR] >> 2, ~0);
 			}
-
-			m_dma[DMA_ADDR] += byte_cnt;
-			m_dma[DMA_BYTE_COUNT] -= byte_cnt;
-		}
-	}
-	else
-	{
-		uint32_t byte_cnt = 3;
-		uint32_t mem_mask = 0;
-		while (transfer_size > 0)
-		{
-			mem_mask |= 0xff << (byte_cnt * 8);
-			transfer_size--;
-
-			if (byte_cnt == 0)
-			{
-				uint32_t data = 0;
-				if (m_arch == ARCH_SUN4C)
-				{
-					data = read_insn_data_4c(11, space, m_dma[DMA_ADDR] >> 2, mem_mask);
-				}
-				else
-				{
-					data = read_insn_data(11, space, m_dma[DMA_ADDR] >> 2, mem_mask);
-				}
-
-				for (int i = 24; i >= 0; i -= 8)
-				{
-					m_scsi->dma_w((data >> i) & 0xff);
-					m_dma[DMA_BYTE_COUNT]--;
-				}
-
-				byte_cnt = 3;
-				mem_mask = 0;
-			}
-			else
-			{
-				byte_cnt--;
-			}
+			logerror("Current word: %08x\n", current_word);
 		}
 
-		if (byte_cnt != 0)
-		{
-			byte_cnt++;
-			uint32_t data = 0;
-			if (m_arch == ARCH_SUN4C)
-			{
-				data = read_insn_data_4c(11, space, m_dma[DMA_ADDR] >> 2, mem_mask);
-			}
-			else
-			{
-				data = read_insn_data(11, space, m_dma[DMA_ADDR] >> 2, mem_mask);
-			}
+		int bit_index = (3 - (m_dma[DMA_ADDR] & 3)) * 8;
+		uint8_t dma_value(current_word >> bit_index);
+		logerror("Write to device: %02x\n", dma_value);
+		m_scsi->dma_w(dma_value);
 
-			uint32_t initial_cnt = byte_cnt;
-			for (int i = 0; i < 4 - initial_cnt; i++)
-			{
-				uint8_t byte_val = (data >> (byte_cnt * 8)) & 0xff;
-				m_scsi->dma_w(byte_val);
+		m_dma[DMA_ADDR]++;
+		if ((m_dma[DMA_CTRL] & DMA_EN_CNT) != 0)
+			m_dma[DMA_BYTE_COUNT]--;
 
-				m_dma[DMA_BYTE_COUNT]--;
-				byte_cnt--;
-			}
-		}
-	}
-
-	if (m_dma[DMA_BYTE_COUNT] == 0)
-	{
-		m_dma[DMA_CTRL] |= DMA_TC;
-		dma_set_int_pend(1);
-		m_dma_timer->adjust(attotime::never);
-	}
-	else
-	{
-		dma_setup_timer(true);
+		if ((m_dma[DMA_ADDR] & 3) == 3)
+			word_cached = false;
 	}
 }
 
-void sun4_state::dma_setup_timer(bool continuing)
+void sun4_state::dma_transfer()
 {
-	const uint32_t remaining_bytes = m_dma[DMA_BYTE_COUNT];
-	const uint64_t latency = (continuing ? 0 : 40);
-	const uint64_t transfer_size = (remaining_bytes < PAGE_SIZE ? remaining_bytes : PAGE_SIZE);
-	const uint64_t transfer_duration = ((transfer_size + 15) / 16) * 8; // 16 byte groupings, 8 clock cycles per group
-	const uint64_t total_ticks = latency + transfer_duration;
-
-	m_dma_timer->adjust(attotime::from_ticks(total_ticks, DMA_XTAL));
-
-	if (!continuing)
+	if (m_dma[DMA_CTRL] & DMA_WRITE)
 	{
-		m_dma[DMA_CTRL] &= DMA_TC;
+		dma_transfer_write();
+	}
+	else
+	{
+		dma_transfer_read();
+	}
+
+	if (m_dma[DMA_BYTE_COUNT] == 0 && (m_dma[DMA_CTRL] & DMA_EN_CNT) != 0)
+	{
+		m_dma[DMA_CTRL] |= DMA_TC;
+		m_dma_tc_read = false;
+		dma_check_interrupts();
 	}
 }
 
 READ32_MEMBER( sun4_state::dma_r )
 {
+	if (offset == DMA_CTRL && (m_dma[DMA_CTRL] & DMA_TC) != 0)
+	{
+		m_dma_tc_read = true;
+		dma_check_interrupts();
+	}
 	return m_dma[offset];
 }
 
@@ -1849,33 +1790,40 @@ WRITE32_MEMBER( sun4_state::dma_w )
 		case DMA_CTRL:
 		{
 			// clear write-only bits
+			logerror("dma_w: ctrl: %08x\n", data);
 			uint32_t old_ctrl = m_dma[DMA_CTRL];
 
-			m_dma[DMA_CTRL] &= (DMA_READ_ONLY | DMA_READ_WRITE);
-
+			m_dma[DMA_CTRL] &= (DMA_WRITE_ONLY | DMA_READ_WRITE);
 			m_dma[DMA_CTRL] |= (data & (DMA_WRITE_ONLY | DMA_READ_WRITE));
 
-			if (data & DMA_FLUSH)
+			uint32_t diff = old_ctrl ^ m_dma[DMA_CTRL];
+
+			if (diff & DMA_FLUSH)
 			{
 				m_dma[DMA_CTRL] &= ~DMA_PACK_CNT;
 				m_dma[DMA_CTRL] &= ~DMA_ERR_PEND;
 				m_dma[DMA_CTRL] &= ~DMA_TC;
 
-				if (!m_scsi_irq)
-				{
-					dma_set_int_pend(0);
-				}
+				dma_check_interrupts();
 			}
 
-			if (data & DMA_EN_DMA && !(old_ctrl & DMA_EN_DMA))
+			if (diff & DMA_EN_DMA)
 			{
-				dma_setup_timer(false);
+				if ((data & DMA_EN_DMA) != 0 && (m_dma[DMA_CTRL] & DMA_REQ_PEND) != 0)
+				{
+					dma_transfer();
+				}
 			}
 			break;
 		}
 
 		case DMA_ADDR:
+			logerror("dma_w: addr: %08x\n", data);
+			m_dma[offset] = data;
+			break;
+
 		case DMA_BYTE_COUNT:
+			logerror("dma_w: byte_count: %08x\n", data);
 			m_dma[offset] = data;
 			break;
 
@@ -1886,23 +1834,24 @@ WRITE32_MEMBER( sun4_state::dma_w )
 
 WRITE_LINE_MEMBER( sun4_state::scsi_irq )
 {
-	if (!(m_dma[DMA_CTRL] & DMA_TC))
-	{
-		dma_set_int_pend(state);
-	}
 	m_scsi_irq = state;
+	dma_check_interrupts();
 }
 
 WRITE_LINE_MEMBER( sun4_state::scsi_drq )
 {
+	logerror("scsi_drq %d\n", state);
+	m_dma[DMA_CTRL] &= ~DMA_REQ_PEND;
 	if (state)
 	{
+		logerror("scsi_drq, DMA pending\n");
+		m_dma[DMA_CTRL] |= DMA_REQ_PEND;
 		if (m_dma[DMA_CTRL] & DMA_EN_DMA)
 		{
-			dma_setup_timer(false);
+			logerror("DMA enabled, starting dma\n");
+			dma_transfer();
 		}
 	}
-	m_scsi_drq = state;
 }
 
 // indicate 4/60 SCSI/DMA/Ethernet card exists

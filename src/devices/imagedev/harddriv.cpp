@@ -112,8 +112,11 @@ void harddisk_image_device::device_start()
 
 void harddisk_image_device::device_stop()
 {
-	if (m_hard_disk_handle)
+	if (m_hard_disk_handle != nullptr)
+	{
 		hard_disk_close(m_hard_disk_handle);
+		m_hard_disk_handle = nullptr;
+	}
 }
 
 image_init_result harddisk_image_device::call_load()
@@ -234,8 +237,11 @@ image_init_result harddisk_image_device::internal_load_hd()
 
 	m_chd = nullptr;
 
-	if (m_hard_disk_handle)
+	if (m_hard_disk_handle != nullptr)
+	{
 		hard_disk_close(m_hard_disk_handle);
+		m_hard_disk_handle = nullptr;
+	}
 
 	/* open the CHD file */
 	if (software_entry() != nullptr)

@@ -11,7 +11,7 @@
     IMPORTANT:
     "physical" block addresses are the actual addresses on the emulated CD.
     "chd" block addresses are the block addresses in the CHD file.
-    Because we pad each track to a 4-frame boundry, these addressing
+    Because we pad each track to a 4-frame boundary, these addressing
     schemes will differ after track 1!
 
 ***************************************************************************/

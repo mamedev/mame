@@ -275,10 +275,10 @@ static INPUT_PORTS_START( cocean1a ) /* 10 */
 	PORT_DIPSETTING(    0x00, "1 Coin 100 Credits" )
 	PORT_DIPNAME( 0x04, 0x04, "Game Select" )                           PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x04, "1 to 8 Lines" )
-	PORT_DIPSETTING(    0x00, "Center Line" )	
+	PORT_DIPSETTING(    0x00, "Center Line" )
 	PORT_DIPNAME( 0x08, 0x08, "Background Music" )                      PORT_DIPLOCATION("SW2:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )	
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x10, "Pay Out %" )                             PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(    0x10, "Payout 75%")
 	PORT_DIPSETTING(    0x00, "Payout 85%")
@@ -1216,12 +1216,12 @@ ROM_START( cocean1a ) // version MD 1-A-0 verified, 061 blocks, decrypted main d
 	ROM_LOAD( "dp-1100-a.rom",   0x0000, 0x0020, CRC(1bc9fccb) SHA1(ffc59c7660d5c87a8deca294f80260b6bc7c3027) )
 ROM_END
 
-ROM_START( cocean6b ) // version MD 10-B-0 not verified, 068 blocks, decrypted main data CRC(410d1f19)	
+ROM_START( cocean6b ) // version MD 10-B-0 not verified, 068 blocks, decrypted main data CRC(410d1f19)
 	DECOCASS_BIOS_BO_ROMS
 
 	ROM_REGION( 0x10000, "cassette", 0 )  /* (max) 64k for cassette image */
 	ROM_LOAD( "dt-1106-b-0.cas", 0x0000, 0x4500, CRC(fa6ffc95) SHA1(95f881503aa8cd97d04b327abeb68891d053563f) )
-	
+
 	ROM_REGION( 0x00020, "dongle", 0 )    /* dongle data */
 	ROM_LOAD( "dp-1100-b.rom",   0x0000, 0x0020, CRC(e09ae5de) SHA1(7dec067d0739a6dad2607132641b66880a5b7751) )
 ROM_END

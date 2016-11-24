@@ -5,14 +5,9 @@ Let's get you going with Sol! To start, you'll need to use a lua distribution of
 
 If you need help getting or building Lua, check out the `Lua page on getting started`_. Note that for Visual Studio, one can simply download the sources, include all the Lua library files in that project, and then build for debug/release, x86/x64/ARM rather easily and with minimal interference. Just make sure to adjust the Project Property page to build as a static library (or a DLL with the proper define set in the ``Preprocessor`` step).
 
-After that, make sure you grab either the `single header file release`_, or just perform a clone of the `github repository here`_ and set your include paths up so that you can get at ``sol.hpp`` somehow. Note that we also have the latest version of the single header file with all dependencies included kept in the `repository as well`_. We recommend the single-header-file release, since it's easier to move around, manage and update if you commit it with some form of version control. If you use the github clone method and do not point to the `single/sol/sol.hpp`_ on your include files, you *must* update submodules in order to make sure Optional is present in the repository. Clone with:
+After that, make sure you grab either the `single header file release`_, or just perform a clone of the `github repository here`_ and set your include paths up so that you can get at ``sol.hpp`` somehow. Note that we also have the latest version of the single header file with all dependencies included kept in the `repository as well`_. We recommend the single-header-file release, since it's easier to move around, manage and update if you commit it with some form of version control. You can also clone/submodule the repository and then point at the `single/sol/sol.hpp`_ on your include files path. Clone with:
 
 >>> git clone https://github.com/ThePhD/sol2.git
->>> git submodule update --init
-
-or, just run
-
->>> git clone --recursive https://github.com/ThePhD/sol2.git
 
 When you're ready, try compiling this short snippet:
 

@@ -290,11 +290,6 @@ void msm5205_device::playmode_w(int select)
 }
 
 
-void msm5205_device::set_volume(int volume)
-{
-	m_stream->set_output_gain(0,volume / 100.0);
-}
-
 void msm5205_device::change_clock_w(int32_t clock)
 {
 	attotime period;

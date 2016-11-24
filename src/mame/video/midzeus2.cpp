@@ -282,7 +282,7 @@ VIDEO_START_MEMBER(midzeus2_state,midzeus2)
 	poly = auto_alloc(machine(), midzeus2_renderer(*this));
 
 	/* we need to cleanup on exit */
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(midzeus2_state::exit_handler2), this));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&midzeus2_state::exit_handler2, this));
 
 	zbase = 2.0f;
 	yoffs = 0;
@@ -1277,11 +1277,11 @@ In memory:
 	//       tests, but the (numverts == 5) statement below may actually be a quad fan instead of a 5-sided
 	//       polygon.
 	if (numverts == 3)
-		render_triangle(zeus_cliprect, render_delegate(FUNC(midzeus2_renderer::render_poly_8bit), this), 4, clipvert[0], clipvert[1], clipvert[2]);
+		render_triangle(zeus_cliprect, render_delegate(&midzeus2_renderer::render_poly_8bit, this), 4, clipvert[0], clipvert[1], clipvert[2]);
 	else if (numverts == 4)
-		render_polygon<4>(zeus_cliprect, render_delegate(FUNC(midzeus2_renderer::render_poly_8bit), this), 4, clipvert);
+		render_polygon<4>(zeus_cliprect, render_delegate(&midzeus2_renderer::render_poly_8bit, this), 4, clipvert);
 	else if (numverts == 5)
-		render_polygon<5>(zeus_cliprect, render_delegate(FUNC(midzeus2_renderer::render_poly_8bit), this), 4, clipvert);
+		render_polygon<5>(zeus_cliprect, render_delegate(&midzeus2_renderer::render_poly_8bit, this), 4, clipvert);
 }
 
 

@@ -315,6 +315,7 @@ void hp9845b_state::machine_reset()
 	m_pa = 0;
 
 	sts_w(GVIDEO_PA , true);
+	update_graphic_bits();
 
 	memset(&m_kb_state[ 0 ] , 0 , sizeof(m_kb_state));
 	m_kb_scancode = 0x7f;
@@ -1063,7 +1064,7 @@ static MACHINE_CONFIG_START( hp9845b, hp9845b_state )
 		MCFG_HPHYBRID_PA_CHANGED(WRITE8(hp9845b_state , pa_w))
 
 	// video hardware
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_UPDATE_DRIVER(hp9845b_state, screen_update)
 		// These parameters are for alpha video
 	MCFG_SCREEN_RAW_PARAMS(VIDEO_PIXEL_CLOCK , VIDEO_HTOTAL , 0 , VIDEO_HBSTART , VIDEO_VTOTAL , 0 , VIDEO_ACTIVE_SCANLINES)

@@ -212,7 +212,7 @@ MACHINE_RESET_MEMBER(pentagon_state,pentagon)
 		if (strcmp(machine().system().name, "pent1024")==0)
 			m_beta->enable();
 	}
-	space.set_direct_update_handler(direct_update_delegate(FUNC(pentagon_state::pentagon_direct), this));
+	space.set_direct_update_handler(direct_update_delegate(&pentagon_state::pentagon_direct, this));
 
 	memset(messram,0,128*1024);
 

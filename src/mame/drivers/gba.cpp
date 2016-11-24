@@ -1452,7 +1452,7 @@ DIRECT_UPDATE_MEMBER(gba_state::gba_direct)
 
 DRIVER_INIT_MEMBER(gba_state,gbadv)
 {
-	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(gba_state::gba_direct), this));
+	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(&gba_state::gba_direct, this));
 }
 
 

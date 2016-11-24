@@ -90,7 +90,7 @@ WRITE8_MEMBER(tecmo_state::adpcm_end_w)
 
 WRITE8_MEMBER(tecmo_state::adpcm_vol_w)
 {
-	m_msm->set_volume((data & 0x0f) * 100 / 15);
+	m_msm->set_output_gain(ALL_OUTPUTS, (data & 15) / 15.0);
 }
 
 WRITE_LINE_MEMBER(tecmo_state::adpcm_int)

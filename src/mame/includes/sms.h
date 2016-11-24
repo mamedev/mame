@@ -227,6 +227,7 @@ protected:
 	void setup_enabled_slots();
 	void lphaser_hcount_latch();
 	void sms_get_inputs();
+	void smsj_set_audio_control(uint8_t data);
 };
 
 class smssdisp_state : public sms_state

@@ -22,10 +22,10 @@
     scale factor
 -------------------------------------------------*/
 
-void rgbaint_t::blend(const rgbaint_t& color2, uint8_t color1scale)
+void rgbaint_t::blend(const rgbaint_t& color2, u8 color1scale)
 {
-	int32_t scale1 = (int32_t)color1scale;
-	int32_t scale2 = 256 - scale1;
+	s32 scale1 = s32(color1scale);
+	s32 scale2 = 256 - scale1;
 
 	m_a = (m_a * scale1 + color2.m_a * scale2) >> 8;
 	m_r = (m_r * scale1 + color2.m_r * scale2) >> 8;
@@ -44,7 +44,7 @@ void rgbaint_t::blend(const rgbaint_t& color2, uint8_t color1scale)
     per channel, and clamp to byte values
 -------------------------------------------------*/
 
-void rgbaint_t::scale_imm_and_clamp(int32_t scale)
+void rgbaint_t::scale_imm_and_clamp(s32 scale)
 {
 	m_a = (m_a * scale) >> 8;
 	m_r = (m_r * scale) >> 8;
@@ -54,10 +54,10 @@ void rgbaint_t::scale_imm_and_clamp(int32_t scale)
 	m_r |= (m_r & 0x00800000) ? 0xff000000 : 0;
 	m_g |= (m_g & 0x00800000) ? 0xff000000 : 0;
 	m_b |= (m_b & 0x00800000) ? 0xff000000 : 0;
-	if ((uint32_t)m_a > 255) { m_a = (m_a < 0) ? 0 : 255; }
-	if ((uint32_t)m_r > 255) { m_r = (m_r < 0) ? 0 : 255; }
-	if ((uint32_t)m_g > 255) { m_g = (m_g < 0) ? 0 : 255; }
-	if ((uint32_t)m_b > 255) { m_b = (m_b < 0) ? 0 : 255; }
+	if (u32(m_a) > 255) { m_a = (m_a < 0) ? 0 : 255; }
+	if (u32(m_r) > 255) { m_r = (m_r < 0) ? 0 : 255; }
+	if (u32(m_g) > 255) { m_g = (m_g < 0) ? 0 : 255; }
+	if (u32(m_b) > 255) { m_b = (m_b < 0) ? 0 : 255; }
 }
 
 void rgbaint_t::scale_and_clamp(const rgbaint_t& scale)
@@ -70,14 +70,14 @@ void rgbaint_t::scale_and_clamp(const rgbaint_t& scale)
 	m_r |= (m_r & 0x00800000) ? 0xff000000 : 0;
 	m_g |= (m_g & 0x00800000) ? 0xff000000 : 0;
 	m_b |= (m_b & 0x00800000) ? 0xff000000 : 0;
-	if ((uint32_t)m_a > 255) { m_a = (m_a < 0) ? 0 : 255; }
-	if ((uint32_t)m_r > 255) { m_r = (m_r < 0) ? 0 : 255; }
-	if ((uint32_t)m_g > 255) { m_g = (m_g < 0) ? 0 : 255; }
-	if ((uint32_t)m_b > 255) { m_b = (m_b < 0) ? 0 : 255; }
+	if (u32(m_a) > 255) { m_a = (m_a < 0) ? 0 : 255; }
+	if (u32(m_r) > 255) { m_r = (m_r < 0) ? 0 : 255; }
+	if (u32(m_g) > 255) { m_g = (m_g < 0) ? 0 : 255; }
+	if (u32(m_b) > 255) { m_b = (m_b < 0) ? 0 : 255; }
 }
 
 
-void rgbaint_t::scale_imm_add_and_clamp(int32_t scale, const rgbaint_t& other)
+void rgbaint_t::scale_imm_add_and_clamp(s32 scale, const rgbaint_t& other)
 {
 	m_a = (m_a * scale) >> 8;
 	m_r = (m_r * scale) >> 8;
@@ -91,10 +91,10 @@ void rgbaint_t::scale_imm_add_and_clamp(int32_t scale, const rgbaint_t& other)
 	m_r += other.m_r;
 	m_g += other.m_g;
 	m_b += other.m_b;
-	if ((uint32_t)m_a > 255) { m_a = (m_a < 0) ? 0 : 255; }
-	if ((uint32_t)m_r > 255) { m_r = (m_r < 0) ? 0 : 255; }
-	if ((uint32_t)m_g > 255) { m_g = (m_g < 0) ? 0 : 255; }
-	if ((uint32_t)m_b > 255) { m_b = (m_b < 0) ? 0 : 255; }
+	if (u32(m_a) > 255) { m_a = (m_a < 0) ? 0 : 255; }
+	if (u32(m_r) > 255) { m_r = (m_r < 0) ? 0 : 255; }
+	if (u32(m_g) > 255) { m_g = (m_g < 0) ? 0 : 255; }
+	if (u32(m_b) > 255) { m_b = (m_b < 0) ? 0 : 255; }
 }
 
 void rgbaint_t::scale_add_and_clamp(const rgbaint_t& scale, const rgbaint_t& other)
@@ -111,10 +111,10 @@ void rgbaint_t::scale_add_and_clamp(const rgbaint_t& scale, const rgbaint_t& oth
 	m_r += other.m_r;
 	m_g += other.m_g;
 	m_b += other.m_b;
-	if ((uint32_t)m_a > 255) { m_a = (m_a < 0) ? 0 : 255; }
-	if ((uint32_t)m_r > 255) { m_r = (m_r < 0) ? 0 : 255; }
-	if ((uint32_t)m_g > 255) { m_g = (m_g < 0) ? 0 : 255; }
-	if ((uint32_t)m_b > 255) { m_b = (m_b < 0) ? 0 : 255; }
+	if (u32(m_a) > 255) { m_a = (m_a < 0) ? 0 : 255; }
+	if (u32(m_r) > 255) { m_r = (m_r < 0) ? 0 : 255; }
+	if (u32(m_g) > 255) { m_g = (m_g < 0) ? 0 : 255; }
+	if (u32(m_b) > 255) { m_b = (m_b < 0) ? 0 : 255; }
 }
 
 void rgbaint_t::scale2_add_and_clamp(const rgbaint_t& scale, const rgbaint_t& other, const rgbaint_t& scale2)
@@ -127,10 +127,10 @@ void rgbaint_t::scale2_add_and_clamp(const rgbaint_t& scale, const rgbaint_t& ot
 	m_r |= (m_r & 0x00800000) ? 0xff000000 : 0;
 	m_g |= (m_g & 0x00800000) ? 0xff000000 : 0;
 	m_b |= (m_b & 0x00800000) ? 0xff000000 : 0;
-	if ((uint32_t)m_a > 255) { m_a = (m_a < 0) ? 0 : 255; }
-	if ((uint32_t)m_r > 255) { m_r = (m_r < 0) ? 0 : 255; }
-	if ((uint32_t)m_g > 255) { m_g = (m_g < 0) ? 0 : 255; }
-	if ((uint32_t)m_b > 255) { m_b = (m_b < 0) ? 0 : 255; }
+	if (u32(m_a) > 255) { m_a = (m_a < 0) ? 0 : 255; }
+	if (u32(m_r) > 255) { m_r = (m_r < 0) ? 0 : 255; }
+	if (u32(m_g) > 255) { m_g = (m_g < 0) ? 0 : 255; }
+	if (u32(m_b) > 255) { m_b = (m_b < 0) ? 0 : 255; }
 }
 
 #endif // !defined(__ALTIVEC__)

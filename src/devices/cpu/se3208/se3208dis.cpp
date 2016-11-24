@@ -25,13 +25,13 @@ static struct
 #define ZEX16(val)  ((val)&0xFFFF)
 #define SEX(bits,val)   ((val)&(1<<(bits-1))?((val)|(~((1<<bits)-1))):(val&((1<<bits)-1)))
 
-typedef uint32_t (*_OP)(uint16_t Opcode,char *dst);
-#define INST(a) static uint32_t a(uint16_t Opcode,char *dst)
+typedef uint32_t (*_OP)(uint16_t Opcode, std::ostream &stream);
+#define INST(a) static uint32_t a(uint16_t Opcode, std::ostream &stream)
 
 
 INST(INVALIDOP)
 {
-	sprintf(dst,"INVALID");
+	util::stream_format(stream, "INVALID");
 	return 0;
 }
 
@@ -45,9 +45,9 @@ INST(LDB)
 		Offset=(EXTRACT(Context.ER,0,27)<<4)|(Offset&0xf);
 
 	if(Index)
-		sprintf(dst,"LDB   (%%R%d,0x%x),%%R%d",Index,Offset,SrcDst);
+		util::stream_format(stream, "LDB   (%%R%d,0x%x),%%R%d",Index,Offset,SrcDst);
 	else
-		sprintf(dst,"LDB   (0x%x),%%R%d",Index+Offset,SrcDst);
+		util::stream_format(stream, "LDB   (0x%x),%%R%d",Index+Offset,SrcDst);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -63,9 +63,9 @@ INST(STB)
 		Offset=(EXTRACT(Context.ER,0,27)<<4)|(Offset&0xf);
 
 	if(Index)
-		sprintf(dst,"STB   %%R%d,(%%R%d,0x%x)",SrcDst,Index,Offset);
+		util::stream_format(stream, "STB   %%R%d,(%%R%d,0x%x)",SrcDst,Index,Offset);
 	else
-		sprintf(dst,"STB   %%R%d,(0x%x)",SrcDst,Index+Offset);
+		util::stream_format(stream, "STB   %%R%d,(0x%x)",SrcDst,Index+Offset);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -83,9 +83,9 @@ INST(LDS)
 		Offset=(EXTRACT(Context.ER,0,27)<<4)|(Offset&0xf);
 
 	if(Index)
-		sprintf(dst,"LDS   (%%R%d,0x%x),%%R%d",Index,Offset,SrcDst);
+		util::stream_format(stream, "LDS   (%%R%d,0x%x),%%R%d",Index,Offset,SrcDst);
 	else
-		sprintf(dst,"LDS   (0x%x),%%R%d",Index+Offset,SrcDst);
+		util::stream_format(stream, "LDS   (0x%x),%%R%d",Index+Offset,SrcDst);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -103,9 +103,9 @@ INST(STS)
 		Offset=(EXTRACT(Context.ER,0,27)<<4)|(Offset&0xf);
 
 	if(Index)
-		sprintf(dst,"STS   %%R%d,(%%R%d,0x%x)",SrcDst,Index,Offset);
+		util::stream_format(stream, "STS   %%R%d,(%%R%d,0x%x)",SrcDst,Index,Offset);
 	else
-		sprintf(dst,"STS   %%R%d,(0x%x)",SrcDst,Index+Offset);
+		util::stream_format(stream, "STS   %%R%d,(0x%x)",SrcDst,Index+Offset);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -123,9 +123,9 @@ INST(LD)
 		Offset=(EXTRACT(Context.ER,0,27)<<4)|(Offset&0xf);
 
 	if(Index)
-		sprintf(dst,"LD    (%%R%d,0x%x),%%R%d",Index,Offset,SrcDst);
+		util::stream_format(stream, "LD    (%%R%d,0x%x),%%R%d",Index,Offset,SrcDst);
 	else
-		sprintf(dst,"LD    (0x%x),%%R%d",Index+Offset,SrcDst);
+		util::stream_format(stream, "LD    (0x%x),%%R%d",Index+Offset,SrcDst);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -143,9 +143,9 @@ INST(ST)
 		Offset=(EXTRACT(Context.ER,0,27)<<4)|(Offset&0xf);
 
 	if(Index)
-		sprintf(dst,"ST    %%R%d,(%%R%d,0x%x)",SrcDst,Index,Offset);
+		util::stream_format(stream, "ST    %%R%d,(%%R%d,0x%x)",SrcDst,Index,Offset);
 	else
-		sprintf(dst,"ST    %%R%d,(0x%x)",SrcDst,Index+Offset);
+		util::stream_format(stream, "ST    %%R%d,(0x%x)",SrcDst,Index+Offset);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -161,9 +161,9 @@ INST(LDBU)
 		Offset=(EXTRACT(Context.ER,0,27)<<4)|(Offset&0xf);
 
 	if(Index)
-		sprintf(dst,"LDBU  (%%R%d,0x%x),%%R%d",Index,Offset,SrcDst);
+		util::stream_format(stream, "LDBU  (%%R%d,0x%x),%%R%d",Index,Offset,SrcDst);
 	else
-		sprintf(dst,"LDBU  (0x%x),%%R%d",Index+Offset,SrcDst);
+		util::stream_format(stream, "LDBU  (0x%x),%%R%d",Index+Offset,SrcDst);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -181,9 +181,9 @@ INST(LDSU)
 		Offset=(EXTRACT(Context.ER,0,27)<<4)|(Offset&0xf);
 
 	if(Index)
-		sprintf(dst,"LDSU  (%%R%d,0x%x),%%R%d",Index,Offset,SrcDst);
+		util::stream_format(stream, "LDSU  (%%R%d,0x%x),%%R%d",Index,Offset,SrcDst);
 	else
-		sprintf(dst,"LDSU  (0x%x),%%R%d",Index+Offset,SrcDst);
+		util::stream_format(stream, "LDSU  (0x%x),%%R%d",Index+Offset,SrcDst);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -199,8 +199,8 @@ INST(LERI)
 	else
 		Context.ER=SEX(14,Imm);
 
-	//sprintf(dst,"LERI  0x%x\t\tER=%08X",Imm,Context.ER);
-	sprintf(dst,"LERI  0x%x",Imm/*,Context.ER*/);
+	//util::stream_format(stream, "LERI  0x%x\t\tER=%08X",Imm,Context.ER);
+	util::stream_format(stream, "LERI  0x%x",Imm/*,Context.ER*/);
 
 	SETFLAG(FLAG_E);
 	return 0;
@@ -216,7 +216,7 @@ INST(LDSP)
 	if(TESTFLAG(FLAG_E))
 		Offset=(EXTRACT(Context.ER,0,27)<<4)|(Offset&0xf);
 
-	sprintf(dst,"LD    (%%SP,0x%x),%%R%d",Offset,SrcDst);
+	util::stream_format(stream, "LD    (%%SP,0x%x),%%R%d",Offset,SrcDst);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -232,7 +232,7 @@ INST(STSP)
 	if(TESTFLAG(FLAG_E))
 		Offset=(EXTRACT(Context.ER,0,27)<<4)|(Offset&0xf);
 
-	sprintf(dst,"ST    %%R%d,(%%SP,0x%x)",SrcDst,Offset);
+	util::stream_format(stream, "ST    %%R%d,(%%SP,0x%x)",SrcDst,Offset);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -266,7 +266,7 @@ INST(PUSH)
 	if(Set&(1<<0))
 		strcat(str,"%R0-");
 	str[strlen(str)-1]=0;
-	strcpy(dst,str);
+	stream << str;
 	return 0;
 }
 
@@ -305,7 +305,7 @@ INST(POP)
 	str[strlen(str)-1]=0;
 	if(Ret)
 		strcat(str,"\n");
-	strcpy(dst,str);
+	stream << str;
 	return Ret ? DASMFLAG_STEP_OUT : 0;
 }
 
@@ -320,9 +320,9 @@ INST(LEATOSP)
 		Offset=SEX(4,Offset);
 
 	if(Index)
-		sprintf(dst,"LEA   (%%R%d,0x%x),%%SP",Index,Offset);
+		util::stream_format(stream, "LEA   (%%R%d,0x%x),%%SP",Index,Offset);
 	else
-		sprintf(dst,"LEA   (0x%x),%%SP",Index+Offset);
+		util::stream_format(stream, "LEA   (0x%x),%%SP",Index+Offset);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -338,7 +338,7 @@ INST(LEAFROMSP)
 	else
 		Offset=SEX(4,Offset);
 
-	sprintf(dst,"LEA   (%%SP,0x%x),%%R%d",Offset,Index);
+	util::stream_format(stream, "LEA   (%%SP,0x%x),%%R%d",Offset,Index);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -356,7 +356,7 @@ INST(LEASPTOSP)
 		Offset=SEX(10,Offset);
 
 
-	sprintf(dst,"LEA   (%%SP,0x%x),%%SP",Offset);
+	util::stream_format(stream, "LEA   (%%SP,0x%x),%%SP",Offset);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -368,9 +368,9 @@ INST(MOV)
 	uint32_t Dst=EXTRACT(Opcode,9,11);
 
 	if(Src==0 && Dst==0)
-		sprintf(dst,"NOP");
+		util::stream_format(stream, "NOP");
 	else
-		sprintf(dst,"MOV   %%SR%d,%%DR%d",Src,Dst);
+		util::stream_format(stream, "MOV   %%SR%d,%%DR%d",Src,Dst);
 	return 0;
 }
 
@@ -384,7 +384,7 @@ INST(LDI)
 	else
 		Imm=SEX8(Imm);
 
-	sprintf(dst,"LDI   0x%x,%%R%d",Imm,Dst);
+	util::stream_format(stream, "LDI   0x%x,%%R%d",Imm,Dst);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -398,7 +398,7 @@ INST(LDBSP)
 	if(TESTFLAG(FLAG_E))
 		Offset=(EXTRACT(Context.ER,0,27)<<4)|(Offset&0xf);
 
-	sprintf(dst,"LDB   (%%SP,0x%x),%%R%d",Offset,SrcDst);
+	util::stream_format(stream, "LDB   (%%SP,0x%x),%%R%d",Offset,SrcDst);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -412,7 +412,7 @@ INST(STBSP)
 	if(TESTFLAG(FLAG_E))
 		Offset=(EXTRACT(Context.ER,0,27)<<4)|(Offset&0xf);
 
-	sprintf(dst,"STB   %%R%d,(%%SP,0x%x)",SrcDst,Offset);
+	util::stream_format(stream, "STB   %%R%d,(%%SP,0x%x)",SrcDst,Offset);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -428,7 +428,7 @@ INST(LDSSP)
 	if(TESTFLAG(FLAG_E))
 		Offset=(EXTRACT(Context.ER,0,27)<<4)|(Offset&0xf);
 
-	sprintf(dst,"LDS   (%%SP,0x%x),%%R%d",Offset,SrcDst);
+	util::stream_format(stream, "LDS   (%%SP,0x%x),%%R%d",Offset,SrcDst);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -444,7 +444,7 @@ INST(STSSP)
 	if(TESTFLAG(FLAG_E))
 		Offset=(EXTRACT(Context.ER,0,27)<<4)|(Offset&0xf);
 
-	sprintf(dst,"STS   %%R%d,(%%SP,0x%x)",SrcDst,Offset);
+	util::stream_format(stream, "STS   %%R%d,(%%SP,0x%x)",SrcDst,Offset);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -458,7 +458,7 @@ INST(LDBUSP)
 	if(TESTFLAG(FLAG_E))
 		Offset=(EXTRACT(Context.ER,0,27)<<4)|(Offset&0xf);
 
-	sprintf(dst,"LDBU  (%%SP,0x%x),%%R%d",Offset,SrcDst);
+	util::stream_format(stream, "LDBU  (%%SP,0x%x),%%R%d",Offset,SrcDst);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -474,7 +474,7 @@ INST(LDSUSP)
 	if(TESTFLAG(FLAG_E))
 		Offset=(EXTRACT(Context.ER,0,27)<<4)|(Offset&0xf);
 
-	sprintf(dst,"LDSU  (%%SP,0x%x),%%R%d",Offset,SrcDst);
+	util::stream_format(stream, "LDSU  (%%SP,0x%x),%%R%d",Offset,SrcDst);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -492,7 +492,7 @@ INST(ADDI)
 	else
 		Imm2=SEX(4,Imm2);
 
-	sprintf(dst,"ADD   %%SR%d,0x%x,%%DR%d",Src,Imm2,Dst/*,Imm2*/);
+	util::stream_format(stream, "ADD   %%SR%d,0x%x,%%DR%d",Src,Imm2,Dst/*,Imm2*/);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -510,7 +510,7 @@ INST(SUBI)
 	else
 		Imm2=SEX(4,Imm2);
 
-	sprintf(dst,"SUB   %%SR%d,0x%x,%%DR%d",Src,Imm2,Dst/*,Imm2*/);
+	util::stream_format(stream, "SUB   %%SR%d,0x%x,%%DR%d",Src,Imm2,Dst/*,Imm2*/);
 
 	CLRFLAG(FLAG_E);
 
@@ -529,7 +529,7 @@ INST(ADCI)
 	else
 		Imm2=SEX(4,Imm2);
 
-	sprintf(dst,"ADC   %%SR%d,0x%x,%%DR%d",Src,Imm2,Dst/*,Imm2*/);
+	util::stream_format(stream, "ADC   %%SR%d,0x%x,%%DR%d",Src,Imm2,Dst/*,Imm2*/);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -547,7 +547,7 @@ INST(SBCI)
 	else
 		Imm2=SEX(4,Imm2);
 
-	sprintf(dst,"SBC   %%SR%d,0x%x,%%DR%d",Src,Imm2,Dst/*,Imm2*/);
+	util::stream_format(stream, "SBC   %%SR%d,0x%x,%%DR%d",Src,Imm2,Dst/*,Imm2*/);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -565,7 +565,7 @@ INST(ANDI)
 	else
 		Imm2=SEX(4,Imm2);
 
-	sprintf(dst,"AND   %%SR%d,0x%x,%%DR%d",Src,Imm2,Dst/*,Imm2*/);
+	util::stream_format(stream, "AND   %%SR%d,0x%x,%%DR%d",Src,Imm2,Dst/*,Imm2*/);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -583,7 +583,7 @@ INST(ORI)
 	else
 		Imm2=SEX(4,Imm2);
 
-	sprintf(dst,"OR    %%SR%d,0x%x,%%DR%d",Src,Imm2,Dst/*,Imm2*/);
+	util::stream_format(stream, "OR    %%SR%d,0x%x,%%DR%d",Src,Imm2,Dst/*,Imm2*/);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -601,7 +601,7 @@ INST(XORI)
 	else
 		Imm2=SEX(4,Imm2);
 
-	sprintf(dst,"XOR   %%SR%d,0x%x,%%DR%d",Src,Imm2,Dst/*,Imm2*/);
+	util::stream_format(stream, "XOR   %%SR%d,0x%x,%%DR%d",Src,Imm2,Dst/*,Imm2*/);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -618,7 +618,7 @@ INST(CMPI)
 	else
 		Imm2=SEX(4,Imm2);
 
-	sprintf(dst,"CMP   %%SR%d,0x%x",Src,Imm2/*,Imm2*/);
+	util::stream_format(stream, "CMP   %%SR%d,0x%x",Src,Imm2/*,Imm2*/);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -635,7 +635,7 @@ INST(TSTI)
 	else
 		Imm2=SEX(4,Imm2);
 
-	sprintf(dst,"TST   %%SR%d,0x%x",Src,Imm2/*,Imm2*/);
+	util::stream_format(stream, "TST   %%SR%d,0x%x",Src,Imm2/*,Imm2*/);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -647,7 +647,7 @@ INST(ADD)
 	uint32_t Src1=EXTRACT(Opcode,3,5);
 	uint32_t Dst=EXTRACT(Opcode,0,2);
 
-	sprintf(dst,"ADD   %%SR%d,%%SR%d,%%DR%d",Src1,Src2,Dst);
+	util::stream_format(stream, "ADD   %%SR%d,%%SR%d,%%DR%d",Src1,Src2,Dst);
 	return 0;
 }
 
@@ -657,7 +657,7 @@ INST(SUB)
 	uint32_t Src1=EXTRACT(Opcode,3,5);
 	uint32_t Dst=EXTRACT(Opcode,0,2);
 
-	sprintf(dst,"SUB   %%SR%d,%%SR%d,%%DR%d",Src1,Src2,Dst);
+	util::stream_format(stream, "SUB   %%SR%d,%%SR%d,%%DR%d",Src1,Src2,Dst);
 	return 0;
 }
 
@@ -667,7 +667,7 @@ INST(ADC)
 	uint32_t Src1=EXTRACT(Opcode,3,5);
 	uint32_t Dst=EXTRACT(Opcode,0,2);
 
-	sprintf(dst,"ADC   %%SR%d,%%SR%d,%%DR%d",Src1,Src2,Dst);
+	util::stream_format(stream, "ADC   %%SR%d,%%SR%d,%%DR%d",Src1,Src2,Dst);
 	return 0;
 }
 
@@ -677,7 +677,7 @@ INST(SBC)
 	uint32_t Src1=EXTRACT(Opcode,3,5);
 	uint32_t Dst=EXTRACT(Opcode,0,2);
 
-	sprintf(dst,"SBC   %%SR%d,%%SR%d,%%DR%d",Src1,Src2,Dst);
+	util::stream_format(stream, "SBC   %%SR%d,%%SR%d,%%DR%d",Src1,Src2,Dst);
 	return 0;
 }
 
@@ -687,7 +687,7 @@ INST(AND)
 	uint32_t Src1=EXTRACT(Opcode,3,5);
 	uint32_t Dst=EXTRACT(Opcode,0,2);
 
-	sprintf(dst,"AND   %%SR%d,%%SR%d,%%DR%d",Src1,Src2,Dst);
+	util::stream_format(stream, "AND   %%SR%d,%%SR%d,%%DR%d",Src1,Src2,Dst);
 	return 0;
 }
 
@@ -697,7 +697,7 @@ INST(OR)
 	uint32_t Src1=EXTRACT(Opcode,3,5);
 	uint32_t Dst=EXTRACT(Opcode,0,2);
 
-	sprintf(dst,"OR    %%SR%d,%%SR%d,%%DR%d",Src1,Src2,Dst);
+	util::stream_format(stream, "OR    %%SR%d,%%SR%d,%%DR%d",Src1,Src2,Dst);
 	return 0;
 }
 
@@ -707,7 +707,7 @@ INST(XOR)
 	uint32_t Src1=EXTRACT(Opcode,3,5);
 	uint32_t Dst=EXTRACT(Opcode,0,2);
 
-	sprintf(dst,"XOR   %%SR%d,%%SR%d,%%DR%d",Src1,Src2,Dst);
+	util::stream_format(stream, "XOR   %%SR%d,%%SR%d,%%DR%d",Src1,Src2,Dst);
 	return 0;
 }
 
@@ -716,7 +716,7 @@ INST(CMP)
 	uint32_t Src2=EXTRACT(Opcode,9,11);
 	uint32_t Src1=EXTRACT(Opcode,3,5);
 
-	sprintf(dst,"CMP   %%SR%d,%%SR%d",Src1,Src2);
+	util::stream_format(stream, "CMP   %%SR%d,%%SR%d",Src1,Src2);
 	return 0;
 }
 
@@ -725,7 +725,7 @@ INST(TST)
 	uint32_t Src2=EXTRACT(Opcode,9,11);
 	uint32_t Src1=EXTRACT(Opcode,3,5);
 
-	sprintf(dst,"TST   %%SR%d,%%SR%d",Src1,Src2);
+	util::stream_format(stream, "TST   %%SR%d,%%SR%d",Src1,Src2);
 	return 0;
 }
 
@@ -735,7 +735,7 @@ INST(MULS)
 	uint32_t Src1=EXTRACT(Opcode,3,5);
 	uint32_t Dst=EXTRACT(Opcode,0,2);
 
-	sprintf(dst,"MUL   %%SR%d,%%SR%d,%%DR%d",Src1,Src2,Dst);
+	util::stream_format(stream, "MUL   %%SR%d,%%SR%d,%%DR%d",Src1,Src2,Dst);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -746,7 +746,7 @@ INST(NEG)
 	uint32_t Dst=EXTRACT(Opcode,9,11);
 	uint32_t Src=EXTRACT(Opcode,3,5);
 
-	sprintf(dst,"NEG   %%SR%d,%%DR%d",Src,Dst);
+	util::stream_format(stream, "NEG   %%SR%d,%%DR%d",Src,Dst);
 	return 0;
 }
 
@@ -760,7 +760,7 @@ INST(CALL)
 	else
 		Offset2=SEX(8,Offset);
 	Offset2<<=1;
-	sprintf(dst,"CALL  0x%x",Context.PC+2+Offset2);
+	util::stream_format(stream, "CALL  0x%x",Context.PC+2+Offset2);
 
 	CLRFLAG(FLAG_E);
 	return DASMFLAG_STEP_OVER;
@@ -776,7 +776,7 @@ INST(JV)
 	else
 		Offset2=SEX(8,Offset);
 	Offset2<<=1;
-	sprintf(dst,"JV    0x%x",Context.PC+2+Offset2);
+	util::stream_format(stream, "JV    0x%x",Context.PC+2+Offset2);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -792,7 +792,7 @@ INST(JNV)
 	else
 		Offset2=SEX(8,Offset);
 	Offset2<<=1;
-	sprintf(dst,"JNV   0x%x",Context.PC+2+Offset2);
+	util::stream_format(stream, "JNV   0x%x",Context.PC+2+Offset2);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -808,7 +808,7 @@ INST(JC)
 	else
 		Offset2=SEX(8,Offset);
 	Offset2<<=1;
-	sprintf(dst,"JC    0x%x",Context.PC+2+Offset2);
+	util::stream_format(stream, "JC    0x%x",Context.PC+2+Offset2);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -824,7 +824,7 @@ INST(JNC)
 	else
 		Offset2=SEX(8,Offset);
 	Offset2<<=1;
-	sprintf(dst,"JNC   0x%x",Context.PC+2+Offset2);
+	util::stream_format(stream, "JNC   0x%x",Context.PC+2+Offset2);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -840,7 +840,7 @@ INST(JP)
 	else
 		Offset2=SEX(8,Offset);
 	Offset2<<=1;
-	sprintf(dst,"JP    0x%x",Context.PC+2+Offset2);
+	util::stream_format(stream, "JP    0x%x",Context.PC+2+Offset2);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -856,7 +856,7 @@ INST(JM)
 	else
 		Offset2=SEX(8,Offset);
 	Offset2<<=1;
-	sprintf(dst,"JM    0x%x",Context.PC+2+Offset2);
+	util::stream_format(stream, "JM    0x%x",Context.PC+2+Offset2);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -872,7 +872,7 @@ INST(JNZ)
 	else
 		Offset2=SEX(8,Offset);
 	Offset2<<=1;
-	sprintf(dst,"JNZ   0x%x",Context.PC+2+Offset2);
+	util::stream_format(stream, "JNZ   0x%x",Context.PC+2+Offset2);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -888,7 +888,7 @@ INST(JZ)
 	else
 		Offset2=SEX(8,Offset);
 	Offset2<<=1;
-	sprintf(dst,"JZ    0x%x",Context.PC+2+Offset2);
+	util::stream_format(stream, "JZ    0x%x",Context.PC+2+Offset2);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -904,7 +904,7 @@ INST(JGE)
 	else
 		Offset2=SEX(8,Offset);
 	Offset2<<=1;
-	sprintf(dst,"JGE   0x%x",Context.PC+2+Offset2);
+	util::stream_format(stream, "JGE   0x%x",Context.PC+2+Offset2);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -920,7 +920,7 @@ INST(JLE)
 	else
 		Offset2=SEX(8,Offset);
 	Offset2<<=1;
-	sprintf(dst,"JLE   0x%x",Context.PC+2+Offset2);
+	util::stream_format(stream, "JLE   0x%x",Context.PC+2+Offset2);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -936,7 +936,7 @@ INST(JHI)
 	else
 		Offset2=SEX(8,Offset);
 	Offset2<<=1;
-	sprintf(dst,"JHI   0x%x",Context.PC+2+Offset2);
+	util::stream_format(stream, "JHI   0x%x",Context.PC+2+Offset2);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -952,7 +952,7 @@ INST(JLS)
 	else
 		Offset2=SEX(8,Offset);
 	Offset2<<=1;
-	sprintf(dst,"JLS   0x%x",Context.PC+2+Offset2);
+	util::stream_format(stream, "JLS   0x%x",Context.PC+2+Offset2);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -968,7 +968,7 @@ INST(JGT)
 	else
 		Offset2=SEX(8,Offset);
 	Offset2<<=1;
-	sprintf(dst,"JGT   0x%x",Context.PC+2+Offset2);
+	util::stream_format(stream, "JGT   0x%x",Context.PC+2+Offset2);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -984,7 +984,7 @@ INST(JLT)
 	else
 		Offset2=SEX(8,Offset);
 	Offset2<<=1;
-	sprintf(dst,"JLT   0x%x",Context.PC+2+Offset2);
+	util::stream_format(stream, "JLT   0x%x",Context.PC+2+Offset2);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -1002,7 +1002,7 @@ INST(JMP)
 	else
 		Offset2=SEX(8,Offset);
 	Offset2<<=1;
-	sprintf(dst,"JMP   0x%x",Context.PC+2+Offset2);
+	util::stream_format(stream, "JMP   0x%x",Context.PC+2+Offset2);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -1012,7 +1012,7 @@ INST(JR)
 {
 	uint32_t Src=EXTRACT(Opcode,0,3);
 
-	sprintf(dst,"JR    %%R%d",Src);
+	util::stream_format(stream, "JR    %%R%d",Src);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -1022,7 +1022,7 @@ INST(CALLR)
 {
 	uint32_t Src=EXTRACT(Opcode,0,3);
 
-	sprintf(dst,"CALLR %%R%d",Src);
+	util::stream_format(stream, "CALLR %%R%d",Src);
 
 	CLRFLAG(FLAG_E);
 	return DASMFLAG_STEP_OVER;
@@ -1036,9 +1036,9 @@ INST(ASR)
 	uint32_t Cnt=EXTRACT(Opcode,5,7);
 
 	if(CS)
-		sprintf(dst,"ASR   %%R%d,%%R%d",Cnt,Dst);
+		util::stream_format(stream, "ASR   %%R%d,%%R%d",Cnt,Dst);
 	else
-		sprintf(dst,"ASR   %x,%%R%d",Imm,Dst);
+		util::stream_format(stream, "ASR   %x,%%R%d",Imm,Dst);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -1052,9 +1052,9 @@ INST(LSR)
 	uint32_t Cnt=EXTRACT(Opcode,5,7);
 
 	if(CS)
-		sprintf(dst,"LSR   %%R%d,%%R%d",Cnt,Dst);
+		util::stream_format(stream, "LSR   %%R%d,%%R%d",Cnt,Dst);
 	else
-		sprintf(dst,"LSR   %x,%%R%d",Imm,Dst);
+		util::stream_format(stream, "LSR   %x,%%R%d",Imm,Dst);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -1068,9 +1068,9 @@ INST(ASL)
 	uint32_t Cnt=EXTRACT(Opcode,5,7);
 
 	if(CS)
-		sprintf(dst,"ASL   %%R%d,%%R%d",Cnt,Dst);
+		util::stream_format(stream, "ASL   %%R%d,%%R%d",Cnt,Dst);
 	else
-		sprintf(dst,"ASL   %x,%%R%d",Imm,Dst);
+		util::stream_format(stream, "ASL   %x,%%R%d",Imm,Dst);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -1080,7 +1080,7 @@ INST(EXTB)
 {
 	uint32_t Dst=EXTRACT(Opcode,0,3);
 
-	sprintf(dst,"EXTB  %%R%d",Dst);
+	util::stream_format(stream, "EXTB  %%R%d",Dst);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -1090,7 +1090,7 @@ INST(EXTS)
 {
 	uint32_t Dst=EXTRACT(Opcode,0,3);
 
-	sprintf(dst,"EXTS  %%R%d",Dst);
+	util::stream_format(stream, "EXTS  %%R%d",Dst);
 
 	CLRFLAG(FLAG_E);
 	return 0;
@@ -1100,7 +1100,7 @@ INST(SET)
 {
 	uint32_t Imm=EXTRACT(Opcode,0,3);
 
-	sprintf(dst,"SET   0x%x",Imm);
+	util::stream_format(stream, "SET   0x%x",Imm);
 	return 0;
 }
 
@@ -1108,7 +1108,7 @@ INST(CLR)
 {
 	uint32_t Imm=EXTRACT(Opcode,0,3);
 
-	sprintf(dst,"CLR   0x%x",Imm);
+	util::stream_format(stream, "CLR   0x%x",Imm);
 	return 0;
 }
 
@@ -1116,7 +1116,7 @@ INST(SWI)
 {
 	uint32_t Imm=EXTRACT(Opcode,0,3);
 
-	sprintf(dst,"SWI   0x%x",Imm);
+	util::stream_format(stream, "SWI   0x%x",Imm);
 	return 0;
 }
 
@@ -1124,7 +1124,7 @@ INST(HALT)
 {
 	uint32_t Imm=EXTRACT(Opcode,0,3);
 
-	sprintf(dst,"HALT  0x%x",Imm);
+	util::stream_format(stream, "HALT  0x%x",Imm);
 	return 0;
 }
 
@@ -1132,7 +1132,7 @@ INST(MVTC)
 {
 	uint32_t Imm=EXTRACT(Opcode,0,3);
 
-	sprintf(dst,"MVTC  %%R0,%%CR%d",Imm);
+	util::stream_format(stream, "MVTC  %%R0,%%CR%d",Imm);
 	return 0;
 }
 
@@ -1140,7 +1140,7 @@ INST(MVFC)
 {
 	uint32_t Imm=EXTRACT(Opcode,0,3);
 
-	sprintf(dst,"MVFC  %%CR0%d,%%R0",Imm);
+	util::stream_format(stream, "MVFC  %%CR0%d,%%R0",Imm);
 	return 0;
 }
 
@@ -1400,7 +1400,7 @@ static _OP DecodeOp(uint16_t Opcode)
 }
 
 
-CPU_DISASSEMBLE( se3208 )
+CPU_DISASSEMBLE(se3208)
 {
 	uint16_t Opcode;
 
@@ -1409,5 +1409,5 @@ CPU_DISASSEMBLE( se3208 )
 
 	Context.PC=pc;
 	Opcode=oprom[0] | (oprom[1] << 8);
-	return 2 | ((*DecodeOp(Opcode))(Opcode,buffer)) | DASMFLAG_SUPPORTED;
+	return 2 | ((*DecodeOp(Opcode))(Opcode, stream)) | DASMFLAG_SUPPORTED;
 }

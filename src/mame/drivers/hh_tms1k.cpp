@@ -23,11 +23,12 @@
  @MP0163   TMS1000   1979, A-One LSI Match Number/LJN Electronic Concentration
  *MP0168   TMS1000   1979, Conic Basketball/Tandy Sports Arena
  @MP0170   TMS1000   1979, Conic Football
- *MP0230   TMS1000?  1980, Entex Blast It (6015)
+ *MP0230   TMS1000   1980, Entex Blast It (6015)
+ @MP0271   TMS1000   1982, Tandy Radio Shack Monkey See
  @MP0914   TMS1000   1979, Entex Baseball 1
- *MP0915   TMS1000   1979, Bandai System Control Car: Cheetah/Palitoy The Incredible Brain Buggy
+ @MP0915   TMS1000   1979, Bandai System Control Car: Cheetah/The Incredible Brain Buggy
  @MP0919   TMS1000   1979, Tiger Copy Cat (model 7-520)
- *MP0920   TMS1000   1979, Entex Space Battle (6004)
+ @MP0920   TMS1000   1979, Entex Space Battle (6004)
  @MP0923   TMS1000   1979, Entex Baseball 2 (6002)
  @MP1030   TMS1100   1980, APF Mathemagician
  @MP1133   TMS1470   1979, Kosmos Astro
@@ -135,6 +136,7 @@
 #include "amaztron.lh" // clickable
 #include "astro.lh"
 #include "bankshot.lh"
+#include "bcheetah.lh"
 #include "bigtrak.lh"
 #include "bship.lh" // clickable
 #include "cnfball.lh"
@@ -153,6 +155,7 @@
 #include "einvader.lh" // test-layout(but still playable)
 #include "elecbowl.lh"
 #include "elecdet.lh"
+#include "esbattle.lh"
 #include "esoccer.lh"
 #include "fxmcr165.lh" // clickable
 #include "gjackpot.lh"
@@ -167,6 +170,7 @@
 #include "mdndclab.lh" // clickable
 #include "merlin.lh" // clickable
 #include "mmerlin.lh" // clickable
+#include "monkeysee.lh"
 #include "raisedvl.lh"
 #include "simon.lh" // clickable
 #include "speechp.lh"
@@ -693,6 +697,110 @@ static MACHINE_CONFIG_START( mathmagi, mathmagi_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_mathmagi)
+
+	/* no sound! */
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
+  Bandai System Control Car: Cheetah 「システムコントロールカー チーター」
+  * TMS1000NLL MP0915 (die label 1000B, MP0915)
+  * 2 motors (one for back axis, one for steering), no sound
+  
+  It's a programmable buggy, like Big Track but much simpler. To add a command
+  step in program-mode, press a direction key and one of the time delay number
+  keys at the same time. To run the program(max 24 steps), switch to run-mode
+  and press the go-key.
+
+  known releases:
+  - Japan: System Control Car: Cheetah
+  - USA: The Incredible Brain Buggy, distributed by Fundimensions
+  - UK: The Incredible Brain Buggy, distributed by Palitoy (same as USA version)
+
+***************************************************************************/
+
+class bcheetah_state : public hh_tms1k_state
+{
+public:
+	bcheetah_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_READ8_MEMBER(read_k);
+};
+
+// handlers
+
+WRITE16_MEMBER(bcheetah_state::write_r)
+{
+	// R0-R4: input mux
+	// R5,R6: tied to K4??
+	m_inp_mux = data & 0x1f;
+}
+
+WRITE16_MEMBER(bcheetah_state::write_o)
+{
+	// O1: back motor (drive)
+	// O0: front motor steer left
+	// O2: front motor steer right
+	// O3: GND, other: N/C
+	output().set_value("motor1", data >> 1 & 1);
+	output().set_value("motor2_left", data & 1);
+	output().set_value("motor2_right", data >> 2 & 1);
+}
+
+READ8_MEMBER(bcheetah_state::read_k)
+{
+	// K: multiplexed inputs
+	return read_inputs(5);
+}
+
+
+// config
+
+static INPUT_PORTS_START( bcheetah )
+	PORT_START("IN.0") // R0
+	PORT_BIT( 0x0d, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_CONFNAME( 0x02, 0x02, "Mode")
+	PORT_CONFSETTING(    0x02, "Program" )
+	PORT_CONFSETTING(    0x00, "Run" )
+
+	PORT_START("IN.1") // R1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_LEFT) PORT_NAME("Left")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_UP) PORT_NAME("Forward")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_RIGHT) PORT_NAME("Right")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Go")
+
+	PORT_START("IN.2") // R2
+	PORT_BIT( 0x07, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DOWN) PORT_NAME("Stop")
+
+	PORT_START("IN.3") // R3
+	PORT_BIT( 0x05, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
+
+	PORT_START("IN.4") // R4
+	PORT_BIT( 0x05, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( bcheetah, bcheetah_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1000, 100000) // approximation - RC osc. R=47K, C=47pf
+	MCFG_TMS1XXX_READ_K_CB(READ8(bcheetah_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(bcheetah_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(bcheetah_state, write_o))
+
+	MCFG_DEFAULT_LAYOUT(layout_bcheetah)
 
 	/* no sound! */
 MACHINE_CONFIG_END
@@ -2022,18 +2130,18 @@ MACHINE_CONFIG_END
   are denoted by words ("left", "center", "short", etc), and an alternate one
   with little guys drawn next to the LEDs.
 
-  lamp translation table: led LDzz from game PCB = MAME lampyx:
+  led translation table: led LDzz from game PCB = MAME y.x:
 
-    LD0  = -        LD10 = lamp12   LD20 = lamp42   LD30 = lamp60
-    LD1  = lamp23   LD11 = lamp4    LD21 = lamp41   LD31 = lamp61
-    LD2  = lamp0    LD12 = lamp15   LD22 = lamp40   LD32 = lamp62
-    LD3  = lamp1    LD13 = lamp22   LD23 = lamp43   LD33 = lamp70
-    LD4  = lamp2    LD14 = lamp33   LD24 = lamp53   LD34 = lamp71
-    LD5  = lamp10   LD15 = lamp32   LD25 = lamp52
-    LD6  = lamp13   LD16 = lamp21   LD26 = lamp51
-    LD7  = lamp11   LD17 = lamp31   LD27 = lamp50
-    LD8  = lamp3    LD18 = lamp30   LD28 = lamp72
-    LD9  = lamp14   LD19 = lamp20   LD29 = lamp73
+    0 = -     10 = 1.2   20 = 4.2   30 = 6.0
+    1 = 2.3   11 = 0.4   21 = 4.1   31 = 6.1
+    2 = 0.0   12 = 1.5   22 = 4.0   32 = 6.2
+    3 = 0.1   13 = 2.2   23 = 4.3   33 = 7.0
+    4 = 0.2   14 = 3.3   24 = 5.3   34 = 7.1
+    5 = 1.0   15 = 3.2   25 = 5.2
+    6 = 1.3   16 = 2.1   26 = 5.1
+    7 = 1.1   17 = 3.1   27 = 5.0
+    8 = 0.3   18 = 3.0   28 = 7.2
+    9 = 1.4   19 = 2.0   29 = 7.3
 
 ***************************************************************************/
 
@@ -2152,18 +2260,18 @@ MACHINE_CONFIG_END
   The sequel to Entex Baseball, this version keeps up with score and innings.
   As its predecessor, the pitcher controls are on a separate joypad.
 
-  lamp translation table: led zz from game PCB = MAME lampyx:
+  led translation table: led zz from game PCB = MAME y.x:
 
-    00 = -        10 = lamp94   20 = lamp74   30 = lamp50
-    01 = lamp53   11 = lamp93   21 = lamp75   31 = lamp51
-    02 = lamp7    12 = lamp92   22 = lamp80   32 = lamp52
-    03 = lamp17   13 = lamp62   23 = lamp81   33 = lamp40
-    04 = lamp27   14 = lamp70   24 = lamp82   34 = lamp41
-    05 = lamp97   15 = lamp71   25 = lamp83   35 = lamp31
-    06 = lamp90   16 = lamp61   26 = lamp84   36 = lamp30
-    07 = lamp95   17 = lamp72   27 = lamp85   37 = lamp33
-    08 = lamp63   18 = lamp73   28 = lamp42   38 = lamp32
-    09 = lamp91   19 = lamp60   29 = lamp43
+    00 = -     10 = 9.4   20 = 7.4   30 = 5.0
+    01 = 5.3   11 = 9.3   21 = 7.5   31 = 5.1
+    02 = 0.7   12 = 9.2   22 = 8.0   32 = 5.2
+    03 = 1.7   13 = 6.2   23 = 8.1   33 = 4.0
+    04 = 2.7   14 = 7.0   24 = 8.2   34 = 4.1
+    05 = 9.7   15 = 7.1   25 = 8.3   35 = 3.1
+    06 = 9.0   16 = 6.1   26 = 8.4   36 = 3.0
+    07 = 9.5   17 = 7.2   27 = 8.5   37 = 3.3
+    08 = 6.3   18 = 7.3   28 = 4.2   38 = 3.2
+    09 = 9.1   19 = 6.0   29 = 4.3
 
 ***************************************************************************/
 
@@ -2274,24 +2382,24 @@ MACHINE_CONFIG_END
   This is another improvement over Entex Baseball, where gameplay is a bit more
   varied. Like the others, the pitcher controls are on a separate joypad.
 
-  lamp translation table: led zz from game PCB = MAME lampyx:
+  led translation table: led zz from game PCB = MAME y.x:
   note: unlabeled panel leds are listed here as Sz, Bz, Oz, Iz, z left-to-right
 
-    00 = -        10 = lamp75   20 = lamp72
-    01 = lamp60   11 = lamp65   21 = lamp84
-    02 = lamp61   12 = lamp55   22 = lamp85
-    03 = lamp62   13 = lamp52   23 = lamp90
-    04 = lamp63   14 = lamp80   24 = lamp92
-    05 = lamp73   15 = lamp81   25 = lamp91
-    06 = lamp53   16 = lamp51   26 = lamp93
-    07 = lamp74   17 = lamp82   27 = lamp95
-    08 = lamp64   18 = lamp83   28 = lamp94
-    09 = lamp54   19 = lamp50
+    00 = -     10 = 7.5   20 = 7.2
+    01 = 6.0   11 = 6.5   21 = 8.4
+    02 = 6.1   12 = 5.5   22 = 8.5
+    03 = 6.2   13 = 5.2   23 = 9.0
+    04 = 6.3   14 = 8.0   24 = 9.2
+    05 = 7.3   15 = 8.1   25 = 9.1
+    06 = 5.3   16 = 5.1   26 = 9.3
+    07 = 7.4   17 = 8.2   27 = 9.5
+    08 = 6.4   18 = 8.3   28 = 9.4
+    09 = 5.4   19 = 5.0
 
-    S1,S2: lamp40,41
-    B1-B3: lamp30-32
-    O1,O2: lamp42,43
-    I1-I6: lamp20-25, I7-I9: lamp33-35
+    S1,S2: 4.0,4.1
+    B1-B3: 3.0-3.2
+    O1,O2: 4.2,4.3
+    I1-I6: 2.0-2.5, I7-I9: 3.3-3.5
 
 ***************************************************************************/
 
@@ -2433,6 +2541,117 @@ static MACHINE_CONFIG_START( ebball3, ebball3_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_ebball3)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
+  Entex Space Battle
+  * TMS1000 EN-6004 MP0920 (die label 1000B, MP0920)
+  * 2 7seg LEDs, and other LEDs behind bezel, 1-bit sound
+  
+  The Japanese version was published by Gakken, same name.
+
+  led translation table: led zz from game PCB = MAME y.x:
+
+    0 = -     10 = 1.1   20 = 2.3   30 = 5.2
+    1 = 0.0   11 = 1.2   21 = 3.0   31 = 5.3
+    2 = 0.1   12 = 1.3   22 = 3.1   32 = 6.0
+    3 = 0.2   13 = 1.4   23 = 3.2   33 = 6.1
+    4 = 0.3   14 = 1.5   24 = 3.3   34 = 6.2
+    5 = 0.4   15 = 1.6   25 = 4.0   35 = 7.0
+    6 = 0.5   16 = 1.7   26 = 4.1   36 = 7.1
+    7 = 0.6   17 = 2.0   27 = 4.2
+    8 = 0.7   18 = 2.1   28 = 5.0
+    9 = 1.0   19 = 2.2   29 = 5.1
+
+***************************************************************************/
+
+class esbattle_state : public hh_tms1k_state
+{
+public:
+	esbattle_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void prepare_display();
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_READ8_MEMBER(read_k);
+};
+
+// handlers
+
+void esbattle_state::prepare_display()
+{
+	// R8,R9 are 7segs
+	set_display_segmask(0x300, 0x7f);
+	display_matrix(8, 10, m_o, m_r);
+}
+
+WRITE16_MEMBER(esbattle_state::write_r)
+{
+	// R0,R1: input mux
+	m_inp_mux = data & 3;
+
+	// R10: speaker out
+	m_speaker->level_w(data >> 10 & 1);
+
+	// R0-R9: led select
+	m_r = data;
+	prepare_display();
+}
+
+WRITE16_MEMBER(esbattle_state::write_o)
+{
+	// O0-O7: led state
+	m_o = data;
+	prepare_display();
+}
+
+READ8_MEMBER(esbattle_state::read_k)
+{
+	// K: multiplexed inputs
+	return read_inputs(2);
+}
+
+
+// config
+
+static INPUT_PORTS_START( esbattle )
+	PORT_START("IN.0") // R0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Fire 1") // F1
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("P1 Fire 2") // F2
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P1 Launch")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // R1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL PORT_NAME("P2 Fire 1") // F1
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_COCKTAIL PORT_NAME("P2 Fire 2") // F2
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_COCKTAIL PORT_NAME("P2 Launch")
+	PORT_CONFNAME( 0x08, 0x08, "Players" )
+	PORT_CONFSETTING(    0x08, "1" ) // Auto
+	PORT_CONFSETTING(    0x00, "2" ) // Manual
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( esbattle, esbattle_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1000, 425000) // approximation - RC osc. R=47K, C=33pf
+	MCFG_TMS1XXX_READ_K_CB(READ8(esbattle_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(esbattle_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(esbattle_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_esbattle)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -2677,17 +2896,17 @@ MACHINE_CONFIG_END
   * TMS1100 6010 MP1218 (die also label MP1218)
   * 4 7seg LEDs, and other LEDs behind bezel, 1-bit sound
 
-  lamp translation table: led zz from game PCB = MAME lampyx:
+  led translation table: led zz from game PCB = MAME y.x:
 
-    11 = lamp90   21 = lamp91   31 = lamp92   41 = lamp93   51 = lamp95
-    12 = lamp80   22 = lamp81   32 = lamp82   42 = lamp83   52 = lamp85
-    13 = lamp70   23 = lamp71   33 = lamp72   43 = lamp73   53 = lamp84
-    14 = lamp60   24 = lamp61   34 = lamp62   44 = lamp63   54 = lamp75
-    15 = lamp50   25 = lamp51   35 = lamp52   45 = lamp53   55 = lamp74
-    16 = lamp40   26 = lamp41   36 = lamp42   46 = lamp43   56 = lamp65
+    11 = 9.0   21 = 9.1   31 = 9.2   41 = 9.3   51 = 9.5
+    12 = 8.0   22 = 8.1   32 = 8.2   42 = 8.3   52 = 8.5
+    13 = 7.0   23 = 7.1   33 = 7.2   43 = 7.3   53 = 8.4
+    14 = 6.0   24 = 6.1   34 = 6.2   44 = 6.3   54 = 7.5
+    15 = 5.0   25 = 5.1   35 = 5.2   45 = 5.3   55 = 7.4
+    16 = 4.0   26 = 4.1   36 = 4.2   46 = 4.3   56 = 6.5
 
-    A  = lamp94
-    B  = lamp64
+    A  = 9.4
+    B  = 6.4
 
 ***************************************************************************/
 
@@ -2798,18 +3017,18 @@ MACHINE_CONFIG_END
   * TMS1100 MP1221 (die label same)
   * 4 7seg LEDs(rightmost one unused), and other LEDs behind bezel, 1-bit sound
 
-  lamp translation table: led zz from game PCB = MAME lampyx:
+  led translation table: led zz from game PCB = MAME y.x:
 
-    0 = -          10 = lamp44     20 = lamp53     30 = lamp95     40 = lamp92
-    1 = lamp30     11 = lamp45     21 = lamp54     31 = lamp85     41 = lamp93
-    2 = lamp31     12 = -          22 = -          32 = lamp65     42 = lamp90
-    3 = lamp32     13 = lamp50     23 = lamp60     33 = lamp74     43 = lamp91
-    4 = lamp33     14 = lamp51     24 = lamp61     34 = lamp70
-    5 = lamp34     15 = lamp52     25 = lamp62     35 = lamp71
-    6 = lamp40     16 = -          26 = lamp63     36 = lamp80
-    7 = lamp41     17 = lamp72     27 = lamp64     37 = lamp81
-    8 = lamp42     18 = lamp73     28 = lamp84     38 = lamp82
-    9 = lamp43     19 = -          29 = lamp94     39 = lamp83
+    0 = -     10 = 4.4   20 = 5.3   30 = 9.5   40 = 9.2
+    1 = 3.0   11 = 4.5   21 = 5.4   31 = 8.5   41 = 9.3
+    2 = 3.1   12 = -     22 = -     32 = 6.5   42 = 9.0
+    3 = 3.2   13 = 5.0   23 = 6.0   33 = 7.4   43 = 9.1
+    4 = 3.3   14 = 5.1   24 = 6.1   34 = 7.0
+    5 = 3.4   15 = 5.2   25 = 6.2   35 = 7.1
+    6 = 4.0   16 = -     26 = 6.3   36 = 8.0
+    7 = 4.1   17 = 7.2   27 = 6.4   37 = 8.1
+    8 = 4.2   18 = 7.3   28 = 8.4   38 = 8.2
+    9 = 4.3   19 = -     29 = 9.4   39 = 8.3
 
 ***************************************************************************/
 
@@ -3716,8 +3935,8 @@ MACHINE_CONFIG_END
   * edge connector to sensors(switches trigger when ball rolls over)
     and other inputs
 
-  lamp translation table: SN74259.u5(mux 1) goes to MAME output lamp5x,
-  SN74259.u6(mux 2) goes to MAME output lamp6x. u1-u3 are SN75492 ICs,
+  lamp translation table: SN74259.u5(mux 1) goes to MAME output 5.x,
+  SN74259.u6(mux 2) goes to MAME output 6.*. u1-u3 are SN75492 ICs,
   where other: u1 A2 is N/C, u3 A1 is from O2 and goes to digits seg C.
 
     u5 Q0 -> u1 A4 -> L2 (pin #2)       u6 Q0 -> u3 A4 -> L1 (pin #1)
@@ -6017,15 +6236,15 @@ MACHINE_CONFIG_END
 
   known releases:
   - World: Tandy-12: Computerized Arcade
-  - Mexico: Fabuloso Fred, distributed by Ensueno Toys (also released as
+  - Mexico: Fabuloso Fred, distributed by Ensueño Toys (also released as
     9-button version, a clone of Mego Fabulous Fred)
 
   This handheld contains 12 minigames. It looks and plays like Game Robot 9 by
-  Gakken (aka Mego's Fabulous Fred) from 1980, which in turn is a mix of Merlin
-  and Simon. Unlike Merlin and Simon, spin-offs were not as successful in the USA.
-  There were releases with and without the prefix "Tandy-12", I don't know which
-  name was more common. Also not worth noting is that it needed five batteries;
-  four C-cells and a 9-volt.
+  Takatoku Toys (aka Mego's Fabulous Fred) from 1980, which in turn is a mix of
+  Merlin and Simon. Unlike Merlin and Simon, spin-offs were not as successful in
+  the USA. There were releases with and without the prefix "Tandy-12", I don't
+  know which name was more common. Also not worth noting is that it needed five
+  batteries; four C-cells and a 9-volt.
 
   Some of the games require accessories included with the toy (eg. the Baseball
   game is played with a board representing the playing field). To start a game,
@@ -6162,6 +6381,114 @@ static MACHINE_CONFIG_START( tandy12, tandy12_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_tandy12)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
+  (Tandy) Radio Shack Monkey See (1982 version)
+  * TMS1000 MP0271 (die label 1000E, MP0271), only half of ROM space used
+  * 2 LEDs(one red, one green), 1-bit sound
+  
+  This is the TMS1000 version, the one from 1977 has a MM5780.
+  To play, enter an equation followed by the ?-key, and the calculator will
+  tell you if it was right(green) or wrong(red). For example 1+2=3?
+
+  known releases:
+  - USA(1): Monkey See
+  - USA(2): Heathcliff, distributed by McNaught Syndicate in 1983
+
+***************************************************************************/
+
+class monkeysee_state : public hh_tms1k_state
+{
+public:
+	monkeysee_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_READ8_MEMBER(read_k);
+};
+
+// handlers
+
+WRITE16_MEMBER(monkeysee_state::write_r)
+{
+	// R0-R4: input mux
+	m_inp_mux = data & 0x1f;
+
+	// R5: speaker out
+	m_speaker->level_w(data >> 5 & 1);
+}
+
+WRITE16_MEMBER(monkeysee_state::write_o)
+{
+	// O6,O7: leds
+	// other: N/C
+	display_matrix(2, 1, data >> 6, 1);
+}
+
+READ8_MEMBER(monkeysee_state::read_k)
+{
+	// K: multiplexed inputs
+	return read_inputs(5);
+}
+
+
+// config
+
+static INPUT_PORTS_START( monkeysee )
+	PORT_START("IN.0") // R0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
+
+	PORT_START("IN.1") // R1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
+
+	PORT_START("IN.2") // R2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.3") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(UTF8_MULTIPLY)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("-")
+
+	PORT_START("IN.4") // R4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("=")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("?")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DEL) PORT_NAME("C")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME(".")
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( monkeysee, monkeysee_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1000, 250000) // approximation - RC osc. R=68K, C=47pf
+	MCFG_TMS1XXX_READ_K_CB(READ8(monkeysee_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(monkeysee_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(monkeysee_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_monkeysee)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -6588,25 +6915,25 @@ MACHINE_CONFIG_END
   - Japan: Block Attack
   - UK: Break-In
 
-  lamp translation table: led zz from game PCB = MAME lampyx:
+  led translation table: led zz from game PCB = MAME y.x:
 
-    00 = -         10 = lamp50    20 = lamp42
-    01 = lamp70    11 = lamp51    21 = lamp33
-    02 = lamp71    12 = lamp52    22 = lamp22
-    03 = lamp72    13 = lamp53
-    04 = lamp73    14 = lamp43
-    05 = lamp60    15 = lamp31
-    06 = lamp61    16 = lamp32
-    07 = lamp62    17 = lamp30
-    08 = lamp63    18 = lamp41
-    09 = lamp40    19 = lamp21
+    00 = -     10 = 5.0   20 = 4.2
+    01 = 7.0   11 = 5.1   21 = 3.3
+    02 = 7.1   12 = 5.2   22 = 2.2
+    03 = 7.2   13 = 5.3
+    04 = 7.3   14 = 4.3
+    05 = 6.0   15 = 3.1
+    06 = 6.1   16 = 3.2
+    07 = 6.2   17 = 3.0
+    08 = 6.3   18 = 4.1
+    09 = 4.0   19 = 2.1
 
-  the 7seg panel is lamp0x and lamp1x(aka digit0/1), and the
-  8(2*4) * 3 rectangular leds panel, where x=0,1,2,3:
+  the 7seg panel is 0.* and 1.*(aka digit0/1),
+  and the 8(2*4) * 3 rectangular leds panel, where x=0,1,2,3:
 
-    lamp9x         lamp11x
-    lamp8x         lamp13x
-    lamp10x        lamp12x
+    9.*        11.*
+    8.*        13.*
+    10.*       12.*
 
 ***************************************************************************/
 
@@ -6789,18 +7116,18 @@ MACHINE_CONFIG_END
   - Japan: Pinball
   - Europe: Flipper
 
-  lamp translation table: led zz from game PCB = MAME lampyx:
+  led translation table: led zz from game PCB = MAME y.x:
 
-    0 = -          10 = lamp50     20 = lamp64     A = lamp30
-    1 = lamp33     11 = lamp55     21 = lamp65     B = lamp34
-    2 = lamp31     12 = lamp51     22 = lamp70     C = lamp35
-    3 = lamp32     13 = lamp52     23 = lamp71     D = lamp80
-    4 = lamp40     14 = lamp53     24 = lamp72     E = lamp81
-    5 = lamp41     15 = lamp60     25 = lamp73     F = lamp82
-    6 = lamp42     16 = lamp54     26 = lamp74     G = lamp83
-    7 = lamp43     17 = lamp61
-    8 = lamp44     18 = lamp62
-    9 = lamp45     19 = lamp63
+    0 = -     10 = 5.0   20 = 6.4   A = 3.0
+    1 = 3.3   11 = 5.5   21 = 6.5   B = 3.4
+    2 = 3.1   12 = 5.1   22 = 7.0   C = 3.5
+    3 = 3.2   13 = 5.2   23 = 7.1   D = 8.0
+    4 = 4.0   14 = 5.3   24 = 7.2   E = 8.1
+    5 = 4.1   15 = 6.0   25 = 7.3   F = 8.2
+    6 = 4.2   16 = 5.4   26 = 7.4   G = 8.3
+    7 = 4.3   17 = 6.1
+    8 = 4.4   18 = 6.2
+    9 = 4.5   19 = 6.3
 
   NOTE!: MAME external artwork is required
 
@@ -7064,6 +7391,17 @@ ROM_START( mathmagi )
 ROM_END
 
 
+ROM_START( bcheetah )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "mp0915", 0x0000, 0x0400, CRC(2968c81e) SHA1(d1e6691952600e88ccf626cb3d683419a1e8468c) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_bcheetah_output.pla", 0, 365, CRC(cc6d1ecd) SHA1(b0635a841d8850c36c1f414abe0571b81884b972) )
+ROM_END
+
+
 ROM_START( amaztron )
 	ROM_REGION( 0x0800, "maincpu", 0 )
 	ROM_LOAD( "mp3405", 0x0000, 0x0800, CRC(9cbc0009) SHA1(17772681271b59280687492f37fa0859998f041d) )
@@ -7204,6 +7542,17 @@ ROM_START( ebball3 )
 	ROM_LOAD( "tms1100_common2_micro.pla", 0, 867, CRC(7cc90264) SHA1(c6e1cf1ffb178061da9e31858514f7cd94e86990) )
 	ROM_REGION( 365, "maincpu:opla", 0 )
 	ROM_LOAD( "tms1100_ebball3_output.pla", 0, 365, CRC(00db663b) SHA1(6eae12503364cfb1f863df0e57970d3e766ec165) )
+ROM_END
+
+
+ROM_START( esbattle )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "en-6004_mp0920", 0x0000, 0x0400, CRC(7460c179) SHA1(be855054b4a98b05b34fd931d5c247c5c0f9b036) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_esbattle_output.pla", 0, 365, CRC(861b45a2) SHA1(a5a9dc9bef8adb761845ad548058b55e970517d3) )
 ROM_END
 
 
@@ -7564,6 +7913,17 @@ ROM_START( tandy12 )
 ROM_END
 
 
+ROM_START( monkeysee )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "mp0271", 0x0000, 0x0400, CRC(acab0f05) SHA1(226f7688caf4a94a88241d3b61ddc4254e4a918c) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_monkeysee_micro.pla", 0, 867, CRC(368d878f) SHA1(956e700a04f453c1610cfdb974fce898ba4cf01f) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_monkeysee_output.pla", 0, 365, CRC(8a010e89) SHA1(3ffbabc5d6c9b34cc06d290817d15b2be42d8b17) )
+ROM_END
+
+
 ROM_START( speechp )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "tms1007nl", 0x0000, 0x0400, CRC(c2669d5c) SHA1(7943d6f39508a9a82bc21e4fe34a5b9f86e3add2) )
@@ -7649,6 +8009,8 @@ CONS( 1979, matchnum,  0,        0, matchnum,  matchnum,  driver_device, 0, "A-O
 
 COMP( 1980, mathmagi,  0,        0, mathmagi,  mathmagi,  driver_device, 0, "APF Electronics Inc.", "Mathemagician", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
+CONS( 1979, bcheetah,  0,        0, bcheetah,  bcheetah,  driver_device, 0, "Bandai", "System Control Car: Cheetah", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_MECHANICAL ) // ***
+
 CONS( 1978, amaztron,  0,        0, amaztron,  amaztron,  driver_device, 0, "Coleco", "Amaze-A-Tron", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***
 COMP( 1979, zodiac,    0,        0, zodiac,    zodiac,    driver_device, 0, "Coleco", "Zodiac - The Astrology Computer", MACHINE_SUPPORTS_SAVE )
 CONS( 1978, cqback,    0,        0, cqback,    cqback,    driver_device, 0, "Coleco", "Electronic Quarterback", MACHINE_SUPPORTS_SAVE )
@@ -7664,6 +8026,7 @@ CONS( 1979, esoccer,   0,        0, esoccer,   esoccer,   driver_device, 0, "Ent
 CONS( 1979, ebball,    0,        0, ebball,    ebball,    driver_device, 0, "Entex", "Electronic Baseball (Entex)", MACHINE_SUPPORTS_SAVE )
 CONS( 1979, ebball2,   0,        0, ebball2,   ebball2,   driver_device, 0, "Entex", "Electronic Baseball 2 (Entex)", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, ebball3,   0,        0, ebball3,   ebball3,   driver_device, 0, "Entex", "Electronic Baseball 3 (Entex)", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, esbattle,  0,        0, esbattle,  esbattle,  driver_device, 0, "Entex", "Space Battle (Entex)", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, einvader,  0,        0, einvader,  einvader,  driver_device, 0, "Entex", "Space Invader (Entex, TMS1100 version)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1980, efootb4 ,  0,        0, efootb4,   efootb4,   driver_device, 0, "Entex", "Color Football 4 (Entex)", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, ebaskb2 ,  0,        0, ebaskb2,   ebaskb2,   driver_device, 0, "Entex", "Electronic Basketball 2 (Entex)", MACHINE_SUPPORTS_SAVE )
@@ -7704,6 +8067,7 @@ CONS( 1982, lostreas,  0,        0, lostreas,  lostreas,  driver_device, 0, "Par
 CONS( 1980, tcfball,   0,        0, tcfball,   tcfball,   driver_device, 0, "Tandy Radio Shack", "Championship Football (model 60-2150)", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, tcfballa,  tcfball,  0, tcfballa,  tcfballa,  driver_device, 0, "Tandy Radio Shack", "Championship Football (model 60-2151)", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, tandy12,   0,        0, tandy12,   tandy12,   driver_device, 0, "Tandy Radio Shack", "Tandy-12: Computerized Arcade", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // some of the minigames: ***
+CONS( 1982, monkeysee, 0,        0, monkeysee, monkeysee, driver_device, 0, "Tandy Radio Shack", "Monkey See (1982 version)", MACHINE_SUPPORTS_SAVE )
 
 COMP( 1976, speechp,   0,        0, speechp,   speechp,   driver_device, 0, "Telesensory Systems, Inc.", "Speech+", MACHINE_SUPPORTS_SAVE )
 

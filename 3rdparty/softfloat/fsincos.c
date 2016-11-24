@@ -31,8 +31,8 @@ these four paragraphs for those parts of this code that are retained.
 //#include "softfloat-specialize"
 #include "fpu_constant.h"
 
-static const floatx80 floatx80_one = packFloatx80(0, 0x3fff, U64(0x8000000000000000));
-static const floatx80 floatx80_default_nan = packFloatx80(0, 0xffff, U64(0xffffffffffffffff));
+static const floatx80 floatx80_one = packFloatx80(0, 0x3fff, 0x8000000000000000U);
+static const floatx80 floatx80_default_nan = packFloatx80(0, 0xffff, 0xffffffffffffffffU);
 
 #define packFloat2x128m(zHi, zLo) {(zHi), (zLo)}
 #define PACK_FLOAT_128(hi,lo) packFloat2x128m(LIT64(hi),LIT64(lo))
@@ -83,7 +83,7 @@ INLINE floatx80 propagateFloatx80NaNOneArg(floatx80 a)
 	if (floatx80_is_signaling_nan(a))
 		float_raise(float_flag_invalid);
 
-	a.low |= U64(0xC000000000000000);
+	a.low |= 0xC000000000000000U;
 
 	return a;
 }
@@ -322,7 +322,7 @@ int sf_fsincos(floatx80 a, floatx80 *sin_a, floatx80 *cos_a)
 //        float_raise(float_flag_denormal);
 
 		/* handle pseudo denormals */
-		if (! (aSig0 & U64(0x8000000000000000)))
+		if (! (aSig0 & 0x8000000000000000U))
 		{
 			float_raise(float_flag_inexact);
 			if (sin_a)
@@ -435,7 +435,7 @@ int floatx80_ftan(floatx80 &a)
 		if (aSig0 == 0) return 0;
 //        float_raise(float_flag_denormal);
 		/* handle pseudo denormals */
-		if (! (aSig0 & U64(0x8000000000000000)))
+		if (! (aSig0 & 0x8000000000000000U))
 		{
 			float_raise(float_flag_inexact | float_flag_underflow);
 			return 0;
@@ -616,7 +616,7 @@ floatx80 floatx80_scale(floatx80 a, floatx80 b)
 		}
 		if (aSig && (aExp == 0)) float_raise(float_flag_denormal);
 		if (bSign) return packFloatx80(aSign, 0, 0);
-		return packFloatx80(aSign, 0x7FFF, U64(0x8000000000000000));
+		return packFloatx80(aSign, 0x7FFF, 0x8000000000000000U);
 	}
 	if (aExp == 0) {
 		if (aSig == 0) return a;

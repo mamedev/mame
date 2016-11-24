@@ -889,8 +889,8 @@ void discrete_device::device_start()
 
 	/* enable profiling */
 	m_profiling = 0;
-	if (getenv("DISCRETE_PROFILING"))
-		m_profiling = atoi(getenv("DISCRETE_PROFILING"));
+	if (osd_getenv("DISCRETE_PROFILING"))
+		m_profiling = atoi(osd_getenv("DISCRETE_PROFILING"));
 
 	/* Build the final block list */
 	sound_block_list_t block_list;

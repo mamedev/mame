@@ -101,8 +101,8 @@ HRESULT CHashBundle::SetMethods(DECL_EXTERNAL_CODECS_LOC_VARS const UStringVecto
     h.Hasher = hasher;
     h.Name = name;
     h.DigestSize = digestSize;
-    for (unsigned i = 0; i < k_HashCalc_NumGroups; i++)
-      memset(h.Digests[i], 0, digestSize);
+    for (unsigned k = 0; k < k_HashCalc_NumGroups; k++)
+      memset(h.Digests[k], 0, digestSize);
   }
 
   return S_OK;

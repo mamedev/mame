@@ -41,6 +41,7 @@ public:
 	virtual bool is_creatable() const override { return 1; }
 	virtual bool must_be_loaded() const override { return 0; }
 	virtual bool is_reset_on_load() const override { return 0; }
+	virtual bool support_command_line_image_creation() const override { return 1; }
 	virtual const char *image_interface() const override { return "sc499_cass"; }
 	virtual const char *file_extensions() const override { return "act,ct"; }
 

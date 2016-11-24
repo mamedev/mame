@@ -1063,7 +1063,7 @@ void m68000_base_device::state_import(const device_state_entry &entry)
 		case STATE_GENPC:
 			ppc = pc;
 			break;
-		
+
 		case STATE_GENPCBASE:
 			pc = ppc;
 			break;
@@ -1208,6 +1208,16 @@ void m68000_base_device::set_hmmu_enable(int enable)
 	hmmu_enabled = enable;
 }
 
+void m68000_base_device::set_fpu_enable(int enable)
+{
+	has_fpu = enable;
+}
+
+int m68000_base_device::get_fpu_enable()
+{
+	return has_fpu;
+}
+
 void m68000_base_device::set_instruction_hook(read32_delegate ihook)
 {
 	instruction_hook = ihook;
@@ -1231,13 +1241,13 @@ void m68000_base_device::init8(address_space &space, address_space &ospace)
 //  m_cpustate = this;
 	opcode_xor = 0;
 
-	readimm16 = m68k_readimm16_delegate(FUNC(m68000_base_device::m68008_read_immediate_16), this);
-	read8 = m68k_read8_delegate(FUNC(address_space::read_byte), &space);
-	read16 = m68k_read16_delegate(FUNC(address_space::read_word), &space);
-	read32 = m68k_read32_delegate(FUNC(address_space::read_dword), &space);
-	write8 = m68k_write8_delegate(FUNC(address_space::write_byte), &space);
-	write16 = m68k_write16_delegate(FUNC(address_space::write_word), &space);
-	write32 = m68k_write32_delegate(FUNC(address_space::write_dword), &space);
+	readimm16 = m68k_readimm16_delegate(&m68000_base_device::m68008_read_immediate_16, this);
+	read8 = m68k_read8_delegate(&address_space::read_byte, &space);
+	read16 = m68k_read16_delegate(&address_space::read_word, &space);
+	read32 = m68k_read32_delegate(&address_space::read_dword, &space);
+	write8 = m68k_write8_delegate(&address_space::write_byte, &space);
+	write16 = m68k_write16_delegate(&address_space::write_word, &space);
+	write32 = m68k_write32_delegate(&address_space::write_dword, &space);
 }
 
 /****************************************************************************
@@ -1270,13 +1280,13 @@ void m68000_base_device::init16(address_space &space, address_space &ospace)
 
 	opcode_xor = 0;
 
-	readimm16 = m68k_readimm16_delegate(FUNC(m68000_base_device::simple_read_immediate_16), this);
-	read8 = m68k_read8_delegate(FUNC(address_space::read_byte), &space);
-	read16 = m68k_read16_delegate(FUNC(address_space::read_word), &space);
-	read32 = m68k_read32_delegate(FUNC(address_space::read_dword), &space);
-	write8 = m68k_write8_delegate(FUNC(m68000_base_device::m68000_write_byte), this);
-	write16 = m68k_write16_delegate(FUNC(address_space::write_word), &space);
-	write32 = m68k_write32_delegate(FUNC(address_space::write_dword), &space);
+	readimm16 = m68k_readimm16_delegate(&m68000_base_device::simple_read_immediate_16, this);
+	read8 = m68k_read8_delegate(&address_space::read_byte, &space);
+	read16 = m68k_read16_delegate(&address_space::read_word, &space);
+	read32 = m68k_read32_delegate(&address_space::read_dword, &space);
+	write8 = m68k_write8_delegate(&m68000_base_device::m68000_write_byte, this);
+	write16 = m68k_write16_delegate(&address_space::write_word, &space);
+	write32 = m68k_write32_delegate(&address_space::write_dword, &space);
 }
 
 
@@ -1296,13 +1306,13 @@ void m68000_base_device::init32(address_space &space, address_space &ospace)
 	m_odirect = &ospace.direct();
 	opcode_xor = WORD_XOR_BE(0);
 
-	readimm16 = m68k_readimm16_delegate(FUNC(m68000_base_device::read_immediate_16), this);
-	read8 = m68k_read8_delegate(FUNC(address_space::read_byte), &space);
-	read16 = m68k_read16_delegate(FUNC(address_space::read_word_unaligned), &space);
-	read32 = m68k_read32_delegate(FUNC(address_space::read_dword_unaligned), &space);
-	write8 = m68k_write8_delegate(FUNC(address_space::write_byte), &space);
-	write16 = m68k_write16_delegate(FUNC(address_space::write_word_unaligned), &space);
-	write32 = m68k_write32_delegate(FUNC(address_space::write_dword_unaligned), &space);
+	readimm16 = m68k_readimm16_delegate(&m68000_base_device::read_immediate_16, this);
+	read8 = m68k_read8_delegate(&address_space::read_byte, &space);
+	read16 = m68k_read16_delegate(&address_space::read_word_unaligned, &space);
+	read32 = m68k_read32_delegate(&address_space::read_dword_unaligned, &space);
+	write8 = m68k_write8_delegate(&address_space::write_byte, &space);
+	write16 = m68k_write16_delegate(&address_space::write_word_unaligned, &space);
+	write32 = m68k_write32_delegate(&address_space::write_dword_unaligned, &space);
 }
 
 /* interface for 32-bit data bus with PMMU (68EC020, 68020) */
@@ -1515,13 +1525,13 @@ void m68000_base_device::init32mmu(address_space &space, address_space &ospace)
 	m_odirect = &ospace.direct();
 	opcode_xor = WORD_XOR_BE(0);
 
-	readimm16 = m68k_readimm16_delegate(FUNC(m68000_base_device::read_immediate_16_mmu), this);
-	read8 = m68k_read8_delegate(FUNC(m68000_base_device::read_byte_32_mmu), this);
-	read16 = m68k_read16_delegate(FUNC(m68000_base_device::readword_d32_mmu), this);
-	read32 = m68k_read32_delegate(FUNC(m68000_base_device::readlong_d32_mmu), this);
-	write8 = m68k_write8_delegate(FUNC(m68000_base_device::write_byte_32_mmu), this);
-	write16 = m68k_write16_delegate(FUNC(m68000_base_device::writeword_d32_mmu), this);
-	write32 = m68k_write32_delegate(FUNC(m68000_base_device::writelong_d32_mmu), this);
+	readimm16 = m68k_readimm16_delegate(&m68000_base_device::read_immediate_16_mmu, this);
+	read8 = m68k_read8_delegate(&m68000_base_device::read_byte_32_mmu, this);
+	read16 = m68k_read16_delegate(&m68000_base_device::readword_d32_mmu, this);
+	read32 = m68k_read32_delegate(&m68000_base_device::readlong_d32_mmu, this);
+	write8 = m68k_write8_delegate(&m68000_base_device::write_byte_32_mmu, this);
+	write16 = m68k_write16_delegate(&m68000_base_device::writeword_d32_mmu, this);
+	write32 = m68k_write32_delegate(&m68000_base_device::writelong_d32_mmu, this);
 }
 
 
@@ -1643,13 +1653,13 @@ void m68000_base_device::init32hmmu(address_space &space, address_space &ospace)
 	m_odirect = &ospace.direct();
 	opcode_xor = WORD_XOR_BE(0);
 
-	readimm16 = m68k_readimm16_delegate(FUNC(m68000_base_device::read_immediate_16_hmmu), this);
-	read8 = m68k_read8_delegate(FUNC(m68000_base_device::read_byte_32_hmmu), this);
-	read16 = m68k_read16_delegate(FUNC(m68000_base_device::readword_d32_hmmu), this);
-	read32 = m68k_read32_delegate(FUNC(m68000_base_device::readlong_d32_hmmu), this);
-	write8 = m68k_write8_delegate(FUNC(m68000_base_device::write_byte_32_hmmu), this);
-	write16 = m68k_write16_delegate(FUNC(m68000_base_device::writeword_d32_hmmu), this);
-	write32 = m68k_write32_delegate(FUNC(m68000_base_device::writelong_d32_hmmu), this);
+	readimm16 = m68k_readimm16_delegate(&m68000_base_device::read_immediate_16_hmmu, this);
+	read8 = m68k_read8_delegate(&m68000_base_device::read_byte_32_hmmu, this);
+	read16 = m68k_read16_delegate(&m68000_base_device::readword_d32_hmmu, this);
+	read32 = m68k_read32_delegate(&m68000_base_device::readlong_d32_hmmu, this);
+	write8 = m68k_write8_delegate(&m68000_base_device::write_byte_32_hmmu, this);
+	write16 = m68k_write16_delegate(&m68000_base_device::writeword_d32_hmmu, this);
+	write32 = m68k_write32_delegate(&m68000_base_device::writelong_d32_hmmu, this);
 }
 
 void m68000_base_device::set_reset_callback(write_line_delegate callback)
@@ -2125,78 +2135,78 @@ void m68000_base_device::init_cpu_coldfire(void)
 
 CPU_DISASSEMBLE( dasm_m68000 )
 {
-	return m68k_disassemble_raw(buffer, pc, oprom, opram, M68K_CPU_TYPE_68000);
+	return m68k_disassemble_raw(stream, pc, oprom, opram, M68K_CPU_TYPE_68000);
 }
 
 CPU_DISASSEMBLE( dasm_m68008 )
 {
-	return m68k_disassemble_raw(buffer, pc, oprom, opram, M68K_CPU_TYPE_68008);
+	return m68k_disassemble_raw(stream, pc, oprom, opram, M68K_CPU_TYPE_68008);
 }
 
 CPU_DISASSEMBLE( dasm_m68010 )
 {
-	return m68k_disassemble_raw(buffer, pc, oprom, opram, M68K_CPU_TYPE_68010);
+	return m68k_disassemble_raw(stream, pc, oprom, opram, M68K_CPU_TYPE_68010);
 }
 
 CPU_DISASSEMBLE( dasm_m68020 )
 {
-	return m68k_disassemble_raw(buffer, pc, oprom, opram, M68K_CPU_TYPE_68020);
+	return m68k_disassemble_raw(stream, pc, oprom, opram, M68K_CPU_TYPE_68020);
 }
 
 CPU_DISASSEMBLE( dasm_m68030 )
 {
-	return m68k_disassemble_raw(buffer, pc, oprom, opram, M68K_CPU_TYPE_68030);
+	return m68k_disassemble_raw(stream, pc, oprom, opram, M68K_CPU_TYPE_68030);
 }
 
 CPU_DISASSEMBLE( dasm_m68ec030 )
 {
-	return m68k_disassemble_raw(buffer, pc, oprom, opram, M68K_CPU_TYPE_68EC030);
+	return m68k_disassemble_raw(stream, pc, oprom, opram, M68K_CPU_TYPE_68EC030);
 }
 
 CPU_DISASSEMBLE( dasm_m68040 )
 {
-	return m68k_disassemble_raw(buffer, pc, oprom, opram, M68K_CPU_TYPE_68040);
+	return m68k_disassemble_raw(stream, pc, oprom, opram, M68K_CPU_TYPE_68040);
 }
 
 CPU_DISASSEMBLE( dasm_m68ec040 )
 {
-	return m68k_disassemble_raw(buffer, pc, oprom, opram, M68K_CPU_TYPE_68EC040);
+	return m68k_disassemble_raw(stream, pc, oprom, opram, M68K_CPU_TYPE_68EC040);
 }
 
 CPU_DISASSEMBLE( dasm_m68lc040 )
 {
-	return m68k_disassemble_raw(buffer, pc, oprom, opram, M68K_CPU_TYPE_68LC040);
+	return m68k_disassemble_raw(stream, pc, oprom, opram, M68K_CPU_TYPE_68LC040);
 }
 
 CPU_DISASSEMBLE( dasm_fscpu32 )
 {
-	return m68k_disassemble_raw(buffer, pc, oprom, opram, M68K_CPU_TYPE_FSCPU32);
+	return m68k_disassemble_raw(stream, pc, oprom, opram, M68K_CPU_TYPE_FSCPU32);
 }
 
 CPU_DISASSEMBLE( dasm_coldfire )
 {
-	return m68k_disassemble_raw(buffer, pc, oprom, opram, M68K_CPU_TYPE_COLDFIRE);
+	return m68k_disassemble_raw(stream, pc, oprom, opram, M68K_CPU_TYPE_COLDFIRE);
 }
 
-offs_t m68000_base_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) { return CPU_DISASSEMBLE_NAME(dasm_m68000)(this, buffer, pc, oprom, opram, options); }
-offs_t m68000_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) { return CPU_DISASSEMBLE_NAME(dasm_m68000)(this, buffer, pc, oprom, opram, options); }
-offs_t m68301_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) { return CPU_DISASSEMBLE_NAME(dasm_m68000)(this, buffer, pc, oprom, opram, options); }
-offs_t m68008_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) { return CPU_DISASSEMBLE_NAME(dasm_m68008)(this, buffer, pc, oprom, opram, options); }
-offs_t m68008plcc_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) { return CPU_DISASSEMBLE_NAME(dasm_m68008)(this, buffer, pc, oprom, opram, options); }
-offs_t m68010_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) { return CPU_DISASSEMBLE_NAME(dasm_m68010)(this, buffer, pc, oprom, opram, options); }
-offs_t m68ec020_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) { return CPU_DISASSEMBLE_NAME(dasm_m68020)(this, buffer, pc, oprom, opram, options); }
-offs_t m68020_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) { return CPU_DISASSEMBLE_NAME(dasm_m68020)(this, buffer, pc, oprom, opram, options); }
-offs_t m68020fpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) { return CPU_DISASSEMBLE_NAME(dasm_m68020)(this, buffer, pc, oprom, opram, options); }
-offs_t m68020pmmu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) { return CPU_DISASSEMBLE_NAME(dasm_m68020)(this, buffer, pc, oprom, opram, options); }
-offs_t m68020hmmu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) { return CPU_DISASSEMBLE_NAME(dasm_m68020)(this, buffer, pc, oprom, opram, options); }
-offs_t m68ec030_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) { return CPU_DISASSEMBLE_NAME(dasm_m68ec030)(this, buffer, pc, oprom, opram, options); }
-offs_t m68030_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) { return CPU_DISASSEMBLE_NAME(dasm_m68030)(this, buffer, pc, oprom, opram, options); }
-offs_t m68ec040_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) { return CPU_DISASSEMBLE_NAME(dasm_m68ec040)(this, buffer, pc, oprom, opram, options); }
-offs_t m68lc040_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) { return CPU_DISASSEMBLE_NAME(dasm_m68lc040)(this, buffer, pc, oprom, opram, options); }
-offs_t m68040_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) { return CPU_DISASSEMBLE_NAME(dasm_m68040)(this, buffer, pc, oprom, opram, options); }
-offs_t scc68070_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) { return CPU_DISASSEMBLE_NAME(dasm_m68000)(this, buffer, pc, oprom, opram, options); }
-offs_t fscpu32_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) { return CPU_DISASSEMBLE_NAME(dasm_fscpu32)(this, buffer, pc, oprom, opram, options); }
-offs_t mcf5206e_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) { return CPU_DISASSEMBLE_NAME(dasm_coldfire)(this, buffer, pc, oprom, opram, options); }
+offs_t m68000_base_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) { return CPU_DISASSEMBLE_NAME(dasm_m68000)(this, stream, pc, oprom, opram, options); }
+offs_t m68000_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) { return CPU_DISASSEMBLE_NAME(dasm_m68000)(this, stream, pc, oprom, opram, options); }
+offs_t m68301_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) { return CPU_DISASSEMBLE_NAME(dasm_m68000)(this, stream, pc, oprom, opram, options); }
+offs_t m68008_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) { return CPU_DISASSEMBLE_NAME(dasm_m68008)(this, stream, pc, oprom, opram, options); }
+offs_t m68008plcc_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) { return CPU_DISASSEMBLE_NAME(dasm_m68008)(this, stream, pc, oprom, opram, options); }
+offs_t m68010_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) { return CPU_DISASSEMBLE_NAME(dasm_m68010)(this, stream, pc, oprom, opram, options); }
+offs_t m68ec020_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) { return CPU_DISASSEMBLE_NAME(dasm_m68020)(this, stream, pc, oprom, opram, options); }
+offs_t m68020_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) { return CPU_DISASSEMBLE_NAME(dasm_m68020)(this, stream, pc, oprom, opram, options); }
+offs_t m68020fpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) { return CPU_DISASSEMBLE_NAME(dasm_m68020)(this, stream, pc, oprom, opram, options); }
+offs_t m68020pmmu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) { return CPU_DISASSEMBLE_NAME(dasm_m68020)(this, stream, pc, oprom, opram, options); }
+offs_t m68020hmmu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) { return CPU_DISASSEMBLE_NAME(dasm_m68020)(this, stream, pc, oprom, opram, options); }
+offs_t m68ec030_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) { return CPU_DISASSEMBLE_NAME(dasm_m68ec030)(this, stream, pc, oprom, opram, options); }
+offs_t m68030_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) { return CPU_DISASSEMBLE_NAME(dasm_m68030)(this, stream, pc, oprom, opram, options); }
+offs_t m68ec040_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) { return CPU_DISASSEMBLE_NAME(dasm_m68ec040)(this, stream, pc, oprom, opram, options); }
+offs_t m68lc040_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) { return CPU_DISASSEMBLE_NAME(dasm_m68lc040)(this, stream, pc, oprom, opram, options); }
+offs_t m68040_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) { return CPU_DISASSEMBLE_NAME(dasm_m68040)(this, stream, pc, oprom, opram, options); }
+offs_t scc68070_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) { return CPU_DISASSEMBLE_NAME(dasm_m68000)(this, stream, pc, oprom, opram, options); }
+offs_t fscpu32_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) { return CPU_DISASSEMBLE_NAME(dasm_fscpu32)(this, stream, pc, oprom, opram, options); }
+offs_t mcf5206e_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) { return CPU_DISASSEMBLE_NAME(dasm_coldfire)(this, stream, pc, oprom, opram, options); }
 
 
 /* Service an interrupt request and start exception processing */

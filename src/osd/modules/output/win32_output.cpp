@@ -67,7 +67,7 @@ class output_win32 : public osd_module, public output_module
 {
 public:
 	output_win32()
-		: osd_module(OSD_OUTPUT_PROVIDER, "windows"), output_module()
+		: osd_module(OSD_OUTPUT_PROVIDER, "windows"), output_module(), m_output_hwnd(nullptr), m_clientlist(nullptr)
 	{
 	}
 	virtual ~output_win32() { }
@@ -110,7 +110,7 @@ int output_win32::init(const osd_options &options)
 	assert(result == 0);
 	(void)result; // to silence gcc 4.6
 
-	// allocate message ids before creating the window 
+	// allocate message ids before creating the window
 	// since the window proc gets called during creation
 	om_mame_start = RegisterWindowMessage(OM_MAME_START);
 	assert(om_mame_start != 0);

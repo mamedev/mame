@@ -12,11 +12,6 @@ configuration { "mingw* or vs*" }
 		"main=utf8_main",
 	}
 
-configuration { "Debug" }
-	defines {
-		"MALLOC_DEBUG",
-	}
-
 configuration { "vs*" }
 	flags {
 		"Unicode",

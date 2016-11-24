@@ -129,8 +129,8 @@ public:
 
 	// symbol access
 	virtual bool is_lval() const = 0;
-	virtual uint64_t value() const = 0;
-	virtual void set_value(uint64_t newvalue) = 0;
+	virtual u64 value() const = 0;
+	virtual void set_value(u64 newvalue) = 0;
 
 protected:
 	// internal state
@@ -150,16 +150,16 @@ class symbol_table
 {
 public:
 	// callback functions for getting/setting a symbol value
-	typedef std::function<uint64_t(symbol_table &table, void *symref)> getter_func;
-	typedef std::function<void(symbol_table &table, void *symref, uint64_t value)> setter_func;
+	typedef std::function<u64(symbol_table &table, void *symref)> getter_func;
+	typedef std::function<void(symbol_table &table, void *symref, u64 value)> setter_func;
 
 	// callback functions for function execution
-	typedef std::function<uint64_t(symbol_table &table, void *symref, int numparams, const uint64_t *paramlist)> execute_func;
+	typedef std::function<u64(symbol_table &table, void *symref, int numparams, const u64 *paramlist)> execute_func;
 
 	// callback functions for memory reads/writes
 	typedef std::function<expression_error::error_code(void *cbparam, const char *name, expression_space space)> valid_func;
-	typedef std::function<uint64_t(void *cbparam, const char *name, expression_space space, uint32_t offset, int size)> read_func;
-	typedef std::function<void(void *cbparam, const char *name, expression_space space, uint32_t offset, int size, uint64_t value)> write_func;
+	typedef std::function<u64(void *cbparam, const char *name, expression_space space, u32 offset, int size)> read_func;
+	typedef std::function<void(void *cbparam, const char *name, expression_space space, u32 offset, int size, u64 value)> write_func;
 
 	enum read_write
 	{
@@ -179,21 +179,21 @@ public:
 	void configure_memory(void *param, valid_func valid, read_func read, write_func write);
 
 	// symbol access
-	void add(const char *name, read_write rw, uint64_t *ptr = nullptr);
-	void add(const char *name, uint64_t constvalue);
+	void add(const char *name, read_write rw, u64 *ptr = nullptr);
+	void add(const char *name, u64 constvalue);
 	void add(const char *name, void *ref, getter_func getter, setter_func setter = nullptr);
 	void add(const char *name, void *ref, int minparams, int maxparams, execute_func execute);
 	symbol_entry *find(const char *name) const { if (name) { auto search = m_symlist.find(name); if (search != m_symlist.end()) return search->second.get(); else return nullptr; } else return nullptr; }
 	symbol_entry *find_deep(const char *name);
 
 	// value getter/setter
-	uint64_t value(const char *symbol);
-	void set_value(const char *symbol, uint64_t value);
+	u64 value(const char *symbol);
+	void set_value(const char *symbol, u64 value);
 
 	// memory accessors
 	expression_error::error_code memory_valid(const char *name, expression_space space);
-	uint64_t memory_value(const char *name, expression_space space, uint32_t offset, int size);
-	void set_memory_value(const char *name, expression_space space, uint32_t offset, int size, uint64_t value);
+	u64 memory_value(const char *name, expression_space space, u32 offset, int size);
+	void set_memory_value(const char *name, expression_space space, u32 offset, int size, u64 value);
 
 private:
 	// internal state
@@ -216,7 +216,7 @@ class parsed_expression
 public:
 	// construction/destruction
 	parsed_expression(const parsed_expression &src) { copy(src); }
-	parsed_expression(symbol_table *symtable = nullptr, const char *expression = nullptr, uint64_t *result = nullptr);
+	parsed_expression(symbol_table *symtable = nullptr, const char *expression = nullptr, u64 *result = nullptr);
 
 	// operators
 	parsed_expression &operator=(const parsed_expression &src) { copy(src); return *this; }
@@ -231,7 +231,7 @@ public:
 
 	// execution
 	void parse(const char *string);
-	uint64_t execute() { return execute_tokens(); }
+	u64 execute() { return execute_tokens(); }
 
 private:
 	// a single token
@@ -279,15 +279,15 @@ private:
 		bool is_memory() const { return (m_type == MEMORY); }
 		bool is_symbol() const { return (m_type == SYMBOL); }
 		bool is_operator() const { return (m_type == OPERATOR); }
-		bool is_operator(uint8_t type) const { return (m_type == OPERATOR && optype() == type); }
+		bool is_operator(u8 type) const { return (m_type == OPERATOR && optype() == type); }
 		bool is_lval() const { return ((m_type == SYMBOL && m_symbol->is_lval()) || m_type == MEMORY); }
 
-		uint64_t value() const { assert(m_type == NUMBER); return m_value; }
-		uint32_t address() const { assert(m_type == MEMORY); return m_value; }
+		u64 value() const { assert(m_type == NUMBER); return m_value; }
+		u32 address() const { assert(m_type == MEMORY); return m_value; }
 		symbol_entry *symbol() const { assert(m_type == SYMBOL); return m_symbol; }
 
-		uint8_t optype() const { assert(m_type == OPERATOR); return (m_flags & TIN_OPTYPE_MASK) >> TIN_OPTYPE_SHIFT; }
-		uint8_t precedence() const { assert(m_type == OPERATOR); return (m_flags & TIN_PRECEDENCE_MASK) >> TIN_PRECEDENCE_SHIFT; }
+		u8 optype() const { assert(m_type == OPERATOR); return (m_flags & TIN_OPTYPE_MASK) >> TIN_OPTYPE_SHIFT; }
+		u8 precedence() const { assert(m_type == OPERATOR); return (m_flags & TIN_PRECEDENCE_MASK) >> TIN_PRECEDENCE_SHIFT; }
 		bool is_function_separator() const { assert(m_type == OPERATOR); return ((m_flags & TIN_FUNCTION_MASK) != 0); }
 		bool right_to_left() const { assert(m_type == OPERATOR); return ((m_flags & TIN_RIGHT_TO_LEFT_MASK) != 0); }
 		expression_space memory_space() const { assert(m_type == OPERATOR || m_type == MEMORY); return expression_space((m_flags & TIN_MEMORY_SPACE_MASK) >> TIN_MEMORY_SPACE_SHIFT); }
@@ -297,11 +297,11 @@ private:
 		parse_token &set_offset(int offset) { m_offset = offset; return *this; }
 		parse_token &set_offset(const parse_token &src) { m_offset = src.m_offset; return *this; }
 		parse_token &set_offset(const parse_token &src1, const parse_token &src2) { m_offset = std::min(src1.m_offset, src2.m_offset); return *this; }
-		parse_token &configure_number(uint64_t value) { m_type = NUMBER; m_value = value; return *this; }
+		parse_token &configure_number(u64 value) { m_type = NUMBER; m_value = value; return *this; }
 		parse_token &configure_string(const char *string) { m_type = STRING; m_string = string; return *this; }
-		parse_token &configure_memory(uint32_t address, parse_token &memoryat) { m_type = MEMORY; m_value = address; m_flags = memoryat.m_flags; m_string = memoryat.m_string; return *this; }
+		parse_token &configure_memory(u32 address, parse_token &memoryat) { m_type = MEMORY; m_value = address; m_flags = memoryat.m_flags; m_string = memoryat.m_string; return *this; }
 		parse_token &configure_symbol(symbol_entry &symbol) { m_type = SYMBOL; m_symbol = &symbol; return *this; }
-		parse_token &configure_operator(uint8_t optype, uint8_t precedence)
+		parse_token &configure_operator(u8 optype, u8 precedence)
 			{ m_type = OPERATOR; m_flags = ((optype << TIN_OPTYPE_SHIFT) & TIN_OPTYPE_MASK) | ((precedence << TIN_PRECEDENCE_SHIFT) & TIN_PRECEDENCE_MASK); return *this; }
 
 		parse_token &set_function_separator() { assert(m_type == OPERATOR); m_flags |= TIN_FUNCTION_MASK; return *this; }
@@ -311,16 +311,16 @@ private:
 		parse_token &set_memory_source(const char *string) { assert(m_type == OPERATOR || m_type == MEMORY); m_string = string; return *this; }
 
 		// access
-		uint64_t get_lval_value(symbol_table *symtable);
-		void set_lval_value(symbol_table *symtable, uint64_t value);
+		u64 get_lval_value(symbol_table *symtable);
+		void set_lval_value(symbol_table *symtable, u64 value);
 
 	private:
 		// internal state
 		parse_token *           m_next;             // next token in list
 		token_type              m_type;             // type of token
 		int                     m_offset;           // offset within the string
-		uint64_t                  m_value;            // integral value
-		uint32_t                  m_flags;            // additional flags/info
+		u64                     m_value;            // integral value
+		u32                     m_flags;            // additional flags/info
 		const char *            m_string;           // associated string
 		symbol_entry *          m_symbol;           // symbol pointer
 	};
@@ -366,7 +366,7 @@ private:
 	parse_token *peek_token(int count);
 	void pop_token_lval(parse_token &token);
 	void pop_token_rval(parse_token &token);
-	uint64_t execute_tokens();
+	u64 execute_tokens();
 	void execute_function(parse_token &token);
 
 	// constants

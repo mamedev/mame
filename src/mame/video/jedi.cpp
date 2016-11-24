@@ -327,7 +327,7 @@ uint32_t jedi_state::screen_update_jedi(screen_device &screen, bitmap_rgb32 &bit
 {
 	/* if no video, clear it all to black */
 	if (*m_video_off & 0x01)
-		bitmap.fill(rgb_t::black, cliprect);
+		bitmap.fill(rgb_t::black(), cliprect);
 	else
 	{
 		/* draw the background/text layers, followed by the sprites

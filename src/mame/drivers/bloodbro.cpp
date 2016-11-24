@@ -698,8 +698,8 @@ DRIVER_INIT_MEMBER(bloodbro_state,weststry)
 {
 	// Patch out jp nz,$3000; no code known to exist at that address
 	memory_region *z80_rom = memregion("audiocpu");
-	z80_rom->u8(0x160e) = 0x00;
-	z80_rom->u8(0x1610) = 0x00;
+	z80_rom->as_u8(0x160e) = 0x00;
+	z80_rom->as_u8(0x1610) = 0x00;
 }
 
 

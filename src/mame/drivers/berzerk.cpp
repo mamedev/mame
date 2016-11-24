@@ -485,7 +485,7 @@ uint32_t berzerk_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 		for (i = 0; i < 4; i++)
 		{
-			rgb_t pen = (data & 0x80) ? pens[color >> 4] : rgb_t::black;
+			rgb_t pen = (data & 0x80) ? pens[color >> 4] : rgb_t::black();
 			bitmap.pix32(y, x) = pen;
 
 			x = x + 1;
@@ -494,7 +494,7 @@ uint32_t berzerk_state::screen_update(screen_device &screen, bitmap_rgb32 &bitma
 
 		for (; i < 8; i++)
 		{
-			rgb_t pen = (data & 0x80) ? pens[color & 0x0f] : rgb_t::black;
+			rgb_t pen = (data & 0x80) ? pens[color & 0x0f] : rgb_t::black();
 			bitmap.pix32(y, x) = pen;
 
 			x = x + 1;

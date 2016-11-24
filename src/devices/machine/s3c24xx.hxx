@@ -187,11 +187,11 @@ rgb_t S3C24_CLASS_NAME::s3c24xx_get_color_stn_01(uint8_t data)
 {
 	if ((data & 1) == 0)
 	{
-		return rgb_t::black;
+		return rgb_t::black();
 	}
 	else
 	{
-		return rgb_t::white;
+		return rgb_t::white();
 	}
 }
 

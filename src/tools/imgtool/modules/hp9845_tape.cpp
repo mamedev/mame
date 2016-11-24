@@ -1399,20 +1399,17 @@ static bool dump_string(imgtool::stream &inp, imgtool::stream &out , unsigned le
 
 static imgtoolerr_t hp9845data_read_file(imgtool::partition &partition, const char *filename, const char *fork, imgtool::stream &destf)
 {
-	imgtool::stream *inp_data;
+	imgtool::stream::ptr inp_data;
 	imgtoolerr_t res;
 	uint8_t tmp[ 2 ];
 
 	inp_data = imgtool::stream::open_mem(NULL , 0);
-	if (inp_data == nullptr) {
+	if (!inp_data)
 		return IMGTOOLERR_OUTOFMEMORY;
-	}
 
 	res = hp9845_tape_read_file(partition , filename , fork , *inp_data);
-	if (res != IMGTOOLERR_SUCCESS) {
-		delete inp_data;
+	if (res != IMGTOOLERR_SUCCESS)
 		return res;
-	}
 
 	inp_data->seek(0, SEEK_SET);
 
@@ -1540,12 +1537,11 @@ static bool split_string_n_dump(const char *s , imgtool::stream &dest)
 
 static imgtoolerr_t hp9845data_write_file(imgtool::partition &partition, const char *filename, const char *fork, imgtool::stream &sourcef, util::option_resolution *opts)
 {
-	imgtool::stream *out_data;
+	imgtool::stream::ptr out_data;
 
 	out_data = imgtool::stream::open_mem(NULL , 0);
-	if (out_data == nullptr) {
+	if (!out_data)
 		return IMGTOOLERR_OUTOFMEMORY;
-	}
 
 	while (1) {
 		char line[ 256 ];
@@ -1593,8 +1589,6 @@ static imgtoolerr_t hp9845data_write_file(imgtool::partition &partition, const c
 	out_data->seek(0 , SEEK_SET);
 
 	imgtoolerr_t res = hp9845_tape_write_file(partition, filename, fork, *out_data, opts);
-
-	delete out_data;
 
 	return res;
 }

@@ -300,7 +300,7 @@ void debug_view_watchpoints::view_update()
 		pad_ostream_to_length(linebuf, tableBreaks[7]);
 
 		auto const &text(linebuf.vec());
-		for (uint32_t i = m_topleft.x; i < (m_topleft.x + m_visible.x); i++, dest++)
+		for (u32 i = m_topleft.x; i < (m_topleft.x + m_visible.x); i++, dest++)
 		{
 			dest->byte = (i < text.size()) ? text[i] : ' ';
 			dest->attrib = DCA_ANCILLARY;
@@ -339,7 +339,7 @@ void debug_view_watchpoints::view_update()
 			pad_ostream_to_length(linebuf, tableBreaks[7]);
 
 			auto const &text(linebuf.vec());
-			for (uint32_t i = m_topleft.x; i < (m_topleft.x + m_visible.x); i++, dest++)
+			for (u32 i = m_topleft.x; i < (m_topleft.x + m_visible.x); i++, dest++)
 			{
 				dest->byte = (i < text.size()) ? text[i] : ' ';
 				dest->attrib = DCA_NORMAL;

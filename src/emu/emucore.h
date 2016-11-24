@@ -55,14 +55,24 @@
 //  FUNDAMENTAL TYPES
 //**************************************************************************
 
+// explicitly sized integers
+using osd::u8;
+using osd::u16;
+using osd::u32;
+using osd::u64;
+using osd::s8;
+using osd::s16;
+using osd::s32;
+using osd::s64;
+
 // genf is a generic function pointer; cast function pointers to this instead of void *
 typedef void genf(void);
 
 // pen_t is used to represent pixel values in bitmaps
-typedef uint32_t pen_t;
+typedef u32 pen_t;
 
 // stream_sample_t is used to represent a single sample in a sound stream
-typedef int32_t stream_sample_t;
+typedef s32 stream_sample_t;
 
 // running_machine is core to pretty much everything
 class running_machine;
@@ -73,38 +83,22 @@ class running_machine;
 //  USEFUL COMPOSITE TYPES
 //**************************************************************************
 
-// generic_ptr is a union of pointers to various sizes
-union generic_ptr
-{
-	generic_ptr(void *value) { v = value; }
-	void *      v;
-	int8_t *      i8;
-	uint8_t *     u8;
-	int16_t *     i16;
-	uint16_t *    u16;
-	int32_t *     i32;
-	uint32_t *    u32;
-	int64_t *     i64;
-	uint64_t *    u64;
-};
-
-
 // PAIR is an endian-safe union useful for representing 32-bit CPU registers
 union PAIR
 {
 #ifdef LSB_FIRST
-	struct { uint8_t l,h,h2,h3; } b;
-	struct { uint16_t l,h; } w;
-	struct { int8_t l,h,h2,h3; } sb;
-	struct { int16_t l,h; } sw;
+	struct { u8 l,h,h2,h3; } b;
+	struct { u16 l,h; } w;
+	struct { s8 l,h,h2,h3; } sb;
+	struct { s16 l,h; } sw;
 #else
-	struct { uint8_t h3,h2,h,l; } b;
-	struct { int8_t h3,h2,h,l; } sb;
-	struct { uint16_t h,l; } w;
-	struct { int16_t h,l; } sw;
+	struct { u8 h3,h2,h,l; } b;
+	struct { s8 h3,h2,h,l; } sb;
+	struct { u16 h,l; } w;
+	struct { s16 h,l; } sw;
 #endif
-	uint32_t d;
-	int32_t sd;
+	u32 d;
+	s32 sd;
 };
 
 
@@ -112,14 +106,14 @@ union PAIR
 union PAIR16
 {
 #ifdef LSB_FIRST
-	struct { uint8_t l,h; } b;
-	struct { int8_t l,h; } sb;
+	struct { u8 l,h; } b;
+	struct { s8 l,h; } sb;
 #else
-	struct { uint8_t h,l; } b;
-	struct { int8_t h,l; } sb;
+	struct { u8 h,l; } b;
+	struct { s8 h,l; } sb;
 #endif
-	uint16_t w;
-	int16_t sw;
+	u16 w;
+	s16 sw;
 };
 
 
@@ -127,22 +121,22 @@ union PAIR16
 union PAIR64
 {
 #ifdef LSB_FIRST
-	struct { uint8_t l,h,h2,h3,h4,h5,h6,h7; } b;
-	struct { uint16_t l,h,h2,h3; } w;
-	struct { uint32_t l,h; } d;
-	struct { int8_t l,h,h2,h3,h4,h5,h6,h7; } sb;
-	struct { int16_t l,h,h2,h3; } sw;
-	struct { int32_t l,h; } sd;
+	struct { u8 l,h,h2,h3,h4,h5,h6,h7; } b;
+	struct { u16 l,h,h2,h3; } w;
+	struct { u32 l,h; } d;
+	struct { s8 l,h,h2,h3,h4,h5,h6,h7; } sb;
+	struct { s16 l,h,h2,h3; } sw;
+	struct { s32 l,h; } sd;
 #else
-	struct { uint8_t h7,h6,h5,h4,h3,h2,h,l; } b;
-	struct { uint16_t h3,h2,h,l; } w;
-	struct { uint32_t h,l; } d;
-	struct { int8_t h7,h6,h5,h4,h3,h2,h,l; } sb;
-	struct { int16_t h3,h2,h,l; } sw;
-	struct { int32_t h,l; } sd;
+	struct { u8 h7,h6,h5,h4,h3,h2,h,l; } b;
+	struct { u16 h3,h2,h,l; } w;
+	struct { u32 h,l; } d;
+	struct { s8 h7,h6,h5,h4,h3,h2,h,l; } sb;
+	struct { s16 h3,h2,h,l; } sw;
+	struct { s32 h,l; } sd;
 #endif
-	uint64_t q;
-	int64_t sq;
+	u64 q;
+	s64 sq;
 };
 
 
@@ -380,7 +374,7 @@ enum_value(T value) noexcept
 
 // population count
 #if !defined(__NetBSD__)
-inline int popcount(uint32_t val)
+inline int popcount(u32 val)
 {
 	int count;
 
@@ -392,11 +386,11 @@ inline int popcount(uint32_t val)
 
 
 // convert a series of 32 bits into a float
-inline float u2f(uint32_t v)
+inline float u2f(u32 v)
 {
 	union {
 		float ff;
-		uint32_t vv;
+		u32 vv;
 	} u;
 	u.vv = v;
 	return u.ff;
@@ -404,11 +398,11 @@ inline float u2f(uint32_t v)
 
 
 // convert a float into a series of 32 bits
-inline uint32_t f2u(float f)
+inline u32 f2u(float f)
 {
 	union {
 		float ff;
-		uint32_t vv;
+		u32 vv;
 	} u;
 	u.ff = f;
 	return u.vv;
@@ -416,11 +410,11 @@ inline uint32_t f2u(float f)
 
 
 // convert a series of 64 bits into a double
-inline double u2d(uint64_t v)
+inline double u2d(u64 v)
 {
 	union {
 		double dd;
-		uint64_t vv;
+		u64 vv;
 	} u;
 	u.vv = v;
 	return u.dd;
@@ -428,11 +422,11 @@ inline double u2d(uint64_t v)
 
 
 // convert a double into a series of 64 bits
-inline uint64_t d2u(double d)
+inline u64 d2u(double d)
 {
 	union {
 		double dd;
-		uint64_t vv;
+		u64 vv;
 	} u;
 	u.dd = d;
 	return u.vv;

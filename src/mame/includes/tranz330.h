@@ -19,14 +19,14 @@
 #include "sound/speaker.h"
 #include "machine/clock.h"
 
-#define CPU_TAG		"cpu"
-#define DART_TAG	"dart"
-#define CTC_TAG		"ctc"
-#define PIO_TAG		"pio"
-#define RTC_TAG		"rtc"
-#define VFD_TAG		"vfd"
-#define RS232_TAG	"rs232"
-#define SPEAKER_TAG	"speaker"
+#define CPU_TAG     "cpu"
+#define DART_TAG    "dart"
+#define CTC_TAG     "ctc"
+#define PIO_TAG     "pio"
+#define RTC_TAG     "rtc"
+#define VFD_TAG     "vfd"
+#define RS232_TAG   "rs232"
+#define SPEAKER_TAG "speaker"
 
 class tranz330_state : public driver_device
 {
@@ -57,17 +57,17 @@ public:
 	DECLARE_READ8_MEMBER( card_r );
 
 private:
-	required_device<cpu_device>				m_cpu;
-	required_device<z80ctc_device>			m_ctc;
-	required_device<z80dart_device>			m_dart;
-	required_device<z80pio_device>			m_pio;
-	required_device<msm6242_device>			m_rtc;
-	required_device<mic10937_t>				m_vfd;
-	required_device<rs232_port_device>		m_rs232;
-	required_device<speaker_sound_device>	m_speaker;
-	required_ioport_array<4>				m_keypad;
+	required_device<cpu_device>             m_cpu;
+	required_device<z80ctc_device>          m_ctc;
+	required_device<z80dart_device>         m_dart;
+	required_device<z80pio_device>          m_pio;
+	required_device<msm6242_device>         m_rtc;
+	required_device<mic10937_t>             m_vfd;
+	required_device<rs232_port_device>      m_rs232;
+	required_device<speaker_sound_device>   m_speaker;
+	required_ioport_array<4>                m_keypad;
 
-	uint8_t	m_keypad_col_mask;
+	uint8_t m_keypad_col_mask;
 };
 
 #endif // VERIFONE_TRANZ330_H

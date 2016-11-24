@@ -463,7 +463,7 @@ WRITE8_MEMBER( amiga_fdc::ciaaprb_w )
 		if(old_floppy)
 			old_floppy->setup_index_pulse_cb(floppy_image_device::index_pulse_cb());
 		if(floppy)
-			floppy->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(FUNC(amiga_fdc::index_callback), this));
+			floppy->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(&amiga_fdc::index_callback, this));
 	}
 
 	if(floppy) {

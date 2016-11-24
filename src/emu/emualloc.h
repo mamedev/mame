@@ -10,8 +10,8 @@
 
 #pragma once
 
-#ifndef __EMUALLOC_H__
-#define __EMUALLOC_H__
+#ifndef MAME_EMU_EMUALLOC_H
+#define MAME_EMU_EMUALLOC_H
 
 #include <new>
 #include <mutex>
@@ -49,7 +49,7 @@ public:
 			m_ordered_prev(nullptr),
 			m_ptr(ptr),
 			m_size(size),
-			m_id(~(uint64_t)0) { }
+			m_id(~osd::u64(0)) { }
 	virtual ~resource_pool_item() { }
 
 	resource_pool_item *    m_next;
@@ -57,7 +57,7 @@ public:
 	resource_pool_item *    m_ordered_prev;
 	void *                  m_ptr;
 	size_t                  m_size;
-	uint64_t                  m_id;
+	osd::u64                m_id;
 };
 
 
@@ -129,8 +129,8 @@ private:
 	std::vector<resource_pool_item *> m_hash;
 	resource_pool_item *    m_ordered_head;
 	resource_pool_item *    m_ordered_tail;
-	static uint64_t           s_id;
+	static osd::u64         s_id;
 };
 
 
-#endif  /* __EMUALLOC_H__ */
+#endif  /* MAME_EMU_EMUALLOC_H */

@@ -179,8 +179,8 @@ void wd_fdc_t::set_floppy(floppy_image_device *_floppy)
 	if(floppy) {
 		if(motor_control)
 			floppy->mon_w(status & S_MON ? 0 : 1);
-		floppy->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(FUNC(wd_fdc_t::index_callback), this));
-		floppy->setup_ready_cb(floppy_image_device::ready_cb(FUNC(wd_fdc_t::ready_callback), this));
+		floppy->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(&wd_fdc_t::index_callback, this));
+		floppy->setup_ready_cb(floppy_image_device::ready_cb(&wd_fdc_t::ready_callback, this));
 	}
 
 	if(prev_ready != next_ready)

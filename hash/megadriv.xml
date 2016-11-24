@@ -1681,7 +1681,26 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 			</dataarea>
 		</part>
 	</software>
-
+    
+	<software name="coolspotp" cloneof="coolspot">
+		<description>Cool Spot (Euro, Prototype)</description>
+		<year>1993</year>
+		<publisher>Virgin Games</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5694-01"/>
+			<feature name="ic1" value="IC1"/> <!-- EPROM1 -->
+			<feature name="ic2" value="IC2"/> <!-- EPROM2 -->
+			<feature name="ic3" value="IC3"/> <!-- EPROM3 -->
+			<feature name="ic4" value="IC4"/> <!-- EPROM4 -->
+			<feature name="ic5" value="IC5"/> <!-- 74HC139P -->
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="Cool Spot Sega Mega Drive EP ROM 0 of 4.ic1" size="262144" crc="eaa7a911" sha1="663b8394eee1d6b679db7ae45ee39df9e3aaabd6" offset="0x000000"/>
+				<rom name="Cool Spot Sega Mega Drive EP ROM 1 of 4.ic2" size="262144" crc="c7bc6cfb" sha1="e5d818993d162b5f2ed18b74848a514525cfd587" offset="0x040000"/>
+				<rom name="Cool Spot Sega Mega Drive EP ROM 2 of 4.ic3" size="262144" crc="3dff64f4" sha1="380c1e183769d8a32b9e52ce7465090ac3872580" offset="0x080000"/>
+				<rom name="Cool Spot Sega Mega Drive EP ROM 3 of 4.ic4" size="262144" crc="8fcce53a" sha1="cbe736a696319771b670c6c539f49d7d1956cd8e" offset="0x0c0000"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="coolspotu" cloneof="coolspot">
 		<description>Cool Spot (USA)</description>

@@ -1,9 +1,32 @@
 HISTORY of the LZMA SDK
 -----------------------
 
+16.04          2016-10-04
+-------------------------
+- The bug was fixed in DllSecur.c.
+
+
+16.03          2016-09-28
+-------------------------
+- SFX modules now use some protection against DLL preloading attack.
+- Some bugs in 7z code were fixed.
+
+
+16.02          2016-05-21
+-------------------------
+- The BUG in 16.00 - 16.01 was fixed:
+  Split Handler (SplitHandler.cpp) returned incorrect 
+  total size value (kpidSize) for split archives.
+
+
+16.01          2016-05-19
+-------------------------	
+- Some internal changes to reduce the number of compiler warnings.
+
+
 16.00          2016-05-10
 -------------------------	
-- Some bugs were fixed,
+- Some bugs were fixed.
 
 
 15.12          2015-11-19

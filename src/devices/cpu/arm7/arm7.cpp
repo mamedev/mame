@@ -326,6 +326,7 @@ bool arm7_cpu_device::arm7_tlb_translate(offs_t &addr, int flags)
 				m_faultStatus[0] = ((fault == FAULT_DOMAIN) ? (9 << 0) : (13 << 0)) | (domain << 4); // 9 = section domain fault, 13 = section permission fault
 				m_faultAddress = addr;
 				m_pendingAbtD = true;
+				update_irq_state();
 				LOG( ( "vaddr %08X desc_lvl1 %08X domain %d permission %d ap %d s %d r %d mode %d read %d write %d\n",
 					addr, desc_lvl1, domain, (m_domainAccessControl >> ((desc_lvl1 >> 4) & 0x1e)) & 3, (desc_lvl1 >> 10) & 3, (m_control & COPRO_CTRL_SYSTEM) ? 1 : 0, (m_control & COPRO_CTRL_ROM) ? 1 : 0,
 					m_r[eCPSR] & MODE_FLAG, flags & ARM7_TLB_READ ? 1 : 0,  flags & ARM7_TLB_WRITE ? 1 : 0) );
@@ -334,6 +335,7 @@ bool arm7_cpu_device::arm7_tlb_translate(offs_t &addr, int flags)
 			{
 				LOG( ( "ARM7: Section Table, Section %s fault on virtual address, vaddr = %08x, PC = %08x\n", (fault == FAULT_DOMAIN) ? "domain" : "permission", addr, m_r[eR15] ) );
 				m_pendingAbtP = true;
+				update_irq_state();
 			}
 			return false;
 		}
@@ -347,11 +349,13 @@ bool arm7_cpu_device::arm7_tlb_translate(offs_t &addr, int flags)
 			m_faultStatus[0] = (5 << 0); // 5 = section translation fault
 			m_faultAddress = addr;
 			m_pendingAbtD = true;
+			update_irq_state();
 		}
 		else if (flags & ARM7_TLB_ABORT_P)
 		{
 			LOG( ( "ARM7: Translation fault on unmapped virtual address, PC = %08x, vaddr = %08x\n", m_r[eR15], addr ) );
 			m_pendingAbtP = true;
+			update_irq_state();
 		}
 		return false;
 	}
@@ -377,11 +381,13 @@ bool arm7_cpu_device::arm7_tlb_translate(offs_t &addr, int flags)
 					m_faultStatus[0] = (7 << 0) | (domain << 4); // 7 = page translation fault
 					m_faultAddress = addr;
 					m_pendingAbtD = true;
+					update_irq_state();
 				}
 				else if (flags & ARM7_TLB_ABORT_P)
 				{
 					LOG( ( "ARM7: Translation fault on unmapped virtual address, vaddr = %08x, PC %08X\n", addr, m_r[eR15] ) );
 					m_pendingAbtP = true;
+					update_irq_state();
 				}
 				return false;
 			case COPRO_TLB_LARGE_PAGE:
@@ -407,6 +413,7 @@ bool arm7_cpu_device::arm7_tlb_translate(offs_t &addr, int flags)
 							m_faultStatus[0] = ((fault == FAULT_DOMAIN) ? (11 << 0) : (15 << 0)) | (domain << 4); // 11 = page domain fault, 15 = page permission fault
 							m_faultAddress = addr;
 							m_pendingAbtD = true;
+							update_irq_state();
 							LOG( ( "vaddr %08X desc_lvl2 %08X domain %d permission %d ap %d s %d r %d mode %d read %d write %d\n",
 								addr, desc_lvl2, domain, permission, ap, (m_control & COPRO_CTRL_SYSTEM) ? 1 : 0, (m_control & COPRO_CTRL_ROM) ? 1 : 0,
 								m_r[eCPSR] & MODE_FLAG, flags & ARM7_TLB_READ ? 1 : 0,  flags & ARM7_TLB_WRITE ? 1 : 0) );
@@ -415,6 +422,7 @@ bool arm7_cpu_device::arm7_tlb_translate(offs_t &addr, int flags)
 						{
 							LOG( ( "ARM7: Page Table, Section %s fault on virtual address, vaddr = %08x, PC = %08x\n", (fault == FAULT_DOMAIN) ? "domain" : "permission", addr, m_r[eR15] ) );
 							m_pendingAbtP = true;
+							update_irq_state();
 						}
 						return false;
 					}
@@ -756,7 +764,7 @@ void arm7_cpu_device::execute_set_input(int irqline, int state)
 }
 
 
-offs_t arm7_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t arm7_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( arm7arm );
 	extern CPU_DISASSEMBLE( arm7thumb );
@@ -766,16 +774,16 @@ offs_t arm7_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_
 	if (T_IS_SET(m_r[eCPSR]))
 	{
 		if ( m_endian == ENDIANNESS_BIG )
-			return CPU_DISASSEMBLE_NAME(arm7thumb_be)(this, buffer, pc, oprom, opram, options);
+			return CPU_DISASSEMBLE_NAME(arm7thumb_be)(this, stream, pc, oprom, opram, options);
 		else
-			return CPU_DISASSEMBLE_NAME(arm7thumb)(this, buffer, pc, oprom, opram, options);
+			return CPU_DISASSEMBLE_NAME(arm7thumb)(this, stream, pc, oprom, opram, options);
 	}
 	else
 	{
 		if ( m_endian == ENDIANNESS_BIG )
-			return CPU_DISASSEMBLE_NAME(arm7arm_be)(this, buffer, pc, oprom, opram, options);
+			return CPU_DISASSEMBLE_NAME(arm7arm_be)(this, stream, pc, oprom, opram, options);
 		else
-			return CPU_DISASSEMBLE_NAME(arm7arm)(this, buffer, pc, oprom, opram, options);
+			return CPU_DISASSEMBLE_NAME(arm7arm)(this, stream, pc, oprom, opram, options);
 	}
 }
 
@@ -785,6 +793,7 @@ offs_t arm7_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_
 WRITE32_MEMBER( arm7_cpu_device::arm7_do_callback )
 {
 	m_pendingUnd = true;
+	update_irq_state();
 }
 
 READ32_MEMBER( arm7_cpu_device::arm7_rt_r_callback )
@@ -827,6 +836,7 @@ READ32_MEMBER( arm7_cpu_device::arm7_rt_r_callback )
 	{
 		LOG( ("ARM7: Unhandled coprocessor %d (archFlags %x)\n", cpnum, m_archFlags) );
 		m_pendingUnd = true;
+		update_irq_state();
 		return 0;
 	}
 	}
@@ -970,6 +980,7 @@ WRITE32_MEMBER( arm7_cpu_device::arm7_rt_w_callback )
 		{
 			LOG( ("ARM7: Unhandled coprocessor %d\n", cpnum) );
 			m_pendingUnd = true;
+			update_irq_state();
 			return;
 		}
 	}
@@ -1070,6 +1081,7 @@ void arm7_cpu_device::arm7_dt_r_callback(uint32_t insn, uint32_t *prn)
 	else
 	{
 		m_pendingUnd = true;
+		update_irq_state();
 	}
 }
 
@@ -1084,6 +1096,7 @@ void arm7_cpu_device::arm7_dt_w_callback(uint32_t insn, uint32_t *prn)
 	else
 	{
 		m_pendingUnd = true;
+		update_irq_state();
 	}
 }
 

@@ -1386,18 +1386,17 @@ Note: on screen copyright is (c)1998 Coinmaster.
 /*------------------------------
     update timer
 ------------------------------*/
-static void uPD71054_update_timer( running_machine &machine, device_t *cpu, int no )
+void seta_state::uPD71054_update_timer(device_t *cpu, int no)
 {
-	seta_state *state = machine.driver_data<seta_state>();
-	uPD71054_state *uPD71054 = &state->m_uPD71054;
+	uPD71054_state *uPD71054 = &m_uPD71054;
 	uint16_t max = uPD71054->max[no]&0xffff;
 
 	if( max != 0 ) {
-		attotime period = attotime::from_hz(machine.device("maincpu")->unscaled_clock()) * (16 * max);
+		attotime period = attotime::from_hz(m_maincpu->unscaled_clock()) * (16 * max);
 		uPD71054->timer[no]->adjust( period, no );
 	} else {
 		uPD71054->timer[no]->adjust( attotime::never, no);
-		state->logerror( "CPU #0 PC %06X: uPD71054 error, timer %d duration is 0\n",
+		logerror( "CPU #0 PC %06X: uPD71054 error, timer %d duration is 0\n",
 				(cpu != nullptr) ? cpu->safe_pc() : -1, no );
 	}
 }
@@ -1410,7 +1409,7 @@ static void uPD71054_update_timer( running_machine &machine, device_t *cpu, int 
 TIMER_CALLBACK_MEMBER(seta_state::uPD71054_timer_callback)
 {
 	m_maincpu->set_input_line(4, HOLD_LINE );
-	uPD71054_update_timer( machine(), nullptr, param );
+	uPD71054_update_timer( nullptr, param );
 }
 
 
@@ -1459,7 +1458,7 @@ WRITE16_MEMBER(seta_state::timer_regs_w)
 			uPD71054->max[offset] = (uPD71054->max[offset]&0x00ff)+(data<<8);
 		}
 		if( uPD71054->max[offset] != 0 ) {
-			uPD71054_update_timer( machine(), &space.device(), offset );
+			uPD71054_update_timer( &space.device(), offset );
 		}
 		break;
 		case 0x0003:
@@ -2698,6 +2697,7 @@ ADDRESS_MAP_END
                             Pro Mahjong Kiwame
 ***************************************************************************/
 
+// TODO: not NVRAM!!!
 READ16_MEMBER(seta_state::kiwame_nvram_r)
 {
 	return m_kiwame_nvram[offset] & 0xff;
@@ -2736,8 +2736,7 @@ READ16_MEMBER(seta_state::kiwame_input_r)
 
 static ADDRESS_MAP_START( kiwame_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                             // ROM
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM                             // RAM
-	AM_RANGE(0xfffc00, 0xffffff) AM_READWRITE(kiwame_nvram_r, kiwame_nvram_w) AM_SHARE("kiwame_nvram")  // NVRAM + Regs ?
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("nvram")                            // RAM
 	AM_RANGE(0x800000, 0x803fff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecode_r16, spritecode_w16)     // Sprites Code + X + Attr
 /**/AM_RANGE(0x900000, 0x900001) AM_RAM                             // ? 0x4000
 /**/AM_RANGE(0xa00000, 0xa005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16)     // Sprites Y
@@ -2746,6 +2745,7 @@ static ADDRESS_MAP_START( kiwame_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0xc00000, 0xc03fff) AM_DEVREADWRITE("x1snd", x1_010_device, word_r, word_w)   // Sound
 	AM_RANGE(0xd00000, 0xd00009) AM_READ(kiwame_input_r)            // mahjong panel
 	AM_RANGE(0xe00000, 0xe00003) AM_READ(seta_dsw_r)                // DSW
+	AM_RANGE(0xfffc00, 0xffffff) AM_READWRITE(kiwame_nvram_r, kiwame_nvram_w) AM_SHARE("kiwame_nvram")  // TODO: actual unknown device
 ADDRESS_MAP_END
 
 
@@ -9023,9 +9023,11 @@ static MACHINE_CONFIG_START( kiwame, seta_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
 	MCFG_CPU_PROGRAM_MAP(kiwame_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  irq1_line_hold)/* lev 1-7 are the same. WARNING:
-	                               the interrupt table is written to. */
-
+	/* lev 1-7 are the same. WARNING: the interrupt table is written to. */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  irq1_line_hold)
+	
+	MCFG_NVRAM_ADD_0FILL("nvram")
+								   
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
 	MCFG_SETA001_SPRITE_GFXBANK_CB(seta_state, setac_gfxbank_callback)
@@ -10758,6 +10760,10 @@ ROM_START( kiwame )
 	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "fp001006.bin", 0x000000, 0x080000, CRC(96cf395d) SHA1(877b291598e3a42e5003b2f50a16d162348ce72d) )
 	ROM_LOAD( "fp001005.bin", 0x080000, 0x080000, CRC(65b5fe9a) SHA1(35605be00c7c455551d18386fcb5ad013aa2907e) )
+	
+	// default NVRAM, avoids "BACKUP RAM ERROR" at boot (useful for inp record/playback)
+	ROM_REGION( 0x10000, "nvram", 0 )
+	ROM_LOAD( "nvram.bin", 0, 0x10000, CRC(1f719400) SHA1(c63bbe5d3a0a917f74c1bd5e57cd44389e4e645c) )
 ROM_END
 
 ROM_START( krzybowl )

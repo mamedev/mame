@@ -128,6 +128,7 @@ public:
 	void tumbleb_draw_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pf1x_offs, int pf1y_offs, int pf2x_offs, int pf2y_offs);
 	void tumbleb2_set_music_bank( int bank );
 	void tumbleb2_play_sound( okim6295_device *oki, int data );
+	void tumbleb2_playmusic(okim6295_device *oki);
 	void process_tumbleb2_music_command( okim6295_device *oki, int data );
 	void tumblepb_gfx_rearrange(int rgn);
 	void suprtrio_decrypt_code();

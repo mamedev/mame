@@ -38,7 +38,7 @@ enum {
 // ======================> sh7604_sci_device
 
 class sh7604_sci_device : public device_t,
-    					  public device_memory_interface
+						  public device_memory_interface
 {
 public:
 	// construction/destruction
@@ -47,7 +47,7 @@ public:
 	// I/O operations
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ8_MEMBER( read );
-	
+
 	DECLARE_READ8_MEMBER( serial_mode_r );
 	DECLARE_WRITE8_MEMBER( serial_mode_w );
 	DECLARE_READ8_MEMBER( bitrate_r );
@@ -64,7 +64,7 @@ public:
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
 protected:
 	// device-level overrides
-//	virtual void device_validity_check(validity_checker &valid) const;
+//  virtual void device_validity_check(validity_checker &valid) const;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 private:

@@ -15,28 +15,28 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const uint64_t device_state_entry::k_decimal_divisor[] =
+const u64 device_state_entry::k_decimal_divisor[] =
 {
-	1,
-	10,
-	100,
-	1000,
-	10000,
-	100000,
-	1000000,
-	10000000,
-	100000000,
-	1000000000,
-	U64(10000000000),
-	U64(100000000000),
-	U64(1000000000000),
-	U64(10000000000000),
-	U64(100000000000000),
-	U64(1000000000000000),
-	U64(10000000000000000),
-	U64(100000000000000000),
-	U64(1000000000000000000),
-	U64(10000000000000000000)
+	1U,
+	10U,
+	100U,
+	1000U,
+	10000U,
+	100000U,
+	1000000U,
+	10000000U,
+	100000000U,
+	1000000000U,
+	10000000000U,
+	100000000000U,
+	1000000000000U,
+	10000000000000U,
+	100000000000000U,
+	1000000000000000U,
+	10000000000000000U,
+	100000000000000000U,
+	1000000000000000000U,
+	10000000000000000000U
 };
 
 
@@ -49,7 +49,7 @@ const uint64_t device_state_entry::k_decimal_divisor[] =
 //  device_state_entry - constructor
 //-------------------------------------------------
 
-device_state_entry::device_state_entry(int index, const char *symbol, void *dataptr, uint8_t size, device_state_interface *dev)
+device_state_entry::device_state_entry(int index, const char *symbol, void *dataptr, u8 size, device_state_interface *dev)
 	: m_device_state(dev),
 		m_index(index),
 		m_dataptr(dataptr),
@@ -69,7 +69,7 @@ device_state_entry::device_state_entry(int index, const char *symbol, void *data
 	else if (size == 4)
 		m_sizemask = 0xffffffff;
 	else
-		m_sizemask = ~U64(0);
+		m_sizemask = ~u64(0);
 
 	// default the data mask to the same
 	m_datamask = m_sizemask;
@@ -128,27 +128,27 @@ void device_state_entry::format_from_mask()
 
 	// make up a format based on the mask
 	int width = 0;
-	for (uint64_t tempmask = m_datamask; tempmask != 0; tempmask >>= 4)
+	for (u64 tempmask = m_datamask; tempmask != 0; tempmask >>= 4)
 		width++;
 	m_format = string_format("%%0%dX", width);
 }
 
 
 //-------------------------------------------------
-//  value - return the current value as a uint64_t
+//  value - return the current value as a u64
 //-------------------------------------------------
 
-uint64_t device_state_entry::value() const
+u64 device_state_entry::value() const
 {
 	// pick up the value
-	uint64_t result;
+	u64 result;
 	switch (m_datasize)
 	{
 		default:
-		case 1: result = *m_dataptr.u8;     break;
-		case 2: result = *m_dataptr.u16;    break;
-		case 4: result = *m_dataptr.u32;    break;
-		case 8: result = *m_dataptr.u64;    break;
+		case 1: result = *static_cast<u8  *>(m_dataptr); break;
+		case 2: result = *static_cast<u16 *>(m_dataptr); break;
+		case 4: result = *static_cast<u32 *>(m_dataptr); break;
+		case 8: result = *static_cast<u64 *>(m_dataptr); break;
 	}
 	return result & m_datamask;
 }
@@ -162,7 +162,7 @@ uint64_t device_state_entry::value() const
 std::string device_state_entry::format(const char *string, bool maxout) const
 {
 	std::string dest;
-	uint64_t result = value();
+	u64 result = value();
 
 	// parse the format
 	bool leadzero = false;
@@ -344,10 +344,10 @@ std::string device_state_entry::format(const char *string, bool maxout) const
 
 
 //-------------------------------------------------
-//  set_value - set the value from a uint64_t
+//  set_value - set the value from a u64
 //-------------------------------------------------
 
-void device_state_entry::set_value(uint64_t value) const
+void device_state_entry::set_value(u64 value) const
 {
 	// apply the mask
 	value &= m_datamask;
@@ -360,10 +360,10 @@ void device_state_entry::set_value(uint64_t value) const
 	switch (m_datasize)
 	{
 		default:
-		case 1: *m_dataptr.u8 = value;      break;
-		case 2: *m_dataptr.u16 = value;     break;
-		case 4: *m_dataptr.u32 = value;     break;
-		case 8: *m_dataptr.u64 = value;     break;
+		case 1: *static_cast<u8  *>(m_dataptr) = value; break;
+		case 2: *static_cast<u16 *>(m_dataptr) = value; break;
+		case 4: *static_cast<u32 *>(m_dataptr) = value; break;
+		case 8: *static_cast<u64 *>(m_dataptr) = value; break;
 	}
 }
 
@@ -408,10 +408,10 @@ device_state_interface::~device_state_interface()
 
 //-------------------------------------------------
 //  state_int - return the value of the given piece
-//  of indexed state as a uint64_t
+//  of indexed state as a u64
 //-------------------------------------------------
 
-uint64_t device_state_interface::state_int(int index)
+u64 device_state_interface::state_int(int index)
 {
 	// nullptr or out-of-range entry returns 0
 	const device_state_entry *entry = state_find_entry(index);
@@ -468,10 +468,10 @@ int device_state_interface::state_string_max_length(int index)
 
 //-------------------------------------------------
 //  set_state_int - set the value of the given
-//  piece of indexed state from a uint64_t
+//  piece of indexed state from a u64
 //-------------------------------------------------
 
-void device_state_interface::set_state_int(int index, uint64_t value)
+void device_state_interface::set_state_int(int index, u64 value)
 {
 	// nullptr or out-of-range entry is a no-op
 	const device_state_entry *entry = state_find_entry(index);
@@ -510,10 +510,10 @@ void device_state_interface::set_state_string(int index, const char *string)
 
 //-------------------------------------------------
 //  state_add - return the value of the given
-//  pieces of indexed state as a uint64_t
+//  pieces of indexed state as a u64
 //-------------------------------------------------
 
-device_state_entry &device_state_interface::state_add(int index, const char *symbol, void *data, uint8_t size)
+device_state_entry &device_state_interface::state_add(int index, const char *symbol, void *data, u8 size)
 {
 	// assert validity of incoming parameters
 	assert(size == 1 || size == 2 || size == 4 || size == 8);

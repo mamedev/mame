@@ -127,7 +127,7 @@ uint32_t dec0_automat_state::screen_update_automat(screen_device &screen, bitmap
 	// layer enables seem different... where are they?
 
 	// the bootleg doesn't write these registers, I think they're hardcoded?, so fake them for compatibility with our implementation..
-	address_space &space = machine().driver_data()->generic_space();
+	address_space &space = machine().dummy_space();
 	m_tilegen1->pf_control_0_w(space,0,0x0003, 0x00ff); // 8x8
 	m_tilegen1->pf_control_0_w(space,1,0x0003, 0x00ff);
 	m_tilegen1->pf_control_0_w(space,2,0x0000, 0x00ff);
@@ -194,7 +194,7 @@ uint32_t dec0_automat_state::screen_update_secretab(screen_device &screen, bitma
 	// layer enables seem different... where are they?
 
 	// the bootleg doesn't write these registers, I think they're hardcoded?, so fake them for compatibility with our implementation..
-	address_space &space = machine().driver_data()->generic_space();
+	address_space &space = machine().dummy_space();
 	m_tilegen1->pf_control_0_w(space,0,0x0003, 0x00ff); // 8x8
 	m_tilegen1->pf_control_0_w(space,1,0x0003, 0x00ff);
 	m_tilegen1->pf_control_0_w(space,2,0x0000, 0x00ff);

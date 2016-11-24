@@ -152,7 +152,7 @@ void menu_custom_filter::handle()
 //-------------------------------------------------
 //  populate
 //-------------------------------------------------
-void menu_custom_filter::populate()
+void menu_custom_filter::populate(float &customtop, float &custombottom)
 {
 	// add main filter
 	uint32_t arrow_flags = get_arrow_flags<uint16_t>(FILTER_ALL, FILTER_UNAVAILABLE, custfltr::main);
@@ -210,7 +210,7 @@ void menu_custom_filter::custom_render(void *selectedref, float top, float botto
 
 	// get the size of the text
 	ui().draw_text_full(container(), _("Select custom filters:"), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::NEVER,
-		mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
+		mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), &width, nullptr);
 	width += (2.0f * UI_BOX_LR_BORDER) + 0.01f;
 	float maxwidth = std::max(width, origx2 - origx1);
 
@@ -439,7 +439,7 @@ void menu_swcustom_filter::handle()
 //-------------------------------------------------
 //  populate
 //-------------------------------------------------
-void menu_swcustom_filter::populate()
+void menu_swcustom_filter::populate(float &customtop, float &custombottom)
 {
 	// add main filter
 	uint32_t arrow_flags = get_arrow_flags<uint16_t>(UI_SW_ALL, UI_SW_UNAVAILABLE, sw_custfltr::main);
@@ -525,7 +525,7 @@ void menu_swcustom_filter::custom_render(void *selectedref, float top, float bot
 
 	// get the size of the text
 	ui().draw_text_full(container(), _("Select custom filters:"), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::NEVER,
-		mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
+		mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), &width, nullptr);
 	width += (2.0f * UI_BOX_LR_BORDER) + 0.01f;
 	float maxwidth = std::max(width, origx2 - origx1);
 

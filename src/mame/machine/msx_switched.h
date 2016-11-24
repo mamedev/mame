@@ -4,18 +4,11 @@
 #define __MSX_SWITCHED_H
 
 
-class msx_switched_device : public device_t
+class msx_switched_interface
 {
 public:
-	msx_switched_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
-
-	virtual uint8_t get_id() = 0;
-
-	virtual DECLARE_READ8_MEMBER(io_read) = 0;
-	virtual DECLARE_WRITE8_MEMBER(io_write) = 0;
-
-protected:
-	virtual void device_start() override;
+	virtual DECLARE_READ8_MEMBER(switched_read) = 0;
+	virtual DECLARE_WRITE8_MEMBER(switched_write) = 0;
 };
 
 #endif

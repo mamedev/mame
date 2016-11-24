@@ -45,6 +45,9 @@ namespace sol {
 		template<typename... Args>
 		struct is_tuple<std::tuple<Args...>> : std::true_type { };
 
+		template <typename T>
+		struct is_builtin_type : std::integral_constant<bool, std::is_arithmetic<T>::value || std::is_pointer<T>::value || std::is_array<T>::value> {};
+
 		template<typename T>
 		struct unwrapped {
 			typedef T type;

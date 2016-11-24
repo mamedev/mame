@@ -151,7 +151,7 @@ void apollo_set_cpu_has_fpu(m68000_base_device *device, int onoff)
 	}
 	else
 	{
-		device->has_fpu = onoff;
+		device->set_fpu_enable(onoff);
 		DLOG1(("apollo_set_cpu_has_fpu: FPU has been %s", onoff ? "enabled" : "disabled"));
 	}
 }
@@ -242,7 +242,7 @@ READ32_MEMBER(apollo_state::apollo_instruction_hook)
 		idle_counter = 0;
 	}
 
-	if (!m_maincpu->has_fpu && !m_maincpu->pmmu_enabled && (m_maincpu->ir & 0xff00) == 0xf200)
+	if (!m_maincpu->get_fpu_enable() && !m_maincpu->pmmu_enabled && (m_maincpu->ir & 0xff00) == 0xf200)
 	{
 		// set APOLLO_CSR_SR_FP_TRAP in cpu status register for /sau7/self_test
 		apollo_csr_set_status_register(APOLLO_CSR_SR_FP_TRAP, APOLLO_CSR_SR_FP_TRAP);

@@ -90,7 +90,7 @@ protected:
 	// device_disasm_interface overrides
 	virtual uint32_t disasm_min_opcode_bytes() const override;
 	virtual uint32_t disasm_max_opcode_bytes() const override;
-	virtual offs_t disasm_generic(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options, const disasm_entry *entries);
+	virtual offs_t disasm_generic(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options, const disasm_entry *entries);
 
 	address_space_config program_config;
 	address_space *program;

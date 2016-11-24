@@ -106,7 +106,7 @@ public:
 		}
 	}
 
-	offs_t dasm(char *buf, offs_t pc, uint32_t op) const;
+	offs_t dasm(std::ostream &stream, offs_t pc, uint32_t op) const;
 
 private:
 	struct branch_desc
@@ -175,25 +175,25 @@ private:
 	};
 	typedef std::map<uint16_t, vis_op_desc> vis_op_desc_map;
 
-	offs_t dasm_invalid(char *buf, offs_t pc, uint32_t op) const;
-	offs_t dasm_branch(char *buf, offs_t pc, uint32_t op) const;
-	offs_t dasm_shift(char *buf, offs_t pc, uint32_t op, const char *mnemonic, const char *mnemonicx, const char *mnemonicx0) const;
-	offs_t dasm_read_state_reg(char *buf, offs_t pc, uint32_t op) const;
-	offs_t dasm_write_state_reg(char *buf, offs_t pc, uint32_t op) const;
-	offs_t dasm_move_cond(char *buf, offs_t pc, uint32_t op) const;
-	offs_t dasm_move_reg_cond(char *buf, offs_t pc, uint32_t op) const;
-	offs_t dasm_fpop1(char *buf, offs_t pc, uint32_t op) const;
-	offs_t dasm_fpop2(char *buf, offs_t pc, uint32_t op) const;
-	offs_t dasm_impdep1(char *buf, offs_t pc, uint32_t op) const;
-	offs_t dasm_jmpl(char *buf, offs_t pc, uint32_t op) const;
-	offs_t dasm_return(char *buf, offs_t pc, uint32_t op) const;
-	offs_t dasm_tcc(char *buf, offs_t pc, uint32_t op) const;
-	offs_t dasm_ldst(char *buf, offs_t pc, uint32_t op) const;
+	offs_t dasm_invalid(std::ostream &stream, offs_t pc, uint32_t op) const;
+	offs_t dasm_branch(std::ostream &stream, offs_t pc, uint32_t op) const;
+	offs_t dasm_shift(std::ostream &stream, offs_t pc, uint32_t op, const char *mnemonic, const char *mnemonicx, const char *mnemonicx0) const;
+	offs_t dasm_read_state_reg(std::ostream &stream, offs_t pc, uint32_t op) const;
+	offs_t dasm_write_state_reg(std::ostream &stream, offs_t pc, uint32_t op) const;
+	offs_t dasm_move_cond(std::ostream &stream, offs_t pc, uint32_t op) const;
+	offs_t dasm_move_reg_cond(std::ostream &stream, offs_t pc, uint32_t op) const;
+	offs_t dasm_fpop1(std::ostream &stream, offs_t pc, uint32_t op) const;
+	offs_t dasm_fpop2(std::ostream &stream, offs_t pc, uint32_t op) const;
+	offs_t dasm_impdep1(std::ostream &stream, offs_t pc, uint32_t op) const;
+	offs_t dasm_jmpl(std::ostream &stream, offs_t pc, uint32_t op) const;
+	offs_t dasm_return(std::ostream &stream, offs_t pc, uint32_t op) const;
+	offs_t dasm_tcc(std::ostream &stream, offs_t pc, uint32_t op) const;
+	offs_t dasm_ldst(std::ostream &stream, offs_t pc, uint32_t op) const;
 
-	void dasm_address(char *&output, uint32_t op) const;
-	void dasm_asi(char *&output, uint32_t op) const;
-	void dasm_asi_comment(char *&output, uint32_t op) const;
-	void dasm_vis_arg(char *&output, bool &args, vis_op_desc::arg fmt, uint32_t reg) const;
+	void dasm_address(std::ostream &stream, uint32_t op) const;
+	void dasm_asi(std::ostream &stream, uint32_t op) const;
+	void dasm_asi_comment(std::ostream &stream, uint32_t op) const;
+	void dasm_vis_arg(std::ostream &stream, bool &args, vis_op_desc::arg fmt, uint32_t reg) const;
 
 	uint32_t freg(uint32_t val, bool shift) const;
 
@@ -203,8 +203,7 @@ private:
 	template <typename T> void add_ldst_desc(const T &desc);
 	template <typename T> void add_vis_op_desc(const T &desc);
 
-	void pad_op_field(char *buf, char *&output) const;
-	ATTR_PRINTF(2, 3) static void print(char *&output, const char *fmt, ...);
+	void pad_op_field(std::ostream &stream, std::streampos start_position) const;
 
 	static const char * const                   REG_NAMES[32];
 	static const branch_desc                    EMPTY_BRANCH_DESC;

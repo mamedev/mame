@@ -455,15 +455,15 @@ READ8_MEMBER(sms_state::sms_input_port_dd_r)
 }
 
 
-WRITE8_MEMBER(sms_state::smsj_audio_control_w)
+void sms_state::smsj_set_audio_control(uint8_t data)
 {
 	m_smsj_audio_control = data & 0x03;
 
 	/*  Mute settings:
-		0,0 : PSG only (power-on default)
-		0,1 : FM only
-		1,0 : Both PSG and FM disabled
-		1,1 : Both PSG and FM enabled 
+	    0,0 : PSG only (power-on default)
+	    0,1 : FM only
+	    1,0 : Both PSG and FM disabled
+	    1,1 : Both PSG and FM enabled
 	*/
 	if (m_smsj_audio_control == 0x00 || m_smsj_audio_control == 0x03)
 		m_psg_sms->set_output_gain(ALL_OUTPUTS, 1.0);
@@ -474,6 +474,12 @@ WRITE8_MEMBER(sms_state::smsj_audio_control_w)
 		m_ym->set_output_gain(ALL_OUTPUTS, 1.0);
 	else
 		m_ym->set_output_gain(ALL_OUTPUTS, 0.0);
+}
+
+
+WRITE8_MEMBER(sms_state::smsj_audio_control_w)
+{
+	smsj_set_audio_control(data);
 }
 
 
@@ -957,7 +963,8 @@ void sms_state::setup_media_slots()
 		if (m_cartslot->get_type() == SEGA8_BASIC_L3 ||
 			m_cartslot->get_type() == SEGA8_MUSIC_EDITOR ||
 			m_cartslot->get_type() == SEGA8_DAHJEE_TYPEA ||
-			m_cartslot->get_type() == SEGA8_DAHJEE_TYPEB)
+			m_cartslot->get_type() == SEGA8_DAHJEE_TYPEB ||
+			m_cartslot->get_type() == SEGA8_SEOJIN)
 		{
 			m_mem_device_enabled |= ENABLE_EXT_RAM;
 		}
@@ -1114,7 +1121,7 @@ MACHINE_RESET_MEMBER(sms_state,sms)
 {
 	if (m_is_smsj)
 	{
-		m_smsj_audio_control = 0x00;
+		smsj_set_audio_control(0x00);
 	}
 
 	if (m_port_rapid.found())
@@ -1341,9 +1348,9 @@ VIDEO_RESET_MEMBER(sms_state,sms1)
 		uint8_t sscope_binocular_hack = m_port_scope_binocular->read();
 
 		if (sscope_binocular_hack & 0x01)
-			m_prevleft_bitmap.fill(rgb_t::black);
+			m_prevleft_bitmap.fill(rgb_t::black());
 		if (sscope_binocular_hack & 0x02)
-			m_prevright_bitmap.fill(rgb_t::black);
+			m_prevright_bitmap.fill(rgb_t::black());
 	}
 
 	m_sscope_state = 0;
@@ -1452,7 +1459,7 @@ uint32_t sms_state::screen_update_sms1(screen_device &screen, bitmap_rgb32 &bitm
 				}
 			}
 		}
-		bitmap.fill(rgb_t::black, cliprect);
+		bitmap.fill(rgb_t::black(), cliprect);
 	}
 
 	return 0;
@@ -1481,12 +1488,12 @@ VIDEO_RESET_MEMBER(sms_state,gamegear)
 {
 	if (m_prev_bitmap_copied)
 	{
-		m_prev_bitmap.fill(rgb_t::black);
+		m_prev_bitmap.fill(rgb_t::black());
 		m_prev_bitmap_copied = false;
 	}
 	if (m_cartslot->exists() && m_cartslot->m_cart->get_sms_mode())
 	{
-		m_gg_sms_mode_bitmap.fill(rgb_t::black);
+		m_gg_sms_mode_bitmap.fill(rgb_t::black());
 		memset(m_line_buffer.get(), 0, 160 * 4 * sizeof(int));
 	}
 }
@@ -1648,7 +1655,7 @@ uint32_t sms_state::screen_update_gamegear(screen_device &screen, bitmap_rgb32 &
 		copybitmap(bitmap, *source_bitmap, 0, 0, 0, 0, cliprect);
 		if (m_prev_bitmap_copied)
 		{
-			m_prev_bitmap.fill(rgb_t::black);
+			m_prev_bitmap.fill(rgb_t::black());
 			m_prev_bitmap_copied = false;
 		}
 	}

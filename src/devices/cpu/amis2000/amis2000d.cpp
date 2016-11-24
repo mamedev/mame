@@ -100,14 +100,13 @@ static const uint8_t s2000_mnemonic[0x100] =
 
 
 
-CPU_DISASSEMBLE( amis2000 )
+CPU_DISASSEMBLE(amis2000)
 {
 	int pos = 0;
 	uint8_t op = oprom[pos++];
 	uint8_t instr = s2000_mnemonic[op];
 
-	char *dst = buffer;
-	dst += sprintf(dst, "%-5s ", s_mnemonics[instr]);
+	util::stream_format(stream, "%-5s ", s_mnemonics[instr]);
 
 	// opcode parameter
 	int mask = s_bits[instr];
@@ -124,9 +123,9 @@ CPU_DISASSEMBLE( amis2000 )
 		param &= mask;
 
 		if (mask < 0x10)
-			dst += sprintf(dst, "%d", param);
+			util::stream_format(stream, "%d", param);
 		else
-			dst += sprintf(dst, "$%02X", param);
+			util::stream_format(stream, "$%02X", param);
 	}
 
 	return pos | s_flags[instr] | DASMFLAG_SUPPORTED;

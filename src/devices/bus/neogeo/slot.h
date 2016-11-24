@@ -108,7 +108,7 @@ public:
 	void rom_alloc(uint32_t size) { m_rom.resize(size/sizeof(uint16_t)); }
 	uint16_t* get_rom_base()  { return &m_rom[0]; }
 	uint32_t get_rom_size() { return m_rom.size() * sizeof(uint16_t); }
-	uint16_t* get_region_rom_base()  { if (m_region_rom.found()) return &m_region_rom->u16(0); return nullptr; }
+	uint16_t* get_region_rom_base()  { if (m_region_rom.found()) return &m_region_rom->as_u16(0); return nullptr; }
 	uint32_t get_region_rom_size() { if (m_region_rom.found()) return m_region_rom->bytes(); return 0; }
 
 	void fixed_alloc(uint32_t size) { m_fixed.resize(size); }

@@ -3804,7 +3804,7 @@ MACHINE_CONFIG_FRAGMENT( psxgpu )
 	MCFG_SCREEN_SIZE( 1024, 1024 )
 	MCFG_SCREEN_VISIBLE_AREA( 0, 639, 0, 479 )
 	MCFG_SCREEN_UPDATE_DEVICE( DEVICE_SELF, psxgpu_device, update_screen )
-	((screen_device *)device)->register_vblank_callback(vblank_state_delegate(FUNC(psxgpu_device::vblank), (psxgpu_device *) owner));
+	((screen_device *)device)->register_vblank_callback(vblank_state_delegate(&psxgpu_device::vblank, (psxgpu_device *) owner));
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD( "palette", 65536 )

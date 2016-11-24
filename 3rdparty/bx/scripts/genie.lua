@@ -49,8 +49,64 @@ project "bx.test"
 	}
 
 	files {
-		path.join(BX_DIR, "tests/**.cpp"),
-		path.join(BX_DIR, "tests/**.H"),
+		path.join(BX_DIR, "tests/*_test.cpp"),
+		path.join(BX_DIR, "tests/*_test.H"),
+		path.join(BX_DIR, "tests/dbg.*"),
+	}
+
+	configuration { "vs* or mingw*" }
+		links {
+			"psapi",
+		}
+
+	configuration { "android*" }
+		targetextension ".so"
+		linkoptions {
+			"-shared",
+		}
+
+	configuration { "nacl or nacl-arm" }
+		targetextension ".nexe"
+		links {
+			"ppapi",
+			"pthread",
+		}
+
+	configuration { "pnacl" }
+		targetextension ".pexe"
+		links {
+			"ppapi",
+			"pthread",
+		}
+
+	configuration { "linux-*" }
+		links {
+			"pthread",
+		}
+
+	configuration { "osx" }
+		links {
+			"Cocoa.framework",
+		}
+
+	configuration {}
+
+	strip()
+
+project "bx.bench"
+	kind "ConsoleApp"
+
+	debugdir (path.join(BX_DIR, "tests"))
+
+	includedirs {
+		path.join(BX_DIR, "include"),
+		BX_THIRD_PARTY_DIR,
+	}
+
+	files {
+		path.join(BX_DIR, "tests/*_bench.cpp"),
+		path.join(BX_DIR, "tests/*_bench.h"),
+		path.join(BX_DIR, "tests/dbg.*"),
 	}
 
 	configuration { "vs* or mingw*" }

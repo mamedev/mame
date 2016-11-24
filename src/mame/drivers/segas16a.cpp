@@ -3665,7 +3665,7 @@ DRIVER_INIT_MEMBER(segas16a_state,aceattaca)
 DRIVER_INIT_MEMBER(segas16a_state,dumpmtmt)
 {
 	DRIVER_INIT_CALL(generic);
-	m_i8751_vblank_hook = i8751_sim_delegate(FUNC(segas16a_state::dumpmtmt_i8751_sim), this);
+	m_i8751_vblank_hook = i8751_sim_delegate(&segas16a_state::dumpmtmt_i8751_sim, this);
 }
 
 DRIVER_INIT_MEMBER(segas16a_state,mjleague)
@@ -3683,7 +3683,7 @@ DRIVER_INIT_MEMBER(segas16a_state,passsht16a)
 DRIVER_INIT_MEMBER(segas16a_state,quartet)
 {
 	DRIVER_INIT_CALL(generic);
-	m_i8751_vblank_hook = i8751_sim_delegate(FUNC(segas16a_state::quartet_i8751_sim), this);
+	m_i8751_vblank_hook = i8751_sim_delegate(&segas16a_state::quartet_i8751_sim, this);
 }
 
 
@@ -3697,7 +3697,7 @@ DRIVER_INIT_MEMBER(segas16a_state,sjryukoa)
 {
 	DRIVER_INIT_CALL(generic);
 	m_custom_io_r = read16_delegate(FUNC(segas16a_state::sjryuko_custom_io_r), this);
-	m_lamp_changed_w = lamp_changed_delegate(FUNC(segas16a_state::sjryuko_lamp_changed_w), this);
+	m_lamp_changed_w = lamp_changed_delegate(&segas16a_state::sjryuko_lamp_changed_w, this);
 }
 
 

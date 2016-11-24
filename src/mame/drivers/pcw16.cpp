@@ -528,7 +528,7 @@ WRITE_LINE_MEMBER(pcw16_state::pcw16_keyboard_callback)
 	{
 		int data;
 
-		data = m_keyboard->read(machine().driver_data()->generic_space(), 0);
+		data = m_keyboard->read(machine().dummy_space(), 0);
 
 		if (data)
 		{

@@ -759,14 +759,14 @@ void g65816_device::execute_set_input(int line, int state)
 #include "g65816ds.h"
 
 
-offs_t g65816_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t g65816_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
-	return g65816_disassemble(buffer, (pc & 0x00ffff), (pc & 0xff0000) >> 16, oprom, FLAG_M, FLAG_X);
+	return g65816_disassemble(stream, (pc & 0x00ffff), (pc & 0xff0000) >> 16, oprom, FLAG_M, FLAG_X);
 }
 
 CPU_DISASSEMBLE( g65816 )
 {
-	return g65816_disassemble(buffer, (pc & 0x00ffff), (pc & 0xff0000) >> 16, oprom, 0/*FLAG_M*/, 0/*FLAG_X*/);
+	return g65816_disassemble(stream, (pc & 0x00ffff), (pc & 0xff0000) >> 16, oprom, 0/*FLAG_M*/, 0/*FLAG_X*/);
 }
 
 void g65816_device::g65816_restore_state()

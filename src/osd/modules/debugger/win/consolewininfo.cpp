@@ -286,7 +286,7 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 				return true;
 			case DEVOPTION_CLOSE:
 				img->unload();
-				return 1;
+				return true;
 			}
 			if (img->device().type() == CASSETTE)
 			{

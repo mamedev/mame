@@ -263,7 +263,7 @@ PALETTE_INIT_MEMBER(hd66421_device, hd66421)
 	// init palette
 	for (int i = 0; i < 4; i++)
 	{
-		palette.set_pen_color(i, rgb_t::white);
+		palette.set_pen_color(i, rgb_t::white());
 #ifndef HD66421_BRIGHTNESS_DOES_NOT_WORK
 		palette.set_pen_contrast(i, 1.0 * i / (4 - 1));
 #endif

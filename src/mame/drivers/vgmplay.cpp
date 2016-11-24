@@ -85,7 +85,7 @@ public:
 
 	virtual uint32_t disasm_min_opcode_bytes() const override;
 	virtual uint32_t disasm_max_opcode_bytes() const override;
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	READ8_MEMBER(segapcm_rom_r);
 	READ8_MEMBER(multipcma_rom_r);
@@ -565,93 +565,93 @@ uint32_t vgmplay_device::disasm_max_opcode_bytes() const
 	return 9;
 }
 
-offs_t vgmplay_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t vgmplay_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	switch(oprom[0]) {
 	case 0x4f:
-		sprintf(buffer, "psg r06 = %02x", oprom[1]);
+		util::stream_format(stream, "psg r06 = %02x", oprom[1]);
 		return 2 | DASMFLAG_SUPPORTED;
 
 	case 0x50:
-		sprintf(buffer, "psg write %02x", oprom[1]);
+		util::stream_format(stream, "psg write %02x", oprom[1]);
 		return 2 | DASMFLAG_SUPPORTED;
 
 	case 0x51:
-		sprintf(buffer, "ym2413 r%02x = %02x", oprom[1], oprom[2]);
+		util::stream_format(stream, "ym2413 r%02x = %02x", oprom[1], oprom[2]);
 		return 3 | DASMFLAG_SUPPORTED;
 
 	case 0x52:
-		sprintf(buffer, "ym2612.0 r%02x = %02x", oprom[1], oprom[2]);
+		util::stream_format(stream, "ym2612.0 r%02x = %02x", oprom[1], oprom[2]);
 		return 3 | DASMFLAG_SUPPORTED;
 
 	case 0x53:
-		sprintf(buffer, "ym2612.1 r%02x = %02x", oprom[1], oprom[2]);
+		util::stream_format(stream, "ym2612.1 r%02x = %02x", oprom[1], oprom[2]);
 		return 3 | DASMFLAG_SUPPORTED;
 
 	case 0x54:
-		sprintf(buffer, "ym2151 r%02x = %02x", oprom[1], oprom[2]);
+		util::stream_format(stream, "ym2151 r%02x = %02x", oprom[1], oprom[2]);
 		return 3 | DASMFLAG_SUPPORTED;
 
 	case 0x55:
-		sprintf(buffer, "ym2203a r%02x = %02x", oprom[1], oprom[2]);
+		util::stream_format(stream, "ym2203a r%02x = %02x", oprom[1], oprom[2]);
 		return 3 | DASMFLAG_SUPPORTED;
 
 	case 0x56:
-		sprintf(buffer, "ym2608.0 r%02x = %02x", oprom[1], oprom[2]);
+		util::stream_format(stream, "ym2608.0 r%02x = %02x", oprom[1], oprom[2]);
 		return 3 | DASMFLAG_SUPPORTED;
 
 	case 0x57:
-		sprintf(buffer, "ym2608.1 r%02x = %02x", oprom[1], oprom[2]);
+		util::stream_format(stream, "ym2608.1 r%02x = %02x", oprom[1], oprom[2]);
 		return 3 | DASMFLAG_SUPPORTED;
 
 	case 0x58:
-		sprintf(buffer, "ym2610.0 r%02x = %02x", oprom[1], oprom[2]);
+		util::stream_format(stream, "ym2610.0 r%02x = %02x", oprom[1], oprom[2]);
 		return 3 | DASMFLAG_SUPPORTED;
 
 	case 0x59:
-		sprintf(buffer, "ym2610.1 r%02x = %02x", oprom[1], oprom[2]);
+		util::stream_format(stream, "ym2610.1 r%02x = %02x", oprom[1], oprom[2]);
 		return 3 | DASMFLAG_SUPPORTED;
 
 	case 0x5a:
-		sprintf(buffer, "ym3812 r%02x = %02x", oprom[1], oprom[2]);
+		util::stream_format(stream, "ym3812 r%02x = %02x", oprom[1], oprom[2]);
 		return 3 | DASMFLAG_SUPPORTED;
 
 	case 0x5b:
-		sprintf(buffer, "ym3526 r%02x = %02x", oprom[1], oprom[2]);
+		util::stream_format(stream, "ym3526 r%02x = %02x", oprom[1], oprom[2]);
 		return 3 | DASMFLAG_SUPPORTED;
 
 	case 0x5c:
-		sprintf(buffer, "y8950 r%02x = %02x", oprom[1], oprom[2]);
+		util::stream_format(stream, "y8950 r%02x = %02x", oprom[1], oprom[2]);
 		return 3 | DASMFLAG_SUPPORTED;
 
 	case 0x5d:
-		sprintf(buffer, "ymz280b r%02x = %02x", oprom[1], oprom[2]);
+		util::stream_format(stream, "ymz280b r%02x = %02x", oprom[1], oprom[2]);
 		return 3 | DASMFLAG_SUPPORTED;
 
 	case 0x5e:
-		sprintf(buffer, "ymf262.0 r%02x = %02x", oprom[1], oprom[2]);
+		util::stream_format(stream, "ymf262.0 r%02x = %02x", oprom[1], oprom[2]);
 		return 3 | DASMFLAG_SUPPORTED;
 
 	case 0x5f:
-		sprintf(buffer, "ymf262.1 r%02x = %02x", oprom[1], oprom[2]);
+		util::stream_format(stream, "ymf262.1 r%02x = %02x", oprom[1], oprom[2]);
 		return 3 | DASMFLAG_SUPPORTED;
 
 	case 0x61: {
 		uint32_t duration = oprom[1] | (oprom[2] << 8);
-		sprintf(buffer, "wait %d", duration);
+		util::stream_format(stream, "wait %d", duration);
 		return 3 | DASMFLAG_SUPPORTED;
 	}
 
 	case 0x62:
-		sprintf(buffer, "wait 735");
+		util::stream_format(stream, "wait 735");
 		return 1 | DASMFLAG_SUPPORTED;
 
 	case 0x63:
-		sprintf(buffer, "wait 882");
+		util::stream_format(stream, "wait 882");
 		return 1 | DASMFLAG_SUPPORTED;
 
 	case 0x66:
-		sprintf(buffer, "end");
+		util::stream_format(stream, "end");
 		return 1 | DASMFLAG_SUPPORTED;
 
 	case 0x67: {
@@ -703,155 +703,155 @@ offs_t vgmplay_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t
 		uint8_t type = oprom[2];
 		uint32_t size = oprom[3] | (oprom[4] << 8) | (oprom[5] << 16) | (oprom[6] << 24);
 		if(type < 0x8)
-			sprintf(buffer, "data-block %x, %s", size, basic_types[type]);
+			util::stream_format(stream, "data-block %x, %s", size, basic_types[type]);
 		else if(type < 0x40)
-			sprintf(buffer, "data-block %x, %02x", size, type);
+			util::stream_format(stream, "data-block %x, %02x", size, type);
 		else if(type < 0x48)
-			sprintf(buffer, "data-block %x comp., %s", size, basic_types[type & 0x3f]);
+			util::stream_format(stream, "data-block %x comp., %s", size, basic_types[type & 0x3f]);
 		else if(type < 0x7f)
-			sprintf(buffer, "data-block %x comp., %02x", size, type & 0x3f);
+			util::stream_format(stream, "data-block %x comp., %02x", size, type & 0x3f);
 		else if(type < 0x80)
-			sprintf(buffer, "decomp-table %x, %02x/%02x", size, oprom[7], oprom[8]);
+			util::stream_format(stream, "decomp-table %x, %02x/%02x", size, oprom[7], oprom[8]);
 		else if(type < 0x94)
-			sprintf(buffer, "data-block %x, %s", size, rom_types[type & 0x7f]);
+			util::stream_format(stream, "data-block %x, %s", size, rom_types[type & 0x7f]);
 		else if(type < 0xc0)
-			sprintf(buffer, "data-block %x, rom %02x", size, type);
+			util::stream_format(stream, "data-block %x, rom %02x", size, type);
 		else if(type < 0xc3)
-			sprintf(buffer, "data-block %x, %s", size, ram_types[type & 0x1f]);
+			util::stream_format(stream, "data-block %x, %s", size, ram_types[type & 0x1f]);
 		else if(type < 0xe0)
-			sprintf(buffer, "data-block %x, ram %02x", size, type);
+			util::stream_format(stream, "data-block %x, ram %02x", size, type);
 		else if(type < 0xe2)
-			sprintf(buffer, "data-block %x, %s", size, ram2_types[type & 0x1f]);
+			util::stream_format(stream, "data-block %x, %s", size, ram2_types[type & 0x1f]);
 		else
-			sprintf(buffer, "data-block %x, ram %02x", size, type);
+			util::stream_format(stream, "data-block %x, ram %02x", size, type);
 		return (7+size) | DASMFLAG_SUPPORTED;
 	}
 
 	case 0x70: case 0x71: case 0x72: case 0x73: case 0x74: case 0x75: case 0x76: case 0x77:
 	case 0x78: case 0x79: case 0x7a: case 0x7b: case 0x7c: case 0x7d: case 0x7e: case 0x7f:
-		sprintf(buffer, "wait %d", 1+(oprom[0] & 0x0f));
+		util::stream_format(stream, "wait %d", 1+(oprom[0] & 0x0f));
 		return 1 | DASMFLAG_SUPPORTED;
 
 	case 0x80:
-		sprintf(buffer, "ym2612.0 r2a = rom++");
+		util::stream_format(stream, "ym2612.0 r2a = rom++");
 		return 1 | DASMFLAG_SUPPORTED;
 
 	case 0x81: case 0x82: case 0x83: case 0x84: case 0x85: case 0x86: case 0x87:
 	case 0x88: case 0x89: case 0x8a: case 0x8b: case 0x8c: case 0x8d: case 0x8e: case 0x8f:
-		sprintf(buffer, "ym2612.0 r2a = rom++; wait %d", oprom[0] & 0xf);
+		util::stream_format(stream, "ym2612.0 r2a = rom++; wait %d", oprom[0] & 0xf);
 		return 1 | DASMFLAG_SUPPORTED;
 
 	case 0xa0:
-		sprintf(buffer, "ay8910 r%02x = %02x", oprom[1], oprom[2]);
+		util::stream_format(stream, "ay8910 r%02x = %02x", oprom[1], oprom[2]);
 		return 3 | DASMFLAG_SUPPORTED;
 
 	case 0xa5:
-		sprintf(buffer, "ym2203b r%02x = %02x", oprom[1], oprom[2]);
+		util::stream_format(stream, "ym2203b r%02x = %02x", oprom[1], oprom[2]);
 		return 3 | DASMFLAG_SUPPORTED;
 
 	case 0xb0:
-		sprintf(buffer, "rf5c68 r%02x = %02x", oprom[1], oprom[2]);
+		util::stream_format(stream, "rf5c68 r%02x = %02x", oprom[1], oprom[2]);
 		return 3 | DASMFLAG_SUPPORTED;
 
 	case 0xb1:
-		sprintf(buffer, "rf5c164 r%02x = %02x", oprom[1], oprom[2]);
+		util::stream_format(stream, "rf5c164 r%02x = %02x", oprom[1], oprom[2]);
 		return 3 | DASMFLAG_SUPPORTED;
 
 	case 0xb2:
-		sprintf(buffer, "pwm r%x = %03x", oprom[1] >> 4, oprom[2] | ((oprom[1] & 0xf) << 8));
+		util::stream_format(stream, "pwm r%x = %03x", oprom[1] >> 4, oprom[2] | ((oprom[1] & 0xf) << 8));
 		return 3 | DASMFLAG_SUPPORTED;
 
 	case 0xb3:
-		sprintf(buffer, "dmg r%02x = %02x", oprom[1], oprom[2]);
+		util::stream_format(stream, "dmg r%02x = %02x", oprom[1], oprom[2]);
 		return 3 | DASMFLAG_SUPPORTED;
 
 	case 0xb4:
-		sprintf(buffer, "nesapu r%02x = %02x", oprom[1], oprom[2]);
+		util::stream_format(stream, "nesapu r%02x = %02x", oprom[1], oprom[2]);
 		return 3 | DASMFLAG_SUPPORTED;
 
 	case 0xb5:
-		sprintf(buffer, "multipcm r%02x = %02x", oprom[1], oprom[2]);
+		util::stream_format(stream, "multipcm r%02x = %02x", oprom[1], oprom[2]);
 		return 3 | DASMFLAG_SUPPORTED;
 
 	case 0xb6:
-		sprintf(buffer, "upd7759 r%02x = %02x", oprom[1], oprom[2]);
+		util::stream_format(stream, "upd7759 r%02x = %02x", oprom[1], oprom[2]);
 		return 3 | DASMFLAG_SUPPORTED;
 
 	case 0xb7:
-		sprintf(buffer, "okim6258 r%02x = %02x", oprom[1], oprom[2]);
+		util::stream_format(stream, "okim6258 r%02x = %02x", oprom[1], oprom[2]);
 		return 3 | DASMFLAG_SUPPORTED;
 
 	case 0xb8:
-		sprintf(buffer, "okim6295 r%02x = %02x", oprom[1], oprom[2]);
+		util::stream_format(stream, "okim6295 r%02x = %02x", oprom[1], oprom[2]);
 		return 3 | DASMFLAG_SUPPORTED;
 
 	case 0xb9:
-		sprintf(buffer, "huc6280 r%02x = %02x", oprom[1], oprom[2]);
+		util::stream_format(stream, "huc6280 r%02x = %02x", oprom[1], oprom[2]);
 		return 3 | DASMFLAG_SUPPORTED;
 
 	case 0xba:
-		sprintf(buffer, "k053260 r%02x = %02x", oprom[1], oprom[2]);
+		util::stream_format(stream, "k053260 r%02x = %02x", oprom[1], oprom[2]);
 		return 3 | DASMFLAG_SUPPORTED;
 
 	case 0xbb:
-		sprintf(buffer, "pokey r%02x = %02x", oprom[1], oprom[2]);
+		util::stream_format(stream, "pokey r%02x = %02x", oprom[1], oprom[2]);
 		return 3 | DASMFLAG_SUPPORTED;
 
 	case 0xc0:
-		sprintf(buffer, "segapcm %04x = %02x", oprom[1] | (oprom[2] << 8), oprom[3]);
+		util::stream_format(stream, "segapcm %04x = %02x", oprom[1] | (oprom[2] << 8), oprom[3]);
 		return 4 | DASMFLAG_SUPPORTED;
 
 	case 0xc1:
-		sprintf(buffer, "rf5c68 %04x = %02x", oprom[1] | (oprom[2] << 8), oprom[3]);
+		util::stream_format(stream, "rf5c68 %04x = %02x", oprom[1] | (oprom[2] << 8), oprom[3]);
 		return 4 | DASMFLAG_SUPPORTED;
 
 	case 0xc2:
-		sprintf(buffer, "rf5c163 %04x = %02x", oprom[1] | (oprom[2] << 8), oprom[3]);
+		util::stream_format(stream, "rf5c163 %04x = %02x", oprom[1] | (oprom[2] << 8), oprom[3]);
 		return 4 | DASMFLAG_SUPPORTED;
 
 	case 0xc3:
-		sprintf(buffer, "multipcm c%02x.off = %04x", oprom[1], oprom[2] | (oprom[3] << 8));
+		util::stream_format(stream, "multipcm c%02x.off = %04x", oprom[1], oprom[2] | (oprom[3] << 8));
 		return 4 | DASMFLAG_SUPPORTED;
 
 	case 0xc4:
-		sprintf(buffer, "qsound %02x = %04x", oprom[3], oprom[2] | (oprom[1] << 8));
+		util::stream_format(stream, "qsound %02x = %04x", oprom[3], oprom[2] | (oprom[1] << 8));
 		return 4 | DASMFLAG_SUPPORTED;
 
 	case 0xd0:
-		sprintf(buffer, "ymf278b r%02x.%02x = %02x", oprom[1], oprom[2], oprom[3]);
+		util::stream_format(stream, "ymf278b r%02x.%02x = %02x", oprom[1], oprom[2], oprom[3]);
 		return 4 | DASMFLAG_SUPPORTED;
 
 	case 0xd1:
-		sprintf(buffer, "ymf271 r%02x.%02x = %02x", oprom[1], oprom[2], oprom[3]);
+		util::stream_format(stream, "ymf271 r%02x.%02x = %02x", oprom[1], oprom[2], oprom[3]);
 		return 4 | DASMFLAG_SUPPORTED;
 
 	case 0xd2:
-		sprintf(buffer, "scc1 r%02x.%02x = %02x", oprom[1], oprom[2], oprom[3]);
+		util::stream_format(stream, "scc1 r%02x.%02x = %02x", oprom[1], oprom[2], oprom[3]);
 		return 4 | DASMFLAG_SUPPORTED;
 
 	case 0xd3:
-		sprintf(buffer, "k054539 r%02x.%02x = %02x", oprom[1], oprom[2], oprom[3]);
+		util::stream_format(stream, "k054539 r%02x.%02x = %02x", oprom[1], oprom[2], oprom[3]);
 		return 4 | DASMFLAG_SUPPORTED;
 
 	case 0xd4:
-		sprintf(buffer, "c140 r%02x.%02x = %02x", oprom[1], oprom[2], oprom[3]);
+		util::stream_format(stream, "c140 r%02x.%02x = %02x", oprom[1], oprom[2], oprom[3]);
 		return 4 | DASMFLAG_SUPPORTED;
 
 	case 0xe0: {
 		uint32_t off = oprom[1] | (oprom[2] << 8) | (oprom[3] << 16) | (oprom[4] << 24);
-		sprintf(buffer, "ym2612 offset = %x", off);
+		util::stream_format(stream, "ym2612 offset = %x", off);
 		return 5 | DASMFLAG_SUPPORTED;
 	}
 
 	case 0xe1: {
 		uint16_t addr = (oprom[1] << 8) | oprom[2];
 		uint16_t data = (oprom[3] << 8) | oprom[4];
-		sprintf(buffer, "c352 r%04x = %04x", addr, data);
+		util::stream_format(stream, "c352 r%04x = %04x", addr, data);
 		return 5 | DASMFLAG_SUPPORTED;
 	}
 
 	default:
-		sprintf(buffer, "?? %02x", oprom[0]);
+		util::stream_format(stream, "?? %02x", oprom[0]);
 		return 1 | DASMFLAG_SUPPORTED;
 	}
 }

@@ -687,8 +687,8 @@ void ccpu_cpu_device::execute_run()
 }
 
 
-offs_t ccpu_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t ccpu_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( ccpu );
-	return CPU_DISASSEMBLE_NAME(ccpu)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(ccpu)(this, stream, pc, oprom, opram, options);
 }

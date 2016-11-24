@@ -647,7 +647,6 @@ MACHINE_START_MEMBER(sat_console_state, saturn)
 
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
-		//printf("HI!\n");
 		using namespace std::placeholders;
 		machine().debugger().console().register_command("saturn", CMDFLAG_NONE, 0, 1, 4, std::bind(&saturn_state::debug_commands, this, _1, _2, _3));
 	}
@@ -727,7 +726,7 @@ MACHINE_START_MEMBER(sat_console_state, saturn)
 	save_item(NAME(m_smpc.SR));
 	save_item(NAME(m_smpc.SMEM));
 
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(sat_console_state::stvcd_exit), this));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&sat_console_state::stvcd_exit, this));
 
 	m_smpc.rtc_data[0] = DectoBCD(systime.local_time.year /100);
 	m_smpc.rtc_data[1] = DectoBCD(systime.local_time.year %100);

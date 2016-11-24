@@ -16,9 +16,9 @@ i8xc196_device::i8xc196_device(const machine_config &mconfig, device_type type, 
 {
 }
 
-offs_t i8xc196_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t i8xc196_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
-	return disasm_generic(buffer, pc, oprom, opram, options, disasm_entries);
+	return disasm_generic(stream, pc, oprom, opram, options, disasm_entries);
 }
 
 void i8xc196_device::io_w8(uint8_t adr, uint8_t data)

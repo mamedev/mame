@@ -20,8 +20,8 @@
 	MCFG_PSX_SPU_WRITE_HANDLER(DEVWRITE16(_tag, spu_device, write)) \
 	MCFG_DEVICE_ADD(_tag, SPU, _clock) \
 	MCFG_SPU_IRQ_HANDLER(DEVWRITELINE("maincpu:irq", psxirq_device, intin9)) \
-	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 4, psx_dma_read_delegate( FUNC( spu_device::dma_read ), (spu_device *) device ) ) \
-	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 4, psx_dma_write_delegate( FUNC( spu_device::dma_write ), (spu_device *) device ) )
+	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 4, psx_dma_read_delegate(&spu_device::dma_read, (spu_device *) device ) ) \
+	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 4, psx_dma_write_delegate(&spu_device::dma_write, (spu_device *) device ) )
 
 // ======================> spu_device
 

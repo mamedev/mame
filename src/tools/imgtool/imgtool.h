@@ -96,7 +96,7 @@ namespace imgtool
 
 		image(const imgtool_module &module, object_pool *pool, void *extra_bytes);
 		~image();
-		
+
 		static imgtoolerr_t identify_file(const char *filename, imgtool_module **modules, size_t count);
 		static imgtoolerr_t open(const imgtool_module *module, const char *filename, int read_or_write, ptr &outimg);
 		static imgtoolerr_t open(const std::string &modulename, const char *filename, int read_or_write, ptr &outimg);
@@ -144,7 +144,7 @@ namespace imgtool
 		typedef std::unique_ptr<partition> ptr;
 
 		// ctor/dtor
-		partition(imgtool::image &image, imgtool_class &imgclass, int partition_index, uint64_t base_block, uint64_t block_count);
+		partition(imgtool::image &image, const imgtool_class &imgclass, int partition_index, uint64_t base_block, uint64_t block_count);
 		~partition();
 
 		static imgtoolerr_t open(imgtool::image &image, int partition_index, ptr &partition);
@@ -256,7 +256,7 @@ namespace imgtool
 	private:
 		imgtool::partition &m_partition;
 		std::unique_ptr<uint8_t[]> m_extra_bytes;
-		bool m_okay_to_close;	// similar wart as what is on imgtool::image
+		bool m_okay_to_close;   // similar wart as what is on imgtool::image
 	};
 };
 

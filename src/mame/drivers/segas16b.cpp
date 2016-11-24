@@ -1343,14 +1343,20 @@ void segas16b_state::device_timer(emu_timer &timer, device_timer_id id, int para
 //  from Altered Beast
 //-------------------------------------------------
 
-void segas16b_state::altbeast_common_i8751_sim(offs_t soundoffs, offs_t inputoffs)
+void segas16b_state::altbeast_common_i8751_sim(offs_t soundoffs, offs_t inputoffs, int alt_bank)
 {
 	// signal a VBLANK to the main CPU
 	m_maincpu->set_input_line(4, HOLD_LINE);
 
 	// set tile banks
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	rom_5704_bank_w(space, 1, m_workram[0x3094/2] & 0x00ff, 0x00ff);
+	int bank = m_workram[0x3094 / 2] & 0x00ff;
+	// alt_bank is used for the alt rom loading (where there are space between the ROMs)
+	// alternatively the rom loading could be changed, but the loading is correct for the non-mcu .b14/.a14 type
+	// board so presumably our MCU simulation should act accordingly.
+	if (alt_bank) bank = (bank & 0x1) | ((bank & 0xfe) << 1);
+
+	rom_5704_bank_w(space, 1, bank, 0x00ff);
 
 	// process any new sound data
 	uint16_t temp = m_workram[soundoffs];
@@ -1366,17 +1372,17 @@ void segas16b_state::altbeast_common_i8751_sim(offs_t soundoffs, offs_t inputoff
 
 void segas16b_state::altbeasj_i8751_sim()
 {
-	altbeast_common_i8751_sim(0x30d4/2, 0x30d0/2);
+	altbeast_common_i8751_sim(0x30d4/2, 0x30d0/2, 1);
 }
 
 void segas16b_state::altbeas5_i8751_sim()
 {
-	altbeast_common_i8751_sim(0x3098/2, 0x3096/2);
+	altbeast_common_i8751_sim(0x3098/2, 0x3096/2, 1);
 }
 
 void segas16b_state::altbeast_i8751_sim()
 {
-	altbeast_common_i8751_sim(0x30c4/2, 0x30c2/2);
+	altbeast_common_i8751_sim(0x30c4/2, 0x30c2/2, 0);
 }
 
 
@@ -8622,19 +8628,19 @@ DRIVER_INIT_MEMBER(segas16b_state,aliensyn7_5358_small)
 DRIVER_INIT_MEMBER(segas16b_state,altbeast_5521)
 {
 	DRIVER_INIT_CALL(generic_5521);
-	m_i8751_vblank_hook = i8751_sim_delegate(FUNC(segas16b_state::altbeast_i8751_sim), this);
+	m_i8751_vblank_hook = i8751_sim_delegate(&segas16b_state::altbeast_i8751_sim, this);
 }
 
 DRIVER_INIT_MEMBER(segas16b_state,altbeasj_5521)
 {
 	DRIVER_INIT_CALL(generic_5521);
-	m_i8751_vblank_hook = i8751_sim_delegate(FUNC(segas16b_state::altbeasj_i8751_sim), this);
+	m_i8751_vblank_hook = i8751_sim_delegate(&segas16b_state::altbeasj_i8751_sim, this);
 }
 
 DRIVER_INIT_MEMBER(segas16b_state,altbeas5_5521)
 {
 	DRIVER_INIT_CALL(generic_5521);
-	m_i8751_vblank_hook = i8751_sim_delegate(FUNC(segas16b_state::altbeas5_i8751_sim), this);
+	m_i8751_vblank_hook = i8751_sim_delegate(&segas16b_state::altbeas5_i8751_sim, this);
 }
 
 DRIVER_INIT_MEMBER(segas16b_state,altbeas4_5521)
@@ -8646,7 +8652,7 @@ DRIVER_INIT_MEMBER(segas16b_state,altbeas4_5521)
 DRIVER_INIT_MEMBER(segas16b_state,ddux_5704)
 {
 	DRIVER_INIT_CALL(generic_5704);
-	m_i8751_vblank_hook = i8751_sim_delegate(FUNC(segas16b_state::ddux_i8751_sim), this);
+	m_i8751_vblank_hook = i8751_sim_delegate(&segas16b_state::ddux_i8751_sim, this);
 }
 
 DRIVER_INIT_MEMBER(segas16b_state,dunkshot_5358_small)
@@ -8665,7 +8671,7 @@ DRIVER_INIT_MEMBER(segas16b_state,exctleag_5358)
 DRIVER_INIT_MEMBER(segas16b_state,goldnaxe_5704)
 {
 	DRIVER_INIT_CALL(generic_5704);
-	m_i8751_vblank_hook = i8751_sim_delegate(FUNC(segas16b_state::goldnaxe_i8751_sim), this);
+	m_i8751_vblank_hook = i8751_sim_delegate(&segas16b_state::goldnaxe_i8751_sim, this);
 
 	static const uint8_t memory_control_5704[0x10] =
 		{ 0x02,0x00, 0x02,0x08, 0x00,0x1f, 0x00,0xff, 0x00,0x20, 0x01,0x10, 0x00,0x14, 0x00,0xc4 };
@@ -8675,7 +8681,7 @@ DRIVER_INIT_MEMBER(segas16b_state,goldnaxe_5704)
 DRIVER_INIT_MEMBER(segas16b_state,goldnaxe_5797)
 {
 	DRIVER_INIT_CALL(generic_5797);
-	m_i8751_vblank_hook = i8751_sim_delegate(FUNC(segas16b_state::goldnaxe_i8751_sim), this);
+	m_i8751_vblank_hook = i8751_sim_delegate(&segas16b_state::goldnaxe_i8751_sim, this);
 
 	static const uint8_t memory_control_5797[0x10] =
 		{ 0x02,0x00, 0x00,0x1f, 0x00,0x1e, 0x00,0xff, 0x00,0x20, 0x01,0x10, 0x00,0x14, 0x00,0xc4 };
@@ -8749,13 +8755,13 @@ DRIVER_INIT_MEMBER(segas16b_state,timescan_5358_small)
 DRIVER_INIT_MEMBER(segas16b_state,tturf_5704)
 {
 	DRIVER_INIT_CALL(generic_5704);
-	m_i8751_vblank_hook = i8751_sim_delegate(FUNC(segas16b_state::tturf_i8751_sim), this);
+	m_i8751_vblank_hook = i8751_sim_delegate(&segas16b_state::tturf_i8751_sim, this);
 }
 
 DRIVER_INIT_MEMBER(segas16b_state,wb3_5704)
 {
 	DRIVER_INIT_CALL(generic_5704);
-	m_i8751_vblank_hook = i8751_sim_delegate(FUNC(segas16b_state::wb3_i8751_sim), this);
+	m_i8751_vblank_hook = i8751_sim_delegate(&segas16b_state::wb3_i8751_sim, this);
 }
 
 DRIVER_INIT_MEMBER(segas16b_state,snapper)
@@ -9430,7 +9436,7 @@ DRIVER_INIT_MEMBER(isgsm_state,shinfz)
 	memcpy(rom, &temp[0], 0x200000);
 
 	m_read_xor = 0x66;
-	m_security_callback = security_callback_delegate(FUNC(isgsm_state::shinfz_security), this);
+	m_security_callback = security_callback_delegate(&isgsm_state::shinfz_security, this);
 }
 
 DRIVER_INIT_MEMBER(isgsm_state,tetrbx)
@@ -9444,7 +9450,7 @@ DRIVER_INIT_MEMBER(isgsm_state,tetrbx)
 	memcpy(rom, &temp[0], 0x80000);
 
 	m_read_xor = 0x73;
-	m_security_callback = security_callback_delegate(FUNC(isgsm_state::tetrbx_security), this);
+	m_security_callback = security_callback_delegate(&isgsm_state::tetrbx_security, this);
 }
 
 

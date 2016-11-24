@@ -324,7 +324,7 @@ static MACHINE_CONFIG_START( sbrain, sbrain_state )
 	MCFG_CPU_IO_MAP(sbrain_subio)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::amber)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::amber())
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_UPDATE_DRIVER(sbrain_state, screen_update)

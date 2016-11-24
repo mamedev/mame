@@ -11,7 +11,6 @@
 #include "psx.h"
 
 extern CPU_DISASSEMBLE( r3000le );
-extern unsigned dasmmips3(char *,unsigned, uint32_t);
 
 static struct
 {
@@ -330,32 +329,4 @@ int main( int argc, char *argv[] )
 	}
 	free (filebuf);
 	return 0;
-}
-
-void *osd_malloc_array(size_t size)
-{
-	return osd_malloc(size);
-}
-
-void *malloc_array_file_line(size_t size, const char *file, int line)
-{
-	// allocate the memory and fail if we can't
-	return osd_malloc_array(size);
-}
-
-void free_file_line( void *memory, const char *file, int line )
-{
-	osd_free( memory );
-}
-
-void osd_free( void *memory )
-{
-#undef free
-	free( memory );
-}
-
-void *osd_malloc( size_t size )
-{
-#undef malloc
-	return malloc( size );
 }

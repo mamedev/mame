@@ -9,7 +9,7 @@ struct xml_writer_string: public pugi::xml_writer
 {
 	std::string contents;
 
-	virtual void write(const void* data, size_t size);
+	virtual void write(const void* data, size_t size) PUGIXML_OVERRIDE;
 
 	std::string as_narrow() const;
 	std::basic_string<wchar_t> as_wide() const;

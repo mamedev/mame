@@ -916,7 +916,7 @@ void c1571_t::device_start()
 	// install image callbacks
 	m_ga->set_floppy(m_floppy);
 	//m_fdc->set_floppy(m_floppy);
-	m_floppy->setup_wpt_cb(floppy_image_device::wpt_cb(FUNC(c1571_t::wpt_callback), this));
+	m_floppy->setup_wpt_cb(floppy_image_device::wpt_cb(&c1571_t::wpt_callback, this));
 
 	// register for state saving
 	save_item(NAME(m_1_2mhz));

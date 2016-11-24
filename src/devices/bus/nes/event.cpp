@@ -194,7 +194,7 @@ void nes_event_device::update_regs(int reg)
 }
 
 //-------------------------------------------------
-//  Dipswicth
+//  Dipswitch
 //-------------------------------------------------
 
 static INPUT_PORTS_START( nwc_dsw )

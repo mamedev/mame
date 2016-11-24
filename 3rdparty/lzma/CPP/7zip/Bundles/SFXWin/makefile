@@ -131,8 +131,9 @@ C_OBJS = \
   $O\Bra.obj \
   $O\Bra86.obj \
   $O\BraIA64.obj \
-  $O\Delta.obj \
   $O\CpuArch.obj \
+  $O\Delta.obj \
+  $O\DllSecur.obj \
   $O\Lzma2Dec.obj \
   $O\LzmaDec.obj \
   $O\Ppmd7.obj \

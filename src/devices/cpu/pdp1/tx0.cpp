@@ -1068,15 +1068,15 @@ void tx0_device::io_complete()
 }
 
 
-offs_t tx0_8kw_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t tx0_8kw_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( tx0_8kw );
-	return CPU_DISASSEMBLE_NAME(tx0_8kw)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(tx0_8kw)(this, stream, pc, oprom, opram, options);
 }
 
 
-offs_t tx0_64kw_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t tx0_64kw_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( tx0_64kw );
-	return CPU_DISASSEMBLE_NAME(tx0_64kw)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(tx0_64kw)(this, stream, pc, oprom, opram, options);
 }

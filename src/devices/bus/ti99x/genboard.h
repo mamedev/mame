@@ -203,15 +203,15 @@ private:
 	int     m_ext_waitcount;
 
 	// Devices
-	mm58274c_device*        m_clock;
-	tms9995_device*         m_cpu;
-	at29c040_device*         m_pfm512;
-	at29c040a_device*        m_pfm512a;
-	sn76496_base_device*    m_sound;
+	required_device<mm58274c_device>     m_clock;
+	required_device<tms9995_device>      m_cpu;
+	required_device<at29c040_device>     m_pfm512;
+	required_device<at29c040a_device>    m_pfm512a;
+	required_device<sn76496_base_device> m_sound;
 
-	geneve_keyboard_device* m_keyboard;
-	v9938_device*           m_video;
-	peribox_device*          m_peribox;
+	required_device<geneve_keyboard_device> m_keyboard;
+	required_device<v9938_device>           m_video;
+	required_device<peribox_device>         m_peribox;
 	uint8_t*                  m_eprom;
 	required_device<ram_device> m_sram;
 	required_device<ram_device> m_dram;

@@ -11,13 +11,8 @@ function dat.check(set, softlist)
 		return nil
 	end
 	local datpath
-	local function xml_parse()
-		local file = emu.file(lfs.env_replace(mame_manager:ui():options().entries.historypath:value():gsub("([^;]+)", "%1/hi2txt")), 1)
-		local ret = file:open(set .. ".xml")
+	local function xml_parse(file)
 		local table
-		if ret then
-			return nil
-		end
 		datpath = file:fullpath():gsub(".zip", "/")
 		local data = file:read(file:size())
 		data = data:match("<hi2txt>(.*)</ *hi2txt>")
@@ -494,6 +489,9 @@ function dat.check(set, softlist)
 					if fld["line-ignore"] then
 						igncol, ignval = fld["line-ignore"]:match("([^:]*):(.*)")
 					end
+					if fld["field"] and not fld["column"] then -- ????
+						fld["column"] = fld["field"]
+					end
 					for num2, col in ipairs(fld["column"]) do
 						if not col["display"] or col["display"] == "always" then
 							if not col["src"] then
@@ -501,7 +499,7 @@ function dat.check(set, softlist)
 							end
 							if not loopcnt and col["src"] ~= "index" then
 								table.insert(dat, 1, "for i = 1, #arr['" .. col["src"] .. "'] do")
-								table.insert(dat, 2, "index = arr['" .. col["src"] .. "'][i].index")
+								table.insert(dat, 2, "index = arr['" .. col["src"] .. "'][i].index or i - 1")
 								table.insert(dat, 3, "line = ''")
 								loopcnt = true
 							end
@@ -654,13 +652,15 @@ function dat.check(set, softlist)
 			local newbytes = {}
 			if skip == "odd" then
 				for i = 1, #bytes, 2 do
-					val = bytes[i]:byte(1)
-					newbytes[(i+1)/2] = string.char(((val & 0x0f) << 4) | (val & 0x0f))
+					val1 = bytes[i]:byte(1)
+					val2 = bytes[i+1]:byte(1)
+					newbytes[(i+1)/2] = string.char(((val1 & 0x0f) << 4) | (val2 & 0x0f))
 				end
 			elseif skip == "even" then
 				for i = 1, #bytes, 2 do
-					val = bytes[i]:byte(1)
-					newbytes[(i+1)/2] = string.char((val & 0xf0) | ((val & 0xf0) >> 4))
+					val1 = bytes[i]:byte(1)
+					val2 = bytes[i+1]:byte(1)
+					newbytes[(i+1)/2] = string.char((val1 & 0xf0) | ((val2 & 0xf0) >> 4))
 				end
 			end
 			return newbytes
@@ -766,9 +766,21 @@ function dat.check(set, softlist)
 	local ret = scrfile:open(set .. ".lua")
 	local script
 	if ret then
-		local xml = xml_parse()
+		function get_xml_table(fileset)
+			local file = emu.file(lfs.env_replace(mame_manager:ui():options().entries.historypath:value():gsub("([^;]+)", "%1/hi2txt")), 1)
+			local ret = file:open(fileset .. ".xml")
+			if ret then
+				return nil
+			end
+			local xml = xml_parse(file)
+			return xml
+		end
+		local xml = get_xml_table(set)
 		if not xml then
 			return nil
+		end
+		if xml.sameas then
+			xml = get_xml_table(xml.sameas[1].id)
 		end
 		local status
 		status, script = pcall(parse_table, xml)

@@ -11,6 +11,15 @@
 #ifndef __ARCOMPACT_H__
 #define __ARCOMPACT_H__
 
+enum
+{
+	ARCOMPACT_PC = STATE_GENPC,
+	ARCOMPACT_STATUS32 = 0x10,
+	ARCOMPACT_LP_START,
+	ARCOMPACT_LP_END
+
+};
+
 #define ARCOMPACT_RETTYPE uint32_t
 #define OPS_32 uint32_t op
 #define OPS_16 uint16_t op
@@ -95,7 +104,7 @@ protected:
 	// device_disasm_interface overrides
 	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; }
 	virtual uint32_t disasm_max_opcode_bytes() const override { return 8; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 
 

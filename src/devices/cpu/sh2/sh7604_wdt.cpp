@@ -3,7 +3,7 @@
 /***************************************************************************
 
   SH7604 Watchdog Timer Controller
-  
+
   TODO:
   - Host CPU setter (clock and callback for irq and reset lines);
   - memory map (needs to verify if ID write is ok);
@@ -28,10 +28,10 @@ const device_type SH7604_WDT = &device_creator<sh7604_wdt_device>;
 //**************************************************************************
 
 static ADDRESS_MAP_START( wdt_regs, AS_0, 8, sh7604_wdt_device )
-//	AM_RANGE(0x00, 0x00) timer control/status
-//	AM_RANGE(0x01, 0x01) timer counter
-//	AM_RANGE(0x02, 0x02) write only, reset control register
-//	AM_RANGE(0x03, 0x03) read status register, write reset status register
+//  AM_RANGE(0x00, 0x00) timer control/status
+//  AM_RANGE(0x01, 0x01) timer counter
+//  AM_RANGE(0x02, 0x02) write only, reset control register
+//  AM_RANGE(0x03, 0x03) read status register, write reset status register
 ADDRESS_MAP_END
 
 //-------------------------------------------------

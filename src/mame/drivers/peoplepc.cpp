@@ -180,10 +180,10 @@ void peoplepc_state::machine_start()
 	m_dma0pg = 0;
 
 	// FIXME: cheat as there no docs about how or obvious ports that set to control the motor
-	m_flop0->get_device()->setup_load_cb(floppy_image_device::load_cb(FUNC(peoplepc_state::floppy_load), this));
-	m_flop0->get_device()->setup_unload_cb(floppy_image_device::unload_cb(FUNC(peoplepc_state::floppy_unload), this));
-	m_flop1->get_device()->setup_load_cb(floppy_image_device::load_cb(FUNC(peoplepc_state::floppy_load), this));
-	m_flop1->get_device()->setup_unload_cb(floppy_image_device::unload_cb(FUNC(peoplepc_state::floppy_unload), this));
+	m_flop0->get_device()->setup_load_cb(floppy_image_device::load_cb(&peoplepc_state::floppy_load, this));
+	m_flop0->get_device()->setup_unload_cb(floppy_image_device::unload_cb(&peoplepc_state::floppy_unload, this));
+	m_flop1->get_device()->setup_load_cb(floppy_image_device::load_cb(&peoplepc_state::floppy_load, this));
+	m_flop1->get_device()->setup_unload_cb(floppy_image_device::unload_cb(&peoplepc_state::floppy_unload, this));
 }
 
 static ADDRESS_MAP_START( peoplepc_map, AS_PROGRAM, 16, peoplepc_state )
@@ -252,7 +252,7 @@ static MACHINE_CONFIG_START( olypeopl, peoplepc_state)
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_RAW_PARAMS(XTAL_22MHz,640,0,640,475,0,475)
 	MCFG_SCREEN_UPDATE_DEVICE( "h46505", mc6845_device, screen_update )
 

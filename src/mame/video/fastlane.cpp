@@ -139,7 +139,7 @@ uint32_t fastlane_state::screen_update_fastlane(screen_device &screen, bitmap_in
 	finalclip1 &= cliprect;
 
 	/* set scroll registers */
-	address_space &space = machine().driver_data()->generic_space();
+	address_space &space = machine().dummy_space();
 	xoffs = m_k007121->ctrlram_r(space, 0);
 	for (i = 0; i < 32; i++)
 		m_layer0->set_scrollx(i, m_k007121_regs[0x20 + i] + xoffs - 40);

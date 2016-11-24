@@ -95,7 +95,7 @@ private:
 		OTHER_FILTER  = LIST_FILTER   + MAX_CUST_FILTER + 1
 	};
 
-	virtual void populate() override;
+	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 
 	void save_sw_custom_filters();
@@ -128,7 +128,7 @@ private:
 		SCREEN_FILTER = YEAR_FILTER   + MAX_CUST_FILTER + 1,
 		OTHER_FILTER  = SCREEN_FILTER + MAX_CUST_FILTER + 1
 	};
-	virtual void populate() override;
+	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 
 	void save_custom_filters();

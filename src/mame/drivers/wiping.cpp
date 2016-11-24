@@ -62,6 +62,8 @@ READ8_MEMBER(wiping_state::ports_r)
 	return res;
 }
 
+// irq/reset controls like in clshroad.cpp
+
 WRITE8_MEMBER(wiping_state::subcpu_reset_w)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);

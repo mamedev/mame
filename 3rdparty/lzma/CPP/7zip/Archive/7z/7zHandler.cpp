@@ -429,11 +429,11 @@ HRESULT CHandler::SetMethodToProp(CNum folderIndex, PROPVARIANT *prop) const
         name = "LZMA2";
         if (propsSize == 1)
         {
-          Byte p = props[0];
-          if ((p & 1) == 0)
-            ConvertUInt32ToString((UInt32)((p >> 1) + 12), s);
+          Byte d = props[0];
+          if ((d & 1) == 0)
+            ConvertUInt32ToString((UInt32)((d >> 1) + 12), s);
           else
-            GetStringForSizeValue(s, 3 << ((p >> 1) + 11));
+            GetStringForSizeValue(s, 3 << ((d >> 1) + 11));
         }
       }
       else if (id == k_PPMD)

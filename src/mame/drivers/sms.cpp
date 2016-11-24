@@ -300,7 +300,7 @@ static ADDRESS_MAP_START( sg1000m3_io, AS_IO, 8, sms_state )
 	AM_RANGE(0x40, 0x7f)                 AM_READWRITE(sms_count_r, sms_psg_w)
 	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3e) AM_DEVREADWRITE("sms_vdp", sega315_5124_device, vram_read, vram_write)
 	AM_RANGE(0x81, 0x81) AM_MIRROR(0x3e) AM_DEVREADWRITE("sms_vdp", sega315_5124_device, register_read, register_write)
-	AM_RANGE(0xc0, 0xc7) AM_MIRROR(0x38) AM_READWRITE(sg1000m3_peripheral_r,sg1000m3_peripheral_w)
+	AM_RANGE(0xc0, 0xc7) AM_MIRROR(0x38) AM_READWRITE(sg1000m3_peripheral_r, sg1000m3_peripheral_w)
 ADDRESS_MAP_END
 
 
@@ -945,6 +945,7 @@ static MACHINE_CONFIG_START( gamegear, sms_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
 
+	/* actually, PSG is embedded in the VDP chip */
 	MCFG_SOUND_ADD("gamegear", GAMEGEAR, MASTER_CLOCK_GG/9)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)

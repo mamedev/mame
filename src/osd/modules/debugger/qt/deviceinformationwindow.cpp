@@ -122,15 +122,15 @@ void DeviceInformationWindowQtConfig::applyToQWidget(QWidget* widget)
 }
 
 
-void DeviceInformationWindowQtConfig::addToXmlDataNode(xml_data_node* node) const
+void DeviceInformationWindowQtConfig::addToXmlDataNode(xml_data_node &node) const
 {
 	WindowQtConfig::addToXmlDataNode(node);
-	xml_set_attribute(node, "device-tag", m_device_tag.c_str());
+	node.set_attribute("device-tag", m_device_tag.c_str());
 }
 
 
-void DeviceInformationWindowQtConfig::recoverFromXmlNode(xml_data_node* node)
+void DeviceInformationWindowQtConfig::recoverFromXmlNode(xml_data_node const &node)
 {
 	WindowQtConfig::recoverFromXmlNode(node);
-	m_device_tag = xml_get_attribute_string(node, "device-tag", ":");
+	m_device_tag = node.get_attribute_string("device-tag", ":");
 }

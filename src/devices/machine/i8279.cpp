@@ -358,6 +358,13 @@ void i8279_device::timer_mainloop()
 }
 
 
+READ8_MEMBER(i8279_device::read)
+{
+	// A0 = control/data select
+	return (offset & 1) ? status_r(space, 0) : data_r(space, 0);
+}
+
+
 READ8_MEMBER( i8279_device::status_r )
 {
 	return m_status;
@@ -429,6 +436,16 @@ READ8_MEMBER( i8279_device::data_r )
 	m_d_ram_ptr &= 15;
 	m_s_ram_ptr &= 7;
 	return data;
+}
+
+
+WRITE8_MEMBER(i8279_device::write)
+{
+	// A0 = control/data select
+	if (offset & 1)
+		cmd_w(space, 0, data);
+	else
+		data_w(space, 0, data);
 }
 
 

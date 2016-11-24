@@ -895,7 +895,6 @@ int apple2gs_state::apple2gs_get_vpos()
 READ8_MEMBER( apple2gs_state::apple2gs_c0xx_r )
 {
 	uint8_t result;
-	scc8530_t *scc;
 
 	if(space.debugger_access())
 	{
@@ -1051,11 +1050,19 @@ READ8_MEMBER( apple2gs_state::apple2gs_c0xx_r )
 			break;
 
 		case 0x38:  /* C038 - SCCBREG */
+			result = m_scc->cb_r(space, 0, mem_mask);
+			break;
+		
 		case 0x39:  /* C039 - SCCAREG */
+			result = m_scc->ca_r(space, 0, mem_mask);
+			break;
+		
 		case 0x3A:  /* C03A - SCCBDATA */
+			result = m_scc->db_r(space, 0, mem_mask);
+			break;
+			
 		case 0x3B:  /* C03B - SCCADATA */
-			scc = space.machine().device<scc8530_t>("scc");
-			result = scc->reg_r(space, offset & 0x03);
+			result = m_scc->da_r(space, 0, mem_mask);
 			break;
 
 		case 0x3C:  /* C03C - SOUNDCTL */
@@ -1131,8 +1138,6 @@ READ8_MEMBER( apple2gs_state::apple2gs_c0xx_r )
 
 WRITE8_MEMBER( apple2gs_state::apple2gs_c0xx_w )
 {
-	scc8530_t *scc;
-
 	offset &= 0xFF;
 
 	if (LOG_C0XX)
@@ -1226,12 +1231,20 @@ WRITE8_MEMBER( apple2gs_state::apple2gs_c0xx_w )
 			break;
 
 		case 0x38:  /* C038 - SCCBREG */
+			m_scc->cb_w(space, 0, data);
+			break;		
+		
 		case 0x39:  /* C039 - SCCAREG */
+			m_scc->ca_w(space, 0, data);
+			break;		
+		
 		case 0x3A:  /* C03A - SCCBDATA */
+			m_scc->db_w(space, 0, data);
+			break;		
+
 		case 0x3B:  /* C03B - SCCADATA */
-			scc = space.machine().device<scc8530_t>("scc");
-			scc->reg_w(space, offset & 0x03, data);
-			break;
+			m_scc->da_w(space, 0, data);
+			break;		
 
 		case 0x3C:  /* C03C - SOUNDCTL */
 		case 0x3D:  /* C03D - SOUNDDATA */

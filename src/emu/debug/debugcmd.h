@@ -8,10 +8,10 @@
 
 *********************************************************************/
 
-#pragma once
+#ifndef MAME_EMU_DEBUG_DEBUGCMD_H
+#define MAME_EMU_DEBUG_DEBUGCMD_H
 
-#ifndef __DEBUGCMD_H__
-#define __DEBUGCMD_H__
+#pragma once
 
 #include "emu.h"
 #include "debugcpu.h"
@@ -29,7 +29,7 @@ public:
 	bool validate_boolean_parameter(const char *param, bool *result);
 
 	/* validates a parameter as a numeric value */
-	bool validate_number_parameter(const char *param, uint64_t *result);
+	bool validate_number_parameter(const char *param, u64 *result);
 
 	/* validates a parameter as a cpu */
 	bool validate_cpu_parameter(const char *param, device_t **result);
@@ -41,55 +41,55 @@ private:
 	struct global_entry
 	{
 		void *      base;
-		uint32_t      size;
+		u32         size;
 	};
 
 
 	struct cheat_map
 	{
-		uint64_t      offset;
-		uint64_t      first_value;
-		uint64_t      previous_value;
-		uint8_t       state:1;
-		uint8_t       undo:7;
+		u64         offset;
+		u64         first_value;
+		u64         previous_value;
+		u8          state:1;
+		u8          undo:7;
 	};
 
 	// TODO [RH 31 May 2016]: Move this cheat stuff into its own class
 	struct cheat_system
 	{
 		char        cpu[2];
-		uint8_t       width;
+		u8          width;
 		std::vector<cheat_map> cheatmap;
-		uint8_t       undo;
-		uint8_t       signed_cheat;
-		uint8_t       swapped_cheat;
+		u8          undo;
+		u8          signed_cheat;
+		u8          swapped_cheat;
 	};
 
 
 	struct cheat_region_map
 	{
-		uint64_t      offset;
-		uint64_t      endoffset;
+		u64         offset;
+		u64         endoffset;
 		const char *share;
-		uint8_t       disabled;
+		u8          disabled;
 	};
 
 	bool debug_command_parameter_expression(const char *param, parsed_expression &result);
 	bool debug_command_parameter_command(const char *param);
 
 	bool cheat_address_is_valid(address_space &space, offs_t address);
-	uint64_t cheat_sign_extend(const cheat_system *cheatsys, uint64_t value);
-	uint64_t cheat_byte_swap(const cheat_system *cheatsys, uint64_t value);
-	uint64_t cheat_read_extended(const cheat_system *cheatsys, address_space &space, offs_t address);
+	u64 cheat_sign_extend(const cheat_system *cheatsys, u64 value);
+	u64 cheat_byte_swap(const cheat_system *cheatsys, u64 value);
+	u64 cheat_read_extended(const cheat_system *cheatsys, address_space &space, offs_t address);
 
-	uint64_t execute_min(symbol_table &table, void *ref, int params, const uint64_t *param);
-	uint64_t execute_max(symbol_table &table, void *ref, int params, const uint64_t *param);
-	uint64_t execute_if(symbol_table &table, void *ref, int params, const uint64_t *param);
+	u64 execute_min(symbol_table &table, void *ref, int params, const u64 *param);
+	u64 execute_max(symbol_table &table, void *ref, int params, const u64 *param);
+	u64 execute_if(symbol_table &table, void *ref, int params, const u64 *param);
 
-	uint64_t global_get(symbol_table &table, void *ref);
-	void global_set(symbol_table &table, void *ref, uint64_t value);
+	u64 global_get(symbol_table &table, void *ref);
+	void global_set(symbol_table &table, void *ref, u64 value);
 
-	int mini_printf(char *buffer, const char *format, int params, uint64_t *param);
+	int mini_printf(char *buffer, const char *format, int params, u64 *param);
 
 	void execute_trace_internal(int ref, int params, const char *param[], bool trace_over);
 
@@ -161,8 +161,8 @@ private:
 	void execute_dumpkbd(int ref, int params, const char **param);
 
 	running_machine&    m_machine;
-	debugger_cpu& m_cpu;
-	debugger_console& m_console;
+	debugger_cpu&       m_cpu;
+	debugger_console&   m_console;
 
 	global_entry *m_global_array;
 	cheat_system m_cheat;
@@ -170,4 +170,4 @@ private:
 	static const size_t MAX_GLOBALS;
 };
 
-#endif
+#endif // MAME_EMU_DEBUG_DEBUGCMD_H

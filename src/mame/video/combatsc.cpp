@@ -357,7 +357,7 @@ WRITE8_MEMBER(combatsc_state::combatsc_scrollram_w)
 void combatsc_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, const uint8_t *source, int circuit, bitmap_ind8 &priority_bitmap, uint32_t pri_mask )
 {
 	k007121_device *k007121 = circuit ? m_k007121_2 : m_k007121_1;
-	address_space &space = machine().driver_data()->generic_space();
+	address_space &space = machine().dummy_space();
 	int base_color = (circuit * 4) * 16 + (k007121->ctrlram_r(space, 6) & 0x10) * 2;
 
 	k007121->sprites_draw(bitmap, cliprect, m_gfxdecode->gfx(circuit), *m_palette, source, base_color, 0, 0, priority_bitmap, pri_mask);
@@ -368,7 +368,7 @@ uint32_t combatsc_state::screen_update_combatsc(screen_device &screen, bitmap_in
 {
 	int i;
 
-	address_space &space = machine().driver_data()->generic_space();
+	address_space &space = machine().dummy_space();
 	if (m_k007121_1->ctrlram_r(space, 1) & 0x02)
 	{
 		m_bg_tilemap[0]->set_scroll_rows(32);

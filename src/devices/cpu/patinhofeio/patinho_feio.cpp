@@ -775,8 +775,8 @@ void patinho_feio_cpu_device::execute_instruction()
 	printf("unimplemented opcode: 0x%02X\n", m_opcode);
 }
 
-offs_t patinho_feio_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t patinho_feio_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( patinho_feio );
-	return CPU_DISASSEMBLE_NAME(patinho_feio)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(patinho_feio)(this, stream, pc, oprom, opram, options);
 }

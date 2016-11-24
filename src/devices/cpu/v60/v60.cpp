@@ -112,17 +112,17 @@ v70_device::v70_device(const machine_config &mconfig, const char *tag, device_t 
 }
 
 
-offs_t v60_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t v60_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( v60 );
-	return CPU_DISASSEMBLE_NAME(v60)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(v60)(this, stream, pc, oprom, opram, options);
 }
 
 
-offs_t v70_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t v70_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( v70 );
-	return CPU_DISASSEMBLE_NAME(v70)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(v70)(this, stream, pc, oprom, opram, options);
 }
 
 

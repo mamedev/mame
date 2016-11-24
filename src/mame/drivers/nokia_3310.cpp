@@ -692,7 +692,7 @@ static MACHINE_CONFIG_START( noki3310, noki3310_state )
 	MCFG_CPU_PROGRAM_MAP(noki3310_map)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", LCD, rgb_t::white)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", LCD, rgb_t::white())
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(84, 48)

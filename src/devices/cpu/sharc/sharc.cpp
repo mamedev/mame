@@ -80,10 +80,10 @@ adsp21062_device::adsp21062_device(const machine_config &mconfig, const char *ta
 }
 
 
-offs_t adsp21062_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t adsp21062_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( sharc );
-	return CPU_DISASSEMBLE_NAME(sharc)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(sharc)(this, stream, pc, oprom, opram, options);
 }
 
 void adsp21062_device::enable_recompiler()

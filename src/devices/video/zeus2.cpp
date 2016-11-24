@@ -80,7 +80,7 @@ void zeus2_device::device_start()
 	m_irq.resolve_safe();
 
 	/* we need to cleanup on exit */
-	//machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(zeus2_device::exit_handler2), this));
+	//machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&zeus2_device::exit_handler2, this));
 
 	int_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(zeus2_device::int_timer_callback), this));
 	vblank_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(zeus2_device::display_irq), this));
@@ -1071,7 +1071,7 @@ void zeus2_device::zeus2_draw_model(uint32_t baseaddr, uint16_t count, int logit
 				if (logit)
 				{
 					//if ((cmd == 0x38) || (cmd == 0x2d))
-					//	log_render_info(texdata);
+					//  log_render_info(texdata);
 					if (cmd != 0x00 || (cmd == 0x00 && curoffs == count)) {
 						logerror("\t");
 						for (int offs = 0; offs < databufcount; offs++)
@@ -1120,24 +1120,24 @@ void zeus2_device::zeus2_draw_model(uint32_t baseaddr, uint16_t count, int logit
 							// Direct commands from waveram buffer
 							//uint32_t cmdData[2];
 							//for (int subIndex = 0; subIndex < 2; ++subIndex) {
-							//	uint32_t offset = (databuffer[subIndex] & 0xff) * 6;
-							//	//printf("directRead curoffs: 0x%X\n", curoffs);
-							//	for (int cmdIndex = 0; cmdIndex < 3; ++cmdIndex) {
-							//		cmdData[0] = m_directCmd[offset + cmdIndex * 2 + 0];
-							//		cmdData[1] = m_directCmd[offset + cmdIndex * 2 + 1];
-							//		if (curoffs < 0x40)
-							//			printf("directRead curoffs: 0x%X cmdData %08X %08X\n", curoffs, cmdData[0], cmdData[1]);
-							//		if (cmdData[0] != 0 && cmdData[1] != 0) {
-							//			// Error check
-							//			if (cmdData[0] != 0x58 && cmdData[0] != 0x5A) {
-							//				if (curoffs < 0x20)
-							//					printf("case38 error curoffs: 0x%X cmdData %08X %08X\n", curoffs, cmdData[0], cmdData[1]);
-							//			}
-							//			else {
-							//				zeus2_register32_w(cmdData[0] & 0x7f, cmdData[1], logit);
-							//			}
-							//		}
-							//	}
+							//  uint32_t offset = (databuffer[subIndex] & 0xff) * 6;
+							//  //printf("directRead curoffs: 0x%X\n", curoffs);
+							//  for (int cmdIndex = 0; cmdIndex < 3; ++cmdIndex) {
+							//      cmdData[0] = m_directCmd[offset + cmdIndex * 2 + 0];
+							//      cmdData[1] = m_directCmd[offset + cmdIndex * 2 + 1];
+							//      if (curoffs < 0x40)
+							//          printf("directRead curoffs: 0x%X cmdData %08X %08X\n", curoffs, cmdData[0], cmdData[1]);
+							//      if (cmdData[0] != 0 && cmdData[1] != 0) {
+							//          // Error check
+							//          if (cmdData[0] != 0x58 && cmdData[0] != 0x5A) {
+							//              if (curoffs < 0x20)
+							//                  printf("case38 error curoffs: 0x%X cmdData %08X %08X\n", curoffs, cmdData[0], cmdData[1]);
+							//          }
+							//          else {
+							//              zeus2_register32_w(cmdData[0] & 0x7f, cmdData[1], logit);
+							//          }
+							//      }
+							//  }
 							//}
 							//void *palbase = waveram0_ptr_from_expanded_addr(m_zeusbase[0x41]);
 							//uint8_t texel = databuffer[0];
@@ -1153,8 +1153,8 @@ void zeus2_device::zeus2_draw_model(uint32_t baseaddr, uint16_t count, int logit
 							//m_frameDepth[m_renderAddr] = 0;
 							//m_frameColor[m_renderAddr++] = databuffer[1] & 0x00ffffff;
 							//if (logit)
-							//	if ((curoffs + 1) % 16 == 0)
-							//		logerror("\n");
+							//  if ((curoffs + 1) % 16 == 0)
+							//      logerror("\n");
 						}
 						else {
 							poly->zeus2_draw_quad(databuffer, texdata, logit);
@@ -1422,7 +1422,7 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 		}
 	}
 	if (logextra & logit && m_state->zeus_quad_size == 14) {
-		m_state->logerror("uknown: int16: %d %d %d %d %d %d %d %d float: %f %f %f %f\n",
+		m_state->logerror("unknown: int16: %d %d %d %d %d %d %d %d float: %f %f %f %f\n",
 			unknown[0], unknown[1], unknown[2], unknown[3], unknown[4], unknown[5], unknown[6], unknown[7],
 			unknownFloat[0], unknownFloat[1], unknownFloat[2], unknownFloat[3]);
 	}
@@ -1550,11 +1550,11 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 	//       tests, but the (numverts == 5) statement below may actually be a quad fan instead of a 5-sided
 	//       polygon.
 	if (numverts == 3)
-		render_triangle(m_state->zeus_cliprect, render_delegate(FUNC(zeus2_renderer::render_poly_8bit), this), 4, clipvert[0], clipvert[1], clipvert[2]);
+		render_triangle(m_state->zeus_cliprect, render_delegate(&zeus2_renderer::render_poly_8bit, this), 4, clipvert[0], clipvert[1], clipvert[2]);
 	else if (numverts == 4)
-		render_polygon<4>(m_state->zeus_cliprect, render_delegate(FUNC(zeus2_renderer::render_poly_8bit), this), 4, clipvert);
+		render_polygon<4>(m_state->zeus_cliprect, render_delegate(&zeus2_renderer::render_poly_8bit, this), 4, clipvert);
 	else if (numverts == 5)
-		render_polygon<5>(m_state->zeus_cliprect, render_delegate(FUNC(zeus2_renderer::render_poly_8bit), this), 4, clipvert);
+		render_polygon<5>(m_state->zeus_cliprect, render_delegate(&zeus2_renderer::render_poly_8bit, this), 4, clipvert);
 }
 
 

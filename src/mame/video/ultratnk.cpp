@@ -139,7 +139,7 @@ void ultratnk_state::screen_eof_ultratnk(screen_device &screen, bool state)
 
 		/* update sound status */
 
-		address_space &space = machine().driver_data()->generic_space();
+		address_space &space = machine().dummy_space();
 		m_discrete->write(space, ULTRATNK_MOTOR_DATA_1, videoram[0x391] & 15);
 		m_discrete->write(space, ULTRATNK_MOTOR_DATA_2, videoram[0x393] & 15);
 	}

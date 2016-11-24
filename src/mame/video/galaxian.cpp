@@ -920,7 +920,7 @@ void galaxian_state::stars_draw_row(bitmap_rgb32 &bitmap, int maxx, int y, uint3
 void galaxian_state::galaxian_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	/* erase the background to black first */
-	bitmap.fill(rgb_t::black, cliprect);
+	bitmap.fill(rgb_t::black(), cliprect);
 
 	/* update the star origin to the current frame */
 	stars_update_origin();
@@ -948,7 +948,7 @@ void galaxian_state::background_draw_colorsplit(bitmap_rgb32 &bitmap, const rect
 		rectangle draw = cliprect;
 		draw.max_x = std::min(draw.max_x, split_flipped * GALAXIAN_XSCALE - 1);
 		if (draw.min_x <= draw.max_x)
-			bitmap.fill(rgb_t::black, draw);
+			bitmap.fill(rgb_t::black(), draw);
 
 		draw = cliprect;
 		draw.min_x = std::max(draw.min_x, split_flipped * GALAXIAN_XSCALE);
@@ -965,7 +965,7 @@ void galaxian_state::background_draw_colorsplit(bitmap_rgb32 &bitmap, const rect
 		draw = cliprect;
 		draw.min_x = std::max(draw.min_x, split * GALAXIAN_XSCALE);
 		if (draw.min_x <= draw.max_x)
-			bitmap.fill(rgb_t::black, draw);
+			bitmap.fill(rgb_t::black(), draw);
 	}
 }
 
@@ -999,7 +999,7 @@ void galaxian_state::scramble_draw_stars(bitmap_rgb32 &bitmap, const rectangle &
 void galaxian_state::scramble_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	/* blue background - 390 ohm resistor */
-	bitmap.fill(m_background_enable ? rgb_t(0,0,0x56) : rgb_t::black, cliprect);
+	bitmap.fill(m_background_enable ? rgb_t(0,0,0x56) : rgb_t::black(), cliprect);
 
 	scramble_draw_stars(bitmap, cliprect, 256);
 }
@@ -1008,7 +1008,7 @@ void galaxian_state::scramble_draw_background(bitmap_rgb32 &bitmap, const rectan
 void galaxian_state::anteater_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	/* blue background, horizontal split as seen on flyer and real cabinet */
-	background_draw_colorsplit(bitmap, cliprect, m_background_enable ? rgb_t(0,0,0x56) : rgb_t::black, 56, 256-56);
+	background_draw_colorsplit(bitmap, cliprect, m_background_enable ? rgb_t(0,0,0x56) : rgb_t::black(), 56, 256-56);
 
 	scramble_draw_stars(bitmap, cliprect, 256);
 }
@@ -1017,7 +1017,7 @@ void galaxian_state::anteater_draw_background(bitmap_rgb32 &bitmap, const rectan
 void galaxian_state::jumpbug_draw_background(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	/* blue background - 390 ohm resistor */
-	bitmap.fill(m_background_enable ? rgb_t(0,0,0x56) : rgb_t::black, cliprect);
+	bitmap.fill(m_background_enable ? rgb_t(0,0,0x56) : rgb_t::black(), cliprect);
 
 	/* render stars same as galaxian but nothing in the status area */
 

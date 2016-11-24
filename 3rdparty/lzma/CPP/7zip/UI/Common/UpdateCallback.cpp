@@ -219,9 +219,7 @@ STDMETHODIMP CArchiveUpdateCallback::GetRawProp(UInt32 index, PROPID propID, con
       return Arc->GetRawProps->GetRawProp(
           ArcItems ? (*ArcItems)[up.ArcIndex].IndexInServer : up.ArcIndex,
           propID, data, dataSize, propType);
-
     {
-      const CUpdatePair2 &up = (*UpdatePairs)[index];
       /*
       if (!up.NewData)
         return E_FAIL;

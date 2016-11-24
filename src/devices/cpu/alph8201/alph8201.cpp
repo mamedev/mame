@@ -441,6 +441,11 @@ void alpha8201_cpu_device::device_start()
 }
 
 
+//-------------------------------------------------
+//  state_import - import state into the device,
+//  after it has been set
+//-------------------------------------------------
+
 void alpha8201_cpu_device::state_import(const device_state_entry &entry)
 {
 	switch (entry.index())
@@ -498,6 +503,11 @@ void alpha8201_cpu_device::state_import(const device_state_entry &entry)
 }
 
 
+//-------------------------------------------------
+//  state_export - export state from the device,
+//  to a known location where it can be read
+//-------------------------------------------------
+
 void alpha8201_cpu_device::state_export(const device_state_entry &entry)
 {
 	switch (entry.index())
@@ -545,6 +555,11 @@ void alpha8201_cpu_device::state_export(const device_state_entry &entry)
 	}
 }
 
+
+//-------------------------------------------------
+//  state_string_export - export state as a string
+//  for the debugger
+//-------------------------------------------------
 
 void alpha8201_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
@@ -673,8 +688,8 @@ void alpha8201_cpu_device::execute_set_input(int inputnum, int state)
 }
 
 
-offs_t alpha8201_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t alpha8201_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( alpha8201 );
-	return CPU_DISASSEMBLE_NAME(alpha8201)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(alpha8201)(this, stream, pc, oprom, opram, options);
 }

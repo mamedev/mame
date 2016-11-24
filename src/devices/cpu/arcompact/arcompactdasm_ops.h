@@ -9,9 +9,9 @@
 
 #include "arcompact_common.h"
 
-#define DASM_OPS_16 char *output, offs_t pc, uint16_t op, const uint8_t* oprom
-#define DASM_OPS_32 char *output, offs_t pc, uint32_t op, const uint8_t* oprom
-#define DASM_PARAMS output, pc, op, oprom
+#define DASM_OPS_16 std::ostream &stream, offs_t pc, uint16_t op, const uint8_t* oprom
+#define DASM_OPS_32 std::ostream &stream, offs_t pc, uint32_t op, const uint8_t* oprom
+#define DASM_PARAMS stream, pc, op, oprom
 
 #define LIMM_REG 62
 

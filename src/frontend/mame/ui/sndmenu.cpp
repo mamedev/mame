@@ -124,7 +124,7 @@ void menu_sound_options::handle()
 //  populate
 //-------------------------------------------------
 
-void menu_sound_options::populate()
+void menu_sound_options::populate(float &customtop, float &custombottom)
 {
 	uint32_t arrow_flags = get_arrow_flags(uint16_t(0), uint16_t(ARRAY_LENGTH(m_sound_rate) - 1), m_cur_rates);
 	m_sample_rate = m_sound_rate[m_cur_rates];
@@ -146,7 +146,7 @@ void menu_sound_options::custom_render(void *selectedref, float top, float botto
 {
 	float width;
 	ui().draw_text_full(container(), _("Sound Options"), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
-									mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
+									mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
 	float maxwidth = std::max(origx2 - origx1, width);
 

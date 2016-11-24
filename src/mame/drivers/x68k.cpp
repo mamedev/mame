@@ -1563,8 +1563,8 @@ MACHINE_START_MEMBER(x68k_state,x68000)
 		floppy_image_device *floppy = m_upd72065->subdevice<floppy_connector>(devname)->get_device();
 		m_fdc.floppy[drive] = floppy;
 		if(floppy) {
-			floppy->setup_load_cb(floppy_image_device::load_cb(FUNC(x68k_state::floppy_load), this));
-			floppy->setup_unload_cb(floppy_image_device::unload_cb(FUNC(x68k_state::floppy_unload), this));
+			floppy->setup_load_cb(floppy_image_device::load_cb(&x68k_state::floppy_load, this));
+			floppy->setup_unload_cb(floppy_image_device::unload_cb(&x68k_state::floppy_unload, this));
 		}
 	}
 	m_fdc.motor = 0;

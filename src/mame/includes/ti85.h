@@ -211,6 +211,7 @@ public:
 	DECLARE_WRITE8_MEMBER( ti83pse_ctimer3_count_w );
 
 
+	void ti8x_update_bank(address_space &space, uint8_t bank, uint8_t *base, uint8_t page, bool is_ram);
 	void update_ti85_memory ();
 	void update_ti83p_memory ();
 	void update_ti83pse_memory ();

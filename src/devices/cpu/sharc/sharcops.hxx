@@ -440,8 +440,8 @@ void adsp21062_device::SET_UREG(int ureg, uint32_t data)
 		case 0xd:
 			switch(reg)
 			{
-				case 0xc:   m_core->px &= U64(0xffffffffffff0000); m_core->px |= (data & 0xffff); break;        /* PX1 */
-				case 0xd:   m_core->px &= U64(0x000000000000ffff); m_core->px |= (uint64_t)data << 16; break;     /* PX2 */
+				case 0xc:   m_core->px &= 0xffffffffffff0000U; m_core->px |= (data & 0xffff); break;        /* PX1 */
+				case 0xd:   m_core->px &= 0x000000000000ffffU; m_core->px |= (uint64_t)data << 16; break;     /* PX2 */
 				default:    fatalerror("SHARC: SET_UREG: unknown register %08X at %08X\n", ureg, m_core->pc);
 			}
 			break;
@@ -2668,29 +2668,29 @@ void adsp21062_device::sharcop_bit_reverse()
 /* push/pop stacks / flush cache */
 void adsp21062_device::sharcop_push_pop_stacks()
 {
-	if (m_core->opcode & U64(0x008000000000))
+	if (m_core->opcode & 0x008000000000U)
 	{
 		fatalerror("sharcop_push_pop_stacks: push loop not implemented\n");
 	}
-	if (m_core->opcode & U64(0x004000000000))
+	if (m_core->opcode & 0x004000000000U)
 	{
 		fatalerror("sharcop_push_pop_stacks: pop loop not implemented\n");
 	}
-	if (m_core->opcode & U64(0x002000000000))
+	if (m_core->opcode & 0x002000000000U)
 	{
 		//fatalerror("sharcop_push_pop_stacks: push sts not implemented\n");
 		PUSH_STATUS_STACK();
 	}
-	if (m_core->opcode & U64(0x001000000000))
+	if (m_core->opcode & 0x001000000000U)
 	{
 		//fatalerror("sharcop_push_pop_stacks: pop sts not implemented\n");
 		POP_STATUS_STACK();
 	}
-	if (m_core->opcode & U64(0x000800000000))
+	if (m_core->opcode & 0x000800000000U)
 	{
 		PUSH_PC(m_core->pcstk);
 	}
-	if (m_core->opcode & U64(0x000400000000))
+	if (m_core->opcode & 0x000400000000U)
 	{
 		POP_PC();
 	}
@@ -2722,8 +2722,8 @@ void adsp21062_device::sharcop_idle()
 void adsp21062_device::sharcop_unimplemented()
 {
 	extern CPU_DISASSEMBLE(sharc);
-	char dasm[1000];
+	std::ostringstream dasm;
 	CPU_DISASSEMBLE_NAME(sharc)(nullptr, dasm, m_core->pc, nullptr, nullptr, 0);
-	osd_printf_debug("SHARC: %08X: %s\n", m_core->pc, dasm);
+	osd_printf_debug("SHARC: %08X: %s\n", m_core->pc, dasm.str().c_str());
 	fatalerror("SHARC: Unimplemented opcode %04X%08X at %08X\n", (uint16_t)(m_core->opcode >> 32), (uint32_t)(m_core->opcode), m_core->pc);
 }

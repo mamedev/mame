@@ -67,12 +67,12 @@ uint32_t sstrangr_state::screen_update_sstrangr(screen_device &screen, bitmap_rg
 
 			if (m_flip_screen)
 			{
-				pen = (data & 0x80) ? rgb_t::white : rgb_t::black;
+				pen = (data & 0x80) ? rgb_t::white() : rgb_t::black();
 				data = data << 1;
 			}
 			else
 			{
-				pen = (data & 0x01) ? rgb_t::white : rgb_t::black;
+				pen = (data & 0x01) ? rgb_t::white() : rgb_t::black();
 				data = data >> 1;
 			}
 

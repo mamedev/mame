@@ -344,7 +344,7 @@ void tx0_state::machine_start()
 	m_typewriter.prt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tx0_state::prt_callback),this));
 	m_dis_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tx0_state::dis_callback),this));
 
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(tx0_state::tx0_machine_stop),this));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&tx0_state::tx0_machine_stop,this));
 }
 
 

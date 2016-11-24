@@ -760,7 +760,7 @@ WRITE8_MEMBER(itech8_state::ym2203_portb_out)
 	/* bit 6 controls the diagnostic sound LED */
 	/* bit 7 controls the ticket dispenser */
 	m_pia_portb_data = data;
-	m_ticket->write(machine().driver_data()->generic_space(), 0, data & 0x80);
+	m_ticket->write(machine().dummy_space(), 0, data & 0x80);
 	machine().bookkeeping().coin_counter_w(0, (data & 0x20) >> 5);
 }
 

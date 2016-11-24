@@ -98,7 +98,7 @@ READ16_MEMBER(m24_z8000_device::pmem_r)
 	uint8_t hostseg;
 	offset <<= 1;
 	if(!m_z8000_mem)
-		return memregion(subtag("z8000").c_str())->u16(offset >> 1);
+		return memregion(subtag("z8000").c_str())->as_u16(offset >> 1);
 
 	hostseg = pmem_table[(offset >> 16) & 0xf][(offset >> 14) & 3];
 	if(hostseg == 255)

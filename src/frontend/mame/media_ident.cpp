@@ -157,7 +157,7 @@ void media_identifier::identify_file(const char *name)
 		if (filerr == osd_file::error::NONE && length > 0)
 		{
 			identify_data(name, reinterpret_cast<uint8_t *>(data), length);
-			osd_free(data);
+			free(data);
 		}
 	}
 }

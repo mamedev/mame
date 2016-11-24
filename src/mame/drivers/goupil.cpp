@@ -117,11 +117,8 @@ static ADDRESS_MAP_START(goupil_mem, AS_PROGRAM, 8, goupil_g1_state)
 	AM_RANGE(0xE800,0xE80F) AM_DEVREADWRITE("ef6850", acia6850_device, data_r, data_w)
 	AM_RANGE(0xE810,0xE81F) AM_DEVREADWRITE("m_via_video", via6522_device, read, write)
 
-	AM_RANGE(0xE820,0xE820) AM_DEVREADWRITE("i8279_kb1", i8279_device, data_r, data_w )
-	AM_RANGE(0xE821,0xE821) AM_DEVREADWRITE("i8279_kb1", i8279_device, status_r, cmd_w )
-
-	AM_RANGE(0xE830,0xE830) AM_DEVREADWRITE("i8279_kb2", i8279_device, data_r, data_w )
-	AM_RANGE(0xE831,0xE831) AM_DEVREADWRITE("i8279_kb2", i8279_device, status_r, cmd_w )
+	AM_RANGE(0xe820, 0xe821) AM_DEVREADWRITE("i8279_kb1", i8279_device, read, write)
+	AM_RANGE(0xe830, 0xe831) AM_DEVREADWRITE("i8279_kb2", i8279_device, read, write)
 
 	AM_RANGE(0xE840,0xE84F) AM_DEVREADWRITE("m_via_keyb", via6522_device, read, write)
 

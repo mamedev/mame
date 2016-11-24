@@ -47,6 +47,10 @@ running lua code
 	int value = lua.script("return 54");
 	// value == 54
 
+To check the success of a loading operation:
+
+.. code-block:: cpp
+
 	// load file without execute
 	sol::load_result script1 = lua.load_file("path/to/luascript.lua");
 	script1(); //execute
@@ -58,6 +62,24 @@ running lua code
 	int value2 = script3(); // execute, get return value
 	// value2 == 24
 
+
+To check whether a script was successfully run or not (after loading is assumed to be successful):
+
+.. code-block:: cpp
+
+	// execute and return result
+	sol::protected_function_result result1 = lua.do_string("return 24");
+	if (result1.valid()) {
+		int value = result1;
+		// value == 24
+		// yay!
+	}
+	else {
+		// ahhh :c
+	}
+	
+
+There is also ``lua.do_file("path/to/luascript.lua");``.
 
 set and get variables
 ---------------------

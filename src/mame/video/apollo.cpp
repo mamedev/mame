@@ -1698,7 +1698,7 @@ void apollo_graphics_15i::register_vblank_callback()
 
 	/* register for VBLANK callbacks */
 	screen_device *screen = (screen_device *)machine().device(VIDEO_SCREEN_TAG);
-	screen->register_vblank_callback(vblank_state_delegate(FUNC(apollo_graphics_15i::vblank_state_changed),this));
+	screen->register_vblank_callback(vblank_state_delegate(&apollo_graphics_15i::vblank_state_changed,this));
 }
 
 

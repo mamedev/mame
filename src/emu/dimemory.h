@@ -14,8 +14,8 @@
 #error Dont include this file directly; include emu.h instead.
 #endif
 
-#ifndef __DIMEMORY_H__
-#define __DIMEMORY_H__
+#ifndef MAME_EMU_DIMEMORY_H
+#define MAME_EMU_DIMEMORY_H
 
 
 //**************************************************************************
@@ -23,19 +23,19 @@
 //**************************************************************************
 
 // Translation intentions
-const int TRANSLATE_TYPE_MASK       = 0x03;     // read write or fetch
-const int TRANSLATE_USER_MASK       = 0x04;     // user mode or fully privileged
-const int TRANSLATE_DEBUG_MASK      = 0x08;     // debug mode (no side effects)
+constexpr int TRANSLATE_TYPE_MASK       = 0x03;     // read write or fetch
+constexpr int TRANSLATE_USER_MASK       = 0x04;     // user mode or fully privileged
+constexpr int TRANSLATE_DEBUG_MASK      = 0x08;     // debug mode (no side effects)
 
-const int TRANSLATE_READ            = 0;        // translate for read
-const int TRANSLATE_WRITE           = 1;        // translate for write
-const int TRANSLATE_FETCH           = 2;        // translate for instruction fetch
-const int TRANSLATE_READ_USER       = (TRANSLATE_READ | TRANSLATE_USER_MASK);
-const int TRANSLATE_WRITE_USER      = (TRANSLATE_WRITE | TRANSLATE_USER_MASK);
-const int TRANSLATE_FETCH_USER      = (TRANSLATE_FETCH | TRANSLATE_USER_MASK);
-const int TRANSLATE_READ_DEBUG      = (TRANSLATE_READ | TRANSLATE_DEBUG_MASK);
-const int TRANSLATE_WRITE_DEBUG     = (TRANSLATE_WRITE | TRANSLATE_DEBUG_MASK);
-const int TRANSLATE_FETCH_DEBUG     = (TRANSLATE_FETCH | TRANSLATE_DEBUG_MASK);
+constexpr int TRANSLATE_READ            = 0;        // translate for read
+constexpr int TRANSLATE_WRITE           = 1;        // translate for write
+constexpr int TRANSLATE_FETCH           = 2;        // translate for instruction fetch
+constexpr int TRANSLATE_READ_USER       = (TRANSLATE_READ | TRANSLATE_USER_MASK);
+constexpr int TRANSLATE_WRITE_USER      = (TRANSLATE_WRITE | TRANSLATE_USER_MASK);
+constexpr int TRANSLATE_FETCH_USER      = (TRANSLATE_FETCH | TRANSLATE_USER_MASK);
+constexpr int TRANSLATE_READ_DEBUG      = (TRANSLATE_READ | TRANSLATE_DEBUG_MASK);
+constexpr int TRANSLATE_WRITE_DEBUG     = (TRANSLATE_WRITE | TRANSLATE_DEBUG_MASK);
+constexpr int TRANSLATE_FETCH_DEBUG     = (TRANSLATE_FETCH | TRANSLATE_DEBUG_MASK);
 
 
 
@@ -100,9 +100,9 @@ public:
 	bool translate(address_spacenum spacenum, int intention, offs_t &address) { return memory_translate(spacenum, intention, address); }
 
 	// read/write access
-	bool read(address_spacenum spacenum, offs_t offset, int size, uint64_t &value) { return memory_read(spacenum, offset, size, value); }
-	bool write(address_spacenum spacenum, offs_t offset, int size, uint64_t value) { return memory_write(spacenum, offset, size, value); }
-	bool readop(offs_t offset, int size, uint64_t &value) { return memory_readop(offset, size, value); }
+	bool read(address_spacenum spacenum, offs_t offset, int size, u64 &value) { return memory_read(spacenum, offset, size, value); }
+	bool write(address_spacenum spacenum, offs_t offset, int size, u64 value) { return memory_write(spacenum, offset, size, value); }
+	bool readop(offs_t offset, int size, u64 &value) { return memory_readop(offset, size, value); }
 
 	// deliberately ambiguous functions; if you have the memory interface
 	// just use it
@@ -114,9 +114,9 @@ protected:
 
 	// optional operation overrides
 	virtual bool memory_translate(address_spacenum spacenum, int intention, offs_t &address);
-	virtual bool memory_read(address_spacenum spacenum, offs_t offset, int size, uint64_t &value);
-	virtual bool memory_write(address_spacenum spacenum, offs_t offset, int size, uint64_t value);
-	virtual bool memory_readop(offs_t offset, int size, uint64_t &value);
+	virtual bool memory_read(address_spacenum spacenum, offs_t offset, int size, u64 &value);
+	virtual bool memory_write(address_spacenum spacenum, offs_t offset, int size, u64 value);
+	virtual bool memory_readop(offs_t offset, int size, u64 &value);
 
 	// interface-level overrides
 	virtual void interface_validity_check(validity_checker &valid) const override;
@@ -134,4 +134,4 @@ typedef device_interface_iterator<device_memory_interface> memory_interface_iter
 
 
 
-#endif  /* __DIMEMORY_H__ */
+#endif  /* MAME_EMU_DIMEMORY_H */

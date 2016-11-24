@@ -416,7 +416,7 @@ uint32_t read_uint32(FILE *infile)
 
 uint64_t read_uint64(FILE *infile)
 {
-	uint64_t res0 = U64(0), res1 = U64(0);
+	uint64_t res0(0), res1(0);
 	uint64_t res;
 	unsigned char buffer[8];
 

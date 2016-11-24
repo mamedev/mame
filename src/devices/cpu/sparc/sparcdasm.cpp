@@ -603,19 +603,12 @@ template <typename T> inline void sparc_disassembler::add_vis_op_desc(const T &d
 		m_vis_op_desc.insert(it);
 }
 
-inline void sparc_disassembler::pad_op_field(char *buf, char *&output) const
+inline void sparc_disassembler::pad_op_field(std::ostream &stream, std::streampos start_position) const
 {
-	while ((output - buf) < m_op_field_width) *output++ = ' ';
+	const std::streamoff difference(stream.tellp() - start_position);
+	for (std::streamoff i = difference; i < m_op_field_width; i++)
+		stream << ' ';
 }
-
-inline void sparc_disassembler::print(char *&output, const char *fmt, ...)
-{
-	va_list vl;
-	va_start(vl, fmt);
-	output += std::vsprintf(output, fmt, vl);
-	va_end(vl);
-}
-
 
 sparc_disassembler::sparc_disassembler(const sparc_debug_state *state, unsigned version)
 	: sparc_disassembler(state, version, vis_none)
@@ -730,7 +723,7 @@ sparc_disassembler::sparc_disassembler(const sparc_debug_state *state, unsigned 
 }
 
 
-offs_t sparc_disassembler::dasm(char *buf, offs_t pc, uint32_t op) const
+offs_t sparc_disassembler::dasm(std::ostream &stream, offs_t pc, uint32_t op) const
 {
 	switch (OP)
 	{
@@ -738,20 +731,20 @@ offs_t sparc_disassembler::dasm(char *buf, offs_t pc, uint32_t op) const
 		switch (OP2)
 		{
 		case 0:
-			print(buf, "%-*s0x%06x", m_op_field_width, (m_version >= 9) ? "illtrap" : "unimp", CONST22);
+			util::stream_format(stream, "%-*s0x%06x", m_op_field_width, (m_version >= 9) ? "illtrap" : "unimp", CONST22);
 			break;
 		case 4:
 			if (IMM22 == 0 && RD == 0)
-				print(buf, "nop");
+				util::stream_format(stream, "nop");
 			else
-				print(buf, "%-*s%%hi(0x%08x),%s", m_op_field_width, "sethi", IMM22, REG_NAMES[RD]);
+				util::stream_format(stream, "%-*s%%hi(0x%08x),%s", m_op_field_width, "sethi", IMM22, REG_NAMES[RD]);
 			break;
 		default:
-			return dasm_branch(buf, pc, op);
+			return dasm_branch(stream, pc, op);
 		}
 		return 4 | DASMFLAG_SUPPORTED;
 	case 1:
-		print(buf, "%-*s%%pc%c0x%08x ! 0x%08x", m_op_field_width, "call", (DISP30 < 0) ? '-' : '+', std::abs(DISP30), pc + DISP30);
+		util::stream_format(stream, "%-*s%%pc%c0x%08x ! 0x%08x", m_op_field_width, "call", (DISP30 < 0) ? '-' : '+', std::abs(DISP30), pc + DISP30);
 		return 4 | DASMFLAG_SUPPORTED;
 	case 2:
 		switch (OP3)
@@ -759,31 +752,31 @@ offs_t sparc_disassembler::dasm(char *buf, offs_t pc, uint32_t op) const
 		case 0x00:
 			if (USEIMM && (RS1 == RD))
 			{
-				if (SIMM13 == 1)    print(buf, "%-*s%s", m_op_field_width, "inc", REG_NAMES[RD]);
-				else                print(buf, "%-*s%d,%s", m_op_field_width, "inc", SIMM13, REG_NAMES[RD]);
+				if (SIMM13 == 1)    util::stream_format(stream, "%-*s%s", m_op_field_width, "inc", REG_NAMES[RD]);
+				else                util::stream_format(stream, "%-*s%d,%s", m_op_field_width, "inc", SIMM13, REG_NAMES[RD]);
 				return 4 | DASMFLAG_SUPPORTED;
 			}
 			break;
 		case 0x02:
 			if (RS1 == 0)
 			{
-				if (USEIMM)         print(buf, "%-*s%d,%s", m_op_field_width, "mov", SIMM13, REG_NAMES[RD]);
-				else if (RS2 == 0)  print(buf, "%-*s%s", m_op_field_width, "clr", REG_NAMES[RD]);
-				else                print(buf, "%-*s%s,%s", m_op_field_width, "mov", REG_NAMES[RS2], REG_NAMES[RD]);
+				if (USEIMM)         util::stream_format(stream, "%-*s%d,%s", m_op_field_width, "mov", SIMM13, REG_NAMES[RD]);
+				else if (RS2 == 0)  util::stream_format(stream, "%-*s%s", m_op_field_width, "clr", REG_NAMES[RD]);
+				else                util::stream_format(stream, "%-*s%s,%s", m_op_field_width, "mov", REG_NAMES[RS2], REG_NAMES[RD]);
 				return 4 | DASMFLAG_SUPPORTED;
 			}
 			else if (RS1 == RD)
 			{
-				if (USEIMM) print(buf, "%-*s0x%08x,%s", m_op_field_width, "bset", SIMM13, REG_NAMES[RD]);
-				else        print(buf, "%-*s%s,%s", m_op_field_width, "bset", REG_NAMES[RS2], REG_NAMES[RD]);
+				if (USEIMM) util::stream_format(stream, "%-*s0x%08x,%s", m_op_field_width, "bset", SIMM13, REG_NAMES[RD]);
+				else        util::stream_format(stream, "%-*s%s,%s", m_op_field_width, "bset", REG_NAMES[RS2], REG_NAMES[RD]);
 				return 4 | DASMFLAG_SUPPORTED;
 			}
 			break;
 		case 0x03:
 			if (RS1 == RD)
 			{
-				if (USEIMM) print(buf, "%-*s0x%08x,%s", m_op_field_width, "btog", SIMM13, REG_NAMES[RD]);
-				else        print(buf, "%-*s%s,%s", m_op_field_width, "btog", REG_NAMES[RS2], REG_NAMES[RD]);
+				if (USEIMM) util::stream_format(stream, "%-*s0x%08x,%s", m_op_field_width, "btog", SIMM13, REG_NAMES[RD]);
+				else        util::stream_format(stream, "%-*s%s,%s", m_op_field_width, "btog", REG_NAMES[RS2], REG_NAMES[RD]);
 				return 4 | DASMFLAG_SUPPORTED;
 			}
 			break;
@@ -792,8 +785,8 @@ offs_t sparc_disassembler::dasm(char *buf, offs_t pc, uint32_t op) const
 			{
 				if (RS1 == RD)
 				{
-					if (SIMM13 == 1)    print(buf, "%-*s%s", m_op_field_width, "dec", REG_NAMES[RD]);
-					else                print(buf, "%-*s%d,%s", m_op_field_width, "dec", SIMM13, REG_NAMES[RD]);
+					if (SIMM13 == 1)    util::stream_format(stream, "%-*s%s", m_op_field_width, "dec", REG_NAMES[RD]);
+					else                util::stream_format(stream, "%-*s%d,%s", m_op_field_width, "dec", SIMM13, REG_NAMES[RD]);
 					return 4 | DASMFLAG_SUPPORTED;
 				}
 			}
@@ -801,8 +794,8 @@ offs_t sparc_disassembler::dasm(char *buf, offs_t pc, uint32_t op) const
 			{
 				if (RS1 == 0)
 				{
-					if (RS2 == RD)  print(buf, "%-*s%s", m_op_field_width, "neg", REG_NAMES[RD]);
-					else            print(buf, "%-*s%s,%s", m_op_field_width, "neg", REG_NAMES[RS2], REG_NAMES[RD]);
+					if (RS2 == RD)  util::stream_format(stream, "%-*s%s", m_op_field_width, "neg", REG_NAMES[RD]);
+					else            util::stream_format(stream, "%-*s%s,%s", m_op_field_width, "neg", REG_NAMES[RS2], REG_NAMES[RD]);
 					return 4 | DASMFLAG_SUPPORTED;
 				}
 			}
@@ -810,54 +803,54 @@ offs_t sparc_disassembler::dasm(char *buf, offs_t pc, uint32_t op) const
 		case 0x05:
 			if (RS1 == RD)
 			{
-				if (USEIMM) print(buf, "%-*s0x%08x,%s", m_op_field_width, "bclr", SIMM13, REG_NAMES[RD]);
-				else        print(buf, "%-*s%s,%s", m_op_field_width, "bclr", REG_NAMES[RS2], REG_NAMES[RD]);
+				if (USEIMM) util::stream_format(stream, "%-*s0x%08x,%s", m_op_field_width, "bclr", SIMM13, REG_NAMES[RD]);
+				else        util::stream_format(stream, "%-*s%s,%s", m_op_field_width, "bclr", REG_NAMES[RS2], REG_NAMES[RD]);
 				return 4 | DASMFLAG_SUPPORTED;
 			}
 			break;
 		case 0x07:
 			if ((USEIMM && (SIMM13 == 0)) || (!USEIMM && (RS2 == 0)))
 			{
-				if (RS1 == RD)  print(buf, "%-*s%s", m_op_field_width, "not", REG_NAMES[RD]);
-				else            print(buf, "%-*s%s,%s", m_op_field_width, "not", REG_NAMES[RS1], REG_NAMES[RD]);
+				if (RS1 == RD)  util::stream_format(stream, "%-*s%s", m_op_field_width, "not", REG_NAMES[RD]);
+				else            util::stream_format(stream, "%-*s%s,%s", m_op_field_width, "not", REG_NAMES[RS1], REG_NAMES[RD]);
 				return 4 | DASMFLAG_SUPPORTED;
 			}
 			break;
 		case 0x10:
 			if (USEIMM && (RS1 == RD))
 			{
-				if (SIMM13 == 1)    print(buf, "%-*s%s", m_op_field_width, "inccc", REG_NAMES[RD]);
-				else                print(buf, "%-*s%d,%s", m_op_field_width, "inccc", SIMM13, REG_NAMES[RD]);
+				if (SIMM13 == 1)    util::stream_format(stream, "%-*s%s", m_op_field_width, "inccc", REG_NAMES[RD]);
+				else                util::stream_format(stream, "%-*s%d,%s", m_op_field_width, "inccc", SIMM13, REG_NAMES[RD]);
 				return 4 | DASMFLAG_SUPPORTED;
 			}
 			break;
 		case 0x12:
 			if (!USEIMM && (RS1 == 0) && (RD == 0))
 			{
-				print(buf, "%-*s%s", m_op_field_width, "tst", REG_NAMES[RS2]);
+				util::stream_format(stream, "%-*s%s", m_op_field_width, "tst", REG_NAMES[RS2]);
 				return 4 | DASMFLAG_SUPPORTED;
 			}
 			break;
 		case 0x14:
 			if (USEIMM && (RS1 == RD) && (RD != 0))
 			{
-				if (SIMM13 == 1)    print(buf, "%-*s%s", m_op_field_width, "deccc", REG_NAMES[RD]);
-				else                print(buf, "%-*s%d,%s", m_op_field_width, "deccc", SIMM13, REG_NAMES[RD]);
+				if (SIMM13 == 1)    util::stream_format(stream, "%-*s%s", m_op_field_width, "deccc", REG_NAMES[RD]);
+				else                util::stream_format(stream, "%-*s%d,%s", m_op_field_width, "deccc", SIMM13, REG_NAMES[RD]);
 				return 4 | DASMFLAG_SUPPORTED;
 			}
 			break;
 		case 0x25:
-			return dasm_shift(buf, pc, op, "sll", "sllx", nullptr);
+			return dasm_shift(stream, pc, op, "sll", "sllx", nullptr);
 		case 0x26:
-			return dasm_shift(buf, pc, op, "srl", "srlx", "clruw");
+			return dasm_shift(stream, pc, op, "srl", "srlx", "clruw");
 		case 0x27:
-			return dasm_shift(buf, pc, op, "sra", "srax", "signx");
+			return dasm_shift(stream, pc, op, "sra", "srax", "signx");
 		case 0x28:
-			return dasm_read_state_reg(buf, pc, op);
+			return dasm_read_state_reg(stream, pc, op);
 		case 0x29:
 			if (m_version <= 8)
 			{
-				print(buf, "%-*s%%psr,%s", m_op_field_width, "rd", REG_NAMES[RD]);
+				util::stream_format(stream, "%-*s%%psr,%s", m_op_field_width, "rd", REG_NAMES[RD]);
 				return 4 | DASMFLAG_SUPPORTED;
 			}
 			break;
@@ -866,13 +859,13 @@ offs_t sparc_disassembler::dasm(char *buf, offs_t pc, uint32_t op) const
 			{
 				if (V9_PRIV_REG_NAMES[RS1])
 				{
-					print(buf, "%-*s%s,%s", m_op_field_width, "rdpr", V9_PRIV_REG_NAMES[RS1], REG_NAMES[RD]);
+					util::stream_format(stream, "%-*s%s,%s", m_op_field_width, "rdpr", V9_PRIV_REG_NAMES[RS1], REG_NAMES[RD]);
 					return 4 | DASMFLAG_SUPPORTED;
 				}
 			}
 			else
 			{
-				print(buf, "%-*s%%wim,%s", m_op_field_width, "rd", REG_NAMES[RD]);
+				util::stream_format(stream, "%-*s%%wim,%s", m_op_field_width, "rd", REG_NAMES[RD]);
 				return 4 | DASMFLAG_SUPPORTED;
 			}
 			break;
@@ -881,40 +874,40 @@ offs_t sparc_disassembler::dasm(char *buf, offs_t pc, uint32_t op) const
 			{
 				if (!USEIMM)
 				{
-					print(buf, "flushw");
+					util::stream_format(stream, "flushw");
 					return 4 | DASMFLAG_SUPPORTED;
 				}
 			}
 			else
 			{
-				print(buf, "%-*s%%tbr,%s", m_op_field_width, "rd", REG_NAMES[RD]);
+				util::stream_format(stream, "%-*s%%tbr,%s", m_op_field_width, "rd", REG_NAMES[RD]);
 				return 4 | DASMFLAG_SUPPORTED;
 			}
 			break;
 		case 0x2c:
-			return dasm_move_cond(buf, pc, op);
+			return dasm_move_cond(stream, pc, op);
 		case 0x2e:
 			if ((m_version >= 9) && (RS1 == 0))
 			{
-				if (USEIMM) print(buf, "%-*s%d,%s", m_op_field_width, "popc", SIMM13, REG_NAMES[RD]);
-				else        print(buf, "%-*s%s,%s", m_op_field_width, "popc", REG_NAMES[RS2], REG_NAMES[RD]);
+				if (USEIMM) util::stream_format(stream, "%-*s%d,%s", m_op_field_width, "popc", SIMM13, REG_NAMES[RD]);
+				else        util::stream_format(stream, "%-*s%s,%s", m_op_field_width, "popc", REG_NAMES[RS2], REG_NAMES[RD]);
 				return 4 | DASMFLAG_SUPPORTED;
 			}
 			break;
 		case 0x2f:
-			return dasm_move_reg_cond(buf, pc, op);
+			return dasm_move_reg_cond(stream, pc, op);
 		case 0x30:
-			return dasm_write_state_reg(buf, pc, op);
+			return dasm_write_state_reg(stream, pc, op);
 		case 0x31:
 			if (m_version >= 9)
 			{
 				switch (RD)
 				{
 				case 0:
-					print(buf, "saved");
+					util::stream_format(stream, "saved");
 					return 4 | DASMFLAG_SUPPORTED;
 				case 1:
-					print(buf, "restored");
+					util::stream_format(stream, "restored");
 					return 4 | DASMFLAG_SUPPORTED;
 				}
 			}
@@ -922,13 +915,13 @@ offs_t sparc_disassembler::dasm(char *buf, offs_t pc, uint32_t op) const
 			{
 				if (RS1 == 0)
 				{
-					if (USEIMM) print(buf, "%-*s0x%08x,%%psr", m_op_field_width, "mov", SIMM13);
-					else        print(buf, "%-*s%s,%%psr", m_op_field_width, "mov", REG_NAMES[RS2]);
+					if (USEIMM) util::stream_format(stream, "%-*s0x%08x,%%psr", m_op_field_width, "mov", SIMM13);
+					else        util::stream_format(stream, "%-*s%s,%%psr", m_op_field_width, "mov", REG_NAMES[RS2]);
 				}
 				else
 				{
-					if (USEIMM) print(buf, "%-*s%s,0x%08x,%%psr", m_op_field_width, "wr", REG_NAMES[RS1], SIMM13);
-					else        print(buf, "%-*s%s,%s,%%psr", m_op_field_width, "wr", REG_NAMES[RS1], REG_NAMES[RS2]);
+					if (USEIMM) util::stream_format(stream, "%-*s%s,0x%08x,%%psr", m_op_field_width, "wr", REG_NAMES[RS1], SIMM13);
+					else        util::stream_format(stream, "%-*s%s,%s,%%psr", m_op_field_width, "wr", REG_NAMES[RS1], REG_NAMES[RS2]);
 				}
 				return 4 | DASMFLAG_SUPPORTED;
 			}
@@ -939,9 +932,9 @@ offs_t sparc_disassembler::dasm(char *buf, offs_t pc, uint32_t op) const
 				if (V9_PRIV_REG_NAMES[RD])
 				{
 					// FIXME: this disassembles wrpr to %fq and %ver which are actually illegal
-					if (!USEIMM)        print(buf, "%-*s%s,%s,%s", m_op_field_width, "wrpr", REG_NAMES[RS1], REG_NAMES[RS2], V9_PRIV_REG_NAMES[RD]);
-					else if (RS1 == 0)  print(buf, "%-*s0x%08x,%s", m_op_field_width, "wrpr", SIMM13, V9_PRIV_REG_NAMES[RD]);
-					else                print(buf, "%-*s%s,0x%08x,%s", m_op_field_width, "wrpr", REG_NAMES[RS1], SIMM13, V9_PRIV_REG_NAMES[RD]);
+					if (!USEIMM)        util::stream_format(stream, "%-*s%s,%s,%s", m_op_field_width, "wrpr", REG_NAMES[RS1], REG_NAMES[RS2], V9_PRIV_REG_NAMES[RD]);
+					else if (RS1 == 0)  util::stream_format(stream, "%-*s0x%08x,%s", m_op_field_width, "wrpr", SIMM13, V9_PRIV_REG_NAMES[RD]);
+					else                util::stream_format(stream, "%-*s%s,0x%08x,%s", m_op_field_width, "wrpr", REG_NAMES[RS1], SIMM13, V9_PRIV_REG_NAMES[RD]);
 					return 4 | DASMFLAG_SUPPORTED;
 				}
 			}
@@ -949,13 +942,13 @@ offs_t sparc_disassembler::dasm(char *buf, offs_t pc, uint32_t op) const
 			{
 				if (RS1 == 0)
 				{
-					if (USEIMM) print(buf, "%-*s0x%08x,%%wim", m_op_field_width, "mov", SIMM13);
-					else        print(buf, "%-*s%s,%%wim", m_op_field_width, "mov", REG_NAMES[RS2]);
+					if (USEIMM) util::stream_format(stream, "%-*s0x%08x,%%wim", m_op_field_width, "mov", SIMM13);
+					else        util::stream_format(stream, "%-*s%s,%%wim", m_op_field_width, "mov", REG_NAMES[RS2]);
 				}
 				else
 				{
-					if (USEIMM) print(buf, "%-*s%s,0x%08x,%%wim", m_op_field_width, "wr", REG_NAMES[RS1], SIMM13);
-					else        print(buf, "%-*s%s,%s,%%wim", m_op_field_width, "wr", REG_NAMES[RS1], REG_NAMES[RS2]);
+					if (USEIMM) util::stream_format(stream, "%-*s%s,0x%08x,%%wim", m_op_field_width, "wr", REG_NAMES[RS1], SIMM13);
+					else        util::stream_format(stream, "%-*s%s,%s,%%wim", m_op_field_width, "wr", REG_NAMES[RS1], REG_NAMES[RS2]);
 				}
 				return 4 | DASMFLAG_SUPPORTED;
 			}
@@ -965,51 +958,51 @@ offs_t sparc_disassembler::dasm(char *buf, offs_t pc, uint32_t op) const
 			{
 				if (RS1 == 0)
 				{
-					if (USEIMM) print(buf, "%-*s0x%08x,%%tbr", m_op_field_width, "mov", SIMM13);
-					else        print(buf, "%-*s%s,%%tbr", m_op_field_width, "mov", REG_NAMES[RS2]);
+					if (USEIMM) util::stream_format(stream, "%-*s0x%08x,%%tbr", m_op_field_width, "mov", SIMM13);
+					else        util::stream_format(stream, "%-*s%s,%%tbr", m_op_field_width, "mov", REG_NAMES[RS2]);
 				}
 				else
 				{
-					if (USEIMM) print(buf, "%-*s%s,0x%08x,%%tbr", m_op_field_width, "wr", REG_NAMES[RS1], SIMM13);
-					else        print(buf, "%-*s%s,%s,%%tbr", m_op_field_width, "wr", REG_NAMES[RS1], REG_NAMES[RS2]);
+					if (USEIMM) util::stream_format(stream, "%-*s%s,0x%08x,%%tbr", m_op_field_width, "wr", REG_NAMES[RS1], SIMM13);
+					else        util::stream_format(stream, "%-*s%s,%s,%%tbr", m_op_field_width, "wr", REG_NAMES[RS1], REG_NAMES[RS2]);
 				}
 				return 4 | DASMFLAG_SUPPORTED;
 			}
 			break;
 		case 0x34:
-			return dasm_fpop1(buf, pc, op);
+			return dasm_fpop1(stream, pc, op);
 		case 0x35:
-			return dasm_fpop2(buf, pc, op);
+			return dasm_fpop2(stream, pc, op);
 		case 0x36:
-			return dasm_impdep1(buf, pc, op);
+			return dasm_impdep1(stream, pc, op);
 		case 0x37:
 			// TODO: hooks for IMPDEP2/CPop2
 			break;
 		case 0x38:
-			return dasm_jmpl(buf, pc, op);
+			return dasm_jmpl(stream, pc, op);
 		case 0x39:
-			return dasm_return(buf, pc, op);
+			return dasm_return(stream, pc, op);
 		case 0x3a:
-			return dasm_tcc(buf, pc, op);
+			return dasm_tcc(stream, pc, op);
 		case 0x3b:
 			if (m_version >= 8)
 			{
-				print(buf, "%-*s", m_op_field_width, "flush");
-				dasm_address(buf, op);
+				util::stream_format(stream, "%-*s", m_op_field_width, "flush");
+				dasm_address(stream, op);
 				return 4 | DASMFLAG_SUPPORTED;
 			}
 			break;
 		case 0x3c:
 			if (!USEIMM && (RS1 == RS2) && (RS2 == RD) && (RD == 0))
 			{
-				print(buf, "save");
+				util::stream_format(stream, "save");
 				return 4 | DASMFLAG_SUPPORTED;
 			}
 			break;
 		case 0x3d:
 			if (!USEIMM && (RS1 == RS2) && (RS2 == RD) && (RD == 0))
 			{
-				print(buf, "restore");
+				util::stream_format(stream, "restore");
 				return 4 | DASMFLAG_SUPPORTED;
 			}
 			break;
@@ -1018,8 +1011,8 @@ offs_t sparc_disassembler::dasm(char *buf, offs_t pc, uint32_t op) const
 			{
 				switch (RD)
 				{
-				case 0: print(buf, "done"); return 4 | DASMFLAG_SUPPORTED;
-				case 1: print(buf, "retry"); return 4 | DASMFLAG_SUPPORTED;
+				case 0: util::stream_format(stream, "done"); return 4 | DASMFLAG_SUPPORTED;
+				case 1: util::stream_format(stream, "retry"); return 4 | DASMFLAG_SUPPORTED;
 				}
 			}
 			break;
@@ -1031,115 +1024,115 @@ offs_t sparc_disassembler::dasm(char *buf, offs_t pc, uint32_t op) const
 				if (it->second.g0_synth && (RD == 0))
 				{
 					if (!USEIMM)
-						print(buf, "%-*s%s,%s", m_op_field_width, it->second.g0_synth, REG_NAMES[RS1], REG_NAMES[RS2]);
+						util::stream_format(stream, "%-*s%s,%s", m_op_field_width, it->second.g0_synth, REG_NAMES[RS1], REG_NAMES[RS2]);
 					else if (it->second.hex_imm)
-						print(buf, "%-*s%s,0x%08x", m_op_field_width, it->second.g0_synth, REG_NAMES[RS1], SIMM13);
+						util::stream_format(stream, "%-*s%s,0x%08x", m_op_field_width, it->second.g0_synth, REG_NAMES[RS1], SIMM13);
 					else
-						print(buf, "%-*s%s,%d", m_op_field_width, it->second.g0_synth, REG_NAMES[RS1], SIMM13);
+						util::stream_format(stream, "%-*s%s,%d", m_op_field_width, it->second.g0_synth, REG_NAMES[RS1], SIMM13);
 				}
 				else
 				{
 					if (!USEIMM)
-						print(buf, "%-*s%s,%s,%s", m_op_field_width, it->second.mnemonic, REG_NAMES[RS1], REG_NAMES[RS2], REG_NAMES[RD]);
+						util::stream_format(stream, "%-*s%s,%s,%s", m_op_field_width, it->second.mnemonic, REG_NAMES[RS1], REG_NAMES[RS2], REG_NAMES[RD]);
 					else if (it->second.hex_imm)
-						print(buf, "%-*s%s,0x%08x,%s", m_op_field_width, it->second.mnemonic, REG_NAMES[RS1], SIMM13, REG_NAMES[RD]);
+						util::stream_format(stream, "%-*s%s,0x%08x,%s", m_op_field_width, it->second.mnemonic, REG_NAMES[RS1], SIMM13, REG_NAMES[RD]);
 					else
-						print(buf, "%-*s%s,%d,%s", m_op_field_width, it->second.mnemonic, REG_NAMES[RS1], SIMM13, REG_NAMES[RD]);
+						util::stream_format(stream, "%-*s%s,%d,%s", m_op_field_width, it->second.mnemonic, REG_NAMES[RS1], SIMM13, REG_NAMES[RD]);
 				}
 				return 4 | DASMFLAG_SUPPORTED;
 			}
 		}
 		break;
 	case 3:
-		return dasm_ldst(buf, pc, op);
+		return dasm_ldst(stream, pc, op);
 	}
-	return dasm_invalid(buf, pc, op);
+	return dasm_invalid(stream, pc, op);
 }
 
 
-offs_t sparc_disassembler::dasm_invalid(char *buf, offs_t pc, uint32_t op) const
+offs_t sparc_disassembler::dasm_invalid(std::ostream &stream, offs_t pc, uint32_t op) const
 {
-	print(buf, "%-*s0x%08x ! ", m_op_field_width, ".word", op);
+	util::stream_format(stream, "%-*s0x%08x ! ", m_op_field_width, ".word", op);
 	if (OP == 0)
 	{
-		print(buf, "op=%x op2=%01x a=%01x cond=%01x", OP, OP2, ANNUL, COND);
+		util::stream_format(stream, "op=%x op2=%01x a=%01x cond=%01x", OP, OP2, ANNUL, COND);
 	}
 	else if ((OP == 2) && ((OP3 == 0x34) || (OP3 == 0x35)))
 	{
-		print(buf, "FPop%d opf=%03x rd=%d rs1=%d rs2=%d", 1 + (OP3 & 1), OPF, RD, RS1, RS2);
+		util::stream_format(stream, "FPop%d opf=%03x rd=%d rs1=%d rs2=%d", 1 + (OP3 & 1), OPF, RD, RS1, RS2);
 	}
 	else if ((OP == 2) && ((OP3 == 0x36) || (OP3 == 0x37)))
 	{
 		if (m_version >= 9)
-			print(buf, "IMPDEP%d impl-dep=%02x impl-dep=%05x", 1 + (OP3 & 1), RD, op & 0x7ffff);
+			util::stream_format(stream, "IMPDEP%d impl-dep=%02x impl-dep=%05x", 1 + (OP3 & 1), RD, op & 0x7ffff);
 		else
-			print(buf, "CPop%d opf=%03x rd=%d rs1=%d rs2=%d", 1 + (OP3 & 1), OPC, RD, RS1, RS2);
+			util::stream_format(stream, "CPop%d opf=%03x rd=%d rs1=%d rs2=%d", 1 + (OP3 & 1), OPC, RD, RS1, RS2);
 	}
 	else
 	{
-		print(buf, "op=%x op3=%02x i=%01x rd=%d", OP, OP3, USEIMM, RD);
+		util::stream_format(stream, "op=%x op3=%02x i=%01x rd=%d", OP, OP3, USEIMM, RD);
 	}
 	return 4 | DASMFLAG_SUPPORTED;
 }
 
 
-offs_t sparc_disassembler::dasm_branch(char *buf, offs_t pc, uint32_t op) const
+offs_t sparc_disassembler::dasm_branch(std::ostream &stream, offs_t pc, uint32_t op) const
 {
-	char *ptr(buf);
+	const std::streampos start_position(stream.tellp());
 	const branch_desc &desc(m_branch_desc[OP2]);
 	const char * const mnemonic(desc.mnemonic[COND]);
-	if (!mnemonic || (desc.use_cc && !desc.reg_cc[BRCC])) return dasm_invalid(buf, pc, op);
+	if (!mnemonic || (desc.use_cc && !desc.reg_cc[BRCC])) return dasm_invalid(stream, pc, op);
 
-	print(ptr, "%s%s%s", mnemonic, ANNUL ? ",a" : "", (desc.use_pred && !PRED) ? ",pn" : "");
-	pad_op_field(buf, ptr);
-	if (desc.use_cc) print(ptr, "%s,", desc.reg_cc[BRCC]);
-	if (OP2 == 3) print(ptr, "%s,", REG_NAMES[RS1]);
+	util::stream_format(stream, "%s%s%s", mnemonic, ANNUL ? ",a" : "", (desc.use_pred && !PRED) ? ",pn" : "");
+	pad_op_field(stream, start_position);
+	if (desc.use_cc) util::stream_format(stream, "%s,", desc.reg_cc[BRCC]);
+	if (OP2 == 3) util::stream_format(stream, "%s,", REG_NAMES[RS1]);
 	const int32_t disp(desc.get_disp(op));
-	print(ptr, "%%pc%c0x%0*x ! 0x%08x", (disp < 0) ? '-' : '+', desc.disp_width, std::abs(disp), pc + disp);
+	util::stream_format(stream, "%%pc%c0x%0*x ! 0x%08x", (disp < 0) ? '-' : '+', desc.disp_width, std::abs(disp), pc + disp);
 	//const char * const comment(desc.get_comment ? desc.get_comment(m_state, desc.use_cc, pc, op) : nullptr);
-	//if (comment) print(ptr, " - %s", comment);
+	//if (comment) util::stream_format(stream, " - %s", comment);
 
 	return 4 | DASMFLAG_SUPPORTED;
 }
 
 
-offs_t sparc_disassembler::dasm_shift(char *buf, offs_t pc, uint32_t op, const char *mnemonic, const char *mnemonicx, const char *mnemonicx0) const
+offs_t sparc_disassembler::dasm_shift(std::ostream &stream, offs_t pc, uint32_t op, const char *mnemonic, const char *mnemonicx, const char *mnemonicx0) const
 {
 	if ((m_version >= 9) && USEEXT)
 	{
 		if (USEIMM)
-			print(buf, "%-*s%s,%d,%s", m_op_field_width, mnemonicx, REG_NAMES[RS1], SHCNT64, REG_NAMES[RD]);
+			util::stream_format(stream, "%-*s%s,%d,%s", m_op_field_width, mnemonicx, REG_NAMES[RS1], SHCNT64, REG_NAMES[RD]);
 		else if (!mnemonicx0 || (RS2 != 0))
-			print(buf, "%-*s%s,%s,%s", m_op_field_width, mnemonicx, REG_NAMES[RS1], REG_NAMES[RS2], REG_NAMES[RD]);
+			util::stream_format(stream, "%-*s%s,%s,%s", m_op_field_width, mnemonicx, REG_NAMES[RS1], REG_NAMES[RS2], REG_NAMES[RD]);
 		else if (RS1 == RD)
-			print(buf, "%-*s%s", m_op_field_width, mnemonicx0, REG_NAMES[RD]);
+			util::stream_format(stream, "%-*s%s", m_op_field_width, mnemonicx0, REG_NAMES[RD]);
 		else
-			print(buf, "%-*s%s,%s", m_op_field_width, mnemonicx0, REG_NAMES[RS1], REG_NAMES[RD]);
+			util::stream_format(stream, "%-*s%s,%s", m_op_field_width, mnemonicx0, REG_NAMES[RS1], REG_NAMES[RD]);
 	}
 	else if (USEIMM)
 	{
-		print(buf, "%-*s%s,%d,%s", m_op_field_width, mnemonic, REG_NAMES[RS1], SHCNT32, REG_NAMES[RD]);
+		util::stream_format(stream, "%-*s%s,%d,%s", m_op_field_width, mnemonic, REG_NAMES[RS1], SHCNT32, REG_NAMES[RD]);
 	}
 	else
 	{
-		print(buf, "%-*s%s,%s,%s", m_op_field_width, mnemonic, REG_NAMES[RS1], REG_NAMES[RS2], REG_NAMES[RD]);
+		util::stream_format(stream, "%-*s%s,%s,%s", m_op_field_width, mnemonic, REG_NAMES[RS1], REG_NAMES[RS2], REG_NAMES[RD]);
 	}
 	return 4 | DASMFLAG_SUPPORTED;
 }
 
 
-offs_t sparc_disassembler::dasm_read_state_reg(char *buf, offs_t pc, uint32_t op) const
+offs_t sparc_disassembler::dasm_read_state_reg(std::ostream &stream, offs_t pc, uint32_t op) const
 {
 	if (RS1 == 0)
 	{
-		print(buf, "%-*s%%y,%s", m_op_field_width, "rd", REG_NAMES[RD]);
+		util::stream_format(stream, "%-*s%%y,%s", m_op_field_width, "rd", REG_NAMES[RD]);
 		return 4 | DASMFLAG_SUPPORTED;
 	}
 	else if ((m_version == 8) || ((m_version >= 9) && !USEIMM))
 	{
 		if (!USEIMM && (RS1 == 15) && (RD == 0))
 		{
-			print(buf, "stbar");
+			util::stream_format(stream, "stbar");
 			return 4 | DASMFLAG_SUPPORTED;
 		}
 		else
@@ -1148,50 +1141,50 @@ offs_t sparc_disassembler::dasm_read_state_reg(char *buf, offs_t pc, uint32_t op
 			if ((it == m_state_reg_desc.end()) || !it->second.reserved)
 			{
 				if ((it != m_state_reg_desc.end()) && it->second.read_name)
-					print(buf, "%-*s%s,%s", m_op_field_width, "rd", it->second.read_name, REG_NAMES[RD]);
+					util::stream_format(stream, "%-*s%s,%s", m_op_field_width, "rd", it->second.read_name, REG_NAMES[RD]);
 				else
-					print(buf, "%-*s%%asr%d,%s ! %s", m_op_field_width, "rd", RS1, REG_NAMES[RD], (RS1 < 16) ? "reserved" : "implementation-dependent");
+					util::stream_format(stream, "%-*s%%asr%d,%s ! %s", m_op_field_width, "rd", RS1, REG_NAMES[RD], (RS1 < 16) ? "reserved" : "implementation-dependent");
 				return 4 | DASMFLAG_SUPPORTED;
 			}
 		}
 	}
 	else if ((m_version >= 9) && USEIMM && (RS1 == 15) && (RD == 0))
 	{
-		print(buf, "%-*s", m_op_field_width, "membar");
+		util::stream_format(stream, "%-*s", m_op_field_width, "membar");
 		uint32_t mask(MMASK | (CMASK << 4));
-		if (mask == 0) print(buf, "0");
-		if (mask & 1) print(buf, "#LoadLoad%s", (mask >> 1) ? "|" : "");
+		if (mask == 0) util::stream_format(stream, "0");
+		if (mask & 1) util::stream_format(stream, "#LoadLoad%s", (mask >> 1) ? "|" : "");
 		mask >>= 1;
-		if (mask & 1) print(buf, "#StoreLoad%s", (mask >> 1) ? "|" : "");
+		if (mask & 1) util::stream_format(stream, "#StoreLoad%s", (mask >> 1) ? "|" : "");
 		mask >>= 1;
-		if (mask & 1) print(buf, "#LoadStore%s", (mask >> 1) ? "|" : "");
+		if (mask & 1) util::stream_format(stream, "#LoadStore%s", (mask >> 1) ? "|" : "");
 		mask >>= 1;
-		if (mask & 1) print(buf, "#StoreStore%s", (mask >> 1) ? "|" : "");
+		if (mask & 1) util::stream_format(stream, "#StoreStore%s", (mask >> 1) ? "|" : "");
 		mask >>= 1;
-		if (mask & 1) print(buf, "#Lookaside%s", (mask >> 1) ? "|" : "");
+		if (mask & 1) util::stream_format(stream, "#Lookaside%s", (mask >> 1) ? "|" : "");
 		mask >>= 1;
-		if (mask & 1) print(buf, "#MemIssue%s", (mask >> 1) ? "|" : "");
+		if (mask & 1) util::stream_format(stream, "#MemIssue%s", (mask >> 1) ? "|" : "");
 		mask >>= 1;
-		if (mask & 1) print(buf, "#Sync");
+		if (mask & 1) util::stream_format(stream, "#Sync");
 		return 4 | DASMFLAG_SUPPORTED;
 	}
-	return dasm_invalid(buf, pc, op);
+	return dasm_invalid(stream, pc, op);
 }
 
 
-offs_t sparc_disassembler::dasm_write_state_reg(char *buf, offs_t pc, uint32_t op) const
+offs_t sparc_disassembler::dasm_write_state_reg(std::ostream &stream, offs_t pc, uint32_t op) const
 {
 	if (RD == 0)
 	{
 		if (RS1 == 0)
 		{
-			if (USEIMM) print(buf, "%-*s%d,%%y", m_op_field_width, "mov", SIMM13);
-			else        print(buf, "%-*s%s,%%y", m_op_field_width, "mov", REG_NAMES[RS2]);
+			if (USEIMM) util::stream_format(stream, "%-*s%d,%%y", m_op_field_width, "mov", SIMM13);
+			else        util::stream_format(stream, "%-*s%s,%%y", m_op_field_width, "mov", REG_NAMES[RS2]);
 		}
 		else
 		{
-			if (USEIMM) print(buf, "%-*s%s,%08x,%%y", m_op_field_width, "wr", REG_NAMES[RS1], SIMM13);
-			else        print(buf, "%-*s%s,%s,%%y", m_op_field_width, "wr", REG_NAMES[RS1], REG_NAMES[RS2]);
+			if (USEIMM) util::stream_format(stream, "%-*s%s,%08x,%%y", m_op_field_width, "wr", REG_NAMES[RS1], SIMM13);
+			else        util::stream_format(stream, "%-*s%s,%s,%%y", m_op_field_width, "wr", REG_NAMES[RS1], REG_NAMES[RS2]);
 		}
 		return 4 | DASMFLAG_SUPPORTED;
 	}
@@ -1199,7 +1192,7 @@ offs_t sparc_disassembler::dasm_write_state_reg(char *buf, offs_t pc, uint32_t o
 	{
 		if ((m_version >= 9) && USEIMM && (RS1 == 0) && (RD == 15))
 		{
-			print(buf, "%-*s%d", m_op_field_width, "sir", SIMM13);
+			util::stream_format(stream, "%-*s%d", m_op_field_width, "sir", SIMM13);
 			return 4 | DASMFLAG_SUPPORTED;
 		}
 		else
@@ -1211,13 +1204,13 @@ offs_t sparc_disassembler::dasm_write_state_reg(char *buf, offs_t pc, uint32_t o
 				{
 					if (RS1 == 0)
 					{
-						if (USEIMM) print(buf, "%-*s%d,%s", m_op_field_width, "mov", SIMM13, it->second.write_name);
-						else        print(buf, "%-*s%s,%s", m_op_field_width, "mov", REG_NAMES[RS2], it->second.write_name);
+						if (USEIMM) util::stream_format(stream, "%-*s%d,%s", m_op_field_width, "mov", SIMM13, it->second.write_name);
+						else        util::stream_format(stream, "%-*s%s,%s", m_op_field_width, "mov", REG_NAMES[RS2], it->second.write_name);
 					}
 					else
 					{
-						if (USEIMM) print(buf, "%-*s%s,%08x,%s", m_op_field_width, "wr", REG_NAMES[RS1], SIMM13, it->second.write_name);
-						else        print(buf, "%-*s%s,%s,%s", m_op_field_width, "wr", REG_NAMES[RS1], REG_NAMES[RS2], it->second.write_name);
+						if (USEIMM) util::stream_format(stream, "%-*s%s,%08x,%s", m_op_field_width, "wr", REG_NAMES[RS1], SIMM13, it->second.write_name);
+						else        util::stream_format(stream, "%-*s%s,%s,%s", m_op_field_width, "wr", REG_NAMES[RS1], REG_NAMES[RS2], it->second.write_name);
 					}
 				}
 				else
@@ -1225,65 +1218,65 @@ offs_t sparc_disassembler::dasm_write_state_reg(char *buf, offs_t pc, uint32_t o
 					const char * const comment((RD < 16) ? "reserved" : "implementation-dependent");
 					if (RS1 == 0)
 					{
-						if (USEIMM) print(buf, "%-*s%d,%%asr%d ! %s", m_op_field_width, "mov", SIMM13, RD, comment);
-						else        print(buf, "%-*s%s,%%asr%d ! %s", m_op_field_width, "mov", REG_NAMES[RS2], RD, comment);
+						if (USEIMM) util::stream_format(stream, "%-*s%d,%%asr%d ! %s", m_op_field_width, "mov", SIMM13, RD, comment);
+						else        util::stream_format(stream, "%-*s%s,%%asr%d ! %s", m_op_field_width, "mov", REG_NAMES[RS2], RD, comment);
 					}
 					else
 					{
-						if (USEIMM) print(buf, "%-*s%s,%08x,%%asr%d ! %s", m_op_field_width, "wr", REG_NAMES[RS1], SIMM13, RD, comment);
-						else        print(buf, "%-*s%s,%s,%%asr%d ! %s", m_op_field_width, "wr", REG_NAMES[RS1], REG_NAMES[RS2], RD, comment);
+						if (USEIMM) util::stream_format(stream, "%-*s%s,%08x,%%asr%d ! %s", m_op_field_width, "wr", REG_NAMES[RS1], SIMM13, RD, comment);
+						else        util::stream_format(stream, "%-*s%s,%s,%%asr%d ! %s", m_op_field_width, "wr", REG_NAMES[RS1], REG_NAMES[RS2], RD, comment);
 					}
 				}
 				return 4 | DASMFLAG_SUPPORTED;
 			}
 		}
 	}
-	return dasm_invalid(buf, pc, op);
+	return dasm_invalid(stream, pc, op);
 }
 
 
-offs_t sparc_disassembler::dasm_move_cond(char *buf, offs_t pc, uint32_t op) const
+offs_t sparc_disassembler::dasm_move_cond(std::ostream &stream, offs_t pc, uint32_t op) const
 {
-	if ((m_version < 9) || !MOVCC_CC_NAMES[MOVCC]) return dasm_invalid(buf, pc, op);
+	if ((m_version < 9) || !MOVCC_CC_NAMES[MOVCC]) return dasm_invalid(stream, pc, op);
 
-	char *ptr(buf);
-	print(ptr, "mov%s", MOVCC_COND_NAMES[MOVCOND | ((MOVCC << 2) & 16)]);
-	pad_op_field(buf, ptr);
+	const std::streampos start_position(stream.tellp());
+	util::stream_format(stream, "mov%s", MOVCC_COND_NAMES[MOVCOND | ((MOVCC << 2) & 16)]);
+	pad_op_field(stream, start_position);
 	if (USEIMM)
-		print(ptr, "%s,%d,%s", MOVCC_CC_NAMES[MOVCC], SIMM11, REG_NAMES[RD]);
+		util::stream_format(stream, "%s,%d,%s", MOVCC_CC_NAMES[MOVCC], SIMM11, REG_NAMES[RD]);
 	else
-		print(ptr, "%s,%s,%s", MOVCC_CC_NAMES[MOVCC], REG_NAMES[RS2], REG_NAMES[RD]);
+		util::stream_format(stream, "%s,%s,%s", MOVCC_CC_NAMES[MOVCC], REG_NAMES[RS2], REG_NAMES[RD]);
 
 	return 4 | DASMFLAG_SUPPORTED;
 }
 
-offs_t sparc_disassembler::dasm_move_reg_cond(char *buf, offs_t pc, uint32_t op) const
+offs_t sparc_disassembler::dasm_move_reg_cond(std::ostream &stream, offs_t pc, uint32_t op) const
 {
-	if ((m_version < 9) || !MOVE_INT_COND_MNEMONICS[RCOND]) return dasm_invalid(buf, pc, op);
+	if ((m_version < 9) || !MOVE_INT_COND_MNEMONICS[RCOND]) return dasm_invalid(stream, pc, op);
 
 	if (USEIMM)
-		print(buf, "%-*s%s,%d,%s", m_op_field_width, MOVE_INT_COND_MNEMONICS[RCOND], REG_NAMES[RS1], SIMM10, REG_NAMES[RD]);
+		util::stream_format(stream, "%-*s%s,%d,%s", m_op_field_width, MOVE_INT_COND_MNEMONICS[RCOND], REG_NAMES[RS1], SIMM10, REG_NAMES[RD]);
 	else
-		print(buf, "%-*s%s,%s,%s", m_op_field_width, MOVE_INT_COND_MNEMONICS[RCOND], REG_NAMES[RS1], REG_NAMES[RS2], REG_NAMES[RD]);
+		util::stream_format(stream, "%-*s%s,%s,%s", m_op_field_width, MOVE_INT_COND_MNEMONICS[RCOND], REG_NAMES[RS1], REG_NAMES[RS2], REG_NAMES[RD]);
 
 	return 4 | DASMFLAG_SUPPORTED;
 }
 
 
-offs_t sparc_disassembler::dasm_fpop1(char *buf, offs_t pc, uint32_t op) const
+offs_t sparc_disassembler::dasm_fpop1(std::ostream &stream, offs_t pc, uint32_t op) const
 {
 	const auto it(m_fpop1_desc.find(OPF));
-	if (it == m_fpop1_desc.end()) return dasm_invalid(buf, pc, op);
+	if (it == m_fpop1_desc.end()) return dasm_invalid(stream, pc, op);
 
 	if (it->second.three_op)
-		print(buf, "%-*s%%f%d,%%f%d,%%f%d", m_op_field_width, it->second.mnemonic, freg(RS1, it->second.rs1_shift), freg(RS2, it->second.rs2_shift), freg(RD, it->second.rd_shift));
+		util::stream_format(stream, "%-*s%%f%d,%%f%d,%%f%d", m_op_field_width, it->second.mnemonic, freg(RS1, it->second.rs1_shift), freg(RS2, it->second.rs2_shift), freg(RD, it->second.rd_shift));
 	else
-		print(buf, "%-*s%%f%d,%%f%d", m_op_field_width, it->second.mnemonic, freg(RS2, it->second.rs2_shift), freg(RD, it->second.rd_shift));
+		util::stream_format(stream, "%-*s%%f%d,%%f%d", m_op_field_width, it->second.mnemonic, freg(RS2, it->second.rs2_shift), freg(RD, it->second.rd_shift));
 	return 4 | DASMFLAG_SUPPORTED;
 }
 
 
-offs_t sparc_disassembler::dasm_fpop2(char *buf, offs_t pc, uint32_t op) const
+offs_t sparc_disassembler::dasm_fpop2(std::ostream &stream, offs_t pc, uint32_t op) const
 {
 	// Move Floating-Point Register on Condition
 	if ((m_version >= 9) && (((op >> 18) & 1) == 0) && MOVCC_CC_NAMES[OPFCC])
@@ -1299,10 +1292,10 @@ offs_t sparc_disassembler::dasm_fpop2(char *buf, offs_t pc, uint32_t op) const
 		}
 		if (mnemonic)
 		{
-			char *ptr(buf);
-			print(ptr, "%s%s", mnemonic, MOVCC_COND_NAMES[MOVCOND | ((OPFCC << 2) & 16)]);
-			pad_op_field(buf, ptr);
-			print(ptr, "%s,%%f%d,%%f%d", MOVCC_CC_NAMES[OPFCC], freg(RS2, shift), freg(RD, shift));
+			const std::streampos start_position(stream.tellp());
+			util::stream_format(stream, "%s%s", mnemonic, MOVCC_COND_NAMES[MOVCOND | ((OPFCC << 2) & 16)]);
+			pad_op_field(stream, start_position);
+			util::stream_format(stream, "%s,%%f%d,%%f%d", MOVCC_CC_NAMES[OPFCC], freg(RS2, shift), freg(RD, shift));
 			return 4 | DASMFLAG_SUPPORTED;
 		}
 	}
@@ -1314,47 +1307,47 @@ offs_t sparc_disassembler::dasm_fpop2(char *buf, offs_t pc, uint32_t op) const
 		{
 			if (it->second.int_rs1)
 			{
-				print(buf, "%-*s%s,%%f%d,%%f%d", m_op_field_width, it->second.mnemonic, REG_NAMES[RS1], freg(RS2, it->second.shift), freg(RD, it->second.shift));
+				util::stream_format(stream, "%-*s%s,%%f%d,%%f%d", m_op_field_width, it->second.mnemonic, REG_NAMES[RS1], freg(RS2, it->second.shift), freg(RD, it->second.shift));
 				return 4 | DASMFLAG_SUPPORTED;
 			}
 			else if (RD < 4)
 			{
-				print(buf, "%-*s%%fcc%d,%%f%d,%%f%d", m_op_field_width, it->second.mnemonic, RD, freg(RS1, it->second.shift), freg(RS2, it->second.shift));
+				util::stream_format(stream, "%-*s%%fcc%d,%%f%d,%%f%d", m_op_field_width, it->second.mnemonic, RD, freg(RS1, it->second.shift), freg(RS2, it->second.shift));
 				return 4 | DASMFLAG_SUPPORTED;
 			}
 		}
 		else if (!it->second.int_rs1)
 		{
-			print(buf, "%-*s%%f%d,%%f%d", m_op_field_width, it->second.mnemonic, freg(RS1, it->second.shift), freg(RS2, it->second.shift));
+			util::stream_format(stream, "%-*s%%f%d,%%f%d", m_op_field_width, it->second.mnemonic, freg(RS1, it->second.shift), freg(RS2, it->second.shift));
 			return 4 | DASMFLAG_SUPPORTED;
 		}
 	}
 
-	return dasm_invalid(buf, pc, op);
+	return dasm_invalid(stream, pc, op);
 }
 
 
-offs_t sparc_disassembler::dasm_impdep1(char *buf, offs_t pc, uint32_t op) const
+offs_t sparc_disassembler::dasm_impdep1(std::ostream &stream, offs_t pc, uint32_t op) const
 {
 	const auto it(m_vis_op_desc.find(OPF));
 	if (it != m_vis_op_desc.end())
 	{
-		print(buf, "%-*s", m_op_field_width, it->second.mnemonic);
+		util::stream_format(stream, "%-*s", m_op_field_width, it->second.mnemonic);
 		bool args(false);
 		if (it->second.collapse && !RS1)
 		{
-			dasm_vis_arg(buf, args, it->second.rs2, RS2);
+			dasm_vis_arg(stream, args, it->second.rs2, RS2);
 		}
 		else if (it->second.collapse && !RS2)
 		{
-			dasm_vis_arg(buf, args, it->second.rs1, RS1);
+			dasm_vis_arg(stream, args, it->second.rs1, RS1);
 		}
 		else
 		{
-			dasm_vis_arg(buf, args, it->second.rs1, RS1);
-			dasm_vis_arg(buf, args, it->second.rs2, RS2);
+			dasm_vis_arg(stream, args, it->second.rs1, RS1);
+			dasm_vis_arg(stream, args, it->second.rs2, RS2);
 		}
-		dasm_vis_arg(buf, args, it->second.rd, RD);
+		dasm_vis_arg(stream, args, it->second.rd, RD);
 		return 4 | DASMFLAG_SUPPORTED;
 	}
 
@@ -1363,7 +1356,7 @@ offs_t sparc_disassembler::dasm_impdep1(char *buf, offs_t pc, uint32_t op) const
 	case 0x081:
 		if (m_vis_level >= vis_2)
 		{
-			print(buf, "%-*s0x%x", m_op_field_width, "siam", IAMODE);
+			util::stream_format(stream, "%-*s0x%x", m_op_field_width, "siam", IAMODE);
 			return 4 | DASMFLAG_SUPPORTED;
 		}
 		break;
@@ -1372,7 +1365,7 @@ offs_t sparc_disassembler::dasm_impdep1(char *buf, offs_t pc, uint32_t op) const
 		if (m_vis_level >= vis_3)
 		{
 			const bool shift(OPF == 0x152);
-			print(buf, "%-*s%%fcc%d,%%f%d,%%f%d", m_op_field_width, (shift) ? "flcmpd" : "flcmps", RD & 3, freg(RS1, shift), freg(RS2, shift));
+			util::stream_format(stream, "%-*s%%fcc%d,%%f%d,%%f%d", m_op_field_width, (shift) ? "flcmpd" : "flcmps", RD & 3, freg(RS1, shift), freg(RS2, shift));
 			return 4 | DASMFLAG_SUPPORTED;
 		}
 		break;
@@ -1380,36 +1373,36 @@ offs_t sparc_disassembler::dasm_impdep1(char *buf, offs_t pc, uint32_t op) const
 
 	// TODO: driver hook for other kinds of coprocessor?
 
-	return dasm_invalid(buf, pc, op);
+	return dasm_invalid(stream, pc, op);
 }
 
 
-offs_t sparc_disassembler::dasm_jmpl(char *buf, offs_t pc, uint32_t op) const
+offs_t sparc_disassembler::dasm_jmpl(std::ostream &stream, offs_t pc, uint32_t op) const
 {
 	if (USEIMM && (RD == 0) && ((RS1 == 15) || (RS1 == 31)) && (SIMM13 == 8))
 	{
-		print(buf, (RS1 == 31) ? "ret" : "retl");
+		util::stream_format(stream, (RS1 == 31) ? "ret" : "retl");
 	}
 	else
 	{
-		print(buf, "%-*s", m_op_field_width, (RD == 0) ? "jmp" : (RD == 15) ? "call" : "jmpl");
-		dasm_address(buf, op);
+		util::stream_format(stream, "%-*s", m_op_field_width, (RD == 0) ? "jmp" : (RD == 15) ? "call" : "jmpl");
+		dasm_address(stream, op);
 		if ((RD != 0) && (RD != 15))
-			print(buf, ",%s", REG_NAMES[RD]);
+			util::stream_format(stream, ",%s", REG_NAMES[RD]);
 	}
 	return 4 | DASMFLAG_SUPPORTED;
 }
 
 
-offs_t sparc_disassembler::dasm_return(char *buf, offs_t pc, uint32_t op) const
+offs_t sparc_disassembler::dasm_return(std::ostream &stream, offs_t pc, uint32_t op) const
 {
-	print(buf, "%-*s", m_op_field_width, (m_version >= 9) ? "return" : "rett");
-	dasm_address(buf, op);
+	util::stream_format(stream, "%-*s", m_op_field_width, (m_version >= 9) ? "return" : "rett");
+	dasm_address(stream, op);
 	return 4 | DASMFLAG_SUPPORTED;
 }
 
 
-offs_t sparc_disassembler::dasm_tcc(char *buf, offs_t pc, uint32_t op) const
+offs_t sparc_disassembler::dasm_tcc(std::ostream &stream, offs_t pc, uint32_t op) const
 {
 	static const char *const tcc_names[16] = {
 		"tn",   "te",   "tle",  "tl",   "tleu", "tcs",  "tneg", "tvs",
@@ -1420,29 +1413,29 @@ offs_t sparc_disassembler::dasm_tcc(char *buf, offs_t pc, uint32_t op) const
 	if (m_version >= 9)
 	{
 		const char *const cc(cc_names[TCCCC]);
-		if (!cc) return dasm_invalid(buf, pc, op);
-		print(buf, "%-*s%s,", m_op_field_width, mnemonic, cc);
+		if (!cc) return dasm_invalid(stream, pc, op);
+		util::stream_format(stream, "%-*s%s,", m_op_field_width, mnemonic, cc);
 	}
 	else
 	{
-		print(buf, "%-*s", m_op_field_width, mnemonic);
+		util::stream_format(stream, "%-*s", m_op_field_width, mnemonic);
 	}
 	if (USEIMM)
 	{
-		if (RS1 == 0)       print(buf, "%d", IMM7);
-		else                print(buf, "%s,%d", REG_NAMES[RS1], IMM7);
+		if (RS1 == 0)       util::stream_format(stream, "%d", IMM7);
+		else                util::stream_format(stream, "%s,%d", REG_NAMES[RS1], IMM7);
 	}
 	else
 	{
-		if (RS1 == 0)       print(buf, "%s", REG_NAMES[RS2]);
-		else if (RS2 == 0)  print(buf, "%s", REG_NAMES[RS1]);
-		else                print(buf, "%s,%s", REG_NAMES[RS1], REG_NAMES[RS2]);
+		if (RS1 == 0)       util::stream_format(stream, "%s", REG_NAMES[RS2]);
+		else if (RS2 == 0)  util::stream_format(stream, "%s", REG_NAMES[RS1]);
+		else                util::stream_format(stream, "%s,%s", REG_NAMES[RS1], REG_NAMES[RS2]);
 	}
 	return 4 | DASMFLAG_SUPPORTED;
 }
 
 
-offs_t sparc_disassembler::dasm_ldst(char *buf, offs_t pc, uint32_t op) const
+offs_t sparc_disassembler::dasm_ldst(std::ostream &stream, offs_t pc, uint32_t op) const
 {
 	if (m_version >= 9)
 	{
@@ -1451,25 +1444,24 @@ offs_t sparc_disassembler::dasm_ldst(char *buf, offs_t pc, uint32_t op) const
 		case 0x21: // Load floating-point state register
 			if ((RD == 0) || (RD == 1))
 			{
-				print(buf, "%-*s[", m_op_field_width, (RD == 1) ? "ldx" : "ld");
-				dasm_address(buf, op);
-				print(buf, "],%%fsr");
+				util::stream_format(stream, "%-*s[", m_op_field_width, (RD == 1) ? "ldx" : "ld");
+				dasm_address(stream, op);
+				util::stream_format(stream, "],%%fsr");
 				return 4 | DASMFLAG_SUPPORTED;
 			}
 			else if ((RD == 3) && (m_vis_level >= vis_3b))
 			{
-				print(buf, "%-*s[", m_op_field_width, "ldx");
-				dasm_address(buf, op);
-				print(buf, "],%%efsr");
+				util::stream_format(stream, "%-*s[", m_op_field_width, "ldx");
+				dasm_address(stream, op);
+				util::stream_format(stream, "],%%efsr");
 			}
 			break;
 		case 0x25: // Store floating-point state register
 			if ((RD == 0) || (RD == 1))
 			{
-				print(buf, "%-*s%%fsr,[", m_op_field_width, (RD == 1) ? "stx" : "st");
-				dasm_address(buf, op);
-				*buf++ = ']';
-				*buf = '\0';
+				util::stream_format(stream, "%-*s%%fsr,[", m_op_field_width, (RD == 1) ? "stx" : "st");
+				dasm_address(stream, op);
+				stream << ']';
 				return 4 | DASMFLAG_SUPPORTED;
 			}
 			break;
@@ -1491,23 +1483,23 @@ offs_t sparc_disassembler::dasm_ldst(char *buf, offs_t pc, uint32_t op) const
 						mnemonic = (OP3 == 0x3e) ? "casxl" : "casl";
 					}
 				}
-				print(buf, "%-*s[%s]", m_op_field_width, mnemonic, REG_NAMES[RS1]);
-				if (print_asi) dasm_asi(buf, op);
-				print(buf, ",%s,%s", REG_NAMES[RS2], REG_NAMES[RD]);
-				if (print_asi) dasm_asi_comment(buf, op);
+				util::stream_format(stream, "%-*s[%s]", m_op_field_width, mnemonic, REG_NAMES[RS1]);
+				if (print_asi) dasm_asi(stream, op);
+				util::stream_format(stream, ",%s,%s", REG_NAMES[RS2], REG_NAMES[RD]);
+				if (print_asi) dasm_asi_comment(stream, op);
 			}
 			return 4 | DASMFLAG_SUPPORTED;
 		case 0x2d: // Prefetch data
 		case 0x3d: // Prefetch data from alternate space
 			{
-				print(buf, "%-*s[", m_op_field_width, (OP3 == 0x3d) ? "prefetcha" : "prefetch");
-				dasm_address(buf, op);
-				*buf++ = ']';
-				if (OP3 == 0x3d) dasm_asi(buf, op);
+				util::stream_format(stream, "%-*s[", m_op_field_width, (OP3 == 0x3d) ? "prefetcha" : "prefetch");
+				dasm_address(stream, op);
+				stream << ']';
+				if (OP3 == 0x3d) dasm_asi(stream, op);
 				const auto it(m_prftch_desc.find(RD));
-				if (it != m_prftch_desc.end())  print(buf, ",%s", it->second.name);
-				else                            print(buf, ",0x%02x", RD);
-				if (OP3 == 0x3d) dasm_asi_comment(buf, op);
+				if (it != m_prftch_desc.end())  util::stream_format(stream, ",%s", it->second.name);
+				else                            util::stream_format(stream, ",0x%02x", RD);
+				if (OP3 == 0x3d) dasm_asi_comment(stream, op);
 			}
 			return 4 | DASMFLAG_SUPPORTED;
 		}
@@ -1518,127 +1510,123 @@ offs_t sparc_disassembler::dasm_ldst(char *buf, offs_t pc, uint32_t op) const
 		{
 		case 0x21: // Load Floating-point State Register
 		case 0x31: // Load Coprocessor State Register
-			print(buf, "%-*s[", m_op_field_width, "ld");
-			dasm_address(buf, op);
-			print(buf, "],%%%csr", (OP3 == 0x31) ? 'c' : 'f');
+			util::stream_format(stream, "%-*s[", m_op_field_width, "ld");
+			dasm_address(stream, op);
+			util::stream_format(stream, "],%%%csr", (OP3 == 0x31) ? 'c' : 'f');
 			return 4 | DASMFLAG_SUPPORTED;
 		case 0x25: // Store Floating-point State Register
 		case 0x35: // Store Coprocessor State Register
-			print(buf, "%-*s%%%csr,[", m_op_field_width, "st", (OP3 == 0x35) ? 'c' : 'f');
-			dasm_address(buf, op);
-			*buf++ = ']';
-			*buf = '\0';
+			util::stream_format(stream, "%-*s%%%csr,[", m_op_field_width, "st", (OP3 == 0x35) ? 'c' : 'f');
+			dasm_address(stream, op);
+			stream << ']';
 			return 4 | DASMFLAG_SUPPORTED;
 		case 0x26: // Store Floating-point deferred-trap Queue
 		case 0x36: // Store Coprocessor deferred-trap Queue
-			print(buf, "%-*s%%%cq,[", m_op_field_width, "std", (OP3 == 0x36) ? 'c' : 'f');
-			dasm_address(buf, op);
-			*buf++ = ']';
-			*buf = '\0';
+			util::stream_format(stream, "%-*s%%%cq,[", m_op_field_width, "std", (OP3 == 0x36) ? 'c' : 'f');
+			dasm_address(stream, op);
+			stream << ']';
 			return 4 | DASMFLAG_SUPPORTED;
 		}
 	}
 
 	const auto it(m_ldst_desc.find(OP3));
 	if (it == m_ldst_desc.end())
-		return dasm_invalid(buf, pc, op);
+		return dasm_invalid(stream, pc, op);
 
 	if (it->second.alternate && USEIMM && (m_version < 9))
-		return dasm_invalid(buf, pc, op);
+		return dasm_invalid(stream, pc, op);
 
 	if (it->second.g0_synth && (RD == 0))
 	{
-		print(buf, "%-*s[", m_op_field_width, it->second.g0_synth);
-		dasm_address(buf, op);
-		*buf++ = ']';
-		*buf = '\0';
+		util::stream_format(stream, "%-*s[", m_op_field_width, it->second.g0_synth);
+		dasm_address(stream, op);
+		stream << ']';
 		if (it->second.alternate)
 		{
-			dasm_asi(buf, op);
-			dasm_asi_comment(buf, op);
+			dasm_asi(stream, op);
+			dasm_asi_comment(stream, op);
 		}
 	}
 	else
 	{
-		print(buf, "%-*s", m_op_field_width, it->second.mnemonic);
+		util::stream_format(stream, "%-*s", m_op_field_width, it->second.mnemonic);
 		if (it->second.rd_first)
 		{
-			if (it->second.rd_alt_reg)  print(buf, "%%%c%d,", it->second.rd_alt_reg, freg(RD, it->second.rd_shift));
-			else                        print(buf, "%s,", REG_NAMES[RD]);
+			if (it->second.rd_alt_reg)  util::stream_format(stream, "%%%c%d,", it->second.rd_alt_reg, freg(RD, it->second.rd_shift));
+			else                        util::stream_format(stream, "%s,", REG_NAMES[RD]);
 		}
-		*buf++ = '[';
-		dasm_address(buf, op);
-		*buf++ = ']';
-		*buf = '\0';
-		if (it->second.alternate) dasm_asi(buf, op);
+		stream << '[';
+		dasm_address(stream, op);
+		stream << ']';
+		if (it->second.alternate) dasm_asi(stream, op);
 		if (!it->second.rd_first)
 		{
-			if (it->second.rd_alt_reg)  print(buf, ",%%%c%d", it->second.rd_alt_reg, freg(RD, it->second.rd_shift));
-			else                        print(buf, ",%s", REG_NAMES[RD]);
+			if (it->second.rd_alt_reg)  util::stream_format(stream, ",%%%c%d", it->second.rd_alt_reg, freg(RD, it->second.rd_shift));
+			else                        util::stream_format(stream, ",%s", REG_NAMES[RD]);
 		}
-		if (it->second.alternate) dasm_asi_comment(buf, op);
+		if (it->second.alternate) dasm_asi_comment(stream, op);
 	}
 	return 4 | DASMFLAG_SUPPORTED;
 }
 
 
-void sparc_disassembler::dasm_address(char *&output, uint32_t op) const
+void sparc_disassembler::dasm_address(std::ostream &stream, uint32_t op) const
 {
 	if (USEIMM)
 	{
-		if (RS1 == 0)       print(output, "0x%08x", SIMM13);
-		else                print(output, "%s%c0x%04x", REG_NAMES[RS1], (SIMM13 < 0) ? '-' : '+', std::abs(SIMM13));
+		if (RS1 == 0)       util::stream_format(stream, "0x%08x", SIMM13);
+		else                util::stream_format(stream, "%s%c0x%04x", REG_NAMES[RS1], (SIMM13 < 0) ? '-' : '+', std::abs(SIMM13));
 	}
 	else
 	{
-		if (RS1 == 0)       print(output, "%s", REG_NAMES[RS2]);
-		else if (RS2 == 0)  print(output, "%s", REG_NAMES[RS1]);
-		else                print(output, "%s+%s", REG_NAMES[RS1], REG_NAMES[RS2]);
+		if (RS1 == 0)       util::stream_format(stream, "%s", REG_NAMES[RS2]);
+		else if (RS2 == 0)  util::stream_format(stream, "%s", REG_NAMES[RS1]);
+		else                util::stream_format(stream, "%s+%s", REG_NAMES[RS1], REG_NAMES[RS2]);
 	}
 }
 
 
-void sparc_disassembler::dasm_asi(char *&output, uint32_t op) const
+void sparc_disassembler::dasm_asi(std::ostream &stream, uint32_t op) const
 {
 	if (USEIMM)
 	{
-		print(output, "%%asi");
+		util::stream_format(stream, "%%asi");
 	}
 	else
 	{
 		const auto it(m_asi_desc.find(ASI));
 		if ((it != m_asi_desc.end()) && it->second.name)
-			print(output, "%s", it->second.name);
+			util::stream_format(stream, "%s", it->second.name);
 		else
-			print(output, "0x%02x", ASI);
+			util::stream_format(stream, "0x%02x", ASI);
 	}
 }
 
 
-void sparc_disassembler::dasm_asi_comment(char *&output, uint32_t op) const
+void sparc_disassembler::dasm_asi_comment(std::ostream &stream, uint32_t op) const
 {
 	if (!USEIMM)
 	{
 		const auto it(m_asi_desc.find(ASI));
 		if ((it != m_asi_desc.end()) && it->second.desc)
-			print(output, " ! %s", it->second.desc);
+			util::stream_format(stream, " ! %s", it->second.desc);
 	}
 }
 
 
-void sparc_disassembler::dasm_vis_arg(char *&output, bool &args, vis_op_desc::arg fmt, uint32_t reg) const
+void sparc_disassembler::dasm_vis_arg(std::ostream &stream, bool &args, vis_op_desc::arg fmt, uint32_t reg) const
 {
 	switch (fmt)
 	{
 	case vis_op_desc::X:
 		break;
 	case vis_op_desc::R:
-		print(output, args ? ",%s" : "%s", REG_NAMES[reg]);
+		util::stream_format(stream, args ? ",%s" : "%s", REG_NAMES[reg]);
 		args = true;
 		break;
 	case vis_op_desc::Fs:
 	case vis_op_desc::Fd:
-		print(output, args ? ",%%f%d" : "%%f%d", freg(reg, (fmt == vis_op_desc::Fd)));
+		util::stream_format(stream, args ? ",%%f%d" : "%%f%d", freg(reg, (fmt == vis_op_desc::Fd)));
 		args = true;
 		break;
 	};

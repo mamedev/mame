@@ -149,7 +149,7 @@ void ym2203_device::calculate_rates()
 	if (m_stream != nullptr)
 		m_stream->set_sample_rate(rate);
 	else
-		m_stream = machine().sound().stream_alloc(*this,0,1,rate, stream_update_delegate(FUNC(ym2203_device::stream_generate),this));
+		m_stream = machine().sound().stream_alloc(*this,0,1,rate, stream_update_delegate(&ym2203_device::stream_generate,this));
 }
 
 //-------------------------------------------------

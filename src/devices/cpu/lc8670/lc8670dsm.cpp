@@ -151,7 +151,7 @@ void lc8670_cpu_device::dasm_arg(uint8_t op, char *buffer, offs_t pc, int arg, c
 //  helper function
 //-------------------------------------------------
 
-offs_t lc8670_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t lc8670_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	int pos = 0;
 	char arg1[16], arg2[16];
@@ -161,18 +161,15 @@ offs_t lc8670_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint
 	int op_idx = decode_op(op);
 	const dasm_entry *inst = &s_dasm_table[op_idx];
 
-	buffer += sprintf(buffer,"%-8s", inst->str);
+	util::stream_format(stream, "%-8s", inst->str);
 
 	dasm_arg(op, inst->inv ? arg2 : arg1, pc+0, inst->arg1, oprom, pos);
 	dasm_arg(op, inst->inv ? arg1 : arg2, pc+1, inst->arg2, oprom, pos);
 
-	strcat(buffer, arg1);
+	stream << arg1;
 
 	if (inst->arg2 != OP_NULL)
-	{
-		strcat(buffer, ",");
-		strcat(buffer, arg2);
-	}
+		stream << "," << arg2;
 
 	return pos;
 }

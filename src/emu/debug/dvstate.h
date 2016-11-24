@@ -53,24 +53,24 @@ private:
 	class state_item
 	{
 	public:
-		state_item(int index, const char *name, uint8_t valuechars);
+		state_item(int index, const char *name, u8 valuechars);
 		state_item(const state_item &) = default;
 		state_item(state_item &&) = default;
 		state_item &operator=(const state_item &) = default;
 		state_item &operator=(state_item &&) = default;
 
-		uint64_t value() const { return m_currval; }
+		u64 value() const { return m_currval; }
 		bool changed() const { return m_lastval != m_currval; }
 		int index() const { return m_index; }
-		uint8_t value_length() const { return m_vallen; }
+		u8 value_length() const { return m_vallen; }
 
-		void update(uint64_t newval, bool save);
+		void update(u64 newval, bool save);
 
 	private:
-		uint64_t      m_lastval;          // last value
-		uint64_t      m_currval;          // current value
+		u64         m_lastval;          // last value
+		u64         m_currval;          // current value
 		int         m_index;            // index
-		uint8_t       m_vallen;           // number of value chars
+		u8          m_vallen;           // number of value chars
 
 	public:
 		std::string m_symbol;           // symbol
@@ -83,15 +83,15 @@ private:
 
 	// internal state
 	int                     m_divider;              // dividing column
-	uint64_t                  m_last_update;          // execution counter at last update
+	u64                     m_last_update;          // execution counter at last update
 	std::vector<state_item> m_state_list;           // state data
 
 	// constants
-	static const int REG_DIVIDER    = -10;
-	static const int REG_CYCLES     = -11;
-	static const int REG_BEAMX      = -12;
-	static const int REG_BEAMY      = -13;
-	static const int REG_FRAME      = -14;
+	static constexpr int REG_DIVIDER    = -10;
+	static constexpr int REG_CYCLES     = -11;
+	static constexpr int REG_BEAMX      = -12;
+	static constexpr int REG_BEAMY      = -13;
+	static constexpr int REG_FRAME      = -14;
 };
 
 

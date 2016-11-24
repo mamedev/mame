@@ -690,17 +690,16 @@ CPU_DISASSEMBLE(e0c6200)
 
 
 	// fetch mnemonic
-	char *dst = buffer;
-	dst += sprintf(dst, "%-6s", em_name[m]);
+	util::stream_format(stream, "%-6s", em_name[m]);
 
 	// fetch param(s)
 	char pbuffer[10];
 	if (p1 != -1)
 	{
-		dst += sprintf(dst, "%s", decode_param(op, p1, pbuffer));
+		util::stream_format(stream, "%s", decode_param(op, p1, pbuffer));
 		if (p2 != -1)
 		{
-			dst += sprintf(dst, ",%s", decode_param(op, p2, pbuffer));
+			util::stream_format(stream, ",%s", decode_param(op, p2, pbuffer));
 		}
 	}
 

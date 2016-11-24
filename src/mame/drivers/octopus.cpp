@@ -32,8 +32,8 @@ Year of unit    1986?
 Year of introduction    1985
 End of production   ?
 CPU     Z80, 8088
-Speed   ??
-RAM     256kB
+Speed   8MHz (8088) or 6MHz (Z80)
+RAM     128kB or 256kB, expandable to 768kB
 ROM     16kB (Basic)
 Colors:     ??
 Sound:  Speaker. Beeps :)
@@ -42,8 +42,8 @@ MP/M 80 o 86
 Concurrent CP/M
 LSI ELSIE
 MS-DOS
-Display modes:  Text: ??
-Graphics: ??
+Text display: SCN2674 CRTC, SCB2675 for attributes
+Graphics: ?? (option board, ROM is dumped)
 
 Media:  Two internal 5.25" floppy disk drives, DS DD, 96tpi.
 Probably hard disk
@@ -101,8 +101,7 @@ Enter selection:
 
 This information was gained by studying boot ROM of the machine.
 
-It's a very rare computer. It has 2 processors, Z80 and 8088, so it seems that it may run CP/M and DOS.
-Its BIOS performs POST and halts as there's no keyboard.
+It's a very rare computer. It has 2 processors, Z80 and 8088, so it can run both MS-DOS and CP/M.
 
 ****************************************************************************/
 
@@ -158,6 +157,7 @@ public:
 		m_parallel(*this, "parallel"),
 		m_z80_bankdev(*this, "z80_bank"),
 		m_ram(*this, "ram"),
+		m_dswa(*this, "DSWA"),
 		m_current_dma(-1),
 		m_speaker_active(false),
 		m_beep_active(false),
@@ -194,6 +194,8 @@ public:
 	DECLARE_WRITE8_MEMBER(z80_vector_w);
 	DECLARE_READ8_MEMBER(parallel_r);
 	DECLARE_WRITE8_MEMBER(parallel_w);
+	DECLARE_READ8_MEMBER(video_latch_r);
+	DECLARE_WRITE8_MEMBER(video_latch_w);
 
 	DECLARE_WRITE_LINE_MEMBER(spk_w);
 	DECLARE_WRITE_LINE_MEMBER(spk_freq_w);
@@ -201,7 +203,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(serial_clock_w);
 	DECLARE_WRITE_LINE_MEMBER(parallel_busy_w) { m_printer_busy = state; }
 	DECLARE_WRITE_LINE_MEMBER(parallel_slctout_w) { m_printer_slctout = state; }
-	
+
 	DECLARE_WRITE_LINE_MEMBER(dack0_w) { m_dma1->hack_w(state ? 0 : 1); }  // for all unused DMA channel?
 	DECLARE_WRITE_LINE_MEMBER(dack1_w) { if(!state) m_current_dma = 1; else if(m_current_dma == 1) m_current_dma = -1; }  // HD
 	DECLARE_WRITE_LINE_MEMBER(dack2_w) { if(!state) m_current_dma = 2; else if(m_current_dma == 2) m_current_dma = -1; }  // RAM refresh
@@ -241,6 +243,7 @@ private:
 	required_device<centronics_device> m_parallel;
 	required_device<address_map_bank_device> m_z80_bankdev;
 	required_device<ram_device> m_ram;
+	required_ioport m_dswa;
 
 	uint8_t m_hd_bank;  // HD bank select
 	uint8_t m_fd_bank;  // Floppy bank select
@@ -261,16 +264,17 @@ private:
 	uint8_t m_rs422_vector;
 	bool m_printer_busy;
 	bool m_printer_slctout;
+	uint8_t m_char_latch_r;
+	uint8_t m_attr_latch_r;
+	uint8_t m_char_latch_w;
+	uint8_t m_attr_latch_w;
 
 	emu_timer* m_timer_beep;
 };
 
 
 static ADDRESS_MAP_START( octopus_mem, AS_PROGRAM, 8, octopus_state )
-	AM_RANGE(0x00000, 0x1ffff) AM_RAMBANK("main_ram_bank")
-	// second 128kB for 256kB system
-	// expansion RAM, up to 512kB extra
-	AM_RANGE(0x20000, 0xcffff) AM_NOP
+	AM_RANGE(0x00000, 0xcffff) AM_RAMBANK("main_ram_bank")
 	AM_RANGE(0xd0000, 0xdffff) AM_RAM AM_SHARE("vram")
 	AM_RANGE(0xe0000, 0xe3fff) AM_NOP
 	AM_RANGE(0xe4000, 0xe5fff) AM_RAM AM_SHARE("fram")
@@ -298,8 +302,7 @@ static ADDRESS_MAP_START( octopus_io, AS_IO, 8, octopus_state )
 	AM_RANGE(0xb4, 0xb5) AM_DEVREADWRITE("pic_slave", pic8259_device, read, write)
 	AM_RANGE(0xc0, 0xc7) AM_DEVREADWRITE("crtc", scn2674_device, read, write)
 	AM_RANGE(0xc8, 0xc8) AM_READWRITE(vidcontrol_r, vidcontrol_w)
-	AM_RANGE(0xc9, 0xc9) AM_DEVREADWRITE("crtc", scn2674_device, buffer_r, buffer_w)
-	AM_RANGE(0xca, 0xca) AM_RAM // attribute writes go here
+	AM_RANGE(0xc9, 0xca) AM_READWRITE(video_latch_r, video_latch_w)
 	// 0xcf: mode control
 	AM_RANGE(0xd0, 0xd3) AM_DEVREADWRITE("fdc", fd1793_t, read, write)
 	AM_RANGE(0xe0, 0xe4) AM_READWRITE(z80_vector_r, z80_vector_w)
@@ -361,11 +364,14 @@ void octopus_state::device_timer(emu_timer &timer, device_timer_id id, int param
 
 WRITE8_MEMBER(octopus_state::vram_w)
 {
-	m_vram[offset] = data;
+	m_vram[offset] = m_char_latch_w;
+	m_vram[offset+0x1000] = m_attr_latch_w;
 }
 
 READ8_MEMBER(octopus_state::vram_r)
 {
+	m_char_latch_r = m_vram[offset];
+	m_attr_latch_r = m_vram[offset+0x1000];
 	return m_vram[offset];
 }
 
@@ -588,6 +594,7 @@ WRITE8_MEMBER(octopus_state::gpo_w)
 // bits 4-5 - character width - 0=10 dots, 1=6 dots, 2=8 dots, 3=9 dots
 // bit 6 - cursor mode (colour only) - 0=inverse cursor, 1=white cursor (normal)
 // bit 7 - 1=monochrome mode, 0=colour mode
+// Is bit 7 writable, or just mirrors DIP switch setting?  Tech manual is unclear.
 READ8_MEMBER(octopus_state::vidcontrol_r)
 {
 	return m_vidctrl;
@@ -719,9 +726,9 @@ void octopus_state::machine_start()
 {
 	m_timer_beep = timer_alloc(BEEP_TIMER);
 
-	// install extra RAM
-	if(m_ram->size() > 0x20000)
-		m_maincpu->space(AS_PROGRAM).install_readwrite_bank(0x20000,m_ram->size()-1,"extra_ram_bank");
+	// install RAM
+	m_maincpu->space(AS_PROGRAM).install_readwrite_bank(0x0000,m_ram->size()-1,"main_ram_bank");
+	m_maincpu->space(AS_PROGRAM).nop_readwrite(m_ram->size(),0xcffff);
 }
 
 void octopus_state::machine_reset()
@@ -734,8 +741,6 @@ void octopus_state::machine_reset()
 	m_rtc_address = true;
 	m_rtc_data = false;
 	membank("main_ram_bank")->set_base(m_ram->pointer());
-	if(m_ram->size() > 0x20000)
-		membank("extra_ram_bank")->set_base(m_ram->pointer()+0x20000);
 	m_kb_uart->write_dsr(1);  // DSR is used to determine if a keyboard is connected?  If DSR is high, then the CHAR_OUT BIOS function will not output to the screen.
 }
 
@@ -744,14 +749,88 @@ void octopus_state::video_start()
 	m_vram.allocate(0x10000);
 }
 
+READ8_MEMBER(octopus_state::video_latch_r)
+{
+	if(offset & 0x01)
+		return m_attr_latch_r;
+	else
+		return m_char_latch_r;
+}
+
+WRITE8_MEMBER(octopus_state::video_latch_w)
+{
+	if(offset & 0x01)
+		m_attr_latch_w = data;
+	else
+		m_char_latch_w = data;
+}
+
 SCN2674_DRAW_CHARACTER_MEMBER(octopus_state::display_pixels)
 {
+	// Attributes:
+	//  - common bits
+	// b7 : blink
+	// b3 : underline
+	//  - Monochrome
+	// b6 : GP1 (general purpose)
+	// b5 : reverse video
+	// b4 : GP2 (general purpose)
+	// b2 : High intensity
+	// b1 : Grey background
+	// b0 : Blank (TODO)
+	//  - Colour
+	// b6,5,4 : background colour (RGB)
+	// b2,1,0 : foreground colour (RGB)
 	if(!lg)
 	{
 		uint8_t tile = m_vram[address & 0x0fff];
+		uint8_t attr = m_vram[(address & 0x0fff) + 0x1000];
 		uint8_t data = m_fontram[(tile * 16) + linecount];
+		rgb_t fg,bg;
+		if(m_dswa->read() & 0x80)  // monochrome or colour mode is selected by switch 8 of system DIP switches
+		{
+			// colour (is the background at half intensity?)
+			bg.set_r((attr & 0x40) ? 0x7f : 0x00);
+			bg.set_g((attr & 0x20) ? 0x7f : 0x00);
+			bg.set_b((attr & 0x10) ? 0x7f : 0x00);
+			fg.set_r((attr & 0x04) ? 0xff : 0x00);
+			fg.set_g((attr & 0x02) ? 0xff : 0x00);
+			fg.set_b((attr & 0x01) ? 0xff : 0x00);
+		}
+		else
+		{
+			// monochrome
+			if(attr & 0x02)
+				fg = 0xffffff;
+			else
+				fg = 0x7f7f7f;
+			if(attr & 0x04)
+				bg = 0x7f7f7f;
+			else
+				bg = 0x000000;
+				
+			if(attr & 0x20)  // reverse video
+				data = ~data;
+		}
+		if(ul && (attr & 0x08))
+			data = 0xff;
+		if(blink && (attr & 0x80))
+			data = 0x00;
+		if(cursor && !blink)
+		{
+			bool inverse = true;
+			
+			if(!(m_dswa->read() & 0x80))  // not available in monochrome mode
+				inverse = false;
+			if(m_vidctrl & 0x40)  // not enabled
+				inverse = false;
+			if(inverse)
+				data = ~data;
+			else
+				data = 0xff;
+		}
 		for (int z=0;z<8;z++)
-			bitmap.pix32(y,x + z) = BIT(data,z) ? rgb_t::white : rgb_t::black;
+			bitmap.pix32(y,x + z) = BIT(data,z) ? fg : bg;
 	}
 }
 
@@ -827,7 +906,7 @@ static MACHINE_CONFIG_START( octopus, octopus_state )
 	MCFG_PIC8259_ADD("pic_master", INPUTLINE("maincpu",0), VCC, READ8(octopus_state,get_slave_ack))
 	MCFG_PIC8259_ADD("pic_slave", DEVWRITELINE("pic_master",pic8259_device, ir7_w), GND, NOOP)
 
-	// RTC (MC146818 via i8255 PPI)  TODO: hook up RTC to PPI
+	// RTC (MC146818 via i8255 PPI)
 	MCFG_DEVICE_ADD("ppi", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(octopus_state,rtc_r))
 	MCFG_I8255_IN_PORTB_CB(READ8(octopus_state,cntl_r))
@@ -871,11 +950,18 @@ static MACHINE_CONFIG_START( octopus, octopus_state )
 
 	MCFG_Z80SIO2_ADD("serial", XTAL_16MHz / 4, 0, 0, 0, 0) // clock rate not mentioned in tech manual
 	MCFG_Z80DART_OUT_INT_CB(DEVWRITELINE("pic_master",pic8259_device, ir1_w))
+	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("serial_a",rs232_port_device, write_txd))
+	MCFG_Z80DART_OUT_TXDB_CB(DEVWRITELINE("serial_b",rs232_port_device, write_txd))
+	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE("serial_a",rs232_port_device, write_rts))
+	MCFG_Z80DART_OUT_RTSB_CB(DEVWRITELINE("serial_b",rs232_port_device, write_rts))
+	
 	MCFG_RS232_PORT_ADD("serial_a", default_rs232_devices, nullptr)
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("serial",z80sio2_device, ctsa_w))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("serial",z80sio2_device, rxa_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("serial",z80sio2_device, ctsa_w)) MCFG_DEVCB_INVERT
 	MCFG_RS232_RI_HANDLER(DEVWRITELINE("serial",z80sio2_device, ria_w)) MCFG_DEVCB_INVERT
 	MCFG_RS232_PORT_ADD("serial_b", default_rs232_devices, nullptr)
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("serial",z80sio2_device, ctsb_w))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("serial",z80sio2_device, rxb_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("serial",z80sio2_device, ctsb_w)) MCFG_DEVCB_INVERT
 	MCFG_RS232_RI_HANDLER(DEVWRITELINE("serial",z80sio2_device, rib_w)) MCFG_DEVCB_INVERT
 
 	MCFG_CENTRONICS_ADD("parallel", octopus_centronics_devices, "printer")
@@ -924,4 +1010,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY             FULLNAME       FLAGS */
-COMP( 1986, octopus,  0,      0,       octopus,   octopus, driver_device, 0,  "Digital Microsystems", "LSI Octopus", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1986, octopus,  0,      0,       octopus,   octopus, driver_device, 0,  "Digital Microsystems", "LSI Octopus", MACHINE_NOT_WORKING)

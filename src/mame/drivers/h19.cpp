@@ -389,7 +389,7 @@ static MACHINE_CONFIG_START( h19, h19_state )
 	//MCFG_DEVICE_PERIODIC_INT_DRIVER(h19_state, irq0_line_hold,  50) // for testing, causes a keyboard scan
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)

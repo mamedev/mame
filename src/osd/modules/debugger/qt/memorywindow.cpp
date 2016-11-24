@@ -430,21 +430,21 @@ void MemoryWindowQtConfig::applyToQWidget(QWidget* widget)
 }
 
 
-void MemoryWindowQtConfig::addToXmlDataNode(xml_data_node* node) const
+void MemoryWindowQtConfig::addToXmlDataNode(xml_data_node &node) const
 {
 	WindowQtConfig::addToXmlDataNode(node);
-	xml_set_attribute_int(node, "memoryregion", m_memoryRegion);
-	xml_set_attribute_int(node, "reverse", m_reverse);
-	xml_set_attribute_int(node, "addressmode", m_addressMode);
-	xml_set_attribute_int(node, "dataformat", m_dataFormat);
+	node.set_attribute_int("memoryregion", m_memoryRegion);
+	node.set_attribute_int("reverse", m_reverse);
+	node.set_attribute_int("addressmode", m_addressMode);
+	node.set_attribute_int("dataformat", m_dataFormat);
 }
 
 
-void MemoryWindowQtConfig::recoverFromXmlNode(xml_data_node* node)
+void MemoryWindowQtConfig::recoverFromXmlNode(xml_data_node const &node)
 {
 	WindowQtConfig::recoverFromXmlNode(node);
-	m_memoryRegion = xml_get_attribute_int(node, "memoryregion", m_memoryRegion);
-	m_reverse = xml_get_attribute_int(node, "reverse", m_reverse);
-	m_addressMode = xml_get_attribute_int(node, "addressmode", m_addressMode);
-	m_dataFormat = xml_get_attribute_int(node, "dataformat", m_dataFormat);
+	m_memoryRegion = node.get_attribute_int("memoryregion", m_memoryRegion);
+	m_reverse = node.get_attribute_int("reverse", m_reverse);
+	m_addressMode = node.get_attribute_int("addressmode", m_addressMode);
+	m_dataFormat = node.get_attribute_int("dataformat", m_dataFormat);
 }

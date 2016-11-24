@@ -213,7 +213,7 @@ struct test_writer: xml_writer
 {
 	std::basic_string<pugi::char_t> contents;
 
-	virtual void write(const void* data, size_t size)
+	virtual void write(const void* data, size_t size) PUGIXML_OVERRIDE
 	{
 		CHECK(size % sizeof(pugi::char_t) == 0);
 		contents.append(static_cast<const pugi::char_t*>(data), size / sizeof(pugi::char_t));
@@ -604,7 +604,7 @@ TEST_XML_FLAGS(write_mixed, "<node><child1/><child2>pre<![CDATA[data]]>mid<!--co
 #ifndef PUGIXML_NO_EXCEPTIONS
 struct throwing_writer: pugi::xml_writer
 {
-	virtual void write(const void*, size_t)
+	virtual void write(const void*, size_t) PUGIXML_OVERRIDE
 	{
 		throw std::runtime_error("write failed");
 	}

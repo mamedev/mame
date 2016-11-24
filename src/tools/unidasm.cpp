@@ -67,6 +67,7 @@ CPU_DISASSEMBLE( alpha8201 );
 CPU_DISASSEMBLE( am29000 );
 CPU_DISASSEMBLE( amis2000 );
 CPU_DISASSEMBLE( apexc );
+CPU_DISASSEMBLE( arcompact );
 CPU_DISASSEMBLE( arm );
 CPU_DISASSEMBLE( arm_be );
 CPU_DISASSEMBLE( arm7arm );
@@ -104,6 +105,7 @@ CPU_DISASSEMBLE( hd63701 );
 CPU_DISASSEMBLE( hmcs40 );
 CPU_DISASSEMBLE( hp_hybrid );
 CPU_DISASSEMBLE( hp_5061_3001 );
+CPU_DISASSEMBLE( hp_nanoprocessor );
 CPU_DISASSEMBLE( hyperstone_generic );
 CPU_DISASSEMBLE( i4004 );
 CPU_DISASSEMBLE( i8008 );
@@ -149,6 +151,7 @@ CPU_DISASSEMBLE( n8x300 );
 CPU_DISASSEMBLE( nec );
 CPU_DISASSEMBLE( nsc8105 );
 CPU_DISASSEMBLE( pdp1 );
+CPU_DISASSEMBLE( pdp8 );
 CPU_DISASSEMBLE( pic16c5x );
 CPU_DISASSEMBLE( pic16c62x );
 CPU_DISASSEMBLE( powerpc );
@@ -214,14 +217,14 @@ CPU_DISASSEMBLE( z8 );
 CPU_DISASSEMBLE( z80 );
 CPU_DISASSEMBLE( z8000 );
 
-CPU_DISASSEMBLE( sparcv7 )      { static sparc_disassembler dasm(nullptr, 7);                             return dasm.dasm(buffer, pc, big_endianize_int32(*reinterpret_cast<const uint32_t *>(oprom))); }
-CPU_DISASSEMBLE( sparcv8 )      { static sparc_disassembler dasm(nullptr, 8);                             return dasm.dasm(buffer, pc, big_endianize_int32(*reinterpret_cast<const uint32_t *>(oprom))); }
-CPU_DISASSEMBLE( sparcv9 )      { static sparc_disassembler dasm(nullptr, 9);                             return dasm.dasm(buffer, pc, big_endianize_int32(*reinterpret_cast<const uint32_t *>(oprom))); }
-CPU_DISASSEMBLE( sparcv9vis1 )  { static sparc_disassembler dasm(nullptr, 9, sparc_disassembler::vis_1);  return dasm.dasm(buffer, pc, big_endianize_int32(*reinterpret_cast<const uint32_t *>(oprom))); }
-CPU_DISASSEMBLE( sparcv9vis2 )  { static sparc_disassembler dasm(nullptr, 9, sparc_disassembler::vis_2);  return dasm.dasm(buffer, pc, big_endianize_int32(*reinterpret_cast<const uint32_t *>(oprom))); }
-CPU_DISASSEMBLE( sparcv9vis2p ) { static sparc_disassembler dasm(nullptr, 9, sparc_disassembler::vis_2p); return dasm.dasm(buffer, pc, big_endianize_int32(*reinterpret_cast<const uint32_t *>(oprom))); }
-CPU_DISASSEMBLE( sparcv9vis3 )  { static sparc_disassembler dasm(nullptr, 9, sparc_disassembler::vis_3);  return dasm.dasm(buffer, pc, big_endianize_int32(*reinterpret_cast<const uint32_t *>(oprom))); }
-CPU_DISASSEMBLE( sparcv9vis3b ) { static sparc_disassembler dasm(nullptr, 9, sparc_disassembler::vis_3b); return dasm.dasm(buffer, pc, big_endianize_int32(*reinterpret_cast<const uint32_t *>(oprom))); }
+CPU_DISASSEMBLE( sparcv7 )      { static sparc_disassembler dasm(nullptr, 7);                             return dasm.dasm(stream, pc, big_endianize_int32(*reinterpret_cast<const uint32_t *>(oprom))); }
+CPU_DISASSEMBLE( sparcv8 )      { static sparc_disassembler dasm(nullptr, 8);                             return dasm.dasm(stream, pc, big_endianize_int32(*reinterpret_cast<const uint32_t *>(oprom))); }
+CPU_DISASSEMBLE( sparcv9 )      { static sparc_disassembler dasm(nullptr, 9);                             return dasm.dasm(stream, pc, big_endianize_int32(*reinterpret_cast<const uint32_t *>(oprom))); }
+CPU_DISASSEMBLE( sparcv9vis1 )  { static sparc_disassembler dasm(nullptr, 9, sparc_disassembler::vis_1);  return dasm.dasm(stream, pc, big_endianize_int32(*reinterpret_cast<const uint32_t *>(oprom))); }
+CPU_DISASSEMBLE( sparcv9vis2 )  { static sparc_disassembler dasm(nullptr, 9, sparc_disassembler::vis_2);  return dasm.dasm(stream, pc, big_endianize_int32(*reinterpret_cast<const uint32_t *>(oprom))); }
+CPU_DISASSEMBLE( sparcv9vis2p ) { static sparc_disassembler dasm(nullptr, 9, sparc_disassembler::vis_2p); return dasm.dasm(stream, pc, big_endianize_int32(*reinterpret_cast<const uint32_t *>(oprom))); }
+CPU_DISASSEMBLE( sparcv9vis3 )  { static sparc_disassembler dasm(nullptr, 9, sparc_disassembler::vis_3);  return dasm.dasm(stream, pc, big_endianize_int32(*reinterpret_cast<const uint32_t *>(oprom))); }
+CPU_DISASSEMBLE( sparcv9vis3b ) { static sparc_disassembler dasm(nullptr, 9, sparc_disassembler::vis_3b); return dasm.dasm(stream, pc, big_endianize_int32(*reinterpret_cast<const uint32_t *>(oprom))); }
 
 
 static const dasm_table_entry dasm_table[] =
@@ -232,6 +235,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "am29000",     _32be,  0, CPU_DISASSEMBLE_NAME(am29000) },
 	{ "amis2000",    _8bit,  0, CPU_DISASSEMBLE_NAME(amis2000) },
 	{ "apexc",       _32be,  0, CPU_DISASSEMBLE_NAME(apexc) },
+	{ "arcompact",   _16le,  0, CPU_DISASSEMBLE_NAME(arcompact) },
 	{ "arm",         _32le,  0, CPU_DISASSEMBLE_NAME(arm) },
 	{ "arm_be",      _32be,  0, CPU_DISASSEMBLE_NAME(arm_be) },
 	{ "arm7",        _32le,  0, CPU_DISASSEMBLE_NAME(arm7arm) },
@@ -313,9 +317,11 @@ static const dasm_table_entry dasm_table[] =
 	{ "mips3be",     _32be,  0, CPU_DISASSEMBLE_NAME(mips3be) },
 	{ "mips3le",     _32le,  0, CPU_DISASSEMBLE_NAME(mips3le) },
 	{ "mn10200",     _16le,  0, CPU_DISASSEMBLE_NAME(mn10200) },
+	{ "nanoprocessor",_8bit, 0, CPU_DISASSEMBLE_NAME(hp_nanoprocessor) },
 	{ "nec",         _8bit,  0, CPU_DISASSEMBLE_NAME(nec) },
 	{ "nsc8105",     _8bit,  0, CPU_DISASSEMBLE_NAME(nsc8105) },
 	{ "pdp1",        _32be,  0, CPU_DISASSEMBLE_NAME(pdp1) },
+	{ "pdp8",        _16be,  0, CPU_DISASSEMBLE_NAME(pdp8) },
 	{ "pic16c5x",    _16le, -1, CPU_DISASSEMBLE_NAME(pic16c5x) },
 	{ "pic16c62x",   _16le, -1, CPU_DISASSEMBLE_NAME(pic16c62x) },
 	{ "powerpc",     _32be,  0, CPU_DISASSEMBLE_NAME(powerpc) },
@@ -372,7 +378,7 @@ static const dasm_table_entry dasm_table[] =
 	{ "tx0_8kw",     _32be, -2, CPU_DISASSEMBLE_NAME(tx0_8kw) },
 	{ "ucom4",       _8bit,  0, CPU_DISASSEMBLE_NAME(ucom4) },
 	{ "unsp",        _16be,  0, CPU_DISASSEMBLE_NAME(unsp) },
-	{ "upd7725",     _32be,  0, CPU_DISASSEMBLE_NAME(unsp) },
+	{ "upd7725",     _32be,  0, CPU_DISASSEMBLE_NAME(upd7725) },
 	{ "upd7801",     _8bit,  0, CPU_DISASSEMBLE_NAME(upd7801) },
 	{ "upd7807",     _8bit,  0, CPU_DISASSEMBLE_NAME(upd7807) },
 	{ "upd7810",     _8bit,  0, CPU_DISASSEMBLE_NAME(upd7810) },
@@ -539,7 +545,6 @@ int main(int argc, char *argv[])
 	options opts;
 	int numbytes;
 	void *data;
-	char *p;
 	int result = 0;
 
 	// parse options first
@@ -572,15 +577,18 @@ int main(int argc, char *argv[])
 		if ((length > opts.count) && (opts.count != 0))
 			length = opts.count;
 		curpc = opts.basepc;
+
+		std::stringstream stream;
 		for (curbyte = 0; curbyte < length; curbyte += numbytes)
 		{
 			uint8_t *oprom = (uint8_t *)data + opts.skip + curbyte;
-			char buffer[1024];
 			uint32_t pcdelta;
 			int numchunks;
 
 			// disassemble
-			pcdelta = (*opts.dasm->func)(nullptr, buffer, curpc, oprom, oprom, opts.mode) & DASMFLAG_LENGTHMASK;
+			stream.str("");
+			pcdelta = (*opts.dasm->func)(nullptr, stream, curpc, oprom, oprom, opts.mode) & DASMFLAG_LENGTHMASK;
+			std::string buffer = stream.str();
 
 			if (opts.dasm->pcshift < 0)
 				numbytes = pcdelta << -opts.dasm->pcshift;
@@ -590,13 +598,19 @@ int main(int argc, char *argv[])
 			// force upper or lower
 			if (opts.lower)
 			{
-				for (p = buffer; *p != 0; p++)
-					*p = tolower((uint8_t)*p);
+				std::transform(
+					std::begin(buffer),
+					std::end(buffer),
+					std::begin(buffer),
+					[](char c) { return tolower(c); });
 			}
 			else if (opts.upper)
 			{
-				for (p = buffer; *p != 0; p++)
-					*p = toupper((uint8_t)*p);
+				std::transform(
+					std::begin(buffer),
+					std::end(buffer),
+					std::begin(buffer),
+					[](char c) { return toupper(c); });
 			}
 
 			// round to the nearest display chunk
@@ -629,7 +643,7 @@ int main(int argc, char *argv[])
 				}
 
 				// output the disassembly
-				printf("%s\n", buffer);
+				printf("%s\n", buffer.c_str());
 
 				// output additional raw bytes
 				if (!opts.norawbytes && numchunks > maxchunks)
@@ -655,7 +669,7 @@ int main(int argc, char *argv[])
 			else
 			{
 				// output the disassembly and address
-				printf("\t%-40s ; %08X", buffer, curpc);
+				printf("\t%-40s ; %08X", buffer.c_str(), curpc);
 
 				// output the raw bytes
 				if (!opts.norawbytes)
@@ -705,7 +719,7 @@ int main(int argc, char *argv[])
 		result = 1;
 	}
 
-	osd_free(data);
+	free(data);
 
 	return result;
 }

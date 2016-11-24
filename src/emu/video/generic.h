@@ -8,10 +8,10 @@
 
 *********************************************************************/
 
-#pragma once
+#ifndef MAME_EMU_VIDEO_GENERIC_H
+#define MAME_EMU_VIDEO_GENERIC_H
 
-#ifndef __VIDEO_GENERIC_H__
-#define __VIDEO_GENERIC_H__
+#pragma once
 
 
 
@@ -28,4 +28,4 @@ extern const gfx_layout gfx_8x8x6_planar;
 
 extern const gfx_layout gfx_16x16x4_planar;
 
-#endif  /* __VIDEO_GENERIC_H__ */
+#endif  /* MAME_EMU_VIDEO_GENERIC_H */

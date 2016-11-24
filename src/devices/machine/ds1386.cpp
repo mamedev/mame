@@ -4,27 +4,27 @@
 
     Dallas DS1386/DS1386P RAMified Watchdog Timekeeper
 
-	Note: Largely untested.
+    Note: Largely untested.
 
 **********************************************************************/
 
 #include "ds1386.h"
 #include "machine/timehelp.h"
 
-#define DISABLE_OSC		(0x80)
-#define	DISABLE_SQW		(0x40)
+#define DISABLE_OSC     (0x80)
+#define DISABLE_SQW     (0x40)
 
-#define COMMAND_TE		(0x80)
-#define COMMAND_IPSW	(0x40)
-#define COMMAND_IBH_LO	(0x20)
-#define COMMAND_PU_LVL	(0x10)
-#define COMMAND_WAM		(0x08)
-#define COMMAND_TDM		(0x04)
-#define COMMAND_WAF		(0x02)
-#define COMMAND_TDF		(0x01)
+#define COMMAND_TE      (0x80)
+#define COMMAND_IPSW    (0x40)
+#define COMMAND_IBH_LO  (0x20)
+#define COMMAND_PU_LVL  (0x10)
+#define COMMAND_WAM     (0x08)
+#define COMMAND_TDM     (0x04)
+#define COMMAND_WAF     (0x02)
+#define COMMAND_TDF     (0x01)
 
-#define HOURS_12_24		(0x40)
-#define HOURS_AM_PM		(0x20)
+#define HOURS_12_24     (0x40)
+#define HOURS_AM_PM     (0x20)
 
 const device_type DS1386_8K = &device_creator<ds1386_8k_device>;
 const device_type DS1386_32K = &device_creator<ds1386_32k_device>;

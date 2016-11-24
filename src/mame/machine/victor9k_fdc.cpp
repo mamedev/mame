@@ -339,14 +339,14 @@ void victor_9000_fdc_t::device_reset()
 	// set floppy callbacks
 	if (m_floppy0->get_device())
 	{
-		m_floppy0->get_device()->setup_load_cb(floppy_image_device::load_cb(FUNC(victor_9000_fdc_t::load0_cb), this));
-		m_floppy0->get_device()->setup_unload_cb(floppy_image_device::unload_cb(FUNC(victor_9000_fdc_t::unload0_cb), this));
+		m_floppy0->get_device()->setup_load_cb(floppy_image_device::load_cb(&victor_9000_fdc_t::load0_cb, this));
+		m_floppy0->get_device()->setup_unload_cb(floppy_image_device::unload_cb(&victor_9000_fdc_t::unload0_cb, this));
 	}
 
 	if (m_floppy1->get_device())
 	{
-		m_floppy1->get_device()->setup_load_cb(floppy_image_device::load_cb(FUNC(victor_9000_fdc_t::load1_cb), this));
-		m_floppy1->get_device()->setup_unload_cb(floppy_image_device::unload_cb(FUNC(victor_9000_fdc_t::unload1_cb), this));
+		m_floppy1->get_device()->setup_load_cb(floppy_image_device::load_cb(&victor_9000_fdc_t::load1_cb, this));
+		m_floppy1->get_device()->setup_unload_cb(floppy_image_device::unload_cb(&victor_9000_fdc_t::unload1_cb, this));
 	}
 }
 
