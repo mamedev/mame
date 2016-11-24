@@ -2129,14 +2129,14 @@ ROM_START( fscc12 )
 ROM_END
 
 
-ROM_START( fexcel )
+ROM_START( fexcel ) // PCB label 510.1117A02
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("101-1080a01.ic5", 0x8000, 0x8000, CRC(846f8e40) SHA1(4e1d5b08d5ff3422192b54fa82cb3f505a69a971) ) // same as fexcelv
 ROM_END
 
-#define rom_fexceld rom_fexcelb
+#define rom_fexceld rom_fexcelb /* model 6093, PCB label 510.1117A02 */
 
-ROM_START( fexcelv )
+ROM_START( fexcelv ) // model 6092, PCB label 510.1117A02, sound PCB 510.1117A01
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("101-1080a01.ic5", 0x8000, 0x8000, CRC(846f8e40) SHA1(4e1d5b08d5ff3422192b54fa82cb3f505a69a971) ) // PCB1, M27256
 
@@ -2144,28 +2144,28 @@ ROM_START( fexcelv )
 	ROM_LOAD("101-1081a01.ic2", 0x0000, 0x8000, CRC(c8ae1607) SHA1(6491ce6be60ed77f3dd931c0ca17616f13af943e) ) // PCB2, M27256
 ROM_END
 
-ROM_START( fexcela )
+ROM_START( fexcela ) // PCB label 510-1099A01
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("101-1072a01.ic5", 0xc000, 0x4000, CRC(212b006d) SHA1(242ff851b0841cbec66bbada6a730da021010e2c) )
 ROM_END
 
-ROM_START( fexcelb )
+ROM_START( fexcelb ) // PCB label 510-1099A01
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("101-1072b01.ic5", 0xc000, 0x4000, CRC(fd2f6064) SHA1(f84bb98bdb9565a04891eb6820597d7aecc90c21) ) // RCA
 ROM_END
 
-ROM_START( fexcelp )
+ROM_START( fexcelp ) // model 6083, PCB label 510-1099B01
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("par_ex.ic5", 0x8000, 0x8000, CRC(0d17b0f0) SHA1(3a6070fd4718c62b62ff0f08637bb6eb84eb9a1c) ) // GI 27C256, no label
 ROM_END
 
-ROM_START( fdes2000 )
+ROM_START( fdes2000 ) // model 6102, PCB label 510.1129A01
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("101-1077a01.ic5", 0x8000, 0x8000, CRC(62006320) SHA1(1d6370973dbae42c54639b261cc81e32cdfc1d5d) ) // AMI
 ROM_END
 
 
-ROM_START( fdes2100d ) // The 'rev B' dump came from a post-release bugfix by Fidelity
+ROM_START( fdes2100d ) // model 6106, PCB label 510.1130A01. The 'rev B' dump came from a post-release bugfix by Fidelity
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("i9_orange.ic9", 0x8000, 0x8000, CRC(83fec02a) SHA1(6f43ab05bc605061989b05d0592dbd184efff9d4) ) // WSI 27C256L-12
 
@@ -2174,7 +2174,7 @@ ROM_START( fdes2100d ) // The 'rev B' dump came from a post-release bugfix by Fi
 ROM_END
 
 
-ROM_START( chesster )
+ROM_START( chesster ) // model 6120, PCB label 510.1141C01
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("chesster.ic9", 0x8000, 0x8000, CRC(29f9a698) SHA1(4c83ca46fd5fc9c40302e9c7f16b4ae2c18b06e6) ) // M27C256B, sticker but no label
 
