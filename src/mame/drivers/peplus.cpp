@@ -1610,13 +1610,13 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 	ROM_RELOAD(                     0x08000, 0x8000) /* 32K version build for the original PE boards (non-plus) */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg857.u72",   0x00000, 0x8000, CRC(0b6c5f96) SHA1(f4cf7bfb715af8b88d9dbbad0c42b65a2c4d341b) ) /* Custom El Cortez card backs */
-	ROM_LOAD( "mgo-cg857.u73",   0x08000, 0x8000, CRC(c49d2258) SHA1(9dd5cc75999f46da84f4331fcd6857dd78768592) )
-	ROM_LOAD( "mbo-cg857.u74",   0x10000, 0x8000, CRC(2c229fcf) SHA1(24d948470d91ede475859f52679fe826547cd248) )
-	ROM_LOAD( "mxo-cg857.u75",   0x18000, 0x8000, CRC(3c216808) SHA1(51fa59710128d6bd653d482d506f383dd671a19f) )
+	ROM_LOAD( "mro-cg857.u52",   0x00000, 0x8000, CRC(0b6c5f96) SHA1(f4cf7bfb715af8b88d9dbbad0c42b65a2c4d341b) ) /* Custom El Cortez card backs */
+	ROM_LOAD( "mgo-cg857.u53",   0x08000, 0x8000, CRC(c49d2258) SHA1(9dd5cc75999f46da84f4331fcd6857dd78768592) )
+	ROM_LOAD( "mbo-cg857.u54",   0x10000, 0x8000, CRC(2c229fcf) SHA1(24d948470d91ede475859f52679fe826547cd248) )
+	ROM_LOAD( "mxo-cg857.u55",   0x18000, 0x8000, CRC(3c216808) SHA1(51fa59710128d6bd653d482d506f383dd671a19f) )
 
 	ROM_REGION( 0x100, "proms", 0 )
-	ROM_LOAD( "cap857.u50", 0x0000, 0x0100, CRC(6957242b) SHA1(e4a8decbf6f62d46eac1734b4fdb3d3b02ee4c90) )
+	ROM_LOAD( "cap857.u37", 0x0000, 0x0100, CRC(6957242b) SHA1(e4a8decbf6f62d46eac1734b4fdb3d3b02ee4c90) )
 ROM_END
 
 ROM_START( pepk0756a ) /* Normal board (non-plus) : Jacks or Better (PK0756) */
@@ -1855,10 +1855,10 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 	ROM_RELOAD(                     0x08000, 0x8000) /* 32K version build for the original PE boards (non-plus) */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg665.u72",   0x00000, 0x8000, CRC(deca24f0) SHA1(8cfc0c106b87d961383f32e9e4a60983848a741d) )
-	ROM_LOAD( "mgo-cg665.u73",   0x08000, 0x8000, CRC(7de9a543) SHA1(fe2251e783581f1a9db4511b2563fff78b662adf) )
-	ROM_LOAD( "mbo-cg665.u74",   0x10000, 0x8000, CRC(ad2edc8b) SHA1(63881363b0e23a35ebc4df22838d6328fe86447b) )
-	ROM_LOAD( "mxo-cg665.u75",   0x18000, 0x8000, CRC(3d25aa32) SHA1(17500f5556d54c8de07b63b06a5dd3d701df3cb7) )
+	ROM_LOAD( "mro-cg665.u52",   0x00000, 0x8000, CRC(deca24f0) SHA1(8cfc0c106b87d961383f32e9e4a60983848a741d) )
+	ROM_LOAD( "mgo-cg665.u53",   0x08000, 0x8000, CRC(7de9a543) SHA1(fe2251e783581f1a9db4511b2563fff78b662adf) )
+	ROM_LOAD( "mbo-cg665.u54",   0x10000, 0x8000, CRC(ad2edc8b) SHA1(63881363b0e23a35ebc4df22838d6328fe86447b) )
+	ROM_LOAD( "mxo-cg665.u55",   0x18000, 0x8000, CRC(3d25aa32) SHA1(17500f5556d54c8de07b63b06a5dd3d701df3cb7) )
 
 	ROM_REGION( 0x100, "proms", 0 )
 	ROM_LOAD( "cap435.u37", 0x0000, 0x0100, CRC(038cabc6) SHA1(c6514b4f9dbed6ab2631f563f7e00648661ebdbb) )
