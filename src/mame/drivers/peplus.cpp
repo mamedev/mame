@@ -5332,10 +5332,16 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  4K  4A  SF  RF  5K  RF  (Bonus)
 	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) )
 ROM_END
 
-ROM_START( pepp0295 ) /* Normal board : Super Deuces Wild Bonus (PP0295) */
+ROM_START( pepp0295 ) /* Normal board : Super Deuces Wild (PP0295) */
 /*
+                                        w/D     w/A      w/oD
+PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  4D  SD*  RF  (Bonus)
+--------------------------------------------------------------------
+  ????      1    2    2   3   5   9  15  25 200 400 800  250    800
+  % Range: ???-???%  Optimum: ???%  Hit Frequency: ???%
+     Programs Available: PP0295
 
-Unknown Paytable
+* Super Dueces
 
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
