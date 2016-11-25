@@ -14787,6 +14787,8 @@ isbc286                         //
 isbc2861                        //
 isbc86                          //
 rpc86                           //
+isbc8605			//
+isbc8630			//
 
 @source:isbc8010.cpp
 isbc8010                        //
