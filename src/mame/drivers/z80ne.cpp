@@ -437,7 +437,8 @@ static MACHINE_CONFIG_START( z80ne, z80ne_state )
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("32K")
 
-	//MCFG_SOFTWARE_LIST_ADD("cass_list","z80ne_cass") /* all known tapes require LX.388 expansion
+	// all known tapes require LX.388 expansion
+	//MCFG_SOFTWARE_LIST_ADD("cass_list","z80ne_cass")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( z80net, z80ne )
