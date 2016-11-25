@@ -1199,17 +1199,6 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<software name="newlook" supported="no">
-		<description>New Look</description>
-		<year>1993</year>
-		<publisher>Acorn?</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="819200">
-				<rom name="newlook (1993)(acorn).adf" size="819200" crc="9d13affa" sha1="ca2edab7a9708ebf8cba80abc97b245de1fa20f4" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="oddball" supported="no">
 		<description>Oddball</description>
 		<year>1995</year>
@@ -2623,41 +2612,19 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
-	<software name="apecutil" supported="no">
-		<description>APEC Utils Disk v1.3</description>
-		<year>1989</year>
-		<publisher>Atomwide Ltd</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="797117">
-				<rom name="APECUtilsDisk(Atomwide).imd" size="797117" crc="b653550b" sha1="9071600281b8c7cc9ab475652105b2749e827c1b" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="wehdutil" supported="no">
-		<description>Archimedes Hard Disc Utilities Disc</description>
-		<year>1989</year>
-		<publisher>Watford Electronics</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="20045">
-				<rom name="WEHardDiscUtilities(Watford).imd" size="20045" crc="5534fe62" sha1="ad13796bde83749cf4e926e8027d247ad3d5f0cd" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="acorndtp" supported="no">
 		<description>Acorn Desktop Publisher</description>
 		<year>1989</year>
 		<publisher>Acorn</publisher>
 		<info name="release" value="SKB69" />
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Program Disc"/>
 			<dataarea name="flop" size="819200">
 				<rom name="AcornDTP_1 (Acorn).adf" size="819200" crc="e2dbdab0" sha1="2268bb317fdd41dfa55151fd8f48373628cb2681" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Examples Disc"/>
 			<dataarea name="flop" size="819200">
 				<rom name="AcornDTP_2 (Acorn).adf" size="819200" crc="77715969" sha1="06abbdd620e76789aa9d199bf75be3aba41ee654" offset="0"/>
 			</dataarea>
@@ -2728,6 +2695,17 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		</part>
 	</software>
 
+	<software name="pcemul" supported="no">
+		<description>PC Emulator</description>
+		<year>1989</year>
+		<publisher>Acorn</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="PC Emulator (Acorn).adf" size="819200" crc="8f0e4809" sha1="bf6708ff04f4f16e6afc0984a493f104b515b293" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="pendown" supported="no">
 		<description>Pen Down (v1.72)</description>
 		<year>1992</year>
@@ -2746,17 +2724,6 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="819200">
 				<rom name="Pipedream3(1989)(Colton).adf" size="819200" crc="24df7612" sha1="3ced346942645806c4f13b83679befb20e9e72b3" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="pipedrm4d" supported="no">
-		<description>PipeDream 4 Demonstration Disc</description>
-		<year>1991</year>
-		<publisher>Colton Software</publisher>
-		<part name="flop1" interface="floppy_3_5">
-			<dataarea name="flop" size="820649">
-				<rom name="Pipedream4Demo(1991)(Colton).imd" size="820649" crc="b921eb00" sha1="6df9c9886fe9632cf23f27e8be1330ca6f9000ef" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -3008,8 +2975,8 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		<publisher>Acorn</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="0281,881"/>
-			<dataarea name="flop" size="635470">
-				<rom name="Acorn ANSI C Release 2.imd" size="635470" crc="c487249c" sha1="d8690806b1d6ee4dfc893065241bfd93b21439af" offset="0"/>
+			<dataarea name="flop" size="819200">
+				<rom name="Acorn ANSI C Release 2.adf" size="819200" crc="adc41189" sha1="61555b04fd08cd29212f3f31b72fea2121eb5bfd" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3019,19 +2986,19 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		<year>1989</year>
 		<publisher>Acorn</publisher>
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disc 1"/>
 			<dataarea name="flop" size="819200">
 				<rom name="Acorn C Release 3 - Disc 1.adf" size="819200" crc="7e7fbab4" sha1="13634be2476f0b546efab3f23d89e4095ca98b2d" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disc 2"/>
 			<dataarea name="flop" size="819200">
 				<rom name="Acorn C Release 3 - Disc 2.adf" size="819200" crc="ee0235dd" sha1="b06ba5b9eb7caecbdac914ef948b4e23463575e7" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 3"/>
+			<feature name="part_id" value="Disc 3"/>
 			<dataarea name="flop" size="819200">
 				<rom name="Acorn C Release 3 - Disc 3.adf" size="819200" crc="c714c7e8" sha1="df941f11c06518305b7e3f287bbda44b4a53b15d" offset="0"/>
 			</dataarea>
@@ -3044,37 +3011,37 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 		<publisher>Acorn</publisher>
 		<info name="release" value="SKB78" />
 		<part name="flop1" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Disc 1"/>
 			<dataarea name="flop" size="819200">
 				<rom name="Acorn C Release 5 - Disc 1.adf" size="819200" crc="ec608570" sha1="1b558ad616440ec4a2b174a5d03e197c83b62c10" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 2"/>
+			<feature name="part_id" value="Disc 2"/>
 			<dataarea name="flop" size="819200">
 				<rom name="Acorn C Release 5 - Disc 2.adf" size="819200" crc="e55d7876" sha1="3f0b212584247895c844c3c9935c7cba2e58f3c7" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 3"/>
+			<feature name="part_id" value="Disc 3"/>
 			<dataarea name="flop" size="819200">
 				<rom name="Acorn C Release 5 - Disc 3.adf" size="819200" crc="a9099124" sha1="27d1a9d83b02b3a7b974cf585a48ff5b0b2a7a9d" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 4"/>
+			<feature name="part_id" value="Disc 4"/>
 			<dataarea name="flop" size="819200">
 				<rom name="Acorn C Release 5 - Disc 4.adf" size="819200" crc="a761b3be" sha1="14e98c427c8b88a29d12a2efc3a95f737c39d536" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 5"/>
+			<feature name="part_id" value="Disc 5"/>
 			<dataarea name="flop" size="819200">
 				<rom name="Acorn C Release 5 - Disc 5.adf" size="819200" crc="1d76482e" sha1="1c3711a4ef8557ae0331c3015b75e7a11d028b7a" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop6" interface="floppy_3_5">
-			<feature name="part_id" value="Disk 6"/>
+			<feature name="part_id" value="Disc 6"/>
 			<dataarea name="flop" size="819200">
 				<rom name="Acorn C Release 5 - Disc 6.adf" size="819200" crc="e81d8f6e" sha1="aff94384df5216df51aa7f942b7fb8523cb75dfa" offset="0"/>
 			</dataarea>
@@ -4298,7 +4265,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<software name="riscapps" supported="no">
-		<description>Acorn Archimedes RISC OS Application Suite (v1.00)</description>
+		<description>Archimedes Applications (RISC OS 2)</description>
 		<year>1988</year>
 		<publisher>Acorn</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -4316,7 +4283,7 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 	</software>
 
 	<software name="riscappsa" cloneof="riscapps" supported="no">
-		<description>Acorn Archimedes RISC OS Application Suite (v1.00, Alt)</description>
+		<description>Archimedes Applications (RISC OS 2) (Alt)</description>
 		<year>1988</year>
 		<publisher>Acorn</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -4329,6 +4296,47 @@ Zelanites: The Onslaught by Micro Power (RiscOS2)
 			<feature name="part_id" value="Disc 2"/>
 			<dataarea name="flop" size="820224">
 				<rom name="acorn archimedes risc os application suite v1.00 (19xx)(acorn)(disk 2 of 2)[a][req risc os].adf" size="820224" crc="45ff05fd" sha1="0a926620d68688766e81593b8150dbcebdb51b11" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ros3apps" supported="no">
+		<description>Acorn RISC OS 3 Applications</description>
+		<year>1992</year>
+		<publisher>Acorn</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="App1"/>
+			<dataarea name="flop" size="819200">
+				<rom name="Acorn RISC OS 3 Applications disc 1 (App1) (0296,050).adf" size="819200" crc="2735250c" sha1="2c274a3c697705372055453ba2b605527bc758ab" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="App2"/>
+			<dataarea name="flop" size="819200">
+				<rom name="Acorn RISC OS 3 Applications disc 2 (App2) (0296,052).adf" size="819200" crc="a1de0c53" sha1="fd56112221601ec5ab38ec818a4221df4a61a529" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ros3supp" supported="no">
+		<description>Acorn RISC OS 3 Support</description>
+		<year>1992</year>
+		<publisher>Acorn</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Support"/>
+			<dataarea name="flop" size="819200">
+				<rom name="Acorn RISC OS 3 Support disc (0296,054).adf" size="819200" crc="35181510" sha1="34c467d255f525564b607d47be1708ff2d3caa5a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="newlook" supported="no">
+		<description>RISC OS !New Look</description>
+		<year>1993</year>
+		<publisher>Acorn</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="819200">
+				<rom name="newlook (1993)(acorn).adf" size="819200" crc="9d13affa" sha1="ca2edab7a9708ebf8cba80abc97b245de1fa20f4" offset="0" />
 			</dataarea>
 		</part>
 	</software>
