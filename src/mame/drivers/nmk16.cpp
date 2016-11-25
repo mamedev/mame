@@ -154,6 +154,7 @@ Afega stands for "Art-Fiction Electronic Game"
 #include "sound/2203intf.h"
 #include "sound/okim6295.h"
 #include "sound/3812intf.h"
+#include "sound/ym2151.h"
 #include "machine/nmk004.h"
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "includes/nmk16.h"
@@ -3950,7 +3951,8 @@ static MACHINE_CONFIG_START( mustangb, nmk16_state )
 	MCFG_CPU_PROGRAM_MAP(mustangb_map)
 	NMK_HACKY_INTERRUPT_TIMING
 
-	SEIBU_SOUND_SYSTEM_CPU(14318180/4)
+	MCFG_CPU_ADD("audiocpu", Z80, 14318180/4)
+	MCFG_CPU_PROGRAM_MAP(seibu_sound_map)
 
 	/* video hardware */
 	NMK_HACKY_SCREEN_LOWRES
@@ -3964,8 +3966,19 @@ static MACHINE_CONFIG_START( mustangb, nmk16_state )
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
 	/* sound hardware */
-	SEIBU_SOUND_SYSTEM_YM3812_INTERFACE(14318180/4, 1320000)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_SOUND_ADD("ymsnd", YM3812, 14318180/4)
+	MCFG_YM3812_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_OKIM6295_ADD("oki", 1320000, OKIM6295_PIN7_LOW)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+
+	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
+	MCFG_SEIBU_SOUND_CPU("audiocpu")
+	MCFG_SEIBU_SOUND_YM_READ_CB(DEVREAD8("ymsnd", ym3812_device, read))
+	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym3812_device, write))
 MACHINE_CONFIG_END
 
 #define BIOSHIP_CRYSTAL1 10000000
@@ -4124,7 +4137,8 @@ static MACHINE_CONFIG_START( tdragonb, nmk16_state )    /* bootleg using Raiden 
 	MCFG_CPU_PROGRAM_MAP(tdragonb_map)
 	NMK_HACKY_INTERRUPT_TIMING
 
-	SEIBU_SOUND_SYSTEM_CPU(14318180/4)
+	MCFG_CPU_ADD("audiocpu", Z80, 14318180/4)
+	MCFG_CPU_PROGRAM_MAP(seibu_sound_map)
 
 	/* video hardware */
 	NMK_HACKY_SCREEN_LOWRES
@@ -4138,7 +4152,19 @@ static MACHINE_CONFIG_START( tdragonb, nmk16_state )    /* bootleg using Raiden 
 	MCFG_VIDEO_START_OVERRIDE(nmk16_state,macross)
 
 	/* sound hardware */
-	SEIBU_SOUND_SYSTEM_YM3812_INTERFACE(14318180/4, 1320000)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("ymsnd", YM3812, 14318180/4)
+	MCFG_YM3812_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_OKIM6295_ADD("oki", 1320000, OKIM6295_PIN7_LOW)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+
+	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
+	MCFG_SEIBU_SOUND_CPU("audiocpu")
+	MCFG_SEIBU_SOUND_YM_READ_CB(DEVREAD8("ymsnd", ym3812_device, read))
+	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym3812_device, write))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( tdragon, nmk16_state )

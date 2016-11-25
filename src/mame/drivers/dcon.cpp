@@ -17,6 +17,9 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
+#include "sound/3812intf.h"
+#include "sound/ym2151.h"
+#include "sound/okim6295.h"
 #include "audio/seibu.h"
 #include "includes/dcon.h"
 #include "video/seibu_crtc.h"
@@ -261,7 +264,8 @@ static MACHINE_CONFIG_START( dcon, dcon_state )
 	MCFG_CPU_PROGRAM_MAP(dcon_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dcon_state,  irq4_line_hold)
 
-	SEIBU_SOUND_SYSTEM_CPU(4000000) /* Perhaps 14318180/4? */
+	MCFG_CPU_ADD("audiocpu", Z80, 4000000) /* Perhaps 14318180/4? */
+	MCFG_CPU_PROGRAM_MAP(seibu_sound_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -281,7 +285,19 @@ static MACHINE_CONFIG_START( dcon, dcon_state )
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
-	SEIBU_SOUND_SYSTEM_YM3812_INTERFACE(4000000,1320000)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("ymsnd", YM3812, 4000000)
+	MCFG_YM3812_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_OKIM6295_ADD("oki", 1320000, OKIM6295_PIN7_LOW)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+
+	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
+	MCFG_SEIBU_SOUND_CPU("audiocpu")
+	MCFG_SEIBU_SOUND_YM_READ_CB(DEVREAD8("ymsnd", ym3812_device, read))
+	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym3812_device, write))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( sdgndmps, dcon_state )
@@ -291,7 +307,8 @@ static MACHINE_CONFIG_START( sdgndmps, dcon_state )
 	MCFG_CPU_PROGRAM_MAP(dcon_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dcon_state,  irq4_line_hold)
 
-	SEIBU2_SOUND_SYSTEM_CPU(14318180/4)
+	MCFG_CPU_ADD("audiocpu", Z80, 14318180/4)
+	MCFG_CPU_PROGRAM_MAP(seibu_sound_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -311,7 +328,20 @@ static MACHINE_CONFIG_START( sdgndmps, dcon_state )
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
-	SEIBU_SOUND_SYSTEM_YM2151_INTERFACE(14318180/4,1320000)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_YM2151_ADD("ymsnd", 14318180/4)
+	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
+	MCFG_SOUND_ROUTE(0, "mono", 0.50)
+	MCFG_SOUND_ROUTE(1, "mono", 0.50)
+
+	MCFG_OKIM6295_ADD("oki", 1320000, OKIM6295_PIN7_LOW)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+
+	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
+	MCFG_SEIBU_SOUND_CPU("audiocpu")
+	MCFG_SEIBU_SOUND_YM_READ_CB(DEVREAD8("ymsnd", ym2151_device, read))
+	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym2151_device, write))
 MACHINE_CONFIG_END
 
 /***************************************************************************/

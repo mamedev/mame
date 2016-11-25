@@ -97,7 +97,7 @@ Notes:
 #include "cpu/z80/z80.h"
 #include "machine/watchdog.h"
 #include "sound/3812intf.h"
-#include "sound/3812intf.h"
+#include "sound/okim6295.h"
 #include "includes/toki.h"
 
 WRITE16_MEMBER(toki_state::tokib_soundcommand_w)
@@ -438,7 +438,8 @@ static MACHINE_CONFIG_START( toki, toki_state ) /* KOYO 20.000MHz near the cpu *
 	MCFG_CPU_PROGRAM_MAP(toki_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", toki_state,  irq1_line_hold)/* VBL */
 
-	SEIBU_SOUND_SYSTEM_CPU(XTAL_14_31818MHz/4)  /* verifed on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_14_31818MHz/4) // verified on pcb
+	MCFG_CPU_PROGRAM_MAP(seibu_sound_map)
 
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
@@ -456,15 +457,35 @@ static MACHINE_CONFIG_START( toki, toki_state ) /* KOYO 20.000MHz near the cpu *
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	/* sound hardware */
-	SEIBU_SOUND_SYSTEM_YM3812_RAIDEN_INTERFACE(XTAL_14_31818MHz/4,XTAL_12MHz/12) /* verifed on pcb */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_14_31818MHz/4)
+	MCFG_YM3812_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_OKIM6295_ADD("oki", XTAL_12MHz/12, OKIM6295_PIN7_HIGH) // verified on pcb
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
+	MCFG_SEIBU_SOUND_CPU("audiocpu")
+	MCFG_SEIBU_SOUND_YM_READ_CB(DEVREAD8("ymsnd", ym3812_device, read))
+	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym3812_device, write))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( tokie, toki )
-	SEIBU_SOUND_SYSTEM_ENCRYPTED_LOW()
+	MCFG_DEVICE_MODIFY("seibu_sound")
+	MCFG_SEIBU_SOUND_CPU_ENCRYPTED_LOW("audiocpu")
+
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(seibu_sound_decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( tokic, toki )
-	SEIBU_SOUND_SYSTEM_ENCRYPTED_CUSTOM()
+	MCFG_DEVICE_MODIFY("seibu_sound")
+	MCFG_SEIBU_SOUND_CPU_ENCRYPTED_CUSTOM("audiocpu")
+
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(seibu_sound_decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( tokib, toki_state )

@@ -133,6 +133,7 @@ DIP locations verified for Blood Bros. & Sky Smasher via manual & DIP-SW setting
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "sound/3812intf.h"
+#include "sound/okim6295.h"
 #include "includes/bloodbro.h"
 #include "video/seibu_crtc.h"
 
@@ -484,7 +485,8 @@ static MACHINE_CONFIG_START( bloodbro, bloodbro_state )
 	MCFG_CPU_PROGRAM_MAP(bloodbro_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", bloodbro_state,  irq4_line_hold)
 
-	SEIBU_SOUND_SYSTEM_CPU(XTAL_7_15909MHz/2) /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_7_15909MHz/2) /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(seibu_sound_map)
 
 	// video hardware
 
@@ -506,7 +508,19 @@ static MACHINE_CONFIG_START( bloodbro, bloodbro_state )
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	// sound hardware
-	SEIBU_SOUND_SYSTEM_YM3812_RAIDEN_INTERFACE(XTAL_7_15909MHz/2, XTAL_12MHz/12)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_7_15909MHz/2)
+	MCFG_YM3812_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_OKIM6295_ADD("oki", XTAL_12MHz/12, OKIM6295_PIN7_HIGH)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
+	MCFG_SEIBU_SOUND_CPU("audiocpu")
+	MCFG_SEIBU_SOUND_YM_READ_CB(DEVREAD8("ymsnd", ym3812_device, read))
+	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym3812_device, write))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( weststry, bloodbro )

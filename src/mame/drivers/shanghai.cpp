@@ -21,6 +21,7 @@ displayed.
 
 #include "emu.h"
 #include "cpu/nec/nec.h"
+#include "sound/2203intf.h"
 #include "audio/seibu.h"
 #include "video/hd63484.h"
 
@@ -131,6 +132,25 @@ static ADDRESS_MAP_START( kothello_map, AS_PROGRAM, 16, shanghai_state )
 	AM_RANGE(0x0a000, 0x0a1ff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x0b010, 0x0b01f) AM_DEVREADWRITE("seibu_sound", seibu_sound_device, main_word_r, main_word_w)
 	AM_RANGE(0x80000, 0xfffff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( kothello_sound_map, AS_PROGRAM, 8, shanghai_state )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x2000, 0x27ff) AM_RAM
+	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("seibu_sound", seibu_sound_device, pending_w)
+	AM_RANGE(0x4001, 0x4001) AM_DEVWRITE("seibu_sound", seibu_sound_device, irq_clear_w)
+	AM_RANGE(0x4002, 0x4002) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst10_ack_w)
+	AM_RANGE(0x4003, 0x4003) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst18_ack_w)
+	AM_RANGE(0x4005, 0x4006) AM_DEVWRITE("adpcm", seibu_adpcm_device, adr_w)
+	AM_RANGE(0x4007, 0x4007) AM_DEVWRITE("seibu_sound", seibu_sound_device, bank_w)
+	AM_RANGE(0x4008, 0x4009) AM_DEVREADWRITE("seibu_sound", seibu_sound_device, ym_r, ym_w)
+	AM_RANGE(0x4010, 0x4011) AM_DEVREAD("seibu_sound", seibu_sound_device, soundlatch_r)
+	AM_RANGE(0x4012, 0x4012) AM_DEVREAD("seibu_sound", seibu_sound_device, main_data_pending_r)
+	AM_RANGE(0x4013, 0x4013) AM_READ_PORT("COIN")
+	AM_RANGE(0x4018, 0x4019) AM_DEVWRITE("seibu_sound", seibu_sound_device, main_data_w)
+	AM_RANGE(0x401a, 0x401a) AM_DEVWRITE("adpcm", seibu_adpcm_device, ctl_w)
+	AM_RANGE(0x401b, 0x401b) AM_DEVWRITE("seibu_sound", seibu_sound_device, coin_w)
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("seibu_bank1")
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( kothello )
@@ -436,7 +456,8 @@ static MACHINE_CONFIG_START( kothello, shanghai_state )
 	MCFG_CPU_PROGRAM_MAP(kothello_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", shanghai_state,  interrupt)
 
-	SEIBU3A_SOUND_SYSTEM_CPU(XTAL_16MHz/4)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/4)
+	MCFG_CPU_PROGRAM_MAP(kothello_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
@@ -457,16 +478,19 @@ static MACHINE_CONFIG_START( kothello, shanghai_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	/* same as standard seibu ym2203, but "ym1" also reads "DSW" */
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL_16MHz/4)
+	/* same as standard seibu ym2203, but also reads "DSW" */
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_16MHz/4)
 	MCFG_YM2203_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("ym2", YM2203, XTAL_16MHz/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
+	MCFG_SEIBU_SOUND_CPU("audiocpu")
+	MCFG_SEIBU_SOUND_YM_READ_CB(DEVREAD8("ymsnd", ym2203_device, read))
+	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym2203_device, write))
 
-	SEIBU_SOUND_SYSTEM_ADPCM_INTERFACE
+	MCFG_SOUND_ADD("adpcm", SEIBU_ADPCM, 8000) // actually MSM5205
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -621,10 +645,8 @@ ROM_START( kothello )
 	ROM_LOAD( "rom5.5l",   0x00000, 0x02000, CRC(7eb6e697) SHA1(4476e13f9a9e04472581f2c069760f53b33d5672))
 	ROM_CONTINUE(          0x10000, 0x0e000 )
 
-	ROM_REGION( 0x10000, "adpcm1", 0 )
+	ROM_REGION( 0x10000, "adpcm", 0 )
 	ROM_LOAD( "rom6.7m",   0x00000, 0x10000, CRC(4ab1335d) SHA1(3a803e8a7e9b0c2a26ee23e7ac9c89c70cf2504b))
-
-	ROM_REGION( 0x10000, "adpcm2", ROMREGION_ERASE00 )
 ROM_END
 
 

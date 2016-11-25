@@ -150,6 +150,7 @@ Stephh's notes (based on the game Z80 code and some tests) :
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "sound/ym2151.h"
 #include "audio/seibu.h"
 #include "video/airraid_dev.h"
 
@@ -277,6 +278,23 @@ static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, airrai
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( airraid_sound_map, AS_PROGRAM, 8, airraid_state )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x2000, 0x27ff) AM_RAM
+	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("seibu_sound", seibu_sound_device, pending_w)
+	AM_RANGE(0x4001, 0x4001) AM_DEVWRITE("seibu_sound", seibu_sound_device, irq_clear_w)
+	AM_RANGE(0x4002, 0x4002) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst10_ack_w)
+	AM_RANGE(0x4003, 0x4003) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst18_ack_w)
+	AM_RANGE(0x4007, 0x4007) AM_DEVWRITE("seibu_sound", seibu_sound_device, bank_w)
+	AM_RANGE(0x4008, 0x4009) AM_DEVREADWRITE("seibu_sound", seibu_sound_device, ym_r, ym_w)
+	AM_RANGE(0x4010, 0x4011) AM_DEVREAD("seibu_sound", seibu_sound_device, soundlatch_r)
+	AM_RANGE(0x4012, 0x4012) AM_DEVREAD("seibu_sound", seibu_sound_device, main_data_pending_r)
+	AM_RANGE(0x4013, 0x4013) AM_READ_PORT("COIN")
+	AM_RANGE(0x4018, 0x4019) AM_DEVWRITE("seibu_sound", seibu_sound_device, main_data_w)
+	AM_RANGE(0x401b, 0x401b) AM_DEVWRITE("seibu_sound", seibu_sound_device, coin_w)
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("seibu_bank1")
+ADDRESS_MAP_END
+
 
 static INPUT_PORTS_START( airraid )
 	PORT_START("IN0")   /* IN0  (0xc200) */
@@ -368,8 +386,9 @@ static MACHINE_CONFIG_START( airraid, airraid_state )
 	MCFG_CPU_PROGRAM_MAP(airraid_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", airraid_state, cshooter_scanline, "airraid_vid:screen", 0, 1)
 
-	SEIBU2_AIRRAID_SOUND_SYSTEM_CPU(XTAL_14_31818MHz/4)      /* verified on pcb */
-	SEIBU_SOUND_SYSTEM_ENCRYPTED_LOW()
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_14_31818MHz/4)      /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(airraid_sound_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(seibu_sound_decrypted_opcodes_map)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -379,7 +398,17 @@ static MACHINE_CONFIG_START( airraid, airraid_state )
 	MCFG_AIRRAID_VIDEO_ADD("airraid_vid")
 
 	/* sound hardware */
-	SEIBU_AIRRAID_SOUND_SYSTEM_YM2151_INTERFACE(XTAL_14_31818MHz/4)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_YM2151_ADD("ymsnd", XTAL_14_31818MHz/4)
+	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
+	MCFG_SOUND_ROUTE(0, "mono", 0.50)
+	MCFG_SOUND_ROUTE(1, "mono", 0.50)
+
+	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
+	MCFG_SEIBU_SOUND_CPU_ENCRYPTED_LOW("audiocpu")
+	MCFG_SEIBU_SOUND_YM_READ_CB(DEVREAD8("ymsnd", ym2151_device, read))
+	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym2151_device, write))
 MACHINE_CONFIG_END
 
 

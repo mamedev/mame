@@ -189,7 +189,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, cabal_state )
 	AM_RANGE(0x4002, 0x4002) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst10_ack_w)
 	AM_RANGE(0x4003, 0x4003) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst18_ack_w)
 	AM_RANGE(0x4005, 0x4006) AM_DEVWRITE("adpcm1", seibu_adpcm_device, adr_w)
-	AM_RANGE(0x4008, 0x4009) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
+	AM_RANGE(0x4008, 0x4009) AM_DEVREADWRITE("seibu_sound", seibu_sound_device, ym_r, ym_w)
 	AM_RANGE(0x4010, 0x4011) AM_DEVREAD("seibu_sound", seibu_sound_device, soundlatch_r)
 	AM_RANGE(0x4012, 0x4012) AM_DEVREAD("seibu_sound", seibu_sound_device, main_data_pending_r)
 	AM_RANGE(0x4013, 0x4013) AM_READ_PORT("COIN")
@@ -496,6 +496,9 @@ static MACHINE_CONFIG_START( cabal_base, cabal_state )
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
+	MCFG_SEIBU_SOUND_CPU("audiocpu")
+	MCFG_SEIBU_SOUND_YM_READ_CB(DEVREAD8("ymsnd", ym2151_device, read))
+	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym2151_device, write))
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -511,11 +514,19 @@ static MACHINE_CONFIG_START( cabal_base, cabal_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( cabal, cabal_base )
-	SEIBU_SOUND_SYSTEM_ENCRYPTED_LOW()
+	MCFG_DEVICE_MODIFY("seibu_sound")
+	MCFG_SEIBU_SOUND_CPU_ENCRYPTED_LOW("audiocpu")
+
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(seibu_sound_decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( cabalbl2, cabal_base )
-	SEIBU_SOUND_SYSTEM_ENCRYPTED_CUSTOM()
+	MCFG_DEVICE_MODIFY("seibu_sound")
+	MCFG_SEIBU_SOUND_CPU_ENCRYPTED_CUSTOM("audiocpu")
+
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(seibu_sound_decrypted_opcodes_map)
 MACHINE_CONFIG_END
 
 
