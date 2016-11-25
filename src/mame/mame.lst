@@ -238,11 +238,6 @@ tvpoker                         // (c) 197? A-1 Supply
 a2600                           // Atari 2600
 a2600p                          // Atari 2600 PAL
 
-@source:a310.cpp
-a3010                           // 1988 Acorn Archimedes 3010
-a3020                           // 1988 Acorn Archimedes 3020
-a310                            // 1988 Acorn Archimedes 310
-
 @source:a5105.cpp
 a5105                           //
 
@@ -259,6 +254,22 @@ a7150                           //
 @source:a7800.cpp
 a7800                           // Atari 7800 NTSC
 a7800p                          // Atari 7800 PAL
+
+@source:aa310.cpp
+aa305                           // 1987 Acorn Archimedes 305
+aa310                           // 1987 Acorn Archimedes 310
+aa440                           // 1987 Acorn Archimedes 440
+aa3000                          // 1989 Acorn Archimedes 3000
+aa4101                          // 1989 Acorn Archimedes 410/1
+aa4201                          // 1989 Acorn Archimedes 420/1
+aa4401                          // 1989 Acorn Archimedes 440/1
+aa540                           // 1990 Acorn Archimedes 540
+aa5000                          // 1991 Acorn A5000
+aa4                             // 1992 Acorn A4
+aa3010                          // 1992 Acorn A3010
+aa3020                          // 1992 Acorn A3020
+aa4000                          // 1992 Acorn A4000
+aa5000a                         // 1993 Acorn A5000 Alpha
 
 @source:abc1600.cpp
 abc1600                         //

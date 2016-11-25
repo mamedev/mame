@@ -1091,7 +1091,7 @@ function createProjects_mame_mess(_target, _subtarget)
 -- the following files are MAME components and
 -- shared across a number of drivers
 --
--- a310.c (MESS), aristmk5.c, ertictac.c (MAME)
+-- aa310.c (MESS), aristmk5.c, ertictac.c (MAME)
 -- amiga.c (MESS), alg.c, arcadia.c, cubo.c, mquake.c, upscope.c (MAME)
 -- a2600.c (MESS), tourtabl.c (MAME)
 -- atari400.c (MESS), bartop52.c, maxaflex.c (MAME)
@@ -1250,7 +1250,7 @@ files {
 
 createMESSProjects(_target, _subtarget, "acorn")
 files {
-	MAME_DIR .. "src/mame/drivers/a310.cpp",
+	MAME_DIR .. "src/mame/drivers/aa310.cpp",
 	MAME_DIR .. "src/mame/drivers/a6809.cpp",
 	MAME_DIR .. "src/mame/drivers/acrnsys1.cpp",
 	MAME_DIR .. "src/mame/drivers/atom.cpp",
