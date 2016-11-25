@@ -4972,7 +4972,14 @@ ROM_END
 
 ROM_START( pepp0232 ) /* Normal board : Uknown Draw Poker (PP0232) */
 /*
-Has 5 additional cards, 10 through Ace, with a US Flag for a Suit.  These count towards matches up to 5K and Sequential Flag Royal.
+Has 5 additional cards, 10 through Ace, with a US Flag for a Suit.
+
+PayTable   Js+  TP  3K  STR  FL  FH  4K  SF   5K    RF    CRF*  SeqRF   CSeqRF*  Bonus
+--------------------------------------------------------------------------------------
+   ????     1    2   2   3    5   6  15  50  1000  1300  3000    5000    10000   800
+
+* Custom or Flag suit.   A Sequential Royal with the Flag suit pays 10,000 per coin in!
+
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pp0232_717-698.u68",   0x00000, 0x10000, CRC(d6d4df92) SHA1(6bb29740658131ae7f25d68427e0c7eb7cb976b0) ) /* Game Version: 717, Library Version: 698  05/02/91   @ IGT  L91-0912  */
