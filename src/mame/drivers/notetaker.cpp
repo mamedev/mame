@@ -594,12 +594,12 @@ static ADDRESS_MAP_START(notetaker_iocpu_io, AS_IO, 16, notetaker_state)
 	AM_RANGE(0x120, 0x127) AM_MIRROR(0x7E18) AM_DEVREADWRITE8("wd1791", fd1791_t, read, write, 0x00FF) // floppy controller
 	AM_RANGE(0x140, 0x15f) AM_MIRROR(0x7E00) AM_DEVREADWRITE8("crt5027", crt5027_device, read, write, 0x00FF) // crt controller
 	AM_RANGE(0x160, 0x161) AM_MIRROR(0x7E1E) AM_WRITE(LoadDispAddr_w) // loads the start address for the display framebuffer
-	AM_RANGE(0x1a0, 0x1a1) AM_MIRROR(0x7E10) AM_READ(ReadEIAStatus_r) // read keyboard fifo state
-	AM_RANGE(0x1a2, 0x1a3) AM_MIRROR(0x7E10) AM_READ(ReadEIAData_r) // read keyboard data
-	AM_RANGE(0x1a8, 0x1a9) AM_MIRROR(0x7E10) AM_WRITE(LoadEIACtlReg_w) // kbd uart control register
-	AM_RANGE(0x1aa, 0x1ab) AM_MIRROR(0x7E10) AM_WRITE(LoadEIAData_w) // kbd uart data register
-	AM_RANGE(0x1ac, 0x1ad) AM_MIRROR(0x7E10) AM_WRITE(EIADataReset_w) // kbd uart ddr switch (data reset)
-	AM_RANGE(0x1ae, 0x1af) AM_MIRROR(0x7E10) AM_WRITE(EIAChipReset_w) // kbd uart reset
+	AM_RANGE(0x1a0, 0x1a1) AM_MIRROR(0x7E10) AM_READ(ReadEIAStatus_r) // read eia fifo state
+	AM_RANGE(0x1a2, 0x1a3) AM_MIRROR(0x7E10) AM_READ(ReadEIAData_r) // read eia data
+	AM_RANGE(0x1a8, 0x1a9) AM_MIRROR(0x7E10) AM_WRITE(LoadEIACtlReg_w) // eia uart control register
+	AM_RANGE(0x1aa, 0x1ab) AM_MIRROR(0x7E10) AM_WRITE(LoadEIAData_w) // eia uart data register
+	AM_RANGE(0x1ac, 0x1ad) AM_MIRROR(0x7E10) AM_WRITE(EIADataReset_w) // eia uart ddr switch (data reset)
+	AM_RANGE(0x1ae, 0x1af) AM_MIRROR(0x7E10) AM_WRITE(EIAChipReset_w) // eia uart reset
 	//AM_RANGE(0x1c0, 0x1c1) AM_MIRROR(0x7E1E) AM_READ(SelADCHi_r) // ADC read
 	//AM_RANGE(0x1e0, 0x1e1) AM_MIRROR(0x7E1E) AM_READ(CRTSwitch_w) // CRT power enable?
 ADDRESS_MAP_END
