@@ -21,6 +21,30 @@
 		</part>
 	</software>
 
+	<software name="astrobl">
+		<description>Astro Blaster</description>
+		<year>2016</year>
+		<publisher>Retro Software</publisher>
+		<info name="author" value="Richard Broadhurst" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="95488">
+				<rom name="AstroBlaster.adf" size="95488" crc="372f352b" sha1="cc247c41bad2c00f99639af93e89bfb29692b00f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="carnival">
+		<description>Carnival</description>
+		<year>2014</year>
+		<publisher>Retro Software</publisher>
+		<info name="author" value="Richard Broadhurst" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="25600">
+				<rom name="carnival.adf" size="25600" crc="cbe0d763" sha1="5caf371370a1358540e8d042ccdb02db2c1470d6" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="elite">
 		<description>Elite</description>
 		<year>1986</year>
