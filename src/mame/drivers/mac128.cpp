@@ -104,7 +104,6 @@ c0   8 data bits, Rx disabled
 #define MACKBD_TAG "mackbd"
 #define DAC_TAG "macdac"
 #define SCC_TAG "scc"
-#define OVERLAY_TAG "bank1"
 
 #define C7M (7833600)
 #define C3_7M (3916800)
@@ -127,8 +126,8 @@ enum mac128model_t
 #define MAC_V_TOTAL (370)       // (342+28)
 
 // sound buffer locations
-#define MAC_MAIN_SND_BUF_OFFSET 0x0300
-#define MAC_ALT_SND_BUF_OFFSET  0x5F00
+#define MAC_MAIN_SND_BUF_OFFSET (0x0300>>1)
+#define MAC_ALT_SND_BUF_OFFSET  (0x5F00>>1)
 
 #define LOG_KEYBOARD    0
 #define LOG_GENERAL		0
@@ -222,6 +221,10 @@ public:
 	void vblank_irq();
 	void mouse_callback();
 
+	DECLARE_READ16_MEMBER ( ram_r );
+	DECLARE_WRITE16_MEMBER ( ram_w );
+	DECLARE_READ16_MEMBER ( ram_600000_r );
+	DECLARE_WRITE16_MEMBER ( ram_600000_w );
 	DECLARE_READ16_MEMBER ( mac_via_r );
 	DECLARE_WRITE16_MEMBER ( mac_via_w );
 	DECLARE_READ16_MEMBER ( mac_autovector_r );
@@ -232,19 +235,7 @@ public:
 	DECLARE_WRITE16_MEMBER ( macplus_scsi_w );
 	DECLARE_WRITE_LINE_MEMBER(mac_scsi_irq);
 	DECLARE_WRITE_LINE_MEMBER(set_scc_interrupt);
-
-private:
-	// wait states for accessing the VIA
-	int m_via_cycles;
-	bool m_snd_enable;
-	bool m_main_buffer;
-	int m_snd_vol;
-
-	required_device<screen_device> m_screen;
-	required_device<dac_8bit_pwm_device> m_dac;
-	required_device<z80scc_device> m_scc;
 	
-public:
 	TIMER_DEVICE_CALLBACK_MEMBER(mac_scanline);
 	DECLARE_DRIVER_INIT(mac128k512k);
 	DECLARE_DRIVER_INIT(mac512ke);
@@ -269,12 +260,27 @@ public:
 	void keyboard_receive(int val);
 	void mac_driver_init(mac128model_t model);
 	void update_volume();
+
+private:
+	// wait states for accessing the VIA
+	int m_via_cycles;
+	bool m_snd_enable;
+	bool m_main_buffer;
+	int m_snd_vol;
+	u16 *m_ram_ptr, *m_rom_ptr;
+	u32 m_ram_mask, m_ram_size;
+
+	required_device<screen_device> m_screen;
+	required_device<dac_8bit_pwm_device> m_dac;
+	required_device<z80scc_device> m_scc;
 };
 
 void mac128_state::machine_start()
 {
-	membank(OVERLAY_TAG)->configure_entry(0, m_ram->pointer());
-	membank(OVERLAY_TAG)->configure_entry(1, memregion("bootrom")->base());
+	m_ram_ptr = (u16*)m_ram->pointer();
+	m_ram_size = m_ram->size()>>1;
+	m_ram_mask = m_ram_size - 1;
+	m_rom_ptr = (u16*)memregion("bootrom")->base();
 }
 
 void mac128_state::machine_reset()
@@ -282,7 +288,6 @@ void mac128_state::machine_reset()
 	m_via_cycles = -10;
 	m_last_taken_interrupt = -1;
 	m_overlay = 1;
-	membank(OVERLAY_TAG)->set_entry(1);
 	m_maincpu->reset();
 	m_screen_buffer = 1;
 #ifndef MAC_USE_EMULATED_KBD
@@ -300,6 +305,34 @@ void mac128_state::machine_reset()
 	m_irq_count = 0;
 	m_ca1_data = 0;
 	m_ca2_data = 0;
+}
+
+READ16_MEMBER(mac128_state::ram_r)
+{
+	if (m_overlay)
+	{
+		return m_rom_ptr[offset];
+	}
+
+	return m_ram_ptr[offset & m_ram_mask];
+}
+
+WRITE16_MEMBER(mac128_state::ram_w)
+{
+	if (!m_overlay)
+	{
+		COMBINE_DATA(&m_ram_ptr[offset & m_ram_mask]);
+	}
+}
+
+READ16_MEMBER(mac128_state::ram_600000_r)
+{
+	return m_ram_ptr[offset & m_ram_mask];
+}
+
+WRITE16_MEMBER(mac128_state::ram_600000_w)
+{
+	COMBINE_DATA(&m_ram_ptr[offset & m_ram_mask]);
 }
 
 void mac128_state::field_interrupts()
@@ -392,11 +425,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(mac128_state::mac_scanline)
 
 	if (m_main_buffer)
 	{
-		mac_snd_buf_ptr = (uint16_t *)(m_ram->pointer() + m_ram->size() - MAC_MAIN_SND_BUF_OFFSET);
+		mac_snd_buf_ptr = (uint16_t *)(m_ram_ptr + m_ram_size - MAC_MAIN_SND_BUF_OFFSET);
 	}
 	else
 	{
-		mac_snd_buf_ptr = (uint16_t *)(m_ram->pointer() + m_ram->size() - MAC_ALT_SND_BUF_OFFSET);
+		mac_snd_buf_ptr = (uint16_t *)(m_ram_ptr + m_ram_size - MAC_ALT_SND_BUF_OFFSET);
 	}
 
 	m_dac->write(mac_snd_buf_ptr[scanline] >> 8);
@@ -711,7 +744,6 @@ WRITE8_MEMBER(mac128_state::mac_via_out_a)
 	if (((data & 0x10) >> 4) != m_overlay)
 	{
 		m_overlay = (data & 0x10) >> 4;
-		membank(OVERLAY_TAG)->set_entry(m_overlay);
 	}
 }
 
@@ -1151,7 +1183,6 @@ void mac128_state::mac_driver_init(mac128model_t model)
 
 void mac128_state::mac128_state_load()
 {
-	membank(OVERLAY_TAG)->set_entry(m_overlay);
 }
 
 PALETTE_INIT_MEMBER(mac128_state,mac)
@@ -1164,8 +1195,8 @@ VIDEO_START_MEMBER(mac128_state,mac)
 {
 }
 
-#define MAC_MAIN_SCREEN_BUF_OFFSET  0x5900
-#define MAC_ALT_SCREEN_BUF_OFFSET   0xD900
+#define MAC_MAIN_SCREEN_BUF_OFFSET  (0x5900>>1)
+#define MAC_ALT_SCREEN_BUF_OFFSET   (0xD900>>1)
 
 uint32_t mac128_state::screen_update_mac(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -1175,8 +1206,8 @@ uint32_t mac128_state::screen_update_mac(screen_device &screen, bitmap_ind16 &bi
 	uint16_t *line;
 	int y, x, b;
 
-	video_base = m_ram->size() - (m_screen_buffer ? MAC_MAIN_SCREEN_BUF_OFFSET : MAC_ALT_SCREEN_BUF_OFFSET);
-	video_ram = (const uint16_t *) (m_ram->pointer() + video_base);
+	video_base = m_ram_size - (m_screen_buffer ? MAC_MAIN_SCREEN_BUF_OFFSET : MAC_ALT_SCREEN_BUF_OFFSET);
+	video_ram = (const uint16_t *) (m_ram_ptr + video_base);
 
 	for (y = 0; y < MAC_V_VIS; y++)
 	{
@@ -1209,8 +1240,9 @@ MAC_DRIVER_INIT(macplus, MODEL_MAC_PLUS)
 ***************************************************************************/
 
 static ADDRESS_MAP_START(mac512ke_map, AS_PROGRAM, 16, mac128_state )
-	AM_RANGE(0x000000, 0x3fffff) AM_RAMBANK(OVERLAY_TAG)
+	AM_RANGE(0x000000, 0x3fffff) AM_READWRITE(ram_r, ram_w)
 	AM_RANGE(0x400000, 0x4fffff) AM_ROM AM_REGION("bootrom", 0) AM_MIRROR(0x100000)
+	AM_RANGE(0x600000, 0x6fffff) AM_READWRITE(ram_600000_r, ram_600000_w)
 	AM_RANGE(0x800000, 0x9fffff) AM_DEVREAD8(SCC_TAG, z80scc_device, cd_ab_r, 0xff00)
 	AM_RANGE(0xa00000, 0xbfffff) AM_DEVWRITE8(SCC_TAG, z80scc_device, cd_ab_w, 0x00ff)
 	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(mac_iwm_r, mac_iwm_w)
@@ -1219,7 +1251,7 @@ static ADDRESS_MAP_START(mac512ke_map, AS_PROGRAM, 16, mac128_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(macplus_map, AS_PROGRAM, 16, mac128_state )
-	AM_RANGE(0x000000, 0x3fffff) AM_RAMBANK(OVERLAY_TAG)
+	AM_RANGE(0x000000, 0x3fffff) AM_READWRITE(ram_r, ram_w)
 	AM_RANGE(0x400000, 0x4fffff) AM_ROM AM_REGION("bootrom", 0)
 	AM_RANGE(0x580000, 0x5fffff) AM_READWRITE(macplus_scsi_r, macplus_scsi_w)
 	AM_RANGE(0x800000, 0x9fffff) AM_DEVREAD8(SCC_TAG, z80scc_device, cd_ab_r, 0xff00)
