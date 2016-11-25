@@ -698,7 +698,7 @@ private:
 
 // GDC RESET MACRO - used in  "machine_reset"  & GDC_EXTRA_REGISTER_w   !
 #define GDC_RESET_MACRO                                     \
-m_PORT50 = 0;                                               \												\
+m_PORT50 = 0;                                               \
 m_GDC_INDIRECT_REGISTER = 0;                                \
 m_GDC_MODE_REGISTER = 0;                                    \
 m_GDC_WRITE_MASK = 0;                                       \

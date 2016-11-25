@@ -14,12 +14,14 @@
 // standard windows headers
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#include <tchar.h>
 #undef interface
 #undef min
 #undef max
 
 // MAME headers
 #include "emu.h"
+#include "strconv.h"
 
 // MAMEOS headers
 #include "winmain.h"
@@ -81,13 +83,15 @@ public:
 		for (int keynum = 0; keynum < MAX_KEYS; keynum++)
 		{
 			input_item_id itemid = table.map_di_scancode_to_itemid(keynum);
-			char name[20];
+			TCHAR keyname[100];
 
-			// generate/fetch the name
-			_snprintf(name, ARRAY_LENGTH(name), "Scan%03d", keynum);
+			// generate the name
+			if (GetKeyNameText(((keynum & 0x7f) << 16) | ((keynum & 0x80) << 17), keyname, ARRAY_LENGTH(keyname)) == 0)
+				_sntprintf(keyname, ARRAY_LENGTH(keyname), TEXT("Scan%03d"), keynum);
+			std::string name = osd::text::from_tstring(keyname);
 
 			// add the item to the device
-			devinfo->device()->add_item(name, itemid, generic_button_get_state<std::uint8_t>, &devinfo->keyboard.state[keynum]);
+			devinfo->device()->add_item(name.c_str(), itemid, generic_button_get_state<std::uint8_t>, &devinfo->keyboard.state[keynum]);
 		}
 	}
 
