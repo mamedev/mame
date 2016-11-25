@@ -161,10 +161,10 @@ extern const device_type SEIBU_ADPCM;
 #define MCFG_SEIBU_SOUND_CPU_ENCRYPTED_LOW(_audiocputag) \
 	seibu_sound_device::set_cpu_tag_and_encryption(*device, "^" _audiocputag, 1);
 
-#define MCFG_SEIBU_SOUND_CPU_ENCRYPTED_CUSTOM(_audiocputag) \
+#define MCFG_SEIBU_SOUND_CPU_ENCRYPTED_FULL(_audiocputag) \
 	seibu_sound_device::set_cpu_tag_and_encryption(*device, "^" _audiocputag, 2);
 
-#define MCFG_SEIBU_SOUND_CPU_ENCRYPTED_FULL(_audiocputag) \
+#define MCFG_SEIBU_SOUND_CPU_ENCRYPTED_CUSTOM(_audiocputag) \
 	seibu_sound_device::set_cpu_tag_and_encryption(*device, "^" _audiocputag, 3);
 
 #define MCFG_SEIBU_SOUND_YM_READ_CB(_devcb) \
