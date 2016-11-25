@@ -1,0 +1,739 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!-- Thanks to http://z80ne.com for info! -->
+<softwarelist name="z80ne_flop" description="Nuova Elettronica Z80NE floppies">
+
+	<software name="basic55k">
+		<description>5.5K Floppy BASIC</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="10194">
+				<rom name="basic55k.imd" size="10194" crc="17ae9bbc" sha1="55154ad633e35426e9f927eef8f97aca68c34e67" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nedos">
+		<description>NE-DOS (v1.5) + BASIC (v2.1) (Original Disk)</description>
+		<year>198?</year>
+		<publisher>Nuova Elettronica</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="97367">
+				<rom name="disk27.imd" size="97367" crc="73a2a89e" sha1="6f76083626e579a6f00d8015b10ebe1a472af062" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nedosa" cloneof="nedos">
+		<description>NE-DOS (v1.5) + BASIC (v2.1) (Original Disk, DMK Format)</description>
+		<year>198?</year>
+		<publisher>Nuova Elettronica</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="261136">
+				<rom name="basic21+dos15 originale.dmk" size="261136" crc="f03c6512" sha1="d333da8933e0320fbbe37c900881ddc24801eceb" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nedosb" cloneof="nedos">
+		<description>NE-DOS (v1.5) + BASIC (v2.1) (Non-Original Disk)</description>
+		<year>198?</year>
+		<publisher>Nuova Elettronica</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="261136">
+				<rom name="basic21+dos15.dmk" size="261136" crc="27f2e040" sha1="e039a3a798dba61d04ecde637477a9e49ed735b0" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nedosg">
+		<description>NE-DOS (G.1) + BASIC (G.1) (Original Disk)</description>
+		<year>198?</year>
+		<publisher>Nuova Elettronica</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="101957">
+				<rom name="disk26.imd" size="101957" crc="2038ef00" sha1="3662ed57eb68e7d1c11d88dcce534f601862ba04" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nedosga" cloneof="nedosg">
+		<description>NE-DOS (G.1) + BASIC (G.1) (Original Disk, DMK Format)</description>
+		<year>198?</year>
+		<publisher>Nuova Elettronica</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="261136">
+				<rom name="basicg10+dosg1 originale.dmk" size="261136" crc="46183e4a" sha1="6ded091f5197157275dee3d06d7f5410721c11ea" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nedosgb" cloneof="nedosg">
+		<description>NE-DOS (G.1) + BASIC (G.1) (Non-Original Disk)</description>
+		<year>198?</year>
+		<publisher>Nuova Elettronica</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="261136">
+				<rom name="basicg10+dosg1.dmk" size="261136" crc="0449fa1f" sha1="db420dac8b88e18f56fefec15559ff1c3229856e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sone">
+		<description>SONE (floppy disk)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="261136">
+				<rom name="sone_fd.dmk" size="261136" crc="51153fbb" sha1="c034af693da1c6670fecc8747ce3d47078abd04f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sonehd" cloneof="sone">
+		<description>SONE (hard disk)</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="261136">
+				<rom name="sone_hd.dmk" size="261136" crc="da9b67d8" sha1="553c2b25e8f47fc46046fff98a16661e346a9246" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Applications/Utilities -->
+
+	<software name="convflp">
+		<description>convflp</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="100744">
+				<rom name="convflp.imd" size="100744" crc="0ac159bf" sha1="d47b10182a52a9fd368a65c383e54b42124a662e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="convflpg">
+		<description>convflpg</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102276">
+				<rom name="convflpg.imd" size="102276" crc="7f625c70" sha1="60c8d44eb3d2e294cc61298464cea1175c2752cf" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="editasm">
+		<description>Editor Assember/Disassembler</description>
+		<year>198?</year>
+		<publisher>Nuova Elettronica</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="261136">
+				<rom name="edtasm.dmk" size="261136" crc="341bb98c" sha1="8b79e443154d0167d613571bb350a1cf359cde58" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	An interesting note from z80ne.com:
+
+	This version has been recovered by undeleting some files that were on the original
+	NE-DOS version G.1.0 floppy. Probably, Nuova Elettronica tecnicians saved that files
+	on the master floppy to be distributed, but they deleted them because that files weren't
+	part of the distribution (infact editor assembler/disassembler was sold separately).
+	Anyway, due to the fact that they are recovered files, I cannot guarantee that they are
+	the official version and not a test version instead. However, from the tests I made, they
+	work perfectly.
+
+	From the NE-DOS version G.1.0 original floppy I was able to undelete and recover the
+	following programs, that I saved on this floppy: Editor assembler, Disassembler, Super
+	Debug, Disk Print and LmOffset.
+	The Super Debug has been announced on the magazine, but it was never released.
+	It's clear that it's a preliminar version, because it's clearly a bad preliminar translation
+	in italian of an english program, probably SuperZap that was made for Tandy TRS-80.
+	The Disk Print is a program never named on the magazine, that dumps floppy
+	contents on video or printer.
+	Then the LmOffset program, also never named on the magazine, it's the same
+	program that can be found on the Tandy TRS-80
+	-->
+	<software name="editasmg">
+		<description>Editor Assember/Disassembler G</description>
+		<year>198?</year>
+		<publisher>Nuova Elettronica</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="261136">
+				<rom name="edtasmg.dmk" size="261136" crc="79c323ba" sha1="daf53abe6ca7a1c0b3ba422fc72b3febbaef8c72" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Unknown Disks -->
+
+	<!--
+	- basic 2.1 + ne-dos 1.5    operating system and basic
+	- totocalc/bas              program to guess results of "totocalcio" italian game
+	- sommergi/bas              submarine simulation
+	- disklist/bas              show a file content
+	- graphic/asc               generic graphic routine to be used into other programs
+	- life/bas                  "Life" game
+	- monitor/cmd               start monitor for the hexadecimal keyboard
+	- fourier/bas               show a graphic function
+	- motocros/bas              game where you must jump over a number of trash can using a motorcicle
+	- gimcana/bas               game where you must drive a car in a tortuous street. Use "," and "." to go left/right
+	- disegni/bas               program to paint pixels on the screen and to save draw
+	- navale/bas                game where a boat must shoot to submarines
+	- barbari/bas               game where you must shoot to barbarians that are climbing on a castle wall
+	-->
+	<software name="disk01">
+		<description>disk01</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="100427">
+				<rom name="disk01.imd" size="100427" crc="72b736bc" sha1="7ebf96f31676a9d7ea8b27c1434ab3928b97bc4e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	- basic 2.1 + ne-dos 1.5    operating system and basic
+	- bioritmi/bas              program to compute biorythms with printer output
+	- aereo/bas                 game where you must bomb some skycrapers using a plane. Use "," and "." to shoot
+	- aereo1/bas                other version of the "aereo/bas" game
+	- linee/bas                 program to draw a line on the screen
+	- mateca/bas                compute: prime factors, MCD and MCM, two degrees equations
+	- ostacol2/bas              "Snake" game clone
+	- filtri/bas                compute filters: bass pass, band pass and high pass
+	- latino/bas                program to coniugate verbs of latin language
+	- basic/g10                 program to boot ne-dos G.1.0
+	- basic/v21                 program to boot ne-dos 2.1. Basic G.1.0 is required
+	- frogger/bas               "Frogger" game clone, where you must drive a frog to pass a high-traffic street and a river
+	-->
+	<software name="disk02">
+		<description>disk02</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="98132">
+				<rom name="disk02.imd" size="98132" crc="dd270d34" sha1="1e4ac7bc3f1aa40a354653a8237733bbdd96323d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	- basic G.1 + ne-dos G.1.0  operating system and basic
+	- robot/bas                 robot war, to be programmed in basic. Requires video card LX.388 and LX.529
+	- robot1/bas                alternate version of robot/bas. Requires video card LX.388 and LX.529
+	- robot2/bas                alternate version of robot/bas. Requires video card LX.388 and LX.529
+	- quadrato/bas              draw a square tunnel
+	- frasi/bas                 unuseful phrases generator
+	- allunagg/bas              instrumental lunar landing. By Corrado Giustozzi
+	- accordi/bas               compute notes that make a musical chord
+	- ohm/bas                   ohm law simulation in a resistive circuit
+	- basic/v21                 perform NE-DOS 1.5 bootstrap. Requires video cards LX.388 and LX.529
+	- bootstra/cmd              assembler program used by basic/v21
+	- graphic/bas               draw random geometric shapes
+	- prospett/bas              perspective computing of a house
+	- prospet1/bas              perspective draw. Doesn't work
+	- disegni/bas               let you draw by using numeric keys
+	- sinusoid/bas              graphic sum of sinusoids. Requires video cards LX.388 and LX.529
+	- meridian/bas              draw a function
+	- fourier/bas               draw a Fourier function
+	- rilievo/bas               draw a function
+	-->
+	<software name="disk03">
+		<description>disk03</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102467">
+				<rom name="disk03m.imd" size="102467" crc="832d6c93" sha1="acb72a3fe949d520e354cd89f3bf43a839cd9c7f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	- basic G.1 + ne-dos G.1.0  operating system and basic
+	- filelist/bas              show or print a file data in ascii and hexadecimal
+	- lander/bas                lunar lander
+	- asta/bas                  simulation of a dropping line
+	- asta1/bas                 simulation of a dropping line (without pauses)
+	- diagnose/bas              artificial intelligence simulation
+	- copia/bas                 copy boot/sys file using a single drive
+	- dieta/bas                 program of dietetic information
+	- oroscopo/bas              compute astrological information
+	- battnava/bas              naval battle
+	- labirint/bas              random labyrinth where you need to exit
+	- tastiera/bas              simulate INKEY$ instruction on keyboard connected to LX.388 video card. Uses assembler
+	- prospet2/bas              perspective computing of a house (different graphic routines)
+	- linee/asc                 subroutine to draw a line without interruptions
+	-->
+	<software name="disk04">
+		<description>disk04</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102467">
+				<rom name="disk04m.imd" size="102467" crc="8c68a321" sha1="5629c42b1cae1f9749326f36ee6c7fd56b9ee6d6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	- basic G.1 + ne-dos G.1.0  operating system and basic
+	- startrek/bas              Star Trek game. Unfinished, doesn't work
+	- zoo/bas                   program to guess an animal, with autolearning
+	- zoo/txt                   data file used by zoo/bas
+	- petrarca/bas              poetic phrases generator. By Franco Lentini
+	- poetri/bas                similar to petrarca/bas but it stores vocabulary on files
+	- creafile/bas              data file creation for poetri/bas program
+	- monitor/v11               start monitor firmware patched to work with LX.388 video card
+	- basic/v21                 start NE-DOS 1.5 bootstrap. Requires LX.388 and LX.529 video cards. Must be run from basic G.1.0
+	- basic/g10                 start NE-DOS G.1.0 bootstrap. Requires LX.388 and LX.529 video cards. Must be run from basic 2.1
+	- mon/cmd                   monitor firmware version to use keyboard connected to LX.529 video card. Enter key doesn't work
+	- monitor1/cmd              monitor firmware for LX.384 hexadecimal keyboard
+	-->
+	<software name="disk05">
+		<description>disk05</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102212">
+				<rom name="disk05m.imd" size="102212" crc="1606c7b8" sha1="a1ae2a9f343ede2c0d5e67fd58f61c3ef1d7824c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	- basic G.1 + ne-dos G.1.0  operating system and basic
+	- rubrica/bas               phone contacts
+	- rubrica1/bas              phone contacts with reverse video
+	- menu                      select type of phone contacts
+	- gestione/bas              company management
+	- wordproc/bas              write input to a file
+	-->
+	<software name="disk06">
+		<description>disk06</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="101957">
+				<rom name="disk06m.imd" size="101957" crc="8a8a8836" sha1="663679a09300f9b21aa6c84433da2a25ac588dac" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	- basic G.1 + ne-dos G.1.0  operating system and basic
+	- toto1/bas                 compute "totocalcio" game card. Data file missing
+	- toto2/bas                 compute "totocalcio" game card. Data file missing
+	- calendar/bas              calendar print. Doesn't work
+	- accoppia/bas              unknown program
+	- pacman/bas                pacman game. Doesn't work. Requires LX.388 and LX.529 video cards
+	- mangia/bas                "eat UFO" game
+	- barbari/bas               barbarians game. Requires LX.388 and LX.529 video cards
+	- barbari1/bas              barbarians game. Version for LX.529 video card
+	- pacsub/asc                screen subroutine of the pacman/bas game
+	-->
+	<software name="disk07">
+		<description>disk07</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102467">
+				<rom name="disk07m.imd" size="102467" crc="1b687819" sha1="00ddaa1938791c6bb5652e957af84a87c836b982" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	- basic G.1 + ne-dos G.1.0  operating system and basic
+	- disass/bas                z80 disassembler. Unfinished
+	- disas1/bas                z80 disassembler. Unfinished
+	- disas2/bas                z80 disassembler. Unfinished
+	- disas3/bas                z80 disassembler. Unfinished
+	- disas4/bas                z80 disassembler. Unfinished
+	- matrice/txt               data file used by disass/bas
+	- readcanz/bas              read text files
+	- writecan/bas              write text files
+	-->
+	<software name="disk08">
+		<description>disk08</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102467">
+				<rom name="disk08m.imd" size="102467" crc="73478c23" sha1="40c25e24e5e1974adc2c26b83e718ca293a5c767" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	- basic G.1 + ne-dos G.1.0  operating system and basic
+	- tappa2/bas                bycicle contest chart (it was shown on a local TV)
+	- tappa3/bas                bycicle contest chart (it was shown on a local TV)
+	- tappa4/bas                bycicle contest chart (it was shown on a local TV)
+	- tappa5/bas                bycicle contest chart (it was shown on a local TV)
+	- tappa6/bas                bycicle contest chart (it was shown on a local TV)
+	- tappa7/bas                bycicle contest chart (it was shown on a local TV)
+	- disas5/bas                z80 disassembler. Unfinished
+	- stampa/bas                print of a computer science course program
+	- carica/bas                load of a computer science course program
+	- daticors/rnd              data of a computer science course program
+	-->
+	<software name="disk09">
+		<description>disk09</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102467">
+				<rom name="disk09m.imd" size="102467" crc="1bb57c78" sha1="e5b872e95dfb3dba61f9a3c5e5be183ab2435bea" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	- moni7000/cmd  monitor firmware allocated at 7000h for LX.384 hexadecimal keyboard
+	- tasc/asc      routine to read a key without interruption of the basic program. It replaces NE-DOS keyboard manager
+	- tast1/asc     routine to read a key without interruption of the basic program. It replaces NE-DOS keyboard manager
+	- test/bas      test program for tast/asc
+	- test1/bas     test program for tast1/asc
+	-->
+	<software name="disk10">
+		<description>disk10</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="11432">
+				<rom name="disk10.imd" size="11432" crc="5dcffda1" sha1="86f889fb877abdde57e399acfbca97bc8250ada8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	- basic G.1 + ne-dos G.1.0  operating system and basic
+	- telefono/bas              phone contacts. It saves data in a different file for every initial name letter
+	-->
+	<software name="disk11">
+		<description>disk11</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="101957">
+				<rom name="disk11m.imd" size="101957" crc="418b77ee" sha1="1e1132310d4551e18c08ef9f8d2a5328aaa7b571" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	- basic 2.1 + ne-dos 1.5    operating system and basic
+	- convflp/cmd               program similar to CONVFLP.IMD disk, but that can be run from NE-DOS 1.5. Allocated at 9000h
+	- convflpg/cmd              program similar to CONVFLPG.IMD disk, but that can be run from NE-DOS G.1.0. Allocated at 9000h
+	- imgz80/cmd                convert directory data address mark from PC format to Z80 format
+	- z80img/cmd                convert directory data address mark from Z80 format to PC format
+	- scrivsys/cmd              write track 15h of file SYS7/SYS on drive 1 reading from A000h to boot in place of NE-DOS 2.1
+	- scrisysg/cmd              write track 15h of file SYS7/SYS on drive 1 reading from A000h to boot in place of NE-DOS G.1.0
+	- convflp/obj               object file of convflp/cmd allocated at 9000h
+	- convflp0/obj              object file of convflp/cmd allocated at 0000h
+	- convflpg/obj              object file of convflpg/cmd allocated at 9000h
+	- convflp1/obj              object file of convflpg/cmd allocated at 0000h
+	- scrivsys/obj              object file of scrivsys/cmd
+	- scrisysg/obj              object file of scrisysg/cmd
+	- leggesys/bas              read sys7/sys file and show it in hexadecimal
+	- scrivsys/bas              write sys7/sys file. Doesn't work
+	- poke/bas                  read a file and write it in ram at the requested address
+	- floppyr2/cmd              read directory track 17 and write it in ram from D000h ("read track" command )
+	- floppyw2/cmd              write directory track 17 with data starting from D000h ("write track" command)
+	- floppyrw/cmd              read or write all sectors of the requested track and put them starting from D000h ("read/write sector command ").
+	                            Before running it you need to setup track number in C7FFh, write command type in C7FEh
+	                            (A8, A9, AA or AB as shown in FD1771 datasheet) and the operation to perform in C7FDh (0=read, 1=write)
+	-->
+	<software name="disk12">
+		<description>disk12</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="99407">
+				<rom name="disk12.imd" size="99407" crc="ff0b145d" sha1="40d4a9eff3f8b6c9f401aba3d40a9fd00800e2ba" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	- basic G.1 + ne-dos G.1.0  operating system and basic
+	- moltipli/bas              multiply two numbers by way of sums only
+	- paghe/bas                 split requested amounts into different money size (in Italian Lire) with 5 Lire rounding
+	- grave/bas                 compute space related to speed and time of an object dropping
+	- riordino/bas              sort of requested numbers by way of "bubble sort" algorithm
+	- fattor/bas                compute factorial one. Doesn't work (corrupted file)
+	- dado/bas                  compute distribution of random dice extraction
+	-->
+	<software name="disk13">
+		<description>disk13</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="101957">
+				<rom name="disk13.imd" size="101957" crc="35c98db2" sha1="c296c6c9b96f43570c1ad30aa87b02ef8c21e51a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	- basic G.1 + ne-dos G.1.0  operating system and basic
+	- menutoto/bas              main menù of "totocalcio" game card computing
+	- caritoto/bas              insert teams. Called from menutoto/bas
+	- moditoto/bas              Modify teams. Called from menutoto/bas
+	- punttoto/bas              Update teams data. Called from menutoto/bas
+	- toto/bas                  compute "totocalcio" game card. Called from menutoto/bas
+	- datitoto/rnd              teams data file
+	- copydati/bas              copy data file using a single drive
+	-->
+	<software name="disk14">
+		<description>disk14</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102467">
+				<rom name="disk14.imd" size="102467" crc="ae9901c4" sha1="e10685f85a4eb87e632e222bec673ab48d90542d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	This disk is a patched NE-DOS with some messages cosmetic changes.
+
+	- basic G.1 + ne-dos G.1.0  operating system and basic
+	- dos/bas                   patch NE-DOS prompt
+	- error/bas                 patch "file not found" message
+	- basiname/bas              patch basic heading
+	- dir/bas                   patch DIR command heading
+	- dosname/bas               patch NE-DOS heading
+	- ready/bas                 patch basic prompt
+	- filelist/bas              print a file to video or printer, in ascii and hexadecimal format
+	- listdos/bas               patch DOS LIST command
+	- protgioc/bas              make a simple floppy protection by patching some NE-DOS and basic commands
+	- syntax/bas                patch "syntax error" message
+	-->
+	<software name="disk15">
+		<description>disk15</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="101957">
+				<rom name="disk15.imd" size="101957" crc="0dc65cb2" sha1="14731df9cbd340573e6384b874e94ce37e967667" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	This disk is a collection of games that can be found in other disks also, starting from a single main menù.
+
+	- basic G.1 + ne-dos G.1.0  operating system and basic
+	- battnava/bas              naval battle
+	- diagnose/bas              animals
+	- barbari/bas               barbarians
+	- frasi/bas                 unuseful phrases generator
+	- allunagg/bas              instrumental lunar landing
+	- ohm/bas                   ohm law simulation in a resistive circuit
+	- sinusoid/bas              graphic sum of sinusoids. Requires video cards LX.388 and LX.529
+	-->
+	<software name="disk16">
+		<description>disk16</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102467">
+				<rom name="disk16m.imd" size="102467" crc="317708f0" sha1="d51aa1c58b90fc5c6dee606fe6fcb0120df90497" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	This disk contains a program to manage relays and sequential lights.
+	The physical connection to relays and lights is done by a dedicated interface card to be connected to the
+	printer port
+	-->
+	<software name="disk17">
+		<description>disk17</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="101192">
+				<rom name="disk17.imd" size="101192" crc="ade87d91" sha1="e1514358dd3f647817ca0f1036116f9ece19b826" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- This disk is similar to DISK17.IMD. Differences are unknown at the moment -->
+	<software name="disk18">
+		<description>disk18</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="101192">
+				<rom name="disk18.imd" size="101192" crc="cd37e64e" sha1="e50b3b01572bdace75da8aa9cbb37cb321e7dff9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- This disk is similar to DISK17.IMD, but this version uses assembler to control the printer port (doesn't work) -->
+	<software name="disk19">
+		<description>disk19</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="101192">
+				<rom name="disk19.imd" size="101192" crc="47b69ecc" sha1="b3b4496678ec11f35f71a3bb79e2a3dd2972ad63" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- This disk is almost identical to DISK06.IMD -->
+	<software name="disk20">
+		<description>disk20</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="101957">
+				<rom name="disk20.imd" size="101957" crc="9abb04ef" sha1="0814e8031868cdb7b969b2445221a9ffa7ebca04" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	similar to disk01
+
+	- basic 2.1 + ne-dos 1.5    operating system and basic
+	- monitor/cmd               start monitor for the hexadecimal keyboard
+	- fourier/bas               draw a Fourier function
+	- motocros/bas              game where you must jump over a number of trash can using a motorcicle
+	- gimcana/bas               game where you must drive a car in a tortuous street. Use "," and "." to go left/right
+	- navale/bas                game where a boat must shoot to submarines
+	-->
+	<software name="disk21">
+		<description>disk21</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="100427">
+				<rom name="disk21.imd" size="100427" crc="d29da8b5" sha1="4ea373cfbfbc30b489712a6bdba243c2f54d963d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	This disk contains a program to receive and show scores.
+	Data receiving is done by an assembler routine, but its working function is unknown at the moment
+	-->
+	<software name="disk22">
+		<description>disk22</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102467">
+				<rom name="disk22.imd" size="102467" crc="f2ae0f2f" sha1="8e24f9359a82a1a7fbf7acb4ff0a52a60eb0f88f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="vicenza">
+		<description>Vicenza Retrocomputing 2007 Demo</description>
+		<year>2007</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="101957">
+				<rom name="disk23.imd" size="101957" crc="da712e7d" sha1="6fe40c5dda46d93605571fe6f766acffc6d8f8e2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="eproms">
+		<description>Z80NE eproms</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="57332">
+				<rom name="disk24.imd" size="57332" crc="d0e51389" sha1="42c8b77c4461125b80be3a81dfb5ea83a736d119" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	- basic 2.1 + ne-dos 1.5    operating system and basic
+	- edtasm/cmd                Z80 editor / assembler
+	- disassem/cmd              Z80 disassembler
+	-->
+	<software name="disk28">
+		<description>disk28</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="98132">
+				<rom name="disk28.imd" size="98132" crc="3b5aa20d" sha1="a181298c1ee9067fde000242a7b8a59adb2ea368" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!--
+	- basic G.1 + ne-dos G.1.0  operating system and basic
+	- edtasm/cmd                Z80 editor / assembler
+	- disassem/cmd              Z80 disassembler
+	- lmoffset/cmd              program to relocate an assembler program
+	- superdeb/bas              superdebug (beta version)
+	- diskprin/bas              show or print a file, in hexadecimal and ascii
+	-->
+	<software name="disk29">
+		<description>disk29</description>
+		<year>198?</year>
+		<publisher>&lt;unknown&gt;</publisher>
+
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="101956">
+				<rom name="disk29.imd" size="101956" crc="adbb2347" sha1="d730181ed1320128e8508f776b54e66870a3cc73" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+</softwarelist>
