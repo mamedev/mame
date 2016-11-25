@@ -124,6 +124,7 @@ public:
 	void dir_w(int state) { dir = state; }
 	void ss_w(int state) { ss = state; }
 	void inuse_w(int state) { }
+	void dskchg_w(int state) { if (dskchg_writable) dskchg = state; }
 
 	void index_resync();
 	attotime time_next_index();
@@ -162,6 +163,7 @@ protected:
 	int sides;  /* number of heads */
 	uint32_t form_factor; /* 3"5, 5"25, etc */
 	bool motor_always_on;
+	bool dskchg_writable;
 
 	/* state of input lines */
 	int dir;  /* direction */
