@@ -4018,7 +4018,7 @@ Internally the program erroneously reports a 95.50% return, same as X000550P doe
 	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) )
 ROM_END
 
-ROM_START( pepp0130 ) /* Normal board : Aces & Faces (PP0130) - PSR Verified */
+ROM_START( pepp0130 ) /* Normal board : Aces & Faces Bonus Poker (PP0130) - PSR Verified */
 /*
                                       2-10 J-K
 PayTable   Js+  2PR  3K   STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
@@ -4974,9 +4974,11 @@ ROM_START( pepp0232 ) /* Normal board : Uknown Draw Poker (PP0232) */
 /*
 Has 5 additional cards, 10 through Ace, with a US Flag for a Suit.
 
-PayTable   Js+  TP  3K  STR  FL  FH  4K  SF   5K    RF    CRF*  SeqRF   CSeqRF*  Bonus
---------------------------------------------------------------------------------------
-   ????     1    2   2   3    5   6  15  50  1000  1300  3000    5000    10000   800
+PayTable   Js+  TP  3K  STR  FL  FH  4K  SF   5K    RF    CRF*  SeqRF   CSeqRF*  (Bonus)
+----------------------------------------------------------------------------------------
+   ????     1    2   2   3    5   6  15  50  1000  1300  3000    5000    10000     800
+  % Range: ???-???%  Optimum: ???%  Hit Frequency: ???%
+     Programs Available: PP0232
 
 * Custom or Flag suit.   A Sequential Royal with the Flag suit pays 10,000 per coin in!
 
@@ -5341,7 +5343,7 @@ PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  4D  SD*  RF  (Bonus)
   % Range: ???-???%  Optimum: ???%  Hit Frequency: ???%
      Programs Available: PP0295
 
-* Super Dueces
+* Super Deuces
 
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -6138,10 +6140,14 @@ ROM_END
 
 ROM_START( pepp0467 ) /* Normal board : Unknown Bonus Poker (PP0467) */
 /*
-PayTable   Js+  2P  3K  STR  FL  FH  4K  ?? SF  RF  (Bonus)
------------------------------------------------------------
-  ????      1    2   3   4    5   8  25  25 50 250    800
+                                         Four
+PayTable   Js+  2P  3K  STR  FL  FH  4K   7s* SF  RF  (Bonus)
+-------------------------------------------------------------
+  ????      1    2   3   4    5   8  25   25 50 250    800
      Programs Available: PP0467
+
+* Bonus for 4 Sevens
+
 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pp0467_823-854.u68",   0x00000, 0x10000, CRC(b19d48ae) SHA1(8a27a791e6f132d70d1ea02860e11fedb8515989) ) /* Game Version: 823, Library Version: 854 */
@@ -6159,7 +6165,7 @@ ROM_END
 ROM_START( pepp0488 ) /* Normal board : Standard Draw Poker (PP0488) - 01/12/95   @ IGT  L95-0175 */
 /*
 PayTable   Js+  TP  3K  STR  FL  FH  4K  4A  SF  RF  (Bonus)
------------------------------------------------------------
+------------------------------------------------------------
   ????      1    1   3   4    5   8  25 250  50 250    800
   % Range: 98.4-100.4%  Optimum: 102.4%  Hit Frequency: ???
 
@@ -14193,7 +14199,7 @@ GAMEL(1987, pepp0290,  pepp0054, peplus,  peplus_poker, peplus_state, peplus,   
 GAMEL(1987, pepp0290a, pepp0054, peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0290) Deuces Wild Poker (set 2)",     0, layout_pe_poker )
 GAMEL(1987, pepp0291,  pepp0054, peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0291) Deuces Wild Poker (set 1)",     0, layout_pe_poker )
 GAMEL(1987, pepp0294,  0,        peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0294) Aces and Faces Bonus Joker Poker", 0, layout_pe_poker )
-GAMEL(1987, pepp0295,  0,        peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0295) Super Deuces Wild Poker", 0, layout_pe_poker )
+GAMEL(1987, pepp0295,  0,        peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0295) Super Deuces Wild Poker",       0, layout_pe_poker )
 GAMEL(1987, pepp0291a, pepp0054, peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0291) Deuces Wild Poker (set 2)",     0, layout_pe_poker )
 GAMEL(1987, pepp0401,  pepp0158, peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0401) 4 of a Kind Bonus Poker",       0, layout_pe_poker )
 GAMEL(1987, pepp0409,  pepp0158, peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0409) 4 of a Kind Bonus Poker",       0, layout_pe_poker )
@@ -14210,8 +14216,8 @@ GAMEL(1987, pepp0423b, pepp0001, peplus,  peplus_poker, peplus_state, peplus,   
 GAMEL(1987, pepp0423c, pepp0001, peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0423) Standard Draw Poker (set 4)",   0, layout_pe_poker )
 GAMEL(1987, pepp0426,  pepp0048, peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0426) Joker Poker",                   0, layout_pe_poker )
 GAMEL(1987, pepp0428,  pepp0048, peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0428) Joker Poker",                   0, layout_pe_poker )
-GAMEL(1987, pepp0429,  pepp0048, peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0429) Joker Poker (Aces or Better, set 1)",  0, layout_pe_poker )
-GAMEL(1987, pepp0429a, pepp0048, peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0429) Joker Poker (Aces or Better, set 2)",  0, layout_pe_poker )
+GAMEL(1987, pepp0429,  pepp0048, peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0429) Joker Poker (Aces or Better, set 1)", 0, layout_pe_poker )
+GAMEL(1987, pepp0429a, pepp0048, peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0429) Joker Poker (Aces or Better, set 2)", 0, layout_pe_poker )
 GAMEL(1987, pepp0430,  pepp0127, peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0430) Deuces Joker Wild Poker",       0, layout_pe_poker )
 GAMEL(1987, pepp0431,  pepp0127, peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0431) Deuces Joker Wild Poker (International)", 0, layout_pe_poker )
 GAMEL(1987, pepp0434,  0,        peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0434) Bonus Poker Deluxe (set 1)",    0, layout_pe_poker )
@@ -14270,7 +14276,7 @@ GAMEL(1987, pepp0725,  pepp0514, peplus,  peplus_poker, peplus_state, peplus,   
 GAMEL(1987, pepp0725a, pepp0514, peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0725) Double Bonus Poker (set 2)",    0, layout_pe_poker )
 GAMEL(1987, pepp0726,  pepp0514, peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0726) Double Bonus Poker",            0, layout_pe_poker )
 GAMEL(1987, pepp0728,  pepp0514, peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0728) Double Bonus Poker",            0, layout_pe_poker )
-GAMEL(1987, pepp0733,  0,        peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0733) Double Aces and Faces Bonus Poker",  MACHINE_WRONG_COLORS, layout_pe_poker ) /* CAP1292 not dumped */
+GAMEL(1987, pepp0733,  0,        peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0733) Double Aces and Faces Bonus Poker", MACHINE_WRONG_COLORS, layout_pe_poker ) /* CAP1292 not dumped */
 GAMEL(1987, pepp0750,  pepp0001, peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0750) Standard Draw Poker",           0, layout_pe_poker )
 GAMEL(1987, pepp0757,  pepp0250, peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0757) Double Down Stud Joker Poker",  0, layout_pe_poker )
 GAMEL(1987, pepp0760,  pepp0250, peplus,  peplus_poker, peplus_state, peplus,   ROT0,  "IGT - International Game Technology", "Player's Edge Plus (PP0760) Double Down Stud Poker",        0, layout_pe_poker )
