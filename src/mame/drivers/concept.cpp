@@ -28,6 +28,7 @@
     Clock: mm58174 RTC
 
     Raphael Nabet, Brett Wyer, 2003-2005
+    Major reworking by R. Belmont 2012-2013 resulting in bootable floppies
 */
 
 #include "emu.h"
@@ -42,7 +43,7 @@ static ADDRESS_MAP_START(concept_memmap, AS_PROGRAM, 16, concept_state )
 	AM_RANGE(0x000000, 0x000007) AM_ROM AM_REGION("maincpu", 0x010000)  /* boot ROM mirror */
 	AM_RANGE(0x000008, 0x000fff) AM_RAM                                     /* static RAM */
 	AM_RANGE(0x010000, 0x011fff) AM_ROM AM_REGION("maincpu", 0x010000)  /* boot ROM */
-	AM_RANGE(0x020000, 0x021fff) AM_ROM                                     /* macsbugs ROM (optional) */
+	AM_RANGE(0x020000, 0x021fff) AM_ROM AM_REGION("macsbug", 0x0)       /* macsbugs ROM (optional) */
 	AM_RANGE(0x030000, 0x03ffff) AM_READWRITE(concept_io_r,concept_io_w)    /* I/O space */
 
 	AM_RANGE(0x080000, 0x0fffff) AM_RAM AM_SHARE("videoram")/* AM_RAMBANK(2) */ /* DRAM */
@@ -305,15 +306,10 @@ ROM_START( concept )
 	// the source code)
 	ROM_LOAD16_WORD("cc.prm", 0x010000, 0x2000, CRC(b5a87dab) SHA1(0da59af6cfeeb38672f71731527beac323d9c3d6))
 #endif
-
-#if 0
-	// only known MACSbug release for the concept, with reset vector and
-	// entry point (the reset vector seems to be bogus: is the ROM dump bad,
-	// or were the ROMs originally loaded with buggy code?)
-	ROM_LOAD16_BYTE("macsbugh", 0x020000, 0x1000, CRC(aa357112))
-	ROM_LOAD16_BYTE("macsbugl", 0x020001, 0x1000, CRC(b4b59de9))
-#endif
-
+	
+	ROM_REGION16_BE(0x2000, "macsbug", 0)
+	ROM_LOAD16_BYTE( "mb20h.bin",    0x000000, 0x001000, CRC(aa357112) SHA1(88211e5f59887928c557c27cdea674f48bf8eaf7) ) 
+	ROM_LOAD16_BYTE( "mb20l.bin",    0x000001, 0x001000, CRC(b4b59de9) SHA1(3e8b8b5950b5359203c054f94af1fc5b8f0495b9) ) 
 ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT    INIT  COMPANY           FULLNAME */
