@@ -1560,8 +1560,9 @@ void input_manager::seq_from_tokens(input_seq &seq, const char *string)
 	seq.reset();
 
 	// loop until we're done
-	std::string strcopy = string;
-	char *str = const_cast<char *>(strcopy.c_str());
+	std::vector<char> strcopy(string, string + std::strlen(string) + 1);
+	char *str = &strcopy[0];
+	unsigned operators = 0;
 	while (1)
 	{
 		// trim any leading spaces
@@ -1581,17 +1582,51 @@ void input_manager::seq_from_tokens(input_seq &seq, const char *string)
 
 		// look for common stuff
 		input_code code;
+		bool is_operator;
 		if (strcmp(str, "OR") == 0)
+		{
 			code = input_seq::or_code;
+			is_operator = true;
+		}
 		else if (strcmp(str, "NOT") == 0)
+		{
 			code = input_seq::not_code;
+			is_operator = true;
+		}
 		else if (strcmp(str, "DEFAULT") == 0)
+		{
 			code = input_seq::default_code;
+			is_operator = false;
+		}
 		else
+		{
 			code = code_from_token(str);
+			is_operator = false;
+		}
 
 		// translate and add to the sequence
-		seq += code;
+		if (is_operator)
+		{
+			++operators;
+			seq += code;
+		}
+		else
+		{
+			if (code.device_class() < DEVICE_CLASS_FIRST_VALID)
+			{
+				osd_printf_warning("Input: Dropping invalid input token %s\n", str);
+				while (operators)
+				{
+					seq.backspace();
+					--operators;
+				}
+			}
+			else
+			{
+				operators = 0;
+				seq += code;
+			}
+		}
 
 		// advance
 		if (origspace == 0)
