@@ -2,14 +2,14 @@
 // copyright-holders: F. Ulivi
 /*********************************************************************
 
-	98034.cpp
+    98034.cpp
 
-	98034 module (HPIB interface)
+    98034 module (HPIB interface)
 
-	TODO: Implement Parallel Poll response
+    TODO: Implement Parallel Poll response
 
-	The main reference for this module is:
-	HP 98034-90001, 98034 Installation and Service Manual
+    The main reference for this module is:
+    HP 98034-90001, 98034 Installation and Service Manual
 
 *********************************************************************/
 
@@ -146,8 +146,8 @@ WRITE16_MEMBER(hp98034_io_card::reg_w)
 	// ==========
 	// 7-4  1
 	// 3-2  ~offset
-	// 1	0
-	// 0	1
+	// 1    0
+	// 0    1
 	m_mode_reg = (uint8_t)((offset << 2) ^ 0xfd);
 	m_force_flg = true;
 

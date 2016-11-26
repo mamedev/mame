@@ -335,7 +335,7 @@ BOOL winwindow_has_focus(void)
 
 void winwindow_process_events(running_machine &machine, bool ingame, bool nodispatch)
 {
-//	MSG message;
+//  MSG message;
 
 	assert(GetCurrentThreadId() == main_threadid);
 
@@ -459,8 +459,8 @@ void uwp_window_info::destroy()
 	osd_common_t::s_window_list.remove(shared_from_this());
 
 	// destroy the window
-//	if (platform_window<HWND>() != nullptr)
-	//	DestroyWindow(platform_window<HWND>());
+//  if (platform_window<HWND>() != nullptr)
+	//  DestroyWindow(platform_window<HWND>());
 
 	// free the render target
 	machine().render().target_free(m_target);
@@ -496,7 +496,7 @@ void uwp_window_info::update()
 			//if (m_isminimized)
 				//SendMessage(platform_window<HWND>(), WM_USER_SET_MINSIZE, 0, 0);
 			//if (m_ismaximized)
-//				SendMessage(platform_window<HWND>(), WM_USER_SET_MAXSIZE, 0, 0);
+//              SendMessage(platform_window<HWND>(), WM_USER_SET_MAXSIZE, 0, 0);
 		}
 	}
 
@@ -1050,7 +1050,7 @@ void uwp_window_info::adjust_window_position_after_major_change()
 	if (oldrect.left != newrect.left() || oldrect.top != newrect.top() ||
 		oldrect.right != newrect.right() || oldrect.bottom != newrect.bottom())
 		//SetWindowPos(platform_window<HWND>(), fullscreen() ? HWND_TOPMOST : HWND_TOP,
-			//	newrect.left(), newrect.top(),
+			//  newrect.left(), newrect.top(),
 				//newrect.width(), newrect.height(), 0);
 
 	// take note of physical window size (used for lightgun coordinate calculation)
@@ -1101,16 +1101,16 @@ void uwp_window_info::set_fullscreen(int fullscreen)
 		//// if we have previous non-fullscreen bounds, use those
 		//if (m_non_fullscreen_bounds.right != m_non_fullscreen_bounds.left)
 		//{
-		//	SetWindowPos(platform_window<HWND>(), HWND_TOP, m_non_fullscreen_bounds.left, m_non_fullscreen_bounds.top,
-		//				rect_width(&m_non_fullscreen_bounds), rect_height(&m_non_fullscreen_bounds),
-		//				SWP_NOZORDER);
+		//  SetWindowPos(platform_window<HWND>(), HWND_TOP, m_non_fullscreen_bounds.left, m_non_fullscreen_bounds.top,
+		//              rect_width(&m_non_fullscreen_bounds), rect_height(&m_non_fullscreen_bounds),
+		//              SWP_NOZORDER);
 		//}
 		//
 		//// otherwise, set a small size and maximize from there
 		//else
 		//{
-		//	SetWindowPos(platform_window<HWND>(), HWND_TOP, 0, 0, MIN_WINDOW_DIM, MIN_WINDOW_DIM, SWP_NOZORDER);
-		//	maximize_window();
+		//  SetWindowPos(platform_window<HWND>(), HWND_TOP, 0, 0, MIN_WINDOW_DIM, MIN_WINDOW_DIM, SWP_NOZORDER);
+		//  maximize_window();
 		//}
 	}
 

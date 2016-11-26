@@ -2118,7 +2118,7 @@ ROM_END
 
   This bootleg has a TMS5220 for spanish voices
   instead of the Namco 52xx. Needs proper implementation.
-  
+
   DIP Switches reference (to be implemented):
 
   .-------------------------------+-----+-----+-----+-----+-----+-----+-----+-----.
@@ -2247,14 +2247,14 @@ ROM_START( polepos2bs )
 	/* the bootleg has a TMS5220, NOT the Namco 52xx */
 
 	/* unknown or unused (P)ROM data */
-//	ROM_REGION( 0x0100, "user1", 0 )
-//	ROM_LOAD( "74s287-a.bin",   0x0000, 0x0100, CRC(0e742cb1) SHA1(3ae43270aab4848fdeece1648e7e040ab216b08e) )    /* sync chain */
+//  ROM_REGION( 0x0100, "user1", 0 )
+//  ROM_LOAD( "74s287-a.bin",   0x0000, 0x0100, CRC(0e742cb1) SHA1(3ae43270aab4848fdeece1648e7e040ab216b08e) )    /* sync chain */
 
 	/* this is used for the spanish speech with a TMS5220, not properly hooked up */
 	ROM_REGION( 0x2000, "soundz80bl", 0 )
 	ROM_LOAD( "aboard-spi.11",  0x0000, 0x2000, CRC(269c1af4) SHA1(73acb28f1cf8eae26838835aef1566fea18b4138) )
 
-//	ROM_REGION( 0x2000, "pals", 0 )
+//  ROM_REGION( 0x2000, "pals", 0 )
 //  ...not dumped yet...
 ROM_END
 

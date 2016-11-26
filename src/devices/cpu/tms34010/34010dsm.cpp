@@ -34,7 +34,7 @@ static void print_reg(std::ostream &stream, uint8_t reg)
 {
 	if (reg != 0x0f)
 	{
-		util::stream_format(stream, "%c%d", rf, reg);		
+		util::stream_format(stream, "%c%d", rf, reg);
 	}
 	else
 	{

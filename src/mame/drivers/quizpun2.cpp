@@ -236,7 +236,7 @@ uint32_t quizpun2_state::screen_update_quizpun2(screen_device &screen, bitmap_in
 
 	if (layers_ctrl & 2)    m_fg_tmap->draw(screen, bitmap, cliprect, 0, 0);
 
-//	popmessage("BG: %x FG: %x", bg_scroll, fg_scroll);
+//  popmessage("BG: %x FG: %x", bg_scroll, fg_scroll);
 
 	return 0;
 }
@@ -458,11 +458,11 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(quizpun2_state::quizpun_protection_r)
 {
-//	logerror("%s: port A read %02x\n", machine().describe_context(), m_port_a);
+//  logerror("%s: port A read %02x\n", machine().describe_context(), m_port_a);
 
-	/* 
-       Upon reading this port the main cpu is stalled until the mcu provides the value to read
-       and explicitly un-stalls the z80. Is this possible under the current MAME architecture?
+	/*
+	   Upon reading this port the main cpu is stalled until the mcu provides the value to read
+	   and explicitly un-stalls the z80. Is this possible under the current MAME architecture?
 
 	   ** ghastly hack **
 
@@ -490,7 +490,7 @@ READ8_MEMBER(quizpun2_state::quizpun_protection_r)
 
 WRITE8_MEMBER(quizpun2_state::quizpun_protection_w)
 {
-//	logerror("%s: port A write %02x\n", machine().describe_context(), data);
+//  logerror("%s: port A write %02x\n", machine().describe_context(), data);
 	m_port_a = data;
 	m_quizpun_pending = true;
 	m_quizpun_written = true;
@@ -511,13 +511,13 @@ ADDRESS_MAP_END
 
 READ8_MEMBER(quizpun2_state::quizpun_68705_port_a_r)
 {
-//	logerror("%s: port A read %02x\n", machine().describe_context(), m_port_a);
+//  logerror("%s: port A read %02x\n", machine().describe_context(), m_port_a);
 	return m_port_a;
 }
 
 WRITE8_MEMBER(quizpun2_state::quizpun_68705_port_a_w)
 {
-//	logerror("%s: port A write %02x\n", machine().describe_context(), data);
+//  logerror("%s: port A write %02x\n", machine().describe_context(), data);
 	m_port_a = data;
 }
 
@@ -530,17 +530,17 @@ READ8_MEMBER(quizpun2_state::quizpun_68705_port_b_r)
 	// bit 0: 0 = main cpu is reading
 
 	uint8_t ret = m_port_b & 0xf4;
-	ret |=	(	 m_quizpun_pending							? 0 : (1 << 3)) |
-			(	(m_quizpun_pending &&  m_quizpun_written)	? 0 : (1 << 1)) |
-			(	(m_quizpun_pending && !m_quizpun_written)	? 0 : (1 << 0)) ;
+	ret |=  (    m_quizpun_pending                          ? 0 : (1 << 3)) |
+			(   (m_quizpun_pending &&  m_quizpun_written)   ? 0 : (1 << 1)) |
+			(   (m_quizpun_pending && !m_quizpun_written)   ? 0 : (1 << 0)) ;
 
-//	logerror("%s: port B read %02x\n", machine().describe_context(), ret);
+//  logerror("%s: port B read %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
 WRITE8_MEMBER(quizpun2_state::quizpun_68705_port_b_w)
 {
-//	logerror("%s: port B write %02x\n", machine().describe_context(), data);
+//  logerror("%s: port B write %02x\n", machine().describe_context(), data);
 
 	// bit 2: 0->1 run main cpu
 
@@ -558,7 +558,7 @@ READ8_MEMBER(quizpun2_state::quizpun_68705_port_c_r)
 {
 	uint8_t ret = m_port_c & 0xf7;
 	ret |= m_eeprom->do_read() ? 0x08 : 0;
-//	logerror("%s: port C read %02x\n", machine().describe_context(), ret);
+//  logerror("%s: port C read %02x\n", machine().describe_context(), ret);
 	return ret;
 }
 
@@ -573,7 +573,7 @@ WRITE8_MEMBER(quizpun2_state::quizpun_68705_port_c_w)
 	// clock line asserted: write latch or select next bit to read
 	m_eeprom->clk_write((data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
 
-//	logerror("%s: port C write %02x\n", machine().describe_context(), data);
+//  logerror("%s: port C write %02x\n", machine().describe_context(), data);
 	m_port_c = data;
 }
 

@@ -349,7 +349,7 @@ public:
 	}
 
 	virtual ~osd_font_dwrite() { osd_font_dwrite::close(); }
-	
+
 	virtual bool open(std::string const &font_path, std::string const &_name, int &height) override
 	{
 		if (m_d2dfactory == nullptr || m_dwriteFactory == nullptr || m_wicFactory == nullptr)

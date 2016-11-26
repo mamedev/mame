@@ -2,15 +2,15 @@
 // copyright-holders:Angelo Salese
 /**********************************************************************************************
 
-	Mirage Youjuu Mahjongden (c) 1994 Mitchell
+    Mirage Youjuu Mahjongden (c) 1994 Mitchell
 
-	Similar to simpl156.cpp with shifted stuff around.
-	
-	TODO:
-	- some unknown writes (irq acks / sprite DMA start presumably);
+    Similar to simpl156.cpp with shifted stuff around.
 
-	Notes:
-	- To enter into full Test Mode you need to keep pressed the Mahjong A key at start-up.
+    TODO:
+    - some unknown writes (irq acks / sprite DMA start presumably);
+
+    Notes:
+    - To enter into full Test Mode you need to keep pressed the Mahjong A key at start-up.
 
 ===============================================================================================
 
@@ -187,7 +187,7 @@ static INPUT_PORTS_START( mirage )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0xffc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	
+
 	PORT_START("KEY0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_MAHJONG_A )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_MAHJONG_E )

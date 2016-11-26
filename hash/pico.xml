@@ -662,7 +662,7 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 				<rom name="9k0-0001a-rv.ic1" size="2097152" crc="b94f7d54" sha1="dabeb440adbb7477cc880c51fb0cfc1e5f99d23b" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
 	<software name="cookpicok" cloneof="cookpico">
 		<description>Cooking Pico (Kor)</description>
@@ -675,7 +675,7 @@ Published by Others (T-yyy*** serial codes, for yyy depending on the publisher)
 			</dataarea>
 		</part>
 	</software>
-    
+
 	<software name="crayola">
 		<description>Crayola - Create a World (USA)</description>
 		<year>19??</year>
@@ -4757,8 +4757,8 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 				<rom name="samsung pico-toy2.u1" size="2097152" crc="27ef458e" sha1="e4f908d235d25d21390a8965416a34c91b880b63" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
-	</software>  
-    
+	</software>
+
 	<software name="ultraher">
 		<description>UltraHero (Jpn)</description>
 		<year>1995</year>
@@ -5151,8 +5151,8 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 				<rom name="mpr-17620-s.u1" size="524288" crc="25639a73" sha1="d0a768236e21d05ea1734691ab9031ea7a4b3e47" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
-	</software> 
-    
+	</software>
+
 	<software name="hkiinkaip" cloneof="hkiinkai">
 		<description>Heisei Kyouiku Iinkai Jr. (Jpn, Prototype)</description>
 		<year>1995</year>
@@ -6057,7 +6057,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 				<rom name="samsung km23c8100dg pico-9837g.u1" size="1048576" crc="70b7440e" sha1="d6f7b9c9e5714afebfdb116480f73976eae23d17" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
 	<software name="muattago">
 		<description>Muat Tago Galka (Kor)</description>
@@ -6069,7 +6069,7 @@ But how do later protos fit with this theory? Maybe the later protos were from t
 				<rom name="samsung km23c8100dg pico-9840g.u1" size="1048576" crc="9974d421" sha1="7026dec346ce459ad5e81f3c4d209e2480d6626c" offset="000000" loadflag="load16_word_swap" />
 			</dataarea>
 		</part>
-	</software> 
+	</software>
 
 	<software name="drmtour">
 		<description>Dreamland Tour (Kor)</description>

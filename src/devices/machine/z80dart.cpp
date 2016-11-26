@@ -537,8 +537,8 @@ void z80dart_channel::device_start()
 	// state saving
 	save_item(NAME(m_rr));
 	save_item(NAME(m_wr));
-	//	save_item(NAME(m_rx_data_fifo));
-	//	save_item(NAME(m_rx_error_fifo));
+	//  save_item(NAME(m_rx_data_fifo));
+	//  save_item(NAME(m_rx_error_fifo));
 	save_item(NAME(m_rx_clock));
 	save_item(NAME(m_rx_first));
 	save_item(NAME(m_rx_break));

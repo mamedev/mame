@@ -232,7 +232,7 @@ public:
 		m_initialized(FALSE)
 	{
 	}
-	
+
 	virtual ~sound_xaudio2() { }
 
 	bool probe() override;

@@ -141,7 +141,7 @@ private:
 
 	std::unique_ptr<uint8_t[]> m_fx1b_fram;
 	std::unique_ptr<uint8_t[]> m_nbajamex_sram;
-	
+
 	uint32_t m_nbajamex_rombank[2];
 
 	uint16_t m_vt83c461_latch;
@@ -1891,7 +1891,7 @@ WRITE16_MEMBER(zn_state::nbajamex_bank_w)
 	}
 
 	m_nbajamex_rombank[offset] = data;
-	
+
 	uint32_t bankbase0 = ((m_nbajamex_rombank[0] & 0x10) ? 0x200000 : 0) + (m_nbajamex_rombank[0] & 7) * 0x400000;
 	uint32_t bankbase1 = ((m_nbajamex_rombank[1] & 0x10) ? 0 : 0x200000) + (m_nbajamex_rombank[1] & 7) * 0x400000;
 

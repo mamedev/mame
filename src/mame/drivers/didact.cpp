@@ -9,12 +9,12 @@
  * Esselte 100 and the Candela computer for the swedish schools to educate the students in assembly programming
  * and BASIC for electro mechanical applications such as stepper motors, simple process control, buttons
  * and LED:s. Didact designs were marketed by Esselte Studium to the swedish schools. The Candela computer
- * was designed to be the big breakthough and developed by Candela Data AB, "a Didact Company". The Candela 
- * system was based around a main unit that could run OS-9 or Flex and a terminal unit that had a propietary 
+ * was designed to be the big breakthough and developed by Candela Data AB, "a Didact Company". The Candela
+ * system was based around a main unit that could run OS-9 or Flex and a terminal unit that had a propietary
  * software including CDBASIC. The Candela system lost the battle of the swedish schools to
  * the Compis computer by TeleNova which was based on CP/M initially.  Later both lost to IBM PC as we know.
  * Candela Data continued to sell their system to the swedish industry without major successes despite great
- * innovation and spririt. 
+ * innovation and spririt.
  *
  * The Esselte 1000 was an educational package based on Apple II plus software and litterature
  * but the relation to Didact is at this point unknown so it is probably a pure Esselte software production.
@@ -30,10 +30,10 @@
  *  TODO:
  *  Didact designs:    mp68a, md6802, Modulab, Esselte 100, can09t, can09
  * --------------------------------------------------------------------------
- *  - Add PCB layouts   OK     OK				 OK          OK
- *  - Dump ROM:s,       OK     OK				 rev2        OK      OK
- *  - Keyboard          OK     OK				 rev2
- *  - Display/CRT       OK     OK				 OK
+ *  - Add PCB layouts   OK     OK                OK          OK
+ *  - Dump ROM:s,       OK     OK                rev2        OK      OK
+ *  - Keyboard          OK     OK                rev2
+ *  - Display/CRT       OK     OK                OK
  *  - Clickable Artwork RQ     RQ
  *  - Sound             NA     NA
  *  - Cassette i/f                               OK
@@ -53,7 +53,7 @@
 #include "video/mc6845.h"    // For candela
 #include "machine/wd_fdc.h"  // For candela
 #include "machine/clock.h"   // For candela
-#include "machine/ram.h"	 // For candela
+#include "machine/ram.h"     // For candela
 #include "video/dm9368.h"    // For the mp68a
 #include "machine/74145.h"   // For the md6802 and e100
 // Features
@@ -66,7 +66,7 @@
 #define VERBOSE 0
 
 #define LOGPRINT(x) do { if (VERBOSE) logerror x; } while (0)
-#define LOG(x) LOGPRINT(x) 
+#define LOG(x) LOGPRINT(x)
 #define LOGSCAN(x) {}
 #define LOGSER(x) {}
 #define LOGSCREEN(x) {}
@@ -839,7 +839,7 @@ ADDRESS_MAP_END
  *       +----------------------------------+-------+------------------+          +----------+-------+-------+---------+--+----------+-------+
  *
  */
-/* 
+/*
  * Candela Terminal
  * TODO:
  * - Map additional PIA:s on the ROM board
@@ -991,15 +991,15 @@ protected:
 };
 
 void can09_state::machine_reset()
-{ 
-	LOG(("%s()\n", FUNCNAME)); 
+{
+	LOG(("%s()\n", FUNCNAME));
 	m_bank1->set_entry(0);
 }
 
 void can09_state::machine_start()
-{ 
-	LOG(("%s()\n", FUNCNAME)); 
-	m_bank1->configure_entries(0, 8, m_ram->pointer(), 0x8000); 
+{
+	LOG(("%s()\n", FUNCNAME));
+	m_bank1->configure_entries(0, 8, m_ram->pointer(), 0x8000);
 }
 
 uint32_t can09_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -1012,7 +1012,7 @@ uint32_t can09_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 #endif
 
 	LOGSCREEN(("%s()\n", FUNCNAME));
-	//	vramad = 0;
+	//  vramad = 0;
 	for (int row = 0; row < 72 * 8; row += 8)
 	{
 		for (int col = 0; col < 64 * 8; col += 8)
@@ -1026,17 +1026,17 @@ uint32_t can09_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 			/* plot the character */
 			for (y = 0; y < 8; y++)
 			{
-				//				if (VERBOSE && charcode != 0x20 && charcode != 0) LOGSCREEN(("\n  %02x: ", *chardata));
+				//              if (VERBOSE && charcode != 0x20 && charcode != 0) LOGSCREEN(("\n  %02x: ", *chardata));
 				for (x = 0; x < 8; x++)
 				{
-					//					if (VERBOSE && charcode != 0x20 && charcode != 0) LOGSCREEN((" %02x: ", *chardata));
+					//                  if (VERBOSE && charcode != 0x20 && charcode != 0) LOGSCREEN((" %02x: ", *chardata));
 					bitmap.pix16(row + y, col + x) = x & 1; //(*chardata & (1 << x)) ? 1 : 0;
 				}
-				//				chardata++;
+				//              chardata++;
 			}
-			//			vramad++;
+			//          vramad++;
 		}
-		//		if (VERBOSE && charcode != 0x20 && charcode != 0) LOGSCREEN(("\n"));
+		//      if (VERBOSE && charcode != 0x20 && charcode != 0) LOGSCREEN(("\n"));
 	}
 
 	return 0;
@@ -1061,9 +1061,9 @@ READ8_MEMBER( can09_state::pia1_B_r )
 
 WRITE8_MEMBER( can09_state::pia1_B_w )
 {
-	//	UINT8 *RAM = memregion("maincpu")->base();
+	//  UINT8 *RAM = memregion("maincpu")->base();
 	LOG(("%s(%02x)\n", FUNCNAME, data));
-	//	membank("bank1")->set_entry((data & 0x70) >> 4);
+	//  membank("bank1")->set_entry((data & 0x70) >> 4);
 	m_bank1->set_entry((data & 0x70) >> 4);
 #if 0
 	switch (data & 0x70){
@@ -1099,10 +1099,10 @@ static ADDRESS_MAP_START( can09_map, AS_PROGRAM, 8, can09_state )
 /*
  * Port A=0x18 B=0x20 erase 0-7fff
  * Port A=0x18 B=0x30 erase 0-7fff
- * Port A=0x18 B=0x00 
+ * Port A=0x18 B=0x00
  * Port A=0x10 B=
 */
-//	AM_RANGE(0x0000, 0x7fff) AM_RAM
+//  AM_RANGE(0x0000, 0x7fff) AM_RAM
 	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_RAMBANK("bank1")
 	AM_RANGE(0xe020, 0xe020) AM_DEVWRITE("crtc", h46505_device, address_w)
 	AM_RANGE(0xe021, 0xe021) AM_DEVWRITE("crtc", h46505_device, register_w)
@@ -1408,25 +1408,25 @@ static MACHINE_CONFIG_START( can09, can09_state )
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(can09_state, crtc_update_row)
 #endif
-	/* Setup loop from data table in ROM: 0xFFCB 0xE020 (CRTC register number), 0xFFD0 0xE021 (CRTC register value)  
-		Reg  Value Comment
-		0x00 0x55  Horizontal Total number of characters,
-		0x01 0x40  Horizontal Displayed number of characters
-		0x02 0x43  Horizontal Sync Position, character number
-		0x03 0x03  Horizontal Sync width, number of charcters
-		0x04 0x50  Vertical Total number of characters
-		0x05 0x09  Vertical Total Adjust number of characters
-		0x06 0x48  Vertical Displayed number of characters
-		0x07 0x4B  Vertical Sync Position, character number
-		0x08 0x00  Interlace Mode/Scew, Non-Interlaced
-		0x09 0x03  Max Scan Line Address Register
-		0x0A 0x00  Cursor Start
-		0x0B 0x0A  Cursor End
-		0x0C 0x00  Start Address hi
-		0x0D 0x00  Start Address lo
-		0x0E 0x00  Cursor hi
-		0x0F 0x00  Cursor lo
-        Note - no init of Light Pen registers
+	/* Setup loop from data table in ROM: 0xFFCB 0xE020 (CRTC register number), 0xFFD0 0xE021 (CRTC register value)
+	    Reg  Value Comment
+	    0x00 0x55  Horizontal Total number of characters,
+	    0x01 0x40  Horizontal Displayed number of characters
+	    0x02 0x43  Horizontal Sync Position, character number
+	    0x03 0x03  Horizontal Sync width, number of charcters
+	    0x04 0x50  Vertical Total number of characters
+	    0x05 0x09  Vertical Total Adjust number of characters
+	    0x06 0x48  Vertical Displayed number of characters
+	    0x07 0x4B  Vertical Sync Position, character number
+	    0x08 0x00  Interlace Mode/Scew, Non-Interlaced
+	    0x09 0x03  Max Scan Line Address Register
+	    0x0A 0x00  Cursor Start
+	    0x0B 0x0A  Cursor End
+	    0x0C 0x00  Start Address hi
+	    0x0D 0x00  Start Address lo
+	    0x0E 0x00  Cursor hi
+	    0x0F 0x00  Cursor lo
+	    Note - no init of Light Pen registers
 	*/
 
 
@@ -1629,7 +1629,7 @@ ROM_START( can09t )
 	ROM_LOAD( "ic2-mon58b-c8d7.bin", 0x0000, 0x8000, CRC(7eabfec6) SHA1(e08e2349035389b441227df903aa54f4c1e4a337) )
 	/* Programmable logic for the CAN09 1.4 PCB */
 	ROM_REGION(0x1000, "plas", 0)
-	ROM_LOAD( "ic10-21.1.bin", 		 0x0000, 0x20,   CRC(b75ac72d) SHA1(689363200035b11a823d17a8d717f313eeefc3bf) )
+	ROM_LOAD( "ic10-21.1.bin",       0x0000, 0x20,   CRC(b75ac72d) SHA1(689363200035b11a823d17a8d717f313eeefc3bf) )
 ROM_END
 
 ROM_START( can09 )

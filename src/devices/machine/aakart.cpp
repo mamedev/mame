@@ -136,7 +136,7 @@ void aakart_device::device_timer(emu_timer &timer, device_timer_id id, int param
 					m_queue_size--;
 					for(int i=0; i<m_queue_size; i++)
 						m_queue[i] = m_queue[i + 1];
-				}	
+				}
 				break;
 			case 0xfd:
 				m_rx = 0xfd;

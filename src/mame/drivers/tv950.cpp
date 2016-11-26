@@ -271,7 +271,7 @@ static MACHINE_CONFIG_START( tv950, tv950_state )
 	MCFG_CPU_PROGRAM_MAP(tv950_mem)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK, 1200, 0, 1120, 370, 0, 250 )	// not real values
+	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK, 1200, 0, 1120, 370, 0, 250 )   // not real values
 	MCFG_SCREEN_UPDATE_DEVICE( CRTC_TAG, r6545_1_device, screen_update )
 
 	// there are many 6845 CRTC submodels, the Theory of Operation manual references the Rockwell R6545-1 specificially.

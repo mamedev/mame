@@ -763,7 +763,7 @@ static INPUT_PORTS_START( roylcrdn )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )                                      PORT_NAME("Note In")        /* Note In */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) PORT_TOGGLE  PORT_CODE(KEYCODE_9)                         /* Memory Reset */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_TOGGLE  PORT_CODE(KEYCODE_0)  PORT_NAME("Analyzer")       /* Analyzer */
-	PORT_SERVICE( 0x10, IP_ACTIVE_LOW ) 						      											/* Test Mode */
+	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                                                                         /* Test Mode */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )                                      PORT_NAME("Coin In")        /* Coin In */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )                              PORT_NAME("Credit Clear")   /* Credit Clear */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )                                                                 /* Spare 1 */

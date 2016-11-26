@@ -2907,7 +2907,7 @@ Beyond that last category are the roms waiting to be classified.
 			</dataarea>
 		</part>
 	</software>
-  
+
 	<software name="tecmonbaup" cloneof="tecmonba">
 		<!-- i2a2n2 -->
 		<description>Tecmo Super NBA Basketball (USA, Prototype 19921026)</description>

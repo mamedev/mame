@@ -23,18 +23,18 @@ function timer.startplugin()
 		total_time = total_time + (os.time() - start_time)
 
 		local db = assert(sqlite3.open(timer_db))
-		
+
 		local insert_stmt = assert( db:prepare("INSERT OR IGNORE INTO timer VALUES (?, ?, 0, 0)") )
 		insert_stmt:bind_values(emu.romname(), emu.softname())
 		insert_stmt:step()
 		insert_stmt:reset()
-		
+
 		local update_stmt = assert( db:prepare("UPDATE timer SET total_time=?, play_count=? WHERE driver=? AND software=?") )
 		update_stmt:bind_values(total_time, play_count,emu.romname(), emu.softname())
 		update_stmt:step()
 		update_stmt:reset()
-				
-		assert(db:close() == sqlite3.OK) 
+
+		assert(db:close() == sqlite3.OK)
 	end
 
 
@@ -48,13 +48,13 @@ function timer.startplugin()
 		local db = assert(sqlite3.open(timer_db))
 		local found=false
 		db:exec([[select * from sqlite_master where name='timer';]], function(...) found=true return 0 end)
-		if not found then 		
+		if not found then
 			db:exec[[  CREATE TABLE timer (
-						driver		VARCHAR(32) PRIMARY KEY,
-						software 	VARCHAR(40),
-						total_time	INTEGER NOT NULL,
-						play_count	INTEGER NOT NULL
-					  ); ]] 
+						driver      VARCHAR(32) PRIMARY KEY,
+						software    VARCHAR(40),
+						total_time  INTEGER NOT NULL,
+						play_count  INTEGER NOT NULL
+					  ); ]]
 		end
 
 		local stmt, row
@@ -69,7 +69,7 @@ function timer.startplugin()
 			total_time = 0
 		end
 
-		assert(db:close() == sqlite3.OK) 
+		assert(db:close() == sqlite3.OK)
 
 		start_time = os.time()
 		play_count = play_count + 1

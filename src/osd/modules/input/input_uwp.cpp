@@ -37,7 +37,7 @@ using namespace Windows::Foundation::Collections;
 using namespace Windows::Gaming::Input;
 
 //============================================================
-//	UWP Base device/module implementation
+//  UWP Base device/module implementation
 //============================================================
 
 //============================================================
@@ -358,27 +358,27 @@ struct gamepad_state
 static input_item_id buttonlabel_to_itemid[] =
 {
 	input_item_id::ITEM_ID_INVALID,       // GameControllerButtonLabel::None
-	input_item_id::ITEM_ID_SELECT,	      // GameControllerButtonLabel::XboxBack
-	input_item_id::ITEM_ID_START,	      // GameControllerButtonLabel::XboxStart
-	input_item_id::ITEM_ID_START,	      // GameControllerButtonLabel::XboxMenu
-	input_item_id::ITEM_ID_SELECT,	      // GameControllerButtonLabel::XboxView
-	input_item_id::ITEM_ID_HAT1UP,	      // GameControllerButtonLabel::XboxUp
+	input_item_id::ITEM_ID_SELECT,        // GameControllerButtonLabel::XboxBack
+	input_item_id::ITEM_ID_START,         // GameControllerButtonLabel::XboxStart
+	input_item_id::ITEM_ID_START,         // GameControllerButtonLabel::XboxMenu
+	input_item_id::ITEM_ID_SELECT,        // GameControllerButtonLabel::XboxView
+	input_item_id::ITEM_ID_HAT1UP,        // GameControllerButtonLabel::XboxUp
 	input_item_id::ITEM_ID_HAT1DOWN,      // GameControllerButtonLabel::XboxDown
-	input_item_id::ITEM_ID_HAT1LEFT,	  // GameControllerButtonLabel::XboxLeft
-	input_item_id::ITEM_ID_HAT1RIGHT,	  // GameControllerButtonLabel::XboxRight
-	input_item_id::ITEM_ID_BUTTON1,	      // GameControllerButtonLabel::XboxA
-	input_item_id::ITEM_ID_BUTTON2,	      // GameControllerButtonLabel::XboxB
-	input_item_id::ITEM_ID_BUTTON3,	      // GameControllerButtonLabel::XboxX
-	input_item_id::ITEM_ID_BUTTON4,	      // GameControllerButtonLabel::XboxY
-	input_item_id::ITEM_ID_BUTTON5,	      // GameControllerButtonLabel::XboxLeftBumper
-	input_item_id::ITEM_ID_ZAXIS,	      // GameControllerButtonLabel::XboxLeftTrigger
-	input_item_id::ITEM_ID_BUTTON7,	      // GameControllerButtonLabel::XboxLeftStickButton
-	input_item_id::ITEM_ID_BUTTON6,	      // GameControllerButtonLabel::XboxRightBumper
-	input_item_id::ITEM_ID_RZAXIS,	      // GameControllerButtonLabel::XboxRightTrigger
-	input_item_id::ITEM_ID_BUTTON8,	      // GameControllerButtonLabel::XboxRightStickButton
-	input_item_id::ITEM_ID_BUTTON9,	      // GameControllerButtonLabel::XboxPaddle1
-	input_item_id::ITEM_ID_BUTTON10,	  // GameControllerButtonLabel::XboxPaddle2
-	input_item_id::ITEM_ID_BUTTON11,	  // GameControllerButtonLabel::XboxPaddle3
+	input_item_id::ITEM_ID_HAT1LEFT,      // GameControllerButtonLabel::XboxLeft
+	input_item_id::ITEM_ID_HAT1RIGHT,     // GameControllerButtonLabel::XboxRight
+	input_item_id::ITEM_ID_BUTTON1,       // GameControllerButtonLabel::XboxA
+	input_item_id::ITEM_ID_BUTTON2,       // GameControllerButtonLabel::XboxB
+	input_item_id::ITEM_ID_BUTTON3,       // GameControllerButtonLabel::XboxX
+	input_item_id::ITEM_ID_BUTTON4,       // GameControllerButtonLabel::XboxY
+	input_item_id::ITEM_ID_BUTTON5,       // GameControllerButtonLabel::XboxLeftBumper
+	input_item_id::ITEM_ID_ZAXIS,         // GameControllerButtonLabel::XboxLeftTrigger
+	input_item_id::ITEM_ID_BUTTON7,       // GameControllerButtonLabel::XboxLeftStickButton
+	input_item_id::ITEM_ID_BUTTON6,       // GameControllerButtonLabel::XboxRightBumper
+	input_item_id::ITEM_ID_RZAXIS,        // GameControllerButtonLabel::XboxRightTrigger
+	input_item_id::ITEM_ID_BUTTON8,       // GameControllerButtonLabel::XboxRightStickButton
+	input_item_id::ITEM_ID_BUTTON9,       // GameControllerButtonLabel::XboxPaddle1
+	input_item_id::ITEM_ID_BUTTON10,      // GameControllerButtonLabel::XboxPaddle2
+	input_item_id::ITEM_ID_BUTTON11,      // GameControllerButtonLabel::XboxPaddle3
 	input_item_id::ITEM_ID_BUTTON12,      // GameControllerButtonLabel::XboxPaddle4
 	input_item_id::ITEM_ID_INVALID,       // GameControllerButtonLabel_Mode
 	input_item_id::ITEM_ID_SELECT,        // GameControllerButtonLabel_Select
@@ -411,12 +411,12 @@ static input_item_id buttonlabel_to_itemid[] =
 	input_item_id::ITEM_ID_OTHER_SWITCH,  // GameControllerButtonLabel_Left2
 	input_item_id::ITEM_ID_OTHER_SWITCH,  // GameControllerButtonLabel_Left3
 	input_item_id::ITEM_ID_BUTTON6,       // GameControllerButtonLabel_RightBumper
-	input_item_id::ITEM_ID_RZAXIS,	      // GameControllerButtonLabel_RightTrigger
+	input_item_id::ITEM_ID_RZAXIS,        // GameControllerButtonLabel_RightTrigger
 	input_item_id::ITEM_ID_BUTTON8,       // GameControllerButtonLabel_RightStickButton
 	input_item_id::ITEM_ID_OTHER_SWITCH,  // GameControllerButtonLabel_Right1
 	input_item_id::ITEM_ID_OTHER_SWITCH,  // GameControllerButtonLabel_Right2
 	input_item_id::ITEM_ID_OTHER_SWITCH,  // GameControllerButtonLabel_Right3
-	input_item_id::ITEM_ID_BUTTON9,	      // GameControllerButtonLabel_Paddle1
+	input_item_id::ITEM_ID_BUTTON9,       // GameControllerButtonLabel_Paddle1
 	input_item_id::ITEM_ID_BUTTON10,      // GameControllerButtonLabel_Paddle2
 	input_item_id::ITEM_ID_BUTTON11,      // GameControllerButtonLabel_Paddle3
 	input_item_id::ITEM_ID_BUTTON12,      // GameControllerButtonLabel_Paddle4
@@ -496,7 +496,7 @@ internal:
 			return;
 
 		GamepadReading r = m_pad->GetCurrentReading();
-		
+
 		// Add the axes
 		for (int axisnum = 0; axisnum < 4; axisnum++)
 		{
@@ -573,11 +573,11 @@ internal:
 
 			// allocate the UWP implementation of the device object
 			UwpJoystickDevice ^refdevice = ref new UwpJoystickDevice(pad, machine, name.c_str(), name.c_str(), *this->NativeModule);
-			
+
 			// Allocate the wrapper and add it to the list
 			auto created_devinfo = std::make_unique<uwp_input_device>(refdevice);
 			devinfo = NativeModule->devicelist()->add_device<uwp_input_device>(machine, std::move(created_devinfo));
-			
+
 			// Give the UWP implementation a handle to the input_device
 			refdevice->InputDevice = devinfo->device();
 

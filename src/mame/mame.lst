@@ -14798,8 +14798,8 @@ isbc286                         //
 isbc2861                        //
 isbc86                          //
 rpc86                           //
-isbc8605			//
-isbc8630			//
+isbc8605            //
+isbc8630            //
 
 @source:isbc8010.cpp
 isbc8010                        //
@@ -20142,7 +20142,7 @@ mice                            //
 micral                          //
 
 @source:micro20.cpp
-micro20							// (c) 1984 GMX
+micro20                         // (c) 1984 GMX
 
 @source:micro3d.cpp
 botss                           // (c) 1992 Microprose Games Inc.
@@ -30361,7 +30361,7 @@ sonstwr2                        //
 wolfman                         //
 
 @source:pg685.cpp
-pg675							//
+pg675                           //
 pg685                           //
 pg685oua12                      //
 
@@ -36126,7 +36126,7 @@ pyuutajr                        // 1982 Tomy Pyuuta Jr.
 tutor                           // 1983? Tomy Tutor
 
 @source:tv910.cpp
-tv910							//
+tv910                           //
 
 @source:tv950.cpp
 tv950                           //

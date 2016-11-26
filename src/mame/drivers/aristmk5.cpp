@@ -732,11 +732,11 @@ DRIVER_INIT_MEMBER(aristmk5_state,aristmk5)
 						{
 							calculatedchecksum += ROM[i];
 
-							//	printf("Using address %08x, value %08x, Calculated Checksum %08x\n", i*4,  ROM[i], calculatedchecksum);
+							//  printf("Using address %08x, value %08x, Calculated Checksum %08x\n", i*4,  ROM[i], calculatedchecksum);
 						}
 						else
 						{
-							//	printf("SKIPPING address %08x, value %08x, Calculated Checksum %08x\n", i*4,  ROM[i], calculatedchecksum);
+							//  printf("SKIPPING address %08x, value %08x, Calculated Checksum %08x\n", i*4,  ROM[i], calculatedchecksum);
 						}
 					}
 
@@ -876,27 +876,27 @@ static MACHINE_CONFIG_START( aristmk5, aristmk5_state )
 
 	// TL16C452FN U71
 	MCFG_DEVICE_ADD("uart_0a", NS16450, MASTER_CLOCK / 9)
-//	MCFG_INS8250_OUT_INT_CB(WRITELINE(aristmk5_state, uart_irq_callback))
+//  MCFG_INS8250_OUT_INT_CB(WRITELINE(aristmk5_state, uart_irq_callback))
 	MCFG_DEVICE_ADD("uart_0b", NS16450, MASTER_CLOCK / 9)
-//	MCFG_INS8250_OUT_INT_CB(WRITELINE(aristmk5_state, uart_irq_callback))
+//  MCFG_INS8250_OUT_INT_CB(WRITELINE(aristmk5_state, uart_irq_callback))
 
 	// TL16C452FN U72
 	MCFG_DEVICE_ADD("uart_1a", NS16450, MASTER_CLOCK / 9)
-//	MCFG_INS8250_OUT_INT_CB(WRITELINE(aristmk5_state, uart_irq_callback))
+//  MCFG_INS8250_OUT_INT_CB(WRITELINE(aristmk5_state, uart_irq_callback))
 	MCFG_DEVICE_ADD("uart_1b", NS16450, MASTER_CLOCK / 9)
-//	MCFG_INS8250_OUT_INT_CB(WRITELINE(aristmk5_state, uart_irq_callback))
+//  MCFG_INS8250_OUT_INT_CB(WRITELINE(aristmk5_state, uart_irq_callback))
 
 	// COMM port 4 - 5
 	MCFG_DEVICE_ADD("uart_2a", NS16450, MASTER_CLOCK / 9)
-//	MCFG_INS8250_OUT_INT_CB(WRITELINE(aristmk5_state, uart_irq_callback))
+//  MCFG_INS8250_OUT_INT_CB(WRITELINE(aristmk5_state, uart_irq_callback))
 	MCFG_DEVICE_ADD("uart_2b", NS16450, MASTER_CLOCK / 9)
-//	MCFG_INS8250_OUT_INT_CB(WRITELINE(aristmk5_state, uart_irq_callback))
+//  MCFG_INS8250_OUT_INT_CB(WRITELINE(aristmk5_state, uart_irq_callback))
 
 	// COMM port 6 - 7
 	MCFG_DEVICE_ADD("uart_3a", NS16450, MASTER_CLOCK / 9)
-//	MCFG_INS8250_OUT_INT_CB(WRITELINE(aristmk5_state, uart_irq_callback))
+//  MCFG_INS8250_OUT_INT_CB(WRITELINE(aristmk5_state, uart_irq_callback))
 	MCFG_DEVICE_ADD("uart_3b", NS16450, MASTER_CLOCK / 9)
-//	MCFG_INS8250_OUT_INT_CB(WRITELINE(aristmk5_state, uart_irq_callback))
+//  MCFG_INS8250_OUT_INT_CB(WRITELINE(aristmk5_state, uart_irq_callback))
 
 	MCFG_DS1302_ADD("rtc", XTAL_32_768kHz)
 
@@ -963,12 +963,12 @@ ROM_END
 ROM_START( adonis )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000bf8
-		0x000000-0x05eb1b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0xfc98a056
-			Calculated Checksum 0xfc98a056  (OK)
-		0x05eb1c-0x10fa8b is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x05eb1c-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
+	    Checksum code found at 0x000bf8
+	    0x000000-0x05eb1b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0xfc98a056
+	        Calculated Checksum 0xfc98a056  (OK)
+	    0x05eb1c-0x10fa8b is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x05eb1c-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "0200751v.u7",  0x000000, 0x80000, CRC(ab386ab0) SHA1(56c5baea4272866a9fe18bdc371a49f155251f86) )
@@ -998,12 +998,12 @@ ROM_END
 ROM_START( adonisa )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000bf8
-		0x000000-0x05cdc3 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x91f374c7
-			Calculated Checksum 0x91f374c7  (OK)
-		0x05cdc4-0x11000b is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x05cdc4-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included			
+	    Checksum code found at 0x000bf8
+	    0x000000-0x05cdc3 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x91f374c7
+	        Calculated Checksum 0x91f374c7  (OK)
+	    0x05cdc4-0x11000b is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x05cdc4-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "0100751v.u7",  0x000000, 0x80000, CRC(ca3e97db) SHA1(bd0a4402e57891899d92ea85a87fb8925a44f706) )
@@ -1034,12 +1034,12 @@ ROM_END
 ROM_START( adonisu )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000d18
-		0x000000-0x0e8a7b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0xe6715f98
-			Calculated Checksum 0xc80cd95e  (BAD)
-		0x0e8a7c-0x1c5f47 is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x0e8a7c-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
+	    Checksum code found at 0x000d18
+	    0x000000-0x0e8a7b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0xe6715f98
+	        Calculated Checksum 0xc80cd95e  (BAD)
+	    0x0e8a7c-0x1c5f47 is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x0e8a7c-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	// the checksum only covers part of the first 2 roms, marked all as BAD_DUMP because it can't be trusted without a full redump.
@@ -1058,11 +1058,11 @@ ROM_START( adonisce )
 	ARISTOCRAT_MK5_BIOS
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	/*
-		Checksum code found at 0x000c44
-		0x000000-0x06ddab is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x07c97aad
-			Calculated Checksum 0x07c97aad  (OK)
-		0x06ddac-0x2a41cb is the non-Checksummed range
+	    Checksum code found at 0x000c44
+	    0x000000-0x06ddab is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x07c97aad
+	        Calculated Checksum 0x07c97aad  (OK)
+	    0x06ddac-0x2a41cb is the non-Checksummed range
 	*/
 	ROM_LOAD32_WORD("0201005v.u7",  0x0000000, 0x0080000, CRC(32149323) SHA1(abfc6a8518a39528db3700c2cb558e925ceeda6d) )
 	ROM_LOAD32_WORD("0201005v.u11", 0x0000002, 0x0080000, CRC(309b0b55) SHA1(669568031d305b29395345a26a5d004d83881433) )
@@ -1080,12 +1080,12 @@ ROM_END
 ROM_START( baddog )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000ae4
-		0x000000-0x056f3f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x15ac4012
-			Calculated Checksum 0x15ac4012  (OK)
-		0x056f40-0x2fb607 is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x056f40-0x2fffff is the non-Checksummed range if the additional vectors? at the end are included
+	    Checksum code found at 0x000ae4
+	    0x000000-0x056f3f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x15ac4012
+	        Calculated Checksum 0x15ac4012  (OK)
+	    0x056f40-0x2fb607 is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x056f40-0x2fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
@@ -1105,12 +1105,12 @@ ROM_END
 ROM_START( blackpnt )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000bb0
-		0x000000-0x056d8b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0xeebac434
-			Calculated Checksum 0xeebac434  (OK)
-		0x056d8c-0x138557 is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x056d8c-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included		
+	    Checksum code found at 0x000bb0
+	    0x000000-0x056d8b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0xeebac434
+	        Calculated Checksum 0xeebac434  (OK)
+	    0x056d8c-0x138557 is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x056d8c-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD("0200818v.u7",  0x0000000, 0x0080000, CRC(eed76145) SHA1(6a40a6ba2ce320a37b086dc4916c92c8e38c065e) )
@@ -1127,11 +1127,11 @@ ROM_END
 ROM_START( bootsctn )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		0x000000-0x06c177 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0xb0980753
-			Calculated Checksum 0xb0980753  (OK)
-		0x06c178-0x384a9b is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x06c178-0x3fffff is the non-Checksummed range if the additional vectors? at the end are included
+	    0x000000-0x06c177 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0xb0980753
+	        Calculated Checksum 0xb0980753  (OK)
+	    0x06c178-0x384a9b is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x06c178-0x3fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD("0100812v.u7",  0x0000000, 0x0080000, CRC(f8e12462) SHA1(82a25757b2146204b86e557b8f1c45280e0668a8) )
@@ -1156,11 +1156,11 @@ ROM_END
 ROM_START( bootsctnu )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000d08
-		0x000000-0x0941ab is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0xdf68cecf
-			Calculated Checksum 0xed145d01  (BAD)
-		0x0941ac-0x328187 is the non-Checksummed range (suspicious endpoint)
+	    Checksum code found at 0x000d08
+	    0x000000-0x0941ab is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0xdf68cecf
+	        Calculated Checksum 0xed145d01  (BAD)
+	    0x0941ac-0x328187 is the non-Checksummed range (suspicious endpoint)
 	*/
 
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
@@ -1183,11 +1183,11 @@ ROM_END
 ROM_START( bumblbug )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000b68
-		0x000000-0x05b94b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0xf5d418fe
-			Calculated Checksum 0xf5d418fe  (OK)
-		0x05b94c-0x0fc69f is the non-Checksummed range (unusual endpoint)
+	    Checksum code found at 0x000b68
+	    0x000000-0x05b94b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0xf5d418fe
+	        Calculated Checksum 0xf5d418fe  (OK)
+	    0x05b94c-0x0fc69f is the non-Checksummed range (unusual endpoint)
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD("0200510v.u7",  0x0000000, 0x0080000, CRC(d4cfce73) SHA1(735c385779afe55e521dbfe9ebfdc55fe3346349) )
@@ -1203,12 +1203,12 @@ ROM_END
 ROM_START( bumblbugql )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000ac8
-		0x000000-0x05554b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x66b20ae6
-			Calculated Checksum 0x66b20ae6  (OK)
-		0x05554c-0x1c4e2b is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x05554c-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
+	    Checksum code found at 0x000ac8
+	    0x000000-0x05554b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x66b20ae6
+	        Calculated Checksum 0x66b20ae6  (OK)
+	    0x05554c-0x1c4e2b is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x05554c-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "0200456v.u7",  0x000000, 0x80000, CRC(f04dd78b) SHA1(443057fc3e02406d46cf68f95e85e5a0fd8e7b1e) )
@@ -1229,12 +1229,12 @@ ROM_END
 ROM_START( bumblbugu )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000d08
-		0x000000-0x0b1f47 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x9f3936f9
-			Calculated Checksum 0x16f5c058  (BAD)
-		0x0b1f48-0x183c1f is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x0b1f48-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included		
+	    Checksum code found at 0x000d08
+	    0x000000-0x0b1f47 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x9f3936f9
+	        Calculated Checksum 0x16f5c058  (BAD)
+	    0x0b1f48-0x183c1f is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x0b1f48-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	// the checksum only covers part of the first 2 roms, marked all as BAD_DUMP because it can't be trusted without a full redump.
@@ -1252,12 +1252,12 @@ ROM_END
 ROM_START( buttdeli )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000adc
-		0x000000-0x04477f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x19143954
-			Calculated Checksum 0x19143954  (OK)
-		0x044780-0x1c713b is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x044780-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
+	    Checksum code found at 0x000adc
+	    0x000000-0x04477f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x19143954
+	        Calculated Checksum 0x19143954  (OK)
+	    0x044780-0x1c713b is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x044780-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD("0200143v.u7",  0x0000000, 0x0080000, CRC(7f69cdfc) SHA1(1241741d21334df10d60080555824a87eae93db3) )
@@ -1275,12 +1275,12 @@ ROM_START( cashcat )
 	ARISTOCRAT_MK5_BIOS
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	/*
-		Checksum code found at 0x000adc
-		0x000000-0x04477f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x19143954
-			Calculated Checksum 0x19143954  (OK)
-		0x044780-0x1c713b is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x044780-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
+	    Checksum code found at 0x000adc
+	    0x000000-0x04477f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x19143954
+	        Calculated Checksum 0x19143954  (OK)
+	    0x044780-0x1c713b is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x044780-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_LOAD32_WORD("0300863v.u7",  0x0000000, 0x0080000, CRC(de0f0202) SHA1(994f6c47b1e2e0e133853dc69b189752104486e4) )
 	ROM_LOAD32_WORD("0300863v.u11", 0x0000002, 0x0080000, CRC(e60e8bd1) SHA1(ffaa7be8968047b9ee54a117d273a14cbca41028) )
@@ -1296,12 +1296,12 @@ ROM_END
 ROM_START( cashcham )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000ae0
-		0x000000-0x055f83 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x159a2aa3
-			Calculated Checksum 0x159a2aa3  (OK)
-		0x055f84-0x1dbdd7 is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x055f84-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
+	    Checksum code found at 0x000ae0
+	    0x000000-0x055f83 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x159a2aa3
+	        Calculated Checksum 0x159a2aa3  (OK)
+	    0x055f84-0x1dbdd7 is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x055f84-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD("0100438v.u7",  0x0000000, 0x0080000, CRC(c942ef22) SHA1(4f56674f749602ae928832f98a641e680af8989b) )
@@ -1317,12 +1317,12 @@ ROM_END
 ROM_START( cashchama )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000b00
-		0x000000-0x05ca1b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0xa32ccd1b
-			Calculated Checksum 0xa32ccd1b  (OK)
-		0x05ca1c-0x1dbdd7 is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x05ca1c-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included	
+	    Checksum code found at 0x000b00
+	    0x000000-0x05ca1b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0xa32ccd1b
+	        Calculated Checksum 0xa32ccd1b  (OK)
+	    0x05ca1c-0x1dbdd7 is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x05ca1c-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD("0200437v.u7",  0x0000000, 0x0080000, CRC(a287fd5a) SHA1(7d06f679e5ff38e0989819410856361962c93e42) )
@@ -1355,12 +1355,12 @@ ROM_END
 ROM_START( cashchamu )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000d08
-		0x000000-0x09b413 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x741cd9a0
-			Calculated Checksum 0x740e5ad7  (BAD)
-		0x09b414-0x1b550b is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x09b414-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
+	    Checksum code found at 0x000d08
+	    0x000000-0x09b413 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x741cd9a0
+	        Calculated Checksum 0x740e5ad7  (BAD)
+	    0x09b414-0x1b550b is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x09b414-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	// the checksum only covers part of the first 2 roms, marked all as BAD_DUMP because it can't be trusted without a full redump.
@@ -1378,12 +1378,12 @@ ROM_END
 ROM_START( cashcra5 )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000b80
-		0x000000-0x06076b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x2c872d3e
-			Calculated Checksum 0x2c872d3e  (OK)
-		0x06076c-0x1a2ecf is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x06076c-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included		
+	    Checksum code found at 0x000b80
+	    0x000000-0x06076b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x2c872d3e
+	        Calculated Checksum 0x2c872d3e  (OK)
+	    0x06076c-0x1a2ecf is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x06076c-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD("0300467v.u7",  0x0000000, 0x0080000, CRC(b0ff2aae) SHA1(b05667ffe952cae7a6581398552db6e47921090e) )
@@ -1403,12 +1403,12 @@ ROM_END
 ROM_START( chariotc )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000ba8
-		0x000000-0x07dbb7 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x203ac6e8
-			Calculated Checksum 0x203ac6e8  (OK)
-		0x07dbb8-0x1b3787 is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x07dbb8-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
+	    Checksum code found at 0x000ba8
+	    0x000000-0x07dbb7 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x203ac6e8
+	        Calculated Checksum 0x203ac6e8  (OK)
+	    0x07dbb8-0x1b3787 is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x07dbb8-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "04j00714.u7",  0x000000, 0x80000, CRC(2f3a1af7) SHA1(e1448116a81687cb79dd380dfbc8decf1f83e649) )
@@ -1425,12 +1425,12 @@ ROM_END
 ROM_START( chariotca )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000ba8
-		0x000000-0x0603fb is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0xbe63efe6
-			Calculated Checksum 0xbe63efe6  (OK)
-		0x0603fc-0x17a75b is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x0603fc-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
+	    Checksum code found at 0x000ba8
+	    0x000000-0x0603fb is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0xbe63efe6
+	        Calculated Checksum 0xbe63efe6  (OK)
+	    0x0603fc-0x17a75b is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x0603fc-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD("0100787v.u7",  0x0000000, 0x0080000, CRC(845f9913) SHA1(df6121290b30ff4a9c2d0e690cf8e7797e9a8612) )
@@ -1447,12 +1447,12 @@ ROM_END
 ROM_START( checkma5 )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000c38
-		0x000000-0x071847 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x0de9b6ca
-			Calculated Checksum 0x0de9b6ca  (OK)
-		0x071848-0x25ff4b is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x071848-0x2fffff is the non-Checksummed range if the additional vectors? at the end are included
+	    Checksum code found at 0x000c38
+	    0x000000-0x071847 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x0de9b6ca
+	        Calculated Checksum 0x0de9b6ca  (OK)
+	    0x071848-0x25ff4b is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x071848-0x2fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD("01j00681.u7",  0x0000000, 0x0080000, CRC(059b940e) SHA1(f637508dafbd37169429c495a893addbc6d28834) )
@@ -1471,11 +1471,11 @@ ROM_END
 ROM_START( chickna5 )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000b80
-		0x000000-0x053fb7 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x8afbaabc
-			Calculated Checksum 0x8afbaabc  (OK)
-		0x053fb8-0x2fda37 is the non-Checksummed range (unusual endpoint)
+	    Checksum code found at 0x000b80
+	    0x000000-0x053fb7 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x8afbaabc
+	        Calculated Checksum 0x8afbaabc  (OK)
+	    0x053fb8-0x2fda37 is the non-Checksummed range (unusual endpoint)
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD("0100351v.u7",  0x0000000, 0x0080000, CRC(be69c21c) SHA1(8b546727b5972f33d077db0a64aa41a7fde6d417) )
@@ -1498,11 +1498,11 @@ ROM_END
 ROM_START( chickna5u )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000d08
-		0x000000-0x0a6917 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x0d44c6b0
-			Calculated Checksum 0xc47bc6b0  (BAD)
-		0x0a6918-0x35040b is the non-Checksummed range (unusual endpoint)
+	    Checksum code found at 0x000d08
+	    0x000000-0x0a6917 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x0d44c6b0
+	        Calculated Checksum 0xc47bc6b0  (BAD)
+	    0x0a6918-0x35040b is the non-Checksummed range (unusual endpoint)
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	// the checksum only covers part of the first 2 roms, marked all as BAD_DUMP because it can't be trusted without a full redump.
@@ -1524,12 +1524,12 @@ ROM_END
 ROM_START( chickna5qld )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000ac8
-		0x000000-0x05f193 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0xeff4424a
-			Calculated Checksum 0xeff4424a  (OK)
-		0x05f194-0x3a9a7f is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x05f194-0x3fffff is the non-Checksummed range if the additional vectors? at the end are included	
+	    Checksum code found at 0x000ac8
+	    0x000000-0x05f193 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0xeff4424a
+	        Calculated Checksum 0xeff4424a  (OK)
+	    0x05f194-0x3a9a7f is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x05f194-0x3fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "0200530v.u7",  0x000000, 0x80000, CRC(2d53de96) SHA1(6f2ed8f68d0474021a302d7e06ba869c0f1f7262) )
@@ -1549,12 +1549,12 @@ ROM_END
 ROM_START( coralrc2 )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000be8
-		0x000000-0x05ba63 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x12fce303
-			Calculated Checksum 0x12fce303  (OK)
-		0x05ba64-0x12b3e3 is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x05ba64-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
+	    Checksum code found at 0x000be8
+	    0x000000-0x05ba63 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x12fce303
+	        Calculated Checksum 0x12fce303  (OK)
+	    0x05ba64-0x12b3e3 is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x05ba64-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD("0100919v.u7",  0x0000000, 0x0080000, CRC(02c430c3) SHA1(f4bae1aa5437af1df2a04f700da044bc4fb652b7) )
@@ -1571,12 +1571,12 @@ ROM_END
 ROM_START( cuckoo )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000b10
-		0x000000-0x05f63f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x6aa5ad46
-			Calculated Checksum 0x6aa5ad46  (OK)
-		0x05f640-0x1b1deb is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x05f640-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
+	    Checksum code found at 0x000b10
+	    0x000000-0x05f63f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x6aa5ad46
+	        Calculated Checksum 0x6aa5ad46  (OK)
+	    0x05f640-0x1b1deb is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x05f640-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD("0200753v.u7",  0x0000000, 0x0080000, CRC(5c7ef84a) SHA1(59563a076ecf391ac1779e0dcd530a1ea158a4e3) )
@@ -1596,12 +1596,12 @@ ROM_END
 ROM_START( cuckoou )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000d18
-		0x000000-0x0a588b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x9e544942
-			Calculated Checksum 0x9e544942  (OK)
-		0x0a588c-0x184b17 is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x0a588c-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
+	    Checksum code found at 0x000d18
+	    0x000000-0x0a588b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x9e544942
+	        Calculated Checksum 0x9e544942  (OK)
+	    0x0a588c-0x184b17 is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x0a588c-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "chg1195.u7",  0x000000, 0x80000, CRC(0bd17338) SHA1(b8f467bdf8d76533a2b7d44fe93be414f25a3c31) )
@@ -1618,12 +1618,12 @@ ROM_END
 ROM_START( dstbloom )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000adc
-		0x000000-0x0431d3 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x3a2c9103
-			Calculated Checksum 0x3a2c9103  (OK)
-		0x0431d4-0x1cb32b is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x0431d4-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
+	    Checksum code found at 0x000adc
+	    0x000000-0x0431d3 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x3a2c9103
+	        Calculated Checksum 0x3a2c9103  (OK)
+	    0x0431d4-0x1cb32b is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x0431d4-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD("0200111v.u7",  0x0000000, 0x0080000, CRC(fbfaa3fe) SHA1(3f915261503fc97eb556422e9ccdac81372c04cc) )
@@ -1640,11 +1640,11 @@ ROM_START( dmdfever )
 	ARISTOCRAT_MK5_BIOS
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	/*
-		Checksum code found at 0x000ad8
-		0x000000-0x054f3f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x87d3b331
-			Calculated Checksum 0x87d3b331  (OK)
-		0x054f40-0x0ef137 is the non-Checksummed range (unusual endpoint)	
+	    Checksum code found at 0x000ad8
+	    0x000000-0x054f3f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x87d3b331
+	        Calculated Checksum 0x87d3b331  (OK)
+	    0x054f40-0x0ef137 is the non-Checksummed range (unusual endpoint)
 	*/
 	ROM_LOAD32_WORD( "0200302v.u7",  0x000000, 0x80000, CRC(d90032f9) SHA1(9c34e626168bdfa3ff2722d9ff1970d826135cf7) )
 	ROM_LOAD32_WORD( "0200302v.u11", 0x000002, 0x80000, CRC(29620f05) SHA1(172b6226c443931f0c4ddc44a63c8fc0e6be3824) )
@@ -1657,12 +1657,12 @@ ROM_END
 ROM_START( diamdove )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000b78
-		0x000000-0x063a9f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x2dfce931
-			Calculated Checksum 0x2dfce931  (OK)
-		0x063aa0-0x273ea3 is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x063aa0-0x2fffff is the non-Checksummed range if the additional vectors? at the end are included
+	    Checksum code found at 0x000b78
+	    0x000000-0x063a9f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x2dfce931
+	        Calculated Checksum 0x2dfce931  (OK)
+	    0x063aa0-0x273ea3 is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x063aa0-0x2fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD("0101018v.u7",  0x0000000, 0x0080000, CRC(2ebb3704) SHA1(42567d873d6ab9221d09e5449fa57b557677d2ab) )
@@ -1696,11 +1696,11 @@ ROM_END
 ROM_START( dolphntr )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000b08
-		0x000000-0x05c367 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x14ccd8a1
-			Calculated Checksum 0x14ccd8a1  (OK)
-		0x05c368-0x0fe787 is the non-Checksummed range (unusual endpoint)	
+	    Checksum code found at 0x000b08
+	    0x000000-0x05c367 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x14ccd8a1
+	        Calculated Checksum 0x14ccd8a1  (OK)
+	    0x05c368-0x0fe787 is the non-Checksummed range (unusual endpoint)
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "0200424v.u7",  0x000000, 0x80000, CRC(5dd88306) SHA1(ee8ec7d123d057e8df9be0e8dadecea7dab7aafd) )
@@ -1715,12 +1715,12 @@ ROM_END
 ROM_START( dolphntra )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000b08
-		0x000000-0x053897 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x81967fa4
-			Calculated Checksum 0x81967fa4  (OK)
-		0x053898-0x1cac2f is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x053898-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
+	    Checksum code found at 0x000b08
+	    0x000000-0x053897 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x81967fa4
+	        Calculated Checksum 0x81967fa4  (OK)
+	    0x053898-0x1cac2f is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x053898-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "0100424v.u7",  0x000000, 0x80000, CRC(657faef7) SHA1(09e1f9d461e855c10cf8b825ef83dd3e7db65b43) )
@@ -1737,12 +1737,12 @@ ROM_END
 ROM_START( dolphntrb )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000b20
-		0x000000-0x0536c3 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0xeee6e6fc
-			Calculated Checksum 0xeee6e6fc  (OK)
-		0x0536c4-0x1ce293 is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x0536c4-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included		
+	    Checksum code found at 0x000b20
+	    0x000000-0x0536c3 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0xeee6e6fc
+	        Calculated Checksum 0xeee6e6fc  (OK)
+	    0x0536c4-0x1ce293 is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x0536c4-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD("0100388v.u7",  0x0000000, 0x0080000, CRC(7463b5f6) SHA1(89e5cf8143d0b4ed54aa2c9bd8840f0aba19322e) )
@@ -1762,12 +1762,12 @@ ROM_END
 ROM_START( dolphntru )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000d08
-		0x000000-0x08ec8b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x9caf255e
-			Calculated Checksum 0x9caf255e  (OK)
-		0x08ec8c-0x13d99f is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x08ec8c-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included		
+	    Checksum code found at 0x000d08
+	    0x000000-0x08ec8b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x9caf255e
+	        Calculated Checksum 0x9caf255e  (OK)
+	    0x08ec8c-0x13d99f is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x08ec8c-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "fhg407702.u7",  0x000000, 0x80000, CRC(97e3e4d0) SHA1(211b9b9e0f25dfaf9d1dfe1d3d88592522aa6f07) )
@@ -1784,12 +1784,12 @@ ROM_END
 ROM_START( dynajack )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000b78
-		0x000000-0x07031b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0xd8815d1c
-			Calculated Checksum 0xd8815d1c  (OK)
-		0x07031c-0x227a4b is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x07031c-0x2fffff is the non-Checksummed range if the additional vectors? at the end are included
+	    Checksum code found at 0x000b78
+	    0x000000-0x07031b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0xd8815d1c
+	        Calculated Checksum 0xd8815d1c  (OK)
+	    0x07031c-0x227a4b is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x07031c-0x2fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD("01j00081.u7",  0x0000000, 0x0080000, CRC(73783ecf) SHA1(280b4da540b405959f31c2eebbf87ab635d21c06) )
@@ -1808,11 +1808,11 @@ ROM_END
 ROM_START( eldorda5 )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000b88
-		0x000000-0x06328b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0xed424efa
-			Calculated Checksum 0xed424efa  (OK)
-		0x06328c-0x0d4b57 is the non-Checksummed range (unusual endpoint)		
+	    Checksum code found at 0x000b88
+	    0x000000-0x06328b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0xed424efa
+	        Calculated Checksum 0xed424efa  (OK)
+	    0x06328c-0x0d4b57 is the non-Checksummed range (unusual endpoint)
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD("0100652v.u7",  0x0000000, 0x0080000, CRC(d9afe87c) SHA1(577ea5da9c4e93a393711a0c7361365301f4241e) )
@@ -1827,11 +1827,11 @@ ROM_END
 ROM_START( eforsta5 )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000ae4
-		0x000000-0x045da3 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x2c99855f
-			Calculated Checksum 0x2c99855f  (OK)
-		0x045da4-0x0ebd43 is the non-Checksummed range (unusual endpoint)
+	    Checksum code found at 0x000ae4
+	    0x000000-0x045da3 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x2c99855f
+	        Calculated Checksum 0x2c99855f  (OK)
+	    0x045da4-0x0ebd43 is the non-Checksummed range (unusual endpoint)
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "0400122v.u7",  0x000000, 0x80000, CRC(b5829b27) SHA1(f6f84c8dc524dcee95e37b93ead9090903bdca4f) )
@@ -1850,12 +1850,12 @@ ROM_END
 ROM_START( eforsta5u )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000d08
-		0x000000-0x0a5233 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x5de71535
-			Calculated Checksum 0x5de71535  (OK)
-		0x0a5234-0x15dbdf is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x0a5234-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
+	    Checksum code found at 0x000d08
+	    0x000000-0x0a5233 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x5de71535
+	        Calculated Checksum 0x5de71535  (OK)
+	    0x0a5234-0x15dbdf is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x0a5234-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 
 	// if you enable the additional debug output you get 'Error in graphics EPROMs' so these ROMs are also bad even if the above passes
@@ -1874,12 +1874,12 @@ ROM_END
 ROM_START( fortellr )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000b78
-		0x000000-0x07038b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x49e7e64e
-			Calculated Checksum 0x49e7e64e  (OK)
-		0x07038c-0x3616a7 is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x07038c-0x3fffff is the non-Checksummed range if the additional vectors? at the end are included
+	    Checksum code found at 0x000b78
+	    0x000000-0x07038b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x49e7e64e
+	        Calculated Checksum 0x49e7e64e  (OK)
+	    0x07038c-0x3616a7 is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x07038c-0x3fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD("01j00131.u7",  0x0000000, 0x0080000, CRC(78394106) SHA1(aedfb98d7aa515eebabf378edb9c43e01bcba010) )
@@ -1904,12 +1904,12 @@ ROM_END
 ROM_START( gambler )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000d08
-		0x000000-0x08f46b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x9eb3c0ef
-			Calculated Checksum 0x9eb3c0ef  (OK)
-		0x08f46c-0x1354cb is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x08f46c-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
+	    Checksum code found at 0x000d08
+	    0x000000-0x08f46b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x9eb3c0ef
+	        Calculated Checksum 0x9eb3c0ef  (OK)
+	    0x08f46c-0x1354cb is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x08f46c-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	// if you enable the additional debug output you get 'Error2 in graphics EPROMs' so these ROMs are also bad even if the above passes
@@ -1963,12 +1963,12 @@ ROM_END
 ROM_START( gnomeatw )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000b68
-		0x000000-0x05ebcb is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0xd396114d
-			Calculated Checksum 0xd396114d  (OK)
-		0x05ebcc-0x1bf9db is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x05ebcc-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
+	    Checksum code found at 0x000b68
+	    0x000000-0x05ebcb is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0xd396114d
+	        Calculated Checksum 0xd396114d  (OK)
+	    0x05ebcc-0x1bf9db is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x05ebcc-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD("0100767v.u7",  0x0000000, 0x0080000, CRC(a5d3825e) SHA1(4ce7466eff770a2c6c3c5de620a14e05bb9fb406) )
@@ -1985,12 +1985,12 @@ ROM_END
 ROM_START( goldpyr )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000d08
-		0x000000-0x08ec83 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x7c8c2fbf
-			Calculated Checksum 0x7c8c2fbf  (OK)
-		0x08ec84-0x1aca63 is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x08ec84-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
+	    Checksum code found at 0x000d08
+	    0x000000-0x08ec83 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x7c8c2fbf
+	        Calculated Checksum 0x7c8c2fbf  (OK)
+	    0x08ec84-0x1aca63 is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x08ec84-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "ahg120503.u7",  0x000000, 0x80000, CRC(2fbed80c) SHA1(fb0d97cb2be96da37c487fc3aef06c6120efdb46) )
@@ -2012,12 +2012,12 @@ ROM_END
 ROM_START( goldpyra )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000d08
-		0x000000-0x08ef13 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0xd3126f08
-			Calculated Checksum 0x26ee6f08  (BAD)
-		0x08ef14-0x1aca3b is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x08ef14-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
+	    Checksum code found at 0x000d08
+	    0x000000-0x08ef13 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0xd3126f08
+	        Calculated Checksum 0x26ee6f08  (BAD)
+	    0x08ef14-0x1aca3b is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x08ef14-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	// the checksum only covers part of the first 2 roms, marked all as BAD_DUMP because it can't be trusted without a full redump.
@@ -2035,12 +2035,12 @@ ROM_END
 ROM_START( goldenra )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000b98
-		0x000000-0x068297 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x1cc81433
-			Calculated Checksum 0x1cc81433  (OK)
-		0x068298-0x285abf is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x068298-0x2fffff is the non-Checksummed range if the additional vectors? at the end are included
+	    Checksum code found at 0x000b98
+	    0x000000-0x068297 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x1cc81433
+	        Calculated Checksum 0x1cc81433  (OK)
+	    0x068298-0x285abf is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x068298-0x2fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD("0101164v.u7",  0x0000000, 0x0080000, CRC(2f75d5f7) SHA1(d7f6ecff7cf759d80733b6d3f224caa5128be0b7) )
@@ -2059,11 +2059,11 @@ ROM_END
 ROM_START( incasun )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000bf8
-		0x000000-0x05f56b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x86b74381
-			Calculated Checksum 0x86b74381  (OK)
-		0x05f56c-0x23586f is the non-Checksummed range (unusual endpoint)
+	    Checksum code found at 0x000bf8
+	    0x000000-0x05f56b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x86b74381
+	        Calculated Checksum 0x86b74381  (OK)
+	    0x05f56c-0x23586f is the non-Checksummed range (unusual endpoint)
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD("0100872v.u7",  0x0000000, 0x0080000, CRC(180e098b) SHA1(48782c46a344dba0aaad407d0d4a432da091b0f5) )
@@ -2098,11 +2098,11 @@ ROM_START( incasunsp )
 	ARISTOCRAT_MK5_BIOS
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	/*
-		Checksum code found at 0x000bf8
-		0x000000-0x05f70f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x1de6e2c7
-			Calculated Checksum 0x1de6e2c7  (OK)
-		0x05f710-0x235a13 is the non-Checksummed range (unusual endpoint)
+	    Checksum code found at 0x000bf8
+	    0x000000-0x05f70f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x1de6e2c7
+	        Calculated Checksum 0x1de6e2c7  (OK)
+	    0x05f710-0x235a13 is the non-Checksummed range (unusual endpoint)
 	*/
 	ROM_LOAD32_WORD("sp__0100872v.u7",  0x0000000, 0x0080000, CRC(62919753) SHA1(0f0d186260a64b8b45671f68abf497586264793e) )
 	ROM_LOAD32_WORD("sp__0100872v.u11", 0x0000002, 0x0080000, CRC(f221ac71) SHA1(c2c1f8703e9a41e5c4d5ebfeac57e220a64e9657) )
@@ -2137,12 +2137,12 @@ ROM_END
 ROM_START( indrema5 )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000ba8
-		0x000000-0x06323f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x965e92e4
-			Calculated Checksum 0x965e92e4  (OK)
-		0x063240-0x1cd2d3 is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x063240-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included	
+	    Checksum code found at 0x000ba8
+	    0x000000-0x06323f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x965e92e4
+	        Calculated Checksum 0x965e92e4  (OK)
+	    0x063240-0x1cd2d3 is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x063240-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "0100845v.u7",  0x000000, 0x80000, CRC(0c924a3e) SHA1(499b4ae601e53173e3ba5f400a40e5ae7bbaa043) )
@@ -2159,20 +2159,20 @@ ROM_END
 ROM_START( jungjuic )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		note, this actually contains a 2nd checksum for the game, this is likely the base/bios check only.
+	    note, this actually contains a 2nd checksum for the game, this is likely the base/bios check only.
 
-		Checksum code found at 0x001b74
-		0x000000-0x089a2f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x5ad8a58b
-			Calculated Checksum 0x5ad8a58b  (OK)
-		0x089a30-0x1b4043 is the non-Checksummed range (unusual endpoint)	
-	
+	    Checksum code found at 0x001b74
+	    0x000000-0x089a2f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x5ad8a58b
+	        Calculated Checksum 0x5ad8a58b  (OK)
+	    0x089a30-0x1b4043 is the non-Checksummed range (unusual endpoint)
+
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	// these are the 'bios' for Casino games (could be moved to a different base set)
 	ROM_LOAD32_WORD( "0700474v.u7",  0x000000, 0x80000, CRC(04b7dcbf) SHA1(eded1223336181bb08f9593247f1f79d96278b75) )
 	ROM_LOAD32_WORD( "0700474v.u11", 0x000002, 0x80000, CRC(a89ce1b5) SHA1(411b474a111f23ebd834bea5af0bf0cf3926d590) )
-	
+
 	ROM_LOAD32_WORD( "0200240v.u8",  0x100000, 0x80000, CRC(10c61ff7) SHA1(86d17cf2492612c3a6284a1c8e41a67a5199c0eb) )
 	ROM_LOAD32_WORD( "0200240v.u12", 0x100002, 0x80000, CRC(ffa3d0ba) SHA1(e60e01d4d425aea483387fa2f9ae5bb69b80f829) )
 
@@ -2185,12 +2185,12 @@ ROM_END
 ROM_START( kgalah )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000b28
-		0x000000-0x05af27 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0xa4ff4d2a
-			Calculated Checksum 0xa4ff4d2a  (OK)
-		0x05af28-0x1b3e9f is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x05af28-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
+	    Checksum code found at 0x000b28
+	    0x000000-0x05af27 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0xa4ff4d2a
+	        Calculated Checksum 0xa4ff4d2a  (OK)
+	    0x05af28-0x1b3e9f is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x05af28-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD("0200536v.u7",  0x0000000, 0x0080000, CRC(9333543a) SHA1(dbbd59de046c35e70e71836b342eb5ecf4799575) )
@@ -2210,11 +2210,11 @@ ROM_END
 ROM_START( koalamnt )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000d18
-		0x000000-0x0ec32b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x5e570341
-			Calculated Checksum 0x17df3e7d  (BAD)
-		0x0ec32c-0x34ebdf is the non-Checksummed range (unusual endpoint)	
+	    Checksum code found at 0x000d18
+	    0x000000-0x0ec32b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x5e570341
+	        Calculated Checksum 0x17df3e7d  (BAD)
+	    0x0ec32c-0x34ebdf is the non-Checksummed range (unusual endpoint)
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	// the checksum only covers part of the first 2 roms, marked all as BAD_DUMP because it can't be trusted without a full redump.
@@ -2236,12 +2236,12 @@ ROM_END
 ROM_START( kookabuk )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000b68
-		0x000000-0x061857 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0xf03ce7cb
-			Calculated Checksum 0xf03ce7cb  (OK)
-		0x061858-0x1a2757 is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x061858-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
+	    Checksum code found at 0x000b68
+	    0x000000-0x061857 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0xf03ce7cb
+	        Calculated Checksum 0xf03ce7cb  (OK)
+	    0x061858-0x1a2757 is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x061858-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD("0100677v.u7",  0x0000000, 0x0080000, CRC(b2fdf0e8) SHA1(0dd002cfad2fa4f217a0c67066d098f4cd3ba319) )
@@ -2258,11 +2258,11 @@ ROM_END
 ROM_START( locoloot )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000b20
-		0x000000-0x055e93 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0xafd2e94d
-			Calculated Checksum 0xafd2e94d  (OK)
-		0x055e94-0x0bbf23 is the non-Checksummed range (unusual endpoint)
+	    Checksum code found at 0x000b20
+	    0x000000-0x055e93 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0xafd2e94d
+	        Calculated Checksum 0xafd2e94d  (OK)
+	    0x055e94-0x0bbf23 is the non-Checksummed range (unusual endpoint)
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD("0100472v.u7",  0x0000000, 0x0080000, CRC(4f02763c) SHA1(302cea5fb157f65fc907f123ef42a0a38cc707ac) )
@@ -2292,11 +2292,11 @@ ROM_END
 ROM_START( lonewolf )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000b48
-		0x000000-0x0580f3 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x424e42b6
-			Calculated Checksum 0x424e42b6  (OK)
-		0x0580f4-0x0df6b7 is the non-Checksummed range (unusual endpoint)
+	    Checksum code found at 0x000b48
+	    0x000000-0x0580f3 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x424e42b6
+	        Calculated Checksum 0x424e42b6  (OK)
+	    0x0580f4-0x0df6b7 is the non-Checksummed range (unusual endpoint)
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD("0100587v.u7",  0x0000000, 0x0080000, CRC(15024eae) SHA1(7101125aa8531c75f9d80fe357013d09dbb0fec9) )
@@ -2314,12 +2314,12 @@ ROM_END
 ROM_START( mgarden )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000d08
-		0x000000-0x0a522b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x8b0f5dae
-			Calculated Checksum 0x8afcb91f  (BAD)
-		0x0a522c-0x15dbd7 is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x0a522c-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
+	    Checksum code found at 0x000d08
+	    0x000000-0x0a522b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x8b0f5dae
+	        Calculated Checksum 0x8afcb91f  (BAD)
+	    0x0a522c-0x15dbd7 is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x0a522c-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	// the checksum only covers part of the first 2 roms, marked all as BAD_DUMP because it can't be trusted without a full redump.
@@ -2339,12 +2339,12 @@ ROM_END
 ROM_START( magimask )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000d18
-		0x000000-0x0e8527 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x1d86deee
-			Calculated Checksum 0x1d86deee  (OK)
-		0x0e8528-0x1e4887 is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x0e8528-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
+	    Checksum code found at 0x000d18
+	    0x000000-0x0e8527 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x1d86deee
+	        Calculated Checksum 0x1d86deee  (OK)
+	    0x0e8528-0x1e4887 is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x0e8528-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "dhg1309.u7",  0x000000, 0x80000, CRC(17317eb9) SHA1(3ddb8d61f23461c3194af534928164550208bbee) )
@@ -2372,12 +2372,12 @@ ROM_END
 ROM_START( magimaska )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000d18
-		0x000000-0x0e9597 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x6610851f
-			Calculated Checksum 0x6610851f  (OK)
-		0x0e9598-0x1e591f is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x0e9598-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
+	    Checksum code found at 0x000d18
+	    0x000000-0x0e9597 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x6610851f
+	        Calculated Checksum 0x6610851f  (OK)
+	    0x0e9598-0x1e591f is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x0e9598-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "ahg1548.u7",  0x000000, 0x80000, CRC(452a19c9) SHA1(aab1f4ccfc6cdb382f7a0e85491614cc58811a08) )
@@ -2411,12 +2411,12 @@ ROM_END
 ROM_START( marmagic )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000b78
-		0x000000-0x06d93b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x59531d0a
-			Calculated Checksum 0x59531d0a  (OK)
-		0x06d93c-0x2deae3 is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x06d93c-0x2fffff is the non-Checksummed range if the additional vectors? at the end are included
+	    Checksum code found at 0x000b78
+	    0x000000-0x06d93b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x59531d0a
+	        Calculated Checksum 0x59531d0a  (OK)
+	    0x06d93c-0x2deae3 is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x06d93c-0x2fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "01j00101.u7",  0x000000, 0x80000, CRC(eee7ebaf) SHA1(bad0c08578877f84325c07d51c6ed76c40b70720) )
@@ -2440,12 +2440,12 @@ ROM_END
 ROM_START( marmagicu )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000d18
-		0x000000-0x0eda53 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0xac229593
-			Calculated Checksum 0x67abc369  (BAD)
-		0x0eda54-0x2fffef is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x0eda54-0x2fffff is the non-Checksummed range if the additional vectors? at the end are included
+	    Checksum code found at 0x000d18
+	    0x000000-0x0eda53 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0xac229593
+	        Calculated Checksum 0x67abc369  (BAD)
+	    0x0eda54-0x2fffef is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x0eda54-0x2fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	// the checksum only covers part of the first 2 roms, marked all as BAD_DUMP because it can't be trusted without a full redump.
@@ -2468,12 +2468,12 @@ ROM_END
 ROM_START( minemine )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000d10
-		0x000000-0x0a7203 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x75c908a7
-			Calculated Checksum 0x75c908a7  (OK)
-		0x0a7204-0x1a0edf is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x0a7204-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
+	    Checksum code found at 0x000d10
+	    0x000000-0x0a7203 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x75c908a7
+	        Calculated Checksum 0x75c908a7  (OK)
+	    0x0a7204-0x1a0edf is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x0a7204-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "vhg0416-99.u7",  0x000000, 0x80000, CRC(41bc3714) SHA1(5a8f7d24a6a697524af7997dcedd214fcaf48768) )
@@ -2490,12 +2490,12 @@ ROM_END
 ROM_START( monmouse )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000b80
-		0x000000-0x066077 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x569023a4
-			Calculated Checksum 0x569023a4  (OK)
-		0x066078-0x1faf7b is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x066078-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
+	    Checksum code found at 0x000b80
+	    0x000000-0x066077 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x569023a4
+	        Calculated Checksum 0x569023a4  (OK)
+	    0x066078-0x1faf7b is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x066078-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD("0400469v.u7",  0x0000000, 0x0080000, CRC(7f7972b6) SHA1(25991f476f55cd1eddc8e63af9c472c1d7e83481) )
@@ -2529,11 +2529,11 @@ ROM_END
 ROM_START( mountmon )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000ae4
-		0x000000-0x04ee9b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x4bb1139e
-			Calculated Checksum 0x4bb1139e  (OK)
-		0x04ee9c-0x0e3a1f is the non-Checksummed range (unusual endpoint)
+	    Checksum code found at 0x000ae4
+	    0x000000-0x04ee9b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x4bb1139e
+	        Calculated Checksum 0x4bb1139e  (OK)
+	    0x04ee9c-0x0e3a1f is the non-Checksummed range (unusual endpoint)
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD("0100294v.u7",  0x0000000, 0x0080000, CRC(b84342af) SHA1(e27e65730ddc897b01e8875a4da3ea2d6db2b858) )
@@ -2548,12 +2548,12 @@ ROM_END
 ROM_START( multidrw )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000b98
-		0x000000-0x07477f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0xe2d3d401
-			Calculated Checksum 0xe2d3d401  (OK)
-		0x074780-0x2c5abb is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x074780-0x2fffff is the non-Checksummed range if the additional vectors? at the end are included
+	    Checksum code found at 0x000b98
+	    0x000000-0x07477f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0xe2d3d401
+	        Calculated Checksum 0xe2d3d401  (OK)
+	    0x074780-0x2c5abb is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x074780-0x2fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
@@ -2573,11 +2573,11 @@ ROM_END
 ROM_START( mystgard )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000ae4
-		0x000000-0x04eea7 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x37310f71
-			Calculated Checksum 0x37310f71  (OK)
-		0x04eea8-0x0dce17 is the non-Checksummed range (unusual endpoint)	
+	    Checksum code found at 0x000ae4
+	    0x000000-0x04eea7 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x37310f71
+	        Calculated Checksum 0x37310f71  (OK)
+	    0x04eea8-0x0dce17 is the non-Checksummed range (unusual endpoint)
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD("Mystic Garden.u7",  0x0000000, 0x0080000, CRC(28d15442) SHA1(ee33017f3efcf688a43ea1d7f2b74b4b9a6d2cae) )
@@ -2592,12 +2592,12 @@ ROM_END
 ROM_START( orchidms )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000b20
-		0x000000-0x0677c7 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x522d283f
-			Calculated Checksum 0x522d283f  (OK)
-		0x0677c8-0x13adcb is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x0677c8-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included	
+	    Checksum code found at 0x000b20
+	    0x000000-0x0677c7 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x522d283f
+	        Calculated Checksum 0x522d283f  (OK)
+	    0x0677c8-0x13adcb is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x0677c8-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD("0100275v.u7",  0x0000000, 0x0080000, CRC(5d18ae22) SHA1(c10f7a83f51cfe75653ace8066b7dedf07e91b28) )
@@ -2614,11 +2614,11 @@ ROM_END
 ROM_START( oscara5 )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000b80
-		0x000000-0x05d187 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0xd11b30fc
-			Calculated Checksum 0xd11b30fc  (OK)
-		0x05d188-0x0e1d73 is the non-Checksummed range (unusual endpoint)	
+	    Checksum code found at 0x000b80
+	    0x000000-0x05d187 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0xd11b30fc
+	        Calculated Checksum 0xd11b30fc  (OK)
+	    0x05d188-0x0e1d73 is the non-Checksummed range (unusual endpoint)
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD("0200348v.u7",  0x0000000, 0x0080000, CRC(930bdc00) SHA1(36b1a289abebc7cce64e767e201d8f8f7fe80cf2) )
@@ -2633,12 +2633,12 @@ ROM_END
 ROM_START( pantmag )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000d18
-		0x000000-0x06d1ff is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x50122492
-			Calculated Checksum 0x50122492  (OK)
-		0x06d200-0x195d7b is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x06d200-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
+	    Checksum code found at 0x000d18
+	    0x000000-0x06d1ff is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x50122492
+	        Calculated Checksum 0x50122492  (OK)
+	    0x06d200-0x195d7b is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x06d200-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD("0101046v.u7",  0x0000000, 0x0080000, CRC(6383899d) SHA1(df96af7cb580565715da6e78b83e7ba6832028e7) )
@@ -2658,12 +2658,12 @@ ROM_END
 ROM_START( partygrs )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000d18
-		0x000000-0x0e9b47 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x673ffb0f
-			Calculated Checksum 0x673ffb0f  (OK)
-		0x0e9b48-0x1fd2ab is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x0e9b48-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
+	    Checksum code found at 0x000d18
+	    0x000000-0x0e9b47 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x673ffb0f
+	        Calculated Checksum 0x673ffb0f  (OK)
+	    0x0e9b48-0x1fd2ab is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x0e9b48-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "ahg1567.u7",  0x000000, 0x80000, CRC(53047385) SHA1(efe50e8785047986513f2de63d2425ba80417481) )
@@ -2683,12 +2683,12 @@ ROM_END
 ROM_START( partygrsa )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000d18
-		0x000000-0x0a69d3 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0xf4a004d3
-			Calculated Checksum 0x221d04d3  (BAD)
-		0x0a69d4-0x1b953f is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x0a69d4-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
+	    Checksum code found at 0x000d18
+	    0x000000-0x0a69d3 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0xf4a004d3
+	        Calculated Checksum 0x221d04d3  (BAD)
+	    0x0a69d4-0x1b953f is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x0a69d4-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	// the checksum only covers part of the first 2 roms, marked all as BAD_DUMP because it can't be trusted without a full redump.
@@ -2706,12 +2706,12 @@ ROM_END
 ROM_START( peaflut )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000b98
-		0x000000-0x0638d3 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x2ce2619f
-			Calculated Checksum 0x2ce2619f  (OK)
-		0x0638d4-0x1dbf8b is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x0638d4-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
+	    Checksum code found at 0x000b98
+	    0x000000-0x0638d3 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x2ce2619f
+	        Calculated Checksum 0x2ce2619f  (OK)
+	    0x0638d4-0x1dbf8b is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x0638d4-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD("02j00011.u7",  0x0000000, 0x0080000, CRC(e4497f35) SHA1(7030aba6c17fc391564385f5669e07edc94dca61) )
@@ -2728,12 +2728,12 @@ ROM_END
 ROM_START( pengpay )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000b68
-		0x000000-0x05c71f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x68980cb3
-			Calculated Checksum 0x68980cb3  (OK)
-		0x05c720-0x1aefcf is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x05c720-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
+	    Checksum code found at 0x000b68
+	    0x000000-0x05c71f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x68980cb3
+	        Calculated Checksum 0x68980cb3  (OK)
+	    0x05c720-0x1aefcf is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x05c720-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD("0200460v.u7",  0x0000000, 0x0080000, CRC(47145744) SHA1(74a186a15537d8b05ce23f37c53f351e8058b0b2) )
@@ -2750,12 +2750,12 @@ ROM_END
 ROM_START( pengpaya )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000b60
-		0x000000-0x05644f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x5bc8a3d6
-			Calculated Checksum 0x5bc8a3d6  (OK)
-		0x056450-0x1c19f3 is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x056450-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
+	    Checksum code found at 0x000b60
+	    0x000000-0x05644f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x5bc8a3d6
+	        Calculated Checksum 0x5bc8a3d6  (OK)
+	    0x056450-0x1c19f3 is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x056450-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD("0200357v.u7",  0x0000000, 0x0080000, CRC(cb21de26) SHA1(5a730f08db4d91b18f0b5a1f489f1d982b08edcc) )
@@ -2772,12 +2772,12 @@ ROM_END
 ROM_START( pengpayb )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000b68
-		0x000000-0x05d7b7 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0xd4f9ba59
-			Calculated Checksum 0xd4f9ba59  (OK)
-		0x05d7b8-0x1c9acf is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x05d7b8-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
+	    Checksum code found at 0x000b68
+	    0x000000-0x05d7b7 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0xd4f9ba59
+	        Calculated Checksum 0xd4f9ba59  (OK)
+	    0x05d7b8-0x1c9acf is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x05d7b8-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD("0200359v.u7",  0x0000000, 0x0080000, CRC(f51c4e02) SHA1(fca30b3ce0d063966df1e878338596d050664695) )
@@ -2797,12 +2797,12 @@ ROM_END
 ROM_START( pengpayu )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000d08
-		0x000000-0x0cd21b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x7dc52ffa
-			Calculated Checksum 0x7dc52ffa  (OK)
-		0x0cd21c-0x192ed7 is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x0cd21c-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
+	    Checksum code found at 0x000d08
+	    0x000000-0x0cd21b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x7dc52ffa
+	        Calculated Checksum 0x7dc52ffa  (OK)
+	    0x0cd21c-0x192ed7 is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x0cd21c-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "bhi041703.u7",  0x000000, 0x80000, CRC(19d75260) SHA1(798472b1b5d8f5ca99d8bfe57e99a76686f0aa3f) )
@@ -2834,12 +2834,12 @@ ROM_END
 ROM_START( przfight )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000b48
-		0x000000-0x053def is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x97c4e600
-			Calculated Checksum 0x97c4e600  (OK)
-		0x053df0-0x2a9f7f is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x053df0-0x2fffff is the non-Checksummed range if the additional vectors? at the end are included
+	    Checksum code found at 0x000b48
+	    0x000000-0x053def is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x97c4e600
+	        Calculated Checksum 0x97c4e600  (OK)
+	    0x053df0-0x2a9f7f is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x053df0-0x2fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD("0100299v.u7",  0x0000000, 0x0080000, CRC(2b1a9678) SHA1(c75de4c76cd934df746040d0515694d92e2fc145) )
@@ -2858,12 +2858,12 @@ ROM_END
 ROM_START( qcash )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000af4
-		0x000000-0x05d55b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x10b06e83
-			Calculated Checksum 0x10b06e83  (OK)
-		0x05d55c-0x1a669f is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x05d55c-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
+	    Checksum code found at 0x000af4
+	    0x000000-0x05d55b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x10b06e83
+	        Calculated Checksum 0x10b06e83  (OK)
+	    0x05d55c-0x1a669f is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x05d55c-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD("0100706v.u7",  0x0000000, 0x0080000, CRC(591c96eb) SHA1(acd6f02206086d710a92401c618f715b3646d78a) )
@@ -2880,12 +2880,12 @@ ROM_END
 ROM_START( qnile )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000b80
-		0x000000-0x055c83 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x53fa5304
-			Calculated Checksum 0x53fa5304  (OK)
-		0x055c84-0x16745b is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x055c84-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included	
+	    Checksum code found at 0x000b80
+	    0x000000-0x055c83 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x53fa5304
+	        Calculated Checksum 0x53fa5304  (OK)
+	    0x055c84-0x16745b is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x055c84-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
@@ -2903,12 +2903,12 @@ ROM_END
 ROM_START( qnilea )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000b80
-		0x000000-0x064c4b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0xa60cbcfa
-			Calculated Checksum 0xa60cbcfa  (OK)
-		0x064c4c-0x172a17 is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x064c4c-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
+	    Checksum code found at 0x000b80
+	    0x000000-0x064c4b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0xa60cbcfa
+	        Calculated Checksum 0xa60cbcfa  (OK)
+	    0x064c4c-0x172a17 is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x064c4c-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD("0300440v.u7",  0x0000000, 0x0080000, CRC(0076da68) SHA1(ed301c102e88d5b637144ed32042da46780e5b34) )
@@ -2925,12 +2925,12 @@ ROM_END
 ROM_START( qnileb )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000b80
-		0x000000-0x059dff is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0xa63a9b3e
-			Calculated Checksum 0xa63a9b3e  (OK)
-		0x059e00-0x16b5d7 is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x059e00-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included	
+	    Checksum code found at 0x000b80
+	    0x000000-0x059dff is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0xa63a9b3e
+	        Calculated Checksum 0xa63a9b3e  (OK)
+	    0x059e00-0x16b5d7 is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x059e00-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "0200439v.u7",  0x000000, 0x80000, CRC(d476a893) SHA1(186d6fb1830c33976f2d3c96e4f045ece885dc63) )
@@ -2947,12 +2947,12 @@ ROM_END
 ROM_START( qnilec )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000b80
-		0x000000-0x062913 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x2d52d80f
-			Calculated Checksum 0x2d52d80f  (OK)
-		0x062914-0x1740eb is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x062914-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
+	    Checksum code found at 0x000b80
+	    0x000000-0x062913 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x2d52d80f
+	        Calculated Checksum 0x2d52d80f  (OK)
+	    0x062914-0x1740eb is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x062914-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "0300439v.u7",  0x000000, 0x80000, CRC(63f9129e) SHA1(a513fd47d3ca4fe007730a06e5f6ffc2891dc74f) )
@@ -2974,12 +2974,12 @@ ROM_END
 ROM_START( qnileu )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000d08
-		0x000000-0x08ec87 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0xb2ac33b8
-			Calculated Checksum 0xb2ac33b8  (OK)
-		0x08ec88-0x1aca67 is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x08ec88-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included	
+	    Checksum code found at 0x000d08
+	    0x000000-0x08ec87 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0xb2ac33b8
+	        Calculated Checksum 0xb2ac33b8  (OK)
+	    0x08ec88-0x1aca67 is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x08ec88-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "ghg409102.u7",  0x000000, 0x80000, CRC(a00ab2cf) SHA1(eb3120fe4b1d0554c224c7646e727e86fd35975e) )
@@ -2996,11 +2996,11 @@ ROM_END
 ROM_START( qnilemax )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000bb8
-		0x000000-0x06fd6f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0xcd901653
-			Calculated Checksum 0xcd901653  (OK)
-		0x06fd70-0x3864c7 is the non-Checksummed range (unusual endpoint)	
+	    Checksum code found at 0x000bb8
+	    0x000000-0x06fd6f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0xcd901653
+	        Calculated Checksum 0xcd901653  (OK)
+	    0x06fd70-0x3864c7 is the non-Checksummed range (unusual endpoint)
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD("0401072v.u7",  0x0000000, 0x0080000, CRC(4ac2a82e) SHA1(3fc50e97ad48c57e21a37fbb6142152c72055ad4) )
@@ -3021,12 +3021,12 @@ ROM_END
 ROM_START( rainwrce )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000bf8
-		0x000000-0x06bb13 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x6c1aaee7
-			Calculated Checksum 0x6c1aaee7  (OK)
-		0x06bb14-0x367863 is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x06bb14-0x3fffff is the non-Checksummed range if the additional vectors? at the end are included	
+	    Checksum code found at 0x000bf8
+	    0x000000-0x06bb13 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x6c1aaee7
+	        Calculated Checksum 0x6c1aaee7  (OK)
+	    0x06bb14-0x367863 is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x06bb14-0x3fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
@@ -3048,12 +3048,12 @@ ROM_END
 ROM_START( reelrock )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000ba8
-		0x000000-0x062f6f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x67b49a57
-			Calculated Checksum 0x67b49a57  (OK)
-		0x062f70-0x1a752b is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x062f70-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included	
+	    Checksum code found at 0x000ba8
+	    0x000000-0x062f6f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x67b49a57
+	        Calculated Checksum 0x67b49a57  (OK)
+	    0x062f70-0x1a752b is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x062f70-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "0100779v.u7",  0x000000, 0x80000, CRC(b60af34f) SHA1(1143380b765db234b3871c0fe04736472fde7de4) )
@@ -3070,12 +3070,12 @@ ROM_END
 ROM_START( retrsam )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000b88
-		0x000000-0x06445b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0xb6820a81
-			Calculated Checksum 0xb6820a81  (OK)
-		0x06445c-0x10203b is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x06445c-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
+	    Checksum code found at 0x000b88
+	    0x000000-0x06445b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0xb6820a81
+	        Calculated Checksum 0xb6820a81  (OK)
+	    0x06445c-0x10203b is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x06445c-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD("v0400549v.u7", 0x0000000, 0x0080000, CRC(129be82c) SHA1(487639b7d42d6d35a9c48b44d26667c269b5b633) )
@@ -3092,11 +3092,11 @@ ROM_END
 ROM_START( retrsama )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000b88
-		0x000000-0x0590b7 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0xa4b725ab
-			Calculated Checksum 0xa4b725ab  (OK)
-		0x0590b8-0x0ef623 is the non-Checksummed range (unusual endpoint)
+	    Checksum code found at 0x000b88
+	    0x000000-0x0590b7 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0xa4b725ab
+	        Calculated Checksum 0xa4b725ab  (OK)
+	    0x0590b8-0x0ef623 is the non-Checksummed range (unusual endpoint)
 	*/
 
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
@@ -3112,11 +3112,11 @@ ROM_END
 ROM_START( retrsamb )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000b88
-		0x000000-0x05889b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0xd80cf106
-			Calculated Checksum 0xd80cf106  (OK)
-		0x05889c-0x0f313b is the non-Checksummed range (unusual endpoint)
+	    Checksum code found at 0x000b88
+	    0x000000-0x05889b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0xd80cf106
+	        Calculated Checksum 0xd80cf106  (OK)
+	    0x05889c-0x0f313b is the non-Checksummed range (unusual endpoint)
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD("0200506v.u7",  0x0000000, 0x0080000, CRC(acb913c1) SHA1(eb008b2b3d06f769f1ea1c75b52334e468c5f13c) )
@@ -3129,14 +3129,14 @@ ROM_END
 
 
 ROM_START( sumospin )
-	ARISTOCRAT_MK5_BIOS	
+	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000b88
-		0x000000-0x05d92b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x94d3401c
-			Calculated Checksum 0x94d3401c  (OK)
-		0x05d92c-0x18f637 is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x05d92c-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
+	    Checksum code found at 0x000b88
+	    0x000000-0x05d92b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x94d3401c
+	        Calculated Checksum 0x94d3401c  (OK)
+	    0x05d92c-0x18f637 is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x05d92c-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD("0200606v.u7",  0x0000000, 0x0080000, CRC(c3ec9f97) SHA1(62c886cc794de4b915533729c5ea5a71a4b59108) )
@@ -3153,12 +3153,12 @@ ROM_END
 ROM_START( sbuk2 )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000b98
-		0x000000-0x06ab7f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x874caad2
-			Calculated Checksum 0x874caad2  (OK)
-		0x06ab80-0x1fffef is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x06ab80-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included	
+	    Checksum code found at 0x000b98
+	    0x000000-0x06ab7f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x874caad2
+	        Calculated Checksum 0x874caad2  (OK)
+	    0x06ab80-0x1fffef is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x06ab80-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD("0400501v.u7",  0x0000000, 0x0080000, CRC(f025775d) SHA1(71a94f6f17fa7cdcd997b0117b8f4afe21606a69) )
@@ -3175,12 +3175,12 @@ ROM_END
 ROM_START( sbuk3 )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000ba8
-		0x000000-0x05ead3 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x23d4cb22
-			Calculated Checksum 0x23d4cb22  (OK)
-		0x05ead4-0x114e33 is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x05ead4-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
+	    Checksum code found at 0x000ba8
+	    0x000000-0x05ead3 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x23d4cb22
+	        Calculated Checksum 0x23d4cb22  (OK)
+	    0x05ead4-0x114e33 is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x05ead4-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD("0200711v.u7",  0x0000000, 0x0080000, CRC(e056c7db) SHA1(7a555583f750d8275b2ffd25a0efbe370a5ac43c) )
@@ -3197,11 +3197,11 @@ ROM_END
 ROM_START( swhr2 )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000ae0
-		0x000000-0x041803 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x4449ca76
-			Calculated Checksum 0x4449ca76  (OK)
-		0x041804-0x0ecbb3 is the non-Checksummed range (unusual endpoint)	
+	    Checksum code found at 0x000ae0
+	    0x000000-0x041803 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x4449ca76
+	        Calculated Checksum 0x4449ca76  (OK)
+	    0x041804-0x0ecbb3 is the non-Checksummed range (unusual endpoint)
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD("0200004v.u7",  0x0000000, 0x0080000, CRC(de4d6d77) SHA1(959ffb7d06359870e07cb9d761f0bc0480c45e0c) )
@@ -3220,12 +3220,12 @@ ROM_END
 ROM_START( swhr2u )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000d08
-		0x000000-0x0b31cb is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x0720df2c
-			Calculated Checksum 0x3dad9905  (BAD)
-		0x0b31cc-0x155097 is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x0b31cc-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
+	    Checksum code found at 0x000d08
+	    0x000000-0x0b31cb is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x0720df2c
+	        Calculated Checksum 0x3dad9905  (BAD)
+	    0x0b31cc-0x155097 is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x0b31cc-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	// the checksum only covers part of the first 2 roms, marked all as BAD_DUMP because it can't be trusted without a full redump.
@@ -3243,11 +3243,11 @@ ROM_END
 ROM_START( swhr2v )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000b68
-		0x000000-0x07a763 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x014df7a2
-			Calculated Checksum 0x014df7a2  (OK)
-		0x07a764-0x0e360b is the non-Checksummed range (unusual endpoint)	
+	    Checksum code found at 0x000b68
+	    0x000000-0x07a763 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x014df7a2
+	        Calculated Checksum 0x014df7a2  (OK)
+	    0x07a764-0x0e360b is the non-Checksummed range (unusual endpoint)
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "01j01986.u7",  0x000000, 0x80000, CRC(f51b2faa) SHA1(dbcfdbee92af5f89a8a2611bbc687ee0cc907642) )
@@ -3275,12 +3275,12 @@ ROM_END
 ROM_START( trstrove )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000b98
-		0x000000-0x0638d7 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x7fa3a1a8
-			Calculated Checksum 0x7fa3a1a8  (OK)
-		0x0638d8-0x158933 is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x0638d8-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included	
+	    Checksum code found at 0x000b98
+	    0x000000-0x0638d7 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x7fa3a1a8
+	        Calculated Checksum 0x7fa3a1a8  (OK)
+	    0x0638d8-0x158933 is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x0638d8-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD("01j00161.u7",  0x0000000, 0x0080000, CRC(07a8b338) SHA1(7508d7d0e3494d355cb773165b240ba876a60eec) )
@@ -3297,12 +3297,12 @@ ROM_END
 ROM_START( tritreat )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000d18
-		0x000000-0x07089b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x56d2b752
-			Calculated Checksum 0x56d2b752  (OK)
-		0x07089c-0x2903cf is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x07089c-0x2fffff is the non-Checksummed range if the additional vectors? at the end are included	
+	    Checksum code found at 0x000d18
+	    0x000000-0x07089b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x56d2b752
+	        Calculated Checksum 0x56d2b752  (OK)
+	    0x07089c-0x2903cf is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x07089c-0x2fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
@@ -3322,12 +3322,12 @@ ROM_END
 ROM_START( trojhors )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000bb8
-		0x000000-0x06e9f7 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x071faa81
-			Calculated Checksum 0x071faa81  (OK)
-		0x06e9f8-0x2df4f7 is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x06e9f8-0x2fffff is the non-Checksummed range if the additional vectors? at the end are included
+	    Checksum code found at 0x000bb8
+	    0x000000-0x06e9f7 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x071faa81
+	        Calculated Checksum 0x071faa81  (OK)
+	    0x06e9f8-0x2df4f7 is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x06e9f8-0x2fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD("01j00851.u7",  0x0000000, 0x0080000, CRC(7be0caf5) SHA1(b83fba7eb4624b3dc56f763b48b7c45fe31f3396) )
@@ -3350,12 +3350,12 @@ ROM_END
 ROM_START( trpdlght )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000d08
-		0x000000-0x0b2d1f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x910fae87
-			Calculated Checksum 0x2485ae87  (BAD)
-		0x0b2d20-0x15384f is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x0b2d20-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
+	    Checksum code found at 0x000d08
+	    0x000000-0x0b2d1f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x910fae87
+	        Calculated Checksum 0x2485ae87  (BAD)
+	    0x0b2d20-0x15384f is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x0b2d20-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	// the checksum only covers part of the first 2 roms, marked all as BAD_DUMP because it can't be trusted without a full redump.
@@ -3373,12 +3373,12 @@ ROM_END
 ROM_START( unicornd )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000bf8
-		0x000000-0x05f36f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x2f8bff86
-			Calculated Checksum 0x2f8bff86  (OK)
-		0x05f370-0x1d0a3f is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x05f370-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
+	    Checksum code found at 0x000bf8
+	    0x000000-0x05f36f is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x2f8bff86
+	        Calculated Checksum 0x2f8bff86  (OK)
+	    0x05f370-0x1d0a3f is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x05f370-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD("0100791v.u7",  0x0000000, 0x0080000, CRC(d785d1b3) SHA1(4aa7c61036dd5fe1cdbc6c39a89881f88f3dd148) )
@@ -3408,12 +3408,12 @@ ROM_END
 ROM_START( wamazon )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000b68
-		0x000000-0x052b8b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0xc07f695c
-			Calculated Checksum 0xc07f695c  (OK)
-		0x052b8c-0x1fffef is the non-Checksummed range still containing data but NOT covered by Checksum  (unusual)
-		0x052b8c-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included		
+	    Checksum code found at 0x000b68
+	    0x000000-0x052b8b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0xc07f695c
+	        Calculated Checksum 0xc07f695c  (OK)
+	    0x052b8c-0x1fffef is the non-Checksummed range still containing data but NOT covered by Checksum  (unusual)
+	    0x052b8c-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD("0200285v.u7",  0x0000000, 0x0080000, CRC(bfa21358) SHA1(6b76656401b3dbbace8d4335951468b9885fc7f0) )
@@ -3430,11 +3430,11 @@ ROM_END
 ROM_START( wamazona )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000b68
-		0x000000-0x05c043 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x2c7f1cbb
-			Calculated Checksum 0x2c7f1cbb  (OK)
-		0x05c044-0x0f60cb is the non-Checksummed range (unusual endpoint)
+	    Checksum code found at 0x000b68
+	    0x000000-0x05c043 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x2c7f1cbb
+	        Calculated Checksum 0x2c7f1cbb  (OK)
+	    0x05c044-0x0f60cb is the non-Checksummed range (unusual endpoint)
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD("0200507v.u7",  0x0000000, 0x0080000, CRC(44576def) SHA1(3396460444ceb394c9c88e5fc37ccedcfc4b179c) )
@@ -3448,12 +3448,12 @@ ROM_END
 ROM_START( wamazonv )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000b68
-		0x000000-0x07b2f3 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x7b4d5882
-			Calculated Checksum 0x7b4d5882  (OK)
-		0x07b2f4-0x11537b is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x07b2f4-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
+	    Checksum code found at 0x000b68
+	    0x000000-0x07b2f3 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x7b4d5882
+	        Calculated Checksum 0x7b4d5882  (OK)
+	    0x07b2f4-0x11537b is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x07b2f4-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
@@ -3471,11 +3471,11 @@ ROM_END
 ROM_START( wildbill )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000ad8
-		0x000000-0x054e6b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0xd6b20386
-			Calculated Checksum 0xd6b20386  (OK)
-		0x054e6c-0x0ec99f is the non-Checksummed range (unusual endpoint)
+	    Checksum code found at 0x000ad8
+	    0x000000-0x054e6b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0xd6b20386
+	        Calculated Checksum 0xd6b20386  (OK)
+	    0x054e6c-0x0ec99f is the non-Checksummed range (unusual endpoint)
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD("0100297v.u7",  0x0000000, 0x0080000, CRC(e3117ab7) SHA1(c13912f524f1c1d373adb6382ceddd1bc18f7f02) )
@@ -3490,12 +3490,12 @@ ROM_END
 ROM_START( wcougar )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000adc
-		0x000000-0x043573 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x0a061a1a
-			Calculated Checksum 0x0a061a1a  (OK)
-		0x043574-0x1061fb is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x043574-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included	
+	    Checksum code found at 0x000adc
+	    0x000000-0x043573 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x0a061a1a
+	        Calculated Checksum 0x0a061a1a  (OK)
+	    0x043574-0x1061fb is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x043574-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD("0100167v.u7",  0x0000000, 0x0080000, CRC(47154679) SHA1(21749fbaa60f9bf1db43bdd272e6628ae73bf759) )
@@ -3515,12 +3515,12 @@ ROM_END
 ROM_START( wcougaru )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000d08
-		0x000000-0x0b0d5b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0xdfe9eb92
-			Calculated Checksum 0xdfe9eb92  (OK)
-		0x0b0d5c-0x153803 is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x0b0d5c-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included	
+	    Checksum code found at 0x000d08
+	    0x000000-0x0b0d5b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0xdfe9eb92
+	        Calculated Checksum 0xdfe9eb92  (OK)
+	    0x0b0d5c-0x153803 is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x0b0d5c-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "nhg029604.u7",  0x000000, 0x80000, CRC(7ada053f) SHA1(5102b0b9db505454624750a3fd6db455682538f3) )
@@ -3537,14 +3537,14 @@ ROM_END
 ROM_START( wthing )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000b74
-		0x000000-0x0673cb is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x89dd307a
-			Calculated Checksum 0x89dd307a  (OK)
-		0x0673cc-0x1b367b is the non-Checksummed range still containing data but NOT covered by Checksum
-		0x0673cc-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included	
+	    Checksum code found at 0x000b74
+	    0x000000-0x0673cb is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x89dd307a
+	        Calculated Checksum 0x89dd307a  (OK)
+	    0x0673cc-0x1b367b is the non-Checksummed range still containing data but NOT covered by Checksum
+	    0x0673cc-0x1fffff is the non-Checksummed range if the additional vectors? at the end are included
 	*/
-		
+
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD("0101158v.u7",  0x0000000, 0x0080000, CRC(eb402ffb) SHA1(49ef6ca2503a6e785f62cb29e505e5c2ba019e37) )
 	ROM_LOAD32_WORD("0101158v.u11", 0x0000002, 0x0080000, CRC(61d22f2e) SHA1(b836e5afbd5bb14ae68e100a6042f1953ed57a21) )
@@ -3560,11 +3560,11 @@ ROM_END
 ROM_START( wtiger )
 	ARISTOCRAT_MK5_BIOS
 	/*
-		Checksum code found at 0x000d30
-		0x000000-0x060227 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-			Expected Checksum   0x61da8e77
-			Calculated Checksum 0x61da8e77  (OK)
-		0x060228-0x0d61cf is the non-Checksummed range (unusual endpoint)	
+	    Checksum code found at 0x000d30
+	    0x000000-0x060227 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
+	        Expected Checksum   0x61da8e77
+	        Calculated Checksum 0x61da8e77  (OK)
+	    0x060228-0x0d61cf is the non-Checksummed range (unusual endpoint)
 	*/
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD( "0200954v.u7",  0x000000, 0x80000, CRC(752e54c5) SHA1(9317544a7cf2d9bf29347d31fe72331fc3d018ef) )

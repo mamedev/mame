@@ -103,20 +103,20 @@
  * Known boards from Mizar:
  *
  * MZX 414
- * MZ 7122 
- * MZ 7132 
+ * MZ 7122
+ * MZ 7132
  * MZ 7300 Serial I/O Board (Z8530)
  * EMX 7320 Serial I/O Board
  * MZ 7400 Disk Controller Board (WD 2010; WD 1772)
  * MZ 7500 IEEE-488 (GPIB) Interface Board
  * EMX 7550 Ethernet Controller Board (AMD 7990 Lance) MAC: 00:80:F8 MIZAR, INC.
- * MZ 7772 
+ * MZ 7772
  * MZ 7810 I/O Expansion Module (6681 DUART)
  * MZ 7831 SCSI Expansion Module (WD 33C93A)
  * MZ 7850 Ethernet Expansion Module (WD 83C690)
  * MZ 8000 ??
  * MZ 8105 3U 68000 CPU board
- * MZ 8115 
+ * MZ 8115
  * MZ 8300 3U serial board, 2 NEC 7201 and 1 AMD CTS9513 5 x 16 bit Counter/Timer
  * MZ 8310 timing module 2 x AM9513
  * MZ 8505 IEEE-488 (GPIB) Interface Board"
@@ -170,7 +170,7 @@
 #include "softlist.h"
 
 // The board needs a SIO board to get a user interface so lets fake one until the VME devices is done
-#define FAKEVME 1 
+#define FAKEVME 1
 
 // There are two user prom sockets
 #define CARDSLOT 0
@@ -253,9 +253,9 @@ static ADDRESS_MAP_START (mzr8105_mem, AS_PROGRAM, 16, mzr8105_state)
 	AM_RANGE (0x000000, 0x003fff) AM_ROM AM_REGION("roms", 0x000000) /* System EPROM Area 16Kb OS9 DEBUG - not verified     */
 	AM_RANGE (0x004000, 0x01ffff) AM_ROM AM_REGION("roms", 0x004000)/* System EPROM Area 112Kb for System ROM - not verified    */
 	AM_RANGE (0x020000, 0x03ffff) AM_RAM /* Not verified */
-//	AM_RANGE (0x0a0000, 0x0bffff) AM_ROM /* User EPROM/SRAM Area, max 128Kb mapped by a cartslot  */
-//	AM_RANGE(0x100000, 0xfeffff)  AM_READWRITE(vme_a24_r, vme_a24_w) /* VMEbus Rev B addresses (24 bits) - not verified */
-//	AM_RANGE(0xff0000, 0xffffff)  AM_READWRITE(vme_a16_r, vme_a16_w) /* VMEbus Rev B addresses (16 bits) - not verified */
+//  AM_RANGE (0x0a0000, 0x0bffff) AM_ROM /* User EPROM/SRAM Area, max 128Kb mapped by a cartslot  */
+//  AM_RANGE(0x100000, 0xfeffff)  AM_READWRITE(vme_a24_r, vme_a24_w) /* VMEbus Rev B addresses (24 bits) - not verified */
+//  AM_RANGE(0xff0000, 0xffffff)  AM_READWRITE(vme_a16_r, vme_a16_w) /* VMEbus Rev B addresses (16 bits) - not verified */
 #if FAKEVME
 // Faking a Mizar 8300 SIO UPD7201 BOARD in VME A16 adress space
 	AM_RANGE (0xFF0000, 0xFF0001) AM_DEVREADWRITE8("upd", upd7201N_device, db_r, db_w, 0x00ff)
@@ -350,13 +350,13 @@ WRITE_LINE_MEMBER (mzr8105_state::write_updterm_clock){
 static MACHINE_CONFIG_START (mzr8105, mzr8105_state)
 	MCFG_CPU_ADD ("maincpu", M68000, XTAL_10MHz)
 	MCFG_CPU_PROGRAM_MAP (mzr8105_mem)
-	
+
 /* Terminal Port config */
 	MCFG_UPD7201_ADD("upd", XTAL_4MHz, 0, 0, 0, 0 )
 	MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("rs232trm", rs232_port_device, write_txd))
 	MCFG_Z80SIO_OUT_DTRB_CB(DEVWRITELINE("rs232trm", rs232_port_device, write_dtr))
 	MCFG_Z80SIO_OUT_RTSB_CB(DEVWRITELINE("rs232trm", rs232_port_device, write_rts))
-	
+
 	MCFG_RS232_PORT_ADD ("rs232trm", default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("upd", upd7201N_device, rxb_w))
 	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("upd", upd7201N_device, ctsb_w))
@@ -373,7 +373,7 @@ MACHINE_CONFIG_END
 
 /* ROM definitions */
 /* UPD7201 init sequence
- * :upd B Reg 02 <- 04 Interrupt vector 
+ * :upd B Reg 02 <- 04 Interrupt vector
  * :upd B Reg 06 <- 00 Sync byte
  * :upd B Reg 07 <- 00 Sync byte
  * :upd B Reg 03 <- c1 Rx 8 bit chars + Rx enable

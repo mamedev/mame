@@ -49,7 +49,7 @@ function datfile.open(file, vertag, fixupcb)
 		dbver = stmt:get_value(0)
 	end
 	stmt:finalize()
-	
+
 	if not dbver then
 		db:exec("CREATE TABLE \"" .. file .. [[_idx" (
 				type VARCHAR NOT NULL,

@@ -5812,7 +5812,7 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 	ROM_LOAD( "mxo-cg2004.u75",  0x18000, 0x8000, CRC(5aaa4480) SHA1(353c4ce566c944406fce21f2c5045c856ef7a609) )
 
 	ROM_REGION( 0x100, "proms", 0 )
-	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) ) 
+	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) )
 ROM_END
 
 ROM_START( pepp0445 ) /* Normal board : Aces & Faces Bonus Joker Poker (PP0445) */

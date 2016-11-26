@@ -19,7 +19,7 @@
     There is a country code byte in the program to select between
     Seibu Kaihatsu/Fabtek/Taito licenses.
 
-    The Double Dynamites is an updated co-op version sporting different 
+    The Double Dynamites is an updated co-op version sporting different
     enemy patterns and drops.
 
     Emulation by Bryan McPhail, mish@tendril.co.uk

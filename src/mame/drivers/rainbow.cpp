@@ -7,7 +7,7 @@
 //-------------------- Differences to VT240: ---------------------------------------------------
 // - Registers of graphics option not directly mapped (indirect access via mode register)
 // - write mask is 16 bits wide (not only 8)
-// - scroll register is 8 bits wide - not 16. 
+// - scroll register is 8 bits wide - not 16.
 // - no "DMA SCROLL", "LINE ERASE MODE", no ZOOM hardware (factor must always be 1)
 
 // Two modes: highres and medres mode (different bank length..?)
@@ -685,9 +685,9 @@ private:
 	emu_timer   *cmd_timer;
 
 	const int vectors[9] = { 0x27, 0x26, 0x25, 0x24, 0x23, 0x22, 0x21, 0x20, 0x02 };
-	
+
 	// VIDEO LEVELS:  0 is 100 % output; F is 0 % output. Range of 0...255.
-	// LIMITED RANGE levels for 100-A model (valid only for all mono + green out on COLOR MONITOR): 
+	// LIMITED RANGE levels for 100-A model (valid only for all mono + green out on COLOR MONITOR):
 	//const uint8_t A_MONO_GREEN_video_levels[16] = { 255 , 185,  166, 21, 255 , 185,  166, 21, 255 , 185,  166, 21, 255 , 185,  166, 21};
 
 	// FULL RANGE video levels for 100-B model, taken from page 46 of PDF
@@ -712,8 +712,8 @@ m_patidx  = 7;                                              \
 m_GDC_FG_BG = 0;                                            \
 m_color_map_changed = true;                                 \
 for(int i=0; i <256; i++) { m_GDC_SCROLL_BUFFER[i] = m_GDC_SCROLL_BUFFER_PRELOAD[i] = i; };\
-m_GDC_scroll_index = 255;									\
-m_scroll_buffer_changed = true;								\
+m_GDC_scroll_index = 255;                                   \
+m_scroll_buffer_changed = true;                             \
 printf("\n** NEC 7220 GDC RESET **\n");
 
 UPD7220_DISPLAY_PIXELS_MEMBER( rainbow_state::hgdc_display_pixels )
@@ -737,8 +737,8 @@ UPD7220_DISPLAY_PIXELS_MEMBER( rainbow_state::hgdc_display_pixels )
 		return; // no output from graphics option
 
 	// ********************* GET BITMAP DATA FOR 4 PLANES ***************************************
- 	// _READ_ BIT MAP  from 2 or 4 planes (plane 0 is least, plane 3 most significant). See page 42 / 43
-	if(m_GDC_MODE_REGISTER & GDC_MODE_HIGHRES) 
+	// _READ_ BIT MAP  from 2 or 4 planes (plane 0 is least, plane 3 most significant). See page 42 / 43
+	if(m_GDC_MODE_REGISTER & GDC_MODE_HIGHRES)
 	{
 			plane0 = m_video_ram[((address & 0x7fff) + 0x00000) >> 1];
 			plane1 = m_video_ram[((address & 0x7fff) + 0x10000) >> 1];
@@ -1119,14 +1119,14 @@ void rainbow_state::machine_reset()
 				output().set_value("led1", 1);
 
 				uint32_t max_sector = (info->cylinders) * (info->heads) * (info->sectors);
-				printf("\n%u (%3.2f) MB HARD DISK MOUNTED. GEOMETRY: %d HEADS (1..%d ARE OK).\n%d CYLINDERS (151 to %d ARE OK).\n%d SECTORS / TRACK (up to %d ARE OK). \n%d BYTES / SECTOR (128 to 1024 ARE OK).\n", 
+				printf("\n%u (%3.2f) MB HARD DISK MOUNTED. GEOMETRY: %d HEADS (1..%d ARE OK).\n%d CYLINDERS (151 to %d ARE OK).\n%d SECTORS / TRACK (up to %d ARE OK). \n%d BYTES / SECTOR (128 to 1024 ARE OK).\n",
 					max_sector * info->sectorbytes / 1000000,
 					(float)max_sector * (float)info->sectorbytes / 1048576.0f,
 					info->heads, RD51_MAX_HEAD,
 					info->cylinders, RD51_MAX_CYLINDER,
 					info->sectors, RD51_SECTORS_PER_TRACK,
 					info->sectorbytes);
-			} 
+			}
 		}
 	}
 
@@ -1216,28 +1216,28 @@ uint32_t rainbow_state::screen_update_rainbow(screen_device &screen, bitmap_ind1
 	}
 #endif
 
-	int monitor_selected = m_inp13->read(); 
-	if(monitor_selected != old_monitor) 
-	{	
+	int monitor_selected = m_inp13->read();
+	if(monitor_selected != old_monitor)
+	{
 		old_monitor = monitor_selected;
 		m_color_map_changed = true;
 	}
 
-	int palette_selected; 
+	int palette_selected;
 	if( m_ONBOARD_GRAPHICS_SELECTED && (monitor_selected == COLOR_MONITOR) )
-		 palette_selected = 2; // Color monitor; green text 
+		 palette_selected = 2; // Color monitor; green text
 	else
 		 palette_selected = m_inp9->read();
 
-	if(palette_selected != old_palette) 
-	{	
+	if(palette_selected != old_palette)
+	{
 		old_palette = palette_selected;
 		m_color_map_changed = true;
 	}
 
 	m_crtc->palette_select(palette_selected);
 
-	if(    m_SCREEN_BLANK                    || 
+	if(    m_SCREEN_BLANK                    ||
 		( (!m_ONBOARD_GRAPHICS_SELECTED) && (monitor_selected != DUAL_MONITOR) )   // blank screen 1, except when in DUAL_MONITOR mode
 	  )
 		m_crtc->video_blanking(bitmap, cliprect);
@@ -1284,11 +1284,11 @@ void rainbow_state::lower_8088_irq(int ref)
 // IRQ service for 7201 (commm / printer)
 void rainbow_state::update_mpsc_irq()
 {
-    if (m_mpsc_irq == 0) {
-        lower_8088_irq(IRQ_COMM_PTR_INTR_L);
-        m_mpsc->m1_r();  // interrupt acknowledge
-    } else
-        raise_8088_irq(IRQ_COMM_PTR_INTR_L);
+	if (m_mpsc_irq == 0) {
+		lower_8088_irq(IRQ_COMM_PTR_INTR_L);
+		m_mpsc->m1_r();  // interrupt acknowledge
+	} else
+		raise_8088_irq(IRQ_COMM_PTR_INTR_L);
 
 }
 
@@ -1503,7 +1503,7 @@ hard_disk_file *(rainbow_state::rainbow_hdc_file(int drv))
 		printf("\n <<< === REJECTED = (SANITY CHECK FAILED) === >>> \n");
 
 		uint32_t max_sector = info->cylinders * info->heads * info->sectors;
-				printf("\n%u (%3.2f) MB HARD DISK REJECTED. GEOMETRY: %d HEADS (1..%d ARE OK).\n%d CYLINDERS (151 to %d ARE OK).\n%d SECTORS / TRACK (up to %d ARE OK). \n%d BYTES / SECTOR (128 to 1024 ARE OK).\n", 
+				printf("\n%u (%3.2f) MB HARD DISK REJECTED. GEOMETRY: %d HEADS (1..%d ARE OK).\n%d CYLINDERS (151 to %d ARE OK).\n%d SECTORS / TRACK (up to %d ARE OK). \n%d BYTES / SECTOR (128 to 1024 ARE OK).\n",
 					max_sector * info->sectorbytes / 1000000,
 					(float)max_sector * (float)info->sectorbytes / 1048576.0f,
 					info->heads, RD51_MAX_HEAD,
@@ -2236,7 +2236,7 @@ WRITE8_MEMBER(rainbow_state::z80_diskcontrol_w)
 		m_floppy = con->get_device();
 		if (m_floppy)
 			selected_drive = drive;
-//		printf("%i <- SELECTED DRIVE...\n", m_unit);
+//      printf("%i <- SELECTED DRIVE...\n", m_unit);
 	}
 
 	if (selected_drive == INVALID_DRIVE)
@@ -2369,29 +2369,29 @@ WRITE_LINE_MEMBER(rainbow_state::GDC_vblank_irq)
 	int xi;
 
 	if(m_scroll_buffer_changed)
-	{	
+	{
 		m_scroll_buffer_changed = false;
 
-		for(xi = 0; xi < m_GDC_scroll_index; xi++) // LOAD REAL SCROLL BUFFER FROM PRELOAD (up to scroll_index...?) 
-				m_GDC_SCROLL_BUFFER[xi] = m_GDC_SCROLL_BUFFER_PRELOAD[xi];  
- 	}
+		for(xi = 0; xi < m_GDC_scroll_index; xi++) // LOAD REAL SCROLL BUFFER FROM PRELOAD (up to scroll_index...?)
+				m_GDC_SCROLL_BUFFER[xi] = m_GDC_SCROLL_BUFFER_PRELOAD[xi];
+	}
 
 	if(m_color_map_changed)
-	{  
+	{
 		m_color_map_changed = false;
 
 		int mono_sum = 0;
 		int green_sum = 0;
-		for(xi=0;xi<16;xi++) // DELAYED LOAD OF PALETTE ... 
-		{	
+		for(xi=0;xi<16;xi++) // DELAYED LOAD OF PALETTE ...
+		{
 						uint8_t colordata1  = m_GDC_COLOR_MAP[xi];
-						uint8_t colordata2 = m_GDC_COLOR_MAP[xi + 16];  	// Does it matter if the palette is incomplete...?
+						uint8_t colordata2 = m_GDC_COLOR_MAP[xi + 16];      // Does it matter if the palette is incomplete...?
 
-						//				Color map:  32 x 8
-						//				2nd 16 Byte 	1st 16 Bytes (colordata1)
-						//				----------- 	------------
-						//				7..4  3..0  	7..4  3..0
-						//				Mono  Blue  	Red   Green
+						//              Color map:  32 x 8
+						//              2nd 16 Byte     1st 16 Bytes (colordata1)
+						//              -----------     ------------
+						//              7..4  3..0      7..4  3..0
+						//              Mono  Blue      Red   Green
 						// NOTE: 2nd 16 BYTES ARE MONO PALETTE, 1st 16 ARE COLOR PALETTE * HERE * (on the VT240 driver, it is the other way round)
 
 						mono = (colordata2 & 0xF0) >> 4;  // FIXME: limit palette in appropriate modes on 100-A
@@ -2404,56 +2404,56 @@ WRITE_LINE_MEMBER(rainbow_state::GDC_vblank_irq)
 						green_sum += green;
 
 						switch( m_inp13->read())
-						{ 
-							case MONO_MONITOR: 
-							{ 
+						{
+							case MONO_MONITOR:
+							{
 								switch( m_inp9->read()   ) //  - monochrome monitor (phosphor) type  (1,2,3)
-								{ 
+								{
 								case 1: // BLACK & WHITE
 										mono  = uint8_t( ( 205.0f / 80.0f) *  ( video_levels[ mono ] / 3.19f) );
-										m_palette2->set_pen_color(xi + 16, rgb_t( mono, mono, mono) ); 
+										m_palette2->set_pen_color(xi + 16, rgb_t( mono, mono, mono) );
 									break;
 
-								case 2: // SHADES OF GREEN    
+								case 2: // SHADES OF GREEN
 										red   = uint8_t( ( 35.0f / 80.0f) *  ( video_levels[ mono ] / 3.19f) ); // 80 % = NORMAL *
 										green = uint8_t( (145.0f / 80.0f) *  ( video_levels[ mono ] / 3.19f) );
 										blue  = uint8_t( ( 75.0f / 80.0f) *  ( video_levels[ mono ] / 3.19f) );
-										m_palette2->set_pen_color(xi + 16, rgb_t( red, green, blue) ); 
+										m_palette2->set_pen_color(xi + 16, rgb_t( red, green, blue) );
 									break;
 
 								case 3: // AMBER. Assumption: "normal" value at 80 % is 213, 146, 82 (decimal)
 									red   = uint8_t( (213.0f / 80.0f) *  ( video_levels[ mono ] / 3.19f) ); // 80 % = NORMAL * is 3.19f (100 % would be 2.55f)
 									green = uint8_t( (146.0f / 80.0f) *  ( video_levels[ mono ] / 3.19f) );
 									blue  = uint8_t( ( 82.0f / 80.0f) *  ( video_levels[ mono ] / 3.19f) );
-									m_palette2->set_pen_color(xi + 16, rgb_t( red, green, blue) ); 
+									m_palette2->set_pen_color(xi + 16, rgb_t( red, green, blue) );
 									break;
 								}
 								break;
 							}
 
-							case COLOR_MONITOR: 
-									red   = uint8_t( red   * 17 *  ( (255-video_levels[ red ]  )  / 255.0f) ); 
+							case COLOR_MONITOR:
+									red   = uint8_t( red   * 17 *  ( (255-video_levels[ red ]  )  / 255.0f) );
 									green = uint8_t( mono * 17 *  ( (255-video_levels[ mono ])  / 255.0f) ); // BCC-17 cable (red, mono -> green, blue)
 									blue  = uint8_t( blue  * 17 *  ( (255-video_levels[ blue ] )  / 255.0f) );
-									m_palette2->set_pen_color(xi, rgb_t( red, green, blue) );	
+									m_palette2->set_pen_color(xi, rgb_t( red, green, blue) );
 								break;
 
-							case DUAL_MONITOR:   
-									red   = uint8_t( red   * 17 *  ( (255-video_levels[ red ]  )  / 255.0f) ); 
+							case DUAL_MONITOR:
+									red   = uint8_t( red   * 17 *  ( (255-video_levels[ red ]  )  / 255.0f) );
 									green = uint8_t( green * 17 *  ( (255-video_levels[ green ])  / 255.0f) ); // true R-G-B (homebrew cable only)
 									blue  = uint8_t( blue  * 17 *  ( (255-video_levels[ blue ] )  / 255.0f) );
-									m_palette2->set_pen_color(xi, rgb_t( red, green, blue) );	
+									m_palette2->set_pen_color(xi, rgb_t( red, green, blue) );
 								break;
 						}
-	
+
 		} // palette (loop)
 
 		if(mono_sum == 0)
-		  if ( m_inp13->read() == COLOR_MONITOR)	
+		  if ( m_inp13->read() == COLOR_MONITOR)
 				printf(" [HINT: COLOR MONITOR (DIP SWITCH) WRONG! NO MONO PALETTE] ");
 
 		if(green_sum == 0)
-			 if ( m_inp13->read() == DUAL_MONITOR)	
+			 if ( m_inp13->read() == DUAL_MONITOR)
 				printf(" [HINT: DUAL MONITOR (DIP SWITCH) WRONG! NO GREEN PALETTE] ");
 	} // color map changed?
 } // 7220 vblank IRQ
@@ -2677,36 +2677,36 @@ WRITE_LINE_MEMBER(rainbow_state::irq_hi_w)
 // ********************************* NEC UPD7220 ***********************************************
 // Readback mode: correct place?  Not for vector mode (really)...?
 
-// NOTE: "More than one plane at a time can be enabled for a write operation; however, 
+// NOTE: "More than one plane at a time can be enabled for a write operation; however,
 //        only one plane can be enabled for a read operation at anyone time."
 
 READ16_MEMBER(rainbow_state::vram_r)
-{  
+{
 	if((!(m_GDC_MODE_REGISTER & GDC_MODE_VECTOR)) || space.debugger_access())  // (NOT VECTOR MODE)
 	{
 		// SCROLL_MAP IN BITMAP MODE ONLY...?
-		if(m_GDC_MODE_REGISTER & GDC_MODE_HIGHRES) 
+		if(m_GDC_MODE_REGISTER & GDC_MODE_HIGHRES)
 			offset = ( m_GDC_SCROLL_BUFFER[ (offset & 0x3FC0) >> 6 ] << 6) |  (offset & 0x3F);
 		else
 			offset = ( m_GDC_SCROLL_BUFFER[ (offset & 0x1FC0) >> 6 ] << 6) |  (offset & 0x3F);
 
 		int readback_plane = 0;
 
-		if( !(m_GDC_MODE_REGISTER & GDC_MODE_ENABLE_WRITES) ) // 0x10   		// READBACK OPERATION - if ENABLE_WRITES NOT SET
-		    readback_plane = (m_GDC_MODE_REGISTER & GDC_MODE_READBACK_PLANE_MASK) >> 2; // READBACK PLANE 00..02, mask in bits 2+3 
+		if( !(m_GDC_MODE_REGISTER & GDC_MODE_ENABLE_WRITES) ) // 0x10           // READBACK OPERATION - if ENABLE_WRITES NOT SET
+			readback_plane = (m_GDC_MODE_REGISTER & GDC_MODE_READBACK_PLANE_MASK) >> 2; // READBACK PLANE 00..02, mask in bits 2+3
 
 		return m_video_ram[ (offset & 0x7fff)  + (0x8000 * readback_plane)];
-	}  
+	}
 	return 0xffff;
 }
 
 // NOTE: Rainbow has separate registers for fore and background.
 WRITE16_MEMBER(rainbow_state::vram_w)
 {
-	if(!(m_GDC_MODE_REGISTER & GDC_MODE_VECTOR)) 
+	if(!(m_GDC_MODE_REGISTER & GDC_MODE_VECTOR))
 	{
 		// SCROLL_MAP IN BITMAP MODE ONLY...?
-		if(m_GDC_MODE_REGISTER & GDC_MODE_HIGHRES) 
+		if(m_GDC_MODE_REGISTER & GDC_MODE_HIGHRES)
 			offset = ( m_GDC_SCROLL_BUFFER[ (offset & 0x3FC0) >> 6 ] << 6) |  (offset & 0x3F);
 		else
 			offset = ( m_GDC_SCROLL_BUFFER[ (offset & 0x1FC0) >> 6 ] << 6) |  (offset & 0x3F);
@@ -2780,11 +2780,11 @@ WRITE16_MEMBER(rainbow_state::vram_w)
 			back >>= 1;
 
 		} // plane select (LOOP)
-		return;  
+		return;
 	}
 }
 
-// (READ) 
+// (READ)
 // Read _preloaded_ scroll buffer (see GDC Diagnostic Disk, SCROLL BUFFER test)
 READ8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_r)
 {
@@ -2794,12 +2794,12 @@ READ8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_r)
 		case 0:
 			out = m_PORT50;
 			break;
-				
+
 		case 1:
 			if(m_GDC_INDIRECT_REGISTER & GDC_SELECT_SCROLL_MAP ) // 0x80
-			{	
+			{
 				// Documentation says it is always incremented (read and write):
-				out = m_GDC_SCROLL_BUFFER_PRELOAD[m_GDC_scroll_index++]; // // * READ * SCROLL_MAP ( 256 x 8 )   
+				out = m_GDC_SCROLL_BUFFER_PRELOAD[m_GDC_scroll_index++]; // // * READ * SCROLL_MAP ( 256 x 8 )
 				m_GDC_scroll_index &= 0xFF; // 0...255  (CPU accesses 256 bytes)
 				break;
 			}
@@ -2832,14 +2832,14 @@ WRITE8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_w)
 
 	switch(offset)
 	{
-		case 0: // Mode register must be reloaded following any write to port 50 (software reset). 
-			// FIXME: "Any write to this port also resynchronizes the 
-			//        read/modify/write memory cycles of the Graphics Option to those of the GDC." (?) 
+		case 0: // Mode register must be reloaded following any write to port 50 (software reset).
+			// FIXME: "Any write to this port also resynchronizes the
+			//        read/modify/write memory cycles of the Graphics Option to those of the GDC." (?)
 			if( data & 1 ) // PDF QV069 suggests 1 -> 0 -> 1; most programs just set bit 0.
-			{	
+			{
 				GDC_RESET_MACRO // Graphics option software reset (separate from GDC reset...)
 				printf("(PC=%x)\n", machine().device("maincpu")->safe_pc());
-			} 
+			}
 			m_PORT50  = data;
 			break;
 
@@ -2979,7 +2979,7 @@ WRITE8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_w)
 			// --------------------  WRITE BUFFER USED IN WORD MODE ONLY !
 			// "OUTPUT WRITE BUFFER IS THE INVERSE OF THE INPUT" (quote from 4-3 of the PDF)
 			//  BITSWAP SEEMS NECESSARY (see digits in DOODLE)... !
-			m_GDC_WRITE_BUFFER[m_GDC_write_buffer_index++] = ~BITSWAP8(data, 0, 1, 2, 3, 4, 5, 6, 7); 
+			m_GDC_WRITE_BUFFER[m_GDC_write_buffer_index++] = ~BITSWAP8(data, 0, 1, 2, 3, 4, 5, 6, 7);
 			m_GDC_write_buffer_index &= 0xf; // write up to 16 bytes to port 52h.
 			break;
 
@@ -3007,7 +3007,7 @@ WRITE8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_w)
 		// There is no specific order for the WRITE_MASK (according to txt/code samples in DEC's PDF).
 		// NOTE: LOW <-> HI JUXTAPOSITION!
 		case 4: // 54h   Write Mask LOW
-			m_GDC_WRITE_MASK = ( BITSWAP8(data, 0, 1, 2, 3, 4, 5, 6, 7) << 8 )  | ( m_GDC_WRITE_MASK & 0x00FF ); 
+			m_GDC_WRITE_MASK = ( BITSWAP8(data, 0, 1, 2, 3, 4, 5, 6, 7) << 8 )  | ( m_GDC_WRITE_MASK & 0x00FF );
 			break;
 		case 5: // 55h   Write Mask HIGH
 			m_GDC_WRITE_MASK = ( m_GDC_WRITE_MASK & 0xFF00 ) | BITSWAP8(data, 0, 1, 2, 3, 4, 5, 6, 7);

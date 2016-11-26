@@ -439,7 +439,7 @@ windows_options::windows_options()
 : osd_options()
 {
 	add_entries(s_option_entries);
-#if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)	
+#if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 	String^ path = ApplicationData::Current->LocalFolder->Path + L"\\";
 	set_default_value(OPTION_INIPATH, (osd::text::from_wstring((LPCWSTR)path->Data()) + ";" + ini_path()).c_str());
 	set_default_value(OPTION_CFG_DIRECTORY, (osd::text::from_wstring((LPCWSTR)path->Data()) +  cfg_directory()).c_str());
@@ -451,7 +451,7 @@ windows_options::windows_options()
 	set_default_value(OPTION_COMMENT_DIRECTORY, (osd::text::from_wstring((LPCWSTR)path->Data()) + comment_directory()).c_str());
 
 	set_default_value(OPTION_HOMEPATH, osd::text::from_wstring((LPCWSTR)path->Data()).c_str());
-	set_default_value(OPTION_MEDIAPATH, (osd::text::from_wstring((LPCWSTR)path->Data()) + media_path()).c_str());	
+	set_default_value(OPTION_MEDIAPATH, (osd::text::from_wstring((LPCWSTR)path->Data()) + media_path()).c_str());
 #endif
 }
 

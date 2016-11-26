@@ -1085,12 +1085,12 @@ void z80sio_channel::control_write(uint8_t data)
 
 	switch (reg)
 	{
-	case REG_WR0_COMMAND_REGPT:		do_sioreg_wr0(data); break;
-	case REG_WR1_INT_DMA_ENABLE:	do_sioreg_wr1(data); m_uart->check_interrupts(); break;
-	case REG_WR2_INT_VECTOR:		do_sioreg_wr2(data); break;
-	case REG_WR3_RX_CONTROL:     	do_sioreg_wr3(data); update_serial(); break;
-	case REG_WR4_RX_TX_MODES:    	do_sioreg_wr4(data); update_serial(); break;
-	case REG_WR5_TX_CONTROL:     	do_sioreg_wr5(data); update_serial(); update_rts(); break;
+	case REG_WR0_COMMAND_REGPT:     do_sioreg_wr0(data); break;
+	case REG_WR1_INT_DMA_ENABLE:    do_sioreg_wr1(data); m_uart->check_interrupts(); break;
+	case REG_WR2_INT_VECTOR:        do_sioreg_wr2(data); break;
+	case REG_WR3_RX_CONTROL:        do_sioreg_wr3(data); update_serial(); break;
+	case REG_WR4_RX_TX_MODES:       do_sioreg_wr4(data); update_serial(); break;
+	case REG_WR5_TX_CONTROL:        do_sioreg_wr5(data); update_serial(); update_rts(); break;
 	case REG_WR6_SYNC_OR_SDLC_A:    do_sioreg_wr6(data); break;
 	case REG_WR7_SYNC_OR_SDLC_F:    do_sioreg_wr7(data); break;
 	default:

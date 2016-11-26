@@ -295,30 +295,30 @@ conditions. In addition, there are four sources per channel: 0) Transmitt 1) Ext
 which affects the way the interrupt vector is formed. The sources in more detail
 
 INT_RECEIVE:  The sources of receive interrupts consist of Receive Character Available and Special Receive Condition.
-		      The Special Receive Condition can be subdivided into Receive Overrun, Framing Error (Asynchronous) or
-			  End of Frame (SDLC). In addition, a parity error can be a special receive condition by programming
+              The Special Receive Condition can be subdivided into Receive Overrun, Framing Error (Asynchronous) or
+              End of Frame (SDLC). In addition, a parity error can be a special receive condition by programming
 
 INT_EXTERNAL: The External/status interrupts have several sources which may be individually enabled in WR15.
               The sources are zero count, /DCD, Sync/Hunt, /CTS, transmitter under-run/EOM and Break/Abort.
 
 INT_TRANSMIT: The NMOS/CMOS version of the SCC only has a one byte deep transmit buffer. The status of the
-		      transmit buffer can be determined through TBE bit in RR0, bit D2, which shows whether the
-			  transmit buffer is empty or not. After a hardware reset (including a hardware reset by software), or
-			  a channel reset, this bit is set to 1.
-			  While transmit interrupts are enabled, the NMOS/CMOS version sets the Transmit Interrupt Pending
-			  (TxIP) bit whenever the transmit buffer becomes empty. This means that the transmit buffer
-			  must be full before the TxIP can be set. Thus, when transmit interrupts are first enabled, the TxIP
-			  will not be set until after the first character is written to the NMOS/CMOS.
+              transmit buffer can be determined through TBE bit in RR0, bit D2, which shows whether the
+              transmit buffer is empty or not. After a hardware reset (including a hardware reset by software), or
+              a channel reset, this bit is set to 1.
+              While transmit interrupts are enabled, the NMOS/CMOS version sets the Transmit Interrupt Pending
+              (TxIP) bit whenever the transmit buffer becomes empty. This means that the transmit buffer
+              must be full before the TxIP can be set. Thus, when transmit interrupts are first enabled, the TxIP
+              will not be set until after the first character is written to the NMOS/CMOS.
 
 INT_SPECIAL:  This mode allows the receiver to interrupt only on
               characters with a special receive condition. When an interrupt occurs, the data containing the error
-			  is held in the Receive FIFO until an Error Reset command is issued. When using this mode in conjunction
-			  with a DMA, the DMA is initialized and enabled before any characters have been
-			  received by the ESCC. This eliminates the time-critical section of code required in the Receive
-			  Interrupt on First Character or Special Condition mode. Hence, all data can be transferred via the
-			  DMA so that the CPU need not handle the first received character as a special case. In SDLC
-			  mode, if the SDLC Frame Status FIFO is enabled and an EOF is received, an interrupt with vector
-			  for receive data available is generated and the Receive FIFO is not locked.
+              is held in the Receive FIFO until an Error Reset command is issued. When using this mode in conjunction
+              with a DMA, the DMA is initialized and enabled before any characters have been
+              received by the ESCC. This eliminates the time-critical section of code required in the Receive
+              Interrupt on First Character or Special Condition mode. Hence, all data can be transferred via the
+              DMA so that the CPU need not handle the first received character as a special case. In SDLC
+              mode, if the SDLC Frame Status FIFO is enabled and an EOF is received, an interrupt with vector
+              for receive data available is generated and the Receive FIFO is not locked.
 
 To allow for control over the daisy chain, the SCC has a Disable Lower Chain (DLC) software command (WR9 bit 2)
 that pulls IEO Low. This selectively deactivates parts of the daisy chain regardless of the interrupt status.
@@ -1847,9 +1847,9 @@ void z80scc_channel::do_sccreg_wr4(uint8_t data)
 		m_wr4 = data;
 		LOG(("- Parity    : %s\n", (data & WR4_PARITY_ENABLE) ? ((data & WR4_PARITY_EVEN) ? "Even" : "Odd") : "None"));
 		LOG(("- Stop Bits : %s\n", data & WR4_STOP_BITS_MASK ? stop_bits_tostring(get_stop_bits()) : "not used, sync modes enabled" ));
-		LOG(("- Sync Mode : %s\n", !(data & WR4_STOP_BITS_MASK) ? 
-			 (data & WR4_BIT5 ? 
-			  (data & WR4_BIT4 ? "External Sync Mode - /SYNC is used as input!" : "SDLC - not implemented") 
+		LOG(("- Sync Mode : %s\n", !(data & WR4_STOP_BITS_MASK) ?
+			 (data & WR4_BIT5 ?
+			  (data & WR4_BIT4 ? "External Sync Mode - /SYNC is used as input!" : "SDLC - not implemented")
 			  : (data & WR4_BIT4 ? "16 bit" : "8 bit"))
 			 : "Disabled"));
 		LOG(("- Clock Mode: %uX\n", get_clock_mode()));
@@ -1946,7 +1946,7 @@ void z80scc_channel::do_sccreg_wr9(uint8_t data)
 	}
 }
 
-/* WR10 contains miscellaneous control bits for both the receiver and the transmitter. 
+/* WR10 contains miscellaneous control bits for both the receiver and the transmitter.
    On the ESCC and 85C30 with the Extended Read option enabled, this register may be read as RR11.*/
 void z80scc_channel::do_sccreg_wr10(uint8_t data)
 {
@@ -2420,7 +2420,7 @@ void z80scc_channel::data_write(uint8_t data)
 		}
 	}
 	else
-    {
+	{
 		LOGTX(("- Transmitter disabled\n"));
 	}
 	/* "While transmit interrupts are enabled, the nmos/cmos version sets the transmit interrupt pending
@@ -2520,7 +2520,7 @@ WRITE_LINE_MEMBER( z80scc_channel::cts_w )
 		if (state) m_rr0 |= RR0_CTS; else  m_rr0 &= ~RR0_CTS; // Raw pin/status value
 
 		if (m_extint_latch == 0 && (m_wr1 & WR1_EXT_INT_ENABLE) && (m_wr15 & WR15_CTS))
-	 	{
+		{
 			// trigger interrupt
 			LOGCTS((" - Trigger CTS interrupt\n"));
 			m_uart->trigger_interrupt(m_index, INT_EXTERNAL);
@@ -2755,7 +2755,7 @@ void z80scc_channel::update_serial()
 			parity = PARITY_ODD;
 	}
 	else
-    {
+	{
 		parity = PARITY_NONE;
 	}
 

@@ -311,7 +311,7 @@ bool address_map_entry::unitmask_is_appropriate(u8 width, u64 unitmask, const ch
 
 address_map::address_map(device_t &device, address_spacenum spacenum)
 	: m_spacenum(spacenum),
-	    m_device(&device),
+		m_device(&device),
 		m_databits(0xff),
 		m_unmapval(0),
 		m_globalmask(0)
@@ -357,7 +357,7 @@ address_map::address_map(device_t &device, address_spacenum spacenum)
 
 address_map::address_map(device_t &device, address_map_entry *entry)
 	: m_spacenum(AS_PROGRAM),
-	    m_device(&device),
+		m_device(&device),
 		m_databits(0xff),
 		m_unmapval(0),
 		m_globalmask(0)
@@ -375,7 +375,7 @@ address_map::address_map(device_t &device, address_map_entry *entry)
 
 address_map::address_map(const address_space &space, offs_t start, offs_t end, int bits, u64 unitmask, device_t &device, address_map_delegate submap_delegate)
 	: m_spacenum(space.spacenum()),
-	    m_device(&device),
+		m_device(&device),
 		m_databits(space.data_width()),
 		m_unmapval(space.unmap()),
 		m_globalmask(space.bytemask())

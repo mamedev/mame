@@ -27,9 +27,9 @@
 
 
 - (BOOL)validateMenuItem:(NSMenuItem *)item {
-	SEL					action = [item action];
-	NSInteger			tag = [item tag];
-	debug_view_memory	*memview = downcast<debug_view_memory *>(view);
+	SEL                 action = [item action];
+	NSInteger           tag = [item tag];
+	debug_view_memory   *memview = downcast<debug_view_memory *>(view);
 
 	if (action == @selector(showChunkSize:))
 	{
@@ -63,8 +63,8 @@
 
 
 - (NSSize)maximumFrameSize {
-	debug_view_xy			max(0, 0);
-	debug_view_source const	*source = view->source();
+	debug_view_xy           max(0, 0);
+	debug_view_source const *source = view->source();
 	for (debug_view_source const *source = view->first_source(); source != nullptr; source = source->next())
 	{
 		view->set_source(*source);
@@ -105,7 +105,7 @@
 
 
 - (void)selectSubviewAtIndex:(int)index {
-	int const	selected = view->source_list().indexof(*view->source());
+	int const   selected = view->source_list().indexof(*view->source());
 	if (selected != index) {
 		view->set_source(*view->source_list().find(index));
 		if ([[self window] firstResponder] != self)
@@ -199,8 +199,8 @@
 - (void)insertActionItemsInMenu:(NSMenu *)menu atIndex:(NSInteger)index {
 	NSInteger tag;
 	for (tag = 1; tag <= 8; tag <<= 1) {
-		NSString	*title = [NSString stringWithFormat:@"%ld-byte Chunks", (long)tag];
-		NSMenuItem	*chunkItem = [menu insertItemWithTitle:title
+		NSString    *title = [NSString stringWithFormat:@"%ld-byte Chunks", (long)tag];
+		NSMenuItem  *chunkItem = [menu insertItemWithTitle:title
 													action:@selector(showChunkSize:)
 											 keyEquivalent:[NSString stringWithFormat:@"%ld", (long)tag]
 												   atIndex:index++];
@@ -208,13 +208,13 @@
 		[chunkItem setTag:tag];
 	}
 
-	NSMenuItem	*chunkItem = [menu insertItemWithTitle:@"32-bit floats"
+	NSMenuItem  *chunkItem = [menu insertItemWithTitle:@"32-bit floats"
 		action:@selector(showChunkSize:)
 		keyEquivalent:@"F"
 		atIndex:index++];
 	[chunkItem setTarget:self];
 	[chunkItem setTag:9];
-	
+
 	NSMenuItem *chunkItem2 = [menu insertItemWithTitle:@"64-bit floats"
 		action:@selector(showChunkSize:)
 		keyEquivalent:@"D"
@@ -228,7 +228,7 @@
 		atIndex:index++];
 	[chunkItem3 setTarget:self];
 	[chunkItem3 setTag:11];
-	
+
 	[menu insertItem:[NSMenuItem separatorItem] atIndex:index++];
 
 	NSMenuItem *logicalItem = [menu insertItemWithTitle:@"Logical Addresses"

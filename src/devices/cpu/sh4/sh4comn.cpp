@@ -676,17 +676,17 @@ WRITE32_MEMBER( sh4_base_device::sh4_internal_w )
 
 //  printf("sh4_internal_w:  Write %08x (%x), %08x @ %08x\n", 0xfe000000+((offset & 0x3fc0) << 11)+((offset & 0x3f) << 2), offset, data, mem_mask);
 
-	switch( offset ) 
+	switch( offset )
 	{
 	case PTEH: // for use with LDTLB opcode
 		m_m[PTEH] &= 0xffffffff;
 		/*
-			NNNN NNNN NNNN NNNN NNNN NN-- AAAA AAAA
+		    NNNN NNNN NNNN NNNN NNNN NN-- AAAA AAAA
 
-			N = VPM = Virtual Page Number
-			A = ASID = Address Space Identifier
+		    N = VPM = Virtual Page Number
+		    A = ASID = Address Space Identifier
 
-			same as the address table part of the utlb but with 2 unused bits (these are sourced from PTEL instead when LDTLB is called)
+		    same as the address table part of the utlb but with 2 unused bits (these are sourced from PTEL instead when LDTLB is called)
 		*/
 
 
@@ -695,18 +695,18 @@ WRITE32_MEMBER( sh4_base_device::sh4_internal_w )
 	case PTEL:
 		m_m[PTEL] &= 0xffffffff;
 		/*
-			 ---P PPPP PPPP PPPP PPPP PP-V zRRz CDHW
+		     ---P PPPP PPPP PPPP PPPP PP-V zRRz CDHW
 
-			 same format as data array 1 of the utlb
+		     same format as data array 1 of the utlb
 		*/
 		break;
 
 	case PTEA:
 		m_m[PTEA] &= 0xffffffff;
 		/*
-			---- ---- ---- ---- ---- ---- ---- TSSS
+		    ---- ---- ---- ---- ---- ---- ---- TSSS
 
-			same format as data array 2 of the utlb
+		    same format as data array 2 of the utlb
 		*/
 		break;
 
@@ -725,18 +725,18 @@ WRITE32_MEMBER( sh4_base_device::sh4_internal_w )
 		logerror("%s: MMUCR %08x\n", machine().describe_context(), data);
 		m_m[MMUCR] &= 0xffffffff;
 		/*
-			LLLL LL-- BBBB BB-- CCCC CCQV ---- -T-A
+		    LLLL LL-- BBBB BB-- CCCC CCQV ---- -T-A
 
-			L = LRUI = Least recently used ITLB
-			B = URB = UTLB replace boundary
-			C = URC = UTLB replace counter
-			Q = SQMD = Store Queue Mode Bit
-			V = SV = Single Virtual Mode Bit
-			T = TI = TLB invaldiate
-			A = AT = Address translation bit (enable)			
+		    L = LRUI = Least recently used ITLB
+		    B = URB = UTLB replace boundary
+		    C = URC = UTLB replace counter
+		    Q = SQMD = Store Queue Mode Bit
+		    V = SV = Single Virtual Mode Bit
+		    T = TI = TLB invaldiate
+		    A = AT = Address translation bit (enable)
 		*/
 
-		
+
 
 		if (data & MMUCR_AT)
 		{
@@ -750,7 +750,7 @@ WRITE32_MEMBER( sh4_base_device::sh4_internal_w )
 				printf("The MMU emulation is a hack specific to that system\n");
 			}
 
-			
+
 			if (m_mmuhack == 2)
 			{
 				for (int i = 0;i < 64;i++)
@@ -1322,16 +1322,16 @@ uint32_t sh4_base_device::sh4_getsqremap(uint32_t address)
 
 WRITE64_MEMBER( sh4_base_device::sh4_utlb_address_array_w )
 {
-/*	uses bits 13:8 of address to select which UTLB entry we're addressing
+/*  uses bits 13:8 of address to select which UTLB entry we're addressing
     bit 7 of the address enables 'associative' mode, causing a search
-	operation rather than a direct write.
+    operation rather than a direct write.
 
-	NNNN NNNN NNNN NNNN NNNN NNDV AAAA AAAA
+    NNNN NNNN NNNN NNNN NNNN NNDV AAAA AAAA
 
-	N = VPN = Virtual Page Number
-	D = Dirty Bit
-	V = Validity Bit
-	A = ASID = Address Space Identifier
+    N = VPN = Virtual Page Number
+    D = Dirty Bit
+    V = Validity Bit
+    A = ASID = Address Space Identifier
 */
 
 	logerror("sh4_utlb_address_array_w %08x %08x\n", offset, data);
@@ -1433,11 +1433,11 @@ WRITE64_MEMBER( sh4_base_device::sh4_utlb_data_array2_w )
 {
 /*  uses bits 13:8 of address to select which UTLB entry we're addressing
 
-	---- ---- ---- ---- ---- ---- ---- TSSS
+    ---- ---- ---- ---- ---- ---- ---- TSSS
 
-	T = TC = Timing Control
-	S = SA = Space attributes
-	- = unused (should be 0)
+    T = TC = Timing Control
+    S = SA = Space attributes
+    - = unused (should be 0)
 
 */
 

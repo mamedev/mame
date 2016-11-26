@@ -3165,20 +3165,20 @@ ROM_END
 
 /*
 CPUs
-QTY 	Type 	clock 	position 	function
-1x 	unknown DIP40 		main PCB 2n 	
-7x 	LM3900N 		sound PCB ic2-ic8 	Quad Operational Amplifier - sound
-1x 	LM377 		sound PCB 1k 	Dual Audio Amplifier - sound
-1x 	oscillator 	19.968000 	main PCB XTAL 8b 
+QTY     Type    clock   position    function
+1x  unknown DIP40       main PCB 2n
+7x  LM3900N         sound PCB ic2-ic8   Quad Operational Amplifier - sound
+1x  LM377       sound PCB 1k    Dual Audio Amplifier - sound
+1x  oscillator  19.968000   main PCB XTAL 8b
 
 ROMs
-QTY 	Type 	position 	status
-4x 	TMS2708 	main PCB 1m 1n 1r 1s 	dumped
-2x 	MCM2708 	main PCB 1j 1l 	dumped
+QTY     Type    position    status
+4x  TMS2708     main PCB 1m 1n 1r 1s    dumped
+2x  MCM2708     main PCB 1j 1l  dumped
 
 RAMs
-QTY 	Type 	position
-16x 	D2107C 	main PCB 1-16
+QTY     Type    position
+16x     D2107C  main PCB 1-16
 
 Others
 1x 18x2 edge connector (main PCB)
@@ -3191,7 +3191,7 @@ Others
 
 Notes
 main PCB is marked "CS210", "SI" and is labeled "C6902575"
-sound PCB is marked "CS214" and is labeled "C6902574", "VOLUME" 
+sound PCB is marked "CS214" and is labeled "C6902574", "VOLUME"
 */
 
 ROM_START( blueshrkmr )
@@ -3252,7 +3252,7 @@ ROM_END
 /* 730 */ GAME( 1978, bowler,     0,        bowler,   bowler,   driver_device, 0, ROT90,  "Midway", "Bowling Alley", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 /* 739 */ GAMEL(1978, invaders,   0,        invaders, invaders, driver_device, 0, ROT270, "Taito / Midway", "Space Invaders / Space Invaders M", MACHINE_SUPPORTS_SAVE, layout_invaders )
 /* 742 */ GAME( 1978, blueshrk,   0,        blueshrk, blueshrk, driver_device, 0, ROT0,   "Midway", "Blue Shark", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-          GAME( 1978, blueshrkmr, blueshrk, blueshrk, blueshrk, driver_device, 0, ROT0,   "bootleg (Model Racing)", "Blue Shark (Model Racing bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+		  GAME( 1978, blueshrkmr, blueshrk, blueshrk, blueshrk, driver_device, 0, ROT0,   "bootleg (Model Racing)", "Blue Shark (Model Racing bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 /* 749 4 Player Bowling Alley (cocktail, dump does not exist) */
 /* 851 */ GAMEL(1980, invad2ct,   0,        invad2ct, invad2ct, driver_device, 0, ROT90,  "Midway", "Space Invaders II (Midway, cocktail)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_invad2ct )
 /* 852 Space Invaders Deluxe (color hardware, not in this driver) */

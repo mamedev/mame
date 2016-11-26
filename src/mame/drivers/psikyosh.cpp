@@ -602,9 +602,9 @@ static INPUT_PORTS_START( soldividk )
 	PORT_INCLUDE( common )
 
 	PORT_START("JP4")   /* jumper pads on the PCB */
-//	PORT_DIPNAME( 0x01000000, 0x01000000, DEF_STR( Region ) ) /* Game is hard coded to Korea */
-//	PORT_DIPSETTING(          0x00000000, DEF_STR( Japan ) )
-//	PORT_DIPSETTING(          0x01000000, DEF_STR( World ) )
+//  PORT_DIPNAME( 0x01000000, 0x01000000, DEF_STR( Region ) ) /* Game is hard coded to Korea */
+//  PORT_DIPSETTING(          0x00000000, DEF_STR( Japan ) )
+//  PORT_DIPSETTING(          0x01000000, DEF_STR( World ) )
 	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 INPUT_PORTS_END
 

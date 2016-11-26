@@ -4575,7 +4575,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/quizo.cpp",
 	MAME_DIR .. "src/mame/drivers/quizpun2.cpp",
 	MAME_DIR .. "src/mame/audio/rax.cpp",
-	MAME_DIR .. "src/mame/audio/rax.h",	
+	MAME_DIR .. "src/mame/audio/rax.h",
 	MAME_DIR .. "src/mame/drivers/rbmk.cpp",
 	MAME_DIR .. "src/mame/drivers/rcorsair.cpp",
 	MAME_DIR .. "src/mame/drivers/re900.cpp",

@@ -4,9 +4,9 @@
 
     drivers/mac128.cpp
     Original-style Macintosh family emulation
- 
+
     The cutoff here is Macs with 128k-style video and audio and no ADB
- 
+
     Nate Woods, Raphael Nabet, R. Belmont
 
         0x000000 - 0x3fffff     RAM/ROM (switches based on overlay)
@@ -36,7 +36,7 @@
         SCC:
             PB_EXT (DCDB)  from mouse Y circuitry
             PA_EXT (DCDA)  from mouse X circuitry
-            
+
 SCC Init:
 
 Control B:
@@ -130,10 +130,10 @@ enum mac128model_t
 #define MAC_ALT_SND_BUF_OFFSET  (0x5F00>>1)
 
 #define LOG_KEYBOARD    0
-#define LOG_GENERAL		0
-#define LOG_MAC_IWM		0
-#define LOG_VIA			0
-#define LOG_MEMORY		0
+#define LOG_GENERAL     0
+#define LOG_MAC_IWM     0
+#define LOG_VIA         0
+#define LOG_MEMORY      0
 
 class mac128_state : public driver_device
 {
@@ -235,7 +235,7 @@ public:
 	DECLARE_WRITE16_MEMBER ( macplus_scsi_w );
 	DECLARE_WRITE_LINE_MEMBER(mac_scsi_irq);
 	DECLARE_WRITE_LINE_MEMBER(set_scc_interrupt);
-	
+
 	TIMER_DEVICE_CALLBACK_MEMBER(mac_scanline);
 	DECLARE_DRIVER_INIT(mac128k512k);
 	DECLARE_DRIVER_INIT(mac512ke);
@@ -348,7 +348,7 @@ void mac128_state::field_interrupts()
 		take_interrupt = 1;
 	}
 
-//	printf("field_interrupts: take %d\n", take_interrupt);
+//  printf("field_interrupts: take %d\n", take_interrupt);
 
 	if (m_last_taken_interrupt > -1)
 	{
@@ -365,7 +365,7 @@ void mac128_state::field_interrupts()
 
 WRITE_LINE_MEMBER(mac128_state::set_scc_interrupt)
 {
-//	printf("SCC IRQ: %d\n", state);
+//  printf("SCC IRQ: %d\n", state);
 	m_scc_interrupt = state;
 	field_interrupts();
 }
@@ -474,59 +474,59 @@ void mac128_state::scc_mouse_irq(int x, int y)
 
 	if (x && y)
 	{
-		if (m_last_was_x) 
+		if (m_last_was_x)
 		{
-			if(x == 2) 
+			if(x == 2)
 			{
-				if(lastx) 
+				if(lastx)
 				{
 					m_scc->dcda_w(CLEAR_LINE);
 					m_mouse_bit_x = 0;
-				} 
-				else 
+				}
+				else
 				{
 					m_scc->dcda_w(ASSERT_LINE);
 					m_mouse_bit_x = 1;
 				}
-			} 
-			else 
+			}
+			else
 			{
-				if(lastx) 
+				if(lastx)
 				{
 					m_scc->dcda_w(CLEAR_LINE);
 					m_mouse_bit_x = 1;
-				} 
-				else 
+				}
+				else
 				{
 					m_scc->dcda_w(ASSERT_LINE);
 					m_mouse_bit_x = 0;
 				}
 			}
 			lastx = !lastx;
-		} 
-		else 
+		}
+		else
 		{
-			if(y == 2) 
+			if(y == 2)
 			{
-				if(lasty) 
+				if(lasty)
 				{
 					m_scc->dcdb_w(CLEAR_LINE);
 					m_mouse_bit_y = 0;
-				} 
-				else 
+				}
+				else
 				{
 					m_scc->dcdb_w(ASSERT_LINE);
 					m_mouse_bit_y = 1;
 				}
-			} 
-			else 
+			}
+			else
 			{
-				if(lasty) 
+				if(lasty)
 				{
 					m_scc->dcdb_w(CLEAR_LINE);
 					m_mouse_bit_y = 1;
-				} 
-				else 
+				}
+				else
 				{
 					m_scc->dcdb_w(ASSERT_LINE);
 					m_mouse_bit_y = 0;
@@ -539,59 +539,59 @@ void mac128_state::scc_mouse_irq(int x, int y)
 	}
 	else
 	{
-		if (x) 
+		if (x)
 		{
-			if(x == 2) 
+			if(x == 2)
 			{
-				if(lastx) 
+				if(lastx)
 				{
 					m_scc->dcda_w(CLEAR_LINE);
 					m_mouse_bit_x = 0;
-				} 
-				else 
+				}
+				else
 				{
 					m_scc->dcda_w(ASSERT_LINE);
 					m_mouse_bit_x = 1;
 				}
-			} 
-			else 
+			}
+			else
 			{
-				if(lastx) 
+				if(lastx)
 				{
 					m_scc->dcda_w(CLEAR_LINE);
 					m_mouse_bit_x = 1;
-				} 
-				else 
+				}
+				else
 				{
 					m_scc->dcda_w(ASSERT_LINE);
 					m_mouse_bit_x = 0;
 				}
 			}
 			lastx = !lastx;
-		} 
-		else 
+		}
+		else
 		{
-			if(y == 2) 
+			if(y == 2)
 			{
-				if(lasty) 
+				if(lasty)
 				{
 					m_scc->dcdb_w(CLEAR_LINE);
 					m_mouse_bit_y = 0;
-				} 
-				else 
+				}
+				else
 				{
 					m_scc->dcdb_w(ASSERT_LINE);
 					m_mouse_bit_y = 1;
 				}
-			} 
-			else 
+			}
+			else
 			{
-				if(lasty) 
+				if(lasty)
 				{
 					m_scc->dcdb_w(CLEAR_LINE);
 					m_mouse_bit_y = 1;
-				} 
-				else 
+				}
+				else
 				{
 					m_scc->dcdb_w(ASSERT_LINE);
 					m_mouse_bit_y = 0;
@@ -740,7 +740,7 @@ WRITE8_MEMBER(mac128_state::mac_via_out_a)
 	/* Early Mac models had VIA A4 control overlaying.  In the Mac SE (and
 	 * possibly later models), overlay was set on reset, but cleared on the
 	 * first access to the ROM. */
-	
+
 	if (((data & 0x10) >> 4) != m_overlay)
 	{
 		m_overlay = (data & 0x10) >> 4;
@@ -1336,7 +1336,7 @@ static MACHINE_CONFIG_START( mac512ke, mac128_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("512K")
-	
+
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop35_list","mac_flop")
 	MCFG_SOFTWARE_LIST_ADD("hdd_list", "mac_hdd")
@@ -1554,7 +1554,7 @@ ROM_END
  * 04 <- 20 x1 clock, Sync Modes Enable, SDLC Mode (01111110 Flag)
  * 0a <- e0 CRC preset to '1's, FM0 encoding scheme
  * 06 <- 00 Receiver SDLC ADR0-ADR7 bits
- * 07 <- 7e Receiver SDLC Flag character (0x7e as expected) 
+ * 07 <- 7e Receiver SDLC Flag character (0x7e as expected)
  * 0c <- 06 Low baudrate divider
  * 0d <- 00 Hi baudrate divider
  * 0e <- c0 Set FM Mode Command
@@ -1562,10 +1562,10 @@ ROM_END
  * 02 <- 00 Interrupt vector
  * 0f <- 08 External/Status Control: DCD interrupts enabled
  * 01 <- 09 Enable External Interrupts + Rx Int On First Character or Special Condition
- * 09 <- 0a Master Interrupt Control: No vector and Interrupts enabled! 
+ * 09 <- 0a Master Interrupt Control: No vector and Interrupts enabled!
  * 0b <- 70 Rx Clock is DPLL Output, Tx Clock is BRG output + TTL Clock on RTxC
  * 0e <- 21 Enter Search Mode Command + BRG enable + RTxC as BRG clock
- * 05 <- 60 Tx 8 bit, Tx disable, SDLC CRC Polynomial selected, Tx CRC disabled 
+ * 05 <- 60 Tx 8 bit, Tx disable, SDLC CRC Polynomial selected, Tx CRC disabled
  * 06 <- 01 Receiver SDLC ADR0-ADR7 bits updated
  * 0f <- 88 External/Status Control: Abort/Break and DCD interrupts enabled
 */
@@ -1580,7 +1580,7 @@ ROM_START( macplus )
 	ROM_REGION16_BE(0x100000, "bootrom", 0)
 	ROM_SYSTEM_BIOS(0, "v3", "Loud Harmonicas")
 	ROMX_LOAD( "macplus.rom",  0x00000, 0x20000, CRC(b2102e8e) SHA1(7d2f808a045aa3a1b242764f0e2c7d13e288bf1f), ROM_GROUPWORD | ROM_BIOS(1) )
-	ROM_FILL(0x20000, 0x2, 0xff)	// ROM checks for same contents at 20000 and 40000 to determine if SCSI is present
+	ROM_FILL(0x20000, 0x2, 0xff)    // ROM checks for same contents at 20000 and 40000 to determine if SCSI is present
 	ROM_FILL(0x40000, 0x2, 0xaa)
 	ROM_SYSTEM_BIOS(1, "v2", "Lonely Heifers")
 	ROMX_LOAD( "23512-1007__342-0342-a.rom-lo.u7d", 0x000000, 0x010000, CRC(5aaa4a2f) SHA1(5dfbfbe279ddadfae691c95f552fd9db41e3ed90), ROM_SKIP(1) | ROM_BIOS(2) )
@@ -1594,8 +1594,8 @@ ROM_START( macplus )
 	ROM_SYSTEM_BIOS(3, "romdisk", "mac68k.info self-boot (1/1/2015)")
 	ROMX_LOAD( "modplus-harp2.bin", 0x000000, 0x028000, CRC(ba56078d) SHA1(debdf328ac73e1662d274a044d8750224f47edef), ROM_GROUPWORD | ROM_BIOS(4) )
 	ROM_SYSTEM_BIOS(4, "romdisk2", "bigmessofwires.com ROMinator (2/25/2015)")
-	ROMX_LOAD( "rominator-20150225-lo.bin", 0x000001, 0x080000, CRC(62cf2a0b) SHA1(f78ebb0919dd9e094bef7952b853b70e66d05e01), ROM_SKIP(1) | ROM_BIOS(5) ) 
-	ROMX_LOAD( "rominator-20150225-hi.bin", 0x000000, 0x080000, CRC(a28ba8ec) SHA1(9ddcf500727955c60db0ff24b5ca2458f53fd89a), ROM_SKIP(1) | ROM_BIOS(5) ) 
+	ROMX_LOAD( "rominator-20150225-lo.bin", 0x000001, 0x080000, CRC(62cf2a0b) SHA1(f78ebb0919dd9e094bef7952b853b70e66d05e01), ROM_SKIP(1) | ROM_BIOS(5) )
+	ROMX_LOAD( "rominator-20150225-hi.bin", 0x000000, 0x080000, CRC(a28ba8ec) SHA1(9ddcf500727955c60db0ff24b5ca2458f53fd89a), ROM_SKIP(1) | ROM_BIOS(5) )
 ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT     COMPANY          FULLNAME */

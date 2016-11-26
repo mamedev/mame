@@ -808,7 +808,7 @@ SCN2674_DRAW_CHARACTER_MEMBER(octopus_state::display_pixels)
 				bg = 0x7f7f7f;
 			else
 				bg = 0x000000;
-				
+
 			if(attr & 0x20)  // reverse video
 				data = ~data;
 		}
@@ -819,7 +819,7 @@ SCN2674_DRAW_CHARACTER_MEMBER(octopus_state::display_pixels)
 		if(cursor && !blink)
 		{
 			bool inverse = true;
-			
+
 			if(!(m_dswa->read() & 0x80))  // not available in monochrome mode
 				inverse = false;
 			if(m_vidctrl & 0x40)  // not enabled
@@ -954,7 +954,7 @@ static MACHINE_CONFIG_START( octopus, octopus_state )
 	MCFG_Z80DART_OUT_TXDB_CB(DEVWRITELINE("serial_b",rs232_port_device, write_txd))
 	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE("serial_a",rs232_port_device, write_rts))
 	MCFG_Z80DART_OUT_RTSB_CB(DEVWRITELINE("serial_b",rs232_port_device, write_rts))
-	
+
 	MCFG_RS232_PORT_ADD("serial_a", default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("serial",z80sio2_device, rxa_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("serial",z80sio2_device, ctsa_w)) MCFG_DEVCB_INVERT

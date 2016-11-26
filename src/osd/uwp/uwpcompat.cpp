@@ -16,7 +16,7 @@
 #include "emu.h"
 
 extern "C" {
-	
+
 	BOOL WINAPI GetVersionEx(
 		_Inout_ LPOSVERSIONINFO lpVersionInfo
 	)

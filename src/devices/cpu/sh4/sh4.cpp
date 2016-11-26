@@ -198,8 +198,8 @@ void sh4_base_device::LDTLB(const uint16_t opcode)
 
 	// these come from PTEH
 	m_utlb[replace].VPN =  (m_m[PTEH] & 0xfffffc00) >> 10;
-//	m_utlb[replace].D =    (m_m[PTEH] & 0x00000200) >> 9; // from PTEL
-//	m_utlb[replace].V =    (m_m[PTEH] & 0x00000100) >> 8; // from PTEL
+//  m_utlb[replace].D =    (m_m[PTEH] & 0x00000200) >> 9; // from PTEL
+//  m_utlb[replace].V =    (m_m[PTEH] & 0x00000100) >> 8; // from PTEL
 	m_utlb[replace].ASID = (m_m[PTEH] & 0x000000ff) >> 0;
 	// these come from PTEL
 	m_utlb[replace].PPN = (m_m[PTEL] & 0x1ffffc00) >> 10;
@@ -4070,7 +4070,7 @@ void sh34_base_device::execute_run()
 		debugger_instruction_hook(this, m_pc & AM);
 
 		uint16_t opcode;
-		
+
 		if (!m_sh4_mmu_enabled) opcode = m_direct->read_word(m_pc & AM, WORD2_XOR_LE(0));
 		else opcode = RW(m_pc); // should probably use a different function as this needs to go through the ITLB
 

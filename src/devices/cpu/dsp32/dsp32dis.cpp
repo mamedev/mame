@@ -313,13 +313,13 @@ static unsigned dasm_dsp32(std::ostream &stream, unsigned pc, uint32_t op)
 				util::stream_format(stream, "a%d = %s(%s)",
 						(op >> 21) & 3,                             // aN
 						functable[(op >> 23) & 15],                 // G
-						dasm_XYZ((op >> 7) & 0x7f));				// Y
+						dasm_XYZ((op >> 7) & 0x7f));                // Y
 			else
 				util::stream_format(stream, "%s = a%d = %s(%s)",
-						dasm_XYZ((op >> 0) & 0x7f),					// Z
+						dasm_XYZ((op >> 0) & 0x7f),                 // Z
 						(op >> 21) & 3,                             // aN
 						functable[(op >> 23) & 15],                 // G
-						dasm_XYZ((op >> 7) & 0x7f));			    // Y
+						dasm_XYZ((op >> 7) & 0x7f));                // Y
 			break;
 
 		/* CA formats 0/1 */

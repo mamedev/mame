@@ -201,11 +201,11 @@
 #define VERBOSE 0
 
 #define LOGPRINT(x)  { do { if (VERBOSE) logerror x; } while (0); }
-#define LOG(x) 		{} LOGPRINT(x)
-#define LOGINIT(x)	{} LOGPRINT(x)
-#define LOGR(x)		{}
-#define LOGSETUP(x)	{}
-#define LOGINT(x)	{}
+#define LOG(x)      {} LOGPRINT(x)
+#define LOGINIT(x)  {} LOGPRINT(x)
+#define LOGR(x)     {}
+#define LOGSETUP(x) {}
+#define LOGINT(x)   {}
 #if VERBOSE >= 2
 #define logerror printf
 #endif
@@ -306,16 +306,16 @@ static ADDRESS_MAP_START (cpu30_mem, AS_PROGRAM, 32, cpu30_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE (0x00000000, 0x00000007) AM_ROM AM_READ  (bootvect_r)   /* ROM mirror just during reset */
 	AM_RANGE (0x00000000, 0x00000007) AM_RAM AM_WRITE (bootvect_w)   /* After first write we act as RAM */
-//	AM_RANGE (0x00000008, 0x003fffff) AM_RAM /* RAM  installed in machine start */
+//  AM_RANGE (0x00000008, 0x003fffff) AM_RAM /* RAM  installed in machine start */
 	AM_RANGE (0xff000000, 0xff7fffff) AM_ROM AM_REGION("roms", 0x000000)
 	AM_RANGE (0xff800c00, 0xff800dff) AM_DEVREADWRITE8("pit1", pit68230_device, read, write, 0xffffffff)
 	AM_RANGE (0xff800e00, 0xff800fff) AM_DEVREADWRITE8("pit2", pit68230_device, read, write, 0xffffffff)
 	AM_RANGE (0xff802000, 0xff8021ff) AM_DEVREADWRITE8("duscc", duscc68562_device, read, write, 0xffffffff) /* Port 1&2 - Dual serial port DUSCC   */
 	AM_RANGE (0xff802200, 0xff8023ff) AM_DEVREADWRITE8("duscc2", duscc68562_device, read, write, 0xffffffff) /* Port 3&4 - Dual serial port DUSCC   */
 	AM_RANGE (0xff803000, 0xff8031ff) AM_DEVREADWRITE8("rtc", rtc72423_device, read, write, 0xffffffff)
-//	AM_RANGE (0xff803400, 0xff8035ff) AM_DEVREADWRITE8("scsi", mb87033_device, read, write, 0xffffffff) /* TODO: implement MB87344 SCSI device */
+//  AM_RANGE (0xff803400, 0xff8035ff) AM_DEVREADWRITE8("scsi", mb87033_device, read, write, 0xffffffff) /* TODO: implement MB87344 SCSI device */
 	AM_RANGE (0xff803400, 0xff8035ff) AM_READWRITE8(scsi_r, scsi_w, 0x000000ff) /* mock driver to log calls to device */
-//	AM_RANGE (0xff803800, 0xff80397f) AM_DEVREADWRITE8("fdc", wd37c65c_device, read, write, 0xffffffff) /* TODO: implement WD3/C65C fdc controller */
+//  AM_RANGE (0xff803800, 0xff80397f) AM_DEVREADWRITE8("fdc", wd37c65c_device, read, write, 0xffffffff) /* TODO: implement WD3/C65C fdc controller */
 	AM_RANGE (0xff803800, 0xff80397f) AM_READWRITE8(fdc_r, fdc_w, 0x000000ff) /* mock driver to log calls to device */
 	AM_RANGE (0xff803980, 0xff8039ff) AM_READ8(slot1_status_r, 0x000000ff)
 	AM_RANGE (0xffc00000, 0xffcfffff) AM_RAM AM_SHARE ("nvram") /* On-board SRAM with battery backup (nvram) */
@@ -354,7 +354,7 @@ void cpu30_state::machine_reset ()
 		m_sysrom = (uint32_t*)(memregion ("roms")->base () + 0x800000);
 }
 
-/* 																				setup board ID */
+/*                                                                              setup board ID */
 DRIVER_INIT_MEMBER( cpu30_state, cpu30x )      { LOGINIT(("%s\n", FUNCNAME)); m_board_id = 0x50; }
 DRIVER_INIT_MEMBER( cpu30_state, cpu30xa )     { LOGINIT(("%s\n", FUNCNAME)); m_board_id = 0x50; }
 DRIVER_INIT_MEMBER( cpu30_state, cpu30za )     { LOGINIT(("%s\n", FUNCNAME)); m_board_id = 0x50; }
@@ -363,7 +363,7 @@ DRIVER_INIT_MEMBER( cpu30_state, cpu30be8 )    { LOGINIT(("%s\n", FUNCNAME)); m_
 DRIVER_INIT_MEMBER( cpu30_state, cpu30be16 )   { LOGINIT(("%s\n", FUNCNAME)); m_board_id = 0x50; }
 DRIVER_INIT_MEMBER( cpu30_state, cpu30lite4 )  { LOGINIT(("%s\n", FUNCNAME)); m_board_id = 0x50; }
 DRIVER_INIT_MEMBER( cpu30_state, cpu30lite8 )  { LOGINIT(("%s\n", FUNCNAME)); m_board_id = 0x50; }
-DRIVER_INIT_MEMBER( cpu30_state, cpu33 )  	   { LOGINIT(("%s\n", FUNCNAME)); m_board_id = 0x68; } // 0x60 skips FGA prompt
+DRIVER_INIT_MEMBER( cpu30_state, cpu33 )       { LOGINIT(("%s\n", FUNCNAME)); m_board_id = 0x68; } // 0x60 skips FGA prompt
 
 /* Mock FDC driver */
 READ8_MEMBER (cpu30_state::fdc_r){
@@ -524,13 +524,13 @@ READ8_MEMBER (cpu30_state::board_mem_id_rd)
 	{
 	case (1024 * 1024 * 32): sz = 0; break;
 	case (1024 * 1024 * 16): sz = 1; break;
-	case (1024 * 1024 * 8):	 sz = 2; break;
-	case (1024 * 1024 * 4):	 sz = 3; break;
-	case (1024 * 1024 * 2):	 sz = 4; break;
-	case (1024 * 1024 * 1):	 sz = 5; break;
-	case (1024 * 512  * 1):	 sz = 6; break;
-	case (1024 * 256  * 1):	 sz = 7; break;
-    default:
+	case (1024 * 1024 * 8):  sz = 2; break;
+	case (1024 * 1024 * 4):  sz = 3; break;
+	case (1024 * 1024 * 2):  sz = 4; break;
+	case (1024 * 1024 * 1):  sz = 5; break;
+	case (1024 * 512  * 1):  sz = 6; break;
+	case (1024 * 256  * 1):  sz = 7; break;
+	default:
 		logerror("No supported RAM size, telling VMEPROM 4Mb\n");
 		sz = 4;
 	}
@@ -550,13 +550,13 @@ READ8_MEMBER (cpu30_state::board_mem_id_rd)
 	// return 0x56;// CPU-30, 1Mb, 36MHz
 	// return 0x53;// CPU-30, 4Mb, 36MHz
 	// return 0x57;// CPU-30, 4Mb, 36MHz
-	//	return 0x48 + sz;// none
-	//	return 0x38 + sz;// none
-	//	return 0x28 + sz;// none
-	//	return 0x18 + sz;// CPU-23 p1
-	//	return 0x10 + sz;// CPU-22 p4
-	//	return 0x20 + sz;// p1: Wait until hard disk is up to speed
-	//	printf("SIZE:%02x\n", sz);
+	//  return 0x48 + sz;// none
+	//  return 0x38 + sz;// none
+	//  return 0x28 + sz;// none
+	//  return 0x18 + sz;// CPU-23 p1
+	//  return 0x10 + sz;// CPU-22 p4
+	//  return 0x20 + sz;// p1: Wait until hard disk is up to speed
+	//  printf("SIZE:%02x\n", sz);
 	LOG(("- Board ID:%02x Size:%02x\n", m_board_id, sz));
 	return m_board_id + sz;
 }
@@ -730,7 +730,7 @@ static MACHINE_CONFIG_DERIVED( cpu30x, cpu30 )
 	MCFG_DEVICE_MODIFY("maincpu")
 	MCFG_DEVICE_CLOCK(XTAL_16_777216MHz) /* 16.7 MHz  from description, crystal needs verification */
 
-//	MCFG_DEVICE_REMOVE("")
+//  MCFG_DEVICE_REMOVE("")
 
 	// dual ported ram
 	MCFG_RAM_MODIFY(RAM_TAG)
@@ -796,10 +796,10 @@ MACHINE_CONFIG_END
 /* SYS68K/CPU-30Lite/4 68030 CPU, 25 MHz, 4 Mbyte shared DRAM, 4 Mbyte Flash, 4 serial ports, 32-bit VMEbus interface, VMEPROM firmware. */
 static MACHINE_CONFIG_DERIVED( cpu30lite4, cpu30zbe )
 // Enable these when added to main config
-//	MCFG_DEVICE_REMOVE("fpu")
-//	MCFG_DEVICE_REMOVE("scsi")
-//	MCFG_DEVICE_REMOVE("eth")
-//	MCFG_DEVICE_REMOVE("fdc")
+//  MCFG_DEVICE_REMOVE("fpu")
+//  MCFG_DEVICE_REMOVE("scsi")
+//  MCFG_DEVICE_REMOVE("eth")
+//  MCFG_DEVICE_REMOVE("fdc")
 	// dual ported ram
 	MCFG_RAM_MODIFY(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("4M")
@@ -842,12 +842,12 @@ ROM_START (nodump)
 ROM_END
 
 /* These needs reality check as they has 1Mb of RAM which is not a suitable size for later CPU_30:s */
-#define rom_fccpu30x		rom_fccpu30
-#define rom_fccpu30xa 		rom_fccpu30
-#define rom_fccpu30za 		rom_fccpu30
+#define rom_fccpu30x        rom_fccpu30
+#define rom_fccpu30xa       rom_fccpu30
+#define rom_fccpu30za       rom_fccpu30
 
-#define rom_fccpu30zbe 		rom_fccpu30
-#define rom_fccpu30be8 		rom_fccpu30
+#define rom_fccpu30zbe      rom_fccpu30
+#define rom_fccpu30be8      rom_fccpu30
 #define rom_fccpu30be16     rom_fccpu30
 
 /* These needs dumps */
@@ -855,7 +855,7 @@ ROM_END
 #define rom_fccpu30lite8    rom_nodump
 
 /* These are most likelly wrong, needs dump */
-#define rom_fccpu30senr 	rom_nodump
+#define rom_fccpu30senr     rom_nodump
 #define rom_fccpu30senr501  rom_nodump
 
 /*

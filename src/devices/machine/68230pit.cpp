@@ -28,8 +28,8 @@
 #define VERBOSE 0
 
 #define LOGPRINT(x) { do { if (VERBOSE) logerror x; } while (0); }
-#define LOG(x)   	{} LOGPRINT(x)
-#define LOGR(x)		{} LOGPRINT(x)
+#define LOG(x)      {} LOGPRINT(x)
+#define LOGR(x)     {} LOGPRINT(x)
 #define LOGINT(x)   {} LOGPRINT(x)
 #define LOGSETUP(x) {} LOGPRINT(x)
 #if VERBOSE > 1
@@ -237,8 +237,8 @@ void pit68230_device::wr_pitreg_pgcr(uint8_t data)
 	LOG(("%s(%02x) \"%s\": %s - %02x\n", FUNCNAME, data, tag(), FUNCNAME, data));
 	LOGSETUP(("PGCR  - Mode %d,", (data >> 6) & 3 ));
 	LOGSETUP((" H34:%s, H12:%s,", (data & 0x20) ? "enabled" : "disabled", (data & 0x10) ? "enabled" : "disabled" ));
-	LOGSETUP((" Sense assert H4:%s, H3:%s, H2:%s, H1:%s\n", 
-			  data & 0x04 ? "Hi" : "Lo", data & 0x03 ? "Hi" : "Lo", 
+	LOGSETUP((" Sense assert H4:%s, H3:%s, H2:%s, H1:%s\n",
+			  data & 0x04 ? "Hi" : "Lo", data & 0x03 ? "Hi" : "Lo",
 			  data & 0x02 ? "Hi" : "Lo", data & 0x01 ? "Hi" : "Lo"));
 	m_pgcr = data;
 }

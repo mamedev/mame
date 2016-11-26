@@ -20,10 +20,10 @@
 @implementation MAMEDisassemblyViewer
 
 - (id)initWithMachine:(running_machine &)m console:(MAMEDebugConsole *)c {
-	NSScrollView	*dasmScroll;
-	NSView			*expressionContainer;
-	NSPopUpButton	*actionButton;
-	NSRect			expressionFrame;
+	NSScrollView    *dasmScroll;
+	NSView          *expressionContainer;
+	NSPopUpButton   *actionButton;
+	NSRect          expressionFrame;
 
 	if (!(self = [super initWithMachine:m title:@"Disassembly" console:c]))
 		return nil;
@@ -204,8 +204,8 @@
 		{
 			device.debug()->breakpoint_enable(bp->index(), !bp->enabled());
 			machine->debugger().console().printf("Breakpoint %X %s\n",
-								                 (uint32_t)bp->index(),
-								                 bp->enabled() ? "enabled" : "disabled");
+												 (uint32_t)bp->index(),
+												 bp->enabled() ? "enabled" : "disabled");
 			machine->debug_view().update_all();
 			machine->debugger().refresh_display();
 		}

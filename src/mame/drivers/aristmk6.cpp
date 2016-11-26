@@ -46,7 +46,7 @@ public:
 
 	u8 irl0pend, irl0en;
 	u8 irl1pend, irl1en;
-	u8 irl2pend, irl2en;	// UARTs ?
+	u8 irl2pend, irl2en;    // UARTs ?
 	u8 irl3pend0, irl3en0;
 	u8 irl3pend1, irl3en1;
 	void testIrq();
@@ -168,7 +168,7 @@ uint32_t aristmk6_state::screen_update_aristmk6(screen_device &screen, bitmap_rg
 
 			uint32_t pix1;
 			int col;
-			
+
 			pix1 = pix & 0xffffffff;
 			col = 0;
 			if (pix1) col = 1;

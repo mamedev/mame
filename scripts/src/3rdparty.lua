@@ -587,7 +587,7 @@ end
 		forcedincludes {
 			MAME_DIR .. "src/osd/uwp/uwpcompat.h"
 		}
-	
+
 	configuration {}
 
 	files {
@@ -1521,12 +1521,12 @@ end
 			"-Wno-discarded-qualifiers",
 			"-Wno-unused-but-set-variable",
 		}
-	
+
 	configuration { "mingw-clang"}
 		buildoptions_c {
 			"-Wno-incompatible-pointer-types-discards-qualifiers"
 		}
-		
+
 	configuration { "osx*"}
 		buildoptions {
 			"-Wno-undef",

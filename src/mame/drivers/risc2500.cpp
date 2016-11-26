@@ -2,11 +2,11 @@
 // copyright-holders:Sandro Ronco
 /******************************************************************************
 
-	Saitek RISC 2500
+    Saitek RISC 2500
 
-	TODO:
-	 - Sound is too short and high pitch, better when you underclock the cpu.
-	   Is cpu cycle timing wrong? or waitstate on p1000_w?
+    TODO:
+     - Sound is too short and high pitch, better when you underclock the cpu.
+       Is cpu cycle timing wrong? or waitstate on p1000_w?
 
 ******************************************************************************/
 
@@ -227,7 +227,7 @@ WRITE32_MEMBER(risc2500_state::p1000_w)
 	{
 		if (!(data & 0x08000000))
 			m_vram[m_vram_addr++ & 0x7f] = data & 0xff;
-	}	
+	}
 	else if (data & 0x80000000)                     // Vertical LED
 	{
 		for(int i=0; i<8; i++)
@@ -242,9 +242,9 @@ WRITE32_MEMBER(risc2500_state::p1000_w)
 	{
 		memset(m_vram, 0, sizeof(m_vram));
 	}
-	
+
 	m_dac->write(data >> 28 & 3);                   // Speaker
-	
+
 	m_p1000 = data;
 }
 

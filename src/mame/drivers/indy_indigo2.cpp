@@ -63,14 +63,14 @@
 #define PI1_TAG     "pi1"
 #define KBDC_TAG    "kbdc"
 #define PIT_TAG     "pit"
-#define RS232A_TAG	"rs232a"
-#define RS232B_TAG	"rs232b"
+#define RS232A_TAG  "rs232a"
+#define RS232B_TAG  "rs232b"
 
-#define SCC_PCLK	XTAL_10MHz
-#define SCC_RXA_CLK	XTAL_3_6864MHz // Needs verification
-#define SCC_TXA_CLK	0
-#define SCC_RXB_CLK	XTAL_3_6864MHz // Needs verification
-#define SCC_TXB_CLK	0
+#define SCC_PCLK    XTAL_10MHz
+#define SCC_RXA_CLK XTAL_3_6864MHz // Needs verification
+#define SCC_TXA_CLK 0
+#define SCC_RXB_CLK XTAL_3_6864MHz // Needs verification
+#define SCC_TXB_CLK 0
 
 #define MCFG_IOC2_GUINNESS_ADD(_tag)  \
 	MCFG_DEVICE_ADD(_tag, SGI_IOC2_GUINNESS, 0)
@@ -103,7 +103,7 @@ protected:
 
 	required_device<mips3_device> m_maincpu;
 	required_device<scc85230_device> m_scc;
-	required_device<pc_lpt_device> m_pi1; 	// we assume standard parallel port (SPP) mode
+	required_device<pc_lpt_device> m_pi1;   // we assume standard parallel port (SPP) mode
 											// TODO: SGI parallel port (SGIPP), HP BOISE high speed parallel port (HPBPP), and Ricoh scanner modes
 	required_device<kbdc8042_device> m_kbdc;
 	required_device<pit8254_device> m_pit;

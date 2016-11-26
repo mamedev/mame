@@ -53,21 +53,21 @@
 #ifndef _NANOPROCESSOR_H_
 #define _NANOPROCESSOR_H_
 
-#define HP_NANO_REGS	16	// Number of GP registers
-#define HP_NANO_PC_MASK	0x7ff	// Mask of PC meaningful bits: 11 bits available
-#define HP_NANO_DC_NO	8	// Number of direct control lines (DC7 is typically used as interrupt mask)
-#define HP_NANO_IE_DC	7	// DC line used as interrupt enable/mask (DC7)
+#define HP_NANO_REGS    16  // Number of GP registers
+#define HP_NANO_PC_MASK 0x7ff   // Mask of PC meaningful bits: 11 bits available
+#define HP_NANO_DC_NO   8   // Number of direct control lines (DC7 is typically used as interrupt mask)
+#define HP_NANO_IE_DC   7   // DC line used as interrupt enable/mask (DC7)
 
 // DC changed callback
 // The callback receives a 8-bit word holding the state of all DC lines.
 // DC0 is in bit 0, DC1 in bit 1 and so on.
 // Keep in mind that DC7 usually masks the interrupt signal.
-#define MCFG_HP_NANO_DC_CHANGED(_devcb)									\
+#define MCFG_HP_NANO_DC_CHANGED(_devcb)                                 \
 	hp_nanoprocessor_device::set_dc_changed_func(*device , DEVCB_##_devcb);
 
 // Callback to read the input state of DC lines
 // All lines that are not in input are to be reported at "1"
-#define MCFG_HP_NANO_READ_DC_CB(_devcb)									\
+#define MCFG_HP_NANO_READ_DC_CB(_devcb)                                 \
 	hp_nanoprocessor_device::set_read_dc_func(*device , DEVCB_##_devcb);
 
 class hp_nanoprocessor_device : public cpu_device
@@ -110,12 +110,12 @@ private:
 	int m_icount;
 
 	// State of processor
-	uint8_t  m_reg_A;	// Accumulator
-	uint8_t  m_reg_R[ HP_NANO_REGS ];	// General purpose registers
-	uint16_t m_reg_PA;	// Program counter ("Program Address" in HP doc)
-	uint16_t m_reg_SSR;	// Subroutine stack register
-	uint16_t m_reg_ISR;	// Interrupt stack register
-	uint16_t m_flags;	// Flags: extend flag (E) & direct control lines (DC0-7)
+	uint8_t  m_reg_A;   // Accumulator
+	uint8_t  m_reg_R[ HP_NANO_REGS ];   // General purpose registers
+	uint16_t m_reg_PA;  // Program counter ("Program Address" in HP doc)
+	uint16_t m_reg_SSR; // Subroutine stack register
+	uint16_t m_reg_ISR; // Interrupt stack register
+	uint16_t m_flags;   // Flags: extend flag (E) & direct control lines (DC0-7)
 
 	address_space_config m_program_config;
 	address_space_config m_io_config;
