@@ -77,7 +77,7 @@ PALETTE_INIT_MEMBER(zodiack_state,zodiack)
 	}
 
 	/* white for bullets */
-	palette.set_indirect_color(0x30, rgb_t::white);
+	palette.set_indirect_color(0x30, rgb_t::white());
 
 	for (i = 0; i < 0x20; i++)
 		palette.set_pen_indirect(i, (i & 3) ? i : 0);

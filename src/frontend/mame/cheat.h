@@ -16,6 +16,7 @@
 #include "debug/express.h"
 #include "debug/debugcpu.h"
 #include "ui/text.h"
+#include "xmlfile.h"
 
 
 //**************************************************************************
@@ -49,7 +50,7 @@ class number_and_format
 {
 public:
 	// construction/destruction
-	number_and_format(uint64_t value = 0, int format = 0)
+	number_and_format(uint64_t value = 0, xml_data_node::int_format format = xml_data_node::int_format::DECIMAL)
 		: m_value(value)
 		, m_format(format)
 	{
@@ -64,8 +65,8 @@ public:
 
 private:
 	// internal state
-	uint64_t          m_value;
-	int             m_format;
+	uint64_t                    m_value;
+	xml_data_node::int_format   m_format;
 };
 
 
@@ -76,7 +77,7 @@ class cheat_parameter
 {
 public:
 	// construction/destruction
-	cheat_parameter(cheat_manager &manager, symbol_table &symbols, const char *filename, xml_data_node &paramnode);
+	cheat_parameter(cheat_manager &manager, symbol_table &symbols, const char *filename, xml_data_node const &paramnode);
 
 	// queries
 	const char *text();
@@ -98,9 +99,10 @@ private:
 	{
 	public:
 		// construction/destruction
-		item(const char *text, uint64_t value, int valformat)
-			: m_text(text),
-				m_value(value, valformat) { }
+		item(const char *text, uint64_t value, xml_data_node::int_format valformat)
+			: m_text(text)
+			, m_value(value, valformat)
+		{ }
 
 		// getters
 		const number_and_format &value() const { return m_value; }
@@ -129,7 +131,7 @@ class cheat_script
 {
 public:
 	// construction/destruction
-	cheat_script(cheat_manager &manager, symbol_table &symbols, const char *filename, xml_data_node &scriptnode);
+	cheat_script(cheat_manager &manager, symbol_table &symbols, const char *filename, xml_data_node const &scriptnode);
 
 	// getters
 	script_state state() const { return m_state; }
@@ -144,7 +146,7 @@ private:
 	{
 	public:
 		// construction/destruction
-		script_entry(cheat_manager &manager, symbol_table &symbols, const char *filename, xml_data_node &entrynode, bool isaction);
+		script_entry(cheat_manager &manager, symbol_table &symbols, const char *filename, xml_data_node const &entrynode, bool isaction);
 
 		// actions
 		void execute(cheat_manager &manager, uint64_t &argindex);
@@ -156,7 +158,7 @@ private:
 		{
 		public:
 			// construction/destruction
-			output_argument(cheat_manager &manager, symbol_table &symbols, const char *filename, xml_data_node &argnode);
+			output_argument(cheat_manager &manager, symbol_table &symbols, const char *filename, xml_data_node const &argnode);
 
 			// getters
 			int count() const { return m_count; }
@@ -199,7 +201,7 @@ class cheat_entry
 {
 public:
 	// construction/destruction
-	cheat_entry(cheat_manager &manager, symbol_table &globaltable, const char *filename, xml_data_node &cheatnode);
+	cheat_entry(cheat_manager &manager, symbol_table &globaltable, const char *filename, xml_data_node const &cheatnode);
 	~cheat_entry();
 
 	// getters

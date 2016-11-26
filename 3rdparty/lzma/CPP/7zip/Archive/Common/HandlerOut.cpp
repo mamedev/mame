@@ -81,7 +81,7 @@ HRESULT CMultiMethodProps::SetProperty(const wchar_t *nameSpec, const PROPVARIAN
   }
   
   UInt32 number;
-  int index = ParseStringToUInt32(name, number);
+  unsigned index = ParseStringToUInt32(name, number);
   UString realName = name.Ptr(index);
   if (index == 0)
   {

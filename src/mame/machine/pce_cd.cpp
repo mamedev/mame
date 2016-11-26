@@ -1009,14 +1009,14 @@ TIMER_CALLBACK_MEMBER(pce_cd_device::cdda_fadeout_callback)
 	if (m_cdda_volume <= 0)
 	{
 		m_cdda_volume = 0.0;
-		m_cdda->set_volume(0.0);
 		m_cdda_fadeout_timer->adjust(attotime::never);
 	}
 	else
 	{
-		m_cdda->set_volume(m_cdda_volume);
 		m_cdda_fadeout_timer->adjust(attotime::from_usec(param), param);
 	}
+
+	m_cdda->set_output_gain(ALL_OUTPUTS, m_cdda_volume / 100.0);
 }
 
 TIMER_CALLBACK_MEMBER(pce_cd_device::cdda_fadein_callback)
@@ -1026,14 +1026,14 @@ TIMER_CALLBACK_MEMBER(pce_cd_device::cdda_fadein_callback)
 	if (m_cdda_volume >= 100.0)
 	{
 		m_cdda_volume = 100.0;
-		m_cdda->set_volume(100.0);
 		m_cdda_fadein_timer->adjust(attotime::never);
 	}
 	else
 	{
-		m_cdda->set_volume(m_cdda_volume);
 		m_cdda_fadein_timer->adjust(attotime::from_usec(param), param);
 	}
+
+	m_cdda->set_output_gain(ALL_OUTPUTS, m_cdda_volume / 100.0);
 }
 
 TIMER_CALLBACK_MEMBER(pce_cd_device::adpcm_fadeout_callback)
@@ -1043,14 +1043,14 @@ TIMER_CALLBACK_MEMBER(pce_cd_device::adpcm_fadeout_callback)
 	if (m_adpcm_volume <= 0)
 	{
 		m_adpcm_volume = 0.0;
-		m_msm->set_volume(0.0);
 		m_adpcm_fadeout_timer->adjust(attotime::never);
 	}
 	else
 	{
-		m_msm->set_volume(m_adpcm_volume);
 		m_adpcm_fadeout_timer->adjust(attotime::from_usec(param), param);
 	}
+
+	m_msm->set_output_gain(ALL_OUTPUTS, m_adpcm_volume / 100.0);
 }
 
 TIMER_CALLBACK_MEMBER(pce_cd_device::adpcm_fadein_callback)
@@ -1060,14 +1060,14 @@ TIMER_CALLBACK_MEMBER(pce_cd_device::adpcm_fadein_callback)
 	if (m_adpcm_volume >= 100.0)
 	{
 		m_adpcm_volume = 100.0;
-		m_msm->set_volume(100.0);
 		m_adpcm_fadein_timer->adjust(attotime::never);
 	}
 	else
 	{
-		m_msm->set_volume(m_adpcm_volume);
 		m_adpcm_fadein_timer->adjust(attotime::from_usec(param), param);
 	}
+
+	m_msm->set_output_gain(ALL_OUTPUTS, m_adpcm_volume / 100.0);
 }
 
 

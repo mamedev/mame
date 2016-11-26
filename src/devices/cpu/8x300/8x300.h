@@ -50,6 +50,9 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
+	// device_state_interface overrides
+	virtual void state_import(const device_state_entry &entry) override;
+
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const override { return 1; }
 	virtual uint32_t execute_max_cycles() const override { return 1; }
@@ -70,12 +73,13 @@ protected:
 	// device_disasm_interface overrides
 	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; }
 	virtual uint32_t disasm_max_opcode_bytes() const override { return 2; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options) override;
 
 	address_space_config m_program_config;
 	address_space_config m_io_config;
 
 	int m_icount;
+	bool m_increment_pc;
 
 	address_space *m_program;
 	direct_read_data *m_direct;

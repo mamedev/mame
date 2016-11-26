@@ -139,7 +139,7 @@ protected:
 		} sprite[10];
 		uint8_t sprite_delay_cycles;
 		// other internal data
-		bool starting;       // Inital fetches when (re)starting the rendering engine.
+		bool starting;       // Initial fetches when (re)starting the rendering engine.
 		uint8_t sequence_counter;
 		bool drawing;
 		bool start_drawing;

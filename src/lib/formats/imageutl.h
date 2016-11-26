@@ -172,7 +172,7 @@ int compute_log2(int val);
  * Extension list handling
  * ----------------------------------------------------------------------- */
 
-int image_find_extension(const char *extensions, const char *ext);
+bool image_find_extension(const char *extensions, const char *ext);
 void image_specify_extension(char *buffer, size_t buffer_len, const char *extension);
 
 #endif /* __IMAGEUTL_H__ */

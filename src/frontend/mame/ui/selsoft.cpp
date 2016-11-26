@@ -242,14 +242,14 @@ void menu_select_software::handle()
 			// handle UI_DOWN_FILTER
 			highlight++;
 		}
-		else if (menu_event->iptkey == IPT_UI_DATS && mame_machine_manager::instance()->lua()->call_plugin("", "data_list"))
+		else if (menu_event->iptkey == IPT_UI_DATS)
 		{
 			// handle UI_DATS
 			ui_software_info *ui_swinfo = (ui_software_info *)menu_event->itemref;
 
-			if (ui_swinfo->startempty == 1 && mame_machine_manager::instance()->lua()->call_plugin(ui_swinfo->driver->name, "data_list"))
+			if (ui_swinfo->startempty == 1 && mame_machine_manager::instance()->lua()->call_plugin_check<const char *>("data_list", ui_swinfo->driver->name, true))
 				menu::stack_push<menu_dats_view>(ui(), container(), ui_swinfo->driver);
-			else if (mame_machine_manager::instance()->lua()->call_plugin(std::string(ui_swinfo->shortname).append(1, ',').append(ui_swinfo->listname).c_str(), "data_list") || !ui_swinfo->usage.empty())
+			else if (mame_machine_manager::instance()->lua()->call_plugin_check<const char *>("data_list", std::string(ui_swinfo->shortname).append(1, ',').append(ui_swinfo->listname).c_str()) || !ui_swinfo->usage.empty())
 				menu::stack_push<menu_dats_view>(ui(), container(), ui_swinfo);
 		}
 		else if (menu_event->iptkey == IPT_UI_LEFT_PANEL)
@@ -417,7 +417,7 @@ void menu_select_software::handle()
 //  populate
 //-------------------------------------------------
 
-void menu_select_software::populate()
+void menu_select_software::populate(float &customtop, float &custombottom)
 {
 	uint32_t flags_ui = FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW;
 	m_has_empty_start = true;
@@ -1139,7 +1139,7 @@ float menu_select_software::draw_left_panel(float x1, float y1, float x2, float 
 			rgb_t bgcolor = UI_TEXT_BG_COLOR;
 			rgb_t fgcolor = UI_TEXT_COLOR;
 
-			if (mouse_hit && x1 <= mouse_x && x2 > mouse_x && y1 <= mouse_y && y1 + line_height > mouse_y)
+			if (mouse_in_rect(x1, y1, x2, y1 + line_height))
 			{
 				bgcolor = UI_MOUSEOVER_BG_COLOR;
 				fgcolor = UI_MOUSEOVER_COLOR;
@@ -1155,7 +1155,7 @@ float menu_select_software::draw_left_panel(float x1, float y1, float x2, float 
 			if (bgcolor != UI_TEXT_BG_COLOR)
 			{
 				ui().draw_textured_box(container(), x1, y1, x2, y1 + line_height, bgcolor, rgb_t(255, 43, 43, 43),
-						hilight_main_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
+						hilight_main_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(1));
 			}
 
 			float x1t = x1 + text_sign;
@@ -1209,7 +1209,7 @@ float menu_select_software::draw_left_panel(float x1, float y1, float x2, float 
 
 		ui().draw_outlined_box(container(), x1, y1, x2, y2, rgb_t(0xEF, 0x12, 0x47, 0x7B));
 
-		if (mouse_hit && x1 <= mouse_x && x2 > mouse_x && y1 <= mouse_y && y2 > mouse_y)
+		if (mouse_in_rect(x1, y1, x2, y2))
 		{
 			fgcolor = UI_MOUSEOVER_COLOR;
 			hover = HOVER_LPANEL_ARROW;
@@ -1232,7 +1232,7 @@ float menu_select_software::draw_left_panel(float x1, float y1, float x2, float 
 
 		ui().draw_outlined_box(container(), x1, y1, x2, y2, rgb_t(0xEF, 0x12, 0x47, 0x7B));
 
-		if (mouse_hit && x1 <= mouse_x && x2 > mouse_x && y1 <= mouse_y && y2 > mouse_y)
+		if (mouse_in_rect(x1, y1, x2, y2))
 		{
 			fgcolor = UI_MOUSEOVER_COLOR;
 			hover = HOVER_LPANEL_ARROW;
@@ -1265,7 +1265,7 @@ software_parts::~software_parts()
 //  populate
 //-------------------------------------------------
 
-void software_parts::populate()
+void software_parts::populate(float &customtop, float &custombottom)
 {
 	for (auto & elem : m_parts)
 		item_append(elem.first, elem.second, 0, (void *)&elem);
@@ -1316,7 +1316,7 @@ void software_parts::custom_render(void *selectedref, float top, float bottom, f
 {
 	float width;
 	ui().draw_text_full(container(), _("Software part selection:"), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
-									mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
+									mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
 	float maxwidth = std::max(origx2 - origx1, width);
 
@@ -1363,7 +1363,7 @@ bios_selection::~bios_selection()
 //  populate
 //-------------------------------------------------
 
-void bios_selection::populate()
+void bios_selection::populate(float &customtop, float &custombottom)
 {
 	for (auto & elem : m_bios)
 		item_append(elem.first, "", 0, (void *)&elem.first);
@@ -1457,7 +1457,7 @@ void bios_selection::custom_render(void *selectedref, float top, float bottom, f
 {
 	float width;
 	ui().draw_text_full(container(), _("Bios selection:"), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
-									mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
+									mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
 	float maxwidth = std::max(origx2 - origx1, width);
 

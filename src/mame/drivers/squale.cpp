@@ -489,7 +489,7 @@ READ8_MEMBER( squale_state::pia_u72_porta_r )
 	#endif
 
 	if( m_cart_rom && m_cart_rom->bytes() )
-		data = m_cart_rom->u8( cart_addr_counter % m_cart_rom->bytes() );
+		data = m_cart_rom->as_u8( cart_addr_counter % m_cart_rom->bytes() );
 	else
 		data = 0xFF;
 

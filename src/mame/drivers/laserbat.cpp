@@ -460,7 +460,7 @@ void laserbat_state_base::device_timer(emu_timer &timer, device_timer_id id, int
 		video_line(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in laserbat_state_base::device_timer");
+		assert_always(false, "Unknown id in laserbat_state_base::device_timer");
 	}
 }
 

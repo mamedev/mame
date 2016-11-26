@@ -128,6 +128,7 @@ public:
 	DECLARE_DRIVER_INIT(vcombat);
 	DECLARE_MACHINE_RESET(vcombat);
 	DECLARE_MACHINE_RESET(shadfgtr);
+	uint32_t update_screen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int index);
 	uint32_t screen_update_vcombat_main(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_vcombat_aux(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
@@ -137,14 +138,13 @@ public:
 	required_device<dac_word_interface> m_dac;
 };
 
-static uint32_t update_screen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int index)
+uint32_t vcombat_state::update_screen(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int index)
 {
-	vcombat_state *state = screen.machine().driver_data<vcombat_state>();
 	int y;
-	const rgb_t *const pens = state->m_tlc34076->get_pens();
+	const rgb_t *const pens = m_tlc34076->get_pens();
 
-	uint16_t *m68k_buf = state->m_m68k_framebuffer[(*state->m_framebuffer_ctrl & 0x20) ? 1 : 0].get();
-	uint16_t *i860_buf = state->m_i860_framebuffer[index][0].get();
+	uint16_t *m68k_buf = m_m68k_framebuffer[(*m_framebuffer_ctrl & 0x20) ? 1 : 0].get();
+	uint16_t *i860_buf = m_i860_framebuffer[index][0].get();
 
 	/* TODO: It looks like the leftmost chunk of the ground should really be on the right side? */
 	/*       But the i860 draws the background correctly, so it may be an original game issue. */

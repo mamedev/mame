@@ -19,7 +19,7 @@ TIMER_CALLBACK_MEMBER(galaxy_state::gal_video)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	int y, x;
-	if (m_interrupts_enabled == TRUE)
+	if (m_interrupts_enabled == true)
 	{
 		uint8_t *gfx = m_region_gfx1->base();
 		uint8_t dat = (m_latch_value & 0x3c) >> 2;
@@ -123,12 +123,12 @@ void galaxy_state::video_start()
 uint32_t galaxy_state::screen_update_galaxy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_gal_video_timer->adjust(attotime::zero, 0, attotime::never);
-	if (m_interrupts_enabled == FALSE)
+	if (m_interrupts_enabled == false)
 	{
 		const rectangle black_area(0, 384 - 1, 0, 208 - 1);
 		m_bitmap.fill(0, black_area);
 	}
-	m_interrupts_enabled = FALSE;
+	m_interrupts_enabled = false;
 	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }

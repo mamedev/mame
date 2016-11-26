@@ -5,7 +5,7 @@
 //  drawbgfx.cpp - BGFX renderer
 //
 //============================================================
-#if defined(SDLMAME_WIN32) || defined(OSD_WINDOWS)
+#if defined(SDLMAME_WIN32) || defined(OSD_WINDOWS) || defined(OSD_UWP)
 // standard windows headers
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -133,7 +133,7 @@ inline void winSetHwnd(::HWND _window)
 	pd.backBufferDS = NULL;
 	bgfx::setPlatformData(pd);
 }
-#else
+#elif defined(OSD_SDL)
 static void* sdlNativeWindowHandle(SDL_Window* _window)
 {
 	SDL_SysWMinfo wmi;
@@ -186,6 +186,22 @@ inline bool sdlSetWindow(SDL_Window* _window)
 
 	return true;
 }
+#elif defined(OSD_UWP)
+inline void winrtSetWindow(::IUnknown* _window)
+{
+	bgfx::PlatformData pd;
+	pd.ndt = NULL;
+	pd.nwh = _window;
+	pd.context = NULL;
+	pd.backBuffer = NULL;
+	pd.backBufferDS = NULL;
+	bgfx::setPlatformData(pd);
+}
+
+IInspectable* AsInspectable(Platform::Agile<Windows::UI::Core::CoreWindow> win)
+{
+	return reinterpret_cast<IInspectable*>(win.Get());
+}
 #endif
 
 int renderer_bgfx::create()
@@ -210,9 +226,12 @@ int renderer_bgfx::create()
 			bgfx::setPlatformData(blank_pd);
 		}
 #ifdef OSD_WINDOWS
-		winSetHwnd(win->platform_window<HWND>());
+		winSetHwnd(std::static_pointer_cast<win_window_info>(win)->platform_window());
+#elif defined(OSD_UWP)
+
+		winrtSetWindow(AsInspectable(std::static_pointer_cast<uwp_window_info>(win)->platform_window()));
 #else
-		sdlSetWindow(win->platform_window<SDL_Window*>());
+		sdlSetWindow(std::dynamic_pointer_cast<sdl_window_info>(win)->platform_window());
 #endif
 		std::string backend(m_options.bgfx_backend());
 		if (backend == "auto")
@@ -259,9 +278,11 @@ int renderer_bgfx::create()
 	if (win->m_index != 0)
 	{
 #ifdef OSD_WINDOWS
-		m_framebuffer = m_targets->create_backbuffer(win->platform_window<HWND>(), m_width[win->m_index], m_height[win->m_index]);
+		m_framebuffer = m_targets->create_backbuffer(std::static_pointer_cast<win_window_info>(win)->platform_window(), m_width[win->m_index], m_height[win->m_index]);
+#elif defined(OSD_UWP)
+		m_framebuffer = m_targets->create_backbuffer(AsInspectable(std::static_pointer_cast<uwp_window_info>(win)->platform_window()), m_width[win->m_index], m_height[win->m_index]);
 #else
-		m_framebuffer = m_targets->create_backbuffer(sdlNativeWindowHandle(win->platform_window<SDL_Window*>()), m_width[win->m_index], m_height[win->m_index]);
+		m_framebuffer = m_targets->create_backbuffer(sdlNativeWindowHandle(std::dynamic_pointer_cast<sdl_window_info>(win)->platform_window()), m_width[win->m_index], m_height[win->m_index]);
 #endif
 		bgfx::touch(win->m_index);
 	}
@@ -898,9 +919,11 @@ bool renderer_bgfx::update_dimensions()
 
 			delete m_framebuffer;
 #ifdef OSD_WINDOWS
-			m_framebuffer = m_targets->create_backbuffer(win->platform_window<HWND>(), width, height);
+			m_framebuffer = m_targets->create_backbuffer(std::static_pointer_cast<win_window_info>(win)->platform_window(), width, height);
+#elif defined(OSD_UWP)
+			m_framebuffer = m_targets->create_backbuffer(AsInspectable(std::static_pointer_cast<uwp_window_info>(win)->platform_window()), width, height);
 #else
-			m_framebuffer = m_targets->create_backbuffer(sdlNativeWindowHandle(win->platform_window<SDL_Window*>()), width, height);
+			m_framebuffer = m_targets->create_backbuffer(sdlNativeWindowHandle(std::dynamic_pointer_cast<sdl_window_info>(win)->platform_window()), width, height);
 #endif
 
 			bgfx::setViewFrameBuffer(s_current_view, m_framebuffer->target());

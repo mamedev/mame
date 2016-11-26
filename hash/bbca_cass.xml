@@ -27,8 +27,8 @@
 		</part>
 	</software>
 
-	<software name="airline">
-		<description>Airline</description>
+	<software name="airlinea">
+		<description>Airline (Model A)</description>
 		<year>1983</year>
 		<publisher>CCS</publisher>
 		<part name="cass" interface="bbc_cass">

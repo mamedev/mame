@@ -315,7 +315,7 @@
 	<software name="advanth">
 		<description>Adventure Anthology</description>
 		<year>198?</year>
-		<publisher>Database</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="24401">
 				<rom name="adventureanthology_e.uef" size="24401" crc="0a78200e" sha1="ec1b67e24df40b9d1c954e35d0d88c0de1e9072f" offset="0"/>
@@ -495,7 +495,7 @@
 	<software name="argcreat">
 		<description>Arcade Game Creator</description>
 		<year>198?</year>
-		<publisher>Database</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="12465">
 				<rom name="arcadegamecreator_e.uef" size="12465" crc="40495057" sha1="afebb3dd31041bc1bd9dfb06160f7ab5c04524b2" offset="0"/>
@@ -1026,7 +1026,7 @@
 
 	<software name="bombbaro">
 		<description>Bomber Baron</description>
-		<year>198?</year>
+		<year>1986</year>
 		<publisher>Optyx</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="4218">
@@ -1138,9 +1138,9 @@
 	</software>
 
 	<software name="bridgema">
-		<description>Bridgemaster</description>
-		<year>19??</year>
-		<publisher>J Keyne</publisher>
+		<description>Bridge Master</description>
+		<year>1983</year>
+		<publisher>J.Keyne</publisher>
 		<part name="cass1" interface="electron_cass">
 			<dataarea name="cass" size="5041">
 				<rom name="bridgemaster-tapea_be.uef" size="5041" crc="ba94bafc" sha1="752800f97f445afa16dcca40c488113892c4050c" offset="0"/>
@@ -1567,7 +1567,7 @@
 	<software name="classarc">
 		<description>Classic Arcade Games</description>
 		<year>198?</year>
-		<publisher>Database</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="32639">
 				<rom name="classicarcadegames_e.uef" size="32639" crc="1fcbc4ec" sha1="668f984549565a2df4046037fb64a708f73b40e4" offset="0"/>
@@ -1578,7 +1578,7 @@
 	<software name="9cardbd1">
 		<description>9 Classic Card and Board Games No.1</description>
 		<year>198?</year>
-		<publisher>Database</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="33879">
 				<rom name="9classiccardandboardgamesvol1_be.uef" size="33879" crc="446f66f5" sha1="b179c2ed7ce9534e8e74b8069ab956dfed3fb6eb" offset="0"/>
@@ -1589,7 +1589,7 @@
 	<software name="9cardbd2">
 		<description>9 Classic Card and Board Games No.2</description>
 		<year>1986</year>
-		<publisher>Database</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="38434">
 				<rom name="9classiccardandboardgamesvol2_be.uef" size="38434" crc="6eae50a8" sha1="58aa71564cb815c2bb2a6c216ac0c155261d989e" offset="0"/>
@@ -2470,9 +2470,9 @@
 	</software>
 
 	<software name="euser101">
-		<description>Electron User Vol.1 No.1</description>
+		<description>Electron User Vol.1, No.1-4</description>
 		<year>1984</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="20200">
 				<rom name="eu1-1-4_e.uef" size="20200" crc="16531ed8" sha1="1bea1e108914fc46a17707a81d29f860e075a81e" offset="0"/>
@@ -2481,9 +2481,9 @@
 	</software>
 
 	<software name="euser105">
-		<description>Electron User Vol.1 No.5</description>
+		<description>Electron User Vol.1, No.5: Lunar Lander</description>
 		<year>1984</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="11633">
 				<rom name="eu1-5_e.uef" size="11633" crc="710c6dd0" sha1="a58314345b1d6b08cfeed0909750deb768ed3d5a" offset="0"/>
@@ -2492,9 +2492,9 @@
 	</software>
 
 	<software name="euser106">
-		<description>Electron User Vol.1 No.6</description>
+		<description>Electron User Vol.1, No.6: Chicken!</description>
 		<year>1984</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="20922">
 				<rom name="eu1-6_e.uef" size="20922" crc="517bd47f" sha1="5ef852c51d36e6683200c82906c6d1a284d550f8" offset="0"/>
@@ -2503,9 +2503,9 @@
 	</software>
 
 	<software name="euser107">
-		<description>Electron User Vol.1 No.7</description>
+		<description>Electron User Vol.1, No.7: Space Hike</description>
 		<year>1984</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="15524">
 				<rom name="eu1-7_e.uef" size="15524" crc="55d09d6b" sha1="b851e0f86ab62ffd4b5f51d9b14287980824de9b" offset="0"/>
@@ -2514,9 +2514,9 @@
 	</software>
 
 	<software name="euser108">
-		<description>Electron User Vol.1 No.8</description>
+		<description>Electron User Vol.1, No.8: Rally Driver</description>
 		<year>1984</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="16419">
 				<rom name="eu1-8_e.uef" size="16419" crc="9fc455b7" sha1="84881bda718dc96f6a58a8c4f39ff569bd2612fb" offset="0"/>
@@ -2525,9 +2525,9 @@
 	</software>
 
 	<software name="euser109">
-		<description>Electron User Vol.1 No.9</description>
+		<description>Electron User Vol.1, No.9: Money Maze</description>
 		<year>1984</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="8644">
 				<rom name="eu1-9_e.uef" size="8644" crc="d8d39340" sha1="0f5e5296f873c7e4e6e06420498384ca2b225145" offset="0"/>
@@ -2536,9 +2536,9 @@
 	</software>
 
 	<software name="euser110">
-		<description>Electron User Vol.1 No.10</description>
+		<description>Electron User Vol.1, No.10: Golf</description>
 		<year>1984</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="12791">
 				<rom name="eu1-10_e.uef" size="12791" crc="8f0e3ba6" sha1="cc37e7ccb9829ccee099093d114e89a54ee1770a" offset="0"/>
@@ -2547,9 +2547,9 @@
 	</software>
 
 	<software name="euser111">
-		<description>Electron User Vol.1 No.11</description>
+		<description>Electron User Vol.1, No.11: Castles of Sand</description>
 		<year>1984</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="17561">
 				<rom name="eu1-11_e.uef" size="17561" crc="051db8c4" sha1="4ac73f632acb98a8c6404dbebcffce335059b14f" offset="0"/>
@@ -2558,9 +2558,9 @@
 	</software>
 
 	<software name="euser112">
-		<description>Electron User Vol.1 No.12</description>
+		<description>Electron User Vol.1, No.12: Haunted House</description>
 		<year>1984</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="19574">
 				<rom name="eu1-12_e.uef" size="19574" crc="f176a6d0" sha1="c70fb87b1165a1c0bb21d56692a7c863aab6402f" offset="0"/>
@@ -2569,9 +2569,9 @@
 	</software>
 
 	<software name="euser201">
-		<description>Electron User Vol.2 No.1</description>
+		<description>Electron User Vol.2, No.1: Break Free!</description>
 		<year>1984</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="14025">
 				<rom name="eu2-1_e.uef" size="14025" crc="6ed8dc89" sha1="cf8ca1fb02860ac300f3d209cc5c2b45165fe312" offset="0"/>
@@ -2580,9 +2580,9 @@
 	</software>
 
 	<software name="euser202">
-		<description>Electron User Vol.2 No.2</description>
+		<description>Electron User Vol.2, No.2</description>
 		<year>1984</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="16010">
 				<rom name="eu2-2_e.uef" size="16010" crc="d0ff3150" sha1="695d5d0afcefc2ddebfd73404023e5e66a139416" offset="0"/>
@@ -2591,9 +2591,9 @@
 	</software>
 
 	<software name="euser203">
-		<description>Electron User Vol.2 No.3</description>
+		<description>Electron User Vol.2, No.3: Christmas Box</description>
 		<year>1984</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="16233">
 				<rom name="eu2-3_e.uef" size="16233" crc="2a8cd001" sha1="0da879179e15ad656ef0cde096a848882ee7020a" offset="0"/>
@@ -2602,9 +2602,9 @@
 	</software>
 
 	<software name="euser204">
-		<description>Electron User Vol.2 No.4</description>
+		<description>Electron User Vol.2, No.4</description>
 		<year>1985</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="19039">
 				<rom name="eu2-4_e.uef" size="19039" crc="a22d0af2" sha1="177fb907562f909dac94974c52901810bcbaa929" offset="0"/>
@@ -2613,9 +2613,9 @@
 	</software>
 
 	<software name="euser205">
-		<description>Electron User Vol.2 No.5</description>
+		<description>Electron User Vol.2, No.5: The Kingdom of Craal</description>
 		<year>1985</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="30558">
 				<rom name="eu2-5_e.uef" size="30558" crc="17592809" sha1="3afa91790b20bc9a13721214e2795d6376f372ce" offset="0"/>
@@ -2624,9 +2624,9 @@
 	</software>
 
 	<software name="euser206">
-		<description>Electron User Vol.2 No.6</description>
+		<description>Electron User Vol.2, No.6</description>
 		<year>1985</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="21741">
 				<rom name="eu2-6_e.uef" size="21741" crc="9250085f" sha1="4d9f77288e2b98b197e43876e17fb9e1bf054282" offset="0"/>
@@ -2635,9 +2635,9 @@
 	</software>
 
 	<software name="euser207">
-		<description>Electron User Vol.2 No.7</description>
+		<description>Electron User Vol.2, No.7</description>
 		<year>1985</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="22557">
 				<rom name="eu2-7_e.uef" size="22557" crc="357c0c19" sha1="3ba0b9c556b52f2857d158731d725a54cd1cd597" offset="0"/>
@@ -2646,9 +2646,9 @@
 	</software>
 
 	<software name="euser208">
-		<description>Electron User Vol.2 No.8</description>
+		<description>Electron User Vol.2, No.8: Skramble</description>
 		<year>1985</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="18137">
 				<rom name="eu2-8_e.uef" size="18137" crc="66031002" sha1="29949537b8b149c8a0895002ab51ea0f34148aff" offset="0"/>
@@ -2657,9 +2657,9 @@
 	</software>
 
 	<software name="euser209">
-		<description>Electron User Vol.2 No.9</description>
+		<description>Electron User Vol.2, No.9</description>
 		<year>1985</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="23864">
 				<rom name="eu2-9_e.uef" size="23864" crc="86885dde" sha1="7d8ef371334a4fa5d12aa1f2a8c9dd6a6d75b4b6" offset="0"/>
@@ -2668,9 +2668,9 @@
 	</software>
 
 	<software name="euser210">
-		<description>Electron User Vol.2 No.10</description>
+		<description>Electron User Vol.2, No.10: Manic Mole!</description>
 		<year>1985</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="19220">
 				<rom name="eu2-10_e.uef" size="19220" crc="5f8be92c" sha1="f395f95995466b15bdfe57f1b50b55fab3ef96ca" offset="0"/>
@@ -2679,9 +2679,9 @@
 	</software>
 
 	<software name="euser211">
-		<description>Electron User Vol.2 No.11</description>
+		<description>Electron User Vol.2, No.11</description>
 		<year>1985</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="18067">
 				<rom name="eu2-11_e.uef" size="18067" crc="8b62ebb4" sha1="7996f49e06c52523b372f6d77443fee5289215a2" offset="0"/>
@@ -2690,9 +2690,9 @@
 	</software>
 
 	<software name="euser212">
-		<description>Electron User Vol.2 No.12</description>
+		<description>Electron User Vol.2, No.12</description>
 		<year>1985</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="22271">
 				<rom name="eu2-12_e.uef" size="22271" crc="db3824cc" sha1="464dfaf9490d0857a518b621e40d2cf03c7c2296" offset="0"/>
@@ -2701,9 +2701,9 @@
 	</software>
 
 	<software name="euser301">
-		<description>Electron User Vol.3 No.1</description>
+		<description>Electron User Vol.3, No.1</description>
 		<year>1985</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="15405">
 				<rom name="eu3-1_e.uef" size="15405" crc="f4eeffbe" sha1="0b63f2a51a8f387de941ca198b10a17bd915a9b1" offset="0"/>
@@ -2712,9 +2712,9 @@
 	</software>
 
 	<software name="euser302">
-		<description>Electron User Vol.3 No.2</description>
+		<description>Electron User Vol.3, No.2</description>
 		<year>1985</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="17905">
 				<rom name="eu3-2_e.uef" size="17905" crc="398d6843" sha1="490ab44d30a5a97d1e7dc891f56445e7850244bf" offset="0"/>
@@ -2723,9 +2723,9 @@
 	</software>
 
 	<software name="euser303">
-		<description>Electron User Vol.3 No.3</description>
+		<description>Electron User Vol.3, No.3</description>
 		<year>1985</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="19990">
 				<rom name="eu3-3_e.uef" size="19990" crc="41d6b19b" sha1="6c0d105e9f0e740ce2f043a2ea1dadcfc3a7af46" offset="0"/>
@@ -2734,9 +2734,9 @@
 	</software>
 
 	<software name="euser304">
-		<description>Electron User Vol.3 No.4</description>
+		<description>Electron User Vol.3, No.4</description>
 		<year>1986</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="13591">
 				<rom name="eu3-4_e.uef" size="13591" crc="a61b72e8" sha1="3390b74b07d9c8155d2b0e98f8f289e79485f902" offset="0"/>
@@ -2745,9 +2745,9 @@
 	</software>
 
 	<software name="euser305">
-		<description>Electron User Vol.3 No.5</description>
+		<description>Electron User Vol.3, No.5</description>
 		<year>1986</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="19149">
 				<rom name="eu3-5_e.uef" size="19149" crc="7a0296c3" sha1="4b2b110be5d6f3b4192dfa154ded2bc99b9eebdf" offset="0"/>
@@ -2756,9 +2756,9 @@
 	</software>
 
 	<software name="euser306">
-		<description>Electron User Vol.3 No.6</description>
+		<description>Electron User Vol.3, No.6</description>
 		<year>1986</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="19441">
 				<rom name="eu3-6_e.uef" size="19441" crc="928cfb3a" sha1="6f13ed693e561213aecf8f9cbaea773af74bf7e4" offset="0"/>
@@ -2767,9 +2767,9 @@
 	</software>
 
 	<software name="euser307">
-		<description>Electron User Vol.3 No.7</description>
+		<description>Electron User Vol.3, No.7</description>
 		<year>1986</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="11371">
 				<rom name="eu3-7_e.uef" size="11371" crc="506a466c" sha1="4e94f92945eec765ebe9170ff142d6c86961f663" offset="0"/>
@@ -2778,9 +2778,9 @@
 	</software>
 
 	<software name="euser308">
-		<description>Electron User Vol.3 No.8</description>
+		<description>Electron User Vol.3, No.8</description>
 		<year>1986</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="13799">
 				<rom name="eu3-8_e.uef" size="13799" crc="09108806" sha1="ccf439f60924c78eeb1daf0a05ea6d2836b0c0b9" offset="0"/>
@@ -2789,9 +2789,9 @@
 	</software>
 
 	<software name="euser309">
-		<description>Electron User Vol.3 No.9</description>
+		<description>Electron User Vol.3, No.9</description>
 		<year>1986</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="15641">
 				<rom name="eu3-9_e.uef" size="15641" crc="67552812" sha1="587118e6b3b6e2045eb1728657284833e4beb496" offset="0"/>
@@ -2800,9 +2800,9 @@
 	</software>
 
 	<software name="euser310">
-		<description>Electron User Vol.3 No.10</description>
+		<description>Electron User Vol.3, No.10</description>
 		<year>1986</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="17768">
 				<rom name="eu3-10_e.uef" size="17768" crc="3b1cec66" sha1="72126331596fdebe690c5814809b023ca4579a1e" offset="0"/>
@@ -2811,9 +2811,9 @@
 	</software>
 
 	<software name="euser311">
-		<description>Electron User Vol.3 No.11</description>
+		<description>Electron User Vol.3, No.11</description>
 		<year>1986</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="18516">
 				<rom name="eu3-11_e.uef" size="18516" crc="e1c5b902" sha1="3e2433012c3eb44f149367b8b1b3fcd61401f5dd" offset="0"/>
@@ -2822,9 +2822,9 @@
 	</software>
 
 	<software name="euser312">
-		<description>Electron User Vol.3 No.12</description>
+		<description>Electron User Vol.3, No.12</description>
 		<year>1986</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="20682">
 				<rom name="eu3-12_e.uef" size="20682" crc="6b31890d" sha1="fd13f0f47eeb77307a96150e91fd060f1a242ff2" offset="0"/>
@@ -2833,9 +2833,9 @@
 	</software>
 
 	<software name="euser401">
-		<description>Electron User Vol.4 No.1</description>
+		<description>Electron User Vol.4, No.1</description>
 		<year>1986</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="21261">
 				<rom name="eu4-1_e.uef" size="21261" crc="ff0b251c" sha1="71d128792c1271d6689faf65fd53ea910dde0c28" offset="0"/>
@@ -2844,9 +2844,9 @@
 	</software>
 
 	<software name="euser402">
-		<description>Electron User Vol.4 No.2</description>
+		<description>Electron User Vol.4, No.2</description>
 		<year>1986</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="15428">
 				<rom name="eu4-2_e.uef" size="15428" crc="f328dded" sha1="857b589101498d60b4dce75b3699c0d3ebe01437" offset="0"/>
@@ -2855,9 +2855,9 @@
 	</software>
 
 	<software name="euser403">
-		<description>Electron User Vol.4 No.3</description>
+		<description>Electron User Vol.4, No.3</description>
 		<year>1986</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="17747">
 				<rom name="eu4-3_e.uef" size="17747" crc="7638447d" sha1="1d6ef1cfa0ef888f5b74fdd34da518834504a583" offset="0"/>
@@ -2866,9 +2866,9 @@
 	</software>
 
 	<software name="euser404">
-		<description>Electron User Vol.4 No.4</description>
+		<description>Electron User Vol.4, No.4</description>
 		<year>1987</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="12642">
 				<rom name="eu4-4_e.uef" size="12642" crc="074524aa" sha1="e0cdf5a68584bde99403fed5f2f7305fbf2c1173" offset="0"/>
@@ -2877,9 +2877,9 @@
 	</software>
 
 	<software name="euser405">
-		<description>Electron User Vol.4 No.5</description>
+		<description>Electron User Vol.4, No.5</description>
 		<year>1987</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="17034">
 				<rom name="eu4-5_e.uef" size="17034" crc="b4cddbc8" sha1="7d4ebf0975dfb1f0b13c6c3b9ccb051f58c61fa4" offset="0"/>
@@ -2888,9 +2888,9 @@
 	</software>
 
 	<software name="euser406">
-		<description>Electron User Vol.4 No.6</description>
+		<description>Electron User Vol.4, No.6</description>
 		<year>1987</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="23990">
 				<rom name="eu4-6_e.uef" size="23990" crc="49308204" sha1="c8826ff31d8e6964d629c2408eef7e0db6829a22" offset="0"/>
@@ -2899,9 +2899,9 @@
 	</software>
 
 	<software name="euser407">
-		<description>Electron User Vol.4 No.7</description>
+		<description>Electron User Vol.4, No.7</description>
 		<year>1987</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="15190">
 				<rom name="eu4-7_e.uef" size="15190" crc="fce023d3" sha1="9209852e321f008f19731f2cc4a89eebcb624bde" offset="0"/>
@@ -2910,9 +2910,9 @@
 	</software>
 
 	<software name="euser408">
-		<description>Electron User Vol.4 No.8</description>
+		<description>Electron User Vol.4, No.8</description>
 		<year>1987</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="18371">
 				<rom name="eu4-8_e.uef" size="18371" crc="f5e6ff84" sha1="7a6e9652c048408a2db85f74a79712b39257dcc6" offset="0"/>
@@ -2921,9 +2921,9 @@
 	</software>
 
 	<software name="euser409">
-		<description>Electron User Vol.4 No.9</description>
+		<description>Electron User Vol.4, No.9</description>
 		<year>1987</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="24635">
 				<rom name="eu4-9_e.uef" size="24635" crc="73c3bc86" sha1="bc2b43c94078a3e53c5065609aa10a3cd4b0c9f4" offset="0"/>
@@ -2932,9 +2932,9 @@
 	</software>
 
 	<software name="euser410">
-		<description>Electron User Vol.4 No.10</description>
+		<description>Electron User Vol.4, No.10</description>
 		<year>1987</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="20300">
 				<rom name="eu4-10_e.uef" size="20300" crc="47bdbf5b" sha1="dbe97a2fdbc39659cace4afec364ada973728b04" offset="0"/>
@@ -2943,9 +2943,9 @@
 	</software>
 
 	<software name="euser411">
-		<description>Electron User Vol.4 No.11</description>
+		<description>Electron User Vol.4, No.11</description>
 		<year>1987</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="15608">
 				<rom name="eu4-11_e.uef" size="15608" crc="539674ba" sha1="187a99dd4a336db90b67bdf411f6f6522a48d878" offset="0"/>
@@ -2954,9 +2954,9 @@
 	</software>
 
 	<software name="euser412">
-		<description>Electron User Vol.4 No.12</description>
+		<description>Electron User Vol.4, No.12</description>
 		<year>1987</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="25055">
 				<rom name="eu4-12_e.uef" size="25055" crc="6be38dce" sha1="05526ca006897eb960cbabd981ebd46ed8a9ef9e" offset="0"/>
@@ -2965,9 +2965,9 @@
 	</software>
 
 	<software name="euser501">
-		<description>Electron User Vol.5 No.1</description>
+		<description>Electron User Vol.5, No.1</description>
 		<year>1987</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="13386">
 				<rom name="eu5-1_e.uef" size="13386" crc="47ecded0" sha1="f9b1b0b6d26126b3ccca8cd41faa7417472b0d58" offset="0"/>
@@ -2976,9 +2976,9 @@
 	</software>
 
 	<software name="euser502">
-		<description>Electron User Vol.5 No.2</description>
+		<description>Electron User Vol.5, No.2</description>
 		<year>1987</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="13748">
 				<rom name="eu5-2_e.uef" size="13748" crc="d4d741e8" sha1="b45cfeb35911edf98df91210bcd32468f20793b5" offset="0"/>
@@ -2987,9 +2987,9 @@
 	</software>
 
 	<software name="euser503">
-		<description>Electron User Vol.5 No.3</description>
+		<description>Electron User Vol.5, No.3</description>
 		<year>1987</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="13725">
 				<rom name="eu5-3_e.uef" size="13725" crc="21391e66" sha1="5ec4b4416ab27f3c192f4508a73fd4582ff754d5" offset="0"/>
@@ -2998,9 +2998,9 @@
 	</software>
 
 	<software name="euser504">
-		<description>Electron User Vol.5 No.4</description>
+		<description>Electron User Vol.5, No.4</description>
 		<year>1988</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="19231">
 				<rom name="eu5-4_e.uef" size="19231" crc="7f5dfec7" sha1="b31d9a8b7003942a8bd8112466d2787814c2b0a5" offset="0"/>
@@ -3009,9 +3009,9 @@
 	</software>
 
 	<software name="euser505">
-		<description>Electron User Vol.5 No.5</description>
+		<description>Electron User Vol.5, No.5</description>
 		<year>1988</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="18840">
 				<rom name="eu5-5_e.uef" size="18840" crc="751a03cf" sha1="e217d3f317d1cc419cc3edf3b99513e5425250d2" offset="0"/>
@@ -3020,9 +3020,9 @@
 	</software>
 
 	<software name="euser506">
-		<description>Electron User Vol.5 No.6</description>
+		<description>Electron User Vol.5, No.6</description>
 		<year>1988</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="19762">
 				<rom name="eu5-6_e.uef" size="19762" crc="d5b3aa34" sha1="99d86681c900329d0ec69e62a8a658b7dc2597dc" offset="0"/>
@@ -3031,9 +3031,9 @@
 	</software>
 
 	<software name="euser507">
-		<description>Electron User Vol.5 No.7</description>
+		<description>Electron User Vol.5, No.7</description>
 		<year>1988</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="24754">
 				<rom name="eu5-7_e.uef" size="24754" crc="a70286ec" sha1="4736d7bb571be5939e2850de9859c4b29bbfc5e1" offset="0"/>
@@ -3042,9 +3042,9 @@
 	</software>
 
 	<software name="euser508">
-		<description>Electron User Vol.5 No.8</description>
+		<description>Electron User Vol.5, No.8</description>
 		<year>1988</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="16851">
 				<rom name="eu5-8_e.uef" size="16851" crc="82ffa545" sha1="8494edf40111105a7a306326fa7c1292595578f1" offset="0"/>
@@ -3053,9 +3053,9 @@
 	</software>
 
 	<software name="euser509">
-		<description>Electron User Vol.5 No.9</description>
+		<description>Electron User Vol.5, No.9</description>
 		<year>1988</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="11630">
 				<rom name="eu5-9_e.uef" size="11630" crc="90efc0f0" sha1="d131d98100fafc9a5f4686eb41b785262c7cee4b" offset="0"/>
@@ -3064,9 +3064,9 @@
 	</software>
 
 	<software name="euser510">
-		<description>Electron User Vol.5 No.10</description>
+		<description>Electron User Vol.5, No.10</description>
 		<year>1988</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="18294">
 				<rom name="eu5-10_e.uef" size="18294" crc="3f0812cf" sha1="f2049e2863dd74fa6af68efb304b4b9ef202276a" offset="0"/>
@@ -3075,9 +3075,9 @@
 	</software>
 
 	<software name="euser511">
-		<description>Electron User Vol.5 No.11</description>
+		<description>Electron User Vol.5, No.11</description>
 		<year>1988</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="13104">
 				<rom name="eu5-11_e.uef" size="13104" crc="c361d598" sha1="9bcd609f13f9fc874d1721d2a61387c066476f7f" offset="0"/>
@@ -3086,9 +3086,9 @@
 	</software>
 
 	<software name="euser512">
-		<description>Electron User Vol.5 No.12</description>
+		<description>Electron User Vol.5, No.12</description>
 		<year>1988</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="16145">
 				<rom name="eu5-12_e.uef" size="16145" crc="e753cccd" sha1="63d417d8dbea0b83daaeb2aadf4b5bcd5b04af6a" offset="0"/>
@@ -3097,9 +3097,9 @@
 	</software>
 
 	<software name="euser601">
-		<description>Electron User Vol.6 No.1</description>
+		<description>Electron User Vol.6, No.1</description>
 		<year>1988</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="23050">
 				<rom name="eu6-1_e.uef" size="23050" crc="cea7bf60" sha1="be2e16e0cb90e771b30d504d359c709155e0c667" offset="0"/>
@@ -3108,9 +3108,9 @@
 	</software>
 
 	<software name="euser602">
-		<description>Electron User Vol.6 No.2</description>
+		<description>Electron User Vol.6, No.2</description>
 		<year>1988</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="15169">
 				<rom name="eu6-2_e.uef" size="15169" crc="45194564" sha1="c2b30edc0bd5453dc7ccd04f54ea16f3b7510c19" offset="0"/>
@@ -3119,9 +3119,9 @@
 	</software>
 
 	<software name="euser603">
-		<description>Electron User Vol.6 No.3</description>
+		<description>Electron User Vol.6, No.3</description>
 		<year>1988</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="13276">
 				<rom name="eu6-3_e.uef" size="13276" crc="b4b89cc8" sha1="b7f5cccb37c053644850f893cb1c9e6e0ac3e502" offset="0"/>
@@ -3130,9 +3130,9 @@
 	</software>
 
 	<software name="euser604">
-		<description>Electron User Vol.6 No.4</description>
+		<description>Electron User Vol.6, No.4</description>
 		<year>1989</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="10297">
 				<rom name="eu6-4_e.uef" size="10297" crc="a3b53468" sha1="e160388c43bb095e0287c4ebf52a1e4ff6fd0230" offset="0"/>
@@ -3141,9 +3141,9 @@
 	</software>
 
 	<software name="euser605">
-		<description>Electron User Vol.6 No.5</description>
+		<description>Electron User Vol.6, No.5</description>
 		<year>1989</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="12168">
 				<rom name="eu6-5_e.uef" size="12168" crc="5077448d" sha1="bf83b555a508331a0432234eeb13a8f2214ff08e" offset="0"/>
@@ -3152,9 +3152,9 @@
 	</software>
 
 	<software name="euser606">
-		<description>Electron User Vol.6 No.6</description>
+		<description>Electron User Vol.6, No.6</description>
 		<year>1989</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="11843">
 				<rom name="eu6-6_e.uef" size="11843" crc="ae93e82c" sha1="4cb5e941f017d02c833929ef9ecfdcaedd2d4fdf" offset="0"/>
@@ -3163,9 +3163,9 @@
 	</software>
 
 	<software name="euser607">
-		<description>Electron User Vol.6 No.7</description>
+		<description>Electron User Vol.6, No.7</description>
 		<year>1989</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="11438">
 				<rom name="eu6-7_e.uef" size="11438" crc="c178a4d6" sha1="8112b9e3b56cd887c4f23b190d1dadb1a002ee36" offset="0"/>
@@ -3174,9 +3174,9 @@
 	</software>
 
 	<software name="euser608">
-		<description>Electron User Vol.6 No.8</description>
+		<description>Electron User Vol.6, No.8</description>
 		<year>1989</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="16776">
 				<rom name="eu6-8_e.uef" size="16776" crc="ddea04ce" sha1="b0cc2b6c1e9b184c1108436b8a12ca4db96a6a8e" offset="0"/>
@@ -3185,9 +3185,9 @@
 	</software>
 
 	<software name="euser609">
-		<description>Electron User Vol.6 No.9</description>
+		<description>Electron User Vol.6, No.9</description>
 		<year>1989</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="23858">
 				<rom name="eu6-9_e.uef" size="23858" crc="ebdc111b" sha1="7647ed7746c9d654d501db4d0228d3e49525361f" offset="0"/>
@@ -3196,9 +3196,9 @@
 	</software>
 
 	<software name="euser610">
-		<description>Electron User Vol.6 No.10</description>
+		<description>Electron User Vol.6, No.10</description>
 		<year>1989</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="17916">
 				<rom name="eu6-10_e.uef" size="17916" crc="7e0f543d" sha1="2c2cce4810228c66f4bf320661c473fef6a2edf9" offset="0"/>
@@ -3207,9 +3207,9 @@
 	</software>
 
 	<software name="euser611">
-		<description>Electron User Vol.6 No.11</description>
+		<description>Electron User Vol.6, No.11</description>
 		<year>1989</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="17287">
 				<rom name="eu6-11_e.uef" size="17287" crc="8346b588" sha1="4a919f960b6cb9ce04053c1c4a60265ca0e5a7b1" offset="0"/>
@@ -3218,9 +3218,9 @@
 	</software>
 
 	<software name="euser612">
-		<description>Electron User Vol.6 No.12</description>
+		<description>Electron User Vol.6, No.12</description>
 		<year>1989</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="19444">
 				<rom name="eu6-12_e.uef" size="19444" crc="1d29a910" sha1="1a7d78e967600fa0ec2e744a306fcb1a435c7244" offset="0"/>
@@ -3229,9 +3229,9 @@
 	</software>
 
 	<software name="euser701">
-		<description>Electron User Vol.7 No.1</description>
+		<description>Electron User Vol.7, No.1</description>
 		<year>1989</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="21433">
 				<rom name="eu7-1_e.uef" size="21433" crc="e0b17aca" sha1="832c08467187a61931e44e9e6a7f524cb1384d71" offset="0"/>
@@ -3240,9 +3240,9 @@
 	</software>
 
 	<software name="euser702">
-		<description>Electron User Vol.7 No.2</description>
+		<description>Electron User Vol.7, No.2</description>
 		<year>1989</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="23884">
 				<rom name="eu7-2_e.uef" size="23884" crc="31b8f957" sha1="91c3300298add49ddc2f56e3ab93226cdc8cbe54" offset="0"/>
@@ -3251,9 +3251,9 @@
 	</software>
 
 	<software name="euser703">
-		<description>Electron User Vol.7 No.3</description>
+		<description>Electron User Vol.7, No.3</description>
 		<year>1989</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="18717">
 				<rom name="eu7-3_e.uef" size="18717" crc="b3378f25" sha1="a8493a3cdfd54989d1d6e7a6e07cb9bdce7e04fb" offset="0"/>
@@ -3262,9 +3262,9 @@
 	</software>
 
 	<software name="euser704">
-		<description>Electron User Vol.7 No.4</description>
+		<description>Electron User Vol.7, No.4</description>
 		<year>1990</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="16769">
 				<rom name="eu7-4_e.uef" size="16769" crc="3b251b5f" sha1="015cb29863dd83594fe6c30818d385ad7b61e0df" offset="0"/>
@@ -3273,9 +3273,9 @@
 	</software>
 
 	<software name="euser705">
-		<description>Electron User Vol.7 No.5</description>
+		<description>Electron User Vol.7, No.5</description>
 		<year>1990</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="16813">
 				<rom name="eu7-5_e.uef" size="16813" crc="05498408" sha1="3123eab74d47cf34d80d36ff873165b03f5dce8f" offset="0"/>
@@ -3284,9 +3284,9 @@
 	</software>
 
 	<software name="euser706">
-		<description>Electron User Vol.7 No.6</description>
+		<description>Electron User Vol.7, No.6</description>
 		<year>1990</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="23284">
 				<rom name="eu7-6_e.uef" size="23284" crc="fe00d4e2" sha1="9ee6f76d4a1ab893bb1d9ee7b0c46f64cee92d04" offset="0"/>
@@ -3295,9 +3295,9 @@
 	</software>
 
 	<software name="euser707">
-		<description>Electron User Vol.7 No.7</description>
+		<description>Electron User Vol.7, No.7</description>
 		<year>1990</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="17076">
 				<rom name="eu7-7_e.uef" size="17076" crc="d3d61c81" sha1="b7f8bb0980ff011bbe92d10ac67810f2d88891d7" offset="0"/>
@@ -3306,9 +3306,9 @@
 	</software>
 
 	<software name="euser708">
-		<description>Electron User Vol.7 No.8</description>
+		<description>Electron User Vol.7, No.8</description>
 		<year>1990</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="17596">
 				<rom name="eu7-8_e.uef" size="17596" crc="a6f27613" sha1="8525d3487bea6e89b95efa8103218edddc764df8" offset="0"/>
@@ -3317,9 +3317,9 @@
 	</software>
 
 	<software name="euser709">
-		<description>Electron User Vol.7 No.9</description>
+		<description>Electron User Vol.7, No.9</description>
 		<year>1990</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="7733">
 				<rom name="eu7-9_e.uef" size="7733" crc="3b97a9b7" sha1="3f483aa48cc2bcecb25b94be5922623b736468c3" offset="0"/>
@@ -3328,9 +3328,9 @@
 	</software>
 
 	<software name="euser710">
-		<description>Electron User Vol.7 No.10</description>
+		<description>Electron User Vol.7, No.10</description>
 		<year>1990</year>
-		<publisher>Electron User</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="28506">
 				<rom name="eu7-10_e.uef" size="28506" crc="406f741d" sha1="40466e277428d1bafbab1a99a85bc910e675b0db" offset="0"/>
@@ -3666,7 +3666,7 @@
 
 	<software name="fbjoyutl">
 		<description>First Byte Joystick Utility</description>
-		<year>198?</year>
+		<year>1984</year>
 		<publisher>First Byte</publisher>
 		<part name="cass1" interface="electron_cass">
 			<feature name="part_id" value="Games"/>
@@ -3780,8 +3780,8 @@
 
 	<software name="frenchru">
 		<description>French On The Run</description>
-		<year>198?</year>
-		<publisher>Database</publisher>
+		<year>1985</year>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="54382">
 				<rom name="frenchontherun_e.uef" size="54382" crc="00576757" sha1="5b7790b17623159f96f3a3d457521b5ebaab94b5" offset="0"/>
@@ -5204,7 +5204,7 @@
 	</software>
 
 	<software name="knowpsiq">
-		<description>Know Your Own Personality</description>
+		<description>Know Your Own PSI-Q</description>
 		<year>1984</year>
 		<publisher>Mirrorsoft</publisher>
 		<part name="cass" interface="electron_cass">
@@ -5705,7 +5705,7 @@
 	<software name="microlym">
 		<description>Micro Olympics</description>
 		<year>1984</year>
-		<publisher>database</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="38809">
 				<rom name="microolympics_e.uef" size="38809" crc="65b3258b" sha1="0a7e2d5e661310bf1c42ed60b912f8efc5b2597d" offset="0"/>
@@ -5825,7 +5825,7 @@
 	<software name="moffice">
 		<description>Mini Office</description>
 		<year>1984</year>
-		<publisher>Database</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass1" interface="electron_cass">
 			<feature name="part_id" value="Word Processor"/>
 			<dataarea name="cass" size="13220">
@@ -8537,7 +8537,7 @@
 	<software name="tenbest1">
 		<description>Ten of the Best! Vol.1</description>
 		<year>1984</year>
-		<publisher>Database</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass0" interface="electron_cass">
 			<feature name="part_id" value="Menu"/>
 			<dataarea name="cass" size="559">
@@ -8609,7 +8609,7 @@
 	<software name="tenbest2">
 		<description>Ten of the Best! Vol.2</description>
 		<year>1984</year>
-		<publisher>Database</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass0" interface="electron_cass">
 			<feature name="part_id" value="Menu"/>
 			<dataarea name="cass" size="562">
@@ -8681,7 +8681,7 @@
 	<software name="tenbest3">
 		<description>Ten of the Best! Vol.3</description>
 		<year>1984</year>
-		<publisher>Database</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="49741">
 				<rom name="10ofthebestvol3_e.uef" size="49741" crc="dee3ac52" sha1="c485aade8c27e5ac298f39341e6ab576d9af0ea0" offset="0"/>
@@ -8822,7 +8822,7 @@
 	</software>
 
 	<software name="axeofkol">
-		<description>The Axe of Kolt</description>
+		<description>Axe of Kolt</description>
 		<year>1987</year>
 		<publisher>Elk Adventure Club</publisher>
 		<part name="cass1" interface="electron_cass">
@@ -9154,7 +9154,7 @@
 	<software name="magsword">
 		<description>The Magic Sword</description>
 		<year>1984</year>
-		<publisher>Database Software</publisher>
+		<publisher>Database Publications</publisher>
 		<part name="cass" interface="electron_cass">
 			<dataarea name="cass" size="17505">
 				<rom name="themagicsword_e.uef" size="17505" crc="d54e99de" sha1="5a1f36f5b6cd95b9821e22695e4a13d6f4833a31" offset="0"/>
@@ -9439,7 +9439,7 @@
 		<year>1983</year>
 		<publisher>Gemini</publisher>
 		<part name="cass1" interface="electron_cass">
-			<feature name="part_id" value="Accordian"/>
+			<feature name="part_id" value="Accordion"/>
 			<dataarea name="cass" size="2672">
 				<rom name="tg-accordian_be.uef" size="2672" crc="3a620f75" sha1="5c1fda51b7d6211cf87a6f8f3a1ca0878bb7ad61" offset="0"/>
 			</dataarea>

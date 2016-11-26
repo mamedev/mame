@@ -213,7 +213,7 @@ void metro_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 		metro_blit_done(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in metro_state::device_timer");
+		assert_always(false, "Unknown id in metro_state::device_timer");
 	}
 }
 
@@ -4567,7 +4567,7 @@ PCB -
  REV: LM2D-Y
  SEL: 00-200-004
 
-Same basic componets as those listed for Bang Bang Ball, except
+Same basic components as those listed for Bang Bang Ball, except
 PCB uses a Xlinix XC9536 istead of the Altera EMP7032LC44 PLD.
 
 Did Limenko license this or bootleg it?  The board doesn't look like a

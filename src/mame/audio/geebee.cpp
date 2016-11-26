@@ -64,7 +64,7 @@ void geebee_sound_device::device_timer(emu_timer &timer, device_timer_id id, int
 			break;
 
 		default:
-			assert_always(FALSE, "Unknown id in geebee_device::device_timer");
+			assert_always(false, "Unknown id in geebee_device::device_timer");
 	}
 }
 

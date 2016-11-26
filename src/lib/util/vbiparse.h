@@ -78,7 +78,7 @@ struct vbi_metadata
 int vbi_parse_manchester_code(const uint16_t *source, int sourcewidth, int sourceshift, int expectedbits, uint32_t *result);
 
 /* compute the "white flag" from a line of video data */
-int vbi_parse_white_flag(const uint16_t *source, int sourcewidth, int sourceshift);
+bool vbi_parse_white_flag(const uint16_t *source, int sourcewidth, int sourceshift);
 
 /* parse everything from a video frame */
 void vbi_parse_all(const uint16_t *source, int sourcerowpixels, int sourcewidth, int sourceshift, vbi_metadata *vbi);

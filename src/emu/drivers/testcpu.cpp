@@ -40,7 +40,7 @@ public:
 	// timer callback; used to wrest control of the system
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override
 	{
-		static const uint32_t sample_instructions[] =
+		static const u32 sample_instructions[] =
 		{
 			0x3d40f900,     // li r10,0xf9000000
 			0x394af000,     // addi r10,r10,-0x1000
@@ -108,7 +108,7 @@ public:
 	void dump_state(bool disassemble)
 	{
 		char buffer[256];
-		uint8_t instruction[32];
+		u8 instruction[32];
 		buffer[0] = 0;
 		int bytes = 0;
 		if (disassemble)
@@ -123,7 +123,7 @@ public:
 		}
 
 		// output the registers
-		printf("PC : %08X", uint32_t(m_cpu->state_int(PPC_PC)));
+		printf("PC : %08X", u32(m_cpu->state_int(PPC_PC)));
 		if (disassemble && bytes > 0)
 		{
 			printf(" => ");
@@ -134,12 +134,12 @@ public:
 		printf("\n");
 		for (int regnum = 0; regnum < 32; regnum++)
 		{
-			printf("R%-2d: %08X   ", regnum, uint32_t(m_cpu->state_int(PPC_R0 + regnum)));
+			printf("R%-2d: %08X   ", regnum, u32(m_cpu->state_int(PPC_R0 + regnum)));
 			if (regnum % 4 == 3) printf("\n");
 		}
 		printf("CR : %08X   LR : %08X   CTR: %08X   XER: %08X\n",
-				uint32_t(m_cpu->state_int(PPC_CR)), uint32_t(m_cpu->state_int(PPC_LR)),
-				uint32_t(m_cpu->state_int(PPC_CTR)), uint32_t(m_cpu->state_int(PPC_XER)));
+				u32(m_cpu->state_int(PPC_CR)), u32(m_cpu->state_int(PPC_LR)),
+				u32(m_cpu->state_int(PPC_CTR)), u32(m_cpu->state_int(PPC_XER)));
 		for (int regnum = 0; regnum < 32; regnum++)
 		{
 			printf("F%-2d: %10g   ", regnum, u2d(m_cpu->state_int(PPC_F0 + regnum)));
@@ -150,8 +150,8 @@ public:
 	// report reads from anywhere
 	READ64_MEMBER( general_r )
 	{
-		uint64_t fulloffs = offset;
-		uint64_t result = fulloffs + (fulloffs << 8) + (fulloffs << 16) + (fulloffs << 24) + (fulloffs << 32);
+		u64 fulloffs = offset;
+		u64 result = fulloffs + (fulloffs << 8) + (fulloffs << 16) + (fulloffs << 24) + (fulloffs << 32);
 		printf("Read from %08X & %08X%08X = %08X%08X\n", offset * 8, (int)((mem_mask&0xffffffff00000000LL) >> 32) , (int)(mem_mask&0xffffffff), (int)((result&0xffffffff00000000LL) >> 32), (int)(result&0xffffffff));
 		return result;
 	}
@@ -165,7 +165,7 @@ public:
 private:
 	// internal state
 	required_device<ppc603e_device> m_cpu;
-	required_shared_ptr<uint64_t> m_ram;
+	required_shared_ptr<u64> m_ram;
 	address_space *m_space;
 };
 

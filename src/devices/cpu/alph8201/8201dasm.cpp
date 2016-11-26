@@ -334,7 +334,7 @@ static void InitDasm8201(void)
 		Op[i].type  = type;
 
 		/* 2 byte code ? */
-		while (isspace((uint8_t)*p)) p++;
+		while (isspace(u8(*p))) p++;
 		if( (*p) )
 			Op[i].type |= 0x10;
 		/* number of param */
@@ -349,7 +349,7 @@ static void InitDasm8201(void)
 	OpInizialized = 1;
 }
 
-CPU_DISASSEMBLE( alpha8201 )
+CPU_DISASSEMBLE(alpha8201)
 {
 	offs_t dasmflags = 0;
 	int i;
@@ -376,7 +376,7 @@ CPU_DISASSEMBLE( alpha8201 )
 
 	if (op == -1)
 	{
-		sprintf(buffer,"db   %2.2x",code);
+		util::stream_format(stream, "db   %2.2x",code);
 		return cnt;
 	}
 
@@ -391,11 +391,11 @@ CPU_DISASSEMBLE( alpha8201 )
 	}
 
 	if (Op[op].type & 0x02)
-		sprintf(buffer, Op[op].fmt,disp,disp);
+		util::stream_format(stream, Op[op].fmt,disp,disp);
 	else if (Op[op].type & 0x01)
-		sprintf(buffer, Op[op].fmt,disp);
+		util::stream_format(stream, Op[op].fmt,disp);
 	else
-		sprintf(buffer, "%s",Op[op].fmt);
+		util::stream_format(stream, "%s",Op[op].fmt);
 
 	switch (code)
 	{

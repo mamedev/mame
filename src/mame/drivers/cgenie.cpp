@@ -376,7 +376,7 @@ MC6845_UPDATE_ROW( cgenie_state::crtc_update_row )
 // how accurate are these colors?
 const rgb_t cgenie_state::m_palette_bg[] =
 {
-	rgb_t::black,
+	rgb_t::black(),
 	rgb_t(0x70, 0x28, 0x20), // dark orange
 	rgb_t(0x28, 0x70, 0x20), // dark green
 	rgb_t(0x48, 0x48, 0x48), // dark gray
@@ -401,13 +401,13 @@ const rgb_t cgenie_state::m_palette_eu[] =
 	rgb_t(0x8c, 0x8c, 0x8c), // light gray
 	rgb_t(0x00, 0xfb, 0x8c), // turquoise
 	rgb_t(0xd2, 0x00, 0xff), // magenta
-	rgb_t::white             // bright white
+	rgb_t::white()           // bright white
 };
 
 // new zealand palette
 const rgb_t cgenie_state::m_palette_nz[] =
 {
-	rgb_t::white,
+	rgb_t::white(),
 	rgb_t(0x12, 0xff, 0xff),
 	rgb_t(0xff, 0x6f, 0xff),
 	rgb_t(0x31, 0x77, 0xff),
@@ -422,7 +422,7 @@ const rgb_t cgenie_state::m_palette_nz[] =
 	rgb_t(0xff, 0xf9, 0x00),
 	rgb_t(0x00, 0xda, 0x00),
 	rgb_t(0xff, 0x22, 0x00),
-	rgb_t::black
+	rgb_t::black()
 };
 
 

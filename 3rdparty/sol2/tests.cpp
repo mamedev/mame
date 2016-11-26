@@ -664,6 +664,21 @@ TEST_CASE("proxy/proper-pushing", "allow proxies to reference other proxies and 
 	REQUIRE(b);
 }
 
+TEST_CASE("proxy/equality", "check to make sure equality tests work") {
+	sol::state lua;
+	REQUIRE((lua["a"] == sol::nil));
+	REQUIRE_FALSE((lua["a"] == nullptr));
+	REQUIRE_FALSE((lua["a"] == 0));
+	REQUIRE_FALSE((lua["a"] == 2));
+	
+	lua["a"] = 2;
+	
+	REQUIRE_FALSE((lua["a"] == sol::nil)); //0
+	REQUIRE_FALSE((lua["a"] == nullptr)); //0
+	REQUIRE_FALSE((lua["a"] == 0)); //0
+	REQUIRE((lua["a"] == 2)); //1
+}
+
 TEST_CASE("compilation/const-regression", "make sure constness in tables is respected all the way down") {
 	struct State {
 	public:
@@ -677,4 +692,103 @@ TEST_CASE("compilation/const-regression", "make sure constness in tables is resp
 	State state;
 	State* s = state.state_.registry()["state"];
 	REQUIRE(s == &state);
+}
+
+TEST_CASE("numbers/integers", "make sure integers are detectable on most platforms") {
+	sol::state lua;
+
+	lua["a"] = 50; // int
+	lua["b"] = 50.5; // double
+
+	sol::object a = lua["a"];
+	sol::object b = lua["b"];
+
+	bool a_is_int = a.is<int>();
+	bool a_is_double = a.is<double>();
+
+	bool b_is_int = b.is<int>();
+	bool b_is_double = b.is<double>();
+
+	REQUIRE(a_is_int);
+	REQUIRE(a_is_double);
+
+	// TODO: will this fail on certain lower Lua versions?
+	REQUIRE_FALSE(b_is_int);
+	REQUIRE(b_is_double);
+}
+
+TEST_CASE("state/script-returns", "make sure script returns are done properly") {
+	std::string script =
+		R"(
+local example = 
+{
+    str = "this is a string",
+    num = 1234,
+
+    func = function(self)
+        print(self.str)
+		return "fstr"
+    end
+}
+
+return example;
+)";
+
+	auto bar = [&script](sol::this_state l) {
+		sol::state_view lua = l;
+		sol::table data = lua.script(script);
+
+		std::string str = data["str"];
+		int num = data["num"];
+		std::string fstr = data["func"](data);
+		REQUIRE(str == "this is a string");
+		REQUIRE(fstr == "fstr");
+		REQUIRE(num == 1234);
+	};
+
+	auto foo = [&script](int, sol::this_state l) {
+		sol::state_view lua = l;
+		sol::table data = lua.script(script);
+
+		std::string str = data["str"];
+		int num = data["num"];
+		std::string fstr = data["func"](data);
+		REQUIRE(str == "this is a string");
+		REQUIRE(fstr == "fstr");
+		REQUIRE(num == 1234);
+	};
+
+	auto bar2 = [&script](sol::this_state l) {
+		sol::state_view lua = l;
+		sol::table data = lua.do_string(script);
+
+		std::string str = data["str"];
+		int num = data["num"];
+		std::string fstr = data["func"](data);
+		REQUIRE(str == "this is a string");
+		REQUIRE(fstr == "fstr");
+		REQUIRE(num == 1234);
+	};
+
+	auto foo2 = [&script](int, sol::this_state l) {
+		sol::state_view lua = l;
+		sol::table data = lua.do_string(script);
+
+		std::string str = data["str"];
+		int num = data["num"];
+		std::string fstr = data["func"](data);
+		REQUIRE(str == "this is a string");
+		REQUIRE(fstr == "fstr");
+		REQUIRE(num == 1234);
+	};
+
+	sol::state lua;
+	lua.open_libraries();
+
+	lua.set_function("foo", foo);
+	lua.set_function("foo2", foo2);
+	lua.set_function("bar", bar);
+	lua.set_function("bar2", bar2);
+
+	lua.script("bar() bar2() foo(1) foo2(1)");
 }

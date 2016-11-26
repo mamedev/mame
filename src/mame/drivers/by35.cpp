@@ -537,7 +537,7 @@ WRITE_LINE_MEMBER( by35_state::u10_cb2_w )
 {
 //  logerror("New U10 CB2 state %01x, was %01x.   PIA=%02x\n", state, m_u10_cb2, m_u10a);
 
-	if (state == TRUE)
+	if (state == true)
 		m_lamp_decode = m_u10a & 0x0f;
 
 	m_u10_cb2 = state;
@@ -609,10 +609,10 @@ WRITE8_MEMBER( by35_state::u10_a_w )
 	{
 		if ((m_lamp_decode & 0x0f) < 0x0f)
 		{
-			if (output().get_indexed_value("lamp", ((m_lamp_decode & 0x0f)+00) ) ==0 ) output().set_indexed_value("lamp", ((m_lamp_decode & 0x0f)+00), ((data & 0x10) ? FALSE : TRUE));
-			if (output().get_indexed_value("lamp", ((m_lamp_decode & 0x0f)+15) ) ==0 ) output().set_indexed_value("lamp", ((m_lamp_decode & 0x0f)+15), ((data & 0x20) ? FALSE : TRUE));
-			if (output().get_indexed_value("lamp", ((m_lamp_decode & 0x0f)+30) ) ==0 ) output().set_indexed_value("lamp", ((m_lamp_decode & 0x0f)+30), ((data & 0x40) ? FALSE : TRUE));
-			if (output().get_indexed_value("lamp", ((m_lamp_decode & 0x0f)+45) ) ==0 ) output().set_indexed_value("lamp", ((m_lamp_decode & 0x0f)+45), ((data & 0x80) ? FALSE : TRUE));
+			if (output().get_indexed_value("lamp", ((m_lamp_decode & 0x0f)+00) ) ==0 ) output().set_indexed_value("lamp", ((m_lamp_decode & 0x0f)+00), ((data & 0x10) ? false : true));
+			if (output().get_indexed_value("lamp", ((m_lamp_decode & 0x0f)+15) ) ==0 ) output().set_indexed_value("lamp", ((m_lamp_decode & 0x0f)+15), ((data & 0x20) ? false : true));
+			if (output().get_indexed_value("lamp", ((m_lamp_decode & 0x0f)+30) ) ==0 ) output().set_indexed_value("lamp", ((m_lamp_decode & 0x0f)+30), ((data & 0x40) ? false : true));
+			if (output().get_indexed_value("lamp", ((m_lamp_decode & 0x0f)+45) ) ==0 ) output().set_indexed_value("lamp", ((m_lamp_decode & 0x0f)+45), ((data & 0x80) ? false : true));
 		}
 		else
 		{
@@ -716,11 +716,11 @@ WRITE8_MEMBER( by35_state::u11_b_w )
 		if ((data & 0x0f) < 0x0f)   // Momentary Solenoids
 		{
 			if (m_solenoid_features[(data & 0x0f)][0] != 0xff) {    // Play solenoid audio sample
-				if (output().get_indexed_value("solenoid", (data & 0x0f)) == FALSE)
+				if (output().get_indexed_value("solenoid", (data & 0x0f)) == false)
 					m_samples->start(m_solenoid_features[(data & 0x0f)][0], m_solenoid_features[(data & 0x0f)][1]);
 			}
 
-			output().set_indexed_value( "solenoid", (data & 0x0f), TRUE);
+			output().set_indexed_value( "solenoid", (data & 0x0f), true);
 
 			if (m_solenoid_features[(data & 0x0f)][3])  // Reset/release relevant switch after firing Solenoid
 				m_io_hold_x[(m_solenoid_features[(data & 0x0f)][2])] &= (m_solenoid_features[(data & 0x0f)][3]);
@@ -729,7 +729,7 @@ WRITE8_MEMBER( by35_state::u11_b_w )
 		{
 			for (int i=0; i<15; i++)
 			{
-				output().set_indexed_value( "solenoid", i, FALSE);
+				output().set_indexed_value( "solenoid", i, false);
 			}
 		}
 	}
@@ -737,49 +737,49 @@ WRITE8_MEMBER( by35_state::u11_b_w )
 
 	if ((m_u11b & 0x10) && ((data & 0x10)==0))
 	{
-		output().set_value("solenoid16", TRUE);
+		output().set_value("solenoid16", true);
 		if (m_solenoid_features[16][0] != 0xff)
 			m_samples->start(m_solenoid_features[16][0], m_solenoid_features[16][1]);
 	}
 	else if ((data & 0x10) && ((m_u11b & 0x10)==0))
 	{
-		output().set_value("solenoid16", FALSE);
+		output().set_value("solenoid16", false);
 		if (m_solenoid_features[16][0] != 0xff)
 			m_samples->start(m_solenoid_features[16][0], m_solenoid_features[16][2]);
 	}
 	if ((m_u11b & 0x20) && ((data & 0x20)==0))
 	{
-		output().set_value("solenoid17", TRUE);                   // Coin Lockout Coil engage
+		output().set_value("solenoid17", true);                   // Coin Lockout Coil engage
 		if (m_solenoid_features[17][0] != 0xff)
 			m_samples->start(m_solenoid_features[17][0], m_solenoid_features[17][1]);
 	}
 	else if ((data & 0x20) && ((m_u11b & 0x20)==0))
 	{
-		output().set_value("solenoid17", FALSE);                  // Coin Lockout Coil release
+		output().set_value("solenoid17", false);                  // Coin Lockout Coil release
 		if (m_solenoid_features[17][0] != 0xff)
 			m_samples->start(m_solenoid_features[17][0], m_solenoid_features[17][2]);
 	}
 	if ((m_u11b & 0x40) && ((data & 0x40)==0))
 	{
-		output().set_value("solenoid18", TRUE);                   // Flipper Enable Relay engage
+		output().set_value("solenoid18", true);                   // Flipper Enable Relay engage
 		if (m_solenoid_features[18][0] != 0xff)
 			m_samples->start(m_solenoid_features[18][0], m_solenoid_features[18][1]);
 	}
 	else if ((data & 0x40) && ((m_u11b & 0x40)==0))
 	{
-		output().set_value("solenoid18", FALSE);                  // Flipper Enable Relay release
+		output().set_value("solenoid18", false);                  // Flipper Enable Relay release
 		if (m_solenoid_features[18][0] != 0xff)
 			m_samples->start(m_solenoid_features[18][0], m_solenoid_features[18][2]);
 	}
 	if ((m_u11b & 0x80) && ((data & 0x80)==0))
 	{
-		output().set_value("solenoid19", TRUE);
+		output().set_value("solenoid19", true);
 		if (m_solenoid_features[19][0] != 0xff)
 			m_samples->start(m_solenoid_features[19][0], m_solenoid_features[19][1]);
 	}
 	else if ((data & 0x80) && ((m_u11b & 0x80)==0))
 	{
-		output().set_value("solenoid19", FALSE);
+		output().set_value("solenoid19", false);
 		if (m_solenoid_features[19][0] != 0xff)
 			m_samples->start(m_solenoid_features[19][0], m_solenoid_features[19][2]);
 	}

@@ -70,7 +70,7 @@ menu_software_parts::~menu_software_parts()
 //  populate
 //-------------------------------------------------
 
-void menu_software_parts::populate()
+void menu_software_parts::populate(float &customtop, float &custombottom)
 {
 	if (m_other_opt)
 	{
@@ -212,7 +212,7 @@ void menu_software_list::append_software_entry(const software_info &swinfo)
 //  populate
 //-------------------------------------------------
 
-void menu_software_list::populate()
+void menu_software_list::populate(float &customtop, float &custombottom)
 {
 	// build up the list of entries for the menu
 	for (const software_info &swinfo : m_swlist->get_info())
@@ -342,7 +342,7 @@ menu_software::~menu_software()
 //  populate
 //-------------------------------------------------
 
-void menu_software::populate()
+void menu_software::populate(float &customtop, float &custombottom)
 {
 	bool have_compatible = false;
 

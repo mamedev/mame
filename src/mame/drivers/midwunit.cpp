@@ -20,6 +20,9 @@
     Known bugs:
         * WWF has an unimplemented and not Y2K compatible real-time clock
 
+    NOTE: There is known to exist (currently not dumped) a Wrestlemania PCB with the following labels:
+          Wrestlemania 1.0 U63 #8549    &    Wrestlemania 1.0 U54 #40C7
+
 ***************************************************************************
 
 MK3/ Ultimate Mortal Kombat 3 / Williams-Midway Wolf hardware
@@ -620,7 +623,7 @@ static MACHINE_CONFIG_START( wunit, midwunit_state )
 
 	MCFG_CPU_ADD("maincpu", TMS34010, 50000000)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_TMS340X0_HALT_ON_RESET(FALSE) /* halt on reset */
+	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(PIXEL_CLOCK) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
 	MCFG_TMS340X0_SCANLINE_IND16_CB(midtunit_state, scanline_update)       /* scanline updater (indexed16) */

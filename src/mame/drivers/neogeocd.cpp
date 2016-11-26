@@ -1073,7 +1073,7 @@ MACHINE_CONFIG_END
 
 /*************************************
  *
- *  Driver initalization
+ *  Driver initialization
  *
  *************************************/
 

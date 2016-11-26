@@ -250,7 +250,7 @@ void gtia_device::device_reset()
 
 	/* reset the GTIA read/write/helper registers */
 	for (int i = 0; i < 32; i++)
-		write(machine().driver_data()->generic_space(), i, 0);
+		write(machine().dummy_space(), i, 0);
 
 	if (is_ntsc())
 		m_r.pal = 0xff;

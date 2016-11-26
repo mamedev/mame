@@ -73,12 +73,12 @@ public:
 	TIMER_CALLBACK_MEMBER(invasn_gun_callback);
 private:
 	void exit_handler();
-	void zeus_pointer_w(uint32_t which, uint32_t data, int logit);
-	void zeus_register16_w(offs_t offset, uint16_t data, int logit);
-	void zeus_register32_w(offs_t offset, uint32_t data, int logit);
+	void zeus_pointer_w(uint32_t which, uint32_t data, bool logit);
+	void zeus_register16_w(offs_t offset, uint16_t data, bool logit);
+	void zeus_register32_w(offs_t offset, uint32_t data, bool logit);
 	void zeus_register_update(offs_t offset);
 	int zeus_fifo_process(const uint32_t *data, int numwords);
-	void zeus_draw_model(uint32_t texdata, int logit);
+	void zeus_draw_model(uint32_t texdata, bool logit);
 
 	void log_fifo_command(const uint32_t *data, int numwords, const char *suffix);
 	void log_waveram(uint32_t length_and_base);

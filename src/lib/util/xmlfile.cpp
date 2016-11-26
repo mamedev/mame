@@ -11,8 +11,13 @@
 #include <assert.h>
 
 #include "xmlfile.h"
-#include <ctype.h>
+
 #include <expat.h>
+
+#include <algorithm>
+#include <cctype>
+#include <cstdlib>
+#include <cstring>
 
 
 /***************************************************************************
@@ -32,7 +37,7 @@ struct xml_parse_info
 	XML_Parser          parser;
 	xml_data_node *     rootnode;
 	xml_data_node *     curnode;
-	uint32_t              flags;
+	uint32_t            flags;
 };
 
 
@@ -42,73 +47,10 @@ struct xml_parse_info
 ***************************************************************************/
 
 /* expat interfaces */
-static int expat_setup_parser(xml_parse_info *parse_info, xml_parse_options *opts);
+static bool expat_setup_parser(xml_parse_info &info, xml_parse_options const *opts);
 static void expat_element_start(void *data, const XML_Char *name, const XML_Char **attributes);
 static void expat_data(void *data, const XML_Char *s, int len);
 static void expat_element_end(void *data, const XML_Char *name);
-
-/* node/attributes additions */
-static xml_data_node *add_child(xml_data_node *parent, const char *name, const char *value);
-static xml_attribute_node *add_attribute(xml_data_node *node, const char *name, const char *value);
-
-/* recursive tree operations */
-static void write_node_recursive(xml_data_node *node, int indent, util::core_file &file);
-static void free_node_recursive(xml_data_node *node);
-
-
-
-/***************************************************************************
-    CORE IMPLEMENTATION
-***************************************************************************/
-
-/*-------------------------------------------------
-    copystring - make an allocated copy of a
-    string
--------------------------------------------------*/
-
-static const char *copystring(const char *input)
-{
-	char *newstr;
-
-	/* nullptr just passes through */
-	if (input == nullptr)
-		return nullptr;
-
-	/* make a lower-case copy if the allocation worked */
-	newstr = (char *)malloc(strlen(input) + 1);
-	if (newstr != nullptr)
-		strcpy(newstr, input);
-
-	return newstr;
-}
-
-
-/*-------------------------------------------------
-    copystring_lower - make an allocated copy of
-    a string and convert it to lowercase along
-    the way
--------------------------------------------------*/
-
-static const char *copystring_lower(const char *input)
-{
-	char *newstr;
-	int i;
-
-	/* nullptr just passes through */
-	if (input == nullptr)
-		return nullptr;
-
-	/* make a lower-case copy if the allocation worked */
-	newstr = (char *)malloc(strlen(input) + 1);
-	if (newstr != nullptr)
-	{
-		for (i = 0; input[i] != 0; i++)
-			newstr[i] = tolower((uint8_t)input[i]);
-		newstr[i] = 0;
-	}
-
-	return newstr;
-}
 
 
 
@@ -121,16 +63,10 @@ static const char *copystring_lower(const char *input)
     object
 -------------------------------------------------*/
 
-xml_data_node *xml_file_create(void)
+xml_data_node *xml_data_node::file_create()
 {
-	xml_data_node *rootnode;
-
-	/* create a root node */
-	rootnode = (xml_data_node *)malloc(sizeof(*rootnode));
-	if (rootnode == nullptr)
-		return nullptr;
-	memset(rootnode, 0, sizeof(*rootnode));
-	return rootnode;
+	try { return new xml_data_node(); }
+	catch (...) { return nullptr; }
 }
 
 
@@ -139,13 +75,13 @@ xml_data_node *xml_file_create(void)
     nodes
 -------------------------------------------------*/
 
-xml_data_node *xml_file_read(util::core_file &file, xml_parse_options *opts)
+xml_data_node *xml_data_node::file_read(util::core_file &file, xml_parse_options const *opts)
 {
-	xml_parse_info parse_info;
+	xml_parse_info info;
 	int done;
 
 	/* set up the parser */
-	if (!expat_setup_parser(&parse_info, opts))
+	if (!expat_setup_parser(info, opts))
 		return nullptr;
 
 	/* loop through the file and parse it */
@@ -158,27 +94,27 @@ xml_data_node *xml_file_read(util::core_file &file, xml_parse_options *opts)
 		done = file.eof();
 
 		/* parse the data */
-		if (XML_Parse(parse_info.parser, tempbuf, bytes, done) == XML_STATUS_ERROR)
+		if (XML_Parse(info.parser, tempbuf, bytes, done) == XML_STATUS_ERROR)
 		{
 			if (opts != nullptr && opts->error != nullptr)
 			{
-				opts->error->error_message = XML_ErrorString(XML_GetErrorCode(parse_info.parser));
-				opts->error->error_line = XML_GetCurrentLineNumber(parse_info.parser);
-				opts->error->error_column = XML_GetCurrentColumnNumber(parse_info.parser);
+				opts->error->error_message = XML_ErrorString(XML_GetErrorCode(info.parser));
+				opts->error->error_line = XML_GetCurrentLineNumber(info.parser);
+				opts->error->error_column = XML_GetCurrentColumnNumber(info.parser);
 			}
 
-			xml_file_free(parse_info.rootnode);
-			XML_ParserFree(parse_info.parser);
+			info.rootnode->file_free();
+			XML_ParserFree(info.parser);
 			return nullptr;
 		}
-
-	} while (!done);
+	}
+	while (!done);
 
 	/* free the parser */
-	XML_ParserFree(parse_info.parser);
+	XML_ParserFree(info.parser);
 
 	/* return the root node */
-	return parse_info.rootnode;
+	return info.rootnode;
 }
 
 
@@ -187,35 +123,35 @@ xml_data_node *xml_file_read(util::core_file &file, xml_parse_options *opts)
     nodes
 -------------------------------------------------*/
 
-xml_data_node *xml_string_read(const char *string, xml_parse_options *opts)
+xml_data_node *xml_data_node::string_read(const char *string, xml_parse_options const *opts)
 {
-	xml_parse_info parse_info;
+	xml_parse_info info;
 	int length = (int)strlen(string);
 
 	/* set up the parser */
-	if (!expat_setup_parser(&parse_info, opts))
+	if (!expat_setup_parser(info, opts))
 		return nullptr;
 
 	/* parse the data */
-	if (XML_Parse(parse_info.parser, string, length, TRUE) == XML_STATUS_ERROR)
+	if (XML_Parse(info.parser, string, length, 1) == XML_STATUS_ERROR)
 	{
 		if (opts != nullptr && opts->error != nullptr)
 		{
-			opts->error->error_message = XML_ErrorString(XML_GetErrorCode(parse_info.parser));
-			opts->error->error_line = XML_GetCurrentLineNumber(parse_info.parser);
-			opts->error->error_column = XML_GetCurrentColumnNumber(parse_info.parser);
+			opts->error->error_message = XML_ErrorString(XML_GetErrorCode(info.parser));
+			opts->error->error_line = XML_GetCurrentLineNumber(info.parser);
+			opts->error->error_column = XML_GetCurrentColumnNumber(info.parser);
 		}
 
-		xml_file_free(parse_info.rootnode);
-		XML_ParserFree(parse_info.parser);
+		info.rootnode->file_free();
+		XML_ParserFree(info.parser);
 		return nullptr;
 	}
 
 	/* free the parser */
-	XML_ParserFree(parse_info.parser);
+	XML_ParserFree(info.parser);
 
 	/* return the root node */
-	return parse_info.rootnode;
+	return info.rootnode;
 }
 
 
@@ -223,10 +159,10 @@ xml_data_node *xml_string_read(const char *string, xml_parse_options *opts)
     xml_file_write - write an XML tree to a file
 -------------------------------------------------*/
 
-void xml_file_write(xml_data_node *node, util::core_file &file)
+void xml_data_node::file_write(util::core_file &file) const
 {
 	/* ensure this is a root node */
-	if (node->name != nullptr)
+	if (get_name())
 		return;
 
 	/* output a simple header */
@@ -234,8 +170,8 @@ void xml_file_write(xml_data_node *node, util::core_file &file)
 	file.printf("<!-- This file is autogenerated; comments and unknown tags will be stripped -->\n");
 
 	/* loop over children of the root and output */
-	for (node = node->child; node; node = node->next)
-		write_node_recursive(node, 0, file);
+	for (xml_data_node const *node = get_first_child(); node; node = node->get_next_sibling())
+		node->write_recursive(0, file);
 }
 
 
@@ -243,13 +179,13 @@ void xml_file_write(xml_data_node *node, util::core_file &file)
     xml_file_free - free an XML file object
 -------------------------------------------------*/
 
-void xml_file_free(xml_data_node *node)
+void xml_data_node::file_free()
 {
 	/* ensure this is a root node */
-	if (node->name != nullptr)
+	if (get_name())
 		return;
 
-	free_node_recursive(node);
+	delete this;
 }
 
 
@@ -258,32 +194,247 @@ void xml_file_free(xml_data_node *node)
     XML NODE MANAGEMENT
 ***************************************************************************/
 
+xml_data_node::xml_data_node()
+	: line(0)
+	, m_next(nullptr)
+	, m_first_child(nullptr)
+	, m_name()
+	, m_value()
+	, m_parent(nullptr)
+	, m_attributes()
+{
+}
+
+xml_data_node::xml_data_node(xml_data_node *parent, const char *name, const char *value)
+	: line(0)
+	, m_next(nullptr)
+	, m_first_child(nullptr)
+	, m_name(name ? name : "")
+	, m_value(value ? value : "")
+	, m_parent(parent)
+	, m_attributes()
+{
+	std::transform(m_name.begin(), m_name.end(), m_name.begin(), [] (char ch) { return std::tolower(uint8_t(ch)); });
+}
+
+
 /*-------------------------------------------------
-    xml_count_children - count the number of
-    child nodes
+    free_node_recursive - recursively free
+    the data allocated to an XML node
 -------------------------------------------------*/
 
-int xml_count_children(xml_data_node *node)
+xml_data_node::~xml_data_node()
+{
+	/* free the children */
+	for (xml_data_node *nchild = nullptr; m_first_child; m_first_child = nchild)
+	{
+		/* note the next node and free this node */
+		nchild = m_first_child->get_next_sibling();
+		delete m_first_child;
+	}
+}
+
+
+void xml_data_node::set_value(char const *value)
+{
+	m_value.assign(value ? value : "");
+}
+
+
+void xml_data_node::append_value(char const *value, int length)
+{
+	m_value.append(value, length);
+}
+
+
+void xml_data_node::trim_whitespace()
+{
+	/* first strip leading spaces */
+	std::string::iterator start = m_value.begin();
+	while ((m_value.end() != start) && std::isspace(uint8_t(*start)))
+		++start;
+	m_value.replace(m_value.begin(), start, 0U, '\0');
+
+	/* then strip trailing spaces */
+	std::string::iterator end = m_value.end();
+	while ((m_value.begin() != end) && std::isspace(uint8_t(*std::prev(end))))
+		--end;
+	m_value.replace(end, m_value.end(), 0U, '\0');
+}
+
+
+/*-------------------------------------------------
+    xml_data_node::count_children - count the
+    number of child nodes
+-------------------------------------------------*/
+
+int xml_data_node::count_children() const
 {
 	int count = 0;
 
 	/* loop over children and count */
-	for (node = node->child; node; node = node->next)
+	for (xml_data_node const *node = get_first_child(); node; node = node->get_next_sibling())
 		count++;
 	return count;
 }
 
 
 /*-------------------------------------------------
-    xml_get_sibling - find the next sibling of
+    xml_data_node::get_child - find the first
+    child of the specified node with the specified
+    tag
+-------------------------------------------------*/
+
+xml_data_node *xml_data_node::get_child(const char *name)
+{
+	return m_first_child ? m_first_child->get_sibling(name) : nullptr;
+}
+
+xml_data_node const *xml_data_node::get_child(const char *name) const
+{
+	return m_first_child ? m_first_child->get_sibling(name) : nullptr;
+}
+
+
+/*-------------------------------------------------
+    xml_find_first_matching_child - find the first
+    child of the specified node with the
+    specified tag or attribute/value pair
+-------------------------------------------------*/
+
+xml_data_node *xml_data_node::find_first_matching_child(const char *name, const char *attribute, const char *matchval)
+{
+	return m_first_child ? m_first_child->find_matching_sibling(name, attribute, matchval) : nullptr;
+}
+
+xml_data_node const *xml_data_node::find_first_matching_child(const char *name, const char *attribute, const char *matchval) const
+{
+	return m_first_child ? m_first_child->find_matching_sibling(name, attribute, matchval) : nullptr;
+}
+
+
+/*-------------------------------------------------
+    xml_data_node::get_next_sibling - find the
+    next sibling of the specified node with the
+    specified tag
+-------------------------------------------------*/
+
+xml_data_node *xml_data_node::get_next_sibling(const char *name)
+{
+	return m_next ? m_next->get_sibling(name) : nullptr;
+}
+
+xml_data_node const *xml_data_node::get_next_sibling(const char *name) const
+{
+	return m_next ? m_next->get_sibling(name) : nullptr;
+}
+
+
+/*-------------------------------------------------
+    xml_find_next_matching_sibling - find the next
+    sibling of the specified node with the
+    specified tag or attribute/value pair
+-------------------------------------------------*/
+
+xml_data_node *xml_data_node::find_next_matching_sibling(const char *name, const char *attribute, const char *matchval)
+{
+	return m_next ? m_next->find_matching_sibling(name, attribute, matchval) : nullptr;
+}
+
+xml_data_node const *xml_data_node::find_next_matching_sibling(const char *name, const char *attribute, const char *matchval) const
+{
+	return m_next ? m_next->find_matching_sibling(name, attribute, matchval) : nullptr;
+}
+
+
+/*-------------------------------------------------
+    xml_add_child - add a new child node to the
+    given node
+-------------------------------------------------*/
+
+xml_data_node *xml_data_node::add_child(const char *name, const char *value)
+{
+	/* new element: create a new node */
+	xml_data_node *node;
+	try { node = new xml_data_node(this, name, value); }
+	catch (...) { return nullptr; }
+
+	if (!node->get_name() || (!node->get_value() && value))
+	{
+		delete node;
+		return nullptr;
+	}
+
+	/* add us to the end of the list of siblings */
+	xml_data_node **pnode;
+	for (pnode = &m_first_child; *pnode; pnode = &(*pnode)->m_next) { }
+	*pnode = node;
+
+	return node;
+}
+
+
+/*-------------------------------------------------
+    xml_get_or_add_child - find a child node of
+    the specified type; if not found, add one
+-------------------------------------------------*/
+
+xml_data_node *xml_data_node::get_or_add_child(const char *name, const char *value)
+{
+	/* find the child first */
+	xml_data_node *const child = m_first_child->get_sibling(name);
+	if (child)
+		return child;
+
+	/* if not found, do a standard add child */
+	return add_child(name, value);
+}
+
+
+/*-------------------------------------------------
+    xml_delete_node - delete a node and its
+    children
+-------------------------------------------------*/
+
+void xml_data_node::delete_node()
+{
+	/* first unhook us from the list of children of our parent */
+	if (m_parent)
+	{
+		for (xml_data_node **pnode = &m_parent->m_first_child; *pnode; pnode = &(*pnode)->m_next)
+		{
+			if (*pnode == this)
+			{
+				*pnode = this->m_next;
+				break;
+			}
+		}
+	}
+
+	/* now free ourselves and our children */
+	delete this;
+}
+
+
+/*-------------------------------------------------
+    xml_get_next_sibling - find the next sibling of
     the specified node with the specified tag
 -------------------------------------------------*/
 
-xml_data_node *xml_get_sibling(xml_data_node *node, const char *name)
+xml_data_node *xml_data_node::get_sibling(const char *name)
 {
 	/* loop over siblings and find a matching name */
-	for ( ; node; node = node->next)
-		if (strcmp(node->name, name) == 0)
+	for (xml_data_node *node = this; node; node = node->get_next_sibling())
+		if (strcmp(node->get_name(), name) == 0)
+			return node;
+	return nullptr;
+}
+
+xml_data_node const *xml_data_node::get_sibling(const char *name) const
+{
+	/* loop over siblings and find a matching name */
+	for (xml_data_node const *node = this; node; node = node->get_next_sibling())
+		if (strcmp(node->get_name(), name) == 0)
 			return node;
 	return nullptr;
 }
@@ -295,74 +446,38 @@ xml_data_node *xml_get_sibling(xml_data_node *node, const char *name)
     specified tag or attribute/value pair
 -------------------------------------------------*/
 
-xml_data_node *xml_find_matching_sibling(xml_data_node *node, const char *name, const char *attribute, const char *matchval)
+xml_data_node *xml_data_node::find_matching_sibling(const char *name, const char *attribute, const char *matchval)
 {
 	/* loop over siblings and find a matching attribute */
-	for ( ; node; node = node->next)
+	for (xml_data_node *node = this; node; node = node->get_next_sibling())
 	{
 		/* can pass nullptr as a wildcard for the node name */
-		if (name == nullptr || strcmp(name, node->name) == 0)
+		if (!name || !strcmp(name, node->get_name()))
 		{
 			/* find a matching attribute */
-			xml_attribute_node *attr = xml_get_attribute(node, attribute);
-			if (attr != nullptr && strcmp(attr->value, matchval) == 0)
+			attribute_node const *const attr = node->get_attribute(attribute);
+			if (attr && !strcmp(attr->value.c_str(), matchval))
 				return node;
 		}
 	}
 	return nullptr;
 }
 
-
-/*-------------------------------------------------
-    xml_add_child - add a new child node to the
-    given node
--------------------------------------------------*/
-
-xml_data_node *xml_add_child(xml_data_node *node, const char *name, const char *value)
+xml_data_node const *xml_data_node::find_matching_sibling(const char *name, const char *attribute, const char *matchval) const
 {
-	/* just a standard add child */
-	return add_child(node, name, value);
-}
-
-
-/*-------------------------------------------------
-    xml_get_or_add_child - find a child node of
-    the specified type; if not found, add one
--------------------------------------------------*/
-
-xml_data_node *xml_get_or_add_child(xml_data_node *node, const char *name, const char *value)
-{
-	xml_data_node *child;
-
-	/* find the child first */
-	child = xml_get_sibling(node->child, name);
-	if (child != nullptr)
-		return child;
-
-	/* if not found, do a standard add child */
-	return add_child(node, name, value);
-}
-
-
-/*-------------------------------------------------
-    xml_delete_node - delete a node and its
-    children
--------------------------------------------------*/
-
-void xml_delete_node(xml_data_node *node)
-{
-	xml_data_node **pnode;
-
-	/* first unhook us from the list of children of our parent */
-	for (pnode = &node->parent->child; *pnode; pnode = &(*pnode)->next)
-		if (*pnode == node)
+	/* loop over siblings and find a matching attribute */
+	for (xml_data_node const *node = this; node; node = node->get_next_sibling())
+	{
+		/* can pass nullptr as a wildcard for the node name */
+		if (!name || !strcmp(name, node->get_name()))
 		{
-			*pnode = node->next;
-			break;
+			/* find a matching attribute */
+			attribute_node const *const attr = node->get_attribute(attribute);
+			if (attr && !strcmp(attr->value.c_str(), matchval))
+				return node;
 		}
-
-	/* now free ourselves and our children */
-	free_node_recursive(node);
+	}
+	return nullptr;
 }
 
 
@@ -371,19 +486,32 @@ void xml_delete_node(xml_data_node *node)
     XML ATTRIBUTE MANAGEMENT
 ***************************************************************************/
 
+bool xml_data_node::has_attribute(const char *attribute) const
+{
+	return get_attribute(attribute) != nullptr;
+}
+
+
 /*-------------------------------------------------
     xml_get_attribute - get the value of the
     specified attribute, or nullptr if not found
 -------------------------------------------------*/
 
-xml_attribute_node *xml_get_attribute(xml_data_node *node, const char *attribute)
+xml_data_node::attribute_node *xml_data_node::get_attribute(const char *attribute)
 {
-	xml_attribute_node *anode;
-
 	/* loop over attributes and find a match */
-	for (anode = node->attribute; anode; anode = anode->next)
-		if (strcmp(anode->name, attribute) == 0)
-			return anode;
+	for (attribute_node &anode : m_attributes)
+		if (strcmp(anode.name.c_str(), attribute) == 0)
+			return &anode;
+	return nullptr;
+}
+
+xml_data_node::attribute_node const *xml_data_node::get_attribute(const char *attribute) const
+{
+	/* loop over attributes and find a match */
+	for (attribute_node const &anode : m_attributes)
+		if (strcmp(anode.name.c_str(), attribute) == 0)
+			return &anode;
 	return nullptr;
 }
 
@@ -394,10 +522,10 @@ xml_attribute_node *xml_get_attribute(xml_data_node *node, const char *attribute
     found, return = the provided default
 -------------------------------------------------*/
 
-const char *xml_get_attribute_string(xml_data_node *node, const char *attribute, const char *defvalue)
+const char *xml_data_node::get_attribute_string(const char *attribute, const char *defvalue) const
 {
-	xml_attribute_node *attr = xml_get_attribute(node, attribute);
-	return attr ? attr->value : defvalue;
+	attribute_node const *attr = get_attribute(attribute);
+	return attr ? attr->value.c_str() : defvalue;
 }
 
 
@@ -407,9 +535,9 @@ const char *xml_get_attribute_string(xml_data_node *node, const char *attribute,
     found, return = the provided default
 -------------------------------------------------*/
 
-int xml_get_attribute_int(xml_data_node *node, const char *attribute, int defvalue)
+int xml_data_node::get_attribute_int(const char *attribute, int defvalue) const
 {
-	const char *string = xml_get_attribute_string(node, attribute, nullptr);
+	char const *const string = get_attribute_string(attribute, nullptr);
 	int value;
 	unsigned int uvalue;
 
@@ -430,19 +558,20 @@ int xml_get_attribute_int(xml_data_node *node, const char *attribute, int defval
     format of the given integer attribute
 -------------------------------------------------*/
 
-int xml_get_attribute_int_format(xml_data_node *node, const char *attribute)
+xml_data_node::int_format xml_data_node::get_attribute_int_format(const char *attribute) const
 {
-	const char *string = xml_get_attribute_string(node, attribute, nullptr);
+	char const *const string = get_attribute_string(attribute, nullptr);
 
-	if (string == nullptr)
-		return XML_INT_FORMAT_DECIMAL;
-	if (string[0] == '$')
-		return XML_INT_FORMAT_HEX_DOLLAR;
-	if (string[0] == '0' && string[1] == 'x')
-		return XML_INT_FORMAT_HEX_C;
+	if (!string)
+		return int_format::DECIMAL;
+	else if (string[0] == '$')
+		return int_format::HEX_DOLLAR;
+	else if (string[0] == '0' && string[1] == 'x')
+		return int_format::HEX_C;
 	if (string[0] == '#')
-		return XML_INT_FORMAT_DECIMAL_POUND;
-	return XML_INT_FORMAT_DECIMAL;
+		return int_format::DECIMAL_HASH;
+	else
+		return int_format::DECIMAL;
 }
 
 
@@ -452,21 +581,9 @@ int xml_get_attribute_int_format(xml_data_node *node, const char *attribute)
     found, return = the provided default
 -------------------------------------------------*/
 
-/**
- * @fn  float xml_get_attribute_float(xml_data_node *node, const char *attribute, float defvalue)
- *
- * @brief   XML get attribute float.
- *
- * @param [in,out]  node    If non-null, the node.
- * @param   attribute       The attribute.
- * @param   defvalue        The defvalue.
- *
- * @return  A float.
- */
-
-float xml_get_attribute_float(xml_data_node *node, const char *attribute, float defvalue)
+float xml_data_node::get_attribute_float(const char *attribute, float defvalue) const
 {
-	const char *string = xml_get_attribute_string(node, attribute, nullptr);
+	char const *const string = get_attribute_string(attribute, nullptr);
 	float value;
 
 	if (string == nullptr || sscanf(string, "%f", &value) != 1)
@@ -480,38 +597,23 @@ float xml_get_attribute_float(xml_data_node *node, const char *attribute, float 
     string value on the node
 -------------------------------------------------*/
 
-/**
- * @fn  xml_attribute_node *xml_set_attribute(xml_data_node *node, const char *name, const char *value)
- *
- * @brief   XML set attribute.
- *
- * @param [in,out]  node    If non-null, the node.
- * @param   name            The name.
- * @param   value           The value.
- *
- * @return  null if it fails, else an xml_attribute_node*.
- */
-
-xml_attribute_node *xml_set_attribute(xml_data_node *node, const char *name, const char *value)
+void xml_data_node::set_attribute(const char *name, const char *value)
 {
-	xml_attribute_node *anode;
+	attribute_node *anode;
 
 	/* first find an existing one to replace */
-	anode = xml_get_attribute(node, name);
+	anode = get_attribute(name);
 
-	/* if we found it, free the old value and replace it */
 	if (anode != nullptr)
 	{
-		if (anode->value != nullptr)
-			free((void *)anode->value);
-		anode->value = copystring(value);
+		/* if we found it, free the old value and replace it */
+		anode->value = value;
 	}
-
-	/* otherwise, create a new node */
 	else
-		anode = add_attribute(node, name, value);
-
-	return anode;
+	{
+		/* otherwise, create a new node */
+		add_attribute(name, value);
+	}
 }
 
 
@@ -520,23 +622,11 @@ xml_attribute_node *xml_set_attribute(xml_data_node *node, const char *name, con
     integer value on the node
 -------------------------------------------------*/
 
-/**
- * @fn  xml_attribute_node *xml_set_attribute_int(xml_data_node *node, const char *name, int value)
- *
- * @brief   XML set attribute int.
- *
- * @param [in,out]  node    If non-null, the node.
- * @param   name            The name.
- * @param   value           The value.
- *
- * @return  null if it fails, else an xml_attribute_node*.
- */
-
-xml_attribute_node *xml_set_attribute_int(xml_data_node *node, const char *name, int value)
+void xml_data_node::set_attribute_int(const char *name, int value)
 {
 	char buffer[100];
 	sprintf(buffer, "%d", value);
-	return xml_set_attribute(node, name, buffer);
+	set_attribute(name, buffer);
 }
 
 
@@ -545,23 +635,11 @@ xml_attribute_node *xml_set_attribute_int(xml_data_node *node, const char *name,
     float value on the node
 -------------------------------------------------*/
 
-/**
- * @fn  xml_attribute_node *xml_set_attribute_float(xml_data_node *node, const char *name, float value)
- *
- * @brief   XML set attribute float.
- *
- * @param [in,out]  node    If non-null, the node.
- * @param   name            The name.
- * @param   value           The value.
- *
- * @return  null if it fails, else an xml_attribute_node*.
- */
-
-xml_attribute_node *xml_set_attribute_float(xml_data_node *node, const char *name, float value)
+void xml_data_node::set_attribute_float(const char *name, float value)
 {
 	char buffer[100];
 	sprintf(buffer, "%f", (double) value);
-	return xml_set_attribute(node, name, buffer);
+	set_attribute(name, buffer);
 }
 
 
@@ -574,16 +652,6 @@ xml_attribute_node *xml_set_attribute_float(xml_data_node *node, const char *nam
     xml_normalize_string - normalize a string
     to ensure it doesn't contain embedded tags
 -------------------------------------------------*/
-
-/**
- * @fn  const char *xml_normalize_string(const char *string)
- *
- * @brief   XML normalize string.
- *
- * @param   string  The string.
- *
- * @return  null if it fails, else a char*.
- */
 
 const char *xml_normalize_string(const char *string)
 {
@@ -623,16 +691,6 @@ const char *xml_normalize_string(const char *string)
     systems
 -------------------------------------------------*/
 
-/**
- * @fn  static void *expat_malloc(size_t size)
- *
- * @brief   Expat malloc.
- *
- * @param   size    The size.
- *
- * @return  null if it fails, else a void*.
- */
-
 static void *expat_malloc(size_t size)
 {
 	uint32_t *result = (uint32_t *)malloc(size + 4 * sizeof(uint32_t));
@@ -640,30 +698,11 @@ static void *expat_malloc(size_t size)
 	return &result[4];
 }
 
-/**
- * @fn  static void expat_free(void *ptr)
- *
- * @brief   Expat free.
- *
- * @param [in,out]  ptr If non-null, the pointer.
- */
-
 static void expat_free(void *ptr)
 {
 	if (ptr != nullptr)
 		free(&((uint32_t *)ptr)[-4]);
 }
-
-/**
- * @fn  static void *expat_realloc(void *ptr, size_t size)
- *
- * @brief   Expat realloc.
- *
- * @param [in,out]  ptr If non-null, the pointer.
- * @param   size        The size.
- *
- * @return  null if it fails, else a void*.
- */
 
 static void *expat_realloc(void *ptr, size_t size)
 {
@@ -684,26 +723,15 @@ static void *expat_realloc(void *ptr, size_t size)
     expat_setup_parser - set up expat for parsing
 -------------------------------------------------*/
 
-/**
- * @fn  static int expat_setup_parser(xml_parse_info *parse_info, xml_parse_options *opts)
- *
- * @brief   Expat setup parser.
- *
- * @param [in,out]  parse_info  If non-null, information describing the parse.
- * @param [in,out]  opts        If non-null, options for controlling the operation.
- *
- * @return  An int.
- */
-
-static int expat_setup_parser(xml_parse_info *parse_info, xml_parse_options *opts)
+static bool expat_setup_parser(xml_parse_info &info, xml_parse_options const *opts)
 {
 	XML_Memory_Handling_Suite memcallbacks;
 
-	/* setup parse_info structure */
-	memset(parse_info, 0, sizeof(*parse_info));
+	/* setup info structure */
+	memset(&info, 0, sizeof(info));
 	if (opts != nullptr)
 	{
-		parse_info->flags = opts->flags;
+		info.flags = opts->flags;
 		if (opts->error != nullptr)
 		{
 			opts->error->error_message = nullptr;
@@ -713,31 +741,31 @@ static int expat_setup_parser(xml_parse_info *parse_info, xml_parse_options *opt
 	}
 
 	/* create a root node */
-	parse_info->rootnode = xml_file_create();
-	if (parse_info->rootnode == nullptr)
-		return FALSE;
-	parse_info->curnode = parse_info->rootnode;
+	info.rootnode = xml_data_node::file_create();
+	if (info.rootnode == nullptr)
+		return false;
+	info.curnode = info.rootnode;
 
 	/* create the XML parser */
 	memcallbacks.malloc_fcn = expat_malloc;
 	memcallbacks.realloc_fcn = expat_realloc;
 	memcallbacks.free_fcn = expat_free;
-	parse_info->parser = XML_ParserCreate_MM(nullptr, &memcallbacks, nullptr);
-	if (parse_info->parser == nullptr)
+	info.parser = XML_ParserCreate_MM(nullptr, &memcallbacks, nullptr);
+	if (info.parser == nullptr)
 	{
-		free(parse_info->rootnode);
-		return FALSE;
+		info.rootnode->file_free();
+		return false;
 	}
 
 	/* configure the parser */
-	XML_SetElementHandler(parse_info->parser, expat_element_start, expat_element_end);
-	XML_SetCharacterDataHandler(parse_info->parser, expat_data);
-	XML_SetUserData(parse_info->parser, parse_info);
+	XML_SetElementHandler(info.parser, expat_element_start, expat_element_end);
+	XML_SetCharacterDataHandler(info.parser, expat_data);
+	XML_SetUserData(info.parser, &info);
 
 	/* optional parser initialization step */
 	if (opts != nullptr && opts->init_parser != nullptr)
-		(*opts->init_parser)(parse_info->parser);
-	return TRUE;
+		(*opts->init_parser)(info.parser);
+	return true;
 }
 
 
@@ -745,16 +773,6 @@ static int expat_setup_parser(xml_parse_info *parse_info, xml_parse_options *opt
     expat_element_start - expat callback for a new
     element
 -------------------------------------------------*/
-
-/**
- * @fn  static void expat_element_start(void *data, const XML_Char *name, const XML_Char **attributes)
- *
- * @brief   Expat element start.
- *
- * @param [in,out]  data    If non-null, the data.
- * @param   name            The name.
- * @param   attributes      The attributes.
- */
 
 static void expat_element_start(void *data, const XML_Char *name, const XML_Char **attributes)
 {
@@ -764,7 +782,7 @@ static void expat_element_start(void *data, const XML_Char *name, const XML_Char
 	int attr;
 
 	/* add a new child node to the current node */
-	newnode = add_child(*curnode, name, nullptr);
+	newnode = (*curnode)->add_child(name, nullptr);
 	if (newnode == nullptr)
 		return;
 
@@ -773,7 +791,7 @@ static void expat_element_start(void *data, const XML_Char *name, const XML_Char
 
 	/* add all the attributes as well */
 	for (attr = 0; attributes[attr]; attr += 2)
-		add_attribute(newnode, attributes[attr+0], attributes[attr+1]);
+		newnode->add_attribute(attributes[attr+0], attributes[attr+1]);
 
 	/* set us up as the current node */
 	*curnode = newnode;
@@ -785,46 +803,11 @@ static void expat_element_start(void *data, const XML_Char *name, const XML_Char
     element data
 -------------------------------------------------*/
 
-/**
- * @fn  static void expat_data(void *data, const XML_Char *s, int len)
- *
- * @brief   Expat data.
- *
- * @param [in,out]  data    If non-null, the data.
- * @param   s               The const XML_Char * to process.
- * @param   len             The length.
- */
-
 static void expat_data(void *data, const XML_Char *s, int len)
 {
 	xml_parse_info *parse_info = (xml_parse_info *) data;
 	xml_data_node **curnode = &parse_info->curnode;
-	int oldlen = 0;
-	char *newdata;
-
-	/* if no data, skip */
-	if (len == 0)
-		return;
-
-	/* determine how much data we currently have */
-	if ((*curnode)->value != nullptr)
-		oldlen = (int)strlen((*curnode)->value);
-
-	/* realloc */
-	newdata = (char *)malloc(oldlen + len + 1);
-	if (newdata == nullptr)
-		return;
-	if ((*curnode)->value != nullptr)
-	{
-		memcpy(newdata, (*curnode)->value, oldlen);
-		free((void *)(*curnode)->value);
-	}
-	(*curnode)->value = newdata;
-
-	/* copy in the new data a NULL-terminate */
-	memcpy(&newdata[oldlen], s, len);
-	newdata[oldlen + len] = 0;
-	(*curnode)->value = newdata;
+	(*curnode)->append_value(s, len);
 }
 
 
@@ -833,53 +816,17 @@ static void expat_data(void *data, const XML_Char *s, int len)
     of an element
 -------------------------------------------------*/
 
-/**
- * @fn  static void expat_element_end(void *data, const XML_Char *name)
- *
- * @brief   Expat element end.
- *
- * @param [in,out]  data    If non-null, the data.
- * @param   name            The name.
- */
-
 static void expat_element_end(void *data, const XML_Char *name)
 {
 	xml_parse_info *parse_info = (xml_parse_info *) data;
 	xml_data_node **curnode = &parse_info->curnode;
-	char *orig;
 
 	/* strip leading/trailing spaces from the value data */
-	orig = (char *)(*curnode)->value;
-	if (orig != nullptr && !(parse_info->flags & XML_PARSE_FLAG_WHITESPACE_SIGNIFICANT))
-	{
-		char *start = orig;
-		char *end = start + strlen(start);
-
-		/* first strip leading spaces */
-		while (*start && isspace((uint8_t)*start))
-			start++;
-
-		/* then strip trailing spaces */
-		while (end > start && isspace((uint8_t)end[-1]))
-			end--;
-
-		/* if nothing left, just free it */
-		if (start == end)
-		{
-			free(orig);
-			(*curnode)->value = nullptr;
-		}
-
-		/* otherwise, memmove the data */
-		else
-		{
-			memmove(orig, start, end - start);
-			orig[end - start] = 0;
-		}
-	}
+	if (!(parse_info->flags & XML_PARSE_FLAG_WHITESPACE_SIGNIFICANT))
+		(*curnode)->trim_whitespace();
 
 	/* back us up a node */
-	*curnode = (*curnode)->parent;
+	*curnode = (*curnode)->get_parent();
 }
 
 
@@ -889,105 +836,20 @@ static void expat_element_end(void *data, const XML_Char *name)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    add_child - add a new node to the parent
--------------------------------------------------*/
-
-/**
- * @fn  static xml_data_node *add_child(xml_data_node *parent, const char *name, const char *value)
- *
- * @brief   Adds a child.
- *
- * @param [in,out]  parent  If non-null, the parent.
- * @param   name            The name.
- * @param   value           The value.
- *
- * @return  null if it fails, else an xml_data_node*.
- */
-
-static xml_data_node *add_child(xml_data_node *parent, const char *name, const char *value)
-{
-	xml_data_node **pnode;
-	xml_data_node *node;
-
-	/* new element: create a new node */
-	node = (xml_data_node *)malloc(sizeof(*node));
-	if (node == nullptr)
-		return nullptr;
-
-	/* initialize the members */
-	node->next = nullptr;
-	node->parent = parent;
-	node->child = nullptr;
-	node->name = copystring_lower(name);
-	if (node->name == nullptr)
-	{
-		free(node);
-		return nullptr;
-	}
-	node->value = copystring(value);
-	if (node->value == nullptr && value != nullptr)
-	{
-		free((void *)node->name);
-		free(node);
-		return nullptr;
-	}
-	node->attribute = nullptr;
-
-	/* add us to the end of the list of siblings */
-	for (pnode = &parent->child; *pnode; pnode = &(*pnode)->next) { }
-	*pnode = node;
-
-	return node;
-}
-
-
-/*-------------------------------------------------
     add_attribute - add a new attribute to the
     given node
 -------------------------------------------------*/
 
-/**
- * @fn  static xml_attribute_node *add_attribute(xml_data_node *node, const char *name, const char *value)
- *
- * @brief   Adds an attribute.
- *
- * @param [in,out]  node    If non-null, the node.
- * @param   name            The name.
- * @param   value           The value.
- *
- * @return  null if it fails, else an xml_attribute_node*.
- */
-
-static xml_attribute_node *add_attribute(xml_data_node *node, const char *name, const char *value)
+void xml_data_node::add_attribute(const char *name, const char *value)
 {
-	xml_attribute_node *anode, **panode;
-
-	/* allocate a new attribute node */
-	anode = (xml_attribute_node *)malloc(sizeof(*anode));
-	if (anode == nullptr)
-		return nullptr;
-
-	/* fill it in */
-	anode->next = nullptr;
-	anode->name = copystring_lower(name);
-	if (anode->name == nullptr)
+	try
 	{
-		free(anode);
-		return nullptr;
+		attribute_node &anode = *m_attributes.emplace(m_attributes.end(), name, value);
+		std::transform(anode.name.begin(), anode.name.end(), anode.name.begin(), [] (char ch) { return std::tolower(uint8_t(ch)); });
 	}
-	anode->value = copystring(value);
-	if (anode->value == nullptr)
+	catch (...)
 	{
-		free((void *)anode->name);
-		free(anode);
-		return nullptr;
 	}
-
-	/* add us to the end of the list of attributes */
-	for (panode = &node->attribute; *panode; panode = &(*panode)->next) { }
-	*panode = anode;
-
-	return anode;
 }
 
 
@@ -1001,100 +863,37 @@ static xml_attribute_node *add_attribute(xml_data_node *node, const char *name, 
     an XML node and its children to a file
 -------------------------------------------------*/
 
-/**
- * @fn  static void write_node_recursive(xml_data_node *node, int indent, util::core_file &file)
- *
- * @brief   Writes a node recursive.
- *
- * @param [in,out]  node    If non-null, the node.
- * @param   indent          The indent.
- * @param [in,out]  file    If non-null, the file.
- */
-
-static void write_node_recursive(xml_data_node *node, int indent, util::core_file &file)
+void xml_data_node::write_recursive(int indent, util::core_file &file) const
 {
-	xml_attribute_node *anode;
-	xml_data_node *child;
-
 	/* output this tag */
-	file.printf("%*s<%s", indent, "", node->name);
+	file.printf("%*s<%s", indent, "", get_name());
 
 	/* output any attributes */
-	for (anode = node->attribute; anode; anode = anode->next)
-		file.printf(" %s=\"%s\"", anode->name, anode->value);
+	for (attribute_node const &anode : m_attributes)
+		file.printf(" %s=\"%s\"", anode.name, anode.value);
 
-	/* if there are no children and no value, end the tag here */
-	if (node->child == nullptr && node->value == nullptr)
+	if (!get_first_child() && !get_value())
+	{
+		/* if there are no children and no value, end the tag here */
 		file.printf(" />\n");
-
-	/* otherwise, close this tag and output more stuff */
+	}
 	else
 	{
+		/* otherwise, close this tag and output more stuff */
 		file.printf(">\n");
 
 		/* if there is a value, output that here */
-		if (node->value != nullptr)
-			file.printf("%*s%s\n", indent + 4, "", node->value);
+		if (get_value())
+			file.printf("%*s%s\n", indent + 4, "", get_value());
 
 		/* loop over children and output them as well */
-		if (node->child != nullptr)
+		if (get_first_child())
 		{
-			for (child = node->child; child; child = child->next)
-				write_node_recursive(child, indent + 4, file);
+			for (xml_data_node const *child = this->get_first_child(); child; child = child->get_next_sibling())
+				child->write_recursive(indent + 4, file);
 		}
 
 		/* write a closing tag */
-		file.printf("%*s</%s>\n", indent, "", node->name);
+		file.printf("%*s</%s>\n", indent, "", get_name());
 	}
-}
-
-
-/*-------------------------------------------------
-    free_node_recursive - recursively free
-    the data allocated to an XML node
--------------------------------------------------*/
-
-/**
- * @fn  static void free_node_recursive(xml_data_node *node)
- *
- * @brief   Free node recursive.
- *
- * @param [in,out]  node    If non-null, the node.
- */
-
-static void free_node_recursive(xml_data_node *node)
-{
-	xml_attribute_node *anode, *nanode;
-	xml_data_node *child, *nchild;
-
-	/* free name/value */
-	if (node->name != nullptr)
-		free((void *)node->name);
-	if (node->value != nullptr)
-		free((void *)node->value);
-
-	/* free attributes */
-	for (anode = node->attribute; anode; anode = nanode)
-	{
-		/* free name/value */
-		if (anode->name != nullptr)
-			free((void *)anode->name);
-		if (anode->value != nullptr)
-			free((void *)anode->value);
-
-		/* note the next node and free this node */
-		nanode = anode->next;
-		free(anode);
-	}
-
-	/* free the children */
-	for (child = node->child; child; child = nchild)
-	{
-		/* note the next node and free this node */
-		nchild = child->next;
-		free_node_recursive(child);
-	}
-
-	/* finally free ourself */
-	free(node);
 }

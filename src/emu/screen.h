@@ -16,8 +16,8 @@
 #error Dont include this file directly; include emu.h instead.
 #endif
 
-#ifndef __SCREEN_H__
-#define __SCREEN_H__
+#ifndef MAME_EMU_SCREEN_H
+#define MAME_EMU_SCREEN_H
 
 
 //**************************************************************************
@@ -46,7 +46,7 @@ enum texture_format
 };
 
 // screen_update callback flags
-const uint32_t UPDATE_HAS_NOT_CHANGED = 0x0001;   // the video has not changed
+constexpr u32 UPDATE_HAS_NOT_CHANGED = 0x0001;   // the video has not changed
 
 /*!
  @defgroup flags for video_attributes
@@ -72,12 +72,12 @@ const uint32_t UPDATE_HAS_NOT_CHANGED = 0x0001;   // the video has not changed
  @}
  */
 
-#define VIDEO_UPDATE_BEFORE_VBLANK      0x0000
-#define VIDEO_UPDATE_AFTER_VBLANK       0x0004
+constexpr u32 VIDEO_UPDATE_BEFORE_VBLANK    = 0x0000;
+constexpr u32 VIDEO_UPDATE_AFTER_VBLANK     = 0x0004;
 
-#define VIDEO_SELF_RENDER               0x0008
-#define VIDEO_ALWAYS_UPDATE             0x0080
-#define VIDEO_UPDATE_SCANLINE           0x0100
+constexpr u32 VIDEO_SELF_RENDER             = 0x0008;
+constexpr u32 VIDEO_ALWAYS_UPDATE           = 0x0080;
+constexpr u32 VIDEO_UPDATE_SCANLINE         = 0x0100;
 
 
 //**************************************************************************
@@ -124,11 +124,11 @@ public:
 	bitmap_rgb32 &as_rgb32() { assert(m_format == BITMAP_FORMAT_RGB32); return m_rgb32; }
 
 	// getters
-	int32_t width() const { return live().width(); }
-	int32_t height() const { return live().height(); }
-	int32_t rowpixels() const { return live().rowpixels(); }
-	int32_t rowbytes() const { return live().rowbytes(); }
-	uint8_t bpp() const { return live().bpp(); }
+	s32 width() const { return live().width(); }
+	s32 height() const { return live().height(); }
+	s32 rowpixels() const { return live().rowpixels(); }
+	s32 rowbytes() const { return live().rowbytes(); }
+	u8 bpp() const { return live().bpp(); }
 	bitmap_format format() const { return m_format; }
 	texture_format texformat() const { return m_texformat; }
 	bool valid() const { return live().valid(); }
@@ -165,8 +165,8 @@ private:
 
 typedef delegate<void (screen_device &, bool)> vblank_state_delegate;
 
-typedef device_delegate<uint32_t (screen_device &, bitmap_ind16 &, const rectangle &)> screen_update_ind16_delegate;
-typedef device_delegate<uint32_t (screen_device &, bitmap_rgb32 &, const rectangle &)> screen_update_rgb32_delegate;
+typedef device_delegate<u32 (screen_device &, bitmap_ind16 &, const rectangle &)> screen_update_ind16_delegate;
+typedef device_delegate<u32 (screen_device &, bitmap_rgb32 &, const rectangle &)> screen_update_rgb32_delegate;
 typedef device_delegate<void (screen_device &, bool)> screen_vblank_delegate;
 
 
@@ -181,7 +181,7 @@ class screen_device : public device_t
 
 public:
 	// construction/destruction
-	screen_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	screen_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 	~screen_device();
 
 	// configuration readers
@@ -202,17 +202,17 @@ public:
 
 	// inline configuration helpers
 	static void static_set_type(device_t &device, screen_type_enum type);
-	static void static_set_raw(device_t &device, uint32_t pixclock, uint16_t htotal, uint16_t hbend, uint16_t hbstart, uint16_t vtotal, uint16_t vbend, uint16_t vbstart);
+	static void static_set_raw(device_t &device, u32 pixclock, u16 htotal, u16 hbend, u16 hbstart, u16 vtotal, u16 vbend, u16 vbstart);
 	static void static_set_refresh(device_t &device, attoseconds_t rate);
 	static void static_set_vblank_time(device_t &device, attoseconds_t time);
-	static void static_set_size(device_t &device, uint16_t width, uint16_t height);
-	static void static_set_visarea(device_t &device, int16_t minx, int16_t maxx, int16_t miny, int16_t maxy);
+	static void static_set_size(device_t &device, u16 width, u16 height);
+	static void static_set_visarea(device_t &device, s16 minx, s16 maxx, s16 miny, s16 maxy);
 	static void static_set_default_position(device_t &device, double xscale, double xoffs, double yscale, double yoffs);
 	static void static_set_screen_update(device_t &device, screen_update_ind16_delegate callback);
 	static void static_set_screen_update(device_t &device, screen_update_rgb32_delegate callback);
 	static void static_set_screen_vblank(device_t &device, screen_vblank_delegate callback);
 	static void static_set_palette(device_t &device, const char *tag);
-	static void static_set_video_attributes(device_t &device, uint32_t flags);
+	static void static_set_video_attributes(device_t &device, u32 flags);
 	static void static_set_color(device_t &device, rgb_t color);
 	static void static_set_svg_region(device_t &device, const char *region);
 
@@ -226,7 +226,7 @@ public:
 	void configure(int width, int height, const rectangle &visarea, attoseconds_t frame_period);
 	void reset_origin(int beamy = 0, int beamx = 0);
 	void set_visible_area(int min_x, int max_x, int min_y, int max_y);
-	void set_brightness(uint8_t brightness) { m_brightness = brightness; }
+	void set_brightness(u8 brightness) { m_brightness = brightness; }
 
 	// beam positioning and state
 	int vpos() const;
@@ -242,7 +242,7 @@ public:
 	attotime time_until_update() const { return (m_video_attributes & VIDEO_UPDATE_AFTER_VBLANK) ? time_until_vblank_end() : time_until_vblank_start(); }
 	attotime scan_period() const { return attotime(0, m_scantime); }
 	attotime frame_period() const { return attotime(0, m_frame_period); }
-	uint64_t frame_number() const { return m_frame_number; }
+	u64 frame_number() const { return m_frame_number; }
 
 	// updating
 	int partial_updates() const { return m_partial_updates_this_frame; }
@@ -259,7 +259,7 @@ public:
 	void update_burnin();
 
 	// globally accessible constants
-	static const int DEFAULT_FRAME_RATE = 60;
+	static constexpr int DEFAULT_FRAME_RATE = 60;
 	static const attotime DEFAULT_FRAME_PERIOD;
 
 private:
@@ -299,7 +299,7 @@ private:
 	screen_update_rgb32_delegate m_screen_update_rgb32; // screen update callback (32-bit RGB)
 	screen_vblank_delegate m_screen_vblank;         // screen vblank callback
 	optional_device<palette_device> m_palette;      // our palette
-	uint32_t              m_video_attributes;         // flags describing the video system
+	u32                 m_video_attributes;         // flags describing the video system
 	const char *        m_svg_region;               // the region in which the svg data is in
 
 	// internal state
@@ -316,15 +316,15 @@ private:
 	screen_bitmap       m_bitmap[2];                // 2x bitmaps for rendering
 	bitmap_ind8         m_priority;                 // priority bitmap
 	bitmap_ind64        m_burnin;                   // burn-in bitmap
-	uint8_t               m_curbitmap;                // current bitmap index
-	uint8_t               m_curtexture;               // current texture index
+	u8                  m_curbitmap;                // current bitmap index
+	u8                  m_curtexture;               // current texture index
 	bool                m_changed;                  // has this bitmap changed?
-	int32_t               m_last_partial_scan;        // scanline of last partial update
-	int32_t               m_partial_scan_hpos;        // horizontal pixel last rendered on this partial scanline
+	s32                 m_last_partial_scan;        // scanline of last partial update
+	s32                 m_partial_scan_hpos;        // horizontal pixel last rendered on this partial scanline
 	bitmap_argb32       m_screen_overlay_bitmap;    // screen overlay bitmap
-	uint32_t              m_unique_id;                // unique id for this screen_device
+	u32                 m_unique_id;                // unique id for this screen_device
 	rgb_t               m_color;                    // render color
-	uint8_t               m_brightness;               // global brightness
+	u8                  m_brightness;               // global brightness
 
 	// screen timing
 	attoseconds_t       m_frame_period;             // attoseconds per frame
@@ -337,8 +337,8 @@ private:
 	emu_timer *         m_vblank_end_timer;         // timer to signal VBLANK end
 	emu_timer *         m_scanline0_timer;          // scanline 0 timer
 	emu_timer *         m_scanline_timer;           // scanline timer
-	uint64_t              m_frame_number;             // the current frame number
-	uint32_t              m_partial_updates_this_frame;// partial update counter this frame
+	u64                 m_frame_number;             // the current frame number
+	u32                 m_partial_updates_this_frame;// partial update counter this frame
 
 	// VBLANK callbacks
 	class callback_item
@@ -362,7 +362,7 @@ private:
 	std::vector<std::unique_ptr<auto_bitmap_item>> m_auto_bitmap_list; // list of registered bitmaps
 
 	// static data
-	static uint32_t       m_id_counter; // incremented for each constructed screen_device,
+	static u32          m_id_counter;   // incremented for each constructed screen_device,
 										// used as a unique identifier during runtime
 };
 
@@ -524,16 +524,16 @@ typedef device_type_iterator<&device_creator<screen_device>, screen_device> scre
 //-------------------------------------------------
 
 template<class _FunctionClass>
-inline screen_update_ind16_delegate screen_update_delegate_smart(uint32_t (_FunctionClass::*callback)(screen_device &, bitmap_ind16 &, const rectangle &), const char *name, const char *devname)
+inline screen_update_ind16_delegate screen_update_delegate_smart(u32 (_FunctionClass::*callback)(screen_device &, bitmap_ind16 &, const rectangle &), const char *name, const char *devname)
 {
 	return screen_update_ind16_delegate(callback, name, devname, (_FunctionClass *)nullptr);
 }
 
 template<class _FunctionClass>
-inline screen_update_rgb32_delegate screen_update_delegate_smart(uint32_t (_FunctionClass::*callback)(screen_device &, bitmap_rgb32 &, const rectangle &), const char *name, const char *devname)
+inline screen_update_rgb32_delegate screen_update_delegate_smart(u32 (_FunctionClass::*callback)(screen_device &, bitmap_rgb32 &, const rectangle &), const char *name, const char *devname)
 {
 	return screen_update_rgb32_delegate(callback, name, devname, (_FunctionClass *)nullptr);
 }
 
 
-#endif  /* __SCREEN_H__ */
+#endif  /* MAME_EMU_SCREEN_H */

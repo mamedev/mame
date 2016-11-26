@@ -42,7 +42,7 @@ const device_type AAKART = &device_creator<aakart_device>;
 aakart_device::aakart_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, AAKART, "AAKART", tag, owner, clock, "aakart", __FILE__), m_rxtimer(nullptr), m_txtimer(nullptr), m_mousetimer(nullptr), m_keybtimer(nullptr),
 		m_out_tx_cb(*this),
-		m_out_rx_cb(*this), m_tx_latch(0), m_rx(0), m_new_command(0), m_status(0), m_mouse_enable(0), m_keyb_enable(0), m_keyb_row(0), m_keyb_col(0), m_keyb_state(0)
+		m_out_rx_cb(*this), m_tx_latch(0), m_rx(0), m_new_command(0), m_status(0), m_mouse_enable(0), m_keyb_enable(0)
 {
 }
 
@@ -68,7 +68,7 @@ void aakart_device::device_start()
 	m_rxtimer = timer_alloc(RX_TIMER);
 	m_rxtimer->adjust(attotime::from_hz(clock()), 0, attotime::from_hz(clock()));
 	m_txtimer = timer_alloc(TX_TIMER);
-	m_txtimer->adjust(attotime::from_hz(clock()), 0, attotime::from_hz(clock()));
+	m_txtimer->adjust(attotime::from_hz(1), 0, attotime::from_hz(clock()));
 	m_mousetimer = timer_alloc(MOUSE_TIMER);
 	m_mousetimer->adjust(attotime::from_hz(clock()), 0, attotime::from_hz(clock()));
 	m_keybtimer = timer_alloc(KEYB_TIMER);
@@ -84,7 +84,9 @@ void aakart_device::device_reset()
 	m_status = STATUS_HRST;
 	m_new_command = 0;
 	m_rx = -1;
+	m_keyb_enable = 0;
 	m_mouse_enable = 0;
+	m_queue_size = 0;
 }
 
 //-------------------------------------------------
@@ -93,13 +95,17 @@ void aakart_device::device_reset()
 
 void aakart_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	if(id == TX_TIMER && m_new_command & 1)
+	if(id == TX_TIMER && m_new_command)
 	{
 		switch(m_tx_latch)
 		{
 			case 0x00:
+			case 0x01:
 			case 0x02:
 			case 0x03:
+			case 0x04:
+			case 0x05:
+			case 0x06:
 			case 0x07:
 				// ---- -x-- scroll lock
 				// ---- --x- num lock
@@ -115,23 +121,22 @@ void aakart_device::device_timer(emu_timer &timer, device_timer_id id, int param
 			case 0x33:
 				m_keyb_enable = m_tx_latch & 1;
 				m_mouse_enable = (m_tx_latch & 2) >> 1;
-				if(m_keyb_enable & 1 && m_keyb_state & 1)
+				if(m_queue_size)
 				{
-					//printf("Got row\n");
-					m_rx = m_keyb_row;
+					m_rx = m_queue[0] & 0xff;
 					m_out_tx_cb(ASSERT_LINE);
 				}
-
 				break;
 			case 0x3f:
-				if(m_keyb_enable & 1 && m_keyb_state & 1)
+				if(m_queue_size)
 				{
-					//printf("Got col\n");
-					m_rx = m_keyb_col;
+					m_rx = (m_queue[0] >> 8) & 0xff;
 					m_out_tx_cb(ASSERT_LINE);
-					m_keyb_state = 0;
-				}
 
+					m_queue_size--;
+					for(int i=0; i<m_queue_size; i++)
+						m_queue[i] = m_queue[i + 1];
+				}	
 				break;
 			case 0xfd:
 				m_rx = 0xfd;
@@ -150,17 +155,20 @@ void aakart_device::device_timer(emu_timer &timer, device_timer_id id, int param
 				break;
 		}
 
-		//m_new_command &= ~1;
+		m_new_command = 0;
 		m_out_rx_cb(ASSERT_LINE);
 	}
-
+	else if(id == TX_TIMER && m_queue_size && (m_keyb_enable || m_mouse_enable))
+	{
+		m_rx = m_queue[0] & 0xff;
+		m_out_tx_cb(ASSERT_LINE);
+	}
 }
 
 //**************************************************************************
 //  READ/WRITE HANDLERS
 //**************************************************************************
 
-#include "debugger.h"
 
 READ8_MEMBER( aakart_device::read )
 {
@@ -181,15 +189,19 @@ WRITE8_MEMBER( aakart_device::write )
 void aakart_device::send_keycode_down(uint8_t row, uint8_t col)
 {
 	//printf("keycode down\n");
-	m_keyb_row = row | 0xc0;
-	m_keyb_col = col | 0xc0;
-	m_keyb_state = 1;
+	if (m_keyb_enable && m_queue_size < 0x10)
+		m_queue[m_queue_size++] = ((col | 0xc0) << 8) | (row | 0xc0);
 }
 
 void aakart_device::send_keycode_up(uint8_t row, uint8_t col)
 {
 	//printf("keycode up\n");
-	m_keyb_row = row | 0xd0;
-	m_keyb_col = col | 0xd0;
-	m_keyb_state = 1;
+	if (m_keyb_enable && m_queue_size < 0x10)
+		m_queue[m_queue_size++] = ((col | 0xd0) << 8) | (row | 0xd0);
+}
+
+void aakart_device::send_mouse(uint8_t x, uint8_t y)
+{
+	if (m_mouse_enable && m_queue_size < 0x10)
+		m_queue[m_queue_size++] = ((y & 0x7f) << 8) | (x & 0x7f);
 }

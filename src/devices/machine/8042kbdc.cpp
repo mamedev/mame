@@ -288,7 +288,7 @@ void kbdc8042_device::at_8042_check_keyboard()
 
 	if (!m_keyboard.received && !m_mouse.received)
 	{
-		if((data = m_keyboard_dev->read(machine().driver_data()->generic_space(), 0)))
+		if((data = m_keyboard_dev->read(machine().dummy_space(), 0)))
 			at_8042_receive(data);
 	}
 }

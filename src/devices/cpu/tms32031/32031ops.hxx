@@ -574,14 +574,14 @@ void tms3203x_device::addf(tmsreg &dst, tmsreg &src1, tmsreg &src2)
 	}
 
 	// if the mantissa is >= 2.0 or < -2.0, normalize
-	else if (man >= int64_t(U64(0x100000000)) || man < int64_t(U64(0xffffffff00000000)))
+	else if (man >= int64_t(0x100000000U) || man < int64_t(0xffffffff00000000U))
 	{
 		man >>= 1;
 		exp++;
 	}
 
 	// if the mantissa is < 1.0 and > -1.0, normalize
-	else if (man < int64_t(U64(0x80000000)) && man >= int64_t(U64(0xffffffff80000000)))
+	else if (man < int64_t(0x80000000U) && man >= int64_t(0xffffffff80000000U))
 	{
 		if (man > 0)
 		{
@@ -687,14 +687,14 @@ void tms3203x_device::subf(tmsreg &dst, tmsreg &src1, tmsreg &src2)
 	}
 
 	// if the mantissa is >= 2.0 or < -2.0, normalize
-	else if (man >= int64_t(U64(0x100000000)) || man < int64_t(U64(0xffffffff00000000)))
+	else if (man >= int64_t(0x100000000U) || man < int64_t(0xffffffff00000000U))
 	{
 		man >>= 1;
 		exp++;
 	}
 
 	// if the mantissa is < 1.0 and > -1.0, normalize
-	else if (man < int64_t(U64(0x80000000)) && man >= int64_t(U64(0xffffffff80000000)))
+	else if (man < int64_t(0x80000000U) && man >= int64_t(0xffffffff80000000U))
 	{
 		if (man > 0)
 		{
@@ -778,11 +778,11 @@ void tms3203x_device::mpyf(tmsreg &dst, tmsreg &src1, tmsreg &src2)
 	}
 
 	// if the mantissa is >= 2.0 or <= -2.0, normalize
-	else if (man >= int64_t(U64(0x100000000)))
+	else if (man >= int64_t(0x100000000U))
 	{
 		man >>= 1;
 		exp++;
-		if (man >= int64_t(U64(0x100000000)))
+		if (man >= int64_t(0x100000000U))
 		{
 			man >>= 1;
 			exp++;
@@ -790,7 +790,7 @@ void tms3203x_device::mpyf(tmsreg &dst, tmsreg &src1, tmsreg &src2)
 	}
 
 	// if the mantissa is >= 2.0 or <= -2.0, normalize
-	else if (man < int64_t(U64(0xffffffff00000000)))
+	else if (man < int64_t(0xffffffff00000000U))
 	{
 		man >>= 1;
 		exp++;

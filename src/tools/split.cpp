@@ -343,7 +343,7 @@ static int join_file(const char *filename, const char *outname, int write_output
 			printf(" verified\n");
 
 		// release allocated memory
-		osd_free(splitbuffer);
+		free(splitbuffer);
 		splitbuffer = nullptr;
 	}
 	if (write_output)
@@ -366,7 +366,7 @@ cleanup:
 			remove(outfilename.c_str());
 	}
 	if (splitbuffer != nullptr)
-		osd_free(splitbuffer);
+		free(splitbuffer);
 	return error;
 }
 
@@ -396,7 +396,7 @@ int main(int argc, char *argv[])
 	{
 		if (argc != 3 && argc != 4)
 			goto usage;
-		result = join_file(argv[2], (argc >= 4) ? argv[3] : nullptr, TRUE);
+		result = join_file(argv[2], (argc >= 4) ? argv[3] : nullptr, true);
 	}
 
 	/* verify command */
@@ -404,7 +404,7 @@ int main(int argc, char *argv[])
 	{
 		if (argc != 3)
 			goto usage;
-		result = join_file(argv[2], nullptr, FALSE);
+		result = join_file(argv[2], nullptr, false);
 	}
 	else
 		goto usage;

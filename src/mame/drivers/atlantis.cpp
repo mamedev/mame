@@ -302,7 +302,7 @@ WRITE8_MEMBER(atlantis_state::cmos_w)
 	}
 	else if (m_cmos_write_enabled) {
 		COMBINE_DATA(&m_rtc_data[offset]);
-		m_cmos_write_enabled = FALSE;
+		m_cmos_write_enabled = false;
 		switch (offset) {
 		case 0x7FF8: // M48T02 time
 			if (data & 0x40) {
@@ -331,7 +331,7 @@ WRITE8_MEMBER(atlantis_state::cmos_w)
 
 WRITE32_MEMBER(atlantis_state::cmos_protect_w)
 {
-	m_cmos_write_enabled = TRUE;
+	m_cmos_write_enabled = true;
 }
 
 READ32_MEMBER(atlantis_state::status_leds_r)
@@ -627,7 +627,7 @@ void atlantis_state::machine_reset()
 	m_dcs->reset_w(1);
 	m_dcs->reset_w(0);
 	m_user_io_state = 0;
-	m_cmos_write_enabled = FALSE;
+	m_cmos_write_enabled = false;
 	m_serial_count = 0;
 	m_irq_state = 0;
 	memset(board_ctrl, 0, sizeof(board_ctrl));

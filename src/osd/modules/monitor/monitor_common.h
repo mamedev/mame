@@ -4,6 +4,8 @@
 * monitor_common.h
 *
 */
+#ifndef __MONITOR_COMMON_H__
+#define __MONITOR_COMMON_H__
 
 #include "modules/lib/osdobj_common.h"
 #include <map>
@@ -41,3 +43,5 @@ private:
 	std::shared_ptr<osd_monitor_info> pick_monitor_internal(osd_options& options, int index);
 	static float get_aspect(const char *defdata, const char *data, int report_error);
 };
+
+#endif

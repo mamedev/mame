@@ -208,14 +208,14 @@ void swtpc09_state::swtpc09_irq_handler(uint8_t peripheral, uint8_t state)
 	if (!m_active_interrupt && m_interrupt)    //no active interrupt and it needs to be asserted
 	{
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
-		m_active_interrupt=TRUE;
+		m_active_interrupt=true;
 		LOG(("swtpc09_irq_assert %02X\n", peripheral));
 	}
 	else if (m_active_interrupt && !m_interrupt)  //active interrupt and it needs to be cleared
 	{
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
 		LOG(("swtpc09_irq_clear %02X\n", peripheral));
-		m_active_interrupt=FALSE;
+		m_active_interrupt=false;
 	}
 }
 
@@ -779,7 +779,7 @@ DRIVER_INIT_MEMBER( swtpc09_state, swtpc09 )
 	m_fdc_status = 0;    // for floppy controller
 	m_system_type = FLEX_DMF2;
 	m_interrupt = 0;
-	m_active_interrupt = FALSE;
+	m_active_interrupt = false;
 
 	/* reset the 6844 */
 	for (i = 0; i < 4; i++)
@@ -801,7 +801,7 @@ DRIVER_INIT_MEMBER( swtpc09_state, swtpc09i )
 	m_fdc_status = 0;    // for floppy controller
 	m_system_type = FLEX_DC4_PIAIDE;
 	m_interrupt = 0;
-	m_active_interrupt = FALSE;
+	m_active_interrupt = false;
 
 	/* reset the 6844 */
 	for (i = 0; i < 4; i++)
@@ -823,7 +823,7 @@ DRIVER_INIT_MEMBER( swtpc09_state, swtpc09u )
 	m_fdc_status = 0;    // for floppy controller
 	m_system_type = UNIFLEX_DMF2;
 	m_interrupt = 0;
-	m_active_interrupt = FALSE;
+	m_active_interrupt = false;
 
 	/* reset the 6844 */
 	for (i = 0; i < 4; i++)
@@ -846,7 +846,7 @@ DRIVER_INIT_MEMBER( swtpc09_state, swtpc09d3 )
 	m_via_ca1_input = 0;
 	m_system_type = UNIFLEX_DMF3;
 	m_interrupt = 0;
-	m_active_interrupt = FALSE;
+	m_active_interrupt = false;
 
 
 	/* reset the 6844 */

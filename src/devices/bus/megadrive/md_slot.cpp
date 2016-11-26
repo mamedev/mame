@@ -1001,7 +1001,7 @@ void base_md_cart_slot_device::file_logging(uint8_t *ROM8, uint32_t rom_len, uin
 	char serial[14], io[16], modem[12], memo[40], country[16];
 	uint32_t rom_start, rom_end, ram_start, ram_end, sram_start = 0, sram_end = 0;
 	uint16_t checksum, csum = 0;
-	bool valid_sram = FALSE, is_pico = FALSE;
+	bool valid_sram = false, is_pico = false;
 	std::string ctrl(""), reg("");
 
 	// LOG FILE DETAILS
@@ -1024,7 +1024,7 @@ void base_md_cart_slot_device::file_logging(uint8_t *ROM8, uint32_t rom_len, uin
 	for (int i = 0; i < 16; i++)
 		console[i] = ROM8[0x100 + (i ^ 1)];
 	if (!strncmp("SEGA PICO", console, 9))
-		is_pico = TRUE;
+		is_pico = true;
 	for (int i = 0; i < 16; i++)
 		copyright[i] = ROM8[0x110 + (i ^ 1)];
 	for (int i = 0; i < 48; i++)
@@ -1051,7 +1051,7 @@ void base_md_cart_slot_device::file_logging(uint8_t *ROM8, uint32_t rom_len, uin
 	ram_end = (ROM8[0x1ad] << 24 | ROM8[0x1ac] << 16 | ROM8[0x1af] << 8 | ROM8[0x1ae]);;
 	if (ROM8[0x1b1] == 'R' && ROM8[0x1b0] == 'A')
 	{
-		valid_sram = TRUE;
+		valid_sram = true;
 		sram_start = (ROM8[0x1b5] << 24 | ROM8[0x1b4] << 16 | ROM8[0x1b7] << 8 | ROM8[0x1b6]);
 		sram_end = (ROM8[0x1b9] << 24 | ROM8[0x1b8] << 16 | ROM8[0x1bb] << 8 | ROM8[0x1ba]);
 	}

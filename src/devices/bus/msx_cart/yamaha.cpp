@@ -164,7 +164,7 @@ READ8_MEMBER(msx_cart_sfg::read_cart)
 
 	if (offset < 0x8000)
 	{
-		return m_region_sfg->u8(offset & m_rom_mask);
+		return m_region_sfg->as_u8(offset & m_rom_mask);
 	}
 
 	return 0xff;

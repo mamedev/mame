@@ -19,7 +19,7 @@
     * finalize sound support (involves adding new features to the 6522 VIA core)
     * fix warm-reset (I think I need to use a callback when 68k RESET
       instruction is called)
-    * write support for additionnal hardware (hard disk, etc...)
+    * write support for additional hardware (hard disk, etc...)
     * emulate LISA1 (?)
     * optimize MMU emulation !
 
@@ -1352,7 +1352,7 @@ READ16_MEMBER(lisa_state::lisa_r)
 
 				/* Something appears to be wrong with the timings, since we expect to read the
 				2nd half when v-syncing, i.e. for lines beyond the 431th or 364th one (provided
-				there are no additionnal margins).
+				there are no additional margins).
 				This is caused by the fact that 68k timings are wrong (memory accesses are
 				interlaced with the video hardware, which is not emulated). */
 				if (m_features.has_mac_xl_video)

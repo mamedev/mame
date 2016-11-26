@@ -23,14 +23,14 @@ void latch8_device::update(uint8_t new_val, uint8_t mask)
 		uint8_t changed = old_val ^ m_value;
 		for (i=0; i<8; i++)
 			if (((changed & (1<<i)) != 0)) {
-				if (i==0 && !m_write_0.isnull()) m_write_0(machine().driver_data()->generic_space(), m_offset[i] , (m_value >> i) & 1);
-				if (i==1 && !m_write_1.isnull()) m_write_1(machine().driver_data()->generic_space(), m_offset[i] , (m_value >> i) & 1);
-				if (i==2 && !m_write_2.isnull()) m_write_2(machine().driver_data()->generic_space(), m_offset[i] , (m_value >> i) & 1);
-				if (i==3 && !m_write_3.isnull()) m_write_3(machine().driver_data()->generic_space(), m_offset[i] , (m_value >> i) & 1);
-				if (i==4 && !m_write_4.isnull()) m_write_4(machine().driver_data()->generic_space(), m_offset[i] , (m_value >> i) & 1);
-				if (i==5 && !m_write_5.isnull()) m_write_5(machine().driver_data()->generic_space(), m_offset[i] , (m_value >> i) & 1);
-				if (i==6 && !m_write_6.isnull()) m_write_6(machine().driver_data()->generic_space(), m_offset[i] , (m_value >> i) & 1);
-				if (i==7 && !m_write_7.isnull()) m_write_7(machine().driver_data()->generic_space(), m_offset[i] , (m_value >> i) & 1);
+				if (i==0 && !m_write_0.isnull()) m_write_0(machine().dummy_space(), m_offset[i] , (m_value >> i) & 1);
+				if (i==1 && !m_write_1.isnull()) m_write_1(machine().dummy_space(), m_offset[i] , (m_value >> i) & 1);
+				if (i==2 && !m_write_2.isnull()) m_write_2(machine().dummy_space(), m_offset[i] , (m_value >> i) & 1);
+				if (i==3 && !m_write_3.isnull()) m_write_3(machine().dummy_space(), m_offset[i] , (m_value >> i) & 1);
+				if (i==4 && !m_write_4.isnull()) m_write_4(machine().dummy_space(), m_offset[i] , (m_value >> i) & 1);
+				if (i==5 && !m_write_5.isnull()) m_write_5(machine().dummy_space(), m_offset[i] , (m_value >> i) & 1);
+				if (i==6 && !m_write_6.isnull()) m_write_6(machine().dummy_space(), m_offset[i] , (m_value >> i) & 1);
+				if (i==7 && !m_write_7.isnull()) m_write_7(machine().dummy_space(), m_offset[i] , (m_value >> i) & 1);
 			}
 	}
 }

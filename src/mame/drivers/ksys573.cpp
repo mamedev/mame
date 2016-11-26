@@ -2025,8 +2025,8 @@ static MACHINE_CONFIG_START( konami573, ksys573_state )
 	MCFG_RAM_MODIFY( "maincpu:ram" )
 	MCFG_RAM_DEFAULT_SIZE( "4M" )
 
-	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psx_dma_read_delegate( FUNC( ksys573_state::cdrom_dma_read ), (ksys573_state *) owner ) )
-	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psx_dma_write_delegate( FUNC( ksys573_state::cdrom_dma_write ), (ksys573_state *) owner ) )
+	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psx_dma_read_delegate(&ksys573_state::cdrom_dma_read, (ksys573_state *) owner ) )
+	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psx_dma_write_delegate(&ksys573_state::cdrom_dma_write, (ksys573_state *) owner ) )
 
 	MCFG_MACHINE_RESET_OVERRIDE( ksys573_state, konami573 )
 
@@ -2064,7 +2064,7 @@ static MACHINE_CONFIG_START( konami573, ksys573_state )
 
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0x200000, XTAL_53_693175MHz )
-	MCFG_PSXGPU_VBLANK_CALLBACK( vblank_state_delegate( FUNC( ksys573_state::sys573_vblank ), (ksys573_state *) owner ) )
+	MCFG_PSXGPU_VBLANK_CALLBACK(vblank_state_delegate(&ksys573_state::sys573_vblank, (ksys573_state *) owner ))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO( "lspeaker", "rspeaker" )

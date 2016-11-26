@@ -5,7 +5,7 @@
 //  strconv.cpp - Win32 string conversion
 //
 //============================================================
-#if defined(SDLMAME_WIN32) || defined(OSD_WINDOWS)
+#if defined(SDLMAME_WIN32) || defined(OSD_WINDOWS) || defined(OSD_UWP)
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #endif
@@ -16,7 +16,7 @@
 // MAMEOS headers
 #include "strconv.h"
 
-#if defined(SDLMAME_WIN32) || defined(OSD_WINDOWS)
+#if defined(SDLMAME_WIN32) || defined(OSD_WINDOWS) || defined(OSD_UWP)
 
 namespace
 {
@@ -34,8 +34,8 @@ namespace
 		{
 		}
 
-		const T *string() const { return m_str;	};	// returns pointer to actual characters
-		int char_count() const { return m_char_count; }		// returns the character count (including NUL terminater), or -1 if NUL terminated
+		const T *string() const { return m_str; };  // returns pointer to actual characters
+		int char_count() const { return m_char_count; }     // returns the character count (including NUL terminater), or -1 if NUL terminated
 
 	private:
 		const T *m_str;
@@ -51,7 +51,7 @@ namespace text {
 //============================================================
 
 static std::string &mbstring_from_wstring(std::string &dst, UINT code_page, const string_source<wchar_t> &src)
-{	
+{
 	// convert UTF-16 to the specified code page
 	int dst_char_count = WideCharToMultiByte(code_page, 0, src.string(), src.char_count(), nullptr, 0, nullptr, nullptr);
 	dst.resize(dst_char_count - 1);

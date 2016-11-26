@@ -7,7 +7,7 @@
  *  Based on original info found in Ron Fries' Pokey emulator,
  *  with additions by Brad Oliver, Eric Smith and Juergen Buchmueller.
  *  paddle (a/d conversion) details from the Atari 400/800 Hardware Manual.
- *  Polynome algorithms according to info supplied by Perry McFarlane.
+ *  Polynomial algorithms according to info supplied by Perry McFarlane.
  *
  *****************************************************************************/
 

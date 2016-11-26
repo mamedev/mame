@@ -78,7 +78,7 @@ Explanations for a few categories are below (rest are self-explanatory).
 * arbitrary keys: Letting C++ code use userdata, other tables, integers, etc. as keys for into a table.
 * user-defined types (udts): C++ types given form and function in Lua code.
 * udts - member functions: C++ member functions on a type, usually callable with ``my_object:foo(1)`` or similar in Lua.
-* udts - variables: C++ member variables, manipulated by ``my_object.var = 24`` and friends
+* udts - table variables: C++ member variables/properties, manipulated by ``my_object.var = 24`` and in Lua
 * function binding: Support for binding all types of functions. Lambdas, member functions, free functions, in different contexts, etc... 
 * protected function: Use of ``lua_pcall`` to call a function, which offers error-handling and trampolining (as well as the ability to opt-in / opt-out of this behavior)
 * multi-return: returning multiple values from and to Lua (generally through ``std::tuple<...>`` or in some other way)
@@ -104,7 +104,7 @@ Explanations for a few categories are below (rest are self-explanatory).
 +---------------------------+-------------+------------+----------+---------+----------+-----------+-----------+----------------+----------+----------+-----------+-----------------+--------+
 | udts: member functions    |      ~      |     ✔      |     ✔    |    ✔    |     ✔    |     ✔     |     ~     |        ✔       |     ✔    |     ✔    |     ✔     |        ✔        |    ✔   |
 +---------------------------+-------------+------------+----------+---------+----------+-----------+-----------+----------------+----------+----------+-----------+-----------------+--------+
-| udts: variables           |      ~      |     ~      |     ~    |    ~    |     ~    |     ✔     |     ~     |        ~       |     ~    |     ✗    |     ✔     |        ✗        |    ~   |
+| udts: table variables     |      ~      |     ~      |     ~    |    ~    |     ~    |     ✔     |     ~     |        ~       |     ~    |     ✗    |     ✔     |        ✗        |    ~   |
 +---------------------------+-------------+------------+----------+---------+----------+-----------+-----------+----------------+----------+----------+-----------+-----------------+--------+
 | stack abstractions        |      ~      |     ✔      |     ✔    |    ✔    |     ✔    |     ✔     |     ✔     |        ✔       |     ✔    |     ~    |     ✗     |        ~        |    ✔   |
 +---------------------------+-------------+------------+----------+---------+----------+-----------+-----------+----------------+----------+----------+-----------+-----------------+--------+
@@ -138,7 +138,7 @@ Explanations for a few categories are below (rest are self-explanatory).
 +---------------------------+-------------+------------+----------+---------+----------+-----------+-----------+----------------+----------+----------+-----------+-----------------+--------+
 | luajit                    |      ✔      |     ✔      |     ✔    |    ✔    |     ~    |     ✔     |     ✔     |        ✔       |     ✔    |     ✔    |     ✔     |        ✗        |    ✔   |
 +---------------------------+-------------+------------+----------+---------+----------+-----------+-----------+----------------+----------+----------+-----------+-----------------+--------+
-| distribution              |   compile   |    header  |   both   | compile |  header  |   header  |  compile  |     compile    |  header  |  compile | generated |     compile     | header |
+| distribution              |   compile   |   header   |   both   | compile |  header  |   header  |  compile  |     compile    |  header  |  compile | generated |     compile     | header |
 +---------------------------+-------------+------------+----------+---------+----------+-----------+-----------+----------------+----------+----------+-----------+-----------------+--------+
 
 
@@ -153,7 +153,7 @@ Plain C -
 
 kaguya -
 
-* member variables are automatically turned into ``obj:x( value )`` to set and ``obj:x()`` to get
+* Table variables / member variables are automatically turned into ``obj:x( value )`` to set and ``obj:x()`` to get
 * Has optional support
 * Inspired coroutine support for Sol
 * Library author (satoren) is a nice guy!
@@ -177,12 +177,12 @@ lua-intf -
 * Macro-based registration (strange pseudo-language)
 * Fairly fast in most regards
 * Registering classes/"modules" in using C++ code is extremely verbose
-* In order to chain lookups, one has to do ``mykey.mykey2`` on the ``operator[]`` lookup (e.g., you can't nest them arbitrarily, you have to pre-compose the proper lookup string) (fails miserably for non-string lookups!).
+* In order to chain lookups, one has to glue the keys together (e.g. ``"mykey.mykey2"``) on the ``operator[]`` lookup (e.g., you can't nest them arbitrarily, you have to pre-compose the proper lookup string) (fails miserably for non-string lookups!).
 * Not too shabby!
 
 Selene -
 
-* member variables are automatically turned into ``obj:set_x( value )`` to set and ``obj:x()`` to get
+* Table variables / member variables are automatically turned into ``obj:set_x( value )`` to set and ``obj:x()`` to get
 * Registering classes/"modules" using C++ code is extremely verbose, similar to lua-intf's style
 * Eats crap when it comes to performance, most of the time (see :doc:`benchmarks<benchmarks>`)
 * Lots of users (blogpost etc. made it popular), but the Repository is kinda stagnant...
@@ -204,7 +204,7 @@ SWIG (3.0) -
 luacppinterface -
 
 * The branch that fixes VC++ warnings and introduces some new work has type checker issues, so use the stable branch only
-* No member variable support
+* No table variable support
 * Actually has tables (but no operator[])
 * Does not support arbitrary keys
 
@@ -238,13 +238,13 @@ SLB3 -
 
 oolua -
 
-* The syntax for this library is thicker than a brick. No, seriously. `Go read the docs`_ 
+* The syntax for this library. `Go read the docs`_ 
 * The worst in terms of how to use it: may have docs, but the DSL is extraordinarily crappy with thick, hard-to-debug/hard-to-error-check macros
     - Same problem as lua-api-pp: cannot have the declaration macros anywhere but the toplevel namespace because of template declaration macro
 * Supports not having exceptions or rtti turned on (shiny!)
 * Poor RAII support: default-construct-and-get style (requires some form of initalization to perform a ``get`` of an object, and it's hard to extend)
 	- The library author has informed me that he does personally advises individuals do not use the ``Table`` abstraction in OOLua... Do I likewise tell people to consider its table abstractions defunct?
-* Member variables are turned into function calls (``get_x`` and ``set_x`` by default)
+* Table variables / member variables from C++ are turned into function calls (``get_x`` and ``set_x`` by default)
 
 luwra - 
 
@@ -253,6 +253,7 @@ luwra -
 * Doesn't understand ``std::function`` conversions and the like (but with some extra code can get it to work)
 * Recently improved by a lot: can chain tables and such, even if performance is a bit sad for that use case
 * When you do manage to set function calls with the macros they are fast (can a template solution do just as good? Sol is going to find out!)
-* No member variable support - get turned into getter/setter functions, similar to kaguya
+* No table variable support - get turned into getter/setter functions, similar to kaguya
+* Table variables become class statics (surprising)
 
 .. _Go read the docs: https://oolua.org/docs/index.html

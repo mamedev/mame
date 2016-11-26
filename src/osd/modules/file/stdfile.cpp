@@ -167,11 +167,11 @@ osd_file::error osd_file::remove(std::string const &filename)
 //  osd_get_physical_drive_geometry
 //============================================================
 
-int osd_get_physical_drive_geometry(const char *filename, uint32_t *cylinders, uint32_t *heads, uint32_t *sectors, uint32_t *bps)
+bool osd_get_physical_drive_geometry(const char *filename, uint32_t *cylinders, uint32_t *heads, uint32_t *sectors, uint32_t *bps)
 {
-	// there is no standard way of doing this, so we always return FALSE, indicating
+	// there is no standard way of doing this, so we always return false, indicating
 	// that a given path is not a physical drive
-	return FALSE;
+	return false;
 }
 
 
@@ -197,7 +197,7 @@ osd_directory_entry *osd_stat(const std::string &path)
 
 	// create an osd_directory_entry; be sure to make sure that the caller can
 	// free all resources by just freeing the resulting osd_directory_entry
-	result = (osd_directory_entry *)osd_malloc_array(sizeof(*result) + path.length() + 1);
+	result = (osd_directory_entry *)malloc(sizeof(*result) + path.length() + 1);
 	strcpy((char *)(result + 1), path.c_str());
 	result->name = (char *)(result + 1);
 	result->type = ENTTYPE_NONE;

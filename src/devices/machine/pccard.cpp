@@ -4,20 +4,24 @@
 
 READ16_MEMBER( pccard_interface::read_memory )
 {
+	//printf("unhandled memory read %08x %04x\n", offset, mem_mask);
 	return 0xffff;
 }
 
 WRITE16_MEMBER( pccard_interface::write_memory )
 {
+	//printf("unhandled memory write %08x %04x %04x\n", offset, data, mem_mask);
 }
 
 READ16_MEMBER( pccard_interface::read_reg )
 {
+	//printf("unhandled register read %08x %04x\n", offset, mem_mask);
 	return 0xffff;
 }
 
 WRITE16_MEMBER( pccard_interface::write_reg )
 {
+	//printf("unhandled register write %08x %04x %04x\n", offset, data, mem_mask);
 }
 
 const device_type PCCARD_SLOT = &device_creator<pccard_slot_device>;

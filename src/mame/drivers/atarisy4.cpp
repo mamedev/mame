@@ -302,7 +302,7 @@ void atarisy4_renderer::draw_polygon(uint16_t color)
 	rectangle clip;
 	vertex_t v1, v2, v3;
 	atarisy4_polydata &extradata = object_data_alloc();
-	render_delegate rd_scan = render_delegate(FUNC(atarisy4_renderer::draw_scanline), this);
+	render_delegate rd_scan = render_delegate(&atarisy4_renderer::draw_scanline, this);
 
 	clip.set(0, 511, 0, 511);
 

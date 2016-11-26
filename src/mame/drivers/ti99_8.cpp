@@ -624,8 +624,8 @@ WRITE_LINE_MEMBER( ti99_8_state::console_reset )
 		m_tms9901->rst1_line(state);
 
 		// Pull up the CRUS and PTGEN lines (9901 outputs have been deactivated, pull-up resistors on the board show effect)
-		m_mainboard->crus_in(TRUE); // assert
-		m_mainboard->ptgen_in(TRUE); // clear
+		m_mainboard->crus_in(true); // assert
+		m_mainboard->ptgen_in(true); // clear
 
 		// Setting ready to false so that automatic wait states are enabled
 		m_cpu->ready_line(CLEAR_LINE);
@@ -912,5 +912,5 @@ ROM_END
 #define rom_ti99_8e rom_ti99_8
 
 /*      YEAR    NAME        PARENT  COMPAT  MACHINE     INPUT   INIT      COMPANY                 FULLNAME */
-COMP(   1983,   ti99_8,     0,      0,  ti99_8_60hz,ti99_8, driver_device,  0,      "Texas Instruments",    "TI-99/8 Computer (US)" , 0)
-COMP(   1983,   ti99_8e,    ti99_8, 0,  ti99_8_50hz,ti99_8, driver_device,  0,      "Texas Instruments",    "TI-99/8 Computer (Europe)" , 0 )
+COMP(   1983,   ti99_8,     0,      0,  ti99_8_60hz,ti99_8, driver_device,  0,      "Texas Instruments",    "TI-99/8 Computer (US)" , MACHINE_SUPPORTS_SAVE )
+COMP(   1983,   ti99_8e,    ti99_8, 0,  ti99_8_50hz,ti99_8, driver_device,  0,      "Texas Instruments",    "TI-99/8 Computer (Europe)" ,  MACHINE_SUPPORTS_SAVE )

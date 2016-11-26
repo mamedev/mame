@@ -25,22 +25,22 @@ static void tlb_entry_log_half(mips3_tlb_entry *entry, int tlbindex, int which);
 ***************************************************************************/
 
 /*-------------------------------------------------
-    tlb_entry_matches_asid - TRUE if the given
+    tlb_entry_matches_asid - true if the given
     TLB entry matches the provided ASID
 -------------------------------------------------*/
 
-static inline int tlb_entry_matches_asid(const mips3_tlb_entry *entry, uint8_t asid)
+static inline bool tlb_entry_matches_asid(const mips3_tlb_entry *entry, uint8_t asid)
 {
 	return (entry->entry_hi & 0xff) == asid;
 }
 
 
 /*-------------------------------------------------
-    tlb_entry_is_global - TRUE if the given
+    tlb_entry_is_global - true if the given
     TLB entry is global
 -------------------------------------------------*/
 
-static inline int tlb_entry_is_global(const mips3_tlb_entry *entry)
+static inline bool tlb_entry_is_global(const mips3_tlb_entry *entry)
 {
 	return (entry->entry_lo[0] & entry->entry_lo[1] & TLB_GLOBAL);
 }
@@ -389,7 +389,7 @@ void mips3_device::tlb_write_common(int tlbindex)
 
 		/* fill in the new TLB entry from the COP0 registers */
 		entry->page_mask = m_core->cpr[0][COP0_PageMask];
-		entry->entry_hi = m_core->cpr[0][COP0_EntryHi] & ~(entry->page_mask & U64(0x0000000001ffe000));
+		entry->entry_hi = m_core->cpr[0][COP0_EntryHi] & ~(entry->page_mask & u64(0x0000000001ffe000U));
 		entry->entry_lo[0] = m_core->cpr[0][COP0_EntryLo0];
 		entry->entry_lo[1] = m_core->cpr[0][COP0_EntryLo1];
 

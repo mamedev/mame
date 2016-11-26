@@ -55,8 +55,8 @@ void psxcontrollerports_device::device_start()
 
 	m_port0 = machine().device<psx_controller_port_device>("port1");
 	m_port1 = machine().device<psx_controller_port_device>("port2");
-	m_port0->setup_ack_cb(psx_controller_port_device::void_cb(FUNC(psxcontrollerports_device::ack), this));
-	m_port1->setup_ack_cb(psx_controller_port_device::void_cb(FUNC(psxcontrollerports_device::ack), this));
+	m_port0->setup_ack_cb(psx_controller_port_device::void_cb(&psxcontrollerports_device::ack, this));
+	m_port1->setup_ack_cb(psx_controller_port_device::void_cb(&psxcontrollerports_device::ack, this));
 }
 
 // add controllers to define so they can be connected to the multitap

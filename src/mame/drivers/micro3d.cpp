@@ -296,7 +296,7 @@ static MACHINE_CONFIG_START( micro3d, micro3d_state )
 
 	MCFG_CPU_ADD("vgb", TMS34010, XTAL_40MHz)
 	MCFG_CPU_PROGRAM_MAP(vgbmem)
-	MCFG_TMS340X0_HALT_ON_RESET(FALSE) /* halt on reset */
+	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(XTAL_40MHz / 8) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(4) /* pixels per clock */
 	MCFG_TMS340X0_SCANLINE_IND16_CB(micro3d_state, scanline_update)        /* scanline updater (indexed16) */

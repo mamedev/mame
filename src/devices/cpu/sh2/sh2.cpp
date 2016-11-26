@@ -248,10 +248,10 @@ const address_space_config *sh2_device::memory_space_config(address_spacenum spa
 	}
 }
 
-offs_t sh2_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t sh2_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( sh2 );
-	return CPU_DISASSEMBLE_NAME( sh2 )(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME( sh2 )(this, stream, pc, oprom, opram, options);
 }
 
 
@@ -2274,7 +2274,7 @@ void sh2_device::device_reset()
 
 	m_sh2_state->internal_irq_level = -1;
 
-	m_cache_dirty = TRUE;
+	m_cache_dirty = true;
 }
 
 
@@ -2565,7 +2565,7 @@ void sh2_device::device_start()
 	}
 
 	/* mark the cache dirty so it is updated on next execute */
-	m_cache_dirty = TRUE;
+	m_cache_dirty = true;
 }
 
 

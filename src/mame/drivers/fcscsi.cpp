@@ -54,6 +54,7 @@
 #include "machine/wd_fdc.h"
 #include "machine/hd63450.h" // compatible with MC68450
 #include "machine/clock.h"
+#include "formats/pc_dsk.h"
 
 #define VERBOSE 0
 
@@ -88,6 +89,7 @@ fcscsi1_state(const machine_config &mconfig, device_type type, const char *tag) 
 	DECLARE_READ16_MEMBER (bootvect_r);
 	DECLARE_READ8_MEMBER (tcr_r);
 	DECLARE_WRITE8_MEMBER (tcr_w);
+	DECLARE_WRITE8_MEMBER (led_w);
 
 	IRQ_CALLBACK_MEMBER(maincpu_irq_acknowledge_callback);
 
@@ -99,10 +101,14 @@ fcscsi1_state(const machine_config &mconfig, device_type type, const char *tag) 
 	DECLARE_WRITE8_MEMBER(fdc_irq);
 	DECLARE_READ8_MEMBER(fdc_read_byte);
 	DECLARE_WRITE8_MEMBER(fdc_write_byte);
+	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
 	/* Dummy driver routines */
 	DECLARE_READ8_MEMBER (not_implemented_r);
 	DECLARE_WRITE8_MEMBER (not_implemented_w);
+
+	DECLARE_READ8_MEMBER (scsi_r);
+	DECLARE_WRITE8_MEMBER (scsi_w);
 
 	uint8_t fdc_irq_state;
 	uint8_t dmac_irq_state;
@@ -119,7 +125,6 @@ private:
 	required_device<pit68230_device> m_pit;
 	required_device<hd63450_device> m_dmac;
 
-
 	uint8_t m_tcr;
 
 	// Pointer to System ROMs needed by bootvect_r
@@ -133,10 +138,9 @@ static ADDRESS_MAP_START (fcscsi1_mem, AS_PROGRAM, 16, fcscsi1_state)
 	AM_RANGE (0x002000, 0x01ffff) AM_RAM /* Dual Ported RAM */
 	AM_RANGE (0xe00000, 0xe7ffff) AM_ROM /* System EPROM Area 32Kb DEBUGGER supplied */
 	AM_RANGE (0xd00000, 0xd0003f) AM_DEVREADWRITE8 ("pit", pit68230_device, read, write, 0x00ff)
-	//AM_RANGE (0xc40000, 0xc4001f) AM_DEVREADWRITE8("scsi", ncr5386s_t, read, write, 0x00ff) /* SCSI Controller interface - device support not yet available*/
+//	AM_RANGE (0xc40000, 0xc4001f) AM_DEVREADWRITE8("scsi", ncr5386_device, read, write, 0x00ff) /* SCSI Controller interface - device support not yet available*/
+	AM_RANGE (0xc40000, 0xc4001f) AM_READWRITE8 (scsi_r, scsi_w, 0x00ff)
 	AM_RANGE (0xc80000, 0xc800ff) AM_DEVREADWRITE("mc68450", hd63450_device, read, write)  /* DMA Controller interface */
-	AM_RANGE (0xc40000, 0xc800ff) AM_READWRITE8 (not_implemented_r, not_implemented_w, 0xffff)  /* Dummy mapping af address area to display message */
-
 	AM_RANGE (0xcc0000, 0xcc0007) AM_DEVREADWRITE8("fdc", wd1772_t, read, write, 0x00ff)      /* Floppy Controller interface */
 	AM_RANGE (0xcc0008, 0xcc0009) AM_READWRITE8 (tcr_r, tcr_w, 0x00ff) /* The Control Register, SCSI ID and FD drive select bits */
 ADDRESS_MAP_END
@@ -160,7 +164,7 @@ READ16_MEMBER (fcscsi1_state::bootvect_r){
 	return m_sysrom [offset];
 }
 
-/* The Control Register - descretelly implemented on the PCB
+/* The Control Register - discretely implemented on the PCB
 Bit #: 7 6 5 4 3 2 1 0
        \ \ \ \ \ \ \ \ Floppy Disk Side Select
         \ \ \ \ \ \ \ Floppy Disk Drive Select 0
@@ -178,8 +182,41 @@ READ8_MEMBER (fcscsi1_state::tcr_r){
 }
 
 WRITE8_MEMBER (fcscsi1_state::tcr_w){
+	floppy_image_device *floppy0 = m_fdc->subdevice<floppy_connector>("0")->get_device();
+	floppy_image_device *floppy1 = m_fdc->subdevice<floppy_connector>("1")->get_device();
+	floppy_image_device *floppy2 = m_fdc->subdevice<floppy_connector>("2")->get_device();
+	floppy_image_device *floppy3 = m_fdc->subdevice<floppy_connector>("3")->get_device();
+	floppy_image_device *floppy = nullptr;
+
+	if (!BIT(data, 1)) floppy = floppy0;
+	else
+	if (!BIT(data, 2)) floppy = floppy1;
+	else
+	if (!BIT(data, 3)) floppy = floppy2;
+	else
+	if (!BIT(data, 4)) floppy = floppy3;
+
+	if (floppy) {
+		m_fdc->set_floppy(floppy);
+		floppy->ss_w(!BIT(data, 0));
+		floppy->mon_w(0);
+	} else {
+		floppy0->mon_w(1);
+		floppy1->mon_w(1);
+		floppy2->mon_w(1);
+		floppy3->mon_w(1);
+	}
+
 	LOG(("%s [%02x]\n", FUNCNAME, data));
 	m_tcr = data;
+	return;
+}
+
+WRITE8_MEMBER (fcscsi1_state::led_w){
+	LOG(("%s [%02x]\n", FUNCNAME, data));
+
+	m_fdc->dden_w(BIT(data, 7));
+
 	return;
 }
 
@@ -235,6 +272,24 @@ READ8_MEMBER(fcscsi1_state::fdc_read_byte)
 WRITE8_MEMBER(fcscsi1_state::fdc_write_byte)
 {
 	m_fdc->data_w(data & 0xff);
+}
+
+READ8_MEMBER(fcscsi1_state::scsi_r)
+{
+	uint8_t data = 0;
+
+	// fake diag status
+	if (offset == 9)
+		data = 0x80;
+
+	LOG(("scsi R %02x == %02x\n", offset, data));
+
+	return data;
+}
+
+WRITE8_MEMBER(fcscsi1_state::scsi_w)
+{
+	LOG(("scsi W %02x <- %02x\n", offset, data));
 }
 
 READ8_MEMBER (fcscsi1_state::not_implemented_r){
@@ -316,6 +371,14 @@ IRQ_CALLBACK_MEMBER(fcscsi1_state::maincpu_irq_acknowledge_callback)
 	return vector;
 }
 
+FLOPPY_FORMATS_MEMBER( fcscsi1_state::floppy_formats )
+	FLOPPY_PC_FORMAT
+FLOPPY_FORMATS_END
+
+static SLOT_INTERFACE_START( fcscsi_floppies )
+	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
+SLOT_INTERFACE_END
+
 /*
  * Machine configuration
  */
@@ -326,11 +389,17 @@ static MACHINE_CONFIG_START (fcscsi1, fcscsi1_state)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(fcscsi1_state, maincpu_irq_acknowledge_callback)
 
 	/* FDC  */
-	MCFG_WD1772_ADD("fdc", CPU_CRYSTAL / 2) /* Same clock divider as for the CPU */
+	MCFG_WD1772_ADD("fdc", PIT_CRYSTAL / 2)
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITE8(fcscsi1_state, fdc_irq))
+	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE("mc68450", hd63450_device, drq1_w))
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", fcscsi_floppies, "525qd", fcscsi1_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", fcscsi_floppies, "525qd", fcscsi1_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:2", fcscsi_floppies, "525qd", fcscsi1_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:3", fcscsi_floppies, "525qd", fcscsi1_state::floppy_formats)
 
 	/* PIT Parallel Interface and Timer device */
 	MCFG_DEVICE_ADD ("pit", PIT68230, PIT_CRYSTAL / 2) /* 7474 based frequency divide by 2 */
+	MCFG_PIT68230_PB_OUTPUT_CB(WRITE8(fcscsi1_state, led_w))
 
 	/* DMAC it is really a M68450 but the HD63850 is upwards compatible */
 	MCFG_DEVICE_ADD("mc68450", HD63450, 0)   // MC68450 compatible

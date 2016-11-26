@@ -66,6 +66,9 @@ void mm58274c_device::device_start()
 	m_interrupt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mm58274c_device::rtc_interrupt_cb),this));
 
 	// register for state saving
+	save_item(NAME(m_mode24));
+	save_item(NAME(m_day1));
+
 	save_item(NAME(m_status));
 	save_item(NAME(m_control));
 	save_item(NAME(m_clk_set));

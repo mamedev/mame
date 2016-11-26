@@ -64,7 +64,7 @@ protected:
 	// device_disasm_interface overrides
 	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
 	virtual uint32_t disasm_max_opcode_bytes() const override { return 15; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	address_space_config m_program_config;
 	address_space_config m_io_config;
@@ -292,7 +292,7 @@ struct I386_CALL_GATE
 	inline uint32_t i386_translate(int segment, uint32_t ip, int rwn);
 	inline vtlb_entry get_permissions(uint32_t pte, int wp);
 	bool i386_translate_address(int intention, offs_t *address, vtlb_entry *entry);
-	inline int translate_address(int pl, int type, uint32_t *address, uint32_t *error);
+	inline bool translate_address(int pl, int type, uint32_t *address, uint32_t *error);
 	inline void CHANGE_PC(uint32_t pc);
 	inline void NEAR_BRANCH(int32_t offs);
 	inline uint8_t FETCH();
@@ -1249,7 +1249,7 @@ struct I386_CALL_GATE
 	inline void WRITE80(uint32_t ea, floatx80 t);
 	inline void x87_set_stack_top(int top);
 	inline void x87_set_tag(int reg, int tag);
-	void x87_write_stack(int i, floatx80 value, int update_tag);
+	void x87_write_stack(int i, floatx80 value, bool update_tag);
 	inline void x87_set_stack_underflow();
 	inline void x87_set_stack_overflow();
 	int x87_inc_stack();

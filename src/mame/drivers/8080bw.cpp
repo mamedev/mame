@@ -3504,6 +3504,14 @@ ROM_START( spaceat2 )
 	ROM_LOAD( "spaceatt.e",   0x1800, 0x0800, CRC(7cf6f604) SHA1(469557de15178c4b2d686e5724e1006f7c20d7a4) )
 ROM_END
 
+ROM_START( cosmicin )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "CN7472N-7921.bin",     0x0000, 0x0800, CRC(734f5ad8) SHA1(ff6200af4c9110d8181249cbcef1a8a40fa40b7f) )
+	ROM_LOAD( "CN7471N-7918.bin",     0x0800, 0x0800, CRC(6bfaca4a) SHA1(16f48649b531bdef8c2d1446c429b5f414524350) )
+	ROM_LOAD( "CN7470N-7918.bin",     0x1000, 0x0800, CRC(0ccead96) SHA1(537aef03468f63c5b9e11dd61e253f7ae17d9743) )
+	ROM_LOAD( "CN7469N-7921.bin",     0x1800, 0x0800, CRC(5733048c) SHA1(e9197925396b723f5dda4653238e6e1ea287fdae) )
+ROM_END
+
 ROM_START( galmonst )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "h.5m",            0x0000, 0x0400, CRC(8a0395e9) SHA1(f456aaa0301a1d0f3f9f45cbe39c5ff14909ecd3) )
@@ -4701,6 +4709,22 @@ ROM_START( ozmawars2 )
 	ROM_LOAD( "02.2",         0x0400, 0x0400, BAD_DUMP CRC(2bdf83a0) SHA1(01ffbd43964c41987e7d44816271308f9a70802b) )
 ROM_END
 
+ROM_START( ozmawarsmr ) // single PCB marked CS 210. No PROMS.
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "73.1s",        0x0000, 0x0400, CRC(9300830e) SHA1(7ed349f7ad01b30aefb41dcaf97e209d00f5af6c) )
+	ROM_LOAD( "74.1pr",       0x0400, 0x0400, CRC(957fc661) SHA1(ac0edc901d8033619f62967f8eaf53a02947e109) )
+	ROM_LOAD( "75.1n",        0x0800, 0x0400, CRC(cf8f4d6c) SHA1(effb4dc48594e1b7164b37f683a5a78b1a9bdd4f) )
+	ROM_LOAD( "76.1m",        0x0c00, 0x0400, CRC(f51544a5) SHA1(368411a2dadaebcbb4d5b6cf6c2beec036ce817f) )
+	ROM_LOAD( "77.1l",        0x1000, 0x0400, CRC(4a653fe6) SHA1(22aee4c6cc3bd474d7159a552c4fb666b78fc4fb) )
+	ROM_LOAD( "78.1kj",       0x1400, 0x0400, CRC(fb3db187) SHA1(bbf3e316215cefe2237115d766332ce185c8ca01) )
+	ROM_LOAD( "79.1h",        0x1800, 0x0400, CRC(ed2d7c34) SHA1(f468b422e9f06522b034d213cebc914afb21dda1) )
+	ROM_LOAD( "80.1g",        0x1c00, 0x0400, CRC(85728971) SHA1(400968f5c99b50416cdeefb4405989aa8012a3d1) )
+	ROM_LOAD( "81.1ef",       0x4000, 0x0400, CRC(df0cc633) SHA1(3725af2e5a6e9ab08dd9ada345630de19c88ce73) )
+	ROM_LOAD( "82.1d",        0x4400, 0x0400, CRC(31b7692e) SHA1(043880750d134d04311eab55e30ee223977d3d17) )
+	ROM_LOAD( "83.1c",        0x4800, 0x0400, CRC(50257351) SHA1(5c3eb29f36f04b7fb8f0351ccf9c8cfc7587f927) )
+	ROM_LOAD( "84.1b",        0x4c00, 0x0400, CRC(293303c9) SHA1(bd3770ff7cf6fa38b17cdfd0e0633d84c015dea7) )
+ROM_END
+
 ROM_START( solfight )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "solfight.m",   0x0000, 0x0800, CRC(a4f2814e) SHA1(e2437e3543dcc97eeaea32babcd4aec6455581ac) )
@@ -4920,6 +4944,7 @@ GAMEL(1980, ultrainv,   invaders, invaders,  sicv,      driver_device, 0, ROT270
 GAMEL(1978, spaceatt,   invaders, invaders,  sicv,      driver_device, 0, ROT270, "bootleg (Video Games GmbH)", "Space Attack (bootleg of Space Invaders)", MACHINE_SUPPORTS_SAVE, layout_invaders )
 GAMEL(1978, spaceattbp, invaders, invaders,  sicv,      driver_device, 0, ROT270, "bootleg (Video Games GmbH)", "Space Attack (bproms)(bootleg of Space Invaders)", MACHINE_SUPPORTS_SAVE, layout_invaders )
 GAMEL(1978, spaceatt2k, invaders, invaders,  sicv,      driver_device, 0, ROT270, "bootleg (Video Games GmbH)", "Space Attack (2k roms)(bootleg of Space Invaders)", MACHINE_SUPPORTS_SAVE, layout_invaders )
+GAMEL(1978, cosmicin,   invaders, invaders,  sicv,      driver_device, 0, ROT270, "bootleg", "Cosmic Invaders (bootleg of Space Invaders)", MACHINE_SUPPORTS_SAVE, layout_invaders )
 GAMEL(1978, galmonst,   invaders, invaders,  sicv,      driver_device, 0, ROT270, "bootleg (Laguna S.A.)", "Galaxy Monsters (Laguna S.A. Spanish bootleg of Space Invaders)", MACHINE_SUPPORTS_SAVE, layout_invaders )
 GAMEL(1980, spaceat2,   invaders, invaders,  spaceat2,  driver_device, 0, ROT270, "bootleg (Video Games UK)", "Space Attack II (bootleg of Super Invaders)", MACHINE_SUPPORTS_SAVE, layout_invaders ) // bootleg of Zenitone-Microsec Super Invaders
 GAMEL(1979, spacecom,   invaders, spacecom,  spacecom,  _8080bw_state, spacecom, ROT270, "bootleg", "Space Combat (bootleg of Space Invaders)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_spacecom )
@@ -5012,6 +5037,7 @@ GAME( 1979, rollingc,   0,        rollingc,  rollingc,  driver_device, 0, ROT270
 
 GAME( 1979, ozmawars,   0,        invadpt2,  ozmawars,  driver_device, 0, ROT270, "SNK", "Ozma Wars (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1979, ozmawars2,  ozmawars, invadpt2,  ozmawars,  driver_device, 0, ROT270, "SNK", "Ozma Wars (set 2)", MACHINE_SUPPORTS_SAVE ) /* Uses Taito's three board color version of Space Invaders PCB */
+GAME( 1979, ozmawarsmr, ozmawars, invaders,  ozmawars,  driver_device, 0, ROT270, "bootleg (Model Racing)", "Ozma Wars (Model Racing bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1979, spaceph,    ozmawars, invaders,  spaceph,   driver_device, 0, ROT270, "bootleg? (Zilec Games)", "Space Phantoms (bootleg of Ozma Wars)", MACHINE_SUPPORTS_SAVE )
 GAME( 1979, solfight,   ozmawars, invaders,  ozmawars,  driver_device, 0, ROT270, "bootleg", "Solar Fight (bootleg of Ozma Wars)", MACHINE_SUPPORTS_SAVE )
 

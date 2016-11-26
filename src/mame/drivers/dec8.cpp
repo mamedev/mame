@@ -141,7 +141,7 @@ void dec8_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 		m_mcu->set_input_line(MCS51_INT1_LINE, CLEAR_LINE);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in dec8_state::device_timer");
+		assert_always(false, "Unknown id in dec8_state::device_timer");
 	}
 }
 

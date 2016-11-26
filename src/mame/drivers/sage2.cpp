@@ -557,7 +557,7 @@ DIRECT_UPDATE_MEMBER(sage2_state::sage2_direct_update_handler)
 DRIVER_INIT_MEMBER(sage2_state,sage2)
 {
 	address_space &program = machine().device<cpu_device>(M68000_TAG)->space(AS_PROGRAM);
-	program.set_direct_update_handler(direct_update_delegate(FUNC(sage2_state::sage2_direct_update_handler), this));
+	program.set_direct_update_handler(direct_update_delegate(&sage2_state::sage2_direct_update_handler, this));
 }
 
 

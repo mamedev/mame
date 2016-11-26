@@ -90,7 +90,7 @@ TODO:
 
   Hangul ROM
    8KB each is divided by a consonant and consonant and neutral.
-   - Inital (Choseong)  SS151-1223: 8 types of intial character (actual 6 types)
+   - Initial (Choseong)  SS151-1223: 8 types of intial character (actual 6 types)
    - Middle (Jungseong) SS152-1224: 2 types of middle character
    - Final  (Jongseong) SS153-1225: 2 types of final character
 
@@ -854,8 +854,6 @@ void spc1500_state::machine_start()
 	membank("bank1")->configure_entry(2, m_p_ram);
 	membank("bank1")->set_entry(0);
 	m_romsel = 1;
-	static_set_addrmap(*m_maincpu, AS_IO, ADDRESS_MAP_NAME(spc1500_double_io));
-	set_address_space(AS_IO, m_maincpu->space(AS_IO));
 	// intialize banks 2, 3, 4 (write banks)
 	membank("bank2")->set_base(m_p_ram);
 	membank("bank4")->set_base(m_p_ram + 0x8000);

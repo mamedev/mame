@@ -26,7 +26,7 @@
 #define MCFG_AMI_S2000_WRITE_D_CB(_devcb) \
 	amis2000_base_device::set_write_d_callback(*device, DEVCB_##_devcb);
 
-// 13-bit external addressbus coupled as output pins
+// 13-bit external address bus coupled as output pins
 #define MCFG_AMI_S2000_WRITE_A_CB(_devcb) \
 	amis2000_base_device::set_write_a_callback(*device, DEVCB_##_devcb);
 
@@ -88,7 +88,9 @@ protected:
 	// device_disasm_interface overrides
 	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
 	virtual uint32_t disasm_max_opcode_bytes() const override { return 1; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+
+	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	address_space_config m_program_config;

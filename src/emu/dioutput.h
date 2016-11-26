@@ -14,8 +14,8 @@
 #error Dont include this file directly; include emu.h instead.
 #endif
 
-#ifndef __DIOUTPUT_H__
-#define __DIOUTPUT_H__
+#ifndef MAME_EMU_DIOUTPUT_H
+#define MAME_EMU_DIOUTPUT_H
 
 
 
@@ -59,4 +59,4 @@ protected:
 
 
 
-#endif  /* __DIOUTPUT_H__ */
+#endif  /* MAME_EMU_DIOUTPUT_H */

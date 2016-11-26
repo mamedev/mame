@@ -210,7 +210,7 @@ void nes_cart_slot_device::call_load_unif()
 	uint8_t buffer[4], mirror = 0;
 	char magic2[4];
 	char unif_mapr[32]; // here we should store MAPR chunks
-	bool mapr_chunk_found = FALSE, small_prg = FALSE;
+	bool mapr_chunk_found = false, small_prg = false;
 
 	// allocate space to temporarily store PRG & CHR banks
 	std::vector<uint8_t> temp_prg(256 * 0x4000);
@@ -237,7 +237,7 @@ void nes_cart_slot_device::call_load_unif()
 		{
 			if ((magic2[0] == 'M') && (magic2[1] == 'A') && (magic2[2] == 'P') && (magic2[3] == 'R'))
 			{
-				mapr_chunk_found = TRUE;
+				mapr_chunk_found = true;
 				logerror("[MAPR] chunk found: ");
 				fread(&buffer, 4);
 				chunk_length = buffer[0] | (buffer[1] << 8) | (buffer[2] << 16) | (buffer[3] << 24);
@@ -384,7 +384,7 @@ void nes_cart_slot_device::call_load_unif()
 					logerror("It consists of %d 16K-blocks.\n", chunk_length / 0x4000);
 				else
 				{
-					small_prg = TRUE;
+					small_prg = true;
 					logerror("This chunk is smaller than 16K: the emulation might have issues. Please report this file to the MESS forums.\n");
 				}
 
@@ -438,7 +438,7 @@ void nes_cart_slot_device::call_load_unif()
 	prgram_size = prgram * 0x2000;
 	vram_size = vram_chunks * 0x2000;
 
-	m_cart->set_four_screen_vram(FALSE);
+	m_cart->set_four_screen_vram(false);
 	switch (mirror)
 	{
 		case 0: // Horizontal Mirroring (Hard Wired)
@@ -454,7 +454,7 @@ void nes_cart_slot_device::call_load_unif()
 			m_cart->set_mirroring(PPU_MIRROR_HIGH);
 			break;
 		case 4: // Four Screens of VRAM (Hard Wired)
-			m_cart->set_four_screen_vram(TRUE);
+			m_cart->set_four_screen_vram(true);
 			m_cart->set_mirroring(PPU_MIRROR_4SCREEN);
 			break;
 		case 5: // Mirroring Controlled By Mapper Hardware

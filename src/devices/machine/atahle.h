@@ -20,8 +20,6 @@ class ata_hle_device : public device_t,
 	public device_slot_card_interface
 {
 public:
-	ata_hle_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock,const char *shortname, const char *source);
-
 	virtual uint16_t read_dma() override;
 	virtual DECLARE_READ16_MEMBER(read_cs0) override;
 	virtual DECLARE_READ16_MEMBER(read_cs1) override;
@@ -33,7 +31,10 @@ public:
 	virtual DECLARE_WRITE_LINE_MEMBER(write_dasp) override;
 	virtual DECLARE_WRITE_LINE_MEMBER(write_dmack) override;
 	virtual DECLARE_WRITE_LINE_MEMBER(write_pdiag) override;
+
 protected:
+	ata_hle_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;

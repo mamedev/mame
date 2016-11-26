@@ -47,7 +47,7 @@ void midvunit_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		scanline_timer_cb(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in midvunit_state::device_timer");
+		assert_always(false, "Unknown id in midvunit_state::device_timer");
 	}
 }
 
@@ -77,13 +77,13 @@ void midvunit_state::video_start()
 	save_item(NAME(m_dma_data_index));
 	save_item(NAME(m_page_control));
 
-	m_video_changed = TRUE;
+	m_video_changed = true;
 	machine().save().register_postload(save_prepost_delegate(FUNC(midvunit_state::postload), this));
 }
 
 void midvunit_state::postload()
 {
-	m_video_changed = TRUE;
+	m_video_changed = true;
 }
 
 /*************************************
@@ -295,7 +295,7 @@ void midvunit_renderer::process_dma_queue()
 {
 	/* if we're rendering to the same page we're viewing, it has changed */
 	if ((((m_state.m_page_control >> 2) ^ m_state.m_page_control) & 1) == 0 || WATCH_RENDER)
-		m_state.m_video_changed = TRUE;
+		m_state.m_video_changed = true;
 
 	/* fill in the vertex data */
 	vertex_t vert[4];
@@ -320,7 +320,7 @@ void midvunit_renderer::process_dma_queue()
 	/* handle flat-shaded quads here */
 	if (!textured)
 	{
-		callback = render_delegate(FUNC(midvunit_renderer::render_flat), this);
+		callback = render_delegate(&midvunit_renderer::render_flat, this);
 		pixdata += (m_state.m_dma_data[0] & 0x00ff);
 	}
 	/* handle textured quads here */
@@ -339,23 +339,23 @@ void midvunit_renderer::process_dma_queue()
 		/* handle non-masked, non-transparent quads */
 		if ((m_state.m_dma_data[0] & 0xc00) == 0x000)
 		{
-			callback = render_delegate(FUNC(midvunit_renderer::render_tex), this);
+			callback = render_delegate(&midvunit_renderer::render_tex, this);
 		}
 		/* handle non-masked, transparent quads */
 		else if ((m_state.m_dma_data[0] & 0xc00) == 0x800)
 		{
-			callback = render_delegate(FUNC(midvunit_renderer::render_textrans), this);
+			callback = render_delegate(&midvunit_renderer::render_textrans, this);
 		}
 		/* handle masked, transparent quads */
 		else if ((m_state.m_dma_data[0] & 0xc00) == 0xc00)
 		{
-			callback = render_delegate(FUNC(midvunit_renderer::render_textransmask), this);
+			callback = render_delegate(&midvunit_renderer::render_textransmask, this);
 			pixdata += (m_state.m_dma_data[0] & 0x00ff);
 		}
 		/* handle masked, non-transparent quads (invalid?) */
 		else
 		{
-			callback = render_delegate(FUNC(midvunit_renderer::render_flat), this);
+			callback = render_delegate(&midvunit_renderer::render_flat, this);
 			pixdata += (m_state.m_dma_data[0] & 0x00ff);
 		}
 	}
@@ -420,7 +420,7 @@ WRITE32_MEMBER(midvunit_state::midvunit_page_control_w)
 	/* watch for the display page to change */
 	if ((m_page_control ^ data) & 1)
 	{
-		m_video_changed = TRUE;
+		m_video_changed = true;
 		if (LOG_DMA && machine().input().code_pressed(KEYCODE_L))
 			logerror("##########################################################\n");
 		m_screen->update_partial(m_screen->vpos() - 1);
@@ -488,7 +488,7 @@ WRITE32_MEMBER(midvunit_state::midvunit_videoram_w)
 	{
 		int visbase = (m_page_control & 1) ? 0x40000 : 0x00000;
 		if ((offset & 0x40000) == visbase)
-			m_video_changed = TRUE;
+			m_video_changed = true;
 	}
 	COMBINE_DATA(&m_videoram[offset]);
 }
@@ -559,7 +559,7 @@ uint32_t midvunit_state::screen_update_midvunit(screen_device &screen, bitmap_in
 	/* if the video didn't change, indicate as much */
 	if (!m_video_changed)
 		return UPDATE_HAS_NOT_CHANGED;
-	m_video_changed = FALSE;
+	m_video_changed = false;
 
 	/* determine the base of the videoram */
 #if WATCH_RENDER

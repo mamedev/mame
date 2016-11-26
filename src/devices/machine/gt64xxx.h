@@ -292,10 +292,10 @@ private:
 	// Chip Select
 	galileo_device_map m_cs_map[4];
 
-	template<int id> void map_trampoline(::address_map &map, device_t &device) {
-		m_cs_map[id].map(map, *m_cs_map[id].device);
+	template<int id> void map_trampoline(::address_map &map) {
+		m_cs_map[id].map(map);
 	}
-	template <typename T> void install_cs_map(offs_t addrstart, offs_t addrend, void (T::*map)(::address_map &map, device_t &device), const char *name) {
+	template <typename T> void install_cs_map(offs_t addrstart, offs_t addrend, void (T::*map)(::address_map &map), const char *name) {
 		//address_map_delegate delegate(map, name, static_cast<T *>(this));
 		address_map_delegate delegate(map, name, static_cast<T *>(this));
 		m_cpu_space->install_device_delegate(addrstart, addrend, *this, delegate);

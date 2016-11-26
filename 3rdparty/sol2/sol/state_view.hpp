@@ -115,6 +115,10 @@ namespace sol {
 
 		}
 
+		state_view(this_state L) : state_view(L.L){
+
+		}
+
 		lua_State* lua_state() const {
 			return L;
 		}
@@ -222,18 +226,30 @@ namespace sol {
 			return require_core(key, [this, &filename]() {stack::script_file(L, filename); }, create_global);
 		}
 
+		protected_function_result do_string(const std::string& code) {
+			sol::protected_function pf = load(code);
+			return pf();
+		}
+
+		protected_function_result do_file(const std::string& filename) {
+			sol::protected_function pf = load_file(filename);
+			return pf();
+		}
+
 		function_result script(const std::string& code) {
-			int index = (::std::max)(lua_gettop(L), 1);
+			int index = lua_gettop(L);
 			stack::script(L, code);
-			int returns = lua_gettop(L) - (index - 1);
-			return function_result(L, index, returns);
+			int postindex = lua_gettop(L);
+			int returns = postindex - index;
+			return function_result(L, (std::max)(postindex - (returns - 1), 1), returns);
 		}
 
 		function_result script_file(const std::string& filename) {
-			int index = (::std::max)(lua_gettop(L), 1);
+			int index = lua_gettop(L);
 			stack::script_file(L, filename);
-			int returns = lua_gettop(L) - (index - 1);
-			return function_result(L, index, returns);
+			int postindex = lua_gettop(L);
+			int returns = postindex - index;
+			return function_result(L, (std::max)(postindex - (returns - 1), 1), returns);
 		}
 
 		load_result load(const std::string& code) {
@@ -317,7 +333,7 @@ namespace sol {
 
 		template<typename T>
 		state_view& set_usertype(usertype<T>& user) {
-			return set_usertype(usertype_traits<T>::name, user);
+			return set_usertype(usertype_traits<T>::name(), user);
 		}
 
 		template<typename Key, typename T>

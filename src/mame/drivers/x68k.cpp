@@ -184,7 +184,7 @@ void x68k_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 		m_hd63450->drq3_w(0);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in x68k_state::device_timer");
+		assert_always(false, "Unknown id in x68k_state::device_timer");
 	}
 }
 
@@ -1480,7 +1480,7 @@ SLOT_INTERFACE_END
 MACHINE_RESET_MEMBER(x68k_state,x68000)
 {
 	/* The last half of the IPLROM is mapped to 0x000000 on reset only
-	   Just copying the inital stack pointer and program counter should
+	   Just copying the initial stack pointer and program counter should
 	   more or less do the same job */
 
 	int drive;
@@ -1563,8 +1563,8 @@ MACHINE_START_MEMBER(x68k_state,x68000)
 		floppy_image_device *floppy = m_upd72065->subdevice<floppy_connector>(devname)->get_device();
 		m_fdc.floppy[drive] = floppy;
 		if(floppy) {
-			floppy->setup_load_cb(floppy_image_device::load_cb(FUNC(x68k_state::floppy_load), this));
-			floppy->setup_unload_cb(floppy_image_device::unload_cb(FUNC(x68k_state::floppy_unload), this));
+			floppy->setup_load_cb(floppy_image_device::load_cb(&x68k_state::floppy_load, this));
+			floppy->setup_unload_cb(floppy_image_device::unload_cb(&x68k_state::floppy_unload, this));
 		}
 	}
 	m_fdc.motor = 0;
@@ -1584,7 +1584,7 @@ DRIVER_INIT_MEMBER(x68k_state,x68000)
 	}
 #endif
 
-	// copy last half of BIOS to a user region, to use for inital startup
+	// copy last half of BIOS to a user region, to use for initial startup
 	memcpy(user2,(rom+0xff0000),0x10000);
 
 	m_scanline_timer = timer_alloc(TIMER_X68K_HSYNC);
@@ -1681,7 +1681,7 @@ static MACHINE_CONFIG_START( x68000, x68k_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(55.45)
-	MCFG_SCREEN_SIZE(1096, 568)  // inital setting
+	MCFG_SCREEN_SIZE(1096, 568)  // initial setting
 	MCFG_SCREEN_VISIBLE_AREA(0, 767, 0, 511)
 	MCFG_SCREEN_UPDATE_DRIVER(x68k_state, screen_update_x68000)
 

@@ -34,10 +34,10 @@ kb1013vk12_device::kb1013vk12_device(const machine_config &mconfig, const char *
 
 
 // disasm
-offs_t kb1013vk12_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t kb1013vk12_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE(kb1013vk12);
-	return CPU_DISASSEMBLE_NAME(kb1013vk12)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(kb1013vk12)(this, stream, pc, oprom, opram, options);
 }
 
 

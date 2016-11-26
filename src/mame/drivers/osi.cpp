@@ -690,7 +690,7 @@ void c1pmf_state::machine_start()
 
 	// drive select logic missing
 	if (m_floppy0->get_device())
-		m_floppy0->get_device()->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(FUNC(sb2m600_state::floppy_index_callback), this));
+		m_floppy0->get_device()->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(&sb2m600_state::floppy_index_callback, this));
 }
 
 // disk format: 1 head, 36 tracks (? - manual displays a directory listing with 40 tracks),
@@ -889,7 +889,7 @@ void sb2m600_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		m_beeper->set_clock(300);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in sb2m600_state::device_timer");
+		assert_always(false, "Unknown id in sb2m600_state::device_timer");
 	}
 }
 

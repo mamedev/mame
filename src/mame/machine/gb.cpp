@@ -192,7 +192,7 @@ MACHINE_START_MEMBER(gb_state,sgb)
 	save_sgb_only();
 
 	if (m_cartslot && m_cartslot->get_sgb_hack()) {
-		dynamic_cast<sgb_ppu_device*>(m_ppu.target())->set_sgb_hack(TRUE);
+		dynamic_cast<sgb_ppu_device*>(m_ppu.target())->set_sgb_hack(true);
 	}
 }
 

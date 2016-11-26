@@ -22,25 +22,31 @@ namespace bx
 
 		const char* findOption(const char* _long, const char* _default) const
 		{
-			const char* result = find('\0', _long, 1);
+			const char* result = find(0, '\0', _long, 1);
 			return result == NULL ? _default : result;
 		}
 
 		const char* findOption(const char _short, const char* _long, const char* _default) const
 		{
-			const char* result = find(_short, _long, 1);
+			const char* result = find(0, _short, _long, 1);
 			return result == NULL ? _default : result;
 		}
 
 		const char* findOption(const char* _long, int _numParams = 1) const
 		{
-			const char* result = find('\0', _long, _numParams);
+			const char* result = find(0, '\0', _long, _numParams);
 			return result;
 		}
 
 		const char* findOption(const char _short, const char* _long = NULL, int _numParams = 1) const
 		{
-			const char* result = find(_short, _long, _numParams);
+			const char* result = find(0, _short, _long, _numParams);
+			return result;
+		}
+
+		const char* findOption(int _skip, const char _short, const char* _long = NULL, int _numParams = 1) const
+		{
+			const char* result = find(_skip, _short, _long, _numParams);
 			return result;
 		}
 
@@ -132,7 +138,7 @@ namespace bx
 		}
 
 	private:
-		const char* find(const char _short, const char* _long, int _numParams) const
+		const char* find(int _skip, const char _short, const char* _long, int _numParams) const
 		{
 			for (int ii = 0; ii < m_argc; ++ii)
 			{
@@ -144,34 +150,46 @@ namespace bx
 					{
 						if (1 == strlen(arg) )
 						{
-							if (0 == _numParams)
+							if (0 == _skip)
 							{
-								return "";
-							}
-							else if (ii+_numParams < m_argc
-								 && '-' != *m_argv[ii+1] )
-							{
-								return m_argv[ii+1];
+								if (0 == _numParams)
+								{
+									return "";
+								}
+								else if (ii+_numParams < m_argc
+									 && '-' != *m_argv[ii+1] )
+								{
+									return m_argv[ii+1];
+								}
+
+								return NULL;
 							}
 
-							return NULL;
+							--_skip;
+							ii += _numParams;
 						}
 					}
 					else if (NULL != _long
 						 &&  '-' == *arg
 						 &&  0 == stricmp(arg+1, _long) )
 					{
-						if (0 == _numParams)
+						if (0 == _skip)
 						{
-							return "";
-						}
-						else if (ii+_numParams < m_argc
-								&&  '-' != *m_argv[ii+1] )
-						{
-							return m_argv[ii+1];
+							if (0 == _numParams)
+							{
+								return "";
+							}
+							else if (ii+_numParams < m_argc
+									&&  '-' != *m_argv[ii+1] )
+							{
+								return m_argv[ii+1];
+							}
+
+							return NULL;
 						}
 
-						return NULL;
+						--_skip;
+						ii += _numParams;
 					}
 				}
 			}

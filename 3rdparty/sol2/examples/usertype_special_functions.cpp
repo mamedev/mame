@@ -34,7 +34,7 @@ int main() {
 		"norm", [](const vec& self) { double len = std::sqrt(dot(self, self)); return vec(self.x / len, self.y / len); },
 		// we use `sol::resolve` because other operator+ can exist
 		// in the (global) namespace
-		sol::meta_function::addition, sol::resolve<const vec&, const vec&>(::operator+),
+		sol::meta_function::addition, sol::resolve<vec(const vec&, const vec&)>(::operator+),
 		sol::meta_function::subtraction, &vec::operator-
 	);
 

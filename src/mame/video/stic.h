@@ -177,7 +177,7 @@ enum
  * +-+-+-+-+-+-+----+----+----+----+----+----+----+----+----+----+          *
  *                                                                          *
  * SPRn         1=collision with sprite #n                                  *
- * BKGD         1=collsion with set background bit                          *
+ * BKGD         1=collision with set background bit                         *
  * BRDR         1=collision with screen border                              *
  *                                                                          *
  ****************************************************************************
@@ -506,7 +506,7 @@ private:
 	void intv_set_pixel(bitmap_ind16 &bitmap, int x, int y, uint32_t color);
 	uint32_t intv_get_pixel(bitmap_ind16 &bitmap, int x, int y);
 	void intv_plot_box(bitmap_ind16 &bm, int x, int y, int w, int h, int color);
-	int sprites_collide(int spriteNum1, int spriteNum2);
+	bool sprites_collide(int spriteNum1, int spriteNum2);
 	void determine_sprite_collisions();
 	void render_sprites();
 	void render_line(bitmap_ind16 &bitmap, uint8_t nextByte, uint16_t x, uint16_t y, uint8_t fgcolor, uint8_t bgcolor);

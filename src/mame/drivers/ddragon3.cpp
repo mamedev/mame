@@ -1105,6 +1105,7 @@ ROM_START( ddragon3b )
 	ROM_LOAD( "mb7114h.38", 0x0000, 0x0100, CRC(113c7443) SHA1(7b0b13e9f0c219f6d436aeec06494734d1f4a599) )
 ROM_END
 
+
 ROM_START( ctribe )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 64k for cpu code */
 	ROM_LOAD16_BYTE( "28a16-2.ic26", 0x00001, 0x20000, CRC(c46b2e63) SHA1(86ace715dca48c78a46da1d102de47e5f948a86c) )
@@ -1206,10 +1207,6 @@ ROM_START( ctribeo ) // only main program code differs from ctribe1 set
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "28.ic44", 0x0000, 0x0100, CRC(964329ef) SHA1(f26846571a16d27b726f689049deb0188103aadb) )
 ROM_END
-
-
-
-
 
 ROM_START( ctribej )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 64k for cpu code */
@@ -1327,8 +1324,8 @@ ROM_END
 
 ROM_START( wwfwfest )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Main CPU  (68000) */
-	ROM_LOAD16_BYTE( "31a13-2.ic19", 0x00001, 0x40000, CRC(7175bca7) SHA1(992b47a787b5bc2a5a381ec78b8dfaf7d42c614b) )
-	ROM_LOAD16_BYTE( "31a14-2.ic18", 0x00000, 0x40000, CRC(5d06bfd1) SHA1(39a93da662158aa5a9953dcabfcb47c2fc196dc7) )
+	ROM_LOAD16_BYTE( "31e13-0.ic19", 0x00001, 0x40000, CRC(bd02e3c4) SHA1(7ae63e48caf9919ce7b63b4c5aa9474ba8c336da) ) /* Euro label but shows FBI "Winners Don't Do drugs" logo */
+	ROM_LOAD16_BYTE( "31e14-0.ic18", 0x00000, 0x40000, CRC(933ea1a0) SHA1(61da142cfa7abd3b77ab21979c061a078c0d0c63) ) /* Euro label but shows FBI "Winners Don't Do drugs" logo */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Sound CPU (Z80)  */
 	ROM_LOAD( "31a11-2.ic42", 0x00000, 0x10000, CRC(5ddebfea) SHA1(30073963e965250d94f0dc3bd261a054850adf95) )
@@ -1337,7 +1334,7 @@ ROM_START( wwfwfest )
 	ROM_LOAD( "31j10.ic73",   0x00000, 0x80000, CRC(6c522edb) SHA1(8005d59c94160638ba2ea7caf4e991fff03003d5) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 ) /* FG0 Tiles (8x8) */
-	ROM_LOAD( "31a12-0.ic33", 0x00000, 0x20000, CRC(d0803e20) SHA1(b68758e9a5522396f831a3972571f8aed54c64de) )
+	ROM_LOAD( "31e12-0.ic33", 0x00000, 0x20000, CRC(06f22615) SHA1(2e9418e372da85ea597977d912d8b35753655f4e) )
 
 	ROM_REGION( 0x800000, "gfx2", 0 ) /* SPR Tiles (16x16), 27080 Mask ROM's */
 	ROM_LOAD( "31j3.ic9",     0x000000, 0x100000, CRC(e395cf1d) SHA1(241f98145e295993c9b6a44dc087a9b61fbc9a6f) ) /* Tiles 0 */
@@ -1354,10 +1351,10 @@ ROM_START( wwfwfest )
 	ROM_LOAD( "31j1.ic2",     0x00000, 0x40000, CRC(82ed7155) SHA1(b338e1150ffe3277c11d4d6e801a7d3bd7c58492) ) /* 2,3 */
 ROM_END
 
-ROM_START( wwfwfesta )
+ROM_START( wwfwfestu )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Main CPU  (68000) */
-	ROM_LOAD16_BYTE( "wf_18.rom", 0x00000, 0x40000, CRC(933ea1a0) SHA1(61da142cfa7abd3b77ab21979c061a078c0d0c63) )
-	ROM_LOAD16_BYTE( "wf_19.rom", 0x00001, 0x40000, CRC(bd02e3c4) SHA1(7ae63e48caf9919ce7b63b4c5aa9474ba8c336da) )
+	ROM_LOAD16_BYTE( "31a13-2.ic19", 0x00001, 0x40000, CRC(7175bca7) SHA1(992b47a787b5bc2a5a381ec78b8dfaf7d42c614b) )
+	ROM_LOAD16_BYTE( "31a14-2.ic18", 0x00000, 0x40000, CRC(5d06bfd1) SHA1(39a93da662158aa5a9953dcabfcb47c2fc196dc7) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Sound CPU (Z80)  */
 	ROM_LOAD( "31a11-2.ic42", 0x00000, 0x10000, CRC(5ddebfea) SHA1(30073963e965250d94f0dc3bd261a054850adf95) )
@@ -1366,7 +1363,7 @@ ROM_START( wwfwfesta )
 	ROM_LOAD( "31j10.ic73",   0x00000, 0x80000, CRC(6c522edb) SHA1(8005d59c94160638ba2ea7caf4e991fff03003d5) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 ) /* FG0 Tiles (8x8) */
-	ROM_LOAD( "31e12-0.ic33", 0x00000, 0x20000, CRC(06f22615) SHA1(2e9418e372da85ea597977d912d8b35753655f4e) )
+	ROM_LOAD( "31a12-0.ic33", 0x00000, 0x20000, CRC(d0803e20) SHA1(b68758e9a5522396f831a3972571f8aed54c64de) )
 
 	ROM_REGION( 0x800000, "gfx2", 0 ) /* SPR Tiles (16x16), 27080 Mask ROM's */
 	ROM_LOAD( "31j3.ic9",     0x000000, 0x100000, CRC(e395cf1d) SHA1(241f98145e295993c9b6a44dc087a9b61fbc9a6f) ) /* Tiles 0 */
@@ -1445,8 +1442,8 @@ ROM_END
 
 ROM_START( wwfwfestk )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Main CPU  (68000) */
-	ROM_LOAD16_BYTE( "31e13-0.ic19", 0x00001, 0x40000, CRC(774a26a7) SHA1(30e00bff9027a0ae971f8820ca6c3e4cdea82994) )
-	ROM_LOAD16_BYTE( "31e14-0.ic18", 0x00000, 0x40000, CRC(05bbb807) SHA1(1dc2ddd9ae498468a97e002f78e7f3a331d802d1) )
+	ROM_LOAD16_BYTE( "31e13-0.ic19", 0x00001, 0x40000, CRC(774a26a7) SHA1(30e00bff9027a0ae971f8820ca6c3e4cdea82994) ) /* same program rom labels as the World set */
+	ROM_LOAD16_BYTE( "31e14-0.ic18", 0x00000, 0x40000, CRC(05bbb807) SHA1(1dc2ddd9ae498468a97e002f78e7f3a331d802d1) ) /* same program rom labels as the World set */
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Sound CPU (Z80)  */
 	ROM_LOAD( "31a11-2.ic42", 0x00000, 0x10000, CRC(5ddebfea) SHA1(30073963e965250d94f0dc3bd261a054850adf95) )
@@ -1491,8 +1488,8 @@ GAME( 1990, ctribej,  ctribe,   ctribe,   ctribe, driver_device,   0, ROT0, "Tec
 GAME( 1990, ctribeb,  ctribe,   ctribe,   ctribeb, driver_device,  0, ROT0, "bootleg", "The Combatribes (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, ctribeb2, ctribe,   ctribe,   ctribeb, driver_device,  0, ROT0, "bootleg", "The Combatribes (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1991, wwfwfest,  0,        wwfwfest, wwfwfest,  driver_device, 0, ROT0, "Technos Japan",                 "WWF WrestleFest (US set 1)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1991, wwfwfesta, wwfwfest, wwfwfest, wwfwfest,  driver_device, 0, ROT0, "Technos Japan (Tecmo license)", "WWF WrestleFest (US Tecmo)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1991, wwfwfest,  0,        wwfwfest, wwfwfest,  driver_device, 0, ROT0, "Technos Japan (Tecmo license)", "WWF WrestleFest (World)",      MACHINE_SUPPORTS_SAVE ) /* Euro label but shows FBI "Winners Don't Do drugs" logo */
+GAME( 1991, wwfwfestu, wwfwfest, wwfwfest, wwfwfest,  driver_device, 0, ROT0, "Technos Japan",                 "WWF WrestleFest (US)",         MACHINE_SUPPORTS_SAVE )
 GAME( 1991, wwfwfestb, wwfwfest, wwfwfstb, wwfwfest,  driver_device, 0, ROT0, "bootleg",                       "WWF WrestleFest (US bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, wwfwfestj, wwfwfest, wwfwfest, wwfwfesta, driver_device, 0, ROT0, "Technos Japan (Tecmo license)", "WWF WrestleFest (Japan)",      MACHINE_SUPPORTS_SAVE )
 GAME( 1991, wwfwfestk, wwfwfest, wwfwfest, wwfwfesta, driver_device, 0, ROT0, "Technos Japan (Tecmo license)", "WWF WrestleFest (Korea)",      MACHINE_SUPPORTS_SAVE )

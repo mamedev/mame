@@ -119,7 +119,7 @@ namespace sol {
 
 		template<typename... Ret, typename... Args>
 		decltype(auto) call(Args&&... args) {
-			return get<function>().template call<Ret...>(std::forward<Args>(args)...);
+			return get<protected_function>().template call<Ret...>(std::forward<Args>(args)...);
 		}
 
 		template<typename... Args>

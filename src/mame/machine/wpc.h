@@ -38,9 +38,9 @@
 #define WPC_FLIPPERS      (0x24) /*   xxx  R: switches W: Solenoids */
 
 /* Sound board */
-#define WPC_SOUNDS11      (0x21) /* xxx    RW: R: Sound data availble, W: Reset soundboard ? */
+#define WPC_SOUNDS11      (0x21) /* xxx    RW: R: Sound data available, W: Reset soundboard ? */
 #define WPC_SOUNDIF       (0x2c) /* xxx    RW: Sound board interface */
-#define WPC_SOUNDBACK     (0x2d) /* xxx    RW: R: Sound data availble, W: Reset soundboard ? */
+#define WPC_SOUNDBACK     (0x2d) /* xxx    RW: R: Sound data available, W: Reset soundboard ? */
 
 #define WPC_SOLENOID1     (0x30) /* xxxxxx W: Solenoid 25-28 */
 #define WPC_SOLENOID2     (0x31) /* xxxxxx W: Solenoid  1- 8 */

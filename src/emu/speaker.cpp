@@ -39,7 +39,7 @@ const device_type SPEAKER = &device_creator<speaker_device>;
 //  speaker_device - constructor
 //-------------------------------------------------
 
-speaker_device::speaker_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+speaker_device::speaker_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, SPEAKER, "Speaker", tag, owner, clock, "speaker", __FILE__),
 		device_mixer_interface(mconfig, *this),
 		m_x(0.0),
@@ -87,7 +87,7 @@ void speaker_device::static_set_position(device_t &device, double x, double y, d
 //  mix - mix in samples from the speaker's stream
 //-------------------------------------------------
 
-void speaker_device::mix(int32_t *leftmix, int32_t *rightmix, int &samples_this_update, bool suppress)
+void speaker_device::mix(s32 *leftmix, s32 *rightmix, int &samples_this_update, bool suppress)
 {
 	// skip if no stream
 	if (m_mixer_stream == nullptr)

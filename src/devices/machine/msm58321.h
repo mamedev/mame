@@ -15,6 +15,20 @@
                     D3   7 |             | 10  _BUSY
                    GND   8 |_____________| 9   ADDRESS WRITE
 
+                            _____   _____
+                    NC   1 |*    \_/     | 24  Vdd
+                    NC   2 |             | 23  Vdd
+                    NC   3 |             | 22  Vdd
+                    NC   4 |             | 21  Vdd
+                   CS2   5 |             | 20  Vdd
+                 WRITE   6 |             | 19  Vdd
+                  READ   7 |   RTC58323  | 18  Vdd
+                    D0   8 |             | 17  CS1
+                    D1   9 |             | 16  TEST
+                    D2  10 |             | 15  STOP
+                    D3  11 |             | 14  _BUSY
+                   GND  12 |_____________| 13  ADDRESS WRITE
+
 **********************************************************************/
 
 #pragma once

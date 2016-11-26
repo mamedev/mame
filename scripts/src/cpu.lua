@@ -704,6 +704,22 @@ if (CPUS["HPHYBRID"]~=null or _OPTIONS["with-tools"]) then
 end
 
 --------------------------------------------------
+-- HP Nanoprocessor
+--@src/devices/cpu/nanoprocessor/nanoprocessor.h,CPUS["NANOPROCESSOR"] = true
+--------------------------------------------------
+
+if (CPUS["NANOPROCESSOR"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/cpu/nanoprocessor/nanoprocessor.cpp",
+		MAME_DIR .. "src/devices/cpu/nanoprocessor/nanoprocessor.h",
+	}
+end
+
+if (CPUS["NANOPROCESSOR"]~=null or _OPTIONS["with-tools"]) then
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/nanoprocessor/nanoprocessor_dasm.cpp")
+end
+
+--------------------------------------------------
 -- Hudsonsoft 6280
 --@src/devices/cpu/h6280/h6280.h,CPUS["H6280"] = true
 --------------------------------------------------
@@ -1356,9 +1372,7 @@ if (CPUS["M6809"]~=null) then
 end
 
 if (CPUS["M6809"]~=null or _OPTIONS["with-tools"]) then
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/m6809/6809dasm.cpp")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/m6809/6309dasm.cpp")
-	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/m6809/knmidasm.cpp")
+	table.insert(disasm_files , MAME_DIR .. "src/devices/cpu/m6809/6x09dasm.cpp")
 end
 
 --------------------------------------------------
@@ -1501,6 +1515,7 @@ if (CPUS["NEC"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/cpu/nec/nec.cpp",
 		MAME_DIR .. "src/devices/cpu/nec/nec.h",
+		MAME_DIR .. "src/devices/cpu/nec/nec_common.h",
 		MAME_DIR .. "src/devices/cpu/nec/necea.h",
 		MAME_DIR .. "src/devices/cpu/nec/necinstr.h",
 		MAME_DIR .. "src/devices/cpu/nec/necinstr.hxx",

@@ -1504,9 +1504,9 @@ void hng64_state::machine_start()
 	m_maincpu->mips3drc_set_options(MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
 
 	/* configure fast RAM regions */
-	m_maincpu->add_fastram(0x00000000, 0x00ffffff, FALSE, m_mainram);
-	m_maincpu->add_fastram(0x04000000, 0x05ffffff, TRUE,  m_cart);
-	m_maincpu->add_fastram(0x1fc00000, 0x1fc7ffff, TRUE,  m_rombase);
+	m_maincpu->add_fastram(0x00000000, 0x00ffffff, false, m_mainram);
+	m_maincpu->add_fastram(0x04000000, 0x05ffffff, true,  m_cart);
+	m_maincpu->add_fastram(0x1fc00000, 0x1fc7ffff, true,  m_rombase);
 
 	m_comm_rom = memregion("user2")->base();
 	m_comm_ram = std::make_unique<uint8_t[]>(0x10000);
@@ -1539,7 +1539,7 @@ static MACHINE_CONFIG_START(hng64, hng64_state)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("rtc", RTC62423, XTAL_32_768kHz)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hng64)
 

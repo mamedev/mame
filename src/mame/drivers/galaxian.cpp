@@ -6405,8 +6405,8 @@ void galaxian_state::common_init(galaxian_draw_bullet_func draw_bullet,galaxian_
 	m_numspritegens = 1;
 	m_bullets_base = 0x60;
 	m_sprites_base = 0x40;
-	m_frogger_adjust = FALSE;
-	m_sfx_tilemap = FALSE;
+	m_frogger_adjust = false;
+	m_sfx_tilemap = false;
 	m_draw_bullet_ptr = (draw_bullet != nullptr) ? draw_bullet : &galaxian_state::galaxian_draw_bullet;
 	m_draw_background_ptr = (draw_background != nullptr) ? draw_background : &galaxian_state::galaxian_draw_background;
 	m_extend_tile_info_ptr = extend_tile_info;
@@ -7032,7 +7032,7 @@ DRIVER_INIT_MEMBER(galaxian_state,sfx)
 {
 	/* basic configuration */
 	common_init(&galaxian_state::scramble_draw_bullet, &galaxian_state::scramble_draw_background, &galaxian_state::upper_extend_tile_info, nullptr);
-	m_sfx_tilemap = TRUE;
+	m_sfx_tilemap = true;
 
 	/* sound board has space for extra ROM */
 	m_audiocpu->space(AS_PROGRAM).install_read_bank(0x0000, 0x3fff, "bank1");
@@ -7107,7 +7107,7 @@ DRIVER_INIT_MEMBER(galaxian_state,frogger)
 {
 	/* video extensions */
 	common_init(nullptr, &galaxian_state::frogger_draw_background, &galaxian_state::frogger_extend_tile_info, &galaxian_state::frogger_extend_sprite_info);
-	m_frogger_adjust = TRUE;
+	m_frogger_adjust = true;
 
 	/* decrypt */
 	decode_frogger_sound();

@@ -72,7 +72,7 @@ void ram_device::device_start()
 void ram_device::device_validity_check(validity_checker &valid) const
 {
 	const char *ramsize_string = nullptr;
-	int is_valid = FALSE;
+	int is_valid = false;
 	uint32_t specified_ram;
 	const char *gamename_option;
 
@@ -98,7 +98,7 @@ void ram_device::device_validity_check(validity_checker &valid) const
 			{
 				/* compare command line option to default value */
 				if (default_size() == specified_ram)
-					is_valid = TRUE;
+					is_valid = true;
 
 				/* verify extra ram options */
 				if (m_extra_options != nullptr)
@@ -121,7 +121,7 @@ void ram_device::device_validity_check(validity_checker &valid) const
 							osd_printf_error("Invalid RAM option: %s\n", p);
 
 						if (option_ram_size == specified_ram)
-							is_valid = TRUE;
+							is_valid = true;
 
 						p += strlen(p);
 						if (p == e)
@@ -129,22 +129,22 @@ void ram_device::device_validity_check(validity_checker &valid) const
 						p += 1;
 					}
 
-					osd_free(s);
+					free(s);
 				}
 
 			} else {
 				/* if not for this driver then return ok */
-				is_valid = TRUE;
+				is_valid = true;
 			}
 		}
 		else
 		{
 			/* not specifying the ramsize on the command line is valid as well */
-			is_valid = TRUE;
+			is_valid = true;
 		}
 	}
 	else
-		is_valid = TRUE;
+		is_valid = true;
 
 	if (!is_valid)
 	{

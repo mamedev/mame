@@ -71,7 +71,7 @@ void gt64xxx_device::device_start()
 	uint32_t romSize = m_romRegion->bytes();
 	m_cpu_space->install_rom   (0x1fc00000, 0x1fc00000 + romSize - 1, m_romRegion->base());
 	// ROM MIPS DRC
-	m_cpu->add_fastram(0x1fc00000, 0x1fc00000 + romSize - 1, TRUE, m_romRegion->base());
+	m_cpu->add_fastram(0x1fc00000, 0x1fc00000 + romSize - 1, true, m_romRegion->base());
 	if (LOG_GALILEO)
 		logerror("%s: gt64xxx_device::device_start ROM Mapped size: 0x%08X start: 0x1fc00000 end: %08X\n", tag(), romSize, 0x1fc00000 + romSize - 1);
 
@@ -175,15 +175,15 @@ void gt64xxx_device::map_cpu_space()
 		winEnd = (m_reg[GREG_RAS_1_0_LO + 0x10 / 4 * (ramIndex / 2)] << 21) | (m_reg[GREG_RAS0_HI + 0x8 / 4 * ramIndex] << 20) | 0xfffff;
 		m_ram[ramIndex].resize((winEnd + 1 - winStart) / 4);
 		m_cpu_space->install_ram(winStart, winEnd, m_ram[ramIndex].data());
-		//m_cpu->add_fastram(winStart, m_ram[ramIndex].size() * sizeof(m_ram[ramIndex][0]), FALSE, &m_ram[ramIndex][0]);
-		//m_cpu->add_fastram(winStart, m_ram[ramIndex].size() * sizeof(uint32_t), FALSE, m_ram[ramIndex].data());
+		//m_cpu->add_fastram(winStart, m_ram[ramIndex].size() * sizeof(m_ram[ramIndex][0]), false, &m_ram[ramIndex][0]);
+		//m_cpu->add_fastram(winStart, m_ram[ramIndex].size() * sizeof(uint32_t), false, m_ram[ramIndex].data());
 		if (LOG_GALILEO)
 			logerror("%s: map_cpu_space ras[%i] start: %08X end: %08X\n", tag(), ramIndex, winStart, winEnd);
 	}
 
 	// CS[0:3]
 	//m_cpu_space->install_device_delegate(0x16000000, 0x17ffffff, machine().root_device(), m_cs_map[3].map);
-	typedef void (gt64xxx_device::*tramp_t)(::address_map &, device_t &);
+	typedef void (gt64xxx_device::*tramp_t)(::address_map &);
 	static const tramp_t trampolines[4] = {
 		&gt64xxx_device::map_trampoline<0>,
 		&gt64xxx_device::map_trampoline<1>,

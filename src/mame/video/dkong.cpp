@@ -708,7 +708,7 @@ void dkong_state::radarscp_step(int line_cnt)
 	 */
 
 	/* Now mix with SND02 (sound 2) line - on 74ls259, bit2 */
-	address_space &space = machine().driver_data()->generic_space();
+	address_space &space = machine().dummy_space();
 	m_rflip_sig = m_dev_6h->bit2_r(space, 0) & m_lfsr_5I;
 
 	/* blue background generation */

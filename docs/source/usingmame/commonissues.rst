@@ -13,6 +13,7 @@ This is not a bug in MAME. On original arcade hardware, you simply could not ins
 
 In either case, the game would display an error for the operator to look into the situation to prevent cheating them out of their hard-earned cash. Keep a slow, coin-insert-ish pace and you'll not trigger this. 
 
+
 Why is my non-official MAME package (e.g. EmuCR build) broken?
 --------------------------------------------------------------
 
@@ -20,19 +21,34 @@ In many cases, updates to various subsystems such as HLSL, BGFX, or Lua plugins 
 
 As we have no control over how third parties distribute these, all we really can do is disclaim the use of sites like EmuCR and say that we cannot provide support for packages we didn't build. Compile your own MAME or use one of the official packages provided by us.
 
+
+Why does MAME support console games and dumb terminals? Wouldn't it be faster if MAME had just the arcade games? Wouldn't it take less RAM? Wouldn't MAME be faster if you just X?
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+This is a common misconception. The actual size of the MAME file doesn't affect the speed of it; only the parts that are actively being used are in memory at any given time.
+
+In truth, the additional supported devices are a good thing for MAME as they allow us to stress test sections of the various CPU cores and other parts of the emulation that don't normally see heavy utilization. While a computer and an arcade machine may use the exact same CPU, how they use that CPU can differ pretty dramatically.
+
+No part of MAME is a second-class citizen to any other part. Video poker machines are just as important to document and preserve as arcade games.
+
+There's still room for improvements in MAME's speed, but chances are that if you're not already a skilled programmer any ideas you have will have already been covered. Don't let that discourage you-- MAME is open source, and improvements are always welcome.
+
+
 Why do my Neo Geo ROMs no longer work? How do I get the Humble Bundle Neo Geo sets working?
 -------------------------------------------------------------------------------------------
 
-Recently the Neo Geo BIOS was updated to add a new version of the Universal BIOS. This was done between 0.171/0.172, and results in an error trying to load Neo Geo games with an un-updated **neogeo.zip** set.
+Recently the Neo Geo BIOS was updated to add a new version of the Universal BIOS. This was done between 0.171 and 0.172, and results in an error trying to load Neo Geo games with an un-updated **neogeo.zip** set.
 
 This also affects the Humble Bundle set: the games themselves are correct and up to date as of MAME 0.173 (and most likely will remain so) though you'll have to pull the ROM set .ZIP files out of the package somehow yourself. However, the Neo Geo BIOS set (**neogeo.zip**) included in the Humble Bundle set is incomplete as of the 0.172 release of MAME.
 
 We suggest you contact the provider of your sets (Humble Bundle and DotEmu) and ask them to update their content to the newest revision. If enough people ask nicely, maybe they'll update the package.
 
+
 How can I use the Sega Genesis & Mega Drive Classics collection from Steam with MAME?
 -------------------------------------------------------------------------------------
 
 As of the April 2016 update to the program, the ROM images included in the set are now 100% compatible with MAME and other Genesis/Mega Drive emulators. The ROMs are contained in the **steamapps\\Sega Classics\\uncompressed ROMs** folder as a series of *.68K* and *.SGD* images that can be loaded directly into MAME. PDF manuals for the games can be found in **steamapps\\Sega Classics\\manuals** as well.
+
 
 Why does MAME report "missing files" even if I have the ROMs?
 -------------------------------------------------------------

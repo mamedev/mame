@@ -54,7 +54,7 @@ private:
 	};
 
 	void state_postload();
-	void recompute_parameters(int postload);
+	void recompute_parameters(bool postload);
 	void generic_access(address_space &space, offs_t offset);
 
 	devcb_write_line m_write_vsyn;

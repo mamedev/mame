@@ -58,7 +58,7 @@ static uint64_t imd_get_track_offset(floppy_image_legacy *floppy, int head, int 
 	return get_tag(floppy)->track_offsets[(track<<1) + head];
 }
 
-static floperr_t get_offset(floppy_image_legacy *floppy, int head, int track, int sector, int sector_is_index, uint64_t *offset)
+static floperr_t get_offset(floppy_image_legacy *floppy, int head, int track, int sector, bool sector_is_index, uint64_t *offset)
 {
 	uint64_t offs = 0;
 	uint8_t header[5];
@@ -96,7 +96,7 @@ static floperr_t get_offset(floppy_image_legacy *floppy, int head, int track, in
 
 
 
-static floperr_t internal_imd_read_sector(floppy_image_legacy *floppy, int head, int track, int sector, int sector_is_index, void *buffer, size_t buflen)
+static floperr_t internal_imd_read_sector(floppy_image_legacy *floppy, int head, int track, int sector, bool sector_is_index, void *buffer, size_t buflen)
 {
 	uint64_t offset;
 	floperr_t err;
@@ -129,12 +129,12 @@ static floperr_t internal_imd_read_sector(floppy_image_legacy *floppy, int head,
 
 static floperr_t imd_read_sector(floppy_image_legacy *floppy, int head, int track, int sector, void *buffer, size_t buflen)
 {
-	return internal_imd_read_sector(floppy, head, track, sector, FALSE, buffer, buflen);
+	return internal_imd_read_sector(floppy, head, track, sector, false, buffer, buflen);
 }
 
 static floperr_t imd_read_indexed_sector(floppy_image_legacy *floppy, int head, int track, int sector, void *buffer, size_t buflen)
 {
-	return internal_imd_read_sector(floppy, head, track, sector, TRUE, buffer, buflen);
+	return internal_imd_read_sector(floppy, head, track, sector, true, buffer, buflen);
 }
 
 static floperr_t imd_expand_file(floppy_image_legacy *floppy , uint64_t offset , size_t amount)
@@ -189,7 +189,7 @@ static floperr_t imd_write_indexed_sector(floppy_image_legacy *floppy, int head,
 	uint8_t header[1];
 
 	// take sector offset
-	err = get_offset(floppy, head, track, sector_index, TRUE, &offset);
+	err = get_offset(floppy, head, track, sector_index, true, &offset);
 	if (err)
 		return err;
 
@@ -225,7 +225,7 @@ static floperr_t imd_write_indexed_sector(floppy_image_legacy *floppy, int head,
 static floperr_t imd_get_sector_length(floppy_image_legacy *floppy, int head, int track, int sector, uint32_t *sector_length)
 {
 	floperr_t err;
-	err = get_offset(floppy, head, track, sector, FALSE, nullptr);
+	err = get_offset(floppy, head, track, sector, false, nullptr);
 	if (err)
 		return err;
 

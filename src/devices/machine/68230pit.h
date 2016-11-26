@@ -2,7 +2,7 @@
 // copyright-holders:Joakim Larsson Edstr??m
 /**********************************************************************
 *
-*   Motorola MC68230 PI/T Parallell Interface and Timer
+*   Motorola MC68230 PI/T Parallel Interface and Timer
 *
 *                           _____   _____
 *                   D5   1 |*    \_/     | 48  D4

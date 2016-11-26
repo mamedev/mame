@@ -178,7 +178,7 @@ int mame_machine_manager::execute()
 	// loop across multiple hard resets
 	bool exit_pending = false;
 	int error = EMU_ERR_NONE;
-	
+
 	while (error == EMU_ERR_NONE && !exit_pending)
 	{
 		m_new_driver_pending = nullptr;
@@ -269,7 +269,7 @@ ui_manager* mame_machine_manager::create_ui(running_machine& machine)
 	m_ui = std::make_unique<mame_ui_manager>(machine);
 	m_ui->init();
 
-	machine.add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(mame_machine_manager::reset), this));
+	machine.add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(&mame_machine_manager::reset, this));
 
 	m_ui->set_startup_text("Initializing...", true);
 
@@ -326,7 +326,7 @@ void emulator_info::draw_user_interface(running_machine& machine)
 
 void emulator_info::periodic_check()
 {
-	mame_machine_manager::instance()->lua()->periodic_check();
+	return mame_machine_manager::instance()->lua()->on_periodic();
 }
 
 bool emulator_info::frame_hook()
@@ -336,12 +336,12 @@ bool emulator_info::frame_hook()
 
 void emulator_info::layout_file_cb(xml_data_node &layout)
 {
-	xml_data_node *mamelayout = xml_get_sibling(layout.child, "mamelayout");
-	if(mamelayout)
+	xml_data_node const *const mamelayout = layout.get_child("mamelayout");
+	if (mamelayout)
 	{
-		xml_data_node *script = xml_get_sibling(mamelayout->child, "script");
+		xml_data_node const *const script = mamelayout->get_child("script");
 		if(script)
-			mame_machine_manager::instance()->lua()->call_plugin(script->value, "layout");
+			mame_machine_manager::instance()->lua()->call_plugin_set("layout", script->get_value());
 	}
 }
 

@@ -158,7 +158,7 @@ WRITE8_MEMBER(labyrunr_state::labyrunr_vram2_w)
 
 uint32_t labyrunr_state::screen_update_labyrunr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	address_space &space = machine().driver_data()->generic_space();
+	address_space &space = machine().dummy_space();
 	uint8_t ctrl_0 = m_k007121->ctrlram_r(space, 0);
 	rectangle finalclip0, finalclip1;
 

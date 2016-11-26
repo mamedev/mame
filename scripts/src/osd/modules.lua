@@ -50,7 +50,6 @@ function osdmodulesbuild()
 	}
 
 	files {
-		MAME_DIR .. "src/osd/asio.cpp",
 		MAME_DIR .. "src/osd/osdnet.cpp",
 		MAME_DIR .. "src/osd/osdnet.h",
 		MAME_DIR .. "src/osd/watchdog.cpp",
@@ -102,6 +101,7 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/modules/input/input_xinput.cpp",
 		MAME_DIR .. "src/osd/modules/input/input_xinput.h",
 		MAME_DIR .. "src/osd/modules/input/input_winhybrid.cpp",
+		MAME_DIR .. "src/osd/modules/input/input_uwp.cpp",
 		MAME_DIR .. "src/osd/modules/output/output_module.h",
 		MAME_DIR .. "src/osd/modules/output/none.cpp",
 		MAME_DIR .. "src/osd/modules/output/console.cpp",

@@ -421,7 +421,7 @@ extern const device_type NES_CART_SLOT;
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 #define MCFG_NES_CARTRIDGE_NOT_MANDATORY                                     \
-	static_cast<nes_cart_slot_device *>(device)->set_must_be_loaded(FALSE);
+	static_cast<nes_cart_slot_device *>(device)->set_must_be_loaded(false);
 
 
 // Hacky configuration to add a slot with fixed disksys interface

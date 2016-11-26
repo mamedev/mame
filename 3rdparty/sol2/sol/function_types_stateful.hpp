@@ -29,9 +29,6 @@ namespace sol {
 		template<typename Func>
 		struct functor_function {
 			typedef meta::unwrapped_t<meta::unqualified_t<Func>> Function;
-			typedef decltype(&Function::operator()) function_type;
-			typedef meta::function_return_t<function_type> return_type;
-			typedef meta::function_args_t<function_type> args_lists;
 			Function fx;
 
 			template<typename... Args>

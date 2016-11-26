@@ -417,10 +417,10 @@ uint32_t btime_state::screen_update_btime(screen_device &screen, bitmap_ind16 &b
 		}
 
 		draw_background(bitmap, cliprect, m_btime_tilemap, 0);
-		draw_chars(bitmap, cliprect, TRUE, 0, -1);
+		draw_chars(bitmap, cliprect, true, 0, -1);
 	}
 	else
-		draw_chars(bitmap, cliprect, FALSE, 0, -1);
+		draw_chars(bitmap, cliprect, false, 0, -1);
 
 	draw_sprites(bitmap, cliprect, 0, 1, 0, m_videoram, 0x20);
 
@@ -430,7 +430,7 @@ uint32_t btime_state::screen_update_btime(screen_device &screen, bitmap_ind16 &b
 
 uint32_t btime_state::screen_update_eggs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	draw_chars(bitmap, cliprect, FALSE, 0, -1);
+	draw_chars(bitmap, cliprect, false, 0, -1);
 	draw_sprites(bitmap, cliprect, 0, 0, 0, m_videoram, 0x20);
 
 	return 0;
@@ -439,7 +439,7 @@ uint32_t btime_state::screen_update_eggs(screen_device &screen, bitmap_ind16 &bi
 
 uint32_t btime_state::screen_update_lnc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	draw_chars(bitmap, cliprect, FALSE, 0, -1);
+	draw_chars(bitmap, cliprect, false, 0, -1);
 	draw_sprites(bitmap, cliprect, 0, 1, 2, m_videoram, 0x20);
 
 	return 0;
@@ -451,10 +451,10 @@ uint32_t btime_state::screen_update_zoar(screen_device &screen, bitmap_ind16 &bi
 	if (m_bnj_scroll1 & 0x04)
 	{
 		draw_background(bitmap, cliprect, m_zoar_scrollram, m_btime_palette);
-		draw_chars(bitmap, cliprect, TRUE, m_btime_palette + 1, -1);
+		draw_chars(bitmap, cliprect, true, m_btime_palette + 1, -1);
 	}
 	else
-		draw_chars(bitmap, cliprect, FALSE, m_btime_palette + 1, -1);
+		draw_chars(bitmap, cliprect, false, m_btime_palette + 1, -1);
 
 	/* The order is important for correct priorities */
 	draw_sprites(bitmap, cliprect, m_btime_palette + 1, 1, 2, m_videoram + 0x1f, 0x20);
@@ -499,13 +499,13 @@ uint32_t btime_state::screen_update_bnj(screen_device &screen, bitmap_ind16 &bit
 
 		/* copy the low priority characters followed by the sprites
 		   then the high priority characters */
-		draw_chars(bitmap, cliprect, TRUE, 0, 1);
+		draw_chars(bitmap, cliprect, true, 0, 1);
 		draw_sprites(bitmap, cliprect, 0, 0, 0, m_videoram, 0x20);
-		draw_chars(bitmap, cliprect, TRUE, 0, 0);
+		draw_chars(bitmap, cliprect, true, 0, 0);
 	}
 	else
 	{
-		draw_chars(bitmap, cliprect, FALSE, 0, -1);
+		draw_chars(bitmap, cliprect, false, 0, -1);
 		draw_sprites(bitmap, cliprect, 0, 0, 0, m_videoram, 0x20);
 	}
 
@@ -537,7 +537,7 @@ uint32_t btime_state::screen_update_cookrace(screen_device &screen, bitmap_ind16
 				8*sx,8*sy);
 	}
 
-	draw_chars(bitmap, cliprect, TRUE, 0, -1);
+	draw_chars(bitmap, cliprect, true, 0, -1);
 	draw_sprites(bitmap, cliprect, 0, 1, 0, m_videoram, 0x20);
 
 	return 0;
@@ -546,7 +546,7 @@ uint32_t btime_state::screen_update_cookrace(screen_device &screen, bitmap_ind16
 
 uint32_t btime_state::screen_update_disco(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	draw_chars(bitmap, cliprect, FALSE, m_btime_palette, -1);
+	draw_chars(bitmap, cliprect, false, m_btime_palette, -1);
 	draw_sprites(bitmap, cliprect, m_btime_palette, 0, 0, m_spriteram, 1);
 
 	return 0;

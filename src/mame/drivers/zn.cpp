@@ -20,7 +20,7 @@
 #include "machine/mb3773.h"
 #include "machine/7200fifo.h"
 #include "machine/cat702.h"
-#include "machine/zndip.h"
+#include "machine/znmcu.h"
 #include "machine/ataintf.h"
 #include "machine/vt83c461.h"
 #include "machine/gen_latch.h"
@@ -30,6 +30,7 @@
 #include "sound/qsound.h"
 #include "sound/spu.h"
 #include "sound/ymf271.h"
+#include "audio/rax.h"
 #include "audio/taito_zm.h"
 
 #define VERBOSE_LEVEL ( 0 )
@@ -44,7 +45,7 @@ public:
 		m_sio0(*this, "maincpu:sio0"),
 		m_cat702_1(*this, "cat702_1"),
 		m_cat702_2(*this, "cat702_2"),
-		m_zndip(*this, "zndip"),
+		m_znmcu(*this, "znmcu"),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_ram(*this, "maincpu:ram"),
@@ -52,21 +53,25 @@ public:
 		m_cbaj_fifo2(*this, "cbaj_fifo2"),
 		m_mb3773(*this, "mb3773"),
 		m_zoom(*this, "taito_zoom"),
+		m_rax(*this, "rax"),
 		m_vt83c461(*this, "ide"),
 		m_soundlatch(*this, "soundlatch"),
 		m_soundlatch16(*this, "soundlatch16"),
 		m_cat702_1_dataout(1),
 		m_cat702_2_dataout(1),
-		m_zndip_dataout(1)
+		m_znmcu_dataout(1),
+		m_znmcu_dsrout(1)
 	{
 	}
 
-	DECLARE_WRITE_LINE_MEMBER(sio0_sck){ m_cat702_1->write_clock(state);  m_cat702_2->write_clock(state); m_zndip->write_clock(state); }
+	DECLARE_WRITE_LINE_MEMBER(sio0_sck){ m_cat702_1->write_clock(state);  m_cat702_2->write_clock(state); m_znmcu->write_clock(state); }
 	DECLARE_WRITE_LINE_MEMBER(sio0_txd){ m_cat702_1->write_datain(state);  m_cat702_2->write_datain(state); }
 	DECLARE_WRITE_LINE_MEMBER(cat702_1_dataout){ m_cat702_1_dataout = state; update_sio0_rxd(); }
 	DECLARE_WRITE_LINE_MEMBER(cat702_2_dataout){ m_cat702_2_dataout = state; update_sio0_rxd(); }
-	DECLARE_WRITE_LINE_MEMBER(zndip_dataout){ m_zndip_dataout = state; update_sio0_rxd(); }
-	void update_sio0_rxd() { m_sio0->write_rxd( m_cat702_1_dataout && m_cat702_2_dataout && m_zndip_dataout ); }
+	DECLARE_WRITE_LINE_MEMBER(znmcu_dataout){ m_znmcu_dataout = state; update_sio0_rxd(); }
+	DECLARE_WRITE_LINE_MEMBER(znmcu_dsrout){ m_znmcu_dsrout = state; update_sio0_dsr(); }
+	void update_sio0_rxd(){ m_sio0->write_rxd(m_cat702_1_dataout && m_cat702_2_dataout && m_znmcu_dataout); }
+	void update_sio0_dsr(){ m_sio0->write_dsr(m_znmcu_dsrout); }
 	DECLARE_CUSTOM_INPUT_MEMBER(jdredd_gun_mux_read);
 	DECLARE_READ8_MEMBER(znsecsel_r);
 	DECLARE_WRITE8_MEMBER(znsecsel_w);
@@ -90,6 +95,7 @@ public:
 	DECLARE_WRITE16_MEMBER(acpsx_10_w);
 	DECLARE_WRITE16_MEMBER(nbajamex_bank_w);
 	DECLARE_WRITE16_MEMBER(nbajamex_80_w);
+	DECLARE_WRITE8_MEMBER(nbajamex_backup_w);
 	DECLARE_READ16_MEMBER(nbajamex_08_r);
 	DECLARE_READ16_MEMBER(nbajamex_80_r);
 	DECLARE_WRITE8_MEMBER(coh1001l_bank_w);
@@ -104,6 +110,7 @@ public:
 	DECLARE_READ16_MEMBER(vt83c461_32_r);
 	DECLARE_WRITE16_MEMBER(vt83c461_32_w);
 	DECLARE_DRIVER_INIT(coh1000tb);
+	DECLARE_DRIVER_INIT(nbajamex);
 	DECLARE_MACHINE_RESET(coh1000c);
 	DECLARE_MACHINE_RESET(glpracr);
 	DECLARE_MACHINE_RESET(coh1000ta);
@@ -120,6 +127,9 @@ public:
 	void atpsx_dma_write(uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
 	void jdredd_vblank(screen_device &screen, bool vblank_state);
 
+protected:
+	virtual void machine_start() override;
+
 private:
 	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
 	inline void psxwriteword( uint32_t *p_n_psxram, uint32_t n_address, uint16_t n_data );
@@ -130,6 +140,9 @@ private:
 	int m_jdredd_gun_mux;
 
 	std::unique_ptr<uint8_t[]> m_fx1b_fram;
+	std::unique_ptr<uint8_t[]> m_nbajamex_sram;
+	
+	uint32_t m_nbajamex_rombank[2];
 
 	uint16_t m_vt83c461_latch;
 
@@ -138,7 +151,7 @@ private:
 	required_device<psxsio0_device> m_sio0;
 	required_device<cat702_device> m_cat702_1;
 	required_device<cat702_device> m_cat702_2;
-	required_device<zndip_device> m_zndip;
+	required_device<znmcu_device> m_znmcu;
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	required_device<ram_device> m_ram;
@@ -146,13 +159,15 @@ private:
 	optional_device<fifo7200_device> m_cbaj_fifo2;
 	optional_device<mb3773_device> m_mb3773;
 	optional_device<taito_zoom_device> m_zoom;
+	optional_device<acclaim_rax_device> m_rax;
 	optional_device<vt83c461_device> m_vt83c461;
 	optional_device<generic_latch_8_device> m_soundlatch;
 	optional_device<generic_latch_16_device> m_soundlatch16;
 
 	int m_cat702_1_dataout;
 	int m_cat702_2_dataout;
-	int m_zndip_dataout;
+	int m_znmcu_dataout;
+	int m_znmcu_dsrout;
 };
 
 inline void ATTR_PRINTF(3,4) zn_state::verboselog( int n_level, const char *s_fmt, ... )
@@ -167,6 +182,16 @@ inline void ATTR_PRINTF(3,4) zn_state::verboselog( int n_level, const char *s_fm
 		logerror( "%s: %s", machine().describe_context(), buf );
 	}
 }
+
+void zn_state::machine_start()
+{
+	save_item(NAME(m_n_znsecsel));
+	save_item(NAME(m_cat702_1_dataout));
+	save_item(NAME(m_cat702_2_dataout));
+	save_item(NAME(m_znmcu_dataout));
+	save_item(NAME(m_znmcu_dsrout));
+}
+
 
 #ifdef UNUSED_FUNCTION
 inline uint16_t zn_state::psxreadword( uint32_t *p_n_psxram, uint32_t n_address )
@@ -190,9 +215,10 @@ WRITE8_MEMBER(zn_state::znsecsel_w)
 {
 	verboselog(2, "znsecsel_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
 
-	m_cat702_1->write_select((data >> 2) & 1);
-	m_cat702_2->write_select((data >> 3) & 1);
-	m_zndip->write_select((data & 0x8c) != 0x8c);
+	m_cat702_1->write_select(BIT(data, 2));
+	m_cat702_2->write_select(BIT(data, 3));
+	m_znmcu->write_select((data & 0x8c) != 0x8c);
+	// BIT(data,4); // read analogue controls?
 
 	m_n_znsecsel = data;
 }
@@ -299,10 +325,12 @@ static MACHINE_CONFIG_START( zn1_1mb_vram, zn_state )
 	MCFG_DEVICE_ADD("cat702_2", CAT702, 0)
 	MCFG_CAT702_DATAOUT_HANDLER(WRITELINE(zn_state, cat702_2_dataout))
 
-	MCFG_DEVICE_ADD("zndip", ZNDIP, 0)
-	MCFG_ZNDIP_DATAOUT_HANDLER(WRITELINE(zn_state, zndip_dataout))
-	MCFG_ZNDIP_DSR_HANDLER(DEVWRITELINE("maincpu:sio0", psxsio0_device, write_dsr))
-	MCFG_ZNDIP_DATA_HANDLER(IOPORT(":DSW"))
+	MCFG_DEVICE_ADD("znmcu", ZNMCU, 0)
+	MCFG_ZNMCU_DATAOUT_HANDLER(WRITELINE(zn_state, znmcu_dataout))
+	MCFG_ZNMCU_DSR_HANDLER(WRITELINE(zn_state, znmcu_dsrout))
+	MCFG_ZNMCU_DSW_HANDLER(IOPORT(":DSW"))
+	MCFG_ZNMCU_ANALOG1_HANDLER(IOPORT(":ANALOG1"))
+	MCFG_ZNMCU_ANALOG2_HANDLER(IOPORT(":ANALOG2"))
 
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0x100000, XTAL_53_693175MHz )
@@ -342,10 +370,12 @@ static MACHINE_CONFIG_START( zn2, zn_state )
 	MCFG_DEVICE_ADD("cat702_2", CAT702, 0)
 	MCFG_CAT702_DATAOUT_HANDLER(WRITELINE(zn_state, cat702_2_dataout))
 
-	MCFG_DEVICE_ADD("zndip", ZNDIP, 0)
-	MCFG_ZNDIP_DATAOUT_HANDLER(WRITELINE(zn_state, zndip_dataout))
-	MCFG_ZNDIP_DSR_HANDLER(DEVWRITELINE("maincpu:sio0", psxsio0_device, write_dsr))
-	MCFG_ZNDIP_DATA_HANDLER(IOPORT(":DSW"))
+	MCFG_DEVICE_ADD("znmcu", ZNMCU, 0)
+	MCFG_ZNMCU_DATAOUT_HANDLER(WRITELINE(zn_state, znmcu_dataout))
+	MCFG_ZNMCU_DSR_HANDLER(WRITELINE(zn_state, znmcu_dsrout))
+	MCFG_ZNMCU_DSW_HANDLER(IOPORT(":DSW"))
+	MCFG_ZNMCU_ANALOG1_HANDLER(IOPORT(":ANALOG1"))
+	MCFG_ZNMCU_ANALOG2_HANDLER(IOPORT(":ANALOG2"))
 
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8654Q, 0x200000, XTAL_53_693175MHz )
@@ -1322,8 +1352,8 @@ static MACHINE_CONFIG_DERIVED( coh1000w, zn1_2mb_vram )
 
 	MCFG_VT83C461_ADD("ide", ata_devices, "hdd", nullptr, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("maincpu:irq", psxirq_device, intin10))
-	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psx_dma_read_delegate( FUNC( zn_state::atpsx_dma_read ), (zn_state *) owner ) )
-	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psx_dma_write_delegate( FUNC( zn_state::atpsx_dma_write ), (zn_state *) owner ) )
+	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psx_dma_read_delegate(&zn_state::atpsx_dma_read, (zn_state *) owner ) )
+	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psx_dma_write_delegate(&zn_state::atpsx_dma_write, (zn_state *) owner ) )
 MACHINE_CONFIG_END
 
 /*
@@ -1853,8 +1883,6 @@ WRITE16_MEMBER(zn_state::acpsx_00_w)
 
 WRITE16_MEMBER(zn_state::nbajamex_bank_w)
 {
-	uint32_t newbank = 0;
-
 	verboselog(0, "nbajamex_bank_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
 
 	if (offset > 1)
@@ -1862,30 +1890,32 @@ WRITE16_MEMBER(zn_state::nbajamex_bank_w)
 		logerror("Unknown banking offset %x!\n", offset);
 	}
 
-	if (offset == 1)
-	{
-		data -= 1;
-	}
-
-	if (data <= 1)
-	{
-		newbank = (data * 0x400000);
-	}
-	else if (data >= 0x10)
-	{
-		data -= 0x10;
-		newbank = (data * 0x400000);
-		newbank += 0x200000;
-	}
+	m_nbajamex_rombank[offset] = data;
+	
+	uint32_t bankbase0 = ((m_nbajamex_rombank[0] & 0x10) ? 0x200000 : 0) + (m_nbajamex_rombank[0] & 7) * 0x400000;
+	uint32_t bankbase1 = ((m_nbajamex_rombank[1] & 0x10) ? 0 : 0x200000) + (m_nbajamex_rombank[1] & 7) * 0x400000;
 
 	if (offset == 0)
 	{
-		membank( "bankedroms" )->set_base( memregion( "bankedroms" )->base() + newbank);
+		if (m_nbajamex_rombank[0] == 0)
+		{
+			m_maincpu->space(AS_PROGRAM).install_read_bank(0x1f200000, 0x1f207fff, "sram");
+			membank( "sram" )->set_base( m_nbajamex_sram.get() );
+		}
+		else
+		{
+			m_maincpu->space(AS_PROGRAM).install_read_bank(0x1f200000, 0x1f7fffff, "bankedroms2");
+			membank( "bankedroms2" )->set_base( memregion( "bankedroms" )->base() + bankbase1);
+		}
+		membank( "bankedroms" )->set_base( memregion( "bankedroms" )->base() + bankbase0);
 	}
 	else if (offset == 1)
 	{
-		newbank += 0x200000;
-		membank( "bankedroms2" )->set_base( memregion( "bankedroms" )->base() + newbank);
+		if (m_nbajamex_rombank[0] != 0)
+		{
+			m_maincpu->space(AS_PROGRAM).install_read_bank(0x1f200000, 0x1f7fffff, "bankedroms2");
+			membank( "bankedroms2" )->set_base( memregion( "bankedroms" )->base() + bankbase1);
+		}
 	}
 }
 
@@ -1897,25 +1927,28 @@ WRITE16_MEMBER(zn_state::acpsx_10_w)
 // all 16 bits goes to the external soundboard's latch (see sound test menu)
 WRITE16_MEMBER(zn_state::nbajamex_80_w)
 {
-	verboselog(0, "nbajamex_80_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
-	psxirq_device *psxirq = (psxirq_device *) machine().device("maincpu:irq");
-	psxirq->intin10(1);
+	m_rax->data_w(space, 0, data, 0xffff);
 }
 
 READ16_MEMBER(zn_state::nbajamex_08_r)
 {
-	uint32_t data = 0xffffffff;
-	verboselog(0, "nbajamex_08_r( %08x, %08x, %08x )\n", offset, data, mem_mask );
-	return data;
+	// Sound related
+	verboselog(0, "nbajamex_08_r( %08x, %08x, %08x )\n", offset, 0, mem_mask );
+	return 0x400;
 }
 
-// possibly a readback from the external soundboard?
 READ16_MEMBER(zn_state::nbajamex_80_r)
 {
-	uint32_t data = 0xffffffff;
-	verboselog(0, "nbajamex_80_r( %08x, %08x, %08x )\n", offset, data, mem_mask );
-	return data;
+	verboselog(0, "nbajamex_80_r( %08x, %08x, %08x )\n", offset, 0, mem_mask );
+	return 0xffff;
 }
+
+WRITE8_MEMBER(zn_state::nbajamex_backup_w)
+{
+	m_nbajamex_sram[offset] = data;
+}
+
+
 
 static ADDRESS_MAP_START(coh1000a_map, AS_PROGRAM, 32, zn_state)
 	AM_RANGE(0x1fbfff00, 0x1fbfff03) AM_WRITE16(acpsx_00_w, 0xffffffff)
@@ -1926,7 +1959,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(nbajamex_map, AS_PROGRAM, 32, zn_state)
 	AM_RANGE(0x1f000000, 0x1f1fffff) AM_ROMBANK("bankedroms")
-	AM_RANGE(0x1f200000, 0x1f7fffff) AM_ROMBANK("bankedroms2")
+	AM_RANGE(0x1f200000, 0x1f207fff) AM_WRITE8(nbajamex_backup_w, 0xffffffff)
 	AM_RANGE(0x1fbfff00, 0x1fbfff07) AM_WRITE16(nbajamex_bank_w, 0xffffffff)
 	AM_RANGE(0x1fbfff08, 0x1fbfff0b) AM_READ16(nbajamex_08_r, 0xffff)
 	AM_RANGE(0x1fbfff80, 0x1fbfff83) AM_READWRITE16(nbajamex_80_r, nbajamex_80_w, 0xffff)
@@ -1934,10 +1967,16 @@ static ADDRESS_MAP_START(nbajamex_map, AS_PROGRAM, 32, zn_state)
 	AM_IMPORT_FROM(coh1000a_map)
 ADDRESS_MAP_END
 
+DRIVER_INIT_MEMBER(zn_state,nbajamex)
+{
+	m_nbajamex_sram = std::make_unique<uint8_t[]>(0x80000);
+	machine().device<nvram_device>("71256")->set_base(m_nbajamex_sram.get(), 0x8000);
+}
+
+
 MACHINE_RESET_MEMBER(zn_state,nbajamex)
 {
 	membank( "bankedroms" )->set_base( memregion( "bankedroms" )->base() );
-	membank( "bankedroms2" )->set_base( memregion( "bankedroms" )->base() + 0x200000 );
 }
 
 static ADDRESS_MAP_START(jdredd_map, AS_PROGRAM, 32, zn_state)
@@ -1956,7 +1995,9 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( nbajamex, coh1000a )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(nbajamex_map)
+	MCFG_NVRAM_ADD_1FILL("71256")
 	MCFG_MACHINE_RESET_OVERRIDE(zn_state, nbajamex)
+	MCFG_DEVICE_ADD("rax", ACCLAIM_RAX, 0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( jdredd, coh1000a )
@@ -1964,7 +2005,7 @@ static MACHINE_CONFIG_DERIVED( jdredd, coh1000a )
 	MCFG_CPU_PROGRAM_MAP(jdredd_map)
 
 	MCFG_DEVICE_MODIFY("gpu")
-	MCFG_PSXGPU_VBLANK_CALLBACK(vblank_state_delegate( FUNC( zn_state::jdredd_vblank ), (zn_state *) owner))
+	MCFG_PSXGPU_VBLANK_CALLBACK(vblank_state_delegate(&zn_state::jdredd_vblank, (zn_state *) owner))
 
 	MCFG_ATA_INTERFACE_ADD("ata", ata_devices, "hdd", nullptr, true)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("maincpu:irq", psxirq_device, intin10))
@@ -2496,15 +2537,21 @@ static INPUT_PORTS_START( zn )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
+	PORT_START("ANALOG1")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
+	PORT_START("ANALOG2")
+	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNKNOWN)
+
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x01, "Freeze" )                PORT_DIPLOCATION("S551:1")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "S551:1" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Service_Mode ) ) PORT_DIPLOCATION("S551:2") // bios testmode
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "S551:3" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "S551:4" ) // game testmode in some games
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "S551:4" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( zn4w )
@@ -2611,6 +2658,43 @@ static INPUT_PORTS_START( primrag2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( aerofgts )
+	PORT_INCLUDE( zn )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x04, 0x04, "Test Mode" )             PORT_DIPLOCATION("S551:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Save" )                  PORT_DIPLOCATION("S551:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Yes ) ) // OK
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) ) // NG
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( znt )
+	PORT_INCLUDE( zn )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x08, 0x08, "Test Mode" )             PORT_DIPLOCATION("S551:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( bldyror2 )
+	PORT_INCLUDE( znt )
+
+	PORT_MODIFY("P3")
+	PORT_BIT( 0x4f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
+
+	PORT_MODIFY("P4")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x08, 0x08, "Test Mode" )             PORT_DIPLOCATION("S551:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
 
 /*
 
@@ -4865,13 +4949,10 @@ ROM_START( nbajamex )
 	ROM_LOAD16_BYTE( "nba6o.u5",    0x1a00001, 0x200000, CRC(b1dfb42e) SHA1(fb9627e228bf2a744842eb44afbca4a6232cadb2) )
 	ROM_LOAD16_BYTE( "nba6e.u19",   0x1a00000, 0x200000, CRC(6f17d8c1) SHA1(22cf263efb64cf62030e02b641c485debe75944d) )
 
-	ROM_REGION( 0x0a0000, "cpu1", 0 ) /* 512k for the audio CPU, ADSP-2181 (+banks) */
-	ROM_LOAD( "360snda1.u52", 0x000000, 0x08000, CRC(36d8a628) SHA1(944a01c9128f5e90c7dba3557a3ecb2c5ca90831) )
-	ROM_CONTINUE(             0x010000, 0x78000 )
-
-	ROM_REGION( 0x400000, "unknown", 0 )
-	ROM_LOAD( "sound0.u48",   0x000000, 0x200000, CRC(38873b67) SHA1(b2f8d32270ae604c099a1b9b71d2e06468c7d4a9) )
-	ROM_LOAD( "sound1.u49",   0x200000, 0x200000, CRC(57014589) SHA1(d360ff1c52424bd91a5a8d1a2a9c10bf7abb0602) )
+	ROM_REGION16_LE( 0x800000, "rax", 0 )
+	ROM_LOAD( "360snda1.u52", 0x000000, 0x080000, CRC(36d8a628) SHA1(944a01c9128f5e90c7dba3557a3ecb2c5ca90831) )
+	ROM_LOAD( "sound0.u48",   0x400000, 0x200000, CRC(38873b67) SHA1(b2f8d32270ae604c099a1b9b71d2e06468c7d4a9) )
+	ROM_LOAD( "sound1.u49",   0x600000, 0x200000, CRC(57014589) SHA1(d360ff1c52424bd91a5a8d1a2a9c10bf7abb0602) )
 
 	ROM_REGION( 0x8, "cat702_2", 0 )
 	ROM_LOAD( "ac02", 0x000000, 0x000008, CRC(1412d475) SHA1(c2f62232a261870f58353d09dc0d6ce2ad17a729) )
@@ -4898,16 +4979,17 @@ ROM_START( nbajamexa )
 	ROM_LOAD16_BYTE( "nba6o.u5",    0x1a00001, 0x200000, CRC(b1dfb42e) SHA1(fb9627e228bf2a744842eb44afbca4a6232cadb2) )
 	ROM_LOAD16_BYTE( "nba6e.u19",   0x1a00000, 0x200000, CRC(6f17d8c1) SHA1(22cf263efb64cf62030e02b641c485debe75944d) )
 
-	ROM_REGION( 0x0a0000, "cpu1", 0 ) /* 512k for the audio CPU, ADSP-2181 (+banks) */
-	ROM_LOAD( "360snda1.u52", 0x000000, 0x08000, CRC(36d8a628) SHA1(944a01c9128f5e90c7dba3557a3ecb2c5ca90831) )
-	ROM_CONTINUE(             0x010000, 0x78000 )
-
 	ROM_REGION( 0x400000, "unknown", 0 )
 	ROM_LOAD( "sound0.u48",   0x000000, 0x200000, CRC(38873b67) SHA1(b2f8d32270ae604c099a1b9b71d2e06468c7d4a9) )
 	ROM_LOAD( "sound1.u49",   0x200000, 0x200000, CRC(57014589) SHA1(d360ff1c52424bd91a5a8d1a2a9c10bf7abb0602) )
 
 	ROM_REGION( 0x8, "cat702_2", 0 )
 	ROM_LOAD( "ac02", 0x000000, 0x000008, CRC(1412d475) SHA1(c2f62232a261870f58353d09dc0d6ce2ad17a729) )
+
+	ROM_REGION16_LE( 0x800000, "rax", 0 )
+	ROM_LOAD( "360snda1.u52", 0x000000, 0x080000, CRC(36d8a628) SHA1(944a01c9128f5e90c7dba3557a3ecb2c5ca90831) )
+	ROM_LOAD( "sound0.u48",   0x400000, 0x200000, CRC(38873b67) SHA1(b2f8d32270ae604c099a1b9b71d2e06468c7d4a9) )
+	ROM_LOAD( "sound1.u49",   0x600000, 0x200000, CRC(57014589) SHA1(d360ff1c52424bd91a5a8d1a2a9c10bf7abb0602) )
 ROM_END
 
 ROM_START( jdredd )
@@ -5025,12 +5107,12 @@ GAME( 1999, shiryu2,   strider2, coh3002c,    zn,       driver_device, 0, ROT0, 
 
 /* Atari */
 GAME( 1996, coh1000w,  0,        coh1000w,    zn,       driver_device, 0, ROT0, "Atari", "Atari PSX", MACHINE_IS_BIOS_ROOT )
-GAME( 1996, primrag2,  coh1000w, coh1000w,    primrag2, driver_device, 0, ROT0, "Atari", "Primal Rage 2 (Ver 0.36a)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // locks up when starting a game
+GAME( 1996, primrag2,  coh1000w, coh1000w,    primrag2, driver_device, 0, ROT0, "Atari", "Primal Rage 2 (Ver 0.36a)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // watchdog reset at startup
 
 /* Acclaim */
 GAME( 1995, coh1000a,  0,        coh1000a,    zn,       driver_device, 0, ROT0, "Acclaim", "Acclaim PSX", MACHINE_IS_BIOS_ROOT )
-GAME( 1996, nbajamex,  coh1000a, nbajamex,    zn,       driver_device, 0, ROT0, "Acclaim", "NBA Jam Extreme (ver. 1.10I)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1996, nbajamexa, nbajamex, nbajamex,    zn,       driver_device, 0, ROT0, "Acclaim", "NBA Jam Extreme (ver. 1.04)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1996, nbajamex,  coh1000a, nbajamex,    zn,       zn_state, nbajamex, ROT0, "Acclaim", "NBA Jam Extreme (ver. 1.10I)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, nbajamexa, nbajamex, nbajamex,    zn,       zn_state, nbajamex, ROT0, "Acclaim", "NBA Jam Extreme (ver. 1.04)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, jdredd,    coh1000a, jdredd,      jdredd,   driver_device, 0, ROT0, "Acclaim", "Judge Dredd (Rev C Dec. 17 1997)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1996, jdreddb,   jdredd,   jdredd,      jdredd,   driver_device, 0, ROT0, "Acclaim", "Judge Dredd (Rev B Nov. 26 1997)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
@@ -5055,54 +5137,54 @@ GAME( 2001, mfjump,    coh1002m, coh1002m,    zn,       driver_device, 0, ROT0, 
 
 /* Video System */
 GAME( 1996, coh1002v,  0,        coh1002v,    zn,       driver_device, 0, ROT0,   "Video System Co.", "Video System PSX", MACHINE_IS_BIOS_ROOT )
-GAME( 1996, aerofgts,  coh1002v, coh1002v,    zn,       driver_device, 0, ROT270, "Video System Co.", "Aero Fighters Special (Taiwan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1996, sncwgltd,  aerofgts, coh1002v,    zn,       driver_device, 0, ROT270, "Video System Co.", "Sonic Wings Limited (Japan)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1996, aerofgts,  coh1002v, coh1002v,    aerofgts, driver_device, 0, ROT270, "Video System Co.", "Aero Fighters Special (Taiwan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1996, sncwgltd,  aerofgts, coh1002v,    aerofgts, driver_device, 0, ROT270, "Video System Co.", "Sonic Wings Limited (Japan)",    MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 /* Taito FX-1A */
-GAME( 1995, coh1000t,  0,        coh1000ta,   zn,       driver_device, 0, ROT0, "Taito", "Taito FX1", MACHINE_IS_BIOS_ROOT )
-GAME( 1995, sfchamp,   coh1000t, coh1000ta,   zn,       driver_device, 0, ROT0, "Taito", "Super Football Champ (Ver 2.5O)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1995, sfchampo,  sfchamp,  coh1000ta,   zn,       driver_device, 0, ROT0, "Taito", "Super Football Champ (Ver 2.4O)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1995, sfchampu,  sfchamp,  coh1000ta,   zn,       driver_device, 0, ROT0, "Taito", "Super Football Champ (Ver 2.4A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1995, sfchampj,  sfchamp,  coh1000ta,   zn,       driver_device, 0, ROT0, "Taito", "Super Football Champ (Ver 2.4J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1995, psyforce,  coh1000t, coh1000ta,   zn,       driver_device, 0, ROT0, "Taito", "Psychic Force (Ver 2.4O)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1995, psyforcej, psyforce, coh1000ta,   zn,       driver_device, 0, ROT0, "Taito", "Psychic Force (Ver 2.4J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1995, psyforcex, psyforce, coh1000ta,   zn,       driver_device, 0, ROT0, "Taito", "Psychic Force EX (Ver 2.0J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1996, mgcldate,  mgcldtex, coh1000ta,   zn,       driver_device, 0, ROT0, "Taito", "Magical Date / Magical Date - dokidoki kokuhaku daisakusen (Ver 2.02J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1997, mgcldtex,  coh1000t, coh1000ta,   zn,       driver_device, 0, ROT0, "Taito", "Magical Date EX / Magical Date - sotsugyou kokuhaku daisakusen (Ver 2.01J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1995, coh1000t,  0,        coh1000ta,   znt,      driver_device, 0, ROT0, "Taito", "Taito FX1", MACHINE_IS_BIOS_ROOT )
+GAME( 1995, sfchamp,   coh1000t, coh1000ta,   znt,      driver_device, 0, ROT0, "Taito", "Super Football Champ (Ver 2.5O)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1995, sfchampo,  sfchamp,  coh1000ta,   znt,      driver_device, 0, ROT0, "Taito", "Super Football Champ (Ver 2.4O)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1995, sfchampu,  sfchamp,  coh1000ta,   znt,      driver_device, 0, ROT0, "Taito", "Super Football Champ (Ver 2.4A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1995, sfchampj,  sfchamp,  coh1000ta,   znt,      driver_device, 0, ROT0, "Taito", "Super Football Champ (Ver 2.4J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1995, psyforce,  coh1000t, coh1000ta,   znt,      driver_device, 0, ROT0, "Taito", "Psychic Force (Ver 2.4O)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1995, psyforcej, psyforce, coh1000ta,   znt,      driver_device, 0, ROT0, "Taito", "Psychic Force (Ver 2.4J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1995, psyforcex, psyforce, coh1000ta,   znt,      driver_device, 0, ROT0, "Taito", "Psychic Force EX (Ver 2.0J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // exception in attract after reading 0xbbbbbbbb from 0x8025ed18 leads to watchdog reset
+GAME( 1996, mgcldate,  mgcldtex, coh1000ta,   znt,      driver_device, 0, ROT0, "Taito", "Magical Date / Magical Date - dokidoki kokuhaku daisakusen (Ver 2.02J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, mgcldtex,  coh1000t, coh1000ta,   znt,      driver_device, 0, ROT0, "Taito", "Magical Date EX / Magical Date - sotsugyou kokuhaku daisakusen (Ver 2.01J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 /* Taito FX-1B */
-GAME( 1996, raystorm,  coh1000t, coh1000tb,   zn,       zn_state, coh1000tb, ROT0, "Taito", "Ray Storm (Ver 2.06A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1996, raystormo, raystorm, coh1000tb,   zn,       zn_state, coh1000tb, ROT0, "Taito", "Ray Storm (Ver 2.05O)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1996, raystormu, raystorm, coh1000tb,   zn,       zn_state, coh1000tb, ROT0, "Taito", "Ray Storm (Ver 2.05A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1996, raystormj, raystorm, coh1000tb,   zn,       zn_state, coh1000tb, ROT0, "Taito", "Ray Storm (Ver 2.05J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1996, ftimpact,  ftimpcta, coh1000tb,   zn,       zn_state, coh1000tb, ROT0, "Taito", "Fighters' Impact (Ver 2.02O)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1996, ftimpactu, ftimpcta, coh1000tb,   zn,       zn_state, coh1000tb, ROT0, "Taito", "Fighters' Impact (Ver 2.02A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1996, ftimpactj, ftimpcta, coh1000tb,   zn,       zn_state, coh1000tb, ROT0, "Taito", "Fighters' Impact (Ver 2.02J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1997, ftimpcta,  coh1000t, coh1000tb,   zn,       zn_state, coh1000tb, ROT0, "Taito", "Fighters' Impact A (Ver 2.00J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1997, gdarius,   gdarius2, coh1002tb,   zn,       zn_state, coh1000tb, ROT0, "Taito", "G-Darius (Ver 2.01J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1997, gdariusb,  gdarius2, coh1002tb,   zn,       zn_state, coh1000tb, ROT0, "Taito", "G-Darius (Ver 2.02A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1997, gdarius2,  coh1000t, coh1002tb,   zn,       zn_state, coh1000tb, ROT0, "Taito", "G-Darius Ver.2 (Ver 2.03J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1996, raystorm,  coh1000t, coh1000tb,   znt,      zn_state, coh1000tb, ROT0, "Taito", "Ray Storm (Ver 2.06A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1996, raystormo, raystorm, coh1000tb,   znt,      zn_state, coh1000tb, ROT0, "Taito", "Ray Storm (Ver 2.05O)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1996, raystormu, raystorm, coh1000tb,   znt,      zn_state, coh1000tb, ROT0, "Taito", "Ray Storm (Ver 2.05A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1996, raystormj, raystorm, coh1000tb,   znt,      zn_state, coh1000tb, ROT0, "Taito", "Ray Storm (Ver 2.05J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1996, ftimpact,  ftimpcta, coh1000tb,   znt,      zn_state, coh1000tb, ROT0, "Taito", "Fighters' Impact (Ver 2.02O)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1996, ftimpactu, ftimpcta, coh1000tb,   znt,      zn_state, coh1000tb, ROT0, "Taito", "Fighters' Impact (Ver 2.02A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1996, ftimpactj, ftimpcta, coh1000tb,   znt,      zn_state, coh1000tb, ROT0, "Taito", "Fighters' Impact (Ver 2.02J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, ftimpcta,  coh1000t, coh1000tb,   znt,      zn_state, coh1000tb, ROT0, "Taito", "Fighters' Impact A (Ver 2.00J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, gdarius,   gdarius2, coh1002tb,   znt,      zn_state, coh1000tb, ROT0, "Taito", "G-Darius (Ver 2.01J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, gdariusb,  gdarius2, coh1002tb,   znt,      zn_state, coh1000tb, ROT0, "Taito", "G-Darius (Ver 2.02A)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, gdarius2,  coh1000t, coh1002tb,   znt,      zn_state, coh1000tb, ROT0, "Taito", "G-Darius Ver.2 (Ver 2.03J)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 /* Eighting / Raizing */
-GAME( 1997, coh1002e,  0,        coh1002e,    zn,       driver_device, 0, ROT0, "Eighting / Raizing", "PS Arcade 95", MACHINE_IS_BIOS_ROOT )
-GAME( 1997, beastrzr,  coh1002e, coh1002e,    zn,       driver_device, 0, ROT0, "Eighting / Raizing", "Beastorizer (USA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1997, bldyroar,  beastrzr, coh1002e,    zn,       driver_device, 0, ROT0, "Eighting / Raizing", "Bloody Roar (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1997, beastrzrb, beastrzr, coh1002e,    zn,       driver_device, 0, ROT0, "bootleg", "Beastorizer (USA bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1997, coh1002e,  0,        coh1002e,    znt,      driver_device, 0, ROT0, "Eighting / Raizing", "PS Arcade 95", MACHINE_IS_BIOS_ROOT )
+GAME( 1997, beastrzr,  coh1002e, coh1002e,    znt,      driver_device, 0, ROT0, "Eighting / Raizing", "Beastorizer (USA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, bldyroar,  beastrzr, coh1002e,    znt,      driver_device, 0, ROT0, "Eighting / Raizing", "Bloody Roar (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1997, beastrzrb, beastrzr, coh1002e,    znt,      driver_device, 0, ROT0, "bootleg", "Beastorizer (USA bootleg)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 
 /* The region on these is determined from the NVRAM, it can't be changed from the test menu, it's pre-programmed */
-GAME( 1998, bldyror2,  coh1002e, coh1002e,    zn6b,     driver_device, 0, ROT0, "Eighting / Raizing", "Bloody Roar 2 (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, bldyror2u, bldyror2, coh1002e,    zn6b,     driver_device, 0, ROT0, "Eighting / Raizing", "Bloody Roar 2 (USA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, bldyror2a, bldyror2, coh1002e,    zn6b,     driver_device, 0, ROT0, "Eighting / Raizing", "Bloody Roar 2 (Asia)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 1998, bldyror2j, bldyror2, coh1002e,    zn6b,     driver_device, 0, ROT0, "Eighting / Raizing", "Bloody Roar 2 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, bldyror2,  coh1002e, coh1002e,    bldyror2, driver_device, 0, ROT0, "Eighting / Raizing", "Bloody Roar 2 (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // locks up if you coin up during the fmw with interlace enabled
+GAME( 1998, bldyror2u, bldyror2, coh1002e,    bldyror2, driver_device, 0, ROT0, "Eighting / Raizing", "Bloody Roar 2 (USA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, bldyror2a, bldyror2, coh1002e,    bldyror2, driver_device, 0, ROT0, "Eighting / Raizing", "Bloody Roar 2 (Asia)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 1998, bldyror2j, bldyror2, coh1002e,    bldyror2, driver_device, 0, ROT0, "Eighting / Raizing", "Bloody Roar 2 (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 /* The region on these is determined from the NVRAM, it can't be changed from the test menu, it's pre-programmed */
-GAME( 2000, brvblade,  coh1002m, coh1002e,    zn,       driver_device, 0, ROT270, "Eighting / Raizing", "Brave Blade (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 2000, brvbladeu, brvblade, coh1002e,    zn,       driver_device, 0, ROT270, "Eighting / Raizing", "Brave Blade (USA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 2000, brvbladea, brvblade, coh1002e,    zn,       driver_device, 0, ROT270, "Eighting / Raizing", "Brave Blade (Asia)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
-GAME( 2000, brvbladej, brvblade, coh1002e,    zn,       driver_device, 0, ROT270, "Eighting / Raizing", "Brave Blade (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 2000, brvblade,  coh1002m, coh1002e,    znt,      driver_device, 0, ROT270, "Eighting / Raizing", "Brave Blade (World)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 2000, brvbladeu, brvblade, coh1002e,    znt,      driver_device, 0, ROT270, "Eighting / Raizing", "Brave Blade (USA)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 2000, brvbladea, brvblade, coh1002e,    znt,      driver_device, 0, ROT270, "Eighting / Raizing", "Brave Blade (Asia)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
+GAME( 2000, brvbladej, brvblade, coh1002e,    znt,      driver_device, 0, ROT270, "Eighting / Raizing", "Brave Blade (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 
 /* Bust a Move 2 uses the PSARC95 bios and ET series security but the top board is completely different */
-GAME( 1999, bam2,      coh1002e, bam2,        zn,       driver_device, 0, ROT0, "Metro / Enix / Namco", "Bust a Move 2 (Japanese ROM ver. 1999/07/17 10:00:00)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+GAME( 1999, bam2,      coh1002e, bam2,        zn,       driver_device, 0, ROT0, "Metro / Enix / Namco", "Bust a Move 2 - Dance Tengoku Mix (Japanese ROM ver. 1999/07/17 10:00:00)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 
 /* Atlus */
 GAME( 1996, coh1001l,  0,        coh1001l,    zn,       driver_device, 0, ROT0, "Atlus", "Atlus PSX", MACHINE_IS_BIOS_ROOT )

@@ -139,11 +139,11 @@ void ninjakd2_state::video_init_common(uint32_t vram_alloc_size)
 	save_item(NAME(m_robokid_bg2_bank));
 }
 
-static int stencil_ninjakd2( uint16_t pal );
-static int stencil_mnight(   uint16_t pal );
-static int stencil_arkarea(  uint16_t pal );
-static int stencil_robokid(  uint16_t pal );
-static int stencil_omegaf(   uint16_t pal );
+static bool stencil_ninjakd2( uint16_t pal );
+static bool stencil_mnight(   uint16_t pal );
+static bool stencil_arkarea(  uint16_t pal );
+static bool stencil_robokid(  uint16_t pal );
+static bool stencil_omegaf(   uint16_t pal );
 
 void ninjakd2_state::video_start()
 {
@@ -409,11 +409,11 @@ void ninjakd2_state::draw_sprites( bitmap_ind16 &bitmap)
 	}
 }
 
-static int stencil_ninjakd2( uint16_t pal ) { return( (pal & 0xf0) == 0xf0 ); }
-static int stencil_mnight(   uint16_t pal ) { return( (pal & 0xf0) == 0xf0 ); }
-static int stencil_arkarea(  uint16_t pal ) { return( (pal & 0xf0) == 0xf0 ); }
-static int stencil_robokid(  uint16_t pal ) { return( (pal & 0xf0) <  0xe0 ); }
-static int stencil_omegaf(   uint16_t pal ) { return( TRUE ); }
+static bool stencil_ninjakd2( uint16_t pal ) { return( (pal & 0xf0) == 0xf0 ); }
+static bool stencil_mnight(   uint16_t pal ) { return( (pal & 0xf0) == 0xf0 ); }
+static bool stencil_arkarea(  uint16_t pal ) { return( (pal & 0xf0) == 0xf0 ); }
+static bool stencil_robokid(  uint16_t pal ) { return( (pal & 0xf0) <  0xe0 ); }
+static bool stencil_omegaf(   uint16_t pal ) { return( true ); }
 //////            OVERDRAW     STENCIL     UNKNOWN
 //////  NINJAKD2  023459ABCDE  F           1678
 //////    MNIGHT  0134568ABCDE F           279

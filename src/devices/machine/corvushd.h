@@ -202,7 +202,7 @@ private:
 
 	// Sector addressing scheme for Rev B/H drives used in various commands (Called a DADR in the docs)
 	struct dadr_t {
-		uint8_t address_msn_and_drive;// Most significant nibble: Most signficant nibble of sector address, Least significant nibble: Drive #
+		uint8_t address_msn_and_drive;// Most significant nibble: Most significant nibble of sector address, Least significant nibble: Drive #
 		uint8_t address_lsb;          // Least significant byte of sector address
 		uint8_t address_mid;          // Middle byte of sector address
 	};

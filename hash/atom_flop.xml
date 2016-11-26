@@ -26,6 +26,32 @@
 		</part>
 	</software>
 
+	<software name="egghead">
+		<description>Egghead in Space (32K)</description>
+		<year>2016</year>
+		<publisher>Retro Software</publisher>
+		<info name="author" value="Kees van Oss" />
+		<info name="usage" value="Load with *RUN&quot;EHRUN&quot;" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102400">
+				<rom name="egghead.dsk" size="102400" crc="a25a9305" sha1="68d53a0e9419c7dca4ba8b525595d12926ab1c85" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="f14">
+		<description>F14 Tomcat (32K)</description>
+		<year>2015</year>
+		<publisher>Retro Software</publisher>
+		<info name="author" value="Kees van Oss" />
+		<info name="usage" value="Load with *RUN&quot;F14RUN&quot;" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102400">
+				<rom name="f14.dsk" size="102400" crc="b0b213c2" sha1="a4691fd7590884e0da96cf92f90c31786a74fd93" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="gala">
 		<description>Galaforce (32K)</description>
 		<year>2012</year>

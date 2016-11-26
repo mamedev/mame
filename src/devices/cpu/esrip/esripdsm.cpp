@@ -17,7 +17,7 @@
     DISASSEMBLY HOOK (TODO: FINISH)
 ***************************************************************************/
 
-CPU_DISASSEMBLE( esrip )
+CPU_DISASSEMBLE(esrip)
 {
 #if 0
 	static const char* const jmp_types[] =
@@ -60,7 +60,7 @@ CPU_DISASSEMBLE( esrip )
 	uint8_t ctrl2 = (inst_lo >> 24) & 0xff;
 	uint8_t ctrl3 = (inst_hi) & 0xff;
 
-	sprintf(buffer, "%.4x %c%c%c%c %.2x %s%s%s%s%s%s%s%s %c%s%s%s %c%c%c%c%c%c%c%c",
+	util::stream_format(stream, "%04x %c%c%c%c %02x %s%s%s%s%s%s%s%s %c%s%s%s %c%c%c%c%c%c%c%c",
 			ins,
 			ctrl & 1 ? 'D' : ' ',
 			ctrl & 2 ? ' ' : 'Y',

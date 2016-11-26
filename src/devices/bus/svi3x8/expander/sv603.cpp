@@ -117,7 +117,7 @@ READ8_MEMBER( sv603_device::mreq_r )
 	if (offset >= 0x8000 && offset < 0xa000)
 	{
 		m_expander->ramdis_w(0);
-		return m_bios->u8(offset & 0x1fff);
+		return m_bios->as_u8(offset & 0x1fff);
 	}
 
 	return 0xff;

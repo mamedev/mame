@@ -710,8 +710,8 @@ void sb16_lle_device::device_start()
 	m_isa->install_device(0x0388, 0x0389, read8_delegate(FUNC(ymf262_device::read), ymf262), write8_delegate(FUNC(ymf262_device::write), ymf262));
 	m_isa->install_device(0x0220, 0x0223, read8_delegate(FUNC(ymf262_device::read), ymf262), write8_delegate(FUNC(ymf262_device::write), ymf262));
 	m_isa->install_device(0x0228, 0x0229, read8_delegate(FUNC(ymf262_device::read), ymf262), write8_delegate(FUNC(ymf262_device::write), ymf262));
-	m_isa->set_dma_channel(1, this, FALSE);
-	m_isa->set_dma_channel(5, this, FALSE);
+	m_isa->set_dma_channel(1, this, false);
+	m_isa->set_dma_channel(5, this, false);
 	m_timer = timer_alloc();
 }
 

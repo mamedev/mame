@@ -197,8 +197,8 @@ SETOFFSET_MEMBER( mainboard8_device::setoffset )
 	select_groms();
 
 	// Speech select lines will always be asserted/cleared as soon as the address is available
-	m_speech->wsq_w((m_vaquerro->spwt_out() == ASSERT_LINE)? FALSE : TRUE);
-	m_speech->rsq_w((m_vaquerro->sprd_out() == ASSERT_LINE)? FALSE : TRUE);
+	m_speech->wsq_w((m_vaquerro->spwt_out() == ASSERT_LINE)? false : true);
+	m_speech->rsq_w((m_vaquerro->sprd_out() == ASSERT_LINE)? false : true);
 
 	// If it is a logical space address, tell the mapper to stay inactive
 	line_state lasreq = (line_state)m_vaquerro->lascsq_out();
@@ -746,8 +746,8 @@ WRITE_LINE_MEMBER( mainboard8_device::sound_ready )
 
 WRITE_LINE_MEMBER( mainboard8_device::speech_ready )
 {
-	// The TMS5200 implementation uses TRUE/FALSE, not ASSERT/CLEAR semantics
-	m_speech_ready = (state==FALSE)? ASSERT_LINE : CLEAR_LINE;
+	// The TMS5200 implementation uses true/false, not ASSERT/CLEAR semantics
+	m_speech_ready = (state==false)? ASSERT_LINE : CLEAR_LINE;
 }
 
 WRITE_LINE_MEMBER( mainboard8_device::pbox_ready )
@@ -1192,6 +1192,11 @@ void vaquerro_device::device_start()
 	save_item(NAME(m_sry));
 	save_item(NAME(m_a14));
 	save_item(NAME(m_dbin_level));
+
+	// FIXME: In rare occasions, the saved state is invalid and restoring
+	// may crash the emulated 99/8 (e.g. with invalid opcodes)
+	// Saving the wait state logic does not affect the operation, as it seems,
+	// so we leave it out.
 }
 
 void vaquerro_device::device_reset()

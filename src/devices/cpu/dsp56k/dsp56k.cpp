@@ -147,11 +147,11 @@ void dsp56k_device::execute_set_input(int irqline, int state)
 				logerror("DSP56k IRQA is set to fire on the \"Negative Edge\".\n");
 
 			if (state != CLEAR_LINE)
-				m_dsp56k_core.modA_state = TRUE;
+				m_dsp56k_core.modA_state = true;
 			else
-				m_dsp56k_core.modA_state = FALSE;
+				m_dsp56k_core.modA_state = false;
 
-			if (m_dsp56k_core.reset_state != TRUE)
+			if (m_dsp56k_core.reset_state != true)
 				dsp56k_add_pending_interrupt(&m_dsp56k_core, "IRQA");
 			break;
 
@@ -161,33 +161,33 @@ void dsp56k_device::execute_set_input(int irqline, int state)
 				logerror("DSP56k IRQB is set to fire on the \"Negative Edge\".\n");
 
 			if (state != CLEAR_LINE)
-				m_dsp56k_core.modB_state = TRUE;
+				m_dsp56k_core.modB_state = true;
 			else
-				m_dsp56k_core.modB_state = FALSE;
+				m_dsp56k_core.modB_state = false;
 
-			if (m_dsp56k_core.reset_state != TRUE)
+			if (m_dsp56k_core.reset_state != true)
 				dsp56k_add_pending_interrupt(&m_dsp56k_core, "IRQB");
 			break;
 
 		case DSP56K_IRQ_MODC:
 			if (state != CLEAR_LINE)
-				m_dsp56k_core.modC_state = TRUE;
+				m_dsp56k_core.modC_state = true;
 			else
-				m_dsp56k_core.modC_state = FALSE;
+				m_dsp56k_core.modC_state = false;
 
 			// TODO : Set bus mode or whatever
 			break;
 
 		case DSP56K_IRQ_RESET:
 			if (state != CLEAR_LINE)
-				m_dsp56k_core.reset_state = TRUE;
+				m_dsp56k_core.reset_state = true;
 			else
 			{
 				/* If it changes state from asserted to cleared.  Call the reset function. */
-				if (m_dsp56k_core.reset_state == TRUE)
+				if (m_dsp56k_core.reset_state == true)
 					device_reset();
 
-				m_dsp56k_core.reset_state = FALSE;
+				m_dsp56k_core.reset_state = false;
 			}
 
 			// dsp56k_add_pending_interrupt("Hardware RESET");
@@ -200,7 +200,7 @@ void dsp56k_device::execute_set_input(int irqline, int state)
 
 	/* If the reset line isn't asserted, service interrupts */
 	// TODO: Is it right to immediately service interrupts?
-	//if (cpustate->reset_state != TRUE)
+	//if (cpustate->reset_state != true)
 	//  pcu_service_interrupts();
 }
 
@@ -251,10 +251,10 @@ void dsp56k_device::device_start()
 	m_dsp56k_core.bootstrap_mode = BOOTSTRAP_OFF;
 
 	/* Clear the irq states */
-	m_dsp56k_core.modA_state = FALSE;
-	m_dsp56k_core.modB_state = FALSE;
-	m_dsp56k_core.modC_state = FALSE;
-	m_dsp56k_core.reset_state = FALSE;
+	m_dsp56k_core.modA_state = false;
+	m_dsp56k_core.modB_state = false;
+	m_dsp56k_core.modC_state = false;
+	m_dsp56k_core.reset_state = false;
 
 	/* save states - dsp56k_core members */
 	save_item(NAME(m_dsp56k_core.modA_state));
@@ -293,8 +293,8 @@ void dsp56k_device::device_start()
 	state_add(DSP56K_X,      "X", m_dsp56k_core.ALU.x.d).mask(0xffffffff).formatstr("%9s");
 	state_add(DSP56K_Y,      "Y", m_dsp56k_core.ALU.y.d).mask(0xffffffff).formatstr("%9s");
 
-	state_add(DSP56K_A,      "A", m_dsp56k_core.ALU.a.q).mask((uint64_t)U64(0xffffffffffffffff)).formatstr("%12s"); /* could benefit from a better mask? */
-	state_add(DSP56K_B,      "B", m_dsp56k_core.ALU.b.q).mask((uint64_t)U64(0xffffffffffffffff)).formatstr("%12s"); /* could benefit from a better mask? */
+	state_add(DSP56K_A,      "A", m_dsp56k_core.ALU.a.q).mask(u64(0xffffffffffffffffU)).formatstr("%12s"); /* could benefit from a better mask? */
+	state_add(DSP56K_B,      "B", m_dsp56k_core.ALU.b.q).mask(u64(0xffffffffffffffffU)).formatstr("%12s"); /* could benefit from a better mask? */
 
 	state_add(DSP56K_R0,     "R0", m_dsp56k_core.AGU.r0).formatstr("%04X");
 	state_add(DSP56K_R1,     "R1", m_dsp56k_core.AGU.r1).formatstr("%04X");
@@ -494,8 +494,8 @@ void dsp56k_device::execute_run()
 }
 
 
-offs_t dsp56k_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t dsp56k_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( dsp56k );
-	return CPU_DISASSEMBLE_NAME(dsp56k)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(dsp56k)(this, stream, pc, oprom, opram, options);
 }

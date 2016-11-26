@@ -163,7 +163,7 @@ void pentagon_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		irq_off(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in pentagon_state::device_timer");
+		assert_always(false, "Unknown id in pentagon_state::device_timer");
 	}
 }
 
@@ -212,7 +212,7 @@ MACHINE_RESET_MEMBER(pentagon_state,pentagon)
 		if (strcmp(machine().system().name, "pent1024")==0)
 			m_beta->enable();
 	}
-	space.set_direct_update_handler(direct_update_delegate(FUNC(pentagon_state::pentagon_direct), this));
+	space.set_direct_update_handler(direct_update_delegate(&pentagon_state::pentagon_direct, this));
 
 	memset(messram,0,128*1024);
 

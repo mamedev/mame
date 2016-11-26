@@ -41,9 +41,25 @@ function ninja.list(value)
 	end
 end
 
+function ninja.arglist(arg, value)
+	if #value > 0 then
+		local args = {}
+		for _, val in ipairs(value) do
+			table.insert(args, string.format("%s %s", arg, val))
+		end
+		return table.concat(args, " ")
+	else
+		return ""
+	end
+end
+
 -- generate all build files for every project configuration
 function ninja.generate_project(prj)
-	ninja.generate_cpp(prj)
+	if prj.language == "Swift" then
+		ninja.generate_swift(prj)
+	else
+		ninja.generate_cpp(prj)
+	end
 end
 
 local function innerget(self, key)
@@ -103,6 +119,7 @@ function new_cfg_proxy(cfg)
 	v.files           = rebasearray(cfg.files, old, new)
 	v.includedirs     = rebasearray(cfg.includedirs, old, new)
 	v.userincludedirs = rebasearray(cfg.userincludedirs, old, new)
+	v.swiftmodulemaps = rebasearray(cfg.swiftmodulemaps, old, new)
 	
 	return setmetatable(v, cfg_proxy)
 end

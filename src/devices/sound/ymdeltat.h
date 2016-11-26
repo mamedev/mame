@@ -15,7 +15,7 @@ typedef void (*STATUS_CHANGE_HANDLER)(void *chip, uint8_t status_bits);
 
 
 /* DELTA-T (adpcm type B) struct */
-struct YM_DELTAT  {     /* AT: rearranged and tigntened structure */
+struct YM_DELTAT  {     /* AT: rearranged and tightened structure */
 	uint8_t   *memory;
 	int32_t   *output_pointer;/* pointer of output pointers   */
 	int32_t   *pan;           /* pan : &output_pointer[pan]   */
@@ -27,7 +27,7 @@ struct YM_DELTAT  {     /* AT: rearranged and tigntened structure */
 	uint32_t  memory_size;
 	int     output_range;
 	uint32_t  now_addr;       /* current address      */
-	uint32_t  now_step;       /* currect step         */
+	uint32_t  now_step;       /* correct step         */
 	uint32_t  step;           /* step                 */
 	uint32_t  start;          /* start address        */
 	uint32_t  limit;          /* limit address        */
@@ -62,7 +62,7 @@ struct YM_DELTAT  {     /* AT: rearranged and tigntened structure */
 	void *  status_change_which_chip;   /* this chip id */
 	uint8_t   status_change_EOS_bit;      /* 1 on End Of Sample (record/playback/cycle time of AD/DA converting has passed)*/
 	uint8_t   status_change_BRDY_bit;     /* 1 after recording 2 datas (2x4bits) or after reading/writing 1 data */
-	uint8_t   status_change_ZERO_bit;     /* 1 if silence lasts for more than 290 miliseconds on ADPCM recording */
+	uint8_t   status_change_ZERO_bit;     /* 1 if silence lasts for more than 290 milliseconds on ADPCM recording */
 
 	/* neither Y8950 nor YM2608 can generate IRQ when PCMBSY bit changes, so instead of above,
 	** the statusflag gets ORed with PCM_BSY (below) (on each read of statusflag of Y8950 and YM2608)

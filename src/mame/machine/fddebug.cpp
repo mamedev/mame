@@ -576,7 +576,7 @@ static void set_default_key_params(running_machine &machine)
 		{
 			fd1094_global = default_keys[keynum].global;
 			fd1094_seed = default_keys[keynum].seed;
-			keydirty = TRUE;
+			keydirty = true;
 			break;
 		}
 }
@@ -604,7 +604,7 @@ static void load_overlay_file(running_machine &machine)
 	}
 
 	/* mark the key dirty */
-	keydirty = TRUE;
+	keydirty = true;
 }
 
 
@@ -680,7 +680,7 @@ void fd1094_regenerate_key(running_machine &machine)
 	machine.debug_view().update_all(DVT_DISASSEMBLY);
 
 	/* reset keydirty */
-	keydirty = FALSE;
+	keydirty = false;
 }
 
 
@@ -925,7 +925,7 @@ static void execute_fdignore(running_machine &machine, int ref, int params, cons
 	/* support 0 or 1 parameters */
 	if (params == 1 && strcmp(param[0], "all") == 0)
 	{
-		ignore_all = TRUE;
+		ignore_all = true;
 		machine.debugger().console().printf("Ignoring all unknown opcodes\n");
 		return;
 	}
@@ -1050,7 +1050,7 @@ static void execute_fdsearch(running_machine &machine, int ref, int params, cons
 {
 	address_space &space = machine->debugger().cpu().get_visible_cpu()->memory().space(AS_PROGRAM);
 	int pc = space.device().safe_pc();
-	int length, first = TRUE;
+	int length, first = true;
 	uint8_t instrdata[2];
 	uint16_t decoded;
 
@@ -1092,7 +1092,7 @@ static void execute_fdsearch(running_machine &machine, int ref, int params, cons
 				break;
 		}
 		keystatus[pc/2] |= SEARCH_MASK;
-		first = FALSE;
+		first = false;
 
 		/* decode the first word */
 		decoded = fd1094_decode(pc/2, coderegion[pc/2], keyregion, 0);
@@ -1177,7 +1177,7 @@ static void execute_fddasm(running_machine &machine, int ref, int params, const 
 	address_space &space = machine->debugger().cpu().get_visible_cpu()->memory().space(AS_PROGRAM);
 	int origstate = fd1094_set_state(keyregion, -1);
 	const char *filename;
-	int skipped = FALSE;
+	int skipped = false;
 	uint32_t pcaddr;
 
 	/* extract the parameters */
@@ -1196,7 +1196,7 @@ static void execute_fddasm(running_machine &machine, int ref, int params, const 
 	for (pcaddr = 0; pcaddr < coderegion_words; )
 	{
 		uint8_t instrbuffer[10];
-		int unknowns = FALSE;
+		int unknowns = false;
 		int length, pcoffs;
 		char disasm[256];
 		uint16_t decoded;
@@ -1206,7 +1206,7 @@ static void execute_fddasm(running_machine &machine, int ref, int params, const 
 		if ((keystatus[pcaddr] & STATE_MASK) == 0)
 		{
 			pcaddr++;
-			skipped = TRUE;
+			skipped = true;
 			continue;
 		}
 
@@ -1225,7 +1225,7 @@ static void execute_fddasm(running_machine &machine, int ref, int params, const 
 			if ((keystatus[pcaddr + pcoffs] & STATUS_MASK) == STATUS_UNVISITED)
 			{
 				pcaddr++;
-				skipped = TRUE;
+				skipped = true;
 				continue;
 			}
 			decoded = fd1094_decode(pcaddr + pcoffs, coderegion[pcaddr + pcoffs], keyregion, 0);
@@ -1239,7 +1239,7 @@ static void execute_fddasm(running_machine &machine, int ref, int params, const 
 		/* print the line */
 		if (skipped)
 			file.printf("\n");
-		skipped = FALSE;
+		skipped = false;
 		file.printf(" %02X %06X:", keystatus[pcaddr] >> 8, pcaddr * 2);
 		for (pcoffs = 0; pcoffs < 5; pcoffs++)
 		{
@@ -1248,7 +1248,7 @@ static void execute_fddasm(running_machine &machine, int ref, int params, const 
 				static const char statchar[] = "? =?";
 				int keystat = keystatus[pcaddr + pcoffs] & STATUS_MASK;
 				if (keystat != STATUS_LOCKED && keystat != STATUS_NOCHANGE)
-					unknowns = TRUE;
+					unknowns = true;
 				file.printf(" %02X%02X%c", instrbuffer[pcoffs*2+0], instrbuffer[pcoffs*2+1], statchar[keystat]);
 			}
 			else
@@ -1436,7 +1436,7 @@ static fd1094_possibility *try_all_possibilities(address_space &space, int basep
 		if (numposs == 1)
 		{
 			keystatus[pcaddr] = (keystatus[pcaddr] & ~STATUS_MASK) | STATUS_NOCHANGE;
-			keydirty = TRUE;
+			keydirty = true;
 		}
 	}
 
@@ -1543,7 +1543,7 @@ static void tag_possibility(running_machine &machine, fd1094_possibility *possda
 		{
 			keystatus[keyaddr] = (keystatus[keyaddr] & ~HIBITS_MASK) | (possdata->keybuffer[pcoffs] & HIBITS_MASK);
 			keystatus[pcaddr] = (keystatus[pcaddr] & ~STATE_MASK & ~STATUS_MASK) | (curfdstate << 8) | newstat[pcoffs];
-			keydirty = TRUE;
+			keydirty = true;
 		}
 		else
 			keystatus[pcaddr] = (keystatus[pcaddr] & ~STATE_MASK) | (curfdstate << 8);
@@ -1603,7 +1603,7 @@ static void perform_constrained_search(running_machine &machine)
 //      machine.debugger().console().printf("Checking global key %08X (PC=%06X)....\n", global, (output[2] << 16) | output[3]);
 
 		/* use the IRQ handler to find more possibilities */
-		numseeds = find_constraint_sequence(global, FALSE);
+		numseeds = find_constraint_sequence(global, false);
 		if (numseeds > 0)
 		{
 			int i;
@@ -1634,7 +1634,7 @@ static uint32_t find_global_key_matches(uint32_t startwith, uint16_t *output)
 		fd1094_set_state(key, FD1094_STATE_RESET);
 
 		/* if we match, iterate over the second key byte */
-		output[0] = fd1094_decode(0x000000, coderegion[0], key, TRUE);
+		output[0] = fd1094_decode(0x000000, coderegion[0], key, true);
 		if ((output[0] & constraints[0].mask) == constraints[0].value)
 
 			/* iterate over the second key byte, limiting the scope to known valid keys */
@@ -1647,7 +1647,7 @@ static uint32_t find_global_key_matches(uint32_t startwith, uint16_t *output)
 					fd1094_set_state(key, FD1094_STATE_RESET);
 
 					/* if we match, iterate over the third key byte */
-					output[1] = fd1094_decode(0x000001, coderegion[1], key, TRUE);
+					output[1] = fd1094_decode(0x000001, coderegion[1], key, true);
 					if ((output[1] & constraints[1].mask) == constraints[1].value)
 
 						/* iterate over the third key byte, limiting the scope to known valid keys */
@@ -1660,7 +1660,7 @@ static uint32_t find_global_key_matches(uint32_t startwith, uint16_t *output)
 								fd1094_set_state(key, FD1094_STATE_RESET);
 
 								/* if we match, iterate over the fourth key byte */
-								output[2] = fd1094_decode(0x000002, coderegion[2], key, TRUE);
+								output[2] = fd1094_decode(0x000002, coderegion[2], key, true);
 								if ((output[2] & constraints[2].mask) == constraints[2].value)
 
 									/* iterate over the fourth key byte, limiting the scope to known valid keys */
@@ -1673,7 +1673,7 @@ static uint32_t find_global_key_matches(uint32_t startwith, uint16_t *output)
 											fd1094_set_state(key, FD1094_STATE_RESET);
 
 											/* if we match, return the value */
-											output[3] = fd1094_decode(0x000003, coderegion[3], key, TRUE);
+											output[3] = fd1094_decode(0x000003, coderegion[3], key, true);
 											if ((output[3] & constraints[3].mask) == constraints[3].value)
 												return (key0 << 24) | (key1 << 16) | (key2 << 8) | key3;
 										}
@@ -1741,7 +1741,7 @@ static int find_constraint_sequence(uint32_t global, int quick)
 			{
 				/* see if this works */
 				key[keyaddr] = keyvalue;
-				decrypted = fd1094_decode(pcaddr, coderegion[pcaddr], key, FALSE);
+				decrypted = fd1094_decode(pcaddr, coderegion[pcaddr], key, false);
 
 				/* if we got a match, stop; we're done */
 				if ((decrypted & curr->mask) == curr->value)
@@ -1774,7 +1774,7 @@ static int find_constraint_sequence(uint32_t global, int quick)
 		{
 			/* see if this works */
 			key[keyaddr] = keyvalue;
-			decrypted = fd1094_decode(pcaddr, coderegion[pcaddr], key, FALSE);
+			decrypted = fd1094_decode(pcaddr, coderegion[pcaddr], key, false);
 
 			/* if we got a match, then iterate over all possible PRNG sequences starting with this */
 			if ((decrypted & minkeyaddr->mask) == minkeyaddr->value)
@@ -1838,18 +1838,18 @@ static int does_key_work_for_constraints(const uint16_t *base, uint8_t *key)
 				key[keyaddr] = (key[keyaddr] & ~0xc0) | hibits;
 
 				/* decrypt using this key; stop if we get a match */
-				decrypted = fd1094_decode(pcaddr, base[pcaddr], key, FALSE);
+				decrypted = fd1094_decode(pcaddr, base[pcaddr], key, false);
 				if ((decrypted & curr->mask) == curr->value)
 					break;
 			}
 
 		/* if we failed to match, we're done */
 		if (hibits >= 0x100)
-			return FALSE;
+			return false;
 	}
 
 	/* got a match on all entries */
-	return TRUE;
+	return true;
 }
 
 
@@ -2282,7 +2282,7 @@ static int validate_ea(address_space &space, uint32_t pc, uint8_t modereg, const
 	}
 
 	/* should never get here */
-	assert(FALSE);
+	assert(false);
 	return 0;
 }
 
@@ -2295,7 +2295,7 @@ static int validate_ea(address_space &space, uint32_t pc, uint8_t modereg, const
 static int validate_opcode(address_space &space, uint32_t pc, const uint8_t *opdata, int maxwords)
 {
 	uint32_t immvalue = 0;
-	int iffy = FALSE;
+	int iffy = false;
 	int offset = 0;
 	uint16_t opcode;
 	uint32_t flags;
@@ -2373,7 +2373,7 @@ static int validate_opcode(address_space &space, uint32_t pc, const uint8_t *opd
 		if (valid == 0)
 			return 0;
 		if (valid == 2)
-			iffy = TRUE;
+			iffy = true;
 	}
 
 	/* process the EA, if present */
@@ -2390,7 +2390,7 @@ static int validate_opcode(address_space &space, uint32_t pc, const uint8_t *opd
 		if (ealen < 0)
 		{
 			ealen = -ealen;
-			iffy = TRUE;
+			iffy = true;
 		}
 
 		/* advance past the ea */
@@ -2411,7 +2411,7 @@ static int validate_opcode(address_space &space, uint32_t pc, const uint8_t *opd
 		if (ealen < 0)
 		{
 			ealen = -ealen;
-			iffy = TRUE;
+			iffy = true;
 		}
 
 		/* advance past the ea */

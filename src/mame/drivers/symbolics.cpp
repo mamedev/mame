@@ -264,7 +264,7 @@ INPUT_PORTS_END
         outfifo_read_cb(ptr, param);
         break;
     default:
-        assert_always(FALSE, "Unknown id in symbolics_state::device_timer");
+        assert_always(false, "Unknown id in symbolics_state::device_timer");
     }
 }
 

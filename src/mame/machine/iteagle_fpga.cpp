@@ -656,7 +656,7 @@ READ32_MEMBER( iteagle_periph_device::ctrl_r )
 				//m_rtc_regs[9] = 0x99; // Use 1998
 				//m_rtc_regs[0xa] &= ~0x10; // Reg A Status
 				//m_ctrl_regs[0xb] &= 0x10; // Reg B Status
-				//m_ctrl_regs[0xc] &= 0x10; // Reg C Interupt Status
+				//m_ctrl_regs[0xc] &= 0x10; // Reg C Interrupt Status
 				m_rtc_regs[0xd] = 0x80; // Reg D Valid time/ram Status
 				result = (result & 0xffff00ff) | (m_rtc_regs[m_ctrl_regs[0x70/4]&0xff]<<8);
 			}

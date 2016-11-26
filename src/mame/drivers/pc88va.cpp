@@ -559,7 +559,7 @@ void pc88va_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 		pc88va_fdc_motor_start_1(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in pc88va_state::device_timer");
+		assert_always(false, "Unknown id in pc88va_state::device_timer");
 	}
 }
 
@@ -1646,11 +1646,11 @@ void pc88va_state::machine_start()
 	floppy_image_device *floppy;
 	floppy = machine().device<floppy_connector>("upd765:0")->get_device();
 	if(floppy)
-		floppy->setup_ready_cb(floppy_image_device::ready_cb(FUNC(pc88va_state::pc88va_fdc_update_ready), this));
+		floppy->setup_ready_cb(floppy_image_device::ready_cb(&pc88va_state::pc88va_fdc_update_ready, this));
 
 	floppy = machine().device<floppy_connector>("upd765:1")->get_device();
 	if(floppy)
-		floppy->setup_ready_cb(floppy_image_device::ready_cb(FUNC(pc88va_state::pc88va_fdc_update_ready), this));
+		floppy->setup_ready_cb(floppy_image_device::ready_cb(&pc88va_state::pc88va_fdc_update_ready, this));
 
 	machine().device<floppy_connector>("upd765:0")->get_device()->set_rpm(300);
 	machine().device<floppy_connector>("upd765:1")->get_device()->set_rpm(300);

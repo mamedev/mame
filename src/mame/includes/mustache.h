@@ -12,8 +12,7 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
 		m_videoram(*this, "videoram"),
-		m_spriteram(*this, "spriteram"),
-		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
+		m_spriteram(*this, "spriteram") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -22,7 +21,6 @@ public:
 
 	required_shared_ptr<uint8_t> m_videoram;
 	required_shared_ptr<uint8_t> m_spriteram;
-	required_shared_ptr<uint8_t> m_decrypted_opcodes;
 
 	tilemap_t *m_bg_tilemap;
 	int m_control_byte;

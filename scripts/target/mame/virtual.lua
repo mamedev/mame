@@ -15,6 +15,8 @@
 
 CPUS["M6502"] = true
 CPUS["H6280"] = true
+CPUS["MCS48"] = true
+CPUS["Z80"] = true
 
 --------------------------------------------------
 -- specify available sound cores; some of these are
@@ -37,6 +39,8 @@ SOUNDS["MULTIPCM"] = true
 SOUNDS["GB_SOUND"] = true
 SOUNDS["POKEY"] = true
 SOUNDS["C352"] = true
+SOUNDS["OKIM6295"] = true
+SOUNDS["WAVE"] = true
 
 --------------------------------------------------
 -- specify available video cores
@@ -46,7 +50,8 @@ SOUNDS["C352"] = true
 --------------------------------------------------
 -- specify available machine cores
 --------------------------------------------------
-
+MACHINES["LDV1000"] = true
+MACHINES["LDPR8210"] = true
 
 --------------------------------------------------
 -- specify available bus cores
@@ -78,12 +83,13 @@ function createVirtualProjects(_target, _subtarget, _name)
 		MAME_DIR .. "src/mame",
 		MAME_DIR .. "src/lib",
 		MAME_DIR .. "src/lib/util",
-		MAME_DIR .. "src/lib/netlist",
 		MAME_DIR .. "3rdparty",
+		GEN_DIR  .. "mame/layout",
 	}
 
 	includedirs {
 		ext_includedir("zlib"),
+		ext_includedir("flac"),
 	}
 end
 
@@ -91,5 +97,6 @@ function createProjects_mame_virtual(_target, _subtarget)
 	createVirtualProjects(_target, _subtarget, "virtual")
 	files {
 		MAME_DIR .. "src/mame/drivers/vgmplay.cpp",
+		MAME_DIR .. "src/mame/drivers/ldplayer.cpp",
 	}
 end

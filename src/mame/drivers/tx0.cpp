@@ -344,7 +344,7 @@ void tx0_state::machine_start()
 	m_typewriter.prt_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tx0_state::prt_callback),this));
 	m_dis_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(tx0_state::dis_callback),this));
 
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(tx0_state::tx0_machine_stop),this));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&tx0_state::tx0_machine_stop,this));
 }
 
 
@@ -919,7 +919,7 @@ void tx0_state::magtape_callback()
 					schedule_select();
 			}
 
-			m_magtape.sel_pending = FALSE;
+			m_magtape.sel_pending = false;
 			m_maincpu->io_complete();
 		}
 		break;
@@ -1104,7 +1104,7 @@ void tx0_state::magtape_callback()
 					{
 						if (m_magtape.cpy_pending)
 						{   /* read command */
-							m_magtape.u.read.space_flag = FALSE;
+							m_magtape.u.read.space_flag = false;
 							m_maincpu->set_state_int(TX0_IOS,1);
 							m_maincpu->set_state_int(TX0_LR, ((m_maincpu->state_int(TX0_LR) >> 1) & 0333333)
 														| ((buf & 040) << 12) | ((buf & 020) << 10) | ((buf & 010) << 8) | ((buf & 004) << 6) | ((buf & 002) << 4) | ((buf & 001) << 2));
@@ -1114,7 +1114,7 @@ void tx0_state::magtape_callback()
 						}
 						else
 						{   /* space command */
-							m_magtape.u.read.space_flag = TRUE;
+							m_magtape.u.read.space_flag = true;
 						}
 						m_magtape.u.read.state = MTRDS_STATE1;
 					}
@@ -1327,7 +1327,7 @@ void tx0_state::magtape_callback()
 
 WRITE_LINE_MEMBER( tx0_state::tx0_sel )
 {
-	m_magtape.sel_pending = TRUE;
+	m_magtape.sel_pending = true;
 
 	if (m_magtape.state == MTS_UNSELECTED)
 	{
@@ -1358,7 +1358,7 @@ WRITE_LINE_MEMBER( tx0_state::tx0_io_cpy )
 			break;
 		case 1: /* read */
 		case 3: /* write */
-			m_magtape.cpy_pending = TRUE;
+			m_magtape.cpy_pending = true;
 			break;
 		}
 		break;

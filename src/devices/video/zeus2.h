@@ -158,7 +158,7 @@ private:
 	TIMER_CALLBACK_MEMBER(int_timer_callback);
 	void zeus2_register32_w(offs_t offset, uint32_t data, int logit);
 	void zeus2_register_update(offs_t offset, uint32_t oldval, int logit);
-	int zeus2_fifo_process(const uint32_t *data, int numwords);
+	bool zeus2_fifo_process(const uint32_t *data, int numwords);
 	void zeus2_pointer_write(uint8_t which, uint32_t value, int logit);
 	void load_pal_table(void *wavePtr, uint32_t ctrl, int logit);
 	void zeus2_draw_model(uint32_t baseaddr, uint16_t count, int logit);
@@ -215,13 +215,13 @@ public:
 		return addr;
 	}
 
-	// Convert 0xRRRRCCCC to frame buffer addresss
+	// Convert 0xRRRRCCCC to frame buffer address
 	//inline uint32_t frame_addr_from_expanded_addr(uint32_t addr)
 	//{
 	//  return (((addr & 0x3ff0000) >> (16 - 9 + 1)) | (addr & 0x1ff)) << 1;
 	//}
 
-	// Convert Physical 0xRRRRCCCC to frame buffer addresss
+	// Convert Physical 0xRRRRCCCC to frame buffer address
 	// Based on address reg 51 (no scaling)
 	inline uint32_t frame_addr_from_phys_addr(uint32_t physAddr)
 	{

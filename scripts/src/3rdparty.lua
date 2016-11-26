@@ -60,7 +60,7 @@ if _OPTIONS["vs"]=="intel-15" then
 			"/Qwd869",              -- remark #869: parameter "xxx" was never referenced
 		}
 end
-	configuration { "vs2015*" }
+	configuration { "vs201*" }
 		buildoptions {
 			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
 		}
@@ -197,6 +197,11 @@ if _OPTIONS["vs"]=="intel-15" then
 		}
 end
 
+	configuration { "winstore*" }
+		defines {
+			"NO_GETENV"
+		}
+
 	configuration { }
 
 	files {
@@ -284,7 +289,7 @@ end
 			"-include stdint.h"
 		}
 
-	configuration { "vs2015*" }
+	configuration { "vs201*" }
 		buildoptions {
 			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
 		}
@@ -372,10 +377,14 @@ if _OPTIONS["vs"]=="intel-15" then
 			"/Qwd869",              -- remark #869: parameter "xxx" was never referenced
 		}
 end
-	configuration { "vs2015*" }
+	configuration { "vs201*" }
 		buildoptions {
 			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
 			"/wd4457", -- warning C4457: declaration of 'xxx' hides function parameter
+		}
+	configuration { "winstore*" }
+		forcedincludes {
+			MAME_DIR .. "src/osd/uwp/uwpcompat.h"
 		}
 
 	configuration { }
@@ -404,6 +413,7 @@ end
 			MAME_DIR .. "3rdparty/lzma/C/BraIA64.c",
 			MAME_DIR .. "3rdparty/lzma/C/CpuArch.c",
 			MAME_DIR .. "3rdparty/lzma/C/Delta.c",
+			-- MAME_DIR .. "3rdparty/lzma/C/DllSecur.c",
 			MAME_DIR .. "3rdparty/lzma/C/LzFind.c",
 			-- MAME_DIR .. "3rdparty/lzma/C/LzFindMt.c",
 			MAME_DIR .. "3rdparty/lzma/C/Lzma2Dec.c",
@@ -463,6 +473,12 @@ if _OPTIONS["vs"]=="intel-15" then
 			"/Qwd592", -- error #592: variable "xxx" is used before its value is set
 		}
 end
+
+	configuration { "winstore*" }
+		forcedincludes {
+			MAME_DIR .. "src/osd/uwp/uwpcompat.h",
+		}
+
 	configuration { }
 		defines {
 			"LUA_COMPAT_ALL",
@@ -556,15 +572,75 @@ project "lualibs"
 	includedirs {
 		MAME_DIR .. "3rdparty",
 	}
+if (_OPTIONS["osd"] ~= "uwp") then
+	includedirs {
+		MAME_DIR .. "3rdparty/linenoise-ng/include",
+	}
+end
 	includedirs {
 		ext_includedir("lua"),
 		ext_includedir("zlib"),
+		ext_includedir("sqlite3"),
 	}
 
+	configuration { "winstore*" }
+		forcedincludes {
+			MAME_DIR .. "src/osd/uwp/uwpcompat.h"
+		}
+	
+	configuration {}
+
 	files {
+		MAME_DIR .. "3rdparty/lsqlite3/lsqlite3.c",
 		MAME_DIR .. "3rdparty/lua-zlib/lua_zlib.c",
 		MAME_DIR .. "3rdparty/luafilesystem/src/lfs.c",
 	}
+if (_OPTIONS["osd"] == "uwp") then
+	files {
+		MAME_DIR .. "3rdparty/lua-linenoise/linenoise_none.c",
+	}
+else
+	files {
+		MAME_DIR .. "3rdparty/lua-linenoise/linenoise.c",
+	}
+end
+
+--------------------------------------------------
+-- SQLite3 library objects
+--------------------------------------------------
+
+if not _OPTIONS["with-system-sqlite3"] then
+project "sqlite3"
+	uuid "5cb3d495-57ed-461c-81e5-80dc0857517d"
+	kind "StaticLib"
+
+	configuration { "gmake" }
+		buildoptions_c {
+			"-Wno-discarded-qualifiers",
+			"-Wno-unused-but-set-variable",
+			"-Wno-bad-function-cast",
+			"-Wno-undef",
+		}
+if _OPTIONS["gcc"]~=nil and ((string.find(_OPTIONS["gcc"], "clang") or string.find(_OPTIONS["gcc"], "asmjs") or string.find(_OPTIONS["gcc"], "android"))) then
+		buildoptions_c {
+			"-Wno-incompatible-pointer-types-discards-qualifiers",
+		}
+end
+	configuration { "winstore*" }
+		defines {
+			"SQLITE_OS_WINRT",
+		}
+
+	configuration { }
+
+	files {
+		MAME_DIR .. "3rdparty/sqlite3/sqlite3.c",
+	}
+else
+links {
+	ext_lib("sqlite3"),
+}
+end
 
 end
 --------------------------------------------------
@@ -597,7 +673,7 @@ if _OPTIONS["vs"]=="intel-15" then
 		}
 end
 
-	configuration { "vs2015*" }
+	configuration { "vs201*" }
 		buildoptions {
 			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
 		}
@@ -781,13 +857,15 @@ end
 		MAME_DIR .. "3rdparty/bgfx/src/glcontext_ppapi.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/glcontext_wgl.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/image.cpp",
+		MAME_DIR .. "3rdparty/bgfx/src/hmd.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/hmd_ovr.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/hmd_openvr.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_d3d12.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_d3d11.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_d3d9.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_gl.cpp",
-		MAME_DIR .. "3rdparty/bgfx/src/renderer_null.cpp",
+		MAME_DIR .. "3rdparty/bgfx/src/renderer_gnm.cpp",
+		MAME_DIR .. "3rdparty/bgfx/src/renderer_noop.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/renderer_vk.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/debug_renderdoc.cpp",
 		MAME_DIR .. "3rdparty/bgfx/src/shader.cpp",
@@ -812,7 +890,6 @@ end
 		MAME_DIR .. "3rdparty/bgfx/3rdparty/ib-compress/indexbufferdecompression.cpp",
 		MAME_DIR .. "3rdparty/bgfx/3rdparty/ocornut-imgui/imgui.cpp",
 		MAME_DIR .. "3rdparty/bgfx/3rdparty/ocornut-imgui/imgui_draw.cpp",
-		MAME_DIR .. "3rdparty/bgfx/3rdparty/ocornut-imgui/imgui_wm.cpp",
 	}
 	if _OPTIONS["targetos"]=="macosx" then
 		files {
@@ -848,7 +925,7 @@ end
 --          "/Qwd1879",             -- warning #1879: unimplemented pragma ignored
 --      }
 --end
---  configuration { "vs2015*" }
+--  configuration { "vs201*" }
 --      buildoptions {
 --          "/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
 --      }
@@ -1106,7 +1183,6 @@ end
 		MAME_DIR .. "3rdparty/SDL2/src/audio/SDL_audiocvt.c",
 		MAME_DIR .. "3rdparty/SDL2/src/audio/SDL_audiodev.c",
 		MAME_DIR .. "3rdparty/SDL2/src/audio/SDL_audiodev_c.h",
-		MAME_DIR .. "3rdparty/SDL2/src/audio/SDL_audiomem.h",
 		MAME_DIR .. "3rdparty/SDL2/src/audio/SDL_audiotypecvt.c",
 		MAME_DIR .. "3rdparty/SDL2/src/audio/SDL_mixer.c",
 		MAME_DIR .. "3rdparty/SDL2/src/audio/SDL_sysaudio.h",
@@ -1306,7 +1382,7 @@ end
 
 	if _OPTIONS["targetos"]=="macosx" then
 		files {
-			MAME_DIR .. "3rdparty/SDL2/src/audio/coreaudio/SDL_coreaudio.c",
+			MAME_DIR .. "3rdparty/SDL2/src/audio/coreaudio/SDL_coreaudio.m",
 			MAME_DIR .. "3rdparty/SDL2/src/audio/coreaudio/SDL_coreaudio.h",
 			MAME_DIR .. "3rdparty/SDL2/src/file/cocoa/SDL_rwopsbundlesupport.m",
 			MAME_DIR .. "3rdparty/SDL2/src/file/cocoa/SDL_rwopsbundlesupport.h",
@@ -1437,12 +1513,20 @@ end
 		}
 		buildoptions_c {
 			"-Wno-undef",
+			"-Wno-format",
+			"-Wno-format-security",
 			"-Wno-strict-prototypes",
 			"-Wno-bad-function-cast",
+			"-Wno-pointer-to-int-cast",
 			"-Wno-discarded-qualifiers",
 			"-Wno-unused-but-set-variable",
 		}
-
+	
+	configuration { "mingw-clang"}
+		buildoptions_c {
+			"-Wno-incompatible-pointer-types-discards-qualifiers"
+		}
+		
 	configuration { "osx*"}
 		buildoptions {
 			"-Wno-undef",
@@ -1477,12 +1561,19 @@ end
 --------------------------------------------------
 -- linenoise-ng library
 --------------------------------------------------
-
+if (_OPTIONS["osd"] ~= "uwp") then
 project "linenoise-ng"
 	uuid "7320ffc8-2748-4add-8864-ae29b72a8511"
 	kind (LIBTYPE)
 
 	addprojectflags()
+
+	configuration { "vs*" }
+		buildoptions {
+			"/wd4701", -- warning C4701: potentially uninitialized local variable 'xxx' used
+		}
+
+	configuration { }
 
 	includedirs {
 		MAME_DIR .. "3rdparty/linenoise-ng/include",
@@ -1493,3 +1584,4 @@ project "linenoise-ng"
 		MAME_DIR .. "3rdparty/linenoise-ng/src/linenoise.cpp",
 		MAME_DIR .. "3rdparty/linenoise-ng/src/wcwidth.cpp",
 	}
+end

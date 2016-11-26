@@ -72,7 +72,7 @@ uint32_t minivadr_state::screen_update_minivadr(screen_device &screen, bitmap_rg
 
 		for (i = 0; i < 8; i++)
 		{
-			pen_t pen = (data & 0x80) ? rgb_t::white : rgb_t::black;
+			pen_t pen = (data & 0x80) ? rgb_t::white() : rgb_t::black();
 			bitmap.pix32(y, x) = pen;
 
 			data = data << 1;

@@ -691,12 +691,12 @@ WRITE32_MEMBER(model2_state::copro_prg_w)
 		logerror("copro_prg_w: %08X:   %08X\n", m_coprocnt, data);
 		if (m_coprocnt & 1)
 		{
-			m_tgpx4_program[m_coprocnt / 2] &= U64(0xffffffff);
-			m_tgpx4_program[m_coprocnt / 2] |= (uint64_t)(data) << 32;
+			m_tgpx4_program[m_coprocnt / 2] &= 0xffffffffU;
+			m_tgpx4_program[m_coprocnt / 2] |= u64(data) << 32;
 		}
 		else
 		{
-			m_tgpx4_program[m_coprocnt / 2] &= U64(0xffffffff00000000);
+			m_tgpx4_program[m_coprocnt / 2] &= 0xffffffff00000000U;
 			m_tgpx4_program[m_coprocnt / 2] |= data;
 		}
 		m_coprocnt++;
@@ -1404,11 +1404,6 @@ WRITE32_MEMBER(model2_state::model2o_luma_w)
 		m_lumaram[offset>>1] &= 0x0000ffff;
 		m_lumaram[offset>>1] |= (data & 0xffff) << 16;
 	}
-}
-
-WRITE32_MEMBER(model2_state::model2_3d_zclip_w)
-{
-	model2_3d_set_zclip( machine(), data & 0xFF );
 }
 
 /* Top Skater reads here and discards the result */

@@ -5,8 +5,8 @@
   SH7604 BUS Controller
 
   Lies at 0xffffffe0-0xffffffff
-  
-  
+
+
   TODO:
   - Host CPU setter (is_slave and clock are needed);
   - timer clock emulation;
@@ -44,7 +44,7 @@ WRITE16_MEMBER(sh7604_bus_device::bus_control_1_w)
 		throw emu_fatalerror("%s: enabled partial space share mode\n", tag());
 }
 
-READ16_MEMBER(sh7604_bus_device::bus_control_2_r) {	return m_bcr2 & 0x00fc; }
+READ16_MEMBER(sh7604_bus_device::bus_control_2_r) { return m_bcr2 & 0x00fc; }
 WRITE16_MEMBER(sh7604_bus_device::bus_control_2_w)
 {
 	COMBINE_DATA(&m_bcr2);
@@ -53,7 +53,7 @@ WRITE16_MEMBER(sh7604_bus_device::bus_control_2_w)
 }
 
 READ16_MEMBER(sh7604_bus_device::wait_control_r) { return m_wcr; }
-WRITE16_MEMBER(sh7604_bus_device::wait_control_w) {	COMBINE_DATA(&m_wcr); }
+WRITE16_MEMBER(sh7604_bus_device::wait_control_w) { COMBINE_DATA(&m_wcr); }
 
 READ16_MEMBER(sh7604_bus_device::memory_control_r) { return m_mcr & 0xfefc; }
 WRITE16_MEMBER(sh7604_bus_device::memory_control_w) { COMBINE_DATA(&m_mcr); }
@@ -66,7 +66,7 @@ READ16_MEMBER(sh7604_bus_device::refresh_timer_status_r)
 WRITE16_MEMBER(sh7604_bus_device::refresh_timer_control_w)
 {
 	COMBINE_DATA(&m_rtcsr);
-	
+
 	if(m_rtcsr & 0x40)
 		throw emu_fatalerror("%s: enabled timer irq register with clock setting = %02x\n",tag(),data & 0x38);
 }
@@ -101,7 +101,7 @@ static ADDRESS_MAP_START( bus_regs, AS_0, 16, sh7604_bus_device )
 	AM_RANGE(0x08, 0x09) AM_READWRITE(refresh_timer_status_r, refresh_timer_control_w)
 	AM_RANGE(0x0a, 0x0b) AM_READWRITE(refresh_timer_counter_r, refresh_timer_counter_w)
 	AM_RANGE(0x0c, 0x0d) AM_READWRITE(refresh_timer_constant_r, refresh_timer_constant_w)
-//	AM_RANGE(0x0e, 0x0f) unmapped, mirror?
+//  AM_RANGE(0x0e, 0x0f) unmapped, mirror?
 ADDRESS_MAP_END
 
 //-------------------------------------------------
@@ -165,6 +165,6 @@ WRITE32_MEMBER( sh7604_bus_device::write )
 		if((data & 0xffff0000) != 0xa55a0000)
 			throw emu_fatalerror("%s: making bus write with ID signature = %04x!\n", tag(),data >> 16);
 	}
-	
+
 	space.write_word(offset,data & 0xffff);
 }

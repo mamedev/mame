@@ -139,8 +139,8 @@ public:
 	DECLARE_WRITE8_MEMBER( counter_w );
 	DECLARE_WRITE8_MEMBER( contrast_w );
 
-	DECLARE_WRITE_LINE_MEMBER( iint_w );
 	DECLARE_WRITE_LINE_MEMBER( eint_w );
+	DECLARE_WRITE_LINE_MEMBER( wake_w );
 
 	uint8_t m_ip;
 	uint8_t m_ie;
@@ -171,6 +171,7 @@ void portfolio_state::check_interrupt()
 	int level = (m_ip & m_ie) ? ASSERT_LINE : CLEAR_LINE;
 
 	m_maincpu->set_input_line(INPUT_LINE_INT0, level);
+	m_exp->iint_w(level);
 }
 
 
@@ -188,16 +189,6 @@ void portfolio_state::trigger_interrupt(int level)
 
 
 //-------------------------------------------------
-//  iint_w - internal interrupt
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( portfolio_state::iint_w )
-{
-	// TODO
-}
-
-
-//-------------------------------------------------
 //  eint_w - external interrupt
 //-------------------------------------------------
 
@@ -207,6 +198,16 @@ WRITE_LINE_MEMBER( portfolio_state::eint_w )
 	{
 		trigger_interrupt(INT_EXTERNAL);
 	}
+}
+
+
+//-------------------------------------------------
+//  wake_w - wake
+//-------------------------------------------------
+
+WRITE_LINE_MEMBER( portfolio_state::wake_w )
+{
+	// TODO
 }
 
 
@@ -424,8 +425,8 @@ READ8_MEMBER( portfolio_state::battery_r )
 	    3       ?           1=boots from ???
 	    4       ?
 	    5       PDET        1=peripheral connected
-	    6       BATD?       0=battery low
-	    7       ?           1=cold boot
+	    6       LOWB        0=battery low
+	    7       BDET?       1=cold boot
 
 	*/
 
@@ -1035,10 +1036,9 @@ static MACHINE_CONFIG_START( portfolio, portfolio_state )
 	MCFG_PORTFOLIO_MEMORY_CARD_SLOT_ADD(PORTFOLIO_MEMORY_CARD_SLOT_A_TAG, portfolio_memory_cards, nullptr)
 
 	MCFG_PORTFOLIO_EXPANSION_SLOT_ADD(PORTFOLIO_EXPANSION_SLOT_TAG, XTAL_4_9152MHz, portfolio_expansion_cards, nullptr)
-	MCFG_PORTFOLIO_EXPANSION_SLOT_IINT_CALLBACK(WRITELINE(portfolio_state, iint_w))
 	MCFG_PORTFOLIO_EXPANSION_SLOT_EINT_CALLBACK(WRITELINE(portfolio_state, eint_w))
 	MCFG_PORTFOLIO_EXPANSION_SLOT_NMIO_CALLBACK(INPUTLINE(M80C88A_TAG, INPUT_LINE_NMI))
-	//MCFG_PORTFOLIO_EXPANSION_SLOT_WAKE_CALLBACK()
+	MCFG_PORTFOLIO_EXPANSION_SLOT_WAKE_CALLBACK(WRITELINE(portfolio_state, wake_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("counter", portfolio_state, counter_tick, attotime::from_hz(XTAL_32_768kHz/16384))
 	MCFG_TIMER_DRIVER_ADD_PERIODIC(TIMER_TICK_TAG, portfolio_state, system_tick, attotime::from_hz(XTAL_32_768kHz/32768))

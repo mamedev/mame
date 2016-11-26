@@ -33,7 +33,7 @@ public:
 	int read_pixel();
 
 	// TODO: add checksum validation!
-	bool is_valid(int len) { return (len != 12 && len != 13 && len != 8) ? FALSE : TRUE; }
+	bool is_valid(int len) { return (len != 12 && len != 13 && len != 8) ? false : true; }
 	void decode(int len);
 
 protected:

@@ -71,7 +71,7 @@ public:
 	void render_poly(int32_t scanline, const extent_t& extent, const mz_poly_extra_data& object, int threadid);
 	void render_poly_solid_fixedz(int32_t scanline, const extent_t& extent, const mz_poly_extra_data& object, int threadid);
 
-	void zeus_draw_quad(int long_fmt, const uint32_t *databuffer, uint32_t texdata, int logit);
+	void zeus_draw_quad(int long_fmt, const uint32_t *databuffer, uint32_t texdata, bool logit);
 	void zeus_draw_debug_quad(const rectangle& rect, const vertex_t* vert);
 
 private:
@@ -292,7 +292,7 @@ VIDEO_START_MEMBER(midzeus_state,midzeus)
 	poly = auto_alloc(machine(), midzeus_renderer(*this));
 
 	/* we need to cleanup on exit */
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(midzeus_state::exit_handler), this));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&midzeus_state::exit_handler, this));
 
 	yoffs = 0;
 	texel_width = 256;
@@ -401,7 +401,7 @@ uint32_t midzeus_state::screen_update_midzeus(screen_device &screen, bitmap_ind1
 
 READ32_MEMBER(midzeus_state::zeus_r)
 {
-	int logit = (offset < 0xb0 || offset > 0xb7);
+	bool logit = (offset < 0xb0 || offset > 0xb7);
 	uint32_t result = m_zeusbase[offset & ~1];
 
 	switch (offset & ~1)
@@ -471,7 +471,7 @@ READ32_MEMBER(midzeus_state::zeus_r)
 
 WRITE32_MEMBER(midzeus_state::zeus_w)
 {
-	int logit = zeus_enable_logging || ((offset < 0xb0 || offset > 0xb7) && (offset < 0xe0 || offset > 0xe1));
+	bool logit = zeus_enable_logging || ((offset < 0xb0 || offset > 0xb7) && (offset < 0xe0 || offset > 0xe1));
 
 	if (logit)
 		logerror("%06X:zeus_w", space.device().safe_pc());
@@ -494,7 +494,7 @@ WRITE32_MEMBER(midzeus_state::zeus_w)
  *
  *************************************/
 
-void midzeus_state::zeus_pointer_w(uint32_t which, uint32_t data, int logit)
+void midzeus_state::zeus_pointer_w(uint32_t which, uint32_t data, bool logit)
 {
 	switch (which & 0xffffff)
 	{
@@ -562,7 +562,7 @@ void midzeus_state::zeus_pointer_w(uint32_t which, uint32_t data, int logit)
  *
  *************************************/
 
-void midzeus_state::zeus_register16_w(offs_t offset, uint16_t data, int logit)
+void midzeus_state::zeus_register16_w(offs_t offset, uint16_t data, bool logit)
 {
 	/* writes to register $CC need to force a partial update */
 	if ((offset & ~1) == 0xcc)
@@ -586,7 +586,7 @@ void midzeus_state::zeus_register16_w(offs_t offset, uint16_t data, int logit)
 }
 
 
-void midzeus_state::zeus_register32_w(offs_t offset, uint32_t data, int logit)
+void midzeus_state::zeus_register32_w(offs_t offset, uint32_t data, bool logit)
 {
 	/* writes to register $CC need to force a partial update */
 	if ((offset & ~1) == 0xcc)
@@ -804,7 +804,7 @@ int midzeus_state::zeus_fifo_process(const uint32_t *data, int numwords)
 		case 0x00:
 		case 0x01:
 			if (numwords < 2 && data[0] != 0)
-				return FALSE;
+				return false;
 			if (log_fifo)
 				log_fifo_command(data, numwords, "");
 			zeus_pointer_w(data[0] & 0xffffff, data[1], log_fifo);
@@ -828,7 +828,7 @@ int midzeus_state::zeus_fifo_process(const uint32_t *data, int numwords)
 		/* in model data, this is 0x19 */
 		case 0x18:
 			if (numwords < 2)
-				return FALSE;
+				return false;
 			if (log_fifo)
 				log_fifo_command(data, numwords, " -- reg32");
 			zeus_register32_w((data[0] >> 16) & 0x7f, data[1], log_fifo);
@@ -850,7 +850,7 @@ int midzeus_state::zeus_fifo_process(const uint32_t *data, int numwords)
 			{
 				/* requires 8 words total */
 				if (numwords < 8)
-					return FALSE;
+					return false;
 				if (log_fifo)
 				{
 					log_fifo_command(data, numwords, "");
@@ -882,7 +882,7 @@ int midzeus_state::zeus_fifo_process(const uint32_t *data, int numwords)
 
 				/* requires 13 words total */
 				if (numwords < 13)
-					return FALSE;
+					return false;
 				if (log_fifo)
 				{
 					log_fifo_command(data, numwords, "");
@@ -931,7 +931,7 @@ int midzeus_state::zeus_fifo_process(const uint32_t *data, int numwords)
 		case 0x23:
 		case 0x2e:
 			if (numwords < 2)
-				return FALSE;
+				return false;
 			if (log_fifo)
 			{
 				log_fifo_command(data, numwords, "");
@@ -951,7 +951,7 @@ int midzeus_state::zeus_fifo_process(const uint32_t *data, int numwords)
 			if (is_mk4b)
 			{
 				if (numwords < 2)
-					return FALSE;
+					return false;
 
 				break;
 			}
@@ -959,7 +959,7 @@ int midzeus_state::zeus_fifo_process(const uint32_t *data, int numwords)
 		case 0x28:
 		case 0x30:
 			if (numwords < 4 || ((data[0] & 0x808000) && numwords < 10))
-				return FALSE;
+				return false;
 
 			if (log_fifo)
 				log_fifo_command(data, numwords, " -- alt. quad and hack screen clear\n");
@@ -975,7 +975,7 @@ int midzeus_state::zeus_fifo_process(const uint32_t *data, int numwords)
 			else
 			{
 				uint32_t texdata = (m_zeusbase[0x06] << 16) | (m_zeusbase[0x00] >> 16);
-				poly->zeus_draw_quad(FALSE, data, texdata, log_fifo);
+				poly->zeus_draw_quad(false, data, texdata, log_fifo);
 			}
 			break;
 
@@ -990,7 +990,7 @@ int midzeus_state::zeus_fifo_process(const uint32_t *data, int numwords)
 		/* 0x67: render model with inline texture info */
 		case 0x67:
 			if (numwords < 3)
-				return FALSE;
+				return false;
 			if (log_fifo)
 				log_fifo_command(data, numwords, "");
 			zeus_objdata = data[1];
@@ -1003,7 +1003,7 @@ int midzeus_state::zeus_fifo_process(const uint32_t *data, int numwords)
 				log_fifo_command(data, numwords, "\n");
 			break;
 	}
-	return TRUE;
+	return true;
 }
 
 
@@ -1014,11 +1014,11 @@ int midzeus_state::zeus_fifo_process(const uint32_t *data, int numwords)
  *
  *************************************/
 
-void midzeus_state::zeus_draw_model(uint32_t texdata, int logit)
+void midzeus_state::zeus_draw_model(uint32_t texdata, bool logit)
 {
 	uint32_t databuffer[32];
 	int databufcount = 0;
-	int model_done = FALSE;
+	int model_done = false;
 
 	if (logit)
 		logerror(" -- model @ %08X\n", zeus_objdata);
@@ -1063,7 +1063,7 @@ void midzeus_state::zeus_draw_model(uint32_t texdata, int logit)
 					case 0x08:
 						if (logit)
 							logerror("end of model\n");
-						model_done = TRUE;
+						model_done = true;
 						break;
 
 					case 0x0c:  /* mk4/invasn */
@@ -1089,7 +1089,7 @@ void midzeus_state::zeus_draw_model(uint32_t texdata, int logit)
 					case 0x25:  /* mk4 */
 					case 0x28:  /* mk4r1 */
 					case 0x30:  /* invasn */
-						poly->zeus_draw_quad(TRUE, databuffer, texdata, logit);
+						poly->zeus_draw_quad(true, databuffer, texdata, logit);
 						break;
 
 					default:
@@ -1113,7 +1113,7 @@ void midzeus_state::zeus_draw_model(uint32_t texdata, int logit)
  *
  *************************************/
 
-void midzeus_renderer::zeus_draw_quad(int long_fmt, const uint32_t *databuffer, uint32_t texdata, int logit)
+void midzeus_renderer::zeus_draw_quad(int long_fmt, const uint32_t *databuffer, uint32_t texdata, bool logit)
 {
 	poly_vertex clipvert[8];
 	poly_vertex vert[4];
@@ -1269,14 +1269,14 @@ void midzeus_renderer::zeus_draw_quad(int long_fmt, const uint32_t *databuffer, 
 	//       a poly_render_quad_fan.  It appears as though the new code defaults to a fan if
 	//       the template argument is 4, but keep an eye out for missing quads.
 	poly->render_polygon<4>(zeus_cliprect,
-							render_delegate(FUNC(midzeus_renderer::render_poly), this),
+							render_delegate(&midzeus_renderer::render_poly, this),
 							4,
 							clipvert);
 }
 
 void midzeus_renderer::zeus_draw_debug_quad(const rectangle& rect, const vertex_t *vert)
 {
-	poly->render_polygon<4>(rect, render_delegate(FUNC(midzeus_renderer::render_poly_solid_fixedz), this), 0, vert);
+	poly->render_polygon<4>(rect, render_delegate(&midzeus_renderer::render_poly_solid_fixedz, this), 0, vert);
 }
 
 
@@ -1535,7 +1535,7 @@ void midzeus_state::log_waveram(uint32_t length_and_base)
 	uint32_t numoctets = (length_and_base >> 24) + 1;
 	const uint32_t *ptr = (const uint32_t *)waveram0_ptr_from_block_addr(length_and_base);
 	uint32_t checksum = length_and_base;
-	int foundit = FALSE;
+	int foundit = false;
 	int i;
 
 	for (i = 0; i < numoctets; i++)
@@ -1544,7 +1544,7 @@ void midzeus_state::log_waveram(uint32_t length_and_base)
 	for (i = 0; i < ARRAY_LENGTH(recent_entries); i++)
 		if (recent_entries[i].lab == length_and_base && recent_entries[i].checksum == checksum)
 		{
-			foundit = TRUE;
+			foundit = true;
 			break;
 		}
 

@@ -586,7 +586,7 @@ uint32_t itech8_state::screen_update_2layer(screen_device &screen, bitmap_rgb32 
 	/* if we're blanked, just fill with black */
 	if (m_tms34061->m_display.blanked)
 	{
-		bitmap.fill(rgb_t::black, cliprect);
+		bitmap.fill(rgb_t::black(), cliprect);
 		return 0;
 	}
 
@@ -621,7 +621,7 @@ uint32_t itech8_state::screen_update_grmatch(screen_device &screen, bitmap_rgb32
 	/* if we're blanked, just fill with black */
 	if (m_tms34061->m_display.blanked)
 	{
-		bitmap.fill(rgb_t::black, cliprect);
+		bitmap.fill(rgb_t::black(), cliprect);
 		return 0;
 	}
 
@@ -669,7 +669,7 @@ uint32_t itech8_state::screen_update_2page(screen_device &screen, bitmap_rgb32 &
 	/* if we're blanked, just fill with black */
 	if (m_tms34061->m_display.blanked)
 	{
-		bitmap.fill(rgb_t::black, cliprect);
+		bitmap.fill(rgb_t::black(), cliprect);
 		return 0;
 	}
 
@@ -700,7 +700,7 @@ uint32_t itech8_state::screen_update_2page_large(screen_device &screen, bitmap_r
 	/* if we're blanked, just fill with black */
 	if (m_tms34061->m_display.blanked)
 	{
-		bitmap.fill(rgb_t::black, cliprect);
+		bitmap.fill(rgb_t::black(), cliprect);
 		return 0;
 	}
 

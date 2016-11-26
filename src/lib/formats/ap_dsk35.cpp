@@ -791,7 +791,7 @@ static floperr_t apple35_write_track(floppy_image_legacy *floppy, int head, int 
 
 
 static floperr_t apple35_construct(floppy_image_legacy *floppy, uint32_t data_offset, uint32_t data_size,
-	uint32_t tag_offset, uint32_t tag_size, int16_t format_byte, uint8_t sides, int is_1440k)
+	uint32_t tag_offset, uint32_t tag_size, int16_t format_byte, uint8_t sides, bool is_1440k)
 {
 	struct apple35_tag *tag;
 	struct FloppyCallbacks *format;
@@ -857,14 +857,14 @@ static FLOPPY_CONSTRUCT(apple35_raw_construct)
 {
 	uint64_t size;
 	uint8_t sides;
-	int is_1440k;
+	bool is_1440k;
 
 	if (params)
 	{
 		/* create */
 		sides = params->lookup_int(PARAM_HEADS);
 		size = 80*sides*10*512;
-		is_1440k = FALSE;
+		is_1440k = false;
 	}
 	else
 	{
@@ -873,7 +873,7 @@ static FLOPPY_CONSTRUCT(apple35_raw_construct)
 		if (size == 80*1*10*512)
 		{
 			sides = 1;
-			is_1440k = FALSE;
+			is_1440k = false;
 		}
 		else if ((size == 80*2*10*512) || (size == 80*2*18*512) || (size == (80*2*18*512)+84))
 		{
@@ -1019,7 +1019,7 @@ static FLOPPY_CONSTRUCT(apple35_diskcopy_construct)
 	format_byte_param = format_byte;
 
 	return apple35_construct(floppy, data_offset, data_size,
-		tag_offset, tag_size, format_byte_param, sides, FALSE);
+		tag_offset, tag_size, format_byte_param, sides, false);
 }
 
 
@@ -1169,7 +1169,7 @@ static FLOPPY_CONSTRUCT(apple35_2img_construct)
 	}
 
 	return apple35_construct(floppy, data_offset, data_size,
-		0, 0, -1, sides, FALSE);
+		0, 0, -1, sides, false);
 }
 
 

@@ -646,7 +646,7 @@ static uint32_t dasm_direct_jump(uint32_t pc, uint64_t opcode)
 	uint32_t flags = 0;
 
 	get_if_condition(cond);
-	if (opcode & U64(0x8000000000))
+	if (opcode & 0x8000000000U)
 	{
 		print("CALL");
 		flags = DASMFLAG_STEP_OVER;
@@ -656,7 +656,7 @@ static uint32_t dasm_direct_jump(uint32_t pc, uint64_t opcode)
 		print("JUMP");
 	}
 
-	if (opcode & U64(0x10000000000))    /* PC-relative branch */
+	if (opcode & 0x10000000000U)    /* PC-relative branch */
 	{
 		print(" (0x%08X)", pc + SIGN_EXTEND24(addr));
 	}
@@ -699,7 +699,7 @@ static uint32_t dasm_indirect_jump_compute(uint32_t pc, uint64_t opcode)
 		print("JUMP");
 	}
 
-	if (opcode & U64(0x10000000000))    /* PC-relative branch */
+	if (opcode & 0x10000000000U)    /* PC-relative branch */
 	{
 		print(" (0x%08X)", pc + SIGN_EXTEND6(reladdr));
 	}
@@ -744,7 +744,7 @@ static uint32_t dasm_indirect_jump_compute_dregdm(uint32_t pc, uint64_t opcode)
 	get_if_condition(cond);
 	print("JUMP");
 
-	if (opcode & U64(0x200000000000))   /* PC-relative branch */
+	if (opcode & 0x200000000000U)   /* PC-relative branch */
 	{
 		print(" (0x%08X)", pc + SIGN_EXTEND6(reladdr));
 	}
@@ -780,7 +780,7 @@ static uint32_t dasm_rts_compute(uint32_t pc, uint64_t opcode)
 
 	get_if_condition(cond);
 
-	if (opcode & U64(0x10000000000))
+	if (opcode & 0x10000000000U)
 	{
 		print("RTI");
 	}
@@ -817,7 +817,7 @@ static uint32_t dasm_do_until_counter(uint32_t pc, uint64_t opcode)
 	int ureg = (opcode >> 32) & 0xff;
 	uint32_t addr = opcode & 0xffffff;
 
-	if (opcode & U64(0x10000000000))    /* Loop counter from universal register */
+	if (opcode & 0x10000000000U)    /* Loop counter from universal register */
 	{
 		print("LCNTR = %s, ", GET_UREG(ureg));
 		print("DO (0x%08X)", pc + SIGN_EXTEND24(addr));
@@ -950,7 +950,7 @@ static uint32_t dasm_ireg_modify(uint32_t pc, uint64_t opcode)
 	int i = (opcode >> 32) & 0x7;
 	uint32_t data = opcode & 0xffffffff;
 
-	if (opcode & U64(0x8000000000))     /* with bit-reverse */
+	if (opcode & 0x8000000000U)     /* with bit-reverse */
 	{
 		if (g)
 		{
@@ -1043,7 +1043,7 @@ static uint32_t dasm_misc(uint32_t pc, uint64_t opcode)
 
 static uint32_t dasm_idlenop(uint32_t pc, uint64_t opcode)
 {
-	if (opcode & U64(0x8000000000))
+	if (opcode & 0x8000000000U)
 	{
 		print("IDLE");
 	}
@@ -1058,7 +1058,7 @@ static uint32_t dasm_idlenop(uint32_t pc, uint64_t opcode)
 static uint32_t dasm_cjump_rframe(uint32_t pc, uint64_t opcode)
 {
 	/* TODO */
-	if (opcode & U64(0x10000000000))    /* RFRAME */
+	if (opcode & 0x10000000000U)    /* RFRAME */
 	{
 		print("TODO: RFRAME");
 	}
@@ -1176,7 +1176,7 @@ static void build_dasm_table(void)
 	}
 }
 
-static uint32_t sharc_dasm_one(char *buffer, offs_t pc, uint64_t opcode)
+static uint32_t sharc_dasm_one(std::ostream &stream, offs_t pc, uint64_t opcode)
 {
 	#define DEFAULT_DASM_WIDTH  (64)
 
@@ -1198,9 +1198,9 @@ static uint32_t sharc_dasm_one(char *buffer, offs_t pc, uint64_t opcode)
 
 	flags = (*sharcdasm_table[op])(pc, opcode);
 
-	for (i=0; i < DEFAULT_DASM_WIDTH; i++)
+	for (i=0; i < DEFAULT_DASM_WIDTH && dasm_buffer[i]; i++)
 	{
-		buffer[i] = dasm_buffer[i];
+		stream << dasm_buffer[i];
 	}
 	return flags;
 }
@@ -1215,6 +1215,6 @@ CPU_DISASSEMBLE( sharc )
 			((uint64_t)oprom[2] << 16) | ((uint64_t)oprom[3] << 24) |
 			((uint64_t)oprom[4] << 32) | ((uint64_t)oprom[5] << 40);
 
-	flags = sharc_dasm_one(buffer, pc, op);
+	flags = sharc_dasm_one(stream, pc, op);
 	return 1 | flags | DASMFLAG_SUPPORTED;
 }

@@ -552,7 +552,7 @@ static INPUT_PORTS_START( satansat )
 	PORT_DIPSETTING (   0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
-/* Derived from 'satansat'. Might not reflect the actual hardware. Dip Swicthes verified from game code though. */
+/* Derived from 'satansat'. Might not reflect the actual hardware. Dip Switches verified from game code though. */
 static INPUT_PORTS_START( sasuke )
 	PORT_INCLUDE(satansat)
 

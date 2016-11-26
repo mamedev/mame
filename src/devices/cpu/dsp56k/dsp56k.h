@@ -170,10 +170,10 @@ struct dsp56k_core
 	dsp56k_host_interface HI;
 
 	// IRQ line states
-	uint8_t modA_state;
-	uint8_t modB_state;
-	uint8_t modC_state;
-	uint8_t reset_state;
+	bool modA_state;
+	bool modB_state;
+	bool modC_state;
+	bool reset_state;
 
 	// HACK - Bootstrap mode state variable.
 	uint8_t bootstrap_mode;
@@ -236,7 +236,7 @@ protected:
 	// device_disasm_interface overrides
 	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; }
 	virtual uint32_t disasm_max_opcode_bytes() const override { return 4; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 private:
 	address_space_config m_program_config;

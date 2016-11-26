@@ -39,6 +39,11 @@
 
 **************************************************************************/
 
+#ifndef MAME_EMU_DRIVERS_XTAL_H
+#define MAME_EMU_DRIVERS_XTAL_H
+
+#pragma once
+
 enum
 {
 /*
@@ -146,6 +151,7 @@ enum
 	XTAL_16MHz          = 16000000,     /* Extremely common, used on 100's of PCBs */
 	XTAL_16_384MHz      = 16384000,
 	XTAL_16_5888MHz     = 16588800,     /* SM 7238 */
+	XTAL_16_67MHz       = 16670000,
 	XTAL_16_777216MHz   = 16777216,     /* Nintendo Game Boy Advance */
 	XTAL_16_9344MHz     = 16934400,     /* Usually used to drive 90's Yamaha OPL/FM chips (44100 * 384) */
 	XTAL_17_36MHz       = 17360000,     /* OMTI Series 10 SCSI controller */
@@ -186,6 +192,7 @@ enum
 	XTAL_27_164MHz      = 27164000,     /* Typically used on 90's Taito PCBs to drive the custom chips */
 	XTAL_27_2109MHz     = 27210900,     /* LA Girl */
 	XTAL_28MHz          = 28000000,
+	XTAL_28_322MHz      = 28322000,     /* Saitek RISC 2500, Mephisto Montreux */
 	XTAL_28_37516MHz    = 28375160,     /* Amiga PAL systems */
 	XTAL_28_48MHz       = 28480000,     /* Chromatics CGC-7900 */
 	XTAL_28_63636MHz    = 28636363,     /* Later Leland games and Atari GT, Amiga NTSC, Raiden2 h/w (8x NTSC subcarrier)*/
@@ -199,6 +206,7 @@ enum
 	XTAL_32_22MHz       = 32220000,     /* Typically used on 90's Data East PCBs (close to 9x NTSC subcarrier which is 32.215905Mhz*/
 	XTAL_32_5304MHz     = 32530400,     /* Seta 2 */
 	XTAL_33MHz          = 33000000,     /* Sega Model 3 video board */
+	XTAL_33_264MHz      = 33264000,     /* Hazeltine 1500 terminal */
 	XTAL_33_333MHz      = 33333000,     /* Sega Model 3 CPU board, Vegas */
 	XTAL_33_833MHz      = 33833000,
 	XTAL_33_8688MHz     = 33868800,     /* Usually used to drive 90's Yamaha OPL/FM chips with /2 divider */
@@ -615,3 +623,5 @@ reveals the following shipping frequencies as of 1/1/2008:
 100.00MHz
 
 */
+
+#endif // MAME_EMU_DRIVERS_XTAL_H

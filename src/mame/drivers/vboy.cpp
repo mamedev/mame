@@ -1249,10 +1249,10 @@ TIMER_DEVICE_CALLBACK_MEMBER(vboy_state::timer_pad_tick)
 
 PALETTE_INIT_MEMBER(vboy_state, vboy)
 {
-	palette.set_pen_color(0, rgb_t::black);
-	palette.set_pen_color(1, rgb_t::black);
-	palette.set_pen_color(2, rgb_t::black);
-	palette.set_pen_color(3, rgb_t::black);
+	palette.set_pen_color(0, rgb_t::black());
+	palette.set_pen_color(1, rgb_t::black());
+	palette.set_pen_color(2, rgb_t::black());
+	palette.set_pen_color(3, rgb_t::black());
 }
 
 void vboy_state::m_set_irq(uint16_t irq_vector)

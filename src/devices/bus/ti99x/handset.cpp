@@ -148,7 +148,7 @@ void ti99_handset_device::post_message(int message)
     poll_keyboard()
     Poll the current state of one given handset keypad.
     num: number of the keypad to poll (0-3)
-    Returns TRUE if the handset state has changed and a message was posted.
+    Returns true if the handset state has changed and a message was posted.
 */
 bool ti99_handset_device::poll_keyboard(int num)
 {
@@ -219,7 +219,7 @@ bool ti99_handset_device::poll_keyboard(int num)
 
     Poll the current state of one given handset joystick.
     num: number of the joystick to poll (0-3)
-    Returns TRUE if the handset state has changed and a message was posted.
+    Returns true if the handset state has changed and a message was posted.
 */
 bool ti99_handset_device::poll_joystick(int num)
 {

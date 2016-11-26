@@ -106,6 +106,7 @@ public:
 		m_win_count(0),
 		m_has_images(false),
 		m_initialised(false),
+		m_dialog_image(nullptr),
 		m_filelist_refresh(false),
 		m_mount_open(false),
 		m_create_open(false),

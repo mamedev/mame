@@ -4,6 +4,7 @@ CFLAGS = $(CFLAGS) \
   -DEXTRACT_ONLY \
   -DNO_READ_FROM_CODER \
   -D_SFX \
+  -D_CONSOLE \
 
 CURRENT_OBJS = \
   $O\SfxCon.obj \
@@ -114,6 +115,7 @@ C_OBJS = \
   $O\BraIA64.obj \
   $O\CpuArch.obj \
   $O\Delta.obj \
+  $O\DllSecur.obj \
   $O\Lzma2Dec.obj \
   $O\LzmaDec.obj \
   $O\Ppmd7.obj \

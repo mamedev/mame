@@ -135,8 +135,8 @@ void iteagle_state::machine_start()
 	m_maincpu->mips3drc_set_options(MIPS3DRC_FASTEST_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	//m_maincpu->mips3drc_add_fastram(0x00000000, 16*1024*1024-1, FALSE, m_rambase);
-	//m_maincpu->mips3drc_add_fastram(0x1fc00000, 0x1fc7ffff, TRUE, m_rombase);
+	//m_maincpu->mips3drc_add_fastram(0x00000000, 16*1024*1024-1, false, m_rambase);
+	//m_maincpu->mips3drc_add_fastram(0x1fc00000, 0x1fc7ffff, true, m_rombase);
 }
 
 void iteagle_state::machine_reset()

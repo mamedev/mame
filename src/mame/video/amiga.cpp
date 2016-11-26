@@ -192,7 +192,7 @@ void amiga_copper_setpc(running_machine &machine, uint32_t pc)
 		state->logerror("copper_setpc(%06x)\n", pc);
 
 	state->m_copper_pc = pc;
-	state->m_copper_waiting = FALSE;
+	state->m_copper_waiting = false;
 }
 
 
@@ -224,7 +224,7 @@ int amiga_copper_execute_next(running_machine &machine, int xpos)
 		if ((curpos & state->m_copper_waitmask) >= (state->m_copper_waitval & state->m_copper_waitmask) &&
 			(!state->m_copper_waitblit || !(CUSTOM_REG(REG_DMACON) & DMACON_BBUSY)))
 		{
-			state->m_copper_waiting = FALSE;
+			state->m_copper_waiting = false;
 #if GUESS_COPPER_OFFSET
 			return xpos + COPPER_CYCLES_TO_PIXELS(1 + state->m_wait_offset);
 #else
@@ -284,8 +284,8 @@ int amiga_copper_execute_next(running_machine &machine, int xpos)
 
 			state->m_copper_waitval = 0xffff;
 			state->m_copper_waitmask = 0xffff;
-			state->m_copper_waitblit = FALSE;
-			state->m_copper_waiting = TRUE;
+			state->m_copper_waitblit = false;
+			state->m_copper_waiting = true;
 
 			return 511;
 		}
@@ -309,7 +309,7 @@ int amiga_copper_execute_next(running_machine &machine, int xpos)
 			if (LOG_COPPER)
 				state->logerror("  Waiting for %04x & %04x (currently %04x)\n", state->m_copper_waitval, state->m_copper_waitmask, (state->m_last_scanline << 8) | (xpos >> 1));
 
-			state->m_copper_waiting = TRUE;
+			state->m_copper_waiting = true;
 		}
 
 		/* handle a skip */

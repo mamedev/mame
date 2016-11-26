@@ -480,12 +480,12 @@ void intelfsh_device::nvram_default()
 		if (m_bits == 8)
 		{
 			for (offs_t offs = 0; offs < bytes; offs++)
-				m_data[offs] = m_region->u8(offs);
+				m_data[offs] = m_region->as_u8(offs);
 		}
 		else
 		{
 			for (offs_t offs = 0; offs < bytes; offs += 2) {
-				uint16_t v = m_region->u16(offs / 2);
+				uint16_t v = m_region->as_u16(offs / 2);
 				m_data[offs] = v >> 8;
 				m_data[offs+1] = v;
 			}

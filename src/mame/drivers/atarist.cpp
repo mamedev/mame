@@ -65,7 +65,7 @@ void st_state::device_timer(emu_timer &timer, device_timer_id id, int param, voi
 		blitter_tick();
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in st_state::device_timer");
+		assert_always(false, "Unknown id in st_state::device_timer");
 	}
 }
 

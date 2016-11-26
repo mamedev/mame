@@ -103,7 +103,7 @@ struct work_thread_info
 	work_thread_info(uint32_t aid, osd_work_queue &aqueue)
 	: queue(aqueue)
 	, handle(nullptr)
-	, wakeevent(FALSE, FALSE)  // auto-reset, not signalled
+	, wakeevent(false, false)  // auto-reset, not signalled
 	, active(0)
 	, id(aid)
 #if KEEP_STATISTICS
@@ -143,7 +143,7 @@ struct osd_work_queue
 	, exiting(0)
 	, threads(0)
 	, flags(0)
-	, doneevent(TRUE, TRUE)     // manual reset, signalled
+	, doneevent(true, true)     // manual reset, signalled
 #if KEEP_STATISTICS
 	, itemsqueued(0)
 	, setevents(0)
@@ -185,7 +185,7 @@ struct osd_work_item
 	, result(nullptr)
 	, event(nullptr)                // manual reset, not signalled
 	, flags(0)
-	, done(FALSE)
+	, done(false)
 	{
 	}
 
@@ -234,12 +234,12 @@ int thread_adjust_priority(std::thread *thread, int adjust)
 	{
 		sched.sched_priority += adjust;
 		if (pthread_setschedparam(thread->native_handle(), policy, &sched) == 0)
-			return TRUE;
+			return true;
 		else
-			return FALSE;
+			return false;
 	}
 #endif
-	return TRUE;
+	return true;
 }
 
 //============================================================
@@ -335,15 +335,15 @@ int osd_work_queue_items(osd_work_queue *queue)
 //  osd_work_queue_wait
 //============================================================
 
-int osd_work_queue_wait(osd_work_queue *queue, osd_ticks_t timeout)
+bool osd_work_queue_wait(osd_work_queue *queue, osd_ticks_t timeout)
 {
 	// if no threads, no waiting
 	if (queue->threads == 0)
-		return TRUE;
+		return true;
 
 	// if no items, we're done
 	if (queue->items == 0)
-		return TRUE;
+		return true;
 
 	// if this is a multi queue, help out rather than doing nothing
 	if (queue->flags & WORK_QUEUE_FLAG_MULTI)
@@ -371,12 +371,12 @@ int osd_work_queue_wait(osd_work_queue *queue, osd_ticks_t timeout)
 
 	// reset our done event and double-check the items before waiting
 	queue->doneevent.reset();
-	queue->waiting = TRUE;
+	queue->waiting = true;
 	if (queue->items != 0)
 		queue->doneevent.wait(timeout);
-	queue->waiting = FALSE;
+	queue->waiting = false;
 
-	// return TRUE if we actually hit 0
+	// return true if we actually hit 0
 	return (queue->items == 0);
 }
 
@@ -394,7 +394,7 @@ void osd_work_queue_free(osd_work_queue *queue)
 	}
 
 	// signal all the threads to exit
-	queue->exiting = TRUE;
+	queue->exiting = true;
 	for (int threadnum = 0; threadnum < queue->threads; threadnum++)
 	{
 		work_thread_info *thread = queue->thread[threadnum];
@@ -501,7 +501,7 @@ osd_work_item *osd_work_item_queue_multiple(osd_work_queue *queue, osd_work_call
 		}
 		else
 		{
-			item->done = FALSE; // needs to be set this way to prevent data race/usage of uninitialized memory on Linux
+			item->done = false; // needs to be set this way to prevent data race/usage of uninitialized memory on Linux
 		}
 
 		// fill in the basics
@@ -568,17 +568,17 @@ osd_work_item *osd_work_item_queue_multiple(osd_work_queue *queue, osd_work_call
 //  osd_work_item_wait
 //============================================================
 
-int osd_work_item_wait(osd_work_item *item, osd_ticks_t timeout)
+bool osd_work_item_wait(osd_work_item *item, osd_ticks_t timeout)
 {
 	// if we're done already, just return
 	if (item->done)
-		return TRUE;
+		return true;
 
 	// if we don't have an event, create one
 	if (item->event == nullptr)
 	{
 		std::lock_guard<std::mutex> lock(item->queue.lock);
-		item->event = new osd_event(TRUE, FALSE);     // manual reset, not signalled
+		item->event = new osd_event(true, false);     // manual reset, not signalled
 	}
 	else
 		item->event->reset();
@@ -594,7 +594,7 @@ int osd_work_item_wait(osd_work_item *item, osd_ticks_t timeout)
 	else if (!item->done)
 		item->event->wait(timeout);
 
-	// return TRUE if the refcount actually hit 0
+	// return true if the refcount actually hit 0
 	return item->done;
 }
 
@@ -687,7 +687,7 @@ static void *worker_thread_entry(void *param)
 			break;
 
 		// indicate that we are live
-		thread->active = TRUE;
+		thread->active = true;
 		++queue.livethreads;
 
 		// process work items
@@ -712,7 +712,7 @@ static void *worker_thread_entry(void *param)
 		}
 
 		// decrement the live thread count
-		thread->active = FALSE;
+		thread->active = false;
 		--queue.livethreads;
 	}
 
@@ -771,7 +771,7 @@ static void worker_thread_process(osd_work_queue *queue, work_thread_info *threa
 
 			// decrement the item count after we are done
 			--queue->items;
-			item->done = TRUE;
+			item->done = true;
 			add_to_stat(thread->itemsdone, 1);
 
 			// if it's an auto-release item, release it

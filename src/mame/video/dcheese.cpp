@@ -83,7 +83,7 @@ void dcheese_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		dcheese_signal_irq(param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in dcheese_state::device_timer");
+		assert_always(false, "Unknown id in dcheese_state::device_timer");
 	}
 }
 

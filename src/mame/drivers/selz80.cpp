@@ -68,8 +68,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(selz80_io, AS_IO, 8, selz80_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("i8279", i8279_device, data_r, data_w )
-	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE("i8279", i8279_device, status_r, cmd_w)
+	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("i8279", i8279_device, read, write)
 ADDRESS_MAP_END
 
 /* Input ports */

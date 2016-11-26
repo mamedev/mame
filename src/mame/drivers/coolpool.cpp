@@ -779,7 +779,7 @@ static MACHINE_CONFIG_START( amerdart, coolpool_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS34010, XTAL_40MHz)
 	MCFG_CPU_PROGRAM_MAP(amerdart_map)
-	MCFG_TMS340X0_HALT_ON_RESET(FALSE) /* halt on reset */
+	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(XTAL_40MHz/12) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(2) /* pixels per clock */
 	MCFG_TMS340X0_SCANLINE_RGB32_CB(coolpool_state, amerdart_scanline) /* scanline callback (rgb32) */
@@ -816,7 +816,7 @@ static MACHINE_CONFIG_START( coolpool, coolpool_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS34010, XTAL_40MHz)
 	MCFG_CPU_PROGRAM_MAP(coolpool_map)
-	MCFG_TMS340X0_HALT_ON_RESET(FALSE) /* halt on reset */
+	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(XTAL_40MHz/6) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
 	MCFG_TMS340X0_SCANLINE_RGB32_CB(coolpool_state, coolpool_scanline) /* scanline callback (rgb32) */

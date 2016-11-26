@@ -581,7 +581,7 @@ fd1094_device::fd1094_device(const machine_config &mconfig, const char *tag, dev
 		if ((opcode & 0xff80) == 0x4e80 || (opcode & 0xf0f8) == 0x50c8 || (opcode & 0xf000) == 0x6000)
 			m_masked_opcodes_lookup[1][opcode >> 4] |= 1 << ((opcode >> 1) & 7);
 
-	m_state_change = state_change_delegate(FUNC(fd1094_device::default_state_change), this);
+	m_state_change = state_change_delegate(&fd1094_device::default_state_change, this);
 }
 
 
@@ -771,7 +771,7 @@ uint16_t fd1094_device::decrypt_one(offs_t address, uint16_t val, const uint8_t 
 	else                    key_F = BIT(mainkey,6);
 
 	// the CPU has been verified to produce different results when fetching opcodes
-	// from 0000-0006 than when fetching the inital SP and PC on reset.
+	// from 0000-0006 than when fetching the initial SP and PC on reset.
 	if (vector_fetch)
 	{
 		if (address <= 3) gkey3 = 0x00; // supposed to always be the case

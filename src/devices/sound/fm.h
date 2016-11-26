@@ -25,7 +25,7 @@
 #define FM_INTERNAL_TIMER 0
 
 /* --- speedup optimize --- */
-/* busy flag enulation , The definition of FM_GET_TIME_NOW() is necessary. */
+/* busy flag emulation , The definition of FM_GET_TIME_NOW() is necessary. */
 #define FM_BUSY_FLAG_SUPPORT 1
 
 /* --- external SSG(YM2149/AY-3-8910)emulator interface port */
@@ -38,7 +38,7 @@ struct ssg_callbacks
 	void (*reset)(void *param);
 };
 
-/* --- external callback funstions for realtime update --- */
+/* --- external callback functions for realtime update --- */
 
 #if FM_BUSY_FLAG_SUPPORT
 #define TIME_TYPE                   attotime

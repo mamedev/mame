@@ -374,54 +374,66 @@ static bool ResolveDotsFolders(UString &s)
   #ifdef _WIN32
   // s.Replace(L'/', WCHAR_PATH_SEPARATOR);
   #endif
+  
   for (unsigned i = 0;;)
   {
-    wchar_t c = s[i];
+    const wchar_t c = s[i];
     if (c == 0)
       return true;
     if (c == '.' && (i == 0 || IS_SEPAR(s[i - 1])))
     {
-      wchar_t c1 = s[i + 1];
+      const wchar_t c1 = s[i + 1];
       if (c1 == '.')
       {
-        wchar_t c2 = s[i + 2];
+        const wchar_t c2 = s[i + 2];
         if (IS_SEPAR(c2) || c2 == 0)
         {
           if (i == 0)
             return false;
           int k = i - 2;
-          for (; k >= 0; k--)
-            if (IS_SEPAR(s[(unsigned)k]))
+          i += 2;
+          
+          for (;; k--)
+          {
+            if (k < 0)
+              return false;
+            if (!IS_SEPAR(s[(unsigned)k]))
               break;
+          }
+
+          do
+            k--;
+          while (k >= 0 && !IS_SEPAR(s[(unsigned)k]));
+          
           unsigned num;
+          
           if (k >= 0)
           {
-            num = i + 2 - k;
+            num = i - k;
             i = k;
           }
           else
           {
-            num = (c2 == 0 ? (i + 2) : (i + 3));
+            num = (c2 == 0 ? i : (i + 1));
             i = 0;
           }
+          
           s.Delete(i, num);
           continue;
         }
       }
-      else
+      else if (IS_SEPAR(c1) || c1 == 0)
       {
-        if (IS_SEPAR(c1) || c1 == 0)
-        {
-          unsigned num = 2;
-          if (i != 0)
-            i--;
-          else if (c1 == 0)
-            num = 1;
-          s.Delete(i, num);
-          continue;
-        }
+        unsigned num = 2;
+        if (i != 0)
+          i--;
+        else if (c1 == 0)
+          num = 1;
+        s.Delete(i, num);
+        continue;
       }
     }
+
     i++;
   }
 }

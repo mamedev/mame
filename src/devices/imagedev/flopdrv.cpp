@@ -781,7 +781,7 @@ void legacy_floppy_image_device::device_start()
 	floppy_drive_init();
 
 	m_drive_id = floppy_get_drive(this);
-	m_active = FALSE;
+	m_active = false;
 
 	/* resolve callbacks */
 	m_out_idx_func.resolve_safe();

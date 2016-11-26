@@ -139,7 +139,7 @@ static const int8_t s_next_pc[0x40] =
 
 // common disasm
 
-static offs_t sm510_common_disasm(const uint8_t *lut_mnemonic, const uint8_t *lut_extended, char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram)
+static offs_t sm510_common_disasm(const uint8_t *lut_mnemonic, const uint8_t *lut_extended, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram)
 {
 	// get raw opcode
 	uint8_t op = oprom[0];
@@ -163,31 +163,30 @@ static offs_t sm510_common_disasm(const uint8_t *lut_mnemonic, const uint8_t *lu
 		instr = lut_extended[param];
 
 	// disassemble it
-	char *dst = buffer;
-	dst += sprintf(dst, "%-6s ", s_mnemonics[instr]);
+	util::stream_format(stream, "%-6s ", s_mnemonics[instr]);
 	if (bits > 0)
 	{
 		if (bits <= 4)
 		{
 			if (param < 10)
-				dst += sprintf(dst, "%d", param);
+				util::stream_format(stream, "%d", param);
 			else
-				dst += sprintf(dst, "$%X", param);
+				util::stream_format(stream, "$%X", param);
 		}
 		else if (bits <= 8)
 		{
 			if (!is_extended)
-				dst += sprintf(dst, "$%02X", param);
+				util::stream_format(stream, "$%02X", param);
 		}
 		else
 		{
 			uint16_t address = (param << 4 & 0xc00) | (mask << 6 & 0x3c0) | (param & 0x03f);
-			dst += sprintf(dst, "$%03X", address);
+			util::stream_format(stream, "$%03X", address);
 		}
 
 		// show param offset
 		if (bits >= 8)
-			dst += sprintf(dst, " [$%03X]", pc + s_next_pc[pc & 0x3f]);
+			util::stream_format(stream, " [$%03X]", pc + s_next_pc[pc & 0x3f]);
 	}
 
 	return len | s_flags[instr] | DASMFLAG_SUPPORTED;
@@ -222,7 +221,7 @@ static const uint8_t sm510_mnemonic[0x100] =
 
 CPU_DISASSEMBLE(sm510)
 {
-	return sm510_common_disasm(sm510_mnemonic, nullptr, buffer, pc, oprom, opram);
+	return sm510_common_disasm(sm510_mnemonic, nullptr, stream, pc, oprom, opram);
 }
 
 
@@ -264,7 +263,7 @@ CPU_DISASSEMBLE(sm511)
 	memset(ext, 0, 0x100);
 	memcpy(ext + 0x30, sm511_extended, 0x10);
 
-	return sm510_common_disasm(sm511_mnemonic, ext, buffer, pc, oprom, opram);
+	return sm510_common_disasm(sm511_mnemonic, ext, stream, pc, oprom, opram);
 }
 
 
@@ -306,7 +305,7 @@ CPU_DISASSEMBLE(sm500)
 	memset(ext, 0, 0x100);
 	memcpy(ext + 0x00, sm500_extended, 0x10);
 
-	return sm510_common_disasm(sm500_mnemonic, ext, buffer, pc, oprom, opram);
+	return sm510_common_disasm(sm500_mnemonic, ext, stream, pc, oprom, opram);
 }
 
 
@@ -348,5 +347,5 @@ CPU_DISASSEMBLE(kb1013vk12)
 	memset(ext, 0, 0x100);
 	memcpy(ext + 0x00, kb1013vk12_extended, 0x10);
 
-	return sm510_common_disasm(kb1013vk12_mnemonic, ext, buffer, pc, oprom, opram);
+	return sm510_common_disasm(kb1013vk12_mnemonic, ext, stream, pc, oprom, opram);
 }

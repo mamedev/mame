@@ -120,7 +120,7 @@ protected:
 	// device_disasm_interface overrides
 	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
 	virtual uint32_t disasm_max_opcode_bytes() const override { return 5; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 protected:
 	address_space_config m_program_config;
@@ -138,10 +138,10 @@ protected:
 	int     m_num_interrupts;     /* number of interrupts supported */
 	int     m_recalc_parity;      /* recalculate parity before next instruction */
 	uint32_t  m_last_line_state;    /* last state of input lines line */
-	int     m_t0_cnt;             /* number of 0->1 transistions on T0 line */
-	int     m_t1_cnt;             /* number of 0->1 transistions on T1 line */
-	int     m_t2_cnt;             /* number of 0->1 transistions on T2 line */
-	int     m_t2ex_cnt;           /* number of 0->1 transistions on T2EX line */
+	int     m_t0_cnt;             /* number of 0->1 transitions on T0 line */
+	int     m_t1_cnt;             /* number of 0->1 transitions on T1 line */
+	int     m_t2_cnt;             /* number of 0->1 transitions on T2 line */
+	int     m_t2ex_cnt;           /* number of 0->1 transitions on T2EX line */
 	int     m_cur_irq_prio;       /* Holds value of the current IRQ Priority Level; -1 if no irq */
 	uint8_t   m_irq_active;         /* mask which irq levels are serviced */
 	uint8_t   m_irq_prio[8];        /* interrupt priority */
@@ -393,7 +393,7 @@ public:
 	i8052_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, int program_width, int data_width, uint8_t features = 0);
 
 protected:
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	/* SFR Callbacks */
 	virtual void sfr_write(size_t offset, uint8_t data) override;
@@ -421,7 +421,7 @@ public:
 	i80c31_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 };
 
 
@@ -433,7 +433,7 @@ public:
 	i80c51_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, int program_width, int data_width, uint8_t features = 0);
 
 protected:
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 };
 
 class i87c51_device : public i80c51_device
@@ -452,7 +452,7 @@ public:
 	i80c52_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, int program_width, int data_width, uint8_t features = 0);
 
 protected:
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	/* SFR Callbacks */
 	virtual void sfr_write(size_t offset, uint8_t data) override;
@@ -512,7 +512,7 @@ public:
 	static void set_crc(device_t &device, uint8_t crc) { downcast<ds5002fp_device &>(device).m_ds5002fp.crc = crc; }
 
 protected:
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	/* SFR Callbacks */
 	virtual void sfr_write(size_t offset, uint8_t data) override;

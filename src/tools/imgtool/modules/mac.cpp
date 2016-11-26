@@ -1204,7 +1204,7 @@ static imgtoolerr_t mac_file_read(struct mac_fileref *fileref, uint32_t len, voi
 			err = image_read_block(&fileref->l2_img->l1_img, block, fileref->block_buffer);
 			if (err)
 				return err;
-			fileref->reload_buf = FALSE;
+			fileref->reload_buf = false;
 
 			if (TAG_EXTRA_CHECKS)
 			{
@@ -1233,7 +1233,7 @@ static imgtoolerr_t mac_file_read(struct mac_fileref *fileref, uint32_t len, voi
 		dest = (uint8_t *)dest + run_len;
 		fileref->crPs += run_len;
 		if ((fileref->crPs % 512) == 0)
-			fileref->reload_buf = TRUE;
+			fileref->reload_buf = true;
 	}
 
 	return IMGTOOLERR_SUCCESS;
@@ -1299,7 +1299,7 @@ static imgtoolerr_t mac_file_write(struct mac_fileref *fileref, uint32_t len, co
 			err = image_read_block(&fileref->l2_img->l1_img, block, fileref->block_buffer);
 			if (err)
 				return err;
-			fileref->reload_buf = FALSE;
+			fileref->reload_buf = false;
 		}
 		run_len = 512 - (fileref->crPs % 512);
 		if (run_len > len)
@@ -1338,7 +1338,7 @@ static imgtoolerr_t mac_file_write(struct mac_fileref *fileref, uint32_t len, co
 		src = (const uint8_t *)src + run_len;
 		fileref->crPs += run_len;
 		if ((fileref->crPs % 512) == 0)
-			fileref->reload_buf = TRUE;
+			fileref->reload_buf = true;
 	}
 
 	return IMGTOOLERR_SUCCESS;
@@ -1376,7 +1376,7 @@ static imgtoolerr_t mac_file_tell(struct mac_fileref *fileref, uint32_t *filePos
 static imgtoolerr_t mac_file_seek(struct mac_fileref *fileref, uint32_t filePos)
 {
 	if ((fileref->crPs / 512) != (filePos / 512))
-		fileref->reload_buf = TRUE;
+		fileref->reload_buf = true;
 
 	fileref->crPs = filePos;
 
@@ -1432,7 +1432,7 @@ static imgtoolerr_t mac_file_seteof(struct mac_fileref *fileref, uint32_t newEof
 	if (fileref->crPs > newEof)
 	{
 		if ((fileref->crPs / 512) != (newEof / 512))
-			fileref->reload_buf = TRUE;
+			fileref->reload_buf = true;
 
 		fileref->crPs = newEof;
 	}
@@ -2092,9 +2092,9 @@ static imgtoolerr_t mfs_find_dir_entry(mfs_dirref *dirref, const mac_str255 file
         string)
     cat_info (I/O): on output, catalog info for this file extracted from the
         catalog file (may be NULL)
-        If create_it is TRUE, created info will first be set according to the
+        If create_it is true, created info will first be set according to the
         data from cat_info
-    create_it (I): TRUE if entry should be created if not found
+    create_it (I): true if entry should be created if not found
 
     Return imgtool error code
 */
@@ -2193,7 +2193,7 @@ static imgtoolerr_t mfs_file_open_internal(struct mac_l2_imgref *l2_img, const m
 
 	fileref->crPs = 0;
 
-	fileref->reload_buf = TRUE;
+	fileref->reload_buf = true;
 
 	return IMGTOOLERR_SUCCESS;
 }
@@ -2943,7 +2943,7 @@ static imgtoolerr_t hfs_open_extents_file(struct mac_l2_imgref *l2_img, const st
 
 	fileref->crPs = 0;
 
-	fileref->reload_buf = TRUE;
+	fileref->reload_buf = true;
 
 	return IMGTOOLERR_SUCCESS;
 }
@@ -2973,7 +2973,7 @@ static imgtoolerr_t hfs_open_cat_file(struct mac_l2_imgref *l2_img, const struct
 
 	fileref->crPs = 0;
 
-	fileref->reload_buf = TRUE;
+	fileref->reload_buf = true;
 
 	return IMGTOOLERR_SUCCESS;
 }
@@ -3074,7 +3074,7 @@ static imgtoolerr_t hfs_image_open(imgtool::image &image, imgtool::stream::ptr &
 	err = hfs_open_extents_file(l2_img, &buf->hfs_mdb, &l2_img->u.hfs.extents_BT.fileref);
 	if (err)
 		return err;
-	err = BT_open(&l2_img->u.hfs.extents_BT, hfs_extentKey_compare, TRUE);
+	err = BT_open(&l2_img->u.hfs.extents_BT, hfs_extentKey_compare, true);
 	if (err)
 		return err;
 	if ((l2_img->u.hfs.extents_BT.attributes & btha_bigKeysMask)
@@ -3093,7 +3093,7 @@ static imgtoolerr_t hfs_image_open(imgtool::image &image, imgtool::stream::ptr &
 		BT_close(&l2_img->u.hfs.extents_BT);
 		return err;
 	}
-	err = BT_open(&l2_img->u.hfs.cat_BT, hfs_catKey_compare, FALSE);
+	err = BT_open(&l2_img->u.hfs.cat_BT, hfs_catKey_compare, false);
 	if (err)
 	{
 		return err;
@@ -3245,7 +3245,7 @@ static imgtoolerr_t hfs_cat_open(struct mac_l2_imgref *l2_img, const char *path,
 	assert(l2_img->format == L2I_HFS);
 
 	/* resolve path and fetch file info from directory/catalog */
-	err = mac_lookup_path(l2_img, path, &parID, filename, &cat_info, FALSE);
+	err = mac_lookup_path(l2_img, path, &parID, filename, &cat_info, false);
 	if (err)
 		return err;
 	if (cat_info.dataRecType != hcrt_Folder)
@@ -3328,7 +3328,7 @@ static imgtoolerr_t hfs_cat_search(struct mac_l2_imgref *l2_img, uint32_t parID,
 	mac_strcpy(search_key.cName, cName);
 
 	/* search key */
-	err = BT_search_leaf_rec(&l2_img->u.hfs.cat_BT, &search_key, NULL, NULL, &rec, &rec_len, TRUE, NULL);
+	err = BT_search_leaf_rec(&l2_img->u.hfs.cat_BT, &search_key, NULL, NULL, &rec, &rec_len, true, NULL);
 	if (err)
 		return err;
 
@@ -3466,7 +3466,7 @@ static imgtoolerr_t hfs_file_open_internal(struct mac_l2_imgref *l2_img, const h
 
 	fileref->crPs = 0;
 
-	fileref->reload_buf = TRUE;
+	fileref->reload_buf = true;
 
 	return IMGTOOLERR_SUCCESS;
 }
@@ -3564,7 +3564,7 @@ static imgtoolerr_t hfs_file_get_nth_block_address(struct mac_fileref *fileref, 
 		includes AB_num, it is that one. */
 		err = BT_search_leaf_rec(&fileref->l2_img->u.hfs.extents_BT, &search_key,
 										NULL, NULL, &extents_BT_rec, &extents_BT_rec_len,
-										FALSE, NULL);
+										false, NULL);
 		if (err)
 			return err;
 
@@ -3710,7 +3710,7 @@ static imgtoolerr_t BT_check(mac_BTref *BTref, int is_extent);
     BTref (I/O): B-tree file handle to open (BTref->fileref must have been
         open previously)
     key_compare_func (I): function that compares two keys
-    is_extent (I): TRUE if we are opening the extent B-tree (we want to do
+    is_extent (I): true if we are opening the extent B-tree (we want to do
         extra checks in this case because the extent B-Tree may include extent
         records for the extent B-tree itself, and if an extent record for the
         extent B-tree is located in an extent that has not been defined by
@@ -3863,7 +3863,7 @@ static imgtoolerr_t BT_node_get_record(mac_BTref *BTref, void *node_buf, unsigne
 
     BTref (I/O): open B-tree file handle
     node_buf (I): buffer with the node the record should be extracted from
-    node_is_index (I): TRUE if node is index node
+    node_is_index (I): true if node is index node
     recnum (I): index of record to read
     rec_ptr (O): set to point to start of record (key + data)
     rec_len (O): set to total length of record (key + data)
@@ -3952,7 +3952,7 @@ static imgtoolerr_t BT_get_keyed_record_data(mac_BTref *BTref, void *rec_ptr, in
     Check integrity of a complete B-tree
 
     BTref (I/O): open B-tree file handle
-    is_extent (I): TRUE if we are opening the extent B-tree (we want to do
+    is_extent (I): true if we are opening the extent B-tree (we want to do
         extra checks in this case because the extent B-Tree may include extent
         records for the extent B-tree itself, and if an extent record for the
         extent B-tree is located in an extent that has not been defined by
@@ -3988,7 +3988,7 @@ static imgtoolerr_t BT_check(mac_BTref *BTref, int is_extent)
 	uint32_t run_bit_len;
 	uint32_t actualFreeNodes;
 	imgtoolerr_t err;
-	uint32_t maxExtentAB = 0, maxExtentNode = 0, extentEOL = 0;   /* if is_extent is TRUE */
+	uint32_t maxExtentAB = 0, maxExtentNode = 0, extentEOL = 0;   /* if is_extent is true */
 
 	if (is_extent)
 	{
@@ -4004,7 +4004,7 @@ static imgtoolerr_t BT_check(mac_BTref *BTref, int is_extent)
 				maxExtentAB += get_UINT16BE(BTref->fileref.hfs.extents[j].numABlks);
 			maxExtentNode = (uint64_t)maxExtentAB * 512 * BTref->fileref.l2_img->blocksperAB
 										/ BTref->nodeSize;
-			extentEOL = FALSE;
+			extentEOL = false;
 			break;
 		}
 	}
@@ -4137,7 +4137,7 @@ static imgtoolerr_t BT_check(mac_BTref *BTref, int is_extent)
 			if (i != 0)
 			{
 				/* extract first record */
-				err = BT_node_get_keyed_record(BTref, data_nodes[i].buf, TRUE, 0, &rec1, &rec1_len);
+				err = BT_node_get_keyed_record(BTref, data_nodes[i].buf, true, 0, &rec1, &rec1_len);
 				if (err)
 					goto bail;
 
@@ -4241,7 +4241,7 @@ static imgtoolerr_t BT_check(mac_BTref *BTref, int is_extent)
 				hfs_extent *extentData;
 
 				/* extract current leaf record */
-				err = BT_node_get_keyed_record(BTref, data_nodes[0].buf, FALSE, data_nodes[0].cur_rec, &rec1, &rec1_len);
+				err = BT_node_get_keyed_record(BTref, data_nodes[0].buf, false, data_nodes[0].cur_rec, &rec1, &rec1_len);
 				if (err)
 					goto bail;
 
@@ -4251,7 +4251,7 @@ static imgtoolerr_t BT_check(mac_BTref *BTref, int is_extent)
 					/* the key is corrupt or does not concern the extent
 					B-tree: set the extentEOL flag so that we stop looking for
 					further extent records for the extent B-tree */
-					extentEOL = TRUE;
+					extentEOL = true;
 				else
 				{   /* this key concerns the extent B-tree: update maxExtentAB
 				    and maxExtentNode */
@@ -4263,7 +4263,7 @@ static imgtoolerr_t BT_check(mac_BTref *BTref, int is_extent)
 						/* the record is corrupt: set the extentEOL flag so
 						that we stop looking for further extent records for the
 						extent B-tree */
-						extentEOL = TRUE;
+						extentEOL = true;
 					else
 					{
 						extentData = (hfs_extent*)rec1_data;
@@ -4312,7 +4312,7 @@ static imgtoolerr_t BT_check(mac_BTref *BTref, int is_extent)
 				i--;
 				if (i>0)
 				{   /* extract first record of root if it is an index node */
-					err = BT_node_get_keyed_record(BTref, data_nodes[i].buf, TRUE, data_nodes[i].cur_rec, &rec1, &rec1_len);
+					err = BT_node_get_keyed_record(BTref, data_nodes[i].buf, true, data_nodes[i].cur_rec, &rec1, &rec1_len);
 					if (err)
 						goto bail;
 				}
@@ -4517,11 +4517,11 @@ bail:
     record_ID (O): set to the index of the record in the node (may be NULL)
     record_ptr (O): set to point to record in node buffer (may be NULL)
     record_len (O): set to total record len (may be NULL)
-    search_exact_match (I): if TRUE, the function will search for a record
-        equal to search_key; if FALSE, the function will search for the
+    search_exact_match (I): if true, the function will search for a record
+        equal to search_key; if false, the function will search for the
         greatest record less than or equal to search_key
-    match_found (O): set to TRUE if an exact match for search_key has been
-        found (only makes sense if search_exact_match is FALSE) (may be NULL)
+    match_found (O): set to true if an exact match for search_key has been
+        found (only makes sense if search_exact_match is false) (may be NULL)
 
     Return imgtool error code
 */
@@ -4585,7 +4585,7 @@ static imgtoolerr_t BT_search_leaf_rec(mac_BTref *BTref, const void *search_key,
 				return IMGTOOLERR_FILENOTFOUND;
 
 			if (match_found)
-				*match_found = FALSE;
+				*match_found = false;
 
 			if (node_ID)
 				*node_ID = 0;
@@ -4702,7 +4702,7 @@ static imgtoolerr_t BT_leaf_rec_enumerator_read(BT_leaf_rec_enumerator *enumerat
 		return IMGTOOLERR_SUCCESS;
 
 	/* get current record */
-	err = BT_node_get_keyed_record(enumerator->BTref, enumerator->BTref->node_buf, FALSE, enumerator->cur_rec, record_ptr, rec_len);
+	err = BT_node_get_keyed_record(enumerator->BTref, enumerator->BTref->node_buf, false, enumerator->cur_rec, record_ptr, rec_len);
 	if (err)
 		return err;
 
@@ -5631,7 +5631,7 @@ static imgtoolerr_t mac_image_readfile(imgtool::partition &partition, const char
 		return err;
 
 	/* resolve path and fetch file info from directory/catalog */
-	err = mac_lookup_path(image, fpath, &parID, filename, &cat_info, FALSE);
+	err = mac_lookup_path(image, fpath, &parID, filename, &cat_info, false);
 	if (err)
 		return err;
 	if (cat_info.dataRecType != hcrt_File)
@@ -5710,7 +5710,7 @@ static imgtoolerr_t mac_image_writefile(imgtool::partition &partition, const cha
 	set_UINT16BE(&cat_info.flFinderInfo.location.h, 0);
 
 	/* resolve path and create file */
-	err = mac_lookup_path(image, fpath, &parID, filename, &cat_info, TRUE);
+	err = mac_lookup_path(image, fpath, &parID, filename, &cat_info, true);
 	if (err)
 		return err;
 
@@ -5752,7 +5752,7 @@ static imgtoolerr_t mac_image_listforks(imgtool::partition &partition, const cha
 	struct mac_l2_imgref *image = get_imgref(img);
 
 	/* resolve path and fetch file info from directory/catalog */
-	err = mac_lookup_path(image, path, &parID, filename, &cat_info, FALSE);
+	err = mac_lookup_path(image, path, &parID, filename, &cat_info, false);
 	if (err)
 		return err;
 	if (cat_info.dataRecType != hcrt_File)
@@ -5790,7 +5790,7 @@ static imgtoolerr_t mac_image_getattrs(imgtool::partition &partition, const char
 	int i;
 
 	/* resolve path and fetch file info from directory/catalog */
-	err = mac_lookup_path(image, path, &parID, filename, &cat_info, FALSE);
+	err = mac_lookup_path(image, path, &parID, filename, &cat_info, false);
 	if (err)
 		return err;
 	if (cat_info.dataRecType != hcrt_File)
@@ -5858,7 +5858,7 @@ static imgtoolerr_t mac_image_setattrs(imgtool::partition &partition, const char
 	int i;
 
 	/* resolve path and fetch file info from directory/catalog */
-	err = mac_lookup_path(image, path, &parID, filename, &cat_info, FALSE);
+	err = mac_lookup_path(image, path, &parID, filename, &cat_info, false);
 	if (err)
 		return err;
 	if (cat_info.dataRecType != hcrt_File)
@@ -5912,7 +5912,7 @@ static imgtoolerr_t mac_image_setattrs(imgtool::partition &partition, const char
 	}
 
 	/* resolve path and fetch file info from directory/catalog */
-	err = mac_lookup_path(image, path, &parID, filename, &cat_info, TRUE);
+	err = mac_lookup_path(image, path, &parID, filename, &cat_info, true);
 	if (err)
 		return err;
 
@@ -6066,7 +6066,7 @@ static int load_icon(uint32_t *dest, const void *resource_fork, uint64_t resourc
 	uint32_t resource_type, uint16_t resource_id, int width, int height, int bpp,
 	const uint32_t *palette, int has_mask)
 {
-	int success = FALSE;
+	int success = false;
 	int y, x, color, is_masked;
 	uint32_t pixel;
 	const uint8_t *src;
@@ -6107,7 +6107,7 @@ static int load_icon(uint32_t *dest, const void *resource_fork, uint64_t resourc
 				dest[y * width + x] = pixel;
 			}
 		}
-		success = TRUE;
+		success = true;
 	}
 	return success;
 }
@@ -6182,7 +6182,7 @@ static imgtoolerr_t mac_image_geticoninfo(imgtool::partition &partition, const c
 	imgtoolerr_t err;
 	imgtool_attribute attr_values[3];
 	uint32_t type_code, creator_code, finder_flags;
-	imgtool::stream *stream = NULL;
+	imgtool::stream::ptr stream;
 	const void *resource_fork;
 	uint64_t resource_fork_length;
 	const void *bundle;
@@ -6198,7 +6198,7 @@ static imgtoolerr_t mac_image_geticoninfo(imgtool::partition &partition, const c
 	/* first retrieve type and creator code */
 	err = mac_image_getattrs(partition, path, attrs, attr_values);
 	if (err)
-		goto done;
+		return err;
 	type_code = (uint32_t) attr_values[0].i;
 	creator_code = (uint32_t) attr_values[1].i;
 	finder_flags = (uint32_t) attr_values[2].i;
@@ -6210,15 +6210,12 @@ static imgtoolerr_t mac_image_geticoninfo(imgtool::partition &partition, const c
 
 	stream = imgtool::stream::open_mem(NULL, 0);
 	if (!stream)
-	{
-		err = IMGTOOLERR_SUCCESS;
-		goto done;
-	}
+		return IMGTOOLERR_SUCCESS;
 
 	/* read in the resource fork */
 	err = mac_image_readfile(partition, path, "RESOURCE_FORK", *stream);
 	if (err)
-		goto done;
+		return err;
 	resource_fork = stream->getptr();
 	resource_fork_length = stream->size();
 
@@ -6226,7 +6223,7 @@ static imgtoolerr_t mac_image_geticoninfo(imgtool::partition &partition, const c
 	bundle = mac_walk_resources(resource_fork, resource_fork_length, /* BNDL */ 0x424E444C,
 		bundle_discriminator, &creator_code, NULL, &bundle_length);
 	if (!bundle)
-		goto done;
+		return err;
 
 	/* find the FREF and the icon family */
 	pos = 8;
@@ -6250,7 +6247,7 @@ static imgtoolerr_t mac_image_geticoninfo(imgtool::partition &partition, const c
 		pos += 6 + this_bundleentry_length * 4;
 	}
 	if (!fref_pos || !icn_pos)
-		goto done;
+		return err;
 
 	/* look up the FREF */
 	for (i = 0; i < fref_bundleentry_length; i++)
@@ -6267,7 +6264,7 @@ static imgtoolerr_t mac_image_geticoninfo(imgtool::partition &partition, const c
 		}
 	}
 	if (i >= fref_bundleentry_length)
-		goto done;
+		return err;
 
 	/* now look up the icon family */
 	resource_id = 0;
@@ -6280,35 +6277,32 @@ static imgtoolerr_t mac_image_geticoninfo(imgtool::partition &partition, const c
 		}
 	}
 	if (i >= icn_bundleentry_length)
-		goto done;
+		return err;
 
 	/* fetch 32x32 icons (ICN#, icl4, icl8) */
 	if (load_icon((uint32_t *) iconinfo->icon32x32, resource_fork, resource_fork_length,
-		/* ICN# */ 0x49434E23, resource_id, 32, 32, 1, mac_palette_1bpp, TRUE))
+		/* ICN# */ 0x49434E23, resource_id, 32, 32, 1, mac_palette_1bpp, true))
 	{
 		iconinfo->icon32x32_specified = 1;
 
 		load_icon((uint32_t *) iconinfo->icon32x32, resource_fork, resource_fork_length,
-			/* icl4 */ 0x69636C34, resource_id, 32, 32, 4, mac_palette_4bpp, FALSE);
+			/* icl4 */ 0x69636C34, resource_id, 32, 32, 4, mac_palette_4bpp, false);
 		load_icon((uint32_t *) iconinfo->icon32x32, resource_fork, resource_fork_length,
-			/* icl8 */ 0x69636C38, resource_id, 32, 32, 8, mac_palette_8bpp, FALSE);
+			/* icl8 */ 0x69636C38, resource_id, 32, 32, 8, mac_palette_8bpp, false);
 	}
 
 	/* fetch 16x16 icons (ics#, ics4, ics8) */
 	if (load_icon((uint32_t *) iconinfo->icon16x16, resource_fork, resource_fork_length,
-		/* ics# */ 0x69637323, resource_id, 16, 16, 1, mac_palette_1bpp, TRUE))
+		/* ics# */ 0x69637323, resource_id, 16, 16, 1, mac_palette_1bpp, true))
 	{
 		iconinfo->icon16x16_specified = 1;
 
 		load_icon((uint32_t *) iconinfo->icon32x32, resource_fork, resource_fork_length,
-			/* ics4 */ 0x69637334, resource_id, 32, 32, 4, mac_palette_4bpp, FALSE);
+			/* ics4 */ 0x69637334, resource_id, 32, 32, 4, mac_palette_4bpp, false);
 		load_icon((uint32_t *) iconinfo->icon32x32, resource_fork, resource_fork_length,
-			/* ics8 */ 0x69637338, resource_id, 32, 32, 8, mac_palette_8bpp, FALSE);
+			/* ics8 */ 0x69637338, resource_id, 32, 32, 8, mac_palette_8bpp, false);
 	}
 
-done:
-	if (stream)
-		delete stream;
 	return err;
 }
 
@@ -6333,7 +6327,7 @@ static imgtoolerr_t mac_image_suggesttransfer(imgtool::partition &partition, con
 	if (path)
 	{
 		/* resolve path and fetch file info from directory/catalog */
-		err = mac_lookup_path(image, path, &parID, filename, &cat_info, FALSE);
+		err = mac_lookup_path(image, path, &parID, filename, &cat_info, false);
 		if (err)
 			return err;
 		if (cat_info.dataRecType != hcrt_File)

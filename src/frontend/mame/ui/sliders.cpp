@@ -135,7 +135,7 @@ void menu_sliders::handle()
 //  menu
 //-------------------------------------------------
 
-void menu_sliders::populate()
+void menu_sliders::populate(float &customtop, float &custombottom)
 {
 	std::string tempstring;
 
@@ -225,7 +225,7 @@ void menu_sliders::custom_render(void *selectedref, float top, float bottom, flo
 
 		// determine the text height
 		ui().draw_text_full(container(), tempstring.c_str(), 0, 0, x2 - x1 - 2.0f * UI_BOX_LR_BORDER,
-					ui::text_layout::CENTER, ui::text_layout::TRUNCATE, mame_ui_manager::NONE, rgb_t::white, rgb_t::black, nullptr, &text_height);
+					ui::text_layout::CENTER, ui::text_layout::TRUNCATE, mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), nullptr, &text_height);
 
 		// draw the thermometer
 		bar_left = x1 + UI_BOX_LR_BORDER;

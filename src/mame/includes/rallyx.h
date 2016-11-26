@@ -88,7 +88,7 @@ public:
 	void draw_stars( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void rallyx_draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void locomotn_draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
-	void rallyx_draw_bullets( bitmap_ind16 &bitmap, const rectangle &cliprect, int transpen );
-	void jungler_draw_bullets( bitmap_ind16 &bitmap, const rectangle &cliprect, int transpen );
-	void locomotn_draw_bullets( bitmap_ind16 &bitmap, const rectangle &cliprect, int transpen );
+	void rallyx_draw_bullets( bitmap_ind16 &bitmap, const rectangle &cliprect, bool transpen );
+	void jungler_draw_bullets( bitmap_ind16 &bitmap, const rectangle &cliprect, bool transpen );
+	void locomotn_draw_bullets( bitmap_ind16 &bitmap, const rectangle &cliprect, bool transpen );
 };

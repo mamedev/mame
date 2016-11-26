@@ -1207,7 +1207,7 @@ osd_file::error core_file::load(std::string const &filename, void **data, std::u
 		return osd_file::error::OUT_OF_MEMORY;
 
 	// allocate memory
-	*data = osd_malloc(size);
+	*data = malloc(size);
 	length = std::uint32_t(size);
 
 	// read the data

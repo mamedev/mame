@@ -428,7 +428,7 @@ INTERRUPT_GEN_MEMBER(apexc_state::apexc_interrupt)
 
 	if (control_transitions & panel_run)
 	{   /* toggle run/stop state */
-		device.state().set_state_int(APEXC_STATE, ! device.state().state_int(APEXC_STATE));
+		m_maincpu->set_state_int(APEXC_STATE, ! m_maincpu->state_int(APEXC_STATE));
 	}
 
 	while (control_transitions & (panel_CR | panel_A | panel_R | panel_ML | panel_HB))
@@ -470,10 +470,10 @@ INTERRUPT_GEN_MEMBER(apexc_state::apexc_interrupt)
 			/* read/write register #reg_id */
 			if (control_keys & panel_write)
 				/* write reg */
-				device.state().set_state_int(reg_id, m_panel_data_reg);
+				m_maincpu->set_state_int(reg_id, m_panel_data_reg);
 			else
 				/* read reg */
-				m_panel_data_reg = device.state().state_int(reg_id);
+				m_panel_data_reg = m_maincpu->state_int(reg_id);
 		}
 	}
 
@@ -482,11 +482,11 @@ INTERRUPT_GEN_MEMBER(apexc_state::apexc_interrupt)
 
 		if (control_keys & panel_write) {
 			/* write memory */
-			space.write_dword(device.state().state_int(APEXC_ML_FULL)<<2, m_panel_data_reg);
+			space.write_dword(m_maincpu->pc(), m_panel_data_reg);
 		}
 		else {
 			/* read memory */
-			m_panel_data_reg = space.read_dword(device.state().state_int(APEXC_ML_FULL)<<2);
+			m_panel_data_reg = space.read_dword(m_maincpu->pc());
 		}
 	}
 
@@ -499,13 +499,13 @@ INTERRUPT_GEN_MEMBER(apexc_state::apexc_interrupt)
 
     Since the APEXC has no video display, we display the control panel.
 
-    Additionnally, We display one page of teletyper output.
+    Additionally, We display one page of teletyper output.
 */
 
 static const rgb_t apexc_palette[] =
 {
-	rgb_t::white,
-	rgb_t::black,
+	rgb_t::white(),
+	rgb_t::black(),
 	rgb_t(255, 0, 0),
 	rgb_t(50, 0, 0)
 };
@@ -629,7 +629,7 @@ uint32_t apexc_state::screen_update_apexc(screen_device &screen, bitmap_ind16 &b
 
 void apexc_state::apexc_teletyper_init()
 {
-	m_letters = FALSE;
+	m_letters = false;
 	m_pos = 0;
 }
 
@@ -691,12 +691,12 @@ void apexc_state::apexc_teletyper_putchar(int character)
 
 	case 27:
 		/* Figures */
-		m_letters = FALSE;
+		m_letters = false;
 		break;
 
 	case 31:
 		/* Letters */
-		m_letters = TRUE;
+		m_letters = true;
 		break;
 
 	default:

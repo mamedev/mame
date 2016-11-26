@@ -144,7 +144,7 @@ void segas18_state::init_generic(segas18_rom_board rom_board)
 
 	// configure VDP
 	m_vdp->set_use_cram(1);
-	m_vdp->set_vdp_pal(FALSE);
+	m_vdp->set_vdp_pal(false);
 	m_vdp->set_framerate(60);
 	m_vdp->set_total_scanlines(262);
 	m_vdp->stop_timers(); // 315-5124 timers

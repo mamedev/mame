@@ -16,8 +16,8 @@
 static const int32_t MIN_24 = -(1 << 23);
 static const int32_t MAX_24 = (1 << 23) - 1;
 
-static const int64_t MIN_48 = -(S64(1) << 47);
-static const int64_t MAX_48 = (S64(1) << 47) - 1;
+static const int64_t MIN_48 = -(s64(1) << 47);
+static const int64_t MAX_48 = (s64(1) << 47) - 1;
 
 #define SIGN_BIT_24 (0x00800000)
 #define GET_SIGN_BIT_24(x) ((x) & SIGN_BIT_24)
@@ -27,8 +27,8 @@ static const int64_t MAX_48 = (S64(1) << 47) - 1;
 
 static inline int32_t SX(int32_t x) { return IS_NEGATIVE(x) ? x | 0xff000000 : x & 0x00ffffff; }
 static inline int32_t SC(int32_t x) { return x & 0x00ffffff; }
-static inline int64_t SX64(int64_t x) { return (x & S64(0x0000800000000000)) ? x | S64(0xffff000000000000) : x & S64(0x0000ffffffffffff); }
-//static inline int64_t SC64(int64_t x) { return x & S64(0x0000ffffffffffff); }
+static inline int64_t SX64(int64_t x) { return (x & s64(0x0000800000000000U)) ? x | s64(0xffff000000000000U) : x & s64(0x0000ffffffffffffU); }
+//static inline int64_t SC64(int64_t x) { return x & s64(0x0000ffffffffffffU); }
 
 #define VERBOSE 0
 #define VERBOSE_EXEC 0
@@ -422,12 +422,12 @@ WRITE8_MEMBER(es5510_device::host_w)
 		break;
 
 		/* 0x03 to 0x08 INSTR Register */
-	case 0x03: instr_latch = ((instr_latch&U64(0x00ffffffffff)) | ((int64_t)data&0xff)<<40); LOG(("%s",string_format("ES5510: Host Write INSTR latch[5] = %02x -> %012I64x\n", data, instr_latch).c_str())); break;
-	case 0x04: instr_latch = ((instr_latch&U64(0xff00ffffffff)) | ((int64_t)data&0xff)<<32); LOG(("%s",string_format("ES5510: Host Write INSTR latch[4] = %02x -> %012I64x\n", data, instr_latch).c_str())); break;
-	case 0x05: instr_latch = ((instr_latch&U64(0xffff00ffffff)) | ((int64_t)data&0xff)<<24); LOG(("%s",string_format("ES5510: Host Write INSTR latch[3] = %02x -> %012I64x\n", data, instr_latch).c_str())); break;
-	case 0x06: instr_latch = ((instr_latch&U64(0xffffff00ffff)) | ((int64_t)data&0xff)<<16); LOG(("%s",string_format("ES5510: Host Write INSTR latch[2] = %02x -> %012I64x\n", data, instr_latch).c_str())); break;
-	case 0x07: instr_latch = ((instr_latch&U64(0xffffffff00ff)) | ((int64_t)data&0xff)<< 8); LOG(("%s",string_format("ES5510: Host Write INSTR latch[1] = %02x -> %012I64x\n", data, instr_latch).c_str())); break;
-	case 0x08: instr_latch = ((instr_latch&U64(0xffffffffff00)) | ((int64_t)data&0xff)<< 0); LOG(("%s",string_format("ES5510: Host Write INSTR latch[0] = %02x -> %012I64x\n", data, instr_latch).c_str())); break;
+	case 0x03: instr_latch = ((instr_latch&0x00ffffffffffU) | ((int64_t)data&0xff)<<40); LOG(("%s",string_format("ES5510: Host Write INSTR latch[5] = %02x -> %012I64x\n", data, instr_latch).c_str())); break;
+	case 0x04: instr_latch = ((instr_latch&0xff00ffffffffU) | ((int64_t)data&0xff)<<32); LOG(("%s",string_format("ES5510: Host Write INSTR latch[4] = %02x -> %012I64x\n", data, instr_latch).c_str())); break;
+	case 0x05: instr_latch = ((instr_latch&0xffff00ffffffU) | ((int64_t)data&0xff)<<24); LOG(("%s",string_format("ES5510: Host Write INSTR latch[3] = %02x -> %012I64x\n", data, instr_latch).c_str())); break;
+	case 0x06: instr_latch = ((instr_latch&0xffffff00ffffU) | ((int64_t)data&0xff)<<16); LOG(("%s",string_format("ES5510: Host Write INSTR latch[2] = %02x -> %012I64x\n", data, instr_latch).c_str())); break;
+	case 0x07: instr_latch = ((instr_latch&0xffffffff00ffU) | ((int64_t)data&0xff)<< 8); LOG(("%s",string_format("ES5510: Host Write INSTR latch[1] = %02x -> %012I64x\n", data, instr_latch).c_str())); break;
+	case 0x08: instr_latch = ((instr_latch&0xffffffffff00U) | ((int64_t)data&0xff)<< 0); LOG(("%s",string_format("ES5510: Host Write INSTR latch[0] = %02x -> %012I64x\n", data, instr_latch).c_str())); break;
 
 		/* 0x09 to 0x0b DIL Register (r/o) */
 
@@ -477,7 +477,7 @@ WRITE8_MEMBER(es5510_device::host_w)
 		break;
 
 	case 0x80: /* Read select - GPR + INSTR */
-		LOG(("%s",string_format("ES5510: Host Read INSTR+GPR %02x (%s): %012I64x %06x (%d)\n", data, REGNAME(data & 0xff), instr[data] & U64(0xffffffffffff), gpr[data] & 0xffffff, gpr[data]).c_str()));
+		LOG(("%s",string_format("ES5510: Host Read INSTR+GPR %02x (%s): %012I64x %06x (%d)\n", data, REGNAME(data & 0xff), instr[data] & 0xffffffffffffU, gpr[data] & 0xffffff, gpr[data]).c_str()));
 
 		/* Check if an INSTR address is selected */
 		if (data < 0xa0) {
@@ -498,10 +498,10 @@ WRITE8_MEMBER(es5510_device::host_w)
 	case 0xc0: /* Write select - INSTR */
 #if VERBOSE
 		DESCRIBE_INSTR(buf, instr_latch, gpr[data], nullptr, nullptr, nullptr, nullptr);
-		LOG(("%s",string_format("ES5510: Host Write INSTR %02x %012I64x: %s\n", data, instr_latch&U64(0xffffffffffff), buf).c_str()));
+		LOG(("%s",string_format("ES5510: Host Write INSTR %02x %012I64x: %s\n", data, instr_latch&0xffffffffffffU, buf).c_str()));
 #endif
 		if (data < 0xa0) {
-			instr[data] = instr_latch&U64(0xffffffffffff);
+			instr[data] = instr_latch&0xffffffffffffU;
 		}
 		break;
 
@@ -802,7 +802,7 @@ void es5510_device::execute_run() {
 				}
 #endif
 				machl = mulacc.result;
-				int32_t tmp = mac_overflow ? (machl < 0 ? MIN_24 : MAX_24) : (mulacc.result & U64(0x0000ffffff000000)) >> 24;
+				int32_t tmp = mac_overflow ? (machl < 0 ? MIN_24 : MAX_24) : (mulacc.result & 0x0000ffffff000000U) >> 24;
 				if (mulacc.dst & SRC_DST_REG) {
 					write_reg(mulacc.cReg, tmp);
 				}
@@ -933,7 +933,7 @@ uint32_t es5510_device::disasm_max_opcode_bytes() const
 	return 6;
 }
 
-offs_t es5510_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t es5510_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	return pc;
 }
@@ -1052,7 +1052,7 @@ void es5510_device::write_reg(uint8_t reg, int32_t value)
 			#if VERBOSE_EXEC
 			old = machl;
 			#endif
-			int64_t masked = machl & (S64(0x00ffffff) << 24);
+			int64_t masked = machl & (s64(0x00ffffffU) << 24);
 			int64_t shifted = (int64_t)(value & 0x00ffffff) << 0;
 			machl = SX64(masked | shifted);
 			#if VERBOSE_EXEC
@@ -1064,7 +1064,7 @@ void es5510_device::write_reg(uint8_t reg, int32_t value)
 			#if VERBOSE_EXEC
 			old = machl;
 			#endif
-			int64_t masked = machl & (S64(0x00ffffff) << 0);
+			int64_t masked = machl & (s64(0x00ffffffU) << 0);
 			int64_t shifted = (int64_t)(value & 0x00ffffff) << 24;
 			machl = SX64(masked | shifted);
 			mac_overflow = false;

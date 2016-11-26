@@ -202,13 +202,13 @@ MACHINE_RESET_MEMBER(tm990189_state,tm990_189_v)
 
 TIMER_CALLBACK_MEMBER(tm990189_state::clear_load)
 {
-	m_load_state = FALSE;
+	m_load_state = false;
 	m_tms9980a->set_input_line(INT_9980A_LOAD, CLEAR_LINE);
 }
 
 void tm990189_state::hold_load()
 {
-	m_load_state = TRUE;
+	m_load_state = true;
 	m_tms9980a->set_input_line(INT_9980A_LOAD, ASSERT_LINE);
 	machine().scheduler().timer_set(attotime::from_msec(100), timer_expired_delegate(FUNC(tm990189_state::clear_load),this));
 }

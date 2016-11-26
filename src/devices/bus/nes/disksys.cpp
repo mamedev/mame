@@ -301,7 +301,7 @@ READ8_MEMBER(nes_disksys_device::read_ex)
 		case 0x10:
 			// $4030 - disk status 0
 			// bit0 - Timer Interrupt (1: an IRQ occurred)
-			// bit1 - Byte transfer flag (Set to 1 every time 8 bits have been transfered between
+			// bit1 - Byte transfer flag (Set to 1 every time 8 bits have been transferred between
 			//        the RAM adaptor & disk drive through $4024/$4031; Reset to 0 when $4024,
 			//        $4031, or $4030 has been serviced)
 			// bit4 - CRC control (0: CRC passed; 1: CRC error)

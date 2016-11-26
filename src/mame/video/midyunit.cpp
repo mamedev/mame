@@ -369,7 +369,7 @@ void midyunit_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		autoerase_line(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in midyunit_state::device_timer");
+		assert_always(false, "Unknown id in midyunit_state::device_timer");
 	}
 }
 

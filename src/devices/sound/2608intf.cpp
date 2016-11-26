@@ -142,7 +142,7 @@ void ym2608_device::device_start()
 	m_timer[1] = timer_alloc(1);
 
 	/* stream system initialize */
-	m_stream = machine().sound().stream_alloc(*this,0,2,rate, stream_update_delegate(FUNC(ym2608_device::stream_generate),this));
+	m_stream = machine().sound().stream_alloc(*this,0,2,rate, stream_update_delegate(&ym2608_device::stream_generate,this));
 	/* setup adpcm buffers */
 	pcmbufa  = m_region->base();
 	pcmsizea = m_region->bytes();

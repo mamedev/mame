@@ -152,7 +152,7 @@ protected:
 	// device_disasm_interface overrides
 	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
 	virtual uint32_t disasm_max_opcode_bytes() const override { return 2; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 protected:
 	address_space_config m_program_config;
@@ -175,15 +175,15 @@ protected:
 	uint8_t       m_dbbi;               /* 8-bit input data buffer (UPI-41 only) */
 	uint8_t       m_dbbo;               /* 8-bit output data buffer (UPI-41 only) */
 
-	uint8_t       m_irq_state;          /* TRUE if an IRQ is pending */
-	uint8_t       m_irq_in_progress;    /* TRUE if an IRQ is in progress */
-	uint8_t       m_timer_overflow;     /* TRUE on a timer overflow; cleared by taking interrupt */
-	uint8_t       m_timer_flag;         /* TRUE on a timer overflow; cleared on JTF */
-	uint8_t       m_tirq_enabled;       /* TRUE if the timer IRQ is enabled */
-	uint8_t       m_xirq_enabled;       /* TRUE if the external IRQ is enabled */
+	bool          m_irq_state;          /* true if an IRQ is pending */
+	bool          m_irq_in_progress;    /* true if an IRQ is in progress */
+	bool          m_timer_overflow;     /* true on a timer overflow; cleared by taking interrupt */
+	bool          m_timer_flag;         /* true on a timer overflow; cleared on JTF */
+	bool          m_tirq_enabled;       /* true if the timer IRQ is enabled */
+	bool          m_xirq_enabled;       /* true if the external IRQ is enabled */
 	uint8_t       m_timecount_enabled;  /* bitmask of timer/counter enabled */
-	uint8_t       m_flags_enabled;      /* TRUE if I/O flags have been enabled (UPI-41 only) */
-	uint8_t       m_dma_enabled;        /* TRUE if DMA has been enabled (UPI-41 only) */
+	bool          m_flags_enabled;      /* true if I/O flags have been enabled (UPI-41 only) */
+	bool          m_dma_enabled;        /* true if DMA has been enabled (UPI-41 only) */
 
 	uint16_t      m_a11;                /* A11 value, either 0x000 or 0x800 */
 
@@ -594,7 +594,7 @@ public:
 	DECLARE_WRITE8_MEMBER(upi41_master_w);
 
 protected:
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	TIMER_CALLBACK_MEMBER( master_callback );
 };

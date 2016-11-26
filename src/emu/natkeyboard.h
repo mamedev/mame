@@ -75,19 +75,19 @@ private:
 	const keycode_map_entry *find_code(char32_t ch) const;
 
 	// internal state
-	running_machine &       m_machine;              // reference to our machine
-	bool                    m_in_use;               // is natural keyboard in use?
-	uint32_t                  m_bufbegin;             // index of starting character
-	uint32_t                  m_bufend;               // index of ending character
-	std::vector<char32_t> m_buffer;           // actual buffer
-	bool                    m_status_keydown;       // current keydown status
-	bool                    m_last_cr;              // was the last char a CR?
-	emu_timer *             m_timer;                // timer for posting characters
-	attotime                m_current_rate;         // current rate for posting
-	ioport_queue_chars_delegate m_queue_chars;      // queue characters callback
-	ioport_accept_char_delegate m_accept_char;      // accept character callback
-	ioport_charqueue_empty_delegate m_charqueue_empty; // character queue empty callback
-	std::vector<keycode_map_entry> m_keycode_map; // keycode map
+	running_machine &               m_machine;          // reference to our machine
+	bool                            m_in_use;           // is natural keyboard in use?
+	u32                             m_bufbegin;         // index of starting character
+	u32                             m_bufend;           // index of ending character
+	std::vector<char32_t>           m_buffer;           // actual buffer
+	bool                            m_status_keydown;   // current keydown status
+	bool                            m_last_cr;          // was the last char a CR?
+	emu_timer *                     m_timer;            // timer for posting characters
+	attotime                        m_current_rate;     // current rate for posting
+	ioport_queue_chars_delegate     m_queue_chars;      // queue characters callback
+	ioport_accept_char_delegate     m_accept_char;      // accept character callback
+	ioport_charqueue_empty_delegate m_charqueue_empty;  // character queue empty callback
+	std::vector<keycode_map_entry>  m_keycode_map;      // keycode map
 };
 
 #endif

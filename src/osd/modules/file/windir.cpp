@@ -139,4 +139,4 @@ directory::ptr directory::open(std::string const &dirname)
 	return ptr(std::move(dir));
 }
 
-} // namesapce osd
+} // namespace osd

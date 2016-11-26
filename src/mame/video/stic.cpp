@@ -170,7 +170,7 @@ void stic_device::intv_plot_box(bitmap_ind16 &bitmap, int x, int y, int w, int h
 }
 
 
-int stic_device::sprites_collide(int spriteNum1, int spriteNum2)
+bool stic_device::sprites_collide(int spriteNum1, int spriteNum2)
 {
 	int16_t x0, y0, w0, h0, x1, y1, w1, h1, x2, y2, w2, h2;
 
@@ -188,7 +188,7 @@ int stic_device::sprites_collide(int spriteNum1, int spriteNum2)
 
 	if ((x1 >= x2 + w2) || (y1 >= y2 + h2) ||
 		(x2 >= x1 + w1) || (y2 >= y1 + h1))
-		return FALSE;
+		return false;
 
 	// iterate over the intersecting bits to see if any touch
 	x0 = std::max(x1, x2);
@@ -205,11 +205,11 @@ int stic_device::sprites_collide(int spriteNum1, int spriteNum2)
 		{
 			if (m_sprite_buffers[spriteNum1][x0 + x1][y0 + y1] &&
 				m_sprite_buffers[spriteNum2][x0 + x2][y0 + y2])
-				return TRUE;
+				return true;
 		}
 	}
 
-	return FALSE;
+	return false;
 }
 
 void stic_device::determine_sprite_collisions()
@@ -423,8 +423,8 @@ void stic_device::copy_sprites_to_background(bitmap_ind16 &bitmap)
 		if (s->xpos == 0 || (!s->coll && !s->visible))
 			continue;
 
-		borderCollision = FALSE;
-		foregroundCollision = FALSE;
+		borderCollision = false;
+		foregroundCollision = false;
 
 		spritePixelHeight = (s->quady ? 4 : 1) * (s->doubley ? 2 : 1) * (s->doubleyres ? 2 : 1) * STIC_CARD_HEIGHT;
 		width = (s->doublex ? 2 : 1) * STIC_CARD_WIDTH;
@@ -451,7 +451,7 @@ void stic_device::copy_sprites_to_background(bitmap_ind16 &bitmap)
 				if ((nextX < leftBorder) || (nextX > rightBorder) ||
 					(nextY < topBorder) || (nextY > bottomBorder))
 				{
-					borderCollision = TRUE;
+					borderCollision = true;
 					continue;
 				}
 
@@ -460,7 +460,7 @@ void stic_device::copy_sprites_to_background(bitmap_ind16 &bitmap)
 				//check for foreground collision
 				if (currentPixel & FOREGROUND_BIT)
 				{
-					foregroundCollision = TRUE;
+					foregroundCollision = true;
 					if (s->behind_foreground)
 						continue;
 				}

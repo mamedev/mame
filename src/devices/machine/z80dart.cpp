@@ -31,20 +31,20 @@
 
 #include "z80dart.h"
 
-
-
 //**************************************************************************
 //  MACROS / CONSTANTS
 //**************************************************************************
 
 #define VERBOSE 0
+#define LOGPRINT(x) do { if (VERBOSE) logerror x; } while (0)
+#define LOG(x)      {} LOGPRINT(x)
 
-#define LOG(x) do { if (VERBOSE) logerror x; } while (0)
+#if VERBOSE == 2
+#define logerror printf
+#endif
 
 #define CHANA_TAG   "cha"
 #define CHANB_TAG   "chb"
-
-
 
 //**************************************************************************
 //  DEVICE DEFINITIONS
@@ -503,7 +503,6 @@ z80dart_channel::z80dart_channel(const machine_config &mconfig, const char *tag,
 	: device_t(mconfig, Z80DART_CHANNEL, "Z80 DART channel", tag, owner, clock, "z80dart_channel", __FILE__),
 		device_serial_interface(mconfig, *this),
 		m_rx_error(0),
-		m_rx_fifo(-1),
 		m_rx_clock(0),
 		m_rx_first(0),
 		m_rx_break(0),
@@ -523,12 +522,6 @@ z80dart_channel::z80dart_channel(const machine_config &mconfig, const char *tag,
 
 	for (auto & elem : m_wr)
 		elem = 0;
-
-	for (int i = 0; i < 3; i++)
-	{
-		m_rx_data_fifo[i] = 0;
-		m_rx_error_fifo[i] = 0;
-	}
 }
 
 
@@ -544,10 +537,8 @@ void z80dart_channel::device_start()
 	// state saving
 	save_item(NAME(m_rr));
 	save_item(NAME(m_wr));
-	save_item(NAME(m_rx_data_fifo));
-	save_item(NAME(m_rx_error_fifo));
-	save_item(NAME(m_rx_error));
-	save_item(NAME(m_rx_fifo));
+	//	save_item(NAME(m_rx_data_fifo));
+	//	save_item(NAME(m_rx_error_fifo));
 	save_item(NAME(m_rx_clock));
 	save_item(NAME(m_rx_first));
 	save_item(NAME(m_rx_break));
@@ -1001,18 +992,15 @@ uint8_t z80dart_channel::data_read()
 {
 	uint8_t data = 0;
 
-	if (m_rx_fifo >= 0)
+	if (!m_rx_data_fifo.empty())
 	{
 		// load data from the FIFO
-		data = m_rx_data_fifo[m_rx_fifo];
+		data = m_rx_data_fifo.dequeue();
 
 		// load error status from the FIFO
-		m_rr[1] = (m_rr[1] & ~(RR1_CRC_FRAMING_ERROR | RR1_RX_OVERRUN_ERROR | RR1_PARITY_ERROR)) | m_rx_error_fifo[m_rx_fifo];
+		m_rr[1] = (m_rr[1] & ~(RR1_CRC_FRAMING_ERROR | RR1_RX_OVERRUN_ERROR | RR1_PARITY_ERROR)) | m_rx_error_fifo.dequeue();
 
-		// decrease FIFO pointer
-		m_rx_fifo--;
-
-		if (m_rx_fifo < 0)
+		if (m_rx_data_fifo.empty())
 		{
 			// no more characters available in the FIFO
 			m_rr[0] &= ~ RR0_RX_CHAR_AVAILABLE;
@@ -1064,7 +1052,7 @@ void z80dart_channel::receive_data(uint8_t data)
 {
 	LOG(("Z80DART \"%s\" Channel %c : Receive Data Byte '%02x'\n", m_owner->tag(), 'A' + m_index, data));
 
-	if (m_rx_fifo == 2)
+	if (m_rx_data_fifo.full())
 	{
 		// receive overrun error detected
 		m_rx_error |= RR1_RX_OVERRUN_ERROR;
@@ -1083,15 +1071,16 @@ void z80dart_channel::receive_data(uint8_t data)
 			m_uart->trigger_interrupt(m_index, INT_SPECIAL);
 			break;
 		}
+		// overwrite last character/error with received character and error status into FIFO
+		m_rx_data_fifo.poke(data);
+		m_rx_error_fifo.poke(m_rx_error);
 	}
 	else
 	{
-		m_rx_fifo++;
+		// store received character and error status into FIFO
+		m_rx_data_fifo.enqueue(data);
+		m_rx_error_fifo.enqueue(m_rx_error);
 	}
-
-	// store received character and error status into FIFO
-	m_rx_data_fifo[m_rx_fifo] = data;
-	m_rx_error_fifo[m_rx_fifo] = m_rx_error;
 
 	m_rr[0] |= RR0_RX_CHAR_AVAILABLE;
 

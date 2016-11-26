@@ -26,9 +26,9 @@
     CONSTANTS
 ***************************************************************************/
 
-#define DOUBLE_SIGN     (U64(0x8000000000000000))
-#define DOUBLE_EXP      (U64(0x7ff0000000000000))
-#define DOUBLE_FRAC     (U64(0x000fffffffffffff))
+#define DOUBLE_SIGN     (0x8000000000000000U)
+#define DOUBLE_EXP      (0x7ff0000000000000U)
+#define DOUBLE_FRAC     (0x000fffffffffffffU)
 #define DOUBLE_ZERO     (0)
 
 
@@ -311,10 +311,10 @@ ppc405gp_device::ppc405gp_device(const machine_config &mconfig, const char *tag,
     of access and the protection bits
 -------------------------------------------------*/
 
-static inline int page_access_allowed(int transtype, uint8_t key, uint8_t protbits)
+static inline bool page_access_allowed(int transtype, uint8_t key, uint8_t protbits)
 {
 	if (key == 0)
-		return (transtype == TRANSLATE_WRITE) ? (protbits != 3) : TRUE;
+		return (transtype == TRANSLATE_WRITE) ? (protbits != 3) : true;
 	else
 		return (transtype == TRANSLATE_WRITE) ? (protbits == 2) : (protbits != 0);
 }
@@ -473,8 +473,8 @@ static inline int is_qnan_double(double x)
 {
 	uint64_t xi = *(uint64_t*)&x;
 	return( ((xi & DOUBLE_EXP) == DOUBLE_EXP) &&
-			((xi & U64(0x0007fffffffffff)) == U64(0x000000000000000)) &&
-			((xi & U64(0x000800000000000)) == U64(0x000800000000000)) );
+			((xi & 0x0007fffffffffffU) == 0x000000000000000U) &&
+			((xi & 0x000800000000000U) == 0x000800000000000U) );
 }
 
 
@@ -489,7 +489,7 @@ static inline int is_snan_double(double x)
 	uint64_t xi = *(uint64_t*)&x;
 	return( ((xi & DOUBLE_EXP) == DOUBLE_EXP) &&
 			((xi & DOUBLE_FRAC) != DOUBLE_ZERO) &&
-			((xi & U64(0x0008000000000000)) == DOUBLE_ZERO) );
+			((xi & 0x0008000000000000U) == DOUBLE_ZERO) );
 }
 #endif
 
@@ -968,7 +968,7 @@ void ppc_device::device_start()
 	}
 
 	/* mark the cache dirty so it is updated on next execute */
-	m_cache_dirty = TRUE;
+	m_cache_dirty = true;
 }
 
 void ppc_device::state_export(const device_state_entry &entry)
@@ -1010,11 +1010,11 @@ void ppc_device::state_import(const device_state_entry &entry)
 			break;
 
 		case PPC_TBL:
-			set_timebase((get_timebase() & ~U64(0x00ffffff00000000)) | m_debugger_temp);
+			set_timebase((get_timebase() & ~u64(0x00ffffff00000000U)) | m_debugger_temp);
 			break;
 
 		case PPC_TBH:
-			set_timebase((get_timebase() & ~U64(0x00000000ffffffff)) | ((uint64_t)(m_debugger_temp & 0x00ffffff) << 32));
+			set_timebase((get_timebase() & ~u64(0x00000000ffffffffU)) | ((uint64_t)(m_debugger_temp & 0x00ffffff) << 32));
 			break;
 
 		case PPC_DEC:
@@ -1223,7 +1223,7 @@ void ppc_device::device_reset()
 
 	/* Mark the cache dirty */
 	m_core->mode = 0;
-	m_cache_dirty = TRUE;
+	m_cache_dirty = true;
 }
 
 
@@ -1232,12 +1232,11 @@ void ppc_device::device_reset()
     CPU
 -------------------------------------------------*/
 
-offs_t ppc_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t ppc_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
-	extern offs_t ppc_dasm_one(char *buffer, uint32_t pc, uint32_t op);
 	uint32_t op = *(uint32_t *)oprom;
 	op = big_endianize_int32(op);
-	return ppc_dasm_one(buffer, pc, op);
+	return ppc_dasm_one(stream, pc, op);
 }
 
 
@@ -1465,7 +1464,7 @@ bool ppc_device::memory_translate(address_spacenum spacenum, int intention, offs
 {
 	/* only applies to the program address space */
 	if (spacenum != AS_PROGRAM)
-		return TRUE;
+		return true;
 
 	/* translation is successful if the internal routine returns 0 or 1 */
 	return (ppccom_translate_address_internal(intention, address) <= 1);
@@ -1764,10 +1763,10 @@ void ppc_device::ppccom_execute_mtspr()
 
 			/* timebase */
 			case SPR603_TBL_W:
-				set_timebase((get_timebase() & ~U64(0xffffffff00000000)) | m_core->param1);
+				set_timebase((get_timebase() & ~u64(0xffffffff00000000U)) | m_core->param1);
 				return;
 			case SPR603_TBU_W:
-				set_timebase((get_timebase() & ~U64(0x00000000ffffffff)) | ((uint64_t)m_core->param1 << 32));
+				set_timebase((get_timebase() & ~u64(0x00000000ffffffffU)) | ((uint64_t)m_core->param1 << 32));
 				return;
 		}
 	}
@@ -1803,9 +1802,9 @@ void ppc_device::ppccom_execute_mtspr()
 			case SPR4XX_TCR:
 				m_core->spr[SPR4XX_TCR] = m_core->param1 | (oldval & PPC4XX_TCR_WRC_MASK);
 				if ((oldval ^ m_core->spr[SPR4XX_TCR]) & PPC4XX_TCR_FIE)
-					ppc4xx_fit_callback(nullptr, FALSE);
+					ppc4xx_fit_callback(nullptr, false);
 				if ((oldval ^ m_core->spr[SPR4XX_TCR]) & PPC4XX_TCR_PIE)
-					ppc4xx_pit_callback(nullptr, FALSE);
+					ppc4xx_pit_callback(nullptr, false);
 				return;
 
 			/* timer status register */
@@ -1818,15 +1817,15 @@ void ppc_device::ppccom_execute_mtspr()
 			case SPR4XX_PIT:
 				m_core->spr[SPR4XX_PIT] = m_core->param1;
 				m_pit_reload = m_core->param1;
-				ppc4xx_pit_callback(nullptr, FALSE);
+				ppc4xx_pit_callback(nullptr, false);
 				return;
 
 			/* timebase */
 			case SPR4XX_TBLO:
-				set_timebase((get_timebase() & ~U64(0x00ffffff00000000)) | m_core->param1);
+				set_timebase((get_timebase() & ~u64(0x00ffffff00000000U)) | m_core->param1);
 				return;
 			case SPR4XX_TBHI:
-				set_timebase((get_timebase() & ~U64(0x00000000ffffffff)) | ((uint64_t)(m_core->param1 & 0x00ffffff) << 32));
+				set_timebase((get_timebase() & ~u64(0x00000000ffffffffU)) | ((uint64_t)(m_core->param1 & 0x00ffffff) << 32));
 				return;
 		}
 	}
@@ -2150,9 +2149,9 @@ void ppc_device::ppc4xx_set_irq_line(uint32_t bitmask, int state)
 	/* update the IRQ status */
 	m_core->irq_pending = ((m_dcr[DCR4XX_EXISR] & m_dcr[DCR4XX_EXIER]) != 0);
 	if ((m_core->spr[SPR4XX_TCR] & PPC4XX_TCR_FIE) && (m_core->spr[SPR4XX_TSR] & PPC4XX_TSR_FIS))
-		m_core->irq_pending = TRUE;
+		m_core->irq_pending = true;
 	if ((m_core->spr[SPR4XX_TCR] & PPC4XX_TCR_PIE) && (m_core->spr[SPR4XX_TSR] & PPC4XX_TSR_PIS))
-		m_core->irq_pending = TRUE;
+		m_core->irq_pending = true;
 }
 
 
@@ -2213,7 +2212,7 @@ void ppc_device::ppc4xx_dma_update_irq_states()
     to do so
 -------------------------------------------------*/
 
-int ppc_device::ppc4xx_dma_decrement_count(int dmachan)
+bool ppc_device::ppc4xx_dma_decrement_count(int dmachan)
 {
 	uint32_t *dmaregs = &m_dcr[8 * dmachan];
 
@@ -2222,7 +2221,7 @@ int ppc_device::ppc4xx_dma_decrement_count(int dmachan)
 
 	/* if non-zero, we keep going */
 	if ((dmaregs[DCR4XX_DMACT0] & 0xffff) != 0)
-		return FALSE;
+		return false;
 
 	// if chained mode
 	if (dmaregs[DCR4XX_DMACR0] & PPC4XX_DMACR_CH)
@@ -2261,9 +2260,9 @@ int ppc_device::ppc4xx_dma_decrement_count(int dmachan)
 	//  m_dcr[DCR4XX_DMASR] |= 1 << (27 - dmachan);
 		ppc4xx_dma_update_irq_states();
 
-		m_buffered_dma_timer[dmachan]->adjust(attotime::never, FALSE);
+		m_buffered_dma_timer[dmachan]->adjust(attotime::never, false);
 	}
-	return TRUE;
+	return true;
 }
 
 
@@ -2376,22 +2375,22 @@ TIMER_CALLBACK_MEMBER( ppc_device::ppc4xx_buffered_dma_callback )
     to send to a peripheral
 -------------------------------------------------*/
 
-int ppc_device::ppc4xx_dma_fetch_transmit_byte(int dmachan, uint8_t *byte)
+bool ppc_device::ppc4xx_dma_fetch_transmit_byte(int dmachan, uint8_t *byte)
 {
 	uint32_t *dmaregs = &m_dcr[8 * dmachan];
 
 	/* if the channel is not enabled, fail */
 	if (!(dmaregs[DCR4XX_DMACR0] & PPC4XX_DMACR_CE))
-		return FALSE;
+		return false;
 
 	/* if no transfers remaining, fail */
 	if ((dmaregs[DCR4XX_DMACT0] & 0xffff) == 0)
-		return FALSE;
+		return false;
 
 	/* fetch the data */
 	*byte = m_program->read_byte(dmaregs[DCR4XX_DMADA0]++);
 	ppc4xx_dma_decrement_count(dmachan);
-	return TRUE;
+	return true;
 }
 
 
@@ -2400,22 +2399,22 @@ int ppc_device::ppc4xx_dma_fetch_transmit_byte(int dmachan, uint8_t *byte)
     transmitted by a peripheral
 -------------------------------------------------*/
 
-int ppc_device::ppc4xx_dma_handle_receive_byte(int dmachan, uint8_t byte)
+bool ppc_device::ppc4xx_dma_handle_receive_byte(int dmachan, uint8_t byte)
 {
 	uint32_t *dmaregs = &m_dcr[8 * dmachan];
 
 	/* if the channel is not enabled, fail */
 	if (!(dmaregs[DCR4XX_DMACR0] & PPC4XX_DMACR_CE))
-		return FALSE;
+		return false;
 
 	/* if no transfers remaining, fail */
 	if ((dmaregs[DCR4XX_DMACT0] & 0xffff) == 0)
-		return FALSE;
+		return false;
 
 	/* store the data */
 	m_program->write_byte(dmaregs[DCR4XX_DMADA0]++, byte);
 	ppc4xx_dma_decrement_count(dmachan);
-	return TRUE;
+	return true;
 }
 
 
@@ -2551,12 +2550,12 @@ TIMER_CALLBACK_MEMBER( ppc_device::ppc4xx_fit_callback )
 		uint32_t timebase = get_timebase();
 		uint32_t interval = 0x200 << (4 * ((m_core->spr[SPR4XX_TCR] & PPC4XX_TCR_FP_MASK) >> 24));
 		uint32_t target = (timebase + interval) & ~(interval - 1);
-		m_fit_timer->adjust(cycles_to_attotime((target + 1 - timebase) / m_tb_divisor), TRUE);
+		m_fit_timer->adjust(cycles_to_attotime((target + 1 - timebase) / m_tb_divisor), true);
 	}
 
 	/* otherwise, turn ourself off */
 	else
-		m_fit_timer->adjust(attotime::never, FALSE);
+		m_fit_timer->adjust(attotime::never, false);
 }
 
 
@@ -2580,12 +2579,12 @@ TIMER_CALLBACK_MEMBER( ppc_device::ppc4xx_pit_callback )
 		uint32_t timebase = get_timebase();
 		uint32_t interval = m_pit_reload;
 		uint32_t target = timebase + interval;
-		m_pit_timer->adjust(cycles_to_attotime((target + 1 - timebase) / m_tb_divisor), TRUE);
+		m_pit_timer->adjust(cycles_to_attotime((target + 1 - timebase) / m_tb_divisor), true);
 	}
 
 	/* otherwise, turn ourself off */
 	else
-		m_pit_timer->adjust(attotime::never, FALSE);
+		m_pit_timer->adjust(attotime::never, false);
 }
 
 

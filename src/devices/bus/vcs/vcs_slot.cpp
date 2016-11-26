@@ -222,7 +222,7 @@ image_init_result vcs_cart_slot_device::call_load()
 		if (software_entry() != nullptr)
 		{
 			const char *pcb_name;
-			bool has_ram = get_software_region("ram") ? TRUE : FALSE;
+			bool has_ram = get_software_region("ram") ? true : false;
 			memcpy(ROM, get_software_region("rom"), len);
 
 			if ((pcb_name = get_feature("slot")) != nullptr)

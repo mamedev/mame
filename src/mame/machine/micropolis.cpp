@@ -163,7 +163,7 @@ void micropolis_device::write_sector()
 {
 #if 0
 	/* at this point, the disc is write enabled, and data
-	 * has been transfered into our buffer - now write it to
+	 * has been transferred into our buffer - now write it to
 	 * the disc image or to the real disc
 	 */
 

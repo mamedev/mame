@@ -289,22 +289,22 @@ osd_file::error osd_file::remove(std::string const &filename)
 //  osd_get_physical_drive_geometry
 //============================================================
 
-int osd_get_physical_drive_geometry(const char *filename, uint32_t *cylinders, uint32_t *heads, uint32_t *sectors, uint32_t *bps)
+bool osd_get_physical_drive_geometry(const char *filename, uint32_t *cylinders, uint32_t *heads, uint32_t *sectors, uint32_t *bps)
 {
 	DISK_GEOMETRY dg;
 	DWORD bytesRead;
 	HANDLE file;
 	int result;
 
-	// if it doesn't smell like a physical drive, just return FALSE
+	// if it doesn't smell like a physical drive, just return false
 	if (!is_path_to_physical_drive(filename))
-		return FALSE;
+		return false;
 
 	// do a create file on the drive
 	auto t_filename = osd::text::to_tstring(filename);
 	file = CreateFile(t_filename.c_str(), GENERIC_READ, FILE_SHARE_WRITE, nullptr, OPEN_EXISTING, FILE_FLAG_NO_BUFFERING, nullptr);
 	if (file == INVALID_HANDLE_VALUE)
-		return FALSE;
+		return false;
 
 	// device I/O control should return the geometry
 	result = DeviceIoControl(file, IOCTL_DISK_GET_DRIVE_GEOMETRY, nullptr, 0, &dg, sizeof(dg), &bytesRead, nullptr);
@@ -312,7 +312,7 @@ int osd_get_physical_drive_geometry(const char *filename, uint32_t *cylinders, u
 
 	// if that failed, return false
 	if (!result)
-		return FALSE;
+		return false;
 
 	// store the results
 	*cylinders = (uint32_t)dg.Cylinders.QuadPart;
@@ -326,7 +326,7 @@ int osd_get_physical_drive_geometry(const char *filename, uint32_t *cylinders, u
 		*heads /= 2;
 		*cylinders *= 2;
 	}
-	return TRUE;
+	return true;
 }
 
 

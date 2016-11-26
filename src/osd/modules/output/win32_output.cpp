@@ -67,7 +67,7 @@ class output_win32 : public osd_module, public output_module
 {
 public:
 	output_win32()
-		: osd_module(OSD_OUTPUT_PROVIDER, "windows"), output_module()
+		: osd_module(OSD_OUTPUT_PROVIDER, "windows"), output_module(), m_output_hwnd(nullptr), m_clientlist(nullptr)
 	{
 	}
 	virtual ~output_win32() { }
@@ -110,7 +110,7 @@ int output_win32::init(const osd_options &options)
 	assert(result == 0);
 	(void)result; // to silence gcc 4.6
 
-	// allocate message ids before creating the window 
+	// allocate message ids before creating the window
 	// since the window proc gets called during creation
 	om_mame_start = RegisterWindowMessage(OM_MAME_START);
 	assert(om_mame_start != 0);
@@ -175,7 +175,7 @@ void output_win32::exit()
 
 int output_win32::create_window_class(void)
 {
-	static uint8_t classes_created = FALSE;
+	static bool classes_created = false;
 
 	/* only do this once */
 	if (!classes_created)
@@ -192,7 +192,7 @@ int output_win32::create_window_class(void)
 		// register the class; fail if we can't
 		if (!RegisterClass(&wc))
 			return 1;
-		classes_created = TRUE;
+		classes_created = true;
 	}
 
 	return 0;
@@ -263,7 +263,7 @@ LRESULT output_win32::register_client(HWND hwnd, LPARAM id)
 LRESULT output_win32::unregister_client(HWND hwnd, LPARAM id)
 {
 	registered_client **client;
-	int found = FALSE;
+	bool found = false;
 
 	// find any matching IDs in the list and remove them
 	for (client = &m_clientlist; *client != nullptr; client = &(*client)->next)
@@ -272,7 +272,7 @@ LRESULT output_win32::unregister_client(HWND hwnd, LPARAM id)
 			registered_client *temp = *client;
 			*client = (*client)->next;
 			global_free(temp);
-			found = TRUE;
+			found = true;
 			break;
 		}
 

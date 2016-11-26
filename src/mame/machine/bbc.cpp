@@ -886,8 +886,8 @@ WRITE8_MEMBER(bbc_state::bbcb_via_system_write_portb)
 				{
 					/* VSP TMS 5220 */
 					m_b1_speech_read = 1;
-					//logerror("Speech read select TRUE\n");
-					if (m_tms) m_tms->rsq_w(TRUE);
+					//logerror("Speech read select true\n");
+					if (m_tms) m_tms->rsq_w(true);
 				}
 			}
 			break;
@@ -904,8 +904,8 @@ WRITE8_MEMBER(bbc_state::bbcb_via_system_write_portb)
 				{
 					/* VSP TMS 5220 */
 					m_b2_speech_write = 1;
-					//logerror("Speech write select TRUE\n");
-					if (m_tms) m_tms->wsq_w(TRUE);
+					//logerror("Speech write select true\n");
+					if (m_tms) m_tms->wsq_w(true);
 				}
 			}
 			break;
@@ -969,8 +969,8 @@ WRITE8_MEMBER(bbc_state::bbcb_via_system_write_portb)
 				{
 					/* VSP TMS 5220 */
 					m_b1_speech_read = 0;
-					//logerror("Speech read select FALSE\n");
-					if (m_tms) m_tms->rsq_w(FALSE);
+					//logerror("Speech read select false\n");
+					if (m_tms) m_tms->rsq_w(false);
 				}
 			}
 			break;
@@ -987,8 +987,8 @@ WRITE8_MEMBER(bbc_state::bbcb_via_system_write_portb)
 				{
 					/* VSP TMS 5220 */
 					m_b2_speech_write = 0;
-					//logerror("Speech write select FALSE\n");
-					if (m_tms) m_tms->wsq_w(FALSE);
+					//logerror("Speech write select false\n");
+					if (m_tms) m_tms->wsq_w(false);
 				}
 			}
 			break;
@@ -1788,7 +1788,7 @@ MACHINE_START_MEMBER(bbc_state, bbcbp)
 	m_machinetype = BPLUS;
 	m_mc6850_clock = 0;
 
-	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(bbc_state::bbcbp_direct_handler), this));
+	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(&bbc_state::bbcbp_direct_handler, this));
 
 	bbc_setup_banks(m_bank4, 16, 0, 0x3000);
 	m_bank4->configure_entries(16, 1, m_region_maincpu->base() + 0x8000, 0x3000);   // additional bank for paged ram
@@ -1816,7 +1816,7 @@ MACHINE_START_MEMBER(bbc_state, bbcm)
 	m_machinetype = MASTER;
 	m_mc6850_clock = 0;
 
-	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(bbc_state::bbcm_direct_handler), this));
+	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(&bbc_state::bbcm_direct_handler, this));
 
 	bbcm_setup_banks(m_bank4, 16, 0, 0x1000);
 	m_bank4->configure_entries(16, 1, m_region_maincpu->base() + 0x8000, 0x1000);   // additional bank for paged ram

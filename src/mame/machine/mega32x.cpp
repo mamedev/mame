@@ -1136,7 +1136,7 @@ WRITE16_MEMBER( sega_32x_device::_32x_common_vdp_regs_w )
 			{
 				m_32x_fb_swap = data & 1;
 
-				_32x_check_framebuffer_swap(TRUE);
+				_32x_check_framebuffer_swap(true);
 			}
 
 			break;
@@ -1856,7 +1856,7 @@ void sega_32x_device::device_reset()
 	// start in a reset state
 	m_sh2_are_running = 0;
 
-	m_32x_a1518a_reg = 0x00; // inital value
+	m_32x_a1518a_reg = 0x00; // initial value
 	m_32x_68k_a15104_reg = 0x00;
 
 	m_32x_autofill_length = 0;

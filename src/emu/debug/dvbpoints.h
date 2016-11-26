@@ -8,8 +8,8 @@
 
 ***************************************************************************/
 
-#ifndef __DVBPOINTS_H__
-#define __DVBPOINTS_H__
+#ifndef MAME_EMU_DEBUG_DVBPOINTS_H
+#define MAME_EMU_DEBUG_DVBPOINTS_H
 
 #include "debugvw.h"
 #include "debugcpu.h"
@@ -52,4 +52,4 @@ private:
 };
 
 
-#endif
+#endif // MAME_EMU_DEBUG_DVBPOINTS_H

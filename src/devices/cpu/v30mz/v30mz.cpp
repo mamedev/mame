@@ -1296,10 +1296,10 @@ void v30mz_cpu_device::execute_set_input( int inptnum, int state )
 }
 
 
-offs_t v30mz_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t v30mz_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( nec );
-	return CPU_DISASSEMBLE_NAME(nec)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(nec)(this, stream, pc, oprom, opram, options);
 }
 
 

@@ -700,7 +700,7 @@ void midway_ioasic_device::ioasic_reset()
 
 void midway_ioasic_device::update_ioasic_irq()
 {
-	uint16_t fifo_state = fifo_status_r(machine().driver_data()->generic_space(),0);
+	uint16_t fifo_state = fifo_status_r(machine().dummy_space(), 0);
 	uint16_t irqbits = 0x2000;
 	uint8_t new_state;
 
@@ -883,7 +883,7 @@ void midway_ioasic_device::output_w(uint32_t data)
 	uint8_t flag = (data >> 8) & 0x8;
 	uint8_t op = (data >> 8) & 0x7;
 	uint8_t arg = data & 0xFF;
-	
+
 	switch (op)
 	{
 		default:
@@ -896,7 +896,7 @@ void midway_ioasic_device::output_w(uint32_t data)
 				machine().output().set_value("wheel", arg); // wheel motor delta. signed byte.
 			}
 			break;
-			
+
 		case 0x4:
 			if (flag)
 			{
@@ -904,7 +904,7 @@ void midway_ioasic_device::output_w(uint32_t data)
 					machine().output().set_lamp_value(bit, (arg >> bit) & 0x1);
 			}
 			break;
-			
+
 		case 0x5:
 			if (flag)
 			{
@@ -1112,7 +1112,7 @@ WRITE32_MEMBER( midway_ioasic_device::write )
 			else
 				midway_serial_pic2_device::write(space, 0, newreg);
 			break;
-			
+
 		case IOASIC_PICIN:
 			output_w(data);
 			break;

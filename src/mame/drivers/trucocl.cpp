@@ -54,7 +54,7 @@ void trucocl_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in trucocl_state::device_timer");
+		assert_always(false, "Unknown id in trucocl_state::device_timer");
 	}
 }
 

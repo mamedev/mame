@@ -374,7 +374,7 @@ void renderer_ogl::load_gl_lib(running_machine &machine)
 
 		stemp = downcast<sdl_options &>(machine.options()).gl_lib();
 		if (stemp != nullptr && strcmp(stemp, OSDOPTVAL_AUTO) == 0)
-			stemp = nullptrnullptr;
+			stemp = nullptr;
 
 		if (SDL_GL_LoadLibrary(stemp) != 0) // Load library (default for e==nullptr
 		{
@@ -385,7 +385,7 @@ void renderer_ogl::load_gl_lib(running_machine &machine)
 #endif
 #endif
 #ifdef USE_DISPATCH_GL
-		gl_dispatch = (osd_gl_dispatch *) osd_malloc(sizeof(osd_gl_dispatch));
+		gl_dispatch = global_alloc(osd_gl_dispatch);
 #endif
 		s_dll_loaded = true;
 	}
@@ -557,9 +557,9 @@ int renderer_ogl::create()
 
 	// create renderer
 #if defined(OSD_WINDOWS)
-	m_gl_context = global_alloc(win_gl_context(win->platform_window<HWND>()));
+	m_gl_context = global_alloc(win_gl_context(std::static_pointer_cast<win_window_info>(win)->platform_window()));
 #else
-	m_gl_context = global_alloc(sdl_gl_context(win->platform_window<SDL_Window*>()));
+	m_gl_context = global_alloc(sdl_gl_context(std::static_pointer_cast<sdl_window_info>(win)->platform_window()));
 #endif
 	if  (m_gl_context->LastErrorMsg() != nullptr)
 	{
@@ -617,7 +617,7 @@ int renderer_ogl::xy_to_render_target(int x, int y, int *xt, int *yt)
 void renderer_ogl::destroy_all_textures()
 {
 	ogl_texture_info *texture = nullptr;
-	int lock=FALSE;
+	bool lock=false;
 	int i;
 
 	if ( !m_initialized )
@@ -634,7 +634,7 @@ void renderer_ogl::destroy_all_textures()
 
 	if(win->m_primlist)
 	{
-		lock=TRUE;
+		lock=true;
 		win->m_primlist->acquire_lock();
 	}
 
@@ -682,7 +682,7 @@ void renderer_ogl::destroy_all_textures()
 			{
 				free(texture->data);
 				texture->data=nullptr;
-				texture->data_own=FALSE;
+				texture->data_own=false;
 			}
 			global_free(texture);
 		}
@@ -707,9 +707,9 @@ void renderer_ogl::loadGLExtensions()
 {
 	static int _once = 1;
 
-	// usevbo=FALSE; // You may want to switch VBO and PBO off, by uncommenting this statement
-	// usepbo=FALSE; // You may want to switch PBO off, by uncommenting this statement
-	// useglsl=FALSE; // You may want to switch GLSL off, by uncommenting this statement
+	// usevbo=false; // You may want to switch VBO and PBO off, by uncommenting this statement
+	// usepbo=false; // You may want to switch PBO off, by uncommenting this statement
+	// useglsl=false; // You may want to switch GLSL off, by uncommenting this statement
 
 	if (! m_usevbo)
 	{
@@ -719,7 +719,7 @@ void renderer_ogl::loadGLExtensions()
 			{
 				osd_printf_warning("OpenGL: PBO not supported, no VBO support. (sdlmame error)\n");
 			}
-			m_usepbo=FALSE;
+			m_usepbo=false;
 		}
 		if(m_useglsl) // should never ever happen ;-)
 		{
@@ -727,7 +727,7 @@ void renderer_ogl::loadGLExtensions()
 			{
 				osd_printf_warning("OpenGL: GLSL not supported, no VBO support. (sdlmame error)\n");
 			}
-			m_useglsl=FALSE;
+			m_useglsl=false;
 		}
 	}
 
@@ -763,7 +763,7 @@ void renderer_ogl::loadGLExtensions()
 			!pfn_glBindBuffer || !pfn_glBufferData || !pfn_glBufferSubData
 		) )
 	{
-		m_usepbo=FALSE;
+		m_usepbo=false;
 		if (_once)
 		{
 			osd_printf_warning("OpenGL: VBO not supported, missing: ");
@@ -795,13 +795,13 @@ void renderer_ogl::loadGLExtensions()
 			{
 				osd_printf_warning("OpenGL: PBO not supported, no VBO support.\n");
 			}
-			m_usepbo=FALSE;
+			m_usepbo=false;
 		}
 	}
 
 	if ( m_usepbo && ( !pfn_glMapBuffer || !pfn_glUnmapBuffer ) )
 	{
-		m_usepbo=FALSE;
+		m_usepbo=false;
 		if (_once)
 		{
 			osd_printf_warning("OpenGL: PBO not supported, missing: ");
@@ -822,7 +822,7 @@ void renderer_ogl::loadGLExtensions()
 			!pfn_glGenFramebuffers || !pfn_glCheckFramebufferStatus || !pfn_glFramebufferTexture2D
 		))
 	{
-		m_usefbo=FALSE;
+		m_usefbo=false;
 		if (_once)
 		{
 			osd_printf_warning("OpenGL: FBO not supported, missing: ");
@@ -930,7 +930,7 @@ void renderer_ogl::loadGLExtensions()
 	if ( m_useglsl )
 	{
 		int i;
-		video_config.filter = FALSE;
+		video_config.filter = false;
 		glsl_shader_feature = GLSL_SHADER_FEAT_PLAIN;
 		m_glsl_program_num = 0;
 		m_glsl_program_mb2sc = 0;
@@ -1401,15 +1401,15 @@ static const char * texfmt_to_string[9] = {
 enum { SDL_TEXFORMAT_SRC_EQUALS_DEST, SDL_TEXFORMAT_SRC_HAS_PALETTE };
 
 static const GLint texture_copy_properties[9][2] = {
-	{ TRUE,  FALSE },   // SDL_TEXFORMAT_ARGB32
-	{ TRUE,  FALSE },   // SDL_TEXFORMAT_RGB32
-	{ TRUE,  TRUE  },   // SDL_TEXFORMAT_RGB32_PALETTED
-	{ FALSE, FALSE },   // SDL_TEXFORMAT_YUY16
-	{ FALSE, TRUE  },   // SDL_TEXFORMAT_YUY16_PALETTED
-	{ FALSE, TRUE  },   // SDL_TEXFORMAT_PALETTE16
-	{ TRUE,  FALSE },   // SDL_TEXFORMAT_RGB15
-	{ TRUE,  TRUE  },   // SDL_TEXFORMAT_RGB15_PALETTED
-	{ FALSE, TRUE  }    // SDL_TEXFORMAT_PALETTE16A
+	{ true,  false },   // SDL_TEXFORMAT_ARGB32
+	{ true,  false },   // SDL_TEXFORMAT_RGB32
+	{ true,  true  },   // SDL_TEXFORMAT_RGB32_PALETTED
+	{ false, false },   // SDL_TEXFORMAT_YUY16
+	{ false, true  },   // SDL_TEXFORMAT_YUY16_PALETTED
+	{ false, true  },   // SDL_TEXFORMAT_PALETTE16
+	{ true,  false },   // SDL_TEXFORMAT_RGB15
+	{ true,  true  },   // SDL_TEXFORMAT_RGB15_PALETTED
+	{ false, true  }    // SDL_TEXFORMAT_PALETTE16A
 };
 
 //============================================================
@@ -1420,13 +1420,13 @@ static const GLint texture_copy_properties[9][2] = {
 // glBufferData to push a nocopy texture to the GPU is slower than TexSubImage2D,
 // so don't use PBO here
 //
-// we also don't want to use PBO's in the case of nocopy==TRUE,
+// we also don't want to use PBO's in the case of nocopy==true,
 // since we now might have GLSL shaders - this decision simplifies out life ;-)
 //
 void renderer_ogl::texture_compute_type_subroutine(const render_texinfo *texsource, ogl_texture_info *texture, uint32_t flags)
 {
 	texture->type = TEXTURE_TYPE_NONE;
-	texture->nocopy = FALSE;
+	texture->nocopy = false;
 
 	if ( texture->type == TEXTURE_TYPE_NONE &&
 			!PRIMFLAG_GET_SCREENTEX(flags))
@@ -1453,7 +1453,7 @@ void renderer_ogl::texture_compute_type_subroutine(const render_texinfo *texsour
 			!texture->borderpix && !texsource->palette &&
 			texsource->rowpixels <= m_texture_max_width )
 	{
-		texture->nocopy = TRUE;
+		texture->nocopy = true;
 	}
 
 	if( texture->type == TEXTURE_TYPE_NONE &&
@@ -1552,7 +1552,7 @@ void renderer_ogl::texture_compute_size_type(const render_texinfo *texsource, og
 		((finalwidth > m_texture_max_width && finalwidth - 2 <= m_texture_max_width) ||
 			(finalheight > m_texture_max_height && finalheight - 2 <= m_texture_max_height)))
 	{
-		texture->borderpix = FALSE;
+		texture->borderpix = false;
 
 		texture_compute_type_subroutine(texsource, texture, flags);
 
@@ -1563,10 +1563,10 @@ void renderer_ogl::texture_compute_size_type(const render_texinfo *texsource, og
 	// if we're above the max width/height, do what?
 	if (finalwidth_create > m_texture_max_width || finalheight_create > m_texture_max_height)
 	{
-		static int printed = FALSE;
+		static int printed = false;
 		if (!printed)
 			osd_printf_warning("Texture too big! (wanted: %dx%d, max is %dx%d)\n", finalwidth_create, finalheight_create, m_texture_max_width, m_texture_max_height);
-		printed = TRUE;
+		printed = true;
 	}
 
 	if(!texture->nocopy || texture->type==TEXTURE_TYPE_DYNAMIC || texture->type==TEXTURE_TYPE_SHADER ||
@@ -2007,7 +2007,7 @@ ogl_texture_info *renderer_ogl::texture_create(const render_texinfo *texsource, 
 	if ( !texture->nocopy && texture->type!=TEXTURE_TYPE_DYNAMIC )
 	{
 		texture->data = (uint32_t *) malloc(texture->rawwidth* texture->rawheight * sizeof(uint32_t));
-		texture->data_own=TRUE;
+		texture->data_own=true;
 	}
 
 	// add us to the texture list

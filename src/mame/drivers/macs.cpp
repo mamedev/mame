@@ -508,9 +508,9 @@ static MACHINE_CONFIG_START( macs, macs_state )
 	MCFG_SCREEN_PALETTE("maincpu:palette")
 
 	MCFG_GENERIC_CARTSLOT_ADD_WITH_DEFAULT("slot_a", generic_plain_slot, "macs_cart", "rom")
-	MCFG_SET_IMAGE_LOADABLE(FALSE)
+	MCFG_SET_IMAGE_LOADABLE(false)
 	MCFG_GENERIC_CARTSLOT_ADD_WITH_DEFAULT("slot_b", generic_plain_slot, "macs_cart", "rom")
-	MCFG_SET_IMAGE_LOADABLE(FALSE)
+	MCFG_SET_IMAGE_LOADABLE(false)
 
 MACHINE_CONFIG_END
 

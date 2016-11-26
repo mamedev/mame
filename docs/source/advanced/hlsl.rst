@@ -262,14 +262,14 @@ Configuration Settings
 
 +-------------------------------+-------------------------+------------------------------------+
 | | bloom_lvl0_weight     1.00  | | Bloom level 0 weight  | | Full-size target.                |
-| | bloom_lvl1_weight     0.48  | | Bloom level 1 weight  | | 1/4 smaller that level 0 target  |
+| | bloom_lvl1_weight     0.64  | | Bloom level 1 weight  | | 1/4 smaller that level 0 target  |
 | | bloom_lvl2_weight     0.32  | | Bloom level 2 weight  | | 1/4 smaller that level 1 target  |
-| | bloom_lvl3_weight     0.24  | | Bloom level 3 weight  | | 1/4 smaller that level 2 target  |
-| | bloom_lvl4_weight     0.16  | | Bloom level 4 weight  | | 1/4 smaller that level 3 target  |
-| | bloom_lvl5_weight     0.24  | | Bloom level 5 weight  | | 1/4 smaller that level 4 target  |
-| | bloom_lvl6_weight     0.32  | | Bloom level 6 weight  | | 1/4 smaller that level 4 target  |
-| | bloom_lvl7_weight     0.48  | | Bloom level 7 weight  | | 1/4 smaller that level 5 target  |
-| | bloom_lvl8_weight     0.64  | | Bloom level 8 weight  | | 1/4 smaller that level 6 target  |
+| | bloom_lvl3_weight     0.16  | | Bloom level 3 weight  | | 1/4 smaller that level 2 target  |
+| | bloom_lvl4_weight     0.08  | | Bloom level 4 weight  | | 1/4 smaller that level 3 target  |
+| | bloom_lvl5_weight     0.06  | | Bloom level 5 weight  | | 1/4 smaller that level 4 target  |
+| | bloom_lvl6_weight     0.04  | | Bloom level 6 weight  | | 1/4 smaller that level 5 target  |
+| | bloom_lvl7_weight     0.02  | | Bloom level 7 weight  | | 1/4 smaller that level 6 target  |
+| | bloom_lvl8_weight     0.01  | | Bloom level 8 weight  | | 1/4 smaller that level 7 target  |
 +-------------------------------+-------------------------+------------------------------------+
 
 Vector Games
@@ -287,7 +287,6 @@ Open your INI file in your text editor of choice (e.g. Notepad), and make sure t
 
 In the Core Vector Options section:
 
-* **antialias 1**
 * **beam_width_min 1.0** (*Beam Width Minimum*)
 * **beam_width_max 1.0** (*Beam Width Maximum*)
 * **beam_intensity_weight 0.0** (*Beam Intensity Weight*)
@@ -295,6 +294,7 @@ In the Core Vector Options section:
 
 In the Vector Post-Processing Options section:
 
+* **vector_beam_smooth 0.0** (*Vector Beam Smooth Amount*)
 * **vector_length_scale 0.5** (*Vector Attenuation Maximum*)
 * **vector_length_ratio 0.5** (*Vector Attenuation Length Minimum*)
 
@@ -307,12 +307,12 @@ Suggested settings for vector games:
 
 +-------------------------------+-------------------------+------------------------------------+
 | | bloom_lvl0_weight     1.00  | | Bloom level 0 weight  | | Full-size target.                |
-| | bloom_lvl1_weight     0.64  | | Bloom level 1 weight  | | 1/4 smaller that level 0 target  |
+| | bloom_lvl1_weight     0.48  | | Bloom level 1 weight  | | 1/4 smaller that level 0 target  |
 | | bloom_lvl2_weight     0.32  | | Bloom level 2 weight  | | 1/4 smaller that level 1 target  |
-| | bloom_lvl3_weight     0.16  | | Bloom level 3 weight  | | 1/4 smaller that level 2 target  |
-| | bloom_lvl4_weight     0.24  | | Bloom level 4 weight  | | 1/4 smaller that level 3 target  |
-| | bloom_lvl5_weight     0.32  | | Bloom level 5 weight  | | 1/4 smaller that level 4 target  |
-| | bloom_lvl6_weight     0.48  | | Bloom level 6 weight  | | 1/4 smaller that level 4 target  |
-| | bloom_lvl7_weight     0.32  | | Bloom level 7 weight  | | 1/4 smaller that level 5 target  |
-| | bloom_lvl8_weight     0.24  | | Bloom level 8 weight  | | 1/4 smaller that level 6 target  |
+| | bloom_lvl3_weight     0.24  | | Bloom level 3 weight  | | 1/4 smaller that level 2 target  |
+| | bloom_lvl4_weight     0.16  | | Bloom level 4 weight  | | 1/4 smaller that level 3 target  |
+| | bloom_lvl5_weight     0.24  | | Bloom level 5 weight  | | 1/4 smaller that level 4 target  |
+| | bloom_lvl6_weight     0.32  | | Bloom level 6 weight  | | 1/4 smaller that level 5 target  |
+| | bloom_lvl7_weight     0.48  | | Bloom level 7 weight  | | 1/4 smaller that level 6 target  |
+| | bloom_lvl8_weight     0.64  | | Bloom level 8 weight  | | 1/4 smaller that level 7 target  |
 +-------------------------------+-------------------------+------------------------------------+

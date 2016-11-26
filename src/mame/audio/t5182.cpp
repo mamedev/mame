@@ -229,7 +229,7 @@ void t5182_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 			setirq_callback(ptr, param);
 			break;
 		default:
-			assert_always(FALSE, "Unknown id in t5182_device::device_timer");
+			assert_always(false, "Unknown id in t5182_device::device_timer");
 	}
 }
 

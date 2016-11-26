@@ -17,7 +17,7 @@
 
     tms99000 is the successor to both ti9900 and ti990/10.  It supports
     privileges, and has a coprocessor interface which enables the use of an
-    external memory mapper.  Additionnally,  it can use a Macrostore ROM to
+    external memory mapper.  Additionally,  it can use a Macrostore ROM to
     emulate additional instructions.
 
     **** This is WORK IN PROGRESS ****
@@ -140,10 +140,10 @@ uint32_t ti990_10_device::disasm_max_opcode_bytes() const
 }
 
 // TODO: check 9900dasm
-offs_t ti990_10_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t ti990_10_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( tms9900 );
-	return CPU_DISASSEMBLE_NAME(tms9900)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(tms9900)(this, stream, pc, oprom, opram, options);
 }
 
 const device_type TI990_10 = &device_creator<ti990_10_device>;

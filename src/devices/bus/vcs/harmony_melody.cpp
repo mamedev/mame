@@ -5,7 +5,7 @@
 Harmony / Melody cart for the A2600
 
 The Harmony cart is a 'modern' A2600 cartridge, used for homebrew etc. It has
-an SD slot and can be connected to a PC, roms can be transfered to it with
+an SD slot and can be connected to a PC, roms can be transferred to it with
 software on the PC side.  It uses an ARM7TDMI-S LPC2103 @ 70 Mhz to emulate
 the mapper behavior of other cartridges.  It has an SD card slot for storing
 game data.

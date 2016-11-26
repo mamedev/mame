@@ -73,13 +73,13 @@ void e05a30_device::device_reset()
 	m_cr_stepper = 0x00;
 
 	/* centronics init */
-	m_centronics_nack = FALSE;
-	m_centronics_busy = FALSE;
+	m_centronics_nack = false;
+	m_centronics_busy = false;
 	m_write_centronics_ack   (!m_centronics_nack);
 	m_write_centronics_busy  ( m_centronics_busy);
-	m_write_centronics_perror(FALSE);
-	m_write_centronics_fault (TRUE);
-	m_write_centronics_select(TRUE);
+	m_write_centronics_perror(false);
+	m_write_centronics_fault (true);
+	m_write_centronics_select(true);
 
 	m_write_ready(1);
 }
@@ -150,11 +150,11 @@ void e05a30_device::update_cr_stepper(uint8_t data)
 
 WRITE_LINE_MEMBER( e05a30_device::centronics_input_strobe )
 {
-	if (m_centronics_strobe == TRUE && state == FALSE && !m_centronics_busy) {
+	if (m_centronics_strobe == true && state == false && !m_centronics_busy) {
 		m_centronics_data_latch   = m_centronics_data;
 
-		m_centronics_data_latched = TRUE;
-		m_centronics_busy         = TRUE;
+		m_centronics_data_latched = true;
+		m_centronics_busy         = true;
 		m_write_centronics_busy(m_centronics_busy);
 	}
 
@@ -180,7 +180,7 @@ WRITE8_MEMBER( e05a30_device::write )
 		 * assume the busy signal cannot be reset while the data hasn't been
 		 * read. */
 		if (m_centronics_data_latched)
-			m_centronics_busy = TRUE;
+			m_centronics_busy = true;
 		m_write_centronics_ack (!m_centronics_nack);
 		m_write_centronics_busy( m_centronics_busy);
 		break;
@@ -206,7 +206,7 @@ READ8_MEMBER( e05a30_device::read )
 		break;
 	case 0x03:
 		result = m_centronics_data_latch;
-		m_centronics_data_latched = FALSE;
+		m_centronics_data_latched = false;
 		break;
 	case 0x04:
 		result |= m_centronics_busy << 0;

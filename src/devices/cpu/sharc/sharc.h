@@ -263,7 +263,7 @@ protected:
 	// device_disasm_interface overrides
 	virtual uint32_t disasm_min_opcode_bytes() const override { return 6; }
 	virtual uint32_t disasm_max_opcode_bytes() const override { return 6; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	direct_read_data *m_direct;
 
@@ -623,8 +623,8 @@ private:
 	void load_fast_iregs(drcuml_block *block);
 	void save_fast_iregs(drcuml_block *block);
 	void generate_sequence_instruction(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, bool last_delayslot);
-	void generate_update_cycles(drcuml_block *block, compiler_state *compiler, uml::parameter param, int allow_exception);
-	int generate_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	void generate_update_cycles(drcuml_block *block, compiler_state *compiler, uml::parameter param, bool allow_exception);
+	bool generate_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 	void generate_unimplemented_compute(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 	void generate_compute(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 	void generate_if_condition(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, int condition, int skip_label);

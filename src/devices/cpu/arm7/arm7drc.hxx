@@ -188,7 +188,7 @@ void arm7_cpu_device::arm7_drc_init()
 	}
 
 	/* mark the cache dirty so it is updated on next execute */
-	m_impstate.cache_dirty = TRUE;
+	m_impstate.cache_dirty = true;
 }
 
 
@@ -205,7 +205,7 @@ void arm7_cpu_device::execute_run_drc()
 	/* reset the cache if dirty */
 	if (m_impstate.cache_dirty)
 		code_flush_cache();
-	m_impstate.cache_dirty = FALSE;
+	m_impstate.cache_dirty = false;
 
 	/* execute */
 	do
@@ -307,12 +307,12 @@ void arm7_cpu_device::code_flush_cache()
 		//static_generate_tlb_mismatch();
 
 		/* add subroutines for memory accesses */
-		static_generate_memory_accessor(1, FALSE, FALSE, "read8",       &m_impstate.read8);
-		static_generate_memory_accessor(1, TRUE,  FALSE, "write8",      &m_impstate.write8);
-		static_generate_memory_accessor(2, FALSE, FALSE, "read16",      &m_impstate.read16);
-		static_generate_memory_accessor(2, TRUE,  FALSE, "write16",     &m_impstate.write16);
-		static_generate_memory_accessor(4, FALSE, FALSE, "read32",      &m_impstate.read32);
-		static_generate_memory_accessor(4, TRUE,  FALSE, "write32",     &m_impstate.write32);
+		static_generate_memory_accessor(1, false, false, "read8",       &m_impstate.read8);
+		static_generate_memory_accessor(1, true,  false, "write8",      &m_impstate.write8);
+		static_generate_memory_accessor(2, false, false, "read16",      &m_impstate.read16);
+		static_generate_memory_accessor(2, true,  false, "write16",     &m_impstate.write16);
+		static_generate_memory_accessor(4, false, false, "read32",      &m_impstate.read32);
+		static_generate_memory_accessor(4, true,  false, "write32",     &m_impstate.write32);
 	}
 	catch (drcuml_block::abort_compilation &)
 	{
@@ -331,7 +331,7 @@ void arm7_cpu_device::code_compile_block(uint8_t mode, offs_t pc)
 	drcuml_state *drcuml = m_impstate.drcuml;
 	compiler_state compiler = { 0 };
 	const opcode_desc *seqlast;
-	int override = FALSE;
+	bool override = false;
 
 	g_profiler.start(PROFILER_DRC_COMPILE);
 
@@ -374,7 +374,7 @@ void arm7_cpu_device::code_compile_block(uint8_t mode, offs_t pc)
 				/* are recompiling due to being out of sync and allow future overrides */
 				else if (seqhead == desclist)
 				{
-					override = TRUE;
+					override = true;
 					UML_HASH(block, mode, seqhead->pc);                                     // hash    mode,pc
 				}
 
@@ -1169,7 +1169,7 @@ void arm7_cpu_device::generate_update_cycles(drcuml_block *block, compiler_state
 	{
 		uml::code_label skip;
 
-		compiler->checkints = FALSE;
+		compiler->checkints = false;
 		UML_CALLH(block, *m_impstate.check_irq);
 	}
 
@@ -1362,7 +1362,7 @@ void arm7_cpu_device::saturate_qbit_overflow(drcuml_block *block)
 	UML_DCMP(block, uml::I0, 0x000000007fffffffL);
 	UML_MOVc(block, uml::COND_G, uml::I1, Q_MASK);
 	UML_MOVc(block, uml::COND_G, uml::I0, 0x7fffffff);
-	UML_DCMP(block, uml::I0, U64(0xffffffff80000000));
+	UML_DCMP(block, uml::I0, 0xffffffff80000000ULL);
 	UML_MOVc(block, uml::COND_L, uml::I1, Q_MASK);
 	UML_MOVc(block, uml::COND_L, uml::I0, 0x80000000);
 	UML_OR(block, DRC_CPSR, DRC_CPSR, uml::I1);
@@ -1685,7 +1685,7 @@ bool arm7_cpu_device::drcarm7ops_f(drcuml_block *block, compiler_state *compiler
     opcode
 -------------------------------------------------*/
 
-int arm7_cpu_device::generate_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
+bool arm7_cpu_device::generate_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc)
 {
 	//int in_delay_slot = ((desc->flags & OPFLAG_IN_DELAY_SLOT) != 0);
 	uint32_t op = desc->opptr.l[0];
@@ -1711,7 +1711,7 @@ int arm7_cpu_device::generate_opcode(drcuml_block *block, compiler_state *compil
 	if (T_IS_SET(GET_CPSR))
 	{
 		//UML_CALLH(block, *m_impstate.drcthumb[(op & 0xffc0) >> 6]);          // callh    drcthumb[op] // TODO FIXME
-		return TRUE;
+		return true;
 	}
 
 	switch (op >> INSN_COND_SHIFT)
@@ -1825,10 +1825,10 @@ int arm7_cpu_device::generate_opcode(drcuml_block *block, compiler_state *compil
 		/* ----- sub-groups ----- */
 
 		case 0x00:  /* SPECIAL - MIPS I */
-			return TRUE;
+			return true;
 
 		// TODO: FINISH ME
 	}
 
-	return FALSE;
+	return false;
 }

@@ -1016,7 +1016,7 @@ uint32_t taitof2_state::screen_update_taitof2(screen_device &screen, bitmap_ind1
 
 uint32_t taitof2_state::screen_update_taitof2_pri(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	address_space &space = machine().driver_data()->generic_space();
+	address_space &space = machine().dummy_space();
 	int layer[3];
 
 	taitof2_handle_sprite_buffering();
@@ -1061,7 +1061,7 @@ void taitof2_state::draw_roz_layer( screen_device &screen, bitmap_ind16 &bitmap,
 
 uint32_t taitof2_state::screen_update_taitof2_pri_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	address_space &space = machine().driver_data()->generic_space();
+	address_space &space = machine().dummy_space();
 	int tilepri[3];
 	int rozpri;
 	int layer[3];
@@ -1130,7 +1130,7 @@ uint32_t taitof2_state::screen_update_taitof2_pri_roz(screen_device &screen, bit
 /* Thunderfox */
 uint32_t taitof2_state::screen_update_taitof2_thundfox(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	address_space &space = machine().driver_data()->generic_space();
+	address_space &space = machine().dummy_space();
 	int tilepri[2][3];
 	int spritepri[4];
 	int layer[2][3];
@@ -1267,7 +1267,7 @@ and it changes these (and the sprite pri settings) a lot.
 
 uint32_t taitof2_state::screen_update_taitof2_metalb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	address_space &space = machine().driver_data()->generic_space();
+	address_space &space = machine().dummy_space();
 	uint8_t layer[5], invlayer[4];
 	uint16_t priority;
 
@@ -1318,7 +1318,7 @@ uint32_t taitof2_state::screen_update_taitof2_metalb(screen_device &screen, bitm
 /* Deadconx, Footchmp */
 uint32_t taitof2_state::screen_update_taitof2_deadconx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	address_space &space = machine().driver_data()->generic_space();
+	address_space &space = machine().dummy_space();
 	uint8_t layer[5];
 	uint8_t tilepri[5];
 	uint8_t spritepri[4];

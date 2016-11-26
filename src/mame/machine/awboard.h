@@ -57,7 +57,7 @@ private:
 	static const int permutation_table[4][16];
 	static const sbox_set sboxes_table[4];
 	static uint16_t decrypt(uint16_t cipherText, uint32_t address, const uint32_t key);
-	uint16_t decrypt16(uint32_t address) { return decrypt(m_region->u16(address), address, rombd_key); }
+	uint16_t decrypt16(uint32_t address) { return decrypt(m_region->as_u16(address), address, rombd_key); }
 
 	void set_key();
 	void recalc_dma_offset(int mode);

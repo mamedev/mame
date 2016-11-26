@@ -211,10 +211,10 @@ private:
 	int     m_keyboard_column;
 	int     m_check_alphalock;
 
-	// True if SGCPU DSR is enabled
+	// true if SGCPU DSR is enabled
 	bool m_internal_dsr;
 
-	// True if SGCPU rom6 is enabled
+	// true if SGCPU rom6 is enabled
 	bool m_internal_rom6;
 
 	// Offset to the ROM6 bank.
@@ -223,10 +223,10 @@ private:
 	// Wait states
 	int m_waitcount;
 
-	// TRUE when mapper is active
+	// true when mapper is active
 	bool m_map_mode;
 
-	// TRUE when mapper registers are accessible
+	// true when mapper registers are accessible
 	bool m_access_mapper;
 
 	// Value on address bus (after being set by setaddress)
@@ -563,7 +563,7 @@ WRITE16_MEMBER( ti99_4p_state::memwrite )
 		if (space.debugger_access()) { debugger_write(space, offset, data); return; }
 
 		// Writing the even address now (addr)
-		// The databus multplexer puts the even value into the latch and outputs the odd value now.
+		// The databus multiplexer puts the even value into the latch and outputs the odd value now.
 		m_latch = (data >> 8) & 0xff;
 
 		// write odd byte
@@ -1050,4 +1050,4 @@ ROM_START(ti99_4p)
 ROM_END
 
 /*    YEAR  NAME      PARENT   COMPAT   MACHINE      INPUT    INIT      COMPANY     FULLNAME */
-COMP( 1996, ti99_4p,  0,       0,       ti99_4p_60hz, ti99_4p, driver_device, 0, "System-99 User Group",       "SGCPU (aka TI-99/4P)" , 0 )
+COMP( 1996, ti99_4p,  0,       0,       ti99_4p_60hz, ti99_4p, driver_device, 0, "System-99 User Group",       "SGCPU (aka TI-99/4P)" , MACHINE_SUPPORTS_SAVE )

@@ -197,7 +197,7 @@ void groundfx_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,co
 
 uint32_t groundfx_state::screen_update_groundfx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	address_space &space = machine().driver_data()->generic_space();
+	address_space &space = machine().dummy_space();
 	uint8_t layer[5];
 	uint8_t scclayer[3];
 	uint16_t priority;

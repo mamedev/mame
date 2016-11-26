@@ -335,7 +335,7 @@ void tms5110_device::perform_dummy_read()
 	{
 		int data = new_int_read();
 		if (DEBUG_5110) logerror("TMS5110 performing dummy read; value read = %1i\n", data & 1);
-		m_schedule_dummy_read = FALSE;
+		m_schedule_dummy_read = false;
 	}
 }
 
@@ -814,10 +814,10 @@ void tms5110_device::PDC_set(int data)
 #ifdef DEBUG_COMMAND_DUMP
 				fprintf(stderr,"Loading address nybble %02x to VSMs\n", m_CTL_pins);
 #endif
-				m_next_is_address = FALSE;
+				m_next_is_address = false;
 				m_address = m_address | ((m_CTL_pins & 0x0F)<<m_addr_bit);
 				m_addr_bit = (m_addr_bit + 4) % 12;
-				m_schedule_dummy_read = TRUE;
+				m_schedule_dummy_read = true;
 				new_int_write_addr(m_CTL_pins & 0x0F);
 			}
 			else
@@ -839,7 +839,7 @@ void tms5110_device::PDC_set(int data)
 #ifdef DEBUG_COMMAND_DUMP
 					fprintf(stderr,"LOAD ADDRESS\n");
 #endif
-					m_next_is_address = TRUE;
+					m_next_is_address = true;
 					break;
 
 				case TMS5110_CMD_OUTPUT:
@@ -918,7 +918,7 @@ void tms5110_device::PDC_set(int data)
 					new_int_write(0,0,0,0);
 					new_int_write(1,0,0,0);
 					new_int_write(0,0,0,0);
-					m_schedule_dummy_read = FALSE;
+					m_schedule_dummy_read = false;
 					break;
 
 				case TMS5110_CMD_TEST_TALK:
@@ -1187,16 +1187,16 @@ void tms5110_device::device_reset()
 	if (m_table.found())
 	{
 		/* legacy interface */
-		m_schedule_dummy_read = TRUE;
+		m_schedule_dummy_read = true;
 	}
 	else
 	{
 		/* no dummy read! This makes bagman and ad2083 speech fail
 		 * with the new cycle and transition exact interfaces
 		 */
-		m_schedule_dummy_read = FALSE;
+		m_schedule_dummy_read = false;
 	}
-	m_next_is_address = FALSE;
+	m_next_is_address = false;
 	m_address = 0;
 	m_addr_bit = 0;
 }
@@ -1297,7 +1297,7 @@ READ8_MEMBER( tms5110_device::romclk_hack_r )
 	/* create and start timer if necessary */
 	if (!m_romclk_hack_timer_started)
 	{
-		m_romclk_hack_timer_started = TRUE;
+		m_romclk_hack_timer_started = true;
 		m_romclk_hack_timer->adjust(attotime::from_hz(clock() / 40), 0, attotime::from_hz(clock() / 40));
 	}
 	return m_romclk_hack_state;

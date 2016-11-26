@@ -5,10 +5,6 @@
 
 #include "bgfx_p.h"
 
-#if BGFX_CONFIG_RENDERER_VULKAN
-#	include "../../bgfx-ext/src/renderer_vk1.cpp"
-#else
-
 namespace bgfx { namespace vk
 {
 	RendererContextI* rendererCreate()
@@ -20,5 +16,3 @@ namespace bgfx { namespace vk
 	{
 	}
 } /* namespace vk */ } // namespace bgfx
-
-#endif // BGFX_CONFIG_RENDERER_VULKAN

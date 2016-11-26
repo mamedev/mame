@@ -488,7 +488,7 @@ void rallyx_state::locomotn_draw_sprites( screen_device &screen, bitmap_ind16 &b
 	}
 }
 
-void rallyx_state::rallyx_draw_bullets( bitmap_ind16 &bitmap, const rectangle &cliprect, int transpen )
+void rallyx_state::rallyx_draw_bullets( bitmap_ind16 &bitmap, const rectangle &cliprect, bool transpen )
 {
 	int offs;
 
@@ -518,7 +518,7 @@ void rallyx_state::rallyx_draw_bullets( bitmap_ind16 &bitmap, const rectangle &c
 	}
 }
 
-void rallyx_state::jungler_draw_bullets( bitmap_ind16 &bitmap, const rectangle &cliprect, int transpen )
+void rallyx_state::jungler_draw_bullets( bitmap_ind16 &bitmap, const rectangle &cliprect, bool transpen )
 {
 	int offs;
 
@@ -546,7 +546,7 @@ void rallyx_state::jungler_draw_bullets( bitmap_ind16 &bitmap, const rectangle &
 	}
 }
 
-void rallyx_state::locomotn_draw_bullets( bitmap_ind16 &bitmap, const rectangle &cliprect, int transpen )
+void rallyx_state::locomotn_draw_bullets( bitmap_ind16 &bitmap, const rectangle &cliprect, bool transpen )
 {
 	int offs;
 
@@ -608,9 +608,9 @@ uint32_t rallyx_state::screen_update_rallyx(screen_device &screen, bitmap_ind16 
 	m_bg_tilemap->draw(screen, bitmap, bg_clip, 1, 1);
 	m_fg_tilemap->draw(screen, bitmap, fg_clip, 1, 1);
 
-	rallyx_draw_bullets(bitmap, cliprect, TRUE);
+	rallyx_draw_bullets(bitmap, cliprect, true);
 	rallyx_draw_sprites(screen, bitmap, cliprect);
-	rallyx_draw_bullets(bitmap, cliprect, FALSE);
+	rallyx_draw_bullets(bitmap, cliprect, false);
 
 	return 0;
 }
@@ -642,9 +642,9 @@ uint32_t rallyx_state::screen_update_jungler(screen_device &screen, bitmap_ind16
 	m_bg_tilemap->draw(screen, bitmap, bg_clip, 1, 0);
 	m_fg_tilemap->draw(screen, bitmap, fg_clip, 1, 0);
 
-	jungler_draw_bullets(bitmap, cliprect, TRUE);
+	jungler_draw_bullets(bitmap, cliprect, true);
 	rallyx_draw_sprites(screen, bitmap, cliprect);
-	jungler_draw_bullets(bitmap, cliprect, FALSE);
+	jungler_draw_bullets(bitmap, cliprect, false);
 
 	if (m_stars_enable)
 		draw_stars(bitmap, cliprect);
@@ -687,9 +687,9 @@ uint32_t rallyx_state::screen_update_locomotn(screen_device &screen, bitmap_ind1
 	m_bg_tilemap->draw(screen, bitmap, bg_clip, 1, 1);
 	m_fg_tilemap->draw(screen, bitmap, fg_clip, 1, 1);
 
-	locomotn_draw_bullets(bitmap, cliprect, TRUE);
+	locomotn_draw_bullets(bitmap, cliprect, true);
 	locomotn_draw_sprites(screen, bitmap, cliprect);
-	locomotn_draw_bullets(bitmap, cliprect, FALSE);
+	locomotn_draw_bullets(bitmap, cliprect, false);
 
 	if (m_stars_enable)
 		draw_stars(bitmap, cliprect);

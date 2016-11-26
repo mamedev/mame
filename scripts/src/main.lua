@@ -48,6 +48,10 @@ end
 			"ppapi_gles2",
 			"pthread",
 		}
+
+	configuration { "winstore*" }
+		kind "WindowedApp"
+
 	configuration {  }
 
 	addprojectflags()
@@ -68,6 +72,36 @@ end
 	flags {
 		"Unicode",
 	}
+
+	configuration { "winstore*" }
+		-- Windows Required Files
+		files {
+			-- Manifest file
+			MAME_DIR .. "scripts/resources/uwp/Package.appxmanifest",
+		}
+
+	configuration { "winstore*" }
+		files {
+			MAME_DIR .. "scripts/resources/uwp/assets/*.png"
+		}
+		configuration "**/scripts/resources/uwp/assets/*.png"
+			flags { "DeploymentContent" }
+	
+	-- Effects and Shaders
+	configuration { "winstore*" }
+		files {
+			MAME_DIR .. "artwork/*",
+			MAME_DIR .. "artwork/**/*",
+			MAME_DIR .. "bgfx/*",
+			MAME_DIR .. "bgfx/**/*",
+			MAME_DIR .. "hash/*",
+			MAME_DIR .. "language/*",
+			MAME_DIR .. "language/**/*",
+			MAME_DIR .. "plugins/*",
+			MAME_DIR .. "plugins/**/*",
+		}
+		configuration "**/*"
+			flags { "DeploymentContent" }
 
 	configuration { "x64", "Release" }
 		targetsuffix "64"
@@ -128,13 +162,18 @@ end
 				.. " --post-js " .. _MAKE.esc(MAME_DIR) .. "scripts/resources/emscripten/emscripten_post.js"
 				.. " --embed-file " .. _MAKE.esc(MAME_DIR) .. "bgfx/chains@bgfx/chains"
 				.. " --embed-file " .. _MAKE.esc(MAME_DIR) .. "bgfx/effects@bgfx/effects"
-				.. " --embed-file " .. _MAKE.esc(MAME_DIR) .. "bgfx/shaders/gles@bgfx/shaders/gles"
+				.. " --embed-file " .. _MAKE.esc(MAME_DIR) .. "bgfx/shaders/essl@bgfx/shaders/essl"
 				.. " --embed-file " .. _MAKE.esc(MAME_DIR) .. "artwork/slot-mask.png@artwork/slot-mask.png"
 
 			if _OPTIONS["SYMBOLS"]~=nil and _OPTIONS["SYMBOLS"]~="0" then
 				emccopts = emccopts
 					.. " -g" .. _OPTIONS["SYMLEVEL"]
 					.. " -s DEMANGLE_SUPPORT=1"
+			end
+
+			if _OPTIONS["WEBASSEMBLY"] then
+				emccopts = emccopts
+					.. " -s BINARYEN=1"
 			end
 
 			if _OPTIONS["ARCHOPTS"] then
@@ -194,8 +233,7 @@ end
 	}
 if (STANDALONE~=true) then
 	links {
-		"frontend",
-		"linenoise-ng",
+		"frontend",	
 	}
 end
 if (MACHINES["NETLIST"]~=null) then
@@ -229,10 +267,16 @@ if (STANDALONE~=true) then
 		ext_lib("lua"),
 		"lualibs",
 	}
+if (_OPTIONS["osd"] ~= "uwp") then
+	links {
+		"linenoise-ng",
+	}
+end
 end
 	links {
 		ext_lib("zlib"),
 		ext_lib("flac"),
+		ext_lib("sqlite3"),
 	}
 
 	if _OPTIONS["NO_USE_MIDI"]~="1" then

@@ -13,7 +13,7 @@
     object with an appropriate stream output operator can be used as
     a format argument with the %s conversion.
 
-    Since the funcitons are implemented using C++ iostream, some
+    Since the functions are implemented using C++ iostream, some
     behaviour more closely resembles iostream output operator behaviour
     than printf behaviour.  You are also exposed to bugs in your C++
     iostream implementation (e.g. hexadecimal scientific format doesn't
@@ -28,7 +28,7 @@
 
     Position specifiers for arguments (%123$), field width (*456$) and
     precision (.*789$) are supported.  Mixing explicit and implied
-    positions for arugments/widths/precisions is discouraged, although
+    positions for arguments/widths/precisions is discouraged, although
     it does produce deterministic behaviour.
 
     The following format flags are recognised:
@@ -79,13 +79,13 @@
     - d/i: signed decimal for integer/char/bool types
     - u:   unsigned decimal for integer/char/bool types
     - o:   unsigned octal for integer/char/bool types
-    - x/X: lower/upppercase unsigned hexadecimal for integer/char/bool
+    - x/X: lower/uppercase unsigned hexadecimal for integer/char/bool
            types or scientific hexadecimal for floating-point types
     - e/E: lower/uppercase scientific decimal for floating-point types
     - f/F: lower/uppercase fixed-point decimal for floating-point types
     - g/G: default stream output format for floating-point types (may
            differ from printf behaviour)
-    - a/A: lower/upppercase scientific hexadecimal for floating-point
+    - a/A: lower/uppercase scientific hexadecimal for floating-point
            types or hexadecimal for integer types
     - c/C: cast integer types to stream's character type, no automatic
            widening or narrowing
@@ -139,7 +139,7 @@
       versa.
     - Precision ignored for d/i/u/o/x/X conversions (should set minimum
       digits to print).
-    - Precisoin for s/S conversion is only honoured for string-like
+    - Precision for s/S conversion is only honoured for string-like
       types (output character pointer/array and std::basic_string).
     - If the output character type is not char, signed char or unsgined
       char, printing the a value of this type with d/i/u/o/x/X

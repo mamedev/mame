@@ -14,7 +14,7 @@ ToDo:
  Some sprite flickers on attract mode
  totmejan: Are the "dots" behind the girls in attract mode correct?
 
-PCB Layout
+Tottemo E Jong PCB Layout
 
 |---------------------------------------------------------------|
 |LA4460  YM3812  M6295  E-JAN.U0911 6116        Z80A 7.15909MHz |
@@ -31,7 +31,7 @@ PCB Layout
 |                           TC110G21AF                          |
 |           82S135.U083                 PAL   6264              |
 |                                                               |
-|  DSW     DSW                                                  |
+|  DSW     DSW     SEI0220BP                                    |
 |                                              62256     62256  |
 |  E-JAN.U078                PAL                                |
 |                                                               |
@@ -48,6 +48,8 @@ Notes:
       M6295 clock - 1.000MHz [16/16], Pin 7 HIGH
       VSync - 60Hz
       HSync - 15.38kHz
+
+Good E Jong has SEI0211 instead of SEI0210, but PCB layout is otherwise identical.
 
 
 Diagnostic Menu:
@@ -72,6 +74,7 @@ Secret menu hack [totmejan only] (I couldn't find official way to enter, so it's
 #include "cpu/nec/nec.h"
 #include "audio/seibu.h"
 #include "sound/3812intf.h"
+#include "sound/okim6295.h"
 #include "video/seibu_crtc.h"
 
 
@@ -632,7 +635,8 @@ static MACHINE_CONFIG_START( goodejan, goodejan_state )
 	MCFG_CPU_IO_MAP(goodejan_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", goodejan_state, irq)
 
-	SEIBU_SOUND_SYSTEM_CPU(GOODEJAN_MHZ1/2)
+	MCFG_CPU_ADD("audiocpu", Z80, GOODEJAN_MHZ1/2)
+	MCFG_CPU_PROGRAM_MAP(seibu_sound_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -652,7 +656,19 @@ static MACHINE_CONFIG_START( goodejan, goodejan_state )
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	/* sound hardware */
-	SEIBU_SOUND_SYSTEM_YM3812_INTERFACE(GOODEJAN_MHZ1/2,GOODEJAN_MHZ2/16)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("ymsnd", YM3812, GOODEJAN_MHZ1/2)
+	MCFG_YM3812_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_OKIM6295_ADD("oki", GOODEJAN_MHZ2/16, OKIM6295_PIN7_LOW)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+
+	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
+	MCFG_SEIBU_SOUND_CPU("audiocpu")
+	MCFG_SEIBU_SOUND_YM_READ_CB(DEVREAD8("ymsnd", ym3812_device, read))
+	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym3812_device, write))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( totmejan, goodejan )

@@ -72,7 +72,6 @@ inline int tms57002_device::sfma(uint32_t st1)
 
 void tms57002_device::decode_error(uint32_t opcode)
 {
-	char buf[256];
 	uint8_t opr[3];
 	if(unsupported_inst_warning)
 		return;
@@ -82,8 +81,9 @@ void tms57002_device::decode_error(uint32_t opcode)
 	opr[1] = opcode >> 8;
 	opr[2] = opcode >> 16;
 
-	disasm_disassemble(buf, pc, opr, opr, 0);
-	popmessage("tms57002: %s - Contact Mamedev", buf);
+	std::stringstream stream;
+	disasm_disassemble(stream, pc, opr, opr, 0);
+	popmessage("tms57002: %s - Contact Mamedev", stream.str());
 }
 
 void tms57002_device::decode_cat1(uint32_t opcode, unsigned short *op, cstate *cs)

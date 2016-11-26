@@ -41,7 +41,7 @@ namespace sol {
 		template<typename T, typename>
 		struct getter {
 			static T& get(lua_State* L, int index, record& tracking) {
-				return getter<T&>{}.get(L, index, tracking);
+				return getter<sol::detail::as_value_tag<T>>{}.get(L, index, tracking);
 			}
 		};
 
@@ -437,7 +437,7 @@ namespace sol {
 		};
 
 		template<typename T>
-		struct getter<T*> {
+		struct getter<detail::as_value_tag<T>> {
 			static T* get_no_nil(lua_State* L, int index, record& tracking) {
 				tracking.use(1);
 				void** pudata = static_cast<void**>(lua_touserdata(L, index));
@@ -456,28 +456,49 @@ namespace sol {
 				T* obj = static_cast<T*>(udata);
 				return obj;
 			}
+			
+			static T& get(lua_State* L, int index, record& tracking) {
+				return *get_no_nil(L, index, tracking);
+			}
+		};
 
+		template<typename T>
+		struct getter<detail::as_pointer_tag<T>> {
 			static T* get(lua_State* L, int index, record& tracking) {
 				type t = type_of(L, index);
 				if (t == type::nil) {
 					tracking.use(1);
 					return nullptr;
 				}
-				return get_no_nil(L, index, tracking);
+				return getter<detail::as_value_tag<T>>::get_no_nil(L, index, tracking);
 			}
 		};
 
 		template<typename T>
 		struct getter<non_null<T*>> {
 			static T* get(lua_State* L, int index, record& tracking) {
-				return getter<T*>::get_no_nil(L, index, tracking);
+				return getter<detail::as_value_tag<T>>::get_no_nil(L, index, tracking);
 			}
 		};
 
 		template<typename T>
 		struct getter<T&> {
 			static T& get(lua_State* L, int index, record& tracking) {
-				return *getter<T*>::get_no_nil(L, index, tracking);
+				return getter<detail::as_value_tag<T>>::get(L, index, tracking);
+			}
+		};
+
+		template<typename T>
+		struct getter<std::reference_wrapper<T>> {
+			static T& get(lua_State* L, int index, record& tracking) {
+				return getter<T&>{}.get(L, index, tracking);
+			}
+		};
+
+		template<typename T>
+		struct getter<T*> {
+			static T* get(lua_State* L, int index, record& tracking) {
+				return getter<detail::as_pointer_tag<T>>::get(L, index, tracking);
 			}
 		};
 
@@ -492,13 +513,6 @@ namespace sol {
 				detail::special_destruct_func* fx = static_cast<detail::special_destruct_func*>(static_cast<void*>(pref + 1));
 				Real* mem = static_cast<Real*>(static_cast<void*>(fx + 1));
 				return *mem;
-			}
-		};
-
-		template<typename T>
-		struct getter<std::reference_wrapper<T>> {
-			static T& get(lua_State* L, int index, record& tracking) {
-				return getter<T&>{}.get(L, index, tracking);
 			}
 		};
 

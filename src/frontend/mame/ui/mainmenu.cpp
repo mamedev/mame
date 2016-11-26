@@ -49,7 +49,7 @@ menu_main::menu_main(mame_ui_manager &mui, render_container &container) : menu(m
 {
 }
 
-void menu_main::populate()
+void menu_main::populate(float &customtop, float &custombottom)
 {
 	/* add input menu items */
 	item_append(_("Input (general)"), "", 0, (void *)INPUT_GROUPS);
@@ -130,7 +130,7 @@ void menu_main::populate()
 		item_append(_("Plugin Options"), "", 0, (void *)PLUGINS);
 
 	// add dats menu
-	if (mame_machine_manager::instance()->lua()->call_plugin("", "data_list"))
+	if (mame_machine_manager::instance()->lua()->call_plugin_check<const char *>("data_list", "", true))
 		item_append(_("External DAT View"), "", 0, (void *)EXTERNAL_DATS);
 
 	item_append(menu_item_type::SEPARATOR);

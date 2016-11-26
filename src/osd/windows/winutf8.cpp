@@ -28,6 +28,7 @@ void win_output_debug_string_utf8(const char *string)
 }
 
 
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 
 //============================================================
 //  win_message_box_utf8
@@ -54,6 +55,8 @@ int win_message_box_utf8(HWND window, const char *text, const char *caption, UIN
 
 	return MessageBox(window, t_text, t_caption, type);
 }
+
+#endif
 
 
 
@@ -113,6 +116,7 @@ std::string win_get_window_text_utf8(HWND window)
 }
 
 
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 
 //============================================================
 //  win_create_window_ex_utf8
@@ -135,3 +139,5 @@ HWND win_create_window_ex_utf8(DWORD exstyle, const char* classname, const char*
 	return CreateWindowEx(exstyle, ts_classname.c_str(), t_windowname, style, x, y, width, height, parent,
 		menu, instance, param);
 }
+
+#endif

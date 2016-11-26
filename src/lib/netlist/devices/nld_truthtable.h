@@ -275,7 +275,7 @@ namespace netlist
 			/* FIXME:
 			 * Based on current measurements there is no point to disable
 			 * 1 input devices. This should actually be a parameter so that we
-			 * can decide for each individual gate whether it is benefitial to
+			 * can decide for each individual gate whether it is beneficial to
 			 * ignore deactivation.
 			 */
 			if (m_NI > 1)

@@ -433,6 +433,12 @@ void scn2674_device::write_command(uint8_t data)
 			LOG2674(("DELAYED write at pointer address %02x\n",data));
 			break;
 
+		case 0xa6:  // used by the Octopus
+			/* write at pointer address */
+			space().write_byte((m_IR10_display_pointer_address_lower | (m_IR11_display_pointer_address_upper << 8)), m_buffer);
+			LOG2674(("DELAYED write at display pointer address %02x\n",data));
+			break;
+
 		case 0xa9:
 			/* increment cursor address */
 			if(!(++m_cursor_l))
@@ -676,7 +682,7 @@ void scn2674_device::device_timer(emu_timer &timer, device_timer_id id, int para
 				}
 			}
 
-			if((m_linecounter == (m_IR12_split_register_1 * m_IR0_scanline_per_char_row)) && m_linecounter) /* Split Screen 1 */
+			if((m_linecounter == ((m_IR12_split_register_1+1) * m_IR0_scanline_per_char_row)) && m_linecounter) /* Split Screen 1 */
 			{
 				m_status_register |= 0x04;
 				if(m_irq_mask & 0x04)
@@ -692,7 +698,7 @@ void scn2674_device::device_timer(emu_timer &timer, device_timer_id id, int para
 					dw = m_IR14_double_1;
 			}
 
-			if((m_linecounter == (m_IR13_split_register_2 * m_IR0_scanline_per_char_row)) && m_linecounter) /* Split Screen 2 */
+			if((m_linecounter == ((m_IR13_split_register_2+1) * m_IR0_scanline_per_char_row)) && m_linecounter) /* Split Screen 2 */
 			{
 				m_status_register |= 0x01;
 				if(m_irq_mask & 0x01)
@@ -776,7 +782,7 @@ void scn2674_device::device_timer(emu_timer &timer, device_timer_id id, int para
 uint32_t scn2674_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	if (!m_display_enabled)
-		m_bitmap.fill(rgb_t::black);
+		m_bitmap.fill(rgb_t::black(), cliprect);
 	else
 		copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 

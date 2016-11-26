@@ -265,7 +265,7 @@ READ8_MEMBER(firetrk_state::montecar_input_r)
 
 WRITE8_MEMBER(firetrk_state::blink_on_w)
 {
-	*m_blink = TRUE;
+	*m_blink = true;
 }
 
 

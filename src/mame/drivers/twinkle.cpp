@@ -939,8 +939,8 @@ static MACHINE_CONFIG_START( twinkle, twinkle_state )
 	MCFG_RAM_MODIFY("maincpu:ram")
 	MCFG_RAM_DEFAULT_SIZE("4M")
 
-	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psx_dma_read_delegate( FUNC( scsi_dma_read ), (twinkle_state *) owner ) )
-	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psx_dma_write_delegate( FUNC( scsi_dma_write ), (twinkle_state *) owner ) )
+	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psx_dma_read_delegate(&scsi_dma_read, (twinkle_state *) owner ) )
+	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psx_dma_write_delegate(&scsi_dma_write, (twinkle_state *) owner ) )
 
 	MCFG_CPU_ADD("audiocpu", M68000, 32000000/2)    /* 16.000 MHz */
 	MCFG_CPU_PROGRAM_MAP( sound_map )

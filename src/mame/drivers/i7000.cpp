@@ -262,8 +262,7 @@ static ADDRESS_MAP_START( i7000_io , AS_IO, 8, i7000_state)
 //  AM_RANGE(0x1f, 0x1f) AM_WRITE(i7000_io_printer_strobe_w) //self-test routine writes 0x08 and 0x09 (it seems that bit 0 is the strobe and bit 3 is an enable signal)
 //  AM_RANGE(0x20, 0x21) AM_READWRITE(i7000_io_keyboard_r, i7000_io_keyboard_w)
 
-	AM_RANGE( 0x20, 0x20 ) AM_DEVREADWRITE("i8279", i8279_device, data_r, data_w)
-	AM_RANGE( 0x21, 0x21 ) AM_DEVREADWRITE("i8279", i8279_device, status_r, cmd_w)
+	AM_RANGE(0x20, 0x21) AM_DEVREADWRITE("i8279", i8279_device, read, write)
 
 //  AM_RANGE(0x24, 0x24) AM_READ(i7000_io_?_r)
 //  AM_RANGE(0x25, 0x25) AM_WRITE(i7000_io_?_w)

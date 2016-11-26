@@ -973,7 +973,7 @@ void mediagx_state::install_speedups(const speedup_entry *entries, int count)
 	}
 
 #ifdef MAME_DEBUG
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(mediagx_state::report_speedups), this));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&mediagx_state::report_speedups, this));
 #endif
 }
 

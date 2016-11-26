@@ -33,7 +33,6 @@ namespace bgfx
 		enum Enum
 		{
 			DebugCheck,
-			MinimumRequiredSpecs,
 			InvalidShader,
 			UnableToInitialize,
 			UnableToCreateTexture,
@@ -52,10 +51,11 @@ namespace bgfx
 		/// Renderer types:
 		enum Enum
 		{
-			Null,         //!< No rendering.
+			Noop,         //!< No rendering.
 			Direct3D9,    //!< Direct3D 9.0
 			Direct3D11,   //!< Direct3D 11.0
 			Direct3D12,   //!< Direct3D 12.0
+			Gnm,          //!< GNM
 			Metal,        //!< Metal
 			OpenGLES,     //!< OpenGL ES 2.0+
 			OpenGL,       //!< OpenGL 2.1+
@@ -520,15 +520,11 @@ namespace bgfx
 		///
 		uint64_t supported;
 
-		uint32_t maxDrawCalls;     //!< Maximum draw calls.
-		uint16_t maxTextureSize;   //!< Maximum texture size.
-		uint16_t maxViews;         //!< Maximum views.
-		uint8_t  maxFBAttachments; //!< Maximum frame buffer attachments.
-		uint8_t  numGPUs;          //!< Number of enumerated GPUs.
-		uint16_t vendorId;         //!< Selected GPU vendor id.
+		uint16_t vendorId;         //!< Selected GPU vendor PCI id.
 		uint16_t deviceId;         //!< Selected GPU device id.
 		bool     homogeneousDepth; //!< True when NDC depth is in [-1, 1] range.
 		bool     originBottomLeft; //!< True when NDC origin is at bottom left.
+		uint8_t  numGPUs;          //!< Number of enumerated GPUs.
 
 		/// GPU info.
 		///
@@ -536,11 +532,35 @@ namespace bgfx
 		///
 		struct GPU
 		{
-			uint16_t vendorId;
-			uint16_t deviceId;
+			uint16_t vendorId; //!< Vendor PCI id. See `BGFX_PCI_ID_*`.
+			uint16_t deviceId; //!< Device id.
 		};
 
 		GPU gpu[4]; //!< Enumerated GPUs.
+
+		struct Limits
+		{
+			uint32_t maxDrawCalls;            //!< Maximum draw calls.
+			uint32_t maxBlits;                //!< Maximum number of blit calls.
+			uint32_t maxTextureSize;          //!< Maximum texture size.
+			uint32_t maxViews;                //!< Maximum views.
+			uint32_t maxFrameBuffers;         //!< Maximum number of frame buffer handles.
+			uint32_t maxFBAttachments;        //!< Maximum frame buffer attachments.
+			uint32_t maxPrograms;             //!< Maximum number of program handles.
+			uint32_t maxShaders;              //!< Maximum number of shader handles.
+			uint32_t maxTextures;             //!< Maximum number of texture handles.
+			uint32_t maxTextureSamplers;      //!< Maximum number of texture samplers.
+			uint32_t maxVertexDecls;          //!< Maximum number of vertex format declarations.
+			uint32_t maxVertexStreams;        //!< Maximum number of vertex streams.
+			uint32_t maxIndexBuffers;         //!< Maximum number of index buffer handles.
+			uint32_t maxVertexBuffers;        //!< Maximum number of vertex buffer handles.
+			uint32_t maxDynamicIndexBuffers;  //!< Maximum number of dynamic index buffer handles.
+			uint32_t maxDynamicVertexBuffers; //!< Maximum number of dynamic vertex buffer handles.
+			uint32_t maxUniforms;             //!< Maximum number of uniform handles.
+			uint32_t maxOcclusionQueries;     //!< Maximum number of occlusion query handles.
+		};
+
+		Limits limits;
 
 		/// Supported texture formats.
 		///   - `BGFX_CAPS_FORMAT_TEXTURE_NONE` - Texture format is not supported.
@@ -701,11 +721,11 @@ namespace bgfx
 		///
 		/// @attention C99 equivalent is `bgfx_vertex_decl_begin`.
 		///
-		VertexDecl& begin(RendererType::Enum _renderer = RendererType::Null);
+		VertexDecl& begin(RendererType::Enum _renderer = RendererType::Noop);
 
 		/// End VertexDecl.
 		///
-		/// @attention C99 equivalent is `bgfx_vertex_decl_begin`.
+		/// @attention C99 equivalent is `bgfx_vertex_decl_end`.
 		///
 		void end();
 
@@ -931,9 +951,14 @@ namespace bgfx
 
 	/// Returns supported backend API renderers.
 	///
+	/// @param[in] _max Maximum number of elements in _enum array.
+	/// @param[inout] _enum Array where supported renderers will be written.
+	///
+	/// @returns Number of supported renderers.
+	///
 	/// @attention C99 equivalent is `bgfx_get_supported_renderers`.
 	///
-	uint8_t getSupportedRenderers(RendererType::Enum _enum[RendererType::Count]);
+	uint8_t getSupportedRenderers(uint8_t _max = 0, RendererType::Enum* _enum = NULL);
 
 	/// Returns name of renderer.
 	///
@@ -961,7 +986,7 @@ namespace bgfx
 	/// @param[in] _callback Provide application specific callback interface.
 	///   See: `bgfx::CallbackI`
 	///
-	/// @param[in] _reallocator Custom allocator. When custom allocator is not
+	/// @param[in] _allocator Custom allocator. When custom allocator is not
 	///   specified, library uses default CRT allocator. The library assumes
 	///   custom allocator is thread safe.
 	///
@@ -974,7 +999,7 @@ namespace bgfx
 		, uint16_t _vendorId = BGFX_PCI_ID_NONE
 		, uint16_t _deviceId = 0
 		, CallbackI* _callback = NULL
-		, bx::AllocatorI* _reallocator = NULL
+		, bx::AllocatorI* _allocator = NULL
 		);
 
 	/// Shutdown bgfx library.
@@ -1051,6 +1076,8 @@ namespace bgfx
 	const HMD* getHMD();
 
 	/// Returns performance counters.
+	///
+	/// @attention C99 equivalent is `bgfx_get_stats`.
 	///
 	const Stats* getStats();
 
@@ -1790,6 +1817,7 @@ namespace bgfx
 	///
 	/// @param[in] _handle Texture handle.
 	/// @param[in] _data Destination buffer.
+	/// @param[in] _mip Mip level.
 	///
 	/// @returns Frame number when the result will be available. See: `bgfx::frame`.
 	///
@@ -1797,7 +1825,7 @@ namespace bgfx
 	/// @attention Availability depends on: `BGFX_CAPS_TEXTURE_READ_BACK`.
 	/// @attention C99 equivalent is `bgfx_read_texture`.
 	///
-	uint32_t readTexture(TextureHandle _handle, void* _data);
+	uint32_t readTexture(TextureHandle _handle, void* _data, uint8_t _mip = 0);
 
 	/// Read back texture content.
 	///
@@ -2538,7 +2566,7 @@ namespace bgfx
 	///   call submit.
 	/// @returns Number of draw calls.
 	///
-	/// @attention C99 equivalent is `bgfx_submit_occlusion_query.
+	/// @attention C99 equivalent is `bgfx_submit_occlusion_query`.
 	///
 	uint32_t submit(
 		  uint8_t _id

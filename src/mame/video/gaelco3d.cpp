@@ -185,15 +185,15 @@ void gaelco3d_renderer::render_poly(screen_device &screen, uint32_t *polydata)
 
 		/* special case: no Z buffering and no perspective correction */
 		if (color != 0x7f00 && z0 < 0 && ooz_dx == 0 && ooz_dy == 0)
-			render_triangle_fan(visarea, render_delegate(FUNC(gaelco3d_renderer::render_noz_noperspective), this), 0, vertnum, &vert[0]);
+			render_triangle_fan(visarea, render_delegate(&gaelco3d_renderer::render_noz_noperspective, this), 0, vertnum, &vert[0]);
 
 		/* general case: non-alpha blended */
 		else if (color != 0x7f00)
-			render_triangle_fan(visarea, render_delegate(FUNC(gaelco3d_renderer::render_normal), this), 0, vertnum, &vert[0]);
+			render_triangle_fan(visarea, render_delegate(&gaelco3d_renderer::render_normal, this), 0, vertnum, &vert[0]);
 
 		/* color 0x7f seems to be hard-coded as a 50% alpha blend */
 		else
-			render_triangle_fan(visarea, render_delegate(FUNC(gaelco3d_renderer::render_alphablend), this), 0, vertnum, &vert[0]);
+			render_triangle_fan(visarea, render_delegate(&gaelco3d_renderer::render_alphablend, this), 0, vertnum, &vert[0]);
 
 		m_polygons += vertnum - 2;
 	}
@@ -385,7 +385,7 @@ WRITE32_MEMBER(gaelco3d_state::gaelco3d_render_w)
 			m_poly->render_poly(*m_screen, &m_polydata_buffer[0]);
 			m_polydata_count = 0;
 		}
-		m_video_changed = TRUE;
+		m_video_changed = true;
 	}
 
 #if DISPLAY_STATS
@@ -471,7 +471,7 @@ uint32_t gaelco3d_state::screen_update_gaelco3d(screen_device &screen, bitmap_in
 		if (m_video_changed)
 			copybitmap(bitmap, m_poly->screenbits(), 0,1, 0,0, cliprect);
 		ret = m_video_changed;
-		m_video_changed = FALSE;
+		m_video_changed = false;
 	}
 
 	logerror("---update---\n");

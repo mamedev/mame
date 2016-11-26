@@ -84,8 +84,8 @@ void msm5232_device::device_reset()
 
 	for (i=0; i<8; i++)
 	{
-		write(machine().driver_data()->generic_space(),i,0x80);
-		write(machine().driver_data()->generic_space(),i,0x00);
+		write(machine().dummy_space(), i, 0x80);
+		write(machine().dummy_space(), i, 0x00);
 	}
 	m_noise_cnt     = 0;
 	m_noise_rng     = 1;
@@ -249,7 +249,7 @@ void msm5232_device::init_tables()
 
 #if 0
 {
-	/* rate tables (in miliseconds) */
+	/* rate tables (in milliseconds) */
 	static const int ATBL[8] = { 2,4,8,16, 32,64, 32,64};
 	static const int DTBL[16]= { 40,80,160,320, 640,1280, 640,1280,
 							333,500,1000,2000, 4000,8000, 4000,8000};

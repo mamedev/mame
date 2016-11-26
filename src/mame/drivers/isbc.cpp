@@ -66,6 +66,8 @@ void isbc_state::machine_reset()
 		m_centronics->write_busy(0);  // centronics_device sets busy to 1 at reset causing spurious irqs
 		m_pic_1->ir7_w(0);
 	}
+	if(m_uart8251)
+		m_uart8251->write_cts(0);
 }
 
 static ADDRESS_MAP_START(rpc86_mem, AS_PROGRAM, 16, isbc_state)
@@ -261,7 +263,10 @@ static MACHINE_CONFIG_START( rpc86, isbc_state )
 	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("pic_0", pic8259_device, ir6_w))
 
 	/* video hardware */
-	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart8251", i8251_device, write_rxd))
+	//MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart8251", i8251_device, write_cts))
+	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart8251", i8251_device, write_dsr))
 
 	MCFG_ISBX_SLOT_ADD("sbx1", 0, isbx_cards, nullptr)
 	//MCFG_ISBX_SLOT_MINTR0_CALLBACK(DEVWRITELINE("pic_0", pic8259_device, ir3_w))
@@ -348,6 +353,19 @@ ROM_START( isbc86 )
 	ROM_LOAD16_BYTE( "8612_3l.bin", 0x2000, 0x1000, CRC(17f27ad2) SHA1(c3f379ac7d67dc4a0a7a611a0bc6323b8a3d4840))
 ROM_END
 
+ROM_START( isbc8605 )
+	ROM_REGION( 0x4000, "user1", ROMREGION_ERASEFF )
+	ROM_LOAD( "i8605mon.bin", 0x0000, 0x4000, CRC(e16acb6e) SHA1(eb9a3fd21f7609d44f8052b6a0603ecbb52dc3f3))
+ROM_END
+
+ROM_START( isbc8630 )
+	ROM_REGION( 0x4000, "user1", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "143780-001_isdm_for_isbc_86-30_socket_u57_i2732a.bin", 0x0000, 0x1000, CRC(db0ef880) SHA1(8ef296066d16881217618e54b410d12157f318ea))
+	ROM_LOAD16_BYTE( "143782-001_isdm_for_isbc_86-30_socket_u39_i2732a.bin", 0x0001, 0x1000, CRC(ea1ebe78) SHA1(f03b63659e8f5e96f481dbc6c2ddef1d22850ebb))
+	ROM_LOAD16_BYTE( "143781-001_isdm_for_isbc_86-30_socket_u58_i2732a.bin", 0x2000, 0x1000, CRC(93732612) SHA1(06e751d0f5ab1fe2c52fd79f6f4725ccf3379791))
+	ROM_LOAD16_BYTE( "143783-001_isdm_for_isbc_86-30_socket_u40_i2732a.bin", 0x2001, 0x1000, CRC(337102d5) SHA1(535f63d24c3948187b208ea594f979bc33579a15))
+ROM_END
+
 ROM_START( isbc286 )
 	ROM_REGION( 0x20000, "user1", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "u79.bin", 0x00001, 0x10000, CRC(144182ea) SHA1(4620ca205a6ac98fe2636183eaead7c4bfaf7a72))
@@ -356,10 +374,16 @@ ROM_END
 
 ROM_START( isbc2861 )
 	ROM_REGION( 0x10000, "user1", ROMREGION_ERASEFF )
-	ROM_LOAD16_BYTE( "174894-001.bin", 0x0000, 0x4000, CRC(79e4f7af) SHA1(911a4595d35e6e82b1149e75bb027927cd1c1658))
-	ROM_LOAD16_BYTE( "174894-002.bin", 0x0001, 0x4000, CRC(66747d21) SHA1(4094b1f10a8bc7db8d6dd48d7128e14e875776c7))
-	ROM_LOAD16_BYTE( "174894-003.bin", 0x8000, 0x4000, CRC(c98c7f17) SHA1(6e9a14aedd630824dccc5eb6052867e73b1d7db6))
-	ROM_LOAD16_BYTE( "174894-004.bin", 0x8001, 0x4000, CRC(61bc1dc9) SHA1(feed5a5f0bb4630c8f6fa0d5cca30654a80b4ee5))
+	ROM_SYSTEM_BIOS( 0, "v11", "iSDM Monitor V1.1" )
+	ROMX_LOAD( "174894-001.bin", 0x0000, 0x4000, CRC(79e4f7af) SHA1(911a4595d35e6e82b1149e75bb027927cd1c1658), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD( "174894-002.bin", 0x0001, 0x4000, CRC(66747d21) SHA1(4094b1f10a8bc7db8d6dd48d7128e14e875776c7), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD( "174894-003.bin", 0x8000, 0x4000, CRC(c98c7f17) SHA1(6e9a14aedd630824dccc5eb6052867e73b1d7db6), ROM_SKIP(1) | ROM_BIOS(1))
+	ROMX_LOAD( "174894-004.bin", 0x8001, 0x4000, CRC(61bc1dc9) SHA1(feed5a5f0bb4630c8f6fa0d5cca30654a80b4ee5), ROM_SKIP(1) | ROM_BIOS(1))
+	ROM_SYSTEM_BIOS( 1, "v10", "iSDM Monitor V1.0" )
+	ROMX_LOAD( "rmx286-_in_socket_u41_on_isbc_286-10.bin.u41", 0x0000, 0x4000, CRC(00996834) SHA1(a17a0f8909be642d89199660b24574b71a9d0c13), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD( "rmx286-_in_socket_u76_on_isbc_286-10.bin.u76", 0x0001, 0x4000, CRC(90c9c7e8) SHA1(b5f961ab236976713266fe7a378e8750825fd5dc), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD( "rmx286-_in_socket_u40_on_isbc_286-10.bin.u40", 0x8000, 0x4000, CRC(35716c9b) SHA1(5b717b4c2f6c59ec140635df7448294a22123a16), ROM_SKIP(1) | ROM_BIOS(2))
+	ROMX_LOAD( "rmx286-_in_socket_u75_on_isbc_286-10.bin.u75", 0x8001, 0x4000, CRC(68c3eb50) SHA1(3eeef2676e4fb187adb8ab50645f4bd172426c15), ROM_SKIP(1) | ROM_BIOS(2))
 ROM_END
 
 ROM_START( rpc86 )
@@ -374,5 +398,7 @@ ROM_END
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT COMPANY   FULLNAME       FLAGS */
 COMP( 19??, rpc86,    0,       0,    rpc86,      isbc, driver_device,    0,   "Intel",   "RPC 86",MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 COMP( 1978, isbc86,   0,       0,    isbc86,     isbc, driver_device,    0,   "Intel",   "iSBC 86/12A",MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1981, isbc8605, 0,       0,    rpc86,      isbc, driver_device,    0,   "Intel",   "iSBC 86/05",MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1981, isbc8630, 0,       0,    rpc86,      isbc, driver_device,    0,   "Intel",   "iSBC 86/30",MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 COMP( 19??, isbc286,  0,       0,    isbc286,    isbc, driver_device,    0,   "Intel",   "iSBC 286",MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-COMP( 1983, isbc2861, 0,       0,    isbc2861,    isbc, driver_device,    0,   "Intel",   "iSBC 286/10",MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1983, isbc2861, 0,       0,    isbc2861,   isbc, driver_device,    0,   "Intel",   "iSBC 286/10", MACHINE_NO_SOUND)

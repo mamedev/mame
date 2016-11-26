@@ -113,7 +113,7 @@ public:
 		double  vInFall;    // voltage that triggers the gate input to go low (0V) on fall
 		double  vInRise;    // voltage that triggers the gate input to go high (vGate) on rise
 		double  clamp;      // voltage is clamped to -clamp ... vb+clamp if clamp>= 0;
-		int     options;    // bitmaped options
+		int     options;    // bitmapped options
 	};
 	enum {
 		IS_TYPE1 = 0x00,

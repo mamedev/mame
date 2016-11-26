@@ -27,7 +27,7 @@
 #define NOISE_LEN 8192
 
 
-/* finite machine state controling frames */
+/* finite machine state controlling frames */
 enum mea8000_state
 {
 	MEA8000_STOPPED,    /* nothing to do, timer disabled */

@@ -620,16 +620,16 @@ class general_flag_reader
 public:
 	general_flag_reader(std::uint16_t val) : m_value(val) { }
 
-	bool        encrypted() const               { return (m_value & 0x0001) !=0; }
-	bool        implode_8k_dict() const         { return (m_value & 0x0002) != 0; }
-	bool        implode_3_trees() const         { return (m_value & 0x0004) != 0; }
+	bool        encrypted() const               { return bool(m_value & 0x0001); }
+	bool        implode_8k_dict() const         { return bool(m_value & 0x0002); }
+	bool        implode_3_trees() const         { return bool(m_value & 0x0004); }
 	unsigned    deflate_option() const          { return unsigned((m_value >> 1) & 0x0003); }
-	bool        lzma_eos_mark() const           { return (m_value & 0x0002) != 0; }
-	bool        use_descriptor() const          { return (m_value & 0x0008) != 0; }
-	bool        patch_data() const              { return (m_value & 0x0020) != 0; }
-	bool        strong_encryption() const       { return (m_value & 0x0040) != 0; }
-	bool        utf8_encoding() const           { return (m_value & 0x0800) != 0; }
-	bool        directory_encryption() const    { return (m_value & 0x2000) != 0; }
+	bool        lzma_eos_mark() const           { return bool(m_value & 0x0002); }
+	bool        use_descriptor() const          { return bool(m_value & 0x0008); }
+	bool        patch_data() const              { return bool(m_value & 0x0020); }
+	bool        strong_encryption() const       { return bool(m_value & 0x0040); }
+	bool        utf8_encoding() const           { return bool(m_value & 0x0800); }
+	bool        directory_encryption() const    { return bool(m_value & 0x2000); }
 
 private:
 	std::uint16_t m_value;

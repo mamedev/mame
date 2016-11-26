@@ -87,8 +87,8 @@ struct chan_info {
 	uint32_t buf_rptr;     // Address to sample cache memory
 	uint16_t buf_count;    // Number of samples that have been played
 	uint16_t buf_size;     // Number of samples minus one to play
-	uint32_t pci_addr;     // PCI Addresss for system memory accesses
-	uint16_t pci_count;    // Number of 32 bits transfered
+	uint32_t pci_addr;     // PCI Address for system memory accesses
+	uint16_t pci_count;    // Number of 32 bits transferred
 	uint16_t pci_size;     // Total number of words (32 bits) minus one in system memory
 };
 

@@ -2262,11 +2262,11 @@ static MACHINE_CONFIG_DERIVED( spcenctr, mw8080bw_root )
 
 	/* timers */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("strobeon", mw8080bw_state, spcenctr_strobe_timer_callback, attotime::from_hz(SPCENCTR_STROBE_FREQ))
-	MCFG_TIMER_PARAM(TRUE)  /* indicates strobe ON */
+	MCFG_TIMER_PARAM(true)  /* indicates strobe ON */
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("strobeoff", mw8080bw_state, spcenctr_strobe_timer_callback, attotime::from_hz(SPCENCTR_STROBE_FREQ))
 	MCFG_TIMER_START_DELAY(attotime::from_hz(SPCENCTR_STROBE_FREQ) * (100 - SPCENCTR_STROBE_DUTY_CYCLE) / 100)
-	MCFG_TIMER_PARAM(FALSE) /* indicates strobe OFF */
+	MCFG_TIMER_PARAM(false) /* indicates strobe OFF */
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -3163,6 +3163,48 @@ ROM_START( blueshrk )
 ROM_END
 
 
+/*
+CPUs
+QTY 	Type 	clock 	position 	function
+1x 	unknown DIP40 		main PCB 2n 	
+7x 	LM3900N 		sound PCB ic2-ic8 	Quad Operational Amplifier - sound
+1x 	LM377 		sound PCB 1k 	Dual Audio Amplifier - sound
+1x 	oscillator 	19.968000 	main PCB XTAL 8b 
+
+ROMs
+QTY 	Type 	position 	status
+4x 	TMS2708 	main PCB 1m 1n 1r 1s 	dumped
+2x 	MCM2708 	main PCB 1j 1l 	dumped
+
+RAMs
+QTY 	Type 	position
+16x 	D2107C 	main PCB 1-16
+
+Others
+1x 18x2 edge connector (main PCB)
+1x 36x2 female connector to sound PCB (main PCB)
+1x 36x2 edge connector to main PCB (sound PCB)
+1x 15x2 edge connector (sound PCB)
+8x trimmer (sound PCB VR1-VR8)
+1x 7 DIP switches banks (sound PCB 3j)
+1x 4 DIP switches banks (sound PCB 3a)
+
+Notes
+main PCB is marked "CS210", "SI" and is labeled "C6902575"
+sound PCB is marked "CS214" and is labeled "C6902574", "VOLUME" 
+*/
+
+ROM_START( blueshrkmr )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "mr14.1s", 0x0000, 0x0400, CRC(ea2ba987) SHA1(929d2c72d81ad15c0f877b8b3421b909fdcc80f6) )
+	ROM_LOAD( "mr15.1r", 0x0400, 0x0400, CRC(049337a4) SHA1(d0288ec63b170722c7f20e7d2e17f6ceeaacab27) )
+	ROM_LOAD( "mr16.1n", 0x0800, 0x0400, CRC(3f9793ca) SHA1(859d0f43fcba7282017e8f4985e5e9217225a617) )
+	ROM_LOAD( "mr17.1m", 0x0c00, 0x0400, CRC(0a73e0eb) SHA1(dfe1c58979642e15f07039d0cec17f975ccd2a48) )
+	ROM_LOAD( "mr18.1l", 0x1000, 0x0400, CRC(a18bb930) SHA1(36ed5d6d3b3643ddf9bd087001dc6ece7fb8df63) )
+	ROM_LOAD( "mr19.1j", 0x1400, 0x0400, CRC(23c63d02) SHA1(74ce4bd9fe2528896c5574affaf0ca132e62cf9e) )
+ROM_END
+
+
 ROM_START( invad2ct )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "invad2ct.h", 0x0000, 0x0800, CRC(51d02a71) SHA1(2fa82ddc2702a72de0a9559ec244b70ab3db3f18) )
@@ -3183,34 +3225,35 @@ ROM_END
 
 /* PCB #              rom       parent    machine   inp       init              monitor,company,fullname,flags */
 
-/* 596 */ GAMEL(1976, seawolf,  0,        seawolf,  seawolf,  driver_device, 0, ROT0,   "Dave Nutting Associates / Midway", "Sea Wolf (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_seawolf )
-/* 596 */ GAMEL(1976, seawolfo, seawolf,  seawolf,  seawolf,  driver_device, 0, ROT0,   "Dave Nutting Associates / Midway", "Sea Wolf (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_seawolf )
-/* 597 */ GAMEL(1975, gunfight, 0,        gunfight, gunfight, driver_device, 0, ROT0,   "Dave Nutting Associates / Midway", "Gun Fight (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_gunfight )
-/* 597 */ GAMEL(1975, gunfighto,gunfight, gunfight, gunfight, driver_device, 0, ROT0,   "Dave Nutting Associates / Midway", "Gun Fight (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_gunfight )
+/* 596 */ GAMEL(1976, seawolf,    0,        seawolf,  seawolf,  driver_device, 0, ROT0,   "Dave Nutting Associates / Midway", "Sea Wolf (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_seawolf )
+/* 596 */ GAMEL(1976, seawolfo,   seawolf,  seawolf,  seawolf,  driver_device, 0, ROT0,   "Dave Nutting Associates / Midway", "Sea Wolf (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_seawolf )
+/* 597 */ GAMEL(1975, gunfight,   0,        gunfight, gunfight, driver_device, 0, ROT0,   "Dave Nutting Associates / Midway", "Gun Fight (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_gunfight )
+/* 597 */ GAMEL(1975, gunfighto,  gunfight, gunfight, gunfight, driver_device, 0, ROT0,   "Dave Nutting Associates / Midway", "Gun Fight (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_gunfight )
 /* 604 Gun Fight (cocktail, dump does not exist) */
-/* 605 */ GAME( 1976, tornbase, 0,        tornbase, tornbase, driver_device, 0, ROT0,   "Dave Nutting Associates / Midway / Taito", "Tornado Baseball / Ball Park", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-/* 610 */ GAMEL(1976, 280zzzap, 0,        zzzap,    zzzap,    driver_device, 0, ROT0,   "Dave Nutting Associates / Midway", "280-ZZZAP", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_280zzzap )
-/* 611 */ GAMEL(1976, maze,     0,        maze,     maze,     driver_device, 0, ROT0,   "Midway", "Amazing Maze", MACHINE_SUPPORTS_SAVE, layout_maze )
-/* 612 */ GAME( 1977, boothill, 0,        boothill, boothill, driver_device, 0, ROT0,   "Dave Nutting Associates / Midway", "Boot Hill", MACHINE_SUPPORTS_SAVE )
-/* 615 */ GAME( 1977, checkmat, 0,        checkmat, checkmat, driver_device, 0, ROT0,   "Dave Nutting Associates / Midway", "Checkmate", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-/* 618 */ GAME( 1977, desertgu, 0,        desertgu, desertgu, driver_device, 0, ROT0,   "Dave Nutting Associates / Midway", "Desert Gun", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-/* 618 */ GAME( 1977, roadrunm, desertgu, desertgu, desertgu, driver_device, 0, ROT0,   "Midway", "Road Runner (Midway)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-/* 619 */ GAME( 1977, dplay,    0,        dplay,    dplay,    driver_device, 0, ROT0,   "Midway", "Double Play", MACHINE_SUPPORTS_SAVE )
-/* 622 */ GAMEL(1977, lagunar,  0,        zzzap,    lagunar,  driver_device, 0, ROT90,  "Midway", "Laguna Racer", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_lagunar )
-/* 623 */ GAME( 1977, gmissile, 0,        gmissile, gmissile, driver_device, 0, ROT0,   "Midway", "Guided Missile", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-/* 626 */ GAME( 1977, m4,       0,        m4,       m4,       driver_device, 0, ROT0,   "Midway", "M-4", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-/* 630 */ GAMEL(1978, clowns,   0,        clowns,   clowns,   driver_device, 0, ROT0,   "Midway", "Clowns (rev. 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_clowns )
-/* 630 */ GAMEL(1978, clowns1,  clowns,   clowns,   clowns1,  driver_device, 0, ROT0,   "Midway", "Clowns (rev. 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_clowns )
-/* 640 */ GAMEL(1978, spacwalk, 0,        spacwalk, spacwalk, driver_device, 0, ROT0,   "Midway", "Space Walk", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_spacwalk )
-/* 642 */ GAME( 1978, einning,  0,        dplay,    einning,  driver_device, 0, ROT0,   "Midway / Taito", "Extra Inning / Ball Park II", MACHINE_SUPPORTS_SAVE )
-/* 643 */ GAME( 1978, shuffle,  0,        shuffle,  shuffle,  driver_device, 0, ROT90,  "Midway", "Shuffleboard", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-/* 644 */ GAME( 1977, dogpatch, 0,        dogpatch, dogpatch, driver_device, 0, ROT0,   "Midway", "Dog Patch", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-/* 645 */ GAMEL(1980, spcenctr, 0,        spcenctr, spcenctr, driver_device, 0, ROT0,   "Midway", "Space Encounters", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_spcenctr )
-/* 652 */ GAMEL(1979, phantom2, 0,        phantom2, phantom2, driver_device, 0, ROT0,   "Midway", "Phantom II", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_phantom2 )
-/* 730 */ GAME( 1978, bowler,   0,        bowler,   bowler,   driver_device, 0, ROT90,  "Midway", "Bowling Alley", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-/* 739 */ GAMEL(1978, invaders, 0,        invaders, invaders, driver_device, 0, ROT270, "Taito / Midway", "Space Invaders / Space Invaders M", MACHINE_SUPPORTS_SAVE, layout_invaders )
-/* 742 */ GAME( 1978, blueshrk, 0,        blueshrk, blueshrk, driver_device, 0, ROT0,   "Midway", "Blue Shark", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+/* 605 */ GAME( 1976, tornbase,   0,        tornbase, tornbase, driver_device, 0, ROT0,   "Dave Nutting Associates / Midway / Taito", "Tornado Baseball / Ball Park", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+/* 610 */ GAMEL(1976, 280zzzap,   0,        zzzap,    zzzap,    driver_device, 0, ROT0,   "Dave Nutting Associates / Midway", "280-ZZZAP", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_280zzzap )
+/* 611 */ GAMEL(1976, maze,       0,        maze,     maze,     driver_device, 0, ROT0,   "Midway", "Amazing Maze", MACHINE_SUPPORTS_SAVE, layout_maze )
+/* 612 */ GAME( 1977, boothill,   0,        boothill, boothill, driver_device, 0, ROT0,   "Dave Nutting Associates / Midway", "Boot Hill", MACHINE_SUPPORTS_SAVE )
+/* 615 */ GAME( 1977, checkmat,   0,        checkmat, checkmat, driver_device, 0, ROT0,   "Dave Nutting Associates / Midway", "Checkmate", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+/* 618 */ GAME( 1977, desertgu,   0,        desertgu, desertgu, driver_device, 0, ROT0,   "Dave Nutting Associates / Midway", "Desert Gun", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+/* 618 */ GAME( 1977, roadrunm,   desertgu, desertgu, desertgu, driver_device, 0, ROT0,   "Midway", "Road Runner (Midway)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+/* 619 */ GAME( 1977, dplay,      0,        dplay,    dplay,    driver_device, 0, ROT0,   "Midway", "Double Play", MACHINE_SUPPORTS_SAVE )
+/* 622 */ GAMEL(1977, lagunar,    0,        zzzap,    lagunar,  driver_device, 0, ROT90,  "Midway", "Laguna Racer", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE, layout_lagunar )
+/* 623 */ GAME( 1977, gmissile,   0,        gmissile, gmissile, driver_device, 0, ROT0,   "Midway", "Guided Missile", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+/* 626 */ GAME( 1977, m4,         0,        m4,       m4,       driver_device, 0, ROT0,   "Midway", "M-4", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+/* 630 */ GAMEL(1978, clowns,     0,        clowns,   clowns,   driver_device, 0, ROT0,   "Midway", "Clowns (rev. 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_clowns )
+/* 630 */ GAMEL(1978, clowns1,    clowns,   clowns,   clowns1,  driver_device, 0, ROT0,   "Midway", "Clowns (rev. 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_clowns )
+/* 640 */ GAMEL(1978, spacwalk,   0,        spacwalk, spacwalk, driver_device, 0, ROT0,   "Midway", "Space Walk", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_spacwalk )
+/* 642 */ GAME( 1978, einning,    0,        dplay,    einning,  driver_device, 0, ROT0,   "Midway / Taito", "Extra Inning / Ball Park II", MACHINE_SUPPORTS_SAVE )
+/* 643 */ GAME( 1978, shuffle,    0,        shuffle,  shuffle,  driver_device, 0, ROT90,  "Midway", "Shuffleboard", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+/* 644 */ GAME( 1977, dogpatch,   0,        dogpatch, dogpatch, driver_device, 0, ROT0,   "Midway", "Dog Patch", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+/* 645 */ GAMEL(1980, spcenctr,   0,        spcenctr, spcenctr, driver_device, 0, ROT0,   "Midway", "Space Encounters", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_spcenctr )
+/* 652 */ GAMEL(1979, phantom2,   0,        phantom2, phantom2, driver_device, 0, ROT0,   "Midway", "Phantom II", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_phantom2 )
+/* 730 */ GAME( 1978, bowler,     0,        bowler,   bowler,   driver_device, 0, ROT90,  "Midway", "Bowling Alley", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+/* 739 */ GAMEL(1978, invaders,   0,        invaders, invaders, driver_device, 0, ROT270, "Taito / Midway", "Space Invaders / Space Invaders M", MACHINE_SUPPORTS_SAVE, layout_invaders )
+/* 742 */ GAME( 1978, blueshrk,   0,        blueshrk, blueshrk, driver_device, 0, ROT0,   "Midway", "Blue Shark", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+          GAME( 1978, blueshrkmr, blueshrk, blueshrk, blueshrk, driver_device, 0, ROT0,   "bootleg (Model Racing)", "Blue Shark (Model Racing bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 /* 749 4 Player Bowling Alley (cocktail, dump does not exist) */
-/* 851 */ GAMEL(1980, invad2ct, 0,        invad2ct, invad2ct, driver_device, 0, ROT90,  "Midway", "Space Invaders II (Midway, cocktail)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_invad2ct )
+/* 851 */ GAMEL(1980, invad2ct,   0,        invad2ct, invad2ct, driver_device, 0, ROT90,  "Midway", "Space Invaders II (Midway, cocktail)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_invad2ct )
 /* 852 Space Invaders Deluxe (color hardware, not in this driver) */
 /* 870 Space Invaders Deluxe (cocktail, dump does not exist) */

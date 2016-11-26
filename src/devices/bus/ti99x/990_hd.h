@@ -9,7 +9,7 @@
 #include "imagedev/harddriv.h"
 
 /* max disk units per controller: 4 is the protocol limit, but it may be
-overriden if more than one controller is used */
+overridden if more than one controller is used */
 #define MAX_DISK_UNIT 4
 
 class ti990_hdc_device : public device_t
@@ -58,8 +58,8 @@ private:
 		device_image_interface *img;                        /* image descriptor */
 		format_t format;
 		hard_disk_file *hd_handle;      /* mame hard disk descriptor - only if format == format_mame */
-		unsigned int wp : 1;                    /* TRUE if disk is write-protected */
-		unsigned int unsafe : 1;                /* TRUE when a disk has just been connected */
+		unsigned int wp : 1;                    /* true if disk is write-protected */
+		unsigned int unsafe : 1;                /* true when a disk has just been connected */
 
 		/* disk geometry */
 		unsigned int cylinders, heads, sectors_per_track, bytes_per_sector;

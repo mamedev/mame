@@ -119,8 +119,7 @@ CPU_DISASSEMBLE(ucom4)
 	uint8_t op = oprom[pos++];
 	uint8_t instr = ucom4_mnemonic[op];
 
-	char *dst = buffer;
-	dst += sprintf(dst, "%-4s ", s_mnemonics[instr]);
+	util::stream_format(stream,"%-4s ", s_mnemonics[instr]);
 
 	// opcode parameter
 	int bits = s_bits[instr];
@@ -142,11 +141,11 @@ CPU_DISASSEMBLE(ucom4)
 		}
 
 		if (bits <= 4)
-			dst += sprintf(dst, "%d", param);
+			util::stream_format(stream, "%d", param);
 		else if (bits <= 8)
-			dst += sprintf(dst, "$%02X", param);
+			util::stream_format(stream, "$%02X", param);
 		else
-			dst += sprintf(dst, "$%03X", param);
+			util::stream_format(stream, "$%03X", param);
 	}
 
 	return pos | s_flags[instr] | DASMFLAG_SUPPORTED;

@@ -68,8 +68,8 @@ void svision_state::svision_irq()
 
 TIMER_CALLBACK_MEMBER(svision_state::svision_timer)
 {
-	m_svision.timer_shot = TRUE;
-	m_svision.timer1->enable(FALSE);
+	m_svision.timer_shot = true;
+	m_svision.timer1->enable(false);
 	svision_irq();
 }
 
@@ -111,12 +111,12 @@ READ8_MEMBER(svision_state::svision_r)
 			break;
 
 		case 0x24:
-			m_svision.timer_shot = FALSE;
+			m_svision.timer_shot = false;
 			svision_irq();
 			break;
 
 		case 0x25:
-			*m_dma_finished = FALSE;
+			*m_dma_finished = false;
 			svision_irq();
 			break;
 
@@ -161,7 +161,7 @@ WRITE8_MEMBER(svision_state::svision_w)
 			{
 				delay = 256;
 			}
-			m_svision.timer1->enable(TRUE);
+			m_svision.timer1->enable(true);
 			m_svision.timer1->reset(m_maincpu->cycles_to_attotime(value * delay));
 			break;
 
@@ -441,14 +441,14 @@ DRIVER_INIT_MEMBER(svision_state, svision)
 {
 	m_svision.timer1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(svision_state::svision_timer),this));
 	m_dma_finished = m_sound->dma_finished();
-	m_pet.on = FALSE;
+	m_pet.on = false;
 }
 
 DRIVER_INIT_MEMBER(svision_state, svisions)
 {
 	m_svision.timer1 = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(svision_state::svision_timer),this));
 	m_dma_finished = m_sound->dma_finished();
-	m_pet.on = TRUE;
+	m_pet.on = true;
 	m_pet.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(svision_state::svision_pet_timer),this));
 }
 
@@ -490,15 +490,15 @@ void svision_state::machine_start()
 
 void svision_state::machine_reset()
 {
-	m_svision.timer_shot = FALSE;
-	*m_dma_finished = FALSE;
+	m_svision.timer_shot = false;
+	*m_dma_finished = false;
 }
 
 
 MACHINE_RESET_MEMBER(svision_state,tvlink)
 {
 	svision_state::machine_reset();
-	m_tvlink.palette_on = FALSE;
+	m_tvlink.palette_on = false;
 
 	memset(m_reg + 0x800, 0xff, 0x40); // normally done from m_tvlink microcontroller
 	m_reg[0x82a] = 0xdf;

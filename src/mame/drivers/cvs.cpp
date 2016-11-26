@@ -1530,7 +1530,7 @@ ROM_END
 
 /*************************************
  *
- *  Game specific initalization
+ *  Game specific initialization
  *
  *************************************/
 

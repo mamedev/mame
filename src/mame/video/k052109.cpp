@@ -211,7 +211,7 @@ void k052109_device::device_start()
 			throw device_missing_dependencies();
 
 		// and register a callback for vblank state
-		m_screen->register_vblank_callback(vblank_state_delegate(FUNC(k052109_device::vblank_callback), this));
+		m_screen->register_vblank_callback(vblank_state_delegate(&k052109_device::vblank_callback, this));
 	}
 
 	decode_gfx();

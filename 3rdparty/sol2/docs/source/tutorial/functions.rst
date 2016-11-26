@@ -338,4 +338,4 @@ It can be used like so, inconjunction with ``sol::this_state``:
 	}
 
 
-This covers almost everything you need to know about Functions and how they interact with Sol. For some advanced tricks and neat things, check out :doc:`sol::this_state<../api/this_state>` and :doc:`sol::variadic_args<../api/variadic_args>`. The next stop in this tutorial is about :doc:`C++ types (usertypes) in Lua<cxx-in-lua>`!
+This covers almost everything you need to know about Functions and how they interact with Sol. For some advanced tricks and neat things, check out :doc:`sol::this_state<../api/this_state>` and :doc:`sol::variadic_args<../api/variadic_args>`. The next stop in this tutorial is about :doc:`C++ types (usertypes) in Lua<cxx-in-lua>`! If you need a bit more information about functions in the C++ side and how to best utilize arguments from C++, see :ref:`this note<function-argument-handling>`.

@@ -887,8 +887,8 @@ uint32_t cischeat_state::screen_update_bigrun(screen_device &screen, bitmap_ind1
 
 	for (i = 7; i >= 4; i--)
 	{                                           /* bitmap, road, min_priority, max_priority, transparency */
-		if (active_layers1 & 0x10) cischeat_draw_road(bitmap,cliprect,0,i,i,FALSE);
-		if (active_layers1 & 0x20) cischeat_draw_road(bitmap,cliprect,1,i,i,TRUE);
+		if (active_layers1 & 0x10) cischeat_draw_road(bitmap,cliprect,0,i,i,false);
+		if (active_layers1 & 0x20) cischeat_draw_road(bitmap,cliprect,1,i,i,true);
 	}
 
 	flag = 0;
@@ -897,8 +897,8 @@ uint32_t cischeat_state::screen_update_bigrun(screen_device &screen, bitmap_ind1
 
 	for (i = 3; i >= 0; i--)
 	{                                           /* bitmap, road, min_priority, max_priority, transparency */
-		if (active_layers1 & 0x10) cischeat_draw_road(bitmap,cliprect,0,i,i,TRUE);
-		if (active_layers1 & 0x20) cischeat_draw_road(bitmap,cliprect,1,i,i,TRUE);
+		if (active_layers1 & 0x10) cischeat_draw_road(bitmap,cliprect,0,i,i,true);
+		if (active_layers1 & 0x20) cischeat_draw_road(bitmap,cliprect,1,i,i,true);
 	}
 
 	if (active_layers1 & 0x08) bigrun_draw_sprites(bitmap,cliprect,15,0);
@@ -932,8 +932,8 @@ uint32_t cischeat_state::screen_update_cischeat(screen_device &screen, bitmap_in
 	bitmap.fill(0, cliprect);
 
 										/* bitmap, road, priority, transparency */
-	if (active_layers1 & 0x10) cischeat_draw_road(bitmap,cliprect,0,7,5,FALSE);
-	if (active_layers1 & 0x20) cischeat_draw_road(bitmap,cliprect,1,7,5,TRUE);
+	if (active_layers1 & 0x10) cischeat_draw_road(bitmap,cliprect,0,7,5,false);
+	if (active_layers1 & 0x20) cischeat_draw_road(bitmap,cliprect,1,7,5,true);
 
 	flag = 0;
 	cischeat_tmap_DRAW(0)
@@ -941,11 +941,11 @@ uint32_t cischeat_state::screen_update_cischeat(screen_device &screen, bitmap_in
 	cischeat_tmap_DRAW(1)
 
 	if (active_layers1 & 0x08) cischeat_draw_sprites(bitmap,cliprect,15,3);
-	if (active_layers1 & 0x10) cischeat_draw_road(bitmap,cliprect,0,4,1,TRUE);
-	if (active_layers1 & 0x20) cischeat_draw_road(bitmap,cliprect,1,4,1,TRUE);
+	if (active_layers1 & 0x10) cischeat_draw_road(bitmap,cliprect,0,4,1,true);
+	if (active_layers1 & 0x20) cischeat_draw_road(bitmap,cliprect,1,4,1,true);
 	if (active_layers1 & 0x08) cischeat_draw_sprites(bitmap,cliprect,2,2);
-	if (active_layers1 & 0x10) cischeat_draw_road(bitmap,cliprect,0,0,0,TRUE);
-	if (active_layers1 & 0x20) cischeat_draw_road(bitmap,cliprect,1,0,0,TRUE);
+	if (active_layers1 & 0x10) cischeat_draw_road(bitmap,cliprect,0,0,0,true);
+	if (active_layers1 & 0x20) cischeat_draw_road(bitmap,cliprect,1,0,0,true);
 	if (active_layers1 & 0x08) cischeat_draw_sprites(bitmap,cliprect,1,0);
 	cischeat_tmap_DRAW(2)
 
@@ -982,8 +982,8 @@ uint32_t cischeat_state::screen_update_f1gpstar(screen_device &screen, bitmap_in
 /*  1: clouds 5, grad 7, road 0     2: clouds 5, grad 7, road 0, tunnel roof 0 */
 
 	/* road 1!! 0!! */                  /* bitmap, road, min_priority, max_priority, transparency */
-	if (active_layers1 & 0x20) f1gpstar_draw_road(bitmap,cliprect,1,6,7,TRUE);
-	if (active_layers1 & 0x10) f1gpstar_draw_road(bitmap,cliprect,0,6,7,TRUE);
+	if (active_layers1 & 0x20) f1gpstar_draw_road(bitmap,cliprect,1,6,7,true);
+	if (active_layers1 & 0x10) f1gpstar_draw_road(bitmap,cliprect,0,6,7,true);
 
 	flag = 0;
 	cischeat_tmap_DRAW(0)
@@ -991,14 +991,14 @@ uint32_t cischeat_state::screen_update_f1gpstar(screen_device &screen, bitmap_in
 	cischeat_tmap_DRAW(1)
 
 	/* road 1!! 0!! */                  /* bitmap, road, min_priority, max_priority, transparency */
-	if (active_layers1 & 0x20) f1gpstar_draw_road(bitmap,cliprect,1,1,5,TRUE);
-	if (active_layers1 & 0x10) f1gpstar_draw_road(bitmap,cliprect,0,1,5,TRUE);
+	if (active_layers1 & 0x20) f1gpstar_draw_road(bitmap,cliprect,1,1,5,true);
+	if (active_layers1 & 0x10) f1gpstar_draw_road(bitmap,cliprect,0,1,5,true);
 
 	if (active_layers1 & 0x08) cischeat_draw_sprites(bitmap,cliprect,15,2);
 
 	/* road 1!! 0!! */                  /* bitmap, road, min_priority, max_priority, transparency */
-	if (active_layers1 & 0x20) f1gpstar_draw_road(bitmap,cliprect,1,0,0,TRUE);
-	if (active_layers1 & 0x10) f1gpstar_draw_road(bitmap,cliprect,0,0,0,TRUE);
+	if (active_layers1 & 0x20) f1gpstar_draw_road(bitmap,cliprect,1,0,0,true);
+	if (active_layers1 & 0x10) f1gpstar_draw_road(bitmap,cliprect,0,0,0,true);
 
 	if (active_layers1 & 0x08) cischeat_draw_sprites(bitmap,cliprect,1,1);
 	cischeat_tmap_DRAW(2)

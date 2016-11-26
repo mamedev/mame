@@ -108,7 +108,7 @@ void arkanoid_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		timer_68705_increment(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in arkanoid_state::device_timer");
+		assert_always(false, "Unknown id in arkanoid_state::device_timer");
 	}
 }
 

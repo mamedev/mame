@@ -1016,7 +1016,7 @@ DRIVER_INIT_MEMBER(md_base_state,megadriv_c2)
 	megadriv_init_common();
 
 	m_vdp->set_use_cram(0); // C2 uses its own palette ram
-	m_vdp->set_vdp_pal(FALSE);
+	m_vdp->set_vdp_pal(false);
 	m_vdp->set_framerate(60);
 	m_vdp->set_total_scanlines(262);
 
@@ -1031,7 +1031,7 @@ DRIVER_INIT_MEMBER(md_base_state, megadriv)
 
 	// todo: move this to the device interface?
 	m_vdp->set_use_cram(1);
-	m_vdp->set_vdp_pal(FALSE);
+	m_vdp->set_vdp_pal(false);
 	m_vdp->set_framerate(60);
 	m_vdp->set_total_scanlines(262);
 
@@ -1044,7 +1044,7 @@ DRIVER_INIT_MEMBER(md_base_state, megadrij)
 
 	// todo: move this to the device interface?
 	m_vdp->set_use_cram(1);
-	m_vdp->set_vdp_pal(FALSE);
+	m_vdp->set_vdp_pal(false);
 	m_vdp->set_framerate(60);
 	m_vdp->set_total_scanlines(262);
 
@@ -1057,7 +1057,7 @@ DRIVER_INIT_MEMBER(md_base_state, megadrie)
 
 	// todo: move this to the device interface?
 	m_vdp->set_use_cram(1);
-	m_vdp->set_vdp_pal(TRUE);
+	m_vdp->set_vdp_pal(true);
 	m_vdp->set_framerate(50);
 	m_vdp->set_total_scanlines(313);
 

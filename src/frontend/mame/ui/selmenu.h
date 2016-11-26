@@ -48,7 +48,7 @@ protected:
 
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
-	// hanlders
+	// handlers
 	void inkey_navigation();
 
 	// draw arrow
@@ -182,8 +182,11 @@ private:
 	cache_ptr               m_cache;
 	bool                    m_is_swlist;
 	focused_menu            m_focus;
-	bool                    m_pressed;          // mouse button held down
+	bool                    m_pressed;              // mouse button held down
 	osd_ticks_t             m_repeat;
+
+	int                     m_right_visible_lines;  // right box lines
+
 
 	render_texture          *m_icons_texture[MAX_ICONS_RENDER];
 	bitmap_ptr              m_icons_bitmap[MAX_ICONS_RENDER];

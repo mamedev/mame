@@ -276,7 +276,7 @@ osd_file::error osd_file::open(std::string const &path, std::uint32_t openflags,
 			}
 		}
 
-		// if we still failed, clean up and osd_free
+		// if we still failed, clean up and free
 		if (fd < 0)
 		{
 			return errno_to_file_error(errno);
@@ -339,9 +339,9 @@ osd_file::error osd_file::remove(std::string const &filename)
 //  osd_get_physical_drive_geometry
 //============================================================
 
-int osd_get_physical_drive_geometry(const char *filename, uint32_t *cylinders, uint32_t *heads, uint32_t *sectors, uint32_t *bps)
+bool osd_get_physical_drive_geometry(const char *filename, uint32_t *cylinders, uint32_t *heads, uint32_t *sectors, uint32_t *bps)
 {
-	return FALSE; // no, no way, huh-uh, forget it
+	return false; // no, no way, huh-uh, forget it
 }
 
 

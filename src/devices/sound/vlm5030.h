@@ -60,7 +60,7 @@ private:
 	uint8_t m_parameter;
 	uint8_t m_phase;
 
-	/* state of option paramter */
+	/* state of option parameter */
 	int m_frame_size;
 	int m_pitch_offset;
 	uint8_t m_interp_step;

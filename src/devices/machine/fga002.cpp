@@ -33,14 +33,15 @@
 */
 #define VERBOSE 0
 
-#define LOGPRINT(x)  do { if (VERBOSE) logerror x; } while (0)
-#define LOG(x)
-#define LOGR(x)
-#define LOGSETUP(x)
-#define LOGINT(x)   LOGPRINT(x)
-#define LOGVEC(x)
-#define LOGLVL(x)
-#define LOGIACK(x) LOGPRINT(x)
+#define LOGPRINT(x) { do { if (VERBOSE) logerror x; } while (0); }
+#define LOG(x)		{} LOGPRINT(x)
+#define LOGR(x)		{} LOGPRINT(x)
+#define LOGSETUP(x)	{} LOGPRINT(x)
+#define LOGINT(x)	{} LOGPRINT(x)
+#define LOGVEC(x)	{} LOGPRINT(x)
+#define LOGLVL(x)	{} LOGPRINT(x)
+#define LOGIACK(x)	{} LOGPRINT(x)
+
 #if VERBOSE == 2
 #define logerror printf
 #endif

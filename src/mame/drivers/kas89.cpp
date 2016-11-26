@@ -6,7 +6,7 @@
   /\/\<< Kasino '89 >>/\/\
 
   6-players electronic roulette.
-  Video field + phisical LEDs roulette.
+  Video field + physical LEDs roulette.
 
   Driver by Roberto Fresca.
 

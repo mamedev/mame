@@ -672,7 +672,7 @@ static void cps2_decrypt(running_machine &machine, uint16_t *rom, uint16_t *dec,
 		{
 			char loadingMessage[256]; // for displaying with UI
 			sprintf(loadingMessage, "Decrypting %d%%", i*100/0x10000);
-			machine.ui().set_startup_text(loadingMessage,FALSE);
+			machine.ui().set_startup_text(loadingMessage,false);
 		}
 
 

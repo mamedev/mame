@@ -136,6 +136,26 @@ struct sh4_ddt_dma
 	int mode;
 };
 
+
+// ASID [7:0] | VPN [31:10] | V |    | PPN [28:10] | SZ[1:0] | SH | C | PR[1:0] | D | WT | SA[2:0] | TC 
+
+struct sh4_utlb
+{
+	uint8_t ASID;
+	uint32_t VPN;
+	uint8_t V;
+	uint32_t PPN;
+	uint8_t PSZ;
+	uint8_t SH;
+	uint8_t C;
+	uint8_t PPR;
+	uint8_t D;
+	uint8_t WT;
+	uint8_t SA;
+	uint8_t TC;
+};
+
+
 typedef void (*sh4_ftcsr_callback)(uint32_t);
 
 
@@ -170,6 +190,10 @@ typedef void (*sh4_ftcsr_callback)(uint32_t);
 	sh34_base_device::set_sh4_clock(*device, _clock);
 
 
+#define MCFG_MMU_HACK_TYPE(_hacktype) \
+	sh34_base_device::set_mmu_hacktype(*device, _hacktype);
+
+
 class sh34_base_device : public cpu_device
 {
 public:
@@ -190,6 +214,8 @@ public:
 	static void set_md7(device_t &device, int md0) { downcast<sh34_base_device &>(device).c_md7 = md0; }
 	static void set_md8(device_t &device, int md0) { downcast<sh34_base_device &>(device).c_md8 = md0; }
 	static void set_sh4_clock(device_t &device, int clock) { downcast<sh34_base_device &>(device).c_clock = clock; }
+
+	static void set_mmu_hacktype(device_t &device, int hacktype) { downcast<sh34_base_device &>(device).m_mmuhack = hacktype; }
 
 	TIMER_CALLBACK_MEMBER( sh4_refresh_timer_callback );
 	TIMER_CALLBACK_MEMBER( sh4_rtc_timer_callback );
@@ -225,7 +251,7 @@ protected:
 	// device_disasm_interface overrides
 	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; }
 	virtual uint32_t disasm_max_opcode_bytes() const override { return 2; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 protected:
 	address_space_config m_program_config;
@@ -241,6 +267,9 @@ protected:
 	int c_md7;
 	int c_md8;
 	int c_clock;
+
+	// hack 1 = Naomi hack, hack 2 = Work in Progress implementation
+	int m_mmuhack;
 
 	uint32_t  m_ppc;
 	uint32_t  m_pc;
@@ -358,8 +387,6 @@ protected:
 	void    (*m_ftcsr_read_callback)(uint32_t data);
 
 	/* This MMU simulation is good for the simple remap used on Naomi GD-ROM SQ access *ONLY* */
-	uint32_t m_sh4_tlb_address[64];
-	uint32_t m_sh4_tlb_data[64];
 	uint8_t m_sh4_mmu_enabled;
 
 	int m_cpu_type;
@@ -451,6 +478,7 @@ protected:
 	void LDSMMACH(const uint16_t opcode);
 	void LDSMMACL(const uint16_t opcode);
 	void LDSMPR(const uint16_t opcode);
+	virtual void LDTLB(const uint16_t opcode);
 	void MAC_L(const uint16_t opcode);
 	void MAC_W(const uint16_t opcode);
 	void MOV(const uint16_t opcode);
@@ -627,7 +655,8 @@ protected:
 	void increment_rtc_time(int mode);
 	void sh4_dmac_nmi();
 	void sh4_handler_ipra_w(uint32_t data, uint32_t mem_mask);
-	uint32_t sh4_getsqremap(uint32_t address);
+	virtual uint32_t get_remap(uint32_t address);
+	virtual uint32_t sh4_getsqremap(uint32_t address);
 	void sh4_parse_configuration();
 	void sh4_timer_recompute(int which);
 	uint32_t sh4_handle_tcnt0_addr_r(uint32_t mem_mask);
@@ -703,7 +732,7 @@ protected:
 	{
 		offs_t              start;                      /* start of the RAM block */
 		offs_t              end;                        /* end of the RAM block */
-		uint8_t               readonly;                   /* TRUE if read-only */
+		bool                readonly;                   /* true if read-only */
 		void *              base;                       /* base in memory where the RAM lives */
 	}       m_fastram[SH4_MAX_FASTRAM];
 #endif
@@ -736,10 +765,21 @@ public:
 	DECLARE_WRITE32_MEMBER( sh4_internal_w );
 	DECLARE_READ32_MEMBER( sh4_internal_r );
 
-	DECLARE_READ64_MEMBER( sh4_tlb_r );
-	DECLARE_WRITE64_MEMBER( sh4_tlb_w );
+	DECLARE_READ64_MEMBER( sh4_utlb_address_array_r );
+	DECLARE_WRITE64_MEMBER( sh4_utlb_address_array_w );
+	DECLARE_READ64_MEMBER( sh4_utlb_data_array1_r );
+	DECLARE_WRITE64_MEMBER( sh4_utlb_data_array1_w );
+	DECLARE_READ64_MEMBER( sh4_utlb_data_array2_r );
+	DECLARE_WRITE64_MEMBER( sh4_utlb_data_array2_w );
+
+	virtual void LDTLB(const uint16_t opcode) override;
+
+	virtual uint32_t get_remap(uint32_t address) override;
+	virtual uint32_t sh4_getsqremap(uint32_t address) override;
+	sh4_utlb m_utlb[64];
 
 protected:
+	virtual void device_start() override;
 	virtual void device_reset() override;
 };
 
@@ -758,7 +798,7 @@ public:
 
 protected:
 	virtual void execute_run() override;
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 };
 
 
@@ -776,7 +816,7 @@ public:
 
 protected:
 	virtual void execute_run() override;
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 };
 
 

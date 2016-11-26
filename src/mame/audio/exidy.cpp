@@ -247,7 +247,7 @@ void exidy_sound_device::device_config_complete()
 void exidy_sound_device::device_start()
 {
 	/* indicate no additional hardware */
-	m_has_sh8253  = FALSE;
+	m_has_sh8253  = false;
 	m_tms = nullptr;
 	m_cvsd = nullptr;
 
@@ -694,7 +694,7 @@ void venture_sound_device::device_start()
 
 	m_riot = machine().device<riot6532_device>("riot");
 
-	m_has_sh8253  = TRUE;
+	m_has_sh8253  = true;
 	m_tms = nullptr;
 	m_pia0 = machine().device<pia6821_device>("pia0");
 	m_pia1 = machine().device<pia6821_device>("pia1");
@@ -742,7 +742,7 @@ void venture_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 
 
 
-static ADDRESS_MAP_START( venture_audio_map, AS_PROGRAM, 8, driver_device )
+static ADDRESS_MAP_START( venture_audio_map, AS_PROGRAM, 8, venture_sound_device )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0780) AM_RAM
 	AM_RANGE(0x0800, 0x087f) AM_MIRROR(0x0780) AM_DEVREADWRITE("riot", riot6532_device, read, write)
@@ -822,13 +822,13 @@ READ8_MEMBER( venture_sound_device::mtrap_voiceio_r )
 }
 
 
-static ADDRESS_MAP_START( cvsd_map, AS_PROGRAM, 8, driver_device )
+static ADDRESS_MAP_START( cvsd_map, AS_PROGRAM, 8, venture_sound_device )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( cvsd_iomap, AS_IO, 8, driver_device )
+static ADDRESS_MAP_START( cvsd_iomap, AS_IO, 8, venture_sound_device )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0xff) AM_DEVREADWRITE("custom", venture_sound_device, mtrap_voiceio_r, mtrap_voiceio_w)
 ADDRESS_MAP_END
@@ -954,7 +954,7 @@ void victory_sound_device::device_start()
 
 	m_riot = machine().device<riot6532_device>("riot");
 
-	m_has_sh8253  = TRUE;
+	m_has_sh8253  = true;
 	m_tms = nullptr;
 	m_pia0 = machine().device<pia6821_device>("pia0");
 	m_pia1 = machine().device<pia6821_device>("pia1");
@@ -1006,7 +1006,7 @@ void victory_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 
 
 
-static ADDRESS_MAP_START( victory_audio_map, AS_PROGRAM, 8, driver_device )
+static ADDRESS_MAP_START( victory_audio_map, AS_PROGRAM, 8, venture_sound_device )
 	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0x0f00) AM_RAM
 	AM_RANGE(0x1000, 0x107f) AM_MIRROR(0x0f80) AM_DEVREADWRITE("riot", riot6532_device, read, write)
 	AM_RANGE(0x2000, 0x2003) AM_MIRROR(0x0ffc) AM_DEVREADWRITE("pia1", pia6821_device, read, write)

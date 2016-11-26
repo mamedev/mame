@@ -10,9 +10,9 @@ extern const device_type TI990_TAPE_CTRL;
 struct tape_unit_t
 {
 	device_image_interface *img;        // image descriptor
-	bool bot;   // TRUE if we are at the beginning of tape
-	bool eot;   // TRUE if we are at the end of tape
-	bool wp;    // TRUE if tape is write-protected
+	bool bot;   // true if we are at the beginning of tape
+	bool eot;   // true if we are at the end of tape
+	bool wp;    // true if tape is write-protected
 };
 
 class tap_990_device : public device_t

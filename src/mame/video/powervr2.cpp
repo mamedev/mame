@@ -2022,7 +2022,7 @@ void powervr2_device::process_ta_fifo()
 
 WRITE64_MEMBER( powervr2_device::ta_fifo_poly_w )
 {
-	if (mem_mask == U64(0xffffffffffffffff))    // 64 bit
+	if (mem_mask == 0xffffffffffffffffU)    // 64 bit
 	{
 		tafifo_buff[tafifo_pos]=(uint32_t)data;
 		tafifo_buff[tafifo_pos+1]=(uint32_t)(data >> 32);

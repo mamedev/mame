@@ -135,7 +135,7 @@ static INPUT_PORTS_START( alto2 )
 	PORT_KEY(A2_KEY_FL2,        KEYCODE_F2,         0,              0,            "FL2"          )  //!< ADL left function key 2
 
 	PORT_START("ROW5")
-	PORT_KEY(A2_KEY_FR4,        KEYCODE_F8,         0,              0,            "FR4"          )  //!< ADL right funtion key 4
+	PORT_KEY(A2_KEY_FR4,        KEYCODE_F8,         0,              0,            "FR4"          )  //!< ADL right function key 4
 	PORT_KEY(A2_KEY_BW,         KEYCODE_F10,        0,              0,            "BW"           )  //!< ADL BW (?)
 
 	PORT_START("ROW6")
@@ -281,7 +281,7 @@ static MACHINE_CONFIG_START( alto2, alto2_state )
 	MCFG_CPU_IO_MAP(alto2_iomem_map)
 
 	// Video hardware
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::white)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::white())
 	MCFG_SCREEN_RAW_PARAMS(XTAL_20_16MHz,
 			 A2_DISP_TOTAL_WIDTH, 0, A2_DISP_WIDTH,
 			 A2_DISP_TOTAL_HEIGHT, 0, A2_DISP_HEIGHT)

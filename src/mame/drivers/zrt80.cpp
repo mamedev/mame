@@ -81,7 +81,7 @@ void zrt80_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 		m_beep->set_state(0);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in zrt80_state::device_timer");
+		assert_always(false, "Unknown id in zrt80_state::device_timer");
 	}
 }
 
@@ -280,7 +280,7 @@ static MACHINE_CONFIG_START( zrt80, zrt80_state )
 	MCFG_CPU_IO_MAP(zrt80_io)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)

@@ -51,9 +51,9 @@ tms32082_mp_device::tms32082_mp_device(const machine_config &mconfig, const char
 }
 
 
-offs_t tms32082_mp_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t tms32082_mp_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
-	return CPU_DISASSEMBLE_NAME(tms32082_mp)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(tms32082_mp)(this, stream, pc, oprom, opram, options);
 }
 
 
@@ -489,9 +489,9 @@ tms32082_pp_device::tms32082_pp_device(const machine_config &mconfig, const char
 }
 
 
-offs_t tms32082_pp_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t tms32082_pp_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
-	return CPU_DISASSEMBLE_NAME(tms32082_pp)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(tms32082_pp)(this, stream, pc, oprom, opram, options);
 }
 
 void tms32082_pp_device::device_start()

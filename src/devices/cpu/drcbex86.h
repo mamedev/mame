@@ -286,8 +286,8 @@ private:
 	void emit_fstp_p(x86code *&dst, int size, const be_parameter &param);
 
 	// callback helpers
-	static int dmulu(uint64_t &dstlo, uint64_t &dsthi, uint64_t src1, uint64_t src2, int flags);
-	static int dmuls(uint64_t &dstlo, uint64_t &dsthi, int64_t src1, int64_t src2, int flags);
+	static int dmulu(uint64_t &dstlo, uint64_t &dsthi, uint64_t src1, uint64_t src2, bool flags);
+	static int dmuls(uint64_t &dstlo, uint64_t &dsthi, int64_t src1, int64_t src2, bool flags);
 	static int ddivu(uint64_t &dstlo, uint64_t &dsthi, uint64_t src1, uint64_t src2);
 	static int ddivs(uint64_t &dstlo, uint64_t &dsthi, int64_t src1, int64_t src2);
 

@@ -57,7 +57,7 @@ void galaxold_state::machine_reset_common(int line)
 {
 	m_irq_line = line;
 
-	/* initalize main CPU interrupt generator flip-flops */
+	/* initialize main CPU interrupt generator flip-flops */
 	m_7474_9m_2->preset_w(1);
 	m_7474_9m_2->clear_w (1);
 

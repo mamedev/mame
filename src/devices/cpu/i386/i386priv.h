@@ -15,7 +15,7 @@
 #define MMXOP(XX)       mmx_##XX
 #define SSEOP(XX)       sse_##XX
 
-extern int i386_dasm_one(char *buffer, uint32_t pc, const uint8_t *oprom, int mode);
+extern int i386_dasm_one(std::ostream &stream, uint32_t pc, const uint8_t *oprom, int mode);
 
 enum SREGS { ES, CS, SS, DS, FS, GS };
 
@@ -481,10 +481,10 @@ bool i386_device::i386_translate_address(int intention, offs_t *address, vtlb_en
 
 //#define TEST_TLB
 
-int i386_device::translate_address(int pl, int type, uint32_t *address, uint32_t *error)
+bool i386_device::translate_address(int pl, int type, uint32_t *address, uint32_t *error)
 {
 	if(!(m_cr[0] & 0x80000000)) // Some (very few) old OS's won't work with this
-		return TRUE;
+		return true;
 
 	const vtlb_entry *table = vtlb_table();
 	uint32_t index = *address >> 12;
@@ -504,15 +504,15 @@ int i386_device::translate_address(int pl, int type, uint32_t *address, uint32_t
 			*error = ((type & TRANSLATE_WRITE) ? 2 : 0) | ((m_CPL == 3) ? 4 : 0);
 			if(entry)
 				*error |= 1;
-			return FALSE;
+			return false;
 		}
 		vtlb_dynload(index, *address, entry);
-		return TRUE;
+		return true;
 	}
 	if(!(entry & (1 << type)))
 	{
 		*error = ((type & TRANSLATE_WRITE) ? 2 : 0) | ((m_CPL == 3) ? 4 : 0) | 1;
-		return FALSE;
+		return false;
 	}
 	*address = (entry & 0xfffff000) | (*address & 0xfff);
 #ifdef TEST_TLB
@@ -520,7 +520,7 @@ int i386_device::translate_address(int pl, int type, uint32_t *address, uint32_t
 	if(!test_ret || (test_addr != *address))
 		logerror("TLB-PTE mismatch! %06X %06X %06x\n", *address, test_addr, m_pc);
 #endif
-	return TRUE;
+	return true;
 }
 
 void i386_device::CHANGE_PC(uint32_t pc)

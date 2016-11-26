@@ -288,7 +288,7 @@ drcbe_c::drcbe_c(drcuml_state &drcuml, device_t &device, drc_cache &cache, uint3
 		m_hash(cache, modes, addrbits, ignorebits),
 		m_map(cache, 0),
 		m_labels(cache),
-		m_fixup_delegate(FUNC(drcbe_c::fixup_label), this)
+		m_fixup_delegate(&drcbe_c::fixup_label, this)
 {
 }
 
@@ -1581,19 +1581,19 @@ int drcbe_c::execute(code_handle &entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_MULU, 8, 0):      // DMULU   dst,edst,src1,src2[,f]
-				dmulu(*inst[0].puint64, *inst[1].puint64, DPARAM2, DPARAM3, FALSE);
+				dmulu(*inst[0].puint64, *inst[1].puint64, DPARAM2, DPARAM3, false);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_MULU, 8, 1):
-				flags = dmulu(*inst[0].puint64, *inst[1].puint64, DPARAM2, DPARAM3, TRUE);
+				flags = dmulu(*inst[0].puint64, *inst[1].puint64, DPARAM2, DPARAM3, true);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_MULS, 8, 0):      // DMULS   dst,edst,src1,src2[,f]
-				dmuls(*inst[0].puint64, *inst[1].puint64, DPARAM2, DPARAM3, FALSE);
+				dmuls(*inst[0].puint64, *inst[1].puint64, DPARAM2, DPARAM3, false);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_MULS, 8, 1):
-				flags = dmuls(*inst[0].puint64, *inst[1].puint64, DPARAM2, DPARAM3, TRUE);
+				flags = dmuls(*inst[0].puint64, *inst[1].puint64, DPARAM2, DPARAM3, true);
 				break;
 
 			case MAKE_OPCODE_SHORT(OP_DIVU, 8, 0):      // DDIVU   dst,edst,src1,src2[,f]
@@ -2220,10 +2220,10 @@ void drcbe_c::fixup_label(void *parameter, drccodeptr labelcodeptr)
 //  dmulu - perform a double-wide unsigned multiply
 //-------------------------------------------------
 
-int drcbe_c::dmulu(uint64_t &dstlo, uint64_t &dsthi, uint64_t src1, uint64_t src2, int flags)
+int drcbe_c::dmulu(uint64_t &dstlo, uint64_t &dsthi, uint64_t src1, uint64_t src2, bool flags)
 {
 	// shortcut if we don't care about the high bits or the flags
-	if (&dstlo == &dsthi && flags == 0)
+	if (&dstlo == &dsthi && flags == false)
 	{
 		dstlo = src1 * src2;
 		return 0;
@@ -2264,10 +2264,10 @@ int drcbe_c::dmulu(uint64_t &dstlo, uint64_t &dsthi, uint64_t src1, uint64_t src
 //  dmuls - perform a double-wide signed multiply
 //-------------------------------------------------
 
-int drcbe_c::dmuls(uint64_t &dstlo, uint64_t &dsthi, int64_t src1, int64_t src2, int flags)
+int drcbe_c::dmuls(uint64_t &dstlo, uint64_t &dsthi, int64_t src1, int64_t src2, bool flags)
 {
 	// shortcut if we don't care about the high bits or the flags
-	if (&dstlo == &dsthi && flags == 0)
+	if (&dstlo == &dsthi && flags == false)
 	{
 		dstlo = src1 * src2;
 		return 0;

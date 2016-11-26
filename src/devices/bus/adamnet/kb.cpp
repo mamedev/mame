@@ -278,7 +278,7 @@ READ8_MEMBER( adam_keyboard_device::p1_r )
 
 	for (int i = 0; i < 13; i++)
 	{
-		if (!BIT(m_key_y, i)) data &= m_y[i]->read();	
+		if (!BIT(m_key_y, i)) data &= m_y[i]->read();
 	}
 
 	return data;

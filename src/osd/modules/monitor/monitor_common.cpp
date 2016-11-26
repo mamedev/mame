@@ -13,7 +13,7 @@
 std::shared_ptr<osd_monitor_info> monitor_module_base::pick_monitor(osd_options& options, int index)
 {
 	// get the aspect ratio
-	float aspect = get_aspect(options.aspect(), options.aspect(index), TRUE);
+	float aspect = get_aspect(options.aspect(), options.aspect(index), true);
 
 	auto monitor = pick_monitor_internal(options, index);
 	if (aspect != 0)

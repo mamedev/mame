@@ -206,9 +206,9 @@ static const char *addrname(int a)
 	return dst;
 }
 
-offs_t alto2_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t alto2_cpu_device::disasm_disassemble(std::ostream &main_stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
-	size_t len = 128;
+	std::ostringstream stream;
 
 	uint32_t mir = (static_cast<uint32_t>(oprom[0]) << 24) |
 			(static_cast<uint32_t>(oprom[1]) << 16) |
@@ -228,7 +228,6 @@ offs_t alto2_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8
 			(static_cast<uint32_t>(src[2]) << 8) |
 			(static_cast<uint32_t>(src[3]) << 0);
 	uint16_t prefetch = next2 & 1023;
-	char *dst = buffer;
 	offs_t result = 1 | DASMFLAG_SUPPORTED;
 	uint8_t pa;
 
@@ -236,87 +235,87 @@ offs_t alto2_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8
 		result |= DASMFLAG_STEP_OUT;
 
 	if (t)
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "T<-%s ", t_bus_alu[aluf]);
+		util::stream_format(stream, "T<-%s ", t_bus_alu[aluf]);
 	if (l)
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "L<- ");
+		util::stream_format(stream, "L<- ");
 	if (bs == 1)
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "%s<- ", regname[rsel]);
+		util::stream_format(stream, "%s<- ", regname[rsel]);
 	switch (aluf) {
 	case  0: // T?: BUS
 		// this is somehow redundant and just wasting space
-		// dst += snprintf(dst, len - (size_t)(dst - buffer), "ALUF(BUS) ");
+		// util::stream_format(stream, "ALUF(BUS) ");
 		break;
 	case  1: //   : T
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "T ");
+		util::stream_format(stream, "T ");
 		break;
 	case  2: // T?: BUS OR T
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS|T ");
+		util::stream_format(stream, "BUS|T ");
 		break;
 	case  3: //   : BUS AND T
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS&T ");
+		util::stream_format(stream, "BUS&T ");
 		break;
 	case  4: //   : BUS XOR T
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS^T ");
+		util::stream_format(stream, "BUS^T ");
 		break;
 	case  5: // T?: BUS + 1
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS+1 ");
+		util::stream_format(stream, "BUS+1 ");
 		break;
 	case  6: // T?: BUS - 1
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS-1 ");
+		util::stream_format(stream, "BUS-1 ");
 		break;
 	case  7: //   : BUS + T
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS+T ");
+		util::stream_format(stream, "BUS+T ");
 		break;
 	case  8: //   : BUS - T
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS-T ");
+		util::stream_format(stream, "BUS-T ");
 		break;
 	case  9: //   : BUS - T - 1
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS-T-1 ");
+		util::stream_format(stream, "BUS-T-1 ");
 		break;
 	case 10: // T?: BUS + T + 1
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS+T+1 ");
+		util::stream_format(stream, "BUS+T+1 ");
 		break;
 	case 11: // T?: BUS + SKIP
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS+SKIP ");
+		util::stream_format(stream, "BUS+SKIP ");
 		break;
 	case 12: // T?: BUS, T (AND)
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS,T ");
+		util::stream_format(stream, "BUS,T ");
 		break;
 	case 13: //   : BUS AND NOT T
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS&~T ");
+		util::stream_format(stream, "BUS&~T ");
 		break;
 	case 14: //   : undefined
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "*BUS ");
+		util::stream_format(stream, "*BUS ");
 		break;
 	case 15: //   : undefined
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "*BUS ");
+		util::stream_format(stream, "*BUS ");
 		break;
 	}
 
 	switch (bs) {
 	case 0: // read R
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS<-%s ", regname[rsel]);
+		util::stream_format(stream, "BUS<-%s ", regname[rsel]);
 		break;
 	case 1: // load R from shifter output
-		// dst += snprintf(dst, len - (size_t)(dst - buffer), "; %s<-", regname[rsel]);
+		// util::stream_format(stream, "; %s<-", regname[rsel]);
 		break;
 	case 2: // enables no source to the BUS, leaving it all ones
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS<-177777 ");
+		util::stream_format(stream, "BUS<-177777 ");
 		break;
 	case 3: // performs different functions in different tasks
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS<-BS3 ");
+		util::stream_format(stream, "BUS<-BS3 ");
 		break;
 	case 4: // performs different functions in different tasks
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS<-BS4 ");
+		util::stream_format(stream, "BUS<-BS4 ");
 		break;
 	case 5: // memory data
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS<-MD ");
+		util::stream_format(stream, "BUS<-MD ");
 		break;
 	case 6: // BUS[3-0] <- MOUSE; BUS[15-4] <- -1
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS<-MOUSE ");
+		util::stream_format(stream, "BUS<-MOUSE ");
 		break;
 	case 7: // IR[7-0], possibly sign extended
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS<-DISP ");
+		util::stream_format(stream, "BUS<-DISP ");
 		break;
 	}
 
@@ -325,29 +324,29 @@ offs_t alto2_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8
 	case 0: // no operation
 		break;
 	case 1: // load MAR from ALU output; start main memory reference
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "MAR<-ALU ");
+		util::stream_format(stream, "MAR<-ALU ");
 		break;
 	case 2: // switch tasks if higher priority wakeup is pending
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "TASK ");
+		util::stream_format(stream, "TASK ");
 		break;
 	case 3: // disable the current task until re-enabled by a hardware-generated condition
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "BLOCK ");
+		util::stream_format(stream, "BLOCK ");
 		break;
 	case 4: // SHIFTER output will be L shifted left one place
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "SHIFTER<-L(LSH1) ");
+		util::stream_format(stream, "SHIFTER<-L(LSH1) ");
 		break;
 	case 5: // SHIFTER output will be L shifted right one place
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "SHIFTER<-L(RSH1) ");
+		util::stream_format(stream, "SHIFTER<-L(RSH1) ");
 		break;
 	case 6: // SHIFTER output will be L rotated left 8 places
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "SHIFTER<-L(LCY8) ");
+		util::stream_format(stream, "SHIFTER<-L(LCY8) ");
 		break;
 	case 7: // put the constant from PROM (RSELECT,BS) on the bus
 		pa = (rsel << 3) | bs;
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS<-%05o ", const_prom[pa]);
+		util::stream_format(stream, "BUS<-%05o ", const_prom[pa]);
 		break;
 	default:
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "F1_%02o ", f1);
+		util::stream_format(stream, "F1_%02o ", f1);
 		break;
 	}
 
@@ -355,39 +354,43 @@ offs_t alto2_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8
 	case 0: // no operation
 		break;
 	case 1: // NEXT <- NEXT OR (BUS==0 ? 1 : 0)
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "[BUS==0 ? %s:%s] ",
+		util::stream_format(stream, "[BUS==0 ? %s:%s] ",
 			addrname((prefetch | 1) & MCODE_MASK), addrname(prefetch & MCODE_MASK));
 		break;
 	case 2: // NEXT <- NEXT OR (SHIFTER==0 ? 1 : 0)
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "[SH==0 ? %s:%s] ",
+		util::stream_format(stream, "[SH==0 ? %s:%s] ",
 			addrname((prefetch | 1) & MCODE_MASK), addrname(prefetch & MCODE_MASK));
 		break;
 	case 3: // NEXT <- NEXT OR (SHIFTER<0 ? 1 : 0)
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "[SH<0 ? %s:%s] ",
+		util::stream_format(stream, "[SH<0 ? %s:%s] ",
 			addrname((prefetch | 1) & MCODE_MASK), addrname(prefetch & MCODE_MASK));
 		break;
 	case 4: // NEXT <- NEXT OR BUS
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "NEXT<-BUS ");
+		util::stream_format(stream, "NEXT<-BUS ");
 		break;
 	case 5: // NEXT <- NEXT OR ALUC0. ALUC0 is the carry produced by last L loading microinstruction.
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "[ALUC0 ? %s:%s] ",
+		util::stream_format(stream, "[ALUC0 ? %s:%s] ",
 			addrname((prefetch | 1) & MCODE_MASK), addrname(prefetch & MCODE_MASK));
 		break;
 	case 6: // write BUS data to memory
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "MD<-BUS ");
+		util::stream_format(stream, "MD<-BUS ");
 		break;
 	case 7: // put the constant from PROM (RSELECT,BS) on the bus
 		if (f1 != 7) {
 			pa = 8 * rsel + bs;
-			dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS<-%05o", const_prom[pa]);
+			util::stream_format(stream, "BUS<-%05o", const_prom[pa]);
 		}
 		break;
 	default:
-		dst += snprintf(dst, len - (size_t)(dst - buffer), "BUS<-F2_%02o ", f2);
+		util::stream_format(stream, "BUS<-F2_%02o ", f2);
 		break;
 	}
-	if (dst > buffer && dst[-1] == ' ')
-		*--dst = '\0';
+
+	// need to trim last space
+	std::string output = stream.str();
+	if (output.length() > 0 && output[output.length() - 1] == ' ')
+		output.resize(output.length() - 1);
+	main_stream << output;
 
 	return result;
 }

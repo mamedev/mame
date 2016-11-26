@@ -68,8 +68,7 @@ static ADDRESS_MAP_START(sdk86_io, AS_IO, 16, sdk86_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xfff0, 0xfff1) AM_MIRROR(4) AM_DEVREADWRITE8(I8251_TAG, i8251_device, data_r, data_w, 0xff)
 	AM_RANGE(0xfff2, 0xfff3) AM_MIRROR(4) AM_DEVREADWRITE8(I8251_TAG, i8251_device, status_r, control_w, 0xff)
-	AM_RANGE(0xffe8, 0xffe9) AM_MIRROR(4) AM_DEVREADWRITE8("i8279", i8279_device, data_r, data_w, 0xff)
-	AM_RANGE(0xffea, 0xffeb) AM_MIRROR(4) AM_DEVREADWRITE8("i8279", i8279_device, status_r, cmd_w, 0xff)
+	AM_RANGE(0xffe8, 0xffeb) AM_MIRROR(4) AM_DEVREADWRITE8("i8279", i8279_device, read, write, 0xff)
 	// FFF8-FFFF = 2 x 8255A i/o chips. chip 1 uses the odd addresses, chip 2 uses the even addresses.
 	//             ports are A,B,C,control in that order.
 ADDRESS_MAP_END

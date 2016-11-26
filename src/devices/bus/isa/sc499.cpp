@@ -1257,6 +1257,10 @@ void sc499_device::write_block()
 		check_tape();
 	}
 
+	// write block to image file as well
+	m_image->fseek((int64_t) m_tape_pos * SC499_CTAPE_BLOCK_SIZE, SEEK_SET);
+	m_image->fwrite(&m_ctape_block_buffer[0], SC499_CTAPE_BLOCK_SIZE);
+
 	m_image->write_block(m_tape_pos, &m_ctape_block_buffer[0]);
 	m_ctape_block_count = m_tape_pos;
 	m_ctape_block_index = 0;
@@ -1313,7 +1317,7 @@ void sc499_ctape_image_device::device_config_complete()
 uint8_t *sc499_ctape_image_device::read_block(int block_num)
 {
 	// access beyond end of tape cart
-	if (m_ctape_data.size() <= (block_num + 1) * SC499_CTAPE_BLOCK_SIZE)
+	if (m_ctape_data.size() < (block_num + 1) * SC499_CTAPE_BLOCK_SIZE)
 		return nullptr;
 	else
 		return &m_ctape_data[block_num * SC499_CTAPE_BLOCK_SIZE];
@@ -1321,8 +1325,10 @@ uint8_t *sc499_ctape_image_device::read_block(int block_num)
 
 void sc499_ctape_image_device::write_block(int block_num, uint8_t *ptr)
 {
-	if (!(m_ctape_data.size() <= (block_num + 1) * SC499_CTAPE_BLOCK_SIZE))
-		memcpy(&m_ctape_data[block_num * SC499_CTAPE_BLOCK_SIZE], ptr, SC499_CTAPE_BLOCK_SIZE);
+	if ((m_ctape_data.size() < (block_num + 1) * SC499_CTAPE_BLOCK_SIZE))
+		m_ctape_data.resize((block_num + 1) * SC499_CTAPE_BLOCK_SIZE);
+
+	memcpy(&m_ctape_data[block_num * SC499_CTAPE_BLOCK_SIZE], ptr, SC499_CTAPE_BLOCK_SIZE);
 }
 
 image_init_result sc499_ctape_image_device::call_load()

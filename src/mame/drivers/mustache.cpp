@@ -43,7 +43,8 @@ YM2151:
 
 
 static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8, mustache_state )
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
+	AM_RANGE(0x0000, 0x7fff) AM_DEVREAD("sei80bu", sei80bu_device, data_r)
+	AM_RANGE(0x8000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE("t5182", t5182_device, sound_irq_w)
 	AM_RANGE(0xd001, 0xd001) AM_DEVREAD("t5182", t5182_device, sharedram_semaphore_snd_r)
@@ -62,7 +63,7 @@ static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8, mustache_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, mustache_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
+	AM_RANGE(0x0000, 0x7fff) AM_DEVREAD("sei80bu", sei80bu_device, opcode_r)
 	AM_RANGE(0x8000, 0xbfff) AM_ROM AM_REGION("maincpu", 0x8000)
 ADDRESS_MAP_END
 
@@ -179,8 +180,10 @@ static MACHINE_CONFIG_START( mustache, mustache_state )
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mustache_state, scanline, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("t5182", T5182, 0)
+	MCFG_DEVICE_ADD("sei80bu", SEI80BU, 0)
+	MCFG_DEVICE_ROM("maincpu")
 
+	MCFG_DEVICE_ADD("t5182", T5182, 0)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -231,6 +234,33 @@ ROM_START( mustache )
 	ROM_LOAD( "mustache.b6",0x0300, 0x1000, CRC(5f83fa35) SHA1(cb13e63577762d818e5dcbb52b8a53f66e284e8f) ) /* 63S281N near SEI0070BU */
 ROM_END
 
+ROM_START( mustachei )
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "1.h18", 0x0000, 0x8000, CRC(22893fbc) SHA1(724ea50642aec9be10547bd86fae5e1ebfe54685) )
+	ROM_LOAD( "2.h16", 0x8000, 0x4000, CRC(ec70cfd3) SHA1(0476eab03b907778ea488c802b79da99bf376eb6) )
+
+	ROM_REGION( 0x8000, "t5182_z80", 0 ) /* Toshiba T5182 external ROM */
+	ROM_LOAD( "10.e5", 0x0000, 0x8000, CRC(efbb1943) SHA1(3320e9eaeb776d09ed63f7dedc79e720674e6718) )
+
+	ROM_REGION( 0x0c000, "gfx1",0)  /* BG tiles  */
+	ROM_LOAD( "5.a13", 0x0000,  0x4000, CRC(9baee4a7) SHA1(31bcec838789462e67e54ebe7256db9fc4e51b69) )
+	ROM_LOAD( "4.a15", 0x4000,  0x4000, CRC(8155387d) SHA1(5f0a394c7671442519a831b0eeeaba4eecd5a406) )
+	ROM_LOAD( "3.a16", 0x8000,  0x4000, CRC(4db4448d) SHA1(50a94fd65c263d95fd24b4009dbb87707929fdcb) )
+
+	ROM_REGION( 0x20000, "gfx2",0 ) /* sprites */
+	ROM_LOAD( "6.a4", 0x00000,  0x8000, CRC(4a95a89c) SHA1(b34ebbda9b0e591876988e42bd36fd505452f38c) )
+	ROM_LOAD( "8.a7", 0x08000,  0x8000, CRC(3e6be0fb) SHA1(319ea59107e37953c31f59f5f635fc520682b09f) )
+	ROM_LOAD( "7.a5", 0x10000,  0x8000, CRC(8ad38884) SHA1(e11f1e1db6d5d119afedbe6604d10a6fd6049f12) )
+	ROM_LOAD( "9.a8", 0x18000,  0x8000, CRC(3568c158) SHA1(c3a2120086befe396a112bd62f032638011cb47a) )
+
+	ROM_REGION( 0x1300, "proms",0 ) /* proms */
+	ROM_LOAD( "d.c3",0x0000, 0x0100, CRC(68575300) SHA1(bc93a38df91ad8c2f335f9bccc98b52376f9b483) )
+	ROM_LOAD( "c.c2",0x0100, 0x0100, CRC(eb008d62) SHA1(a370fbd1affaa489210ea36eb9e365263fb4e232) )
+	ROM_LOAD( "b.c1",0x0200, 0x0100, CRC(65da3604) SHA1(e4874d4152a57944d4e47306250833ea5cd0d89b) )
+
+	ROM_LOAD( "a.b6",0x0300, 0x1000, CRC(5f83fa35) SHA1(cb13e63577762d818e5dcbb52b8a53f66e284e8f) ) /* 63S281N near SEI0070BU */
+ROM_END
+
 DRIVER_INIT_MEMBER(mustache_state,mustache)
 {
 	int i;
@@ -274,9 +304,8 @@ DRIVER_INIT_MEMBER(mustache_state,mustache)
 	/* SPR address lines */
 	for (i = 0; i < 2*G2; i++)
 		gfx2[i] = buf[BITSWAP24(i,23,22,21,20,19,18,17,16,15,12,11,10,9,8,7,6,5,4,13,14,3,2,1,0)];
-
-	seibu_sound_device::apply_decrypt(memregion("maincpu")->base(), m_decrypted_opcodes, 0x8000);
 }
 
 
-GAME( 1987, mustache, 0, mustache, mustache, mustache_state, mustache, ROT90, "Seibu Kaihatsu (March license)", "Mustache Boy", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, mustache,  0,        mustache, mustache, mustache_state, mustache, ROT90, "Seibu Kaihatsu (March license)",  "Mustache Boy (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, mustachei, mustache, mustache, mustache, mustache_state, mustache, ROT90, "Seibu Kaihatsu (IG SPA license)", "Mustache Boy (Italy)", MACHINE_SUPPORTS_SAVE )

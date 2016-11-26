@@ -381,7 +381,7 @@ static imgtoolerr_t fat_partition_open(imgtool::partition &partition, uint64_t f
 	fat_partition_info *info;
 	uint32_t fat_bits, total_sectors_l, total_sectors_h, sector_size;
 	uint64_t available_sectors;
-	//int has_extended_bios_param_block = TRUE;
+	//int has_extended_bios_param_block = true;
 
 	info = fat_get_partition_info(partition);
 
@@ -406,7 +406,7 @@ static imgtoolerr_t fat_partition_open(imgtool::partition &partition, uint64_t f
 	else
 	{
 		fat_bits = 8;
-		//has_extended_bios_param_block = FALSE;
+		//has_extended_bios_param_block = false;
 	}
 
 	info->fat_bits              = fat_bits;
@@ -465,7 +465,7 @@ static imgtoolerr_t fat_partition_create(imgtool::image &image, uint64_t first_b
 #endif
 
 	/* check for limits */
-	if (block_count > U64(0xFFFFFFFFFFFF))
+	if (block_count > 0xFFFFFFFFFFFFU)
 		return IMGTOOLERR_PARAMTOOLARGE;
 
 	/* get the geometry */
@@ -971,8 +971,8 @@ static imgtoolerr_t fat_set_file_size(imgtool::partition &partition, fat_file *f
 	uint8_t dirent[32];
 	size_t clear_size;
 	void *clear_buffer = NULL;
-	int delete_file = FALSE;
-	int rest_free = FALSE;
+	int delete_file = false;
+	int rest_free = false;
 
 	disk_info = fat_get_partition_info(partition);
 
@@ -981,7 +981,7 @@ static imgtoolerr_t fat_set_file_size(imgtool::partition &partition, fat_file *f
 	/* special case */
 	if (new_size == ~0)
 	{
-		delete_file = TRUE;
+		delete_file = true;
 		new_size = 0;
 	}
 
@@ -1070,7 +1070,7 @@ static imgtoolerr_t fat_set_file_size(imgtool::partition &partition, fat_file *f
 
 					/* did we write the last cluster?  if so, the rest (if any) are free */
 					if (write_cluster == 0xFFFFFFFF)
-						rest_free = TRUE;
+						rest_free = true;
 				}
 			}
 			while((++i < new_cluster_count) || (cluster != 0xFFFFFFFF));
@@ -1735,7 +1735,7 @@ static imgtoolerr_t fat_lookup_path(imgtool::partition &partition, const char *p
 					if (err)
 						goto done;
 
-					bumped_sfn = FALSE;
+					bumped_sfn = false;
 					fat_cannonicalize_sfn(sfn, &created_entry[created_entry_len - FAT_DIRENT_SIZE]);
 
 					do
@@ -1746,7 +1746,7 @@ static imgtoolerr_t fat_lookup_path(imgtool::partition &partition, const char *p
 
 						if (!core_stricmp(sfn, ent.short_filename))
 						{
-							bumped_sfn = TRUE;
+							bumped_sfn = true;
 							fat_bump_dirent(partition, created_entry, created_entry_len);
 							fat_cannonicalize_sfn(sfn, &created_entry[created_entry_len - FAT_DIRENT_SIZE]);
 						}

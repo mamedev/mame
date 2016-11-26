@@ -2,9 +2,9 @@
 // copyright-holders:Aaron Giles,smf
 /***************************************************************************
 
-	timehelp.h
+    timehelp.h
 
-	Assorted shared functionality between timekeeping chips and RTCs.
+    Assorted shared functionality between timekeeping chips and RTCs.
 
 ***************************************************************************/
 

@@ -40,7 +40,7 @@
  *          +-------++----+----+----+----+----+
  *
  *          Reset count function: Please refer to
- *          National Semiconductor datasheet (timing diagramm)
+ *          National Semiconductor datasheet (timing diagram)
  *
  *  Naming conventions follow National Semiconductor datasheet
  *

@@ -437,9 +437,9 @@ int renderer_sdl2::create()
 	auto win = assert_window();
 
 	if (video_config.waitvsync)
-		m_sdl_renderer = SDL_CreateRenderer(win->platform_window<SDL_Window*>(), -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
+		m_sdl_renderer = SDL_CreateRenderer(std::dynamic_pointer_cast<sdl_window_info>(win)->platform_window(), -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
 	else
-		m_sdl_renderer = SDL_CreateRenderer(win->platform_window<SDL_Window*>(), -1, SDL_RENDERER_ACCELERATED);
+		m_sdl_renderer = SDL_CreateRenderer(std::dynamic_pointer_cast<sdl_window_info>(win)->platform_window(), -1, SDL_RENDERER_ACCELERATED);
 
 	if (!m_sdl_renderer)
 	{

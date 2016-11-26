@@ -234,7 +234,7 @@ static MACHINE_CONFIG_START( skeetsht, skeetsht_state )
 
 	MCFG_CPU_ADD("tms", TMS34010, 48000000)
 	MCFG_CPU_PROGRAM_MAP(tms_program_map)
-	MCFG_TMS340X0_HALT_ON_RESET(TRUE) /* halt on reset */
+	MCFG_TMS340X0_HALT_ON_RESET(true) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(48000000 / 8) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
 	MCFG_TMS340X0_SCANLINE_RGB32_CB(skeetsht_state, scanline_update)   /* scanline updater (rgb32) */

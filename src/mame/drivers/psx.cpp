@@ -124,8 +124,8 @@ static MACHINE_CONFIG_START( psj, psx1_state )
 
 	MCFG_PSXCD_ADD(PSXCD_TAG, "cdrom")
 	MCFG_PSXCD_IRQ_HANDLER(DEVWRITELINE("maincpu:irq", psxirq_device, intin2))
-	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 3, psx_dma_read_delegate( FUNC( psx1_state::cd_dma_read ), (psx1_state *) owner ) )
-	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 3, psx_dma_write_delegate( FUNC( psx1_state::cd_dma_write ), (psx1_state *) owner ) )
+	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 3, psx_dma_read_delegate(&psx1_state::cd_dma_read, (psx1_state *) owner ) )
+	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 3, psx_dma_write_delegate(&psx1_state::cd_dma_write, (psx1_state *) owner ) )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( psu, psj )
@@ -170,8 +170,8 @@ static MACHINE_CONFIG_START( pse, psx1_state )
 
 	MCFG_PSXCD_ADD(PSXCD_TAG, "cdrom")
 	MCFG_PSXCD_IRQ_HANDLER(DEVWRITELINE("maincpu:irq", psxirq_device, intin2))
-	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 3, psx_dma_read_delegate( FUNC( psx1_state::cd_dma_read ), (psx1_state *) owner ) )
-	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 3, psx_dma_write_delegate( FUNC( psx1_state::cd_dma_write ), (psx1_state *) owner ) )
+	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 3, psx_dma_read_delegate(&psx1_state::cd_dma_read, (psx1_state *) owner ) )
+	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 3, psx_dma_write_delegate(&psx1_state::cd_dma_write, (psx1_state *) owner ) )
 MACHINE_CONFIG_END
 
 ROM_START( psj )

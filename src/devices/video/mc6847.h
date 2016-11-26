@@ -202,7 +202,7 @@ protected:
 		}
 	};
 
-	// artficater internal class
+	// artificater internal class
 	class artifacter
 	{
 	public:
@@ -522,7 +522,7 @@ public:
 	static void set_black_and_white(device_t &device, bool bw) { downcast<mc6847_base_device &>(device).m_black_and_white = bw; }
 
 	/* updates the screen -- this will call begin_update(),
-	   followed by update_row() reapeatedly and after all row
+	   followed by update_row() repeatedly and after all row
 	   updating is complete, end_update() */
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 

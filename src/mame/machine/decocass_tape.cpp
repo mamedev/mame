@@ -343,11 +343,11 @@ uint8_t decocass_tape_device::get_status_bits()
 
 
 /*-------------------------------------------------
-    tape_is_present - return TRUE if the tape is
+    tape_is_present - return true if the tape is
     present
 -------------------------------------------------*/
 
-uint8_t decocass_tape_device::is_present()
+bool decocass_tape_device::is_present()
 {
 	return m_tape_data.found();
 }

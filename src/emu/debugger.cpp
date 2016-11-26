@@ -21,7 +21,7 @@
 ***************************************************************************/
 
 static running_machine *g_machine = nullptr;
-static int g_atexit_registered = FALSE;
+static bool g_atexit_registered = false;
 
 /*-------------------------------------------------
     debugger_instruction_hook - CPU cores call
@@ -132,7 +132,7 @@ debugger_manager::debugger_manager(running_machine &machine)
 	/* register an atexit handler if we haven't yet */
 	if (!g_atexit_registered)
 		atexit(debugger_flush_all_traces_on_abnormal_exit);
-	g_atexit_registered = TRUE;
+	g_atexit_registered = true;
 
 	/* initialize osd debugger features */
 	machine.osd().init_debugger();

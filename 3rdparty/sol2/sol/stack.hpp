@@ -181,13 +181,16 @@ namespace sol {
 			return call_into_lua(returns_list(), args_list(), L, start, std::forward<Fx>(fx), std::forward<FxArgs>(fxargs)...);
 		}
 
-		inline call_syntax get_call_syntax(lua_State* L, const std::string& key, int index = -2) {
+		inline call_syntax get_call_syntax(lua_State* L, const std::string& key, int index) {
+			if (lua_gettop(L) == 0) {
+				return call_syntax::dot;
+			}
 			luaL_getmetatable(L, key.c_str());
 			auto pn = pop_n(L, 1);
-			if (lua_compare(L, -1, index, LUA_OPEQ) == 1) {
-				return call_syntax::colon;
+			if (lua_compare(L, -1, index, LUA_OPEQ) != 1) {
+				return call_syntax::dot;
 			}
-			return call_syntax::dot;
+			return call_syntax::colon;
 		}
 
 		inline void script(lua_State* L, const std::string& code) {

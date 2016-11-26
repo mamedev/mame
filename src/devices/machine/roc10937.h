@@ -2,7 +2,7 @@
 // copyright-holders:James Wallace
 /**********************************************************************
 
-    Rockwell 10937/10957 interface and simlar chips
+    Rockwell 10937/10957 interface and similar chips
     Emulation by J.Wallace
     OKI MSC1937 is a clone of this chip, with many others.
 

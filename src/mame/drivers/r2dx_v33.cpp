@@ -66,6 +66,8 @@ Then it puts settings at 0x9e08 and 0x9e0a (bp 91acb)
 #include "cpu/nec/nec.h"
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
+#include "sound/3812intf.h"
+//#include "sound/ym2151.h"
 #include "sound/okim6295.h"
 #include "includes/raiden2.h"
 #include "machine/r2crypt.h"
@@ -804,9 +806,8 @@ static MACHINE_CONFIG_START( nzerotea, r2dx_v33_state )
 
 	MCFG_MACHINE_RESET_OVERRIDE(r2dx_v33_state,nzeroteam)
 
-
-	//  SEIBU2_RAIDEN2_SOUND_SYSTEM_CPU(14318180/4)
-	SEIBU_NEWZEROTEAM_SOUND_SYSTEM_CPU(14318180/4)
+	MCFG_CPU_ADD("audiocpu", Z80, 14318180/4)
+	MCFG_CPU_PROGRAM_MAP(zeroteam_sound_map)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
@@ -827,9 +828,19 @@ static MACHINE_CONFIG_START( nzerotea, r2dx_v33_state )
 	MCFG_SEIBU_CRTC_LAYER_SCROLL_CB(WRITE16(raiden2_state, tile_scroll_w))
 
 	/* sound hardware */
-//  SEIBU_SOUND_SYSTEM_YM2151_RAIDEN2_INTERFACE(28636360/8,28636360/28,1,2)
-	SEIBU_SOUND_SYSTEM_YM3812_INTERFACE(14318180/4,1320000)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_SOUND_ADD("ymsnd", YM3812, 14318180/4)
+	MCFG_YM3812_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_OKIM6295_ADD("oki", 1320000, OKIM6295_PIN7_LOW)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+
+	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
+	MCFG_SEIBU_SOUND_CPU("audiocpu")
+	MCFG_SEIBU_SOUND_YM_READ_CB(DEVREAD8("ymsnd", ym3812_device, read))
+	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym3812_device, write))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( zerotm2k, nzerotea )

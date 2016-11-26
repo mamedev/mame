@@ -1061,96 +1061,95 @@ MACHINE_CONFIG_END
 
 ROM_START( zaxxon )
 	ROM_REGION( 0x6000, "maincpu", 0 )
-	ROM_LOAD( "zaxxon3.u27",  0x0000, 0x2000, CRC(6e2b4a30) SHA1(80ac53c554c84226b119cbe3cf3470bcdbcd5762) )
-	ROM_LOAD( "zaxxon2.u28",  0x2000, 0x2000, CRC(1c9ea398) SHA1(0cd259be3fa80f3d53dfa76d5ca06773cdfe5945) )
-	ROM_LOAD( "zaxxon1.u29",  0x4000, 0x1000, CRC(1c123ef9) SHA1(2588be06ea7baca6112d58c78a1eeb98aad8a02e) )
+	ROM_LOAD( "zaxxon_rom3d.u27",  0x0000, 0x2000, CRC(6e2b4a30) SHA1(80ac53c554c84226b119cbe3cf3470bcdbcd5762) ) /* These 3 roms had a red D stamped on them */
+	ROM_LOAD( "zaxxon_rom2d.u28",  0x2000, 0x2000, CRC(1c9ea398) SHA1(0cd259be3fa80f3d53dfa76d5ca06773cdfe5945) )
+	ROM_LOAD( "zaxxon_rom1d.u29",  0x4000, 0x1000, CRC(1c123ef9) SHA1(2588be06ea7baca6112d58c78a1eeb98aad8a02e) )
 
 	ROM_REGION( 0x1000, "gfx_tx", 0 )
-	ROM_LOAD( "zaxxon14.u68", 0x0000, 0x0800, CRC(07bf8c52) SHA1(425157a1625b1bd5169c3218b958010bf6af12bb) )
-	ROM_LOAD( "zaxxon15.u69", 0x0800, 0x0800, CRC(c215edcb) SHA1(f1ded2173eb139f48d2ca86c5ef00acbe6c11cd3) )
+	ROM_LOAD( "zaxxon_rom14.u68", 0x0000, 0x0800, CRC(07bf8c52) SHA1(425157a1625b1bd5169c3218b958010bf6af12bb) )
+	ROM_LOAD( "zaxxon_rom15.u69", 0x0800, 0x0800, CRC(c215edcb) SHA1(f1ded2173eb139f48d2ca86c5ef00acbe6c11cd3) )
 
 	ROM_REGION( 0x6000, "gfx_bg", 0 )
-	ROM_LOAD( "zaxxon6.u113", 0x0000, 0x2000, CRC(6e07bb68) SHA1(a002f3441b0f0044615ce71ecbd14edadba16270) )
-	ROM_LOAD( "zaxxon5.u112", 0x2000, 0x2000, CRC(0a5bce6a) SHA1(a86543727389931244ba8a576b543d7ac05a2585) )
-	ROM_LOAD( "zaxxon4.u111", 0x4000, 0x2000, CRC(a5bf1465) SHA1(a8cd27dfb4a606bae8bfddcf936e69e980fb1977) )
+	ROM_LOAD( "zaxxon_rom6.u113", 0x0000, 0x2000, CRC(6e07bb68) SHA1(a002f3441b0f0044615ce71ecbd14edadba16270) )
+	ROM_LOAD( "zaxxon_rom5.u112", 0x2000, 0x2000, CRC(0a5bce6a) SHA1(a86543727389931244ba8a576b543d7ac05a2585) )
+	ROM_LOAD( "zaxxon_rom4.u111", 0x4000, 0x2000, CRC(a5bf1465) SHA1(a8cd27dfb4a606bae8bfddcf936e69e980fb1977) )
 
 	ROM_REGION( 0x6000, "gfx_spr", 0 )
-	ROM_LOAD( "zaxxon11.u77", 0x0000, 0x2000, CRC(eaf0dd4b) SHA1(194e2ca0a806e0cb6bb7cc8341d1fc6f2ea911f6) )
-	ROM_LOAD( "zaxxon12.u78", 0x2000, 0x2000, CRC(1c5369c7) SHA1(af6a5984c3cedfa8c9efcd669f4f205b51a433b2) )
-	ROM_LOAD( "zaxxon13.u79", 0x4000, 0x2000, CRC(ab4e8a9a) SHA1(4ac79cccc30e4adfa878b36101e97e20ac010438) )
+	ROM_LOAD( "zaxxon_rom11.u77", 0x0000, 0x2000, CRC(eaf0dd4b) SHA1(194e2ca0a806e0cb6bb7cc8341d1fc6f2ea911f6) )
+	ROM_LOAD( "zaxxon_rom12.u78", 0x2000, 0x2000, CRC(1c5369c7) SHA1(af6a5984c3cedfa8c9efcd669f4f205b51a433b2) )
+	ROM_LOAD( "zaxxon_rom13.u79", 0x4000, 0x2000, CRC(ab4e8a9a) SHA1(4ac79cccc30e4adfa878b36101e97e20ac010438) )
 
 	ROM_REGION( 0x8000, "tilemap_dat", 0 )
-	ROM_LOAD( "zaxxon8.u91",  0x0000, 0x2000, CRC(28d65063) SHA1(e1f90716236c61df61bdc6915a8e390cb4dcbf15) )
-	ROM_LOAD( "zaxxon7.u90",  0x2000, 0x2000, CRC(6284c200) SHA1(d26a9049541479b8b19f5aa0690cf4aaa787c9b5) )
-	ROM_LOAD( "zaxxon10.u93", 0x4000, 0x2000, CRC(a95e61fd) SHA1(a0f8c15ff75affa3532abf8f340811cf415421fd) )
-	ROM_LOAD( "zaxxon9.u92",  0x6000, 0x2000, CRC(7e42691f) SHA1(2124363be8f590b74e2b15dd3f90d77dd9ca9528) )
+	ROM_LOAD( "zaxxon_rom8.u91",  0x0000, 0x2000, CRC(28d65063) SHA1(e1f90716236c61df61bdc6915a8e390cb4dcbf15) )
+	ROM_LOAD( "zaxxon_rom7.u90",  0x2000, 0x2000, CRC(6284c200) SHA1(d26a9049541479b8b19f5aa0690cf4aaa787c9b5) )
+	ROM_LOAD( "zaxxon_rom10.u93", 0x4000, 0x2000, CRC(a95e61fd) SHA1(a0f8c15ff75affa3532abf8f340811cf415421fd) )
+	ROM_LOAD( "zaxxon_rom9.u92",  0x6000, 0x2000, CRC(7e42691f) SHA1(2124363be8f590b74e2b15dd3f90d77dd9ca9528) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "zaxxon.u98",   0x0000, 0x0100, CRC(6cc6695b) SHA1(01ae8450ccc302e1a5ae74230d44f6f531a962e2) )
-	ROM_LOAD( "zaxxon.u72",   0x0100, 0x0100, CRC(deaa21f7) SHA1(0cf08fb62f77d93ff7cb883c633e0db35906e11d) )
+	ROM_LOAD( "mro16.u76",   0x0000, 0x0100, CRC(6cc6695b) SHA1(01ae8450ccc302e1a5ae74230d44f6f531a962e2) ) /* BPROM from TI stamped as J214A2  MRO16 */
+	ROM_LOAD( "zaxxon.u72",  0x0100, 0x0100, CRC(deaa21f7) SHA1(0cf08fb62f77d93ff7cb883c633e0db35906e11d) ) /* Same data as PR-5167 from Super Zaxxon */
 ROM_END
 
 ROM_START( zaxxon2 )
 	ROM_REGION( 0x6000, "maincpu", 0 )
-	ROM_LOAD( "zaxxon3a.u27", 0x0000, 0x2000, CRC(b18e428a) SHA1(d3ff077e37a3ed8a9cc32cba19e1694b79df6b30) )
-	ROM_LOAD( "zaxxon2.u28",  0x2000, 0x2000, CRC(1c9ea398) SHA1(0cd259be3fa80f3d53dfa76d5ca06773cdfe5945) )
-	ROM_LOAD( "zaxxon1a.u29", 0x4000, 0x1000, CRC(1977d933) SHA1(b0100a51a85928b8df3b07b27c9e7e4f929d7893) )
+	ROM_LOAD( "zaxxon_rom3a.u27", 0x0000, 0x2000, CRC(b18e428a) SHA1(d3ff077e37a3ed8a9cc32cba19e1694b79df6b30) ) /* Need to verify proper revision level via ROM label */
+	ROM_LOAD( "zaxxon_rom2a.u28", 0x2000, 0x2000, CRC(1c9ea398) SHA1(0cd259be3fa80f3d53dfa76d5ca06773cdfe5945) ) /* Need to verify proper revision level via ROM label */
+	ROM_LOAD( "zaxxon_rom1a.u29", 0x4000, 0x1000, CRC(1977d933) SHA1(b0100a51a85928b8df3b07b27c9e7e4f929d7893) ) /* Need to verify proper revision level via ROM label */
 
 	ROM_REGION( 0x1000, "gfx_tx", 0 )
-	ROM_LOAD( "zaxxon14.u68", 0x0000, 0x0800, CRC(07bf8c52) SHA1(425157a1625b1bd5169c3218b958010bf6af12bb) )
-	ROM_LOAD( "zaxxon15.u69", 0x0800, 0x0800, CRC(c215edcb) SHA1(f1ded2173eb139f48d2ca86c5ef00acbe6c11cd3) )
+	ROM_LOAD( "zaxxon_rom14.u68", 0x0000, 0x0800, CRC(07bf8c52) SHA1(425157a1625b1bd5169c3218b958010bf6af12bb) )
+	ROM_LOAD( "zaxxon_rom15.u69", 0x0800, 0x0800, CRC(c215edcb) SHA1(f1ded2173eb139f48d2ca86c5ef00acbe6c11cd3) )
 
 	ROM_REGION( 0x6000, "gfx_bg", 0 )
-	ROM_LOAD( "zaxxon6.u113", 0x0000, 0x2000, CRC(6e07bb68) SHA1(a002f3441b0f0044615ce71ecbd14edadba16270) )
-	ROM_LOAD( "zaxxon5.u112", 0x2000, 0x2000, CRC(0a5bce6a) SHA1(a86543727389931244ba8a576b543d7ac05a2585) )
-	ROM_LOAD( "zaxxon4.u111", 0x4000, 0x2000, CRC(a5bf1465) SHA1(a8cd27dfb4a606bae8bfddcf936e69e980fb1977) )
+	ROM_LOAD( "zaxxon_rom6.u113", 0x0000, 0x2000, CRC(6e07bb68) SHA1(a002f3441b0f0044615ce71ecbd14edadba16270) )
+	ROM_LOAD( "zaxxon_rom5.u112", 0x2000, 0x2000, CRC(0a5bce6a) SHA1(a86543727389931244ba8a576b543d7ac05a2585) )
+	ROM_LOAD( "zaxxon_rom4.u111", 0x4000, 0x2000, CRC(a5bf1465) SHA1(a8cd27dfb4a606bae8bfddcf936e69e980fb1977) )
 
 	ROM_REGION( 0x6000, "gfx_spr", 0 )
-	ROM_LOAD( "zaxxon11.u77", 0x0000, 0x2000, CRC(eaf0dd4b) SHA1(194e2ca0a806e0cb6bb7cc8341d1fc6f2ea911f6) )
-	ROM_LOAD( "zaxxon12.u78", 0x2000, 0x2000, CRC(1c5369c7) SHA1(af6a5984c3cedfa8c9efcd669f4f205b51a433b2) )
-	ROM_LOAD( "zaxxon13.u79", 0x4000, 0x2000, CRC(ab4e8a9a) SHA1(4ac79cccc30e4adfa878b36101e97e20ac010438) )
+	ROM_LOAD( "zaxxon_rom11.u77", 0x0000, 0x2000, CRC(eaf0dd4b) SHA1(194e2ca0a806e0cb6bb7cc8341d1fc6f2ea911f6) )
+	ROM_LOAD( "zaxxon_rom12.u78", 0x2000, 0x2000, CRC(1c5369c7) SHA1(af6a5984c3cedfa8c9efcd669f4f205b51a433b2) )
+	ROM_LOAD( "zaxxon_rom13.u79", 0x4000, 0x2000, CRC(ab4e8a9a) SHA1(4ac79cccc30e4adfa878b36101e97e20ac010438) )
 
 	ROM_REGION( 0x8000, "tilemap_dat", 0 )
-	ROM_LOAD( "zaxxon8.u91",  0x0000, 0x2000, CRC(28d65063) SHA1(e1f90716236c61df61bdc6915a8e390cb4dcbf15) )
-	ROM_LOAD( "zaxxon7.u90",  0x2000, 0x2000, CRC(6284c200) SHA1(d26a9049541479b8b19f5aa0690cf4aaa787c9b5) )
-	ROM_LOAD( "zaxxon10.u93", 0x4000, 0x2000, CRC(a95e61fd) SHA1(a0f8c15ff75affa3532abf8f340811cf415421fd) )
-	ROM_LOAD( "zaxxon9.u92",  0x6000, 0x2000, CRC(7e42691f) SHA1(2124363be8f590b74e2b15dd3f90d77dd9ca9528) )
+	ROM_LOAD( "zaxxon_rom8.u91",  0x0000, 0x2000, CRC(28d65063) SHA1(e1f90716236c61df61bdc6915a8e390cb4dcbf15) )
+	ROM_LOAD( "zaxxon_rom7.u90",  0x2000, 0x2000, CRC(6284c200) SHA1(d26a9049541479b8b19f5aa0690cf4aaa787c9b5) )
+	ROM_LOAD( "zaxxon_rom10.u93", 0x4000, 0x2000, CRC(a95e61fd) SHA1(a0f8c15ff75affa3532abf8f340811cf415421fd) )
+	ROM_LOAD( "zaxxon_rom9.u92",  0x6000, 0x2000, CRC(7e42691f) SHA1(2124363be8f590b74e2b15dd3f90d77dd9ca9528) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "zaxxon.u98",   0x0000, 0x0100, CRC(6cc6695b) SHA1(01ae8450ccc302e1a5ae74230d44f6f531a962e2) )
-	ROM_LOAD( "j214a2.72",    0x0100, 0x0100, CRC(a9e1fb43) SHA1(57dbcfe2438fd090c08594818549aeea6339eab2) )
+	ROM_LOAD( "mro16.u76",   0x0000, 0x0100, CRC(6cc6695b) SHA1(01ae8450ccc302e1a5ae74230d44f6f531a962e2) ) /* BPROM from TI stamped as J214A2  MRO16 */
+	ROM_LOAD( "mro17.u41",   0x0100, 0x0100, CRC(a9e1fb43) SHA1(57dbcfe2438fd090c08594818549aeea6339eab2) ) /* BPROM from TI stamped as J214A2  MRO17 */
 ROM_END
 
 ROM_START( zaxxon3 )
 	ROM_REGION( 0x6000, "maincpu", 0 )
-	ROM_LOAD( "zaxxon3_alt.u27", 0x0000, 0x2000, CRC(2f2f2b7c) SHA1(009b6f8943b35bf933c56e9538377be3e1db6a6d) )
-	ROM_LOAD( "zaxxon2_alt.u28", 0x2000, 0x2000, CRC(ae7e1c38) SHA1(896f920e04c182eced3a3714b45a1d96e45b4473) )
-	ROM_LOAD( "zaxxon1_alt.u29", 0x4000, 0x1000, CRC(cc67c097) SHA1(d258b2900a173b0f3f8acd94b6b636ce3324616d) )
+	ROM_LOAD( "zaxxon3_alt.u27", 0x0000, 0x2000, CRC(2f2f2b7c) SHA1(009b6f8943b35bf933c56e9538377be3e1db6a6d) ) /* Need to verify proper revision level via ROM label */
+	ROM_LOAD( "zaxxon2_alt.u28", 0x2000, 0x2000, CRC(ae7e1c38) SHA1(896f920e04c182eced3a3714b45a1d96e45b4473) ) /* Need to verify proper revision level via ROM label */
+	ROM_LOAD( "zaxxon1_alt.u29", 0x4000, 0x1000, CRC(cc67c097) SHA1(d258b2900a173b0f3f8acd94b6b636ce3324616d) ) /* Need to verify proper revision level via ROM label */
 
 	ROM_REGION( 0x1000, "gfx_tx", 0 )
-	ROM_LOAD( "zaxxon14.u68", 0x0000, 0x0800, CRC(07bf8c52) SHA1(425157a1625b1bd5169c3218b958010bf6af12bb) )
-	ROM_LOAD( "zaxxon15.u69", 0x0800, 0x0800, CRC(c215edcb) SHA1(f1ded2173eb139f48d2ca86c5ef00acbe6c11cd3) )
+	ROM_LOAD( "zaxxon_rom14.u68", 0x0000, 0x0800, CRC(07bf8c52) SHA1(425157a1625b1bd5169c3218b958010bf6af12bb) )
+	ROM_LOAD( "zaxxon_rom15.u69", 0x0800, 0x0800, CRC(c215edcb) SHA1(f1ded2173eb139f48d2ca86c5ef00acbe6c11cd3) )
 
 	ROM_REGION( 0x6000, "gfx_bg", 0 )
-	ROM_LOAD( "zaxxon6.u113", 0x0000, 0x2000, CRC(6e07bb68) SHA1(a002f3441b0f0044615ce71ecbd14edadba16270) )
-	ROM_LOAD( "zaxxon5.u112", 0x2000, 0x2000, CRC(0a5bce6a) SHA1(a86543727389931244ba8a576b543d7ac05a2585) )
-	ROM_LOAD( "zaxxon4.u111", 0x4000, 0x2000, CRC(a5bf1465) SHA1(a8cd27dfb4a606bae8bfddcf936e69e980fb1977) )
+	ROM_LOAD( "zaxxon_rom6.u113", 0x0000, 0x2000, CRC(6e07bb68) SHA1(a002f3441b0f0044615ce71ecbd14edadba16270) )
+	ROM_LOAD( "zaxxon_rom5.u112", 0x2000, 0x2000, CRC(0a5bce6a) SHA1(a86543727389931244ba8a576b543d7ac05a2585) )
+	ROM_LOAD( "zaxxon_rom4.u111", 0x4000, 0x2000, CRC(a5bf1465) SHA1(a8cd27dfb4a606bae8bfddcf936e69e980fb1977) )
 
 	ROM_REGION( 0x6000, "gfx_spr", 0 )
-	ROM_LOAD( "zaxxon11.u77", 0x0000, 0x2000, CRC(eaf0dd4b) SHA1(194e2ca0a806e0cb6bb7cc8341d1fc6f2ea911f6) )
-	ROM_LOAD( "zaxxon12.u78", 0x2000, 0x2000, CRC(1c5369c7) SHA1(af6a5984c3cedfa8c9efcd669f4f205b51a433b2) )
-	ROM_LOAD( "zaxxon13.u79", 0x4000, 0x2000, CRC(ab4e8a9a) SHA1(4ac79cccc30e4adfa878b36101e97e20ac010438) )
+	ROM_LOAD( "zaxxon_rom11.u77", 0x0000, 0x2000, CRC(eaf0dd4b) SHA1(194e2ca0a806e0cb6bb7cc8341d1fc6f2ea911f6) )
+	ROM_LOAD( "zaxxon_rom12.u78", 0x2000, 0x2000, CRC(1c5369c7) SHA1(af6a5984c3cedfa8c9efcd669f4f205b51a433b2) )
+	ROM_LOAD( "zaxxon_rom13.u79", 0x4000, 0x2000, CRC(ab4e8a9a) SHA1(4ac79cccc30e4adfa878b36101e97e20ac010438) )
 
 	ROM_REGION( 0x8000, "tilemap_dat", 0 )
-	ROM_LOAD( "zaxxon8.u91",  0x0000, 0x2000, CRC(28d65063) SHA1(e1f90716236c61df61bdc6915a8e390cb4dcbf15) )
-	ROM_LOAD( "zaxxon7.u90",  0x2000, 0x2000, CRC(6284c200) SHA1(d26a9049541479b8b19f5aa0690cf4aaa787c9b5) )
-	ROM_LOAD( "zaxxon10.u93", 0x4000, 0x2000, CRC(a95e61fd) SHA1(a0f8c15ff75affa3532abf8f340811cf415421fd) )
-	ROM_LOAD( "zaxxon9.u92",  0x6000, 0x2000, CRC(7e42691f) SHA1(2124363be8f590b74e2b15dd3f90d77dd9ca9528) )
-	//ROM_LOAD( "zaxxon9_alt.u92",  0x6000, 0x2000, CRC(aef163fb) SHA1(b9e88b3a467926fac3931b891fb01b9b4add3809) ) // was in this set, but seems to have bad bits
+	ROM_LOAD( "zaxxon_rom8.u91",  0x0000, 0x2000, CRC(28d65063) SHA1(e1f90716236c61df61bdc6915a8e390cb4dcbf15) )
+	ROM_LOAD( "zaxxon_rom7.u90",  0x2000, 0x2000, CRC(6284c200) SHA1(d26a9049541479b8b19f5aa0690cf4aaa787c9b5) )
+	ROM_LOAD( "zaxxon_rom10.u93", 0x4000, 0x2000, CRC(a95e61fd) SHA1(a0f8c15ff75affa3532abf8f340811cf415421fd) )
+	ROM_LOAD( "zaxxon_rom9.u92",  0x6000, 0x2000, CRC(7e42691f) SHA1(2124363be8f590b74e2b15dd3f90d77dd9ca9528) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "zaxxon.u98",   0x0000, 0x0100, CRC(6cc6695b) SHA1(01ae8450ccc302e1a5ae74230d44f6f531a962e2) )
-	ROM_LOAD( "j214a2.72",    0x0100, 0x0100, CRC(a9e1fb43) SHA1(57dbcfe2438fd090c08594818549aeea6339eab2) )
+	ROM_LOAD( "mro16.u76",   0x0000, 0x0100, CRC(6cc6695b) SHA1(01ae8450ccc302e1a5ae74230d44f6f531a962e2) ) /* BPROM from TI stamped as J214A2  MRO16 */
+	ROM_LOAD( "mro17.u41",   0x0100, 0x0100, CRC(a9e1fb43) SHA1(57dbcfe2438fd090c08594818549aeea6339eab2) ) /* BPROM from TI stamped as J214A2  MRO17 */
 ROM_END
 
 ROM_START( zaxxonj )
@@ -1180,39 +1179,39 @@ ROM_START( zaxxonj )
 	ROM_LOAD( "zaxxon_rom9.u59",  0x6000, 0x2000, CRC(7e42691f) SHA1(2124363be8f590b74e2b15dd3f90d77dd9ca9528) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "mro_16.u76",   0x0000, 0x0100, CRC(6cc6695b) SHA1(01ae8450ccc302e1a5ae74230d44f6f531a962e2) )
-	ROM_LOAD( "mro_17.u41",   0x0100, 0x0100, CRC(a9e1fb43) SHA1(57dbcfe2438fd090c08594818549aeea6339eab2) )
+	ROM_LOAD( "mro16.u76",   0x0000, 0x0100, CRC(6cc6695b) SHA1(01ae8450ccc302e1a5ae74230d44f6f531a962e2) ) /* BPROM from TI stamped as J214A2  MRO16 */
+	ROM_LOAD( "mro17.u41",   0x0100, 0x0100, CRC(a9e1fb43) SHA1(57dbcfe2438fd090c08594818549aeea6339eab2) ) /* BPROM from TI stamped as J214A2  MRO17 */
 ROM_END
 
 ROM_START( zaxxonb )
 	ROM_REGION( 0x6000, "maincpu", 0 )
-	ROM_LOAD( "zaxxonb3.u27", 0x0000, 0x2000, CRC(125bca1c) SHA1(f4160966d42e5282736cde8a276204ba8910ca61) )
-	ROM_LOAD( "zaxxonb2.u28", 0x2000, 0x2000, CRC(c088df92) SHA1(c0c6cd8dcf6db65129980331fa9ecc3800b63436) )
-	ROM_LOAD( "zaxxonb1.u29", 0x4000, 0x1000, CRC(e7bdc417) SHA1(209f0d259f60b984c84229bb31af1ef939adc73e) )
+	ROM_LOAD( "jackson_rom3.u27", 0x0000, 0x2000, CRC(125bca1c) SHA1(f4160966d42e5282736cde8a276204ba8910ca61) ) /* Need to verify ALL the labels in this set */
+	ROM_LOAD( "jackson_rom2.u28", 0x2000, 0x2000, CRC(c088df92) SHA1(c0c6cd8dcf6db65129980331fa9ecc3800b63436) ) /* Same data as ROM2 from the Japanese set */
+	ROM_LOAD( "jackson_rom1.u29", 0x4000, 0x1000, CRC(e7bdc417) SHA1(209f0d259f60b984c84229bb31af1ef939adc73e) )
 
 	ROM_REGION( 0x1000, "gfx_tx", 0 )
-	ROM_LOAD( "zaxxon14.u68", 0x0000, 0x0800, CRC(07bf8c52) SHA1(425157a1625b1bd5169c3218b958010bf6af12bb) )
-	ROM_LOAD( "zaxxon15.u69", 0x0800, 0x0800, CRC(c215edcb) SHA1(f1ded2173eb139f48d2ca86c5ef00acbe6c11cd3) )
+	ROM_LOAD( "zaxxon_rom14.u54", 0x0000, 0x0800, CRC(07bf8c52) SHA1(425157a1625b1bd5169c3218b958010bf6af12bb) )
+	ROM_LOAD( "zaxxon_rom15.u55", 0x0800, 0x0800, CRC(c215edcb) SHA1(f1ded2173eb139f48d2ca86c5ef00acbe6c11cd3) )
 
 	ROM_REGION( 0x6000, "gfx_bg", 0 )
-	ROM_LOAD( "zaxxon6.u113", 0x0000, 0x2000, CRC(6e07bb68) SHA1(a002f3441b0f0044615ce71ecbd14edadba16270) )
-	ROM_LOAD( "zaxxon5.u112", 0x2000, 0x2000, CRC(0a5bce6a) SHA1(a86543727389931244ba8a576b543d7ac05a2585) )
-	ROM_LOAD( "zaxxon4.u111", 0x4000, 0x2000, CRC(a5bf1465) SHA1(a8cd27dfb4a606bae8bfddcf936e69e980fb1977) )
+	ROM_LOAD( "zaxxon_rom6.u70",  0x0000, 0x2000, CRC(6e07bb68) SHA1(a002f3441b0f0044615ce71ecbd14edadba16270) )
+	ROM_LOAD( "zaxxon_rom5.u69",  0x2000, 0x2000, CRC(0a5bce6a) SHA1(a86543727389931244ba8a576b543d7ac05a2585) )
+	ROM_LOAD( "zaxxon_rom4.u68",  0x4000, 0x2000, CRC(a5bf1465) SHA1(a8cd27dfb4a606bae8bfddcf936e69e980fb1977) )
 
 	ROM_REGION( 0x6000, "gfx_spr", 0 )
-	ROM_LOAD( "zaxxon11.u77", 0x0000, 0x2000, CRC(eaf0dd4b) SHA1(194e2ca0a806e0cb6bb7cc8341d1fc6f2ea911f6) )
-	ROM_LOAD( "zaxxon12.u78", 0x2000, 0x2000, CRC(1c5369c7) SHA1(af6a5984c3cedfa8c9efcd669f4f205b51a433b2) )
-	ROM_LOAD( "zaxxon13.u79", 0x4000, 0x2000, CRC(ab4e8a9a) SHA1(4ac79cccc30e4adfa878b36101e97e20ac010438) )
+	ROM_LOAD( "zaxxon_rom11.u59", 0x0000, 0x2000, CRC(eaf0dd4b) SHA1(194e2ca0a806e0cb6bb7cc8341d1fc6f2ea911f6) )
+	ROM_LOAD( "zaxxon_rom12.u60", 0x2000, 0x2000, CRC(1c5369c7) SHA1(af6a5984c3cedfa8c9efcd669f4f205b51a433b2) )
+	ROM_LOAD( "zaxxon_rom13.u61", 0x4000, 0x2000, CRC(ab4e8a9a) SHA1(4ac79cccc30e4adfa878b36101e97e20ac010438) )
 
 	ROM_REGION( 0x8000, "tilemap_dat", 0 )
-	ROM_LOAD( "zaxxon8.u91",  0x0000, 0x2000, CRC(28d65063) SHA1(e1f90716236c61df61bdc6915a8e390cb4dcbf15) )
-	ROM_LOAD( "zaxxon7.u90",  0x2000, 0x2000, CRC(6284c200) SHA1(d26a9049541479b8b19f5aa0690cf4aaa787c9b5) )
-	ROM_LOAD( "zaxxon10.u93", 0x4000, 0x2000, CRC(a95e61fd) SHA1(a0f8c15ff75affa3532abf8f340811cf415421fd) )
-	ROM_LOAD( "zaxxon9.u92",  0x6000, 0x2000, CRC(7e42691f) SHA1(2124363be8f590b74e2b15dd3f90d77dd9ca9528) )
+	ROM_LOAD( "zaxxon_rom8.u58",  0x0000, 0x2000, CRC(28d65063) SHA1(e1f90716236c61df61bdc6915a8e390cb4dcbf15) )
+	ROM_LOAD( "zaxxon_rom7.u57",  0x2000, 0x2000, CRC(6284c200) SHA1(d26a9049541479b8b19f5aa0690cf4aaa787c9b5) )
+	ROM_LOAD( "zaxxon_rom10.u60", 0x4000, 0x2000, CRC(a95e61fd) SHA1(a0f8c15ff75affa3532abf8f340811cf415421fd) )
+	ROM_LOAD( "zaxxon_rom9.u59",  0x6000, 0x2000, CRC(7e42691f) SHA1(2124363be8f590b74e2b15dd3f90d77dd9ca9528) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
-	ROM_LOAD( "zaxxon.u98",   0x0000, 0x0100, CRC(6cc6695b) SHA1(01ae8450ccc302e1a5ae74230d44f6f531a962e2) )
-	ROM_LOAD( "zaxxon.u72",   0x0100, 0x0100, CRC(deaa21f7) SHA1(0cf08fb62f77d93ff7cb883c633e0db35906e11d) )
+	ROM_LOAD( "mro16.u76",   0x0000, 0x0100, CRC(6cc6695b) SHA1(01ae8450ccc302e1a5ae74230d44f6f531a962e2) ) /* BPROM from TI stamped as J214A2  MRO16 */
+	ROM_LOAD( "zaxxon.u72",  0x0100, 0x0100, CRC(deaa21f7) SHA1(0cf08fb62f77d93ff7cb883c633e0db35906e11d) )
 ROM_END
 
 
@@ -1579,9 +1578,9 @@ DRIVER_INIT_MEMBER(zaxxon_state,razmataz)
  *************************************/
 
 /* these games run on standard Zaxxon hardware */
-GAME( 1982, zaxxon,   0,      zaxxon,   zaxxon, driver_device,   0,        ROT90,  "Sega",    "Zaxxon (set 1)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, zaxxon2,  zaxxon, zaxxon,   zaxxon, driver_device,   0,        ROT90,  "Sega",    "Zaxxon (set 2)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1982, zaxxon3,  zaxxon, zaxxon,   zaxxon, driver_device,   0,        ROT90,  "Sega",    "Zaxxon (set 3)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, zaxxon,   0,      zaxxon,   zaxxon, driver_device,   0,        ROT90,  "Sega",    "Zaxxon (set 1, rev D)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, zaxxon2,  zaxxon, zaxxon,   zaxxon, driver_device,   0,        ROT90,  "Sega",    "Zaxxon (set 2, unknown rev)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1982, zaxxon3,  zaxxon, zaxxon,   zaxxon, driver_device,   0,        ROT90,  "Sega",    "Zaxxon (set 3, unknown rev)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, zaxxonj,  zaxxon, szaxxon,  zaxxon, zaxxon_state,    zaxxonj,  ROT90,  "Sega",    "Zaxxon (Japan)",  MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1982, zaxxonb,  zaxxon, szaxxon,  zaxxon, zaxxon_state,    zaxxonj,  ROT90,  "bootleg", "Jackson",         MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
@@ -1593,7 +1592,7 @@ GAME( 1984, futspy,   0,      futspye,  futspy, driver_device,    0,   ROT90,  "
 
 /* these games run on modified Zaxxon hardware with no skewing, extra inputs, and a */
 /* G-80 Universal Sound Board */
-GAME( 1983, razmataz, 0,      razmataze,  razmataz, zaxxon_state,  razmataz, ROT90,  "Sega",    "Razzmatazz", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1983, razmataz, 0,      razmataze,  razmataz, zaxxon_state,   razmataz, ROT90,  "Sega",    "Razzmatazz", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, ixion,    0,      ixion,      ixion,    driver_device,  0,        ROT270, "Sega",    "Ixion (prototype)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE)
 
 /* these games run on a slightly newer Zaxxon hardware with more ROM space and a */

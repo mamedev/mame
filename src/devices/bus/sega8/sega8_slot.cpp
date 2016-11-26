@@ -54,8 +54,8 @@ device_sega8_cart_interface::device_sega8_cart_interface(const machine_config &m
 		m_rom(nullptr),
 		m_rom_size(0),
 		m_rom_page_count(0),
-		has_battery(FALSE),
-		m_late_battery_enable(FALSE),
+		has_battery(false),
+		m_late_battery_enable(false),
 		m_lphaser_xoffs(-1),
 		m_sms_mode(0)
 {
@@ -112,7 +112,7 @@ sega8_cart_slot_device::sega8_cart_slot_device(const machine_config &mconfig, de
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this),
 						m_type(SEGA8_BASE_ROM),
-						m_must_be_loaded(FALSE),
+						m_must_be_loaded(false),
 						m_interface("sms_cart"),
 						m_extensions("bin"), m_cart(nullptr)
 {
@@ -124,15 +124,15 @@ sega8_cart_slot_device::sega8_cart_slot_device(const machine_config &mconfig, co
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this),
 						m_type(SEGA8_BASE_ROM),
-						m_must_be_loaded(FALSE),
-						m_is_card(FALSE),
+						m_must_be_loaded(false),
+						m_is_card(false),
 						m_interface("sms_cart"),
 						m_extensions("bin"), m_cart(nullptr)
 {
 }
 
 sega8_card_slot_device::sega8_card_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-						sega8_cart_slot_device(mconfig, SEGA8_CARD_SLOT, "Sega Master System / Game Gear / SG1000 Card Slot", tag, owner, clock, TRUE, "sega8_card_slot", __FILE__)
+						sega8_cart_slot_device(mconfig, SEGA8_CARD_SLOT, "Sega Master System / Game Gear / SG1000 Card Slot", tag, owner, clock, true, "sega8_card_slot", __FILE__)
 {
 }
 
@@ -183,7 +183,8 @@ static const sega8_slot slot_list[] =
 	{ SEGA8_BASIC_L3, "level3" },
 	{ SEGA8_MUSIC_EDITOR, "music_editor" },
 	{ SEGA8_DAHJEE_TYPEA, "dahjee_typea" },
-	{ SEGA8_DAHJEE_TYPEB, "dahjee_typeb" }
+	{ SEGA8_DAHJEE_TYPEB, "dahjee_typeb" },
+	{ SEGA8_SEOJIN, "seojin" }
 };
 
 static int sega8_get_pcb_id(const char *slot)
@@ -275,45 +276,45 @@ void sega8_cart_slot_device::setup_ram()
 		if (m_type == SEGA8_CASTLE)
 		{
 			m_cart->ram_alloc(0x2000);
-			m_cart->set_has_battery(FALSE);
+			m_cart->set_has_battery(false);
 		}
 		else if (m_type == SEGA8_OTHELLO)
 		{
 			m_cart->ram_alloc(0x800);
-			m_cart->set_has_battery(FALSE);
+			m_cart->set_has_battery(false);
 		}
 		else if (m_type == SEGA8_BASIC_L3)
 		{
 			m_cart->ram_alloc(0x8000);
-			m_cart->set_has_battery(FALSE);
+			m_cart->set_has_battery(false);
 		}
 		else if (m_type == SEGA8_MUSIC_EDITOR)
 		{
 			m_cart->ram_alloc(0x2800);
-			m_cart->set_has_battery(FALSE);
+			m_cart->set_has_battery(false);
 		}
 		else if (m_type == SEGA8_DAHJEE_TYPEA)
 		{
 			m_cart->ram_alloc(0x2400);
-			m_cart->set_has_battery(FALSE);
+			m_cart->set_has_battery(false);
 		}
 		else if (m_type == SEGA8_DAHJEE_TYPEB)
 		{
 			m_cart->ram_alloc(0x2000);
-			m_cart->set_has_battery(FALSE);
+			m_cart->set_has_battery(false);
 		}
 		else if (m_type == SEGA8_CODEMASTERS)
 		{
 			// Codemasters cart can have 64KB of RAM (Ernie Els Golf? or 8KB?) and no battery
 			m_cart->ram_alloc(0x10000);
-			m_cart->set_has_battery(FALSE);
+			m_cart->set_has_battery(false);
 		}
 		else
 		{
 			// for generic carts loaded from fullpath we have no way to know exactly if there was RAM,
 			// how much RAM was in the cart and if there was a battery so we always alloc 32KB and
 			// we save its content only if the game enable the RAM
-			m_cart->set_late_battery(TRUE);
+			m_cart->set_late_battery(true);
 			m_cart->ram_alloc(0x08000);
 		}
 	}
@@ -321,13 +322,13 @@ void sega8_cart_slot_device::setup_ram()
 	{
 		// from softlist we rely on the xml to only allocate the correct amount of RAM and to save it only if a battery was present
 		const char *battery = get_feature("battery");
-		m_cart->set_late_battery(FALSE);
+		m_cart->set_late_battery(false);
 
 		if (get_software_region_length("ram"))
 			m_cart->ram_alloc(get_software_region_length("ram"));
 
 		if (battery && !strcmp(battery, "yes"))
-			m_cart->set_has_battery(TRUE);
+			m_cart->set_has_battery(true);
 	}
 }
 
@@ -388,7 +389,7 @@ image_init_result sega8_cart_slot_device::call_load()
 				m_cart->set_sms_mode(1);
 		}
 
-		// when loading from fullpath m_late_battery_enable can be TRUE and in that case
+		// when loading from fullpath m_late_battery_enable can be true and in that case
 		// we attempt to load a battery because the game might have it!
 		if (m_cart->get_ram_size() && (m_cart->get_has_battery() || m_cart->get_late_battery()))
 			battery_load(m_cart->get_ram_base(), m_cart->get_ram_size(), 0x00);
@@ -831,6 +832,7 @@ SLOT_INTERFACE_START(sg1000mk3_cart)
 	SLOT_INTERFACE_INTERNAL("hicom",  SEGA8_ROM_HICOM)
 	SLOT_INTERFACE_INTERNAL("korean",  SEGA8_ROM_KOREAN)
 	SLOT_INTERFACE_INTERNAL("korean_nb",  SEGA8_ROM_KOREAN_NB)
+	SLOT_INTERFACE_INTERNAL("seojin",  SEGA8_ROM_SEOJIN)
 	SLOT_INTERFACE_INTERNAL("othello",  SEGA8_ROM_OTHELLO)
 	SLOT_INTERFACE_INTERNAL("castle",  SEGA8_ROM_CASTLE)
 	SLOT_INTERFACE_INTERNAL("dahjee_typea",  SEGA8_ROM_DAHJEE_TYPEA)

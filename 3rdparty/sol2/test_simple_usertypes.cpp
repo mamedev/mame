@@ -453,7 +453,11 @@ TEST_CASE("usertype/simple-table-append", "Ensure that appending to the meta tab
 	table["func"] = &A::func;
 	A a;
 	lua.set("a", &a);
+	lua.set("pa", &a);
+	lua.set("ua", std::make_unique<A>());
 	REQUIRE_NOTHROW(
-		lua.script("assert(a:func() == 5000)")
+		lua.script("assert(a:func() == 5000)");
+		lua.script("assert(pa:func() == 5000)");
+		lua.script("assert(ua:func() == 5000)");
 	);
 }

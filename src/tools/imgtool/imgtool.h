@@ -48,7 +48,7 @@ enum
  * marking up return codes with the source.  In addition, some of the img_*
  * calls are high level calls that simply image manipulation
  *
- * Calls that return 'int' that are not explictly noted otherwise return
+ * Calls that return 'int' that are not explicitly noted otherwise return
  * imgtool error codes
  * ---------------------------------------------------------------------------
  */
@@ -96,7 +96,7 @@ namespace imgtool
 
 		image(const imgtool_module &module, object_pool *pool, void *extra_bytes);
 		~image();
-		
+
 		static imgtoolerr_t identify_file(const char *filename, imgtool_module **modules, size_t count);
 		static imgtoolerr_t open(const imgtool_module *module, const char *filename, int read_or_write, ptr &outimg);
 		static imgtoolerr_t open(const std::string &modulename, const char *filename, int read_or_write, ptr &outimg);
@@ -124,7 +124,7 @@ namespace imgtool
 		object_pool *m_pool;
 		void *m_extra_bytes;
 
-		// because of an idiosycracy of how imgtool::image::internal_open() works, we are only "okay to close"
+		// because of an idiosyncrasy of how imgtool::image::internal_open() works, we are only "okay to close"
 		// by invoking the module's close function once internal_open() succeeds.  the long term solution is
 		// better C++ adoption (e.g. - std::unique_ptr<>, std:move() etc)
 		bool m_okay_to_close;
@@ -144,7 +144,7 @@ namespace imgtool
 		typedef std::unique_ptr<partition> ptr;
 
 		// ctor/dtor
-		partition(imgtool::image &image, imgtool_class &imgclass, int partition_index, uint64_t base_block, uint64_t block_count);
+		partition(imgtool::image &image, const imgtool_class &imgclass, int partition_index, uint64_t base_block, uint64_t block_count);
 		~partition();
 
 		static imgtoolerr_t open(imgtool::image &image, int partition_index, ptr &partition);
@@ -256,7 +256,7 @@ namespace imgtool
 	private:
 		imgtool::partition &m_partition;
 		std::unique_ptr<uint8_t[]> m_extra_bytes;
-		bool m_okay_to_close;	// similar wart as what is on imgtool::image
+		bool m_okay_to_close;   // similar wart as what is on imgtool::image
 	};
 };
 

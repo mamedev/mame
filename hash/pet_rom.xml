@@ -272,6 +272,19 @@
 		</part>
 	</software>
 
+	<software name="supertol">
+		<description>SUPER*TOOL</description>
+		<year>1981</year>
+		<publisher>PDATA</publisher>
+		<info name="usage" value="Requires BASIC 2 (works on pet2001n).  Enter 'SYS 37000' to run"/>
+
+		<part name="rom" interface="pet_9000_rom">
+			<dataarea name="rom" size="0x1000">
+				<rom name="supertool-9000.bin" size="0x1000" crc="69c8c549" sha1="5093f117981edd1cb5c5214359c266838acc3a13" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="suo9000">
 		<description>SUO 001024</description>
 		<year>198?</year>

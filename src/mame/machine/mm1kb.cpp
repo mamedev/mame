@@ -237,7 +237,7 @@ void mm1_keyboard_t::device_start()
 	m_scan_timer->adjust(attotime::from_hz(clock()), 0, attotime::from_hz(clock()));
 
 	// add notification request for system shut down (to play back the power switch sound once more)
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(mm1_keyboard_t::shut_down_mm1), this));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&mm1_keyboard_t::shut_down_mm1, this));
 
 	// state saving
 	save_item(NAME(m_sense));

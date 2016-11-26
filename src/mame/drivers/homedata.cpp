@@ -554,7 +554,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mrokumei_sound_io_map, AS_IO, 8, homedata_state )
 	AM_RANGE(0x0000, 0xffff) AM_READ(mrokumei_sound_io_r) /* read address is 16-bit */
 	AM_RANGE(0x0040, 0x0040) AM_MIRROR(0xff00) AM_DEVWRITE("dac", dac_byte_interface, write) /* write address is only 8-bit */
-	// hourouki mirror... 
+	// hourouki mirror...
 	AM_RANGE(0x007f, 0x007f) AM_MIRROR(0xff00) AM_DEVWRITE("dac", dac_byte_interface, write) /* write address is only 8-bit */
 ADDRESS_MAP_END
 

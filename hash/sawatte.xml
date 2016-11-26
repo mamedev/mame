@@ -17,6 +17,19 @@
 		</part>
 	</software>
 
+	<software name="doraedbl">
+		<description>Doraemon Nobita no Dou Butsu Land</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sawatte_cart">
+			<feature name="pcb" value="171-7323A" />
+			<feature name="ic1" value="MPR-19040" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-19040.ic1" size="524288" crc="0c9bae2f" sha1="bc5030fab99e8f4b1bcc8ed77c1cc07d8407df93" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+  
 	<software name="mickkuda">
 		<description>Mickey no Kudamonoya-san</description>
 		<year>1996</year>
@@ -77,6 +90,19 @@
 		</part>
 	</software>
 
+	<software name="soreike">
+		<description>Soreike! Anpanman Onamae Na~ni</description>
+		<year>1996</year>
+		<publisher>Sega</publisher>
+		<part name="cart" interface="sawatte_cart">
+			<feature name="pcb" value="171-7323A" />
+			<feature name="ic1" value="MPR-19041" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-19041.ic1" size="524288" crc="ec924165" sha1="b25a5637c8cc1f2f6224595853d540195be86ec9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+   
 	<software name="micknatk">
 		<description>Tokyo Disneyland - Mickey no Nakayoshi Tankentai</description>
 		<year>1998</year>
@@ -118,6 +144,19 @@
 			<feature name="ic1" value="MPR-20983-S" />
 			<dataarea name="rom" size="524288">
 				<rom name="mpr-20983-s.ic1" size="524288" crc="035750ba" sha1="669a23458e7efa1fcbbb6ada555b6cba1c8425c9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="uht">
+		<description>Ultra Hero Touch</description>
+		<year>1997</year>
+		<publisher>Bandai</publisher>
+		<part name="cart" interface="sawatte_cart">
+			<feature name="pcb" value="171-7323A" />
+			<feature name="ic1" value="MPR-19828-T" />
+			<dataarea name="rom" size="524288">
+				<rom name="mpr-19828-t.ic1" size="524288" crc="57988dc7" sha1="438a35b2a46ec82b5e31478d9e244928f98891ab" offset="0" />
 			</dataarea>
 		</part>
 	</software>

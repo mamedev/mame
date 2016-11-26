@@ -2,16 +2,21 @@ local dat = {}
 local ver, info
 
 local datread = require("data/load_dat")
-datread, ver = datread.open("messinfo.dat", "#     MESSINFO.DAT")
+datread, ver = datread.open("messinfo.dat", "#     MESSINFO.DAT", function(str) return str:gsub("\n\n", "\n") end)
 
 function dat.check(set, softlist)
 	if softlist or not datread then
 		return nil
 	end
-	local status
+	local status, drvinfo
 	status, info = pcall(datread, "mame", "info", set)
 	if not status or not info then
 		return nil
+	end
+	local sourcefile = emu.driver_find(set).source_file:match("[^/\\]*$")
+	status, drvinfo = pcall(datread, "drv", "info", sourcefile)
+	if drvinfo then
+		info = info .. "\n\n--- DRIVER INFO ---\nDriver: " .. sourcefile .. "\n\n" .. drvinfo
 	end
 	return "Messinfo"
 end

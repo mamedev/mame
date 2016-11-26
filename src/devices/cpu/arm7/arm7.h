@@ -76,7 +76,7 @@ protected:
 	// device_disasm_interface overrides
 	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; }
 	virtual uint32_t disasm_max_opcode_bytes() const override { return 4; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	address_space_config m_program_config;
 
@@ -279,7 +279,7 @@ protected:
 	{
 		offs_t              start;                      /* start of the RAM block */
 		offs_t              end;                        /* end of the RAM block */
-		uint8_t               readonly;                   /* TRUE if read-only */
+		bool                readonly;                   /* true if read-only */
 		void *              base;                       /* base in memory where the RAM lives */
 	};
 
@@ -486,7 +486,7 @@ protected:
 	bool drcarm7ops_cd(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t op);
 	bool drcarm7ops_e(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t op);
 	bool drcarm7ops_f(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t op);
-	int generate_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	bool generate_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 
 };
 

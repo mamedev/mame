@@ -280,7 +280,7 @@ READ16_MEMBER( glasgow_state::glasgow_board_r )
 		}
 	}
 
-	m_read_board_flag = TRUE;
+	m_read_board_flag = true;
 
 	return data << 8;
 }

@@ -660,7 +660,7 @@ struct fm2612_FM_OPN
 	uint32_t  eg_cnt;         /* global envelope generator counter */
 	uint32_t  eg_timer;       /* global envelope generator counter works at frequency = chipclock/144/3 */
 	uint32_t  eg_timer_add;   /* step of eg_timer */
-	uint32_t  eg_timer_overflow;/* envelope generator timer overlfows every 3 samples (on real chip) */
+	uint32_t  eg_timer_overflow;/* envelope generator timer overflows every 3 samples (on real chip) */
 
 
 	/* there are 2048 FNUMs that can be generated using FNUM/BLK registers
@@ -1689,7 +1689,7 @@ static inline void CSMKeyControll(fm2612_FM_OPN *OPN, fm2612_FM_CH *CH)
 	OPN->SL3.key_csm = 1;
 }
 
-#ifdef __SAVE_H__
+#ifdef MAME_EMU_SAVE_H
 /* FM channel save , internal state only */
 static void FMsave_state_channel(device_t *device,fm2612_FM_CH *CH,int num_ch)
 {
@@ -1728,7 +1728,7 @@ static void FMsave_state_st(device_t *device,fm2612_FM_ST *ST)
 	device->save_item(NAME(ST->TB)  );
 	device->save_item(NAME(ST->TBC)  );
 }
-#endif /* _STATE_H */
+#endif /* MAME_EMU_SAVE_H */
 
 #if BUILD_OPN
 /* write a OPN mode register 0x20-0x2f */
@@ -2320,7 +2320,7 @@ void ym2612_update_one(void *chip, FMSAMPLE **buffer, int length)
 	INTERNAL_TIMER_B(&OPN->ST,length)
 }
 
-#ifdef __SAVE_H__
+#ifdef MAME_EMU_SAVE_H
 void ym2612_postload(void *chip)
 {
 	if (chip)
@@ -2363,7 +2363,7 @@ static void YM2612_save_state(YM2612 *F2612, device_t *device)
 	/* address register1 */
 	device->save_item(NAME(F2612->addr_A1));
 }
-#endif /* _STATE_H */
+#endif /* MAME_EMU_SAVE_H */
 
 /* initialize YM2612 emulator(s) */
 void * ym2612_init(void *param, device_t *device, int clock, int rate,
@@ -2389,7 +2389,7 @@ void * ym2612_init(void *param, device_t *device, int clock, int rate,
 	F2612->OPN.ST.timer_handler = timer_handler;
 	F2612->OPN.ST.IRQ_Handler   = IRQHandler;
 
-#ifdef __SAVE_H__
+#ifdef MAME_EMU_SAVE_H
 	YM2612_save_state(F2612, device);
 #endif
 	return F2612;

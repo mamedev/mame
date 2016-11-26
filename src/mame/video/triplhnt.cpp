@@ -34,7 +34,7 @@ void triplhnt_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		triplhnt_set_collision(param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in triplhnt_state::device_timer");
+		assert_always(false, "Unknown id in triplhnt_state::device_timer");
 	}
 }
 
@@ -119,7 +119,7 @@ uint32_t triplhnt_state::screen_update_triplhnt(screen_device &screen, bitmap_in
 
 	draw_sprites(bitmap, cliprect);
 
-	address_space &space = machine().driver_data()->generic_space();
+	address_space &space = machine().dummy_space();
 	m_discrete->write(space, TRIPLHNT_BEAR_ROAR_DATA, m_playfield_ram[0xfa] & 15);
 	m_discrete->write(space, TRIPLHNT_SHOT_DATA, m_playfield_ram[0xfc] & 15);
 	return 0;

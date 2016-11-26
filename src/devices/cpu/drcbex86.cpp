@@ -148,7 +148,7 @@ const uint32_t PTYPE_MF   = PTYPE_M | PTYPE_F;
 drcbe_x86::opcode_generate_func drcbe_x86::s_opcode_table[OP_MAX];
 
 // size-to-mask table
-//static const uint64_t size_to_mask[] = { 0, 0xff, 0xffff, 0, 0xffffffff, 0, 0, 0, U64(0xffffffffffffffff) };
+//static const uint64_t size_to_mask[] = { 0, 0xff, 0xffff, 0, 0xffffffff, 0, 0, 0, 0xffffffffffffffffU };
 
 // register mapping tables
 static const uint8_t int_register_map[REG_I_COUNT] =
@@ -542,8 +542,8 @@ drcbe_x86::drcbe_x86(drcuml_state &drcuml, device_t &device, drc_cache &cache, u
 		m_hashstacksave(nullptr),
 		m_reslo(0),
 		m_reshi(0),
-		m_fixup_label(FUNC(drcbe_x86::fixup_label), this),
-		m_fixup_exception(FUNC(drcbe_x86::fixup_exception), this)
+		m_fixup_label(&drcbe_x86::fixup_label, this),
+		m_fixup_exception(&drcbe_x86::fixup_exception, this)
 {
 	// compute hi pointers for each register
 	for (int regnum = 0; regnum < ARRAY_LENGTH(int_register_map); regnum++)
@@ -5243,7 +5243,7 @@ void drcbe_x86::op_and(x86code *&dst, const instruction &inst)
 		}
 
 		// AND with immediate 0xffffffff00000000
-		else if (src2p.is_immediate_value(U64(0xffffffff00000000)) && inst.flags() == 0)
+		else if (src2p.is_immediate_value(0xffffffff00000000U) && inst.flags() == 0)
 		{
 			if (src1p != dstp)
 			{
@@ -6615,10 +6615,10 @@ void drcbe_x86::op_icopyf(x86code *&dst, const instruction &inst)
 //  dmulu - perform a double-wide unsigned multiply
 //-------------------------------------------------
 
-int drcbe_x86::dmulu(uint64_t &dstlo, uint64_t &dsthi, uint64_t src1, uint64_t src2, int flags)
+int drcbe_x86::dmulu(uint64_t &dstlo, uint64_t &dsthi, uint64_t src1, uint64_t src2, bool flags)
 {
 	// shortcut if we don't care about the high bits or the flags
-	if (&dstlo == &dsthi && flags == 0)
+	if (&dstlo == &dsthi && flags == false)
 	{
 		dstlo = src1 * src2;
 		return 0;
@@ -6659,13 +6659,13 @@ int drcbe_x86::dmulu(uint64_t &dstlo, uint64_t &dsthi, uint64_t src1, uint64_t s
 //  dmuls - perform a double-wide signed multiply
 //-------------------------------------------------
 
-int drcbe_x86::dmuls(uint64_t &dstlo, uint64_t &dsthi, int64_t src1, int64_t src2, int flags)
+int drcbe_x86::dmuls(uint64_t &dstlo, uint64_t &dsthi, int64_t src1, int64_t src2, bool flags)
 {
 	uint64_t lo, hi, prevlo;
 	uint64_t a, b, temp;
 
 	// shortcut if we don't care about the high bits or the flags
-	if (&dstlo == &dsthi && flags == 0)
+	if (&dstlo == &dsthi && flags == false)
 	{
 		dstlo = src1 * src2;
 		return 0;

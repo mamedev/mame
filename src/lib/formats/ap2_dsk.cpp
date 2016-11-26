@@ -376,7 +376,7 @@ static floperr_t apple2_nib_read_sector(floppy_image_legacy *floppy, int head, i
 	if (buflen != APPLE2_SECTOR_SIZE)
 		return FLOPPY_ERROR_INTERNAL;
 
-	err = floppy_load_track(floppy, head, track, FALSE, &track_data_v, nullptr);
+	err = floppy_load_track(floppy, head, track, false, &track_data_v, nullptr);
 	if (err)
 		return err;
 	track_data = (uint8_t *) track_data_v;
@@ -465,7 +465,7 @@ static floperr_t apple2_nib_write_sector(floppy_image_legacy *floppy, int head, 
 	if (buflen != APPLE2_SECTOR_SIZE)
 		return FLOPPY_ERROR_INTERNAL;
 
-	err = floppy_load_track(floppy, head, track, TRUE, &track_data_v, nullptr);
+	err = floppy_load_track(floppy, head, track, true, &track_data_v, nullptr);
 	if (err)
 		return err;
 	track_data = (uint8_t *) track_data_v;
@@ -1633,7 +1633,7 @@ bool a2_edd_format::load(io_generic *io, uint32_t form_factor, floppy_image *ima
 			stream[splice >> 3] ^= 0x80 >> (splice & 7);
 
 		generate_track_from_bitstream(i >> 2, 0, stream, len, image, i & 3);
-		image->set_write_splice_position(i >> 2, 0, uint32_t(U64(200000000)*splice/len), i & 3);
+		image->set_write_splice_position(i >> 2, 0, uint32_t(uint64_t(200'000'000)*splice/len), i & 3);
 	}
 	free(img);
 	return true;

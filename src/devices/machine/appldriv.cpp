@@ -101,7 +101,7 @@ static void apple525_seek_disk(apple525_floppy_image_device *img, signed int ste
 
 	disk = get_device(img);
 
-	apple525_save_current_track(img, FALSE);
+	apple525_save_current_track(img, false);
 
 	track = img->floppy_drive_get_current_track();
 	pseudo_track = (track * 2) + disk->tween_tracks;
@@ -237,7 +237,7 @@ static uint8_t apple525_process_byte(device_t *img, int write_value)
 
 	/* when writing; save the current track after every full sector write */
 	if ((write_value >= 0) && ((disk->position % APPLE2_NIBBLE_SIZE) == 0))
-		apple525_save_current_track(img, FALSE);
+		apple525_save_current_track(img, false);
 
 	return read_value;
 }
@@ -330,7 +330,7 @@ image_init_result apple525_floppy_image_device::call_load()
 
 void apple525_floppy_image_device::call_unload()
 {
-	apple525_save_current_track(this, TRUE);
+	apple525_save_current_track(this, true);
 
 	legacy_floppy_image_device::call_unload();
 }

@@ -207,18 +207,13 @@ VIDEO_START_MEMBER(clshroad_state,firebatl)
 	/* Text (No scrolling) */
 	m_tilemap_1  = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(clshroad_state::get_tile_info_fb1),this),tilemap_mapper_delegate(FUNC(clshroad_state::tilemap_scan_rows_extra),this),8,8,0x24,0x20);
 
-	m_tilemap_0a->set_scroll_rows(1);
-	m_tilemap_0b->set_scroll_rows(1);
-	m_tilemap_1->set_scroll_rows(1);
+	m_tilemap_0a->set_scrolldx(-0x2a, -0xb3);
+	m_tilemap_0b->set_scrolldx(-0x2a, -0xb3);
 
-	m_tilemap_0a->set_scroll_cols(1);
-	m_tilemap_0b->set_scroll_cols(1);
-	m_tilemap_1->set_scroll_cols(1);
+	m_tilemap_0a->set_scrolldy(0, 1);
+	m_tilemap_0b->set_scrolldy(0, 1);
 
-	m_tilemap_0a->set_scrolldx(-0x30, -0xb5);
-	m_tilemap_0b->set_scrolldx(-0x30, -0xb5);
-
-	m_tilemap_0b->set_transparent_pen(0 );
+	m_tilemap_0b->set_transparent_pen(0);
 	m_tilemap_1->configure_groups(*m_gfxdecode->gfx(2), 0x0f);
 }
 
@@ -230,19 +225,11 @@ VIDEO_START_MEMBER(clshroad_state,clshroad)
 	/* Text (No scrolling) */
 	m_tilemap_1  = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(clshroad_state::get_tile_info_1),this),tilemap_mapper_delegate(FUNC(clshroad_state::tilemap_scan_rows_extra),this),8,8,0x24,0x20);
 
-	m_tilemap_0a->set_scroll_rows(1);
-	m_tilemap_0b->set_scroll_rows(1);
-	m_tilemap_1->set_scroll_rows(1);
-
-	m_tilemap_0a->set_scroll_cols(1);
-	m_tilemap_0b->set_scroll_cols(1);
-	m_tilemap_1->set_scroll_cols(1);
-
 	m_tilemap_0a->set_scrolldx(-0x30, -0xb5);
 	m_tilemap_0b->set_scrolldx(-0x30, -0xb5);
 
-	m_tilemap_0b->set_transparent_pen(0x0f );
-	m_tilemap_1->set_transparent_pen(0x0f );
+	m_tilemap_0b->set_transparent_pen(0x0f);
+	m_tilemap_1->set_transparent_pen(0x0f);
 }
 
 

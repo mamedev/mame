@@ -50,7 +50,7 @@ menu_barcode_reader::~menu_barcode_reader()
 //  populate - populates the barcode input menu
 //-------------------------------------------------
 
-void menu_barcode_reader::populate()
+void menu_barcode_reader::populate(float &customtop, float &custombottom)
 {
 	if (current_device())
 	{
@@ -89,8 +89,7 @@ void menu_barcode_reader::populate()
 void menu_barcode_reader::handle()
 {
 	// rebuild the menu (so to update the selected device, if the user has pressed L or R)
-	reset(reset_options::REMEMBER_POSITION);
-	populate();
+	repopulate(reset_options::REMEMBER_POSITION);
 
 	// process the menu
 	const event *event = process(PROCESS_LR_REPEAT);

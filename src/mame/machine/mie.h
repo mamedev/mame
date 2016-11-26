@@ -93,7 +93,7 @@ private:
 		CTRL_EMP  = 0x000100, // Empty flag
 		CTRL_PERR = 0x000200, // Parity error
 		CTRL_BFOV = 0x000800, // Set when overflow, cleared to 0 when starting send/receive
-		CTRL_RXB  = 0x001000, // Recieving
+		CTRL_RXB  = 0x001000, // Receiving
 		CTRL_RFB  = 0x002000, // Receive done
 		CTRL_TFB  = 0x004000, // Transmit done
 		CTRL_HRES = 0x008000  // Reset pattern received

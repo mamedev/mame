@@ -746,7 +746,7 @@ static MACHINE_CONFIG_START( vixen, vixen_state )
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(vixen_state,vixen_int_ack)
 
 	// video hardware
-	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::amber)
+	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::amber())
 	MCFG_SCREEN_UPDATE_DRIVER(vixen_state, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_23_9616MHz/2, 96*8, 0*8, 81*8, 27*10, 0*10, 26*10)
 

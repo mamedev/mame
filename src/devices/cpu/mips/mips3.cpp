@@ -421,7 +421,7 @@ void mips3_device::device_start()
 	}
 
 	/* mark the cache dirty so it is updated on next execute */
-	m_cache_dirty = TRUE;
+	m_cache_dirty = true;
 
 
 	/* register for save states */
@@ -943,7 +943,7 @@ void mips3_device::device_reset()
 	vtlb_load(2 * m_tlbentries + 1, (0xc0000000 - 0xa0000000) >> MIPS3_MIN_PAGE_SHIFT, 0xa0000000, 0x00000000 | VTLB_READ_ALLOWED | VTLB_WRITE_ALLOWED | VTLB_FETCH_ALLOWED | VTLB_FLAG_VALID);
 
 	m_core->mode = (MODE_KERNEL << 1) | 0;
-	m_cache_dirty = TRUE;
+	m_cache_dirty = true;
 	m_interrupt_cycles = 0;
 }
 
@@ -963,15 +963,14 @@ bool mips3_device::memory_translate(address_spacenum spacenum, int intention, of
 }
 
 
-offs_t mips3_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t mips3_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
-	extern unsigned dasmmips3(char *, unsigned, uint32_t);
 	uint32_t op = *(uint32_t *)oprom;
 	if (m_bigendian)
 		op = big_endianize_int32(op);
 	else
 		op = little_endianize_int32(op);
-	return dasmmips3(buffer, pc, op);
+	return dasmmips3(stream, pc, op);
 }
 
 
@@ -1156,7 +1155,7 @@ inline void mips3_device::WBYTE(offs_t address, uint8_t data)
 		const uint32_t tlbaddress = (tlbval & ~0xfff) | (address & 0xfff);
 		for (int ramnum = 0; ramnum < m_fastram_select; ramnum++)
 		{
-			if (m_fastram[ramnum].readonly == TRUE || tlbaddress < m_fastram[ramnum].start || tlbaddress > m_fastram[ramnum].end)
+			if (m_fastram[ramnum].readonly == true || tlbaddress < m_fastram[ramnum].start || tlbaddress > m_fastram[ramnum].end)
 			{
 				continue;
 			}
@@ -1190,7 +1189,7 @@ inline void mips3_device::WHALF(offs_t address, uint16_t data)
 		const uint32_t tlbaddress = (tlbval & ~0xfff) | (address & 0xfff);
 		for (int ramnum = 0; ramnum < m_fastram_select; ramnum++)
 		{
-			if (m_fastram[ramnum].readonly == TRUE || tlbaddress < m_fastram[ramnum].start || tlbaddress > m_fastram[ramnum].end)
+			if (m_fastram[ramnum].readonly == true || tlbaddress < m_fastram[ramnum].start || tlbaddress > m_fastram[ramnum].end)
 			{
 				continue;
 			}
@@ -1224,7 +1223,7 @@ inline void mips3_device::WWORD(offs_t address, uint32_t data)
 		const uint32_t tlbaddress = (tlbval & ~0xfff) | (address & 0xfff);
 		for (int ramnum = 0; ramnum < m_fastram_select; ramnum++)
 		{
-			if (m_fastram[ramnum].readonly == TRUE || tlbaddress < m_fastram[ramnum].start || tlbaddress > m_fastram[ramnum].end)
+			if (m_fastram[ramnum].readonly == true || tlbaddress < m_fastram[ramnum].start || tlbaddress > m_fastram[ramnum].end)
 			{
 				continue;
 			}
@@ -2718,7 +2717,7 @@ void mips3_device::execute_run()
 		/* reset the cache if dirty */
 		if (m_cache_dirty)
 			code_flush_cache();
-		m_cache_dirty = FALSE;
+		m_cache_dirty = false;
 
 		/* execute */
 		do
@@ -2984,7 +2983,7 @@ void mips3_device::ldl_be(uint32_t op)
 {
 	offs_t offs = SIMMVAL + RSVAL32;
 	int shift = 8 * (offs & 7);
-	uint64_t mask = U64(0xffffffffffffffff) << shift;
+	uint64_t mask = 0xffffffffffffffffU << shift;
 	uint64_t temp;
 
 	if (RDOUBLE_MASKED(offs & ~7, &temp, mask >> shift) && RTREG)
@@ -2995,7 +2994,7 @@ void mips3_device::ldr_be(uint32_t op)
 {
 	offs_t offs = SIMMVAL + RSVAL32;
 	int shift = 8 * (~offs & 7);
-	uint64_t mask = U64(0xffffffffffffffff) >> shift;
+	uint64_t mask = 0xffffffffffffffffU >> shift;
 	uint64_t temp;
 
 	if (RDOUBLE_MASKED(offs & ~7, &temp, mask << shift) && RTREG)
@@ -3022,7 +3021,7 @@ void mips3_device::sdl_be(uint32_t op)
 {
 	offs_t offs = SIMMVAL + RSVAL32;
 	int shift = 8 * (offs & 7);
-	uint64_t mask = U64(0xffffffffffffffff) >> shift;
+	uint64_t mask = 0xffffffffffffffffU >> shift;
 	WDOUBLE_MASKED(offs & ~7, RTVAL64 >> shift, mask);
 }
 
@@ -3030,7 +3029,7 @@ void mips3_device::sdr_be(uint32_t op)
 {
 	offs_t offs = SIMMVAL + RSVAL32;
 	int shift = 8 * (~offs & 7);
-	uint64_t mask = U64(0xffffffffffffffff) << shift;
+	uint64_t mask = 0xffffffffffffffffU << shift;
 	WDOUBLE_MASKED(offs & ~7, RTVAL64 << shift, mask);
 }
 
@@ -3062,7 +3061,7 @@ void mips3_device::ldl_le(uint32_t op)
 {
 	offs_t offs = SIMMVAL + RSVAL32;
 	int shift = 8 * (~offs & 7);
-	uint64_t mask = U64(0xffffffffffffffff) << shift;
+	uint64_t mask = 0xffffffffffffffffU << shift;
 	uint64_t temp;
 
 	if (RDOUBLE_MASKED(offs & ~7, &temp, mask >> shift) && RTREG)
@@ -3073,7 +3072,7 @@ void mips3_device::ldr_le(uint32_t op)
 {
 	offs_t offs = SIMMVAL + RSVAL32;
 	int shift = 8 * (offs & 7);
-	uint64_t mask = U64(0xffffffffffffffff) >> shift;
+	uint64_t mask = 0xffffffffffffffffU >> shift;
 	uint64_t temp;
 
 	if (RDOUBLE_MASKED(offs & ~7, &temp, mask << shift) && RTREG)
@@ -3100,7 +3099,7 @@ void mips3_device::sdl_le(uint32_t op)
 {
 	offs_t offs = SIMMVAL + RSVAL32;
 	int shift = 8 * (~offs & 7);
-	uint64_t mask = U64(0xffffffffffffffff) >> shift;
+	uint64_t mask = 0xffffffffffffffffU >> shift;
 	WDOUBLE_MASKED(offs & ~7, RTVAL64 >> shift, mask);
 }
 
@@ -3108,6 +3107,6 @@ void mips3_device::sdr_le(uint32_t op)
 {
 	offs_t offs = SIMMVAL + RSVAL32;
 	int shift = 8 * (offs & 7);
-	uint64_t mask = U64(0xffffffffffffffff) << shift;
+	uint64_t mask = 0xffffffffffffffffU << shift;
 	WDOUBLE_MASKED(offs & ~7, RTVAL64 << shift, mask);
 }

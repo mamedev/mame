@@ -10,7 +10,7 @@
 #define __S2636_H__
 
 
-#define S2636_IS_PIXEL_DRAWN(p)     (((p) & 0x08) ? TRUE : FALSE)
+#define S2636_IS_PIXEL_DRAWN(p)     (((p) & 0x08) ? true : false)
 #define S2636_PIXEL_COLOR(p)        ((p) & 0x07)
 
 

@@ -51,7 +51,7 @@ void i8271_device::device_start()
 			if(con) {
 				flopi[i].dev = con->get_device();
 				if (flopi[i].dev != nullptr)
-					flopi[i].dev->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(FUNC(i8271_device::index_callback), this));
+					flopi[i].dev->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(&i8271_device::index_callback, this));
 			} else
 				flopi[i].dev = nullptr;
 		} else
@@ -126,7 +126,7 @@ void i8271_device::set_floppy(floppy_image_device *flop)
 		elem.dev = flop;
 	}
 	if(flop)
-		flop->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(FUNC(i8271_device::index_callback), this));
+		flop->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(&i8271_device::index_callback, this));
 }
 
 READ8_MEMBER(i8271_device::sr_r)

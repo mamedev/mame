@@ -73,27 +73,24 @@ static imgtoolerr_t basic_readfile(const basictokens *tokens,
 	const char *fork, imgtool::stream &destf)
 {
 	imgtoolerr_t err;
-	imgtool::stream *mem_stream;
+	imgtool::stream::ptr mem_stream;
 	uint8_t line_header[4];
 	uint16_t line_number; //, address;
 	uint8_t b, shift;
 	int i;
-	int in_string = FALSE;
+	int in_string = false;
 	const basictoken_tableent *token_table;
 	const char *token;
 
 	/* open a memory stream */
 	mem_stream = imgtool::stream::open_mem(nullptr, 0);
-	if (mem_stream == nullptr)
-	{
-		err = IMGTOOLERR_OUTOFMEMORY;
-		goto done;
-	}
+	if (!mem_stream)
+		return IMGTOOLERR_OUTOFMEMORY;
 
 	/* read actual file */
 	err = partition.read_file(filename, fork, *mem_stream, nullptr);
 	if (err)
-		goto done;
+		return err;
 
 	/* skip first few bytes */
 	mem_stream->seek(tokens->skip_bytes, SEEK_SET);
@@ -122,7 +119,7 @@ static imgtoolerr_t basic_readfile(const basictokens *tokens,
 		while((mem_stream->read(&b, 1) > 0) && (b != 0x00))
 		{
 			if (b == 0x22)
-				in_string = in_string ? FALSE : TRUE;
+				in_string = in_string ? false : true;
 
 			if ((b & 0x80) && (!in_string))
 			{
@@ -160,9 +157,6 @@ static imgtoolerr_t basic_readfile(const basictokens *tokens,
 		destf.puts(EOLN);
 	}
 
-done:
-	if (mem_stream != nullptr)
-		delete mem_stream;
 	return err;
 }
 
@@ -177,10 +171,9 @@ static imgtoolerr_t basic_writefile(const basictokens *tokens,
 	imgtool::partition &partition, const char *filename,
 	const char *fork, imgtool::stream &sourcef, util::option_resolution *opts)
 {
-	imgtoolerr_t err;
-	imgtool::stream *mem_stream;
+	imgtool::stream::ptr mem_stream;
 	char buf[1024];
-	int eof = FALSE;
+	int eof = false;
 	uint32_t len;
 	char c;
 	int i, j, pos, in_quotes;
@@ -194,11 +187,8 @@ static imgtoolerr_t basic_writefile(const basictokens *tokens,
 
 	/* open a memory stream */
 	mem_stream = imgtool::stream::open_mem(nullptr, 0);
-	if (mem_stream == nullptr)
-	{
-		err = IMGTOOLERR_OUTOFMEMORY;
-		goto done;
-	}
+	if (!mem_stream)
+		return IMGTOOLERR_OUTOFMEMORY;
 
 	/* skip first few bytes */
 	mem_stream->fill(0x00, tokens->skip_bytes);
@@ -267,7 +257,7 @@ static imgtoolerr_t basic_writefile(const basictokens *tokens,
 				pos++;
 
 			/* when we start out, we are not within quotation marks */
-			in_quotes = FALSE;
+			in_quotes = false;
 
 			/* read until end of line */
 			while(buf[pos] != '\0')
@@ -343,14 +333,7 @@ static imgtoolerr_t basic_writefile(const basictokens *tokens,
 	}
 
 	/* write actual file */
-	err = partition.write_file(filename, fork, *mem_stream, opts, nullptr);
-	if (err)
-		goto done;
-
-done:
-	if (mem_stream != nullptr)
-		delete mem_stream;
-	return err;
+	return partition.write_file(filename, fork, *mem_stream, opts, nullptr);
 }
 
 
@@ -2953,7 +2936,7 @@ static const basictokens cocobas_tokens =
 {
 	0x2600,
 	3,
-	TRUE,
+	true,
 	cocobas_tokenents,
 	ARRAY_LENGTH(cocobas_tokenents)
 };
@@ -2997,7 +2980,7 @@ static const basictokens dragonbas_tokens =
 {
 	0x2600,
 	4,
-	TRUE,
+	true,
 	dragonbas_tokenents,
 	ARRAY_LENGTH(dragonbas_tokenents)
 };
@@ -3042,7 +3025,7 @@ static const basictokens vzbas_tokens =
 {
 	0x7ae9,
 	0,
-	FALSE,
+	false,
 	vzbas_tokenents,
 	ARRAY_LENGTH(vzbas_tokenents)
 };
@@ -3086,7 +3069,7 @@ static const basictokens bml3bas_tokens =
 {
 	0x2600,
 	3,
-	TRUE,
+	true,
 	bml3bas_tokenents,
 	ARRAY_LENGTH(bml3bas_tokenents)
 };

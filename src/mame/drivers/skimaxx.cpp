@@ -503,7 +503,7 @@ static MACHINE_CONFIG_START( skimaxx, skimaxx_state )
 	/* video hardware */
 	MCFG_CPU_ADD("tms", TMS34010, XTAL_50MHz)
 	MCFG_CPU_PROGRAM_MAP(tms_program_map)
-	MCFG_TMS340X0_HALT_ON_RESET(FALSE) /* halt on reset */
+	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(50000000/8) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(2) /* pixels per clock */
 	MCFG_TMS340X0_SCANLINE_IND16_CB(skimaxx_state, scanline_update)     /* scanline updater (indexed16) */

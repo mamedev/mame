@@ -161,7 +161,7 @@ void tehkanwc_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		m_audiocpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in tehkanwc_state::device_timer");
+		assert_always(false, "Unknown id in tehkanwc_state::device_timer");
 	}
 }
 

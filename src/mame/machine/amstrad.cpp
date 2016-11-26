@@ -113,7 +113,7 @@ static const int RamConfigurations[8 * 4] =
 /* this contains the colours in machine.pens form.*/
 /* this is updated from the eventlist and reflects the current state
 of the render colours - these may be different to the current colour palette values */
-/* colours can be changed at any time and will take effect immediatly */
+/* colours can be changed at any time and will take effect immediately */
 
 
 
@@ -234,7 +234,7 @@ void amstrad_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		cb_set_resolution(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in amstrad_state::device_timer");
+		assert_always(false, "Unknown id in amstrad_state::device_timer");
 	}
 }
 
@@ -2071,7 +2071,7 @@ WRITE8_MEMBER(amstrad_state::amstrad_cpc_io_w)
 
 			/* printer port d7 */
 			if (data == 0x0c && m_system_type == SYSTEM_PLUS)
-				m_printer_bit8_selected = TRUE;
+				m_printer_bit8_selected = true;
 
 			m_asic.addr_6845 = data;
 			break;
@@ -2086,7 +2086,7 @@ WRITE8_MEMBER(amstrad_state::amstrad_cpc_io_w)
 			if (m_printer_bit8_selected && m_system_type == SYSTEM_PLUS)
 			{
 				m_centronics->write_data7(BIT(data, 3));
-				m_printer_bit8_selected = FALSE;
+				m_printer_bit8_selected = false;
 			}
 
 			if ( m_asic.addr_6845 == 0x01 )
@@ -3237,7 +3237,7 @@ MACHINE_RESET_MEMBER(amstrad_state,kccomp)
 	/* bit 1 = /TEST. When 0, KC compact will enter data transfer
 	sequence, where another system using the expansion port signals
 	DATA2,DATA1, /STROBE and DATA7 can transfer 256 bytes of program.
-	When the program has been transfered, it will be executed. This
+	When the program has been transferred, it will be executed. This
 	is not supported in the driver */
 	/* bit 3,4 are tied to +5V, bit 2 is tied to 0V */
 	m_ppi_port_inputs[amstrad_ppi_PortB] = (1<<4) | (1<<3) | 2;
@@ -3287,7 +3287,7 @@ DEVICE_IMAGE_LOAD_MEMBER(amstrad_state, amstrad_plus_cartridge)
 {
 	uint32_t size = m_cart->common_get_size("rom");
 	unsigned char header[12];
-	bool is_cpr = FALSE;
+	bool is_cpr = false;
 	logerror("IMG: loading CPC+ cartridge file\n");
 
 	// check for .CPR header
@@ -3301,7 +3301,7 @@ DEVICE_IMAGE_LOAD_MEMBER(amstrad_state, amstrad_plus_cartridge)
 		}
 		else
 		{
-			is_cpr = TRUE;
+			is_cpr = true;
 			size -= 12;
 		}
 	}

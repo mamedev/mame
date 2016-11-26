@@ -51,8 +51,8 @@ void espial_state::machine_reset()
 {
 	m_flipscreen = 0;
 
-	m_main_nmi_enabled = FALSE;
-	m_sound_nmi_enabled = FALSE;
+	m_main_nmi_enabled = false;
+	m_sound_nmi_enabled = false;
 }
 
 void espial_state::machine_start()

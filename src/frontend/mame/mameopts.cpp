@@ -363,7 +363,7 @@ void mame_options::set_system_name(emu_options &options, const char *name)
 		int middle = sw_load.find_first_of(':', left + 1);
 		int right = sw_load.find_last_of(':');
 
-		sw_list = sw_load.substr(0, left - 1);
+		sw_list = sw_load.substr(0, left);
 		sw_name = sw_load.substr(left + 1, middle - left - 1);
 		sw_part = sw_load.substr(middle + 1, right - middle - 1);
 		sw_instance = sw_load.substr(right + 1);
@@ -374,6 +374,8 @@ void mame_options::set_system_name(emu_options &options, const char *name)
 		software_list_device *swlist = software_list_device::find_by_name(config, sw_list.c_str());
 		const software_info *swinfo = swlist != nullptr ? swlist->find(sw_name.c_str()) : nullptr;
 		const software_part *swpart = swinfo != nullptr ? swinfo->find_part(sw_part.c_str()) : nullptr;
+		if (swpart == nullptr)
+			osd_printf_warning("Could not find %s in software list\n", options.software_name());
 
 		// then add the options
 		if (new_system)

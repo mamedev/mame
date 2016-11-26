@@ -32,8 +32,6 @@ const device_type RSP = &device_creator<rsp_device>;
 							(uint32_t)( ( ACCUM(x) >> 32 ) & 0x00000000ffffffff ),    \
 							(uint32_t)(   ACCUM(x)         & 0x00000000ffffffff ))
 
-extern offs_t rsp_dasm_one(char *buffer, offs_t pc, uint32_t op);
-
 
 #define SIMM16      ((int32_t)(int16_t)(op))
 #define UIMM16      ((uint16_t)(op))
@@ -106,7 +104,7 @@ rsp_device::rsp_device(const machine_config &mconfig, const char *tag, device_t 
 //  , m_drcuml(*this, m_cache, 0, 8, 32, 2)
 	, m_drcfe(nullptr)
 	, m_drcoptions(0)
-	, m_cache_dirty(TRUE)
+	, m_cache_dirty(true)
 	, m_numcycles(0)
 	, m_format(nullptr)
 	, m_arg2(0)
@@ -141,10 +139,10 @@ rsp_device::rsp_device(const machine_config &mconfig, const char *tag, device_t 
 {
 }
 
-offs_t rsp_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t rsp_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( rsp );
-	return CPU_DISASSEMBLE_NAME( rsp )(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME( rsp )(this, stream, pc, oprom, opram, options);
 }
 
 void rsp_device::rsp_add_imem(uint32_t *base)
@@ -310,9 +308,10 @@ void rsp_device::unimplemented_opcode(uint32_t op)
 {
 	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 	{
-		char string[200];
+		util::ovectorstream string;
 		rsp_dasm_one(string, m_ppc, op);
-		osd_printf_debug("%08X: %s\n", m_ppc, string);
+		string.put('\0');
+		osd_printf_debug("%08X: %s\n", m_ppc, &string.vec()[0]);
 	}
 
 #if SAVE_DISASM
@@ -420,7 +419,7 @@ void rsp_device::device_start()
 	}
 
 	/* mark the cache dirty so it is updated on next execute */
-	m_cache_dirty = TRUE;
+	m_cache_dirty = true;
 
 	state_add( RSP_PC,      "PC", m_debugger_temp).callimport().callexport().formatstr("%08X");
 	state_add( RSP_R0,      "R0", m_rsp_state->r[0]).formatstr("%08X");
@@ -736,12 +735,14 @@ void rsp_device::execute_run()
 		{
 			int i, l;
 			static uint32_t prev_regs[32];
-			char string[200];
+			
+			util::ovectorstream string;
 			rsp_dasm_one(string, m_ppc, op);
+			string.put('\0');
 
-			fprintf(m_exec_output, "%08X: %s", m_ppc, string);
+			fprintf(m_exec_output, "%08X: %s", m_ppc, &string.vec()[0]);
 
-			l = strlen(string);
+			l = string.vec().size() - 1;
 			if (l < 36)
 			{
 				for (i=l; i < 36; i++)

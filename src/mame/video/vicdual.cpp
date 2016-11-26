@@ -12,14 +12,14 @@
 
 static const pen_t pens_from_color_prom[] =
 {
-	rgb_t::black,
+	rgb_t::black(),
 	rgb_t(0x00, 0xff, 0x00),
 	rgb_t(0x00, 0x00, 0xff),
 	rgb_t(0x00, 0xff, 0xff),
 	rgb_t(0xff, 0x00, 0x00),
 	rgb_t(0xff, 0xff, 0x00),
 	rgb_t(0xff, 0x00, 0xff),
-	rgb_t::white
+	rgb_t::white()
 };
 
 
@@ -55,7 +55,7 @@ uint32_t vicdual_state::screen_update_bw(screen_device &screen, bitmap_rgb32 &bi
 		}
 
 		/* plot the current pixel */
-		pen = (video_data & 0x80) ? rgb_t::white : rgb_t::black;
+		pen = (video_data & 0x80) ? rgb_t::white() : rgb_t::black();
 		bitmap.pix32(y, x) = pen;
 
 		/* next pixel */

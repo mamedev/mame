@@ -169,7 +169,7 @@ void nes_state::setup_disk(nes_disksys_device *slot)
 		slot->vram_alloc(0x2000);
 		slot->prgram_alloc(0x8000);
 
-		slot->pcb_start(machine(), m_ciram.get(), FALSE);
+		slot->pcb_start(machine(), m_ciram.get(), false);
 		m_ppu->space(AS_PROGRAM).install_readwrite_handler(0, 0x1fff, read8_delegate(FUNC(device_nes_cart_interface::chr_r),(device_nes_cart_interface *)slot), write8_delegate(FUNC(device_nes_cart_interface::chr_w),(device_nes_cart_interface *)slot));
 		m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8_delegate(FUNC(device_nes_cart_interface::nt_r),(device_nes_cart_interface *)slot), write8_delegate(FUNC(device_nes_cart_interface::nt_w),(device_nes_cart_interface *)slot));
 		m_ppu->set_scanline_callback(ppu2c0x_scanline_delegate(FUNC(device_nes_cart_interface::scanline_irq),(device_nes_cart_interface *)slot));
@@ -208,6 +208,10 @@ static MACHINE_CONFIG_DERIVED( fds, famicom )
 
 	MCFG_DEVICE_REMOVE("cart_list")
 	MCFG_DEVICE_REMOVE("cass_list")
+	MCFG_DEVICE_REMOVE("ade_list")
+	MCFG_DEVICE_REMOVE("ntb_list")
+	MCFG_DEVICE_REMOVE("kstudio_list")
+	MCFG_DEVICE_REMOVE("datach_list")
 MACHINE_CONFIG_END
 
 

@@ -269,7 +269,7 @@ protected:
 	// device_disasm_interface overrides
 	virtual uint32_t disasm_min_opcode_bytes() const override { return 4; }
 	virtual uint32_t disasm_max_opcode_bytes() const override { return 4; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	/* exception types */
 	enum
@@ -588,7 +588,7 @@ protected:
 	{
 		offs_t              start;                      /* start of the RAM block */
 		offs_t              end;                        /* end of the RAM block */
-		uint8_t               readonly;                   /* TRUE if read-only */
+		bool                readonly;                   /* true if read-only */
 		void *              base;                       /* base in memory where the RAM lives */
 	};
 
@@ -629,9 +629,9 @@ protected:
 	void ppc4xx_set_irq_line(uint32_t bitmask, int state);
 	int ppc4xx_get_irq_line(uint32_t bitmask);
 	void ppc4xx_dma_update_irq_states();
-	int ppc4xx_dma_decrement_count(int dmachan);
-	int ppc4xx_dma_fetch_transmit_byte(int dmachan, uint8_t *byte);
-	int ppc4xx_dma_handle_receive_byte(int dmachan, uint8_t byte);
+	bool ppc4xx_dma_decrement_count(int dmachan);
+	bool ppc4xx_dma_fetch_transmit_byte(int dmachan, uint8_t *byte);
+	bool ppc4xx_dma_handle_receive_byte(int dmachan, uint8_t byte);
 	void ppc4xx_dma_exec(int dmachan);
 	void ppc4xx_spu_update_irq_states();
 	void ppc4xx_spu_rx_data(uint8_t data);
@@ -656,7 +656,7 @@ protected:
 	void static_generate_lsw_entries(int mode);
 	void static_generate_stsw_entries(int mode);
 	void generate_update_mode(drcuml_block *block);
-	void generate_update_cycles(drcuml_block *block, compiler_state *compiler, uml::parameter param, int allow_exception);
+	void generate_update_cycles(drcuml_block *block, compiler_state *compiler, uml::parameter param, bool allow_exception);
 	void generate_checksum_block(drcuml_block *block, compiler_state *compiler, const opcode_desc *seqhead, const opcode_desc *seqlast);
 	void generate_sequence_instruction(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 	void generate_compute_flags(drcuml_block *block, const opcode_desc *desc, int updatecr, uint32_t xermask, int invertcarry);
@@ -664,11 +664,11 @@ protected:
 	void generate_fp_flags(drcuml_block *block, const opcode_desc *desc, int updatefprf);
 	void generate_branch(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, int source, uint8_t link);
 	void generate_branch_bo(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, uint32_t bo, uint32_t bi, int source, int link);
-	int generate_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	int generate_instruction_13(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	int generate_instruction_1f(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	int generate_instruction_3b(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
-	int generate_instruction_3f(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	bool generate_opcode(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	bool generate_instruction_13(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	bool generate_instruction_1f(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	bool generate_instruction_3b(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
+	bool generate_instruction_3f(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc);
 	void log_add_disasm_comment(drcuml_block *block, uint32_t pc, uint32_t op);
 	const char *log_desc_flags_to_string(uint32_t flags);
 	void log_register_list(drcuml_state *drcuml, const char *string, const uint32_t *reglist, const uint32_t *regnostarlist);

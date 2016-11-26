@@ -90,7 +90,7 @@ ADDRESS_MAP_END
 static MACHINE_CONFIG_FRAGMENT( inder_vid )
 	MCFG_CPU_ADD("tms", TMS34010, XTAL_40MHz)
 	MCFG_CPU_PROGRAM_MAP(megaphx_tms_map)
-	MCFG_TMS340X0_HALT_ON_RESET(TRUE) /* halt on reset */
+	MCFG_TMS340X0_HALT_ON_RESET(true) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(XTAL_40MHz/12) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(2) /* pixels per clock */
 	MCFG_TMS340X0_SCANLINE_RGB32_CB(inder_vid_device, scanline)     /* scanline updater (RGB32) */

@@ -84,7 +84,7 @@ static unsigned MakeEA (char *ea, int lo, unsigned pc, int width)
 }
 
 
-CPU_DISASSEMBLE( t11 )
+CPU_DISASSEMBLE(t11)
 {
 	char ea1[32], ea2[32];
 	unsigned PC = pc;
@@ -104,153 +104,153 @@ CPU_DISASSEMBLE( t11 )
 		case 0x0000:
 			switch (lo)
 			{
-				case 0x00:  sprintf (buffer, "HALT"); break;
-				case 0x01:  sprintf (buffer, "WAIT"); break;
-				case 0x02:  sprintf (buffer, "RTI"); flags = DASMFLAG_STEP_OUT; break;
-				case 0x03:  sprintf (buffer, "BPT"); break;
-				case 0x04:  sprintf (buffer, "IOT"); break;
-				case 0x05:  sprintf (buffer, "RESET"); break;
-				case 0x06:  sprintf (buffer, "RTT"); break;
-				default:    sprintf (buffer, "???? (%04X)", op); break;
+				case 0x00:  util::stream_format(stream, "HALT"); break;
+				case 0x01:  util::stream_format(stream, "WAIT"); break;
+				case 0x02:  util::stream_format(stream, "RTI"); flags = DASMFLAG_STEP_OUT; break;
+				case 0x03:  util::stream_format(stream, "BPT"); break;
+				case 0x04:  util::stream_format(stream, "IOT"); break;
+				case 0x05:  util::stream_format(stream, "RESET"); break;
+				case 0x06:  util::stream_format(stream, "RTT"); break;
+				default:    util::stream_format(stream, "???? (%04X)", op); break;
 			}
 			break;
 		case 0x0040:
 			pc = MakeEA (ea1, lo, pc, 4);
-			sprintf (buffer, "JMP   %s", ea1);
+			util::stream_format(stream, "JMP   %s", ea1);
 			break;
 		case 0x0080:
 			switch (lo & 070)
 			{
 				case 000:
 					if( (lo & 7) == 7 )
-						sprintf (buffer, "RTS");
+						util::stream_format(stream, "RTS");
 					else
-						sprintf (buffer, "RTS   %s", regs[lo & 7]);
+						util::stream_format(stream, "RTS   %s", regs[lo & 7]);
 					flags = DASMFLAG_STEP_OUT;
 					break;
 				case 040:
 				case 050:
 					switch( lo & 15 )
 					{
-						case 0x00:  sprintf (buffer, "NOP"); break;
-						case 0x0f:  sprintf (buffer, "CCC"); break;
-						case 0x01:  sprintf (buffer, "CEC"); break;
-						case 0x02:  sprintf (buffer, "CEV"); break;
-						case 0x04:  sprintf (buffer, "CEZ"); break;
-						case 0x08:  sprintf (buffer, "CEN"); break;
-						default:    sprintf (buffer, "Ccc   #$%X", lo & 15); break;
+						case 0x00:  util::stream_format(stream, "NOP"); break;
+						case 0x0f:  util::stream_format(stream, "CCC"); break;
+						case 0x01:  util::stream_format(stream, "CEC"); break;
+						case 0x02:  util::stream_format(stream, "CEV"); break;
+						case 0x04:  util::stream_format(stream, "CEZ"); break;
+						case 0x08:  util::stream_format(stream, "CEN"); break;
+						default:    util::stream_format(stream, "Ccc   #$%X", lo & 15); break;
 					}
 					break;
 				case 060:
 				case 070:
 					switch( lo & 15 )
 					{
-						case 0x00:  sprintf (buffer, "NOP"); break;
-						case 0x0f:  sprintf (buffer, "SCC"); break;
-						case 0x01:  sprintf (buffer, "SEC"); break;
-						case 0x02:  sprintf (buffer, "SEV"); break;
-						case 0x04:  sprintf (buffer, "SEZ"); break;
-						case 0x08:  sprintf (buffer, "SEN"); break;
-						default:    sprintf (buffer, "Scc   #$%X", lo & 15); break;
+						case 0x00:  util::stream_format(stream, "NOP"); break;
+						case 0x0f:  util::stream_format(stream, "SCC"); break;
+						case 0x01:  util::stream_format(stream, "SEC"); break;
+						case 0x02:  util::stream_format(stream, "SEV"); break;
+						case 0x04:  util::stream_format(stream, "SEZ"); break;
+						case 0x08:  util::stream_format(stream, "SEN"); break;
+						default:    util::stream_format(stream, "Scc   #$%X", lo & 15); break;
 					}
 					break;
 			}
 			break;
 		case 0x00c0:
 			pc = MakeEA (ea1, lo, pc, 4);
-			sprintf (buffer, "SWAB  %s", ea1);
+			util::stream_format(stream, "SWAB  %s", ea1);
 			break;
 		case 0x0100: case 0x0140: case 0x0180: case 0x01c0:
 			offset = 2 * (int8_t)(op & 0xff);
-			sprintf (buffer, "BR    $%04X", pc + offset);
+			util::stream_format(stream, "BR    $%04X", pc + offset);
 			break;
 		case 0x0200: case 0x0240: case 0x0280: case 0x02c0:
 			offset = 2 * (int8_t)(op & 0xff);
-			sprintf (buffer, "BNE   $%04X", pc + offset);
+			util::stream_format(stream, "BNE   $%04X", pc + offset);
 			break;
 		case 0x0300: case 0x0340: case 0x0380: case 0x03c0:
 			offset = 2 * (int8_t)(op & 0xff);
-			sprintf (buffer, "BEQ   $%04X", pc + offset);
+			util::stream_format(stream, "BEQ   $%04X", pc + offset);
 			break;
 		case 0x0400: case 0x0440: case 0x0480: case 0x04c0:
 			offset = 2 * (int8_t)(op & 0xff);
-			sprintf (buffer, "BGE   $%04X", pc + offset);
+			util::stream_format(stream, "BGE   $%04X", pc + offset);
 			break;
 		case 0x0500: case 0x0540: case 0x0580: case 0x05c0:
 			offset = 2 * (int8_t)(op & 0xff);
-			sprintf (buffer, "BLT   $%04X", pc + offset);
+			util::stream_format(stream, "BLT   $%04X", pc + offset);
 			break;
 		case 0x0600: case 0x0640: case 0x0680: case 0x06c0:
 			offset = 2 * (int8_t)(op & 0xff);
-			sprintf (buffer, "BGT   $%04X", pc + offset);
+			util::stream_format(stream, "BGT   $%04X", pc + offset);
 			break;
 		case 0x0700: case 0x0740: case 0x0780: case 0x07c0:
 			offset = 2 * (int8_t)(op & 0xff);
-			sprintf (buffer, "BLE   $%04X", pc + offset);
+			util::stream_format(stream, "BLE   $%04X", pc + offset);
 			break;
 		case 0x0800: case 0x0840: case 0x0880: case 0x08c0:
 		case 0x0900: case 0x0940: case 0x0980: case 0x09c0:
 			pc = MakeEA (ea1, lo, pc, 4);
 			if ( (hi & 7) == 7 )
-				sprintf (buffer, "JSR   %s", ea1);
+				util::stream_format(stream, "JSR   %s", ea1);
 			else
-				sprintf (buffer, "JSR   %s,%s", regs[hi & 7], ea1);
+				util::stream_format(stream, "JSR   %s,%s", regs[hi & 7], ea1);
 			flags = DASMFLAG_STEP_OVER;
 			break;
 		case 0x0a00:
 			pc = MakeEA (ea1, lo, pc, 4);
-			sprintf (buffer, "CLR   %s", ea1);
+			util::stream_format(stream, "CLR   %s", ea1);
 			break;
 		case 0x0a40:
 			pc = MakeEA (ea1, lo, pc, 4);
-			sprintf (buffer, "COM   %s", ea1);
+			util::stream_format(stream, "COM   %s", ea1);
 			break;
 		case 0x0a80:
 			pc = MakeEA (ea1, lo, pc, 4);
-			sprintf (buffer, "INC   %s", ea1);
+			util::stream_format(stream, "INC   %s", ea1);
 			break;
 		case 0x0ac0:
 			pc = MakeEA (ea1, lo, pc, 4);
-			sprintf (buffer, "DEC   %s", ea1);
+			util::stream_format(stream, "DEC   %s", ea1);
 			break;
 		case 0x0b00:
 			pc = MakeEA (ea1, lo, pc, 4);
-			sprintf (buffer, "NEG   %s", ea1);
+			util::stream_format(stream, "NEG   %s", ea1);
 			break;
 		case 0x0b40:
 			pc = MakeEA (ea1, lo, pc, 4);
-			sprintf (buffer, "ADC   %s", ea1);
+			util::stream_format(stream, "ADC   %s", ea1);
 			break;
 		case 0x0b80:
 			pc = MakeEA (ea1, lo, pc, 4);
-			sprintf (buffer, "SBC   %s", ea1);
+			util::stream_format(stream, "SBC   %s", ea1);
 			break;
 		case 0x0bc0:
 			pc = MakeEA (ea1, lo, pc, 4);
-			sprintf (buffer, "TST   %s", ea1);
+			util::stream_format(stream, "TST   %s", ea1);
 			break;
 		case 0x0c00:
 			pc = MakeEA (ea1, lo, pc, 4);
-			sprintf (buffer, "ROR   %s", ea1);
+			util::stream_format(stream, "ROR   %s", ea1);
 			break;
 		case 0x0c40:
 			pc = MakeEA (ea1, lo, pc, 4);
-			sprintf (buffer, "ROL   %s", ea1);
+			util::stream_format(stream, "ROL   %s", ea1);
 			break;
 		case 0x0c80:
 			pc = MakeEA (ea1, lo, pc, 4);
-			sprintf (buffer, "ASR   %s", ea1);
+			util::stream_format(stream, "ASR   %s", ea1);
 			break;
 		case 0x0cc0:
 			pc = MakeEA (ea1, lo, pc, 4);
-			sprintf (buffer, "ASL   %s", ea1);
+			util::stream_format(stream, "ASL   %s", ea1);
 			break;
 /*      case 0x0d00:
-            sprintf (buffer, "MARK  #$%X", lo);
+            util::stream_format(stream, "MARK  #$%X", lo);
             break;*/
 		case 0x0dc0:
 			pc = MakeEA (ea1, lo, pc, 4);
-			sprintf (buffer, "SXT   %s", ea1);
+			util::stream_format(stream, "SXT   %s", ea1);
 			break;
 		case 0x1000: case 0x1040: case 0x1080: case 0x10c0: case 0x1100: case 0x1140: case 0x1180: case 0x11c0:
 		case 0x1200: case 0x1240: case 0x1280: case 0x12c0: case 0x1300: case 0x1340: case 0x1380: case 0x13c0:
@@ -263,12 +263,12 @@ CPU_DISASSEMBLE( t11 )
 			pc = MakeEA (ea1, hi, pc, 4);
 			pc = MakeEA (ea2, lo, pc, 4);
 			if (lo == 046)      /* MOV src,-(SP) */
-				sprintf (buffer, "PUSH  %s", ea1);
+				util::stream_format(stream, "PUSH  %s", ea1);
 			else
 			if (hi == 026)      /* MOV (SP)+,buffer */
-				sprintf (buffer, "POP   %s", ea2);
+				util::stream_format(stream, "POP   %s", ea2);
 			else                /* all other */
-				sprintf (buffer, "MOV   %s,%s", ea1, ea2);
+				util::stream_format(stream, "MOV   %s,%s", ea1, ea2);
 			break;
 		case 0x2000: case 0x2040: case 0x2080: case 0x20c0: case 0x2100: case 0x2140: case 0x2180: case 0x21c0:
 		case 0x2200: case 0x2240: case 0x2280: case 0x22c0: case 0x2300: case 0x2340: case 0x2380: case 0x23c0:
@@ -280,7 +280,7 @@ CPU_DISASSEMBLE( t11 )
 		case 0x2e00: case 0x2e40: case 0x2e80: case 0x2ec0: case 0x2f00: case 0x2f40: case 0x2f80: case 0x2fc0:
 			pc = MakeEA (ea1, hi, pc, 4);
 			pc = MakeEA (ea2, lo, pc, 4);
-			sprintf (buffer, "CMP   %s,%s", ea1, ea2);
+			util::stream_format(stream, "CMP   %s,%s", ea1, ea2);
 			break;
 		case 0x3000: case 0x3040: case 0x3080: case 0x30c0: case 0x3100: case 0x3140: case 0x3180: case 0x31c0:
 		case 0x3200: case 0x3240: case 0x3280: case 0x32c0: case 0x3300: case 0x3340: case 0x3380: case 0x33c0:
@@ -292,7 +292,7 @@ CPU_DISASSEMBLE( t11 )
 		case 0x3e00: case 0x3e40: case 0x3e80: case 0x3ec0: case 0x3f00: case 0x3f40: case 0x3f80: case 0x3fc0:
 			pc = MakeEA (ea1, hi, pc, 4);
 			pc = MakeEA (ea2, lo, pc, 4);
-			sprintf (buffer, "BIT   %s,%s", ea1, ea2);
+			util::stream_format(stream, "BIT   %s,%s", ea1, ea2);
 			break;
 		case 0x4000: case 0x4040: case 0x4080: case 0x40c0: case 0x4100: case 0x4140: case 0x4180: case 0x41c0:
 		case 0x4200: case 0x4240: case 0x4280: case 0x42c0: case 0x4300: case 0x4340: case 0x4380: case 0x43c0:
@@ -304,7 +304,7 @@ CPU_DISASSEMBLE( t11 )
 		case 0x4e00: case 0x4e40: case 0x4e80: case 0x4ec0: case 0x4f00: case 0x4f40: case 0x4f80: case 0x4fc0:
 			pc = MakeEA (ea1, hi, pc, 4);
 			pc = MakeEA (ea2, lo, pc, 4);
-			sprintf (buffer, "BIC   %s,%s", ea1, ea2);
+			util::stream_format(stream, "BIC   %s,%s", ea1, ea2);
 			break;
 		case 0x5000: case 0x5040: case 0x5080: case 0x50c0: case 0x5100: case 0x5140: case 0x5180: case 0x51c0:
 		case 0x5200: case 0x5240: case 0x5280: case 0x52c0: case 0x5300: case 0x5340: case 0x5380: case 0x53c0:
@@ -316,7 +316,7 @@ CPU_DISASSEMBLE( t11 )
 		case 0x5e00: case 0x5e40: case 0x5e80: case 0x5ec0: case 0x5f00: case 0x5f40: case 0x5f80: case 0x5fc0:
 			pc = MakeEA (ea1, hi, pc, 4);
 			pc = MakeEA (ea2, lo, pc, 4);
-			sprintf (buffer, "BIS   %s,%s", ea1, ea2);
+			util::stream_format(stream, "BIS   %s,%s", ea1, ea2);
 			break;
 		case 0x6000: case 0x6040: case 0x6080: case 0x60c0: case 0x6100: case 0x6140: case 0x6180: case 0x61c0:
 		case 0x6200: case 0x6240: case 0x6280: case 0x62c0: case 0x6300: case 0x6340: case 0x6380: case 0x63c0:
@@ -328,113 +328,113 @@ CPU_DISASSEMBLE( t11 )
 		case 0x6e00: case 0x6e40: case 0x6e80: case 0x6ec0: case 0x6f00: case 0x6f40: case 0x6f80: case 0x6fc0:
 			pc = MakeEA (ea1, hi, pc, 4);
 			pc = MakeEA (ea2, lo, pc, 4);
-			sprintf (buffer, "ADD   %s,%s", ea1, ea2);
+			util::stream_format(stream, "ADD   %s,%s", ea1, ea2);
 			break;
 
 		case 0x7800: case 0x7840: case 0x7880: case 0x78c0: case 0x7900: case 0x7940: case 0x7980: case 0x79c0:
 			pc = MakeEA (ea1, lo, pc, 4);
-			sprintf (buffer, "XOR   %s,%s", regs[hi & 7], ea1);
+			util::stream_format(stream, "XOR   %s,%s", regs[hi & 7], ea1);
 			break;
 
 		case 0x7e00: case 0x7e40: case 0x7e80: case 0x7ec0: case 0x7f00: case 0x7f40: case 0x7f80: case 0x7fc0:
 			addr = (pc + 2 - 2 * lo) & 0xffff;
-			sprintf (buffer, "SOB   %s,$%X", regs[hi & 7], addr);
+			util::stream_format(stream, "SOB   %s,$%X", regs[hi & 7], addr);
 			break;
 
 		case 0x8000: case 0x8040: case 0x8080: case 0x80c0:
 			offset = 2 * (int8_t)(op & 0xff);
-			sprintf (buffer, "BPL   $%04X", pc + offset);
+			util::stream_format(stream, "BPL   $%04X", pc + offset);
 			break;
 		case 0x8100: case 0x8140: case 0x8180: case 0x81c0:
 			offset = 2 * (int8_t)(op & 0xff);
-			sprintf (buffer, "BMI   $%04X", pc + offset);
+			util::stream_format(stream, "BMI   $%04X", pc + offset);
 			break;
 		case 0x8200: case 0x8240: case 0x8280: case 0x82c0:
 			offset = 2 * (int8_t)(op & 0xff);
-			sprintf (buffer, "BHI   $%04X", pc + offset);
+			util::stream_format(stream, "BHI   $%04X", pc + offset);
 			break;
 		case 0x8300: case 0x8340: case 0x8380: case 0x83c0:
 			offset = 2 * (int8_t)(op & 0xff);
-			sprintf (buffer, "BLOS  $%04X", pc + offset);
+			util::stream_format(stream, "BLOS  $%04X", pc + offset);
 			break;
 		case 0x8400: case 0x8440: case 0x8480: case 0x84c0:
 			offset = 2 * (int8_t)(op & 0xff);
-			sprintf (buffer, "BVC   $%04X", pc + offset);
+			util::stream_format(stream, "BVC   $%04X", pc + offset);
 			break;
 		case 0x8500: case 0x8540: case 0x8580: case 0x85c0:
 			offset = 2 * (int8_t)(op & 0xff);
-			sprintf (buffer, "BVS   $%04X", pc + offset);
+			util::stream_format(stream, "BVS   $%04X", pc + offset);
 			break;
 		case 0x8600: case 0x8640: case 0x8680: case 0x86c0:
 			offset = 2 * (int8_t)(op & 0xff);
-			sprintf (buffer, "BCC   $%04X", pc + offset);
+			util::stream_format(stream, "BCC   $%04X", pc + offset);
 			break;
 		case 0x8700: case 0x8740: case 0x8780: case 0x87c0:
 			offset = 2 * (int8_t)(op & 0xff);
-			sprintf (buffer, "BCS   $%04X", pc + offset);
+			util::stream_format(stream, "BCS   $%04X", pc + offset);
 			break;
 		case 0x8800: case 0x8840: case 0x8880: case 0x88c0:
-			sprintf (buffer, "EMT   #$%02X", op & 0xff);
+			util::stream_format(stream, "EMT   #$%02X", op & 0xff);
 			break;
 		case 0x8900: case 0x8940: case 0x8980: case 0x89c0:
-			sprintf (buffer, "TRAP  #$%02X", op & 0xff);
+			util::stream_format(stream, "TRAP  #$%02X", op & 0xff);
 			break;
 
 		case 0x8a00:
 			pc = MakeEA (ea1, lo, pc, 2);
-			sprintf (buffer, "CLRB  %s", ea1);
+			util::stream_format(stream, "CLRB  %s", ea1);
 			break;
 		case 0x8a40:
 			pc = MakeEA (ea1, lo, pc, 2);
-			sprintf (buffer, "COMB  %s", ea1);
+			util::stream_format(stream, "COMB  %s", ea1);
 			break;
 		case 0x8a80:
 			pc = MakeEA (ea1, lo, pc, 2);
-			sprintf (buffer, "INCB  %s", ea1);
+			util::stream_format(stream, "INCB  %s", ea1);
 			break;
 		case 0x8ac0:
 			pc = MakeEA (ea1, lo, pc, 2);
-			sprintf (buffer, "DECB  %s", ea1);
+			util::stream_format(stream, "DECB  %s", ea1);
 			break;
 		case 0x8b00:
 			pc = MakeEA (ea1, lo, pc, 2);
-			sprintf (buffer, "NEGB  %s", ea1);
+			util::stream_format(stream, "NEGB  %s", ea1);
 			break;
 		case 0x8b40:
 			pc = MakeEA (ea1, lo, pc, 2);
-			sprintf (buffer, "ADCB  %s", ea1);
+			util::stream_format(stream, "ADCB  %s", ea1);
 			break;
 		case 0x8b80:
 			pc = MakeEA (ea1, lo, pc, 2);
-			sprintf (buffer, "SBCB  %s", ea1);
+			util::stream_format(stream, "SBCB  %s", ea1);
 			break;
 		case 0x8bc0:
 			pc = MakeEA (ea1, lo, pc, 2);
-			sprintf (buffer, "TSTB  %s", ea1);
+			util::stream_format(stream, "TSTB  %s", ea1);
 			break;
 		case 0x8c00:
 			pc = MakeEA (ea1, lo, pc, 2);
-			sprintf (buffer, "RORB  %s", ea1);
+			util::stream_format(stream, "RORB  %s", ea1);
 			break;
 		case 0x8c40:
 			pc = MakeEA (ea1, lo, pc, 2);
-			sprintf (buffer, "ROLB  %s", ea1);
+			util::stream_format(stream, "ROLB  %s", ea1);
 			break;
 		case 0x8c80:
 			pc = MakeEA (ea1, lo, pc, 2);
-			sprintf (buffer, "ASRB  %s", ea1);
+			util::stream_format(stream, "ASRB  %s", ea1);
 			break;
 		case 0x8cc0:
 			pc = MakeEA (ea1, lo, pc, 2);
-			sprintf (buffer, "ASLB  %s", ea1);
+			util::stream_format(stream, "ASLB  %s", ea1);
 			break;
 		case 0x8d00:
 			pc = MakeEA (ea1, lo, pc, 2);
-			sprintf (buffer, "MTPS  %s", ea1);
+			util::stream_format(stream, "MTPS  %s", ea1);
 			break;
 		case 0x8dc0:
 			pc = MakeEA (ea1, lo, pc, 2);
-			sprintf (buffer, "MFPS  %s", ea1);
+			util::stream_format(stream, "MFPS  %s", ea1);
 			break;
 		case 0x9000: case 0x9040: case 0x9080: case 0x90c0: case 0x9100: case 0x9140: case 0x9180: case 0x91c0:
 		case 0x9200: case 0x9240: case 0x9280: case 0x92c0: case 0x9300: case 0x9340: case 0x9380: case 0x93c0:
@@ -446,7 +446,7 @@ CPU_DISASSEMBLE( t11 )
 		case 0x9e00: case 0x9e40: case 0x9e80: case 0x9ec0: case 0x9f00: case 0x9f40: case 0x9f80: case 0x9fc0:
 			pc = MakeEA (ea1, hi, pc, 2);
 			pc = MakeEA (ea2, lo, pc, 2);
-			sprintf (buffer, "MOVB  %s,%s", ea1, ea2);
+			util::stream_format(stream, "MOVB  %s,%s", ea1, ea2);
 			break;
 		case 0xa000: case 0xa040: case 0xa080: case 0xa0c0: case 0xa100: case 0xa140: case 0xa180: case 0xa1c0:
 		case 0xa200: case 0xa240: case 0xa280: case 0xa2c0: case 0xa300: case 0xa340: case 0xa380: case 0xa3c0:
@@ -458,7 +458,7 @@ CPU_DISASSEMBLE( t11 )
 		case 0xae00: case 0xae40: case 0xae80: case 0xaec0: case 0xaf00: case 0xaf40: case 0xaf80: case 0xafc0:
 			pc = MakeEA (ea1, hi, pc, 2);
 			pc = MakeEA (ea2, lo, pc, 2);
-			sprintf (buffer, "CMPB  %s,%s", ea1, ea2);
+			util::stream_format(stream, "CMPB  %s,%s", ea1, ea2);
 			break;
 		case 0xb000: case 0xb040: case 0xb080: case 0xb0c0: case 0xb100: case 0xb140: case 0xb180: case 0xb1c0:
 		case 0xb200: case 0xb240: case 0xb280: case 0xb2c0: case 0xb300: case 0xb340: case 0xb380: case 0xb3c0:
@@ -470,7 +470,7 @@ CPU_DISASSEMBLE( t11 )
 		case 0xbe00: case 0xbe40: case 0xbe80: case 0xbec0: case 0xbf00: case 0xbf40: case 0xbf80: case 0xbfc0:
 			pc = MakeEA (ea1, hi, pc, 2);
 			pc = MakeEA (ea2, lo, pc, 2);
-			sprintf (buffer, "BITB  %s,%s", ea1, ea2);
+			util::stream_format(stream, "BITB  %s,%s", ea1, ea2);
 			break;
 		case 0xc000: case 0xc040: case 0xc080: case 0xc0c0: case 0xc100: case 0xc140: case 0xc180: case 0xc1c0:
 		case 0xc200: case 0xc240: case 0xc280: case 0xc2c0: case 0xc300: case 0xc340: case 0xc380: case 0xc3c0:
@@ -482,7 +482,7 @@ CPU_DISASSEMBLE( t11 )
 		case 0xce00: case 0xce40: case 0xce80: case 0xcec0: case 0xcf00: case 0xcf40: case 0xcf80: case 0xcfc0:
 			pc = MakeEA (ea1, hi, pc, 2);
 			pc = MakeEA (ea2, lo, pc, 2);
-			sprintf (buffer, "BICB  %s,%s", ea1, ea2);
+			util::stream_format(stream, "BICB  %s,%s", ea1, ea2);
 			break;
 		case 0xd000: case 0xd040: case 0xd080: case 0xd0c0: case 0xd100: case 0xd140: case 0xd180: case 0xd1c0:
 		case 0xd200: case 0xd240: case 0xd280: case 0xd2c0: case 0xd300: case 0xd340: case 0xd380: case 0xd3c0:
@@ -494,7 +494,7 @@ CPU_DISASSEMBLE( t11 )
 		case 0xde00: case 0xde40: case 0xde80: case 0xdec0: case 0xdf00: case 0xdf40: case 0xdf80: case 0xdfc0:
 			pc = MakeEA (ea1, hi, pc, 2);
 			pc = MakeEA (ea2, lo, pc, 2);
-			sprintf (buffer, "BISB  %s,%s", ea1, ea2);
+			util::stream_format(stream, "BISB  %s,%s", ea1, ea2);
 			break;
 		case 0xe000: case 0xe040: case 0xe080: case 0xe0c0: case 0xe100: case 0xe140: case 0xe180: case 0xe1c0:
 		case 0xe200: case 0xe240: case 0xe280: case 0xe2c0: case 0xe300: case 0xe340: case 0xe380: case 0xe3c0:
@@ -506,11 +506,11 @@ CPU_DISASSEMBLE( t11 )
 		case 0xee00: case 0xee40: case 0xee80: case 0xeec0: case 0xef00: case 0xef40: case 0xef80: case 0xefc0:
 			pc = MakeEA (ea1, hi, pc, 4);
 			pc = MakeEA (ea2, lo, pc, 4);
-			sprintf (buffer, "SUB   %s,%s", ea1, ea2);
+			util::stream_format(stream, "SUB   %s,%s", ea1, ea2);
 			break;
 
 		default:
-			sprintf (buffer, "???? (%06o)", op);
+			util::stream_format(stream, "???? (%06o)", op);
 			break;
 	}
 

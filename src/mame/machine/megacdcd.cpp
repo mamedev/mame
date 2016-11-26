@@ -998,13 +998,13 @@ WRITE16_MEMBER( lc89510_temp_device::segacd_cdfader_w )
 	cdfader_vol = (double)((data & 0x3ff0) >> 4);
 
 	if(data & 0x4000)
-		cdfader_vol = 100.0;
+		cdfader_vol = 1.0;
 	else
-		cdfader_vol = (cdfader_vol / 1024.0) * 100.0;
+		cdfader_vol = cdfader_vol / 1024.0;
 
 	//printf("%f\n",cdfader_vol);
 
-	m_cdda->set_volume(cdfader_vol);
+	m_cdda->set_output_gain(ALL_OUTPUTS, cdfader_vol);
 }
 
 void lc89510_temp_device::reset_cd(void)

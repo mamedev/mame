@@ -29,12 +29,19 @@
 #include <EGL/egl.h>
 #include <mir_toolkit/mir_client_library.h>
 
+typedef struct MIR_Window MIR_Window;
+
 typedef struct
 {
-    MirConnection* connection;
-    SDL_bool software;
-    
+    MirConnection*    connection;
+    MirDisplayConfig* display_config;
+    MIR_Window*       current_window;
+    SDL_bool          software;
+    MirPixelFormat    pixel_format;
 } MIR_Data;
+
+extern Uint32
+MIR_GetSDLPixelFormat(MirPixelFormat format);
 
 #endif /* _SDL_mirvideo_h_ */
 

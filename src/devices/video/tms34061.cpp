@@ -487,7 +487,7 @@ uint8_t tms34061_device::read(address_space &space, int col, int row, int func)
 			result = xypixel_r(space, col);
 			break;
 
-		/* funtion 3 maps to direct access */
+		/* function 3 maps to direct access */
 		case 3:
 			offs = ((row << m_rowshift) | col) & m_vrammask;
 			result = m_vram[offs];

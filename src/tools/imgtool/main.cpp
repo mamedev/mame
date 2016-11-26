@@ -548,7 +548,7 @@ static int cmd_create(const struct command *c, int argc, char *argv[])
 	int unnamedargs;
 	const imgtool_module *module;
 	std::unique_ptr<util::option_resolution> resolution;
-	
+
 	module = imgtool_find_module(argv[0]);
 	if (!module)
 	{
@@ -588,7 +588,7 @@ static int cmd_readsector(const struct command *c, int argc, char *argv[])
 {
 	imgtoolerr_t err;
 	std::unique_ptr<imgtool::image> img;
-	imgtool::stream *stream = nullptr;
+	imgtool::stream::ptr stream;
 	std::vector<uint8_t> buffer;
 	uint32_t track, head, sector;
 
@@ -615,8 +615,6 @@ static int cmd_readsector(const struct command *c, int argc, char *argv[])
 	stream->write(&buffer[0], buffer.size());
 
 done:
-	if (stream)
-		delete stream;
 	if (err)
 		reporterror(err, c, argv[0], argv[1], nullptr, nullptr, nullptr);
 	return err ? -1 : 0;
@@ -628,7 +626,7 @@ static int cmd_writesector(const struct command *c, int argc, char *argv[])
 {
 	imgtoolerr_t err;
 	std::unique_ptr<imgtool::image> img;
-	imgtool::stream *stream = nullptr;
+	imgtool::stream::ptr stream;
 	std::vector<uint8_t> buffer;
 	uint32_t size, track, head, sector;
 
@@ -659,8 +657,6 @@ static int cmd_writesector(const struct command *c, int argc, char *argv[])
 		goto done;
 
 done:
-	if (stream)
-		delete stream;
 	if (err)
 		reporterror(err, c, argv[0], argv[1], nullptr, nullptr, nullptr);
 	return err ? -1 : 0;
@@ -855,7 +851,7 @@ int CLIB_DECL main(int argc, char *argv[])
 					goto cmderror;
 
 				/* initialize the imgtool core */
-				imgtool_init(TRUE, nullptr);
+				imgtool_init(true, nullptr);
 
 				if (c->lastargrepeats && (argc > c->maxargs))
 				{

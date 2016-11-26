@@ -61,6 +61,7 @@ public:
 	virtual bool is_creatable() const override { return 1; }
 	virtual bool must_be_loaded() const override { return 0; }
 	virtual bool is_reset_on_load() const override { return 0; }
+	virtual bool support_command_line_image_creation() const override { return 1; }
 	virtual const char *file_extensions() const override { return "awd"; }
 
 	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
@@ -108,7 +109,7 @@ public:
 
 #define OMTI_STATUS_REQ  0x01 // Request (1 = request transfer of data via data in/out register)
 #define OMTI_STATUS_IO   0x02 // In/Out (1 = direction of transfer is from controller to host)
-#define OMTI_STATUS_CD   0x04 // Command/Data ( 1 = byte transfered is command or status byte)
+#define OMTI_STATUS_CD   0x04 // Command/Data ( 1 = byte transferred is command or status byte)
 #define OMTI_STATUS_BUSY 0x08 // Busy (0 = controller is idle, 1 = controller selected)
 #define OMTI_STATUS_DREQ 0x10 // Data Request (0 = no DMA request, 1 = DMA cycle requested)
 #define OMTI_STATUS_IREQ 0x20 // Interrupt Request (0 = no interrupt, 1 = command complete)
@@ -331,7 +332,7 @@ void omti8621_device::device_reset()
 			m_isa->install_device(0x03f0, 0x03f7, *m_fdc, &pc_fdc_interface::map);
 		}
 
-		m_isa->set_dma_channel(2, this, TRUE);
+		m_isa->set_dma_channel(2, this, true);
 
 		m_installed = true;
 	}

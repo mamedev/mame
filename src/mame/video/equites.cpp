@@ -208,8 +208,7 @@ WRITE16_MEMBER(equites_state::equites_flipw_w)
 
 WRITE8_MEMBER(equites_state::equites_flipb_w)
 {
-	// data bit is A16 (offset)
-	flip_screen_set(offset != 0);
+	flip_screen_set(data);
 }
 
 WRITE16_MEMBER(equites_state::splndrbt_bg_scrollx_w)

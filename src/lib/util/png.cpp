@@ -235,10 +235,10 @@ static png_error read_chunk(util::core_file &fp, uint8_t **data, uint32_t *type,
     process_chunk - process a PNG chunk
 -------------------------------------------------*/
 
-static png_error process_chunk(png_private *png, uint8_t *data, uint32_t type, uint32_t length, int *keepmem)
+static png_error process_chunk(png_private *png, uint8_t *data, uint32_t type, uint32_t length, bool *keepmem)
 {
 	/* default to not keeping memory */
-	*keepmem = FALSE;
+	*keepmem = false;
 
 	/* switch off of the type */
 	switch (type)
@@ -258,14 +258,14 @@ static png_error process_chunk(png_private *png, uint8_t *data, uint32_t type, u
 		case PNG_CN_PLTE:
 			png->pnginfo->num_palette = length / 3;
 			png->pnginfo->palette = data;
-			*keepmem = TRUE;
+			*keepmem = true;
 			break;
 
 		/* transparency information */
 		case PNG_CN_tRNS:
 			png->pnginfo->num_trans = length;
 			png->pnginfo->trans = data;
-			*keepmem = TRUE;
+			*keepmem = true;
 			break;
 
 		/* image data */
@@ -281,7 +281,7 @@ static png_error process_chunk(png_private *png, uint8_t *data, uint32_t type, u
 			(*png->idata_next)->length = length;
 			(*png->idata_next)->data = data;
 			png->idata_next = &(*png->idata_next)->next;
-			*keepmem = TRUE;
+			*keepmem = true;
 			break;
 
 		/* gamma */
@@ -318,7 +318,7 @@ static png_error process_chunk(png_private *png, uint8_t *data, uint32_t type, u
 			else
 				pt->next = text;
 
-			*keepmem = TRUE;
+			*keepmem = true;
 			break;
 		}
 
@@ -523,7 +523,7 @@ png_error png_read_file(util::core_file &fp, png_info *pnginfo)
 	for ( ; ; )
 	{
 		uint32_t chunk_type, chunk_length;
-		int keepmem;
+		bool keepmem;
 
 		/* read a chunk */
 		error = read_chunk(fp, &chunk_data, &chunk_type, &chunk_length);
