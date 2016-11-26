@@ -89,7 +89,7 @@ static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 16, deadang_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, deadang_state )
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x0000, 0x1fff) AM_DEVREAD("sei80bu", sei80bu_device, data_r)
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("seibu_sound", seibu_sound_device, pending_w)
 	AM_RANGE(0x4001, 0x4001) AM_DEVWRITE("seibu_sound", seibu_sound_device, irq_clear_w)
@@ -107,6 +107,11 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, deadang_state )
 	AM_RANGE(0x6005, 0x6006) AM_DEVWRITE("adpcm2", seibu_adpcm_device, adr_w)
 	AM_RANGE(0x6008, 0x6009) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
 	AM_RANGE(0x601a, 0x601a) AM_DEVWRITE("adpcm2", seibu_adpcm_device, ctl_w)
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("seibu_bank1")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( sound_decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, deadang_state )
+	AM_RANGE(0x0000, 0x1fff) AM_DEVREAD("sei80bu", sei80bu_device, opcode_r)
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("seibu_bank1")
 ADDRESS_MAP_END
 
@@ -270,7 +275,10 @@ static MACHINE_CONFIG_START( deadang, deadang_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_14_31818MHz/4)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(seibu_sound_decrypted_opcodes_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(sound_decrypted_opcodes_map)
+
+	MCFG_DEVICE_ADD("sei80bu", SEI80BU, 0)
+	MCFG_DEVICE_ROM("audiocpu")
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(60)) // the game stops working with higher interleave rates..
 
@@ -293,7 +301,7 @@ static MACHINE_CONFIG_START( deadang, deadang_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
-	MCFG_SEIBU_SOUND_CPU_ENCRYPTED_LOW("audiocpu")
+	MCFG_SEIBU_SOUND_CPU("audiocpu")
 	MCFG_SEIBU_SOUND_YM_READ_CB(DEVREAD8("ym1", ym2203_device, read))
 	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ym1", ym2203_device, write))
 

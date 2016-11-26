@@ -84,15 +84,12 @@ seibu_sound_device::seibu_sound_device(const machine_config &mconfig, const char
 		m_rst10_irq(0xff),
 		m_rst18_irq(0xff)
 {
-	m_encryption_mode = 0;
-	m_decrypted_opcodes = nullptr;
 }
 
-void seibu_sound_device::set_cpu_tag_and_encryption(device_t &device, const char *tag, int mode)
+void seibu_sound_device::static_set_cpu_tag(device_t &device, const char *tag)
 {
 	downcast<seibu_sound_device &>(device).m_sound_cpu.set_tag(tag);
 	downcast<seibu_sound_device &>(device).m_sound_rom.set_tag(tag);
-	downcast<seibu_sound_device &>(device).m_encryption_mode = mode;
 }
 
 //-------------------------------------------------
@@ -104,29 +101,16 @@ void seibu_sound_device::device_start()
 	m_ym_read_cb.resolve_safe(0);
 	m_ym_write_cb.resolve_safe();
 
-	if (m_sound_rom.length() > 0x10000)
+	if (m_sound_rom.found() && membank(":seibu_bank1") != nullptr)
 	{
-		membank(":seibu_bank1")->configure_entries(0, (m_sound_rom.length() - 0x10000) / 0x8000, &m_sound_rom[0x10000], 0x8000);
+		if (m_sound_rom.length() > 0x10000)
+		{
+			membank(":seibu_bank1")->configure_entries(0, (m_sound_rom.length() - 0x10000) / 0x8000, &m_sound_rom[0x10000], 0x8000);
 
-		/* Denjin Makai definitely needs this at start-up, it never writes to the bankswitch */
-		membank(":seibu_bank1")->set_entry(0);
-	} else
-		membank(":seibu_bank1")->set_base(&m_sound_rom[0x8000]);
-
-	switch(m_encryption_mode) {
-	case 0: break;
-	case 3: break;
-
-	case 1:
-		get_custom_decrypt();
-		memcpy(m_decrypted_opcodes.get(), &m_sound_rom[0], m_sound_rom.length());
-		apply_decrypt(&m_sound_rom[0], m_decrypted_opcodes.get(), 0x2000);
-		break;
-
-	case 2:
-		get_custom_decrypt();
-		apply_decrypt(&m_sound_rom[0], m_decrypted_opcodes.get(), m_sound_rom.length());
-		break;
+			/* Denjin Makai definitely needs this at start-up, it never writes to the bankswitch */
+			membank(":seibu_bank1")->set_entry(0);
+		} else
+			membank(":seibu_bank1")->set_base(&m_sound_rom[0x8000]);
 	}
 
 	m_main2sub[0] = m_main2sub[1] = 0;
@@ -147,67 +131,6 @@ void seibu_sound_device::device_start()
 void seibu_sound_device::device_reset()
 {
 	update_irq_lines(VECTOR_INIT);
-}
-
-static uint8_t decrypt_data(int a,int src)
-{
-	if ( BIT(a,9)  &  BIT(a,8))             src ^= 0x80;
-	if ( BIT(a,11) &  BIT(a,4) &  BIT(a,1)) src ^= 0x40;
-	if ( BIT(a,11) & ~BIT(a,8) &  BIT(a,1)) src ^= 0x04;
-	if ( BIT(a,13) & ~BIT(a,6) &  BIT(a,4)) src ^= 0x02;
-	if (~BIT(a,11) &  BIT(a,9) &  BIT(a,2)) src ^= 0x01;
-
-	if (BIT(a,13) &  BIT(a,4)) src = BITSWAP8(src,7,6,5,4,3,2,0,1);
-	if (BIT(a, 8) &  BIT(a,4)) src = BITSWAP8(src,7,6,5,4,2,3,1,0);
-
-	return src;
-}
-
-static uint8_t decrypt_opcode(int a,int src)
-{
-	if ( BIT(a,9)  &  BIT(a,8))             src ^= 0x80;
-	if ( BIT(a,11) &  BIT(a,4) &  BIT(a,1)) src ^= 0x40;
-	if (~BIT(a,13) & BIT(a,12))             src ^= 0x20;
-	if (~BIT(a,6)  &  BIT(a,1))             src ^= 0x10;
-	if (~BIT(a,12) &  BIT(a,2))             src ^= 0x08;
-	if ( BIT(a,11) & ~BIT(a,8) &  BIT(a,1)) src ^= 0x04;
-	if ( BIT(a,13) & ~BIT(a,6) &  BIT(a,4)) src ^= 0x02;
-	if (~BIT(a,11) &  BIT(a,9) &  BIT(a,2)) src ^= 0x01;
-
-	if (BIT(a,13) &  BIT(a,4)) src = BITSWAP8(src,7,6,5,4,3,2,0,1);
-	if (BIT(a, 8) &  BIT(a,4)) src = BITSWAP8(src,7,6,5,4,2,3,1,0);
-	if (BIT(a,12) &  BIT(a,9)) src = BITSWAP8(src,7,6,4,5,3,2,1,0);
-	if (BIT(a,11) & ~BIT(a,6)) src = BITSWAP8(src,6,7,5,4,3,2,1,0);
-
-	return src;
-}
-
-uint8_t *seibu_sound_device::get_custom_decrypt()
-{
-	if (m_decrypted_opcodes)
-		return m_decrypted_opcodes.get();
-
-	int size = memregion(":audiocpu")->bytes();
-	m_decrypted_opcodes = make_unique_clear<uint8_t[]>(size);
-	membank(":seibu_bank0d")->set_base(m_decrypted_opcodes.get());
-	if (size > 0x10000) {
-		membank(":seibu_bank1d")->configure_entries(0, (size - 0x10000) / 0x8000, m_decrypted_opcodes.get() + 0x10000, 0x8000);
-		membank(":seibu_bank1d")->set_entry(0);
-	} else
-		membank(":seibu_bank1d")->set_base(m_decrypted_opcodes.get() + 0x8000);
-
-	return m_decrypted_opcodes.get();
-}
-
-void seibu_sound_device::apply_decrypt(uint8_t *rom, uint8_t *opcodes, int length)
-{
-	for (int i = 0;i < length;i++)
-	{
-		uint8_t src = rom[i];
-
-		rom[i]      = decrypt_data(i,src);
-		opcodes[i]  = decrypt_opcode(i,src);
-	}
 }
 
 void seibu_sound_device::update_irq_lines(int param)
@@ -283,8 +206,6 @@ WRITE8_MEMBER( seibu_sound_device::ym_w )
 WRITE8_MEMBER( seibu_sound_device::bank_w )
 {
 	membank(":seibu_bank1")->set_entry(data & 1);
-	if (m_decrypted_opcodes)
-		membank(":seibu_bank1d")->set_entry(data & 1);
 }
 
 WRITE8_MEMBER( seibu_sound_device::coin_w )
@@ -372,11 +293,6 @@ WRITE16_MEMBER( seibu_sound_device::main_mustb_w )
 
 /***************************************************************************/
 
-ADDRESS_MAP_START( seibu_sound_decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, seibu_sound_device )
-	AM_RANGE(0x0000, 0x1fff) AM_ROMBANK("seibu_bank0d")
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("seibu_bank1d")
-ADDRESS_MAP_END
-
 ADDRESS_MAP_START( seibu_sound_map, AS_PROGRAM, 8, seibu_sound_device )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
@@ -394,6 +310,55 @@ ADDRESS_MAP_START( seibu_sound_map, AS_PROGRAM, 8, seibu_sound_device )
 	AM_RANGE(0x6000, 0x6000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("seibu_bank1")
 ADDRESS_MAP_END
+
+/***************************************************************************/
+
+const device_type SEI80BU = &device_creator<sei80bu_device>;
+
+sei80bu_device::sei80bu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, SEI80BU, "SEI80BU Encrypted Z80 Interface", tag, owner, clock, "sei80bu", __FILE__),
+		device_rom_interface(mconfig, *this, 16)
+{
+}
+
+READ8_MEMBER(sei80bu_device::data_r)
+{
+	u16 a = offset;
+	u8 src = read_byte(offset);
+
+	if ( BIT(a,9)  &  BIT(a,8))             src ^= 0x80;
+	if ( BIT(a,11) &  BIT(a,4) &  BIT(a,1)) src ^= 0x40;
+	if ( BIT(a,11) & ~BIT(a,8) &  BIT(a,1)) src ^= 0x04;
+	if ( BIT(a,13) & ~BIT(a,6) &  BIT(a,4)) src ^= 0x02;
+	if (~BIT(a,11) &  BIT(a,9) &  BIT(a,2)) src ^= 0x01;
+
+	if (BIT(a,13) &  BIT(a,4)) src = BITSWAP8(src,7,6,5,4,3,2,0,1);
+	if (BIT(a, 8) &  BIT(a,4)) src = BITSWAP8(src,7,6,5,4,2,3,1,0);
+
+	return src;
+}
+
+READ8_MEMBER(sei80bu_device::opcode_r)
+{
+	u16 a = offset;
+	u8 src = read_byte(offset);
+
+	if ( BIT(a,9)  &  BIT(a,8))             src ^= 0x80;
+	if ( BIT(a,11) &  BIT(a,4) &  BIT(a,1)) src ^= 0x40;
+	if (~BIT(a,13) & BIT(a,12))             src ^= 0x20;
+	if (~BIT(a,6)  &  BIT(a,1))             src ^= 0x10;
+	if (~BIT(a,12) &  BIT(a,2))             src ^= 0x08;
+	if ( BIT(a,11) & ~BIT(a,8) &  BIT(a,1)) src ^= 0x04;
+	if ( BIT(a,13) & ~BIT(a,6) &  BIT(a,4)) src ^= 0x02;
+	if (~BIT(a,11) &  BIT(a,9) &  BIT(a,2)) src ^= 0x01;
+
+	if (BIT(a,13) &  BIT(a,4)) src = BITSWAP8(src,7,6,5,4,3,2,0,1);
+	if (BIT(a, 8) &  BIT(a,4)) src = BITSWAP8(src,7,6,5,4,2,3,1,0);
+	if (BIT(a,12) &  BIT(a,9)) src = BITSWAP8(src,7,6,4,5,3,2,1,0);
+	if (BIT(a,11) & ~BIT(a,6)) src = BITSWAP8(src,6,7,5,4,3,2,1,0);
+
+	return src;
+}
 
 /***************************************************************************
     Seibu ADPCM device

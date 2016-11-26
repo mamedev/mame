@@ -279,7 +279,7 @@ static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, airrai
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( airraid_sound_map, AS_PROGRAM, 8, airraid_state )
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x0000, 0x1fff) AM_DEVREAD("sei80bu", sei80bu_device, data_r)
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("seibu_sound", seibu_sound_device, pending_w)
 	AM_RANGE(0x4001, 0x4001) AM_DEVWRITE("seibu_sound", seibu_sound_device, irq_clear_w)
@@ -292,6 +292,11 @@ static ADDRESS_MAP_START( airraid_sound_map, AS_PROGRAM, 8, airraid_state )
 	AM_RANGE(0x4013, 0x4013) AM_READ_PORT("COIN")
 	AM_RANGE(0x4018, 0x4019) AM_DEVWRITE("seibu_sound", seibu_sound_device, main_data_w)
 	AM_RANGE(0x401b, 0x401b) AM_DEVWRITE("seibu_sound", seibu_sound_device, coin_w)
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("seibu_bank1")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( airraid_sound_decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, airraid_state )
+	AM_RANGE(0x0000, 0x1fff) AM_DEVREAD("sei80bu", sei80bu_device, opcode_r)
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("seibu_bank1")
 ADDRESS_MAP_END
 
@@ -388,7 +393,7 @@ static MACHINE_CONFIG_START( airraid, airraid_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_14_31818MHz/4)      /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(airraid_sound_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(seibu_sound_decrypted_opcodes_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(airraid_sound_decrypted_opcodes_map)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -406,9 +411,12 @@ static MACHINE_CONFIG_START( airraid, airraid_state )
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
-	MCFG_SEIBU_SOUND_CPU_ENCRYPTED_LOW("audiocpu")
+	MCFG_SEIBU_SOUND_CPU("audiocpu") //_ENCRYPTED_LOW("audiocpu")
 	MCFG_SEIBU_SOUND_YM_READ_CB(DEVREAD8("ymsnd", ym2151_device, read))
 	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym2151_device, write))
+
+	MCFG_DEVICE_ADD("sei80bu", SEI80BU, 0)
+	MCFG_DEVICE_ROM("audiocpu")
 MACHINE_CONFIG_END
 
 
@@ -450,9 +458,9 @@ ROM_START( airraid )
 	ROM_REGION( 0x10000, "maindata", 0 ) // cpu data
 	ROM_LOAD( "2.19j",   0x00000, 0x10000, CRC(842ae6c2) SHA1(0468445e4ab6f42bac786f9a258df3972fd1fde9) )
 
-	ROM_REGION( 0x18000, "audiocpu", 0 ) // Sub/Sound CPU
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // Sub/Sound CPU
 	ROM_LOAD( "5.6f",    0x00000, 0x02000, CRC(30be398c) SHA1(6c61200ee8888d6270c8cec50423b3b5602c2027) )
-	ROM_LOAD( "4.7f",    0x10000, 0x08000, CRC(3cd715b4) SHA1(da735fb5d262908ddf7ed7dacdea68899f1723ff) )
+	ROM_LOAD( "4.7f",    0x08000, 0x08000, CRC(3cd715b4) SHA1(da735fb5d262908ddf7ed7dacdea68899f1723ff) )
 
 	ROM_REGION( 0x0200, "proms", 0 ) // this PCB type has different proms when compared to the cshootert hardware PCB where they were dumped
 	ROM_LOAD( "pr.c19",  0x0000, 0x0200, NO_DUMP )
@@ -533,9 +541,9 @@ ROM_START( cshooter )
 	ROM_REGION( 0x10000, "maindata", 0 ) // cpu data
 	ROM_LOAD( "2.k20",   0x00000, 0x10000, CRC(5812fe72) SHA1(3b28bff6b62a411d2195bb228952db62ad32ef3d) )
 
-	ROM_REGION( 0x18000, "audiocpu", 0 ) // Sub/Sound CPU
+	ROM_REGION( 0x10000, "audiocpu", 0 ) // Sub/Sound CPU
 	ROM_LOAD( "5.6f",    0x00000, 0x02000, CRC(30be398c) SHA1(6c61200ee8888d6270c8cec50423b3b5602c2027) ) // 5.g6
-	ROM_LOAD( "4.7f",    0x10000, 0x08000, CRC(3cd715b4) SHA1(da735fb5d262908ddf7ed7dacdea68899f1723ff) ) // 4.g8
+	ROM_LOAD( "4.7f",    0x08000, 0x08000, CRC(3cd715b4) SHA1(da735fb5d262908ddf7ed7dacdea68899f1723ff) ) // 4.g8
 
 	ROM_REGION( 0x0200, "proms", 0 ) // this PCB type has different proms when compared to the cshootert hardware PCB where they were dumped
 	ROM_LOAD( "pr.c19",  0x0000, 0x0200, NO_DUMP )

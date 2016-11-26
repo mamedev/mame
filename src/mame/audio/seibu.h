@@ -28,7 +28,6 @@
 #include "cpu/z80/z80.h"
 #include "sound/okiadpcm.h"
 
-ADDRESS_MAP_EXTERN(seibu_sound_decrypted_opcodes_map, 8);
 ADDRESS_MAP_EXTERN(seibu_sound_map, 8);
 
 class seibu_sound_device : public device_t
@@ -38,7 +37,7 @@ public:
 	~seibu_sound_device() {}
 
 	// static configuration
-	static void set_cpu_tag_and_encryption(device_t &device, const char *tag, int mode);
+	static void static_set_cpu_tag(device_t &device, const char *tag);
 	template<class _Object> static devcb_base &set_ym_read_callback(device_t &device, _Object object)  { return downcast<seibu_sound_device &>(device).m_ym_read_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_ym_write_callback(device_t &device, _Object object) { return downcast<seibu_sound_device &>(device).m_ym_write_cb.set_callback(object); }
 
@@ -58,8 +57,6 @@ public:
 	DECLARE_WRITE8_MEMBER( main_data_w );
 	DECLARE_WRITE8_MEMBER( pending_w );
 
-	static void apply_decrypt(uint8_t *rom, uint8_t *opcodes, int length);
-	uint8_t *get_custom_decrypt();
 	void update_irq_lines(int param);
 
 protected:
@@ -68,16 +65,13 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	int m_encryption_mode;
-	std::unique_ptr<uint8_t[]> m_decrypted_opcodes;
-
 	// device callbacks
 	devcb_read8 m_ym_read_cb;
 	devcb_write8 m_ym_write_cb;
 
 	// internal state
 	required_device<cpu_device> m_sound_cpu;
-	required_region_ptr<uint8_t> m_sound_rom;
+	optional_region_ptr<uint8_t> m_sound_rom;
 	uint8_t m_main2sub[2];
 	uint8_t m_sub2main[2];
 	int m_main2sub_pending;
@@ -97,6 +91,24 @@ private:
 
 extern const device_type SEIBU_SOUND;
 
+
+// SEI80BU (Z80 program decryption)
+
+class sei80bu_device : public device_t, public device_rom_interface
+{
+public:
+	sei80bu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	DECLARE_READ8_MEMBER(data_r);
+	DECLARE_READ8_MEMBER(opcode_r);
+
+protected:
+	// device-level overrides
+	virtual void device_start() override { }
+	virtual void rom_bank_updated() override { }
+};
+
+extern const device_type SEI80BU;
 
 // Seibu ADPCM device
 
@@ -156,16 +168,7 @@ extern const device_type SEIBU_ADPCM;
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 #define MCFG_SEIBU_SOUND_CPU(_audiocputag) \
-	seibu_sound_device::set_cpu_tag_and_encryption(*device, "^" _audiocputag, 0);
-
-#define MCFG_SEIBU_SOUND_CPU_ENCRYPTED_LOW(_audiocputag) \
-	seibu_sound_device::set_cpu_tag_and_encryption(*device, "^" _audiocputag, 1);
-
-#define MCFG_SEIBU_SOUND_CPU_ENCRYPTED_FULL(_audiocputag) \
-	seibu_sound_device::set_cpu_tag_and_encryption(*device, "^" _audiocputag, 2);
-
-#define MCFG_SEIBU_SOUND_CPU_ENCRYPTED_CUSTOM(_audiocputag) \
-	seibu_sound_device::set_cpu_tag_and_encryption(*device, "^" _audiocputag, 3);
+	seibu_sound_device::static_set_cpu_tag(*device, "^" _audiocputag);
 
 #define MCFG_SEIBU_SOUND_YM_READ_CB(_devcb) \
 	devcb = &seibu_sound_device::set_ym_read_callback(*device, DEVCB_##_devcb);

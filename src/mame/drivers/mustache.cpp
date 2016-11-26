@@ -43,7 +43,8 @@ YM2151:
 
 
 static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8, mustache_state )
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
+	AM_RANGE(0x0000, 0x7fff) AM_DEVREAD("sei80bu", sei80bu_device, data_r)
+	AM_RANGE(0x8000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE("t5182", t5182_device, sound_irq_w)
 	AM_RANGE(0xd001, 0xd001) AM_DEVREAD("t5182", t5182_device, sharedram_semaphore_snd_r)
@@ -62,7 +63,7 @@ static ADDRESS_MAP_START( memmap, AS_PROGRAM, 8, mustache_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, mustache_state )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_SHARE("decrypted_opcodes")
+	AM_RANGE(0x0000, 0x7fff) AM_DEVREAD("sei80bu", sei80bu_device, opcode_r)
 	AM_RANGE(0x8000, 0xbfff) AM_ROM AM_REGION("maincpu", 0x8000)
 ADDRESS_MAP_END
 
@@ -179,8 +180,10 @@ static MACHINE_CONFIG_START( mustache, mustache_state )
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mustache_state, scanline, "screen", 0, 1)
 
-	MCFG_DEVICE_ADD("t5182", T5182, 0)
+	MCFG_DEVICE_ADD("sei80bu", SEI80BU, 0)
+	MCFG_DEVICE_ROM("maincpu")
 
+	MCFG_DEVICE_ADD("t5182", T5182, 0)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -301,8 +304,6 @@ DRIVER_INIT_MEMBER(mustache_state,mustache)
 	/* SPR address lines */
 	for (i = 0; i < 2*G2; i++)
 		gfx2[i] = buf[BITSWAP24(i,23,22,21,20,19,18,17,16,15,12,11,10,9,8,7,6,5,4,13,14,3,2,1,0)];
-
-	seibu_sound_device::apply_decrypt(memregion("maincpu")->base(), m_decrypted_opcodes, 0x8000);
 }
 
 

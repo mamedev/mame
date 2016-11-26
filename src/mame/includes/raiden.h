@@ -55,8 +55,6 @@ public:
 	DECLARE_WRITE8_MEMBER(raidenb_control_w);
 	DECLARE_WRITE16_MEMBER(raidenb_layer_enable_w);
 	DECLARE_WRITE16_MEMBER(raidenb_layer_scroll_w);
-	DECLARE_DRIVER_INIT(raidenu);
-	DECLARE_DRIVER_INIT(raidenk);
 	DECLARE_DRIVER_INIT(raiden);
 
 	TILE_GET_INFO_MEMBER(get_back_tile_info);

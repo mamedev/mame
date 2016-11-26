@@ -3,12 +3,22 @@
 
 device_rom_interface::device_rom_interface(const machine_config &mconfig, device_t &device, u8 addrwidth, endianness_t endian, u8 datawidth) :
 	device_memory_interface(mconfig, device),
+	m_rom_tag(device.basetag()),
 	m_rom_config("rom", endian, datawidth, addrwidth)
 {
 }
 
 device_rom_interface::~device_rom_interface()
 {
+}
+
+void device_rom_interface::static_set_device_rom_tag(device_t &device, const char *tag)
+{
+	device_rom_interface *romintf;
+	if (!device.interface(romintf))
+		throw emu_fatalerror("MCFG_DEVICE_ROM called on device '%s' with no ROM interface\n", device.tag());
+
+	romintf->m_rom_tag = tag;
 }
 
 const address_space_config *device_rom_interface::memory_space_config(address_spacenum spacenum) const
@@ -81,10 +91,11 @@ void device_rom_interface::interface_pre_start()
 	device().machine().save().register_postload(save_prepost_delegate(FUNC(device_rom_interface::reset_bank), this));
 
 	if(!has_configured_map(0)) {
-		memory_region *reg = device().memregion(DEVICE_SELF);
+		memory_region *reg = device().owner()->memregion(m_rom_tag);
 		if(reg)
 			set_rom(reg->base(), reg->bytes());
 		else {
+			device().logerror("ROM region '%s' not found\n", m_rom_tag);
 			u32 end = m_rom_config.addr_width() == 32 ? 0xffffffff : (1 << m_rom_config.addr_width()) - 1;
 			space().unmap_read(0, end);
 		}

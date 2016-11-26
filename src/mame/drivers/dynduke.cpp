@@ -117,6 +117,32 @@ static ADDRESS_MAP_START( masterj_map, AS_PROGRAM, 16, dynduke_state )
 	AM_RANGE(0xa0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, dynduke_state )
+	AM_RANGE(0x2000, 0x27ff) AM_RAM
+	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("seibu_sound", seibu_sound_device, pending_w)
+	AM_RANGE(0x4001, 0x4001) AM_DEVWRITE("seibu_sound", seibu_sound_device, irq_clear_w)
+	AM_RANGE(0x4002, 0x4002) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst10_ack_w)
+	AM_RANGE(0x4003, 0x4003) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst18_ack_w)
+	AM_RANGE(0x4007, 0x4007) AM_DEVWRITE("seibu_sound", seibu_sound_device, bank_w)
+	AM_RANGE(0x4008, 0x4009) AM_DEVREADWRITE("seibu_sound", seibu_sound_device, ym_r, ym_w)
+	AM_RANGE(0x4010, 0x4011) AM_DEVREAD("seibu_sound", seibu_sound_device, soundlatch_r)
+	AM_RANGE(0x4012, 0x4012) AM_DEVREAD("seibu_sound", seibu_sound_device, main_data_pending_r)
+	AM_RANGE(0x4013, 0x4013) AM_READ_PORT("COIN")
+	AM_RANGE(0x4018, 0x4019) AM_DEVWRITE("seibu_sound", seibu_sound_device, main_data_w)
+	AM_RANGE(0x401b, 0x401b) AM_DEVWRITE("seibu_sound", seibu_sound_device, coin_w)
+	AM_RANGE(0x6000, 0x6000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE(0x0000, 0xffff) AM_DEVREAD("sei80bu", sei80bu_device, data_r)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( sound_decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, dynduke_state )
+	AM_RANGE(0x0000, 0xffff) AM_DEVREAD("sei80bu", sei80bu_device, opcode_r)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( sei80bu_encrypted_full_map, AS_PROGRAM, 8, dynduke_state )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("audiocpu", 0)
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("seibu_bank1")
+ADDRESS_MAP_END
+
 /* Input Ports */
 
 static INPUT_PORTS_START( dynduke )
@@ -286,8 +312,11 @@ static MACHINE_CONFIG_START( dynduke, dynduke_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dynduke_state, interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z80, 14318180/4)
-	MCFG_CPU_PROGRAM_MAP(seibu_sound_map)
-	MCFG_CPU_DECRYPTED_OPCODES_MAP(seibu_sound_decrypted_opcodes_map)
+	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(sound_decrypted_opcodes_map)
+
+	MCFG_DEVICE_ADD("sei80bu", SEI80BU, 0)
+	MCFG_DEVICE_PROGRAM_MAP(sei80bu_encrypted_full_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(3600))
 
@@ -319,7 +348,7 @@ static MACHINE_CONFIG_START( dynduke, dynduke_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
-	MCFG_SEIBU_SOUND_CPU_ENCRYPTED_FULL("audiocpu")
+	MCFG_SEIBU_SOUND_CPU("audiocpu")
 	MCFG_SEIBU_SOUND_YM_READ_CB(DEVREAD8("ymsnd", ym3812_device, read))
 	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym3812_device, write))
 MACHINE_CONFIG_END
