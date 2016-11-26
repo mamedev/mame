@@ -7,7 +7,7 @@
     
     68020 + 68881 FPU
     
-
+    800a5e = end of initial 68020 torture test
 ****************************************************************************/
 
 #include "emu.h"
@@ -15,6 +15,7 @@
 #include "machine/mc68681.h"
 #include "machine/msm58321.h"
 #include "machine/wd_fdc.h"
+#include "machine/68230pit.h"
 #include "softlist.h"
 
 #define MAINCPU_TAG "maincpu"
@@ -22,24 +23,29 @@
 #define DUART_B_TAG "duartb"
 #define RTC_TAG		"rtc"
 #define FDC_TAG		"fdc"
+#define PIT_TAG		"pit"
 
 class micro20_state : public driver_device
 {
 public:
 	micro20_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
+		m_maincpu(*this, MAINCPU_TAG),
 		m_rom(*this, "bootrom"),
-		m_mainram(*this, "mainram")
+		m_mainram(*this, "mainram"),
+		m_pit(*this, PIT_TAG)
 	{
 	}
 
-	required_device<cpu_device> m_maincpu;
+	required_device<m68020_device> m_maincpu;
 	required_memory_region m_rom;
 	required_shared_ptr<uint32_t> m_mainram;
+	required_device<pit68230_device> m_pit;
 	
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+	
+	DECLARE_WRITE_LINE_MEMBER(m68k_reset_callback);
 	
 private:
 
@@ -57,6 +63,14 @@ void micro20_state::machine_reset()
 	pRAM[0] = pROM[0];
 	pRAM[1] = pROM[1];
 	m_maincpu->reset();
+	
+	m_maincpu->set_reset_callback(write_line_delegate(FUNC(micro20_state::m68k_reset_callback),this));
+}
+
+WRITE_LINE_MEMBER(micro20_state::m68k_reset_callback)
+{
+	// startup test explicitly checks if the m68k RESET opcode resets the 68230
+	m_pit->reset();
 }
 
 /***************************************************************************
@@ -64,8 +78,15 @@ void micro20_state::machine_reset()
 ***************************************************************************/
 
 static ADDRESS_MAP_START(micro20_map, AS_PROGRAM, 32, micro20_state )
-	AM_RANGE(0x000000, 0x1fffff) AM_RAM AM_SHARE("mainram")
-	AM_RANGE(0x800000, 0x83ffff) AM_ROM AM_REGION("bootrom", 0)
+	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("mainram")
+	AM_RANGE(0x00800000, 0x0083ffff) AM_ROM AM_REGION("bootrom", 0)
+	AM_RANGE(0xffff8000, 0xffff8003) AM_DEVREADWRITE8(FDC_TAG, wd1772_t, status_r, cmd_w,    0xff000000)	
+	AM_RANGE(0xffff8000, 0xffff8003) AM_DEVREADWRITE8(FDC_TAG, wd1772_t, track_r, track_w,   0x00ff0000)	
+	AM_RANGE(0xffff8000, 0xffff8003) AM_DEVREADWRITE8(FDC_TAG, wd1772_t, sector_r, sector_w, 0x0000ff00)	
+	AM_RANGE(0xffff8000, 0xffff8003) AM_DEVREADWRITE8(FDC_TAG, wd1772_t, data_r, data_w,     0x000000ff)	
+	AM_RANGE(0xffff8080, 0xffff808f) AM_DEVREADWRITE8(DUART_A_TAG, mc68681_device, read, write, 0xffffffff)
+	AM_RANGE(0xffff80a0, 0xffff80af) AM_DEVREADWRITE8(DUART_B_TAG, mc68681_device, read, write, 0xffffffff)	
+	AM_RANGE(0xffff80c0, 0xffff80df) AM_DEVREADWRITE8(PIT_TAG, pit68230_device, read, write, 0xffffffff)
 ADDRESS_MAP_END
 
 static MACHINE_CONFIG_START( micro20, micro20_state )
@@ -84,6 +105,8 @@ static MACHINE_CONFIG_START( micro20, micro20_state )
 	MCFG_DEVICE_ADD(RTC_TAG, MSM58321, XTAL_32_768kHz)
 	
 	MCFG_WD1772_ADD(FDC_TAG, XTAL_16_67MHz / 2)
+	
+	MCFG_DEVICE_ADD(PIT_TAG, PIT68230, XTAL_16_67MHz / 2)
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( micro20 )
