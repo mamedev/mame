@@ -591,10 +591,6 @@ ifdef MAP
 PARAMS += --MAP='$(MAP)'
 endif
 
-ifdef USE_BGFX
-PARAMS += --USE_BGFX='$(USE_BGFX)'
-endif
-
 ifdef NOASM
 TARGET_PARAMS += --NOASM='$(NOASM)'
 endif
