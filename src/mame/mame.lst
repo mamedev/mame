@@ -20536,9 +20536,9 @@ sgt24h                          // 1996.07 Super GT 24h
 skisuprg                        // 1996.12 Sega Ski Super G
 skytargt                        // 1995.10 Sky Target
 srallyc                         // 1995.02 Sega Rally Championship TWIN (Revision C)
-srallyca                        // 1995.02 Sega Rally Championship DX (Revision A)
-srallycao                       // 1995.02 Sega Rally Championship DX
 srallycb                        // 1995.02 Sega Rally Championship TWIN (Revision B)
+srallycdx                       // 1995.02 Sega Rally Championship DX (Revision A)
+srallycdxa                      // 1995.02 Sega Rally Championship DX
 stcc                            // 1996.09 Sega Touring Car Championship
 stcca                           // 1996.09 Sega Touring Car Championship (Revision A)
 stccb                           // 1996.09 Sega Touring Car Championship
