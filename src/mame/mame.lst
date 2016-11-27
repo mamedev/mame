@@ -20537,6 +20537,7 @@ skisuprg                        // 1996.12 Sega Ski Super G
 skytargt                        // 1995.10 Sky Target
 srallyc                         // 1995.02 Sega Rally Championship TWIN (Revision C)
 srallyca                        // 1995.02 Sega Rally Championship DX (Revision A)
+srallycao                       // 1995.02 Sega Rally Championship DX
 srallycb                        // 1995.02 Sega Rally Championship TWIN (Revision B)
 stcc                            // 1996.09 Sega Touring Car Championship
 stcca                           // 1996.09 Sega Touring Car Championship (Revision A)
@@ -32875,7 +32876,8 @@ sonicp                          // 1993.?? Sonic the Hedgehog (proto, Japan)
 spidman                         // 1991.?? Spiderman (World)
 spidmanj                        // 1991.09 Spiderman (Japan)
 spidmanu                        // 1991.09 Spiderman (US)
-svf                             // 1994.?? Super Visual Football
+svf                             // 1994.?? Super Visual Football (Rev A)
+svfo                            // 1994.?? Super Visual Football
 svs                             // 1994.?? Super Visual Soccer
 titlef                          // 1993.?? Title Fight (World)
 titlefj                         // 1993.03 Title Fight (Japan)
