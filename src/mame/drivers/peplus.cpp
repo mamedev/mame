@@ -3272,13 +3272,13 @@ PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  RF  (Bonus)
 	ROM_RELOAD(                       0x08000, 0x8000) /* 32K version built using earlier gaming libraries */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD( "mro-cg914.u72",   0x00000, 0x8000, CRC(3a428484) SHA1(04ca1148b29df394d948b5d9ae06ac0ba9e53246) ) /* Custom El Cortez card backs - 4/2/90   @ IGT  L90-0708  */
-	ROM_LOAD( "mgo-cg914.u73",   0x08000, 0x8000, CRC(dee10fa3) SHA1(2f2fc6496374e3c145f61f94da99a7c6d7ba8524) )
-	ROM_LOAD( "mbo-cg914.u74",   0x10000, 0x8000, CRC(8c05106f) SHA1(942183094df0ea6666725386711e7b60e16d3d50) )
-	ROM_LOAD( "mxo-cg914.u75",   0x18000, 0x8000, CRC(7e8453e0) SHA1(0d2fdd11767d9982657a75c1276aa8c35abfa653) )
+	ROM_LOAD( "mro-cg845.u72",   0x00000, 0x8000, CRC(af626808) SHA1(694182ae8e7d8bb3d219cc4a83672a35e489c5ea) ) /* Custom El Cortez card backs - 05/19/89   @ IGT  L89-0967  */
+	ROM_LOAD( "mgo-cg845.u73",   0x08000, 0x8000, CRC(f8aebcd1) SHA1(d4abf044bf75359ba020a6c68245351a1d191990) )
+	ROM_LOAD( "mbo-cg845.u74",   0x10000, 0x8000, CRC(01b5f798) SHA1(1b2c679f4a393d1d649421b6a08c0222a6a626f6) )
+	ROM_LOAD( "mxo-cg845.u75",   0x18000, 0x8000, CRC(e05456bd) SHA1(401652f690dae02180da4d45121823d2dc2d247f) )
 
 	ROM_REGION( 0x100, "proms", 0 )
-	ROM_LOAD( "cap914.u50", 0x0000, 0x0100, CRC(ab8ec1e4) SHA1(e2af88f4ff555a8d56fef98adb57149522239a07) )
+	ROM_LOAD( "cap845.u50", 0x0000, 0x0100, CRC(00439b0d) SHA1(4367ebf3eb90322d796f082f52da2667b0766c1e) )
 ROM_END
 
 ROM_START( pepp0057c ) /* Normal board : Deuces Wild Poker (PP0057) */
@@ -5346,7 +5346,7 @@ PayTable   3K   STR  FL  FH  4K  SF  5K  RF  4D  4D  SD*  RF  (Bonus)
 	ROM_LOAD( "mxo-cg773.u75",   0x18000, 0x8000, CRC(75da0cd8) SHA1(4fb4eda9ae8e59884201368c7d8e4ff8b9967a4f) )
 
 	ROM_REGION( 0x100, "proms", 0 )
-	ROM_LOAD( "cap740.u50", 0x0000, 0x0100, CRC(6fe619c4) SHA1(49e43dafd010ce0fe9b2a63b96a4ddedcb933c6d) )
+	ROM_LOAD( "cap773.u50", 0x0000, 0x0100, CRC(294b7b10) SHA1(a405a4b8547b713c5c02dacb19e7354095a7b584) )
 ROM_END
 
 ROM_START( pepp0401 ) /* Normal board : 4 of a Kind Bonus Poker (PP0401) - PSR Verified */
