@@ -1529,14 +1529,12 @@ ROM_START( mac128k )
 	[can't find reference for rom-hi]
 	"<Hitachi 'target' logo> 8413 // 3256 016 JAPAN // (C)APPLE 83 // 342-0221-A"
 	*/
-	//ROM_LOAD16_WORD( "28ba61ce - Macintosh-128k.rom",  0x00000, 0x10000, CRC(6d0c8a28) SHA1(9d86c883aa09f7ef5f086d9e32330ef85f1bc93b) )
 ROM_END
 
 ROM_START( mac512k )
 	ROM_REGION16_BE(0x100000, "bootrom", 0)
 	ROMX_LOAD("342-0220-b.u6d",  0x00000, 0x08000, CRC(0dce9a3f) SHA1(101ca6570f5a273e400d1a8bc63e15ee0e94153e), ROM_SKIP(1) ) // "<VTi logo along side> 512 VH 6434 // 23256-1104 // 342-0220-B // (C) APPLE 84 // KOREA-A"
 	ROMX_LOAD("342-0221-b.u8d",  0x00001, 0x08000, CRC(d51f376e) SHA1(575586109e876cffa4a4d472cb38771aa21b70cb), ROM_SKIP(1) ) // "<VTi logo along side> 512 VH 6709 // 23256-1105 // 342-0221-B // (C) APPLE 84 // KOREA-A"
-	//ROM_LOAD16_WORD( "28ba4e50 - Macintosh-512k.rom",  0x00000, 0x10000, CRC(cf759e0d) SHA1(5b1ced181b74cecd3834c49c2a4aa1d7ffe944d7) )
 ROM_END
 
 ROM_START( unitron )
@@ -1632,11 +1630,8 @@ ROM_START( mac512ke )
 	v1/4d1eeee1:
 		'ROM-HI' @ U6D:
 			GUESSED, since this ROM is very rare: "VTI // 62? V0 86?? // 23512-1008 // 342-0341-A // (C)APPLE '83-'85 // KOREA A"
-		'ROM-LO' @ U8D is same as v2/4d1eeae1
+		'ROM-LO' @ U8D is same as v2/4d1eeae1 'ROM-LO' @ U8D
 	*/
-	//ROMX_LOAD( "4d1f8172 - MacPlus v3.rom",  0x00000, 0x020000, CRC(b2102e8e) SHA1(7d2f808a045aa3a1b242764f0e2c7d13e288bf1f), ROM_GROUPWORD | ROM_BIOS(1) )
-	//ROMX_LOAD( "4d1eeae1 - MacPlus v2.rom",  0x00000, 0x020000, CRC(7cacd18f) SHA1(73bf2eb215646e108daa0cdd874e6c843c8ce421), ROM_GROUPWORD | ROM_BIOS(2) )
-	//ROMX_LOAD( "4d1eeee1 - MacPlus v1.rom",  0x00000, 0x020000, CRC(4fa5b399) SHA1(e0da7165b92dee90d8b1522429c033729fa73fd2), ROM_GROUPWORD | ROM_BIOS(3) )
 ROM_END
 
 
