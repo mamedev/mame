@@ -1518,12 +1518,25 @@ ROM_START( mac128k )
 	// Apple used at least 3 manufacturers for these ROMs, but they're always Apple part numbers 342-0220-A and 342-0221-A
 	ROMX_LOAD("342-0220-a.u6d",  0x00000, 0x08000, CRC(198210ad) SHA1(2590ff4af5ac0361babdf0dc5da18e2eecad454a), ROM_SKIP(1) )
  	ROMX_LOAD("342-0221-a.u8d",  0x00001, 0x08000, CRC(fd2665c2) SHA1(8507932a854bd28196a17785c8b1851cb53eaf64), ROM_SKIP(1) )
+	/* Labels seen in the wild:
+	VTi:
+	"<VTi logo along side> // 416 VH 2605 // 23256-1020 // 342-0220-A // (C)APPLE 83 // KOREA-AE"
+	"<VTi logo along side> // 416 VH 2826 // 23256-1023 // 342-0221-A // (C)APPLE 83 // KOREA-AE"
+	Synertek:
+	"<Synertek 'S' logo> 8416 G // C19728 // 342-0220-A // (C)APPLE 83"
+	"<Synertek 'S' logo> 8410 G // C19729 // 342-0221-A // (C)APPLE 83"
+	Hitachi:
+	[can't find reference for rom-hi]
+	"<Hitachi 'target' logo> 8413 // 3256 016 JAPAN // (C)APPLE 83 // 342-0221-A"
+	*/
+	//ROM_LOAD16_WORD( "28ba61ce - Macintosh-128k.rom",  0x00000, 0x10000, CRC(6d0c8a28) SHA1(9d86c883aa09f7ef5f086d9e32330ef85f1bc93b) )
 ROM_END
 
 ROM_START( mac512k )
 	ROM_REGION16_BE(0x100000, "bootrom", 0)
 	ROMX_LOAD("342-0220-b.u6d",  0x00000, 0x08000, CRC(0dce9a3f) SHA1(101ca6570f5a273e400d1a8bc63e15ee0e94153e), ROM_SKIP(1) ) // "<VTi logo along side> 512 VH 6434 // 23256-1104 // 342-0220-B // (C) APPLE 84 // KOREA-A"
 	ROMX_LOAD("342-0221-b.u8d",  0x00001, 0x08000, CRC(d51f376e) SHA1(575586109e876cffa4a4d472cb38771aa21b70cb), ROM_SKIP(1) ) // "<VTi logo along side> 512 VH 6709 // 23256-1105 // 342-0221-B // (C) APPLE 84 // KOREA-A"
+	//ROM_LOAD16_WORD( "28ba4e50 - Macintosh-512k.rom",  0x00000, 0x10000, CRC(cf759e0d) SHA1(5b1ced181b74cecd3834c49c2a4aa1d7ffe944d7) )
 ROM_END
 
 ROM_START( unitron )
@@ -1575,37 +1588,71 @@ ROM_END
 
 ROM_START( mac512ke )
 	ROM_REGION16_BE(0x100000, "bootrom", 0)
-	ROM_SYSTEM_BIOS(0, "v3", "Loud Harmonicas") // AMI and VLSI manufacture
+	ROM_SYSTEM_BIOS(0, "v3", "Loud Harmonicas")
 	ROMX_LOAD( "342-0341-c.u6d", 0x000000, 0x010000, CRC(f69697e6) SHA1(41317614ac71eb94941e9952f6ea37407e21ffff), ROM_SKIP(1) | ROM_BIOS(1) )
 	ROMX_LOAD( "342-0342-b.u8d", 0x000001, 0x010000, CRC(49f25913) SHA1(72f658c02bae265e8845899582575fb7c784ee87), ROM_SKIP(1) | ROM_BIOS(1) )
 	ROM_FILL(0x20000, 0x2, 0xff)    // ROM checks for same contents at 20000 and 40000 to determine if SCSI is present
 	ROM_FILL(0x40000, 0x2, 0xaa)
-	ROM_SYSTEM_BIOS(1, "v2", "Lonely Heifers") // VTi manufacture
+	ROM_SYSTEM_BIOS(1, "v2", "Lonely Heifers")
 	ROMX_LOAD( "342-0341-b.u6d", 0x000000, 0x010000, CRC(65341487) SHA1(bf43fa4f5a3dcbbac20f1fe1deedee0895454379), ROM_SKIP(1) | ROM_BIOS(2) )
 	ROMX_LOAD( "342-0342-a.u8d", 0x000001, 0x010000, CRC(fb766270) SHA1(679f529fbfc05f9cc98924c53457d2996dfcb1a7), ROM_SKIP(1) | ROM_BIOS(2) )
 	ROM_FILL(0x20000, 0x2, 0xff)
 	ROM_FILL(0x40000, 0x2, 0xaa)
-	ROM_SYSTEM_BIOS(2, "v1", "Lonely Hearts") // VTi manufacture
+	ROM_SYSTEM_BIOS(2, "v1", "Lonely Hearts")
 	ROMX_LOAD( "342-0341-a.u6d", 0x000000, 0x010000, CRC(5095fe39) SHA1(be780580033d914b5035d60b5ebbd66bd1d28a9b), ROM_SKIP(1) | ROM_BIOS(3) )
 	ROMX_LOAD( "342-0342-a.u8d", 0x000001, 0x010000, CRC(fb766270) SHA1(679f529fbfc05f9cc98924c53457d2996dfcb1a7), ROM_SKIP(1) | ROM_BIOS(3) )
 	ROM_FILL(0x20000, 0x2, 0xff)
 	ROM_FILL(0x40000, 0x2, 0xaa)
+	/* from Technical note HW11 (https://www.fenestrated.net/mirrors/Apple%20Technotes%20(As%20of%202002)/hw/hw_11.html)
+	1st version (Lonely Hearts, checksum 4D 1E EE E1)
+	Bug in the SCSI driver; won't boot if external drive is turned off. We only produced about
+	one and a half months worth of these.
+	
+	2nd version (Lonely Heifers, checksum 4D 1E EA E1):
+	Fixed boot bug. This version is the vast majority of beige Macintosh Pluses.
+	
+	3rd version (Loud Harmonicas, checksum 4D 1F 81 72):
+	Fixed bug for drives that return Unit Attention on power up or reset. Basically took the
+	SCSI bus Reset command out of the boot sequence loop, so it will only reset once
+	during boot sequence. 
+	*/
+	/* Labels seen in the wild:
+	v3/4d1f8172:
+		'ROM-HI' @ U6D:
+			"VLSI // 740 SA 1262 // 23512-1054 // 342-0341-C // (C)APPLE '83-'86 // KOREA A"
+			"342-0341-C // (C)APPLE 85,86 // (M)AMI 8849MBL // PHILLIPINES"
+		'ROM-LO' @ U8D:
+			"VLSI // 740 SA 1342 // 23512-1055 // 342-0342-B // (C)APPLE '83-'86 // KOREA A"
+			"<VLSI logo>VLSI // 8905AV 0 AS759 // 23512-1055 // 342-0342-B // (C)APPLE '85-'86"
+	v2/4d1eeae1:
+		'ROM-HI' @ U6D:
+			"VTI // 624 V0 8636 // 23512-1010 // 342-0341-B // (C)APPLE '85 // MEXICO R"
+		'ROM-LO' @ U8D:
+			"VTI // 622 V0 B637 // 23512-1007 // 342-0342-A // (C)APPLE '83-'85 // KOREA A"
+	v1/4d1eeee1:
+		'ROM-HI' @ U6D:
+			GUESSED, since this ROM is very rare: "VTI // 62? V0 86?? // 23512-1008 // 342-0341-A // (C)APPLE '83-'85 // KOREA A"
+		'ROM-LO' @ U8D is same as v2/4d1eeae1
+	*/
+	//ROMX_LOAD( "4d1f8172 - MacPlus v3.rom",  0x00000, 0x020000, CRC(b2102e8e) SHA1(7d2f808a045aa3a1b242764f0e2c7d13e288bf1f), ROM_GROUPWORD | ROM_BIOS(1) )
+	//ROMX_LOAD( "4d1eeae1 - MacPlus v2.rom",  0x00000, 0x020000, CRC(7cacd18f) SHA1(73bf2eb215646e108daa0cdd874e6c843c8ce421), ROM_GROUPWORD | ROM_BIOS(2) )
+	//ROMX_LOAD( "4d1eeee1 - MacPlus v1.rom",  0x00000, 0x020000, CRC(4fa5b399) SHA1(e0da7165b92dee90d8b1522429c033729fa73fd2), ROM_GROUPWORD | ROM_BIOS(3) )
 ROM_END
 
 
-ROM_START( macplus )
+ROM_START( macplus ) // same notes as above apply here as well
 	ROM_REGION16_BE(0x100000, "bootrom", 0)
-	ROM_SYSTEM_BIOS(0, "v3", "Loud Harmonicas") // AMI and VLSI manufacture
+	ROM_SYSTEM_BIOS(0, "v3", "Loud Harmonicas")
 	ROMX_LOAD( "342-0341-c.u6d", 0x000000, 0x010000, CRC(f69697e6) SHA1(41317614ac71eb94941e9952f6ea37407e21ffff), ROM_SKIP(1) | ROM_BIOS(1) )
 	ROMX_LOAD( "342-0342-b.u8d", 0x000001, 0x010000, CRC(49f25913) SHA1(72f658c02bae265e8845899582575fb7c784ee87), ROM_SKIP(1) | ROM_BIOS(1) )
 	ROM_FILL(0x20000, 0x2, 0xff)    // ROM checks for same contents at 20000 and 40000 to determine if SCSI is present
 	ROM_FILL(0x40000, 0x2, 0xaa)
-	ROM_SYSTEM_BIOS(1, "v2", "Lonely Heifers") // VTi manufacture
+	ROM_SYSTEM_BIOS(1, "v2", "Lonely Heifers")
 	ROMX_LOAD( "342-0341-b.u6d", 0x000000, 0x010000, CRC(65341487) SHA1(bf43fa4f5a3dcbbac20f1fe1deedee0895454379), ROM_SKIP(1) | ROM_BIOS(2) )
 	ROMX_LOAD( "342-0342-a.u8d", 0x000001, 0x010000, CRC(fb766270) SHA1(679f529fbfc05f9cc98924c53457d2996dfcb1a7), ROM_SKIP(1) | ROM_BIOS(2) )
 	ROM_FILL(0x20000, 0x2, 0xff)
 	ROM_FILL(0x40000, 0x2, 0xaa)
-	ROM_SYSTEM_BIOS(2, "v1", "Lonely Hearts") // VTi manufacture
+	ROM_SYSTEM_BIOS(2, "v1", "Lonely Hearts")
 	ROMX_LOAD( "342-0341-a.u6d", 0x000000, 0x010000, CRC(5095fe39) SHA1(be780580033d914b5035d60b5ebbd66bd1d28a9b), ROM_SKIP(1) | ROM_BIOS(3) )
 	ROMX_LOAD( "342-0342-a.u8d", 0x000001, 0x010000, CRC(fb766270) SHA1(679f529fbfc05f9cc98924c53457d2996dfcb1a7), ROM_SKIP(1) | ROM_BIOS(3) )
 	ROM_FILL(0x20000, 0x2, 0xff)
