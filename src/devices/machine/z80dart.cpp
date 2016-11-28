@@ -882,6 +882,16 @@ void z80dart_channel::control_write(uint8_t data)
 			// return from interrupt
 			LOG(("Z80DART \"%s\" Channel %c : Return from Interrupt\n", m_owner->tag(), 'A' + m_index));
 			m_uart->z80daisy_irq_reti();
+			if((m_uart->m_variant == z80dart_device::TYPE_I8274) || (m_uart->m_variant == z80dart_device::TYPE_UPD7201))
+			{
+				if (m_uart->m_chanB->m_wr[1] & z80dart_channel::WR1_STATUS_VECTOR)
+				{
+					if((m_uart->m_chanA->m_wr[1] & 0x18) == z80dart_channel::WR2_MODE_8086_8088)
+						m_uart->m_chanB->m_rr[2] = (m_uart->m_chanB->m_wr[2] & 0xf8) | 0x07;
+					else
+						m_uart->m_chanB->m_rr[2] = (m_uart->m_chanB->m_wr[2] & 0xe3) | 0x1c;
+				}
+			}
 			break;
 		}
 		break;
