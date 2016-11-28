@@ -49,6 +49,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(m68k_reset_callback);
 	DECLARE_READ32_MEMBER(buserror_r);
 	
+	TIMER_DEVICE_CALLBACK_MEMBER(micro20_timer);
+	DECLARE_WRITE_LINE_MEMBER(h4_w);
+
 private:
 
 };
@@ -67,6 +70,16 @@ void micro20_state::machine_reset()
 	m_maincpu->reset();
 	
 	m_maincpu->set_reset_callback(write_line_delegate(FUNC(micro20_state::m68k_reset_callback),this));
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(micro20_state::micro20_timer)
+{
+//	m_pit->  TODO: write this to TIN on the 68230 when it supports that
+}
+
+WRITE_LINE_MEMBER(micro20_state::h4_w)
+{
+	printf("h4_w: %d\n", state);
 }
 
 WRITE_LINE_MEMBER(micro20_state::m68k_reset_callback)
@@ -109,18 +122,16 @@ static MACHINE_CONFIG_START( micro20, micro20_state )
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(DUART_A_TAG, mc68681_device, rx_a_w))
 
-//	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(vt240_state, irq13_w))
-//	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE("host", rs232_port_device, write_txd))
-//	MCFG_MC68681_B_TX_CALLBACK(DEVWRITELINE("printer", rs232_port_device, write_txd))
-//	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(vt240_state, duartout_w))
-
 	MCFG_MC68681_ADD(DUART_B_TAG, XTAL_3_6864MHz)
-	
-	MCFG_DEVICE_ADD(RTC_TAG, MSM58321, XTAL_32_768kHz)
 	
 	MCFG_WD1772_ADD(FDC_TAG, XTAL_16_67MHz / 2)
 	
 	MCFG_DEVICE_ADD(PIT_TAG, PIT68230, XTAL_16_67MHz / 2)
+	MCFG_PIT68230_H4_CB(WRITELINE(micro20_state, h4_w));
+	
+	MCFG_DEVICE_ADD(RTC_TAG, MSM58321, XTAL_32_768kHz)
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer", micro20_state, micro20_timer, attotime::from_hz(100))
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( micro20 )
