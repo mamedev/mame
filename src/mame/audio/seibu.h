@@ -38,6 +38,7 @@ public:
 
 	// static configuration
 	static void static_set_cpu_tag(device_t &device, const char *tag);
+	static void static_set_rombank_tag(device_t &device, const char *tag);
 	template<class _Object> static devcb_base &set_ym_read_callback(device_t &device, _Object object)  { return downcast<seibu_sound_device &>(device).m_ym_read_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_ym_write_callback(device_t &device, _Object object) { return downcast<seibu_sound_device &>(device).m_ym_write_cb.set_callback(object); }
 
@@ -72,6 +73,7 @@ private:
 	// internal state
 	required_device<cpu_device> m_sound_cpu;
 	optional_region_ptr<uint8_t> m_sound_rom;
+	optional_memory_bank m_rom_bank;
 	uint8_t m_main2sub[2];
 	uint8_t m_sub2main[2];
 	int m_main2sub_pending;
@@ -169,6 +171,9 @@ extern const device_type SEIBU_ADPCM;
 
 #define MCFG_SEIBU_SOUND_CPU(_audiocputag) \
 	seibu_sound_device::static_set_cpu_tag(*device, "^" _audiocputag);
+
+#define MCFG_SEIBU_SOUND_ROMBANK(_banktag) \
+	seibu_sound_device::static_set_rombank_tag(*device, "^" _banktag);
 
 #define MCFG_SEIBU_SOUND_YM_READ_CB(_devcb) \
 	devcb = &seibu_sound_device::set_ym_read_callback(*device, DEVCB_##_devcb);
