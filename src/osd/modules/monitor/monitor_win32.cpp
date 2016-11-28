@@ -31,7 +31,7 @@ private:
 
 public:
 	win32_monitor_info(monitor_module& module, const HMONITOR handle, const char* monitor_device, float aspect)
-		: osd_monitor_info(module, std::intptr_t(handle), monitor_device, aspect)
+		: osd_monitor_info(module, std::uintptr_t(handle), monitor_device, aspect)
 	{
 		win32_monitor_info::refresh();
 	}
