@@ -4801,6 +4801,44 @@ ROM_START( overrevb ) /* Over Rev Revision B, Model 2B, rom board stickered as 8
 	ROM_LOAD( "mpr-20004.34", 0x400000, 0x400000, CRC(0b9c5410) SHA1(e5bb30702fc853ccc03316be07a334269d3ebb4a) )
 ROM_END
 
+ROM_START( rascot2 ) /* Royal Ascot 2, Model 2C, Rom Board : 837-12485 Com Board : 837-12532 SDC-2 */
+	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
+	ROM_LOAD32_WORD("epr-20166.15",   0x000000, 0x020000, CRC(520479a4) SHA1(02e14a7be299c2af36373595cf6f154312372a60) )
+	ROM_LOAD32_WORD("epr-20167.16",   0x000002, 0x020000, CRC(e92f3d55) SHA1(a0b0df16484be0c45669982d87fe64a98f833549) )
+	ROM_LOAD32_WORD("epr-20164.13",   0x040000, 0x020000, CRC(576a15dc) SHA1(34e02d79b4e9c36e9dd441edc6e8d2afd589c558) )
+	ROM_LOAD32_WORD("epr-20165.14",   0x040002, 0x020000, CRC(7527f33b) SHA1(18c33173508ae43a2ab6a8f2d62e7735a6cd2898) )
+
+	ROM_REGION32_LE( 0x2000000, "user1", 0 ) // Data
+	ROM_LOAD32_WORD("mpr-20171.11",   0x000000, 0x400000, CRC(9f2327c6) SHA1(ed41d8b831bcf4dacbbd8bcaa92377cc95fc2a72) )
+	ROM_LOAD32_WORD("mpr-20172.12",   0x000002, 0x400000, CRC(40b4f8e6) SHA1(7d4a1d604205148c6d94c320e1d6438ab706fa67) )
+	ROM_LOAD32_WORD("mpr-20169.9",    0x800000, 0x400000, CRC(b5be4d6b) SHA1(cfb4696506efa0e93fab35bbeb87decd83aec040) )
+	ROM_LOAD32_WORD("mpr-20170.10",   0x800002, 0x400000, CRC(7b05cf33) SHA1(9e392ea0c7a9f4cef76d46ad92a7cf814022c133) )
+
+	ROM_REGION( 0x800000, "cpu2", ROMREGION_ERASE00) // TGPx4 program
+
+	ROM_REGION( 0x2000000, "user2", 0 ) // Models
+	ROM_LOAD32_WORD("mpr-20173.17",  0x0000000, 0x400000, CRC(60bd684e) SHA1(893985808adb88fb54f0ca85ca23995d65360360) )
+	ROM_LOAD32_WORD("mpr-20177.21",  0x0000002, 0x400000, CRC(4ba5199d) SHA1(5fa1cc56ec1d1c37d885c2d9a80fa93b9fbc4bce) )
+	ROM_LOAD32_WORD("mpr-20174.18",  0x0800000, 0x400000, CRC(6751ada5) SHA1(1ff61c133a93d3663d6a748b13ebb33285909314) )
+	ROM_LOAD32_WORD("mpr-20178.22",  0x0800002, 0x400000, CRC(f4fa00aa) SHA1(444805f403eac3b0377089176ead62aff7db7b96) )
+	ROM_LOAD32_WORD("mpr-20175.19",  0x1000000, 0x400000, CRC(801f4eff) SHA1(f5375b59c818841d77ab38317be0f7b9dbe14969) )
+	ROM_LOAD32_WORD("mpr-20179.23",  0x1000002, 0x400000, CRC(bd2c4e65) SHA1(bcc2f4cd37ebf4c36d00581e024281603d306123) )
+	ROM_LOAD32_WORD("mpr-20176.20",  0x1800000, 0x400000, CRC(50cb6b5a) SHA1(02c869cf874aa2310d60062e1e9b88ee26d7fa02) )
+	ROM_LOAD32_WORD("mpr-20180.24",  0x1800002, 0x400000, CRC(df16f2ca) SHA1(782a5ea3f713c47b55a9a5ecb5d36578977740a9) )
+
+	ROM_REGION( 0x1000000, "user3", 0 ) // Textures
+	ROM_LOAD32_WORD("mpr-20183.27",   0x000000, 0x400000, CRC(48520d72) SHA1(4519b497e20898e3aaa6398eb98cad990010a2fa) )
+	ROM_LOAD32_WORD("mpr-20181.25",   0x000002, 0x400000, CRC(99bfa480) SHA1(7176870b8fcc233440d31e1ca945fc4eb1dff204) )
+	ROM_LOAD32_WORD("mpr-20184.28",   0x800000, 0x400000, CRC(b8df0b12) SHA1(391c6aa40f2f6296ba3aa2a6ea2414ef2487f80c) )
+	ROM_LOAD32_WORD("mpr-20182.26",   0x800002, 0x400000, CRC(e3f085fe) SHA1(28efa84f6c04fbd285a9bcf6f651a57bfe54a507) )
+
+	ROM_REGION( 0x100000, "audiocpu", 0 ) // Sound program
+	ROM_LOAD16_WORD_SWAP("epr-20168.31",  0x080000, 0x020000, CRC(13a6a78d) SHA1(cbff422567b72d71607a42ea804c98b8c1e65824) )
+
+	ROM_REGION( 0x800000, "scsp", 0 ) // Samples
+	ROM_LOAD("epr-20185.32",  0x0000000, 0x200000, CRC(168cc361) SHA1(fbd2a9d99cc0afd7b5f0d9274916a0960d864118) )
+ROM_END
+
 ROM_START( topskatr ) /* Top Skater Revision A (Export), Model 2C, Sega Game ID# 833-13080-02, ROM board ID# 834-13081-02 */
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program
 	ROM_LOAD32_WORD("epr-19755a.15", 0x000000, 0x080000, CRC(b80633b9) SHA1(5396da414beeb918e6f38f25a43dd76345a0c8ed) )
@@ -6061,6 +6099,7 @@ GAME( 1996, stcca,        stcc,    stcc,      model2,  driver_device, 0,       R
 GAME( 1996, waverunr,        0, model2c,      model2,  driver_device, 0,       ROT0, "Sega",   "Wave Runner (Japan, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, hotd,            0, model2c,      model2,  driver_device, 0,       ROT0, "Sega",   "House of the Dead", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, overrev,         0, model2c,      srallyc, driver_device, 0,       ROT0, "Jaleco", "Over Rev (Model 2C, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, rascot2,         0, model2c,      model2,  driver_device, 0,       ROT0, "Sega",   "Royal Ascot II", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, segawski,        0, model2c,      model2,  driver_device, 0,       ROT0, "Sega",   "Sega Water Ski (Japan, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, topskatr,        0, model2c,      model2,  driver_device, 0,       ROT0, "Sega",   "Top Skater (Export, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, topskatru,topskatr, model2c,      model2,  driver_device, 0,       ROT0, "Sega",   "Top Skater (USA, Revision A)", MACHINE_NOT_WORKING|MACHINE_IMPERFECT_GRAPHICS )
