@@ -1528,6 +1528,13 @@ ROM_START( mac128k )
 	Hitachi:
 	[can't find reference for rom-hi]
 	"<Hitachi 'target' logo> 8413 // 3256 016 JAPAN // (C)APPLE 83 // 342-0221-A"
+	
+	References:
+	http://www.vintagecomputer.net/apple/Macintosh/Macintosh_motherboard.jpg
+	https://upload.wikimedia.org/wikipedia/commons/3/34/Macintosh-motherboard.jpg
+	https://68kmla.org/forums/uploads/monthly_01_2016/post-2105-0-31195100-1452296677.jpg
+	https://68kmla.org/forums/uploads/monthly_12_2014/post-2597-0-46269000-1419299800.jpg
+	http://cdn.cultofmac.com/wp-content/uploads/2014/01/12A-128k-Motherboard.jpg
 	*/
 ROM_END
 
@@ -1535,6 +1542,7 @@ ROM_START( mac512k )
 	ROM_REGION16_BE(0x100000, "bootrom", 0)
 	ROMX_LOAD("342-0220-b.u6d",  0x00000, 0x08000, CRC(0dce9a3f) SHA1(101ca6570f5a273e400d1a8bc63e15ee0e94153e), ROM_SKIP(1) ) // "<VTi logo along side> 512 VH 6434 // 23256-1104 // 342-0220-B // (C) APPLE 84 // KOREA-A"
 	ROMX_LOAD("342-0221-b.u8d",  0x00001, 0x08000, CRC(d51f376e) SHA1(575586109e876cffa4a4d472cb38771aa21b70cb), ROM_SKIP(1) ) // "<VTi logo along side> 512 VH 6709 // 23256-1105 // 342-0221-B // (C) APPLE 84 // KOREA-A"
+	// reference: http://i.ebayimg.com/images/g/Uj8AAOSwvzRXy2tW/s-l1600.jpg
 ROM_END
 
 ROM_START( unitron )
@@ -1584,7 +1592,7 @@ ROM_END
  * 0f <- 88 External/Status Control: Abort/Break and DCD interrupts enabled
 */
 
-ROM_START( mac512ke )
+ROM_START( mac512ke ) // 512ke has been observed with any of the v3, v2 or v1 macplus romsets installed, and v1 romsets are more common here than in the plus, since the 512ke lacks scsi, which is the cause of the major bug fixed between v1 and v2, hence 512ke is unaffected and was a good way for apple to use up the buggy roms rather than destroying them.
 	ROM_REGION16_BE(0x100000, "bootrom", 0)
 	ROM_SYSTEM_BIOS(0, "v3", "Loud Harmonicas")
 	ROMX_LOAD( "342-0341-c.u6d", 0x000000, 0x010000, CRC(f69697e6) SHA1(41317614ac71eb94941e9952f6ea37407e21ffff), ROM_SKIP(1) | ROM_BIOS(1) )
@@ -1633,7 +1641,6 @@ ROM_START( mac512ke )
 		'ROM-LO' @ U8D is same as v2/4d1eeae1 'ROM-LO' @ U8D
 	*/
 ROM_END
-
 
 ROM_START( macplus ) // same notes as above apply here as well
 	ROM_REGION16_BE(0x100000, "bootrom", 0)
