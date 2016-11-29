@@ -721,13 +721,13 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side 1"/>
 			<dataarea name="flop" size="102400">
-				<rom name="The Times Crosswords Volume 1-Side1.ssd" size="102400" crc="9b84fe62" sha1="02ee8578ad37ac07a52ba4114dd448fba1d80c62" offset="0" />
+				<rom name="The Times Crosswords Volume 1-Side1.ssd" size="102400" crc="9b84fe62" sha1="d1ccb5057557cc380a9839cbf365bd0bb4dfe1a3" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Side 2"/>
 			<dataarea name="flop" size="102400">
-				<rom name="The Times Crosswords Volume 1-Side2.ssd" size="102400" crc="6328fef8" sha1="59bf18805722ef0e6b3672d35f9ac7192936f3b3" offset="0" />
+				<rom name="The Times Crosswords Volume 1-Side2.ssd" size="102400" crc="6328fef8" sha1="02ee8578ad37ac07a52ba4114dd448fba1d80c62" offset="0" />
 			</dataarea>
 		</part>
 	</software>
