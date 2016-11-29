@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina
 /*
   Super Free Kick / Spinkick by HEC (Haesung Enterprise Co.)

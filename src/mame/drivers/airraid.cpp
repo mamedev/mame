@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina, Angelo Salese, hap
 /* Air Raid (aka Cross Shooter) (c) 1987 Seibu
 
