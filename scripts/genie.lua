@@ -475,6 +475,7 @@ configuration { "vs*" }
 configuration { "Debug", "vs*" }
 	flags {
 		"Symbols",
+		"NoIncrementalLink",
 	}
 
 configuration { "Release", "vs*" }
