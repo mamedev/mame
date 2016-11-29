@@ -441,7 +441,7 @@ void mac_state::set_memory_overlay(int overlay)
 			}
 		}
 		else if ((m_model == MODEL_MAC_PORTABLE) || (m_model == MODEL_MAC_PB100) || (m_model == MODEL_MAC_IIFX))
-		{			
+		{
 			address_space& space = m_maincpu->space(AS_PROGRAM);
 			space.unmap_write(0x000000, 0x9fffff);
 			mac_install_memory(0x000000, memory_size-1, memory_size, memory_data, is_rom, "bank1");
@@ -497,7 +497,7 @@ READ32_MEMBER(mac_state::rom_switch_r)
 	{
 		set_memory_overlay(0);
 	}
-	
+
 	//printf("rom_switch_r: offset %08x ROM_size -1 = %08x, masked = %08x\n", offset, ROM_size-1, offset & ((ROM_size - 1)>>2));
 
 	return ROM_data[offset & ((ROM_size - 1)>>2)];

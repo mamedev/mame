@@ -28,11 +28,17 @@ Use that method at machine config time to provide an address map for
 the bus to connect to.  It has priority over a rom region if one is
 also present.
 
+| **MCFG_DEVICE_ROM**\ (tag)
+
+Used to select a rom region to use if a device address map is not
+given.  Defaults to DEVICE_SELF, e.g. the device tag.
+
 | **ROM_REGION**\ (length, tag, flags)
 
-If a rom region with a tag identical to the device tag is provided in
-the rom description for the system, it will be automatically picked up
-as the connected rom.  An address map has priority over the region if
+If a rom region with a tag as given with **MCFG_DEVICE_ROM** if
+present, or identical to the device tag otherwise, is provided in the
+rom description for the system, it will be automatically picked up as
+the connected rom.  An address map has priority over the region if
 present in the machine config.
 
 | void **set_rom**\ (const void \*base, UINT32 size);
