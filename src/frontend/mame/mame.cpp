@@ -151,6 +151,11 @@ void mame_machine_manager::start_luaengine()
 			}
 		}
 	}
+	if (options().console()) {
+		std::string error_string;
+		m_plugins->set_value("console", "1", OPTION_PRIORITY_CMDLINE, error_string);
+	}
+	
 	m_lua->initialize();
 
 	{
