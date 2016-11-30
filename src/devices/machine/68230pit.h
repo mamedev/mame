@@ -131,7 +131,7 @@ class pit68230_device :  public device_t//, public device_execute_interface
 	void pa_update_bit(uint8_t bit, uint8_t state);
 	void pb_update_bit(uint8_t bit, uint8_t state);
 	void pc_update_bit(uint8_t bit, uint8_t state);
-	void update_tin();
+	void update_tin(uint8_t);
 
 	void wr_pitreg_pgcr(uint8_t data);
 	void wr_pitreg_psrr(uint8_t data);
@@ -289,11 +289,11 @@ protected:
 	uint8_t m_pbdr;           // Port B Data register
 	uint8_t m_pcdr;           // Port C Data register
 	uint8_t m_psr;            // Port Status Register
-	uint8_t m_tcr;        // Timer Control Register
-	uint8_t m_tivr;       // Timer Interrupt Vector register
-	int m_cpr;          // Counter Preload Registers (3 x 8 = 24 bits)
-	int   m_cntr;       // - The 24 bit Counter
-	uint8_t m_tsr;        // Timer Status Register
+	uint8_t m_tcr;        	  // Timer Control Register
+	uint8_t m_tivr;           // Timer Interrupt Vector register
+	int 	m_cpr;            // Counter Preload Registers (3 x 8 = 24 bits)
+	int   	m_cntr;           // - The 24 bit Counter
+	uint8_t m_tsr;            // Timer Status Register
 
 	// Timers
 	emu_timer *pit_timer;

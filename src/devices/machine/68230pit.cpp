@@ -20,7 +20,7 @@
 *  - Complete support for clock and timers
 *  - Add interrupt support
 *  - Add DMA support
-*  - Add apropriate buffering for each submode
+*  - Add appropriate buffering for each submode
 **********************************************************************/
 
 #include "68230pit.h"
@@ -240,18 +240,15 @@ void pit68230_device::pa_update_bit(uint8_t bit, uint8_t state){ if (state) m_pa
 void pit68230_device::pb_update_bit(uint8_t bit, uint8_t state){ if (state) m_pbdr |= (1 << bit); else m_pbdr &= ~(1 << bit); }
 void pit68230_device::pc_update_bit(uint8_t bit, uint8_t state){ if (state) m_pcdr |= (1 << bit); else m_pcdr &= ~(1 << bit); }
 
-void pit68230_device::update_tin()
+void pit68230_device::update_tin(uint8_t state)
 { 
-	static uint32_t counter = 0;
-
 	// Tick clock on falling edge. TODO: check what flank is correct
-	if (((counter & 1) != 0))
+	if (state == CLEAR_LINE)
 	{
 		tick_clock(); 
 	}
 
-	pc_update_bit(REG_PCDR_TIN_BIT, counter & 1);
-	counter++;
+	pc_update_bit(REG_PCDR_TIN_BIT, state == ASSERT_LINE ? 0 : 1);
 }
 
 #if VERBOSE > 2
