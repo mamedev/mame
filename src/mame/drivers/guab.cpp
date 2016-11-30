@@ -67,6 +67,8 @@ public:
 		m_floppy(*this, "fdc:0"),
 		m_palette(*this, "palette") { }
 
+
+	EF9369_COLOR_UPDATE(ef9369_color_update);
 	DECLARE_WRITE_LINE_MEMBER(generate_tms34061_interrupt);
 	DECLARE_WRITE16_MEMBER(guab_tms34061_w);
 	DECLARE_READ16_MEMBER(guab_tms34061_r);
@@ -107,6 +109,11 @@ WRITE_LINE_MEMBER(guab_state::ptm_irq)
  *  Video hardware
  *
  *************************************/
+
+EF9369_COLOR_UPDATE( guab_state::ef9369_color_update )
+{
+	m_palette->set_pen_color(entry, pal4bit(ca), pal4bit(cb), pal4bit(cc));
+}
 
 /*****************
  * TMS34061 CRTC
@@ -436,7 +443,8 @@ static MACHINE_CONFIG_START( guab, guab_state )
 
 	MCFG_PALETTE_ADD("palette", ef9369_device::NUMCOLORS)
 
-	MCFG_EF9369_ADD("ef9369", "palette")
+	MCFG_EF9369_ADD("ef9369")
+	MCFG_EF9369_COLOR_UPDATE_CB(guab_state, ef9369_color_update)
 
 	MCFG_DEVICE_ADD("tms34061", TMS34061, 0)
 	MCFG_TMS34061_ROWSHIFT(8)  /* VRAM address is (row << rowshift) | col */

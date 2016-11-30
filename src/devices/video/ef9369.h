@@ -36,14 +36,19 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_EF9369_ADD(_tag, _palette_tag) \
+#define MCFG_EF9369_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, EF9369, 0) \
-	ef9369_device::set_palette_tag(*device, owner, _palette_tag);
+
+#define MCFG_EF9369_COLOR_UPDATE_CB(_class, _method) \
+	ef9369_device::set_color_update_callback(*device, ef9369_color_update_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
 
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
+
+typedef device_delegate<void (int entry, bool m, uint8_t ca, uint8_t cb, uint8_t cc)> ef9369_color_update_delegate;
+#define EF9369_COLOR_UPDATE(name)	void name(int entry, bool m, uint8_t ca, uint8_t cb, uint8_t cc)
 
 // ======================> ef9369_device
 
@@ -53,8 +58,8 @@ public:
 	// construction/destruction
 	ef9369_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	// inline configuration
-	static void set_palette_tag(device_t &device, device_t *owner, const char *tag);
+	// configuration
+	static void set_color_update_callback(device_t &device, ef9369_color_update_delegate callback) { downcast<ef9369_device &>(device).m_color_update_cb = callback; }
 
 	DECLARE_READ8_MEMBER(data_r);
 	DECLARE_WRITE8_MEMBER(data_w);
@@ -68,9 +73,7 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	// configuration
-	const char *m_palette_tag;
-	palette_device *m_palette;
+	ef9369_color_update_delegate m_color_update_cb;
 
 	// state
 	uint8_t m_ca[NUMCOLORS], m_cb[NUMCOLORS], m_cc[NUMCOLORS];	// actually 4-bit

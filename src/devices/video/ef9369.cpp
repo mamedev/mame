@@ -27,8 +27,6 @@ const device_type EF9369 = &device_creator<ef9369_device>;
 
 ef9369_device::ef9369_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, EF9369, "EF9369 Single Chip Color Palette", tag, owner, clock, "ef9369", __FILE__),
-	m_palette_tag(nullptr),
-	m_palette(nullptr),
 	m_address(0)
 {
 	std::fill(m_ca, m_ca + NUMCOLORS, 0);
@@ -38,21 +36,14 @@ ef9369_device::ef9369_device(const machine_config &mconfig, const char *tag, dev
 }
 
 //-------------------------------------------------
-//  set_palette_tag - set the palette we should handle
-//-------------------------------------------------
-
-void ef9369_device::set_palette_tag(device_t &device, device_t *owner, const char *tag)
-{
-	ef9369_device &dev = dynamic_cast<ef9369_device &>(device);
-	dev.m_palette_tag = tag;
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
 void ef9369_device::device_start()
 {
+	// bind delegate
+	m_color_update_cb.bind_relative_to(*owner());
+
 	// register for save states
 	save_pointer(NAME(m_ca), NUMCOLORS);
 	save_pointer(NAME(m_cb), NUMCOLORS);
@@ -67,8 +58,6 @@ void ef9369_device::device_start()
 
 void ef9369_device::device_reset()
 {
-	m_palette = m_owner->subdevice<palette_device>(m_palette_tag);
-
 	m_address = 0;
 }
 
@@ -91,7 +80,7 @@ WRITE8_MEMBER( ef9369_device::data_w )
 
 	if (m_address & 1)
 	{
-		m_m[entry] = (data >> 4) & 0xf;
+		m_m[entry] = (data >> 4) & 0x1;
 		m_cc[entry] = (data >> 0) & 0xf;
 	}
 	else
@@ -101,7 +90,8 @@ WRITE8_MEMBER( ef9369_device::data_w )
 	}
 
 	// update color
-	m_palette->set_pen_color(entry, pal4bit(m_ca[entry]), pal4bit(m_cb[entry]), pal4bit(m_cc[entry]));
+	if (!m_color_update_cb.isnull())
+		m_color_update_cb(entry, m_m[entry], m_ca[entry], m_cb[entry], m_cc[entry]);
 
 	// auto-increment
 	m_address++;
