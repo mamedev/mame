@@ -882,6 +882,24 @@ ROM_START( sdungeon )
 	ROM_LOAD( "sd101",    0x0000, 0x0800, CRC(e255af9a) SHA1(2410d3b7dec8e72a93d71c824c9403a6d96b9e8c) )
 ROM_END
 
+// same as above but uses larger ROMs
+ROM_START( sdungeona )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1514.1J", 0xa000, 0x2000, CRC(8fe3e3c6) SHA1(f60acf7d2096a17726e89fee532fc68218657269) )
+	ROM_LOAD( "1716.1K", 0xc000, 0x2000, CRC(9976fe14) SHA1(759e966abaa3dd458c3d3f9ce5ef6abfec196d28) )
+	ROM_LOAD( "1819.1L", 0xe000, 0x2000, CRC(d56a40b0) SHA1(5b98e99938b6a394abca336995959cd97a55ddf7) )
+
+	ROM_REGION( 0x10000, "videocpu", 0 )
+	ROM_LOAD("65.1H",    0xa000, 0x2000, CRC(4b567837) SHA1(985e75829779cac366e57996016e5f949e1202c7) )
+	ROM_LOAD("87.1F",    0xc000, 0x2000, CRC(9298778b) SHA1(26c4dfd932e55e2525e46be8f58f26c67970d2bd) )
+	ROM_LOAD("109.1E",   0xe000, 0x2000, CRC(7437a6f1) SHA1(232fefb28c55338e5f3fed213ee94f44816241a0) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "2627.2D", 0xf000, 0x1000, CRC(1f830dff) SHA1(05b99d941d8fa53a4a9f9eb82e31d493d21d0f6f) )
+
+	ROM_REGION( 0x0800, "mcu", 0 )
+	ROM_LOAD( "sd101",   0x0000, 0x0800, CRC(e255af9a) SHA1(2410d3b7dec8e72a93d71c824c9403a6d96b9e8c) )
+ROM_END
 
 ROM_START( elecyoyo )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -1454,6 +1472,7 @@ GAME( 1981, qixb,     qix,      qix,      qix,      driver_device, 0,        ROT
 GAME( 1981, qixo,     qix,      qix,      qix,      driver_device, 0,        ROT270, "Taito America Corporation", "Qix (set 3, earlier)", MACHINE_SUPPORTS_SAVE ) // oldest set / prototype? has incorrect spelling 'deutch' and doesn't allow language selection to be changed
 GAME( 1981, qix2,     qix,      qix,      qix,      driver_device, 0,        ROT270, "Taito America Corporation", "Qix II (Tournament)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, sdungeon, 0,        mcu,      sdungeon, driver_device, 0,        ROT270, "Taito America Corporation", "Space Dungeon", MACHINE_SUPPORTS_SAVE ) // actually released July 1982
+GAME( 1981, sdungeona, sdungeon,mcu,      sdungeon, driver_device, 0,        ROT270, "Taito America Corporation", "Space Dungeon (larger roms)", MACHINE_SUPPORTS_SAVE ) // same as above but uses larger ROMs
 GAMEL(1982, elecyoyo, 0,        mcu,      elecyoyo, driver_device, 0,        ROT270, "Taito America Corporation", "The Electric Yo-Yo (set 1)", MACHINE_SUPPORTS_SAVE, layout_elecyoyo )
 GAMEL(1982, elecyoyo2,elecyoyo, mcu,      elecyoyo, driver_device, 0,        ROT270, "Taito America Corporation", "The Electric Yo-Yo (set 2)", MACHINE_SUPPORTS_SAVE, layout_elecyoyo )
 GAME( 1982, kram,     0,        mcu,      kram,     driver_device, 0,        ROT0,   "Taito America Corporation", "Kram (set 1)", MACHINE_SUPPORTS_SAVE )
