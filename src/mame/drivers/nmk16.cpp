@@ -2952,10 +2952,14 @@ static INPUT_PORTS_START( atombjt ) // verified with dip sheet
 	PORT_INCLUDE(bjtwin)
 
 	PORT_MODIFY("DSW1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unused ) )       PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 
 	PORT_MODIFY("DSW2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unused ) )       PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( nouryoku )
@@ -4635,7 +4639,7 @@ static MACHINE_CONFIG_START( atombjt, nmk16_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki1", 16000000/4, OKIM6295_PIN7_LOW) // ?? mhz, I see no 16 crystal
+	MCFG_OKIM6295_ADD("oki1", 10000000/8, OKIM6295_PIN7_LOW) // divider and pin not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
