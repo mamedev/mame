@@ -665,10 +665,10 @@ ROM_START( vt100ac ) // This is from the VT180 technical manual at http://www.bi
 // on page 433: VT100 WC or WK uses these as well.
 // This romset adds the Set-up C page to the setup menu (press keypad 5 twice once you hit set-up)
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "23-095e2.e40", 0x0000, 0x0800, CRC(6C8ACF44) SHA1(B3EF5AF920995A40A316C6DC008960C461853BFC)) // Label: "23095E2 // (C)DEC // (M)QQ8227" @E40
-	ROM_LOAD( "23-096e2.e45", 0x0800, 0x0800, CRC(77F21473) SHA1(6F10B250777C12CCA63EE611735F9F36CC05A7EF)) // Label: "23096E2 // (C)DEC // (M)QQ8227" @E45
-	ROM_LOAD( "23-139e2.bad3.e52", 0x1000, 0x0800, BAD_DUMP CRC(EAEDE07A) SHA1(410CEF41C4F3A6A37570A82F359DD2B2D536D3DD)) // Label: "AMD // 37108 8232DKP // 23-139E2 // AM9218CPC // (C)DEC_1979" @E52;  // revision 2?; revision 1 is 23-097e2 MAYBE // bytes with A1 and A2 both high and a3 high? are mostly correct, rest are likely all wrong.
-	ROM_LOAD( "23-140e2.e56", 0x1800, 0x0800, CRC(4BF1CE4E) SHA1(279F47EC9A68C801C3C05005DD782202AC9E51A4)) // Label: "AMD // 37109 8230DHP // 23-140E2 // AM9218CPC // (C)DEC 1979" @E56  // revision 2?; revision 1 is 23-098e2 MAYBE
+	ROM_LOAD( "23-095e2.e40", 0x0000, 0x0800, CRC(6c8acf44) SHA1(b3ef5af920995a40a316c6dc008960c461853bfc)) // Label: "23095E2 // (C)DEC // (M)QQ8227" @E40
+	ROM_LOAD( "23-096e2.e45", 0x0800, 0x0800, CRC(77f21473) SHA1(6f10b250777c12cca63ee611735f9f36cc05a7ef)) // Label: "23096E2 // (C)DEC // (M)QQ8227" @E45
+	ROM_LOAD( "23-139e2.bad3.e52", 0x1000, 0x0800, BAD_DUMP CRC(eaede07a) SHA1(410cef41c4f3a6a37570a82f359dd2b2d536d3dd)) // Label: "AMD // 37108 8232DKP // 23-139E2 // AM9218CPC // (C)DEC_1979" @E52;  // revision 2?; revision 1 is 23-097e2 MAYBE // bytes with A1 and A2 both high and a3 high? are mostly correct, rest are likely all wrong.
+	ROM_LOAD( "23-140e2.e56", 0x1800, 0x0800, CRC(4bf1ce4e) SHA1(279f47ec9a68c801c3c05005dd782202ac9e51a4)) // Label: "AMD // 37109 8230DHP // 23-140E2 // AM9218CPC // (C)DEC 1979" @E56  // revision 2?; revision 1 is 23-098e2 MAYBE
 
 	/* bad rom tracing
 	bpset 1be then set pc=1d5 to bypass rom test
@@ -679,11 +679,11 @@ ROM_START( vt100ac ) // This is from the VT180 technical manual at http://www.bi
 	ROM_REGION(0x1000, "avo", 0) // all switches on avo are open EXCEPT S2-3; does this map at 0xa000-0xcfff (mirrored) in maincpu space?
 	// are 184 and 185 an older version of the stp avo firmware?
 	//NOTE: for both of these two avo roms, Pin 18 is positive enable CE, Pin 20 is negative enable /CE1, Pin 21 is negative enable /CE2,
-	ROM_LOAD( "23-186e2.avo.e21", 0x0000, 0x0800, CRC(1592DEC1) SHA1(C4B8FC9FC0514E0CD46AD2DE03ABE72271CE460B)) // Label: "S 8218 // C69063 // 23186E2" @E21
-	ROM_LOAD( "23-187e2.avo.e17", 0x0800, 0x0800, CRC(C6D72A41) SHA1(956F9EB945A250FD05C76100B38C0BA381AB8FDE)) // Label: "S 8228 // C69062 // 23187E2" @E17
+	ROM_LOAD( "23-186e2.avo.e21", 0x0000, 0x0800, CRC(1592dec1) SHA1(c4b8fc9fc0514e0cd46ad2de03abe72271ce460b)) // Label: "S 8218 // C69063 // 23186E2" @E21
+	ROM_LOAD( "23-187e2.avo.e17", 0x0800, 0x0800, CRC(c6d72a41) SHA1(956f9eb945a250fd05c76100b38c0ba381ab8fde)) // Label: "S 8228 // C69062 // 23187E2" @E17
 
 	ROM_REGION(0x2000, "stp", 0) // stp switches 1 and 5 are closed, 2,3,4 open
-	ROM_LOAD( "23-029e4.stp.e14", 0x0000, 0x2000, CRC(DA55C62B) SHA1(261B02B774D57253D1DEDECAB8CA0E368C2A96CD)) // Label: "S 8218 // C43020 // 23029E4 (C) DEC // TP02" @E14
+	ROM_LOAD( "23-029e4.stp.e14", 0x0000, 0x2000, CRC(da55c62b) SHA1(261b02b774d57253d1dedecab8ca0e368c2a96cd)) // Label: "S 8218 // C43020 // 23029E4 (C) DEC // TP02" @E14
 	// the rom dump above MIGHT be in the wrong order: it was dumped with A11 to pin 18, A12 to pin 21, A13 to pin 20, but I'm not sure those assignments to pins are correct.
 	// At worst the 8 parts of it are in the wrong order.
 
