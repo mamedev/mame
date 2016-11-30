@@ -30,6 +30,7 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/6840ptm.h"
 #include "video/tms34061.h"
+#include "video/ef9369.h"
 #include "sound/sn76496.h"
 #include "machine/wd_fdc.h"
 #include "formats/guab_dsk.h"
@@ -54,13 +55,6 @@ enum int_levels
 };
 
 
-struct ef9369
-{
-	uint32_t addr;
-	uint16_t clut[16];    /* 13-bits - a marking bit and a 444 color */
-};
-
-
 class guab_state : public driver_device
 {
 public:
@@ -76,8 +70,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(generate_tms34061_interrupt);
 	DECLARE_WRITE16_MEMBER(guab_tms34061_w);
 	DECLARE_READ16_MEMBER(guab_tms34061_r);
-	DECLARE_WRITE16_MEMBER(ef9369_w);
-	DECLARE_READ16_MEMBER(ef9369_r);
 	DECLARE_READ16_MEMBER(io_r);
 	DECLARE_WRITE16_MEMBER(io_w);
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
@@ -96,8 +88,6 @@ private:
 	required_device<wd1773_t> m_fdc;
 	required_device<floppy_connector> m_floppy;
 	required_device<palette_device> m_palette;
-
-	struct ef9369 m_pal;
 };
 
 
@@ -167,71 +157,6 @@ READ16_MEMBER(guab_state::guab_tms34061_r)
 	return data;
 }
 
-
-/****************************
- *  EF9369 color palette IC
- *  (16 colors from 4096)
- ****************************/
-
-/* Non-multiplexed mode */
-WRITE16_MEMBER(guab_state::ef9369_w)
-{
-	struct ef9369 &pal = m_pal;
-	data &= 0x00ff;
-
-	/* Address register */
-	if (offset & 1)
-	{
-		pal.addr = data & 0x1f;
-	}
-	/* Data register */
-	else
-	{
-		uint32_t entry = pal.addr >> 1;
-
-		if ((pal.addr & 1) == 0)
-		{
-			pal.clut[entry] &= ~0x00ff;
-			pal.clut[entry] |= data;
-		}
-		else
-		{
-			uint16_t col;
-
-			pal.clut[entry] &= ~0x1f00;
-			pal.clut[entry] |= (data & 0x1f) << 8;
-
-			/* Remove the marking bit */
-			col = pal.clut[entry] & 0xfff;
-
-			/* Update the MAME palette */
-			m_palette->set_pen_color(entry, pal4bit(col >> 0), pal4bit(col >> 4), pal4bit(col >> 8));
-		}
-
-			/* Address register auto-increment */
-		if (++pal.addr == 32)
-			pal.addr = 0;
-	}
-}
-
-READ16_MEMBER(guab_state::ef9369_r)
-{
-	struct ef9369 &pal = m_pal;
-	if ((offset & 1) == 0)
-	{
-		uint16_t col = pal.clut[pal.addr >> 1];
-
-		if ((pal.addr & 1) == 0)
-			return col & 0xff;
-		else
-			return col >> 8;
-	}
-	else
-	{
-		/* Address register is write only */
-		return 0xffff;
-	}
-}
 
 uint32_t guab_state::screen_update_guab(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -396,7 +321,8 @@ static ADDRESS_MAP_START( guab_map, AS_PROGRAM, 16, guab_state )
 	AM_RANGE(0x0c00c0, 0x0c00cf) AM_DEVREADWRITE8("6840ptm", ptm6840_device, read, write, 0xff)
 	AM_RANGE(0x0c00e0, 0x0c00e7) AM_DEVREADWRITE8("fdc", wd1773_t, read, write, 0x00ff)
 	AM_RANGE(0x080000, 0x080fff) AM_RAM
-	AM_RANGE(0x100000, 0x100003) AM_READWRITE(ef9369_r, ef9369_w)
+	AM_RANGE(0x100000, 0x100001) AM_DEVREADWRITE8("ef9369", ef9369_device, data_r, data_w, 0x00ff)
+	AM_RANGE(0x100002, 0x100003) AM_DEVWRITE8("ef9369", ef9369_device, address_w, 0x00ff)
 	AM_RANGE(0x800000, 0xb0ffff) AM_READWRITE(guab_tms34061_r, guab_tms34061_w)
 	AM_RANGE(0xb10000, 0xb1ffff) AM_RAM
 	AM_RANGE(0xb80000, 0xb8ffff) AM_RAM
@@ -508,7 +434,9 @@ static MACHINE_CONFIG_START( guab, guab_state )
 	MCFG_SCREEN_UPDATE_DRIVER(guab_state, screen_update_guab)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD("palette", 16)
+	MCFG_PALETTE_ADD("palette", ef9369_device::NUMCOLORS)
+
+	MCFG_EF9369_ADD("ef9369", "palette")
 
 	MCFG_DEVICE_ADD("tms34061", TMS34061, 0)
 	MCFG_TMS34061_ROWSHIFT(8)  /* VRAM address is (row << rowshift) | col */
