@@ -17313,6 +17313,9 @@ trojanj                         // 4/1986 (c) 1986 (Japan)
 trojanr                         // 4/1986 (c) 1986 + Romstar
 fball                        //
 
+@source:lwriter.cpp
+lwriter							// Apple LaserWriter
+
 @source:lynx.cpp
 lynx                            // Atari Lynx Handheld
 
