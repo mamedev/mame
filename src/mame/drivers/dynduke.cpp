@@ -364,10 +364,10 @@ MACHINE_CONFIG_END
 
 ROM_START( dynduke )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* v30 main cpu */
-	ROM_LOAD16_BYTE( "1.cd8", 0x0a0000, 0x10000, CRC(a5e2a95a) SHA1(135d57073d826b9cf46fb43dc49439e1400fb021) )
-	ROM_LOAD16_BYTE( "2.cd7", 0x0a0001, 0x10000, CRC(7e51af22) SHA1(b26103c0d41c469d1e2d1e4e89f591c0d9cdb67c) )
-	ROM_LOAD16_BYTE( "3.e8",  0x0c0000, 0x20000, CRC(a56f8692) SHA1(00d86c660efae30c008f8220fdfd397b7d69b2cd) )
-	ROM_LOAD16_BYTE( "4e.e7", 0x0c0001, 0x20000, CRC(384c0635) SHA1(4b9332d8b91426c17a2b2a58633dc6dde526284d) )
+	ROM_LOAD16_BYTE( "1.cd8",   0x0a0000, 0x10000, CRC(a5e2a95a) SHA1(135d57073d826b9cf46fb43dc49439e1400fb021) )
+	ROM_LOAD16_BYTE( "2.cd7",   0x0a0001, 0x10000, CRC(7e51af22) SHA1(b26103c0d41c469d1e2d1e4e89f591c0d9cdb67c) )
+	ROM_LOAD16_BYTE( "dde3.e8", 0x0c0000, 0x20000, CRC(95336279) SHA1(0218640e57d0a6df03ce51f2afad9862d4b13a50) )
+	ROM_LOAD16_BYTE( "dde4.e7", 0x0c0001, 0x20000, CRC(eb2d8fea) SHA1(d6bb718ece9011f7e24ca1c2f70a513e1c13a7a8) )
 
 	ROM_REGION( 0x100000, "slave", 0 ) /* v30 sub cpu */
 	ROM_LOAD16_BYTE( "5.p8", 0x0e0000, 0x10000, CRC(883d319c) SHA1(b0df05bfe342a5289a6368be26317fa879975463) )
@@ -412,10 +412,10 @@ ROM_END
 
 ROM_START( dyndukea )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* v30 main cpu */
-	ROM_LOAD16_BYTE( "1.cd8",   0x0a0000, 0x10000, CRC(a5e2a95a) SHA1(135d57073d826b9cf46fb43dc49439e1400fb021) )
-	ROM_LOAD16_BYTE( "2.cd7",   0x0a0001, 0x10000, CRC(7e51af22) SHA1(b26103c0d41c469d1e2d1e4e89f591c0d9cdb67c) )
-	ROM_LOAD16_BYTE( "dde3.e8", 0x0c0000, 0x20000, CRC(95336279) SHA1(0218640e57d0a6df03ce51f2afad9862d4b13a50) )
-	ROM_LOAD16_BYTE( "dde4.e7", 0x0c0001, 0x20000, CRC(eb2d8fea) SHA1(d6bb718ece9011f7e24ca1c2f70a513e1c13a7a8) )
+	ROM_LOAD16_BYTE( "1.cd8", 0x0a0000, 0x10000, CRC(a5e2a95a) SHA1(135d57073d826b9cf46fb43dc49439e1400fb021) )
+	ROM_LOAD16_BYTE( "2.cd7", 0x0a0001, 0x10000, CRC(7e51af22) SHA1(b26103c0d41c469d1e2d1e4e89f591c0d9cdb67c) )
+	ROM_LOAD16_BYTE( "3.e8",  0x0c0000, 0x20000, CRC(a56f8692) SHA1(00d86c660efae30c008f8220fdfd397b7d69b2cd) )
+	ROM_LOAD16_BYTE( "4e.e7", 0x0c0001, 0x20000, CRC(384c0635) SHA1(4b9332d8b91426c17a2b2a58633dc6dde526284d) )
 
 	ROM_REGION( 0x100000, "slave", 0 ) /* v30 sub cpu */
 	ROM_LOAD16_BYTE( "5.p8", 0x0e0000, 0x10000, CRC(883d319c) SHA1(b0df05bfe342a5289a6368be26317fa879975463) )
@@ -653,9 +653,9 @@ ROM_END
 
 /* Game Drivers */
 
-GAME( 1989, dynduke,  0,       dynduke, dynduke, driver_device, 0, ROT0, "Seibu Kaihatsu",                  "Dynamite Duke (Europe set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, dyndukea, dynduke, dynduke, dynduke, driver_device, 0, ROT0, "Seibu Kaihatsu",                  "Dynamite Duke (Europe set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, dyndukej, dynduke, dynduke, dynduke, driver_device, 0, ROT0, "Seibu Kaihatsu",                  "Dynamite Duke (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, dyndukeu, dynduke, dynduke, dynduke, driver_device, 0, ROT0, "Seibu Kaihatsu (Fabtek license)", "Dynamite Duke (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, dbldynj,  0,       dbldyn,  dynduke, driver_device, 0, ROT0, "Seibu Kaihatsu",                  "The Double Dynamites (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, dbldynu,  dbldynj, dynduke, dynduke, driver_device, 0, ROT0, "Seibu Kaihatsu (Fabtek license)", "The Double Dynamites (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dynduke,  0,       dynduke, dynduke, driver_device, 0, ROT0, "Seibu Kaihatsu",                  "Dynamite Duke (Europe set 1 03SEP89)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dyndukea, dynduke, dynduke, dynduke, driver_device, 0, ROT0, "Seibu Kaihatsu",                  "Dynamite Duke (Europe set 2 25JUL89)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dyndukej, dynduke, dynduke, dynduke, driver_device, 0, ROT0, "Seibu Kaihatsu",                  "Dynamite Duke (Japan 03SEP89)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dyndukeu, dynduke, dynduke, dynduke, driver_device, 0, ROT0, "Seibu Kaihatsu (Fabtek license)", "Dynamite Duke (US 25JUL89)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dbldynj,  0,       dbldyn,  dynduke, driver_device, 0, ROT0, "Seibu Kaihatsu",                  "The Double Dynamites (Japan 13NOV89)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dbldynu,  dbldynj, dynduke, dynduke, driver_device, 0, ROT0, "Seibu Kaihatsu (Fabtek license)", "The Double Dynamites (US 13NOV89)", MACHINE_SUPPORTS_SAVE )
