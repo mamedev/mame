@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Philip Bennett
+// copyright-holders:Philip Bennett, Dirk Best
 /***************************************************************************
 
     JPM Give us a Break hardware
@@ -23,6 +23,11 @@
         security PAL - maybe this is related? I'm poking the coin values
         directly into RAM for now.
         * Verify WD FDC type
+        * Are IRQs 1 or 2 connected to something?
+        * Hook up ACIA (IRQ 4)
+        * Hook up watchdog NMI
+        * Verify clocks
+        * Use real video timings
 
 ***************************************************************************/
 
@@ -35,24 +40,7 @@
 #include "machine/wd_fdc.h"
 #include "formats/guab_dsk.h"
 #include "softlist.h"
-
-/*************************************
- *
- *  Defines
- *
- *************************************/
-
-
-enum int_levels
-{
-	INT_UNKNOWN1     = 1,
-	INT_UNKNOWN2     = 2,
-	INT_6840PTM      = 3,
-	INT_6850ACIA     = 4,
-	INT_TMS34061     = 5,
-	INT_FLOPPYCTRL   = 6,
-	INT_WATCHDOG_INT = 7
-};
+#include "guab.lh"
 
 
 class guab_state : public driver_device
@@ -67,16 +55,23 @@ public:
 		m_floppy(*this, "fdc:0"),
 		m_palette(*this, "palette") { }
 
-
 	EF9369_COLOR_UPDATE(ef9369_color_update);
-	DECLARE_WRITE_LINE_MEMBER(generate_tms34061_interrupt);
-	DECLARE_WRITE16_MEMBER(guab_tms34061_w);
-	DECLARE_READ16_MEMBER(guab_tms34061_r);
-	DECLARE_READ16_MEMBER(io_r);
-	DECLARE_WRITE16_MEMBER(io_w);
-	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
-	DECLARE_WRITE_LINE_MEMBER(ptm_irq);
+	DECLARE_WRITE16_MEMBER(tms34061_w);
+	DECLARE_READ16_MEMBER(tms34061_r);
 	uint32_t screen_update_guab(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	DECLARE_WRITE8_MEMBER(output1_w);
+	DECLARE_WRITE8_MEMBER(output2_w);
+	DECLARE_WRITE8_MEMBER(output3_w);
+	DECLARE_WRITE8_MEMBER(output4_w);
+	DECLARE_WRITE8_MEMBER(output5_w);
+	DECLARE_WRITE8_MEMBER(output6_w);
+	DECLARE_READ8_MEMBER(sn76489_ready_r);
+	DECLARE_WRITE8_MEMBER(floppy_ctrl_w);
+	DECLARE_WRITE8_MEMBER(watchdog_w);
+	DECLARE_WRITE8_MEMBER(unknown_w);
+
+	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
 	DECLARE_FLOPPY_FORMATS(floppy_formats);
 
@@ -95,17 +90,6 @@ private:
 
 /*************************************
  *
- *  6840 PTM
- *
- *************************************/
-
-WRITE_LINE_MEMBER(guab_state::ptm_irq)
-{
-	m_maincpu->set_input_line(INT_6840PTM, state);
-}
-
-/*************************************
- *
  *  Video hardware
  *
  *************************************/
@@ -115,16 +99,7 @@ EF9369_COLOR_UPDATE( guab_state::ef9369_color_update )
 	m_palette->set_pen_color(entry, pal4bit(ca), pal4bit(cb), pal4bit(cc));
 }
 
-/*****************
- * TMS34061 CRTC
- *****************/
-
-WRITE_LINE_MEMBER(guab_state::generate_tms34061_interrupt)
-{
-	m_maincpu->set_input_line(INT_TMS34061, state);
-}
-
-WRITE16_MEMBER(guab_state::guab_tms34061_w)
+WRITE16_MEMBER( guab_state::tms34061_w )
 {
 	int func = (offset >> 19) & 3;
 	int row = (offset >> 7) & 0xff;
@@ -142,8 +117,7 @@ WRITE16_MEMBER(guab_state::guab_tms34061_w)
 		m_tms34061->write(space, col | 1, row, func, data & 0xff);
 }
 
-
-READ16_MEMBER(guab_state::guab_tms34061_r)
+READ16_MEMBER( guab_state::tms34061_r )
 {
 	uint16_t data = 0;
 	int func = (offset >> 19) & 3;
@@ -163,7 +137,6 @@ READ16_MEMBER(guab_state::guab_tms34061_r)
 
 	return data;
 }
-
 
 uint32_t guab_state::screen_update_guab(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -197,36 +170,11 @@ uint32_t guab_state::screen_update_guab(screen_device &screen, bitmap_ind16 &bit
 }
 
 
-/****************************************
+/*************************************
  *
- *  Hardware inputs (coins, buttons etc)
+ *  I/O
  *
- ****************************************/
-
-READ16_MEMBER(guab_state::io_r)
-{
-	static const char *const portnames[] = { "IN0", "IN1", "IN2" };
-
-	switch (offset)
-	{
-		case 0x00:
-		case 0x01:
-		case 0x02:
-		{
-			return ioport(portnames[offset])->read();
-		}
-		case 0x30:
-		{
-			/* Whatever it is, bit 7 must be 0 */
-			return 0x7f;
-		}
-		default:
-		{
-			osd_printf_debug("Unknown IO R:0x%x\n", 0xc0000 + (offset * 2));
-			return 0;
-		}
-	}
-}
+ *************************************/
 
 INPUT_CHANGED_MEMBER(guab_state::coin_inserted)
 {
@@ -241,75 +189,106 @@ INPUT_CHANGED_MEMBER(guab_state::coin_inserted)
 	}
 }
 
-/****************************************
- *
- *  Hardware outputs (lamps, meters etc)
- *
- ****************************************/
-
-WRITE16_MEMBER(guab_state::io_w)
+WRITE8_MEMBER( guab_state::output1_w )
 {
-	switch (offset)
-	{
-		case 0x10:
-		{
-			/* Outputs 0 - 7 */
-			break;
-		}
-		case 0x11:
-		{
-			/* Outputs 8 - 15 */
-			break;
-		}
-		case 0x12:
-		{
-			/* Outputs 16 - 23 */
-			break;
-		}
-		case 0x20:
-		{
-			/* Outputs 24 - 31 */
-			break;
-		}
-		case 0x21:
-		{
-			/* Outputs 32 - 39 */
-			break;
-		}
-		case 0x22:
-		{
-			/* Outputs 40 - 47 */
-			break;
-		}
-		case 0x30:
-		{
-			m_sn->write(space, 0, data & 0xff);
-			break;
-		}
-		case 0x31:
-		{
-			/* Only JPM knows about the other bits... */
-			m_floppy->get_device()->ss_w(BIT(data, 3));
+	output().set_value("led_0", BIT(data, 0));
+	output().set_value("led_1", BIT(data, 1));
+	output().set_value("led_2", BIT(data, 2));
+	output().set_value("led_3", BIT(data, 3));
+	output().set_value("led_4", BIT(data, 4));
+	output().set_value("led_5", BIT(data, 5));
+	output().set_value("led_6", BIT(data, 6));
+	output().set_value("led_7", BIT(data, 7));
+}
 
-			// one of those bits will probably control the motor, we just let it run all the time for now
-			m_floppy->get_device()->mon_w(0);
-			break;
-		}
-		case 0x32:
-		{
-			/* Watchdog? */
-			break;
-		}
-		case 0x33:
-		{
-			/* Dunno */
-			break;
-		}
-		default:
-		{
-			osd_printf_debug("Unknown IO W:0x%x with %x\n", 0xc0000 + (offset * 2), data);
-		}
-	}
+WRITE8_MEMBER( guab_state::output2_w )
+{
+	output().set_value("led_8", BIT(data, 0));
+	output().set_value("led_9", BIT(data, 1));
+	output().set_value("led_10", BIT(data, 2));
+	output().set_value("led_11", BIT(data, 3));
+	output().set_value("led_12", BIT(data, 4));
+	output().set_value("led_13", BIT(data, 5));
+	output().set_value("led_14", BIT(data, 6));
+	output().set_value("led_15", BIT(data, 7));
+}
+
+WRITE8_MEMBER( guab_state::output3_w )
+{
+	output().set_value("led_16", BIT(data, 0));
+	output().set_value("led_17", BIT(data, 1));
+	output().set_value("led_18", BIT(data, 2));
+	output().set_value("led_19", BIT(data, 3));
+	output().set_value("led_20", BIT(data, 4));
+	output().set_value("led_21", BIT(data, 5));
+	output().set_value("led_22", BIT(data, 6));
+	output().set_value("led_23", BIT(data, 7));
+}
+
+WRITE8_MEMBER( guab_state::output4_w )
+{
+	output().set_value("led_24", BIT(data, 0));
+	output().set_value("led_25", BIT(data, 1));
+	output().set_value("led_26", BIT(data, 2));
+	output().set_value("led_27", BIT(data, 3));
+	output().set_value("led_28", BIT(data, 4));
+	output().set_value("led_29", BIT(data, 5));
+	output().set_value("led_30", BIT(data, 6));
+	output().set_value("led_31", BIT(data, 7));
+}
+
+WRITE8_MEMBER( guab_state::output5_w )
+{
+	output().set_value("led_32", BIT(data, 0));
+	output().set_value("led_33", BIT(data, 1));
+	output().set_value("led_34", BIT(data, 2));
+	output().set_value("led_35", BIT(data, 3));
+	output().set_value("led_36", BIT(data, 4));
+	output().set_value("led_37", BIT(data, 5));
+	output().set_value("led_38", BIT(data, 6));
+	output().set_value("led_39", BIT(data, 7));
+}
+
+WRITE8_MEMBER( guab_state::output6_w )
+{
+	output().set_value("led_40", BIT(data, 0));
+	output().set_value("led_41", BIT(data, 1));
+	output().set_value("led_42", BIT(data, 2));
+	output().set_value("led_43", BIT(data, 3));
+	output().set_value("led_44", BIT(data, 4));
+	output().set_value("led_45", BIT(data, 5));
+	output().set_value("led_46", BIT(data, 6));
+	output().set_value("led_47", BIT(data, 7));
+}
+
+READ8_MEMBER( guab_state::sn76489_ready_r )
+{
+	// bit 7 connected to sn76489 ready output (0 = ready)
+	return ~(m_sn->ready_r() << 7);
+}
+
+WRITE8_MEMBER( guab_state::floppy_ctrl_w )
+{
+	m_floppy->get_device()->ss_w(BIT(data, 3));
+
+	// one of those bits will probably control the motor, we just let it run all the time for now
+	m_floppy->get_device()->mon_w(0);
+}
+
+WRITE8_MEMBER( guab_state::watchdog_w )
+{
+	// nibbles only
+	// reads from the port, then writes the sequence
+	// b 3 1 5 d a 2 0 4 0 8   b 3 1 5 d a 2 0 4 0 8
+	// this continues 10 times, after that it just
+	// continues writing f to it
+}
+
+WRITE8_MEMBER( guab_state::unknown_w )
+{
+	// unknown
+	// at startup, 0x88 or 0x98 is written here
+	// while the game is running only 0x88
 }
 
 
@@ -322,15 +301,27 @@ WRITE16_MEMBER(guab_state::io_w)
 static ADDRESS_MAP_START( guab_map, AS_PROGRAM, 16, guab_state )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x040000, 0x04ffff) AM_ROM AM_REGION("maincpu", 0x10000)
-	AM_RANGE(0x0c0000, 0x0c007f) AM_READWRITE(io_r, io_w)
-	AM_RANGE(0x0c0080, 0x0c0083) AM_NOP /* ACIA 1 */
-	AM_RANGE(0x0c00a0, 0x0c00a3) AM_NOP /* ACIA 2 */
-	AM_RANGE(0x0c00c0, 0x0c00cf) AM_DEVREADWRITE8("6840ptm", ptm6840_device, read, write, 0xff)
+	AM_RANGE(0x0c0000, 0x0c0001) AM_READ_PORT("IN0")
+	AM_RANGE(0x0c0002, 0x0c0003) AM_READ_PORT("IN1")
+	AM_RANGE(0x0c0004, 0x0c0005) AM_READ_PORT("IN2")
+	AM_RANGE(0x0c0020, 0x0c0021) AM_WRITE8(output1_w, 0x00ff)
+	AM_RANGE(0x0c0022, 0x0c0023) AM_WRITE8(output2_w, 0x00ff)
+	AM_RANGE(0x0c0024, 0x0c0025) AM_WRITE8(output3_w, 0x00ff)
+	AM_RANGE(0x0c0040, 0x0c0041) AM_WRITE8(output4_w, 0x00ff)
+	AM_RANGE(0x0c0042, 0x0c0043) AM_WRITE8(output5_w, 0x00ff)
+	AM_RANGE(0x0c0044, 0x0c0045) AM_WRITE8(output6_w, 0x00ff)
+	AM_RANGE(0x0c0060, 0x0c0061) AM_READ8(sn76489_ready_r, 0x00ff) AM_DEVWRITE8("snsnd", sn76489_device, write, 0x00ff)
+	AM_RANGE(0x0c0062, 0x0c0063) AM_WRITE8(floppy_ctrl_w, 0x00ff)
+	AM_RANGE(0x0c0064, 0x0c0065) AM_WRITE8(watchdog_w, 0x00ff)
+	AM_RANGE(0x0c0066, 0x0c0067) AM_WRITE8(unknown_w, 0x00ff)
+//	AM_RANGE(0x0c0080, 0x0c0083) AM_NOP /* ACIA 1 */
+//	AM_RANGE(0x0c00a0, 0x0c00a3) AM_NOP /* ACIA 2 */
+	AM_RANGE(0x0c00c0, 0x0c00cf) AM_DEVREADWRITE8("6840ptm", ptm6840_device, read, write, 0x00ff)
 	AM_RANGE(0x0c00e0, 0x0c00e7) AM_DEVREADWRITE8("fdc", wd1773_t, read, write, 0x00ff)
 	AM_RANGE(0x080000, 0x080fff) AM_RAM
 	AM_RANGE(0x100000, 0x100001) AM_DEVREADWRITE8("ef9369", ef9369_device, data_r, data_w, 0x00ff)
 	AM_RANGE(0x100002, 0x100003) AM_DEVWRITE8("ef9369", ef9369_device, address_w, 0x00ff)
-	AM_RANGE(0x800000, 0xb0ffff) AM_READWRITE(guab_tms34061_r, guab_tms34061_w)
+	AM_RANGE(0x800000, 0xb0ffff) AM_READWRITE(tms34061_r, tms34061_w)
 	AM_RANGE(0xb10000, 0xb1ffff) AM_RAM
 	AM_RANGE(0xb80000, 0xb8ffff) AM_RAM
 	AM_RANGE(0xb90000, 0xb9ffff) AM_RAM
@@ -448,8 +439,8 @@ static MACHINE_CONFIG_START( guab, guab_state )
 
 	MCFG_DEVICE_ADD("tms34061", TMS34061, 0)
 	MCFG_TMS34061_ROWSHIFT(8)  /* VRAM address is (row << rowshift) | col */
-	MCFG_TMS34061_VRAM_SIZE(0x40000) /* size of video RAM */
-	MCFG_TMS34061_INTERRUPT_CB(WRITELINE(guab_state, generate_tms34061_interrupt))      /* interrupt gen callback */
+	MCFG_TMS34061_VRAM_SIZE(0x40000)
+	MCFG_TMS34061_INTERRUPT_CB(INPUTLINE("maincpu", 5))
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
@@ -461,16 +452,18 @@ static MACHINE_CONFIG_START( guab, guab_state )
 	MCFG_DEVICE_ADD("6840ptm", PTM6840, 0)
 	MCFG_PTM6840_INTERNAL_CLOCK(1000000)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_IRQ_CB(WRITELINE(guab_state, ptm_irq))
+	MCFG_PTM6840_IRQ_CB(INPUTLINE("maincpu", 3))
 
 	// floppy
 	MCFG_WD1773_ADD("fdc", 8000000)
-	MCFG_WD_FDC_DRQ_CALLBACK(INPUTLINE("maincpu", INT_FLOPPYCTRL))
+	MCFG_WD_FDC_DRQ_CALLBACK(INPUTLINE("maincpu", 6))
 
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", guab_floppies, "dd", guab_state::floppy_formats)
 	MCFG_SLOT_FIXED(true)
 
 	MCFG_SOFTWARE_LIST_ADD("floppy_list", "guab")
+
+	MCFG_DEFAULT_LAYOUT(layout_guab)
 MACHINE_CONFIG_END
 
 
